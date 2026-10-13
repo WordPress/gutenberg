@@ -155,9 +155,53 @@ class Tests_View_Config_API extends WP_UnitTestCase {
 	 */
 	public function data_post_types_with_own_form() {
 		return array(
+			'attachment'       => array( 'attachment' ),
 			'wp_block'         => array( 'wp_block' ),
 			'wp_template'      => array( 'wp_template' ),
 			'wp_template_part' => array( 'wp_template_part' ),
+		);
+	}
+
+	/**
+	 * The `attachment` post type provides the form of the media editor: the
+	 * editable fields in a regular layout, then the rest in panels.
+	 */
+	public function test_attachment_form() {
+		$config = gutenberg_get_entity_view_config( 'postType', 'attachment' );
+
+		$this->assertSame( array( 'type' => 'panel' ), $config['form']['layout'] );
+
+		$regular_layout = array(
+			'type'          => 'regular',
+			'labelPosition' => 'top',
+		);
+		$this->assertSame(
+			array(
+				array(
+					'id'     => 'title',
+					'layout' => $regular_layout,
+				),
+				array(
+					'id'     => 'alt_text',
+					'layout' => $regular_layout,
+				),
+				array(
+					'id'     => 'caption',
+					'layout' => $regular_layout,
+				),
+				array(
+					'id'     => 'description',
+					'layout' => $regular_layout,
+				),
+				'date',
+				'author',
+				'filename',
+				'mime_type',
+				'filesize',
+				'media_dimensions',
+				'attached_to',
+			),
+			$config['form']['fields']
 		);
 	}
 

@@ -10,7 +10,8 @@
 @use "./components/collaborators-presence/avatar/styles.scss" as *;
 @use "./components/collaborators-presence/avatar-group/styles.scss" as *;
 @use "./components/collaborators-presence/styles/collaborators-list.scss" as *;
-@use "./components/collaborators-presence/styles/collaborators-presence.scss" as *;
+@use "./components/collaborators-presence/styles/collaborators-presence.scss"
+	as *;
 @use "./components/collapsible-block-toolbar/style.scss" as *;
 @use "./components/block-visibility/style.scss" as *;
 @use "./components/blog-title/style.scss" as *;
@@ -72,5 +73,4 @@
 @use "./components/text-editor/style.scss" as *;
 @use "./components/upload-progress-snackbar/style.scss" as *;
 @use "./components/visual-editor/style.scss" as *;
-@use "./dataviews/fields/content-preview/style.scss" as *;
 @use "./hooks/push-changes-to-global-styles/style.scss" as *;

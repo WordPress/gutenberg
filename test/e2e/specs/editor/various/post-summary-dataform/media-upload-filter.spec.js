@@ -43,9 +43,7 @@ test.describe( 'Featured image media upload filter (DataForm inspector)', () => 
 		await requestUtils.setGutenbergExperiments( EXPERIMENTS );
 		await admin.createNewPost();
 		await editor.openDocumentSettingsSidebar();
-		const marker = page.locator(
-			'.fields__media-edit .e2e-media-upload-filter'
-		);
+		const marker = page.locator( '.media-edit .e2e-media-upload-filter' );
 		await expect( marker ).toHaveAttribute(
 			'data-featured-image-flow',
 			'true'

@@ -1560,9 +1560,11 @@ _Parameters_
 
 ### registerEntityField
 
-Registers a new DataViews field.
+> **Deprecated** since Gutenberg 24.2. Register the field in PHP on the `wp_fields_api_init` action instead, with a script module for its JavaScript parts.
 
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+Has no effect: every field of an entity is registered on the server.
+
+Register the field in PHP on the `wp_fields_api_init` action instead, with a script module for the parts PHP cannot serialize (`render`, `Edit`, `getElements`…).
 
 _Parameters_
 
@@ -1667,9 +1669,11 @@ _Parameters_
 
 ### unregisterEntityField
 
-Unregisters a DataViews field.
+> **Deprecated** since Gutenberg 24.2. Unregister the field in PHP on the `wp_fields_api_init` action instead.
 
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+Has no effect: every field of an entity is registered on the server.
+
+Unregister the field in PHP on the `wp_fields_api_init` action instead.
 
 _Parameters_
 

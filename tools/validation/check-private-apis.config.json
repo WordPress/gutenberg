@@ -32,14 +32,19 @@
 			"via": "packages/fields/src/lock-unlock.ts"
 		},
 		{
-			"comment": "Unlocks private APIs of @wordpress/media-utils (see its media-edit component). Remove when the unlocked surface goes public.",
+			"comment": "Depends on @wordpress/media-utils, whose media-upload-modal unlocks the private core-data APIs. Remove when that surface goes public.",
 			"package": "fields",
-			"via": "packages/media-utils/src/private-apis.ts"
+			"via": "packages/media-utils/src/lock-unlock.ts"
 		},
 		{
 			"comment": "Depends on @wordpress/api-fetch, whose internals unlock private APIs. Remove when api-fetch no longer does.",
 			"package": "fields",
 			"via": "packages/api-fetch/src/index.ts"
+		},
+		{
+			"comment": "Depends on @wordpress/core-data, whose internals unlock private APIs across api-fetch, sync, blocks, block-editor, and global-styles-engine. Remove when the core-data dependency is dropped or those internals stop using private APIs.",
+			"package": "fields-loader",
+			"via": "packages/core-data/src/index.js"
 		},
 		{
 			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",

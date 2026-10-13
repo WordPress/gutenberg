@@ -1,5 +1,5 @@
 import { createContext, useContext } from '@wordpress/element';
-import type { Field } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';
 
 /**
@@ -23,6 +23,7 @@ export interface MediaEditorContextValue {
 	media?: Media;
 	onChange?: ( updates: Partial< Media > ) => void;
 	fields: Field< Media >[];
+	form?: Form;
 }
 
 /**
@@ -41,6 +42,11 @@ export interface MediaEditorProviderProps {
 	/** Configuration settings for the media editor. */
 	settings?: {
 		fields?: Field< Media >[];
+		/**
+		 * The form the fields are laid out with. When omitted, the form
+		 * falls back to a default layout of the core attachment fields.
+		 */
+		form?: Form;
 	};
 	/** Child components. */
 	children: ReactNode;
@@ -60,6 +66,7 @@ export function MediaEditorProvider( {
 		media: value,
 		onChange,
 		fields: settings.fields || [],
+		form: settings.form,
 	};
 
 	return (

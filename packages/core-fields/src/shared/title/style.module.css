@@ -1,0 +1,18 @@
+.title > span:first-child {
+	text-overflow: ellipsis;
+	overflow: hidden;
+	text-decoration: none;
+	white-space: nowrap;
+	display: block;
+	flex-grow: 0;
+}
+
+/*
+ * The pattern title fills the row, so that the lock icon beside it sits at the
+ * end. It repeats the rule of `@wordpress/fields`, which this module would
+ * otherwise outrank: the two set `flex-grow` at the same specificity, and the
+ * module's stylesheet is the one loaded last.
+ */
+.pattern-title > span:first-child {
+	flex: 1;
+}

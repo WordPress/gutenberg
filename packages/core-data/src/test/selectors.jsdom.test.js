@@ -20,6 +20,7 @@ import {
 	hasRevision,
 	hasUndo,
 	hasRedo,
+	getFieldsConfig,
 } from '../selectors';
 import { getEntitySyncManager } from '../entity-sync';
 
@@ -1546,5 +1547,23 @@ describe( 'hasRevision', () => {
 				_fields: [ 'id', 'title.raw' ],
 			} )
 		).toBe( false );
+	} );
+} );
+
+describe( 'getFieldsConfig', () => {
+	it( 'returns undefined until the fields of the entity are received', () => {
+		const state = deepFreeze( { fieldsConfigs: {} } );
+
+		expect( getFieldsConfig( state, 'postType', 'page' ) ).toBeUndefined();
+	} );
+
+	it( 'returns the received fields of the entity', () => {
+		const config = { kind: 'postType', name: 'page', fields: [] };
+		const state = deepFreeze( {
+			fieldsConfigs: { postType: { page: config } },
+		} );
+
+		expect( getFieldsConfig( state, 'postType', 'page' ) ).toBe( config );
+		expect( getFieldsConfig( state, 'postType', 'post' ) ).toBeUndefined();
 	} );
 } );

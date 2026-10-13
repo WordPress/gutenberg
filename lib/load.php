@@ -101,6 +101,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-wp-fields-registry.php';
 	require __DIR__ . '/compat/wordpress-7.2/fields-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/preload.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-fields-controller-7-2.php';
 
 	// Real-time collaboration.
@@ -202,6 +203,9 @@ if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
 	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-processor-gutenberg.php';
 	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-gutenberg.php';
 	require_once __DIR__ . '/../build/scripts/style-engine/style-engine-gutenberg.php';
+}
+if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
+	require_once __DIR__ . '/../build/scripts/core-fields/index.php';
 }
 
 // Block supports overrides.

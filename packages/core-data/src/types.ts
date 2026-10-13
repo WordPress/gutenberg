@@ -200,3 +200,21 @@ export interface ResolvedSelection {
 	// Set to `null` for WholeBlock selections.
 	attributeKey: string | null;
 }
+
+/**
+ * The fields registered on the server for an entity, as returned by the
+ * `/wp/v2/fields` route.
+ */
+export interface FieldsConfig {
+	kind: string;
+	name: string;
+	/**
+	 * The serializable part of each field, in registration order.
+	 */
+	fields: Array< { id: string } & Record< string, any > >;
+	/**
+	 * The script modules providing the JavaScript parts of the fields, in
+	 * registration order, with the ids of the fields each provides.
+	 */
+	script_modules: Array< { id: string; fields: string[] } >;
+}

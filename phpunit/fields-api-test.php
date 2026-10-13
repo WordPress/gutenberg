@@ -10,6 +10,8 @@
  * @covers ::wp_unregister_fields
  * @covers ::wp_register_field_collection
  * @covers ::gutenberg_override_wp_fields_registry
+ * @covers ::gutenberg_register_core_post_type_supports_fields
+ * @covers ::gutenberg_register_core_field_collections
  * @covers WP_Fields_Registry::initialize
  * @covers WP_Fields_Registry::register
  * @covers WP_Fields_Registry::unregister
@@ -21,12 +23,36 @@
 class Tests_Fields_API extends WP_UnitTestCase {
 
 	/**
+	 * The ids of the default fields every post type gets, whatever it
+	 * supports, but for the design post types, which exclude some of them.
+	 *
+	 * @var string[]
+	 */
+	const EVERY_POST_TYPE_FIELDS = array( 'date', 'last_edited_date', 'password', 'scheduled_date', 'status', 'template' );
+
+	/**
+	 * The ids of the default fields the design post types exclude: those
+	 * about publishing a post, and the template that renders it.
+	 *
+	 * @var string[]
+	 */
+	const DESIGN_EXCLUDED_FIELDS = array( 'date', 'password', 'scheduled_date', 'slug', 'status', 'template' );
+
+	/**
 	 * The callbacks a test hooked to `wp_fields_api_init`, as callback and
 	 * priority pairs, removed on tear down.
 	 *
 	 * @var array[]
 	 */
 	private $callbacks = array();
+
+	/**
+	 * Whether a test unhooked the loader of the core collections, hooked
+	 * back on tear down.
+	 *
+	 * @var bool
+	 */
+	private $core_collections_unhooked = false;
 
 	/**
 	 * The post types a test registered, unregistered on tear down.
@@ -36,17 +62,6 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	private $post_types = array();
 
 	/**
-	 * Sets up each test: the default fields are hooked at priority 0, as
-	 * WordPress registers its own, so every test runs against a registry
-	 * holding fields registered before the callbacks hooked at the default
-	 * priority run.
-	 */
-	public function set_up() {
-		parent::set_up();
-		add_action( 'wp_fields_api_init', array( __CLASS__, 'register_default_fields' ), 0 );
-	}
-
-	/**
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the fields a test registered along with
@@ -54,11 +69,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 * registers the defaults anew.
 	 */
 	public function tear_down() {
-		remove_action( 'wp_fields_api_init', array( __CLASS__, 'register_default_fields' ), 0 );
 		foreach ( $this->callbacks as list( $callback, $priority ) ) {
 			remove_action( 'wp_fields_api_init', $callback, $priority );
 		}
 		$this->callbacks = array();
+		if ( $this->core_collections_unhooked ) {
+			add_action( 'wp_fields_api_init', 'gutenberg_register_core_field_collections', 0 );
+			$this->core_collections_unhooked = false;
+		}
 		foreach ( $this->post_types as $post_type ) {
 			unregister_post_type( $post_type );
 		}
@@ -66,31 +84,6 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		self::reset_registry();
 
 		parent::tear_down();
-	}
-
-	/**
-	 * Registers the default fields of the tests, with the `core` origin: the
-	 * author and comment status fields of pages, with a script module.
-	 */
-	public static function register_default_fields() {
-		wp_register_fields(
-			'core',
-			'postType',
-			'page',
-			array(
-				array(
-					'id'    => 'author',
-					'type'  => 'integer',
-					'label' => 'Author',
-				),
-				array(
-					'id'    => 'comment_status',
-					'type'  => 'text',
-					'label' => 'Comment status',
-				),
-			),
-			'core/defaults'
-		);
 	}
 
 	/**
@@ -183,8 +176,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Registers the fields of fixture collections at priority 0, as the
-	 * core collections are, for the duration of the test.
+	 * Registers the fields of fixture collections instead of the core
+	 * collections, for the duration of the test: the loader of the core
+	 * collections is unhooked, then hooked back on tear down.
 	 *
 	 * @param string   $fixture     The folder of the collections, in
 	 *                              data/core-fields/collections.
@@ -193,6 +187,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 *                each collection, keyed by collection.
 	 */
 	private function register_fixture_collections( $fixture, $collections ) {
+		remove_action( 'wp_fields_api_init', 'gutenberg_register_core_field_collections', 0 );
+		$this->core_collections_unhooked = true;
+
 		$directory = __DIR__ . '/data/core-fields/collections/' . $fixture;
 		$results   = array();
 		$this->on_fields_api_init(
@@ -225,6 +222,27 @@ class Tests_Fields_API extends WP_UnitTestCase {
 				)
 			);
 		}
+	}
+
+	/**
+	 * The ids of the fields registered on a post type, but for the defaults
+	 * every post type gets, see EVERY_POST_TYPE_FIELDS.
+	 *
+	 * @param string $post_type The post type.
+	 * @return string[] The ids, in registration order.
+	 */
+	private static function get_support_field_ids( $post_type ) {
+		return self::without_every_post_type_fields( array_column( wp_get_registered_fields( 'postType', $post_type ), 'id' ) );
+	}
+
+	/**
+	 * Removes the defaults every post type gets from a list of field ids.
+	 *
+	 * @param string[] $ids The field ids.
+	 * @return string[] The ids, but for those of EVERY_POST_TYPE_FIELDS.
+	 */
+	private static function without_every_post_type_fields( $ids ) {
+		return array_values( array_diff( $ids, self::EVERY_POST_TYPE_FIELDS ) );
 	}
 
 	/**
@@ -394,6 +412,27 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The script module of the default post fields is declared by default,
+	 * since the author field of every post type supporting authors ships its
+	 * JavaScript parts in it.
+	 */
+	public function test_the_default_fields_module_is_a_dependency_of_the_editor_script() {
+		$scripts = new WP_Scripts();
+		$scripts->add( 'wp-editor', '/editor.js' );
+		$scripts->enqueue( 'wp-editor' );
+		$scripts->add_data( 'wp-editor', 'module_dependencies', array() );
+		_wp_add_field_modules_to_editor_script( $scripts );
+
+		$this->assertContains(
+			array(
+				'id'     => '@wordpress/core-fields/post_type_supports',
+				'import' => 'dynamic',
+			),
+			$scripts->get_data( 'wp-editor', 'module_dependencies' )
+		);
+	}
+
+	/**
 	 * The script modules of the fields reach the import map of a page that
 	 * loads the editor script.
 	 */
@@ -426,6 +465,220 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Any post type supporting authors, comments, or notes, including a
+	 * custom one, gets the default fields: the defaults derive from the post
+	 * types registered when the action fires.
+	 */
+	public function test_a_custom_post_type_gets_the_default_fields_of_its_supports() {
+		register_post_type(
+			'gutenberg_book',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array(
+					'title',
+					'author',
+					'comments',
+					'editor' => array( 'notes' => true ),
+				),
+			)
+		);
+
+		try {
+			self::reset_registry();
+			$fields  = wp_get_registered_fields( 'postType', 'gutenberg_book' );
+			$modules = wp_get_registered_field_modules( 'postType', 'gutenberg_book' );
+		} finally {
+			unregister_post_type( 'gutenberg_book' );
+		}
+
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info', 'title' ), self::without_every_post_type_fields( array_column( $fields, 'id' ) ) );
+		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( $fields, 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
+		$this->assertSame(
+			array( '@wordpress/core-fields/post_type_supports' => array_column( $fields, 'id' ) ),
+			$modules,
+			'Every default field is registered with the module of its folder.'
+		);
+	}
+
+	/**
+	 * The notes field follows the `notes` argument of the `editor` support,
+	 * which WordPress stores as a list of argument arrays; a bare `editor`
+	 * support does not enable it.
+	 */
+	public function test_the_notes_field_follows_the_editor_support_argument() {
+		register_post_type(
+			'gutenberg_book',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'editor' => array( 'notes' => true ) ),
+			)
+		);
+		register_post_type(
+			'gutenberg_note',
+			array(
+				'show_in_rest' => true,
+				'supports'     => array( 'editor' ),
+			)
+		);
+
+		try {
+			self::reset_registry();
+			$with_notes    = array_column( wp_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' );
+			$without_notes = array_column( wp_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' );
+		} finally {
+			unregister_post_type( 'gutenberg_book' );
+			unregister_post_type( 'gutenberg_note' );
+		}
+
+		$this->assertContains( 'notesCount', $with_notes );
+		$this->assertNotContains( 'notesCount', $without_notes );
+	}
+
+	/**
+	 * The defaults derived from a single support, each with the supports
+	 * that give it to a post type.
+	 *
+	 * @return array[] The id of each field and the supports that give it.
+	 */
+	public function data_default_fields_and_their_supports() {
+		return array(
+			'discussion'        => array( 'discussion', array( 'comments', 'trackbacks' ) ),
+			'excerpt'           => array( 'excerpt', array( 'excerpt' ) ),
+			'parent'            => array( 'parent', array( 'page-attributes' ) ),
+			'ping_status'       => array( 'ping_status', array( 'trackbacks' ) ),
+			'title'             => array( 'title', array( 'title' ) ),
+			'post-content-info' => array( 'post-content-info', array( 'editor' ) ),
+		);
+	}
+
+	/**
+	 * The defaults every post type gets, whatever it supports, each with
+	 * whether the design post types exclude it.
+	 *
+	 * @return array[] The id of each field and whether the design post
+	 *                 types exclude it.
+	 */
+	public function data_default_fields_of_every_post_type() {
+		return array(
+			'date'             => array( 'date', true ),
+			'last_edited_date' => array( 'last_edited_date', false ),
+			'password'         => array( 'password', true ),
+			'scheduled_date'   => array( 'scheduled_date', true ),
+			'status'           => array( 'status', true ),
+			'template'         => array( 'template', true ),
+		);
+	}
+
+	/**
+	 * A default field of every post type is registered on a post type
+	 * supporting nothing, and on the design post types unless they exclude
+	 * it.
+	 *
+	 * @dataProvider data_default_fields_of_every_post_type
+	 *
+	 * @param string $field_id              The id of the field.
+	 * @param bool   $excluded_for_design The design post types exclude it.
+	 */
+	public function test_a_default_field_of_every_post_type( $field_id, $excluded_for_design ) {
+		$this->assertContains( $field_id, self::EVERY_POST_TYPE_FIELDS, 'The tests know the field applies to every post type.' );
+		$this->register_post_types( array( 'gutenberg_plain' => array( 'title' ) ) );
+		self::reset_registry();
+
+		$this->assertContains( $field_id, array_column( wp_get_registered_fields( 'postType', 'gutenberg_plain' ), 'id' ) );
+		foreach ( array( 'wp_template', 'wp_template_part', 'wp_block', 'wp_navigation' ) as $post_type ) {
+			$ids = array_column( wp_get_registered_fields( 'postType', $post_type ), 'id' );
+			if ( $excluded_for_design ) {
+				$this->assertNotContains( $field_id, $ids, "$post_type excludes the field." );
+			} else {
+				$this->assertContains( $field_id, $ids, "$post_type gets the field." );
+			}
+		}
+	}
+
+	/**
+	 * A default field is registered on the post types with one of its
+	 * supports, and only on them.
+	 *
+	 * @dataProvider data_default_fields_and_their_supports
+	 *
+	 * @param string   $field_id The id of the field.
+	 * @param string[] $supports The supports that give the field.
+	 */
+	public function test_a_default_field_follows_its_supports( $field_id, $supports ) {
+		$with_support = array();
+		foreach ( $supports as $index => $support ) {
+			$with_support[ "gutenberg_with_$index" ] = array( 'title', $support );
+		}
+		$this->register_post_types( $with_support + array( 'gutenberg_without' => array( 'author' ) ) );
+
+		self::reset_registry();
+
+		foreach ( array_keys( $with_support ) as $post_type ) {
+			$this->assertContains( $field_id, array_column( wp_get_registered_fields( 'postType', $post_type ), 'id' ), "$post_type gets the field." );
+		}
+		$this->assertNotContains( $field_id, array_column( wp_get_registered_fields( 'postType', 'gutenberg_without' ), 'id' ) );
+	}
+
+	/**
+	 * The build copies the collections as they are: the configurations and
+	 * the fields come out byte-identical.
+	 */
+	public function test_the_build_copies_the_collections_as_they_are() {
+		$source = __DIR__ . '/../packages/core-fields/src';
+		$build  = __DIR__ . '/../build/scripts/core-fields';
+		$files  = array_merge( glob( $source . '/*/index.php' ), glob( $source . '/*/*/field.php' ) );
+
+		$this->assertNotEmpty( $files );
+		foreach ( $files as $file ) {
+			$this->assertFileEquals( $file, $build . substr( $file, strlen( $source ) ) );
+		}
+	}
+
+	/**
+	 * The build prefixes the functions the core-fields loader defines, and
+	 * nothing else: the functions of the Fields API keep their names.
+	 */
+	public function test_the_build_prefixes_the_functions_of_the_core_fields_loader() {
+		$source = file_get_contents( __DIR__ . '/../packages/core-fields/src/index.php' );
+		$built  = file_get_contents( __DIR__ . '/../build/scripts/core-fields/index.php' );
+
+		$this->assertStringContainsString( 'function gutenberg_register_core_post_type_supports_fields()', $built );
+		$this->assertStringContainsString( 'function gutenberg_register_core_field_collections()', $built );
+		$this->assertStringContainsString( "wp_get_field_collection_fields( __DIR__ . '/post_type_supports' );", $built );
+		$this->assertStringContainsString( 'gutenberg_register_core_post_type_supports_fields();', $built );
+		$this->assertStringContainsString( "wp_register_field_collection( __DIR__ . '/wp_template' );", $built );
+		$this->assertStringContainsString( "add_action( 'wp_fields_api_init', 'gutenberg_register_core_field_collections', 0 );", $built );
+		$this->assertStringNotContainsString( 'gutenberg_register_field_collection', $built );
+		$this->assertStringNotContainsString( 'gutenberg_get_field_collection_fields', $built );
+		$this->assertSame(
+			strtr(
+				$source,
+				array(
+					'register_core_post_type_supports_fields' => 'gutenberg_register_core_post_type_supports_fields',
+					'register_core_field_collections' => 'gutenberg_register_core_field_collections',
+				)
+			),
+			$built,
+			'Only the function names change.'
+		);
+	}
+
+	/**
+	 * The default fields come from the `field.php` files of the
+	 * `post_type_supports` folder.
+	 */
+	public function test_the_default_fields_come_from_the_post_type_supports_folder() {
+		$fields = array_column( wp_get_registered_fields( 'postType', 'post' ), null, 'id' );
+		$this->assertSame( 'integer', $fields['author']['type'] );
+		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
+		$this->assertSame( 'radio', $fields['comment_status']['Edit'] );
+		$this->assertSame( 'boolean', $fields['ping_status']['type'] );
+		$this->assertSame( 'Discussion', $fields['discussion']['label'] );
+		$this->assertSame( 'textarea', $fields['excerpt']['Edit']['control'] );
+		$this->assertTrue( $fields['post-content-info']['readOnly'] );
+	}
+
+	/**
 	 * A collection lists a folder per field: the id of a field is the name
 	 * of its folder unless its `field.php` sets one, and the fields are in
 	 * the alphabetical order of their folders, keyed by id.
@@ -444,6 +697,383 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_a_missing_collection_has_no_fields() {
 		$this->assertSame( array(), wp_get_field_collection_fields( __DIR__ . '/data/core-fields/missing' ) );
+	}
+
+	/**
+	 * The core fields are registered on `wp_fields_api_init` at priority 0,
+	 * before the plugins hooking the action at the default priority.
+	 */
+	public function test_the_core_collections_are_registered_at_priority_zero() {
+		$this->assertSame( 0, has_action( 'wp_fields_api_init', 'gutenberg_register_core_field_collections' ) );
+		$this->assertFalse( function_exists( 'register_core_field_collections' ), 'The Gutenberg build prefixes the function.' );
+		$this->assertFalse( function_exists( 'register_core_post_type_supports_fields' ), 'The Gutenberg build prefixes the function.' );
+	}
+
+	/**
+	 * The defaults make no exception for any post type: on their own, they
+	 * register the author field on templates, template parts, and
+	 * attachments, which support authors.
+	 */
+	public function test_the_defaults_make_no_exception() {
+		remove_action( 'wp_fields_api_init', 'gutenberg_register_core_field_collections', 0 );
+		$this->core_collections_unhooked = true;
+		$this->on_fields_api_init( 'gutenberg_register_core_post_type_supports_fields', 0 );
+
+		foreach ( array( 'wp_template', 'wp_template_part', 'attachment' ) as $post_type ) {
+			$fields = array_column( wp_get_registered_fields( 'postType', $post_type ), null, 'id' );
+			$this->assertArrayHasKey( 'author', $fields, "The defaults register the author field on $post_type." );
+			$this->assertSame( 'integer', $fields['author']['type'] );
+		}
+	}
+
+	/**
+	 * Template parts support authors but their author is the theme, plugin,
+	 * site, or user that provides them: they opt out of the default author
+	 * field and their collection has its own, with its own script module.
+	 */
+	public function test_template_parts_get_their_own_author_field() {
+		$this->assertTrue( post_type_supports( 'wp_template_part', 'author' ), 'The post type supports authors.' );
+
+		$fields = array_column( wp_get_registered_fields( 'postType', 'wp_template_part' ), null, 'id' );
+		$this->assertSame( array( 'author', 'title' ), self::get_support_field_ids( 'wp_template_part' ), 'The fields are the ones of the collection, not the default author and title fields.' );
+		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template part author is not the integer post author.' );
+		$this->assertArrayHasKey( 'title', $fields, 'The collection registers the template part title.' );
+		$this->assertSame( 'Title', $fields['title']['label'], 'The title is the one of the collection.' );
+		$this->assertSame(
+			array( 'author', 'title' ),
+			wp_get_registered_field_modules( 'postType', 'wp_template_part' )['@wordpress/core-fields/wp_template_part']
+		);
+	}
+
+	/**
+	 * Patterns have their description, title, and sync status in their
+	 * collection instead of the default excerpt and title fields.
+	 */
+	public function test_patterns_get_their_own_fields() {
+		$fields = array_column( wp_get_registered_fields( 'postType', 'wp_block' ), null, 'id' );
+		$this->assertArrayHasKey( 'excerpt', $fields );
+		$this->assertArrayHasKey( 'sync-status', $fields );
+		$this->assertArrayHasKey( 'title', $fields );
+		$this->assertSame( 'Description', $fields['excerpt']['label'] );
+		$this->assertSame( 'Title', $fields['title']['label'] );
+		$this->assertTrue( $fields['sync-status']['readOnly'] );
+		$this->assertSame(
+			array( 'excerpt', 'sync-status', 'title' ),
+			wp_get_registered_field_modules( 'postType', 'wp_block' )['@wordpress/core-fields/wp_block']
+		);
+	}
+
+	/**
+	 * The slug field is registered on the viewable post types, which have a
+	 * permalink, but for the design ones.
+	 */
+	public function test_the_viewable_post_types_get_the_slug_field() {
+		register_post_type(
+			'gutenberg_book',
+			array(
+				'public'       => true,
+				'show_in_rest' => true,
+			)
+		);
+		register_post_type(
+			'gutenberg_note',
+			array(
+				'public'       => false,
+				'show_in_rest' => true,
+			)
+		);
+		$this->post_types[] = 'gutenberg_book';
+		$this->post_types[] = 'gutenberg_note';
+		self::reset_registry();
+
+		$this->assertContains( 'slug', array_column( wp_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+		$this->assertNotContains( 'slug', array_column( wp_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ), 'A post type that is not viewable has no permalink.' );
+		$this->assertContains( 'slug', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertNotContains( 'slug', array_column( wp_get_registered_fields( 'postType', 'wp_template' ), 'id' ) );
+	}
+
+	/**
+	 * Only posts have sticky posts, so only they get the sticky field.
+	 */
+	public function test_only_posts_get_the_sticky_field() {
+		$this->register_post_types( array( 'gutenberg_book' => array( 'title', 'editor' ) ) );
+		self::reset_registry();
+
+		$this->assertContains( 'sticky', array_column( wp_get_registered_fields( 'postType', 'post' ), 'id' ) );
+		$this->assertNotContains( 'sticky', array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' ) );
+		$this->assertNotContains( 'sticky', array_column( wp_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ) );
+	}
+
+	/**
+	 * The featured media field needs the post type to support `thumbnail`
+	 * and the theme to support post thumbnails for that post type, which a
+	 * theme may opt into for some post types only.
+	 */
+	public function test_the_featured_media_field_follows_the_post_type_support_and_the_theme() {
+		$this->register_post_types(
+			array(
+				'gutenberg_book' => array( 'title', 'thumbnail' ),
+				'gutenberg_note' => array( 'title', 'thumbnail' ),
+				'gutenberg_page' => array( 'title' ),
+			)
+		);
+		$original_support = get_theme_support( 'post-thumbnails' );
+
+		try {
+			// Naming post types only narrows the support when the theme does
+			// not already support post thumbnails for every post type.
+			remove_theme_support( 'post-thumbnails' );
+			add_theme_support( 'post-thumbnails', array( 'gutenberg_book' ) );
+			self::reset_registry();
+
+			$this->assertContains( 'featured_media', self::get_support_field_ids( 'gutenberg_book' ) );
+			$this->assertNotContains(
+				'featured_media',
+				self::get_support_field_ids( 'gutenberg_note' ),
+				'The theme did not opt the post type into post thumbnails.'
+			);
+			$this->assertNotContains(
+				'featured_media',
+				self::get_support_field_ids( 'gutenberg_page' ),
+				'The post type does not support thumbnails.'
+			);
+
+			// A theme may also opt every post type in at once.
+			remove_theme_support( 'post-thumbnails' );
+			add_theme_support( 'post-thumbnails' );
+			self::reset_registry();
+
+			$this->assertContains( 'featured_media', self::get_support_field_ids( 'gutenberg_note' ) );
+
+			remove_theme_support( 'post-thumbnails' );
+			self::reset_registry();
+
+			$this->assertNotContains(
+				'featured_media',
+				self::get_support_field_ids( 'gutenberg_book' ),
+				'A theme without post thumbnails has no featured image to set.'
+			);
+		} finally {
+			remove_theme_support( 'post-thumbnails' );
+			if ( is_array( $original_support ) ) {
+				add_theme_support( 'post-thumbnails', ...$original_support );
+			} elseif ( true === $original_support ) {
+				add_theme_support( 'post-thumbnails' );
+			}
+		}
+	}
+
+	/**
+	 * The format field needs the post type to support `post-formats` and
+	 * the theme to support post formats: a theme without formats has none
+	 * to assign. Its elements are the formats of the theme, plus
+	 * `standard`, which the themes route exposes for every theme
+	 * supporting formats, sorted by label.
+	 *
+	 * It has a test of its own rather than a row in
+	 * data_default_fields_and_their_supports(), whose fields follow a post
+	 * type support alone.
+	 */
+	public function test_the_format_field_follows_the_post_type_support_and_the_theme() {
+		$this->register_post_types(
+			array(
+				'gutenberg_book' => array( 'title', 'post-formats' ),
+				'gutenberg_note' => array( 'title' ),
+			)
+		);
+		$original_support = get_theme_support( 'post-formats' );
+
+		try {
+			add_theme_support( 'post-formats', array( 'gallery', 'aside' ) );
+			self::reset_registry();
+			$fields = array_column( wp_get_registered_fields( 'postType', 'gutenberg_book' ), null, 'id' );
+
+			$this->assertArrayHasKey( 'format', $fields );
+			$this->assertNotContains(
+				'format',
+				array_column( wp_get_registered_fields( 'postType', 'gutenberg_note' ), 'id' ),
+				'A post type that does not support post formats has no format field.'
+			);
+			$this->assertSame(
+				array( 'aside', 'gallery', 'standard' ),
+				array_column( $fields['format']['elements'], 'value' ),
+				'The elements are the formats of the theme, plus standard, sorted by label.'
+			);
+
+			remove_theme_support( 'post-formats' );
+			self::reset_registry();
+
+			$this->assertNotContains(
+				'format',
+				array_column( wp_get_registered_fields( 'postType', 'gutenberg_book' ), 'id' ),
+				'A theme without post formats has none to assign.'
+			);
+		} finally {
+			remove_theme_support( 'post-formats' );
+			if ( is_array( $original_support ) ) {
+				add_theme_support( 'post-formats', ...$original_support );
+			}
+		}
+	}
+
+	/**
+	 * Pages support titles but their title shows the page's role on the
+	 * site: they opt out of the default title field and their collection has
+	 * its own, with its own script module.
+	 */
+	public function test_pages_get_their_own_title_field() {
+		$fields  = array_column( wp_get_registered_fields( 'postType', 'page' ), null, 'id' );
+		$modules = wp_get_registered_field_modules( 'postType', 'page' );
+
+		$this->assertFalse( $fields['title']['enableHiding'], 'The page title is the one of the collection.' );
+		$this->assertSame( 'core', $fields['title']['origin']['registeredBy'] );
+		$this->assertSame( array( 'title' ), $modules['@wordpress/core-fields/page'] );
+		$this->assertNotContains( 'title', $modules['@wordpress/core-fields/post_type_supports'], 'The default title field is not registered.' );
+	}
+
+	/**
+	 * Patterns support excerpts but their excerpt is their description,
+	 * which their collection defines with a field of the same id, so they
+	 * opt out of the default excerpt field.
+	 */
+	public function test_patterns_do_not_get_the_default_excerpt_field() {
+		$this->assertTrue( post_type_supports( 'wp_block', 'excerpt' ), 'The post type supports excerpts.' );
+
+		$modules = wp_get_registered_field_modules( 'postType', 'wp_block' );
+		$this->assertContains( 'excerpt', $modules['@wordpress/core-fields/wp_block'], 'The excerpt is the description field of the collection.' );
+		$this->assertNotContains( 'excerpt', $modules['@wordpress/core-fields/post_type_supports'], 'The default excerpt field is not registered.' );
+	}
+
+	/**
+	 * Navigation menus support the editor, but their content is blocks
+	 * laying out a site rather than text to read, so they opt out of the
+	 * content information field. Patterns keep it.
+	 */
+	public function test_navigation_menus_do_not_get_the_content_information_field() {
+		$this->assertTrue( post_type_supports( 'wp_navigation', 'editor' ), 'The post type supports the editor.' );
+		$this->assertNotContains( 'post-content-info', array_column( wp_get_registered_fields( 'postType', 'wp_navigation' ), 'id' ) );
+		$this->assertContains( 'post-content-info', array_column( wp_get_registered_fields( 'postType', 'wp_block' ), 'id' ) );
+	}
+
+	/**
+	 * Templates support authors but their author is the theme, plugin, site,
+	 * or user that provides them: they opt out of the default author field
+	 * and their collection has its own, with its own script module.
+	 */
+	public function test_templates_get_their_own_author_field() {
+		$this->assertTrue( post_type_supports( 'wp_template', 'author' ), 'The post type supports authors.' );
+
+		$fields = array_column( wp_get_registered_fields( 'postType', 'wp_template' ), null, 'id' );
+		$this->assertSame( array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ), self::get_support_field_ids( 'wp_template' ), 'The fields are the ones of the collection, not the default author and title fields.' );
+		$this->assertSame( 'Template', $fields['title']['label'], 'The title is the one of the collection.' );
+		$this->assertArrayNotHasKey( 'type', $fields['author'], 'The template author is not the integer post author.' );
+		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
+		$this->assertSame(
+			array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ),
+			wp_get_registered_field_modules( 'postType', 'wp_template' )['@wordpress/core-fields/wp_template'],
+			'The fields of templates ship their JavaScript parts in the module of the collection.'
+		);
+	}
+
+	/**
+	 * A plugin can replace the author field of templates.
+	 */
+	public function test_a_plugin_can_replace_the_author_field_of_templates() {
+		$this->on_fields_api_init(
+			static function () {
+				wp_unregister_fields( 'postType', 'wp_template', array( 'author' ) );
+				wp_register_fields(
+					'my-plugin',
+					'postType',
+					'wp_template',
+					array(
+						array(
+							'id'    => 'author',
+							'type'  => 'text',
+							'label' => 'Maker',
+						),
+					)
+				);
+			}
+		);
+
+		$author = array_column( wp_get_registered_fields( 'postType', 'wp_template' ), null, 'id' )['author'];
+		$this->assertSame( 'my-plugin', $author['origin']['registeredBy'] );
+		$modules = wp_get_registered_field_modules( 'postType', 'wp_template' );
+		$this->assertNotContains( 'author', $modules['@wordpress/core-fields/wp_template'] ?? array(), 'The module of the replaced field no longer applies to it.' );
+	}
+
+	/**
+	 * Attachments support authors and comments but the media editor has its
+	 * own fields, so they opt out of every default field and their
+	 * collection has the media fields, with its script module.
+	 */
+	public function test_attachments_get_the_media_fields_instead_of_the_defaults() {
+		$this->assertTrue( post_type_supports( 'attachment', 'author' ), 'The post type supports authors.' );
+		$this->assertTrue( post_type_supports( 'attachment', 'comments' ), 'The post type supports comments.' );
+
+		$ids    = array( 'alt_text', 'attached_to', 'author', 'caption', 'date', 'description', 'filename', 'filesize', 'media_dimensions', 'mime_type', 'title' );
+		$fields = array_column( wp_get_registered_fields( 'postType', 'attachment' ), null, 'id' );
+		$this->assertSame( $ids, array_keys( $fields ), 'Only the media fields are registered.' );
+		$this->assertSame( 'datetime', $fields['date']['type'], 'The media fields come from the attachment collection.' );
+		$this->assertSame( 'core', $fields['date']['origin']['registeredBy'] );
+		$this->assertSame(
+			array( '@wordpress/core-fields/attachment' => $ids ),
+			wp_get_registered_field_modules( 'postType', 'attachment' ),
+			'Every media field is registered with the module of the collection.'
+		);
+	}
+
+	/**
+	 * A plugin registering attachment fields keeps them next to the media
+	 * fields.
+	 */
+	public function test_attachments_keep_the_fields_plugins_register() {
+		$this->register_fields( 'postType', 'attachment', array( $this->field( 'credit' ) ) );
+
+		$ids = array_column( wp_get_registered_fields( 'postType', 'attachment' ), 'id' );
+		$this->assertContains( 'date', $ids, 'The media fields are kept.' );
+		$this->assertSame( 'credit', end( $ids ), 'The plugin field follows the media fields.' );
+	}
+
+	/**
+	 * The site is not a post type: its collection has all of its fields,
+	 * the ones the identity screen of the site editor shows, with its
+	 * script module.
+	 */
+	public function test_the_site_gets_the_fields_of_its_collection() {
+		$ids    = array( 'description', 'site_icon', 'site_logo', 'title' );
+		$fields = array_column( wp_get_registered_fields( 'root', 'site' ), null, 'id' );
+		$this->assertSame( $ids, array_keys( $fields ) );
+		$this->assertSame( 'text', $fields['title']['type'] );
+		$this->assertSame( 'media', $fields['site_logo']['type'] );
+		$this->assertSame( 'core', $fields['title']['origin']['registeredBy'] );
+		$this->assertSame(
+			array( '@wordpress/core-fields/root_site' => $ids ),
+			wp_get_registered_field_modules( 'root', 'site' ),
+			'Every field of the site is registered with the module of the collection.'
+		);
+	}
+
+	/**
+	 * A plugin drops a default field from its post type by unregistering
+	 * it at the default priority, keeping the others.
+	 */
+	public function test_a_plugin_can_drop_a_default_field_from_a_post_type() {
+		$this->register_post_types(
+			array(
+				'gutenberg_book' => array( 'title', 'author', 'comments' ),
+				'gutenberg_note' => array( 'title', 'author', 'comments' ),
+			)
+		);
+		$this->on_fields_api_init(
+			static function () {
+				wp_unregister_fields( 'postType', 'gutenberg_book', array( 'comment_status' ) );
+			}
+		);
+
+		$this->assertSame( array( 'author', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_book' ) );
+		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'title' ), self::get_support_field_ids( 'gutenberg_note' ), 'The other post types keep the field.' );
 	}
 
 	/**
@@ -478,9 +1108,9 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'fixture', $book[0]['origin']['registeredBy'], 'The fields carry the origin of their collection.' );
 		$this->assertSame( array( 'fixture/book' => array( 'subtitle' ) ), wp_get_registered_field_modules( 'postType', 'gutenberg_book' ), 'Each field is registered with the module of its collection.' );
 
-		$this->assertSame( array( 'issue' ), array_column( wp_get_registered_fields( 'postType', 'gutenberg_magazine' ), 'id' ) );
+		$this->assertSame( array( 'issue' ), self::get_support_field_ids( 'gutenberg_magazine' ) );
 		$this->assertSame( array(), wp_get_registered_field_modules( 'postType', 'gutenberg_magazine' ), 'A collection without module registers none.' );
-		$this->assertSame( array( 'secret' ), array_column( wp_get_registered_fields( 'postType', 'gutenberg_hidden' ), 'id' ), 'A post type not exposed in the REST API gets its fields too.' );
+		$this->assertSame( array( 'secret' ), self::get_support_field_ids( 'gutenberg_hidden' ), 'A post type not exposed in the REST API gets its fields too.' );
 	}
 
 	/**
@@ -503,6 +1133,8 @@ class Tests_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_a_collection_redefining_a_registered_field_is_skipped() {
 		$this->register_post_types( array( 'gutenberg_book' => array( 'title' ) ) );
+		remove_action( 'wp_fields_api_init', 'gutenberg_register_core_field_collections', 0 );
+		$this->core_collections_unhooked = true;
 
 		$this->setExpectedIncorrectUsage( 'WP_Fields_Registry::register' );
 		$directory = __DIR__ . '/data/core-fields/collections/duplicate/book';
@@ -927,7 +1559,7 @@ class Tests_Fields_API extends WP_UnitTestCase {
 			$fields[0]['origin']
 		);
 		$modules = wp_get_registered_field_modules( 'postType', 'page' );
-		$this->assertContains( 'author', $modules['core/defaults'], 'The field keeps its modules.' );
+		$this->assertContains( 'author', $modules['@wordpress/core-fields/post_type_supports'], 'The field keeps its modules.' );
 		$this->assertSame( array( 'author' ), $modules['plugin/author'], 'The module applies to the field.' );
 	}
 
@@ -1121,14 +1753,14 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		$unregistered = null;
 		$this->on_fields_api_init(
 			static function () use ( &$unregistered ) {
-				$unregistered = wp_unregister_fields( 'postType', 'page', array( array( 'id' => 'author' ), '', 'comment_status' ) );
+				$unregistered = wp_unregister_fields( 'postType', 'page', array( array( 'id' => 'author' ), '', 'date' ) );
 			}
 		);
 
-		$this->assertSame( array( 'comment_status' ), array_column( $unregistered, 'id' ) );
+		$this->assertSame( array( 'date' ), array_column( $unregistered, 'id' ) );
 		$ids = array_column( wp_get_registered_fields( 'postType', 'page' ), 'id' );
 		$this->assertContains( 'author', $ids, 'A definition in place of an id is skipped, not matched.' );
-		$this->assertNotContains( 'comment_status', $ids );
+		$this->assertNotContains( 'date', $ids );
 	}
 
 	/**

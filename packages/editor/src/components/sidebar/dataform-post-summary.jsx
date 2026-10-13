@@ -2,7 +2,8 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
-import { Stack } from '@wordpress/ui';
+import { useFields } from '@wordpress/fields-loader';
+import { Notice, Stack } from '@wordpress/ui';
 import { useMemo } from '@wordpress/element';
 import { useViewConfig } from '@wordpress/views';
 import PostCardPanel from '../post-card-panel';
@@ -10,10 +11,9 @@ import PluginPostStatusInfo from '../plugin-post-status-info';
 import PostPanelSection from '../post-panel-section';
 import { store as editorStore } from '../../store';
 import PostTrash from '../post-trash';
-import usePostFields from '../post-fields';
 import { usePostTemplatePanelMode } from '../post-template/hooks';
-import revisionsField from '../../dataviews/fields/revisions';
-import readingSettingsField from '../../dataviews/fields/reading-settings';
+import revisionsField from './fields/revisions';
+import readingSettingsField from './fields/reading-settings';
 
 const EMPTY_FORM = { layout: { type: 'panel' }, fields: [] };
 const VIEW_CONFIG_FIELDS = [ 'form' ];
@@ -277,7 +277,13 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 		return map;
 	}, [ postType ] );
 
-	const _fields = usePostFields( { postType } );
+	// The actions this panel needs are registered by `usePostActions`, which
+	// `PostCardPanel` reaches through `PostActions`.
+	const {
+		fields: _fields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields( { kind: 'postType', name: postType } );
 	const fields = useMemo(
 		() =>
 			_fields
@@ -321,8 +327,18 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					return field;
 				} )
 				.filter( Boolean )
-				// Editor-only fields, injected here rather than registered
-				// so they never leak into the site editor list / quick-edit fields.
+				// Editor-only fields, injected here rather than registered on
+				// the server: `revisions` switches the editor to its revisions
+				// view and `reading_settings` shares its component with the
+				// legacy summary panel, so both read the editor store, which the
+				// script modules of `@wordpress/core-fields` cannot import.
+				//
+				// Their ids are already in the form configurations the server
+				// builds (`revisions` in the default post type form and in the
+				// `wp_block`, `wp_template_part`, and `wp_template` ones,
+				// `reading_settings` in the `wp_template` one), yet nothing
+				// registers a field for them: every other consumer of those forms
+				// drops the ids for want of a field.
 				.concat( revisionsField, readingSettingsField ),
 		[
 			_fields,
@@ -383,12 +399,23 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					postId={ postId }
 					onActionPerformed={ onActionPerformed }
 				/>
-				<DataForm
-					data={ data }
-					fields={ fields }
-					form={ form }
-					onChange={ onChange }
-				/>
+				{ fieldsError && (
+					<Notice.Root intent="error">
+						<Notice.Description>
+							{ fieldsError.message }
+						</Notice.Description>
+					</Notice.Root>
+				) }
+				{ /* A form built from no fields renders nothing but its
+				     panel chrome, so it waits for the fields to arrive. */ }
+				{ ! isLoadingFields && ! fieldsError && (
+					<DataForm
+						data={ data }
+						fields={ fields }
+						form={ form }
+						onChange={ onChange }
+					/>
+				) }
 				{ ! isPostStatusRemoved && (
 					<>
 						<PluginPostStatusInfo.Slot>

@@ -289,7 +289,7 @@ Private actions:
 - `createTemplate`
 - `hideBlockTypes`
 - `registerEntityAction`
-- `registerPostTypeActions`
+- `registerPostTypeSchema`
 - `removeTemplates`
 - `revertTemplate`
 - `saveDirtyEntities`

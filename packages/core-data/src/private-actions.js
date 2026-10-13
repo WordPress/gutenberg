@@ -196,6 +196,24 @@ export function receiveViewConfig( kind, name, config ) {
 }
 
 /**
+ * Returns an action object used to receive the fields config of an entity.
+ *
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name.
+ * @param {Object} config Fields config, as returned by the `/wp/v2/fields` route.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveFieldsConfig( kind, name, config ) {
+	return {
+		type: 'RECEIVE_FIELDS_CONFIG',
+		kind,
+		name,
+		config,
+	};
+}
+
+/**
  * Records that the entity sync manager opened a new undo level for a record
  * it syncs, so the level takes its place in core-data's undo history next to
  * the edits core-data records itself.

@@ -690,6 +690,20 @@ _Returns_
 
 - `number | null`: number | null.
 
+### getFieldsConfig
+
+Returns the fields registered on the server for the given entity, as the `/wp/v2/fields` REST API route returns them.
+
+_Parameters_
+
+- _state_ `State`: Data state.
+- _kind_ `string`: Entity kind.
+- _name_ `string`: Entity name.
+
+_Returns_
+
+- `FieldsConfig | undefined`: The fields config, or undefined if not loaded.
+
 ### getLastEntityDeleteError
 
 Returns the specified entity record's last delete error.

@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Internal
+
+-   Allow `@wordpress/core-fields` to use private APIs: the template field it registers on the server reads the `getTemplateId`, `getHomePage`, and `getPostsPageId` private selectors of `@wordpress/core-data` ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+
 ## 2.0.0 (2026-10-07)
 
 ### Breaking Changes

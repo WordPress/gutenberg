@@ -78,6 +78,7 @@ Context provider that supplies media data and actions to child components.
 - `onChange`: (optional) Callback when media is updated `(updates: Partial<Media>) => void`. If not provided, the MediaEditor can be used in a read-only mode, which is useful for preview-only scenarios where editing is not needed.
 - `settings`: (optional) Configuration object
     - `settings.fields`: Array of field definitions (uses `Field` type from `@wordpress/dataviews`)
+    - `settings.form`: (optional) Form the fields are laid out with (uses `Form` type from `@wordpress/dataviews`). When omitted, `<MediaForm>` falls back to a default layout of the core attachment fields.
 - `children`: Child components
 
 ### `<MediaPreview>`
@@ -94,8 +95,9 @@ Form for editing media metadata using `DataForm` from `@wordpress/dataviews`.
 
 **Props:**
 
-- `form`: Optional form configuration (uses `Form` type from `@wordpress/dataviews`)
 - `header`: Optional header content to display above the form
+
+The fields are laid out with `settings.form` of the provider, or with a default layout of the core attachment fields when the settings have none.
 
 ## TypeScript
 

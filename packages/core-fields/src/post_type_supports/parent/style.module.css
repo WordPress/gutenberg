@@ -1,0 +1,6 @@
+.parent {
+	/* Reset `fieldset` browser defaults. */
+	border: 0;
+	padding: 0;
+	margin: 0;
+}

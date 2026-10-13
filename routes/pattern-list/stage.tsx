@@ -19,9 +19,11 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
+import { Notice } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { useFields } from '@wordpress/fields-loader';
 import {
 	privateApis as patternPrivateApis,
 	// @ts-expect-error - No type declarations available for @wordpress/patterns
@@ -35,7 +37,7 @@ import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
 import type { NormalizedPattern } from './use-patterns';
 import ImportPatternButton from './import-pattern-button';
 // Unlock WordPress private APIs
-const { usePostActions, usePostFields } = unlock( editorPrivateApis );
+const { usePostActions } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
 const { PATTERN_TYPES, CreatePatternModal } = unlock( patternPrivateApis );
 /**
@@ -174,10 +176,17 @@ function PatternListView( {
 	const patternsWithPermissions =
 		useAugmentPatternsWithPermissions( patterns );
 
-	// The canonical `wp_block` fields registered by the editor (title, sync
+	// The canonical `wp_block` fields the server registers (title, sync
 	// status, description...), plus the fields specific to this screen.
-	const postTypeFields: Field< NormalizedPattern >[] = usePostFields( {
-		postType: 'wp_block',
+	// `usePostActions` below registers the post type's schema, which is what
+	// brings in the actions.
+	const {
+		fields: postTypeFields,
+		isLoading: isLoadingFields,
+		error: fieldsError,
+	} = useFields< NormalizedPattern >( {
+		kind: 'postType',
+		name: PATTERN_POST_TYPE,
 	} );
 	const patternCategoryField = usePatternCategoryField();
 	const fields = useMemo( (): Field< NormalizedPattern >[] => {
@@ -333,13 +342,20 @@ function PatternListView( {
 					</Tabs>
 				</div>
 			) }
+			{ fieldsError && (
+				<Notice.Root intent="error">
+					<Notice.Description>
+						{ fieldsError.message }
+					</Notice.Description>
+				</Notice.Root>
+			) }
 			<DataViews
 				data={ posts }
 				fields={ fields }
 				view={ view }
 				onChangeView={ onChangeView }
 				actions={ actions }
-				isLoading={ isResolving }
+				isLoading={ isResolving || isLoadingFields }
 				paginationInfo={ {
 					totalItems,
 					totalPages,

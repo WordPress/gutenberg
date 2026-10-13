@@ -1,6 +1,7 @@
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { loadFields } from '@wordpress/fields-loader';
 import { notFound } from '@wordpress/route';
 import { loadNavigationViewConfig } from './view-utils';
 
@@ -67,9 +68,17 @@ export const route = {
 				kind: 'postType',
 				name: NAVIGATION_POST_TYPE,
 			} ),
-			// Preload post type object (what usePostFields needs)
+			// Preload the post type object, which the actions need.
 			resolveSelect( coreStore ).getPostType( NAVIGATION_POST_TYPE ),
-			// Preload users data (what usePostFields needs for author field)
+			// Warm up the fields the stage renders. `useFields` there shares
+			// this resolution, so the screen paints with its fields on first
+			// render. A failure is the stage's to report, so it does not
+			// block the route.
+			loadFields( {
+				kind: 'postType',
+				name: NAVIGATION_POST_TYPE,
+			} ).catch( () => {} ),
+			// Preload the users, which the author field's control needs.
 			resolveSelect( coreStore ).getEntityRecords( 'root', 'user', {
 				per_page: -1,
 			} ),

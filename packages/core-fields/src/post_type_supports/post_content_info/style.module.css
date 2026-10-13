@@ -1,0 +1,10 @@
+/*
+ * The 1.4 line height of the `Text` of `@wordpress/components`, which the
+ * original view used. No line-height token carries 13px × 1.4: the `sm` token
+ * the default `body-md` variant takes is 20px, which grows the two-line block
+ * by about 4px.
+ */
+.text {
+	color: var(--wpds-color-foreground-content-neutral-weak);
+	line-height: 1.4;
+}

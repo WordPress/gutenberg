@@ -1,0 +1,127 @@
+{
+	"name": "@wordpress/core-fields",
+	"version": "0.1.0-prerelease",
+	"description": "The fields WordPress core registers on the server for the Fields API: their PHP declarations and their JavaScript parts.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"dataviews",
+		"fields",
+		"core"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-fields/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/core-fields"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0"
+	},
+	"files": [
+		"src",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"module": "build-module/post_type_supports/index.mjs",
+	"exports": {
+		"./attachment": {
+			"types": "./build-types/attachment/index.d.ts",
+			"import": "./build-module/attachment/index.mjs"
+		},
+		"./page": {
+			"types": "./build-types/page/index.d.ts",
+			"import": "./build-module/page/index.mjs"
+		},
+		"./post_type_supports": {
+			"types": "./build-types/post_type_supports/index.d.ts",
+			"import": "./build-module/post_type_supports/index.mjs"
+		},
+		"./root_site": {
+			"types": "./build-types/root_site/index.d.ts",
+			"import": "./build-module/root_site/index.mjs"
+		},
+		"./wp_block": {
+			"types": "./build-types/wp_block/index.d.ts",
+			"import": "./build-module/wp_block/index.mjs"
+		},
+		"./wp_template": {
+			"types": "./build-types/wp_template/index.d.ts",
+			"import": "./build-module/wp_template/index.mjs"
+		},
+		"./wp_template_part": {
+			"types": "./build-types/wp_template_part/index.d.ts",
+			"import": "./build-module/wp_template_part/index.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": {
+		"./attachment": "./build-module/attachment/index.mjs",
+		"./page": "./build-module/page/index.mjs",
+		"./post_type_supports": "./build-module/post_type_supports/index.mjs",
+		"./root_site": "./build-module/root_site/index.mjs",
+		"./wp_block": "./build-module/wp_block/index.mjs",
+		"./wp_template": "./build-module/wp_template/index.mjs",
+		"./wp_template_part": "./build-module/wp_template_part/index.mjs"
+	},
+	"wpCopyFiles": {
+		"files": [
+			"src/**/*.php"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_"
+			}
+		}
+	},
+	"types": "build-types",
+	"sideEffects": [
+		"src/**/*.module.css"
+	],
+	"dependencies": {
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/date": "file:../date",
+		"@wordpress/element": "file:../element",
+		"@wordpress/fields-loader": "file:../fields-loader",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/media-utils": "file:../media-utils",
+		"@wordpress/notices": "file:../notices",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/style-runtime": "file:../style-runtime",
+		"@wordpress/ui": "file:../ui",
+		"@wordpress/url": "file:../url",
+		"@wordpress/wordcount": "file:../wordcount",
+		"clsx": "^2.1.1",
+		"remove-accents": "^0.5.0"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.3"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
