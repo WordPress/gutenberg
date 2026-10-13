@@ -183,37 +183,7 @@ class Tests_Blocks_Render_Table_Of_Contents_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_block_core_table_of_contents_render
 	 */
-	public function test_render_only_include_current_page_uses_current_paginated_page() {
-		$post_id = self::factory()->post->create(
-			array(
-				'post_status'  => 'publish',
-				'post_content' => implode(
-					"\n",
-					array(
-						$this->table_of_contents_block(
-							array(
-								'onlyIncludeCurrentPage' => true,
-							)
-						),
-						$this->heading_block( 'Page one heading', 'page-one-heading' ),
-						$this->nextpage_block(),
-						$this->heading_block( 'Page two heading', 'page-two-heading' ),
-					)
-				),
-			)
-		);
-
-		$nav = $this->get_table_of_contents_html( $this->render_post_content( $post_id, 2 ) );
-
-		$this->assertStringContainsString( 'Page two heading', $nav );
-		$this->assertStringNotContainsString( 'Page one heading', $nav );
-		$this->assertStringContainsString( 'page=2#page-two-heading', $nav );
-	}
-
-	/**
-	 * @covers ::gutenberg_block_core_table_of_contents_render
-	 */
-	public function test_render_all_paginated_headings_links_to_each_page_when_current_page_filtering_is_disabled() {
+	public function test_render_all_paginated_headings_links_to_each_page() {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_status'  => 'publish',

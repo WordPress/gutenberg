@@ -5,7 +5,7 @@
 	"name": "core/table-of-contents",
 	"title": "Table of Contents",
 	"category": "design",
-	"description": "Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.",
+	"description": "Summarize your post with a table of contents automatically generated from the headings in your content.",
 	"keywords": [ "document outline", "summary" ],
 	"textdomain": "default",
 	"attributes": {
@@ -16,10 +16,6 @@
 			},
 			"default": [],
 			"role": "local"
-		},
-		"onlyIncludeCurrentPage": {
-			"type": "boolean",
-			"default": false
 		},
 		"maxLevel": {
 			"type": "number"

@@ -91,3 +91,34 @@ function gutenberg_restrict_privacy_policy_page_setting_update( $updated, $name 
 	return $updated;
 }
 add_filter( 'rest_pre_update_setting', 'gutenberg_restrict_privacy_policy_page_setting_update', 10, 2 );
+
+/**
+ * Injects editor content into the Table of Contents block's rendering context.
+ *
+ * @param mixed           $result  Existing dispatch result.
+ * @param WP_REST_Request $request REST request.
+ * @param string          $route   Matched route.
+ * @param array           $handler Route handler.
+ * @return mixed Dispatch result.
+ */
+function gutenberg_rest_block_renderer_editor_content_compat( $result, $request, $route, $handler ) {
+	if (
+		null !== $result || '/wp/v2/block-renderer/(?P<name>[a-z0-9-]+/[a-z0-9-]+)' !== $route ||
+		null === $request->get_param( 'post_content' )
+	) {
+		return $result;
+	}
+
+	$inject_context = static function ( $context ) use ( $request ) {
+		$context['postContent'] = $request->get_param( 'post_content' );
+		return $context;
+	};
+	add_filter( 'render_block_context', $inject_context, 0 );
+	try {
+		return call_user_func( $handler['callback'], $request );
+	} finally {
+		remove_filter( 'render_block_context', $inject_context, 0 );
+	}
+}
+
+add_filter( 'rest_dispatch_request', 'gutenberg_rest_block_renderer_editor_content_compat', 10, 4 );

@@ -73,6 +73,8 @@ export interface UseServerSideRenderArgs {
 	skipBlockSupportAttributes?: boolean;
 	/** The HTTP method to use ('GET' or 'POST'). Default is 'GET'. */
 	httpMethod?: 'GET' | 'POST';
+	/** Current serialized editor content to supply as block rendering context in a POST request. */
+	postContent?: string;
 	/** Additional query arguments to append to the request URL. */
 	urlQueryArgs?: Record< string, unknown >;
 }
@@ -126,6 +128,7 @@ export function useServerSideRender(
 		block,
 		skipBlockSupportAttributes = false,
 		httpMethod = 'GET',
+		postContent,
 		urlQueryArgs,
 	} = args;
 
@@ -143,7 +146,12 @@ export function useServerSideRender(
 	const urlAttributes = isPostRequest ? null : sanitizedAttributes;
 	const path = rendererPath( block, urlAttributes, urlQueryArgs );
 	const body = isPostRequest
-		? JSON.stringify( { attributes: sanitizedAttributes ?? null } )
+		? JSON.stringify( {
+				attributes: sanitizedAttributes ?? null,
+				...( postContent !== undefined
+					? { post_content: postContent }
+					: {} ),
+			} )
 		: undefined;
 
 	useEffect( () => {

@@ -162,10 +162,10 @@ function block_core_table_of_contents_get_heading_from_block( $block, $max_level
  * Normalizes heading resolution context.
  *
  * The context is the shared state used while walking the current post content.
- * It tracks whether the post is paginated, which page is being scanned, which
- * page the rendered ToC should include, and which permalink should be used for
- * page-aware heading links. Callers can pass partial context, so this helper
- * fills defaults and normalizes booleans and page numbers before scanning.
+ * It tracks whether the post is paginated, which page is being scanned, and
+ * which permalink should be used for page-aware heading links. Callers can pass
+ * partial context, so this helper fills defaults and normalizes booleans and
+ * page numbers before scanning.
  *
  * @param string $content Serialized block content.
  * @param array  $context Heading resolution context.
@@ -176,20 +176,16 @@ function block_core_table_of_contents_normalize_heading_context( $content, $cont
 	$context = wp_parse_args(
 		$context,
 		array(
-			'current_page'              => 1,
-			'is_paginated'              => str_contains( $content, '<!--nextpage-->' ),
-			'only_include_current_page' => false,
-			'permalink'                 => '',
-			'target_page'               => 1,
+			'current_page' => 1,
+			'is_paginated' => str_contains( $content, '<!--nextpage-->' ),
+			'permalink'    => '',
 		)
 	);
 
 	return array(
-		'current_page'              => max( 1, (int) $context['current_page'] ),
-		'is_paginated'              => ! empty( $context['is_paginated'] ),
-		'only_include_current_page' => ! empty( $context['only_include_current_page'] ),
-		'permalink'                 => $context['permalink'],
-		'target_page'               => max( 1, (int) $context['target_page'] ),
+		'current_page' => max( 1, (int) $context['current_page'] ),
+		'is_paginated' => ! empty( $context['is_paginated'] ),
+		'permalink'    => $context['permalink'],
 	);
 }
 
@@ -220,15 +216,7 @@ function block_core_table_of_contents_get_headings_from_content( $content, $max_
 			continue;
 		}
 
-		// `only_include_current_page` is the normalized form of the block's
-		// `onlyIncludeCurrentPage` attribute. When false, headings from every
-		// paginated page are included.
-		$include_current_page = (
-			empty( $context['only_include_current_page'] ) ||
-			$context['current_page'] === $context['target_page']
-		);
-
-		if ( 'core/heading' !== $block_type || ! $include_current_page ) {
+		if ( 'core/heading' !== $block_type ) {
 			continue;
 		}
 
@@ -241,24 +229,6 @@ function block_core_table_of_contents_get_headings_from_content( $content, $max_
 	}
 
 	return $headings;
-}
-
-/**
- * Gets the current page number for paginated post content.
- *
- * @global int $page Current page number of the content.
- *
- * @return int Current page number.
- */
-function block_core_table_of_contents_get_current_page_number() {
-	global $page;
-
-	$current_page = (int) get_query_var( 'page' );
-	if ( ! $current_page && isset( $page ) ) {
-		$current_page = (int) $page;
-	}
-
-	return max( 1, $current_page );
 }
 
 /**
@@ -383,35 +353,31 @@ function block_core_table_of_contents_render( $attributes, $content, $block = nu
 		return block_core_table_of_contents_add_aria_label( $attributes, $legacy_content );
 	}
 
-	// The REST block renderer provides the edited post as the global post, so
-	// use the same dynamic output for its editor preview as on the front end.
+	$has_editor_content = isset( $block->context['postContent'] ) && is_string( $block->context['postContent'] );
+
+	// Editor previews can supply current content through block context. The
+	// REST block renderer still provides the saved post for post context.
 	$is_rest_request = defined( 'REST_REQUEST' ) && REST_REQUEST;
 
 	// Outside post content rendering, there is no reliable current post to scan.
 	if (
 		( ! is_array( $wp_current_filter ) || ! in_array( 'the_content', $wp_current_filter, true ) ) &&
-		! $is_rest_request
+		! $is_rest_request && ! $has_editor_content
 	) {
 		return block_core_table_of_contents_add_aria_label( $attributes, $content );
 	}
 
 	$post = get_post();
-	if ( ! $post ) {
+	if ( ! $post && ! $has_editor_content ) {
 		return '';
 	}
 
+	$post_content = $has_editor_content ? $block->context['postContent'] : $post->post_content;
+
 	$max_level = isset( $attributes['maxLevel'] ) ? (int) $attributes['maxLevel'] : 0;
-	// Heading context records the current pagination state so collection can
-	// skip headings outside the rendered page and build page-aware links.
-	$context  = block_core_table_of_contents_normalize_heading_context(
-		$post->post_content,
-		array(
-			'only_include_current_page' => ! empty( $attributes['onlyIncludeCurrentPage'] ),
-			'permalink'                 => get_permalink( $post ),
-			'target_page'               => block_core_table_of_contents_get_current_page_number(),
-		)
-	);
-	$headings = block_core_table_of_contents_get_headings_from_content( $post->post_content, $max_level, $context );
+	// Track pagination so headings link to the correct post page.
+	$context = array( 'permalink' => $post ? get_permalink( $post ) : '' );
+	$headings = block_core_table_of_contents_get_headings_from_content( $post_content, $max_level, $context );
 
 	if ( empty( $headings ) ) {
 		return '';
@@ -443,6 +409,7 @@ function register_block_core_table_of_contents() {
 		__DIR__ . '/table-of-contents',
 		array(
 			'render_callback' => 'block_core_table_of_contents_render',
+			'uses_context'    => array( 'postId', 'postType', 'postContent' ),
 		)
 	);
 }

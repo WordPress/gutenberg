@@ -995,13 +995,13 @@ Create structured content in rows and columns to display information.
 
 ## Table of Contents
 
-Summarize your post with a list of headings. Add HTML anchors to Heading blocks to link them here.
+Summarize your post with a table of contents automatically generated from the headings in your content.
 
 -	**Name:** [core/table-of-contents](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/core-block-table-of-contents/)
 -	**Experimental:** true
 -	**Category:** [design](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-design/)
 -	**Supports:** anchor, ariaLabel, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
--	**Attributes:** headings, maxLevel, onlyIncludeCurrentPage, ordered
+-	**Attributes:** headings, maxLevel, ordered
 
 ## Tabs
 

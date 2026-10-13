@@ -18,40 +18,16 @@ function getLatestHeadings( select, clientId ) {
 	// declaring @wordpress/editor as a dependency, we must access its
 	// store by string. When the store is not available, editorSelectors
 	// will be null, and the block's saved markup will lack permalinks.
-	const permalink = select( 'core/editor' ).getPermalink() ?? null;
+	const permalink = select( 'core/editor' )?.getPermalink?.() ?? null;
 
 	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;
-	const { onlyIncludeCurrentPage, maxLevel } =
-		getBlockAttributes( clientId ) ?? {};
+	const { maxLevel } = getBlockAttributes( clientId ) ?? {};
 
 	// Get post-content block client ID.
 	const [ postContentClientId = '' ] = getBlocksByName( 'core/post-content' );
 
 	// Get the client ids of all blocks in the editor.
 	const allBlockClientIds = getClientIdsOfDescendants( postContentClientId );
-
-	// If onlyIncludeCurrentPage is true, calculate the page (of a paginated post) this block is part of, so we know which headings to include; otherwise, skip the calculation.
-	let tocPage = 1;
-
-	if ( isPaginated && onlyIncludeCurrentPage ) {
-		// We can't use getBlockIndex because it only returns the index
-		// relative to sibling blocks.
-		const tocIndex = allBlockClientIds.indexOf( clientId );
-
-		for ( const [
-			blockIndex,
-			blockClientId,
-		] of allBlockClientIds.entries() ) {
-			// If we've reached blocks after the Table of Contents, we've
-			// finished calculating which page the block is on.
-			if ( blockIndex >= tocIndex ) {
-				break;
-			}
-			if ( getBlockName( blockClientId ) === 'core/nextpage' ) {
-				tocPage++;
-			}
-		}
-	}
 
 	const latestHeadings = [];
 
@@ -72,51 +48,35 @@ function getLatestHeadings( select, clientId ) {
 		if ( blockName === 'core/nextpage' ) {
 			headingPage++;
 
-			// If we're only including headings from the current page (of
-			// a paginated post), then exit the loop if we've reached the
-			// pages after the one with the Table of Contents block.
-			if ( onlyIncludeCurrentPage && headingPage > tocPage ) {
-				break;
-			}
-
 			if ( typeof permalink === 'string' ) {
 				headingPageLink = addQueryArgs(
 					removeQueryArgs( permalink, [ 'page' ] ),
 					{ page: headingPage }
 				);
 			}
-		}
-		// If we're including all headings or we've reached headings on
-		// the same page as the Table of Contents block, add them to the
-		// list.
-		else if ( ! onlyIncludeCurrentPage || headingPage === tocPage ) {
-			if ( blockName === 'core/heading' ) {
-				const headingAttributes = getBlockAttributes( blockClientId );
+		} else if ( blockName === 'core/heading' ) {
+			const headingAttributes = getBlockAttributes( blockClientId );
 
-				// Skip headings that are deeper than maxLevel
-				if ( maxLevel && headingAttributes.level > maxLevel ) {
-					continue;
-				}
-
-				const canBeLinked =
-					typeof headingPageLink === 'string' &&
-					typeof headingAttributes.anchor === 'string' &&
-					headingAttributes.anchor !== '';
-
-				latestHeadings.push( {
-					// Convert line breaks to spaces, and get rid of HTML tags in the headings.
-					content: stripHTML(
-						headingAttributes.content.replace(
-							/(<br *\/?>)+/g,
-							' '
-						)
-					),
-					level: headingAttributes.level,
-					link: canBeLinked
-						? `${ headingPageLink }#${ headingAttributes.anchor }`
-						: null,
-				} );
+			// Skip headings that are deeper than maxLevel
+			if ( maxLevel && headingAttributes.level > maxLevel ) {
+				continue;
 			}
+
+			const canBeLinked =
+				typeof headingPageLink === 'string' &&
+				typeof headingAttributes.anchor === 'string' &&
+				headingAttributes.anchor !== '';
+
+			latestHeadings.push( {
+				// Convert line breaks to spaces, and get rid of HTML tags in the headings.
+				content: stripHTML(
+					headingAttributes.content.replace( /(<br *\/?>)+/g, ' ' )
+				),
+				level: headingAttributes.level,
+				link: canBeLinked
+					? `${ headingPageLink }#${ headingAttributes.anchor }`
+					: null,
+			} );
 		}
 	}
 

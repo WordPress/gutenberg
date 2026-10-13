@@ -104,83 +104,6 @@ test.describe( 'Table of Contents', () => {
 			await admin.createNewPost();
 		} );
 
-		// A newly created post must be saved before its table of contents can be
-		// shown. The before-save experience is covered separately below.
-		test( 'shows heading changes after saving the post', async ( {
-			editor,
-		} ) => {
-			await editor.setContent(
-				postContentWithTocAndHeadings( [
-					{ content: 'First section', anchor: 'first-section' },
-				] )
-			);
-			await editor.saveDraft();
-
-			const tableOfContents = getTableOfContentsEditorBlock( editor );
-			await expect(
-				tableOfContents.getByRole( 'link', { name: 'First section' } )
-			).toBeVisible();
-
-			await editor.setContent(
-				postContentWithTocAndHeadings( [
-					{ content: 'First section', anchor: 'first-section' },
-					{ content: 'Second section', anchor: 'second-section' },
-				] )
-			);
-			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
-				'First section',
-			] );
-			await editor.saveDraft();
-			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
-				'First section',
-				'Second section',
-			] );
-
-			await editor.setContent(
-				postContentWithTocAndHeadings( [
-					{ content: 'Second section', anchor: 'second-section' },
-				] )
-			);
-			await editor.saveDraft();
-			await expect(
-				tableOfContents.getByRole( 'link', { name: 'Second section' } )
-			).toBeVisible();
-			await expect(
-				tableOfContents.getByRole( 'link', { name: 'First section' } )
-			).toHaveCount( 0 );
-
-			await editor.setContent(
-				postContentWithTocAndHeadings( [
-					{ content: 'Second section', anchor: 'second-section' },
-					{ content: 'First section', anchor: 'first-section' },
-				] )
-			);
-			await editor.saveDraft();
-			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
-				'Second section',
-				'First section',
-			] );
-		} );
-
-		test( 'does not show a table of contents until a new post is saved', async ( {
-			editor,
-		} ) => {
-			await editor.setContent(
-				postContentWithTocAndHeadings( [
-					{
-						content: 'Unsaved first section',
-						anchor: 'unsaved-first-section',
-					},
-				] )
-			);
-
-			await expect(
-				editor.canvas.getByRole( 'navigation', {
-					name: 'Table of Contents',
-				} )
-			).toHaveCount( 0 );
-		} );
-
 		test( 'shows the same server-rendered nested heading list in the editor and after publish', async ( {
 			editor,
 			page,
@@ -335,7 +258,7 @@ test.describe( 'Table of Contents', () => {
 			await editor.openDocumentSettingsSidebar();
 			await page
 				.getByRole( 'combobox', {
-					name: 'Include headings down to level',
+					name: 'Maximum heading level',
 				} )
 				.selectOption( '3' );
 
@@ -420,6 +343,181 @@ test.describe( 'Table of Contents', () => {
 			await expect(
 				page.getByRole( 'navigation', { name: 'Table of Contents' } )
 			).toHaveCount( 0 );
+		} );
+
+		test( 'updates the table of contents as headings are added, renamed, and removed without saving', async ( {
+			editor,
+			admin,
+			page,
+			requestUtils,
+		} ) => {
+			const savedContent = postContentWithTocAndHeadings( [
+				{ content: 'First section', anchor: 'first-section' },
+			] );
+			const post = await createPostWithContent(
+				requestUtils,
+				'Editor headings',
+				savedContent
+			);
+			await admin.editPost( post.id );
+			const tableOfContents = getTableOfContentsEditorBlock( editor );
+			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
+				'First section',
+			] );
+
+			await editor.insertBlock( {
+				name: 'core/heading',
+				attributes: {
+					content: 'Second section',
+					anchor: 'second-section',
+				},
+			} );
+			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
+				'First section',
+				'Second section',
+			] );
+
+			const firstHeading = editor.canvas
+				.getByRole( 'document', { name: 'Block: Heading' } )
+				.first();
+			await firstHeading.fill( 'Renamed section' );
+			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
+				'Renamed section',
+				'Second section',
+			] );
+
+			await editor.selectBlocks( firstHeading );
+			await page.evaluate( () => {
+				const store = window.wp.data;
+				store
+					.dispatch( 'core/block-editor' )
+					.removeBlocks(
+						store
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientId()
+					);
+			} );
+			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
+				'Second section',
+			] );
+			expect( await getSavedPostContent( requestUtils, post.id ) ).toBe(
+				savedContent
+			);
+
+			await openPostOnFrontend( page, post.id );
+			await expect(
+				page
+					.getByRole( 'navigation', { name: 'Table of Contents' } )
+					.getByRole( 'link' )
+			).toHaveText( [ 'First section' ] );
+		} );
+
+		test( 'shows editor headings before the first manual save', async ( {
+			editor,
+		} ) => {
+			await editor.setContent(
+				postContentWithTocAndHeadings( [
+					{
+						content: 'Unsaved first section',
+						anchor: 'unsaved-first-section',
+					},
+				] )
+			);
+
+			await expect(
+				getTableOfContentsEditorBlock( editor ).getByRole( 'link', {
+					name: 'Unsaved first section',
+				} )
+			).toBeVisible();
+		} );
+
+		test( 'keeps the previous table of contents visible during refresh and clears it when the last heading is removed', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent(
+				postContentWithTocAndHeadings( [
+					{ content: 'First section', anchor: 'first-section' },
+				] )
+			);
+			const tableOfContents = getTableOfContentsEditorBlock( editor );
+			await expect( tableOfContents.getByRole( 'link' ) ).toHaveText( [
+				'First section',
+			] );
+
+			const rendererUrl = ( url ) =>
+				decodeURIComponent( url.href ).includes(
+					'/wp/v2/block-renderer/core/table-of-contents'
+				);
+			let releaseResponse;
+			const heldResponse = new Promise( ( resolve ) => {
+				releaseResponse = resolve;
+			} );
+			const holdRenamedPreview = async ( route ) => {
+				const request = route.request();
+				if (
+					request.method() === 'POST' &&
+					request
+						.postDataJSON()
+						?.post_content?.includes( 'Renamed section' )
+				) {
+					await heldResponse;
+				}
+				await route.continue();
+			};
+			await page.route( rendererUrl, holdRenamedPreview );
+			try {
+				const refresh = page.waitForRequest(
+					( request ) =>
+						rendererUrl( new URL( request.url() ) ) &&
+						request.method() === 'POST' &&
+						request
+							.postDataJSON()
+							?.post_content?.includes( 'Renamed section' )
+				);
+				await editor.canvas
+					.getByRole( 'document', { name: 'Block: Heading' } )
+					.fill( 'Renamed section' );
+				await refresh;
+				// Let the loading state paint while the response remains held.
+				await page.evaluate(
+					() =>
+						new Promise( ( resolve ) =>
+							window.requestAnimationFrame( resolve )
+						)
+				);
+				await expect(
+					tableOfContents.getByRole( 'link', {
+						name: 'First section',
+					} )
+				).toBeVisible();
+				releaseResponse();
+				await expect( tableOfContents.getByRole( 'link' ) ).toHaveText(
+					[ 'Renamed section' ]
+				);
+			} finally {
+				releaseResponse();
+				await page.unroute( rendererUrl, holdRenamedPreview );
+			}
+
+			await editor.selectBlocks(
+				editor.canvas.getByRole( 'document', {
+					name: 'Block: Heading',
+				} )
+			);
+			await page.evaluate( () => {
+				const store = window.wp.data;
+				store
+					.dispatch( 'core/block-editor' )
+					.removeBlocks(
+						store
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientId()
+					);
+			} );
+			await expect( tableOfContents.getByRole( 'link' ) ).toHaveCount(
+				0
+			);
 		} );
 	} );
 

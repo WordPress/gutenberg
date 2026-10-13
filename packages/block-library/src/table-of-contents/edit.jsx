@@ -4,10 +4,9 @@ import {
 	store as blockEditorStore,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, __unstableSerializeAndClean } from '@wordpress/blocks';
 import {
 	Spinner,
-	ToggleControl,
 	SelectControl as WCSelectControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -27,10 +26,6 @@ import {
 	formatListNumbered,
 	formatListNumberedRTL,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { createListItemBlocks, linearToNestedHeadingList } from './utils';
 import { useObserveHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -122,18 +117,17 @@ function TableOfContentsToolbar( {
 /**
  * Table of Contents block edit component.
  *
- * @param {Object}                       props                                   The props.
- * @param {Object}                       props.attributes                        The block attributes.
- * @param {HeadingData[]}                props.attributes.headings               The list of data for each heading in the post.
- * @param {boolean}                      props.attributes.onlyIncludeCurrentPage Whether to only include headings from the current page (if the post is paginated).
- * @param {number|undefined}             props.attributes.maxLevel               The maximum heading level to include, or null to include all levels.
- * @param {boolean}                      props.attributes.ordered                Whether to display as an ordered list (true) or unordered list (false).
- * @param {string}                       props.clientId                          The client id.
- * @param {string}                       props.name                              The block name.
- * @param {Object}                       props.context                           The block context.
- * @param {number}                       props.context.postId                    The post ID.
- * @param {string}                       props.context.postType                  The post type.
- * @param {(attributes: Object) => void} props.setAttributes                     The set attributes function.
+ * @param {Object}                       props                     The props.
+ * @param {Object}                       props.attributes          The block attributes.
+ * @param {HeadingData[]}                props.attributes.headings The list of data for each heading in the post.
+ * @param {number|undefined}             props.attributes.maxLevel The maximum heading level to include, or null to include all levels.
+ * @param {boolean}                      props.attributes.ordered  Whether to display as an ordered list (true) or unordered list (false).
+ * @param {string}                       props.clientId            The client id.
+ * @param {string}                       props.name                The block name.
+ * @param {Object}                       props.context             The block context.
+ * @param {number}                       props.context.postId      The post ID.
+ * @param {string}                       props.context.postType    The post type.
+ * @param {(attributes: Object) => void} props.setAttributes       The set attributes function.
  *
  * @return {Component} The component.
  */
@@ -145,38 +139,52 @@ export default function TableOfContentsEdit( props ) {
 		context: { postId, postType } = {},
 		setAttributes,
 	} = props;
-	const {
-		headings = [],
-		onlyIncludeCurrentPage,
-		maxLevel,
-		ordered = true,
-	} = attributes;
+	const { headings = [], maxLevel, ordered = true } = attributes;
 	useObserveHeadings( clientId );
 
-	const post = useSelect(
+	const editorContent = useSelect(
 		( select ) => {
 			if ( ! postId || ! postType ) {
-				return;
+				return undefined;
 			}
 
-			return select( coreStore ).getEntityRecord(
+			// Use the edited entity to ensure unsaved content is included in the table of contents previews.
+			const record = select( coreStore ).getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
 			);
+			if ( typeof record?.content === 'function' ) {
+				return record.content( record );
+			}
+			if ( record?.blocks ) {
+				return __unstableSerializeAndClean( record.blocks );
+			}
+			const editedContent = record?.content;
+			return typeof editedContent === 'string'
+				? editedContent
+				: editedContent?.raw;
 		},
 		[ postId, postType ]
 	);
-	const [ invalidationKey, setInvalidationKey ] = useState( 0 );
-	useEffect( () => {
-		setInvalidationKey( ( value ) => value + 1 );
-	}, [ post ] );
 
 	const { content, status, error } = useServerSideRender( {
 		attributes,
 		block: name,
-		urlQueryArgs: { post_id: postId, invalidationKey },
+		httpMethod: 'POST',
+		postContent: editorContent,
+		urlQueryArgs: { post_id: postId },
 	} );
+	const [ previousContent, setPreviousContent ] = useState();
+	useEffect( () => {
+		if ( status === 'success' ) {
+			// Remember empty responses too, so removing the last heading does
+			// not leave the old list visible on the next request.
+			setPreviousContent( content ?? '' );
+		}
+	}, [ content, status ] );
+	const previewContent = status === 'success' ? content : previousContent;
+
 	const disabledRef = useDisabled();
 	const blockProps = useBlockProps( { ref: disabledRef } );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -197,38 +205,12 @@ export default function TableOfContentsEdit( props ) {
 				label={ __( 'Settings' ) }
 				resetAll={ () => {
 					setAttributes( {
-						onlyIncludeCurrentPage: false,
 						maxLevel: undefined,
 						ordered: true,
 					} );
 				} }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
-				<ToolsPanelItem
-					hasValue={ () => !! onlyIncludeCurrentPage }
-					label={ __( 'Only include current page' ) }
-					onDeselect={ () =>
-						setAttributes( { onlyIncludeCurrentPage: false } )
-					}
-					isShownByDefault
-				>
-					<ToggleControl
-						label={ __( 'Only include current page' ) }
-						checked={ onlyIncludeCurrentPage }
-						onChange={ ( value ) =>
-							setAttributes( { onlyIncludeCurrentPage: value } )
-						}
-						help={
-							onlyIncludeCurrentPage
-								? __(
-										'Only including headings from the current page (if the post is paginated).'
-									)
-								: __(
-										'Include headings from all pages (if the post is paginated).'
-									)
-						}
-					/>
-				</ToolsPanelItem>
 				<ToolsPanelItem
 					hasValue={ () => !! maxLevel }
 					label={ __( 'Limit heading levels' ) }
@@ -238,7 +220,7 @@ export default function TableOfContentsEdit( props ) {
 					isShownByDefault
 				>
 					<WCSelectControl
-						label={ __( 'Include headings down to level' ) }
+						label={ __( 'Maximum heading level' ) }
 						value={ maxLevel || '' }
 						options={ [
 							{ value: '', label: __( 'All levels' ) },
@@ -254,15 +236,6 @@ export default function TableOfContentsEdit( props ) {
 								maxLevel: value ? parseInt( value ) : undefined,
 							} )
 						}
-						help={
-							! maxLevel
-								? __(
-										'Including all heading levels in the table of contents.'
-									)
-								: __(
-										'Only include headings up to and including this level.'
-									)
-						}
 					/>
 				</ToolsPanelItem>
 			</ToolsPanel>
@@ -271,7 +244,7 @@ export default function TableOfContentsEdit( props ) {
 
 	return (
 		<>
-			{ status === 'loading' && (
+			{ status === 'loading' && previousContent === undefined && (
 				<div { ...blockProps }>
 					<Spinner />
 				</div>
@@ -287,8 +260,11 @@ export default function TableOfContentsEdit( props ) {
 					</p>
 				</div>
 			) }
-			{ status === 'success' && (
-				<HtmlRenderer wrapperProps={ blockProps } html={ content } />
+			{ status !== 'error' && previewContent !== undefined && (
+				<HtmlRenderer
+					wrapperProps={ blockProps }
+					html={ previewContent }
+				/>
 			) }
 			{ headings.length > 0 && toolbarControls }
 			{ inspectorControls }
