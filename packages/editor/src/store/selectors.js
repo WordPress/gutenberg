@@ -20,8 +20,11 @@ import {
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
+	EDITOR_INTENT_SUGGEST,
+	EDITOR_INTENT_VIEW,
 } from './constants';
 import { getPostRawValue } from './reducer';
+import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
 import { getDeviceTypeByCanvasWidth } from '../utils/device-type';
 
@@ -316,6 +319,14 @@ const getNestedEditedPostProperty = createSelector(
  * edit if one exists, but falling back to the attribute for the last known
  * saved state of the post.
  *
+ * While the editor is in Suggestion mode (experimental), a post field with a
+ * pending suggestion returns the suggested value instead, so the fields the
+ * suggester changed show what they proposed. The post itself keeps its value
+ * until a reviewer accepts the suggestion: read the `core` entity record
+ * (`getEditedEntityRecord`) for the value the post will be saved with. A
+ * suggested meta value is merged into `meta`, and a suggested term field
+ * returns term ids only, leaving out terms that do not exist yet.
+ *
  * @param {Object} state         Global application state.
  * @param {string} attributeName Post attribute name.
  *
@@ -348,19 +359,89 @@ export function getEditedPostAttribute( state, attributeName ) {
 			return getEditedPostContent( state );
 	}
 
+	// While suggesting, a field with a pending proposal reads as the
+	// proposed value, so every panel and plugin that reads the post through
+	// this selector shows what the suggester proposed. The post itself keeps
+	// its value until a reviewer accepts. See issue #73411.
+	const proposals =
+		state.editorIntent === EDITOR_INTENT_SUGGEST
+			? state.postFieldProposals
+			: undefined;
+	if ( proposals && attributeName !== 'meta' && proposals[ attributeName ] ) {
+		return withoutProposedNewTerms( proposals[ attributeName ].proposed );
+	}
+
 	// Fall back to saved post value if not edited.
 	const edits = getPostEdits( state );
+	let value;
 	if ( ! edits.hasOwnProperty( attributeName ) ) {
-		return getCurrentPostAttribute( state, attributeName );
+		value = getCurrentPostAttribute( state, attributeName );
+	} else if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
+		// Merge properties are objects which contain only the patch edit in
+		// state, and thus must be merged with the current post attribute.
+		value = getNestedEditedPostProperty( state, attributeName );
+	} else {
+		value = edits[ attributeName ];
 	}
 
-	// Merge properties are objects which contain only the patch edit in state,
-	// and thus must be merged with the current post attribute.
-	if ( EDIT_MERGE_PROPERTIES.has( attributeName ) ) {
-		return getNestedEditedPostProperty( state, attributeName );
+	if ( proposals && attributeName === 'meta' ) {
+		return withProposedMeta( value, proposals );
 	}
+	return value;
+}
 
-	return edits[ attributeName ];
+/*
+ * A terms proposal can name terms that do not exist yet (`{ name, parent }`
+ * entries, created when a reviewer accepts). The post's term field only ever
+ * holds term ids, so readers get the ids alone; the term pickers read the
+ * new terms through `getProposedNewTerms`. Memoized per proposed value so the
+ * selector stays referentially stable.
+ */
+const proposedTermIds = new WeakMap();
+function withoutProposedNewTerms( value ) {
+	if (
+		! Array.isArray( value ) ||
+		value.every( ( item ) => typeof item !== 'object' )
+	) {
+		return value;
+	}
+	if ( ! proposedTermIds.has( value ) ) {
+		proposedTermIds.set(
+			value,
+			value.filter( ( item ) => typeof item !== 'object' )
+		);
+	}
+	return proposedTermIds.get( value );
+}
+
+/*
+ * The meta object with proposed meta values laid over it, memoized on its
+ * two inputs so a selector returning it stays referentially stable.
+ */
+let lastProposedMeta = { meta: undefined, proposals: undefined, value: null };
+function withProposedMeta( meta, proposals ) {
+	if (
+		lastProposedMeta.meta === meta &&
+		lastProposedMeta.proposals === proposals
+	) {
+		return lastProposedMeta.value;
+	}
+	const metaProposals = Object.values( proposals ).filter(
+		( proposal ) => proposal.attribute === 'meta'
+	);
+	const value = metaProposals.length
+		? {
+				...meta,
+				...Object.fromEntries(
+					metaProposals.map( ( proposal ) => [
+						proposal.key,
+						proposal.proposed,
+					] )
+				),
+			}
+		: meta;
+	lastProposedMeta = { meta, proposals, value };
+	return value;
 }
 
 /**
@@ -1387,10 +1468,80 @@ export function isInserterOpened( state ) {
  *
  * @return {string} Editing mode.
  */
-export const getEditorMode = createRegistrySelector(
-	( select ) => () =>
-		select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual'
-);
+export const getEditorMode = createRegistrySelector( ( select ) => {
+	/*
+	 * The marker probe is memoized on the edited record rather than run per
+	 * call: this selector has a subscriber in most of the editor chrome, and
+	 * `getEditedPostContent` re-serializes the record's blocks whenever it
+	 * holds any, so probing on every call would serialize the document once
+	 * per subscriber per state change. The edited record is itself memoized
+	 * by core-data, so its identity changes exactly when the content can.
+	 */
+	const hasPendingSuggestionMarkersInPost = createSelector(
+		( state ) =>
+			hasPendingSuggestionMarkers( getEditedPostContent( state ) ),
+		( state ) => [
+			select( coreStore ).getEditedEntityRecord(
+				'postType',
+				getCurrentPostType( state ),
+				getCurrentPostId( state )
+			),
+		]
+	);
+
+	return ( state ) => {
+		/*
+		 * The `suggest` and `view` intents both report `visual` whatever the
+		 * stored preference says. The code editor is a raw `post_content`
+		 * textarea: it has nowhere to render an inline marker, and the
+		 * document it hands back is re-parsed from scratch, so an edit made
+		 * there is not capturable as a suggestion and destroys the markers
+		 * already in the post. Viewing has the simpler reason - it is a
+		 * read-only preview, and preview rendering does not reach the
+		 * textarea, so a user whose preference is the code editor would land
+		 * in a fully writable one. Answering here keeps every consumer of
+		 * this selector - the interface, the header, the document tools, the
+		 * mode switcher - agreed on one mode, and leaves the preference
+		 * untouched so returning to the `edit` intent returns the user to the
+		 * code editor.
+		 *
+		 * The intent is read off state rather than through the private
+		 * `getEditorIntent` selector because private-selectors.js imports
+		 * from this module, so importing it back would close a cycle. The
+		 * reducer always holds a value, so there is nothing to fall back to.
+		 */
+		if (
+			state.editorIntent === EDITOR_INTENT_SUGGEST ||
+			state.editorIntent === EDITOR_INTENT_VIEW
+		) {
+			return 'visual';
+		}
+
+		const mode =
+			select( preferencesStore ).get( 'core', 'editorMode' ) ?? 'visual';
+
+		/*
+		 * The same refusal, for the same reason, one intent later. Markers
+		 * left unresolved when the user goes back to Editing - or already in
+		 * the post when it loads - are just as destructible, and neither
+		 * route dispatches `switchEditorMode`, so its guard never runs: the
+		 * mask simply lifts and the stored `text` preference puts the raw
+		 * `post_content` textarea back on screen with the markers in it.
+		 * Answering here covers both, and leaves the preference alone so the
+		 * code editor returns once the suggestions are resolved.
+		 *
+		 * Probing costs a serialization of the document, so it is gated on
+		 * the preference actually being `text`: a visual-editor session -
+		 * every session by default - never pays for it, and a code-editor
+		 * session is not re-serializing per keystroke the way the canvas is.
+		 */
+		if ( mode === 'text' && hasPendingSuggestionMarkersInPost( state ) ) {
+			return 'visual';
+		}
+
+		return mode;
+	};
+} );
 
 /*
  * Backward compatibility

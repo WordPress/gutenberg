@@ -8,6 +8,8 @@ import { keyboardShortcut } from '@wordpress/keycodes';
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Menu } from '@wordpress/ui';
 import CopyContentMenuItem from './copy-content-menu-item';
+import IntentSwitcher from '../intent-switcher';
+import { isSuggestionModeEnabled } from '../suggestion-mode/gate';
 import MoreMenuItem from './more-menu-item';
 import ModeSwitcher from '../mode-switcher';
 import MoreMenuPreferenceItem from './more-menu-preference-item';
@@ -128,6 +130,7 @@ export default function MoreMenu( { isRevisionMode = false } ) {
 					</ActionItem.Slot>
 				</Menu.Group>
 				<Menu.Separator />
+				{ isSuggestionModeEnabled() && <IntentSwitcher /> }
 				<ModeSwitcher />
 				<Menu.Separator />
 				<Menu.Group>
