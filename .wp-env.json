@@ -1,5 +1,6 @@
 {
 	"core": "WordPress/WordPress#5.8-branch",
+	"mariadbVersion": "10.6",
 	"plugins": [
 		"."
 	],
