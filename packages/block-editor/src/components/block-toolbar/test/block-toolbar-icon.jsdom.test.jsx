@@ -8,11 +8,17 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 	const actualImplementation = await importOriginal();
 	return {
 		...actualImplementation,
-		getBlockType: ( name ) => ( {
-			name,
-			title: name === 'core/template-part' ? 'Template Part' : 'Group',
-			icon: `${ name }-icon`,
-		} ),
+		getBlockType: ( name ) =>
+			name
+				? {
+						name,
+						title:
+							name === 'core/template-part'
+								? 'Template Part'
+								: 'Group',
+						icon: `${ name }-icon`,
+					}
+				: undefined,
 	};
 } );
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
@@ -292,6 +298,22 @@ describe( 'BlockToolbarIcon', () => {
 				'aria-label',
 				'Multiple blocks selected'
 			);
+		} );
+	} );
+
+	describe( 'when no block is selected (placeholder)', () => {
+		it( 'should keep a discernible label when no default block type is registered', () => {
+			useSelect.mockImplementation( () => ( {
+				icon: undefined,
+				showIconLabels: false,
+				variant: 'default',
+			} ) );
+
+			render( <BlockToolbarIcon clientIds={ [] } isSynced={ false } /> );
+
+			const button = screen.getByRole( 'button' );
+			expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+			expect( button ).toHaveAttribute( 'aria-label', 'Block' );
 		} );
 	} );
 } );
