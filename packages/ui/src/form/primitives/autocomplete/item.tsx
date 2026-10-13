@@ -33,7 +33,7 @@ export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
 		},
 		ref
 	) {
-		const keyboardHighlight = useKeyboardHighlight();
+		const { keyboardHighlight } = useKeyboardHighlight();
 		const { contentChildren, itemAriaProps } = useItemContent(
 			children,
 			ITEM_CONTENT_COMPONENTS,
