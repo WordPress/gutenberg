@@ -40,8 +40,8 @@ function gutenberg_url( $path ) {
  *
  * @param string|false $file   Path to the translation file to load. False if
  *                             there isn't one.
- * @param string       $handle Name of the script to register a translation
- *                             domain to.
+ * @param string       $handle Name of the script, or ID of the script module,
+ *                             to register a translation domain to.
  *
  * @return string|false Filtered path to the Gutenberg translation file, if
  *                      available.
@@ -51,15 +51,19 @@ function gutenberg_override_translation_file( $file, $handle ) {
 		return $file;
 	}
 
-	// Ignore scripts whose handle does not have the "wp-" prefix.
-	if ( ! str_starts_with( $handle, 'wp-' ) ) {
-		return $file;
-	}
+	// Script modules served from the plugin's `build/` folder, e.g. from `build/modules/` and `build/routes/`, skip the checks for scripts.
+	$script_module = wp_script_modules()->get_registered( $handle );
+	if ( null === $script_module || ! str_starts_with( $script_module['src'], gutenberg_url( 'build/' ) ) ) {
+		// Ignore scripts whose handle does not have the "wp-" prefix.
+		if ( ! str_starts_with( $handle, 'wp-' ) ) {
+			return $file;
+		}
 
-	// Ignore scripts that are not found in the expected `build/scripts/` location.
-	$script_path = gutenberg_dir_path() . 'build/scripts/' . substr( $handle, 3 ) . '/index.min.js';
-	if ( ! file_exists( $script_path ) ) {
-		return $file;
+		// Ignore scripts that are not found in the expected `build/scripts/` location.
+		$script_path = gutenberg_dir_path() . 'build/scripts/' . substr( $handle, 3 ) . '/index.min.js';
+		if ( ! file_exists( $script_path ) ) {
+			return $file;
+		}
 	}
 
 	/*
@@ -68,9 +72,10 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	 *
 	 * Example: /www/wp-content/languages/plugins/de_DE-07d88e6a803e01276b9bfcc1203e862e.json
 	 *
-	 * The logic of `load_script_textdomain` is such that it will assume to
-	 * search in the plugins language directory, since the assigned source of
-	 * the overridden Gutenberg script originates in the plugins directory.
+	 * The logic of `load_script_textdomain` and `load_script_module_textdomain`
+	 * is such that it will assume to search in the plugins language directory,
+	 * since the assigned source of the overridden Gutenberg script originates
+	 * in the plugins directory.
 	 *
 	 * The plugin translation files each begin with the slug of the plugin, so
 	 * it's a simple matter of prepending the Gutenberg plugin slug.
