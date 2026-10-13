@@ -20,6 +20,7 @@
 
 ### Bug Fixes
 
+-   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
 -   `Tabs`: Restore the `fit-content` width of horizontal tab lists, which stretched to full width after the SCSS Modules migration ([#84626](https://github.com/WordPress/gutenberg/pull/84626)).
 -   `Snackbar`: Return focus to the previously focused control when dismissing a focused snackbar outside SnackbarList, including portaled snackbars ([#84342](https://github.com/WordPress/gutenberg/pull/84342)).
