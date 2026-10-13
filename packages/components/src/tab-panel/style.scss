@@ -32,7 +32,8 @@
 	&:not(:disabled, [aria-disabled="true"]):is(:hover, :active, :focus-visible) {
 		color: var(--wpds-color-foreground-interactive-neutral-active);
 
-		&::before {
+		&::before,
+		& .components-tab-panel__tabs-item-label::before {
 			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 		}
 	}
@@ -74,6 +75,10 @@
 	// Interaction background and focus ring.
 	&::before {
 		content: "";
+	}
+
+	&::before,
+	& .components-tab-panel__tabs-item-label::before {
 		position: absolute;
 		z-index: -1;
 		inset: var(--wpds-dimension-padding-md);
@@ -81,12 +86,35 @@
 		border-radius: var(--wpds-border-radius-sm);
 	}
 
-	&:focus-visible::before {
+	&:focus-visible::before,
+	&:focus-visible .components-tab-panel__tabs-item-label::before {
 		@include outset-ring__focus();
 		outline-offset: 0;
 	}
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
+		&::before {
+			content: none;
+		}
+
+		&.has-icon::before {
+			content: "";
+			inset-block: var(--wpds-dimension-padding-sm);
+			inset-inline-start: calc(50% - var(--wpds-dimension-size-sm) / 2 - var(--wpds-dimension-padding-xs));
+			inset-inline-end: auto;
+			width: calc(var(--wpds-dimension-size-sm) + 2 * var(--wpds-dimension-padding-xs));
+		}
+
+		& .components-tab-panel__tabs-item-label {
+			position: relative;
+			display: inline-flex;
+
+			&::before {
+				content: "";
+				inset: calc(-1 * var(--wpds-dimension-padding-xs));
+			}
+		}
+
 		&::after {
 			inset-block: 0;
 			inset-inline: 0 auto;

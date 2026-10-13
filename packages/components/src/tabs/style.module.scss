@@ -126,7 +126,8 @@
 		&:not([aria-disabled="true"]):is(:hover, :active, [data-focus-visible]) {
 			color: var(--wpds-color-foreground-interactive-neutral-active);
 
-			&::after {
+			&::after,
+			& .tab-children::after {
 				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 				opacity: 1;
 			}
@@ -140,7 +141,8 @@
 		// Interaction background and focus indicator.
 		position: relative;
 		isolation: isolate;
-		&::after {
+		&::after,
+		& .tab-children::after {
 			position: absolute;
 			z-index: -1;
 			pointer-events: none;
@@ -160,7 +162,8 @@
 			}
 		}
 
-		&[data-focus-visible]::after {
+		&[data-focus-visible]::after,
+		&[data-focus-visible] .tab-children::after {
 			outline-color: $components-color-accent;
 			opacity: 1;
 		}
@@ -185,12 +188,6 @@
 			fill: currentColor;
 		}
 	}
-	[aria-orientation="vertical"] &::after {
-		content: "";
-		inset-block: var(--wp-admin-border-width-focus);
-		// Keep the focus ring clear of the selection indicator.
-		inset-inline: calc(2 * var(--wp-admin-border-width-focus));
-	}
 }
 
 .tab-children {
@@ -203,12 +200,20 @@
 		justify-content: center;
 	}
 	[aria-orientation="vertical"] & {
+		flex-grow: 0;
+		position: relative;
 		justify-content: start;
+
+		&::after {
+			content: "";
+			inset: calc(-1 * var(--wpds-dimension-padding-xs));
+		}
 	}
 }
 
 .tab-chevron {
 	flex-shrink: 0;
+	margin-inline-start: auto;
 	margin-inline-end: -4px;
 	[aria-orientation="horizontal"] & {
 		display: none;

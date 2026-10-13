@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   `TabPanel`: Add interaction backgrounds within the focus ring and use neutral selection lines in both orientations ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
+-   `TabPanel`: Add padded interaction backgrounds around tab content within the focus ring and use neutral selection lines in both orientations ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 
 ### Deprecations
 
@@ -23,7 +23,7 @@
 
 ### Bug Fixes
 
--   `Tabs`: Use semantic interaction colors and separate hover backgrounds, keyboard focus rings, and selection lines in both orientations ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
+-   `Tabs`: Use semantic interaction colors and separate padded backgrounds around tab content, keyboard focus rings, and selection lines in both orientations ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).

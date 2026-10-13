@@ -136,7 +136,8 @@
 			&:not([data-disabled]):is(:hover, :active, :focus-visible) {
 				color: var(--wpds-color-foreground-interactive-neutral-active);
 
-				&::after {
+				&::after,
+				& .tab-children::after {
 					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 					opacity: 1;
 				}
@@ -144,7 +145,8 @@
 
 			/* Interaction background and focus indicator. */
 			&::before,
-			&::after {
+			&::after,
+			& .tab-children::after {
 				position: absolute;
 				z-index: -1;
 				pointer-events: none;
@@ -161,7 +163,8 @@
 				}
 			}
 
-			&:focus-visible::after {
+			&:focus-visible::after,
+			&:focus-visible .tab-children::after {
 				outline-color: var(--wpds-color-stroke-focus);
 				opacity: 1;
 			}
@@ -218,12 +221,6 @@
 				padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
 				min-height: var(--wpds-dimension-size-lg);
 
-				&::after {
-					content: "";
-					inset-block: var(--wpds-border-width-focus);
-					/* Keep the focus ring clear of the selection indicator. */
-					inset-inline: calc(2 * var(--wpds-border-width-focus));
-				}
 			}
 		}
 
@@ -238,12 +235,20 @@
 			}
 
 			[data-orientation="vertical"] & {
+				flex-grow: 0;
+				position: relative;
 				justify-content: start;
+
+				&::after {
+					content: "";
+					inset: calc(-1 * var(--wpds-dimension-padding-xs));
+				}
 			}
 		}
 
 		.tab-chevron {
 			flex-shrink: 0;
+			margin-inline-start: auto;
 			margin-inline-end: calc(var(--wpds-dimension-gap-xs) * -1);
 
 			[data-orientation="horizontal"] & {
