@@ -2,10 +2,11 @@ import { _x, __ } from '@wordpress/i18n';
 import { dateI18n, humanTimeDiff } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
 import {
+	Field,
 	Fieldset,
 	InputControl,
 	Link,
-	SelectControl,
+	Select,
 	Stack,
 	SwitchControl,
 } from '@wordpress/ui';
@@ -118,44 +119,55 @@ function NonDefaultControls( { format, onChange } ) {
 
 	return (
 		<Stack direction="column" gap="sm">
-			<SelectControl
-				label={ __( 'Choose a format' ) }
-				value={
-					isCustom
-						? customOption
-						: ( suggestedOptions.find(
-								( option ) => option.format === format
-							) ?? customOption )
-				}
-				onValueChange={ ( selectedItem ) => {
-					if ( ! selectedItem ) {
-						return;
+			<Field.Root>
+				<Field.Label className="components-base-control__label">
+					{ __( 'Choose a format' ) }
+				</Field.Label>
+				<Select.Root
+					items={ [ ...suggestedOptions, customOption ] }
+					value={
+						isCustom
+							? customOption
+							: ( suggestedOptions.find(
+									( option ) => option.format === format
+								) ?? customOption )
 					}
-					if ( selectedItem === customOption ) {
-						setIsCustom( true );
-					} else {
-						setIsCustom( false );
-						onChange( selectedItem.format );
-					}
-				} }
-			>
-				{ suggestedOptions.map( ( option ) => (
-					<SelectControl.Item key={ option.value } value={ option }>
-						<SelectControl.ItemLabel>
-							{ option.label }
-						</SelectControl.ItemLabel>
-					</SelectControl.Item>
-				) ) }
-				<SelectControl.Separator />
-				<SelectControl.Item value={ customOption }>
-					<SelectControl.ItemLabel>
-						{ customOption.label }
-					</SelectControl.ItemLabel>
-					<SelectControl.ItemDescription>
-						{ customOption.description }
-					</SelectControl.ItemDescription>
-				</SelectControl.Item>
-			</SelectControl>
+					onValueChange={ ( selectedItem ) => {
+						if ( ! selectedItem ) {
+							return;
+						}
+						if ( selectedItem === customOption ) {
+							setIsCustom( true );
+						} else {
+							setIsCustom( false );
+							onChange( selectedItem.format );
+						}
+					} }
+				>
+					<Select.Trigger />
+					<Select.Popup width="content">
+						{ suggestedOptions.map( ( option ) => (
+							<Select.Item key={ option.value } value={ option }>
+								<Select.ItemLabel>
+									{ option.label }
+								</Select.ItemLabel>
+							</Select.Item>
+						) ) }
+						<Select.Separator />
+						<Select.Item
+							value={ customOption }
+							className="block-editor-date-format-picker__custom-format-select-control__custom-option"
+						>
+							<Select.ItemLabel>
+								{ customOption.label }
+							</Select.ItemLabel>
+							<Select.ItemDescription>
+								{ customOption.description }
+							</Select.ItemDescription>
+						</Select.Item>
+					</Select.Popup>
+				</Select.Root>
+			</Field.Root>
 			{ isCustom && (
 				<InputControl
 					label={ __( 'Custom format' ) }

@@ -1,7 +1,6 @@
 import clsx from 'clsx';
-import { CustomSelectControl } from '@wordpress/components';
-import { SelectControl } from '@wordpress/ui';
-import { __ } from '@wordpress/i18n';
+import { Field, Select, VisuallyHidden } from '@wordpress/ui';
+import { __, sprintf } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 
 export default function FontFamilyControl( {
@@ -15,6 +14,16 @@ export default function FontFamilyControl( {
 	onChange,
 	fontFamilies,
 	className,
+	label = __( 'Font' ),
+	hideLabelFromVision,
+	describedBy,
+	size,
+	disabled,
+	options: customOptions,
+	__experimentalShowSelectedHint = false,
+	showSelectedHint = __experimentalShowSelectedHint,
+	__nextUnconstrainedWidth: _nextUnconstrainedWidth,
+	__nextHasNoMarginBottom: _nextHasNoMarginBottom,
 	...props
 } ) {
 	const [ blockLevelFontFamilies ] = useSettings( 'typography.fontFamilies' );
@@ -26,68 +35,82 @@ export default function FontFamilyControl( {
 		return null;
 	}
 
-	const options = [
-		{
-			value: null,
-			label: __( 'Default' ),
-		},
-		...fontFamilies.map( ( { fontFamily, name } ) => ( {
-			value: fontFamily,
-			label: name || fontFamily,
-			style: { fontFamily },
-		} ) ),
-	];
+	const options = customOptions
+		? customOptions.map( ( option ) => ( {
+				value: option.key || null,
+				label: option.name,
+				style: option.style,
+				className: option.className,
+				description: option.hint ?? option.__experimentalHint,
+			} ) )
+		: [
+				{
+					value: null,
+					label: __( 'Default' ),
+				},
+				...fontFamilies.map( ( { fontFamily, name } ) => ( {
+					value: fontFamily,
+					label: name || fontFamily,
+					style: { fontFamily },
+				} ) ),
+			];
 
 	const selectedValue =
 		options.find( ( option ) => option.value === ( value || null ) ) ??
 		options[ 0 ];
 
-	// Callers can forward legacy props such as describedBy, size, and trigger focus callbacks.
-	// SelectControl does not accept those props with the same behavior.
-	if ( Object.keys( props ).length ) {
-		const legacyOptions = options.map(
-			( { value: key, label: name, style } ) => ( {
-				key: key ?? '',
-				name,
-				style,
-			} )
-		);
-		return (
-			<CustomSelectControl
-				label={ __( 'Font' ) }
-				value={
-					legacyOptions.find( ( option ) => option.key === value ) ??
-					''
-				}
-				onChange={ ( { selectedItem } ) =>
-					onChange( selectedItem.key )
-				}
-				options={ legacyOptions }
-				className={ clsx(
-					'block-editor-font-family-control',
-					className
-				) }
-				{ ...props }
-			/>
-		);
-	}
-
 	return (
-		<SelectControl
-			label={ __( 'Font' ) }
-			value={ selectedValue }
-			onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
-			items={ options }
+		<Field.Root
 			className={ clsx( 'block-editor-font-family-control', className ) }
-			{ ...props }
+			disabled={ disabled }
 		>
-			{ options.map( ( option ) => (
-				<SelectControl.Item key={ option.value } value={ option }>
-					<SelectControl.ItemLabel style={ option.style }>
-						{ option.label }
-					</SelectControl.ItemLabel>
-				</SelectControl.Item>
-			) ) }
-		</SelectControl>
+			<Field.Label
+				className="components-base-control__label"
+				hideFromVision={ hideLabelFromVision }
+			>
+				{ label }
+			</Field.Label>
+			<Select.Root
+				value={ selectedValue }
+				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+				items={ options }
+				disabled={ disabled }
+			>
+				<Select.Trigger size={ size } { ...props }>
+					{ showSelectedHint && selectedValue.description ? (
+						<>
+							{ selectedValue.label }
+							<span> { selectedValue.description }</span>
+						</>
+					) : undefined }
+				</Select.Trigger>
+				<Select.Popup width="content">
+					{ options.map( ( option ) => (
+						<Select.Item
+							key={ option.value }
+							value={ option }
+							className={ option.className }
+						>
+							<Select.ItemLabel style={ option.style }>
+								{ option.label }
+							</Select.ItemLabel>
+							{ option.description && (
+								<Select.ItemDescription>
+									{ option.description }
+								</Select.ItemDescription>
+							) }
+						</Select.Item>
+					) ) }
+				</Select.Popup>
+			</Select.Root>
+			<VisuallyHidden render={ <Field.Description /> }>
+				{ describedBy ||
+					sprintf(
+						// translators: %s: The selected option.
+						__( 'Currently selected: %s' ),
+						selectedValue.label
+					) }
+			</VisuallyHidden>
+		</Field.Root>
 	);
 }

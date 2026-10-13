@@ -266,49 +266,54 @@ export default function PresetInputControl( {
 				/>
 			) }
 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (
-				<Select.Root
-					onValueChange={ ( selection ) => {
-						if ( ! selection ) {
-							return;
+				<div className="preset-input-control__custom-select-control">
+					<Select.Root
+						items={ options }
+						onValueChange={ ( selection ) => {
+							if ( ! selection ) {
+								return;
+							}
+							if (
+								showCustomValueInSelectList &&
+								selection.value === options.length - 1
+							) {
+								setShowCustomValueControl( true );
+							} else {
+								onChange(
+									getNewPresetValue(
+										selection.value,
+										'selectList'
+									)
+								);
+							}
+						} }
+						value={
+							options.find(
+								( option ) => option.value === currentValue
+							) ?? options[ 0 ]
 						}
-						if (
-							showCustomValueInSelectList &&
-							selection.value === options.length - 1
-						) {
-							setShowCustomValueControl( true );
-						} else {
-							onChange(
-								getNewPresetValue(
-									selection.value,
-									'selectList'
-								)
-							);
-						}
-					} }
-					value={
-						options.find(
-							( option ) => option.value === currentValue
-						) ?? options[ 0 ]
-					}
-				>
-					<Select.Trigger
-						className="preset-input-control__custom-select-control"
-						aria-label={ ariaLabel }
-						onBlur={ onMouseOut }
-						onFocus={ onMouseOver }
-						onMouseOut={ onMouseOut }
-						onMouseOver={ onMouseOver }
-					/>
-					<Select.Popup>
-						{ options.map( ( option ) => (
-							<Select.Item key={ option.value } value={ option }>
-								<Select.ItemLabel>
-									{ option.label }
-								</Select.ItemLabel>
-							</Select.Item>
-						) ) }
-					</Select.Popup>
-				</Select.Root>
+					>
+						<Select.Trigger
+							aria-label={ ariaLabel }
+							onBlur={ onMouseOut }
+							onFocus={ onMouseOver }
+							onMouseOut={ onMouseOut }
+							onMouseOver={ onMouseOver }
+						/>
+						<Select.Popup>
+							{ options.map( ( option ) => (
+								<Select.Item
+									key={ option.value }
+									value={ option }
+								>
+									<Select.ItemLabel>
+										{ option.label }
+									</Select.ItemLabel>
+								</Select.Item>
+							) ) }
+						</Select.Popup>
+					</Select.Root>
+				</div>
 			) }
 			{ hasPresets && ! disableCustomValues && (
 				<Button
