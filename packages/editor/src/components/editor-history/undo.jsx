@@ -16,10 +16,13 @@ function EditorHistoryUndo( props, ref ) {
 		 * action it would decline. `isEditorIntentReadOnly` is private while
 		 * Suggest mode is experimental.
 		 */
-		if ( unlock( select( editorStore ) ).isEditorIntentReadOnly() ) {
+		const editor = unlock( select( editorStore ) );
+		if ( editor.isEditorIntentReadOnly() ) {
 			return false;
 		}
-		return select( editorStore ).hasEditorUndo();
+		// A pending suggestion Undo would withdraw may not be in the
+		// history at all (see `hasSuggestionUndo`).
+		return editor.hasEditorUndo() || editor.hasSuggestionUndo();
 	}, [] );
 	const { undo } = useDispatch( editorStore );
 	return (
