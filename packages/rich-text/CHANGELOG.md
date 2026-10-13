@@ -9,12 +9,12 @@
 
 ### Enhancements
 
--   Type `start` and `end` of `RichTextValue` as optional, since a value has no selection until one is set, and document the return types of the public functions ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Type `start` and `end` of `RichTextValue` as optional, since a value has no selection until one is set, and document the return types of the public functions ([#84610](https://github.com/WordPress/gutenberg/pull/84610)).
 
 ### Bug Fixes
 
 -   `getTextContent`: Remove every object replacement character from the returned text, not just the first one ([#81526](https://github.com/WordPress/gutenberg/pull/81526)).
--   Fix `replace` for a caret at `0` and patterns with named groups, `insert` and `split` without a selection, `registerFormatType` with `keywords: undefined`, `RichTextShortcut` and `RichTextInputEvent` outside a rich text field, and a `null` format selector result ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Fix `replace` for a caret at `0` and patterns with named groups, `insert` and `split` without a selection, `registerFormatType` with `keywords: undefined`, `RichTextShortcut` and `RichTextInputEvent` outside a rich text field, and a `null` format selector result ([#84610](https://github.com/WordPress/gutenberg/pull/84610)).
 
 ### Internal
 
