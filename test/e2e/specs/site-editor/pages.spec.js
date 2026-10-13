@@ -124,7 +124,10 @@ test.describe( 'Pages', () => {
 			.click();
 
 		// Site Title and Page entities should have been modified.
-		await page.getByRole( 'button', { name: 'Save', exact: true } ).click();
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
 		await expect(
 			page.locator(
 				'role=region[name="Save panel"] >> role=checkbox[name="Title"]'
