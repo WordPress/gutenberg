@@ -158,8 +158,8 @@
 // box pane and the content, which should not lag behind a pin, unpin, or drag.
 .has-metaboxes .interface-interface-skeleton__content iframe[name="editor-canvas"] {
 	@media not ( prefers-reduced-motion ) {
-		transition-property: all, height, min-height;
-		transition-duration: 400ms, 0s, 0s;
+		transition-property: all, height;
+		transition-duration: 400ms, 0s;
 	}
 }
 
@@ -192,21 +192,13 @@
 // second scrollbar and sticks when the scroll hands off.
 .has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main.is-inline) {
 	.editor-visual-editor {
-		flex: 0 0 auto;
-		height: auto;
 		max-height: none;
-		min-height: 100%;
 		overflow: visible;
 	}
 
 	.block-editor-iframe__container,
 	.block-editor-iframe__scale-container {
 		height: auto;
-	}
-
-	iframe[name="editor-canvas"] {
-		display: block;
-		min-height: 100%;
 	}
 
 	.editor-text-editor {

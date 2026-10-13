@@ -150,12 +150,10 @@ function MetaBoxesMain() {
 	// does not apply, including if the pane is collapsed and opened again.
 	const [ sessionHeight, setSessionHeight ] = useState();
 
-	// Grow the canvas iframe to its content while meta boxes are inline, so the
-	// content area is the only scroller. An inner iframe scrollbar plus the
-	// outer one sticks at the handoff and shows both bars. The iframe is
-	// mounted after this component, and later replaced, so watch for it.
-	// A layout effect so the switch between pinned and inline is sized and
-	// scrolled before paint, instead of flashing an empty canvas.
+	// While inline, grow the canvas iframe to its content so the content area
+	// is the only scroller. An inner iframe scrollbar plus the outer one sticks
+	// at the handoff and shows both bars. A layout effect so switching modes is
+	// sized and scrolled before paint.
 	useLayoutEffect( () => {
 		if ( isPinned || ! hasAnyVisible ) {
 			return;
@@ -167,137 +165,92 @@ function MetaBoxesMain() {
 			return;
 		}
 
-		let resizeObserver;
-		let iframe = null;
-		let frameDocument = null;
-		// Read on cleanup, when the pinned layout has already clamped the
-		// content area's scrollTop to 0.
+		let iframe;
+		// Kept current because cleanup runs after the pinned layout has
+		// already clamped the content area's scrollTop to 0.
 		let contentScrollTop = content.scrollTop;
-		const trackContentScroll = () => {
+		const onContentScroll = () => {
 			contentScrollTop = content.scrollTop;
 		};
-
-		// The iframe document keeps its scroll offset even with overflow
-		// hidden, which hides the top of the post. Hand any offset to the
-		// content scroller so there is only one scroll position.
+		// The iframe document keeps a scroll offset even with overflow hidden,
+		// which would hide the top of the post. Hand it to the content area.
 		const moveFrameScrollToContent = () => {
-			const scroller = frameDocument?.scrollingElement;
-			if ( ! scroller || ! scroller.scrollTop ) {
-				return;
-			}
-			const offset = scroller.scrollTop;
-			scroller.scrollTop = 0;
-			content.scrollTop += offset;
-		};
-		const release = ( frame, { keepPosition = false } = {} ) => {
-			if ( ! frame ) {
-				return;
-			}
-			const offset = contentScrollTop;
-			frame.style.height = '';
-			const doc = frame.contentDocument;
-			if ( doc?.documentElement ) {
-				doc.documentElement.style.overflow = '';
-			}
-			// Pinned, the iframe scrolls on its own and the content area does
-			// not, so keep the reading position by moving it back.
-			if ( keepPosition ) {
-				content.scrollTop = 0;
-				if ( doc?.scrollingElement ) {
-					doc.scrollingElement.scrollTop = offset;
-				}
+			const scroller = iframe?.contentDocument?.scrollingElement;
+			if ( scroller?.scrollTop ) {
+				content.scrollTop += scroller.scrollTop;
+				scroller.scrollTop = 0;
 			}
 		};
 		const sync = () => {
-			const doc = iframe?.contentDocument;
-			const body = doc?.body;
-			if ( ! iframe || ! body ) {
+			const body = iframe?.contentDocument?.body;
+			if ( ! body ) {
 				return;
 			}
-			doc.documentElement.style.overflow = 'hidden';
-			// In-flow boxes only. The canvas cover is position:absolute and
-			// matches the iframe height, and the document's min-height stretches
-			// to the iframe, so either of those would grow the frame forever.
-			const bodyTop = body.getBoundingClientRect().top;
-			let bottom = bodyTop;
+			// In-flow boxes only. The canvas cover is absolutely positioned at
+			// the iframe height, and the document stretches to the iframe, so
+			// measuring either would grow the frame forever.
+			const { top } = body.getBoundingClientRect();
+			let bottom = top;
 			for ( const child of body.children ) {
-				const position = window.getComputedStyle( child ).position;
-				if ( position === 'absolute' || position === 'fixed' ) {
-					continue;
+				const { position } = window.getComputedStyle( child );
+				if ( position !== 'absolute' && position !== 'fixed' ) {
+					bottom = Math.max(
+						bottom,
+						child.getBoundingClientRect().bottom
+					);
 				}
-				bottom = Math.max(
-					bottom,
-					child.getBoundingClientRect().bottom
-				);
 			}
-			const pad =
+			const padding =
 				parseFloat( window.getComputedStyle( body ).paddingBottom ) ||
 				0;
-			const next = Math.max(
-				Math.ceil( bottom - bodyTop + pad ),
+			const height = Math.max(
+				Math.ceil( bottom - top + padding ),
 				content.clientHeight
 			);
-			const nextHeight = `${ next }px`;
-			if ( iframe.style.height !== nextHeight ) {
-				iframe.style.height = nextHeight;
-			}
+			iframe.style.height = `${ height }px`;
 		};
-		const watch = ( next ) => {
-			resizeObserver?.disconnect();
-			resizeObserver = undefined;
-			if ( iframe && iframe !== next ) {
-				release( iframe );
-			}
-			frameDocument?.removeEventListener(
-				'scroll',
-				moveFrameScrollToContent
-			);
-			iframe = next;
-			const doc = iframe?.contentDocument;
-			frameDocument = doc?.body ? doc : null;
-			if ( ! frameDocument ) {
+		const resizeObserver = new window.ResizeObserver( sync );
+		const watch = ( frame ) => {
+			const doc = frame?.contentDocument;
+			if ( ! doc?.body ) {
 				return;
 			}
-			resizeObserver = new window.ResizeObserver( sync );
+			iframe = frame;
+			resizeObserver.disconnect();
 			resizeObserver.observe( doc.documentElement );
 			resizeObserver.observe( content );
+			doc.documentElement.style.overflow = 'hidden';
+			doc.addEventListener( 'scroll', moveFrameScrollToContent );
 			sync();
 			moveFrameScrollToContent();
-			doc.addEventListener( 'scroll', moveFrameScrollToContent );
 		};
-		const find = () =>
-			content.querySelector( 'iframe[name="editor-canvas"]' );
-		// The same iframe element is reused when its document is replaced.
-		const onLoad = ( event ) => {
-			if ( event.target === find() ) {
-				watch( event.target );
+		// The canvas can mount, or replace its document, after this runs.
+		// Load does not bubble, so listen in the capture phase.
+		const onLoad = ( { target } ) => {
+			if ( target.matches?.( 'iframe[name="editor-canvas"]' ) ) {
+				watch( target );
 			}
 		};
 
 		content.addEventListener( 'load', onLoad, true );
-		content.addEventListener( 'scroll', trackContentScroll );
-		const mutationObserver = new window.MutationObserver( () => {
-			const next = find();
-			if ( next !== iframe ) {
-				watch( next );
-			}
-		} );
-		mutationObserver.observe( content, {
-			childList: true,
-			subtree: true,
-		} );
-		watch( find() );
+		content.addEventListener( 'scroll', onContentScroll );
+		watch( content.querySelector( 'iframe[name="editor-canvas"]' ) );
 
 		return () => {
 			content.removeEventListener( 'load', onLoad, true );
-			content.removeEventListener( 'scroll', trackContentScroll );
-			mutationObserver.disconnect();
-			resizeObserver?.disconnect();
-			frameDocument?.removeEventListener(
-				'scroll',
-				moveFrameScrollToContent
-			);
-			release( iframe, { keepPosition: true } );
+			content.removeEventListener( 'scroll', onContentScroll );
+			resizeObserver.disconnect();
+			const doc = iframe?.contentDocument;
+			if ( ! doc ) {
+				return;
+			}
+			doc.removeEventListener( 'scroll', moveFrameScrollToContent );
+			doc.documentElement.style.overflow = '';
+			iframe.style.height = '';
+			// Pinned, the iframe scrolls and the content area does not, so
+			// move the reading position back into the iframe.
+			content.scrollTop = 0;
+			doc.scrollingElement.scrollTop = contentScrollTop;
 		};
 	}, [ isPinned, hasAnyVisible ] );
 
