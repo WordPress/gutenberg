@@ -13,6 +13,7 @@ import {
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
+import { PrivateBlockInspectorEditOriginal } from './components/block-inspector/edit-original-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { showPlaceholderKey as blockToolbarShowPlaceholderKey } from './components/block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
@@ -48,7 +49,6 @@ import {
 	getMediaSelectKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
-	canUserEditEntityRecordKey,
 	isNavigationOverlayContextKey,
 	isNavigationPostEditorKey,
 	mediaUploadOnSuccessKey,
@@ -89,6 +89,7 @@ const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
+	PrivateBlockInspectorEditOriginal,
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,
 	ExperimentalBlockEditorProvider,
@@ -133,7 +134,6 @@ lock( privateApis, {
 	BlockStyleVariationOverridesWithConfig,
 	setBackgroundStyleDefaults,
 	sectionRootClientIdKey,
-	canUserEditEntityRecordKey,
 	NoteIconSlotFill,
 	NoteIconToolbarSlotFill,
 	mediaEditKey,
