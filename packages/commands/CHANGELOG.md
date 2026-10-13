@@ -12,7 +12,7 @@
 
 ### Bug Fixes
 
--   Render only React elements as command icons, and stop reporting an unregistered command loader as loading ([#84377](https://github.com/WordPress/gutenberg/pull/84377)).
+-   Fix the command palette crashing on a dashicon or component icon, and stop reporting an unregistered command loader as loading ([#84377](https://github.com/WordPress/gutenberg/pull/84377)).
 
 ## 1.57.0 (2026-10-07)
 
