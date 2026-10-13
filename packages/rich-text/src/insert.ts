@@ -1,7 +1,6 @@
 import { create } from './create';
 import { normaliseFormats } from './normalise-formats';
-
-/** @typedef {import('./types').RichTextValue} RichTextValue */
+import type { RichTextContent, RichTextValue } from './types';
 
 /**
  * Insert a Rich Text value, an HTML string, or a plain text string, into a
@@ -9,16 +8,16 @@ import { normaliseFormats } from './normalise-formats';
  * and `endIndex` will be removed. Indices are retrieved from the selection if
  * none are provided.
  *
- * @param {RichTextValue}        value         Value to modify.
- * @param {RichTextValue|string} valueToInsert Value to insert.
- * @param {number}               [startIndex]  Start index.
- * @param {number}               [endIndex]    End index.
+ * @param value         Value to modify.
+ * @param valueToInsert Value to insert.
+ * @param [startIndex]  Start index.
+ * @param [endIndex]    End index.
  *
- * @return {RichTextValue} A new value with the value inserted.
+ * @return A new value with the value inserted.
  */
 export function insert(
-	value,
-	valueToInsert,
+	value: RichTextValue,
+	valueToInsert: RichTextContent | string,
 	startIndex = value.start,
 	endIndex = value.end
 ) {

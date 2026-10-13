@@ -1,7 +1,5 @@
 import { getActiveFormats } from './get-active-formats';
-
-/** @typedef {import('./types').RichTextValue} RichTextValue */
-/** @typedef {import('./types').RichTextFormat} RichTextFormat */
+import type { RichTextValue } from './types';
 
 /**
  * Gets the format object by type at the start of the selection. This can be
@@ -9,13 +7,13 @@ import { getActiveFormats } from './get-active-formats';
  * to check if a format is active at the selection. Returns undefined if there
  * is no format at the selection.
  *
- * @param {RichTextValue} value      Value to inspect.
- * @param {string}        formatType Format type to look for.
+ * @param value      Value to inspect.
+ * @param formatType Format type to look for.
  *
- * @return {RichTextFormat|undefined} Active format object of the specified
+ * @return Active format object of the specified
  *                                    type, or undefined.
  */
-export function getActiveFormat( value, formatType ) {
+export function getActiveFormat( value: RichTextValue, formatType: string ) {
 	return getActiveFormats( value ).find(
 		( { type } ) => type === formatType
 	);
