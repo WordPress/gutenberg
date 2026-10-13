@@ -135,7 +135,7 @@ export function useRecentCommands() {
 
 	if ( ! recentlyUsedNames.length ) {
 		return {
-			commands: [],
+			commands: EMPTY_COMMANDS,
 			loaders: [],
 			recentSet: EMPTY_SET,
 			onResolved,
