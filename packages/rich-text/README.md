@@ -143,7 +143,7 @@ Combine all Rich Text values into one. This is similar to `String.prototype.conc
 
 _Parameters_
 
-- _values_ `RichTextValue[]`: Objects to combine.
+- _values_ `RichTextContent[]`: Objects to combine.
 
 _Returns_
 
