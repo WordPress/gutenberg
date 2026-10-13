@@ -3,6 +3,11 @@ import { screen, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import { describe, expect, it, vi } from 'vitest';
+import {
+	createReduxStore,
+	createRegistry,
+	RegistryProvider,
+} from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import DataViewsPicker from '../index';
 import {
@@ -94,6 +99,24 @@ const groupingFields: Field< Data >[] = [
 		enableSorting: false,
 	},
 ];
+
+// A store holding the id of the only item the action of the eligibility test is
+// eligible for.
+const eligibilityStore = createReduxStore( 'test/eligibility', {
+	reducer: (
+		state = { eligibleId: 1 },
+		action: { type: string; id?: number }
+	) =>
+		action.type === 'SET_ELIGIBLE_ID'
+			? { eligibleId: action.id as number }
+			: state,
+	actions: {
+		setEligibleId: ( id: number ) => ( { type: 'SET_ELIGIBLE_ID', id } ),
+	},
+	selectors: {
+		getEligibleId: ( state: { eligibleId: number } ) => state.eligibleId,
+	},
+} );
 
 type PickerLayout =
 	| typeof LAYOUT_PICKER_GRID
@@ -439,6 +462,54 @@ describe( 'DataViews Picker', () => {
 						( item: Data ) => item.id
 					)
 				).toEqual( [ 2 ] );
+			} );
+
+			it( 'evaluates `isEligible` with the registry again when the data it reads changes', async () => {
+				const registry = createRegistry();
+				registry.register( eligibilityStore );
+				const callback = vi.fn();
+				const actions: ActionButton< Data >[] = [
+					{
+						id: 'confirm',
+						label: 'Confirm',
+						supportsBulk: true,
+						isPrimary: true,
+						isEligible: ( item, context ) =>
+							context.registry
+								.select( eligibilityStore )
+								.getEligibleId() === item.id,
+						callback,
+					},
+				];
+				await render(
+					<RegistryProvider value={ registry }>
+						<Picker actions={ actions } />
+					</RegistryProvider>
+				);
+
+				const user = userEvent.setup();
+				const options = screen.getAllByRole( 'option' );
+
+				// The selected item is not eligible yet.
+				await user.click( options[ 1 ] );
+				const button = screen.getByRole( 'button', {
+					name: 'Confirm',
+				} );
+				expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
+
+				registry.dispatch( eligibilityStore ).setEligibleId( 2 );
+				await expect
+					.element( button )
+					.not.toHaveAttribute( 'aria-disabled', 'true' );
+				await user.click( button );
+				expect(
+					callback.mock.calls[ 0 ][ 0 ].map(
+						( item: Data ) => item.id
+					)
+				).toEqual( [ 2 ] );
+				expect( callback.mock.calls[ 0 ][ 1 ] ).toEqual( {
+					registry,
+				} );
 			} );
 
 			it( 'calls the action callback when the action button is clicked', async () => {

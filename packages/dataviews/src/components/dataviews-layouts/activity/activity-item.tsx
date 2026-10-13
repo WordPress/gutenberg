@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useRef, useContext, useMemo } from '@wordpress/element';
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import ItemActions, { PrimaryActions } from '../../dataviews-item-actions';
@@ -41,20 +41,22 @@ function ActivityItem< Item >(
 	const registry = useRegistry();
 	const { paginationInfo } = useContext( DataViewsContext );
 
-	const { primaryActions, eligibleActions } = useMemo( () => {
-		// If an action is eligible for all items, doesn't need
-		// to provide the `isEligible` function.
-		const _eligibleActions = actions.filter(
-			( action ) => ! action.isEligible || action.isEligible( item )
-		);
-		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary
-		);
-		return {
-			primaryActions: _primaryActions,
-			eligibleActions: _eligibleActions,
-		};
-	}, [ actions, item ] );
+	// If an action is eligible for all items, doesn't need
+	// to provide the `isEligible` function. Eligibility is evaluated in
+	// `useSelect`, so it's evaluated again when the data it reads changes.
+	const eligibleActions = useSelect(
+		() =>
+			actions.filter(
+				( action ) =>
+					! action.isEligible ||
+					action.isEligible( item, { registry } )
+			),
+		[ actions, item, registry ]
+	);
+	const primaryActions = useMemo(
+		() => eligibleActions.filter( ( action ) => action.isPrimary ),
+		[ eligibleActions ]
+	);
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const density = view.layout?.density ?? 'balanced';

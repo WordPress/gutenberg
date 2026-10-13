@@ -9,6 +9,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
 import { isAppleOS } from '@wordpress/keycodes';
 import { inertValue } from '@wordpress/react-inert-value';
 import DataViewsContext from '../../dataviews-context';
@@ -274,6 +275,7 @@ function ViewTable< Item >( {
 	empty,
 }: ViewTableProps< Item > ) {
 	const { containerRef } = useContext( DataViewsContext );
+	const registry = useRegistry();
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -287,7 +289,8 @@ function ViewTable< Item >( {
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
-		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
+		isItemSelectable: ( item ) =>
+			hasAPossibleBulkAction( actions, item, registry ),
 		selection,
 		onChangeSelection,
 		selectionMode: 'multi',
