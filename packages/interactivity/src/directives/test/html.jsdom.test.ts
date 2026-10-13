@@ -10,7 +10,7 @@ import {
 import { hydrate, options } from 'preact';
 import { act } from 'preact/test-utils';
 import '../index'; // Registers all core directives, including `html`.
-import { hydratedIslands, toVdom } from '../../vdom';
+import { toVdom } from '../../vdom';
 import { populateServerData, store } from '../../store';
 import { asDangerousHTML, type DangerousHTML } from '../../html';
 import { getScope, resetScope } from '../../scopes';
@@ -21,8 +21,6 @@ let originalVNodeHook: typeof options.vnode;
 beforeEach( () => {
 	originalVNodeHook = options.vnode;
 	document.body.innerHTML = '';
-	// @ts-expect-error `_values` is an internal property, accessed here for testing.
-	hydratedIslands._values = new WeakMap();
 } );
 
 afterEach( () => {

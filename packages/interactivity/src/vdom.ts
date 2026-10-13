@@ -147,15 +147,12 @@ export function parseDirectiveValue( rawValue: string ): {
 	return { namespace, value };
 }
 
-export const hydratedIslands = new WeakSet();
-
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
  * Default HTML directives yield to content-owning directives on the same
- * element, using {@link getHtmlDirectiveStatus}, also used by hydration.
- * Eligible HTML content stays opaque; only islands visited by the walk are
- * recorded as hydrated.
+ * element, using {@link getHtmlDirectiveStatus}. Eligible HTML content and
+ * server-rendered list items stay opaque.
  *
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
@@ -248,10 +245,6 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		if ( island ) {
-			hydratedIslands.add( elementNode );
-		}
-
 		if ( directives.length ) {
 			props.__directives = directives.reduce<
 				Record< string, Array< DirectiveEntry > >
@@ -317,9 +310,6 @@ export function toVdom( root: Node ): ComponentChild {
 			// vnodes, since the directive writes to the DOM directly rather
 			// than through Preact's own props diffing (see
 			// `directives/html.ts`).
-			//
-			// `hydrateRegions()` excludes islands inside HTML content from
-			// its snapshot before hydration starts, so they need no marking.
 			props.dangerouslySetInnerHTML = {
 				__html: elementNode.innerHTML,
 			};

@@ -1,50 +1,6 @@
 import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
-import {
-	toVdom,
-	hydratedIslands,
-	parseDirectiveName,
-	getHtmlDirectiveStatus,
-	type ParsedDirectives,
-} from './vdom';
+import { toVdom } from './vdom';
 import { createRootFragment, splitTask } from './utils';
-
-/**
- * Finds the nearest inclusive ancestor whose HTML directive owns its content.
- * Attribute names use the same filter and parser as `toVdom()`, and content
- * ownership follows the shared parsed-directive rule in `vdom.ts`.
- *
- * @param element Element at which to begin the inclusive ancestor walk. Pass
- *                a node's parent element to test strict content membership.
- * @return The nearest eligible HTML directive element, or `null`.
- */
-export function closestHtmlDirectiveElement(
-	element: Element
-): Element | null {
-	let current: Element | null = element;
-	while ( current ) {
-		const directives: ParsedDirectives = {};
-		for ( const { name } of current.attributes ) {
-			if (
-				! name.startsWith( 'data-wp-' ) ||
-				! name[ 8 ] ||
-				name === 'data-wp-interactive'
-			) {
-				continue;
-			}
-			const parsed = parseDirectiveName( name );
-			if ( parsed ) {
-				const { prefix, suffix } = parsed;
-				directives[ prefix ] = directives[ prefix ] || [];
-				directives[ prefix ].push( { suffix } );
-			}
-		}
-		if ( getHtmlDirectiveStatus( directives ).isHtmlDirectiveElement ) {
-			return current;
-		}
-		current = current.parentElement;
-	}
-	return null;
-}
 
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
@@ -76,9 +32,10 @@ export const initialVdomPromise = new Promise<
 } );
 
 /**
- * Hydrates interactive islands outside HTML directive content and initializes
- * the router's initial vDOM. Content membership is checked for the full snapshot
- * before hydration can detach any fallback islands.
+ * Hydrates the document's top-level interactive islands and initializes the
+ * router's initial vDOM. Islands without an interactive ancestor are selected
+ * before any hydration can change the document. Nested islands run only as part
+ * of their outer island's tree.
  *
  * @return A promise that resolves once all eligible islands are hydrated.
  */
@@ -86,20 +43,16 @@ export const hydrateRegions = async () => {
 	const nodes = [
 		...document.querySelectorAll( `[data-wp-interactive]` ),
 	].filter(
-		( node ) =>
-			! node.parentElement ||
-			! closestHtmlDirectiveElement( node.parentElement )
+		( node ) => ! node.parentElement?.closest( '[data-wp-interactive]' )
 	);
 
 	for ( const node of nodes ) {
-		if ( ! hydratedIslands.has( node ) ) {
-			await splitTask();
-			const fragment = getRegionRootFragment( node );
-			const vdom = toVdom( node );
-			initialVdom.set( node, vdom );
-			await splitTask();
-			hydrate( vdom, fragment );
-		}
+		await splitTask();
+		const fragment = getRegionRootFragment( node );
+		const vdom = toVdom( node );
+		initialVdom.set( node, vdom );
+		await splitTask();
+		hydrate( vdom, fragment );
 	}
 
 	// Resolve the promise with the fully populated initialVdom after all regions are hydrated.

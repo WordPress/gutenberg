@@ -1,101 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { options } from 'preact';
 import { act } from 'preact/test-utils';
 import '../directives';
-import { closestHtmlDirectiveElement, hydrateRegions } from '../hydration';
-import { store } from '../store';
+import { hydrateRegions, initialVdom } from '../hydration';
+import { populateServerData, store } from '../store';
+import { getElement } from '../scopes';
 import { asDangerousHTML } from '../html';
-
-/**
- * Creates a detached element for an ancestor-check fixture.
- *
- * @param html Markup with one root element.
- * @return The fixture's root element.
- */
-function createElementFromHTML( html: string ): HTMLElement {
-	const div = document.createElement( 'div' );
-	div.innerHTML = html.trim();
-	return div.firstChild as HTMLElement;
-}
-
-describe( 'closestHtmlDirectiveElement', () => {
-	it.each( [
-		'data-wp-html',
-		'data-wp-html--',
-		'data-wp-html---',
-		'data-wp-html---id',
-	] )(
-		'finds an inclusive ancestor with %s, independently of its value',
-		( attribute ) => {
-			const outer = createElementFromHTML(
-				`<div ${ attribute }="missing::state.html"><span></span></div>`
-			);
-			const child = outer.firstElementChild!;
-			expect( closestHtmlDirectiveElement( outer ) ).toBe( outer );
-			expect( closestHtmlDirectiveElement( child ) ).toBe( outer );
-			expect( closestHtmlDirectiveElement( child.parentElement! ) ).toBe(
-				outer
-			);
-			expect(
-				closestHtmlDirectiveElement( outer.parentElement! )
-			).toBeNull();
-		}
-	);
-	it.each(
-		[ 'text', 'each', 'router-region' ].flatMap( ( prefix ) =>
-			[
-				'',
-				'--',
-				'---',
-				'--x',
-				'---id',
-				'--x---id',
-				'----',
-				'------',
-			].map( ( suffix ) => `data-wp-${ prefix }${ suffix }` )
-		)
-	)( 'excludes an element with the conflict %s', ( attribute ) => {
-		const outer = createElementFromHTML(
-			`<div data-wp-html ${ attribute }="null"><span></span></div>`
-		);
-		expect( closestHtmlDirectiveElement( outer ) ).toBeNull();
-		expect(
-			closestHtmlDirectiveElement( outer.firstElementChild! )
-		).toBeNull();
-	} );
-	it.each( [
-		'',
-		'data-wp-html--suffix',
-		'data-wp-html----',
-		'data-wp-html[name]',
-		'other-data-wp-html',
-	] )( 'does not treat %s as a default HTML directive', ( attribute ) => {
-		const element = createElementFromHTML(
-			`<div ${ attribute }><span></span></div>`
-		);
-		expect(
-			closestHtmlDirectiveElement( element.firstElementChild! )
-		).toBeNull();
-	} );
-	it( 'finds the nearest eligible ancestor through a conflicting element', () => {
-		const outer = createElementFromHTML(
-			'<div data-wp-html><section data-wp-html><div data-wp-html data-wp-text><span></span></div></section></div>'
-		);
-		const inner = outer.firstElementChild!;
-		expect(
-			closestHtmlDirectiveElement( outer.querySelector( 'span' )! )
-		).toBe( inner );
-		expect( closestHtmlDirectiveElement( inner ) ).toBe( inner );
-		expect( closestHtmlDirectiveElement( inner.parentElement! ) ).toBe(
-			outer
-		);
-	} );
-	it( 'ignores attributes that do not parse to a conflicting directive', () => {
-		const element = createElementFromHTML(
-			'<div data-wp-html data-wp-interactive="ns" data-wp-textual data-wp-each-child data-wp-text[x]></div>'
-		);
-		expect( closestHtmlDirectiveElement( element ) ).toBe( element );
-	} );
-} );
 
 /** Counter for store namespaces, whose registry persists between tests. */
 let namespaceCount = 0;
@@ -114,18 +24,21 @@ describe( 'hydrateRegions', () => {
 		document.body.innerHTML = '';
 	} );
 
-	it.each( [ 'outside every island', 'inside an island' ] )(
-		'keeps islands inside HTML content inert %s',
-		async ( position ) => {
+	it.each( [ false, true ] )(
+		'hydrates HTML fallback islands only outside an interactive region (inside: %s)',
+		async ( inside ) => {
 			const namespace = uniqueNamespace();
 			const mark = vi.fn();
 			const markFollowing = vi.fn();
+			populateServerData( {
+				// Identifies HTML as a getter whose implementation is pending.
+				state: { [ namespace ]: { html: {} } },
+				derivedStateClosures: { [ namespace ]: [ 'state.html' ] },
+			} );
 			store( namespace, {
 				state: {
-					/** Empties owned HTML content during hydration. */
-					html: null,
 					/** Text rendered only by eligible islands. */
-					label: 'hydrated',
+					label: 'live',
 				},
 				actions: {
 					/** Records initialization inside HTML content. */
@@ -134,31 +47,187 @@ describe( 'hydrateRegions', () => {
 					markFollowing,
 				},
 			} );
-			const htmlElement = `<div data-wp-html="state.html"><div data-wp-interactive="${ namespace }" data-wp-init="actions.mark"><span data-wp-text="state.label">static</span></div></div>`;
+			const htmlElement = `<div data-wp-html="state.html"><p>fallback</p><div data-wp-interactive="${ namespace }" data-wp-init="actions.mark"><span data-wp-text="state.label">static</span></div></div>`;
 			document.body.innerHTML =
-				( position === 'inside an island'
+				( inside
 					? `<div data-wp-interactive="${ namespace }">${ htmlElement }</div>`
 					: htmlElement ) +
 				`<div id="following" data-wp-interactive="${ namespace }" data-wp-init="actions.markFollowing"><span data-wp-text="state.label">static</span></div>`;
 
 			const fallback = document.querySelector( '[data-wp-html] span' )!;
+			const paragraph = document.querySelector( 'p' )!;
+			const island = fallback.parentElement!;
+			const roots = [
+				...document.querySelectorAll( '[data-wp-interactive]' ),
+			].filter(
+				( node ) =>
+					! node.parentElement?.closest( '[data-wp-interactive]' )
+			);
 			await act( () => hydrateRegions() );
 
-			expect( mark ).not.toHaveBeenCalled();
-			expect( fallback ).toHaveTextContent( /^static$/ );
-			const inside = position === 'inside an island';
-			expect( fallback.isConnected ).toBe( ! inside );
-			expect(
-				document.querySelector( '[data-wp-html]' )!.outerHTML
-			).toBe(
-				inside ? '<div data-wp-html="state.html"></div>' : htmlElement
+			expect( mark ).toHaveBeenCalledTimes( inside ? 0 : 1 );
+			expect( fallback ).toHaveTextContent(
+				inside ? /^static$/ : /^live$/
 			);
+			expect( fallback.isConnected ).toBe( true );
+			expect( document.querySelector( 'p' ) ).toBe( paragraph );
+			expect( paragraph ).toHaveTextContent( /^fallback$/ );
+			expect( initialVdom.has( island ) ).toBe( ! inside );
+			for ( const root of roots ) {
+				expect( initialVdom.has( root ) ).toBe( true );
+			}
 			expect( markFollowing ).toHaveBeenCalledTimes( 1 );
 			expect(
 				document.querySelector( '#following span' )
-			).toHaveTextContent( /^hydrated$/ );
+			).toHaveTextContent( /^live$/ );
 		}
 	);
+
+	it.each( [ false, true ] )(
+		'runs template islands, never server item islands, when the list is pending: %s',
+		async ( pending ) => {
+			const namespace = uniqueNamespace();
+			const origins: unknown[] = [];
+			const after = vi.fn();
+			if ( pending ) {
+				populateServerData( {
+					// The list's getter has not yet registered on the client.
+					state: { [ namespace ]: { list: {} } },
+					derivedStateClosures: { [ namespace ]: [ 'state.list' ] },
+				} );
+			}
+			store( namespace, {
+				state: pending
+					? {}
+					: {
+							/** Items whose template islands run as part of the list. */
+							list: [ 'one', 'two' ],
+						},
+				actions: {
+					/** Records the origin of every initialized list island. */
+					mark: () => {
+						origins.push(
+							Reflect.get(
+								getElement().attributes,
+								'data-origin'
+							)
+						);
+					},
+					/** Records initialization of the separate following island. */
+					after,
+				},
+			} );
+			const serverItem = `<div data-wp-each-child="${ namespace }::state.list"><div data-wp-interactive="${ namespace }" data-wp-init="actions.mark" data-origin="server"></div></div>`;
+			document.body.innerHTML = `<div id="list" data-wp-interactive="${ namespace }"><template data-wp-each="state.list"><div data-wp-interactive="${ namespace }" data-wp-init="actions.mark" data-origin="template"></div></template>${ serverItem }${ serverItem }</div><div id="following" data-wp-interactive="${ namespace }" data-wp-init="actions.after"></div>`;
+			const roots = [
+				document.querySelector( '#list' )!,
+				document.querySelector( '#following' )!,
+			];
+			const serverItems = [
+				...document.querySelectorAll( '[data-wp-each-child]' ),
+			];
+			const serverIslands = serverItems.map(
+				( item ) => item.firstElementChild!
+			);
+
+			await act( () => hydrateRegions() );
+
+			expect( origins ).toEqual(
+				pending ? [] : [ 'template', 'template' ]
+			);
+			expect( after ).toHaveBeenCalledTimes( 1 );
+			for ( const root of roots ) {
+				expect( initialVdom.has( root ) ).toBe( true );
+			}
+			for ( const island of serverIslands ) {
+				expect( initialVdom.has( island ) ).toBe( false );
+			}
+			expect(
+				[
+					...document.querySelectorAll( '[data-origin="server"]' ),
+				].map( ( island ) => island.parentElement )
+			).toEqual( pending ? serverItems : [] );
+			expect(
+				serverIslands.every( ( island ) => island.isConnected )
+			).toBe( pending );
+			if ( pending ) {
+				await act( async () => {
+					store( namespace, {
+						state: {
+							/**
+							 * Supplies the pending derived list.
+							 *
+							 * @return The two list items to render.
+							 */
+							get list() {
+								return [ 'one', 'two' ];
+							},
+						},
+					} );
+				} );
+			}
+			expect( origins ).toEqual( [ 'template', 'template' ] );
+			expect(
+				serverIslands.every( ( island ) => ! island.isConnected )
+			).toBe( true );
+			expect( after ).toHaveBeenCalledTimes( 1 );
+		}
+	);
+
+	it( 'publishes only the starting top-level islands after all have hydrated', async () => {
+		// A fresh module gives this document its own completion promise.
+		const originalVNodeHook = options.vnode;
+		vi.resetModules();
+		try {
+			await import( '../directives' );
+			const { act: isolatedAct } = await import( 'preact/test-utils' );
+			const runtime = await import( '../hydration' );
+			const { store: isolatedStore } = await import( '../store' );
+			const namespace = uniqueNamespace();
+			const mark = vi.fn();
+			const after = vi.fn();
+			isolatedStore( namespace, {
+				state: {
+					/** Text that exposes completion of the final island's hydration. */
+					label: 'live',
+				},
+				actions: {
+					/** Records initialization through the owner's tree. */
+					mark,
+					/** Records initialization of the final top-level island. */
+					after,
+				},
+			} );
+			document.body.innerHTML = `<div id="outer" data-wp-interactive="${ namespace }"><div id="nested" data-wp-interactive="${ namespace }" data-wp-init="actions.mark"></div></div><div id="following" data-wp-interactive="${ namespace }" data-wp-init="actions.after"><span data-wp-text="state.label">static</span></div>`;
+			const outer = document.querySelector( '#outer' )!;
+			const nested = document.querySelector( '#nested' )!;
+			const following = document.querySelector( '#following' )!;
+			// Capture membership and rendered text at resolution, not after flushing.
+			const completed = runtime.initialVdomPromise.then( ( map ) => ( {
+				/** The map exposed to the router when hydration completes. */
+				map,
+				/** Membership of the initial outer, following and nested islands. */
+				membership: [ outer, following, nested ].map( ( node ) =>
+					map.has( node )
+				),
+				/** The following island's text at the instant the promise resolves. */
+				text: following.textContent,
+			} ) );
+			await isolatedAct( async () => {
+				const [ , snapshot ] = await Promise.all( [
+					runtime.hydrateRegions(),
+					completed,
+				] );
+				expect( snapshot.map ).toBe( runtime.initialVdom );
+				expect( snapshot.membership ).toEqual( [ true, true, false ] );
+				expect( snapshot.text ).toBe( 'live' );
+			} );
+			expect( mark ).toHaveBeenCalledTimes( 1 );
+			expect( after ).toHaveBeenCalledTimes( 1 );
+		} finally {
+			options.vnode = originalVNodeHook;
+		}
+	} );
 
 	it( 'keeps fallback and inserted islands inert when trusted HTML replaces content during hydration and reactive updates', async () => {
 		const namespace = uniqueNamespace();
