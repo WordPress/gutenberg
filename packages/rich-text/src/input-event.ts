@@ -24,9 +24,9 @@ export function RichTextInputEvent( {
 			}
 		}
 
-		callbacks!.add( callback );
+		callbacks.add( callback );
 		return () => {
-			callbacks!.delete( callback );
+			callbacks.delete( callback );
 		};
 	}, [ inputType, callbacks, stableOnInput ] );
 

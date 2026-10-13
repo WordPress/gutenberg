@@ -13,7 +13,10 @@ import type { RichTextFormat, RichTextValue } from './types';
  *
  * @return A new value with the format applied or removed.
  */
-export function toggleFormat( value: RichTextValue, format: RichTextFormat ) {
+export function toggleFormat(
+	value: RichTextValue,
+	format: RichTextFormat
+): RichTextValue {
 	if ( getActiveFormat( value, format.type ) ) {
 		// For screen readers, will announce if formatting control is disabled.
 		if ( format.title ) {
