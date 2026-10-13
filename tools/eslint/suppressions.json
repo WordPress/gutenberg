@@ -7192,9 +7192,6 @@
 		}
 	},
 	"packages/dataviews/src/components/dataviews-layouts/table/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react-hooks/refs": {
 			"count": 1
 		}

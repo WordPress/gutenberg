@@ -17,6 +17,34 @@ import type { MEDIA_ASPECT_RATIOS } from '../constants';
  */
 export type ItemWithId = { id: string };
 
+/**
+ * Loading state for the next batch at one level of a hierarchy.
+ */
+export interface HierarchyPaginationInfo {
+	/** Whether another batch is available. */
+	hasMore: boolean;
+
+	/** Total remaining items at this level, not the next batch size. */
+	remainingItems?: number;
+
+	/** Whether the next batch is loading. */
+	isLoading?: boolean;
+
+	/** A message ready to show the user when a batch fails. */
+	error?: string;
+}
+
+/**
+ * Controlled per-level loading for a hierarchical table. `null` identifies
+ * the top level; other values are item ids returned by `getItemId`.
+ */
+export interface HierarchyPagination {
+	getPaginationInfo: (
+		parentId: string | null
+	) => HierarchyPaginationInfo | undefined;
+	onLoadMore: ( parentId: string | null ) => void;
+}
+
 export type DataViewsProps< Item > = {
 	/**
 	 * The current view configuration: layout type, filters, sorting,
@@ -166,6 +194,13 @@ export type DataViewsProps< Item > = {
 	 * button is used.
 	 */
 	onChangeExpandedItemIds?: ( itemIds: string[] ) => void;
+
+	/**
+	 * Loads each level of a hierarchical table in batches. Each level ends
+	 * with a Load more row. Applies while `view.infiniteScrollEnabled` is
+	 * off. DataViews calls `onLoadMore` but does not fetch items itself.
+	 */
+	hierarchyPagination?: HierarchyPagination;
 
 	/**
 	 * Custom component tree rendered instead of the default layout
@@ -840,6 +875,11 @@ export interface ViewBaseProps< Item > {
 	onChangeExpandedItemIds?: ( itemIds: string[] ) => void;
 
 	/**
+	 * Controlled loading state for each level of a hierarchical table.
+	 */
+	hierarchyPagination?: HierarchyPagination;
+
+	/**
 	 * Whether the data is loading, in which case a loading state is shown.
 	 */
 	isLoading?: boolean;
@@ -904,7 +944,8 @@ export interface ViewBaseProps< Item > {
  * `ViewBaseProps`, minus the props pickers don't support: the item-click
  * ones (`onClickItem`, `renderItemLink`, `isItemClickable`) and the
  * hierarchy ones (`getItemLevel`, `getItemParentId`,
- * `getItemHasChildren`, `expandedItemIds`, `onChangeExpandedItemIds`).
+ * `getItemHasChildren`, `expandedItemIds`, `onChangeExpandedItemIds`,
+ * `hierarchyPagination`).
  */
 export type ViewPickerBaseProps< Item > = Omit<
 	ViewBaseProps< Item >,
@@ -919,6 +960,7 @@ export type ViewPickerBaseProps< Item > = Omit<
 	| 'getItemHasChildren'
 	| 'expandedItemIds'
 	| 'onChangeExpandedItemIds'
+	| 'hierarchyPagination'
 > & {
 	/**
 	 * The current view configuration.

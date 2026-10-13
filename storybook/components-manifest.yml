@@ -526,6 +526,7 @@
       - getItemLevel
       - getItemParentId
       - header
+      - hierarchyPagination
       - isItemClickable
       - isLoading
       - onChangeExpandedItemIds
