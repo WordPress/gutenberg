@@ -17,7 +17,7 @@ export default function Combobox< Item >( {
 	const value = getValue( { item: data } ) ?? '';
 
 	const onChangeControl = useCallback(
-		( newValue: string | null | undefined ) =>
+		( newValue: string | null ) =>
 			onChange( setValue( { item: data, value: newValue ?? '' } ) ),
 		[ data, onChange, setValue ]
 	);

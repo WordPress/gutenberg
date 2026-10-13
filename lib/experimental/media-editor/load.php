@@ -5,8 +5,6 @@
  * @package gutenberg
  */
 
-add_action( 'admin_menu', 'gutenberg_register_media_editor_admin_page' );
-
 /**
  * Registers a hidden wp-admin page for direct media editor deep links.
  */
@@ -23,22 +21,43 @@ function gutenberg_register_media_editor_admin_page() {
 	);
 
 	if ( $hook_suffix ) {
-		// Hidden pages do not resolve a title from a visible menu item, so set
-		// one before admin-header.php formats the page title.
-		add_action( "load-$hook_suffix", 'gutenberg_media_editor_wp_admin_set_title' );
+		add_action( "load-$hook_suffix", 'gutenberg_media_editor_wp_admin_prepare_screen' );
 	}
 }
 
 /**
- * Sets the admin page title before wp-admin/admin-header.php renders.
+ * Prepares the admin chrome before wp-admin/admin-header.php renders.
  *
- * @global string $title The admin page title.
+ * @global string $title        The admin page title.
+ * @global string $parent_file  The current top-level menu item.
+ * @global string $submenu_file The current submenu item.
  */
-function gutenberg_media_editor_wp_admin_set_title() {
-	global $title;
+function gutenberg_media_editor_wp_admin_prepare_screen() {
+	global $title, $parent_file, $submenu_file;
 
+	// Hidden pages do not resolve a title from a visible menu item, so set one
+	// before admin-header.php formats the page title.
 	$title = __( 'Edit media', 'gutenberg' );
+
+	/*
+	 * Take the page out of the hidden `''` submenu bucket it was registered in.
+	 * Left in place, get_admin_page_parent() matches it there and resets
+	 * $parent_file to '' — and it does so *after* the `parent_file` filter runs,
+	 * so filtering cannot win. With no match it preserves a non-empty
+	 * $parent_file instead.
+	 *
+	 * Safe at this point: `load-` fires after the capability check in admin.php,
+	 * which needs the page registered, and before the menu is rendered.
+	 */
+	remove_submenu_page( '', 'media-editor-wp-admin' );
+
+	// Match the classic Edit Media screen, which the media editor stands in for:
+	// Media expanded and current, Library the current submenu item.
+	$parent_file  = 'upload.php';
+	$submenu_file = 'upload.php';
 }
+
+add_action( 'admin_menu', 'gutenberg_register_media_editor_admin_page' );
 
 /**
  * Builds the media editor URL for an attachment.

@@ -33,7 +33,7 @@ function Dashicon( {
 					fontSize: `${ size }px`,
 					width: `${ size }px`,
 					height: `${ size }px`,
-			  }
+				}
 			: {};
 
 	const styles = {

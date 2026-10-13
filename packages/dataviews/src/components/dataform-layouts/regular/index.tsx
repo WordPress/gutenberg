@@ -11,6 +11,7 @@ import type {
 	NormalizedRegularLayout,
 } from '../../../types';
 import DataFormContext from '../../dataform-context';
+import { canRenderField } from '../can-render-field';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 
@@ -70,7 +71,7 @@ export default function FormRegularField< Item >( {
 		( fieldDef ) => fieldDef.id === field.id
 	);
 
-	if ( ! fieldDefinition || ! fieldDefinition.Edit ) {
+	if ( ! canRenderField( fieldDefinition ) ) {
 		return null;
 	}
 
@@ -98,15 +99,17 @@ export default function FormRegularField< Item >( {
 							field={ fieldDefinition }
 						/>
 					) : (
-						<fieldDefinition.Edit
-							key={ fieldDefinition.id }
-							data={ data }
-							field={ fieldDefinition }
-							onChange={ onChange }
-							hideLabelFromVision
-							markWhenOptional={ markWhenOptional }
-							validity={ validity }
-						/>
+						fieldDefinition.Edit && (
+							<fieldDefinition.Edit
+								key={ fieldDefinition.id }
+								data={ data }
+								field={ fieldDefinition }
+								onChange={ onChange }
+								hideLabelFromVision
+								markWhenOptional={ markWhenOptional }
+								validity={ validity }
+							/>
+						)
 					) }
 				</div>
 			</Stack>
@@ -130,16 +133,20 @@ export default function FormRegularField< Item >( {
 					</>
 				</>
 			) : (
-				<fieldDefinition.Edit
-					data={ data }
-					field={ fieldDefinition }
-					onChange={ onChange }
-					hideLabelFromVision={
-						labelPosition === 'none' ? true : hideLabelFromVision
-					}
-					markWhenOptional={ markWhenOptional }
-					validity={ validity }
-				/>
+				fieldDefinition.Edit && (
+					<fieldDefinition.Edit
+						data={ data }
+						field={ fieldDefinition }
+						onChange={ onChange }
+						hideLabelFromVision={
+							labelPosition === 'none'
+								? true
+								: hideLabelFromVision
+						}
+						markWhenOptional={ markWhenOptional }
+						validity={ validity }
+					/>
+				)
 			) }
 		</div>
 	);

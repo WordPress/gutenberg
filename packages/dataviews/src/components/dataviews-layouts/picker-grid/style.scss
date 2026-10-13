@@ -77,6 +77,9 @@
 		min-height: 0;
 		background-color: var(--wpds-color-background-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-md);
+		// Clip the preview to the rounded corners, as the grid layout does.
+		// The selection checkbox is a sibling, so it isn't affected.
+		overflow: hidden;
 		position: relative;
 
 		img {
@@ -95,6 +98,16 @@
 			box-shadow: inset 0 0 0 var(--wpds-border-width-xs) rgba(0, 0, 0, 0.1);
 			border-radius: var(--wpds-border-radius-md);
 			pointer-events: none;
+		}
+	}
+
+	// Keep in sync with the grid layout, which letterboxes fitted previews
+	// against the same background so each item still reads as a unit.
+	&.has-media-fit-contain .dataviews-view-picker-grid__media {
+		background-color: var(--wpds-color-background-surface-neutral);
+
+		img {
+			object-fit: contain;
 		}
 	}
 

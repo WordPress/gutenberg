@@ -1,16 +1,45 @@
 import { useViewportMatch } from '@wordpress/compose';
+import { createContext, useContext } from '@wordpress/element';
+
+/**
+ * Popover props for ToolsPanel dropdown menus (`dropdown`) and item popovers
+ * (`item`). Defaults to the editor sidebar; consumers rendering the panels
+ * elsewhere provide their own values.
+ */
+export const ToolsPanelPopoverPropsContext = createContext( {
+	dropdown: {
+		placement: 'left-start',
+		// Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+		offset: 259,
+	},
+	item: {
+		placement: 'left-start',
+		// Panel padding (16px) + spacing (20px)
+		offset: 36,
+		shift: true,
+	},
+} );
 
 export function useToolsPanelDropdownMenuProps() {
 	const isMobile = useViewportMatch( 'medium', '<' );
-	return ! isMobile
-		? {
-				popoverProps: {
-					placement: 'left-start',
-					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
-					offset: 259,
-				},
-		  }
-		: {};
+	const { dropdown } = useContext( ToolsPanelPopoverPropsContext );
+	return ! isMobile ? { popoverProps: dropdown } : {};
+}
+
+/**
+ * @typedef {Pick<
+ *   NonNullable<import('react').ComponentProps<import('@wordpress/components').Dropdown>['popoverProps']>,
+ *   'placement' | 'offset' | 'shift'
+ * >} ToolsPanelPopoverProps
+ */
+
+/**
+ * Popover props for a tools panel item.
+ *
+ * @return {ToolsPanelPopoverProps} Popover props for a tools panel item.
+ */
+export function useToolsPanelItemPopoverProps() {
+	return useContext( ToolsPanelPopoverPropsContext ).item;
 }
 
 /**
@@ -46,4 +75,27 @@ export function scopeSelector( scope, selector ) {
 	} );
 
 	return selectorsScoped.join( ', ' );
+}
+
+/**
+ * Reads the preset slug out of a duotone style value.
+ *
+ * Two presets can hold the same pair of colors, so the slug is the only thing
+ * that identifies which one is applied. The colors alone do not.
+ *
+ * Lives here rather than beside its siblings in `hooks/duotone` because that
+ * module imports the filters panel, so the panel cannot import back from it.
+ *
+ * @param {string|string[]|undefined} duotone A duotone style value.
+ *
+ * @return {string|undefined} The preset slug, if the value references one.
+ */
+export function getDuotoneSlugFromPreset( duotone ) {
+	if ( typeof duotone !== 'string' ) {
+		return undefined;
+	}
+
+	const [ , slug ] = duotone.match( /^var:preset\|duotone\|(.+)$/ ) ?? [];
+
+	return slug;
 }

@@ -416,7 +416,7 @@ test.describe( 'Contrast Checker', () => {
 			.getByRole( 'button', { name: 'Elements options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
 			.click();
 		await elementsPanel
 			.getByRole( 'button', { name: 'Elements options' } )

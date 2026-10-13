@@ -5,7 +5,7 @@
 	overflow: auto;
 }
 
-.feedIcon {
+.feed-icon {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -16,7 +16,7 @@
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
-.titleLink {
+.title-link {
 	min-width: 0;
 	overflow: hidden;
 	white-space: nowrap;

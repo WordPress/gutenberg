@@ -108,8 +108,8 @@ function block_core_query_disable_enhanced_pagination( $parsed_block ) {
 			 * by adding an attribute called `data-wp-navigation-disabled` which
 			 * is later handled by the front-end logic.
 			 *
-			 * @param string   $content  The block content.
-			 * @param array    $block    The full block, including name and attributes.
+			 * @param string $content The block content.
+			 * @param array  $block   The full block, including name and attributes.
 			 * @return string Returns the modified output of the query block.
 			 */
 			$render_query_callback = static function ( $content, $block ) use ( &$enhanced_query_stack, &$dirty_enhanced_queries, &$render_query_callback ) {

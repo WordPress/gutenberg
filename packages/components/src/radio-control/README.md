@@ -100,12 +100,14 @@ A function that receives the value of the new option that is being selected as i
 
 -   Required: Yes
 
-#### `options`: `{ label: string, value: string }[]`
+#### `options`: `{ label: string, value: string, description?: string, disabled?: boolean }[]`
 
 An array of objects containing the value and label of the options.
 
 -   `label`: `string` The label to be shown to the user.
 -   `value`: `string` The internal value compared against select and passed to onChange.
+-   `description`: `string` Optional help text shown below the label.
+-   `disabled`: `boolean` Whether the option is disabled.
 
 *   Required: No
 

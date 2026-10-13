@@ -3,6 +3,7 @@ import { forwardRef } from '@wordpress/element';
 import type { WordPressComponentProps } from '../../context';
 import type { ToggleGroupControlOptionProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+import { useToggleGroupControlContext } from '../context';
 
 function UnforwardedToggleGroupControlOption(
 	props: WordPressComponentProps<
@@ -12,6 +13,7 @@ function UnforwardedToggleGroupControlOption(
 	>,
 	ref: ForwardedRef< any >
 ) {
+	useToggleGroupControlContext( 'ToggleGroupControlOption' );
 	const { label, ...restProps } = props;
 	const optionLabel = restProps[ 'aria-label' ] || label;
 	return (

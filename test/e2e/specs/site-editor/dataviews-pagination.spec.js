@@ -1,5 +1,19 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+// Whether the run targets the extensible site editor (v2). Its pagination
+// state lives in the route path carried by the `p` query param, under a
+// different name than the classic editor's top-level `pageNumber`.
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
+function getPageNumber( url ) {
+	const { searchParams } = new URL( url );
+	if ( ! isSiteEditorV2 ) {
+		return searchParams.get( 'pageNumber' );
+	}
+	const route = searchParams.get( 'p' ) ?? '';
+	return new URLSearchParams( route.split( '?' )[ 1 ] ?? '' ).get( 'page' );
+}
+
 test.describe( 'DataViews Pagination', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
@@ -18,9 +32,8 @@ test.describe( 'DataViews Pagination', () => {
 		);
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( { postType: 'page' } );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -39,20 +52,14 @@ test.describe( 'DataViews Pagination', () => {
 		await page
 			.getByRole( 'button', { name: 'Next page', exact: true } )
 			.click();
-		expect( new URL( page.url() ).searchParams.get( 'pageNumber' ) ).toBe(
-			'2'
-		);
+		expect( getPageNumber( page.url() ) ).toBe( '2' );
 		await page
 			.getByRole( 'button', { name: 'Previous page', exact: true } )
 			.click();
-		expect( new URL( page.url() ).searchParams.get( 'pageNumber' ) ).toBe(
-			'1'
-		);
+		expect( getPageNumber( page.url() ) ).toBe( '1' );
 		await page
 			.getByRole( 'button', { name: 'Next page', exact: true } )
 			.click();
-		expect( new URL( page.url() ).searchParams.get( 'pageNumber' ) ).toBe(
-			'2'
-		);
+		expect( getPageNumber( page.url() ) ).toBe( '2' );
 	} );
 } );

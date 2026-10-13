@@ -1,4 +1,4 @@
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import type {
 	AdditionalData,
@@ -11,6 +11,7 @@ import { validateMimeType } from './validate-mime-type';
 import { validateMimeTypeForUser } from './validate-mime-type-for-user';
 import { validateFileSize } from './validate-file-size';
 import { UploadError } from './upload-error';
+import { getUploadErrorMessage } from './get-upload-error-message';
 
 declare global {
 	interface Window {
@@ -136,29 +137,10 @@ export function uploadMedia( {
 			// Reset to empty on failure.
 			setAndUpdateFiles( index, null );
 
-			// @wordpress/api-fetch throws any response that isn't in the 200 range as-is.
-			let message: string;
-			if (
-				typeof error === 'object' &&
-				error !== null &&
-				'message' in error
-			) {
-				message =
-					typeof error.message === 'string'
-						? error.message
-						: String( error.message );
-			} else {
-				message = sprintf(
-					// translators: %s: file name
-					__( 'Error while uploading file %s to the media library.' ),
-					file.name
-				);
-			}
-
 			onError?.(
 				new UploadError( {
 					code: 'GENERAL',
-					message,
+					message: getUploadErrorMessage( error, file.name ),
 					file,
 					cause: error instanceof Error ? error : undefined,
 				} )

@@ -1,4 +1,3 @@
-export { ControlWithError } from './control-with-error';
 export { ValidatedCheckboxControl } from './checkbox-control';
 export { ValidatedComboboxControl } from './combobox-control';
 export { ValidatedFormTokenField } from './form-token-field';

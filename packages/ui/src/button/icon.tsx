@@ -5,7 +5,7 @@ import { Icon } from '../icon';
 import styles from './style.module.css';
 
 export const ButtonIcon = forwardRef< SVGSVGElement, ButtonIconProps >(
-	function ButtonIcon( { className, icon, ...props }, ref ) {
+	function UnforwardedButtonIcon( { className, icon, ...props }, ref ) {
 		return (
 			<Icon
 				ref={ ref }

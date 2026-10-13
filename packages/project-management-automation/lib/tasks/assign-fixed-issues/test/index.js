@@ -1,4 +1,5 @@
-import assignFixedIssues from '../';
+import { describe, expect, it, vi } from 'vitest';
+import assignFixedIssues from '../index.js';
 
 describe( 'assignFixedIssues', () => {
 	it( 'does nothing if there are no fixed issues', async () => {
@@ -10,8 +11,8 @@ describe( 'assignFixedIssues', () => {
 		const octokit = {
 			rest: {
 				issues: {
-					addAssignees: jest.fn(),
-					addLabels: jest.fn(),
+					addAssignees: vi.fn(),
+					addLabels: vi.fn(),
 				},
 			},
 		};
@@ -40,8 +41,8 @@ describe( 'assignFixedIssues', () => {
 		const octokit = {
 			rest: {
 				issues: {
-					addAssignees: jest.fn( () => Promise.resolve( {} ) ),
-					addLabels: jest.fn( () => Promise.resolve( {} ) ),
+					addAssignees: vi.fn( () => Promise.resolve( {} ) ),
+					addLabels: vi.fn( () => Promise.resolve( {} ) ),
 				},
 			},
 		};

@@ -2,5 +2,5 @@
 // core-js dependencies are updated.
 // It should always test a feature that is supported, but requires
 // a polyfill to work across all supported browsers.
-const { promise } = Promise.withResolvers();
+const promise = Promise.try( () => {} );
 window.promise = promise;

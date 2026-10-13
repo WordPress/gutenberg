@@ -1,19 +1,22 @@
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
-jest.mock( '@wordpress/api-fetch' );
 import { controls } from '../index';
+vi.mock( import( '@wordpress/api-fetch' ) );
+
+const mockedTriggerFetch = vi.mocked( triggerFetch );
 
 describe( 'controls', () => {
 	describe( 'API_FETCH', () => {
 		afterEach( () => {
-			triggerFetch.mockClear();
+			mockedTriggerFetch.mockClear();
 		} );
 		it( 'invokes the triggerFetch function', () => {
 			controls.API_FETCH( { request: '' } );
-			expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
+			expect( mockedTriggerFetch ).toHaveBeenCalledTimes( 1 );
 		} );
 		it( 'invokes the triggerFetch function with the passed in request', () => {
 			controls.API_FETCH( { request: 'foo' } );
-			expect( triggerFetch ).toHaveBeenCalledWith( 'foo' );
+			expect( mockedTriggerFetch ).toHaveBeenCalledWith( 'foo' );
 		} );
 	} );
 } );

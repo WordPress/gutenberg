@@ -17,6 +17,14 @@ declare module './base-entity-records' {
 			 * The icon label.
 			 */
 			label: string;
+			/**
+			 * The slug of the collection this icon belongs to.
+			 */
+			collection?: string;
+			/**
+			 * Additional search terms for the icon.
+			 */
+			keywords?: string[];
 		}
 	}
 }

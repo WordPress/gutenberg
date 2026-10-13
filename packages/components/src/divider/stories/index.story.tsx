@@ -1,11 +1,12 @@
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { Text } from '../../text';
-import { Divider } from '..';
+import Divider from '../deprecated';
 import { Flex } from '../../flex';
 
 const meta: Meta< typeof Divider > = {
 	component: Divider,
-	title: 'Components/Divider',
+	title: 'Components/@wordpress-components/Deprecated/Divider',
+	id: 'components-divider',
 	argTypes: {
 		margin: {
 			control: { type: 'text' },
@@ -32,7 +33,7 @@ const meta: Meta< typeof Divider > = {
 		componentStatus: {
 			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Planned for deprecation.',
+			notes: 'Deprecated. Prefer a `Separator` subcomponent such as [`Menu.Separator`](?path=/docs/design-system-components-menu--docs) when the surrounding component provides one. Otherwise write your own CSS, preferably using the [`design tokens`](?path=/docs/design-system-tokens-introduction--docs) available in `@wordpress/theme`.',
 		},
 	},
 };

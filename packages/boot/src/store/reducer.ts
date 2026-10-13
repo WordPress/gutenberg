@@ -5,6 +5,7 @@ const initialState: State = {
 	menuItems: {},
 	routes: [],
 	dashboardLink: undefined,
+	entityLinks: {},
 };
 
 export function reducer( state: State = initialState, action: Action ): State {
@@ -40,6 +41,18 @@ export function reducer( state: State = initialState, action: Action ): State {
 			return {
 				...state,
 				routes: [ ...state.routes, action.route ],
+			};
+
+		case 'REGISTER_ENTITY_LINKS':
+			return {
+				...state,
+				entityLinks: {
+					...state.entityLinks,
+					[ action.postType ]: {
+						...state.entityLinks[ action.postType ],
+						...action.links,
+					},
+				},
 			};
 
 		case 'SET_DASHBOARD_LINK':

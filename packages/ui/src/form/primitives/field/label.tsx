@@ -6,7 +6,7 @@ import { VisuallyHidden } from '../../../visually-hidden';
 import type { FieldLabelProps } from './types';
 
 export const Label = forwardRef< HTMLLabelElement, FieldLabelProps >(
-	function Label(
+	function UnforwardedLabel(
 		{ className, hideFromVision, variant, ...restProps },
 		ref
 	) {

@@ -1,7 +1,8 @@
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import * as ProgressBarStyled from './styles';
+import styles from './style.module.scss';
 import type { ProgressBarProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -13,23 +14,26 @@ function UnforwardedProgressBar(
 	const isIndeterminate = ! Number.isFinite( value );
 
 	return (
-		<ProgressBarStyled.Track className={ className }>
-			<ProgressBarStyled.Indicator
+		<div className={ clsx( styles.track, className ) }>
+			<div
+				className={ clsx( styles.indicator, {
+					[ styles[ 'is-indeterminate' ] ]: isIndeterminate,
+				} ) }
 				style={ {
 					'--indicator-width': ! isIndeterminate
 						? `${ value }%`
 						: undefined,
 				} }
-				isIndeterminate={ isIndeterminate }
 			/>
-			<ProgressBarStyled.ProgressElement
+			<progress
+				className={ styles[ 'progress-element' ] }
 				max={ 100 }
 				value={ value }
 				aria-label={ __( 'Loading …' ) }
 				ref={ ref }
 				{ ...progressProps }
 			/>
-		</ProgressBarStyled.Track>
+		</div>
 	);
 }
 

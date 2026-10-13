@@ -60,7 +60,7 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		/**
 		 * The allowed tag names match the options offered in the editor.
 		 *
-		 * @see packages/block-library/src/post-content/edit.js
+		 * @see packages/block-library/src/post-content/edit.jsx
 		 */
 		$allowed_tag_names   = array( 'div', 'main', 'section', 'article' );
 		$normalized_tag_name = strtolower( $attributes['tagName'] );

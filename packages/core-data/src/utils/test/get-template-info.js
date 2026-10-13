@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import { footer, header, layout } from '@wordpress/icons';
 import { getTemplateInfo } from '../get-template-info';
 

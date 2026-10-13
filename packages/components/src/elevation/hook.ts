@@ -1,13 +1,18 @@
-import type { SerializedStyles } from '@emotion/react';
-import { css } from '@emotion/react';
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
+import type { CSSProperties } from 'react';
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
-import * as styles from './styles';
-import { CONFIG } from '../utils';
-import { useCx } from '../utils/hooks/use-cx';
 import { isValueDefined } from '../utils/values';
 import type { ElevationProps } from './types';
+import styles from './style.module.scss';
+
+const BORDER_RADIUS_KEYWORDS = new Set( [
+	'inherit',
+	'initial',
+	'unset',
+	'revert',
+	'revert-layer',
+] );
 
 export function getBoxShadow( value: number ) {
 	const boxShadowColor = `rgba(0, 0, 0, ${ value / 20 })`;
@@ -15,6 +20,12 @@ export function getBoxShadow( value: number ) {
 	${ boxShadowColor }`;
 
 	return boxShadow;
+}
+
+function hasValidShadow( value: number | undefined ): value is number {
+	// A negative blur invalidates the old declaration. Do not let a custom
+	// property turn it into a winning declaration that clears the prior shadow.
+	return isValueDefined( value ) && Number.isFinite( value ) && value >= 0;
 }
 
 export function useElevation(
@@ -28,95 +39,55 @@ export function useElevation(
 		hover,
 		isInteractive = false,
 		offset = 0,
+		style,
 		value = 0,
 		...otherProps
 	} = useContextSystem( props, 'Elevation' );
 
-	const cx = useCx();
+	const hoverValue = hover ?? ( isInteractive ? value * 2 : undefined );
+	const activeValue = active ?? ( isInteractive ? value / 2 : undefined );
+	const radiusValue =
+		typeof borderRadius === 'number' ? `${ borderRadius }px` : borderRadius;
+	const radiusKeyword =
+		typeof borderRadius === 'string' &&
+		BORDER_RADIUS_KEYWORDS.has( borderRadius.trim().toLowerCase() )
+			? borderRadius.trim().toLowerCase()
+			: undefined;
 
-	const classes = useMemo( () => {
-		let hoverValue: number | undefined = isValueDefined( hover )
-			? hover
-			: value * 2;
-		let activeValue: number | undefined = isValueDefined( active )
-			? active
-			: value / 2;
+	const elevationStyle: CSSProperties = {
+		'--wp-components-elevation-border-radius': radiusKeyword
+			? undefined
+			: radiusValue,
+		'--wp-components-elevation-offset': `${ offset }px`,
+		'--wp-components-elevation-shadow': hasValidShadow( value )
+			? getBoxShadow( value )
+			: undefined,
+		'--wp-components-elevation-hover-shadow': hasValidShadow( hoverValue )
+			? getBoxShadow( hoverValue )
+			: undefined,
+		'--wp-components-elevation-focus-shadow': hasValidShadow( focus )
+			? getBoxShadow( focus )
+			: undefined,
+		'--wp-components-elevation-active-shadow': hasValidShadow( activeValue )
+			? getBoxShadow( activeValue )
+			: undefined,
+		...style,
+	};
 
-		if ( ! isInteractive ) {
-			hoverValue = isValueDefined( hover ) ? hover : undefined;
-			activeValue = isValueDefined( active ) ? active : undefined;
-		}
-
-		const transition = `box-shadow ${ CONFIG.transitionDuration } ${ CONFIG.transitionTimingFunction }`;
-
-		const sx: {
-			Base?: SerializedStyles;
-			hover?: SerializedStyles;
-			active?: SerializedStyles;
-			focus?: SerializedStyles;
-		} = {};
-
-		sx.Base = css(
+	return {
+		...otherProps,
+		className: clsx(
+			styles.elevation,
 			{
-				borderRadius,
-				bottom: offset,
-				boxShadow: getBoxShadow( value ),
-				opacity: CONFIG.elevationIntensity,
-				left: offset,
-				right: offset,
-				top: offset,
+				[ styles[ 'has-shadow' ] ]: hasValidShadow( value ),
+				[ styles[ 'has-hover' ] ]: hasValidShadow( hoverValue ),
+				[ styles[ 'has-focus' ] ]: hasValidShadow( focus ),
+				[ styles[ 'has-active' ] ]: hasValidShadow( activeValue ),
 			},
-			css`
-				@media not ( prefers-reduced-motion ) {
-					transition: ${ transition };
-				}
-			`
-		);
-
-		if ( isValueDefined( hoverValue ) ) {
-			sx.hover = css`
-				*:hover > & {
-					box-shadow: ${ getBoxShadow( hoverValue ) };
-				}
-			`;
-		}
-
-		if ( isValueDefined( activeValue ) ) {
-			sx.active = css`
-				*:active > & {
-					box-shadow: ${ getBoxShadow( activeValue ) };
-				}
-			`;
-		}
-
-		if ( isValueDefined( focus ) ) {
-			sx.focus = css`
-				*:focus > & {
-					box-shadow: ${ getBoxShadow( focus ) };
-				}
-			`;
-		}
-
-		const elevationStyles = css(
-			styles.Elevation,
-			sx.Base,
-			sx.hover,
-			sx.focus,
-			sx.active
-		);
-
-		return cx( elevationStyles, className );
-	}, [
-		active,
-		borderRadius,
-		className,
-		cx,
-		focus,
-		hover,
-		isInteractive,
-		offset,
-		value,
-	] );
-
-	return { ...otherProps, className: classes, 'aria-hidden': true };
+			radiusKeyword && styles[ `border-radius-${ radiusKeyword }` ],
+			className
+		),
+		style: elevationStyle,
+		'aria-hidden': true,
+	};
 }

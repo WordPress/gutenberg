@@ -26,9 +26,21 @@ const elements = {
 		description: __( 'Manage the fonts and typography used on captions.' ),
 		title: __( 'Captions' ),
 	},
+	cite: {
+		description: __( 'Manage the fonts and typography used on citations.' ),
+		title: __( 'Citations' ),
+	},
 	button: {
 		description: __( 'Manage the fonts and typography used on buttons.' ),
 		title: __( 'Buttons' ),
+	},
+	textInput: {
+		description: __( 'Manage the fonts and typography used on inputs.' ),
+		title: __( 'Inputs' ),
+	},
+	select: {
+		description: __( 'Manage the fonts and typography used on selects.' ),
+		title: __( 'Selects' ),
 	},
 };
 

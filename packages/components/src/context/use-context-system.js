@@ -33,11 +33,20 @@ export function useContextSystem( props, namespace ) {
 		...getNamespace( namespace ),
 	};
 
-	const { _overrides: overrideProps, ...otherContextProps } = contextProps;
+	const { _overrides, ...otherContextProps } = contextProps;
+	/** @type {Record<string, unknown>} */
+	const overrideProps = /** @type {Record<string, unknown>} */ ( _overrides );
 
 	const initialMergedProps = Object.entries( otherContextProps ).length
 		? Object.assign( {}, otherContextProps, props )
 		: props;
+	/**
+	 * @type {P & {
+	 *   children?: React.ReactNode,
+	 *   renderChildren?: (props: P) => React.ReactNode
+	 * }}
+	 */
+	const propsWithChildren = initialMergedProps;
 
 	const cx = useCx();
 
@@ -48,9 +57,9 @@ export function useContextSystem( props, namespace ) {
 
 	// Provides the ability to customize the render of the component.
 	const rendered =
-		typeof initialMergedProps.renderChildren === 'function'
-			? initialMergedProps.renderChildren( initialMergedProps )
-			: initialMergedProps.children;
+		typeof propsWithChildren.renderChildren === 'function'
+			? propsWithChildren.renderChildren( initialMergedProps )
+			: propsWithChildren.children;
 
 	for ( const key in initialMergedProps ) {
 		// @ts-expect-error A string key cannot index the merged props type.

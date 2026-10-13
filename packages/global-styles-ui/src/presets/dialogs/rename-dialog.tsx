@@ -1,5 +1,5 @@
 import {
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 	Button,
 	Modal,
 } from '@wordpress/components';
@@ -45,7 +45,7 @@ export default function RenameDialog( {
 				} }
 			>
 				<Stack gap="sm" direction="column">
-					<InputControl
+					<WCInputControl
 						autoComplete="off"
 						value={ newName }
 						onChange={ setNewName }

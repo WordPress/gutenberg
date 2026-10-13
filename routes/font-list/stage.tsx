@@ -67,35 +67,37 @@ function FontLibraryPage() {
 
 	return (
 		<Page title={ __( 'Fonts' ) } className="font-library-page">
-			<Tabs
-				selectedTabId={ activeTab }
-				onSelect={ ( tabId: string ) => setActiveTab( tabId ) }
-			>
-				<div className="font-library-page__tablist">
-					<Tabs.TabList>
-						{ tabs.map( ( { id, title } ) => (
-							<Tabs.Tab key={ id } tabId={ id }>
-								{ title }
-							</Tabs.Tab>
-						) ) }
-					</Tabs.TabList>
-				</div>
-				{ tabs.map( ( { id } ) => (
-					<Tabs.TabPanel
-						key={ id }
-						tabId={ id }
-						focusable={ false }
-						className="font-library-page__tab-panel"
-					>
-						<FontLibrary
-							value={ user }
-							baseValue={ base }
-							onChange={ setUser }
-							activeTab={ id }
-						/>
-					</Tabs.TabPanel>
-				) ) }
-			</Tabs>
+			<div className="font-library-page__content">
+				<Tabs
+					selectedTabId={ activeTab }
+					onSelect={ ( tabId: string ) => setActiveTab( tabId ) }
+				>
+					<div className="font-library-page__tablist">
+						<Tabs.TabList>
+							{ tabs.map( ( { id, title } ) => (
+								<Tabs.Tab key={ id } tabId={ id }>
+									{ title }
+								</Tabs.Tab>
+							) ) }
+						</Tabs.TabList>
+					</div>
+					{ tabs.map( ( { id } ) => (
+						<Tabs.TabPanel
+							key={ id }
+							tabId={ id }
+							focusable={ false }
+							className="font-library-page__tab-panel"
+						>
+							<FontLibrary
+								value={ user }
+								baseValue={ base }
+								onChange={ setUser }
+								activeTab={ id }
+							/>
+						</Tabs.TabPanel>
+					) ) }
+				</Tabs>
+			</div>
 		</Page>
 	);
 }

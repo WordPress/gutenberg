@@ -200,7 +200,7 @@ export default function useDynamicGallery( {
 	// current post. Clearing the inner blocks removes the manually-added images:
 	// they're the gallery's image data, so there's nothing else to reset. The
 	// legacy `images`/`ids` attributes aren't touched — they're back-compat shims
-	// for the pre-innerBlocks format (see `deprecated.js`/`transforms.js`), empty
+	// for the pre-innerBlocks format (see `deprecated.jsx`/`transforms.js`), empty
 	// on any gallery reachable here.
 	function enableDynamicMode() {
 		// Batch the attribute change and the inner-block reset into a single
@@ -235,7 +235,7 @@ export default function useDynamicGallery( {
 
 	// Updates the source ordering within `dynamicContent.args`. Passing
 	// `undefined` (or the default order) strips the keys so they aren't
-	// persisted redundantly and the ToolsPanel item reads as unset.
+	// persisted redundantly and the Settings "Order by" item reads as unset.
 	function setSourceOrder( nextOrderby, nextOrder ) {
 		const nextArgs = { ...dynamicContent?.args };
 		delete nextArgs.orderBy;
@@ -256,13 +256,6 @@ export default function useDynamicGallery( {
 		setAttributes( { dynamicContent: nextSource } );
 	}
 
-	// Resets the source to its bare form: keeps the source kind, drops its args.
-	function resetSource() {
-		setAttributes( {
-			dynamicContent: { source: dynamicContent.source },
-		} );
-	}
-
 	return {
 		dynamicContent,
 		canUseDynamicSource,
@@ -278,6 +271,5 @@ export default function useDynamicGallery( {
 		enableDynamicMode,
 		convertToStatic,
 		setSourceOrder,
-		resetSource,
 	};
 }

@@ -509,7 +509,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 export const orderEventActions: Action< OrderEvent >[] = [
 	{
 		id: 'view-note',
-		label: 'View Item',
+		label: 'View',
 		isPrimary: true,
 		icon: link,
 		isEligible: ( item ) => item.type === 'note',
@@ -523,8 +523,7 @@ export const orderEventActions: Action< OrderEvent >[] = [
 	},
 	{
 		id: 'delete-note',
-		label: 'Delete Note',
-		isPrimary: false,
+		label: 'Delete…',
 		icon: trash,
 		isEligible: ( item ) => item.type === 'note',
 		modalHeader: ( items ) =>
@@ -608,7 +607,7 @@ const LayoutActivityComponent = ( {
 					field: 'date',
 					direction: 'asc',
 					showLabel: groupByLabel,
-			  }
+				}
 			: undefined,
 	} );
 	useEffect( () => {
@@ -620,7 +619,7 @@ const LayoutActivityComponent = ( {
 							field: 'date',
 							direction: 'asc',
 							showLabel: groupByLabel,
-					  }
+						}
 					: undefined,
 				showMedia,
 			};

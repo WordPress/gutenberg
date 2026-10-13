@@ -1,8 +1,8 @@
-import { useMemo } from '@wordpress/element';
+import clsx from 'clsx';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import styles from '../style.module.scss';
+import { getPaddingBySize } from '../get-padding-by-size';
 import type { FooterProps } from '../types';
 
 export function useCardFooter(
@@ -17,20 +17,17 @@ export function useCardFooter(
 		...otherProps
 	} = useContextSystem( props, 'CardFooter' );
 
-	const cx = useCx();
-
-	const classes = useMemo( () => {
-		return cx(
-			styles.getCardFooterStyles( {
-				isBorderless,
-				isShady,
-				size,
-			} ),
-			// This classname is added for legacy compatibility reasons.
-			'components-card__footer',
-			className
-		);
-	}, [ className, cx, isBorderless, isShady, size ] );
+	const classes = clsx(
+		styles.footer,
+		getPaddingBySize( size ),
+		{
+			[ styles[ 'section-borderless' ] ]: isBorderless,
+			[ styles[ 'is-shady' ] ]: isShady,
+		},
+		// This classname is added for legacy compatibility reasons.
+		'components-card__footer',
+		className
+	);
 
 	return {
 		...otherProps,

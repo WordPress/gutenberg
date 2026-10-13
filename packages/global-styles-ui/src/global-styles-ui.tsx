@@ -20,6 +20,8 @@ import ScreenColors from './screen-colors';
 import ScreenColorPalette from './screen-color-palette';
 import ScreenBackground from './screen-background';
 import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
+import ScreenTextShadows from './screen-text-shadows';
+import ScreenTextShadowsEdit from './screen-text-shadows-edit';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import ScreenCSS from './screen-css';
@@ -231,6 +233,12 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/shadows/edit/:category/:slug">
 						<ScreenShadowsEdit />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text-shadows">
+						<ScreenTextShadows />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/text-shadows/edit/:category/:slug">
+						<ScreenTextShadowsEdit />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/background">
 						<ScreenBackground />
 					</GlobalStylesNavigationScreen>
@@ -246,8 +254,17 @@ export function GlobalStylesUI( {
 					<GlobalStylesNavigationScreen path="/typography/caption">
 						<ScreenTypographyElement element="caption" />
 					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/cite">
+						<ScreenTypographyElement element="cite" />
+					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/typography/button">
 						<ScreenTypographyElement element="button" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/textInput">
+						<ScreenTypographyElement element="textInput" />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/typography/select">
+						<ScreenTypographyElement element="select" />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/blocks">
 						<ScreenBlockList />

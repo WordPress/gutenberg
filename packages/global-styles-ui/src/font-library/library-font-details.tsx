@@ -16,7 +16,7 @@ function LibraryFontDetails( { font }: { font: FontFamily } ) {
 						fontStyle: 'normal',
 						fontWeight: '400',
 					},
-			  ];
+				];
 
 	return (
 		<>

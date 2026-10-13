@@ -1,3 +1,4 @@
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { replace } from '../replace';
 import { getSparseArrayLength } from './helpers';

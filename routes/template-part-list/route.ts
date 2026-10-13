@@ -51,9 +51,6 @@ export const route = {
 				postType: 'wp_template_part',
 				postId,
 				isPreview: true,
-				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
-					postId
-				) }`,
 			};
 		}
 
@@ -62,7 +59,7 @@ export const route = {
 		const posts = await resolveSelect( coreStore ).getEntityRecords(
 			'postType',
 			'wp_template_part',
-			{ ...query, per_page: 1 }
+			query
 		);
 
 		// Return first template part if available
@@ -72,9 +69,6 @@ export const route = {
 				postType: 'wp_template_part',
 				postId,
 				isPreview: true,
-				editLink: `/types/wp_template_part/edit/${ encodeURIComponent(
-					postId
-				) }`,
 			};
 		}
 

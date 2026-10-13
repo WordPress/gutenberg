@@ -20,24 +20,13 @@ class Tests_Collaboration_WpSyncSaveServer extends WP_Test_REST_Controller_Testc
 		self::$subscriber_id = $factory->user->create( array( 'role' => 'subscriber' ) );
 		self::$post_id       = $factory->post->create( array( 'post_author' => self::$editor_id ) );
 		self::$category_id   = $factory->category->create();
-
-		// Enable option in setUpBeforeClass to ensure REST routes are registered.
-		update_option( 'wp_collaboration_enabled', 1 );
 	}
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$subscriber_id );
-		delete_option( 'wp_collaboration_enabled' );
 		wp_delete_post( self::$post_id, true );
 		wp_delete_term( self::$category_id, 'category' );
-	}
-
-	public function set_up() {
-		parent::set_up();
-
-		// Enable option for tests.
-		update_option( 'wp_collaboration_enabled', 1 );
 	}
 
 	/**

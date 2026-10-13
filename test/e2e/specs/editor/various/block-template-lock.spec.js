@@ -237,13 +237,14 @@ test.describe( 'Template Lock', () => {
 
 		test( 'should allow inserting blocks inside inner Column blocks (own lock=false)', async ( {
 			editor,
+			page,
 		} ) => {
-			await editor.selectBlocks(
-				editor.canvas.getByLabel( 'Block: Column (1 of 1)' )
-			);
+			await editor.selectBlocks( editor.canvas.getByText( 'Col 1' ) );
 
 			await expect(
-				editor.canvas.getByLabel( 'Add Block' )
+				page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Add block' } )
 			).toBeVisible();
 		} );
 

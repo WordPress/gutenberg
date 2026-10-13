@@ -1,3 +1,9 @@
+import { describe, expect, it } from 'vitest';
+import type { Attachment } from '../attachment';
+import imageAttachmentFixture from './fixtures/attachment-image.json';
+import zipAttachmentFixture from './fixtures/attachment-zip.json';
+import audioAttachmentFixture from './fixtures/attachment-audio.json';
+import videoAttachmentFixture from './fixtures/attachment-video.json';
 /**
  * Tests for the Attachment type against real REST API responses.
  *
@@ -6,11 +12,6 @@
  * are from the REST API's edit context, which includes edit-only fields like
  * permalink_template, generated_slug, and missing_image_sizes.
  */
-import type { Attachment } from '../attachment';
-import imageAttachmentFixture from './fixtures/attachment-image.json';
-import zipAttachmentFixture from './fixtures/attachment-zip.json';
-import audioAttachmentFixture from './fixtures/attachment-audio.json';
-import videoAttachmentFixture from './fixtures/attachment-video.json';
 
 describe( 'Attachment type', () => {
 	describe( 'Image attachment', () => {

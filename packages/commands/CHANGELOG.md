@@ -2,6 +2,35 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   The package now bundles TypeScript types ([#84315](https://github.com/WordPress/gutenberg/pull/84315)).
+
+## 1.57.0 (2026-10-07)
+
+## 1.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `useCommandLoader`: stop unregistering and re-registering the loader when the `hook` option changes identity between renders ([#82819](https://github.com/WordPress/gutenberg/pull/82819)).
+
+## 1.55.0 (2026-09-10)
+
+### Internal
+
+-   Remove unused dependency `@wordpress/warning` ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 1.54.0 (2026-08-26)
+
+### Enhancements
+
+-   Command Palette: Treat the per-category icon as a fallback used only when a command passes no `icon`, instead of an override that discards the command's own icon ([#81787](https://github.com/WordPress/gutenberg/pull/81787)).
+
 ## 1.53.0 (2026-08-12)
 
 ### Internal
@@ -52,6 +81,7 @@
 ## 1.41.0 (2026-03-04)
 
 ## 1.40.0 (2026-02-18)
+
 -   Add `category` property to command config, used to visually differentiate commands in the Command Palette.
 
 ## 1.39.0 (2026-01-29)

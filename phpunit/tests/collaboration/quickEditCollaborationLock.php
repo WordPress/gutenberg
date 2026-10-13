@@ -119,8 +119,6 @@ class Tests_Collaboration_QuickEditCollaborationLock extends WP_UnitTestCase {
 	}
 
 	public function test_inline_save_guard_is_registered_on_core_quick_edit_ajax_hook() {
-		update_option( 'wp_collaboration_enabled', '1' );
-
 		gutenberg_post_list_collaboration_ui();
 
 		$this->assertSame(

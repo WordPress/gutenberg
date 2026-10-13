@@ -3,17 +3,17 @@
 	min-height: 200px;
 }
 
-.locationPickerInWidget {
+.location-picker-in-widget {
 	flex-grow: 1;
 	padding: var(--wpds-dimension-padding-2xl);
 }
 
-.statusText {
+.status-text {
 	padding-inline: var(--wpds-dimension-padding-2xl);
 	color: var(--wpds-color-foreground-content-neutral-weak);
 	margin: 0;
 }
 
-.noLocationSelected {
+.no-location-selected {
 	flex-grow: 1;
 }

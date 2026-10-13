@@ -194,6 +194,39 @@ export function toDom( {
 }
 
 /**
+ * Returns the position in the DOM, as a node and an offset within it, of an
+ * offset in a value, inside the element the value is rendered in. The tree is
+ * built with the same handlers and placeholder as the element, so the path
+ * matches it.
+ *
+ * @param {Object}        $1                       Named arguments.
+ * @param {RichTextValue} $1.value                 The value rendered in the
+ *                                                 element.
+ * @param {number}        $1.offset                Offset in the value.
+ * @param {HTMLElement}   $1.element               The live element.
+ * @param {Function}      [$1.prepareEditableTree] Function to filter editable
+ *                                                 formats.
+ * @param {string}        [$1.placeholder]         Placeholder text.
+ *
+ * @return {{node: Node, offset: number}} The position.
+ */
+export function getDomPosition( {
+	value,
+	offset,
+	element,
+	prepareEditableTree,
+	placeholder,
+} ) {
+	const { selection } = toDom( {
+		value: { ...value, start: offset, end: offset },
+		prepareEditableTree,
+		placeholder,
+		doc: element.ownerDocument,
+	} );
+	return getNodeByPath( element, selection.startPath );
+}
+
+/**
  * Create an `Element` tree from a Rich Text value and applies the difference to
  * the `Element` tree contained by `current`.
  *

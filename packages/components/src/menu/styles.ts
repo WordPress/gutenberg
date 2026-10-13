@@ -55,9 +55,11 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 	background-color: ${ COLORS.ui.background };
 	border-radius: ${ CONFIG.radiusMedium };
 	${ ( props ) => css`
-		box-shadow: ${ props.variant === 'toolbar'
-			? TOOLBAR_VARIANT_BOX_SHADOW
-			: DEFAULT_BOX_SHADOW };
+		box-shadow: ${
+			props.variant === 'toolbar'
+				? TOOLBAR_VARIANT_BOX_SHADOW
+				: DEFAULT_BOX_SHADOW
+		};
 	` }
 `;
 
@@ -71,9 +73,11 @@ export const MenuSurface = styled.div< Pick< ContextProps, 'variant' > >`
 export const MenuMotionRoot = styled.div`
 	@media not ( prefers-reduced-motion ) {
 		transition-property: transform, opacity;
-		transition-duration: ${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
+		transition-duration:
+			${ DROPDOWN_MOTION_CSS.SLIDE_DURATION },
 			${ DROPDOWN_MOTION_CSS.FADE_DURATION };
-		transition-timing-function: ${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
+		transition-timing-function:
+			${ DROPDOWN_MOTION_CSS.SLIDE_EASING },
 			${ DROPDOWN_MOTION_CSS.FADE_EASING };
 		will-change: transform, opacity;
 

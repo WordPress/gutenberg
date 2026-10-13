@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
@@ -12,7 +13,9 @@ import {
 	useCustomUnits,
 } from '../unit-control';
 import type { FontSizePickerProps } from './types';
-import { Container, Header, HeaderLabel, HeaderToggle } from './styles';
+import BaseControl from '../base-control';
+import { HStack } from '../h-stack';
+import styles from './style.module.scss';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
@@ -104,19 +107,31 @@ const UnforwardedFontSizePicker = (
 	const isDisabled = value === undefined;
 
 	return (
-		<Container
+		<fieldset
 			ref={ ref }
-			className="components-font-size-picker"
-			// This Container component renders a fieldset element that needs to be labeled.
+			className={ clsx(
+				'components-font-size-picker',
+				styles.container
+			) }
+			// The fieldset needs to be labeled.
 			aria-labelledby={ labelId }
 		>
 			<Spacer>
-				<Header className="components-font-size-picker__header">
-					<HeaderLabel id={ labelId }>
+				<HStack
+					className={ clsx(
+						'components-font-size-picker__header',
+						styles.header
+					) }
+				>
+					<BaseControl.VisualLabel
+						id={ labelId }
+						className={ styles[ 'header-label' ] }
+					>
 						{ __( 'Font size' ) }
-					</HeaderLabel>
+					</BaseControl.VisualLabel>
 					{ ! disableCustomFontSizes && (
-						<HeaderToggle
+						<Button
+							className={ styles[ 'header-toggle' ] }
 							label={
 								currentPickerType === 'custom'
 									? __( 'Use size preset' )
@@ -130,7 +145,7 @@ const UnforwardedFontSizePicker = (
 							size="small"
 						/>
 					) }
-				</Header>
+				</HStack>
 			</Spacer>
 			<div>
 				{ currentPickerType === 'select' && (
@@ -180,7 +195,7 @@ const UnforwardedFontSizePicker = (
 									hasUnits
 										? `${ valueQuantity ?? '' }${
 												valueUnit ?? ''
-										  }`
+											}`
 										: resolvedValueForControls
 								}
 								onChange={ ( newValue ) => {
@@ -254,7 +269,7 @@ const UnforwardedFontSizePicker = (
 					</Flex>
 				) }
 			</div>
-		</Container>
+		</fieldset>
 	);
 };
 

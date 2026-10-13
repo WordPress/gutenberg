@@ -1,12 +1,22 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+	type Mock,
+} from 'vitest';
+
 // Store the original self.
 const originalSelf = globalThis.self;
 
 // Mock self for worker context.
-let mockPostMessage: jest.Mock;
+let mockPostMessage: Mock;
 let messageListeners: Array< ( event: MessageEvent ) => void > = [];
 
 function setupMockSelf() {
-	mockPostMessage = jest.fn();
+	mockPostMessage = vi.fn();
 	messageListeners = [];
 
 	// Override self with addEventListener pattern (matching comctx usage).
@@ -51,7 +61,7 @@ function restoreSelf() {
 describe( 'worker-thread', () => {
 	beforeEach( () => {
 		setupMockSelf();
-		jest.resetModules();
+		vi.resetModules();
 	} );
 
 	afterEach( () => {
@@ -61,7 +71,7 @@ describe( 'worker-thread', () => {
 	describe( 'expose', () => {
 		it( 'should set up message handler', async () => {
 			const { expose } = await import( '../worker-thread' );
-			const api = { method: jest.fn() };
+			const api = { method: vi.fn() };
 
 			expose( api );
 
@@ -70,8 +80,8 @@ describe( 'worker-thread', () => {
 
 		it( 'should register handlers for all methods on target', async () => {
 			const { expose } = await import( '../worker-thread' );
-			const method1 = jest.fn();
-			const method2 = jest.fn();
+			const method1 = vi.fn();
+			const method2 = vi.fn();
 			const api = {
 				method1,
 				method2,
@@ -85,7 +95,7 @@ describe( 'worker-thread', () => {
 		it( 'should only expose functions, not other properties', async () => {
 			const { expose } = await import( '../worker-thread' );
 			const api = {
-				validMethod: jest.fn(),
+				validMethod: vi.fn(),
 				stringProp: 'not a function',
 				numberProp: 42,
 				objectProp: { nested: true },

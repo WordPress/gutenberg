@@ -1,8 +1,9 @@
-import { useState, useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { Spinner } from '@wordpress/components';
 import { Link, Stack, Text } from '@wordpress/ui';
+import { HostLink, useWidgetActions } from '@wordpress/widget-primitives';
 import { CircleProgress, type HealthTone } from './components';
 import styles from './style.module.css';
 
@@ -18,13 +19,15 @@ type IssueCounts = {
 	critical: number;
 };
 
-// Async site health tests exposed via the REST API.
+// Async site health tests exposed via the REST API. The Site Health page
+// reads the same set; keep `routes/site-health/stage.tsx` in sync.
 const ASYNC_TEST_PATHS = [
 	'/wp-site-health/v1/tests/background-updates',
 	'/wp-site-health/v1/tests/loopback-requests',
 	'/wp-site-health/v1/tests/https-status',
 	'/wp-site-health/v1/tests/dotorg-communication',
 	'/wp-site-health/v1/tests/authorization-header',
+	'/wp-site-health/v1/tests/page-cache',
 ] as const;
 
 /**
@@ -79,9 +82,50 @@ function statusMessage( counts: IssueCounts ): string {
 	);
 }
 
+/**
+ * Builds the href of the dashboard's Site Health page, the same target as
+ * the Details action, filtered to the statuses that have items. The query
+ * travels inside `p`, so a full load and the host's route link read the
+ * same filter.
+ *
+ * @param {IssueCounts} counts Aggregated issue counts.
+ */
+function reviewHref( counts: IssueCounts ): string {
+	const statuses = ( [ 'critical', 'recommended' ] as const ).filter(
+		( status ) => counts[ status ] > 0
+	);
+	const route = `/site-health?status=${ statuses.join( ',' ) }`;
+
+	return `admin.php?page=dashboard-wp-admin&p=${ encodeURIComponent(
+		route
+	) }`;
+}
+
 export default function SiteHealth() {
 	const [ counts, setCounts ] = useState< IssueCounts | null >( null );
 	const [ isLoading, setIsLoading ] = useState( true );
+
+	const issuesTotal = counts ? counts.recommended + counts.critical : 0;
+	const reviewLabel = sprintf(
+		/* translators: %d: Number of issues to address. */
+		_n( 'Review %d item', 'Review %d items', issuesTotal ),
+		issuesTotal
+	);
+	const href = counts ? reviewHref( counts ) : '';
+
+	// With items to review, a link to them joins the declared actions.
+	const hosted = useWidgetActions(
+		issuesTotal > 0
+			? [
+					{
+						id: 'site-health-review',
+						label: reviewLabel,
+						relevance: 'medium',
+						href,
+					},
+				]
+			: []
+	);
 
 	useEffect( () => {
 		let ignore = false;
@@ -136,7 +180,6 @@ export default function SiteHealth() {
 	const total = counts.good + counts.recommended + counts.critical;
 	const percentage =
 		total > 0 ? Math.round( ( counts.good / total ) * 100 ) : 0;
-	const issuesTotal = counts.recommended + counts.critical;
 	const tone = toneForPercentage( percentage );
 
 	return (
@@ -149,13 +192,9 @@ export default function SiteHealth() {
 		>
 			<CircleProgress percentage={ percentage } tone={ tone } />
 			<Text variant="body-lg">{ statusMessage( counts ) }</Text>
-			{ issuesTotal > 0 && (
-				<Link href="site-health.php">
-					{ sprintf(
-						/* translators: %d: Number of issues to address. */
-						_n( 'Review %d item', 'Review %d items', issuesTotal ),
-						issuesTotal
-					) }
+			{ issuesTotal > 0 && ! hosted && (
+				<Link render={ <HostLink href={ href } /> }>
+					{ reviewLabel }
 				</Link>
 			) }
 		</Stack>

@@ -141,7 +141,7 @@ export type CompositeProps = CompositeStoreProps & {
 	 * `onFocusVisible` prop.
 	 * The component supports the `disabled` prop even for those elements not
 	 * supporting the native `disabled` attribute. Disabled elements may be
-	 * still accessible via keyboard by using the the `accessibleWhenDisabled`
+	 * still accessible via keyboard by using the `accessibleWhenDisabled`
 	 * prop.
 	 * Non-native focusable elements will lose their focusability entirely.
 	 * However, native focusable elements will retain their inherent focusability.

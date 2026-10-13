@@ -16,18 +16,24 @@ function isColorTransparent( color ) {
  *   - Inserts a default block on ENTER.
  *   - Disables dragging of block contents.
  *
+ * For a block that is part of a multi selection, only the drag handling is
+ * added, so that dragging any of the selected blocks moves them all.
+ *
  * @param {string} clientId Block client ID.
  */
-export function useEventHandlers( { clientId, isSelected } ) {
+export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 	const {
 		getBlockRootClientId,
+		getSelectedBlockClientIds,
 		isZoomOut,
 		hasMultiSelection,
+		__unstableIsFullySelected,
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
+		multiSelect,
 		removeBlock,
 		resetZoomLevel,
 		startDraggingBlocks,
@@ -37,7 +43,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 	return useRefEffect(
 		( node ) => {
-			if ( ! isSelected ) {
+			if ( ! isSelected && ! isMultiSelected ) {
 				return;
 			}
 
@@ -77,25 +83,19 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			}
 
 			/**
-			 * A press on the block's fully selected content drags the
-			 * block, but the browser only starts a drag of a text selection
-			 * when the press begins at rest on the selected glyphs; a press
-			 * that is already moving falls back to starting a new
-			 * selection. For the length of the press, make the block a non
-			 * editable, draggable element instead: exactly the shape a
-			 * directly draggable block has, from which a native drag starts
-			 * on any press, however fast the gesture begins.
+			 * Lets the browser start a drag of the block from any press
+			 * inside a fully selected multi-selection, or on the fully
+			 * selected text of the block. Editable content places a caret
+			 * on press instead of dragging the draggable block, and a text
+			 * selection only drags from a press that begins at rest on the
+			 * selected glyphs, so the editing host and the pressed field are
+			 * taken out of editing for the length of the press.
 			 *
 			 * @param {MouseEvent} event Mouse down event.
 			 */
 			function onMouseDown( event ) {
-				if ( event.button !== 0 ) {
-					return;
-				}
-
-				// Shift and other modifiers adjust the selection; those
-				// presses keep their native behavior.
 				if (
+					event.button !== 0 ||
 					event.shiftKey ||
 					event.metaKey ||
 					event.ctrlKey ||
@@ -106,48 +106,82 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				const { ownerDocument } = node;
 				const selection = ownerDocument.defaultView.getSelection();
+				const isWholeMultiSelection =
+					isMultiSelected &&
+					hasMultiSelection() &&
+					__unstableIsFullySelected();
+				const isFullySelectedText =
+					isSelected &&
+					! hasMultiSelection() &&
+					node.isContentEditable &&
+					! selection.isCollapsed &&
+					isEntirelySelected( node );
 
-				if (
-					! node.isContentEditable ||
-					selection.isCollapsed ||
-					! isEntirelySelected( node ) ||
-					hasMultiSelection()
-				) {
+				if ( ! isWholeMultiSelection && ! isFullySelectedText ) {
 					return;
 				}
 
-				const hadTabIndex = node.hasAttribute( 'tabindex' );
-
+				// Multi-selected blocks and text fields are not draggable by
+				// themselves; the pressed one is, for the length of the press.
+				const hadDraggable = node.getAttribute( 'draggable' );
 				node.setAttribute( 'draggable', 'true' );
-				node.setAttribute( 'contenteditable', 'false' );
+				const editables = [
+					node.parentElement?.closest( '[contenteditable="true"]' ),
+					event.target.closest?.( '[contenteditable="true"]' ),
+				].filter(
+					( element, index, all ) =>
+						element && all.indexOf( element ) === index
+				);
 
-				// A non editable block is only a drag target while it is
-				// focused, and losing editability also loses the focus
-				// unless the block is focusable in its own right.
-				if ( ! hadTabIndex ) {
-					node.setAttribute( 'tabindex', '-1' );
+				for ( const element of editables ) {
+					element.contentEditable = 'false';
 				}
-				node.focus();
+
+				// A field that stops being editable loses focus unless it is
+				// focusable in its own right, and a block is only a direct
+				// drag target while it is focused.
+				const hadTabIndex = node.hasAttribute( 'tabindex' );
+				if ( isFullySelectedText ) {
+					if ( ! hadTabIndex ) {
+						node.setAttribute( 'tabindex', '-1' );
+					}
+					node.focus();
+				}
 
 				function restore() {
-					node.removeAttribute( 'draggable' );
-					node.setAttribute( 'contenteditable', 'true' );
-					if ( ! hadTabIndex ) {
+					if ( hadDraggable === null ) {
+						node.removeAttribute( 'draggable' );
+					} else {
+						node.setAttribute( 'draggable', hadDraggable );
+					}
+					for ( const element of editables ) {
+						element.contentEditable = 'true';
+					}
+					if ( isFullySelectedText && ! hadTabIndex ) {
 						node.removeAttribute( 'tabindex' );
 					}
 					ownerDocument.removeEventListener( 'mouseup', onPressEnd );
+					ownerDocument.removeEventListener( 'dragend', restore );
 					node.removeEventListener( 'dragstart', onPressDragStart );
 				}
 
 				function onPressDragStart() {
-					// The drag session is committed; the block can become
-					// editable again while it is dragged.
-					restore();
+					// The drag of a fully selected field is under way: the
+					// field can be editable again while it is dragged. The
+					// editing host of a multi-selection stays out of editing
+					// until the drag ends, or the browser would show a text
+					// drop caret in it.
+					if ( isFullySelectedText ) {
+						restore();
+					}
 				}
 
 				function onPressEnd( e ) {
 					restore();
-					// The block was not editable during the press, so the
+					if ( ! isFullySelectedText ) {
+						return;
+					}
+					// The field was not editable during the press, so the
 					// browser did not place a caret for the click. Place it
 					// where the press landed, so clicking into the selected
 					// text keeps putting the caret at the click position.
@@ -177,43 +211,399 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				node.addEventListener( 'dragstart', onPressDragStart );
 				ownerDocument.addEventListener( 'mouseup', onPressEnd );
+				ownerDocument.addEventListener( 'dragend', restore );
 			}
 
 			/**
-			 * Starts a drag of the block when it is the direct, non
-			 * editable, focused drag target. The press above puts a fully
-			 * selected block in exactly that shape. Any other drag within
-			 * the block stays fully native: the browser moves the dragged
-			 * text selection to the drop point, like cut and paste.
+			 * Starts the visuals of a multi-selection drag: the pressed
+			 * block hangs below and right of the pointer, the next block
+			 * of the selection slides out from underneath it, slightly
+			 * turned, and a count of all dragged blocks sits on its top
+			 * right corner. The rest of the selection hides in place.
+			 *
+			 * @param {DragEvent}   event       Drag event.
+			 * @param {string[]}    clientIds   The dragged block client IDs.
+			 * @param {HTMLElement} dragElement The fake drag image element.
+			 */
+			function startPileDrag( event, clientIds, dragElement ) {
+				const { ownerDocument } = node;
+				const { defaultView } = ownerDocument;
+
+				const blockNodes = clientIds
+					.map( ( selectedClientId ) =>
+						ownerDocument.querySelector(
+							`[data-block="${ selectedClientId }"]`
+						)
+					)
+					.filter( Boolean );
+
+				// The pressed block is the drag visual. The block after it
+				// (or before it, for the last block) slides out from
+				// underneath, so the visual reads as a stack. The rest of
+				// the selection hides in place.
+				const anchorPlace = blockNodes.indexOf( node );
+				const backNode =
+					blockNodes[ anchorPlace + 1 ] ??
+					blockNodes[ anchorPlace - 1 ];
+				const pileNodes = backNode ? [ node, backNode ] : [ node ];
+				const restNodes = blockNodes.filter(
+					( blockNode ) => ! pileNodes.includes( blockNode )
+				);
+
+				let _scale = 1;
+
+				{
+					let parentElement = node;
+					while ( ( parentElement = parentElement.parentElement ) ) {
+						const { scale } =
+							defaultView.getComputedStyle( parentElement );
+						if ( scale && scale !== 'none' ) {
+							_scale = parseFloat( scale );
+							break;
+						}
+					}
+				}
+
+				const inverted = 1 / _scale;
+				// Every block scales towards the same diagonal, and only
+				// ever down. Wide blocks come out long and thin, tall ones
+				// narrow.
+				const cardScale = ( rect ) =>
+					Math.min( 1, 420 / Math.hypot( rect.width, rect.height ) );
+				const anchorRect = node.getBoundingClientRect();
+				const dragScale = cardScale( anchorRect );
+				const grabX = event.clientX;
+				const grabY = event.clientY;
+				// The pointer holds the block by its top left corner,
+				// wherever the press landed in the block: the corner sits
+				// just inside the grabbing hand.
+				const grabOffset = 4;
+				const anchorVisual = {
+					left: grabX - grabOffset,
+					top: grabY - grabOffset,
+					width: anchorRect.width * dragScale,
+					height: anchorRect.height * dragScale,
+				};
+
+				// Scaling happens around the center; compensate the shift
+				// so the box still lands on its slot.
+				function translationTo( rect, scale, left, top ) {
+					return {
+						x:
+							left -
+							rect.left -
+							( rect.width * ( 1 - scale ) ) / 2,
+						y: top - rect.top - ( rect.height * ( 1 - scale ) ) / 2,
+					};
+				}
+
+				const cards = pileNodes.map( ( blockNode, index ) => {
+					const rect = blockNode.getBoundingClientRect();
+					const scale = cardScale( rect );
+
+					if ( index === 0 ) {
+						const to = translationTo(
+							rect,
+							scale,
+							anchorVisual.left,
+							anchorVisual.top
+						);
+						return { scale, turn: 0, from: { x: 0, y: 0 }, to };
+					}
+
+					const width = rect.width * scale;
+					const height = rect.height * scale;
+					// It starts centered under the pressed block and slides
+					// out a little to the left, its bottom edge peeking out
+					// below, slightly turned.
+					const from = translationTo(
+						rect,
+						scale,
+						anchorVisual.left + ( anchorVisual.width - width ) / 2,
+						anchorVisual.top + ( anchorVisual.height - height ) / 2
+					);
+					const to = translationTo(
+						rect,
+						scale,
+						anchorVisual.left - 12,
+						anchorVisual.top + anchorVisual.height + 24 - height
+					);
+					return { scale, turn: 1.5, from, to };
+				} );
+				const toTransform = ( { x, y }, scale, turn ) =>
+					`translate(${ x * inverted }px, ${
+						y * inverted
+					}px) scale(${ scale }) rotate(${ turn }deg)`;
+				const restoreCallbacks = [];
+
+				pileNodes.forEach( ( blockNode, index ) => {
+					const savedProperties = {};
+
+					for ( const property of [
+						'transform',
+						'transformOrigin',
+						'transition',
+						'zIndex',
+						'position',
+						'top',
+						'left',
+						'pointerEvents',
+						'backgroundColor',
+						'boxShadow',
+					] ) {
+						savedProperties[ property ] =
+							blockNode.style[ property ];
+					}
+
+					// Remove the id and leave it on a hidden shallow clone
+					// so that drop target calculations are correct.
+					const blockId = blockNode.id;
+					const placeholder = blockNode.cloneNode();
+					placeholder.style.display = 'none';
+					blockNode.id = null;
+					blockNode.after( placeholder );
+					// The attribute keeps the slot styling for dragged
+					// blocks from hiding the selection overlay on the
+					// stack.
+					blockNode.dataset.dragPile = 'true';
+
+					restoreCallbacks.push( () => {
+						for ( const [ property, value ] of Object.entries(
+							savedProperties
+						) ) {
+							blockNode.style[ property ] = value;
+						}
+						delete blockNode.dataset.dragPile;
+						blockNode.id = blockId;
+						placeholder.remove();
+					} );
+
+					const { style } = blockNode;
+					const { scale, from } = cards[ index ];
+					style.position = 'relative';
+					style.zIndex = `${ 1000 - index }`;
+					style.transformOrigin = '50% 50%';
+					style.boxShadow = '4px 4px 8px rgba(0, 0, 0, 0.15)';
+					style.transform = toTransform( from, index ? scale : 1, 0 );
+
+					// If the block has no background color, use the
+					// nearest ancestor's, so it does not show the content
+					// it moves over through the gaps between lines.
+					if (
+						isColorTransparent(
+							defaultView.getComputedStyle( blockNode )
+								.backgroundColor
+						)
+					) {
+						let bgColor = 'transparent';
+						let parentElement = blockNode;
+
+						while (
+							( parentElement = parentElement.parentElement )
+						) {
+							const { backgroundColor } =
+								defaultView.getComputedStyle( parentElement );
+							if ( ! isColorTransparent( backgroundColor ) ) {
+								bgColor = backgroundColor;
+								break;
+							}
+						}
+
+						style.backgroundColor = bgColor;
+					}
+				} );
+
+				// Flush the starting styles, then set the targets, so the
+				// pressed block animates from its place to the pointer and
+				// the block behind it slides out from underneath.
+				void pileNodes[ 0 ].offsetHeight;
+				pileNodes.forEach( ( blockNode, index ) => {
+					const { scale, turn, to } = cards[ index ];
+					blockNode.style.transition = 'transform 0.2s ease-out';
+					blockNode.style.transform = toTransform( to, scale, turn );
+				} );
+
+				// The other selected blocks hide in place; their spots
+				// keep their size until the drag ends.
+				for ( const blockNode of restNodes ) {
+					const savedVisibility = blockNode.style.visibility;
+					blockNode.style.visibility = 'hidden';
+					restoreCallbacks.push( () => {
+						blockNode.style.visibility = savedVisibility;
+					} );
+				}
+
+				const originScrollTop = defaultView.scrollY;
+				const originScrollLeft = defaultView.scrollX;
+				const originClientX = grabX;
+				const originClientY = grabY;
+				let lastClientX = originClientX;
+				let lastClientY = originClientY;
+
+				// A count near the pointer: most of the selection may be
+				// hidden, so the stack alone does not tell how many
+				// blocks are dragged.
+				const countBadge = ownerDocument.createElement( 'div' );
+				countBadge.className = 'block-editor-block-list__drag-count';
+				countBadge.textContent = String( clientIds.length );
+				ownerDocument.body.appendChild( countBadge );
+
+				function positionCountBadge() {
+					// On the stack's top right corner, clear of the
+					// pointer at its top left.
+					countBadge.style.left = `${
+						( lastClientX - grabOffset + anchorVisual.width ) *
+							inverted -
+						12
+					}px`;
+					countBadge.style.top = `${
+						( lastClientY - grabOffset ) * inverted - 12
+					}px`;
+				}
+				positionCountBadge();
+
+				function over() {
+					const topDelta =
+						( lastClientY -
+							originClientY +
+							defaultView.scrollY -
+							originScrollTop ) *
+						inverted;
+					const leftDelta =
+						( lastClientX -
+							originClientX +
+							defaultView.scrollX -
+							originScrollLeft ) *
+						inverted;
+
+					for ( const blockNode of pileNodes ) {
+						blockNode.style.top = `${ topDelta }px`;
+						blockNode.style.left = `${ leftDelta }px`;
+					}
+
+					positionCountBadge();
+				}
+				over();
+
+				function dragOver( e ) {
+					// The pile rides under the pointer, so it must not catch
+					// the drag events meant for the drop zones beneath it.
+					// Applied once the drag is under way: the browser cancels
+					// a drag whose source stops receiving pointer events
+					// while the drag starts.
+					for ( const blockNode of pileNodes ) {
+						blockNode.style.pointerEvents = 'none';
+					}
+					// Only move if the pointer has moved.
+					if (
+						e.clientX === lastClientX &&
+						e.clientY === lastClientY
+					) {
+						return;
+					}
+					lastClientX = e.clientX;
+					lastClientY = e.clientY;
+					over();
+				}
+
+				function end() {
+					ownerDocument.removeEventListener( 'dragover', dragOver );
+					ownerDocument.removeEventListener( 'dragend', end );
+					ownerDocument.removeEventListener( 'drop', end );
+					ownerDocument.removeEventListener( 'scroll', over );
+					restoreCallbacks.forEach( ( restore ) => restore() );
+					countBadge.remove();
+					dragElement.remove();
+					stopDraggingBlocks();
+					document.body.classList.remove(
+						'is-dragging-components-draggable'
+					);
+					ownerDocument.documentElement.classList.remove(
+						'is-dragging'
+					);
+				}
+
+				ownerDocument.addEventListener( 'dragover', dragOver );
+				ownerDocument.addEventListener( 'dragend', end );
+				ownerDocument.addEventListener( 'drop', end );
+				ownerDocument.addEventListener( 'scroll', over );
+
+				startDraggingBlocks( clientIds );
+				// Important because it hides the block toolbar.
+				document.body.classList.add(
+					'is-dragging-components-draggable'
+				);
+				ownerDocument.documentElement.classList.add( 'is-dragging' );
+			}
+
+			/**
+			 * Prevents default dragging behavior within a block, except when
+			 * the block is part of a multi selection (then the drag moves
+			 * all selected blocks).
+			 * To do: we must handle partial selections in the future and
+			 * clean up the drag target.
 			 *
 			 * @param {DragEvent} event Drag event.
 			 */
 			function onDragStart( event ) {
-				if (
-					node !== event.target ||
-					node.isContentEditable ||
-					node.ownerDocument.activeElement !== node ||
-					hasMultiSelection()
-				) {
+				const { target } = event;
+				const { ownerDocument } = node;
+				const { defaultView } = ownerDocument;
+				const { activeElement } = ownerDocument;
+				// The drag may start on an image, which is draggable by
+				// default: it is the block's drag as long as no nested
+				// draggable, such as an inner block, is closer to the source.
+				// The data and the drag image set below replace the image's.
+				// A selection drag, whose source Firefox reports as the text
+				// node, is not the block's.
+				const isDirectBlockDrag =
+					! node.isContentEditable &&
+					activeElement === node &&
+					! hasMultiSelection() &&
+					target.nodeType === target.ELEMENT_NODE &&
+					target.closest( '[draggable="true"]' ) === node;
+				// When multiple blocks are selected, dragging any of them
+				// moves the whole selection, the same way dragging the drag
+				// handle in the block toolbar does.
+				const isMultiSelectionDrag =
+					isMultiSelected &&
+					hasMultiSelection() &&
+					__unstableIsFullySelected();
+
+				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
+					// A drag of a text selection within the field stays
+					// native: the browser moves the dragged text to the drop
+					// point. Any other drag within the block is prevented.
+					const textSelection = defaultView.getSelection();
+					if ( ! (
+						node.isContentEditable &&
+						! textSelection.isCollapsed &&
+						node.contains( textSelection.anchorNode )
+					) ) {
+						event.preventDefault();
+					}
 					return;
 				}
-
+				const clientIds = isMultiSelectionDrag
+					? getSelectedBlockClientIds()
+					: [ clientId ];
 				const data = JSON.stringify( {
 					type: 'block',
-					srcClientIds: [ clientId ],
-					srcRootClientId: getBlockRootClientId( clientId ),
+					srcClientIds: clientIds,
+					srcRootClientId: getBlockRootClientId( clientIds[ 0 ] ),
 				} );
 				event.dataTransfer.effectAllowed = 'move'; // remove "+" cursor
 				event.dataTransfer.clearData();
 				event.dataTransfer.setData( 'wp-blocks', data );
-				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
 				const selection = defaultView.getSelection();
-				// A block dragged by its fully selected content keeps the
+				// A block dragged by its fully selected text keeps the
 				// selection, so the highlight rides along with the block
 				// and survives the drop. Other drags clear the selection.
 				const editableElement =
-					! selection.isCollapsed && isEntirelySelected( node )
+					isDirectBlockDrag &&
+					! selection.isCollapsed &&
+					node.contains( selection.anchorNode ) &&
+					isEntirelySelected( node )
 						? node
 						: null;
 
@@ -235,6 +625,11 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				dragElement.style.visibility = 'hidden';
 				ownerDocument.body.appendChild( dragElement );
 				event.dataTransfer.setDragImage( dragElement, 0, 0 );
+
+				if ( isMultiSelectionDrag ) {
+					startPileDrag( event, clientIds, dragElement );
+					return;
+				}
 
 				const rect = node.getBoundingClientRect();
 
@@ -401,7 +796,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.addEventListener( 'drop', end );
 				ownerDocument.addEventListener( 'scroll', over );
 
-				startDraggingBlocks( [ clientId ] );
+				startDraggingBlocks( clientIds );
 				// Important because it hides the block toolbar.
 				document.body.classList.add(
 					'is-dragging-components-draggable'
@@ -409,9 +804,19 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				ownerDocument.documentElement.classList.add( 'is-dragging' );
 			}
 
-			node.addEventListener( 'keydown', onKeyDown );
-			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'dragstart', onDragStart );
+			node.addEventListener( 'mousedown', onMouseDown );
+
+			// Blocks in a multi selection only get the drag handling; the
+			// key and double click handling is for the selected block.
+			if ( ! isSelected ) {
+				return () => {
+					node.removeEventListener( 'dragstart', onDragStart );
+					node.removeEventListener( 'mousedown', onMouseDown );
+				};
+			}
+
+			node.addEventListener( 'keydown', onKeyDown );
 
 			/**
 			 * Handles double-click events on section blocks to edit content only section.
@@ -442,15 +847,17 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
-				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'dragstart', onDragStart );
+				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'dblclick', onDoubleClick );
 			};
 		},
 		[
 			clientId,
 			isSelected,
+			isMultiSelected,
 			getBlockRootClientId,
+			getSelectedBlockClientIds,
 			getBlock,
 			isReusableBlock,
 			isTemplatePart,
@@ -458,6 +865,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			isZoomOut,
 			resetZoomLevel,
 			hasMultiSelection,
+			multiSelect,
 			startDraggingBlocks,
 			stopDraggingBlocks,
 			isSectionBlock,

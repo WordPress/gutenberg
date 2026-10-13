@@ -2,6 +2,8 @@
  * Tests for typography utility functions
  * Ported from Gutenberg's typography-utils.js tests
  */
+
+import { describe, expect, it } from 'vitest';
 import {
 	getTypographyFontSizeValue,
 	getFluidTypographyOptionsFromSettings,
@@ -250,14 +252,14 @@ describe( 'typography utils', () => {
 			},
 		];
 
-		testCases.forEach( ( { message, preset, settings, expected } ) => {
-			// eslint-disable-next-line jest/valid-title
-			it( message, () => {
+		it.each( testCases )(
+			'$message',
+			( { preset, settings, expected } ) => {
 				expect(
 					getTypographyFontSizeValue( preset, settings || {} )
 				).toEqual( expected );
-			} );
-		} );
+			}
+		);
 	} );
 
 	describe( 'getFluidTypographyOptionsFromSettings', () => {
@@ -338,13 +340,10 @@ describe( 'typography utils', () => {
 			},
 		];
 
-		testCases.forEach( ( { message, settings, expected } ) => {
-			// eslint-disable-next-line jest/valid-title
-			it( message, () => {
-				expect(
-					getFluidTypographyOptionsFromSettings( settings || {} )
-				).toEqual( expected );
-			} );
+		it.each( testCases )( '$message', ( { settings, expected } ) => {
+			expect(
+				getFluidTypographyOptionsFromSettings( settings || {} )
+			).toEqual( expected );
 		} );
 	} );
 } );
