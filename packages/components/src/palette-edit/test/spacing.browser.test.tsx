@@ -3,9 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 // Load the same tokens and button styles used by consumers.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../../../theme/prebuilt/css/design-tokens.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../button/style.scss';
 import PaletteEdit from '..';
 

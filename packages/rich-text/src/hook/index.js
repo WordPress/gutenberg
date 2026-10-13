@@ -1,15 +1,23 @@
-import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
+import {
+	useCallback,
+	useRef,
+	useLayoutEffect,
+	useReducer,
+} from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { create, RichTextData } from '../create';
-import { apply } from '../to-dom';
+import { apply, getDomPosition } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
 import { useFormatTypes } from './use-format-types';
+
+// A symbol, so the function stays private if the hook becomes public.
+export const getDomPositionKey = Symbol( 'getDomPosition' );
 
 /**
  * Whether a selection may be set into the element: it (or an editing host
@@ -233,6 +241,19 @@ function useRichTextBase( {
 		getValue: () => recordRef.current,
 		onChange: handleChange,
 		ref: mergedRefs,
+		// The DOM position of an offset in the value, for a selection set
+		// from outside the element.
+		[ getDomPositionKey ]: useCallback(
+			( offset ) =>
+				getDomPosition( {
+					value: recordRef.current,
+					offset: Math.min( offset, recordRef.current.text.length ),
+					element: ref.current,
+					prepareEditableTree: __unstableAddInvisibleFormats,
+					placeholder,
+				} ),
+			[ __unstableAddInvisibleFormats, placeholder ]
+		),
 	};
 }
 

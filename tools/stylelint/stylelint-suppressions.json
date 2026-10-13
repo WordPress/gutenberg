@@ -34,11 +34,6 @@
 			"count": 1
 		}
 	},
-	"packages/dataviews/src/components/dataviews-filters/style.scss": {
-		"selector-class-pattern": {
-			"count": 1
-		}
-	},
 	"packages/edit-site/src/components/add-new-template/style.scss": {
 		"selector-class-pattern": {
 			"count": 1

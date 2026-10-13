@@ -20,6 +20,8 @@
 		{ "path": "../../packages/html-entities/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/lazy-editor" },
+		{ "path": "../../packages/react-inert-value/tsconfig.build.json" },
+		{ "path": "../../packages/ui/tsconfig.build.json" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],

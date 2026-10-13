@@ -71,6 +71,21 @@ const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 const TS_EXT = '@([cm]ts|ts|tsx)';
 const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
 
+const vitestLintFiles = [
+	...vitestTestPatterns,
+	`**/test/**/*.${ SCRIPT_EXT }`,
+	`**/__tests__/**/*.${ SCRIPT_EXT }`,
+	`test/unit/config/**/*.${ SCRIPT_EXT }`,
+	'packages/block-serialization-spec-parser/shared-tests.js',
+];
+const vitestLintIgnores = [
+	'test/e2e/**',
+	'test/performance/**',
+	'test/storybook-playwright/**',
+	'test/ai-development/**',
+	'**/fixtures/**',
+];
+
 /**
  * The list of patterns matching files used only for development purposes.
  *
@@ -534,6 +549,8 @@ export default dedupePlugins( [
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,
 		],
+		// Tests load styles directly instead of using WordPress's enqueue path.
+		ignores: vitestLintFiles,
 		rules: {
 			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
@@ -587,25 +604,10 @@ export default dedupePlugins( [
 	// Use the public Vitest baseline for suites and shared unit-test helpers.
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
-		files: [
-			...vitestTestPatterns,
-			`**/test/**/*.${ SCRIPT_EXT }`,
-			`**/__tests__/**/*.${ SCRIPT_EXT }`,
-			`test/unit/config/**/*.${ SCRIPT_EXT }`,
-			'packages/block-serialization-spec-parser/shared-tests.js',
-		],
-		ignores: [
-			'test/e2e/**',
-			'test/performance/**',
-			'test/storybook-playwright/**',
-			'test/ai-development/**',
-			'**/fixtures/**',
-		],
+		files: vitestLintFiles,
+		ignores: vitestLintIgnores,
 		rules: {
 			...config.rules,
-			'vitest/valid-describe-callback': 'error',
-			'vitest/valid-expect-in-promise': 'error',
-			'vitest/valid-title': [ 'error', { allowArguments: true } ],
 			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
@@ -640,6 +642,18 @@ export default dedupePlugins( [
 			],
 		},
 	} ) ),
+	{
+		// Dynamic imports let import/no-unresolved check JavaScript mock paths.
+		// TypeScript mock imports remain owned by validateVitestPolicy.
+		files: vitestLintFiles.map( ( pattern ) => [
+			pattern,
+			'**/*.{js,jsx,mjs,cjs}',
+		] ),
+		ignores: vitestLintIgnores,
+		rules: {
+			'vitest/prefer-import-in-mock': 'error',
+		},
+	},
 	// Recognize only the assertion helpers used by these files. Avoid a global
 	// expect* wildcard, which would also accept unrelated function calls.
 	...[

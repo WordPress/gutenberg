@@ -4,6 +4,7 @@ import { Checkbox } from '../../checkbox';
 import { CheckboxGroup } from '../';
 
 const meta: Meta< typeof CheckboxGroup > = {
+	tags: [ 'manifest' ],
 	title: 'Components/@wordpress-ui/Form/Primitives/CheckboxGroup',
 	id: 'design-system-components-form-primitives-checkboxgroup',
 	component: CheckboxGroup,
@@ -15,9 +16,8 @@ const meta: Meta< typeof CheckboxGroup > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components` and component set completeness. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

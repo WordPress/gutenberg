@@ -60,6 +60,14 @@
 		}
 	}
 
+	// In the placeholder the icon is disabled like the rest of the toolbar.
+	.is-placeholder & .components-button.block-editor-block-toolbar__block-icon-button[aria-disabled="true"] {
+		&,
+		&:hover {
+			color: $gray-600;
+		}
+	}
+
 	&.is-synced,
 	&.is-connected {
 		.block-editor-block-toolbar__block-icon {

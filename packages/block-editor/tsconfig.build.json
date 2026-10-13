@@ -6,6 +6,7 @@
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../blocks" },
+		{ "path": "../commands" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
@@ -29,6 +30,7 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-engine" },
 		{ "path": "../token-list/tsconfig.build.json" },
@@ -42,6 +44,7 @@
 	// the future, this can be simplified to an `includes` of `src/**/*`.
 	"files": [
 		"src/lock-unlock.ts",
+		"src/components/background-clip-control/index.tsx",
 		"src/components/block-context/index.jsx",
 		"src/components/block-visibility/constants.ts",
 		"src/components/block-visibility/use-block-visibility.ts"

@@ -3,7 +3,7 @@ import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 const ALLOW_ALL = {
 	headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),

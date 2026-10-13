@@ -105,6 +105,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Enables the Guidelines page under Settings and the experimental knowledge storage (wp_knowledge).', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-wpds-admin-restyle',
+					'label'       => __( 'Admin design tokens', 'gutenberg' ),
+					'description' => __( 'Styles wp-admin from WordPress Design System tokens, so every admin screen reads as one product regardless of how it is rendered. No markup changes. (Warning: this can change how plugin styles apply to admin screens, and it loads admin stylesheets one by one instead of combined. Use it for testing, not on a live site.)', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
@@ -112,7 +117,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-react-19',
 					'label'       => __( 'React 19', 'gutenberg' ),
-					'description' => __( 'Registers React 19 as the bundled React version, replacing the default React 18 scripts.', 'gutenberg' ),
+					'description' => __( 'Uses React 19 for the registered React scripts, instead of the legacy React 18 version. Can be disabled when the new React 19 script cause compatibility issues with plugins and themes.', 'gutenberg' ),
 				),
 			),
 		),
@@ -128,6 +133,7 @@ function gutenberg_initialize_experiments_settings() {
 				'description' => $experiment['description'],
 				'group'       => $group['slug'],
 				'group_label' => $group['label'],
+				'default'     => gutenberg_get_experiment_default( $experiment['id'] ),
 			);
 
 			$properties[ $experiment['id'] ] = $property;

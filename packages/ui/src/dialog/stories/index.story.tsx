@@ -17,7 +17,7 @@ const meta: Meta< typeof Dialog.Root > = {
 		'Dialog.Title': Dialog.Title,
 		'Dialog.Description': Dialog.Description,
 		'Dialog.Content': Dialog.Content,
-		'Dialog.CloseIcon': Dialog.CloseIcon,
+		'Dialog.CloseIconButton': Dialog.CloseIconButton,
 		'Dialog.Action': Dialog.Action,
 		'Dialog.Footer': Dialog.Footer,
 	},
@@ -50,7 +50,7 @@ export const _Default: Story = {
 			<Dialog.Popup key="popup">
 				<Dialog.Header>
 					<Dialog.Title>Welcome</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<Dialog.Description>
@@ -114,7 +114,7 @@ function SizePlaygroundContent() {
 			<Dialog.Popup size={ size }>
 				<Dialog.Header>
 					<Dialog.Title>Size Playground</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<Stack direction="column" gap="lg" align="start">
@@ -170,7 +170,7 @@ export const WithCustomZIndex: Story = {
 			>
 				<Dialog.Header>
 					<Dialog.Title>Custom z-index</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<Dialog.Description>
@@ -239,7 +239,7 @@ function ScrollableContent() {
 	const header = (
 		<Dialog.Header>
 			<Dialog.Title>Terms of service</Dialog.Title>
-			<Dialog.CloseIcon />
+			<Dialog.CloseIconButton />
 		</Dialog.Header>
 	);
 
@@ -330,7 +330,7 @@ export const WithVisuallyHiddenTitle: Story = {
 					<VisuallyHidden render={ <Dialog.Title /> }>
 						Accessible dialog heading
 					</VisuallyHidden>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<p style={ { margin: 0 } }>
