@@ -102,6 +102,7 @@ add_action( 'init', function () {
 	wp_set_current_user( 1 );
 }, 0 );
 PHP
+cp "$ROOT/test/ios/diagnostics/timing.php" "$WP_DIR/wp-content/mu-plugins/0-timing.php" # Temporary diagnostics.
 step "Starting the server"
 PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
 SERVER_PID=$!
@@ -117,8 +118,10 @@ done
 # one-time work of a fresh site before the test's clock starts.
 step "Loading the editor once"
 # -b "" keeps the login cookie between redirects, in memory.
+"$ROOT/test/ios/diagnostics/sample-workers.sh" "$SERVER_PID" 10 & # Temporary diagnostics.
 if ! EDITOR_HTML=$( curl -sSL --fail -b "" "$WP_BASE_URL/wp-admin/post-new.php" ); then
 	echo "The editor did not load from $WP_BASE_URL"
+	sort "$WP_DIR/timing.log" | grep -v "rest end .* 0\.[0-4]" # Temporary diagnostics.
 	tail -40 "$ROOT/test/ios/build/server.log"
 	exit 1
 fi
