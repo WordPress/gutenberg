@@ -764,19 +764,44 @@ const UNPUBLISHED_POST_STATUSES = [ 'auto-draft', 'draft', 'pending' ];
  * Returns whether the given post fields differ from the edits a restore would
  * apply.
  *
- * @param {Object} fields         The post's title, content, and excerpt.
+ * @param {Object} fields         The post's title, content, excerpt, and meta.
  * @param {string} fields.title   The post title.
  * @param {string} fields.content The post content.
  * @param {string} fields.excerpt The post excerpt.
+ * @param {Object} fields.meta    The post meta.
  * @param {Object} edits          The edits the restore would apply.
  * @return {boolean} Whether restoring would replace different content.
  */
 function hasContentToReplace( fields, edits ) {
-	return [ 'title', 'content', 'excerpt' ].some(
+	const hasDifferentFields = [ 'title', 'content', 'excerpt' ].some(
 		( attribute ) =>
 			edits[ attribute ] !== undefined &&
 			fields[ attribute ] !== edits[ attribute ]
 	);
+	if ( hasDifferentFields || edits.meta === undefined ) {
+		return hasDifferentFields;
+	}
+
+	// Meta includes footnotes, which are not part of the post content. A
+	// difference in key order is treated as a change, which only means an
+	// extra save.
+	return Object.keys( edits.meta ).some(
+		( key ) =>
+			JSON.stringify( fields.meta?.[ key ] ) !==
+			JSON.stringify( edits.meta[ key ] )
+	);
+}
+
+/**
+ * Returns whether the last save of the current post failed. A save that was
+ * stopped before the request, such as by an `editor.preSavePost` filter, does
+ * not record a save error, so a post that is still dirty is treated as failed.
+ *
+ * @param {Object} select The editor store selectors.
+ * @return {boolean} Whether the save failed.
+ */
+function didSaveFail( select ) {
+	return select.didPostSaveRequestFail() || select.isEditedPostDirty();
 }
 
 /**
@@ -865,13 +890,14 @@ export const restoreRevision =
 					title: select.getEditedPostAttribute( 'title' ),
 					content: select.getEditedPostContent(),
 					excerpt: select.getEditedPostAttribute( 'excerpt' ),
+					meta: select.getEditedPostAttribute( 'meta' ),
 				},
 				edits
 			);
 
 		if ( shouldSaveCurrentContent ) {
 			await dispatch.savePost();
-			if ( select.didPostSaveRequestFail() ) {
+			if ( didSaveFail( select ) ) {
 				registry.dispatch( noticesStore ).createErrorNotice(
 					__(
 						'The revision was not restored because the current version of the post could not be saved first. Your content has not been changed.'
@@ -919,7 +945,7 @@ export const restoreRevision =
 
 		// Save the post to persist the restored revision.
 		await dispatch.savePost();
-		if ( select.didPostSaveRequestFail() ) {
+		if ( didSaveFail( select ) ) {
 			// The restored content is only in the editor. If the post was
 			// saved above, it is now newer than the autosave, and the autosave
 			// can be deleted the next time the editor loads.
@@ -961,7 +987,7 @@ export const restoreRevision =
 
 			dispatch.editPost( { blocks: undefined, ...previousFields } );
 			await dispatch.savePost();
-			if ( select.didPostSaveRequestFail() ) {
+			if ( didSaveFail( select ) ) {
 				return;
 			}
 
