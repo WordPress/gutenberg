@@ -36,11 +36,11 @@ const interactiveContentTags = new Set( [
 ] );
 
 function prefixSelectKeys( selected: unknown, prefix: string ) {
-	if ( typeof selected !== 'object' ) {
+	if ( typeof selected !== 'object' || selected === null ) {
 		return { [ prefix ]: selected };
 	}
 	return Object.fromEntries(
-		Object.entries( selected as object ).map( ( [ key, value ] ) => [
+		Object.entries( selected ).map( ( [ key, value ] ) => [
 			`${ prefix }.${ key }`,
 			value,
 		] )

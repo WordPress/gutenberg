@@ -1,4 +1,9 @@
 /**
+ * The body element reused by every call.
+ */
+let body: HTMLElement | undefined;
+
+/**
  * Parse the given HTML into a body element.
  *
  * Note: The current implementation will return a shared reference, reset on
@@ -16,18 +21,11 @@ export function createElement( { implementation }: Document, html: string ) {
 	// function being internal to `rich-text` (full control in avoiding a risk
 	// of asynchronous operations on the shared reference), a single document
 	// is reused and reset for each call to the function.
-	if ( ! createElement.body ) {
-		createElement.body = implementation.createHTMLDocument( '' ).body;
+	if ( ! body ) {
+		body = implementation.createHTMLDocument( '' ).body;
 	}
 
-	createElement.body.innerHTML = html;
+	body.innerHTML = html;
 
-	return createElement.body;
-}
-
-export declare namespace createElement {
-	/**
-	 * The body element reused by every call.
-	 */
-	let body: HTMLElement | undefined;
+	return body;
 }

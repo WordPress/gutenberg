@@ -53,7 +53,7 @@ const formatBoundaries: EventListenerEffect = ( props ) => ( element ) => {
 		// If the selection is not collapsed, let the browser handle collapsing
 		// the selection for now. Later we could expand this logic to set
 		// boundary positions if needed.
-		if ( ! collapsed ) {
+		if ( ! collapsed || start === undefined ) {
 			return;
 		}
 
