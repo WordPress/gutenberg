@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from '@wordpress/element';
 import {
 	isInsideCurrentPopup,
-	useObserveIframePresses,
+	useIframePressListeners,
 } from './iframe-dismissal-utils';
 
 type Actions = { close: () => void };
@@ -12,35 +12,38 @@ type OpenChangeHandler< EventDetails > = (
 	eventDetails: EventDetails
 ) => void;
 
-/*
- * Temporary bridge for https://github.com/mui/base-ui/issues/5410#issuecomment-5376507925.
- * Base UI listens for outside presses only in the popup's owner document,
- * but pointer events do not cross document boundaries. Once the minimum Base
- * UI version fixes this, delete this hook's import, call, and prop spread from
- * `Menu.Root` and `Popover.Root`, then pass their `onOpenChange` handlers
- * directly to the Base UI roots again.
- */
-export function useIframeDismissalBridge<
-	TActions extends Actions,
-	TEventDetails extends {
-		isCanceled: boolean;
-		trigger: Element | undefined;
-	},
->( {
-	actionsRef,
-	defaultOpen,
-	disabled,
-	modal,
-	onOpenChange,
-	open: openProp,
-}: {
+type IframeDismissalWithCloseActionOptions< TActions, TEventDetails > = {
 	actionsRef?: RefObject< TActions | null >;
 	defaultOpen?: boolean;
 	disabled?: boolean;
 	modal?: boolean | 'trap-focus';
 	onOpenChange: OpenChangeHandler< TEventDetails >;
 	open?: boolean;
-} ) {
+};
+
+/**
+ * Dismisses non-modal Menu and Popover popups on outside same-origin iframe presses.
+ * Uses actionsRef.close() and a trigger captured by an opening onOpenChange.
+ *
+ * Workaround for Base UI's document-scoped outside-press listeners.
+ * @see https://github.com/mui/base-ui/issues/5410#issuecomment-5376507925
+ * @param options Popup state, close action, and open-change handler.
+ */
+export function useIframeDismissalWithCloseAction<
+	TActions extends Actions,
+	TEventDetails extends {
+		isCanceled: boolean;
+		trigger: Element | undefined;
+	},
+>( options: IframeDismissalWithCloseActionOptions< TActions, TEventDetails > ) {
+	const {
+		actionsRef,
+		defaultOpen,
+		disabled,
+		modal,
+		onOpenChange,
+		open: openProp,
+	} = options;
 	const fallbackActionsRef = useRef< TActions | null >( null );
 	const resolvedActionsRef = actionsRef ?? fallbackActionsRef;
 	const [ uncontrolledOpen, setUncontrolledOpen ] = useState(
@@ -57,7 +60,7 @@ export function useIframeDismissalBridge<
 		[ resolvedActionsRef, trigger ]
 	);
 
-	useObserveIframePresses( {
+	useIframePressListeners( {
 		enabled: open && modal === false && ! disabled && trigger !== null,
 		onPointerDown: handleIframePointerDown,
 		ownerDocument: trigger?.ownerDocument ?? null,

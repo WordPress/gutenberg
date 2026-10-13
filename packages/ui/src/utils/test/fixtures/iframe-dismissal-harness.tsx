@@ -5,7 +5,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { useIframeDismissalBridge } from '../../use-iframe-dismissal-bridge';
+import { useIframeDismissalWithCloseAction } from '../../use-iframe-dismissal-with-close-action';
 
 export function IframeDismissalHarness( {
 	iframeKey,
@@ -19,7 +19,7 @@ export function IframeDismissalHarness( {
 	const [ open, setOpen ] = useState( false );
 	const triggerRef = useRef< HTMLButtonElement >( null );
 	const popupId = useId();
-	const bridge = useIframeDismissalBridge( {
+	const bridge = useIframeDismissalWithCloseAction( {
 		modal: false,
 		onOpenChange: setOpen,
 	} );

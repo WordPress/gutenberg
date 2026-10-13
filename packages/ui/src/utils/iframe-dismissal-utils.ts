@@ -29,6 +29,13 @@ export function getNodeDocument( node: Node | null ) {
 		: ( node?.ownerDocument ?? null );
 }
 
+/**
+ * Checks whether an iframe event belongs to the trigger's aria-controls popup.
+ * Walks containing frames and respects Base UI's data-rootownerid ownership.
+ *
+ * @param event   Event from an iframe document.
+ * @param trigger Trigger identifying the popup via aria-controls.
+ */
 export function isInsideCurrentPopup( event: Event, trigger: Element ) {
 	const popupId = trigger.getAttribute( 'aria-controls' );
 	if ( ! popupId ) {
@@ -65,17 +72,23 @@ export function isInsideCurrentPopup( event: Event, trigger: Element ) {
 	return false;
 }
 
-export function useObserveIframePresses( {
-	enabled,
-	onClick,
-	onPointerDown,
-	ownerDocument,
-}: {
+type IframePressListenersOptions = {
 	enabled: boolean;
 	onClick?: ( event: Event ) => void;
 	onPointerDown: ( event: Event ) => void;
 	ownerDocument: Document | null;
-} ) {
+};
+
+/**
+ * Listens for presses in descendant same-origin iframe documents.
+ * Tracks nested frames, reloads, and DOM changes, and cleans up listeners.
+ *
+ * @param options Listener callbacks, document, and enabled state.
+ */
+export function useIframePressListeners(
+	options: IframePressListenersOptions
+) {
+	const { enabled, onClick, onPointerDown, ownerDocument } = options;
 	useEffect( () => {
 		if ( ! enabled || ! ownerDocument ) {
 			return;

@@ -1,7 +1,7 @@
 import { Select as _Select } from '@base-ui/react/select';
 import type { SelectRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
-import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-outside-press-bridge';
+import { useIframeOutsidePressForwarding } from '../../../utils/use-iframe-outside-press-forwarding';
 
 /**
  * A component that lets users choose one option from a list.
@@ -18,7 +18,7 @@ import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-outside-p
  */
 export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
 	const iframeDismissalProps =
-		useIframeOutsidePressBridge< _Select.Root.ChangeEventDetails >( {
+		useIframeOutsidePressForwarding< _Select.Root.ChangeEventDetails >( {
 			defaultOpen: props.defaultOpen,
 			disabled: props.disabled,
 			modal: props.modal ?? true,

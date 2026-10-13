@@ -2,7 +2,7 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import type { AutocompleteRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import { AutocompleteGridContext } from './context';
-import { useIframeOutsidePressBridge } from '../../../utils/use-iframe-outside-press-bridge';
+import { useIframeOutsidePressForwarding } from '../../../utils/use-iframe-outside-press-forwarding';
 
 /**
  * Low-level primitive for an autocomplete input that suggests options as
@@ -17,14 +17,16 @@ export const Root: typeof _Autocomplete.Root = function Root(
 	props: AutocompleteRootProps
 ) {
 	const iframeDismissalProps =
-		useIframeOutsidePressBridge< _Autocomplete.Root.ChangeEventDetails >( {
-			defaultOpen: props.defaultOpen,
-			disabled: props.disabled,
-			modal: props.modal ?? false,
-			onOpenChange: ( nextOpen, eventDetails ) =>
-				props.onOpenChange?.( nextOpen, eventDetails ),
-			open: props.open,
-		} );
+		useIframeOutsidePressForwarding< _Autocomplete.Root.ChangeEventDetails >(
+			{
+				defaultOpen: props.defaultOpen,
+				disabled: props.disabled,
+				modal: props.modal ?? false,
+				onOpenChange: ( nextOpen, eventDetails ) =>
+					props.onOpenChange?.( nextOpen, eventDetails ),
+				open: props.open,
+			}
+		);
 
 	return (
 		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>

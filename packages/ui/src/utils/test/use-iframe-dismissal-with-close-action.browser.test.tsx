@@ -4,7 +4,7 @@ import { render } from 'vitest-browser-react';
 import { page, userEvent } from 'vitest/browser';
 import { IframeDismissalHarness } from './fixtures/iframe-dismissal-harness';
 
-describe( 'useIframeDismissalBridge', () => {
+describe( 'useIframeDismissalWithCloseAction', () => {
 	it( 'stays open for a press inside an iframe in its popup', async () => {
 		const onPopupClick = vi.fn();
 		await render( <IframeDismissalHarness popupIframe /> );
