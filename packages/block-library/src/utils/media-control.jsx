@@ -80,6 +80,7 @@ export function MediaControlPreview( {
  * @param {string}   props.mediaUrl              Media URL
  * @param {string}   props.filename              Filename to display
  * @param {Array}    props.allowedTypes          Allowed media types
+ * @param {string}   props.accept                Comma-separated file types the upload input accepts
  * @param {Function} props.onSelect              Callback when media selected
  * @param {Function} props.onSelectURL           Callback when URL entered
  * @param {Function} props.onError               Error callback
@@ -95,6 +96,7 @@ export function MediaControl( {
 	mediaUrl,
 	filename,
 	allowedTypes,
+	accept,
 	onSelect,
 	onSelectURL,
 	onError,
@@ -132,6 +134,7 @@ export function MediaControl( {
 				mediaId={ mediaId }
 				mediaURL={ mediaUrl }
 				allowedTypes={ allowedTypes }
+				accept={ accept }
 				onSelect={ onSelect }
 				onSelectURL={ onSelectURL }
 				onError={ onError }

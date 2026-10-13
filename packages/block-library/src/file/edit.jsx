@@ -4,11 +4,14 @@ import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	ResizableBox,
 	ToolbarButton,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockIcon,
+	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
@@ -26,7 +29,11 @@ import { getFilename } from '@wordpress/url';
 import FileBlockInspector from './inspector';
 import { browserSupportsPdfs } from './utils';
 import removeAnchorTag from '../utils/remove-anchor-tag';
-import { useUploadMediaFromBlobURL } from '../utils/hooks';
+import {
+	useUploadMediaFromBlobURL,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
+import { MediaControl } from '../utils/media-control';
 
 export const MIN_PREVIEW_HEIGHT = 200;
 export const MAX_PREVIEW_HEIGHT = 2000;
@@ -80,6 +87,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { toggleSelection } = useDispatch( blockEditorStore );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	useUploadMediaFromBlobURL( {
 		url: temporaryURL,
@@ -185,22 +193,75 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 
 	const displayPreviewInEditor = browserSupportsPdfs() && displayPreview;
 
+	/*
+	 * Rendered whether or not a file has been set, so that a file block in its
+	 * setup state can be given media from the toolbar and the inspector as well
+	 * as from the placeholder. The settings in `FileBlockInspector` stay behind
+	 * their own condition, having nothing to configure until there is a file.
+	 */
+	const mediaToolbar = (
+		<BlockControls group="other">
+			<MediaReplaceFlow
+				mediaId={ id }
+				mediaURL={ href }
+				accept="*"
+				onSelect={ onSelectFile }
+				onError={ onUploadError }
+				onReset={ () => onSelectFile( undefined ) }
+				name={ href ? __( 'Replace' ) : __( 'Add file' ) }
+			/>
+		</BlockControls>
+	);
+
+	const mediaInspectorPanel = isSelected && (
+		<InspectorControls group="content">
+			<ToolsPanel
+				label={ __( 'Media' ) }
+				resetAll={ () => onSelectFile( undefined ) }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'File' ) }
+					hasValue={ () => !! href }
+					onDeselect={ () => onSelectFile( undefined ) }
+					isShownByDefault
+				>
+					<MediaControl
+						mediaId={ id }
+						mediaUrl={ href }
+						filename={ getFilename( href ) }
+						accept="*"
+						onSelect={ onSelectFile }
+						onError={ onUploadError }
+						onReset={ () => onSelectFile( undefined ) }
+						isUploading={ !! temporaryURL }
+						emptyLabel={ __( 'Add file' ) }
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
+		</InspectorControls>
+	);
+
 	if ( ! href && ! temporaryURL ) {
 		return (
-			<div { ...blockProps }>
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					labels={ {
-						title: __( 'File' ),
-						instructions: __(
-							'Drag and drop a file, upload, or choose from your library.'
-						),
-					} }
-					onSelect={ onSelectFile }
-					onError={ onUploadError }
-					accept="*"
-				/>
-			</div>
+			<>
+				{ mediaToolbar }
+				{ mediaInspectorPanel }
+				<div { ...blockProps }>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						labels={ {
+							title: __( 'File' ),
+							instructions: __(
+								'Drag and drop a file, upload, or choose from your library.'
+							),
+						} }
+						onSelect={ onSelectFile }
+						onError={ onUploadError }
+						accept="*"
+					/>
+				</div>
+			</>
 		);
 	}
 
@@ -224,15 +285,9 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 					changePreviewHeight,
 				} }
 			/>
+			{ mediaToolbar }
+			{ mediaInspectorPanel }
 			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ href }
-					accept="*"
-					onSelect={ onSelectFile }
-					onError={ onUploadError }
-					onReset={ () => onSelectFile( undefined ) }
-				/>
 				<ClipboardToolbarButton
 					text={ href }
 					disabled={ isBlobURL( href ) }
