@@ -45,3 +45,15 @@ foreach ( array_keys( (array) _get_cron_array() ) as $diag_time ) {
 		}, -1 );
 	}
 }
+if ( function_exists( 'pcntl_alarm' ) && false !== strpos( $_SERVER['REQUEST_URI'] ?? '', 'post-new.php' ) ) {
+	pcntl_async_signals( true );
+	pcntl_signal( SIGALRM, function () {
+		$frames = array();
+		foreach ( debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS ) as $frame ) {
+			$frames[] = ( $frame['class'] ?? '' ) . ( $frame['type'] ?? '' ) . $frame['function'] . ( isset( $frame['line'] ) ? ':' . $frame['line'] : '' );
+		}
+		diag_log( 'stuck in ' . implode( ' < ', array_slice( $frames, 0, 25 ) ) );
+		pcntl_alarm( 10 );
+	} );
+	pcntl_alarm( 8 );
+}

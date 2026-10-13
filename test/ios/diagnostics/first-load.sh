@@ -21,7 +21,27 @@ for i in $( seq 1 "${1:-8}" ); do
 	PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -d max_execution_time=0 -S "127.0.0.1:$PORT" -t "$WP_DIR" > /dev/null 2>&1 &
 	SERVER=$!
 	until curl -sf -o /dev/null "$URL/wp-login.php"; do sleep 1; done
-	TIME=$( curl -sSL --max-time 180 -o /dev/null -w "%{time_total}" -b "" "$URL/wp-admin/post-new.php" )
+	curl -sSL --max-time 180 -o /dev/null -w "%{time_total}" -b "" "$URL/wp-admin/post-new.php" > "$ROOT/test/ios/build/diag/time" &
+	CURL=$!
+	for _ in $( seq 1 10 ); do kill -0 "$CURL" 2>/dev/null || break; sleep 1; done
+	if kill -0 "$CURL" 2>/dev/null; then
+		echo "LOAD $i still running after 10s, sampling the PHP processes"
+		SAMPLES=""
+		for PID in $( pgrep -P "$SERVER" ); do
+			sample "$PID" 2 -file "$ROOT/test/ios/build/diag/sample-$PID.txt" > /dev/null 2>&1 &
+			SAMPLES="$SAMPLES $!"
+		done
+		wait $SAMPLES
+		# Only the worker that runs PHP code: the others wait for a connection.
+		for FILE in "$ROOT"/test/ios/build/diag/sample-*.txt; do
+			grep -q execute_ex "$FILE" || continue
+			echo "  $( basename "$FILE" .txt ), most sampled native frames:"
+			awk '/Sort by top of stack/{f=1;next} /Binary Images/{f=0} f&&NF' "$FILE" | grep -v __workq_kernreturn | head -6 | sed 's/^ */    /'
+		done
+		rm -f "$ROOT"/test/ios/build/diag/sample-*.txt
+	fi
+	wait "$CURL"
+	TIME=$( cat "$ROOT/test/ios/build/diag/time" )
 	sleep 2
 	pkill -P "$SERVER"; kill "$SERVER"; wait "$SERVER" 2>/dev/null
 	echo "LOAD $i (no cron: ${NO_CRON:-false}): ${TIME}s"

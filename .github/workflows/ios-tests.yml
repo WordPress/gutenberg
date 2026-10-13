@@ -101,8 +101,7 @@ jobs:
             - name: Time the first editor load (temporary)
               if: ${{ always() }}
               run: |
-                  ./test/ios/diagnostics/first-load.sh 12
-                  NO_CRON=true ./test/ios/diagnostics/first-load.sh 12
+                  ./test/ios/diagnostics/first-load.sh 20
 
             - name: Archive the test results
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
