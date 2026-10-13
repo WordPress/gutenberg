@@ -233,7 +233,6 @@ const resolve = ( path: string, namespace: string ) => {
  * Creates an evaluator bound to a directive scope.
  *
  * Returned functions restore the caller's scope when the wrapped call throws.
- * Functions are resolved without being invoked.
  *
  * @param args       Arguments used to bind the evaluator to a scope.
  * @param args.scope Scope used to resolve directive values.
@@ -262,12 +261,6 @@ export const getEvaluate: GetEvaluate =
 			}
 			// Reset scope before return and wrap the function so it will still run within the correct scope.
 			resetScope();
-			/**
-			 * Invokes the resolved function within its directive scope.
-			 *
-			 * @param functionArgs Arguments forwarded to the resolved function.
-			 * @return The resolved function's result.
-			 */
 			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
 				setScope( scope );
 				try {
@@ -276,14 +269,13 @@ export const getEvaluate: GetEvaluate =
 					resetScope();
 				}
 			};
-			// Preserve the sync property from the original function.
+			// Preserve the sync property from the original function
 			if ( value.sync ) {
 				const syncAwareFunction = wrappedFunction as SyncAwareFunction;
 				syncAwareFunction.sync = true;
 			}
 			return wrappedFunction;
 		}
-		// Resolved non-function value, including a pending getter sentinel.
 		const result = value;
 		resetScope();
 		return hasNegationOperator && value !== PENDING_GETTER

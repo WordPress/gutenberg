@@ -9,19 +9,9 @@ const isObject = ( item: unknown ): item is Record< string, unknown > =>
 	Boolean( item && typeof item === 'object' && item.constructor === Object );
 const invalidCharsRegex = /[^a-z0-9-_]/i;
 
-/**
- * Parses a directive attribute name into its prefix, suffix and unique ID.
- * The caller filters names to the `data-wp-` prefix before parsing.
- *
- * @param directiveName Directive attribute name to parse.
- * @return The parsed parts, or `null` when the name contains invalid characters.
- */
 function parseDirectiveName( directiveName: string ): {
-	/** Directive prefix without `data-wp-`. */
 	prefix: string;
-	/** Directive suffix, or `null` for the default entry. */
 	suffix: string | null;
-	/** Unique ID, or `null` when absent. */
 	uniqueId: string | null;
 } | null {
 	const name = directiveName.substring( 8 );
@@ -115,9 +105,6 @@ export function parseDirectiveValue( rawValue: string ): {
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
- * All HTML directive entries yield to text, each and router-region directives
- * on the same element, based on their parsed prefixes. Otherwise, default HTML
- * content and server-rendered list items stay opaque.
  *
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
@@ -131,12 +118,6 @@ export function toVdom( root: Node ): ComponentChild {
 		205 // TEXT + CDATA_SECTION + COMMENT + PROCESSING_INSTRUCTION + ELEMENT
 	);
 
-	/**
-	 * Converts a node and its non-opaque descendants, recording DOM cleanup.
-	 *
-	 * @param node The current node in the tree walker.
-	 * @return The node's vDOM representation, or `null` for removed nodes.
-	 */
 	function walk( node: Node ): ComponentChild | null {
 		const { nodeType } = node;
 
@@ -258,15 +239,11 @@ export function toVdom( root: Node ): ComponentChild {
 		}
 
 		if ( props.__directives?.html ) {
-			// Presence, not directive values or suffixes, determines a conflict.
-			/** Content-owning prefixes present on this element, in warning order. */
 			const conflictingPrefixes = [
 				'text',
 				'each',
 				'router-region',
-			].filter( ( prefix ) =>
-				Boolean( props.__directives[ prefix ]?.length )
-			);
+			].filter( ( prefix ) => prefix in props.__directives );
 			if ( conflictingPrefixes.length ) {
 				warn(
 					`The data-wp-html directive was ignored because it conflicts with ${ conflictingPrefixes.map( ( prefix ) => `data-wp-${ prefix }` ).join( ', ' ) }.`
@@ -275,10 +252,10 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		/** Whether a remaining default HTML entry owns this element's content. */
 		const hasDefaultHtmlDirective = props.__directives?.html?.some(
 			( { suffix }: DirectiveEntry ) => suffix === null
 		);
+
 		if ( props.__directives?.[ 'each-child' ] || hasDefaultHtmlDirective ) {
 			// `data-wp-html` owns this element's content entirely — whether
 			// that's still the server-rendered fallback or HTML the

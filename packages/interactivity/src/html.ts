@@ -16,12 +16,6 @@ interface TrustedHTML {
  * @see https://developer.mozilla.org/en-US/docs/Web/API/TrustedTypePolicyFactory/isHTML
  */
 interface TrustedTypePolicyFactory {
-	/**
-	 * Checks whether a value is native trusted HTML.
-	 *
-	 * @param value Value to check.
-	 * @return Whether the value is native trusted HTML.
-	 */
 	isHTML: ( value: unknown ) => value is TrustedHTML;
 	/** Empty trusted HTML accepted by HTML sinks without a policy. */
 	readonly emptyHTML: TrustedHTML;

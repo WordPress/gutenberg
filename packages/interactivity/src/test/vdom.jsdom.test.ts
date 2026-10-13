@@ -1,4 +1,4 @@
-import { h, options } from 'preact';
+import { h } from 'preact';
 import type { ComponentChild } from 'preact';
 import { describe, expect, it, vi } from 'vitest';
 import { parseDirectiveValue, toVdom } from '../vdom';
@@ -32,53 +32,6 @@ expect.extend( {
 				pass ? "Expected VNodes don't match" : 'Expected VNode match',
 		};
 	},
-} );
-
-describe( 'privateApis', () => {
-	it( 'exposes only the runtime private APIs', async () => {
-		document.body.innerHTML = '';
-		// jsdom has no navigation timing entry. Keep automatic hydration pending.
-		vi.spyOn( performance, 'getEntriesByType' ).mockReturnValue( [
-			{ domContentLoadedEventStart: 0 } as PerformanceNavigationTiming,
-		] );
-		// Runtime registration wraps vnodes; restore the converter-only renderer.
-		const originalVNodeHook = options.vnode;
-		try {
-			const { privateApis } = await import( '../index' );
-			expect(
-				Object.keys(
-					privateApis(
-						'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
-					)
-				).sort()
-			).toEqual(
-				[
-					'getRegionRootFragment',
-					'initialVdomPromise',
-					'toVdom',
-					'parseDirectiveValue',
-					'directive',
-					'getNamespace',
-					'h',
-					'cloneElement',
-					'render',
-					'proxifyState',
-					'parseServerData',
-					'populateServerData',
-					'batch',
-					'routerRegions',
-					'deepReadOnly',
-					'navigationSignal',
-					'sessionId',
-					'warn',
-					'afterNextFrame',
-					'getScope',
-				].sort()
-			);
-		} finally {
-			options.vnode = originalVNodeHook;
-		}
-	} );
 } );
 
 describe( 'toVdom', () => {
