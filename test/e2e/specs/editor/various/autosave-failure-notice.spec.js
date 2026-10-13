@@ -110,6 +110,11 @@ test.describe( 'Autosave failure notice', () => {
 			withDetails( 'The response is not a valid JSON response.' ),
 		],
 		[
+			'too many requests',
+			'too-many-requests',
+			withDetails( 'The response is not a valid JSON response.' ),
+		],
+		[
 			'PHP fatal error printed before the JSON',
 			'fatal-error-displayed',
 			withDetails( 'The response is not a valid JSON response.' ),

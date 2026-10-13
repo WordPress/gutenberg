@@ -85,6 +85,12 @@ function gutenberg_test_autosave_failure( $result, $server, $request ) {
 			echo '0';
 			exit;
 
+		case 'too-many-requests':
+			status_header( 429 );
+			header( 'Content-Type: text/html' );
+			echo '<html><body><h1>429 Too Many Requests</h1></body></html>';
+			exit;
+
 		case 'bad-gateway':
 			status_header( 502 );
 			header( 'Content-Type: text/html' );
