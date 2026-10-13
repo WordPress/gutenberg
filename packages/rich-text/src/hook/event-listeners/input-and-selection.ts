@@ -74,6 +74,11 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		const currentValue = createRecord();
 		const { start, activeFormats: oldActiveFormats = [] } = record.current;
 
+		if ( start === undefined || currentValue.start === undefined ) {
+			handleChange( currentValue );
+			return;
+		}
+
 		// When a non-collapsed selection is deleted (not replaced with new
 		// text), the old active formats refer to the deleted content and
 		// should not be carried forward.
@@ -97,8 +102,8 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 				anchorOffset: number;
 				focusNode: Node | null;
 				focusOffset: number;
-				processedStart: number;
-				processedEnd: number;
+				processedStart: number | undefined;
+				processedEnd: number | undefined;
 		  }
 		| undefined;
 

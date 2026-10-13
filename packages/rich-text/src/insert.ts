@@ -6,7 +6,7 @@ import type { RichTextContent, RichTextValue } from './types';
  * Insert a Rich Text value, an HTML string, or a plain text string, into a
  * Rich Text value at the given `startIndex`. Any content between `startIndex`
  * and `endIndex` will be removed. Indices are retrieved from the selection if
- * none are provided.
+ * none are provided. Without a selection, the value is appended.
  *
  * @param value         Value to modify.
  * @param valueToInsert Value to insert.
@@ -18,9 +18,9 @@ import type { RichTextContent, RichTextValue } from './types';
 export function insert(
 	value: RichTextValue,
 	valueToInsert: RichTextContent | string,
-	startIndex = value.start,
-	endIndex = value.end
-) {
+	startIndex = value.start ?? value.text.length,
+	endIndex = value.end ?? startIndex
+): RichTextValue & { start: number; end: number } {
 	const { formats, replacements, text } = value;
 
 	if ( typeof valueToInsert === 'string' ) {

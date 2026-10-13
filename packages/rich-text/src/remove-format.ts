@@ -18,9 +18,19 @@ export function removeFormat(
 	formatType: string,
 	startIndex = value.start,
 	endIndex = value.end
-) {
+): RichTextValue {
 	const { formats, activeFormats } = value;
 	const newFormats = formats.slice();
+	const newActiveFormats =
+		activeFormats?.filter( ( { type } ) => type !== formatType ) || [];
+
+	if ( startIndex === undefined || endIndex === undefined ) {
+		return normaliseFormats( {
+			...value,
+			formats: newFormats,
+			activeFormats: newActiveFormats,
+		} );
+	}
 
 	// If the selection is collapsed, expand start and end to the edges of the
 	// format.
@@ -61,8 +71,7 @@ export function removeFormat(
 	return normaliseFormats( {
 		...value,
 		formats: newFormats,
-		activeFormats:
-			activeFormats?.filter( ( { type } ) => type !== formatType ) || [],
+		activeFormats: newActiveFormats,
 	} );
 }
 

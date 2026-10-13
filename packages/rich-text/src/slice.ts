@@ -15,7 +15,7 @@ export function slice(
 	value: RichTextValue,
 	startIndex = value.start,
 	endIndex = value.end
-) {
+): RichTextValue {
 	const { formats, replacements, text } = value;
 
 	if ( startIndex === undefined || endIndex === undefined ) {
@@ -26,5 +26,5 @@ export function slice(
 		formats: formats.slice( startIndex, endIndex ),
 		replacements: replacements.slice( startIndex, endIndex ),
 		text: text.slice( startIndex, endIndex ),
-	} as RichTextValue;
+	};
 }
