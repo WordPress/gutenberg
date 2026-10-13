@@ -736,6 +736,23 @@ export const restoreBrowserBackup =
 	};
 
 /**
+ * Creates the notice shown when a revision is not restored because the post
+ * is saving.
+ *
+ * @param {Object} registry The data registry.
+ */
+function createRestoreWhileSavingNotice( registry ) {
+	registry
+		.dispatch( noticesStore )
+		.createErrorNotice(
+			__(
+				'The revision could not be restored while the post is saving. Wait for the save to finish, then try again.'
+			),
+			{ id: 'editor-revision-restore-failed' }
+		);
+}
+
+/**
  * Statuses where saving the post does not change what visitors can see.
  */
 const UNPUBLISHED_POST_STATUSES = [ 'auto-draft', 'draft', 'pending' ];
@@ -825,14 +842,7 @@ export const restoreRevision =
 		// A save that is already in progress would make the save below a
 		// no-op, so the current content could not be kept.
 		if ( select.isSavingPost() ) {
-			registry
-				.dispatch( noticesStore )
-				.createErrorNotice(
-					__(
-						'The revision could not be restored while the post is saving. Wait for the save to finish, then try again.'
-					),
-					{ id: 'editor-revision-restore-failed' }
-				);
+			createRestoreWhileSavingNotice( registry );
 			return;
 		}
 
@@ -887,6 +897,13 @@ export const restoreRevision =
 			);
 		}
 
+		// Check again, as an autosave may have started during the save above.
+		// Nothing has been changed yet, so it is safe to stop here.
+		if ( select.isSavingPost() ) {
+			createRestoreWhileSavingNotice( registry );
+			return;
+		}
+
 		// Apply edits and save.
 		dispatch.editPost( edits );
 
@@ -896,6 +913,17 @@ export const restoreRevision =
 		// Save the post to persist the restored revision.
 		await dispatch.savePost();
 		if ( select.didPostSaveRequestFail() ) {
+			// The restored content is only in the editor. If the post was
+			// saved above, it is now newer than the autosave, and the autosave
+			// can be deleted the next time the editor loads.
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice(
+					__(
+						'The revision was restored in the editor but could not be saved. Save the post before leaving this page to keep the restored content.'
+					),
+					{ id: 'editor-revision-restore-failed' }
+				);
 			return;
 		}
 
