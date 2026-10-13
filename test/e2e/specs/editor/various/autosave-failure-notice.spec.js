@@ -68,88 +68,73 @@ test.describe( 'Autosave failure notice', () => {
 		);
 	} );
 
-	test.describe( 'without details', () => {
-		for ( const [ title, failure ] of [
-			[ 'PHP fatal error', 'fatal-error' ],
-			[ 'database connection lost', 'database-connection' ],
-			[ 'error message containing a link', 'link-in-message' ],
-			[ 'connection dropped before a response', 'dropped-connection' ],
-			[ 'error without a message', 'no-message' ],
-		] ) {
-			test( title, async ( { autosaveFailure } ) => {
-				await autosaveFailure.fail( failure );
-				await autosaveFailure.autosave();
-				expect( await autosaveFailure.getNotices() ).toEqual( [
-					AUTOSAVE_FAILED,
-				] );
-			} );
-		}
-
-		test( 'offline', async ( { autosaveFailure, context } ) => {
-			await context.setOffline( true );
+	for ( const [ title, failure, details ] of [
+		[ 'PHP fatal error', 'fatal-error', null ],
+		[ 'database connection lost', 'database-connection', null ],
+		[ 'error message containing a link', 'link-in-message', null ],
+		[ 'connection dropped before a response', 'dropped-connection', null ],
+		[ 'error without a message', 'no-message', null ],
+		[
+			'error with a plain text message',
+			'plain-message',
+			'Something went wrong on the server.',
+		],
+		[
+			'permission denied',
+			'permission',
+			'Sorry, you are not allowed to edit this post.',
+		],
+		[
+			'database write failed',
+			'database-write',
+			'Could not update post in the database.',
+		],
+		[
+			'HTML error page',
+			'bad-gateway',
+			'The response is not a valid JSON response.',
+		],
+		[
+			'PHP fatal error printed before the JSON',
+			'fatal-error-displayed',
+			'The response is not a valid JSON response.',
+		],
+	] ) {
+		test( title, async ( { autosaveFailure } ) => {
+			await autosaveFailure.fail( failure );
 			await autosaveFailure.autosave();
-			await context.setOffline( false );
 			expect( await autosaveFailure.getNotices() ).toEqual( [
-				'Auto-save failed because you were offline. We’ll try to save a backup in this browser. Please verify your connection and save manually.',
+				details === null ? AUTOSAVE_FAILED : withDetails( details ),
 			] );
 		} );
+	}
+
+	test( 'offline', async ( { autosaveFailure, context } ) => {
+		await context.setOffline( true );
+		await autosaveFailure.autosave();
+		await context.setOffline( false );
+		expect( await autosaveFailure.getNotices() ).toEqual( [
+			'Auto-save failed because you were offline. We’ll try to save a backup in this browser. Please verify your connection and save manually.',
+		] );
 	} );
 
-	test.describe( 'with details', () => {
-		for ( const [ title, failure, details ] of [
-			[
-				'error with a plain text message',
-				'plain-message',
-				'Something went wrong on the server.',
-			],
-			[
-				'permission denied',
-				'permission',
-				'Sorry, you are not allowed to edit this post.',
-			],
-			[
-				'database write failed',
-				'database-write',
-				'Could not update post in the database.',
-			],
-			[
-				'HTML error page',
-				'bad-gateway',
-				'The response is not a valid JSON response.',
-			],
-			[
-				'PHP fatal error printed before the JSON',
-				'fatal-error-displayed',
-				'The response is not a valid JSON response.',
-			],
-		] ) {
-			test( title, async ( { autosaveFailure } ) => {
-				await autosaveFailure.fail( failure );
-				await autosaveFailure.autosave();
-				expect( await autosaveFailure.getNotices() ).toEqual( [
-					withDetails( details ),
-				] );
-			} );
-		}
-
-		test( 'plugin hook throwing an error', async ( {
-			autosaveFailure,
-			page,
-		} ) => {
-			await page.evaluate( () =>
-				window.wp.hooks.addAction(
-					'editor.savePost',
-					'test/autosave-failure',
-					() => {
-						throw new Error( 'A plugin could not save.' );
-					}
-				)
-			);
-			await autosaveFailure.autosave();
-			expect( await autosaveFailure.getNotices() ).toEqual( [
-				withDetails( 'A plugin could not save.' ),
-			] );
-		} );
+	test( 'plugin hook throwing an error', async ( {
+		autosaveFailure,
+		page,
+	} ) => {
+		await page.evaluate( () =>
+			window.wp.hooks.addAction(
+				'editor.savePost',
+				'test/autosave-failure',
+				() => {
+					throw new Error( 'A plugin could not save.' );
+				}
+			)
+		);
+		await autosaveFailure.autosave();
+		expect( await autosaveFailure.getNotices() ).toEqual( [
+			withDetails( 'A plugin could not save.' ),
+		] );
 	} );
 
 	test.describe( 'no notice', () => {
