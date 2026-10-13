@@ -2377,11 +2377,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/store/test/selectors.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/utils/test/dom.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
