@@ -1,0 +1,35 @@
+<?php
+// Temporary diagnostics: logs where a request spends its time.
+function diag_log( $line ) {
+	if ( false === strpos( $_SERVER['REQUEST_URI'] ?? '', 'post-new.php' ) ) {
+		return;
+	}
+	file_put_contents( ABSPATH . 'timing.log', sprintf( "%6.2fs %s\n", microtime( true ) - $_SERVER['REQUEST_TIME_FLOAT'], $line ), FILE_APPEND );
+}
+diag_log( 'mu-plugins loaded' );
+$GLOBALS['diag_last'] = array( microtime( true ), 'start' );
+add_action( 'all', function ( $hook ) {
+	$now = microtime( true );
+	list( $last, $previous ) = $GLOBALS['diag_last'];
+	if ( $now - $last > 0.5 ) {
+		diag_log( sprintf( 'gap %.2fs between %s and %s', $now - $last, $previous, $hook ) );
+	}
+	$GLOBALS['diag_last'] = array( $now, $hook );
+} );
+foreach ( array( 'plugins_loaded', 'init', 'admin_init', 'current_screen', 'admin_enqueue_scripts', 'admin_footer', 'shutdown' ) as $phase ) {
+	add_action( $phase, function () use ( $phase ) {
+		diag_log( $phase );
+	}, PHP_INT_MAX );
+}
+add_filter( 'rest_pre_dispatch', function ( $result, $server, $request ) {
+	$GLOBALS['diag_rest'][ $request->get_route() ] = microtime( true );
+	diag_log( 'rest start ' . $request->get_route() );
+	return $result;
+}, 10, 3 );
+add_filter( 'rest_post_dispatch', function ( $response, $server, $request ) {
+	diag_log( sprintf( 'rest end %s %.2fs', $request->get_route(), microtime( true ) - $GLOBALS['diag_rest'][ $request->get_route() ] ) );
+	return $response;
+}, 10, 3 );
+add_action( 'http_api_debug', function ( $response, $context, $class, $args, $url ) {
+	diag_log( 'http ' . substr( $url, 0, 80 ) );
+}, 10, 5 );
