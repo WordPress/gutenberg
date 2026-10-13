@@ -742,14 +742,17 @@ export const restoreBrowserBackup =
  * @param {Object} registry The data registry.
  */
 function createRestoreWhileSavingNotice( registry ) {
-	registry
-		.dispatch( noticesStore )
-		.createErrorNotice(
-			__(
-				'The revision could not be restored while the post is saving. Wait for the save to finish, then try again.'
-			),
-			{ id: 'editor-revision-restore-failed' }
-		);
+	registry.dispatch( noticesStore ).createErrorNotice(
+		__(
+			'The revision could not be restored while the post is saving. Wait for the save to finish, then try again.'
+		),
+		// Revisions mode does not show inline notices, so use a snackbar.
+		{
+			type: 'snackbar',
+			explicitDismiss: true,
+			id: 'editor-revision-restore-failed',
+		}
+	);
 }
 
 /**
@@ -869,14 +872,18 @@ export const restoreRevision =
 		if ( shouldSaveCurrentContent ) {
 			await dispatch.savePost();
 			if ( select.didPostSaveRequestFail() ) {
-				registry
-					.dispatch( noticesStore )
-					.createErrorNotice(
-						__(
-							'The revision was not restored because the current version of the post could not be saved first. Your content has not been changed.'
-						),
-						{ id: 'editor-revision-restore-failed' }
-					);
+				registry.dispatch( noticesStore ).createErrorNotice(
+					__(
+						'The revision was not restored because the current version of the post could not be saved first. Your content has not been changed.'
+					),
+					// Revisions mode does not show inline notices, so use
+					// a snackbar.
+					{
+						type: 'snackbar',
+						explicitDismiss: true,
+						id: 'editor-revision-restore-failed',
+					}
+				);
 				return;
 			}
 		}
