@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { MouseEvent, ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { NestedHeadingData } from './utils';
 
 const ENTRY_CLASS_NAME = 'wp-block-table-of-contents__entry';
@@ -14,10 +7,12 @@ export default function TableOfContentsList( {
 	nestedHeadingList,
 	disableLinkActivation,
 	onClick,
+	ordered = true,
 }: {
 	nestedHeadingList: NestedHeadingData[];
 	disableLinkActivation?: boolean;
 	onClick?: ( event: MouseEvent< HTMLAnchorElement > ) => void;
+	ordered?: boolean;
 } ): ReactElement {
 	return (
 		<>
@@ -42,11 +37,13 @@ export default function TableOfContentsList( {
 					<span className={ ENTRY_CLASS_NAME }>{ content }</span>
 				);
 
+				const NestedListTag = ordered ? 'ol' : 'ul';
+
 				return (
 					<li key={ index }>
 						{ entry }
 						{ node.children ? (
-							<ol>
+							<NestedListTag>
 								<TableOfContentsList
 									nestedHeadingList={ node.children }
 									disableLinkActivation={
@@ -58,8 +55,9 @@ export default function TableOfContentsList( {
 											? onClick
 											: undefined
 									}
+									ordered={ ordered }
 								/>
-							</ol>
+							</NestedListTag>
 						) : null }
 					</li>
 				);

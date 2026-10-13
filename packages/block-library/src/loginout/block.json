@@ -21,12 +21,26 @@
 		"viewportWidth": 350
 	},
 	"supports": {
+		"anchor": true,
 		"className": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
 		"color": {
 			"background": true,
 			"text": false,
 			"gradients": true,
 			"link": true
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"spacing": {
 			"margin": true,
@@ -55,6 +69,7 @@
 			"width": true,
 			"style": true
 		},
+		"shadow": true,
 		"interactivity": {
 			"clientNavigation": true
 		}

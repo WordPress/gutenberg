@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { getDropTargetPosition } from '..';
 
 const elementData = [
@@ -37,13 +35,13 @@ const mapElements =
 							right,
 							bottom,
 							left,
-					  }
+						}
 					: {
 							top: left,
 							bottom: right,
 							left: top,
 							right: bottom,
-					  };
+						};
 			},
 		};
 	};

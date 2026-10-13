@@ -11,18 +11,30 @@
 			"backgroundType": "image",
 			"gradient": "luminous-dusk",
 			"isDark": false,
-			"tagName": "div"
+			"tagName": "div",
+			"allowedVideoProviders": [
+				"youtube",
+				"vimeo",
+				"videopress",
+				"animoto",
+				"tiktok",
+				"wordpress-tv"
+			]
 		},
 		"innerBlocks": [
 			{
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "Cover!",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}

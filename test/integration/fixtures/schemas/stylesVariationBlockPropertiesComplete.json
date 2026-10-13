@@ -5,7 +5,7 @@
 		"variations": {
 			"custom-variation": {
 				"blocks": {
-					"core/button": {
+					"core/paragraph": {
 						"invalidAdditionalProperty": true
 					}
 				}

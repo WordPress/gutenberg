@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Editing modes (visual/HTML)', () => {
@@ -45,7 +42,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Drop cap, show' } )
 			.click();
 
 		await expect(
@@ -74,7 +71,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Drop cap, show' } )
 			.click();
 		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).check();
 

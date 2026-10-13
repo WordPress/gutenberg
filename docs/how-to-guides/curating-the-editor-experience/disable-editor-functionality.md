@@ -24,14 +24,14 @@ You can also use [block filters](/docs/reference-guides/filters/block-filters.md
 
 ```php
 function example_modify_heading_levels_globally( $args, $block_type ) {
-	
+
 	if ( 'core/heading' !== $block_type ) {
 		return $args;
 	}
 
 	// Remove H1, H2, and H6.
 	$args['attributes']['levelOptions']['default'] = [ 3, 4, 5 ];
-	
+
 	return $args;
 }
 add_filter( 'register_block_type_args', 'example_modify_heading_levels_globally', 10, 2 );
@@ -91,33 +91,50 @@ wp.domReady( () => {
 
 This JavaScript should be enqueued much like the block variation example above. Refer to the [block styles](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-styles/) documentation for how to register and unregister styles using PHP.
 
-## Disable access to the Template Editor
-
-Whether you’re using theme.json in a Classic or Block theme, you can add the following to your `functions.php` file to remove access to the Template Editor that is available when editing posts or pages:
-
-```php
-function example_theme_support() {
-	remove_theme_support( 'block-templates');
-}
-add_action( 'after_setup_theme', 'example_theme_support' );
-```
-
-This prevents both the ability to create new block templates or edit them from within the Post Editor.
-
 ## Disable access to the Code Editor
 
 The Code Editor allows you to view the underlying block markup for a page or post. While this view is handy for experienced users, you can inadvertently break block markup by editing content. Add the following to your `functions.php` file to restrict access.
 
 ```php
-function example_restrict_code_editor_access( $settings, $context ) {
-    $settings[ 'codeEditingEnabled' ] = false;
+function example_restrict_code_editor_access( $settings ) {
+	$settings[ 'codeEditingEnabled' ] = false;
 
 	return $settings;
 }
-add_filter( 'block_editor_settings_all', 'example_restrict_code_editor_access', 10, 2 );
+add_filter( 'block_editor_settings_all', 'example_restrict_code_editor_access' );
 ```
 
 This code prevents all users from accessing the Code Editor. You could also add [capability](https://wordpress.org/documentation/article/roles-and-capabilities/) checks to disable access for specific users.
+
+## Disable responsive editing
+
+The "Responsive styles" option in the View menu lets users apply style changes to a single viewport only. If you want style edits to always apply to every viewport, add the following to your `functions.php` file.
+
+```php
+function example_disable_responsive_editing( $settings ) {
+	$settings[ 'responsiveEditingEnabled' ] = false;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'example_disable_responsive_editing' );
+```
+
+Responsive styles already defined in `theme.json` or in Global Styles continue to be applied on the front end.
+
+## Disable block states editing
+
+The state controls for blocks in the block inspector and Global Styles let users apply block styles to states. To hide those controls, add the following to your `functions.php` file.
+
+```php
+function example_disable_block_states_editing( $settings ) {
+	$settings[ 'blockStatesEditingEnabled' ] = false;
+
+	return $settings;
+}
+add_filter( 'block_editor_settings_all', 'example_disable_block_states_editing' );
+```
+
+State styles already saved in `theme.json`, in Global Styles, or in a block's `style` attribute continue to be applied in the editor and on the front end. This setting does not affect viewport state controls, which are controlled by `responsiveEditingEnabled`.
 
 ## Disable formatting options for RichText blocks
 

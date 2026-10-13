@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
-import { renderToString } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { RichTextData, create } from '@wordpress/rich-text';
 
 export function addActiveFormats( value, activeFormats ) {
 	if ( activeFormats?.length ) {
@@ -32,6 +28,10 @@ export function getMultilineTag( multiline ) {
 	return multiline === true ? 'p' : multiline;
 }
 
+export function isEmpty( value ) {
+	return ! value || value.length === 0;
+}
+
 export function getAllowedFormats( { allowedFormats, disableFormats } ) {
 	if ( disableFormats ) {
 		return getAllowedFormats.EMPTY_ARRAY;
@@ -43,15 +43,19 @@ export function getAllowedFormats( { allowedFormats, disableFormats } ) {
 getAllowedFormats.EMPTY_ARRAY = [];
 
 /**
- * Creates a link from pasted URL.
- * Creates a paragraph block containing a link to the URL, and calls `onReplace`.
+ * The formats, replacements and text of a rich text attribute value, which is
+ * rich text data or an HTML string. Spreading rich text data would lose them:
+ * they are getters.
  *
- * @param {string}   url       The URL that could not be embedded.
- * @param {Function} onReplace Function to call with the created fallback block.
+ * @param {unknown} value Attribute value.
+ *
+ * @return {import('@wordpress/rich-text').RichTextValue} Rich text value
+ *                                                       without a selection.
  */
-export function createLinkInParagraph( url, onReplace ) {
-	const link = <a href={ url }>{ url }</a>;
-	onReplace(
-		createBlock( 'core/paragraph', { content: renderToString( link ) } )
-	);
+export function toRecord( value ) {
+	if ( value instanceof RichTextData ) {
+		const { formats, replacements, text } = value;
+		return { formats, replacements, text };
+	}
+	return create( { html: value ? String( value ) : '' } );
 }

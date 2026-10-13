@@ -1,8 +1,4 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
+/* eslint-disable playwright/expect-expect */
 import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
 
 const results = {
@@ -64,4 +60,4 @@ test.describe( 'Front End Performance', () => {
 	}
 } );
 
-/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-enable playwright/expect-expect */

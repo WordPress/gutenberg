@@ -1,7 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue } from '@wordpress/components';
+import {
+	getCustomValueFromPreset,
+	isValuePreset,
+} from '../preset-input-control/utils';
+
+const BORDER_RADIUS_PRESET_TYPE = 'border-radius';
 
 /**
  * Gets the (non-undefined) item with the highest occurrence within an array
@@ -60,9 +63,13 @@ export function getAllValue( values = {} ) {
 		return values;
 	}
 
-	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) =>
-		parseQuantityAndUnitFromRawValue( value )
-	);
+	const parsedQuantitiesAndUnits = Object.values( values ).map( ( value ) => {
+		const newValue = parseQuantityAndUnitFromRawValue( value );
+		if ( typeof value === 'string' && newValue[ 0 ] === undefined ) {
+			return [ value, '' ];
+		}
+		return newValue;
+	} );
 
 	const allValues = parsedQuantitiesAndUnits.map(
 		( value ) => value[ 0 ] ?? ''
@@ -74,7 +81,8 @@ export function getAllValue( values = {} ) {
 		: '';
 	const unit = mode( allUnits );
 
-	const allValue = value === 0 || value ? `${ value }${ unit }` : undefined;
+	const allValue =
+		value === 0 || value ? `${ value }${ unit || '' }` : undefined;
 
 	return allValue;
 }
@@ -86,11 +94,26 @@ export function getAllValue( values = {} ) {
  * @return {boolean}      Whether values are mixed.
  */
 export function hasMixedValues( values = {} ) {
-	const allValue = getAllValue( values );
-	const isMixed =
-		typeof values === 'string' ? false : isNaN( parseFloat( allValue ) );
+	if ( typeof values === 'string' ) {
+		return false;
+	}
 
-	return isMixed;
+	if ( ! values || typeof values !== 'object' ) {
+		return false;
+	}
+
+	const cornerValues = Object.values( values );
+
+	if ( cornerValues.length === 0 ) {
+		return false;
+	}
+
+	const firstValue = cornerValues[ 0 ];
+
+	// Check if all values are exactly the same (including undefined)
+	const allSame = cornerValues.every( ( value ) => value === firstValue );
+
+	return ! allSame;
 }
 
 /**
@@ -116,4 +139,61 @@ export function hasDefinedValues( values ) {
 	} );
 
 	return !! filteredValues.length;
+}
+
+/**
+ * Converts a control value into a preset value.
+ *
+ * @param {number} controlValue to convert to preset value.
+ * @param {string} controlType  Type of control
+ * @param {Array}  presets      Array of current radius preset value objects.
+ *
+ * @return {string} The custom value for use in Range control.
+ */
+export function getPresetValueFromControlValue(
+	controlValue,
+	controlType,
+	presets
+) {
+	const size = parseInt( controlValue, 10 );
+	if ( controlType === 'selectList' ) {
+		if ( size === 0 ) {
+			return undefined;
+		}
+	} else if ( size === 0 ) {
+		return '0';
+	}
+
+	return `var:preset|border-radius|${ presets[ controlValue ]?.slug }`;
+}
+
+/**
+ * Converts all preset values in a values object to their custom equivalents.
+ *
+ * @param {Object} values  Values object to convert
+ * @param {Array}  presets Array of current border radius preset objects
+ *
+ * @return {Object} Values with presets converted to custom values
+ */
+export function convertPresetsToCustomValues( values, presets ) {
+	if ( ! values || typeof values !== 'object' ) {
+		return values;
+	}
+
+	const converted = {};
+	Object.keys( values ).forEach( ( key ) => {
+		const value = values[ key ];
+		if ( isValuePreset( value, BORDER_RADIUS_PRESET_TYPE ) ) {
+			const customValue = getCustomValueFromPreset(
+				value,
+				presets,
+				BORDER_RADIUS_PRESET_TYPE
+			);
+			converted[ key ] = customValue !== undefined ? customValue : value;
+		} else {
+			converted[ key ] = value;
+		}
+	} );
+
+	return converted;
 }

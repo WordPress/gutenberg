@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import { chevronRightSmall } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import type { ItemProps } from './types';
 import { Context } from './context';
@@ -21,7 +10,7 @@ import * as Styled from './styles';
 export const SubmenuTriggerItem = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< ItemProps, 'div', false >
->( function SubmenuTriggerItem( { suffix, ...otherProps }, ref ) {
+>( function UnforwardedSubmenuTriggerItem( { suffix, ...otherProps }, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store.parent ) {

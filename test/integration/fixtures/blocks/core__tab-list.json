@@ -1,0 +1,17 @@
+[
+	{
+		"name": "core/tab-list",
+		"isValid": true,
+		"attributes": {
+			"tabs": [
+				{
+					"label": "Tab 1"
+				},
+				{
+					"label": "Tab 2"
+				}
+			]
+		},
+		"innerBlocks": []
+	}
+]

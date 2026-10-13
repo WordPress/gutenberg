@@ -1,18 +1,20 @@
-/**
- * WordPress dependencies
- */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import {
+	getBlockType,
+	unregisterBlockVariation,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import variations from './variations';
+import { unlock } from '../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -20,11 +22,17 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	// Opt into the editing host behaviour privately, like the paragraph.
+	[ editableRootKey ]: true,
 	example: {
 		attributes: {
 			content: __( 'Code is Poetry' ),
 			level: 2,
-			textAlign: 'center',
+			style: {
+				typography: {
+					textAlign: 'center',
+				},
+			},
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
@@ -39,19 +47,23 @@ export const settings = {
 			return customName || content;
 		}
 
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			return ! hasContent
 				? sprintf(
 						/* translators: accessibility text. %s: heading level. */
 						__( 'Level %s. Empty.' ),
 						level
-				  )
+					)
 				: sprintf(
 						/* translators: accessibility text. 1: heading level. 2: heading content. */
 						__( 'Level %1$s. %2$s' ),
 						level,
 						content
-				  );
+					);
 		}
 	},
 	transforms,
@@ -65,6 +77,24 @@ export const settings = {
 	},
 	edit,
 	save,
+	variations,
 };
 
-export const init = () => initBlock( { name, metadata, settings } );
+export const init = () => {
+	const block = initBlock( { name, metadata, settings } );
+
+	// Unregister heading level variations based on `levelOptions` attribute.
+	// This is for backwards compatibility, as extenders can now unregister the
+	// variation directly: `wp.blocks.unregisterBlockVariation( 'core/heading', 'h1' )`.
+	const levelOptions =
+		getBlockType( name )?.attributes?.levelOptions?.default;
+	if ( levelOptions ) {
+		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+			if ( ! levelOptions.includes( level ) ) {
+				unregisterBlockVariation( name, `h${ level }` );
+			}
+		} );
+	}
+
+	return block;
+};

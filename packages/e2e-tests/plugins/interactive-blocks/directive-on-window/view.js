@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, privateApis } from '@wordpress/interactivity';
 
 const { directive } = privateApis(
@@ -31,6 +28,7 @@ const { state } = store( 'directive-on-window', {
 		isEventAttached: 'no',
 		resizeHandler: 'no',
 		resizeSecondHandler: 'no',
+		resizeThirdHandler: 'no',
 	},
 	callbacks: {
 		resizeHandler() {
@@ -50,6 +48,9 @@ const { state } = store( 'directive-on-window', {
 		},
 		resizeSecondHandler: () => {
 			state.resizeSecondHandler = 'yes';
+		},
+		resizeThirdHandler: () => {
+			state.resizeThirdHandler = 'yes';
 		},
 	},
 } );

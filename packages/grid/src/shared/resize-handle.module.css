@@ -1,0 +1,88 @@
+/*
+ * Fade with opacity only: `visibility` is not interpolatable and pairing
+ * it with delayed transitions breaks fade-in.
+ */
+.resize-handle-slot {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	.resize-handle-slot {
+		transition:
+			opacity var(--wpds-motion-duration-md)
+			var(--wpds-motion-easing-subtle);
+	}
+}
+
+/*
+ * Grid-level interaction hooks (`data-wp-grid-dragging`,
+ * `data-wp-grid-resizing`, `data-wp-grid-item-resizing`) drive
+ * handle visibility.
+ */
+:global([data-wp-grid-dragging]) .resize-handle-slot,
+:global([data-wp-grid-resizing]) .resize-handle-slot {
+	opacity: 0;
+	pointer-events: none;
+}
+
+:global([data-wp-grid-resizing])
+:global([data-wp-grid-item-resizing])
+.resize-handle-slot {
+	opacity: 1;
+	pointer-events: auto;
+}
+
+.resize-handle {
+	position: absolute;
+	bottom: 0;
+	inset-inline-end: 0;
+	width: 0;
+	height: 0;
+	z-index: 1;
+	cursor: nwse-resize;
+	/*
+	 * Triangle drawn via borders. Use per-side logical shorthands
+	 * instead of `border-width: 0` + `border-block-end-width: 12px`:
+	 * the build's CSS optimizer merges the global shorthands into a
+	 * single `border: 0 solid transparent` and emits it AFTER the
+	 * logical longhands, which then loses the cascade and zeroes
+	 * the triangle widths. The unused sides default to
+	 * `border-style: none` and render as 0 regardless of width.
+	 */
+	border-block-end: 12px solid var(--wpds-color-foreground-interactive-brand);
+	border-inline-start: 12px solid transparent;
+}
+
+/*
+ * When the host surface only resizes horizontally (e.g. lanes,
+ * where height is content-driven), the corner triangle advertises a
+ * vertical drag the user cannot perform. Override with a vertical
+ * grip centered on the trailing edge.
+ */
+.is-horizontal-only {
+	cursor: ew-resize;
+	border-style: none;
+	bottom: auto;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 16px;
+	height: 40px;
+	background: transparent;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.is-horizontal-only::before {
+	content: "";
+	width: 4px;
+	height: 24px;
+	border-radius: 2px;
+	background-color: var(--wpds-color-foreground-interactive-brand);
+}
+
+@media (forced-colors: active) {
+	.is-horizontal-only::before {
+		background-color: Highlight;
+	}
+}

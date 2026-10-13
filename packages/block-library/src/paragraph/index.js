@@ -1,18 +1,15 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { paragraph as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
+import { unlock } from '../lock-unlock';
+
+const { editableRootKey } = unlock( blocksPrivateApis );
 
 const { name } = metadata;
 
@@ -20,6 +17,9 @@ export { metadata, name };
 
 export const settings = {
 	icon,
+	// Opt into the editing host behaviour privately. It's a Symbol setting
+	// rather than a public `supports` key so it stays an internal detail.
+	[ editableRootKey ]: true,
 	example: {
 		attributes: {
 			content: __(
@@ -30,7 +30,10 @@ export const settings = {
 	__experimentalLabel( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
-		if ( context === 'list-view' && customName ) {
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
 			return customName;
 		}
 

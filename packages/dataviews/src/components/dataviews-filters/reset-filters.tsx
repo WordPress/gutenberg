@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { NormalizedFilter, View } from '../../types';
 
 interface ResetFilterProps {
@@ -28,7 +21,8 @@ export default function ResetFilter( {
 		! view.search &&
 		! view.filters?.some(
 			( _filter ) =>
-				_filter.value !== undefined || ! isPrimary( _filter.field )
+				! _filter.isLocked &&
+				( _filter.value !== undefined || ! isPrimary( _filter.field ) )
 		);
 	return (
 		<Button
@@ -42,7 +36,8 @@ export default function ResetFilter( {
 					...view,
 					page: 1,
 					search: '',
-					filters: [],
+					filters:
+						view.filters?.filter( ( f ) => !! f.isLocked ) || [],
 				} );
 			} }
 		>

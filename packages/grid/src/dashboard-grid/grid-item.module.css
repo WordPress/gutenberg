@@ -1,0 +1,94 @@
+.item {
+	position: relative;
+}
+
+.item-content {
+	position: relative;
+	height: 100%;
+}
+
+.is-resizing {
+	overflow: visible;
+	z-index: 1;
+}
+
+.is-resizing .item-content {
+	position: relative;
+	z-index: 2;
+	overflow: visible;
+}
+
+/*
+ * During drag, the original item acts as a placeholder in its grid
+ * cell while `<DragOverlay>` renders a clone that follows the cursor.
+ * Fading the placeholder and outlining it makes the destination visible
+ * without any scaling or translation on the original element.
+ *
+ * Placeholder chrome waits until `data-wp-grid-dragging` is set and the
+ * drag-preview enter animation (`--wpds-motion-duration-sm`) finishes
+ * so the dashed outline does not flash under the lifting clone.
+ */
+.is-dragging {
+	pointer-events: none;
+}
+
+:global([data-wp-grid-dragging]) .is-dragging {
+	border-radius: var(--wp-grid-placeholder-radius, 0);
+}
+
+@media not (prefers-reduced-motion: reduce) {
+	:global([data-wp-grid-dragging]) .is-dragging {
+		opacity: 1;
+		outline-width: 0;
+		outline-style: var(--wp-grid-placeholder-outline-style, dashed);
+		outline-color: transparent;
+		animation:
+			wp-grid-item-placeholder-in 0ms linear
+			var(--wpds-motion-duration-sm) forwards;
+	}
+
+	@keyframes wp-grid-item-placeholder-in {
+		to {
+			opacity: var(--wp-grid-placeholder-opacity, 0.4);
+			outline-width: var(--wpds-border-width-sm);
+			outline-color: var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:global([data-wp-grid-dragging]) .is-dragging {
+		opacity: var(--wp-grid-placeholder-opacity, 0.4);
+		outline:
+			var(--wpds-border-width-sm)
+			var(--wp-grid-placeholder-outline-style, dashed)
+			var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
+	}
+}
+
+@media (forced-colors: active) {
+	:global([data-wp-grid-dragging]) .is-dragging {
+		--wp-grid-placeholder-outline-color: Highlight;
+	}
+}
+
+.preview-overlay {
+	position: absolute;
+	top: 0;
+	inset-inline-start: 0;
+	box-sizing: border-box;
+	pointer-events: none;
+	z-index: 0;
+	border:
+		var(--wpds-border-width-sm)
+		var(--wp-grid-resize-preview-outline-style, solid)
+		var(--wp-grid-placeholder-outline-color, var(--wpds-color-stroke-interactive-brand));
+	background: transparent;
+	border-radius: var(--wp-grid-placeholder-radius, 0);
+}
+
+@media (forced-colors: active) {
+	.preview-overlay {
+		border-color: Highlight;
+	}
+}

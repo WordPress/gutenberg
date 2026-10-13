@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 
 const getMovementDirection = ( moveDirection, orientation ) => {

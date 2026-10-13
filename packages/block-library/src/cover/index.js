@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { cover as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -40,7 +33,11 @@ export const settings = {
 				name: 'core/paragraph',
 				attributes: {
 					content: `<strong>${ __( 'Snow Patrol' ) }</strong>`,
-					align: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 		],

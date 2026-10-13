@@ -1,0 +1,20 @@
+[
+	{
+		"name": "core/terms-query",
+		"isValid": true,
+		"attributes": {
+			"termQuery": {
+				"perPage": 10,
+				"taxonomy": "category",
+				"order": "asc",
+				"orderBy": "name",
+				"include": [],
+				"hideEmpty": true,
+				"showNested": false,
+				"inherit": false
+			},
+			"tagName": "div"
+		},
+		"innerBlocks": []
+	}
+]

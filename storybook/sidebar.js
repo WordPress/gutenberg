@@ -2,18 +2,9 @@
  * Provides sidebar configuration options.
  * See https://storybook.js.org/docs/configure/features-and-behavior
  */
-
-/**
- * External dependencies
- */
-// eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { createElement, useMemo } from 'react';
-import { useStorybookApi } from '@storybook/manager-api';
-import { styled } from '@storybook/theming';
-
-/**
- * Internal dependencies
- */
+import { useStorybookApi } from 'storybook/manager-api';
+import { styled } from 'storybook/theming';
 import badges from './badges';
 
 const Wrapper = styled.span( {
@@ -32,13 +23,19 @@ const Icon = styled.span( {
 	lineHeight: 1,
 } );
 
+// Storybook treats slashes as hierarchy separators, so story titles use
+// internal keys and the sidebar restores the exact npm package names.
+const PACKAGE_LABELS = {
+	'@wordpress-ui': '@wordpress/ui',
+	'@wordpress-components': '@wordpress/components',
+};
+
 /**
  * Fetches tags from the Storybook API, and returns Icon
  * elements for any that have matching badge data
  */
 function useIcons( item ) {
 	const api = useStorybookApi();
-	const prefix = 'status-';
 
 	return useMemo( () => {
 		let data = {};
@@ -49,19 +46,21 @@ function useIcons( item ) {
 
 		const { tags = [] } = data;
 
+		// The indexer appends the recommendation tag after the hand-declared
+		// ones, so the lifecycle icon comes first.
 		return tags
-			.filter( ( tag ) => tag.startsWith( prefix ) )
-			.map( ( tag ) => badges[ tag.substring( prefix.length ) ] )
+			.map( ( tag ) => badges[ tag ] )
+			.filter( Boolean )
 			.map( ( { icon, title, tooltip } ) =>
 				icon
 					? createElement(
 							Icon,
 							{ title: tooltip?.title ?? title },
 							icon
-					  )
+						)
 					: null
 			);
-	}, [ api, item.children, item.isComponent ] );
+	}, [ api, item.children, item.type ] );
 }
 
 /**
@@ -69,13 +68,20 @@ function useIcons( item ) {
  */
 function Label( { item } ) {
 	const iconSet = useIcons( item );
-	const title = createElement( Title, {}, item.name );
+	const title = createElement(
+		Title,
+		{},
+		PACKAGE_LABELS[ item.name ] ?? item.name
+	);
 	const icons = createElement( Icons, { 'aria-hidden': true }, ...iconSet );
 
 	return createElement( Wrapper, {}, title, icons );
 }
 
 export default {
-	// Renders status icons for items tagged with `status-*`
+	// Renders an icon for each tag that has a badge definition
 	renderLabel: ( item ) => createElement( Label, { item } ),
+
+	// Renders sections as collapsed by default
+	showRoots: false,
 };

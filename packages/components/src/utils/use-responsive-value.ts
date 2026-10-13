@@ -1,14 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 
 const breakpoints = [ '40em', '52em', '64em' ];
 
 export const useBreakpointIndex = (
-	options: { defaultIndex?: number } = {}
+	options: { defaultIndex?: number; enabled?: boolean } = {}
 ) => {
-	const { defaultIndex = 0 } = options;
+	const { defaultIndex = 0, enabled = true } = options;
 
 	if ( typeof defaultIndex !== 'number' ) {
 		throw new TypeError(
@@ -23,6 +20,10 @@ export const useBreakpointIndex = (
 	const [ value, setValue ] = useState( defaultIndex );
 
 	useEffect( () => {
+		if ( ! enabled ) {
+			return;
+		}
+
 		const getIndex = () =>
 			breakpoints.filter( ( bp ) => {
 				return typeof window !== 'undefined'
@@ -48,7 +49,7 @@ export const useBreakpointIndex = (
 				window.removeEventListener( 'resize', onResize );
 			}
 		};
-	}, [ value ] );
+	}, [ value, enabled ] );
 
 	return value;
 };
@@ -57,7 +58,11 @@ export function useResponsiveValue< T >(
 	values: ( T | undefined )[],
 	options: Parameters< typeof useBreakpointIndex >[ 0 ] = {}
 ): T | undefined {
-	const index = useBreakpointIndex( options );
+	// A single value is the same at every breakpoint, so there is nothing to
+	// watch. Most callers pass one, and watching for them would mean a media
+	// query and a resize listener per component instance.
+	const isResponsive = Array.isArray( values ) && values.length > 1;
+	const index = useBreakpointIndex( { ...options, enabled: isResponsive } );
 
 	// Allow calling the function with a "normal" value without having to check on the outside.
 	if ( ! Array.isArray( values ) && typeof values !== 'function' ) {
@@ -66,9 +71,5 @@ export function useResponsiveValue< T >(
 
 	const array = values || [];
 
-	/* eslint-disable jsdoc/no-undefined-types */
-	return /** @type {T[]} */ array[
-		/* eslint-enable jsdoc/no-undefined-types */
-		index >= array.length ? array.length - 1 : index
-	];
+	return array[ index >= array.length ? array.length - 1 : index ];
 }

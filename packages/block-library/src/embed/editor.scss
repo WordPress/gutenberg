@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+
 .wp-block-embed {
 	// Remove the left and right margin the figure is born with.
 	margin-left: 0;
@@ -18,7 +20,8 @@
 
 	// Stops long URLs from breaking out of the no preview available screen
 	.components-placeholder__error {
-		word-break: break-word;
+		word-break: normal;
+		overflow-wrap: break-word;
 	}
 }
 

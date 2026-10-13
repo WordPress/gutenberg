@@ -1,0 +1,15 @@
+.disabled {
+	position: relative;
+	pointer-events: none;
+
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+	}
+
+	// Also make nested blocks unselectable.
+	* {
+		pointer-events: none;
+	}
+}

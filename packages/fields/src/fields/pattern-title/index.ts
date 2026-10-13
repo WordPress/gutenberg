@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { Pattern } from '../../types';
 import { getItemTitle } from '../../actions/utils';
 import PatternTitleView from './view';
@@ -20,6 +13,7 @@ const patternTitleField: Field< Pattern > = {
 	render: PatternTitleView,
 	enableHiding: false,
 	enableGlobalSearch: true,
+	filterBy: false,
 };
 
 /**

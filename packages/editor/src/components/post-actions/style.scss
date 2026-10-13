@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/z-index" as *;
+
 .editor-action-modal {
 	z-index: z-index(".editor-action-modal");
 }

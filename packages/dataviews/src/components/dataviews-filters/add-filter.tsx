@@ -1,25 +1,10 @@
-/**
- * External dependencies
- */
 import type { Ref } from 'react';
-
-/**
- * WordPress dependencies
- */
-import {
-	privateApis as componentsPrivateApis,
-	Button,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import type { NormalizedFilter, View } from '../../types';
-
-const { Menu } = unlock( componentsPrivateApis );
 
 interface AddFilterProps {
 	filters: NormalizedFilter[];
@@ -35,13 +20,16 @@ export function AddFilterMenu( {
 	setOpenedFilter,
 	triggerProps,
 }: AddFilterProps & {
-	triggerProps: React.ComponentProps< typeof Menu.TriggerButton >;
+	triggerProps: React.ComponentProps< typeof Menu.Trigger >;
 } ) {
 	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
-		<Menu>
-			<Menu.TriggerButton { ...triggerProps } />
-			<Menu.Popover>
+		<Menu.Root>
+			<Menu.Trigger
+				{ ...triggerProps }
+				disabled={ ! inactiveFilters.length || triggerProps.disabled }
+			/>
+			<Menu.Popup>
 				{ inactiveFilters.map( ( filter ) => {
 					return (
 						<Menu.Item
@@ -66,8 +54,8 @@ export function AddFilterMenu( {
 						</Menu.Item>
 					);
 				} ) }
-			</Menu.Popover>
-		</Menu>
+			</Menu.Popup>
+		</Menu.Root>
 	);
 }
 
@@ -78,7 +66,6 @@ function AddFilter(
 	if ( ! filters.length || filters.every( ( { isPrimary } ) => isPrimary ) ) {
 		return null;
 	}
-	const inactiveFilters = filters.filter( ( filter ) => ! filter.isVisible );
 	return (
 		<AddFilterMenu
 			triggerProps={ {
@@ -88,7 +75,6 @@ function AddFilter(
 						size="compact"
 						className="dataviews-filters-button"
 						variant="tertiary"
-						disabled={ ! inactiveFilters.length }
 						ref={ ref }
 					/>
 				),

@@ -1,20 +1,14 @@
-/**
- * WordPress dependencies
- */
-import { _x } from '@wordpress/i18n';
+import { _x, sprintf } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
-import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
+import deprecated from './deprecated';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import { enhanceNavigationLinkVariations } from './hooks';
 import transforms from './transforms';
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -23,7 +17,23 @@ export { metadata, name };
 export const settings = {
 	icon: linkIcon,
 
-	__experimentalLabel: ( { label } ) => label,
+	__experimentalLabel( attributes, { context } ) {
+		if ( context === 'list-view' ) {
+			return attributes?.label;
+		}
+
+		if ( context === 'appender' ) {
+			const type = attributes?.type || 'link';
+			return sprintf(
+				/* translators: %s: block type (e.g., 'page', 'post', 'category') */
+				_x( 'Add %s', 'add default block type' ),
+				type
+			);
+		}
+
+		// Backwards compatibility - return label for unknown contexts
+		return attributes?.label;
+	},
 
 	merge( leftAttributes, { label: rightLabel = '' } ) {
 		return {
@@ -43,50 +53,9 @@ export const settings = {
 		},
 	},
 
-	deprecated: [
-		{
-			isEligible( attributes ) {
-				return attributes.nofollow;
-			},
-
-			attributes: {
-				label: {
-					type: 'string',
-				},
-				type: {
-					type: 'string',
-				},
-				nofollow: {
-					type: 'boolean',
-				},
-				description: {
-					type: 'string',
-				},
-				id: {
-					type: 'number',
-				},
-				opensInNewTab: {
-					type: 'boolean',
-					default: false,
-				},
-				url: {
-					type: 'string',
-				},
-			},
-
-			migrate( { nofollow, ...rest } ) {
-				return {
-					rel: nofollow ? 'nofollow' : '',
-					...rest,
-				};
-			},
-
-			save() {
-				return <InnerBlocks.Content />;
-			},
-		},
-	],
+	deprecated,
 	transforms,
+	variations,
 };
 
 export const init = () => {

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import fastDeepEqual from 'fast-deep-equal/es6';
-
-/**
- * WordPress dependencies
- */
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useRegistry } from '@wordpress/data';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useEffect } from '@wordpress/element';
@@ -25,7 +18,6 @@ function getLatestHeadings( select, clientId ) {
 	// declaring @wordpress/editor as a dependency, we must access its
 	// store by string. When the store is not available, editorSelectors
 	// will be null, and the block's saved markup will lack permalinks.
-	// eslint-disable-next-line @wordpress/data-no-store-string-literals
 	const permalink = select( 'core/editor' ).getPermalink() ?? null;
 
 	const isPaginated = getBlocksByName( 'core/nextpage' ).length !== 0;

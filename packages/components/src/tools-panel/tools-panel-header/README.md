@@ -1,8 +1,6 @@
 # ToolsPanelHeader
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 <br />
 
 This component renders a tools panel's header including a menu.
@@ -12,9 +10,7 @@ This component renders a tools panel's header including a menu.
 This component is generated automatically by its parent
 `ToolsPanel`.
 
-<div class="callout callout-alert">
-<strong>In general, this should not be used directly.</strong>
-</div>
+<p class="callout callout-alert"><strong>In general, this should not be used directly.</strong></p>
 
 ## Props
 

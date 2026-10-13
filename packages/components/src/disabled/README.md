@@ -15,8 +15,6 @@ const MyDisabled = () => {
 
 	let input = (
 		<TextControl
-			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label="Input"
 			onChange={ () => {} }
 		/>

@@ -3,7 +3,8 @@
 		"name": "core/home-link",
 		"isValid": true,
 		"attributes": {
-			"label": "Home"
+			"label": "Home",
+			"opensInNewTab": false
 		},
 		"innerBlocks": []
 	}

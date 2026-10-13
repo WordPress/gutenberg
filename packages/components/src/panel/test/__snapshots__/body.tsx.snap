@@ -1,9 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`PanelBody basic rendering should render an empty div with the matching className 1`] = `
-<div>
-  <div
-    class="components-panel__body is-opened"
-  />
-</div>
-`;

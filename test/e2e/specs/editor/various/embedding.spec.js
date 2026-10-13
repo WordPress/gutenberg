@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -87,7 +84,7 @@ test.describe( 'Embedding content', () => {
 			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 			'https://twitter.com/wooyaygutenberg123454312':
 				MOCK_CANT_EMBED_RESPONSE,
-			'https://wordpress.org/gutenberg/handbook/':
+			'https://wordpress.org/gutenberg/handbook':
 				MOCK_BAD_WORDPRESS_RESPONSE,
 			'https://twitter.com/thatbunty': MOCK_BAD_EMBED_PROVIDER_RESPONSE,
 			'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-attributes/':
@@ -117,7 +114,7 @@ test.describe( 'Embedding content', () => {
 		).toHaveValue( 'https://twitter.com/wooyaygutenberg123454312' );
 
 		await embedUtils.insertEmbed(
-			'https://wordpress.org/gutenberg/handbook/'
+			'https://wordpress.org/gutenberg/handbook'
 		);
 		await expect(
 			currentEmbedBlock.getByRole( 'textbox', { name: 'Embed URL' } ),
@@ -151,6 +148,33 @@ test.describe( 'Embedding content', () => {
 			currentEmbedBlock.locator( 'iframe' ),
 			'Photo content. Should render valid iframe element.'
 		).toHaveAttribute( 'title', 'Embedded content from cloudup.com' );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/issues/73288.
+	test( 'should send a referrer from iframes inside embed previews @webkit', async ( {
+		page,
+		embedUtils,
+	} ) => {
+		await embedUtils.interceptRequests( {
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc': {
+				...MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
+				html: '<iframe title="YouTube video" src="https://www.youtube.com/embed/lXMskKTw3Bc"></iframe>',
+			},
+		} );
+		const embedRequest = page.waitForRequest(
+			'https://www.youtube.com/embed/lXMskKTw3Bc'
+		);
+		await page.route( 'https://www.youtube.com/embed/**', ( route ) =>
+			route.fulfill( { contentType: 'text/html', body: '' } )
+		);
+
+		await embedUtils.insertEmbed(
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+		);
+
+		expect( await ( await embedRequest ).headerValue( 'referer' ) ).toBe(
+			`${ new URL( page.url() ).origin }/`
+		);
 	} );
 
 	test( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async ( {
@@ -202,7 +226,7 @@ test.describe( 'Embedding content', () => {
 
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Twitter',
+				name: 'Block: X',
 			} )
 		).toBeVisible();
 	} );
@@ -235,7 +259,7 @@ test.describe( 'Embedding content', () => {
 		await embedBlock.getByRole( 'button', { name: 'Try again' } ).click();
 		await expect(
 			editor.canvas.getByRole( 'document', {
-				name: 'Block: Twitter',
+				name: 'Block: X',
 			} )
 		).toBeVisible();
 	} );
@@ -255,6 +279,36 @@ test.describe( 'Embedding content', () => {
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Embed' } )
 		).toBeVisible();
+	} );
+
+	test( 'should undo URL submit and preview-driven upgrade in a single step', async ( {
+		editor,
+		embedUtils,
+		pageUtils,
+	} ) => {
+		await embedUtils.interceptRequests( {
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc':
+				MOCK_EMBED_VIDEO_SUCCESS_RESPONSE,
+		} );
+
+		await embedUtils.insertEmbed(
+			'https://www.youtube.com/watch?v=lXMskKTw3Bc'
+		);
+
+		// Wait for the block to upgrade to the YouTube variant.
+		await expect(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: YouTube Embed',
+			} )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Embed' } )
+				.getByRole( 'textbox', { name: 'Embed URL' } )
+		).toHaveValue( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 	} );
 } );
 

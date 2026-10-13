@@ -1,0 +1,128 @@
+{
+	"$schema": "../../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/group": {
+				"@mobile": {
+					"spacing": {
+						"padding": {
+							"top": "1rem",
+							"bottom": "1rem"
+						}
+					},
+					"elements": {
+						"link": {
+							"color": {
+								"text": "var(--wp--preset--color--primary)"
+							},
+							":hover": {
+								"color": {
+									"text": "var(--wp--preset--color--secondary)"
+								}
+							}
+						},
+						"h2": {
+							"typography": {
+								"fontSize": "1.5rem"
+							}
+						}
+					}
+				},
+				"@tablet": {
+					"elements": {
+						"button": {
+							"color": {
+								"background": "var(--wp--preset--color--primary)"
+							}
+						}
+					}
+				}
+			},
+			"core/button": {
+				"@mobile": {
+					"elements": {
+						"link": {
+							"color": {
+								"text": "var(--wp--preset--color--primary)"
+							}
+						}
+					},
+					":hover": {
+						"color": {
+							"background": "var(--wp--preset--color--secondary)"
+						}
+					}
+				},
+				"variations": {
+					"outline": {
+						"@mobile": {
+							"elements": {
+								"link": {
+									"color": {
+										"text": "var(--wp--preset--color--primary)"
+									}
+								}
+							}
+						}
+					}
+				}
+			},
+			"core/navigation-link": {
+				"@tablet": {
+					"elements": {
+						"link": {
+							"color": {
+								"text": "var(--wp--preset--color--primary)"
+							},
+							":hover": {
+								"color": {
+									"text": "var(--wp--preset--color--secondary)"
+								}
+							}
+						}
+					}
+				}
+			},
+			"my-plugin/custom-block": {
+				"@mobile": {
+					"elements": {
+						"link": {
+							"color": {
+								"text": "var(--wp--preset--color--primary)"
+							}
+						}
+					}
+				}
+			}
+		},
+		"variations": {
+			"custom-variation": {
+				"blocks": {
+					"core/group": {
+						"@mobile": {
+							"elements": {
+								"link": {
+									"color": {
+										"text": "var(--wp--preset--color--primary)"
+									}
+								}
+							}
+						}
+					},
+					"core/button": {
+						"@mobile": {
+							"elements": {
+								"link": {
+									"color": {
+										"text": "var(--wp--preset--color--primary)"
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

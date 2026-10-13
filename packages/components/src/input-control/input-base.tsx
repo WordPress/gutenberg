@@ -1,19 +1,10 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Backdrop from './backdrop';
 import Label from './label';
+import styles from './style.module.scss';
 import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -22,7 +13,7 @@ import {
 	contextConnect,
 	useContextSystem,
 } from '../context';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
+import type { FlexDirection } from '../flex/types';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( InputBase );
@@ -34,7 +25,7 @@ function useUniqueId( idProp?: string ) {
 // Adapter to map props for the new ui/flex component.
 function getUIFlexProps( labelPosition?: LabelPosition ) {
 	const props: {
-		direction?: string;
+		direction?: FlexDirection;
 		gap?: number;
 		justify?: string;
 		expanded?: boolean;
@@ -63,7 +54,6 @@ function InputBase(
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const {
-		__next40pxDefaultSize,
 		__unstableInputWidth,
 		children,
 		className,
@@ -77,22 +67,19 @@ function InputBase(
 		size = 'default',
 		suffix,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp(
-		useContextSystem( props, 'InputBase' )
-	);
+	} = useContextSystem( props, 'InputBase' );
 
 	const id = useUniqueId( idProp );
 	const hideLabel = hideLabelFromVision || ! label;
 
 	const prefixSuffixContextValue = useMemo( () => {
 		return {
-			InputControlPrefixWrapper: { __next40pxDefaultSize, size },
-			InputControlSuffixWrapper: { __next40pxDefaultSize, size },
+			InputControlPrefixWrapper: { size },
+			InputControlSuffixWrapper: { size },
 		};
-	}, [ __next40pxDefaultSize, size ] );
+	}, [ size ] );
 
 	return (
-		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
 		<Root
 			{ ...restProps }
 			{ ...getUIFlexProps( labelPosition ) }
@@ -110,7 +97,10 @@ function InputBase(
 			</Label>
 			<Container
 				__unstableInputWidth={ __unstableInputWidth }
-				className="components-input-control__container"
+				className={ clsx(
+					'components-input-control__container',
+					styles.container
+				) }
 				disabled={ disabled }
 				hideLabel={ hideLabel }
 				labelPosition={ labelPosition }

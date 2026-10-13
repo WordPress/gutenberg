@@ -1,6 +1,6 @@
 {
-	"title": "JSON schema for @wordpress/components README manifests",
 	"$schema": "http://json-schema.org/draft-07/schema#",
+	"title": "JSON schema for @wordpress/components README manifests",
 	"type": "object",
 	"properties": {
 		"displayName": {
@@ -10,6 +10,10 @@
 		"filePath": {
 			"type": "string",
 			"description": "The file path where the component is located."
+		},
+		"deprecated": {
+			"type": "string",
+			"description": "If set, a deprecation callout is rendered in the README. Use the replacement guidance, e.g. 'Please use `Badge` from the `@wordpress/ui` package instead.'"
 		},
 		"subcomponents": {
 			"type": "array",

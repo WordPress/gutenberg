@@ -1,10 +1,4 @@
-/**
- * External dependencies
- */
 import type { HTMLAttributes, ReactNode } from 'react';
-/**
- * Internal dependencies
- */
 import type { ButtonAsButtonProps } from '../button/types';
 import type { WordPressComponentProps } from '../context';
 import type { DropdownProps } from '../dropdown/types';
@@ -58,7 +52,7 @@ type ToggleProps = Partial<
 		'label' | 'text'
 	>
 > & {
-	as?: React.ElementType | keyof JSX.IntrinsicElements;
+	as?: React.ElementType | keyof React.JSX.IntrinsicElements;
 	'data-toolbar-item'?: boolean;
 };
 

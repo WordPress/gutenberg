@@ -1,0 +1,126 @@
+import clsx from 'clsx';
+import type { ReactNode } from 'react';
+import {
+	FlexBlock,
+	__experimentalItem as Item,
+	__experimentalHStack as HStack,
+	Icon as WCIcon,
+	__unstableMotion as motion,
+	__unstableAnimatePresence as AnimatePresence,
+} from '@wordpress/components';
+import { chevronDownSmall } from '@wordpress/icons';
+import { useReducedMotion } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
+import { STORE_NAME } from '../../../store';
+import NavigationItem from '../navigation-item';
+import { wrapIcon } from '../items';
+import type { IconType, MenuItem } from '../../../store/types';
+import navigationItemStyles from '../navigation-item/style.module.scss';
+import styles from './style.module.scss';
+
+const ANIMATION_DURATION = 0.2;
+
+interface DropdownItemProps {
+	/**
+	 * Optional CSS class name.
+	 */
+	className?: string;
+	/**
+	 * Identifier of the parent menu item.
+	 */
+	id: string;
+	/**
+	 * Icon to display with the dropdown item.
+	 */
+	icon?: IconType;
+	/**
+	 * Whether to show placeholder icons for alignment.
+	 */
+	shouldShowPlaceholder?: boolean;
+	/**
+	 * Content to display inside the dropdown item.
+	 */
+	children: ReactNode;
+	/**
+	 * Whether this dropdown is currently expanded.
+	 */
+	isExpanded: boolean;
+	/**
+	 * Function to toggle this dropdown's expanded state.
+	 */
+	onToggle: () => void;
+}
+
+export default function DropdownItem( {
+	className,
+	id,
+	icon,
+	children,
+	isExpanded,
+	onToggle,
+}: DropdownItemProps ) {
+	const menuItems: MenuItem[] = useSelect(
+		( select ) =>
+			// @ts-expect-error Store types are not available when selecting by store name.
+			select( STORE_NAME ).getMenuItems(),
+		[]
+	);
+	const items = menuItems.filter( ( item ) => item.parent === id );
+	const disableMotion = useReducedMotion();
+	return (
+		<div className={ styles.dropdown }>
+			<Item
+				className={ clsx( navigationItemStyles.item, className ) }
+				onClick={ ( e ) => {
+					e.preventDefault();
+					e.stopPropagation();
+					onToggle();
+				} }
+				onMouseDown={ ( e ) => e.preventDefault() }
+			>
+				<HStack
+					justify="flex-start"
+					spacing={ 2 }
+					style={ { flexGrow: '1' } }
+				>
+					{ wrapIcon( icon, false ) }
+					<FlexBlock>{ children }</FlexBlock>
+					<WCIcon
+						icon={ chevronDownSmall }
+						className={ clsx( styles.chevron, {
+							[ styles[ 'is-up' ] ]: isExpanded,
+						} ) }
+					/>
+				</HStack>
+			</Item>
+			<AnimatePresence initial={ false }>
+				{ isExpanded && (
+					<motion.div
+						initial={ { height: 0 } }
+						animate={ { height: 'auto' } }
+						exit={ { height: 0 } }
+						transition={ {
+							type: 'tween',
+							duration: disableMotion ? 0 : ANIMATION_DURATION,
+							ease: 'easeOut',
+						} }
+						className={ styles[ 'dropdown-children' ] }
+					>
+						{ items.map( ( item, index ) => (
+							<NavigationItem
+								key={ index }
+								className={
+									navigationItemStyles[ 'is-compact' ]
+								}
+								to={ item.to }
+								shouldShowPlaceholder={ false }
+							>
+								{ item.label }
+							</NavigationItem>
+						) ) }
+					</motion.div>
+				) }
+			</AnimatePresence>
+		</div>
+	);
+}

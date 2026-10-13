@@ -2,6 +2,159 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo` and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
+
+## 7.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Remove the `data-wp-ignore` directive. An element carrying it is now hydrated like any other element, and a warning is shown in development mode. Remove the attribute. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   Remove support for two-hyphen unique IDs, such as `data-wp-watch--id` or `data-wp-on--click--id`. Use three hyphens instead, such as `data-wp-watch---id` or `data-wp-on--click---id`. `data-wp-watch`, `data-wp-init`, and `data-wp-run` now skip directives with a suffix, and `data-wp-on`, `data-wp-on-window`, and `data-wp-on-document` now use the whole text after `--` as the event name. Both show a warning in development mode. The deprecated `data-wp-on-async` directives are unchanged. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   Applying `!` to a function in a directive value, such as `data-wp-bind--hidden="!actions.isOpen"`, no longer calls the function: the value resolves to `undefined`, with a warning in development mode. Use derived state defined with a getter instead. Negating values and getters is unchanged. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+-   The `evaluate` function passed to directive callbacks now accepts only the directive entry. Additional arguments, which were only forwarded to negated functions, are no longer accepted. ([#84098](https://github.com/WordPress/gutenberg/pull/84098))
+
+### New Features
+
+-   Add the `data-wp-html` directive and `asDangerousHTML()` for rendering explicitly trusted HTML from reactive state. ([#83092](https://github.com/WordPress/gutenberg/pull/83092))
+
+### Enhancements
+
+-   `getConfig` accepts a type parameter describing the config it returns, like `getContext` does, so consumers can read typed config values. It defaults to `any`, so existing calls are unaffected ([#71692](https://github.com/WordPress/gutenberg/pull/71692)).
+
+### Bug Fixes
+
+-   Run `watch()` callbacks without a directive scope. A callback passed to `watch()` no longer inherits the scope of the action or callback that called `watch()`, so `getContext()` and `getElement()` throw inside it, as they already did when `watch()` was called outside any scope. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+### Internal
+
+-   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+
+## 6.56.0 (2026-09-23)
+
+## 6.55.0 (2026-09-10)
+
+## 6.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project, replacing `tsconfig.test.json`. ([#81509](https://github.com/WordPress/gutenberg/pull/81509))
+
+## 6.53.0 (2026-08-12)
+
+## 6.52.0 (2026-07-29)
+
+## 6.51.0 (2026-07-14)
+
+## 6.50.0 (2026-07-01)
+
+## 6.49.0 (2026-06-24)
+
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
+## 6.47.0 (2026-05-27)
+
+## 6.46.0 (2026-05-14)
+
+## 6.45.0 (2026-04-29)
+
+## 6.44.0 (2026-04-15)
+
+## 6.43.0 (2026-04-01)
+
+## 6.42.0 (2026-03-18)
+
+### Bug Fixes
+
+-   Fix `sessionId` generation crashing in non-secure (non-HTTPS) contexts. ([#76151](https://github.com/WordPress/gutenberg/pull/76151))
+-   Add `initialVdomPromise` synchronization promise to ensure the router waits for hydration to complete before initializing, fixing dead DOM on Safari and Firefox. ([#76053](https://github.com/WordPress/gutenberg/pull/76053))
+-   Fix unexpected full page reload on anchor links. ([#76520](https://github.com/WordPress/gutenberg/pull/76520))
+
+## 6.41.0 (2026-03-04)
+
+## 6.40.0 (2026-02-18)
+
+### New Features
+
+-   Export `watch()` function for subscribing to signal changes outside of directives. ([#75563](https://github.com/WordPress/gutenberg/pull/75563))
+
+## 6.39.0 (2026-01-29)
+
+## 6.38.0 (2026-01-16)
+
+### Bug Fixes
+
+-   Preserve boolean HTML attributes during client-side navigation. ([#74446](https://github.com/WordPress/gutenberg/pull/74446))
+-   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
+-   Update deprecation warning for unique ID format. ([#74580](https://github.com/WordPress/gutenberg/pull/74580))
+
+## 6.36.0 (2025-11-26)
+
+### Bug Fixes
+
+-   Return a deep-clone object from `getServerState` and `getServerContext` functions. ([#73437](https://github.com/WordPress/gutenberg/pull/73437))
+-   Fix using `getServerContext` in derived state getters. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
+
+## 6.35.0 (2025-11-12)
+
+## 6.34.0 (2025-10-29)
+
+### Bug Fixes
+
+-   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
+
+## 6.33.0 (2025-10-17)
+
+### Enhancements
+
+-   Add official support for unique IDs. ([#72161](https://github.com/WordPress/gutenberg/pull/72161))
+
+### Bug Fixes
+
+-   Change ordering of multiple `data-wp-context` directives in iAPI processing. ([#72395](https://github.com/WordPress/gutenberg/pull/72395))
+-   Handle client-server state synchronization scenarios for `getServerContext` and `getServerState`. ([#72381](https://github.com/WordPress/gutenberg/pull/72381))
+
+## 6.32.0 (2025-10-01)
+
+-   Update router regions inside elements with `data-wp-interactive`. ([#71635](https://github.com/WordPress/gutenberg/pull/71635))
+-   Fix nested `data-wp-each` directives using the same items key. ([#71870](https://github.com/WordPress/gutenberg/pull/71870))
+
+## 6.31.0 (2025-09-17)
+
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+### Deprecations
+
+-   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))
+    It is deprecated as of WordPress 6.9 and will be removed in version 7.0.
+
+### Bug Fixes
+
+-   Make state getters to be updated asynchronously with `store()`. ([#70974](https://github.com/WordPress/gutenberg/pull/70974))
+
+## 6.27.0 (2025-07-23)
+
+## 6.26.0 (2025-06-25)
+
+## 6.25.0 (2025-06-04)
+
+### Bug Fixes
+
+-   Fix `store()` types to support typing it without passing a store part. ([#70296](https://github.com/WordPress/gutenberg/pull/70296))
+-   Fix captured errors in `withScope` for passed generators. ([#70303](https://github.com/WordPress/gutenberg/pull/70303))
+-   Fix parsing of HTML comments without siblings. ([#70304](https://github.com/WordPress/gutenberg/pull/70304))
+
 ## 6.24.0 (2025-05-22)
 
 ## 6.23.0 (2025-05-07)
@@ -109,7 +262,7 @@
 
 ### Enhancements
 
--   Export `splitTask` function from `@wordpress/interactivity` package to facilitate yielding to the main thread. See example in [async actions](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/interactivity-api/api-reference.md#async-actions) documentation. ([#62665](https://github.com/WordPress/gutenberg/pull/62665))
+-   Export `splitTask` function from `@wordpress/interactivity` package to facilitate yielding to the main thread. See example in [async actions](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/interactivity-api/directives-and-store.md#async-actions) documentation. ([#62665](https://github.com/WordPress/gutenberg/pull/62665))
 
 ## 6.1.0 (2024-06-15)
 

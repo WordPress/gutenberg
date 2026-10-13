@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useReducedMotion } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Snackbar from '.';
 import {
 	__unstableMotion as motion,
@@ -66,7 +55,7 @@ export function SnackbarList( {
 	children,
 	onRemove,
 }: WordPressComponentProps< SnackbarListProps, 'div' > ) {
-	const listRef = useRef< HTMLDivElement | null >( null );
+	const listRef = useRef< HTMLDivElement >( null );
 	const isReducedMotion = useReducedMotion();
 	className = clsx( 'components-snackbar-list', className );
 	const removeNotice =
@@ -86,7 +75,12 @@ export function SnackbarList( {
 
 					return (
 						<motion.div
-							layout={ ! isReducedMotion } // See https://www.framer.com/docs/animation/#layout-animations
+							layout={ isReducedMotion ? false : 'position' } // See https://www.framer.com/docs/animation/#layout-animations
+							// Ensures a stable full-width bounding box so that
+							// `layout="position"` only ever detects vertical
+							// shifts, preventing horizontal animation when
+							// notice text changes in place.
+							style={ { width: '100%' } }
 							initial="init"
 							animate="open"
 							exit="exit"

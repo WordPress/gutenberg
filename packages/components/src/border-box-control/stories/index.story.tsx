@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { BorderBoxControl } from '../';
 
 const meta: Meta< typeof BorderBoxControl > = {
-	title: 'Components/BorderBoxControl',
+	id: 'components-borderboxcontrol',
+	title: 'Components/@wordpress-components/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
@@ -25,6 +15,10 @@ const meta: Meta< typeof BorderBoxControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;
@@ -65,12 +59,13 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 					borderBottom: 'none',
 				} }
 			/>
-			<p style={ { color: '#aaa', fontSize: '0.9em' } }>
+			<p style={ { color: '#6c6c6c', fontSize: '0.9em' } }>
 				The BorderBoxControl is intended to be used within a component
 				that will provide reset controls. The button below is only for
 				convenience.
 			</p>
 			<Button
+				__next40pxDefaultSize
 				variant="primary"
 				onClick={ () => onChangeMerged( undefined ) }
 			>
@@ -84,5 +79,14 @@ Default.args = {
 	colors,
 	label: 'Borders',
 	enableStyle: true,
-	__next40pxDefaultSize: true,
+};
+
+/**
+ * With no visible label there is no label row for the linked/unlinked toggle to
+ * join, so it is rendered alongside the border inputs instead.
+ */
+export const WithoutLabel = Template.bind( {} );
+WithoutLabel.args = {
+	...Default.args,
+	label: undefined,
 };

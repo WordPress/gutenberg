@@ -1,0 +1,7 @@
+
+@use "@wordpress/base-styles/z-index" as *;
+
+// Use a lower z-index for the popover when a modal is open to prevent it appearing atop the modal.
+.modal-open .block-editor-inspector-list-view-content-popover {
+	z-index: z-index(".components-popover.block-editor-media-replace-flow__options");
+}

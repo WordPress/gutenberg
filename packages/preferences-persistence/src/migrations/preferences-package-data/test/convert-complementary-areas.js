@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import convertComplementaryAreas from '../convert-complementary-areas';
 
 describe( 'convertComplementaryAreas', () => {
@@ -32,5 +30,15 @@ describe( 'convertComplementaryAreas', () => {
 		};
 
 		expect( convertComplementaryAreas( input ) ).toEqual( expectedOutput );
+	} );
+
+	it( 'does not mutate its input', () => {
+		const input = {
+			'core/edit-post': { complementaryArea: 'edit-post/block' },
+		};
+		const snapshot = structuredClone( input );
+
+		convertComplementaryAreas( input );
+		expect( input ).toEqual( snapshot );
 	} );
 } );

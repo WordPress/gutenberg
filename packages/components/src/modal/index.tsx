@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	createPortal,
 	useCallback,
@@ -14,7 +7,6 @@ import {
 	useState,
 	forwardRef,
 	useLayoutEffect,
-	createContext,
 	useContext,
 } from '@wordpress/element';
 import {
@@ -23,27 +15,19 @@ import {
 	useFocusOnMount,
 	useConstrainedTabbing,
 	useMergeRefs,
+	useRefEffect,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
-import { getScrollContainer } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
+import { focus, getScrollContainer } from '@wordpress/dom';
+import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
 import type { ModalProps } from './types';
-import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
 import { useModalExitAnimation } from './use-modal-exit-animation';
-
-// Used to track and dismiss the prior modal when another opens unless nested.
-type Dismissers = Set<
-	React.RefObject< ModalProps[ 'onRequestClose' ] | undefined >
->;
-const ModalContext = createContext< Dismissers >( new Set() );
+import { ModalContext, type Dismissers } from './context';
 
 // Used to track body class names applied while modals are open.
 const bodyOpenClasses = new Map< string, number >();
@@ -80,28 +64,45 @@ function UnforwardedModal(
 		__experimentalHideHeader = false,
 	} = props;
 
-	const ref = useRef< HTMLDivElement >();
+	const ref = useRef< HTMLDivElement >( null );
 
 	const instanceId = useInstanceId( Modal );
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
 
-	// The focus hook does not support 'firstContentElement' but this is a valid
-	// value for the Modal's focusOnMount prop. The following code ensures the focus
-	// hook will focus the first focusable node within the element to which it is applied.
-	// When `firstContentElement` is passed as the value of the focusOnMount prop,
-	// the focus hook is applied to the Modal's content element.
-	// Otherwise, the focus hook is applied to the Modal's ref. This ensures that the
-	// focus hook will focus the first element in the Modal's **content** when
-	// `firstContentElement` is passed.
+	const shouldFocusContent = focusOnMount === 'firstContentElement';
 	const focusOnMountRef = useFocusOnMount(
-		focusOnMount === 'firstContentElement' ? 'firstElement' : focusOnMount
+		shouldFocusContent ? false : focusOnMount
 	);
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusReturnRef = useFocusReturn();
 	const contentRef = useRef< HTMLDivElement >( null );
 	const childrenContainerRef = useRef< HTMLDivElement >( null );
+	const focusContentRef = useRefEffect< HTMLDivElement >(
+		( node ) => {
+			if (
+				! shouldFocusContent ||
+				node.contains( node.ownerDocument.activeElement )
+			) {
+				return;
+			}
+
+			// Match useFocusOnMount's deferred focus so child effects can finish first.
+			const timerId = setTimeout( () => {
+				const childrenContainer = childrenContainerRef.current;
+				const target =
+					( childrenContainer &&
+						focus.tabbable.find( childrenContainer )[ 0 ] ) ||
+					focus.tabbable.find( node )[ 0 ] ||
+					node;
+				target.focus( { preventScroll: true } );
+			}, 0 );
+
+			return () => clearTimeout( timerId );
+		},
+		[ shouldFocusContent ]
+	);
 
 	const [ hasScrolledContent, setHasScrolledContent ] = useState( false );
 	const [ hasScrollableContent, setHasScrollableContent ] = useState( false );
@@ -130,12 +131,13 @@ function UnforwardedModal(
 
 	// Accessibly isolates/unisolates the modal.
 	useEffect( () => {
-		ariaHelper.modalize( ref.current );
+		ariaHelper.modalize( ref.current! );
 		return () => ariaHelper.unmodalize();
 	}, [] );
 
 	// Keeps a fresh ref for the subsequent effect.
-	const onRequestCloseRef = useRef< ModalProps[ 'onRequestClose' ] >();
+	const onRequestCloseRef =
+		useRef< ModalProps[ 'onRequestClose' ] >( undefined );
 	useEffect( () => {
 		onRequestCloseRef.current = onRequestClose;
 	}, [ onRequestClose ] );
@@ -184,8 +186,7 @@ function UnforwardedModal(
 		};
 	}, [ bodyOpenClassName ] );
 
-	const { closeModal, frameRef, frameStyle, overlayClassname } =
-		useModalExitAnimation();
+	const { closeModal, frameRef, overlayClassname } = useModalExitAnimation();
 
 	// Calls the isContentScrollable callback when the Modal children container resizes.
 	useLayoutEffect( () => {
@@ -212,6 +213,7 @@ function UnforwardedModal(
 			! event.defaultPrevented
 		) {
 			event.preventDefault();
+			event.stopPropagation();
 			closeModal().then( () => onRequestClose( event ) );
 		}
 	}
@@ -275,17 +277,12 @@ function UnforwardedModal(
 						sizeClass,
 						className
 					) }
-					style={ {
-						...frameStyle,
-						...style,
-					} }
+					style={ style }
 					ref={ useMergeRefs( [
 						frameRef,
 						constrainedTabbingRef,
 						focusReturnRef,
-						focusOnMount !== 'firstContentElement'
-							? focusOnMountRef
-							: null,
+						shouldFocusContent ? focusContentRef : focusOnMountRef,
 					] ) }
 					role={ role }
 					aria-label={ contentLabel }
@@ -358,12 +355,8 @@ function UnforwardedModal(
 						) }
 
 						<div
-							ref={ useMergeRefs( [
-								childrenContainerRef,
-								focusOnMount === 'firstContentElement'
-									? focusOnMountRef
-									: null,
-							] ) }
+							ref={ childrenContainerRef }
+							className="components-modal__children-container"
 						>
 							{ children }
 						</div>
@@ -413,5 +406,6 @@ function UnforwardedModal(
  * ```
  */
 export const Modal = forwardRef( UnforwardedModal );
+Modal.displayName = 'Modal';
 
 export default Modal;

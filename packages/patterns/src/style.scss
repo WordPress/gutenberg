@@ -1,1 +1,2 @@
-@import "./components/style.scss";
+@use "@wordpress/base-styles/default-custom-properties";
+@use "./components/style.scss" as *;

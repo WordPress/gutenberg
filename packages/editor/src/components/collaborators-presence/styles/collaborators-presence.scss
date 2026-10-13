@@ -1,0 +1,34 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-collaborators-presence {
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+	height: $button-size-compact;
+	background: $gray-100;
+	border-radius: $grid-unit-05;
+
+	&:hover,
+	&:has(.is-pressed) {
+		background-color: $gray-200;
+	}
+}
+
+.editor-header__center .editor-collaborators-presence {
+	margin-right: $grid-unit-10;
+}
+
+.editor-collaborators-presence__button.editor-collaborators-presence__button {
+	position: relative;
+	padding: $grid-unit-05;
+
+	// Override button's default rest, hover & pressed state - let the container handle the background
+	&,
+	&:hover,
+	&.is-pressed,
+	&.is-pressed:hover {
+		background: transparent;
+		color: $gray-800;
+	}
+}

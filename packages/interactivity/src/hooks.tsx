@@ -1,29 +1,24 @@
-// eslint-disable-next-line eslint-comments/disable-enable-pair
+// eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
-
-/**
- * External dependencies
- */
 import {
 	h as createElement,
 	options,
 	createContext,
 	cloneElement,
 	type ComponentChildren,
+	type VNode,
+	type Context,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-import type { VNode, Context } from 'preact';
-
-/**
- * Internal dependencies
- */
 import { store, stores, universalUnlock } from './store';
-import { warn } from './utils';
+import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
+import { PENDING_GETTER } from './proxies/state';
 export interface DirectiveEntry {
 	value: string | object;
 	namespace: string;
 	suffix: string | null;
+	uniqueId: string | null;
 }
 
 export interface NonDefaultSuffixDirectiveEntry extends DirectiveEntry {
@@ -64,6 +59,7 @@ interface DirectiveArgs {
 		class?: string;
 		style?: string | Record< string, string | number >;
 		content?: ComponentChildren;
+		dangerouslySetInnerHTML?: { __html: string };
 	} >;
 	/**
 	 * The inherited context.
@@ -91,7 +87,7 @@ interface DirectiveOptions {
 }
 
 export interface Evaluate {
-	( entry: DirectiveEntry, ...args: any[] ): any;
+	( entry: DirectiveEntry ): any;
 }
 
 interface GetEvaluate {
@@ -120,7 +116,7 @@ const directiveCallbacks: Record< string, DirectiveCallback > = {};
 const directivePriorities: Record< string, number > = {};
 
 /**
- * Register a new directive type in the Interactivity API runtime.
+ * Registers a new directive type in the Interactivity API runtime.
  *
  * @example
  * ```js
@@ -222,17 +218,27 @@ const resolve = ( path: string, namespace: string ) => {
 		...resolvedStore,
 		context: getScope().context[ namespace ],
 	};
+
 	try {
-		// TODO: Support lazy/dynamically initialized stores
-		return path.split( '.' ).reduce( ( acc, key ) => acc[ key ], current );
-	} catch ( e ) {}
+		const pathParts = path.split( '.' );
+		return pathParts.reduce( ( acc, key ) => acc[ key ], current );
+	} catch ( e ) {
+		if ( e === PENDING_GETTER ) {
+			return PENDING_GETTER;
+		}
+	}
 };
 
-// Generate the evaluate function.
+/**
+ * Creates an evaluator bound to a directive scope.
+ *
+ * @param args       Arguments used to bind the evaluator to a scope.
+ * @param args.scope Scope used to resolve directive values.
+ * @return An evaluator for directive entries.
+ */
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
-	// TODO: When removing the temporarily remaining `value( ...args )` call below, remove the `...args` parameter too.
-	( entry, ...args ) => {
+	( entry ) => {
 		let { value: path, namespace } = entry;
 		if ( typeof path !== 'string' ) {
 			throw new Error( 'The `value` prop should be a string path' );
@@ -244,29 +250,33 @@ export const getEvaluate: GetEvaluate =
 		const value = resolve( path, namespace );
 		// Functions are returned without invoking them.
 		if ( typeof value === 'function' ) {
-			// Except if they have a negation operator present, for backward compatibility.
-			// This pattern is strongly discouraged and deprecated, and it will be removed in a near future release.
-			// TODO: Remove this condition to effectively ignore negation operator when provided with a function.
 			if ( hasNegationOperator ) {
 				warn(
-					'Using a function with a negation operator is deprecated and will stop working in WordPress 6.9. Please use derived state instead.'
+					`The value of "${ path }" is a function and cannot be negated. Please use derived state instead.`
 				);
-				const functionResult = ! value( ...args );
 				resetScope();
-				return functionResult;
+				return undefined;
 			}
 			// Reset scope before return and wrap the function so it will still run within the correct scope.
 			resetScope();
-			return ( ...functionArgs: any[] ) => {
+			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
 				setScope( scope );
 				const functionResult = value( ...functionArgs );
 				resetScope();
 				return functionResult;
 			};
+			// Preserve the sync property from the original function
+			if ( value.sync ) {
+				const syncAwareFunction = wrappedFunction as SyncAwareFunction;
+				syncAwareFunction.sync = true;
+			}
+			return wrappedFunction;
 		}
 		const result = value;
 		resetScope();
-		return hasNegationOperator ? ! result : result;
+		return hasNegationOperator && value !== PENDING_GETTER
+			? ! result
+			: result;
 	};
 
 // Separate directives by priority. The resulting array contains objects
@@ -321,7 +331,7 @@ const Directives = ( {
 					element,
 					originalProps,
 					previousScope: scope,
-			  } )
+				} )
 			: element;
 
 	const props = { ...originalProps, children };

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const COLUMNS_BLOCK = [
@@ -45,7 +42,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.insertBlock( { name: 'core/columns' } );
 		await editor.canvas
-			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.locator( 'role=button[name="Three columns; equal split"i]' )
 			.click();
 
 		// Open the block inserter.
@@ -53,7 +50,10 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Add a paragraph in the first column.
-		const paragraph = page.getByRole( 'option', { name: 'Paragraph' } );
+		const paragraph = page.getByRole( 'option', {
+			name: 'Paragraph',
+			exact: true,
+		} );
 		await expect( paragraph ).toBeVisible();
 		await paragraph.click();
 		await page.keyboard.type( 'First column' );
@@ -69,10 +69,6 @@ test.describe( 'Navigating the block hierarchy', () => {
 			.getByRole( 'gridcell', { name: 'Columns', exact: true } )
 			.click();
 
-		// Tweak the columns count.
-		await page.getByRole( 'spinbutton', { name: 'Columns' } ).fill( '3' );
-
-		// Wait for the new column block to appear in the list view
 		const column = listView.getByRole( 'gridcell', {
 			name: 'Column',
 			exact: true,
@@ -80,6 +76,9 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await expect( column ).toHaveCount( 3 );
 
 		await column.last().click();
+
+		// Activate the block to transfer focus to the canvas.
+		await page.keyboard.press( 'Enter' );
 
 		// Open the block inserter.
 		await page.keyboard.press( 'ArrowDown' );
@@ -100,7 +99,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.insertBlock( { name: 'core/columns' } );
 		await editor.canvas
-			.locator( 'role=button[name="Two columns; equal split"i]' )
+			.locator( 'role=button[name="Three columns; equal split"i]' )
 			.click();
 
 		// Open the block inserter.
@@ -108,7 +107,10 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Add a paragraph in the first column.
-		const paragraph = page.getByRole( 'option', { name: 'Paragraph' } );
+		const paragraph = page.getByRole( 'option', {
+			name: 'Paragraph',
+			exact: true,
+		} );
 		await expect( paragraph ).toBeVisible();
 		await paragraph.click();
 		await page.keyboard.type( 'First column' );
@@ -118,6 +120,12 @@ test.describe( 'Navigating the block hierarchy', () => {
 			name: 'Block navigation structure',
 		} );
 		await expect( listView ).toBeVisible();
+		await expect(
+			listView.getByRole( 'link', {
+				name: 'Paragraph',
+				exact: true,
+			} )
+		).toBeFocused();
 
 		// Navigate to the columns blocks using the keyboard.
 		await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
@@ -126,12 +134,14 @@ test.describe( 'Navigating the block hierarchy', () => {
 		// Move focus to the sidebar area.
 		await pageUtils.pressKeys( 'ctrl+`' );
 
-		// Navigate to the block settings sidebar and tweak the column count.
+		// Navigate to the block settings sidebar.
+		const stackOnMobile = page.getByRole( 'checkbox', {
+			name: 'Stack on mobile',
+		} );
+		// Ensure the block is selected and its settings are visible in the inspector.
+		await expect( stackOnMobile ).toBeVisible();
 		await pageUtils.pressKeys( 'Tab', { times: 5 } );
-		await expect(
-			page.getByRole( 'slider', { name: 'Columns' } )
-		).toBeFocused();
-		await page.keyboard.press( 'ArrowRight' );
+		await expect( stackOnMobile ).toBeFocused();
 
 		// Navigate to the third column in the columns block via List View.
 		await pageUtils.pressKeys( 'ctrlShift+`', { times: 2 } );
@@ -156,7 +166,7 @@ test.describe( 'Navigating the block hierarchy', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'You say goodbye' );
 		await page.keyboard.press( 'Enter' );
@@ -204,12 +214,18 @@ test.describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Enter' );
 
 		// Add some random blocks.
-		const paragraph = page.getByRole( 'option', { name: 'Paragraph' } );
+		const paragraph = page.getByRole( 'option', {
+			name: 'Paragraph',
+			exact: true,
+		} );
 		await expect( paragraph ).toBeVisible();
 		await paragraph.click();
 		await page.keyboard.type( 'just a paragraph' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '/spacer' );
+		await expect(
+			page.getByRole( 'option', { name: 'Spacer', selected: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 
 		// Verify group block contents.
@@ -235,11 +251,15 @@ test.describe( 'Navigating the block hierarchy', () => {
 
 		// Open list view and return to the first block.
 		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
 		await expect(
-			page.getByRole( 'treegrid', {
-				name: 'Block navigation structure',
+			listView.getByRole( 'link', {
+				name: 'Group',
+				exact: true,
 			} )
-		).toBeVisible();
+		).toBeFocused();
 		await page.keyboard.press( 'Enter' );
 
 		await expect(

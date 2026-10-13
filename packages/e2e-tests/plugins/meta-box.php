@@ -12,6 +12,8 @@
  */
 function gutenberg_test_meta_box_render_meta_box() {
 	echo 'Hello World';
+	echo '<label for="gutenberg_test_meta_box_input">Test meta box field</label>';
+	echo '<input type="text" id="gutenberg_test_meta_box_input" name="gutenberg_test_meta_box_input" />';
 }
 
 /**
@@ -31,6 +33,7 @@ add_action( 'add_meta_boxes', 'gutenberg_test_meta_box_add_meta_box' );
 
 /**
  * Print excerpt in <meta> tag in wp_head
+ * @global WP_Post $post Global post object.
  */
 function gutenberg_test_meta_box_render_head() {
 	global $post;

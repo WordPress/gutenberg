@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { Controller, easings } from '@react-spring/web';
-
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 
 function getAbsolutePosition( element ) {

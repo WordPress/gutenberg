@@ -1,7 +1,9 @@
-/**
- * Internal dependencies
- */
-import { appendSelectors, getBlockGapCSS } from '../utils';
+import { describe, expect, it } from 'vitest';
+import {
+	appendSelectors,
+	getBlockGapCSS,
+	normalizeLegacyLayout,
+} from '../utils';
 
 const layoutDefinitions = {
 	default: {
@@ -127,5 +129,48 @@ describe( 'appendSelectors', () => {
 		expect(
 			appendSelectors( '.first-selector,.second-selector', '.appended' )
 		).toBe( '.first-selector .appended,.second-selector .appended' );
+	} );
+} );
+
+describe( 'normalizeLegacyLayout', () => {
+	it( 'should promote a layout using the legacy inherit flag to constrained', () => {
+		expect( normalizeLegacyLayout( { inherit: true } ) ).toEqual( {
+			inherit: true,
+			type: 'constrained',
+		} );
+	} );
+
+	it( 'should promote a layout with only a content size to constrained', () => {
+		expect( normalizeLegacyLayout( { contentSize: '600px' } ) ).toEqual( {
+			contentSize: '600px',
+			type: 'constrained',
+		} );
+	} );
+
+	it( 'should promote a layout with only a wide size to constrained', () => {
+		expect( normalizeLegacyLayout( { wideSize: '1200px' } ) ).toEqual( {
+			wideSize: '1200px',
+			type: 'constrained',
+		} );
+	} );
+
+	it( 'should return a typed layout unchanged', () => {
+		const layout = { type: 'flex', orientation: 'vertical' };
+
+		expect( normalizeLegacyLayout( layout ) ).toBe( layout );
+	} );
+
+	it( 'should return an explicitly flow layout unchanged', () => {
+		const layout = { type: 'default' };
+
+		expect( normalizeLegacyLayout( layout ) ).toBe( layout );
+	} );
+
+	it( 'should return an empty or missing layout unchanged', () => {
+		const layout = {};
+
+		expect( normalizeLegacyLayout( layout ) ).toBe( layout );
+		expect( normalizeLegacyLayout( null ) ).toBeNull();
+		expect( normalizeLegacyLayout( undefined ) ).toBeUndefined();
 	} );
 } );

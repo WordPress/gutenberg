@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { RgbInput } from './rgb-input';
 import { HslInput } from './hsl-input';
 import { HexInput } from './hex-input';
@@ -9,17 +6,36 @@ import type { ColorInputProps } from './types';
 export const ColorInput = ( {
 	colorType,
 	color,
+	hsla,
 	onChange,
+	onHSLChange,
 	enableAlpha,
 }: ColorInputProps ) => {
-	const props = { color, onChange, enableAlpha };
 	switch ( colorType ) {
 		case 'hsl':
-			return <HslInput { ...props } />;
+			return (
+				<HslInput
+					hsla={ hsla }
+					onChange={ onHSLChange }
+					enableAlpha={ enableAlpha }
+				/>
+			);
 		case 'rgb':
-			return <RgbInput { ...props } />;
+			return (
+				<RgbInput
+					color={ color }
+					onChange={ onChange }
+					enableAlpha={ enableAlpha }
+				/>
+			);
 		default:
 		case 'hex':
-			return <HexInput { ...props } />;
+			return (
+				<HexInput
+					color={ color }
+					onChange={ onChange }
+					enableAlpha={ enableAlpha }
+				/>
+			);
 	}
 };

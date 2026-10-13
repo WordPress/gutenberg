@@ -6,7 +6,11 @@
 			"content": "Text",
 			"level": 2,
 			"textColor": "accent",
-			"textAlign": "center"
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
 		},
 		"innerBlocks": []
 	}

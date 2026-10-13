@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it, test } from 'vitest';
 import {
 	filterUnitsWithSettings,
 	useCustomUnits,
@@ -56,7 +54,7 @@ describe( 'UnitControl utils', () => {
 			expect( unitsA ).not.toEqual( unitsB );
 		} );
 
-		it( 'should not mutate custon units argument definitons', () => {
+		it( 'should not mutate custom units argument definitions', () => {
 			const units = [
 				{ value: 'px', label: 'pixel' },
 				{ value: 'em', label: 'em' },

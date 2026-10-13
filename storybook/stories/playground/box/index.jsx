@@ -1,0 +1,35 @@
+import { useState } from '@wordpress/element';
+import {
+	BlockEditorProvider,
+	BlockCanvas,
+	BlockToolbar,
+} from '@wordpress/block-editor';
+import { contentStyles } from '../editor-styles';
+import styles from './style.module.css';
+
+export default function EditorBox( { direction = 'ltr' } ) {
+	const [ blocks, updateBlocks ] = useState( [] );
+
+	return (
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
+			className={ styles.root }
+			onKeyDown={ ( event ) => event.stopPropagation() }
+		>
+			<BlockEditorProvider
+				value={ blocks }
+				onInput={ updateBlocks }
+				onChange={ updateBlocks }
+				settings={ {
+					hasFixedToolbar: true,
+				} }
+			>
+				<BlockToolbar hideDragHandle />
+				<BlockCanvas
+					height="500px"
+					styles={ contentStyles[ direction ] }
+				/>
+			</BlockEditorProvider>
+		</div>
+	);
+}

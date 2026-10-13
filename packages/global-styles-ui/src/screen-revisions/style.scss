@@ -1,0 +1,64 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.global-styles-ui-screen-revisions {
+	display: flex;
+	flex-direction: column;
+	// Bound the picker so the layout scrolls internally and the footer
+	// stays pinned to the bottom of the sidebar.
+	flex-grow: 1;
+	min-height: 0;
+}
+
+.global-styles-ui-screen-revisions__actions {
+	// The picker footer spreads its parts, so on a single page of revisions —
+	// where the page select renders nothing — the action would sit at the
+	// start of the row. Keep it at the end whichever parts survive.
+	margin-inline-start: auto;
+}
+
+.global-styles-ui-screen-revisions__date {
+	text-transform: uppercase;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	font-size: 12px;
+}
+
+.global-styles-ui-screen-revisions__description {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: $grid-unit-10;
+}
+
+.global-styles-ui-screen-revisions__changes,
+.global-styles-ui-screen-revisions__meta {
+	// Dark enough to keep AA contrast over the selected row's tint.
+	color: $gray-800;
+	font-size: 12px;
+}
+
+.global-styles-ui-screen-revisions__meta {
+	display: flex;
+	justify-content: start;
+	width: 100%;
+	align-items: center;
+	text-align: left;
+
+	img {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		border-radius: 100%;
+		margin-right: $grid-unit-10;
+	}
+}
+
+.global-styles-ui-screen-revisions__changes {
+	text-align: left;
+	line-height: $default-line-height;
+	margin: 0 0 0 $grid-unit-15;
+	list-style: disc;
+
+	li {
+		margin-bottom: $grid-unit-05;
+	}
+}

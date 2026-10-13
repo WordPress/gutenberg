@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .block-editor-block-mover__move-button-container {
 	display: flex;
 	padding: 0;
@@ -8,7 +11,7 @@
 		.block-editor-block-mover:not(.is-horizontal) & {
 			flex-direction: column;
 
-			> * {
+			> .block-editor-block-mover-button {
 				height: $block-toolbar-height * 0.5 - $grid-unit-05;
 				width: 100%;
 				min-width: 0 !important; // overrides default button width.
@@ -33,7 +36,7 @@
 		.block-editor-block-mover.is-horizontal & {
 			width: $block-toolbar-height;
 
-			> * {
+			> .block-editor-block-mover-button {
 				width: $block-toolbar-height * 0.5;
 				min-width: 0 !important; // overrides default button width.
 				overflow: hidden;
@@ -92,18 +95,5 @@
 			animation: components-button__appear-animation 0.1s ease;
 			animation-fill-mode: forwards;
 		}
-	}
-
-	// Don't show the focus inherited by the Button component.
-	&:focus,
-	&:focus:enabled,
-	// Override focus styles from the block toolbar
-	&:focus::before {
-		box-shadow: none;
-		outline: none;
-	}
-
-	&:focus-visible::before {
-		@include block-toolbar-button-style__focus();
 	}
 }

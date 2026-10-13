@@ -1,0 +1,49 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.badge {
+			padding-inline: var(--wpds-dimension-padding-sm);
+			padding-block: var(--wpds-dimension-padding-xs);
+			border-radius: var(--wpds-border-radius-lg);
+		}
+
+		.is-high-intent {
+			background-color: var(--wpds-color-background-surface-error);
+			color: var(--wpds-color-foreground-content-error);
+		}
+
+		.is-medium-intent {
+			background-color: var(--wpds-color-background-surface-warning);
+			color: var(--wpds-color-foreground-content-warning);
+		}
+
+		.is-low-intent {
+			background-color: var(--wpds-color-background-surface-caution);
+			color: var(--wpds-color-foreground-content-caution);
+		}
+
+		.is-stable-intent {
+			background-color: var(--wpds-color-background-surface-success);
+			color: var(--wpds-color-foreground-content-success);
+		}
+
+		.is-informational-intent {
+			background-color: var(--wpds-color-background-surface-info);
+			color: var(--wpds-color-foreground-content-info);
+		}
+
+		.is-draft-intent {
+			background-color: var(--wpds-color-background-surface-neutral-weak);
+			color: var(--wpds-color-foreground-content-neutral);
+		}
+
+		.is-none-intent {
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+			color: var(--wpds-color-foreground-content-neutral);
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			padding-block: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
+			padding-inline: calc(var(--wpds-dimension-padding-sm) - var(--wpds-border-width-xs));
+		}
+	}
+}
