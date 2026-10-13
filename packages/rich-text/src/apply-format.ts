@@ -32,9 +32,25 @@ export function applyFormat(
 	format: RichTextFormat,
 	startIndex = value.start,
 	endIndex = value.end
-) {
+): RichTextValue {
 	const { formats, activeFormats } = value;
 	const newFormats = formats.slice();
+	// Always revise active formats. This serves as a placeholder for new
+	// inputs with the format so new input appears with the format applied,
+	// and ensures a format of the same type uses the latest values.
+	const newActiveFormats = [
+		...( activeFormats?.filter( ( { type } ) => type !== format.type ) ||
+			[] ),
+		format,
+	];
+
+	if ( startIndex === undefined || endIndex === undefined ) {
+		return normaliseFormats( {
+			...value,
+			formats: newFormats,
+			activeFormats: newActiveFormats,
+		} );
+	}
 
 	// The selection is collapsed.
 	if ( startIndex === endIndex ) {
@@ -102,14 +118,6 @@ export function applyFormat(
 	return normaliseFormats( {
 		...value,
 		formats: newFormats,
-		// Always revise active formats. This serves as a placeholder for new
-		// inputs with the format so new input appears with the format applied,
-		// and ensures a format of the same type uses the latest values.
-		activeFormats: [
-			...( activeFormats?.filter(
-				( { type } ) => type !== format.type
-			) || [] ),
-			format,
-		],
+		activeFormats: newActiveFormats,
 	} );
 }

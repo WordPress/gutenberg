@@ -183,7 +183,7 @@ export function getEntityFields( state, ...args ) {
 }
 
 /**
- * Similar to getBlocksByName in @wordpress/block-editor, but only returns the top-most
+ * Similar to getBlocksByName in `@wordpress/block-editor`, but only returns the top-most
  * blocks that aren't descendants of the query block.
  *
  * @param {Object}       state      Global application state.

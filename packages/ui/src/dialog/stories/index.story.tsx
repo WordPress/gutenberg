@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useId, useState } from '@wordpress/element';
 import type { ComponentProps } from 'react';
 import { Stack } from '../../stack';
+import { Button } from '../../button';
 import { VisuallyHidden } from '../../visually-hidden';
 import * as Dialog from '../index';
 
@@ -67,7 +68,14 @@ export const _Default: Story = {
 	},
 };
 
-const ALL_SIZES = [ 'small', 'medium', 'large', 'stretch', 'full' ] as const;
+const ALL_SIZES = [
+	'small',
+	'medium',
+	'large',
+	'stretch',
+	'full',
+	'auto',
+] as const;
 
 function SizeSelector( {
 	value,
@@ -136,6 +144,44 @@ function SizePlaygroundContent() {
 export const AllSizes: Story = {
 	args: {
 		children: <SizePlaygroundContent />,
+	},
+};
+
+function AutoSizeContent() {
+	const widths = [ 200, 450, 750, 1600 ];
+	const [ index, setIndex ] = useState( 0 );
+	return (
+		<>
+			<Dialog.Trigger>Open content-sized dialog</Dialog.Trigger>
+			<Dialog.Popup size="auto">
+				<Dialog.Header>
+					<Dialog.Title>Content width</Dialog.Title>
+					<Dialog.CloseIconButton />
+				</Dialog.Header>
+				<Dialog.Content>
+					<div style={ { width: widths[ index ], maxWidth: '100%' } }>
+						<p>Content width: { widths[ index ] }px</p>
+						<Button
+							onClick={ () =>
+								setIndex( ( index + 1 ) % widths.length )
+							}
+						>
+							Next content width
+						</Button>
+					</div>
+				</Dialog.Content>
+			</Dialog.Popup>
+		</>
+	);
+}
+
+/**
+ * Fits changing content widths while retaining the responsive minimum and
+ * viewport inset. Wide content must also be constrained to the content area.
+ */
+export const AutoSize: Story = {
+	args: {
+		children: <AutoSizeContent />,
 	},
 };
 

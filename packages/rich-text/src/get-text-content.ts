@@ -10,5 +10,5 @@ import type { RichTextValue } from './types';
  * @return {string} The text content.
  */
 export function getTextContent( { text }: Pick< RichTextValue, 'text' > ) {
-	return text.replace( OBJECT_REPLACEMENT_CHARACTER, '' );
+	return text.replaceAll( OBJECT_REPLACEMENT_CHARACTER, '' );
 }

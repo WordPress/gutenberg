@@ -32,6 +32,7 @@ import { Heading } from '../heading';
 import { View } from '../view';
 import InputControl from '../input-control';
 import ColorIndicator from '../color-indicator';
+import { VisuallyHidden } from '../visually-hidden';
 import styles from './style.module.scss';
 import { DEFAULT_GRADIENT } from '../custom-gradient-picker/constants';
 import CustomGradientPicker from '../custom-gradient-picker';
@@ -315,6 +316,16 @@ function ColorPickerPopover< T extends PaletteElement >( {
 	popoverProps: receivedPopoverProps,
 	onClose = () => {},
 }: ColorPickerPopoverProps< T > ) {
+	const dismissButton = (
+		<VisuallyHidden
+			as="button"
+			type="button"
+			tabIndex={ -1 }
+			onClick={ onClose }
+		>
+			{ __( 'Close' ) }
+		</VisuallyHidden>
+	);
 	const popoverProps: ColorPickerPopoverProps< T >[ 'popoverProps' ] =
 		useMemo(
 			() => ( {
@@ -335,7 +346,21 @@ function ColorPickerPopover< T extends PaletteElement >( {
 		);
 
 	return (
-		<Popover { ...popoverProps } onClose={ onClose }>
+		<Popover
+			role="dialog"
+			aria-label={ sprintf(
+				// translators: %s is a color, gradient or duotone name, e.g. "Red".
+				__( 'Edit: %s' ),
+				element.name.trim().length
+					? element.name
+					: getElementValue( element, variant ) || ''
+			) }
+			{ ...popoverProps }
+			onClose={ onClose }
+		>
+			{ /* Screen reader users can dismiss from either end of the popup
+			     without adding a visible control or a keyboard Tab stop. */ }
+			{ dismissButton }
 			{ variant === 'color' && (
 				<ColorPicker
 					color={ element.color }
@@ -403,6 +428,7 @@ function ColorPickerPopover< T extends PaletteElement >( {
 					</VStack>
 				</div>
 			) }
+			{ dismissButton }
 		</Popover>
 	);
 }
