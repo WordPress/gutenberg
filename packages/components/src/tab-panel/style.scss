@@ -22,14 +22,10 @@
 	padding: 3px var(--wpds-dimension-padding-lg); // Use padding to offset the is-active border, this benefits Windows High Contrast mode
 	margin-left: 0;
 	font-weight: var(--wpds-typography-font-weight-default);
-	color: var(--wpds-color-foreground-interactive-neutral);
 
 	&[aria-selected="true"] {
 		cursor: default;
 
-		&:is(:hover, :active):not(:focus-visible) {
-			color: var(--wpds-color-foreground-interactive-neutral);
-		}
 	}
 
 	&:disabled,
@@ -37,16 +33,18 @@
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
-	&:not(:disabled, [aria-disabled="true"]):is(
-		:not([aria-selected="true"]):hover,
-		:not([aria-selected="true"]):active,
-		:focus-visible
-	) {
-		color: var(--wpds-color-foreground-interactive-neutral-active);
+	// Keep Button's hover color from overriding the resting tab color.
+	.components-tab-panel__tabs &:not(:disabled, [aria-disabled="true"]) {
+		color: var(--wpds-color-foreground-interactive-neutral);
 
-		&::before,
-		& .components-tab-panel__tabs-item-label::before {
-			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+		&:is(:hover, :active):not([aria-selected="true"]),
+		&:focus-visible {
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+
+			&::before,
+			& .components-tab-panel__tabs-item-label::before {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+			}
 		}
 	}
 
@@ -105,8 +103,6 @@
 	}
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
-		height: auto !important;
-		padding-block: calc((#{$grid-unit-60} - 1lh) / 2);
 		&::before {
 			content: none;
 		}
@@ -134,18 +130,41 @@
 		}
 
 		&::after {
-			inset-block: calc((#{$grid-unit-60} - 1lh) / 2);
+			inset-block-start: 50%;
+			inset-block-end: auto;
 			inset-inline: 0 auto;
 			width: 0;
-			height: auto;
+			height: var(--wpds-dimension-size-sm);
+			transform: translateY(-50%);
 
 			@media not (prefers-reduced-motion) {
 				transition-property: width;
 			}
 		}
 
-		&.is-active::after {
+		&:not(.has-icon)::after {
+			content: none;
+		}
+
+		& .components-tab-panel__tabs-item-label::after {
+			content: "";
+			position: absolute;
+			inset-block: 0;
+			inset-inline-start: calc(-1 * var(--wpds-dimension-padding-lg));
+			width: 0;
+			background: currentColor;
+			pointer-events: none;
+
+			@media not (prefers-reduced-motion) {
+				transition: width 0.1s linear;
+			}
+		}
+
+		&.is-active::after,
+		&.is-active .components-tab-panel__tabs-item-label::after {
 			width: var(--wpds-border-width-focus);
+			outline: 2px solid transparent;
+			outline-offset: -1px;
 		}
 	}
 }
