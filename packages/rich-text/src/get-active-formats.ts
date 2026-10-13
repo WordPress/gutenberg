@@ -14,7 +14,7 @@ export function getActiveFormats(
 	EMPTY_ACTIVE_FORMATS: RichTextFormatList = []
 ): RichTextFormatList {
 	const { formats, start, end, activeFormats } = value;
-	if ( start === undefined ) {
+	if ( start === undefined || end === undefined ) {
 		return EMPTY_ACTIVE_FORMATS;
 	}
 

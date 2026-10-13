@@ -60,7 +60,7 @@ function splitAtSelection(
 	startIndex = start,
 	endIndex = end
 ) {
-	if ( start === undefined || end === undefined ) {
+	if ( startIndex === undefined || endIndex === undefined ) {
 		return;
 	}
 

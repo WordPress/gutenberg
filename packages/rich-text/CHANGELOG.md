@@ -14,7 +14,7 @@
 ### Bug Fixes
 
 -   `getTextContent`: Remove every object replacement character from the returned text, not just the first one ([#81526](https://github.com/WordPress/gutenberg/pull/81526)).
--   Fix `replace` for a caret at `0` and patterns with named groups, `insert` without a selection, `registerFormatType` with `keywords: undefined`, `RichTextShortcut` and `RichTextInputEvent` outside a rich text field, and a `null` format selector result ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Fix `replace` for a caret at `0` and patterns with named groups, `insert` and `split` without a selection, `registerFormatType` with `keywords: undefined`, `RichTextShortcut` and `RichTextInputEvent` outside a rich text field, and a `null` format selector result ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
 
 ### Internal
 
