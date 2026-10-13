@@ -60,6 +60,7 @@ jobs:
     unit-php:
         name: PHP
         runs-on: ubuntu-latest
+        timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
