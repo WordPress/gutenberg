@@ -5,8 +5,9 @@
 
 $arrow-triangle-base-size: 14px;
 
-// Toolbar variant keeps an outside ring. The default surface uses a real border.
+$shadow-popover-border-default: 0 0 0 var(--wpds-border-width-xs) var(--wpds-color-stroke-surface-neutral);
 $shadow-popover-border-default-alternate: 0 0 0 $border-width $gray-900;
+$shadow-popover-border-top-only: 0 calc(var(--wpds-border-width-xs) * -1) 0 0 var(--wpds-color-stroke-surface-neutral);
 $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover {
@@ -25,16 +26,14 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 .components-popover__content {
 	background: var(--wpds-color-background-surface-neutral-strong);
-	border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-	// Elevation only. The stroke is the border above, matching Menu.
-	box-shadow: $elevation-medium;
+	// The stroke stays on the box-shadow, since consumers override it there.
+	box-shadow: $shadow-popover-border-default, $elevation-medium;
 	border-radius: var(--wpds-border-radius-md);
 	box-sizing: border-box;
 	width: min-content;
 
 	// Alternate treatment for popovers that put them at elevation zero with high contrast and smaller radius.
 	.is-alternate & {
-		border-width: 0;
 		box-shadow: $shadow-popover-border-default-alternate;
 		border-radius: $radius-small;
 	}
@@ -42,7 +41,6 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	// A style that gives the popover no visible ui.
 	.is-unstyled & {
 		background: none;
-		border: 0;
 		border-radius: 0;
 		box-shadow: none;
 	}
@@ -52,19 +50,16 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 		height: calc(100% - #{ $panel-header-height });
 		overflow-y: visible;
 		width: auto;
-		border-width: 0;
-		border-block-start: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-		box-shadow: none;
+		box-shadow: $shadow-popover-border-top-only;
 	}
 	.components-popover.is-expanded.is-alternate & {
-		border-width: 0;
 		box-shadow: $shadow-popover-border-top-only-alternate;
 	}
 
-	// Forced colors removes box-shadow, so the border is the only edge.
+	// Forced colors removes box-shadow. The transparent outline is drawn as the system text color instead.
 	@media (forced-colors: active) {
-		.components-popover:not(.is-alternate):not(.is-unstyled) & {
-			border-color: CanvasText;
+		.components-popover:not(.is-unstyled):not(.is-expanded) & {
+			outline: var(--wpds-border-width-xs) solid transparent;
 		}
 	}
 }
@@ -92,8 +87,9 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	pointer-events: none;
 	display: flex;
 
-	// Covers the inside border and the triangle's top stroke where the arrow
-	// meets the surface. Inset from the sides so the stroke still meets the border at the corners.
+	// Thin line that helps to make sure that the underlying
+	// popover__content's outline is fully overlapped by the
+	// arrow
 	&::before {
 		content: "";
 		position: absolute;
@@ -110,40 +106,23 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 
 	// Position and rotate the arrow depending on the popover's placement.
 	// The `!important' is necessary to override the inline styles.
-	// The default border sits inside the box, so the arrow moves in by the border width. Toolbar keeps the outside ring.
 	&.is-top {
 		bottom: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(0);
-
-		.components-popover:not(.is-alternate):not(.is-unstyled) & {
-			bottom: calc(#{-$arrow-triangle-base-size} + var(--wpds-border-width-xs)) !important;
-		}
 	}
 	&.is-right {
 		/*rtl:begin:ignore*/
 		left: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(90deg);
-
-		.components-popover:not(.is-alternate):not(.is-unstyled) & {
-			left: calc(#{-$arrow-triangle-base-size} + var(--wpds-border-width-xs)) !important;
-		}
 	}
 	&.is-bottom {
 		top: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(180deg);
-
-		.components-popover:not(.is-alternate):not(.is-unstyled) & {
-			top: calc(#{-$arrow-triangle-base-size} + var(--wpds-border-width-xs)) !important;
-		}
 	}
 	&.is-left {
 		/*rtl:begin:ignore*/
 		right: -1 * $arrow-triangle-base-size !important;
 		transform: rotate(-90deg);
-
-		.components-popover:not(.is-alternate):not(.is-unstyled) & {
-			right: calc(#{-$arrow-triangle-base-size} + var(--wpds-border-width-xs)) !important;
-		}
 		/*rtl:end:ignore*/
 	}
 }
@@ -173,7 +152,7 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	}
 
 	@media (forced-colors: active) {
-		.components-popover:not(.is-alternate):not(.is-unstyled) & {
+		.components-popover:not(.is-unstyled) & {
 			stroke: CanvasText;
 		}
 	}
