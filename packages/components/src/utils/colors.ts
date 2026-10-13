@@ -103,7 +103,9 @@ const getComputedBackgroundColor = memoize( _getComputedBackgroundColor );
  *
  * @return The optimized text color (black or white).
  */
-export function getOptimalTextColor( backgroundColor: string | unknown ) {
+export function getOptimalTextColor(
+	backgroundColor: string | unknown
+): string {
 	const background = getComputedBackgroundColor( backgroundColor );
 
 	return colord( background ).isLight() ? '#000000' : '#ffffff';
@@ -116,7 +118,9 @@ export function getOptimalTextColor( backgroundColor: string | unknown ) {
  *
  * @return The optimized text shade (dark or light).
  */
-export function getOptimalTextShade( backgroundColor: string | unknown ) {
+export function getOptimalTextShade(
+	backgroundColor: string | unknown
+): string {
 	const result = getOptimalTextColor( backgroundColor );
 
 	return result === '#000000' ? 'dark' : 'light';
