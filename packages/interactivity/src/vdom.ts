@@ -16,7 +16,7 @@ const invalidCharsRegex = /[^a-z0-9-_]/i;
  * @param directiveName Directive attribute name to parse.
  * @return The parsed parts, or `null` when the name contains invalid characters.
  */
-export function parseDirectiveName( directiveName: string ): {
+function parseDirectiveName( directiveName: string ): {
 	/** Directive prefix without `data-wp-`. */
 	prefix: string;
 	/** Directive suffix, or `null` for the default entry. */
@@ -78,41 +78,6 @@ export function parseDirectiveName( directiveName: string ): {
 	return { prefix, suffix: suffix || null, uniqueId: null };
 }
 
-/** Directive prefixes that take precedence over `html`, in warning order. */
-const htmlConflictingPrefixes = [ 'text', 'each', 'router-region' ];
-
-/** Parsed directive entries keyed by prefix, retaining their suffixes. */
-export type ParsedDirectives = Record<
-	string,
-	Array< Pick< DirectiveEntry, 'suffix' > >
->;
-
-/**
- * Classifies HTML content ownership from an element's parsed directives.
- *
- * @param directives Parsed directives, absent on elements without directives.
- * @return Whether HTML owns the content and the prefixes it yields to otherwise.
- */
-export function getHtmlDirectiveStatus( directives?: ParsedDirectives ): {
-	/** Whether a default HTML directive owns this element's content. */
-	isHtmlDirectiveElement: boolean;
-	/** Prefixes a default HTML directive yields to, in warning order. */
-	conflictingPrefixes: string[];
-} {
-	// Presence, not directive values, determines ownership of the content.
-	const hasDefaultHtmlDirective = directives?.html?.some(
-		( { suffix } ) => suffix === null
-	);
-	const conflictingPrefixes = htmlConflictingPrefixes.filter( ( prefix ) =>
-		Boolean( directives?.[ prefix ]?.length )
-	);
-	return {
-		isHtmlDirectiveElement:
-			!! hasDefaultHtmlDirective && ! conflictingPrefixes.length,
-		conflictingPrefixes: hasDefaultHtmlDirective ? conflictingPrefixes : [],
-	};
-}
-
 // Regular expression for reference parsing. It can contain a namespace before
 // the reference, separated by `::`, like `some-namespace::state.somePath`.
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
@@ -150,9 +115,9 @@ export function parseDirectiveValue( rawValue: string ): {
 /**
  * Recursive function that transforms a DOM tree into vDOM.
  * Directive attributes are interpreted with {@link parseDirectiveValue}.
- * Default HTML directives yield to content-owning directives on the same
- * element, using {@link getHtmlDirectiveStatus}. Eligible HTML content and
- * server-rendered list items stay opaque.
+ * All HTML directive entries yield to text, each and router-region directives
+ * on the same element, based on their parsed prefixes. Otherwise, default HTML
+ * content and server-rendered list items stay opaque.
  *
  * @param root The root element or node to start traversing on.
  * @return The resulting vDOM tree.
@@ -166,6 +131,12 @@ export function toVdom( root: Node ): ComponentChild {
 		205 // TEXT + CDATA_SECTION + COMMENT + PROCESSING_INSTRUCTION + ELEMENT
 	);
 
+	/**
+	 * Converts a node and its non-opaque descendants, recording DOM cleanup.
+	 *
+	 * @param node The current node in the tree walker.
+	 * @return The node's vDOM representation, or `null` for removed nodes.
+	 */
 	function walk( node: Node ): ComponentChild | null {
 		const { nodeType } = node;
 
@@ -286,22 +257,28 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		const {
-			isHtmlDirectiveElement: hasDefaultHtmlDirective,
-			conflictingPrefixes,
-		} = getHtmlDirectiveStatus( props.__directives );
-		if ( conflictingPrefixes.length ) {
-			warn(
-				`The data-wp-html directive was ignored because it conflicts with ${ conflictingPrefixes.map( ( prefix ) => `data-wp-${ prefix }` ).join( ', ' ) }.`
+		if ( props.__directives?.html ) {
+			// Presence, not directive values or suffixes, determines a conflict.
+			/** Content-owning prefixes present on this element, in warning order. */
+			const conflictingPrefixes = [
+				'text',
+				'each',
+				'router-region',
+			].filter( ( prefix ) =>
+				Boolean( props.__directives[ prefix ]?.length )
 			);
-			props.__directives.html = props.__directives.html.filter(
-				( { suffix }: DirectiveEntry ) => suffix !== null
-			);
-			if ( ! props.__directives.html.length ) {
+			if ( conflictingPrefixes.length ) {
+				warn(
+					`The data-wp-html directive was ignored because it conflicts with ${ conflictingPrefixes.map( ( prefix ) => `data-wp-${ prefix }` ).join( ', ' ) }.`
+				);
 				delete props.__directives.html;
 			}
 		}
 
+		/** Whether a remaining default HTML entry owns this element's content. */
+		const hasDefaultHtmlDirective = props.__directives?.html?.some(
+			( { suffix }: DirectiveEntry ) => suffix === null
+		);
 		if ( props.__directives?.[ 'each-child' ] || hasDefaultHtmlDirective ) {
 			// `data-wp-html` owns this element's content entirely — whether
 			// that's still the server-rendered fallback or HTML the

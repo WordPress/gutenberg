@@ -7,7 +7,7 @@ import {
 	vi,
 	type MockInstance,
 } from 'vitest';
-import { hydrate, options } from 'preact';
+import { hydrate, options, type VNode } from 'preact';
 import { act } from 'preact/test-utils';
 import '../index'; // Registers all core directives, including `html`.
 import { toVdom } from '../../vdom';
@@ -1020,31 +1020,112 @@ describe( 'data-wp-html conflicts', () => {
 		);
 	} );
 
-	it( 'keeps the suffixed HTML warning when a default HTML entry yields', async () => {
-		const {
-			store: register,
-			asDangerousHTML: token,
-			act: flush,
-			hydrate: hydrateRegion,
-			toVdom: convert,
-		} = await loadConflictRuntime();
-		const namespace = uniqueNamespace();
-		register( namespace, {
-			state: { html: token( '<b>x</b>' ), text: 'Hello' },
-		} );
-		const region = createRegion(
-			namespace,
-			'<div data-wp-html="state.html" data-wp-html--suffix="state.html" data-wp-text="state.text">fallback</div>'
-		);
-		await flush( () =>
-			hydrateRegion( convert( region ), region.parentNode! )
-		);
-		expect( region ).toHaveTextContent( /^Hello$/ );
-		expectConflictWarnings( [
-			'The data-wp-html directive was ignored because it conflicts with data-wp-text.',
-			'The usage of data-wp-html--suffix is not supported. Please use data-wp-html instead.',
-		] );
-	} );
+	it.each(
+		[ 'text', 'each', 'router-region' ].flatMap( ( prefix ) =>
+			[ '', '--', '---', '---id', '--suffix', '----' ].flatMap(
+				( suffix ) =>
+					[ true, false ].flatMap( ( debug ) =>
+						[ true, false ].flatMap( ( htmlFirst ) =>
+							[ true, false ].map(
+								( defaultHtml ) =>
+									[
+										prefix,
+										suffix,
+										debug,
+										htmlFirst,
+										defaultHtml,
+									] as const
+							)
+						)
+					)
+			)
+		)
+	)(
+		'yields every HTML entry to %s%s with only a conflict warning (debug: %s, HTML first: %s, default HTML: %s)',
+		async ( prefix, suffix, debug, htmlFirst, defaultHtml ) => {
+			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+			const runtime = await loadConflictRuntime();
+			const namespace = uniqueNamespace();
+			const { state } = runtime.store( namespace, {
+				state: {
+					html: runtime.asDangerousHTML( '<b>x</b>' ),
+					text: 'Hello',
+					list: [ 'a', 'b' ],
+				},
+			} );
+			const html = [
+				'data-wp-html--suffix="state.html"',
+				'data-wp-html--suffix---id="state.html"',
+			];
+			if ( defaultHtml ) {
+				html.push(
+					'data-wp-html="state.html"',
+					'data-wp-html--="state.html"',
+					'data-wp-html---="state.html"',
+					'data-wp-html---id="state.html"'
+				);
+			}
+			const reference = prefix === 'each' ? 'state.list' : 'state.text';
+			const conflict = `data-wp-${ prefix }${ suffix }="${ reference }"`;
+			const attributes = htmlFirst
+				? [ ...html, conflict ]
+				: [ conflict, ...html ];
+			const tag = prefix === 'each' ? 'template' : 'div';
+			const child = '<span data-wp-text="state.text">fallback</span>';
+			const target = createRegion(
+				namespace,
+				`<${ tag } ${ attributes.join( ' ' ) }>${ child }</${ tag }>`
+			);
+			const baseline = createRegion(
+				namespace,
+				`<${ tag } ${ conflict }>${ child }</${ tag }>`
+			);
+			const vdom = runtime.toVdom( target ) as VNode;
+			const children = vdom.props.children as VNode< {
+				/** Parsed directives consumed by the runtime's vnode wrapper. */
+				directives: Record< string, unknown >;
+			} >[];
+			expect( children[ 0 ].props.directives ).not.toHaveProperty(
+				'html'
+			);
+			await runtime.act( () => {
+				runtime.hydrate( vdom, target.parentNode! );
+				runtime.hydrate(
+					runtime.toVdom( baseline ),
+					baseline.parentNode!
+				);
+			} );
+			// Inert HTML attributes remain on the element, not in its directive entries.
+			/** Returns rendered markup with inert HTML attributes omitted. */
+			const withoutHtmlAttributes = () =>
+				target.innerHTML.replace( / data-wp-html[^=]*="[^"]*"/g, '' );
+			expect( withoutHtmlAttributes() ).toBe( baseline.innerHTML );
+			await runtime.act( () => {
+				state.text = 'Bye';
+				state.list = [ 'a', 'b', 'c' ];
+			} );
+			expect( withoutHtmlAttributes() ).toBe( baseline.innerHTML );
+			expect( target.querySelector( 'b' ) ).toBeNull();
+			expectConflictWarnings(
+				debug
+					? [
+							`The data-wp-html directive was ignored because it conflicts with data-wp-${ prefix }.`,
+							...( prefix === 'text' &&
+							[ '--suffix', '----' ].includes( suffix )
+								? [
+										'The usage of data-wp-text--suffix is not supported. Please use data-wp-text instead.',
+									]
+								: [] ),
+							...( suffix === '---id'
+								? [
+										`Unique IDs are not supported for the data-wp-${ prefix } directive. Ignoring the directive with unique ID "id".`,
+									]
+								: [] ),
+						]
+					: []
+			);
+		}
+	);
 } );
 
 describe( 'data-wp-html value contract', () => {
