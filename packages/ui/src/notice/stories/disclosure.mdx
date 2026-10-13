@@ -7,7 +7,31 @@ import * as DisclosureStories from './disclosure.story';
 
 Compose `Notice` with `Collapsible` to keep a short message visible and let users reveal supplementary details. This example explores the approach discussed in [Gutenberg PR #82496](https://github.com/WordPress/gutenberg/pull/82496#issuecomment-6141339677).
 
+See [Error messages](?path=/docs/design-system-patterns-error-messages--docs) for guidance on writing actionable errors and deciding when to offer copying.
+
 <Canvas of={ DisclosureStories.WithDetails } />
+
+## Compare the alternatives
+
+These examples use the same message and details to compare copy button presentation and action placement. They explore design choices rather than prescribe one recommended layout.
+
+### Text-only copy button
+
+Use a visible "Copy details" label instead of an icon and tooltip. The button keeps its label after copying; a separate "Copied" message provides visual confirmation.
+
+<Canvas of={ DisclosureStories.TextCopyButton } />
+
+### Actions below the details
+
+Keep the message and expanded details together, with both buttons at the bottom. Expanding the panel reveals content above the focused disclosure button, so compare the reading and keyboard flow with the original example.
+
+<Canvas of={ DisclosureStories.ActionsAtBottom } />
+
+### Text-only copy button with actions below
+
+Combine both alternatives to compare the complete layout, including wrapping in a narrow container.
+
+<Canvas of={ DisclosureStories.TextCopyButtonWithActionsAtBottom } />
 
 ## Composition
 
@@ -19,7 +43,7 @@ The main message and details are separate plain-text strings. Convert server-pro
 
 The `IconButton` shows "Copy details" in its tooltip and uses the same text as its accessible name. It copies only the supplementary details, even while the panel is collapsed. It does not copy the main message or action labels. The application supplies the exact text to `useCopyToClipboard`; `Notice` does not inspect its children or choose the clipboard contents.
 
-After a successful copy, the icon changes to a checkmark and `speak()` announces the confirmation. The button keeps its accessible name, "Copy details". The static notice has no automatic announcement. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for dynamic messages.
+After a successful copy, the icon changes to a checkmark or the text-only version shows "Copied" beside the button. `speak()` announces the confirmation in both versions. The button keeps its accessible name, "Copy details". The static notice has no automatic announcement. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for dynamic messages.
 
 ## Trying the example
 
