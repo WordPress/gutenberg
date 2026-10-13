@@ -243,7 +243,8 @@ function hasExplicitDisabledParent( state, clientId ) {
  * Returns true when the writing flow wrapper can host editing for the given
  * block: it supports `editableRoot`, is edited visually in the default
  * editing mode, and has sibling blocks for a native selection to extend
- * into, all of them editable.
+ * into, all of them editable. Never in preview mode, where the content is
+ * read-only and the wrapper taking focus would stop preview mode navigation.
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Block client ID.
@@ -254,6 +255,7 @@ export const canHostEditableRoot = createSelector(
 	( state, clientId ) => {
 		if (
 			! clientId ||
+			state.settings.isPreviewMode ||
 			getBlockEditingMode( state, clientId ) !== 'default' ||
 			// Not when the block is edited as HTML: there is no rich text to
 			// host then, only a textarea, which the editing host would
@@ -290,6 +292,7 @@ export const canHostEditableRoot = createSelector(
 		state.blocks.blockEditingModes,
 		state.derivedBlockEditingModes,
 		state.blocksMode,
+		state.settings.isPreviewMode,
 	]
 );
 

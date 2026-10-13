@@ -385,6 +385,83 @@ test.describe( 'Post revisions', () => {
 		await expect( titleBlock ).toBeVisible();
 		await expect( titleBlock ).not.toHaveClass( /has-warning/ );
 	} );
+
+	test( 'should move focus past paragraph blocks with Tab', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>First paragraph</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Second paragraph</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		await editor.setContent(
+			'<!-- wp:paragraph -->\n<p>First paragraph</p>\n<!-- /wp:paragraph -->\n\n<!-- wp:paragraph -->\n<p>Second paragraph, changed</p>\n<!-- /wp:paragraph -->'
+		);
+		await editor.saveDraft();
+
+		// Enter revisions mode.
+		await editor.openDocumentSettingsSidebar();
+		const settingsSidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settingsSidebar.getByRole( 'tab', { name: 'Post' } ).click();
+		await settingsSidebar
+			.getByRole( 'button', {
+				name: 'Open revisions screen: 2 revisions',
+				exact: true,
+			} )
+			.click();
+		await expect(
+			page.getByRole( 'button', { name: 'Restore' } )
+		).toBeVisible();
+
+		const firstBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+			exact: true,
+		} );
+		const modifiedBlock = editor.canvas.getByRole( 'document', {
+			name: 'Modified block: Paragraph',
+		} );
+		await expect( modifiedBlock ).toHaveText( 'Second paragraph, changed' );
+
+		// Record whether the canvas root ever becomes an editing host. It
+		// does so asynchronously after a block is selected, so checking the
+		// attribute once could pass before it changes.
+		await editor.canvas.locator( 'body' ).evaluate( ( body ) => {
+			window.__becameEditable = false;
+			new window.MutationObserver( () => {
+				if ( body.contentEditable === 'true' ) {
+					window.__becameEditable = true;
+				}
+			} ).observe( body, { attributeFilter: [ 'contenteditable' ] } );
+		} );
+
+		// Selecting a paragraph must not move focus to the canvas root, so
+		// Tab can continue to the next block and then leave the canvas.
+		await firstBlock.focus();
+		await expect( firstBlock ).toBeFocused();
+		await page.keyboard.press( 'Tab' );
+		await expect( modifiedBlock ).toBeFocused();
+		await page.keyboard.press( 'Tab' );
+		await expect(
+			page
+				.getByRole( 'navigation', { name: 'Document changes' } )
+				.getByRole( 'button', { name: 'Go to modified block' } )
+		).toBeFocused();
+
+		// A click also places a collapsed selection in the paragraph text.
+		await firstBlock.click();
+		await expect( firstBlock ).toBeFocused();
+		await page.keyboard.press( 'Tab' );
+		await expect( modifiedBlock ).toBeFocused();
+
+		expect(
+			await editor.canvas
+				.locator( 'body' )
+				.evaluate( () => window.__becameEditable )
+		).toBe( false );
+	} );
 } );
 
 test.describe( 'Post revisions with classic meta boxes', () => {
