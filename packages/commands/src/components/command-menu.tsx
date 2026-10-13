@@ -27,6 +27,7 @@ import { unlock } from '../lock-unlock';
 import {
 	recordUsage,
 	useLoaderCollector,
+	useLoaderLoadingState,
 	useRecentCommands,
 } from './use-recent-commands';
 import type { CommandCategory } from '../store/types';
@@ -142,11 +143,8 @@ function CommandMenuLoader( {
 	category,
 	valuePrefix,
 }: CommandMenuLoaderProps ) {
-	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
 	const { isLoading: loading, commands = [] } = hook( { search } ) ?? {};
-	useEffect( () => {
-		setLoaderLoading( name, loading );
-	}, [ setLoaderLoading, name, loading ] );
+	useLoaderLoadingState( name, loading );
 
 	if ( ! commands.length ) {
 		return null;

@@ -55,4 +55,15 @@ describe( 'isLoading', () => {
 
 		expect( isLoading( state ) ).toBe( true );
 	} );
+
+	it( 'drops the flag once the loader stops loading', () => {
+		const state = reduce(
+			registerCommandLoader( { name: NAME, hook } ),
+			setLoaderLoading( NAME, true ),
+			setLoaderLoading( NAME, false )
+		);
+
+		expect( isLoading( state ) ).toBe( false );
+		expect( state.loaderStates ).toEqual( {} );
+	} );
 } );

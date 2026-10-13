@@ -30,19 +30,37 @@ export function recordUsage( name: string ) {
 	dispatch( preferencesStore ).set( 'core/commands', 'recentlyUsed', next );
 }
 
+/**
+ * Reports a loader's loading state to the store, and clears it on unmount so
+ * a loader removed mid-load does not keep the palette loading.
+ *
+ * @param name    Command loader name.
+ * @param loading Whether the loader is loading.
+ */
+export function useLoaderLoadingState(
+	name: string,
+	loading: boolean | undefined
+) {
+	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
+
+	useEffect( () => {
+		setLoaderLoading( name, loading );
+	}, [ setLoaderLoading, name, loading ] );
+
+	useEffect( () => {
+		return () => setLoaderLoading( name, false );
+	}, [ setLoaderLoading, name ] );
+}
+
 export function useLoaderCollector(
 	hook: CommandLoaderHook,
 	name: string,
 	filterNames: Set< string > | undefined,
 	onResolved: OnResolved
 ) {
-	const { setLoaderLoading } = unlock( useDispatch( commandsStore ) );
 	const { isLoading: loading, commands = EMPTY_COMMANDS } =
 		hook( { search: '' } ) ?? {};
-
-	useEffect( () => {
-		setLoaderLoading( name, loading );
-	}, [ setLoaderLoading, name, loading ] );
+	useLoaderLoadingState( name, loading );
 
 	// A fresh array would re-run the effect below, and `onResolved`, on every render.
 	const filtered = useMemo(
