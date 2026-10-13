@@ -100,7 +100,7 @@ function RichTextWrapper(
 	const registry = useRegistry();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
-		// selected.
+		// selected, alone or with others.
 		if ( ! isBlockSelected && ! isBlockMultiSelected ) {
 			return { isSelected: false };
 		}
@@ -125,7 +125,7 @@ function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
-		// The field holds one end of a text selection across blocks.
+		// The selection spans blocks, so the field may hold one end of it.
 		const isCrossBlockEnd =
 			! isSelected && selectionStart.clientId !== selectionEnd.clientId;
 
@@ -434,10 +434,9 @@ function RichTextWrapper(
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
-	// One end of a text selection across blocks is in this field. The field
-	// puts that end of the native selection back once it has rendered, as it
-	// does for a selection within it. The field at the other end does the
-	// same for its end.
+	// One end of a text selection across blocks is in this field: put that
+	// end of the native selection back after rendering, as a field does for
+	// a selection within it. The field at the other end does the same.
 	useLayoutEffect( () => {
 		if ( crossBlockStart === undefined && crossBlockEnd === undefined ) {
 			return;

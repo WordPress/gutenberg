@@ -2216,6 +2216,17 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				},
 			},
 		] );
+
+		// Leave the link preview, which keeps focus, and the selection is
+		// still the one to delete.
+		await page.keyboard.press( 'Escape' );
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			] );
 	} );
 
 	test( 'should keep a selection ending after a non-breaking space', async ( {
@@ -2277,6 +2288,12 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 					)
 			)
 			.toBe( 'ab' );
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'abcd' } },
+			] );
 	} );
 
 	test( 'should offer the formats every selected block allows', async ( {
