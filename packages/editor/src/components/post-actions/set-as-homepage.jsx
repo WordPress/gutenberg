@@ -1,5 +1,4 @@
 import { __, sprintf } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
 import {
 	Button,
 	__experimentalText as WCText,
@@ -10,6 +9,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { getItemTitle } from '../../utils/get-item-title';
+import { isEligibleForHomepageActions } from './utils';
 
 const SetAsHomepageModal = ( { items, closeModal } ) => {
 	const [ item ] = items;
@@ -113,50 +113,11 @@ const SetAsHomepageModal = ( { items, closeModal } ) => {
 	);
 };
 
-export const useSetAsHomepageAction = () => {
-	const { pageOnFront, pageForPosts } = useSelect( ( select ) => {
-		const { getEntityRecord, canUser } = select( coreStore );
-		const siteSettings = canUser( 'read', {
-			kind: 'root',
-			name: 'site',
-		} )
-			? getEntityRecord( 'root', 'site' )
-			: undefined;
-		return {
-			pageOnFront: siteSettings?.page_on_front,
-			pageForPosts: siteSettings?.page_for_posts,
-		};
-	} );
-
-	return useMemo(
-		() => ( {
-			id: 'set-as-homepage',
-			label: __( 'Set as homepage…' ),
-			modalHeader: __( 'Set as homepage' ),
-			isEligible( post ) {
-				if ( post.status !== 'publish' ) {
-					return false;
-				}
-
-				if ( post.type !== 'page' ) {
-					return false;
-				}
-
-				// Don't show the action if the page is already set as the homepage.
-				if ( pageOnFront === post.id ) {
-					return false;
-				}
-
-				// Don't show the action if the page is already set as the page for posts.
-				if ( pageForPosts === post.id ) {
-					return false;
-				}
-
-				return true;
-			},
-			modalFocusOnMount: 'firstContentElement',
-			RenderModal: SetAsHomepageModal,
-		} ),
-		[ pageForPosts, pageOnFront ]
-	);
+export const setAsHomepage = {
+	id: 'set-as-homepage',
+	label: __( 'Set as homepage…' ),
+	modalHeader: __( 'Set as homepage' ),
+	isEligible: isEligibleForHomepageActions,
+	modalFocusOnMount: 'firstContentElement',
+	RenderModal: SetAsHomepageModal,
 };

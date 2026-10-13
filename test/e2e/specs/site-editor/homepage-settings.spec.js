@@ -22,6 +22,10 @@ test.describe( 'Homepage Settings via Editor', () => {
 			title: 'Draft page',
 			status: 'draft',
 		} );
+		await requestUtils.createPage( {
+			title: 'About',
+			status: 'publish',
+		} );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -112,6 +116,37 @@ test.describe( 'Homepage Settings via Editor', () => {
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.getByRole( 'menu', { name: 'Actions' } )
+		).toBeHidden();
+	} );
+
+	test( 'should not show the "Set as homepage" action once it is unregistered', async ( {
+		page,
+	} ) => {
+		const aboutPageRow = getPageRow( page, 'About' );
+		await aboutPageRow.hover();
+		await aboutPageRow.getByRole( 'button', { name: 'Actions' } ).click();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
+		).toBeVisible();
+		await page.keyboard.press( 'Escape' );
+		await expect(
+			page.getByRole( 'menu', { name: 'Actions' } )
+		).toBeHidden();
+
+		await page.evaluate( () => {
+			window.wp.editor.unregisterEntityAction(
+				'postType',
+				'page',
+				'set-as-homepage'
+			);
+		} );
+
+		await aboutPageRow.getByRole( 'button', { name: 'Actions' } ).click();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as posts page' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as homepage' } )
 		).toBeHidden();
 	} );
 } );
