@@ -1,0 +1,95 @@
+{
+	"name": "@wordpress/core-actions",
+	"version": "0.1.0-prerelease",
+	"description": "The actions WordPress core registers for its entities, shown in DataViews and in the editor.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"dataviews",
+		"actions",
+		"core"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-actions/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/core-actions"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=22.13.0"
+	},
+	"files": [
+		"src",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"module": "build-module/post_type_supports/index.mjs",
+	"exports": {
+		"./post_type_supports": {
+			"types": "./build-types/post_type_supports/index.d.ts",
+			"import": "./build-module/post_type_supports/index.mjs"
+		},
+		"./wp_block": {
+			"types": "./build-types/wp_block/index.d.ts",
+			"import": "./build-module/wp_block/index.mjs"
+		},
+		"./wp_template_part": {
+			"types": "./build-types/wp_template_part/index.d.ts",
+			"import": "./build-module/wp_template_part/index.mjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"wpScriptModuleExports": {
+		"./post_type_supports": "./build-module/post_type_supports/index.mjs",
+		"./wp_block": "./build-module/wp_block/index.mjs",
+		"./wp_template_part": "./build-module/wp_template_part/index.mjs"
+	},
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/notices": "file:../notices",
+		"@wordpress/patterns": "file:../patterns",
+		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/url": "file:../url",
+		"change-case": "^4.1.2",
+		"client-zip": "^2.4.5",
+		"remove-accents": "^0.5.0"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.3"
+	},
+	"peerDependencies": {
+		"@types/react": "^18 || ^19",
+		"@types/react-dom": "^18 || ^19",
+		"react": "^18 || ^19",
+		"react-dom": "^18 || ^19"
+	},
+	"peerDependenciesMeta": {
+		"@types/react": {
+			"optional": true
+		},
+		"@types/react-dom": {
+			"optional": true
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
