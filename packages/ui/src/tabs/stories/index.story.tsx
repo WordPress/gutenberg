@@ -266,7 +266,6 @@ export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
 							aria-label={ label }
 							render={ <Tabs.Tab value={ value } /> }
 						>
-							{ /* TODO: potentially refactor with new Icon component */ }
 							<Icon icon={ icon } size={ 20 } />
 						</Tooltip.Trigger>
 						<Tooltip.Popup
