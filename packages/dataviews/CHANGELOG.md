@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Actions API: `isEligible` receives the data `registry` as its second argument, as `callback` does, and the eligibility is evaluated again when the data it reads through the registry changes ([#84646](https://github.com/WordPress/gutenberg/pull/84646)).
+
 ### Enhancements
 
 -   Format footer item and selection counts with locale-specific separators ([#84622](https://github.com/WordPress/gutenberg/pull/84622)).
