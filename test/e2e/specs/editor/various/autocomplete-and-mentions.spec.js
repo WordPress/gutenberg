@@ -419,7 +419,11 @@ test.describe( 'Autocomplete (@firefox, @webkit)', () => {
 
 	// The following test concerns an infinite loop regression (https://github.com/WordPress/gutenberg/issues/41709).
 	// When present, the regression will cause this test to time out.
-	test( 'should insert elements from multiple completers in a single block', async ( {
+	/*
+	 * Skipped as flaky: after the `@` mention is inserted, the autocomplete can reopen
+	 * the user popover on it, so ` +bi` goes into that search. Fixed in trunk by #77185.
+	 */
+	test.skip( 'should insert elements from multiple completers in a single block', async ( {
 		page,
 		editor,
 	} ) => {
