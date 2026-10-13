@@ -929,9 +929,6 @@
 		}
 	},
 	"packages/block-editor/src/components/date-format-picker/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

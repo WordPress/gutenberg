@@ -2,12 +2,13 @@ import { _x, __ } from '@wordpress/i18n';
 import { dateI18n, humanTimeDiff } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
 import {
-	TextControl,
-	ExternalLink,
-	ToggleControl,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
-import { SelectControl, VisuallyHidden } from '@wordpress/ui';
+	Fieldset,
+	InputControl,
+	Link,
+	SelectControl,
+	Stack,
+	SwitchControl,
+} from '@wordpress/ui';
 
 // So that we illustrate the different formats in the dropdown properly, show a date that is
 // somewhat recent, has a day greater than 12, and a month with more than three letters.
@@ -36,29 +37,30 @@ export default function DateFormatPicker( {
 	onChange,
 } ) {
 	return (
-		<VStack
-			as="fieldset"
-			spacing={ 4 }
+		<Fieldset.Root
+			render={
+				<Stack render={ <fieldset /> } direction="column" gap="lg" />
+			}
 			className="block-editor-date-format-picker"
 		>
-			<VisuallyHidden render={ <legend /> }>
+			<Fieldset.Legend render={ <legend /> } hideFromVision>
 				{ __( 'Date format' ) }
-			</VisuallyHidden>
-			<ToggleControl
+			</Fieldset.Legend>
+			<SwitchControl
 				label={ __( 'Default format' ) }
-				help={ `${ __( 'Example:' ) }  ${ dateI18n(
+				description={ `${ __( 'Example:' ) }  ${ dateI18n(
 					defaultFormat,
 					exampleDate
 				) }` }
 				checked={ ! format }
-				onChange={ ( checked ) =>
+				onCheckedChange={ ( checked ) =>
 					onChange( checked ? null : defaultFormat )
 				}
 			/>
 			{ format && (
 				<NonDefaultControls format={ format } onChange={ onChange } />
 			) }
-		</VStack>
+		</Fieldset.Root>
 	);
 }
 
@@ -115,7 +117,7 @@ function NonDefaultControls( { format, onChange } ) {
 	);
 
 	return (
-		<VStack>
+		<Stack direction="column" gap="sm">
 			<SelectControl
 				label={ __( 'Choose a format' ) }
 				value={
@@ -155,16 +157,17 @@ function NonDefaultControls( { format, onChange } ) {
 				</SelectControl.Item>
 			</SelectControl>
 			{ isCustom && (
-				<TextControl
+				<InputControl
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
-					help={ createInterpolateElement(
+					details={ createInterpolateElement(
 						__(
 							'Enter a date or time <Link>format string</Link>.'
 						),
 						{
 							Link: (
-								<ExternalLink
+								<Link
+									openInNewTab
 									href={ __(
 										'https://wordpress.org/documentation/article/customize-date-and-time-format/'
 									) }
@@ -173,9 +176,9 @@ function NonDefaultControls( { format, onChange } ) {
 						}
 					) }
 					value={ format }
-					onChange={ ( value ) => onChange( value ) }
+					onValueChange={ ( value ) => onChange( value ) }
 				/>
 			) }
-		</VStack>
+		</Stack>
 	);
 }
