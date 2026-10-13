@@ -1122,6 +1122,56 @@ describe( 'Post actions', () => {
 			).toContain( 'editor-revision-restore-failed' );
 		} );
 
+		it( 'keeps the restored content in the editor when saving the restored revision fails', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+				onSave: ( data ) => {
+					// Let the save of the current content succeed, and fail
+					// the save of the restored revision.
+					if ( savedData.length === 1 ) {
+						return { ...post, ...data };
+					}
+					throw {
+						code: 'test_save_failure',
+						message: 'Details from server.',
+					};
+				},
+			} );
+			registry
+				.dispatch( noticesStore )
+				.createWarningNotice( 'There is an autosave.', {
+					id: 'autosave-exists',
+				} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 2 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'autosaved content' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			const noticeIds = registry
+				.select( noticesStore )
+				.getNotices()
+				.map( ( notice ) => notice.id );
+			expect( noticeIds ).toContain( 'editor-revision-restore-failed' );
+			expect( noticeIds ).toContain( 'autosave-exists' );
+			expect( noticeIds ).not.toContain( 'editor-revision-restored' );
+		} );
+
 		it( 'offers an Undo action that restores the content of a draft from before the restore', async () => {
 			const post = {
 				id: postId,
