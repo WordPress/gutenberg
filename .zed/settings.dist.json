@@ -18,6 +18,7 @@
 				"eslint",
 				"!vtsls",
 				"!typescript-language-server",
+				"!tailwindcss-language-server",
 				"..."
 			]
 		},
@@ -27,6 +28,7 @@
 				"eslint",
 				"!vtsls",
 				"!typescript-language-server",
+				"!tailwindcss-language-server",
 				"..."
 			]
 		},
@@ -36,6 +38,7 @@
 				"eslint",
 				"!vtsls",
 				"!typescript-language-server",
+				"!tailwindcss-language-server",
 				"..."
 			]
 		},
@@ -45,11 +48,16 @@
 				"eslint",
 				"!vtsls",
 				"!typescript-language-server",
+				"!tailwindcss-language-server",
 				"..."
 			]
 		},
 		"CSS": {
-			"language_servers": [ "stylelint-lsp", "..." ],
+			"language_servers": [
+				"stylelint-lsp",
+				"!tailwindcss-language-server",
+				"..."
+			],
 			"formatter": [
 				{
 					"code_action": "source.fixAll.stylelint"
@@ -57,7 +65,11 @@
 			]
 		},
 		"SCSS": {
-			"language_servers": [ "stylelint-lsp", "..." ],
+			"language_servers": [
+				"stylelint-lsp",
+				"!tailwindcss-language-server",
+				"..."
+			],
 			"formatter": [
 				{
 					"code_action": "source.fixAll.stylelint"
