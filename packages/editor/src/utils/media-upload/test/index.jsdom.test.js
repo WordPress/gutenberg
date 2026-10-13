@@ -55,6 +55,26 @@ describe( 'mediaUpload', () => {
 		);
 	} );
 
+	it( 'uses the opt-in batch callback when available', () => {
+		const onFileChange = vi.fn();
+		const onFilesChange = vi.fn();
+		mediaUpload( {
+			filesList: [ file( 'a.png' ), file( 'b.png' ) ],
+			onFileChange,
+			onFilesChange,
+		} );
+
+		const { onFileChange: reportFiles } = uploadMedia.mock.calls[ 0 ][ 0 ];
+		const attachments = [
+			{ id: 1, url: 'https://example.com/a.png' },
+			{ id: 2, url: 'https://example.com/b.png' },
+		];
+		reportFiles( attachments );
+
+		expect( onFilesChange ).toHaveBeenCalledWith( attachments );
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
 	it( 'uploads a single file for a caller that only takes one', () => {
 		mediaUpload( {
 			filesList: [ file( 'a.png' ) ],

@@ -63,18 +63,20 @@ function setUpMediaUpload() {
 }
 
 describe( 'mediaUpload with client-side media processing', () => {
-	it( 'reports every file uploaded so far, in file order, on each onFileChange call', async () => {
+	it( 'reports the current upload in file order through onFilesChange', async () => {
 		const mediaUpload = setUpMediaUpload();
+		const onFilesChange = vi.fn();
 		const onFileChange = vi.fn();
 
 		mediaUpload( {
 			filesList: createFiles( 'one.txt', 'two.txt', 'three.txt' ),
 			onFileChange,
+			onFilesChange,
 		} );
 
 		await finishServerUpload( 'three.txt' );
 		await waitFor( () =>
-			expect( onFileChange ).toHaveBeenLastCalledWith( [
+			expect( onFilesChange ).toHaveBeenLastCalledWith( [
 				expect.objectContaining( { url: 'blob:one.txt' } ),
 				expect.objectContaining( { url: 'blob:two.txt' } ),
 				expect.objectContaining( { id: 'three.txt' } ),
@@ -83,7 +85,7 @@ describe( 'mediaUpload with client-side media processing', () => {
 
 		await finishServerUpload( 'one.txt' );
 		await waitFor( () =>
-			expect( onFileChange ).toHaveBeenLastCalledWith( [
+			expect( onFilesChange ).toHaveBeenLastCalledWith( [
 				expect.objectContaining( { id: 'one.txt' } ),
 				expect.objectContaining( { url: 'blob:two.txt' } ),
 				expect.objectContaining( { id: 'three.txt' } ),
@@ -92,22 +94,47 @@ describe( 'mediaUpload with client-side media processing', () => {
 
 		await finishServerUpload( 'two.txt' );
 		await waitFor( () =>
-			expect( onFileChange ).toHaveBeenLastCalledWith( [
+			expect( onFilesChange ).toHaveBeenLastCalledWith( [
 				expect.objectContaining( { id: 'one.txt' } ),
 				expect.objectContaining( { id: 'two.txt' } ),
 				expect.objectContaining( { id: 'three.txt' } ),
 			] )
 		);
+		expect( onFileChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps onFileChange as a one-file callback without opting in', async () => {
+		const mediaUpload = setUpMediaUpload();
+		const onFileChange = vi.fn();
+
+		mediaUpload( {
+			filesList: createFiles( 'legacy-one.txt', 'legacy-two.txt' ),
+			onFileChange,
+		} );
+
+		await finishServerUpload( 'legacy-two.txt' );
+		await waitFor( () =>
+			expect( onFileChange ).toHaveBeenCalledWith( [
+				expect.objectContaining( { id: 'legacy-two.txt' } ),
+			] )
+		);
+		expect(
+			onFileChange.mock.calls.every( ( [ files ] ) => files.length === 1 )
+		).toBe( true );
+		await finishServerUpload( 'legacy-one.txt' );
+		await waitFor( () =>
+			expect( selectStore( uploadStore ).getItems() ).toHaveLength( 0 )
+		);
 	} );
 
 	it( 'reports only files from the current upload when uploading again', async () => {
 		const mediaUpload = setUpMediaUpload();
-		const onFileChange = vi.fn();
+		const onFilesChange = vi.fn();
 		const onBatchSuccess = vi.fn();
 
 		mediaUpload( {
 			filesList: createFiles( 'earlier.txt' ),
-			onFileChange,
+			onFilesChange,
 			onBatchSuccess,
 		} );
 
@@ -115,22 +142,22 @@ describe( 'mediaUpload with client-side media processing', () => {
 		await waitFor( () =>
 			expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 )
 		);
-		onFileChange.mockClear();
+		onFilesChange.mockClear();
 
 		mediaUpload( {
 			filesList: createFiles( 'later.txt' ),
-			onFileChange,
+			onFilesChange,
 		} );
 
 		await waitFor( () =>
-			expect( onFileChange ).toHaveBeenLastCalledWith( [
+			expect( onFilesChange ).toHaveBeenLastCalledWith( [
 				expect.objectContaining( { url: 'blob:later.txt' } ),
 			] )
 		);
 
 		await finishServerUpload( 'later.txt' );
 		await waitFor( () =>
-			expect( onFileChange ).toHaveBeenLastCalledWith( [
+			expect( onFilesChange ).toHaveBeenLastCalledWith( [
 				expect.objectContaining( { id: 'later.txt' } ),
 			] )
 		);
@@ -138,12 +165,12 @@ describe( 'mediaUpload with client-side media processing', () => {
 
 	it( 'drops a failed file from the files it reports', async () => {
 		const mediaUpload = setUpMediaUpload();
-		const onFileChange = vi.fn();
+		const onFilesChange = vi.fn();
 		const onError = vi.fn();
 
 		mediaUpload( {
 			filesList: createFiles( 'four.txt', 'five.txt', 'six.txt' ),
-			onFileChange,
+			onFilesChange,
 			onError,
 		} );
 
@@ -152,7 +179,7 @@ describe( 'mediaUpload with client-side media processing', () => {
 		await finishServerUpload( 'six.txt' );
 
 		await waitFor( () =>
-			expect( onFileChange ).toHaveBeenLastCalledWith( [
+			expect( onFilesChange ).toHaveBeenLastCalledWith( [
 				expect.objectContaining( { id: 'four.txt' } ),
 				expect.objectContaining( { id: 'six.txt' } ),
 			] )
@@ -192,7 +219,7 @@ describe( 'mediaUpload with client-side media processing', () => {
 		expect( queuedAtBatchSuccess ).toEqual( [ [] ] );
 	} );
 
-	it( 'finishes a batch when every file is refused before upload', async () => {
+	it( 'does not create a batch when every file is refused before upload', async () => {
 		const mediaUpload = setUpMediaUpload();
 		const onFileChange = vi.fn();
 		const onError = vi.fn();
@@ -206,11 +233,9 @@ describe( 'mediaUpload with client-side media processing', () => {
 			onBatchSuccess,
 		} );
 
-		await waitFor( () =>
-			expect( onBatchSuccess ).toHaveBeenCalledTimes( 1 )
-		);
+		await waitFor( () => expect( onError ).toHaveBeenCalledTimes( 2 ) );
 		expect( onError ).toHaveBeenCalledTimes( 2 );
-		expect( onError ).toHaveBeenCalledBefore( onBatchSuccess );
+		expect( onBatchSuccess ).not.toHaveBeenCalled();
 		expect( onFileChange ).not.toHaveBeenCalled();
 	} );
 

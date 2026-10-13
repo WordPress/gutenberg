@@ -244,14 +244,17 @@ export function MediaPlaceholder( {
 		} else {
 			setMedia = ( [ media ] ) => onSelect( media );
 		}
+		// The upload passes the uploaded media.
+		const onFileChange = setMedia as (
+			attachments: Array< Record< string, unknown > >
+		) => void;
 		// Uploads only start where the user can upload media.
 		mediaUpload!( {
 			allowedTypes,
 			filesList: files,
-			// The upload passes the uploaded media.
-			onFileChange: setMedia as (
-				attachments: Array< Record< string, unknown > >
-			) => void,
+			onFileChange,
+			// Older upload functions ignore this option and use onFileChange.
+			onFilesChange: multiple ? onFileChange : undefined,
 			onError,
 			// `add` allows multiple files like `true`.
 			multiple: multiple as boolean,

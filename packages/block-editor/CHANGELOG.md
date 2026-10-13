@@ -87,7 +87,7 @@
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
 -   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
 -   `RichText`: Apply the formats at the caret to pasted text after a previous paste or undo, and when pasting plain text with `__unstablePastePlainText`, instead of splitting the format around it ([#84303](https://github.com/WordPress/gutenberg/pull/84303)).
--   Client-side media processing: Call `onFileChange` with every file of a multi-file upload so far, in file order, so blocks such as `MediaPlaceholder` with `multiple` keep every file ([#84364](https://github.com/WordPress/gutenberg/pull/84364)).
+-   Client-side media processing: Let `MediaPlaceholder` receive the current files in input order through the optional `onFilesChange` callback, while keeping the existing `onFileChange` behavior for other callers ([#84364](https://github.com/WordPress/gutenberg/pull/84364)).
 
 
 ### Internal

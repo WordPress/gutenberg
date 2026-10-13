@@ -4,8 +4,10 @@ import { __ } from '@wordpress/i18n';
 type WPDataRegistry = ReturnType< typeof createRegistry >;
 import type {
 	AdditionalData,
+	Attachment,
 	CancelAction,
 	OnBatchSuccessHandler,
+	OnBatchChangeHandler,
 	OnChangeHandler,
 	OnErrorHandler,
 	OnSuccessHandler,
@@ -66,6 +68,7 @@ type ThunkArgs = {
 interface AddItemsArgs {
 	files: File[];
 	onChange?: OnChangeHandler;
+	onBatchChange?: OnBatchChangeHandler;
 	onSuccess?: OnSuccessHandler;
 	onBatchSuccess?: OnBatchSuccessHandler;
 	onError?: OnErrorHandler;
@@ -79,6 +82,7 @@ interface AddItemsArgs {
  * @param $0
  * @param $0.files            Files
  * @param [$0.onChange]       Function called each time a file or a temporary representation of the file is available.
+ * @param [$0.onBatchChange]  Function called with the latest attachment for each file in the batch, in input order. Empty positions are null.
  * @param [$0.onSuccess]      Function called after the file is uploaded.
  * @param [$0.onBatchSuccess] Function called after a batch of files is uploaded.
  * @param [$0.onError]        Function called when an error happens.
@@ -88,6 +92,7 @@ interface AddItemsArgs {
 export function addItems( {
 	files,
 	onChange,
+	onBatchChange,
 	onSuccess,
 	onError,
 	onBatchSuccess,
@@ -96,7 +101,10 @@ export function addItems( {
 }: AddItemsArgs ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const batchId = uuidv4();
-		for ( const file of files ) {
+		const attachments: Array< Partial< Attachment > | null > = Array(
+			files.length
+		).fill( null );
+		for ( const [ index, file ] of files.entries() ) {
 			/*
 			 Check if the caller (e.g. a block) supports this mime type.
 			 Special case for file types such as HEIC which will be converted before upload anyway.
@@ -126,10 +134,20 @@ export function addItems( {
 			dispatch.addItem( {
 				file,
 				batchId,
-				onChange,
+				onChange: ( changedAttachments ) => {
+					attachments[ index ] = changedAttachments[ 0 ] ?? null;
+					onBatchChange?.( [ ...attachments ] );
+					onChange?.( changedAttachments );
+				},
 				onSuccess,
 				onBatchSuccess,
-				onError,
+				onError: ( error ) => {
+					if ( attachments[ index ] ) {
+						attachments[ index ] = null;
+						onBatchChange?.( [ ...attachments ] );
+					}
+					onError?.( error );
+				},
 				additionalData,
 			} );
 		}

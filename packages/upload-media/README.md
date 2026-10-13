@@ -49,6 +49,7 @@ _Parameters_
 - _$0_ `AddItemsArgs`:
 - _$0.files_ `AddItemsArgs[ 'files' ]`: Files
 - _$0.onChange_ `[AddItemsArgs[ 'onChange' ]]`: Function called each time a file or a temporary representation of the file is available.
+- _$0.onBatchChange_ `[AddItemsArgs[ 'onBatchChange' ]]`: Function called with the latest attachment for each file in the batch, in input order. Empty positions are null.
 - _$0.onSuccess_ `[AddItemsArgs[ 'onSuccess' ]]`: Function called after the file is uploaded.
 - _$0.onBatchSuccess_ `[AddItemsArgs[ 'onBatchSuccess' ]]`: Function called after a batch of files is uploaded.
 - _$0.onError_ `[AddItemsArgs[ 'onError' ]]`: Function called when an error happens.
