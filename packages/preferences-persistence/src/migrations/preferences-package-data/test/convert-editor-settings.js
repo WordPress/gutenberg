@@ -31,4 +31,9 @@ describe( 'convertEditorSettings', () => {
 		} );
 		expect( input ).toEqual( snapshot );
 	} );
+
+	it( 'leaves scopes that are not objects untouched', () => {
+		const input = { 'core/edit-post': 'abc', 'core/edit-site': [] };
+		expect( convertEditorSettings( input ) ).toEqual( input );
+	} );
 } );

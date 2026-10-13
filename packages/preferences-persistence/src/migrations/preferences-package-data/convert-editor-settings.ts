@@ -1,9 +1,16 @@
-import type { ScopedPreferences } from '../../types';
+import type { ScopePreferences, ScopedPreferences } from '../../types';
+
+// Leaves a scope that is not an object, such as a corrupt string, untouched.
+function copyScope( scope: unknown ): ScopePreferences | undefined {
+	return scope && typeof scope === 'object' && ! Array.isArray( scope )
+		? { ...scope }
+		: undefined;
+}
 
 export default function convertEditorSettings( data: ScopedPreferences ) {
 	const newData = { ...data };
-	const editPost = { ...data[ 'core/edit-post' ] };
-	const editSite = { ...data[ 'core/edit-site' ] };
+	const editPost = copyScope( data[ 'core/edit-post' ] );
+	const editSite = copyScope( data[ 'core/edit-site' ] );
 	const settingsToMoveToCore = [
 		'allowRightClickOverrides',
 		'distractionFree',
@@ -24,7 +31,7 @@ export default function convertEditorSettings( data: ScopedPreferences ) {
 	];
 
 	settingsToMoveToCore.forEach( ( setting ) => {
-		if ( editPost[ setting ] !== undefined ) {
+		if ( editPost?.[ setting ] !== undefined ) {
 			newData.core = {
 				...newData.core,
 				[ setting ]: editPost[ setting ],
@@ -32,21 +39,25 @@ export default function convertEditorSettings( data: ScopedPreferences ) {
 			delete editPost[ setting ];
 		}
 
-		if ( editSite[ setting ] !== undefined ) {
+		if ( editSite?.[ setting ] !== undefined ) {
 			delete editSite[ setting ];
 		}
 	} );
 
-	if ( Object.keys( editPost ).length === 0 ) {
-		delete newData[ 'core/edit-post' ];
-	} else {
-		newData[ 'core/edit-post' ] = editPost;
+	if ( editPost ) {
+		if ( Object.keys( editPost ).length === 0 ) {
+			delete newData[ 'core/edit-post' ];
+		} else {
+			newData[ 'core/edit-post' ] = editPost;
+		}
 	}
 
-	if ( Object.keys( editSite ).length === 0 ) {
-		delete newData[ 'core/edit-site' ];
-	} else {
-		newData[ 'core/edit-site' ] = editSite;
+	if ( editSite ) {
+		if ( Object.keys( editSite ).length === 0 ) {
+			delete newData[ 'core/edit-site' ];
+		} else {
+			newData[ 'core/edit-site' ] = editSite;
+		}
 	}
 
 	return newData;
