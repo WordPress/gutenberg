@@ -138,7 +138,7 @@ test.describe( 'Block variations', () => {
 
 		await expect(
 			page
-				.getByRole( 'group', { name: 'Block breadcrumb' } )
+				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
 				.getByText( 'Quote', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
@@ -176,7 +176,7 @@ test.describe( 'Block variations', () => {
 
 		await expect(
 			page
-				.getByRole( 'group', { name: 'Block breadcrumb' } )
+				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
 				.getByText( 'Success Message', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
@@ -214,7 +214,7 @@ test.describe( 'Block variations', () => {
 
 		await expect(
 			page
-				.getByRole( 'group', { name: 'Block breadcrumb' } )
+				.getByRole( 'list', { name: 'Block breadcrumb' } )
 				.getByRole( 'listitem' )
 				.getByText( 'Warning Message', { exact: true } )
 		).toHaveAttribute( 'aria-current', 'true' );
