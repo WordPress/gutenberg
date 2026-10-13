@@ -26,7 +26,7 @@ concurrency:
 jobs:
     release:
         name: Release - ${{ github.event.inputs.release_type }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
         environment: WordPress packages
         steps:
             - name: Checkout (for CLI)
