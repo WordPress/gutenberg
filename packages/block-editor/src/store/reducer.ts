@@ -6,28 +6,47 @@ import {
 	store as blocksStore,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from './private-keys';
 import { unlock } from '../lock-unlock';
+import type {
+	Action,
+	BlockAttributes,
+	HistoryMode,
+	Reducer,
+	RemoveBlocksAction,
+	BlockEditingMode,
+	BlockListSettings,
+	BlockSelection,
+	BlocksState,
+	BlockTreeNode,
+	BlockWithoutAttributes,
+	InitialPosition,
+	Settings,
+	State,
+	TraversedBlock,
+	TreeBlock,
+} from './types';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
-const identity = ( x ) => x;
+const identity = < T >( x: T ) => x;
 
 /**
  * Given an array of blocks, returns an object where each key is a nesting
  * context, the value of which is an array of block client IDs existing within
  * that nesting context.
  *
- * @param {Array}   blocks       Blocks to map.
- * @param {?string} rootClientId Assumed root client ID.
+ * @param blocks       Blocks to map.
+ * @param rootClientId Assumed root client ID.
  *
- * @return {Object} Block order map object.
+ * @return Block order map object.
  */
-function mapBlockOrder( blocks, rootClientId = '' ) {
-	const result = new Map();
-	const current = [];
+function mapBlockOrder( blocks: Block[], rootClientId = '' ) {
+	const result = new Map< string, string[] >();
+	const current: string[] = [];
 	result.set( rootClientId, current );
 	blocks.forEach( ( block ) => {
 		const { clientId, innerBlocks } = block;
@@ -45,16 +64,16 @@ function mapBlockOrder( blocks, rootClientId = '' ) {
  * Given an array of blocks, returns an object where each key contains
  * the clientId of the block and the value is the parent of the block.
  *
- * @param {Array}   blocks       Blocks to map.
- * @param {?string} rootClientId Assumed root client ID.
+ * @param blocks       Blocks to map.
+ * @param rootClientId Assumed root client ID.
  *
- * @return {Object} Block order map object.
+ * @return Block order map object.
  */
-function mapBlockParents( blocks, rootClientId = '' ) {
-	const result = [];
-	const stack = [ [ rootClientId, blocks ] ];
+function mapBlockParents( blocks: Block[], rootClientId = '' ) {
+	const result: Array< [ string, string ] > = [];
+	const stack: Array< [ string, Block[] ] > = [ [ rootClientId, blocks ] ];
 	while ( stack.length ) {
-		const [ parent, currentBlocks ] = stack.shift();
+		const [ parent, currentBlocks ] = stack.shift()!;
 		currentBlocks.forEach( ( { innerBlocks, ...block } ) => {
 			result.push( [ block.clientId, parent ] );
 			if ( innerBlocks?.length ) {
@@ -70,17 +89,20 @@ function mapBlockParents( blocks, rootClientId = '' ) {
  * applying a transformation function to each one.
  * Returns a flattened object with the transformed blocks.
  *
- * @param {Array}    blocks    Blocks to flatten.
- * @param {Function} transform Transforming function to be applied to each block.
+ * @param blocks    Blocks to flatten.
+ * @param transform Transforming function to be applied to each block.
  *
- * @return {Array} Flattened object.
+ * @return Flattened object.
  */
-function flattenBlocks( blocks, transform = identity ) {
-	const result = [];
+function flattenBlocks< T >(
+	blocks: Block[],
+	transform = identity as ( block: Omit< Block, 'innerBlocks' > ) => T
+) {
+	const result: Array< [ string, T ] > = [];
 
 	const stack = [ ...blocks ];
 	while ( stack.length ) {
-		const { innerBlocks, ...block } = stack.shift();
+		const { innerBlocks, ...block } = stack.shift()!;
 		stack.push( ...innerBlocks );
 		result.push( [ block.clientId, transform( block ) ] );
 	}
@@ -88,11 +110,11 @@ function flattenBlocks( blocks, transform = identity ) {
 	return result;
 }
 
-function getFlattenedClientIds( blocks ) {
-	const result = {};
+function getFlattenedClientIds( blocks: Block[] ) {
+	const result: Record< string, boolean > = {};
 	const stack = [ ...blocks ];
 	while ( stack.length ) {
-		const { innerBlocks, ...block } = stack.shift();
+		const { innerBlocks, ...block } = stack.shift()!;
 		stack.push( ...innerBlocks );
 		result[ block.clientId ] = true;
 	}
@@ -105,12 +127,12 @@ function getFlattenedClientIds( blocks ) {
  * attributes, recursing into inner blocks. Keys correspond to the block client
  * ID, the value of which is the attributes object.
  *
- * @param {Array} blocks Blocks to flatten.
+ * @param blocks Blocks to flatten.
  *
- * @return {Array} Flattened block attributes object.
+ * @return Flattened block attributes object.
  */
-function getFlattenedBlocksWithoutAttributes( blocks ) {
-	return flattenBlocks( blocks, ( block ) => {
+function getFlattenedBlocksWithoutAttributes( blocks: Block[] ) {
+	return flattenBlocks( blocks, ( block ): BlockWithoutAttributes => {
 		const { attributes, ...restBlock } = block;
 		return restBlock;
 	} );
@@ -121,11 +143,11 @@ function getFlattenedBlocksWithoutAttributes( blocks ) {
  * recursing into inner blocks. Keys correspond to the block client ID, the
  * value of which is the attributes object.
  *
- * @param {Array} blocks Blocks to flatten.
+ * @param blocks Blocks to flatten.
  *
- * @return {Array} Flattened block attributes object.
+ * @return Flattened block attributes object.
  */
-function getFlattenedBlockAttributes( blocks ) {
+function getFlattenedBlockAttributes( blocks: Block[] ) {
 	return flattenBlocks( blocks, ( block ) => block.attributes );
 }
 
@@ -133,12 +155,12 @@ function getFlattenedBlockAttributes( blocks ) {
  * Returns true if the two object arguments have the same keys, or false
  * otherwise.
  *
- * @param {Object} a First object.
- * @param {Object} b Second object.
+ * @param a First object.
+ * @param b Second object.
  *
- * @return {boolean} Whether the two objects have the same keys.
+ * @return Whether the two objects have the same keys.
  */
-export function hasSameKeys( a, b ) {
+export function hasSameKeys( a: object, b: object ) {
 	return fastDeepEqual( Object.keys( a ), Object.keys( b ) );
 }
 
@@ -147,12 +169,15 @@ export function hasSameKeys( a, b ) {
  * dispatched action, the two actions are updating the same block attribute, or
  * false otherwise.
  *
- * @param {Object} action     Currently dispatching action.
- * @param {Object} lastAction Previously dispatched action.
+ * @param action     Currently dispatching action.
+ * @param lastAction Previously dispatched action.
  *
- * @return {boolean} Whether actions are updating the same block attribute.
+ * @return Whether actions are updating the same block attribute.
  */
-export function isUpdatingSameBlockAttribute( action, lastAction ) {
+export function isUpdatingSameBlockAttribute(
+	action: Action,
+	lastAction: Action | undefined
+) {
 	return (
 		action.type === 'UPDATE_BLOCK_ATTRIBUTES' &&
 		lastAction !== undefined &&
@@ -162,27 +187,28 @@ export function isUpdatingSameBlockAttribute( action, lastAction ) {
 	);
 }
 
-function updateBlockTreeForBlocks( state, blocks ) {
+function updateBlockTreeForBlocks( state: BlocksState, blocks: Block[] ) {
 	const treeToUpdate = state.tree;
 	const stack = [ ...blocks ];
 	const flattenedBlocks = [ ...blocks ];
 	while ( stack.length ) {
-		const block = stack.shift();
+		const block = stack.shift()!;
 		stack.push( ...block.innerBlocks );
 		flattenedBlocks.push( ...block.innerBlocks );
 	}
 	// Create objects before mutating them, that way it's always defined.
 	for ( const block of flattenedBlocks ) {
-		treeToUpdate.set( block.clientId, {} );
+		treeToUpdate.set( block.clientId, {} as TreeBlock );
 	}
 	for ( const block of flattenedBlocks ) {
 		treeToUpdate.set(
 			block.clientId,
-			Object.assign( treeToUpdate.get( block.clientId ), {
+			Object.assign( treeToUpdate.get( block.clientId ) as TreeBlock, {
 				...state.byClientId.get( block.clientId ),
 				attributes: state.attributes.get( block.clientId ),
-				innerBlocks: block.innerBlocks.map( ( subBlock ) =>
-					treeToUpdate.get( subBlock.clientId )
+				innerBlocks: block.innerBlocks.map(
+					( subBlock ) =>
+						treeToUpdate.get( subBlock.clientId ) as TreeBlock
 				),
 			} )
 		);
@@ -190,17 +216,17 @@ function updateBlockTreeForBlocks( state, blocks ) {
 }
 
 function updateParentInnerBlocksInTree(
-	state,
-	updatedClientIds,
+	state: BlocksState,
+	updatedClientIds: Iterable< string >,
 	updateChildrenOfUpdatedClientIds = false
 ) {
 	const treeToUpdate = state.tree;
-	const uncontrolledParents = new Set( [] );
-	const controlledParents = new Set();
+	const uncontrolledParents = new Set< string >( [] );
+	const controlledParents = new Set< string >();
 	for ( const clientId of updatedClientIds ) {
 		let current = updateChildrenOfUpdatedClientIds
 			? clientId
-			: state.parents.get( clientId );
+			: state.parents.get( clientId )!;
 		do {
 			if ( state.controlledInnerBlocks.has( current ) ) {
 				// Should stop on controlled blocks.
@@ -210,7 +236,7 @@ function updateParentInnerBlocksInTree(
 			} else {
 				// Else continue traversing up through parents.
 				uncontrolledParents.add( current );
-				current = state.parents.get( current );
+				current = state.parents.get( current )!;
 			}
 		} while ( current !== undefined );
 	}
@@ -218,12 +244,16 @@ function updateParentInnerBlocksInTree(
 	// To make sure the order of assignments doesn't matter,
 	// we first create empty objects and mutates the inner blocks later.
 	for ( const clientId of uncontrolledParents ) {
-		treeToUpdate.set( clientId, { ...treeToUpdate.get( clientId ) } );
+		treeToUpdate.set( clientId, {
+			...treeToUpdate.get( clientId ),
+		} as BlockTreeNode );
 	}
 	for ( const clientId of uncontrolledParents ) {
-		treeToUpdate.get( clientId ).innerBlocks = (
+		treeToUpdate.get( clientId )!.innerBlocks = (
 			state.order.get( clientId ) || []
-		).map( ( subClientId ) => treeToUpdate.get( subClientId ) );
+		).map(
+			( subClientId ) => treeToUpdate.get( subClientId ) as TreeBlock
+		);
 	}
 
 	// Controlled parent blocks, need a dedicated key for their inner blocks
@@ -231,7 +261,7 @@ function updateParentInnerBlocksInTree(
 	for ( const clientId of controlledParents ) {
 		treeToUpdate.set( 'controlled||' + clientId, {
 			innerBlocks: ( state.order.get( clientId ) || [] ).map(
-				( subClientId ) => treeToUpdate.get( subClientId )
+				( subClientId ) => treeToUpdate.get( subClientId ) as TreeBlock
 			),
 		} );
 	}
@@ -242,13 +272,13 @@ function updateParentInnerBlocksInTree(
  * This is a denormalization to optimize the performance of the getBlock selectors and avoid
  * recomputing the block objects and avoid heavy memoization.
  *
- * @param {Function} reducer Original reducer function.
+ * @param reducer Original reducer function.
  *
- * @return {Function} Enhanced reducer function.
+ * @return Enhanced reducer function.
  */
 const withBlockTree =
-	( reducer ) =>
-	( state = {}, action ) => {
+	( reducer: Reducer< BlocksState > ) =>
+	( state: BlocksState = {} as BlocksState, action: Action ) => {
 		const newState = reducer( state, action );
 
 		if ( newState === state ) {
@@ -274,7 +304,7 @@ const withBlockTree =
 					...newState.tree.get( action.clientId ),
 					...newState.byClientId.get( action.clientId ),
 					attributes: newState.attributes.get( action.clientId ),
-				} );
+				} as TreeBlock );
 				updateParentInnerBlocksInTree(
 					newState,
 					[ action.clientId ],
@@ -287,7 +317,7 @@ const withBlockTree =
 					newState.tree.set( clientId, {
 						...newState.tree.get( clientId ),
 						attributes: newState.attributes.get( clientId ),
-					} );
+					} as TreeBlock );
 				} );
 				updateParentInnerBlocksInTree(
 					newState,
@@ -402,15 +432,15 @@ const withBlockTree =
  * state can be considered as persistent. All changes are considered persistent
  * except when updating the same block attribute as in the previous action.
  *
- * @param {Function} reducer Original reducer function.
+ * @param reducer Original reducer function.
  *
- * @return {Function} Enhanced reducer function.
+ * @return Enhanced reducer function.
  */
-function withPersistentBlockChange( reducer ) {
-	let lastAction;
-	let nextHistoryMode;
+function withPersistentBlockChange( reducer: Reducer< BlocksState > ) {
+	let lastAction: Action | undefined;
+	let nextHistoryMode: HistoryMode | undefined;
 
-	return ( state, action ) => {
+	return ( state: BlocksState | undefined, action: Action ) => {
 		const nextState = reducer( state, action );
 
 		const pendingHistoryMode = nextHistoryMode;
@@ -461,19 +491,17 @@ function withPersistentBlockChange( reducer ) {
  * can be considered as ignored. A change is considered ignored when the result
  * of an action not incurred by direct user interaction.
  *
- * @param {Function} reducer Original reducer function.
+ * @param reducer Original reducer function.
  *
- * @return {Function} Enhanced reducer function.
+ * @return Enhanced reducer function.
  */
-function withIgnoredBlockChange( reducer ) {
+function withIgnoredBlockChange( reducer: Reducer< BlocksState > ) {
 	/**
 	 * Set of action types for which a blocks state change should be ignored.
-	 *
-	 * @type {Set}
 	 */
 	const IGNORED_ACTION_TYPES = new Set( [ 'RECEIVE_BLOCKS' ] );
 
-	return ( state, action ) => {
+	return ( state: BlocksState | undefined, action: Action ) => {
 		const nextState = reducer( state, action );
 
 		if ( nextState !== state ) {
@@ -488,53 +516,57 @@ function withIgnoredBlockChange( reducer ) {
  * Higher-order reducer targeting the combined blocks reducer, augmenting
  * block client IDs in remove action to include cascade of inner blocks.
  *
- * @param {Function} reducer Original reducer function.
+ * @param reducer Original reducer function.
  *
- * @return {Function} Enhanced reducer function.
+ * @return Enhanced reducer function.
  */
-const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
-	// Gets all children which need to be removed.
-	const getAllChildren = ( clientIds ) => {
-		let result = clientIds;
-		for ( let i = 0; i < result.length; i++ ) {
-			if (
-				! state.order.get( result[ i ] ) ||
-				( action.keepControlledInnerBlocks &&
-					action.keepControlledInnerBlocks[ result[ i ] ] )
-			) {
-				continue;
-			}
+const withInnerBlocksRemoveCascade =
+	( reducer: Reducer< BlocksState > ) =>
+	( state: BlocksState | undefined, action: Action ) => {
+		// Gets all children which need to be removed.
+		const getAllChildren = ( clientIds: string[] ) => {
+			let result = clientIds;
+			for ( let i = 0; i < result.length; i++ ) {
+				if (
+					! state!.order.get( result[ i ] ) ||
+					( ( action as RemoveBlocksAction )
+						.keepControlledInnerBlocks &&
+						( action as RemoveBlocksAction )
+							.keepControlledInnerBlocks![ result[ i ] ] )
+				) {
+					continue;
+				}
 
-			if ( result === clientIds ) {
-				result = [ ...result ];
-			}
+				if ( result === clientIds ) {
+					result = [ ...result ];
+				}
 
-			result.push( ...state.order.get( result[ i ] ) );
+				result.push( ...state!.order.get( result[ i ] )! );
+			}
+			return result;
+		};
+
+		if ( state ) {
+			switch ( action.type ) {
+				case 'REMOVE_BLOCKS':
+					action = {
+						...action,
+						type: 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN',
+						removedClientIds: getAllChildren( action.clientIds ),
+					};
+					break;
+				case 'REPLACE_BLOCKS':
+					action = {
+						...action,
+						type: 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN',
+						replacedClientIds: getAllChildren( action.clientIds ),
+					};
+					break;
+			}
 		}
-		return result;
+
+		return reducer( state, action );
 	};
-
-	if ( state ) {
-		switch ( action.type ) {
-			case 'REMOVE_BLOCKS':
-				action = {
-					...action,
-					type: 'REMOVE_BLOCKS_AUGMENTED_WITH_CHILDREN',
-					removedClientIds: getAllChildren( action.clientIds ),
-				};
-				break;
-			case 'REPLACE_BLOCKS':
-				action = {
-					...action,
-					type: 'REPLACE_BLOCKS_AUGMENTED_WITH_CHILDREN',
-					replacedClientIds: getAllChildren( action.clientIds ),
-				};
-				break;
-		}
-	}
-
-	return reducer( state, action );
-};
 
 /**
  * Higher-order reducer which targets the combined blocks reducer and handles
@@ -542,114 +574,119 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  * blocks that exist in the post, leaving blocks that exist only in state (e.g.
  * reusable blocks and blocks controlled by inner blocks controllers) alone.
  *
- * @param {Function} reducer Original reducer function.
+ * @param reducer Original reducer function.
  *
- * @return {Function} Enhanced reducer function.
+ * @return Enhanced reducer function.
  */
-const withBlockReset = ( reducer ) => ( state, action ) => {
-	if ( action.type === 'RESET_BLOCKS' ) {
-		/**
-		 * Preserve controlled inner block flags across RESET_BLOCKS.
-		 * If there are old and new blocks that:
-		 * - have the same `clientId`
-		 * - have the `controlledInnerBlocks` flag
-		 * - don't have any own, uncontrolled children
-		 * then we preserve the `controlledInnerBlocks` flag and the controlled sub-trees.
-		 * Nested controllers (e.g., `post-content`, patterns) don't lose their
-		 * controlled status and don't unnecessarily re-clone blocks.
-		 */
-		const newState = reducer( undefined, {
-			type: 'INSERT_BLOCKS',
-			rootClientId: '',
-			blocks: action.blocks,
-		} );
+const withBlockReset =
+	( reducer: Reducer< BlocksState > ) =>
+	( state: BlocksState | undefined, action: Action ) => {
+		if ( action.type === 'RESET_BLOCKS' ) {
+			/**
+			 * Preserve controlled inner block flags across RESET_BLOCKS.
+			 * If there are old and new blocks that:
+			 * - have the same `clientId`
+			 * - have the `controlledInnerBlocks` flag
+			 * - don't have any own, uncontrolled children
+			 * then we preserve the `controlledInnerBlocks` flag and the controlled sub-trees.
+			 * Nested controllers (e.g., `post-content`, patterns) don't lose their
+			 * controlled status and don't unnecessarily re-clone blocks.
+			 */
+			const newState = reducer( undefined, {
+				type: 'INSERT_BLOCKS',
+				rootClientId: '',
+				blocks: action.blocks,
+			} );
 
-		const preservedControlledInnerBlocks =
-			state?.controlledInnerBlocks ?? new Set();
+			const preservedControlledInnerBlocks =
+				state?.controlledInnerBlocks ?? new Set();
 
-		// Preserve controlled inner blocks data from the old state.
-		// The maps above are rebuilt solely from action.blocks, but
-		// controlled inner blocks live under cloned IDs that aren't
-		// present in action.blocks. Re-inject them so the state
-		// remains consistent with the preserved flags.
-		if ( state?.order ) {
-			for ( const clientId of preservedControlledInnerBlocks ) {
-				// Only preserve if the parent block still exists.
-				if ( ! newState.byClientId.has( clientId ) ) {
+			// Preserve controlled inner blocks data from the old state.
+			// The maps above are rebuilt solely from action.blocks, but
+			// controlled inner blocks live under cloned IDs that aren't
+			// present in action.blocks. Re-inject them so the state
+			// remains consistent with the preserved flags.
+			if ( state?.order ) {
+				for ( const clientId of preservedControlledInnerBlocks ) {
+					// Only preserve if the parent block still exists.
+					if ( ! newState.byClientId.has( clientId ) ) {
+						continue;
+					}
+					newState.controlledInnerBlocks.add( clientId );
+					const oldOrder = state.order.get( clientId );
+					if ( ! oldOrder?.length ) {
+						continue;
+					}
+					newState.order.set( clientId, oldOrder );
+					const preserveBlock = (
+						blockId: string,
+						parentId: string
+					) => {
+						const blockData = state!.byClientId.get( blockId );
+						if ( ! blockData ) {
+							return;
+						}
+						newState.byClientId.set( blockId, blockData );
+						newState.attributes.set(
+							blockId,
+							state!.attributes.get( blockId )!
+						);
+						newState.parents.set( blockId, parentId );
+						const childOrder = state!.order.get( blockId ) || [];
+						newState.order.set( blockId, childOrder );
+						childOrder.forEach( ( childId ) =>
+							preserveBlock( childId, blockId )
+						);
+					};
+					oldOrder.forEach( ( id ) => preserveBlock( id, clientId ) );
+				}
+			}
+
+			// Fix tree entries for controlled blocks. updateBlockTreeForBlocks
+			// built tree entries using action.blocks' inner block structure
+			// (entity-level IDs), but we need them to reference the preserved
+			// cloned inner blocks instead. Mutating the existing object
+			// preserves references held by ancestor tree entries.
+			for ( const clientId of newState.controlledInnerBlocks ) {
+				const controlledOrder = newState.order.get( clientId );
+				if ( ! controlledOrder?.length ) {
 					continue;
 				}
-				newState.controlledInnerBlocks.add( clientId );
-				const oldOrder = state.order.get( clientId );
-				if ( ! oldOrder?.length ) {
-					continue;
+				const innerBlocks = controlledOrder.map(
+					( id ) => state!.tree.get( id ) as TreeBlock
+				);
+				const existingEntry = newState.tree.get( clientId );
+				if ( existingEntry ) {
+					existingEntry.innerBlocks = innerBlocks;
 				}
-				newState.order.set( clientId, oldOrder );
-				const preserveBlock = ( blockId, parentId ) => {
-					const blockData = state.byClientId.get( blockId );
-					if ( ! blockData ) {
+				newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
+				const preserveTreeEntry = ( blockId: string ) => {
+					const treeEntry = state!.tree.get( blockId );
+					if ( ! treeEntry ) {
 						return;
 					}
-					newState.byClientId.set( blockId, blockData );
-					newState.attributes.set(
-						blockId,
-						state.attributes.get( blockId )
-					);
-					newState.parents.set( blockId, parentId );
-					const childOrder = state.order.get( blockId ) || [];
-					newState.order.set( blockId, childOrder );
-					childOrder.forEach( ( childId ) =>
-						preserveBlock( childId, blockId )
-					);
+					newState.tree.set( blockId, treeEntry );
+					const childOrder = newState.order.get( blockId ) || [];
+					childOrder.forEach( preserveTreeEntry );
 				};
-				oldOrder.forEach( ( id ) => preserveBlock( id, clientId ) );
+				controlledOrder.forEach( preserveTreeEntry );
 			}
-		}
 
-		// Fix tree entries for controlled blocks. updateBlockTreeForBlocks
-		// built tree entries using action.blocks' inner block structure
-		// (entity-level IDs), but we need them to reference the preserved
-		// cloned inner blocks instead. Mutating the existing object
-		// preserves references held by ancestor tree entries.
-		for ( const clientId of newState.controlledInnerBlocks ) {
-			const controlledOrder = newState.order.get( clientId );
-			if ( ! controlledOrder?.length ) {
-				continue;
-			}
-			const innerBlocks = controlledOrder.map( ( id ) =>
-				state.tree.get( id )
-			);
-			const existingEntry = newState.tree.get( clientId );
-			if ( existingEntry ) {
-				existingEntry.innerBlocks = innerBlocks;
-			}
-			newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
-			const preserveTreeEntry = ( blockId ) => {
-				const treeEntry = state.tree.get( blockId );
-				if ( ! treeEntry ) {
-					return;
+			// Preserve block editing modes for blocks that are not removed.
+			const preservedBlockEditingModes =
+				state?.blockEditingModes ?? new Map();
+			for ( const [ clientId, mode ] of preservedBlockEditingModes ) {
+				if ( ! newState.tree.has( clientId ) ) {
+					continue;
 				}
-				newState.tree.set( blockId, treeEntry );
-				const childOrder = newState.order.get( blockId ) || [];
-				childOrder.forEach( preserveTreeEntry );
-			};
-			controlledOrder.forEach( preserveTreeEntry );
-		}
-
-		// Preserve block editing modes for blocks that are not removed.
-		const preservedBlockEditingModes =
-			state?.blockEditingModes ?? new Map();
-		for ( const [ clientId, mode ] of preservedBlockEditingModes ) {
-			if ( ! newState.tree.has( clientId ) ) {
-				continue;
+				newState.blockEditingModes.set( clientId, mode );
 			}
-			newState.blockEditingModes.set( clientId, mode );
+
+			return newState;
 		}
 
-		return newState;
-	}
-
-	return reducer( state, action );
-};
+		return reducer( state, action );
+	};
 
 /**
  * Higher-order reducer which targets the combined blocks reducer and handles
@@ -658,110 +695,114 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
  * containing all the child's of the root block followed by the execution of
  * `INSERT_BLOCKS` with the new blocks.
  *
- * @param {Function} reducer Original reducer function.
+ * @param reducer Original reducer function.
  *
- * @return {Function} Enhanced reducer function.
+ * @return Enhanced reducer function.
  */
-const withReplaceInnerBlocks = ( reducer ) => ( state, action ) => {
-	if ( action.type !== 'REPLACE_INNER_BLOCKS' ) {
-		return reducer( state, action );
-	}
+const withReplaceInnerBlocks =
+	( reducer: Reducer< BlocksState > ) =>
+	( state: BlocksState, action: Action ) => {
+		if ( action.type !== 'REPLACE_INNER_BLOCKS' ) {
+			return reducer( state, action );
+		}
 
-	// Finds every nested inner block controller. We must check the action blocks
-	// and not just the block parent state because some inner block controllers
-	// should be deleted if specified, whereas others should not be deleted. If
-	// a controlled should not be deleted, then we need to avoid deleting its
-	// inner blocks from the block state because its inner blocks will not be
-	// attached to the block in the action.
-	const nestedControllers = {};
-	if ( state.controlledInnerBlocks.size ) {
-		const stack = [ ...action.blocks ];
-		while ( stack.length ) {
-			const { innerBlocks, ...block } = stack.shift();
-			stack.push( ...innerBlocks );
-			if ( state.controlledInnerBlocks.has( block.clientId ) ) {
-				nestedControllers[ block.clientId ] = true;
+		// Finds every nested inner block controller. We must check the action blocks
+		// and not just the block parent state because some inner block controllers
+		// should be deleted if specified, whereas others should not be deleted. If
+		// a controlled should not be deleted, then we need to avoid deleting its
+		// inner blocks from the block state because its inner blocks will not be
+		// attached to the block in the action.
+		const nestedControllers: Record< string, boolean > = {};
+		if ( state.controlledInnerBlocks.size ) {
+			const stack = [ ...action.blocks ];
+			while ( stack.length ) {
+				const { innerBlocks, ...block } = stack.shift()!;
+				stack.push( ...innerBlocks );
+				if ( state.controlledInnerBlocks.has( block.clientId ) ) {
+					nestedControllers[ block.clientId ] = true;
+				}
 			}
 		}
-	}
 
-	// The `keepControlledInnerBlocks` prop will keep the inner blocks of the
-	// marked block in the block state so that they can be reattached to the
-	// marked block when we re-insert everything a few lines below.
-	let stateAfterBlocksRemoval = state;
-	if ( state.order.get( action.rootClientId ) ) {
-		stateAfterBlocksRemoval = reducer( stateAfterBlocksRemoval, {
-			type: 'REMOVE_BLOCKS',
-			keepControlledInnerBlocks: nestedControllers,
-			clientIds: state.order.get( action.rootClientId ),
-		} );
-	}
-	let stateAfterInsert = stateAfterBlocksRemoval;
-	if ( action.blocks.length ) {
-		stateAfterInsert = reducer( stateAfterInsert, {
-			...action,
-			type: 'INSERT_BLOCKS',
-			index: 0,
-		} );
+		// The `keepControlledInnerBlocks` prop will keep the inner blocks of the
+		// marked block in the block state so that they can be reattached to the
+		// marked block when we re-insert everything a few lines below.
+		let stateAfterBlocksRemoval = state;
+		if ( state.order.get( action.rootClientId ) ) {
+			stateAfterBlocksRemoval = reducer( stateAfterBlocksRemoval, {
+				type: 'REMOVE_BLOCKS',
+				keepControlledInnerBlocks: nestedControllers,
+				clientIds: state.order.get( action.rootClientId )!,
+			} );
+		}
+		let stateAfterInsert = stateAfterBlocksRemoval;
+		if ( action.blocks.length ) {
+			stateAfterInsert = reducer( stateAfterInsert, {
+				...action,
+				type: 'INSERT_BLOCKS',
+				index: 0,
+			} );
 
-		// We need to re-attach the controlled inner blocks to the blocks tree and
-		// preserve their block order. Otherwise, an inner block controller's blocks
-		// will be deleted entirely from its entity.
-		const stateAfterInsertOrder = new Map( stateAfterInsert.order );
-		Object.keys( nestedControllers ).forEach( ( key ) => {
-			if ( state.order.get( key ) ) {
-				stateAfterInsertOrder.set( key, state.order.get( key ) );
-			}
-		} );
-		stateAfterInsert.order = stateAfterInsertOrder;
-		stateAfterInsert.tree = new Map( stateAfterInsert.tree );
-		Object.keys( nestedControllers ).forEach( ( _key ) => {
-			const key = `controlled||${ _key }`;
-			if ( state.tree.has( key ) ) {
-				stateAfterInsert.tree.set( key, state.tree.get( key ) );
-			}
-		} );
-	}
-	return stateAfterInsert;
-};
+			// We need to re-attach the controlled inner blocks to the blocks tree and
+			// preserve their block order. Otherwise, an inner block controller's blocks
+			// will be deleted entirely from its entity.
+			const stateAfterInsertOrder = new Map( stateAfterInsert.order );
+			Object.keys( nestedControllers ).forEach( ( key ) => {
+				if ( state.order.get( key ) ) {
+					stateAfterInsertOrder.set( key, state.order.get( key )! );
+				}
+			} );
+			stateAfterInsert.order = stateAfterInsertOrder;
+			stateAfterInsert.tree = new Map( stateAfterInsert.tree );
+			Object.keys( nestedControllers ).forEach( ( _key ) => {
+				const key = `controlled||${ _key }`;
+				if ( state.tree.has( key ) ) {
+					stateAfterInsert.tree.set( key, state.tree.get( key )! );
+				}
+			} );
+		}
+		return stateAfterInsert;
+	};
 
 /**
  * Higher-order reducer which removes blocks from state when switching parent block controlled state.
  *
- * @param {Function} reducer Original reducer function.
+ * @param reducer Original reducer function.
  *
- * @return {Function} Enhanced reducer function.
+ * @return Enhanced reducer function.
  */
-const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
-	if ( action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-		// When switching a block from controlled to uncontrolled or inverse,
-		// we need to remove its content first — but only if there are inner
-		// blocks to remove. Skipping the no-op dispatch is important because
-		// REPLACE_INNER_BLOCKS creates new state references even when empty,
-		// which propagates tree changes up to the root and triggers false-
-		// positive change detection in parent subscriptions.
-		const innerBlockOrder = state.order.get( action.clientId );
-		if ( innerBlockOrder?.length ) {
-			const tempState = reducer( state, {
-				type: 'REPLACE_INNER_BLOCKS',
-				rootClientId: action.clientId,
-				blocks: [],
-			} );
-			return reducer( tempState, action );
+const withResetControlledBlocks =
+	( reducer: Reducer< BlocksState > ) =>
+	( state: BlocksState, action: Action ) => {
+		if ( action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
+			// When switching a block from controlled to uncontrolled or inverse,
+			// we need to remove its content first — but only if there are inner
+			// blocks to remove. Skipping the no-op dispatch is important because
+			// REPLACE_INNER_BLOCKS creates new state references even when empty,
+			// which propagates tree changes up to the root and triggers false-
+			// positive change detection in parent subscriptions.
+			const innerBlockOrder = state.order.get( action.clientId );
+			if ( innerBlockOrder?.length ) {
+				const tempState = reducer( state, {
+					type: 'REPLACE_INNER_BLOCKS',
+					rootClientId: action.clientId,
+					blocks: [],
+				} );
+				return reducer( tempState, action );
+			}
+			return reducer( state, action );
 		}
-		return reducer( state, action );
-	}
 
-	return reducer( state, action );
-};
+		return reducer( state, action );
+	};
 
 /**
  * Reducer returning the blocks state.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
 export const blocks = pipe(
 	combineReducers,
@@ -776,7 +817,10 @@ export const blocks = pipe(
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact
 	// code changes can have on this reducer.
-	byClientId( state = new Map(), action ) {
+	byClientId(
+		state: BlocksState[ 'byClientId' ] = new Map(),
+		action: Action
+	) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {
@@ -802,7 +846,7 @@ export const blocks = pipe(
 
 				const newState = new Map( state );
 				newState.set( action.clientId, {
-					...state.get( action.clientId ),
+					...state.get( action.clientId )!,
 					...changes,
 				} );
 				return newState;
@@ -841,7 +885,10 @@ export const blocks = pipe(
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact
 	// code changes can have on this reducer.
-	attributes( state = new Map(), action ) {
+	attributes(
+		state: BlocksState[ 'attributes' ] = new Map(),
+		action: Action
+	) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS':
 			case 'INSERT_BLOCKS': {
@@ -882,7 +929,9 @@ export const blocks = pipe(
 				for ( const clientId of action.clientIds ) {
 					const updatedAttributeEntries = Object.entries(
 						!! action.options?.uniqueByBlock
-							? action.attributes[ clientId ]
+							? ( action.attributes[
+									clientId
+								] as BlockAttributes )
 							: ( action.attributes ?? {} )
 					);
 					if ( updatedAttributeEntries.length === 0 ) {
@@ -890,9 +939,9 @@ export const blocks = pipe(
 					}
 					let hasUpdatedAttributes = false;
 					const existingAttributes = state.get( clientId );
-					const newAttributes = {};
+					const newAttributes: BlockAttributes = {};
 					updatedAttributeEntries.forEach( ( [ key, value ] ) => {
-						if ( existingAttributes[ key ] !== value ) {
+						if ( existingAttributes![ key ] !== value ) {
 							hasUpdatedAttributes = true;
 							newAttributes[ key ] = value;
 						}
@@ -941,7 +990,7 @@ export const blocks = pipe(
 	// The state is using a Map instead of a plain object for performance reasons.
 	// You can run the "./test/performance.js" unit test to check the impact
 	// code changes can have on this reducer.
-	order( state = new Map(), action ) {
+	order( state: BlocksState[ 'order' ] = new Map(), action: Action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS': {
 				const blockOrder = mapBlockOrder( action.blocks );
@@ -953,7 +1002,10 @@ export const blocks = pipe(
 				} );
 				newState.set(
 					'',
-					( state.get( '' ) ?? [] ).concat( blockOrder[ '' ] )
+					( state.get( '' ) ?? [] ).concat(
+						// @ts-expect-error `blockOrder` is a `Map`, so this reads `undefined`.
+						blockOrder[ '' ]
+					)
 				);
 				return newState;
 			}
@@ -973,7 +1025,7 @@ export const blocks = pipe(
 					rootClientId,
 					insertAt(
 						subState,
-						mappedBlocks.get( rootClientId ),
+						mappedBlocks.get( rootClientId )!,
 						index
 					)
 				);
@@ -986,11 +1038,11 @@ export const blocks = pipe(
 					toRootClientId = '',
 					clientIds,
 				} = action;
-				const { index = state.get( toRootClientId ).length } = action;
+				const { index = state.get( toRootClientId )!.length } = action;
 
 				// Moving inside the same parent block.
 				if ( fromRootClientId === toRootClientId ) {
-					const subState = state.get( toRootClientId );
+					const subState = state.get( toRootClientId )!;
 					const fromIndex = subState.indexOf( clientIds[ 0 ] );
 					if ( fromIndex === -1 ) {
 						return state;
@@ -999,7 +1051,7 @@ export const blocks = pipe(
 					newState.set(
 						toRootClientId,
 						moveTo(
-							state.get( toRootClientId ),
+							state.get( toRootClientId )!,
 							fromIndex,
 							index,
 							clientIds.length
@@ -1018,7 +1070,7 @@ export const blocks = pipe(
 				);
 				newState.set(
 					toRootClientId,
-					insertAt( state.get( toRootClientId ), clientIds, index )
+					insertAt( state.get( toRootClientId )!, clientIds, index )
 				);
 				return newState;
 			}
@@ -1026,7 +1078,7 @@ export const blocks = pipe(
 			case 'MOVE_BLOCKS_UP': {
 				const { clientIds, rootClientId = '' } = action;
 				const firstClientId = clientIds[ 0 ];
-				const subState = state.get( rootClientId );
+				const subState = state.get( rootClientId )!;
 
 				if ( ! subState.length || firstClientId === subState[ 0 ] ) {
 					return state;
@@ -1050,7 +1102,7 @@ export const blocks = pipe(
 				const { clientIds, rootClientId = '' } = action;
 				const firstClientId = clientIds[ 0 ];
 				const lastClientId = clientIds[ clientIds.length - 1 ];
-				const subState = state.get( rootClientId );
+				const subState = state.get( rootClientId )!;
 
 				if (
 					! subState.length ||
@@ -1090,20 +1142,19 @@ export const blocks = pipe(
 					}
 				} );
 				newState.forEach( ( order, clientId ) => {
-					const newSubOrder = Object.values( order ).reduce(
-						( result, subClientId ) => {
-							if ( subClientId === clientIds[ 0 ] ) {
-								return [ ...result, ...mappedBlocks.get( '' ) ];
-							}
+					const newSubOrder = Object.values( order ).reduce<
+						string[]
+					>( ( result, subClientId ) => {
+						if ( subClientId === clientIds[ 0 ] ) {
+							return [ ...result, ...mappedBlocks.get( '' )! ];
+						}
 
-							if ( clientIds.indexOf( subClientId ) === -1 ) {
-								result.push( subClientId );
-							}
+						if ( clientIds.indexOf( subClientId ) === -1 ) {
+							result.push( subClientId );
+						}
 
-							return result;
-						},
-						[]
-					);
+						return result;
+					}, [] );
 					newState.set( clientId, newSubOrder );
 				} );
 				return newState;
@@ -1133,7 +1184,7 @@ export const blocks = pipe(
 
 	// While technically redundant data as the inverse of `order`, it serves as
 	// an optimization for the selectors which derive the ancestry of a block.
-	parents( state = new Map(), action ) {
+	parents( state: BlocksState[ 'parents' ] = new Map(), action: Action ) {
 		switch ( action.type ) {
 			case 'RECEIVE_BLOCKS': {
 				const newState = new Map( state );
@@ -1188,8 +1239,12 @@ export const blocks = pipe(
 	},
 
 	controlledInnerBlocks(
-		state = new Set(),
-		{ type, clientId, hasControlledInnerBlocks }
+		state: BlocksState[ 'controlledInnerBlocks' ] = new Set(),
+		{
+			type,
+			clientId,
+			hasControlledInnerBlocks,
+		}: Action & { clientId?: string; hasControlledInnerBlocks?: boolean }
 	) {
 		if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
 			if ( hasControlledInnerBlocks ) {
@@ -1208,7 +1263,10 @@ export const blocks = pipe(
 		return state;
 	},
 
-	blockEditingModes( state = new Map(), action ) {
+	blockEditingModes(
+		state: BlocksState[ 'blockEditingModes' ] = new Map(),
+		action: Action
+	) {
 		switch ( action.type ) {
 			case 'SET_BLOCK_EDITING_MODE':
 				if ( state.get( action.clientId ) === action.mode ) {
@@ -1226,17 +1284,20 @@ export const blocks = pipe(
 		}
 		return state;
 	},
-} );
+} ) as Reducer< BlocksState >;
 
 /**
  * Reducer returning visibility status of block interface.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function isBlockInterfaceHidden( state = false, action ) {
+export function isBlockInterfaceHidden(
+	state: State[ 'isBlockInterfaceHidden' ] = false,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'HIDE_BLOCK_INTERFACE':
 			return true;
@@ -1251,12 +1312,12 @@ export function isBlockInterfaceHidden( state = false, action ) {
 /**
  * Reducer returning typing state.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function isTyping( state = false, action ) {
+export function isTyping( state: State[ 'isTyping' ] = false, action: Action ) {
 	switch ( action.type ) {
 		case 'START_TYPING':
 			return true;
@@ -1272,12 +1333,15 @@ export function isTyping( state = false, action ) {
  * Reducer returning dragging state. It is possible for a user to be dragging
  * data from outside of the editor, so this state is separate from `draggedBlocks`.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function isDragging( state = false, action ) {
+export function isDragging(
+	state: State[ 'isDragging' ] = false,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'START_DRAGGING':
 			return true;
@@ -1292,12 +1356,15 @@ export function isDragging( state = false, action ) {
 /**
  * Reducer returning dragged block client id.
  *
- * @param {string[]} state  Current state.
- * @param {Object}   action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {string[]} Updated state.
+ * @return Updated state.
  */
-export function draggedBlocks( state = [], action ) {
+export function draggedBlocks(
+	state: State[ 'draggedBlocks' ] = [],
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'START_DRAGGING_BLOCKS':
 			return action.clientIds;
@@ -1312,12 +1379,15 @@ export function draggedBlocks( state = [], action ) {
 /**
  * Reducer tracking the visible blocks.
  *
- * @param {Record<string,boolean>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Record<string,boolean>} Block visibility.
+ * @return Block visibility.
  */
-export function blockVisibility( state = {}, action ) {
+export function blockVisibility(
+	state: State[ 'blockVisibility' ] = {},
+	action: Action
+) {
 	if ( action.type === 'SET_BLOCK_VISIBILITY' ) {
 		return {
 			...state,
@@ -1332,12 +1402,12 @@ export function blockVisibility( state = {}, action ) {
  * Internal helper reducer for selectionStart and selectionEnd. Can hold a block
  * selection, represented by an object with property clientId.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-function selectionHelper( state = {}, action ) {
+function selectionHelper( state: BlockSelection = {}, action: Action ) {
 	switch ( action.type ) {
 		case 'CLEAR_SELECTED_BLOCK': {
 			if ( state.clientId ) {
@@ -1364,19 +1434,19 @@ function selectionHelper( state = {}, action ) {
 			if (
 				! action.clientIds ||
 				! action.clientIds.length ||
-				action.clientIds.indexOf( state.clientId ) === -1
+				action.clientIds.indexOf( state.clientId! ) === -1
 			) {
 				return state;
 			}
 
 			return {};
 		case 'REPLACE_BLOCKS': {
-			if ( action.clientIds.indexOf( state.clientId ) === -1 ) {
+			if ( action.clientIds.indexOf( state.clientId! ) === -1 ) {
 				return state;
 			}
 
 			const blockToSelect =
-				action.blocks[ action.indexToSelect ] ||
+				action.blocks[ action.indexToSelect! ] ||
 				action.blocks[ action.blocks.length - 1 ];
 
 			if ( ! blockToSelect ) {
@@ -1397,12 +1467,12 @@ function selectionHelper( state = {}, action ) {
 /**
  * Reducer returning the selection state.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function selection( state = {}, action ) {
+export function selection( state: State[ 'selection' ] = {}, action: Action ) {
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
 			if ( action.clientId ) {
@@ -1497,12 +1567,15 @@ export function selection( state = {}, action ) {
 /**
  * Reducer returning whether the user is multi-selecting.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function isMultiSelecting( state = false, action ) {
+export function isMultiSelecting(
+	state: State[ 'isMultiSelecting' ] = false,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'START_MULTI_SELECT':
 			return true;
@@ -1517,12 +1590,15 @@ export function isMultiSelecting( state = false, action ) {
 /**
  * Reducer returning whether selection is enabled.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function isSelectionEnabled( state = true, action ) {
+export function isSelectionEnabled(
+	state: State[ 'isSelectionEnabled' ] = true,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'TOGGLE_SELECTION':
 			return action.isSelectionEnabled;
@@ -1535,12 +1611,15 @@ export function isSelectionEnabled( state = true, action ) {
  * Reducer returning the client IDs for the viewport modal,
  * or null if the modal is not open.
  *
- * @param {string[]|null} state  Current state.
- * @param {Object}        action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {string[]|null} Client IDs for the viewport modal.
+ * @return Client IDs for the viewport modal.
  */
-export function viewportModalClientIds( state = null, action ) {
+export function viewportModalClientIds(
+	state: State[ 'viewportModalClientIds' ] = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SHOW_VIEWPORT_MODAL':
 			return action.clientIds;
@@ -1554,12 +1633,15 @@ export function viewportModalClientIds( state = null, action ) {
  * Reducer returning the data needed to display a prompt when certain blocks
  * are removed, or `false` if no such prompt is requested.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object|false} Data for removal prompt display, if any.
+ * @return Data for removal prompt display, if any.
  */
-function removalPromptData( state = false, action ) {
+function removalPromptData(
+	state: State[ 'removalPromptData' ] = false,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
 			const { clientIds, selectPrevious, message } = action;
@@ -1586,12 +1668,15 @@ function removalPromptData( state = false, action ) {
  * whose values are the explanation to be shown to users (e.g. 'Query Loop
  * displays a list of posts or pages.').
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Record<string,string>} Updated state.
+ * @return Updated state.
  */
-function blockRemovalRules( state = false, action ) {
+function blockRemovalRules(
+	state: State[ 'blockRemovalRules' ] = false,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SET_BLOCK_REMOVAL_RULES':
 			return action.rules;
@@ -1607,12 +1692,15 @@ function blockRemovalRules( state = false, action ) {
  * pasting new content.This reducer should eventually be removed in favour of setting
  * selection directly.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {number|null} Initial position: 0, -1 or null.
+ * @return Initial position: 0, -1 or null.
  */
-export function initialPosition( state = null, action ) {
+export function initialPosition(
+	state: State[ 'initialPosition' ] = null,
+	action: Action
+) {
 	if (
 		action.type === 'REPLACE_BLOCKS' &&
 		action.initialPosition !== undefined
@@ -1627,13 +1715,17 @@ export function initialPosition( state = null, action ) {
 			'REPLACE_INNER_BLOCKS',
 		].includes( action.type )
 	) {
-		return action.initialPosition;
+		return ( action as { initialPosition?: InitialPosition } )
+			.initialPosition;
 	}
 
 	return state;
 }
 
-export function blocksMode( state = {}, action ) {
+export function blocksMode(
+	state: State[ 'blocksMode' ] = {},
+	action: Action
+) {
 	if ( action.type === 'TOGGLE_BLOCK_MODE' ) {
 		const { clientId } = action;
 		return {
@@ -1653,12 +1745,15 @@ export function blocksMode( state = {}, action ) {
  * is not an explicit insertion point assigned, or an object of its `index` and
  * `rootClientId`.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function insertionCue( state = null, action ) {
+export function insertionCue(
+	state: State[ 'insertionCue' ] = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT': {
 			const {
@@ -1690,12 +1785,15 @@ export function insertionCue( state = null, action ) {
 /**
  * Reducer returning whether the post blocks match the defined template or not.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function template( state = { isValid: true }, action ) {
+export function template(
+	state: State[ 'template' ] = { isValid: true },
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE_VALIDITY':
 			return {
@@ -1710,15 +1808,18 @@ export function template( state = { isValid: true }, action ) {
 /**
  * Reducer returning the editor setting.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function settings( state = SETTINGS_DEFAULTS, action ) {
+export function settings(
+	state: State[ 'settings' ] = SETTINGS_DEFAULTS,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'UPDATE_SETTINGS': {
-			const updatedSettings = action.reset
+			const updatedSettings: Settings = action.reset
 				? {
 						...SETTINGS_DEFAULTS,
 						...action.settings,
@@ -1749,12 +1850,15 @@ export function settings( state = SETTINGS_DEFAULTS, action ) {
 /**
  * Reducer returning the user preferences.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return Updated state.
  */
-export function preferences( state = PREFERENCES_DEFAULTS, action ) {
+export function preferences(
+	state: State[ 'preferences' ] = PREFERENCES_DEFAULTS,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
 		case 'REPLACE_BLOCKS': {
@@ -1802,12 +1906,15 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  * Reducer returning an object where each key is a block client ID, its value
  * representing the settings for its nested blocks.
  *
- * @param {Map}    state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export const blockListSettings = ( state = new Map(), action ) => {
+export const blockListSettings = (
+	state: State[ 'blockListSettings' ] = new Map(),
+	action: Action
+) => {
 	switch ( action.type ) {
 		case 'REPLACE_BLOCKS': {
 			// Collect all clientIds from replacement blocks. If a clientId
@@ -1815,10 +1922,10 @@ export const blockListSettings = ( state = new Map(), action ) => {
 			// its InnerBlocks config) survived the replace. Settings for
 			// clientIds that are truly removed get cleaned up so stale
 			// config from old block types doesn't linger.
-			const replacementIds = new Set();
+			const replacementIds = new Set< string >();
 			const stack = [ ...action.blocks ];
 			while ( stack.length ) {
-				const block = stack.shift();
+				const block = stack.shift()!;
 				replacementIds.add( block.clientId );
 				stack.push( ...block.innerBlocks );
 			}
@@ -1838,7 +1945,7 @@ export const blockListSettings = ( state = new Map(), action ) => {
 			return newState;
 		}
 		case 'UPDATE_BLOCK_LIST_SETTINGS': {
-			const updates =
+			const updates: Array< [ string, BlockListSettings | undefined ] > =
 				typeof action.clientId === 'string'
 					? [ [ action.clientId, action.settings ] ]
 					: Object.entries( action.clientId );
@@ -1876,12 +1983,15 @@ export const blockListSettings = ( state = new Map(), action ) => {
  * block update. The state is always reset to null if the last action is
  * anything other than an attributes update.
  *
- * @param {Object<string,Object>} state  Current state.
- * @param {Object}                action Action object.
+ * @param state  Current state.
+ * @param action Action object.
  *
- * @return {[string,Object]} Updated state.
+ * @return Updated state.
  */
-export function lastBlockAttributesChange( state = null, action ) {
+export function lastBlockAttributesChange(
+	state: State[ 'lastBlockAttributesChange' ] = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'UPDATE_BLOCK':
 			if ( ! action.updates.attributes ) {
@@ -1908,12 +2018,15 @@ export function lastBlockAttributesChange( state = null, action ) {
 /**
  * Reducer returning current highlighted block.
  *
- * @param {boolean} state  Current highlighted block.
- * @param {Object}  action Dispatched action.
+ * @param state  Current highlighted block.
+ * @param action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return Updated state.
  */
-export function highlightedBlock( state, action ) {
+export function highlightedBlock(
+	state: State[ 'highlightedBlock' ],
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'TOGGLE_BLOCK_HIGHLIGHT':
 			const { clientId, isHighlighted } = action;
@@ -1937,12 +2050,15 @@ export function highlightedBlock( state, action ) {
 /**
  * Reducer returning current spotlighted block.
  *
- * @param {string|null} state  Current clientId or null.
- * @param {Object}      action Dispatched action.
+ * @param state  Current clientId or null.
+ * @param action Dispatched action.
  *
- * @return {string|null} Updated state.
+ * @return Updated state.
  */
-export function hasBlockSpotlight( state, action ) {
+export function hasBlockSpotlight(
+	state: State[ 'hasBlockSpotlight' ],
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'TOGGLE_BLOCK_SPOTLIGHT':
 			const { clientId, hasBlockSpotlight: _hasBlockSpotlight } = action;
@@ -1976,12 +2092,15 @@ export function hasBlockSpotlight( state, action ) {
 /**
  * Reducer returning current expanded block in the list view.
  *
- * @param {string|null} state  Current expanded block.
- * @param {Object}      action Dispatched action.
+ * @param state  Current expanded block.
+ * @param action Dispatched action.
  *
- * @return {string|null} Updated state.
+ * @return Updated state.
  */
-export function expandedBlock( state = null, action ) {
+export function expandedBlock(
+	state: State[ 'expandedBlock' ] = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SET_BLOCK_EXPANDED_IN_LIST_VIEW':
 			return action.clientId;
@@ -1997,12 +2116,15 @@ export function expandedBlock( state = null, action ) {
 /**
  * Reducer returning the block insertion event list state.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function lastBlockInserted( state = {}, action ) {
+export function lastBlockInserted(
+	state: State[ 'lastBlockInserted' ] = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
 		case 'REPLACE_BLOCKS':
@@ -2026,12 +2148,15 @@ export function lastBlockInserted( state = {}, action ) {
 /**
  * Reducer returning the contentOnly block that is being edited.
  *
- * @param {string|undefined} state  Current state.
- * @param {Object}           action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {string|undefined} Updated state.
+ * @return Updated state.
  */
-export function editedContentOnlySection( state, action ) {
+export function editedContentOnlySection(
+	state: State[ 'editedContentOnlySection' ],
+	action: Action
+) {
 	if ( action.type === 'EDIT_CONTENT_ONLY_SECTION' ) {
 		return action.clientId;
 	}
@@ -2068,12 +2193,15 @@ export function editedContentOnlySection( state, action ) {
 /**
  * Reducer returning a map of style IDs to style overrides.
  *
- * @param {Map}    state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Map} Updated state.
+ * @return Updated state.
  */
-export function styleOverrides( state = new Map(), action ) {
+export function styleOverrides(
+	state: State[ 'styleOverrides' ] = new Map(),
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SET_STYLE_OVERRIDE':
 			return new Map( state ).set( action.id, action.style );
@@ -2089,12 +2217,15 @@ export function styleOverrides( state = new Map(), action ) {
 /**
  * Reducer returning a map of the registered inserter media categories.
  *
- * @param {Array}  state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Array} Updated state.
+ * @return Updated state.
  */
-export function registeredInserterMediaCategories( state = [], action ) {
+export function registeredInserterMediaCategories(
+	state: State[ 'registeredInserterMediaCategories' ] = [],
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'REGISTER_INSERTER_MEDIA_CATEGORY':
 			return [ ...state, action.category ];
@@ -2106,12 +2237,15 @@ export function registeredInserterMediaCategories( state = [], action ) {
 /**
  * Reducer setting last focused element
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function lastFocus( state = false, action ) {
+export function lastFocus(
+	state: State[ 'lastFocus' ] = false,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'LAST_FOCUS':
 			return action.lastFocus;
@@ -2123,12 +2257,12 @@ export function lastFocus( state = false, action ) {
 /**
  * Reducer setting zoom out state.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {number} Updated state.
+ * @return Updated state.
  */
-export function zoomLevel( state = 100, action ) {
+export function zoomLevel( state: State[ 'zoomLevel' ] = 100, action: Action ) {
 	switch ( action.type ) {
 		case 'SET_ZOOM_LEVEL':
 			return action.zoom;
@@ -2142,12 +2276,15 @@ export function zoomLevel( state = 100, action ) {
 /**
  * Reducer setting the insertion point
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function insertionPoint( state = null, action ) {
+export function insertionPoint(
+	state: State[ 'insertionPoint' ] = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SET_INSERTION_POINT':
 			return action.value;
@@ -2161,14 +2298,14 @@ export function insertionPoint( state = null, action ) {
 /**
  * Reducer returning the opened List View panels state.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
 function openedListViewPanels(
-	state = { allOpen: false, panels: {} },
-	action
+	state: State[ 'openedListViewPanels' ] = { allOpen: false, panels: {} },
+	action: Action
 ) {
 	switch ( action.type ) {
 		case 'SET_OPEN_LIST_VIEW_PANEL':
@@ -2216,12 +2353,15 @@ function openedListViewPanels(
  * the ListView key changes, causing the component to remount with a fresh
  * isExpanded=true state.
  *
- * @param {number} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {number} Updated state.
+ * @return Updated state.
  */
-function listViewExpandRevision( state = 0, action ) {
+function listViewExpandRevision(
+	state: State[ 'listViewExpandRevision' ] = 0,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'INCREMENT_LIST_VIEW_EXPAND_REVISION':
 			return state + 1;
@@ -2232,12 +2372,15 @@ function listViewExpandRevision( state = 0, action ) {
 /**
  * Reducer tracking whether the list view content panel popover is open.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function listViewContentPanelOpen( state = false, action ) {
+export function listViewContentPanelOpen(
+	state: State[ 'listViewContentPanelOpen' ] = false,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'OPEN_LIST_VIEW_CONTENT_PANEL':
 			return true;
@@ -2257,12 +2400,15 @@ export function listViewContentPanelOpen( state = false, action ) {
  * Reducer tracking the requested inspector tab state.
  * Stores a request to open a specific inspector tab with optional configuration.
  *
- * @param {Object|null} state  Current state.
- * @param {Object}      action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object|undefined} Updated state.
+ * @return Updated state.
  */
-export function requestedInspectorTab( state = null, action ) {
+export function requestedInspectorTab(
+	state: State[ 'requestedInspectorTab' ] = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'REQUEST_INSPECTOR_TAB':
 			return {
@@ -2279,12 +2425,15 @@ export function requestedInspectorTab( state = null, action ) {
 /**
  * Reducer tracking the selected style state for block style controls.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object|null} Updated state.
+ * @return Updated state.
  */
-export function selectedBlockStyleState( state = undefined, action ) {
+export function selectedBlockStyleState(
+	state: State[ 'selectedBlockStyleState' ] = undefined,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SET_SELECTED_BLOCK_STYLE_STATE': {
 			if ( ! action.clientId || ! action.value ) {
@@ -2389,12 +2538,15 @@ export function selectedBlockStyleState( state = undefined, action ) {
  * value other than 'default', block style edits in the inspector are applied to
  * that viewport. Driven by the editor's device preview (Responsive editing).
  *
- * @param {string} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {string} Updated state.
+ * @return Updated state.
  */
-export function styleStateViewport( state = 'default', action ) {
+export function styleStateViewport(
+	state: State[ 'styleStateViewport' ] = 'default',
+	action: Action
+) {
 	if ( action.type === 'SET_STYLE_STATE_VIEWPORT' ) {
 		return action.viewport ?? 'default';
 	}
@@ -2406,12 +2558,15 @@ export function styleStateViewport( state = 'default', action ) {
  * Reducer for whether Responsive editing is enabled. When enabled, the device
  * preview also drives which viewport block style edits are applied to.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function isResponsiveEditing( state = false, action ) {
+export function isResponsiveEditing(
+	state: State[ 'isResponsiveEditing' ] = false,
+	action: Action
+) {
 	if ( action.type === 'SET_RESPONSIVE_EDITING' ) {
 		return action.enabled;
 	}
@@ -2462,13 +2617,16 @@ const combinedReducers = combineReducers( {
 /**
  * Retrieves a block's tree structure, handling both controlled and uncontrolled inner blocks.
  *
- * @param {Object} state    The current state object.
- * @param {string} clientId The client ID of the block to retrieve.
+ * @param state    The current state object.
+ * @param clientId The client ID of the block to retrieve.
  *
- * @return {Object|undefined} The block tree object, or undefined if not found. For controlled blocks,
+ * @return The block tree object, or undefined if not found. For controlled blocks,
  *                           returns a merged tree with controlled inner blocks.
  */
-function getBlockTreeBlock( state, clientId ) {
+function getBlockTreeBlock(
+	state: State,
+	clientId: string
+): TraversedBlock | undefined {
 	if ( clientId === '' ) {
 		const rootBlock = state.blocks.tree.get( clientId );
 
@@ -2485,14 +2643,15 @@ function getBlockTreeBlock( state, clientId ) {
 	}
 
 	if ( ! state.blocks.controlledInnerBlocks.has( clientId ) ) {
-		return state.blocks.tree.get( clientId );
+		return state.blocks.tree.get( clientId ) as TreeBlock | undefined;
 	}
 
 	const controlledTree = state.blocks.tree.get( `controlled||${ clientId }` );
 	const regularTree = state.blocks.tree.get( clientId );
 
+	// A stale controlled ID has no regular entry, leaving no client ID.
 	return {
-		...regularTree,
+		...( regularTree as TreeBlock ),
 		innerBlocks: controlledTree?.innerBlocks,
 	};
 }
@@ -2500,12 +2659,16 @@ function getBlockTreeBlock( state, clientId ) {
 /**
  * Recursively traverses through a block tree of a given block and executes a callback for each block.
  *
- * @param {Object}   state    The store state.
- * @param {string}   clientId The clientId of the block to start traversing from.
- * @param {Function} callback Function to execute for each block encountered during traversal.
- *                            The callback receives the current block as its argument.
+ * @param state    The store state.
+ * @param clientId The clientId of the block to start traversing from.
+ * @param callback Function to execute for each block encountered during traversal.
+ *                 The callback receives the current block as its argument.
  */
-function traverseBlockTree( state, clientId, callback ) {
+function traverseBlockTree(
+	state: State,
+	clientId: string,
+	callback: ( block: TraversedBlock ) => void
+) {
 	const tree = getBlockTreeBlock( state, clientId );
 	if ( ! tree ) {
 		return;
@@ -2525,13 +2688,17 @@ function traverseBlockTree( state, clientId, callback ) {
 /**
  * Checks if a block has a parent in a list of client IDs, and if so returns the client ID of the parent.
  *
- * @param {Object} state     The current state object.
- * @param {string} clientId  The client ID of the block to search the parents of.
- * @param {Array}  clientIds The client IDs of the blocks to check.
+ * @param state     The current state object.
+ * @param clientId  The client ID of the block to search the parents of.
+ * @param clientIds The client IDs of the blocks to check.
  *
- * @return {string|undefined} The client ID of the parent block if found, undefined otherwise.
+ * @return The client ID of the parent block if found, undefined otherwise.
  */
-function findParentInClientIdsList( state, clientId, clientIds ) {
+function findParentInClientIdsList(
+	state: State,
+	clientId: string,
+	clientIds: string[]
+): string | void {
 	if ( ! clientIds.length ) {
 		return;
 	}
@@ -2548,10 +2715,10 @@ function findParentInClientIdsList( state, clientId, clientIds ) {
 /**
  * Checks if a block has any bindings in its metadata attributes.
  *
- * @param {Object} block The block object to check for bindings.
- * @return {boolean}    True if the block has bindings, false otherwise.
+ * @param block The block object to check for bindings.
+ * @return    True if the block has bindings, false otherwise.
  */
-function hasBindings( block ) {
+function hasBindings( block: TraversedBlock ) {
 	return (
 		block?.attributes?.metadata?.bindings &&
 		Object.keys( block?.attributes?.metadata?.bindings ).length
@@ -2564,24 +2731,27 @@ function hasBindings( block ) {
  * This function calculates the editing modes for each block in the tree, taking into account
  * various factors such as zoom level, sections, and synced patterns.
  *
- * @param {Object} state        The current state object.
- * @param {string} treeClientId The client ID of the root block for the tree. Defaults to an empty string.
- * @return {Map} A Map containing the derived block editing modes, keyed by block client ID.
+ * @param state        The current state object.
+ * @param treeClientId The client ID of the root block for the tree. Defaults to an empty string.
+ * @return A Map containing the derived block editing modes, keyed by block client ID.
  */
-function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
+function getDerivedBlockEditingModesForTree( state: State, treeClientId = '' ) {
 	const isZoomedOut =
-		state?.zoomLevel < 100 || state?.zoomLevel === 'auto-scaled';
+		( state?.zoomLevel as number ) < 100 ||
+		state?.zoomLevel === 'auto-scaled';
 	const derivedBlockEditingModes = new Map();
 
 	// When there are sections, the majority of blocks are disabled,
 	// so the default block editing mode is set to disabled.
-	const sectionRootClientId = state.settings?.[ sectionRootClientIdKey ];
+	const sectionRootClientId = state.settings?.[
+		sectionRootClientIdKey
+	] as string;
 	const sectionClientIds = state.blocks.order.get( sectionRootClientId );
 	const hasDisabledBlocks = Array.from( state.blocks.blockEditingModes ).some(
 		( [ , mode ] ) => mode === 'disabled'
 	);
-	const templatePartClientIds = [];
-	const syncedPatternClientIds = [];
+	const templatePartClientIds: string[] = [];
+	const syncedPatternClientIds: string[] = [];
 
 	state.blocks.controlledInnerBlocks.forEach( ( clientId ) => {
 		const block = state.blocks.byClientId?.get( clientId );
@@ -2637,7 +2807,7 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			isWithinEditedContentOnlySection =
 				clientId === state.editedContentOnlySection ||
 				!! findParentInClientIdsList( state, clientId, [
-					state.editedContentOnlySection,
+					state.editedContentOnlySection!,
 				] );
 
 			// When a contentOnly section is being edited, all blocks outside
@@ -2796,21 +2966,27 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
  *
  * It only returns a value when modifications are made to the block editing modes.
  *
- * @param {Object} options                    The options for updating derived block editing modes.
- * @param {Object} options.prevState          The previous state object.
- * @param {Object} options.nextState          The next state object.
- * @param {Array}  [options.addedBlocks]      An array of blocks that were added.
- * @param {Array}  [options.removedClientIds] An array of client IDs of blocks that were removed.
- * @return {Map|undefined} The updated derived block editing modes, or undefined if no changes were made.
+ * @param options                    The options for updating derived block editing modes.
+ * @param options.prevState          The previous state object.
+ * @param options.nextState          The next state object.
+ * @param [options.addedBlocks]      An array of blocks that were added.
+ * @param [options.removedClientIds] An array of client IDs of blocks that were removed.
+ * @return The updated derived block editing modes, or undefined if no changes were made.
  */
 function getDerivedBlockEditingModesUpdates( {
 	prevState,
 	nextState,
 	addedBlocks,
 	removedClientIds,
+}: {
+	prevState: State;
+	nextState: State;
+	addedBlocks?: Array< TraversedBlock | BlockWithoutAttributes | undefined >;
+	removedClientIds?: string[];
 } ) {
 	const prevDerivedBlockEditingModes = prevState.derivedBlockEditingModes;
-	let nextDerivedBlockEditingModes;
+	let nextDerivedBlockEditingModes:
+		Map< string, BlockEditingMode > | undefined;
 
 	// Perform removals before additions to handle cases like the `MOVE_BLOCKS_TO_POSITION` action.
 	// That action removes a set of clientIds, but adds the same blocks back in a different location.
@@ -2834,7 +3010,8 @@ function getDerivedBlockEditingModesUpdates( {
 	addedBlocks?.forEach( ( addedBlock ) => {
 		const updates = getDerivedBlockEditingModesForTree(
 			nextState,
-			addedBlock.clientId
+			// A stale client ID leaves `undefined` here, which throws as before.
+			addedBlock!.clientId
 		);
 
 		if ( updates.size ) {
@@ -2867,11 +3044,11 @@ function getDerivedBlockEditingModesUpdates( {
  * based on various actions such as adding, removing, or moving blocks, or changing
  * the editor mode.
  *
- * @param {Function} reducer The original reducer function to be wrapped.
- * @return {Function} A new reducer function that includes derived block editing modes handling.
+ * @param reducer The original reducer function to be wrapped.
+ * @return A new reducer function that includes derived block editing modes handling.
  */
-export function withDerivedBlockEditingModes( reducer ) {
-	return ( state, action ) => {
+export function withDerivedBlockEditingModes( reducer: Reducer< State > ) {
+	return ( state: State, action: Action ) => {
 		const nextState = reducer( state, action );
 
 		// An exception is needed here to still recompute the block editing modes when
@@ -2930,13 +3107,15 @@ export function withDerivedBlockEditingModes( reducer ) {
 					break;
 				}
 
-				const addedBlocks = [];
-				const removedClientIds = [];
+				const addedBlocks: Array< TreeBlock | undefined > = [];
+				const removedClientIds: string[] = [];
 
 				for ( const clientId of action?.clientIds ) {
-					const attributes = action.options?.uniqueByBlock
-						? action.attributes[ clientId ]
-						: action.attributes;
+					const attributes = (
+						action.options?.uniqueByBlock
+							? action.attributes[ clientId ]
+							: action.attributes
+					) as BlockAttributes | undefined;
 
 					if ( ! attributes ) {
 						break;
@@ -2950,7 +3129,8 @@ export function withDerivedBlockEditingModes( reducer ) {
 							?.patternName
 					) {
 						addedBlocks.push(
-							nextState.blocks.tree.get( clientId )
+							nextState.blocks.tree.get( clientId ) as
+								TreeBlock | undefined
 						);
 					} else if (
 						// patternName is switching from truthy to falsy, this block is becoming
@@ -2993,8 +3173,8 @@ export function withDerivedBlockEditingModes( reducer ) {
 			}
 			case 'UPDATE_BLOCK_LIST_SETTINGS': {
 				// Handle the addition and removal of contentOnly template locked blocks.
-				const addedBlocks = [];
-				const removedClientIds = [];
+				const addedBlocks: Array< TreeBlock | undefined > = [];
+				const removedClientIds: string[] = [];
 
 				const updates =
 					typeof action.clientId === 'string'
@@ -3016,7 +3196,8 @@ export function withDerivedBlockEditingModes( reducer ) {
 
 					if ( isNewContentOnlyBlock ) {
 						addedBlocks.push(
-							nextState.blocks.tree.get( clientId )
+							nextState.blocks.tree.get( clientId ) as
+								TreeBlock | undefined
 						);
 					} else if ( wasContentOnlyBlock ) {
 						removedClientIds.push( clientId );
@@ -3192,8 +3373,8 @@ export function withDerivedBlockEditingModes( reducer ) {
 	};
 }
 
-function withAutomaticChangeReset( reducer ) {
-	return ( state, action ) => {
+function withAutomaticChangeReset( reducer: Reducer< State > ) {
+	return ( state: State | undefined, action: Action ) => {
 		const nextState = reducer( state, action );
 
 		if ( ! state ) {
@@ -3248,4 +3429,4 @@ function withAutomaticChangeReset( reducer ) {
 export default pipe(
 	withDerivedBlockEditingModes,
 	withAutomaticChangeReset
-)( combinedReducers );
+)( combinedReducers ) as Reducer< State >;
