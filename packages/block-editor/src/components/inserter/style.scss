@@ -446,10 +446,10 @@ $media-panel-min-height: 320px;
 	min-height: $media-panel-min-height;
 
 	// The panel body is a DataViews grid composed from its sub-components.
-	// Strip the surface colour DataViews brings for full-page use, and let its
-	// layout container be the scroll host across the panel's full width, so
-	// the scrollbar sits at the sidebar edge: the search, grid, empty state
-	// and footer each carry the horizontal gutter instead of the panel.
+	// Strip the surface colour DataViews brings for full-page use. The panel
+	// spans the sidebar's full width and the search, grid, empty state and
+	// footer each carry the horizontal gutter, so a scrollbar sits at the
+	// sidebar edge rather than inset from it.
 	.dataviews-wrapper {
 		background-color: transparent;
 	}

@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
+import { getScrollContainer } from '@wordpress/dom';
 import MediaGrid from './media-grid';
 import { useMediaResults } from './hooks';
 import { useMediaInsert } from './use-media-insert';
@@ -68,11 +69,11 @@ export function MediaCategoryPanel( {
 	}
 	const panelRef = useRef();
 	const changePage = useCallback( ( nextPage ) => {
-		// The grid's layout container is the scroll host; start the new page
-		// from the top rather than wherever the previous one was scrolled to.
-		panelRef.current
-			?.querySelector( '.dataviews-layout__container' )
-			?.scrollTo?.( 0, 0 );
+		// Start the new page from the top rather than wherever the previous
+		// one was scrolled to. Same approach as `usePatternsPaging`: the panel
+		// doesn't scroll itself, so find whichever ancestor does.
+		// `scrollTo` is guarded because jsdom leaves it undefined.
+		getScrollContainer( panelRef.current )?.scrollTo?.( 0, 0 );
 		setPage( nextPage );
 	}, [] );
 	// Inserting lives here alongside attach and detach, so every operation on

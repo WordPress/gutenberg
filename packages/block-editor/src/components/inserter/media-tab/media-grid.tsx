@@ -234,20 +234,17 @@ export default function MediaGrid( {
 		[ page, perPage, search ]
 	);
 
-	// The panel owns page and search, so changes are forwarded to it rather
-	// than stored here.
+	// The panel owns the page, so changes are forwarded to it rather than
+	// stored here. Search comes in through `MediaSearch`, not the view, so
+	// paging is the only thing `DataViews` changes.
 	const onChangeView = useCallback(
 		( nextView: View ) => {
-			const nextSearch = nextView.search ?? '';
-			if ( nextSearch !== search ) {
-				onChangeSearch( nextSearch );
-			}
 			const nextPage = nextView.page ?? 1;
 			if ( nextPage !== page ) {
 				onChangePage( nextPage );
 			}
 		},
-		[ search, page, onChangeSearch, onChangePage ]
+		[ page, onChangePage ]
 	);
 
 	const paginationInfo = useMemo(

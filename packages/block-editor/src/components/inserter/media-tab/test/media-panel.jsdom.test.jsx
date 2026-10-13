@@ -59,7 +59,7 @@ const baseCategory = {
 	invalidate: vi.fn(),
 };
 
-// The search term lives above the panel (in `MediaBrowser`), so the harness
+// The search term lives above the panel (in `MediaTab`), so the harness
 // owns it here the same way.
 function PanelHarness( { category } ) {
 	const [ search, setSearch ] = useState( '' );
