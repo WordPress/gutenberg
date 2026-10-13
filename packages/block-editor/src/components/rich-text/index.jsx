@@ -300,6 +300,7 @@ function RichTextWrapper(
 		setFieldFormatSettings( clientId, identifier, {
 			allowedFormats: adjustedAllowedFormats,
 			withoutInteractiveFormatting,
+			disabled: shouldDisableEditing,
 		} );
 		return () => {
 			deleteFieldFormatSettings( clientId, identifier );
@@ -309,6 +310,7 @@ function RichTextWrapper(
 		identifier,
 		adjustedAllowedFormats,
 		withoutInteractiveFormatting,
+		shouldDisableEditing,
 	] );
 
 	const onSelectionChange = useCallback(

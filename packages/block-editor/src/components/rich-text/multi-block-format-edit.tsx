@@ -104,12 +104,17 @@ function selector( select: ( store: typeof blockEditorStore ) => any ) {
 	}
 
 	for ( const clientId of clientIds ) {
+		const key = getSoleRichTextAttributeKey( getBlockName( clientId ) );
 		// Inner blocks would be inside the selection but outside the text.
-		if (
-			! getSoleRichTextAttributeKey( getBlockName( clientId ) ) ||
-			getBlockCount( clientId )
-		) {
+		if ( ! key || getBlockCount( clientId ) ) {
 			return null;
+		}
+		// The selection ends must be in that field, not another one of the
+		// block.
+		for ( const end of [ anchor, focus ] ) {
+			if ( end.clientId === clientId && end.attributeKey !== key ) {
+				return null;
+			}
 		}
 	}
 
@@ -170,25 +175,28 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 		},
 		[ clientIds, keys ]
 	);
-	// The formats every selected field allows.
-	const { allowedFormats, withoutInteractiveFormatting } = useMemo( () => {
-		const fields = clientIds.map( ( clientId, i ) =>
-			getFieldFormatSettings( clientId, keys[ i ] )
-		);
-		const lists: string[][] = fields
-			.map( ( field ) => field?.allowedFormats )
-			.filter( Boolean );
-		return {
-			allowedFormats: lists.length
-				? lists.reduce( ( a, b ) =>
-						a.filter( ( name ) => b.includes( name ) )
-					)
-				: undefined,
-			withoutInteractiveFormatting: fields.some(
-				( field ) => field?.withoutInteractiveFormatting
-			),
-		};
-	}, [ clientIds, keys ] );
+	// The formats every selected field allows, and whether one of them
+	// cannot be edited.
+	const { allowedFormats, withoutInteractiveFormatting, disabled } =
+		useMemo( () => {
+			const fields = clientIds.map( ( clientId, i ) =>
+				getFieldFormatSettings( clientId, keys[ i ] )
+			);
+			const lists: string[][] = fields
+				.map( ( field ) => field?.allowedFormats )
+				.filter( Boolean );
+			return {
+				allowedFormats: lists.length
+					? lists.reduce( ( a, b ) =>
+							a.filter( ( name ) => b.includes( name ) )
+						)
+					: undefined,
+				withoutInteractiveFormatting: fields.some(
+					( field ) => field?.withoutInteractiveFormatting
+				),
+				disabled: fields.some( ( field ) => field?.disabled ),
+			};
+		}, [ clientIds, keys ] );
 	const { formatTypes } = useFormatTypes( {
 		allowedFormats,
 		withoutInteractiveFormatting,
@@ -274,6 +282,10 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 
 	function onFocus() {
 		contentRef.current?.focus();
+	}
+
+	if ( disabled ) {
+		return null;
 	}
 
 	return (
