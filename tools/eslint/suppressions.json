@@ -4859,7 +4859,7 @@
 			"count": 4
 		}
 	},
-	"packages/components/src/utils/rtl.js": {
+	"packages/components/src/utils/rtl.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -7919,7 +7919,7 @@
 			"count": 1
 		}
 	},
-	"packages/rich-text/src/hook/index.js": {
+	"packages/rich-text/src/hook/index.ts": {
 		"react-hooks/refs": {
 			"count": 8
 		}
