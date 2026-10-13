@@ -109,7 +109,12 @@ export function Note( {
 		{
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
-			isEligible: ( { status } ) => canResolve && hasResolved( status ),
+			// A decided suggestion can be reopened too; its own Accept and
+			// Reject replace Resolve, but not Reopen.
+			isEligible: ( { status } ) =>
+				( canResolve ||
+					( note.parent === 0 && hasSuggestionPayload ) ) &&
+				hasResolved( status ),
 			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},
 		{
@@ -233,6 +238,7 @@ export function Note( {
 				<SuggestionActions
 					thread={ note }
 					decision={ suggestionDecision }
+					onReopen={ () => onEditNote( note, { status: 'hold' } ) }
 				/>
 			) }
 			{ actionState === 'delete' && (

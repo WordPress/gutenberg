@@ -1,5 +1,11 @@
 import clsx from 'clsx';
-import { useContext, useEffect, useRef, useState } from '@wordpress/element';
+import {
+	useContext,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
@@ -27,6 +33,12 @@ import {
 } from './utils';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import {
+	findPostAttributeOps,
+	parseSuggestionPayload,
+} from '../suggestion-mode/operations';
+import { getPostFieldName } from '../suggestion-mode/post-field-labels';
+import { useTaxonomyNames } from '../suggestion-mode/use-taxonomy-names';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
@@ -85,6 +97,17 @@ export function NoteThread( {
 	onKeyDown,
 } ) {
 	const isFloating = !! floating;
+	const taxonomyNames = useTaxonomyNames();
+	// A post field suggestion (the title, the excerpt...) has no block by
+	// design; it is not an orphan.
+	const suggestionPayload = note.meta?._wp_suggestion;
+	const postFieldName = useMemo( () => {
+		const [ op ] = findPostAttributeOps(
+			parseSuggestionPayload( suggestionPayload )?.operations
+		);
+		return op ? getPostFieldName( op, taxonomyNames ) : null;
+	}, [ suggestionPayload, taxonomyNames ] );
+	const isPostSuggestion = postFieldName !== null;
 	const { toggleBlockHighlight, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -214,17 +237,27 @@ export function NoteThread( {
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const ariaLabel = !! note.blockClientId
-		? sprintf(
-				// translators: %s: note excerpt
-				__( 'Note: %s' ),
-				noteExcerpt
-			)
-		: sprintf(
-				// translators: %s: note excerpt
-				__( 'Original block deleted. Note: %s' ),
-				noteExcerpt
-			);
+	let ariaLabel;
+	if ( isPostSuggestion ) {
+		ariaLabel = sprintf(
+			// translators: 1: post field name, e.g. "Post title". 2: note excerpt.
+			__( '%1$s note: %2$s' ),
+			postFieldName,
+			noteExcerpt
+		);
+	} else if ( note.blockClientId ) {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Note: %s' ),
+			noteExcerpt
+		);
+	} else {
+		ariaLabel = sprintf(
+			// translators: %s: note excerpt
+			__( 'Original block deleted. Note: %s' ),
+			noteExcerpt
+		);
+	}
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -286,7 +319,12 @@ export function NoteThread( {
 			>
 				{ __( 'Add new reply' ) }
 			</Button>
-			{ ! note.blockClientId && (
+			{ isPostSuggestion && (
+				<p className="editor-collab-sidebar-panel__note-target">
+					{ postFieldName }
+				</p>
+			) }
+			{ ! note.blockClientId && ! isPostSuggestion && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
 					{ __( 'Original block deleted.' ) }
 				</p>

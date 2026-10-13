@@ -1,0 +1,887 @@
+import {
+	afterEach,
+	beforeAll,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+import { render, act } from '@testing-library/react';
+import apiFetch from '@wordpress/api-fetch';
+import { createRegistry, RegistryProvider } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
+// @ts-expect-error No exported types
+import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { store as noticesStore } from '@wordpress/notices';
+import { createBlock, registerBlockType } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
+import SuggestionNoteGC from '../suggestion-note-gc';
+import { SuggestionSessionProvider } from '../suggestion-session';
+import { registerSuggestionFormat } from '../../inline-suggestions';
+import {
+	getReopenedDecision,
+	getSuggestionsResolvedThisSession,
+	rememberRedo,
+	rememberReopenedDecision,
+	rememberResolvedSuggestion,
+} from '../decision-state';
+import { store as editorStore } from '../../../store';
+
+// The editor store pulls in `@wordpress/viewport`, which reads
+// `window.matchMedia` while loading.
+vi.hoisted( () => {
+	globalThis.wpVitest.mockMatchMedia();
+} );
+
+vi.mock( import( '@wordpress/api-fetch' ), async ( importOriginal ) => {
+	const original = await importOriginal();
+
+	return {
+		...original,
+		default: vi.fn(),
+	} as unknown as typeof original;
+} );
+
+/*
+ * What the comments endpoint answers with. The reply guard asks the server
+ * directly rather than reading the store, so these - not the records seeded
+ * into the cache - are what it sees. `serverReplies` answers the collector's
+ * `parent=<note>` probe; an `Error` makes that request fail.
+ */
+let serverThreads: any[] = [];
+let serverReplies: any[] | Error = [];
+/*
+ * The note as the server has it when the collector reads it fresh before
+ * trashing. Defaults to the root note the threads were seeded with.
+ */
+let serverNote: any = null;
+
+const CURRENT_USER_ID = 1;
+const OTHER_USER_ID = 2;
+
+const POST_ID = 77;
+const NOTE_ID = 9;
+const REPLY_ID = 10;
+const TEST_BLOCK_NAME = 'test/note-gc-block';
+
+const THREADS_QUERY = {
+	post: POST_ID,
+	type: 'note',
+	status: 'all',
+	per_page: -1,
+};
+
+/*
+ * An inline `add` suggestion note. `status` / `_wp_suggestion_status` describe
+ * the note's lifecycle: `hold` with no lifecycle status is pending, `approved`
+ * plus `applied` is a decision that has landed.
+ */
+function note( {
+	status = 'approved',
+	lifecycle = 'applied',
+	author = CURRENT_USER_ID,
+} = {} ) {
+	return {
+		id: NOTE_ID,
+		parent: 0,
+		author,
+		status,
+		...( author !== undefined && { author } ),
+		meta: {
+			_wp_suggestion_status: lifecycle,
+			_wp_suggestion: JSON.stringify( {
+				schemaVersion: 2,
+				operations: [
+					{
+						type: 'inline-suggestion',
+						attribute: 'content',
+						suggestionType: 'add',
+					},
+				],
+			} ),
+		},
+	};
+}
+
+/*
+ * A reply to the note above. Replies are children of the root comment, which
+ * is why a withdrawal that trashes the root takes them with it.
+ */
+function reply() {
+	return {
+		id: REPLY_ID,
+		parent: NOTE_ID,
+		status: 'hold',
+		meta: {},
+	};
+}
+
+/*
+ * A pending attribute-set note (a heading level change). Its anchor is the
+ * block marker's proposal, not a mark in the content.
+ */
+function attributeNote() {
+	return {
+		id: NOTE_ID,
+		parent: 0,
+		author: CURRENT_USER_ID,
+		status: 'hold',
+		meta: {
+			_wp_suggestion_status: 'pending',
+			_wp_suggestion: JSON.stringify( {
+				schemaVersion: 2,
+				operations: [
+					{
+						type: 'attribute-set',
+						attribute: 'level',
+						before: 2,
+						after: 3,
+					},
+				],
+			} ),
+		},
+	};
+}
+
+const MARKED = `Hello <mark class="wp-suggestion-add" data-suggestion-id="${ NOTE_ID }" data-suggestion-type="add" data-author="1">world</mark>`;
+
+beforeAll( () => {
+	registerBlockType( TEST_BLOCK_NAME, {
+		apiVersion: 3,
+		title: 'Note GC block',
+		category: 'text',
+		attributes: {
+			content: { type: 'rich-text', source: 'rich-text' },
+			metadata: { type: 'object' },
+		},
+		save: () => null,
+	} );
+	registerSuggestionFormat();
+} );
+
+function setup( {
+	content,
+	threads,
+	resolved = false,
+	metadata = { noteId: [ NOTE_ID ] },
+	currentUserId = CURRENT_USER_ID,
+}: {
+	content: string;
+	threads: any[];
+	/** Whether this session already applied or rejected the note. */
+	resolved?: boolean;
+	/** The block's metadata; defaults to the note link alone. */
+	metadata?: Record< string, any >;
+	/** The signed-in user, or null while unresolved. */
+	currentUserId?: number | null;
+} ) {
+	serverThreads = threads;
+	serverReplies = threads.filter(
+		( thread: any ) => thread.parent === NOTE_ID
+	);
+	serverNote = threads.find( ( thread: any ) => thread.id === NOTE_ID );
+	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockReset();
+	( apiFetch as unknown as ReturnType< typeof vi.fn > ).mockImplementation(
+		async ( { path }: any ) => {
+			if ( path.startsWith( `/wp/v2/comments/${ NOTE_ID }?` ) ) {
+				return serverNote;
+			}
+			if ( ! path.includes( `parent=${ NOTE_ID }` ) ) {
+				return serverThreads;
+			}
+			if ( serverReplies instanceof Error ) {
+				throw serverReplies;
+			}
+			return serverReplies;
+		}
+	);
+
+	const registry = createRegistry();
+	registry.register( coreStore );
+	registry.register( preferencesStore );
+	registry.register( blockEditorStore );
+	registry.register( editorStore );
+	registry.register( noticesStore );
+	if ( resolved ) {
+		rememberResolvedSuggestion( registry, NOTE_ID );
+	}
+
+	registry.dispatch( editorStore ).setEditedPost( 'post', POST_ID as any );
+	if ( currentUserId !== null ) {
+		( registry.dispatch( coreStore ) as any ).receiveCurrentUser( {
+			id: currentUserId,
+		} );
+	}
+
+	const block = createBlock( TEST_BLOCK_NAME, {
+		content: RichTextData.fromHTMLString( content ),
+		metadata,
+	} );
+	registry.dispatch( blockEditorStore ).resetBlocks( [ block ] );
+	registry
+		.dispatch( coreStore )
+		.receiveEntityRecords( 'root', 'comment', threads, THREADS_QUERY );
+
+	const saveEntityRecord = vi
+		.spyOn( registry.dispatch( coreStore ), 'saveEntityRecord' )
+		.mockResolvedValue( {} );
+
+	render(
+		<RegistryProvider value={ registry }>
+			<SuggestionSessionProvider>
+				<SuggestionNoteGC />
+			</SuggestionSessionProvider>
+		</RegistryProvider>
+	);
+
+	return { registry, saveEntityRecord, clientId: block.clientId };
+}
+
+afterEach( () => {
+	vi.restoreAllMocks();
+} );
+
+describe( 'SuggestionNoteGC reopening an undone decision', () => {
+	it( 'reopens a note this session resolved when its marker comes back', async () => {
+		/*
+		 * The state an undo leaves behind: the block change is walked back so
+		 * the marker is on screen again, but the comment's status is on the
+		 * server and no keystroke reached it. Without the reopen the run stays
+		 * marked with no Accept/Reject on it (#73411, F-18).
+		 */
+		let saveEntityRecord;
+		await act( async () => {
+			( { saveEntityRecord } = setup( {
+				content: MARKED,
+				threads: [ note() ],
+				resolved: true,
+			} ) );
+		} );
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{
+				id: NOTE_ID,
+				status: 'hold',
+				meta: { _wp_suggestion_status: 'pending' },
+			},
+			expect.anything()
+		);
+	} );
+
+	it( 'remembers the decision it reopened, so a redo can restore it', async () => {
+		let registry: any;
+		await act( async () => {
+			( { registry } = setup( {
+				content: MARKED,
+				threads: [ note( { lifecycle: 'rejected' } ) ],
+				resolved: true,
+			} ) );
+		} );
+
+		expect( getReopenedDecision( registry, NOTE_ID ) ).toBe( 'rejected' );
+	} );
+
+	it( 'leaves a resolved note alone while its marker is gone', async () => {
+		// The ordinary post-decision state: the decision stands.
+		let saveEntityRecord;
+		await act( async () => {
+			( { saveEntityRecord } = setup( {
+				content: 'Hello world',
+				threads: [ note() ],
+				resolved: true,
+			} ) );
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not reopen a decision this session did not make', async () => {
+		/*
+		 * A peer's decision arriving through sync before this session's content
+		 * catches up looks exactly like an undo from the outside. Reopening it
+		 * would undo their review, so only decisions made here are tracked.
+		 */
+		let saveEntityRecord;
+		await act( async () => {
+			( { saveEntityRecord } = setup( {
+				content: MARKED,
+				threads: [ note() ],
+			} ) );
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'SuggestionNoteGC redoing an undone decision', () => {
+	beforeEach( () => {
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	/**
+	 * Mounts the collector on a note an undo reopened, with its marker on
+	 * screen, then takes the marker away again and lets the grace period run.
+	 *
+	 * @param redo Whether a redo was dispatched just before the marker went.
+	 * @return The registry and the `saveEntityRecord` spy.
+	 */
+	async function removeMarkerAfterReopen( redo: boolean ) {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: MARKED,
+				threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			} );
+		} );
+		rememberReopenedDecision( harness.registry, NOTE_ID, 'applied' );
+		if ( redo ) {
+			rememberRedo( harness.registry );
+		}
+
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+		return harness;
+	}
+
+	it( 'resolves the note again when a redo lands the decision', async () => {
+		const { registry, saveEntityRecord } =
+			await removeMarkerAfterReopen( true );
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{
+				id: NOTE_ID,
+				// Provisional: only a post save makes it final.
+				status: 'hold',
+				meta: { _wp_suggestion_status: 'applied-unsaved' },
+			},
+			expect.anything()
+		);
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+		// Recorded as decided again, so a second undo reopens it again.
+		expect(
+			getSuggestionsResolvedThisSession( registry ).has(
+				String( NOTE_ID )
+			)
+		).toBe( true );
+		expect( getReopenedDecision( registry, NOTE_ID ) ).toBeUndefined();
+	} );
+
+	it( 'still collects the note when the marker goes without a redo', async () => {
+		// Undoing further, past the suggestion itself, withdraws it.
+		const { saveEntityRecord } = await removeMarkerAfterReopen( false );
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+} );
+
+describe( 'SuggestionNoteGC collecting a withdrawn marker', () => {
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	it( 'retries a trash request that failed while the marker stays gone', async () => {
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+
+		let registry: any;
+		let saveEntityRecord: any;
+		// The marker is on screen first, so the collector observes the anchor
+		// before it disappears; it never collects an anchor it has not seen.
+		await act( async () => {
+			( { registry, saveEntityRecord } = setup( {
+				content: MARKED,
+				threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			} ) );
+		} );
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+
+		// The server refuses the first trash.
+		saveEntityRecord.mockRejectedValueOnce( new Error( 'Offline' ) );
+
+		// Undo withdraws the marker: the note's anchor is gone.
+		const [ clientId ] = registry
+			.select( blockEditorStore )
+			.getClientIdsWithDescendants();
+		await act( async () => {
+			registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+
+		// The grace period runs out and the first trash is attempted.
+		await act( async () => {
+			vi.advanceTimersByTime( 600 );
+		} );
+		expect( saveEntityRecord ).toHaveBeenCalledTimes( 1 );
+		expect( saveEntityRecord ).toHaveBeenLastCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+
+		// Nothing else changed, so only the retry can collect the note.
+		await act( async () => {
+			vi.advanceTimersByTime( 5000 );
+		} );
+		expect( saveEntityRecord ).toHaveBeenCalledTimes( 2 );
+		expect( saveEntityRecord ).toHaveBeenLastCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+} );
+
+describe( 'SuggestionNoteGC collecting a withdrawn suggestion', () => {
+	beforeEach( () => {
+		/*
+		 * Only the timers: the collection awaits a real request between its
+		 * two withdrawal checks, so the promise jobs have to keep running.
+		 */
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	/**
+	 * Mounts the collector on a marked block, then takes the marker away the
+	 * way an undo would, and lets the grace period run out.
+	 *
+	 * @param threads    Note threads the sidebar query resolves to at mount.
+	 * @param repliesNow What the server reports for the note's replies once the
+	 *                   marker is gone, when that differs from what the editor
+	 *                   loaded: the replies a peer added since, or `null` for a
+	 *                   request that fails.
+	 * @return The registry and the `saveEntityRecord` spy.
+	 */
+	async function withdrawMarker(
+		threads: any[],
+		repliesNow?: any[] | null,
+		currentUserId?: number
+	) {
+		let harness: any;
+		await act( async () => {
+			harness = setup( { content: MARKED, threads, currentUserId } );
+		} );
+
+		if ( repliesNow === null ) {
+			serverReplies = new Error( 'Network error' );
+		} else if ( repliesNow !== undefined ) {
+			serverReplies = repliesNow;
+		}
+
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+
+		await act( async () => {
+			vi.advanceTimersByTime( 1000 );
+		} );
+
+		/*
+		 * The collection waits on a request before it decides. Each round runs
+		 * the timers the last one queued and flushes the promises they settle.
+		 */
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+
+		return harness;
+	}
+
+	it( 'trashes a pending note nobody has replied to', async () => {
+		const { saveEntityRecord } = await withdrawMarker( [
+			note( { status: 'hold', lifecycle: 'pending' } ),
+		] );
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+
+	it( 'trashes the current user’s own note', async () => {
+		const { saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending', author: 1 } ) ],
+			undefined,
+			1
+		);
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+
+	it( 'leaves another author’s note for the save pass to mark outdated', async () => {
+		/*
+		 * Rejecting someone's addition takes a third author's nested
+		 * deletion with it. That note is not the reviewer's to trash: the
+		 * server marks it outdated when the post saves.
+		 */
+		const { saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending', author: 5 } ) ],
+			undefined,
+			1
+		);
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps a pending note that has replies, and says so', async () => {
+		const { registry, saveEntityRecord } = await withdrawMarker( [
+			note( { status: 'hold', lifecycle: 'pending' } ),
+			reply(),
+		] );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+		expect(
+			( registry.select( noticesStore ) as any ).getNotices()[ 0 ].content
+		).toContain( 'kept because it has replies' );
+	} );
+
+	it( 'keeps a pending note whose reply arrived in another session', async () => {
+		/*
+		 * The reported case (#81958): the colleague answered after this editor
+		 * loaded its thread list, so the copy in the store still says nobody
+		 * replied. Reading that copy would take their comment with the
+		 * withdrawal - the guard has to ask the server.
+		 */
+		const { registry, saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			[ reply() ]
+		);
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+		expect(
+			( registry.select( noticesStore ) as any ).getNotices()[ 0 ].content
+		).toContain( 'kept because it has replies' );
+	} );
+
+	it( 'keeps a pending note without announcing when the reply check fails', async () => {
+		/*
+		 * A failed check answers "unknown", not "no replies". Keep the note,
+		 * but claim nothing about why: the snackbar would assert replies that
+		 * may not exist. Nothing is latched either, so the next presence change
+		 * asks again.
+		 */
+		const { registry, saveEntityRecord } = await withdrawMarker(
+			[ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			null
+		);
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+		expect(
+			( registry.select( noticesStore ) as any ).getNotices()
+		).toHaveLength( 0 );
+	} );
+} );
+
+describe( 'SuggestionNoteGC collecting an attribute proposal', () => {
+	beforeEach( () => {
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	async function settle() {
+		await act( async () => {
+			vi.advanceTimersByTime( 1000 );
+		} );
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+	}
+
+	it( 'trashes an attribute note once its marker proposal disappears', async () => {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: 'Hello world',
+				threads: [ attributeNote() ],
+				metadata: {
+					noteId: [ NOTE_ID ],
+					suggestion: {
+						type: 'pending-attributes',
+						after: { level: 3 },
+					},
+				},
+			} );
+		} );
+		expect( harness.saveEntityRecord ).not.toHaveBeenCalled();
+
+		// Undo pops the marker write; the note link alone is left.
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: { noteId: [ NOTE_ID ] },
+				} );
+		} );
+		await settle();
+
+		expect( harness.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+	} );
+
+	it( 'restores the trashed note when redo brings the proposal back', async () => {
+		let harness: any;
+		const marker = {
+			noteId: [ NOTE_ID ],
+			suggestion: {
+				type: 'pending-attributes',
+				after: { level: 3 },
+			},
+		};
+		await act( async () => {
+			harness = setup( {
+				content: 'Hello world',
+				threads: [ attributeNote() ],
+				metadata: marker,
+			} );
+		} );
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: { noteId: [ NOTE_ID ] },
+				} );
+		} );
+		await settle();
+		expect( harness.saveEntityRecord ).toHaveBeenCalledWith(
+			'root',
+			'comment',
+			{ id: NOTE_ID, status: 'trash' },
+			expect.anything()
+		);
+
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: marker,
+				} );
+		} );
+		await settle();
+		expect( harness.saveEntityRecord ).toHaveBeenLastCalledWith(
+			'root',
+			'comment',
+			{
+				id: NOTE_ID,
+				status: 'hold',
+				meta: { _wp_suggestion_status: 'pending' },
+			},
+			expect.anything()
+		);
+	} );
+
+	it( 'keeps an attribute note whose proposal rides on a structural marker', async () => {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: 'Hello world',
+				threads: [ attributeNote() ],
+				metadata: {
+					noteId: [ NOTE_ID ],
+					suggestion: {
+						type: 'pending-attributes',
+						after: { level: 3 },
+					},
+				},
+			} );
+		} );
+
+		// The proposed block is then moved: the interceptor retypes the
+		// marker and keeps the proposal on it.
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					metadata: {
+						noteId: [ NOTE_ID ],
+						suggestion: {
+							type: 'pending-move',
+							fromIndex: 0,
+							after: { level: 3 },
+						},
+					},
+				} );
+		} );
+		await settle();
+
+		expect( harness.saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'SuggestionNoteGC scope', () => {
+	beforeEach( () => {
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+	} );
+
+	afterEach( () => {
+		vi.useRealTimers();
+	} );
+
+	/**
+	 * Mounts the collector on a marked block, removes the marker and lets the
+	 * grace period and the server reads run out.
+	 *
+	 * @param options         Setup options.
+	 * @param options.threads Note threads.
+	 * @param options.server  The note as a fresh server read returns it.
+	 * @param options.userId  The signed-in user, or null while unresolved.
+	 * @return The `saveEntityRecord` spy.
+	 */
+	async function withdraw( {
+		threads,
+		server,
+		userId = CURRENT_USER_ID,
+	}: {
+		threads: any[];
+		server?: any;
+		userId?: number | null;
+	} ) {
+		let harness: any;
+		await act( async () => {
+			harness = setup( {
+				content: MARKED,
+				threads,
+				currentUserId: userId,
+			} );
+		} );
+		if ( server ) {
+			serverNote = server;
+		}
+		await act( async () => {
+			harness.registry
+				.dispatch( blockEditorStore )
+				.updateBlockAttributes( harness.clientId, {
+					content: RichTextData.fromHTMLString( 'Hello world' ),
+				} );
+		} );
+		await act( async () => {
+			vi.advanceTimersByTime( 1000 );
+		} );
+		for ( let round = 0; round < 3; round++ ) {
+			await act( async () => {
+				vi.runOnlyPendingTimers();
+			} );
+		}
+		return harness.saveEntityRecord;
+	}
+
+	const TRASH = [
+		'root',
+		'comment',
+		{ id: NOTE_ID, status: 'trash' },
+		expect.anything(),
+	];
+
+	it( "never collects another author's note", async () => {
+		const saveEntityRecord = await withdraw( {
+			threads: [
+				note( {
+					status: 'hold',
+					lifecycle: 'pending',
+					author: OTHER_USER_ID,
+				} ),
+			],
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
+	} );
+
+	it( 'collects nothing while the current user is unresolved', async () => {
+		const saveEntityRecord = await withdraw( {
+			threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			userId: null,
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it.each( [ 'applied-unsaved', 'rejected-unsaved' ] )(
+		'never collects a note decided but not saved (%s)',
+		async ( lifecycle ) => {
+			const saveEntityRecord = await withdraw( {
+				threads: [ note( { status: 'hold', lifecycle } ) ],
+			} );
+
+			expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
+		}
+	);
+
+	it( 'never collects an outdated note', async () => {
+		const saveEntityRecord = await withdraw( {
+			threads: [ note( { status: 'approved', lifecycle: 'outdated' } ) ],
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps the note when the server says a peer decided it meanwhile', async () => {
+		/*
+		 * The local copy still reads pending: a peer's accept synced its
+		 * content change here before the thread list heard of the decision.
+		 */
+		const saveEntityRecord = await withdraw( {
+			threads: [ note( { status: 'hold', lifecycle: 'pending' } ) ],
+			server: note( { status: 'hold', lifecycle: 'applied-unsaved' } ),
+		} );
+
+		expect( saveEntityRecord ).not.toHaveBeenCalledWith( ...TRASH );
+	} );
+} );

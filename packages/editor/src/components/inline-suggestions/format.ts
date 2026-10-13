@@ -35,6 +35,14 @@ export const SUGGESTION_TYPE_DELETION = 'del';
 export const SUGGESTION_TYPE_ADDITION = 'add';
 
 /**
+ * Suggested replacement: a note kind, not a marker kind. Typing over a
+ * selection writes an `add` run for the new text followed by a `del` run over
+ * the replaced text, both carrying the same note id, so the two halves are
+ * one suggestion that is accepted or rejected together.
+ */
+export const SUGGESTION_TYPE_REPLACEMENT = 'replace';
+
+/**
  * Suggested formatting change: the wrapped run's *text* is unchanged, but its
  * formatting (bold/italic/link/...) is proposed to change. The marked run holds
  * the proposed formatting so the editor shows it in place (single run, no
@@ -557,6 +565,9 @@ export function findSuggestionRange(
  * from the in-content marker on every read. Used to summarize what an inline
  * suggestion proposes to add or remove (e.g. `Add: "new text"` in the sidebar)
  * without storing the text in the suggestion payload.
+ *
+ * A replacement keeps its replaced text and its new text under one id; pass
+ * `kind` to quote one side.
  *
  * @param value  Block attribute value (RichTextData, string, or other).
  * @param id     Suggestion id to search for.

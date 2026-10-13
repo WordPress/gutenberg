@@ -1394,7 +1394,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				array(
 					'status' => 'approved',
 					'meta'   => array(
-						'_wp_suggestion_status' => 'applied',
+						'_wp_suggestion_status' => 'applied-unsaved',
 					),
 				)
 			)
@@ -1402,7 +1402,9 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$response = rest_get_server()->dispatch( $request );
 		// Core maps `edit_comment` to `edit_post` on the parent post, which
-		// the editor holds; the update succeeds with a 200 status.
+		// the editor holds; the update succeeds with a 200 status. The status
+		// is the provisional one an editor writes: only a post save makes it
+		// final.
 		$this->assertSame( 200, $response->get_status() );
 	}
 
@@ -1431,7 +1433,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			wp_json_encode(
 				array(
 					'meta' => array(
-						'_wp_suggestion_status' => 'rejected',
+						'_wp_suggestion_status' => 'rejected-unsaved',
 					),
 				)
 			)
@@ -1506,7 +1508,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 				array(
 					'status' => 'approved',
 					'meta'   => array(
-						'_wp_suggestion_status' => 'applied',
+						'_wp_suggestion_status' => 'applied-unsaved',
 					),
 				)
 			)

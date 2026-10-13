@@ -31,13 +31,15 @@ import {
 	acceptInlineAddition,
 	acceptInlineDeletion,
 	acceptInlineFormat,
+	acceptInlineReplacement,
 	rejectInlineAddition,
 	rejectInlineDeletion,
 	rejectInlineFormat,
+	rejectInlineReplacement,
 	suggestionMarkerRuns,
 } from './operations';
 
-export type InlineSuggestionType = 'add' | 'del' | 'format';
+export type InlineSuggestionType = 'add' | 'del' | 'replace' | 'format';
 
 export interface ResolutionEffect {
 	/** The value after the decision. */
@@ -70,9 +72,13 @@ function removedKind(
 	decision: 'accept' | 'reject'
 ): SuggestionMarkerKind | null {
 	if ( decision === 'accept' ) {
-		return suggestionType === 'del' ? 'del' : null;
+		return suggestionType === 'del' || suggestionType === 'replace'
+			? 'del'
+			: null;
 	}
-	return suggestionType === 'add' ? 'add' : null;
+	return suggestionType === 'add' || suggestionType === 'replace'
+		? 'add'
+		: null;
 }
 
 /**
@@ -111,6 +117,7 @@ export function resolveInlineSuggestion(
 		next = {
 			add: acceptInlineAddition,
 			del: acceptInlineDeletion,
+			replace: acceptInlineReplacement,
 			format: acceptInlineFormat,
 		}[ suggestionType ]( value, id );
 	} else if ( suggestionType === SUGGESTION_TYPE_FORMAT ) {
@@ -120,6 +127,7 @@ export function resolveInlineSuggestion(
 		next = {
 			add: rejectInlineAddition,
 			del: rejectInlineDeletion,
+			replace: rejectInlineReplacement,
 		}[ suggestionType ]( value, id );
 	}
 
