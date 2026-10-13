@@ -4,7 +4,7 @@ import { useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { check, copy } from '@wordpress/icons';
-import { Button } from '../../button';
+import { IconButton } from '../../icon-button';
 import * as Collapsible from '../../collapsible';
 import * as Notice from '../index';
 
@@ -55,16 +55,18 @@ export const WithDetails: Story = {
 				<Notice.Description>{ message }</Notice.Description>
 				<Notice.Actions>
 					<Collapsible.Trigger
-						render={ <Notice.ActionButton variant="minimal" /> }
+						render={ <Notice.ActionButton variant="outline" /> }
 					>
 						{ open ? 'Hide details' : 'Show details' }
 					</Collapsible.Trigger>
-					<Notice.ActionButton ref={ copyRef } variant="minimal">
-						<Button.Icon
-							icon={ copiedDetails === details ? check : copy }
-						/>
-						Copy details
-					</Notice.ActionButton>
+					<IconButton
+						ref={ copyRef }
+						label="Copy details"
+						icon={ copiedDetails === details ? check : copy }
+						size="compact"
+						variant="minimal"
+						tone="neutral"
+					/>
 				</Notice.Actions>
 				<Collapsible.Panel
 					hiddenUntilFound

@@ -17,7 +17,7 @@ The main message and details are separate plain-text strings. Convert server-pro
 
 ## Copying details
 
-The copy button copies only the supplementary details, even while the panel is collapsed. It does not copy the main message or action labels. The application supplies the exact text to `useCopyToClipboard`; `Notice` does not inspect its children or choose the clipboard contents.
+The `IconButton` shows "Copy details" in its tooltip and uses the same text as its accessible name. It copies only the supplementary details, even while the panel is collapsed. It does not copy the main message or action labels. The application supplies the exact text to `useCopyToClipboard`; `Notice` does not inspect its children or choose the clipboard contents.
 
 After a successful copy, the icon changes to a checkmark and `speak()` announces the confirmation. The button keeps its accessible name, "Copy details". The static notice has no automatic announcement. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for dynamic messages.
 
