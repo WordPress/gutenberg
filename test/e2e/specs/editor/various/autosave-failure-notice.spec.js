@@ -70,7 +70,11 @@ test.describe( 'Autosave failure notice', () => {
 
 	for ( const [ title, failure, notice ] of [
 		[ 'PHP fatal error', 'fatal-error', AUTOSAVE_FAILED ],
-		[ 'database connection lost', 'database-connection', AUTOSAVE_FAILED ],
+		[
+			'database connection lost',
+			'database-connection-lost',
+			AUTOSAVE_FAILED,
+		],
 		[
 			'error message containing a link',
 			'link-in-message',

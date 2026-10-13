@@ -38,7 +38,7 @@ function gutenberg_test_autosave_failure( $result, $server, $request ) {
 			gutenberg_test_autosave_undefined_function();
 			break;
 
-		case 'database-connection':
+		case 'database-connection-lost':
 			$wpdb->query( 'KILL CONNECTION_ID()' );
 			$wpdb->dbhost            = '127.0.0.1:1';
 			$wpdb->reconnect_retries = 1;
