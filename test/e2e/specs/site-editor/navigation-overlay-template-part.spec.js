@@ -123,16 +123,16 @@ test.describe( 'Navigation Overlay Template Part', () => {
 
 			await editor.insertBlock( { name: 'core/navigation' } );
 
-			const navigationBlock = editor.canvas
-				.locator( '[data-type="core/navigation"]' )
-				.last();
-
-			// The block mounts with the flex layout already applied, so wait for
-			// the overlay defaults to land before asserting it survived them.
-			await expect( navigationBlock ).toHaveClass( /is-vertical/ );
-			await expect( navigationBlock ).toHaveClass(
-				/wp-block-navigation-is-layout-flex/
-			);
+			await expect
+				.poll( () =>
+					page.evaluate(
+						() =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getSelectedBlock()?.attributes.layout
+					)
+				)
+				.toMatchObject( { type: 'flex', orientation: 'vertical' } );
 		} );
 	} );
 
