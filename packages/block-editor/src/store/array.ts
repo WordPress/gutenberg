@@ -7,7 +7,11 @@
  *
  * @return {Array} Result.
  */
-export function insertAt( array, elements, index ) {
+export function insertAt< T, U >(
+	array: T[],
+	elements: U | U[],
+	index: number
+) {
 	return [
 		...array.slice( 0, index ),
 		...( Array.isArray( elements ) ? elements : [ elements ] ),
@@ -25,7 +29,7 @@ export function insertAt( array, elements, index ) {
  *
  * @return {Array} Result.
  */
-export function moveTo( array, from, to, count = 1 ) {
+export function moveTo< T >( array: T[], from: number, to: number, count = 1 ) {
 	const withoutMovedElements = [ ...array ];
 	withoutMovedElements.splice( from, count );
 	return insertAt(
