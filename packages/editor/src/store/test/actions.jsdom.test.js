@@ -5,6 +5,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import warning from '@wordpress/warning';
@@ -1121,6 +1122,103 @@ describe( 'Post actions', () => {
 			).toContain( 'editor-revision-restore-failed' );
 		} );
 
+		it( 'offers an Undo action that restores the content of a draft from before the restore', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			const restoredNotice = registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( notice ) => notice.id === 'editor-revision-restored' );
+			expect( restoredNotice.explicitDismiss ).toBe( true );
+			expect( restoredNotice.actions ).toMatchObject( [
+				{ label: 'Undo' },
+			] );
+
+			await restoredNotice.actions[ 0 ].onClick();
+
+			expect( savedData ).toHaveLength( 3 );
+			expect( savedData[ 2 ] ).toMatchObject( {
+				title: 'Saved title',
+				content: 'unsaved content',
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'unsaved content' );
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.id )
+			).toContain( 'editor-revision-restore-undone' );
+		} );
+
+		it( 'offers an Undo action that restores the saved content of a published post', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'publish',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			const restoredNotice = registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( notice ) => notice.id === 'editor-revision-restored' );
+			await restoredNotice.actions[ 0 ].onClick();
+
+			expect( savedData ).toHaveLength( 2 );
+			expect( savedData[ 1 ] ).toMatchObject( {
+				title: 'Saved title',
+				content: 'saved content',
+			} );
+		} );
+
+		it( 'does not offer an Undo action when the saved post already matches the revision', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Autosaved title',
+				content: 'autosaved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry } = setUpRestore( post );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			const restoredNotice = registry
+				.select( noticesStore )
+				.getNotices()
+				.find( ( notice ) => notice.id === 'editor-revision-restored' );
+			expect( restoredNotice.actions ).toEqual( [] );
+			expect( restoredNotice.explicitDismiss ).toBe( false );
+		} );
+
 		it( 'does not restore the revision while the post is saving', async () => {
 			const post = {
 				id: postId,
@@ -1130,21 +1228,30 @@ describe( 'Post actions', () => {
 				excerpt: '',
 				status: 'draft',
 			};
-			let finishSave;
 			const { registry, savedData } = setUpRestore( post, {
 				edits: { content: 'unsaved content' },
-				onSave: ( data ) =>
-					new Promise( ( resolve ) => {
-						finishSave = () => resolve( { ...post, ...data } );
-					} ),
 			} );
 
+			// Hold the save open before its request is sent.
+			let finishSave;
+			addFilter(
+				'editor.preSavePost',
+				'test/hold-save',
+				( edits ) =>
+					new Promise( ( resolve ) => {
+						finishSave = () => resolve( edits );
+					} )
+			);
+
 			const savePromise = registry.dispatch( editorStore ).savePost();
-			await vi.waitFor( () => expect( savedData ).toHaveLength( 1 ) );
+			expect( registry.select( editorStore ).isSavingPost() ).toBe(
+				true
+			);
 
 			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
 				revisionId
 			);
+			removeFilter( 'editor.preSavePost', 'test/hold-save' );
 
 			expect(
 				registry.select( editorStore ).getEditedPostContent()
@@ -1159,6 +1266,9 @@ describe( 'Post actions', () => {
 			finishSave();
 			await savePromise;
 			expect( savedData ).toHaveLength( 1 );
+			expect( savedData[ 0 ] ).toMatchObject( {
+				content: 'unsaved content',
+			} );
 		} );
 	} );
 } );
