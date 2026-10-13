@@ -27,9 +27,31 @@ export const DEFAULT_CROP_OPTIONS: CropOptionsSlice = {
 };
 
 /**
- * The full composite state for the media editor — cropper geometry
- * plus the sidebar control slice. Future feature slices (text
- * overlays, filters, …) extend this object.
+ * A value an edit can hold: plain data only, because the session
+ * compares values by content to tell a real change from a no-op.
+ * Anything else, such as a `Blob`, would compare equal to any other
+ * and the change would be dropped — keep bytes behind a URL instead.
+ *
+ * Objects must satisfy the index signature, so type a value with a
+ * `type` alias rather than an `interface`.
+ */
+export type EditValue =
+	| string
+	| number
+	| boolean
+	| null
+	| EditValue[]
+	| { [ key: string ]: EditValue };
+
+/**
+ * Named edits other than crop, keyed by edit name (for example
+ * `my-plugin/vignette`). An edit that is not present means "no edit".
+ */
+export type EditsSlice = Record< string, EditValue >;
+
+/**
+ * The full composite state for the media editor — cropper geometry,
+ * the sidebar control slice, and named edits.
  *
  * Every undo/redo snapshot is a full `MediaEditorState`. Slices stay
  * referentially equal across actions that don't touch them.
@@ -37,6 +59,7 @@ export const DEFAULT_CROP_OPTIONS: CropOptionsSlice = {
 export interface MediaEditorState {
 	cropper: CropperState;
 	cropOptions: CropOptionsSlice;
+	edits: EditsSlice;
 }
 
 /**
@@ -79,8 +102,17 @@ export type MediaEditorAction =
 				visualSize: Size;
 			};
 	  }
-	/** Reset cropOptions to defaults. */
-	| { type: 'RESET_CROP_OPTIONS' }
+	/**
+	 * Put every slice back to its starting state, keeping the image:
+	 * default geometry, default crop options, no edits. One action,
+	 * so one undo entry.
+	 */
+	| { type: 'RESET' }
+	/** Set a named edit, or remove it when `value` is `undefined`. */
+	| {
+			type: 'SET_EDIT';
+			payload: { name: string; value: EditValue | undefined };
+	  }
 	/**
 	 * Replace the entire composite state with `payload`. Used by
 	 * undo/redo to restore a full snapshot atomically.

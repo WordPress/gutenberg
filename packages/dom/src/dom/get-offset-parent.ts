@@ -1,4 +1,5 @@
 import getComputedStyle from './get-computed-style';
+import isElement from './is-element';
 
 /**
  * Returns the closest positioned element, or null under any of the conditions
@@ -14,11 +15,9 @@ import getComputedStyle from './get-computed-style';
 export default function getOffsetParent( node: Node ): Node | null {
 	// Cannot retrieve computed style or offset parent only anything other than
 	// an element node, so find the closest element node.
-	let closestElement;
-	while ( ( closestElement = node.parentNode as Node ) ) {
-		if ( closestElement.nodeType === closestElement.ELEMENT_NODE ) {
-			break;
-		}
+	let closestElement = node.parentNode;
+	while ( closestElement && ! isElement( closestElement ) ) {
+		closestElement = closestElement.parentNode;
 	}
 
 	if ( ! closestElement ) {
@@ -27,10 +26,10 @@ export default function getOffsetParent( node: Node ): Node | null {
 
 	// If the closest element is already positioned, return it, as offsetParent
 	// does not otherwise consider the node itself.
-	if ( getComputedStyle( closestElement as Element ).position !== 'static' ) {
+	if ( getComputedStyle( closestElement ).position !== 'static' ) {
 		return closestElement;
 	}
 
 	// offsetParent is undocumented/draft.
-	return ( closestElement as Node & { offsetParent: Node } ).offsetParent;
+	return ( closestElement as HTMLElement ).offsetParent;
 }

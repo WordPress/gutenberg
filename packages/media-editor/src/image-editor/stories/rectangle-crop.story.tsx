@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	Button,
-	SelectControl as WCSelectControl,
 	RangeControl,
 	ToggleControl,
 	Flex,
 	FlexItem,
 } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import {
 	rotateLeft,
 	rotateRight,
@@ -41,6 +41,21 @@ import {
 } from '../core/camera';
 import { getSourceRegion } from '../core/source-region';
 import styles from './style.module.css';
+
+const aspectRatioItems = DEFAULT_ASPECT_RATIOS.map( ( preset ) => ( {
+	label: preset.label,
+	value: preset.value.toString(),
+} ) );
+const gridItems = [
+	{ label: 'Grid: off', value: 'off' },
+	{ label: 'Grid: always on', value: 'on' },
+	{ label: 'Grid: interactive', value: 'interactive' },
+];
+const formatItems = [
+	{ label: 'JPEG', value: 'image/jpeg' },
+	{ label: 'PNG', value: 'image/png' },
+	{ label: 'WebP', value: 'image/webp' },
+];
 
 const SAMPLE_IMAGE = 'image-editor-demo.jpeg';
 
@@ -389,17 +404,20 @@ const WithControlsComponent = () => {
 						/>
 					</FlexItem>
 					<FlexItem>
-						<WCSelectControl
+						<SelectControl
 							label="Aspect ratio"
 							hideLabelFromVision
-							value={ aspectRatioValue }
-							onChange={ handleAspectRatioChange }
-							options={ DEFAULT_ASPECT_RATIOS.map(
-								( preset ) => ( {
-									label: preset.label,
-									value: preset.value.toString(),
-								} )
-							) }
+							value={
+								aspectRatioItems.find(
+									( item ) => item.value === aspectRatioValue
+								) ?? null
+							}
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									handleAspectRatioChange( item.value );
+								}
+							} }
+							items={ aspectRatioItems }
 						/>
 					</FlexItem>
 					<FlexItem>
@@ -410,21 +428,20 @@ const WithControlsComponent = () => {
 						/>
 					</FlexItem>
 					<FlexItem>
-						<WCSelectControl
+						<SelectControl
 							label="Grid"
 							hideLabelFromVision
-							value={ gridMode }
-							onChange={ ( value ) =>
-								setGridMode( value as GridMode )
+							value={
+								gridItems.find(
+									( item ) => item.value === gridMode
+								) ?? null
 							}
-							options={ [
-								{ label: 'Grid: off', value: 'off' },
-								{ label: 'Grid: always on', value: 'on' },
-								{
-									label: 'Grid: interactive',
-									value: 'interactive',
-								},
-							] }
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									setGridMode( item.value as GridMode );
+								}
+							} }
+							items={ gridItems }
 						/>
 					</FlexItem>
 					<FlexItem isBlock />
@@ -826,18 +843,20 @@ const DebugComponent = () => {
 						</Button>
 					</FlexItem>
 					<FlexItem>
-						<WCSelectControl
+						<SelectControl
 							label="Format"
 							hideLabelFromVision
-							value={ exportFormat as 'image/jpeg' }
-							onChange={ ( value ) =>
-								setExportFormat( value as string )
+							value={
+								formatItems.find(
+									( item ) => item.value === exportFormat
+								) ?? null
 							}
-							options={ [
-								{ label: 'JPEG', value: 'image/jpeg' },
-								{ label: 'PNG', value: 'image/png' },
-								{ label: 'WebP', value: 'image/webp' },
-							] }
+							onValueChange={ ( item ) => {
+								if ( item && item.value !== null ) {
+									setExportFormat( item.value );
+								}
+							} }
+							items={ formatItems }
 						/>
 					</FlexItem>
 					<FlexItem>
