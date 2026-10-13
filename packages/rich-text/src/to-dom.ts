@@ -220,16 +220,14 @@ export function toDom( {
  * built with the same handlers and placeholder as the element, so the path
  * matches it.
  *
- * @param {Object}        $1                       Named arguments.
- * @param {RichTextValue} $1.value                 The value rendered in the
- *                                                 element.
- * @param {number}        $1.offset                Offset in the value.
- * @param {HTMLElement}   $1.element               The live element.
- * @param {Function}      [$1.prepareEditableTree] Function to filter editable
- *                                                 formats.
- * @param {string}        [$1.placeholder]         Placeholder text.
+ * @param $1                       Named arguments.
+ * @param $1.value                 The value rendered in the element.
+ * @param $1.offset                Offset in the value.
+ * @param $1.element               The live element.
+ * @param [$1.prepareEditableTree] Function to filter editable formats.
+ * @param [$1.placeholder]         Placeholder text.
  *
- * @return {{node: Node, offset: number}} The position.
+ * @return The position.
  */
 export function getDomPosition( {
 	value,
@@ -237,6 +235,12 @@ export function getDomPosition( {
 	element,
 	prepareEditableTree,
 	placeholder,
+}: {
+	value: RichTextValue;
+	offset: number;
+	element: HTMLElement;
+	prepareEditableTree?: ( value: RichTextValue ) => RichTextFormatList[];
+	placeholder?: string;
 } ) {
 	const { selection } = toDom( {
 		value: { ...value, start: offset, end: offset },
