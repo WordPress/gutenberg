@@ -5,7 +5,7 @@ import ReactionDisplay, { invalidateReactionNames } from '../reaction-display';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
-const NOTE_ID = 7;
+const TARGET = { kind: 'note', id: 7 } as const;
 
 const REACTIONS = [
 	{ author_name: 'Ada', content: { raw: '2764' } },
@@ -16,7 +16,7 @@ const REACTIONS = [
 function renderPills() {
 	render(
 		<ReactionDisplay
-			noteId={ NOTE_ID }
+			target={ TARGET }
 			reactions={ {
 				2764: { count: 2, current_user_reaction: 0 },
 				'1f44d': { count: 1, current_user_reaction: 42 },
@@ -29,7 +29,7 @@ function renderPills() {
 
 describe( 'ReactionDisplay', () => {
 	beforeEach( () => {
-		invalidateReactionNames( NOTE_ID );
+		invalidateReactionNames( TARGET );
 		vi.mocked( apiFetch ).mockReset();
 		vi.mocked( apiFetch ).mockResolvedValue( REACTIONS );
 	} );
@@ -66,7 +66,7 @@ describe( 'ReactionDisplay', () => {
 		fireEvent.focus( heart );
 		await waitFor( () => expect( apiFetch ).toHaveBeenCalledTimes( 1 ) );
 
-		invalidateReactionNames( NOTE_ID );
+		invalidateReactionNames( TARGET );
 		fireEvent.focus( heart );
 
 		await waitFor( () => expect( apiFetch ).toHaveBeenCalledTimes( 2 ) );

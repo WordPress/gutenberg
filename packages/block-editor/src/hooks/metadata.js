@@ -75,6 +75,14 @@ export function addTransforms( result, source, index, results ) {
 		preservedMetadata.noteId = sourceMetadata.noteId;
 	}
 
+	// Block reactions
+	if (
+		sourceMetadata.reactionsId &&
+		! result.attributes?.metadata?.reactionsId
+	) {
+		preservedMetadata.reactionsId = sourceMetadata.reactionsId;
+	}
+
 	// Custom name
 	if (
 		sourceMetadata.name &&

@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -16,6 +16,11 @@ import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { BlockReactionsMenuItem } from './reactions/block-reactions-menu-item';
+import {
+	getBlockReactionsEntryId,
+	isBlockReactionsEntry,
+} from './reactions/block-reactions';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import {
 	NoteDraftsContext,
@@ -24,7 +29,11 @@ import {
 	useNoteThreads,
 	usePickNote,
 } from './hooks';
-import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
+import {
+	focusNoteThread,
+	getNoteIdsFromMetadata,
+	pickPrimaryNote,
+} from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
@@ -63,7 +72,20 @@ function NotesSidebar( { postId, drafts } ) {
 			};
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { notes, unresolvedNotes } = useNoteThreads( postId );
+
+	// The block the user is reacting to from the options menu, listed before
+	// its first reaction until another block is selected.
+	const [ reactingClientId, setReactingClientId ] = useState();
+	useEffect( () => {
+		setReactingClientId( ( current ) =>
+			current === clientId ? current : undefined
+		);
+	}, [ clientId ] );
+
+	const { notes, unresolvedNotes } = useNoteThreads(
+		postId,
+		reactingClientId
+	);
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
@@ -80,6 +102,7 @@ function NotesSidebar( { postId, drafts } ) {
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const areNotesHidden = notesDisplayMode === 'hidden';
+
 	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
 	const showAllNotesSidebar =
 		notes.length > 0 || ! isLargeViewport || isAllNotesSidebarOpen;
@@ -126,7 +149,9 @@ function NotesSidebar( { postId, drafts } ) {
 	function openNoteForBlock( targetClientId ) {
 		// A block can carry multiple threads; surface the most relevant.
 		const blockThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
+			( thread ) =>
+				thread.blockClientId === targetClientId &&
+				! isBlockReactionsEntry( thread )
 		);
 		const target = pickPrimaryNote( blockThreads );
 		return focusNote( {
@@ -142,6 +167,35 @@ function NotesSidebar( { postId, drafts } ) {
 			noteId: 'new',
 			isApproved: false,
 		} );
+	}
+
+	// The picker lives with the block's reactions in the notes: on its
+	// first unresolved thread, or in an entry of its own.
+	function reactToBlock( targetClientId ) {
+		setReactingClientId( targetClientId );
+		const hasCanvasMargin =
+			isLargeViewport && !! canvasMarginRef?.current?.checkVisibility();
+		if ( ! hasCanvasMargin ) {
+			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
+		} else if (
+			areNotesHidden &&
+			getActiveComplementaryArea( 'core' ) !== ALL_NOTES_SIDEBAR
+		) {
+			setPreference( 'core', 'notesDisplayMode', 'full' );
+		}
+		const threadId =
+			unresolvedNotes.find(
+				( thread ) => thread.blockClientId === targetClientId
+			)?.id ?? getBlockReactionsEntryId( targetClientId );
+		pickNote( threadId );
+		// Wait a frame for a sidebar that was closed to mount.
+		window.requestAnimationFrame( () =>
+			focusNoteThread(
+				threadId,
+				sidebarRef.current,
+				'.editor-collab-sidebar-panel__block-reactions .editor-collab-sidebar-panel__add-reaction-button'
+			)
+		);
 	}
 
 	useShortcut(
@@ -165,7 +219,9 @@ function NotesSidebar( { postId, drafts } ) {
 	return (
 		<>
 			<NoteHighlightStyles
-				threads={ unresolvedNotes }
+				threads={ unresolvedNotes.filter(
+					( thread ) => ! isBlockReactionsEntry( thread )
+				) }
 				selectedId={ selectedNoteId }
 			/>
 			{ !! currentThread && (
@@ -178,6 +234,9 @@ function NotesSidebar( { postId, drafts } ) {
 				onClick={ ( menuClientId ) =>
 					addNewNoteForBlock( menuClientId )
 				}
+			/>
+			<BlockReactionsMenuItem
+				onClick={ ( menuClientId ) => reactToBlock( menuClientId ) }
 			/>
 			<NotesDisplayModeMenu
 				hasFloatingNotes={ hasFloatingNotes }

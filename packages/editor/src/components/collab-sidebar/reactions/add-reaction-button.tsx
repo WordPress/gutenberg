@@ -9,9 +9,10 @@ import { reaction as reactionIcon } from '@wordpress/icons';
 import EmojiPicker from './emoji-picker';
 import { emojiToHexKey } from './reaction-emojis';
 import { hasUserReacted } from './reaction-display';
-import type { ReactionSummary } from './reaction-display';
+import type { ReactionSummary } from './block-reactions';
 
 interface AddReactionButtonProps {
+	label?: string;
 	reactions?: ReactionSummary | null;
 	onToggleReaction: ( hexKey: string ) => void;
 }
@@ -21,11 +22,14 @@ interface AddReactionButtonProps {
  * with its "Frequently used" section seeded from the curated set.
  *
  * @param props                  Component props.
- * @param props.reactions        The note's reaction summary, used to mark the
+ * @param props.label            Accessible name of the trigger and of the
+ *                               picker popup. Defaults to "Add reaction".
+ * @param props.reactions        The target's reaction summary, used to mark the
  *                               emoji the current user has already reacted with.
  * @param props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( {
+	label = __( 'Add reaction' ),
 	reactions,
 	onToggleReaction,
 }: AddReactionButtonProps ) {
@@ -35,7 +39,7 @@ export function AddReactionButton( {
 
 	return (
 		<EmojiPicker
-			label={ __( 'Add reaction' ) }
+			label={ label }
 			trigger={
 				<IconButton
 					size="small"
@@ -44,7 +48,7 @@ export function AddReactionButton( {
 					tone="neutral"
 					className="editor-collab-sidebar-panel__add-reaction-button"
 					icon={ reactionIcon }
-					label={ __( 'Add reaction' ) }
+					label={ label }
 				/>
 			}
 			reactedHexKeys={ reactedHexKeys }
