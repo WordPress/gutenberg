@@ -549,7 +549,16 @@ function FontCollection( { slug }: { slug: string } ) {
 														'Current page'
 													) }
 												/>
-												<Select.Popup width="content">
+												<Select.Popup
+													width="content"
+													positioner={
+														<Select.Positioner
+															alignItemWithTrigger={
+																false
+															}
+														/>
+													}
+												>
 													{ [
 														...Array( totalPages ),
 													].map( ( e, i ) => {

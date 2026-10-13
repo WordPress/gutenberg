@@ -84,7 +84,14 @@ export function DataViewsPageSelect( { className }: { className?: string } ) {
 								variant="minimal"
 								aria-label={ __( 'Current page' ) }
 							/>
-							<Select.Popup width="content">
+							<Select.Popup
+								width="content"
+								positioner={
+									<Select.Positioner
+										alignItemWithTrigger={ false }
+									/>
+								}
+							>
 								{ pageSelectOptions.map( ( option ) => (
 									<Select.Item
 										key={ option.value }
