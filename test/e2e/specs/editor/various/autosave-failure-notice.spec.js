@@ -72,22 +72,27 @@ test.describe( 'Autosave failure notice', () => {
 	} );
 
 	for ( const [ title, failure, notice ] of [
+		// TODO: Show the PHP error the response includes in `data.error`.
 		[ 'PHP fatal error', 'fatal-error', AUTOSAVE_FAILED ],
+		// TODO: Show the message without its HTML tags.
 		[
 			'database connection lost',
 			'database-connection-lost',
 			AUTOSAVE_FAILED,
 		],
+		// TODO: Show the message without its HTML tags.
 		[
 			'error message containing a link',
 			'link-in-message',
 			AUTOSAVE_FAILED,
 		],
+		// TODO: Say the server could not be reached, and retry right away.
 		[
 			'connection dropped before a response',
 			'dropped-connection',
 			AUTOSAVE_FAILED,
 		],
+		// TODO: Show the status code.
 		[ 'error without a message', 'no-message', AUTOSAVE_FAILED ],
 		[
 			'error with a plain text message',
@@ -104,26 +109,31 @@ test.describe( 'Autosave failure notice', () => {
 			'database-write',
 			withDetails( 'Could not update post in the database.' ),
 		],
+		// TODO: Show the status code (502) instead.
 		[
 			'HTML error page',
 			'bad-gateway',
 			withDetails( 'The response is not a valid JSON response.' ),
 		],
+		// TODO: Show the status code (429) instead.
 		[
 			'too many requests',
 			'too-many-requests',
 			withDetails( 'The response is not a valid JSON response.' ),
 		],
+		// TODO: Show the PHP error the response includes in `data.error`.
 		[
 			'PHP fatal error printed before the JSON',
 			'fatal-error-displayed',
 			withDetails( 'The response is not a valid JSON response.' ),
 		],
+		// TODO: Say the session may have expired.
 		[
 			'redirected to the login page',
 			'redirect-to-login',
 			withDetails( 'The response is not a valid JSON response.' ),
 		],
+		// TODO: Say the server could not be reached.
 		[
 			'redirected to another site',
 			'redirect-to-other-site',
@@ -136,6 +146,7 @@ test.describe( 'Autosave failure notice', () => {
 				'Briefly unavailable for scheduled maintenance. Check back in a minute.'
 			),
 		],
+		// TODO: Report the failure; the autosave fails without a notice.
 		[ 'response body of 0', 'zero', null ],
 	] ) {
 		test( title, async ( { autosaveFailure } ) => {
@@ -162,6 +173,7 @@ test.describe( 'Autosave failure notice', () => {
 			true,
 			withDetails( 'A plugin could not save.' ),
 		],
+		// TODO: Show the thrown string.
 		[ 'plugin hook throwing a string', false, AUTOSAVE_FAILED ],
 	] ) {
 		test( title, async ( { autosaveFailure, page } ) => {
@@ -184,6 +196,7 @@ test.describe( 'Autosave failure notice', () => {
 	test( 'session expired', async ( { autosaveFailure, context } ) => {
 		await context.clearCookies( { name: /^wordpress_/ } );
 		await autosaveFailure.autosave();
+		// TODO: Say the session expired and offer to log in again.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
 			withDetails( 'Cookie check failed' ),
 		] );
@@ -196,6 +209,7 @@ test.describe( 'Autosave failure notice', () => {
 	} ) => {
 		await autosaveFailure.fail( 'warning-displayed' );
 		const title = await autosaveFailure.autosave();
+		// TODO: Don't report a failure; the autosave was stored.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
 			withDetails( 'The response is not a valid JSON response.' ),
 		] );
@@ -232,6 +246,7 @@ test.describe( 'Autosave failure notice', () => {
 		await autosaveFailure.edit();
 		await autosaveResponse;
 
+		// TODO: Time out a request that never finishes.
 		expect( requests ).toBe( 1 );
 		expect( await autosaveFailure.getNotices() ).toEqual( [] );
 	} );
@@ -307,6 +322,7 @@ test.describe( 'Autosave failure notice', () => {
 						.didPostSaveRequestFail()
 				)
 			).toBe( false );
+			// TODO: Remove the failure notice once an autosave succeeds.
 			expect( await autosaveFailure.getNotices() ).toEqual( [
 				AUTOSAVE_FAILED,
 			] );
