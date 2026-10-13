@@ -32,13 +32,6 @@
 		Set Loading
 	</button>
 
-	<button
-		data-wp-on--click="actions.setPlainString"
-		data-testid="set plain string"
-	>
-		Set Plain String
-	</button>
-
 	<div data-wp-html--suffix="state.html" data-testid="ignores suffixes">
 		<span data-testid="suffix-fallback">Suffix fallback</span>
 	</div>

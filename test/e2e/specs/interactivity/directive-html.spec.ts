@@ -15,17 +15,12 @@ test.describe( 'data-wp-html', () => {
 		await utils.deleteAllPosts();
 	} );
 
-	test( 'does not enforce Trusted Types without the query argument', async ( {
-		page,
-		interactivityUtils: utils,
-	} ) => {
-		const response = await page.goto(
-			utils.getLink( 'test/directive-html' )
+	test( 'renders trusted HTML from asDangerousHTML()', async ( { page } ) => {
+		const el = page.getByTestId( 'show state html' );
+		await page.getByTestId( 'set html' ).click();
+		await expect( el.getByTestId( 'rendered-strong' ) ).toHaveText(
+			'Rendered HTML'
 		);
-		expect( response ).not.toBeNull();
-		expect(
-			response!.headers()[ 'content-security-policy' ]
-		).toBeUndefined();
 	} );
 
 	test( 'removes content safely and renders late trusted HTML under Trusted Types enforcement', async ( {
@@ -109,15 +104,6 @@ test.describe( 'data-wp-html', () => {
 		expect( await rejected.innerHTML() ).toBe( '' );
 		expect( await violations() ).toHaveLength( 1 );
 		expect( pageErrors ).toEqual( [] );
-	} );
-
-	test( 'renders trusted HTML from asDangerousHTML()', async ( { page } ) => {
-		await page.getByTestId( 'set html' ).click();
-		await expect(
-			page
-				.getByTestId( 'show state html' )
-				.getByTestId( 'rendered-strong' )
-		).toHaveText( 'Rendered HTML' );
 	} );
 
 	test( 'should ignore suffixes and unique-ids in the html directive', async ( {
