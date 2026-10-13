@@ -1,0 +1,41 @@
+[
+	{
+		"name": "core/table",
+		"isValid": true,
+		"attributes": {
+			"hasFixedLayout": true,
+			"caption": "A <a href=\"https://wordpress.org/\">linked</a> caption",
+			"head": [],
+			"body": [
+				{
+					"cells": [
+						{
+							"content": "<a href=\"https://wordpress.org/\">WordPress</a>",
+							"tag": "td"
+						},
+						{
+							"content": "Cell",
+							"tag": "td"
+						}
+					]
+				}
+			],
+			"foot": [],
+			"backgroundColor": "pale-cyan-blue",
+			"textColor": "black",
+			"style": {
+				"elements": {
+					"link": {
+						"color": {
+							"text": "var:preset|color|vivid-red"
+						}
+					}
+				},
+				"typography": {
+					"fontSize": "20px"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

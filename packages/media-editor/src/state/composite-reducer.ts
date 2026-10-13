@@ -70,17 +70,11 @@ export function mediaEditorReducer(
 				cropOptions: nextCropOptions,
 			};
 		}
-		case 'RESET_CROP_OPTIONS': {
-			if (
-				state.cropOptions.aspectRatioValue ===
-				DEFAULT_CROP_OPTIONS.aspectRatioValue
-			) {
-				return state;
-			}
-			return {
-				...state,
-				cropOptions: { ...DEFAULT_CROP_OPTIONS },
-			};
+		case 'RESET': {
+			const next = buildInitialMediaEditorState(
+				cropperReducer( state.cropper, { type: 'RESET' } )
+			);
+			return areMediaEditorStatesEqual( state, next ) ? state : next;
 		}
 		case 'SET_EDIT': {
 			const { name, value } = action.payload;
