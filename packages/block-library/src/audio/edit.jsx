@@ -23,12 +23,14 @@ import { useDispatch } from '@wordpress/data';
 import { audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useState } from '@wordpress/element';
+import { getFilename } from '@wordpress/url';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,
 	useToolsPanelDropdownMenuProps,
 } from '../utils/hooks';
 import { Caption } from '../utils/caption';
+import { MediaControl } from '../utils/media-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -132,39 +134,83 @@ function AudioEdit( {
 	} );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! src && ! temporaryURL ) {
-		return (
-			<div { ...blockProps }>
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					onSelect={ onSelectAudio }
-					onSelectURL={ onSelectURL }
-					accept="audio/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ attributes }
-					onError={ onUploadError }
-				/>
-			</div>
-		);
-	}
+	/*
+	 * Rendered whether or not audio has been set, so that an audio block in its
+	 * setup state can be given media from the toolbar and the inspector as well
+	 * as from the placeholder.
+	 */
+	const mediaToolbar = isSingleSelected && (
+		<BlockControls group="other">
+			<MediaReplaceFlow
+				mediaId={ id }
+				mediaURL={ src }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				accept="audio/*"
+				onSelect={ onSelectAudio }
+				onSelectURL={ onSelectURL }
+				onError={ onUploadError }
+				onReset={ () => onSelectAudio( undefined ) }
+				name={ src ? __( 'Replace' ) : __( 'Add audio' ) }
+				variant="toolbar"
+			/>
+		</BlockControls>
+	);
 
-	return (
-		<>
-			{ isSingleSelected && (
-				<BlockControls group="other">
-					<MediaReplaceFlow
+	const mediaInspectorPanel = isSingleSelected && (
+		<InspectorControls group="content">
+			<ToolsPanel
+				label={ __( 'Media' ) }
+				resetAll={ () => onSelectAudio( undefined ) }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'Audio' ) }
+					hasValue={ () => !! src }
+					onDeselect={ () => onSelectAudio( undefined ) }
+					isShownByDefault
+				>
+					<MediaControl
 						mediaId={ id }
-						mediaURL={ src }
+						mediaUrl={ src }
+						filename={ getFilename( src ) }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						accept="audio/*"
 						onSelect={ onSelectAudio }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 						onReset={ () => onSelectAudio( undefined ) }
-						variant="toolbar"
+						isUploading={ !! temporaryURL }
+						emptyLabel={ __( 'Add audio' ) }
 					/>
-				</BlockControls>
-			) }
+				</ToolsPanelItem>
+			</ToolsPanel>
+		</InspectorControls>
+	);
+
+	if ( ! src && ! temporaryURL ) {
+		return (
+			<>
+				{ mediaToolbar }
+				{ mediaInspectorPanel }
+				<div { ...blockProps }>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						onSelect={ onSelectAudio }
+						onSelectURL={ onSelectURL }
+						accept="audio/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ attributes }
+						onError={ onUploadError }
+					/>
+				</div>
+			</>
+		);
+	}
+
+	return (
+		<>
+			{ mediaToolbar }
+			{ mediaInspectorPanel }
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
