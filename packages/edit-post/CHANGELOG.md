@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Expand the Meta Boxes panel by default for users who have not set a preference for it.
+-   Expand the Meta Boxes panel by default for users who have not set a preference for it ([#84597](https://github.com/WordPress/gutenberg/pull/84597)).
 
 ## 8.57.0 (2026-10-07)
 
