@@ -20,14 +20,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -47,6 +46,9 @@
 		"@wordpress/i18n": "file:../i18n",
 		"dequal": "^2.0.3",
 		"react-easy-crop": "^5.4.2"
+	},
+	"devDependencies": {
+		"@wordpress/ui": "file:../ui"
 	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",

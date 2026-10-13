@@ -35,6 +35,44 @@ afterEach( () => {
 } );
 
 describe( 'Menu', () => {
+	it( 'keeps the popup open when clicking inside an iframe contained by it', async () => {
+		const onFrameClick = vi.fn();
+		await render(
+			<Menu.Root modal={ false }>
+				<Menu.Trigger>Actions</Menu.Trigger>
+				<Menu.Popup>
+					<Menu.Item>
+						<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+					</Menu.Item>
+					<iframe title="Popup frame" />
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: 'Actions' } )
+		);
+		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
+
+		const iframe = screen.getByTitle< HTMLIFrameElement >( 'Popup frame' );
+		const iframeDocument = iframe.contentDocument;
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+		const button = iframeDocument.createElement( 'button' );
+		button.textContent = 'Inside popup';
+		button.addEventListener( 'click', onFrameClick );
+		iframeDocument.body.appendChild( button );
+
+		await page
+			.frameLocator( page.getByTitle( 'Popup frame' ) )
+			.getByRole( 'button', { name: 'Inside popup' } )
+			.click();
+
+		expect( onFrameClick ).toHaveBeenCalledTimes( 1 );
+		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
+	} );
+
 	it( 'closes a non-modal menu without consuming an iframe pointer interaction', async () => {
 		const user = userEvent;
 		const onCanvasClick = vi.fn();
@@ -88,77 +126,6 @@ describe( 'Menu', () => {
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		} );
 		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
-	} );
-
-	it( 'closes a non-modal menu on a nested same-origin iframe pointer interaction', async () => {
-		const user = userEvent;
-
-		await render(
-			<>
-				<Menu.Root modal={ false }>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<Menu.Popup>
-						<Menu.Item>
-							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-				<iframe
-					title="Editor canvas"
-					style={ { display: 'block', marginTop: 200 } }
-				/>
-			</>
-		);
-
-		const editorIframe =
-			screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
-		const editorDocument = editorIframe.contentDocument;
-
-		if ( ! editorDocument ) {
-			throw new Error( 'Expected a same-origin iframe document.' );
-		}
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
-
-		const nestedIframe = editorDocument.createElement( 'iframe' );
-		nestedIframe.title = 'Nested canvas';
-		editorDocument.body.appendChild( nestedIframe );
-		const nestedDocument = nestedIframe.contentDocument;
-
-		if ( ! nestedDocument ) {
-			throw new Error( 'Expected a nested same-origin iframe document.' );
-		}
-
-		const canvasTarget = nestedDocument.createElement( 'button' );
-		canvasTarget.textContent = 'Edit nested block';
-		nestedDocument.body.appendChild( canvasTarget );
-
-		const nestedAddEventListener = vi.spyOn(
-			nestedDocument,
-			'addEventListener'
-		);
-		await waitFor( () => {
-			expect( nestedAddEventListener ).toHaveBeenCalledWith(
-				'pointerdown',
-				expect.any( Function ),
-				true
-			);
-		} );
-
-		const editorFrame = page.frameLocator(
-			page.getByTitle( 'Editor canvas' )
-		);
-		const nestedFrame = page.frameLocator(
-			editorFrame.getByTitle( 'Nested canvas' )
-		);
-		await nestedFrame
-			.getByRole( 'button', { name: 'Edit nested block' } )
-			.click();
-
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
 	} );
 
 	it( 'keeps prefix icons hidden from assistive technology', async () => {

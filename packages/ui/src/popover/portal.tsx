@@ -11,7 +11,11 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function PopoverPortal( { container, ...restProps }, ref ) {
 		return (
 			<_Popover.Portal
-				container={ container ?? getWpCompatOverlaySlot() }
+				container={
+					container === undefined
+						? getWpCompatOverlaySlot()
+						: container
+				}
 				{ ...restProps }
 				ref={ ref }
 			/>

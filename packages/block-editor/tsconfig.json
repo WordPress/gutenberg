@@ -10,6 +10,7 @@
 		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../blob/tsconfig.build.json" },
 		{ "path": "../blocks" },
+		{ "path": "../commands/tsconfig.build.json" },
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
@@ -47,6 +48,7 @@
 	 */
 	"exclude": [
 		"**/benchmark",
+		"src/components/block-breadcrumb/test/index.browser.test.tsx",
 		"src/components/block-icon/stories/index.story.ts",
 		"src/components/contrast-checker/stories/index.story.ts",
 		"src/components/inspector-controls-tabs/test/use-inspector-controls-tabs.jsdom.test.tsx",

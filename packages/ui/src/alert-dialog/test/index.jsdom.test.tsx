@@ -1,7 +1,11 @@
-import { describe, expect, it, vi } from 'vitest';
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import * as AlertDialog from '..';
+import {
+	getWpCompatOverlaySlot,
+	__resetWpCompatOverlaySlotCacheForTests,
+} from '../../utils/wp-compat-overlay-slot';
 
 vi.mock( import( '@wordpress/a11y' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -265,5 +269,42 @@ describe( 'AlertDialog', () => {
 				'data-wp-ui-overlay-scrolled-from-bottom'
 			);
 		} );
+	} );
+} );
+
+describe( 'AlertDialog.Portal', () => {
+	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', true );
+	} );
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'waits for an explicit null container to become available', () => {
+		const content = ( container: HTMLElement | null ) => (
+			<AlertDialog.Root defaultOpen>
+				<div data-testid="portal-target" />
+				<AlertDialog.Popup
+					title="Dialog title"
+					portal={ <AlertDialog.Portal container={ container } /> }
+				>
+					Portal content
+				</AlertDialog.Popup>
+			</AlertDialog.Root>
+		);
+
+		const { rerender } = render( content( null ) );
+
+		expect(
+			screen.queryByText( 'Portal content' )
+		).not.toBeInTheDocument();
+
+		const target = screen.getByTestId( 'portal-target' );
+		rerender( content( target ) );
+
+		expect( within( target ).getByText( 'Portal content' ) ).toBeVisible();
 	} );
 } );
