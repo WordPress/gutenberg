@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { CustomSelectControl } from '@wordpress/components';
 import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
@@ -40,6 +41,36 @@ export default function FontFamilyControl( {
 	const selectedValue =
 		options.find( ( option ) => option.value === ( value || null ) ) ??
 		options[ 0 ];
+
+	// Preserve the public legacy prop contract for callers that customize the control.
+	if ( Object.keys( props ).length ) {
+		const legacyOptions = options.map(
+			( { value: key, label: name, style } ) => ( {
+				key: key ?? '',
+				name,
+				style,
+			} )
+		);
+		return (
+			<CustomSelectControl
+				label={ __( 'Font' ) }
+				value={
+					legacyOptions.find( ( option ) => option.key === value ) ??
+					''
+				}
+				onChange={ ( { selectedItem } ) =>
+					onChange( selectedItem.key )
+				}
+				options={ legacyOptions }
+				className={ clsx(
+					'block-editor-font-family-control',
+					className
+				) }
+				{ ...props }
+			/>
+		);
+	}
+
 	return (
 		<SelectControl
 			label={ __( 'Font' ) }
