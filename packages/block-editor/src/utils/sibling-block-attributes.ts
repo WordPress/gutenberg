@@ -6,12 +6,15 @@ import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
  * (attributes with the `content` role) and its metadata.
  * A styled sibling thus yields an equally styled, empty new block.
  *
- * @param {string}  blockName  The block name.
- * @param {?Object} attributes The adjacent block's attributes.
+ * @param blockName  The block name.
+ * @param attributes The adjacent block's attributes.
  *
- * @return {Object} The attributes for the new block.
+ * @return The attributes for the new block.
  */
-export function getSiblingBlockAttributes( blockName, attributes ) {
+export function getSiblingBlockAttributes(
+	blockName: string,
+	attributes?: Record< string, unknown > | null
+): Record< string, unknown > {
 	if ( ! attributes ) {
 		return {};
 	}

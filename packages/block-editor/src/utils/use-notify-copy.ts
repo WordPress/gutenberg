@@ -11,14 +11,15 @@ export function useNotifyCopy() {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	return useCallback(
-		( eventType, selectedBlockClientIds ) => {
+		( eventType: string, selectedBlockClientIds: string[] ) => {
 			let notice = '';
 
 			if ( eventType === 'copyStyles' ) {
 				notice = __( 'Styles copied to clipboard.' );
 			} else if ( selectedBlockClientIds.length === 1 ) {
 				const clientId = selectedBlockClientIds[ 0 ];
-				const title = getBlockType( getBlockName( clientId ) )?.title;
+				// A selected block always has a registered type.
+				const title = getBlockType( getBlockName( clientId ) )?.title!;
 
 				if ( eventType === 'copy' ) {
 					notice = sprintf(

@@ -1,5 +1,8 @@
+import type { BlockType } from '@wordpress/blocks';
 import { getBlockDefaultClassName, getBlockType } from '@wordpress/blocks';
 import { splitSelectorList } from '@wordpress/global-styles-engine';
+
+type BlockSelector = NonNullable< BlockType[ 'selectors' ] >[ string ];
 
 /**
  * Given a block's `selectors.root` value, returns the part of the selector
@@ -11,10 +14,10 @@ import { splitSelectorList } from '@wordpress/global-styles-engine';
  *   ".wp-block-foo > .inner"                 → "> .inner"
  *   ".wp-block-foo"                          → null (no descendant)
  *
- * @param {string} rootSelector The block's `selectors.root` value.
- * @return {string|null} Relative selector, or null if rootSelector targets the wrapper itself.
+ * @param rootSelector The block's `selectors.root` value.
+ * @return Relative selector, or null if rootSelector targets the wrapper itself.
  */
-export function getRelativeRootSelector( rootSelector ) {
+export function getRelativeRootSelector( rootSelector: string ): string | null {
 	// Match everything after the first compound selector (up to the first
 	// whitespace or combinator character).
 	// Require at least one combinator character (space, >, +, ~) between the
@@ -33,11 +36,11 @@ export function getRelativeRootSelector( rootSelector ) {
  * a different block, e.g. `.wp-block-list > ` in List Item's `.wp-block-list > li`.
  * Mirror of `gutenberg_get_state_selector_ancestor()` in PHP.
  *
- * @param {string}  selector A single block or feature selector.
- * @param {string=} name     Name of the block being scoped.
- * @return {string} The leading compound and its combinator, or an empty string.
+ * @param selector A single block or feature selector.
+ * @param name     Name of the block being scoped.
+ * @return The leading compound and its combinator, or an empty string.
  */
-function getStateSelectorAncestor( selector, name ) {
+function getStateSelectorAncestor( selector: string, name?: string ): string {
 	const match = name && selector.match( /^\.(wp-block-[-_a-zA-Z0-9]+)/ );
 	if ( ! match || match[ 1 ] === getBlockDefaultClassName( name ) ) {
 		return '';
@@ -59,7 +62,7 @@ function getStateSelectorAncestor( selector, name ) {
 				break;
 			}
 			ancestorLength =
-				i + selector.slice( i ).match( /^[\s>+~]*/ )[ 0 ].length;
+				i + selector.slice( i ).match( /^[\s>+~]*/ )![ 0 ].length;
 			i = ancestorLength - 1;
 		} else if ( depth === 0 && ancestorLength ) {
 			nextCompound += char;
@@ -81,18 +84,18 @@ function getStateSelectorAncestor( selector, name ) {
  * When the leading compound names a different block (an ancestor outside this
  * block's markup), it is kept and the next compound is scoped instead.
  *
- * @param {string}  baseSelector  The block-instance scoping selector.
- * @param {string}  blockSelector The block or feature selector from block metadata.
- * @param {string}  suffix        Optional selector suffix, e.g. ":hover".
- * @param {string=} name          Optional name of the block being scoped.
- * @return {string} The scoped CSS selector.
+ * @param baseSelector  The block-instance scoping selector.
+ * @param blockSelector The block or feature selector from block metadata.
+ * @param suffix        Optional selector suffix, e.g. ":hover".
+ * @param name          Optional name of the block being scoped.
+ * @return The scoped CSS selector.
  */
 export function buildScopedBlockSelector(
-	baseSelector,
-	blockSelector,
-	suffix = '',
-	name
-) {
+	baseSelector: string,
+	blockSelector: BlockSelector | undefined,
+	suffix: string = '',
+	name?: string
+): string {
 	if ( typeof blockSelector !== 'string' || ! blockSelector ) {
 		return splitSelectorList( baseSelector )
 			.map( ( selector ) => `${ selector.trim() }${ suffix }` )
@@ -152,11 +155,14 @@ export function buildScopedBlockSelector(
  * scoped under `baseSelector`. If no descendant is present, falls back to the
  * base selector.
  *
- * @param {string} baseSelector The block-instance scoping class selector.
- * @param {string} name         The block name, used to look up selectors.
- * @return {string} The fully-scoped CSS selector for root state styles.
+ * @param baseSelector The block-instance scoping class selector.
+ * @param name         The block name, used to look up selectors.
+ * @return The fully-scoped CSS selector for root state styles.
  */
-export function buildRootStyleStateSelector( baseSelector, name ) {
+export function buildRootStyleStateSelector(
+	baseSelector: string,
+	name: string
+): string {
 	const rootSelector = getBlockType( name )?.selectors?.root;
 	return buildScopedBlockSelector( baseSelector, rootSelector );
 }
@@ -170,16 +176,24 @@ export function buildRootStyleStateSelector( baseSelector, name ) {
  * portion (".wp-block-button__link") is scoped under `baseSelector`. If no
  * descendant is present, falls back to appending the state to `baseSelector`.
  *
- * @param {string} baseSelector The block-instance scoping class selector.
- * @param {string} name         The block name, used to look up selectors.
- * @param {string} state        The pseudo-class string, e.g. ":hover".
- * @return {string} The fully-scoped CSS selector for this state.
+ * @param baseSelector The block-instance scoping class selector.
+ * @param name         The block name, used to look up selectors.
+ * @param state        The pseudo-class string, e.g. ":hover".
+ * @return The fully-scoped CSS selector for this state.
  */
-export function buildPseudoStyleStateSelector( baseSelector, name, state ) {
+export function buildPseudoStyleStateSelector(
+	baseSelector: string,
+	name: string,
+	state: string
+): string {
 	return `${ buildRootStyleStateSelector( baseSelector, name ) }${ state }`;
 }
 
-export function buildStateSelector( baseSelector, name, state ) {
+export function buildStateSelector(
+	baseSelector: string,
+	name: string,
+	state: string
+): string {
 	const rootSelector = getBlockType( name )?.selectors?.root;
 	return buildScopedBlockSelector( baseSelector, rootSelector, state );
 }
@@ -193,11 +207,14 @@ export function buildStateSelector( baseSelector, name, state ) {
  * that descendant inside the block wrapper. Otherwise it targets the wrapper
  * itself.
  *
- * @param {string} clientId The block's clientId.
- * @param {string} name     The block name, used to look up selectors.
- * @return {string} CSS selector scoped to this block instance.
+ * @param clientId The block's clientId.
+ * @param name     The block name, used to look up selectors.
+ * @return CSS selector scoped to this block instance.
  */
-export function buildCanvasStateSelector( clientId, name ) {
+export function buildCanvasStateSelector(
+	clientId: string,
+	name: string
+): string {
 	const rootSelector = getBlockType( name )?.selectors?.root;
 	return buildScopedBlockSelector(
 		`[data-block="${ clientId }"]`,
