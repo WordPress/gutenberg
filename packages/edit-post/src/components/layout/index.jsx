@@ -16,7 +16,7 @@ import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
-	useEffect,
+	useLayoutEffect,
 	useMemo,
 	useId,
 	useRef,
@@ -154,7 +154,9 @@ function MetaBoxesMain() {
 	// content area is the only scroller. An inner iframe scrollbar plus the
 	// outer one sticks at the handoff and shows both bars. The iframe is
 	// mounted after this component, and later replaced, so watch for it.
-	useEffect( () => {
+	// A layout effect so the switch between pinned and inline is sized and
+	// scrolled before paint, instead of flashing an empty canvas.
+	useLayoutEffect( () => {
 		if ( isPinned || ! hasAnyVisible ) {
 			return;
 		}
@@ -167,15 +169,43 @@ function MetaBoxesMain() {
 
 		let resizeObserver;
 		let iframe = null;
+		let frameDocument = null;
+		// Read on cleanup, when the pinned layout has already clamped the
+		// content area's scrollTop to 0.
+		let contentScrollTop = content.scrollTop;
+		const trackContentScroll = () => {
+			contentScrollTop = content.scrollTop;
+		};
 
-		const release = ( frame ) => {
+		// The iframe document keeps its scroll offset even with overflow
+		// hidden, which hides the top of the post. Hand any offset to the
+		// content scroller so there is only one scroll position.
+		const moveFrameScrollToContent = () => {
+			const scroller = frameDocument?.scrollingElement;
+			if ( ! scroller || ! scroller.scrollTop ) {
+				return;
+			}
+			const offset = scroller.scrollTop;
+			scroller.scrollTop = 0;
+			content.scrollTop += offset;
+		};
+		const release = ( frame, { keepPosition = false } = {} ) => {
 			if ( ! frame ) {
 				return;
 			}
+			const offset = contentScrollTop;
 			frame.style.height = '';
 			const doc = frame.contentDocument;
 			if ( doc?.documentElement ) {
 				doc.documentElement.style.overflow = '';
+			}
+			// Pinned, the iframe scrolls on its own and the content area does
+			// not, so keep the reading position by moving it back.
+			if ( keepPosition ) {
+				content.scrollTop = 0;
+				if ( doc?.scrollingElement ) {
+					doc.scrollingElement.scrollTop = offset;
+				}
 			}
 		};
 		const sync = () => {
@@ -218,15 +248,22 @@ function MetaBoxesMain() {
 			if ( iframe && iframe !== next ) {
 				release( iframe );
 			}
+			frameDocument?.removeEventListener(
+				'scroll',
+				moveFrameScrollToContent
+			);
 			iframe = next;
 			const doc = iframe?.contentDocument;
-			if ( ! doc?.body ) {
+			frameDocument = doc?.body ? doc : null;
+			if ( ! frameDocument ) {
 				return;
 			}
 			resizeObserver = new window.ResizeObserver( sync );
 			resizeObserver.observe( doc.documentElement );
 			resizeObserver.observe( content );
 			sync();
+			moveFrameScrollToContent();
+			doc.addEventListener( 'scroll', moveFrameScrollToContent );
 		};
 		const find = () =>
 			content.querySelector( 'iframe[name="editor-canvas"]' );
@@ -238,6 +275,7 @@ function MetaBoxesMain() {
 		};
 
 		content.addEventListener( 'load', onLoad, true );
+		content.addEventListener( 'scroll', trackContentScroll );
 		const mutationObserver = new window.MutationObserver( () => {
 			const next = find();
 			if ( next !== iframe ) {
@@ -252,9 +290,14 @@ function MetaBoxesMain() {
 
 		return () => {
 			content.removeEventListener( 'load', onLoad, true );
+			content.removeEventListener( 'scroll', trackContentScroll );
 			mutationObserver.disconnect();
 			resizeObserver?.disconnect();
-			release( iframe );
+			frameDocument?.removeEventListener(
+				'scroll',
+				moveFrameScrollToContent
+			);
+			release( iframe, { keepPosition: true } );
 		};
 	}, [ isPinned, hasAnyVisible ] );
 

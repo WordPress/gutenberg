@@ -154,6 +154,15 @@
 	clear: both;
 }
 
+// The canvas transition is for device previews. Its height follows the meta
+// box pane and the content, which should not lag behind a pin, unpin, or drag.
+.has-metaboxes .interface-interface-skeleton__content iframe[name="editor-canvas"] {
+	@media not ( prefers-reduced-motion ) {
+		transition-property: all, height, min-height;
+		transition-duration: 400ms, 0s, 0s;
+	}
+}
+
 // When the pane is pinned the editors should allow shrinking so the meta box
 // pane remains visible and reachable. Apply common sizing to both editors, then
 // specialise overflow handling per editor so scroll behavior is correct.
