@@ -3,13 +3,14 @@ import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useMemo, useState } from '@wordpress/element';
 import DataViews from '../index';
+import DataViewsPicker from '../../dataviews-picker';
 import {
 	LAYOUT_ACTIVITY,
 	LAYOUT_GRID,
 	LAYOUT_LIST,
 	LAYOUT_TABLE,
 } from '../../constants';
-import type { Action, SupportedLayouts, View } from '../../types';
+import type { Action, Field, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -30,6 +31,20 @@ const DEFAULT_VIEW = {
 	layout: {},
 	filters: [],
 };
+
+const HIERARCHY_VIEW = {
+	...DEFAULT_VIEW,
+	fields: [],
+	showLevels: true,
+	titleField: 'title',
+};
+const hierarchyFixture = [
+	{ id: 2, title: 'Child' },
+	{ id: 1, title: 'Parent' },
+];
+const getHierarchyParentId = ( item: Data ) =>
+	item.id === 2 ? 1 : undefined;
+const getHierarchyHasChildren = ( item: Data ) => item.id === 1;
 
 const defaultLayouts: SupportedLayouts = {
 	[ LAYOUT_TABLE ]: true,
@@ -174,22 +189,94 @@ describe( 'DataViews component', () => {
 		expect( screen.getByText( 'No results' ) ).toBeInTheDocument();
 	} );
 
+	it( 'shows flat search matches with supplied ancestor descriptions and restores the tree when cleared', async () => {
+		type SearchItem = Data & { parent?: number; ancestorPath: string[] };
+		const items: SearchItem[] = [
+			{ id: 1, title: 'Root', ancestorPath: [] },
+			{ id: 2, title: 'Branch', parent: 1, ancestorPath: [ 'Root' ] },
+			{
+				id: 3,
+				title: 'Needle',
+				parent: 2,
+				ancestorPath: [ 'Root', 'Branch' ],
+			},
+		];
+		const searchFields: Field< SearchItem >[] = [
+			{
+				id: 'title',
+				label: 'Title',
+				type: 'text',
+				enableGlobalSearch: true,
+			},
+			{
+				id: 'ancestorPath',
+				label: 'Location',
+				type: 'text',
+				render: ( { item } ) => (
+					<span role="group" aria-label="Breadcrumbs">
+						{ item.ancestorPath.join( ' / ' ) }
+					</span>
+				),
+			},
+		];
+		function SearchConsumer() {
+			const [ view, setView ] = useState< View >( {
+				...DEFAULT_VIEW,
+				fields: [],
+				titleField: 'title',
+				showLevels: true,
+			} );
+			const filtered = filterSortAndPaginate( items, view, searchFields );
+			return (
+				<DataViews
+					data={ filtered.data }
+					fields={ searchFields }
+					paginationInfo={ filtered.paginationInfo }
+					view={ {
+						...view,
+						showLevels: ! view.search,
+						descriptionField: view.search
+							? 'ancestorPath'
+							: undefined,
+					} }
+					onChangeView={ setView }
+					defaultLayouts={ { table: true } }
+					getItemId={ ( item ) => item.id.toString() }
+					getItemParentId={ ( item ) => item.parent }
+					getItemHasChildren={ ( item ) => item.id < 3 }
+					expandedItemIds={ [] }
+					onChangeExpandedItemIds={ vi.fn() }
+				/>
+			);
+		}
+		const user = userEvent.setup();
+		render( <SearchConsumer /> );
+		expect(
+			screen.getByRole( 'button', { name: 'Expand Root' } )
+		).toBeInTheDocument();
+		expect( screen.queryByText( 'Needle' ) ).not.toBeInTheDocument();
+		await user.type( screen.getByRole( 'searchbox' ), 'Needle' );
+		const row = await screen.findByRole( 'row', { name: /Needle/ } );
+		expect(
+			within( row ).getByRole( 'group', { name: 'Breadcrumbs' } )
+		).toHaveTextContent( 'Root / Branch' );
+		expect( within( row ).queryByRole( 'link' ) ).not.toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: 'Expand all' } )
+		).not.toBeInTheDocument();
+		await user.clear( screen.getByRole( 'searchbox' ) );
+		expect(
+			await screen.findByRole( 'button', { name: 'Expand Root' } )
+		).toBeInTheDocument();
+		expect( screen.queryByText( 'Needle' ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'orders and indents loaded items from their parent ids', () => {
 		render(
 			<DataViewWrapper
-				data={ [
-					{ id: 2, title: 'Child' },
-					{ id: 1, title: 'Parent' },
-				] }
-				getItemParentId={ ( item ) =>
-					item.id === 2 ? 1 : undefined
-				}
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				data={ hierarchyFixture }
+				getItemParentId={ getHierarchyParentId }
+				view={ HIERARCHY_VIEW }
 			/>
 		);
 
@@ -201,22 +288,12 @@ describe( 'DataViews component', () => {
 	it( 'hides loaded descendants of collapsed items', () => {
 		render(
 			<DataViewWrapper
-				data={ [
-					{ id: 2, title: 'Child' },
-					{ id: 1, title: 'Parent' },
-				] }
-				getItemParentId={ ( item ) =>
-					item.id === 2 ? 1 : undefined
-				}
-				getItemHasChildren={ ( item ) => item.id === 1 }
+				data={ hierarchyFixture }
+				getItemParentId={ getHierarchyParentId }
+				getItemHasChildren={ getHierarchyHasChildren }
 				expandedItemIds={ [] }
 				onChangeExpandedItemIds={ vi.fn() }
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				view={ HIERARCHY_VIEW }
 			/>
 		);
 
@@ -229,22 +306,12 @@ describe( 'DataViews component', () => {
 		const onChangeExpandedItemIds = vi.fn();
 		render(
 			<DataViewWrapper
-				data={ [
-					{ id: 2, title: 'Child' },
-					{ id: 1, title: 'Parent' },
-				] }
-				getItemParentId={ ( item ) =>
-					item.id === 2 ? 1 : undefined
-				}
-				getItemHasChildren={ ( item ) => item.id === 1 }
+				data={ hierarchyFixture }
+				getItemParentId={ getHierarchyParentId }
+				getItemHasChildren={ getHierarchyHasChildren }
 				expandedItemIds={ [] }
 				onChangeExpandedItemIds={ onChangeExpandedItemIds }
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				view={ HIERARCHY_VIEW }
 			/>
 		);
 
@@ -267,12 +334,7 @@ describe( 'DataViews component', () => {
 				}
 				expandedItemIds={ [] }
 				onChangeExpandedItemIds={ vi.fn() }
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				view={ HIERARCHY_VIEW }
 			/>
 		);
 
@@ -338,6 +400,379 @@ describe( 'DataViews component', () => {
 		] );
 	} );
 
+	it.each( [ 'default', 'custom wrapper', 'individual controls' ] )(
+		'hides flat pagination only during hierarchy pagination with %s',
+		async ( composition ) => {
+			const user = userEvent.setup();
+			const onChangeView = vi.fn();
+			const renderView = ( showLevels: boolean ) => (
+				<DataViews
+					fields={ fields }
+					defaultLayouts={ defaultLayouts }
+					getItemId={ ( item ) => item.id.toString() }
+					data={ hierarchyFixture }
+					getItemParentId={ getHierarchyParentId }
+					getItemHasChildren={ getHierarchyHasChildren }
+					expandedItemIds={ [ '1' ] }
+					onChangeExpandedItemIds={ vi.fn() }
+					hierarchyPagination={ {
+						getPaginationInfo: () => ( { hasMore: true } ),
+						onLoadMore: vi.fn(),
+					} }
+					paginationInfo={ { totalItems: 30, totalPages: 3 } }
+					view={ {
+						...HIERARCHY_VIEW,
+						showLevels,
+						infiniteScrollEnabled: false,
+					} }
+					onChangeView={ onChangeView }
+				>
+					{ composition === 'default' ? undefined : (
+						<>
+							<DataViews.Layout />
+							{ composition === 'custom wrapper' ? (
+								<DataViews.Pagination>
+									<span>Custom pagination</span>
+								</DataViews.Pagination>
+							) : (
+								<>
+									<DataViewsPicker.PageSelect />
+									<DataViewsPicker.PageNavigation />
+								</>
+							) }
+						</>
+					) }
+				</DataViews>
+			);
+			const { rerender } = render( renderView( true ) );
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Load more children of Parent',
+				} )
+			).toBeVisible();
+			expect(
+				screen.queryByRole( 'button', { name: 'Next page' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'combobox', { name: 'Current page' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Custom pagination' )
+			).not.toBeInTheDocument();
+
+			rerender( renderView( false ) );
+			expect( screen.queryAllByText( 'Custom pagination' ) ).toHaveLength(
+				composition === 'custom wrapper' ? 1 : 0
+			);
+			if ( composition !== 'custom wrapper' ) {
+				await user.selectOptions(
+					screen.getByRole( 'combobox', { name: 'Current page' } ),
+					'3'
+				);
+				await user.click(
+					screen.getByRole( 'button', { name: 'Next page' } )
+				);
+			}
+			expect(
+				onChangeView.mock.calls.map( ( [ view ] ) => view.page )
+			).toEqual( composition === 'custom wrapper' ? [] : [ 3, 2 ] );
+		}
+	);
+
+	it( 'shows remaining counts with accessible branch labels and preserves loading and retry states', () => {
+		const renderView = ( isLoading = false, error?: string ) => (
+			<DataViewWrapper
+				data={ [
+					{ id: 1, title: 'Parent' },
+					{ id: 2, title: 'Child' },
+					{ id: 3, title: 'Sibling' },
+				] }
+				getItemParentId={ getHierarchyParentId }
+				getItemHasChildren={ getHierarchyHasChildren }
+				expandedItemIds={ [ '1' ] }
+				onChangeExpandedItemIds={ vi.fn() }
+				hierarchyPagination={ {
+					getPaginationInfo: ( id ) => ( {
+						hasMore: true,
+						remainingItems: id === '1' ? 27 : 1,
+						isLoading,
+						error,
+					} ),
+					onLoadMore: vi.fn(),
+				} }
+				view={ {
+					...DEFAULT_VIEW,
+					fields: [],
+					titleField: 'title',
+					showLevels: true,
+					layout: { density: 'compact' },
+				} }
+			/>
+		);
+		const { rerender } = render( renderView() );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Show 27 more children of Parent',
+			} )
+		).toHaveTextContent( 'Show 27 more' );
+		expect(
+			screen.getByRole( 'button', { name: 'Show 1 more item' } )
+		).toHaveTextContent( 'Show 1 more' );
+		const rows = screen.getAllByRole( 'row' );
+		expect( rows[ 2 ] ).toHaveTextContent( 'Child' );
+		expect( rows[ 3 ] ).toHaveTextContent( 'Show 27 more' );
+		expect( rows[ 4 ] ).toHaveTextContent( 'Sibling' );
+		rerender( renderView( true ) );
+		expect(
+			screen.getByRole( 'button', { name: 'Loading children of Parent' } )
+		).toHaveTextContent( 'Loading…' );
+		expect(
+			screen.getByRole( 'button', { name: 'Loading children of Parent' } )
+		).toHaveAttribute( 'aria-disabled', 'true' );
+		rerender( renderView( false, 'Failed' ) );
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Retry loading children of Parent',
+			} )
+		).toHaveTextContent( 'Retry' );
+	} );
+
+	it( 'renders independent continuations after loaded subtrees', async () => {
+		const user = userEvent.setup();
+		const onLoadMore = vi.fn();
+		const onChangeView = vi.fn();
+		const hierarchyData = [
+			{ id: 3, title: 'Grandchild' },
+			{ id: 2, title: 'Child B' },
+			{ id: 1, title: 'Parent A' },
+			{ id: 4, title: 'Root D' },
+		];
+		const renderDataView = (
+			items: typeof hierarchyData,
+			hasParentContinuation = true
+		) => (
+			<DataViewWrapper
+				actions={ actions }
+				data={ items }
+				getItemParentId={ ( item ) => {
+					if ( item.id === 2 || item.id === 5 ) {
+						return 1;
+					}
+					return item.id === 3 ? 2 : undefined;
+				} }
+				getItemHasChildren={ ( item ) => item.id < 3 }
+				expandedItemIds={ [ '1', '2' ] }
+				onChangeExpandedItemIds={ vi.fn() }
+				hierarchyPagination={ {
+					getPaginationInfo: ( parentId ) => {
+						if ( parentId === '2' ) {
+							return { hasMore: true, isLoading: true };
+						}
+						return {
+							hasMore:
+								parentId === '1' ? hasParentContinuation : true,
+						};
+					},
+					onLoadMore,
+				} }
+				onChangeView={ onChangeView }
+				paginationInfo={ { totalItems: 100, totalPages: 10 } }
+				view={ {
+					...DEFAULT_VIEW,
+					page: 15,
+					fields: [],
+					groupBy: { field: 'missing', direction: 'asc' },
+					showLevels: true,
+					titleField: 'title',
+					infiniteScrollEnabled: true,
+				} }
+			/>
+		);
+		const { rerender } = render( renderDataView( hierarchyData ) );
+
+		const rows = screen.getAllByRole( 'row' );
+		expect( rows[ 1 ] ).toHaveTextContent( 'Parent A' );
+		expect( rows[ 2 ] ).toHaveTextContent( 'Child B' );
+		expect( rows[ 3 ] ).toHaveTextContent( 'Grandchild' );
+		expect( rows[ 4 ] ).toHaveTextContent( 'Loading…' );
+		expect( rows[ 5 ] ).toHaveTextContent( 'Load more' );
+		expect( rows[ 6 ] ).toHaveTextContent( 'Root D' );
+		expect( rows[ 7 ] ).toHaveTextContent( 'Load more' );
+		for ( const row of [ rows[ 4 ], rows[ 5 ], rows[ 7 ] ] ) {
+			const cells = within( row ).getAllByRole( 'cell' );
+			expect( cells ).toHaveLength( 1 );
+			expect( cells[ 0 ] ).toHaveAttribute(
+				'colspan',
+				String(
+					within( rows[ 0 ] ).getAllByRole( 'columnheader' ).length
+				)
+			);
+		}
+
+		const childContinuation = screen.getByRole( 'button', {
+			name: 'Loading children of Child B',
+		} );
+		expect( childContinuation ).toHaveAttribute( 'aria-disabled', 'true' );
+		expect( childContinuation ).toHaveAttribute( 'aria-busy', 'true' );
+		const parentContinuation = screen.getByRole( 'button', {
+			name: 'Load more children of Parent A',
+		} );
+		await user.click( parentContinuation );
+		await user.click(
+			screen.getByRole( 'button', { name: 'Load more items' } )
+		);
+		expect( onLoadMore.mock.calls ).toEqual( [ [ '1' ], [ null ] ] );
+
+		expect(
+			screen.queryByRole( 'button', { name: 'Next page' } )
+		).not.toBeInTheDocument();
+		expect( screen.getByRole( 'table' ) ).toBeInTheDocument();
+		expect( screen.queryByRole( 'article' ) ).not.toBeInTheDocument();
+		expect( screen.getByText( '4 Items' ) ).toBeInTheDocument();
+		await user.click(
+			screen.getByRole( 'button', { name: 'View options' } )
+		);
+		expect(
+			screen.queryByText( 'Items per page' )
+		).not.toBeInTheDocument();
+		expect( onChangeView ).not.toHaveBeenCalled();
+
+		parentContinuation.focus();
+		rerender(
+			renderDataView( [
+				...hierarchyData,
+				{ id: 5, title: 'New child' },
+			] )
+		);
+		expect(
+			screen.getByRole( 'button', {
+				name: 'Load more children of Parent A',
+			} )
+		).toHaveFocus();
+
+		rerender(
+			renderDataView(
+				[ ...hierarchyData, { id: 5, title: 'New child' } ],
+				false
+			)
+		);
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Collapse Parent A',
+				} )
+			).toHaveFocus()
+		);
+	} );
+
+	it.each( [ 'together', 'separately', 'empty root' ] )(
+		'focuses the first new item when data and loading update %s',
+		async ( update ) => {
+			const user = userEvent.setup();
+			const isRoot = update === 'empty root';
+			const loadedItems = isRoot
+				? []
+				: [
+						{ id: 1, title: 'Parent' },
+						{ id: 2, title: 'First child' },
+					];
+			const renderDataView = ( items: Data[], hasMore: boolean ) => (
+				<DataViewWrapper
+					data={ items }
+					getItemParentId={ ( item ) =>
+						! isRoot && item.id > 1 ? 1 : undefined
+					}
+					getItemHasChildren={ ( item ) => ! isRoot && item.id === 1 }
+					expandedItemIds={ isRoot ? [] : [ '1' ] }
+					onChangeExpandedItemIds={ vi.fn() }
+					hierarchyPagination={ {
+						getPaginationInfo: ( parentId ) =>
+							parentId === ( isRoot ? null : '1' )
+								? {
+										hasMore,
+										isLoading:
+											hasMore && items !== loadedItems,
+									}
+								: undefined,
+						onLoadMore: vi.fn(),
+					} }
+					view={ HIERARCHY_VIEW }
+				/>
+			);
+			const { rerender } = render( renderDataView( loadedItems, true ) );
+			await user.click(
+				screen.getByRole( 'button', {
+					name: isRoot
+						? 'Load more items'
+						: 'Load more children of Parent',
+				} )
+			);
+			const nextItems = [ ...loadedItems, { id: 3, title: 'New item' } ];
+			if ( update === 'separately' ) {
+				rerender( renderDataView( nextItems, true ) );
+			}
+			rerender( renderDataView( nextItems, false ) );
+			await waitFor( () =>
+				expect(
+					screen.getByRole( 'row', { name: /New item/ } )
+				).toHaveFocus()
+			);
+		}
+	);
+
+	it( 'keeps an empty root error retryable', async () => {
+		const user = userEvent.setup();
+		const onLoadMore = vi.fn();
+		const hierarchyProps = {
+			data: [],
+			getItemParentId: () => undefined,
+			getItemHasChildren: () => undefined,
+			expandedItemIds: [],
+			onChangeExpandedItemIds: vi.fn(),
+			paginationInfo: { totalItems: 0, totalPages: 0 },
+			view: {
+				...DEFAULT_VIEW,
+				fields: [],
+				showLevels: true,
+				titleField: 'title',
+			},
+		};
+		const { rerender } = render(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				hierarchyPagination={ {
+					getPaginationInfo: () => ( {
+						hasMore: false,
+						error: 'Pages could not be loaded.',
+					} ),
+					onLoadMore,
+				} }
+			/>
+		);
+
+		expect( screen.getByRole( 'alert' ) ).toHaveTextContent(
+			'Pages could not be loaded.'
+		);
+		expect( screen.queryByText( 'No results' ) ).not.toBeInTheDocument();
+		await user.click(
+			screen.getByRole( 'button', { name: 'Retry loading items' } )
+		);
+		expect( onLoadMore ).toHaveBeenCalledWith( null );
+
+		rerender(
+			<DataViewWrapper
+				{ ...hierarchyProps }
+				hierarchyPagination={ {
+					getPaginationInfo: () => ( { hasMore: false } ),
+					onLoadMore,
+				} }
+			/>
+		);
+		await waitFor( () =>
+			expect( screen.getByRole( 'status' ) ).toHaveFocus()
+		);
+	} );
+
 	it( 'keeps getItemLevel indentation when no parent callback exists', () => {
 		render(
 			<DataViewWrapper
@@ -346,12 +781,7 @@ describe( 'DataViews component', () => {
 					{ id: 2, title: 'Child' },
 				] }
 				getItemLevel={ ( item ) => item.id - 1 }
-				view={ {
-					...DEFAULT_VIEW,
-					fields: [],
-					showLevels: true,
-					titleField: 'title',
-				} }
+				view={ HIERARCHY_VIEW }
 			/>
 		);
 
