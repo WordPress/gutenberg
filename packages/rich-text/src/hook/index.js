@@ -6,6 +6,7 @@ import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
+import { slice } from '../slice';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
@@ -36,6 +37,7 @@ function useRichTextBase( {
 	placeholder,
 	onSelectionChange,
 	preserveWhiteSpace,
+	maxLength,
 	onChange,
 	__unstableDisableFormats: disableFormats,
 	__unstableIsSelected: isSelected,
@@ -137,6 +139,24 @@ function useRichTextBase( {
 	 * @param {Object} newRecord The record to sync and apply.
 	 */
 	function handleChange( newRecord ) {
+		// Every edit passes through here, so trimming here also covers input
+		// that cannot be cancelled up front (IME, autocorrect, paste). Text
+		// already above the limit is never cut, only prevented from growing.
+		if ( maxLength !== undefined ) {
+			const previousLength = recordRef.current?.text.length ?? 0;
+			const { length } = newRecord.text;
+
+			if ( length > maxLength && length > previousLength ) {
+				const limit = Math.max( maxLength, previousLength );
+				newRecord = {
+					...slice( newRecord, 0, limit ),
+					activeFormats: newRecord.activeFormats,
+					start: Math.min( newRecord.start ?? limit, limit ),
+					end: Math.min( newRecord.end ?? limit, limit ),
+				};
+			}
+		}
+
 		recordRef.current = newRecord;
 		applyRecord( newRecord );
 
