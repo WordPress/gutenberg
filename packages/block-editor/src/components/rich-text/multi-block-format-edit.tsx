@@ -1,5 +1,11 @@
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import {
+	createContext,
+	useContext,
+	useMemo,
+	useState,
+} from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import {
@@ -11,7 +17,7 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type { RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import {
@@ -24,8 +30,12 @@ import { getFieldFormatSettings } from './field-format-settings';
 import FormatToolbarContainer from './format-toolbar-container';
 import { toRecord } from './utils';
 
-const { KeyboardShortcutContext, InputEventContext, useFormatTypes } =
-	unlock( richTextPrivateApis );
+const {
+	KeyboardShortcutContext,
+	InputEventContext,
+	useFormatTypes,
+	shortcutsListener,
+} = unlock( richTextPrivateApis );
 
 // Cannot occur in rich text, so the joined fields split back unambiguously.
 const SEPARATOR = '\u0000';
@@ -43,6 +53,32 @@ type SelectionEnd = {
 	attributeKey?: string;
 	offset?: number;
 };
+
+type Shortcuts = Set< ( event: KeyboardEvent ) => void >;
+
+/**
+ * The Set the format types register their shortcut callbacks in, for the
+ * writing flow to dispatch them from its element.
+ */
+const ShortcutsContext = createContext< Shortcuts | undefined >( undefined );
+
+/**
+ * Attaches the format shortcuts of a text selection across blocks to the
+ * writing flow element, which holds the selection.
+ *
+ * @return Ref callback.
+ */
+export function useMultiBlockFormatShortcuts() {
+	const keyboardShortcuts = useContext( ShortcutsContext );
+	return useRefEffect(
+		( element: HTMLElement ) => {
+			if ( keyboardShortcuts ) {
+				return shortcutsListener( keyboardShortcuts )( element );
+			}
+		},
+		[ keyboardShortcuts ]
+	);
+}
 
 /**
  * Returns the key of the block's rich text attribute if that is all the
@@ -135,41 +171,48 @@ function selector( select: ( store: typeof blockEditorStore ) => any ) {
 	return { clientIds, anchor, focus };
 }
 
-type Props = {
-	/**
-	 * The Set the format types register their shortcut callbacks in. The
-	 * writing flow dispatches them on keydown.
-	 */
-	keyboardShortcuts: Set< ( event: KeyboardEvent ) => void >;
-	/**
-	 * The writing flow element, which holds the selection: the format
-	 * popovers anchor to it and focus returns to it.
-	 */
-	elementRef: RefObject< HTMLElement | null >;
-};
-
-type FieldsProps = Props & {
+type FieldsProps = {
 	clientIds: string[];
 	anchor: SelectionEnd;
 	focus: SelectionEnd;
+	keyboardShortcuts: Shortcuts;
+	contentRef: RefObject< HTMLElement | null >;
 };
 
 /**
  * Presents the rich text of a text selection across blocks as one value to
  * the format types, so their toolbar buttons and shortcuts work on it. Only
- * when every selected block is nothing but a rich text field. Rendered by the
- * writing flow, whose element holds the selection.
+ * when every selected block is nothing but a rich text field.
  *
  * @param props
+ * @param props.children   The block editor content, wrapped so the writing flow
+ *                         in it can take the shortcuts.
+ * @param props.contentRef The writing flow element, which holds the
+ *                         selection: the format popovers anchor to it and
+ *                         focus returns to it.
  */
-export default function MultiBlockFormatEdit( props: Props ) {
+export default function MultiBlockFormatEdit( {
+	children,
+	contentRef,
+}: {
+	children: ReactNode;
+	contentRef: RefObject< HTMLElement | null >;
+} ) {
+	const [ keyboardShortcuts ] = useState< Shortcuts >( () => new Set() );
 	const selection = useSelect( selector, [] );
 
-	if ( ! selection ) {
-		return null;
-	}
-
-	return <Fields { ...selection } { ...props } />;
+	return (
+		<ShortcutsContext.Provider value={ keyboardShortcuts }>
+			{ children }
+			{ selection && (
+				<Fields
+					{ ...selection }
+					keyboardShortcuts={ keyboardShortcuts }
+					contentRef={ contentRef }
+				/>
+			) }
+		</ShortcutsContext.Provider>
+	);
 }
 
 function Fields( {
@@ -177,7 +220,7 @@ function Fields( {
 	anchor,
 	focus,
 	keyboardShortcuts,
-	elementRef,
+	contentRef,
 }: FieldsProps ) {
 	const registry = useRegistry();
 	const { updateBlockAttributes, replaceBlocks, selectionChange } =
@@ -322,7 +365,7 @@ function Fields( {
 	}
 
 	function onFocus() {
-		elementRef.current?.focus();
+		contentRef.current?.focus();
 	}
 
 	if ( disabled ) {
@@ -339,7 +382,7 @@ function Fields( {
 							onChange={ onChange }
 							onFocus={ onFocus }
 							formatTypes={ formatTypes }
-							forwardedRef={ elementRef }
+							forwardedRef={ contentRef }
 						/>
 					</Popover.__unstableSlotNameProvider>
 				</InputEventContext.Provider>
