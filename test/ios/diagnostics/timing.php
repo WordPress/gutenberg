@@ -1,10 +1,11 @@
 <?php
 // Temporary diagnostics: logs where a request spends its time.
 function diag_log( $line ) {
-	if ( false === strpos( $_SERVER['REQUEST_URI'] ?? '', 'post-new.php' ) ) {
+	$uri = $_SERVER['REQUEST_URI'] ?? '';
+	if ( false === strpos( $uri, 'post-new.php' ) && false === strpos( $uri, 'wp-cron.php' ) ) {
 		return;
 	}
-	file_put_contents( ABSPATH . 'timing.log', sprintf( "%6.2fs %s\n", microtime( true ) - $_SERVER['REQUEST_TIME_FLOAT'], $line ), FILE_APPEND );
+	file_put_contents( ABSPATH . 'timing.log', sprintf( "%.2f %-12s %6.2fs %s\n", microtime( true ), strtok( basename( $uri ), '?' ), microtime( true ) - $_SERVER['REQUEST_TIME_FLOAT'], $line ), FILE_APPEND );
 }
 diag_log( 'mu-plugins loaded' );
 $GLOBALS['diag_last'] = array( microtime( true ), 'start' );
@@ -16,7 +17,7 @@ add_action( 'all', function ( $hook ) {
 	}
 	$GLOBALS['diag_last'] = array( $now, $hook );
 } );
-foreach ( array( 'plugins_loaded', 'init', 'admin_init', 'current_screen', 'admin_enqueue_scripts', 'admin_footer', 'shutdown' ) as $phase ) {
+foreach ( array( 'plugins_loaded', 'init', 'admin_init', 'current_screen', 'admin_enqueue_scripts', 'admin_footer', 'shutdown', 'wp_loaded' ) as $phase ) {
 	add_action( $phase, function () use ( $phase ) {
 		diag_log( $phase );
 	}, PHP_INT_MAX );
@@ -33,3 +34,14 @@ add_filter( 'rest_post_dispatch', function ( $response, $server, $request ) {
 add_action( 'http_api_debug', function ( $response, $context, $class, $args, $url ) {
 	diag_log( 'http ' . substr( $url, 0, 80 ) );
 }, 10, 5 );
+add_action( 'shutdown', function () {
+	diag_log( 'cron events ran: ' . implode( ',', $GLOBALS['diag_cron'] ?? array() ) );
+} );
+foreach ( array_keys( (array) _get_cron_array() ) as $diag_time ) {
+	foreach ( array_keys( _get_cron_array()[ $diag_time ] ) as $diag_hook ) {
+		add_action( $diag_hook, function () use ( $diag_hook ) {
+			$GLOBALS['diag_cron'][] = $diag_hook;
+			diag_log( 'cron ' . $diag_hook );
+		}, -1 );
+	}
+}
