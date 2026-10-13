@@ -7148,52 +7148,6 @@
 			"count": 1
 		}
 	},
-	"packages/fields/src/actions/delete-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/actions/duplicate-pattern.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/actions/duplicate-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/actions/permanently-delete-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/actions/rename-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/actions/reorder-page.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/actions/reset-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/actions/trash-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
 	"packages/fields/src/components/create-template-part-modal/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4

@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Remove the `deletePost`, `duplicatePattern`, `duplicatePost`, `duplicateTemplatePart`, `exportPattern`, `permanentlyDeletePost`, `renamePost`, `reorderPage`, `resetPost`, `restorePost`, `trashPost`, `viewPost` and `viewPostRevisions` actions, which moved to the `@wordpress/core-actions` script modules ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 
 ### Enhancements
 

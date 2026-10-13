@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import type { CommonPost } from '../../types';
-import { getItemTitle } from '../../actions/utils';
+import { getItemTitle } from '../utils';
 
 export function BaseTitleView( {
 	item,

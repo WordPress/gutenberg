@@ -51,8 +51,7 @@ export type NoticeSettings< T extends Post > = {
 };
 
 /**
- * A copy of `deletePostWithNotices()` of `@wordpress/fields`: deletes the
- * posts permanently, then shows a notice with the outcome.
+ * Deletes the posts permanently, then shows a notice with the outcome.
  *
  * @param posts                       The posts to delete.
  * @param notice                      The messages of the notices.
