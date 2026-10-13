@@ -1,11 +1,6 @@
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	Composite,
-	Dropdown,
-	SelectControl as WCSelectControl,
-} from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Button, Composite, Dropdown } from '@wordpress/components';
+import { SelectControl, Stack, Text } from '@wordpress/ui';
 import { useRef, useMemo } from '@wordpress/element';
 import { shadow as textShadowIcon, Icon, check, reset } from '@wordpress/icons';
 import type { TextShadowPreset } from '@wordpress/global-styles-engine';
@@ -124,6 +119,7 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 			label: preset.name,
 		} ) ),
 	];
+	const items = [ { value: '', label: __( 'Default' ) }, ...choices ];
 
 	const activeSlug = getTextShadowPresetSlug( textShadow );
 	const activeValue = activeSlug
@@ -149,15 +145,16 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 				{ __( 'Code is poetry' ) }
 			</div>
 			{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
-				<WCSelectControl
+				<SelectControl
 					hideLabelFromVision
 					label={ __( 'Text shadow preset' ) }
-					value={ activeValue }
-					options={ [
-						{ value: '', label: __( 'Default' ) },
-						...choices,
-					] }
-					onChange={ onChange }
+					value={
+						items.find( ( item ) => item.value === activeValue ) ??
+						items[ 0 ]
+					}
+					items={ items }
+					triggerContent={ ( item ) => item.label }
+					onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
 				/>
 			) : (
 				<Composite

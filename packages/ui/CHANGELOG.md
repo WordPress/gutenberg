@@ -4,6 +4,38 @@
 
 ### Breaking Changes
 
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, a neutral border, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
+-   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
+
+### Enhancements
+
+-   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
+-   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators ([#84321](https://github.com/WordPress/gutenberg/pull/84321)).
+-   `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress environment ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
+
+### Bug Fixes
+
+-   `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of its wrapper, while retaining navigation landmark labels for page breadcrumbs ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+-   `Breadcrumb`: Align button, link, and current-item padding, separate button hover backgrounds from separators, and preserve list semantics in Safari ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+-   `Breadcrumb.CurrentItem`: Exclude false values from the `aria-current` type ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+-   `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`: Preserve an explicit null portal container so popup content waits until its target is available ([#84370](https://github.com/WordPress/gutenberg/pull/84370)).
+-   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
+-   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
+
+### Documentation
+
+-   Document accessible naming for Combobox popups ([#84551](https://github.com/WordPress/gutenberg/pull/84551)).
+-   Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect, and SearchableChipSelect ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
+-   `Menu`: Clarify icon and description usage, document mixed icon alignment and current layout defaults, and favor short, clear labels ([#84020](https://github.com/WordPress/gutenberg/pull/84020)).
+
+## 0.24.0 (2026-10-07)
+
+### Breaking Changes
+
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 -   Rename `LinkButton` to `ButtonLink`, including `LinkButton.Icon` to `ButtonLink.Icon`, `LinkButtonProps` to `ButtonLinkProps`, and `LinkButtonIconProps` to `ButtonLinkIconProps`. Rename `Dialog.CloseIcon`, `Drawer.CloseIcon`, and `Notice.CloseIcon` to `CloseIconButton` within each component. Update imports and JSX to use the new names; props and behavior are unchanged. If you use the `use-recommended-components` rule, also update `@wordpress/eslint-plugin` to a version that recognizes `ButtonLink` ([#83789](https://github.com/WordPress/gutenberg/pull/83789)).
 -   `Menu.Root`, `Menu.SubmenuRoot`: Remove the `disabled` prop. Disable `Menu.Trigger`, `Menu.SubmenuTrigger`, or individual items instead ([#83791](https://github.com/WordPress/gutenberg/pull/83791)).
@@ -39,6 +71,9 @@
 
 ### Bug Fixes
 
+-   `SearchableChipSelect`, `SearchableChipSelectControl`: Preserve selected chips when pressing Escape in an empty search field ([#84172](https://github.com/WordPress/gutenberg/pull/84172)).
+
+-   `VisuallyHidden`: Move hiding styles outside CSS cascade layers to prevent overrides by global element styles ([#84114](https://github.com/WordPress/gutenberg/pull/84114)).
 -   `Combobox.Root`: Preserve separate item and selected-value types for collections, including filtering callbacks ([#84094](https://github.com/WordPress/gutenberg/pull/84094)).
 -   `Autocomplete.Root`: Preserve item type inference in filtering, formatting, and highlight callbacks for flat and grouped items ([#84095](https://github.com/WordPress/gutenberg/pull/84095)).
 -   `Breadcrumb`: Keep a custom renderer's ref on the visible item ([#84069](https://github.com/WordPress/gutenberg/pull/84069)).
