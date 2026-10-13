@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+-   Highlight format: Save palette background colors as a `has-{slug}-background-color` class instead of an inline style, so they follow style variations. Custom colors and existing highlights are unchanged ([#49332](https://github.com/WordPress/gutenberg/issues/49332)).
 
 ## 5.57.0 (2026-10-07)
 
