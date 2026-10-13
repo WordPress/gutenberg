@@ -9,9 +9,11 @@ import {
 export const KeyboardHighlightContext = createContext< {
 	keyboardHighlight: boolean;
 	onPointerHighlight: () => void;
+	onInputFocusChange: ( focused: boolean ) => void;
 } >( {
 	keyboardHighlight: false,
 	onPointerHighlight: () => {},
+	onInputFocusChange: () => {},
 } );
 
 export const useKeyboardHighlight = () =>
@@ -26,12 +28,14 @@ export function useKeyboardHighlightState< Value >(
 	props: HighlightCallbacks< Value >
 ) {
 	const [ keyboardHighlight, setKeyboardHighlight ] = useState( false );
+	const [ inputFocused, setInputFocused ] = useState( false );
 	const keyboardHighlightContext = useMemo(
 		() => ( {
-			keyboardHighlight,
+			keyboardHighlight: keyboardHighlight && inputFocused,
 			onPointerHighlight: () => setKeyboardHighlight( false ),
+			onInputFocusChange: setInputFocused,
 		} ),
-		[ keyboardHighlight ]
+		[ keyboardHighlight, inputFocused ]
 	);
 	const handleOpenChange: NonNullable<
 		HighlightCallbacks< Value >[ 'onOpenChange' ]
@@ -59,7 +63,7 @@ export function useKeyboardHighlightState< Value >(
 		HighlightCallbacks< Value >[ 'onItemHighlighted' ]
 	> = ( value, eventDetails ) => {
 		setKeyboardHighlight( ( wasKeyboardHighlight ) =>
-			eventDetails.index !== -1 && eventDetails.reason === 'none'
+			eventDetails.reason === 'none'
 				? wasKeyboardHighlight
 				: eventDetails.reason === 'keyboard'
 		);
