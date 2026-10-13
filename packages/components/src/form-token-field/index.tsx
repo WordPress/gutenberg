@@ -835,7 +835,9 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 				</Flex>
 				{ isExpanded && (
 					<SuggestionsList
-						isKeyboardNavigation={ isKeyboardNavigation }
+						isKeyboardNavigation={
+							isKeyboardNavigation && isActive
+						}
 						instanceId={ instanceId }
 						match={ saveTransform( incompleteTokenValue ) }
 						displayTransform={ displayTransform }
