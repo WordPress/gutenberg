@@ -29,6 +29,7 @@ function CollectionFontVariant( {
 
 	const displayName = font.name + ' ' + getFontFaceVariantName( face );
 	const checkboxId = useId();
+	const installedId = `${ checkboxId }-installed`;
 
 	return (
 		<div className="font-library__font-card">
@@ -39,6 +40,7 @@ function CollectionFontVariant( {
 						disabled={ installed }
 						onChange={ handleToggleActivation }
 						id={ checkboxId }
+						aria-describedby={ installed ? installedId : undefined }
 					/>
 					<label htmlFor={ checkboxId }>
 						<FontDemo
@@ -49,7 +51,10 @@ function CollectionFontVariant( {
 					</label>
 				</Flex>
 				{ installed && (
-					<Text className="font-library__font-card__count">
+					<Text
+						id={ installedId }
+						className="font-library__font-card__count"
+					>
 						{ __( 'Installed' ) }
 					</Text>
 				) }
