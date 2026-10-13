@@ -87,6 +87,7 @@ function OperatorSelector( {
 				</FlexItem>
 
 				<Select.Root
+					items={ operatorOptions }
 					value={ value }
 					onValueChange={ ( newValue ) => {
 						if ( newValue === null ) {
@@ -150,13 +151,7 @@ function OperatorSelector( {
 						variant="minimal"
 						aria-label={ __( 'Conditions' ) }
 						className="dataviews-filters__summary-operators-filter-select"
-					>
-						{
-							operatorOptions.find(
-								( option ) => option.value === value
-							)?.label
-						}
-					</Select.Trigger>
+					/>
 					<Select.Popup width="content">
 						{ operatorOptions.map( ( option ) => (
 							<Select.Item
