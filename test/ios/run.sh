@@ -49,7 +49,8 @@ step "Downloading WP-CLI and SQLite"
 fetch() { [ -f "$2" ] || { curl -sSLf -o "$2.part" "$1" && mv "$2.part" "$2"; }; }
 fetch https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar "$CACHE/wp-cli.phar"
 fetch https://downloads.wordpress.org/plugin/sqlite-database-integration.latest-stable.zip "$CACHE/sqlite.zip"
-wp() { php -d memory_limit=512M "$CACHE/wp-cli.phar" --path="$WP_DIR" --quiet "$@"; }
+# Without the JIT: compiling WordPress takes longer than running it.
+wp() { php -d memory_limit=512M -d opcache.jit=disable "$CACHE/wp-cli.phar" --path="$WP_DIR" --quiet "$@"; }
 rm -rf "$WP_DIR"
 # The same WordPress as the end-to-end tests: a GitHub repository, with
 # an optional #branch, from .wp-env.test.json.
@@ -104,7 +105,7 @@ add_action( 'init', function () {
 PHP
 step "Starting the server"
 # Without the JIT: compiling WordPress on the first request takes longer
-# than the request's time limit on the CI runner.
+# than the request's 30 second limit on the CI runner.
 PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -d opcache.jit=disable -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
 SERVER_PID=$!
 # The server's workers are its child processes: stop them too.
