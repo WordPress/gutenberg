@@ -1,21 +1,32 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { __unstableCreatePersistenceLayer } from '..';
 
+vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn( () => Promise.resolve() ),
+} ) );
+
 describe( '__unstableCreatePersistenceLayer', () => {
 	afterEach( () => {
 		vi.restoreAllMocks();
 		window.localStorage.clear();
 	} );
 
-	it( 'loads when local storage is unavailable', async () => {
+	it( 'works when local storage is unavailable', async () => {
+		// Import afresh so that reading storage at module load would throw.
 		vi.resetModules();
 		vi.spyOn( window, 'localStorage', 'get' ).mockImplementation( () => {
 			throw new Error( 'SecurityError' );
 		} );
 		const module = await import( '..' );
-		expect( () =>
-			module.__unstableCreatePersistenceLayer( false, 1 )
-		).not.toThrow();
+		const { get, set } = module.__unstableCreatePersistenceLayer(
+			false,
+			1
+		);
+		expect( await get() ).toEqual( {} );
+		expect( () => set( { core: { fixedToolbar: true } } ) ).not.toThrow();
+		expect( await get() ).toEqual(
+			expect.objectContaining( { core: { fixedToolbar: true } } )
+		);
 	} );
 
 	it( 'prefers server data', async () => {
