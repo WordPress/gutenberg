@@ -2,7 +2,8 @@ import clsx from 'clsx';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useRef, useState } from '@wordpress/element';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import useEditableRoot from './use-editable-root';
 import useHomeEnd from './use-home-end';
 import useMultiSelection from './use-multi-selection';
@@ -18,7 +19,10 @@ import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
-import { useMultiBlockFormatElement } from '../rich-text/multi-block-format-edit';
+import { unlock } from '../../lock-unlock';
+import MultiBlockFormatEdit from '../rich-text/multi-block-format-edit';
+
+const { shortcutsListener } = unlock( richTextPrivateApis );
 
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
@@ -26,6 +30,10 @@ export function useWritingFlow() {
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
 		[]
 	);
+	// The format types' shortcuts for a text selection across blocks, which
+	// the wrapper holds.
+	const [ keyboardShortcuts ] = useState( () => new Set() );
+	const elementRef = useRef();
 
 	return [
 		before,
@@ -37,7 +45,10 @@ export function useWritingFlow() {
 			ref,
 			useEditableRootEventHandlers(),
 			useClipboardHandler(),
-			useMultiBlockFormatElement(),
+			elementRef,
+			useRefEffect( shortcutsListener( keyboardShortcuts ), [
+				keyboardShortcuts,
+			] ),
 			useInput(),
 			useEditableRoot(),
 			useHomeEnd(),
@@ -91,11 +102,16 @@ export function useWritingFlow() {
 			),
 		] ),
 		after,
+		<MultiBlockFormatEdit
+			key="format"
+			keyboardShortcuts={ keyboardShortcuts }
+			elementRef={ elementRef }
+		/>,
 	];
 }
 
 function WritingFlow( { children, ...props }, forwardedRef ) {
-	const [ before, ref, after ] = useWritingFlow();
+	const [ before, ref, after, formatEdit ] = useWritingFlow();
 	return (
 		<>
 			{ before }
@@ -110,6 +126,7 @@ function WritingFlow( { children, ...props }, forwardedRef ) {
 				{ children }
 			</div>
 			{ after }
+			{ formatEdit }
 		</>
 	);
 }

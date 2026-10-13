@@ -1,12 +1,5 @@
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import {
-	createContext,
-	createRef,
-	useContext,
-	useMemo,
-	useState,
-} from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useMemo, useState } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import {
@@ -18,7 +11,7 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type { ReactNode, RefObject } from 'react';
+import type { RefObject } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import {
@@ -31,12 +24,8 @@ import { getFieldFormatSettings } from './field-format-settings';
 import FormatToolbarContainer from './format-toolbar-container';
 import { toRecord } from './utils';
 
-const {
-	KeyboardShortcutContext,
-	InputEventContext,
-	useFormatTypes,
-	shortcutsListener,
-} = unlock( richTextPrivateApis );
+const { KeyboardShortcutContext, InputEventContext, useFormatTypes } =
+	unlock( richTextPrivateApis );
 
 // Cannot occur in rich text, so the joined fields split back unambiguously.
 const SEPARATOR = '\u0000';
@@ -54,44 +43,6 @@ type SelectionEnd = {
 	attributeKey?: string;
 	offset?: number;
 };
-
-type Canvas = {
-	keyboardShortcuts: Set< ( event: KeyboardEvent ) => void >;
-	elementRef: RefObject< HTMLElement | null >;
-	registry: ReturnType< typeof useRegistry >;
-};
-
-const CanvasContext = createContext< Canvas | undefined >( undefined );
-
-/**
- * Marks the element that holds a text selection across blocks, the writing
- * flow: the format shortcuts listen on it and the format popovers anchor to
- * it.
- *
- * @return Ref callback.
- */
-export function useMultiBlockFormatElement() {
-	const canvas = useContext( CanvasContext );
-	const registry = useRegistry();
-	return useRefEffect(
-		( element: HTMLElement ) => {
-			// A writing flow of another editor, such as a block preview in
-			// the canvas, is not where this editor's selection is.
-			if ( ! canvas || canvas.registry !== registry ) {
-				return;
-			}
-			const { keyboardShortcuts, elementRef } = canvas;
-			elementRef.current = element;
-			const removeListener =
-				shortcutsListener( keyboardShortcuts )( element );
-			return () => {
-				removeListener();
-				elementRef.current = null;
-			};
-		},
-		[ canvas, registry ]
-	);
-}
 
 /**
  * Returns the key of the block's rich text attribute if that is all the
@@ -184,7 +135,20 @@ function selector( select: ( store: typeof blockEditorStore ) => any ) {
 	return { clientIds, anchor, focus };
 }
 
-type FieldsProps = {
+type Props = {
+	/**
+	 * The Set the format types register their shortcut callbacks in. The
+	 * writing flow dispatches them on keydown.
+	 */
+	keyboardShortcuts: Set< ( event: KeyboardEvent ) => void >;
+	/**
+	 * The writing flow element, which holds the selection: the format
+	 * popovers anchor to it and focus returns to it.
+	 */
+	elementRef: RefObject< HTMLElement | null >;
+};
+
+type FieldsProps = Props & {
 	clientIds: string[];
 	anchor: SelectionEnd;
 	focus: SelectionEnd;
@@ -193,38 +157,30 @@ type FieldsProps = {
 /**
  * Presents the rich text of a text selection across blocks as one value to
  * the format types, so their toolbar buttons and shortcuts work on it. Only
- * when every selected block is nothing but a rich text field.
+ * when every selected block is nothing but a rich text field. Rendered by the
+ * writing flow, whose element holds the selection.
  *
  * @param props
- * @param props.children The block editor content, wrapped so the writing flow
- *                       in it can take the shortcuts and anchor the popovers.
  */
-export default function MultiBlockFormatEdit( {
-	children,
-}: {
-	children: ReactNode;
-} ) {
-	const registry = useRegistry();
-	const [ canvas ] = useState< Canvas >( () => ( {
-		keyboardShortcuts: new Set(),
-		elementRef: createRef(),
-		registry,
-	} ) );
+export default function MultiBlockFormatEdit( props: Props ) {
 	const selection = useSelect( selector, [] );
 
-	return (
-		<CanvasContext.Provider value={ canvas }>
-			{ children }
-			{ selection && <Fields { ...selection } /> }
-		</CanvasContext.Provider>
-	);
+	if ( ! selection ) {
+		return null;
+	}
+
+	return <Fields { ...selection } { ...props } />;
 }
 
-function Fields( { clientIds, anchor, focus }: FieldsProps ) {
-	const { keyboardShortcuts, elementRef, registry } = useContext(
-		CanvasContext
-	) as Canvas;
-	const { updateBlockAttributes, removeBlocks, selectionChange } =
+function Fields( {
+	clientIds,
+	anchor,
+	focus,
+	keyboardShortcuts,
+	elementRef,
+}: FieldsProps ) {
+	const registry = useRegistry();
+	const { updateBlockAttributes, replaceBlocks, selectionChange } =
 		useDispatch( blockEditorStore );
 	const keys: string[] = useSelect(
 		( select ) => {
@@ -335,14 +291,15 @@ function Fields( { clientIds, anchor, focus }: FieldsProps ) {
 		}
 		// The selected text was replaced, by an inline image or a
 		// non-breaking space. It ran from the first block to the last, so
-		// they are now one block, with the caret after the new text.
+		// they are now one block, with the caret after the new text: the
+		// same as typing over the selection.
 		if ( parts.length !== 1 ) {
 			return;
 		}
-		const [ clientId, ...rest ] = clientIds;
-		if ( ! registry.select( blockEditorStore ).canRemoveBlocks( rest ) ) {
-			return;
-		}
+		const [ clientId ] = clientIds;
+		const block = registry
+			.select( blockEditorStore )
+			.getBlock( clientId ) as { attributes: Record< string, unknown > };
 		registry.batch( () => {
 			selectionChange(
 				clientId,
@@ -350,10 +307,17 @@ function Fields( { clientIds, anchor, focus }: FieldsProps ) {
 				newValue.start,
 				newValue.end
 			);
-			updateBlockAttributes( clientId, {
-				[ keys[ 0 ] ]: toAttribute( parts[ 0 ], values[ 0 ] ),
-			} );
-			removeBlocks( rest, false );
+			replaceBlocks(
+				clientIds,
+				{
+					...block,
+					attributes: {
+						...block.attributes,
+						[ keys[ 0 ] ]: toAttribute( parts[ 0 ], values[ 0 ] ),
+					},
+				},
+				0
+			);
 		} );
 	}
 

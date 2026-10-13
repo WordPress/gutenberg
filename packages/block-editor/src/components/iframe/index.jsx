@@ -151,7 +151,7 @@ function Iframe( {
 	/** @type {[Document, React.Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
-	const [ before, writingFlowRef, after ] = useWritingFlow();
+	const [ before, writingFlowRef, after, formatEdit ] = useWritingFlow();
 
 	const setRef = useRefEffect( ( node ) => {
 		let iFrameDocument;
@@ -361,6 +361,7 @@ function Iframe( {
 					) }
 			</iframe>
 			{ shouldRenderFocusCaptureElements && after }
+			{ formatEdit }
 		</>
 	);
 

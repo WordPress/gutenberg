@@ -22,7 +22,6 @@ import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal, useBlockRename } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
-import MultiBlockFormatEdit from '../rich-text/multi-block-format-edit';
 
 function selector( select ) {
 	const {
@@ -319,7 +318,7 @@ export default function BlockTools( {
 						ref={ blockToolbarRef }
 					/>
 				) }
-				<MultiBlockFormatEdit>{ children }</MultiBlockFormatEdit>
+				{ children }
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
 					name="__unstable-block-tools-after"
