@@ -694,7 +694,12 @@ async function runPerformanceTests( branches, options ) {
 				);
 			}
 
-			if ( branches.length === 2 ) {
+			// A metric can be missing on one branch when its test skipped
+			// there, such as a comparison build that predates the feature.
+			if (
+				branches.length === 2 &&
+				branches.every( ( name ) => branch[ name ] )
+			) {
 				const [ branch1, branch2 ] = branches;
 				const value1 = branch[ branch1 ].q50;
 				const value2 = branch[ branch2 ].q50;
