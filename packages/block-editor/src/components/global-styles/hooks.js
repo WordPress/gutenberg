@@ -146,9 +146,18 @@ export function useSettingsForBlockElement(
 				};
 			}
 
-			const sides = Array.isArray( supports?.spacing?.[ key ] )
-				? supports?.spacing?.[ key ]
-				: supports?.spacing?.[ key ]?.sides;
+			const support = supports?.spacing?.[ key ];
+			const { type, default: defaultLayout } =
+				updatedSettings.parentLayout ?? {};
+			// Horizontal margins are forced to `auto` in a constrained
+			// parent, so the extra sides are only offered where they apply.
+			const hasUnconstrainedParent =
+				!! updatedSettings.parentLayout &&
+				( type ?? defaultLayout?.type ) !== 'constrained';
+			const sides = Array.isArray( support )
+				? support
+				: ( hasUnconstrainedParent && support?.unconstrainedSides ) ||
+					support?.sides;
 			// Check if spacing type is supported before adding sides.
 			if ( sides?.length && updatedSettings.spacing?.[ key ] ) {
 				updatedSettings.spacing = {

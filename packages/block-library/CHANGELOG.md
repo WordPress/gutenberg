@@ -12,6 +12,7 @@
 -   Icon: Speed up loading icons in the icon library ([#84327](https://github.com/WordPress/gutenberg/pull/84327)).
 -   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#84308](https://github.com/WordPress/gutenberg/pull/84308)).
 -   Cover: Stop an uploaded background video on the front end when the visitor prefers reduced motion ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
+-   Group: Offer left and right margin when the block is inside a parent layout that is not constrained, such as a Row ([#60997](https://github.com/WordPress/gutenberg/issues/60997)).
 
 ### Bug Fixes
 
