@@ -20,7 +20,6 @@
 
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
 -   Use the `RefObject` React type instead of `MutableRefObject` which is deprecated in React 19 types ([#84550](https://github.com/WordPress/gutenberg/pull/84550)).
--   Update Base UI to 1.9.0. DataViews does not expose the changed popup action or item-highlight props ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 
 ## 20.0.0 (2026-10-07)
 
