@@ -76,12 +76,12 @@ test.describe( 'Post revisions', () => {
 		// Click the Restore button.
 		await restoreButton.click();
 
-		// Verify the success notice.
-		await expect(
-			page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
-				.filter( { hasText: 'Restored to revision' } )
-		).toBeVisible();
+		// Verify the success notice. It offers Undo, so it is not dismissed
+		// by clicking on it, and is not a button.
+		const restoredNotice = page
+			.getByTestId( 'snackbar' )
+			.filter( { hasText: 'Restored to revision' } );
+		await expect( restoredNotice ).toBeVisible();
 
 		// Verify the original content is restored.
 		await expect.poll( editor.getBlocks ).toMatchObject( [
@@ -90,6 +90,30 @@ test.describe( 'Post revisions', () => {
 				attributes: { content: 'Original content' },
 			},
 		] );
+
+		// Undo the restore.
+		await restoredNotice.getByRole( 'button', { name: 'Undo' } ).click();
+		await expect(
+			page
+				.getByTestId( 'snackbar' )
+				.filter( { hasText: 'Restore undone.' } )
+		).toBeVisible();
+
+		// Verify the content from before the restore is back, and is still
+		// there after a reload.
+		const contentBeforeRestore = [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Original content - Updated content' },
+			},
+		];
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( contentBeforeRestore );
+		await page.reload();
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( contentBeforeRestore );
 	} );
 
 	test( 'should show revision changes in the code editor (@webkit)', async ( {
@@ -748,9 +772,10 @@ test.describe( 'Template and template part revisions', () => {
 			// Restore the oldest revision.
 			await restoreButton.click();
 
-			// Verify the success notice.
+			// Verify the success notice. It offers Undo, so it is not
+			// dismissed by clicking on it, and is not a button.
 			const notice = page
-				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.getByTestId( 'snackbar' )
 				.filter( { hasText: 'Restored to revision' } );
 			await expect( notice ).toBeVisible();
 			await expect( notice ).not.toHaveText( /Invalid Date/ );
