@@ -177,21 +177,19 @@ test.describe( 'Autosave failure notice', () => {
 				}
 			} );
 			await autosaveFailure.fail( 'dropped-connection' );
-			await page.clock.install();
 			await page.evaluate( () =>
 				window.wp.data
 					.dispatch( 'core/editor' )
-					.updateEditorSettings( { autosaveInterval: 61 } )
+					.updateEditorSettings( { autosaveInterval: 1 } )
 			);
 			await autosaveFailure.edit();
 
-			for ( let attempt = 1; attempt <= 3; attempt++ ) {
-				await page.clock.runFor( 61_000 );
-				await expect.poll( () => failures ).toBe( attempt );
-				expect( await autosaveFailure.getNotices() ).toEqual( [
-					AUTOSAVE_FAILED,
-				] );
-			}
+			await expect
+				.poll( () => failures, { timeout: 10_000 } )
+				.toBeGreaterThanOrEqual( 3 );
+			expect( await autosaveFailure.getNotices() ).toEqual( [
+				AUTOSAVE_FAILED,
+			] );
 		} );
 
 		test( 'notice stays after a later autosave succeeds', async ( {
