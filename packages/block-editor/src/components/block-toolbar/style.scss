@@ -37,26 +37,17 @@
 		margin-bottom: -$border-width;
 
 		// The component is born with a border, but we only need some of them.
+		// The toolbar paints one surface for all groups, so legacy groups in
+		// the `NavigableMenu` fallback drop their own surface too.
 		border: 0;
+		border-radius: 0;
+		box-shadow: none;
 
 		// Groups in the block toolbar are not siblings, so the component's
-		// `:not(:last-child)` hairline does not run between segments. Draw it
-		// here, then clear it on the last segment below.
+		// `:not(:last-child)` hairline does not run between segments. Show it
+		// on every segment here, then clear it on the last segment below.
 		&::after {
 			content: "";
-			position: absolute;
-			z-index: 1;
-			inset-block: 0;
-			inset-inline-end: 0;
-			margin-block: auto;
-			width: var(--wpds-border-width-xs);
-			height: var(--wpds-dimension-size-sm);
-			background-color: var(--wpds-color-stroke-surface-neutral-weak);
-			pointer-events: none;
-
-			@media ( forced-colors: active ) {
-				background-color: CanvasText;
-			}
 		}
 	}
 
@@ -124,14 +115,6 @@
 	// Block UI appearance.
 	background-color: var(--wpds-color-background-surface-neutral-strong);
 	flex-shrink: 3;
-
-	// Raise the specificity. The floating toolbar paints the surface again
-	// from the block popover. This keeps the docked bar flat.
-	&.components-accessible-toolbar {
-		border: none;
-		border-radius: 0;
-		box-shadow: none;
-	}
 
 	&.is-unstyled {
 		box-shadow: 0 $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.

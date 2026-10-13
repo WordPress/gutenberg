@@ -45,21 +45,11 @@
 		// absolute centering so it stays aligned with those buttons.
 		.block-editor-block-toolbar .components-toolbar-group,
 		.block-editor-block-toolbar .components-toolbar {
-			border-right: none;
-
 			&::after {
 				content: "";
 				position: static;
 				inset: auto;
-				width: var(--wpds-border-width-xs);
-				height: var(--wpds-dimension-size-sm);
-				background-color: var(--wpds-color-stroke-surface-neutral-weak);
 				margin: $grid-unit-05 0 0 $grid-unit;
-				pointer-events: none;
-
-				@media ( forced-colors: active ) {
-					background-color: CanvasText;
-				}
 			}
 
 			& .components-toolbar-group.components-toolbar-group {

@@ -107,13 +107,18 @@
 		pointer-events: all;
 		margin-top: $grid-unit-10;
 		margin-bottom: $grid-unit-10;
-		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-		border-radius: var(--wpds-border-radius-md);
-		background-color: var(--wpds-color-background-surface-neutral-strong);
-		box-shadow: $elevation-medium;
 		overflow: visible; // allow the parent selector to be visible
 		position: static;
 		width: auto;
+
+		// `Toolbar` paints the surface. When `NavigableToolbar` falls back to
+		// `NavigableMenu`, there is no `Toolbar`, so paint the same one here.
+		&:not(.components-accessible-toolbar) {
+			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+			border-radius: var(--wpds-border-radius-md);
+			background-color: var(--wpds-color-background-surface-neutral-strong);
+			box-shadow: $elevation-medium;
+		}
 
 		&.has-parent {
 			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
