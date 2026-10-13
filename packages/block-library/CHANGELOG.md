@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Term Count: Reuse filtered terms from Term Template so changes made through the `get_terms` filter appear on the front end without a separate query for each count ([#84119](https://github.com/WordPress/gutenberg/pull/84119)).
 -   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
 -   Icon: Speed up loading icons in the icon library ([#84327](https://github.com/WordPress/gutenberg/pull/84327)).
 -   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#84308](https://github.com/WordPress/gutenberg/pull/84308)).
@@ -15,7 +16,9 @@
 
 ### Bug Fixes
 
+-   Media & Text: Replace deprecated `word-break: break-word` and prevent long content from widening the text column. Nested blocks that only override `word-break` can now wrap long unbroken text mid-word ([#82580](https://github.com/WordPress/gutenberg/pull/82580)).
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
+-   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it ([#82232](https://github.com/WordPress/gutenberg/pull/82232)).
 
 ## 11.2.0 (2026-10-07)
 
