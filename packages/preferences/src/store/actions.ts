@@ -1,5 +1,8 @@
-import type { PersistenceLayer } from '@wordpress/preferences-persistence';
-import type { ActionObject, StoreState } from './types';
+import type {
+	ActionObject,
+	StoreState,
+	WPPreferencesPersistenceLayer,
+} from './types';
 
 /**
  * Returns an action object used in signalling that a preference should be
@@ -66,10 +69,10 @@ export function setDefaults(
 	};
 }
 
-type SetPersistenceLayerAction< D extends object > = ActionObject<
+type SetPersistenceLayerAction< D extends Object > = ActionObject<
 	'SET_PERSISTENCE_LAYER',
 	{
-		persistenceLayer: PersistenceLayer< D >;
+		persistenceLayer: WPPreferencesPersistenceLayer< D >;
 		persistedData: D;
 	}
 >;
@@ -89,8 +92,8 @@ type SetPersistenceLayerAction< D extends object > = ActionObject<
  *
  * @return Action object.
  */
-export async function setPersistenceLayer< D extends object >(
-	persistenceLayer: PersistenceLayer< D >
+export async function setPersistenceLayer< D extends Object >(
+	persistenceLayer: WPPreferencesPersistenceLayer< D >
 ): Promise< SetPersistenceLayerAction< D > > {
 	const persistedData = await persistenceLayer.get();
 	return {
