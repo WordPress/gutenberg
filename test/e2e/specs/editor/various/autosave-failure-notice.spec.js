@@ -170,31 +170,37 @@ test.describe( 'Autosave failure notice', () => {
 	} );
 
 	test.describe( 'after a failure', () => {
-		test( 'autosave is retried at every interval without new edits', async ( {
-			autosaveFailure,
-			page,
-		} ) => {
-			let failures = 0;
-			page.on( 'requestfailed', ( request ) => {
-				if ( isAutosaveRequest( request ) ) {
-					failures++;
-				}
-			} );
-			await autosaveFailure.fail( 'dropped-connection' );
-			await page.evaluate( () =>
-				window.wp.data
-					.dispatch( 'core/editor' )
-					.updateEditorSettings( { autosaveInterval: 1 } )
-			);
-			await autosaveFailure.edit();
+		for ( const newEdits of [ false, true ] ) {
+			test( `autosave is retried at every interval ${
+				newEdits ? 'with' : 'without'
+			} new edits`, async ( { autosaveFailure, page } ) => {
+				let failures = 0;
+				page.on( 'requestfailed', ( request ) => {
+					if ( isAutosaveRequest( request ) ) {
+						failures++;
+					}
+				} );
+				await autosaveFailure.fail( 'dropped-connection' );
+				await page.evaluate( () =>
+					window.wp.data
+						.dispatch( 'core/editor' )
+						.updateEditorSettings( { autosaveInterval: 1 } )
+				);
+				await autosaveFailure.edit();
 
-			await expect
-				.poll( () => failures, { timeout: 10_000 } )
-				.toBeGreaterThanOrEqual( 3 );
-			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
-			] );
-		} );
+				for ( let attempt = 1; attempt <= 3; attempt++ ) {
+					await expect
+						.poll( () => failures )
+						.toBeGreaterThanOrEqual( attempt );
+					if ( newEdits ) {
+						await autosaveFailure.edit();
+					}
+				}
+				expect( await autosaveFailure.getNotices() ).toEqual( [
+					AUTOSAVE_FAILED,
+				] );
+			} );
+		}
 
 		test( 'notice stays after a later autosave succeeds', async ( {
 			autosaveFailure,
