@@ -319,8 +319,7 @@ export default function BlockTools( {
 						ref={ blockToolbarRef }
 					/>
 				) }
-				{ children }
-				<MultiBlockFormatEdit contentRef={ __unstableContentRef } />
+				<MultiBlockFormatEdit>{ children }</MultiBlockFormatEdit>
 				{ /* Used for inline rich text popovers. */ }
 				<Popover.Slot
 					name="__unstable-block-tools-after"

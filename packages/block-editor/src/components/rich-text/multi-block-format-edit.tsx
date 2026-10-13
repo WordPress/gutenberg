@@ -1,5 +1,12 @@
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import {
+	createContext,
+	createRef,
+	useContext,
+	useMemo,
+	useState,
+} from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import {
@@ -11,7 +18,7 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-import type { RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import {
@@ -24,8 +31,12 @@ import { getFieldFormatSettings } from './field-format-settings';
 import FormatToolbarContainer from './format-toolbar-container';
 import { toRecord } from './utils';
 
-const { KeyboardShortcutContext, InputEventContext, useFormatTypes } =
-	unlock( richTextPrivateApis );
+const {
+	KeyboardShortcutContext,
+	InputEventContext,
+	useFormatTypes,
+	shortcutsListener,
+} = unlock( richTextPrivateApis );
 
 // Cannot occur in rich text, so the joined fields split back unambiguously.
 const SEPARATOR = '\u0000';
@@ -43,6 +54,40 @@ type SelectionEnd = {
 	attributeKey?: string;
 	offset?: number;
 };
+
+type Shared = {
+	keyboardShortcuts: Set< ( event: KeyboardEvent ) => void >;
+	elementRef: RefObject< HTMLElement | null >;
+};
+
+const SharedContext = createContext< Shared | undefined >( undefined );
+
+/**
+ * Marks the element that holds a text selection across blocks, the writing
+ * flow: the format shortcuts listen on it and the format popovers anchor to
+ * it.
+ *
+ * @return Ref callback.
+ */
+export function useMultiBlockFormatElement() {
+	const shared = useContext( SharedContext );
+	return useRefEffect(
+		( element: HTMLElement ) => {
+			if ( ! shared ) {
+				return;
+			}
+			const { keyboardShortcuts, elementRef } = shared;
+			elementRef.current = element;
+			const removeListener =
+				shortcutsListener( keyboardShortcuts )( element );
+			return () => {
+				removeListener();
+				elementRef.current = null;
+			};
+		},
+		[ shared ]
+	);
+}
 
 /**
  * Returns the key of the block's rich text attribute if that is all the
@@ -64,6 +109,20 @@ function getSoleRichTextAttributeKey(
 		return sourced[ 0 ][ 0 ];
 	}
 	return undefined;
+}
+
+/**
+ * Returns the value in the shape the block stores its attribute in.
+ *
+ * @param value   Rich text value.
+ * @param current The current attribute value.
+ *
+ * @return Attribute value.
+ */
+function toAttribute( value: RichTextValue, current: unknown ) {
+	return typeof current === 'string'
+		? toHTMLString( { value } )
+		: new RichTextData( value );
 }
 
 function selector( select: ( store: typeof blockEditorStore ) => any ) {
@@ -125,7 +184,6 @@ type FieldsProps = {
 	clientIds: string[];
 	anchor: SelectionEnd;
 	focus: SelectionEnd;
-	contentRef: RefObject< HTMLElement >;
 };
 
 /**
@@ -134,22 +192,35 @@ type FieldsProps = {
  * when every selected block is nothing but a rich text field.
  *
  * @param props
- * @param props.contentRef The writing flow element.
+ * @param props.children The block editor content, wrapped so the writing flow
+ *                       in it can take the shortcuts and anchor the popovers.
  */
 export default function MultiBlockFormatEdit( {
-	contentRef,
-}: Pick< FieldsProps, 'contentRef' > ) {
+	children,
+}: {
+	children: ReactNode;
+} ) {
+	const [ shared ] = useState< Shared >( () => ( {
+		keyboardShortcuts: new Set(),
+		elementRef: createRef(),
+	} ) );
 	const selection = useSelect( selector, [] );
 
-	if ( ! selection ) {
-		return null;
-	}
-
-	return <Fields { ...selection } contentRef={ contentRef } />;
+	return (
+		<SharedContext.Provider value={ shared }>
+			{ children }
+			{ selection && <Fields { ...selection } /> }
+		</SharedContext.Provider>
+	);
 }
 
-function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+function Fields( { clientIds, anchor, focus }: FieldsProps ) {
+	const { keyboardShortcuts, elementRef } = useContext(
+		SharedContext
+	) as Shared;
+	const registry = useRegistry();
+	const { updateBlockAttributes, removeBlocks, selectionChange } =
+		useDispatch( blockEditorStore );
 	const keys: string[] = useSelect(
 		( select ) => {
 			const { getBlockName } = select( blockEditorStore );
@@ -201,9 +272,6 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 		allowedFormats,
 		withoutInteractiveFormatting,
 	} );
-	const [ keyboardShortcuts ] = useState(
-		() => new Set< ( event: Event ) => void >()
-	);
 	const [ inputEvents ] = useState(
 		() => new Set< ( event: Event ) => void >()
 	);
@@ -237,51 +305,52 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 		return { ...joined, start, end };
 	}, [ records, clientIds, anchor, focus ] );
 
-	useEffect( () => {
-		const element = contentRef.current;
-		if ( ! element ) {
-			return;
-		}
-		function onKeyDown( event: KeyboardEvent ) {
-			for ( const callback of keyboardShortcuts ) {
-				callback( event );
-			}
-		}
-		element.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			element.removeEventListener( 'keydown', onKeyDown );
-		};
-	}, [ contentRef, keyboardShortcuts ] );
-
 	function onChange( newValue: RichTextValue ) {
-		// Only formatting: a change to the text itself would have to merge or
-		// split the blocks.
-		if ( newValue.text !== value.text ) {
-			return;
-		}
 		const parts = split( newValue, SEPARATOR );
 		if ( ! parts ) {
 			return;
 		}
-		updateBlockAttributes(
-			clientIds,
-			Object.fromEntries(
-				clientIds.map( ( clientId, i ) => [
-					clientId,
-					{
-						[ keys[ i ] ]:
-							typeof values[ i ] === 'string'
-								? toHTMLString( { value: parts[ i ] } )
-								: new RichTextData( parts[ i ] ),
-					},
-				] )
-			),
-			{ uniqueByBlock: true }
-		);
+		if ( parts.length === clientIds.length ) {
+			updateBlockAttributes(
+				clientIds,
+				Object.fromEntries(
+					clientIds.map( ( clientId, i ) => [
+						clientId,
+						{
+							[ keys[ i ] ]: toAttribute(
+								parts[ i ],
+								values[ i ]
+							),
+						},
+					] )
+				),
+				{ uniqueByBlock: true }
+			);
+			return;
+		}
+		// The selected text was replaced, by an inline image or a
+		// non-breaking space. It ran from the first block to the last, so
+		// they are now one block, with the caret after the new text.
+		if ( parts.length !== 1 ) {
+			return;
+		}
+		const [ clientId, ...rest ] = clientIds;
+		registry.batch( () => {
+			selectionChange(
+				clientId,
+				keys[ 0 ],
+				newValue.start,
+				newValue.end
+			);
+			updateBlockAttributes( clientId, {
+				[ keys[ 0 ] ]: toAttribute( parts[ 0 ], values[ 0 ] ),
+			} );
+			removeBlocks( rest, false );
+		} );
 	}
 
 	function onFocus() {
-		contentRef.current?.focus();
+		elementRef.current?.focus();
 	}
 
 	if ( disabled ) {
@@ -298,7 +367,7 @@ function Fields( { clientIds, anchor, focus, contentRef }: FieldsProps ) {
 							onChange={ onChange }
 							onFocus={ onFocus }
 							formatTypes={ formatTypes }
-							forwardedRef={ contentRef }
+							forwardedRef={ elementRef }
 						/>
 					</Popover.__unstableSlotNameProvider>
 				</InputEventContext.Provider>

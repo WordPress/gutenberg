@@ -2296,6 +2296,50 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			] );
 	} );
 
+	test( 'should replace the selection across blocks with an inline object', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 2 );
+
+		// A non-breaking space replaces the selected text, as it does
+		// within a block, and the blocks become one with the caret after
+		// it.
+		await pageUtils.pressKeys( 'primaryShift+Space' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'a\u00a0b' } },
+			] );
+		await page.keyboard.type( 'c' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a\u00a0cb' },
+			},
+		] );
+	} );
+
 	test( 'should offer the formats every selected block allows', async ( {
 		editor,
 		page,
