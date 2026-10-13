@@ -31,15 +31,18 @@ const test = base.extend( {
 				} );
 			},
 			async edit() {
+				const title = `Autosave failure ${ Date.now() }`;
 				await editor.canvas
 					.getByRole( 'textbox', { name: 'Add title' } )
-					.fill( `Autosave failure ${ Date.now() }` );
+					.fill( title );
+				return title;
 			},
 			async autosave() {
-				await this.edit();
+				const title = await this.edit();
 				await page.evaluate( () =>
 					window.wp.data.dispatch( 'core/editor' ).autosave()
 				);
+				return title;
 			},
 			getNotices() {
 				return page.evaluate( () =>
@@ -111,6 +114,23 @@ test.describe( 'Autosave failure notice', () => {
 			'fatal-error-displayed',
 			withDetails( 'The response is not a valid JSON response.' ),
 		],
+		[
+			'redirected to the login page',
+			'redirect-to-login',
+			withDetails( 'The response is not a valid JSON response.' ),
+		],
+		[
+			'redirected to another site',
+			'redirect-to-other-site',
+			AUTOSAVE_FAILED,
+		],
+		[
+			'maintenance mode',
+			'maintenance',
+			withDetails(
+				'Briefly unavailable for scheduled maintenance. Check back in a minute.'
+			),
+		],
 		[ 'response body of 0', 'zero', null ],
 	] ) {
 		test( title, async ( { autosaveFailure } ) => {
@@ -131,23 +151,84 @@ test.describe( 'Autosave failure notice', () => {
 		] );
 	} );
 
-	test( 'plugin hook throwing an error', async ( {
+	for ( const [ title, throwsError, notice ] of [
+		[
+			'plugin hook throwing an error',
+			true,
+			withDetails( 'A plugin could not save.' ),
+		],
+		[ 'plugin hook throwing a string', false, AUTOSAVE_FAILED ],
+	] ) {
+		test( title, async ( { autosaveFailure, page } ) => {
+			await page.evaluate( ( error ) => {
+				window.wp.hooks.addAction(
+					'editor.savePost',
+					'test/autosave-failure',
+					() => {
+						throw error
+							? new Error( 'A plugin could not save.' )
+							: 'A plugin could not save.';
+					}
+				);
+			}, throwsError );
+			await autosaveFailure.autosave();
+			expect( await autosaveFailure.getNotices() ).toEqual( [ notice ] );
+		} );
+	}
+
+	test( 'session expired', async ( { autosaveFailure, context } ) => {
+		await context.clearCookies( { name: /^wordpress_/ } );
+		await autosaveFailure.autosave();
+		expect( await autosaveFailure.getNotices() ).toEqual( [
+			withDetails( 'Cookie check failed' ),
+		] );
+	} );
+
+	test( 'PHP warning printed before a successful response', async ( {
+		autosaveFailure,
+		page,
+		requestUtils,
+	} ) => {
+		await autosaveFailure.fail( 'warning-displayed' );
+		const title = await autosaveFailure.autosave();
+		expect( await autosaveFailure.getNotices() ).toEqual( [
+			withDetails( 'The response is not a valid JSON response.' ),
+		] );
+
+		const postId = await page.evaluate( () =>
+			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+		);
+		const post = await requestUtils.rest( {
+			path: `/wp/v2/posts/${ postId }`,
+			params: { context: 'edit' },
+		} );
+		expect( post.title.raw ).toBe( title );
+	} );
+
+	test( 'slow response holds back the next autosaves', async ( {
 		autosaveFailure,
 		page,
 	} ) => {
+		let requests = 0;
+		page.on( 'request', ( request ) => {
+			if ( isAutosaveRequest( request ) ) {
+				requests++;
+			}
+		} );
+		await autosaveFailure.fail( 'slow' );
 		await page.evaluate( () =>
-			window.wp.hooks.addAction(
-				'editor.savePost',
-				'test/autosave-failure',
-				() => {
-					throw new Error( 'A plugin could not save.' );
-				}
-			)
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.updateEditorSettings( { autosaveInterval: 1 } )
 		);
-		await autosaveFailure.autosave();
-		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'A plugin could not save.' ),
-		] );
+		const autosaveResponse = page.waitForResponse( ( response ) =>
+			isAutosaveRequest( response.request() )
+		);
+		await autosaveFailure.edit();
+		await autosaveResponse;
+
+		expect( requests ).toBe( 1 );
+		expect( await autosaveFailure.getNotices() ).toEqual( [] );
 	} );
 
 	test( 'expired nonce is refreshed and the autosave retried', async ( {

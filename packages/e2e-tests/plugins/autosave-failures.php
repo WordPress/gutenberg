@@ -94,8 +94,45 @@ function gutenberg_test_autosave_failure( $result, $server, $request ) {
 		case 'dropped-connection':
 			posix_kill( getmypid(), 9 );
 			break;
+
+		case 'warning-displayed':
+			ini_set( 'display_errors', '1' );
+			trigger_error( 'A plugin printed a warning.', E_USER_WARNING );
+			break;
+
+		case 'slow':
+			sleep( 3 );
+			break;
+
+		case 'redirect-to-login':
+			wp_redirect( wp_login_url() );
+			exit;
+
+		case 'redirect-to-other-site':
+			wp_redirect( str_replace( '://localhost', '://127.0.0.1', wp_login_url() ) );
+			exit;
 	}
 
 	return $result;
 }
 add_filter( 'rest_pre_dispatch', 'gutenberg_test_autosave_failure', 10, 3 );
+
+/**
+ * Turns on maintenance mode for requests that ask for it. WordPress includes
+ * this file on every request, before plugins load.
+ */
+function gutenberg_test_autosave_failures_activate() {
+	file_put_contents(
+		ABSPATH . '.maintenance',
+		"<?php\n\$upgrading = 'maintenance' === ( \$_COOKIE['gutenberg_test_autosave_failure'] ?? '' ) ? time() : 0;\n"
+	);
+}
+register_activation_hook( __FILE__, 'gutenberg_test_autosave_failures_activate' );
+
+/**
+ * Removes the maintenance file.
+ */
+function gutenberg_test_autosave_failures_deactivate() {
+	wp_delete_file( ABSPATH . '.maintenance' );
+}
+register_deactivation_hook( __FILE__, 'gutenberg_test_autosave_failures_deactivate' );
