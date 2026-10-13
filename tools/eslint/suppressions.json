@@ -236,11 +236,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-context/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-controls/fill.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -320,16 +315,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-heading-level-dropdown/stories/index.story.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-icon/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-icon/test/index.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1122,16 +1107,6 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/inheritance/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/inheritance/test/index.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
