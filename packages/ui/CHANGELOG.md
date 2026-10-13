@@ -4,6 +4,9 @@
 
 ### Breaking Changes
 
+-   `Select.Root`, `Autocomplete.Root`, `Combobox.Root`, `SelectControl`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl`: Popups now unmount automatically after closing even when `actionsRef` is supplied. For externally controlled exit animations, call `eventDetails.preventUnmountOnClose()` in `onOpenChange` when closing, then call `actionsRef.current?.unmount()` when the animation ends. Close programmatically with `actionsRef.current?.close()` so the handler runs; setting `open={ false }` directly does not invoke it. Automatic CSS exit animations need no migration. Inherited from Base UI 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
+-   The `actionsRef` action types for these components now require `close()` in addition to `unmount()`. Add `close()` to manually constructed action objects and ref stubs. Inherited from Base UI 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
+-   `Autocomplete.Root`, `Combobox.Root`, `SearchableSelect`, `SearchableChipSelect`, `SearchableSelectControl`, and `SearchableChipSelectControl`: `onItemHighlighted` now receives the originating native event. For the `pointer` reason, accept `MouseEvent | PointerEvent` instead of assuming `PointerEvent`. Typing or clearing the highlight reports `none`; hovering after keyboard navigation reports `pointer`. Calling `preventDefault()` or `stopPropagation()` on the event can now affect the original interaction. Inherited from Base UI 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### New Features
@@ -26,10 +29,6 @@
 -   `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`: Preserve an explicit null portal container so popup content waits until its target is available ([#84370](https://github.com/WordPress/gutenberg/pull/84370)).
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
-
-### Internal
-
--   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 
 ### Documentation
 
