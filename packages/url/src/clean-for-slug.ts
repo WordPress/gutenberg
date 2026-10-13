@@ -30,6 +30,8 @@ export function cleanForSlug( string: string ): string {
 			.replace( /[\s\./]+/g, '-' )
 			// Remove all HTML entities.
 			.replace( /&\S+?;/g, '' )
+			// Drop emoji variation selectors and enclosing marks like keycaps.
+			.replace( /[\p{Variation_Selector}\p{Me}]/gu, '' )
 			// Remove anything that's not a letter, mark, number, underscore or hyphen.
 			// Marks are needed by scripts like Devanagari, Tamil and Bengali.
 			.replace( /[^\p{L}\p{M}\p{N}_-]+/gu, '' )
