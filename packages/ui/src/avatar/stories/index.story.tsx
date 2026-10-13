@@ -66,11 +66,15 @@ export const IconFallback: Story = {
 };
 
 /** Derive complete initials from a display name, or use the person silhouette. */
-export const Initials: Story = {
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Initials name="Alex Morgan" />
-			<Avatar.Image src={ IMAGE_SRC } alt="" />
+export const Initials: StoryObj< typeof Avatar.Initials > = {
+	args: { name: 'Alex Morgan' },
+	argTypes: {
+		name: { control: 'text' },
+		locale: { control: 'text' },
+	},
+	render: ( { name, locale, delay } ) => (
+		<Avatar.Root role="img" aria-label={ name || 'Unknown person' }>
+			<Avatar.Initials name={ name } locale={ locale } delay={ delay } />
 		</Avatar.Root>
 	),
 };
