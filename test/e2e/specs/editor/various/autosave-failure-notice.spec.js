@@ -303,9 +303,8 @@ test.describe( 'Autosave failure notice', () => {
 			} );
 		}
 
-		test( 'notice stays after a later autosave succeeds', async ( {
+		test( 'notice is removed after a later autosave succeeds', async ( {
 			autosaveFailure,
-			page,
 		} ) => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
@@ -315,16 +314,54 @@ test.describe( 'Autosave failure notice', () => {
 
 			await autosaveFailure.stopFailing();
 			await autosaveFailure.autosave();
-			expect(
-				await page.evaluate( () =>
-					window.wp.data
-						.select( 'core/editor' )
-						.didPostSaveRequestFail()
-				)
-			).toBe( false );
-			// TODO: Remove the failure notice once an autosave succeeds.
+			expect( await autosaveFailure.getNotices() ).toEqual( [] );
+		} );
+
+		test( 'notice is replaced by the outcome of a manual save', async ( {
+			autosaveFailure,
+			pageUtils,
+		} ) => {
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
 				AUTOSAVE_FAILED,
+			] );
+
+			await autosaveFailure.stopFailing();
+			await pageUtils.pressKeys( 'primary+s' );
+			await expect
+				.poll( autosaveFailure.getNotices )
+				.toEqual( [ 'Draft saved.' ] );
+		} );
+
+		test( 'failed manual save notice stays after an autosave succeeds', async ( {
+			admin,
+			autosaveFailure,
+			context,
+			page,
+			pageUtils,
+			requestUtils,
+		} ) => {
+			const { id } = await requestUtils.createPost( {
+				title: 'Published',
+				status: 'publish',
+			} );
+			await admin.editPost( id );
+			await autosaveFailure.edit();
+			await context.setOffline( true );
+			await pageUtils.pressKeys( 'primary+s' );
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data.select( 'core/editor' ).isSavingPost()
+					)
+				)
+				.toBe( false );
+			await context.setOffline( false );
+
+			await autosaveFailure.autosave();
+			expect( await autosaveFailure.getNotices() ).toEqual( [
+				'Updating failed because you were offline. Please verify your connection and try again.',
 			] );
 		} );
 	} );

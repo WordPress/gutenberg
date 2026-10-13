@@ -99,6 +99,7 @@ export function getNotificationArgumentsForSaveFail( data ) {
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
+	const id = options?.isAutosave ? 'editor-autosave' : 'editor-save';
 
 	if ( error.code === 'offline_error' ) {
 		const messages = {
@@ -125,7 +126,7 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			noticeMessage = AUTO_SAVE_OFFLINE_FAILURE_NOTICE;
 		}
 
-		return [ noticeMessage, { id: 'editor-save' } ];
+		return [ noticeMessage, { id } ];
 	}
 
 	const messages = {
@@ -152,12 +153,7 @@ export function getNotificationArgumentsForSaveFail( data ) {
 		noticeMessage = AUTO_SAVE_FAILURE_NOTICE;
 	}
 
-	return [
-		noticeMessage,
-		{
-			id: 'editor-save',
-		},
-	];
+	return [ noticeMessage, { id } ];
 }
 
 /**

@@ -284,6 +284,12 @@ export const savePost =
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
+		// An earlier autosave failure is resolved by a successful autosave, and
+		// replaced by the outcome of a manual save.
+		if ( ! error || ! options.isAutosave ) {
+			registry.dispatch( noticesStore ).removeNotice( 'editor-autosave' );
+		}
+
 		// Attach any images in the post that aren't attached to a post yet. Not
 		// awaited: it shouldn't hold up the editor showing "Saved", and it
 		// handles its own errors.
