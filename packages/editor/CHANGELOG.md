@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Preferences modal: Add a "Show non-breaking spaces" toggle under Appearance ([#84592](https://github.com/WordPress/gutenberg/pull/84592)).
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
 ### Bug Fixes

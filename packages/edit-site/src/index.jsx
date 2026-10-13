@@ -64,6 +64,7 @@ export function initializeEditor( id, settings ) {
 		openPanels: [ 'post-status' ],
 		showBlockBreadcrumbs: true,
 		showListViewByDefault: false,
+		showNonBreakingSpaces: true,
 		enableChoosePatternModal: true,
 		showCollaborationCursor: false,
 		showCollaborationJoinNotifications: true,
