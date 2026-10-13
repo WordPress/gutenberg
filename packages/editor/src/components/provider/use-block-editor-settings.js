@@ -114,7 +114,26 @@ const {
 	mediaUploadOnSuccessKey,
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
+	canUserEditEntityRecordKey,
 } = unlock( privateApis );
+
+/**
+ * Whether the current user can edit an entity a block references, such as
+ * the synced pattern or template part behind an "Edit original" button.
+ *
+ * @param {(store: Object) => Object} select          Registry select.
+ * @param {Object}                    entity          The entity.
+ * @param {string}                    entity.postType Entity post type.
+ * @param {number|string}             entity.postId   Entity ID.
+ * @return {boolean|undefined} Whether the user can edit it; undefined until resolved.
+ */
+function canUserEditEntityRecord( select, { postType, postId } ) {
+	return select( coreStore ).canUser( 'update', {
+		kind: 'postType',
+		name: postType,
+		id: postId,
+	} );
+}
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -409,6 +428,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					: undefined;
 			},
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ canUserEditEntityRecordKey ]: canUserEditEntityRecord,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
 			__experimentalBlockPatternCategories: blockPatternCategories,
