@@ -55,12 +55,13 @@ type SelectionEnd = {
 	offset?: number;
 };
 
-type Shared = {
+type Canvas = {
 	keyboardShortcuts: Set< ( event: KeyboardEvent ) => void >;
 	elementRef: RefObject< HTMLElement | null >;
+	registry: ReturnType< typeof useRegistry >;
 };
 
-const SharedContext = createContext< Shared | undefined >( undefined );
+const CanvasContext = createContext< Canvas | undefined >( undefined );
 
 /**
  * Marks the element that holds a text selection across blocks, the writing
@@ -70,13 +71,16 @@ const SharedContext = createContext< Shared | undefined >( undefined );
  * @return Ref callback.
  */
 export function useMultiBlockFormatElement() {
-	const shared = useContext( SharedContext );
+	const canvas = useContext( CanvasContext );
+	const registry = useRegistry();
 	return useRefEffect(
 		( element: HTMLElement ) => {
-			if ( ! shared ) {
+			// A writing flow of another editor, such as a block preview in
+			// the canvas, is not where this editor's selection is.
+			if ( ! canvas || canvas.registry !== registry ) {
 				return;
 			}
-			const { keyboardShortcuts, elementRef } = shared;
+			const { keyboardShortcuts, elementRef } = canvas;
 			elementRef.current = element;
 			const removeListener =
 				shortcutsListener( keyboardShortcuts )( element );
@@ -85,7 +89,7 @@ export function useMultiBlockFormatElement() {
 				elementRef.current = null;
 			};
 		},
-		[ shared ]
+		[ canvas, registry ]
 	);
 }
 
@@ -200,25 +204,26 @@ export default function MultiBlockFormatEdit( {
 }: {
 	children: ReactNode;
 } ) {
-	const [ shared ] = useState< Shared >( () => ( {
+	const registry = useRegistry();
+	const [ canvas ] = useState< Canvas >( () => ( {
 		keyboardShortcuts: new Set(),
 		elementRef: createRef(),
+		registry,
 	} ) );
 	const selection = useSelect( selector, [] );
 
 	return (
-		<SharedContext.Provider value={ shared }>
+		<CanvasContext.Provider value={ canvas }>
 			{ children }
 			{ selection && <Fields { ...selection } /> }
-		</SharedContext.Provider>
+		</CanvasContext.Provider>
 	);
 }
 
 function Fields( { clientIds, anchor, focus }: FieldsProps ) {
-	const { keyboardShortcuts, elementRef } = useContext(
-		SharedContext
-	) as Shared;
-	const registry = useRegistry();
+	const { keyboardShortcuts, elementRef, registry } = useContext(
+		CanvasContext
+	) as Canvas;
 	const { updateBlockAttributes, removeBlocks, selectionChange } =
 		useDispatch( blockEditorStore );
 	const keys: string[] = useSelect(
@@ -335,6 +340,9 @@ function Fields( { clientIds, anchor, focus }: FieldsProps ) {
 			return;
 		}
 		const [ clientId, ...rest ] = clientIds;
+		if ( ! registry.select( blockEditorStore ).canRemoveBlocks( rest ) ) {
+			return;
+		}
 		registry.batch( () => {
 			selectionChange(
 				clientId,

@@ -2365,6 +2365,15 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				},
 			},
 		] );
+
+		// Undo takes the typed letter back, then the image and the merge
+		// together.
+		await pageUtils.pressKeys( 'primary+z' );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
 	} );
 
 	test( 'should offer the formats every selected block allows', async ( {

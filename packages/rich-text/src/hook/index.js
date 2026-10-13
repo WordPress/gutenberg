@@ -1,4 +1,9 @@
-import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
+import {
+	useCallback,
+	useRef,
+	useLayoutEffect,
+	useReducer,
+} from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -238,14 +243,17 @@ function useRichTextBase( {
 		ref: mergedRefs,
 		// The DOM position of an offset in the value, for a selection set
 		// from outside the element.
-		[ getDomPositionKey ]: ( offset ) =>
-			getDomPosition( {
-				value: recordRef.current,
-				offset: Math.min( offset, recordRef.current.text.length ),
-				element: ref.current,
-				prepareEditableTree: __unstableAddInvisibleFormats,
-				placeholder,
-			} ),
+		[ getDomPositionKey ]: useCallback(
+			( offset ) =>
+				getDomPosition( {
+					value: recordRef.current,
+					offset: Math.min( offset, recordRef.current.text.length ),
+					element: ref.current,
+					prepareEditableTree: __unstableAddInvisibleFormats,
+					placeholder,
+				} ),
+			[ __unstableAddInvisibleFormats, placeholder ]
+		),
 	};
 }
 

@@ -119,7 +119,7 @@ Determines if the given blocks are allowed to be removed.
 _Parameters_
 
 - _state_ `Object`: Editor state.
-- _clientIds_ `string`: The block client IDs to be removed.
+- _clientIds_ `string[]`: The block client IDs to be removed.
 
 _Returns_
 
