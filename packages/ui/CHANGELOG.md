@@ -50,6 +50,7 @@
 ### Documentation
 
 -   Clarify that badges should not be interactive in the usage guidelines ([#84920](https://github.com/WordPress/gutenberg/pull/84920)).
+-   `Notice`: Add a Storybook example for composing disclosed details and a copy button ([#84627](https://github.com/WordPress/gutenberg/pull/84627)).
 -   `Tabs`: Preserve intrinsic icon styles in the tab icons and tooltips story ([#84618](https://github.com/WordPress/gutenberg/pull/84618)).
 -   Document accessible naming for Combobox popups ([#84551](https://github.com/WordPress/gutenberg/pull/84551)).
 -   Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect, and SearchableChipSelect ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
