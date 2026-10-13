@@ -1,3 +1,7 @@
+import { randomUUID } from 'crypto';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -2296,7 +2300,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			] );
 	} );
 
-	test( 'should replace the selection across blocks with an inline object', async ( {
+	test( 'should replace the selection across blocks with an inline image', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -2322,20 +2326,43 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			)
 			.toBe( 2 );
 
-		// A non-breaking space replaces the selected text, as it does
-		// within a block, and the blocks become one with the caret after
-		// it.
-		await pageUtils.pressKeys( 'primaryShift+Space' );
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/paragraph', attributes: { content: 'a\u00a0b' } },
-			] );
+		await page.getByRole( 'button', { name: 'More' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Inline image' } ).click();
+		const fileName = randomUUID();
+		const tmpFileName = path.join( os.tmpdir(), fileName + '.png' );
+		fs.copyFileSync(
+			'./assets/10x10_e2e_test_image_z9T8jK.png',
+			tmpFileName
+		);
+		await page
+			.locator( '.media-modal .moxie-shim input[type=file]' )
+			.setInputFiles( tmpFileName );
+		await page
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+
+		// The image replaces the selected text, as it does within a block,
+		// and the blocks become one with the caret after it.
+		const image = `<img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ fileName }\\.png" alt=""\\/?>`;
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: expect.stringMatching(
+						new RegExp( `^a${ image }b$` )
+					),
+				},
+			},
+		] );
 		await page.keyboard.type( 'c' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'a\u00a0cb' },
+				attributes: {
+					content: expect.stringMatching(
+						new RegExp( `^a${ image }cb$` )
+					),
+				},
 			},
 		] );
 	} );
