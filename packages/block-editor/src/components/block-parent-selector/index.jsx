@@ -48,11 +48,12 @@ export default function BlockParentSelector() {
 			const parentBlockType = getBlockType(
 				getBlockName( _parentClientId )
 			);
-			// A wrapper that merges with the text flow (list, quote) grows
-			// by typing: Enter continues it, and users know that. Any
-			// other parent gets a plus button to add a child; the Inserter
-			// hides itself when nothing is insertable.
-			const isTextFlowWrapper =
+			// A parent that Enter splits (group, quote, column) or that
+			// merges with the text flow (list) grows by typing, so it gets
+			// no plus button. The Inserter hides itself when nothing is
+			// insertable.
+			const growsByTyping =
+				hasBlockSupport( parentBlockType, '__experimentalOnEnter' ) ||
 				parentBlockType?.merge ||
 				hasBlockSupport( parentBlockType, '__experimentalOnMerge' );
 			return {
@@ -68,7 +69,7 @@ export default function BlockParentSelector() {
 					!! _parentClientId &&
 					_parentClientId === immediateParentClientId &&
 					! parentSection &&
-					! isTextFlowWrapper &&
+					! growsByTyping &&
 					hasInserterItems( _parentClientId ),
 			};
 		},
