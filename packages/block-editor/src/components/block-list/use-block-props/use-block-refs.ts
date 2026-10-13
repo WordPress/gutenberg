@@ -1,18 +1,18 @@
+import type { Ref, RefCallback } from 'react';
 import { useContext, useState, useLayoutEffect } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { BlockRefs } from '../../provider/block-refs-provider';
 
-/** @typedef {import('@wordpress/element').RefCallback} RefCallback */
-/** @typedef {import('@wordpress/element').Ref} Ref */
-
 /**
  * Provides a ref to the BlockRefs context.
  *
- * @param {string} clientId The client ID of the element ref.
+ * @param clientId The client ID of the element ref.
  *
- * @return {RefCallback} Ref callback.
+ * @return Ref callback.
  */
-export function useBlockRefProvider( clientId ) {
+export function useBlockRefProvider(
+	clientId: string
+): RefCallback< Element > {
 	const { refsMap } = useContext( BlockRefs );
 	return useRefEffect(
 		( element ) => {
@@ -23,7 +23,7 @@ export function useBlockRefProvider( clientId ) {
 	);
 }
 
-function assignRef( ref, value ) {
+function assignRef( ref: Ref< Element | null >, value: Element | null ) {
 	if ( typeof ref === 'function' ) {
 		ref( value );
 	} else if ( ref ) {
@@ -35,10 +35,13 @@ function assignRef( ref, value ) {
  * Tracks the DOM element for the block identified by `clientId` and assigns it to the `ref`
  * whenever it changes.
  *
- * @param {string} clientId The client ID to track.
- * @param {Ref}    ref      The ref object/callback to assign to.
+ * @param clientId The client ID to track.
+ * @param ref      The ref object/callback to assign to.
  */
-export function useBlockElementRef( clientId, ref ) {
+export function useBlockElementRef(
+	clientId: string,
+	ref: Ref< Element | null >
+) {
 	const { refsMap } = useContext( BlockRefs );
 	useLayoutEffect( () => {
 		assignRef( ref, refsMap.get( clientId ) );
@@ -56,12 +59,14 @@ export function useBlockElementRef( clientId, ref ) {
  * Return the element for a given client ID. Updates whenever the element
  * changes, becomes available, or disappears.
  *
- * @param {string} clientId The client ID to an element for.
+ * @param clientId The client ID to an element for.
  *
- * @return {Element|null} The block's wrapper element.
+ * @return The block's wrapper element.
  */
-export function useBlockElement( clientId ) {
-	const [ blockElement, setBlockElement ] = useState( null );
+export function useBlockElement( clientId: string ) {
+	const [ blockElement, setBlockElement ] = useState< Element | null >(
+		null
+	);
 	useBlockElementRef( clientId, setBlockElement );
 	return blockElement;
 }

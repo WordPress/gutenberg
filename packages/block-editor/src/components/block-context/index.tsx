@@ -1,18 +1,8 @@
 // @ts-check
 import { createContext, useContext, useMemo } from '@wordpress/element';
+import type { BlockContextProviderProps } from './types';
 
-/** @typedef {React.ReactNode} ReactNode */
-
-/**
- * @typedef BlockContextProviderProps
- *
- * @property {Record<string,*>} value    Context value to merge with current
- *                                       value.
- * @property {ReactNode}        children Component children.
- */
-
-/** @type {React.Context<Record<string,*>>} */
-const Context = createContext( {} );
+const Context = createContext< Record< string, unknown > >( {} );
 Context.displayName = 'BlockContext';
 
 /**
@@ -22,7 +12,10 @@ Context.displayName = 'BlockContext';
  *
  * @param {BlockContextProviderProps} props
  */
-export function BlockContextProvider( { value, children } ) {
+export function BlockContextProvider( {
+	value,
+	children,
+}: BlockContextProviderProps ) {
 	const context = useContext( Context );
 	const nextValue = useMemo(
 		() => ( { ...context, ...value } ),
