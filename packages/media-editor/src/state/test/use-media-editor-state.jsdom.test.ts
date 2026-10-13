@@ -264,24 +264,38 @@ describe( 'useMediaEditorState', () => {
 				5
 			);
 		} );
+	} );
 
-		it( 'groups cropper reset and cropOptions reset in one undo step', () => {
+	describe( 'reset', () => {
+		it( 'puts geometry, crop options and edits back to their starting state', () => {
 			const { result } = setupHook();
 
 			act( () => result.current.setAspectRatioValue( '1' ) );
 			act( () => result.current.cropper.setRotation( 45 ) );
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
 
-			act( () => {
-				result.current.beginGesture();
-				result.current.cropper.reset();
-				result.current.resetCropOptions();
-				result.current.endGesture();
-			} );
+			act( () => result.current.reset() );
 
 			expect( result.current.cropper.state.rotation ).toBe( 0 );
+			expect( result.current.cropper.state.image ).toEqual( IMAGE );
 			expect( result.current.cropOptions ).toEqual( {
 				aspectRatioValue: '0',
 			} );
+			expect( result.current.edits ).toEqual( {} );
+			expect( result.current.isDirty ).toBe( false );
+		} );
+
+		it( 'is undone in one step', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.setAspectRatioValue( '1' ) );
+			act( () => result.current.cropper.setRotation( 45 ) );
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
+			act( () => result.current.reset() );
 
 			act( () => result.current.undo() );
 
@@ -289,6 +303,17 @@ describe( 'useMediaEditorState', () => {
 			expect( result.current.cropOptions ).toEqual( {
 				aspectRatioValue: '1',
 			} );
+			expect( result.current.edits ).toEqual( {
+				'test/vignette': { amount: 0.5 },
+			} );
+		} );
+
+		it( 'records no history on a clean session', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.reset() );
+
+			expect( result.current.hasUndo ).toBe( false );
 		} );
 	} );
 
