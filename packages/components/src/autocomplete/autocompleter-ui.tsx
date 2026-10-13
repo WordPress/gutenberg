@@ -6,7 +6,10 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
-import { useAnchor } from '@wordpress/rich-text';
+import {
+	useAnchor,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { useDebounce, useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -15,6 +18,10 @@ import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
 import type { AutocompleterUIProps, KeyedOption } from './types';
+import { useKeyboardNavigation } from '../utils/hooks/use-keyboard-navigation';
+import { unlock } from '../lock-unlock';
+
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 type ListBoxProps = {
 	items: KeyedOption[];
@@ -24,6 +31,7 @@ type ListBoxProps = {
 	listBoxId: string | undefined;
 	className?: string;
 	Component?: React.ElementType;
+	isKeyboardNavigation: boolean;
 };
 
 function ListBox( {
@@ -34,12 +42,14 @@ function ListBox( {
 	listBoxId,
 	className,
 	Component = 'div',
+	isKeyboardNavigation,
 }: ListBoxProps ) {
 	return (
 		<Component
 			id={ listBoxId }
 			role="listbox"
 			className="components-autocomplete__results"
+			data-keyboard-navigation={ isKeyboardNavigation ? '' : undefined }
 		>
 			{ items.map( ( option, index ) => (
 				<Button
@@ -54,11 +64,9 @@ function ListBox( {
 						'components-autocomplete__result',
 						className,
 						{
-							// Unused, for backwards compatibility.
 							'is-selected': index === selectedIndex,
 						}
 					) }
-					variant={ index === selectedIndex ? 'primary' : undefined }
 					onClick={ () => onSelect( option ) }
 				>
 					{ option.label }
@@ -80,6 +88,26 @@ export function AutocompleterUI( {
 	reset,
 	contentRef,
 }: AutocompleterUIProps ) {
+	const { isKeyboardNavigation, onKeyDown, onPointer } =
+		useKeyboardNavigation( true );
+	useEffect( () => {
+		const content = contentRef.current;
+		if ( ! content ) {
+			return;
+		}
+		// The canvas editing host can receive keys while the selection is inside content.
+		const unsubscribeKeyDown = subscribeOwnedListener(
+			content,
+			'keydown',
+			onKeyDown,
+			true
+		);
+		content.addEventListener( 'pointerdown', onPointer );
+		return () => {
+			unsubscribeKeyDown();
+			content.removeEventListener( 'pointerdown', onPointer );
+		};
+	}, [ contentRef, onKeyDown, onPointer ] );
 	// The useItems hook is derived from the autocompleter prop. This is safe
 	// because the parent renders this component with key={autocompleter.name},
 	// ensuring a fresh mount (and stable hook identity) when the completer changes.
@@ -167,6 +195,9 @@ export function AutocompleterUI( {
 	return (
 		<>
 			<Popover
+				onPointerMoveCapture={ onPointer }
+				onPointerDownCapture={ onPointer }
+				onKeyDownCapture={ onKeyDown }
 				offset={ 8 }
 				focusOnMount={ false }
 				placement="top-start"
@@ -175,6 +206,7 @@ export function AutocompleterUI( {
 				ref={ popoverRefs }
 			>
 				<ListBox
+					isKeyboardNavigation={ isKeyboardNavigation }
 					items={ items }
 					onSelect={ onSelect }
 					selectedIndex={ selectedIndex }
@@ -187,6 +219,7 @@ export function AutocompleterUI( {
 				needsA11yCompat &&
 				createPortal(
 					<ListBox
+						isKeyboardNavigation={ isKeyboardNavigation }
 						items={ items }
 						onSelect={ onSelect }
 						selectedIndex={ selectedIndex }

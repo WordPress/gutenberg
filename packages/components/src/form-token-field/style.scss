@@ -3,6 +3,7 @@
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
+@use "../utils/composite-item";
 
 .components-form-token-field__input-container {
 	@include input-control;
@@ -174,6 +175,8 @@
 
 // Suggestion list
 .components-form-token-field__suggestions-list {
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	box-sizing: border-box;
 	flex: 1 0 100%;
 	min-width: 100%;
 	max-height: $grid-unit-80 * 2;
@@ -186,10 +189,13 @@
 	list-style: none;
 	box-shadow: inset 0 $border-width 0 0 $gray-600; // Matches the border color of the input.
 	margin: 0;
-	padding: 0;
+	padding: var(--wpds-dimension-padding-xs);
+	scroll-padding: var(--wpds-dimension-padding-xs);
 }
 
 .components-form-token-field__suggestion {
+	border-radius: var(--wpds-border-radius-sm);
+	scroll-margin: var(--wpds-dimension-padding-xs);
 	color: $components-color-foreground;
 	display: block;
 	font-size: $default-font-size;
@@ -198,9 +204,12 @@
 	margin: 0;
 	box-sizing: border-box;
 
-	&.is-selected {
-		background: $components-color-accent;
-		color: $components-color-foreground-inverted;
+	&:is(:hover, .is-selected):not([aria-disabled="true"]) {
+		@include composite-item.highlight;
+	}
+
+	[data-keyboard-navigation] &.is-selected {
+		@include composite-item.focus;
 	}
 
 	&[aria-disabled="true"] {
@@ -208,7 +217,7 @@
 		color: $gray-600;
 
 		&.is-selected {
-			background: color-mix(in srgb, $components-color-accent 4%, transparent);
+			background: var(--wpds-color-background-interactive-neutral-weak-disabled);
 		}
 	}
 
