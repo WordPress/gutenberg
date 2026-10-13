@@ -23,6 +23,7 @@ const noop = () => {};
  * @param {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
  * @param {Function} $0.onError           Function called when an error happens.
  * @param {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
+ * @param {Function} $0.onFilesChange     Function called with the current files from this upload, in input order.
  * @param {Function} $0.onSuccess         Function called after the final representation of the file is available.
  * @param {boolean}  $0.multiple          Whether to allow multiple files to be uploaded.
  * @param {boolean}  $0.isTransportOnly   Whether the caller owns the upload lifecycle UX (progress tracking and
@@ -37,6 +38,7 @@ export default function mediaUpload( {
 	maxUploadFileSize,
 	onError = noop,
 	onFileChange,
+	onFilesChange,
 	onSuccess,
 	multiple = true,
 	isTransportOnly = false,
@@ -102,7 +104,11 @@ export default function mediaUpload( {
 		allowedTypes,
 		filesList,
 		onFileChange: ( files ) => {
-			onFileChange?.( files );
+			if ( onFilesChange ) {
+				onFilesChange( files );
+			} else {
+				onFileChange?.( files );
+			}
 
 			// Files are initially received by `onFileChange` as a blob.
 			// After that the function is called again with the file as an entity.
