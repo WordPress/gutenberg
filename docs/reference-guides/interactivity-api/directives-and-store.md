@@ -377,10 +377,12 @@ store( 'myPlugin', {
 
 #### Content ownership
 
-An element with a `data-wp-html` attribute owns its content: the server-rendered fallback and any HTML `wp-html` inserts. The Interactivity API treats that content as inert, wherever the element sits on the page, including outside every interactive region:
+An element with a `data-wp-html` attribute owns its content: the server-rendered fallback and any HTML `wp-html` inserts. When the element is inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API treats that content as inert:
 
 -   **Directives** inside the content are never processed: not on hydration, not on updates, and not on client-side navigation.
 -   **Interactive islands** inside the content (elements with `data-wp-interactive`) are never hydrated, and none of their directives run.
+
+Outside every interactive region, a `data-wp-html` attribute is plain markup. No directive runs on that element, `wp-html` never empties or replaces its content, and the islands inside it hydrate as usual.
 
 Router regions are the exception: regions nested inside the content (elements with `data-wp-router-region`) aren't excluded from [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md) yet. The router discovers and updates them as it does any other region, wherever the `data-wp-html` element sits. The same goes for the target a region's `attachTo` selects, which may be an element inside the content: see [Adding new regions on navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md#adding-new-regions-on-navigation).
 
@@ -394,6 +396,7 @@ Use only the plain `data-wp-html` spelling. A suffixed name like `data-wp-html--
 
 -   **Any spelling counts.** Any attribute the Interactivity API parses as one of these directives triggers the rule, with or without a suffix or a unique ID: `data-wp-text--x` and `data-wp-each----` included. Only the presence of the attribute matters, even if the other directive does nothing with that spelling or element, such as `data-wp-each` on an element that isn't a `<template>`. The element then behaves as it does without `data-wp-html`, including whatever that directive does or warns about.
 -   **Several at once.** When more than one of the three is present, `wp-html` yields to all of them, and their interaction with each other is unchanged.
+-   **Every `data-wp-html` spelling yields.** On a conflicting element the Interactivity API ignores every `data-wp-html` attribute, including the suffixed and unique-ID spellings, so the conflict warning below is the only `data-wp-html` message. The suffix and unique-ID warnings described under [content ownership](#content-ownership) appear only on an element without a conflict.
 -   **Markup decides.** The outcome is the same in every attribute order and for every value the directives resolve to, including pending values, `null` and tokens. A router region that carries `data-wp-html` takes the destination page's content on navigation like any other region, and the HTML is never written into it.
 -   **Development warning.** Under `SCRIPT_DEBUG`, the console warns that `data-wp-html` was ignored and names the directives it yielded to, in the order `data-wp-text`, `data-wp-each`, `data-wp-router-region`. Without `SCRIPT_DEBUG` nothing is logged. The warning comes from the Interactivity API processing the element, so an element outside every interactive region logs nothing, and no directive runs on it. The other directive's own behavior and warnings don't change.
 
@@ -799,6 +802,13 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 	<li data-wp-each-child>olá</li>
 </ul>
 ```
+
+Inside an interactive region, an interactive island (an element with `data-wp-interactive`) inside a server-rendered `data-wp-each-child` item is never hydrated on its own, whether its list is pending or not. It initializes only as part of the items the list renders:
+
+-   **While the list is pending**, the server-rendered items stay in place and none of the directives inside their islands run.
+-   **Once the list resolves**, the items rendered from the `<template>` replace the server-rendered ones, and an island in the template initializes once for each rendered item, never for the server-rendered item it replaced.
+
+Islands that come after the list in the document hydrate as usual.
 
 ## Values of directives are references to store properties
 
