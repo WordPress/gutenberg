@@ -10,10 +10,12 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
+	Icon as WCIcon,
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
+import type { IconType } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
 	useShortcut,
@@ -62,6 +64,22 @@ const CATEGORY_LABELS: Record< CommandCategory, string > = {
 	workflow: __( 'Workflow' ),
 };
 
+/**
+ * Whether `WCIcon` can render the value. Plugins in plain JS may still pass
+ * dashicon names or components, so this accepts more than the `icon` type.
+ *
+ * @param icon Value to check.
+ *
+ * @return Whether the value is a renderable icon.
+ */
+function isValidIcon( icon: unknown ): icon is IconType {
+	return (
+		typeof icon === 'string' ||
+		typeof icon === 'function' ||
+		isValidElement( icon )
+	);
+}
+
 function CommandItem( {
 	command,
 	search,
@@ -73,12 +91,10 @@ function CommandItem( {
 	const categoryLabel = commandCategory
 		? CATEGORY_LABELS[ commandCategory ]
 		: undefined;
-	const icon =
-		command.icon ??
-		( commandCategory
-			? CATEGORY_FALLBACK_ICONS[ commandCategory ]
-			: undefined );
-	const hasIcon = isValidElement( icon );
+	const fallbackIcon = commandCategory
+		? CATEGORY_FALLBACK_ICONS[ commandCategory ]
+		: undefined;
+	const icon = isValidIcon( command.icon ) ? command.icon : fallbackIcon;
 	const label = command.searchLabel ?? command.label;
 	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
 	return (
@@ -99,10 +115,10 @@ function CommandItem( {
 			<HStack
 				alignment="left"
 				className={ clsx( 'commands-command-menu__item', {
-					'has-icon': hasIcon,
+					'has-icon': !! icon,
 				} ) }
 			>
-				{ hasIcon && <Icon icon={ icon } /> }
+				{ icon && <WCIcon icon={ icon } /> }
 				<span className="commands-command-menu__item-label">
 					<TextHighlight
 						text={ command.label }
