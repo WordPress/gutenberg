@@ -741,21 +741,21 @@ export const restoreBrowserBackup =
 const UNPUBLISHED_POST_STATUSES = [ 'auto-draft', 'draft', 'pending' ];
 
 /**
- * Returns whether the post's current content differs from the given edits.
+ * Returns whether the given post fields differ from the edits a restore would
+ * apply.
  *
- * @param {Object} select The editor store selectors.
- * @param {Object} edits  The edits the restore would apply.
+ * @param {Object} fields         The post's title, content, and excerpt.
+ * @param {string} fields.title   The post title.
+ * @param {string} fields.content The post content.
+ * @param {string} fields.excerpt The post excerpt.
+ * @param {Object} edits          The edits the restore would apply.
  * @return {boolean} Whether restoring would replace different content.
  */
-function hasContentToReplace( select, edits ) {
-	if ( select.getEditedPostContent() !== edits.content ) {
-		return true;
-	}
-
-	return [ 'title', 'excerpt' ].some(
+function hasContentToReplace( fields, edits ) {
+	return [ 'title', 'content', 'excerpt' ].some(
 		( attribute ) =>
 			edits[ attribute ] !== undefined &&
-			select.getEditedPostAttribute( attribute ) !== edits[ attribute ]
+			fields[ attribute ] !== edits[ attribute ]
 	);
 }
 
@@ -847,7 +847,14 @@ export const restoreRevision =
 			UNPUBLISHED_POST_STATUSES.includes(
 				select.getEditedPostAttribute( 'status' )
 			) &&
-			hasContentToReplace( select, edits );
+			hasContentToReplace(
+				{
+					title: select.getEditedPostAttribute( 'title' ),
+					content: select.getEditedPostContent(),
+					excerpt: select.getEditedPostAttribute( 'excerpt' ),
+				},
+				edits
+			);
 
 		if ( shouldSaveCurrentContent ) {
 			await dispatch.savePost();
@@ -862,6 +869,22 @@ export const restoreRevision =
 					);
 				return;
 			}
+		}
+
+		// Keep the saved fields that the restore replaces, so it can be undone.
+		const previousFields = {
+			title: select.getCurrentPostAttribute( 'title' ),
+			content: select.getCurrentPostAttribute( 'content' ),
+			excerpt: select.getCurrentPostAttribute( 'excerpt' ),
+		};
+		if ( edits.meta !== undefined ) {
+			const savedMeta = select.getCurrentPostAttribute( 'meta' ) ?? {};
+			previousFields.meta = Object.fromEntries(
+				Object.keys( edits.meta ).map( ( key ) => [
+					key,
+					savedMeta[ key ],
+				] )
+			);
 		}
 
 		// Apply edits and save.
@@ -880,7 +903,44 @@ export const restoreRevision =
 		// autosave notice is stale.
 		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
 
-		// Show success notice.
+		const undoRestore = async () => {
+			// The editor may have moved on to a different post.
+			if (
+				select.getCurrentPostId() !== postId ||
+				select.getCurrentPostType() !== postType
+			) {
+				return;
+			}
+
+			if ( select.isSavingPost() ) {
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice(
+						__(
+							'The restore could not be undone while the post is saving. Wait for the save to finish, then try again.'
+						),
+						{ id: 'editor-revision-restore-failed' }
+					);
+				return;
+			}
+
+			dispatch.editPost( { blocks: undefined, ...previousFields } );
+			await dispatch.savePost();
+			if ( select.didPostSaveRequestFail() ) {
+				return;
+			}
+
+			registry
+				.dispatch( noticesStore )
+				.createSuccessNotice( __( 'Restore undone.' ), {
+					type: 'snackbar',
+					id: 'editor-revision-restore-undone',
+				} );
+		};
+
+		// Show success notice. When there is something to undo, keep the
+		// notice open until it is dismissed so the Undo action is not missed.
+		const canUndo = hasContentToReplace( previousFields, edits );
 		registry.dispatch( noticesStore ).createSuccessNotice(
 			sprintf(
 				/* translators: %s: Date and time of the revision. */
@@ -890,6 +950,15 @@ export const restoreRevision =
 			{
 				type: 'snackbar',
 				id: 'editor-revision-restored',
+				...( canUndo && {
+					explicitDismiss: true,
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: undoRestore,
+						},
+					],
+				} ),
 			}
 		);
 	};
