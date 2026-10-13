@@ -58,13 +58,9 @@ export function __unstableCreatePersistenceLayer(
 		preloadedData = convertLegacyLocalStorageData( userId );
 	}
 
-	// `[]` is empty user meta, so the server has nothing more to fetch.
-	if ( ! preloadedData && Array.isArray( serverData ) ) {
-		preloadedData = {};
-	}
-
 	return create( {
-		preloadedData,
+		// The server data is already preloaded, so fetching it again is redundant.
+		preloadedData: preloadedData ?? {},
 		localStorageRestoreKey,
 	} );
 }
