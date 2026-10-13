@@ -23,6 +23,7 @@ jobs:
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 60
         permissions:
             contents: read
             id-token: write
@@ -78,6 +79,7 @@ jobs:
     e2e-playwright-rtc-websocket:
         name: Playwright - RTC WebSocket
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 45
         permissions:
             contents: read
             id-token: write
@@ -137,6 +139,7 @@ jobs:
         if: ${{ !cancelled() }}
         needs: [e2e-playwright, e2e-playwright-rtc-websocket]
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 10
         permissions:
             contents: read
         steps:

@@ -20,6 +20,7 @@ jobs:
     checks:
         name: Checks w/Node.js ${{ matrix.node }} on ${{ contains( matrix.os, 'macos-' ) && 'MacOS' || contains( matrix.os, 'windows-' ) && 'Windows' || 'Linux' }}
         runs-on: ${{ matrix.os }}
+        timeout-minutes: 20
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}

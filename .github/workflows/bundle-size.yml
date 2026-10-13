@@ -44,6 +44,7 @@ jobs:
     build:
         name: Check
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 30
         permissions:
             contents: read
             # Only used on a fork, where the action falls back to commenting and
