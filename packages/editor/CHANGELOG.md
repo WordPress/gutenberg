@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+-   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 -   Notes Sidebar: Once a post has a note, add an "Add note" button to the block toolbar alongside the block options menu item. The button toggles the form it opened and exposes `aria-expanded` ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 -   Notes Sidebar: Fade the floating note card in once its anchor has been measured, rather than cutting it to full opacity in a single frame ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
@@ -16,6 +17,10 @@
 
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+
+### Internal
+
+-   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 
 ## 15.2.0 (2026-10-07)
 
