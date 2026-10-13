@@ -75,6 +75,7 @@ describe( 'Dialog', () => {
 		expect( await screen.findByRole( 'dialog' ) ).toBeInTheDocument();
 
 		for ( const size of [
+			'auto',
 			'small',
 			'medium',
 			'large',
