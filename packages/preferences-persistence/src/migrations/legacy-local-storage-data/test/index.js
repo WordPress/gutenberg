@@ -214,4 +214,10 @@ describe( 'convertLegacyData', () => {
 		}
 	` );
 	} );
+
+	it( 'ignores legacy preferences that are not an object', () => {
+		expect(
+			convertLegacyData( { 'core/preferences': { preferences: [] } } )
+		).toBeUndefined();
+	} );
 } );

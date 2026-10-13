@@ -119,6 +119,10 @@ interface BlockNode {
 	[ key: string ]: any; // For additional style properties
 }
 
+type FeatureSelectorObject = Record< string, string >;
+type FeatureSelector = string | FeatureSelectorObject;
+type FeatureSelectors = string | Record< string, FeatureSelector >;
+
 export type BlockSelectors = Record<
 	string,
 	{
@@ -126,8 +130,7 @@ export type BlockSelectors = Record<
 		selector: string;
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
-		featureSelectors?:
-			string | Record< string, string | Record< string, string > >;
+		featureSelectors?: FeatureSelectors;
 		name?: string;
 		styleVariationSelectors?: Record< string, string >;
 	}
@@ -152,16 +155,17 @@ export type BlockSelectors = Record<
  * - `layoutHasBlockGapSupport`: optional block gap support override for layout styles.
  * - `name`: block name used by block-specific declaration adjustments.
  * - `elementName`: element name used to resolve valid pseudo selectors.
+ * - `baseStyles`: for a state node, the styles it layers over, nearest first.
  */
 interface StylesNode {
 	styles: any;
 	selector: string;
+	baseStyles?: any[];
 	selectorSuffix?: string;
 	mediaQuery?: string;
 	skipSelectorWrapper?: boolean;
 	duotoneSelector?: string;
-	featureSelectors?:
-		string | Record< string, string | Record< string, string > >;
+	featureSelectors?: FeatureSelectors;
 	fallbackGapValue?: string;
 	hasLayoutSupport?: boolean;
 	isStyleVariation?: boolean;
@@ -490,7 +494,13 @@ const getFeatureDeclarations = (
 
 	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
 		// We're only processing features/subfeatures that have styles.
-		if ( feature === 'root' || ! styles?.[ feature ] ) {
+		// `css` isn't a style feature; it identifies the selector to use for
+		// custom CSS and is handled separately by `renderStylesNode`.
+		if (
+			feature === 'root' ||
+			feature === 'css' ||
+			! styles?.[ feature ]
+		) {
 			return;
 		}
 
@@ -567,6 +577,53 @@ const getFeatureDeclarations = (
 
 	return declarations;
 };
+
+/**
+ * Adds the declarations a state needs to escape a text clip set below it.
+ *
+ * Mirror of `getStateTextClipEscapeCSS` and `getStateTextFillResetCSS` in
+ * packages/block-editor/src/hooks/style.jsx.
+ *
+ * @param declarations Declarations generated for the state.
+ * @param stateStyles  State style object.
+ * @param baseStyles   Styles the state layers over, nearest first.
+ * @return Declarations with the escapes applied where needed.
+ */
+function getStateDeclarationsWithTextClipEscapes(
+	declarations: string[],
+	stateStyles: any,
+	baseStyles?: any[]
+): string[] {
+	const baseClip = baseStyles?.find(
+		( baseStyle ) => baseStyle?.background?.backgroundClip
+	)?.background?.backgroundClip;
+
+	if ( 'text' !== baseClip ) {
+		return declarations;
+	}
+
+	const stateClip = stateStyles?.background?.backgroundClip;
+	const paintsItsOwnBackground =
+		!! stateStyles?.background?.gradient ||
+		!! stateStyles?.background?.backgroundImage ||
+		!! stateStyles?.color?.gradient;
+
+	if ( stateClip && 'text' !== stateClip ) {
+		return paintsItsOwnBackground
+			? declarations
+			: [ ...declarations, 'background-image: unset' ];
+	}
+
+	if (
+		! stateClip &&
+		! paintsItsOwnBackground &&
+		!! stateStyles?.color?.text
+	) {
+		return [ ...declarations, '-webkit-text-fill-color: currentColor' ];
+	}
+
+	return declarations;
+}
 
 /**
  * Transform given style tree into a set of style declarations.
@@ -958,6 +1015,7 @@ function pickStyleAndPseudoKeys(
 function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 	const {
 		styles,
+		baseStyles,
 		selector,
 		featureSelectors,
 		name,
@@ -982,6 +1040,7 @@ function getPseudoStyleNodes( node: StylesNode ): StylesNode[] {
 		return [
 			{
 				styles: JSON.parse( JSON.stringify( pseudoStyles ) ),
+				baseStyles: [ styles, ...( baseStyles ?? [] ) ],
 				selector,
 				selectorSuffix: pseudoSelector,
 				mediaQuery,
@@ -1013,6 +1072,7 @@ function getResponsiveStyleNodes(
 ): StylesNode[] {
 	const {
 		styles,
+		baseStyles,
 		selector,
 		fallbackGapValue,
 		featureSelectors,
@@ -1039,6 +1099,7 @@ function getResponsiveStyleNodes(
 			return [
 				{
 					styles: JSON.parse( JSON.stringify( breakpointStyles ) ),
+					baseStyles: [ styles, ...( baseStyles ?? [] ) ],
 					selector,
 					mediaQuery,
 					featureSelectors:
@@ -1137,6 +1198,15 @@ export const getNodesWithStyles = (
 			);
 			const typedNode = node as BlockNode;
 
+			// Custom CSS is not a `STYLE_KEYS` entry, so re-add it: it must render
+			// in the same node as this block's other default-state declarations,
+			// ahead of its viewport/pseudo-state nodes, so it wins over the
+			// block's own defaults but loses to a more specific state (matching
+			// the PHP renderer's per-node ordering).
+			if ( typedNode?.css ) {
+				blockStyles.css = typedNode.css;
+			}
+
 			// Store variation child nodes so they can be inserted after the block's own elements.
 			const variationNodesToAdd: typeof nodes = [];
 			const variationStyleNodesToAdd: typeof nodes = [];
@@ -1167,6 +1237,7 @@ export const getNodesWithStyles = (
 							const blockSelector = blockSelectors[ blockName ];
 							variationStyleNodesToAdd.push( {
 								styles: variationStyles,
+								baseStyles: [ typedNode ],
 								selector: variationSelector,
 								featureSelectors:
 									blockSelector?.featureSelectors,
@@ -1386,8 +1457,7 @@ export const getNodesWithSettings = (
 		duotoneSelector?: string;
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
-		featureSelectors?:
-			string | Record< string, string | Record< string, string > >;
+		featureSelectors?: FeatureSelectors;
 		styleVariationSelectors?: Record< string, string >;
 	}[] = [];
 
@@ -1450,16 +1520,13 @@ export const getNodesWithSettings = (
  * with a `root` key), that selector is returned. Otherwise the fallback
  * selector is used.
  *
- * @param {string|Record<string,string|Record<string,string>>|undefined} featureSelectors The block's feature selectors.
- * @param {string}                                                       featureKey       The feature key to resolve.
- * @param {string}                                                       fallback         The default selector.
+ * @param {FeatureSelectors|undefined} featureSelectors The block's feature selectors.
+ * @param {string}                     featureKey       The feature key to resolve.
+ * @param {string}                     fallback         The default selector.
  * @return {string} The resolved selector.
  */
 function resolveFeatureSelector(
-	featureSelectors:
-		| string
-		| Record< string, string | Record< string, string > >
-		| undefined,
+	featureSelectors: FeatureSelectors | undefined,
 	featureKey: string,
 	fallback: string
 ): string {
@@ -1471,7 +1538,11 @@ function resolveFeatureSelector(
 	if ( typeof feature === 'string' ) {
 		return feature;
 	}
-	if ( typeof feature === 'object' && feature.root ) {
+	if (
+		feature &&
+		typeof feature === 'object' &&
+		typeof feature.root === 'string'
+	) {
 		return feature.root;
 	}
 	return fallback;
@@ -1622,6 +1693,7 @@ function renderStylesNode(
 		mediaQuery,
 		duotoneSelector,
 		styles,
+		baseStyles,
 		fallbackGapValue,
 		hasLayoutSupport,
 		featureSelectors,
@@ -1709,12 +1781,17 @@ function renderStylesNode(
 	}
 
 	// Process the remaining block styles (they use either normal block class or __experimentalSelector).
-	const styleDeclarations = getStylesDeclarations(
+	const declarations = getStylesDeclarations(
 		styles,
 		effectiveSelector,
 		useRootPaddingAlign,
 		tree,
 		disableRootPadding
+	);
+	const styleDeclarations = getStateDeclarationsWithTextClipEscapes(
+		declarations,
+		styles,
+		baseStyles
 	);
 	if ( styleDeclarations?.length ) {
 		const generalSelector = skipSelectorWrapper
@@ -1723,10 +1800,40 @@ function renderStylesNode(
 		ruleset += `${ generalSelector }{${ styleDeclarations.join( ';' ) };}`;
 	}
 	if ( styles?.css ) {
-		ruleset += processCSSNesting(
-			styles.css,
-			`:root :where(${ effectiveSelector })`
-		);
+		// A block can declare a dedicated selector for custom CSS (e.g. to
+		// target a different element than its other styles); fall back to
+		// this node's own selector otherwise. Mirrors the PHP renderer.
+		const cssFeatureSelector =
+			featureSelectors && typeof featureSelectors === 'object'
+				? featureSelectors.css
+				: undefined;
+		let resolvedCssSelector: string | undefined;
+		if ( typeof cssFeatureSelector === 'string' ) {
+			resolvedCssSelector = cssFeatureSelector;
+		} else if (
+			cssFeatureSelector &&
+			typeof cssFeatureSelector === 'object' &&
+			'root' in cssFeatureSelector &&
+			typeof cssFeatureSelector.root === 'string'
+		) {
+			resolvedCssSelector = cssFeatureSelector.root;
+		}
+		// A variation's dedicated custom-CSS selector is defined on the base
+		// block and targets its feature element; scope it to this specific
+		// variation the same way the other feature selectors are scoped
+		// above (getBlockStyleVariationFeatureSelector), rather than the
+		// base block's own instances of that element.
+		if ( resolvedCssSelector && variationName ) {
+			resolvedCssSelector = getBlockStyleVariationFeatureSelector(
+				variationName,
+				resolvedCssSelector
+			);
+		}
+		const cssBaseSelector = resolvedCssSelector ?? selector;
+		const cssSelector = selectorSuffix
+			? appendToSelector( cssBaseSelector, selectorSuffix )
+			: cssBaseSelector;
+		ruleset += processCSSNesting( styles.css, cssSelector );
 	}
 
 	if ( mediaQuery && ruleset ) {
@@ -2159,6 +2266,7 @@ export function generateGlobalStyles(
 		styleOptions
 	);
 	const svgs = generateSvgFilters( updatedConfig, blockSelectors );
+
 	const styles = [
 		{
 			css: customProperties,
@@ -2179,35 +2287,6 @@ export function generateGlobalStyles(
 			isGlobalStyles: true,
 		},
 	];
-
-	// Loop through the blocks to check if there are custom CSS values.
-	// If there are, get the block selector and push the selector together with
-	// the CSS value to the 'stylesheets' array.
-	blocks.forEach( ( blockType: BlockType ) => {
-		const blockStyles = updatedConfig?.styles?.blocks?.[ blockType.name ];
-		if ( blockStyles?.css ) {
-			const { featureSelectors } = blockSelectors[ blockType.name ];
-			const cssFeatureSelector =
-				typeof featureSelectors === 'object'
-					? featureSelectors?.css
-					: undefined;
-			let resolvedCssSelector: string | undefined;
-			if ( typeof cssFeatureSelector === 'string' ) {
-				resolvedCssSelector = cssFeatureSelector;
-			} else if ( typeof cssFeatureSelector === 'object' ) {
-				resolvedCssSelector = (
-					cssFeatureSelector as Record< string, string >
-				 )?.root;
-			}
-			const selector =
-				resolvedCssSelector ??
-				blockSelectors[ blockType.name ].selector;
-			styles.push( {
-				css: processCSSNesting( blockStyles.css, selector ),
-				isGlobalStyles: true,
-			} );
-		}
-	} );
 
 	return [ styles, updatedConfig.settings ];
 }

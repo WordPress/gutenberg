@@ -5,6 +5,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import {
 	setBackgroundStyleDefaults,
 	backgroundResetAllFilter,
+	getBackgroundImageClasses,
 	BackgroundImagePanel,
 	BACKGROUND_BLOCK_DEFAULT_VALUES,
 } from '../background';
@@ -68,6 +69,67 @@ describe( 'background', () => {
 				style: {},
 			} );
 			expect( result.className ).toBe( 'is-style-fancy' );
+		} );
+
+		it( 'keeps the background values the panel filter keeps, such as a text gradient', () => {
+			const textGradient = {
+				gradient: 'var:preset|gradient|vivid',
+				backgroundClip: 'text',
+			};
+			const panelResetAllFilter = vi.fn( () => ( {
+				background: textGradient,
+			} ) );
+			const style = {
+				background: {
+					...textGradient,
+					backgroundImage: { url: 'image.png' },
+				},
+			};
+
+			const result = backgroundResetAllFilter(
+				{ backgroundColor: 'primary', style },
+				panelResetAllFilter
+			);
+
+			expect( panelResetAllFilter ).toHaveBeenCalledWith( style );
+			expect( result.backgroundColor ).toBeUndefined();
+			expect( result.style ).toEqual( { background: textGradient } );
+		} );
+	} );
+
+	describe( 'getBackgroundImageClasses', () => {
+		const gradient = 'linear-gradient(0deg,#000,#fff)';
+		const backgroundImage = { url: 'image.png' };
+
+		it.each( [
+			[ 'a gradient', { background: { gradient } } ],
+			[ 'a background image', { background: { backgroundImage } } ],
+			[
+				'a gradient clipped to a box',
+				{ background: { gradient, backgroundClip: 'padding-box' } },
+			],
+		] )( 'returns has-background for %s', ( _label, style ) => {
+			expect( getBackgroundImageClasses( style ) ).toBe(
+				'has-background'
+			);
+		} );
+
+		it.each( [
+			[ 'there is no background', {} ],
+			[
+				'only a clip is set',
+				{ background: { backgroundClip: 'border-box' } },
+			],
+			[
+				'a gradient is clipped to the text',
+				{ background: { gradient, backgroundClip: 'text' } },
+			],
+			[
+				'a background image is clipped to the text',
+				{ background: { backgroundImage, backgroundClip: 'text' } },
+			],
+		] )( 'returns no class when %s', ( _label, style ) => {
+			expect( getBackgroundImageClasses( style ) ).toBe( '' );
 		} );
 	} );
 

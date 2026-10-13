@@ -60,6 +60,7 @@ const ALLOWLIST = {
 			'Tooltip',
 			'ValidityIndicator',
 			'VisuallyHidden',
+			'useEnableWpCompatOverlaySlot',
 			'useKeyboardShortcutProps',
 		],
 		caution: [
