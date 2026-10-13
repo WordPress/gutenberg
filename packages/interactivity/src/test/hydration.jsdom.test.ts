@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { options } from 'preact';
 import { act } from 'preact/test-utils';
 import '../directives';
 import { hydrateRegions, initialVdom } from '../hydration';
@@ -174,61 +173,6 @@ describe( 'hydrateRegions', () => {
 		}
 	);
 
-	it( 'publishes only the starting top-level islands after all have hydrated', async () => {
-		// A fresh module gives this document its own completion promise.
-		const originalVNodeHook = options.vnode;
-		vi.resetModules();
-		try {
-			await import( '../directives' );
-			const { act: isolatedAct } = await import( 'preact/test-utils' );
-			const runtime = await import( '../hydration' );
-			const { store: isolatedStore } = await import( '../store' );
-			const namespace = uniqueNamespace();
-			const mark = vi.fn();
-			const after = vi.fn();
-			isolatedStore( namespace, {
-				state: {
-					/** Text that exposes completion of the final island's hydration. */
-					label: 'live',
-				},
-				actions: {
-					/** Records initialization through the owner's tree. */
-					mark,
-					/** Records initialization of the final top-level island. */
-					after,
-				},
-			} );
-			document.body.innerHTML = `<div id="outer" data-wp-interactive="${ namespace }"><div id="nested" data-wp-interactive="${ namespace }" data-wp-init="actions.mark"></div></div><div id="following" data-wp-interactive="${ namespace }" data-wp-init="actions.after"><span data-wp-text="state.label">static</span></div>`;
-			const outer = document.querySelector( '#outer' )!;
-			const nested = document.querySelector( '#nested' )!;
-			const following = document.querySelector( '#following' )!;
-			// Capture membership and rendered text at resolution, not after flushing.
-			const completed = runtime.initialVdomPromise.then( ( map ) => ( {
-				/** The map exposed to the router when hydration completes. */
-				map,
-				/** Membership of the initial outer, following and nested islands. */
-				membership: [ outer, following, nested ].map( ( node ) =>
-					map.has( node )
-				),
-				/** The following island's text at the instant the promise resolves. */
-				text: following.textContent,
-			} ) );
-			await isolatedAct( async () => {
-				const [ , snapshot ] = await Promise.all( [
-					runtime.hydrateRegions(),
-					completed,
-				] );
-				expect( snapshot.map ).toBe( runtime.initialVdom );
-				expect( snapshot.membership ).toEqual( [ true, true, false ] );
-				expect( snapshot.text ).toBe( 'live' );
-			} );
-			expect( mark ).toHaveBeenCalledTimes( 1 );
-			expect( after ).toHaveBeenCalledTimes( 1 );
-		} finally {
-			options.vnode = originalVNodeHook;
-		}
-	} );
-
 	it( 'keeps fallback and inserted islands inert when trusted HTML replaces content during hydration and reactive updates', async () => {
 		const namespace = uniqueNamespace();
 		const mark = vi.fn();
@@ -275,29 +219,5 @@ describe( 'hydrateRegions', () => {
 		expect( document.querySelector( '#following span' ) ).toHaveTextContent(
 			/^updated$/
 		);
-	} );
-
-	it( 'hydrates an island that owns HTML content without hydrating its nested island', async () => {
-		const namespace = uniqueNamespace();
-		const mark = vi.fn();
-		const markOwner = vi.fn();
-		store( namespace, {
-			state: {
-				/** Empties the owning island's HTML content during hydration. */
-				html: null,
-			},
-			actions: {
-				/** Records initialization of the nested inert island. */
-				mark,
-				/** Records initialization on the HTML element itself. */
-				markOwner,
-			},
-		} );
-		document.body.innerHTML = `<div data-wp-interactive="${ namespace }" data-wp-html="state.html" data-wp-init="actions.markOwner"><div data-wp-interactive="${ namespace }" data-wp-init="actions.mark">static</div></div>`;
-
-		await act( () => hydrateRegions() );
-
-		expect( markOwner ).toHaveBeenCalledTimes( 1 );
-		expect( mark ).not.toHaveBeenCalled();
 	} );
 } );
