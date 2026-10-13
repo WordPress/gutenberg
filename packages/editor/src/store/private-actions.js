@@ -973,8 +973,8 @@ export const restoreRevision =
 				} );
 		};
 
-		// Show success notice. When there is something to undo, keep the
-		// notice open until it is dismissed so the Undo action is not missed.
+		// Show success notice, with an Undo action when there is something
+		// to undo.
 		const canUndo = hasContentToReplace( previousFields, edits );
 		registry.dispatch( noticesStore ).createSuccessNotice(
 			sprintf(
@@ -986,7 +986,6 @@ export const restoreRevision =
 				type: 'snackbar',
 				id: 'editor-revision-restored',
 				...( canUndo && {
-					explicitDismiss: true,
 					actions: [
 						{
 							label: __( 'Undo' ),

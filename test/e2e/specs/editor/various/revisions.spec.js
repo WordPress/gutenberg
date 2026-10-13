@@ -76,10 +76,9 @@ test.describe( 'Post revisions', () => {
 		// Click the Restore button.
 		await restoreButton.click();
 
-		// Verify the success notice. It offers Undo, so it is not dismissed
-		// by clicking on it, and is not a button.
+		// Verify the success notice.
 		const restoredNotice = page
-			.getByTestId( 'snackbar' )
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
 			.filter( { hasText: 'Restored to revision' } );
 		await expect( restoredNotice ).toBeVisible();
 
@@ -95,7 +94,7 @@ test.describe( 'Post revisions', () => {
 		await restoredNotice.getByRole( 'button', { name: 'Undo' } ).click();
 		await expect(
 			page
-				.getByTestId( 'snackbar' )
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
 				.filter( { hasText: 'Restore undone.' } )
 		).toBeVisible();
 
@@ -772,10 +771,9 @@ test.describe( 'Template and template part revisions', () => {
 			// Restore the oldest revision.
 			await restoreButton.click();
 
-			// Verify the success notice. It offers Undo, so it is not
-			// dismissed by clicking on it, and is not a button.
+			// Verify the success notice.
 			const notice = page
-				.getByTestId( 'snackbar' )
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
 				.filter( { hasText: 'Restored to revision' } );
 			await expect( notice ).toBeVisible();
 			await expect( notice ).not.toHaveText( /Invalid Date/ );
