@@ -45,12 +45,12 @@ export default function getValidationMessage(
 	}
 
 	return sprintf(
-		/* translators: %d: Number of fields that need attention */
+		/* translators: %s: Formatted number of fields that need attention */
 		_n(
-			'%d field needs attention',
-			'%d fields need attention',
+			'%s field needs attention',
+			'%s fields need attention',
 			invalidCount
 		),
-		invalidCount
+		invalidCount.toLocaleString()
 	);
 }
