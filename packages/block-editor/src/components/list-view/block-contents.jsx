@@ -2,10 +2,7 @@ import { forwardRef, useState } from '@wordpress/element';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { useInsertedBlockClientId, useListViewContext } from './context';
-import ListViewDragChip, {
-	getDragChipId,
-	getDragChipSnapshot,
-} from './drag-chip';
+import ListViewDragChip, { getDragChipSnapshot } from './drag-chip';
 
 /**
  * Renders the additional block content for the row of the block that was just
@@ -66,7 +63,7 @@ const ListViewBlockContents = forwardRef(
 						<ListViewDragChip
 							clientId={ clientId }
 							count={ draggableClientIds.length }
-							id={ getDragChipId( listViewInstanceId ) }
+							listViewInstanceId={ listViewInstanceId }
 							snapshot={ dragChipSnapshot }
 						/>
 					}

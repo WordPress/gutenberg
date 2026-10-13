@@ -29,7 +29,7 @@ export interface DragChipSnapshot {
 interface ListViewDragChipProps {
 	clientId: string;
 	count: number;
-	id: string;
+	listViewInstanceId: string | number;
 	snapshot?: DragChipSnapshot;
 }
 
@@ -39,14 +39,29 @@ const noop = () => {};
 // before the chip swaps to the block chip used in the canvas.
 const SWAP_THRESHOLD = 0;
 
-/**
- * Returns the ID of the drag chip for a given list view instance.
- *
- * @param listViewInstanceId The list view instance ID.
- * @return The element ID of the drag chip.
- */
-export function getDragChipId( listViewInstanceId: string | number ) {
+function getDragChipId( listViewInstanceId: string | number ) {
 	return `block-editor-list-view-drag-chip-${ listViewInstanceId }`;
+}
+
+/**
+ * Returns the drag chip of a list view while one of its rows is being
+ * dragged. Returns null when there is no chip, or when the canvas chip is
+ * shown in its place.
+ *
+ * @param ownerDocument      The document the list view is rendered in.
+ * @param listViewInstanceId The list view instance ID.
+ * @param clientId           The client ID of the dragged row.
+ * @return The drag chip element, or null.
+ */
+export function getDragChip(
+	ownerDocument: Document,
+	listViewInstanceId: string | number,
+	clientId: string
+): HTMLElement | null {
+	const chip = ownerDocument.getElementById(
+		getDragChipId( listViewInstanceId )
+	);
+	return chip?.dataset.clientId === clientId ? chip : null;
 }
 
 /**
@@ -149,16 +164,16 @@ export function getDragChipSnapshot(
  * the cursor leaves the list view horizontally (for example, over the canvas),
  * it swaps to the block chip used in the canvas.
  *
- * @param props          Component props.
- * @param props.clientId The client ID of the dragged row.
- * @param props.count    The number of blocks being dragged.
- * @param props.id       The element ID of the chip.
- * @param props.snapshot The result of `getDragChipSnapshot` for this drag.
+ * @param props                    Component props.
+ * @param props.clientId           The client ID of the dragged row.
+ * @param props.count              The number of blocks being dragged.
+ * @param props.listViewInstanceId The list view instance ID.
+ * @param props.snapshot           The result of `getDragChipSnapshot` for this drag.
  */
 export default function ListViewDragChip( {
 	clientId,
 	count,
-	id,
+	listViewInstanceId,
 	snapshot,
 }: ListViewDragChipProps ) {
 	const ref = useRef< HTMLDivElement >( null );
@@ -222,7 +237,8 @@ export default function ListViewDragChip( {
 	return (
 		<div
 			ref={ ref }
-			id={ id }
+			id={ getDragChipId( listViewInstanceId ) }
+			data-client-id={ clientId }
 			className="block-editor-list-view-drag-chip"
 			style={ style }
 			aria-hidden
