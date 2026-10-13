@@ -9,12 +9,12 @@
 }
 
 .border-left {
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Surface exposes physical border props. */
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Surface exposes physical border props. */
 	border-left: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 }
 
 .border-right {
-	/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Surface exposes physical border props. */
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Surface exposes physical border props. */
 	border-right: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
 }
 

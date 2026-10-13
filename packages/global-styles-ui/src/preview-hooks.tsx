@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type { Color } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { useSetting, useStyle } from './hooks';
 
 export function useStylesPreviewColors(): {

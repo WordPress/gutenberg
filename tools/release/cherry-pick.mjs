@@ -1,12 +1,8 @@
-/**
- * External dependencies
- */
-import fetch from 'node-fetch';
 import readline from 'readline';
-import { gte } from 'semver';
-
 import { spawnSync } from 'node:child_process';
 import { pathToFileURL } from 'node:url';
+import fetch from 'node-fetch';
+import { gte } from 'semver';
 
 const REPO = 'WordPress/gutenberg';
 const LABEL = process.argv[ 2 ] || 'Backport to WP Beta/RC';

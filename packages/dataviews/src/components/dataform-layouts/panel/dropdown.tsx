@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
@@ -12,10 +9,6 @@ import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type {
 	FieldLayoutProps,
 	NormalizedForm,
@@ -87,14 +80,15 @@ function PanelDropdown< Item >( {
 	);
 	// Memoize popoverProps to avoid returning a new object every time.
 	const popoverProps = useMemo(
-		() => ( {
-			// Anchor the popover to the middle of the entire row so that it doesn't
-			// move around when the label changes.
-			anchor: popoverAnchor,
-			placement: 'left-start',
-			offset: 36,
-			shift: true,
-		} ),
+		() =>
+			( {
+				// Anchor the popover to the middle of the entire row so that it doesn't
+				// move around when the label changes.
+				anchor: popoverAnchor,
+				placement: 'left-start',
+				offset: 36,
+				shift: true,
+			} ) as const,
 		[ popoverAnchor ]
 	);
 	const [ dialogRef, dialogProps ] = useDialog( {
@@ -107,7 +101,7 @@ function PanelDropdown< Item >( {
 			fields: !! field.children
 				? field.children
 				: // If not explicit children return the field id itself.
-				  [ { id: field.id, layout: DEFAULT_LAYOUT } ],
+					[ { id: field.id, layout: DEFAULT_LAYOUT } ],
 		} ),
 		[ field ]
 	);
@@ -128,6 +122,9 @@ function PanelDropdown< Item >( {
 	if ( ! fieldDefinition ) {
 		return null;
 	}
+	const isDisabled =
+		fieldDefinition.readOnly === true ||
+		fieldDefinition.isDisabled( { item: data, field: fieldDefinition } );
 
 	return (
 		<div
@@ -151,7 +148,7 @@ function PanelDropdown< Item >( {
 						summaryFields={ summaryFields }
 						validity={ validity }
 						touched={ touched }
-						disabled={ fieldDefinition.readOnly === true }
+						disabled={ isDisabled }
 						isOpen={ isOpen }
 						onClick={ onToggle }
 					/>

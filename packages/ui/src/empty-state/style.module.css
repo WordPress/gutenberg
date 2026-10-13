@@ -52,4 +52,11 @@
 			}
 		}
 	}
+
+	@layer compositions {
+		.title,
+		.description {
+			text-wrap: balance;
+		}
+	}
 }

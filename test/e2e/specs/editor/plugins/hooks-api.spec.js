@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Using Hooks API', () => {
@@ -23,12 +19,13 @@ test.describe( 'Using Hooks API', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
 		await expect(
 			page.locator( 'role=button[name="Reset Block"i]' )
 		).toBeVisible();
@@ -40,7 +37,7 @@ test.describe( 'Using Hooks API', () => {
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'First paragraph' );
 
@@ -48,10 +45,11 @@ test.describe( 'Using Hooks API', () => {
 			'role=document[name="Block: Paragraph"i]'
 		);
 		await expect( paragraphBlock ).toHaveText( 'First paragraph' );
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
-		await page.click( 'role=button[name="Reset Block"i]' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
+		await page.getByRole( 'button', { name: 'Reset Block' } ).click();
 		expect( await editor.getEditedPostContent() ).toEqual( '' );
 	} );
 } );

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
 test.describe( 'Link color in themes', () => {
@@ -25,7 +22,7 @@ test.describe( 'Link color in themes', () => {
 		await page.getByRole( 'button', { name: 'Elements options' } ).click();
 
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Link' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Link, show' } )
 			.click();
 
 		await page

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -21,7 +18,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'before pause' );
 		await editor.page.waitForTimeout( 1000 );
@@ -93,7 +90,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( 'before keyboard ' );
@@ -169,7 +166,7 @@ test.describe( 'undo', () => {
 
 	test( 'should undo bold', async ( { page, pageUtils, editor } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'test' );
 		await editor.saveDraft();
@@ -208,7 +205,7 @@ test.describe( 'undo', () => {
 		undoUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		const firstBlock = await editor.getEditedPostContent();
@@ -359,7 +356,7 @@ test.describe( 'undo', () => {
 
 		// Issue is demonstrated from an edited post: create, save, and reload.
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'original' );
 		await editor.saveDraft();
@@ -394,7 +391,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await editor.saveDraft();
@@ -409,7 +406,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '1' );
 		await editor.publishPost();
@@ -424,7 +421,7 @@ test.describe( 'undo', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 
 		await page.keyboard.type( '1' );
@@ -466,7 +463,7 @@ test.describe( 'undo', () => {
 		// and skipping `undo` history steps.
 		const text = 'tonis';
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( text );
 		await editor.publishPost();
@@ -475,7 +472,7 @@ test.describe( 'undo', () => {
 		await expect(
 			page.locator( 'role=button[name="Redo"]' )
 		).toBeEnabled();
-		await page.click( 'role=button[name="Redo"]' );
+		await page.getByRole( 'button', { name: 'Redo', exact: true } ).click();
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -498,7 +495,7 @@ test.describe( 'undo', () => {
 			.type( 'a' ); // First step.
 		await page.keyboard.press( 'Backspace' ); // Second step.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click(); // third step.
 
 		// Title should be empty
@@ -537,7 +534,7 @@ test.describe( 'undo', () => {
 			.click();
 
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( 'Howdy!' );
 
@@ -553,7 +550,7 @@ test.describe( 'undo', () => {
 		// This cleanup runs through `withMultiEntityRecordEdits`, which
 		// real-time collaboration bypasses in favor of its own undo manager.
 		const isCollaborationEnabled = await page.evaluate(
-			() => window._wpCollaborationEnabled === true
+			() => window.__experimentalEnableRealTimeCollaboration === true
 		);
 
 		// The entity is no longer dirty, so the "Save" button is disabled.
@@ -577,7 +574,7 @@ test.describe( 'undo', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'some linked text here' );
 		// Select the word "linked".
@@ -613,7 +610,7 @@ test.describe( 'undo', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'first' );
 		await page.keyboard.press( 'Enter' );
@@ -657,7 +654,7 @@ test.describe( 'undo', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'a paragraph' );
 		await editor.insertBlock( {
@@ -692,6 +689,77 @@ test.describe( 'undo', () => {
 		// browser's redo stack with it.
 		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
 		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
+	} );
+} );
+
+test.describe( 'Media Library modal undo', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test( 'does not remove block on undo while media modal is open', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const modal = page.locator( '.media-modal' );
+		await expect( modal ).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect( modal ).toBeVisible();
+		await expect( modal.locator( '.media-frame-content' ) ).toBeVisible();
+
+		const closeButton = page.locator( '.media-modal-close' );
+		await expect( closeButton ).toBeVisible();
+		await closeButton.focus();
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect( modal ).toBeVisible();
+
+		await closeButton.click();
+		await expect( modal ).toBeHidden();
+
+		await expect(
+			editor.canvas.locator( '[data-type="core/image"]' )
+		).toHaveCount( 1 );
+	} );
+
+	test( 'cleans up modal and backdrop when component unmounts', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Media Library' } )
+			.click();
+
+		const modal = page.locator( '.media-modal' );
+		const backdrop = page.locator( '.media-modal-backdrop' );
+
+		await expect( modal ).toBeVisible();
+		await expect( backdrop ).toBeVisible();
+
+		await page.evaluate( () => {
+			const { select, dispatch } = window.wp.data;
+			const blocks = select( 'core/block-editor' ).getBlocks();
+			const imageBlock = blocks.find(
+				( block ) => block.name === 'core/image'
+			);
+
+			if ( imageBlock ) {
+				dispatch( 'core/block-editor' ).removeBlock(
+					imageBlock.clientId
+				);
+			}
+		} );
+
+		await expect( modal ).toHaveCount( 0 );
+		await expect( backdrop ).toHaveCount( 0 );
 	} );
 } );
 

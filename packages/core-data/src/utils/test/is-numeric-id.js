@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, test } from 'vitest';
 import isNumericID from '../is-numeric-id';
 
 describe( 'isNumericID', () => {

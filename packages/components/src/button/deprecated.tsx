@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Button from '.';
 import type { DeprecatedIconButtonProps } from './types';
 

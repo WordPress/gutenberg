@@ -1,22 +1,12 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import FormTokenField from '../';
 
 const meta: Meta< typeof FormTokenField > = {
 	tags: [ 'manifest' ],
 	component: FormTokenField,
-	title: 'Components/Selection & Input/Common/FormTokenField',
+	title: 'Components/@wordpress-components/Selection & Input/Common/FormTokenField',
 	id: 'components-formtokenfield',
 	argTypes: {
 		value: {

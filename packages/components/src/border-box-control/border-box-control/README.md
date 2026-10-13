@@ -103,7 +103,9 @@ Provides control over whether the label will only be visible to screen readers.
 
 ### `label`: `string`
 
-If provided, a label will be generated using this as the content.
+If provided, a label will be generated using this as the content. A visible
+label is rendered in a row alongside the linked/unlinked toggle; when there is
+no visible label the toggle is rendered beside the border inputs instead.
 
 _Whether it is visible only to screen readers is controlled via
 `hideLabelFromVision`._
@@ -130,9 +132,9 @@ The available base placements are 'top', 'right', 'bottom', 'left'. Each of thes
 
 -   Required: No
 
-### `popoverOffset`: `number`
+### `popoverOffset`: `number | { mainAxis?: number; crossAxis?: number }`
 
-The space between the popover and the control wrapper.
+The space between the popover and the control wrapper. A number displaces the popover along its main axis; pass an object to also displace it along its cross axis.
 
 -   Required: No
 

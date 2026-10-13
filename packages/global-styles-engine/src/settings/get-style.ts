@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getValueFromObjectPath } from '../utils/object';
 import { getValueFromVariable } from '../utils/common';
 import type { GlobalStylesConfig, UnresolvedValue } from '../types';
@@ -21,8 +18,7 @@ export function getStyle< T = any >(
 	}
 
 	let rawResult = getValueFromObjectPath( globalStyles, finalPath ) as
-		| string
-		| UnresolvedValue;
+		string | UnresolvedValue;
 	const legacyPath = getLegacyStyleStatePath( finalPath );
 	if ( rawResult === undefined && legacyPath ) {
 		let hasCanonicalPath = true;
@@ -40,8 +36,7 @@ export function getStyle< T = any >(
 		}
 		if ( ! hasCanonicalPath ) {
 			rawResult = getValueFromObjectPath( globalStyles, legacyPath ) as
-				| string
-				| UnresolvedValue;
+				string | UnresolvedValue;
 		}
 	}
 	const result = shouldDecodeEncode

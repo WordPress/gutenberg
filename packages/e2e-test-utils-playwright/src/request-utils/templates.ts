@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { RequestUtils } from './index';
 
 type TemplateType = 'wp_template' | 'wp_template_part';

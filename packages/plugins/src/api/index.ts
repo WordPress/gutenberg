@@ -1,13 +1,6 @@
 /* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
 import { isValidElementType } from 'react-is';
-
-/**
- * WordPress dependencies
- */
 import { applyFilters, doAction } from '@wordpress/hooks';
 import { plugins as pluginsIcon } from '@wordpress/icons';
 import type { IconType } from '@wordpress/components';

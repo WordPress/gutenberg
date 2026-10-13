@@ -1,0 +1,29 @@
+import { SearchableChipSelectControl as _SearchableChipSelectControl } from './searchable-chip-select-control';
+import { Group } from '../primitives/combobox/group';
+import { GroupLabel } from '../primitives/combobox/group-label';
+import { Separator } from '../primitives/combobox/separator';
+import { Item } from '../primitives/combobox/item';
+import { ItemDescription } from '../primitives/combobox/item-description';
+import { ItemLabel } from '../primitives/combobox/item-label';
+import { ChipWithRemove } from '../primitives/combobox/chip-with-remove';
+import { Collection } from '../primitives/combobox/collection';
+import { useFilteredItems } from '../primitives/combobox/use-filtered-items';
+
+/**
+ * A complete searchable multi-select field with chips, integrated label,
+ * and description.
+ */
+export const SearchableChipSelectControl = Object.assign(
+	_SearchableChipSelectControl,
+	{
+		Group,
+		GroupLabel,
+		Separator,
+		Item,
+		ItemLabel,
+		ItemDescription,
+		ChipWithRemove,
+		Collection,
+		useFilteredItems,
+	}
+);

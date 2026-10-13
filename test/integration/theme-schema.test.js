@@ -1,12 +1,7 @@
-/**
- * External dependencies
- */
+import { readFileSync } from 'node:fs';
 import Ajv from 'ajv';
 import glob from 'fast-glob';
-
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it, test } from 'vitest';
 import themeSchema from '../../schemas/json/theme.json';
 
 describe( 'theme.json schema', () => {
@@ -18,10 +13,14 @@ describe( 'theme.json schema', () => {
 		[ 'test/integration/fixtures/schemas/*.json' ],
 		{ onlyFiles: true }
 	);
-	const ajv = new Ajv( {
-		// Used for matching unknown blocks without repeating core blocks names
-		// with patternProperties in settings.blocks and settings.styles
-		allowMatchingProperties: true,
+	let ajv;
+
+	beforeEach( () => {
+		ajv = new Ajv( {
+			// Used for matching unknown blocks without repeating core blocks names
+			// with patternProperties in settings.blocks and settings.styles
+			allowMatchingProperties: true,
+		} );
 	} );
 
 	it( 'strictly adheres to the draft-07 meta schema', () => {
@@ -40,7 +39,9 @@ describe( 'theme.json schema', () => {
 
 	test.each( jsonFiles )( 'validates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
-		const { $schema, ...metadata } = require( filepath );
+		const { $schema, ...metadata } = JSON.parse(
+			readFileSync( filepath, 'utf8' )
+		);
 
 		// we expect the $schema property to be present in the theme.json file
 		expect( $schema ).toBeTruthy();
@@ -52,7 +53,9 @@ describe( 'theme.json schema', () => {
 
 	test.each( invalidFiles )( 'invalidates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
-		const { $schema, ...metadata } = require( filepath );
+		const { $schema, ...metadata } = JSON.parse(
+			readFileSync( filepath, 'utf8' )
+		);
 
 		const result = ajv.validate( themeSchema, metadata );
 

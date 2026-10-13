@@ -9,4 +9,4 @@ function debug( message ) {
 	}
 }
 
-module.exports = debug;
+export default debug;

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Heading', () => {
@@ -13,7 +10,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '### 3' );
 
@@ -30,7 +27,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '4' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -49,7 +46,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## 1. H' );
 
@@ -66,7 +63,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## `code`' );
 
@@ -191,7 +188,7 @@ test.describe( 'Heading', () => {
 		page,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '### Heading' );
 		await editor.openDocumentSettingsSidebar();
@@ -229,7 +226,7 @@ test.describe( 'Heading', () => {
 
 	test( 'should correctly apply named colors', async ( { editor, page } ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
 		await editor.openDocumentSettingsSidebar();
@@ -273,7 +270,7 @@ test.describe( 'Heading', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
 
@@ -308,7 +305,7 @@ test.describe( 'Heading', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( 'Paragraph' );
 
@@ -343,7 +340,7 @@ test.describe( 'Heading', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '## Heading' );
 
@@ -425,6 +422,35 @@ test.describe( 'Heading', () => {
 			headingListViewItem,
 			'should show custom name'
 		).toHaveText( 'My new name' );
+	} );
+
+	test( 'Should leave inline objects out of the list view label', async ( {
+		editor,
+		page,
+	} ) => {
+		const imageSrc =
+			'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: `One<img src="${ imageSrc }">Two<img src="${ imageSrc }">Three`,
+			},
+		} );
+
+		await page
+			.getByRole( 'toolbar', { name: 'Document tools' } )
+			.getByRole( 'button', { name: 'Document Overview' } )
+			.click();
+
+		// Each inline image is one object replacement character in the
+		// value, and none of them should reach the plain text label.
+		await expect(
+			page
+				.getByRole( 'treegrid', {
+					name: 'Block navigation structure',
+				} )
+				.getByRole( 'link' )
+		).toHaveText( 'OneTwoThree' );
 	} );
 
 	test.describe( 'Block transforms', () => {

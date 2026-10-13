@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 // @ts-expect-error: Not typed yet.
@@ -9,10 +6,6 @@ import type {
 	GlobalStylesStyles,
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import { ScreenBody } from './screen-body';
 import Palette from './palette';
@@ -22,6 +15,22 @@ import { unlock } from './lock-unlock';
 const { useSettingsForBlockElement, ColorPanel: StylesColorPanel } = unlock(
 	blockEditorPrivateApis
 );
+
+const ADDITIONAL_ELEMENTS = [
+	{ name: 'cite', label: __( 'Citations' ) },
+	{ name: 'textInput', label: __( 'Inputs' ) },
+	{ name: 'select', label: __( 'Selects' ) },
+];
+
+const DEFAULT_CONTROLS = {
+	link: true,
+	heading: true,
+	button: true,
+	caption: true,
+	cite: true,
+	textInput: true,
+	select: true,
+};
 
 function ScreenColors() {
 	// Get user styles for editing
@@ -60,6 +69,8 @@ function ScreenColors() {
 				value={ style }
 				onChange={ setStyle }
 				settings={ settings }
+				additionalElements={ ADDITIONAL_ELEMENTS }
+				defaultControls={ DEFAULT_CONTROLS }
 				showInheritanceLabelIndicators={ false }
 			/>
 		</>

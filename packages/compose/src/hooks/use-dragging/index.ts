@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import useIsomorphicLayoutEffect from '../use-isomorphic-layout-effect';
 import type { DraggingProps, DraggingReturn } from './types';
 
@@ -41,10 +34,10 @@ export default function useDragging( {
 	}, [] );
 
 	const endDrag = useCallback(
-		function endDrag( event?: MouseEvent ): void {
+		function handleEndDrag( event?: MouseEvent ): void {
 			eventsRef.current.onDragEnd?.( event );
 			document.removeEventListener( 'mousemove', onMouseMove );
-			document.removeEventListener( 'mouseup', endDrag );
+			document.removeEventListener( 'mouseup', handleEndDrag );
 			setIsDragging( false );
 		},
 		[ onMouseMove ]

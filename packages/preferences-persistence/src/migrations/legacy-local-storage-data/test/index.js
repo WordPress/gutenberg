@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { convertLegacyData } from '..';
 
 const legacyData = {
@@ -215,5 +213,11 @@ describe( 'convertLegacyData', () => {
 		  },
 		}
 	` );
+	} );
+
+	it( 'ignores legacy preferences that are not an object', () => {
+		expect(
+			convertLegacyData( { 'core/preferences': { preferences: [] } } )
+		).toBeUndefined();
 	} );
 } );

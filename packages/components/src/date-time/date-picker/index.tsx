@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	isSameDay,
 	subMonths,
@@ -13,18 +10,10 @@ import {
 	isSameMonth,
 } from 'date-fns';
 import type { KeyboardEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight } from '@wordpress/icons';
 import { dateI18n, date as formatDate, getSettings } from '@wordpress/date';
 import { useState, useRef, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useLilius } from './use-lilius';
 import type { DatePickerProps } from '../types';
 import {

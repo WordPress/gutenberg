@@ -1,6 +1,6 @@
-// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`getChangelog verify that the changelog is properly formatted 1`] = `
+exports[`getChangelog > verify that the changelog is properly formatted 1`] = `
 "## Changelog
 
 ### Features
@@ -223,7 +223,6 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 ### Tools
 
 - Label enforcer workflow: Make accessibility a focus instead of a type. ([54941](https://github.com/WordPress/gutenberg/pull/54941))
-- Scripts: Update webpack and related dependencies to the latest version. ([54657](https://github.com/WordPress/gutenberg/pull/54657))
 - Update changelog automation and test fixtures to match the last a11y label renaming. ([54974](https://github.com/WordPress/gutenberg/pull/54974))
 
 #### Testing
@@ -251,6 +250,9 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 - Update the default JSX pragma to React instead of @wordpress/element. ([54494](https://github.com/WordPress/gutenberg/pull/54494))
 - Upgrade wp-prettier to v3.0.3 (final). ([54775](https://github.com/WordPress/gutenberg/pull/54775))
 - [RNMobile] Upgrade \`compileSdkVersion\` to 34 (Android). ([54437](https://github.com/WordPress/gutenberg/pull/54437))
+
+#### Scripts
+- Update webpack and related dependencies to the latest version. ([54657](https://github.com/WordPress/gutenberg/pull/54657))
 
 
 ### Security
@@ -287,7 +289,7 @@ exports[`getChangelog verify that the changelog is properly formatted 1`] = `
 "
 `;
 
-exports[`getContributorList verify that the contributors list is properly formatted 1`] = `
+exports[`getContributorList > verify that the contributors list is properly formatted 1`] = `
 "
 
 ## Contributors
@@ -297,7 +299,7 @@ The following contributors merged PRs in this release:
 @aaronrobertshaw @adamsilverstein @alexstine @andrewhayward @andrewserong @annezazu @anton-vlasenko @artemiomorales @aurooba @bangank36 @brookewp @c4rl0sbr4v0 @carolinan @chad1008 @ciampo @dcalhoun @derekblank @draganescu @ellatrix @fluiddot @fullofcaffeine @geriux @getdave @glendaviesnz @gziolo @jameskoster @jeryj @jsnajdr @juhi123 @kevin940726 @leemyongpakvn @madhusudhand @MaggieCabrera @Mamaduka @matiasbenedetto @michalczaplinski @mirka @mtias @mujuonly @ndiego @noahtallen @noisysocks @ntsekouras @oandregal @ockham @pbking @priethor @ramonjd @richtabor @scruffian @SiobhyB @spacedmonkey @stokesman @swissspidy @t-hamano @tellthemachines @tellyworth @them-es @torounit @tyxla @westonruter @WunderBart @youknowriad"
 `;
 
-exports[`getContributorProps verify that the contributors props are properly formatted 1`] = `
+exports[`getContributorProps > verify that the contributors props are properly formatted 1`] = `
 "## First-time contributors
 
 The following PRs were merged by first-time contributors:

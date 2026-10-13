@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import { __unsafe_useEmotionCache as useEmotionCache } from '@emotion/react';
 import type { SerializedStyles } from '@emotion/serialize';
 import { insertStyles } from '@emotion/utils';
 import type { ClassNamesArg } from '@emotion/css/create-instance';
 // eslint-disable-next-line no-restricted-imports
 import { cx as innerCx } from '@emotion/css';
-
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
 
 const isSerializedStyles = ( o: any ): o is SerializedStyles =>

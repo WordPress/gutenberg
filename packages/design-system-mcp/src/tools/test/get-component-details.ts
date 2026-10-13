@@ -1,13 +1,15 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { handler } from '../get-component-details';
 import { getComponentDetail } from '../../data';
 import { formatComponentDetail } from '../../format';
 import type { ComponentDetail } from '../../types';
 
-jest.mock( '../../data' );
+vi.mock( import( '../../data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getComponentDetail: vi.fn(),
+} ) );
 
-const mockGetComponentDetail = getComponentDetail as jest.MockedFunction<
-	typeof getComponentDetail
->;
+const mockGetComponentDetail = vi.mocked( getComponentDetail );
 
 function fakeDetail( name: string ): ComponentDetail {
 	return {

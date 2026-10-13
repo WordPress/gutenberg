@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const semver = require( 'semver' );
-const SimpleGit = require( 'simple-git' );
-
-/**
- * Internal dependencies
- */
+const { simpleGit } = require( 'simple-git' );
 const { readJSONFile } = require( '../lib/utils' );
 
 /**
@@ -18,7 +11,7 @@ const { readJSONFile } = require( '../lib/utils' );
  * @return {string} Name of the plugin release branch.
  */
 async function findPluginReleaseBranchName( gitWorkingDirectoryPath ) {
-	await SimpleGit( gitWorkingDirectoryPath )
+	await simpleGit( gitWorkingDirectoryPath )
 		.fetch( 'origin', 'trunk' )
 		.checkout( 'trunk' );
 

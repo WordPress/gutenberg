@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useCopyToClipboard } from '@wordpress/compose';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { copy, check } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../button';
 import Tooltip from '../tooltip';
-
 import type { ColorCopyButtonProps } from './types';
 
 export const ColorCopyButton = ( props: ColorCopyButtonProps ) => {

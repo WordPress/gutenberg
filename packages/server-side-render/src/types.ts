@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import type React from 'react';
-
-/**
- * Internal dependencies
- */
 import type { UseServerSideRenderArgs } from './hook';
 
 export interface PlaceholderProps {
@@ -33,8 +26,10 @@ export interface ServerSideRenderProps extends UseServerSideRenderArgs {
 	LoadingResponsePlaceholder?: React.ComponentType< LoadingPlaceholderProps >;
 }
 
-export interface ServerSideRenderWithPostIdProps
-	extends Omit< ServerSideRenderProps, 'urlQueryArgs' > {
+export interface ServerSideRenderWithPostIdProps extends Omit<
+	ServerSideRenderProps,
+	'urlQueryArgs'
+> {
 	/** Additional query arguments to append to the request URL. */
 	urlQueryArgs?: Record< string, unknown >;
 }

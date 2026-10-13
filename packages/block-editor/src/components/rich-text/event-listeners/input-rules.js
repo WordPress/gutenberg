@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	insert,
 	toHTMLString,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { preventEventDiscovery } from '../prevent-event-discovery';
 import {
@@ -91,8 +84,13 @@ export default ( props ) => ( element ) => {
 		} );
 		const block = transformation.transform( content );
 
-		selectionChange( ...findSelection( [ block ] ) );
-		onReplace( [ block ] );
+		// Batch so the undo history records the pre-transform selection,
+		// instead of the selection change here overwriting it first.
+		registry.batch( () => {
+			selectionChange( ...findSelection( [ block ] ) );
+			onReplace( [ block ] );
+		} );
+
 		registry.dispatch( blockEditorStore ).__unstableMarkAutomaticChange();
 
 		return true;

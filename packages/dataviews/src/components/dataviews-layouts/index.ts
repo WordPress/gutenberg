@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	blockTable,
@@ -9,10 +6,6 @@ import {
 	formatListBulletsRTL,
 	scheduled,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import ViewTable from './table';
 import ViewGrid from './grid';
 import ViewList from './list';

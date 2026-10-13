@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { RichTextData } from '@wordpress/rich-text';
 
 const RICH_TEXT_CACHE_MAX_SIZE = 500;

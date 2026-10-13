@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useRegistry } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit';
 

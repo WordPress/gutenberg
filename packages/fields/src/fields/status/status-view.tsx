@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	Icon as WCIcon,
 } from '@wordpress/components';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 import STATUSES from './status-elements';
 

@@ -1,7 +1,7 @@
 import { cp, mkdir, readdir, rm } from 'node:fs/promises';
 import path from 'node:path';
 import { createInterface } from 'node:readline/promises';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const SOURCE_SKILLS_DIRECTORY = '.agents/skills';
 const TARGET_SKILLS_DIRECTORY = '.claude/skills';
@@ -85,7 +85,10 @@ async function confirmReplacement( unmatchedEntries ) {
 async function runSetupSkills() {
 	const ifSafe = process.argv.includes( '--if-safe' );
 	const generated = await setupSkills( {
-		repositoryRoot: process.cwd(),
+		repositoryRoot: path.resolve(
+			path.dirname( fileURLToPath( import.meta.url ) ),
+			'../..'
+		),
 		confirm: confirmReplacement,
 		ifSafe,
 	} );

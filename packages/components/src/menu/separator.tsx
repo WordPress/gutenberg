@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { Context } from './context';
 import type { SeparatorProps } from './types';
@@ -14,7 +7,7 @@ import * as Styled from './styles';
 export const Separator = forwardRef<
 	HTMLHRElement,
 	WordPressComponentProps< SeparatorProps, 'hr', false >
->( function Separator( props, ref ) {
+>( function UnforwardedSeparator( props, ref ) {
 	const menuContext = useContext( Context );
 
 	if ( ! menuContext?.store ) {

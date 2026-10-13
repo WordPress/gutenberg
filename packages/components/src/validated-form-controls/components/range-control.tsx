@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { ControlWithError } from '../control-with-error';
+import { ControlWithError } from '@wordpress/ui';
 import type { ValidatedControlProps } from './types';
 import RangeControl from '../../range-control';
 
@@ -25,6 +18,7 @@ const UnforwardedValidatedRangeControl = (
 
 	return (
 		<ControlWithError
+			className="components-validated-control"
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ customValidity }

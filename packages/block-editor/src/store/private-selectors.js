@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	getBlockType,
@@ -8,10 +5,6 @@ import {
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import {
 	getBlockOrder,
 	getBlockParents,
@@ -32,6 +25,7 @@ import {
 	getInsertBlockTypeDependants,
 	getGrammar,
 	mapUserPattern,
+	getFallbackInsertionRoots,
 } from './utils';
 import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
@@ -366,12 +360,13 @@ function getListViewClientIdsTreeUnmemoized( state, rootClientId ) {
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getEnabledClientIdsTree = createRegistrySelector( () =>
-	createSelector( getEnabledClientIdsTreeUnmemoized, ( state ) => [
+export const getEnabledClientIdsTree = createSelector(
+	getEnabledClientIdsTreeUnmemoized,
+	( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
-	] )
+	]
 );
 
 /**
@@ -388,18 +383,27 @@ export const getEnabledClientIdsTree = createRegistrySelector( () =>
  *
  * @return {Object[]} Tree of block objects with only clientID and innerBlocks set.
  */
-export const getListViewClientIdsTree = createRegistrySelector( () =>
-	createSelector( getListViewClientIdsTreeUnmemoized, ( state ) => [
+export const getListViewClientIdsTree = createSelector(
+	getListViewClientIdsTreeUnmemoized,
+	( state ) => [
 		state.blocks.order,
 		state.derivedBlockEditingModes,
 		state.blocks.blockEditingModes,
 		state.blocks.parents,
-		state.blocks.byClientId,
-		state.blocks.attributes,
-		state.blockListSettings,
 		state.editedContentOnlySection,
-		state.settings,
-	] )
+		// The state below is only read to resolve a block's parent section,
+		// which the tree does only while a content-only section is being
+		// edited. Depending on it otherwise rebuilds the tree on every
+		// attribute change, i.e. on every keystroke.
+		...( state.editedContentOnlySection
+			? [
+					state.blocks.byClientId,
+					state.blocks.attributes,
+					state.blockListSettings,
+					state.settings,
+				]
+			: [] ),
+	]
 );
 
 /**
@@ -630,11 +634,11 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 				? [
 						unlock( select( STORE_NAME ) ).getReusableBlocks(),
 						state.settings.__experimentalReusableBlocks,
-				  ]
+					]
 				: [
 						state.settings.__experimentalBlockPatterns,
 						state.settings[ selectBlockPatternsKey ]?.( select ),
-				  ]
+					]
 	)
 );
 
@@ -838,6 +842,29 @@ export function isSectionBlock( state, clientId ) {
 }
 
 /**
+ * Returns whether the block is displayed as a synced block, meaning a synced
+ * pattern or a template part. A block that carries pattern metadata is
+ * displayed as a pattern instead, so it is not considered synced.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client Id of the block.
+ *
+ * @return {boolean} Whether the block is displayed as a synced block.
+ */
+export function isSyncedBlock( state, clientId ) {
+	const blockName = getBlockName( state, clientId );
+	// Checked first so that the section lookup below, which walks the block's
+	// ancestors, is only reached for the few blocks that can be synced.
+	if ( blockName !== 'core/block' && blockName !== 'core/template-part' ) {
+		return false;
+	}
+
+	const patternName = getBlockAttributes( state, clientId )?.metadata
+		?.patternName;
+	return ! ( patternName && isSectionBlock( state, clientId ) );
+}
+
+/**
  * Retrieves the client ID of the block that is a contentOnly section but is
  * currently being temporarily edited (contentOnly is deactivated).
  *
@@ -937,31 +964,15 @@ export function getClosestAllowedInsertionPoint( state, name, clientId = '' ) {
 			canInsertBlockType( state, currentName, id )
 		);
 
-	// If we're trying to insert at the root level and it's not allowed
-	// Try the section root instead.
-	if ( ! clientId ) {
-		if ( areBlockNamesAllowedInClientId( clientId ) ) {
-			return clientId;
-		}
-
-		const sectionRootClientId = getSectionRootClientId( state );
-		if (
-			sectionRootClientId &&
-			areBlockNamesAllowedInClientId( sectionRootClientId )
-		) {
-			return sectionRootClientId;
-		}
-		return null;
+	if ( areBlockNamesAllowedInClientId( clientId ) ) {
+		return clientId;
 	}
 
-	// Traverse the block tree up until we find a place where we can insert.
-	let current = clientId;
-	while ( current !== null && ! areBlockNamesAllowedInClientId( current ) ) {
-		const parentClientId = getBlockRootClientId( state, current );
-		current = parentClientId;
-	}
-
-	return current;
+	return (
+		getFallbackInsertionRoots( state, clientId ).find(
+			areBlockNamesAllowedInClientId
+		) ?? null
+	);
 }
 
 export function getClosestAllowedInsertionPointForPattern(
@@ -1360,7 +1371,7 @@ export function getRequestedInspectorTab( state ) {
 	return state.requestedInspectorTab;
 }
 
-const DEFAULT_BLOCK_STYLE_STATE = {
+export const DEFAULT_BLOCK_STYLE_STATE = {
 	viewport: 'default',
 	pseudo: 'default',
 };
@@ -1387,51 +1398,6 @@ export function getStyleStateViewport( state ) {
  */
 export function isResponsiveEditing( state ) {
 	return state.isResponsiveEditing;
-}
-
-/**
- * Returns the selected style state for a block's style controls.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
- *
- * @return {Object} The selected block style state.
- */
-export const getSelectedBlockStyleState = createSelector(
-	( state, clientId ) => {
-		const perBlockState =
-			state.selectedBlockStyleState?.clientId === clientId
-				? state.selectedBlockStyleState.value ??
-				  DEFAULT_BLOCK_STYLE_STATE
-				: DEFAULT_BLOCK_STYLE_STATE;
-
-		return {
-			...perBlockState,
-			// The viewport is tracked globally, so inject it here. This way
-			// consumers receive a single combined state object instead of
-			// merging the global viewport themselves, and selectors derived
-			// from this stay consistent.
-			viewport: getStyleStateViewport( state ),
-		};
-	},
-	( state ) => [ state.styleStateViewport, state.selectedBlockStyleState ]
-);
-
-/**
- * Returns whether a non-default style state is selected for a block.
- *
- * @param {Object} state    Global application state.
- * @param {string} clientId The block client ID.
- *
- * @return {boolean} Whether a non-default block style state is selected.
- */
-export function hasSelectedStyleState( state, clientId ) {
-	const selectedState = getSelectedBlockStyleState( state, clientId );
-
-	return (
-		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
-		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
-	);
 }
 
 /**

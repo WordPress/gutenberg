@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 const { Octokit } = require( '@octokit/rest' );
 const { sprintf } = require( 'sprintf-js' );
 const semver = require( 'semver' );
-
-/**
- * Internal dependencies
- */
 const { getNextMajorVersion } = require( '../lib/version' );
 const {
 	getMilestoneByTitle,
@@ -15,15 +8,14 @@ const {
 } = require( '../lib/milestone' );
 const { log, warn, formats } = require( '../lib/logger' );
 const config = require( '../config' );
-// @ts-ignore
 const manifest = require( '../../../package.json' );
 
 const UNKNOWN_FEATURE_FALLBACK_NAME = 'Uncategorized';
 
-/** @typedef {import('@octokit/rest')} GitHub */
-/** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
-/** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
-/** @typedef {import('@octokit/rest').ReposListReleasesResponseItem} ReposListReleasesResponseItem */
+/** @typedef {import('@octokit/rest').Octokit} GitHub */
+/** @typedef {import('@octokit/rest').RestEndpointMethodTypes} RestEndpointMethodTypes */
+/** @typedef {RestEndpointMethodTypes['issues']['listForRepo']['response']['data'][number]} IssuesListForRepoResponseItem */
+/** @typedef {RestEndpointMethodTypes['repos']['listReleases']['response']['data'][number]} ReposListReleasesResponseItem */
 
 /**
  * @typedef WPChangelogCommandOptions
@@ -74,6 +66,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Package] Scripts': 'Tools',
 	'[Type] Build Tooling': 'Tools',
 	'[Type] Automated Testing': 'Tools',
+	'[Type] Flaky Test': 'Tools',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Type] Code Quality': 'Code Quality',
 	'[Focus] Accessibility (a11y)': 'Accessibility',
@@ -138,6 +131,7 @@ const LABEL_FEATURE_MAPPING = {
 	'[Package] E2E Tests': 'Testing',
 	'[Package] E2E Test Utils': 'Testing',
 	'[Type] Automated Testing': 'Testing',
+	'[Type] Flaky Test': 'Testing',
 	'Connectors screen': 'Connectors',
 	'[Package] UI': 'Components',
 	'[Package] Compose': 'Components',
@@ -303,6 +297,20 @@ function getFeatureSpecificLabels( labels ) {
 }
 
 /**
+ * Returns the first package or tool-specific label from the given labels.
+ *
+ * @param {string[]} labels Label names.
+ *
+ * @return {string|undefined} the package or tool-specific label.
+ */
+function getPackageOrToolSpecificLabel( labels ) {
+	return labels.find(
+		( label ) =>
+			label.startsWith( '[Package] ' ) || label.startsWith( '[Tool] ' )
+	);
+}
+
+/**
  * Returns type candidates based on given issue title.
  *
  * @param {string} title Issue title.
@@ -388,6 +396,16 @@ function getIssueFeature( issue ) {
 
 	if ( blockSpecificLabels ) {
 		return 'Block Library';
+	}
+
+	// 4. Package and tool-specific labels that do not have an explicit mapping.
+	const packageOrToolSpecificLabel = getPackageOrToolSpecificLabel( labels );
+
+	if ( packageOrToolSpecificLabel ) {
+		return packageOrToolSpecificLabel.replace(
+			/^\[(?:Package|Tool)\] /,
+			''
+		);
 	}
 
 	// Fallback - if we couldn't find a good match.
@@ -653,7 +671,7 @@ async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
 	let latestReleaseForMilestone;
 
 	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').ReposListReleasesResponse>>}
+	 * @type {AsyncIterableIterator<{ data: ReposListReleasesResponseItem[] }>}
 	 */
 	const releases = octokit.paginate.iterator( releaseOptions );
 
@@ -1075,15 +1093,15 @@ async function getReleaseChangelog( options ) {
 		milestone:
 			options.milestone === undefined
 				? // Disable reason: valid-sprintf applies to `@wordpress/i18n` where
-				  // strings are expected to need to be extracted, and thus variables are
-				  // not allowed. This string will not need to be extracted.
-				  // eslint-disable-next-line @wordpress/valid-sprintf
-				  sprintf( config.versionMilestoneFormat, {
+					// strings are expected to need to be extracted, and thus variables are
+					// not allowed. This string will not need to be extracted.
+					// eslint-disable-next-line @wordpress/valid-sprintf
+					sprintf( config.versionMilestoneFormat, {
 						...config,
 						...semver.parse(
 							getNextMajorVersion( manifest.version )
 						),
-				  } )
+					} )
 				: options.milestone,
 		unreleased: options.unreleased,
 	} );

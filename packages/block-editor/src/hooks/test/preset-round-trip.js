@@ -7,20 +7,16 @@
  * empty values as non-contributing layers.
  */
 
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	getValueFromVariable,
 	getPresetVariableFromValue,
 } from '@wordpress/global-styles-engine';
-
 import {
 	getCustomValueFromPreset as getCustomSpacingValue,
 	getPresetValueFromCustomValue as getSpacingPresetFromCustom,
 	isValueSpacingPreset,
 } from '../../components/spacing-sizes-control/utils';
-
 import {
 	getCustomValueFromPreset,
 	getPresetValueFromCustomValue,

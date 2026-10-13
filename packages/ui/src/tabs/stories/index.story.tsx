@@ -5,7 +5,8 @@ import * as Tabs from '../';
 import * as Tooltip from '../../tooltip';
 
 const meta: Meta< typeof Tabs.Root > = {
-	title: 'Design System/Components/Tabs',
+	title: 'Components/@wordpress-ui/Tabs',
+	id: 'design-system-components-tabs',
 	component: Tabs.Root,
 	tags: [ 'manifest' ],
 	subcomponents: {
@@ -79,7 +80,7 @@ export const Minimal: StoryObj< typeof Tabs.Root > = {
 };
 
 export const SizeAndOverflowPlayground: StoryObj< typeof Tabs.Root > = {
-	render: function SizeAndOverflowPlayground( props ) {
+	render: function SizeAndOverflowPlaygroundRender( props ) {
 		const [ fullWidth, setFullWidth ] = useState( false );
 		return (
 			<div>

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import { useBaseControlProps } from '../base-control/hooks';
 import type { WordPressComponentProps } from '../context';
@@ -69,9 +58,10 @@ function UnforwardedContentEditableControl(
 				aria-disabled={ disabled || undefined }
 				aria-required={ required || undefined }
 				ref={ mergedRefs }
-				// A disabled field is not `contentEditable`, which also
-				// removes it from the tab order.
+				// Not editable and out of the tab order, but still focusable:
+				// a field disabled while focused keeps focus.
 				contentEditable={ ! disabled }
+				tabIndex={ disabled ? -1 : undefined }
 				suppressContentEditableWarning
 				{ ...additionalProps }
 				{ ...controlProps }

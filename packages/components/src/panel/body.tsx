@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useReducedMotion, useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { PanelBodyProps, PanelBodyTitleProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import Button from '../button';

@@ -1,25 +1,13 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { isRTL, __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { Flex, FlexBlock } from '../flex';
 import { Spacer } from '../spacer';
 import NumberControl from '../number-control';
 import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 import InputControlSuffixWrapper from '../input-control/input-suffix-wrapper';
 import AngleCircle from './angle-circle';
-
 import type { WordPressComponentProps } from '../context';
 import type { AnglePickerControlProps } from './types';
 

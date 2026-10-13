@@ -1,10 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
-import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
@@ -13,10 +9,6 @@ import {
 	cloneBlock,
 	getDefaultBlockName,
 } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
@@ -36,12 +28,12 @@ export function useOnEnter( props ) {
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
-		function onKeyDown( event ) {
+		function onBeforeInput( event ) {
 			if ( event.defaultPrevented ) {
 				return;
 			}
 
-			if ( event.keyCode !== ENTER ) {
+			if ( event.inputType !== 'insertParagraph' ) {
 				return;
 			}
 
@@ -127,8 +119,16 @@ export function useOnEnter( props ) {
 			} );
 		}
 
-		// Capture phase so we run before writing-flow's ancestor-bubble
-		// keydown handlers that gate on `event.defaultPrevented`.
-		return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
+		// Enter is handled on beforeinput: moving focus while the keydown
+		// is still being handled leaves the iOS keyboard's
+		// auto-capitalization stale. Capture phase so we run before
+		// writing-flow's ancestor-bubble handler that gates on
+		// `event.defaultPrevented`.
+		return subscribeOwnedListener(
+			element,
+			'beforeinput',
+			onBeforeInput,
+			true
+		);
 	}, [] );
 }

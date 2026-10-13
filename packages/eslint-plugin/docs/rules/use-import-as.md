@@ -29,9 +29,7 @@ Examples of **incorrect** code for this rule:
 
 ```js
 import { VisuallyHidden } from '@wordpress/components';
-
 import { Button, VisuallyHidden as Hidden } from '@wordpress/components';
-
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../lock-unlock';
 
@@ -42,9 +40,10 @@ Examples of **correct** code for this rule:
 
 ```js
 import { VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
-
-import { Button, VisuallyHidden as WCVisuallyHidden } from '@wordpress/components';
-
+import {
+	Button,
+	VisuallyHidden as WCVisuallyHidden,
+} from '@wordpress/components';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { unlock } from '../../lock-unlock';
 

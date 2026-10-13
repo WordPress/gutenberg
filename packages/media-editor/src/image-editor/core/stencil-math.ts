@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { MIN_CROP_PIXELS, MIN_CROP_SCREEN_PX } from './constants';
 import type { HandlePosition, NormalizedRect, Size } from './types';
 

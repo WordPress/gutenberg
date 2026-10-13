@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { StoryFn, Meta } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { fullscreen } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import InputControl from '../../input-control';
 import Modal from '../';
@@ -20,7 +9,7 @@ import type { ModalProps } from '../types';
 const meta: Meta< typeof Modal > = {
 	tags: [ 'manifest' ],
 	component: Modal,
-	title: 'Components/Overlays/Modal',
+	title: 'Components/@wordpress-components/Overlays/Modal',
 	id: 'components-modal',
 	argTypes: {
 		children: {

@@ -7,21 +7,9 @@
  *
  * @see https://ariakit.org/components/composite
  */
-
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { isRTL } from '@wordpress/i18n';
 import { useMemo, forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { CompositeContext } from './context';
 import { CompositeGroup } from './group';
@@ -51,7 +39,7 @@ export const Composite = Object.assign(
 	forwardRef<
 		HTMLDivElement,
 		WordPressComponentProps< CompositeProps, 'div', false >
-	>( function Composite(
+	>( function UnforwardedComposite(
 		{
 			// Composite store props
 			activeId,

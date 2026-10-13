@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 // @ts-expect-error: Not typed yet.
 import { getComputedFluidTypographyValue } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import type { FontSize } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { useStyle } from '../hooks';
 
 interface FontSizePreviewProps {
@@ -25,10 +18,10 @@ function FontSizePreview( { fontSize }: FontSizePreviewProps ) {
 			? {
 					minimumFontSize: fontSize.fluid.min,
 					maximumFontSize: fontSize.fluid.max,
-			  }
+				}
 			: {
 					fontSize: fontSize.size,
-			  };
+				};
 
 	const computedFontSize = getComputedFluidTypographyValue( input );
 	return (

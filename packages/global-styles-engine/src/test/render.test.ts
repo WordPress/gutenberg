@@ -1,6 +1,6 @@
-/**
- * Internal dependencies
- */
+import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
+import { getBlockSupport } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
 import {
 	getNodesWithStyles,
 	getNodesWithSettings,
@@ -16,33 +16,20 @@ import {
 } from '../utils/common';
 
 // Mock WordPress data store
-jest.mock( '@wordpress/data', () => ( {
-	select: jest.fn(),
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	select: vi.fn(),
 } ) );
 
 // Mock WordPress blocks store
-jest.mock( '@wordpress/blocks', () => ( {
-	__EXPERIMENTAL_STYLE_PROPERTY: {
-		filter: {
-			value: [ 'filter', 'duotone' ],
-			support: [ 'filter', 'duotone' ],
-		},
-	},
-	__EXPERIMENTAL_ELEMENTS: {
-		link: 'a:where(:not(.wp-element-button))',
-		h1: 'h1',
-		h2: 'h2',
-		h3: 'h3',
-		h4: 'h4',
-		h5: 'h5',
-		h6: 'h6',
-		button: '.wp-element-button',
-		caption: '.wp-element-caption',
-	},
-	getBlockSupport: jest.fn(),
-	getBlockTypes: jest.fn(),
-	store: 'core/blocks',
+vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	getBlockSupport: vi.fn(),
+	getBlockTypes: vi.fn(),
 } ) );
+
+const mockedSelect = vi.mocked( select ) as Mock;
+const mockedGetBlockSupport = vi.mocked( getBlockSupport ) as Mock;
 
 // Mock WordPress elements (minimal, no mocking of complex APIs)
 const ELEMENTS = {
@@ -404,6 +391,49 @@ describe( 'global styles renderer', () => {
 			presets: false,
 			rootPadding: false,
 		};
+
+		it( 'uses the row value for Flow and Constrained layouts and both values for Flex and Grid layouts when block spacing is axial', () => {
+			const tree: GlobalStylesConfig = {
+				styles: {
+					blocks: {
+						'core/group': {
+							spacing: {
+								blockGap: { top: '1em', left: '2em' },
+							},
+						},
+					},
+				},
+			};
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+					hasLayoutSupport: true,
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				true,
+				false,
+				false,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flow) > * { margin-block-start: 1em; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-constrained) > * { margin-block-start: 1em; margin-block-end: 0; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-flex) { gap: 1em 2em; }'
+			);
+			expect( result ).toContain(
+				':root :where(.wp-block-group-is-layout-grid) { gap: 1em 2em; }'
+			);
+		} );
 
 		it( 'should return a ruleset', () => {
 			const tree = {
@@ -819,6 +849,237 @@ describe( 'global styles renderer', () => {
 			expect( result ).toEqual(
 				':root :where(.wp-block-button){color: black;}@media (width <= 480px){:root :where(.wp-block-button){color: red;}}:root :where(.wp-block-button:hover){color: blue;}'
 			);
+		} );
+
+		describe( 'state styles under a text clip', () => {
+			const textGradient = {
+				background: {
+					gradient: 'linear-gradient(135deg,#ff0000,#0000ff)',
+					backgroundClip: 'text',
+				},
+			};
+			const blockSelectors = {
+				'core/paragraph': { selector: '.wp-block-paragraph' },
+			};
+
+			const render = ( paragraphStyles: object ) =>
+				transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: { 'core/paragraph': paragraphStyles },
+						},
+					} as unknown as GlobalStylesConfig ),
+					blockSelectors,
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+			it( 'clears the inherited gradient when a breakpoint escapes the clip', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: { backgroundClip: 'border-box' },
+					},
+				} );
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-paragraph){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}'
+				);
+			} );
+
+			it( 'leaves a background the breakpoint paints itself', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: {
+							gradient: 'linear-gradient(135deg,#00ff00,#ffff00)',
+							backgroundClip: 'border-box',
+						},
+					},
+				} );
+
+				expect( result ).not.toContain( 'background-image: unset' );
+			} );
+
+			it( 'restores the fill for a breakpoint text color', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': { color: { text: '#00ff00' } },
+				} );
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-paragraph){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'adds nothing when the breakpoint keeps the text clip', () => {
+				const result = render( {
+					...textGradient,
+					'@mobile': {
+						background: {
+							gradient: 'linear-gradient(135deg,#00ff00,#ffff00)',
+							backgroundClip: 'text',
+						},
+					},
+				} );
+
+				expect( result ).not.toContain( 'background-image: unset' );
+				expect( result ).not.toContain(
+					'-webkit-text-fill-color: currentColor'
+				);
+			} );
+
+			it( 'reads the clip the breakpoint sets for itself', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									background: {
+										backgroundClip: 'border-box',
+									},
+									'@mobile': {
+										background: {
+											gradient:
+												'linear-gradient(135deg,#ff0000,#0000ff)',
+											backgroundClip: 'text',
+										},
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}'
+				);
+			} );
+
+			it( 'reads the variation clip for a breakpoint inside it', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/group': {
+									variations: {
+										flashy: {
+											...textGradient,
+											'@mobile': {
+												background: {
+													backgroundClip:
+														'border-box',
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/group': {
+							selector: '.wp-block-group',
+							styleVariationSelectors: {
+								flashy: '.is-style-flashy.wp-block-group',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain( 'background-image: unset' );
+			} );
+
+			it( 'reads the block clip for a breakpoint inside a variation', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/group': {
+									...textGradient,
+									variations: {
+										flashy: {
+											'@mobile': {
+												background: {
+													backgroundClip:
+														'border-box',
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{
+						'core/group': {
+							selector: '.wp-block-group',
+							styleVariationSelectors: {
+								flashy: '.is-style-flashy.wp-block-group',
+							},
+						},
+					},
+					false,
+					false,
+					true,
+					true,
+					{ ...minimalStyleOptions, variationStyles: true }
+				);
+
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.is-style-flashy.wp-block-group){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}'
+				);
+			} );
+
+			it( 'reads the breakpoint clip for a pseudo state inside it', () => {
+				const result = transformToStyles(
+					Object.freeze( {
+						styles: {
+							blocks: {
+								'core/button': {
+									...textGradient,
+									'@mobile': {
+										background: {
+											backgroundClip: 'border-box',
+										},
+										':hover': {
+											color: { text: '#00ff00' },
+										},
+									},
+								},
+							},
+						},
+					} as unknown as GlobalStylesConfig ),
+					{ 'core/button': { selector: '.wp-block-button' } },
+					false,
+					false,
+					true,
+					true,
+					minimalStyleOptions
+				);
+
+				// The breakpoint already escaped the clip, so no fill is needed.
+				expect( result ).toContain(
+					'@media (width <= 480px){:root :where(.wp-block-button:hover){color: #00ff00;}}'
+				);
+			} );
 		} );
 
 		it( 'ignores root-level state styles', () => {
@@ -1391,6 +1652,137 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'renders block element styles defined only in a viewport', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									heading: {
+										color: {
+											text: 'red',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group h1,.wp-block-group  h2,.wp-block-group  h3,.wp-block-group  h4,.wp-block-group  h5,.wp-block-group  h6){color: red;}}'
+			);
+		} );
+
+		it( 'renders block element pseudo styles defined only in a viewport', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									link: {
+										':hover': {
+											color: {
+												text: 'red',
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button)):hover){color: red;}}'
+			);
+		} );
+
+		it( 'renders block element styles defined in separate viewports', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/group': {
+							'@mobile': {
+								elements: {
+									link: {
+										color: {
+											text: 'red',
+										},
+									},
+								},
+							},
+							'@tablet': {
+								elements: {
+									link: {
+										color: {
+											text: 'blue',
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const blockSelectors = {
+				'core/group': {
+					selector: '.wp-block-group',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors,
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: red;}}@media (480px < width <= 782px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: blue;}}'
+			);
+		} );
+
 		it( 'handles responsive style variation styles', () => {
 			const tree = {
 				styles: {
@@ -1486,9 +1878,8 @@ describe( 'global styles renderer', () => {
 
 	describe( 'generateGlobalStyles', () => {
 		beforeEach( () => {
-			jest.clearAllMocks();
-			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
-			mockSelect.mockReturnValue( {
+			vi.clearAllMocks();
+			mockedSelect.mockReturnValue( {
 				getBlockStyles: () => [],
 			} );
 		} );
@@ -1527,6 +1918,50 @@ describe( 'global styles renderer', () => {
 			expect( customCssStylesheet.css ).not.toContain(
 				':root :where(p){color:red;}'
 			);
+		} );
+
+		it( 'should render viewport and pseudo-state block custom CSS', () => {
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/button': {
+							css: 'color:blue;',
+							':hover': {
+								css: 'color:green;',
+							},
+							'@mobile': {
+								css: 'color:pink;',
+								':hover': {
+									css: 'color:yellow;',
+								},
+							},
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/button',
+					selectors: {
+						root: '.wp-block-button .wp-block-button__link',
+						typography: { writingMode: '.wp-block-button' },
+						dimensions: {
+							root: '.wp-block-button',
+							width: '.wp-block-button',
+						},
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const combinedCss = styles.map( ( s: any ) => s.css ).join( '\n' );
+			expect( combinedCss ).toContain( 'color:blue' );
+			expect( combinedCss ).toContain( 'color:green' );
+			expect( combinedCss ).toContain( 'color:pink' );
+			expect( combinedCss ).toContain( 'color:yellow' );
 		} );
 
 		it( 'should use css feature selector object form with root subkey for block custom CSS', () => {
@@ -1598,8 +2033,7 @@ describe( 'global styles renderer', () => {
 		} );
 
 		it( 'should output duotone SVG filters with __unstableType of svgs', () => {
-			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
-			mockSelect.mockReturnValue( {
+			mockedSelect.mockReturnValue( {
 				getBlockStyles: () => [],
 			} );
 
@@ -1613,6 +2047,23 @@ describe( 'global styles renderer', () => {
 									slug: 'midnight',
 									name: 'Midnight',
 									colors: [ '#263135', '#69a8a7' ],
+								},
+							],
+							default: [
+								{
+									slug: 'grayscale',
+									name: 'Grayscale',
+									colors: [ '#000000', '#ffffff' ],
+								},
+							],
+							// User-created duotones need a filter in the
+							// editor too, or they render on the front end but
+							// not on the canvas.
+							custom: [
+								{
+									slug: 'custom-duotone-1',
+									name: 'Duotone 1',
+									colors: [ '#0000ff', '#1a4548' ],
 								},
 							],
 						},
@@ -1639,22 +2090,104 @@ describe( 'global styles renderer', () => {
 
 			expect( svgStyle ).toBeDefined();
 			expect( svgStyle.__unstableType ).toBe( 'svgs' );
-			expect( svgStyle.assets.join( '' ) ).toContain(
-				'wp-duotone-midnight'
-			);
+
+			const assets = svgStyle.assets.join( '' );
+			expect( assets ).toContain( 'wp-duotone-midnight' );
+			expect( assets ).toContain( 'wp-duotone-grayscale' );
+			expect( assets ).toContain( 'wp-duotone-custom-duotone-1' );
+		} );
+
+		describe( 'block gap support', () => {
+			const blockTypes = [
+				{
+					name: 'core/columns',
+					selectors: { root: '.wp-block-columns' },
+					supports: {
+						layout: true,
+						spacing: {
+							blockGap: { __experimentalDefault: '2em' },
+						},
+					},
+				},
+			];
+
+			const getGlobalStylesCSS = ( settings: Record< string, any > ) => {
+				const config: any = {
+					version: 3,
+					settings,
+					styles: {
+						spacing: { blockGap: '24px' },
+						blocks: {
+							// WordPress adds an empty block gap placeholder for
+							// blocks that declare a default block gap value.
+							'core/columns': { spacing: { blockGap: null } },
+						},
+					},
+				};
+				const [ styles ] = generateGlobalStyles( config, blockTypes );
+				return styles
+					.map( ( style: any ) => style.css ?? '' )
+					.join( '' );
+			};
+
+			it( 'outputs block gap styles when the theme opts into block gap', () => {
+				const css = getGlobalStylesCSS( {
+					spacing: { blockGap: true },
+				} );
+
+				expect( css ).toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+				expect( css ).toContain( '--wp--style--block-gap: 24px;' );
+				expect( css ).not.toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+			} );
+
+			it( 'outputs fallback gap styles when the theme sets the block gap setting to null', () => {
+				// WordPress' default theme.json sets `spacing.blockGap` to
+				// `null` for themes that do not opt into block gap.
+				const css = getGlobalStylesCSS( {
+					spacing: { blockGap: null },
+				} );
+
+				expect( css ).toContain(
+					':where(.is-layout-flex) { gap: 0.5em; }'
+				);
+				expect( css ).toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+				expect( css ).not.toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+				expect( css ).not.toContain( '--wp--style--block-gap' );
+			} );
+
+			it( 'outputs fallback gap styles when the block gap setting is missing', () => {
+				const css = getGlobalStylesCSS( {} );
+
+				expect( css ).toContain(
+					':where(.is-layout-flex) { gap: 0.5em; }'
+				);
+				expect( css ).toContain(
+					':where(.wp-block-columns.is-layout-flex) { gap: 2em; }'
+				);
+				expect( css ).not.toContain(
+					':root :where(.is-layout-flex) { gap: 24px; }'
+				);
+			} );
 		} );
 	} );
 
 	describe( 'getBlockSelectors', () => {
 		beforeEach( () => {
 			// Reset mocks before each test
-			jest.clearAllMocks();
+			vi.clearAllMocks();
 		} );
 
 		it( 'should return block selectors data', () => {
 			// Mock the select function to return getBlockStyles
-			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
-			mockSelect.mockReturnValue( {
+			mockedSelect.mockReturnValue( {
 				getBlockStyles: () => [ { name: 'foo', label: 'foo' } ],
 			} );
 
@@ -1670,7 +2203,13 @@ describe( 'global styles renderer', () => {
 				category: 'media',
 			};
 			const blockTypes = [ imageBlock ];
-			expect( getBlockSelectors( blockTypes ) ).toEqual( {
+			expect(
+				getBlockSelectors(
+					blockTypes as unknown as Parameters<
+						typeof getBlockSelectors
+					>[ 0 ]
+				)
+			).toEqual( {
 				'core/image': {
 					name: imageBlock.name,
 					selector: imageSelectors.root,
@@ -1691,15 +2230,12 @@ describe( 'global styles renderer', () => {
 
 		it( 'should return block selectors data with old experimental selectors', () => {
 			// Mock the select function to return getBlockStyles with empty array
-			const mockSelect = require( '@wordpress/data' ).select as jest.Mock;
-			mockSelect.mockReturnValue( {
+			mockedSelect.mockReturnValue( {
 				getBlockStyles: () => [],
 			} );
 
 			// Mock getBlockSupport to handle experimental duotone support
-			const mockGetBlockSupport = require( '@wordpress/blocks' )
-				.getBlockSupport as jest.Mock;
-			mockGetBlockSupport.mockImplementation(
+			mockedGetBlockSupport.mockImplementation(
 				( blockType, path, defaultValue ) => {
 					if ( path === 'color.__experimentalDuotone' ) {
 						return 'img';
@@ -1726,7 +2262,13 @@ describe( 'global styles renderer', () => {
 			};
 			const blockTypes = [ imageBlock ];
 
-			expect( getBlockSelectors( blockTypes ) ).toEqual( {
+			expect(
+				getBlockSelectors(
+					blockTypes as unknown as Parameters<
+						typeof getBlockSelectors
+					>[ 0 ]
+				)
+			).toEqual( {
 				'core/image': {
 					name: imageBlock.name,
 					selector: imageSupports.__experimentalSelector,

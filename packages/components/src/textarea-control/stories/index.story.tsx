@@ -1,22 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TextareaControl from '..';
 
 const meta: Meta< typeof TextareaControl > = {
-	tags: [ 'manifest' ],
 	component: TextareaControl,
-	title: 'Components/Selection & Input/Common/TextareaControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/TextareaControl',
 	id: 'components-textareacontrol',
 	argTypes: {
 		onChange: { action: 'onChange' },
@@ -33,9 +21,9 @@ const meta: Meta< typeof TextareaControl > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'recommended',
+			status: 'not-recommended',
 			whereUsed: 'global',
-			notes: 'Will be superseded by [`TextareaControl`](?path=/docs/design-system-components-form-primitives-textarea--docs) in `@wordpress/ui`, but continue using for now.',
+			notes: 'Use [`TextareaControl`](?path=/docs/design-system-components-form-textareacontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-textareacontrol--migration-guide).',
 		},
 	},
 };

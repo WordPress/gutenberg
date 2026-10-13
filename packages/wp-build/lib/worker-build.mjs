@@ -6,10 +6,6 @@
  *
  * @package
  */
-
-/**
- * External dependencies
- */
 import { readFile, writeFile, access } from 'fs/promises';
 import path from 'path';
 import esbuild from 'esbuild';
@@ -59,11 +55,20 @@ function createModuleRedirectPlugin( resolveMap ) {
 					matchedKey,
 					resolveMap[ matchedKey ]
 				);
+				const resolveDir = path.dirname( args.path );
+				// A relative specifier keeps the checkout path out of the source map.
+				const specifier =
+					'./' +
+					path
+						.relative( resolveDir, targetPath )
+						.split( path.sep )
+						.join( '/' );
 				return {
 					contents: `export { default } from ${ JSON.stringify(
-						targetPath
+						specifier
 					) };`,
 					loader: 'js',
+					resolveDir,
 				};
 			} );
 		},
@@ -337,7 +342,6 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);
@@ -360,7 +364,6 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				target,
 				jsx: 'automatic',
 				jsxImportSource: 'react',
-				loader: { '.js': 'jsx' },
 				plugins,
 			} )
 		);

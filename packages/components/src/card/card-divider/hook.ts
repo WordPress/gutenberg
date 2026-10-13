@@ -1,15 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import clsx from 'clsx';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import * as styles from '../styles';
-import { useCx } from '../../utils/hooks/use-cx';
+import styles from '../style.module.scss';
 import type { DividerProps } from '../../divider';
 
 /*
@@ -24,18 +16,11 @@ export function useCardDivider(
 		'CardDivider'
 	);
 
-	const cx = useCx();
-
-	const classes = useMemo(
-		() =>
-			cx(
-				styles.Divider,
-				styles.borderColor,
-				// This classname is added for legacy compatibility reasons.
-				'components-card__divider',
-				className
-			),
-		[ className, cx ]
+	const classes = clsx(
+		styles.divider,
+		// This classname is added for legacy compatibility reasons.
+		'components-card__divider',
+		className
 	);
 
 	return {

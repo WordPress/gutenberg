@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { fixCustomClassname } from './fix-custom-classname';
 import { fixGlobalAttribute } from './fix-global-attribute';
 import type { Block, BlockAttribute, BlockType } from '../../types';
@@ -20,7 +17,7 @@ const ANCHOR_ATTR_SCHEMA: BlockAttribute = {
 };
 
 /**
- * Attempts to fix block invalidation by applying build-in validation fixes
+ * Attempts to fix block invalidation by applying built-in validation fixes
  * like moving all extra classNames to the className attribute.
  *
  * @param block     block object.

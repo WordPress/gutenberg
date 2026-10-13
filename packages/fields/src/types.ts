@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { DataFormControlProps } from '@wordpress/dataviews';
 
 type PostStatus =
@@ -54,6 +51,7 @@ export interface BasePost extends CommonPost {
 	ping_status?: 'open' | 'closed';
 	link?: string;
 	slug?: string;
+	generated_slug?: string;
 	sticky?: boolean;
 	permalink_template?: string;
 	date?: string;
@@ -166,11 +164,10 @@ export interface PostType {
 // Will be unnecessary after typescript 5.0 upgrade.
 export type CoreDataError = { message?: string; code?: string };
 
-export interface MediaEditProps< Item >
-	extends Pick<
-		DataFormControlProps< Item >,
-		'data' | 'field' | 'onChange' | 'hideLabelFromVision' | 'validity'
-	> {
+export interface MediaEditProps< Item > extends Pick<
+	DataFormControlProps< Item >,
+	'data' | 'field' | 'onChange' | 'hideLabelFromVision' | 'validity'
+> {
 	/**
 	 * Array of allowed media types (e.g., ['image', 'video']).
 	 * Use ['*'] to allow all file types.

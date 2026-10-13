@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import * as fs from 'fs/promises';
 import { dirname } from 'path';
 import { expect } from '@playwright/test';
 import type { APIRequestContext } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { WP_BASE_URL } from '../config';
 import type { RequestUtils, StorageState } from './index';
 

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
@@ -39,7 +32,7 @@ export default function useTruncate(
 				ellipsizeMode,
 				limit,
 				numberOfLines,
-		  } )
+			} )
 		: children;
 
 	const shouldTruncate =
@@ -58,7 +51,7 @@ export default function useTruncate(
 		? {
 				...style,
 				'--wp-components-truncate-lines': numberOfLines,
-		  }
+			}
 		: style;
 
 	return {

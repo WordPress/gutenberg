@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { accordion as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import edit from './edit';
 import save from './save';
 import metadata from './block.json';
@@ -15,6 +8,8 @@ import initBlock from '../utils/init-block';
 const { name } = metadata;
 
 export { metadata, name };
+
+const TEMPLATE = [ [ 'core/accordion-item' ] ];
 
 export const settings = {
 	icon,
@@ -48,6 +43,8 @@ export const settings = {
 			},
 		],
 	},
+	template: TEMPLATE,
+	templateInsertUpdatesSelection: true,
 	edit,
 	save,
 };

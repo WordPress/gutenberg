@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FieldType } from '../types/private';
 import getValueFormatted from './utils/get-value-formatted-default';
 

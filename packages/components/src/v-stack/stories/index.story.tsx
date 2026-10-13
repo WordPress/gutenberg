@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import { VStack } from '..';
 
@@ -25,7 +18,7 @@ const ALIGNMENTS = {
 
 const meta: Meta< typeof VStack > = {
 	component: VStack,
-	title: 'Components/Layout/VStack',
+	title: 'Components/@wordpress-components/Layout/VStack',
 	id: 'components-vstack',
 	argTypes: {
 		alignment: {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Font Library', () => {
@@ -70,7 +67,7 @@ test.describe( 'Font Library', () => {
 				.getByRole( 'button', { name: 'Typography options' } )
 				.click();
 			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show Font' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Font, show' } )
 				.click();
 			await page.getByRole( 'combobox', { name: 'Font' } ).click();
 			await page.getByRole( 'option', { name: 'Exo 2' } ).click();

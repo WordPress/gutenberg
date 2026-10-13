@@ -1,12 +1,10 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 // This block deliberately exercises legacy React 18 patterns (a bundled React
 // 18 development JSX runtime that produces `Symbol.for( 'react.element' )`
-// elements, a function component relying on `defaultProps`, and the `inert`
-// attribute) while the editor runs on the externalized React 19 runtime.
+// elements, function components relying on `defaultProps` both plain and
+// wrapped in `memo()`, and the `inert` attribute) while the editor runs on the
+// externalized React 19 runtime.
 //
 // It is expected to FAIL until the React 19 compatibility layer can render
 // elements created by an older React runtime and restore `defaultProps`
@@ -49,6 +47,19 @@ test.describe( 'React 18 compatibility block (React 19 runtime)', () => {
 			block.locator( '.react-18-compat-block__greeting' )
 		).toHaveText( 'Hello from defaultProps' );
 
+		// `defaultProps` declared on the component inside a `memo()` wrapper
+		// are resolved too, whichever runtime created the element — including
+		// the bundled React 18 one, which never wrote them into the element.
+		await expect(
+			block.locator( '.react-18-compat-block__memo-greeting' )
+		).toHaveText( 'Hello from memo defaultProps' );
+		await expect(
+			block.locator( '.react-18-compat-block__memo-greeting-jsx' )
+		).toHaveText( 'Hello from memo defaultProps' );
+		await expect(
+			block.locator( '.react-18-compat-block__memo-greeting-legacy' )
+		).toHaveText( 'Hello from memo defaultProps' );
+
 		// `inert=''` attribute specified as string is rendered as `true` by a patched React 19 runtime.
 		const inertString = block.locator(
 			'.react-18-compat-block__inert-string'
@@ -65,7 +76,10 @@ test.describe( 'React 18 compatibility block (React 19 runtime)', () => {
 
 test.describe( 'React 18 compatibility block (React 18 runtime)', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
+		// React 19 is on by default, so this runtime has to be asked for.
+		await requestUtils.setGutenbergExperiments( {
+			'gutenberg-react-19': false,
+		} );
 		await requestUtils.activatePlugin(
 			'gutenberg-test-react-18-compat-block'
 		);
@@ -79,6 +93,7 @@ test.describe( 'React 18 compatibility block (React 18 runtime)', () => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-react-18-compat-block'
 		);
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test( 'renders a React 19 boolean inert attribute with React 18 runtime', async ( {

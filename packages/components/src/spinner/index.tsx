@@ -1,27 +1,20 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
-import { StyledSpinner, SpinnerTrack, SpinnerIndicator } from './styles';
-import type { WordPressComponentProps } from '../context';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
+import styles from './style.module.scss';
+import type { WordPressComponentProps } from '../context';
 
 export function UnforwardedSpinner(
 	{ className, ...props }: WordPressComponentProps< {}, 'svg', false >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	return (
-		<StyledSpinner
-			className={ clsx( 'components-spinner', className ) }
+		<svg
+			className={ clsx(
+				'components-spinner',
+				styles.spinner,
+				className
+			) }
 			viewBox="0 0 100 100"
 			width="16"
 			height="16"
@@ -32,7 +25,8 @@ export function UnforwardedSpinner(
 			ref={ forwardedRef }
 		>
 			{ /* Gray circular background */ }
-			<SpinnerTrack
+			<circle
+				className={ styles.track }
 				cx="50"
 				cy="50"
 				r="50"
@@ -40,11 +34,12 @@ export function UnforwardedSpinner(
 			/>
 
 			{ /* Theme-colored arc */ }
-			<SpinnerIndicator
+			<path
+				className={ styles.indicator }
 				d="m 50 0 a 50 50 0 0 1 50 50"
 				vectorEffect="non-scaling-stroke"
 			/>
-		</StyledSpinner>
+		</svg>
 	);
 }
 /**

@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import { Controller } from '@react-spring/web';
-
-/**
- * WordPress dependencies
- */
 import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 
 /**

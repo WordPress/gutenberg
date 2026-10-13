@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useFlexContext } from '../context';

@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { shortcutAriaLabel } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
 import Tooltip from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof Tooltip > = {
-	title: 'Components/Overlays/Tooltip',
+	title: 'Components/@wordpress-components/Overlays/Tooltip',
 	id: 'components-tooltip',
 	component: Tooltip,
 	argTypes: {

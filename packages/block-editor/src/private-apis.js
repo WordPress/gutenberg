@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
 import { lock, unlock } from './lock-unlock';
@@ -13,19 +6,17 @@ import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import ResizableBoxPopover from './components/resizable-box-popover';
 import { default as PrivateQuickInserter } from './components/inserter/quick-inserter';
 import {
-	extractWords,
-	getNormalizedSearchTerms,
+	SEARCH_RANK,
 	normalizeString,
-} from './components/inserter/search-items';
+	searchItems,
+} from './utils/search-ranking';
+import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
+import { showPlaceholderKey as blockToolbarShowPlaceholderKey } from './components/block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
-import {
-	getStyleForState,
-	isDefaultBlockStyleState,
-	setStyleForState,
-} from './hooks/block-style-state';
+import { isDefaultBlockStyleState } from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import BlockManager from './components/block-manager';
@@ -64,7 +55,6 @@ import {
 	openMediaEditorModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
-import { PrivateRichText } from './components/rich-text/';
 import { PrivateBlockPopover } from './components/block-popover';
 import { PrivateInserterLibrary } from './components/inserter/library';
 import { PrivatePublishDateTimePicker } from './components/publish-date-time-picker';
@@ -88,11 +78,12 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+import { isElementVisible } from './utils/dom';
 
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
 /**
- * Private @wordpress/block-editor APIs.
+ * Private `@wordpress/block-editor` APIs.
  */
 export const privateApis = {};
 lock( privateApis, {
@@ -103,17 +94,15 @@ lock( privateApis, {
 	getDuotoneFilter,
 	getRichTextValues,
 	PrivateQuickInserter,
-	extractWords,
-	getNormalizedSearchTerms,
+	SEARCH_RANK,
 	normalizeString,
 	PrivateListView,
 	ResizableBoxPopover,
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
+	blockToolbarShowPlaceholderKey,
 	cleanEmptyObject,
-	getStyleForState,
 	isDefaultBlockStyleState,
-	setStyleForState,
 	usePrivateStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
@@ -133,7 +122,6 @@ lock( privateApis, {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
-	PrivateRichText,
 	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
 	userPatternCategoriesSelectKey,
@@ -166,4 +154,7 @@ lock( privateApis, {
 	InnerContent,
 	useNativeUndo,
 	usesNativeUndo,
+	isElementVisible,
+	getPopulatedCategories,
+	searchItems,
 } );

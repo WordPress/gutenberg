@@ -1,10 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -81,7 +78,7 @@ async function downloadTestSuite(
 		? ( message ) => {
 				spinner.info( `SimpleGit: ${ message }` );
 				spinner.start();
-		  }
+			}
 		: () => {};
 	onProgress( 0 );
 
@@ -97,7 +94,7 @@ async function downloadTestSuite(
 	}
 
 	log( 'Cloning or getting the PHPUnit suite from GitHub.' );
-	const git = SimpleGit( { progress: progressHandler } );
+	const git = simpleGit( { progress: progressHandler } );
 
 	const isRepo =
 		fs.existsSync( directory ) &&

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { createElement } from 'react';
 import { addons, types, useStorybookApi } from 'storybook/manager-api';

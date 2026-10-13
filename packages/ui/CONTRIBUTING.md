@@ -2,6 +2,15 @@
 
 The following guidance builds upon the existing [contribution guidelines for `@wordpress/components`](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md), which should serve as a starting point for contribution. The documentation included here encodes decisions and technical approaches which are unique to this package.
 
+## Design principles
+
+-   **Scope**: Only add components that are generic and reusable in building admin interfaces. If it can live in a higher-level package or one scoped to a particular feature (`admin-ui`, `block-editor`, `dataviews`, etc.), it should.
+-   **Composition**: Prefer existing `@wordpress/ui` primitives over bespoke markup and styles when they fit.
+-   **Spacing**: Components should not ship with outer margins. Consumers should provide their own spacing via layout like `Stack` or `className` custom styling.
+-   **Tokens**: Visual values should use semantic `--wpds-*` design tokens, not hardcoded colors or spacing. Avoid props that accept arbitrary CSS values when a token or variant can express the intent.
+-   **Token semantics**: Use `interactive` tokens for clickable UI and `content` tokens for static text. Prefer state variants (`-active`, `-disabled`) over mixing tones (for example, neutral at rest and brand on hover).
+-   **Motion**: Animation should respect `prefers-reduced-motion`.
+
 ## Folder Structure
 
 Each component should be organized within its own folder under `src/` following this pattern:
@@ -42,7 +51,51 @@ The package follows [semantic versioning](https://semver.org/), and the followin
 
 -   Component definitions (e.g. removing a component)
 -   Component props (e.g. renaming, removing, or changing a props supported types such that existing usage would break in an update)
--   CSS properties prefixed with `--wp-ui-` (e.g. changing a CSS property such that it would negatively impact a user's experience)
+-   CSS properties prefixed with `--wp-ui-` (e.g. changing a CSS property such that it would negatively impact a user's experience). This surface is frozen: do not add new `--wp-ui-*` custom properties. See [Custom property names](#custom-property-names).
+
+### Component naming
+
+Name components for what they are. In a name with a modifier, put the component's kind last and its appearance or purpose first. For example, `IconButton` is a button that displays an icon, while `ButtonLink` is a link styled as a button.
+
+Apply the same pattern to compound components. `Dialog.CloseIconButton`, `Drawer.CloseIconButton`, and `Notice.CloseIconButton` are icon buttons with a close or dismiss purpose. `ButtonLink.Icon` is the icon inside a link, not an interactive control of its own.
+
+Use the compound component's context when naming its parts. `Menu.LinkItem`, `Menu.CheckboxItem`, and `Menu.RadioItem` describe kinds of menu items; `Breadcrumb.LinkItem` describes a breadcrumb item. Names that describe a composition, such as `ControlWithError` and `ChipWithRemove`, can retain that structure.
+
+Keep filenames, prop types, display names, and Storybook names consistent with the public component name. Follow the [compound component conventions](#compound-components) when deciding whether to expose a standalone component or a `.Root` with required parts.
+
+### Controlled and uncontrolled props
+
+When designing props for a new component:
+
+-   Always offer both controlled and uncontrolled modes when the component has user-facing state.
+-   Name the uncontrolled prop `defaultX`, the controlled prop `x`, and the callback `onXChange`.
+-   In JSDoc comments, indicate which mode each prop is for and cross-reference the alternative:
+
+    ```ts
+    /**
+     * Whether the panel is currently open (controlled).
+     *
+     * To render an uncontrolled component, use the `defaultOpen` prop instead.
+     */
+    open?: boolean;
+    /**
+     * Whether the panel is initially open (uncontrolled).
+     * @default false
+     */
+    defaultOpen?: boolean;
+    /**
+     * Event handler called when the open state changes.
+     */
+    onOpenChange?: ( open: boolean ) => void;
+    ```
+
+-   Provide a `@default` JSDoc tag for the uncontrolled prop when there is a sensible default.
+
+### Component status
+
+When you change a component's Storybook `parameters.componentStatus.status` or its public export, check the `@wordpress/ui` entry in the [`use-recommended-components`](../eslint-plugin/docs/rules/use-recommended-components.md) ESLint rule. `recommended` components belong in `allowed`, `use-with-caution` components in `caution`, and other statuses in neither.
+
+The Design System MCP catalog uses a curated Storybook manifest. Add `tags: [ 'manifest' ]` to a recommended component's story metadata, and remove the tag from the component it replaces. The tag is independent of `componentStatus`, so update both when changing the recommendation. Update the ESLint rule's replacement guidance and any migration documentation as needed. Run `npm run storybook:build` and `npm run storybook:manifest-snapshot`, then review and commit the generated snapshot and any allowlist reductions. See [Manifest snapshot regression testing](../../storybook/README.md#manifest-snapshot-regression-testing).
 
 ## Compound Components
 
@@ -83,7 +136,8 @@ export const Button = Object.assign( _Button, {
 
 ```ts
 const meta: Meta< typeof Button > = {
-	title: 'Design System/Components/Button',
+	title: 'Components/@wordpress-ui/Button',
+	id: 'design-system-components-button',
 	component: Button,
 	subcomponents: {
 		'Button.Icon': Button.Icon,
@@ -107,15 +161,18 @@ For components that do **not** wrap a Base UI primitive, use `useRender` and `me
 import { useRender, mergeProps } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
 
-export const Root = forwardRef( function MyComponent( { render, className, ...restProps }, ref ) {
-    const element = useRender( {
-        render,
-        defaultTagName: 'div',
-        ref,
-        props: mergeProps( { className: styles.root }, restProps ),
-    } );
+export const Root = forwardRef( function MyComponent(
+	{ render, className, ...restProps },
+	ref
+) {
+	const element = useRender( {
+		render,
+		defaultTagName: 'div',
+		ref,
+		props: mergeProps( { className: styles.root }, restProps ),
+	} );
 
-    return element;
+	return element;
 } );
 ```
 
@@ -130,7 +187,7 @@ import { Collapsible as _Collapsible } from '@base-ui/react/collapsible';
 import { forwardRef } from '@wordpress/element';
 
 export const Trigger = forwardRef( function MyTrigger( props, ref ) {
-    return <_Collapsible.Trigger ref={ ref } { ...props } />;
+	return <_Collapsible.Trigger ref={ ref } { ...props } />;
 } );
 ```
 
@@ -160,14 +217,19 @@ The default can be a **JSX element** or a **render function**, depending on what
 const DEFAULT_TAG = <div />;
 
 export const Title = forwardRef( function MyTitle(
-    { render = DEFAULT_TAG, className, children, ...props },
-    ref
+	{ render = DEFAULT_TAG, className, children, ...props },
+	ref
 ) {
-    return (
-        <Text ref={ ref } render={ render } className={ className } { ...props }>
-            { children }
-        </Text>
-    );
+	return (
+		<Text
+			ref={ ref }
+			render={ render }
+			className={ className }
+			{ ...props }
+		>
+			{ children }
+		</Text>
+	);
 } );
 ```
 
@@ -175,16 +237,21 @@ export const Title = forwardRef( function MyTitle(
 // Render function — useful when the default needs to compose
 // other components or add additional props.
 const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
-    <Stack { ...props } direction="column" gap="sm" />
+	<Stack { ...props } direction="column" gap="sm" />
 );
 
 export const Root = forwardRef( function MyRoot(
-    { className, render = DEFAULT_RENDER, ...restProps },
-    ref
+	{ className, render = DEFAULT_RENDER, ...restProps },
+	ref
 ) {
-    return (
-        <_Field.Root ref={ ref } className={ className } render={ render } { ...restProps } />
-    );
+	return (
+		<_Field.Root
+			ref={ ref }
+			className={ className }
+			render={ render }
+			{ ...restProps }
+		/>
+	);
 } );
 ```
 
@@ -206,12 +273,12 @@ When `render` is provided by the consumer, `ref` and `...props` remain on the un
 ```tsx
 // BAD: destructure-and-pass-through with no interaction
 function MyComponent( { render, ...props }, ref ) {
-    return <Inner ref={ ref } render={ render } { ...props } />;
+	return <Inner ref={ ref } render={ render } { ...props } />;
 }
 
 // GOOD: let render flow through ...props
 function MyComponent( props, ref ) {
-    return <Inner ref={ ref } { ...props } />;
+	return <Inner ref={ ref } { ...props } />;
 }
 ```
 
@@ -253,9 +320,9 @@ High-level wrappers that hide `Popup` (for example `IconButton`, which renders a
 
 ### CSS Layers
 
-We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. All component stylesheets must follow this layering approach to maintain consistency and prevent specificity conflicts.
+We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. Component stylesheets follow this layering approach to maintain consistency and prevent specificity conflicts. `VisuallyHidden` is an exception: its styles are unlayered so global element styles cannot override its hiding behavior solely through cascade layer precedence.
 
-Every component stylesheet must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
+Layered component stylesheets must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
 
 ```css
 @layer wp-ui {
@@ -295,15 +362,23 @@ When the override also `composes` the primitive it extends, keep the override in
 }
 ```
 
+### Custom property names
+
+Do not add new `--wp-ui-*` custom properties. Names in that prefix are public API. Existing ones remain supported; renaming or removing them is a breaking change.
+
+Private custom properties must use an underscore after `--`. New private variables should be `--_wp-ui-*` (for example `--_wp-ui-elevation-lg`). `--_gcd-*` is reserved for global CSS defense bridges. A shorter `--_*` name is fine when it only aliases an existing public `--wp-ui-*` value locally (for example `--_checkbox-input-size`).
+
+Style with semantic `--wpds-*` tokens, existing `--wp-ui-*` variables, props, or class composition. Do not introduce a new public CSS variable to make a value themeable.
+
 ### Custom Properties and State Styles
 
-When components expose CSS custom properties (variables) for theming or composition, care must be taken to separate **configurable values** from **state handling**. Getting this wrong can silently break styles when components are composed across CSS layers.
+When components use CSS custom properties (variables) for theming or composition, care must be taken to separate **configurable values** from **state handling**. Getting this wrong can silently break styles when components are composed across CSS layers.
 
 #### The rule
 
 > **Custom properties = configurable values. CSS properties = state machine.**
 
-Define custom properties for each visual "slot" (default, active/hover, disabled, etc.) and assign them to design tokens or other values. In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`) to reference the appropriate custom property for that state — do **not** reassign the custom property itself.
+Define private `--_wp-ui-*` custom properties for each visual "slot" (default, active/hover, disabled, etc.) and assign them to design tokens or other values. In state selectors (`:hover`, `:active`, `:focus`, `[data-disabled]`, etc.), set **CSS properties** (like `background-color`, `color`) to reference the appropriate custom property for that state — do **not** reassign the custom property itself.
 
 In CSS cascade layers, a rule in a higher-priority layer always wins over a lower-priority layer regardless of selector specificity. If a component reassigns a custom property inside a state selector, a higher layer that overrides that same custom property will win unconditionally — the state-based reassignment in the lower layer becomes dead code.
 
@@ -313,12 +388,12 @@ Define a separate custom property per state, and use CSS property declarations i
 
 ```css
 .button {
-	--button-bg: blue;
-	--button-bg-hover: darkblue;
-	background-color: var(--button-bg);
+	--_wp-ui-button-bg: blue;
+	--_wp-ui-button-bg-hover: darkblue;
+	background-color: var( --_wp-ui-button-bg );
 
 	&:hover {
-		background-color: var(--button-bg-hover);
+		background-color: var( --_wp-ui-button-bg-hover );
 	}
 }
 ```
@@ -331,16 +406,16 @@ Do not reassign the same custom property in state selectors:
 
 ```css
 .button {
-	--button-bg: blue;
-	background-color: var(--button-bg);
+	--_wp-ui-button-bg: blue;
+	background-color: var( --_wp-ui-button-bg );
 
 	&:hover {
-		--button-bg: darkblue;
+		--_wp-ui-button-bg: darkblue;
 	}
 }
 ```
 
-If a higher layer sets `.special-button { --button-bg: red; }`, that override wins over the hover reassignment (layer precedence trumps specificity). The hover state will show `red` instead of `darkblue`, and there is no way for the lower layer to recover.
+If a higher layer sets `.special-button { --_wp-ui-button-bg: red; }`, that override wins over the hover reassignment (layer precedence trumps specificity). The hover state will show `red` instead of `darkblue`, and there is no way for the lower layer to recover.
 
 ### Disabled State Styling
 

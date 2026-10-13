@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalText as WCText,
 	__experimentalVStack as VStack,
@@ -10,13 +7,9 @@ import { count as wordCount } from '@wordpress/wordcount';
 import type { Strategy } from '@wordpress/wordcount';
 import { humanTimeDiff } from '@wordpress/date';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { BasePostWithEditedEntity } from '../../types';
 
-// Taken from packages/editor/src/components/time-to-read/index.js.
+// Taken from packages/editor/src/components/time-to-read/index.jsx.
 const AVERAGE_READING_RATE = 189;
 
 export default function PostContentInfoView( {
@@ -66,7 +59,7 @@ export default function PostContentInfoView( {
 						/* translators: %s: the number of minutes to read the post. */
 						_n( '%s minute', '%s minutes', readingTime ),
 						readingTime.toLocaleString()
-				  );
+					);
 		contentInfoText = sprintf(
 			/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
 			__( '%1$s, %2$s read time.' ),

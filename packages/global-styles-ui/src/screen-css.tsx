@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { ExternalLink } from '@wordpress/components';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import { ScreenHeader } from './screen-header';
 import { useStyle } from './hooks';
 import { unlock } from './lock-unlock';
@@ -17,15 +10,10 @@ import { unlock } from './lock-unlock';
 const { AdvancedPanel: StylesAdvancedPanel } = unlock( blockEditorPrivateApis );
 
 function ScreenCSS() {
-	// Get user-only styles (should not decode/encode to preserve raw CSS)
-	const [ style ] = useStyle( '', undefined, 'user', false );
-	// Get all styles (inherited + user) for context
-	const [ inheritedStyle, setStyle ] = useStyle(
-		'',
-		undefined,
-		'merged',
-		false
-	);
+	// User-only styles (should not decode/encode to preserve raw CSS).
+	const [ style, setStyle ] = useStyle( '', undefined, 'user', false );
+	// Merged (theme.json + user) styles, previewed when there's no local override.
+	const [ inheritedStyle ] = useStyle( '', undefined, 'merged', false );
 
 	return (
 		<>

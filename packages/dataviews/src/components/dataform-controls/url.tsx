@@ -1,15 +1,5 @@
-/**
- * WordPress dependencies
- */
-import {
-	Icon as WCIcon,
-	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
-} from '@wordpress/components';
+import { Icon, InputLayout } from '@wordpress/ui';
 import { link } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import ValidatedText from './utils/validated-input';
 
@@ -32,9 +22,9 @@ export default function Url< Item >( {
 				validity,
 				type: 'url',
 				prefix: (
-					<InputControlPrefixWrapper variant="icon">
-						<WCIcon icon={ link } />
-					</InputControlPrefixWrapper>
+					<InputLayout.Slot padding="minimal">
+						<Icon icon={ link } />
+					</InputLayout.Slot>
 				),
 			} }
 		/>

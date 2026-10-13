@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { StorageInterface } from '../../../types';
 import objectStorage from './object';
 

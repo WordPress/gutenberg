@@ -1,0 +1,51 @@
+<svg viewBox="0 0 860 270" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="One widget type materialized as a tile of three areas: the header takes the identity, the high-relevance attributes, and the low-relevance actions; the content takes the render module fed with the attribute values; the footer takes the promoted actions.">
+  <rect x="6" y="6" width="848" height="258" rx="12" fill="#ffffff"/>
+
+  <text x="430" y="34" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">from metadata to tile</text>
+
+  <!-- The tile -->
+  <rect x="40" y="54" width="470" height="190" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+
+  <!-- Header: identity, one inline attribute, the More menu -->
+  <rect x="56" y="68" width="26" height="26" rx="6" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.4"/>
+  <text x="92" y="86" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#1e3a8a">Goal Progress</text>
+  <circle cx="200" cy="81" r="8" fill="#eef4fe" stroke="#7f9cd8" stroke-width="1.2"/>
+  <text x="200" y="85" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" font-weight="700" font-style="italic" fill="#3b62b0">i</text>
+  <rect x="334" y="72" width="110" height="22" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="346" y="87" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#475569">Metric</text>
+  <path d="M430 81 l7 0 l-3.5 5 z" fill="#94a3b8"/>
+  <rect x="452" y="72" width="42" height="22" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <circle cx="473" cy="78" r="1.8" fill="#475569"/>
+  <circle cx="473" cy="83" r="1.8" fill="#475569"/>
+  <circle cx="473" cy="88" r="1.8" fill="#475569"/>
+
+  <!-- Content: the render module's output -->
+  <rect x="56" y="118" width="300" height="8" rx="4" fill="#eef2f7"/>
+  <rect x="56" y="134" width="220" height="8" rx="4" fill="#eef2f7"/>
+  <rect x="56" y="158" width="438" height="10" rx="5" fill="#eef2f7"/>
+  <rect x="56" y="158" width="260" height="10" rx="5" fill="#e2ecfd"/>
+
+  <!-- Footer -->
+  <line x1="40" y1="196" x2="510" y2="196" stroke="#cbd5e1" stroke-width="1.4"/>
+  <text x="56" y="226" font-family="-apple-system, system-ui, sans-serif" font-size="12.5" font-weight="600" fill="#2f54a5">View goal details</text>
+  <rect x="468" y="208" width="26" height="24" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <path d="M481 213 v8 m-3.5 -3.5 l3.5 3.5 l3.5 -3.5 M476 226 h10" stroke="#475569" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Area annotations -->
+  <line x1="510" y1="83" x2="552" y2="83" stroke="#cbd5e1" stroke-width="1.2"/>
+  <circle cx="510" cy="83" r="2.5" fill="#cbd5e1"/>
+  <text x="560" y="79" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">header</text>
+  <text x="560" y="94" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">icon · title · help</text>
+  <text x="560" y="108" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">attributes: high inline · full schema in settings</text>
+  <text x="560" y="122" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">actions: low</text>
+
+  <line x1="510" y1="145" x2="552" y2="145" stroke="#cbd5e1" stroke-width="1.2"/>
+  <circle cx="510" cy="145" r="2.5" fill="#cbd5e1"/>
+  <text x="560" y="141" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">content</text>
+  <text x="560" y="156" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">render module · attribute values</text>
+
+  <line x1="510" y1="220" x2="552" y2="220" stroke="#cbd5e1" stroke-width="1.2"/>
+  <circle cx="510" cy="220" r="2.5" fill="#cbd5e1"/>
+  <text x="560" y="216" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#334155">footer</text>
+  <text x="560" y="231" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">actions: high · medium</text>
+</svg>

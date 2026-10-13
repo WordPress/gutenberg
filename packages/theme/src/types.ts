@@ -1,10 +1,13 @@
 import { type ReactNode } from 'react';
+import type { ThemeProviderColorWarning } from './theme-provider-color-warnings.ts';
 
 export type CornerRadiusPreset = 'none' | 'subtle' | 'moderate' | 'pronounced';
 
 export interface ThemeProviderSettings {
 	/**
-	 * The set of color options to apply to the theme.
+	 * Seeds for the generated theme colors. The ramp builder may adjust their
+	 * lightness to meet its contrast targets, so generated tokens are not
+	 * guaranteed to contain the seeds unchanged.
 	 */
 	color?: {
 		/**
@@ -15,8 +18,8 @@ export interface ThemeProviderSettings {
 		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
 		 * error.
 		 *
-		 * By default, it inherits from parent `ThemeProvider`,
-		 * and fallbacks to statically built CSS.
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies.
 		 */
 		primary?: string;
 		/**
@@ -27,8 +30,8 @@ export interface ThemeProviderSettings {
 		 * (e.g. `hsl()`, `oklch()`, `lab()`) are not accepted and throw an
 		 * error.
 		 *
-		 * By default, it inherits from parent `ThemeProvider`,
-		 * and fallbacks to statically built CSS.
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies.
 		 */
 		background?: string;
 	};
@@ -41,8 +44,8 @@ export interface ThemeProviderSettings {
 		 * The cursor style for interactive controls that are not links
 		 * (e.g. buttons, checkboxes, and toggles).
 		 *
-		 * By default, it inherits from the parent `ThemeProvider`,
-		 * and falls back to the prebuilt default (`pointer`).
+		 * When omitted, inherits from the parent `ThemeProvider`. If there is
+		 * no parent value, the prebuilt default applies (`pointer`).
 		 */
 		control?: 'default' | 'pointer';
 	};
@@ -55,8 +58,8 @@ export interface ThemeProviderSettings {
 	 * subtree; it sets the overall amount of roundness, not a single token
 	 * size.
 	 *
-	 * By default, it inherits from the parent `ThemeProvider`,
-	 * and falls back to the prebuilt default (`subtle`).
+	 * When omitted, inherits from the parent `ThemeProvider`. If there is no
+	 * parent value, the prebuilt default applies (`subtle`).
 	 */
 	cornerRadius?: CornerRadiusPreset;
 }
@@ -72,6 +75,17 @@ export interface ThemeProviderProps extends ThemeProviderSettings {
 	 * The children to render.
 	 */
 	children?: ReactNode;
+
+	/**
+	 * Called after the provider calculates its colors. Reports failures from the
+	 * generated ramp checks and defined semantic foreground/background pairs. It
+	 * does not validate every possible token pairing. Receives an empty array
+	 * when all checked targets are met.
+	 * The callback may run more than once in development under React Strict Mode.
+	 */
+	onColorWarnings?: (
+		warnings: readonly ThemeProviderColorWarning[]
+	) => void;
 
 	/**
 	 * When a ThemeProvider is the root provider, it will apply its theming

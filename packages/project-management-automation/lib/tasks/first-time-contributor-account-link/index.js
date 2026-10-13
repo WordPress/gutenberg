@@ -1,13 +1,11 @@
-/**
- * Internal dependencies
- */
-const debug = require( '../../debug' );
-const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
-const hasWordPressProfile = require( '../../has-wordpress-profile' );
+import { setOutput } from '@actions/core';
+import debug from '../../debug.js';
+import getAssociatedPullRequest from '../../get-associated-pull-request.js';
+import hasWordPressProfile from '../../has-wordpress-profile.js';
 
 /** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
-/** @typedef {import('../../get-associated-pull-request').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+/** @typedef {import('@octokit/openapi-webhooks-types').components['schemas']['webhook-push']} WebhookPayloadPush */
+/** @typedef {import('../../get-associated-pull-request.js').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
  * Returns the message text to be used for the comment prompting contributor to
@@ -58,18 +56,31 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
+	const author = commit.author.username;
+	if ( ! author ) {
+		debug(
+			'first-time-contributor-account-link: Commit author has no GitHub username. Aborting'
+		);
+		return;
+	}
+
+	const repo = payload.repository.name;
+	const owner = payload.repository.owner?.login;
+	if ( ! owner ) {
+		debug(
+			'first-time-contributor-account-link: Push payload is missing a repository owner. Aborting'
+		);
+		return;
+	}
+
 	const { data: user } = await octokit.rest.users.getByUsername( {
-		username: commit.author.username,
+		username: author,
 	} );
 
 	if ( user.type === 'Bot' ) {
 		debug( 'first-time-contributor-account-link: User is a bot. Aborting' );
 		return;
 	}
-
-	const repo = payload.repository.name;
-	const owner = payload.repository.owner.login;
-	const author = commit.author.username;
 
 	debug(
 		`first-time-contributor-account-link: Searching for commits in ${ owner }/${ repo } by @${ author }`
@@ -112,15 +123,19 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	}
 
 	debug(
-		'first-time-contributor-account-link: User not known. Adding comment to prompt for account link.'
+		'first-time-contributor-account-link: User not known. Prompting for account link.'
 	);
 
-	await octokit.rest.issues.createComment( {
-		owner,
-		repo,
-		issue_number: pullRequest,
-		body: getPromptMessageText( author ),
-	} );
+	/*
+	 * The workflow posts this, so the prompt joins the single automation
+	 * comment rather than adding one of its own. A push payload carries no
+	 * pull request number, so the writer needs this one.
+	 */
+	setOutput(
+		'first-time-contributor-prompt',
+		getPromptMessageText( author )
+	);
+	setOutput( 'first-time-contributor-pr-number', pullRequest );
 }
 
-module.exports = firstTimeContributorAccountLink;
+export default firstTimeContributorAccountLink;

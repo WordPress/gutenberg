@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Content-only lock', () => {
@@ -566,6 +563,64 @@ test.describe( 'Content-only lock', () => {
 					.getByRole( 'button', { name: 'Move down' } )
 			).toBeVisible();
 		} );
+	} );
+
+	test( 'the parent block selector selects the nearest parent shown in List View', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Learn more</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		const groupBlock = editor.canvas
+			.getByRole( 'document', { name: 'Block: Group' } )
+			.first();
+		const buttonsBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Buttons',
+			includeHidden: true,
+		} );
+		const buttonBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Button',
+			exact: true,
+			includeHidden: true,
+		} );
+
+		// Select the content-locked group block.
+		await editor.selectBlocks( groupBlock );
+
+		await editor.selectBlocks( buttonBlock );
+		await editor.showBlockToolbar();
+
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+		// The nested group is disabled, so the parent is the Buttons block.
+		const parentSelector = blockToolbar.getByRole( 'button', {
+			name: 'Select parent block: Buttons',
+		} );
+		await expect( parentSelector ).toBeVisible();
+		await expect(
+			blockToolbar.locator(
+				'.block-editor-block-parent-selector__inserter'
+			)
+		).toHaveCount( 0 );
+
+		await parentSelector.click();
+
+		await expect( buttonsBlock ).toHaveClass( /is-selected/ );
 	} );
 
 	test( 'pressing Enter on a non-text block in a contentOnly section should not insert a paragraph', async ( {

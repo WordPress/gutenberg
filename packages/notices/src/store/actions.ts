@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
 import type { NoticeOptions, ReducerAction } from './types';
 

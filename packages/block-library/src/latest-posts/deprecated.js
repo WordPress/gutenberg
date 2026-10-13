@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import metadata from './block.json';
 
 const currentSupports = {

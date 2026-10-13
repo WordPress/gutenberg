@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Button,
 	Notice,
@@ -14,10 +11,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import { scopeSlug, saveGuidelineRow, deleteGuidelineRow } from '../data';
 import type { Scope, GuidelineQuery } from '../types';
 
@@ -63,7 +56,7 @@ export default function GuidelineAccordionForm( {
 
 	const form: Form = useMemo(
 		() => ( {
-			layout: { type: 'regular', labelPosition: 'none' },
+			layout: { type: 'regular', labelPosition: 'top' },
 			fields: [ 'guidelines' ],
 		} ),
 		[]
@@ -143,17 +136,7 @@ export default function GuidelineAccordionForm( {
 						{ error }
 					</Notice>
 				) }
-				<HStack spacing={ 4 } alignment="left">
-					<Button
-						variant="primary"
-						type="submit"
-						disabled={ loading || ! draft }
-						accessibleWhenDisabled
-						isBusy={ loading }
-						__next40pxDefaultSize
-					>
-						{ __( 'Save guidelines' ) }
-					</Button>
+				<HStack spacing={ 4 } alignment="right">
 					<Button
 						variant="tertiary"
 						type="button"
@@ -163,7 +146,17 @@ export default function GuidelineAccordionForm( {
 						onClick={ handleClearClick }
 						__next40pxDefaultSize
 					>
-						{ __( 'Clear guidelines' ) }
+						{ __( 'Clear' ) }
+					</Button>
+					<Button
+						variant="primary"
+						type="submit"
+						disabled={ loading || ! draft }
+						accessibleWhenDisabled
+						isBusy={ loading }
+						__next40pxDefaultSize
+					>
+						{ __( 'Save' ) }
 					</Button>
 				</HStack>
 			</VStack>
@@ -171,19 +164,19 @@ export default function GuidelineAccordionForm( {
 				isOpen={ showClearConfirmation }
 				title={ sprintf(
 					/* translators: %s: Guideline section title. */
-					__( 'Clear %s guidelines' ),
+					__( 'Clear %s guideline' ),
 					scope.title
 				) }
 				__experimentalHideHeader={ false }
 				onConfirm={ handleClearConfirm }
 				onCancel={ () => setShowClearConfirmation( false ) }
-				confirmButtonText={ __( 'Clear guidelines' ) }
+				confirmButtonText={ __( 'Clear' ) }
 				isBusy={ loading }
 				size="small"
 			>
 				{ sprintf(
 					/* translators: %s: Guideline section title. */
-					__( 'You are about to clear the %s guidelines.' ),
+					__( 'You are about to clear the %s guideline.' ),
 					scope.title
 				) }
 			</ConfirmDialog>

@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const path = require( 'path' );
 const fs = require( 'fs' );
-
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Upload progress snackbar (HEIC-only canvas mode) (@webkit)', () => {

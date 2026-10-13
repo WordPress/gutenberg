@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TabbedSidebar from '../';
 
 const meta = {
-	title: 'BlockEditor/TabbedSidebar',
+	id: 'blockeditor-tabbedsidebar',
+	title: 'Editor/Block Editor/TabbedSidebar',
 	component: TabbedSidebar,
 	tags: [ 'status-private' ],
 	parameters: {
