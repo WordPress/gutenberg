@@ -8,7 +8,11 @@
 			text-decoration-thickness: from-font;
 
 			&:is(:hover, :active, :focus-visible) {
-				text-decoration-thickness: max(0.12em, var(--wpds-border-width-sm));
+				text-underline-offset: 0.3em;
+			}
+
+			@media not (prefers-reduced-motion) {
+				--_gcd-a-transition: text-underline-offset var(--wpds-motion-duration-xs) ease-out;
 			}
 		}
 

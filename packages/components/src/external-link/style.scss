@@ -14,7 +14,7 @@
 		color: var(--wpds-color-foreground-interactive-brand-active);
 
 		.components-external-link__contents {
-			text-decoration-thickness: max(0.12em, var(--wpds-border-width-sm));
+			text-underline-offset: 0.3em;
 		}
 	}
 
@@ -34,6 +34,10 @@
 	text-decoration-color: currentColor;
 	text-underline-offset: 0.2em;
 	text-decoration-thickness: from-font;
+
+	@media not (prefers-reduced-motion) {
+		transition: text-underline-offset var(--wpds-motion-duration-xs) ease-out;
+	}
 }
 
 .components-external-link__icon {

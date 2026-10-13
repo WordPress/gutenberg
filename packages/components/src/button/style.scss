@@ -238,7 +238,7 @@
 		text-decoration-thickness: from-font;
 
 		&:is(:hover, :active, :focus-visible):not(:disabled, [aria-disabled="true"]) {
-			text-decoration-thickness: max(0.12em, var(--wpds-border-width-sm));
+			text-underline-offset: 0.3em;
 		}
 
 		&:where(:not(.is-destructive, .is-pressed, :disabled, [aria-disabled="true"])) {
@@ -251,9 +251,9 @@
 		}
 
 		@media not (prefers-reduced-motion) {
-			transition-property: border, background, color;
-			transition-duration: 0.05s;
-			transition-timing-function: ease-in-out;
+			transition-property: border, background, color, text-underline-offset;
+			transition-duration: var(--wpds-motion-duration-xs);
+			transition-timing-function: ease-out;
 		}
 
 		height: auto;
