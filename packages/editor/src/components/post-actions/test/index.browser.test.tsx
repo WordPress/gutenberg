@@ -3,6 +3,7 @@ import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { useSelect } from '@wordpress/data';
+import { lock } from '../../../lock-unlock';
 import PostActions from '../';
 import { usePostActions } from '../actions';
 
@@ -14,11 +15,18 @@ const mockedUsePostActions = vi.mocked( usePostActions );
 
 const item = { id: 123, title: { raw: 'Test post' } };
 
+// The core store selectors `PostActions` reads the post with, which it gets
+// from the private selectors.
+const coreSelectors = {};
+lock( coreSelectors, {
+	getEditedEntityRecord: () => item,
+	getEntityRecordPermissions: () => ( { canUpdate: true } ),
+} );
+
 async function renderPostActions() {
-	mockedUseSelect.mockReturnValue( {
-		item,
-		permissions: { canUpdate: true },
-	} );
+	mockedUseSelect.mockImplementation( ( mapSelect: any ) =>
+		mapSelect( () => coreSelectors )
+	);
 
 	await render(
 		<PostActions

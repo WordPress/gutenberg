@@ -12,6 +12,7 @@ import { usePostActions } from './actions';
 
 export default function PostActions( { postType, postId, onActionPerformed } ) {
 	const [ activeModalAction, setActiveModalAction ] = useState( null );
+	const registry = useRegistry();
 
 	const { item, permissions } = useSelect(
 		( select ) => {
@@ -36,13 +37,16 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 	}, [ item, permissions ] );
 	const allActions = usePostActions( { postType, onActionPerformed } );
 
-	const actions = useMemo( () => {
+	// Eligibility is evaluated in `useSelect`, so it's evaluated again when
+	// the data it reads changes.
+	const actions = useSelect( () => {
 		return allActions.filter( ( action ) => {
 			return (
-				! action.isEligible || action.isEligible( itemWithPermissions )
+				! action.isEligible ||
+				action.isEligible( itemWithPermissions, { registry } )
 			);
 		} );
-	}, [ allActions, itemWithPermissions ] );
+	}, [ allActions, itemWithPermissions, registry ] );
 
 	return (
 		<>
