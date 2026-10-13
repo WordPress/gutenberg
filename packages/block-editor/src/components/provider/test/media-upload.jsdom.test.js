@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
-import { select as selectStore, useSelect } from '@wordpress/data';
+import { select as selectStore, useRegistry, useSelect } from '@wordpress/data';
 import { createElement } from '@wordpress/element';
 import { store as uploadStore } from '@wordpress/upload-media';
 import { BlockEditorProvider } from '../';
@@ -43,9 +43,11 @@ function createFiles( ...names ) {
 	);
 }
 
-function setUpMediaUpload() {
+function setUpMediaUpload( onRegistry ) {
 	let mediaUpload;
 	const GetMediaUpload = () => {
+		const registry = useRegistry();
+		onRegistry?.( registry );
 		mediaUpload = useSelect(
 			( select ) => select( blockEditorStore ).getSettings().mediaUpload,
 			[]
@@ -125,6 +127,51 @@ describe( 'mediaUpload with client-side media processing', () => {
 		await waitFor( () =>
 			expect( selectStore( uploadStore ).getItems() ).toHaveLength( 0 )
 		);
+	} );
+
+	it( 'falls back to onFileChange when an older queue ignores onBatchChange', () => {
+		let registry;
+		const mediaUpload = setUpMediaUpload( ( value ) => {
+			registry = value;
+		} );
+		const originalDispatch = registry.dispatch.bind( registry );
+		const oldAddItems = vi.fn( ( { files, onChange } ) => {
+			files.forEach( ( file ) =>
+				onChange( [ { url: `blob:${ file.name }` } ] )
+			);
+		} );
+		const dispatchSpy = vi
+			.spyOn( registry, 'dispatch' )
+			.mockImplementation( ( store ) =>
+				store === uploadStore
+					? { addItems: oldAddItems }
+					: originalDispatch( store )
+			);
+		const onFileChange = vi.fn();
+		const onFilesChange = vi.fn();
+
+		try {
+			mediaUpload( {
+				filesList: createFiles( 'old-one.txt', 'old-two.txt' ),
+				onFileChange,
+				onFilesChange,
+			} );
+		} finally {
+			dispatchSpy.mockRestore();
+		}
+
+		expect( oldAddItems ).toHaveBeenCalledTimes( 1 );
+		expect( oldAddItems ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				onBatchChange: expect.any( Function ),
+				onChange: expect.any( Function ),
+			} )
+		);
+		expect( onFileChange.mock.calls ).toEqual( [
+			[ [ { url: 'blob:old-one.txt' } ] ],
+			[ [ { url: 'blob:old-two.txt' } ] ],
+		] );
+		expect( onFilesChange ).not.toHaveBeenCalled();
 	} );
 
 	it( 'reports only files from the current upload when uploading again', async () => {
