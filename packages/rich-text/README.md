@@ -305,7 +305,7 @@ _Returns_
 
 ### privateApis
 
-Private @wordpress/rich-text APIs.
+Private `@wordpress/rich-text` APIs.
 
 ### registerFormatType
 
