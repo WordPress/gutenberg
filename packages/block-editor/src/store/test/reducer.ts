@@ -2640,13 +2640,17 @@ describe( 'state', () => {
 
 					expect(
 						getBlocks(
-							{ blocks: withControlledContent },
+							partial< State >( {
+								blocks: withControlledContent,
+							} ),
 							'chicken'
 						).map( ( b ) => ( b as Block ).clientId )
 					).toEqual( [ 'content' ] );
 					expect(
 						getBlocks(
-							{ blocks: withControlledContent },
+							partial< State >( {
+								blocks: withControlledContent,
+							} ),
 							'content'
 						).map( ( b ) => ( b as Block ).clientId )
 					).toEqual( [ 'content-inner' ] );
@@ -2667,14 +2671,16 @@ describe( 'state', () => {
 						true
 					);
 					expect(
-						getBlocks( { blocks: state }, 'chicken' ).map(
-							( b ) => ( b as Block ).clientId
-						)
+						getBlocks(
+							partial< State >( { blocks: state } ),
+							'chicken'
+						).map( ( b ) => ( b as Block ).clientId )
 					).toEqual( [ 'content' ] );
 					expect(
-						getBlocks( { blocks: state }, 'content' ).map(
-							( b ) => ( b as Block ).clientId
-						)
+						getBlocks(
+							partial< State >( { blocks: state } ),
+							'content'
+						).map( ( b ) => ( b as Block ).clientId )
 					).toEqual( [ 'content-inner' ] );
 				} );
 
@@ -2722,7 +2728,7 @@ describe( 'state', () => {
 					} );
 
 					// Expect that the `template`/`content` blocks are reconstructed.
-					const fullState = { blocks: state };
+					const fullState = partial< State >( { blocks: state } );
 					expect( getBlocks( fullState, 'template' ) ).toEqual( [] );
 					expect( getBlockOrder( fullState, 'template' ) ).toEqual(
 						[]
@@ -2796,7 +2802,7 @@ describe( 'state', () => {
 
 					// At this point the template has empty content, and `useInnerBlockTemplateSync` should apply
 					// its template content. It will check if `getBlocks` is empty before applying the template.
-					const fullState = { blocks: state };
+					const fullState = partial< State >( { blocks: state } );
 					expect( getBlockOrder( fullState, 'template' ) ).toEqual(
 						[]
 					);
