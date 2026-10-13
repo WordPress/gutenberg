@@ -53,8 +53,8 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 
 		let inputType;
 
-		if ( event ) {
-			inputType = ( event as InputEvent ).inputType;
+		if ( event && 'inputType' in event ) {
+			inputType = event.inputType;
 		}
 
 		const { record, applyRecord, createRecord, handleChange } =

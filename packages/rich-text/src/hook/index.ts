@@ -98,26 +98,18 @@ function useRichTextBase( {
 
 	function setRecordFromProps() {
 		const activeFormats = recordRef.current?.activeFormats;
-		// The record holds the parsed `RichTextData` until it is copied below.
-		const parsedRef = recordRef as unknown as RefObject< RichTextData >;
 		_valueRef.current = value;
-		parsedRef.current = value as RichTextData;
-		if ( ! ( value instanceof RichTextData ) ) {
-			// `fromHTMLString` ignores `preserveWhiteSpace`.
-			parsedRef.current = value
-				? (
-						RichTextData.fromHTMLString as (
-							html: string,
-							options: { preserveWhiteSpace?: boolean }
-						) => RichTextData
-					 )( value, { preserveWhiteSpace } )
+		let parsed = value;
+		if ( ! ( parsed instanceof RichTextData ) ) {
+			parsed = parsed
+				? RichTextData.fromHTMLString( parsed )
 				: RichTextData.empty();
 		}
 		// To do: make rich text internally work with RichTextData.
 		recordRef.current = {
-			text: parsedRef.current.text,
-			formats: parsedRef.current.formats,
-			replacements: parsedRef.current.replacements,
+			text: parsed.text,
+			formats: parsed.formats,
+			replacements: parsed.replacements,
 			activeFormats,
 		} as RichTextRecord;
 		if ( disableFormats ) {
