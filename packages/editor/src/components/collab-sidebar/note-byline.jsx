@@ -9,11 +9,10 @@ import {
 } from '@wordpress/date';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getAvatarBorderColor } from './utils';
 
 export function NoteByline( { avatar, name, date, userId } ) {
-	const hasAvatar = !! avatar;
+	const hasAuthor = !! userId;
 	const dateSettings = getDateSettings();
 	const {
 		currentUserAvatar,
@@ -31,25 +30,21 @@ export function NoteByline( { avatar, name, date, userId } ) {
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
-			if ( hasAvatar ) {
+			if ( hasAuthor ) {
 				return {
 					dateFormat: siteSettings?.date_format,
 				};
 			}
 
-			const { getSettings } = select( blockEditorStore );
-			const { __experimentalDiscussionSettings } = getSettings();
-			const defaultAvatar = __experimentalDiscussionSettings?.avatarURL;
 			const userData = getCurrentUser();
 			return {
-				currentUserAvatar:
-					userData?.avatar_urls?.[ 48 ] ?? defaultAvatar,
+				currentUserAvatar: userData?.avatar_urls?.[ 48 ],
 				currentUserName: userData?.name,
 				currentUserId: userData?.id,
 				dateFormat: siteSettings?.date_format,
 			};
 		},
-		[ hasAvatar ]
+		[ hasAuthor ]
 	);
 
 	const commentDate = getDate( date );
@@ -72,12 +67,14 @@ export function NoteByline( { avatar, name, date, userId } ) {
 		<>
 			<Avatar.Root
 				className="editor-collab-sidebar-panel__user-avatar"
+				aria-hidden
 				style={ {
 					borderColor: getAvatarBorderColor(
 						userId ?? currentUserId
 					),
 				} }
 			>
+				<Avatar.Fallback delay={ 300 } />
 				<Avatar.Image src={ avatar || currentUserAvatar } alt="" />
 			</Avatar.Root>
 			<Stack
