@@ -2,7 +2,11 @@ import { Component } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import type { ComponentType } from 'react';
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
-import type { WithStateHOC, WithStateInnerProps } from './types';
+import type {
+	WithInjectedProps,
+	WithoutInjectedProps,
+} from '../../utils/create-higher-order-component';
+import type { WithStateInnerProps } from './types';
 
 /**
  * A Higher Order Component used to provide and manage internal component state
@@ -10,7 +14,7 @@ import type { WithStateHOC, WithStateInnerProps } from './types';
  *
  * @deprecated Use `useState` instead.
  *
- * @param      initialState Optional initial state of the component.
+ * @param {Object} [initialState] Optional initial state of the component.
  *
  * @return A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
  */
@@ -22,27 +26,41 @@ export default function withState< TState extends object = object >(
 		alternative: 'wp.element.useState',
 	} );
 
-	type Inner = ComponentType< WithStateInnerProps< TState > >;
+	return createHigherOrderComponent(
+		< C extends WithInjectedProps< C, WithStateInnerProps< TState > > >(
+			OriginalComponent: C
+		) => {
+			type OwnProps = WithoutInjectedProps<
+				C,
+				WithStateInnerProps< TState >
+			>;
+			// A concrete type, since JSX cannot resolve the props of a generic `C`.
+			const Inner: ComponentType<
+				OwnProps & WithStateInnerProps< TState >
+			> = OriginalComponent;
+			return class WrappedComponent extends Component<
+				OwnProps,
+				TState
+			> {
+				constructor( props: OwnProps ) {
+					super( props );
 
-	return createHigherOrderComponent( ( OriginalComponent: Inner ) => {
-		return class WrappedComponent extends Component< object, TState > {
-			constructor( props: object ) {
-				super( props );
+					this.setState = this.setState.bind( this );
 
-				this.setState = this.setState.bind( this );
+					this.state = initialState;
+				}
 
-				this.state = initialState;
-			}
-
-			render() {
-				return (
-					<OriginalComponent
-						{ ...this.props }
-						{ ...this.state }
-						setState={ this.setState }
-					/>
-				);
-			}
-		};
-	}, 'withState' ) as WithStateHOC< TState >;
+				render() {
+					return (
+						<Inner
+							{ ...this.props }
+							{ ...this.state }
+							setState={ this.setState }
+						/>
+					);
+				}
+			};
+		},
+		'withState'
+	);
 }

@@ -656,7 +656,7 @@ A Higher Order Component used to provide and manage internal component state via
 
 _Parameters_
 
-- _initialState_ `TState`: Optional initial state of the component.
+- _initialState_ `[Object]`: Optional initial state of the component.
 
 _Returns_
 
