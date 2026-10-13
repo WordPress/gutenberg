@@ -135,7 +135,7 @@ _Parameters_
 
 _Returns_
 
-- A new value with the format applied.
+- `RichTextValue`: A new value with the format applied.
 
 ### concat
 
@@ -147,7 +147,7 @@ _Parameters_
 
 _Returns_
 
-- A new value combining all given records.
+- `RichTextValue`: A new value combining all given records.
 
 ### create
 
@@ -178,7 +178,7 @@ _Parameters_
 
 _Returns_
 
-- A rich text value.
+- `RichTextValue`: A rich text value.
 
 ### EventCallbacksSet
 
@@ -195,7 +195,7 @@ _Parameters_
 
 _Returns_
 
-- Active format object of the specified type, or undefined.
+- `RichTextFormat | undefined`: Active format object of the specified type, or undefined.
 
 ### getActiveFormats
 
@@ -208,7 +208,7 @@ _Parameters_
 
 _Returns_
 
-- Active format objects.
+- `RichTextFormatList`: Active format objects.
 
 ### getActiveObject
 
@@ -236,7 +236,7 @@ _Returns_
 
 ### insert
 
-Insert a Rich Text value, an HTML string, or a plain text string, into a Rich Text value at the given `startIndex`. Any content between `startIndex` and `endIndex` will be removed. Indices are retrieved from the selection if none are provided.
+Insert a Rich Text value, an HTML string, or a plain text string, into a Rich Text value at the given `startIndex`. Any content between `startIndex` and `endIndex` will be removed. Indices are retrieved from the selection if none are provided. Without a selection, the value is appended.
 
 _Parameters_
 
@@ -247,7 +247,7 @@ _Parameters_
 
 _Returns_
 
-- A new value with the value inserted.
+- `RichTextValue & { start: number; end: number; }`: A new value with the value inserted.
 
 ### insertObject
 
@@ -301,7 +301,7 @@ _Parameters_
 
 _Returns_
 
-- A new combined value.
+- `RichTextValue`: A new combined value.
 
 ### privateApis
 
@@ -318,7 +318,7 @@ _Parameters_
 
 _Returns_
 
-- The format, if it has been successfully registered; otherwise `undefined`.
+- `FormatType | undefined`: The format, if it has been successfully registered; otherwise `undefined`.
 
 ### remove
 
@@ -347,7 +347,7 @@ _Parameters_
 
 _Returns_
 
-- A new value with the format applied.
+- `RichTextValue`: A new value with the format applied.
 
 ### replace
 
@@ -404,7 +404,7 @@ _Parameters_
 
 _Returns_
 
-- A new extracted value.
+- `RichTextValue`: A new extracted value.
 
 ### split
 
@@ -418,7 +418,7 @@ _Parameters_
 
 _Returns_
 
-- An array of new values.
+- `RichTextValue[] | undefined`: An array of new values.
 
 ### store
 
@@ -439,7 +439,7 @@ _Parameters_
 
 _Returns_
 
-- A new value with the format applied or removed.
+- `RichTextValue`: A new value with the format applied or removed.
 
 ### toHTMLString
 
@@ -453,7 +453,7 @@ _Parameters_
 
 _Returns_
 
-- HTML string.
+- `string`: HTML string.
 
 ### unregisterFormatType
 
@@ -465,7 +465,7 @@ _Parameters_
 
 _Returns_
 
-- The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+- `FormatType | undefined`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 ### useAnchor
 
