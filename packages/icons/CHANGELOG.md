@@ -9,7 +9,7 @@
 
 ### Enhancements
 
--   Scale icon artwork by up to 1.25× so icons better fill their 24×24 canvas. `*-small` variants and the WordPress mark are unchanged.
+-   Scale icon artwork by up to 1.25× so icons better fill their 24×24 canvas. `*-small` variants and the WordPress mark are unchanged ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
 
 ## 18.0.0 (2026-10-07)
 
