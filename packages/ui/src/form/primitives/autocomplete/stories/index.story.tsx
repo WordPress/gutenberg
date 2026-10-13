@@ -4,8 +4,6 @@ import { Fragment, useRef, useState } from '@wordpress/element';
 import { search } from '@wordpress/icons';
 import * as Autocomplete from '../index';
 import { Icon } from '../../../../icon';
-import { Spinner } from '../../../../spinner';
-import { Stack } from '../../../../stack';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import { Input } from '../../input';
 import { InputLayout } from '../../input-layout';
@@ -29,6 +27,7 @@ const meta: Meta< typeof Autocomplete.Root > = {
 	id: 'design-system-components-form-primitives-autocomplete',
 	component: Autocomplete.Root,
 	subcomponents: {
+		'Autocomplete.LoadingIndicator': Autocomplete.LoadingIndicator,
 		'Autocomplete.Portal': Autocomplete.Portal,
 		'Autocomplete.Positioner': Autocomplete.Positioner,
 		'Autocomplete.Popup': Autocomplete.Popup,
@@ -243,10 +242,7 @@ export const AsyncItems: Story = {
 				<Autocomplete.Popup>
 					<Autocomplete.Status>
 						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
+							<Autocomplete.LoadingIndicator />
 						) : (
 							<HiddenResultCount />
 						) }

@@ -1,3 +1,4 @@
+import { LoadingIndicator } from '../combobox/loading-indicator';
 import { Item } from '../combobox/item';
 import { ItemDescription } from '../combobox/item-description';
 import { ItemLabel } from '../combobox/item-label';
@@ -26,6 +27,7 @@ export const SearchableChipSelect = Object.assign( _SearchableChipSelect, {
 	Item,
 	ItemLabel,
 	ItemDescription,
+	LoadingIndicator,
 	ChipWithRemove,
 	Group,
 	GroupLabel,

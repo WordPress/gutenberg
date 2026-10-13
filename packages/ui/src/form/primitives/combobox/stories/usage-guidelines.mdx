@@ -12,3 +12,20 @@ When `Combobox.Input` is inside `Combobox.Popup`, the popup renders with `role="
 The default example labels the trigger and popup as Fruit, and the input as Search. Preserve all three names when adapting the example.
 
 <Canvas of={ ComboboxStories.Default } />
+
+## Show loading inside Status
+
+Keep `Combobox.Status` mounted and render `Combobox.LoadingIndicator` inside it while fetching items. The indicator includes a spinner and a translated Loading… message, with the same row layout as popup items. Pass `children` to replace the message. Use `Combobox.Empty` for an empty result, and hide its content while loading.
+
+```jsx
+<Combobox.Status>
+	{ loading ? (
+		<Combobox.LoadingIndicator>Loading fruit…</Combobox.LoadingIndicator>
+	) : null }
+</Combobox.Status>
+<Combobox.Empty>{ loading ? null : 'No results found.' }</Combobox.Empty>
+```
+
+`Autocomplete.LoadingIndicator` follows the same pattern inside `Autocomplete.Status`. For `SearchableSelect`, `SearchableChipSelect`, and their controls, pass the corresponding `LoadingIndicator` as `statusContent` and `emptyContent={ loading ? null : undefined }`.
+
+<Canvas of={ ComboboxStories.AsyncItems } />

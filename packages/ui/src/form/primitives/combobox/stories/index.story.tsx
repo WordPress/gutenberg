@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment, useRef, useState } from '@wordpress/element';
 import * as Combobox from '../index';
-import { Spinner } from '../../../../spinner';
-import { Stack } from '../../../../stack';
 import { VisuallyHidden } from '../../../../visually-hidden';
 import {
 	ITEMS,
@@ -20,6 +18,7 @@ const meta: Meta< typeof Combobox.Root > = {
 	id: 'design-system-components-form-primitives-combobox',
 	component: Combobox.Root,
 	subcomponents: {
+		'Combobox.LoadingIndicator': Combobox.LoadingIndicator,
 		'Combobox.Trigger': Combobox.Trigger,
 		'Combobox.Portal': Combobox.Portal,
 		'Combobox.Positioner': Combobox.Positioner,
@@ -332,10 +331,7 @@ export const AsyncItems: Story = {
 					</div>
 					<Combobox.Status>
 						{ loading ? (
-							<Stack direction="row" gap="sm" align="center">
-								<Spinner />
-								Loading…
-							</Stack>
+							<Combobox.LoadingIndicator />
 						) : (
 							<HiddenResultCount />
 						) }
@@ -601,4 +597,64 @@ export const PopupWidth: Story = {
 			</Combobox.Popup>
 		</Combobox.Root>
 	),
+};
+
+/**
+ * Use children to customize the loading message. The spinner and message
+ * share the prefix and label layout of regular and creatable items.
+ */
+export const WithLoadingIndicator: Story = {
+	render: function Template( args ) {
+		const items = ITEMS.slice( 0, 2 );
+		const creatableItem = {
+			value: 'new-fruit',
+			label: 'Create a new fruit',
+		};
+		return (
+			<Combobox.Root { ...args } items={ [ ...items, creatableItem ] }>
+				<Combobox.Trigger aria-label="Fruit" />
+				<Combobox.Popup aria-label="Fruit" width="sm">
+					<div style={ inputWrapperStyle }>
+						<Combobox.Input
+							aria-label="Search"
+							placeholder="Search"
+						/>
+					</div>
+					<Combobox.Status>
+						<Combobox.LoadingIndicator>
+							Loading more fruit from the available suppliers…
+						</Combobox.LoadingIndicator>
+					</Combobox.Status>
+					<Combobox.List>
+						<Combobox.ListBody>
+							<Combobox.Collection>
+								{ ( item: FixtureItem ) =>
+									item.value !== creatableItem.value && (
+										<Combobox.Item
+											key={ item.value }
+											value={ item }
+										>
+											<Combobox.ItemLabel>
+												{ item.label }
+											</Combobox.ItemLabel>
+										</Combobox.Item>
+									)
+								}
+							</Combobox.Collection>
+						</Combobox.ListBody>
+						<Combobox.ListFooter>
+							<Combobox.Item
+								value={ creatableItem }
+								variant="creatable"
+							>
+								<Combobox.ItemLabel>
+									{ creatableItem.label }
+								</Combobox.ItemLabel>
+							</Combobox.Item>
+						</Combobox.ListFooter>
+					</Combobox.List>
+				</Combobox.Popup>
+			</Combobox.Root>
+		);
+	},
 };

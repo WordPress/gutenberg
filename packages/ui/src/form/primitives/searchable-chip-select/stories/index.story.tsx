@@ -19,6 +19,8 @@ const meta: Meta< typeof SearchableChipSelect > = {
 	id: 'design-system-components-form-primitives-searchablechipselect',
 	component: SearchableChipSelect,
 	subcomponents: {
+		'SearchableChipSelect.LoadingIndicator':
+			SearchableChipSelect.LoadingIndicator,
 		'SearchableChipSelect.Group': SearchableChipSelect.Group,
 		'SearchableChipSelect.GroupLabel': SearchableChipSelect.GroupLabel,
 		'SearchableChipSelect.Separator': SearchableChipSelect.Separator,
