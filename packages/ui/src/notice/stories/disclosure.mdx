@@ -1,0 +1,28 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as DisclosureStories from './disclosure.story';
+
+<Meta of={ DisclosureStories } />
+
+# Notice with disclosed details
+
+Compose `Notice` with `Collapsible` to keep a short message visible and let users reveal supplementary details. This example explores the approach discussed in [Gutenberg PR #82496](https://github.com/WordPress/gutenberg/pull/82496#issuecomment-6141339677).
+
+<Canvas of={ DisclosureStories.WithDetails } />
+
+## Composition
+
+`Collapsible.Root` renders `Notice.Root`, so the message, actions, and panel remain direct children of the notice's grid. `Collapsible.Trigger` renders a `Notice.ActionButton`. The panel renders `Notice.Description` as a `div`, preserving the notice's typography and alignment without nesting block content inside a span.
+
+The main message and details are separate plain-text strings. Convert server-provided HTML to plain text in the application before passing it to this composition.
+
+## Copying details
+
+The copy button copies only the supplementary details, even while the panel is collapsed. It does not copy the main message or action labels. The application supplies the exact text to `useCopyToClipboard`; `Notice` does not inspect its children or choose the clipboard contents.
+
+After a successful copy, the icon changes to a checkmark and `speak()` announces the confirmation. The button keeps its accessible name, "Copy details". The static notice has no automatic announcement. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for dynamic messages.
+
+## Trying the example
+
+Use Enter or Space on "Show details" to expand the panel. The trigger keeps focus. Tab to "Copy details", activate it, and paste into a text field to inspect the copied text. Copying also works while the panel is collapsed.
+
+Use the story controls to try a longer message or multiline details, and resize the canvas to check wrapping. The panel uses `hiddenUntilFound`, so browser find-in-page can reveal a matching detail in browsers that support `hidden="until-found"`.
