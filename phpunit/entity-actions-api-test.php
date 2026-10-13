@@ -17,12 +17,15 @@
 class Tests_Entity_Actions_API extends WP_UnitTestCase {
 
 	/**
-	 * Sets up each test: the default actions of the tests are registered at
-	 * priority 0, so every test runs against a registry holding actions
-	 * registered before the callbacks hooked at the default priority run.
+	 * Sets up each test: the actions WordPress registers are replaced with
+	 * the default actions of the tests, hooked at priority 0 as WordPress
+	 * registers its own, so every test runs against a registry holding
+	 * actions registered before the callbacks hooked at the default priority
+	 * run.
 	 */
 	public function set_up() {
 		parent::set_up();
+		remove_action( 'wp_entity_actions_api_init', 'gutenberg_register_core_entity_actions', 0 );
 		add_action( 'wp_entity_actions_api_init', array( __CLASS__, 'register_default_actions' ), 0 );
 	}
 
@@ -31,8 +34,9 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 	 *
 	 * Resetting the registry drops the actions a test registered along with
 	 * the defaults; the next read fires `wp_entity_actions_api_init` again and
-	 * registers the defaults anew. The test case removes the callbacks the
-	 * test hooked, the defaults included.
+	 * registers the defaults anew. The test case restores the hooks: it
+	 * removes the callbacks the test hooked, the defaults included, and hooks
+	 * the actions WordPress registers back.
 	 */
 	public function tear_down() {
 		self::reset_registry();

@@ -226,6 +226,9 @@ if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
 	}
 	require_once __DIR__ . '/../build/scripts/core-fields/index.php';
 }
+if ( is_dir( __DIR__ . '/../build/scripts/core-actions' ) ) {
+	require_once __DIR__ . '/../build/scripts/core-actions/index.php';
+}
 
 // Block supports overrides.
 require __DIR__ . '/block-supports/settings.php';

@@ -15,7 +15,8 @@
  *
  * Actions are registered on the `wp_entity_actions_api_init` action, and only there,
  * with {@see wp_register_entity_actions()} and {@see wp_unregister_entity_actions()}. The
- * other functions read the registry.
+ * other functions read the registry. WordPress core registers its own
+ * actions the same way, from packages/core-actions.
  *
  * The functions are defined when core does not ship them. When it does, the
  * core functions read the plugin registry, which replaces the core one on
