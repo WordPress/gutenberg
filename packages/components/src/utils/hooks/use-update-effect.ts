@@ -1,3 +1,4 @@
+import type { DependencyList, EffectCallback } from 'react';
 import { useRef, useEffect } from '@wordpress/element';
 
 /**
@@ -5,10 +6,10 @@ import { useRef, useEffect } from '@wordpress/element';
  * Source:
  * https://github.com/ariakit/ariakit/blob/main/packages/ariakit-react-core/src/utils/hooks.ts
  *
- * @param {React.EffectCallback} effect
- * @param {React.DependencyList} deps
+ * @param effect
+ * @param deps
  */
-function useUpdateEffect( effect, deps ) {
+function useUpdateEffect( effect: EffectCallback, deps: DependencyList ) {
 	const mountedRef = useRef( false );
 	useEffect( () => {
 		if ( mountedRef.current ) {

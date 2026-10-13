@@ -1,15 +1,8 @@
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { isValueDefined, getDefinedValue } from '../values';
+import type { ControlledStateOptions } from './types';
 
-/**
- * @template T
- * @typedef Options
- * @property {T}      [initial] Initial value
- * @property {T | ""} fallback  Fallback value
- */
-
-/** @type {Readonly<{ initial: undefined, fallback: '' }>} */
-const defaultOptions = {
+const defaultOptions: Readonly< { initial: undefined; fallback: '' } > = {
 	initial: undefined,
 	/**
 	 * Defaults to empty string, as that is preferred for usage with
@@ -34,14 +27,15 @@ const defaultOptions = {
  * Unlike the basic useState hook, useControlledState's state can
  * be updated if a new incoming prop value is changed.
  *
- * @template T
+ * @param currentState             The current value.
+ * @param [options=defaultOptions] Additional options for the hook.
  *
- * @param {T | undefined} currentState             The current value.
- * @param {Options<T>}    [options=defaultOptions] Additional options for the hook.
- *
- * @return {[T | "", (nextState: T) => void]} The controlled value and the value setter.
+ * @return The controlled value and the value setter.
  */
-function useControlledState( currentState, options = defaultOptions ) {
+function useControlledState< T >(
+	currentState: T | undefined,
+	options: ControlledStateOptions< T > = defaultOptions
+): [ T | '', ( nextState: T ) => void ] {
 	const { initial, fallback } = { ...defaultOptions, ...options };
 
 	const [ internalState, setInternalState ] = useState( currentState );
@@ -61,9 +55,8 @@ function useControlledState( currentState, options = defaultOptions ) {
 		fallback
 	);
 
-	/** @type {(nextState: T) => void} */
 	const setState = useCallback(
-		( nextState ) => {
+		( nextState: T ) => {
 			if ( ! hasCurrentState ) {
 				setInternalState( nextState );
 			}

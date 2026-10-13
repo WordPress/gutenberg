@@ -9,10 +9,12 @@ import { CONNECTED_NAMESPACE, COMPONENT_NAMESPACE } from './constants';
  * <div {...ns('Container')} />
  * ```
  *
- * @param {string} componentName The name for the component.
- * @return {Record<string, any>} A props object with the namespaced HTML attribute.
+ * @param componentName The name for the component.
+ * @return A props object with the namespaced HTML attribute.
  */
-export function getNamespace( componentName ) {
+export function getNamespace(
+	componentName: string
+): Record< string, unknown > {
 	return { [ COMPONENT_NAMESPACE ]: componentName };
 }
 
@@ -25,8 +27,8 @@ export function getNamespace( componentName ) {
  * <div {...cns()} />
  * ```
  *
- * @return {Record<string, any>} A props object with the namespaced HTML attribute.
+ * @return A props object with the namespaced HTML attribute.
  */
-export function getConnectedNamespace() {
+export function getConnectedNamespace(): Record< string, unknown > {
 	return { [ CONNECTED_NAMESPACE ]: true };
 }

@@ -1,24 +1,23 @@
+import type { ReactNode } from 'react';
 import warn from '@wordpress/warning';
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 import { useCx } from '../utils/hooks/use-cx';
-
-/**
- * @template TProps
- * @typedef {TProps & { className: string }} ConnectedProps
- */
+import type { ConnectedProps } from './types';
 
 /**
  * Custom hook that derives registered props from the Context system.
  * These derived props are then consolidated with incoming component props.
  *
- * @template {{ className?: string }} P
- * @param {P}      props     Incoming props from the component.
- * @param {string} namespace The namespace to register and to derive context props from.
- * @return {ConnectedProps<P>} The connected props.
+ * @param props     Incoming props from the component.
+ * @param namespace The namespace to register and to derive context props from.
+ * @return The connected props.
  */
-export function useContextSystem( props, namespace ) {
+export function useContextSystem< P extends { className?: string } >(
+	props: P,
+	namespace: string
+) {
 	const contextSystemProps = useComponentsContext();
 	if ( typeof namespace === 'undefined' ) {
 		warn( 'useContextSystem: Please provide a namespace' );
@@ -26,27 +25,21 @@ export function useContextSystem( props, namespace ) {
 
 	const contextProps = contextSystemProps?.[ namespace ] || {};
 
-	/** @type {ConnectedProps<P>} */
-	// @ts-expect-error The initial object cannot satisfy the generic `P`, whose props are copied in below.
 	const finalComponentProps = {
 		...getConnectedNamespace(),
 		...getNamespace( namespace ),
-	};
+	} as ConnectedProps< P >;
 
 	const { _overrides, ...otherContextProps } = contextProps;
-	/** @type {Record<string, unknown>} */
-	const overrideProps = /** @type {Record<string, unknown>} */ ( _overrides );
+	const overrideProps = _overrides as Record< string, unknown >;
 
 	const initialMergedProps = Object.entries( otherContextProps ).length
 		? Object.assign( {}, otherContextProps, props )
 		: props;
-	/**
-	 * @type {P & {
-	 *   children?: React.ReactNode,
-	 *   renderChildren?: (props: P) => React.ReactNode
-	 * }}
-	 */
-	const propsWithChildren = initialMergedProps;
+	const propsWithChildren: P & {
+		children?: ReactNode;
+		renderChildren?: ( props: P ) => ReactNode;
+	} = initialMergedProps;
 
 	const cx = useCx();
 
@@ -62,20 +55,20 @@ export function useContextSystem( props, namespace ) {
 			: propsWithChildren.children;
 
 	for ( const key in initialMergedProps ) {
-		// @ts-expect-error A string key cannot index the merged props type.
-		finalComponentProps[ key ] = initialMergedProps[ key ];
+		( finalComponentProps as Record< string, unknown > )[ key ] =
+			initialMergedProps[ key ];
 	}
 
 	for ( const key in overrideProps ) {
-		// @ts-expect-error A string key cannot index the merged props type.
-		finalComponentProps[ key ] = overrideProps[ key ];
+		( finalComponentProps as Record< string, unknown > )[ key ] =
+			overrideProps[ key ];
 	}
 
 	// Setting an `undefined` explicitly can cause unintended overwrites
 	// when a `cloneElement()` is involved.
 	if ( rendered !== undefined ) {
-		// @ts-expect-error `children` does not exist on `ConnectedProps<P>`.
-		finalComponentProps.children = rendered;
+		( finalComponentProps as Record< string, unknown > ).children =
+			rendered;
 	}
 
 	finalComponentProps.className = classes;

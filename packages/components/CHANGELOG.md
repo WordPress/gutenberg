@@ -28,6 +28,7 @@
 ### Internal
 
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
+-   Refactor the remaining source files and utility tests to TypeScript.
 
 ## 42.0.0 (2026-10-07)
 
