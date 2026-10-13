@@ -6326,7 +6326,7 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/page-attributes/order.jsx": {
+	"packages/editor/src/components/page-attributes/menu-order.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
 		},
@@ -6347,7 +6347,7 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/page-attributes/test/order.jsdom.test.jsx": {
+	"packages/editor/src/components/page-attributes/test/menu-order.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

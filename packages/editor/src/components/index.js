@@ -19,7 +19,7 @@ export { default as EditorSnackbars } from './editor-snackbars';
 export { default as ErrorBoundary } from './error-boundary';
 export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
-export { default as PageAttributesOrder } from './page-attributes/order';
+export { default as PageAttributesOrder } from './page-attributes/menu-order';
 export { default as PageAttributesPanel } from './page-attributes/panel';
 export { default as PageAttributesParent } from './page-attributes/parent';
 export { default as PageTemplate } from './post-template/classic-theme';

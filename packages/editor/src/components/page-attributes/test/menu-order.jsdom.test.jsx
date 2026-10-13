@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect, useDispatch } from '@wordpress/data';
-import PageAttributesOrder from '../order';
+import PageAttributesOrder from '../menu-order';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
