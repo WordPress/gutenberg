@@ -12,6 +12,11 @@ final class SelectionTests: XCTestCase {
 
 	override func setUpWithError() throws {
 		continueAfterFailure = false
+
+		// The first synthesized touch of a run can lose its lift inside the
+		// simulator. Spend it on the status bar of the home screen.
+		let springboard = XCUIApplication( bundleIdentifier: "com.apple.springboard" )
+		springboard.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.01 ) ).tap()
 	}
 
 	override func tearDownWithError() throws {

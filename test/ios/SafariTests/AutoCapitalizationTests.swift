@@ -19,6 +19,13 @@ final class AutoCapitalizationTests: XCTestCase {
 
 	override func setUpWithError() throws {
 		continueAfterFailure = false
+
+		// The first synthesized touch of a run can lose its lift inside the
+		// simulator: backboardd registers the virtual digitizer after its
+		// first event arrives. Spend that touch on the status bar of the home
+		// screen, before Safari is up, where it changes nothing.
+		let springboard = XCUIApplication( bundleIdentifier: "com.apple.springboard" )
+		springboard.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.01 ) ).tap()
 	}
 
 	/// Each test leaves its post open and unsaved. Ending Safari keeps the
