@@ -4,6 +4,7 @@ import {
 	Spinner,
 	Placeholder,
 	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -23,7 +24,7 @@ import { inertValue } from '@wordpress/react-inert-value';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { prependHTTPS } from '@wordpress/url';
+import { getFilename, prependHTTPS } from '@wordpress/url';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import {
 	useUploadMediaFromBlobURL,
@@ -34,6 +35,7 @@ import TracksEditor from './tracks-editor';
 import Tracks from './tracks';
 import { Caption } from '../utils/caption';
 import PosterImage from '../utils/poster-image';
+import { MediaControl } from '../utils/media-control';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 
@@ -186,50 +188,94 @@ function VideoEdit( {
 		className: classes,
 	} );
 
+	/*
+	 * Rendered whether or not a video has been set, so that a video block in its
+	 * setup state can be given media from the toolbar and the inspector as well
+	 * as from the placeholder.
+	 */
+	const mediaToolbar = isSingleSelected && (
+		<BlockControls group="other">
+			<MediaReplaceFlow
+				mediaId={ id }
+				mediaURL={ src }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				accept="video/*"
+				onSelect={ onSelectVideo }
+				onSelectURL={ onSelectURL }
+				onError={ onUploadError }
+				onReset={ () => onSelectVideo( undefined ) }
+				name={ src ? __( 'Replace' ) : __( 'Add video' ) }
+				variant="toolbar"
+			/>
+		</BlockControls>
+	);
+
+	const mediaInspectorPanel = isSingleSelected && (
+		<InspectorControls group="content">
+			<ToolsPanel
+				label={ __( 'Media' ) }
+				resetAll={ () => onSelectVideo( undefined ) }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'Video' ) }
+					hasValue={ () => !! src }
+					onDeselect={ () => onSelectVideo( undefined ) }
+					isShownByDefault
+				>
+					<MediaControl
+						mediaId={ id }
+						mediaUrl={ src }
+						filename={ getFilename( src ) }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="video/*"
+						onSelect={ onSelectVideo }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+						onReset={ () => onSelectVideo( undefined ) }
+						isUploading={ !! temporaryURL }
+						emptyLabel={ __( 'Add video' ) }
+					/>
+				</ToolsPanelItem>
+			</ToolsPanel>
+		</InspectorControls>
+	);
+
 	if ( ! src && ! temporaryURL ) {
 		return (
-			<div { ...blockProps }>
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					onSelect={ onSelectVideo }
-					onSelectURL={ onSelectURL }
-					accept="video/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					value={ attributes }
-					onError={ onUploadError }
-					placeholder={ placeholder }
-				/>
-			</div>
+			<>
+				{ mediaToolbar }
+				{ mediaInspectorPanel }
+				<div { ...blockProps }>
+					<MediaPlaceholder
+						icon={ <BlockIcon icon={ icon } /> }
+						onSelect={ onSelectVideo }
+						onSelectURL={ onSelectURL }
+						accept="video/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						value={ attributes }
+						onError={ onUploadError }
+						placeholder={ placeholder }
+					/>
+				</div>
+			</>
 		);
 	}
 
 	return (
 		<>
 			{ isSingleSelected && (
-				<>
-					<BlockControls>
-						<TracksEditor
-							tracks={ tracks }
-							onChange={ ( newTracks ) => {
-								setAttributes( { tracks: newTracks } );
-							} }
-						/>
-					</BlockControls>
-					<BlockControls group="other">
-						<MediaReplaceFlow
-							mediaId={ id }
-							mediaURL={ src }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="video/*"
-							onSelect={ onSelectVideo }
-							onSelectURL={ onSelectURL }
-							onError={ onUploadError }
-							onReset={ () => onSelectVideo( undefined ) }
-							variant="toolbar"
-						/>
-					</BlockControls>
-				</>
+				<BlockControls>
+					<TracksEditor
+						tracks={ tracks }
+						onChange={ ( newTracks ) => {
+							setAttributes( { tracks: newTracks } );
+						} }
+					/>
+				</BlockControls>
 			) }
+			{ mediaToolbar }
+			{ mediaInspectorPanel }
 			<InspectorControls>
 				<ToolsPanel
 					label={ __( 'Settings' ) }
