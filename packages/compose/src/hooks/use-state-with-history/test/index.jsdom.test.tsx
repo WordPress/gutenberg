@@ -10,7 +10,10 @@ const TestComponent = () => {
 		<div>
 			<input
 				value={ value as string }
-				onChange={ ( event ) => setValue( event.target.value, false ) }
+				onChange={ ( event ) =>
+					// @ts-expect-error Callers omit `isStaged`, which is then `undefined`.
+					setValue( event.target.value )
+				}
 			/>
 			<button className="undo" onClick={ undo } disabled={ ! hasUndo }>
 				Undo
