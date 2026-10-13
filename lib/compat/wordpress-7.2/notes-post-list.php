@@ -144,7 +144,7 @@ function gutenberg_get_unseen_notes_indicator_html( $post ) {
 	}
 
 	return sprintf(
-		'<a class="wp-note-unseen-indicator" href="%1$s"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><path d="M18 5.5H6C5.30964 5.5 4.75 6.05964 4.75 6.75V16V18.4096C4.75 18.8725 5.32471 19.0869 5.62784 18.7371L8 16H18C18.6904 16 19.25 15.4404 19.25 14.75V6.75C19.25 6.05964 18.6904 5.5 18 5.5Z" /></svg><span class="screen-reader-text">%2$s</span></a>',
+		'<a class="wp-note-unseen-indicator" href="%1$s"><span class="screen-reader-text">%2$s</span></a>',
 		esc_url( add_query_arg( 'notes', 'open', $edit_link ) ),
 		sprintf(
 			/* translators: %s: Post title. */
@@ -205,28 +205,26 @@ function gutenberg_add_unseen_notes_indicator_to_post_states( $post_states_html,
 function gutenberg_add_unseen_notes_indicator_styles() {
 	wp_add_inline_style(
 		'list-tables',
+		// The dot sits in a 24px box so the link keeps a usable target size.
 		'.wp-note-unseen-indicator {
-			position: relative;
 			display: inline-flex;
-			margin-inline-start: 4px;
+			align-items: center;
+			justify-content: center;
+			width: 24px;
+			height: 24px;
 			vertical-align: middle;
 		}
-		.wp-note-unseen-indicator::after {
+		.wp-note-unseen-indicator::before {
 			content: "";
-			position: absolute;
-			top: 0;
-			inset-inline-end: -1px;
 			width: 8px;
 			height: 8px;
 			border-radius: 50%;
-			box-shadow: 0 0 0 2px #fff;
 			background: var(--wp-admin-theme-color, #3858e9);
 		}
 		@media (forced-colors: active) {
-			.wp-note-unseen-indicator::after {
+			.wp-note-unseen-indicator::before {
 				forced-color-adjust: none;
-				background: Highlight;
-				box-shadow: 0 0 0 2px Canvas;
+				background: LinkText;
 			}
 		}'
 	);
