@@ -4761,11 +4761,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/navigator/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2
