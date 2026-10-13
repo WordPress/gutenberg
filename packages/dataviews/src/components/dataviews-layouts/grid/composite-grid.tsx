@@ -15,6 +15,7 @@ import {
 	useRef,
 	forwardRef,
 } from '@wordpress/element';
+import { inertValue } from '@wordpress/react-inert-value';
 import { MEDIA_ASPECT_RATIOS } from '../../../constants';
 import ItemActions from '../../dataviews-item-actions';
 import DataViewsSelectionCheckbox from '../../dataviews-selection-checkbox';
@@ -343,7 +344,7 @@ export default function CompositeGrid< Item >( {
 	data,
 	isInfiniteScroll,
 	className,
-	inert,
+	inert = false,
 	isLoading,
 	view,
 	fields,
@@ -452,8 +453,7 @@ export default function CompositeGrid< Item >( {
 						}
 						role="feed"
 						focusWrap
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-						inert={ inert }
+						inert={ inertValue( inert ) }
 					>
 						{ /* Render placeholders for unloaded items in first row */ }
 						{ Array.from( { length: placeholdersNeeded } ).map(
@@ -550,8 +550,7 @@ export default function CompositeGrid< Item >( {
 						aria-busy={ isLoading }
 						aria-rowcount={ totalRows }
 						ref={ resizeObserverRef }
-						// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
-						inert={ inert }
+						inert={ inertValue( inert ) }
 					>
 						{ chunk( data, gridColumns ).map( ( row, i ) => (
 							<Composite.Row

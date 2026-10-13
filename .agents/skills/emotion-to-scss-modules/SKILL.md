@@ -5,22 +5,22 @@ description: Use when planning or implementing an Emotion-to-SCSS-Modules migrat
 
 # Migrate Emotion styles to SCSS Modules
 
-## Establish the scope
+In a Gutenberg checkout, read the relative links below from the checked-out revision. Outside a checkout, resolve them from `.agents/skills/emotion-to-scss-modules/` in [Gutenberg on GitHub](https://github.com/WordPress/gutenberg/tree/trunk).
 
-1. Read the [migration guide](../../../packages/components/emotion-to-scss-modules.md) and the package's [styling conventions](../../../packages/components/CONTRIBUTING.md#styling) before editing.
-2. Identify the requested component or dependency cluster and the baseline revision. Search for imports of its wrappers/style fragments and consumers of its public classes, including outside `packages/components`.
-3. Record the contract and the states at risk using the guide's [contract audit](../../../packages/components/emotion-to-scss-modules.md#establish-the-component-and-consumer-contract). Select a relevant [merged example](../../../packages/components/emotion-to-scss-modules.md#reference-migrations), then check its lesson against current source.
+Read the [migration guide](../../../packages/components/emotion-to-scss-modules.md) and the package's [styling conventions](../../../packages/components/CONTRIBUTING.md#styling) before editing.
 
-## Implement and compare
+## Preserve behavior and consumer overrides
 
-1. Capture baseline behavior for the affected states and at least one relevant composed consumer. For a reported regression, establish a failing test or browser reproduction first.
-2. Apply the guide's [translation rules](../../../packages/components/emotion-to-scss-modules.md#translate-the-styles). Reuse the underlying component or shared polymorphic utility according to the existing contract. Classify values as static, conditional, or genuinely dynamic before choosing Sass, module classes, or custom properties.
-3. Audit the [winning declarations](../../../packages/components/emotion-to-scss-modules.md#preserve-the-winning-declarations) after removing the wrapper. Check consumer overrides, remaining Emotion composition, shorthand/longhand precedence, and nested instances. Explain any required specificity adjustment with the conflicting declaration.
-4. Use the guide's [verification choices](../../../packages/components/emotion-to-scss-modules.md#verify-css-delivery-and-behavior), starting with existing coverage. Private module-class assertions prove wiring only. Check actual styles in a browser, including RTL or root/iframe differences when applicable. Keep fixture-CSS tests limited to the registration or composition mechanism they exercise.
-5. Keep intentional API, interaction, or visual changes explicit and within the requested scope. An older migration's exception does not authorize the same change here.
+1. Identify the requested component and baseline. Search for consumers of its wrappers, style fragments, and public classes, including outside `packages/components`. Use the guide's [contract audit](../../../packages/components/emotion-to-scss-modules.md#establish-the-component-and-consumer-contract) to select affected states and compositions for comparison.
+2. Capture the baseline for those cases. For a reported regression, reproduce it first. Apply the [translation rules](../../../packages/components/emotion-to-scss-modules.md#translate-the-styles), distinguishing static, conditional, and genuinely dynamic values. Preserve the wrapper's element, props, and ref behavior.
+3. Check which declarations win after removing the wrapper. Follow the guide's [cascade checks](../../../packages/components/emotion-to-scss-modules.md#preserve-the-winning-declarations) for consumer overrides and remaining Emotion composition. Justify a specificity change with the actual conflicting declaration.
 
-## Finish
+Keep intentional API, interaction, or visual changes within the agreed scope. Consult a [merged example](../../../packages/components/emotion-to-scss-modules.md#reference-migrations) only when it answers a migration question; an older exception is not a rule for this component.
 
-Follow the guide's [completion checks](../../../packages/components/emotion-to-scss-modules.md#complete-the-migration), including scoped cleanup, whole-repository snapshot review, type checking, builds, generated-file checks, and the current migration changelog convention.
+## Verify the migration
 
-Recheck affected consumers after the last selector edit or rebase. Report the preserved behavior, any agreed change, the real-style evidence, and any unverified case. Do not report visual parity from mocked styles or passing snapshots alone.
+Reuse existing tests and stories. A behavior-preserving migration may need no new tests. Add a focused test only for an uncovered risk introduced by the migration; do not duplicate shared helper or dependency suites. Follow the guide's [verification choices](../../../packages/components/emotion-to-scss-modules.md#verify-css-delivery-and-behavior) and the [testing overview](../../../docs/contributors/code/testing-overview.md#folder-structure).
+
+Compare actual styles for the affected states and consumers, including RTL or another document when relevant. Class assertions and mocked styles cannot prove cascade or visual parity. Recheck affected consumers after subsequent selector changes or a rebase that changes relevant styles.
+
+Follow the [completion checks](../../../packages/components/emotion-to-scss-modules.md#complete-the-migration) for scoped cleanup, affected downstream snapshots, generated files, required checks, and the migration changelog. Report any unverified styling case with reproducible manual steps.

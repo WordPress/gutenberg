@@ -32,6 +32,7 @@ import {
 	InheritanceResetButton,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from '../global-styles/inheritance';
+import { useToolsPanelItemPopoverProps } from '../global-styles/utils';
 import { setImmutably } from '../../utils/object';
 import MediaReplaceFlow from '../media-replace-flow';
 import { store as blockEditorStore } from '../../store';
@@ -42,12 +43,6 @@ import {
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 
-const BACKGROUND_POPOVER_PROPS = {
-	placement: 'left-start',
-	offset: 36,
-	shift: true,
-	className: 'block-editor-global-styles-background-panel__popover',
-};
 const noop = () => {};
 
 /**
@@ -188,6 +183,11 @@ function BackgroundControlsPanel( {
 	hasLocalOverride,
 	containerRef,
 } ) {
+	const popoverProps = {
+		...useToolsPanelItemPopoverProps(),
+		className: 'block-editor-global-styles-background-panel__popover',
+	};
+
 	if ( ! hasImageValue ) {
 		return;
 	}
@@ -196,7 +196,7 @@ function BackgroundControlsPanel( {
 
 	return (
 		<Dropdown
-			popoverProps={ BACKGROUND_POPOVER_PROPS }
+			popoverProps={ popoverProps }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				const toggleProps = {
 					onClick: onToggle,

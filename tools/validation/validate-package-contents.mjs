@@ -5,6 +5,7 @@ import { readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
+import { readNpmPackResult } from './read-npm-pack-result.mjs';
 
 const usage =
 	'Usage: node tools/validation/validate-package-contents.mjs <package-directory> [--disallow-path <path>]';
@@ -67,11 +68,7 @@ if ( packResult.status !== 0 ) {
 	process.exit( packResult.status ?? 1 );
 }
 
-/* npm v12 keys `pack --json` output by package name; older versions return an array. */
-const packOutput = JSON.parse( packResult.stdout );
-const [ pack ] = Array.isArray( packOutput )
-	? packOutput
-	: Object.values( packOutput );
+const pack = readNpmPackResult( packResult.stdout, packageJson.name );
 const packedPaths = pack.files.map( ( { path } ) => path );
 const packedPathSet = new Set( packedPaths );
 const disallowedPathPatterns = [

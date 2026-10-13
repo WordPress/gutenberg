@@ -21,16 +21,14 @@ const { mockSyncManager, mockCreateSyncManager, mockSaveCRDTDoc } = vi.hoisted(
 );
 
 vi.mock( import( '@wordpress/sync' ), () => ( {
-	privateApis: {
-		createSyncManager: mockCreateSyncManager,
-		ConnectionErrorCode: {},
-		Delta: class {},
-		CRDT_DOC_META_PERSISTENCE_KEY: 'crdt-doc-meta',
-		CRDT_RECORD_MAP_KEY: 'crdt-record',
-		LOCAL_EDITOR_ORIGIN: 'local-editor',
-		LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
-		retrySyncConnection: vi.fn(),
-	},
+	createSyncManager: mockCreateSyncManager,
+	ConnectionErrorCode: {},
+	Delta: class {},
+	CRDT_DOC_META_PERSISTENCE_KEY: 'crdt-doc-meta',
+	CRDT_RECORD_MAP_KEY: 'crdt-record',
+	LOCAL_EDITOR_ORIGIN: 'local-editor',
+	LOCAL_UNDO_IGNORED_ORIGIN: 'local-undo-ignored',
+	retrySyncConnection: vi.fn(),
 } ) );
 
 vi.mock( import( '../lock-unlock' ), () => ( {

@@ -11,7 +11,12 @@
 		"global.d.ts",
 		"src/assets/test/script-modules.jsdom.test.ts",
 		"src/assets/test/scs.test.ts",
-		"src/assets/test/styles.jsdom.test.ts"
+		"src/assets/test/styles.jsdom.test.ts",
+		"src/test/fixtures/helpers.ts",
+		"src/test/fixtures/jsdom-setup.ts",
+		"src/test/initiator.jsdom.test.ts",
+		"src/test/lifecycle-navigate.jsdom.test.ts",
+		"src/test/lifecycle-popstate.jsdom.test.ts"
 	],
 	"include": [],
 	"exclude": []

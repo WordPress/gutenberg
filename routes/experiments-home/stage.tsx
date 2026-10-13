@@ -44,8 +44,11 @@ function ExperimentsPage() {
 	const settings = useMemo( () => {
 		const combined: Record< string, boolean > = {};
 
+		// The `siteSettings` field only records experiments that have been
+		// explicitly set by the user. We must fill the defaults from the schema
+		// from `fetchExperiments`.
 		for ( const exp of experiments ?? [] ) {
-			combined[ exp.id ] = false;
+			combined[ exp.id ] = exp.defaultValue;
 		}
 
 		for ( const [ key, value ] of Object.entries( gutenbergExperiments ) ) {

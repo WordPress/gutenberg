@@ -14,7 +14,6 @@ export function RichTextShortcut( { character, type, onUse } ) {
 	const stableOnUse = useEvent( onUse );
 
 	useEffect( () => {
-		const shortcuts = keyboardShortcuts.current;
 		function callback( event ) {
 			if ( isKeyboardEvent[ type ]( event, character ) ) {
 				stableOnUse();
@@ -22,9 +21,9 @@ export function RichTextShortcut( { character, type, onUse } ) {
 			}
 		}
 
-		shortcuts.add( callback );
+		keyboardShortcuts.add( callback );
 		return () => {
-			shortcuts.delete( callback );
+			keyboardShortcuts.delete( callback );
 		};
 	}, [ character, type, keyboardShortcuts, stableOnUse ] );
 

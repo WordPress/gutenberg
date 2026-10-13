@@ -32,11 +32,21 @@ const ALLOWED_NOTE_FORMATS = [
 
 const NOTE_COMPLETERS = [ noteMentionCompleter ];
 
-export function NoteForm( { onSubmit, onCancel, note, labels } ) {
-	const [ inputComment, setInputComment ] = useState(
-		note?.content?.raw ?? ''
-	);
+export function NoteForm( {
+	onSubmit,
+	onCancel,
+	onChange,
+	note,
+	labels,
+	initialValue = note?.content?.raw ?? '',
+} ) {
+	const [ inputComment, setInputComment ] = useState( initialValue );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
+
+	function updateComment( value ) {
+		setInputComment( value );
+		onChange?.( value );
+	}
 
 	const inputId = useInstanceId( NoteForm, 'comment-input' );
 	const trimmedPlainText = sanitizeNoteContent( stripHTML( inputComment ) );
@@ -50,23 +60,15 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 			return;
 		}
 		setIsSubmitting( true );
-		const submitted = inputComment;
 
 		/*
 		 * The note actions resolve with the saved record on success and
 		 * `undefined` on failure (they surface their own error notice),
-		 * so only discard the draft once the save actually succeeded.
+		 * so only discard the content once the save actually succeeded.
 		 */
-		const result = await onSubmit( submitted );
+		const result = await onSubmit( inputComment );
 		if ( result ) {
-			/*
-			 * The field stays editable while the request is in flight, so
-			 * keep anything typed since; clearing unconditionally would
-			 * discard it.
-			 */
-			setInputComment( ( current ) =>
-				current === submitted ? '' : current
-			);
+			updateComment( '' );
 		}
 
 		setIsSubmitting( false );
@@ -101,7 +103,8 @@ export function NoteForm( { onSubmit, onCancel, note, labels } ) {
 				label={ labels?.input ?? __( 'Note' ) }
 				hideLabelFromVision
 				value={ inputComment }
-				onChange={ setInputComment }
+				onChange={ updateComment }
+				disabled={ isSubmitting }
 				placeholder={ labels?.placeholder }
 				allowedFormats={ ALLOWED_NOTE_FORMATS }
 				completers={ NOTE_COMPLETERS }

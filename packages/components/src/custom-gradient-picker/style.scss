@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/mixins" as *;
 
-$components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 16px handles inside, that leaves 32px padding, half of which is 1å6.
+$components-custom-gradient-picker__padding: $grid-unit-20; // Center 16px handles in the 48px bar.
 
 .components-custom-gradient-picker__gradient-bar {
 	border-radius: $radius-small;
@@ -36,9 +36,18 @@ $components-custom-gradient-picker__padding: $grid-unit-20; // 48px container, 1
 		display: flex;
 	}
 
-	.components-custom-gradient-picker__insert-point-dropdown {
-		position: relative;
+	.components-custom-gradient-picker__insert-point-dropdown,
+	.components-custom-gradient-picker__control-point-button {
+		&::before {
+			content: "";
+			position: absolute;
+			// Use the dropdown as the containing block to cover the bar's full
+			// height without changing the handle or overlapping adjacent points.
+			inset: -$components-custom-gradient-picker__padding 0;
+		}
+	}
 
+	.components-custom-gradient-picker__insert-point-dropdown {
 		// Same size as the .components-custom-gradient-picker__control-point-dropdown parent
 		height: inherit;
 		width: inherit;
