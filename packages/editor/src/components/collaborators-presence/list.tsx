@@ -1,5 +1,10 @@
 import { __ } from '@wordpress/i18n';
-import { Popover, Button } from '@wordpress/components';
+import {
+	Popover,
+	Button,
+	__experimentalVStack as VStack,
+	__experimentalText as WCText,
+} from '@wordpress/components';
 import { closeSmall } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 import { speak } from '@wordpress/a11y';
@@ -104,13 +109,21 @@ export function CollaboratorsList( {
 									}
 									dimmed={ ! collaboratorState.isConnected }
 								/>
-								<div className="editor-collaborators-presence__list-item-info">
+								<VStack
+									spacing={ 0 }
+									className="editor-collaborators-presence__list-item-info"
+								>
 									<div className="editor-collaborators-presence__list-item-name">
 										{ isCurrentUser
 											? __( 'You' )
 											: displayName }
 									</div>
-								</div>
+									{ ! collaboratorState.isConnected && (
+										<WCText variant="muted" size={ 12 }>
+											{ __( 'Offline' ) }
+										</WCText>
+									) }
+								</VStack>
 							</button>
 						);
 					} ) }

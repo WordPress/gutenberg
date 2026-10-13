@@ -6130,6 +6130,11 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/collaborators-presence/list.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
 	"packages/editor/src/components/collapsible-block-toolbar/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
