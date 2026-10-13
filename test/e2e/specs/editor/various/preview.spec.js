@@ -19,6 +19,7 @@ test.describe( 'Preview', () => {
 	} );
 
 	test( 'hides viewport dimensions when space is limited and restores them when space returns', async ( {
+		editor,
 		page,
 	} ) => {
 		await page.setViewportSize( { width: 1600, height: 900 } );
@@ -35,6 +36,9 @@ test.describe( 'Preview', () => {
 			.toBe( 781 );
 
 		await page.setViewportSize( { width: 900, height: 900 } );
+		// Keep the footer present while the settings sidebar reduces the
+		// space available to the canvas.
+		await editor.openDocumentSettingsSidebar();
 		await expect(
 			footer.getByText( 'Tablet', { exact: true } )
 		).toBeVisible();

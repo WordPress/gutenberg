@@ -24,7 +24,9 @@
 
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   Block Toolbar: Keep `__unstableBlockToolbarLastItem` fills out of the placeholder toolbar shown on small screens while no block is selected ([#84554](https://github.com/WordPress/gutenberg/pull/84554)).
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
+
 
 ## 18.1.0 (2026-10-07)
 

@@ -4789,11 +4789,6 @@
 			"count": 4
 		}
 	},
-	"packages/components/src/range-control/styles/range-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/select-control/styles/select-control-styles.ts": {
 		"no-restricted-imports": {
 			"count": 2
@@ -4859,7 +4854,7 @@
 			"count": 4
 		}
 	},
-	"packages/components/src/utils/rtl.js": {
+	"packages/components/src/utils/rtl.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -7919,7 +7914,7 @@
 			"count": 1
 		}
 	},
-	"packages/rich-text/src/hook/index.js": {
+	"packages/rich-text/src/hook/index.ts": {
 		"react-hooks/refs": {
 			"count": 8
 		}
