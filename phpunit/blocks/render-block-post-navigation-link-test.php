@@ -239,7 +239,7 @@ class Tests_Blocks_Render_Post_Navigation_Link extends WP_UnitTestCase {
 			$processor->get_attribute( 'class' )
 		);
 		$this->assertSame(
-			'border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;padding-top:20px;margin-top:30px',
+			'border-style:dashed;border-width:3px;box-shadow:10px 10px 5px #000000;min-height:100px;min-width:200px;padding-top:20px;margin-top:30px',
 			$processor->get_attribute( 'style' )
 		);
 	}
