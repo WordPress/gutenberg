@@ -6,9 +6,7 @@
  */
 
 $attributes = get_defined_vars()['attributes'];
-$scenario   = $attributes['scenario'];
 $page       = $attributes['page'];
-$region     = 'router-html-' . $scenario;
 
 if ( 'pending' === $attributes['value'] ) {
 	wp_interactivity_state(
@@ -43,9 +41,8 @@ if ( 'pending' === $attributes['value'] ) {
 
 <div data-wp-interactive="router-html">
 	<div
-		data-testid="main-region"
 		data-wp-interactive="router-html"
-		data-wp-router-region="<?php echo esc_attr( $region ); ?>"
+		data-wp-router-region="router-html-kept"
 		<?php
 		echo wp_interactivity_data_wp_context(
 			array(
@@ -56,18 +53,12 @@ if ( 'pending' === $attributes['value'] ) {
 		?>
 	>
 		<p data-testid="page-content">content from <?php echo esc_html( $page ); ?></p>
-		<?php if ( 'kept' === $scenario ) : ?>
-			<div data-testid="kept-html" data-wp-html="state.html"><i><?php echo 'one' === $page ? 'one' : 'two'; ?></i></div>
-			<div data-testid="never-html" data-wp-html="state.never"><i><?php echo 'one' === $page ? 'never one' : 'never two'; ?></i></div>
-			<p data-testid="value" data-wp-text="state.value">not hydrated</p>
-			<button data-wp-on--click="actions.resolve">Resolve HTML</button>
-		<?php endif; ?>
+		<div data-testid="kept-html" data-wp-html="state.html"><i><?php echo 'one' === $page ? 'one' : 'two'; ?></i></div>
+		<div data-testid="never-html" data-wp-html="state.never"><i><?php echo 'one' === $page ? 'never one' : 'never two'; ?></i></div>
+		<p data-testid="value" data-wp-text="state.value">not hydrated</p>
+		<button data-wp-on--click="actions.resolve">Resolve HTML</button>
 		<?php if ( ! empty( $attributes['next'] ) ) : ?>
 			<a href="<?php echo esc_url( $attributes['next'] ); ?>" data-wp-on--click="actions.navigate">Next</a>
 		<?php endif; ?>
 	</div>
-</div>
-
-<div data-wp-interactive="router-html">
-	<p data-testid="hydration" data-wp-text="state.hydration">not hydrated</p>
 </div>

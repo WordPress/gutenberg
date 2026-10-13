@@ -16,8 +16,6 @@ const tokens = {
 
 const { state } = store( 'router-html', {
 	state: {
-		/** Confirms the fixture script initialized. */
-		hydration: 'hydrated',
 		/** Always empty, including on a kept node. */
 		never: null,
 		/** Returns the destination token, null, or a pending derived value. */

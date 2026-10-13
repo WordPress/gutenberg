@@ -25,18 +25,16 @@ let marks: number;
 /**
  * Builds an interactive router region for the current test's namespace.
  *
- * @param content    Region content.
- * @param id         Region id within the current namespace.
- * @param attributes Additional attributes on the region element.
+ * @param content Region content.
  * @return Region markup.
  */
-const regionHtml = ( content: string, id = 'r', attributes = '' ) =>
+const regionHtml = ( content: string ) =>
 	`<div data-wp-interactive="${ namespace }" data-wp-router-region='${ JSON.stringify(
 		{
 			// Region signals persist across navigations, so ids must be unique.
-			id: `${ namespace }/${ id }`,
+			id: `${ namespace }/r`,
 		}
-	) }' ${ attributes }>${ content }</div>`;
+	) }'>${ content }</div>`;
 
 /**
  * Navigates using supplied destination markup and waits for directive effects.

@@ -6,7 +6,6 @@
 	"category": "text",
 	"icon": "heart",
 	"attributes": {
-		"scenario": { "type": "string" },
 		"page": { "type": "string" },
 		"value": { "type": "string", "default": "null" },
 		"next": { "type": "string" }
