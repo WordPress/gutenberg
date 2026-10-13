@@ -28,6 +28,25 @@ export default meta;
 
 type Story = StoryObj< StoryArgs >;
 
+function CopyDetailsButton( { details }: { details: string } ) {
+	const [ copied, setCopied ] = useState( false );
+	const copyRef = useCopyToClipboard< HTMLButtonElement >( details, () => {
+		setCopied( true );
+		speak( 'Details copied to clipboard.', 'polite' );
+	} );
+
+	return (
+		<IconButton
+			ref={ copyRef }
+			label="Copy details"
+			icon={ copied ? check : copy }
+			size="compact"
+			variant="outline"
+			tone="neutral"
+		/>
+	);
+}
+
 export const WithDetails: Story = {
 	args: {
 		intent: 'error',
@@ -37,14 +56,6 @@ export const WithDetails: Story = {
 	},
 	render: function NoticeWithDetails( { intent, message, details } ) {
 		const [ open, setOpen ] = useState( false );
-		const [ copiedDetails, setCopiedDetails ] = useState< string >();
-		const copyRef = useCopyToClipboard< HTMLButtonElement >(
-			details,
-			() => {
-				setCopiedDetails( details );
-				speak( 'Details copied to clipboard.', 'polite' );
-			}
-		);
 
 		return (
 			<Collapsible.Root
@@ -59,14 +70,7 @@ export const WithDetails: Story = {
 					>
 						{ open ? 'Hide details' : 'Show details' }
 					</Collapsible.Trigger>
-					<IconButton
-						ref={ copyRef }
-						label="Copy details"
-						icon={ copiedDetails === details ? check : copy }
-						size="compact"
-						variant="minimal"
-						tone="neutral"
-					/>
+					<CopyDetailsButton key={ details } details={ details } />
 				</Notice.Actions>
 				<Collapsible.Panel
 					hiddenUntilFound
