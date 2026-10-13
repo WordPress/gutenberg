@@ -42,7 +42,8 @@ export default function FontFamilyControl( {
 		options.find( ( option ) => option.value === ( value || null ) ) ??
 		options[ 0 ];
 
-	// Preserve the public legacy prop contract for callers that customize the control.
+	// Callers can forward legacy props such as describedBy, size, and trigger focus callbacks.
+	// SelectControl does not accept those props with the same behavior.
 	if ( Object.keys( props ).length ) {
 		const legacyOptions = options.map(
 			( { value: key, label: name, style } ) => ( {

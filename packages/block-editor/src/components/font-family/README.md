@@ -72,4 +72,4 @@ The current font family value.
 - Required: No
 - Default: ''
 
-The rest of the props are passed down to the legacy `CustomSelectControl`. When no additional props are supplied, the component uses `SelectControl` from `@wordpress/ui`. The `onChange` callback receives the font family string, including an empty string for Default.
+The rest of the props are passed down to the legacy `CustomSelectControl`. This preserves props such as `describedBy`, `size`, and focus callbacks on the trigger, which `SelectControl` from `@wordpress/ui` does not accept with the same behavior. When no additional props are supplied, the component uses `SelectControl`. The `onChange` callback receives the font family string, including an empty string for Default.
