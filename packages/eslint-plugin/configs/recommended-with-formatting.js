@@ -1,3 +1,6 @@
+// Exclude bundled WordPress packages from the list.
+const wpPackagesRegExp = '^@wordpress/(?!(icons|interface))';
+
 module.exports = {
 	parser: 'babel-eslint',
 	extends: [
@@ -16,6 +19,9 @@ module.exports = {
 		document: true,
 		wp: 'readonly',
 	},
+	settings: {
+		'import/internal-regex': wpPackagesRegExp,
+	},
 	rules: {
 		'import/no-extraneous-dependencies': [
 			'error',
@@ -23,7 +29,12 @@ module.exports = {
 				peerDependencies: true,
 			},
 		],
-		'import/no-unresolved': 'error',
+		'import/no-unresolved': [
+			'error',
+			{
+				ignore: [ wpPackagesRegExp ],
+			},
+		],
 		'import/default': 'warn',
 		'import/named': 'warn',
 	},
