@@ -68,44 +68,53 @@ test.describe( 'Autosave failure notice', () => {
 		);
 	} );
 
-	for ( const [ title, failure, details ] of [
-		[ 'PHP fatal error', 'fatal-error', null ],
-		[ 'database connection lost', 'database-connection', null ],
-		[ 'error message containing a link', 'link-in-message', null ],
-		[ 'connection dropped before a response', 'dropped-connection', null ],
-		[ 'error without a message', 'no-message', null ],
+	for ( const [ title, failure, notice ] of [
+		[ 'PHP fatal error', 'fatal-error', AUTOSAVE_FAILED ],
+		[ 'database connection lost', 'database-connection', AUTOSAVE_FAILED ],
+		[
+			'error message containing a link',
+			'link-in-message',
+			AUTOSAVE_FAILED,
+		],
+		[
+			'connection dropped before a response',
+			'dropped-connection',
+			AUTOSAVE_FAILED,
+		],
+		[ 'error without a message', 'no-message', AUTOSAVE_FAILED ],
 		[
 			'error with a plain text message',
 			'plain-message',
-			'Something went wrong on the server.',
+			withDetails( 'Something went wrong on the server.' ),
 		],
 		[
 			'permission denied',
 			'permission',
-			'Sorry, you are not allowed to edit this post.',
+			withDetails( 'Sorry, you are not allowed to edit this post.' ),
 		],
 		[
 			'database write failed',
 			'database-write',
-			'Could not update post in the database.',
+			withDetails( 'Could not update post in the database.' ),
 		],
 		[
 			'HTML error page',
 			'bad-gateway',
-			'The response is not a valid JSON response.',
+			withDetails( 'The response is not a valid JSON response.' ),
 		],
 		[
 			'PHP fatal error printed before the JSON',
 			'fatal-error-displayed',
-			'The response is not a valid JSON response.',
+			withDetails( 'The response is not a valid JSON response.' ),
 		],
+		[ 'response body of 0', 'zero', null ],
 	] ) {
 		test( title, async ( { autosaveFailure } ) => {
 			await autosaveFailure.fail( failure );
 			await autosaveFailure.autosave();
-			expect( await autosaveFailure.getNotices() ).toEqual( [
-				details === null ? AUTOSAVE_FAILED : withDetails( details ),
-			] );
+			expect( await autosaveFailure.getNotices() ).toEqual(
+				notice === null ? [] : [ notice ]
+			);
 		} );
 	}
 
@@ -137,31 +146,23 @@ test.describe( 'Autosave failure notice', () => {
 		] );
 	} );
 
-	test.describe( 'no notice', () => {
-		test( 'response body of 0', async ( { autosaveFailure } ) => {
-			await autosaveFailure.fail( 'zero' );
-			await autosaveFailure.autosave();
-			expect( await autosaveFailure.getNotices() ).toEqual( [] );
+	test( 'expired nonce is refreshed and the autosave retried', async ( {
+		autosaveFailure,
+		page,
+	} ) => {
+		const statuses = [];
+		page.on( 'response', ( response ) => {
+			if ( isAutosaveRequest( response.request() ) ) {
+				statuses.push( response.status() );
+			}
 		} );
-
-		test( 'expired nonce is refreshed and the autosave retried', async ( {
-			autosaveFailure,
-			page,
-		} ) => {
-			const statuses = [];
-			page.on( 'response', ( response ) => {
-				if ( isAutosaveRequest( response.request() ) ) {
-					statuses.push( response.status() );
-				}
-			} );
-			await page.evaluate( () => {
-				window.wp.apiFetch.nonceMiddleware.nonce = 'expired';
-			} );
-			await autosaveFailure.autosave();
-
-			expect( statuses ).toEqual( [ 403, 200 ] );
-			expect( await autosaveFailure.getNotices() ).toEqual( [] );
+		await page.evaluate( () => {
+			window.wp.apiFetch.nonceMiddleware.nonce = 'expired';
 		} );
+		await autosaveFailure.autosave();
+
+		expect( statuses ).toEqual( [ 403, 200 ] );
+		expect( await autosaveFailure.getNotices() ).toEqual( [] );
 	} );
 
 	test.describe( 'after a failure', () => {
