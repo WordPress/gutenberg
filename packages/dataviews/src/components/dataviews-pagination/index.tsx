@@ -87,6 +87,8 @@ export function DataViewsPageSelect( { className }: { className?: string } ) {
 							<Select.Popup
 								width="content"
 								positioner={
+									// Item alignment currently removes the popup height limit.
+									// Anchor the popup instead so long page lists stay scrollable.
 									<Select.Positioner
 										alignItemWithTrigger={ false }
 									/>
