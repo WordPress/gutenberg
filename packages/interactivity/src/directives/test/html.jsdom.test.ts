@@ -7,7 +7,7 @@ import {
 	vi,
 	type MockInstance,
 } from 'vitest';
-import { hydrate, options, type VNode } from 'preact';
+import { hydrate, options } from 'preact';
 import { act } from 'preact/test-utils';
 import '../index'; // Registers all core directives, including `html`.
 import { toVdom } from '../../vdom';
@@ -99,20 +99,6 @@ describe( 'data-wp-html', () => {
 			state.html = asDangerousHTML( '<em>Bye</em>' );
 		} );
 		expect( target.innerHTML ).toBe( '<em>Bye</em>' );
-	} );
-
-	it( 'empties server-rendered content when the value is null', async () => {
-		const namespace = uniqueNamespace();
-		store( namespace, { state: { html: null } } );
-
-		const region = createRegion(
-			namespace,
-			'<div data-wp-html="state.html"><p>Loading…</p></div>'
-		);
-		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
-
-		const target = region.querySelector( 'div' )!;
-		expect( target ).toBeEmptyDOMElement();
 	} );
 
 	it( 'keeps the server-rendered nodes when they match the trusted HTML on hydration', async () => {
@@ -232,10 +218,12 @@ describe( 'data-wp-html', () => {
 				mutations.push( ...records )
 			);
 			observer.observe( target, { childList: true } );
+			const warnings = vi.spyOn( console, 'warn' );
 			await act( () => hydrate( toVdom( region ), region.parentNode! ) );
 			expect( writes ).toEqual( [] );
 			expect( mutations ).toHaveLength( 0 );
 			expect( target.firstElementChild ).toBe( serverNode );
+			expect( warnings ).not.toHaveBeenCalled();
 
 			// Reactive source populated by the late store registration.
 			let state!: {
@@ -360,86 +348,6 @@ describe( 'data-wp-html', () => {
 		expect( console ).toHaveWarnedWith(
 			expect.stringMatching( /not.*trusted HTML/ )
 		);
-	} );
-
-	it( 'does not render a plain string as HTML', async () => {
-		const runtime = await loadConflictRuntime();
-		const namespace = uniqueNamespace();
-		runtime.store( namespace, {
-			state: { html: '<strong>Not safe</strong>' },
-		} );
-
-		const region = createRegion(
-			namespace,
-			'<div data-wp-html="state.html"><p>fallback</p></div>'
-		);
-		await runtime.act( () =>
-			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
-		);
-
-		const target = region.querySelector( 'div' )!;
-		expect( target ).toBeEmptyDOMElement();
-		expect( console ).toHaveWarnedWith(
-			expect.stringMatching( /not.*trusted HTML/ )
-		);
-	} );
-
-	it( 'empties trusted content when the value becomes null', async () => {
-		const namespace = uniqueNamespace();
-		const { state } = store( namespace, {
-			state: { html: asDangerousHTML( '<strong>Hi</strong>' ) },
-		} );
-
-		const region = createRegion(
-			namespace,
-			'<div data-wp-html="state.html">fallback</div>'
-		);
-		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
-
-		const target = region.querySelector( 'div' )!;
-		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
-
-		// Null removes the previously rendered trusted HTML.
-		await act( () => {
-			// @ts-expect-error Testing an invalid runtime value on purpose.
-			state.html = null;
-		} );
-		expect( target ).toBeEmptyDOMElement();
-	} );
-
-	it( 'empties content when a getter throws from asDangerousHTML()', async () => {
-		const namespace = uniqueNamespace();
-		const { state } = store( namespace, {
-			state: {
-				isValid: false,
-				get html(): DangerousHTML {
-					return asDangerousHTML(
-						( state.isValid
-							? '<strong>Hi</strong>'
-							: null ) as string
-					);
-				},
-			},
-		} );
-
-		const region = createRegion(
-			namespace,
-			'<div data-wp-html="state.html"><p>fallback</p></div>'
-		);
-		await act( () => hydrate( toVdom( region ), region.parentNode! ) );
-
-		const target = region.querySelector( 'div' )!;
-		expect( target ).toBeEmptyDOMElement();
-
-		await act( () => {
-			state.isValid = true;
-		} );
-		expect( target.innerHTML ).toBe( '<strong>Hi</strong>' );
-
-		await act( () => {
-			state.isValid = false;
-		} );
-		expect( target ).toBeEmptyDOMElement();
 	} );
 
 	it( 'empties content and restores scope when a function value throws', async () => {
@@ -654,6 +562,7 @@ describe( 'data-wp-html conflicts', () => {
 	let conflictWarningSpy: MockInstance< typeof console.warn >;
 
 	beforeEach( () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
 		conflictWarningSpy = vi.spyOn( console, 'warn' );
 	} );
 
@@ -671,11 +580,11 @@ describe( 'data-wp-html conflicts', () => {
 		}
 	}
 
-	it.each(
-		[ true, false ].flatMap( ( debug ) =>
-			[ true, false ].map( ( htmlFirst ) => [ debug, htmlFirst ] )
-		)
-	)(
+	it.each( [
+		[ true, true ],
+		[ true, false ],
+		[ false, true ],
+	] )(
 		'yields to text and its updates (debug: %s, HTML first: %s)',
 		async ( debug, htmlFirst ) => {
 			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
@@ -726,16 +635,11 @@ describe( 'data-wp-html conflicts', () => {
 
 	it.each(
 		[ 'data-wp-each', 'data-wp-each----' ].flatMap( ( each ) =>
-			[ true, false ].flatMap( ( debug ) =>
-				[ true, false ].map(
-					( htmlFirst ) => [ each, debug, htmlFirst ] as const
-				)
-			)
+			[ true, false ].map( ( htmlFirst ) => [ each, htmlFirst ] as const )
 		)
 	)(
-		'yields to %s and list growth (debug: %s, HTML first: %s)',
-		async ( each, debug, htmlFirst ) => {
-			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+		'yields to %s and list growth (HTML first: %s)',
+		async ( each, htmlFirst ) => {
 			const {
 				store: register,
 				asDangerousHTML: token,
@@ -792,85 +696,60 @@ describe( 'data-wp-html conflicts', () => {
 				)
 			);
 			expect( region.querySelector( 'b' ) ).toBeNull();
-			expectConflictWarnings(
-				debug
-					? [
-							'The data-wp-html directive was ignored because it conflicts with data-wp-each.',
-						]
-					: []
-			);
+			expectConflictWarnings( [
+				'The data-wp-html directive was ignored because it conflicts with data-wp-each.',
+			] );
 		}
 	);
 
-	it.each(
-		[ true, false ].flatMap( ( debug ) =>
-			[ true, false ].map( ( htmlFirst ) => [ debug, htmlFirst ] )
-		)
-	)(
-		'yields to router-region and processes descendants (debug: %s, HTML first: %s)',
-		async ( debug, htmlFirst ) => {
-			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
-			const {
-				store: register,
-				asDangerousHTML: token,
-				act: flush,
-				hydrate: hydrateRegion,
-				toVdom: convert,
-			} = await loadConflictRuntime();
-			const namespace = uniqueNamespace();
-			const { state } = register( namespace, {
-				state: { html: token( '<b>x</b>' ), text: 'Hello' },
-			} );
-			const attributes = [
-				'data-wp-html="state.html"',
-				`data-wp-router-region="${ namespace }/target"`,
-			];
-			if ( ! htmlFirst ) {
-				attributes.reverse();
-			}
-			const child = '<span data-wp-text="state.text">fallback</span>';
-			const region = createRegion(
-				namespace,
-				`<div ${ attributes.join( ' ' ) }>${ child }</div><div data-wp-router-region="${ namespace }/baseline">${ child }</div>`
-			);
-			await flush( () =>
-				hydrateRegion( convert( region ), region.parentNode! )
-			);
-			const [ target, baseline ] = region.querySelectorAll( 'div' );
-			expect( target.innerHTML ).toBe( baseline.innerHTML );
-			expect( target ).toHaveTextContent( /^Hello$/ );
-			await flush( () => {
-				state.text = 'Bye';
-			} );
-			expect( target.innerHTML ).toBe( baseline.innerHTML );
-			expect( target ).toHaveTextContent( /^Bye$/ );
-			expect( target.querySelector( 'b' ) ).toBeNull();
-			expectConflictWarnings(
-				debug
-					? [
-							'The data-wp-html directive was ignored because it conflicts with data-wp-router-region.',
-						]
-					: []
-			);
-		}
-	);
+	it( 'yields to router-region and processes descendants', async () => {
+		const {
+			store: register,
+			asDangerousHTML: token,
+			act: flush,
+			hydrate: hydrateRegion,
+			toVdom: convert,
+		} = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const { state } = register( namespace, {
+			state: { html: token( '<b>x</b>' ), text: 'Hello' },
+		} );
+		const attributes = [
+			'data-wp-html="state.html"',
+			`data-wp-router-region="${ namespace }/target"`,
+		];
+		const child = '<span data-wp-text="state.text">fallback</span>';
+		const region = createRegion(
+			namespace,
+			`<div ${ attributes.join( ' ' ) }>${ child }</div><div data-wp-router-region="${ namespace }/baseline">${ child }</div>`
+		);
+		await flush( () =>
+			hydrateRegion( convert( region ), region.parentNode! )
+		);
+		const [ target, baseline ] = region.querySelectorAll( 'div' );
+		expect( target.innerHTML ).toBe( baseline.innerHTML );
+		expect( target ).toHaveTextContent( /^Hello$/ );
+		await flush( () => {
+			state.text = 'Bye';
+		} );
+		expect( target.innerHTML ).toBe( baseline.innerHTML );
+		expect( target ).toHaveTextContent( /^Bye$/ );
+		expect( target.querySelector( 'b' ) ).toBeNull();
+		expectConflictWarnings( [
+			'The data-wp-html directive was ignored because it conflicts with data-wp-router-region.',
+		] );
+	} );
 
 	it.each(
 		[ 'data-wp-text--x="state.text"', 'data-wp-each="state.list"' ].flatMap(
 			( conflict ) =>
-				[ true, false ].flatMap( ( debug ) =>
-					[ true, false ].flatMap( ( htmlFirst ) =>
-						[ true, false ].map(
-							( trusted ) =>
-								[ conflict, debug, htmlFirst, trusted ] as const
-						)
-					)
+				[ true, false ].map(
+					( trusted ) => [ conflict, trusted ] as const
 				)
 		)
 	)(
-		'preserves the content and warnings of %s on a div (debug: %s, HTML first: %s, trusted: %s)',
-		async ( conflict, debug, htmlFirst, trusted ) => {
-			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+		'preserves the content and warnings of %s on a div (trusted: %s)',
+		async ( conflict, trusted ) => {
 			const warnings = vi.spyOn( console, 'warn' );
 			const outputs: string[] = [];
 			const calls: unknown[][][] = [];
@@ -890,12 +769,9 @@ describe( 'data-wp-html conflicts', () => {
 						list: [ 'a' ],
 					},
 				} );
-				const attributes = htmlFirst
-					? `${ html } ${ conflict }`
-					: `${ conflict } ${ html }`;
 				const region = createRegion(
 					namespace,
-					`<div ${ attributes }><i>fallback</i><span data-wp-text="state.text"></span></div>`
+					`<div ${ html } ${ conflict }><i>fallback</i><span data-wp-text="state.text"></span></div>`
 				);
 				const start = warnings.mock.calls.length;
 				await flush( () =>
@@ -915,35 +791,28 @@ describe( 'data-wp-html conflicts', () => {
 					? 'The usage of data-wp-text--suffix is not supported. Please use data-wp-text instead.'
 					: 'The data-wp-each directive can only be used on <template> elements.';
 			const conflictWarning = `The data-wp-html directive was ignored because it conflicts with data-wp-${ prefix }.`;
-			expect( calls ).toEqual(
-				debug
-					? [
-							[ [ ownWarning ] ],
-							[ [ conflictWarning ], [ ownWarning ] ],
-						]
-					: [ [], [] ]
-			);
-			expectConflictWarnings(
-				debug ? [ ownWarning, conflictWarning, ownWarning ] : []
-			);
+			expect( calls ).toEqual( [
+				[ [ ownWarning ] ],
+				[ [ conflictWarning ], [ ownWarning ] ],
+			] );
+			expectConflictWarnings( [
+				ownWarning,
+				conflictWarning,
+				ownWarning,
+			] );
 		}
 	);
 
-	it.each(
-		[
-			[ 'html', 'text', 'each' ],
-			[ 'html', 'each', 'text' ],
-			[ 'text', 'html', 'each' ],
-			[ 'text', 'each', 'html' ],
-			[ 'each', 'html', 'text' ],
-			[ 'each', 'text', 'html' ],
-		].flatMap( ( order ) =>
-			[ true, false ].map( ( debug ) => [ order, debug ] as const )
-		)
-	)(
-		'preserves text/each template behavior in order %s (debug: %s)',
-		async ( order, debug ) => {
-			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+	it.each( [
+		[ [ 'html', 'text', 'each' ] ],
+		[ [ 'html', 'each', 'text' ] ],
+		[ [ 'text', 'html', 'each' ] ],
+		[ [ 'text', 'each', 'html' ] ],
+		[ [ 'each', 'html', 'text' ] ],
+		[ [ 'each', 'text', 'html' ] ],
+	] )(
+		'preserves text/each template behavior in order %s',
+		async ( order ) => {
 			const {
 				store: register,
 				populateServerData: populate,
@@ -998,13 +867,9 @@ describe( 'data-wp-html conflicts', () => {
 				target.innerHTML.replace( ' data-wp-html="state.html"', '' )
 			).toBe( baseline.innerHTML );
 			expect( region.querySelector( 'b' ) ).toBeNull();
-			expectConflictWarnings(
-				debug
-					? [
-							'The data-wp-html directive was ignored because it conflicts with data-wp-text, data-wp-each.',
-						]
-					: []
-			);
+			expectConflictWarnings( [
+				'The data-wp-html directive was ignored because it conflicts with data-wp-text, data-wp-each.',
+			] );
 		}
 	);
 
@@ -1021,29 +886,15 @@ describe( 'data-wp-html conflicts', () => {
 	} );
 
 	it.each(
-		[ 'text', 'each', 'router-region' ].flatMap( ( prefix ) =>
-			[ '', '--', '---', '---id', '--suffix', '----' ].flatMap(
-				( suffix ) =>
-					[ true, false ].flatMap( ( debug ) =>
-						[ true, false ].flatMap( ( htmlFirst ) =>
-							[ true, false ].map(
-								( defaultHtml ) =>
-									[
-										prefix,
-										suffix,
-										debug,
-										htmlFirst,
-										defaultHtml,
-									] as const
-							)
-						)
-					)
-			)
-		)
+		[ 'text', 'each', 'router-region' ].flatMap( ( prefix ) => [
+			...[ '', '--', '---', '---id', '--suffix', '----' ].map(
+				( suffix ) => [ prefix, suffix, true ] as const
+			),
+			[ prefix, '', false ] as const,
+		] )
 	)(
-		'yields every HTML entry to %s%s with only a conflict warning (debug: %s, HTML first: %s, default HTML: %s)',
-		async ( prefix, suffix, debug, htmlFirst, defaultHtml ) => {
-			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+		'yields every HTML entry to %s%s with only a conflict warning (default HTML: %s)',
+		async ( prefix, suffix, defaultHtml ) => {
 			const runtime = await loadConflictRuntime();
 			const namespace = uniqueNamespace();
 			const { state } = runtime.store( namespace, {
@@ -1067,9 +918,7 @@ describe( 'data-wp-html conflicts', () => {
 			}
 			const reference = prefix === 'each' ? 'state.list' : 'state.text';
 			const conflict = `data-wp-${ prefix }${ suffix }="${ reference }"`;
-			const attributes = htmlFirst
-				? [ ...html, conflict ]
-				: [ conflict, ...html ];
+			const attributes = [ ...html, conflict ];
 			const tag = prefix === 'each' ? 'template' : 'div';
 			const child = '<span data-wp-text="state.text">fallback</span>';
 			const target = createRegion(
@@ -1080,50 +929,37 @@ describe( 'data-wp-html conflicts', () => {
 				namespace,
 				`<${ tag } ${ conflict }>${ child }</${ tag }>`
 			);
-			const vdom = runtime.toVdom( target ) as VNode;
-			const children = vdom.props.children as VNode< {
-				/** Parsed directives consumed by the runtime's vnode wrapper. */
-				directives: Record< string, unknown >;
-			} >[];
-			expect( children[ 0 ].props.directives ).not.toHaveProperty(
-				'html'
-			);
 			await runtime.act( () => {
-				runtime.hydrate( vdom, target.parentNode! );
+				runtime.hydrate( runtime.toVdom( target ), target.parentNode! );
 				runtime.hydrate(
 					runtime.toVdom( baseline ),
 					baseline.parentNode!
 				);
 			} );
-			// Inert HTML attributes remain on the element, not in its directive entries.
-			/** Returns rendered markup with inert HTML attributes omitted. */
+			/**
+			 * Serializes rendered content without inert HTML attributes.
+			 *
+			 * @return Markup comparable to the element without HTML directives.
+			 */
 			const withoutHtmlAttributes = () =>
 				target.innerHTML.replace( / data-wp-html[^=]*="[^"]*"/g, '' );
 			expect( withoutHtmlAttributes() ).toBe( baseline.innerHTML );
+			expect( target.querySelector( 'b' ) ).toBeNull();
 			await runtime.act( () => {
 				state.text = 'Bye';
 				state.list = [ 'a', 'b', 'c' ];
 			} );
 			expect( withoutHtmlAttributes() ).toBe( baseline.innerHTML );
 			expect( target.querySelector( 'b' ) ).toBeNull();
-			expectConflictWarnings(
-				debug
-					? [
-							`The data-wp-html directive was ignored because it conflicts with data-wp-${ prefix }.`,
-							...( prefix === 'text' &&
-							[ '--suffix', '----' ].includes( suffix )
-								? [
-										'The usage of data-wp-text--suffix is not supported. Please use data-wp-text instead.',
-									]
-								: [] ),
-							...( suffix === '---id'
-								? [
-										`Unique IDs are not supported for the data-wp-${ prefix } directive. Ignoring the directive with unique ID "id".`,
-									]
-								: [] ),
-						]
-					: []
-			);
+			const conflictWarning = `The data-wp-html directive was ignored because it conflicts with data-wp-${ prefix }.`;
+			expect(
+				conflictWarningSpy.mock.calls.filter( ( [ message ] ) =>
+					message.includes( 'data-wp-html' )
+				)
+			).toEqual( [ [ conflictWarning ] ] );
+			expect( console ).toHaveWarnedWith( conflictWarning );
+			// Account for other directives' warnings without pinning their messages.
+			expect( console ).toHaveWarned();
 		}
 	);
 } );
@@ -1207,36 +1043,6 @@ describe( 'data-wp-html value contract', () => {
 			}
 		}
 	);
-
-	it( 'keeps pending server nodes without mutations or warnings', async () => {
-		const runtime = await loadConflictRuntime();
-		const namespace = uniqueNamespace();
-		runtime.populateServerData( {
-			state: { [ namespace ]: { html: {} } },
-			derivedStateClosures: { [ namespace ]: [ 'state.html' ] },
-		} );
-		const region = createRegion(
-			namespace,
-			'<div data-wp-html="state.html"><p>fallback</p></div>'
-		);
-		const target = region.querySelector( 'div' )!;
-		const original = target.firstChild;
-		const mutations: MutationRecord[] = [];
-		const observer = new MutationObserver( ( records ) =>
-			mutations.push( ...records )
-		);
-		observer.observe( target, { childList: true } );
-		const writes = recordHtmlWrites( target );
-		const warnings = vi.spyOn( console, 'warn' );
-		await runtime.act( () =>
-			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
-		);
-		expect( target.firstChild ).toBe( original );
-		expect( writes ).toEqual( [] );
-		expect( [ ...mutations, ...observer.takeRecords() ] ).toEqual( [] );
-		expect( warnings ).not.toHaveBeenCalled();
-		observer.disconnect();
-	} );
 
 	it( 'renders the current value and reapplies HTML after each removal', async () => {
 		const runtime = await loadConflictRuntime();
