@@ -4,14 +4,18 @@
 
 ### Breaking Changes
 
+-   `ImageSizeControl`: The event in the `onChangeImage` callback's `{ event }` argument now comes from popup selection rather than a native select change. Read the selected value from the `slug` argument rather than `event.target.value` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
+
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### Enhancements
 
+-   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ### Bug Fixes
 
+-   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 
 ## 18.1.0 (2026-10-07)

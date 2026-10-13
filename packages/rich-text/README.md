@@ -180,9 +180,9 @@ _Returns_
 
 - A rich text value.
 
-### EventListenersProps
+### EventCallbacksSet
 
-The callback-Set refs the private event-listener helpers dispatch from.
+A Set of callbacks that format types register for an event.
 
 ### getActiveFormat
 
