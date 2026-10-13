@@ -24,11 +24,11 @@
 		box-shadow: none;
 	}
 
-	&:is(:hover, .is-selected):not(:disabled, [aria-disabled="true"]) {
+	&:is(:hover, :focus-visible, .is-selected):not(:disabled, [aria-disabled="true"]) {
 		@include composite-item.highlight;
 	}
 
-	[data-keyboard-navigation] &.is-selected,
+	[data-keyboard-navigation]:not(:focus-within) &.is-selected,
 	&:focus-visible:not(:active) {
 		@include composite-item.focus;
 	}
