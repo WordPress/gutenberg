@@ -689,8 +689,36 @@ export function setShowRevisionDiff( showDiff ) {
 }
 
 /**
+ * Statuses where saving the post does not change what visitors can see.
+ */
+const UNPUBLISHED_POST_STATUSES = [ 'auto-draft', 'draft', 'pending' ];
+
+/**
+ * Returns whether the post's current content differs from the given edits.
+ *
+ * @param {Object} select The editor store selectors.
+ * @param {Object} edits  The edits the restore would apply.
+ * @return {boolean} Whether restoring would replace different content.
+ */
+function hasContentToReplace( select, edits ) {
+	if ( select.getEditedPostContent() !== edits.content ) {
+		return true;
+	}
+
+	return [ 'title', 'excerpt' ].some(
+		( attribute ) =>
+			edits[ attribute ] !== undefined &&
+			select.getEditedPostAttribute( attribute ) !== edits[ attribute ]
+	);
+}
+
+/**
  * Restore a revision by replacing the current content with the revision's content
  * and auto-saving.
+ *
+ * For unpublished posts, the current content is saved first so that it is kept
+ * as a revision. Otherwise content that only exists in the editor or in an
+ * autosave could be lost when the restored revision is saved.
  *
  * @param {number} revisionId The revision ID to restore.
  */
@@ -745,6 +773,48 @@ export const restoreRevision =
 		}
 		if ( revision.meta !== undefined ) {
 			edits.meta = revision.meta;
+		}
+
+		// A save that is already in progress would make the save below a
+		// no-op, so the current content could not be kept.
+		if ( select.isSavingPost() ) {
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice(
+					__(
+						'The revision could not be restored while the post is saving. Wait for the save to finish, then try again.'
+					),
+					{ id: 'editor-revision-restore-failed' }
+				);
+			return;
+		}
+
+		// Save the current content first so that it is stored as a revision
+		// and the restore can be undone. Only do this when neither the saved
+		// nor the edited status is public, so that unsaved edits are not
+		// published.
+		const shouldSaveCurrentContent =
+			UNPUBLISHED_POST_STATUSES.includes(
+				select.getCurrentPostAttribute( 'status' )
+			) &&
+			UNPUBLISHED_POST_STATUSES.includes(
+				select.getEditedPostAttribute( 'status' )
+			) &&
+			hasContentToReplace( select, edits );
+
+		if ( shouldSaveCurrentContent ) {
+			await dispatch.savePost();
+			if ( select.didPostSaveRequestFail() ) {
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice(
+						__(
+							'The revision was not restored because the current version of the post could not be saved first. Your content has not been changed.'
+						),
+						{ id: 'editor-revision-restore-failed' }
+					);
+				return;
+			}
 		}
 
 		// Apply edits and save.
