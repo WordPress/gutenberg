@@ -10,7 +10,7 @@
 		flex-direction: column;
 	}
 
-	:where([aria-orientation="horizontal"]) {
+	&:where([aria-orientation="horizontal"]) {
 		width: fit-content;
 	}
 
@@ -75,24 +75,21 @@
 		}
 	}
 	&:has(
-		[aria-selected="true"]:not([aria-disabled="true"]):is(
-			:hover,
-			:active,
-			[data-focus-visible]
-		)
+		[aria-selected="true"]:not([aria-disabled="true"])[data-focus-visible]
 	)::before {
 		color: var(--wpds-color-foreground-interactive-neutral-active);
 	}
 
 	&[aria-orientation="vertical"] {
 		&::before {
-			top: 0;
+			top: 12px;
 			inset-inline-start: 0;
 			width: var(--wp-admin-border-width-focus);
 			height: calc(var(--antialiasing-factor) * 1px);
 			transform:
 				translateY(calc(var(--selected-top, 0) * 1px))
-				scaleY(calc(var(--selected-height, 0) / var(--antialiasing-factor)));
+				scaleY(calc(max(0, var(--selected-height, 0) - 24) /
+				var(--antialiasing-factor)));
 			background-color: currentColor;
 		}
 	}
@@ -118,12 +115,19 @@
 		font-size: $font-size-medium;
 		color: var(--wpds-color-foreground-interactive-neutral);
 
-		&[aria-disabled="true"] {
+		&:is([aria-selected="true"], [aria-disabled="true"]) {
 			cursor: default;
+		}
+
+		&[aria-disabled="true"] {
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 
-		&:not([aria-disabled="true"]):is(:hover, :active, [data-focus-visible]) {
+		&:not([aria-disabled="true"]):is(
+			:not([aria-selected="true"]):hover,
+			:not([aria-selected="true"]):active,
+			[data-focus-visible]
+		) {
 			color: var(--wpds-color-foreground-interactive-neutral-active);
 
 			&::after,
@@ -149,9 +153,7 @@
 
 			// Draw the indicator.
 			// Outline works for Windows high contrast mode as well.
-			outline:
-				var(--wp-admin-border-width-focus) solid
-				transparent;
+			outline: var(--wp-admin-border-width-focus) solid transparent;
 			border-radius: $radius-small;
 
 			// Animation
@@ -181,12 +183,8 @@
 	}
 
 	[aria-orientation="vertical"] & {
-		padding: 8px 12px;
+		padding: 12px;
 		min-height: 40px;
-
-		&[aria-selected="true"] {
-			fill: currentColor;
-		}
 	}
 }
 
@@ -208,30 +206,6 @@
 			content: "";
 			inset: calc(-1 * var(--wpds-dimension-padding-xs));
 		}
-	}
-}
-
-.tab-chevron {
-	flex-shrink: 0;
-	margin-inline-start: auto;
-	margin-inline-end: -4px;
-	[aria-orientation="horizontal"] & {
-		display: none;
-	}
-	opacity: 0;
-	[role="tab"]:is([aria-selected="true"], [data-focus-visible], :hover) & {
-		opacity: 1;
-	}
-	// The chevron is transitioned into existence when selectOnMove is enabled,
-	// because otherwise it looks jarring, as it shows up outside of the focus
-	// indicator that's being animated at the same time.
-	@media not (prefers-reduced-motion) {
-		[data-select-on-move="true"] [role="tab"]:is([aria-selected="true"]) & {
-			transition: opacity 0.15s 0.15s linear;
-		}
-	}
-	&:dir(rtl) {
-		rotate: 180deg;
 	}
 }
 

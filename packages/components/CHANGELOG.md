@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   `TabPanel`: Add padded interaction backgrounds around tab content within the focus ring and use neutral selection lines in both orientations ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
+-   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 
 ### Deprecations
 
@@ -23,15 +23,21 @@
 
 ### Bug Fixes
 
--   `Tabs`: Use semantic interaction colors and separate padded backgrounds around tab content, keyboard focus rings, and selection lines in both orientations ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
-
+-   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
+-   `Tabs`: Use semantic interaction colors for unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
+-   `Tabs`: Restore the `fit-content` width of horizontal tab lists, which stretched to full width after the SCSS Modules migration ([#84626](https://github.com/WordPress/gutenberg/pull/84626)).
+-   `Snackbar`: Return focus to the previously focused control when dismissing a focused snackbar outside SnackbarList, including portaled snackbars ([#84342](https://github.com/WordPress/gutenberg/pull/84342)).
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
+-   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
 -   `ToolsPanel`: Use setting-first accessible action labels without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
+-   `DropdownMenu`: Keep the menu closed on ArrowDown when the toggle is disabled ([#84556](https://github.com/WordPress/gutenberg/pull/84556)).
+-   `ColorPicker`: Make the HSL and RGB input labels translatable, and name the Hue and Alpha inputs after their color format ([#70214](https://github.com/WordPress/gutenberg/pull/70214)).
 
 ### Internal
 
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
+-   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
 
 ## 42.0.0 (2026-10-07)
 
