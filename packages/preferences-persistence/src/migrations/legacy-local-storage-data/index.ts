@@ -3,6 +3,7 @@ import moveThirdPartyFeaturePreferences from './move-third-party-feature-prefere
 import moveIndividualPreference from './move-individual-preference';
 import moveInterfaceEnableItems from './move-interface-enable-items';
 import convertEditPostPanels from './convert-edit-post-panels';
+import isPreferencesData from '../../is-preferences-data';
 import { readStoredJSON } from '../../local-storage';
 import type { ScopedPreferences } from '../../types';
 import type { LegacyData } from './types';
@@ -84,7 +85,8 @@ export function convertLegacyData(
 
 	// The new system is only concerned with persisting
 	// 'core/preferences' preferences reducer, so only return that.
-	return data?.[ 'core/preferences' ]?.preferences;
+	const preferences = data?.[ 'core/preferences' ]?.preferences;
+	return isPreferencesData( preferences ) ? preferences : undefined;
 }
 
 /**
