@@ -79,23 +79,47 @@ function parseCSS( css = '' ): { color?: string; backgroundColor?: string } {
 export function parseClassName(
 	className = '',
 	colorSettings: ColorObject[]
-): { color?: string } {
+): { color?: string; backgroundColor?: string } {
 	return className
 		.split( ' ' )
-		.reduce( ( accumulator: { color?: string }, name ) => {
-			// `colorSlug` could contain dashes, so simply match the start and end.
-			if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
-				const colorSlug = name
-					.replace( /^has-/, '' )
-					.replace( /-color$/, '' );
-				const colorObject = getColorObjectByAttributeValues(
-					colorSettings,
-					colorSlug
-				);
-				accumulator.color = colorObject.color;
-			}
-			return accumulator;
-		}, {} );
+		.reduce(
+			(
+				accumulator: { color?: string; backgroundColor?: string },
+				name
+			) => {
+				// `colorSlug` could contain dashes, so simply match the start and end.
+				if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
+					const colorSlug = name
+						.replace( /^has-/, '' )
+						.replace( /-color$/, '' );
+					const colorObject = getColorObjectByAttributeValues(
+						colorSettings,
+						colorSlug
+					);
+					const backgroundSlug = name.endsWith( '-background-color' )
+						? name
+								.replace( /^has-/, '' )
+								.replace( /-background-color$/, '' )
+						: undefined;
+					const backgroundObject = backgroundSlug
+						? getColorObjectByAttributeValues(
+								colorSettings,
+								backgroundSlug
+							)
+						: undefined;
+
+					// A text colour class keeps priority, so every class that was
+					// read as a text colour before is still read the same way.
+					if ( colorObject.color || ! backgroundObject?.color ) {
+						accumulator.color = colorObject.color;
+					} else {
+						accumulator.backgroundColor = backgroundObject.color;
+					}
+				}
+				return accumulator;
+			},
+			{}
+		);
 }
 
 export function getActiveColors(
@@ -118,7 +142,7 @@ export function getActiveColors(
 	};
 }
 
-function setColors(
+export function setColors(
 	value: RichTextValue,
 	name: string,
 	colorSettings: ColorObject[],
@@ -138,7 +162,25 @@ function setColors(
 	const attributes: { style?: string; class?: string } = {};
 
 	if ( backgroundColor ) {
-		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
+		const backgroundObject = getColorObjectByColorValue(
+			colorSettings,
+			backgroundColor
+		);
+		// `has-{slug}-background-color` cannot be told from the text colour
+		// class of a `{slug}-background` colour, so such a pair stays inline.
+		const backgroundClassName =
+			backgroundObject?.slug &&
+			! colorSettings.some(
+				( { slug } ) => slug === `${ backgroundObject.slug }-background`
+			)
+				? getColorClassName( 'background-color', backgroundObject.slug )
+				: undefined;
+
+		if ( backgroundClassName ) {
+			classNames.push( backgroundClassName );
+		} else {
+			styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
+		}
 	} else {
 		// Override default browser color for mark element.
 		styles.push( [ 'background-color', transparentValue ].join( ':' ) );
