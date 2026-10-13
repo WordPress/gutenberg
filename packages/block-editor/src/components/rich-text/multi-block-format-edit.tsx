@@ -3,6 +3,7 @@ import {
 	createContext,
 	useContext,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
@@ -187,7 +188,7 @@ type FieldsProps = {
  * @param props
  * @param props.children   The block editor content, wrapped so the writing flow
  *                         in it can take the shortcuts.
- * @param props.contentRef The writing flow element, which holds the
+ * @param props.contentRef Ref to the writing flow element, which holds the
  *                         selection: the format popovers anchor to it and
  *                         focus returns to it.
  */
@@ -196,9 +197,12 @@ export default function MultiBlockFormatEdit( {
 	contentRef,
 }: {
 	children: ReactNode;
-	contentRef: RefObject< HTMLElement | null >;
+	contentRef?: RefObject< HTMLElement | null >;
 } ) {
 	const [ keyboardShortcuts ] = useState< Shortcuts >( () => new Set() );
+	// Block tools may be rendered without a content ref: then the popovers
+	// have no anchor and focus stays where it is.
+	const fallbackRef = useRef< HTMLElement | null >( null );
 	const selection = useSelect( selector, [] );
 
 	return (
@@ -208,7 +212,7 @@ export default function MultiBlockFormatEdit( {
 				<Fields
 					{ ...selection }
 					keyboardShortcuts={ keyboardShortcuts }
-					contentRef={ contentRef }
+					contentRef={ contentRef ?? fallbackRef }
 				/>
 			) }
 		</ShortcutsContext.Provider>
