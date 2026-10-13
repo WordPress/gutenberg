@@ -7,12 +7,9 @@ import { DirectionProvider } from '../../../utils/direction-provider';
  *
  * Prefer `SelectControl` when using with a standard label and description.
  *
- * For object values with a `{ value, label }` shape, the trigger uses `label`
- * directly when the serialized value is nonempty. Empty values follow the
- * placeholder rules instead.
- * For custom object shapes, provide `itemToStringLabel`.
- * Pass `items` when primitive values need label mapping, or when a null-valued
- * option supplies the placeholder label.
+ * When using object values, pass an `items` array so `Select.Trigger` can
+ * auto-resolve the selected item's label. By default, items should use a
+ * `{ value, label }` shape, or provide `itemToStringLabel` for a custom shape.
  *
  * Object values are compared with `Object.is` by default, so use the same
  * object references for `value` / `defaultValue` and `Select.Item` values, or

@@ -118,7 +118,7 @@ export const InsideComponentsModal = {
 						<UiPopoverFixture />
 
 						<div style={ { marginTop: '1rem' } }>
-							<Select.Root>
+							<Select.Root items={ selectItems }>
 								<Select.Trigger aria-label="Select primitive" />
 								<Select.Popup>
 									{ selectItems.map( ( item ) => (
@@ -249,7 +249,7 @@ export const InsideComponentsPopover = {
 							<UiPopoverFixture />
 
 							<div style={ { marginTop: '1rem' } }>
-								<Select.Root>
+								<Select.Root items={ selectItems }>
 									<Select.Trigger aria-label="Select primitive" />
 									<Select.Popup>
 										{ selectItems.map( ( item ) => (
