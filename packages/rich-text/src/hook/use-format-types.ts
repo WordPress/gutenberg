@@ -1,8 +1,18 @@
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import type { SelectFunction } from '@wordpress/data';
 import { store as richTextStore } from '../store';
+import type { RichTextFormatList } from '../types';
 
-function formatTypesSelector( select ) {
+/**
+ * Format handlers derived from the editable tree and passed to `useRichText`.
+ */
+type FormatHandler = (
+	formats: RichTextFormatList[],
+	text: string
+) => RichTextFormatList[];
+
+function formatTypesSelector( select: SelectFunction ) {
 	return select( richTextStore ).getFormatTypes();
 }
 
@@ -25,25 +35,28 @@ const interactiveContentTags = new Set( [
 	'video',
 ] );
 
-function prefixSelectKeys( selected, prefix ) {
+function prefixSelectKeys( selected: unknown, prefix: string ) {
 	if ( typeof selected !== 'object' ) {
 		return { [ prefix ]: selected };
 	}
 	return Object.fromEntries(
-		Object.entries( selected ).map( ( [ key, value ] ) => [
+		Object.entries( selected as object ).map( ( [ key, value ] ) => [
 			`${ prefix }.${ key }`,
 			value,
 		] )
 	);
 }
 
-function getPrefixedSelectKeys( selected, prefix ) {
+function getPrefixedSelectKeys(
+	selected: Record< string, unknown >,
+	prefix: string
+) {
 	if ( selected[ prefix ] ) {
 		return selected[ prefix ];
 	}
 	return Object.keys( selected )
 		.filter( ( key ) => key.startsWith( prefix + '.' ) )
-		.reduce( ( accumulator, key ) => {
+		.reduce( ( accumulator: Record< string, unknown >, key ) => {
 			accumulator[ key.slice( prefix.length + 1 ) ] = selected[ key ];
 			return accumulator;
 		}, {} );
@@ -62,6 +75,10 @@ export function useFormatTypes( {
 	allowedFormats,
 	withoutInteractiveFormatting,
 	__unstableFormatTypeHandlerContext,
+}: {
+	allowedFormats?: readonly string[];
+	withoutInteractiveFormatting?: boolean;
+	__unstableFormatTypeHandlerContext?: object;
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
@@ -82,32 +99,38 @@ export function useFormatTypes( {
 	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
 	const keyedSelected = useSelect(
 		( select ) =>
-			formatTypes.reduce( ( accumulator, type ) => {
-				if (
-					! type.__experimentalGetPropsForEditableTreePreparation ||
-					! __unstableFormatTypeHandlerContext
-				) {
-					return accumulator;
-				}
+			formatTypes.reduce(
+				( accumulator: Record< string, unknown >, type ) => {
+					if (
+						! type.__experimentalGetPropsForEditableTreePreparation ||
+						! __unstableFormatTypeHandlerContext
+					) {
+						return accumulator;
+					}
 
-				return {
-					...accumulator,
-					...prefixSelectKeys(
-						type.__experimentalGetPropsForEditableTreePreparation(
-							select,
-							__unstableFormatTypeHandlerContext
+					return {
+						...accumulator,
+						...prefixSelectKeys(
+							type.__experimentalGetPropsForEditableTreePreparation(
+								select,
+								__unstableFormatTypeHandlerContext
+							),
+							type.name
 						),
-						type.name
-					),
-				};
-			}, {} ),
+					};
+				},
+				{}
+			),
 		[ formatTypes, __unstableFormatTypeHandlerContext ]
 	);
 	const dispatch = useDispatch();
-	const prepareHandlers = [];
-	const valueHandlers = [];
-	const changeHandlers = [];
-	const dependencies = [];
+	const prepareHandlers: FormatHandler[] = [];
+	const valueHandlers: FormatHandler[] = [];
+	const changeHandlers: ( (
+		formats: RichTextFormatList[],
+		text: string
+	) => void )[] = [];
+	const dependencies: unknown[] = [];
 
 	for ( const key in keyedSelected ) {
 		dependencies.push( keyedSelected[ key ] );
@@ -134,7 +157,7 @@ export function useFormatTypes( {
 			type.__experimentalCreateOnChangeEditableValue &&
 			__unstableFormatTypeHandlerContext
 		) {
-			let dispatchers = {};
+			let dispatchers: object = {};
 
 			if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
 				dispatchers =

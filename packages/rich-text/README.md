@@ -487,10 +487,10 @@ This hook, to be used in a format type's Edit component, returns the active elem
 
 _Parameters_
 
-- _$1_ `Object`: Named parameters.
-- _$1.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
-- _$1.value_ `RichTextValue`: Value to check for selection.
-- _$1.settings_ `FormatType`: The format type's settings.
+- _options_ `Object`: Named parameters.
+- _options.ref_ `RefObject<HTMLElement>`: React ref of the element containing the editable content.
+- _options.value_ `RichTextValue`: Value to check for selection.
+- _options.settings_ `FormatType`: The format type's settings.
 
 _Returns_
 
