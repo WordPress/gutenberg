@@ -10,29 +10,30 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
  * @see https://github.com/WordPress/gutenberg/pull/66402
  */
 export function preventFocusCapture() {
-	return ( element ) => {
+	return ( element: HTMLElement ) => {
 		const { ownerDocument } = element;
 		const { defaultView } = ownerDocument;
 
-		let value = null;
+		let value: string | null = null;
 
-		function onPointerDown( event ) {
+		function onPointerDown( event: PointerEvent ) {
+			const target = event.target as Element;
 			// Abort if the event is default prevented, we will not get a pointer up event.
 			if ( event.defaultPrevented ) {
 				return;
 			}
-			if ( event.target === element ) {
+			if ( target === element ) {
 				return;
 			}
-			if ( ! event.target.contains( element ) ) {
+			if ( ! target.contains( element ) ) {
 				return;
 			}
 			// Only relevant when a parent block is pressed.
-			if ( ! event.target.closest( '[data-block]' ) ) {
+			if ( ! target.closest( '[data-block]' ) ) {
 				return;
 			}
 			value = element.getAttribute( 'contenteditable' );
-			defaultView.getSelection().removeAllRanges();
+			defaultView!.getSelection()!.removeAllRanges();
 			element.setAttribute( 'contenteditable', 'false' );
 		}
 
@@ -41,7 +42,7 @@ export function preventFocusCapture() {
 				element.setAttribute( 'contenteditable', value );
 				value = null;
 				// Safari may still have placed a caret in the element.
-				const selection = defaultView.getSelection();
+				const selection = defaultView!.getSelection()!;
 				if (
 					selection.isCollapsed &&
 					element.contains( selection.anchorNode )
@@ -52,17 +53,17 @@ export function preventFocusCapture() {
 		}
 
 		const unsubscribePointerDown = subscribeDelegatedListener(
-			defaultView,
+			defaultView!,
 			'pointerdown',
-			onPointerDown
+			onPointerDown as EventListener
 		);
 		const unsubscribePointerUp = subscribeDelegatedListener(
-			defaultView,
+			defaultView!,
 			'pointerup',
 			onPointerUp
 		);
 		const unsubscribePointerCancel = subscribeDelegatedListener(
-			defaultView,
+			defaultView!,
 			'pointercancel',
 			onPointerUp
 		);

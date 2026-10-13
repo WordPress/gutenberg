@@ -1,6 +1,7 @@
 import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { isRangeEqual } from '../../is-range-equal';
 import { unlock } from '../../lock-unlock';
+import type { EventListenerEffect } from '../types';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
@@ -10,18 +11,18 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
  * detect no `selectionchange` or `input` event between the up and down events,
  * we fire a `selectionchange` event.
  */
-export default () => ( element ) => {
+const selectionChangeCompat: EventListenerEffect = () => ( element ) => {
 	const { ownerDocument } = element;
 	const { defaultView } = ownerDocument;
 	const selection = defaultView?.getSelection();
 
-	let range;
+	let range: Range | null;
 
 	function getRange() {
-		return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+		return selection!.rangeCount ? selection!.getRangeAt( 0 ) : null;
 	}
 
-	function onDown( event ) {
+	function onDown( event: Event ) {
 		const type = event.type === 'keydown' ? 'keyup' : 'pointerup';
 
 		function onCancel() {
@@ -60,3 +61,5 @@ export default () => ( element ) => {
 		unsubscribeKeyDown();
 	};
 };
+
+export default selectionChangeCompat;

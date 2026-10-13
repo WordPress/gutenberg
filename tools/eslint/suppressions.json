@@ -7919,7 +7919,7 @@
 			"count": 1
 		}
 	},
-	"packages/rich-text/src/hook/index.js": {
+	"packages/rich-text/src/hook/index.ts": {
 		"react-hooks/refs": {
 			"count": 8
 		}
