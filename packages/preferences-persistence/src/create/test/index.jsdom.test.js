@@ -173,6 +173,31 @@ describe( 'create', () => {
 			expect( await create().get() ).toEqual( {} );
 		} );
 
+		it( 'fetches when the preloaded data is not an object', async () => {
+			mockedApiFetch.mockResolvedValueOnce( {
+				meta: {
+					persisted_preferences: { core: { fixedToolbar: true } },
+				},
+			} );
+
+			const { get } = create( { preloadedData: [] } );
+			expect( await get() ).toEqual( { core: { fixedToolbar: true } } );
+			expect( mockedApiFetch ).toHaveBeenCalled();
+		} );
+
+		it( 'migrates data from the REST API', async () => {
+			mockedApiFetch.mockResolvedValueOnce( {
+				meta: {
+					persisted_preferences: {
+						'core/edit-post': { fixedToolbar: true },
+					},
+				},
+			} );
+
+			const { get } = create();
+			expect( await get() ).toEqual( { core: { fixedToolbar: true } } );
+		} );
+
 		it( 'ignores an empty array from the REST API', async () => {
 			mockedApiFetch.mockResolvedValueOnce( {
 				meta: { persisted_preferences: [] },

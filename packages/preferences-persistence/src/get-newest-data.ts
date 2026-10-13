@@ -1,6 +1,7 @@
 import isPreferencesData from './is-preferences-data';
 import { readStoredJSON } from './local-storage';
-import type { PreferencesData } from './types';
+import convertPreferencesPackageData from './migrations/preferences-package-data';
+import type { PreferencesData, ScopedPreferences } from './types';
 
 /**
  * Picks the most recently modified preferences from the server data and the
@@ -11,7 +12,7 @@ import type { PreferencesData } from './types';
  *
  * @return The newest preferences data, or `null` when neither is valid.
  */
-export default function getNewestData(
+function pickNewestData(
 	serverData: unknown,
 	localStorageRestoreKey: string
 ): PreferencesData | null {
@@ -28,4 +29,22 @@ export default function getNewestData(
 
 	// Prefer server data when it is at least as recent.
 	return localData && localModified > serverModified ? localData : serverData;
+}
+
+/**
+ * Gets the newest persisted preferences, migrated to the current format.
+ *
+ * @param serverData             Preferences data from the server.
+ * @param localStorageRestoreKey The key of the local storage backup.
+ *
+ * @return The migrated preferences, or `undefined` when there are none.
+ */
+export default function getNewestData(
+	serverData: unknown,
+	localStorageRestoreKey: string
+): ScopedPreferences | undefined {
+	const newestData = pickNewestData( serverData, localStorageRestoreKey );
+	return newestData
+		? convertPreferencesPackageData( newestData as ScopedPreferences )
+		: undefined;
 }

@@ -1,6 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import debounceAsync from './debounce-async';
 import getNewestData from '../get-newest-data';
+import isPreferencesData from '../is-preferences-data';
 import { writeStoredJSON } from '../local-storage';
 import type {
 	CreateOptions,
@@ -30,7 +31,7 @@ export default function create( {
 	localStorageRestoreKey = 'WP_PREFERENCES_RESTORE_DATA',
 	requestDebounceMS = 2500,
 }: CreateOptions = {} ): PersistenceLayer {
-	let cache = preloadedData;
+	let cache = isPreferencesData( preloadedData ) ? preloadedData : undefined;
 	const debouncedApiFetch = debounceAsync( apiFetch, requestDebounceMS );
 
 	async function get() {

@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import apiFetch from '@wordpress/api-fetch';
 import { __unstableCreatePersistenceLayer } from '..';
 
 vi.mock( import( '@wordpress/api-fetch' ), () => ( {
@@ -7,6 +8,7 @@ vi.mock( import( '@wordpress/api-fetch' ), () => ( {
 
 describe( '__unstableCreatePersistenceLayer', () => {
 	afterEach( () => {
+		vi.mocked( apiFetch ).mockClear();
 		vi.restoreAllMocks();
 		window.localStorage.clear();
 	} );
@@ -54,6 +56,7 @@ describe( '__unstableCreatePersistenceLayer', () => {
 		async ( serverData ) => {
 			const { get } = __unstableCreatePersistenceLayer( serverData, 1 );
 			expect( await get() ).toEqual( {} );
+			expect( apiFetch ).not.toHaveBeenCalled();
 		}
 	);
 

@@ -1,12 +1,7 @@
 import create from './create';
 import convertLegacyLocalStorageData from './migrations/legacy-local-storage-data';
-import convertPreferencesPackageData from './migrations/preferences-package-data';
 import getNewestData from './get-newest-data';
-import type {
-	PersistenceLayer,
-	PreferencesData,
-	ScopedPreferences,
-} from './types';
+import type { PersistenceLayer } from './types';
 
 export { create };
 
@@ -27,19 +22,19 @@ export type * from './types';
  * @return The persistence layer initialized with the preloaded data.
  */
 export function __unstableCreatePersistenceLayer(
-	serverData: PreferencesData | [] | '' | false,
+	serverData: unknown,
 	userId: string | number
 ): PersistenceLayer {
 	const localStorageRestoreKey = `WP_PREFERENCES_USER_${ userId }`;
-	const newestData = getNewestData( serverData, localStorageRestoreKey );
-	// Otherwise fall back to data in the legacy format from the old persistence system.
-	const preloadedData = newestData
-		? convertPreferencesPackageData( newestData as ScopedPreferences )
-		: convertLegacyLocalStorageData( userId );
-
 	return create( {
-		// The server data is already preloaded, so fetching it again is redundant.
-		preloadedData: preloadedData ?? {},
+		/*
+		 * Fall back to data in the legacy format from the old persistence system.
+		 * The server data is already preloaded, so fetching it again is redundant.
+		 */
+		preloadedData:
+			getNewestData( serverData, localStorageRestoreKey ) ??
+			convertLegacyLocalStorageData( userId ) ??
+			{},
 		localStorageRestoreKey,
 	} );
 }
