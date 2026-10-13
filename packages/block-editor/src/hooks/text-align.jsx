@@ -59,7 +59,7 @@ export function getValidTextAlignments( blockTextAlign ) {
 
 export function getTextAlignControlGroup( isResponsiveEditing, selectedState ) {
 	return isResponsiveEditing && hasViewportBlockStyleState( selectedState )
-		? 'style-state'
+		? 'style-states'
 		: 'block';
 }
 

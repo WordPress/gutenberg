@@ -44,7 +44,7 @@ const groups = {
 	settings: InspectorControlsDefault, // Alias for default.
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,
-	styleStates: InspectorControlsStyleStates,
+	'style-states': InspectorControlsStyleStates,
 };
 
 export default groups;

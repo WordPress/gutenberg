@@ -152,7 +152,7 @@ function StyleStateInspectorSlots( {
 				</>
 			) }
 			{ ! isDefaultBlockStyleState( selectedBlockStyleState ) && (
-				<InspectorControls.Slot group="styleStates" />
+				<InspectorControls.Slot group="style-states" />
 			) }
 			{ ! isDefaultBlockStyleState( selectedBlockStyleState ) && (
 				<PrivateInspectorControlsStyleStatesAdvanced.Slot />

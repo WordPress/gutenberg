@@ -299,7 +299,7 @@ export function PrivateBlockToolbar( {
 									) }
 									{ showStyleStateSlot && (
 										<BlockControls.Slot
-											group="style-state"
+											group="style-states"
 											className="block-editor-block-toolbar__slot"
 										/>
 									) }
