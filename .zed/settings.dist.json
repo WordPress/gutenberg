@@ -65,6 +65,9 @@
 				}
 			]
 		},
+		"HTML": {
+			"language_servers": [ "!tailwindcss-language-server", "..." ]
+		},
 		"PHP": {
 			"language_servers": [
 				"intelephense",
@@ -72,6 +75,7 @@
 				"!phpactor",
 				"!phptools",
 				"!phpantom",
+				"!tailwindcss-language-server",
 				"..."
 			],
 			"formatter": [
