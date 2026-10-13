@@ -238,6 +238,7 @@ function Navigation( {
 	attributes,
 	setAttributes,
 	clientId,
+	name,
 	isSelected,
 	className,
 	backgroundColor,
@@ -590,7 +591,7 @@ function Navigation( {
 			setAttributes( {
 				submenuVisibility: 'always',
 				layout: {
-					...getBlockSupport( 'core/navigation', 'layout' )?.default,
+					...getBlockSupport( name, 'layout' )?.default,
 					...attributes.layout,
 					orientation: 'vertical',
 				},
@@ -600,6 +601,7 @@ function Navigation( {
 	}, [
 		attributes.layout,
 		isWithinOverlay,
+		name,
 		overlayMenu,
 		ref,
 		setAttributes,
