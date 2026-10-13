@@ -52,13 +52,13 @@ const CORE_BLOCKS_HANDBOOK_URL =
  * when the script runs without arguments.
  *
  * @type {Object}
- * @property {string}        blocksDir            Directory holding one sub-directory per block.
- * @property {string|null}   sourceUrlBase        URL that block directory names are appended to.
- * @property {string|null}   fixturesDir          Directory of `{namespace}__{name}.html` markup fixtures.
- * @property {string|null}   categoryDocsDir      Where to write `category-{cat}.md` index pages.
- * @property {string|null}   deprecatedNoticeFile File holding the deprecated blocks token pair.
- * @property {Function}      getBlockUrl          Returns a block's doc URL, or null for none.
- * @property {Function}      getCategoryUrl       Returns a category's doc URL, or null for none.
+ * @property {string}      blocksDir            Directory holding one sub-directory per block.
+ * @property {string|null} sourceUrlBase        URL that block directory names are appended to.
+ * @property {string|null} fixturesDir          Directory of `{namespace}__{name}.html` markup fixtures.
+ * @property {string|null} categoryDocsDir      Where to write `category-{cat}.md` index pages.
+ * @property {string|null} deprecatedNoticeFile File holding the deprecated blocks token pair.
+ * @property {Function}    getBlockUrl          Returns a block's doc URL, or null for none.
+ * @property {Function}    getCategoryUrl       Returns a category's doc URL, or null for none.
  */
 export const CORE_OPTIONS = {
 	blocksDir: path.resolve( ROOT_DIR, 'packages/block-library/src' ),
@@ -181,6 +181,33 @@ function readBlockJson( blockDir ) {
 }
 
 /**
+ * Check whether a block registers a `save` function in its index script,
+ * for blocks that don't have a separate save file. `save: () => null` does
+ * not count, since it saves no markup.
+ *
+ * @param {string} dir Absolute block directory.
+ * @return {boolean} Whether the index script defines a markup-saving `save`.
+ */
+function hasInlineSave( dir ) {
+	const indexFile = [ 'index.js', 'index.jsx', 'index.ts', 'index.tsx' ]
+		.map( ( filename ) => path.join( dir, filename ) )
+		.find( ( filePath ) => fs.existsSync( filePath ) );
+	if ( ! indexFile ) {
+		return false;
+	}
+
+	const code = fs
+		.readFileSync( indexFile, 'utf-8' )
+		.replace( /\/\*[\s\S]*?\*\//g, '' ) // block comments
+		.replace( /^\s*\/\/.*$/gm, '' ); // line comments
+
+	return (
+		/(?<!\.)\bsave\s*[:(,}]/.test( code ) &&
+		! /\bsave\s*:\s*\(\s*\)\s*=>\s*null\b/.test( code )
+	);
+}
+
+/**
  * Check which source files exist for a block.
  *
  * @param {string} blockDir Directory name.
@@ -189,9 +216,10 @@ function readBlockJson( blockDir ) {
 function getBlockFiles( blockDir ) {
 	const dir = path.join( options.blocksDir, blockDir );
 	return {
-		hasSaveScript: [ 'save.js', 'save.jsx' ].some( ( filename ) =>
-			fs.existsSync( path.join( dir, filename ) )
-		),
+		hasSaveScript:
+			[ 'save.js', 'save.jsx' ].some( ( filename ) =>
+				fs.existsSync( path.join( dir, filename ) )
+			) || hasInlineSave( dir ),
 		hasIndexPhp: fs.existsSync( path.join( dir, 'index.php' ) ),
 	};
 }
@@ -820,12 +848,14 @@ function generateBlockApiSection( blockDir ) {
 		lines.push(
 			'This is a [**hybrid block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). It saves static markup that the server may enhance during rendering.'
 		);
-	} else {
+	} else if ( blockType === 'static' ) {
 		lines.push(
 			'This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.'
 		);
 	}
-	lines.push( '' );
+	if ( blockType !== 'unknown' ) {
+		lines.push( '' );
+	}
 
 	const fixturePath =
 		options.fixturesDir &&
