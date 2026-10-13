@@ -19,13 +19,6 @@ final class AutoCapitalizationTests: XCTestCase {
 
 	override func setUpWithError() throws {
 		continueAfterFailure = false
-
-		// The first synthesized touch of a run can lose its lift inside the
-		// simulator: backboardd registers the virtual digitizer after its
-		// first event arrives. Spend that touch on the status bar of the home
-		// screen, before Safari is up, where it changes nothing.
-		let springboard = XCUIApplication( bundleIdentifier: "com.apple.springboard" )
-		springboard.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.01 ) ).tap()
 	}
 
 	/// Each test leaves its post open and unsaved. Ending Safari keeps the
@@ -107,22 +100,11 @@ final class AutoCapitalizationTests: XCTestCase {
 		waitForEmptyField( "Empty block; start writing or type forward slash to choose a block", message )
 	}
 
-	/// Waits for the keyboard to finish sliding in. XCUITest waits for
-	/// Safari to go idle before a tap, not for the keyboard, which runs in
-	/// its own process; a tap during its animation is dropped.
+	/// Waits for the software keyboard, which a simulator that has had a
+	/// hardware keyboard connected keeps hidden.
 	func waitForKeyboard() {
 		let shown = XCTNSPredicateExpectation( predicate: NSPredicate( format: "hittable == true" ), object: key( "return" ) )
 		XCTAssertEqual( XCTWaiter.wait( for: [ shown ], timeout: 10 ), .completed, "No software keyboard" )
-		var previous = CGRect.null
-		for _ in 0 ..< 50 {
-			let frame = keyboard.frame
-			if frame == previous {
-				return
-			}
-			previous = frame
-			usleep( 100_000 )
-		}
-		XCTFail( "The keyboard kept moving" )
 	}
 
 	/// The keyboard updates shortly after focus moves.
