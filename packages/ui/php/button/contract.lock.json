@@ -1,0 +1,50 @@
+{
+	"props": {
+		"label": {
+			"type": "string",
+			"required": true
+		},
+		"tone": {
+			"type": "string",
+			"enum": [
+				"brand",
+				"neutral"
+			]
+		},
+		"variant": {
+			"type": "string",
+			"enum": [
+				"solid",
+				"outline",
+				"minimal",
+				"unstyled"
+			]
+		},
+		"size": {
+			"type": "string",
+			"enum": [
+				"default",
+				"compact",
+				"small"
+			]
+		},
+		"type": {
+			"type": "string",
+			"enum": [
+				"button",
+				"submit",
+				"reset"
+			]
+		},
+		"disabled": {
+			"type": "boolean"
+		},
+		"loading": {
+			"type": "boolean"
+		},
+		"class": {
+			"type": "string"
+		}
+	},
+	"markup": "9914d36c780f"
+}

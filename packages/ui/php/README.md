@@ -15,6 +15,7 @@ Each component has a folder here with a `component.json`:
 -   `props` is the PHP contract, a JSON schema per prop. Props with a fixed set of values (an `enum` or a boolean) are variants. Free-form strings are slots.
 -   `render` maps the props to the React element, as `[ type, props, ...children ]`, where `"$name"` is a prop.
 -   `example` gives the props for the checks.
+-   `deprecations` (optional) keeps renamed props and values working. See [Versioning](#versioning-and-backward-compatibility).
 
 `bin/build-php.mjs` runs after the package build. It renders the React element for every combination of variants, with placeholders for the slots, and stores each render as a snapshot in `build-php/manifest.php`. PHP picks the snapshot for the props it gets, then escapes and fills in the slots. Strings React translates with `__()`, such as Button's "Loading" label, are caught through the `i18n.gettext` filter while rendering snapshots, and PHP translates them with `translate()` in the same text domain. `_x()` and `_n()` aren't supported yet; the build fails if their text reaches the markup. The stylesheet is compiled by `@wordpress/build` from the same CSS modules React uses, so class names match.
 
@@ -31,6 +32,21 @@ React changes far more often than PHP callers can adapt, so every kind of change
 | A prop or value is renamed or removed | The build fails: the variant no longer changes the markup. |
 | A component is renamed or removed | The build fails: the `render` mapping points at a missing export. |
 | A new prop or value | Not exposed to PHP until it's added to `component.json`, on purpose. |
+
+## Versioning and backward compatibility
+
+React components can change freely; PHP callers in core and plugins can't. The contract between them is only the component name and its `props`. Markup and class names change with every build and aren't part of it.
+
+-   Each component's `contract.lock.json` records its props as of the last release, and a fingerprint of its markup. The build fails if a prop or value is removed, a type changes or a prop becomes required, unless `deprecations` keeps the old one working. Release tooling would update the lock with `npm run update-php-contracts --workspace @wordpress/ui`.
+-   Markup can't be frozen, because it's generated together with the CSS that depends on it. Instead, the build lists the components whose markup changed since the last release, for the release notes and developer notes, so plugin authors who style or query it know in advance.
+-   A deprecation maps an old prop or value to its replacement, with a `_deprecated_argument()` notice: `{ "prop": "text", "replacement": "label", "since": "0.26.0" }` or `{ "prop": "variant", "value": "secondary", "replacement": "outline", "since": "0.26.0" }`.
+-   Class names are hashes of the file path and class name, the same in React and PHP. They stay the same across releases, but they aren't part of the contract. Snapshots write classes as `button/style:is-brand`, so they'd survive a change to how hashes are made, such as changing them with every release.
+
+Open questions:
+
+-   Version skew. A plugin that needs a newer version than core's can bundle `build-php/` from the npm package and create its own renderer with its own handle prefix (`new Gutenberg_UI_Components( $dir, $url, 'my-plugin-ui-' )`), so its stylesheet loads next to core's. It would still need to prefix the class name (with a tool like Strauss).
+-   Whether removing a deprecated prop is ever allowed, or deprecations stay forever.
+-   Which version a deprecation's `since` names. The `@wordpress/ui` version is easy to record, but WordPress notices name WordPress versions, so core would translate it when syncing.
 
 ## Bringing it to WordPress core
 

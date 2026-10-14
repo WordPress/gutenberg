@@ -12,6 +12,7 @@
  *   - `render`       The React element to render for those props, as
  *                    `[ type, props, ...children ]`, where `"$name"` refers to a prop.
  *   - `example`      Props for the preview page and the checks below.
+ *   - `deprecations` Optional. Props and values kept working after a rename.
  *
  * The build renders the React element once for every combination of variants,
  * with placeholders for the slots, and turns each render into a snapshot: the
@@ -23,12 +24,17 @@
  *   - `php/<name>/snapshot.html` holds the example markup. When React changes,
  *     it's out of date until updated with `--update-snapshots`, so the change
  *     shows up in review and the PHPUnit check fails until then.
+ *   - `php/<name>/contract.lock.json` holds the props of the last release and
+ *     a fingerprint of its markup. Removing a prop or value fails the build
+ *     unless it's listed in `deprecations`, and markup changes are listed for
+ *     the release notes. Release tooling updates it with `--update-contracts`.
  *
  * Writes everything else to `build-php/`, which is never committed.
  *
  * Runs after `wp-build` (as `build:wp`), because it renders the built package.
  * Each step lives in a module in `bin/php/`: rendering (`render.mjs`),
- * snapshots (`snapshots.mjs`) and stylesheets (`stylesheets.mjs`).
+ * snapshots (`snapshots.mjs`), contracts (`contracts.mjs`) and stylesheets
+ * (`stylesheets.mjs`).
  */
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -54,6 +60,11 @@ import {
 	stripRuntimeAttributes,
 	toSnapshot,
 } from './php/snapshots.mjs';
+import {
+	getBreakingChanges,
+	getContract,
+	getMarkupFingerprint,
+} from './php/contracts.mjs';
 import { compileStylesheets, getUsedStylesheets } from './php/stylesheets.mjs';
 
 const PACKAGE_DIR = path.resolve(
@@ -66,6 +77,7 @@ const OUT_DIR = path.join( PACKAGE_DIR, 'build-php' );
 const TEST_DIR = path.join( OUT_DIR, 'test' );
 
 const UPDATE_SNAPSHOTS = process.argv.includes( '--update-snapshots' );
+const UPDATE_CONTRACTS = process.argv.includes( '--update-contracts' );
 
 /**
  * Makes the strings React translates come out as placeholders while rendering
@@ -144,14 +156,15 @@ async function catchTranslations() {
 
 /**
  * Builds one component: renders its snapshots and examples, and checks it
- * against React.
+ * against React and its released contract.
  *
  * @param {string} file    Path of its `component.json`, relative to the package.
  * @param {Object} context Shared build state: the built package (`ui`), the
  *                         compiled `stylesheets`, `allCss`, `classReferences`
  *                         and `translations`.
  * @return {Promise<Object>} The component's manifest entry, examples and used
- *         stylesheets, and any problems or stale snapshot to report.
+ *         stylesheets, and any problems, stale snapshot or markup change to
+ *         report.
  */
 async function buildComponent( file, context ) {
 	const { ui, stylesheets, allCss, classReferences, translations } = context;
@@ -243,11 +256,37 @@ async function buildComponent( file, context ) {
 		result.staleSnapshot = path.relative( ROOT_DIR, snapshotFile );
 	}
 
+	// The lock records the props and a fingerprint of the markup as of the
+	// last release.
+	const contractFile = path.join( dir, 'contract.lock.json' );
+	const contract = {
+		props: getContract( component ),
+		markup: getMarkupFingerprint( snapshot ),
+	};
+	if ( UPDATE_CONTRACTS ) {
+		await writeFile(
+			contractFile,
+			JSON.stringify( contract, null, '\t' ) + '\n'
+		);
+	} else if ( existsSync( contractFile ) ) {
+		const released = JSON.parse( await readFile( contractFile, 'utf8' ) );
+		result.problems.push(
+			...getBreakingChanges(
+				component.name,
+				released.props,
+				contract.props,
+				component.deprecations
+			)
+		);
+		result.markupChanged = released.markup !== contract.markup;
+	}
+
 	result.name = component.name;
 	result.entry = {
 		props: component.props,
 		variants: variants.map( ( { prop } ) => prop ),
 		snapshots,
+		deprecations: component.deprecations ?? [],
 	};
 
 	return result;
@@ -358,6 +397,15 @@ return ${ json2php.make( { linebreak: '\n', indent: '\t' } )( manifest ) };
 			)
 			.join( ', ' ) }.`
 	);
+
+	const changedMarkup = results.filter( ( result ) => result.markupChanged );
+	if ( changedMarkup.length ) {
+		console.log(
+			`\nMarkup changed since the last release, for the release notes: ${ changedMarkup
+				.map( ( { name } ) => name )
+				.join( ', ' ) }.`
+		);
+	}
 
 	const staleSnapshots = results
 		.map( ( result ) => result.staleSnapshot )

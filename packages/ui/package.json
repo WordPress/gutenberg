@@ -90,7 +90,8 @@
 	},
 	"scripts": {
 		"build:wp": "node bin/build-php.mjs",
-		"update-php-snapshots": "node bin/build-php.mjs --update-snapshots"
+		"update-php-snapshots": "node bin/build-php.mjs --update-snapshots",
+		"update-php-contracts": "node bin/build-php.mjs --update-contracts"
 	},
 	"publishConfig": {
 		"access": "public"

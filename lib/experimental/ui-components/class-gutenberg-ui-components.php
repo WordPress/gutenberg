@@ -146,7 +146,8 @@ final class Gutenberg_UI_Components {
 			return '';
 		}
 
-		$props = $this->validate_props( $name, $component['props'], (array) $props );
+		$props = $this->apply_deprecations( $component['deprecations'], (array) $props );
+		$props = $this->validate_props( $name, $component['props'], $props );
 		if ( null === $props ) {
 			return '';
 		}
@@ -211,6 +212,46 @@ final class Gutenberg_UI_Components {
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Keeps deprecated props and values working by mapping them to their
+	 * replacements, with a `_deprecated_argument()` notice.
+	 *
+	 * A deprecation is `{ prop, replacement, since }` for a renamed prop, or
+	 * `{ prop, value, replacement, since }` for a renamed value.
+	 *
+	 * @param array $deprecations The component's deprecations.
+	 * @param array $props        Props passed by the caller.
+	 * @return array Props with the replacements applied.
+	 */
+	private function apply_deprecations( $deprecations, $props ) {
+		foreach ( $deprecations as $deprecation ) {
+			$prop = $deprecation['prop'];
+			if ( ! array_key_exists( $prop, $props ) ) {
+				continue;
+			}
+
+			if ( isset( $deprecation['value'] ) ) {
+				if ( $props[ $prop ] !== $deprecation['value'] ) {
+					continue;
+				}
+				$props[ $prop ] = $deprecation['replacement'];
+				/* translators: 1: Old value. 2: Prop name. 3: New value. */
+				$message = sprintf( __( 'The "%1$s" value of "%2$s" is deprecated. Use "%3$s" instead.', 'gutenberg' ), $deprecation['value'], $prop, $deprecation['replacement'] );
+			} else {
+				if ( ! array_key_exists( $deprecation['replacement'], $props ) ) {
+					$props[ $deprecation['replacement'] ] = $props[ $prop ];
+				}
+				unset( $props[ $prop ] );
+				/* translators: 1: Old prop name. 2: New prop name. */
+				$message = sprintf( __( 'The "%1$s" prop is deprecated. Use "%2$s" instead.', 'gutenberg' ), $prop, $deprecation['replacement'] );
+			}
+
+			_deprecated_argument( __CLASS__ . '::render', esc_html( $deprecation['since'] ), esc_html( $message ) );
+		}
+
+		return $props;
 	}
 
 	/**
