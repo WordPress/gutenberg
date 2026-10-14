@@ -209,40 +209,34 @@ const UnconnectedColorPicker = (
 			/>
 			<div className={ styles.auxiliary }>
 				<HStack className={ styles.header } justify="space-between">
-					<div className={ styles.select }>
-						<Select.Root
-							value={ colorType }
-							onValueChange={ ( nextColorType ) => {
-								if ( nextColorType !== null ) {
-									setColorType( nextColorType as ColorType );
-								}
-							} }
-						>
-							<Select.Trigger
-								size="compact"
-								variant="minimal"
-								aria-label={ __( 'Color format' ) }
-							>
-								{
-									options.find(
-										( option ) => option.value === colorType
-									)?.label
-								}
-							</Select.Trigger>
-							<Select.Popup width="content">
-								{ options.map( ( option ) => (
-									<Select.Item
-										key={ option.value }
-										value={ option.value }
-									>
-										<Select.ItemLabel>
-											{ option.label }
-										</Select.ItemLabel>
-									</Select.Item>
-								) ) }
-							</Select.Popup>
-						</Select.Root>
-					</div>
+					<Select.Root
+						items={ options }
+						value={ colorType }
+						onValueChange={ ( nextColorType ) => {
+							if ( nextColorType !== null ) {
+								setColorType( nextColorType );
+							}
+						} }
+					>
+						<Select.Trigger
+							size="compact"
+							variant="minimal"
+							aria-label={ __( 'Color format' ) }
+							className={ styles.select }
+						/>
+						<Select.Popup width="content">
+							{ options.map( ( option ) => (
+								<Select.Item
+									key={ option.value }
+									value={ option.value }
+								>
+									<Select.ItemLabel>
+										{ option.label }
+									</Select.ItemLabel>
+								</Select.Item>
+							) ) }
+						</Select.Popup>
+					</Select.Root>
 					<ColorCopyButton
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }
