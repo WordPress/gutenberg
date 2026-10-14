@@ -628,7 +628,7 @@ export const unregisterBlockStyle = (
 
 /**
  * Returns an array with the variations of a given block type.
- * Ignored from documentation as the recommended usage is via useSelect from @wordpress/data.
+ * Ignored from documentation as the recommended usage is via useSelect from `@wordpress/data`.
  *
  * @ignore
  *

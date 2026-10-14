@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
@@ -138,7 +138,7 @@ export default function MediaEditorCanvas( {
 		<div className="media-editor-canvas">
 			{ status === 'loading' && (
 				<div className="media-editor-canvas__spinner">
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ /*
