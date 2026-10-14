@@ -15,9 +15,17 @@ async function setup( attributes ) {
 	return view;
 }
 
+// The inspector shows the block name as a heading too, so pick the one that
+// sits inside the panel.
 async function getMediaPanel() {
-	const heading = await screen.findByRole( 'heading', { name: 'Media' } );
-	return within( heading.closest( '[data-wp-component="ToolsPanel"]' ) );
+	const headings = await screen.findAllByRole( 'heading', { name: 'File' } );
+	const panel = headings
+		.map( ( heading ) =>
+			// eslint-disable-next-line testing-library/no-node-access
+			heading.closest( '[data-wp-component="ToolsPanel"]' )
+		)
+		.find( Boolean );
+	return within( panel );
 }
 
 // The inspector offers the same labels, so scope to the block toolbar.

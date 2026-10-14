@@ -216,7 +216,7 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 	const mediaInspectorPanel = isSelected && (
 		<InspectorControls group="content">
 			<ToolsPanel
-				label={ __( 'Media' ) }
+				label={ __( 'File' ) }
 				resetAll={ () => onSelectFile( undefined ) }
 				dropdownMenuProps={ dropdownMenuProps }
 			>
