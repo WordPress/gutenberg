@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { useFocusOnMount } from '@wordpress/compose';
 
 export type ModalProps = {
@@ -23,6 +20,8 @@ export type ModalProps = {
 	};
 	/**
 	 * Class name added to the body element when the modal is open.
+	 * If you use a custom class name, its styles must set `overflow: hidden`
+	 * to preserve the Modal's scroll lock.
 	 *
 	 * @default 'modal-open'
 	 */
@@ -146,7 +145,8 @@ export type ModalProps = {
 	title?: string;
 	/**
 	 * When set to `true`, the Modal's header (including the icon, title and
-	 * close button) will not be rendered.
+	 * close button) will not be rendered. A `title` is then applied to the
+	 * dialog as its `aria-label`, so the dialog keeps an accessible name.
 	 *
 	 * _Warning_: This property is still experimental. “Experimental” means this
 	 * is an early implementation subject to drastic and breaking changes.

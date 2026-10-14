@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import { useStyle } from './hooks';
 import { useStylesPreviewColors } from './preview-hooks';
 import TypographyExample from './typography-example';

@@ -59,7 +59,7 @@
 	}
 
 	&__file-name {
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		margin-bottom: $grid-unit-10;
 	}
 

@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
 import { useState, forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { Button } from '../button';
 import RangeControl from '../range-control';
 import { Flex, FlexItem } from '../flex';
@@ -23,11 +13,12 @@ import {
 	useCustomUnits,
 } from '../unit-control';
 import type { FontSizePickerProps } from './types';
-import { Container, Header, HeaderLabel, HeaderToggle } from './styles';
+import BaseControl from '../base-control';
+import { HStack } from '../h-stack';
+import styles from './style.module.scss';
 import { Spacer } from '../spacer';
 import FontSizePickerSelect from './font-size-picker-select';
 import FontSizePickerToggleGroup from './font-size-picker-toggle-group';
-import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 const DEFAULT_UNITS = [ 'px', 'em', 'rem', 'vw', 'vh' ];
 
@@ -38,12 +29,10 @@ const UnforwardedFontSizePicker = (
 	ref: ForwardedRef< any >
 ) => {
 	const {
-		__next40pxDefaultSize = false,
 		fallbackFontSize,
 		fontSizes = [],
 		disableCustomFontSizes = false,
 		onChange,
-		size = 'default',
 		units: unitsProp = DEFAULT_UNITS,
 		value,
 		valueMode = 'literal',
@@ -117,26 +106,32 @@ const UnforwardedFontSizePicker = (
 		!! valueUnit && [ 'em', 'rem', 'vw', 'vh' ].includes( valueUnit );
 	const isDisabled = value === undefined;
 
-	maybeWarnDeprecated36pxSize( {
-		componentName: 'FontSizePicker',
-		__next40pxDefaultSize,
-		size,
-	} );
-
 	return (
-		<Container
+		<fieldset
 			ref={ ref }
-			className="components-font-size-picker"
-			// This Container component renders a fieldset element that needs to be labeled.
+			className={ clsx(
+				'components-font-size-picker',
+				styles.container
+			) }
+			// The fieldset needs to be labeled.
 			aria-labelledby={ labelId }
 		>
 			<Spacer>
-				<Header className="components-font-size-picker__header">
-					<HeaderLabel id={ labelId }>
+				<HStack
+					className={ clsx(
+						'components-font-size-picker__header',
+						styles.header
+					) }
+				>
+					<BaseControl.VisualLabel
+						id={ labelId }
+						className={ styles[ 'header-label' ] }
+					>
 						{ __( 'Font size' ) }
-					</HeaderLabel>
+					</BaseControl.VisualLabel>
 					{ ! disableCustomFontSizes && (
-						<HeaderToggle
+						<Button
+							className={ styles[ 'header-toggle' ] }
 							label={
 								currentPickerType === 'custom'
 									? __( 'Use size preset' )
@@ -150,17 +145,15 @@ const UnforwardedFontSizePicker = (
 							size="small"
 						/>
 					) }
-				</Header>
+				</HStack>
 			</Spacer>
 			<div>
 				{ currentPickerType === 'select' && (
 					<FontSizePickerSelect
-						__next40pxDefaultSize={ __next40pxDefaultSize }
 						fontSizes={ fontSizes }
 						value={ value }
 						valueMode={ valueMode }
 						disableCustomFontSizes={ disableCustomFontSizes }
-						size={ size }
 						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined, selectedItem );
@@ -179,8 +172,6 @@ const UnforwardedFontSizePicker = (
 						fontSizes={ fontSizes }
 						value={ value }
 						valueMode={ valueMode }
-						__next40pxDefaultSize={ __next40pxDefaultSize }
-						size={ size }
 						onChange={ ( newValue, selectedItem ) => {
 							if ( newValue === undefined ) {
 								onChange?.( undefined, selectedItem );
@@ -197,8 +188,6 @@ const UnforwardedFontSizePicker = (
 					<Flex className="components-font-size-picker__custom-size-control">
 						<FlexItem isBlock>
 							<UnitControl
-								__next40pxDefaultSize={ __next40pxDefaultSize }
-								__shouldNotWarnDeprecated36pxSize
 								label={ __( 'Font size' ) }
 								labelPosition="top"
 								hideLabelFromVision
@@ -206,7 +195,7 @@ const UnforwardedFontSizePicker = (
 									hasUnits
 										? `${ valueQuantity ?? '' }${
 												valueUnit ?? ''
-										  }`
+											}`
 										: resolvedValueForControls
 								}
 								onChange={ ( newValue ) => {
@@ -226,7 +215,6 @@ const UnforwardedFontSizePicker = (
 										);
 									}
 								} }
-								size={ size }
 								units={ hasUnits ? units : [] }
 								min={ 0 }
 							/>
@@ -235,10 +223,6 @@ const UnforwardedFontSizePicker = (
 							<FlexItem isBlock>
 								<Spacer marginX={ 2 } marginBottom={ 0 }>
 									<RangeControl
-										__next40pxDefaultSize={
-											__next40pxDefaultSize
-										}
-										__shouldNotWarnDeprecated36pxSize
 										className="components-font-size-picker__custom-input"
 										label={ __( 'Font size' ) }
 										hideLabelFromVision
@@ -276,12 +260,7 @@ const UnforwardedFontSizePicker = (
 									} }
 									variant="secondary"
 									__next40pxDefaultSize
-									size={
-										size === '__unstable-large' ||
-										props.__next40pxDefaultSize
-											? 'default'
-											: 'small'
-									}
+									size="default"
 								>
 									{ __( 'Reset' ) }
 								</Button>
@@ -290,7 +269,7 @@ const UnforwardedFontSizePicker = (
 					</Flex>
 				) }
 			</div>
-		</Container>
+		</fieldset>
 	);
 };
 

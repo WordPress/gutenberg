@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
-
-/**
- * Internal dependencies
- */
 import type { WPCompleter } from './types';
 
 type AutocompleteMatch = {

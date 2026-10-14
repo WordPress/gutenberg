@@ -1,0 +1,7 @@
+@use "@wordpress/base-styles/mixins" as *;
+
+.modal {
+	@include break-small() {
+		width: 600px;
+	}
+}

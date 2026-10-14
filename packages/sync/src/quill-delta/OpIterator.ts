@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import Op from './Op';
 
 export default class Iterator {

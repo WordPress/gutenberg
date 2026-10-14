@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ComponentType } from 'react';
-
-/**
- * Internal dependencies
- */
 import { createHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**

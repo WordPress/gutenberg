@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useId, useMemo } from '@wordpress/element';
 // @ts-expect-error Block Editor not fully typed yet.
 import { BlockPreview, BlockEditorProvider } from '@wordpress/block-editor';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { parse } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import { unlock } from '../../lock-unlock';
 import { useEditorAssets } from '../../hooks/use-editor-assets';

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf, _x } from '@wordpress/i18n';
 import type { Field } from '@wordpress/dataviews';
-
-/**
- * Internal dependencies
- */
 import type { MediaItem } from '../types';
 
 const KB_IN_BYTES = 1024;

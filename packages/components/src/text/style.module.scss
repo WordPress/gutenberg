@@ -1,0 +1,84 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "../utils/theme-variables" as *;
+
+.text {
+	// Reset instance values so nested Text does not inherit another instance's props.
+	--wp-components-text-color: initial;
+	--wp-components-text-display: initial;
+	--wp-components-text-font-size: initial;
+	--wp-components-text-font-weight: initial;
+	--wp-components-text-line-height: initial;
+	--wp-components-text-letter-spacing: initial;
+	--wp-components-text-text-align: initial;
+
+	color: var(--wp-components-text-color, #{$components-color-foreground});
+	font-size: var(--wp-components-text-font-size);
+	font-weight: var(--wp-components-text-font-weight);
+	line-height: var(--wp-components-text-line-height, 1.4);
+	margin: 0;
+}
+
+// Truncate's white-space declaration must win in either stylesheet order.
+:where(.text) {
+	text-wrap: pretty;
+}
+
+// Only emit optional declarations when supplied, so Truncate can set display.
+.has-display {
+	display: var(--wp-components-text-display);
+}
+
+.has-letter-spacing {
+	letter-spacing: var(--wp-components-text-letter-spacing);
+}
+
+.has-text-align {
+	text-align: var(--wp-components-text-text-align);
+}
+
+$typography-properties: color, display, font-size, font-weight, line-height,
+	letter-spacing, text-align;
+
+@each $property in $typography-properties {
+	@each $keyword in inherit, initial, unset, revert, revert-layer {
+		.#{$property}-#{$keyword} {
+			#{$property}: $keyword;
+		}
+	}
+}
+
+// Keep the original order: readability, destructive, then caption/variant color.
+.readability-dark {
+	color: $gray-900;
+}
+
+.readability-light {
+	color: $white;
+}
+
+.destructive {
+	// Preserve Text's existing color, which differs from the base-styles alert red.
+	color: #d94f4f;
+}
+
+.highlighter-text {
+	mark {
+		background: $alert-yellow;
+		border-radius: 2px;
+		box-shadow:
+			0 0 0 1px rgba(0, 0, 0, 0.05) inset,
+			0 -1px 0 rgba(0, 0, 0, 0.1) inset;
+	}
+}
+
+.block {
+	display: block;
+}
+
+.muted {
+	color: $components-color-gray-700;
+}
+
+.upper-case {
+	text-transform: uppercase;
+}

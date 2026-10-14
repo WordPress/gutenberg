@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { getProtocol, prependHTTPS } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import { isHashLink, isRelativePath } from './is-url-like';
 import { TEL_TYPE, MAILTO_TYPE, INTERNAL_TYPE, URL_TYPE } from './constants';
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlobURL, isBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 

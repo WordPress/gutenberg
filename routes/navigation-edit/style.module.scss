@@ -1,0 +1,7 @@
+.content {
+	flex-grow: 1;
+	min-height: 0;
+	overflow: auto;
+	background-color: var(--wpds-color-background-surface-neutral-strong);
+	padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-2xl);
+}

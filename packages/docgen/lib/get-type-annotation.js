@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 // See https://babeljs.io/docs/en/babel-types.
 const { types: babelTypes } = require( '@babel/core' );
 

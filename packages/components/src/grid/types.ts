@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties, ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ResponsiveCSSValue } from '../utils/types';
 
 type GridAlignment =

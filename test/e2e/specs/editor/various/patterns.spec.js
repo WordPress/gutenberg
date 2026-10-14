@@ -1,7 +1,8 @@
-/**
- * WordPress dependencies
- */
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Unsynced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -461,6 +462,157 @@ test.describe( 'Unsynced pattern', () => {
 				exact: true,
 			} )
 		).toBeVisible();
+	} );
+
+	test( 'shows the source block in the inspector when editing a pattern', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await listView
+			.getByRole( 'gridcell', { name: 'Header', exact: true } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const blockHeading = editorSettings
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByRole( 'heading' )
+			.first();
+
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Pattern' );
+
+		await editorSettings
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
+	} );
+
+	test( 'shows the full pattern editing command suggestion when a pattern content block is selected', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+<!-- wp:paragraph -->
+<p>Outside paragraph</p>
+<!-- /wp:paragraph -->` );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Pattern content' } )
+			.click();
+
+		await pageUtils.pressKeys( 'primary+k' );
+		const commandSuggestions = page.getByRole( 'listbox', {
+			name: 'Command suggestions',
+		} );
+
+		await expect(
+			commandSuggestions.getByText( 'Suggestions' )
+		).toBeVisible();
+		await expect(
+			commandSuggestions.getByRole( 'option', {
+				name: 'Enable editing all patterns',
+			} )
+		).toBeVisible();
+
+		await commandSuggestions
+			.getByRole( 'option', {
+				name: 'Enable editing all patterns',
+			} )
+			.click();
+		await expect( commandSuggestions ).toBeHidden();
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/commands', 'recentlyUsed', [] );
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Outside paragraph' } )
+			.click();
+
+		await pageUtils.pressKeys( 'primary+k' );
+
+		await expect( commandSuggestions.getByText( 'Recent' ) ).toBeHidden();
+		await expect(
+			commandSuggestions.getByText( 'Suggestions' )
+		).toBeVisible();
+		await expect(
+			commandSuggestions.getByRole( 'option', {
+				name: 'Disable editing all patterns',
+			} )
+		).toBeVisible();
+	} );
+
+	test( 'shows the source block in the inspector when full pattern editing is enabled', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"theme/header-wrapper","name":"Header"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:paragraph -->
+<p>Pattern content</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await listView
+			.getByRole( 'gridcell', { name: 'Header', exact: true } )
+			.click();
+
+		await editor.openDocumentSettingsSidebar();
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const blockHeading = editorSettings
+			.getByRole( 'tabpanel', { name: 'Block' } )
+			.getByRole( 'heading' )
+			.first();
+
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Pattern' );
+
+		await editorSettings
+			.getByRole( 'button', { name: 'Edit pattern' } )
+			.click();
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Exit pattern' } )
+		).toBeVisible();
+
+		await pageUtils.pressKeys( 'primary+k' );
+		await page
+			.getByRole( 'combobox', { name: 'Search commands and settings' } )
+			.fill( 'editing all patterns' );
+		await page
+			.getByRole( 'option', { name: 'Enable editing all patterns' } )
+			.click();
+
+		await expect(
+			editorSettings.getByRole( 'button', { name: 'Exit pattern' } )
+		).toBeHidden();
+		await expect( blockHeading ).toHaveAccessibleName( 'Header Group' );
 	} );
 
 	test( 'detaches an unsynced pattern via the block options menu', async ( {
@@ -925,7 +1077,7 @@ test.describe( 'Synced pattern', () => {
 
 		await admin.createNewPost();
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '/Awesome block' );
 		await page.getByRole( 'option', { name: 'Awesome block' } ).click();
@@ -1237,5 +1389,99 @@ test.describe( 'Synced pattern - entity navigation', () => {
 
 		// The pattern block should still be selected.
 		await expect( patternBlock ).toHaveClass( /is-selected/ );
+	} );
+} );
+
+test.describe( 'Synced pattern - read-only access', () => {
+	let postId;
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		const author = await requestUtils.createUser( {
+			username: 'patternauthor',
+			email: 'patternauthor@example.com',
+			password: 'patternauthorpassword',
+			roles: [ 'author' ],
+		} );
+		// An administrator's pattern, which an author can use but not edit.
+		const { id } = await requestUtils.createBlock( {
+			title: 'Administrator pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Read-only pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+		const post = await requestUtils.createPost( {
+			title: 'Author post',
+			status: 'draft',
+			author: author.id,
+			content: `<!-- wp:block {"ref":${ id }} /-->`,
+		} );
+		postId = post.id;
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllUsers();
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/11343.
+	test( 'renders for a user who cannot edit it, without "Edit original"', async ( {
+		browser,
+		requestUtils,
+	} ) => {
+		const context = await browser.newContext( {
+			baseURL: requestUtils.baseURL,
+			storageState: { cookies: [], origins: [] },
+		} );
+		const page = await context.newPage();
+		await page.goto( '/wp-login.php' );
+		await page
+			.getByLabel( 'Username or Email Address' )
+			.fill( 'patternauthor' );
+		await page
+			.getByLabel( 'Password', { exact: true } )
+			.fill( 'patternauthorpassword' );
+		await page.getByRole( 'button', { name: 'Log In' } ).click();
+		await page.waitForURL( '**/wp-admin/**' );
+
+		await page.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
+		await page.waitForFunction( () => !! window.wp?.data );
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'welcomeGuide', false );
+		} );
+
+		const editor = new Editor( { page } );
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		await expect(
+			patternBlock.getByText( 'Read-only pattern content' )
+		).toBeVisible();
+
+		await editor.selectBlocks( patternBlock );
+		await editor.openDocumentSettingsSidebar();
+		const blockInspector = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			blockInspector.getByRole( 'heading', {
+				name: 'Administrator pattern',
+			} )
+		).toBeVisible();
+		await expect(
+			blockInspector.getByRole( 'button', { name: 'Edit original' } )
+		).toBeHidden();
+
+		await editor.showBlockToolbar();
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Edit original' } )
+		).toBeHidden();
+
+		await context.close();
 	} );
 } );

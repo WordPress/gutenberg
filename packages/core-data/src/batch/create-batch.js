@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import defaultProcessor from './default-processor';
 
 /**

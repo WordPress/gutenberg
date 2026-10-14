@@ -1,19 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import DimensionsTool from '..';
 
 export default {
-	title: 'BlockEditor/DimensionsTool/DimensionsTool',
+	id: 'blockeditor-dimensionstool-dimensionstool',
+	title: 'Editor/Block Editor/DimensionsTool/DimensionsTool',
 	component: DimensionsTool,
 	tags: [ 'status-private' ],
 	argTypes: {

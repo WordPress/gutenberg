@@ -1,0 +1,54 @@
+<svg viewBox="0 0 860 344" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="A dashboard grid of four widget tiles; one is opened to show the dashboard's chrome, an identity header with a toolbar, framing the widget's content area. The widget declares identity and representation; the dashboard frames them as chrome and content.">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect x="6" y="6" width="848" height="332" rx="12" fill="#ffffff"/>
+
+  <!-- Column headers -->
+  <text x="166" y="40" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">a grid of widget tiles</text>
+  <text x="620" y="40" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11.5" font-weight="700" fill="#64748b">one tile, framed</text>
+
+  <!-- Left: grid of tiles, one highlighted -->
+  <rect x="48" y="60" width="112" height="92" rx="8" fill="#fafbfc" stroke="#2f54a5" stroke-width="1.6"/>
+  <rect x="56" y="68" width="96" height="14" rx="3" fill="#e2ecfd"/>
+  <rect x="172" y="60" width="112" height="68" rx="8" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <rect x="180" y="68" width="96" height="12" rx="3" fill="#eef2f7"/>
+  <rect x="48" y="164" width="112" height="68" rx="8" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <rect x="56" y="172" width="96" height="12" rx="3" fill="#eef2f7"/>
+  <rect x="172" y="140" width="112" height="92" rx="8" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.4"/>
+  <rect x="180" y="148" width="96" height="12" rx="3" fill="#eef2f7"/>
+
+  <!-- Arrow: open one tile -->
+  <text x="386" y="140" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="10" fill="#94a3b8">open one</text>
+  <line x1="320" y1="150" x2="452" y2="150" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Right: the opened tile -->
+  <rect x="470" y="60" width="300" height="224" rx="10" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.6"/>
+  <line x1="470" y1="112" x2="770" y2="112" stroke="#e2e8f0" stroke-width="1.2"/>
+
+  <!-- Identity in the header -->
+  <rect x="486" y="76" width="20" height="20" rx="5" fill="#e2ecfd" stroke="#2f54a5" stroke-width="1.3"/>
+  <text x="514" y="90" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="600" fill="#1e3a8a">Widget title</text>
+
+  <!-- Toolbar in the header -->
+  <rect x="688" y="76" width="66" height="20" rx="6" fill="#fafbfc" stroke="#cbd5e1" stroke-width="1.2"/>
+  <circle cx="704" cy="86" r="2.1" fill="#94a3b8"/>
+  <circle cx="720" cy="86" r="2.1" fill="#94a3b8"/>
+  <circle cx="736" cy="86" r="2.1" fill="#94a3b8"/>
+
+  <!-- Content -->
+  <rect x="484" y="128" width="272" height="140" rx="8" fill="#fff3d0" stroke="#b07020" stroke-width="1.2"/>
+  <text x="620" y="202" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="12" fill="#855317">widget content</text>
+
+  <!-- Leaders: chrome / content -->
+  <line x1="770" y1="88" x2="792" y2="88" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="796" y="91" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#475569">chrome</text>
+  <line x1="770" y1="198" x2="792" y2="198" stroke="#cbd5e1" stroke-width="1.2"/>
+  <text x="796" y="201" font-family="ui-monospace, SFMono-Regular, monospace" font-size="11" fill="#475569">content</text>
+
+  <!-- Caption -->
+  <text x="430" y="314" text-anchor="middle" font-family="-apple-system, system-ui, sans-serif" font-size="11" fill="#64748b">the widget declares identity and representation; the dashboard frames them as chrome and content</text>
+</svg>

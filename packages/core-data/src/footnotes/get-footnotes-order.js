@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import getRichTextValuesCached from './get-rich-text-values-cached';
 
 const cache = new WeakMap();

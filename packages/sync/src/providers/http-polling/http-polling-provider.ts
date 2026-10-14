@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import type * as Y from 'yjs';
 import { ObservableV2 } from 'lib0/observable';
 import { Awareness } from 'y-protocols/awareness';
-
-/**
- * Internal dependencies
- */
 import type {
 	ConnectionStatus,
 	ProviderCreator,
@@ -23,8 +16,8 @@ export interface ProviderOptions {
 }
 
 /**
- * Event types for HttpPollingProvider.
- * ObservableV2 expects event handlers as functions.
+ * Event types for HttpPollingProvider. ObservableV2 expects event handlers as
+ * functions. `status` mirrors the generic `ProviderEventMap`.
  */
 type HttpPollingEvents = {
 	status: ( status: ConnectionStatus ) => void;
@@ -37,7 +30,6 @@ type HttpPollingEvents = {
 class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	protected awareness: Awareness;
 	protected status: ConnectionStatus[ 'status' ] = 'disconnected';
-	protected synced = false;
 
 	public constructor( protected options: ProviderOptions ) {
 		super();
@@ -59,7 +51,6 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			awareness: this.awareness,
 			log: this.log,
 			onStatusChange: this.emitStatus,
-			onSync: this.onSync,
 		} );
 	}
 
@@ -133,16 +124,6 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			room: this.options.room,
 			...debug,
 		} );
-	};
-
-	/**
-	 * Handle synchronization events from the polling manager.
-	 */
-	protected onSync = (): void => {
-		if ( ! this.synced ) {
-			this.synced = true;
-			this.log( 'Synced' );
-		}
 	};
 }
 

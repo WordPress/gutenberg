@@ -1,0 +1,4 @@
+.fixture {
+	/* stylelint-disable-next-line plugin-wpds/no-token-fallback-values -- Fixture verifies empty fallback handling. */
+	gap: var(--wpds-dimension-gap-sm,);
+}

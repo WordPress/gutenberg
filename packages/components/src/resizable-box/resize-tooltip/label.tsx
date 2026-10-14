@@ -1,24 +1,11 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { Text } from '../../text';
 import type { Position } from './utils';
 import { POSITIONS } from './utils';
-import {
-	TooltipWrapper,
-	Tooltip,
-	LabelText,
-} from './styles/resize-tooltip.styles';
+import styles from './style.module.scss';
 
 const CORNER_OFFSET = 4;
 const CURSOR_OFFSET_TOP = CORNER_OFFSET * 2.5;
@@ -77,20 +64,28 @@ function Label(
 	}
 
 	return (
-		<TooltipWrapper
+		<div
 			aria-hidden="true"
-			className="components-resizable-tooltip__tooltip-wrapper"
+			className={ clsx(
+				'components-resizable-tooltip__tooltip-wrapper',
+				styles[ 'tooltip-wrapper' ]
+			) }
 			ref={ ref }
 			style={ style }
 			{ ...props }
 		>
-			<Tooltip
-				className="components-resizable-tooltip__tooltip"
+			<div
+				className={ clsx(
+					'components-resizable-tooltip__tooltip',
+					styles.tooltip
+				) }
 				style={ labelStyle }
 			>
-				<LabelText as="span">{ label }</LabelText>
-			</Tooltip>
-		</TooltipWrapper>
+				<Text as="span" className={ styles[ 'label-text' ] }>
+					{ label }
+				</Text>
+			</div>
+		</div>
 	);
 }
 

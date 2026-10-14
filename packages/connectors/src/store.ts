@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createReduxStore, createSelector, register } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import type { ConnectorConfig, ConnectorsState } from './types';
 import { unlock } from './lock-unlock';
 

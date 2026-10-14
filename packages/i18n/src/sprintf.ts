@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import _sprintf from '@tannin/sprintf';
-
-/**
- * Internal dependencies
- */
 import type { DistributeSprintfArgs, TransformedText } from './types';
 
 export function sprintf< T extends string >(

@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type {
 	ComponentPropsWithRef,
 	MouseEventHandler,
@@ -54,11 +51,10 @@ export interface TokenItem {
 	onMouseLeave?: MouseEventHandler< HTMLSpanElement >;
 }
 
-export interface FormTokenFieldProps
-	extends Pick<
-		ComponentPropsWithRef< 'input' >,
-		'autoCapitalize' | 'autoComplete' | 'className'
-	> {
+export interface FormTokenFieldProps extends Pick<
+	ComponentPropsWithRef< 'input' >,
+	'autoCapitalize' | 'autoComplete' | 'className'
+> {
 	label?: string;
 	/**
 	 * An array of strings to present to the user as suggested tokens.
@@ -167,7 +163,8 @@ export interface FormTokenFieldProps
 	 * Start opting into the larger default height that will become the
 	 * default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { Link, Stack, Text } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { HeaderBackground } from '../header-background';
 import styles from './banner.module.css';
 
@@ -18,7 +11,7 @@ export function Banner() {
 			<HeaderBackground version={ DISPLAY_VERSION } />
 
 			<Stack
-				className={ styles.bannerContent }
+				className={ styles[ 'banner-content' ] }
 				gap="sm"
 				direction="column"
 			>
@@ -28,7 +21,7 @@ export function Banner() {
 
 				<Text variant="heading-lg">
 					<Link
-						className={ styles.bannerLink }
+						className={ styles[ 'banner-link' ] }
 						href="/wp-admin/about.php"
 						variant="unstyled"
 					>

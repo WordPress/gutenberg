@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createSlotFill } from '@wordpress/components';
 
 const InspectorControlsDefault = createSlotFill( 'InspectorControls' );
@@ -16,9 +13,13 @@ const InspectorControlsDimensions = createSlotFill(
 	'InspectorControlsDimensions'
 );
 const InspectorControlsLayout = createSlotFill( 'InspectorControlsLayout' );
+const InspectorControlsElements = createSlotFill( 'InspectorControlsElements' );
 const InspectorControlsPosition = createSlotFill( 'InspectorControlsPosition' );
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
+);
+const InspectorControlsStyleStates = createSlotFill(
+	'InspectorControlsStyleStates'
 );
 const InspectorControlsListView = createSlotFill( 'InspectorControlsListView' );
 const InspectorControlsStyles = createSlotFill( 'InspectorControlsStyles' );
@@ -35,6 +36,7 @@ const groups = {
 	content: InspectorControlsContent,
 	dimensions: InspectorControlsDimensions,
 	effects: InspectorControlsEffects,
+	elements: InspectorControlsElements,
 	filter: InspectorControlsFilter,
 	layout: InspectorControlsLayout,
 	list: InspectorControlsListView,
@@ -42,6 +44,7 @@ const groups = {
 	settings: InspectorControlsDefault, // Alias for default.
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,
+	styleStates: InspectorControlsStyleStates,
 };
 
 export default groups;
@@ -49,4 +52,10 @@ export default groups;
 // Private slot for allowed blocks control UI.
 export const PrivateInspectorControlsAllowedBlocks = createSlotFill(
 	Symbol( 'PrivateInspectorControlsAllowedBlocks' )
+);
+
+// Private slot for the "Advanced" panel shown while editing a style state, so
+// it always renders after every other style state panel.
+export const PrivateInspectorControlsStyleStatesAdvanced = createSlotFill(
+	Symbol( 'PrivateInspectorControlsStyleStatesAdvanced' )
 );

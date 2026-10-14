@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { useStyle } from './hooks';
 
 interface TypographyPreviewProps {
@@ -37,7 +34,7 @@ export default function TypographyPreview( {
 		element === 'link'
 			? {
 					textDecoration: 'underline',
-			  }
+				}
 			: {};
 
 	return (

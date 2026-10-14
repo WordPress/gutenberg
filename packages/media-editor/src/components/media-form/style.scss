@@ -1,0 +1,6 @@
+// Discourage an orphaned "am/pm" (or other single-word widow) when a read-only
+// value wraps in the narrow Details panel. Progressive enhancement: browsers
+// without `text-wrap: pretty` simply wrap normally.
+.media-editor-form .dataforms-layouts-panel__field-control {
+	text-wrap: pretty;
+}

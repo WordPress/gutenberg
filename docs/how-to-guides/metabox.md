@@ -91,7 +91,6 @@ registerBlockType( 'myguten/meta-block', {
 		return (
 			<div { ...blockProps }>
 				<TextControl
-					__next40pxDefaultSize				
 					label="Meta Block Field"
 					value={ metaFieldValue }
 					onChange={ updateMetaValue }

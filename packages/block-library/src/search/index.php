@@ -191,8 +191,32 @@ function render_block_core_search( $attributes ) {
 		';
 	}
 
+	/*
+	 * The semantic <search> landmark wrapper is opt-in to preserve back
+	 * compatibility with themes targeting <form role="search">. The block
+	 * exposes a per-instance HTML element selector with three values:
+	 *
+	 *   - 'search' forces the <search> wrapper
+	 *   - 'form'   forces the original <form role="search"> markup
+	 *   - empty    defers to the 'search-element' html5 sub-feature
+	 *              ( add_theme_support( 'html5', array( 'search-element' ) ) ),
+	 *              matching the opt-in added to get_search_form() in core
+	 */
+	$tag_name           = $attributes['tagName'] ?? '';
+	$use_search_element = 'search' === $tag_name || ( '' === $tag_name && current_theme_supports( 'html5', 'search-element' ) );
+
+	/*
+	 * Only the wrapper markup differs between the semantic <search> landmark
+	 * and the classic <form role="search">. Positional specifiers keep a
+	 * single argument list usable by both formats, since the action URL
+	 * precedes the wrapper attributes in the <search> variant.
+	 */
+	$format = $use_search_element
+		? '<search %2$s %3$s><form method="get" action="%1$s">%4$s</form></search>'
+		: '<form role="search" method="get" action="%1$s" %2$s %3$s>%4$s</form>';
+
 	return sprintf(
-		'<form role="search" method="get" action="%1s" %2s %3s>%4s</form>',
+		$format,
 		esc_url( home_url( '/' ) ),
 		$wrapper_attributes,
 		$form_directives,
@@ -336,7 +360,7 @@ function apply_block_core_search_border_styles( $attributes, $property, &$wrappe
  *
  * @since 5.8.0
  *
- * @param  array $attributes The block attributes.
+ * @param array $attributes The block attributes.
  *
  * @return array Style HTML attribute.
  */
@@ -433,6 +457,20 @@ function styles_for_block_core_search( $attributes ) {
 		}
 	}
 
+	// Shadow lands on the same elements as the border.
+	if ( ! empty( $attributes['style']['shadow'] ) && is_string( $attributes['style']['shadow'] ) ) {
+		$shadow_styles = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ) );
+
+		if ( ! empty( $shadow_styles['css'] ) ) {
+			if ( $is_button_inside ) {
+				$wrapper_styles[] = $shadow_styles['css'];
+			} else {
+				$button_styles[] = $shadow_styles['css'];
+				$input_styles[]  = $shadow_styles['css'];
+			}
+		}
+	}
+
 	$use_input_for_colors = ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'];
 
 	// Add color styles.
@@ -463,6 +501,24 @@ function styles_for_block_core_search( $attributes ) {
 			$input_styles[] = $custom_gradient_style;
 		} else {
 			$button_styles[] = $custom_gradient_style;
+		}
+	}
+
+	// Background skips serialization, so it follows color onto the same element.
+	if ( ! empty( $attributes['style']['background']['gradient'] ) ) {
+		$background_styles = wp_style_engine_get_styles(
+			array(
+				'background' => array(
+					'gradient' => $attributes['style']['background']['gradient'],
+				),
+			)
+		);
+		if ( ! empty( $background_styles['css'] ) ) {
+			if ( $use_input_for_colors ) {
+				$input_styles[] = $background_styles['css'];
+			} else {
+				$button_styles[] = $background_styles['css'];
+			}
 		}
 	}
 
@@ -622,11 +678,13 @@ function get_color_classes_for_block_core_search( $attributes ) {
 	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
 	$has_named_gradient          = ! empty( $attributes['gradient'] );
 	$has_custom_gradient         = ! empty( $attributes['style']['color']['gradient'] );
+	$has_background_gradient     = ! empty( $attributes['style']['background']['gradient'] );
 	if (
 		$has_named_background_color ||
 		$has_custom_background_color ||
 		$has_named_gradient ||
-		$has_custom_gradient
+		$has_custom_gradient ||
+		$has_background_gradient
 	) {
 		$classnames[] = 'has-background';
 	}

@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { DependencyList, RefCallback } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { useCallback, useRef } from '@wordpress/element';
 
 /**

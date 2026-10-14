@@ -1,0 +1,19 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"blocks": {
+			"core/group": {
+				"@mobile": {
+					"elements": {
+						"notanelement": {
+							"color": {
+								"text": "red"
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

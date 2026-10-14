@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { removep, autop } from '@wordpress/autop';
 import { getBlockTransforms, rawHandler } from '@wordpress/blocks';
 import { next } from '@wordpress/shortcode';

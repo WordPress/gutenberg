@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	Icon as WCIcon,
 	BaseControl,
@@ -26,10 +23,6 @@ import {
 } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { serialize } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	getCleanTemplatePartSlug,
 	getUniqueTemplatePartTitle,
@@ -177,7 +170,7 @@ export function CreateTemplatePartModalContents( {
 					? error.message
 					: __(
 							'An error occurred while creating the template part.'
-					  );
+						);
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 
@@ -195,7 +188,6 @@ export function CreateTemplatePartModalContents( {
 		>
 			<VStack spacing="4">
 				<TextControl
-					__next40pxDefaultSize
 					label={ __( 'Name' ) }
 					value={ title }
 					onChange={ setTitle }

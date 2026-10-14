@@ -2,6 +2,7 @@ import { forwardRef } from '@wordpress/element';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { TabsValidationProvider } from './context';
 import type { TabRootProps } from './types';
+import { DirectionProvider } from '../utils/direction-provider';
 
 /**
  * Groups the tabs and the corresponding panels.
@@ -12,9 +13,11 @@ import type { TabRootProps } from './types';
 export const Root = forwardRef< HTMLDivElement, TabRootProps >(
 	function TabsRoot( { ...otherProps }, forwardedRef ) {
 		return (
-			<TabsValidationProvider>
-				<_Tabs.Root ref={ forwardedRef } { ...otherProps } />
-			</TabsValidationProvider>
+			<DirectionProvider>
+				<TabsValidationProvider>
+					<_Tabs.Root ref={ forwardedRef } { ...otherProps } />
+				</TabsValidationProvider>
+			</DirectionProvider>
 		);
 	}
 );

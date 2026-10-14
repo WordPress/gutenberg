@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, memo, useContext } from '@wordpress/element';
 import { SearchControl } from '@wordpress/components';
 import { useDebouncedInput } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import DataViewsContext from '../dataviews-context';
 
 interface SearchProps {

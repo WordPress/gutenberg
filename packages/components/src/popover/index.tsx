@@ -51,21 +51,25 @@ import type {
 } from './types';
 import { overlayMiddlewares } from './overlay-middlewares';
 import { StyleProvider } from '../style-provider';
-
 /**
  * Name of slot in which popover should fill.
  *
  * @type {string}
  */
 export const SLOT_NAME = 'Popover';
-
 /**
  * Virtual padding to account for overflow boundaries.
  *
  * @type {number}
  */
 const OVERFLOW_PADDING = 8;
-
+/**
+ * How long to wait after the last position update before dropping the
+ * `will-change` hint.
+ *
+ * @type {number}
+ */
+const WILL_CHANGE_IDLE_TIMEOUT = 200;
 // An SVG displaying a triangle facing down, filled with a solid
 // color and bordered in such a way to create an arrow-like effect.
 // Keeping the SVG's viewbox squared simplify the arrow positioning
@@ -88,7 +92,6 @@ const ArrowTriangle = () => (
 		/>
 	</SVG>
 );
-
 import { slotNameContext } from './context';
 
 const fallbackContainerClassname = 'components-popover__fallback-container';
@@ -334,6 +337,8 @@ const UnforwardedPopover = (
 		y,
 		// Object with "regular" refs to both "reference" and "floating"
 		refs,
+		// The "reference" and "floating" DOM elements
+		elements,
 		// Type of CSS position property to use (absolute or fixed)
 		strategy,
 		update,
@@ -396,11 +401,35 @@ const UnforwardedPopover = (
 		refs,
 	] );
 
+	const popoverElementRef = useRef< HTMLElement | null >( null );
+
 	const mergedFloatingRef = useMergeRefs( [
 		refs.setFloating,
 		dialogRef,
+		popoverElementRef,
 		forwardedRef,
 	] );
+
+	// Keep the `will-change: transform` hint on only while the popover is
+	// actually moving. Leaving it on for good keeps the popover on its own
+	// compositing layer, which Chrome can render blurry, while never hinting
+	// makes the popover repaint on every scroll frame (see #46187). The
+	// floating element can also be swapped without moving, e.g. when a
+	// `Popover.Slot` mounts, so a new element restarts the timer too.
+	useLayoutEffect( () => {
+		const popoverElement = popoverElementRef.current;
+		if ( ! popoverElement ) {
+			return;
+		}
+
+		popoverElement.style.willChange = 'transform';
+
+		const timeoutId = setTimeout( () => {
+			popoverElement.style.willChange = 'auto';
+		}, WILL_CHANGE_IDLE_TIMEOUT );
+
+		return () => clearTimeout( timeoutId );
+	}, [ x, y, elements.floating ] );
 
 	const style = isExpanded
 		? undefined
@@ -415,7 +444,7 @@ const UnforwardedPopover = (
 				// `placementToMotionAnimationProps` function.
 				x: computePopoverPosition( x ),
 				y: computePopoverPosition( y ),
-		  };
+			};
 
 	const shouldReduceMotion = useReducedMotion();
 	const shouldAnimate = animate && ! isExpanded && ! shouldReduceMotion;
@@ -436,14 +465,14 @@ const UnforwardedPopover = (
 				},
 				onAnimationComplete: () => setAnimationFinished( true ),
 				...otherMotionProps,
-		  }
+			}
 		: {
 				animate: false,
 				style: {
 					...contentStyle,
 					...style,
 				},
-		  };
+			};
 
 	// When Floating UI has finished positioning and Framer Motion has finished animating
 	// the popover, add the `is-positioned` class to signal that all transitions have finished.

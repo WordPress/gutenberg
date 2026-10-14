@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { formatListNumbered as icon } from '@wordpress/icons';
 import { registerFormatType } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';

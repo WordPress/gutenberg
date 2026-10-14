@@ -62,7 +62,6 @@ The `value` property is handled in a manner similar to controlled form component
 -   `__experimentalShowHowTo` - **Deprecated.** Use the `help` prop instead. The `help` prop now defaults to the previous how-to text; if you were passing `__experimentalShowHowTo={ false }` to hide it, pass an empty string to `help` instead.
 -   `__experimentalValidateInput` - If passed, all introduced values will be validated before being added as tokens.
 -   `__experimentalAutoSelectFirstMatch` - If true, the select the first matching suggestion when the user presses the Enter key (or space when tokenizeOnSpace is true).
--   `__next40pxDefaultSize` - Start opting into the larger default height that will become the default size in a future version.
 -   `tokenizeOnBlur` - If true, add any incompleteTokenValue as a new token when the field loses focus.
 
 ## Usage
@@ -85,7 +84,6 @@ const MyFormTokenField = () => {
 
 	return (
 		<FormTokenField
-			__next40pxDefaultSize
 			value={ selectedContinents }
 			suggestions={ continents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }

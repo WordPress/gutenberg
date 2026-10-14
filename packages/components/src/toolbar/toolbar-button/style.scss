@@ -13,7 +13,7 @@
 		content: attr(data-subscript);
 		font-family: $default-font;
 		font-size: $default-font-size;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		line-height: 12px;
 		position: absolute;
 		right: 8px;

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getContext } from '@wordpress/interactivity';
 
 // Whether the hash has been handled for the current page load.
@@ -17,6 +14,13 @@ const { actions } = store(
 					( item ) => item.id === id
 				);
 				return accordionItem ? accordionItem.isOpen : false;
+			},
+			get isHidden() {
+				const { id, accordionItems } = getContext();
+				const accordionItem = accordionItems.find(
+					( item ) => item.id === id
+				);
+				return accordionItem?.isOpen ? null : 'until-found';
 			},
 		},
 		actions: {
@@ -37,16 +41,13 @@ const { actions } = store(
 				}
 			},
 			openPanelByHash: () => {
-				if ( hashHandled || ! window.location?.hash?.length ) {
+				if ( hashHandled ) {
 					return;
 				}
 
 				const context = getContext();
 				const { id, accordionItems, autoclose } = context;
-				const hash = decodeURIComponent(
-					window.location.hash.slice( 1 )
-				);
-				const targetElement = window.document.getElementById( hash );
+				const targetElement = document.querySelector( ':target' );
 
 				if ( ! targetElement ) {
 					return;
@@ -83,6 +84,23 @@ const { actions } = store(
 				window.setTimeout( () => {
 					targetElement.scrollIntoView();
 				}, 0 );
+			},
+			handleBeforeMatch: () => {
+				const context = getContext();
+				const { id, autoclose, accordionItems } = context;
+				const accordionItem = accordionItems.find(
+					( item ) => item.id === id
+				);
+
+				if ( accordionItem ) {
+					if ( autoclose ) {
+						accordionItems.forEach( ( item ) => {
+							item.isOpen = item.id === id;
+						} );
+					} else {
+						accordionItem.isOpen = true;
+					}
+				}
 			},
 		},
 		callbacks: {

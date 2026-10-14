@@ -5,3 +5,12 @@
 	@include snackbar-container();
 }
 
+.edit-widgets-notices.notices-inline-notices-wrapper,
+.edit-widgets-notices .components-notice-list {
+	gap: 0;
+}
+
+.edit-widgets-notices .components-notice {
+	border-top-width: 0;
+	border-inline-width: 0;
+}

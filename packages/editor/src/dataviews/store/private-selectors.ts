@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { State } from './reducer';
 
 const EMPTY_ARRAY = [] as [];

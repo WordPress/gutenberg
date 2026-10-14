@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Registered sources', () => {
@@ -79,7 +76,7 @@ test.describe( 'Registered sources', () => {
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.getByRole( 'menuitemcheckbox', { name: 'id, show' } )
 				.click();
 			const idAttribute = page.getByRole( 'button', {
 				name: 'id',
@@ -422,6 +419,31 @@ test.describe( 'Registered sources', () => {
 				);
 			} );
 
+			test( 'icon', async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/icon',
+					attributes: {
+						icon: 'core/arrow-right',
+						metadata: {
+							bindings: {
+								icon: {
+									source: 'testing/can-user-edit-false',
+									args: { key: 'icon_field' },
+								},
+							},
+						},
+					},
+				} );
+				const replaceButton = page
+					.getByRole( 'toolbar', { name: 'Block tools' } )
+					.getByRole( 'button', { name: 'Replace' } );
+				await expect( replaceButton ).toBeDisabled();
+				await replaceButton.focus();
+				await expect( replaceButton ).toHaveAccessibleDescription(
+					'Connected to Can User Edit: False'
+				);
+			} );
+
 			test( 'button', async ( { editor, page } ) => {
 				await editor.insertBlock( {
 					name: 'core/buttons',
@@ -558,6 +580,54 @@ test.describe( 'Registered sources', () => {
 						.getByLabel( 'Title attribute' )
 				).toHaveValue( 'Text Field Value' );
 			} );
+
+			test( 'list item', async ( { editor, page } ) => {
+				await editor.insertBlock( {
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: {
+								content: 'list item default content',
+								metadata: {
+									bindings: {
+										content: {
+											source: 'testing/can-user-edit-false',
+											args: { key: 'text_field' },
+										},
+									},
+								},
+							},
+						},
+					],
+				} );
+				const listItemText = editor.canvas.getByRole( 'textbox', {
+					name: 'List text',
+				} );
+				await listItemText.click();
+
+				const blockToolbar = page.getByRole( 'toolbar', {
+					name: 'Block tools',
+				} );
+
+				// Format controls don't exist. `contenteditable=false` makes the
+				// whole rich text non-editable, so checking the always-visible
+				// Bold and Link controls is a proxy for every inline format
+				// (footnote, highlight, inline code, strikethrough, etc.).
+				await expect(
+					blockToolbar.getByRole( 'button', { name: 'Bold' } )
+				).toBeHidden();
+				await expect(
+					blockToolbar.getByRole( 'button', { name: 'Link' } )
+				).toBeHidden();
+
+				// List item content is not editable.
+				await expect( listItemText ).toHaveText( 'Text Field Value' );
+				await expect( listItemText ).toHaveAttribute(
+					'contenteditable',
+					'false'
+				);
+			} );
 		} );
 
 		// The following tests just check the paragraph and assume is the case for the rest of the blocks.
@@ -583,6 +653,57 @@ test.describe( 'Registered sources', () => {
 				editor,
 				page,
 			} );
+		} );
+
+		test( 'source is not defined - list item', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							content: 'list item default content',
+							metadata: {
+								bindings: {
+									content: {
+										source: 'testing/undefined-source',
+										args: { key: 'text_field' },
+									},
+								},
+							},
+						},
+					},
+				],
+			} );
+			const listItemText = editor.canvas.getByRole( 'textbox', {
+				name: 'List text',
+			} );
+			await listItemText.click();
+
+			const blockToolbar = page.getByRole( 'toolbar', {
+				name: 'Block tools',
+			} );
+
+			// Unregistered source locks editing: no `canUserEditValue`, so the
+			// content is not editable and inline formats are unavailable.
+			await expect(
+				blockToolbar.getByRole( 'button', { name: 'Bold' } )
+			).toBeHidden();
+			await expect(
+				blockToolbar.getByRole( 'button', { name: 'Link' } )
+			).toBeHidden();
+			await expect( listItemText ).toHaveAttribute(
+				'contenteditable',
+				'false'
+			);
+
+			// The unregistered source surfaces a warning on the binding.
+			await expect(
+				page.getByRole( 'button', { name: 'content' } )
+			).toContainText( 'Source not registered' );
 		} );
 	} );
 
@@ -626,6 +747,112 @@ test.describe( 'Registered sources', () => {
 			await expect(
 				previewPage.locator( '#connected-paragraph' )
 			).toHaveText( 'new value' );
+		} );
+
+		test( 'should be possible to edit the value from list item content', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							anchor: 'connected-list-item',
+							content: 'list item default content',
+							metadata: {
+								bindings: {
+									content: {
+										source: 'core/post-meta',
+										args: { key: 'text_custom_field' },
+									},
+								},
+							},
+						},
+					},
+				],
+			} );
+			const listItemText = editor.canvas.getByRole( 'textbox', {
+				name: 'List text',
+			} );
+
+			await expect( listItemText ).toHaveAttribute(
+				'contenteditable',
+				'true'
+			);
+			await listItemText.fill( 'new list item value' );
+			// Check that the list item content attribute didn't change.
+			const [ listBlockObject ] = await editor.getBlocks();
+			expect( listBlockObject.innerBlocks[ 0 ].attributes.content ).toBe(
+				'list item default content'
+			);
+			// Check the value of the custom field is being updated by visiting the frontend.
+			const previewPage = await editor.openPreviewPage();
+			await expect(
+				previewPage.locator( '#connected-list-item' )
+			).toHaveText( 'new list item value' );
+		} );
+
+		test( 'should preserve nested list inner blocks when list item content is bound', async ( {
+			editor,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: {
+							anchor: 'connected-list-item-with-nested-list',
+							content: 'list item default content',
+							metadata: {
+								bindings: {
+									content: {
+										source: 'core/post-meta',
+										args: { key: 'text_custom_field' },
+									},
+								},
+							},
+						},
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									{
+										name: 'core/list-item',
+										attributes: {
+											content: 'Nested child',
+										},
+									},
+								],
+							},
+						],
+					},
+				],
+			} );
+
+			// The editor canvas shows the bound value and keeps the nested list.
+			// The anchor only renders on the front end, so locate the two list
+			// item rich-text areas by role: the bound item first, its nested
+			// child second.
+			const listItemTexts = editor.canvas.getByRole( 'textbox', {
+				name: 'List text',
+			} );
+			await expect( listItemTexts.first() ).toHaveText(
+				'Value of the text custom field'
+			);
+			await expect( listItemTexts.nth( 1 ) ).toHaveText( 'Nested child' );
+
+			// The front end renders the bound value without dropping the nested list.
+			const previewPage = await editor.openPreviewPage();
+			const frontendListItem = previewPage.locator(
+				'#connected-list-item-with-nested-list'
+			);
+			await expect( frontendListItem ).toContainText(
+				'Value of the text custom field'
+			);
+			await expect( frontendListItem.locator( 'li' ) ).toHaveText(
+				'Nested child'
+			);
 		} );
 
 		// Related issue: https://github.com/WordPress/gutenberg/issues/62347
@@ -698,6 +925,7 @@ test.describe( 'Registered sources', () => {
 				} )
 				.getByRole( 'textbox' );
 			await buttonBlock.click();
+			await pageUtils.pressKeys( 'primary+k' );
 			await page
 				.getByRole( 'button', { name: 'Edit link', exact: true } )
 				.click();
@@ -836,7 +1064,7 @@ test.describe( 'Registered sources', () => {
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
-					name: 'Show content',
+					name: 'content, show',
 				} )
 				.click();
 			await page.getByRole( 'button', { name: 'content' } ).click();
@@ -864,7 +1092,7 @@ test.describe( 'Registered sources', () => {
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show content',
+				name: 'content, show',
 			} );
 			await expect( contentAttribute ).toBeVisible();
 		} );
@@ -878,9 +1106,46 @@ test.describe( 'Registered sources', () => {
 			} );
 			await page.getByLabel( 'Attributes options' ).click();
 			const contentAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show content',
+				name: 'content, show',
 			} );
 			await expect( contentAttribute ).toBeVisible();
+		} );
+
+		test( 'should be possible to connect the icon block icon', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/icon',
+				attributes: {
+					icon: 'core/arrow-right',
+				},
+			} );
+			await page.getByLabel( 'Attributes options' ).click();
+			const iconAttribute = page.getByRole( 'menuitemcheckbox', {
+				name: 'icon, show',
+			} );
+			await expect( iconAttribute ).toBeVisible();
+			await iconAttribute.click();
+			await page
+				.getByRole( 'button', {
+					name: 'icon Not connected',
+					exact: true,
+				} )
+				.click();
+			await page
+				.getByRole( 'menuitem', { name: 'Complete Source' } )
+				.click();
+			await page
+				.getByRole( 'menuitemcheckbox' )
+				.filter( { hasText: 'Icon Field Label' } )
+				.click();
+			await expect(
+				page.getByRole( 'button', {
+					name: 'icon Icon Field Label',
+					exact: true,
+				} )
+			).toContainText( 'Icon Field Label' );
 		} );
 
 		test( 'should be possible to connect the button supported attributes', async ( {
@@ -904,24 +1169,24 @@ test.describe( 'Registered sources', () => {
 				.click();
 			await page.getByLabel( 'Attributes options' ).click();
 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show url',
+				name: 'url, show',
 			} );
 			await expect( urlAttribute ).toBeVisible();
 			const textAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show text',
+				name: 'text, show',
 			} );
 			await expect( textAttribute ).toBeVisible();
 			const linkTargetAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show linkTarget',
+				name: 'linkTarget, show',
 			} );
 			await expect( linkTargetAttribute ).toBeVisible();
 			const relAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show rel',
+				name: 'rel, show',
 			} );
 			await expect( relAttribute ).toBeVisible();
 			// Check not supported attributes are not included.
 			const tagNameAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show tagName',
+				name: 'tagName, show',
 			} );
 			await expect( tagNameAttribute ).toBeHidden();
 		} );
@@ -941,24 +1206,24 @@ test.describe( 'Registered sources', () => {
 				.getByLabel( 'Attributes options' )
 				.click();
 			const urlAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show url',
+				name: 'url, show',
 			} );
 			await expect( urlAttribute ).toBeVisible();
 			const idAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show id',
+				name: 'id, show',
 			} );
 			await expect( idAttribute ).toBeVisible();
 			const titleAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show title',
+				name: 'title, show',
 			} );
 			await expect( titleAttribute ).toBeVisible();
 			const altAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show alt',
+				name: 'alt, show',
 			} );
 			await expect( altAttribute ).toBeVisible();
 			// Check not supported attributes are not included.
 			const linkClassAttribute = page.getByRole( 'menuitemcheckbox', {
-				name: 'Show linkClass',
+				name: 'linkClass, show',
 			} );
 			await expect( linkClassAttribute ).toBeHidden();
 		} );
@@ -1299,7 +1564,7 @@ test.describe( 'Registered sources', () => {
 			await page.getByRole( 'tab', { name: 'Settings' } ).click();
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show id' } )
+				.getByRole( 'menuitemcheckbox', { name: 'id, show' } )
 				.click();
 			await page.getByRole( 'button', { name: 'id' } ).click();
 

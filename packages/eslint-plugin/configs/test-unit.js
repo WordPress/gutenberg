@@ -1,16 +1,10 @@
-/**
- * External dependencies
- */
-const jestPlugin = require( 'eslint-plugin-jest' );
+const vitest = require( '@vitest/eslint-plugin' );
 
 module.exports = [
-	jestPlugin.configs[ 'flat/recommended' ],
+	vitest.configs.recommended,
 	{
 		rules: {
-			'jest/expect-expect': [
-				'error',
-				{ assertFunctionNames: [ 'expect', 'measurePerformance' ] },
-			],
+			'vitest/valid-title': [ 'error', { allowArguments: true } ],
 		},
 	},
 ];

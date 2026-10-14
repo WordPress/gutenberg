@@ -1,20 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
+import deprecated from '@wordpress/deprecated';
 import { cloneElement, Children } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { ResponsiveWrapperProps } from './types';
 
 /**
  * A wrapper component that maintains its aspect ratio when resized.
+ *
+ * This component is deprecated. Use the CSS `aspect-ratio` property instead.
+ *
+ * @deprecated
  *
  * ```jsx
  * import { ResponsiveWrapper } from '@wordpress/components';
@@ -35,6 +29,12 @@ function ResponsiveWrapper( {
 	children,
 	isInline = false,
 }: ResponsiveWrapperProps ) {
+	deprecated( 'wp.components.ResponsiveWrapper', {
+		since: '7.2',
+		version: '7.4',
+		alternative: 'the CSS aspect-ratio property',
+	} );
+
 	if ( Children.count( children ) !== 1 ) {
 		return null;
 	}

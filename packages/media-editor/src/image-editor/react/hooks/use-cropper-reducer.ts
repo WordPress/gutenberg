@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useReducer,
 	useCallback,
@@ -8,10 +5,6 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	CropperState,
 	CropperAction,

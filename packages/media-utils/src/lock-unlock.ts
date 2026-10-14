@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 
 export const { lock, unlock } =

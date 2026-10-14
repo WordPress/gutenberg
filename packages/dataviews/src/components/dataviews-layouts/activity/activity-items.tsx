@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import ActivityItem from './activity-item';
 import type { ViewActivityProps } from '../../../types';
 

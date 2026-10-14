@@ -2,17 +2,23 @@
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT = path.resolve( __dirname, '../..' );
+const require = createRequire( import.meta.url );
 
 const ES5_BLOCK = path.join( ROOT, 'example-static-es5' );
 const STATIC_BLOCK = path.join( ROOT, 'example-static' );
 
-// `npm` is a `.cmd` shim on Windows that only resolves through the shell.
+/*
+ * `npm` is a `.cmd` shim on Windows that only resolves through the shell. Only
+ * pass this to `npm`: under a shell, a `process.execPath` containing spaces
+ * (e.g. `C:\Program Files\nodejs\node.exe`) would be split into two arguments.
+ */
 const NEEDS_SHELL = process.platform === 'win32';
 
 /**
@@ -44,7 +50,6 @@ function fail( message ) {
 function run( command, args, options = {} ) {
 	const result = spawnSync( command, args, {
 		stdio: 'inherit',
-		shell: NEEDS_SHELL,
 		...options,
 	} );
 	if ( result.error ) {
@@ -56,14 +61,36 @@ function run( command, args, options = {} ) {
 }
 
 /**
- * Execute a command via `npm exec` and exit on failure.
+ * Resolve a bin via module resolution rather than a `node_modules/.bin` path,
+ * whose location depends on the install layout.
  *
- * @param {string}   bin     Binary to execute (must be in `devDependencies`).
+ * @param {string} pkg     Package declaring the bin.
+ * @param {string} binName Bin entry name.
+ * @return {string} Absolute path to the bin script.
+ */
+function resolveBin( pkg, binName ) {
+	const packageJsonPath = require.resolve( `${ pkg }/package.json` );
+	const { bin } = require( packageJsonPath );
+	return path.resolve(
+		path.dirname( packageJsonPath ),
+		typeof bin === 'string' ? bin : bin[ binName ]
+	);
+}
+
+const WP_CREATE_BLOCK = resolveBin(
+	'@wordpress/create-block',
+	'wp-create-block'
+);
+const WP_SCRIPTS = resolveBin( '@wordpress/scripts', 'wp-scripts' );
+
+/**
+ * Execute `wp-create-block` and exit on failure.
+ *
  * @param {string[]} args    Command arguments.
  * @param {Object}   options Spawn options.
  */
-function npmExec( bin, args, options = {} ) {
-	run( 'npm', [ 'exec', '--no', '--', bin, ...args ], options );
+function wpCreateBlock( args, options = {} ) {
+	run( process.execPath, [ WP_CREATE_BLOCK, ...args ], options );
 }
 
 /**
@@ -72,7 +99,7 @@ function npmExec( bin, args, options = {} ) {
  * @param {...string} args Command arguments forwarded to `wp-scripts`.
  */
 function wpScripts( ...args ) {
-	npmExec( 'wp-scripts', args, { cwd: STATIC_BLOCK } );
+	run( process.execPath, [ WP_SCRIPTS, ...args ], { cwd: STATIC_BLOCK } );
 }
 
 /**
@@ -135,7 +162,7 @@ process.on( 'SIGTERM', () => process.exit( 1 ) );
 
 // First test block.
 status( 'Scaffolding Example Static (ES5) block...' );
-npmExec( 'wp-create-block', [ 'example-static-es5', '-t', 'es5' ], {
+wpCreateBlock( [ 'example-static-es5', '-t', 'es5' ], {
 	cwd: ROOT,
 } );
 
@@ -144,7 +171,7 @@ expectFileCount( ES5_BLOCK, 'the project root', 1, 8 );
 
 // Second test block.
 status( 'Scaffolding Example Static block...' );
-npmExec( 'wp-create-block', [ 'example-static', '--no-wp-scripts' ], {
+wpCreateBlock( [ 'example-static', '--no-wp-scripts' ], {
 	cwd: ROOT,
 } );
 
@@ -199,7 +226,7 @@ wpScripts( 'lint-style' );
 
 // Ensure monorepo prelint:js scripts have run (e.g., build design tokens for ESLint).
 status( 'Running prelint:js...' );
-run( 'npm', [ 'run', 'prelint:js' ], { cwd: ROOT } );
+run( 'npm', [ 'run', 'prelint:js' ], { cwd: ROOT, shell: NEEDS_SHELL } );
 
 status( 'Linting JavaScript files...' );
 wpScripts( 'lint-js' );

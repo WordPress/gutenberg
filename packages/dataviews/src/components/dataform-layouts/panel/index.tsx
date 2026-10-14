@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { FieldLayoutProps, NormalizedPanelLayout } from '../../../types';
 import PanelModal from './modal';
 import PanelDropdown from './dropdown';

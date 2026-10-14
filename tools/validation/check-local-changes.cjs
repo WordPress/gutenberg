@@ -1,9 +1,6 @@
-/**
- * External dependencies
- */
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 
-SimpleGit()
+simpleGit()
 	.diff( [ '-U0' ] )
 	.then( ( diff ) => {
 		// npm will introduce changes to a `package-lock.json` file for optional
@@ -44,6 +41,8 @@ SimpleGit()
 				`There are local changes after running one or more of the following commands:
 
 - npm install
+- npm run lint:js:prune-suppressions
+- npm run lint:css:update-suppressions
 - npm run docs:build
 - npm run --workspace @wordpress/theme build
 

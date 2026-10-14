@@ -119,6 +119,14 @@
 				margin-left: 0;
 			}
 		}
+
+		// Make room for the inserter next to the parent selector.
+		&.has-parent:has(.block-editor-block-parent-selector__inserter) {
+			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-30} + #{$grid-unit-15} + #{$grid-unit-10} + 2 * #{$border-width});
+			.show-icon-labels & {
+				margin-left: 0;
+			}
+		}
 	}
 
 	.block-editor-block-toolbar {
@@ -148,6 +156,92 @@
 	.block-editor-block-parent-selector {
 		position: absolute;
 		left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+		// With the inserter next to the parent button, the border moves to
+		// the shared container so the pair reads as one toolbar segment.
+		// The toolbar group sizing comes from the components-toolbar-group
+		// class the container carries when the inserter is in it; only the
+		// detached position and the full border are its own.
+		&:has(.block-editor-block-parent-selector__inserter) {
+			left: calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$grid-unit-15} - #{$grid-unit-10} - 3 * #{$border-width});
+			border: $border-width solid $gray-900;
+			border-radius: $radius-small;
+			// The box paints the background, like the toolbar box does for
+			// its groups.
+			background-color: $white;
+
+			// The same rule the Toolbar container has for its last group;
+			// this box stands in for it here.
+			> .components-toolbar-group:last-child {
+				border-right: none;
+			}
+
+			.block-editor-block-parent-selector__button {
+				// Buttons in a toolbar are transparent; the box paints the
+				// background and border behind them.
+				border: none;
+				background: none;
+			}
+		}
+
+		.block-editor-block-parent-selector__inserter.components-button.has-icon {
+			color: $white;
+			background: transparent;
+
+			// The black square every other inserter has, drawn under the
+			// icon in the middle of the target.
+			&::after {
+				content: "";
+				position: absolute;
+				z-index: -1;
+				top: 50%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				width: $button-size-small;
+				height: $button-size-small;
+				border-radius: $radius-small;
+				background: $gray-900;
+			}
+
+			&:hover {
+				color: $white;
+
+				&::after {
+					background: var(--wp-admin-theme-color);
+				}
+			}
+
+			// With the text labels preference, the button shows its label
+			// like every other toolbar button, not the black square.
+			.show-icon-labels & {
+				width: auto;
+				padding: 0 $grid-unit-15;
+				color: inherit;
+
+				svg {
+					display: none;
+				}
+
+				&::after {
+					content: attr(aria-label);
+					position: static;
+					transform: none;
+					width: auto;
+					height: auto;
+					border-radius: 0;
+					background: none;
+					white-space: nowrap;
+				}
+
+				&:hover {
+					color: var(--wp-admin-theme-color);
+
+					&::after {
+						background: none;
+					}
+				}
+			}
+		}
 
 		&::before {
 			content: "";

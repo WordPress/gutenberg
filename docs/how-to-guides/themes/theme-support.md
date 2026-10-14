@@ -355,7 +355,7 @@ remove_theme_support( 'core-block-patterns' );
 
 The block editor supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style), however it works a little differently than in the classic editor.
 
-In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. The block editor, however, doesn't use iframes. To make sure your styles are applied only to the content of the editor, we automatically transform your editor styles by selectively rewriting or adjusting certain CSS selectors. This also allows the block editor to leverage your editor style in block variation previews.
+In the classic editor, the editor stylesheet is loaded directly into the iframe of the WYSIWYG editor, with no changes. The block editor uses an iframe for the Site Editor and, in Gutenberg 23.6, for the Post Editor. WordPress Core versions before 7.1 can still fall back to a non-iframe Post Editor in some configurations. To keep editor styles scoped to the content across these contexts, WordPress selectively rewrites or adjusts certain CSS selectors. This also allows the block editor to use your editor style in block variation previews.
 
 For example, if you write `body { ... }` in your editor style, this is rewritten to `.editor-styles-wrapper { ... }`. This also means that you should _not_ target any of the editor class names directly.
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useEffect,
@@ -9,11 +6,7 @@ import {
 } from '@wordpress/element';
 import { useReducedMotion } from '@wordpress/compose';
 import { isRTL as isRTLFn } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
+import { ANIMATION_END_NAMES, TOTAL_ANIMATION_DURATION } from '../animation';
 
 // Possible values:
 // - 'INITIAL': the initial state
@@ -22,11 +15,7 @@ import * as styles from '../styles';
 // - 'ANIMATING_OUT': start exit animation
 // - 'OUT': the exit animation has ended
 type AnimationStatus =
-	| 'INITIAL'
-	| 'ANIMATING_IN'
-	| 'IN'
-	| 'ANIMATING_OUT'
-	| 'OUT';
+	'INITIAL' | 'ANIMATING_IN' | 'IN' | 'ANIMATING_OUT' | 'OUT';
 
 // Allow an extra 20% of the total animation duration to account for potential
 // event loop delays.
@@ -38,7 +27,7 @@ const isEnterAnimation = (
 	animationName: string
 ) =>
 	animationStatus === 'ANIMATING_IN' &&
-	animationName === styles.ANIMATION_END_NAMES[ animationDirection ].in;
+	animationName === ANIMATION_END_NAMES[ animationDirection ].in;
 
 const isExitAnimation = (
 	animationDirection: 'end' | 'start',
@@ -46,7 +35,7 @@ const isExitAnimation = (
 	animationName: string
 ) =>
 	animationStatus === 'ANIMATING_OUT' &&
-	animationName === styles.ANIMATION_END_NAMES[ animationDirection ].out;
+	animationName === ANIMATION_END_NAMES[ animationDirection ].out;
 
 export function useScreenAnimatePresence( {
 	isMatch,
@@ -143,12 +132,12 @@ export function useScreenAnimatePresence( {
 			animationTimeout = window.setTimeout( () => {
 				setAnimationStatus( 'OUT' );
 				animationTimeout = undefined;
-			}, styles.TOTAL_ANIMATION_DURATION.OUT * ANIMATION_TIMEOUT_MARGIN );
+			}, TOTAL_ANIMATION_DURATION.OUT * ANIMATION_TIMEOUT_MARGIN );
 		} else if ( isAnimatingIn ) {
 			animationTimeout = window.setTimeout( () => {
 				setAnimationStatus( 'IN' );
 				animationTimeout = undefined;
-			}, styles.TOTAL_ANIMATION_DURATION.IN * ANIMATION_TIMEOUT_MARGIN );
+			}, TOTAL_ANIMATION_DURATION.IN * ANIMATION_TIMEOUT_MARGIN );
 		}
 
 		return () => {
@@ -160,7 +149,6 @@ export function useScreenAnimatePresence( {
 	}, [ isAnimatingOut, isAnimatingIn ] );
 
 	return {
-		animationStyles: styles.navigatorScreenAnimation,
 		// Render the screen's contents in the DOM not only when the screen is
 		// selected, but also while it is animating out.
 		shouldRenderScreen:

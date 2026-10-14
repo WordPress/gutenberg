@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { useContextSystem } from '../context';
 import { useText } from '../text';
@@ -16,7 +13,7 @@ export function useHeading(
 		level = 2,
 		color = COLORS.theme.foreground,
 		isBlock = true,
-		weight = CONFIG.fontWeightHeading as React.CSSProperties[ 'fontWeight' ],
+		weight = CONFIG.fontWeightEmphasis as React.CSSProperties[ 'fontWeight' ],
 		...otherProps
 	} = useContextSystem( props, 'Heading' );
 

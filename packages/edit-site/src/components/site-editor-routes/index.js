@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useRegistry, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../../lock-unlock';
 import { store as siteEditorStore } from '../../store';
 import { homeRoute } from './home';

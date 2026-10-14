@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf, _x } from '@wordpress/i18n';
@@ -10,12 +7,8 @@ import {
 	Button,
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
-	__experimentalInputControl as InputControl,
+	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import type { BasePost, CoreDataError } from '../types';
 import { getItemTitle } from './utils';
 
@@ -28,6 +21,7 @@ interface RenderModalProps< Item > {
 interface Action< Item > {
 	id: string;
 	label: string;
+	modalHeader?: string;
 	isEligible?: ( item: Item ) => boolean;
 	modalFocusOnMount?: string;
 	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
@@ -35,7 +29,8 @@ interface Action< Item > {
 
 const duplicatePost: Action< BasePost > = {
 	id: 'duplicate-post',
-	label: _x( 'Duplicate', 'action label' ),
+	label: _x( 'Duplicate…', 'action label' ),
+	modalHeader: _x( 'Duplicate', 'action label' ),
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
@@ -62,12 +57,10 @@ const duplicatePost: Action< BasePost > = {
 				return;
 			}
 
-			const isTemplate = item.type === 'wp_template';
-
 			const newItemObject = {
-				status: isTemplate ? 'publish' : 'draft',
+				status: 'draft',
 				title: item.title,
-				slug: isTemplate ? item.slug : item.title || __( 'No title' ),
+				slug: item.title || __( 'No title' ),
 				comment_status: item.comment_status,
 				content:
 					typeof item.content === 'string'
@@ -98,7 +91,7 @@ const duplicatePost: Action< BasePost > = {
 				);
 			assignableProperties.forEach( ( property ) => {
 				if ( item.hasOwnProperty( property ) ) {
-					// @ts-ignore
+					// @ts-expect-error `property` is a dynamic string key on both objects.
 					newItemObject[ property ] = item[ property ];
 				}
 			} );
@@ -145,15 +138,7 @@ const duplicatePost: Action< BasePost > = {
 		return (
 			<form onSubmit={ createPage }>
 				<VStack spacing={ 3 }>
-					{ typeof item.id === 'string' && (
-						<div>
-							{ __(
-								'You are about to duplicate a bundled template. Changes will not be live until you activate the new template.'
-							) }
-						</div>
-					) }
-					<InputControl
-						__next40pxDefaultSize
+					<WCInputControl
 						label={ __( 'Title' ) }
 						placeholder={ __( 'No title' ) }
 						value={ getItemTitle( item ) }

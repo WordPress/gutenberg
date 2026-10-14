@@ -25,4 +25,4 @@ registerPlugin( 'more-menu-item-test', { render: MyButtonMoreMenuItemTest } );
 
 ## Location
 
-![Location](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-more-menu-item.png?raw=true)
+![Location](https://developer.wordpress.org/files/2026/06/plugin-more-menu-item.png)

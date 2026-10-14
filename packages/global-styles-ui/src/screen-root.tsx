@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalHStack as HStack,
@@ -16,10 +13,6 @@ import { isRTL, __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { IconWithCurrentColor } from './icon-with-current-color';
 import { NavigationButtonAsItem } from './navigation-button';
 import RootMenu from './root-menu';
@@ -76,7 +69,7 @@ function ScreenRoot() {
 					marginBottom={ 4 }
 				>
 					{ __(
-						'Customize the appearance of specific blocks for the whole site.'
+						"Customize how a block looks everywhere it's used."
 					) }
 				</Spacer>
 				<ItemGroup>

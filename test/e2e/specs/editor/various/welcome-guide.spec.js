@@ -118,9 +118,7 @@ test.describe( 'Welcome Guide', () => {
 			} )
 			.getByRole( 'button', { name: 'Options' } )
 			.click();
-		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Welcome Guide' } )
-			.click();
+		await page.getByRole( 'menuitem', { name: 'Welcome Guide' } ).click();
 
 		await expect( welcomeGuide ).toBeVisible();
 	} );

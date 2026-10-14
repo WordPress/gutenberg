@@ -136,4 +136,179 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 		$result = gutenberg_block_core_navigation_set_overlay_image_fetch_priority( $html );
 		$this->assertSame( $html, $result );
 	}
+
+	/**
+	 * Test that original markup is returned when there are no state classes.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_no_state_class_preserves_block_markup() {
+		$block_content = '<nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Test that Navigation state classes are copied to inner list containers.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_state_class_is_added_to_inner_list_container() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Item</li></ul></nav>',
+			$actual
+		);
+	}
+
+	/**
+	 * Test that non-Navigation blocks are unchanged.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_state_class_is_not_added_to_non_navigation_blocks() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/group' );
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Test that existing inner state classes are preserved.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_existing_inner_state_class_is_preserved() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-abcd1234"><li class="wp-block-navigation-item">Item</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame( $block_content, $actual );
+	}
+
+	/**
+	 * Test that Navigation state classes are copied to multiple inner list containers.
+	 *
+	 * Navigation can emit more than one list container when listable menu items
+	 * are separated by non-listable blocks.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_state_class_is_added_to_multiple_inner_list_containers() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Two</li></ul></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Two</li></ul></nav>',
+			$actual
+		);
+	}
+
+	/**
+	 * Test that Navigation state classes are not copied to nested Navigation blocks.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_state_class_is_not_added_to_nested_navigation_containers() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>',
+			$actual
+		);
+	}
+
+	/**
+	 * Test that nested Navigation blocks preserve their own state classes.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_nested_navigation_preserves_its_own_state_class() {
+		$block_content = '<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation wp-states-abcd1234"><ul class="wp-block-navigation__container wp-block-navigation wp-states-abcd1234"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>';
+		$block         = array( 'blockName' => 'core/navigation' );
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $block_content, $block );
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation wp-states-1234abcd"><ul class="wp-block-navigation__container wp-block-navigation wp-states-1234abcd"><li class="wp-block-navigation-item">Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation wp-states-abcd1234"><ul class="wp-block-navigation__container wp-block-navigation wp-states-abcd1234"><li class="wp-block-navigation-item">Nested</li></ul></nav></div></nav>',
+			$actual
+		);
+	}
+
+	/**
+	 * Test that layout values are converted to the Navigation custom properties.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_get_layout_custom_property_declarations
+	 */
+	public function test_get_layout_custom_property_declarations() {
+		$actual = gutenberg_block_core_navigation_get_layout_custom_property_declarations(
+			array(
+				'orientation'    => 'vertical',
+				'justifyContent' => 'right',
+				'flexWrap'       => 'nowrap',
+			)
+		);
+
+		$this->assertSame(
+			array(
+				'--navigation-layout-justification-setting' => 'flex-end',
+				'--navigation-layout-direction' => 'column',
+				'--navigation-layout-wrap'      => 'nowrap',
+				'--navigation-layout-justify'   => 'flex-end',
+				'--navigation-layout-align'     => 'flex-end',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Test responsive layout styles and classes on local Navigation containers.
+	 *
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_add_layout_custom_properties_updates_navigation_containers_only() {
+		$block_content = '<nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation items-justified-right"><li>One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation items-justified-right"><li>Two</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li>Nested</li></ul></nav></div></nav>';
+		$attributes    = array(
+			'layout' => array(
+				'justifyContent' => 'right',
+				'flexWrap'       => 'nowrap',
+			),
+			'style'  => array(
+				'@mobile' => array(
+					'layout' => array( 'orientation' => 'vertical' ),
+				),
+			),
+		);
+
+		$actual = gutenberg_block_core_navigation_add_support_classes_to_container(
+			$block_content,
+			array(
+				'blockName' => 'core/navigation',
+				'attrs'     => $attributes,
+			)
+		);
+		$this->assertMatchesRegularExpression( '/\bwp-block-navigation-(\d+)\b/', $actual );
+		preg_match( '/\bwp-block-navigation-(\d+)\b/', $actual, $matches );
+		$responsive_class = $matches[0];
+
+		$this->assertSame(
+			'<nav class="wp-block-navigation ' . $responsive_class . '"><ul class="wp-block-navigation__container wp-block-navigation items-justified-right ' . $responsive_class . '"><li>One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-block-navigation items-justified-right ' . $responsive_class . '"><li>Two</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation"><ul class="wp-block-navigation__container wp-block-navigation"><li>Nested</li></ul></nav></div></nav>',
+			$actual
+		);
+	}
 }

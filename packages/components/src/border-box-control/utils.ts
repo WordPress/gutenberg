@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import { parseCSSUnitValue } from '../utils/unit-values';
 import type { Border } from '../border-control/types';
 import type { AnyBorder, Borders, BorderProp, BorderSide } from './types';

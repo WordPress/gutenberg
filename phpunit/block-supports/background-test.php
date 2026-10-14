@@ -285,35 +285,133 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div>Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
+			'background clip alone does not add has-background' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-is-output',
+				'background_settings' => array(
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'border-box',
+				),
+				'expected_wrapper'    => '<div style="background-clip:border-box;-webkit-text-fill-color:currentColor;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clip text style is applied with vendor prefixes' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-text-is-output',
+				'background_settings' => array(
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'text',
+				),
+				'expected_wrapper'    => '<div style="background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clip alone does not add has-background for block with only backgroundClip support' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-only-support',
+				'background_settings' => array(
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'padding-box',
+				),
+				'expected_wrapper'    => '<p style="background-clip:padding-box;-webkit-text-fill-color:currentColor;">Content</p>',
+				'wrapper'             => '<p>Content</p>',
+			),
+			'background clip style is not applied if the block does not support it' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-not-supported',
+				'background_settings' => array(
+					'backgroundClip' => false,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'text',
+				),
+				'expected_wrapper'    => '<div>Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clip keeps has-background when a background is painted into a box' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-with-gradient',
+				'background_settings' => array(
+					'gradient'       => true,
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'gradient'       => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					'backgroundClip' => 'padding-box',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);background-clip:padding-box;-webkit-text-fill-color:currentColor;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clipped to text drops has-background from a gradient' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-text-with-gradient',
+				'background_settings' => array(
+					'gradient'       => true,
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'gradient'       => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					'backgroundClip' => 'text',
+				),
+				'expected_wrapper'    => '<div style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clipped to text keeps has-background when the block does not support the clip' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-text-without-clip-support',
+				'background_settings' => array(
+					'gradient'       => true,
+					'backgroundClip' => false,
+				),
+				'background_style'    => array(
+					'gradient'       => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+					'backgroundClip' => 'text',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
+			'background clip style is appended to existing styles' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-clip-appends-styles',
+				'background_settings' => array(
+					'backgroundClip' => true,
+				),
+				'background_style'    => array(
+					'backgroundClip' => 'content-box',
+				),
+				'expected_wrapper'    => '<div class="wp-block-test" style="color: red;background-clip:content-box;-webkit-text-fill-color:currentColor;">Content</div>',
+				'wrapper'             => '<div class="wp-block-test" style="color: red">Content</div>',
+			),
 		);
 	}
 
 	/**
-	 * Tests that combined background gradient and image CSS values pass KSES.
+	 * Tests that background gradients using functions beyond rgb()/rgba(), and
+	 * gradients combined with a url() image, survive KSES sanitization.
 	 *
-	 * WordPress's safecss_filter_attr() handles gradient and url() values
-	 * separately but strips the declaration when both appear in a single
-	 * comma-separated background-image. The gutenberg_allow_background_image_combined
-	 * filter should ensure these combined values survive sanitization.
+	 * @covers ::gutenberg_allow_extended_gradient_backgrounds
 	 *
-	 * @covers ::gutenberg_allow_background_image_combined
-	 *
-	 * @dataProvider data_background_combined_values_pass_kses
+	 * @dataProvider data_background_gradient_values_pass_kses
 	 *
 	 * @param string $css The CSS declaration to test.
 	 */
-	public function test_background_combined_values_pass_kses( $css ) {
+	public function test_background_gradient_values_pass_kses( $css ) {
 		$result = safecss_filter_attr( $css );
 		$this->assertNotEmpty( $result, "Expected CSS to be allowed: $css" );
 		$this->assertStringContainsString( 'background-image', $result );
 	}
 
 	/**
-	 * Data provider for combined background-image KSES tests.
+	 * Data provider for gradient background-image KSES tests.
 	 *
 	 * @return array[]
 	 */
-	public function data_background_combined_values_pass_kses() {
+	public function data_background_gradient_values_pass_kses() {
 		return array(
 			'gradient first with rgb colors'     => array(
 				'background-image: linear-gradient(135deg, rgb(255,0,0) 0%, rgb(0,0,255) 100%), url(https://example.com/image.jpg)',
@@ -353,6 +451,15 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 			),
 			'gradient with hex colors'           => array(
 				'background-image: linear-gradient(135deg, #ff0000 0%, #0000ff 100%), url(https://example.com/image.jpg)',
+			),
+			'standalone hsl gradient'            => array(
+				'background-image: linear-gradient(135deg, hsl(0, 100%, 50%) 0%, hsl(240, 100%, 50%) 100%)',
+			),
+			'standalone oklch gradient'          => array(
+				'background-image: linear-gradient(oklch(0.7 0.15 30), oklch(0.5 0.2 260))',
+			),
+			'standalone gradient with calc'      => array(
+				'background-image: linear-gradient(red 0%, blue calc(50% + 10px))',
 			),
 		);
 	}

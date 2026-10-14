@@ -1,13 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 import { addQueryArgs } from '@wordpress/url';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { Button, Icon, Stack, Text } from '@wordpress/ui';
 import styles from './style.module.css';
 
@@ -19,27 +16,27 @@ function PreviewUrlBar( {
 	siteIconUrl?: string;
 } ) {
 	return (
-		<div className={ styles.urlBar }>
+		<div className={ styles[ 'url-bar' ] }>
 			<Stack
 				direction="row"
 				align="center"
 				gap="xs"
-				className={ styles.urlField }
+				className={ styles[ 'url-field' ] }
 			>
 				{ siteIconUrl ? (
 					<img
-						className={ styles.urlFavicon }
+						className={ styles[ 'url-favicon' ] }
 						src={ siteIconUrl }
 						alt=""
 					/>
 				) : (
 					<Icon
-						className={ styles.urlIcon }
+						className={ styles[ 'url-icon' ] }
 						icon={ wordpress }
 						size={ 12 }
 					/>
 				) }
-				<Text className={ styles.urlText }>{ siteUrl }</Text>
+				<Text className={ styles[ 'url-text' ] }>{ siteUrl }</Text>
 			</Stack>
 		</div>
 	);
@@ -87,7 +84,7 @@ export default function SitePreview() {
 	return (
 		<Stack direction="column" className={ styles.container }>
 			<PreviewUrlBar siteUrl={ siteUrl } siteIconUrl={ siteIconUrl } />
-			<div className={ styles.previewWrap }>
+			<div className={ styles[ 'preview-wrap' ] }>
 				{ isIframeLoading && (
 					<Stack
 						direction="column"
@@ -95,7 +92,7 @@ export default function SitePreview() {
 						justify="center"
 						className={ styles.loading }
 					>
-						<Spinner />
+						<WCSpinner />
 					</Stack>
 				) }
 				<iframe

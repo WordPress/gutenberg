@@ -1,28 +1,46 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
 /** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
 /** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
+/** @typedef {import('../../../store/actions').InserterMediaCategory} InserterMediaCategory */
+/** @typedef {import('../../../store/actions').InserterMediaResponse} InserterMediaResponse */
+
+/**
+ * Normalizes the result of a media category's `fetch`, which may be either a
+ * plain array of media items or an `InserterMediaResponse` carrying pagination
+ * totals. Sources that don't report totals leave them `undefined`, which is how
+ * the panel knows to hide the pager.
+ *
+ * @param {InserterMediaItem[]|InserterMediaResponse|undefined} result The raw `fetch` result.
+ * @return {{ mediaItems: InserterMediaItem[], totalItems: number|undefined, totalPages: number|undefined }} The normalized result.
+ */
+function normalizeFetchResult( result ) {
+	if ( Array.isArray( result ) ) {
+		return { mediaItems: result };
+	}
+	return {
+		mediaItems: result?.mediaItems ?? [],
+		totalItems: result?.totalItems,
+		totalPages: result?.totalPages,
+	};
+}
 
 /**
  * Fetches media items based on the provided category.
  * Each media category is responsible for providing a `fetch` function.
  *
- * @param {Object}               category The media category to fetch results for.
- * @param {InserterMediaRequest} query    The query args to use for the request.
- * @return {InserterMediaItem[]} The media results.
+ * @param {Object}               category   The media category to fetch results for.
+ * @param {InserterMediaRequest} query      The query args to use for the request.
+ * @param {unknown}              refreshKey Optional value that, when changed, forces
+ *                                          a refetch (e.g. after attaching/detaching).
+ * @return {{ mediaList: InserterMediaItem[], isLoading: boolean, totalItems: number|undefined, totalPages: number|undefined }} The media results and paging totals.
  */
-export function useMediaResults( category, query = {} ) {
+export function useMediaResults( category, query = {}, refreshKey ) {
 	const [ mediaList, setMediaList ] = useState();
+	const [ totals, setTotals ] = useState( {} );
 	const [ isLoading, setIsLoading ] = useState( false );
 	// We need to keep track of the last request made because
 	// multiple request can be fired without knowing the order
@@ -32,27 +50,74 @@ export function useMediaResults( category, query = {} ) {
 	// requests, but we don't for now as it involves adding support
 	// for this to `core-data` package.
 	const lastRequestRef = useRef();
+	const lastQueryKeyRef = useRef();
+	const lastFetchRef = useRef();
+	const lastSourceRef = useRef();
 	useEffect( () => {
 		( async () => {
 			const key = JSON.stringify( {
 				category: category.name,
 				...query,
 			} );
-			lastRequestRef.current = key;
+			// Unique token so identical-query refreshes can't apply stale results.
+			const request = {};
+			lastRequestRef.current = request;
 			setIsLoading( true );
-			setMediaList( [] ); // Empty the previous results.
-			const _media = await category.fetch?.( query );
-			if ( key === lastRequestRef.current ) {
-				setMediaList( _media );
+			// Only clear the previous results when the category source or query
+			// changes, not on a manual refresh (a `refreshKey` bump after
+			// attach/detach). Keeping them lets the panel dim the existing grid
+			// during the refetch instead of blanking it.
+			if (
+				lastQueryKeyRef.current !== key ||
+				lastFetchRef.current !== category.fetch
+			) {
+				setMediaList( [] );
+			}
+			// Reset paging totals only when the source (category or its `fetch`)
+			// changes, so switching to an array-returning source doesn't leave a
+			// stale pager showing. A mere page change keeps the previous totals,
+			// which is what holds the footer mounted while the next page loads.
+			if (
+				lastSourceRef.current !== category.name ||
+				lastFetchRef.current !== category.fetch
+			) {
+				setTotals( {} );
+			}
+			lastQueryKeyRef.current = key;
+			lastFetchRef.current = category.fetch;
+			lastSourceRef.current = category.name;
+			// Omit the default first page so sources that forward the query to a
+			// strict external API don't receive an unexpected `page` arg.
+			const { page, ...queryWithoutPage } = query;
+			const fetchQuery = page > 1 ? query : queryWithoutPage;
+			const { mediaItems, totalItems, totalPages } = normalizeFetchResult(
+				await category.fetch?.( fetchQuery )
+			);
+			if ( request === lastRequestRef.current ) {
+				// Set together so the grid and the pager never disagree.
+				setMediaList( mediaItems );
+				setTotals( { totalItems, totalPages } );
 				setIsLoading( false );
 			}
 		} )();
-	}, [ category.name, ...Object.values( query ) ] );
-	return { mediaList, isLoading };
+	}, [
+		category.name,
+		category.fetch,
+		...Object.values( query ),
+		refreshKey,
+	] );
+	return {
+		mediaList,
+		isLoading,
+		totalItems: totals.totalItems,
+		totalPages: totals.totalPages,
+	};
 }
 
 export function useMediaCategories( rootClientId ) {
-	const [ categories, setCategories ] = useState( [] );
+	const [ categories, setCategories ] = useState(
+		/** @type {InserterMediaCategory[]} */ ( [] )
+	);
 
 	const inserterMediaCategories = useSelect(
 		( select ) =>
@@ -97,9 +162,10 @@ export function useMediaCategories( rootClientId ) {
 						}
 						let results = [];
 						try {
-							results = await category.fetch( {
-								per_page: 1,
-							} );
+							const { mediaItems } = normalizeFetchResult(
+								await category.fetch( { per_page: 1 } )
+							);
+							results = mediaItems;
 						} catch {
 							// If the request fails, we shallow the error and just don't show
 							// the category, in order to not break the media tab.
@@ -110,7 +176,9 @@ export function useMediaCategories( rootClientId ) {
 			);
 			// We need to filter out categories that don't have any media items or
 			// whose corresponding block type is not allowed to be inserted, based
-			// on the category's `mediaType`.
+			// on the category's `mediaType`. A category that provides an
+			// `emptyMessage` stays in the list even when empty, so it can show
+			// that message (e.g. Attachments, to expose its "Attach" action).
 			const canInsertMediaType = {
 				image: canInsertImage,
 				video: canInsertVideo,
@@ -119,7 +187,8 @@ export function useMediaCategories( rootClientId ) {
 			inserterMediaCategories.forEach( ( category ) => {
 				if (
 					canInsertMediaType[ category.mediaType ] &&
-					categoriesHaveMedia.get( category.name )
+					( categoriesHaveMedia.get( category.name ) ||
+						category.emptyMessage )
 				) {
 					_categories.push( category );
 				}

@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { CATEGORY_SLUG } from './components/category-selector';
 
 /**

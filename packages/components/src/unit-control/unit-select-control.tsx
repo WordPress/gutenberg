@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ChangeEvent, ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import { UnitSelect, UnitLabel } from './styles/unit-control-styles';
+import styles from './style.module.scss';
 import { CSS_UNITS, hasUnits } from './utils';
 import type { UnitSelectControlProps } from './types';
 
@@ -31,12 +20,15 @@ function UnitSelectControl(
 ) {
 	if ( ! hasUnits( units ) || units?.length === 1 ) {
 		return (
-			<UnitLabel
-				className="components-unit-control__unit-label"
-				selectSize={ size }
+			<div
+				className={ clsx(
+					'components-unit-control__unit-label',
+					styles[ 'unit-label' ],
+					{ [ styles[ 'is-small' ] ]: size === 'small' }
+				) }
 			>
 				{ unit }
-			</UnitLabel>
+			</div>
 		);
 	}
 
@@ -47,14 +39,18 @@ function UnitSelectControl(
 		onChange?.( unitValue, { event, data } );
 	};
 
-	const classes = clsx( 'components-unit-control__select', className );
+	const classes = clsx(
+		'components-unit-control__select',
+		styles[ 'unit-select' ],
+		className,
+		{ [ styles[ 'is-small' ] ]: size === 'small' }
+	);
 
 	return (
-		<UnitSelect
+		<select
 			ref={ ref }
 			className={ classes }
 			onChange={ handleOnChange }
-			selectSize={ size }
 			tabIndex={ isTabbable ? undefined : -1 }
 			value={ unit }
 			{ ...props }
@@ -64,7 +60,7 @@ function UnitSelectControl(
 					{ option.label }
 				</option>
 			) ) }
-		</UnitSelect>
+		</select>
 	);
 }
 export default forwardRef( UnitSelectControl );

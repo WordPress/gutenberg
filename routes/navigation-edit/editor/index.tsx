@@ -1,17 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockEditorProvider } from '@wordpress/block-editor';
-// @ts-expect-error - No type declarations available for @wordpress/blocks
 import { createBlock } from '@wordpress/blocks';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 import { useEditorAssets } from '@wordpress/lazy-editor';
-
-/**
- * Internal dependencies
- */
 import './style.scss';
 import NavigationMenuContent from './content';
 
@@ -28,6 +21,18 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 		return [ createBlock( 'core/navigation', { ref: id } ) ];
 	}, [ assetsReady, id ] );
 
+	// The link UI's search needs a suggestions fetcher, which the block
+	// editor takes from its settings.
+	const settings = useMemo(
+		() => ( {
+			__experimentalFetchLinkSuggestions: (
+				search: string,
+				searchOptions: Record< string, unknown >
+			) => fetchLinkSuggestions( search, searchOptions, {} ),
+		} ),
+		[]
+	);
+
 	if ( ! assetsReady || ! blocks.length ) {
 		return (
 			<div
@@ -38,14 +43,14 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 					height: '100vh',
 				} }
 			>
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}
 
 	return (
 		<BlockEditorProvider
-			settings={ {} }
+			settings={ settings }
 			value={ blocks }
 			onChange={ noop }
 			onInput={ noop }

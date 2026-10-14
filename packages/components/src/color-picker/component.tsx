@@ -1,15 +1,9 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import type { ClipboardEvent, ForwardedRef } from 'react';
 import type { Colord } from 'colord';
 import { colord, extend, getFormat } from 'colord';
 import type { HslaColor } from 'react-colorful';
 import namesPlugin from 'colord/plugins/names';
-
-/**
- * WordPress dependencies
- */
 import {
 	useCallback,
 	useEffect,
@@ -19,23 +13,16 @@ import {
 } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useContextSystem, contextConnect } from '../context';
-import {
-	ColorfulWrapper,
-	SelectControl,
-	AuxiliaryColorArtefactWrapper,
-	AuxiliaryColorArtefactHStackHeader,
-	ColorInputWrapper,
-} from './styles';
+import SelectControl from '../select-control';
+import { HStack } from '../h-stack';
+import { Flex } from '../flex';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import { ColorCopyButton } from './color-copy-button';
 import { ColorInput } from './color-input';
 import { Picker } from './picker';
 import { useControlledValue } from '../utils/hooks';
-
 import type { ColorPickerProps, ColorType } from './types';
 
 extend( [ namesPlugin ] );
@@ -71,6 +58,7 @@ const UnconnectedColorPicker = (
 		onChange,
 		defaultValue = '#fff',
 		copyFormat,
+		className,
 		...divProps
 	} = useContextSystem( props, 'ColorPicker' );
 
@@ -98,42 +86,40 @@ const UnconnectedColorPicker = (
 	// distinguish our own updates from external prop changes.
 	const lastProducedHexRef = useRef( safeColordColor.toHex() );
 
+	// While the user is dragging the visual picker, ignore color-prop sync
+	// so delayed/stale controlled echoes cannot overwrite internalHSLA mid-drag.
+	const isPickerInteractingRef = useRef( false );
+
 	// Sync internalHSLA when the color prop changes externally (e.g.
 	// parent passes a new color that wasn't produced by our onChange).
 	useEffect( () => {
-		const incomingHex = safeColordColor.toHex();
+		if ( isPickerInteractingRef.current ) {
+			return;
+		}
 
-		// If this hex matches what we last produced, it's our own
-		// update arriving back — skip the sync to avoid overwriting
-		// internalHSLA with lossy round-tripped values.
-		if ( incomingHex === lastProducedHexRef.current ) {
+		// Compare by color equality, not hex string — rgb()/rgba()
+		// round-trips can differ in string form for the same color.
+		if ( safeColordColor.isEqual( lastProducedHexRef.current ) ) {
 			return;
 		}
 
 		// Genuinely external change — sync internalHSLA.
-		lastProducedHexRef.current = incomingHex;
+		lastProducedHexRef.current = safeColordColor.toHex();
 		const externalHSLA = safeColordColor.toHsl();
 		setInternalHSLA( ( prev ) => mergeHSLA( externalHSLA, prev ) );
 	}, [ safeColordColor ] );
 
-	// Handler for HSL-aware components (Picker, HSL inputs) that
-	// provide raw HSLA values without information loss.
-	// Uses direct setColor (not debounced) to prevent race conditions
-	// where a stale debounced hex would overwrite newer internalHSLA.
-	// This is safe performance-wise because react-colorful internally
-	// throttles its onChange callbacks using requestAnimationFrame.
-
+	// Handler for HSL inputs (and the HSVA picker after it converts to HSLA).
+	// Apply the user's HSLA, then notify the parent only when the color
+	// actually changes. setColor must not run inside setInternalHSLA
+	// (state updaters must be pure). Uses direct setColor (not debounced)
+	// to avoid races with hex/RGB's debouncedSetColor.
 	const handleHSLAChange = useCallback(
 		( nextHSLA: HslaColor ) => {
-			// No mergeHSLA here — this handler receives the user's explicit
-			// choice from the picker or HSL inputs, with no lossy conversion.
 			setInternalHSLA( nextHSLA );
 			const previousHex = lastProducedHexRef.current;
 			const nextHex = colord( nextHSLA ).toHex();
-			// Only notify parent when the hex actually changes. This
-			// avoids firing onChange for H/S changes on achromatic
-			// colors (e.g. adjusting hue on pure white).
-			if ( nextHex !== previousHex ) {
+			if ( ! colord( nextHex ).isEqual( previousHex ) ) {
 				lastProducedHexRef.current = nextHex;
 				setColor( nextHex );
 			}
@@ -204,19 +190,27 @@ const UnconnectedColorPicker = (
 	);
 
 	return (
-		<ColorfulWrapper
+		<PolymorphicElement
 			ref={ forwardedRef }
 			{ ...divProps }
+			className={ clsx( styles.colorful, className ) }
 			onPasteCapture={ maybeHandlePaste }
 		>
 			<Picker
 				onChange={ handleHSLAChange }
 				hsla={ internalHSLA }
 				enableAlpha={ enableAlpha }
+				onInteractionStart={ () => {
+					isPickerInteractingRef.current = true;
+				} }
+				onInteractionEnd={ () => {
+					isPickerInteractingRef.current = false;
+				} }
 			/>
-			<AuxiliaryColorArtefactWrapper>
-				<AuxiliaryColorArtefactHStackHeader justify="space-between">
+			<div className={ styles.auxiliary }>
+				<HStack className={ styles.header } justify="space-between">
 					<SelectControl
+						className={ styles.select }
 						size="compact"
 						options={ options }
 						value={ colorType }
@@ -231,8 +225,12 @@ const UnconnectedColorPicker = (
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }
 					/>
-				</AuxiliaryColorArtefactHStackHeader>
-				<ColorInputWrapper direction="column" gap={ 2 }>
+				</HStack>
+				<Flex
+					className={ styles[ 'color-input' ] }
+					direction="column"
+					gap={ 2 }
+				>
 					<ColorInput
 						colorType={ colorType }
 						color={ safeColordColor }
@@ -241,12 +239,16 @@ const UnconnectedColorPicker = (
 						onHSLChange={ handleHSLAChange }
 						enableAlpha={ enableAlpha }
 					/>
-				</ColorInputWrapper>
-			</AuxiliaryColorArtefactWrapper>
-		</ColorfulWrapper>
+				</Flex>
+			</div>
+		</PolymorphicElement>
 	);
 };
 
+/**
+ * `ColorPicker` lets users select a color from a visual color surface, or by
+ * editing its hex, RGB, or HSL values.
+ */
 export const ColorPicker = contextConnect(
 	UnconnectedColorPicker,
 	'ColorPicker'
