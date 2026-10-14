@@ -93,17 +93,19 @@ async function run() {
 
 	/*
 	 * A `pull_request_target` workflow comes from the default branch whatever
-	 * a pull request targets, so a caller can reach a release branch whose own
-	 * writers are older than this and would re-cut the section on their next write.
+	 * a pull request targets, so a caller can reach a branch whose own writers
+	 * are older than this and would re-cut the section on their next write.
 	 */
-	const skippedPrefix = getInput( 'skip-base-prefixes' )
-		.split( /\s+/ )
-		.find(
-			( prefix ) => prefix && pullRequest.baseRef.startsWith( prefix )
-		);
-	if ( skippedPrefix ) {
+	const requireBaseContains = getInput( 'require-base-contains' );
+	if (
+		requireBaseContains &&
+		! ( await api.branchContains(
+			pullRequest.baseRef,
+			requireBaseContains
+		) )
+	) {
 		info(
-			`Skipped the "${ section }" section: this pull request targets ${ pullRequest.baseRef }, which starts with ${ skippedPrefix }.`
+			`Skipped the "${ section }" section: ${ pullRequest.baseRef } does not contain ${ requireBaseContains }.`
 		);
 		return;
 	}
