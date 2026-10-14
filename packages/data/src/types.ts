@@ -43,7 +43,8 @@ export interface ReduxStoreConfig< State, ActionCreators, Selectors > {
 	selectors?: Selectors;
 	controls?: MapOf< Function >;
 	/**
-	 * State keys to persist, or `true` for all, when the persistence plugin is in use.
+	 * State keys to persist, or `true` for all. Only the persistence plugin's
+	 * `registerStore` reads it; stores registered with `register` ignore it.
 	 */
 	persist?: boolean | string[];
 }
