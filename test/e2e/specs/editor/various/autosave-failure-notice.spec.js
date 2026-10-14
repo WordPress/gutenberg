@@ -365,6 +365,7 @@ test.describe( 'Autosave failure notice', () => {
 		} );
 
 		for ( const [ status, afterAutosave, afterManualSave ] of [
+			// TODO: Should a manual save stay possible, so it creates a revision?
 			[ 'draft', [], [] ],
 			[ 'publish', [ UPDATING_FAILED_OFFLINE ], [ 'Post updated.' ] ],
 		] ) {
