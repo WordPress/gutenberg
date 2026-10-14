@@ -8,7 +8,7 @@
 
 ### New Features
 
--   Give each widget its type's translated title through the `title` host capability, on the dashboard and in its previews ([#84204](https://github.com/WordPress/gutenberg/issues/84204)).
+-   Give each widget its type's translated title through the `title` host capability, on the dashboard and in its previews ([#84738](https://github.com/WordPress/gutenberg/pull/84738)).
 
 ### Internal
 
