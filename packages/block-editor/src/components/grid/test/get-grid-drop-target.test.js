@@ -59,6 +59,26 @@ describe( 'getGridDropTarget()', () => {
 		).toBe( 1 );
 	} );
 
+	it( 'keeps the point the block was grabbed at under the pointer', () => {
+		// A 2x2 block in cells 2/2, from 110,60 to 320,170, grabbed 20px
+		// right and 10px down from its corner, then moved 10px down and
+		// right. Treated as its center, the pointer would land it in 1/1.
+		expect(
+			toPlain(
+				getGridDropTarget( {
+					x: 140,
+					y: 80,
+					columnTracks,
+					rowTracks,
+					columnSpan: 2,
+					rowSpan: 2,
+					grabX: 20,
+					grabY: 10,
+				} )
+			)
+		).toEqual( { columnStart: 2, rowStart: 2, columnSpan: 2, rowSpan: 2 } );
+	} );
+
 	it( 'clamps the landing area against the right and bottom edges', () => {
 		expect(
 			toPlain(

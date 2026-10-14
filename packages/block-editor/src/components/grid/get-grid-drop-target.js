@@ -7,11 +7,10 @@ function clamp( value, min, max ) {
 /**
  * Works out which cells a block being dragged over a grid would land in.
  *
- * The pointer is the center of the block, wherever the drag started. The
- * block's top-left corner snaps to the closest cell, so the landing area is
- * the one whose center is closest to the pointer. The landing area keeps the
- * block's span, up to the size of the grid, and is clamped to stay inside the
- * grid.
+ * The block keeps the point it was grabbed at under the pointer, or its center
+ * when it wasn't grabbed by its body. The block's top-left corner snaps to the
+ * closest cell. The landing area keeps the block's span, up to the size of the
+ * grid, and is clamped to stay inside the grid.
  *
  * @param {Object}                              options
  * @param {number}                              options.x            Pointer position in pixels, relative to the start of the first column track.
@@ -22,6 +21,8 @@ function clamp( value, min, max ) {
  * @param {number}                              options.rowSpan      Number of rows the block spans. A span taller than the grid is reduced to fit.
  * @param {number}                              options.width        Width of the block in pixels. Defaults to the width of the columns it spans.
  * @param {number}                              options.height       Height of the block in pixels. Defaults to the height of the rows it spans.
+ * @param {number}                              options.grabX        Where the block was grabbed, in pixels from its left edge. Defaults to its center.
+ * @param {number}                              options.grabY        Where the block was grabbed, in pixels from its top edge. Defaults to its center.
  *
  * @return {GridRect} The cells the block would land in.
  */
@@ -34,9 +35,11 @@ export function getGridDropTarget( {
 	rowSpan = 1,
 	width = getSpanSize( columnTracks, columnSpan ),
 	height = getSpanSize( rowTracks, rowSpan ),
+	grabX = width / 2,
+	grabY = height / 2,
 } ) {
-	const column = getClosestTrack( columnTracks, x - width / 2 ) + 1;
-	const row = getClosestTrack( rowTracks, y - height / 2 ) + 1;
+	const column = getClosestTrack( columnTracks, x - grabX ) + 1;
+	const row = getClosestTrack( rowTracks, y - grabY ) + 1;
 	const fittedColumnSpan = clamp( columnSpan, 1, columnTracks.length );
 	const fittedRowSpan = clamp( rowSpan, 1, rowTracks.length );
 	return new GridRect( {
