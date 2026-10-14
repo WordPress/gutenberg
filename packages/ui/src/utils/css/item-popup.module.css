@@ -48,7 +48,7 @@
 			}
 		}
 
-		.is-align-item-with-trigger .popup {
+		.is-align-item-with-trigger[data-side="none"] .popup {
 			max-height: none;
 		}
 
