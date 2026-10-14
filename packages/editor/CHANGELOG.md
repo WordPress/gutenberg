@@ -6,6 +6,8 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 -   The editor stylesheet no longer includes the styles of `@wordpress/fields`. A plugin that renders `MediaEdit` loads `@wordpress/fields/build-style/style.css` with its own script, as the package README describes ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
+-   Every action of a post type now comes from the server: `usePostActions` shows the actions the `wp/v2/entity-actions` route returns, merged with the JavaScript parts of the script modules registered along with them, and `registerPostTypeSchema()` registers no action.
+-   `registerEntityAction` and `unregisterEntityAction`, only available in the Gutenberg plugin, have no effect. They still warn, and they no longer register or unregister anything: every action of an entity is registered on the server. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for their JavaScript parts.
 
 ### New Features
 
@@ -20,6 +22,7 @@
 ### Deprecations
 
 -   `registerEntityField` and `unregisterEntityField`, which only had an effect in the Gutenberg plugin, are deprecated and have no effect anymore: the fields of an entity are registered on the server. Register and unregister them in PHP, with `wp_register_entity_fields()` and `wp_unregister_entity_fields()` on the `wp_entity_fields_api_init` action, and a script module for their JavaScript parts ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   `registerEntityAction` and `unregisterEntityAction`, only available in the Gutenberg plugin, are deprecated. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for their JavaScript parts.
 
 ### Bug Fixes
 
@@ -37,6 +40,7 @@
 -   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   Import the core actions `registerPostTypeSchema()` registers from the `@wordpress/core-actions` script modules instead of `@wordpress/fields` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 -   Take `CreateTemplatePartModal` from the private APIs of `@wordpress/patterns` instead of `@wordpress/fields`, and remove it from the private APIs of the editor ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   The `core/editor` store no longer holds the actions of an entity: its private `registerEntityAction`, `unregisterEntityAction` and `getEntityActions` are gone.
 
 ## 15.2.0 (2026-10-07)
 
