@@ -7552,6 +7552,11 @@
 			"count": 1
 		}
 	},
+	"packages/global-styles-ui/src/typography-elements.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
 	"packages/global-styles-ui/src/utils.ts": {
 		"no-restricted-imports": {
 			"count": 1
