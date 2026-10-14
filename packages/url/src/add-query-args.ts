@@ -31,7 +31,7 @@ export function addQueryArgs(
 	let baseUrl = url.replace( fragment, '' );
 
 	// Determine whether URL already had query arguments.
-	const queryStringIndex = url.indexOf( '?' );
+	const queryStringIndex = baseUrl.indexOf( '?' );
 	if ( queryStringIndex !== -1 ) {
 		// Merge into existing query arguments.
 		args = Object.assign( getQueryArgs( url ), args );

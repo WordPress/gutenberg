@@ -546,7 +546,7 @@ describe( 'getFragment', () => {
 			getFragment(
 				'https://user:password@www.test-this.com:1020/test-path/file.extension#fragment?query=params&more'
 			)
-		).toBe( '#fragment' );
+		).toBe( '#fragment?query=params&more' );
 		expect(
 			getFragment(
 				'http://user:password@www.test-this.com:1020/test-path/file.extension?query=params&more#fragment'
@@ -554,6 +554,18 @@ describe( 'getFragment', () => {
 		).toBe( '#fragment' );
 		expect( getFragment( 'relative/url/#fragment' ) ).toBe( '#fragment' );
 		expect( getFragment( '/absolute/url/#fragment' ) ).toBe( '#fragment' );
+		expect(
+			getFragment( 'https://wordpress.org/#donate?amount=10/items' )
+		).toBe( '#donate?amount=10/items' );
+		expect(
+			getFragment( 'https://wordpress.org#path/after/fragment' )
+		).toBe( '#path/after/fragment' );
+		expect( getFragment( 'https://wordpress.org#:~:text=example' ) ).toBe(
+			'#:~:text=example'
+		);
+		expect(
+			getFragment( 'https://wordpress.org#section:~:text=example' )
+		).toBe( '#section:~:text=example' );
 	} );
 
 	it( 'returns undefined when the provided does not contain a url fragment', () => {
@@ -590,6 +602,12 @@ describe( 'isValidFragment', () => {
 		expect( isValidFragment( '#yes-it-is' ) ).toBe( true );
 		expect( isValidFragment( '#yes-it-is?' ) ).toBe( true );
 		expect( isValidFragment( '#yes-it-is/' ) ).toBe( true );
+		expect( isValidFragment( '#:~:text=example' ) ).toBe( true );
+		expect( isValidFragment( '#:~:text=exact%20words' ) ).toBe( true );
+		expect(
+			isValidFragment( '#:~:text=prefix%2D,start,end,%2Dsuffix' )
+		).toBe( true );
+		expect( isValidFragment( '#section:~:text=example' ) ).toBe( true );
 	} );
 
 	it( 'returns false if the fragment is invalid', () => {
@@ -672,6 +690,14 @@ describe( 'addQueryArgs', () => {
 		expect( addQueryArgs( url, args ) ).toBe(
 			'https://andalouses.example/beach/?sun=true#fragment'
 		);
+	} );
+
+	it( 'should preserve a question mark in the fragment when adding query args', () => {
+		expect(
+			addQueryArgs( 'https://example.com/#donate?amount=10', {
+				currency: 'USD',
+			} )
+		).toBe( 'https://example.com/?currency=USD#donate?amount=10' );
 	} );
 
 	it( 'should return URL argument unaffected if no query arguments to append', () => {
