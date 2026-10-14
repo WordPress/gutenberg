@@ -108,7 +108,7 @@ function ReactionButton( {
 	// Names that don't add up to the count are stale until the refetch lands.
 	const label =
 		names?.length === count
-			? formatReactorNames( names, emojiLabel )
+			? formatReactorNames( names, emoji?.sentenceLabel ?? hexKey )
 			: sprintf(
 					/* translators: 1: emoji label, 2: count of reactions */
 					_n( '%1$s, %2$s reaction', '%1$s, %2$s reactions', count ),

@@ -11,6 +11,7 @@ export interface ReactionEmoji {
 	// server accepts exactly these keys.
 	hexKey: string;
 	label: string;
+	sentenceLabel: string;
 }
 
 /**
@@ -30,7 +31,10 @@ export const REACTION_EMOJIS: ReactionEmoji[] = [
 		emoji: '🎉',
 		hexKey: '1f389',
 		label: _x( 'Celebration', 'emoji reaction' ),
-		sentenceLabel: _x( 'celebration', 'emoji reaction, after "reacted with"' ),
+		sentenceLabel: _x(
+			'celebration',
+			'emoji reaction, after "reacted with"'
+		),
 	},
 	{
 		emoji: '😄',
