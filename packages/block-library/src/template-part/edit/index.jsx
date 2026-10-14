@@ -27,6 +27,7 @@ import TemplatePartSelectionModal from './selection-modal';
 import { TemplatePartAdvancedControls } from './advanced-controls';
 import TemplatePartInnerBlocks from './inner-blocks';
 import { createTemplatePartId } from './utils/create-template-part-id';
+import EditOriginalInspectorButton from '../../utils/edit-original-inspector-button';
 import {
 	useAlternativeBlockPatterns,
 	useAlternativeTemplateParts,
@@ -233,6 +234,11 @@ export default function TemplatePartEdit( {
 	return (
 		<>
 			<RecursionProvider uniqueId={ templatePartId }>
+				<EditOriginalInspectorButton
+					clientId={ clientId }
+					postType="wp_template_part"
+					postId={ templatePartId }
+				/>
 				{ isEntityAvailable &&
 					onNavigateToEntityRecord &&
 					canUserEdit && (
