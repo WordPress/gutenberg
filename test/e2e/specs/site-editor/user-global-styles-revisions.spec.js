@@ -562,8 +562,14 @@ test.describe( 'Style Revisions', () => {
 		// The page select is the screen's only pagination control.
 		const currentPageSelect = page.getByLabel( 'Current page' );
 		await expect( currentPageSelect ).toHaveValue( '1' );
-		await currentPageSelect.selectOption( '2' );
-		await expect( currentPageSelect ).toHaveValue( '2' );
+		// Specs that ran earlier can leave revisions behind, so go to the last
+		// page rather than assuming there are exactly two.
+		const lastPage = await currentPageSelect
+			.locator( 'option' )
+			.last()
+			.getAttribute( 'value' );
+		await currentPageSelect.selectOption( lastPage );
+		await expect( currentPageSelect ).toHaveValue( lastPage );
 		// The theme defaults entry closes the last page.
 		await expect(
 			page.getByRole( 'option', {
