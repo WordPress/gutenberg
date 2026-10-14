@@ -8,6 +8,7 @@ import type {
 } from '@wordpress/global-styles-engine';
 import { ScreenHeader } from './screen-header';
 import ElementPreview from './element-preview';
+import ElementBlockOverrides from './element-block-overrides';
 import { useSetting, useStyle, useCanEditCSS } from './hooks';
 import { unlock } from './lock-unlock';
 import { getValidPseudoStates } from './utils';
@@ -273,6 +274,7 @@ function ScreenElement( {
 				inheritedStyle={ inheritedStyle }
 				setStyle={ setStyle }
 			/>
+			<ElementBlockOverrides element={ element } />
 		</>
 	);
 }
