@@ -12,6 +12,7 @@
 			--wp-ui-notice-decorative-icon-color: var(--wpds-color-foreground-content-neutral);
 
 			container-type: inline-size;
+			isolation: isolate;
 			display: grid;
 			align-items: start;
 			grid-template-columns: auto 1fr auto;
@@ -125,20 +126,15 @@
 			margin-block: auto;
 		}
 
-		/* Keep the dismiss control in the notice's color palette. */
-		.close-icon:not([data-disabled]) {
-			color: var(--wp-ui-notice-text-color);
+		/* Tint controls with the notice background while retaining their own state styles. */
+		.close-icon,
+		.action-button,
+		.action-link {
+			mix-blend-mode: luminosity;
 
-			&:is(:hover, :active, :focus) {
-				background-color: color-mix(in srgb, var(--wp-ui-notice-text-color) 10%, transparent);
-				border-color: transparent;
+			@media (forced-colors: active) {
+				mix-blend-mode: normal;
 			}
-		}
-
-		/* Add partial transparency to outline/minimal ActionButton
-		 * for a better look over tinted backgrounds */
-		.action-button:is(.is-action-button-outline, .is-action-button-minimal) {
-			--wp-ui-button-background-color-active: color-mix(in srgb, transparent 50%, var(--wpds-color-background-interactive-neutral-weak-active));
 		}
 	}
 }
