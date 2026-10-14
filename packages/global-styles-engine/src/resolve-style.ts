@@ -7,6 +7,7 @@ type StyleTree = Record< string, any >;
 
 interface SelectedState {
 	viewport?: string | null;
+	customState?: string | null;
 	pseudoState?: string | null;
 }
 
@@ -33,6 +34,10 @@ interface ResolveStyleContext {
 	elements?: string[] | null;
 	// Responsive breakpoint (e.g. `@mobile`), or null for the default viewport.
 	viewport?: string | null;
+	// Custom state the block declares in `selectors.states` (e.g. `-current`),
+	// or null for none. Matches the `custom` terminology used across the
+	// block-editor state helpers.
+	customState?: string | null;
 	// CSS pseudo-state (e.g. `:hover`), or null for the default state. Matches
 	// the `pseudo` terminology used across the block-editor state helpers.
 	pseudoState?: string | null;
@@ -42,9 +47,11 @@ const DEFAULT_STATE_VALUE = 'default';
 
 function isDefaultBlockStyleState( selectedState?: SelectedState | null ) {
 	const viewport = selectedState?.viewport;
+	const customState = selectedState?.customState;
 	const pseudoState = selectedState?.pseudoState;
 	return (
 		( ! viewport || viewport === DEFAULT_STATE_VALUE ) &&
+		( ! customState || customState === DEFAULT_STATE_VALUE ) &&
 		( ! pseudoState || pseudoState === DEFAULT_STATE_VALUE )
 	);
 }
@@ -53,7 +60,11 @@ function getStyleStatePath( selectedState: SelectedState ) {
 	if ( isDefaultBlockStyleState( selectedState ) ) {
 		return [];
 	}
-	return [ selectedState.viewport, selectedState.pseudoState ].filter(
+	return [
+		selectedState.viewport,
+		selectedState.customState,
+		selectedState.pseudoState,
+	].filter(
 		( state ): state is string => !! state && state !== DEFAULT_STATE_VALUE
 	);
 }
@@ -396,6 +407,7 @@ function resolveThemeFileBackgroundImage(
  * @param context.variationName Slug of the active block style variation, or null.
  * @param context.elements      Root-level `styles.elements.*` keys that paint this block, ordered low to high precedence.
  * @param context.viewport      Responsive breakpoint, or null for the default viewport.
+ * @param context.customState   Custom state, or null for none.
  * @param context.pseudoState   CSS pseudo-state, or null for the default state.
  * @return Merged panel-scoped payload and source map.
  */
@@ -406,6 +418,7 @@ function computeResolvedStyle(
 		variationName = null,
 		elements = null,
 		viewport = null,
+		customState = null,
 		pseudoState = null,
 	}: ResolveStyleContext = {}
 ): ResolvedStyle {
@@ -420,7 +433,7 @@ function computeResolvedStyle(
 	// `globalStyles` (the whole payload) is passed to the merge and variation
 	// lookups so a `{ ref }` value can resolve against a `styles.*` path.
 	const styles = globalStyles.styles as StyleTree;
-	const selectedState: SelectedState = { viewport, pseudoState };
+	const selectedState: SelectedState = { viewport, customState, pseudoState };
 
 	const root = styles;
 	const block = styles.blocks?.[ blockName ] ?? null;
@@ -469,7 +482,7 @@ function computeResolvedStyle(
 			: null,
 	];
 
-	// For a non-default state (pseudo and/or viewport), layer each layer's
+	// For a non-default state (viewport, custom and/or pseudo), layer each layer's
 	// state-scoped slice on top of the base contributions, mirroring the CSS
 	// cascade: a block's `:hover`/responsive styles inherit from its base
 	// styles. State slices are appended after all base layers, preserving the
@@ -547,7 +560,7 @@ const NO_LINKS = {};
 
 // Two-level memo: keyed by the raw Global Styles payload identity, then by the
 // `_links` map identity, then by a `(blockName, variationName, viewport,
-// pseudoState)` string. Keying on both object identities means a change to
+// customState, pseudoState)` string. Keying on both object identities means a change to
 // either the styles payload or the theme-file links produces a fresh entry.
 const memo = new WeakMap<
 	object,
@@ -589,7 +602,7 @@ export function resolveStyle(
 	// must take part in the cache key alongside the state slice.
 	const sliceKey = `${ context.elements?.join( ',' ) ?? '' }:${
 		context.viewport ?? ''
-	}:${ context.pseudoState ?? '' }`;
+	}:${ context.customState ?? '' }:${ context.pseudoState ?? '' }`;
 	const key =
 		( context.blockName || '' ) +
 		'\u0001' +
