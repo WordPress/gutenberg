@@ -175,7 +175,8 @@
 
 			// The same rule the Toolbar container has for its last group;
 			// this box stands in for it here.
-			> .components-toolbar-group:last-child::after {
+			> .components-toolbar-group:last-child::after,
+			> .components-toolbar:last-child::after {
 				content: none;
 			}
 
