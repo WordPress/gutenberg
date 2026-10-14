@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .rich-text {
@@ -55,8 +56,19 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	background-color: transparent;
 }
 
-.is-selected .non-breaking-space {
-	outline: 1px solid currentColor;
-	outline-offset: -1px;
-	opacity: 0.8;
+.rich-text .non-breaking-space {
+	position: relative;
+
+	&::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 4px;
+		height: 4px;
+		margin: -2px 0 0 -2px;
+		border-radius: 50%;
+		background-color: $alert-red;
+		pointer-events: none;
+	}
 }
