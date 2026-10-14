@@ -3,15 +3,29 @@ import { info } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Infotip pattern; Popover is not allowlisted yet (same as widget-header-infotip).
 import { Badge, Icon, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
 
-function getSummaryDescription( selectedViewport, selectedPseudoState ) {
-	if ( selectedViewport && selectedPseudoState ) {
+function getSummaryDescription( selectedViewport, selectedStates ) {
+	const [ firstState, secondState ] = selectedStates;
+
+	if ( selectedViewport && secondState ) {
 		return sprintf(
-			/* translators: 1: viewport name, e.g. "Tablet". 2: pseudo state name, e.g. "Hover". */
+			/* translators: 1: viewport name, e.g. "Tablet". 2: first state name, e.g. "Current". 3: second state name, e.g. "Hover". */
+			__(
+				'Style changes apply to the %1$s viewport and the %2$s and %3$s states.'
+			),
+			selectedViewport.label,
+			firstState.label,
+			secondState.label
+		);
+	}
+
+	if ( selectedViewport && firstState ) {
+		return sprintf(
+			/* translators: 1: viewport name, e.g. "Tablet". 2: state name, e.g. "Hover". */
 			__(
 				'Style changes apply to the %1$s viewport and the %2$s state.'
 			),
 			selectedViewport.label,
-			selectedPseudoState.label
+			firstState.label
 		);
 	}
 
@@ -23,11 +37,20 @@ function getSummaryDescription( selectedViewport, selectedPseudoState ) {
 		);
 	}
 
-	if ( selectedPseudoState ) {
+	if ( secondState ) {
 		return sprintf(
-			/* translators: %s: pseudo state name, e.g. "Hover". */
+			/* translators: 1: first state name, e.g. "Current". 2: second state name, e.g. "Hover". */
+			__( 'Style changes apply to the %1$s and %2$s states.' ),
+			firstState.label,
+			secondState.label
+		);
+	}
+
+	if ( firstState ) {
+		return sprintf(
+			/* translators: %s: state name, e.g. "Hover". */
 			__( 'Style changes apply to the %s state.' ),
-			selectedPseudoState.label
+			firstState.label
 		);
 	}
 
@@ -36,32 +59,23 @@ function getSummaryDescription( selectedViewport, selectedPseudoState ) {
 
 export default function StateControlBadges( {
 	viewportStates = [],
+	customStates = [],
 	pseudoStates = [],
 	viewportValue = 'default',
+	customStateValue = 'default',
 	pseudoStateValue = 'default',
 	className = 'block-editor-global-styles-state-control__badges',
 } ) {
-	const activeStates = [];
 	const selectedViewport = viewportStates.find(
 		( state ) => state.value === viewportValue
 	);
-	const selectedPseudoState = pseudoStates.find(
-		( state ) => state.value === pseudoStateValue
-	);
-
-	if ( selectedViewport ) {
-		activeStates.push( {
-			key: `viewport-${ selectedViewport.value }`,
-			label: selectedViewport.label,
-		} );
-	}
-
-	if ( selectedPseudoState ) {
-		activeStates.push( {
-			key: `pseudo-${ selectedPseudoState.value }`,
-			label: selectedPseudoState.label,
-		} );
-	}
+	const selectedStates = [
+		customStates.find( ( state ) => state.value === customStateValue ),
+		pseudoStates.find( ( state ) => state.value === pseudoStateValue ),
+	].filter( Boolean );
+	const activeStates = [ selectedViewport, ...selectedStates ]
+		.filter( Boolean )
+		.map( ( state ) => ( { key: state.value, label: state.label } ) );
 
 	if ( ! activeStates.length ) {
 		return null;
@@ -69,7 +83,7 @@ export default function StateControlBadges( {
 
 	const summaryDescription = getSummaryDescription(
 		selectedViewport,
-		selectedPseudoState
+		selectedStates
 	);
 	const moreInfoLabel =
 		activeStates.length === 1
