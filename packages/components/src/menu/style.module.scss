@@ -35,14 +35,14 @@
 }
 
 .menu-motion-root {
-	// Keep motion values in sync with ../utils/dropdown-motion.ts.
+	// Keep the slide distance in sync with ../popover/utils.ts.
 	@media not ( prefers-reduced-motion ) {
 		transition-property: transform, opacity;
 		transition-duration:
-			200ms,
-			100ms;
+			var(--wpds-motion-duration-md),
+			var(--wpds-motion-duration-sm);
 		transition-timing-function:
-			cubic-bezier(0.25, 0, 0, 1),
+			var(--wpds-motion-easing-expressive),
 			linear;
 		will-change: transform, opacity;
 
@@ -293,4 +293,3 @@
 		color: inherit;
 	}
 }
-

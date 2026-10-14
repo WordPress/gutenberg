@@ -6,4 +6,3 @@ export { breakpoint } from './breakpoint';
 export { default as CONFIG } from './config-values';
 export { COLORS } from './colors-values';
 export { baseLabelTypography } from './base-label';
-export { DROPDOWN_MOTION } from './dropdown-motion';
