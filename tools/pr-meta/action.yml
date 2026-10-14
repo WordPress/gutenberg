@@ -2,7 +2,7 @@ name: 'PR meta comment'
 description: 'Writes one section of the unified automation comment on a pull request'
 inputs:
     repo-token:
-        description: 'GitHub token with `pull-requests: write`'
+        description: 'GitHub token with `pull-requests: write`, plus `contents: read` for `require-base-contains`'
         required: true
     section:
         description: 'Section id, which must exist in the section registry'

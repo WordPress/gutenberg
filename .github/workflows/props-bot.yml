@@ -91,13 +91,14 @@ jobs:
                         ...context.repo,
                         pull_number: context.issue.number,
                       } );
+                      // This way round, a target holding the commit lists no files.
                       const { data: comparison } =
                         await github.rest.repos.compareCommitsWithBasehead( {
                           ...context.repo,
-                          basehead: `${ process.env.PR_META_WRITERS_SHA }...${ data.base.ref }`,
+                          basehead: `${ data.base.ref }...${ process.env.PR_META_WRITERS_SHA }`,
                           per_page: 1,
                         } );
-                      return [ 'ahead', 'identical' ].includes( comparison.status );
+                      return [ 'behind', 'identical' ].includes( comparison.status );
 
     # Collects a list of contributor props for the PR meta comment to post.
     props-bot:
