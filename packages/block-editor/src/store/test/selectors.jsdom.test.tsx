@@ -26,17 +26,28 @@ import { store } from '../';
 import { lock } from '../../lock-unlock';
 import { sectionRootClientIdKey } from '../private-keys';
 import { isFiltered } from '../utils';
-import type { State } from '../types';
+import type { BlockTemplate, State } from '../types';
 
-type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
+// The depth limit stops at recursive types such as block templates.
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
 	? T
-	: T extends Node
+	: T extends ( ...args: never[] ) => unknown
 		? T
-		: T extends Map< infer K, infer V >
-			? Map< K, DeepPartial< V > >
-			: T extends object
-				? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
-				: T;
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends object
+					? {
+							[ P in keyof T ]?: DeepPartial<
+								T[ P ],
+								[ ...Depth, unknown ]
+							>;
+						}
+					: T;
 
 /*
  * Fixtures set only the fields the selector under test reads, down to the
@@ -3801,8 +3812,6 @@ describe( 'selectors', () => {
 				__experimentalReusableBlocks: [
 					{
 						id: 1,
-						isTemporary: false,
-						clientId: 'block1',
 						title: { raw: 'Reusable Block 1' },
 						content: { raw: '<!-- /wp:test-block-a -->' },
 					},
@@ -3923,31 +3932,27 @@ describe( 'selectors', () => {
 				__experimentalReusableBlocks: [
 					{
 						id: 1,
-						isTemporary: false,
-						clientId: 'block1',
 						title: { raw: 'Reusable Block 1' },
 						content: { raw: '<!-- /wp:test-block-a -->' },
 					},
 					{
 						id: 2,
-						isTemporary: false,
-						clientId: 'block2',
 						title: { raw: 'Reusable Block 2' },
 						content: { raw: '<!-- /wp:test-block-b -->' },
 					},
 				],
 			} );
 			await dispatch( store ).resetBlocks( [
-				{
+				partial< Block >( {
 					clientId: 'block3',
 					name: 'core/test-block-a',
 					innerBlocks: [],
-				},
-				{
+				} ),
+				partial< Block >( {
 					clientId: 'block4',
 					name: 'core/test-block-a',
 					innerBlocks: [],
-				},
+				} ),
 			] );
 			await dispatch( store ).updateBlockListSettings( 'block3', {} );
 			await dispatch( store ).updateBlockListSettings( 'block4', {} );
@@ -3998,16 +4003,16 @@ describe( 'selectors', () => {
 
 		it( 'should reuse item objects across roots', async () => {
 			await dispatch( store ).resetBlocks( [
-				{
+				partial< Block >( {
 					clientId: 'block3',
 					name: 'core/test-block-a',
 					innerBlocks: [],
-				},
-				{
+				} ),
+				partial< Block >( {
 					clientId: 'block4',
 					name: 'core/test-block-a',
 					innerBlocks: [],
-				},
+				} ),
 			] );
 			await dispatch( store ).updateBlockListSettings( 'block3', {} );
 			await dispatch( store ).updateBlockListSettings( 'block4', {} );
@@ -4048,11 +4053,11 @@ describe( 'selectors', () => {
 
 		it( 'should set isDisabled when a block with `multiple: false` has been used', async () => {
 			await dispatch( store ).resetBlocks( [
-				{
+				partial< Block >( {
 					clientId: 'block1',
 					name: 'core/test-block-b',
 					innerBlocks: [],
-				},
+				} ),
 			] );
 			const items = select( store ).getInserterItems();
 			const testBlockBItem = items.find(
@@ -4063,13 +4068,12 @@ describe( 'selectors', () => {
 
 		it( 'should set a frecency', async () => {
 			for ( let i = 0; i < 10; i++ ) {
-				// @ts-expect-error The action JSDoc marks the optional parameters as only nullable.
 				await dispatch( store ).insertBlocks( [
-					{
+					partial< Block >( {
 						clientId: 'block1',
 						name: 'core/test-block-b',
 						innerBlocks: [],
-					},
+					} ),
 				] );
 			}
 
@@ -4465,7 +4469,7 @@ describe( 'selectors', () => {
 
 	describe( 'getTemplate', () => {
 		it( 'should return the template object', () => {
-			const template: unknown[] = [];
+			const template: BlockTemplate = [];
 			const state = partial< State >( {
 				settings: { template },
 			} );

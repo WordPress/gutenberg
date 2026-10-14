@@ -12,6 +12,7 @@ import {
 	setSelectedBlockStyleState,
 	setSelectedBlockStyleStateCanvasPreview,
 } from '../private-actions';
+import type { Settings } from '../types';
 
 describe( 'private actions', () => {
 	describe( 'hideBlockInterface', () => {
@@ -31,7 +32,8 @@ describe( 'private actions', () => {
 	} );
 
 	describe( '__experimentalUpdateSettings', () => {
-		const experimentalSettings = {
+		const experimentalSettings: Settings = {
+			// @ts-expect-error A placeholder, since the test only checks it is stripped.
 			inserterMediaCategories: 'foo',
 			blockInspectorAnimation: 'bar',
 		};
@@ -115,6 +117,7 @@ describe( 'private actions', () => {
 			expect(
 				setInsertionPoint( {
 					rootClientId: '',
+					// @ts-expect-error A string, which the action passes through unchanged.
 					index: '123',
 				} )
 			).toEqual( {

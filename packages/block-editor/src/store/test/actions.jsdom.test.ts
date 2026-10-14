@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { createRegistry } from '@wordpress/data';
 import {
@@ -8,15 +9,56 @@ import {
 	createBlock,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import * as selectors from '../selectors';
 import reducer from '../reducer';
 import * as actions from '../actions';
 import { STORE_NAME as blockEditorStoreName } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import type { BlockEditorThunkArgs, InserterMediaCategory } from '../types';
 
 const { editableRootKey } = unlock( blocksPrivateApis );
 
-const noop = () => {};
+const noop = () => undefined;
+
+// The depth limit stops at recursive types such as block templates.
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
+	? T
+	: T extends ( ...args: never[] ) => unknown
+		? T
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends object
+					? {
+							[ P in keyof T ]?: DeepPartial<
+								T[ P ],
+								[ ...Depth, unknown ]
+							>;
+						}
+					: T;
+
+/*
+ * Fixtures set only the fields the action under test reads, and stub the
+ * functions it never calls, so this marks the deliberately partial objects.
+ */
+function partial< T >( fixture: DeepPartial< T > ) {
+	return fixture as T;
+}
+
+type MockDispatch = Mock & Record< string, Mock >;
+
+/*
+ * Thunk tests pass mocked selectors and dispatchers that cover only what the
+ * action under test calls.
+ */
+function thunkArgs( args: Record< string, unknown > ) {
+	return args as unknown as BlockEditorThunkArgs;
+}
 
 const {
 	clearSelectedBlock,
@@ -53,7 +95,7 @@ const {
 } = actions;
 
 describe( 'actions', () => {
-	const defaultBlockSettings = {
+	const defaultBlockSettings = partial< BlockConfiguration >( {
 		apiVersion: 3,
 		attributes: {
 			content: {},
@@ -61,13 +103,13 @@ describe( 'actions', () => {
 		save: () => 'Saved',
 		category: 'text',
 		title: 'block title',
-	};
+	} );
 
 	describe( 'resetBlocks', () => {
 		it( 'should dispatch the RESET_BLOCKS action', () => {
-			const dispatch = vi.fn();
-			const blocks = [];
-			resetBlocks( blocks )( { dispatch } );
+			const dispatch = vi.fn() as MockDispatch;
+			const blocks: Block[] = [];
+			resetBlocks( blocks )( thunkArgs( { dispatch } ) );
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'RESET_BLOCKS',
 				blocks,
@@ -171,9 +213,9 @@ describe( 'actions', () => {
 					return [];
 				},
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
-			multiSelect( start, end )( { select, dispatch } );
+			multiSelect( start, end )( thunkArgs( { select, dispatch } ) );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MULTI_SELECT',
@@ -187,7 +229,7 @@ describe( 'actions', () => {
 			const start = 'start';
 			const end = 'end';
 			const select = {
-				getBlockRootClientId( clientId ) {
+				getBlockRootClientId( clientId: string ) {
 					switch ( clientId ) {
 						case start:
 							return 'parent';
@@ -201,9 +243,9 @@ describe( 'actions', () => {
 					return 0;
 				},
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
-			multiSelect( start, end )( { select, dispatch } );
+			multiSelect( start, end )( thunkArgs( { select, dispatch } ) );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -219,10 +261,10 @@ describe( 'actions', () => {
 
 	describe( 'replaceBlock', () => {
 		it( 'should dispatch the REPLACE_BLOCKS action if the new block can be inserted in the destination root block', () => {
-			const block = {
+			const block = partial< Block >( {
 				clientId: 'ribs',
 				name: 'core/test-block',
-			};
+			} );
 
 			const select = {
 				getSettings: () => null,
@@ -231,11 +273,14 @@ describe( 'actions', () => {
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 			dispatch.ensureDefaultBlock = vi.fn();
 			const registry = createRegistry();
 
-			replaceBlock( 'chicken', block )( { select, dispatch, registry } );
+			replaceBlock(
+				'chicken',
+				block
+			)( thunkArgs( { select, dispatch, registry } ) );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -249,7 +294,7 @@ describe( 'actions', () => {
 
 	describe( 'replaceBlocks', () => {
 		it( 'should not dispatch the REPLACE_BLOCKS action if the replacement is not possible', () => {
-			const blocks = [
+			const blocks = partial< Block[] >( [
 				{
 					clientId: 'ribs',
 					name: 'core/test-ribs',
@@ -258,13 +303,13 @@ describe( 'actions', () => {
 					clientId: 'chicken',
 					name: 'core/test-chicken',
 				},
-			];
+			] );
 
 			const select = {
 				getSettings: () => null,
 				getSelectedBlockClientId: () => null,
 				getBlockRootClientId: () => null,
-				canInsertBlockType: ( clientId ) => {
+				canInsertBlockType: ( clientId: string ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
 							return true;
@@ -274,15 +319,18 @@ describe( 'actions', () => {
 					}
 				},
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
-			replaceBlocks( [ 'chicken' ], blocks )( { select, dispatch } );
+			replaceBlocks(
+				[ 'chicken' ],
+				blocks
+			)( thunkArgs( { select, dispatch } ) );
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should dispatch the REPLACE_BLOCKS action if the all the replacement blocks can be inserted in the parent block', () => {
-			const blocks = [
+			const blocks = partial< Block[] >( [
 				{
 					clientId: 'ribs',
 					name: 'core/test-ribs',
@@ -291,7 +339,7 @@ describe( 'actions', () => {
 					clientId: 'chicken',
 					name: 'core/test-chicken',
 				},
-			];
+			] );
 
 			const select = {
 				getSettings: () => null,
@@ -300,14 +348,14 @@ describe( 'actions', () => {
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 			dispatch.ensureDefaultBlock = vi.fn();
 			const registry = createRegistry();
 
 			replaceBlocks(
 				[ 'chicken' ],
 				blocks
-			)( { select, dispatch, registry } );
+			)( thunkArgs( { select, dispatch, registry } ) );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -319,7 +367,7 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should pass patternName through metadata to REPLACE_BLOCKS action', () => {
-			const blocks = [
+			const blocks = partial< Block[] >( [
 				{
 					clientId: 'ribs',
 					name: 'core/test-ribs',
@@ -328,7 +376,7 @@ describe( 'actions', () => {
 					clientId: 'chicken',
 					name: 'core/test-chicken',
 				},
-			];
+			] );
 
 			const meta = { patternName: 'core/chicken-ribs-pattern' };
 
@@ -339,7 +387,7 @@ describe( 'actions', () => {
 				canInsertBlockType: () => true,
 				getBlockCount: () => 1,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 			dispatch.ensureDefaultBlock = vi.fn();
 			const registry = createRegistry();
 
@@ -349,7 +397,7 @@ describe( 'actions', () => {
 				null,
 				null,
 				meta
-			)( { select, dispatch, registry } );
+			)( thunkArgs( { select, dispatch, registry } ) );
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REPLACE_BLOCKS',
@@ -365,10 +413,10 @@ describe( 'actions', () => {
 
 	describe( 'insertBlock', () => {
 		it( 'should yield the INSERT_BLOCKS action', () => {
-			const block = {
+			const block = partial< Block >( {
 				clientId: 'ribs',
 				name: 'core/test-block',
-			};
+			} );
 			const index = 5;
 
 			const select = {
@@ -376,14 +424,20 @@ describe( 'actions', () => {
 				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			insertBlock(
 				block,
 				index,
 				'testclientid',
 				true
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -405,10 +459,13 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should apply block type templates to empty blocks', () => {
-			registerBlockType( 'core/test-container', {
-				...defaultBlockSettings,
-				template: [ [ 'core/test-item', { content: 'chicken' } ] ],
-			} );
+			registerBlockType(
+				'core/test-container',
+				partial< BlockConfiguration >( {
+					...defaultBlockSettings,
+					template: [ [ 'core/test-item', { content: 'chicken' } ] ],
+				} )
+			);
 			registerBlockType( 'core/test-item', defaultBlockSettings );
 
 			const containerBlock = createBlock( 'core/test-container' );
@@ -417,18 +474,20 @@ describe( 'actions', () => {
 				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			insertBlocks(
 				[ containerBlock ],
 				5,
 				'testrootid',
 				false
-			)( {
-				select,
-				dispatch,
-				registry: { batch: ( fn ) => fn() },
-			} );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -452,11 +511,14 @@ describe( 'actions', () => {
 		} );
 
 		it( 'selects the first inner leaf block when the block type opts in', () => {
-			registerBlockType( 'core/test-container', {
-				...defaultBlockSettings,
-				template: [ [ 'core/test-item', { foo: 42 } ] ],
-				templateInsertUpdatesSelection: true,
-			} );
+			registerBlockType(
+				'core/test-container',
+				partial< BlockConfiguration >( {
+					...defaultBlockSettings,
+					template: [ [ 'core/test-item', { foo: 42 } ] ],
+					templateInsertUpdatesSelection: true,
+				} )
+			);
 			registerBlockType( 'core/test-item', defaultBlockSettings );
 
 			const containerBlock = createBlock( 'core/test-container' );
@@ -467,7 +529,7 @@ describe( 'actions', () => {
 				getBlockName: () => 'core/test-container',
 				canInsertBlockType: () => true,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 			dispatch.selectBlock = vi.fn();
 			dispatch.selectionChange = vi.fn();
 
@@ -477,11 +539,13 @@ describe( 'actions', () => {
 				'testrootid',
 				true,
 				0
-			)( {
-				select,
-				dispatch,
-				registry: { batch: ( fn ) => fn() },
-			} );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			const insertedBlocks = dispatch.mock.calls[ 0 ][ 0 ].blocks;
 			expect( dispatch.selectBlock ).toHaveBeenCalledWith(
@@ -491,11 +555,14 @@ describe( 'actions', () => {
 		} );
 
 		it( 'selects the start of an inserted editable root block text', () => {
-			registerBlockType( 'core/test-host', {
-				...defaultBlockSettings,
-				attributes: { content: { source: 'rich-text' } },
-				[ editableRootKey ]: true,
-			} );
+			registerBlockType(
+				'core/test-host',
+				partial< BlockConfiguration >( {
+					...defaultBlockSettings,
+					attributes: { content: { source: 'rich-text' } },
+					[ editableRootKey ]: true,
+				} )
+			);
 
 			const block = createBlock( 'core/test-host' );
 			const select = {
@@ -504,7 +571,7 @@ describe( 'actions', () => {
 				getBlockName: () => 'core/test-host',
 				canInsertBlockType: () => true,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 			dispatch.selectionChange = vi.fn();
 
 			insertBlocks(
@@ -513,11 +580,13 @@ describe( 'actions', () => {
 				undefined,
 				true,
 				0
-			)( {
-				select,
-				dispatch,
-				registry: { batch: ( fn ) => fn() },
-			} );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				block.clientId,
@@ -530,25 +599,37 @@ describe( 'actions', () => {
 			// since the store cannot know which field it focuses.
 			dispatch.selectionChange.mockClear();
 			select.getBlockName = () => 'core/test-item';
-			registerBlockType( 'core/test-item', {
-				...defaultBlockSettings,
-				attributes: { content: { source: 'rich-text' } },
-			} );
+			registerBlockType(
+				'core/test-item',
+				partial< BlockConfiguration >( {
+					...defaultBlockSettings,
+					attributes: { content: { source: 'rich-text' } },
+				} )
+			);
 			insertBlocks(
 				[ createBlock( 'core/test-item' ) ],
 				0,
 				undefined,
 				true,
 				0
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should not apply block type templates to blocks with inner blocks', () => {
-			registerBlockType( 'core/test-container', {
-				...defaultBlockSettings,
-				template: [ [ 'core/test-item', { content: 'chicken' } ] ],
-			} );
+			registerBlockType(
+				'core/test-container',
+				partial< BlockConfiguration >( {
+					...defaultBlockSettings,
+					template: [ [ 'core/test-item', { content: 'chicken' } ] ],
+				} )
+			);
 			registerBlockType( 'core/test-item', defaultBlockSettings );
 
 			const containerBlock = createBlock( 'core/test-container', {}, [
@@ -559,18 +640,20 @@ describe( 'actions', () => {
 				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			insertBlocks(
 				[ containerBlock ],
 				5,
 				'testrootid',
 				false
-			)( {
-				select,
-				dispatch,
-				registry: { batch: ( fn ) => fn() },
-			} );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -580,10 +663,16 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should leave a nested occurrence of the same block type empty', () => {
-			registerBlockType( 'core/test-container', {
-				...defaultBlockSettings,
-				template: [ [ 'core/test-item' ], [ 'core/test-container' ] ],
-			} );
+			registerBlockType(
+				'core/test-container',
+				partial< BlockConfiguration >( {
+					...defaultBlockSettings,
+					template: [
+						[ 'core/test-item' ],
+						[ 'core/test-container' ],
+					],
+				} )
+			);
 			registerBlockType( 'core/test-item', defaultBlockSettings );
 
 			const containerBlock = createBlock( 'core/test-container' );
@@ -592,18 +681,20 @@ describe( 'actions', () => {
 				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => true,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			insertBlocks(
 				[ containerBlock ],
 				5,
 				'testrootid',
 				false
-			)( {
-				select,
-				dispatch,
-				registry: { batch: ( fn ) => fn() },
-			} );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -640,12 +731,16 @@ describe( 'actions', () => {
 				clientId: 'chicken-ribs',
 				name: 'core/test-chicken-ribs',
 			};
-			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
+			const blocks = partial< Block[] >( [
+				ribsBlock,
+				chickenBlock,
+				chickenRibsBlock,
+			] );
 
 			const select = {
 				getSettings: () => null,
 				getSelectedBlockClientId: () => null,
-				canInsertBlockType: ( clientId ) => {
+				canInsertBlockType: ( clientId: string ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
 							return true;
@@ -658,14 +753,20 @@ describe( 'actions', () => {
 					}
 				},
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			insertBlocks(
 				blocks,
 				5,
 				'testrootid',
 				false
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -687,21 +788,27 @@ describe( 'actions', () => {
 				clientId: 'chicken',
 				name: 'core/test-chicken',
 			};
-			const blocks = [ ribsBlock, chickenBlock ];
+			const blocks = partial< Block[] >( [ ribsBlock, chickenBlock ] );
 
 			const select = {
 				getSettings: () => null,
 				getSelectedBlockClientId: () => null,
 				canInsertBlockType: () => false,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			insertBlocks(
 				blocks,
 				5,
 				'testrootid',
 				false
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -719,13 +826,17 @@ describe( 'actions', () => {
 				clientId: 'chicken-ribs',
 				name: 'core/test-chicken-ribs',
 			};
-			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
+			const blocks = partial< Block[] >( [
+				ribsBlock,
+				chickenBlock,
+				chickenRibsBlock,
+			] );
 			const meta = { patternName: 'core/chicken-ribs-pattern' };
 
 			const select = {
 				getSettings: () => null,
 				getSelectedBlockClientId: () => null,
-				canInsertBlockType: ( clientId ) => {
+				canInsertBlockType: ( clientId: string ) => {
 					switch ( clientId ) {
 						case 'core/test-ribs':
 							return true;
@@ -738,7 +849,7 @@ describe( 'actions', () => {
 					}
 				},
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			insertBlocks(
 				blocks,
@@ -747,7 +858,13 @@ describe( 'actions', () => {
 				false,
 				0,
 				meta
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'INSERT_BLOCKS',
@@ -785,7 +902,9 @@ describe( 'actions', () => {
 			} );
 			const registry = createRegistry();
 
-			removeBlocks( clientIds )( { select, dispatch, registry } );
+			removeBlocks( clientIds )(
+				thunkArgs( { select, dispatch, registry } )
+			);
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
 				clientId,
@@ -804,14 +923,20 @@ describe( 'actions', () => {
 			const select = {
 				canMoveBlocks: () => false,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			moveBlocksToPosition(
 				[ 'chicken' ],
 				'ribs',
 				'ribs',
 				5
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -822,14 +947,20 @@ describe( 'actions', () => {
 				canRemoveBlocks: () => true,
 				canInsertBlocks: () => true,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			moveBlocksToPosition(
 				[ 'chicken' ],
 				'ribs',
 				'chicken-ribs',
 				5
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
@@ -846,14 +977,20 @@ describe( 'actions', () => {
 				canRemoveBlocks: () => true,
 				canInsertBlocks: () => false,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			moveBlocksToPosition(
 				[ 'chicken' ],
 				'ribs',
 				'chicken-ribs',
 				5
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).not.toHaveBeenCalled();
 		} );
@@ -864,14 +1001,21 @@ describe( 'actions', () => {
 			const select = {
 				canMoveBlocks: () => true,
 			};
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as MockDispatch;
 
 			moveBlocksToPosition(
+				// @ts-expect-error Deliberately one client ID as a string, which is forwarded unchanged.
 				'chicken',
 				'ribs',
 				'ribs',
 				5
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'MOVE_BLOCKS_TO_POSITION',
@@ -897,7 +1041,9 @@ describe( 'actions', () => {
 				selectPreviousBlock: vi.fn(),
 			} );
 			const registry = createRegistry();
-			removeBlock( clientId )( { select, dispatch, registry } );
+			removeBlock( clientId )(
+				thunkArgs( { select, dispatch, registry } )
+			);
 
 			expect( dispatch.selectPreviousBlock ).toHaveBeenCalledWith(
 				clientId,
@@ -927,7 +1073,7 @@ describe( 'actions', () => {
 			removeBlocks(
 				[ clientId ],
 				false
-			)( { select, dispatch, registry } );
+			)( thunkArgs( { select, dispatch, registry } ) );
 
 			expect( dispatch.selectPreviousBlock ).not.toHaveBeenCalled();
 
@@ -1026,9 +1172,9 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'replaceInnerBlocks', () => {
-		const block = {
+		const block = partial< Block >( {
 			clientId: 'ribs',
-		};
+		} );
 
 		it( 'should return the REPLACE_INNER_BLOCKS action with default values set', () => {
 			expect( replaceInnerBlocks( 'root', [ block ] ) ).toEqual( {
@@ -1081,15 +1227,18 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should only focus the blockA if the blockA has no merge function and the content of blockB is modified', () => {
-			registerBlockType( 'core/test-block', {
-				...defaultBlockSettings,
-				attributes: {
-					content: {
-						type: 'string',
-						role: 'content',
+			registerBlockType(
+				'core/test-block',
+				partial< BlockConfiguration >( {
+					...defaultBlockSettings,
+					attributes: {
+						content: {
+							type: 'string',
+							role: 'content',
+						},
 					},
-				},
-			} );
+				} )
+			);
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
@@ -1103,7 +1252,7 @@ describe( 'actions', () => {
 			} );
 
 			const select = {
-				getBlock: ( clientId ) =>
+				getBlock: ( clientId: string ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
 				getBlockEditingMode: () => 'default',
 				isBlockSelected: () => false,
@@ -1116,29 +1265,38 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch.selectBlock ).toHaveBeenCalledWith( 'chicken' );
 		} );
 
 		it( 'should merge the blocks if blocks of the same type', () => {
-			registerBlockType( 'core/test-block', {
-				apiVersion: 3,
-				attributes: {
-					content: {},
-				},
-				merge( attributes, attributesToMerge ) {
-					return {
-						content:
-							attributes.content +
-							' ' +
-							attributesToMerge.content,
-					};
-				},
-				save: noop,
-				category: 'text',
-				title: 'test block',
-			} );
+			registerBlockType(
+				'core/test-block',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					attributes: {
+						content: {},
+					},
+					merge( attributes, attributesToMerge ) {
+						return {
+							content:
+								attributes.content +
+								' ' +
+								attributesToMerge.content,
+						};
+					},
+					save: noop,
+					category: 'text',
+					title: 'test block',
+				} )
+			);
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
@@ -1153,7 +1311,7 @@ describe( 'actions', () => {
 			} );
 
 			const select = {
-				getBlock: ( clientId ) =>
+				getBlock: ( clientId: string ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
@@ -1170,7 +1328,13 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				blockA.clientId,
@@ -1193,23 +1357,26 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
-			registerBlockType( 'core/test-block', {
-				apiVersion: 3,
-				attributes: {
-					content: {},
-				},
-				merge( attributes, attributesToMerge ) {
-					return {
-						content:
-							attributes.content +
-							' ' +
-							attributesToMerge.content,
-					};
-				},
-				save: noop,
-				category: 'text',
-				title: 'test block',
-			} );
+			registerBlockType(
+				'core/test-block',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					attributes: {
+						content: {},
+					},
+					merge( attributes, attributesToMerge ) {
+						return {
+							content:
+								attributes.content +
+								' ' +
+								attributesToMerge.content,
+						};
+					},
+					save: noop,
+					category: 'text',
+					title: 'test block',
+				} )
+			);
 			registerBlockType( 'core/test-block-2', defaultBlockSettings );
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
@@ -1225,7 +1392,7 @@ describe( 'actions', () => {
 			} );
 
 			const select = {
-				getBlock: ( clientId ) =>
+				getBlock: ( clientId: string ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
@@ -1241,55 +1408,68 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should transform and merge the blocks', () => {
-			registerBlockType( 'core/test-block', {
-				apiVersion: 3,
-				attributes: {
-					content: {
-						type: 'string',
-					},
-				},
-				merge( attributes, attributesToMerge ) {
-					return {
-						content:
-							attributes.content +
-							' ' +
-							attributesToMerge.content,
-					};
-				},
-				save: noop,
-				category: 'text',
-				title: 'test block',
-			} );
-			registerBlockType( 'core/test-block-2', {
-				apiVersion: 3,
-				attributes: {
-					content2: {
-						type: 'string',
-					},
-				},
-				transforms: {
-					to: [
-						{
-							type: 'block',
-							blocks: [ 'core/test-block' ],
-							transform: ( { content2 } ) => {
-								return createBlock( 'core/test-block', {
-									content: content2,
-								} );
-							},
+			registerBlockType(
+				'core/test-block',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					attributes: {
+						content: {
+							type: 'string',
 						},
-					],
-				},
-				save: noop,
-				category: 'text',
-				title: 'test block 2',
-			} );
+					},
+					merge( attributes, attributesToMerge ) {
+						return {
+							content:
+								attributes.content +
+								' ' +
+								attributesToMerge.content,
+						};
+					},
+					save: noop,
+					category: 'text',
+					title: 'test block',
+				} )
+			);
+			registerBlockType(
+				'core/test-block-2',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					attributes: {
+						content2: {
+							type: 'string',
+						},
+					},
+					transforms: {
+						to: [
+							{
+								type: 'block',
+								blocks: [ 'core/test-block' ],
+								// @ts-expect-error A single block transform receives that block's attributes.
+								transform: ( { content2 } ) => {
+									return createBlock( 'core/test-block', {
+										content: content2,
+									} );
+								},
+							},
+						],
+					},
+					save: noop,
+					category: 'text',
+					title: 'test block 2',
+				} )
+			);
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
@@ -1304,7 +1484,7 @@ describe( 'actions', () => {
 			} );
 
 			const select = {
-				getBlock: ( clientId ) =>
+				getBlock: ( clientId: string ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
@@ -1321,7 +1501,13 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch.selectionChange ).toHaveBeenCalledWith(
 				blockA.clientId,
@@ -1344,23 +1530,26 @@ describe( 'actions', () => {
 		} );
 
 		it( 'should not merge the blocks if blockB editing mode is `disabled`', () => {
-			registerBlockType( 'core/test-block', {
-				apiVersion: 3,
-				attributes: {
-					content: {},
-				},
-				merge( attributes, attributesToMerge ) {
-					return {
-						content:
-							attributes.content +
-							' ' +
-							attributesToMerge.content,
-					};
-				},
-				save: noop,
-				category: 'text',
-				title: 'test block',
-			} );
+			registerBlockType(
+				'core/test-block',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					attributes: {
+						content: {},
+					},
+					merge( attributes, attributesToMerge ) {
+						return {
+							content:
+								attributes.content +
+								' ' +
+								attributesToMerge.content,
+						};
+					},
+					save: noop,
+					category: 'text',
+					title: 'test block',
+				} )
+			);
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
@@ -1374,20 +1563,20 @@ describe( 'actions', () => {
 				innerBlocks: [],
 			} );
 
-			const modes = {
+			const modes: Record< string, string > = {
 				chicken: 'default',
 				ribs: 'disabled',
 			};
 
 			const select = {
-				getBlock: ( clientId ) =>
+				getBlock: ( clientId: string ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
 					attributeKey: 'content',
 					offset: 0,
 				} ),
-				getBlockEditingMode: ( clientId ) => modes[ clientId ],
+				getBlockEditingMode: ( clientId: string ) => modes[ clientId ],
 			};
 			const dispatch = Object.assign( vi.fn(), {
 				replaceBlocks: vi.fn(),
@@ -1397,30 +1586,39 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should not merge the blocks if blockA editing mode is `disabled`', () => {
-			registerBlockType( 'core/test-block', {
-				apiVersion: 3,
-				attributes: {
-					content: {},
-				},
-				merge( attributes, attributesToMerge ) {
-					return {
-						content:
-							attributes.content +
-							' ' +
-							attributesToMerge.content,
-					};
-				},
-				save: noop,
-				category: 'text',
-				title: 'test block',
-			} );
+			registerBlockType(
+				'core/test-block',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					attributes: {
+						content: {},
+					},
+					merge( attributes, attributesToMerge ) {
+						return {
+							content:
+								attributes.content +
+								' ' +
+								attributesToMerge.content,
+						};
+					},
+					save: noop,
+					category: 'text',
+					title: 'test block',
+				} )
+			);
 			const blockA = deepFreeze( {
 				clientId: 'chicken',
 				name: 'core/test-block',
@@ -1434,20 +1632,20 @@ describe( 'actions', () => {
 				innerBlocks: [],
 			} );
 
-			const modes = {
+			const modes: Record< string, string > = {
 				chicken: 'disabled',
 				ribs: 'default',
 			};
 
 			const select = {
-				getBlock: ( clientId ) =>
+				getBlock: ( clientId: string ) =>
 					[ blockA, blockB ].find( ( b ) => b.clientId === clientId ),
 				getSelectionStart: () => ( {
 					clientId: blockB.clientId,
 					attributeKey: 'content',
 					offset: 0,
 				} ),
-				getBlockEditingMode: ( clientId ) => modes[ clientId ],
+				getBlockEditingMode: ( clientId: string ) => modes[ clientId ],
 			};
 			const dispatch = Object.assign( vi.fn(), {
 				replaceBlocks: vi.fn(),
@@ -1457,7 +1655,13 @@ describe( 'actions', () => {
 			mergeBlocks(
 				blockA.clientId,
 				blockB.clientId
-			)( { select, dispatch, registry: { batch: ( fn ) => fn() } } );
+			)(
+				thunkArgs( {
+					select,
+					dispatch,
+					registry: { batch: ( fn: () => void ) => fn() },
+				} )
+			);
 
 			expect( dispatch.selectionChange ).not.toHaveBeenCalled();
 			expect( dispatch.replaceBlocks ).not.toHaveBeenCalled();
@@ -1465,7 +1669,9 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'validateBlocksToTemplate', () => {
-		let store;
+		let store: ReturnType<
+			ReturnType< typeof createRegistry >[ 'registerStore' ]
+		>;
 		beforeEach( () => {
 			store = createRegistry().registerStore( blockEditorStoreName, {
 				actions,
@@ -1484,8 +1690,10 @@ describe( 'actions', () => {
 
 		it( 'should return undefined if no template assigned', async () => {
 			const result = await store.dispatch(
+				// @ts-expect-error The store middleware runs thunks, which the Redux types do not model.
 				validateBlocksToTemplate(
 					resetBlocks( [ createBlock( 'core/test-block' ) ] ),
+					// @ts-expect-error The action takes no store.
 					store
 				)
 			);
@@ -1501,6 +1709,7 @@ describe( 'actions', () => {
 			);
 
 			const result = await store.dispatch(
+				// @ts-expect-error The store middleware runs thunks, which the Redux types do not model.
 				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
@@ -1516,6 +1725,7 @@ describe( 'actions', () => {
 			);
 
 			const result = await store.dispatch(
+				// @ts-expect-error The store middleware runs thunks, which the Redux types do not model.
 				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
@@ -1531,6 +1741,7 @@ describe( 'actions', () => {
 			);
 
 			const result = await store.dispatch(
+				// @ts-expect-error The store middleware runs thunks, which the Redux types do not model.
 				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
@@ -1574,19 +1785,26 @@ describe( 'actions', () => {
 	describe( 'registerInserterMediaCategory', () => {
 		describe( 'should log errors when invalid', () => {
 			it( 'valid object', () => {
-				registerInserterMediaCategory()( {} );
+				// @ts-expect-error Deliberately no category.
+				registerInserterMediaCategory()( thunkArgs( {} ) );
 				expect( console ).toHaveErroredWith(
 					'Category should be an `InserterMediaCategory` object.'
 				);
 			} );
 			it( 'has name', () => {
-				registerInserterMediaCategory( {} )( {} );
+				registerInserterMediaCategory(
+					// @ts-expect-error Deliberately an empty category.
+					{}
+				)( thunkArgs( {} ) );
 				expect( console ).toHaveErroredWith(
 					'Category should have a `name` that should be unique among all media categories.'
 				);
 			} );
 			it( 'has labels.name', () => {
-				registerInserterMediaCategory( { name: 'a' } )( {} );
+				registerInserterMediaCategory(
+					// @ts-expect-error Deliberately a category without labels.
+					{ name: 'a' }
+				)( thunkArgs( {} ) );
 				expect( console ).toHaveErroredWith(
 					'Category should have a `labels.name`.'
 				);
@@ -1595,8 +1813,9 @@ describe( 'actions', () => {
 				registerInserterMediaCategory( {
 					name: 'a',
 					labels: { name: 'a' },
+					// @ts-expect-error Deliberately an unknown media type.
 					mediaType: 'b',
-				} )( {} );
+				} )( thunkArgs( {} ) );
 				expect( console ).toHaveErroredWith(
 					'Category should have `mediaType` property that is one of `image|audio|video`.'
 				);
@@ -1606,65 +1825,79 @@ describe( 'actions', () => {
 					name: 'a',
 					labels: { name: 'a' },
 					mediaType: 'image',
+					// @ts-expect-error Deliberately not a function.
 					fetch: 'c',
-				} )( {} );
+				} )( thunkArgs( {} ) );
 				expect( console ).toHaveErroredWith(
 					'Category should have a `fetch` function defined with the following signature `(InserterMediaRequest) => Promise<InserterMediaItem[]|InserterMediaResponse>`.'
 				);
 			} );
 			it( 'has unique name', () => {
-				registerInserterMediaCategory( {
-					name: 'a',
-					labels: { name: 'a' },
-					mediaType: 'image',
-					fetch: () => {},
-				} )( {
-					select: {
-						getRegisteredInserterMediaCategories: () => [
-							{ name: 'a' },
-						],
-					},
-				} );
+				registerInserterMediaCategory(
+					partial< InserterMediaCategory >( {
+						name: 'a',
+						labels: { name: 'a' },
+						mediaType: 'image',
+						// @ts-expect-error The test never calls `fetch`.
+						fetch: () => {},
+					} )
+				)(
+					thunkArgs( {
+						select: {
+							getRegisteredInserterMediaCategories: () => [
+								{ name: 'a' },
+							],
+						},
+					} )
+				);
 				expect( console ).toHaveErroredWith(
 					'A category is already registered with the same name: "a".'
 				);
 			} );
 			it( 'has unique labels.name', () => {
-				registerInserterMediaCategory( {
-					name: 'a',
-					labels: { name: 'a' },
-					mediaType: 'image',
-					fetch: () => {},
-				} )( {
-					select: {
-						getRegisteredInserterMediaCategories: () => [
-							{ labels: { name: 'a' } },
-						],
-					},
-				} );
+				registerInserterMediaCategory(
+					partial< InserterMediaCategory >( {
+						name: 'a',
+						labels: { name: 'a' },
+						mediaType: 'image',
+						// @ts-expect-error The test never calls `fetch`.
+						fetch: () => {},
+					} )
+				)(
+					thunkArgs( {
+						select: {
+							getRegisteredInserterMediaCategories: () => [
+								{ labels: { name: 'a' } },
+							],
+						},
+					} )
+				);
 				expect( console ).toHaveErroredWith(
 					'A category is already registered with the same labels.name: "a".'
 				);
 			} );
 		} );
 		it( 'should register a media category', () => {
-			const category = {
+			const category = partial< InserterMediaCategory >( {
 				name: 'new',
 				labels: { name: 'new' },
 				mediaType: 'image',
+				// @ts-expect-error The test never calls `fetch`.
 				fetch: () => {},
-			};
+			} );
 			const inserterMediaCategories = [
 				{ name: 'a', labels: { name: 'a' } },
 			];
-			const dispatch = vi.fn();
-			registerInserterMediaCategory( category )( {
-				select: {
-					getRegisteredInserterMediaCategories: () =>
-						inserterMediaCategories,
-				},
-				dispatch,
-			} );
+			const dispatch = vi.fn() as MockDispatch;
+			registerInserterMediaCategory( category )(
+				thunkArgs( {
+					select: {
+						getRegisteredInserterMediaCategories: () =>
+							inserterMediaCategories,
+					},
+					dispatch,
+				} )
+			);
 			expect( dispatch ).toHaveBeenLastCalledWith( {
 				type: 'REGISTER_INSERTER_MEDIA_CATEGORY',
 				category: { ...category, isExternalResource: true },

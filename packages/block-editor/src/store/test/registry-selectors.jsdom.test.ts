@@ -14,10 +14,10 @@ import {
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
 import { select, dispatch } from '@wordpress/data';
-import type { BlockConfiguration } from '@wordpress/blocks';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import { store } from '../';
 import { isFiltered } from '../utils';
-import type { TreeBlock } from '../types';
+import type { BlockPattern, TreeBlock } from '../types';
 
 type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
 	? T
@@ -71,16 +71,16 @@ describe( 'selectors', () => {
 	describe( '__experimentalGetAllowedPatterns', () => {
 		beforeAll( async () => {
 			await dispatch( store ).resetBlocks( [
-				{
+				partial< Block >( {
 					clientId: 'block1',
 					name: 'core/test-block-a',
 					innerBlocks: [],
-				},
-				{
+				} ),
+				partial< Block >( {
 					clientId: 'block2',
 					name: 'core/test-block-b',
 					innerBlocks: [],
-				},
+				} ),
 			] );
 			await dispatch( store ).updateSettings( {
 				__experimentalBlockPatterns: [
@@ -214,11 +214,11 @@ describe( 'selectors', () => {
 	describe( 'getPatternsByBlockTypes', () => {
 		beforeAll( async () => {
 			await dispatch( store ).resetBlocks( [
-				{
+				partial< Block >( {
 					clientId: 'block1',
 					name: 'core/test-block-a',
 					innerBlocks: [],
-				},
+				} ),
 			] );
 			await dispatch( store ).updateSettings( {
 				__experimentalBlockPatterns: [
@@ -236,12 +236,12 @@ describe( 'selectors', () => {
 						content:
 							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
 					},
-					{
+					partial< BlockPattern >( {
 						title: 'pattern c',
 						blockTypes: [ 'test/block-a' ],
 						content:
 							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
-					},
+					} ),
 				],
 			} );
 			await dispatch( store ).updateBlockListSettings( 'block1', {
@@ -299,16 +299,16 @@ describe( 'selectors', () => {
 	describe( '__experimentalGetPatternTransformItems', () => {
 		beforeAll( async () => {
 			await dispatch( store ).resetBlocks( [
-				{
+				partial< Block >( {
 					clientId: 'block1',
 					name: 'core/test-block-a',
 					innerBlocks: [],
-				},
-				{
+				} ),
+				partial< Block >( {
 					clientId: 'block2',
 					name: 'core/test-block-b',
 					innerBlocks: [],
-				},
+				} ),
 			] );
 			await dispatch( store ).setHasControlledInnerBlocks(
 				'block2-clientId',
