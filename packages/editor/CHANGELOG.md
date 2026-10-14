@@ -7,6 +7,10 @@
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 -   The editor stylesheet no longer includes the styles of `@wordpress/fields`. A plugin that renders `MediaEdit` loads `@wordpress/fields/build-style/style.css` with its own script, as the package README describes ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
 
+### New Features
+
+-   Show the actions registered on the server for a post type after its other actions, in the lists of the site editor and in the inspector. Plugins register them in PHP on the `wp_entity_actions_api_init` action, with a script module for their JavaScript parts ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
+
 ### Enhancements
 
 -   The post summary of the DataForm-based inspector, the media editor, and the private `usePostFields` hook, through which the site editor screens get their fields, read the fields of the post type from the server, through the Entity fields API. The media editor also lays out the attachment fields with the form of the attachment view configuration ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
