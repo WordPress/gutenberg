@@ -44,7 +44,7 @@ import { unlock } from '../../lock-unlock';
  * @param {boolean}           props.isEnabled Whether the children can be dragged.
  * @param {Block[]}           props.blocks    The blocks to drag.
  * @param {DraggableChildren} props.children  Renders the drag source.
- * @param {BlockTypeIcon}     [props.icon]    Icon for the drag chip. For a single block, falls back to its block type's icon.
+ * @param {BlockTypeIcon}     [props.icon]    Icon for the drag chip. Defaults to the block type's icon when dragging a single block that isn't a pattern.
  * @param {DraggablePattern}  [props.pattern] The pattern the blocks came from, if any.
  * @return {React.ReactElement} The drag source.
  */
