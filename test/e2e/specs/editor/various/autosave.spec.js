@@ -189,6 +189,64 @@ test.describe( 'Autosave', () => {
 		).toHaveText( 'Backup title' );
 	} );
 
+	test( 'should keep the replaced content as a revision when recovering from sessionStorage', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+
+		// An autosave of the author's own draft updates the post without
+		// creating a revision.
+		await page.keyboard.type( ' autosaved' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		await page.keyboard.type( ' backup' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		await page.reload();
+
+		await page
+			.getByRole( 'button', { name: 'Restore the backup' } )
+			.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save autosaved backup' },
+			},
+		] );
+
+		const getRevisionContents = () =>
+			page.evaluate( () => {
+				const postId = window.wp.data
+					.select( 'core/editor' )
+					.getCurrentPostId();
+				return window.wp
+					.apiFetch( {
+						path: `/wp/v2/posts/${ postId }/revisions?context=edit`,
+					} )
+					.then( ( revisions ) =>
+						revisions.map( ( revision ) => revision.content.raw )
+					);
+			} );
+		await expect.poll( getRevisionContents ).toContain(
+			`<!-- wp:paragraph -->
+<p>before save autosaved</p>
+<!-- /wp:paragraph -->`
+		);
+	} );
+
 	test( "shouldn't contaminate other posts", async ( {
 		admin,
 		editor,
