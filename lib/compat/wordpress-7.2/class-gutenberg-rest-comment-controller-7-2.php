@@ -9,12 +9,15 @@
  * inside a core method, the whole method is copied from WordPress 7.1.0 and
  * every line that differs from core is wrapped in START CHANGE / END CHANGE
  * comments, so the rest of the method can be read as unmodified core code.
+ * Code added around a parent call is wrapped the same way, and members that
+ * core does not have are wrapped as a whole.
  *
  * @package gutenberg
  */
 
 class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller {
 
+	// START CHANGE: New method, added in 7.2.
 	/**
 	 * Retrieves the hex keys of the emoji a note reaction accepts.
 	 *
@@ -31,6 +34,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	private static function get_note_reaction_keys(): array {
 		return array( '2764', '1f389', '1f604', '1f440', '1f680' );
 	}
+	// END CHANGE.
 
 	/**
 	 * Retrieves the comment schema, adding reaction_summary.
@@ -45,6 +49,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	public function get_item_schema() {
 		$schema = parent::get_item_schema();
 
+		// START CHANGE: Add `reaction_summary`.
 		$schema['properties']['reaction_summary'] = array(
 			'description'          => __( 'Aggregated reaction counts for this note, keyed by emoji hex key.', 'gutenberg' ),
 			'type'                 => 'object',
@@ -66,12 +71,16 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				),
 			),
 		);
+		// END CHANGE.
 
 		return $schema;
 	}
 
+	// START CHANGE: New Gutenberg-only helper, not in core.
 	/**
 	 * Checks whether the request type is an internal comment type (note or reaction).
+	 *
+	 * @since 7.2.0
 	 *
 	 * @param mixed $type The comment type from the request.
 	 * @return bool True if the type is one of the internal comment types.
@@ -79,6 +88,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	protected function is_note_or_reaction( $type ): bool {
 		return in_array( $type, array( 'note', 'reaction' ), true );
 	}
+	// END CHANGE.
 
 	/**
 	 * Check if post type supports notes.
@@ -922,6 +932,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		return $response;
 	}
 
+	// START CHANGE: New property, added in 7.2.
 	/**
 	 * Pre-fetched reaction summaries for batch queries.
 	 *
@@ -932,6 +943,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @var array<int, array<string, array{count: int, current_user_reaction: int}>>|null
 	 */
 	protected $reaction_summaries = null;
+	// END CHANGE.
 
 	/**
 	 * Retrieves a collection of comments.
@@ -945,6 +957,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
 	 */
 	public function get_items( $request ) {
+		// START CHANGE: Pre-fetch reaction summaries.
 		$fields = $this->get_fields_for_response( $request );
 
 		/*
@@ -970,17 +983,21 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			};
 			add_filter( 'the_comments', $prefetch );
 		}
+		// END CHANGE.
 
 		$response = parent::get_items( $request );
 
+		// START CHANGE: Clear the pre-fetched reaction summaries.
 		if ( $prefetch ) {
 			remove_filter( 'the_comments', $prefetch );
 		}
 		$this->reaction_summaries = null;
+		// END CHANGE.
 
 		return $response;
 	}
 
+	// START CHANGE: New method, added in 7.2.
 	/**
 	 * Pre-fetches reaction summaries for a set of note IDs.
 	 *
@@ -1051,6 +1068,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			);
 		}
 	}
+	// END CHANGE.
 
 	/**
 	 * Prepares a single comment output for response.
@@ -1065,7 +1083,9 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 */
 	public function prepare_item_for_response( $item, $request ) {
 		$response = parent::prepare_item_for_response( $item, $request );
-		$fields   = $this->get_fields_for_response( $request );
+
+		// START CHANGE: Add `reaction_summary` to notes.
+		$fields = $this->get_fields_for_response( $request );
 
 		if ( 'note' === $item->comment_type && rest_is_field_included( 'reaction_summary', $fields ) ) {
 			// Use pre-fetched data if available, otherwise query individually.
@@ -1082,6 +1102,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			$data['reaction_summary'] = $summary;
 			$response->set_data( $data );
 		}
+		// END CHANGE.
 
 		return $response;
 	}
@@ -1102,6 +1123,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	protected function prepare_links( $comment ) {
 		$links = parent::prepare_links( $comment );
 
+		// START CHANGE: Leave reactions out of the `children` link.
 		if ( isset( $links['children'] ) ) {
 			/*
 			 * Query directly: before WordPress 7.1, `get_children()` caches a
@@ -1122,6 +1144,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				unset( $links['children'] );
 			}
 		}
+		// END CHANGE.
 
 		return $links;
 	}
