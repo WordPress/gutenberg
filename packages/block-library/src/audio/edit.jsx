@@ -174,7 +174,6 @@ function AudioEdit( {
 						mediaUrl={ src }
 						filename={ getFilename( src ) }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="audio/*"
 						onSelect={ onSelectAudio }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
