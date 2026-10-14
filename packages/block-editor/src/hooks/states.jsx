@@ -5,6 +5,7 @@ import StateControl from '../components/global-styles/state-control';
 import StateControlBadges from '../components/global-styles/state-control-badges';
 import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 import { useSettings } from '../components/use-settings';
+import { getCustomStateSelectorSuffix } from './state-utils';
 import { unlock } from '../lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -17,6 +18,13 @@ export const PSEUDO_STATE_LABELS = {
 		'Name for the CSS pseudo-class selector'
 	),
 	':active': _x( 'Active', 'Name for the CSS pseudo-class selector' ),
+};
+
+export const CUSTOM_STATE_LABELS = {
+	'-current': _x(
+		'Current',
+		'Name for the block style state of the current menu item'
+	),
 };
 
 export const RESPONSIVE_STATE_LABELS = {
@@ -65,38 +73,61 @@ function getPseudoStateOptions( name ) {
 		} ) );
 }
 
+// Only offer a custom state when the block declares the selector it matches.
+function getCustomStateOptions( name ) {
+	const validStates = VALID_BLOCK_CUSTOM_STATES[ name ] ?? [];
+
+	return validStates
+		.filter(
+			( state ) =>
+				CUSTOM_STATE_LABELS[ state ] &&
+				getCustomStateSelectorSuffix( name, state )
+		)
+		.map( ( state ) => ( {
+			value: state,
+			label: CUSTOM_STATE_LABELS[ state ],
+		} ) );
+}
+
 const DEFAULT_STATE_VALUE = 'default';
 const EMPTY_STATE_OPTIONS = [];
 
 /**
- * Renders a pseudo-state selector in the block card header.
+ * Renders a custom and pseudo-state selector in the block card header.
  *
  * Viewport states are selected globally via the editor's device preview
- * (Responsive editing), so only pseudo-states are exposed here.
+ * (Responsive editing), so only custom and pseudo-states are exposed here.
  *
- * @param {Object}   props          Component props.
- * @param {string}   props.name     Block name.
- * @param {Object}   props.value    Currently selected style-state value.
- * @param {Function} props.onChange Callback when style-state selection changes.
- * @param {Element}  props.children Optional menu content rendered after the
- *                                  state groups.
- * @return {Element|null} State control component, or null if not applicable.
+ * @param {Object}                  props            Component props.
+ * @param {string}                  props.name       Block name.
+ * @param {Object}                  props.value      Currently selected style-state value.
+ * @param {(value: Object) => void} props.onChange   Callback when style-state selection changes.
+ * @param {React.ReactNode}         [props.children] Optional menu content rendered after the
+ *                                                   state groups.
+ * @return {React.JSX.Element|null} State control component, or null if not applicable.
  */
 export function BlockStatesControl( { name, value, onChange, children } ) {
+	const customStateOptions = useMemo(
+		() => getCustomStateOptions( name ),
+		[ name ]
+	);
 	const pseudoStateOptions = useMemo(
 		() => getPseudoStateOptions( name ),
 		[ name ]
 	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! pseudoStateOptions.length ) {
+	if ( ! customStateOptions.length && ! pseudoStateOptions.length ) {
 		return null;
 	}
 
 	return (
 		<StateControl
+			customStates={ customStateOptions }
 			pseudoStates={ pseudoStateOptions }
+			customStateValue={ value?.custom ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
+			onChangeCustomState={ ( custom ) => onChange( { custom } ) }
 			onChangePseudoState={ ( pseudo ) => onChange( { pseudo } ) }
 			popoverProps={ dropdownMenuProps.popoverProps }
 			showText={ false }
@@ -116,6 +147,10 @@ export function BlockStatesControl( { name, value, onChange, children } ) {
  * @return {Element|null} Badges component, or null if there is nothing to show.
  */
 export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
+	const customStateOptions = useMemo(
+		() => getCustomStateOptions( name ),
+		[ name ]
+	);
 	const pseudoStateOptions = useMemo(
 		() => getPseudoStateOptions( name ),
 		[ name ]
@@ -126,7 +161,11 @@ export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 		[ viewportSettings ]
 	);
 
-	if ( ! pseudoStateOptions.length && ! isResponsiveEditing ) {
+	if (
+		! customStateOptions.length &&
+		! pseudoStateOptions.length &&
+		! isResponsiveEditing
+	) {
 		return null;
 	}
 
@@ -135,8 +174,10 @@ export function BlockStateBadges( { name, value, isResponsiveEditing } ) {
 			viewportStates={
 				isResponsiveEditing ? deviceStateOptions : EMPTY_STATE_OPTIONS
 			}
+			customStates={ customStateOptions }
 			pseudoStates={ pseudoStateOptions }
 			viewportValue={ value?.viewport ?? DEFAULT_STATE_VALUE }
+			customStateValue={ value?.custom ?? DEFAULT_STATE_VALUE }
 			pseudoStateValue={ value?.pseudo ?? DEFAULT_STATE_VALUE }
 		/>
 	);

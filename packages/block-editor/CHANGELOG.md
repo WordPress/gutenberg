@@ -13,6 +13,7 @@
 
 -   Typography: Add a Gradient control that fills the text with a gradient, shown when `settings.background.backgroundClip` allows the `text` value, or when the block declares the support and a theme has not set it ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 -   Background: Add a Clip control for choosing the box a background is painted into, shown when `settings.background.backgroundClip` allows a value other than `text` ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
+-   Block Style States: Add a Current state to Navigation Link's block inspector, for styling the current menu item. The selected block style state, as returned by `getSelectedBlockStyleState` and read by `getStyleForState` and `setStyleForState`, now includes the selected custom state as `custom` ([#78769](https://github.com/WordPress/gutenberg/pull/78769)).
 
 ### Enhancements
 
