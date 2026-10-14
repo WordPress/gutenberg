@@ -56,19 +56,8 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	background-color: transparent;
 }
 
+// A background, not a pseudo-element: generated content adds a caret stop in
+// Firefox.
 .is-selected .non-breaking-space {
-	position: relative;
-
-	&::after {
-		content: "";
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 4px;
-		height: 4px;
-		margin: -2px 0 0 -2px;
-		border-radius: 50%;
-		background-color: $alert-red;
-		pointer-events: none;
-	}
+	background: radial-gradient(circle, $alert-red 2px, transparent 2.5px) center / 100% 100% no-repeat;
 }
