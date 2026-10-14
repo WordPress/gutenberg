@@ -152,12 +152,39 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 		$valid_block_names   = array( 'core/button', 'core/paragraph' );
 		$valid_element_names = array_keys( WP_Theme_JSON_Gutenberg::ELEMENTS );
 		$valid_variations    = array( 'core/button' => array( 'outline' ) );
-		$diagnostics         = array();
+		$while_collecting    = null;
 
-		$without_collector = WP_Theme_JSON_Sanitizer_Gutenberg::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
-		$with_collector    = WP_Theme_JSON_Sanitizer_Gutenberg::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations, $diagnostics );
+		$not_collecting = WP_Theme_JSON_Sanitizer_Gutenberg::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+		WP_Theme_JSON_Sanitizer_Gutenberg::collect(
+			static function () use ( &$while_collecting, $theme_json, $valid_block_names, $valid_element_names, $valid_variations ) {
+				$while_collecting = WP_Theme_JSON_Sanitizer_Gutenberg::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
+			}
+		);
 
-		$this->assertSame( $without_collector, $with_collector );
+		$this->assertSame( $not_collecting, $while_collecting );
+	}
+
+	public function test_nothing_is_collected_outside_collect() {
+		$outside = WP_Theme_JSON_Sanitizer_Gutenberg::sanitize( array( 'invention' => true ), array(), array(), array() );
+		$inside  = WP_Theme_JSON_Sanitizer_Gutenberg::collect( static function () {} );
+
+		$this->assertSame( array(), $outside );
+		$this->assertSame( array(), $inside, 'A drop before collect() must not leak into a later collection.' );
+	}
+
+	public function test_collect_restores_state_after_an_exception() {
+		try {
+			WP_Theme_JSON_Sanitizer_Gutenberg::collect(
+				static function () {
+					WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_unknown_key', array( 'boom' ) );
+					throw new RuntimeException( 'boom' );
+				}
+			);
+		} catch ( RuntimeException $e ) {
+			// Expected.
+		}
+
+		$this->assertSame( array(), WP_Theme_JSON_Sanitizer_Gutenberg::collect( static function () {} ) );
 	}
 
 	public function test_missing_version_is_reported_and_nothing_else() {
