@@ -3,7 +3,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { DataViews } from '@wordpress/dataviews';
 import type { Action, Field, View } from '@wordpress/dataviews';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { Stack, Tabs } from '@wordpress/ui';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import MediaSearch from './media-search';
@@ -112,7 +112,7 @@ function MediaGridPreview( {
 					{ preview }
 					{ isInserting && (
 						<div className="block-editor-inserter__media-grid__spinner">
-							<Spinner />
+							<WCSpinner />
 						</div>
 					) }
 				</div>

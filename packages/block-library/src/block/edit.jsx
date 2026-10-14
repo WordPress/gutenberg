@@ -8,7 +8,7 @@ import {
 } from '@wordpress/core-data';
 import {
 	Placeholder,
-	Spinner,
+	Spinner as WCSpinner,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -241,7 +241,7 @@ function ReusableBlockEdit( {
 	if ( ! hasResolved ) {
 		children = (
 			<Placeholder>
-				<Spinner />
+				<WCSpinner />
 			</Placeholder>
 		);
 	}
