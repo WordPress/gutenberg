@@ -120,5 +120,25 @@ describe( 'getGradientAstWithDefault', () => {
 			expect( hasGradient ).toBe( false );
 			expect( gradientAST.colorInterpolation ).toBeUndefined();
 		} );
+
+		test( 'reads an interpolation method that is the whole first argument', () => {
+			const { gradientAST, hasGradient } = getGradientAstWithDefault(
+				'linear-gradient(in oklch, #009ED4 0%, #FFCE00 100%)'
+			);
+
+			expect( hasGradient ).toBe( true );
+			expect( gradientAST.colorInterpolation ).toBe( 'in oklch' );
+			expect( gradientAST.colorStops ).toHaveLength( 2 );
+		} );
+
+		test( 'falls back to the default gradient for a hue interpolation method on a non-hue color space', () => {
+			const { gradientAST, hasGradient } = getGradientAstWithDefault(
+				'linear-gradient(in oklab longer hue 160deg, #009ED4 0%, #FFCE00 100%)'
+			);
+
+			expect( console ).toHaveWarned();
+			expect( hasGradient ).toBe( false );
+			expect( gradientAST.colorInterpolation ).toBeUndefined();
+		} );
 	} );
 } );
