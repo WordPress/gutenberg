@@ -14,6 +14,11 @@ import {
 	createBlock,
 	privateApis,
 } from '@wordpress/blocks';
+import type {
+	Block,
+	BlockConfiguration,
+	BlockVariation,
+} from '@wordpress/blocks';
 import { combineReducers } from '@wordpress/data';
 import {
 	hasSameKeys,
@@ -46,6 +51,12 @@ import {
 import { getBlockOrder, getBlocks } from '../selectors';
 import { unlock } from '../../lock-unlock';
 import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
+import type {
+	Action,
+	BlocksState,
+	SelectedBlockStyleState,
+	State,
+} from '../types';
 
 const { isContentBlock } = unlock( privateApis );
 
@@ -58,7 +69,9 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 
 	return {
 		...actualData,
-		select: vi.fn( ( ...args ) => actualData.select( ...args ) ),
+		select: vi.fn( ( ...args: Parameters< typeof actualData.select > ) =>
+			actualData.select( ...args )
+		) as typeof actualData.select,
 	};
 } );
 
@@ -84,7 +97,15 @@ vi.mock( import( '../../lock-unlock' ), async ( importOriginal ) => {
 	};
 } );
 
-const noop = () => {};
+const noop = () => undefined;
+
+/*
+ * Fixtures set only the fields the reducer under test reads, so this marks
+ * the deliberately partial blocks, actions and states.
+ */
+function partial< T >( fixture: Partial< T > ) {
+	return fixture as T;
+}
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
@@ -105,11 +126,11 @@ describe( 'state', () => {
 
 	describe( 'isUpdatingSameBlockAttribute()', () => {
 		it( 'should return false if not updating block attributes', () => {
-			const action = {
+			const action: Action = {
 				type: 'SELECT_BLOCK',
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
-			const previousAction = {
+			const previousAction: Action = {
 				type: 'SELECT_BLOCK',
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
@@ -120,14 +141,14 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return false if last action was not updating block attributes', () => {
-			const action = {
+			const action: Action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
-			const previousAction = {
+			const previousAction: Action = {
 				type: 'SELECT_BLOCK',
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
@@ -138,14 +159,14 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return false if not updating the same block', () => {
-			const action = {
+			const action: Action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
-			const previousAction = {
+			const previousAction: Action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 				attributes: {
@@ -159,14 +180,14 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return false if not updating the same block attributes', () => {
-			const action = {
+			const action: Action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
-			const previousAction = {
+			const previousAction: Action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
@@ -180,7 +201,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return false if no previous action', () => {
-			const action = {
+			const action: Action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
@@ -195,14 +216,14 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return true if updating the same block attributes', () => {
-			const action = {
+			const action: Action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
-			const previousAction = {
+			const previousAction: Action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
@@ -218,13 +239,16 @@ describe( 'state', () => {
 
 	describe( 'blocks()', () => {
 		beforeAll( () => {
-			registerBlockType( 'core/test-block', {
-				apiVersion: 3,
-				save: noop,
-				edit: noop,
-				category: 'text',
-				title: 'test block',
-			} );
+			registerBlockType(
+				'core/test-block',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: noop,
+					edit: noop,
+					category: 'text',
+					title: 'test block',
+				} )
+			);
 		} );
 
 		afterAll( () => {
@@ -233,28 +257,34 @@ describe( 'state', () => {
 
 		describe( 'replace inner blocks', () => {
 			beforeAll( () => {
-				registerBlockType( 'core/test-parent-block', {
-					apiVersion: 3,
-					save: noop,
-					edit: noop,
-					category: 'text',
-					title: 'test parent block',
-				} );
-				registerBlockType( 'core/test-child-block', {
-					apiVersion: 3,
-					save: noop,
-					edit: noop,
-					category: 'text',
-					title: 'test child block 1',
-					attributes: {
-						attr: {
-							type: 'boolean',
+				registerBlockType(
+					'core/test-parent-block',
+					partial< BlockConfiguration >( {
+						apiVersion: 3,
+						save: noop,
+						edit: noop,
+						category: 'text',
+						title: 'test parent block',
+					} )
+				);
+				registerBlockType(
+					'core/test-child-block',
+					partial< BlockConfiguration >( {
+						apiVersion: 3,
+						save: noop,
+						edit: noop,
+						category: 'text',
+						title: 'test child block 1',
+						attributes: {
+							attr: {
+								type: 'boolean',
+							},
+							attr2: {
+								type: 'string',
+							},
 						},
-						attr2: {
-							type: 'string',
-						},
-					},
-				} );
+					} )
+				);
 			} );
 
 			afterAll( () => {
@@ -262,52 +292,54 @@ describe( 'state', () => {
 				unregisterBlockType( 'core/test-child-block' );
 			} );
 			it( 'can replace a child block', () => {
-				const existingState = deepFreeze( {
-					byClientId: new Map(
-						Object.entries( {
-							chicken: {
-								clientId: 'chicken',
-								name: 'core/test-parent-block',
-								isValid: true,
-							},
-							'chicken-child': {
-								clientId: 'chicken-child',
-								name: 'core/test-child-block',
-								isValid: true,
-							},
-						} )
-					),
-					attributes: new Map(
-						Object.entries( {
-							chicken: {},
-							'chicken-child': {
-								attr: true,
-							},
-						} )
-					),
-					order: new Map(
-						Object.entries( {
-							'': [ 'chicken' ],
-							chicken: [ 'chicken-child' ],
-							'chicken-child': [],
-						} )
-					),
-					parents: new Map(
-						Object.entries( {
-							chicken: '',
-							'chicken-child': 'chicken',
-						} )
-					),
-					tree: new Map(
-						Object.entries( {
-							'': {},
-							chicken: {},
-							'chicken-child': {},
-						} )
-					),
-					controlledInnerBlocks: new Set(),
-					blockEditingModes: new Map(),
-				} );
+				const existingState = deepFreeze(
+					partial< BlocksState >( {
+						byClientId: new Map(
+							Object.entries( {
+								chicken: {
+									clientId: 'chicken',
+									name: 'core/test-parent-block',
+									isValid: true,
+								},
+								'chicken-child': {
+									clientId: 'chicken-child',
+									name: 'core/test-child-block',
+									isValid: true,
+								},
+							} )
+						),
+						attributes: new Map(
+							Object.entries( {
+								chicken: {},
+								'chicken-child': {
+									attr: true,
+								},
+							} )
+						),
+						order: new Map(
+							Object.entries( {
+								'': [ 'chicken' ],
+								chicken: [ 'chicken-child' ],
+								'chicken-child': [],
+							} )
+						),
+						parents: new Map(
+							Object.entries( {
+								chicken: '',
+								'chicken-child': 'chicken',
+							} )
+						),
+						tree: new Map(
+							Object.entries( {
+								'': {},
+								chicken: {},
+								'chicken-child': {},
+							} )
+						) as BlocksState[ 'tree' ],
+						controlledInnerBlocks: new Set(),
+						blockEditingModes: new Map(),
+					} )
+				);
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
 					attr: false,
@@ -316,7 +348,7 @@ describe( 'state', () => {
 
 				const { clientId: newChildBlockId } = newChildBlock;
 
-				const action = {
+				const action: Action = {
 					type: 'REPLACE_INNER_BLOCKS',
 					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
@@ -373,43 +405,45 @@ describe( 'state', () => {
 			} );
 
 			it( 'can insert a child block', () => {
-				const existingState = deepFreeze( {
-					byClientId: new Map(
-						Object.entries( {
-							chicken: {
-								clientId: 'chicken',
-								name: 'core/test-parent-block',
-								isValid: true,
-							},
-						} )
-					),
-					attributes: new Map(
-						Object.entries( {
-							chicken: {},
-						} )
-					),
-					order: new Map(
-						Object.entries( {
-							'': [ 'chicken' ],
-							chicken: [],
-						} )
-					),
-					parents: new Map(
-						Object.entries( {
-							chicken: '',
-						} )
-					),
-					tree: new Map(
-						Object.entries( {
-							'': {
-								innerBlocks: [],
-							},
-							chicken: {},
-						} )
-					),
-					controlledInnerBlocks: new Set(),
-					blockEditingModes: new Map(),
-				} );
+				const existingState = deepFreeze(
+					partial< BlocksState >( {
+						byClientId: new Map(
+							Object.entries( {
+								chicken: {
+									clientId: 'chicken',
+									name: 'core/test-parent-block',
+									isValid: true,
+								},
+							} )
+						),
+						attributes: new Map(
+							Object.entries( {
+								chicken: {},
+							} )
+						),
+						order: new Map(
+							Object.entries( {
+								'': [ 'chicken' ],
+								chicken: [],
+							} )
+						),
+						parents: new Map(
+							Object.entries( {
+								chicken: '',
+							} )
+						),
+						tree: new Map(
+							Object.entries( {
+								'': {
+									innerBlocks: [],
+								},
+								chicken: {},
+							} )
+						) as BlocksState[ 'tree' ],
+						controlledInnerBlocks: new Set(),
+						blockEditingModes: new Map(),
+					} )
+				);
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
 					attr: false,
@@ -418,7 +452,7 @@ describe( 'state', () => {
 
 				const { clientId: newChildBlockId } = newChildBlock;
 
-				const action = {
+				const action: Action = {
 					type: 'REPLACE_INNER_BLOCKS',
 					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
@@ -472,10 +506,10 @@ describe( 'state', () => {
 				expect( state.tree.get( 'chicken' ) ).not.toBe(
 					existingState.tree.get( 'chicken' )
 				);
-				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
 					state.tree.get( 'chicken' )
 				);
-				expect( state.tree.get( 'chicken' ).innerBlocks[ 0 ] ).toBe(
+				expect( state.tree.get( 'chicken' )!.innerBlocks![ 0 ] ).toBe(
 					state.tree.get( newChildBlockId )
 				);
 				expect( state.tree.get( newChildBlockId ) ).toEqual( {
@@ -491,56 +525,58 @@ describe( 'state', () => {
 			} );
 
 			it( 'can replace multiple child blocks', () => {
-				const existingState = deepFreeze( {
-					byClientId: new Map(
-						Object.entries( {
-							chicken: {
-								clientId: 'chicken',
-								name: 'core/test-parent-block',
-								isValid: true,
-							},
-							'chicken-child': {
-								clientId: 'chicken-child',
-								name: 'core/test-child-block',
-								isValid: true,
-							},
-							'chicken-child-2': {
-								clientId: 'chicken-child',
-								name: 'core/test-child-block',
-								isValid: true,
-							},
-						} )
-					),
-					attributes: new Map(
-						Object.entries( {
-							chicken: {},
-							'chicken-child': {
-								attr: true,
-							},
-							'chicken-child-2': {
-								attr2: 'ok',
-							},
-						} )
-					),
-					order: new Map(
-						Object.entries( {
-							'': [ 'chicken' ],
-							chicken: [ 'chicken-child', 'chicken-child-2' ],
-							'chicken-child': [],
-							'chicken-child-2': [],
-						} )
-					),
-					parents: new Map(
-						Object.entries( {
-							chicken: '',
-							'chicken-child': 'chicken',
-							'chicken-child-2': 'chicken',
-						} )
-					),
-					tree: new Map(),
-					controlledInnerBlocks: new Set(),
-					blockEditingModes: new Map(),
-				} );
+				const existingState = deepFreeze(
+					partial< BlocksState >( {
+						byClientId: new Map(
+							Object.entries( {
+								chicken: {
+									clientId: 'chicken',
+									name: 'core/test-parent-block',
+									isValid: true,
+								},
+								'chicken-child': {
+									clientId: 'chicken-child',
+									name: 'core/test-child-block',
+									isValid: true,
+								},
+								'chicken-child-2': {
+									clientId: 'chicken-child',
+									name: 'core/test-child-block',
+									isValid: true,
+								},
+							} )
+						),
+						attributes: new Map(
+							Object.entries( {
+								chicken: {},
+								'chicken-child': {
+									attr: true,
+								},
+								'chicken-child-2': {
+									attr2: 'ok',
+								},
+							} )
+						),
+						order: new Map(
+							Object.entries( {
+								'': [ 'chicken' ],
+								chicken: [ 'chicken-child', 'chicken-child-2' ],
+								'chicken-child': [],
+								'chicken-child-2': [],
+							} )
+						),
+						parents: new Map(
+							Object.entries( {
+								chicken: '',
+								'chicken-child': 'chicken',
+								'chicken-child-2': 'chicken',
+							} )
+						),
+						tree: new Map(),
+						controlledInnerBlocks: new Set(),
+						blockEditingModes: new Map(),
+					} )
+				);
 
 				const newChildBlock1 = createBlock( 'core/test-child-block', {
 					attr: false,
@@ -560,7 +596,7 @@ describe( 'state', () => {
 				const { clientId: newChildBlockId2 } = newChildBlock2;
 				const { clientId: newChildBlockId3 } = newChildBlock3;
 
-				const action = {
+				const action: Action = {
 					type: 'REPLACE_INNER_BLOCKS',
 					rootClientId: 'chicken',
 					blocks: [ newChildBlock1, newChildBlock2, newChildBlock3 ],
@@ -637,16 +673,16 @@ describe( 'state', () => {
 					blockEditingModes: new Map(),
 				} );
 
-				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+				expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
 					state.tree.get( 'chicken' )
 				);
-				expect( state.tree.get( 'chicken' ).innerBlocks[ 0 ] ).toBe(
+				expect( state.tree.get( 'chicken' )!.innerBlocks![ 0 ] ).toBe(
 					state.tree.get( newChildBlockId1 )
 				);
-				expect( state.tree.get( 'chicken' ).innerBlocks[ 1 ] ).toBe(
+				expect( state.tree.get( 'chicken' )!.innerBlocks![ 1 ] ).toBe(
 					state.tree.get( newChildBlockId2 )
 				);
-				expect( state.tree.get( 'chicken' ).innerBlocks[ 2 ] ).toBe(
+				expect( state.tree.get( 'chicken' )!.innerBlocks![ 2 ] ).toBe(
 					state.tree.get( newChildBlockId3 )
 				);
 				expect( state.tree.get( newChildBlockId1 ) ).toEqual( {
@@ -662,62 +698,64 @@ describe( 'state', () => {
 			} );
 
 			it( 'can replace a child block that has other children', () => {
-				const existingState = deepFreeze( {
-					byClientId: new Map(
-						Object.entries( {
-							chicken: {
-								clientId: 'chicken',
-								name: 'core/test-parent-block',
-								isValid: true,
-							},
-							'chicken-child': {
-								clientId: 'chicken-child',
-								name: 'core/test-child-block',
-								isValid: true,
-							},
-							'chicken-grand-child': {
-								clientId: 'chicken-child',
-								name: 'core/test-block',
-								isValid: true,
-							},
-						} )
-					),
-					attributes: new Map(
-						Object.entries( {
-							chicken: {},
-							'chicken-child': {},
-							'chicken-grand-child': {},
-						} )
-					),
-					order: new Map(
-						Object.entries( {
-							'': [ 'chicken' ],
-							chicken: [ 'chicken-child' ],
-							'chicken-child': [ 'chicken-grand-child' ],
-							'chicken-grand-child': [],
-						} )
-					),
-					parents: new Map(
-						Object.entries( {
-							chicken: '',
-							'chicken-child': 'chicken',
-							'chicken-grand-child': 'chicken-child',
-						} )
-					),
-					tree: new Map(
-						Object.entries( {
-							chicken: {},
-						} )
-					),
-					controlledInnerBlocks: new Set(),
-					blockEditingModes: new Map(),
-				} );
+				const existingState = deepFreeze(
+					partial< BlocksState >( {
+						byClientId: new Map(
+							Object.entries( {
+								chicken: {
+									clientId: 'chicken',
+									name: 'core/test-parent-block',
+									isValid: true,
+								},
+								'chicken-child': {
+									clientId: 'chicken-child',
+									name: 'core/test-child-block',
+									isValid: true,
+								},
+								'chicken-grand-child': {
+									clientId: 'chicken-child',
+									name: 'core/test-block',
+									isValid: true,
+								},
+							} )
+						),
+						attributes: new Map(
+							Object.entries( {
+								chicken: {},
+								'chicken-child': {},
+								'chicken-grand-child': {},
+							} )
+						),
+						order: new Map(
+							Object.entries( {
+								'': [ 'chicken' ],
+								chicken: [ 'chicken-child' ],
+								'chicken-child': [ 'chicken-grand-child' ],
+								'chicken-grand-child': [],
+							} )
+						),
+						parents: new Map(
+							Object.entries( {
+								chicken: '',
+								'chicken-child': 'chicken',
+								'chicken-grand-child': 'chicken-child',
+							} )
+						),
+						tree: new Map(
+							Object.entries( {
+								chicken: {},
+							} )
+						) as BlocksState[ 'tree' ],
+						controlledInnerBlocks: new Set(),
+						blockEditingModes: new Map(),
+					} )
+				);
 
 				const newChildBlock = createBlock( 'core/test-block' );
 
 				const { clientId: newChildBlockId } = newChildBlock;
 
-				const action = {
+				const action: Action = {
 					type: 'REPLACE_INNER_BLOCKS',
 					rootClientId: 'chicken',
 					blocks: [ newChildBlock ],
@@ -774,7 +812,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return empty byClientId, attributes, order by default', () => {
-			const state = blocks( undefined, {} );
+			const state = blocks( undefined, partial< Action >( {} ) );
 
 			expect( state ).toEqual( {
 				byClientId: new Map(),
@@ -790,41 +828,51 @@ describe( 'state', () => {
 		} );
 
 		it( 'should key by reset blocks clientId', () => {
-			[ undefined, blocks( undefined, {} ) ].forEach( ( original ) => {
-				const state = blocks( original, {
-					type: 'RESET_BLOCKS',
-					blocks: [ { clientId: 'bananas', innerBlocks: [] } ],
-				} );
+			[ undefined, blocks( undefined, partial< Action >( {} ) ) ].forEach(
+				( original ) => {
+					const state = blocks( original, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							partial< Block >( {
+								clientId: 'bananas',
+								innerBlocks: [],
+							} ),
+						],
+					} );
 
-				expect( state.byClientId.size ).toBe( 1 );
-				expect( state.byClientId.get( 'bananas' ).clientId ).toBe(
-					'bananas'
-				);
-				expect( Object.fromEntries( state.order ) ).toEqual( {
-					'': [ 'bananas' ],
-					bananas: [],
-				} );
-				expect( state.tree.get( 'bananas' ) ).toEqual( {
-					clientId: 'bananas',
-					innerBlocks: [],
-				} );
-				expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
-					state.tree.get( 'bananas' )
-				);
-			} );
+					expect( state.byClientId.size ).toBe( 1 );
+					expect( state.byClientId.get( 'bananas' )!.clientId ).toBe(
+						'bananas'
+					);
+					expect( Object.fromEntries( state.order ) ).toEqual( {
+						'': [ 'bananas' ],
+						bananas: [],
+					} );
+					expect( state.tree.get( 'bananas' ) ).toEqual( {
+						clientId: 'bananas',
+						innerBlocks: [],
+					} );
+					expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
+						state.tree.get( 'bananas' )
+					);
+				}
+			);
 		} );
 
 		it( 'should key by reset blocks clientId, including inner blocks', () => {
-			const original = blocks( undefined, {} );
+			const original = blocks( undefined, partial< Action >( {} ) );
 			const state = blocks( original, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'bananas',
 						innerBlocks: [
-							{ clientId: 'apples', innerBlocks: [] },
+							partial< Block >( {
+								clientId: 'apples',
+								innerBlocks: [],
+							} ),
 						],
-					},
+					} ),
 				],
 			} );
 
@@ -840,37 +888,37 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
 				type: 'INSERT_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/registered-block',
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
 			expect( state.byClientId.size ).toBe( 2 );
-			expect( state.byClientId.get( 'ribs' ).clientId ).toBe( 'ribs' );
+			expect( state.byClientId.get( 'ribs' )!.clientId ).toBe( 'ribs' );
 			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'chicken', 'ribs' ],
 				chicken: [],
 				ribs: [],
 			} );
 
-			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
 				state.tree.get( 'chicken' )
 			);
-			expect( state.tree.get( '' ).innerBlocks[ 1 ] ).toBe(
+			expect( state.tree.get( '' )!.innerBlocks![ 1 ] ).toBe(
 				state.tree.get( 'ribs' )
 			);
 			expect( state.tree.get( 'chicken' ) ).toEqual( {
@@ -885,31 +933,31 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'wings',
 						name: 'core/registered-block',
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
 			expect( state.byClientId.size ).toBe( 1 );
-			expect( state.byClientId.get( 'wings' ).name ).toBe(
+			expect( state.byClientId.get( 'wings' )!.name ).toBe(
 				'core/registered-block'
 			);
-			expect( state.byClientId.get( 'wings' ).clientId ).toBe( 'wings' );
+			expect( state.byClientId.get( 'wings' )!.clientId ).toBe( 'wings' );
 			expect( Object.fromEntries( state.order ) ).toEqual( {
 				'': [ 'wings' ],
 				wings: [],
@@ -917,7 +965,7 @@ describe( 'state', () => {
 			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				wings: '',
 			} );
-			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
 				state.tree.get( 'wings' )
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
@@ -931,12 +979,12 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -946,37 +994,37 @@ describe( 'state', () => {
 			} );
 
 			expect( state.byClientId.size ).toBe( 0 );
-			expect( state.tree.get( '' ).innerBlocks ).toHaveLength( 0 );
+			expect( state.tree.get( '' )!.innerBlocks ).toHaveLength( 0 );
 		} );
 
 		it( 'should replace the block and remove references to its inner blocks', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [
-							{
+							partial< Block >( {
 								clientId: 'child',
 								name: 'core/test-block',
 								attributes: {},
 								innerBlocks: [],
-							},
+							} ),
 						],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'wings',
 						name: 'core/registered-block',
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
@@ -988,7 +1036,7 @@ describe( 'state', () => {
 			expect( Object.fromEntries( state.parents ) ).toEqual( {
 				wings: '',
 			} );
-			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
 				state.tree.get( 'wings' )
 			);
 			expect( state.tree.get( 'wings' ) ).toEqual( {
@@ -1027,7 +1075,7 @@ describe( 'state', () => {
 			} );
 
 			expect(
-				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 0 ]
+				state.tree.get( wrapperBlock.clientId )!.innerBlocks![ 0 ]
 			).toBe( state.tree.get( replacementBlock.clientId ) );
 			expect( state.tree.get( replacementBlock.clientId ) ).toEqual( {
 				clientId: replacementBlock.clientId,
@@ -1042,34 +1090,34 @@ describe( 'state', () => {
 			const originalState = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const replacedState = blocks( originalState, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/registered-block',
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
 			expect( replacedState.byClientId.size ).toBe( 1 );
-			expect( originalState.byClientId.get( 'chicken' ).name ).toBe(
+			expect( originalState.byClientId.get( 'chicken' )!.name ).toBe(
 				'core/test-block'
 			);
-			expect( replacedState.byClientId.get( 'chicken' ).name ).toBe(
+			expect( replacedState.byClientId.get( 'chicken' )!.name ).toBe(
 				'core/registered-block'
 			);
-			expect( replacedState.byClientId.get( 'chicken' ).clientId ).toBe(
+			expect( replacedState.byClientId.get( 'chicken' )!.clientId ).toBe(
 				'chicken'
 			);
 			expect( Object.fromEntries( replacedState.order ) ).toEqual( {
@@ -1080,21 +1128,21 @@ describe( 'state', () => {
 				replacedState.tree.get( 'chicken' )
 			);
 
-			const nestedBlock = {
+			const nestedBlock = partial< Block >( {
 				clientId: 'chicken',
 				name: 'core/test-block',
 				attributes: {},
 				innerBlocks: [],
-			};
+			} );
 			const wrapperBlock = createBlock( 'core/test-block', {}, [
 				nestedBlock,
 			] );
-			const replacementNestedBlock = {
+			const replacementNestedBlock = partial< Block >( {
 				clientId: 'chicken',
 				name: 'core/registered-block',
 				attributes: {},
 				innerBlocks: [],
-			};
+			} );
 
 			const originalNestedState = blocks( undefined, {
 				type: 'RESET_BLOCKS',
@@ -1113,12 +1161,12 @@ describe( 'state', () => {
 				[ replacementNestedBlock.clientId ]: [],
 			} );
 
-			expect( originalNestedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/test-block'
-			);
-			expect( replacedNestedState.byClientId.get( 'chicken' ).name ).toBe(
-				'core/registered-block'
-			);
+			expect(
+				originalNestedState.byClientId.get( 'chicken' )!.name
+			).toBe( 'core/test-block' );
+			expect(
+				replacedNestedState.byClientId.get( 'chicken' )!.name
+			).toBe( 'core/registered-block' );
 		} );
 
 		it( 'should update the block', () => {
@@ -1152,7 +1200,7 @@ describe( 'state', () => {
 			expect( state.attributes.get( 'chicken' ) ).toEqual( {
 				content: 'ribs',
 			} );
-			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
 				state.tree.get( 'chicken' )
 			);
 			expect( state.tree.get( 'chicken' ) ).toEqual( {
@@ -1170,18 +1218,18 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1190,10 +1238,10 @@ describe( 'state', () => {
 			} );
 
 			expect( state.order.get( '' ) ).toEqual( [ 'ribs', 'chicken' ] );
-			expect( state.tree.get( '' ).innerBlocks[ 0 ] ).toBe(
+			expect( state.tree.get( '' )!.innerBlocks![ 0 ] ).toBe(
 				state.tree.get( 'ribs' )
 			);
-			expect( state.tree.get( '' ).innerBlocks[ 1 ] ).toBe(
+			expect( state.tree.get( '' )!.innerBlocks![ 1 ] ).toBe(
 				state.tree.get( 'chicken' )
 			);
 			expect( state.tree.get( 'chicken' ) ).toBe(
@@ -1229,10 +1277,10 @@ describe( 'state', () => {
 			} );
 
 			expect(
-				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 0 ]
+				state.tree.get( wrapperBlock.clientId )!.innerBlocks![ 0 ]
 			).toBe( state.tree.get( movedBlock.clientId ) );
 			expect(
-				state.tree.get( wrapperBlock.clientId ).innerBlocks[ 1 ]
+				state.tree.get( wrapperBlock.clientId )!.innerBlocks![ 1 ]
 			).toBe( state.tree.get( siblingBlock.clientId ) );
 			expect( state.tree.get( movedBlock.clientId ) ).toBe(
 				original.tree.get( movedBlock.clientId )
@@ -1243,24 +1291,24 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'veggies',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1311,18 +1359,18 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1337,18 +1385,18 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1391,24 +1439,24 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'veggies',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1459,18 +1507,18 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1485,18 +1533,18 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1520,31 +1568,31 @@ describe( 'state', () => {
 			expect( Object.fromEntries( state.attributes ) ).toEqual( {
 				ribs: {},
 			} );
-			expect( state.tree.get( '' ).innerBlocks ).toHaveLength( 1 );
+			expect( state.tree.get( '' )!.innerBlocks ).toHaveLength( 1 );
 		} );
 
 		it( 'should remove multiple blocks', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'veggies',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1601,18 +1649,18 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'kumquat',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'loquat',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
@@ -1620,11 +1668,11 @@ describe( 'state', () => {
 				type: 'INSERT_BLOCKS',
 				index: 1,
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'persimmon',
 						name: 'core/registered-block',
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
@@ -1640,24 +1688,24 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'veggies',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1677,24 +1725,24 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'veggies',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1714,24 +1762,24 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'veggies',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1751,24 +1799,24 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'veggies',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1788,24 +1836,24 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'veggies',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1827,25 +1875,25 @@ describe( 'state', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'chicken',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: 'ribs',
 						name: 'core/test-block',
 						attributes: {},
 						innerBlocks: [
-							{
+							partial< Block >( {
 								clientId: 'nested',
 								name: 'core/test-block',
 								attributes: {},
 								innerBlocks: [],
-							},
+							} ),
 						],
-					},
+					} ),
 				],
 			} );
 			const state = blocks( original, {
@@ -1885,13 +1933,13 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {
 										updated: true,
 									},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -1913,11 +1961,11 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -1929,7 +1977,7 @@ describe( 'state', () => {
 						},
 					} );
 
-					expect( state.attributes.get( 'kumquat' ).updated ).toBe(
+					expect( state.attributes.get( 'kumquat' )!.updated ).toBe(
 						true
 					);
 				} );
@@ -1939,11 +1987,11 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -1972,11 +2020,11 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -1989,7 +2037,7 @@ describe( 'state', () => {
 						options: { uniqueByBlock: true },
 					} );
 
-					expect( state.attributes.get( 'kumquat' ).updated ).toBe(
+					expect( state.attributes.get( 'kumquat' )!.updated ).toBe(
 						true
 					);
 				} );
@@ -1999,13 +2047,13 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {
 										updated: true,
 									},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -2046,13 +2094,13 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {
 										updated: true,
 									},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -2072,18 +2120,21 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
-					const state = blocks( original, {
-						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientIds: [ 'kumquat' ],
-					} );
+					const state = blocks(
+						original,
+						partial< Action >( {
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'kumquat' ],
+						} )
+					);
 
 					expect( state.attributes.get( 'kumquat' ) ).toEqual( {} );
 				} );
@@ -2091,7 +2142,9 @@ describe( 'state', () => {
 
 			describe( 'isPersistentChange', () => {
 				it( 'should default a changing state to true', () => {
-					const state = deepFreeze( blocks( undefined, {} ) );
+					const state = deepFreeze(
+						blocks( undefined, partial< Action >( {} ) )
+					);
 
 					expect( state.isPersistentChange ).toBe( true );
 				} );
@@ -2120,15 +2173,16 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
 					original = blocks( original, {
+						// @ts-expect-error Deliberately unknown action type.
 						type: 'NOOP',
 					} );
 					original = blocks( original, {
@@ -2154,11 +2208,11 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -2186,11 +2240,11 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -2221,11 +2275,11 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -2260,11 +2314,11 @@ describe( 'state', () => {
 						blocks( undefined, {
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									clientId: 'kumquat',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						} )
 					);
@@ -2310,6 +2364,7 @@ describe( 'state', () => {
 					);
 
 					const state = blocks( original, {
+						// @ts-expect-error Deliberately unknown action type.
 						type: '__INERT__',
 					} );
 
@@ -2320,16 +2375,17 @@ describe( 'state', () => {
 			describe( 'isIgnoredChange', () => {
 				it( 'should consider received blocks as ignored change', () => {
 					const resetState = blocks( undefined, {
+						// @ts-expect-error Deliberately unknown action type.
 						type: 'random action',
 					} );
 					const state = blocks( resetState, {
 						type: 'RECEIVE_BLOCKS',
 						blocks: [
-							{
+							partial< Block >( {
 								clientId: 'kumquat',
 								attributes: {},
 								innerBlocks: [],
-							},
+							} ),
 						],
 					} );
 
@@ -2342,19 +2398,19 @@ describe( 'state', () => {
 					const original = blocks( undefined, {
 						type: 'RESET_BLOCKS',
 						blocks: [
-							{
+							partial< Block >( {
 								clientId: 'chicken',
 								name: 'core/test-block',
 								attributes: {},
 								innerBlocks: [
-									{
+									partial< Block >( {
 										clientId: 'child',
 										name: 'core/test-block',
 										attributes: {},
 										innerBlocks: [],
-									},
+									} ),
 								],
-							},
+							} ),
 						],
 					} );
 
@@ -2368,14 +2424,15 @@ describe( 'state', () => {
 						true
 					);
 					// The previous content of the block should be removed
+					// @ts-expect-error `byClientId` is a `Map`, so this reads `undefined`.
 					expect( state.byClientId.child ).toBeUndefined();
 					expect( state.tree.get( 'child' ) ).toBeUndefined();
-					expect( state.tree.get( 'chicken' ).innerBlocks ).toEqual(
+					expect( state.tree.get( 'chicken' )!.innerBlocks ).toEqual(
 						[]
 					);
 				} );
 				it( 'should preserve the controlled blocks in state and re-attach them in other pieces of state(order, tree, etc..), when we replace inner blocks', () => {
-					const initialState = {
+					const initialState = partial< BlocksState >( {
 						byClientId: new Map(
 							Object.entries( {
 								'group-id': {
@@ -2475,12 +2532,12 @@ describe( 'state', () => {
 									],
 								},
 							} )
-						),
-					};
+						) as BlocksState[ 'tree' ],
+					} );
 					// We will dispatch an action that replaces the inner
 					// blocks with the same inner blocks, which contain
 					// a controlled block (`reusable-id`).
-					const action = {
+					const action: Action = {
 						type: 'REPLACE_INNER_BLOCKS',
 						rootClientId: 'group-id',
 						blocks: [
@@ -2513,12 +2570,12 @@ describe( 'state', () => {
 					const original = blocks( undefined, {
 						type: 'RESET_BLOCKS',
 						blocks: [
-							{
+							partial< Block >( {
 								clientId: 'chicken',
 								name: 'core/test-block',
 								attributes: {},
 								innerBlocks: [],
-							},
+							} ),
 						],
 					} );
 					const withControlled = blocks( original, {
@@ -2533,12 +2590,12 @@ describe( 'state', () => {
 					const state = blocks( withControlled, {
 						type: 'RESET_BLOCKS',
 						blocks: [
-							{
+							partial< Block >( {
 								clientId: 'chicken',
 								name: 'core/test-block',
 								attributes: {},
 								innerBlocks: [],
-							},
+							} ),
 						],
 					} );
 
@@ -2551,12 +2608,12 @@ describe( 'state', () => {
 					const original = blocks( undefined, {
 						type: 'RESET_BLOCKS',
 						blocks: [
-							{
+							partial< Block >( {
 								clientId: 'chicken',
 								name: 'core/test-block',
 								attributes: {},
 								innerBlocks: [],
-							},
+							} ),
 						],
 					} );
 					const withControlled = blocks( original, {
@@ -2569,15 +2626,15 @@ describe( 'state', () => {
 						type: 'REPLACE_INNER_BLOCKS',
 						rootClientId: 'chicken',
 						blocks: [
-							{
+							partial< Block >( {
 								clientId: 'content',
 								innerBlocks: [
-									{
+									partial< Block >( {
 										clientId: 'content-inner',
 										innerBlocks: [],
-									},
+									} ),
 								],
-							},
+							} ),
 						],
 					} );
 
@@ -2585,24 +2642,24 @@ describe( 'state', () => {
 						getBlocks(
 							{ blocks: withControlledContent },
 							'chicken'
-						).map( ( b ) => b.clientId )
+						).map( ( b ) => ( b as Block ).clientId )
 					).toEqual( [ 'content' ] );
 					expect(
 						getBlocks(
 							{ blocks: withControlledContent },
 							'content'
-						).map( ( b ) => b.clientId )
+						).map( ( b ) => ( b as Block ).clientId )
 					).toEqual( [ 'content-inner' ] );
 
 					const state = blocks( withControlledContent, {
 						type: 'RESET_BLOCKS',
 						blocks: [
-							{
+							partial< Block >( {
 								clientId: 'chicken',
 								name: 'core/test-block',
 								attributes: {},
 								innerBlocks: [],
-							},
+							} ),
 						],
 					} );
 
@@ -2611,29 +2668,29 @@ describe( 'state', () => {
 					);
 					expect(
 						getBlocks( { blocks: state }, 'chicken' ).map(
-							( b ) => b.clientId
+							( b ) => ( b as Block ).clientId
 						)
 					).toEqual( [ 'content' ] );
 					expect(
 						getBlocks( { blocks: state }, 'content' ).map(
-							( b ) => b.clientId
+							( b ) => ( b as Block ).clientId
 						)
 					).toEqual( [ 'content-inner' ] );
 				} );
 
 				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
-					const templateBlock = {
+					const templateBlock = partial< Block >( {
 						clientId: 'template',
 						name: 'core/post-content',
 						attributes: {},
 						innerBlocks: [],
-					};
-					const contentBlock = {
+					} );
+					const contentBlock = partial< Block >( {
 						clientId: 'content',
 						name: 'core/paragraph',
 						attributes: {},
 						innerBlocks: [],
-					};
+					} );
 
 					let state = blocks( undefined, {
 						type: 'RESET_BLOCKS',
@@ -2673,18 +2730,18 @@ describe( 'state', () => {
 				} );
 
 				it( 'should not leave stale controlled tree entries after root replacement and reset', () => {
-					const templateBlock = {
+					const templateBlock = partial< Block >( {
 						clientId: 'template',
 						name: 'core/post-content',
 						attributes: {},
 						innerBlocks: [],
-					};
-					const contentBlock = {
+					} );
+					const contentBlock = partial< Block >( {
 						clientId: 'content',
 						name: 'core/paragraph',
 						attributes: {},
 						innerBlocks: [],
-					};
+					} );
 
 					// Initialize template, simulates root `useBlockSync` initialization.
 					let state = blocks( undefined, {
@@ -2750,12 +2807,12 @@ describe( 'state', () => {
 					const original = blocks( undefined, {
 						type: 'RESET_BLOCKS',
 						blocks: [
-							{
+							partial< Block >( {
 								clientId: 'chicken',
 								name: 'core/test-block',
 								attributes: {},
 								innerBlocks: [],
-							},
+							} ),
 						],
 					} );
 
@@ -2782,7 +2839,7 @@ describe( 'state', () => {
 
 	describe( 'insertionCue', () => {
 		it( 'should default to null', () => {
-			const state = insertionCue( undefined, {} );
+			const state = insertionCue( undefined, partial< Action >( {} ) );
 
 			expect( state ).toBe( null );
 		} );
@@ -2890,19 +2947,25 @@ describe( 'state', () => {
 
 	describe( 'initialPosition()', () => {
 		it( 'should return with block clientId as selected', () => {
-			const state = initialPosition( undefined, {
-				type: 'SELECT_BLOCK',
-				initialPosition: -1,
-			} );
+			const state = initialPosition(
+				undefined,
+				partial< Action >( {
+					type: 'SELECT_BLOCK',
+					initialPosition: -1,
+				} )
+			);
 
 			expect( state ).toBe( -1 );
 		} );
 
 		it( 'should allow setting null value in multi selection', () => {
-			const state = initialPosition( undefined, {
-				type: 'MULTI_SELECT',
-				initialPosition: null,
-			} );
+			const state = initialPosition(
+				undefined,
+				partial< Action >( {
+					type: 'MULTI_SELECT',
+					initialPosition: null,
+				} )
+			);
 
 			expect( state ).toBe( null );
 		} );
@@ -2928,7 +2991,7 @@ describe( 'state', () => {
 
 	describe( 'selection()', () => {
 		it( 'should set multi selection', () => {
-			const action = {
+			const action: Action = {
 				type: 'MULTI_SELECT',
 				start: 'ribs',
 				end: 'chicken',
@@ -2942,7 +3005,7 @@ describe( 'state', () => {
 		it( 'should reset selection', () => {
 			const start = { clientId: 'a' };
 			const end = { clientId: 'b' };
-			const action = {
+			const action: Action = {
 				type: 'RESET_SELECTION',
 				selectionStart: start,
 				selectionEnd: end,
@@ -2954,7 +3017,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should change selection', () => {
-			const action = {
+			const action: Action = {
 				type: 'SELECTION_CHANGE',
 				clientId: 'a',
 				attributeKey: 'content',
@@ -2976,7 +3039,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should return with block clientId as selected', () => {
-			const action = {
+			const action: Action = {
 				type: 'SELECT_BLOCK',
 				clientId: 'kumquat',
 			};
@@ -2993,7 +3056,7 @@ describe( 'state', () => {
 				selectionStart: { clientId },
 				selectionEnd: { clientId },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'SELECT_BLOCK',
 				clientId,
 			};
@@ -3009,7 +3072,7 @@ describe( 'state', () => {
 				selectionStart: { clientId },
 				selectionEnd: { clientId },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'CLEAR_SELECTED_BLOCK',
 			};
 
@@ -3024,7 +3087,7 @@ describe( 'state', () => {
 				selectionStart: {},
 				selectionEnd: {},
 			} );
-			const action = {
+			const action: Action = {
 				type: 'CLEAR_SELECTED_BLOCK',
 			};
 
@@ -3035,9 +3098,9 @@ describe( 'state', () => {
 		} );
 
 		it( 'should select inserted block', () => {
-			const action = {
+			const action: Action = {
 				type: 'INSERT_BLOCKS',
-				blocks: [ { clientId: 'ribs' } ],
+				blocks: [ partial< Block >( { clientId: 'ribs' } ) ],
 				updateSelection: true,
 			};
 			const state = selection( undefined, action );
@@ -3052,7 +3115,7 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'ribs' },
 				selectionEnd: { clientId: 'ribs' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'MOVE_BLOCKS_UP',
 				clientIds: [ 'ribs' ],
 			};
@@ -3068,10 +3131,10 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
-				blocks: [ { clientId: 'wings' } ],
+				blocks: [ partial< Block >( { clientId: 'wings' } ) ],
 			};
 			const state = selection( original, action );
 			const expected = {
@@ -3088,10 +3151,13 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'wings' },
 				selectionEnd: { clientId: 'wings' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'wings' ],
-				blocks: [ { clientId: 'chicken' }, { clientId: 'wings' } ],
+				blocks: [
+					partial< Block >( { clientId: 'chicken' } ),
+					partial< Block >( { clientId: 'wings' } ),
+				],
 			};
 			const state = selection( original, action );
 
@@ -3104,10 +3170,13 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
-				blocks: [ { clientId: 'chicken' }, { clientId: 'wings' } ],
+				blocks: [
+					partial< Block >( { clientId: 'chicken' } ),
+					partial< Block >( { clientId: 'wings' } ),
+				],
 			};
 			const state = selection( original, action );
 			const expected = {
@@ -3124,13 +3193,13 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [
-					{ clientId: 'rigas' },
-					{ clientId: 'chicken' },
-					{ clientId: 'wings' },
+					partial< Block >( { clientId: 'rigas' } ),
+					partial< Block >( { clientId: 'chicken' } ),
+					partial< Block >( { clientId: 'wings' } ),
 				],
 				indexToSelect: 0,
 			};
@@ -3148,7 +3217,7 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [],
@@ -3165,10 +3234,10 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'ribs' ],
-				blocks: [ { clientId: 'wings' } ],
+				blocks: [ partial< Block >( { clientId: 'wings' } ) ],
 			};
 			const state = selection( original, action );
 
@@ -3181,7 +3250,7 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'chicken' ],
 			};
@@ -3197,7 +3266,7 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'ribs' ],
 			};
@@ -3213,9 +3282,9 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'chicken' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'REPLACE_INNER_BLOCKS',
-				blocks: [ { clientId: 'another-block' } ],
+				blocks: [ partial< Block >( { clientId: 'another-block' } ) ],
 				rootClientId: 'parent',
 				updateSelection: true,
 			};
@@ -3234,13 +3303,13 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'cow' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{ clientId: 'another-block' },
-					{ clientId: 'chicken' },
-					{ clientId: 'this-is-a-block-too' },
-					{ clientId: 'cow' },
+					partial< Block >( { clientId: 'another-block' } ),
+					partial< Block >( { clientId: 'chicken' } ),
+					partial< Block >( { clientId: 'this-is-a-block-too' } ),
+					partial< Block >( { clientId: 'cow' } ),
 				],
 			};
 			const state = selection( original, action );
@@ -3254,12 +3323,12 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'cow' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{ clientId: 'another-block' },
-					{ clientId: 'chicken' },
-					{ clientId: 'this-is-a-block-too' },
+					partial< Block >( { clientId: 'another-block' } ),
+					partial< Block >( { clientId: 'chicken' } ),
+					partial< Block >( { clientId: 'this-is-a-block-too' } ),
 				],
 			};
 			const state = selection( original, action );
@@ -3273,11 +3342,11 @@ describe( 'state', () => {
 				selectionStart: { clientId: 'chicken' },
 				selectionEnd: { clientId: 'cow' },
 			} );
-			const action = {
+			const action: Action = {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{ clientId: 'another-block' },
-					{ clientId: 'this-is-a-block-too' },
+					partial< Block >( { clientId: 'another-block' } ),
+					partial< Block >( { clientId: 'this-is-a-block-too' } ),
 				],
 			};
 			const state = selection( original, action );
@@ -3289,7 +3358,7 @@ describe( 'state', () => {
 
 	describe( 'preferences()', () => {
 		it( 'should apply all defaults', () => {
-			const state = preferences( undefined, {} );
+			const state = preferences( undefined, partial< Action >( {} ) );
 
 			expect( state ).toEqual( {
 				insertUsage: {},
@@ -3299,10 +3368,10 @@ describe( 'state', () => {
 			const state = preferences( deepFreeze( { insertUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'bacon',
 						name: 'core/embed',
-					},
+					} ),
 				],
 				time: 123456,
 			} );
@@ -3328,15 +3397,15 @@ describe( 'state', () => {
 				{
 					type: 'INSERT_BLOCKS',
 					blocks: [
-						{
+						partial< Block >( {
 							clientId: 'eggs',
 							name: 'core/embed',
-						},
-						{
+						} ),
+						partial< Block >( {
 							clientId: 'bacon',
 							name: 'core/block',
 							attributes: { ref: 123 },
-						},
+						} ),
 					],
 					time: 123457,
 				}
@@ -3364,18 +3433,27 @@ describe( 'state', () => {
 						attributes: { fruit: 'apple' },
 					},
 					{ name: 'orange', attributes: { fruit: 'orange' } },
-				].map( ( variation ) => ( {
-					...variation,
-					isActive: ( blockAttributes, variationAttributes ) =>
-						blockAttributes?.fruit === variationAttributes.fruit,
-				} ) );
-				registerBlockType( blockWithVariations, {
-					apiVersion: 3,
-					save: noop,
-					edit: noop,
-					title: 'Fruit with variations',
-					variations,
-				} );
+				].map( ( variation ) =>
+					partial< BlockVariation >( {
+						...variation,
+						isActive: (
+							blockAttributes: Record< string, unknown >,
+							variationAttributes: Record< string, unknown >
+						) =>
+							blockAttributes?.fruit ===
+							variationAttributes.fruit,
+					} )
+				);
+				registerBlockType(
+					blockWithVariations,
+					partial< BlockConfiguration >( {
+						apiVersion: 3,
+						save: noop,
+						edit: noop,
+						title: 'Fruit with variations',
+						variations,
+					} )
+				);
 			} );
 			afterAll( () => {
 				unregisterBlockType( blockWithVariations );
@@ -3384,25 +3462,25 @@ describe( 'state', () => {
 				const state = preferences( deepFreeze( { insertUsage: {} } ), {
 					type: 'INSERT_BLOCKS',
 					blocks: [
-						{
+						partial< Block >( {
 							clientId: 'no match',
 							name: blockWithVariations,
-						},
-						{
+						} ),
+						partial< Block >( {
 							clientId: 'not a variation match',
 							name: blockWithVariations,
 							attributes: { fruit: 'not in a variation' },
-						},
-						{
+						} ),
+						partial< Block >( {
 							clientId: 'orange',
 							name: blockWithVariations,
 							attributes: { fruit: 'orange' },
-						},
-						{
+						} ),
+						partial< Block >( {
 							clientId: 'apple',
 							name: blockWithVariations,
 							attributes: { fruit: 'apple' },
-						},
+						} ),
 					],
 					time: 123456,
 				} );
@@ -3431,7 +3509,7 @@ describe( 'state', () => {
 
 	describe( 'blocksMode', () => {
 		it( 'should set mode to html if not set', () => {
-			const action = {
+			const action: Action = {
 				type: 'TOGGLE_BLOCK_MODE',
 				clientId: 'chicken',
 			};
@@ -3441,7 +3519,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should toggle mode to visual if set as html', () => {
-			const action = {
+			const action: Action = {
 				type: 'TOGGLE_BLOCK_MODE',
 				clientId: 'chicken',
 			};
@@ -3456,7 +3534,7 @@ describe( 'state', () => {
 
 	describe( 'template', () => {
 		it( 'should default to visible', () => {
-			const state = template( undefined, {} );
+			const state = template( undefined, partial< Action >( {} ) );
 
 			expect( state ).toEqual( { isValid: true } );
 		} );
@@ -3474,10 +3552,13 @@ describe( 'state', () => {
 
 	describe( 'settings', () => {
 		it( 'should warn about __unstableIsPreviewMode deprecation', () => {
-			const settingsObject = settings( undefined, {
-				type: 'UPDATE_SETTINGS',
-				reset: true,
-			} );
+			const settingsObject = settings(
+				undefined,
+				partial< Action >( {
+					type: 'UPDATE_SETTINGS',
+					reset: true,
+				} )
+			);
 
 			expect( settingsObject.__unstableIsPreviewMode ).toBeDefined();
 			expect( settingsObject.isPreviewMode ).toBeDefined();
@@ -3668,10 +3749,10 @@ describe( 'state', () => {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
@@ -3716,7 +3797,10 @@ describe( 'state', () => {
 
 	describe( 'lastBlockAttributesChange', () => {
 		it( 'defaults to null', () => {
-			const state = lastBlockAttributesChange( undefined, {} );
+			const state = lastBlockAttributesChange(
+				undefined,
+				partial< Action >( {} )
+			);
 
 			expect( state ).toBe( null );
 		} );
@@ -3789,11 +3873,11 @@ describe( 'state', () => {
 		it( 'should contain client id if last block inserted is called with action INSERT_BLOCKS', () => {
 			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 
-			const action = {
+			const action: Action = {
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: expectedClientId,
-					},
+					} ),
 				],
 				meta: {
 					source: 'inserter_menu',
@@ -3809,11 +3893,11 @@ describe( 'state', () => {
 		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
 			const expectedSource = 'inserter_menu';
 
-			const action = {
+			const action: Action = {
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
-					},
+					} ),
 				],
 				meta: {
 					source: expectedSource,
@@ -3831,7 +3915,7 @@ describe( 'state', () => {
 				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 			};
 
-			const action = {
+			const action: Action = {
 				blocks: [],
 				meta: {
 					source: 'inserter_menu',
@@ -3848,17 +3932,17 @@ describe( 'state', () => {
 			const clientIdOne = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 			const clientIdTwo = '9db792c6-a25a-495d-adbd-97d56a4c4189';
 
-			const action = {
+			const action: Action = partial< Action >( {
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: clientIdOne,
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: clientIdTwo,
-					},
+					} ),
 				],
 				type: 'REPLACE_BLOCKS',
-			};
+			} );
 
 			const state = lastBlockInserted( {}, action );
 
@@ -3871,21 +3955,21 @@ describe( 'state', () => {
 				'9db792c6-a25a-495d-adbd-97d56a4c4189',
 			] );
 
-			const action = {
+			const action: Action = partial< Action >( {
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
-					},
-					{
+					} ),
+					partial< Block >( {
 						clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
-					},
+					} ),
 				],
 				type: 'REPLACE_INNER_BLOCKS',
-			};
+			} );
 
 			const state = lastBlockInserted(
 				{
-					clientIds: initialBlocks,
+					clientIds: initialBlocks as string[],
 				},
 				action
 			);
@@ -3896,9 +3980,9 @@ describe( 'state', () => {
 		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {
 			const expectedState = {};
 
-			const action = {
+			const action: Action = partial< Action >( {
 				type: 'RESET_BLOCKS',
-			};
+			} );
 
 			const state = lastBlockInserted( expectedState, action );
 
@@ -3908,12 +3992,12 @@ describe( 'state', () => {
 
 	describe( 'blockEditingModes', () => {
 		it( 'should return an empty map by default', () => {
-			const state = blocks( undefined, {} );
+			const state = blocks( undefined, partial< Action >( {} ) );
 			expect( state.blockEditingModes ).toEqual( new Map() );
 		} );
 
 		it( 'should set the editing mode for a block', () => {
-			const state = blocks( undefined, {} );
+			const state = blocks( undefined, partial< Action >( {} ) );
 			const newState = blocks( state, {
 				type: 'SET_BLOCK_EDITING_MODE',
 				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
@@ -3927,7 +4011,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should clear the editing mode for a block', () => {
-			let state = blocks( undefined, {} );
+			let state = blocks( undefined, partial< Action >( {} ) );
 			state = blocks( state, {
 				type: 'SET_BLOCK_EDITING_MODE',
 				clientId: '14501cc2-90a6-4f52-aa36-ab6e896135d1',
@@ -3942,22 +4026,22 @@ describe( 'state', () => {
 
 		it( 'should preserve editing modes when blocks are reset', () => {
 			// Add a template with two template parts.
-			let state = blocks( undefined, {} );
+			let state = blocks( undefined, partial< Action >( {} ) );
 			state = blocks( state, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						name: 'core/template-part',
 						clientId: 'template-part-1',
 						attributes: {},
 						innerBlocks: [],
-					},
-					{
+					} ),
+					partial< Block >( {
 						name: 'core/template-part',
 						clientId: 'template-part-2',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
@@ -3971,12 +4055,12 @@ describe( 'state', () => {
 				type: 'REPLACE_INNER_BLOCKS',
 				rootClientId: 'template-part-1',
 				blocks: [
-					{
+					partial< Block >( {
 						name: 'core/paragraph',
 						clientId: 'paragraph-1',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 			state = blocks( state, {
@@ -3988,12 +4072,12 @@ describe( 'state', () => {
 				type: 'REPLACE_INNER_BLOCKS',
 				rootClientId: 'template-part-2',
 				blocks: [
-					{
+					partial< Block >( {
 						name: 'core/paragraph',
 						clientId: 'paragraph-2',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
@@ -4031,12 +4115,12 @@ describe( 'state', () => {
 			state = blocks( state, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						name: 'core/template-part',
 						clientId: 'template-part-1',
 						attributes: {},
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
@@ -4054,7 +4138,9 @@ describe( 'state', () => {
 
 	describe( 'expandedBlock', () => {
 		it( 'should return null by default', () => {
-			expect( expandedBlock( undefined, {} ) ).toBe( null );
+			expect( expandedBlock( undefined, partial< Action >( {} ) ) ).toBe(
+				null
+			);
 		} );
 
 		it( 'should set client id for expanded block', () => {
@@ -4080,7 +4166,10 @@ describe( 'state', () => {
 	describe( 'editedContentOnlySection', () => {
 		it( 'returns undefined by default', () => {
 			expect(
-				editedContentOnlySection( undefined, { type: 'UNKNOWN' } )
+				editedContentOnlySection( undefined, {
+					// @ts-expect-error Deliberately unknown action type.
+					type: 'UNKNOWN',
+				} )
 			).toBeUndefined();
 		} );
 
@@ -4093,9 +4182,12 @@ describe( 'state', () => {
 		} );
 
 		it( 'clears the clientId when EDIT_CONTENT_ONLY_SECTION has no clientId', () => {
-			const state = editedContentOnlySection( 'block-1', {
-				type: 'EDIT_CONTENT_ONLY_SECTION',
-			} );
+			const state = editedContentOnlySection(
+				'block-1',
+				partial< Action >( {
+					type: 'EDIT_CONTENT_ONLY_SECTION',
+				} )
+			);
 			expect( state ).toBeUndefined();
 		} );
 
@@ -4119,7 +4211,12 @@ describe( 'state', () => {
 			const state = editedContentOnlySection( 'block-1', {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'block-1' ],
-				blocks: [ { clientId: 'block-new', innerBlocks: [] } ],
+				blocks: [
+					partial< Block >( {
+						clientId: 'block-new',
+						innerBlocks: [],
+					} ),
+				],
 			} );
 			expect( state ).toBeUndefined();
 		} );
@@ -4128,7 +4225,12 @@ describe( 'state', () => {
 			const state = editedContentOnlySection( 'block-1', {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'block-2' ],
-				blocks: [ { clientId: 'block-new', innerBlocks: [] } ],
+				blocks: [
+					partial< Block >( {
+						clientId: 'block-new',
+						innerBlocks: [],
+					} ),
+				],
 			} );
 			expect( state ).toBe( 'block-1' );
 		} );
@@ -4137,8 +4239,14 @@ describe( 'state', () => {
 			const state = editedContentOnlySection( 'block-1', {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{ clientId: 'block-2', innerBlocks: [] },
-					{ clientId: 'block-3', innerBlocks: [] },
+					partial< Block >( {
+						clientId: 'block-2',
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'block-3',
+						innerBlocks: [],
+					} ),
 				],
 			} );
 			expect( state ).toBeUndefined();
@@ -4148,8 +4256,14 @@ describe( 'state', () => {
 			const state = editedContentOnlySection( 'block-1', {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{ clientId: 'block-1', innerBlocks: [] },
-					{ clientId: 'block-2', innerBlocks: [] },
+					partial< Block >( {
+						clientId: 'block-1',
+						innerBlocks: [],
+					} ),
+					partial< Block >( {
+						clientId: 'block-2',
+						innerBlocks: [],
+					} ),
 				],
 			} );
 			expect( state ).toBe( 'block-1' );
@@ -4159,15 +4273,15 @@ describe( 'state', () => {
 			const state = editedContentOnlySection( 'block-1', {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'block-parent',
 						innerBlocks: [
-							{
+							partial< Block >( {
 								clientId: 'block-1',
 								innerBlocks: [],
-							},
+							} ),
 						],
-					},
+					} ),
 				],
 			} );
 			expect( state ).toBe( 'block-1' );
@@ -4192,7 +4306,7 @@ describe( 'state', () => {
 
 	describe( 'insertionPoint', () => {
 		it( 'should default to null', () => {
-			const state = insertionPoint( undefined, {} );
+			const state = insertionPoint( undefined, partial< Action >( {} ) );
 
 			expect( state ).toBe( null );
 		} );
@@ -4217,9 +4331,12 @@ describe( 'state', () => {
 				rootClientId: 'clientId1',
 				index: 4,
 			} );
-			const state = insertionPoint( original, {
-				type: 'SELECT_BLOCK',
-			} );
+			const state = insertionPoint(
+				original,
+				partial< Action >( {
+					type: 'SELECT_BLOCK',
+				} )
+			);
 
 			expect( state ).toBe( null );
 		} );
@@ -4227,6 +4344,7 @@ describe( 'state', () => {
 
 	describe( 'withDerivedBlockEditingModes', () => {
 		const testReducer = withDerivedBlockEditingModes(
+			// @ts-expect-error The test combines only the slices the reducer reads.
 			combineReducers( {
 				blocks,
 				settings,
@@ -4236,7 +4354,11 @@ describe( 'state', () => {
 			} )
 		);
 
-		function dispatchActions( actions, reducer, initialState = {} ) {
+		function dispatchActions(
+			actions: Action[],
+			reducer: typeof testReducer,
+			initialState = partial< State >( {} )
+		) {
 			return actions.reduce( ( _state, action ) => {
 				return reducer( _state, action );
 			}, initialState );
@@ -4244,7 +4366,7 @@ describe( 'state', () => {
 
 		beforeEach( () => {
 			isContentBlock.mockImplementation(
-				( blockName ) => blockName === 'core/paragraph'
+				( blockName: string ) => blockName === 'core/paragraph'
 			);
 		} );
 
@@ -4253,7 +4375,7 @@ describe( 'state', () => {
 		} );
 
 		describe( 'edit mode', () => {
-			let initialState;
+			let initialState: State;
 			beforeEach( () => {
 				initialState = dispatchActions(
 					[
@@ -4266,32 +4388,32 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-1',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/group',
 											clientId: 'group-2',
 											attributes: {},
 											innerBlocks: [
-												{
+												partial< Block >( {
 													name: 'core/paragraph',
 													clientId: 'paragraph-2',
 													attributes: {},
 													innerBlocks: [],
-												},
+												} ),
 											],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -4307,7 +4429,7 @@ describe( 'state', () => {
 		} );
 
 		describe( 'synced patterns', () => {
-			let initialState;
+			let initialState: State;
 			beforeEach( () => {
 				// Simulates how the editor typically inserts controlled blocks,
 				// - first the pattern is inserted with no inner blocks.
@@ -4325,44 +4447,44 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-1',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/group',
 											clientId: 'group-2',
 											attributes: {},
 											innerBlocks: [
-												{
+												partial< Block >( {
 													name: 'core/paragraph',
 													clientId: 'paragraph-2',
 													attributes: {},
 													innerBlocks: [],
-												},
+												} ),
 											],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 						{
 							type: 'INSERT_BLOCKS',
 							rootClientId: '',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/block',
 									clientId: 'root-pattern',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 						{
@@ -4374,24 +4496,24 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'root-pattern',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/block',
 									clientId: 'nested-pattern',
 									attributes: {},
 									innerBlocks: [],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId: 'pattern-paragraph',
 									attributes: {},
 									innerBlocks: [],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'pattern-group',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId:
 												'pattern-paragraph-with-overrides',
@@ -4404,9 +4526,9 @@ describe( 'state', () => {
 												},
 											},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 						{
@@ -4418,18 +4540,18 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'nested-pattern',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId: 'nested-paragraph',
 									attributes: {},
 									innerBlocks: [],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'nested-group',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId:
 												'nested-paragraph-with-overrides',
@@ -4442,9 +4564,9 @@ describe( 'state', () => {
 												},
 											},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -4502,7 +4624,7 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'unsynced-pattern-group',
 									attributes: {
@@ -4511,20 +4633,20 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-in-unsynced',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/block',
 											clientId: 'synced-in-unsynced',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 						{
@@ -4536,18 +4658,18 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'synced-in-unsynced',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId: 'synced-inner-paragraph',
 									attributes: {},
 									innerBlocks: [],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'synced-inner-group',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId:
 												'synced-inner-paragraph-with-overrides',
@@ -4560,9 +4682,9 @@ describe( 'state', () => {
 												},
 											},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -4617,7 +4739,7 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'unsynced-pattern-group',
 									attributes: {
@@ -4626,20 +4748,20 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-in-unsynced',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/block',
 											clientId: 'synced-in-unsynced',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 						{
@@ -4651,7 +4773,7 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'synced-in-unsynced',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId:
 										'synced-inner-paragraph-with-overrides',
@@ -4664,13 +4786,13 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/block',
 									clientId: 'nested-synced',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 						{
@@ -4682,12 +4804,12 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'nested-synced',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId: 'deeply-nested-paragraph',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 					],
@@ -4745,7 +4867,7 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'unsynced-pattern',
 									attributes: {
@@ -4754,21 +4876,21 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId:
 												'unsynced-pattern-paragraph',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/block',
 									clientId: 'sibling-synced-pattern',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 						{
@@ -4780,13 +4902,13 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'sibling-synced-pattern',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId: 'synced-pattern-paragraph',
 									attributes: {},
 									innerBlocks: [],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId:
 										'synced-pattern-paragraph-with-overrides',
@@ -4799,7 +4921,7 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 					],
@@ -4872,39 +4994,39 @@ describe( 'state', () => {
 		} );
 
 		describe( 'contentOnly template locking', () => {
-			let initialState;
+			let initialState: State;
 			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-1',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/group',
 											clientId: 'group-2',
 											attributes: {},
 											innerBlocks: [
-												{
+												partial< Block >( {
 													name: 'core/paragraph',
 													clientId: 'paragraph-2',
 													attributes: {},
 													innerBlocks: [],
-												},
+												} ),
 											],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 						{
@@ -5017,9 +5139,9 @@ describe( 'state', () => {
 				// Stop editing the content-only section
 				const restoredState = dispatchActions(
 					[
-						{
+						partial< Action >( {
 							type: 'EDIT_CONTENT_ONLY_SECTION',
-						},
+						} ),
 					],
 					testReducer,
 					editingState
@@ -5044,32 +5166,32 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'section-1',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'section-1-paragraph',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'section-2',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'section-2-paragraph',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 						{
@@ -5129,7 +5251,7 @@ describe( 'state', () => {
 		} );
 
 		describe( 'zoom out mode', () => {
-			let initialState;
+			let initialState: State;
 
 			beforeEach( () => {
 				initialState = dispatchActions(
@@ -5147,32 +5269,32 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-1',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/group',
 											clientId: 'group-2',
 											attributes: {},
 											innerBlocks: [
-												{
+												partial< Block >( {
 													name: 'core/paragraph',
 													clientId: 'paragraph-2',
 													attributes: {},
 													innerBlocks: [],
-												},
+												} ),
 											],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -5224,25 +5346,25 @@ describe( 'state', () => {
 							type: 'INSERT_BLOCKS',
 							rootClientId: '',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-3',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-3',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/group',
 											clientId: 'group-4',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -5321,14 +5443,14 @@ describe( 'state', () => {
 		} );
 
 		describe( 'unsynced patterns', () => {
-			let initialState;
+			let initialState: State;
 			beforeEach( () => {
 				initialState = dispatchActions(
 					[
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-1',
 									attributes: {
@@ -5337,27 +5459,27 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/group',
 											clientId: 'group-2',
 											attributes: {},
 											innerBlocks: [
-												{
+												partial< Block >( {
 													name: 'core/paragraph',
 													clientId: 'paragraph-2',
 													attributes: {},
 													innerBlocks: [],
-												},
+												} ),
 											],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -5445,7 +5567,7 @@ describe( 'state', () => {
 							rootClientId: '',
 							index: 1,
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-3',
 									attributes: {
@@ -5454,14 +5576,14 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-3',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -5483,7 +5605,7 @@ describe( 'state', () => {
 		} );
 
 		describe( 'unsynced patterns with disableContentOnlyForUnsyncedPatterns enabled', () => {
-			let initialState;
+			let initialState: State;
 			beforeEach( () => {
 				initialState = dispatchActions(
 					[
@@ -5496,7 +5618,7 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-1',
 									attributes: {
@@ -5505,27 +5627,27 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
-										},
-										{
+										} ),
+										partial< Block >( {
 											name: 'core/group',
 											clientId: 'group-2',
 											attributes: {},
 											innerBlocks: [
-												{
+												partial< Block >( {
 													name: 'core/paragraph',
 													clientId: 'paragraph-2',
 													attributes: {},
 													innerBlocks: [],
-												},
+												} ),
 											],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -5551,19 +5673,19 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-1',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -5591,7 +5713,7 @@ describe( 'state', () => {
 		} );
 
 		describe( 'isIsolatedEditor setting', () => {
-			let stateWithUnsyncedPatternAndTemplatePart;
+			let stateWithUnsyncedPatternAndTemplatePart: State;
 			beforeEach( () => {
 				// Set up a state with both an unsynced pattern and a template part.
 				stateWithUnsyncedPatternAndTemplatePart = dispatchActions(
@@ -5599,7 +5721,7 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'unsynced-pattern',
 									attributes: {
@@ -5608,20 +5730,20 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'pattern-paragraph',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/template-part',
 									clientId: 'template-part',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 						{
@@ -5633,12 +5755,12 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'template-part',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId: 'template-part-paragraph',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 					],
@@ -5731,7 +5853,7 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'group-1',
 									attributes: {
@@ -5740,14 +5862,14 @@ describe( 'state', () => {
 										},
 									},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId: 'paragraph-1',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -5761,7 +5883,7 @@ describe( 'state', () => {
 		} );
 
 		describe( 'template parts', () => {
-			let initialState;
+			let initialState: State;
 			beforeEach( () => {
 				// Simulates how the editor typically inserts controlled blocks,
 				// - first the template part is inserted with no inner blocks.
@@ -5772,12 +5894,12 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/template-part',
 									clientId: 'template-part',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 						{
@@ -5789,26 +5911,26 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'template-part',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId: 'template-part-paragraph',
 									attributes: {},
 									innerBlocks: [],
-								},
-								{
+								} ),
+								partial< Block >( {
 									name: 'core/group',
 									clientId: 'template-part-group',
 									attributes: {},
 									innerBlocks: [
-										{
+										partial< Block >( {
 											name: 'core/paragraph',
 											clientId:
 												'template-part-grouped-paragraph',
 											attributes: {},
 											innerBlocks: [],
-										},
+										} ),
 									],
-								},
+								} ),
 							],
 						},
 					],
@@ -5875,7 +5997,7 @@ describe( 'state', () => {
 		} );
 
 		describe( 'template parts with disableContentOnlyForTemplateParts enabled', () => {
-			let initialState;
+			let initialState: State;
 			beforeEach( () => {
 				initialState = dispatchActions(
 					[
@@ -5888,12 +6010,12 @@ describe( 'state', () => {
 						{
 							type: 'RESET_BLOCKS',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/template-part',
 									clientId: 'template-part',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 						{
@@ -5905,12 +6027,12 @@ describe( 'state', () => {
 							type: 'REPLACE_INNER_BLOCKS',
 							rootClientId: 'template-part',
 							blocks: [
-								{
+								partial< Block >( {
 									name: 'core/paragraph',
 									clientId: 'template-part-paragraph',
 									attributes: {},
 									innerBlocks: [],
-								},
+								} ),
 							],
 						},
 					],
@@ -5928,7 +6050,10 @@ describe( 'state', () => {
 
 	describe( 'selectedBlockStyleState', () => {
 		it( 'defaults to undefined', () => {
-			const state = selectedBlockStyleState( undefined, {} );
+			const state = selectedBlockStyleState(
+				undefined,
+				partial< Action >( {} )
+			);
 
 			expect( state ).toBeUndefined();
 		} );
@@ -5968,10 +6093,10 @@ describe( 'state', () => {
 
 		it( 'updates only the selected state type for the same block', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: '@mobile', pseudo: 'default' },
-				},
+				} ),
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					clientId: 'client-1',
@@ -5991,10 +6116,10 @@ describe( 'state', () => {
 
 		it( 'replaces the selected state when another block is selected', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: '@mobile', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					clientId: 'client-2',
@@ -6013,10 +6138,10 @@ describe( 'state', () => {
 
 		it( 'stores explicit defaults when both state types are default', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: '@mobile', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					clientId: 'client-1',
@@ -6036,14 +6161,14 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when clientId is missing', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
-				{
+				} ),
+				partial< Action >( {
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					value: { pseudo: ':focus' },
-				}
+				} )
 			);
 
 			expect( state ).toBeUndefined();
@@ -6051,24 +6176,24 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when value is missing', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
-				{
+				} ),
+				partial< Action >( {
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
 					clientId: 'client-1',
-				}
+				} )
 			);
 
 			expect( state ).toBeUndefined();
 		} );
 
 		it( 'keeps the selected state when the same block is selected', () => {
-			const originalState = {
+			const originalState = partial< SelectedBlockStyleState >( {
 				clientId: 'client-1',
 				value: { viewport: 'default', pseudo: ':hover' },
-			};
+			} );
 			const state = selectedBlockStyleState( originalState, {
 				type: 'SELECT_BLOCK',
 				clientId: 'client-1',
@@ -6079,10 +6204,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when another block is selected', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'SELECT_BLOCK',
 					clientId: 'client-2',
@@ -6093,10 +6218,10 @@ describe( 'state', () => {
 		} );
 
 		it( 'keeps the selected state for selection changes in the same block', () => {
-			const originalState = {
+			const originalState = partial< SelectedBlockStyleState >( {
 				clientId: 'client-1',
 				value: { viewport: 'default', pseudo: ':hover' },
-			};
+			} );
 			const state = selectedBlockStyleState( originalState, {
 				type: 'SELECTION_CHANGE',
 				clientId: 'client-1',
@@ -6107,10 +6232,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state for selection changes in another block', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'SELECTION_CHANGE',
 					clientId: 'client-2',
@@ -6121,10 +6246,10 @@ describe( 'state', () => {
 		} );
 
 		it( 'keeps the selected state for selection changes within the same block', () => {
-			const originalState = {
+			const originalState = partial< SelectedBlockStyleState >( {
 				clientId: 'client-1',
 				value: { viewport: 'default', pseudo: ':hover' },
-			};
+			} );
 			const state = selectedBlockStyleState( originalState, {
 				type: 'SELECTION_CHANGE',
 				start: { clientId: 'client-1' },
@@ -6136,10 +6261,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state for selection changes across multiple blocks', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'SELECTION_CHANGE',
 					start: { clientId: 'client-1' },
@@ -6151,28 +6276,31 @@ describe( 'state', () => {
 		} );
 
 		it( 'keeps the selected state when selection resets to the same block', () => {
-			const originalState = {
+			const originalState = partial< SelectedBlockStyleState >( {
 				clientId: 'client-1',
 				value: { viewport: 'default', pseudo: ':hover' },
-			};
-			const state = selectedBlockStyleState( originalState, {
-				type: 'RESET_SELECTION',
-				selectionStart: { clientId: 'client-1' },
 			} );
+			const state = selectedBlockStyleState(
+				originalState,
+				partial< Action >( {
+					type: 'RESET_SELECTION',
+					selectionStart: { clientId: 'client-1' },
+				} )
+			);
 
 			expect( state ).toBe( originalState );
 		} );
 
 		it( 'clears the selected state when selection resets to another block', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
-				{
+				} ),
+				partial< Action >( {
 					type: 'RESET_SELECTION',
 					selectionStart: { clientId: 'client-2' },
-				}
+				} )
 			);
 
 			expect( state ).toBeUndefined();
@@ -6180,10 +6308,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when the selection is cleared', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'CLEAR_SELECTED_BLOCK',
 				}
@@ -6194,13 +6322,13 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when multiple blocks are selected', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
-				{
+				} ),
+				partial< Action >( {
 					type: 'MULTI_SELECT',
-				}
+				} )
 			);
 
 			expect( state ).toBeUndefined();
@@ -6208,10 +6336,10 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when the block is removed', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ 'client-1' ],
@@ -6223,14 +6351,14 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when the block is replaced', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-2',
 					value: { viewport: 'default', pseudo: ':focus' },
-				},
-				{
+				} ),
+				partial< Action >( {
 					type: 'REPLACE_BLOCKS',
 					clientIds: [ 'client-2' ],
-				}
+				} )
 			);
 
 			expect( state ).toBeUndefined();
@@ -6238,17 +6366,17 @@ describe( 'state', () => {
 
 		it( 'clears the selected state when the block is missing after reset', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'RESET_BLOCKS',
 					blocks: [
-						{
+						partial< Block >( {
 							clientId: 'client-2',
 							innerBlocks: [],
-						},
+						} ),
 					],
 				}
 			);
@@ -6257,17 +6385,17 @@ describe( 'state', () => {
 		} );
 
 		it( 'keeps the selected state when the block exists after reset', () => {
-			const originalState = {
+			const originalState = partial< SelectedBlockStyleState >( {
 				clientId: 'client-2',
 				value: { viewport: 'default', pseudo: ':focus' },
-			};
+			} );
 			const state = selectedBlockStyleState( originalState, {
 				type: 'RESET_BLOCKS',
 				blocks: [
-					{
+					partial< Block >( {
 						clientId: 'client-2',
 						innerBlocks: [],
-					},
+					} ),
 				],
 			} );
 
@@ -6276,10 +6404,10 @@ describe( 'state', () => {
 
 		it( 'stores whether canvas preview is enabled for the selected state', () => {
 			const state = selectedBlockStyleState(
-				{
+				partial< SelectedBlockStyleState >( {
 					clientId: 'client-1',
 					value: { viewport: '@mobile', pseudo: ':hover' },
-				},
+				} ),
 				{
 					type: 'SET_SELECTED_BLOCK_STYLE_STATE_CANVAS_PREVIEW',
 					clientId: 'client-1',
@@ -6318,7 +6446,9 @@ describe( 'state', () => {
 
 	describe( 'styleStateViewport', () => {
 		it( 'defaults to "default"', () => {
-			expect( styleStateViewport( undefined, {} ) ).toBe( 'default' );
+			expect(
+				styleStateViewport( undefined, partial< Action >( {} ) )
+			).toBe( 'default' );
 		} );
 
 		it( 'stores the selected viewport', () => {
@@ -6340,14 +6470,20 @@ describe( 'state', () => {
 
 		it( 'ignores unrelated actions', () => {
 			expect(
-				styleStateViewport( '@mobile', { type: 'SOME_OTHER_ACTION' } )
+				styleStateViewport( '@mobile', {
+					// @ts-expect-error Deliberately unknown action type.
+					type: 'SOME_OTHER_ACTION',
+				} )
 			).toBe( '@mobile' );
 		} );
 	} );
 
 	describe( 'viewportModalClientIds', () => {
 		it( 'should default to null', () => {
-			const state = viewportModalClientIds( undefined, {} );
+			const state = viewportModalClientIds(
+				undefined,
+				partial< Action >( {} )
+			);
 			expect( state ).toBeNull();
 		} );
 
@@ -6370,6 +6506,7 @@ describe( 'state', () => {
 		it( 'should return current state for unknown actions', () => {
 			const currentState = [ 'client-1' ];
 			const state = viewportModalClientIds( currentState, {
+				// @ts-expect-error Deliberately unknown action type.
 				type: 'UNKNOWN_ACTION',
 			} );
 			expect( state ).toBe( currentState );
