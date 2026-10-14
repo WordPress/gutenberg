@@ -7,6 +7,7 @@ import type {
 	BlockEditorThunkArgs,
 	BlockRemovalRule,
 	InsertionPoint,
+	LastFocus,
 	RemovalPromptMessage,
 	Settings,
 	State,
@@ -351,7 +352,7 @@ export function deleteStyleOverride( id: unknown ) {
  *
  * @return Action object.
  */
-export function setLastFocus( lastFocus: HTMLElement | null | false = null ) {
+export function setLastFocus( lastFocus: LastFocus | null | false = null ) {
 	return {
 		type: 'LAST_FOCUS',
 		lastFocus,

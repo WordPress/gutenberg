@@ -369,6 +369,13 @@ export type Settings = Record< string | symbol, unknown > & {
 	) => UserPatternCategory[];
 };
 
+/**
+ * A reference to the element that had focus when focus left the editor canvas.
+ */
+export interface LastFocus {
+	current: HTMLElement | SVGElement | null;
+}
+
 export interface StyleOverride {
 	clientId?: string;
 	[ key: string ]: unknown;
@@ -469,7 +476,7 @@ export interface State {
 		insertUsage: Record< string, { time?: number; count: number } >;
 	};
 	lastBlockAttributesChange: Record< string, BlockAttributes > | null;
-	lastFocus: HTMLElement | null | false;
+	lastFocus: LastFocus | null | false;
 	expandedBlock: string | null;
 	highlightedBlock: string | null | undefined;
 	lastBlockInserted: { clientIds?: string[]; source?: string };
@@ -524,7 +531,7 @@ export type Action =
 			meta?: BlocksMeta;
 			time?: number;
 	  }
-	| { type: 'LAST_FOCUS'; lastFocus: HTMLElement | null | false }
+	| { type: 'LAST_FOCUS'; lastFocus: LastFocus | null | false }
 	| { type: 'MARK_AUTOMATIC_CHANGE' }
 	| { type: 'MARK_AUTOMATIC_CHANGE_FINAL' }
 	| { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' }
