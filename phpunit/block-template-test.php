@@ -30,7 +30,7 @@ class Tests_Block_Template extends WP_UnitTestCase {
 
 		$template = get_block_template( 'block-theme//test-template' );
 
-		$this->assertEquals( 'Test Template', $template->title );
+		$this->assertSame( 'Test Template', $template->title );
 
 		unregister_block_template( $template_name );
 	}
