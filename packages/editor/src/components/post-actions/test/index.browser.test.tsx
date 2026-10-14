@@ -22,10 +22,12 @@ lock( coreSelectors, {
 	getEditedEntityRecord: () => item,
 	getEntityRecordPermissions: () => ( { canUpdate: true } ),
 } );
+const registry = { select: () => coreSelectors };
 
 async function renderPostActions() {
+	// `useSelect` calls the callback with `registry.select` and the registry.
 	mockedUseSelect.mockImplementation( ( mapSelect: any ) =>
-		mapSelect( () => coreSelectors )
+		mapSelect( registry.select, registry )
 	);
 
 	await render(

@@ -15,6 +15,7 @@ import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
+import useEligibleItems from '../../hooks/use-eligible-items';
 
 interface ActionWithModalProps< Item > {
 	action: ActionModalType< Item >;
@@ -67,10 +68,10 @@ export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	item: Item
 ) {
-	const registry = useRegistry();
 	return useSelect(
-		() => hasAPossibleBulkAction( actions, item, registry ),
-		[ actions, item, registry ]
+		( select, registry ) =>
+			hasAPossibleBulkAction( actions, item, registry ),
+		[ actions, item ]
 	);
 }
 
@@ -78,13 +79,12 @@ export function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
-	const registry = useRegistry();
 	return useSelect(
-		() =>
+		( select, registry ) =>
 			data.some( ( item ) =>
 				hasAPossibleBulkAction( actions, item, registry )
 			),
-		[ actions, data, registry ]
+		[ actions, data ]
 	);
 }
 
@@ -105,17 +105,19 @@ export function BulkSelectionCheckbox< Item >( {
 	getItemId,
 	disableSelectAll = false,
 }: BulkSelectionCheckboxProps< Item > ) {
-	const registry = useRegistry();
-	const selectableItems = useSelect( () => {
-		return data.filter( ( item ) => {
-			return actions.some(
-				( action ) =>
-					action.supportsBulk &&
-					( ! action.isEligible ||
-						action.isEligible( item, { registry } ) )
-			);
-		} );
-	}, [ data, actions, registry ] );
+	const selectableItems = useSelect(
+		( select, registry ) => {
+			return data.filter( ( item ) => {
+				return actions.some(
+					( action ) =>
+						action.supportsBulk &&
+						( ! action.isEligible ||
+							action.isEligible( item, { registry } ) )
+				);
+			} );
+		},
+		[ data, actions ]
+	);
 	const selectedItems = data.filter(
 		( item ) =>
 			selection.includes( getItemId( item ) ) &&
@@ -223,13 +225,7 @@ function ActionButton< Item >( {
 	setActionInProgress,
 }: ActionButtonProps< Item > ) {
 	const registry = useRegistry();
-	const selectedEligibleItems = useSelect( () => {
-		return selectedItems.filter( ( item ) => {
-			return (
-				! action.isEligible || action.isEligible( item, { registry } )
-			);
-		} );
-	}, [ action, selectedItems, registry ] );
+	const selectedEligibleItems = useEligibleItems( action, selectedItems );
 	if ( 'RenderModal' in action ) {
 		return (
 			<ActionWithModal
@@ -346,21 +342,23 @@ function FooterContent< Item >( {
 	);
 	const footerContentRef = useRef< React.JSX.Element >( undefined );
 	const isMobile = useViewportMatch( 'medium', '<' );
-	const registry = useRegistry();
 
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-	const selectableItems = useSelect( () => {
-		return data.filter( ( item ) => {
-			return bulkActions.some(
-				( action ) =>
-					! action.isEligible ||
-					action.isEligible( item, { registry } )
-			);
-		} );
-	}, [ data, bulkActions, registry ] );
+	const selectableItems = useSelect(
+		( select, registry ) => {
+			return data.filter( ( item ) => {
+				return bulkActions.some(
+					( action ) =>
+						! action.isEligible ||
+						action.isEligible( item, { registry } )
+				);
+			} );
+		},
+		[ data, bulkActions ]
+	);
 
 	const selectedItems = useMemo( () => {
 		return data.filter(
@@ -371,7 +369,7 @@ function FooterContent< Item >( {
 	}, [ selection, data, getItemId, selectableItems ] );
 
 	const actionsToShow = useSelect(
-		() =>
+		( select, registry ) =>
 			actions.filter( ( action ) => {
 				return (
 					action.supportsBulk &&
@@ -383,7 +381,7 @@ function FooterContent< Item >( {
 					)
 				);
 			} ),
-		[ actions, selectedItems, isMobile, registry ]
+		[ actions, selectedItems, isMobile ]
 	);
 	if ( ! actionInProgress ) {
 		if ( footerContentRef.current ) {

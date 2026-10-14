@@ -3,11 +3,12 @@ import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { Menu, Stack } from '@wordpress/ui';
 import { kebabCase } from '@wordpress/kebab-case';
+import useEligibleActions from '../../hooks/use-eligible-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 
 export interface ActionTriggerProps< Item > {
@@ -166,18 +167,7 @@ export default function ItemActions< Item >( {
 	isCompact,
 }: ItemActionsProps< Item > ) {
 	const registry = useRegistry();
-	// If an action is eligible for all items, doesn't need
-	// to provide the `isEligible` function. Eligibility is evaluated in
-	// `useSelect`, so it's evaluated again when the data it reads changes.
-	const eligibleActions = useSelect(
-		() =>
-			actions.filter(
-				( action ) =>
-					! action.isEligible ||
-					action.isEligible( item, { registry } )
-			),
-		[ actions, item, registry ]
-	);
+	const eligibleActions = useEligibleActions( actions, item );
 	const primaryActions = useMemo(
 		() => eligibleActions.filter( ( action ) => action.isPrimary ),
 		[ eligibleActions ]

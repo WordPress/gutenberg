@@ -4,7 +4,7 @@ import {
 	Button,
 	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
@@ -13,6 +13,7 @@ import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action, ActionButton as ActionButtonType } from '../../types';
 import getFooterMessage from '../../utils/get-footer-message';
+import useEligibleItems from '../../hooks/use-eligible-items';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -107,15 +108,7 @@ function ActionButton< Item >( {
 
 	// `items` holds the current page's selection only, so an action without
 	// `isEligible` stays enabled for a selection made on other pages.
-	// Eligibility is evaluated in `useSelect`, so it's evaluated again when
-	// the data it reads changes.
-	const eligibleItems = useSelect(
-		() =>
-			isEligible
-				? items.filter( ( item ) => isEligible( item, { registry } ) )
-				: items,
-		[ isEligible, items, registry ]
-	);
+	const eligibleItems = useEligibleItems( action, items );
 	const _label = typeof label === 'string' ? label : label( items );
 	const variant = isPrimary ? 'primary' : 'tertiary';
 	const isInProgress = id === actionInProgress;

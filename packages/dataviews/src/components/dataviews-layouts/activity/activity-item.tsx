@@ -1,10 +1,11 @@
 import clsx from 'clsx';
 import { useRef, useContext, useMemo } from '@wordpress/element';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import ItemActions, { PrimaryActions } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
+import useEligibleActions from '../../../hooks/use-eligible-actions';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 import type { NormalizedField, ViewActivityProps } from '../../../types';
 
@@ -41,18 +42,7 @@ function ActivityItem< Item >(
 	const registry = useRegistry();
 	const { paginationInfo } = useContext( DataViewsContext );
 
-	// If an action is eligible for all items, doesn't need
-	// to provide the `isEligible` function. Eligibility is evaluated in
-	// `useSelect`, so it's evaluated again when the data it reads changes.
-	const eligibleActions = useSelect(
-		() =>
-			actions.filter(
-				( action ) =>
-					! action.isEligible ||
-					action.isEligible( item, { registry } )
-			),
-		[ actions, item, registry ]
-	);
+	const eligibleActions = useEligibleActions( actions, item );
 	const primaryActions = useMemo(
 		() => eligibleActions.filter( ( action ) => action.isPrimary ),
 		[ eligibleActions ]
