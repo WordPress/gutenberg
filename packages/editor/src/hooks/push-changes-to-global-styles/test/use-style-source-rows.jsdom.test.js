@@ -66,22 +66,26 @@ describe( 'getStyleSourceRows', () => {
 			id: 'color.text',
 			value: 'Vivid Red',
 			replacedValue: 'Accent',
-			sourceLabel: '“Outline” block style variation',
+			sourceLabel: 'Outline style',
 			presetAttributes: [ 'textColor' ],
 		} );
 	} );
 
-	it( 'shows the `inherit` keyword as its real value, with its source', () => {
+	it( 'drops rows that resolve to no value, and overrides of them', () => {
 		const { changed, inherited } = getStyleSourceRows( {
 			...base,
 			attributes: { style: { typography: { letterSpacing: '1px' } } },
 			inheritedValue: {
 				typography: { letterSpacing: 'inherit', fontFamily: 'inherit' },
+				color: { gradient: 'transparent none', background: 'none' },
 			},
 			sources: {
 				'typography.letterSpacing': { layer: 'element' },
 				'typography.fontFamily': { layer: 'element' },
+				'color.gradient': { layer: 'blockVariation' },
+				'color.background': { layer: 'element' },
 			},
+			supportedPaths: [ ...base.supportedPaths, 'color.gradient' ],
 			elements: [ 'button' ],
 			elementStyles: {
 				button: {
@@ -89,20 +93,73 @@ describe( 'getStyleSourceRows', () => {
 						letterSpacing: 'inherit',
 						fontFamily: 'inherit',
 					},
+					color: { background: 'none' },
 				},
 			},
 		} );
 
 		expect( changed[ 0 ] ).toMatchObject( {
-			isOverride: true,
-			replacedValue: 'inherit',
-			sourceLabel: 'Button element',
+			isOverride: false,
+			replacedValue: undefined,
+			sourceLabel: 'Not set in Global Styles',
 		} );
+		expect( inherited ).toEqual( [] );
+	} );
+
+	it( 'keeps a plain `transparent` color', () => {
+		const { inherited } = getStyleSourceRows( {
+			...base,
+			attributes: {},
+			inheritedValue: { color: { background: 'transparent' } },
+			sources: { 'color.background': { layer: 'blockVariation' } },
+		} );
+
 		expect( inherited[ 0 ] ).toMatchObject( {
-			id: 'typography.fontFamily',
-			value: 'inherit',
-			sourceLabel: 'Button element',
+			value: 'transparent',
+			sourceLabel: 'Outline style',
 		} );
+	} );
+
+	it( 'merges border parts from one source into one row', () => {
+		const { inherited } = getStyleSourceRows( {
+			...base,
+			attributes: {},
+			inheritedValue: {
+				border: { width: '1px', style: 'solid', color: 'currentColor' },
+			},
+			sources: {
+				'border.width': { layer: 'blockVariation' },
+				'border.style': { layer: 'blockVariation' },
+				'border.color': { layer: 'blockVariation' },
+			},
+			supportedPaths: [ 'border.width', 'border.style', 'border.color' ],
+		} );
+
+		expect( inherited ).toHaveLength( 1 );
+		expect( inherited[ 0 ] ).toMatchObject( {
+			id: 'border',
+			label: 'Border',
+			value: '1px solid currentColor',
+			sourceLabel: 'Outline style',
+		} );
+	} );
+
+	it( 'keeps border parts apart when their sources differ', () => {
+		const { inherited } = getStyleSourceRows( {
+			...base,
+			attributes: {},
+			inheritedValue: { border: { width: '1px', style: 'solid' } },
+			sources: {
+				'border.width': { layer: 'blockVariation' },
+				'border.style': { layer: 'block' },
+			},
+			supportedPaths: [ 'border.width', 'border.style' ],
+		} );
+
+		expect( inherited.map( ( row ) => row.id ) ).toEqual( [
+			'border.width',
+			'border.style',
+		] );
 	} );
 
 	it( 'lists inherited values with their source', () => {
@@ -124,7 +181,7 @@ describe( 'getStyleSourceRows', () => {
 		} );
 
 		expect( inherited.map( ( row ) => row.sourceLabel ) ).toEqual( [
-			'Typography style',
+			'Site typography',
 			'Button element',
 		] );
 	} );

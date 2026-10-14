@@ -11,6 +11,7 @@ import { unlock } from '../../lock-unlock';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import { STYLE_LABELS, getStyleLabel } from './style-labels';
 import {
+	EMPTY_VALUE_LABEL,
 	formatStyleValue,
 	formatBorderShorthand,
 	formatBorderRadius,
@@ -43,6 +44,31 @@ const LABEL_ORDER = Object.keys( STYLE_LABELS );
 
 const isSet = ( value ) =>
 	value !== undefined && value !== null && value !== '';
+
+// Keywords that resolve to no value of their own. The Outline variation's
+// gradient reads `transparent none`, so `transparent` counts beside them.
+const NO_VALUE_KEYWORDS = [ 'inherit', 'none' ];
+
+// Whether a formatted value says nothing about how the block looks, such as
+// `inherit`, `none` or an empty value.
+function isNoValue( value ) {
+	const tokens = String( value ?? '' )
+		.trim()
+		.split( /\s+/ )
+		.filter( Boolean );
+	return (
+		! tokens.length ||
+		tokens.every( ( token ) => token === EMPTY_VALUE_LABEL ) ||
+		( tokens.every(
+			( token ) =>
+				NO_VALUE_KEYWORDS.includes( token ) || token === 'transparent'
+		) &&
+			tokens.some( ( token ) => NO_VALUE_KEYWORDS.includes( token ) ) )
+	);
+}
+
+// Border parts that read as one "Border" row when one source sets them all.
+const BORDER_PARTS = [ 'border.width', 'border.style', 'border.color' ];
 
 const getAtPath = ( object, path ) =>
 	path.reduce( ( value, key ) => value?.[ key ], object );
@@ -126,9 +152,11 @@ function isSupportedPath( key, supportedPaths ) {
  *
  * Every value the block sets on itself is a changed row, whether or not it
  * replaces anything: a local value with nothing underneath reads as "Not set
- * in Global Styles". Every inherited value the block does not change is an
- * inherited row, named by the Global Styles layer `resolveStyle` reports.
- * Nothing else is shown, so no row claims a source the engine did not resolve.
+ * in Global Styles", as does one that replaces only `inherit` or `none`. Every
+ * inherited value the block does not change is an inherited row, named by the
+ * Global Styles layer `resolveStyle` reports, unless it is `inherit`, `none` or
+ * empty. Nothing else is shown, so no row claims a source the engine did not
+ * resolve.
  *
  * @param {Object}   options                Options.
  * @param {Object}   options.attributes     Block attributes.
@@ -239,7 +267,14 @@ export function getStyleSourceRows( {
 				? `var:preset|${ PRESET_ATTRIBUTES[ presetAttribute ].type }|${ attributes[ presetAttribute ] }`
 				: getAtPath( style, path );
 			const inherited = getAtPath( inheritedValue, path );
-			const source = isSet( inherited ) ? getSource( key ) : null;
+			const replacedValue = isSet( inherited )
+				? formatRowValue( key, inherited, resolve )
+				: undefined;
+			// Replacing `inherit` or `none` replaces nothing a person can see.
+			const source =
+				isSet( inherited ) && ! isNoValue( replacedValue )
+					? getSource( key )
+					: null;
 			return {
 				id: key,
 				path,
@@ -249,9 +284,7 @@ export function getStyleSourceRows( {
 					? resolve( localValue )
 					: undefined,
 				isOverride: !! source,
-				replacedValue: source
-					? formatRowValue( key, inherited, resolve )
-					: undefined,
+				replacedValue: source ? replacedValue : undefined,
 				sourceLabel: describeSource( key, source ),
 				leafPaths,
 				presetAttributes,
@@ -281,12 +314,43 @@ export function getStyleSourceRows( {
 					: undefined,
 				sourceLabel: describeSource( key, getSource( key ) ),
 			};
-		} );
+		} )
+		.filter( ( row ) => ! isNoValue( row.value ) );
+
+	// One source setting width, style and color reads as one "Border" row.
+	const borderParts = inherited.filter( ( row ) =>
+		BORDER_PARTS.includes( row.id )
+	);
+	const mergedRows =
+		borderParts.length > 1 &&
+		borderParts.every(
+			( row ) => row.sourceLabel === borderParts[ 0 ].sourceLabel
+		)
+			? [
+					...inherited.filter(
+						( row ) => ! BORDER_PARTS.includes( row.id )
+					),
+					{
+						id: 'border',
+						path: [ 'border' ],
+						label: getStyleLabel( [ 'border' ] ),
+						value: formatBorderShorthand(
+							Object.fromEntries(
+								borderParts.map( ( row ) => [
+									row.path[ 1 ],
+									getAtPath( inheritedValue, row.path ),
+								] )
+							)
+						),
+						sourceLabel: borderParts[ 0 ].sourceLabel,
+					},
+				]
+			: inherited;
 
 	const byKey = ( a, b ) => compareRowKeys( a.id, b.id );
 	return {
 		changed: changed.sort( byKey ),
-		inherited: inherited.sort( byKey ),
+		inherited: mergedRows.sort( byKey ),
 	};
 }
 
