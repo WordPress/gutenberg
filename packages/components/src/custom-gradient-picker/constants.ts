@@ -38,6 +38,7 @@ export const RECTANGULAR_INTERPOLATION_COLOR_SPACES = [
 	'srgb',
 	'srgb-linear',
 	'display-p3',
+	'display-p3-linear',
 	'a98-rgb',
 	'prophoto-rgb',
 	'rec2020',

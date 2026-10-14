@@ -111,6 +111,53 @@ describe( 'getGradientAstWithDefault', () => {
 			);
 		} );
 
+		// The keywords below are copied from the CSS Color 4 grammar for
+		// `<rectangular-color-space>`, `<polar-color-space>` and
+		// `<hue-interpolation-method>`, so that a keyword missing from the
+		// picker's own lists is caught.
+		// See https://www.w3.org/TR/css-color-4/#interpolation-space.
+		test.each( [
+			'srgb',
+			'srgb-linear',
+			'display-p3',
+			'display-p3-linear',
+			'a98-rgb',
+			'prophoto-rgb',
+			'rec2020',
+			'lab',
+			'oklab',
+			'xyz',
+			'xyz-d50',
+			'xyz-d65',
+			'hsl',
+			'hwb',
+			'lch',
+			'oklch',
+		] )( 'reads the %s color space', ( colorSpace ) => {
+			const { gradientAST, hasGradient } = getGradientAstWithDefault(
+				`linear-gradient(in ${ colorSpace } 160deg, #009ED4 0%, #FFCE00 100%)`
+			);
+
+			expect( hasGradient ).toBe( true );
+			expect( gradientAST.colorInterpolation ).toBe(
+				`in ${ colorSpace }`
+			);
+		} );
+
+		test.each( [ 'shorter', 'longer', 'increasing', 'decreasing' ] )(
+			'reads the %s hue interpolation method',
+			( method ) => {
+				const { gradientAST, hasGradient } = getGradientAstWithDefault(
+					`linear-gradient(in oklch ${ method } hue 160deg, #009ED4 0%, #FFCE00 100%)`
+				);
+
+				expect( hasGradient ).toBe( true );
+				expect( gradientAST.colorInterpolation ).toBe(
+					`in oklch ${ method } hue`
+				);
+			}
+		);
+
 		test( 'falls back to the default gradient for an unknown color space', () => {
 			const { gradientAST, hasGradient } = getGradientAstWithDefault(
 				'linear-gradient(in not-a-space 160deg, #009ED4 0%, #FFCE00 100%)'
