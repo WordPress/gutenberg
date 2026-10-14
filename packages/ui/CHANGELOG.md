@@ -30,7 +30,7 @@
 ### Bug Fixes
 
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
--   `Avatar`: Show missing and failed image fallbacks immediately despite a delay, scale fallback SVGs with the avatar, and preserve decorative avatar layout and typography inside wp-admin trees ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
+-   `Avatar`: Show missing and failed image fallbacks immediately despite a delay, preserve fallback render state, scale fallback SVGs with the avatar, and preserve decorative avatar layout and typography inside wp-admin trees ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
 
 -   `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of its wrapper, while retaining navigation landmark labels for page breadcrumbs ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb`: Align button, link, and current-item padding, separate button hover backgrounds from separators, and preserve list semantics in Safari ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).

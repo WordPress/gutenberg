@@ -36,12 +36,16 @@ export type ImageProps = Omit<
 	alt?: ComponentProps< typeof _Avatar.Image >[ 'alt' ];
 };
 
-export type FallbackProps = ComponentProps< typeof _Avatar.Fallback > & {
-	/**
-	 * Custom fallback content. Omit to display the standard person icon.
-	 */
-	children?: React.ReactNode;
-};
+export type FallbackProps = Omit<
+	ComponentProps< typeof _Avatar.Fallback >,
+	'render'
+> &
+	Pick< _Avatar.Fallback.Props, 'render' > & {
+		/**
+		 * Custom fallback content. Omit to display the standard person icon.
+		 */
+		children?: React.ReactNode;
+	};
 
 export type InitialsProps = Omit< FallbackProps, 'children' > & {
 	/**

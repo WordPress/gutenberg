@@ -65,6 +65,45 @@ describe( 'Avatar fallback', () => {
 	} );
 } );
 
+describe( 'Avatar custom rendering', () => {
+	it.each( [ 'Fallback', 'Initials' ] as const )(
+		'passes image loading state to custom %s rendering',
+		( part ) => {
+			const customRender: React.ComponentProps<
+				typeof Avatar.Fallback
+			>[ 'render' ] = ( elementProps, state ) => (
+				<span { ...elementProps } title={ state.imageLoadingStatus } />
+			);
+			const fallback =
+				part === 'Fallback' ? (
+					<Avatar.Fallback render={ customRender }>
+						AM
+					</Avatar.Fallback>
+				) : (
+					<Avatar.Initials
+						name="Alex Morgan"
+						render={ customRender }
+					/>
+				);
+			const { rerender } = render(
+				<Avatar.Root>{ fallback }</Avatar.Root>
+			);
+			expect( screen.getByTitle( 'idle' ) ).toHaveTextContent( 'AM' );
+
+			rerender(
+				<Avatar.Root>
+					{ fallback }
+					<Avatar.Image src="/portrait.png" alt="" keepMounted />
+				</Avatar.Root>
+			);
+			expect( screen.getByTitle( 'loading' ) ).toHaveTextContent( 'AM' );
+
+			fireEvent.error( screen.getByAltText( '' ) );
+			expect( screen.getByTitle( 'error' ) ).toHaveTextContent( 'AM' );
+		}
+	);
+} );
+
 describe( 'Avatar initials', () => {
 	it.each( [
 		[ '  Alex   Morgan  ', 'AM' ],
