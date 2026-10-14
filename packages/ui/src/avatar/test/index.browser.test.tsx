@@ -8,6 +8,33 @@ import * as Avatar from '../index';
 import { ThemeProvider } from '../../utils/theme-provider';
 import { Icon } from '../../icon';
 
+const sizes = [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const;
+
+async function renderGallery(
+	shape: 'circle' | 'square',
+	kind: 'person' | 'site'
+) {
+	await render(
+		<ThemeProvider>
+			{ sizes.map( ( size ) => (
+				<Avatar.Root
+					key={ size }
+					size={ size }
+					shape={ shape }
+					role="img"
+					aria-label={ `${ size } ${ kind }` }
+				>
+					<Avatar.Fallback>
+						{ kind === 'site' ? (
+							<Icon icon={ globe } role="presentation" />
+						) : undefined }
+					</Avatar.Fallback>
+				</Avatar.Root>
+			) ) }
+		</ThemeProvider>
+	);
+}
+
 describe( 'Avatar layout', () => {
 	it( 'keeps decorative avatars in flow with their typography inside wp-admin trees', async () => {
 		const avatarRef = createRef< HTMLSpanElement >();
@@ -44,58 +71,75 @@ describe( 'Avatar layout', () => {
 	} );
 
 	it.each( [ 'circle', 'square' ] as const )(
-		'fits default and custom fallback graphics at every size with shape=%s',
+		'crops the person shoulders at the frame and keeps the head centered with shape=%s',
 		async ( shape ) => {
-			await render(
-				<ThemeProvider>
-					{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
-						( size ) => (
-							<div key={ size }>
-								<Avatar.Root
-									size={ size }
-									shape={ shape }
-									role="img"
-									aria-label={ `${ size } person` }
-								>
-									<Avatar.Fallback />
-								</Avatar.Root>
-								<Avatar.Root
-									size={ size }
-									shape={ shape }
-									role="img"
-									aria-label={ `${ size } site` }
-								>
-									<Avatar.Fallback>
-										<Icon
-											icon={ globe }
-											role="presentation"
-										/>
-									</Avatar.Fallback>
-								</Avatar.Root>
-							</div>
-						)
-					) }
-				</ThemeProvider>
-			);
-			for ( const size of [ 'xs', 'sm', 'md', 'lg', 'xl' ] ) {
-				for ( const kind of [ 'person', 'site' ] ) {
-					const avatar = screen.getByRole( 'img', {
-						name: `${ size } ${ kind }`,
-					} );
-					const icon = within( avatar ).getByRole( 'presentation', {
-						hidden: true,
-					} );
-					expect( icon ).toBeInTheDocument();
-					const frame = avatar.getBoundingClientRect();
-					const graphic = icon.getBoundingClientRect();
-					expect( graphic.width ).toBeGreaterThan( 0 );
-					expect( graphic.width ).toBeLessThan( frame.width );
-					expect( graphic.height ).toBeLessThan( frame.height );
-					expect( graphic.left ).toBeGreaterThan( frame.left );
-					expect( graphic.right ).toBeLessThan( frame.right );
-					expect( graphic.top ).toBeGreaterThan( frame.top );
-					expect( graphic.bottom ).toBeLessThan( frame.bottom );
-				}
+			await renderGallery( shape, 'person' );
+			for ( const size of sizes ) {
+				const avatar = screen.getByRole( 'img', {
+					name: `${ size } person`,
+				} );
+				const icon = within( avatar ).getByRole( 'presentation', {
+					hidden: true,
+				} );
+				// eslint-disable-next-line testing-library/no-node-access -- Decorative SVG shapes have no semantic queries; inspect their rendered geometry.
+				const headShape = icon.querySelector( 'circle' )!;
+				// eslint-disable-next-line testing-library/no-node-access -- Verify the painted shoulders reach the frame.
+				const torsoShape = icon.querySelector( 'path' )!;
+				// eslint-disable-next-line testing-library/no-node-access -- The fallback is the SVG's clipping frame, inside Avatar's border.
+				const clippingFrame = icon.parentElement!;
+				const frame = clippingFrame.getBoundingClientRect();
+				const head = headShape.getBoundingClientRect();
+				const torso = torsoShape.getBoundingClientRect();
+				const graphic = icon.getBoundingClientRect();
+				const stroke =
+					( parseFloat( getComputedStyle( icon ).strokeWidth ) *
+						graphic.width ) /
+					24;
+				expect( head.top - stroke / 2 ).toBeGreaterThan( frame.top );
+				expect( head.left - stroke / 2 ).toBeGreaterThan( frame.left );
+				expect( head.right + stroke / 2 ).toBeLessThan( frame.right );
+				expect(
+					Math.abs(
+						head.left +
+							head.width / 2 -
+							frame.left -
+							frame.width / 2
+					)
+				).toBeLessThan( 0.1 );
+				expect( torso.left - stroke / 2 ).toBeLessThanOrEqual(
+					frame.left
+				);
+				expect( torso.right + stroke / 2 ).toBeGreaterThanOrEqual(
+					frame.right
+				);
+				expect( torso.bottom ).toBeGreaterThan( frame.bottom );
+				expect( getComputedStyle( clippingFrame ).overflow ).toBe(
+					'hidden'
+				);
+			}
+		}
+	);
+
+	it.each( [ 'circle', 'square' ] as const )(
+		'fits custom fallback graphics at every size with shape=%s',
+		async ( shape ) => {
+			await renderGallery( shape, 'site' );
+			for ( const size of sizes ) {
+				const avatar = screen.getByRole( 'img', {
+					name: `${ size } site`,
+				} );
+				const icon = within( avatar ).getByRole( 'presentation', {
+					hidden: true,
+				} );
+				const frame = avatar.getBoundingClientRect();
+				const graphic = icon.getBoundingClientRect();
+				expect( graphic.width ).toBeGreaterThan( 0 );
+				expect( graphic.width ).toBeLessThan( frame.width );
+				expect( graphic.height ).toBeLessThan( frame.height );
+				expect( graphic.left ).toBeGreaterThan( frame.left );
+				expect( graphic.right ).toBeLessThan( frame.right );
+				expect( graphic.top ).toBeGreaterThan( frame.top );
+				expect( graphic.bottom ).toBeLessThan( frame.bottom );
 			}
 		}
 	);
