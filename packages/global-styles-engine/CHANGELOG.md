@@ -9,7 +9,7 @@
 
 ### Enhancements
 
--   Output a custom duotone, a list of colors in a block's `filter.duotone`, as `filter: url(#id)` with a matching SVG filter, including in block style variations ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Output a custom duotone, a list of colors in a block's `filter.duotone`, as `filter: url(#id)` with a matching SVG filter, including in block style variations ([#84670](https://github.com/WordPress/gutenberg/pull/84670)).
 
 ## 1.24.0 (2026-10-07)
 
