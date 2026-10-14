@@ -55,24 +55,13 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * The callbacks a test hooked to `wp_actions_api_init`, removed on tear
-	 * down.
-	 *
-	 * @var callable[]
-	 */
-	private $callbacks = array();
-
-	/**
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the actions a test registered; the next
-	 * read fires `wp_actions_api_init` again.
+	 * read fires `wp_actions_api_init` again. The test case removes the
+	 * callbacks the test hooked.
 	 */
 	public function tear_down() {
-		foreach ( $this->callbacks as $callback ) {
-			remove_action( 'wp_actions_api_init', $callback );
-		}
-		$this->callbacks = array();
 		self::reset_registry();
 
 		parent::tear_down();
@@ -112,7 +101,6 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 			$registered = wp_register_actions( 'test-plugin', $kind, $name, $actions, $module );
 		};
 		add_action( 'wp_actions_api_init', $callback );
-		$this->callbacks[] = $callback;
 
 		self::reset_registry();
 		WP_Actions_Registry::get_instance()->get_all_registered();

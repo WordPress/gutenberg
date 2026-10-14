@@ -17,14 +17,6 @@
 class Tests_Actions_API extends WP_UnitTestCase {
 
 	/**
-	 * The callbacks a test hooked to `wp_actions_api_init`, as callback and
-	 * priority pairs, removed on tear down.
-	 *
-	 * @var array[]
-	 */
-	private $callbacks = array();
-
-	/**
 	 * Sets up each test: the default actions of the tests are registered at
 	 * priority 0, so every test runs against a registry holding actions
 	 * registered before the callbacks hooked at the default priority run.
@@ -39,14 +31,10 @@ class Tests_Actions_API extends WP_UnitTestCase {
 	 *
 	 * Resetting the registry drops the actions a test registered along with
 	 * the defaults; the next read fires `wp_actions_api_init` again and
-	 * registers the defaults anew.
+	 * registers the defaults anew. The test case removes the callbacks the
+	 * test hooked, the defaults included.
 	 */
 	public function tear_down() {
-		remove_action( 'wp_actions_api_init', array( __CLASS__, 'register_default_actions' ), 0 );
-		foreach ( $this->callbacks as list( $callback, $priority ) ) {
-			remove_action( 'wp_actions_api_init', $callback, $priority );
-		}
-		$this->callbacks = array();
 		self::reset_registry();
 
 		parent::tear_down();
@@ -97,15 +85,13 @@ class Tests_Actions_API extends WP_UnitTestCase {
 	 * Registering and unregistering only run on the action, so this is how a
 	 * test alters the registry, as a plugin does. The registry is reset and
 	 * read, which fires the action: the defaults are registered again and
-	 * the callbacks hooked so far replay, in order. The callbacks are
-	 * removed on tear down.
+	 * the callbacks hooked so far replay, in order.
 	 *
 	 * @param callable $callback The callback.
 	 * @param int      $priority The priority. Default 10, after the defaults.
 	 */
 	private function on_actions_api_init( $callback, $priority = 10 ) {
 		add_action( 'wp_actions_api_init', $callback, $priority );
-		$this->callbacks[] = array( $callback, $priority );
 
 		self::reset_registry();
 		WP_Actions_Registry::get_instance()->get_all_registered();
@@ -516,13 +502,9 @@ class Tests_Actions_API extends WP_UnitTestCase {
 		};
 		add_action( 'wp_actions_api_init', $callback );
 
-		try {
-			self::reset_registry();
-			$actions = wp_get_registered_actions( 'postType', 'page' );
-			$modules = wp_get_registered_action_modules( 'postType', 'page' );
-		} finally {
-			remove_action( 'wp_actions_api_init', $callback );
-		}
+		self::reset_registry();
+		$actions = wp_get_registered_actions( 'postType', 'page' );
+		$modules = wp_get_registered_action_modules( 'postType', 'page' );
 
 		$this->assertSame(
 			array(
