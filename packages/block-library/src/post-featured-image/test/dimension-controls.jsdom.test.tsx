@@ -21,11 +21,11 @@ function Example( { attributes = {}, setAttributes = () => {} } ) {
 }
 
 describe( 'PostFeaturedImage dimension controls', () => {
-	it( 'offers scale when only a height is set', () => {
+	it( 'offers scale when only a height is set', async () => {
 		render( <Example attributes={ { height: '200px' } } /> );
 
 		expect(
-			screen.getByRole( 'radiogroup', { name: 'Scale' } )
+			await screen.findByRole( 'radiogroup', { name: 'Scale' } )
 		).toBeInTheDocument();
 	} );
 
