@@ -349,9 +349,7 @@ The returned value is used to change the inner content of the element: `<div>val
 
 ### `wp-html`
 
-It sets the inner HTML of an element, rendering markup instead of the plain text `wp-text` would produce. The element's content always matches the value the reference resolves to: a value returned by `asDangerousHTML()` renders its HTML, a pending value leaves the server-rendered content as it is, and any other value, `null` included, leaves the element empty. The [lifecycle](#lifecycle) section describes each case.
-
-Because rendering arbitrary HTML is a security concern, `wp-html` only accepts a value returned by `asDangerousHTML()`, exported from `@wordpress/interactivity`. Passing a plain string directly never renders it, by design: the plugin's JavaScript has to explicitly opt in to rendering that string as markup.
+It sets the inner HTML of an element from a value created with `asDangerousHTML()`, exported from `@wordpress/interactivity`. Because rendering arbitrary HTML is a security concern, a plain string is never rendered as HTML, by design: the plugin's JavaScript has to explicitly opt in. The server doesn't process this directive, so the element's server-rendered content is the fallback until hydration.
 
 ```html
 <div data-wp-interactive="myPlugin">
@@ -375,53 +373,34 @@ store( 'myPlugin', {
 } );
 ```
 
-#### Content ownership
+#### Values
 
-An element with a `data-wp-html` attribute owns its content: the server-rendered fallback and any HTML `wp-html` inserts. When the element is inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API treats that content as inert:
+The element shows what its reference resolves to, calling it first when it is a function:
 
--   **Directives** inside the content are never processed: not on hydration, not on updates, and not on client-side navigation.
--   **Interactive islands** inside the content (elements with `data-wp-interactive`) are never hydrated, and none of their directives run.
+-   A value returned by `asDangerousHTML()` renders its HTML.
+-   A pending value, which is server-computed derived state that the client hasn't defined yet, keeps the current content. This is how the server-rendered fallback stays visible while a store loads.
+-   `null` and `undefined` empty the element. So do a path that doesn't exist and a getter or function that throws.
+-   Anything else, plain strings included, empties the element, and a warning is shown in development mode.
 
-Outside every interactive region, a `data-wp-html` attribute is plain markup. No directive runs on that element, `wp-html` never empties or replaces its content, and the islands inside it hydrate as usual.
+To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page.
 
-Router regions are the exception: regions nested inside the content (elements with `data-wp-router-region`) aren't excluded from [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md) yet.
+#### Inert content
+
+Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Router regions nested in the content aren't excluded from [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md) yet. Outside any interactive region, the attribute does nothing and the element is plain markup.
 
 #### Conflicts with other directives
 
-`data-wp-text`, `data-wp-each` and `data-wp-router-region` each own the content of the element they sit on. When one of them is on the same element as `data-wp-html`, `wp-html` yields: it writes no HTML, the element's descendants aren't inert content, and the element and its descendants behave exactly as they would without the `data-wp-html` attribute.
-
--   **Any spelling counts.** Any attribute the Interactivity API parses as one of these directives triggers the rule, with or without a suffix or a unique ID: `data-wp-text--x` and `data-wp-each----` included. Only the presence of the attribute matters, even if the other directive does nothing with that spelling or element, such as `data-wp-each` on an element that isn't a `<template>`. The element then behaves as it does without `data-wp-html`, including whatever that directive does or warns about.
--   **Several at once.** When more than one of the three is present, `wp-html` yields to all of them, and their interaction with each other is unchanged.
--   **Every `data-wp-html` spelling yields.** On a conflicting element the Interactivity API ignores every `data-wp-html` attribute, including the suffixed and unique-ID spellings (`data-wp-html--suffix`, `data-wp-html---id`), which `wp-html` otherwise doesn't support and warns about under `SCRIPT_DEBUG`. The conflict warning below is the only `data-wp-html` message on such an element.
--   **Markup decides.** The outcome is the same in every attribute order and for every value the directives resolve to, including pending values, `null` and tokens. A router region that carries `data-wp-html` takes the destination page's content on navigation like any other region, and the HTML is never written into it.
--   **Development warning.** Under `SCRIPT_DEBUG`, the console warns that `data-wp-html` was ignored and names the directives it yielded to, in the order `data-wp-text`, `data-wp-each`, `data-wp-router-region`. Without `SCRIPT_DEBUG` nothing is logged. An element outside every interactive region logs nothing. The other directive's own behavior and warnings don't change.
-
-The rule covers only these three directives. A `data-wp-html` element with any other directive on the same element keeps owning its content.
-
-#### Lifecycle
-
-The server leaves `wp-html` unprocessed, so the element's server-rendered content serves as a fallback until hydration runs (and stays visible if JavaScript never loads, or on a version of the Interactivity API that doesn't support this directive yet). After that, the directive decides what the element shows from the value its reference resolves to, on hydration and on every later update. A reference can resolve to a getter or a function: the directive calls a function and uses its return value.
-
--   **A token.** A value returned by `asDangerousHTML()` shows its HTML.
--   **A pending value.** The content is left as it is. A reference is pending when it reads server-computed derived state that the client store hasn't defined yet. This is the only case in which server-rendered content survives without a token. A function that throws while reading pending state isn't pending: it counts as a function that throws, described next.
--   **`null` and `undefined`.** Both are valid values meaning "empty": the element is emptied and nothing is logged. A state or context path that doesn't exist, a getter that throws, and a function that throws resolve to `undefined`, so they empty the element silently too. The error doesn't escape the directive, and other directives and islands on the page keep rendering. A getter that returns `null` while its content loads therefore empties the server-rendered fallback at hydration.
--   **Any other value.** A plain string (the empty string included), a number, a boolean, or an object that isn't a token empties the element. Under `SCRIPT_DEBUG`, the console warns that the value isn't trusted HTML. Without `SCRIPT_DEBUG` nothing is logged.
--   **Nothing is kept for having been there.** Trusted HTML that rendered earlier doesn't survive a later `null`, `undefined` or invalid value, and it renders again if its token returns. Only a pending value leaves the existing content alone.
--   **First value after hydration.** When a pending value later resolves to a token, whether its store loads after hydration or state is set later, the element changes at most once, and the change is the trusted HTML: the directive never empties the element first or rewrites its fallback. If the element's current `innerHTML` already equals the HTML exactly, there's no write and the server-rendered nodes stay in place. The same applies when the value is available at hydration.
--   **Later changes.** Each change to a different trusted HTML value causes one write, of that value. Outside client-side navigation, nothing else changes a hydrated element's content except emptying it when its value calls for that.
--   **Elements created after hydration.** Elements the Interactivity API creates, such as the items of a `data-wp-each` list, show their fallback while their value is pending, the trusted HTML once a token resolves, and no content for `null`, `undefined` or an invalid value. An element created after its value has already resolved to a token shows the trusted HTML.
--   **Client-side navigation.** When navigation updates a region and keeps an element's DOM node, the element follows its value on the destination page once navigation completes. An element that navigation creates follows the rule for created elements above.
-    -   **A token** shows its HTML. When that HTML equals what the element showed before, the element isn't rewritten, and the destination's fallback never replaces it.
-    -   **`null`, `undefined` or an invalid value** empties the element, with the warning described above for an invalid value. The trusted HTML shown before navigation isn't kept.
-    -   **A pending value** leaves the element as it is: it keeps what it showed before navigation (trusted HTML, its earlier fallback, or nothing), and the destination page's server-rendered content for it never replaces that. When a token resolves, the element shows its HTML.
--   **Rejected writes.** When the browser rejects a token's HTML, as a site enforcing Trusted Types does (see the [security contract](#security-contract)), the directive empties the element instead of keeping its existing content. The same HTML isn't written again until the element's value changes to different content. Under `SCRIPT_DEBUG`, the console warns that the browser rejected the value and the element was emptied. Without `SCRIPT_DEBUG` nothing is logged. No error escapes, and other directives and islands on the page keep rendering.
+On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`, `data-wp-html` is ignored, and the element behaves as it does without it. A warning is shown in development mode.
 
 #### Security contract
 
 -   **`asDangerousHTML()` does not sanitize.** It performs no processing at all on the HTML it's given — the same responsibility a developer takes on using React's `dangerouslySetInnerHTML`. Treating untrusted input as trusted here is an XSS risk. Never pass it raw user-supplied content or a `context` value directly: `context` is meant for selecting *which* trusted markup to show (e.g. an ID or a flag), while the actual HTML should come from `state`, computed by your plugin's own code from a source it trusts (its own bundled markup, or a response from an endpoint it controls).
 -   **The returned value is opaque and identity-based, not content-based.** It carries no inspectable trace of the HTML it wraps. Adding it to `data-wp-context`, spreading it into a new object, or serializing it as JSON does not carry the "trusted" marker along with it — only a `wp-html` reference that resolves directly to the exact value `asDangerousHTML()` returned is ever rendered.
--   **This package creates no Trusted Types policy.** On a site that enforces Trusted Types with no default policy, passing a plain string causes the browser to reject the write; the [rejected writes](#lifecycle) rule describes what happens to the element and when the write is tried again. The supported way to render on such a site is to pass a `TrustedHTML` value from the site's own policy: `asDangerousHTML( myPolicy.createHTML( markup ) )`. That works for elements hydrated from server-rendered markup, including when the value arrives after hydration, and for elements the Interactivity API creates. Emptying an element never needs a policy and is never rejected: the directive empties it with the browser's own empty `TrustedHTML` value where Trusted Types exists, on hydrated and created elements alike. One write remains outside the package's control: when the Interactivity API creates an element whose value is pending and whose fallback isn't empty, such as a `data-wp-each` item or an element added by navigation, Preact writes that fallback as a plain string. A site enforcing Trusted Types rejects that write and the directive can't catch it, so give such elements an empty fallback. This package deliberately doesn't create a policy of its own — that's a decision for the site to make.
--   **"Inert" means inert to the Interactivity API only.** The [content ownership](#content-ownership) rules apply to the fallback and to the HTML `wp-html` inserts alike. But the inserted content is still live browser HTML: a `<script>` tag inside it won't execute, but that's an artifact of how `innerHTML` works, not a security boundary you should rely on. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
+-   **Trusted Types.**
+    -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
+    -   A rejected value empties the element, and a warning is shown in development mode.
+    -   Known limitation: elements created after hydration, such as `data-wp-each` items, whose value is pending must have an empty fallback on sites enforcing Trusted Types.
+-   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`
 
@@ -799,12 +778,7 @@ For server-side rendered lists, another directive called `data-wp-each-child` en
 </ul>
 ```
 
-Inside an interactive region, an interactive island (an element with `data-wp-interactive`) inside a server-rendered `data-wp-each-child` item is never hydrated on its own, whether its list is pending or not. It initializes only as part of the items the list renders:
-
--   **While the list is pending**, the server-rendered items stay in place and none of the directives inside their islands run.
--   **Once the list resolves**, the items rendered from the `<template>` replace the server-rendered ones, and an island in the template initializes once for each rendered item, never for the server-rendered item it replaced.
-
-Islands that come after the list in the document hydrate as usual.
+Inside an interactive region, interactive islands inside server-rendered `data-wp-each-child` items aren't hydrated on their own. They initialize as part of the items the list renders.
 
 ## Values of directives are references to store properties
 
