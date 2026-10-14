@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `test-playwright` and `test-e2e`: Run the tests against the port of the `wp-env` environment that the project tests with, including its override file, when `WP_BASE_URL` is not set. This uses `.wp-env.test.json` when present, uses the development environment when the config has no tests environment, and finds the config files from an npm workspace subdirectory. Previously such projects silently fell back to `http://localhost:8889`, which may belong to another project's environment.
+
 ## 36.1.0 (2026-10-07)
 
 ### Enhancements

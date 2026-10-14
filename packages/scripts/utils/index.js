@@ -29,8 +29,10 @@ const {
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 } = require( './block-json' );
+const { findConfigDirectory, getTestsBaseUrl } = require( './wp-env' );
 
 module.exports = {
+	findConfigDirectory,
 	fromConfigRoot,
 	fromProjectRoot,
 	fromScriptsRoot,
@@ -46,6 +48,7 @@ module.exports = {
 	getWebpackEntryPoints,
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
+	getTestsBaseUrl,
 	hasArgInCLI,
 	hasBabelConfig,
 	hasCssnanoConfig,

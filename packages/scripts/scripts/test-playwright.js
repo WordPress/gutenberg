@@ -16,6 +16,8 @@ const {
 	hasArgInCLI,
 	getArgsFromCLI,
 	getAsBooleanFromENV,
+	getTestsBaseUrl,
+	findConfigDirectory,
 } = require( '../utils' );
 
 /**
@@ -25,7 +27,7 @@ const {
 /**
  * Loads any configuration from a given directory.
  *
- * @type {(configDirectoryPath: string) => Promise<WPConfig> | null}
+ * @type {(configDirectoryPath: string, customConfigPath?: string|null) => Promise<WPConfig> | null}
  */
 let loadConfig = null;
 
@@ -84,10 +86,16 @@ function spawnProcess() {
 	}
 }
 
-if ( loadConfig ) {
-	loadConfig( resolve( '.' ) ).then( ( envConfig ) => {
-		if ( ! process.env.WP_BASE_URL && envConfig?.env?.tests?.port ) {
-			process.env.WP_BASE_URL = `http://localhost:${ envConfig.env.tests.port }`;
+if ( loadConfig && ! process.env.WP_BASE_URL ) {
+	getTestsBaseUrl(
+		loadConfig,
+		findConfigDirectory(
+			resolve( '.' ),
+			process.env.npm_config_local_prefix
+		)
+	).then( ( baseUrl ) => {
+		if ( baseUrl ) {
+			process.env.WP_BASE_URL = baseUrl;
 		}
 		spawnProcess();
 	} );
