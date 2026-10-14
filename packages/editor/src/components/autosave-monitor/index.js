@@ -84,6 +84,8 @@ function ScheduledAutosaveMonitor( { interval } ) {
 
 	// Reference of the edits last sent in an autosave.
 	const lastEditsReferenceRef = useRef();
+	// Interval the stored time was computed with.
+	const scheduledIntervalRef = useRef();
 
 	const { nextAutosaveTime, isSaving, needsAutosave } = useSelect(
 		( select ) => {
@@ -116,7 +118,11 @@ function ScheduledAutosaveMonitor( { interval } ) {
 			}
 			return;
 		}
-		if ( nextAutosaveTime === null ) {
+		if (
+			nextAutosaveTime === null ||
+			scheduledIntervalRef.current !== interval
+		) {
+			scheduledIntervalRef.current = interval;
 			setNextAutosaveTime( Date.now() + interval * 1000 );
 		}
 	}, [
