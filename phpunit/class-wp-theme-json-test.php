@@ -10511,7 +10511,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers WP_Theme_JSON_Gutenberg::sanitize
-	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 * @covers WP_Theme_JSON_Sanitizer_Gutenberg::remove_keys_not_in_schema
 	 */
 	public function test_sanitize_preserves_boolean_values_when_schema_expects_boolean() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -10533,7 +10533,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers WP_Theme_JSON_Gutenberg::sanitize
-	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 * @covers WP_Theme_JSON_Sanitizer_Gutenberg::remove_keys_not_in_schema
 	 */
 	public function test_sanitize_removes_non_boolean_values_when_schema_expects_boolean() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -10555,7 +10555,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers WP_Theme_JSON_Gutenberg::sanitize
-	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 * @covers WP_Theme_JSON_Sanitizer_Gutenberg::remove_keys_not_in_schema
 	 */
 	public function test_sanitize_preserves_boolean_values_in_block_settings() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -10581,7 +10581,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers WP_Theme_JSON_Gutenberg::sanitize
-	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 * @covers WP_Theme_JSON_Sanitizer_Gutenberg::remove_keys_not_in_schema
 	 */
 	public function test_sanitize_removes_non_boolean_values_in_block_settings() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
@@ -10608,7 +10608,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 	/**
 	 * @covers WP_Theme_JSON_Gutenberg::sanitize
-	 * @covers WP_Theme_JSON_Gutenberg::remove_keys_not_in_schema
+	 * @covers WP_Theme_JSON_Sanitizer_Gutenberg::remove_keys_not_in_schema
 	 */
 	public function test_sanitize_preserves_null_schema_behavior() {
 		// Test that settings with null in schema (no type validation) still accept any type.
