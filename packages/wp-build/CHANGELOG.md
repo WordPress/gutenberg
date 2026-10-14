@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   Remove the components-only Emotion Babel transform and its build-time dependencies.
 -   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
 
 ## 0.25.0 (2026-10-07)
