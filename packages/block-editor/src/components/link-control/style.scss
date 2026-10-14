@@ -218,12 +218,8 @@ $block-editor-link-control-number-of-actions: 1;
 		line-height: var(--wpds-typography-line-height-sm);
 
 		&:focus {
-			box-shadow: none;
-		}
-
-		&:focus-visible {
-			@include block-toolbar-button-style__focus();
-			text-decoration: none;
+			// Keep the focus ring rounded, ExternalLink resets the radius on focus.
+			border-radius: $radius-small;
 		}
 
 		mark {
