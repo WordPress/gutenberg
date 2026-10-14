@@ -11,13 +11,25 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 */
 	private $test_block_name;
 
+	/**
+	 * Navigation Link's registered selectors, while a test replaces them.
+	 *
+	 * @var array|null
+	 */
+	private $original_navigation_link_selectors;
+
 	public function set_up() {
 		parent::set_up();
-		$this->test_block_name = null;
+		$this->test_block_name                    = null;
+		$this->original_navigation_link_selectors = null;
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
 	}
 
 	public function tear_down() {
+		if ( null !== $this->original_navigation_link_selectors ) {
+			WP_Block_Type_Registry::get_instance()->get_registered( 'core/navigation-link' )->selectors = $this->original_navigation_link_selectors;
+		}
+		$this->original_navigation_link_selectors = null;
 		if ( $this->test_block_name ) {
 			unregister_block_type( $this->test_block_name );
 		}
@@ -56,6 +68,23 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		register_block_type( $block_name, $args );
 
 		return WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+	}
+
+	/**
+	 * Replaces Navigation Link's selectors for the current test. `tear_down()`
+	 * restores the registered ones.
+	 *
+	 * Custom states are only valid for Navigation Link, so the tests for them
+	 * can't use a block of their own.
+	 *
+	 * @param array $selectors Block selectors.
+	 */
+	private function set_navigation_link_selectors( $selectors ) {
+		$block_type = $this->ensure_block_registered( 'core/navigation-link' );
+		if ( null === $this->original_navigation_link_selectors ) {
+			$this->original_navigation_link_selectors = $block_type->selectors;
+		}
+		$block_type->selectors = $selectors;
 	}
 
 	/**
@@ -2140,6 +2169,145 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString(
 			'.' . $parts['unique_class'] . ' .wp-block-button__link:hover{background-color:#ff00d0 !important;background-image:unset !important;}',
 			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a custom state scopes the instance class to the selector the
+	 * block declares for the state.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 * @covers ::gutenberg_get_custom_state_selector_suffix
+	 */
+	public function test_custom_state_generates_css_scoped_to_the_state_selector() {
+		$this->set_navigation_link_selectors(
+			array( 'states' => array( '-current' => '.wp-block-navigation .current-menu-item' ) )
+		);
+
+		$block_content = '<li class="wp-block-navigation-item">Item</li>';
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array(
+				'style' => array(
+					'-current' => array(
+						'color'  => array( 'text' => '#ff0000' ),
+						':hover' => array( 'color' => array( 'text' => '#0000ff' ) ),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		$this->assertMatchesRegularExpression(
+			'/^<li class="wp-block-navigation-item (wp-states-[a-f0-9]{8})">Item<\/li>$/',
+			$actual
+		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$current = '.' . $matches[0] . ':is(.wp-block-navigation .current-menu-item)';
+
+		$this->assertSame(
+			$current . '{color:#ff0000 !important;}' . $current . ':hover{color:#0000ff !important;}',
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	/**
+	 * Tests that a custom state stays on the block wrapper when a style is
+	 * routed through a feature selector for an inner element.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 * @covers ::gutenberg_get_custom_state_style_rules
+	 */
+	public function test_custom_state_keeps_the_state_on_the_block_wrapper_for_feature_selectors() {
+		$this->set_navigation_link_selectors(
+			array(
+				'color'  => array(
+					'background' => '.wp-block-navigation-link > .wp-block-navigation-item__content',
+				),
+				'states' => array( '-current' => '.wp-block-navigation .current-menu-item' ),
+			)
+		);
+
+		$block_content = '<li class="wp-block-navigation-item"><a class="wp-block-navigation-item__content">Item</a></li>';
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array(
+				'style' => array(
+					'-current' => array(
+						':hover' => array( 'color' => array( 'background' => '#000000' ) ),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertSame(
+			'.' . $matches[0] . ':is(.wp-block-navigation .current-menu-item) > .wp-block-navigation-item__content:hover{background-color:#000000 !important;background-image:unset !important;}',
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	/**
+	 * Tests that a custom state inside a viewport state is wrapped in the
+	 * viewport's media query and is not output as the viewport's own styles.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_custom_state_generates_media_query_scoped_css() {
+		$this->set_navigation_link_selectors(
+			array( 'states' => array( '-current' => '.wp-block-navigation .current-menu-item' ) )
+		);
+
+		$block_content = '<li class="wp-block-navigation-item">Item</li>';
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array(
+				'style' => array(
+					'@mobile' => array(
+						'-current' => array(
+							'color' => array( 'text' => '#ff0000' ),
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( $block_content, $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$this->assertSame(
+			'@media (width <= 480px){.' . $matches[0] . ':is(.wp-block-navigation .current-menu-item){color:#ff0000 !important;}}',
+			gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) )
+		);
+	}
+
+	/**
+	 * Tests that a custom state is skipped when the block declares no selector
+	 * for it.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_custom_state_is_skipped_without_a_state_selector() {
+		$this->set_navigation_link_selectors( array() );
+
+		$block_content = '<li class="wp-block-navigation-item">Item</li>';
+		$block         = array(
+			'blockName' => 'core/navigation-link',
+			'attrs'     => array(
+				'style' => array(
+					'-current' => array(
+						'color' => array( 'text' => '#ff0000' ),
+					),
+				),
+			),
+		);
+
+		$this->assertSame(
+			$block_content,
+			gutenberg_render_block_states_support( $block_content, $block )
 		);
 	}
 }
