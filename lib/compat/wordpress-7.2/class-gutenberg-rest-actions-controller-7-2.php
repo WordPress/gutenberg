@@ -31,6 +31,10 @@ class Gutenberg_REST_Actions_Controller_7_2 extends WP_REST_Controller {
 	 * Registers the routes for the controller.
 	 */
 	public function register_routes() {
+		if ( $this->is_route_of_entity_items() ) {
+			return;
+		}
+
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
@@ -56,6 +60,43 @@ class Gutenberg_REST_Actions_Controller_7_2 extends WP_REST_Controller {
 			),
 			true // override existing route defined by core, if it exists
 		);
+	}
+
+	/**
+	 * Checks whether a post type or taxonomy has its items on the route of
+	 * the controller, reporting it with _doing_it_wrong().
+	 *
+	 * The route is then left to the post type or taxonomy. Overriding it
+	 * would take the items out of the REST API. Registering it without
+	 * overriding would not serve the actions either, as the route of the
+	 * items comes first, and would replace the schema of that route.
+	 *
+	 * @return bool Whether a post type or taxonomy has its items on the route.
+	 */
+	protected function is_route_of_entity_items() {
+		$objects = array_merge(
+			array_values( get_post_types( array( 'show_in_rest' => true ), 'objects' ) ),
+			array_values( get_taxonomies( array( 'show_in_rest' => true ), 'objects' ) )
+		);
+		foreach ( $objects as $object ) {
+			$namespace = $object->rest_namespace ? $object->rest_namespace : 'wp/v2';
+			$base      = $object->rest_base ? $object->rest_base : $object->name;
+			if ( $this->namespace === $namespace && $this->rest_base === $base ) {
+				_doing_it_wrong(
+					__METHOD__,
+					sprintf(
+						/* translators: 1: REST route, e.g. /wp/v2/actions. 2: Post type or taxonomy name. */
+						__( 'The %1$s route serves the items of the "%2$s" post type or taxonomy, so the actions of entities are not available.', 'gutenberg' ),
+						'/' . $this->namespace . '/' . $this->rest_base,
+						$object->name
+					),
+					'7.2.0'
+				);
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**

@@ -153,6 +153,34 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * A taxonomy whose items are on the route keeps it: the route of the
+	 * actions is not registered, and that is reported.
+	 *
+	 * @covers ::register_routes
+	 * @covers ::is_route_of_entity_items
+	 */
+	public function test_the_route_of_a_taxonomy_with_the_same_base_is_kept() {
+		global $wp_rest_server;
+		$this->setExpectedIncorrectUsage( 'Gutenberg_REST_Actions_Controller_7_2::is_route_of_entity_items' );
+		register_taxonomy( 'actions', 'post', array( 'show_in_rest' => true ) );
+
+		try {
+			$wp_rest_server = null;
+			$handlers       = rest_get_server()->get_routes()[ self::ROUTE ];
+			$response       = rest_get_server()->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
+		} finally {
+			unregister_taxonomy( 'actions' );
+			$wp_rest_server = null;
+		}
+
+		$this->assertCount( 2, $handlers, 'Only the route of the terms is registered.' );
+		$this->assertInstanceOf( WP_REST_Terms_Controller::class, $handlers[0]['callback'][0] );
+		$this->assertArrayHasKey( 'POST', $handlers[1]['methods'], 'Terms can still be created.' );
+		$this->assertSame( 200, $response->get_status(), 'The terms are listed.' );
+		$this->assertSame( array(), $response->get_data() );
+	}
+
+	/**
 	 * Editors (with `edit_posts`) can read the actions.
 	 *
 	 * @covers ::get_items_permissions_check
