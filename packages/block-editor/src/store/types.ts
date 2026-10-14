@@ -102,10 +102,34 @@ export interface SelectionState {
 	selectionEnd?: BlockSelection;
 }
 
+/**
+ * A removal prompt message with an optional warning that the user must
+ * confirm, as returned by the editor's removal rules.
+ */
+export interface RemovalPromptDetails {
+	description: string;
+	warning?: string;
+	subtext?: string;
+	requireConfirmation?: boolean;
+}
+
+export type RemovalPromptMessage = string | RemovalPromptDetails;
+
+export interface BlockRemovalRule {
+	postTypes?: string[];
+	/**
+	 * Returns the prompt message when removing the given flattened blocks
+	 * needs confirmation, or nothing otherwise.
+	 */
+	callback: (
+		blocks: Omit< TreeBlock, 'innerBlocks' >[]
+	) => RemovalPromptMessage | undefined;
+}
+
 export interface RemovalPromptData {
 	clientIds: string[];
 	selectPrevious: boolean;
-	message: string;
+	message: RemovalPromptMessage;
 }
 
 export interface SelectedBlockStyleState {
@@ -143,7 +167,7 @@ export interface State {
 	viewportModalClientIds: string[] | null;
 	styleOverrides: Map< unknown, unknown >;
 	removalPromptData: RemovalPromptData | false;
-	blockRemovalRules: Record< string, string > | false;
+	blockRemovalRules: BlockRemovalRule[] | false;
 	registeredInserterMediaCategories: InserterMediaCategory[];
 	zoomLevel: number | 'auto-scaled';
 	hasBlockSpotlight: string | null | undefined;
@@ -291,7 +315,7 @@ export type Action =
 	| { type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW'; clientId: string | null }
 	| {
 			type: 'SET_BLOCK_REMOVAL_RULES';
-			rules: Record< string, string > | false;
+			rules: BlockRemovalRule[] | false;
 	  }
 	| { type: 'SET_BLOCK_VISIBILITY'; updates: Record< string, boolean > }
 	| { type: 'SET_EDITOR_MODE' }
