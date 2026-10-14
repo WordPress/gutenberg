@@ -17,6 +17,8 @@ import { unlock } from '../../../lock-unlock';
  * @param {InserterMediaItem[]|InserterMediaResponse|undefined} result The raw `fetch` result.
  * @return {{ mediaItems: InserterMediaItem[], totalItems: number|undefined, totalPages: number|undefined }} The normalized result.
  */
+const EMPTY_MEDIA_LIST = [];
+
 function normalizeFetchResult( result ) {
 	if ( Array.isArray( result ) ) {
 		return { mediaItems: result };
@@ -40,6 +42,9 @@ function normalizeFetchResult( result ) {
  */
 export function useMediaResults( category, query = {}, refreshKey ) {
 	const [ mediaList, setMediaList ] = useState();
+	// Which source produced `mediaList`, so results can be told apart from the
+	// ones still being fetched.
+	const [ resolvedSource, setResolvedSource ] = useState();
 	const [ totals, setTotals ] = useState( {} );
 	const [ isLoading, setIsLoading ] = useState( false );
 	// We need to keep track of the last request made because
@@ -96,6 +101,7 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			if ( request === lastRequestRef.current ) {
 				// Set together so the grid and the pager never disagree.
 				setMediaList( mediaItems );
+				setResolvedSource( category.name );
 				setTotals( { totalItems, totalPages } );
 				setIsLoading( false );
 			}
@@ -106,11 +112,18 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 		...Object.values( query ),
 		refreshKey,
 	] );
+	// `DataViews` keeps showing the last non-empty list it was given until the
+	// next one arrives, so passing the previous source's items through would
+	// leave them on screen under the new tab. Report an empty list until the
+	// requested source is the one that resolved.
+	const isSwitchingSource = resolvedSource !== category.name;
 	return {
-		mediaList,
+		mediaList: isSwitchingSource ? EMPTY_MEDIA_LIST : mediaList,
 		isLoading,
-		totalItems: totals.totalItems,
-		totalPages: totals.totalPages,
+		isSwitchingSource,
+		// Held back too, so the pager can't show the previous source's totals.
+		totalItems: isSwitchingSource ? undefined : totals.totalItems,
+		totalPages: isSwitchingSource ? undefined : totals.totalPages,
 	};
 }
 

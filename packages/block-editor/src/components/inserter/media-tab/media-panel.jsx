@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useCallback, useMemo, useRef, useState } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
@@ -55,11 +56,8 @@ export function MediaCategoryPanel( {
 	const { actions, attach, handleAttach, refreshKey } = useAttachmentActions(
 		{ category, query }
 	);
-	const { mediaList, isLoading, totalItems, totalPages } = useMediaResults(
-		category,
-		query,
-		refreshKey
-	);
+	const { mediaList, isLoading, isSwitchingSource, totalItems, totalPages } =
+		useMediaResults( category, query, refreshKey );
 	const numPages = totalPages || 1;
 	// If the current set shrinks below the active page (e.g. detaching images
 	// empties the last page), clamp back into range so the grid isn't left blank
@@ -121,8 +119,16 @@ export function MediaCategoryPanel( {
 				insertingId={ insertingId }
 				actions={ actions }
 				searchLabel={ searchLabel }
+				// Shown whenever the grid has no items, which during a fetch
+				// means the placeholder stands in for the results to come.
 				empty={
-					<InserterNoResults>{ emptyMessage }</InserterNoResults>
+					isLoading || isSwitchingSource ? (
+						<div className="block-editor-inserter__media-grid__loading">
+							<WCSpinner />
+						</div>
+					) : (
+						<InserterNoResults>{ emptyMessage }</InserterNoResults>
+					)
 				}
 				sourceMenu={ sourceMenu }
 				mediaTypes={ mediaTypes }

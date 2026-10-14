@@ -177,6 +177,62 @@ describe( 'useMediaResults', () => {
 		expect( result.current.mediaList ).toEqual( [ { id: 2 } ] );
 	} );
 
+	it( 'reports no results for a source that has not resolved yet', async () => {
+		const images = createCategory( 'images', [ { id: 1 } ] );
+		// Every render is recorded, because the guarantee is about the render
+		// itself: by the time effects have run the list has been cleared
+		// either way, and it's the render in between that would put the
+		// previous source's items on screen.
+		const renders = [];
+		const { result, rerender } = renderHook(
+			( { category } ) => {
+				const results = useMediaResults( category, { search: '' }, 0 );
+				renders.push( {
+					source: category.name,
+					mediaList: results.mediaList,
+				} );
+				return results;
+			},
+			{ initialProps: { category: images } }
+		);
+		await waitFor( () =>
+			expect( result.current.mediaList ).toEqual( [ { id: 1 } ] )
+		);
+		expect( result.current.isSwitchingSource ).toBe( false );
+
+		let resolveFetch;
+		const videos = {
+			name: 'videos',
+			fetch: vi.fn(
+				() =>
+					new Promise( ( resolve ) => {
+						resolveFetch = resolve;
+					} )
+			),
+		};
+		renders.length = 0;
+		rerender( { category: videos } );
+
+		// `DataViews` keeps showing the last non-empty list it was given, so
+		// the images must never be handed over once videos are the source —
+		// one such render is enough to leave them under the Videos tab.
+		expect(
+			renders.filter(
+				( render ) =>
+					render.source === 'videos' && render.mediaList.length > 0
+			)
+		).toEqual( [] );
+		expect( result.current.isSwitchingSource ).toBe( true );
+		expect( result.current.totalItems ).toBeUndefined();
+		expect( result.current.totalPages ).toBeUndefined();
+
+		await act( async () => {
+			resolveFetch( [ { id: 2 } ] );
+		} );
+		expect( result.current.mediaList ).toEqual( [ { id: 2 } ] );
+		expect( result.current.isSwitchingSource ).toBe( false );
+	} );
+
 	it( 'does not refetch when only the category wrapper changes', async () => {
 		const fetch = vi.fn( async () => [ { id: 1 } ] );
 		const { result, rerender } = renderHook(
