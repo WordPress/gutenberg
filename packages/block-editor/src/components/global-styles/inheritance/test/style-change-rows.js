@@ -71,6 +71,7 @@ describe( 'getStyleChangeRows', () => {
 				status: 'override',
 				sourceLabel: 'block source',
 				value: '#000',
+				inheritedValue: '#111',
 			} ),
 		] );
 	} );
@@ -96,6 +97,7 @@ describe( 'getStyleChangeRows', () => {
 		const rows = getStyleChangeRows( {
 			paths: PATHS,
 			localStyle: { spacing: { padding: { top: '1px' } } },
+			inheritedStyle: { typography: { fontSize: '18px' } },
 			sources: { 'typography.fontSize': { layer: 'root' } },
 			describeSource,
 		} );
@@ -109,6 +111,9 @@ describe( 'getStyleChangeRows', () => {
 		const rows = getStyleChangeRows( {
 			paths: PATHS,
 			localStyle: {},
+			inheritedStyle: {
+				spacing: { padding: { top: '1px', left: '2px' } },
+			},
 			sources: {
 				'spacing.padding.top': { layer: 'block' },
 				'spacing.padding.left': { layer: 'blockVariation' },
@@ -162,6 +167,117 @@ describe( 'getStyleChangeRows', () => {
 				key: 'typography.lineHeight',
 				status: 'local',
 			} ),
+		] );
+	} );
+
+	it( 'leaves out inherited values that only hand the value on', () => {
+		const rows = getStyleChangeRows( {
+			paths: PATHS,
+			localStyle: {},
+			inheritedStyle: {
+				color: { text: 'inherit', gradient: 'transparent none' },
+				typography: { fontSize: 'none' },
+			},
+			sources: {
+				'color.text': { layer: 'element' },
+				'typography.fontSize': { layer: 'element' },
+			},
+			describeSource,
+		} );
+		expect( rows ).toEqual( [] );
+	} );
+
+	it( 'treats a local value over an inherit keyword as replacing nothing', () => {
+		const rows = getStyleChangeRows( {
+			paths: PATHS,
+			localStyle: { typography: { fontSize: '22px' } },
+			inheritedStyle: { typography: { fontSize: 'inherit' } },
+			sources: { 'typography.fontSize': { layer: 'element' } },
+			describeSource,
+		} );
+		expect( rows ).toEqual( [
+			expect.objectContaining( {
+				key: 'typography.fontSize',
+				status: 'local',
+				sourceLabel: null,
+			} ),
+		] );
+	} );
+
+	it( 'lists each group in inspector order', () => {
+		const rows = getStyleChangeRows( {
+			paths: [
+				{ path: [ 'shadow' ], isSupported: true },
+				{ path: [ 'color', 'background' ], isSupported: true },
+				{ path: [ 'typography', 'fontSize' ], isSupported: true },
+				{ path: [ 'color', 'text' ], isSupported: true },
+			],
+			localStyle: { shadow: 'natural', color: { text: '#000' } },
+			inheritedStyle: {
+				color: { background: '#fff' },
+				typography: { fontSize: '18px' },
+			},
+			sources: {
+				'color.background': { layer: 'element' },
+				'typography.fontSize': { layer: 'element' },
+			},
+			describeSource,
+		} );
+		expect( rows.map( ( row ) => row.key ) ).toEqual( [
+			'color.text',
+			'shadow',
+			'typography.fontSize',
+			'color.background',
+		] );
+	} );
+
+	it( 'folds border parts from one source into a Border row', () => {
+		const border = { width: '1px', style: 'solid', color: 'currentColor' };
+		const rows = getStyleChangeRows( {
+			paths: [ 'width', 'style', 'color' ].map( ( part ) => ( {
+				path: [ 'border', part ],
+				isSupported: true,
+			} ) ),
+			localStyle: {},
+			inheritedStyle: { border },
+			sources: {
+				'border.width': { layer: 'blockVariation' },
+				'border.style': { layer: 'blockVariation' },
+				'border.color': { layer: 'blockVariation' },
+			},
+			describeSource,
+		} );
+		expect( rows ).toEqual( [
+			expect.objectContaining( {
+				key: 'border',
+				label: 'Border',
+				status: 'inherited',
+				sourceLabel: 'blockVariation source',
+				value: border,
+			} ),
+		] );
+		expect(
+			getStyleValueDisplay( rows[ 0 ].path, rows[ 0 ].value ).text
+		).toBe( '1px solid currentColor' );
+	} );
+
+	it( 'keeps border parts apart when their sources differ', () => {
+		const rows = getStyleChangeRows( {
+			paths: [ 'width', 'color' ].map( ( part ) => ( {
+				path: [ 'border', part ],
+				isSupported: true,
+			} ) ),
+			localStyle: {},
+			inheritedStyle: { border: { width: '1px', color: '#000' } },
+			sources: {
+				'border.width': { layer: 'blockVariation' },
+				'border.color': { layer: 'block' },
+			},
+			describeSource,
+		} );
+		expect( rows.map( ( row ) => row.key ) ).toEqual( [
+			'border.color',
+			'border.width',
 		] );
 	} );
 } );

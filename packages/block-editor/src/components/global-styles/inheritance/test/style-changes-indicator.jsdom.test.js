@@ -149,17 +149,20 @@ describe( 'StyleChangesIndicator', () => {
 			screen
 				.getAllByRole( 'listitem' )
 				.map( ( item ) => item.textContent );
+		expect(
+			screen.getByRole( 'heading', { name: 'Changed on this block (2)' } )
+		).toBeInTheDocument();
 		expect( rowText() ).toEqual( [
-			'Text colorOverrides Paragraph block#c0f',
-			'Background color#fff',
+			'Text color#c0fWas #111 · Paragraph block',
+			'Background color#fffNot set in Global Styles',
 		] );
 
 		const disclosure = screen.getByRole( 'button', {
-			name: 'From Global Styles (1)',
+			name: 'Inherited styles (1)',
 		} );
 		expect( disclosure ).toHaveAttribute( 'aria-expanded', 'false' );
 		await user.click( disclosure );
 		expect( disclosure ).toHaveAttribute( 'aria-expanded', 'true' );
-		expect( rowText() ).toContain( 'Font sizeTypography style18px' );
+		expect( rowText() ).toContain( 'Font size18pxSite typography' );
 	} );
 } );
