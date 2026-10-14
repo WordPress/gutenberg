@@ -45,6 +45,8 @@ The session also holds named edits other than crop: `session.edits`, set with `s
 
 `session.reset()` puts every slice back to its starting state in one undo entry: default geometry and crop options, no edits, same image. The Reset button calls it; it does not compose per-slice resets itself.
 
+A panel reads and writes the one edit it owns through `useMediaEditorEdit( name, defaultValue )`, which returns `{ value, setValue, beginGesture, endGesture }` and nothing else of the session. The default lives with the panel: setting a value equal in content to it removes the edit, so the session reads as clean.
+
 ### Viewport
 
 Viewport pan/zoom lets the user inspect or follow the crop area without changing the crop output. It is not part of export and should not create undo entries.

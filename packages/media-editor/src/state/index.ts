@@ -7,6 +7,8 @@ export {
 	MediaEditorStateProvider,
 	useMediaEditor,
 } from './media-editor-state-provider';
+export { useMediaEditorEdit } from './use-media-editor-edit';
+export type { MediaEditorEdit } from './use-media-editor-edit';
 export {
 	mediaEditorReducer,
 	areMediaEditorStatesEqual,
