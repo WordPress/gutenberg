@@ -239,12 +239,14 @@ test.describe( 'Template Lock', () => {
 			editor,
 			page,
 		} ) => {
-			await editor.selectBlocks( editor.canvas.getByText( 'Col 1' ) );
+			await editor.selectBlocks(
+				editor.canvas.getByLabel( 'Block: Column (1 of 1)' )
+			);
 
 			await expect(
 				page
 					.getByRole( 'toolbar', { name: 'Block tools' } )
-					.getByRole( 'button', { name: 'Add block' } )
+					.getByRole( 'button', { name: 'Add column' } )
 			).toBeVisible();
 		} );
 
