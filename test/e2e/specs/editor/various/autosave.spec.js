@@ -1,5 +1,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const BACKUP_NOTICE =
+	/The backup of this post in your browser from .+ is different from the version below\./;
+
 test.describe( 'Autosave', () => {
 	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
@@ -65,6 +68,7 @@ test.describe( 'Autosave', () => {
 		await page.keyboard.type( ' after save' );
 
 		// Trigger local autosave.
+		await page.clock.setFixedTime( new Date( '2026-10-12T15:41:00Z' ) );
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
@@ -73,8 +77,8 @@ test.describe( 'Autosave', () => {
 
 		await expect(
 			page.locator( '.components-notice__content' )
-		).toContainText(
-			'The backup of this post in your browser is different from the version below.'
+		).toHaveText(
+			'The backup of this post in your browser from October 12, 2026 3:41 pm is different from the version below.'
 		);
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -121,9 +125,7 @@ test.describe( 'Autosave', () => {
 		await page.reload();
 		await expect(
 			page.locator( '.components-notice__content' )
-		).toContainText(
-			'The backup of this post in your browser is different from the version below.'
-		);
+		).toContainText( BACKUP_NOTICE );
 
 		await admin.createNewPost();
 		await expect(

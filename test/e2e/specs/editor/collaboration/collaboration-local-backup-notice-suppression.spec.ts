@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { test, expect } from './fixtures';
 
 const NOTICE_TEXT =
-	'The backup of this post in your browser is different from the version below.';
+	/The backup of this post in your browser (from .+ )?is different from the version below\./;
 
 async function getCurrentPostId( page: Page ): Promise< number > {
 	return page.evaluate( () =>

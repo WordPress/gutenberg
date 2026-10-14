@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { parse } from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 import AutosaveMonitor from '../autosave-monitor';
@@ -137,9 +138,21 @@ function useAutosaveNotice() {
 		const id = 'wpEditorAutosaveRestore';
 
 		createWarningNotice(
-			__(
-				'The backup of this post in your browser is different from the version below.'
-			),
+			// Backups written before the time was recorded don't have one.
+			localAutosave.time
+				? sprintf(
+						/* translators: %s: Date and time the backup was made. */
+						__(
+							'The backup of this post in your browser from %s is different from the version below.'
+						),
+						dateI18n(
+							getDateSettings().formats.datetime,
+							localAutosave.time
+						)
+					)
+				: __(
+						'The backup of this post in your browser is different from the version below.'
+					),
 			{
 				id,
 				actions: [
