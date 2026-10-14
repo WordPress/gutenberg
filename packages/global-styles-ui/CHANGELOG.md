@@ -8,6 +8,9 @@
 
 ### Enhancements
 
+-   List elements alongside blocks in one Blocks & Elements screen, grouped under Elements, Headings and Form controls, instead of splitting them between Typography and Colors ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Offer every element the background, dimensions, border, shadow and custom CSS controls that `theme.json` already accepts, instead of typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Preview an element as a sample of the markup it applies to, rendered with the site's own styles, so the preview reflects every panel rather than typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
 -   Font Library: Use `Select` from `@wordpress/ui` for the pagination page selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   Remove the dot that marks blocks with user styles in the block list. The filter to show only those blocks stays ([#84657](https://github.com/WordPress/gutenberg/pull/84657)).
 -   Font Library: Mark installed font variants in font collections ([#84023](https://github.com/WordPress/gutenberg/pull/84023)).
@@ -24,9 +27,6 @@
 
 ### Enhancements
 
--   List elements alongside blocks in one Blocks & Elements screen, grouped under Elements, Headings and Form controls, instead of splitting them between Typography and Colors ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
--   Offer every element the background, dimensions, border, shadow and custom CSS controls that `theme.json` already accepts, instead of typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
--   Preview an element as a sample of the markup it applies to, rendered with the site's own styles, so the preview reflects every panel rather than typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
 
 ### Internal
