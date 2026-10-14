@@ -193,3 +193,33 @@ if ( ! function_exists( '_wp_add_entity_action_modules_to_editor_script' ) ) {
 	}
 	add_action( 'admin_footer', '_wp_add_entity_action_modules_to_editor_script', 10, 0 );
 }
+
+if ( ! function_exists( '_wp_preload_entity_actions' ) ) {
+	/**
+	 * Preloads the actions of the post type the post editor edits.
+	 *
+	 * The actions menu of the post editor reads them from the `wp/v2/entity-actions`
+	 * route as it loads, see `useEntityActions()` in
+	 * packages/editor/src/dataviews/entity-actions-loader.ts. The path must match the
+	 * request of the `getEntityActionsConfig` core data resolver, see
+	 * packages/core-data/src/resolvers.js.
+	 *
+	 * @param array                   $paths   REST API paths to preload.
+	 * @param WP_Block_Editor_Context $context Block editor context.
+	 * @return array Filtered preload paths.
+	 */
+	function _wp_preload_entity_actions( $paths, $context ) {
+		if ( 'core/edit-post' === $context->name && isset( $context->post ) ) {
+			$paths[] = add_query_arg(
+				array(
+					'kind' => 'postType',
+					'name' => $context->post->post_type,
+				),
+				'/wp/v2/entity-actions'
+			);
+		}
+
+		return $paths;
+	}
+	add_filter( 'block_editor_rest_api_preload_paths', '_wp_preload_entity_actions', 10, 2 );
+}
