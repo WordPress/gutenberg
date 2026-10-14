@@ -33,10 +33,12 @@ function PatternsManageButton( { clientId, onClose } ) {
 			const _isUnsyncedPattern =
 				!! block?.attributes?.metadata?.patternName;
 
+			// Detaching only copies the pattern's blocks into the post, so
+			// reading the pattern is enough. Editing it isn't required.
 			const _isSyncedPattern =
 				!! block &&
 				isReusableBlock( block ) &&
-				!! canUser( 'update', {
+				!! canUser( 'read', {
 					kind: 'postType',
 					name: 'wp_block',
 					id: block.attributes.ref,

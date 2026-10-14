@@ -24,7 +24,7 @@ export {
 } from './api';
 
 /**
- * The store can be used directly with @wordpress/data via selectors
+ * The store can be used directly with `@wordpress/data` via selectors
  * in React components with useSelect.
  *
  * @example

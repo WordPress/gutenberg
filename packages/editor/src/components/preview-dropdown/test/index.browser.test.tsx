@@ -7,6 +7,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { lock } from '../../../lock-unlock';
 import PreviewDropdown from '../';
 
+const setResponsiveEditing = vi.fn();
+
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	useViewportMatch: vi.fn< typeof useViewportMatch >(),
@@ -27,8 +29,29 @@ beforeEach( () => {
 	lock( actions, {
 		setDeviceType: vi.fn(),
 		resetZoomLevel: vi.fn(),
+		setResponsiveEditing,
+		setStyleStateViewport: vi.fn(),
 	} );
 	vi.mocked( useDispatch ).mockReturnValue( actions );
+} );
+
+it( 'keeps responsive styles discoverable but prevents activation on Desktop', async () => {
+	await render( <Preview disabled={ false } /> );
+	await page.getByRole( 'button', { name: 'View', exact: true } ).click();
+	const option = page.getByRole( 'menuitemcheckbox', {
+		name: 'Responsive styles',
+	} );
+	await expect.element( option ).toHaveAttribute( 'aria-disabled', 'true' );
+	await expect
+		.element( option )
+		.toHaveAccessibleDescription(
+			'Select Tablet or Mobile to style a specific viewport.'
+		);
+	await userEvent.keyboard( '{Home}{ArrowDown}{ArrowDown}{ArrowDown}' );
+	await expect.element( option ).toHaveFocus();
+	await userEvent.keyboard( '{Enter} ' );
+	expect( setResponsiveEditing ).not.toHaveBeenCalled();
+	await expect.element( option ).toHaveAttribute( 'aria-checked', 'false' );
 } );
 
 function Preview( { disabled }: { disabled: boolean } ) {
@@ -57,4 +80,29 @@ it( 'closes the View menu when it becomes unavailable and keeps its trigger focu
 	await expect.element( page.getByRole( 'menu' ) ).toBeVisible();
 	await userEvent.keyboard( '{Escape}' );
 	await expect.element( page.getByRole( 'menu' ) ).not.toBeInTheDocument();
+} );
+
+it( 'shows the responsive editing cue only on viewport-specific breakpoints', async () => {
+	const selection = {
+		deviceType: 'Tablet',
+		hasMobileViewport: true,
+		hasTabletViewport: true,
+		isResponsiveEditing: true,
+		isResponsiveEditingEnabled: true,
+	};
+	vi.mocked( useSelect ).mockReturnValue( selection );
+	const screen = await render( <Preview disabled={ false } /> );
+	const trigger = page.getByRole( 'button', { name: 'View', exact: true } );
+	await expect.element( trigger ).toHaveClass( 'is-responsive-editing' );
+
+	vi.mocked( useSelect ).mockReturnValue( {
+		...selection,
+		deviceType: 'Desktop',
+	} );
+	await screen.rerender( <Preview disabled={ false } /> );
+	await expect.element( trigger ).not.toHaveClass( 'is-responsive-editing' );
+
+	vi.mocked( useSelect ).mockReturnValue( selection );
+	await screen.rerender( <Preview disabled={ false } /> );
+	await expect.element( trigger ).toHaveClass( 'is-responsive-editing' );
 } );

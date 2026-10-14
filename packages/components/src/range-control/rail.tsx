@@ -1,6 +1,10 @@
 import { isRTL } from '@wordpress/i18n';
+import clsx from 'clsx';
+import { COLORS } from '../utils';
+import { getCSSWideKeyword } from './utils';
 import RangeMark from './mark';
-import { MarksWrapper, Rail } from './styles/range-control-styles';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import type { WordPressComponentProps } from '../context';
 import type {
 	MarksProps,
@@ -19,12 +23,36 @@ export default function RangeRail(
 		max = 100,
 		step = 1,
 		value = 0,
+		railColor,
+		className,
+		style,
 		...restProps
 	} = props;
 
+	const railColorKeyword = getCSSWideKeyword( railColor );
+
 	return (
 		<>
-			<Rail disabled={ disabled } { ...restProps } />
+			<PolymorphicElement
+				as="span"
+				{ ...restProps }
+				{ ...{ disabled } }
+				className={ clsx(
+					styles.rail,
+					className,
+					{ [ styles[ 'is-disabled' ] ]: disabled },
+					! disabled &&
+						railColorKeyword &&
+						styles[ `background-${ railColorKeyword }` ]
+				) }
+				style={
+					{
+						'--_wp-components-range-control-rail-color':
+							railColor || COLORS.theme.gray[ 300 ],
+						...style,
+					} as React.CSSProperties
+				}
+			/>
 			{ marks && (
 				<Marks
 					disabled={ disabled }
@@ -53,9 +81,12 @@ function Marks( props: WordPressComponentProps< MarksProps, 'span' > ) {
 	const marksData = useMarks( { marks, min, max, step, value } );
 
 	return (
-		<MarksWrapper
+		<span
 			aria-hidden="true"
-			className="components-range-control__marks"
+			className={ clsx(
+				'components-range-control__marks',
+				styles.marks
+			) }
 		>
 			{ marksData.map( ( mark ) => (
 				<RangeMark
@@ -65,7 +96,7 @@ function Marks( props: WordPressComponentProps< MarksProps, 'span' > ) {
 					disabled={ disabled }
 				/>
 			) ) }
-		</MarksWrapper>
+		</span>
 	);
 }
 
