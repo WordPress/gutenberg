@@ -25,7 +25,11 @@ import {
 import { useStyle, useSetting, useStyleWithResolvedBackground } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
-import { getValidPseudoStates, getValidViewportStates } from './utils';
+import {
+	getValidCustomStates,
+	getValidPseudoStates,
+	getValidViewportStates,
+} from './utils';
 
 // Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
@@ -117,6 +121,8 @@ function ScreenBlock( {
 	// State selector state
 	const [ localSelectedViewport, setSelectedViewport ] =
 		useState< string >( 'default' );
+	const [ selectedCustomState, setSelectedCustomState ] =
+		useState< string >( 'default' );
 	const [ selectedPseudoState, setSelectedPseudoState ] =
 		useState< string >( 'default' );
 	const selectedViewport =
@@ -137,8 +143,29 @@ function ScreenBlock( {
 		() => getValidPseudoStates( name ),
 		[ name ]
 	);
+	// theme.json only accepts a custom state at the top level of a block's
+	// styles, so it isn't offered for a viewport or a block style variation.
+	const canSelectCustomState =
+		showBlockStateControls &&
+		! variation &&
+		effectiveSelectedViewport === 'default';
+	const validCustomStates = useMemo(
+		() => ( canSelectCustomState ? getValidCustomStates( name ) : [] ),
+		[ canSelectCustomState, name ]
+	);
+	const effectiveSelectedCustomState = validCustomStates.some(
+		( state ) => state.value === selectedCustomState
+	)
+		? selectedCustomState
+		: 'default';
 
-	const stateParam = [ effectiveSelectedViewport, selectedPseudoState ]
+	// The path order is viewport, custom, pseudo, matching the block-editor
+	// state helpers.
+	const stateParam = [
+		effectiveSelectedViewport,
+		effectiveSelectedCustomState,
+		selectedPseudoState,
+	]
 		.filter( ( value ) => value !== 'default' )
 		.join( '.' );
 	const hasSelectedState = stateParam.length > 0;
@@ -367,14 +394,17 @@ function ScreenBlock( {
 					variation ? currentBlockStyle?.label! : blockType?.title!
 				}
 				viewportStates={ validViewportStates }
+				customStates={ validCustomStates }
 				pseudoStates={ showBlockStateControls ? validPseudoStates : [] }
 				selectedViewport={ effectiveSelectedViewport }
+				selectedCustomState={ effectiveSelectedCustomState }
 				selectedPseudoState={ selectedPseudoState }
 				onChangeViewport={
 					showResponsiveStateControls
 						? setSelectedViewport
 						: undefined
 				}
+				onChangeCustomState={ setSelectedCustomState }
 				onChangePseudoState={ setSelectedPseudoState }
 				showResponsiveStateControls={ showResponsiveStateControls }
 			/>

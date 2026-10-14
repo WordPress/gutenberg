@@ -1,3 +1,4 @@
+import { getBlockType } from '@wordpress/blocks';
 import {
 	areGlobalStylesEqual,
 	privateApis as globalStylesEnginePrivateApis,
@@ -6,7 +7,7 @@ import type {
 	GlobalStylesConfig,
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { unlock } from './lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -64,6 +65,23 @@ export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 };
 
 /**
+ * Custom states for blocks with their labels. A block declares the selector
+ * each one matches in `selectors.states` in block.json.
+ * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
+ */
+export const VALID_BLOCK_CUSTOM_STATES: Record< string, StateDefinition[] > = {
+	'core/navigation-link': [
+		{
+			value: '-current',
+			label: _x(
+				'Current',
+				'Name for the block style state of the current menu item'
+			),
+		},
+	],
+};
+
+/**
  * Responsive breakpoint states available for all blocks.
  * These map to CSS media queries wrapping the block's styles.
  */
@@ -90,6 +108,25 @@ export function getValidPseudoStates( name: string ): StateDefinition[] {
 	}
 
 	return [];
+}
+
+/**
+ * Get the valid custom states for a given block. A custom state is only output
+ * when the block declares a selector for it, so the others are left out.
+ *
+ * @param name The block name (e.g., 'core/navigation-link')
+ * @return Array of valid custom state definitions, or empty array if none
+ */
+export function getValidCustomStates( name: string ): StateDefinition[] {
+	const stateSelectors = getBlockType( name )?.selectors?.states;
+	if ( ! stateSelectors || typeof stateSelectors !== 'object' ) {
+		return [];
+	}
+
+	return ( VALID_BLOCK_CUSTOM_STATES[ name ] ?? [] ).filter( ( state ) => {
+		const selector = stateSelectors[ state.value ];
+		return typeof selector === 'string' && !! selector.trim();
+	} );
 }
 
 /**
