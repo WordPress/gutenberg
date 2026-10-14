@@ -51,10 +51,7 @@ export interface State {
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
 	fieldsConfigs: Record< string, Record< string, FieldsConfig > >;
-	entityActionsConfigs: Record<
-		string,
-		Record< string, Record< string, any > >
-	>;
+	entityActionsConfigs: Record< string, Record< string, any > >;
 }
 
 type EntityRecordKey = string | number;
