@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Update dependencies ([#84674](https://github.com/WordPress/gutenberg/pull/84674)).
+
 ## 36.1.0 (2026-10-07)
 
 ### Enhancements
