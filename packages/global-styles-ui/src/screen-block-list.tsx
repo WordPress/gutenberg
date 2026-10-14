@@ -296,8 +296,15 @@ function getFilteredElementGroups(
 		...group,
 		elements: group.elements.filter(
 			( element ) =>
+				// The element's name and group title match too, so "h1" finds
+				// Heading 1 and "form" lists the form controls.
 				( ! search ||
-					ELEMENTS[ element.name ].title
+					[
+						ELEMENTS[ element.name ].title,
+						element.name,
+						group.title,
+					]
+						.join( ' ' )
 						.toLowerCase()
 						.includes( search ) ) &&
 				( styleFilter !== 'customized' ||
