@@ -89,5 +89,9 @@ test.describe( 'Global styles sidebar', () => {
 		await expect(
 			page.getByRole( 'button', { name: 'Accordion Item' } )
 		).toBeVisible();
+		// Matching elements are listed alongside the blocks.
+		await expect(
+			page.getByRole( 'button', { name: 'All headings' } )
+		).toBeVisible();
 	} );
 } );
