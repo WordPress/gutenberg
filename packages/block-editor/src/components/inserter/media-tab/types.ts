@@ -1,5 +1,5 @@
 type InserterMediaCategory =
-	import( '../../../store/actions' ).InserterMediaCategory;
+	import( '../../../store/types' ).InserterMediaCategory;
 
 /**
  * Taken from the registration interface so the two cannot drift.
