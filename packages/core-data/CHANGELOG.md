@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Add the private `getActionsConfig( kind, name )` selector, which fetches the actions registered on the server for an entity from the `/wp/v2/actions` route.
+-   Add the private `getActionsConfig( kind, name )` selector, which fetches the actions registered on the server for an entity from the `/wp/v2/actions` route ([#84650](https://github.com/WordPress/gutenberg/pull/84650)).
 
 ## 8.2.0 (2026-10-07)
 

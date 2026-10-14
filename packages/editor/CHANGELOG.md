@@ -8,7 +8,7 @@
 
 ### New Features
 
--   Show the actions registered on the server for a post type after its other actions, in the lists of the site editor and in the inspector. Plugins register them in PHP on the `wp_actions_api_init` action, with a script module for their JavaScript parts.
+-   Show the actions registered on the server for a post type after its other actions, in the lists of the site editor and in the inspector. Plugins register them in PHP on the `wp_actions_api_init` action, with a script module for their JavaScript parts ([#84650](https://github.com/WordPress/gutenberg/pull/84650)).
 
 ### Enhancements
 
