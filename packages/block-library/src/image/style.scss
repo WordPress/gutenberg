@@ -200,12 +200,10 @@
 
 .wp-lightbox-overlay {
 	position: fixed;
-	top: 0;
-	left: 0;
+	// Not `100vh`: in iOS Safari the area fixed content is laid out in is shorter.
+	inset: 0;
 	z-index: 100000;
 	overflow: hidden;
-	width: 100%;
-	height: 100vh;
 	box-sizing: border-box;
 	visibility: hidden;
 	cursor: zoom-out;
@@ -348,9 +346,9 @@
 	}
 
 	.scrim {
-		width: 100%;
-		height: 100%;
-		position: absolute;
+		// Fixed, so iOS Safari extends its color behind the browser toolbars.
+		position: fixed;
+		inset: 0;
 		z-index: 2000000;
 		background-color: rgb(255, 255, 255);
 		opacity: 0.9;
@@ -457,7 +455,7 @@
 @keyframes lightbox-zoom-in {
 	0% {
 		clip-path: var(--wp--lightbox-initial-clip);
-		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(var(--wp--lightbox-initial-top-position) - var(--wp--lightbox-overlay-height) / 2)) scale(var(--wp--lightbox-scale));
 	}
 	100% {
 		clip-path: inset(0);
@@ -477,6 +475,6 @@
 	100% {
 		visibility: hidden;
 		clip-path: var(--wp--lightbox-initial-clip);
-		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(-50vh + var(--wp--lightbox-initial-top-position))) scale(var(--wp--lightbox-scale));
+		transform: translate(calc((-100vw + var(--wp--lightbox-scrollbar-width)) / 2 + var(--wp--lightbox-initial-left-position)), calc(var(--wp--lightbox-initial-top-position) - var(--wp--lightbox-overlay-height) / 2)) scale(var(--wp--lightbox-scale));
 	}
 }

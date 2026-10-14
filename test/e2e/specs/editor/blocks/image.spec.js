@@ -1132,6 +1132,113 @@ test.describe( 'Image - lightbox', () => {
 				);
 			} );
 		} );
+
+		test.describe( 'Overlay shorter than the viewport', () => {
+			test.use( { reducedMotion: 'no-preference' } );
+
+			test( 'should zoom from the thumbnail and center the image in the overlay', async ( {
+				editor,
+				page,
+				requestUtils,
+			} ) => {
+				const largeMedia = await requestUtils.uploadMedia(
+					'./assets/3200x2400_e2e_test_image_responsive_lightbox.jpeg'
+				);
+
+				await editor.setContent( `<!-- wp:image {"id":${ largeMedia.id },"sizeSlug":"full","linkDestination":"none","lightbox":{"enabled":true}} -->
+				<figure class="wp-block-image size-full"><img src="${ largeMedia.source_url }" alt="" class="wp-image-${ largeMedia.id }"/></figure>
+				<!-- /wp:image --> ` );
+
+				const postId = await editor.publishPost();
+				await page.goto( `/?p=${ postId }` );
+
+				// Stands in for iOS Safari, where the area fixed content is laid
+				// out in is shorter than `100vh`.
+				await page.addStyleTag( {
+					content:
+						'body .wp-lightbox-overlay { top: 40px; bottom: 80px; }',
+				} );
+
+				await page.evaluate( () => {
+					document.addEventListener( 'animationstart', ( event ) => {
+						if ( event.animationName === 'lightbox-zoom-in' ) {
+							event.target
+								.getAnimations()
+								.forEach( ( animation ) => {
+									animation.pause();
+									animation.currentTime = 0;
+								} );
+						}
+					} );
+				} );
+
+				const thumbnail = page.locator( '.wp-lightbox-container img' );
+				await thumbnail.scrollIntoViewIfNeeded();
+				await thumbnail.evaluate( ( img ) => img.decode() );
+				const thumbnailBox = await thumbnail.boundingBox();
+				await thumbnail.click();
+
+				const overlay = page.locator( '.wp-lightbox-overlay' );
+				const enlarged = overlay.locator(
+					'.lightbox-image-container:not(.lightbox-thumbnail-container)'
+				);
+				await expect
+					.poll( () =>
+						enlarged.evaluate(
+							( element ) =>
+								element.getAnimations()[ 0 ]?.playState
+						)
+					)
+					.toBe( 'paused' );
+
+				const startBox = await enlarged.boundingBox();
+				for ( const key of [ 'x', 'y', 'width', 'height' ] ) {
+					expect(
+						Math.abs( startBox[ key ] - thumbnailBox[ key ] ),
+						key
+					).toBeLessThan( 2 );
+				}
+
+				await page.evaluate( () =>
+					document
+						.getAnimations()
+						.forEach( ( animation ) => animation.finish() )
+				);
+
+				const viewport = await page.evaluate( () => ( {
+					width: document.documentElement.clientWidth,
+					height: document.documentElement.clientHeight,
+				} ) );
+				const overlayBox = await overlay.boundingBox();
+				expect( overlayBox ).toEqual( {
+					x: 0,
+					y: 40,
+					width: viewport.width,
+					height: viewport.height - 120,
+				} );
+
+				expect(
+					await overlay.locator( '.scrim' ).boundingBox()
+				).toEqual( {
+					x: 0,
+					y: 0,
+					width: viewport.width,
+					height: viewport.height,
+				} );
+
+				const restBox = await enlarged.boundingBox();
+				expect( restBox.height ).toBeLessThanOrEqual(
+					overlayBox.height
+				);
+				expect(
+					Math.abs(
+						restBox.y +
+							restBox.height / 2 -
+							( overlayBox.y + overlayBox.height / 2 )
+					)
+				).toBeLessThan( 1 );
+			} );
+		} );
 	} );
 } );
 

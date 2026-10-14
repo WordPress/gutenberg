@@ -724,6 +724,12 @@ const { state, actions, callbacks } = store(
 					return;
 				}
 
+				// In iOS Safari the overlay can be shorter than `100vh` and
+				// `window.innerHeight`, so it is measured.
+				const { top: overlayTop, height: overlayHeight } = document
+					.querySelector( '.wp-lightbox-overlay' )
+					.getBoundingClientRect();
+
 				let {
 					naturalWidth,
 					naturalHeight,
@@ -809,7 +815,7 @@ const { state, actions, callbacks } = store(
 					containerWidth
 				);
 				const targetMaxHeight = Math.min(
-					window.innerHeight - verticalPadding,
+					overlayHeight - verticalPadding,
 					containerHeight
 				);
 				const targetContainerRatio = targetMaxWidth / targetMaxHeight;
@@ -851,7 +857,7 @@ const { state, actions, callbacks } = store(
 				// adding 1 pixel to the container width and height solves the problem,
 				// though this can be removed if the issue is fixed in the future.
 				state.overlayStyles = `
-					--wp--lightbox-initial-top-position: ${ screenPosY }px;
+					--wp--lightbox-initial-top-position: ${ screenPosY - overlayTop }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
 					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
 					--wp--lightbox-container-height: ${ containerHeight + 1 }px;
@@ -868,6 +874,7 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
+					--wp--lightbox-overlay-height: ${ overlayHeight }px;
 				`;
 			},
 			setButtonStyles() {
