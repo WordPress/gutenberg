@@ -8,7 +8,7 @@
 
 ### New Features
 
--   `WidgetHost.title`: a host gives the widget it renders its translated title, for accessible names the widget builds from it ([#84204](https://github.com/WordPress/gutenberg/issues/84204)).
+-   `WidgetHost.title`: a host gives the widget it renders its translated title, for accessible names the widget builds from it ([#84738](https://github.com/WordPress/gutenberg/pull/84738)).
 
 ## 0.9.0 (2026-10-07)
 
