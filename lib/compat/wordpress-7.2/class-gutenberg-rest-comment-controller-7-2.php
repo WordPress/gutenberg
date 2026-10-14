@@ -1103,8 +1103,14 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		$links = parent::prepare_links( $comment );
 
 		if ( isset( $links['children'] ) ) {
-			$comment_children = $comment->get_children(
+			/*
+			 * Query directly: before WordPress 7.1, `get_children()` caches a
+			 * count, so it would return the count core just took.
+			 * See https://core.trac.wordpress.org/changeset/62822.
+			 */
+			$comment_children = get_comments(
 				array(
+					'parent'       => $comment->comment_ID,
 					'count'        => true,
 					'orderby'      => 'none',
 					'type'         => 'all',
