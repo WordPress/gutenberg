@@ -124,6 +124,44 @@ describe( 'FlexLayoutInspectorControls', () => {
 		} );
 	} );
 
+	it( 'should not crash when the selected justification becomes unavailable', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const renderControls = ( layout ) => (
+			<ToolsPanel
+				label="Layout"
+				resetAll={ vi.fn() }
+				panelId={ PANEL_ID }
+			>
+				<FlexLayoutInspectorControls
+					clientId={ PANEL_ID }
+					layout={ layout }
+					onChange={ onChange }
+				/>
+			</ToolsPanel>
+		);
+		const { rerender } = render(
+			renderControls( { orientation: 'vertical' } )
+		);
+
+		await user.click(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		);
+		await user.click(
+			await screen.findByRole( 'option', { name: /Stretch items/ } )
+		);
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			orientation: 'vertical',
+			justifyContent: 'stretch',
+		} );
+
+		rerender( renderControls( { justifyContent: 'stretch' } ) );
+
+		expect(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		).toHaveTextContent( 'Left' );
+	} );
+
 	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
 		await screen.findByRole( 'combobox', { name: 'Justification' } );

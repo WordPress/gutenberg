@@ -70,31 +70,37 @@ describe( 'Navigation layout custom properties', () => {
 		);
 	} );
 
-	describe( 'responsive styles', () => {
-		it.each( [ 'space-around', 'space-evenly' ] )(
-			'supports %s justification',
-			( justifyContent ) => {
-				renderHook( () =>
-					useLayoutCustomProperties( {
-						clientId: 'test',
-						style: {
-							'@mobile': {
-								layout: { justifyContent },
-							},
+	describe( 'horizontal layouts', () => {
+		it.each( [
+			[ 'left', 'flex-start' ],
+			[ 'center', 'center' ],
+			[ 'right', 'flex-end' ],
+			[ 'space-between', 'space-between' ],
+			[ 'space-around', 'space-around' ],
+			[ 'space-evenly', 'space-evenly' ],
+		] )( 'maps %s justification to %s', ( justifyContent, justify ) => {
+			renderHook( () =>
+				useLayoutCustomProperties( {
+					clientId: 'test',
+					style: {
+						'@mobile': {
+							layout: { justifyContent },
 						},
-					} )
-				);
+					},
+				} )
+			);
 
-				const { css } = useStyleOverride.mock.calls.at( -1 )[ 0 ];
-				expect( css ).toContain(
-					`--navigation-layout-justification-setting: ${ justifyContent };`
-				);
-				expect( css ).toContain(
-					`--navigation-layout-justify: ${ justifyContent };`
-				);
-			}
-		);
+			const { css } = useStyleOverride.mock.calls.at( -1 )[ 0 ];
+			expect( css ).toContain(
+				`--navigation-layout-justification-setting: ${ justify };`
+			);
+			expect( css ).toContain(
+				`--navigation-layout-justify: ${ justify };`
+			);
+		} );
+	} );
 
+	describe( 'responsive styles', () => {
 		it( 'merges viewport overrides with the base layout', () => {
 			renderHook( () =>
 				useLayoutCustomProperties( {

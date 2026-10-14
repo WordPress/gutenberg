@@ -277,25 +277,26 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Test that distributed justification values are converted to Navigation custom properties.
+	 * Test that horizontal justification values are mapped to Navigation custom properties.
 	 *
-	 * @dataProvider data_distributed_justification_values
+	 * @dataProvider data_horizontal_justification_values
 	 *
 	 * @covers ::gutenberg_block_core_navigation_get_layout_custom_property_declarations
 	 *
-	 * @param string $justification Justification value.
+	 * @param string $justify_content Justification value.
+	 * @param string $justify         Expected CSS value.
 	 */
-	public function test_get_distributed_layout_custom_property_declarations( $justification ) {
+	public function test_get_horizontal_layout_custom_property_declarations( $justify_content, $justify ) {
 		$actual = gutenberg_block_core_navigation_get_layout_custom_property_declarations(
-			array( 'justifyContent' => $justification )
+			array( 'justifyContent' => $justify_content )
 		);
 
 		$this->assertSame(
 			array(
-				'--navigation-layout-justification-setting' => $justification,
+				'--navigation-layout-justification-setting' => $justify,
 				'--navigation-layout-direction' => 'row',
 				'--navigation-layout-wrap'      => 'wrap',
-				'--navigation-layout-justify'   => $justification,
+				'--navigation-layout-justify'   => $justify,
 				'--navigation-layout-align'     => 'center',
 			),
 			$actual
@@ -303,14 +304,18 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Data provider for distributed Navigation justification values.
+	 * Data provider for horizontal Navigation justification values.
 	 *
 	 * @return array
 	 */
-	public function data_distributed_justification_values() {
+	public function data_horizontal_justification_values() {
 		return array(
-			'space around' => array( 'space-around' ),
-			'space evenly' => array( 'space-evenly' ),
+			'left'          => array( 'left', 'flex-start' ),
+			'center'        => array( 'center', 'center' ),
+			'right'         => array( 'right', 'flex-end' ),
+			'space between' => array( 'space-between', 'space-between' ),
+			'space around'  => array( 'space-around', 'space-around' ),
+			'space evenly'  => array( 'space-evenly', 'space-evenly' ),
 		);
 	}
 

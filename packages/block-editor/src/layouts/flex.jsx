@@ -563,9 +563,12 @@ function FlexLayoutJustifyContentControl( {
 			label={ __( 'Justification' ) }
 			items={ justificationOptions }
 			value={ selectedOption }
-			onValueChange={ ( selectedItem ) =>
-				onJustificationChange( selectedItem.value )
-			}
+			isItemEqualToValue={ ( item, value ) => item.value === value.value }
+			onValueChange={ ( selectedItem ) => {
+				if ( selectedItem ) {
+					onJustificationChange( selectedItem.value );
+				}
+			} }
 		/>
 	);
 }
