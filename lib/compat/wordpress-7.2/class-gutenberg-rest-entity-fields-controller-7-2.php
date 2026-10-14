@@ -24,7 +24,7 @@ class Gutenberg_REST_Entity_Fields_Controller_7_2 extends WP_REST_Controller {
 	 */
 	public function __construct() {
 		$this->namespace = 'wp/v2';
-		$this->rest_base = 'fields';
+		$this->rest_base = 'entity-fields';
 	}
 
 	/**
@@ -72,7 +72,7 @@ class Gutenberg_REST_Entity_Fields_Controller_7_2 extends WP_REST_Controller {
 
 		if ( null === $capability ) {
 			return new WP_Error(
-				'rest_fields_invalid_entity',
+				'rest_entity_fields_invalid_entity',
 				__( 'Invalid entity kind or name.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
@@ -176,7 +176,7 @@ class Gutenberg_REST_Entity_Fields_Controller_7_2 extends WP_REST_Controller {
 
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'fields',
+			'title'      => 'entity-fields',
 			'type'       => 'object',
 			'properties' => array(
 				'kind'           => array(

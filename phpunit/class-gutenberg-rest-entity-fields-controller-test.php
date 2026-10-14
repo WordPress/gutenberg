@@ -11,7 +11,7 @@ class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 	/**
 	 * The REST route the controller registers.
 	 */
-	const ROUTE = '/wp/v2/fields';
+	const ROUTE = '/wp/v2/entity-fields';
 
 	/**
 	 * Administrator user id (has `edit_theme_options` and `manage_options`).
@@ -253,7 +253,7 @@ class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 
 		$response = $this->dispatch_request( 'postType', 'nonexistent_post_type' );
 
-		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_fields_invalid_entity', $response, 404 );
 	}
 
 	/**
@@ -285,7 +285,7 @@ class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 		}
 
 		$this->assertSame( array( 'secret' ), $registered, 'The registry accepts the fields.' );
-		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_fields_invalid_entity', $response, 404 );
 	}
 
 	/**
@@ -320,7 +320,7 @@ class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 
 		$response = $this->dispatch_request( 'taxonomy', 'nonexistent_taxonomy' );
 
-		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_fields_invalid_entity', $response, 404 );
 	}
 
 	/**

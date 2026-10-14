@@ -361,7 +361,7 @@ if ( ! class_exists( 'WP_Entity_Fields_Registry' ) ) {
 		 * registered on it before, in the alphabetical order of their folders.
 		 * register() skips a field already registered for the entity, and
 		 * registers the rest of the collection. Like register(), it does not check
-		 * that the entity exists: the `/wp/v2/fields` route only serves the fields
+		 * that the entity exists: the `/wp/v2/entity-fields` route only serves the fields
 		 * of the entities the REST API exposes.
 		 *
 		 * Fields that apply to several entities, such as the defaults every post
