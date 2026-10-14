@@ -48,6 +48,59 @@ test.describe( 'Block Notes', () => {
 		await expect( form ).toBeFocused();
 	} );
 
+	test( 'shows the toolbar button once the post has a note', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First block' },
+		} );
+		const addNoteButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } );
+
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options' } )
+		).toBeVisible();
+		await expect( addNoteButton ).toBeHidden();
+
+		await blockNoteUtils.addNote( 'First note' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second block' },
+		} );
+
+		await expect( addNoteButton ).toBeVisible();
+		await addNoteButton.click();
+		await expect(
+			page.getByRole( 'textbox', { name: 'New note', exact: true } )
+		).toBeFocused();
+	} );
+
+	test( 'toolbar button hints at the notes a block already has', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Howdy!' },
+			comment: 'Test comment',
+		} );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+		const addNoteButton = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Add note (1 note)', exact: true } );
+
+		await expect( addNoteButton ).toHaveText( '1' );
+	} );
+
 	test( 'can add a note to a block', async ( { editor, page } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
