@@ -388,14 +388,15 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		}
 		parsedConfig.autoPort = rawConfig.autoPort;
 	}
-	if ( rawConfig.testsEnvironment !== undefined ) {
-		if ( typeof rawConfig.testsEnvironment !== 'boolean' ) {
-			throw new ValidationError(
-				`Invalid ${ configFile }: "testsEnvironment" must be a boolean.`
-			);
-		}
-		parsedConfig.testsEnvironment = rawConfig.testsEnvironment;
+	if (
+		rawConfig.testsEnvironment !== undefined &&
+		typeof rawConfig.testsEnvironment !== 'boolean'
+	) {
+		throw new ValidationError(
+			`Invalid ${ configFile }: "testsEnvironment" must be a boolean.`
+		);
 	}
+	parsedConfig.testsEnvironment = rawConfig.testsEnvironment ?? false;
 	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
 		checkObjectWithValues(

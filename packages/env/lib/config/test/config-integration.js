@@ -98,6 +98,16 @@ describe( 'Config Integration', () => {
 		delete process.env.WP_ENV_LIFECYCLE_SCRIPT_AFTER_START;
 	} );
 
+	it( 'should disable tests environment by default', async () => {
+		readFile.mockImplementation( async () => {
+			throw { code: 'ENOENT' };
+		} );
+
+		const config = await loadConfig( '/test/gutenberg' );
+
+		expect( config.testsEnvironment ).toBe( false );
+	} );
+
 	it( 'should use default configuration', async () => {
 		readFile.mockImplementation( async () => {
 			throw { code: 'ENOENT' };

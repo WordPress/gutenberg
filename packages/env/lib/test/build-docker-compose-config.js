@@ -32,6 +32,10 @@ const CONFIG = {
 	configDirectoryPath: '/path/to/config',
 };
 
+const TESTS_ENABLED_CONFIG = {
+	testsEnvironment: true,
+};
+
 describe( 'buildDockerComposeConfig', () => {
 	it( 'should map directories before individual sources', () => {
 		const envConfig = {
@@ -75,6 +79,7 @@ describe( 'buildDockerComposeConfig', () => {
 			],
 		};
 		const dockerConfig = buildDockerComposeConfig( {
+			...TESTS_ENABLED_CONFIG,
 			workDirectoryPath: '/path',
 			env: { development: envConfig, tests: envConfig },
 		} );
@@ -112,6 +117,7 @@ describe( 'buildDockerComposeConfig', () => {
 		// local filesystem, so a volume should be created to contain core
 		// sources.
 		const dockerConfig = buildDockerComposeConfig( {
+			...TESTS_ENABLED_CONFIG,
 			workDirectoryPath: '/path',
 			env: { development: CONFIG, tests: CONFIG },
 		} );
@@ -142,6 +148,7 @@ describe( 'buildDockerComposeConfig', () => {
 
 	it( 'should add healthcheck to mysql services', () => {
 		const config = buildDockerComposeConfig( {
+			...TESTS_ENABLED_CONFIG,
 			workDirectoryPath: '/some/path',
 			env: {
 				development: {
@@ -194,6 +201,7 @@ describe( 'buildDockerComposeConfig', () => {
 
 	it( 'should use service_healthy condition for WordPress depends_on', () => {
 		const config = buildDockerComposeConfig( {
+			...TESTS_ENABLED_CONFIG,
 			workDirectoryPath: '/some/path',
 			env: {
 				development: {
@@ -272,8 +280,25 @@ describe( 'buildDockerComposeConfig', () => {
 			expect( dockerConfig.volumes[ 'tests-user-home' ] ).toBeUndefined();
 		} );
 
-		it( 'should include tests services by default', () => {
+		it( 'should omit tests services when testsEnvironment is omitted', () => {
 			const dockerConfig = buildDockerComposeConfig( {
+				workDirectoryPath: '/path',
+				env: {
+					development: CONFIG,
+					tests: CONFIG,
+				},
+			} );
+
+			expect( dockerConfig.services[ 'tests-mysql' ] ).toBeUndefined();
+			expect(
+				dockerConfig.services[ 'tests-wordpress' ]
+			).toBeUndefined();
+			expect( dockerConfig.services[ 'tests-cli' ] ).toBeUndefined();
+		} );
+
+		it( 'should include tests services when testsEnvironment is true', () => {
+			const dockerConfig = buildDockerComposeConfig( {
+				testsEnvironment: true,
 				workDirectoryPath: '/path',
 				env: {
 					development: CONFIG,

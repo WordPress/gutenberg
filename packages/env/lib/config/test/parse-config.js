@@ -582,6 +582,17 @@ describe( 'parseConfig', () => {
 		expect( parsed.env ).toEqual( expected );
 	} );
 
+	it( 'should default testsEnvironment to false when omitted', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.testsEnvironment ).toEqual( false );
+	} );
+
 	it( 'should accept testsEnvironment as a boolean', async () => {
 		readRawConfigFile.mockImplementation( async ( configFile ) => {
 			if ( configFile === '/test/gutenberg/.wp-env.json' ) {

@@ -161,9 +161,9 @@
 					"default": 8889
 				},
 				"testsEnvironment": {
-					"description": "Whether to create the tests environment. Set to false to skip creating test containers, saving resources.",
+					"description": "Whether to create the tests environment. Set to true to create test containers alongside the development environment.",
 					"type": "boolean",
-					"default": true
+					"default": false
 				},
 				"autoPort": {
 					"description": "Whether to automatically find available HTTP ports when configured ports are busy.",

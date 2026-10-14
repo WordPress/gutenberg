@@ -37,7 +37,7 @@ module.exports = function downloadWPPHPUnit(
 
 	const promises = [];
 	for ( const env in config.env ) {
-		if ( env === 'tests' && config.testsEnvironment === false ) {
+		if ( env === 'tests' && ! config.testsEnvironment ) {
 			continue;
 		}
 		const wpVersion = wpVersions[ env ] ? wpVersions[ env ] : null;
