@@ -91,3 +91,32 @@ export function getRotatedOverlayStyle( { width, height, angle } ) {
 		transformOrigin: 'center',
 	};
 }
+
+/**
+ * Gets the bounding box of a rectangle rotated around its center.
+ *
+ * @param {{left: number, top: number, right: number, bottom: number}} rect  The unrotated rectangle.
+ * @param {number}                                                     angle Rotation in degrees.
+ *
+ * @return {{left: number, top: number, right: number, bottom: number}} The bounding box, around the same center.
+ */
+export function getRotatedBoundingRect( rect, angle ) {
+	if ( ! angle ) {
+		return rect;
+	}
+	const radians = ( angle * Math.PI ) / 180;
+	const cos = Math.abs( Math.cos( radians ) );
+	const sin = Math.abs( Math.sin( radians ) );
+	const width = rect.right - rect.left;
+	const height = rect.bottom - rect.top;
+	const halfWidth = ( width * cos + height * sin ) / 2;
+	const halfHeight = ( width * sin + height * cos ) / 2;
+	const centerX = ( rect.left + rect.right ) / 2;
+	const centerY = ( rect.top + rect.bottom ) / 2;
+	return {
+		left: centerX - halfWidth,
+		top: centerY - halfHeight,
+		right: centerX + halfWidth,
+		bottom: centerY + halfHeight,
+	};
+}

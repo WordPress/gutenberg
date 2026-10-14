@@ -21,9 +21,11 @@ import {
 	getGridItemRect,
 	getGridTrackPositions,
 	getGridItemPixelRect,
+	getGridItemRotation,
 	getGridRectFromPixelRect,
 	getBoundingGridRect,
 } from './utils';
+import { getRotatedBoundingRect } from './rotation';
 import {
 	getGridDropTarget,
 	getPixelRectFromGridRect,
@@ -476,27 +478,38 @@ function GridVisualizerDropLayer( {
 		}
 
 		// Measure the blocks in the grid from the canvas, so that the result
-		// matches what is on screen in every viewport.
+		// matches what is on screen in every viewport. Other blocks take up
+		// the cells they reach with their rotation.
 		const siblings = [];
 		let srcSpan = null;
 		let srcPixelRect = null;
+		let srcAngle = 0;
 		for ( const child of gridElement.children ) {
 			const childClientId = child.getAttribute( 'data-block' );
 			if ( ! childClientId || ! child.offsetParent ) {
 				continue;
 			}
 			const pixelRect = getGridItemPixelRect( child );
-			const rect = getGridRectFromPixelRect(
-				pixelRect,
-				columnTracks,
-				rowTracks
-			);
+			const angle = getGridItemRotation( child );
 			if ( childClientId === srcClientId ) {
-				srcSpan = rect;
+				srcSpan = getGridRectFromPixelRect(
+					pixelRect,
+					columnTracks,
+					rowTracks
+				);
 				srcPixelRect = pixelRect;
+				srcAngle = angle;
 				continue;
 			}
-			siblings.push( { pixelRect, rect } );
+			const rotatedPixelRect = getRotatedBoundingRect( pixelRect, angle );
+			siblings.push( {
+				pixelRect: rotatedPixelRect,
+				rect: getGridRectFromPixelRect(
+					rotatedPixelRect,
+					columnTracks,
+					rowTracks
+				),
+			} );
 		}
 		const srcLayout = getBlockAttributes( srcClientId )?.style?.layout;
 		const columnSpan = srcSpan?.columnSpan ?? srcLayout?.columnSpan ?? 1;
@@ -560,34 +573,50 @@ function GridVisualizerDropLayer( {
 			return;
 		}
 
-		const landingPixelRect = getPixelRectFromGridRect(
+		const landingCellsPixelRect = getPixelRectFromGridRect(
 			landing,
 			columnTracks,
 			rowTracks
 		);
-		if ( ! landingPixelRect ) {
+		if ( ! landingCellsPixelRect ) {
 			clearDropTarget();
 			return;
 		}
 
+		// The block lands by its cells, but the cells shown are the ones it
+		// reaches with its rotation, around the same center.
+		const footprint = srcAngle
+			? getGridRectFromPixelRect(
+					getRotatedBoundingRect( landingCellsPixelRect, srcAngle ),
+					columnTracks,
+					rowTracks
+				)
+			: landing;
+		const landingPixelRect = srcAngle
+			? getPixelRectFromGridRect( footprint, columnTracks, rowTracks )
+			: landingCellsPixelRect;
+
 		const overlaps = siblings
-			.filter( ( sibling ) => sibling.rect.intersectsRect( landing ) )
+			.filter( ( sibling ) => sibling.rect.intersectsRect( footprint ) )
 			.map( ( sibling ) =>
 				getPixelRectFromGridRect(
 					new GridRect( {
 						columnStart: Math.max(
 							sibling.rect.columnStart,
-							landing.columnStart
+							footprint.columnStart
 						),
 						columnEnd: Math.min(
 							sibling.rect.columnEnd,
-							landing.columnEnd
+							footprint.columnEnd
 						),
 						rowStart: Math.max(
 							sibling.rect.rowStart,
-							landing.rowStart
+							footprint.rowStart
 						),
-						rowEnd: Math.min( sibling.rect.rowEnd, landing.rowEnd ),
+						rowEnd: Math.min(
+							sibling.rect.rowEnd,
+							footprint.rowEnd
+						),
 					} ),
 					columnTracks,
 					rowTracks

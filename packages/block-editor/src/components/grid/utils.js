@@ -264,6 +264,42 @@ export function getGridItemPixelRect( gridItemElement ) {
 	};
 }
 
+const DEGREES_PER_UNIT = {
+	deg: 1,
+	grad: 0.9,
+	rad: 180 / Math.PI,
+	turn: 360,
+};
+
+/**
+ * Gets the rotation in degrees from a value of the CSS `rotate` property,
+ * such as its computed value.
+ *
+ * @param {string|undefined} value The `rotate` value, such as `45deg`.
+ *
+ * @return {number} The rotation in degrees, or 0 when there is none in the page's plane.
+ */
+export function getRotationFromCSS( value ) {
+	const match = value
+		?.trim()
+		.match( /^(?:z\s+)?(-?[\d.]+(?:e-?\d+)?)(deg|grad|rad|turn)$/ );
+	if ( ! match ) {
+		return 0;
+	}
+	return parseFloat( match[ 1 ] ) * DEGREES_PER_UNIT[ match[ 2 ] ];
+}
+
+/**
+ * Gets the rotation of a grid item as it is rendered, in degrees.
+ *
+ * @param {HTMLElement} gridItemElement The grid item element.
+ *
+ * @return {number} The rotation in degrees.
+ */
+export function getGridItemRotation( gridItemElement ) {
+	return getRotationFromCSS( getComputedCSS( gridItemElement, 'rotate' ) );
+}
+
 /**
  * Sets an inline style on an element, or removes it when the value is empty.
  * Used for previews that should not go through block attributes, such as the
