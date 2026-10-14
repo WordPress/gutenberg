@@ -1,20 +1,14 @@
-import { SelectControl as WCSelectControl } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import type { WpTemplate } from '@wordpress/core-data';
 import type { DataFormControlProps } from '@wordpress/dataviews';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { SelectControl } from '@wordpress/ui';
 import { getItemTitle } from '../../shared/title/get-item-title';
 import { unlock } from '../../lock-unlock';
 import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
 import type { PostWithTemplate } from './types';
-
-/*
- * The template control. It keeps `SelectControl` of `@wordpress/components`: the design system's select
- * has no value for "no template assigned", which this control offers as the
- * label of the default template.
- */
 
 type TemplateEditProps = DataFormControlProps< PostWithTemplate >;
 
@@ -61,7 +55,7 @@ function ClassicTemplateEdit( {
 	onChange,
 }: TemplateEditComponentProps ) {
 	const value = field.getValue( { item: data } );
-	const options = useMemo(
+	const items = useMemo(
 		() =>
 			Object.entries( data?.available_templates ?? {} ).map(
 				( [ templateSlug, title ] ) => ( {
@@ -73,12 +67,16 @@ function ClassicTemplateEdit( {
 	);
 	const canSwitchTemplate = useCanSwitchTemplate( data.type, data.id );
 	return (
-		<WCSelectControl
+		<SelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
-			value={ value }
-			options={ options }
-			onChange={ onChange }
+			value={
+				items.find( ( item ) => item.value === value ) ??
+				items[ 0 ] ??
+				null
+			}
+			items={ items }
+			onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
 			disabled={ ! canSwitchTemplate }
 		/>
 	);
@@ -111,7 +109,7 @@ function BlockThemeTemplateEdit( {
 		slug
 	);
 	const value = field.getValue( { item: data } );
-	const options = useMemo(
+	const items = useMemo(
 		() => [
 			{ label: defaultTemplateLabel, value: '' },
 			...templates.map( ( template ) => ( {
@@ -122,12 +120,16 @@ function BlockThemeTemplateEdit( {
 		[ templates, defaultTemplateLabel ]
 	);
 	return (
-		<WCSelectControl
+		<SelectControl
 			label={ __( 'Template' ) }
 			hideLabelFromVision
-			value={ value }
-			options={ options }
-			onChange={ onChange }
+			value={
+				items.find( ( item ) => item.value === value ) ??
+				items[ 0 ] ??
+				null
+			}
+			items={ items }
+			onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
 			disabled={ ! canSwitchTemplate }
 		/>
 	);
