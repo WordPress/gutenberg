@@ -1139,43 +1139,6 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Only the user who added a reaction can remove it, even though other
-	 * editors of the post can edit the note it belongs to.
-	 */
-	public function test_cannot_delete_another_users_reaction() {
-		wp_set_current_user( self::$editor_id );
-		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$note_id     = $this->create_note( $post_id, self::$editor_id );
-		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
-
-		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $reaction_id );
-		$request->set_param( 'force', true );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertErrorResponse( 'rest_cannot_delete', $response, 403 );
-		$this->assertNotNull( get_comment( $reaction_id ), 'Another user removed the reaction.' );
-	}
-
-	/**
-	 * The reaction's author can still remove it.
-	 */
-	public function test_can_delete_own_reaction() {
-		wp_set_current_user( self::$editor_id );
-		$post_id     = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
-		$note_id     = $this->create_note( $post_id, self::$admin_id );
-		$reaction_id = $this->create_reaction( $post_id, $note_id, self::$editor_id );
-
-		wp_set_current_user( self::$editor_id );
-		$request = new WP_REST_Request( 'DELETE', '/wp/v2/comments/' . $reaction_id );
-		$request->set_param( 'force', true );
-		$response = rest_get_server()->dispatch( $request );
-
-		$this->assertSame( 200, $response->get_status() );
-		$this->assertNull( get_comment( $reaction_id ) );
-	}
-
-	/**
 	 * Resolving approves the thread's root note and the editor disables
 	 * reactions from then on, so the server rejects them too, on the root
 	 * note and on its replies.

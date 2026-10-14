@@ -345,37 +345,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	}
 
 	/**
-	 * Checks if a given request has access to delete a comment.
-	 *
-	 * Anyone who can edit a note's post can edit the note, and core's delete
-	 * check follows that, but a reaction belongs to the user who added it:
-	 * only they can take it back.
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has access to delete the item, error object otherwise.
-	 */
-	public function delete_item_permissions_check( $request ) {
-		$comment = $this->get_comment( $request['id'] );
-		if ( is_wp_error( $comment ) ) {
-			return $comment;
-		}
-
-		// START CHANGE: Only the author can remove a reaction.
-		if ( 'reaction' === $comment->comment_type && get_current_user_id() !== (int) $comment->user_id ) {
-			return new WP_Error(
-				'rest_cannot_delete',
-				__( 'Sorry, you can only remove your own reactions.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
-		}
-		// END CHANGE.
-
-		return parent::delete_item_permissions_check( $request );
-	}
-
-	/**
 	 * Checks if a given request has access to create a comment.
 	 *
 	 * Copied from core, extended to the 'reaction' type. A reaction can only
