@@ -5,6 +5,9 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
+    -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
+    -   `RangeControl` ([#84562](https://github.com/WordPress/gutenberg/pull/84562))
     -   `Tabs` ([#84332](https://github.com/WordPress/gutenberg/pull/84332))
     -   `NumberControl` ([#84330](https://github.com/WordPress/gutenberg/pull/84330))
     -   `TimePicker` ([#84331](https://github.com/WordPress/gutenberg/pull/84331))
@@ -16,6 +19,7 @@
 ### Enhancements
 
 -   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
+-   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
 
 ### Deprecations
 
@@ -23,6 +27,8 @@
 
 ### Bug Fixes
 
+-   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
+-   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
 -   `Tabs`: Use semantic interaction colors for unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Tabs`: Restore the `fit-content` width of horizontal tab lists, which stretched to full width after the SCSS Modules migration ([#84626](https://github.com/WordPress/gutenberg/pull/84626)).
@@ -32,7 +38,9 @@
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
 -   `ToolsPanel`: Use setting-first accessible action labels without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
 -   `DropdownMenu`: Keep the menu closed on ArrowDown when the toggle is disabled ([#84556](https://github.com/WordPress/gutenberg/pull/84556)).
+-   `Modal`: Keep an accessible name on the dialog when `title` is combined with `__experimentalHideHeader`. The heading that `aria-labelledby` referenced is not rendered in that case, so the title is now applied as the dialog's `aria-label` instead ([#82645](https://github.com/WordPress/gutenberg/pull/82645)).
 -   `ColorPicker`: Make the HSL and RGB input labels translatable, and name the Hue and Alpha inputs after their color format ([#70214](https://github.com/WordPress/gutenberg/pull/70214)).
+-   `CustomGradientPicker`: Use the bundled `gradient-parser` types, preserve gradient angles when editing, and keep unsupported gradient syntax on the existing fallback path ([#84582](https://github.com/WordPress/gutenberg/pull/84582)).
 
 ### Internal
 

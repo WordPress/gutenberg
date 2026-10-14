@@ -1024,10 +1024,7 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$style_attr            = gutenberg_resolve_style_state_aliases(
-		$block['attrs']['style'] ?? array(),
-		$block['blockName']
-	);
+	$style_attr            = $block['attrs']['style'] ?? array();
 	/*
 	 * A block with no layout support and no style attribute at all cannot
 	 * produce layout output, so return before resolving global settings.

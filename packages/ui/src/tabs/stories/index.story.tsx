@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { useState, cloneElement } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { link, more, wordpress } from '@wordpress/icons';
 import * as Tabs from '../';
 import * as Tooltip from '../../tooltip';
+import { Icon } from '../../icon';
 
 const meta: Meta< typeof Tabs.Root > = {
 	title: 'Components/@wordpress-ui/Tabs',
@@ -236,33 +237,21 @@ export const WithDisabledTab: StoryObj< typeof Tabs.Root > = {
 	},
 };
 
-const LinkIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( link, props );
-};
-
-const MoreIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( more, props );
-};
-
-const WordpressIcon = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( wordpress, props );
-};
-
 const tabWithIconsData = [
 	{
 		value: 'tab1',
 		label: 'Tab one',
-		icon: WordpressIcon,
+		icon: wordpress,
 	},
 	{
 		value: 'tab2',
 		label: 'Tab two',
-		icon: LinkIcon,
+		icon: link,
 	},
 	{
 		value: 'tab3',
 		label: 'Tab three',
-		icon: MoreIcon,
+		icon: more,
 	},
 ];
 
@@ -271,19 +260,13 @@ export const WithTabIconsAndTooltips: StoryObj< typeof Tabs.Root > = {
 		...Default.args,
 		children: [
 			<Tabs.List key="list">
-				{ tabWithIconsData.map( ( { value, label, icon: Icon } ) => (
+				{ tabWithIconsData.map( ( { value, label, icon } ) => (
 					<Tooltip.Root key={ value }>
 						<Tooltip.Trigger
 							aria-label={ label }
 							render={ <Tabs.Tab value={ value } /> }
 						>
-							{ /* TODO: potentially refactor with new Icon component */ }
-							<Icon
-								style={ {
-									width: '20px',
-									height: '20px',
-								} }
-							/>
+							<Icon icon={ icon } size={ 20 } />
 						</Tooltip.Trigger>
 						<Tooltip.Popup
 							positioner={

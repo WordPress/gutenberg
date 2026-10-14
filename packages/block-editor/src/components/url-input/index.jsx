@@ -7,7 +7,7 @@ import {
 	BaseControl,
 	Button,
 	__experimentalInputControl as WCInputControl,
-	Spinner,
+	Spinner as WCSpinner,
 	Popover,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -452,7 +452,7 @@ function Control( {
 					} ),
 				} ) }
 			/>
-			{ isLoading && <Spinner /> }
+			{ isLoading && <WCSpinner /> }
 		</BaseControl>
 	);
 }

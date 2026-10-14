@@ -70,6 +70,11 @@ function UnforwardedModal(
 	const headingId = title
 		? `components-modal-header-${ instanceId }`
 		: aria.labelledby;
+	// The heading that `aria-labelledby` points at lives in the header, so when
+	// the header is hidden the title has to label the dialog directly instead.
+	const dialogLabel =
+		contentLabel ??
+		( __experimentalHideHeader && title ? title : undefined );
 
 	const shouldFocusContent = focusOnMount === 'firstContentElement';
 	const focusOnMountRef = useFocusOnMount(
@@ -285,8 +290,8 @@ function UnforwardedModal(
 						shouldFocusContent ? focusContentRef : focusOnMountRef,
 					] ) }
 					role={ role }
-					aria-label={ contentLabel }
-					aria-labelledby={ contentLabel ? undefined : headingId }
+					aria-label={ dialogLabel }
+					aria-labelledby={ dialogLabel ? undefined : headingId }
 					aria-describedby={ aria.describedby }
 					tabIndex={ -1 }
 					onKeyDown={ onKeyDown }

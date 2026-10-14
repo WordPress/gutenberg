@@ -93,15 +93,15 @@ add_action( 'rest_api_init', 'gutenberg_register_view_config_controller_endpoint
 /**
  * Registers the Fields REST API route.
  *
- * Exposes the fields registered on the server on the `wp_fields_api_init` action.
+ * Exposes the fields registered on the server on the `wp_entity_fields_api_init` action.
  *
- * @see Gutenberg_REST_Fields_Controller_7_2
+ * @see Gutenberg_REST_Entity_Fields_Controller_7_2
  */
-function gutenberg_register_fields_controller_endpoints() {
-	$fields_controller = new Gutenberg_REST_Fields_Controller_7_2();
-	$fields_controller->register_routes();
+function gutenberg_register_entity_fields_controller_endpoints() {
+	$entity_fields_controller = new Gutenberg_REST_Entity_Fields_Controller_7_2();
+	$entity_fields_controller->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_fields_controller_endpoints', PHP_INT_MAX );
+add_action( 'rest_api_init', 'gutenberg_register_entity_fields_controller_endpoints', PHP_INT_MAX );
 
 /**
  * Registers the Templates and Template Parts REST API routes.

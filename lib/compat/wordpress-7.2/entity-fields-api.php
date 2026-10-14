@@ -10,32 +10,32 @@
  * a script module registered for the entity along with its fields: its default
  * export maps field ids to the properties of each field that are JavaScript. An
  * entity can have several modules. Each module applies to the fields it was
- * registered with, see {@see wp_get_registered_field_modules()}.
+ * registered with, see {@see wp_get_registered_entity_field_modules()}.
  *
- * Fields are registered on the `wp_fields_api_init` action, and only there,
- * with {@see wp_register_fields()}, {@see wp_update_fields()}, and
- * {@see wp_unregister_fields()}. The other functions read the registry.
+ * Fields are registered on the `wp_entity_fields_api_init` action, and only there,
+ * with {@see wp_register_entity_fields()}, {@see wp_update_entity_fields()}, and
+ * {@see wp_unregister_entity_fields()}. The other functions read the registry.
  *
  * Fields can also be declared as files, grouped in a field collection, which
- * a `wp_fields_api_init` callback registers with
- * {@see wp_register_field_collection()}. A collection is for a single
+ * a `wp_entity_fields_api_init` callback registers with
+ * {@see wp_register_entity_field_collection()}. A collection is for a single
  * entity. WordPress core registers its own fields this way, from
  * packages/core-fields: the defaults every post type derives from its
  * supports in code, the fields of single post types as collections.
  *
  * The functions are defined when core does not ship them. When it does, the
  * core functions read the plugin registry, which replaces the core one on
- * `init`, see {@see WP_Fields_Registry_Gutenberg}.
+ * `init`, see {@see WP_Entity_Fields_Registry_Gutenberg}.
  *
  * @package gutenberg
  */
 
-if ( ! function_exists( 'wp_register_fields' ) ) {
+if ( ! function_exists( 'wp_register_entity_fields' ) ) {
 	/**
 	 * Registers fields for an entity, see
-	 * {@see WP_Fields_Registry::register()}.
+	 * {@see WP_Entity_Fields_Registry::register()}.
 	 *
-	 * It only runs on the `wp_fields_api_init` action.
+	 * It only runs on the `wp_entity_fields_api_init` action.
 	 *
 	 * @since 7.2.0
 	 *
@@ -49,17 +49,17 @@ if ( ! function_exists( 'wp_register_fields' ) ) {
 	 * @return string[] The ids of the fields registered, in the order of the
 	 *                  call. Empty when none is.
 	 */
-	function wp_register_fields( $origin, $kind, $name, $fields, $script_module = null ) {
-		return WP_Fields_Registry::get_instance()->register( $origin, $kind, $name, $fields, $script_module );
+	function wp_register_entity_fields( $origin, $kind, $name, $fields, $script_module = null ) {
+		return WP_Entity_Fields_Registry::get_instance()->register( $origin, $kind, $name, $fields, $script_module );
 	}
 }
 
-if ( ! function_exists( 'wp_update_fields' ) ) {
+if ( ! function_exists( 'wp_update_entity_fields' ) ) {
 	/**
 	 * Updates registered fields of an entity, see
-	 * {@see WP_Fields_Registry::update()}.
+	 * {@see WP_Entity_Fields_Registry::update()}.
 	 *
-	 * It only runs on the `wp_fields_api_init` action.
+	 * It only runs on the `wp_entity_fields_api_init` action.
 	 *
 	 * @since 7.2.0
 	 *
@@ -74,17 +74,17 @@ if ( ! function_exists( 'wp_update_fields' ) ) {
 	 * @return string[] The ids of the fields updated, in the order of the
 	 *                  call. Empty when none is.
 	 */
-	function wp_update_fields( $origin, $kind, $name, $fields, $script_module = null ) {
-		return WP_Fields_Registry::get_instance()->update( $origin, $kind, $name, $fields, $script_module );
+	function wp_update_entity_fields( $origin, $kind, $name, $fields, $script_module = null ) {
+		return WP_Entity_Fields_Registry::get_instance()->update( $origin, $kind, $name, $fields, $script_module );
 	}
 }
 
-if ( ! function_exists( 'wp_unregister_fields' ) ) {
+if ( ! function_exists( 'wp_unregister_entity_fields' ) ) {
 	/**
 	 * Unregisters fields of an entity, see
-	 * {@see WP_Fields_Registry::unregister()}.
+	 * {@see WP_Entity_Fields_Registry::unregister()}.
 	 *
-	 * It only runs on the `wp_fields_api_init` action.
+	 * It only runs on the `wp_entity_fields_api_init` action.
 	 *
 	 * @since 7.2.0
 	 *
@@ -95,12 +95,12 @@ if ( ! function_exists( 'wp_unregister_fields' ) ) {
 	 * @return array[] The list of the definitions unregistered, in
 	 *                 registration order. Empty when none is.
 	 */
-	function wp_unregister_fields( $kind, $name, $ids = null ) {
-		return WP_Fields_Registry::get_instance()->unregister( $kind, $name, $ids );
+	function wp_unregister_entity_fields( $kind, $name, $ids = null ) {
+		return WP_Entity_Fields_Registry::get_instance()->unregister( $kind, $name, $ids );
 	}
 }
 
-if ( ! function_exists( 'wp_get_registered_fields' ) ) {
+if ( ! function_exists( 'wp_get_registered_entity_fields' ) ) {
 	/**
 	 * Returns the fields registered for the given entity.
 	 *
@@ -110,12 +110,12 @@ if ( ! function_exists( 'wp_get_registered_fields' ) ) {
 	 *                 order. Empty until the `init` action has completed: a
 	 *                 read before then is refused.
 	 */
-	function wp_get_registered_fields( $kind, $name ) {
-		return WP_Fields_Registry::get_instance()->get_registered( $kind, $name );
+	function wp_get_registered_entity_fields( $kind, $name ) {
+		return WP_Entity_Fields_Registry::get_instance()->get_registered( $kind, $name );
 	}
 }
 
-if ( ! function_exists( 'wp_get_registered_field_modules' ) ) {
+if ( ! function_exists( 'wp_get_registered_entity_field_modules' ) ) {
 	/**
 	 * Returns the ids of the script modules registered for the given entity.
 	 *
@@ -126,12 +126,12 @@ if ( ! function_exists( 'wp_get_registered_field_modules' ) ) {
 	 *                                 order. Empty until the `init` action has
 	 *                                 completed: a read before then is refused.
 	 */
-	function wp_get_registered_field_modules( $kind, $name ) {
-		return WP_Fields_Registry::get_instance()->get_registered_field_modules( $kind, $name );
+	function wp_get_registered_entity_field_modules( $kind, $name ) {
+		return WP_Entity_Fields_Registry::get_instance()->get_registered_field_modules( $kind, $name );
 	}
 }
 
-if ( ! function_exists( 'wp_get_all_registered_field_modules' ) ) {
+if ( ! function_exists( 'wp_get_all_registered_entity_field_modules' ) ) {
 	/**
 	 * Returns the ids of all script modules registered for any entity.
 	 *
@@ -142,12 +142,12 @@ if ( ! function_exists( 'wp_get_all_registered_field_modules' ) ) {
 	 *                                                completed: a read before
 	 *                                                then is refused.
 	 */
-	function wp_get_all_registered_field_modules() {
-		return WP_Fields_Registry::get_instance()->get_all_registered_field_modules();
+	function wp_get_all_registered_entity_field_modules() {
+		return WP_Entity_Fields_Registry::get_instance()->get_all_registered_field_modules();
 	}
 }
 
-if ( ! function_exists( '_wp_add_field_modules_to_editor_script' ) ) {
+if ( ! function_exists( '_wp_add_entity_field_modules_to_editor_script' ) ) {
 	/**
 	 * Declares the script modules of the entity fields as dependencies of the
 	 * editor script.
@@ -160,7 +160,7 @@ if ( ! function_exists( '_wp_add_field_modules_to_editor_script' ) ) {
 	 * prerequisites depend on it. A dynamic dependency is only listed in the
 	 * import map; the module is fetched when it is imported.
 	 *
-	 * Reading the registry fires `wp_fields_api_init`, so the fields and their
+	 * Reading the registry fires `wp_entity_fields_api_init`, so the fields and their
 	 * script modules are registered on demand. It only reads the registry on the
 	 * pages that load the editor script, not on every admin request (heartbeat,
 	 * Ajax, other screens). It runs on `admin_footer`, the last action before the
@@ -176,7 +176,7 @@ if ( ! function_exists( '_wp_add_field_modules_to_editor_script' ) ) {
 	 *
 	 * @param WP_Scripts|null $scripts The scripts registry. Defaults to the global one.
 	 */
-	function _wp_add_field_modules_to_editor_script( $scripts = null ) {
+	function _wp_add_entity_field_modules_to_editor_script( $scripts = null ) {
 		if ( ! $scripts instanceof WP_Scripts ) {
 			$scripts = wp_scripts();
 		}
@@ -187,7 +187,7 @@ if ( ! function_exists( '_wp_add_field_modules_to_editor_script' ) ) {
 			return;
 		}
 
-		$kinds = wp_get_all_registered_field_modules();
+		$kinds = wp_get_all_registered_entity_field_modules();
 		if ( empty( $kinds ) ) {
 			return;
 		}
@@ -221,30 +221,30 @@ if ( ! function_exists( '_wp_add_field_modules_to_editor_script' ) ) {
 			$scripts->add_data( 'wp-editor', 'module_dependencies', $dependencies );
 		}
 	}
-	add_action( 'admin_footer', '_wp_add_field_modules_to_editor_script' );
+	add_action( 'admin_footer', '_wp_add_entity_field_modules_to_editor_script' );
 }
 
-if ( ! function_exists( 'wp_get_field_collection_fields' ) ) {
+if ( ! function_exists( 'wp_get_entity_field_collection_fields' ) ) {
 	/**
 	 * Returns the fields of a field collection, see
-	 * {@see WP_Fields_Registry::get_collection_fields()}.
+	 * {@see WP_Entity_Fields_Registry::get_collection_fields()}.
 	 *
 	 * @param string $directory The directory of the collection.
 	 * @return array<string, array> The fields of the collection, keyed by id, in
 	 *                              the alphabetical order of their folders.
 	 */
-	function wp_get_field_collection_fields( $directory ) {
-		return WP_Fields_Registry::get_instance()->get_collection_fields( $directory );
+	function wp_get_entity_field_collection_fields( $directory ) {
+		return WP_Entity_Fields_Registry::get_instance()->get_collection_fields( $directory );
 	}
 }
 
-if ( ! function_exists( 'wp_register_field_collection' ) ) {
+if ( ! function_exists( 'wp_register_entity_field_collection' ) ) {
 	/**
 	 * Registers the fields of a field collection, see
-	 * {@see WP_Fields_Registry::register_collection()} for the format of a
+	 * {@see WP_Entity_Fields_Registry::register_collection()} for the format of a
 	 * collection.
 	 *
-	 * Like wp_register_fields(), it only runs on the `wp_fields_api_init`
+	 * Like wp_register_entity_fields(), it only runs on the `wp_entity_fields_api_init`
 	 * action.
 	 *
 	 * @since 7.2.0
@@ -253,7 +253,7 @@ if ( ! function_exists( 'wp_register_field_collection' ) ) {
 	 * @return bool Whether the collection is valid and all of its fields are
 	 *              registered. True as well when it has no fields.
 	 */
-	function wp_register_field_collection( $directory ) {
-		return WP_Fields_Registry::get_instance()->register_collection( $directory );
+	function wp_register_entity_field_collection( $directory ) {
+		return WP_Entity_Fields_Registry::get_instance()->register_collection( $directory );
 	}
 }
