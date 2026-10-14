@@ -1142,11 +1142,11 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for reactions',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'heart' );
+			await blockNoteUtils.addReactionToComment( 'Heart' );
 
 			// Verify the reaction button appears with count.
 			const reactionButton = page.getByRole( 'button', {
-				name: /heart/,
+				name: /Heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
@@ -1166,9 +1166,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Re-add reaction',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'heart' );
+			await blockNoteUtils.addReactionToComment( 'Heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /heart/,
+				name: /Heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '1' );
@@ -1186,7 +1186,7 @@ test.describe( 'Block Notes', () => {
 			//    so the just-removed reaction blocked the re-add with
 			//    `rest_comment_duplicate_reaction` ("You have already
 			//    reacted with this emoji").
-			await blockNoteUtils.addReactionToComment( 'heart' );
+			await blockNoteUtils.addReactionToComment( 'Heart' );
 			await expect( reactionButton ).toBeVisible();
 			await expect( reactionButton ).toContainText( '❤' );
 			await expect( reactionButton ).toContainText( '1' );
@@ -1211,9 +1211,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Original note text',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'heart' );
+			await blockNoteUtils.addReactionToComment( 'Heart' );
 			await expect(
-				page.getByRole( 'button', { name: /heart/ } )
+				page.getByRole( 'button', { name: /Heart/ } )
 			).toContainText( '1' );
 
 			await blockNoteUtils.clickBlockNoteActionMenuItem( 'Edit' );
@@ -1233,11 +1233,11 @@ test.describe( 'Block Notes', () => {
 			} );
 
 			// Add a reaction.
-			await blockNoteUtils.addReactionToComment( 'celebration' );
+			await blockNoteUtils.addReactionToComment( 'Celebration' );
 
 			// Hover over the reaction button to trigger tooltip.
 			const reactionButton = page.getByRole( 'button', {
-				name: /celebration/,
+				name: /Celebration/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 			await reactionButton.hover();
@@ -1276,25 +1276,25 @@ test.describe( 'Block Notes', () => {
 			// The arrow keys move through the emoji, and Enter picks one.
 			await page.keyboard.press( 'Enter' );
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
 			).toBeFocused();
 			await page.keyboard.press( 'ArrowDown' );
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
 			).toBeFocused();
 			await page.keyboard.press( 'Enter' );
 
 			await expect(
-				page.getByRole( 'button', { name: /celebration/ } )
+				page.getByRole( 'button', { name: /Celebration/ } )
 			).toContainText( '1' );
 
 			// The menu marks the emoji the user has already reacted with.
 			await trigger.click();
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'celebration' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Celebration' } )
 			).toBeChecked();
 			await expect(
-				menu.getByRole( 'menuitemcheckbox', { name: 'heart' } )
+				menu.getByRole( 'menuitemcheckbox', { name: 'Heart' } )
 			).not.toBeChecked();
 		} );
 
@@ -1320,9 +1320,9 @@ test.describe( 'Block Notes', () => {
 			await thread.click();
 			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
 
-			await blockNoteUtils.addReactionToComment( 'heart' );
+			await blockNoteUtils.addReactionToComment( 'Heart' );
 			const reactionPill = sidebar.getByRole( 'button', {
-				name: /heart/,
+				name: /Heart/,
 			} );
 			await expect( reactionPill ).toBeVisible();
 
@@ -1423,9 +1423,9 @@ test.describe( 'Block Notes', () => {
 				comment: 'Test comment for deselected reactions',
 			} );
 
-			await blockNoteUtils.addReactionToComment( 'heart' );
+			await blockNoteUtils.addReactionToComment( 'Heart' );
 			const reactionButton = page.getByRole( 'button', {
-				name: /heart/,
+				name: /Heart/,
 			} );
 			await expect( reactionButton ).toBeVisible();
 
