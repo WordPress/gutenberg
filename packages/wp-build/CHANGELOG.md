@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   Remove the automatic Emotion Babel transform and its build-time dependencies. External projects with a `packages/components` directory that rely on Emotion component selectors must replace those selectors or run the Emotion Babel transform separately before `@wordpress/build` ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### Bug Fixes
@@ -12,7 +13,6 @@
 
 ### Internal
 
--   Remove the components-only Emotion Babel transform and its build-time dependencies ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
 -   Publish only runtime files, dropping `tsconfig.json`, the TypeScript build cache (`.cache`) and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
 
 ## 0.25.0 (2026-10-07)
