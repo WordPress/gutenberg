@@ -1,13 +1,20 @@
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
+import type { ForwardedRef } from 'react';
 import BlockSupportToolsPanel from './block-support-tools-panel';
 import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
+import type { InspectorControlsSlotProps } from './types';
 
 function InspectorControlsSlot(
-	{ group = 'default', label, fillProps, ...props },
-	ref
+	{
+		group = 'default',
+		label,
+		fillProps,
+		...props
+	}: InspectorControlsSlotProps,
+	ref: ForwardedRef< unknown >
 ) {
 	const slotFill = groups[ group ];
 	const fills = useSlotFills( slotFill?.name );

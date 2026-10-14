@@ -4,8 +4,16 @@ import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
+import type {
+	BlockSupportResetAllFilter,
+	BlockSupportToolsPanelProps,
+} from './types';
 
-export default function BlockSupportToolsPanel( { children, group, label } ) {
+export default function BlockSupportToolsPanel( {
+	children,
+	group,
+	label,
+}: BlockSupportToolsPanelProps ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const {
 		getBlockAttributes,
@@ -17,17 +25,21 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const panelId = getSelectedBlockClientId();
 	const resetAll = useCallback(
-		( resetFilters = [] ) => {
-			const newAttributes = {};
+		( resetFilters: BlockSupportResetAllFilter[] = [] ) => {
+			const newAttributes: Record<
+				string,
+				Record< string, unknown >
+			> = {};
 
+			// The panel only renders while a block is selected.
 			const clientIds = hasMultiSelection()
 				? getMultiSelectedBlockClientIds()
-				: [ panelId ];
+				: [ panelId! ];
 
 			clientIds.forEach( ( clientId ) => {
 				const blockAttributes = getBlockAttributes( clientId ) || {};
 				const { style } = blockAttributes;
-				let newBlockAttributes = { style };
+				let newBlockAttributes: Record< string, unknown > = { style };
 				const resetContext = {
 					attributes: blockAttributes,
 					clientId,

@@ -1,11 +1,12 @@
 import { __experimentalToolsPanelContext as ToolsPanelContext } from '@wordpress/components';
 import { useContext, useMemo } from '@wordpress/element';
+import type { BlockSupportSlotContainerProps } from './types';
 
 export default function BlockSupportSlotContainer( {
 	Slot,
 	fillProps,
 	...props
-} ) {
+}: BlockSupportSlotContainerProps ) {
 	// Add the toolspanel context provider and value to existing fill props
 	const toolsPanelContext = useContext( ToolsPanelContext );
 	const computedFillProps = useMemo(

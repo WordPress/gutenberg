@@ -1,4 +1,5 @@
 import { createSlotFill } from '@wordpress/components';
+import type { SlotFill } from './types';
 
 const InspectorControlsDefault = createSlotFill( 'InspectorControls' );
 const InspectorControlsAdvanced = createSlotFill( 'InspectorAdvancedControls' );
@@ -26,7 +27,7 @@ const InspectorControlsStyles = createSlotFill( 'InspectorControlsStyles' );
 const InspectorControlsEffects = createSlotFill( 'InspectorControlsEffects' );
 const InspectorControlsContent = createSlotFill( 'InspectorControlsContent' );
 
-const groups = {
+const groups: Record< string, SlotFill > = {
 	default: InspectorControlsDefault,
 	advanced: InspectorControlsAdvanced,
 	background: InspectorControlsBackground,
