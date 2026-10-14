@@ -10,7 +10,7 @@
 		flex-direction: column;
 	}
 
-	:where([aria-orientation="horizontal"]) {
+	&:where([aria-orientation="horizontal"]) {
 		width: fit-content;
 	}
 

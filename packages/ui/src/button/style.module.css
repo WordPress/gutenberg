@@ -109,41 +109,6 @@
 					color: GrayText;
 				}
 			}
-
-			/* Loading spinner — not animated and hidden unless in loading state */
-			&::before {
-				content: "";
-				position: absolute;
-				top: 50%;
-				/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical centering technique used with transform: translate(-50%, -50%) */
-				left: 50%;
-				transform: translate(-50%, -50%);
-
-				display: block;
-				box-sizing: border-box;
-				height: var(--wp-ui-button-font-size);
-				aspect-ratio: 1;
-
-				border: var(--wpds-border-width-focus) solid;
-				border-block-start-color: var(--wp-ui-button-foreground-color);
-				border-inline-end-color: var(--wp-ui-button-foreground-color);
-				border-block-end-color: transparent;
-				border-inline-start-color: transparent;
-				border-radius: 50%;
-
-				pointer-events: none;
-				opacity: 0;
-
-				@media not ( prefers-reduced-motion ) {
-					transition: opacity 0.1s ease-out;
-				}
-
-				@media ( forced-colors: active ) {
-					border-color: ButtonText;
-					border-block-end-style: none;
-					border-inline-start-style: none;
-				}
-			}
 		}
 
 		.is-small {
@@ -245,29 +210,33 @@
 				color: ButtonFace;
 			}
 
-			* {
+			> :not(.spinner) {
 				opacity: 0;
 			}
-
-			&::before {
-				transition-delay: 0.05s;
-				opacity: 1;
-
-				@media not ( prefers-reduced-motion ) {
-					animation: loading-animation 1s linear infinite;
-				}
-			}
 		}
-
 	}
 
-	@keyframes loading-animation {
-		0% {
-			transform: translate(-50%, -50%) rotate(0deg);
-		}
+	@layer compositions {
+		.spinner {
+			position: absolute;
+			inset: 0;
+			margin: auto;
+			width: var(--wp-ui-button-font-size);
+			height: var(--wp-ui-button-font-size);
+			color: var(--wp-ui-button-foreground-color);
+			pointer-events: none;
 
-		100% {
-			transform: translate(-50%, -50%) rotate(360deg);
+			@media ( prefers-reduced-motion ) {
+				> * {
+					animation: none;
+				}
+			}
+
+			@media ( forced-colors: active ) {
+				> * {
+					stroke: ButtonText;
+				}
+			}
 		}
 	}
 }
