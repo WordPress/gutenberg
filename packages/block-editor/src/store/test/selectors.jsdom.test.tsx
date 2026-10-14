@@ -5702,6 +5702,7 @@ describe( 'getBlockEditingMode', () => {
 				getSelectedBlockStyleState( state, undefined )
 			).toEqual( {
 				viewport: 'default',
+				custom: 'default',
 				pseudo: 'default',
 			} );
 		} );
@@ -5711,6 +5712,7 @@ describe( 'getBlockEditingMode', () => {
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: 'default',
+				custom: 'default',
 				pseudo: 'default',
 			} );
 		} );
@@ -5739,6 +5741,7 @@ describe( 'getBlockEditingMode', () => {
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: 'default',
+				custom: 'default',
 				pseudo: 'default',
 			} );
 		} );
@@ -5754,6 +5757,7 @@ describe( 'getBlockEditingMode', () => {
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: '@mobile',
+				custom: 'default',
 				pseudo: 'default',
 			} );
 		} );
@@ -5800,6 +5804,19 @@ describe( 'getBlockEditingMode', () => {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
+				},
+			} );
+
+			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'returns true when a custom state is selected', () => {
+			const state = partial< State >( {
+				selectedBlockStyleState: {
+					clientId: 'client-1',
+					value: { custom: '-current', pseudo: 'default' },
 				},
 			} );
 
