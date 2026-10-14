@@ -148,7 +148,6 @@ const GridVisualizerGrid = forwardRef(
 							gridElement={ gridElement }
 							gridInfo={ gridInfo }
 							childGridRect={ childGridRect }
-							isDroppingAllowed={ isDroppingAllowed }
 						/>
 					) : (
 						<AutoGridVisualizer
@@ -187,7 +186,6 @@ function ManualGridVisualizer( {
 	gridElement,
 	gridInfo,
 	childGridRect,
-	isDroppingAllowed,
 } ) {
 	const [ dropTarget, setDropTarget ] = useState( null );
 	const [ marquee, setMarquee ] = useState( null );
@@ -240,17 +238,13 @@ function ManualGridVisualizer( {
 					const isCellOccupied = occupiedRects.some( ( rect ) =>
 						rect.contains( column, row )
 					);
-					// The lines of cells that blocks are in are only drawn
-					// over the blocks while one is dragged or drawn, to line
-					// it up.
-					const hasLines =
-						! isChildGridCell &&
-						( ! isCellOccupied || isDroppingAllowed || !! marquee );
 					return (
 						<GridVisualizerCell
 							key={ `${ row }-${ column }` }
 							color={ gridInfo.currentColor }
-							lineStyle={ hasLines ? 'contrasting' : 'none' }
+							lineStyle={
+								isChildGridCell ? 'none' : 'contrasting'
+							}
 						>
 							{ ! isCellOccupied && ! isChildGridCell && (
 								<GridVisualizerAppender
