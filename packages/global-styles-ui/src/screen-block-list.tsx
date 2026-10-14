@@ -158,23 +158,6 @@ export function hasUserStylesForBlock(
 	);
 }
 
-/**
- * Whether the user has customized an element.
- *
- * Reads the user layer only, for the same reason as blocks: the merged config
- * would match most elements, because themes style them.
- *
- * @param user        The user's global styles config.
- * @param elementName The element to check, e.g. `button` or `h2`.
- * @return Whether the user has any styles for that element.
- */
-export function hasUserStylesForElement(
-	user: GlobalStylesConfig | undefined,
-	elementName: string
-): boolean {
-	return hasAnyValue( user?.styles?.elements?.[ elementName ] );
-}
-
 type StyleFilter = 'all' | 'customized';
 
 function useSortedBlockTypes() {
@@ -344,13 +327,16 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 		return names;
 	}, [ user ] );
 
+	// Reads the user layer only, for the same reason as blocks.
 	const customizedElementNames = useMemo( () => {
 		const names = new Set< string >();
-		Object.keys( user?.styles?.elements ?? {} ).forEach( ( name ) => {
-			if ( hasUserStylesForElement( user, name ) ) {
-				names.add( name );
+		Object.entries( user?.styles?.elements ?? {} ).forEach(
+			( [ name, styles ] ) => {
+				if ( hasAnyValue( styles ) ) {
+					names.add( name );
+				}
 			}
-		} );
+		);
 		return names;
 	}, [ user ] );
 
