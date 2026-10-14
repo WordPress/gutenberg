@@ -76,7 +76,7 @@ const SlugEdit = ( {
 			{ isEditable && (
 				<Stack direction="column" gap="sm">
 					<Stack direction="column">
-						<span>
+						<span id={ postUrlSlugDescriptionId }>
 							{ __(
 								'Customize the last part of the Permalink.'
 							) }
