@@ -101,4 +101,42 @@ describe( 'withGlobalEvents', () => {
 		);
 		expect( onResize ).toHaveBeenCalledWith( event );
 	} );
+
+	it( 'keeps default props optional and accepts a null ref', () => {
+		class WithDefaults extends Component< { label: string } > {
+			static defaultProps = { label: 'Default' };
+
+			render() {
+				return <div>{ this.props.label }</div>;
+			}
+		}
+
+		// Only type checked: React warns when `super()` gets other props.
+		class NoArgConstructor extends Component< { label: string } > {
+			constructor() {
+				super( { label: '' } );
+			}
+
+			render() {
+				return <div>{ this.props.label }</div>;
+			}
+		}
+
+		const EnhancedWithDefaults = withGlobalEvents( {
+			resize: 'handleResize',
+		} )( WithDefaults );
+		const EnhancedNoArgConstructor = withGlobalEvents( {
+			resize: 'handleResize',
+		} )( NoArgConstructor );
+
+		const noArgConstructorElement = (
+			<EnhancedNoArgConstructor label="Hello" />
+		);
+
+		render( <EnhancedWithDefaults ref={ null } /> );
+
+		expect( console ).toHaveWarnedWith( DEPRECATION_MESSAGE );
+		expect( screen.getByText( 'Default' ) ).toBeVisible();
+		expect( noArgConstructorElement.props.label ).toBe( 'Hello' );
+	} );
 } );
