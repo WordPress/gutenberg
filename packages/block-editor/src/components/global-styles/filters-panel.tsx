@@ -71,12 +71,14 @@ export function useHasFiltersPanel( settings: StyleSettings ) {
 }
 
 function useHasDuotoneControl( settings: StyleSettings ) {
-	// The filters panel gets resolved color settings. An object of presets
-	// has no length, so it reads as none.
+	// Presets are keyed by origin. Default ones only count when `defaultDuotone` is on.
+	const hasPresets = ( [ 'theme', 'custom' ] as const ).some(
+		( origin ) => ( settings?.color?.duotone?.[ origin ]?.length ?? 0 ) > 0
+	);
 	return (
-		settings.color!.customDuotone ||
-		settings.color!.defaultDuotone ||
-		( settings.color!.duotone as unknown[] ).length > 0
+		settings?.color?.customDuotone ||
+		settings?.color?.defaultDuotone ||
+		hasPresets
 	);
 }
 
