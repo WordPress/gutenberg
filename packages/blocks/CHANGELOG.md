@@ -11,6 +11,7 @@
 
 -   `getBlockSupport` and `hasBlockSupport`: Accept the feature as an array of path segments in the types, as the store selectors and runtime already do ([#84708](https://github.com/WordPress/gutenberg/pull/84708)).
 -   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
+-   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
 
 ## 16.2.0 (2026-10-07)
 
