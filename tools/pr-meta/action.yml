@@ -23,6 +23,12 @@ inputs:
     run-url:
         description: 'URL of the workflow run that produced the content.'
         required: false
+    require-base:
+        description: 'Only write when the pull request targets this branch. For a producer whose workflow runs from the default branch regardless of the target, so it cannot reach a branch whose own writers are older.'
+        required: false
+    retire-comments-matching:
+        description: 'Text identifying a standalone comment this section replaces. Any the bot posted are deleted once the section is written.'
+        required: false
 runs:
     # Node 24 strips the types on the fly, so the action runs straight from its
     # TypeScript sources without a build step. This requires every relative

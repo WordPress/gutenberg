@@ -12,7 +12,11 @@ import {
 } from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
-import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import {
+	getValueFromObjectPath,
+	isPlainObject,
+	setImmutably,
+} from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 
@@ -23,11 +27,7 @@ import { unlock } from '../lock-unlock';
  * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if (
-		object === null ||
-		typeof object !== 'object' ||
-		Array.isArray( object )
-	) {
+	if ( ! isPlainObject( object ) ) {
 		return object;
 	}
 
@@ -565,8 +565,19 @@ export function createBlockEditFilter( features ) {
 							shareWithChildBlocks,
 							supportsPatternEditing,
 						} = feature;
+						// Explicit `false` hides the feature during pattern editing,
+						// even when the block is selected.
+						if (
+							context[ mayDisplayPatternEditingControlsKey ] &&
+							supportsPatternEditing === false
+						) {
+							return null;
+						}
+
 						const shouldDisplayControls =
-							( supportsPatternEditing &&
+							// Explicit `true` also shows controls for unselected blocks
+							// in the section. `undefined` uses the selection/parent rules.
+							( supportsPatternEditing === true &&
 								context[
 									mayDisplayPatternEditingControlsKey
 								] ) ||

@@ -61,7 +61,7 @@ The icon to render in the snackbar.
 -   Required: No
 -   Default: `null`
 
-#### `listRef`: `MutableRefObject< HTMLDivElement | null >`
+#### `listRef`: `RefObject< HTMLDivElement | null >`
 
 A ref to the list that contains the snackbar.
 
@@ -99,4 +99,5 @@ Used to provide a custom spoken message.
 
 ## Related components
 
+-   Use SnackbarList to display multiple snackbars.
 -   To create a prominent message that requires a higher-level of attention, use a Notice.

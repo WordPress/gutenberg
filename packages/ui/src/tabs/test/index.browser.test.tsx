@@ -1804,6 +1804,7 @@ describe( 'Tabs', () => {
 				} );
 			} );
 
+			/* eslint-disable vitest/no-conditional-expect -- These fixed controlled and uncontrolled variants both assert their expected behavior. */
 			describe.each( [
 				[ 'defaultValue', 'Uncontrolled', UncontrolledTabs ],
 				[ 'value', 'Controlled', ControlledTabs ],
@@ -2406,6 +2407,7 @@ describe( 'Tabs', () => {
 			);
 		} );
 	} );
+	/* eslint-enable vitest/no-conditional-expect */
 
 	describe( 'Development mode validation', () => {
 		function collectUncaughtErrors() {

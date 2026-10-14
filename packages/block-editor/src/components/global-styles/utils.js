@@ -1,16 +1,45 @@
 import { useViewportMatch } from '@wordpress/compose';
+import { createContext, useContext } from '@wordpress/element';
+
+/**
+ * Popover props for ToolsPanel dropdown menus (`dropdown`) and item popovers
+ * (`item`). Defaults to the editor sidebar; consumers rendering the panels
+ * elsewhere provide their own values.
+ */
+export const ToolsPanelPopoverPropsContext = createContext( {
+	dropdown: {
+		placement: 'left-start',
+		// Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
+		offset: 259,
+	},
+	item: {
+		placement: 'left-start',
+		// Panel padding (16px) + spacing (20px)
+		offset: 36,
+		shift: true,
+	},
+} );
 
 export function useToolsPanelDropdownMenuProps() {
 	const isMobile = useViewportMatch( 'medium', '<' );
-	return ! isMobile
-		? {
-				popoverProps: {
-					placement: 'left-start',
-					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
-					offset: 259,
-				},
-			}
-		: {};
+	const { dropdown } = useContext( ToolsPanelPopoverPropsContext );
+	return ! isMobile ? { popoverProps: dropdown } : {};
+}
+
+/**
+ * @typedef {Pick<
+ *   NonNullable<import('react').ComponentProps<import('@wordpress/components').Dropdown>['popoverProps']>,
+ *   'placement' | 'offset' | 'shift'
+ * >} ToolsPanelPopoverProps
+ */
+
+/**
+ * Popover props for a tools panel item.
+ *
+ * @return {ToolsPanelPopoverProps} Popover props for a tools panel item.
+ */
+export function useToolsPanelItemPopoverProps() {
+	return useContext( ToolsPanelPopoverPropsContext ).item;
 }
 
 /**

@@ -3,8 +3,8 @@ import deprecated from '@wordpress/deprecated';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
 
-vi.mock( '@wordpress/deprecated' );
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/deprecated' ) );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 /**
  * Returns the expected arguments for the deprecated function call.

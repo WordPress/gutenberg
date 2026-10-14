@@ -11,3 +11,11 @@ reviews:
         # `@coderabbitai review`, or when the keyword below is in the description.
         enabled: false
         description_keyword: '@coderabbitai review'
+
+knowledge_base:
+    code_guidelines:
+        filePatterns:
+            # CodeRabbit does not reliably read the `applyTo` frontmatter in
+            # Copilot instruction files, so repeat the scope here.
+            - files: '.github/instructions/lint-suppressions.instructions.md'
+              applyTo: 'tools/eslint/suppressions.json,tools/stylelint/stylelint-suppressions.json'

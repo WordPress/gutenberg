@@ -9,21 +9,32 @@ export type SectionScope = 'commit' | 'pr-state';
 
 export type SectionDefinition = {
 	id: string;
-	/* Led by an emoji, so a reader can pick out their section at a glance. */
-	heading: string;
+	/*
+	 * Led by an emoji, so a reader can pick out their section at a glance.
+	 * Omitted for a body that labels itself, such as a badge.
+	 */
+	heading?: string;
 	scope: SectionScope;
 	/** Maximum characters of rendered body before the section is truncated. */
 	budget: number;
 	/** Label for a section long enough to collapse. Omitted leaves it open. */
 	summary?: string;
+	/** Which end truncation keeps. Defaults to the start. */
+	keep?: 'start' | 'end';
 };
 
 /*
- * Render order, independent of the order the workflows finish in. The two a
- * human acts on lead: the welcome greets a first-time contributor, and props
- * is copied out by hand at merge time.
+ * Render order, independent of the order the workflows finish in. The
+ * Playground badge sits right under the comment heading. The two a human acts
+ * on follow: the welcome greets a first-time contributor, and props is copied
+ * out by hand at merge time.
  */
 export const SECTIONS: SectionDefinition[] = [
+	{
+		id: 'playground',
+		scope: 'pr-state',
+		budget: 1000,
+	},
 	{
 		id: 'welcome',
 		heading: '👋 Welcome',
@@ -34,7 +45,9 @@ export const SECTIONS: SectionDefinition[] = [
 		id: 'props',
 		heading: '🎉 Props',
 		scope: 'pr-state',
-		budget: 8000,
+		budget: 20000,
+		// The trailer a committer copies is the last thing in the body.
+		keep: 'end',
 	},
 	{
 		id: 'labels',
@@ -52,21 +65,20 @@ export const SECTIONS: SectionDefinition[] = [
 		id: 'bundle-size',
 		heading: '📦 Bundle size',
 		scope: 'commit',
-		budget: 12000,
+		budget: 10000,
 	},
 	{
 		id: 'performance',
 		heading: '⚡ Performance',
 		scope: 'commit',
-		budget: 12000,
+		budget: 10000,
 		summary: 'Show the results',
 	},
 	{
 		id: 'flaky-tests',
 		heading: '🏁 Flaky tests',
 		scope: 'commit',
-		budget: 16000,
-		summary: 'Show the failures',
+		budget: 14000,
 	},
 ];
 

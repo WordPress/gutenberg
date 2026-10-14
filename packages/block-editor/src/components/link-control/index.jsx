@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import {
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	Notice,
 	TextControl,
 	__experimentalHStack as HStack,
@@ -102,6 +102,9 @@ import normalizeUrl from './normalize-url';
  * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
  * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
+ * @property {Function=}                  transformSuggestions       Changes the search suggestions before they are shown. Called
+ *                                                                   with the suggestions and `{ searchTerm, isInitialSuggestions }`,
+ *                                                                   and returns the suggestions to show or a Promise of them.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
  * @property {boolean=}                   hasTextControl             Whether to add a text field to the UI to update the value.title.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
@@ -168,6 +171,7 @@ function LinkControl( {
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
 	suggestionsQuery = {},
+	transformSuggestions,
 	noURLSuggestion = false,
 	createSuggestionButtonText,
 	hasRichPreviews = false,
@@ -653,7 +657,7 @@ function LinkControl( {
 		>
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
-					<Spinner /> { __( 'Creating' ) }…
+					<WCSpinner /> { __( 'Creating' ) }…
 				</div>
 			) }
 
@@ -690,6 +694,7 @@ function LinkControl( {
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
 							suggestionsQuery={ suggestionsQuery }
+							transformSuggestions={ transformSuggestions }
 							withURLSuggestion={ ! noURLSuggestion }
 							createSuggestionButtonText={
 								createSuggestionButtonText

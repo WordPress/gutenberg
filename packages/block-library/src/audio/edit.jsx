@@ -2,11 +2,12 @@ import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
 import {
 	SelectControl as WCSelectControl,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
+import { inertValue } from '@wordpress/react-inert-value';
 import { Text } from '@wordpress/ui';
 import {
 	BlockControls,
@@ -251,10 +252,10 @@ function AudioEdit( {
 			<figure { ...blockProps }>
 				<audio
 					controls="controls"
-					inert={ ! isSingleSelected ? 'true' : undefined }
+					inert={ inertValue( ! isSingleSelected ) }
 					src={ src ?? temporaryURL }
 				/>
-				{ !! temporaryURL && <Spinner /> }
+				{ !! temporaryURL && <WCSpinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

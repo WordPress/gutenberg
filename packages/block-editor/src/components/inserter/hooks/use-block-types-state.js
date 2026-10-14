@@ -1,17 +1,17 @@
 import {
-	getBlockType,
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	store as blocksStore,
 	parse,
 } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo } from '@wordpress/element';
-import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../../store';
 import { isFiltered } from '../../../store/utils';
-import { unlock } from '../../../lock-unlock';
+
+// Shared so the selector cache survives the inserter closing and reopening.
+const FILTERED_OPTIONS = { [ isFiltered ]: true };
+const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
 
 /**
  * Retrieves the block types inserter state.
@@ -22,23 +22,16 @@ import { unlock } from '../../../lock-unlock';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
-	const options = useMemo(
-		() => ( { [ isFiltered ]: !! isQuick } ),
-		[ isQuick ]
-	);
-	const [ items ] = useSelect(
-		( select ) => [
+	const options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
+	// Not wrapped in a tuple, so `useSelect` can return the previous array when the items match.
+	const items = useSelect(
+		( select ) =>
 			select( blockEditorStore ).getInserterItems(
 				rootClientId,
 				options
 			),
-		],
 		[ rootClientId, options ]
 	);
-	const { getClosestAllowedInsertionPoint } = unlock(
-		useSelect( blockEditorStore )
-	);
-	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const [ categories, collections ] = useSelect( ( select ) => {
 		const { getCategories, getCollections } = select( blocksStore );
@@ -57,26 +50,6 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 			},
 			shouldFocusBlock
 		) => {
-			const destinationClientId = getClosestAllowedInsertionPoint(
-				name,
-				rootClientId
-			);
-			if ( destinationClientId === null ) {
-				const title = getBlockType( name )?.title ?? name;
-				createErrorNotice(
-					sprintf(
-						/* translators: %s: block pattern title. */
-						__( 'Block "%s" can\'t be inserted.' ),
-						title
-					),
-					{
-						type: 'snackbar',
-						id: 'inserter-notice',
-					}
-				);
-				return;
-			}
-
 			const insertedBlock =
 				syncStatus === 'unsynced'
 					? parse( content, {
@@ -88,19 +61,9 @@ const useBlockTypesState = ( rootClientId, onInsert, isQuick ) => {
 							createBlocksFromInnerBlocksTemplate( innerBlocks ),
 							innerContent
 						);
-			onInsert(
-				insertedBlock,
-				undefined,
-				shouldFocusBlock,
-				destinationClientId
-			);
+			onInsert( insertedBlock, undefined, shouldFocusBlock );
 		},
-		[
-			getClosestAllowedInsertionPoint,
-			rootClientId,
-			onInsert,
-			createErrorNotice,
-		]
+		[ onInsert ]
 	);
 
 	return [ items, categories, collections, onSelectItem ];

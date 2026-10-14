@@ -11,31 +11,48 @@ class WP_Test_Icon_Collections_Registry extends WP_UnitTestCase {
 	 */
 	protected $collections;
 
+	/**
+	 * Icons registry instance in place before the test, restored in tear_down.
+	 *
+	 * @var WP_Icons_Registry|null
+	 */
+	private $original_icons_registry = null;
+
 	public function set_up() {
 		parent::set_up();
 		$this->collections = WP_Icon_Collections_Registry::get_instance();
-	}
-
-	public function tear_down() {
-		foreach ( array( 'plugin-a', 'plugin-b', 'my-collection' ) as $slug ) {
-			if ( $this->collections->is_registered( $slug ) ) {
-				$this->collections->unregister( $slug );
-			}
-		}
-
-		$instance_property = new ReflectionProperty( WP_Icons_Registry_Gutenberg::class, 'instance' );
 
 		/*
+		 * Start from a clean registry, keeping the instance that was in place so
+		 * `tear_down()` can put it back rather than leaving later suites with a
+		 * base registry that rejects Gutenberg-only icon properties.
+		 *
 		 * ReflectionProperty::setAccessible is:
 		 * - redundant as of 8.1.0, which made all properties accessible
 		 * - deprecated as of 8.5.0
 		 * - needed until 8.1.0, as property `instance` is private
 		 */
+		$instance_property = new ReflectionProperty( WP_Icons_Registry_Gutenberg::class, 'instance' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$instance_property->setAccessible( true );
 		}
-
+		$this->original_icons_registry = $instance_property->getValue();
 		$instance_property->setValue( null, null );
+	}
+
+	public function tear_down() {
+		$instance_property = new ReflectionProperty( WP_Icons_Registry_Gutenberg::class, 'instance' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$instance_property->setAccessible( true );
+		}
+		$instance_property->setValue( null, $this->original_icons_registry );
+		$this->original_icons_registry = null;
+
+		foreach ( array( 'plugin-a', 'plugin-b', 'my-collection' ) as $slug ) {
+			if ( $this->collections->is_registered( $slug ) ) {
+				$this->collections->unregister( $slug );
+			}
+		}
 
 		parent::tear_down();
 	}

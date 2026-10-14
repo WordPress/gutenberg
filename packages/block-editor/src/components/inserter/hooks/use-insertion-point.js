@@ -1,6 +1,7 @@
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
-import { _n, sprintf } from '@wordpress/i18n';
+import { getBlockType, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
 import { useCallback } from '@wordpress/element';
 import { store as blockEditorStore } from '../../../store';
@@ -32,6 +33,55 @@ function getIndex( {
 	}
 	return registry.select( blockEditorStore ).getBlockOrder( rootClientId )
 		.length;
+}
+
+/**
+ * Resolves where an insertion from this inserter lands.
+ *
+ * @param {Object}   selectors             Unlocked `core/block-editor` selectors.
+ * @param {Object}   config                Inserter config.
+ * @param {string}   config.rootClientId   Root the inserter belongs to.
+ * @param {number=}  config.insertionIndex Explicit index to insert at.
+ * @param {string=}  config.clientId       Block to insert after.
+ * @param {boolean=} config.isAppender     Whether the inserter is an appender.
+ * @return {{ destinationRootClientId: string, destinationIndex: number }} Destination.
+ */
+function getDestination(
+	selectors,
+	{ rootClientId, insertionIndex, clientId, isAppender }
+) {
+	const {
+		getSelectedBlockClientId,
+		getBlockRootClientId,
+		getBlockIndex,
+		getBlockOrder,
+		getInsertionPoint,
+	} = selectors;
+	const selectedBlockClientId = getSelectedBlockClientId();
+	let destinationRootClientId = rootClientId;
+	let destinationIndex;
+	const insertionPoint = getInsertionPoint();
+
+	if ( insertionIndex !== undefined ) {
+		// Insert into a specific index.
+		destinationIndex = insertionIndex;
+	} else if ( insertionPoint && insertionPoint.hasOwnProperty( 'index' ) ) {
+		destinationRootClientId = insertionPoint?.rootClientId
+			? insertionPoint.rootClientId
+			: rootClientId;
+		destinationIndex = insertionPoint.index;
+	} else if ( clientId ) {
+		// Insert after a specific client ID.
+		destinationIndex = getBlockIndex( clientId );
+	} else if ( ! isAppender && selectedBlockClientId ) {
+		destinationRootClientId = getBlockRootClientId( selectedBlockClientId );
+		destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
+	} else {
+		// Insert at the end of the list.
+		destinationIndex = getBlockOrder( destinationRootClientId ).length;
+	}
+
+	return { destinationRootClientId, destinationIndex };
 }
 
 /**
@@ -69,51 +119,14 @@ function useInsertionPoint( {
 		getClosestAllowedInsertionPoint,
 		getBlockInsertionPoint,
 	} = unlock( useSelect( blockEditorStore ) );
-	const { destinationRootClientId, destinationIndex } = useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientId,
-				getBlockRootClientId,
-				getBlockIndex,
-				getBlockOrder,
-				getInsertionPoint,
-			} = unlock( select( blockEditorStore ) );
-			const selectedBlockClientId = getSelectedBlockClientId();
-			let _destinationRootClientId = rootClientId;
-			let _destinationIndex;
-			const insertionPoint = getInsertionPoint();
-
-			if ( insertionIndex !== undefined ) {
-				// Insert into a specific index.
-				_destinationIndex = insertionIndex;
-			} else if (
-				insertionPoint &&
-				insertionPoint.hasOwnProperty( 'index' )
-			) {
-				_destinationRootClientId = insertionPoint?.rootClientId
-					? insertionPoint.rootClientId
-					: rootClientId;
-				_destinationIndex = insertionPoint.index;
-			} else if ( clientId ) {
-				// Insert after a specific client ID.
-				_destinationIndex = getBlockIndex( clientId );
-			} else if ( ! isAppender && selectedBlockClientId ) {
-				_destinationRootClientId = getBlockRootClientId(
-					selectedBlockClientId
-				);
-				_destinationIndex = getBlockIndex( selectedBlockClientId ) + 1;
-			} else {
-				// Insert at the end of the list.
-				_destinationIndex = getBlockOrder(
-					_destinationRootClientId
-				).length;
-			}
-
-			return {
-				destinationRootClientId: _destinationRootClientId,
-				destinationIndex: _destinationIndex,
-			};
-		},
+	const { destinationRootClientId } = useSelect(
+		( select ) =>
+			getDestination( unlock( select( blockEditorStore ) ), {
+				rootClientId,
+				insertionIndex,
+				clientId,
+				isAppender,
+			} ),
 		[ rootClientId, insertionIndex, clientId, isAppender ]
 	);
 
@@ -124,6 +137,7 @@ function useInsertionPoint( {
 		hideInsertionPoint,
 		setLastFocus,
 	} = unlock( useDispatch( blockEditorStore ) );
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onInsertBlocks = useCallback(
 		( blocks, meta, shouldForceFocusBlock = false, _rootClientId ) => {
@@ -137,6 +151,36 @@ function useInsertionPoint( {
 				selectBlockOnInsert
 			) {
 				setLastFocus( null );
+			}
+
+			// Resolved at call time: the destination follows the selection, and
+			// closing over it would give this callback a new identity per click.
+			const destination = getDestination(
+				unlock( registry.select( blockEditorStore ) ),
+				{ rootClientId, insertionIndex, clientId, isAppender }
+			);
+
+			// No root given: use the closest container that accepts the blocks,
+			// as the hover cue does.
+			if ( _rootClientId === undefined ) {
+				const names = (
+					Array.isArray( blocks ) ? blocks : [ blocks ]
+				).map( ( block ) => block.name );
+				_rootClientId = getClosestAllowedInsertionPoint(
+					names,
+					destination.destinationRootClientId
+				);
+				if ( _rootClientId === null ) {
+					createErrorNotice(
+						sprintf(
+							/* translators: %s: block title. */
+							__( 'Block "%s" can\'t be inserted.' ),
+							getBlockType( names[ 0 ] )?.title ?? names[ 0 ]
+						),
+						{ type: 'snackbar', id: 'inserter-notice' }
+					);
+					return;
+				}
 			}
 
 			const selectedBlock = getSelectedBlock();
@@ -156,16 +200,15 @@ function useInsertionPoint( {
 			} else {
 				insertBlocks(
 					blocks,
-					isAppender || _rootClientId === undefined
-						? destinationIndex
+					isAppender
+						? destination.destinationIndex
 						: getIndex( {
-								destinationRootClientId,
-								destinationIndex,
+								...destination,
 								rootClientId: _rootClientId,
 								registry,
 							} ),
-					isAppender || _rootClientId === undefined
-						? destinationRootClientId
+					isAppender
+						? destination.destinationRootClientId
 						: _rootClientId,
 					selectBlockOnInsert,
 					shouldFocusBlock || shouldForceFocusBlock ? 0 : null,
@@ -185,12 +228,15 @@ function useInsertionPoint( {
 			}
 		},
 		[
+			rootClientId,
+			insertionIndex,
+			clientId,
 			isAppender,
 			getSelectedBlock,
+			getClosestAllowedInsertionPoint,
+			createErrorNotice,
 			replaceBlocks,
 			insertBlocks,
-			destinationRootClientId,
-			destinationIndex,
 			onSelect,
 			shouldFocusBlock,
 			selectBlockOnInsert,
@@ -202,17 +248,20 @@ function useInsertionPoint( {
 	const onToggleInsertionPoint = useCallback(
 		( item ) => {
 			if ( item ) {
+				const destination = getDestination(
+					unlock( registry.select( blockEditorStore ) ),
+					{ rootClientId, insertionIndex, clientId, isAppender }
+				);
 				const allowedDestinationRootClientId =
 					getClosestAllowedInsertionPoint(
 						item.name,
-						destinationRootClientId
+						destination.destinationRootClientId
 					);
 				if ( allowedDestinationRootClientId !== null ) {
 					showInsertionPoint(
 						allowedDestinationRootClientId,
 						getIndex( {
-							destinationRootClientId,
-							destinationIndex,
+							...destination,
 							rootClientId: allowedDestinationRootClientId,
 							registry,
 						} )
@@ -228,12 +277,14 @@ function useInsertionPoint( {
 			}
 		},
 		[
+			rootClientId,
+			insertionIndex,
+			clientId,
+			isAppender,
 			getClosestAllowedInsertionPoint,
 			getBlockInsertionPoint,
 			showInsertionPoint,
 			hideInsertionPoint,
-			destinationRootClientId,
-			destinationIndex,
 			registry,
 		]
 	);
