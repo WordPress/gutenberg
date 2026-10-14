@@ -727,7 +727,7 @@ describe( 'PaletteEdit', () => {
 		} );
 	} );
 
-	it( 'can update palette name', async () => {
+	it( 'can update palette name without changing its slug', async () => {
 		const onChange = vi.fn();
 
 		await render(
@@ -762,7 +762,6 @@ describe( 'PaletteEdit', () => {
 				{
 					...colors[ 0 ],
 					name: 'Primary Updated',
-					slug: 'primary-updated',
 				},
 				colors[ 1 ],
 			] );

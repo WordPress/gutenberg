@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { screen, waitFor } from '@testing-library/react';
 import { userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
@@ -22,10 +22,6 @@ const DEPRECATION_MESSAGE =
 
 beforeEach( () => {
 	logged[ DEPRECATION_MESSAGE ] = true;
-} );
-
-afterEach( () => {
-	delete logged[ DEPRECATION_MESSAGE ];
 } );
 
 const ControlledColorPalette = ( {

@@ -119,7 +119,6 @@ export function BulkSelectionCheckbox< Item >( {
 	if ( disableSelectAll ) {
 		return (
 			<WCCheckboxControl
-				className="dataviews-view-table-selection-checkbox"
 				checked={ hasSelection }
 				disabled={ ! hasSelection }
 				onChange={ () => {
@@ -132,7 +131,6 @@ export function BulkSelectionCheckbox< Item >( {
 
 	return (
 		<WCCheckboxControl
-			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && !! selectedItems.length }
 			onChange={ () => {

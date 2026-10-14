@@ -146,6 +146,7 @@ const BorderControlDropdown = (
 		popoverControlsClassName,
 		resetButtonWrapperClassName,
 		__unstablePopoverProps,
+		onToggle: onToggleProp, // Remove from `otherProps` to avoid type errors (native HTML `onToggle` vs `Dropdown` `onToggle`).
 		...otherProps
 	} = useBorderControlDropdown( props );
 

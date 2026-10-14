@@ -431,6 +431,18 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
 
+### getBackgroundClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's background support attributes.
+
+_Parameters_
+
+- _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+- `Object`: Background block support derived CSS classes & styles.
+
 ### getColorClassName
 
 Returns a class based on the context a color is being used and its slug.
@@ -1032,6 +1044,20 @@ _Related_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
+
+### useBackgroundProps
+
+Derives the background related props for a block from its background block support attributes.
+
+Prefer this in edit components so editor settings can be resolved later without a new API.
+
+_Parameters_
+
+- _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+- `Object`: ClassName & style props from background block support.
 
 ### useBlockBindingsUtils
 

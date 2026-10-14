@@ -564,10 +564,17 @@ function CoverEdit( {
 			return;
 		}
 
+		const previousImage = { id, url: propsRef.current.attributes.url };
+		let isUndone = false;
 		openMediaEditorModal( {
 			id,
 			onClose: () => {
 				editMediaButtonRef.current?.focus();
+			},
+			onUndo: () => {
+				isUndone = true;
+				setIsSwappingMedia( false );
+				setAttributes( previousImage );
 			},
 			onUpdate: async ( { id: newId, url: newUrl } ) => {
 				if ( typeof newId !== 'number' ) {
@@ -590,6 +597,10 @@ function CoverEdit( {
 				if ( newUrl ) {
 					const averageBackgroundColor =
 						await getMediaColor( newUrl );
+					// Snackbar Undo can run while the image color is loading.
+					if ( isUndone ) {
+						return;
+					}
 
 					// Read latest values after await to avoid stale closures.
 					const {

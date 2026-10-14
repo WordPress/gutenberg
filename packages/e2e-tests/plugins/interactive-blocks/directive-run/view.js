@@ -39,8 +39,8 @@ const html = `
 	<div data-testid="navigated">yes</div>
 
 	<div
-		data-wp-run--hydrated="callbacks.updateIsHydrated"
-		data-wp-run--renderCount="callbacks.updateRenderCount"
+		data-wp-run---hydrated="callbacks.updateIsHydrated"
+		data-wp-run---renderCount="callbacks.updateRenderCount"
 		data-wp-text="state.clickCount"
 	></div>
 </div>
