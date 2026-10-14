@@ -52,9 +52,7 @@ The list carries data, not UI: placement and materialization stay the host's. Th
 title: string;
 ```
 
-The translated title of the widget the host renders: the one the host shows in its header, translated on the server from `widget.json`. A widget reads it to build accessible names, so a focusable chart says what it shows without a second, hardcoded copy of the title.
-
-The host passes the string, not the id of its title element. `aria-labelledby` joins text in a fixed order, and a translated name built around the title must be free to place it.
+The translated title of the widget the host renders: the one the host shows in its header, translated on the server from `widget.json`.
 
 ## Providing it
 
