@@ -83,7 +83,9 @@ describe( 'getGradientAstWithDefault', () => {
 				value: '160',
 				unit: 'deg',
 			} );
-			expect( gradientAST.colorStops ).toHaveLength( 2 );
+			expect( serializeGradient( gradientAST ) ).toBe(
+				'linear-gradient(in oklch 160deg,#009ED4 0%,#FFCE00 100%)'
+			);
 		} );
 
 		test( 'reads an interpolation method placed after the direction', () => {
@@ -175,7 +177,9 @@ describe( 'getGradientAstWithDefault', () => {
 
 			expect( hasGradient ).toBe( true );
 			expect( gradientAST.colorInterpolation ).toBe( 'in oklch' );
-			expect( gradientAST.colorStops ).toHaveLength( 2 );
+			expect( serializeGradient( gradientAST ) ).toBe(
+				'linear-gradient(in oklch,#009ED4 0%,#FFCE00 100%)'
+			);
 		} );
 
 		test( 'falls back to the default gradient for a hue interpolation method on a non-hue color space', () => {

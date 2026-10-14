@@ -165,10 +165,13 @@ describe( 'CustomGradientPicker', () => {
 	} );
 
 	describe( 'with a color interpolation method', () => {
+		// The gradient from the issue. It has more color stops than the default
+		// gradient the picker falls back to, so the assertions below can only
+		// pass when this is the gradient being edited.
 		const INTERPOLATED_GRADIENT =
-			'linear-gradient(in oklch 160deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)';
+			'linear-gradient(in oklch 160deg,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)';
 
-		it( 'shows the color stops of a gradient that has an interpolation method', async () => {
+		it( 'shows the color stops and angle of a gradient that has an interpolation method', async () => {
 			await render(
 				<CustomGradientPicker
 					value={ INTERPOLATED_GRADIENT }
@@ -177,10 +180,21 @@ describe( 'CustomGradientPicker', () => {
 			);
 
 			expect(
-				screen.getAllByRole( 'button', {
-					name: /Gradient control point/,
-				} )
-			).toHaveLength( 2 );
+				screen
+					.getAllByRole( 'button', {
+						name: /Gradient control point/,
+					} )
+					.map( ( point ) => point.getAttribute( 'aria-label' ) )
+			).toEqual( [
+				'Gradient control point at position 0% with color code #009ED4.',
+				'Gradient control point at position 45% with color code #003366.',
+				'Gradient control point at position 65% with color code #452955.',
+				'Gradient control point at position 95% with color code #F08119.',
+				'Gradient control point at position 100% with color code #FFCE00.',
+			] );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Angle' } )
+			).toHaveValue( 160 );
 		} );
 
 		it( 'keeps the interpolation method when the angle changes', async () => {
@@ -199,7 +213,9 @@ describe( 'CustomGradientPicker', () => {
 
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
-			expect( lastCall ).toMatch( /^linear-gradient\(in oklch 161deg,/ );
+			expect( lastCall ).toBe(
+				'linear-gradient(in oklch 161deg,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)'
+			);
 		} );
 
 		it( 'keeps the interpolation method when switching to a radial gradient', async () => {
@@ -220,7 +236,9 @@ describe( 'CustomGradientPicker', () => {
 
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
-			expect( lastCall ).toMatch( /^radial-gradient\(in oklch,/ );
+			expect( lastCall ).toBe(
+				'radial-gradient(in oklch,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)'
+			);
 		} );
 
 		it( 'keeps the interpolation method when a color stop moves', async () => {
@@ -240,9 +258,12 @@ describe( 'CustomGradientPicker', () => {
 			firstPoint.focus();
 			await user.keyboard( '[ArrowRight]' );
 
+			// Moving a color stop rewrites every color as `rgb()`.
 			const lastCall =
 				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
-			expect( lastCall ).toMatch( /^linear-gradient\(in oklch 160deg,/ );
+			expect( lastCall ).toBe(
+				`linear-gradient(in oklch 160deg,rgb(0,158,212) ${ KEYBOARD_CONTROL_POINT_VARIATION }%,rgb(0,51,102) 45%,rgb(69,41,85) 65%,rgb(240,129,25) 95%,rgb(255,206,0) 100%)`
+			);
 		} );
 	} );
 } );
