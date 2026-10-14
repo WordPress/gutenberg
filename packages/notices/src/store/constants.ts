@@ -11,3 +11,10 @@ export const DEFAULT_CONTEXT = 'global';
  * Default notice status.
  */
 export const DEFAULT_STATUS: Notice[ 'status' ] = 'info';
+
+/**
+ * Private notice option carrying a React element, rendered in place of the
+ * notice's content. The content stays the notice's text, which is what gets
+ * spoken and what other readers of the notice see.
+ */
+export const NOTICE_ELEMENT = Symbol( 'NOTICE_ELEMENT' );
