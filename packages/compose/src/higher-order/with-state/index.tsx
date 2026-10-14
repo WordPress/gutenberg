@@ -6,7 +6,7 @@ import type {
 	WithInjectedProps,
 	WithoutInjectedProps,
 } from '../../utils/create-higher-order-component';
-import type { WithStateInnerProps } from './types';
+import type { WithStateHOC, WithStateInnerProps } from './types';
 
 function createWithState< TState extends object >( initialState: TState ) {
 	deprecated( 'wp.compose.withState', {
@@ -50,12 +50,8 @@ function createWithState< TState extends object >( initialState: TState ) {
 			};
 		},
 		'withState'
-	);
+	) as WithStateHOC< TState >;
 }
-
-type WithStateHOC< TState extends object > = ReturnType<
-	typeof createWithState< TState >
->;
 
 /**
  * A Higher Order Component used to provide and manage internal component state

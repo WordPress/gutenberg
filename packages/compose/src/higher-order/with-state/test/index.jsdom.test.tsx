@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Component } from '@wordpress/element';
 import withState from '../';
 import type { WithStateInnerProps } from '../types';
 
@@ -61,6 +62,29 @@ describe( 'withState', () => {
 		await user.click( button );
 
 		expect( button ).toHaveTextContent( '2' );
+	} );
+
+	it( 'should keep defaulted own props optional', () => {
+		type State = { count: number };
+		class Counter extends Component<
+			{ label: string } & WithStateInnerProps< State >
+		> {
+			static defaultProps = { label: 'Count' };
+
+			render() {
+				return (
+					<p>
+						{ this.props.label }: { this.props.count }
+					</p>
+				);
+			}
+		}
+		const EnhancedComponent = withState< State >( { count: 0 } )( Counter );
+
+		render( <EnhancedComponent /> );
+
+		expect( console ).toHaveWarned();
+		expect( screen.getByText( 'Count: 0' ) ).toBeVisible();
 	} );
 
 	it( 'should require an initial state for required state keys', () => {
