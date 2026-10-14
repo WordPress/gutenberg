@@ -40,6 +40,17 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 	class WP_Actions_Registry {
 
 		/**
+		 * The values DataViews supports for the properties of an action that
+		 * take one of a set of values, see packages/dataviews/src/types/dataviews.ts.
+		 *
+		 * @var array<string, string[]>
+		 */
+		const SUPPORTED_VALUES = array(
+			'context'   => array( 'list', 'single' ),
+			'modalSize' => array( 'small', 'medium', 'large', 'fill' ),
+		);
+
+		/**
 		 * Registered actions, as kind => name => array of action id => definition.
 		 *
 		 * Kept nested rather than under a joined `{$kind}/{$name}` key: both parts
@@ -97,6 +108,10 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		 * non-empty string `id` is reported and skipped the same way. To replace
 		 * a registered action, unregister it first. The script module, if any,
 		 * applies to every action the call registers.
+		 *
+		 * A value DataViews does not support is reported, and a property only a
+		 * script module can provide is reported and removed, see
+		 * report_invalid_values().
 		 *
 		 * The origin is stored as the `origin` property of each action, as
 		 * `registeredBy`, replacing any `origin` the definition sets.
@@ -167,6 +182,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			if ( ! $new_actions ) {
 				return array();
 			}
+			$new_actions = $this->report_invalid_values( __METHOD__, $kind, $name, $new_actions );
 
 			foreach ( $new_actions as $action ) {
 				$this->actions[ $kind ][ $name ][ $action['id'] ] = array_merge(
@@ -182,6 +198,71 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			$this->add_action_module( $kind, $name, $ids, $script_module );
 
 			return $ids;
+		}
+
+		/**
+		 * Reports the values of action definitions that DataViews does not
+		 * support, and the properties only a script module can provide, with
+		 * _doing_it_wrong().
+		 *
+		 * A value DataViews does not support is otherwise silent: an action
+		 * whose `context` is not `list` or `single` shows on no screen. Such a
+		 * value is kept, like the field types the fields registry reports.
+		 * `callback`, `RenderModal`, and `isEligible` are functions and
+		 * components, which only a script module can provide: a value set on
+		 * the server would be called on the client and fail, so it is removed.
+		 *
+		 * @param string  $method  The calling method, for the notice.
+		 * @param string  $kind    The entity kind.
+		 * @param string  $name    The entity name.
+		 * @param array[] $actions The action definitions, keyed by id.
+		 * @return array[] The definitions, without the properties only a script
+		 *                 module can provide.
+		 */
+		protected function report_invalid_values( $method, $kind, $name, $actions ) {
+			$invalid = array();
+			foreach ( $actions as $id => $action ) {
+				foreach ( self::SUPPORTED_VALUES as $property => $values ) {
+					if ( array_key_exists( $property, $action ) && ! in_array( $action[ $property ], $values, true ) ) {
+						$invalid[] = sprintf(
+							'%1$s (%2$s)',
+							$id,
+							wp_sprintf(
+								/* translators: 1: Property name, e.g. context. 2: List of the values DataViews supports. */
+								__( '%1$s is not one of %2$l.', 'gutenberg' ),
+								$property,
+								$values
+							)
+						);
+					}
+				}
+				foreach ( array( 'callback', 'RenderModal', 'isEligible' ) as $property ) {
+					if ( array_key_exists( $property, $action ) ) {
+						unset( $actions[ $id ][ $property ] );
+						$invalid[] = sprintf(
+							/* translators: 1: Action id. 2: Property name, e.g. callback. */
+							__( '%1$s (%2$s can only come from a script module, so it is removed.)', 'gutenberg' ),
+							$id,
+							$property
+						);
+					}
+				}
+			}
+			if ( $invalid ) {
+				_doing_it_wrong(
+					$method,
+					sprintf(
+						/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of action ids, each with the error of a value. */
+						__( 'These actions of %1$s "%2$s" have values DataViews does not support: %3$s', 'gutenberg' ),
+						$kind,
+						$name,
+						implode( ', ', $invalid )
+					),
+					'7.2.0'
+				);
+			}
+
+			return $actions;
 		}
 
 		/**

@@ -527,6 +527,46 @@ class Tests_Actions_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * A `context` or `modalSize` DataViews does not support is reported, and
+	 * registered anyway. A property only a script module can provide is
+	 * reported and removed. The other actions of the call are not reported.
+	 */
+	public function test_registering_an_action_with_invalid_values_is_reported() {
+		$this->setExpectedIncorrectUsage( 'WP_Actions_Registry::register' );
+		$reported   = &$this->record_notices( 'WP_Actions_Registry::register' );
+		$registered = $this->register_actions(
+			'postType',
+			'page',
+			array(
+				$this->action( 'feature' ),
+				array(
+					'id'         => 'archive',
+					'label'      => 'Archive',
+					'context'    => 'lists',
+					'isEligible' => true,
+				),
+				array(
+					'id'        => 'export',
+					'label'     => 'Export',
+					'modalSize' => 'huge',
+				),
+			)
+		);
+
+		$this->assertSame( array( 'feature', 'archive', 'export' ), $registered, 'The actions are registered anyway.' );
+		$actions = array_column( wp_get_registered_actions( 'postType', 'page' ), null, 'id' );
+		$this->assertSame( 'lists', $actions['archive']['context'], 'A value DataViews does not support is kept.' );
+		$this->assertSame( 'huge', $actions['export']['modalSize'], 'A value DataViews does not support is kept.' );
+		$this->assertArrayNotHasKey( 'isEligible', $actions['archive'], 'A property only a script module can provide is removed.' );
+		$this->assertCount( 1, $reported );
+		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
+		$this->assertStringContainsString( ': archive (context is not one of list and single.)', $reported[0], 'The notice names the action and its value DataViews does not support.' );
+		$this->assertStringContainsString( 'archive (isEligible can only come from a script module', $reported[0], 'The notice names the property that is removed.' );
+		$this->assertStringContainsString( 'export (modalSize is not one of small, medium, large, and fill.)', $reported[0], 'The notice names every value DataViews does not support.' );
+		$this->assertStringNotContainsString( 'feature', $reported[0], 'The other actions of the call are not reported.' );
+	}
+
+	/**
 	 * An id that appears more than once in a call is registered once, with
 	 * its first definition, and the rest of the actions of the call are
 	 * registered.
