@@ -188,8 +188,9 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$typography_block_styles['writingMode'] = $block_attributes['style']['typography']['writingMode'] ?? null;
 	}
 
+	$text_indent_block_styles = array();
 	if ( $has_text_indent_support && ! $should_skip_text_indent && isset( $block_attributes['style']['typography']['textIndent'] ) ) {
-		$typography_block_styles['textIndent'] = $block_attributes['style']['typography']['textIndent'] ?? null;
+		$text_indent_block_styles['textIndent'] = $block_attributes['style']['typography']['textIndent'] ?? null;
 	}
 
 	if ( $has_text_shadow_support && ! $should_skip_text_shadow ) {
@@ -205,6 +206,15 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		array( 'convert_vars_to_classnames' => true )
 	);
 
+	/*
+	 * Text indent can use spacing presets, which have no classnames, so it is
+	 * generated separately to output presets as CSS custom properties.
+	 */
+	$text_indent_styles = gutenberg_style_engine_get_styles(
+		array( 'typography' => $text_indent_block_styles )
+	);
+	$css                = ( $styles['css'] ?? '' ) . ( $text_indent_styles['css'] ?? '' );
+
 	if ( ! empty( $styles['classnames'] ) ) {
 		$classnames[] = $styles['classnames'];
 	}
@@ -217,8 +227,8 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$attributes['class'] = implode( ' ', $classnames );
 	}
 
-	if ( ! empty( $styles['css'] ) ) {
-		$attributes['style'] = $styles['css'];
+	if ( ! empty( $css ) ) {
+		$attributes['style'] = $css;
 	}
 
 	return $attributes;

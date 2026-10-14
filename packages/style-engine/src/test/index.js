@@ -120,6 +120,14 @@ describe( 'generate', () => {
 		);
 	} );
 
+	it( 'should parse a spacing preset text indent value', () => {
+		expect(
+			compileCSS( {
+				typography: { textIndent: 'var:preset|spacing|30' },
+			} )
+		).toEqual( 'text-indent: var(--wp--preset--spacing--30);' );
+	} );
+
 	it( 'should parse border rules', () => {
 		expect(
 			compileCSS( {

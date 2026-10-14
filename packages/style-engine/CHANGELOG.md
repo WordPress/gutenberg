@@ -10,6 +10,10 @@
 
 -   Export `VALID_BACKGROUND_CLIP_VALUES`, the values `background-clip` accepts, so consumers stop keeping their own copy ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 
+### Enhancements
+
+-   Output spacing preset values for `typography.textIndent` as CSS custom properties in the PHP style engine.
+
 ## 2.57.0 (2026-10-07)
 
 ### New Features

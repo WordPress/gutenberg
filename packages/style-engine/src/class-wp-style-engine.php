@@ -346,6 +346,9 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 						'default' => 'text-indent',
 					),
 					'path'          => array( 'typography', 'textIndent' ),
+					'css_vars'      => array(
+						'spacing' => '--wp--preset--spacing--$slug',
+					),
 				),
 				'textShadow'     => array(
 					'property_keys' => array(

@@ -317,6 +317,47 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a CSS var is generated for a text indent spacing preset.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_generate_css_var_for_text_indent_spacing_preset() {
+		$this->test_block_name = 'test/text-indent-spacing-preset';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'textIndent'                  => true,
+						'__experimentalLetterSpacing' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+		$block_atts = array(
+			'style' => array(
+				'typography' => array(
+					'letterSpacing' => '2px',
+					'textIndent'    => 'var:preset|spacing|40',
+				),
+			),
+		);
+
+		$actual   = gutenberg_apply_typography_support( $block_type, $block_atts );
+		$expected = array( 'style' => 'letter-spacing:2px;text-indent:var(--wp--preset--spacing--40);' );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
 	 * Tests generating font size values, including fluid formulae, from fontSizes preset.
 	 *
 	 * @covers ::wp_get_typography_font_size_value
