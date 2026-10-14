@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Fields_Controller_7_2 class
+ * REST API: Gutenberg_REST_Entity_Fields_Controller_7_2 class
  *
  * @package gutenberg
  */
@@ -10,14 +10,14 @@
  * registered for a given entity type.
  *
  * The fields are the ones registered on the server on the
- * `wp_fields_api_init` action: the serializable part of each field, plus
+ * `wp_entity_fields_api_init` action: the serializable part of each field, plus
  * the script modules that provide the JavaScript parts (render callbacks,
  * components, value getters and setters), each with the ids of the fields
  * it applies to. The client merges both into the fields it derives itself.
  *
  * @since 7.2.0
  */
-class Gutenberg_REST_Fields_Controller_7_2 extends WP_REST_Controller {
+class Gutenberg_REST_Entity_Fields_Controller_7_2 extends WP_REST_Controller {
 
 	/**
 	 * Constructor.
@@ -142,12 +142,12 @@ class Gutenberg_REST_Fields_Controller_7_2 extends WP_REST_Controller {
 
 		$field_schema = $this->get_field_schema();
 		$fields       = array();
-		foreach ( wp_get_registered_fields( $kind, $name ) as $field ) {
+		foreach ( wp_get_registered_entity_fields( $kind, $name ) as $field ) {
 			$fields[] = gutenberg_rest_cast_empty_objects_from_schema( $field, $field_schema );
 		}
 
 		$script_modules = array();
-		foreach ( wp_get_registered_field_modules( $kind, $name ) as $module => $field_ids ) {
+		foreach ( wp_get_registered_entity_field_modules( $kind, $name ) as $module => $field_ids ) {
 			$script_modules[] = array(
 				'id'     => $module,
 				'fields' => array_values( $field_ids ),
