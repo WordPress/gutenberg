@@ -78,12 +78,16 @@ function InputBase(
 		};
 	}, [ size ] );
 
+	const normalizedWidth =
+		typeof __unstableInputWidth === 'string'
+			? __unstableInputWidth.trim().toLowerCase()
+			: undefined;
 	const widthKeyword =
-		typeof __unstableInputWidth === 'string' &&
+		normalizedWidth &&
 		[ 'inherit', 'initial', 'revert', 'revert-layer', 'unset' ].includes(
-			__unstableInputWidth
+			normalizedWidth
 		)
-			? __unstableInputWidth
+			? normalizedWidth
 			: undefined;
 	const hasWidth = !! __unstableInputWidth;
 	const hasCustomWidth =

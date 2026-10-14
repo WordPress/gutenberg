@@ -10,12 +10,9 @@ function UnconnectedInputControlSuffixWrapper(
 	props: WordPressComponentProps< PrefixSuffixWrapperProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const {
-		className,
-		size,
-		variant = 'default',
-		...derivedProps
-	} = useContextSystem( props, 'InputControlSuffixWrapper' );
+	const derivedProps = useContextSystem( props, 'InputControlSuffixWrapper' );
+	const { className, size, variant = 'default' } = derivedProps;
+
 	const classes = clsx( styles[ 'suffix-wrapper' ], className, {
 		[ styles[ 'is-small' ] ]: size === 'small',
 		[ styles[ 'is-compact' ] ]: size === 'compact',

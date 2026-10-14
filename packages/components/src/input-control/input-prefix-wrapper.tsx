@@ -10,12 +10,9 @@ function UnconnectedInputControlPrefixWrapper(
 	props: WordPressComponentProps< PrefixSuffixWrapperProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
-	const {
-		className,
-		size,
-		variant = 'default',
-		...derivedProps
-	} = useContextSystem( props, 'InputControlPrefixWrapper' );
+	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );
+	const { className, size, variant = 'default' } = derivedProps;
+
 	const classes = clsx( styles[ 'prefix-wrapper' ], className, {
 		[ styles[ 'is-small' ] ]: size === 'small',
 		[ styles[ 'is-compact' ] ]: size === 'compact',
@@ -26,6 +23,7 @@ function UnconnectedInputControlPrefixWrapper(
 		<PolymorphicElement
 			as="div"
 			{ ...derivedProps }
+			{ ...{ isPrefix: true } }
 			className={ classes }
 			ref={ forwardedRef }
 		/>
