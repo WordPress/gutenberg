@@ -2,21 +2,15 @@ import { capitalCase } from 'change-case';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
- * Readable names for the top-level Global Styles sections, used to name a
- * root-level source, e.g. "Typography style".
+ * Readable names for the site-wide sections a root-level source can come from.
+ * Root only reaches a block through text color and typography (see
+ * `NON_CASCADING_ROOT_PREFIXES` in `resolveStyle`).
  *
  * @type {Record<string, string>}
  */
-const SECTION_LABELS = {
-	typography: __( 'Typography' ),
-	color: __( 'Color' ),
-	spacing: __( 'Spacing' ),
-	border: __( 'Border' ),
-	dimensions: __( 'Dimensions' ),
-	background: __( 'Background' ),
-	shadow: __( 'Shadow' ),
-	filter: __( 'Filters' ),
-	elements: __( 'Elements' ),
+const ROOT_LABELS = {
+	typography: __( 'Site typography' ),
+	color: __( 'Site colors' ),
 };
 
 /**
@@ -59,14 +53,10 @@ export function getStyleSourceLabel(
 	{ pathKey, blockTitle, variationLabel }
 ) {
 	switch ( source?.layer ) {
-		case 'root': {
-			const section = pathKey.split( '.' )[ 0 ];
-			return sprintf(
-				// translators: %s: Global Styles section, e.g. "Typography".
-				__( '%s style' ),
-				SECTION_LABELS[ section ] ?? capitalCase( section )
+		case 'root':
+			return (
+				ROOT_LABELS[ pathKey.split( '.' )[ 0 ] ] ?? __( 'Site styles' )
 			);
-		}
 		case 'element':
 			return source.element
 				? sprintf(
@@ -85,7 +75,7 @@ export function getStyleSourceLabel(
 		case 'blockVariation':
 			return sprintf(
 				// translators: %s: Block style variation label, e.g. "Outline".
-				__( '“%s” block style variation' ),
+				__( '%s style' ),
 				variationLabel
 			);
 		default:

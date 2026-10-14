@@ -8,10 +8,16 @@ const context = {
 };
 
 describe( 'getStyleSourceLabel', () => {
-	it( 'names a root source by its Global Styles section', () => {
+	it( 'names a root source by its site-wide section', () => {
 		expect( getStyleSourceLabel( { layer: 'root' }, context ) ).toBe(
-			'Typography style'
+			'Site typography'
 		);
+		expect(
+			getStyleSourceLabel(
+				{ layer: 'root' },
+				{ ...context, pathKey: 'color.text' }
+			)
+		).toBe( 'Site colors' );
 	} );
 
 	it( 'names an element source by its element', () => {
@@ -32,7 +38,7 @@ describe( 'getStyleSourceLabel', () => {
 	it( 'names a block style variation source by its label', () => {
 		expect(
 			getStyleSourceLabel( { layer: 'blockVariation' }, context )
-		).toBe( '“Outline” block style variation' );
+		).toBe( 'Outline style' );
 	} );
 
 	it( 'says nothing else sets the value when there is no source', () => {

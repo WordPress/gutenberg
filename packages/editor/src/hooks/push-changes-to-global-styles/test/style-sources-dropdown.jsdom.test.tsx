@@ -3,16 +3,6 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import StyleSourcesDropdown from '../style-sources-dropdown';
 
-vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
-	const original = await importOriginal();
-	return {
-		...original,
-		getBlockType: ( () => ( {
-			title: 'Button',
-		} ) ) as unknown as typeof original.getBlockType,
-	};
-} );
-
 const changedRows = [
 	{
 		id: 'typography.fontSize',
@@ -35,22 +25,24 @@ const changedRows = [
 	},
 ];
 
+const rows = { changed: changedRows };
+
 vi.mock( import( '../use-style-source-rows' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	useStyleSourceRows: () => ( {
-		changed: changedRows,
+		changed: rows.changed,
 		inherited: [
 			{
 				id: 'typography.fontFamily',
 				label: 'Font family',
 				value: 'Serif',
-				sourceLabel: 'Typography style',
+				sourceLabel: 'Site typography',
 			},
 			{
 				id: 'typography.fontWeight',
 				label: 'Font weight',
-				value: 'inherit',
-				sourceLabel: 'Button element',
+				value: '600',
+				sourceLabel: 'Button block',
 			},
 		],
 		variationLabel: 'Outline',
@@ -65,8 +57,7 @@ const attributes = {
 	},
 };
 
-async function openPopover( setAttributes = vi.fn() ) {
-	const user = userEvent.setup();
+function renderDropdown( setAttributes = vi.fn() ) {
 	render(
 		<StyleSourcesDropdown
 			name="core/button"
@@ -74,24 +65,35 @@ async function openPopover( setAttributes = vi.fn() ) {
 			setAttributes={ setAttributes }
 		/>
 	);
+}
+
+async function openPopover( setAttributes = vi.fn() ) {
+	const user = userEvent.setup();
+	renderDropdown( setAttributes );
 	await user.click(
-		screen.getByRole( 'button', { name: 'Where styles come from' } )
+		screen.getByRole( 'button', { name: 'See 2 style changes' } )
 	);
 	return user;
 }
 
 describe( 'StyleSourcesDropdown', () => {
+	it( 'hides the link when nothing is changed on the block', () => {
+		rows.changed = [];
+		renderDropdown();
+		rows.changed = changedRows;
+
+		expect( screen.queryByRole( 'button' ) ).not.toBeInTheDocument();
+	} );
+
 	it( 'lists changed rows, including one that overrides nothing', async () => {
 		await openPopover();
 
-		expect(
-			screen.getByText( 'Button, Outline style' )
-		).toBeInTheDocument();
+		expect( screen.getByText( 'Style changes' ) ).toBeInTheDocument();
 		expect(
 			screen.getByText( 'Changed on this block (2)' )
 		).toBeInTheDocument();
 		expect(
-			screen.getByText( 'Was Medium, Button element' )
+			screen.getByText( 'Was Medium · Button element' )
 		).toBeInTheDocument();
 		expect(
 			screen.getByText( 'Not set in Global Styles' )
@@ -101,12 +103,14 @@ describe( 'StyleSourcesDropdown', () => {
 	it( 'lists inherited rows with their real values and sources', async () => {
 		await openPopover();
 
-		expect( screen.getByText( 'Not changed (2)' ) ).toBeInTheDocument();
-		expect( screen.getByText( 'Font family' ) ).toBeInTheDocument();
-		expect( screen.getByText( 'Typography style' ) ).toBeInTheDocument();
-		expect( screen.getByText( 'inherit' ) ).toBeInTheDocument();
 		expect(
-			screen.queryByRole( 'button', { name: /Not changed/ } )
+			screen.getByText( 'Inherited styles (2)' )
+		).toBeInTheDocument();
+		expect( screen.getByText( 'Font family' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Site typography' ) ).toBeInTheDocument();
+		expect( screen.getByText( '600' ) ).toBeInTheDocument();
+		expect(
+			screen.queryByRole( 'button', { name: /Inherited styles/ } )
 		).not.toBeInTheDocument();
 	} );
 
