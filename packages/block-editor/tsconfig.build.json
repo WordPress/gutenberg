@@ -1,6 +1,9 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
+	"compilerOptions": {
+		"checkJs": false
+	},
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
 		{ "path": "../block-serialization-default-parser" },
@@ -38,16 +41,5 @@
 		{ "path": "../url" },
 		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../warning" }
-	],
-	// NOTE: This package is being progressively typed. You are encouraged to
-	// expand this array with files which can be type-checked. At some point in
-	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [
-		"src/lock-unlock.ts",
-		"src/components/background-clip-control/index.tsx",
-		"src/components/block-context/index.jsx",
-		"src/components/block-visibility/constants.ts",
-		"src/components/block-visibility/use-block-visibility.ts"
-	],
-	"include": [ "src/utils/**/*.ts" ]
+	]
 }
