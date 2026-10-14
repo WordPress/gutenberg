@@ -38,9 +38,7 @@ export type CustomGradientPickerProps = {
 };
 
 export type GradientAnglePickerProps = {
-	gradientAST:
-		| gradientParser.LinearGradientNode
-		| gradientParser.RepeatingLinearGradientNode;
+	gradientAST: gradientParser.LinearGradientNode;
 	hasGradient: boolean;
 	onChange: ( gradient: string ) => void;
 };

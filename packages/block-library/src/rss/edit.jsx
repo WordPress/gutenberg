@@ -7,7 +7,7 @@ import {
 	Button,
 	Placeholder,
 	RangeControl,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	ToolbarGroup,
 	TextControl,
@@ -295,7 +295,7 @@ export default function RSSEdit( { attributes, setAttributes, name } ) {
 			</InspectorControls>
 			{ status === 'loading' && (
 				<div { ...blockProps }>
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ status === 'error' && (

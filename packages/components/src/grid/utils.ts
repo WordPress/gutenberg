@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 
 const ALIGNMENTS = {
 	bottom: { alignItems: 'flex-end', justifyContent: 'center' },
-	bottomLeft: { alignItems: 'flex-start', justifyContent: 'flex-end' },
+	bottomLeft: { alignItems: 'flex-end', justifyContent: 'flex-start' },
 	bottomRight: { alignItems: 'flex-end', justifyContent: 'flex-end' },
 	center: { alignItems: 'center', justifyContent: 'center' },
 	spaced: { alignItems: 'center', justifyContent: 'space-between' },
