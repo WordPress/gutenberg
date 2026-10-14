@@ -13,13 +13,26 @@ This first step covers Button only.
 Each component has a folder here with a `component.json`:
 
 -   `props` is the PHP contract, a JSON schema per prop. Props with a fixed set of values (an `enum` or a boolean) are variants. Free-form strings are slots.
--   `render` maps the props to the React element, as `[ type, props, ...children ]`, where `"$name"` is a prop. A boolean prop that is `false` is left out of the element, as a React caller would leave it out, so the component's own defaults apply: Button disables itself while loading unless `disabled` is set.
+-   `render` maps the props to the React element, as `[ type, props, ...children ]`, where `"$name"` is a prop. A boolean prop that is `false` is left out of the element, as a React caller would leave it out, so the component's own defaults apply, as they would for a React caller.
 -   `example` gives the props for the preview page and the checks.
 -   `deprecations` (optional) keeps renamed props and values working. See [Versioning](#versioning-and-backward-compatibility).
 
-`bin/build-php.mjs` runs after the package build. It renders the React element for every combination of variants, with placeholders for the slots, and stores each render as a snapshot in `build-php/manifest.php`. PHP picks the snapshot for the props it gets, then escapes and fills in the slots. Strings React translates with `__()`, such as Button's "Loading" label, are caught through the `i18n.gettext` filter while rendering snapshots, and PHP translates them with `translate()` in the same text domain. `_x()` and `_n()` aren't supported yet; the build fails if their text reaches the markup. The stylesheet is compiled by `@wordpress/build` from the same CSS modules React uses, so class names match.
+`bin/build-php.mjs` runs after the package build. It renders the React element for every combination of variants, with placeholders for the slots, and stores each render as a snapshot in `build-php/manifest.php`. PHP picks the snapshot for the props it gets, then escapes and fills in the slots. Strings React translates with `__()`, such as a "Dismiss" label, are caught through the `i18n.gettext` filter while rendering snapshots, and PHP translates them with `translate()` in the same text domain. `_x()` and `_n()` aren't supported yet; the build fails if their text reaches the markup. The stylesheet is compiled by `@wordpress/build` from the same CSS modules React uses, so class names match.
 
 This works for components whose props have a fixed set of values or are plain text, which covers most static components.
+
+## What PHP components support
+
+A PHP component is a subset of the React one: markup and CSS only, with no JavaScript. A prop is only exposed when the snapshot alone gets its behavior right, and a check covers that behavior.
+
+-   **Text** props are plain text, escaped with `esc_html()`. They can't contain markup.
+-   **Attribute** props are escaped with `esc_attr()`, or `esc_url()` for URLs.
+-   **No other content.** A component takes no children beyond what its props declare.
+
+For Button:
+
+-   `disabled` renders the native `disabled` attribute, so the browser blocks activation without JavaScript. That's why the mapping sets `focusableWhenDisabled` to `false`. React's default keeps a disabled button focusable and blocks activation with Base UI's JavaScript, which a snapshot can't carry. The end-to-end test checks that a disabled PHP button can't be focused or activated.
+-   `loading` isn't supported. React announces it with `speak()` from an effect, and a loading state only happens after the user acts, which needs JavaScript. It comes back with the behavior work below.
 
 ## Keeping up with React
 
@@ -59,7 +72,7 @@ Core would consume the build output, not this folder, the way it consumes the ic
 
 -   **Collapsible behavior.** CollapsibleCard: the build renders it closed and open and records which attributes change, and one generic script applies them on toggle. This shows state derived from React renders, without a second implementation of the behavior.
 -   **Shared interaction tests.** Run the same Playwright scenarios against the React component and its PHP version, written with roles and names rather than markup.
--   **Announcements.** Button (loading) calls `speak()` from `@wordpress/a11y` in React. The PHP version announces nothing, and no check catches it.
+-   **Announcements.** Button's `loading` prop needs the `speak()` announcement React makes from an effect. Bring it back once there's a way to run that behavior on PHP screens.
 -   **Accessibility tree parity.** Add an `aria-snapshot` comparison of the PHP and React renders next to the pixel comparison.
 -   **Layering against legacy admin CSS.** `lib/experimental/wpds-admin/` already moves core's stylesheets into `@layer wp-legacy`. Check whether the components should rely on that on classic screens.
 -   **Interactivity API.** Decide between small custom elements and Interactivity API stores for behavior, and measure what loading `@wordpress/interactivity` costs on a classic screen.

@@ -23,6 +23,38 @@ test.describe( 'UI components rendered by PHP', () => {
 		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
+	// Identical markup doesn't prove identical behavior. React blocks a
+	// disabled Button with JavaScript; the PHP one relies on the native
+	// `disabled` attribute instead, so check the browser enforces it.
+	test( 'disabled button cannot be focused or activated', async ( {
+		admin,
+		page,
+	} ) => {
+		await admin.visitAdminPage(
+			'tools.php',
+			'page=gutenberg-ui-components&sample=php'
+		);
+		const button = page.locator(
+			'[data-example="button: disabled: true"] button'
+		);
+		await expect( button ).toBeDisabled();
+
+		// Tabbing from the example before it skips it.
+		await page
+			.locator( '[data-example="button: size: small"] button' )
+			.focus();
+		await page.keyboard.press( 'Tab' );
+		await expect( button ).not.toBeFocused();
+
+		const activated = await button.evaluate( ( element ) => {
+			let clicked = false;
+			element.addEventListener( 'click', () => ( clicked = true ) );
+			element.click();
+			return clicked;
+		} );
+		expect( activated ).toBe( false );
+	} );
+
 	test( 'look the same as the React components', async ( {
 		admin,
 		page,

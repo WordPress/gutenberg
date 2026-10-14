@@ -204,7 +204,7 @@ final class Gutenberg_UI_Components {
 					break;
 
 				case 'text':
-					// A string React translates with `__()`, such as a "Loading" label.
+					// A string React translates with `__()`, such as a "Dismiss" label.
 					$text  = translate( $part[1], $part[2] ); // phpcs:ignore WordPress.WP.I18n -- Strings from the React components.
 					$html .= 'attribute' === $part[3] ? esc_attr( $text ) : esc_html( $text );
 					break;

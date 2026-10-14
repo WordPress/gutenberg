@@ -25,7 +25,6 @@
 			"slot": true
 		},
 		"disabled": { "type": "boolean", "default": false },
-		"loading": { "type": "boolean", "default": false },
 		"class": { "type": "string", "default": "" }
 	},
 	"render": [
@@ -36,7 +35,6 @@
 			"size": "$size",
 			"type": "$type",
 			"disabled": "$disabled",
-			"loading": "$loading",
 			"className": "$class",
 			"focusableWhenDisabled": false
 		},

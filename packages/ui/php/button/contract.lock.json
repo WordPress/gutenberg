@@ -23,12 +23,9 @@
 		"disabled": {
 			"type": "boolean"
 		},
-		"loading": {
-			"type": "boolean"
-		},
 		"class": {
 			"type": "string"
 		}
 	},
-	"markup": "100b5accd8f0"
+	"markup": "fa3b728ead65"
 }
