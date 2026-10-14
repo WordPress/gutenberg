@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `tag`, `termCount`, `termName` and `postTerms`: mirror the tag so it leans the same way as the other angled icons, such as `brush`, `pin` and `plugins`. The number in `termCount` stays readable.
+-   `tag`, `termCount`, `termName` and `postTerms`: mirror the tag so it leans the same way as the other angled icons, such as `brush`, `pin` and `plugins`. The number in `termCount` stays readable ([#84675](https://github.com/WordPress/gutenberg/pull/84675)).
 
 ## 18.0.0 (2026-10-07)
 
