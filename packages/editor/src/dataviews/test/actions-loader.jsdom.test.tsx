@@ -142,6 +142,25 @@ describe( 'resolveActionsConfig', () => {
 		);
 	} );
 
+	it( 'keeps the id the server registered the action with', async () => {
+		const actions = await resolveActionsConfig(
+			{
+				...CONFIG,
+				actions: [ CONFIG.actions[ 0 ] ],
+				script_modules: [
+					{ id: CORE_MODULE, actions: [ 'rename-post' ] },
+				],
+			},
+			async () => ( {
+				default: {
+					'rename-post': { id: 'retitle', RenderModal: RenameModal },
+				},
+			} )
+		);
+
+		expect( actions.map( ( { id } ) => id ) ).toEqual( [ 'rename-post' ] );
+	} );
+
 	it( 'skips the actions whose module fails to load', async () => {
 		const callback = vi.fn();
 		const actions = await resolveActionsConfig( CONFIG, async ( id ) => {

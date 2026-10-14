@@ -80,19 +80,21 @@ export async function resolveActionsConfig< Item >(
 	const partsById = new Map< string, ActionsScriptParts[ string ] >();
 	const failedIds = new Set< string >();
 	results.forEach( ( result, index ) => {
-		const { id: moduleId, actions: actionIds = [] } = modules[ index ];
+		const { id: moduleId, actions: actionIds } = modules[ index ];
 		if ( result.status === 'rejected' ) {
 			// eslint-disable-next-line no-console
 			console.warn(
 				`Could not load the script module ${ moduleId } of the actions of ${ config.kind }/${ config.name }.`,
 				result.reason
 			);
-			actionIds.forEach( ( actionId ) => failedIds.add( actionId ) );
+			( actionIds ?? [] ).forEach( ( actionId ) =>
+				failedIds.add( actionId )
+			);
 			return;
 		}
 		const parts =
 			( result.value as { default?: ActionsScriptParts } )?.default ?? {};
-		for ( const actionId of actionIds ) {
+		for ( const actionId of actionIds ?? [] ) {
 			if ( parts[ actionId ] ) {
 				partsById.set( actionId, {
 					...partsById.get( actionId ),
@@ -106,6 +108,8 @@ export async function resolveActionsConfig< Item >(
 		const action: Record< string, any > = {
 			...definition,
 			...partsById.get( definition.id ),
+			// The server identifies the action, not its module.
+			id: definition.id,
 		};
 		if ( action.callback || action.RenderModal ) {
 			return [ action as Action< Item > ];
