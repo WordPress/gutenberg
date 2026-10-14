@@ -356,6 +356,8 @@ async function loadPostTypeEntities() {
 				selection: true,
 			},
 			mergedEdits: { meta: true },
+			// The post meta endpoint updates only keys included in the request.
+			partialEdits: { meta: true },
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
 				record?.title?.rendered ||

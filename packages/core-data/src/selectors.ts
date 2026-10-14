@@ -1039,10 +1039,18 @@ export const getEditedEntityRecord = createSelector(
 		if ( ! raw && ! edited ) {
 			return false;
 		}
-		return {
+		const merged = {
 			...raw,
 			...edited,
 		};
+		const { partialEdits = {} } =
+			getEntityConfig( state, kind, name ) || {};
+		for ( const key of Object.keys( partialEdits ) ) {
+			if ( edited?.[ key ] !== undefined ) {
+				merged[ key ] = { ...raw?.[ key ], ...edited[ key ] };
+			}
+		}
+		return merged;
 	},
 	(
 		state: State,

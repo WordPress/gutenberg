@@ -368,13 +368,21 @@ export const editEntityRecord =
 				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 			);
 		}
-		const { mergedEdits = {} } = entityConfig;
+		const { mergedEdits = {}, partialEdits = {} } = entityConfig;
 		const record = select.getRawEntityRecord( kind, name, recordId );
 		const editedRecord = select.getEditedEntityRecord(
 			kind,
 			name,
 			recordId
 		);
+		// Reverting a pending key to its old persisted value is still an edit:
+		// the outstanding request may replace that persisted value afterward.
+		const pendingEdits =
+			Object.keys( partialEdits ).length &&
+			select.isSavingEntityRecord( kind, name, recordId ) &&
+			! select.isAutosavingEntityRecord( kind, name, recordId )
+				? select.getEntityRecordEdits( kind, name, recordId )
+				: undefined;
 
 		// Some fields are merged with the existing value instead of replaced.
 		// See `mergedEdits` definition on the entity config.
@@ -392,7 +400,19 @@ export const editEntityRecord =
 			recordId,
 			// Clear edits when they are equal to their persisted counterparts
 			// so that the property is not considered dirty.
-			edits: clearUnchangedEdits( editsWithMerges, record ),
+			edits: clearUnchangedEdits(
+				Object.fromEntries(
+					Object.entries( editsWithMerges ).map(
+						( [ key, value ] ) => [
+							key,
+							partialEdits[ key ] ? edits[ key ] : value,
+						]
+					)
+				),
+				record,
+				partialEdits,
+				pendingEdits
+			),
 		};
 		// Tell the entity sync manager about the edit before it arrives in the
 		// store. It receives merged edits and the edit's intent, and decides
@@ -409,21 +429,48 @@ export const editEntityRecord =
 			! options.undoIgnore &&
 			! syncManager?.isLoaded?.( kind, name, recordId )
 		) {
+			const history = [];
+			const changes = {};
+			for ( const key of Object.keys( edits ) ) {
+				if ( partialEdits[ key ] ) {
+					// Distinct keys need distinct identities so staged history
+					// retains the first and last actual value of each key.
+					for ( const [ itemKey, value ] of Object.entries(
+						edits[ key ] || {}
+					) ) {
+						history.push( {
+							id: {
+								kind,
+								name,
+								recordId,
+								partialEdit: key,
+								partialEditKey: itemKey,
+							},
+							changes: {
+								[ key ]: {
+									from: {
+										[ itemKey ]:
+											editedRecord[ key ]?.[ itemKey ],
+									},
+									to: { [ itemKey ]: value },
+								},
+							},
+						} );
+					}
+				} else {
+					changes[ key ] = {
+						from: editedRecord[ key ],
+						to: edits[ key ],
+					};
+				}
+			}
+			if ( Object.keys( changes ).length ) {
+				history.unshift( { id: { kind, name, recordId }, changes } );
+			}
 			recordEntityEdit(
 				select.getUndoManager(),
 				syncManager,
-				[
-					{
-						id: { kind, name, recordId },
-						changes: Object.keys( edits ).reduce( ( acc, key ) => {
-							acc[ key ] = {
-								from: editedRecord[ key ],
-								to: edits[ key ],
-							};
-							return acc;
-						}, {} ),
-					},
-				],
+				history,
 				options.isCached
 			);
 		}
@@ -640,6 +687,16 @@ export const saveEntityRecord =
 					// is intentionally excluded to avoid stale values
 					// overriding reverted fields.
 					const merged = { ...persistedRecord, ...record };
+					// Autosave revisions need a complete snapshot, including
+					// persisted values of keys whose edits were reverted.
+					for ( const key of Object.keys(
+						entityConfig.partialEdits || {}
+					) ) {
+						merged[ key ] = {
+							...persistedRecord?.[ key ],
+							...record[ key ],
+						};
+					}
 					const data = [
 						'title',
 						'excerpt',
@@ -663,10 +720,21 @@ export const saveEntityRecord =
 									: undefined,
 						}
 					);
+					const autosaveData = { ...data, ...syncEdits };
+					for ( const key of Object.keys(
+						entityConfig.partialEdits || {}
+					) ) {
+						if ( syncEdits && key in syncEdits ) {
+							autosaveData[ key ] = {
+								...data[ key ],
+								...syncEdits[ key ],
+							};
+						}
+					}
 					updatedRecord = await __unstableFetch( {
 						path: `${ path }/autosaves`,
 						method: 'POST',
-						data: { ...data, ...syncEdits },
+						data: autosaveData,
 					} );
 
 					// An autosave may be processed by the server as a regular save

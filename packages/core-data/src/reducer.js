@@ -133,36 +133,47 @@ export function themeGlobalStyleVariations( state = {}, action ) {
 	return state;
 }
 
-const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
-	if ( action.type === 'UNDO' || action.type === 'REDO' ) {
-		const { record } = action;
+const withMultiEntityRecordEdits =
+	( entityConfig ) => ( reducer ) => ( state, action ) => {
+		if ( action.type === 'UNDO' || action.type === 'REDO' ) {
+			const { record } = action;
 
-		let newState = state;
-		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
-			const persistedRecord =
-				state?.queriedData?.items?.default?.[ recordId ];
-			const edits = Object.fromEntries(
-				Object.entries( changes ).map( ( [ key, value ] ) => [
-					key,
-					action.type === 'UNDO' ? value.from : value.to,
-				] )
-			);
+			let newState = state;
+			record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
+				const persistedRecord =
+					state?.queriedData?.items?.default?.[ recordId ];
+				const saving = state?.saving?.[ recordId ];
+				const pendingEdits =
+					saving?.pending && ! saving.isAutosave
+						? state?.edits?.[ recordId ]
+						: undefined;
+				const edits = Object.fromEntries(
+					Object.entries( changes ).map( ( [ key, value ] ) => [
+						key,
+						action.type === 'UNDO' ? value.from : value.to,
+					] )
+				);
 
-			newState = reducer( newState, {
-				type: 'EDIT_ENTITY_RECORD',
-				kind,
-				name,
-				recordId,
-				// Clear edits matching the persisted record so the entity is
-				// no longer dirty after undoing back to its saved state.
-				edits: clearUnchangedEdits( edits, persistedRecord ),
+				newState = reducer( newState, {
+					type: 'EDIT_ENTITY_RECORD',
+					kind,
+					name,
+					recordId,
+					// Clear edits matching the persisted record so the entity is
+					// no longer dirty after undoing back to its saved state.
+					edits: clearUnchangedEdits(
+						edits,
+						persistedRecord,
+						entityConfig.partialEdits,
+						pendingEdits
+					),
+				} );
 			} );
-		} );
-		return newState;
-	}
+			return newState;
+		}
 
-	return reducer( state, action );
-};
+		return reducer( state, action );
+	};
 
 /**
  * Higher Order Reducer for a given entity config. It supports:
@@ -177,7 +188,7 @@ const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
  */
 function entity( entityConfig ) {
 	return compose( [
-		withMultiEntityRecordEdits,
+		withMultiEntityRecordEdits( entityConfig ),
 
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
@@ -221,6 +232,35 @@ function entity( entityConfig ) {
 
 							const nextEdits = Object.keys( edits ).reduce(
 								( acc, key ) => {
+									if ( entityConfig.partialEdits?.[ key ] ) {
+										const remaining = Object.fromEntries(
+											Object.entries(
+												edits[ key ]
+											).filter(
+												( [ itemKey, value ] ) =>
+													! fastDeepEqual(
+														value,
+														record[ key ]?.[
+															itemKey
+														]
+													) &&
+													( ! action.persistedEdits?.[
+														key
+													] ||
+														! fastDeepEqual(
+															value,
+															action
+																.persistedEdits[
+																key
+															][ itemKey ]
+														) )
+											)
+										);
+										if ( Object.keys( remaining ).length ) {
+											acc[ key ] = remaining;
+										}
+										return acc;
+									}
 									// If the edited value is still different to the persisted value,
 									// keep the edited value in edits.
 									if (
@@ -260,6 +300,27 @@ function entity( entityConfig ) {
 							...state[ action.recordId ],
 							...action.edits,
 						};
+						for ( const key of Object.keys( action.edits ) ) {
+							if (
+								entityConfig.partialEdits?.[ key ] &&
+								action.edits[ key ] !== undefined
+							) {
+								const partial = {
+									...state[ action.recordId ]?.[ key ],
+									...action.edits[ key ],
+								};
+								for ( const itemKey of Object.keys(
+									partial
+								) ) {
+									if ( partial[ itemKey ] === undefined ) {
+										delete partial[ itemKey ];
+									}
+								}
+								nextEdits[ key ] = Object.keys( partial ).length
+									? partial
+									: undefined;
+							}
+						}
 						Object.keys( nextEdits ).forEach( ( key ) => {
 							// Delete cleared edits so that the properties
 							// are not considered dirty.
