@@ -1,8 +1,4 @@
-import {
-	CreateTemplatePartModal,
-	patternTitleField,
-	templateTitleField,
-} from '@wordpress/fields';
+import { patternTitleField, templateTitleField } from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
 import { lock } from './lock-unlock';
 import BackButton from './components/header/back-button';
@@ -29,7 +25,6 @@ const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
 export const privateApis = {};
 lock( privateApis, {
-	CreateTemplatePartModal,
 	patternTitleField,
 	templateTitleField,
 	BackButton,

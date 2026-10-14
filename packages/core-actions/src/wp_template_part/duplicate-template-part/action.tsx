@@ -4,9 +4,14 @@ import { store as noticesStore } from '@wordpress/notices';
 import { useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import type { Action } from '@wordpress/dataviews';
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { unlock } from '../../lock-unlock';
 import type { Post, TemplatePart } from '../../shared/types';
-import { CreateTemplatePartModalContents } from './create-template-part-modal-contents';
 import { getItemTitle } from '../../shared/utils';
+
+// Patterns.
+const { CreateTemplatePartModalContents } = unlock( patternsPrivateApis );
 
 /**
  * This action is used to duplicate a template part.

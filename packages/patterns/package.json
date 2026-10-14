@@ -64,7 +64,11 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"change-case": "^4.1.2"
+	},
+	"devDependencies": {
+		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {
 		"react": "^18 || ^19",
