@@ -104,6 +104,19 @@ function gutenberg_register_entity_fields_controller_endpoints() {
 add_action( 'rest_api_init', 'gutenberg_register_entity_fields_controller_endpoints', PHP_INT_MAX );
 
 /**
+ * Registers the Actions REST API route.
+ *
+ * Exposes the actions registered on the server on the `wp_entity_actions_api_init` action.
+ *
+ * @see Gutenberg_REST_Entity_Actions_Controller_7_2
+ */
+function gutenberg_register_entity_actions_controller_endpoints() {
+	$entity_actions_controller = new Gutenberg_REST_Entity_Actions_Controller_7_2();
+	$entity_actions_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_entity_actions_controller_endpoints', PHP_INT_MAX );
+
+/**
  * Registers the Templates and Template Parts REST API routes.
  *
  * Replaces the core controller class so the 7.2 controller is used.

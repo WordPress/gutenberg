@@ -11,6 +11,10 @@
 
 -   `rawHandler`: Add an optional `isBlockTypeAllowed` callback. Transforms to block types it rejects are skipped, so the content falls back to another block ([#84183](https://github.com/WordPress/gutenberg/pull/84183)).
 
+### Bug Fixes
+
+-   `getBlockSupport` and `hasBlockSupport`: Accept the feature as an array of path segments in the types, as the store selectors and runtime already do ([#84708](https://github.com/WordPress/gutenberg/pull/84708)).
+
 ## 16.2.0 (2026-10-07)
 
 ### Bug Fixes
