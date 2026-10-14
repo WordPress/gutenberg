@@ -4,9 +4,8 @@ import {
 } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Notice, Stack, SwitchControl } from '@wordpress/ui';
+import { SwitchControl } from '@wordpress/ui';
 
 const META_KEY = 'wp_navigation_auto_add_pages';
 
@@ -25,9 +24,9 @@ type Props = {
 /**
  * The menu's "Auto add pages" setting.
  *
- * It belongs to the Navigation Menu rather than to the block, and it is saved
- * the moment it changes, on its own, so it never shows up as a pending change
- * in the editor's save flow.
+ * It belongs to the Navigation Menu rather than to the block, so a change is
+ * an edit to the menu record and is saved along with the block's other menu
+ * edits.
  *
  * @param props
  * @param props.menuId
@@ -39,7 +38,7 @@ export default function AutoAddPagesControl( {
 }: Props ) {
 	const isEnabled = useSelect(
 		( select ) => {
-			const record = select( coreStore ).getEntityRecord(
+			const record = select( coreStore ).getEditedEntityRecord(
 				'postType',
 				'wp_navigation',
 				menuId
@@ -48,24 +47,12 @@ export default function AutoAddPagesControl( {
 		},
 		[ menuId ]
 	);
-	const [ isSaving, setIsSaving ] = useState( false );
-	const [ hasError, setHasError ] = useState( false );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 
-	const setEnabled = async ( value: boolean ) => {
-		setIsSaving( true );
-		setHasError( false );
-		try {
-			await saveEntityRecord(
-				'postType',
-				'wp_navigation',
-				{ id: menuId, meta: { [ META_KEY ]: value } },
-				{ throwOnError: true }
-			);
-		} catch {
-			setHasError( true );
-		}
-		setIsSaving( false );
+	const setEnabled = ( value: boolean ) => {
+		editEntityRecord( 'postType', 'wp_navigation', menuId, {
+			meta: { [ META_KEY ]: value },
+		} );
 	};
 
 	return (
@@ -80,26 +67,14 @@ export default function AutoAddPagesControl( {
 				onDeselect={ () => setEnabled( false ) }
 				isShownByDefault
 			>
-				<Stack direction="column" gap="sm" align="start">
-					<SwitchControl
-						label={ __( 'Auto add pages' ) }
-						description={ __(
-							'Add a link to each new top-level page when it is published.'
-						) }
-						checked={ isEnabled }
-						disabled={ isSaving }
-						onCheckedChange={ setEnabled }
-					/>
-					{ hasError && (
-						<Notice.Root intent="error">
-							<Notice.Description>
-								{ __(
-									'The setting could not be saved. Try again.'
-								) }
-							</Notice.Description>
-						</Notice.Root>
+				<SwitchControl
+					label={ __( 'Auto add pages' ) }
+					description={ __(
+						'Add a link to each new top-level page when it is published.'
 					) }
-				</Stack>
+					checked={ isEnabled }
+					onCheckedChange={ setEnabled }
+				/>
 			</ToolsPanelItem>
 		</ToolsPanel>
 	);

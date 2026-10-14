@@ -1,8 +1,7 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Notice, Stack, SwitchControl } from '@wordpress/ui';
+import { SwitchControl } from '@wordpress/ui';
 
 const NAVIGATION_POST_TYPE = 'wp_navigation';
 const META_KEY = 'wp_navigation_auto_add_pages';
@@ -12,8 +11,8 @@ type NavigationMenuRecord = {
 };
 
 /**
- * The menu's "Auto add pages" setting. This screen has no save button, so a
- * change is saved as soon as it is made, and only the setting is sent.
+ * The menu's "Auto add pages" setting. A change is an edit to the menu record
+ * and is saved with the screen's other changes.
  *
  * @param props
  * @param props.id The `wp_navigation` post ID.
@@ -30,44 +29,22 @@ export default function AutoAddPagesToggle( { id }: { id: number } ) {
 		},
 		[ id ]
 	);
-	const [ isSaving, setIsSaving ] = useState( false );
-	const [ hasError, setHasError ] = useState( false );
-	const { saveEntityRecord } = useDispatch( coreStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 
-	const onCheckedChange = async ( value: boolean ) => {
-		setIsSaving( true );
-		setHasError( false );
-		try {
-			await saveEntityRecord(
-				'postType',
-				NAVIGATION_POST_TYPE,
-				{ id, meta: { [ META_KEY ]: value } },
-				{ throwOnError: true }
-			);
-		} catch {
-			setHasError( true );
-		}
-		setIsSaving( false );
+	const onCheckedChange = ( value: boolean ) => {
+		editEntityRecord( 'postType', NAVIGATION_POST_TYPE, id, {
+			meta: { [ META_KEY ]: value },
+		} );
 	};
 
 	return (
-		<Stack direction="column" gap="sm" align="start">
-			<SwitchControl
-				label={ __( 'Auto add pages' ) }
-				description={ __(
-					'Add a link to each new top-level page when it is published.'
-				) }
-				checked={ isEnabled }
-				disabled={ isSaving }
-				onCheckedChange={ onCheckedChange }
-			/>
-			{ hasError && (
-				<Notice.Root intent="error">
-					<Notice.Description>
-						{ __( 'The setting could not be saved. Try again.' ) }
-					</Notice.Description>
-				</Notice.Root>
+		<SwitchControl
+			label={ __( 'Auto add pages' ) }
+			description={ __(
+				'Add a link to each new top-level page when it is published.'
 			) }
-		</Stack>
+			checked={ isEnabled }
+			onCheckedChange={ onCheckedChange }
+		/>
 	);
 }

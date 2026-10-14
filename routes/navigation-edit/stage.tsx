@@ -1,5 +1,6 @@
 import { useParams } from '@wordpress/route';
 import { Page, Breadcrumbs } from '@wordpress/admin-ui';
+import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -54,10 +55,10 @@ function NavigationEditStage() {
 			}
 		>
 			<div className={ styles.content }>
-				<div className={ styles.settings }>
+				<Stack direction="column" gap="lg" align="stretch">
 					<AutoAddPagesToggle id={ navigationId } />
-				</div>
-				<NavigationMenuEditor id={ navigationId } />
+					<NavigationMenuEditor id={ navigationId } />
+				</Stack>
 			</div>
 		</Page>
 	);

@@ -31,7 +31,7 @@ test.describe( 'Navigation menu screen: Auto add pages', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'the setting is saved as soon as it is changed', async ( {
+	test( 'the setting is saved with the menu', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -53,6 +53,23 @@ test.describe( 'Navigation menu screen: Auto add pages', () => {
 		await expect( toggle ).not.toBeChecked();
 		await toggle.click();
 		await expect( toggle ).toBeChecked();
+
+		// The change is a pending edit to the menu until it is saved.
+		const reviewButton = page.getByRole( 'button', {
+			name: 'Review 1 change…',
+		} );
+		await expect( reviewButton ).toBeVisible();
+		const pendingMenu = await requestUtils.rest( {
+			path: `/wp/v2/navigation/${ menu.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( pendingMenu.meta[ META_KEY ] ).toBe( false );
+
+		await reviewButton.click();
+		await page
+			.getByRole( 'dialog', { name: 'Review changes' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
 
 		await expect
 			.poll( async () => {
