@@ -22,7 +22,6 @@
 
 -   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 
-
 ## 15.2.0 (2026-10-07)
 
 ### Enhancements
