@@ -93,17 +93,12 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            # Playground fetches the plugin ZIP from this pull request's latest
-            # "Build Gutenberg Plugin Zip" run, so one link stays current across
-            # pushes and the section is written once, when the pull request opens.
             - uses: ./tools/pr-meta
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   section: playground
                   body: '[Preview this pull request in WordPress Playground](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }}). It loads the latest build of this pull request once the "Build Gutenberg Plugin Zip" workflow has finished.'
                   pr-number: ${{ github.event.pull_request.number }}
-                  # Runs from the default branch for a pull request targeting a
-                  # release branch, whose own writers do not know this section yet.
                   require-base: ${{ github.event.repository.default_branch }}
 
     account-link:
