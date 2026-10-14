@@ -442,6 +442,25 @@ class Tests_Actions_API extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Firing the action again once the registry has been read does not reopen
+	 * it: the registrations made then are refused.
+	 */
+	public function test_firing_the_action_again_does_not_reopen_the_registry() {
+		$this->setExpectedIncorrectUsage( 'WP_Actions_Registry::register' );
+		$actions = wp_get_registered_actions( 'postType', 'page' );
+		add_action(
+			'wp_actions_api_init',
+			function () {
+				wp_register_actions( 'test-plugin', 'postType', 'page', array( $this->action( 'late' ) ) );
+			}
+		);
+
+		do_action( 'wp_actions_api_init' );
+
+		$this->assertSame( $actions, wp_get_registered_actions( 'postType', 'page' ) );
+	}
+
+	/**
 	 * The plugin registry replaces the core one on `init`, so every reader
 	 * of `WP_Actions_Registry::get_instance()`, the functions included, gets
 	 * the plugin one, holding whatever the core one held.

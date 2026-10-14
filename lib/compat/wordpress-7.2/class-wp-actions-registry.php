@@ -78,6 +78,14 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		protected $initialized = false;
 
 		/**
+		 * Whether the registry is firing the `wp_actions_api_init` action, the
+		 * only time register() and unregister() run.
+		 *
+		 * @var bool
+		 */
+		protected $initializing = false;
+
+		/**
 		 * The singleton instance.
 		 *
 		 * @var WP_Actions_Registry|null
@@ -439,23 +447,30 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			 *
 			 * @since 7.2.0
 			 */
-			do_action( 'wp_actions_api_init' );
+			$this->initializing = true;
+			try {
+				do_action( 'wp_actions_api_init' );
+			} finally {
+				$this->initializing = false;
+			}
 		}
 
 		/**
-		 * Checks that the `wp_actions_api_init` action is firing, as register()
-		 * and unregister() require.
+		 * Checks that the registry is firing the `wp_actions_api_init` action,
+		 * as register() and unregister() require.
 		 *
 		 * Outside the action a registration would either come before the
 		 * registrations made on it, and take the ids they register, or after
 		 * the actions have been read and the import map of the editor script
-		 * built from them. Refusing keeps the registry immutable once read.
+		 * built from them. Refusing keeps the registry immutable once read,
+		 * even when the action is fired again with do_action(), which is why
+		 * the registry tracks its own firing rather than check doing_action().
 		 *
 		 * @param string $method The calling method, for the notice.
 		 * @return bool Whether the action is firing.
 		 */
 		protected function doing_actions_api_init( $method ) {
-			if ( doing_action( 'wp_actions_api_init' ) ) {
+			if ( $this->initializing ) {
 				return true;
 			}
 
