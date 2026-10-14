@@ -394,7 +394,9 @@ function renderSection(
 		attributes ? ` ${ attributes }` : ''
 	} -->`;
 	const close = `<!-- /pr-meta:section:${ section.id } -->`;
-	const heading = definition ? `#### ${ definition.heading }\n\n` : '';
+	const heading = definition?.heading
+		? `#### ${ definition.heading }\n\n`
+		: '';
 	const body = section.body;
 
 	const delimited = `${ open }\n${ body }\n${ close }`;
