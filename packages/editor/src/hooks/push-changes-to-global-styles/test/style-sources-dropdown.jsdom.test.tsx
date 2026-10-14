@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from '@wordpress/element';
 import StyleSourcesDropdown from '../style-sources-dropdown';
 
 const changedRows = [
@@ -136,5 +137,38 @@ describe( 'StyleSourcesDropdown', () => {
 		expect( setAttributes ).toHaveBeenCalledWith( {
 			style: { css: 'color: red;' },
 		} );
+	} );
+
+	it( 'keeps focus in the popover once the last change is reset', async () => {
+		// Resets empty the rows, as the real hook would after the update.
+		function Block() {
+			const [ blockAttributes, setBlockAttributes ] =
+				useState( attributes );
+			return (
+				<StyleSourcesDropdown
+					name="core/button"
+					attributes={ blockAttributes }
+					setAttributes={ ( next ) => {
+						rows.changed = [];
+						setBlockAttributes( { ...blockAttributes, ...next } );
+					} }
+				/>
+			);
+		}
+		const user = userEvent.setup();
+		render( <Block /> );
+		await user.click(
+			screen.getByRole( 'button', { name: 'See 2 style changes' } )
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'Reset all' } ) );
+		rows.changed = changedRows;
+
+		expect(
+			screen.getByRole( 'heading', { name: 'Changed on this block (0)' } )
+		).toHaveFocus();
+		expect(
+			screen.queryByRole( 'button', { name: 'Reset all' } )
+		).not.toBeInTheDocument();
 	} );
 } );
