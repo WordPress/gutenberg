@@ -4733,11 +4733,6 @@
 			"count": 3
 		}
 	},
-	"packages/components/src/menu/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2
