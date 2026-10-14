@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Show the actions registered on the server for a post type after its other actions, in the lists of the site editor and in the inspector. Plugins register them in PHP on the `wp_actions_api_init` action, with a script module for their JavaScript parts.
+
 ### Enhancements
 
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
