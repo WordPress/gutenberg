@@ -1,4 +1,3 @@
-// @ts-check
 import { createContext, useContext, useMemo } from '@wordpress/element';
 import type { BlockContextProviderProps } from './types';
 
