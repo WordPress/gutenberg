@@ -34,7 +34,7 @@ function normalizeFetchResult( result ) {
  *
  * @param {Object}               category   The media category to fetch results for.
  * @param {InserterMediaRequest} query      The query args to use for the request.
- * @param {any}                  refreshKey Optional value that, when changed, forces
+ * @param {unknown}              refreshKey Optional value that, when changed, forces
  *                                          a refetch (e.g. after attaching/detaching).
  * @return {{ mediaList: InserterMediaItem[], isLoading: boolean, totalItems: number|undefined, totalPages: number|undefined }} The media results and paging totals.
  */
