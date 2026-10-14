@@ -53,26 +53,30 @@ const { default: actions } = await import(
 const renamePost = { ...actionFromTheServer, ...actions[ 'rename-post' ] };
 ```
 
-A plugin replacing a core action registers its own definition with the script module of the core action, so the action keeps its JavaScript parts:
+A plugin replacing a core action unregisters it, then registers it again with its changes and with the script module of the core action, so the action keeps its JavaScript parts. Merging the changes into the definition `wp_unregister_entity_actions()` returns keeps the rest of the core action, such as its modal options, and registering only when something was unregistered keeps the action away from the users WordPress does not register it for:
 
 ```php
 add_action( 'wp_entity_actions_api_init', function () {
-	wp_unregister_entity_actions( 'postType', 'page', array( 'move-to-trash' ) );
+	$removed = wp_unregister_entity_actions( 'postType', 'page', array( 'move-to-trash' ) );
+	if ( ! $removed ) {
+		return;
+	}
 	wp_register_entity_actions(
 		'acme',
 		'postType',
 		'page',
 		array(
-			array(
-				'id'           => 'move-to-trash',
-				'label'        => __( 'Move to the bin…', 'acme' ),
-				'supportsBulk' => true,
+			array_merge(
+				$removed[0],
+				array( 'label' => __( 'Move to the bin…', 'acme' ) )
 			),
 		),
 		'@wordpress/core-actions/post_type_supports'
 	);
 } );
 ```
+
+The actions are shown in registration order, so an action registered again moves to the end of the actions of the entity. A property the script module provides takes precedence over the one registered in PHP: the label of `view-post-revisions`, which shows the number of revisions, comes from its module.
 
 ## Contributing to this package
 
