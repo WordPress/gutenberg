@@ -70,6 +70,18 @@ export function getResetLayout( layoutBlockSupport = {}, blockVariation ) {
 	} );
 }
 
+/**
+ * Returns the type of a layout, resolving a legacy constrained layout that
+ * has no `type` to `constrained`.
+ *
+ * @param { Object|undefined } layout Layout values.
+ *
+ * @return { string } Layout type.
+ */
+function getLayoutTypeName( layout ) {
+	return layout?.type ?? normalizeLegacyLayout( layout )?.type ?? 'default';
+}
+
 export function getLayoutStateOverrides(
 	layout = {},
 	baseLayout = {},
@@ -516,14 +528,15 @@ function LayoutPanelPure( {
 	};
 	const onChangeType = ( newType ) => onChangeLayout( { type: newType } );
 	const resetLayout = () => onChangeLayout( resetLayoutDefaults );
-	const resetInheritToggle = () => onChangeLayout( { type: 'default' } );
+	// The toggle resets to the same defaults as "Reset all", e.g. the
+	// default Group variation uses content width.
+	const resetInheritToggleType = getLayoutTypeName( resetLayoutDefaults );
+	const resetInheritToggle = () =>
+		onChangeLayout( { type: resetInheritToggleType } );
 	const isUsingContentWidth = () =>
 		layoutType?.name === 'constrained' || hasContentSizeOrLegacySettings;
 	const hasInheritToggleValue = () =>
-		isViewportLayoutState
-			? ( usedLayout?.type ?? 'default' ) !==
-				( resetLayoutDefaults?.type ?? 'default' )
-			: layout?.type === 'constrained';
+		getLayoutTypeName( usedLayout ) !== resetInheritToggleType;
 	const hasLayoutTypeValue = () =>
 		( usedLayout?.type ?? 'default' ) !==
 		( resetLayoutDefaults?.type ?? 'default' );
