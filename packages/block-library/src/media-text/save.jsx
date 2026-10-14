@@ -1,5 +1,10 @@
 import clsx from 'clsx';
-import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useInnerBlocksProps,
+	useBlockProps,
+	__experimentalGetElementClassName,
+} from '@wordpress/block-editor';
 import { imageFillStyles } from './image-fill';
 import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
@@ -22,6 +27,7 @@ export default function save( { attributes } ) {
 		href,
 		linkTarget,
 		rel,
+		caption,
 	} = attributes;
 	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = ! rel ? undefined : rel;
@@ -79,6 +85,19 @@ export default function save( { attributes } ) {
 		gridTemplateColumns,
 	};
 
+	const mediaFigure = (
+		<figure className="wp-block-media-text__media">
+			{ ( mediaTypeRenders[ mediaType ] || noop )() }
+			{ ! RichText.isEmpty( caption ) && (
+				<RichText.Content
+					tagName="figcaption"
+					className={ __experimentalGetElementClassName( 'caption' ) }
+					value={ caption }
+				/>
+			) }
+		</figure>
+	);
+
 	if ( 'right' === mediaPosition ) {
 		return (
 			<div { ...useBlockProps.save( { className, style } ) }>
@@ -87,17 +106,13 @@ export default function save( { attributes } ) {
 						className: 'wp-block-media-text__content',
 					} ) }
 				/>
-				<figure className="wp-block-media-text__media">
-					{ ( mediaTypeRenders[ mediaType ] || noop )() }
-				</figure>
+				{ mediaFigure }
 			</div>
 		);
 	}
 	return (
 		<div { ...useBlockProps.save( { className, style } ) }>
-			<figure className="wp-block-media-text__media">
-				{ ( mediaTypeRenders[ mediaType ] || noop )() }
-			</figure>
+			{ mediaFigure }
 			<div
 				{ ...useInnerBlocksProps.save( {
 					className: 'wp-block-media-text__content',
