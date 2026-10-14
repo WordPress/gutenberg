@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Update the bundled `webpack-dev-server` from `^5.2.1` to `^6.0.0` and `@pmmmwh/react-refresh-webpack-plugin` from `^0.5.11` to `^0.6.3`. Custom `devServer` configs need migrating: SockJS is removed, so drop `webSocketServer: 'sockjs'` and `client.webSocketTransport: 'sockjs'` to use the default `ws`; the proxy `bypass` option is removed in favor of `http-proxy-middleware`'s `context` or `router`; custom middleware runs on Express 5; and `getFilenameFromUrl()` is now asynchronous. See the [webpack-dev-server 6.0.0 release notes](https://github.com/webpack/webpack-dev-server/releases/tag/v6.0.0) ([#84674](https://github.com/WordPress/gutenberg/pull/84674)).
+
 ### Bug Fixes
 
 -   `test-playwright` and `test-e2e`: When `WP_BASE_URL` is not set, run the tests against the port of the `wp-env` environment that the project tests with. A project with a `.wp-env.test.json` uses that config merged with its `.wp-env.test.override.json`, and otherwise `.wp-env.json` merged with its `.wp-env.override.json`, plus any `WP_ENV_*` environment variables. The port is that of the tests environment if the config enables one, and otherwise of the development environment. The config files are also found when the tests run from an npm workspace subdirectory. Previously such projects silently fell back to `http://localhost:8889`, which may belong to another project's environment ([#84654](https://github.com/WordPress/gutenberg/pull/84654)).

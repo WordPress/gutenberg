@@ -19,6 +19,7 @@
 -   `BlockBreadcrumb`: Use the `Breadcrumb` component from `@wordpress/ui` to collapse overflowing ancestors into a menu while preserving block selection and document-root activation, including multi-block selections. Use block titles when renamed labels are blank after stripping HTML. Accept a `className` for consumer-specific layout ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 -   Apply formats from the toolbar and keyboard shortcuts to text selected across blocks, when every selected block is only a rich text field ([#58913](https://github.com/WordPress/gutenberg/pull/58913)).
+-   Inserter: Redesign the Media tab around a single DataViews grid, in place of the category list and flyout panel. One search covers the tab, media types are tabs, and other sources (the post's attached images, Openverse, anything registered through the public API) are chosen from a menu beside the search ([#82749](https://github.com/WordPress/gutenberg/pull/82749)).
 
 ### Bug Fixes
 
@@ -26,7 +27,19 @@
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 -   Block Toolbar: Keep `__unstableBlockToolbarLastItem` fills out of the placeholder toolbar shown on small screens while no block is selected ([#84554](https://github.com/WordPress/gutenberg/pull/84554)).
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
+-   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
 
+
+### Internal
+
+-   Convert the remaining `utils` modules and the `state-utils` and `useCachedTruthy` hook helpers to TypeScript ([#84629](https://github.com/WordPress/gutenberg/pull/84629)).
+-   Convert the `private-keys`, `constants` and `array` store modules to TypeScript ([#84616](https://github.com/WordPress/gutenberg/pull/84616)).
+-   Convert the store reducer to TypeScript and add the store `State` and `Action` types ([#84624](https://github.com/WordPress/gutenberg/pull/84624)).
+-   Convert the store selectors and `store/utils` to TypeScript ([#84631](https://github.com/WordPress/gutenberg/pull/84631)).
+-   Convert the store private selectors to TypeScript and type the editor settings the store reads ([#84662](https://github.com/WordPress/gutenberg/pull/84662)).
+-   Convert the store actions and private actions to TypeScript and add the store thunk arguments type ([#84672](https://github.com/WordPress/gutenberg/pull/84672)).
+-   Convert the block edit context, block context, block icon, block editing mode, `useSettings`, block refs, Global Styles utils and inheritance, and spacing size utils to TypeScript ([#84625](https://github.com/WordPress/gutenberg/pull/84625)).
+-   Convert the store defaults, `getBlockSettings` and the store index to TypeScript and type the theme.json settings the store reads ([#84677](https://github.com/WordPress/gutenberg/pull/84677)).
 
 ## 18.1.0 (2026-10-07)
 
