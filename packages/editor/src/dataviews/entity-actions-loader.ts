@@ -9,7 +9,8 @@
 
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import type { Action } from '@wordpress/dataviews';
 import { unlock } from '../lock-unlock';
 
@@ -47,6 +48,32 @@ const EMPTY_ACTIONS: Action< any >[] = [];
 
 function importModule( id: string ) {
 	return import( /* webpackIgnore: true */ /* @vite-ignore */ id );
+}
+
+/**
+ * Turns the rejection of the actions request into an `Error` to show.
+ *
+ * A failed `apiFetch` rejects with a plain `{ code, message, data }` object
+ * rather than an `Error`, so the server's own message is used when there is
+ * one. Anything else, such as a `Response` from `parse: false` or a rejection
+ * from a custom fetch handler, falls back to copy of our own, so there is
+ * always something to show.
+ *
+ * @param value The rejection.
+ * @return An `Error` whose `cause` is the original rejection.
+ */
+function toError( value: unknown ): Error {
+	if ( value instanceof Error ) {
+		return value;
+	}
+	const serverMessage = ( value as { message?: unknown } )?.message;
+	const message =
+		typeof serverMessage === 'string' && serverMessage.trim()
+			? serverMessage
+			: __(
+					'The actions of this screen did not load. Reload the page to try again.'
+				);
+	return new Error( message, { cause: value } );
 }
 
 /**
@@ -155,8 +182,8 @@ function getResolvedActions< Item >(
  * @param entity      The entity.
  * @param entity.kind Entity kind (e.g. `postType`).
  * @param entity.name Entity name (e.g. `page`).
- * @return The actions, in the server order. Empty until they load, or when
- *         they cannot be requested, which is reported.
+ * @return The actions, in the server order (empty until they load), and the
+ *         error when they could not be requested.
  */
 export function useEntityActions< Item = any >( {
 	kind,
@@ -164,7 +191,10 @@ export function useEntityActions< Item = any >( {
 }: {
 	kind: string;
 	name: string;
-} ): Action< Item >[] {
+} ): {
+	actions: Action< Item >[];
+	error?: Error;
+} {
 	const { config, error } = useSelect(
 		( select ) => {
 			const { getEntityActionsConfig, getResolutionError } = unlock(
@@ -182,20 +212,15 @@ export function useEntityActions< Item = any >( {
 		[ kind, name ]
 	);
 
-	useEffect( () => {
-		if ( error ) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`Could not load the actions of ${ kind }/${ name }.`,
-				error
-			);
-		}
-	}, [ error, kind, name ] );
-
 	const [ resolved, setResolved ] = useState< {
 		config: EntityActionsConfig;
 		actions: Action< Item >[];
 	} >();
+
+	const normalizedError = useMemo(
+		() => ( error ? toError( error ) : undefined ),
+		[ error ]
+	);
 
 	useEffect( () => {
 		if ( ! config ) {
@@ -212,8 +237,11 @@ export function useEntityActions< Item = any >( {
 		};
 	}, [ config ] );
 
-	if ( ! config || resolved?.config !== config ) {
-		return EMPTY_ACTIONS;
+	if ( normalizedError ) {
+		return { actions: EMPTY_ACTIONS, error: normalizedError };
 	}
-	return resolved.actions;
+	if ( ! config || resolved?.config !== config ) {
+		return { actions: EMPTY_ACTIONS };
+	}
+	return { actions: resolved.actions };
 }

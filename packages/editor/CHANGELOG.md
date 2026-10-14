@@ -6,7 +6,7 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 -   The editor stylesheet no longer includes the styles of `@wordpress/fields`. A plugin that renders `MediaEdit` loads `@wordpress/fields/build-style/style.css` with its own script, as the package README describes ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
--   Every action of a post type now comes from the server: `usePostActions` shows the actions the `wp/v2/entity-actions` route returns, merged with the JavaScript parts of the script modules registered along with them, and `registerPostTypeSchema()` registers no action.
+-   Every action of a post type now comes from the server: `usePostActions` shows the actions the `wp/v2/entity-actions` route returns, merged with the JavaScript parts of the script modules registered along with them, and `registerPostTypeSchema()` registers no action. When the actions cannot be loaded, a notice says so.
 -   `registerEntityAction` and `unregisterEntityAction`, only available in the Gutenberg plugin, have no effect. They still warn, and they no longer register or unregister anything: every action of an entity is registered on the server. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for their JavaScript parts.
 
 ### New Features

@@ -223,9 +223,12 @@ describe( 'useEntityActions', () => {
 
 		const { result } = renderUseActions();
 
-		expect( result.current ).toEqual( [] );
-		await waitFor( () => expect( result.current ).toHaveLength( 1 ) );
-		expect( result.current[ 0 ] ).toEqual( {
+		expect( result.current ).toEqual( { actions: [] } );
+		await waitFor( () =>
+			expect( result.current.actions ).toHaveLength( 1 )
+		);
+		expect( result.current.error ).toBeUndefined();
+		expect( result.current.actions[ 0 ] ).toEqual( {
 			id: 'acme/feature',
 			label: 'Feature',
 			supportsBulk: true,
@@ -236,7 +239,7 @@ describe( 'useEntityActions', () => {
 		} );
 	} );
 
-	it( 'returns no actions and reports it when the request fails', async () => {
+	it( 'returns no actions and the message of the server when the request fails', async () => {
 		const error = {
 			code: 'rest_forbidden',
 			message: 'Sorry, you are not allowed to do that.',
@@ -247,11 +250,26 @@ describe( 'useEntityActions', () => {
 		const { result } = renderUseActions();
 
 		await waitFor( () =>
-			expect( console ).toHaveWarnedWith(
-				'Could not load the actions of postType/page.',
-				error
-			)
+			expect( result.current.error ).toBeInstanceOf( Error )
 		);
-		expect( result.current ).toEqual( [] );
+		expect( result.current.actions ).toEqual( [] );
+		expect( result.current.error?.message ).toBe(
+			'Sorry, you are not allowed to do that.'
+		);
+		expect( result.current.error?.cause ).toBe( error );
+	} );
+
+	it( 'returns copy of its own when the request fails without a message', async () => {
+		// Like the `Response` a request with `parse: false` rejects with.
+		vi.mocked( apiFetch ).mockRejectedValue( { status: 500 } );
+
+		const { result } = renderUseActions();
+
+		await waitFor( () =>
+			expect( result.current.error ).toBeInstanceOf( Error )
+		);
+		expect( result.current.error?.message ).toBe(
+			'The actions of this screen did not load. Reload the page to try again.'
+		);
 	} );
 } );
