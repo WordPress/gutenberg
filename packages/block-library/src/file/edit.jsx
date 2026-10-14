@@ -230,7 +230,6 @@ function FileEdit( { attributes, isSelected, setAttributes, clientId } ) {
 						mediaId={ id }
 						mediaUrl={ href }
 						filename={ getFilename( href ) }
-						accept="*"
 						onSelect={ onSelectFile }
 						onError={ onUploadError }
 						onReset={ () => onSelectFile( undefined ) }
