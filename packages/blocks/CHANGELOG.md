@@ -10,6 +10,7 @@
 ### Bug Fixes
 
 -   `getBlockSupport` and `hasBlockSupport`: Accept the feature as an array of path segments in the types, as the store selectors and runtime already do ([#84708](https://github.com/WordPress/gutenberg/pull/84708)).
+-   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
 
 ## 16.2.0 (2026-10-07)
 
