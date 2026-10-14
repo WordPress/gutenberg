@@ -5,7 +5,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 import { store as blockEditorStore } from '../../store';
-import { PrivateBlockInspectorEditOriginal } from './edit-original-slot-fill';
 
 function InlineEditButton( {
 	clientId,
@@ -70,7 +69,14 @@ export default function EditContents( { clientId } ) {
 		return null;
 	}
 
-	const inlineEditButton = (
+	// Synced patterns and template parts are never edited inline. They're
+	// edited through the entity they render, whose "Edit original" button the
+	// blocks fill into PrivateBlockInspectorEditOriginal.
+	if ( isReusableBlock( block ) || isTemplatePart( block ) ) {
+		return null;
+	}
+
+	return (
 		<InlineEditButton
 			clientId={ clientId }
 			editedContentOnlySection={ editedContentOnlySection }
@@ -78,16 +84,4 @@ export default function EditContents( { clientId } ) {
 			stopEditingContentOnlySection={ stopEditingContentOnlySection }
 		/>
 	);
-
-	// Synced patterns and template parts are edited through the entity they
-	// render, which the editor package handles. Without its fill, edit inline.
-	if ( isReusableBlock( block ) || isTemplatePart( block ) ) {
-		return (
-			<PrivateBlockInspectorEditOriginal.Slot fillProps={ { clientId } }>
-				{ ( fills ) => ( fills.length ? fills : inlineEditButton ) }
-			</PrivateBlockInspectorEditOriginal.Slot>
-		);
-	}
-
-	return inlineEditButton;
 }

@@ -27,6 +27,7 @@ import {
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { getBlockBindingsSource, parse } from '@wordpress/blocks';
 import { unlock } from '../lock-unlock';
+import EditOriginalInspectorButton from '../utils/edit-original-inspector-button';
 
 const { useLayoutClasses } = unlock( blockEditorPrivateApis );
 const { isOverridableBlock } = unlock( patternsPrivateApis );
@@ -143,6 +144,7 @@ const EMPTY_ARRAY = [];
 
 function ReusableBlockEdit( {
 	name,
+	clientId,
 	attributes: { ref, content },
 	__unstableParentLayout: parentLayout,
 	setAttributes,
@@ -182,10 +184,11 @@ function ReusableBlockEdit( {
 		() => ( readOnlyContent ? parse( readOnlyContent ) : EMPTY_ARRAY ),
 		[ readOnlyContent ]
 	);
-	const blocks = readOnlyRecord ? readOnlyBlocks : editableBlocks;
-	const isResolving =
-		! hasResolved || ( isUnavailableToEdit && ! hasResolvedReadOnly );
-	const isMissing = isUnavailableToEdit && ! isResolving && ! readOnlyRecord;
+	const blocks = editableBlocks?.length ? editableBlocks : readOnlyBlocks;
+	const isResolving = isUnavailableToEdit
+		? ! hasResolvedReadOnly
+		: ! hasResolved;
+	const isMissing = ! isResolving && ! record && ! readOnlyRecord;
 
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
@@ -279,6 +282,13 @@ function ReusableBlockEdit( {
 
 	return (
 		<>
+			{ ! isResolving && ! isMissing && (
+				<EditOriginalInspectorButton
+					clientId={ clientId }
+					postType="wp_block"
+					postId={ ref }
+				/>
+			) }
 			{ ! isResolving && ! isMissing && (
 				<ReusableBlockControl
 					recordId={ ref }
