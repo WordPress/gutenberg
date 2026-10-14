@@ -8,6 +8,13 @@
 	z-index: z-index(".customize-widgets__block-toolbar");
 }
 
+// Core places an invisible 3px strip along the sidebar's right edge, above
+// everything in the sidebar. The block toolbar can run past that edge, so let
+// clicks through to the toolbar buttons under the strip.
+#customize-controls::after {
+	pointer-events: none;
+}
+
 .customize-widgets-popover .components-popover,
 .customize-control-sidebar_block_editor .components-popover {
 	// FloatingUI library used in Popover component forces us to have an "absolute" inline style.

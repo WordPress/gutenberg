@@ -12,11 +12,11 @@
 		margin-bottom: $grid-unit-10;
 		box-shadow: none;
 		outline: none;
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-md);
 	}
 
 	.components-toolbar {
-		border-radius: $radius-small;
+		border-radius: var(--wpds-border-radius-md);
 	}
 
 	.components-toolbar-group {
