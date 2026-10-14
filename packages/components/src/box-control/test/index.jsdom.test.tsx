@@ -108,6 +108,45 @@ describe( 'BoxControl', () => {
 			expect( input ).toHaveAttribute( 'min', '10' );
 			expect( input ).toHaveAttribute( 'max', '50' );
 		} );
+
+		it( 'should render separated inputs when linkedByDefault is false', () => {
+			render( <UncontrolledBoxControl linkedByDefault={ false } /> );
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Top side' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Right side' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Bottom side' } )
+			).toBeVisible();
+			expect(
+				screen.getByRole( 'textbox', { name: 'Left side' } )
+			).toBeVisible();
+			expect(
+				screen.queryByRole( 'textbox', { name: 'All sides' } )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'should allow toggling between linked and unlinked views when linkedByDefault is false', async () => {
+			const user = userEvent.setup();
+
+			render( <UncontrolledBoxControl linkedByDefault={ false } /> );
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'Top side' } )
+			).toBeVisible();
+
+			const toggleButton = screen.getByRole( 'button', {
+				name: 'Link sides',
+			} );
+			await user.click( toggleButton );
+
+			expect(
+				screen.getByRole( 'textbox', { name: 'All sides' } )
+			).toBeVisible();
+		} );
 	} );
 
 	describe( 'Reset', () => {

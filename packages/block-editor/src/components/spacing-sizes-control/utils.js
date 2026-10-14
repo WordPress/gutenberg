@@ -216,19 +216,20 @@ export function hasBalancedSidesSupport( sides = [] ) {
  * Determines which view the SpacingSizesControl should default to on its
  * first render; Axial, Custom, or Single side.
  *
- * @param {Object} values Current side values.
- * @param {Array}  sides  Supported sides.
+ * @param {Object}  values          Current side values.
+ * @param {Array}   sides           Supported sides.
+ * @param {boolean} linkedByDefault Whether sides are linked by default when no values are defined.
  *
  * @return {string} View to display.
  */
-export function getInitialView( values = {}, sides ) {
+export function getInitialView( values = {}, sides, linkedByDefault = true ) {
 	const { top, right, bottom, left } = values;
 	const sideValues = [ top, right, bottom, left ].filter( Boolean );
 
 	// Axial ( Horizontal & vertical ).
 	// - Has axial side support
-	// - Has axial side values which match
-	// - Has no values and the supported sides are balanced
+	// - Has axial side values which match and sides are linked by default, or only axial sides supported
+	// - Has no values, the supported sides are balanced, and sides are linked by default
 	const hasMatchingAxialValues =
 		top === bottom && left === right && ( !! top || !! left );
 	const hasNoValuesAndBalancedSides =
@@ -240,7 +241,10 @@ export function getInitialView( values = {}, sides ) {
 
 	if (
 		hasAxisSupport( sides ) &&
-		( hasMatchingAxialValues || hasNoValuesAndBalancedSides )
+		( ( ( hasMatchingAxialValues || hasNoValuesAndBalancedSides ) &&
+			linkedByDefault ) ||
+			( hasOnlyAxialSides &&
+				( ! sideValues.length || hasMatchingAxialValues ) ) )
 	) {
 		return VIEWS.axial;
 	}

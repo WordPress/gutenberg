@@ -461,6 +461,48 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( paddingAllSides ).toHaveValue( '24' );
 			expect( paddingAllSides ).not.toHaveAttribute( 'placeholder' );
 		} );
+
+		it( 'renders unlinked inputs in BoxControl when linkedByDefault is false', () => {
+			renderPanel( {
+				value: {},
+				settings: {
+					...baseSettings,
+					spacing: {
+						...baseSettings.spacing,
+						linkedByDefault: false,
+					},
+				},
+			} );
+
+			const paddingGroup = screen.getByRole( 'group', {
+				name: /Padding/,
+			} );
+			expect(
+				within( paddingGroup ).getByRole( 'textbox', {
+					name: 'Top side',
+				} )
+			).toBeVisible();
+			expect(
+				within( paddingGroup ).getByRole( 'textbox', {
+					name: 'Right side',
+				} )
+			).toBeVisible();
+			expect(
+				within( paddingGroup ).getByRole( 'textbox', {
+					name: 'Bottom side',
+				} )
+			).toBeVisible();
+			expect(
+				within( paddingGroup ).getByRole( 'textbox', {
+					name: 'Left side',
+				} )
+			).toBeVisible();
+			expect(
+				within( paddingGroup ).queryByRole( 'textbox', {
+					name: 'All sides',
+				} )
+			).not.toBeInTheDocument();
+		} );
 	} );
 
 	// The min-dimension DimensionControls (minHeight, minWidth) use the
@@ -798,6 +840,53 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expect( paddingSliders.every( ( s ) => s.value === '2' ) ).toBe(
 				true
 			);
+		} );
+
+		it( '(padding) renders unlinked sides when linkedByDefault is false', () => {
+			renderPanel( {
+				value: {},
+				settings: {
+					...settingsWithSpacingPresets,
+					spacing: {
+						...settingsWithSpacingPresets.spacing,
+						linkedByDefault: false,
+					},
+				},
+			} );
+
+			const paddingSliders = getPaddingSliders();
+			// Separated view renders 4 sliders: Top, Right, Bottom, Left.
+			expect( paddingSliders ).toHaveLength( 4 );
+			expect(
+				screen.getAllByRole( 'button', { name: 'Link sides' } ).length
+			).toBeGreaterThanOrEqual( 1 );
+		} );
+
+		it( 'supports object overrides for linkedByDefault (e.g. padding unlinked, margin linked)', () => {
+			renderPanel( {
+				value: {},
+				settings: {
+					...settingsWithSpacingPresets,
+					spacing: {
+						...settingsWithSpacingPresets.spacing,
+						linkedByDefault: {
+							padding: false,
+							margin: true,
+						},
+					},
+				},
+			} );
+
+			const paddingSliders = getPaddingSliders();
+			expect( paddingSliders ).toHaveLength( 4 );
+
+			const marginSliders = screen
+				.getAllByRole( 'slider' )
+				.filter( ( s ) =>
+					/margin/i.test( s.getAttribute( 'aria-label' ) || '' )
+				);
+			// Margin linked by default renders 2 axial sliders (horizontal & vertical).
+			expect( marginSliders ).toHaveLength( 2 );
 		} );
 	} );
 

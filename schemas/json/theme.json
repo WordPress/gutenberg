@@ -506,6 +506,31 @@
 							"type": "boolean",
 							"default": true
 						},
+						"linkedByDefault": {
+							"description": "Whether margin and padding controls have their sides linked by default.",
+							"default": true,
+							"anyOf": [
+								{
+									"type": "boolean"
+								},
+								{
+									"type": "object",
+									"properties": {
+										"margin": {
+											"description": "Whether margin controls have their sides linked by default.",
+											"type": "boolean",
+											"default": true
+										},
+										"padding": {
+											"description": "Whether padding controls have their sides linked by default.",
+											"type": "boolean",
+											"default": true
+										}
+									},
+									"additionalProperties": false
+								}
+							]
+						},
 						"spacingSizes": {
 							"description": "Space size presets for the space size selector.\nGenerates a custom property (`--wp--preset--spacing--{slug}`) per preset value.",
 							"type": "array",

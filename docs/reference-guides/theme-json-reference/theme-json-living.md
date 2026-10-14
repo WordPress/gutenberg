@@ -187,6 +187,7 @@ Settings related to spacing.
 | units | List of units the user can use for spacing values. | `[ string ]` | `["px","em","rem","vh","vw","%"]` |
 | customSpacingSize | Allow users to set custom space sizes. | `boolean` | `true` |
 | defaultSpacingSizes | Allow users to choose space sizes from the default space size presets. | `boolean` | `true` |
+| linkedByDefault | Whether margin and padding controls have their sides linked by default. | `boolean`, `{ margin, padding }` | `true` |
 | spacingSizes | Space size presets for the space size selector. | `[ { name, slug, size } ]` |  |
 | spacingScale | Settings to auto-generate space size presets for the space size selector. | `{ operator, increment, steps, mediumStep, unit }` |  |
 

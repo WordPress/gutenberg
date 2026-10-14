@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { useInstanceId } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 import { BaseControl } from '../base-control';
@@ -69,6 +69,7 @@ function BoxControl( {
 	presetKey,
 	onMouseOver,
 	onMouseOut,
+	linkedByDefault = true,
 }: BoxControlProps ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
@@ -79,8 +80,33 @@ function BoxControl( {
 
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValueMixed( inputValues ) || hasOneSide
+		() =>
+			( ( ! hasInitialValue || ! isValueMixed( inputValues ) ) &&
+				linkedByDefault ) ||
+			hasOneSide
 	);
+
+	const prevLinkedByDefault = usePrevious( linkedByDefault );
+	const inputValuesRef = useRef( inputValues );
+
+	useEffect( () => {
+		inputValuesRef.current = inputValues;
+	}, [ inputValues ] );
+
+	useEffect( () => {
+		// Only re-sync when linkedByDefault changes its value.
+		if (
+			prevLinkedByDefault !== undefined &&
+			prevLinkedByDefault !== linkedByDefault
+		) {
+			setIsLinked(
+				( ( ! hasInitialValue ||
+					! isValueMixed( inputValuesRef.current ) ) &&
+					linkedByDefault ) ||
+					hasOneSide
+			);
+		}
+	}, [ linkedByDefault, prevLinkedByDefault, hasInitialValue, hasOneSide ] );
 
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection

@@ -198,6 +198,18 @@ describe( 'getInitialView', () => {
 				)
 			).not.toBe( VIEWS.axial );
 		} );
+		it( 'should return axial view when only axial sides are supported with matching values, even if linkedByDefault is false', () => {
+			expect(
+				getInitialView(
+					{ top: '1em', bottom: '1em', left: '2em', right: '2em' },
+					[ 'horizontal', 'vertical' ],
+					false
+				)
+			).toBe( VIEWS.axial );
+			expect(
+				getInitialView( {}, [ 'horizontal', 'vertical' ], false )
+			).toBe( VIEWS.axial );
+		} );
 	} );
 
 	describe( 'Custom sides view', () => {
@@ -207,6 +219,28 @@ describe( 'getInitialView', () => {
 			);
 			expect(
 				getInitialView( undefined, [ 'right', 'bottom', 'left' ] )
+			).toBe( VIEWS.custom );
+		} );
+		it( 'should return custom view when linkedByDefault is false, even if values match or are undefined', () => {
+			expect( getInitialView( {}, ALL_SIDES, false ) ).toBe(
+				VIEWS.custom
+			);
+			expect( getInitialView( undefined, ALL_SIDES, false ) ).toBe(
+				VIEWS.custom
+			);
+			expect(
+				getInitialView(
+					{ top: '0px', right: '0px', bottom: '0px', left: '0px' },
+					ALL_SIDES,
+					false
+				)
+			).toBe( VIEWS.custom );
+			expect(
+				getInitialView(
+					{ top: '1em', right: '1em', bottom: '1em', left: '1em' },
+					ALL_SIDES,
+					false
+				)
 			).toBe( VIEWS.custom );
 		} );
 		it( 'should return custom sides view when all values match and unbalanced sides config', () => {

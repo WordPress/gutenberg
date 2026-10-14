@@ -64,6 +64,12 @@ export type BoxControlProps = Pick<
 		 */
 		label?: string;
 		/**
+		 * Whether the box control sides are linked by default when no values are defined or when existing side values match.
+		 *
+		 * @default true
+		 */
+		linkedByDefault?: boolean;
+		/**
 		 * A callback function when an input value changes.
 		 */
 		onChange: ( next: BoxControlValue ) => void;
