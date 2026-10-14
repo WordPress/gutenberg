@@ -373,6 +373,7 @@ export default dedupePlugins( [
 					'ts-check': false,
 				},
 			],
+			'jsdoc/escape-inline-tags': 'error',
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
