@@ -1,0 +1,20 @@
+.slug {
+	/* Reset `fieldset` browser defaults. */
+	border: 0;
+	padding: 0;
+	margin: 0;
+}
+
+.help-link {
+	word-break: normal;
+	overflow-wrap: anywhere;
+}
+
+.help {
+	display: flex;
+	flex-direction: column;
+}
+
+.help-slug {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
