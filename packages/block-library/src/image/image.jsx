@@ -3,7 +3,7 @@ import {
 	ExternalLink,
 	FocalPointPicker,
 	ResizableBox,
-	Spinner,
+	Spinner as WCSpinner,
 	TextareaControl as WCTextareaControl,
 	TextControl,
 	CheckboxControl as WCCheckboxControl,
@@ -1192,7 +1192,7 @@ export default function Image( {
 					className="wp-block-image__placeholder"
 					withIllustration
 				>
-					<Spinner />
+					<WCSpinner />
 				</Placeholder>
 			) : (
 				<>
@@ -1259,7 +1259,7 @@ export default function Image( {
 							...shadowProps.style,
 						} }
 					/>
-					{ ( isUploading || isSwappingMedia ) && <Spinner /> }
+					{ ( isUploading || isSwappingMedia ) && <WCSpinner /> }
 				</>
 			) }
 		</ImageWrapper>

@@ -3,7 +3,7 @@ import {
 	Button,
 	DropZone,
 	Icon as WCIcon,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
@@ -174,7 +174,7 @@ function MediaPickerButton( {
 			{ children }
 			{ isBlob && (
 				<span className="media-edit__picker-button-spinner">
-					<Spinner />
+					<WCSpinner />
 				</span>
 			) }
 			{ ! isUploading && (

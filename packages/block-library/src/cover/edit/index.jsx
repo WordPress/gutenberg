@@ -8,7 +8,11 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Placeholder, SandBox, Spinner } from '@wordpress/components';
+import {
+	Placeholder,
+	SandBox,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
 import {
 	compose,
 	useMergeRefs,
@@ -902,7 +906,7 @@ function CoverEdit( {
 					</div>
 				) }
 				{ isEmbedVideoBackground && ! embedHtml && isFetchingEmbed && (
-					<Spinner />
+					<WCSpinner />
 				) }
 
 				{ showOverlay && (
@@ -927,7 +931,7 @@ function CoverEdit( {
 					/>
 				) }
 
-				{ ( isUploadingMedia || isSwappingMedia ) && <Spinner /> }
+				{ ( isUploadingMedia || isSwappingMedia ) && <WCSpinner /> }
 
 				<CoverPlaceholder
 					disableMediaButtons

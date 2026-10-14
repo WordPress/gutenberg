@@ -232,6 +232,111 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		} );
 	} );
 
+	test( 'TypographyPanel clearing a text gradient leaves no gradient behind', () => {
+		mockUseSelectImpl.fn = () => ( {
+			style: {
+				background: {
+					gradient: 'var:preset|gradient|purple-blue',
+					backgroundClip: 'text',
+				},
+			},
+			fontFamily: undefined,
+			fontSize: undefined,
+			fitText: undefined,
+			className: undefined,
+			gradient: undefined,
+		} );
+		const setAttributes = vi.fn();
+
+		render(
+			<TypographyPanel
+				clientId="block-1"
+				name="core/paragraph"
+				setAttributes={ setAttributes }
+				settings={ { typography: { fontSize: true } } }
+			/>
+		);
+
+		const [ , props ] = mockPanelRecorder.calls[ 0 ];
+		props.onChange( {
+			typography: {},
+			color: {},
+			background: { gradient: undefined, backgroundClip: undefined },
+		} );
+
+		// A lone gradient would become a background gradient.
+		const [ [ attributes ] ] = setAttributes.mock.calls;
+		expect( attributes.style?.background?.gradient ).toBeUndefined();
+		expect( attributes.style?.background?.backgroundClip ).toBeUndefined();
+	} );
+
+	test( 'TypographyPanel leaves a background gradient it does not own', () => {
+		mockUseSelectImpl.fn = () => ( {
+			style: {
+				background: { gradient: 'var:preset|gradient|purple-blue' },
+			},
+			fontFamily: undefined,
+			fontSize: undefined,
+			fitText: undefined,
+			className: undefined,
+			gradient: undefined,
+		} );
+		const setAttributes = vi.fn();
+
+		render(
+			<TypographyPanel
+				clientId="block-1"
+				name="core/paragraph"
+				setAttributes={ setAttributes }
+				settings={ { typography: { fontSize: true } } }
+			/>
+		);
+
+		const [ , props ] = mockPanelRecorder.calls[ 0 ];
+		props.onChange( { typography: {}, color: {}, background: {} } );
+
+		const [ [ attributes ] ] = setAttributes.mock.calls;
+		expect( attributes.style?.background?.gradient ).toBe(
+			'var:preset|gradient|purple-blue'
+		);
+	} );
+
+	test( 'TypographyPanel replaces a preset gradient with a text gradient', () => {
+		mockUseSelectImpl.fn = () => ( {
+			style: undefined,
+			fontFamily: undefined,
+			fontSize: undefined,
+			fitText: undefined,
+			className: undefined,
+			gradient: 'vivid',
+		} );
+		const setAttributes = vi.fn();
+
+		render(
+			<TypographyPanel
+				clientId="block-1"
+				name="core/paragraph"
+				setAttributes={ setAttributes }
+				settings={ { typography: { fontSize: true } } }
+			/>
+		);
+
+		const [ , props ] = mockPanelRecorder.calls[ 0 ];
+		props.onChange( {
+			typography: {},
+			color: {},
+			background: {
+				gradient: 'var:preset|gradient|purple-blue',
+				backgroundClip: 'text',
+			},
+		} );
+
+		// The preset's `background` shorthand would reset the text clip.
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( { gradient: undefined } )
+		);
+	} );
+
 	// After relocation, block-scoped element/link colors are owned by the
 	// Elements panel (`hooks/elements.js`), which renders the shared Color
 	// panel. The former `ColorEdit` wrapper no longer exists; top-level text
