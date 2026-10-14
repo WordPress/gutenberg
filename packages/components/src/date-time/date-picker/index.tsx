@@ -326,13 +326,15 @@ function Day( {
 			className={ clsx(
 				'components-datetime__date__day', // Unused, for backwards compatibility.
 				styles.day,
-				isSelected && styles[ 'is-selected' ],
-				! isSelected && isToday && styles[ 'is-today' ],
-				numEvents > 0 && styles[ 'has-events' ]
+				{
+					[ styles[ 'is-selected' ] ]: isSelected,
+					[ styles[ 'is-today' ] ]: ! isSelected && isToday,
+					[ styles[ 'has-events' ] ]: numEvents > 0,
+				}
 			) }
 			style={
 				{
-					'--wp-components-date-picker-column': column,
+					'--_wp-components-date-picker-column': column,
 				} as CSSProperties
 			}
 			disabled={ isInvalid }

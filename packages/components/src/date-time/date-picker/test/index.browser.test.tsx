@@ -37,6 +37,11 @@ it( 'keeps month navigation aligned with the calendar in root and iframe documen
 	) ) {
 		frame.contentDocument!.head.appendChild( style.cloneNode( true ) );
 	}
+	// Load Flex's actual stylesheet last so its defaults cannot hide the grid.
+	const flexStyle = document.head.querySelector(
+		'style[data-vite-dev-id$="/flex/style.module.scss"]'
+	)!;
+	frame.contentDocument!.head.appendChild( flexStyle.cloneNode( true ) );
 	for ( const doc of [ document, frame.contentDocument! ] ) {
 		const calendar = doc.querySelector( '.components-datetime__date' )!;
 		const navigation = calendar.firstElementChild!;
