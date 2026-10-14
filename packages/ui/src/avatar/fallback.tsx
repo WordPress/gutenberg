@@ -1,11 +1,24 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import { person } from '@wordpress/icons';
+import { Circle, Path, SVG } from '@wordpress/primitives';
 import { Icon } from '../icon';
 import type { FallbackProps } from './types';
 import { FallbackWithLoadingDelay } from './fallback-with-loading-delay';
 import defenseStyles from '../utils/css/global-css-defense.module.css';
 import styles from './style.module.css';
+
+const person = (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 24 24"
+		style={ { fill: 'none' } }
+		stroke="currentColor"
+		strokeWidth={ 1.5 }
+	>
+		<Circle cx={ 12 } cy={ 8 } r={ 5 } />
+		<Path d="M20 21a8 8 0 0 0-16 0" />
+	</SVG>
+);
 
 /**
  * The content shown while the image loads, when it fails, or when no image

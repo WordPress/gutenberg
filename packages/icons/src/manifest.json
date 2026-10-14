@@ -1153,11 +1153,6 @@
 		"filePath": "library/percent.svg"
 	},
 	{
-		"slug": "person",
-		"label": "Person",
-		"filePath": "library/person.svg"
-	},
-	{
 		"slug": "pin",
 		"label": "Pin",
 		"filePath": "library/pin.svg",
