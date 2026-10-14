@@ -32,6 +32,14 @@
 	display: grid;
 	position: relative;
 
+	// A dark line beside a light one, so that the lines stand out on any
+	// background, whatever the blocks under them look like.
+	&.has-contrasting-lines {
+		box-shadow:
+			inset 0 0 0 1px rgb(0 0 0 / 35%),
+			inset 0 0 0 2px rgb(255 255 255 / 55%);
+	}
+
 	.block-editor-inserter {
 		color: inherit;
 		z-index: 32;
