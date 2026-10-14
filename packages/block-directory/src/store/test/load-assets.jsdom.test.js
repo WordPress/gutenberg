@@ -35,9 +35,11 @@ describe( 'controls', () => {
 			const mirrored =
 				iframe.contentDocument.getElementById( 'my-block-style' );
 			expect( mirrored ).not.toBeNull();
-			expect( mirrored ).toHaveAttribute( 'rel', 'stylesheet' );
-			expect( mirrored ).toHaveAttribute(
-				'href',
+			// Assert on properties (not jest-dom matchers): the mirrored node
+			// lives in the iframe's document, so it is not an instance of the
+			// top window's HTMLElement.
+			expect( mirrored.rel ).toBe( 'stylesheet' );
+			expect( mirrored.href ).toBe(
 				'https://example.com/my-block/style.css'
 			);
 		} );
