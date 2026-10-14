@@ -23,6 +23,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import type { BlockType, BlockTypeIcon } from '@wordpress/blocks';
+import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
@@ -62,7 +63,9 @@ const {
 	useHasColorPanel,
 	useHasBackgroundPanel,
 	searchItems,
+	getBlockTypesForElement,
 } = unlock( blockEditorPrivateApis );
+const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
 // `text` is the site's base text, styled under Typography rather than listed.
 type ListedElementName = Exclude< ElementName, 'text' >;
@@ -155,6 +158,60 @@ export function hasUserStylesForBlock(
 		hasAnyValue( user?.styles?.blocks?.[ blockName ] ) ||
 		hasAnyValue( user?.settings?.blocks?.[ blockName ] )
 	);
+}
+
+// The heading screen's level tabs share one list: block-type styles apply at
+// every level, so any heading element's property counts.
+const HEADING_ELEMENTS = [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ];
+
+function getElementLayers( element: string ): string[] {
+	return HEADING_ELEMENTS.includes( element )
+		? HEADING_ELEMENTS
+		: [ element ];
+}
+
+// State, viewport and nested element styles go to other selectors, so they
+// cannot override the element itself.
+function isOwnStylePath( path: string ) {
+	const [ first ] = path.split( '.' );
+	return (
+		first !== 'elements' &&
+		! first.startsWith( ':' ) &&
+		! first.startsWith( '@' )
+	);
+}
+
+/**
+ * The block types an element paints whose own Global Styles beat the element
+ * for at least one property it sets. Block style variations are not counted.
+ *
+ * @param config  Merged Global Styles config.
+ * @param element Element key, e.g. `heading`, `h2` or `button`.
+ * @return Block names, in map order.
+ */
+export function getOverridingBlockTypes(
+	config: GlobalStylesConfig | undefined,
+	element: string
+): string[] {
+	const blockNames: string[] = getBlockTypesForElement( element );
+	if ( ! blockNames.length || ! config?.styles ) {
+		return [];
+	}
+	const elements = getElementLayers( element );
+	// Without block styles, the resolver reports which leaves the element sets.
+	const { sources: elementSources } = resolveStyle(
+		{ ...config, styles: { ...config.styles, blocks: undefined } },
+		{ blockName: blockNames[ 0 ], elements }
+	);
+	return blockNames.filter( ( blockName ) => {
+		const { sources } = resolveStyle( config, { blockName, elements } );
+		return Object.keys( sources ).some(
+			( path ) =>
+				isOwnStylePath( path ) &&
+				sources[ path ].layer === 'block' &&
+				elementSources[ path ]?.layer === 'element'
+		);
+	} );
 }
 
 type StyleFilter = 'all' | 'customized';
