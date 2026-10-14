@@ -5913,6 +5913,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'palette keyed by origin with a string' => array(
 				array( 'settings' => array( 'color' => array( 'palette' => array( 'custom' => array( '#000' ) ) ) ) ),
 			),
+			'palette mixing a list and an origin'   => array(
+				array(
+					'settings' => array(
+						'color' => array(
+							'palette' => array(
+								0       => '#000',
+								'theme' => '#fff',
+							),
+						),
+					),
+				),
+			),
 			'preset slug as an array'               => array(
 				array(
 					'settings' => array(

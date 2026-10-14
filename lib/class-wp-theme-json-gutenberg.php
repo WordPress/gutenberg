@@ -1523,7 +1523,7 @@ class WP_Theme_JSON_Gutenberg {
 						if ( ! is_array( $presets ) ) {
 							continue;
 						}
-						if ( wp_is_numeric_array( $presets ) ) {
+						if ( isset( $presets[0] ) ) {
 							$presets = array_values( array_filter( $presets, $is_valid_preset ) );
 						} else {
 							foreach ( static::VALID_ORIGINS as $origin ) {
