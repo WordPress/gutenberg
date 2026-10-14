@@ -8,6 +8,7 @@ export const mayDisplayPatternEditingControlsKey = Symbol(
 export const blockEditingModeKey = Symbol( 'blockEditingMode' );
 export const blockBindingsKey = Symbol( 'blockBindings' );
 export const isPreviewModeKey = Symbol( 'isPreviewMode' );
+export const isMultiSelectedKey = Symbol( 'isMultiSelected' );
 export const isInListViewBlockSupportTreeKey = Symbol(
 	'isInListViewBlockSupportTree'
 );

@@ -383,11 +383,11 @@ export function toggleSelection( isSelectionEnabled = true ) {
 /**
  * Action that replaces given blocks with one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds       Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks          Replacement block(s).
- * @param {number}            indexToSelect   Index of replacement block to select.
- * @param {0|-1|null}         initialPosition Index of caret after in the selected block after the operation.
- * @param {?Object}           meta            Optional Meta values to be passed to the action object.
+ * @param {(string|string[])} clientIds         Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks            Replacement block(s).
+ * @param {number}            [indexToSelect]   Index of replacement block to select.
+ * @param {0|-1|null}         [initialPosition] Index of caret after in the selected block after the operation.
+ * @param {?Object}           [meta]            Optional Meta values to be passed to the action object.
  *
  * @return {Object} Action object.
  */

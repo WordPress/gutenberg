@@ -79,16 +79,17 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Resets the registry: drops the singleton instance, so the next
-	 * get_instance() creates an empty registry and its first read fires
+	 * Resets the registry: drops the singleton instance and puts an empty
+	 * plugin registry in its place, as `init` does, so its first read fires
 	 * `wp_fields_api_init` again.
 	 */
 	private static function reset_registry() {
-		$instance = new ReflectionProperty( Gutenberg_Fields_Registry::class, 'instance' );
+		$instance = new ReflectionProperty( WP_Fields_Registry::class, 'instance' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$instance->setAccessible( true );
 		}
 		$instance->setValue( null, null );
+		WP_Fields_Registry_Gutenberg::get_instance();
 	}
 
 	/**
@@ -107,15 +108,14 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 */
 	private function register_fields( $kind, $name, $fields, $module = null ) {
 		$registered = array();
-		$callback   = static function ( $registry ) use ( &$registered, $kind, $name, $fields, $module ) {
-			$registered = $registry->register( 'test-plugin', $kind, $name, $fields, $module );
+		$callback   = static function () use ( &$registered, $kind, $name, $fields, $module ) {
+			$registered = wp_register_fields( 'test-plugin', $kind, $name, $fields, $module );
 		};
 		add_action( 'wp_fields_api_init', $callback );
 		$this->callbacks[] = $callback;
 
 		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$registry->get_all_registered();
+		WP_Fields_Registry::get_instance()->get_all_registered();
 
 		return $registered;
 	}
@@ -133,15 +133,14 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 */
 	private function update_fields( $kind, $name, $fields, $module = null ) {
 		$updated  = array();
-		$callback = static function ( $registry ) use ( &$updated, $kind, $name, $fields, $module ) {
-			$updated = $registry->update( 'test-plugin', $kind, $name, $fields, $module );
+		$callback = static function () use ( &$updated, $kind, $name, $fields, $module ) {
+			$updated = wp_update_fields( 'test-plugin', $kind, $name, $fields, $module );
 		};
 		add_action( 'wp_fields_api_init', $callback );
 		$this->callbacks[] = $callback;
 
 		self::reset_registry();
-		$registry = Gutenberg_Fields_Registry::get_instance();
-		$registry->get_all_registered();
+		WP_Fields_Registry::get_instance()->get_all_registered();
 
 		return $updated;
 	}

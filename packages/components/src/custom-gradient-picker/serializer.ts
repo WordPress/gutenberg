@@ -18,7 +18,7 @@ export function serializeGradientColor( {
 		return `hsl(${ hue },${ saturation }%,${ lightness }%)`;
 	}
 	if ( type === 'hsla' ) {
-		const [ hue, saturation, lightness, alpha ] = value;
+		const [ hue, saturation, lightness, alpha = '1' ] = value;
 		return `hsla(${ hue },${ saturation }%,${ lightness }%,${ alpha })`;
 	}
 	return `${ type }(${ value.join( ',' ) })`;
@@ -58,7 +58,7 @@ export function serializeGradientOrientation(
 	) {
 		return;
 	}
-	return `${ orientation.value }deg`;
+	return `${ orientation.value }${ orientation.unit }`;
 }
 
 export function serializeGradient( {

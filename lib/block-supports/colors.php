@@ -125,6 +125,18 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$attributes = array();
 	$styles     = gutenberg_style_engine_get_styles( array( 'color' => $color_block_styles ), array( 'convert_vars_to_classnames' => true ) );
 
+	/*
+	 * Mirror of the background support: a color clipped to the text paints the
+	 * glyphs, not the box, so only a gradient still adds `has-background`.
+	 */
+	$clips_to_text = 'text' === ( $block_attributes['style']['background']['backgroundClip'] ?? null ) &&
+		block_has_support( $block_type, array( 'background', 'backgroundClip' ), false ) &&
+		! wp_should_skip_block_supports_serialization( $block_type, 'background', 'backgroundClip' );
+
+	if ( $clips_to_text && ! empty( $styles['classnames'] ) && empty( $color_block_styles['gradient'] ) ) {
+		$styles['classnames'] = implode( ' ', array_diff( explode( ' ', $styles['classnames'] ), array( 'has-background' ) ) );
+	}
+
 	if ( ! empty( $styles['classnames'] ) ) {
 		$attributes['class'] = $styles['classnames'];
 	}

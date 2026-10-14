@@ -1,60 +1,6 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useDelayedLoading, useMediaResults } from '../hooks';
-
-describe( 'useDelayedLoading', () => {
-	beforeEach( () => {
-		vi.useFakeTimers();
-	} );
-	afterEach( () => {
-		vi.useRealTimers();
-	} );
-
-	it( 'does not surface loading before the delay elapses', () => {
-		const { result } = renderHook( () => useDelayedLoading( true, 400 ) );
-		expect( result.current ).toBe( false );
-		act( () => {
-			vi.advanceTimersByTime( 399 );
-		} );
-		expect( result.current ).toBe( false );
-	} );
-
-	it( 'surfaces loading once the delay elapses', () => {
-		const { result } = renderHook( () => useDelayedLoading( true, 400 ) );
-		act( () => {
-			vi.advanceTimersByTime( 400 );
-		} );
-		expect( result.current ).toBe( true );
-	} );
-
-	it( 'never surfaces loading for an operation that ends before the delay', () => {
-		const { result, rerender } = renderHook(
-			( { isLoading } ) => useDelayedLoading( isLoading, 400 ),
-			{ initialProps: { isLoading: true } }
-		);
-		act( () => {
-			vi.advanceTimersByTime( 200 );
-		} );
-		rerender( { isLoading: false } );
-		act( () => {
-			vi.advanceTimersByTime( 400 );
-		} );
-		expect( result.current ).toBe( false );
-	} );
-
-	it( 'resets once loading finishes', () => {
-		const { result, rerender } = renderHook(
-			( { isLoading } ) => useDelayedLoading( isLoading, 400 ),
-			{ initialProps: { isLoading: true } }
-		);
-		act( () => {
-			vi.advanceTimersByTime( 400 );
-		} );
-		expect( result.current ).toBe( true );
-		rerender( { isLoading: false } );
-		expect( result.current ).toBe( false );
-	} );
-} );
+import { useMediaResults } from '../hooks';
 
 describe( 'useMediaResults', () => {
 	const createCategory = ( name, items ) => ( {

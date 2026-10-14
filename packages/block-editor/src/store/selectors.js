@@ -2102,8 +2102,8 @@ export function canRemoveBlock( state, clientId ) {
 /**
  * Determines if the given blocks are allowed to be removed.
  *
- * @param {Object} state     Editor state.
- * @param {string} clientIds The block client IDs to be removed.
+ * @param {Object}   state     Editor state.
+ * @param {string[]} clientIds The block client IDs to be removed.
  *
  * @return {boolean} Whether the given blocks are allowed to be removed.
  */

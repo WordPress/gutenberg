@@ -149,7 +149,7 @@
 		{
 			"comment": "Depends on @wordpress/commands, whose store and private surface use private APIs. Remove when commands no longer does or the dependency is dropped.",
 			"package": "widget-dashboard",
-			"via": "packages/commands/src/index.js"
+			"via": "packages/commands/src/index.ts"
 		},
 		{
 			"comment": "The package's own private cross-package API usage, tracked file-by-file by the private-apis lint suppressions. Remove when the package stops using private APIs.",

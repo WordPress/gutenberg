@@ -13,6 +13,7 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
@@ -69,6 +70,7 @@ function VideoEdit( {
 		width && height ? `${ width } / ${ height }` : undefined;
 	const videoStyle = {
 		...( aspectRatio && { aspectRatio } ),
+		...getDimensionsClassesAndStyles( attributes ).style,
 		...getShadowClassesAndStyles( attributes ).style,
 	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
