@@ -79,7 +79,7 @@ Applications mount the provider. `useWidgetHost` reads the bag directly, for a c
 
 The second capability is `actions` (`WidgetHostActions`): `declare` takes the runtime actions of one instance. A host that places actions binds it where it mounts the widget's render.
 
-The third capability is `title`: the translated title of the widget the host renders, for accessible names the widget builds, such as a chart's. A host provides it where it mounts the widget's render; without it, the widget names its content itself.
+The third capability is `title`: the translated title of the widget the host renders. A host provides it where it mounts the widget's render; without it, the widget names its content itself.
 
 ### Contract types
 
