@@ -8,19 +8,7 @@ import type {
 } from '../../utils/create-higher-order-component';
 import type { WithStateInnerProps } from './types';
 
-/**
- * A Higher Order Component used to provide and manage internal component state
- * via props.
- *
- * @deprecated Use `useState` instead.
- *
- * @param {Object} [initialState] Optional initial state of the component.
- *
- * @return A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
- */
-export default function withState< TState extends object = object >(
-	initialState: TState = {} as TState
-) {
+function createWithState< TState extends object >( initialState: TState ) {
 	deprecated( 'wp.compose.withState', {
 		since: '5.8',
 		alternative: 'wp.element.useState',
@@ -36,7 +24,7 @@ export default function withState< TState extends object = object >(
 			>;
 			// A concrete type, since JSX cannot resolve the props of a generic `C`.
 			const Inner: ComponentType<
-				OwnProps & WithStateInnerProps< TState >
+				OwnProps & WithStateInnerProps< TState, OwnProps >
 			> = OriginalComponent;
 			return class WrappedComponent extends Component<
 				OwnProps,
@@ -63,4 +51,29 @@ export default function withState< TState extends object = object >(
 		},
 		'withState'
 	);
+}
+
+type WithStateHOC< TState extends object > = ReturnType<
+	typeof createWithState< TState >
+>;
+
+/**
+ * A Higher Order Component used to provide and manage internal component state
+ * via props.
+ *
+ * @deprecated Use `useState` instead.
+ *
+ * @param {Object} [initialState] Optional initial state of the component.
+ *
+ * @return A higher order component wrapper accepting a component that takes the state props + its own props + `setState` and returning a component that only accepts the own props.
+ */
+export default function withState< TState extends object >(
+	initialState: TState
+): WithStateHOC< TState >;
+// Without an initial state, every state key must be optional.
+export default function withState< TState extends object = object >(
+	...args: {} extends TState ? [] : [ never ]
+): WithStateHOC< TState >;
+export default function withState( initialState: object = {} ) {
+	return createWithState( initialState );
 }
