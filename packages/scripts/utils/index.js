@@ -29,10 +29,10 @@ const {
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 } = require( './block-json' );
-const { findConfigDirectory, getTestsBaseUrl } = require( './wp-env' );
+const { extractWpEnvConfigArg, getTestsBaseUrl } = require( './wp-env' );
 
 module.exports = {
-	findConfigDirectory,
+	extractWpEnvConfigArg,
 	fromConfigRoot,
 	fromProjectRoot,
 	fromScriptsRoot,

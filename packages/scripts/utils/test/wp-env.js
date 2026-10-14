@@ -13,89 +13,58 @@ import {
 	vi,
 } from 'vitest';
 const require = createRequire( import.meta.url );
-const { findConfigDirectory, getTestsBaseUrl } = require( '../wp-env' );
+const { extractWpEnvConfigArg, getTestsBaseUrl } = require( '../wp-env' );
 
-describe( 'findConfigDirectory', () => {
-	let root;
-	let workspace;
-
-	const writeFile = ( directory, fileName ) =>
-		fs.writeFileSync( path.join( directory, fileName ), '{}' );
-
-	beforeEach( () => {
-		root = fs.mkdtempSync(
-			path.join( os.tmpdir(), 'wp-scripts-wp-env-root-' )
-		);
-		workspace = path.join( root, 'test', 'e2e' );
-		fs.mkdirSync( workspace, { recursive: true } );
+describe( 'extractWpEnvConfigArg', () => {
+	it( 'returns all arguments when the option is not passed', () => {
+		expect(
+			extractWpEnvConfigArg( [ '--config', 'playwright.config.ts' ] )
+		).toEqual( {
+			wpEnvConfig: undefined,
+			args: [ '--config', 'playwright.config.ts' ],
+		} );
 	} );
 
-	afterEach( () => {
-		rimrafSync( root );
+	it( 'extracts the option with its value after an equals sign', () => {
+		expect(
+			extractWpEnvConfigArg( [
+				'--config=playwright.config.ts',
+				'--wp-env-config=../../.wp-env.test.json',
+				'--ui',
+			] )
+		).toEqual( {
+			wpEnvConfig: '../../.wp-env.test.json',
+			args: [ '--config=playwright.config.ts', '--ui' ],
+		} );
 	} );
 
-	it( 'returns the starting directory when it has a config', () => {
-		writeFile( workspace, '.wp-env.json' );
-		writeFile( root, '.wp-env.json' );
-
-		expect( findConfigDirectory( workspace, root ) ).toBe( workspace );
+	it( 'extracts the option with its value as the next argument', () => {
+		expect(
+			extractWpEnvConfigArg( [
+				'--config',
+				'playwright.config.ts',
+				'--wp-env-config',
+				'../../.wp-env.test.json',
+				'specs/editor.spec.js',
+			] )
+		).toEqual( {
+			wpEnvConfig: '../../.wp-env.test.json',
+			args: [
+				'--config',
+				'playwright.config.ts',
+				'specs/editor.spec.js',
+			],
+		} );
 	} );
 
-	it.each( [ '.wp-env.json', '.wp-env.override.json', '.wp-env.test.json' ] )(
-		'finds a %s at the project root from a workspace directory',
-		( fileName ) => {
-			writeFile( root, fileName );
-
-			expect( findConfigDirectory( workspace, root ) ).toBe( root );
-		}
-	);
-
-	it( 'ignores a .wp-env.test.override.json without the config it overrides', () => {
-		writeFile( root, '.wp-env.test.override.json' );
-
-		expect( findConfigDirectory( workspace, root ) ).toBe( workspace );
-	} );
-
-	it( 'returns the nearest directory with a config', () => {
-		const intermediate = path.dirname( workspace );
-		writeFile( intermediate, '.wp-env.json' );
-		writeFile( root, '.wp-env.json' );
-
-		expect( findConfigDirectory( workspace, root ) ).toBe( intermediate );
-	} );
-
-	it( 'does not search above the project root', () => {
-		const projectRoot = path.dirname( workspace );
-		writeFile( root, '.wp-env.json' );
-
-		expect( findConfigDirectory( workspace, projectRoot ) ).toBe(
-			workspace
-		);
-	} );
-
-	it( 'returns the starting directory when no config is found', () => {
-		expect( findConfigDirectory( workspace, root ) ).toBe( workspace );
-	} );
-
-	it( 'only uses the starting directory without a project root', () => {
-		writeFile( root, '.wp-env.json' );
-
-		expect( findConfigDirectory( workspace, undefined ) ).toBe( workspace );
-	} );
-
-	it( 'only uses the starting directory when the project root does not contain it', () => {
-		const otherRoot = fs.mkdtempSync(
-			path.join( os.tmpdir(), 'wp-scripts-wp-env-other-' )
-		);
-		writeFile( root, '.wp-env.json' );
-
-		try {
-			expect( findConfigDirectory( workspace, otherRoot ) ).toBe(
-				workspace
-			);
-		} finally {
-			rimrafSync( otherRoot );
-		}
+	it.each( [
+		[ 'without a value', [ '--ui', '--wp-env-config' ] ],
+		[ 'with an empty value', [ '--wp-env-config=', '--ui' ] ],
+	] )( 'returns null for the option %s', ( _, args ) => {
+		expect( extractWpEnvConfigArg( args ) ).toEqual( {
+			wpEnvConfig: null,
+			args: [ '--ui' ],
+		} );
 	} );
 } );
 
@@ -106,43 +75,25 @@ describe( 'findConfigDirectory', () => {
  * environment. The tests further below use the real loadConfig().
  */
 describe( 'getTestsBaseUrl with a stand-in loadConfig', () => {
-	let configDirectory;
+	const configDirectory = path.join( os.tmpdir(), 'project' );
+	const customConfigPath = path.join( configDirectory, '.wp-env.test.json' );
 
-	beforeEach( () => {
-		configDirectory = fs.mkdtempSync(
-			path.join( os.tmpdir(), 'wp-scripts-wp-env-' )
-		);
-	} );
-
-	afterEach( () => {
-		rimrafSync( configDirectory );
-	} );
-
-	const writeTestsConfig = () =>
-		fs.writeFileSync(
-			path.join( configDirectory, '.wp-env.test.json' ),
-			'{}'
-		);
-
-	it( 'loads the tests config and uses its port when there is one', async () => {
-		writeTestsConfig();
+	it( 'loads the custom config and uses its port when there is one', async () => {
 		const loadConfig = vi.fn().mockResolvedValue( {
 			env: { development: { port: 8991 } },
 		} );
 
 		await expect(
-			getTestsBaseUrl( loadConfig, configDirectory )
+			getTestsBaseUrl( loadConfig, configDirectory, customConfigPath )
 		).resolves.toBe( 'http://localhost:8991' );
 
-		// The path must be absolute, since @wordpress/env resolves it
-		// relative to the current working directory.
 		expect( loadConfig ).toHaveBeenCalledWith(
 			configDirectory,
-			path.join( configDirectory, '.wp-env.test.json' )
+			customConfigPath
 		);
 	} );
 
-	it( 'loads the default config and uses the development port when there is no tests config', async () => {
+	it( 'loads the default config and uses the development port when there is no tests environment', async () => {
 		const loadConfig = vi.fn().mockResolvedValue( {
 			env: { development: { port: 8890 } },
 		} );
@@ -167,9 +118,7 @@ describe( 'getTestsBaseUrl with a stand-in loadConfig', () => {
 		).resolves.toBe( 'http://localhost:8991' );
 	} );
 
-	it( 'uses the tests environment when loadConfig ignores the tests config', async () => {
-		writeTestsConfig();
-
+	it( 'uses the tests environment when loadConfig ignores the custom config', async () => {
 		// Versions of @wordpress/env before `--config` support accept only
 		// the directory, and return the default config.
 		const loadConfig = async ( configDirectoryPath ) => ( {
@@ -181,7 +130,7 @@ describe( 'getTestsBaseUrl with a stand-in loadConfig', () => {
 		} );
 
 		await expect(
-			getTestsBaseUrl( loadConfig, configDirectory )
+			getTestsBaseUrl( loadConfig, configDirectory, customConfigPath )
 		).resolves.toBe( 'http://localhost:8889' );
 	} );
 
@@ -219,11 +168,12 @@ describe( 'getTestsBaseUrl with the loadConfig from @wordpress/env', () => {
 	const { loadConfig } = require( envConfigPath );
 
 	let root;
+	let testsConfigPath;
 	let originalEnv;
 
-	const writeConfig = ( fileName, config, directory = root ) =>
+	const writeConfig = ( fileName, config ) =>
 		fs.writeFileSync(
-			path.join( directory, fileName ),
+			path.join( root, fileName ),
 			JSON.stringify( config )
 		);
 
@@ -231,6 +181,7 @@ describe( 'getTestsBaseUrl with the loadConfig from @wordpress/env', () => {
 		root = fs.mkdtempSync(
 			path.join( os.tmpdir(), 'wp-scripts-wp-env-config-' )
 		);
+		testsConfigPath = path.join( root, '.wp-env.test.json' );
 
 		originalEnv = { ...process.env };
 		process.env.WP_ENV_HOME = path.join( root, 'wp-env-home' );
@@ -264,23 +215,23 @@ describe( 'getTestsBaseUrl with the loadConfig from @wordpress/env', () => {
 		} );
 	};
 
-	it( 'uses the port from the override of the tests config', async () => {
+	it( 'uses the port from the override of the custom config', async () => {
 		writeSplitConfigs();
 		writeConfig( '.wp-env.override.json', { port: 8891 } );
 		writeConfig( '.wp-env.test.override.json', { port: 8991 } );
 
-		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
-			'http://localhost:8991'
-		);
+		await expect(
+			getTestsBaseUrl( loadConfig, root, testsConfigPath )
+		).resolves.toBe( 'http://localhost:8991' );
 	} );
 
-	it( 'uses the port of the tests config when it has no override', async () => {
+	it( 'uses the port of the custom config when it has no override', async () => {
 		writeSplitConfigs();
 		writeConfig( '.wp-env.override.json', { port: 8891 } );
 
-		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
-			'http://localhost:8889'
-		);
+		await expect(
+			getTestsBaseUrl( loadConfig, root, testsConfigPath )
+		).resolves.toBe( 'http://localhost:8889' );
 	} );
 
 	it( 'uses the port from the WP_ENV_PORT environment variable over the override', async () => {
@@ -288,14 +239,15 @@ describe( 'getTestsBaseUrl with the loadConfig from @wordpress/env', () => {
 		writeConfig( '.wp-env.test.override.json', { port: 8991 } );
 		process.env.WP_ENV_PORT = '9999';
 
-		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
-			'http://localhost:9999'
-		);
+		await expect(
+			getTestsBaseUrl( loadConfig, root, testsConfigPath )
+		).resolves.toBe( 'http://localhost:9999' );
 	} );
 
-	it( 'uses the development port from the override when there is no tests config or environment', async () => {
-		writeConfig( '.wp-env.json', { testsEnvironment: false, port: 8888 } );
+	it( 'uses the development port from the override of the default config when there is no tests environment', async () => {
+		writeSplitConfigs();
 		writeConfig( '.wp-env.override.json', { port: 8890 } );
+		writeConfig( '.wp-env.test.override.json', { port: 8991 } );
 
 		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
 			'http://localhost:8890'
@@ -323,18 +275,11 @@ describe( 'getTestsBaseUrl with the loadConfig from @wordpress/env', () => {
 		);
 	} );
 
-	it( 'uses the override of the tests config found from a workspace directory', async () => {
-		const workspace = path.join( root, 'test', 'e2e' );
-		fs.mkdirSync( workspace, { recursive: true } );
-		writeConfig( 'package.json', { name: 'e2e-tests' }, workspace );
-		writeSplitConfigs();
-		writeConfig( '.wp-env.test.override.json', { port: 8991 } );
+	it( 'rejects when the custom config does not exist', async () => {
+		writeConfig( '.wp-env.json', { testsEnvironment: false, port: 8888 } );
 
 		await expect(
-			getTestsBaseUrl(
-				loadConfig,
-				findConfigDirectory( workspace, root )
-			)
-		).resolves.toBe( 'http://localhost:8991' );
+			getTestsBaseUrl( loadConfig, root, testsConfigPath )
+		).rejects.toThrow( 'Config file not found' );
 	} );
 } );

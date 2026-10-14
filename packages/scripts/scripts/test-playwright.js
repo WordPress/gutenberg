@@ -8,17 +8,27 @@ process.env.NODE_ENV = 'test';
 process.on( 'unhandledRejection', ( err ) => {
 	throw err;
 } );
-const { resolve } = require( 'node:path' );
+const { dirname, resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
 const {
+	extractWpEnvConfigArg,
 	fromConfigRoot,
 	hasProjectFile,
 	hasArgInCLI,
 	getArgsFromCLI,
 	getAsBooleanFromENV,
 	getTestsBaseUrl,
-	findConfigDirectory,
 } = require( '../utils' );
+
+const { wpEnvConfig, args: playwrightArgs } =
+	extractWpEnvConfigArg( getArgsFromCLI() );
+
+if ( wpEnvConfig === null ) {
+	console.error(
+		'Error: The --wp-env-config option requires the path to a wp-env config file.'
+	);
+	process.exit( 1 );
+}
 
 /**
  * @typedef {import('../../env/lib/config/load-config').WPConfig} WPConfig
@@ -74,7 +84,7 @@ function spawnProcess() {
 			require.resolve( '@playwright/test/cli' ),
 			'test',
 			...config,
-			...getArgsFromCLI(),
+			...playwrightArgs,
 		],
 		{
 			stdio: 'inherit',
@@ -87,12 +97,13 @@ function spawnProcess() {
 }
 
 if ( loadConfig && ! process.env.WP_BASE_URL ) {
+	// Like `wp-env --config`, resolve the path relative to the current working
+	// directory. It must be absolute for `loadConfig()`.
+	const customConfigPath = wpEnvConfig ? resolve( wpEnvConfig ) : null;
 	getTestsBaseUrl(
 		loadConfig,
-		findConfigDirectory(
-			resolve( '.' ),
-			process.env.npm_config_local_prefix
-		)
+		customConfigPath ? dirname( customConfigPath ) : resolve( '.' ),
+		customConfigPath
 	).then( ( baseUrl ) => {
 		if ( baseUrl ) {
 			process.env.WP_BASE_URL = baseUrl;
