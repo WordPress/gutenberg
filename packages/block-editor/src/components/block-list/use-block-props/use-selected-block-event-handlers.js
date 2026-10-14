@@ -153,7 +153,28 @@ export function useEventHandlers( { clientId, isSelected } ) {
 						node,
 					] );
 
+					// The grid's drop layer covers the block once dragging
+					// starts. Chrome cancels a drag when that happens during
+					// `dragstart`, so it waits for the first `dragover`.
+					function startGridDrag() {
+						ownerDocument.removeEventListener(
+							'dragover',
+							startGridDrag
+						);
+						startDraggingBlocks( [ clientId ] );
+						document.body.classList.add(
+							'is-dragging-components-draggable'
+						);
+						ownerDocument.documentElement.classList.add(
+							'is-dragging'
+						);
+					}
+
 					function endGridDrag() {
+						ownerDocument.removeEventListener(
+							'dragover',
+							startGridDrag
+						);
 						for ( const endTarget of endTargets ) {
 							endTarget.removeEventListener(
 								'dragend',
@@ -179,13 +200,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 						endTarget.addEventListener( 'dragend', endGridDrag );
 						endTarget.addEventListener( 'drop', endGridDrag );
 					}
-					startDraggingBlocks( [ clientId ] );
-					document.body.classList.add(
-						'is-dragging-components-draggable'
-					);
-					ownerDocument.documentElement.classList.add(
-						'is-dragging'
-					);
+					ownerDocument.addEventListener( 'dragover', startGridDrag );
 					return;
 				}
 
