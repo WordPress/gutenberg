@@ -9,10 +9,10 @@
 ### Bug Fixes
 
 -   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core ([#81023](https://github.com/WordPress/gutenberg/pull/81023)).
--   `data-wp-html` now follows its value on hydration, on every later update and after client-side navigation: `asDangerousHTML()` renders its HTML, a pending value leaves the existing content as it is, and any other value, `null` included, empties the element. Trusted HTML that matches the content already there isn't rewritten, and a getter or function that throws no longer breaks rendering. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
--   `data-wp-html` now yields to `data-wp-text`, `data-wp-each` and `data-wp-router-region` on the same element, whatever the attribute order or value, with a warning under `SCRIPT_DEBUG`. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
--   Interactive islands inside server-rendered `data-wp-each-child` items are no longer hydrated on their own, so their directives no longer run twice. They stay inert while the list is pending and initialize once for each item the list renders. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
--   A function called through a directive value now restores the caller's scope when it throws, instead of leaving a stale scope for the code that runs next. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   `data-wp-html` now follows its value on every update and after navigation: tokens render, pending values keep the content, anything else empties the element. Throwing getters and functions no longer break rendering. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   `data-wp-html` is ignored, with a warning, when combined with `data-wp-text`, `data-wp-each` or `data-wp-router-region` on the same element. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Interactive islands inside server-rendered `data-wp-each-child` items are no longer hydrated twice. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Functions called from directive values restore the caller's scope when they throw. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
 
 ### Internal
 
