@@ -10,6 +10,7 @@
 
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
+-   Notes: Once a post has a note, replace the avatars in the block toolbar with an "Add note" button that shows how many notes the block has ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
 
 ### Bug Fixes
 
