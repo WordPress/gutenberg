@@ -13,7 +13,7 @@ This first step covers Button only.
 Each component has a folder here with a `component.json`:
 
 -   `props` is the PHP contract, a JSON schema per prop. Props with a fixed set of values (an `enum` or a boolean) are variants. Free-form strings are slots.
--   `render` maps the props to the React element, as `[ type, props, ...children ]`, where `"$name"` is a prop.
+-   `render` maps the props to the React element, as `[ type, props, ...children ]`, where `"$name"` is a prop. A boolean prop that is `false` is left out of the element, as a React caller would leave it out, so the component's own defaults apply: Button disables itself while loading unless `disabled` is set.
 -   `example` gives the props for the preview page and the checks.
 -   `deprecations` (optional) keeps renamed props and values working. See [Versioning](#versioning-and-backward-compatibility).
 

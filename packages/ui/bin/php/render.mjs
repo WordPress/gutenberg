@@ -75,6 +75,11 @@ export function* getCombinations( variants ) {
 /**
  * Creates the React element a component definition describes.
  *
+ * A boolean prop that is `false` is left out, as a React caller would leave
+ * it out, so the component's own defaults apply. Button, for example,
+ * disables itself while loading unless `disabled` is set, and passing
+ * `disabled={ false }` would override that.
+ *
  * @param {unknown} node   Node of the `render` definition.
  * @param {Object}  values Value per prop: real values for variants, and
  *                         placeholders for slots.
@@ -102,10 +107,14 @@ export function createNode( node, values, ui ) {
 		return createElement(
 			elementType,
 			Object.fromEntries(
-				Object.entries( props ?? {} ).map( ( [ key, value ] ) => [
-					key,
-					createNode( value, values, ui ),
-				] )
+				Object.entries( props ?? {} ).flatMap( ( [ key, value ] ) => {
+					const resolved = createNode( value, values, ui );
+					const isProp =
+						typeof value === 'string' && value.startsWith( '$' );
+					return isProp && resolved === false
+						? []
+						: [ [ key, resolved ] ];
+				} )
 			),
 			...children.map( ( child ) => createNode( child, values, ui ) )
 		);

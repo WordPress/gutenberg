@@ -6,35 +6,19 @@
 		},
 		"tone": {
 			"type": "string",
-			"enum": [
-				"brand",
-				"neutral"
-			]
+			"enum": [ "brand", "neutral" ]
 		},
 		"variant": {
 			"type": "string",
-			"enum": [
-				"solid",
-				"outline",
-				"minimal",
-				"unstyled"
-			]
+			"enum": [ "solid", "outline", "minimal", "unstyled" ]
 		},
 		"size": {
 			"type": "string",
-			"enum": [
-				"default",
-				"compact",
-				"small"
-			]
+			"enum": [ "default", "compact", "small" ]
 		},
 		"type": {
 			"type": "string",
-			"enum": [
-				"button",
-				"submit",
-				"reset"
-			]
+			"enum": [ "button", "submit", "reset" ]
 		},
 		"disabled": {
 			"type": "boolean"
@@ -46,5 +30,5 @@
 			"type": "string"
 		}
 	},
-	"markup": "9914d36c780f"
+	"markup": "100b5accd8f0"
 }
