@@ -86,7 +86,7 @@ jobs:
             # generated files next to sources: the block parsers, the icon
             # library, and the worker entry points.
             - name: Upload build output
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
                   name: build-output
                   path: |
@@ -141,7 +141,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Download build output
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                   name: build-output
 
@@ -162,7 +162,7 @@ jobs:
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
 
             - name: Archive blob reports (HTML)
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ !cancelled() }}
               with:
                   name: blob-reports--${{ matrix.part }}
@@ -170,7 +170,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ !cancelled() }}
               with:
                   name: flaky-tests-report--${{ matrix.part }}
@@ -207,7 +207,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Download build output
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                   name: build-output
 
@@ -236,7 +236,7 @@ jobs:
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:rtc-websocket
 
             - name: Archive blob reports (HTML)
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ !cancelled() }}
               with:
                   name: blob-reports--rtc-websocket
@@ -244,7 +244,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ !cancelled() }}
               with:
                   name: flaky-tests-report--rtc-websocket
@@ -281,7 +281,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Download build output
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                   name: build-output
 
@@ -308,7 +308,7 @@ jobs:
                   xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run --workspace @wordpress/e2e-tests-playwright test:e2e:site-editor-v2
 
             - name: Archive blob reports (HTML)
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ !cancelled() }}
               with:
                   name: blob-reports--site-editor-v2
@@ -316,7 +316,7 @@ jobs:
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               if: ${{ !cancelled() }}
               with:
                   name: flaky-tests-report--site-editor-v2
@@ -348,7 +348,7 @@ jobs:
 
             - name: Merge flaky tests reports
               id: merge-flaky-tests-reports
-              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact/merge@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               continue-on-error: true
               with:
                   name: flaky-tests-report
@@ -356,7 +356,7 @@ jobs:
                   delete-merged: true
 
             - name: Merge blob reports
-              uses: actions/upload-artifact/merge@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact/merge@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               continue-on-error: true
               with:
                   name: blob-reports-merged
@@ -367,7 +367,7 @@ jobs:
             # it also resolves under the isolated install strategy. That puts
             # its working directory in the workspace, hence the paths below.
             - name: Download merged blob reports
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               continue-on-error: true
               with:
                   name: blob-reports-merged
@@ -378,7 +378,7 @@ jobs:
               continue-on-error: true
 
             - name: Upload merged HTML report
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               continue-on-error: true
               with:
                   name: html-report--attempt-${{ github.run_attempt }}
@@ -391,7 +391,7 @@ jobs:
             - name: Download merged flaky tests report
               id: download-flaky-tests-report
               if: ${{ github.event_name == 'pull_request' && steps.merge-flaky-tests-reports.outputs.artifact-id }}
-              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               with:
                   name: flaky-tests-report
                   path: flaky-tests
@@ -405,7 +405,7 @@ jobs:
 
             - name: Upload the flaky tests report
               if: ${{ steps.download-flaky-tests-report.outcome == 'success' }}
-              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
               with:
                   name: pr-meta--flaky-tests
                   path: pr-meta
@@ -438,7 +438,7 @@ jobs:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
-            - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+            - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
               continue-on-error: true
               with:
                   name: pr-meta--flaky-tests
