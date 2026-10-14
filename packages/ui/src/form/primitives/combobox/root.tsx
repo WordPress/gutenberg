@@ -14,7 +14,7 @@ export function Root<
 	Multiple extends boolean | undefined = false,
 	Item = Value,
 >( props: ComboboxRootProps< Value, Multiple, Item > ) {
-	const iframeDismissalProps =
+	const iframeOutsidePressForwardingProps =
 		useIframeOutsidePressForwarding< _Combobox.Root.ChangeEventDetails >( {
 			defaultOpen: props.defaultOpen,
 			disabled: props.disabled,
@@ -26,7 +26,10 @@ export function Root<
 
 	return (
 		<DirectionProvider>
-			<_Combobox.Root { ...props } { ...iframeDismissalProps } />
+			<_Combobox.Root
+				{ ...props }
+				{ ...iframeOutsidePressForwardingProps }
+			/>
 		</DirectionProvider>
 	);
 }

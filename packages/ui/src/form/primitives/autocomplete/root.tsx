@@ -16,7 +16,7 @@ import { useIframeOutsidePressForwarding } from '../../../utils/use-iframe-outsi
 export const Root: typeof _Autocomplete.Root = function Root(
 	props: AutocompleteRootProps
 ) {
-	const iframeDismissalProps =
+	const iframeOutsidePressForwardingProps =
 		useIframeOutsidePressForwarding< _Autocomplete.Root.ChangeEventDetails >(
 			{
 				defaultOpen: props.defaultOpen,
@@ -31,7 +31,10 @@ export const Root: typeof _Autocomplete.Root = function Root(
 	return (
 		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>
 			<DirectionProvider>
-				<_Autocomplete.Root { ...props } { ...iframeDismissalProps } />
+				<_Autocomplete.Root
+					{ ...props }
+					{ ...iframeOutsidePressForwardingProps }
+				/>
 			</DirectionProvider>
 		</AutocompleteGridContext.Provider>
 	);

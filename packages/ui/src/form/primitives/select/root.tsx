@@ -17,7 +17,7 @@ import { useIframeOutsidePressForwarding } from '../../../utils/use-iframe-outsi
  * provide `isItemEqualToValue`.
  */
 export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
-	const iframeDismissalProps =
+	const iframeOutsidePressForwardingProps =
 		useIframeOutsidePressForwarding< _Select.Root.ChangeEventDetails >( {
 			defaultOpen: props.defaultOpen,
 			disabled: props.disabled,
@@ -31,7 +31,7 @@ export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
 		<DirectionProvider>
 			<_Select.Root< Value, false >
 				{ ...props }
-				{ ...iframeDismissalProps }
+				{ ...iframeOutsidePressForwardingProps }
 			/>
 		</DirectionProvider>
 	);
