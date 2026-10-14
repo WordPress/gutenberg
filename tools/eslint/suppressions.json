@@ -2103,11 +2103,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/hooks/auto-inspector-controls.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/background.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
