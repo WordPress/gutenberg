@@ -32,10 +32,12 @@
 	display: grid;
 	position: relative;
 
-	// Only drawn while a block that can land in the grid is dragged: each cell
-	// is a rounded square with a dark edge beside a light one, so that it
-	// stands out on any background, whatever the blocks under it look like.
-	.block-editor-grid-visualizer.is-dropping-allowed &.has-contrasting-lines::before {
+	// Only drawn while a block that can land in the grid is dragged, or cells
+	// are selected by dragging across the grid: each cell is a rounded square
+	// with a dark edge beside a light one, so that it stands out on any
+	// background, whatever the blocks under it look like.
+	.block-editor-grid-visualizer.is-dropping-allowed &.has-contrasting-lines::before,
+	.block-editor-grid-visualizer__grid:has(> .block-editor-grid-visualizer__marquee) > &.has-contrasting-lines::before {
 		content: "";
 		position: absolute;
 		inset: 2px;

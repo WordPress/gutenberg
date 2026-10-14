@@ -278,7 +278,7 @@ function ManualGridVisualizer( {
  *
  * @param {Object}                       props
  * @param {string}                       props.color     The grid's text color.
- * @param {'color'|'contrasting'|'none'} props.lineStyle Lines in the grid's text color, a square that stands out on any background while a block is dragged into the grid, or no lines.
+ * @param {'color'|'contrasting'|'none'} props.lineStyle Lines in the grid's text color, a square that stands out on any background while a block is dragged into the grid or cells are selected in it, or no lines.
  * @param {import('react').ReactNode}    props.children  The cell's content.
  */
 function GridVisualizerCell( { color, lineStyle = 'color', children } ) {
