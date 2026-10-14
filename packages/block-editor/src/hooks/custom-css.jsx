@@ -18,6 +18,7 @@ import AdvancedPanel, {
 import { cleanEmptyObject, usePrivateStyleOverride } from './utils';
 import {
 	getStyleForState,
+	hasCustomBlockStyleState,
 	isDefaultBlockStyleState,
 	setStyleForState,
 } from './block-style-state';
@@ -143,7 +144,11 @@ function CustomCSSControl( {
 } ) {
 	const blockEditingMode = useBlockEditingMode();
 
-	if ( blockEditingMode !== 'default' ) {
+	// Custom CSS isn't output for custom states such as `-current`.
+	if (
+		blockEditingMode !== 'default' ||
+		hasCustomBlockStyleState( selectedState )
+	) {
 		return null;
 	}
 	const blockType = getBlockType( blockName );
