@@ -314,7 +314,7 @@ CSS and SVG filter styles.
 
 | Property | Description | Type |
 | -------- | ----------- | ---- |
-| duotone | Sets the duotone filter. | `string`, `{ ref }` |
+| duotone | Sets the duotone filter: a preset reference, a CSS value such as `unset`, or a list of custom colors from dark to light. | `string`, `{ ref }`, `[ string ]` |
 
 ---
 
