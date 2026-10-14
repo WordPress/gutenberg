@@ -16,6 +16,23 @@
 class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller {
 
 	/**
+	 * Retrieves the hex keys of the emoji a note reaction accepts.
+	 *
+	 * Each key is the emoji's lowercase code points, padded to four digits,
+	 * matching the client's `emojiToHexKey()`. A reaction stores its key in
+	 * `comment_content`.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return string[] Hex keys for heart, celebration, smile, eyes and rocket.
+	 *
+	 * @phpstan-return non-empty-list<lowercase-string&non-falsy-string>
+	 */
+	private static function get_note_reaction_keys(): array {
+		return array( '2764', '1f389', '1f604', '1f440', '1f680' );
+	}
+
+	/**
 	 * Retrieves the comment schema, adding reaction_summary.
 	 *
 	 * Extends the parent schema with a read-only `reaction_summary`
@@ -643,7 +660,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 			$emoji_key = trim( wp_strip_all_tags( $raw_content ) );
 
-			if ( ! in_array( $emoji_key, gutenberg_get_note_reaction_keys(), true ) ) {
+			if ( ! in_array( $emoji_key, self::get_note_reaction_keys(), true ) ) {
 				return new WP_Error(
 					'rest_comment_invalid_reaction',
 					__( 'Invalid reaction emoji.', 'gutenberg' ),

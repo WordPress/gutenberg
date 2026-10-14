@@ -190,22 +190,6 @@ function gutenberg_exclude_notes_from_comment_count_7_2( $new_count, $old_count,
 add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count_7_2', 10, 3 );
 
 /**
- * Returns the hex keys of the emoji a note reaction accepts.
- *
- * Each key is the emoji's lowercase code points, padded to four digits,
- * matching the client's `emojiToHexKey()`.
- *
- * @since 7.2.0
- *
- * @return string[] Heart, celebration, smile, eyes and rocket.
- *
- * @phpstan-return non-empty-list<lowercase-string&non-falsy-string>
- */
-function gutenberg_get_note_reaction_keys() {
-	return array( '2764', '1f389', '1f604', '1f440', '1f680' );
-}
-
-/**
  * Returns the reaction children of a note.
  *
  * @since 7.2.0
