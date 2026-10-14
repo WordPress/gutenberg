@@ -98,6 +98,7 @@
 	& .components-toolbar.components-toolbar {
 		border-width: 0;
 		margin: 0;
+		box-shadow: none;
 
 		&::after {
 			content: none;
