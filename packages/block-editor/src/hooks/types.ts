@@ -1,5 +1,10 @@
 import type { ComponentType } from 'react';
-import type { Block, BlockType, ColorProps } from '@wordpress/blocks';
+import type {
+	Block,
+	BlockAttribute,
+	BlockType,
+	ColorProps,
+} from '@wordpress/blocks';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 
 /**
@@ -214,3 +219,21 @@ export interface CustomClassNameEditProps {
  * A block whose `className` attribute is read.
  */
 export type BlockWithClassName = Block< { className?: string } >;
+
+/**
+ * A block attribute that PHP marks for an auto-generated inspector control.
+ */
+export interface AutoGenerateAttribute extends BlockAttribute {
+	autoGenerateControl?: boolean;
+	label?: string;
+	items?: Pick< BlockAttribute, 'type' | 'enum' >;
+}
+
+/**
+ * Props of the auto-generated inspector controls.
+ */
+export interface AutoRegisterControlsProps {
+	name: string;
+	clientId: string;
+	setAttributes: BlockSupportEditProps[ 'setAttributes' ];
+}

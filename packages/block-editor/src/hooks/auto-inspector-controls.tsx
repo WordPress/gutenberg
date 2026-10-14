@@ -10,14 +10,17 @@ import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import BlockContext from '../components/block-context';
 import { generateFieldsFromAttributes } from './generate-fields-from-attributes';
+import type { AutoGenerateAttribute, AutoRegisterControlsProps } from './types';
 
 /**
  * Checks if a block has any attributes marked for auto-generated inspector controls.
  *
- * @param {Object} blockTypeAttributes - The block type's attributes object.
- * @return {boolean} True if any attribute has autoGenerateControl marker.
+ * @param blockTypeAttributes - The block type's attributes object.
+ * @return True if any attribute has autoGenerateControl marker.
  */
-function hasAutoGenerateControl( blockTypeAttributes ) {
+function hasAutoGenerateControl(
+	blockTypeAttributes: Record< string, AutoGenerateAttribute > | undefined
+): boolean {
 	if ( ! blockTypeAttributes ) {
 		return false;
 	}
@@ -32,12 +35,16 @@ function hasAutoGenerateControl( blockTypeAttributes ) {
  * Fields are generated on-the-fly from attributes marked with `autoGenerateControl`
  * during PHP registration.
  *
- * @param {Object}   props               Component props.
- * @param {string}   props.name          Block name.
- * @param {string}   props.clientId      Block client ID.
- * @param {Function} props.setAttributes Function to update block attributes.
+ * @param props               Component props.
+ * @param props.name          Block name.
+ * @param props.clientId      Block client ID.
+ * @param props.setAttributes Function to update block attributes.
  */
-function AutoRegisterControls( { name, clientId, setAttributes } ) {
+function AutoRegisterControls( {
+	name,
+	clientId,
+	setAttributes,
+}: AutoRegisterControlsProps ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	const blockContext = useContext( BlockContext );
@@ -95,7 +102,8 @@ function AutoRegisterControls( { name, clientId, setAttributes } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<DataForm
-					data={ attributes }
+					// The controls only render for a block in the store.
+					data={ attributes! }
 					fields={ fields }
 					form={ form }
 					onChange={ setAttributes }
@@ -108,7 +116,7 @@ function AutoRegisterControls( { name, clientId, setAttributes } ) {
 export default {
 	edit: AutoRegisterControls,
 	attributeKeys: [],
-	hasSupport( name ) {
+	hasSupport( name: string ) {
 		const blockType = getBlockType( name );
 		return hasAutoGenerateControl( blockType?.attributes );
 	},
