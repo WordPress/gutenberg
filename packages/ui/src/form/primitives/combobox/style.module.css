@@ -2,12 +2,8 @@
 	@layer utilities, components, compositions, overrides;
 
 	@layer components {
-		.search-icon {
+		.search-icon:dir(ltr) {
 			transform: scaleX(-1);
-
-			&:dir(rtl) {
-				transform: none;
-			}
 		}
 
 		.positioner {
