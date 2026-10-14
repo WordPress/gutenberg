@@ -100,12 +100,10 @@
 			}
 
 			> .person-icon {
-				/* Keep the head inside the frame and crop the shoulders at its edges. */
-				inline-size: 145%;
-				block-size: 145%;
-				translate: 0 5%;
-				/* Preserve the original 1.5-unit stroke at 145% scale. */
-				stroke-width: 1.034483;
+				/* Keep the head visible and crop the torso at the bottom of the frame. */
+				inline-size: 110%;
+				block-size: 110%;
+				translate: 0 15%;
 			}
 		}
 	}

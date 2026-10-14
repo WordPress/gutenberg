@@ -71,7 +71,7 @@ describe( 'Avatar layout', () => {
 	} );
 
 	it.each( [ 'circle', 'square' ] as const )(
-		'joins the person head to the torso and crops the shoulders at the frame with shape=%s',
+		'keeps the person head visible and centered with the torso cropped at the bottom with shape=%s',
 		async ( shape ) => {
 			await renderGallery( shape, 'person' );
 			for ( const size of sizes ) {
@@ -83,7 +83,7 @@ describe( 'Avatar layout', () => {
 				} );
 				// eslint-disable-next-line testing-library/no-node-access -- Decorative SVG shapes have no semantic queries; inspect their rendered geometry.
 				const headShape = icon.querySelector( 'circle' )!;
-				// eslint-disable-next-line testing-library/no-node-access -- Verify the painted shoulders reach the frame.
+				// eslint-disable-next-line testing-library/no-node-access -- Inspect the painted shoulders inside the frame.
 				const torsoShape = icon.querySelector( 'path' )!;
 				// eslint-disable-next-line testing-library/no-node-access -- The fallback is the SVG's clipping frame, inside Avatar's border.
 				const clippingFrame = icon.parentElement!;
@@ -109,12 +109,16 @@ describe( 'Avatar layout', () => {
 							frame.width / 2
 					)
 				).toBeLessThan( 0.1 );
-				expect( torso.left - stroke / 2 ).toBeLessThanOrEqual(
-					frame.left
-				);
-				expect( torso.right + stroke / 2 ).toBeGreaterThanOrEqual(
-					frame.right
-				);
+				expect( torso.left - stroke / 2 ).toBeGreaterThan( frame.left );
+				expect( torso.right + stroke / 2 ).toBeLessThan( frame.right );
+				expect(
+					Math.abs(
+						torso.left +
+							torso.width / 2 -
+							frame.left -
+							frame.width / 2
+					)
+				).toBeLessThan( 0.1 );
 				expect( torso.bottom ).toBeGreaterThan( frame.bottom );
 				expect( getComputedStyle( clippingFrame ).overflow ).toBe(
 					'hidden'
