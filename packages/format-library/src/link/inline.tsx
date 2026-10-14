@@ -159,7 +159,7 @@ function InlineLinkUI( {
 
 		// Scenario: we have any active text selection or an active format.
 		let newValue: RichTextValue;
-		if ( isCollapsed( value ) && ! isActive ) {
+		if ( isCollapsed( value ) && value.start !== undefined && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const inserted = insert( value, newText );
 
@@ -284,7 +284,7 @@ function InlineLinkUI( {
 	}
 
 	/*
-	 * `isActive` is not part of `WPFormat`, but `useAnchor` reads it
+	 * `isActive` is not part of `FormatType`, but `useAnchor` reads it
 	 * dynamically. Hoisting the object out of the call avoids excess property
 	 * checking, which only applies to object literals passed inline.
 	 */

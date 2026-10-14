@@ -6,6 +6,19 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Type `withGlobalEvents` and `withState` instead of returning `any`, and let `withGlobalEvents` take only the events it handles ([#84382](https://github.com/WordPress/gutenberg/pull/84382)).
+
+### Bug Fixes
+
+-   `useConstrainedTabbing`: Retain focus when the constrained area has no tabbable elements ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
+
+### Internal
+
+-   Use the `RefObject` React type instead of `MutableRefObject` which is deprecated in React 19 types ([#84550](https://github.com/WordPress/gutenberg/pull/84550)).
+-   Refactor to TypeScript ([#84382](https://github.com/WordPress/gutenberg/pull/84382)).
+
 ## 8.10.0 (2026-10-07)
 
 ### Bug Fixes

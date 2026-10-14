@@ -6,6 +6,14 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   The package now bundles TypeScript types ([#84312](https://github.com/WordPress/gutenberg/pull/84312)).
+
+### Bug Fixes
+
+-   Load preferences when local storage is blocked or holds invalid JSON, and ignore persisted data that is not an object ([#84375](https://github.com/WordPress/gutenberg/pull/84375)).
+
 ## 2.57.0 (2026-10-07)
 
 ## 2.56.0 (2026-09-23)

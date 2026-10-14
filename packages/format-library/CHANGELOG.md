@@ -6,9 +6,14 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
 ### Bug Fixes
 
 -   Accept scroll-to-text fragments in anchor links ([#84336](https://github.com/WordPress/gutenberg/pull/84336)).
+
 
 ## 5.57.0 (2026-10-07)
 

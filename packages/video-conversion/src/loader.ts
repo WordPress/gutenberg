@@ -1,5 +1,5 @@
 /**
- * Loader for the @wordpress/video-conversion/worker module.
+ * Loader for the `@wordpress/video-conversion/worker` module.
  *
  * This tiny module exists so that WordPress can discover the video conversion
  * worker as a dynamic module dependency and include it in the import map.
