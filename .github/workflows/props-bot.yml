@@ -86,10 +86,12 @@ jobs:
                       return data.base.ref;
 
     # Collects a list of contributor props for the PR meta comment to post.
+    # Keep the release branch prefixes in sync with `standalone-props` and the
+    # `skip-base-prefixes` input below.
     props-bot:
         name: Generate a list of props
         needs: pull-request
-        if: ${{ needs.pull-request.outputs.base-ref == github.event.repository.default_branch }}
+        if: ${{ ! ( startsWith( needs.pull-request.outputs.base-ref, 'wp/' ) || startsWith( needs.pull-request.outputs.base-ref, 'release/' ) ) }}
         runs-on: 'ubuntu-24.04'
         permissions:
             # Read is enough: the action posts nothing, see `post-comment`.
@@ -108,12 +110,12 @@ jobs:
                   # it to an output and posts nothing itself.
                   post-comment: false
 
-    # Other branches retain standalone props until their shared writers have
+    # Release branches retain standalone props until their shared writers have
     # been updated. Otherwise the base gate would discard every fresh list.
     standalone-props:
         name: Update the standalone props comment
         needs: pull-request
-        if: ${{ needs.pull-request.outputs.base-ref != github.event.repository.default_branch }}
+        if: ${{ ( startsWith( needs.pull-request.outputs.base-ref, 'wp/' ) || startsWith( needs.pull-request.outputs.base-ref, 'release/' ) ) }}
         runs-on: 'ubuntu-24.04'
         permissions:
             pull-requests: write
@@ -192,7 +194,7 @@ jobs:
                   # request targeting a release branch, whose own writers are
                   # older and would re-cut the section. They need the action
                   # before this section may appear there.
-                  require-base: ${{ github.event.repository.default_branch }}
+                  skip-base-prefixes: 'wp/ release/'
                   # Retires the standalone comment on pull requests open before
                   # this landed, so no one copies its list once it stops moving.
                   # Editing a comment notifies nobody, so an unlinked

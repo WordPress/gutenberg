@@ -54,7 +54,7 @@ describe( 'run', () => {
 			'commit-sha': '',
 			'run-url': '',
 			'retire-comments-matching': '',
-			'require-base': '',
+			'skip-base-prefixes': '',
 		} );
 	} );
 
@@ -182,12 +182,12 @@ describe( 'run', () => {
 	 * pull request targets, so without this it reaches release branches whose
 	 * own writers still truncate at render.
 	 */
-	it( 'writes nothing when the pull request targets another branch', async () => {
+	it( 'writes nothing when the pull request targets a skipped branch', async () => {
 		api.getPullRequest.mockResolvedValue( {
 			headSha: HEAD,
 			baseRef: 'wp/7.1',
 		} );
-		withInputs( { 'require-base': 'trunk' } );
+		withInputs( { 'skip-base-prefixes': 'wp/ release/' } );
 
 		await run();
 
@@ -196,15 +196,15 @@ describe( 'run', () => {
 		expect( api.deleteComment ).not.toHaveBeenCalled();
 	} );
 
-	it( 'writes when the pull request targets the required branch', async () => {
-		api.getPullRequest.mockResolvedValue( {
-			headSha: HEAD,
-			baseRef: 'trunk',
-		} );
-		withInputs( { 'require-base': 'trunk' } );
+	it.each( [ 'trunk', 'refactor/stacked-on-trunk' ] )(
+		'writes when the pull request targets %s',
+		async ( baseRef ) => {
+			api.getPullRequest.mockResolvedValue( { headSha: HEAD, baseRef } );
+			withInputs( { 'skip-base-prefixes': 'wp/ release/' } );
 
-		await run();
+			await run();
 
-		expect( api.createComment ).toHaveBeenCalledTimes( 1 );
-	} );
+			expect( api.createComment ).toHaveBeenCalledTimes( 1 );
+		}
+	);
 } );

@@ -93,13 +93,17 @@ async function run() {
 
 	/*
 	 * A `pull_request_target` workflow comes from the default branch whatever
-	 * a pull request targets, so a caller can reach a branch whose own writers
-	 * are older than this and would re-cut the section on their next write.
+	 * a pull request targets, so a caller can reach a release branch whose own
+	 * writers are older than this and would re-cut the section on their next write.
 	 */
-	const requireBase = getInput( 'require-base' );
-	if ( requireBase && pullRequest.baseRef !== requireBase ) {
+	const skippedPrefix = getInput( 'skip-base-prefixes' )
+		.split( /\s+/ )
+		.find(
+			( prefix ) => prefix && pullRequest.baseRef.startsWith( prefix )
+		);
+	if ( skippedPrefix ) {
 		info(
-			`Skipped the "${ section }" section: this pull request targets ${ pullRequest.baseRef }, not ${ requireBase }.`
+			`Skipped the "${ section }" section: this pull request targets ${ pullRequest.baseRef }, which starts with ${ skippedPrefix }.`
 		);
 		return;
 	}
