@@ -14,12 +14,12 @@ import type {
 	SelectionRange,
 } from './types';
 
-function createEmptyValue() {
+function createEmptyValue(): RichTextValue {
 	return {
 		formats: [],
 		replacements: [],
 		text: '',
-	} as unknown as RichTextValue;
+	};
 }
 
 function toFormat( {
@@ -185,7 +185,7 @@ export class RichTextData {
 		return (
 			this.originalHTML ||
 			toHTMLString( {
-				value: this.#value as RichTextValue,
+				value: this.#value,
 				preserveWhiteSpace,
 			} )
 		);
@@ -277,13 +277,13 @@ export function create( {
 	html?: string | RichTextData;
 	range?: Range | null;
 	__unstableIsEditableTree?: boolean;
-} = {} ) {
+} = {} ): RichTextValue {
 	if ( html instanceof RichTextData ) {
 		return {
 			text: html.text,
 			formats: html.formats,
 			replacements: html.replacements,
-		} as RichTextValue;
+		};
 	}
 
 	if ( typeof text === 'string' && text.length > 0 ) {
@@ -291,7 +291,7 @@ export function create( {
 			formats: Array( text.length ),
 			replacements: Array( text.length ),
 			text,
-		} as RichTextValue;
+		};
 	}
 
 	if ( typeof html === 'string' && html.length > 0 ) {

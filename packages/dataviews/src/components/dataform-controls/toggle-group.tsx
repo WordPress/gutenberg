@@ -1,6 +1,6 @@
 import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	Spinner,
+	Spinner as WCSpinner,
 } from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import type { DataFormControlProps } from '../../types';
@@ -32,7 +32,7 @@ export default function ToggleGroup< Item >( {
 	} );
 
 	if ( isLoading ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	if ( elements.length === 0 ) {
