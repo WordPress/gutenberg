@@ -3,6 +3,9 @@
 
 	@layer components {
 		.link {
+			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
+
+			border-radius: var(--wpds-border-radius-sm);
 			text-underline-offset: 0.2em;
 			text-decoration-thickness: from-font;
 		}
@@ -40,6 +43,7 @@
 
 		/* Unstyled variant */
 		.is-unstyled {
+			--_gcd-a-border-radius: 0;
 			--_gcd-a-color: inherit;
 
 			color: inherit;
