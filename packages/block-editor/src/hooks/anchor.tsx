@@ -2,13 +2,13 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl, ExternalLink } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import type { AnchorAttributes, AnchorEditProps } from './types';
 
 /**
  * Regular expression matching invalid anchor characters for replacement.
- *
- * @type {RegExp}
  */
 const ANCHOR_REGEX = /[\s#]/g;
 
@@ -16,11 +16,11 @@ const ANCHOR_REGEX = /[\s#]/g;
  * Filters registered block settings, extending attributes with anchor using ID
  * of the first node.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-export function addAttribute( settings ) {
+export function addAttribute( settings: BlockType ): BlockType {
 	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( 'type' in ( settings.attributes?.anchor ?? {} ) ) {
 		return settings;
@@ -38,7 +38,10 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
+function BlockEditAnchorControlPure( {
+	anchor,
+	setAttributes,
+}: AnchorEditProps ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	if ( blockEditingMode !== 'default' ) {
@@ -65,6 +68,7 @@ function BlockEditAnchorControlPure( { anchor, setAttributes } ) {
 					</>
 				}
 				value={ anchor || '' }
+				// @ts-expect-error React types `placeholder` as a string, the runtime omits `null`.
 				placeholder={ null }
 				onChange={ ( nextValue ) => {
 					nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
@@ -83,7 +87,7 @@ export default {
 	addSaveProps,
 	edit: BlockEditAnchorControlPure,
 	attributeKeys: [ 'anchor' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, 'anchor' );
 	},
 };
@@ -93,13 +97,17 @@ export default {
  * supports anchor. This is only applied if the block's save result is an
  * element and not a markup string.
  *
- * @param {Object} extraProps Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Current block attributes.
+ * @param extraProps Additional props applied to save element.
+ * @param blockType  Block type.
+ * @param attributes Current block attributes.
  *
- * @return {Object} Filtered props applied to save element.
+ * @return Filtered props applied to save element.
  */
-export function addSaveProps( extraProps, blockType, attributes ) {
+export function addSaveProps(
+	extraProps: Record< string, unknown >,
+	blockType: BlockType,
+	attributes: AnchorAttributes
+): Record< string, unknown > {
 	if ( hasBlockSupport( blockType, 'anchor' ) ) {
 		extraProps.id = attributes.anchor === '' ? null : attributes.anchor;
 	}

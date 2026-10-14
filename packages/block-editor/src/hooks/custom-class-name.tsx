@@ -3,17 +3,24 @@ import { addFilter } from '@wordpress/hooks';
 import { TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { InspectorControls } from '../components';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import type {
+	BlockWithClassName,
+	BlockWrapperProps,
+	CustomClassNameAttributes,
+	CustomClassNameEditProps,
+} from './types';
 
 /**
  * Filters registered block settings, extending attributes to include `className`.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-export function addAttribute( settings ) {
+export function addAttribute( settings: BlockType ): BlockType {
 	if ( hasBlockSupport( settings, 'customClassName', true ) ) {
 		// Gracefully handle if settings.attributes is undefined.
 		settings.attributes = {
@@ -27,7 +34,10 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-function CustomClassNameControlsPure( { className, setAttributes } ) {
+function CustomClassNameControlsPure( {
+	className,
+	setAttributes,
+}: CustomClassNameEditProps ) {
 	const blockEditingMode = useBlockEditingMode();
 	if ( blockEditingMode !== 'default' ) {
 		return null;
@@ -54,7 +64,7 @@ export default {
 	edit: CustomClassNameControlsPure,
 	addSaveProps,
 	attributeKeys: [ 'className' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, 'customClassName', true );
 	},
 };
@@ -64,13 +74,17 @@ export default {
  * supports customClassName. This is only applied if the block's save result is an
  * element and not a markup string.
  *
- * @param {Object} extraProps Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Current block attributes.
+ * @param extraProps Additional props applied to save element.
+ * @param blockType  Block type.
+ * @param attributes Current block attributes.
  *
- * @return {Object} Filtered props applied to save element.
+ * @return Filtered props applied to save element.
  */
-export function addSaveProps( extraProps, blockType, attributes ) {
+export function addSaveProps(
+	extraProps: BlockWrapperProps,
+	blockType: BlockType,
+	attributes: CustomClassNameAttributes
+): BlockWrapperProps {
 	if (
 		hasBlockSupport( blockType, 'customClassName', true ) &&
 		attributes.className
@@ -84,7 +98,12 @@ export function addSaveProps( extraProps, blockType, attributes ) {
 	return extraProps;
 }
 
-export function addTransforms( result, source, index, results ) {
+export function addTransforms(
+	result: BlockWithClassName,
+	source: BlockWithClassName[],
+	index: number,
+	results: BlockWithClassName[]
+): BlockWithClassName {
 	if ( ! hasBlockSupport( result.name, 'customClassName', true ) ) {
 		return result;
 	}
