@@ -299,7 +299,9 @@ test.describe( 'Widgets Customizer', () => {
 		const headingBlock = page.locator(
 			'role=document[name="Block: Heading 2"i] >> text="First Heading"'
 		);
-		await expect( headingBlock ).toBeFocused();
+		await expect
+			.poll( () => editor.ownsSelection( headingBlock ) )
+			.toBe( true );
 	} );
 
 	test( 'should clear block selection', async ( {
@@ -586,7 +588,7 @@ test.describe( 'Widgets Customizer', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Drop cap, show' } )
 			.click();
 
 		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).click();
