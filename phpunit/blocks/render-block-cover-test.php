@@ -128,4 +128,38 @@ class Tests_Blocks_Render_Cover extends WP_UnitTestCase {
 		$this->assertStringNotContainsString( 'background-image', $rendered );
 		$this->assertStringNotContainsString( 'min-height', $rendered );
 	}
+
+	/**
+	 * Tests that an embed background reads the iframe src, decoded, from the
+	 * oEmbed HTML.
+	 *
+	 * @covers ::gutenberg_render_block_core_cover
+	 */
+	public function test_gutenberg_render_block_core_cover_embed_background_reads_decoded_iframe_src() {
+		$oembed_html = '<iframe data-src="https://example.com/placeholder" src="https://www.youtube.com/embed/abc123?feature=oembed&amp;si=xyz" title="Video"></iframe>';
+		$filter      = static function () use ( $oembed_html ) {
+			return $oembed_html;
+		};
+		add_filter( 'pre_oembed_result', $filter );
+
+		$attributes = array(
+			'backgroundType' => 'embed-video',
+			'url'            => 'https://www.youtube.com/watch?v=abc123',
+		);
+		$content    = '<div class="wp-block-cover"><figure class="wp-block-embed"><div class="wp-block-embed__wrapper">https://www.youtube.com/watch?v=abc123</div></figure></div>';
+		$rendered   = gutenberg_render_block_core_cover( $attributes, $content );
+
+		remove_filter( 'pre_oembed_result', $filter );
+
+		$processor = new WP_HTML_Tag_Processor( $rendered );
+		$this->assertTrue( $processor->next_tag( 'IFRAME' ), 'The rendered cover should contain an iframe.' );
+
+		$src = $processor->get_attribute( 'src' );
+		$this->assertSame( 'www.youtube.com', wp_parse_url( $src, PHP_URL_HOST ), 'The src should come from the src attribute, not data-src.' );
+
+		parse_str( wp_parse_url( $src, PHP_URL_QUERY ), $query_params );
+		$this->assertSame( 'oembed', $query_params['feature'] ?? null );
+		$this->assertSame( 'xyz', $query_params['si'] ?? null, 'Parameters after the first one should keep their names.' );
+		$this->assertArrayNotHasKey( 'amp;si', $query_params );
+	}
 }
