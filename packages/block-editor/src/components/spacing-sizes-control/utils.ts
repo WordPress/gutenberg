@@ -9,12 +9,13 @@ import {
 	sidesVertical,
 } from '@wordpress/icons';
 import { getPresetSlug, isValuePreset } from '../preset-input-control/utils';
+import type { Side, SideValues, SpacingSize } from './types';
 
 const SPACING_PRESET_TYPE = 'spacing';
 
 export const RANGE_CONTROL_MAX_SIZE = 8;
 
-export const ALL_SIDES = [ 'top', 'bottom', 'left', 'right' ];
+export const ALL_SIDES: Side[] = [ 'top', 'bottom', 'left', 'right' ];
 
 export const DEFAULT_VALUES = {
 	top: undefined,
@@ -63,7 +64,9 @@ export const VIEWS = {
  *
  * @return {boolean} Return true if value is string in format var:preset|spacing|.
  */
-export function isValueSpacingPreset( value ) {
+export function isValueSpacingPreset(
+	value: string | undefined
+): value is string {
 	return isValuePreset( value, SPACING_PRESET_TYPE );
 }
 
@@ -75,7 +78,10 @@ export function isValueSpacingPreset( value ) {
  *
  * @return {string} Mapping of the spacing preset to its equivalent custom value.
  */
-export function getCustomValueFromPreset( value, spacingSizes ) {
+export function getCustomValueFromPreset(
+	value: string | undefined,
+	spacingSizes: SpacingSize[]
+) {
 	if ( ! isValueSpacingPreset( value ) ) {
 		return value;
 	}
@@ -93,12 +99,15 @@ export function getCustomValueFromPreset( value, spacingSizes ) {
  *
  * Returns value as-is if no match is found.
  *
- * @param {string} value        Value to convert
- * @param {Array}  spacingSizes Array of the current spacing preset objects
+ * @param value        Value to convert
+ * @param spacingSizes Array of the current spacing preset objects
  *
- * @return {string} The preset value if it can be found.
+ * @return The preset value if it can be found.
  */
-export function getPresetValueFromCustomValue( value, spacingSizes ) {
+export function getPresetValueFromCustomValue(
+	value: string | undefined,
+	spacingSizes: SpacingSize[]
+) {
 	// Return value as-is if it is undefined or is already a preset, or '0';
 	if ( ! value || isValueSpacingPreset( value ) || value === '0' ) {
 		return value;
@@ -122,7 +131,7 @@ export function getPresetValueFromCustomValue( value, spacingSizes ) {
  *
  * @return {string | undefined} CSS var string for given spacing preset value.
  */
-export function getSpacingPresetCssVar( value ) {
+export function getSpacingPresetCssVar( value: unknown ) {
 	if ( ! value || typeof value !== 'string' ) {
 		return;
 	}
@@ -139,17 +148,24 @@ export function getSpacingPresetCssVar( value ) {
 /**
  * Converts spacing preset value into a Range component value .
  *
- * @param {string} presetValue  Value to convert to Range value.
- * @param {Array}  spacingSizes Array of current spacing preset value objects.
+ * @param presetValue  Value to convert to Range value.
+ * @param spacingSizes Array of current spacing preset value objects.
  *
- * @return {number} The int value for use in Range control.
+ * @return The int value for use in Range control.
  */
-export function getSliderValueFromPreset( presetValue, spacingSizes ) {
+export function getSliderValueFromPreset(
+	presetValue: string | undefined,
+	spacingSizes: SpacingSize[]
+) {
 	if ( presetValue === undefined ) {
 		return 0;
 	}
 	const slug =
-		parseFloat( presetValue, 10 ) === 0
+		parseFloat(
+			presetValue,
+			// @ts-expect-error `parseFloat` takes no radix, so this is ignored.
+			10
+		) === 0
 			? '0'
 			: getPresetSlug( presetValue, SPACING_PRESET_TYPE );
 	const sliderValue = spacingSizes.findIndex( ( spacingSize ) => {
@@ -164,12 +180,12 @@ export function getSliderValueFromPreset( presetValue, spacingSizes ) {
  * Determines whether a particular axis has support. If no axis is
  * specified, this function checks if either axis is supported.
  *
- * @param {Array}  sides Supported sides.
- * @param {string} axis  Which axis to check.
+ * @param sides Supported sides.
+ * @param axis  Which axis to check.
  *
- * @return {boolean} Whether there is support for the specified axis or both axes.
+ * @return Whether there is support for the specified axis or both axes.
  */
-export function hasAxisSupport( sides, axis ) {
+export function hasAxisSupport( sides?: string[], axis?: string ) {
 	if ( ! sides || ! sides.length ) {
 		return false;
 	}
@@ -198,12 +214,17 @@ export function hasAxisSupport( sides, axis ) {
  * - Horizontal - both left and right sides are supported.
  * - Vertical - both top and bottom are supported.
  *
- * @param {Array} sides The supported sides which may be axes as well.
+ * @param sides The supported sides which may be axes as well.
  *
- * @return {boolean} Whether or not the supported sides are balanced.
+ * @return Whether or not the supported sides are balanced.
  */
-export function hasBalancedSidesSupport( sides = [] ) {
-	const counts = { top: 0, right: 0, bottom: 0, left: 0 };
+export function hasBalancedSidesSupport( sides: string[] = [] ) {
+	const counts: Record< string, number > = {
+		top: 0,
+		right: 0,
+		bottom: 0,
+		left: 0,
+	};
 	sides.forEach( ( side ) => ( counts[ side ] += 1 ) );
 
 	return (
@@ -216,12 +237,12 @@ export function hasBalancedSidesSupport( sides = [] ) {
  * Determines which view the SpacingSizesControl should default to on its
  * first render; Axial, Custom, or Single side.
  *
- * @param {Object} values Current side values.
- * @param {Array}  sides  Supported sides.
+ * @param values Current side values.
+ * @param sides  Supported sides.
  *
- * @return {string} View to display.
+ * @return View to display.
  */
-export function getInitialView( values = {}, sides ) {
+export function getInitialView( values: SideValues = {}, sides?: string[] ) {
 	const { top, right, bottom, left } = values;
 	const sideValues = [ top, right, bottom, left ].filter( Boolean );
 
@@ -248,7 +269,7 @@ export function getInitialView( values = {}, sides ) {
 	// Only axial sides are supported and single value defined.
 	// - Ensure the side returned is the first side that has a value.
 	if ( hasOnlyAxialSides && sideValues.length === 1 ) {
-		let side;
+		let side: string | undefined;
 
 		Object.entries( values ).some( ( [ key, value ] ) => {
 			side = key;

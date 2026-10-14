@@ -5,10 +5,9 @@ import {
 	useBlockEditContext,
 	blockEditingModeKey,
 } from '../block-edit/context';
+import type { BlockEditingMode } from './types';
 
-/**
- * @typedef {'disabled'|'contentOnly'|'default'} BlockEditingMode
- */
+export type { BlockEditingMode };
 
 /**
  * Allows a block to restrict the user interface that is displayed for editing
@@ -40,7 +39,7 @@ import {
  *
  * @return {BlockEditingMode} The current editing mode.
  */
-export function useBlockEditingMode( mode ) {
+export function useBlockEditingMode( mode?: BlockEditingMode | null ) {
 	const context = useBlockEditContext();
 	const { clientId = '' } = context;
 	const registry = useRegistry();
