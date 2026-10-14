@@ -64,9 +64,7 @@ export const VIEWS = {
  *
  * @return {boolean} Return true if value is string in format var:preset|spacing|.
  */
-export function isValueSpacingPreset(
-	value: string | undefined
-): value is string {
+export function isValueSpacingPreset( value: string | undefined ): boolean {
 	return isValuePreset( value, SPACING_PRESET_TYPE );
 }
 
@@ -86,7 +84,8 @@ export function getCustomValueFromPreset(
 		return value;
 	}
 
-	const slug = getPresetSlug( value, SPACING_PRESET_TYPE );
+	// Only a string can be a preset.
+	const slug = getPresetSlug( value!, SPACING_PRESET_TYPE );
 	const spacingSize = spacingSizes.find(
 		( size ) => String( size.slug ) === slug
 	);
