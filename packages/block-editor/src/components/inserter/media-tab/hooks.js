@@ -42,8 +42,9 @@ function normalizeFetchResult( result ) {
  */
 export function useMediaResults( category, query = {}, refreshKey ) {
 	const [ mediaList, setMediaList ] = useState();
-	// Which source produced `mediaList`, so results can be told apart from the
-	// ones still being fetched.
+	// Which source produced the `mediaList`. Lets the return value go empty
+	// during render when a different source is asked for, which is a render
+	// earlier than the effect below can manage. See the note on the return.
 	const [ resolvedSource, setResolvedSource ] = useState();
 	const [ totals, setTotals ] = useState( {} );
 	const [ isLoading, setIsLoading ] = useState( false );
@@ -68,10 +69,11 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			const request = {};
 			lastRequestRef.current = request;
 			setIsLoading( true );
-			// Only clear the previous results when the category source or query
-			// changes, not on a manual refresh (a `refreshKey` bump after
-			// attach/detach). Keeping them lets the panel dim the existing grid
-			// during the refetch instead of blanking it.
+			// Clear the previous results when the query changes, but not on a
+			// manual refresh (a `refreshKey` bump after attach/detach), where
+			// keeping them lets the panel dim the existing grid rather than
+			// blank it. A source change is handled on the return instead,
+			// where clearing happens a render earlier.
 			if (
 				lastQueryKeyRef.current !== key ||
 				lastFetchRef.current !== category.fetch
@@ -112,10 +114,12 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 		...Object.values( query ),
 		refreshKey,
 	] );
-	// `DataViews` keeps showing the last non-empty list it was given until the
-	// next one arrives, so passing the previous source's items through would
-	// leave them on screen under the new tab. Report an empty list until the
-	// requested source is the one that resolved.
+	// `DataViews` holds on to the last non-empty list it was given while a
+	// fetch is in flight, which is what keeps the current page visible while
+	// the next one loads. A source change isn't the next page though, so the
+	// list has to be empty before the fetch starts: clearing it in the effect
+	// above would be one render too late, by which point `DataViews` has
+	// already taken a copy. Report empty until the requested source resolves.
 	const isSwitchingSource = resolvedSource !== category.name;
 	return {
 		mediaList: isSwitchingSource ? EMPTY_MEDIA_LIST : mediaList,
