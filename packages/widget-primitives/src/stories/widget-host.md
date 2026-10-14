@@ -54,7 +54,7 @@ title: string;
 
 The translated title of the widget the host renders: the one the host shows in its header, translated on the server from `widget.json`. A widget reads it to build accessible names, so a focusable chart says what it shows without a second, hardcoded copy of the title.
 
-The host passes the string, not the id of its title element. `aria-labelledby` joins text in a fixed order, and a name such as "Sales by device chart" must reorder for locales that put the word for chart first.
+The host passes the string, not the id of its title element. `aria-labelledby` joins text in a fixed order, and a translated name built around the title must be free to place it.
 
 ## Providing it
 
@@ -141,13 +141,4 @@ See the Actions page for the materialization rules this serves: the widget decla
 
 `useWidgetHost` stays available for a capability no component covers yet, or an answer a consumer needs before it renders.
 
-`title` is one of those. A widget builds its names from it and falls back to its own name when it is absent:
-
-```tsx
-const { title } = useWidgetHost();
-const name = title
-	? sprintf( /* translators: %s: widget title */ __( '%s chart' ), title )
-	: __( 'Chart' );
-
-return <Chart aria-label={ name } />;
-```
+`title` is one of those: a widget reads it to build accessible names, and uses its own name when it is absent.
