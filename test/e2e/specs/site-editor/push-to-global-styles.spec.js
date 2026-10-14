@@ -123,9 +123,7 @@ test.describe( 'Push to Global Styles button', () => {
 		await page
 			.getByRole( 'button', { name: 'Styles', exact: true } )
 			.click();
-		await page
-			.getByRole( 'button', { name: 'Blocks & Elements' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Blocks & Elements' } ).click();
 		await settingsPanel
 			.getByRole( 'button', { name: 'Heading', exact: true } )
 			.click();
