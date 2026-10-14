@@ -190,6 +190,7 @@ function ManualGridVisualizer( {
 	isDroppingAllowed,
 } ) {
 	const [ dropTarget, setDropTarget ] = useState( null );
+	const [ marquee, setMarquee ] = useState( null );
 
 	const gridItemStyles = useSelect(
 		( select ) => {
@@ -240,11 +241,12 @@ function ManualGridVisualizer( {
 						rect.contains( column, row )
 					);
 					// The lines of cells that blocks are in are only drawn
-					// over the blocks while one is dragged, to line it up.
+					// over the blocks while one is dragged or drawn, to line
+					// it up.
 					let color = gridInfo.currentColor;
 					if (
 						isChildGridCell ||
-						( isCellOccupied && ! isDroppingAllowed )
+						( isCellOccupied && ! isDroppingAllowed && ! marquee )
 					) {
 						color = 'transparent';
 					}
@@ -269,6 +271,8 @@ function ManualGridVisualizer( {
 				gridClientId={ gridClientId }
 				gridElement={ gridElement }
 				gridInfo={ gridInfo }
+				marquee={ marquee }
+				setMarquee={ setMarquee }
 			/>
 			<GridVisualizerDropLayer
 				gridClientId={ gridClientId }
@@ -744,14 +748,21 @@ function GridVisualizerAppender( {
  * inserted covers the selected cells. A press without a drag opens the
  * inserter for the one cell, as before.
  *
- * @param {Object}      props
- * @param {string}      props.gridClientId Client ID of the grid block.
- * @param {HTMLElement} props.gridElement  The grid element in the canvas.
- * @param {Object}      props.gridInfo     Grid info, from `getGridInfo`.
+ * @param {Object}                     props
+ * @param {string}                     props.gridClientId Client ID of the grid block.
+ * @param {HTMLElement}                props.gridElement  The grid element in the canvas.
+ * @param {Object}                     props.gridInfo     Grid info, from `getGridInfo`.
+ * @param {?Object}                    props.marquee      The cells being drawn, or null.
+ * @param {(marquee: ?Object) => void} props.setMarquee   Sets the cells being drawn.
  */
-function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
+function GridVisualizerMarquee( {
+	gridClientId,
+	gridElement,
+	gridInfo,
+	marquee,
+	setMarquee,
+} ) {
 	const anchorRef = useRef();
-	const [ marquee, setMarquee ] = useState( null );
 
 	useEffect( () => {
 		// The visualizer grid that the cells are drawn in.
@@ -920,7 +931,7 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 			}
 			ownerWindow.clearTimeout( ignoreClickTimeout );
 		};
-	}, [ gridElement ] );
+	}, [ gridElement, setMarquee ] );
 
 	return (
 		<>
