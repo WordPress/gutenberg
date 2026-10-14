@@ -341,6 +341,22 @@ export type BlockTemplate = NonNullable<
 >;
 
 /**
+ * Theme.json settings, optionally overridden per block type under `blocks`.
+ */
+export type FeatureSettings = Record< string, unknown > & {
+	blocks?: Record< string, Record< string, unknown > >;
+};
+
+/**
+ * A theme.json preset setting, split by the origin that defines it.
+ */
+export interface PresetsByOrigin {
+	custom?: unknown;
+	theme?: unknown;
+	default?: unknown;
+}
+
+/**
  * The editor settings, with the fields the store itself reads.
  */
 export type Settings = Record< string | symbol, unknown > & {
@@ -353,7 +369,7 @@ export type Settings = Record< string | symbol, unknown > & {
 	template?: BlockTemplate;
 	templateLock?: string | false;
 	__experimentalBlockPatterns?: BlockPattern[];
-	__experimentalFeatures?: { viewport?: unknown };
+	__experimentalFeatures?: FeatureSettings;
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
 	[ isIsolatedEditorKey ]?: boolean;
