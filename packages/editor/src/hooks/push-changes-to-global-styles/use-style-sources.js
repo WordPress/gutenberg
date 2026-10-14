@@ -18,6 +18,13 @@ const { useResolvedStyle, getElementLayers, getStyleLabel } = unlock(
 	blockEditorPrivateApis
 );
 
+const KEYWORD_COLORS = [
+	'currentColor',
+	'currentcolor',
+	'transparent',
+	'inherit',
+];
+
 /**
  * Returns the active block style variation, read from the block's class the
  * same way `useResolvedStyle` reads it.
@@ -92,6 +99,12 @@ export function useStyleSources( name, attributes ) {
 				} ),
 		} );
 
+		// A keyword such as `currentColor` has no color of its own to show.
+		const getSwatch = ( value ) =>
+			typeof value === 'string' && ! KEYWORD_COLORS.includes( value )
+				? resolveVariable( value )
+				: undefined;
+
 		return {
 			variationTitle,
 			rows: rows.map( ( row ) => {
@@ -104,7 +117,7 @@ export function useStyleSources( name, attributes ) {
 						row.value,
 						resolveVariable
 					),
-					color: isColor ? resolveVariable( row.value ) : undefined,
+					color: isColor ? getSwatch( row.value ) : undefined,
 					replaces: row.replaces && {
 						...row.replaces,
 						formattedValue: formatSourceValue(
@@ -113,7 +126,7 @@ export function useStyleSources( name, attributes ) {
 							resolveVariable
 						),
 						color: isColor
-							? resolveVariable( row.replaces.value )
+							? getSwatch( row.replaces.value )
 							: undefined,
 					},
 				};

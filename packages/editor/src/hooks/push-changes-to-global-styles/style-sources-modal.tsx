@@ -5,11 +5,10 @@ import {
 } from '@wordpress/components';
 import { DataViews, DataViewsPicker } from '@wordpress/dataviews';
 import type { ActionButton, Field, View } from '@wordpress/dataviews';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useMemo, useState } from '@wordpress/element';
-import { Checkbox, Stack, Tooltip } from '@wordpress/ui';
-import { EMPTY_VALUE_LABEL } from './format-style-value';
+import { Stack, Text, Tooltip } from '@wordpress/ui';
 
 interface ShownValue {
 	formattedValue: string;
@@ -28,17 +27,18 @@ export interface StyleSourceRow extends ShownValue {
 interface StyleSourcesModalProps {
 	name: string;
 	rows: StyleSourceRow[];
-	variationTitle?: string;
 	onReset: ( rows: StyleSourceRow[] ) => void;
 	canApply: ( row: StyleSourceRow ) => boolean;
 	onApply: ( rows: StyleSourceRow[] ) => void;
 	onRequestClose: () => void;
 }
 
-const DEFAULT_LAYOUTS = { table: {} };
+// Mirrors the "Apply globally" modal: a table with a checkbox per row.
+const PICKER_LAYOUTS = { pickerTable: {} };
+const TABLE_LAYOUTS = { table: {} };
 
 // Past this many characters a value truncates, with the full value in a tooltip.
-const TRUNCATE_LIMIT = 24;
+const TRUNCATE_LIMIT = 48;
 
 const getItemId = ( row: StyleSourceRow ) => row.id;
 
@@ -61,166 +61,183 @@ function StyleValue( { formattedValue, color }: ShownValue ) {
 	return (
 		<Stack direction="row" gap="sm" align="center">
 			{ color && <ColorIndicator colorValue={ color } /> }
-			<span className="editor-style-sources-modal__value">{ text }</span>
+			<span className="editor-style-changes-modal__value">{ text }</span>
 		</Stack>
 	);
 }
 
-function EmptyCell() {
+function Muted( { children }: { children: string } ) {
 	return (
-		<span className="editor-style-sources-modal__muted">
-			{ EMPTY_VALUE_LABEL }
-		</span>
+		<span className="editor-style-changes-modal__muted">{ children }</span>
 	);
 }
 
-// Counts and selects the changed rows only, as the others can't be selected.
-function FooterSelection( {
-	changedRows,
-	selection,
-	onChangeSelection,
+// A value with the place it is set on the line below.
+function SourcedValue( {
+	value,
+	source,
 }: {
-	changedRows: StyleSourceRow[];
-	selection: string[];
-	onChangeSelection: ( selection: string[] ) => void;
+	value: ShownValue;
+	source?: string | null;
 } ) {
-	const areAllSelected =
-		changedRows.length > 0 && selection.length === changedRows.length;
 	return (
-		<Stack direction="row" gap="md" align="center">
-			<Checkbox
-				checked={ areAllSelected }
-				indeterminate={ ! areAllSelected && selection.length > 0 }
-				disabled={ ! changedRows.length }
-				onCheckedChange={ () =>
-					onChangeSelection(
-						areAllSelected ? [] : changedRows.map( getItemId )
-					)
-				}
-				aria-label={
-					areAllSelected ? __( 'Deselect all' ) : __( 'Select all' )
-				}
-			/>
-			<span>
-				{ sprintf(
-					// translators: 1: Number of selected styles. 2: Number of styles changed on the block.
-					_n(
-						'%1$d of %2$d changed style selected',
-						'%1$d of %2$d changed styles selected',
-						changedRows.length
-					),
-					selection.length,
-					changedRows.length
-				) }
-			</span>
+		<Stack direction="column" className="editor-style-changes-modal__stack">
+			<StyleValue { ...value } />
+			{ source && <Muted>{ source }</Muted> }
 		</Stack>
 	);
 }
 
-const FIELDS: Field< StyleSourceRow >[] = [
-	{
-		id: 'label',
-		label: __( 'Style' ),
-		enableSorting: false,
-		enableHiding: false,
-		filterBy: false,
-		// Also the row checkbox's label, so a disabled checkbox says why.
-		getValue: ( { item } ) =>
-			item.isChanged
-				? item.label
-				: sprintf(
-						// translators: %s: Style name e.g. 'Line height'.
-						__( '%s, not changed on this block' ),
-						item.label
-					),
-		render: ( { item } ) =>
-			item.isChanged ? (
-				item.label
-			) : (
-				<span className="editor-style-sources-modal__inherited-label">
-					{ item.label }
-				</span>
-			),
-	},
-	{
-		id: 'value',
-		label: __( 'Current value' ),
-		enableSorting: false,
-		enableHiding: false,
-		filterBy: false,
-		getValue: ( { item } ) => item.formattedValue,
-		render: ( { item } ) => <StyleValue { ...item } />,
-	},
-	{
-		id: 'source',
-		label: __( 'Comes from' ),
-		enableSorting: false,
-		enableHiding: false,
-		filterBy: false,
-		getValue: ( { item } ) =>
-			item.isChanged ? __( 'This block' ) : ( item.source ?? '' ),
-		render: ( { item } ) =>
-			item.isChanged ? (
-				<span className="editor-style-sources-modal__this-block">
-					{ __( 'This block' ) }
-				</span>
-			) : (
-				<span className="editor-style-sources-modal__muted">
-					{ item.source }
-				</span>
-			),
-	},
-	{
-		id: 'theme-value',
-		label: __( 'Theme value' ),
-		enableSorting: false,
-		enableHiding: false,
-		filterBy: false,
-		getValue: ( { item } ) => item.replaces?.formattedValue ?? '',
-		render: ( { item } ) => {
-			if ( ! item.isChanged ) {
-				return <EmptyCell />;
-			}
-			// The engine can't see block stylesheet CSS, so say only what is
-			// known.
-			if ( ! item.replaces ) {
-				return (
-					<span className="editor-style-sources-modal__muted">
-						{ __( 'Not set' ) }
-					</span>
-				);
-			}
-			return <StyleValue { ...item.replaces } />;
-		},
-	},
-	{
-		id: 'set-in',
-		label: __( 'Set in' ),
-		enableSorting: false,
-		enableHiding: false,
-		filterBy: false,
-		getValue: ( { item } ) => item.replaces?.source ?? '',
-		render: ( { item } ) =>
-			item.isChanged && item.replaces ? (
-				item.replaces.source
-			) : (
-				<EmptyCell />
-			),
-	},
-];
+function useFields( canApply: StyleSourcesModalProps[ 'canApply' ] ) {
+	return useMemo(
+		(): Field< StyleSourceRow >[] => [
+			{
+				id: 'label',
+				label: __( 'Style' ),
+				enableSorting: false,
+				enableHiding: false,
+				filterBy: false,
+				getValue: ( { item } ) => item.label,
+				render: ( { item } ) => item.label,
+			},
+			{
+				id: 'this-block',
+				label: __( 'This block' ),
+				enableSorting: false,
+				enableHiding: false,
+				filterBy: false,
+				getValue: ( { item } ) =>
+					item.isChanged ? item.formattedValue : '',
+				render: ( { item } ) => {
+					if ( ! item.isChanged ) {
+						return null;
+					}
+					return (
+						<Stack
+							direction="column"
+							className="editor-style-changes-modal__stack"
+						>
+							<StyleValue { ...item } />
+							{ ! canApply( item ) && (
+								<Muted>{ __( 'Can’t apply globally' ) }</Muted>
+							) }
+						</Stack>
+					);
+				},
+			},
+			{
+				id: 'global-styles',
+				label: __( 'Global Styles' ),
+				enableSorting: false,
+				enableHiding: false,
+				filterBy: false,
+				getValue: ( { item } ) =>
+					item.isChanged
+						? ( item.replaces?.formattedValue ?? '' )
+						: item.formattedValue,
+				render: ( { item } ) => {
+					if ( ! item.isChanged ) {
+						return (
+							<SourcedValue
+								value={ item }
+								source={ item.source }
+							/>
+						);
+					}
+					// The engine can't see block stylesheet CSS, so say only
+					// what is known.
+					if ( ! item.replaces ) {
+						return <Muted>{ __( 'Not set' ) }</Muted>;
+					}
+					return (
+						<SourcedValue
+							value={ item.replaces }
+							source={ item.replaces.source }
+						/>
+					);
+				},
+			},
+		],
+		[ canApply ]
+	);
+}
+
+function SectionHeading( { children }: { children: string } ) {
+	return (
+		<Text
+			variant="heading-md"
+			render={ <h2 /> }
+			className="editor-style-changes-modal__heading"
+		>
+			{ children }
+		</Text>
+	);
+}
 
 /**
- * Modal listing every style a block's controls show, with its value and where
- * that value comes from: this block, or a Global Styles layer.
+ * The block's inherited styles: what it doesn't set itself, and where each
+ * value comes from. Read only, so a plain table without checkboxes.
  *
- * One table, changed rows first. Only changed rows are selectable, and the
- * footer resets or applies the selection globally, like the "Apply globally"
- * modal.
+ * @param props        Component props.
+ * @param props.rows   Rows the block doesn't change.
+ * @param props.fields Shared table fields.
+ */
+function InheritedStyles( {
+	rows,
+	fields,
+}: {
+	rows: StyleSourceRow[];
+	fields: Field< StyleSourceRow >[];
+} ) {
+	const [ view, setView ] = useState< View >( () => ( {
+		type: 'table',
+		titleField: 'label',
+		fields: [ 'this-block', 'global-styles' ],
+		page: 1,
+		perPage: 100,
+		layout: { enableMoving: false },
+	} ) );
+
+	if ( ! rows.length ) {
+		return null;
+	}
+
+	return (
+		<section className="editor-style-changes-modal__inherited">
+			<SectionHeading>
+				{ sprintf(
+					// translators: %d: Number of styles the block inherits.
+					__( 'Inherited styles (%d)' ),
+					rows.length
+				) }
+			</SectionHeading>
+			<DataViews
+				data={ rows }
+				fields={ fields }
+				view={ view }
+				onChangeView={ setView }
+				getItemId={ getItemId }
+				paginationInfo={ { totalItems: rows.length, totalPages: 1 } }
+				defaultLayouts={ TABLE_LAYOUTS }
+				search={ false }
+			>
+				<DataViews.Layout />
+			</DataViews>
+		</section>
+	);
+}
+
+/**
+ * The one place to review a block's styles and act on them: the "Apply
+ * globally" modal, grown to say where each value comes from and to reset.
+ *
+ * Changed styles come first, every one checked, with Reset and Apply globally
+ * for the selection. The styles the block inherits follow, read only, each with
+ * its own source.
  *
  * @param props                Component props.
  * @param props.name           Block name.
  * @param props.rows           Rows from `useStyleSources`.
- * @param props.variationTitle Active block style variation label.
  * @param props.onReset        Called with the rows to reset.
  * @param props.canApply       Whether a row can be applied globally.
  * @param props.onApply        Called with the rows to apply globally.
@@ -229,23 +246,22 @@ const FIELDS: Field< StyleSourceRow >[] = [
 export default function StyleSourcesModal( {
 	name,
 	rows,
-	variationTitle,
 	onReset,
 	canApply,
 	onApply,
 	onRequestClose,
 }: StyleSourcesModalProps ) {
 	const changedRows = rows.filter( ( row ) => row.isChanged );
-	const sortedRows = [
-		...changedRows,
-		...rows.filter( ( row ) => ! row.isChanged ),
-	];
+	const inheritedRows = rows.filter( ( row ) => ! row.isChanged );
+	const fields = useFields( canApply );
 
-	const [ selection, setSelection ] = useState< string[] >( [] );
+	const [ selection, setSelection ] = useState< string[] >( () =>
+		changedRows.map( getItemId )
+	);
 	const [ view, setView ] = useState< View >( () => ( {
-		type: 'table',
+		type: 'pickerTable',
 		titleField: 'label',
-		fields: [ 'value', 'source', 'theme-value', 'set-in' ],
+		fields: [ 'this-block', 'global-styles' ],
 		page: 1,
 		perPage: 100,
 		layout: { enableMoving: false },
@@ -255,29 +271,25 @@ export default function StyleSourcesModal( {
 		changedRows.some( ( row ) => row.id === id )
 	);
 
-	// A row with no eligible bulk action gets a disabled checkbox, so only
-	// changed rows can be selected.
+	// Apply skips rows Global Styles can't take, such as a shadow.
 	const actions: ActionButton< StyleSourceRow >[] = useMemo(
 		() => [
 			{
 				id: 'reset',
-				label: __( 'Reset selected' ),
+				label: __( 'Reset' ),
 				supportsBulk: true,
-				isEligible: ( row ) => row.isChanged,
 				callback( items ) {
 					onReset( items );
-					setSelection( [] );
 				},
 			},
 			{
 				id: 'apply-globally',
-				label: __( 'Apply selected globally' ),
+				label: __( 'Apply globally' ),
 				isPrimary: true,
 				supportsBulk: true,
-				isEligible: ( row ) => row.isChanged && canApply( row ),
+				isEligible: canApply,
 				callback( items ) {
 					onApply( items );
-					setSelection( [] );
 				},
 			},
 		],
@@ -285,75 +297,64 @@ export default function StyleSourcesModal( {
 	);
 
 	const blockTitle = getBlockType( name )?.title ?? name;
-	const blockSummary = variationTitle
-		? sprintf(
-				// translators: 1: Title of the block e.g. 'Button'. 2: Block style variation name e.g. 'Outline'.
-				__( '%1$s block · %2$s style' ),
-				blockTitle,
-				variationTitle
-			)
-		: sprintf(
-				// translators: %s: Title of the block e.g. 'Button'.
-				__( '%s block' ),
-				blockTitle
-			);
-	const countSummary = sprintf(
-		// translators: 1: Number of styles changed on the block. 2: Number of styles.
-		_n(
-			'%1$d of %2$d style changed on this block',
-			'%1$d of %2$d styles changed on this block',
-			rows.length
-		),
-		changedRows.length,
-		rows.length
-	);
 
 	return (
 		<Modal
-			title={ __( 'Where styles come from' ) }
+			title={ sprintf(
+				// translators: %s: Title of the block e.g. 'Button'.
+				__( '%s styles' ),
+				blockTitle
+			) }
 			onRequestClose={ onRequestClose }
 			size="large"
-			className="editor-style-sources-modal"
+			className="editor-style-changes-modal"
 		>
-			<Stack
-				direction="row"
-				justify="space-between"
-				align="center"
-				gap="md"
-				className="editor-style-sources-modal__summary"
-			>
-				<span>{ blockSummary }</span>
-				<span className="editor-style-sources-modal__muted">
-					{ countSummary }
-				</span>
-			</Stack>
-			<DataViews
-				data={ sortedRows }
-				fields={ FIELDS }
-				view={ view }
-				onChangeView={ setView }
-				actions={ actions }
-				selection={ currentSelection }
-				onChangeSelection={ setSelection }
-				getItemId={ getItemId }
-				paginationInfo={ {
-					totalItems: sortedRows.length,
-					totalPages: 1,
-				} }
-				defaultLayouts={ DEFAULT_LAYOUTS }
-				search={ false }
-			>
-				<DataViews.Layout />
-				{ /* The "Apply globally" modal's footer, counting changed rows only. */ }
-				<DataViewsPicker.Footer>
-					<FooterSelection
-						changedRows={ changedRows }
-						selection={ currentSelection }
-						onChangeSelection={ setSelection }
-					/>
-					<DataViewsPicker.Actions />
-				</DataViewsPicker.Footer>
-			</DataViews>
+			<p>
+				{ changedRows.length
+					? sprintf(
+							// translators: %s: Title of the block e.g. 'Button'.
+							__(
+								'Changes on this block override Global Styles. Apply them to all %s blocks, or reset them.'
+							),
+							blockTitle
+						)
+					: __(
+							'This block doesn’t change any styles. Everything below comes from Global Styles.'
+						) }
+			</p>
+			{ changedRows.length > 0 && (
+				<DataViewsPicker
+					data={ changedRows }
+					fields={ fields }
+					view={ view }
+					onChangeView={ setView }
+					actions={ actions }
+					selection={ currentSelection }
+					onChangeSelection={ setSelection }
+					getItemId={ getItemId }
+					paginationInfo={ {
+						totalItems: changedRows.length,
+						totalPages: 1,
+					} }
+					defaultLayouts={ PICKER_LAYOUTS }
+					search={ false }
+					itemListLabel={ __( 'Styles changed on this block' ) }
+				>
+					<SectionHeading>
+						{ sprintf(
+							// translators: %d: Number of styles changed on the block.
+							__( 'Changed on this block (%d)' ),
+							changedRows.length
+						) }
+					</SectionHeading>
+					<DataViewsPicker.Layout />
+					<InheritedStyles rows={ inheritedRows } fields={ fields } />
+					<DataViewsPicker.Footer />
+				</DataViewsPicker>
+			) }
+			{ ! changedRows.length && (
+				<InheritedStyles rows={ inheritedRows } fields={ fields } />
+			) }
 		</Modal>
 	);
 }

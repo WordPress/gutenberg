@@ -8,45 +8,44 @@ import type { StyleSourceRow } from '../style-sources-modal';
 
 const rows: StyleSourceRow[] = [
 	{
-		id: 'typography.lineHeight',
-		path: [ 'typography', 'lineHeight' ],
-		label: 'Line height',
-		isChanged: false,
-		formattedValue: 'inherit',
-		source: 'Typography style',
-		replaces: null,
-	},
-	{
 		id: 'color.text',
 		path: [ 'color', 'text' ],
 		label: 'Text color',
 		isChanged: true,
 		formattedValue: 'Vivid Red',
 		replaces: {
-			formattedValue: 'Accent',
-			source: '“Outline” block style variation',
+			formattedValue: 'currentColor',
+			source: 'Outline style',
 		},
 	},
 	{
-		id: 'typography.letterSpacing',
-		path: [ 'typography', 'letterSpacing' ],
-		label: 'Letter spacing',
+		id: 'typography.fontWeight',
+		path: [ 'typography', 'fontWeight' ],
+		label: 'Font weight',
+		isChanged: false,
+		formattedValue: '600',
+		source: 'Button block',
+		replaces: null,
+	},
+	{
+		id: 'shadow',
+		path: [ 'shadow' ],
+		label: 'Shadow',
 		isChanged: true,
-		formattedValue: '1px',
+		formattedValue: 'Natural',
 		replaces: null,
 	},
 ];
 
-async function renderModal() {
+async function renderModal( modalRows = rows ) {
 	const onReset = vi.fn();
 	const onApply = vi.fn();
 	await render(
 		<StyleSourcesModal
 			name="test/button"
-			rows={ rows }
-			variationTitle="Outline"
+			rows={ modalRows }
 			onReset={ onReset }
-			canApply={ () => true }
+			canApply={ ( row ) => row.id !== 'shadow' }
 			onApply={ onApply }
 			onRequestClose={ vi.fn() }
 		/>
@@ -69,112 +68,82 @@ describe( 'StyleSourcesModal', () => {
 		unregisterBlockType( 'test/button' );
 	} );
 
-	it( 'names the block and variation, and counts the overrides', async () => {
+	it( 'names the block and splits changed and inherited styles', async () => {
 		await renderModal();
 		expect(
-			screen.getByText( 'Button block · Outline style' )
+			screen.getByRole( 'heading', { name: 'Button styles' } )
 		).toBeInTheDocument();
 		expect(
-			screen.getByText( '2 of 3 styles changed on this block' )
+			screen.getByRole( 'heading', { name: 'Changed on this block (2)' } )
 		).toBeInTheDocument();
-	} );
-
-	it( 'lists changed rows first, then inherited rows, in one table', async () => {
-		await renderModal();
+		expect(
+			screen.getByRole( 'heading', { name: 'Inherited styles (1)' } )
+		).toBeInTheDocument();
+		expect( screen.getByRole( 'listbox' ) ).toBeInTheDocument();
 		expect( screen.getAllByRole( 'table' ) ).toHaveLength( 1 );
-		const labels = screen
-			.getAllByRole( 'row' )
-			.slice( 1 )
-			.map( ( row ) => row.textContent );
-		expect( labels[ 0 ] ).toContain( 'Text color' );
-		expect( labels[ 1 ] ).toContain( 'Letter spacing' );
-		expect( labels[ 2 ] ).toContain( 'Line height' );
 	} );
 
-	it( 'shows the theme value under a changed style and where it is set', async () => {
+	it( 'starts with every changed style selected', async () => {
 		await renderModal();
-		const row = screen.getByRole( 'row', { name: /Text color/ } );
-		expect( within( row ).getByText( 'This block' ) ).toBeInTheDocument();
-		expect( within( row ).getByText( 'Accent' ) ).toBeInTheDocument();
 		expect(
-			within( row ).getByText( '“Outline” block style variation' )
+			screen.getByRole( 'option', { name: /Text color/ } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+		expect(
+			screen.getByRole( 'option', { name: /Shadow/ } )
+		).toHaveAttribute( 'aria-selected', 'true' );
+		expect(
+			screen.queryByRole( 'option', { name: /Font weight/ } )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'shows the Global Styles value a change overrides, and where it is set', async () => {
+		await renderModal();
+		const row = screen.getByRole( 'option', { name: /Text color/ } );
+		expect( within( row ).getByText( 'Vivid Red' ) ).toBeInTheDocument();
+		expect( within( row ).getByText( 'currentColor' ) ).toBeInTheDocument();
+		expect(
+			within( row ).getByText( 'Outline style' )
 		).toBeInTheDocument();
 	} );
 
-	it( 'shows a changed style with nothing set underneath', async () => {
+	it( 'says when a change overrides nothing and cannot go global', async () => {
 		await renderModal();
-		const row = screen.getByRole( 'row', { name: /Letter spacing/ } );
-		expect( within( row ).getByText( 'This block' ) ).toBeInTheDocument();
+		const row = screen.getByRole( 'option', { name: /Shadow/ } );
 		expect( within( row ).getByText( 'Not set' ) ).toBeInTheDocument();
-		expect( within( row ).getByText( '\u2014' ) ).toBeInTheDocument();
-	} );
-
-	it( 'shows an inherit value as inherit', async () => {
-		await renderModal();
-		const row = screen.getByRole( 'row', { name: /Line height/ } );
-		expect( within( row ).getByText( 'inherit' ) ).toBeInTheDocument();
 		expect(
-			within( row ).getByText( 'Typography style' )
+			within( row ).getByText( 'Can’t apply globally' )
 		).toBeInTheDocument();
-		expect( within( row ).getAllByText( '\u2014' ) ).toHaveLength( 2 );
 	} );
 
-	it( 'disables the checkbox of a row not changed on this block', async () => {
+	it( 'names the source of each inherited style', async () => {
 		await renderModal();
-		expect(
-			screen.getByRole( 'checkbox', {
-				name: 'Line height, not changed on this block',
-			} )
-		).toHaveAttribute( 'aria-disabled', 'true' );
-		expect(
-			screen.getByRole( 'checkbox', { name: 'Text color' } )
-		).not.toHaveAttribute( 'aria-disabled', 'true' );
+		const row = screen.getByRole( 'row', { name: /Font weight/ } );
+		expect( within( row ).getByText( '600' ) ).toBeInTheDocument();
+		expect( within( row ).getByText( 'Button block' ) ).toBeInTheDocument();
 	} );
 
-	it( 'applies or resets only the selected rows', async () => {
+	it( 'applies only what Global Styles can take, and resets the selection', async () => {
 		const { onReset, onApply } = await renderModal();
 
-		const apply = screen.getByRole( 'button', {
-			name: 'Apply selected globally',
-		} );
-		const reset = screen.getByRole( 'button', { name: 'Reset selected' } );
-		expect( apply ).toHaveAttribute( 'aria-disabled', 'true' );
-		expect( reset ).toHaveAttribute( 'aria-disabled', 'true' );
-
 		await user.click(
-			screen.getByRole( 'checkbox', { name: 'Text color' } )
+			screen.getByRole( 'button', { name: 'Apply globally' } )
 		);
-		await user.click( apply );
-		expect( onApply ).toHaveBeenLastCalledWith( [ rows[ 1 ] ] );
+		expect( onApply ).toHaveBeenLastCalledWith( [ rows[ 0 ] ] );
 
-		await user.click(
-			screen.getByRole( 'checkbox', { name: 'Letter spacing' } )
-		);
-		await user.click( reset );
-		expect( onReset ).toHaveBeenLastCalledWith( [ rows[ 2 ] ] );
+		await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+		expect( onReset ).toHaveBeenLastCalledWith( [ rows[ 0 ], rows[ 2 ] ] );
 	} );
 
-	it( 'counts and selects changed styles only in the footer', async () => {
-		await renderModal();
+	it( 'shows only the inherited styles when nothing is changed', async () => {
+		await renderModal( [ rows[ 1 ] ] );
 		expect(
-			screen.getByText( '0 of 2 changed styles selected' )
+			screen.getByText(
+				'This block doesn’t change any styles. Everything below comes from Global Styles.'
+			)
 		).toBeInTheDocument();
-
-		await user.click(
-			screen.getByRole( 'checkbox', { name: 'Text color' } )
-		);
+		expect( screen.getAllByRole( 'table' ) ).toHaveLength( 1 );
 		expect(
-			screen.getByText( '1 of 2 changed styles selected' )
-		).toBeInTheDocument();
-		expect( screen.queryByText( /Items?/ ) ).not.toBeInTheDocument();
-	} );
-
-	it( 'has no per row reset, Reset all or footer Close', async () => {
-		await renderModal();
-		expect(
-			screen.queryByRole( 'button', { name: /^Reset text color/ } )
+			screen.queryByRole( 'button', { name: 'Apply globally' } )
 		).not.toBeInTheDocument();
-		expect( screen.queryByText( 'Reset all' ) ).not.toBeInTheDocument();
-		expect( screen.queryByText( 'Close' ) ).not.toBeInTheDocument();
 	} );
 } );

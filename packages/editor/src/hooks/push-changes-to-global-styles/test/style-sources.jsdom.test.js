@@ -18,13 +18,13 @@ const getLabel = ( path ) => path.join( '.' );
 const getSource = ( source ) => source.layer;
 
 describe( 'getSourceLabel', () => {
-	it( 'names the Global Styles section for the root layer', () => {
+	it( 'names the site section for the root layer', () => {
 		expect(
 			getSourceLabel(
 				{ layer: 'root' },
 				{ ...context, path: [ 'typography', 'fontSize' ] }
 			)
-		).toBe( 'Typography style' );
+		).toBe( 'Site typography' );
 	} );
 
 	it( 'reads root element styles as their property section', () => {
@@ -33,7 +33,7 @@ describe( 'getSourceLabel', () => {
 				{ layer: 'root' },
 				{ ...context, path: [ 'elements', 'link', 'color', 'text' ] }
 			)
-		).toBe( 'Colors style' );
+		).toBe( 'Site colors' );
 	} );
 
 	it( 'names the element, block and variation layers', () => {
@@ -44,7 +44,7 @@ describe( 'getSourceLabel', () => {
 			'Button block'
 		);
 		expect( getSourceLabel( { layer: 'blockVariation' }, context ) ).toBe(
-			'“Outline” block style variation'
+			'Outline style'
 		);
 	} );
 
@@ -182,6 +182,100 @@ describe( 'getStyleSourceRows', () => {
 				source: 'blockVariation',
 			},
 		} );
+	} );
+
+	it( 'drops inherited styles with no real value, and keeps a local one', () => {
+		const rows = getStyleSourceRows( {
+			stylePaths: [
+				[ 'typography', 'fontFamily' ],
+				[ 'typography', 'letterSpacing' ],
+				[ 'typography', 'textDecoration' ],
+			],
+			attributes: { style: { typography: { letterSpacing: '1px' } } },
+			resolved: {
+				value: {
+					typography: {
+						fontFamily: 'inherit',
+						letterSpacing: 'inherit',
+						textDecoration: 'none',
+					},
+				},
+				sources: {
+					'typography.fontFamily': { layer: 'element' },
+					'typography.letterSpacing': { layer: 'element' },
+					'typography.textDecoration': { layer: 'element' },
+				},
+			},
+			getLabel,
+			getSource,
+		} );
+		expect( rows ).toHaveLength( 1 );
+		expect( rows[ 0 ] ).toMatchObject( {
+			id: 'typography.letterSpacing',
+			isChanged: true,
+			replaces: null,
+		} );
+	} );
+
+	it( 'folds inherited border width, style and color into one row', () => {
+		const rows = getStyleSourceRows( {
+			stylePaths: [
+				[ 'border', 'color' ],
+				[ 'border', 'style' ],
+				[ 'border', 'width' ],
+				[ 'shadow' ],
+				[ 'typography', 'fontWeight' ],
+			],
+			attributes: { style: { shadow: 'var:preset|shadow|natural' } },
+			resolved: {
+				value: {
+					border: {
+						color: 'currentColor',
+						style: 'solid',
+						width: '1px',
+					},
+					typography: { fontWeight: '600' },
+				},
+				sources: {
+					'border.color': { layer: 'blockVariation' },
+					'border.style': { layer: 'blockVariation' },
+					'border.width': { layer: 'blockVariation' },
+					'typography.fontWeight': { layer: 'block' },
+				},
+			},
+			getLabel,
+			getSource,
+		} );
+		expect( rows.map( ( row ) => row.id ) ).toEqual( [
+			'typography.fontWeight',
+			'border',
+			'shadow',
+		] );
+		expect( rows[ 1 ] ).toMatchObject( {
+			isChanged: false,
+			value: { color: 'currentColor', style: 'solid', width: '1px' },
+			source: 'blockVariation',
+		} );
+	} );
+
+	it( 'keeps border rows apart when the block sets one of them', () => {
+		const ids = getStyleSourceRows( {
+			stylePaths: [
+				[ 'border', 'color' ],
+				[ 'border', 'width' ],
+			],
+			attributes: { style: { border: { width: '3px' } } },
+			resolved: {
+				value: { border: { color: 'red', width: '1px' } },
+				sources: {
+					'border.color': { layer: 'block' },
+					'border.width': { layer: 'block' },
+				},
+			},
+			getLabel,
+			getSource,
+		} ).map( ( row ) => row.id );
+		expect( ids ).toEqual( [ 'border.color', 'border.width' ] );
 	} );
 
 	it( 'adds a row for a local style no control path covers', () => {
