@@ -195,9 +195,7 @@ function persistencePlugin(
 	return {
 		registerStore(
 			storeName: string,
-			options: ReduxStoreConfig< any, any, any > & {
-				persist?: boolean | string[];
-			}
+			options: ReduxStoreConfig< any, any, any >
 		) {
 			if ( ! options.persist ) {
 				return registry.registerStore( storeName, options );

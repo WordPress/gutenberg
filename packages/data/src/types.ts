@@ -42,6 +42,10 @@ export interface ReduxStoreConfig< State, ActionCreators, Selectors > {
 	resolvers?: MapOf< Resolver >;
 	selectors?: Selectors;
 	controls?: MapOf< Function >;
+	/**
+	 * State keys to persist, or `true` for all, when the persistence plugin is in use.
+	 */
+	persist?: boolean | string[];
 }
 
 // Return type for the useSelect() hook.
