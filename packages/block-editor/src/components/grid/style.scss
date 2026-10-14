@@ -32,12 +32,23 @@
 	display: grid;
 	position: relative;
 
-	// A dark line beside a light one, so that the lines stand out on any
-	// background, whatever the blocks under them look like.
-	&.has-contrasting-lines {
+	// Only drawn while a block that can land in the grid is dragged: each cell
+	// is a rounded square with a dark edge beside a light one, so that it
+	// stands out on any background, whatever the blocks under it look like.
+	.block-editor-grid-visualizer.is-dropping-allowed &.has-contrasting-lines::before {
+		content: "";
+		position: absolute;
+		inset: 2px;
+		border-radius: $radius-medium;
+		background: rgb(0 0 0 / 3%);
 		box-shadow:
-			inset 0 0 0 1px rgb(0 0 0 / 7%),
-			inset 0 0 0 2px rgb(255 255 255 / 11%);
+			inset 0 0 0 1px rgb(0 0 0 / 10%),
+			inset 0 0 0 2px rgb(255 255 255 / 16%);
+		pointer-events: none;
+
+		@media not ( prefers-reduced-motion ) {
+			animation: block-editor-grid-visualizer__cell-appear 0.16s cubic-bezier(0.2, 0, 0, 1) both;
+		}
 	}
 
 	.block-editor-inserter {
@@ -66,6 +77,13 @@
 	.block-editor-grid-visualizer__appender:focus {
 		opacity: 1;
 		background-color: color-mix(in srgb, currentColor  20%, #0000);
+	}
+}
+
+@keyframes block-editor-grid-visualizer__cell-appear {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
 	}
 }
 
