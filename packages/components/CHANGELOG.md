@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
     -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
     -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
     -   `RangeControl` ([#84562](https://github.com/WordPress/gutenberg/pull/84562))
@@ -18,6 +19,7 @@
 
 ### Enhancements
 
+-   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
 -   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
 
