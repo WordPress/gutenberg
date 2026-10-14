@@ -22,12 +22,17 @@ import {
 	blockBindingsKey,
 	blockEditingModeKey,
 	isPreviewModeKey,
+	isMultiSelectedKey,
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
+import {
+	setFieldFormatSettings,
+	deleteFieldFormatSettings,
+} from './field-format-settings';
 import { getAllowedFormats, isEmpty } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
@@ -41,6 +46,7 @@ import { PrivateBlockContext } from '../block-list/private-block-context';
 // `@wordpress/format-library` imports them from `@wordpress/block-editor`).
 const {
 	useRichText,
+	getDomPositionKey,
 	KeyboardShortcutContext,
 	InputEventContext,
 	RichTextShortcut,
@@ -87,14 +93,15 @@ function RichTextWrapper(
 	const [ anchorElement, setAnchorElement ] = useState( null );
 	const context = useBlockEditContext();
 	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
+	const isBlockMultiSelected = context[ isMultiSelectedKey ];
 	const blockBindings = context[ blockBindingsKey ];
 	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
 	const selector = ( select ) => {
 		// Avoid subscribing to the block editor store if the block is not
-		// selected.
-		if ( ! isBlockSelected ) {
+		// selected, alone or with others.
+		if ( ! isBlockSelected && ! isBlockMultiSelected ) {
 			return { isSelected: false };
 		}
 
@@ -102,32 +109,53 @@ function RichTextWrapper(
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
+		const isInField = ( end ) =>
+			end.clientId === clientId &&
+			( identifier
+				? end.attributeKey === identifier
+				: end[ instanceIdKey ] === instanceId );
 
 		let isSelected;
 
 		if ( originalIsSelected === undefined ) {
 			isSelected =
-				selectionStart.clientId === clientId &&
-				selectionEnd.clientId === clientId &&
-				( identifier
-					? selectionStart.attributeKey === identifier
-					: selectionStart[ instanceIdKey ] === instanceId );
+				isInField( selectionStart ) &&
+				selectionEnd.clientId === clientId;
 		} else if ( originalIsSelected ) {
 			isSelected = selectionStart.clientId === clientId;
 		}
+
+		// The selection spans blocks, so the field may hold one end of it.
+		const isCrossBlockEnd =
+			! isSelected && selectionStart.clientId !== selectionEnd.clientId;
 
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
+			crossBlockStart:
+				isCrossBlockEnd && isInField( selectionStart )
+					? selectionStart.offset
+					: undefined,
+			crossBlockEnd:
+				isCrossBlockEnd && isInField( selectionEnd )
+					? selectionEnd.offset
+					: undefined,
 		};
 	};
-	const { selectionStart, selectionEnd, isSelected } = useSelect( selector, [
+	const {
+		selectionStart,
+		selectionEnd,
+		isSelected,
+		crossBlockStart,
+		crossBlockEnd,
+	} = useSelect( selector, [
 		clientId,
 		identifier,
 		instanceId,
 		originalIsSelected,
 		isBlockSelected,
+		isBlockMultiSelected,
 	] );
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
@@ -263,6 +291,28 @@ function RichTextWrapper(
 	const hasFormats =
 		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
 
+	// For formatting a selection across blocks, which happens outside the
+	// fields.
+	useEffect( () => {
+		if ( ! identifier ) {
+			return;
+		}
+		setFieldFormatSettings( clientId, identifier, {
+			allowedFormats: adjustedAllowedFormats,
+			withoutInteractiveFormatting,
+			disabled: shouldDisableEditing,
+		} );
+		return () => {
+			deleteFieldFormatSettings( clientId, identifier );
+		};
+	}, [
+		clientId,
+		identifier,
+		adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		shouldDisableEditing,
+	] );
+
 	const onSelectionChange = useCallback(
 		( start, end ) => {
 			const selection = {};
@@ -328,6 +378,7 @@ function RichTextWrapper(
 		onChange,
 		ref: richTextRef,
 		formatTypes,
+		[ getDomPositionKey ]: getDomPosition,
 	} = useRichText( {
 		value: adjustedValue,
 		onChange: adjustedOnChange,
@@ -384,6 +435,49 @@ function RichTextWrapper(
 			target.focus();
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
+
+	// One end of a text selection across blocks is in this field: put that
+	// end of the native selection back after rendering, as a field does for
+	// a selection within it. The field at the other end does the same.
+	useLayoutEffect( () => {
+		if ( crossBlockStart === undefined && crossBlockEnd === undefined ) {
+			return;
+		}
+		const element = anchorRef.current;
+		if ( ! element ) {
+			return;
+		}
+		const { ownerDocument } = element;
+		if ( ownerDocument.activeElement?.contentEditable !== 'true' ) {
+			return;
+		}
+		const selection = ownerDocument.defaultView.getSelection();
+		if ( ! selection.rangeCount ) {
+			return;
+		}
+		if ( crossBlockStart !== undefined ) {
+			const { node, offset } = getDomPosition( crossBlockStart );
+			if (
+				selection.anchorNode !== node ||
+				selection.anchorOffset !== offset
+			) {
+				selection.setBaseAndExtent(
+					node,
+					offset,
+					selection.focusNode,
+					selection.focusOffset
+				);
+			}
+		} else {
+			const { node, offset } = getDomPosition( crossBlockEnd );
+			if (
+				selection.focusNode !== node ||
+				selection.focusOffset !== offset
+			) {
+				selection.extend( node, offset );
+			}
+		}
+	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,
@@ -452,8 +546,8 @@ function RichTextWrapper(
 		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
 	} );
 
-	const keyboardShortcuts = useRef( new Set() );
-	const inputEvents = useRef( new Set() );
+	const [ keyboardShortcuts ] = useState( () => new Set() );
+	const [ inputEvents ] = useState( () => new Set() );
 
 	function onFocus() {
 		anchorRef.current?.focus();
