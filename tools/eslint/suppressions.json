@@ -4560,11 +4560,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/input-control/styles/input-control-styles.tsx": {
-		"no-restricted-imports": {
-			"count": 3
-		}
-	},
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2
@@ -4615,11 +4610,6 @@
 	},
 	"packages/components/src/tree-grid/cell.tsx": {
 		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/components/src/utils/base-label.ts": {
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},

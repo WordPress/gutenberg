@@ -1,15 +1,17 @@
 import clsx from 'clsx';
 import { memo } from '@wordpress/element';
-import { BackdropUI } from './styles/input-control-styles';
+import { isRTL } from '@wordpress/i18n';
 import styles from './style.module.scss';
 
 function Backdrop( { disabled = false, isBorderless = false } ) {
 	return (
-		<BackdropUI
+		<div
 			aria-hidden="true"
 			className={ clsx(
 				'components-input-control__backdrop',
 				styles.border,
+				styles.backdrop,
+				{ [ styles[ 'is-rtl' ] ]: isRTL() },
 				disabled && styles[ 'is-disabled' ],
 				isBorderless && styles[ 'is-borderless' ]
 			) }
