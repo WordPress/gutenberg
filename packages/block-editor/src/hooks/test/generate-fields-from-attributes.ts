@@ -1,15 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { generateFieldsFromAttributes } from '../generate-fields-from-attributes';
+import type { AutoGenerateAttribute } from '../types';
 
 /**
  * Helper to mark attributes for auto-generated inspector controls.
  * In production, this marker is added by PHP during block registration.
  *
- * @param {Object} attrs - Attributes object
- * @return {Object} Attributes with autoGenerateControl marker
+ * @param attrs - Attributes object
+ * @return Attributes with autoGenerateControl marker
  */
-function markForAutoInspectorControl( attrs ) {
-	const result = {};
+function markForAutoInspectorControl(
+	attrs: Record< string, AutoGenerateAttribute >
+): Record< string, AutoGenerateAttribute > {
+	const result: Record< string, AutoGenerateAttribute > = {};
 	for ( const [ name, def ] of Object.entries( attrs ) ) {
 		result[ name ] = { ...def, autoGenerateControl: true };
 	}

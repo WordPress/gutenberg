@@ -5,6 +5,7 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import AutoRegisterControls from '../auto-inspector-controls';
+import type { AutoGenerateAttribute } from '../types';
 
 describe( 'auto-inspector-controls', () => {
 	const blockName = 'test/auto-inspector-controls-block';
@@ -36,20 +37,21 @@ describe( 'auto-inspector-controls', () => {
 		} );
 
 		it( 'should return true for blocks with autoGenerateControl markers', () => {
+			const attributes: Record< string, AutoGenerateAttribute > = {
+				title: {
+					type: 'string',
+					autoGenerateControl: true,
+				},
+				count: {
+					type: 'integer',
+					autoGenerateControl: true,
+				},
+			};
 			registerBlockType( blockName, {
 				apiVersion: 3,
 				title: 'Test Block',
 				category: 'text',
-				attributes: {
-					title: {
-						type: 'string',
-						autoGenerateControl: true,
-					},
-					count: {
-						type: 'integer',
-						autoGenerateControl: true,
-					},
-				},
+				attributes,
 				edit: () => null,
 				save: () => null,
 			} );
@@ -68,6 +70,7 @@ describe( 'auto-inspector-controls', () => {
 				apiVersion: 3,
 				title: 'Test Block',
 				category: 'text',
+				attributes: {},
 				edit: () => null,
 				save: () => null,
 			} );
@@ -78,21 +81,22 @@ describe( 'auto-inspector-controls', () => {
 		} );
 
 		it( 'should return true when at least one attribute has autoGenerateControl', () => {
+			const attributes: Record< string, AutoGenerateAttribute > = {
+				// This one has the marker
+				title: {
+					type: 'string',
+					autoGenerateControl: true,
+				},
+				// This one doesn't (e.g., added by block supports)
+				className: {
+					type: 'string',
+				},
+			};
 			registerBlockType( blockName, {
 				apiVersion: 3,
 				title: 'Test Block',
 				category: 'text',
-				attributes: {
-					// This one has the marker
-					title: {
-						type: 'string',
-						autoGenerateControl: true,
-					},
-					// This one doesn't (e.g., added by block supports)
-					className: {
-						type: 'string',
-					},
-				},
+				attributes,
 				edit: () => null,
 				save: () => null,
 			} );
