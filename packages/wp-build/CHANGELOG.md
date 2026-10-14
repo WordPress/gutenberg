@@ -9,6 +9,7 @@
 ### Bug Fixes
 
 -   Check that `SCRIPT_DEBUG` is defined before reading it in the generated `build/scripts.php` and `build/styles.php`, like the other generated files, so they no longer throw an `Error` when loaded without WordPress defining the constant ([#83633](https://github.com/WordPress/gutenberg/pull/83633)).
+-   Fire `admin_print_footer_scripts` in the footer of the generated full-page template, as `wp-admin/admin-footer.php` does, instead of calling the footer printers one by one, so full-page screens also print the translations of their script modules ([#84651](https://github.com/WordPress/gutenberg/pull/84651)).
 
 ### Internal
 

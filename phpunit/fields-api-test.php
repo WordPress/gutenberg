@@ -5,6 +5,7 @@
  * @package gutenberg
  *
  * @covers ::_wp_add_field_modules_to_editor_script
+ * @covers ::gutenberg_print_script_module_translations
  * @covers ::wp_register_fields
  * @covers ::wp_update_fields
  * @covers ::wp_unregister_fields
@@ -423,6 +424,66 @@ class Tests_Fields_API extends WP_UnitTestCase {
 		}
 
 		$this->assertArrayHasKey( 'plugin/color', $import_map['imports'] );
+	}
+
+	/**
+	 * The translations of the script modules of the fields are printed on a
+	 * page that loads the editor script.
+	 */
+	public function test_field_script_module_translations_are_printed() {
+		global $wp_scripts;
+		$original_scripts = $wp_scripts;
+		$wp_scripts       = new WP_Scripts();
+
+		add_filter(
+			'pre_load_script_translations',
+			static function ( $translations, $file, $handle ) {
+				if ( 'plugin/color' !== $handle ) {
+					return $translations;
+				}
+				return wp_json_encode(
+					array(
+						'locale_data' => array(
+							'messages' => array(
+								''      => array(
+									'domain' => 'messages',
+									'lang'   => 'es',
+								),
+								'Color' => array( 'Cor' ),
+							),
+						),
+					)
+				);
+			},
+			10,
+			3
+		);
+
+		try {
+			// Only the test module is of interest: the built modules may not be
+			// registered in the test environment.
+			$this->unregister_all_field_modules();
+			$this->register_fields( 'postType', 'page', array( $this->field( 'color' ) ), 'plugin/color' );
+			$wp_scripts->add( 'wp-editor', '/editor.js' );
+			wp_register_script_module( 'plugin/color', '/color.js' );
+
+			$wp_scripts->enqueue( 'wp-editor' );
+			_wp_add_field_modules_to_editor_script( $wp_scripts );
+
+			$translations = null;
+			$processor    = new WP_HTML_Tag_Processor( get_echo( 'gutenberg_print_script_module_translations' ) );
+			while ( null === $translations && $processor->next_tag( 'SCRIPT' ) ) {
+				if ( 'wp-script-module-translation-data-plugin/color' === $processor->get_attribute( 'id' ) ) {
+					$translations = $processor->get_modifiable_text();
+				}
+			}
+		} finally {
+			$wp_scripts = $original_scripts;
+			wp_deregister_script_module( 'plugin/color' );
+		}
+
+		$this->assertNotNull( $translations, 'The translations of the script module are printed.' );
+		$this->assertStringContainsString( '"Cor"', $translations );
 	}
 
 	/**
