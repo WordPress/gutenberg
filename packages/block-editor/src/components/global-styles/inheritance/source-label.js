@@ -1,18 +1,18 @@
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
- * Root level Styles sections, keyed by the first part of a style path. Each
+ * Site wide Styles sources, keyed by the first part of a style path. Each
  * names the section of the Styles screen where that root value is edited.
  *
  * @type {Record<string, string>}
  */
-const ROOT_SECTION_LABELS = {
-	typography: __( 'Typography' ),
-	color: __( 'Colors' ),
-	background: __( 'Background' ),
-	shadow: __( 'Shadows' ),
-	spacing: __( 'Layout' ),
-	dimensions: __( 'Layout' ),
+const ROOT_SOURCE_LABELS = {
+	typography: __( 'Site typography' ),
+	color: __( 'Site colors' ),
+	background: __( 'Site background' ),
+	shadow: __( 'Site shadows' ),
+	spacing: __( 'Site layout' ),
+	dimensions: __( 'Site layout' ),
 };
 
 /**
@@ -34,20 +34,20 @@ const ELEMENT_LABELS = {
 };
 
 /**
- * Returns the root section label for a style path, skipping an `elements.*`
- * prefix so `elements.link.color.text` reads as a Colors value.
+ * Returns the site wide source label for a style path, skipping an
+ * `elements.*` prefix so `elements.link.color.text` reads as a colors value.
  *
  * @param {string[]} path Style path.
- * @return {?string} Section label, or `null` when the path has no section.
+ * @return {?string} Source label, or `null` when the path has no section.
  */
-function getRootSectionLabel( path ) {
+function getRootSourceLabel( path ) {
 	const [ group ] = path[ 0 ] === 'elements' ? path.slice( 2 ) : path;
-	return ROOT_SECTION_LABELS[ group ] ?? null;
+	return ROOT_SOURCE_LABELS[ group ] ?? null;
 }
 
 /**
  * Turns a `resolveStyle` source descriptor into the text that names where an
- * inherited value comes from, e.g. "Typography style" or "Paragraph block".
+ * inherited value comes from, e.g. "Site typography" or "Paragraph block".
  *
  * Returns `null` when the descriptor is missing or the layer cannot be named,
  * so a caller never shows a source the engine did not resolve.
@@ -65,16 +65,8 @@ export function getStyleSourceLabel(
 	{ path, blockTitle, elementName, variationLabel } = {}
 ) {
 	switch ( source?.layer ) {
-		case 'root': {
-			const section = getRootSectionLabel( path ?? [] );
-			return section
-				? sprintf(
-						/* translators: %s: Styles section name, e.g. "Typography". */
-						__( '%s style' ),
-						section
-					)
-				: null;
-		}
+		case 'root':
+			return getRootSourceLabel( path ?? [] );
 		case 'element': {
 			const element = ELEMENT_LABELS[ elementName ];
 			return element
@@ -96,8 +88,8 @@ export function getStyleSourceLabel(
 		case 'blockVariation':
 			return variationLabel
 				? sprintf(
-						/* translators: %s: Block style variation name, e.g. "Annotation". */
-						__( '“%s” block style variation' ),
+						/* translators: %s: Block style name, e.g. "Outline". */
+						__( '%s style' ),
 						variationLabel
 					)
 				: null;
