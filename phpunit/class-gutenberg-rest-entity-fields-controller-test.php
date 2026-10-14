@@ -1,17 +1,17 @@
 <?php
 /**
- * Unit tests covering Gutenberg_REST_Fields_Controller_7_2 functionality.
+ * Unit tests covering Gutenberg_REST_Entity_Fields_Controller_7_2 functionality.
  *
  * @package gutenberg
  *
- * @coversDefaultClass Gutenberg_REST_Fields_Controller_7_2
+ * @coversDefaultClass Gutenberg_REST_Entity_Fields_Controller_7_2
  */
-class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
+class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 
 	/**
 	 * The REST route the controller registers.
 	 */
-	const ROUTE = '/wp/v2/fields';
+	const ROUTE = '/wp/v2/entity-fields';
 
 	/**
 	 * Administrator user id (has `edit_theme_options` and `manage_options`).
@@ -55,7 +55,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * The callbacks a test hooked to `wp_fields_api_init`, removed on tear
+	 * The callbacks a test hooked to `wp_entity_fields_api_init`, removed on tear
 	 * down.
 	 *
 	 * @var callable[]
@@ -66,11 +66,11 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the fields a test registered; the next
-	 * read fires `wp_fields_api_init` again.
+	 * read fires `wp_entity_fields_api_init` again.
 	 */
 	public function tear_down() {
 		foreach ( $this->callbacks as $callback ) {
-			remove_action( 'wp_fields_api_init', $callback );
+			remove_action( 'wp_entity_fields_api_init', $callback );
 		}
 		$this->callbacks = array();
 		self::reset_registry();
@@ -81,19 +81,19 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	/**
 	 * Resets the registry: drops the singleton instance and puts an empty
 	 * plugin registry in its place, as `init` does, so its first read fires
-	 * `wp_fields_api_init` again.
+	 * `wp_entity_fields_api_init` again.
 	 */
 	private static function reset_registry() {
-		$instance = new ReflectionProperty( WP_Fields_Registry::class, 'instance' );
+		$instance = new ReflectionProperty( WP_Entity_Fields_Registry::class, 'instance' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$instance->setAccessible( true );
 		}
 		$instance->setValue( null, null );
-		WP_Fields_Registry_Gutenberg::get_instance();
+		WP_Entity_Fields_Registry_Gutenberg::get_instance();
 	}
 
 	/**
-	 * Registers fields on `wp_fields_api_init` for the duration of the test,
+	 * Registers fields on `wp_entity_fields_api_init` for the duration of the test,
 	 * with the `test-plugin` origin: the registry is reset on tear down.
 	 *
 	 * Registering only runs on the action, so the registration is hooked to
@@ -109,19 +109,19 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	private function register_fields( $kind, $name, $fields, $module = null ) {
 		$registered = array();
 		$callback   = static function () use ( &$registered, $kind, $name, $fields, $module ) {
-			$registered = wp_register_fields( 'test-plugin', $kind, $name, $fields, $module );
+			$registered = wp_register_entity_fields( 'test-plugin', $kind, $name, $fields, $module );
 		};
-		add_action( 'wp_fields_api_init', $callback );
+		add_action( 'wp_entity_fields_api_init', $callback );
 		$this->callbacks[] = $callback;
 
 		self::reset_registry();
-		WP_Fields_Registry::get_instance()->get_all_registered();
+		WP_Entity_Fields_Registry::get_instance()->get_all_registered();
 
 		return $registered;
 	}
 
 	/**
-	 * Updates registered fields on `wp_fields_api_init` for the duration of the
+	 * Updates registered fields on `wp_entity_fields_api_init` for the duration of the
 	 * test, with the `test-plugin` origin, the way register_fields() registers
 	 * them.
 	 *
@@ -134,13 +134,13 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	private function update_fields( $kind, $name, $fields, $module = null ) {
 		$updated  = array();
 		$callback = static function () use ( &$updated, $kind, $name, $fields, $module ) {
-			$updated = wp_update_fields( 'test-plugin', $kind, $name, $fields, $module );
+			$updated = wp_update_entity_fields( 'test-plugin', $kind, $name, $fields, $module );
 		};
-		add_action( 'wp_fields_api_init', $callback );
+		add_action( 'wp_entity_fields_api_init', $callback );
 		$this->callbacks[] = $callback;
 
 		self::reset_registry();
-		WP_Fields_Registry::get_instance()->get_all_registered();
+		WP_Entity_Fields_Registry::get_instance()->get_all_registered();
 
 		return $updated;
 	}
@@ -173,8 +173,8 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertArrayHasKey( self::ROUTE, $routes );
 		$this->assertCount( 1, $routes[ self::ROUTE ], 'The route should be registered once.' );
-		$this->assertInstanceOf( 'Gutenberg_REST_Fields_Controller_7_2', $routes[ self::ROUTE ][0]['callback'][0] );
-		$this->assertSame( PHP_INT_MAX, has_action( 'rest_api_init', 'gutenberg_register_fields_controller_endpoints' ), 'The route is registered after the routes of core, to override its controller.' );
+		$this->assertInstanceOf( 'Gutenberg_REST_Entity_Fields_Controller_7_2', $routes[ self::ROUTE ][0]['callback'][0] );
+		$this->assertSame( PHP_INT_MAX, has_action( 'rest_api_init', 'gutenberg_register_entity_fields_controller_endpoints' ), 'The route is registered after the routes of core, to override its controller.' );
 	}
 
 	/**
@@ -253,7 +253,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 
 		$response = $this->dispatch_request( 'postType', 'nonexistent_post_type' );
 
-		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_fields_invalid_entity', $response, 404 );
 	}
 
 	/**
@@ -285,7 +285,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 		}
 
 		$this->assertSame( array( 'secret' ), $registered, 'The registry accepts the fields.' );
-		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_fields_invalid_entity', $response, 404 );
 	}
 
 	/**
@@ -320,7 +320,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 
 		$response = $this->dispatch_request( 'taxonomy', 'nonexistent_taxonomy' );
 
-		$this->assertErrorResponse( 'rest_fields_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_fields_invalid_entity', $response, 404 );
 	}
 
 	/**
@@ -554,7 +554,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 	 * @covers ::get_field_schema
 	 */
 	public function test_get_item_schema() {
-		$controller = new Gutenberg_REST_Fields_Controller_7_2();
+		$controller = new Gutenberg_REST_Entity_Fields_Controller_7_2();
 		$schema     = $controller->get_item_schema();
 
 		$this->assertSame( array( 'kind', 'name', 'fields', 'script_modules' ), array_keys( $schema['properties'] ) );
@@ -596,7 +596,7 @@ class Tests_REST_Fields_Controller extends WP_Test_REST_TestCase {
 
 		wp_set_current_user( self::$editor_id );
 		$response = $this->dispatch_request( 'postType', 'page' );
-		$schema   = ( new Gutenberg_REST_Fields_Controller_7_2() )->get_item_schema();
+		$schema   = ( new Gutenberg_REST_Entity_Fields_Controller_7_2() )->get_item_schema();
 
 		$this->assertTrue( rest_validate_value_from_schema( $response->get_data(), $schema ) );
 	}
