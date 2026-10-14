@@ -14,6 +14,7 @@ import { useRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
+import { PrivateBlockInspectorEditOriginal } from './edit-original-slot-fill';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
@@ -527,6 +528,9 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
+			<PrivateBlockInspectorEditOriginal.Slot
+				fillProps={ { clientId: renderedBlockClientId } }
+			/>
 			{ ! isEditingStyleState && (
 				<BlockVariationTransforms
 					blockClientId={ renderedBlockClientId }
