@@ -272,3 +272,68 @@ describe( 'FiltersPanel — duplicate duotone presets', () => {
 		} );
 	} );
 } );
+
+describe( 'FiltersPanel: custom duotone', () => {
+	it( 'offers custom duotone when the settings allow it', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<FiltersPanel
+				value={ {} }
+				settings={ {
+					color: { ...baseSettings.color, custom: true },
+				} }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+		await openDuotone( user );
+
+		expect( screen.getByText( 'Shadows' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Highlights' ) ).toBeInTheDocument();
+	} );
+
+	it( 'hides custom duotone when color.customDuotone is false', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<FiltersPanel
+				value={ {} }
+				settings={ {
+					color: {
+						...baseSettings.color,
+						custom: true,
+						customDuotone: false,
+					},
+				} }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+		await openDuotone( user );
+
+		expect( screen.queryByText( 'Shadows' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'hides custom duotone when there are no palette colors and custom colors are off', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<FiltersPanel
+				value={ {} }
+				settings={ {
+					color: {
+						...baseSettings.color,
+						custom: false,
+						palette: {},
+					},
+				} }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+		await openDuotone( user );
+
+		expect( screen.queryByText( 'Shadows' ) ).not.toBeInTheDocument();
+	} );
+} );
