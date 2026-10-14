@@ -15,7 +15,7 @@
 
 ### Enhancements
 
--   `Iframe`: Add a `fitContent` prop that sizes the iframe to its document so the closest scrollable ancestor scrolls the canvas instead ([#84587](https://github.com/WordPress/gutenberg/issues/84587)).
+-   `Iframe`: Add a `fitContent` prop that sizes the iframe to its document so the closest scrollable ancestor scrolls the canvas instead ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
 -   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 -   `BlockBreadcrumb`: Use the `Breadcrumb` component from `@wordpress/ui` to collapse overflowing ancestors into a menu while preserving block selection and document-root activation, including multi-block selections. Use block titles when renamed labels are blank after stripping HTML. Accept a `className` for consumer-specific layout ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).

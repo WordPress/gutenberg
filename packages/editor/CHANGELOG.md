@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Visual editor: Size the canvas to its content when meta boxes are inline ([#84659](https://github.com/WordPress/gutenberg/pull/84659)).
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 
