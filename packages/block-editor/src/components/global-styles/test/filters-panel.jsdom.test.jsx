@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import FiltersPanel from '../filters-panel';
+import FiltersPanel, { useHasFiltersPanel } from '../filters-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -335,5 +335,39 @@ describe( 'FiltersPanel: custom duotone', () => {
 		await openDuotone( user );
 
 		expect( screen.queryByText( 'Shadows' ) ).not.toBeInTheDocument();
+	} );
+} );
+
+describe( 'useHasFiltersPanel', () => {
+	it( 'is true for theme duotone presets when custom and default duotone are off', () => {
+		expect(
+			useHasFiltersPanel( {
+				color: {
+					customDuotone: false,
+					defaultDuotone: false,
+					duotone: {
+						theme: [
+							{
+								name: 'Blue and orange',
+								slug: 'blue-orange',
+								colors: [ '#0000ff', '#ff8800' ],
+							},
+						],
+					},
+				},
+			} )
+		).toBe( true );
+	} );
+
+	it( 'is false when only default presets exist and default duotone is off', () => {
+		expect(
+			useHasFiltersPanel( {
+				color: {
+					customDuotone: false,
+					defaultDuotone: false,
+					duotone: baseSettings.color.duotone,
+				},
+			} )
+		).toBe( false );
 	} );
 } );

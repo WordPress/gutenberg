@@ -54,10 +54,14 @@ export function useHasFiltersPanel( settings ) {
 }
 
 function useHasDuotoneControl( settings ) {
+	// Presets are keyed by origin. Default ones only count when `defaultDuotone` is on.
+	const hasPresets = [ 'theme', 'custom' ].some(
+		( origin ) => settings?.color?.duotone?.[ origin ]?.length > 0
+	);
 	return (
-		settings.color.customDuotone ||
-		settings.color.defaultDuotone ||
-		settings.color.duotone.length > 0
+		settings?.color?.customDuotone ||
+		settings?.color?.defaultDuotone ||
+		hasPresets
 	);
 }
 
