@@ -420,6 +420,8 @@ All new components should be styled using SCSS Modules.
 
 Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx` object syntax, e.g. `{ [ styles.className ]: condition }`.
 
+Use `--_wp-components-*` for new private custom properties. These are implementation details, not public theming APIs. Keep supported customization in component props and existing public styles.
+
 Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
 
 Before migrating existing styles, read [Migrating components from Emotion to SCSS Modules](./emotion-to-scss-modules.md) for compatibility checks, cascade and custom-property pitfalls, verification, and examples from merged migrations.

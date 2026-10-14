@@ -384,6 +384,121 @@ describe( 'getBlockStateStylesCSS', () => {
 	} );
 } );
 
+describe( 'getStateStylesCSS under a text clip', () => {
+	const textClipBase = { background: { backgroundClip: 'text' } };
+
+	it( 'stops an inherited gradient painting when a state escapes the clip', () => {
+		const css = getStateStylesCSS(
+			{ background: { backgroundClip: 'border-box' } },
+			'.wp-block-test',
+			textClipBase
+		);
+
+		expect( css ).toContain( 'background-clip: border-box !important' );
+		expect( css ).toContain(
+			'-webkit-text-fill-color: currentColor !important'
+		);
+		expect( css ).toContain( 'background-image: unset !important' );
+	} );
+
+	it( 'keeps a background the state paints itself', () => {
+		const css = getStateStylesCSS(
+			{
+				background: {
+					backgroundClip: 'padding-box',
+					gradient: 'linear-gradient(red,blue)',
+				},
+			},
+			'.wp-block-test',
+			textClipBase
+		);
+
+		expect( css ).not.toContain( 'background-image: unset' );
+	} );
+
+	it( 'leaves a deliberate box clip alone when nothing above clips to text', () => {
+		const css = getStateStylesCSS(
+			{ background: { backgroundClip: 'padding-box' } },
+			'.wp-block-test',
+			{ background: { backgroundImage: { url: 'image.png' } } }
+		);
+
+		expect( css ).not.toContain( 'background-image: unset' );
+	} );
+
+	it( 'paints a text color the clip would otherwise hide', () => {
+		const css = getStateStylesCSS(
+			{ color: { text: '#ff0000' } },
+			'.wp-block-test',
+			textClipBase
+		);
+
+		expect( css ).toContain( 'color: #ff0000 !important' );
+		expect( css ).toContain(
+			'-webkit-text-fill-color: currentColor !important'
+		);
+	} );
+
+	it( 'leaves the fill to the style engine when the state sets its own clip', () => {
+		const css = getStateStylesCSS(
+			{
+				color: { text: '#ff0000' },
+				background: { backgroundClip: 'text' },
+			},
+			'.wp-block-test',
+			textClipBase
+		);
+
+		// The engine already writes `transparent` for a text clip.
+		expect( css ).not.toContain( 'currentColor' );
+	} );
+
+	it( 'leaves the fill alone when the state paints its own gradient', () => {
+		const css = getStateStylesCSS(
+			{
+				color: { text: '#ff0000' },
+				background: { gradient: 'linear-gradient(red,blue)' },
+			},
+			'.wp-block-test',
+			textClipBase
+		);
+
+		// `currentColor` would paint over this state's gradient.
+		expect( css ).not.toContain( 'currentColor' );
+	} );
+
+	it( 'paints a text color over a text clip the block cannot see', () => {
+		const css = getStateStylesCSS(
+			{ color: { text: '#ff0000' } },
+			'.wp-block-test',
+			{}
+		);
+
+		expect( css ).toContain( 'color: #ff0000 !important' );
+		expect( css ).toContain(
+			'-webkit-text-fill-color: currentColor !important'
+		);
+	} );
+
+	it( 'says nothing for a block that cannot sit under a text clip', () => {
+		expect(
+			getStateStylesCSS(
+				{ color: { text: '#ff0000' } },
+				'.wp-block-test'
+			)
+		).toBe( '.wp-block-test { color: #ff0000 !important; }' );
+	} );
+
+	it( 'leaves a box clip alone without a text clip to escape', () => {
+		expect(
+			getStateStylesCSS(
+				{ background: { backgroundClip: 'padding-box' } },
+				'.wp-block-test'
+			)
+		).not.toContain( 'background-image: unset' );
+	} );
+} );
+
 describe( 'getResponsiveStateCSSRules', () => {
 	beforeEach( () => {
 		registerBlockType( 'test/state-button', {
@@ -434,6 +549,29 @@ describe( 'getResponsiveStateCSSRules', () => {
 			)
 		).toEqual( [
 			'@media (width <= 480px){.wp-elements-1 { color: red !important; }}',
+		] );
+	} );
+
+	it( 'paints a viewport text color for a block that supports the clip', () => {
+		registerBlockType( 'test/state-text', {
+			apiVersion: 3,
+			title: 'State Text',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			supports: { background: { backgroundClip: true } },
+		} );
+
+		const rules = getResponsiveStateCSSRules(
+			{ '@mobile': { color: { text: 'red' } } },
+			'test/state-text',
+			'.wp-elements-1'
+		);
+		unregisterBlockType( 'test/state-text' );
+
+		expect( rules ).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 { color: red !important; }\n.wp-elements-1 { -webkit-text-fill-color: currentColor !important; }}',
 		] );
 	} );
 

@@ -99,4 +99,5 @@ Used to provide a custom spoken message.
 
 ## Related components
 
+-   Use SnackbarList to display multiple snackbars.
 -   To create a prominent message that requires a higher-level of attention, use a Notice.
