@@ -392,7 +392,7 @@ describe( 'global styles renderer', () => {
 			rootPadding: false,
 		};
 		const textInputSelectorWith = ( pseudoSelector: string ) =>
-			`textarea${ pseudoSelector }, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])${ pseudoSelector }`;
+			`textarea${ pseudoSelector }, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])${ pseudoSelector }`;
 		const transformTextInputStyles = (
 			textInputStyles: Record< string, unknown >
 		) =>
