@@ -57,6 +57,8 @@ jobs:
         runs-on: 'ubuntu-24.04'
         permissions:
             pull-requests: read
+            # Comparing the target with `PR_META_WRITERS_SHA`.
+            contents: read
         timeout-minutes: 5
         outputs:
             writers-current: ${{ steps.pull-request.outputs.result }}
