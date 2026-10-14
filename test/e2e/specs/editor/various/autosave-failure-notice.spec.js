@@ -364,8 +364,11 @@ test.describe( 'Autosave failure notice', () => {
 			await context.setOffline( false );
 		} );
 
-		for ( const status of [ 'draft', 'publish' ] ) {
-			test( `failed manual save notice stays through later autosaves (${ status })`, async ( {
+		for ( const [ status, afterAutosave, afterManualSave ] of [
+			[ 'draft', [], [] ],
+			[ 'publish', [ UPDATING_FAILED_OFFLINE ], [ 'Post updated.' ] ],
+		] ) {
+			test( `failed manual save notice is cleared once nothing is left to save (${ status })`, async ( {
 				admin,
 				autosaveFailure,
 				context,
@@ -403,9 +406,14 @@ test.describe( 'Autosave failure notice', () => {
 
 				await autosaveFailure.stopFailing();
 				await autosaveFailure.autosave();
-				expect( await autosaveFailure.getNotices() ).toEqual( [
-					UPDATING_FAILED_OFFLINE,
-				] );
+				expect( await autosaveFailure.getNotices() ).toEqual(
+					afterAutosave
+				);
+
+				await pageUtils.pressKeys( 'primary+s' );
+				await expect
+					.poll( autosaveFailure.getNotices )
+					.toEqual( afterManualSave );
 			} );
 		}
 	} );
