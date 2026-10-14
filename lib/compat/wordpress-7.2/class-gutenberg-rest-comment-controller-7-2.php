@@ -267,23 +267,30 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * @return bool True if the user can read the comment, false otherwise.
 	 */
 	protected function check_read_permission( $comment, $request ) {
-		if ( 'reaction' === $comment->comment_type ) {
-			if ( 0 === get_current_user_id() ) {
-				return false;
+		// START CHANGE: Treat `reaction` like `note`.
+		if ( ! $this->is_note_or_reaction( $comment->comment_type ) && ! empty( $comment->comment_post_ID ) ) {
+			// END CHANGE.
+			$post = get_post( $comment->comment_post_ID );
+			if ( $post ) {
+				if ( $this->check_read_post_permission( $post, $request ) && 1 === (int) $comment->comment_approved ) {
+					return true;
+				}
 			}
-
-			if ( empty( $comment->comment_post_ID ) && ! current_user_can( 'moderate_comments' ) ) {
-				return false;
-			}
-
-			if ( ! empty( $comment->user_id ) && get_current_user_id() === (int) $comment->user_id ) {
-				return true;
-			}
-
-			return current_user_can( 'edit_comment', $comment->comment_ID );
 		}
 
-		return parent::check_read_permission( $comment, $request );
+		if ( 0 === get_current_user_id() ) {
+			return false;
+		}
+
+		if ( empty( $comment->comment_post_ID ) && ! current_user_can( 'moderate_comments' ) ) {
+			return false;
+		}
+
+		if ( ! empty( $comment->user_id ) && get_current_user_id() === (int) $comment->user_id ) {
+			return true;
+		}
+
+		return current_user_can( 'edit_comment', $comment->comment_ID );
 	}
 
 	/**
