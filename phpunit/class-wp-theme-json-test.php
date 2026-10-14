@@ -2271,6 +2271,41 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	public function test_get_stylesheet_handles_select_pseudo_selectors() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'select' => array(
+							'color'          => array(
+								'text' => 'green',
+							),
+							':hover'         => array(
+								'color' => array(
+									'background' => 'blue',
+								),
+							),
+							':focus-visible' => array(
+								'outline' => array(
+									'style' => 'solid',
+								),
+							),
+							':visited'       => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'select{color: green;}:root :where(select:hover){background-color: blue;}:root :where(select:focus-visible){outline-style: solid;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
 	public function test_get_stylesheet_ignores_non_whitelisted_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
