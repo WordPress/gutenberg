@@ -1,7 +1,8 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
-import { __, _x, isRTL } from '@wordpress/i18n';
+import { __, _x, isRTL, sprintf } from '@wordpress/i18n';
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import { drawerLeft, drawerRight, seen } from '@wordpress/icons';
 import HeaderSkeleton from '../header/header-skeleton';
 import MoreMenu from '../more-menu';
@@ -20,11 +21,20 @@ import { unlock } from '../../lock-unlock';
  * @return {React.JSX.Element} The revisions header component.
  */
 function RevisionsHeader( { showDiff, onToggleDiff } ) {
-	const { currentRevisionId, sidebarIsOpened } = useSelect( ( select ) => {
+	const {
+		currentRevisionId,
+		isViewingBrowserBackup,
+		browserBackupDate,
+		sidebarIsOpened,
+	} = useSelect( ( select ) => {
+		const editor = unlock( select( editorStore ) );
+		const _isViewingBrowserBackup = editor.isViewingBrowserBackup();
 		return {
-			currentRevisionId: unlock(
-				select( editorStore )
-			).getCurrentRevisionId(),
+			currentRevisionId: editor.getCurrentRevisionId(),
+			isViewingBrowserBackup: _isViewingBrowserBackup,
+			browserBackupDate: _isViewingBrowserBackup
+				? editor.getCurrentRevision()?.date
+				: undefined,
 			sidebarIsOpened:
 				!! select( interfaceStore ).getActiveComplementaryArea(
 					'core'
@@ -32,9 +42,8 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 		};
 	}, [] );
 
-	const { setCurrentRevisionId, restoreRevision } = unlock(
-		useDispatch( editorStore )
-	);
+	const { setCurrentRevisionId, restoreRevision, restoreBrowserBackup } =
+		unlock( useDispatch( editorStore ) );
 
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
@@ -42,10 +51,26 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 	const canRestore = !! currentRevisionId;
 
 	const handleRestore = () => {
-		if ( currentRevisionId ) {
+		if ( isViewingBrowserBackup ) {
+			restoreBrowserBackup();
+		} else if ( currentRevisionId ) {
 			restoreRevision( currentRevisionId );
 		}
 	};
+
+	let browserBackupLabel;
+	if ( isViewingBrowserBackup ) {
+		browserBackupLabel = browserBackupDate
+			? sprintf(
+					/* translators: %s: Date and time the backup was made. */
+					__( 'Backup in this browser from %s' ),
+					dateI18n(
+						getDateSettings().formats.datetime,
+						browserBackupDate
+					)
+				)
+			: __( 'Backup in this browser' );
+	}
 
 	return (
 		<HeaderSkeleton
@@ -60,7 +85,15 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 					onClick={ onToggleDiff }
 				/>
 			}
-			center={ <RevisionsSlider /> }
+			center={
+				isViewingBrowserBackup ? (
+					<span className="editor-revisions-header__no-revisions">
+						{ browserBackupLabel }
+					</span>
+				) : (
+					<RevisionsSlider />
+				)
+			}
 			settings={
 				<>
 					<PostPreviewButton className="editor-header__post-preview-button" />

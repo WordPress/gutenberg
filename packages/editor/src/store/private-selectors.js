@@ -26,6 +26,7 @@ import {
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
 import { unlock } from '../lock-unlock';
+import { BROWSER_BACKUP_REVISION_ID, STORE_NAME } from './constants';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -460,6 +461,42 @@ export function getCurrentRevisionId( state ) {
 }
 
 /**
+ * Returns whether the revisions view shows the backup kept in the browser.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the browser backup is shown.
+ */
+export function isViewingBrowserBackup( state ) {
+	return getCurrentRevisionId( state ) === BROWSER_BACKUP_REVISION_ID;
+}
+
+let editorContentRevision;
+
+/**
+ * Returns the editor's current content shaped like a revision, keeping the
+ * same object while the content is unchanged.
+ *
+ * @param {string} title   The edited title.
+ * @param {string} content The edited content.
+ * @param {string} excerpt The edited excerpt.
+ * @return {Object} The content as a revision.
+ */
+function getEditorContentRevision( title, content, excerpt ) {
+	if (
+		editorContentRevision?.title.raw !== title ||
+		editorContentRevision?.content.raw !== content ||
+		editorContentRevision?.excerpt.raw !== excerpt
+	) {
+		editorContentRevision = {
+			title: { raw: title },
+			content: { raw: content },
+			excerpt: { raw: excerpt },
+		};
+	}
+	return editorContentRevision;
+}
+
+/**
  * Returns the current revision object in revisions mode.
  *
  * @param {Object} state Global application state.
@@ -547,6 +584,18 @@ export const getPreviousRevision = createRegistrySelector(
 		const currentRevisionId = getCurrentRevisionId( state );
 		if ( ! currentRevisionId ) {
 			return undefined;
+		}
+
+		// The browser backup is compared with what the editor shows, which is
+		// what restoring it replaces.
+		if ( currentRevisionId === BROWSER_BACKUP_REVISION_ID ) {
+			const { getEditedPostAttribute, getEditedPostContent } =
+				select( STORE_NAME );
+			return getEditorContentRevision(
+				getEditedPostAttribute( 'title' ),
+				getEditedPostContent(),
+				getEditedPostAttribute( 'excerpt' )
+			);
 		}
 
 		const page = getRevisionPage( state );

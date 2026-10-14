@@ -41,7 +41,9 @@ export default function BrowserURL() {
 
 	const { postId, postStatus, currentRevisionId } = useSelect( ( select ) => {
 		const { getCurrentPost } = select( editorStore );
-		const { getCurrentRevisionId } = unlock( select( editorStore ) );
+		const { getCurrentRevisionId, isViewingBrowserBackup } = unlock(
+			select( editorStore )
+		);
 		const post = getCurrentPost();
 		let { id, status, type } = post;
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
@@ -56,7 +58,11 @@ export default function BrowserURL() {
 			postStatus: status,
 			// `post.php` rejects templates because `show_ui` is false. Adding
 			// their revision ID to this URL would create a dead link.
-			currentRevisionId: isTemplate ? null : getCurrentRevisionId(),
+			// The browser backup isn't on the server, so it can't be linked to.
+			currentRevisionId:
+				isTemplate || isViewingBrowserBackup()
+					? null
+					: getCurrentRevisionId(),
 		};
 	}, [] );
 	const { openRevision } = unlock( useDispatch( editorStore ) );

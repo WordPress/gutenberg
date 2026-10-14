@@ -87,15 +87,66 @@ test.describe( 'Autosave', () => {
 			},
 		] );
 
-		await page
-			.getByRole( 'button', { name: 'Restore the backup' } )
-			.click();
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await expect(
+			page.getByText(
+				'Backup in this browser from October 12, 2026 3:41 pm',
+				{ exact: true }
+			)
+		).toBeVisible();
+		await expect(
+			editor.canvas.locator(
+				'.is-revision-modified .revision-diff-added'
+			)
+		).toHaveText( 'after save' );
+
+		await page.getByRole( 'button', { name: 'Restore' } ).click();
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'before save after save' },
 			},
 		] );
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toBeHidden();
+	} );
+
+	test( 'should keep the backup when its view is closed', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'before save' );
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.keyboard.type( ' after save' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		await page.reload();
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await page.getByRole( 'button', { name: 'Exit' } ).click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before save' },
+			},
+		] );
+		await expect(
+			page.locator( '.components-notice__content' )
+		).toContainText( BACKUP_NOTICE );
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
 	} );
 
 	test( "shouldn't contaminate other posts", async ( {

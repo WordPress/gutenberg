@@ -14,6 +14,14 @@ export const STORE_NAME = 'core/editor';
 export const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 export const ONE_MINUTE_IN_MS = 60 * 1000;
 export const AUTOSAVE_PROPERTIES = [ 'title', 'excerpt', 'content' ];
+/**
+ * Revision ID used to view the backup kept in the browser's session storage.
+ */
+export const BROWSER_BACKUP_REVISION_ID = 'browser-backup';
+/**
+ * ID of the notice that offers the browser backup.
+ */
+export const BROWSER_BACKUP_NOTICE_ID = 'wpEditorAutosaveRestore';
 export const TEMPLATE_PART_AREA_DEFAULT_CATEGORY = 'uncategorized';
 export const TEMPLATE_POST_TYPE = 'wp_template';
 export const TEMPLATE_PART_POST_TYPE = 'wp_template_part';

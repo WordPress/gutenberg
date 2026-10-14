@@ -18,7 +18,11 @@ export default function useClassicRevisionRedirect() {
 			return {
 				disableVisualRevisions:
 					!! editor.getEditorSettings().disableVisualRevisions,
-				currentRevisionId: unlock( editor ).getCurrentRevisionId(),
+				// The browser backup isn't on the server, so the classic screen
+				// can't show it.
+				currentRevisionId: unlock( editor ).isViewingBrowserBackup()
+					? null
+					: unlock( editor ).getCurrentRevisionId(),
 				postType: editor.getCurrentPostType(),
 				postId: editor.getCurrentPostId(),
 			};
