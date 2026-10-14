@@ -4,8 +4,6 @@ import {
 	Dropdown,
 	Path,
 	SVG,
-	__experimentalItem as Item,
-	__experimentalItemGroup as ItemGroup,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { Stack, Tooltip } from '@wordpress/ui';
@@ -15,6 +13,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { chevronDown, chevronUp } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../../store';
 import { BlockEditContextProvider } from '../../block-edit/context';
+import InspectorPopoverHeader from '../../inspector-popover-header';
 import { isGlobalStylesInheritanceIndicatorUIEnabled } from '.';
 import { useStyleChangeRows } from './style-changes';
 import { getStyleValueDisplay } from './style-change-rows';
@@ -37,38 +36,43 @@ interface StyleChangeRow {
 	status: 'override' | 'local' | 'inherited';
 	sourceLabel: string | null;
 	value: unknown;
+	inheritedValue?: unknown;
 }
 
 /**
- * Returns the line under a row's label naming where its value comes from, or
- * what a local value replaces. A local value that replaces nothing has none:
- * its group already says it is set on the block.
+ * Returns the line under a row's label: where an inherited value comes from,
+ * or what a local value replaced and where that is set.
  *
  * @param row Row from `useStyleChangeRows`.
- * @return Source text, or `null`.
+ * @return Source text.
  */
 function getRowSource( row: StyleChangeRow ) {
 	if ( row.status === 'override' ) {
 		return sprintf(
-			/* translators: %s: Where the replaced value comes from, e.g. "Paragraph block". */
-			__( 'Overrides %s' ),
+			/* translators: 1: Replaced value, e.g. "Medium". 2: Where it is set, e.g. "Button element". */
+			__( 'Was %1$s · %2$s' ),
+			getStyleValueDisplay( row.path, row.inheritedValue ).text,
 			row.sourceLabel
 		);
 	}
-	return row.status === 'inherited' ? row.sourceLabel : null;
+	if ( row.status === 'local' ) {
+		return __( 'Not set in Global Styles' );
+	}
+	return row.sourceLabel;
 }
 
 function StyleValue( { row }: { row: StyleChangeRow } ) {
 	const { text, color } = getStyleValueDisplay( row.path, row.value );
 	return (
-		<Stack direction="row" gap="sm" align="center">
+		<Stack
+			direction="row"
+			gap="sm"
+			align="center"
+			className="block-editor-style-changes__value"
+		>
 			{ color && <ColorIndicator colorValue={ color } /> }
 			<Tooltip.Root>
-				<Tooltip.Trigger
-					render={
-						<Truncate className="block-editor-style-changes__value" />
-					}
-				>
+				<Tooltip.Trigger render={ <Truncate /> }>
 					{ text }
 				</Tooltip.Trigger>
 				<Tooltip.Popup>{ text }</Tooltip.Popup>
@@ -78,77 +82,85 @@ function StyleValue( { row }: { row: StyleChangeRow } ) {
 }
 
 function StyleChangeItem( { row }: { row: StyleChangeRow } ) {
-	const source = getRowSource( row );
 	return (
-		<Item size="small" className="block-editor-style-changes__item">
-			<Stack direction="row" gap="md" align="flex-start">
-				<Stack
-					direction="column"
-					className="block-editor-style-changes__text"
-				>
-					<span className="block-editor-style-changes__label">
-						{ row.label }
-					</span>
-					{ source && (
-						<span className="block-editor-style-changes__source">
-							{ source }
-						</span>
-					) }
-				</Stack>
+		<li className="block-editor-style-changes__item">
+			<Stack
+				direction="row"
+				gap="md"
+				align="center"
+				justify="space-between"
+			>
+				<span className="block-editor-style-changes__label">
+					{ row.label }
+				</span>
 				<StyleValue row={ row } />
 			</Stack>
-		</Item>
+			<span className="block-editor-style-changes__source">
+				{ getRowSource( row ) }
+			</span>
+		</li>
 	);
 }
 
-function StyleChangesList( { rows }: { rows: StyleChangeRow[] } ) {
+function StyleChangeItems( { rows }: { rows: StyleChangeRow[] } ) {
+	return (
+		<ul className="block-editor-style-changes__items">
+			{ rows.map( ( row ) => (
+				<StyleChangeItem key={ row.key } row={ row } />
+			) ) }
+		</ul>
+	);
+}
+
+function StyleChangesList( {
+	rows,
+	onClose,
+}: {
+	rows: StyleChangeRow[];
+	onClose: () => void;
+} ) {
 	const [ showInherited, setShowInherited ] = useState( false );
 	const localRows = rows.filter( ( row ) => row.status !== 'inherited' );
 	const inheritedRows = rows.filter( ( row ) => row.status === 'inherited' );
 	return (
-		<Stack
-			direction="column"
-			gap="lg"
-			className="block-editor-style-changes"
-		>
-			<Stack direction="column" gap="xs">
-				<h2 className="block-editor-style-changes__heading">
-					{ __( 'Changed on this block' ) }
-				</h2>
-				<ItemGroup>
-					{ localRows.map( ( row ) => (
-						<StyleChangeItem key={ row.key } row={ row } />
-					) ) }
-				</ItemGroup>
-			</Stack>
+		<div className="block-editor-style-changes">
+			<InspectorPopoverHeader
+				title={ __( 'Style changes' ) }
+				onClose={ onClose }
+			/>
+			<section className="block-editor-style-changes__group">
+				<h3 className="block-editor-style-changes__heading">
+					{ sprintf(
+						/* translators: %d: Number of styles set on the block. */
+						__( 'Changed on this block (%d)' ),
+						localRows.length
+					) }
+				</h3>
+				<StyleChangeItems rows={ localRows } />
+			</section>
 			{ inheritedRows.length > 0 && (
-				<Stack direction="column" gap="xs">
+				<section className="block-editor-style-changes__group">
 					<Button
 						__next40pxDefaultSize={ false }
 						size="small"
 						className="block-editor-style-changes__toggle"
 						icon={ showInherited ? chevronUp : chevronDown }
 						iconPosition="right"
-						iconSize={ 16 }
 						aria-expanded={ showInherited }
 						onClick={ () => setShowInherited( ! showInherited ) }
 					>
 						{ sprintf(
-							/* translators: %d: Number of styles that come from Global Styles. */
-							__( 'From Global Styles (%d)' ),
+							/* translators: %d: Number of styles the block takes from Global Styles. */
+							__( 'Inherited styles (%d)' ),
 							inheritedRows.length
 						) }
 					</Button>
 					{ showInherited && (
-						<ItemGroup>
-							{ inheritedRows.map( ( row ) => (
-								<StyleChangeItem key={ row.key } row={ row } />
-							) ) }
-						</ItemGroup>
+						<StyleChangeItems rows={ inheritedRows } />
 					) }
-				</Stack>
+				</section>
 			) }
-		</Stack>
+		</div>
 	);
 }
 
@@ -197,15 +209,17 @@ function StyleChangesDropdown( {
 					aria-expanded={ isOpen }
 				/>
 			) }
-			renderContent={ () => <StyleChangesList rows={ rows } /> }
+			renderContent={ ( { onClose } ) => (
+				<StyleChangesList rows={ rows } onClose={ onClose } />
+			) }
 		/>
 	);
 }
 
 /**
  * The block card's indicator for a block that sets some of its own styles.
- * It opens a popover listing the styles the block sets, then, on request, the
- * ones it takes from Global Styles and where each comes from.
+ * It opens a popover listing the styles the block sets and what each replaced,
+ * then, on request, the ones it inherits and where each comes from.
  *
  * Shown only behind the `gutenberg-global-styles-inheritance-ui` experiment,
  * for a block theme, since the sources it names live in the Styles screen.

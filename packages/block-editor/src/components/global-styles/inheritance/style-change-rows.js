@@ -95,13 +95,105 @@ function getWinningSource( sources, key ) {
 }
 
 /**
+ * CSS values that resolve to nothing a person can see or act on. A row whose
+ * value is one of these says nothing, so it is left out.
+ */
+const NO_VALUE_KEYWORDS = [ 'inherit', 'none', 'transparent none' ];
+
+/**
+ * Whether a resolved value is worth a row: set, and not a keyword that only
+ * hands the value on.
+ *
+ * @param {unknown} value Style value.
+ * @return {boolean} Whether the value is real.
+ */
+function hasRealValue( value ) {
+	return isSet( value ) && ! NO_VALUE_KEYWORDS.includes( value );
+}
+
+// Style paths in the order of the inspector controls that set them. Paths not
+// listed keep their place after these.
+const INSPECTOR_ORDER = [
+	'color.text',
+	'typography.fontFamily',
+	'typography.fontSize',
+	'typography.fontStyle',
+	'typography.fontWeight',
+	'typography.lineHeight',
+	'typography.letterSpacing',
+	'typography.textDecoration',
+	'typography.writingMode',
+	'typography.textTransform',
+	'color.background',
+	'color.gradient',
+	'background',
+	'spacing.padding',
+	'spacing.margin',
+	'spacing.blockGap',
+	'dimensions.minHeight',
+	'border',
+	'border.color',
+	'border.width',
+	'border.style',
+	'border.radius',
+	'shadow',
+];
+
+function getInspectorIndex( key ) {
+	const index = INSPECTOR_ORDER.indexOf( key );
+	return index === -1 ? INSPECTOR_ORDER.length : index;
+}
+
+const BORDER_PARTS = [ 'width', 'style', 'color' ];
+
+/**
+ * Folds border width, style and colour rows into one Border row, as the
+ * border control sets them together. Only rows that share a status and a
+ * source fold, so no row's source is lost.
+ *
+ * @param {Array} rows Rows from one status group.
+ * @return {Array} Rows with the border parts folded where they can be.
+ */
+function foldBorderRows( rows ) {
+	const parts = rows.filter( ( row ) =>
+		BORDER_PARTS.some( ( part ) => row.key === `border.${ part }` )
+	);
+	if (
+		parts.length < 2 ||
+		parts.some(
+			( row ) =>
+				row.status !== parts[ 0 ].status ||
+				row.sourceLabel !== parts[ 0 ].sourceLabel
+		)
+	) {
+		return rows;
+	}
+	const collect = ( field ) =>
+		Object.fromEntries(
+			parts.map( ( row ) => [ row.path[ 1 ], row[ field ] ] )
+		);
+	const border = {
+		...parts[ 0 ],
+		key: 'border',
+		path: [ 'border' ],
+		label: getStyleLabel( [ 'border' ] ),
+		value: collect( 'value' ),
+		...( parts[ 0 ].status === 'override' && {
+			inheritedValue: collect( 'inheritedValue' ),
+		} ),
+	};
+	return [ ...rows.filter( ( row ) => ! parts.includes( row ) ), border ];
+}
+
+/**
  * Builds the style change rows for a block: every value it sets itself, and
  * every value it inherits from Global Styles.
  *
- * - `override`: set on the block, with an inherited value underneath.
- * - `local`: set on the block with nothing underneath. Always listed, so the
- *   list matches what a person changed even when nothing is replaced.
- * - `inherited`: from Global Styles only.
+ * - `override`: set on the block over a real inherited value, carried as
+ *   `inheritedValue`.
+ * - `local`: set on the block with nothing real underneath. Always listed, so
+ *   the list matches what a person changed even when nothing is replaced.
+ * - `inherited`: from Global Styles only, and only with a real value.
  *
  * An inherited value whose source cannot be named is left out rather than
  * shown with a guessed source.
@@ -112,7 +204,7 @@ function getWinningSource( sources, key ) {
  * @param {Object}                                       args.inheritedStyle Merged value from `resolveStyle`.
  * @param {Object}                                       args.sources        Source map from `resolveStyle`.
  * @param {(source: Object, context: Object) => ?string} args.describeSource Names a source for a path and the leaf it was read from.
- * @return {Array} Rows, local ones first, each in style property order.
+ * @return {Array} Rows, local ones first, each group in inspector order.
  */
 export function getStyleChangeRows( {
 	paths,
@@ -129,31 +221,49 @@ export function getStyleChangeRows( {
 		if ( ! isSetOnBlock && ! supported ) {
 			continue;
 		}
-		const winner = getWinningSource( sources, key );
+		const inheritedValue = getValueFromObjectPath( inheritedStyle, path );
+		const winner = hasRealValue( inheritedValue )
+			? getWinningSource( sources, key )
+			: null;
 		const sourceLabel = winner
 			? describeSource( winner.source, { path, leafKey: winner.leafKey } )
 			: null;
 		if ( ! isSetOnBlock && ! sourceLabel ) {
 			continue;
 		}
-		let status = 'inherited';
-		if ( isSetOnBlock ) {
-			status = sourceLabel ? 'override' : 'local';
+		if ( ! isSetOnBlock ) {
+			rows.push( {
+				key,
+				path,
+				label: getStyleLabel( path ),
+				status: 'inherited',
+				sourceLabel,
+				value: inheritedValue,
+			} );
+			continue;
 		}
 		rows.push( {
 			key,
 			path,
 			label: getStyleLabel( path ),
-			status,
+			status: sourceLabel ? 'override' : 'local',
 			sourceLabel,
-			value: isSetOnBlock
-				? localValue
-				: getValueFromObjectPath( inheritedStyle, path ),
+			value: localValue,
+			...( sourceLabel && { inheritedValue } ),
 		} );
 	}
+	const ofStatus = ( status ) =>
+		foldBorderRows( rows.filter( ( row ) => row.status === status ) );
+	const inInspectorOrder = ( list ) =>
+		list.sort(
+			( a, b ) => getInspectorIndex( a.key ) - getInspectorIndex( b.key )
+		);
 	return [
-		...rows.filter( ( row ) => row.status !== 'inherited' ),
-		...rows.filter( ( row ) => row.status === 'inherited' ),
+		...inInspectorOrder( [
+			...ofStatus( 'override' ),
+			...ofStatus( 'local' ),
+		] ),
+		...inInspectorOrder( ofStatus( 'inherited' ) ),
 	];
 }
 

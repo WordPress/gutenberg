@@ -2,19 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { getStyleSourceLabel } from '../source-label';
 
 describe( 'getStyleSourceLabel', () => {
-	it( 'names the Styles section for a root value', () => {
+	it( 'names the site wide section for a root value', () => {
 		expect(
 			getStyleSourceLabel(
 				{ layer: 'root' },
 				{ path: [ 'typography', 'fontSize' ] }
 			)
-		).toBe( 'Typography style' );
+		).toBe( 'Site typography' );
 		expect(
 			getStyleSourceLabel(
 				{ layer: 'root' },
 				{ path: [ 'elements', 'link', 'color', 'text' ] }
 			)
-		).toBe( 'Colors style' );
+		).toBe( 'Site colors' );
 	} );
 
 	it( 'names the element for an element value', () => {
@@ -39,9 +39,9 @@ describe( 'getStyleSourceLabel', () => {
 		expect(
 			getStyleSourceLabel(
 				{ layer: 'blockVariation' },
-				{ path: [ 'spacing', 'padding' ], variationLabel: 'Annotation' }
+				{ path: [ 'spacing', 'padding' ], variationLabel: 'Outline' }
 			)
-		).toBe( '“Annotation” block style variation' );
+		).toBe( 'Outline style' );
 	} );
 
 	it( 'returns null rather than guessing a source', () => {
