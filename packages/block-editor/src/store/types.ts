@@ -1,12 +1,22 @@
 import type { Block, BlockTypeIcon, BlockVariation } from '@wordpress/blocks';
+import type { select as globalSelect } from '@wordpress/data';
 import type { BlockEditingMode } from '../components/block-editing-mode';
+import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { InserterMediaCategory } from './actions';
+import type {
+	isIsolatedEditorKey,
+	reusableBlocksSelectKey,
+	sectionRootClientIdKey,
+	selectBlockPatternsKey,
+	userPatternCategoriesSelectKey,
+} from './private-keys';
 
 export interface BlockAttributes {
 	metadata?: Record< string, unknown > & {
 		name?: string;
 		patternName?: string;
 		bindings?: Record< string, unknown >;
+		blockVisibility?: BlockVisibility;
 	};
 	lock?: { move?: boolean; remove?: boolean; edit?: boolean };
 	[ key: string ]: unknown;
@@ -158,7 +168,47 @@ export type BlockListSettings = Record< string, unknown > & {
 	templateLock?: string | false;
 };
 
-export type Settings = Record< string | symbol, unknown >;
+/**
+ * The editor settings, with the fields the store itself reads.
+ */
+export type Settings = Record< string | symbol, unknown > & {
+	allowedBlockTypes?: boolean | string[];
+	allowedMimeTypes?: Record< string, string > | null;
+	canLockBlocks?: boolean;
+	enableOpenverseMediaCategory?: boolean;
+	inserterMediaCategories?: InserterMediaCategory[];
+	isPreviewMode?: boolean;
+	template?: unknown[];
+	templateLock?: string | false;
+	__experimentalBlockPatterns?: BlockPattern[];
+	__experimentalFeatures?: { viewport?: unknown };
+	__experimentalReusableBlocks?: UserPattern[];
+	__experimentalUserPatternCategories?: UserPatternCategory[];
+	[ isIsolatedEditorKey ]?: boolean;
+	[ reusableBlocksSelectKey ]?: (
+		select: typeof globalSelect
+	) => UserPattern[] | null;
+	[ sectionRootClientIdKey ]?: string;
+	[ selectBlockPatternsKey ]?: (
+		select: typeof globalSelect
+	) => BlockPattern[] | undefined;
+	[ userPatternCategoriesSelectKey ]?: (
+		select: typeof globalSelect
+	) => UserPatternCategory[];
+};
+
+export interface StyleOverride {
+	clientId?: string;
+	[ key: string ]: unknown;
+}
+
+/**
+ * A block reduced to its client ID and the same shape for its inner blocks.
+ */
+export interface ClientIdsTreeNode {
+	clientId: string;
+	innerBlocks: ClientIdsTreeNode[];
+}
 
 export interface InsertionCue {
 	rootClientId?: string;
@@ -254,7 +304,7 @@ export interface State {
 	editedContentOnlySection: string | undefined;
 	blockVisibility: Record< string, boolean >;
 	viewportModalClientIds: string[] | null;
-	styleOverrides: Map< unknown, unknown >;
+	styleOverrides: Map< unknown, StyleOverride >;
 	removalPromptData: RemovalPromptData | false;
 	blockRemovalRules: BlockRemovalRule[] | false;
 	registeredInserterMediaCategories: InserterMediaCategory[];
@@ -426,7 +476,7 @@ export type Action =
 			clientId: string;
 			value: boolean;
 	  }
-	| { type: 'SET_STYLE_OVERRIDE'; id: unknown; style: unknown }
+	| { type: 'SET_STYLE_OVERRIDE'; id: unknown; style: StyleOverride }
 	| { type: 'SET_STYLE_STATE_VIEWPORT'; viewport?: string }
 	| { type: 'SET_TEMPLATE_VALIDITY'; isValid: boolean }
 	| { type: 'SET_ZOOM_LEVEL'; zoom: number | 'auto-scaled' }
