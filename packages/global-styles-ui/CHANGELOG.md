@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add a Current state to the Navigation Link block screen's States dropdown, for styling the current menu item. It's offered for the default viewport only, as theme.json doesn't accept a custom state inside a viewport ([#78769](https://github.com/WordPress/gutenberg/pull/78769)).
+
 ### Enhancements
 
 -   Remove the dot that marks blocks with user styles in the block list. The filter to show only those blocks stays ([#84657](https://github.com/WordPress/gutenberg/pull/84657)).
