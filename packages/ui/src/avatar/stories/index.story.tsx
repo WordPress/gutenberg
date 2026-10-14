@@ -4,9 +4,10 @@ import * as Avatar from '../index';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 
-// Profile illustration by Boxicons: https://unsplash.com/illustrations/simple-black-outline-of-a-person-icon-s4_txsqJZ7M
+// Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
+// Used under the Unsplash License: https://unsplash.com/license
 const IMAGE_SRC =
-	'https://images.unsplash.com/vector-1776244476031-db2aa624a2a0?w=128&h=128&fit=crop&fm=jpg';
+	'https://images.unsplash.com/vector-1753200161282-0c2bef060ac4?w=128&h=128&fit=crop&fm=jpg';
 
 const meta: Meta< typeof Avatar.Root > = {
 	title: 'Components/@wordpress-ui/Avatar',
