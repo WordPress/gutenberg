@@ -40,7 +40,6 @@ interface ConnectorData {
 interface ConnectorScriptModuleData {
 	connectors?: Record< string, ConnectorData >;
 	isFileModDisabled?: boolean;
-	filesystemCredentialsRequired?: boolean;
 }
 
 function getConnectorScriptModuleData(): ConnectorScriptModuleData {
@@ -64,10 +63,6 @@ export function getConnectorData(): Record< string, ConnectorData > {
 
 export function getIsFileModDisabled(): boolean {
 	return !! getConnectorScriptModuleData().isFileModDisabled;
-}
-
-export function getRequiresFilesystemCredentials(): boolean {
-	return !! getConnectorScriptModuleData().filesystemCredentialsRequired;
 }
 
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
@@ -218,7 +213,6 @@ function ApiKeyConnector( {
 		isActivated: plugin?.isActivated,
 		keySource: auth?.keySource,
 		initialIsConnected: auth?.isConnected,
-		requiresFilesystemCredentials: getRequiresFilesystemCredentials(),
 	} );
 	const isExternallyConfigured =
 		keySource === 'env' || keySource === 'constant';

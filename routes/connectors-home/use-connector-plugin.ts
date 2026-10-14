@@ -22,7 +22,6 @@ interface UseConnectorPluginOptions {
 	isActivated?: boolean;
 	keySource?: ApiKeySource;
 	initialIsConnected?: boolean;
-	requiresFilesystemCredentials?: boolean;
 }
 
 interface WpUpdatesInstallPluginResponse {
@@ -43,8 +42,7 @@ interface WpUpdates {
 type JQueryHandler = (
 	event: unknown,
 	response:
-		| WpUpdatesInstallPluginResponse
-		| WpUpdatesInstallPluginErrorResponse
+		WpUpdatesInstallPluginResponse | WpUpdatesInstallPluginErrorResponse
 ) => void;
 
 interface WpUpdatesGlobal {
@@ -55,6 +53,20 @@ interface WpUpdatesGlobal {
 		on: ( events: string, handler: JQueryHandler ) => void;
 		off: ( events: string, handler: JQueryHandler ) => void;
 	};
+}
+
+/**
+ * Whether a rejected REST plugin install failed because the filesystem
+ * requires credentials (`FS_METHOD` is not `direct` and none are stored).
+ *
+ * @param error Rejection from the REST plugin endpoint.
+ */
+export function isFilesystemUnavailableError( error: unknown ): boolean {
+	return (
+		typeof error === 'object' &&
+		error !== null &&
+		( error as { code?: unknown } ).code === 'fs_unavailable'
+	);
 }
 
 /**
@@ -155,7 +167,6 @@ export function useConnectorPlugin( {
 	isActivated,
 	keySource = 'none',
 	initialIsConnected = false,
-	requiresFilesystemCredentials = false,
 }: UseConnectorPluginOptions ): UseConnectorPluginReturn {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ isBusy, setIsBusy ] = useState( false );
@@ -358,12 +369,23 @@ export function useConnectorPlugin( {
 		}
 		setIsBusy( true );
 		try {
-			if ( requiresFilesystemCredentials ) {
-				// The REST plugin endpoint rejects installs up front when
-				// FS_METHOD is not 'direct' and credentials have not been
-				// stored. Route through wp.updates.installPlugin() so the
-				// standard "Connection Information" modal handles credential
-				// entry, then activate via REST.
+			try {
+				await saveEntityRecord(
+					'root',
+					'plugin',
+					{ slug: pluginSlug, status: 'active' },
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				// The REST plugin endpoint rejects installs up front with
+				// `fs_unavailable` when FS_METHOD is not 'direct' and
+				// credentials have not been stored. Fall back to
+				// wp.updates.installPlugin() so the standard "Connection
+				// Information" modal handles credential entry, then activate
+				// via REST.
+				if ( ! isFilesystemUnavailableError( error ) ) {
+					throw error;
+				}
 				const outcome = await installPluginViaWpUpdates( pluginSlug );
 				if ( outcome === 'canceled' ) {
 					// User closed the credentials modal; abort silently.
@@ -383,13 +405,6 @@ export function useConnectorPlugin( {
 					'plugin',
 					pluginBasename,
 				] );
-			} else {
-				await saveEntityRecord(
-					'root',
-					'plugin',
-					{ slug: pluginSlug, status: 'active' },
-					{ throwOnError: true }
-				);
 			}
 			setPluginStatusOverride( 'active' );
 			// Re-fetch settings since the new plugin may register new settings.

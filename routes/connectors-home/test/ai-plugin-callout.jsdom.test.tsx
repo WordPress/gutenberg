@@ -4,7 +4,6 @@ import type { ReactNode } from 'react';
 import { beforeEach, describe, expect, it, vi, type Mock } from 'vitest';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { AiPluginCallout } from '../ai-plugin-callout';
-import { getRequiresFilesystemCredentials } from '../default-connectors';
 import { installPluginViaWpUpdates } from '../use-connector-plugin';
 
 vi.mock(
@@ -111,17 +110,13 @@ vi.mock(
 					},
 				},
 			} ) ),
-			getRequiresFilesystemCredentials: vi.fn( () => false ),
 		} ) as unknown as typeof import( '../default-connectors' )
 );
 
-vi.mock(
-	import( '../use-connector-plugin' ),
-	() =>
-		( {
-			installPluginViaWpUpdates: vi.fn(),
-		} ) as unknown as typeof import( '../use-connector-plugin' )
-);
+vi.mock( import( '../use-connector-plugin' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	installPluginViaWpUpdates: vi.fn(),
+} ) );
 
 vi.mock(
 	import( '../wp-logo-decoration' ),
@@ -192,14 +187,8 @@ describe( 'AiPluginCallout', () => {
 				mapSelect( () => selectorStore )
 		);
 
-		vi.mocked( getRequiresFilesystemCredentials ).mockReset();
-		vi.mocked( getRequiresFilesystemCredentials ).mockReturnValue(
-			false
-		);
 		vi.mocked( installPluginViaWpUpdates ).mockReset();
-		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue(
-			'installed'
-		);
+		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue( 'installed' );
 
 		mockSaveEntityRecord.mockReset();
 		mockSaveEntityRecord.mockResolvedValue( undefined );
@@ -245,16 +234,23 @@ describe( 'AiPluginCallout', () => {
 		expect( installPluginViaWpUpdates ).not.toHaveBeenCalled();
 	} );
 
-	it( 'installs via wp.updates then activates when filesystem credentials are required', async () => {
+	it( 'falls back to wp.updates then activates when the REST install reports fs_unavailable', async () => {
 		const user = userEvent.setup();
 
 		storeState.plugin = undefined;
-		vi.mocked( getRequiresFilesystemCredentials ).mockReturnValue(
-			true
+		// The REST install (using `slug`) is rejected up front; the
+		// subsequent activate (using `plugin`) succeeds.
+		mockSaveEntityRecord.mockImplementation(
+			(
+				_kind: string,
+				_name: string,
+				record: Record< string, unknown >
+			) =>
+				'slug' in record
+					? Promise.reject( { code: 'fs_unavailable' } )
+					: Promise.resolve( undefined )
 		);
-		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue(
-			'installed'
-		);
+		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue( 'installed' );
 
 		render( <AiPluginCallout /> );
 
@@ -274,18 +270,16 @@ describe( 'AiPluginCallout', () => {
 				{ throwOnError: true }
 			);
 		} );
+
+		expect( mockCreateErrorNotice ).not.toHaveBeenCalled();
 	} );
 
 	it( 'aborts silently when the filesystem credentials modal is canceled', async () => {
 		const user = userEvent.setup();
 
 		storeState.plugin = undefined;
-		vi.mocked( getRequiresFilesystemCredentials ).mockReturnValue(
-			true
-		);
-		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue(
-			'canceled'
-		);
+		mockSaveEntityRecord.mockRejectedValue( { code: 'fs_unavailable' } );
+		vi.mocked( installPluginViaWpUpdates ).mockResolvedValue( 'canceled' );
 
 		render( <AiPluginCallout /> );
 
@@ -297,7 +291,31 @@ describe( 'AiPluginCallout', () => {
 			expect( installPluginViaWpUpdates ).toHaveBeenCalledWith( 'ai' );
 		} );
 
-		expect( mockSaveEntityRecord ).not.toHaveBeenCalled();
+		// Only the initial REST install attempt ran: no activate follow-up
+		// and no error notice.
+		expect( mockSaveEntityRecord ).toHaveBeenCalledTimes( 1 );
 		expect( mockCreateErrorNotice ).not.toHaveBeenCalled();
+	} );
+
+	it( 'shows an error notice when the REST install fails for another reason', async () => {
+		const user = userEvent.setup();
+
+		storeState.plugin = undefined;
+		mockSaveEntityRecord.mockRejectedValue( {
+			code: 'rest_cannot_install',
+		} );
+
+		render( <AiPluginCallout /> );
+
+		await user.click(
+			screen.getByRole( 'button', { name: 'Install the AI plugin' } )
+		);
+
+		await waitFor( () => {
+			expect( mockCreateErrorNotice ).toHaveBeenCalled();
+		} );
+
+		// A non-filesystem error must not trigger the wp.updates fallback.
+		expect( installPluginViaWpUpdates ).not.toHaveBeenCalled();
 	} );
 } );

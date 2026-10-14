@@ -67,36 +67,3 @@ function _gutenberg_connectors_print_filesystem_credentials_modal(): void {
 	wp_print_request_filesystem_credentials_modal();
 	wp_print_admin_notice_templates();
 }
-
-/**
- * Exposes whether the current request can install plugins directly to the
- * Connectors script module.
- *
- * When the filesystem method is anything other than `direct` and stored
- * credentials are not yet available, the REST plugin endpoint will reject
- * an install attempt up front. Surfacing this state to the client lets the
- * React layer pre-emptively route through `wp.updates.installPlugin()`,
- * which displays the standard filesystem credentials modal.
- *
- * @access private
- *
- * @param array<string, mixed> $data Existing script module data.
- * @return array<string, mixed> Script module data with the filesystem flag added.
- */
-function _gutenberg_connectors_add_filesystem_data_to_script_module_data( array $data ): array {
-	require_once ABSPATH . 'wp-admin/includes/file.php';
-
-	$method = get_filesystem_method();
-	if ( 'direct' === $method ) {
-		$data['filesystemCredentialsRequired'] = false;
-		return $data;
-	}
-
-	ob_start();
-	$stored = request_filesystem_credentials( self_admin_url() );
-	ob_end_clean();
-
-	$data['filesystemCredentialsRequired'] = false === $stored;
-	return $data;
-}
-add_filter( 'script_module_data_options-connectors-wp-admin', '_gutenberg_connectors_add_filesystem_data_to_script_module_data' );

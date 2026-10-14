@@ -10,12 +10,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
-import {
-	getConnectorData,
-	getRequiresFilesystemCredentials,
-} from './default-connectors';
+import { getConnectorData } from './default-connectors';
 import { WpLogoDecoration } from './wp-logo-decoration';
-import { installPluginViaWpUpdates } from './use-connector-plugin';
+import {
+	installPluginViaWpUpdates,
+	isFilesystemUnavailableError,
+} from './use-connector-plugin';
 import type { PluginStatus } from './use-connector-plugin';
 
 const AI_PLUGIN_SLUG = 'ai';
@@ -125,12 +125,23 @@ export function AiPluginCallout() {
 	const installPlugin = async () => {
 		setIsBusy( true );
 		try {
-			if ( getRequiresFilesystemCredentials() ) {
-				// The REST plugin endpoint rejects installs up front when
-				// FS_METHOD is not 'direct' and credentials have not been
-				// stored. Route through wp.updates.installPlugin() so the
-				// standard "Connection Information" modal handles credential
-				// entry, then activate via REST.
+			try {
+				await saveEntityRecord(
+					'root',
+					'plugin',
+					{ slug: AI_PLUGIN_SLUG, status: 'active' },
+					{ throwOnError: true }
+				);
+			} catch ( error ) {
+				// The REST plugin endpoint rejects installs up front with
+				// `fs_unavailable` when FS_METHOD is not 'direct' and
+				// credentials have not been stored. Fall back to
+				// wp.updates.installPlugin() so the standard "Connection
+				// Information" modal handles credential entry, then activate
+				// via REST.
+				if ( ! isFilesystemUnavailableError( error ) ) {
+					throw error;
+				}
 				const outcome =
 					await installPluginViaWpUpdates( AI_PLUGIN_SLUG );
 				if ( outcome === 'canceled' ) {
@@ -141,13 +152,6 @@ export function AiPluginCallout() {
 					'root',
 					'plugin',
 					{ plugin: AI_PLUGIN_ID, status: 'active' },
-					{ throwOnError: true }
-				);
-			} else {
-				await saveEntityRecord(
-					'root',
-					'plugin',
-					{ slug: AI_PLUGIN_SLUG, status: 'active' },
 					{ throwOnError: true }
 				);
 			}
