@@ -307,6 +307,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			return $comment;
 		}
 
+		// START CHANGE: Reactions cannot be edited.
 		if ( 'reaction' === $comment->comment_type ) {
 			return new WP_Error(
 				'rest_comment_update_not_allowed',
@@ -314,6 +315,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				array( 'status' => 403 )
 			);
 		}
+		// END CHANGE.
 
 		return parent::update_item_permissions_check( $request );
 	}
