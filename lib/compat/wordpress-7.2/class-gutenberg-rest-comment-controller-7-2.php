@@ -64,29 +64,25 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	}
 
 	/**
-	 * Checks whether a post type supports notes.
+	 * Check if post type supports notes.
 	 *
-	 * The core comment controller (WordPress 6.9) declares this check as a
-	 * private method, so it cannot be reused from this subclass. The logic is
-	 * mirrored here to keep the note permission checks working.
+	 * Copied from core, where it is private and cannot be called from this subclass.
 	 *
 	 * @param string $post_type Post type name.
-	 * @return bool True if the post type supports notes, false otherwise.
+	 * @return bool True if post type supports notes, false otherwise.
 	 */
-	protected function check_post_type_supports_notes( string $post_type ): bool {
+	protected function check_post_type_supports_notes( $post_type ) {
 		$supports = get_all_post_type_supports( $post_type );
+
 		if ( ! isset( $supports['editor'] ) ) {
 			return false;
 		}
+
 		if ( ! is_array( $supports['editor'] ) ) {
 			return false;
 		}
-		foreach ( $supports['editor'] as $item ) {
-			if ( ! empty( $item['notes'] ) ) {
-				return true;
-			}
-		}
-		return false;
+
+		return array_any( $supports['editor'], fn( $item ) => ! empty( $item['notes'] ) );
 	}
 
 	/**
