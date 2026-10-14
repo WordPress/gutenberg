@@ -138,5 +138,3 @@ The **WithHostLink** story runs it against a demo router, with a toggle that rem
 See the Actions page for the materialization rules this serves: the widget declares where to go, the host decides how to get there.
 
 `useWidgetHost` stays available for a capability no component covers yet, or an answer a consumer needs before it renders.
-
-`title` is one of those: a widget reads it to build accessible names, and uses its own name when it is absent.
