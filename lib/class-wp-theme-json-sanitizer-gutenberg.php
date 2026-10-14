@@ -31,23 +31,52 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 * @since 6.6.0 Extended schema definition to allow enhanced block style variations.
 	 * @since 7.1.1 Updated schema to allow responsive breakpoint states and pseudo-selectors
 	 *              at the top level of `styles` for block style variation partials.
+	 * @since 7.2.0 Added the optional `$diagnostics` collector.
 	 *
 	 * @param array $input               Structure to sanitize.
 	 * @param array $valid_block_names   List of valid block names.
 	 * @param array $valid_element_names List of valid element names.
 	 * @param array $valid_variations    List of valid variations per block.
+	 * @param array $diagnostics         Optional. Collector for diagnostics, passed by reference. When an
+	 *                                   array is given, a diagnostic is appended for each value that is
+	 *                                   dropped or coerced. Default null, which collects nothing.
 	 * @return array The sanitized output.
 	 */
-	public static function sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations ) {
+	public static function sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations, &$diagnostics = null ) {
 
 		$output = array();
 
 		if ( ! is_array( $input ) ) {
+			static::add_diagnostic(
+				$diagnostics,
+				'theme_json_invalid_type',
+				'type',
+				'dropped',
+				array(),
+				__( 'The theme.json structure must be an object.', 'gutenberg' ),
+				array(
+					'expected' => 'object',
+					'actual'   => static::get_type_name( $input ),
+				)
+			);
 			return $output;
 		}
 
 		// Preserve only the top most level keys.
 		$output = array_intersect_key( $input, array_flip( WP_Theme_JSON_Gutenberg::VALID_TOP_LEVEL_KEYS ) );
+
+		if ( null !== $diagnostics ) {
+			foreach ( array_keys( array_diff_key( $input, $output ) ) as $key ) {
+				// `$schema` only points editors at the published JSON Schema, so dropping it is expected.
+				if ( '$schema' === $key ) {
+					continue;
+				}
+				/* translators: %s: theme.json key. */
+				static::add_diagnostic( $diagnostics, 'theme_json_unknown_key', 'structure', 'dropped', array( $key ), sprintf( __( 'Unknown top-level key "%s".', 'gutenberg' ), $key ) );
+			}
+			// The schema below only covers registered names, so report these before they vanish as unknown keys.
+			$input = static::report_unregistered_names( $input, $valid_block_names, $valid_variations, $diagnostics );
+		}
 
 		/*
 		 * Remove any rules that are annotated as "top" in VALID_STYLES constant.
@@ -268,11 +297,24 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 			}
 
 			if ( ! is_array( $input[ $subtree ] ) ) {
+				static::add_diagnostic(
+					$diagnostics,
+					'theme_json_invalid_type',
+					'type',
+					'dropped',
+					array( $subtree ),
+					/* translators: %s: theme.json key. */
+					sprintf( __( '"%s" must be an object.', 'gutenberg' ), $subtree ),
+					array(
+						'expected' => 'object',
+						'actual'   => static::get_type_name( $input[ $subtree ] ),
+					)
+				);
 				unset( $output[ $subtree ] );
 				continue;
 			}
 
-			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
+			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ], array( $subtree ), $diagnostics );
 
 			if ( 'settings' === $subtree ) {
 				// Preset leaves are untyped in VALID_SETTINGS, but consumers read `$preset['slug']` as a string.
@@ -309,6 +351,21 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 
 			if ( 'settings' === $subtree && array_key_exists( 'viewport', $input[ $subtree ] ) ) {
 				$result['viewport'] = static::sanitize_viewport_settings( $input[ $subtree ]['viewport'] );
+
+				if ( null !== $diagnostics && $result['viewport'] !== $input[ $subtree ]['viewport'] ) {
+					static::add_diagnostic(
+						$diagnostics,
+						'theme_json_invalid_viewport',
+						'type',
+						'coerced',
+						array( 'settings', 'viewport' ),
+						__( 'Viewport breakpoints were normalized, or replaced by the defaults because no valid breakpoint was found.', 'gutenberg' ),
+						array(
+							'actual'    => $input[ $subtree ]['viewport'],
+							'sanitized' => $result['viewport'],
+						)
+					);
+				}
 			}
 
 			if ( empty( $result ) ) {
@@ -328,19 +385,26 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 	 *
 	 * @since 5.8.0
 	 * @since 7.0.0 Added type validation for boolean values.
+	 * @since 7.2.0 Added the `$path` and `$diagnostics` parameters.
 	 *
-	 * @param array $tree   Input to process.
-	 * @param array $schema Schema to adhere to.
+	 * @param array $tree        Input to process.
+	 * @param array $schema      Schema to adhere to.
+	 * @param array $path        Optional. Path of `$tree` within the theme.json structure, used in diagnostics. Default empty.
+	 * @param array $diagnostics Optional. Collector for diagnostics, passed by reference. Default null, which collects nothing.
 	 * @return array The modified $tree.
 	 */
-	public static function remove_keys_not_in_schema( $tree, $schema ) {
+	public static function remove_keys_not_in_schema( $tree, $schema, $path = array(), &$diagnostics = null ) {
 		if ( ! is_array( $tree ) ) {
 			return $tree;
 		}
 
 		foreach ( $tree as $key => $value ) {
+			$key_path = null === $diagnostics ? $path : array_merge( $path, array( $key ) );
+
 			// Remove keys not in the schema or with null/empty values.
 			if ( ! array_key_exists( $key, $schema ) ) {
+				/* translators: 1: theme.json key, 2: dot-separated path to its parent. */
+				static::add_diagnostic( $diagnostics, 'theme_json_unknown_key', 'structure', 'dropped', $key_path, sprintf( __( 'Unknown key "%1$s" under "%2$s".', 'gutenberg' ), $key, implode( '.', $path ) ) );
 				unset( $tree[ $key ] );
 				continue;
 			}
@@ -349,6 +413,19 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 			if ( is_bool( $schema[ $key ] ) ) {
 				// Schema expects a boolean value - validate the input matches.
 				if ( ! is_bool( $value ) ) {
+					static::add_diagnostic(
+						$diagnostics,
+						'theme_json_invalid_type',
+						'type',
+						'dropped',
+						$key_path,
+						/* translators: %s: dot-separated theme.json path. */
+						sprintf( __( '"%s" must be a boolean.', 'gutenberg' ), implode( '.', $key_path ) ),
+						array(
+							'expected' => 'boolean',
+							'actual'   => static::get_type_name( $value ),
+						)
+					);
 					unset( $tree[ $key ] );
 					continue;
 				}
@@ -358,12 +435,25 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 
 			if ( is_array( $schema[ $key ] ) ) {
 				if ( ! is_array( $value ) ) {
+					static::add_diagnostic(
+						$diagnostics,
+						'theme_json_invalid_type',
+						'type',
+						'dropped',
+						$key_path,
+						/* translators: %s: dot-separated theme.json path. */
+						sprintf( __( '"%s" must be an object.', 'gutenberg' ), implode( '.', $key_path ) ),
+						array(
+							'expected' => 'object',
+							'actual'   => static::get_type_name( $value ),
+						)
+					);
 					unset( $tree[ $key ] );
 				} elseif ( wp_is_numeric_array( $value ) ) {
 					// If indexed, process each item in the array.
 					foreach ( $value as $item_key => $item_value ) {
 						if ( isset( $schema[ $key ][0] ) && is_array( $schema[ $key ][0] ) ) {
-							$tree[ $key ][ $item_key ] = self::remove_keys_not_in_schema( $item_value, $schema[ $key ][0] );
+							$tree[ $key ][ $item_key ] = self::remove_keys_not_in_schema( $item_value, $schema[ $key ][0], null === $diagnostics ? $path : array_merge( $key_path, array( $item_key ) ), $diagnostics );
 						} else {
 							// If the schema does not define a further structure, keep the value as is.
 							$tree[ $key ][ $item_key ] = $item_value;
@@ -371,7 +461,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 					}
 				} else {
 					// If associative, process as a single object.
-					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ] );
+					$tree[ $key ] = self::remove_keys_not_in_schema( $value, $schema[ $key ], $key_path, $diagnostics );
 
 					if ( empty( $tree[ $key ] ) ) {
 						unset( $tree[ $key ] );
@@ -427,6 +517,117 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 			$schema_in_root_and_per_origin[ $origin ] = $schema;
 		}
 		return $schema_in_root_and_per_origin;
+	}
+
+	/**
+	 * Reports block names and block style variation names that are not registered, and removes them.
+	 *
+	 * The sanitization schema is only built for registered names, so without this step they would be
+	 * reported as unknown keys. Removing them here, and the containers that become empty, matches what
+	 * `remove_keys_not_in_schema()` would do, so the sanitized output does not change. Numeric lists are
+	 * left alone because the walk keeps them as they are.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param array $input             Structure to sanitize.
+	 * @param array $valid_block_names List of valid block names.
+	 * @param array $valid_variations  List of valid variations per block.
+	 * @param array $diagnostics       Collector for diagnostics, passed by reference.
+	 * @return array The structure without the unregistered names.
+	 */
+	private static function report_unregistered_names( $input, $valid_block_names, $valid_variations, &$diagnostics ) {
+		foreach ( array( 'settings', 'styles' ) as $subtree ) {
+			if ( ! isset( $input[ $subtree ]['blocks'] ) || ! is_array( $input[ $subtree ]['blocks'] ) || wp_is_numeric_array( $input[ $subtree ]['blocks'] ) ) {
+				continue;
+			}
+
+			foreach ( array_keys( $input[ $subtree ]['blocks'] ) as $block_name ) {
+				if ( ! in_array( $block_name, $valid_block_names, true ) ) {
+					/* translators: %s: block name. */
+					static::add_diagnostic( $diagnostics, 'theme_json_unregistered_block', 'structure', 'dropped', array( $subtree, 'blocks', $block_name ), sprintf( __( 'Block "%s" is not registered.', 'gutenberg' ), $block_name ) );
+					unset( $input[ $subtree ]['blocks'][ $block_name ] );
+					continue;
+				}
+
+				if ( 'styles' !== $subtree || ! isset( $input['styles']['blocks'][ $block_name ]['variations'] ) || ! is_array( $input['styles']['blocks'][ $block_name ]['variations'] ) || wp_is_numeric_array( $input['styles']['blocks'][ $block_name ]['variations'] ) ) {
+					continue;
+				}
+
+				foreach ( array_keys( $input['styles']['blocks'][ $block_name ]['variations'] ) as $variation_name ) {
+					if ( ! in_array( $variation_name, $valid_variations[ $block_name ] ?? array(), true ) ) {
+						/* translators: 1: block style variation name, 2: block name. */
+						static::add_diagnostic( $diagnostics, 'theme_json_unregistered_variation', 'structure', 'dropped', array( 'styles', 'blocks', $block_name, 'variations', $variation_name ), sprintf( __( 'Block style variation "%1$s" is not registered for block "%2$s".', 'gutenberg' ), $variation_name, $block_name ) );
+						unset( $input['styles']['blocks'][ $block_name ]['variations'][ $variation_name ] );
+					}
+				}
+
+				if ( empty( $input['styles']['blocks'][ $block_name ]['variations'] ) ) {
+					unset( $input['styles']['blocks'][ $block_name ]['variations'] );
+				}
+				if ( empty( $input['styles']['blocks'][ $block_name ] ) ) {
+					unset( $input['styles']['blocks'][ $block_name ] );
+				}
+			}
+
+			if ( empty( $input[ $subtree ]['blocks'] ) ) {
+				unset( $input[ $subtree ]['blocks'] );
+			}
+		}
+
+		return $input;
+	}
+
+	/**
+	 * Appends a diagnostic to the collector, when one was provided.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param array|null $diagnostics Collector passed by reference, or null when not collecting.
+	 * @param string     $code        Diagnostic code, prefixed with `theme_json_`.
+	 * @param string     $category    What kind of rule was applied: `structure` or `type`.
+	 * @param string     $severity    What happened to the value: `dropped` or `coerced`.
+	 * @param array      $path        Path to the value in the theme.json structure. Empty for the whole structure.
+	 * @param string     $message     Human readable description.
+	 * @param array      $data        Optional. Additional data, such as the expected and actual types. Default empty.
+	 */
+	public static function add_diagnostic( &$diagnostics, $code, $category, $severity, $path, $message, $data = array() ) {
+		if ( null === $diagnostics ) {
+			return;
+		}
+
+		$diagnostics[] = array(
+			'code'     => $code,
+			'category' => $category,
+			'severity' => $severity,
+			'path'     => $path,
+			'message'  => $message,
+			'data'     => $data,
+		);
+	}
+
+	/**
+	 * Returns the JSON type name of a value, for diagnostics.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param mixed $value Value to describe.
+	 * @return string One of `object`, `array`, `string`, `number`, `boolean` or `null`.
+	 */
+	private static function get_type_name( $value ) {
+		if ( is_array( $value ) ) {
+			return wp_is_numeric_array( $value ) ? 'array' : 'object';
+		}
+		if ( is_int( $value ) || is_float( $value ) ) {
+			return 'number';
+		}
+		if ( is_bool( $value ) ) {
+			return 'boolean';
+		}
+		if ( null === $value ) {
+			return 'null';
+		}
+
+		return 'string';
 	}
 
 	/**
