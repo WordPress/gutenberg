@@ -2,6 +2,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import type { BlockEditorThunkArgs } from '../store/types';
 
 /**
  * A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
@@ -9,19 +10,21 @@ import { unlock } from '../lock-unlock';
  * - If we most recently changed the zoom level for them (in or out), we always resetZoomLevel() level when unmounting.
  * - If the user most recently changed the zoom level (manually toggling), we do nothing when unmounting.
  *
- * @param {boolean} enabled If we should enter into zoomOut mode or not
+ * @param enabled If we should enter into zoomOut mode or not
  */
-export function useZoomOut( enabled = true ) {
-	const { setZoomLevel, resetZoomLevel } = unlock(
-		useDispatch( blockEditorStore )
-	);
+export function useZoomOut( enabled: boolean = true ): void {
+	const { setZoomLevel, resetZoomLevel } = unlock<
+		BlockEditorThunkArgs[ 'dispatch' ]
+	>( useDispatch( blockEditorStore ) );
 
 	/**
 	 * We need access to both the value and the function. The value is to trigger a useEffect hook
 	 * and the function is to check zoom out within another hook without triggering a re-render.
 	 */
 	const { isZoomedOut, isZoomOut } = useSelect( ( select ) => {
-		const { isZoomOut: _isZoomOut } = unlock( select( blockEditorStore ) );
+		const { isZoomOut: _isZoomOut } = unlock<
+			BlockEditorThunkArgs[ 'select' ]
+		>( select( blockEditorStore ) );
 		return {
 			isZoomedOut: _isZoomOut(),
 			isZoomOut: _isZoomOut,
