@@ -11,6 +11,8 @@ export const PLUGIN_FILES = [
 	'packages/block-serialization-default-parser/*.php',
 	'packages/icons/src/manifest.php',
 	'packages/icons/src/library/*.svg',
+	'packages/ui/build-php/manifest.php',
+	'packages/ui/build-php/style.css',
 	'build',
 	'build-module',
 	'readme.txt',
