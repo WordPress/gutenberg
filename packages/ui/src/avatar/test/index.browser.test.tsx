@@ -71,7 +71,7 @@ describe( 'Avatar layout', () => {
 	} );
 
 	it.each( [ 'circle', 'square' ] as const )(
-		'crops the person shoulders at the frame and keeps the head centered with shape=%s',
+		'joins the person head to the torso and crops the shoulders at the frame with shape=%s',
 		async ( shape ) => {
 			await renderGallery( shape, 'person' );
 			for ( const size of sizes ) {
@@ -98,6 +98,9 @@ describe( 'Avatar layout', () => {
 				expect( head.top - stroke / 2 ).toBeGreaterThan( frame.top );
 				expect( head.left - stroke / 2 ).toBeGreaterThan( frame.left );
 				expect( head.right + stroke / 2 ).toBeLessThan( frame.right );
+				expect( head.bottom + stroke / 2 ).toBeGreaterThanOrEqual(
+					torso.top - stroke / 2
+				);
 				expect(
 					Math.abs(
 						head.left +
