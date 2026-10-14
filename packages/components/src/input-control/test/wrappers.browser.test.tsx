@@ -1,5 +1,6 @@
 import { expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
 import { createRef } from '@wordpress/element';
 import InputControlPrefixWrapper from '../input-prefix-wrapper';
 import InputControlSuffixWrapper from '../input-suffix-wrapper';
@@ -9,9 +10,9 @@ it.each( [
 	{ name: 'suffix', Component: InputControlSuffixWrapper },
 ] )(
 	'preserves the $name wrapper element, ref, and consumer props',
-	( { name, Component } ) => {
+	async ( { name, Component } ) => {
 		const ref = createRef< HTMLSpanElement >();
-		render(
+		await render(
 			<Component
 				as="span"
 				ref={ ref }
