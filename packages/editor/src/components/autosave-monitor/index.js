@@ -70,9 +70,9 @@ function IntervalAutosaveMonitor( { interval, autosave } ) {
 }
 
 /**
- * Autosaves to the server at the time stored in the editor store. A time is
- * only stored while an autosave is needed, so whatever shows the time until
- * the next autosave matches the request that follows.
+ * Autosaves to the server once `interval` seconds have passed while an
+ * autosave is needed. The time of the next autosave is stored in the editor
+ * store, so the countdown in the notice matches the request that follows.
  *
  * @param {Object} props          The component props.
  * @param {number} props.interval Time in seconds between autosaves.
@@ -84,81 +84,46 @@ function ScheduledAutosaveMonitor( { interval } ) {
 
 	// Reference of the edits last sent in an autosave.
 	const lastEditsReferenceRef = useRef();
-	// Interval the stored time was computed with.
-	const scheduledIntervalRef = useRef();
 
-	const { nextAutosaveTime, isSaving, needsAutosave } = useSelect(
-		( select ) => {
-			const {
-				isEditedPostDirty,
-				isEditedPostAutosaveable,
-				isSavingPost,
-				didPostSaveRequestFail,
-			} = select( editorStore );
-			return {
-				nextAutosaveTime: unlock(
-					select( editorStore )
-				).getNextAutosaveTime(),
-				isSaving: isSavingPost(),
-				needsAutosave:
-					isEditedPostDirty() &&
-					isEditedPostAutosaveable() &&
-					( select( coreStore ).getReferenceByDistinctEdits() !==
-						lastEditsReferenceRef.current ||
-						didPostSaveRequestFail() ),
-			};
-		},
-		[]
-	);
+	const { isSaving, needsAutosave } = useSelect( ( select ) => {
+		const {
+			isEditedPostDirty,
+			isEditedPostAutosaveable,
+			isSavingPost,
+			didPostSaveRequestFail,
+		} = select( editorStore );
+		return {
+			isSaving: isSavingPost(),
+			needsAutosave:
+				isEditedPostDirty() &&
+				isEditedPostAutosaveable() &&
+				( select( coreStore ).getReferenceByDistinctEdits() !==
+					lastEditsReferenceRef.current ||
+					didPostSaveRequestFail() ),
+		};
+	}, [] );
 
 	useEffect( () => {
 		if ( isSaving || ! needsAutosave || ! interval ) {
-			if ( nextAutosaveTime !== null ) {
-				setNextAutosaveTime( null );
-			}
 			return;
 		}
-		if (
-			nextAutosaveTime === null ||
-			scheduledIntervalRef.current !== interval
-		) {
-			scheduledIntervalRef.current = interval;
-			setNextAutosaveTime( Date.now() + interval * 1000 );
-		}
+		setNextAutosaveTime( Date.now() + interval * 1000 );
+		const timeout = setTimeout( () => {
+			autosave();
+			lastEditsReferenceRef.current = getReferenceByDistinctEdits();
+		}, interval * 1000 );
+		return () => {
+			clearTimeout( timeout );
+			setNextAutosaveTime( null );
+		};
 	}, [
 		isSaving,
 		needsAutosave,
 		interval,
-		nextAutosaveTime,
-		setNextAutosaveTime,
-	] );
-
-	useEffect( () => {
-		if ( nextAutosaveTime === null ) {
-			return;
-		}
-		const timeout = setTimeout(
-			() => {
-				// Starting the autosave marks the post as saving in the same
-				// tick, before the scheduled time is cleared.
-				autosave();
-				lastEditsReferenceRef.current = getReferenceByDistinctEdits();
-				setNextAutosaveTime( null );
-			},
-			Math.max( 0, nextAutosaveTime - Date.now() )
-		);
-		return () => clearTimeout( timeout );
-	}, [
-		nextAutosaveTime,
 		autosave,
 		getReferenceByDistinctEdits,
 		setNextAutosaveTime,
 	] );
-
-	useEffect(
-		() => () => setNextAutosaveTime( null ),
-		[ setNextAutosaveTime ]
-	);
 
 	return null;
 }
