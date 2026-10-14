@@ -226,16 +226,22 @@ describe( 'useActions', () => {
 		} );
 	} );
 
-	it( 'returns no actions when the request fails', async () => {
-		vi.mocked( apiFetch ).mockRejectedValue( {
+	it( 'returns no actions and reports it when the request fails', async () => {
+		const error = {
 			code: 'rest_forbidden',
 			message: 'Sorry, you are not allowed to do that.',
 			data: { status: 403 },
-		} );
+		};
+		vi.mocked( apiFetch ).mockRejectedValue( error );
 
 		const { result } = renderUseActions();
 
-		await waitFor( () => expect( apiFetch ).toHaveBeenCalled() );
+		await waitFor( () =>
+			expect( console ).toHaveWarnedWith(
+				'Could not load the actions of postType/page.',
+				error
+			)
+		);
 		expect( result.current ).toEqual( [] );
 	} );
 } );

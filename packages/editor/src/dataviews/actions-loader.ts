@@ -155,7 +155,7 @@ function getResolvedActions< Item >(
  * @param entity.kind Entity kind (e.g. `postType`).
  * @param entity.name Entity name (e.g. `page`).
  * @return The actions, in the server order. Empty until they load, or when
- *         they cannot be requested.
+ *         they cannot be requested, which is reported.
  */
 export function useActions< Item = any >( {
 	kind,
@@ -164,12 +164,32 @@ export function useActions< Item = any >( {
 	kind: string;
 	name: string;
 } ): Action< Item >[] {
-	const config = useSelect(
-		( select ) =>
-			unlock( select( coreStore ) ).getActionsConfig( kind, name ) as
-				ActionsConfig | undefined,
+	const { config, error } = useSelect(
+		( select ) => {
+			const { getActionsConfig, getResolutionError } = unlock(
+				select( coreStore )
+			);
+			return {
+				config: getActionsConfig( kind, name ) as
+					ActionsConfig | undefined,
+				error: getResolutionError( 'getActionsConfig', [
+					kind,
+					name,
+				] ) as unknown,
+			};
+		},
 		[ kind, name ]
 	);
+
+	useEffect( () => {
+		if ( error ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				`Could not load the actions of ${ kind }/${ name }.`,
+				error
+			);
+		}
+	}, [ error, kind, name ] );
 
 	const [ resolved, setResolved ] = useState< {
 		config: ActionsConfig;
