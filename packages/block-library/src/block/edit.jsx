@@ -283,24 +283,24 @@ function ReusableBlockEdit( {
 	return (
 		<>
 			{ ! isResolving && ! isMissing && (
-				<EditOriginalInspectorButton
-					clientId={ clientId }
-					postType="wp_block"
-					postId={ ref }
-				/>
-			) }
-			{ ! isResolving && ! isMissing && (
-				<ReusableBlockControl
-					recordId={ ref }
-					canOverrideBlocks={ canOverrideBlocks }
-					hasContent={ !! content }
-					handleEditOriginal={
-						onNavigateToEntityRecord
-							? handleEditOriginal
-							: undefined
-					}
-					resetContent={ resetContent }
-				/>
+				<>
+					<EditOriginalInspectorButton
+						clientId={ clientId }
+						postType="wp_block"
+						postId={ ref }
+					/>
+					<ReusableBlockControl
+						recordId={ ref }
+						canOverrideBlocks={ canOverrideBlocks }
+						hasContent={ !! content }
+						handleEditOriginal={
+							onNavigateToEntityRecord
+								? handleEditOriginal
+								: undefined
+						}
+						resetContent={ resetContent }
+					/>
+				</>
 			) }
 
 			{ children === null ? (
