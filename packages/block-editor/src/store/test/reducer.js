@@ -2621,6 +2621,74 @@ describe( 'state', () => {
 					).toEqual( [ 'content-inner' ] );
 				} );
 
+				it( 'should keep the controlled inner blocks references across RESET_BLOCKS when the sub-trees are preserved', () => {
+					const resetAction = {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					};
+					let state = blocks( undefined, resetAction );
+					// A controlled block (`chicken`) with a nested controlled
+					// block (`content`), like a template part holding a
+					// navigation block.
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'chicken',
+						blocks: [
+							{
+								clientId: 'content',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+					state = blocks( state, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'content',
+						hasControlledInnerBlocks: true,
+					} );
+					state = blocks( state, {
+						type: 'REPLACE_INNER_BLOCKS',
+						rootClientId: 'content',
+						blocks: [
+							{
+								clientId: 'content-inner',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+					const before = { blocks: state };
+
+					const after = { blocks: blocks( state, resetAction ) };
+
+					// Nothing under the controlled blocks changed, so their
+					// block lists keep their references and the controllers
+					// syncing them do not see a change.
+					expect( getBlocks( after, 'chicken' ) ).toBe(
+						getBlocks( before, 'chicken' )
+					);
+					expect( getBlocks( after, 'content' ) ).toBe(
+						getBlocks( before, 'content' )
+					);
+					expect(
+						getBlocks( after, 'content' ).map( ( b ) => b.clientId )
+					).toEqual( [ 'content-inner' ] );
+				} );
+
 				it( 'should forget controlledInnerBlocks during full RESET_BLOCKS', () => {
 					const templateBlock = {
 						clientId: 'template',
