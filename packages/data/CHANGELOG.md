@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Internal
+
+-   Declare the persistence plugin's `persist` option on `ReduxStoreConfig`, so typed stores can pass it ([#84676](https://github.com/WordPress/gutenberg/pull/84676)).
+
 ## 10.57.0 (2026-10-07)
 
 ### Bug Fixes
