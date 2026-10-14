@@ -3,6 +3,8 @@ import { getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import type { BlockGapValue } from '../hooks/types';
+import type { Layout, LayoutAlignment, LayoutStyleArgs } from './types';
 
 export default {
 	name: 'default',
@@ -22,12 +24,14 @@ export default {
 		blockName,
 		hasBlockGapSupport,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
-	} ) {
-		const blockGapStyleValue = style?.spacing?.blockGap;
+	}: LayoutStyleArgs ): string {
+		// The `style` attribute is not validated; a string gap reads `top` as undefined.
+		const blockGapStyleValue = style?.spacing?.blockGap as
+			( BlockGapValue & { top?: string } ) | undefined;
 
 		// If a block's block.json skips serialization for spacing or
 		// spacing.blockGap, don't apply the user-defined value to the styles.
-		let blockGapValue = '';
+		let blockGapValue: string | null = '';
 		if ( ! shouldSkipSerialization( blockName, 'spacing', 'blockGap' ) ) {
 			// If an object is provided only use the 'top' value for this kind of gap.
 			if ( blockGapStyleValue?.top ) {
@@ -50,10 +54,13 @@ export default {
 		}
 		return output;
 	},
-	getOrientation() {
+	getOrientation(): string {
 		return 'vertical';
 	},
-	getAlignments( layout, isBlockBasedTheme ) {
+	getAlignments(
+		layout: Layout,
+		isBlockBasedTheme?: boolean
+	): LayoutAlignment[] {
 		const alignmentInfo = getAlignmentsInfo( layout );
 		if ( layout.alignments !== undefined ) {
 			if ( ! layout.alignments.includes( 'none' ) ) {
@@ -65,7 +72,7 @@ export default {
 			} ) );
 		}
 
-		const alignments = [
+		const alignments: LayoutAlignment[] = [
 			{ name: 'left' },
 			{ name: 'center' },
 			{ name: 'right' },
