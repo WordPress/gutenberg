@@ -32,7 +32,6 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const drafts = useContext( NoteDraftsContext );
 	const pickNote = usePickNote( { drafts, onDiscard } );
-	useNoteFocus( { sidebarRef } );
 
 	const { selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
@@ -123,6 +122,10 @@ export function Notes( { notes, sidebarRef, isFloating = false } ) {
 			isFloating,
 			sidebarRef,
 		} );
+	useNoteFocus( {
+		sidebarRef,
+		isPlaced: ! isFloating || notePositions[ selectedNote ] !== undefined,
+	} );
 
 	const navigate = ( event, thread, isSelected ) => {
 		if ( event.defaultPrevented ) {

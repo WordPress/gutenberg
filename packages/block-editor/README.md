@@ -126,11 +126,12 @@ Block breadcrumb component, displaying the hierarchy of the current block select
 _Parameters_
 
 - _props_ `Object`: Component props.
-- _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
+- _props.rootLabelText_ `[string]`: Translated label for the root element of the breadcrumb trail.
+- _props.className_ `[string]`: Additional class name for the breadcrumb navigation.
 
 _Returns_
 
-- `Element`: Block Breadcrumb.
+- `React.JSX.Element`: Block Breadcrumb.
 
 ### BlockCanvas
 
@@ -883,7 +884,7 @@ _Returns_
 
 ### privateApis
 
-Private @wordpress/block-editor APIs.
+Private `@wordpress/block-editor` APIs.
 
 ### RecursionProvider
 
