@@ -48,15 +48,26 @@ import type { BlockAttributes, BlockWithoutAttributes, State } from '../types';
 
 const { editableRootKey } = unlock( blocksPrivateApis );
 
-type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
+// The depth limit stops at recursive types such as block templates.
+type DeepPartial<
+	T,
+	Depth extends unknown[] = [],
+> = Depth[ 'length' ] extends 7
 	? T
-	: T extends Node
+	: T extends ( ...args: never[] ) => unknown
 		? T
-		: T extends Map< infer K, infer V >
-			? Map< K, DeepPartial< V > >
-			: T extends object
-				? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
-				: T;
+		: T extends Node
+			? T
+			: T extends Map< infer K, infer V >
+				? Map< K, DeepPartial< V, [ ...Depth, unknown ] > >
+				: T extends object
+					? {
+							[ P in keyof T ]?: DeepPartial<
+								T[ P ],
+								[ ...Depth, unknown ]
+							>;
+						}
+					: T;
 
 /*
  * Fixtures set only the fields the selector under test reads, down to the

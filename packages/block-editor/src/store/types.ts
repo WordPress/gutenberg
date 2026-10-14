@@ -1,8 +1,16 @@
-import type { Block, BlockTypeIcon, BlockVariation } from '@wordpress/blocks';
-import type { select as globalSelect } from '@wordpress/data';
+import type {
+	Block,
+	BlockTypeIcon,
+	BlockVariation,
+	synchronizeBlocksWithTemplate,
+} from '@wordpress/blocks';
+import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { BlockEditingMode } from '../components/block-editing-mode';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
-import type { InserterMediaCategory } from './actions';
+import type { WPDropOperation } from '../components/use-on-block-drop/types';
+import type { store } from '.';
+import type * as privateSelectors from './private-selectors';
+import type * as privateActions from './private-actions';
 import type {
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
@@ -55,7 +63,145 @@ export type TraversedBlock = Partial< Omit< TreeBlock, 'clientId' > > & {
 	clientId: string;
 };
 
-export type { BlockEditingMode, InserterMediaCategory };
+export type { BlockEditingMode };
+
+/**
+ * Interface for inserter media requests.
+ */
+export interface InserterMediaRequest {
+	/**
+	 * How many items to fetch per page.
+	 */
+	per_page: number;
+	/**
+	 * Which page of results to fetch. Defaults to the first page.
+	 */
+	page?: number;
+	/**
+	 * The search term to use for filtering the results.
+	 */
+	search: string;
+}
+
+/**
+ * Interface for inserter media responses. Any media resource should map their
+ * response to this interface, in order to create the core WordPress media
+ * blocks (image, video, audio).
+ */
+export interface InserterMediaItem {
+	/**
+	 * The title of the media item.
+	 */
+	title: string;
+	/**
+	 * The source url of the media item.
+	 */
+	url: string;
+	/**
+	 * The preview source url of the media item to display in the media list.
+	 */
+	previewUrl?: string;
+	/**
+	 * The WordPress id of the media item.
+	 */
+	id?: number;
+	/**
+	 * The id of the media item from external source.
+	 */
+	sourceId?: number | string;
+	/**
+	 * The alt text of the media item.
+	 */
+	alt?: string;
+	/**
+	 * The caption of the media item.
+	 */
+	caption?: string;
+}
+
+/**
+ * Interface for paginated inserter media responses.
+ */
+export interface InserterMediaResponse {
+	/**
+	 * The media items for the requested page.
+	 */
+	mediaItems: InserterMediaItem[];
+	/**
+	 * The total number of items across all pages.
+	 */
+	totalItems: number;
+	/**
+	 * The total number of pages available.
+	 */
+	totalPages: number;
+}
+
+/**
+ * Interface for inserter media category.
+ */
+export interface InserterMediaCategory {
+	/**
+	 * The name of the media category, that should be unique among all media
+	 * categories.
+	 */
+	name: string;
+	/**
+	 * Labels for the media category.
+	 */
+	labels: {
+		/**
+		 * General name of the media category. It's used in the inserter media
+		 * items list.
+		 */
+		name: string;
+		/**
+		 * Label for searching items. Default is ‘Search Posts’ / ‘Search Pages’.
+		 */
+		search_items?: string;
+	};
+	/**
+	 * The media type of the media category.
+	 */
+	mediaType: 'image' | 'audio' | 'video';
+	/**
+	 * The function to fetch media items for the category. Returning an
+	 * `InserterMediaResponse` instead of a plain array opts the category into
+	 * pagination.
+	 */
+	fetch: (
+		query: InserterMediaRequest
+	) => Promise< InserterMediaItem[] | InserterMediaResponse >;
+	/**
+	 * If the media category supports reporting media items, this function
+	 * should return the report url for the media item.
+	 */
+	getReportUrl?: ( item: InserterMediaItem ) => string;
+	/**
+	 * If the media category is an external resource, this should be set to
+	 * true, to avoid requesting it to check whether it has items to display.
+	 */
+	isExternalResource?: boolean;
+	/**
+	 * Optional message shown in place of the generic "No results found." when
+	 * the source has no items and there is no active search.
+	 */
+	emptyMessage?: string;
+}
+
+/**
+ * A selection object.
+ */
+export interface Selection {
+	/**
+	 * The selection start.
+	 */
+	start: BlockSelection;
+	/**
+	 * The selection end.
+	 */
+	end: BlockSelection;
+}
 
 export interface BlockSelection {
 	/**
@@ -166,7 +312,33 @@ export type HistoryMode = 'merge' | 'ignore';
 
 export type BlockListSettings = Record< string, unknown > & {
 	templateLock?: string | false;
+	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
+	directInsert?: boolean;
 };
+
+export interface ShowInsertionPointOptions {
+	/**
+	 * Whether or not to show an inserter button.
+	 */
+	__unstableWithInserter?: boolean;
+	/**
+	 * The operation to perform when applied, either 'insert' or 'replace'.
+	 */
+	operation?: WPDropOperation;
+	nearestSide?: string;
+}
+
+export type SettingsByClientId = Record<
+	string,
+	BlockListSettings | undefined
+>;
+
+/**
+ * A block template: block names with their attributes and inner templates.
+ */
+export type BlockTemplate = NonNullable<
+	Parameters< typeof synchronizeBlocksWithTemplate >[ 1 ]
+>;
 
 /**
  * The editor settings, with the fields the store itself reads.
@@ -178,7 +350,7 @@ export type Settings = Record< string | symbol, unknown > & {
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
-	template?: unknown[];
+	template?: BlockTemplate;
 	templateLock?: string | false;
 	__experimentalBlockPatterns?: BlockPattern[];
 	__experimentalFeatures?: { viewport?: unknown };
@@ -196,6 +368,13 @@ export type Settings = Record< string | symbol, unknown > & {
 		select: typeof globalSelect
 	) => UserPatternCategory[];
 };
+
+/**
+ * A reference to the element that had focus when focus left the editor canvas.
+ */
+export interface LastFocus {
+	current: HTMLElement | SVGElement | null;
+}
 
 export interface StyleOverride {
 	clientId?: string;
@@ -297,7 +476,7 @@ export interface State {
 		insertUsage: Record< string, { time?: number; count: number } >;
 	};
 	lastBlockAttributesChange: Record< string, BlockAttributes > | null;
-	lastFocus: HTMLElement | null | false;
+	lastFocus: LastFocus | null | false;
 	expandedBlock: string | null;
 	highlightedBlock: string | null | undefined;
 	lastBlockInserted: { clientIds?: string[]; source?: string };
@@ -352,7 +531,7 @@ export type Action =
 			meta?: BlocksMeta;
 			time?: number;
 	  }
-	| { type: 'LAST_FOCUS'; lastFocus: HTMLElement | null | false }
+	| { type: 'LAST_FOCUS'; lastFocus: LastFocus | null | false }
 	| { type: 'MARK_AUTOMATIC_CHANGE' }
 	| { type: 'MARK_AUTOMATIC_CHANGE_FINAL' }
 	| { type: 'MARK_LAST_CHANGE_AS_PERSISTENT' }
@@ -529,3 +708,13 @@ export type Action =
 export type RemoveBlocksAction = Extract< Action, { type: 'REMOVE_BLOCKS' } >;
 
 export type Reducer< S > = ( state: S | undefined, action: Action ) => S;
+
+/**
+ * Thunk arguments for the block editor store, including private selectors
+ * and actions.
+ */
+export type BlockEditorThunkArgs = ThunkArgs<
+	typeof store,
+	Omit< typeof privateSelectors, 'DEFAULT_BLOCK_STYLE_STATE' >,
+	typeof privateActions
+>;
