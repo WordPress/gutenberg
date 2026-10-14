@@ -2,10 +2,12 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import { page } from 'vitest/browser';
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import '@wordpress/theme/design-tokens.css';
 import * as Dialog from '..';
 import { ThemeProvider } from '../../utils/theme-provider';
+
+type Size = NonNullable< ComponentProps< typeof Dialog.Popup >[ 'size' ] >;
 
 describe( 'Dialog sizing', () => {
 	function Example( {
@@ -158,26 +160,31 @@ describe( 'Dialog sizing', () => {
 	} );
 } );
 
-it.each( [
-	[ 'small', 400 ],
-	[ 'medium', 560 ],
-	[ 'large', 960 ],
-	[ 'stretch', 1152 ],
-	[ 'full', 1152 ],
-] as const )( 'keeps the Dialog %s preset width', async ( size, width ) => {
-	await page.viewport( 1200, 800 );
-	await render(
-		<ThemeProvider isRoot>
-			<Dialog.Root defaultOpen>
-				<Dialog.Popup size={ size }>
-					<Dialog.Title>Preview</Dialog.Title>
-					<Dialog.Action>Close</Dialog.Action>
-				</Dialog.Popup>
-			</Dialog.Root>
-		</ThemeProvider>
-	);
-	const popup = screen.getByRole( 'dialog', { name: 'Preview' } );
-	await expect
-		.poll( () => popup.getBoundingClientRect().width )
-		.toBe( width );
-} );
+const PRESET_WIDTHS = {
+	small: 400,
+	medium: 560,
+	large: 960,
+	stretch: 1152,
+	full: 1152,
+} satisfies Record< Exclude< Size, 'auto' >, number >;
+
+it.each( Object.entries( PRESET_WIDTHS ) )(
+	'keeps the Dialog %s preset width',
+	async ( size, width ) => {
+		await page.viewport( 1200, 800 );
+		await render(
+			<ThemeProvider isRoot>
+				<Dialog.Root defaultOpen>
+					<Dialog.Popup size={ size as keyof typeof PRESET_WIDTHS }>
+						<Dialog.Title>Preview</Dialog.Title>
+						<Dialog.Action>Close</Dialog.Action>
+					</Dialog.Popup>
+				</Dialog.Root>
+			</ThemeProvider>
+		);
+		const popup = screen.getByRole( 'dialog', { name: 'Preview' } );
+		await expect
+			.poll( () => popup.getBoundingClientRect().width )
+			.toBe( width );
+	}
+);

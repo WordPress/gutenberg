@@ -3,10 +3,10 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-/** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
-/** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
-/** @typedef {import('../../../store/actions').InserterMediaCategory} InserterMediaCategory */
-/** @typedef {import('../../../store/actions').InserterMediaResponse} InserterMediaResponse */
+/** @typedef {import('../../../store/types').InserterMediaRequest} InserterMediaRequest */
+/** @typedef {import('../../../store/types').InserterMediaItem} InserterMediaItem */
+/** @typedef {import('../../../store/types').InserterMediaCategory} InserterMediaCategory */
+/** @typedef {import('../../../store/types').InserterMediaResponse} InserterMediaResponse */
 
 /**
  * Normalizes the result of a media category's `fetch`, which may be either a
