@@ -32,12 +32,12 @@ describe( 'controls', () => {
 
 			loadAsset( stylesheet );
 
-			const mirrored = iframe.contentDocument.getElementById(
-				'my-block-style'
-			);
+			const mirrored =
+				iframe.contentDocument.getElementById( 'my-block-style' );
 			expect( mirrored ).not.toBeNull();
-			expect( mirrored.rel ).toBe( 'stylesheet' );
-			expect( mirrored.getAttribute( 'href' ) ).toBe(
+			expect( mirrored ).toHaveAttribute( 'rel', 'stylesheet' );
+			expect( mirrored ).toHaveAttribute(
+				'href',
 				'https://example.com/my-block/style.css'
 			);
 		} );
