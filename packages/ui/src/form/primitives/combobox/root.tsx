@@ -15,14 +15,16 @@ export function Root<
 	Item = Value,
 >( props: ComboboxRootProps< Value, Multiple, Item > ) {
 	const iframeOutsidePressForwardingProps =
-		useIframeOutsidePressForwarding< _Combobox.Root.ChangeEventDetails >( {
-			defaultOpen: props.defaultOpen,
-			disabled: props.disabled,
-			modal: props.modal ?? false,
-			onOpenChange: ( nextOpen, eventDetails ) =>
-				props.onOpenChange?.( nextOpen, eventDetails ),
-			open: props.open,
-		} );
+		useIframeOutsidePressForwarding< _Combobox.Root.OpenChangeEventDetails >(
+			{
+				defaultOpen: props.defaultOpen,
+				disabled: props.disabled,
+				modal: props.modal ?? false,
+				onOpenChange: ( nextOpen, eventDetails ) =>
+					props.onOpenChange?.( nextOpen, eventDetails ),
+				open: props.open,
+			}
+		);
 
 	return (
 		<DirectionProvider>

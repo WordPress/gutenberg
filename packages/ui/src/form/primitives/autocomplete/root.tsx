@@ -17,7 +17,7 @@ export const Root: typeof _Autocomplete.Root = function Root(
 	props: AutocompleteRootProps
 ) {
 	const iframeOutsidePressForwardingProps =
-		useIframeOutsidePressForwarding< _Autocomplete.Root.ChangeEventDetails >(
+		useIframeOutsidePressForwarding< _Autocomplete.Root.OpenChangeEventDetails >(
 			{
 				defaultOpen: props.defaultOpen,
 				disabled: props.disabled,

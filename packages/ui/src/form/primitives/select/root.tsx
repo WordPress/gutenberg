@@ -18,14 +18,16 @@ import { useIframeOutsidePressForwarding } from '../../../utils/use-iframe-outsi
  */
 export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
 	const iframeOutsidePressForwardingProps =
-		useIframeOutsidePressForwarding< _Select.Root.ChangeEventDetails >( {
-			defaultOpen: props.defaultOpen,
-			disabled: props.disabled,
-			modal: props.modal ?? true,
-			onOpenChange: ( nextOpen, eventDetails ) =>
-				props.onOpenChange?.( nextOpen, eventDetails ),
-			open: props.open,
-		} );
+		useIframeOutsidePressForwarding< _Select.Root.OpenChangeEventDetails >(
+			{
+				defaultOpen: props.defaultOpen,
+				disabled: props.disabled,
+				modal: props.modal ?? true,
+				onOpenChange: ( nextOpen, eventDetails ) =>
+					props.onOpenChange?.( nextOpen, eventDetails ),
+				open: props.open,
+			}
+		);
 
 	return (
 		<DirectionProvider>
