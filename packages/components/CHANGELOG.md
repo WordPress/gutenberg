@@ -18,6 +18,7 @@
 
 ### Enhancements
 
+-   `ExternalLink`: Use a small border radius for consistent focus rings.
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
 
 ### Deprecations
