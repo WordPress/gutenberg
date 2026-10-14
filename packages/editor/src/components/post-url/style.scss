@@ -29,6 +29,11 @@
 		background: color-mix(in srgb, var(--wp-admin-theme-color) 4%, transparent);
 		color: var(--wp-admin-theme-color-darker-20, #183ad6);
 	}
+
+	&:focus {
+		// Keep the focus ring rounded, ExternalLink resets the radius on focus.
+		border-radius: $radius-small;
+	}
 }
 
 
