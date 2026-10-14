@@ -3,6 +3,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import {
 	buildScopedBlockSelector,
 	buildRootStyleStateSelector,
+	getCustomStateSelectorSuffix,
 } from '../state-utils';
 
 describe( 'buildScopedBlockSelector', () => {
@@ -177,5 +178,46 @@ describe( 'state selector builders', () => {
 		expect( buildRootStyleStateSelector( BASE, 'test/plain' ) ).toBe(
 			BASE
 		);
+	} );
+} );
+
+describe( 'getCustomStateSelectorSuffix', () => {
+	beforeEach( () => {
+		registerBlockType( 'test/link', {
+			apiVersion: 3,
+			title: 'Link',
+			category: 'text',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				states: {
+					'-current': ' .wp-block-navigation .current-menu-item ',
+					'-empty': '   ',
+				},
+			},
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( 'test/link' );
+	} );
+
+	it( 'wraps the selector the block declares for the state in :is()', () => {
+		expect( getCustomStateSelectorSuffix( 'test/link', '-current' ) ).toBe(
+			':is(.wp-block-navigation .current-menu-item)'
+		);
+	} );
+
+	it( 'returns null when the block declares no selector for the state', () => {
+		expect(
+			getCustomStateSelectorSuffix( 'test/link', '-active' )
+		).toBeNull();
+		expect(
+			getCustomStateSelectorSuffix( 'test/link', '-empty' )
+		).toBeNull();
+		expect(
+			getCustomStateSelectorSuffix( 'test/unknown', '-current' )
+		).toBeNull();
 	} );
 } );

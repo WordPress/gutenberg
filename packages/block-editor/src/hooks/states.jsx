@@ -47,6 +47,13 @@ export const VALID_BLOCK_PSEUDO_STATES = {
 	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
 };
 
+// Keep in sync with WP_Theme_JSON_Gutenberg::VALID_BLOCK_CUSTOM_STATES. Custom
+// states are matched by the selector the block declares for them in
+// `selectors.states` in block.json.
+export const VALID_BLOCK_CUSTOM_STATES = {
+	'core/navigation-link': [ '-current' ],
+};
+
 function getPseudoStateOptions( name ) {
 	const validStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
 
