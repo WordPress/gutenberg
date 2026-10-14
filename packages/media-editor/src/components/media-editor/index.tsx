@@ -6,8 +6,11 @@ import {
 	MenuItem,
 	Spinner as WCSpinner,
 	__experimentalConfirmDialog as ConfirmDialog,
+	Slot,
+	SlotFillProvider,
 } from '@wordpress/components';
 import { Stack, Tabs, VisuallyHidden } from '@wordpress/ui';
+import { PluginArea } from '@wordpress/plugins';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -51,6 +54,12 @@ import MediaEditorFineRotation from '../media-editor-fine-rotation';
 import MediaEditorCropPanel from '../media-editor-crop-panel';
 import MediaEditorImageControls from '../media-editor-image-controls';
 import MediaForm from '../media-form';
+import MediaEditorPanel, {
+	MediaEditorPanelsProvider,
+	getPanelSlotName,
+	useMediaEditorPanels,
+	type MediaEditorPanelFillProps,
+} from '../media-editor-panel';
 import { getMediaTypeFromMimeType } from '../../utils';
 import { MediaEditorStateProvider, useMediaEditor } from '../../state';
 import type { AspectRatioPreset } from '../../image-editor/core/constants';
@@ -78,10 +87,13 @@ const PLACEMENT_CONTROL_IDLE_MS = 300;
  * whether one is, so a further panel is a new id here and a new entry in the
  * tab list — not a change to the state's shape.
  */
-const DETAILS_PANEL = 'details';
+const DETAILS_PANEL = 'core/details';
 
 /** Identifier for the crop panel. Images only; other media has nothing to crop. */
-const CROP_PANEL = 'crop';
+const CROP_PANEL = 'core/crop';
+
+/** Crop applies to images only; other media has nothing to crop. */
+const CROP_MEDIA_TYPES = [ 'image' ] as const;
 
 interface MediaEditorTab {
 	id: string;
@@ -252,6 +264,27 @@ function useMediaEditorFrameContext(): MediaEditorFrameContextValue {
 		);
 	}
 	return context;
+}
+
+/**
+ * Core's Crop panel. The aspect-ratio presets are the host's, so they come
+ * from the frame context rather than from the session.
+ *
+ * @param props
+ * @param props.disabled
+ */
+function CropPanelContent( { disabled }: MediaEditorPanelFillProps ) {
+	const { aspectRatioPresets } = useMediaEditorFrameContext();
+	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
+		useCropOptions( { aspectRatioPresets } );
+	return (
+		<MediaEditorCropPanel
+			aspectRatioValue={ aspectRatioValue }
+			onAspectRatioChange={ setAspectRatioValue }
+			aspectRatioOptions={ aspectRatioOptions }
+			disabled={ disabled }
+		/>
+	);
 }
 
 export interface HeaderActionsProps {
@@ -728,8 +761,6 @@ function MediaEditorContent( {
 			setActivePanel( isWide ? lastPanelRef.current : null );
 		}
 	}, [ isWide, isImage ] );
-	const { aspectRatioValue, setAspectRatioValue, aspectRatioOptions } =
-		useCropOptions( { aspectRatioPresets } );
 	const { isSaving, save: saveMediaEditor } = useSaveMediaEditor( {
 		session,
 		id,
@@ -830,32 +861,25 @@ function MediaEditorContent( {
 			/>
 		) : null;
 
-	// Crop leads, since it is what the docked panel opens on. Non-image media
-	// has nothing to crop and gets Details alone, which is why the sidebar
-	// takes this list rather than deriving it.
-	const tabs: MediaEditorTab[] = [
-		...( isImage
-			? [
-					{
-						id: CROP_PANEL,
-						title: __( 'Crop' ),
-						render: () => (
-							<MediaEditorCropPanel
-								aspectRatioValue={ aspectRatioValue }
-								onAspectRatioChange={ setAspectRatioValue }
-								aspectRatioOptions={ aspectRatioOptions }
-								disabled={ isSaving }
-							/>
-						),
-					},
-				]
-			: [] ),
-		{
-			id: DETAILS_PANEL,
-			title: __( 'Details' ),
-			render: () => <MediaForm />,
-		},
-	];
+	// The mounted panels that apply to this media, in panel order: Crop
+	// leads for images, since it is what the docked panel opens on, and
+	// non-image media gets Details alone.
+	const { panels, contextValue: panelsContextValue } = useMediaEditorPanels();
+	const tabs: MediaEditorTab[] = panels
+		.filter(
+			( panel ) =>
+				! panel.mediaTypes || panel.mediaTypes.includes( mediaType )
+		)
+		.map( ( panel ) => ( {
+			id: panel.name,
+			title: panel.title,
+			render: () => (
+				<Slot
+					name={ getPanelSlotName( panel.name ) }
+					fillProps={ { disabled: isSaving } }
+				/>
+			),
+		} ) );
 
 	const ruler = isImage ? (
 		<MediaEditorFineRotation
@@ -922,7 +946,7 @@ function MediaEditorContent( {
 								</div>
 							) }
 						</NavigableRegion>
-						{ !! activePanel && (
+						{ !! activePanel && tabs.length > 0 && (
 							<MediaEditorSidebar
 								tabs={ tabs }
 								// Swapping the edited media can drop the Crop
@@ -989,7 +1013,39 @@ function MediaEditorContent( {
 	return (
 		<MediaEditorFrameContext.Provider value={ contextValue }>
 			{ renderFrame( {
-				children,
+				children: (
+					<SlotFillProvider>
+						<MediaEditorPanelsProvider value={ panelsContextValue }>
+							{ /* Core's panels and plugins' panels arrive the same
+							     way: components that announce a tab and fill it.
+							     `PluginArea` mounts `registerPlugin` callbacks for
+							     this scope here, inside the session provider, so
+							     plugin panels get the session from
+							     `useMediaEditor()`. Each panel's content renders
+							     at its slot in the sidebar, inside
+							     `MediaEditorProvider`. */ }
+							<MediaEditorPanel
+								name={ CROP_PANEL }
+								title={ __( 'Crop' ) }
+								order={ 10 }
+								mediaTypes={ CROP_MEDIA_TYPES }
+							>
+								{ ( { disabled } ) => (
+									<CropPanelContent disabled={ disabled } />
+								) }
+							</MediaEditorPanel>
+							<MediaEditorPanel
+								name={ DETAILS_PANEL }
+								title={ __( 'Details' ) }
+								order={ 20 }
+							>
+								<MediaForm />
+							</MediaEditorPanel>
+							<PluginArea scope="media-editor" />
+							{ children }
+						</MediaEditorPanelsProvider>
+					</SlotFillProvider>
+				),
 				isImage,
 				layout,
 				onRequestClose: handleRequestClose,
