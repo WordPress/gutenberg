@@ -70,7 +70,7 @@ function gutenberg_exclude_block_comments_from_admin_7_2( $clauses, WP_Comment_Q
 
 	return $clauses;
 }
-add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_2', 10, 2 );
+add_filter( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_2', 10, 2 );
 
 /**
  * Excludes internal comment types from comment feeds.
