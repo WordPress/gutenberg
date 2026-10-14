@@ -110,6 +110,11 @@ function gutenberg_initialize_experiments_settings() {
 					'description' => __( 'Styles wp-admin from WordPress Design System tokens, so every admin screen reads as one product regardless of how it is rendered. No markup changes. (Warning: this can change how plugin styles apply to admin screens, and it loads admin stylesheets one by one instead of combined. Use it for testing, not on a live site.)', 'gutenberg' ),
 				),
 				array(
+					'id'          => 'gutenberg-ui-php-components',
+					'label'       => __( 'UI components for PHP screens', 'gutenberg' ),
+					'description' => __( 'Lets PHP-rendered admin screens render @wordpress/ui components.', 'gutenberg' ),
+				),
+				array(
 					'id'          => 'gutenberg-dashboard-widgets',
 					'label'       => __( 'New Dashboard experience', 'gutenberg' ),
 					'description' => __( 'Enables a new dashboard experience with resizable, reorderable widgets that plugins can register and users can personalize.', 'gutenberg' ),
