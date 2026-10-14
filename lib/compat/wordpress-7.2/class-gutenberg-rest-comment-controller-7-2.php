@@ -338,6 +338,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			return $comment;
 		}
 
+		// START CHANGE: Only the author can remove a reaction.
 		if ( 'reaction' === $comment->comment_type && get_current_user_id() !== (int) $comment->user_id ) {
 			return new WP_Error(
 				'rest_cannot_delete',
@@ -345,6 +346,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 				array( 'status' => rest_authorization_required_code() )
 			);
 		}
+		// END CHANGE.
 
 		return parent::delete_item_permissions_check( $request );
 	}
