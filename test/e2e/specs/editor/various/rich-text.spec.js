@@ -999,33 +999,43 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should replace non-breaking spaces from the toolbar', async ( {
+	test( 'should replace selected non-breaking spaces from the toolbar', async ( {
 		page,
 		editor,
 		pageUtils,
 	} ) => {
+		const button = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Replace non-breaking spaces' } );
+
 		await editor.insertBlock( { name: 'core/paragraph' } );
 		await page.keyboard.type( 'one' );
 		await pageUtils.pressKeys( 'primaryShift+Space' );
-		await page.keyboard.type( 'two' );
+		await editor.showBlockToolbar();
+		await expect( button ).toBeVisible();
 
-		await editor.clickBlockToolbarButton( 'Replace non-breaking spaces' );
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/paragraph', attributes: { content: 'one two' } },
-			] );
-		await expect(
-			page
-				.getByRole( 'toolbar', { name: 'Block tools' } )
-				.getByRole( 'button', { name: 'Replace non-breaking spaces' } )
-		).toHaveCount( 0 );
+		await page.keyboard.type( 'two' );
+		await pageUtils.pressKeys( 'primaryShift+Space' );
+		await page.keyboard.type( 'three' );
+		await editor.showBlockToolbar();
+		await expect( button ).toHaveCount( 0 );
+
+		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
+		await button.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one\u00a0two three' },
+			},
+		] );
+		await expect( button ).toHaveCount( 0 );
 
 		await page.keyboard.type( '!' );
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [
-				{ name: 'core/paragraph', attributes: { content: 'one two!' } },
-			] );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'one\u00a0two!' },
+			},
+		] );
 	} );
 } );

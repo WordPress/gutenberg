@@ -19,6 +19,18 @@ const icon = (
 	</SVG>
 );
 
+// The selected text, or the characters on both sides of the caret.
+function getNonBreakingSpaceRange( { text, start, end }: RichTextValue ) {
+	if ( start === undefined || end === undefined ) {
+		return null;
+	}
+
+	const from = start === end ? Math.max( start - 1, 0 ) : start;
+	const to = start === end ? end + 1 : end;
+
+	return text.slice( from, to ).includes( NBSP ) ? [ from, to ] : null;
+}
+
 function PopoverAnchor( {
 	contentRef,
 }: Pick< FormatEditProps, 'contentRef' > ) {
@@ -47,8 +59,22 @@ export const nonBreakingSpace = {
 			onChange( insert( value, NBSP ) );
 		}
 
+		const range = getNonBreakingSpaceRange( value );
+
 		function replaceNonBreakingSpaces() {
-			onChange( { ...value, text: value.text.replaceAll( NBSP, ' ' ) } );
+			if ( ! range ) {
+				return;
+			}
+
+			const [ from, to ] = range;
+			const { text } = value;
+			onChange( {
+				...value,
+				text:
+					text.slice( 0, from ) +
+					text.slice( from, to ).replaceAll( NBSP, ' ' ) +
+					text.slice( to ),
+			} );
 			onFocus();
 		}
 
@@ -64,7 +90,7 @@ export const nonBreakingSpace = {
 					character=" "
 					onUse={ addNonBreakingSpace }
 				/>
-				{ value.text.includes( NBSP ) && (
+				{ range && (
 					<RichTextToolbarButton
 						name="non-breaking-space"
 						icon={ icon }
