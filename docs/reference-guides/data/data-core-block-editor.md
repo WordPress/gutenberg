@@ -119,7 +119,7 @@ Determines if the given blocks are allowed to be removed.
 _Parameters_
 
 - _state_ `Object`: Editor state.
-- _clientIds_ `string`: The block client IDs to be removed.
+- _clientIds_ `string[]`: The block client IDs to be removed.
 
 _Returns_
 
@@ -1604,9 +1604,9 @@ _Parameters_
 
 - _clientIds_ `(string|string[])`: Block client ID(s) to replace.
 - _blocks_ `(Object|Object[])`: Replacement block(s).
-- _indexToSelect_ `number`: Index of replacement block to select.
-- _initialPosition_ `0|-1|null`: Index of caret after in the selected block after the operation.
-- _meta_ `?Object`: Optional Meta values to be passed to the action object.
+- _indexToSelect_ `[number]`: Index of replacement block to select.
+- _initialPosition_ `[0|-1|null]`: Index of caret after in the selected block after the operation.
+- _meta_ `[?Object]`: Optional Meta values to be passed to the action object.
 
 _Returns_
 

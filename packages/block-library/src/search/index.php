@@ -457,6 +457,20 @@ function styles_for_block_core_search( $attributes ) {
 		}
 	}
 
+	// Shadow lands on the same elements as the border.
+	if ( ! empty( $attributes['style']['shadow'] ) && is_string( $attributes['style']['shadow'] ) ) {
+		$shadow_styles = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ) );
+
+		if ( ! empty( $shadow_styles['css'] ) ) {
+			if ( $is_button_inside ) {
+				$wrapper_styles[] = $shadow_styles['css'];
+			} else {
+				$button_styles[] = $shadow_styles['css'];
+				$input_styles[]  = $shadow_styles['css'];
+			}
+		}
+	}
+
 	$use_input_for_colors = ! empty( $attributes['buttonPosition'] ) && 'no-button' === $attributes['buttonPosition'];
 
 	// Add color styles.

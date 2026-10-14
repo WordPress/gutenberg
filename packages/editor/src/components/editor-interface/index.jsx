@@ -14,6 +14,7 @@ import { useState, useCallback, useLayoutEffect } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { InlineNotices } from '@wordpress/notices';
 import { ThemeProvider } from '@wordpress/theme';
+import { Stack } from '@wordpress/ui';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import TemplateValidationNotice from '../template-validation-notice';
@@ -31,6 +32,7 @@ import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
+import ViewportStatus from '../viewport-status';
 
 const { blockToolbarShowPlaceholderKey } = unlock( blockEditorPrivateApis );
 
@@ -85,6 +87,7 @@ export default function EditorInterface( {
 		isDistractionFree,
 		isPreviewMode,
 		showBlockBreadcrumbs,
+		hasCanvasWidth,
 		postTypeLabel,
 		stylesPath,
 		showStylebook,
@@ -103,6 +106,7 @@ export default function EditorInterface( {
 			getShowStylebook,
 			isRevisionsMode: _isRevisionsMode,
 			isShowingRevisionDiff,
+			getCanvasWidth,
 		} = unlock( select( editorStore ) );
 		const editorSettings = getEditorSettings();
 
@@ -123,6 +127,7 @@ export default function EditorInterface( {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isPreviewMode: editorSettings.isPreviewMode,
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
+			hasCanvasWidth: getCanvasWidth() !== undefined,
 			postTypeLabel: getPostTypeLabel(),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
@@ -283,14 +288,23 @@ export default function EditorInterface( {
 				! isDistractionFree &&
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
+				shouldShowBlockEditor &&
 				mode === 'visual' && (
-					<BlockBreadcrumb
-						rootLabelText={
-							postTypeLabel
-								? decodeEntities( postTypeLabel )
-								: undefined
-						}
-					/>
+					<Stack
+						direction="row"
+						align="center"
+						className="editor-editor-interface__footer"
+					>
+						<BlockBreadcrumb
+							className="editor-editor-interface__breadcrumbs"
+							rootLabelText={
+								postTypeLabel
+									? decodeEntities( postTypeLabel )
+									: undefined
+							}
+						/>
+						{ hasCanvasWidth && <ViewportStatus /> }
+					</Stack>
 				)
 			}
 			actions={
