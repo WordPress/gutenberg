@@ -243,8 +243,6 @@ function gutenberg_get_note_reaction_ids( WP_Comment $note, string $status = 'an
  *
  * @param string     $comment_id The comment ID as a numeric string.
  * @param WP_Comment $comment    The comment being deleted.
- * 
- * @phpstan-param numeric-string $comment_id
  *
  * @phpstan-param numeric-string $comment_id
  */
