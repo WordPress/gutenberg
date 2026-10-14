@@ -19,7 +19,7 @@ export function useNotifyCopy() {
 			} else if ( selectedBlockClientIds.length === 1 ) {
 				const clientId = selectedBlockClientIds[ 0 ];
 				// A selected block always has a registered type.
-				const title = getBlockType( getBlockName( clientId ) )?.title!;
+				const title = getBlockType( getBlockName( clientId )! )?.title!;
 
 				if ( eventType === 'copy' ) {
 					notice = sprintf(
