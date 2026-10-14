@@ -97,7 +97,7 @@ jobs:
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   section: playground
-                  body: '[Preview this PR in WordPress Playground](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }}). Requires the "Build Gutenberg Plugin Zip" workflow to succeed.'
+                  body: '[![Preview in WordPress Playground](https://img.shields.io/badge/Preview-WordPress%20Playground-3858e9?logo=wordpress)](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }})'
                   pr-number: ${{ github.event.pull_request.number }}
                   require-base: ${{ github.event.repository.default_branch }}
 
