@@ -40,15 +40,16 @@
 class WP_Duotone_Gutenberg {
 	/**
 	 * Block names from global, theme, and custom styles that use duotone presets and the slug of
-	 * the preset they are using.
+	 * the preset they are using, or the custom colors they are using.
 	 *
 	 * Example:
 	 *  [
 	 *      'core/featured-image' => 'blue-orange',
+	 *      'core/image'          => [ '#000000', '#ffffff' ],
 	 *       …
 	 *  ]
 	 *
-	 * @var ?array<string, string>
+	 * @var ?array<string, string|string[]>
 	 */
 	private static $global_styles_block_names;
 
@@ -518,6 +519,42 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Gets a stable filter ID for a custom duotone, a raw list of colors.
+	 *
+	 * The ID is built from the normalized hex value of each color, so the
+	 * same colors always map to the same filter.
+	 *
+	 * Example output: 'wp-duotone-custom-000000-ffffff'.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param mixed $colors The duotone value to check, e.g. array( '#000', 'rgb(255,255,255)' ).
+	 * @return string|null The filter ID, or null if the value is not a list of at least two valid colors.
+	 */
+	public static function get_custom_filter_id( $colors ) {
+		if ( ! is_array( $colors ) || ! array_is_list( $colors ) || count( $colors ) < 2 ) {
+			return null;
+		}
+
+		$hex_colors = array();
+		foreach ( $colors as $color_str ) {
+			$color = is_string( $color_str ) ? self::colord_parse( $color_str ) : null;
+			if ( null === $color ) {
+				return null;
+			}
+
+			// Mirrors colord's toHex(), which drops the alpha channel when opaque.
+			$hex = sprintf( '%02x%02x%02x', round( $color['r'] ), round( $color['g'] ), round( $color['b'] ) );
+			if ( $color['a'] < 1 ) {
+				$hex .= sprintf( '%02x', round( $color['a'] * 255 ) );
+			}
+			$hex_colors[] = $hex;
+		}
+
+		return self::get_filter_id( 'custom-' . implode( '-', $hex_colors ) );
+	}
+
+	/**
 	 * Gets the SVG for the duotone filter definition.
 	 *
 	 * @param string $filter_id The ID of the filter.
@@ -814,7 +851,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 *
-	 * @return null|array<string, string> An array of global style block slugs, keyed on the block name.
+	 * @return null|array<string, string|string[]> An array of global style block slugs or custom colors, keyed on the block name.
 	 */
 	private static function get_all_global_style_block_names() {
 		if ( isset( self::$global_styles_block_names ) ) {
@@ -841,8 +878,16 @@ class WP_Duotone_Gutenberg {
 			if ( empty( $duotone_attr ) ) {
 				continue;
 			}
+
+			// Custom colors are kept as is, the filter is built from them at render time.
+			if ( is_array( $duotone_attr ) ) {
+				if ( null !== self::get_custom_filter_id( $duotone_attr ) ) {
+					self::$global_styles_block_names[ $block_node['name'] ] = $duotone_attr;
+				}
+				continue;
+			}
+
 			// If it has a duotone filter preset, save the block name and the preset slug.
-			// Only process if it's a string (preset reference), not an array (custom colors).
 			if ( ! is_string( $duotone_attr ) ) {
 				continue;
 			}
@@ -940,6 +985,17 @@ class WP_Duotone_Gutenberg {
 				// SVG filter and block CSS.
 				self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data );
 			}
+		} elseif ( $has_global_styles_duotone && is_array( $global_styles_block_names[ $block['blockName'] ] ) ) {
+			$colors       = $global_styles_block_names[ $block['blockName'] ];
+			$filter_id    = self::get_custom_filter_id( $colors ); // e.g. 'wp-duotone-custom-000000-ffffff'.
+			$filter_value = self::get_filter_url( $filter_id ); // e.g. 'url(#wp-duotone-custom-000000-ffffff)'.
+			$filter_data  = array(
+				'slug'   => substr( $filter_id, strlen( 'wp-duotone-' ) ),
+				'colors' => $colors,
+			);
+
+			// SVG filter and block CSS.
+			self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data );
 		} elseif ( $has_global_styles_duotone ) {
 			$slug         = $global_styles_block_names[ $block['blockName'] ]; // e.g. 'blue-orange'.
 			$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-blue-orange'.

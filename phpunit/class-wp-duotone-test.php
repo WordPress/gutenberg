@@ -150,4 +150,88 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );
 	}
+
+	public function data_get_custom_filter_id() {
+		return array(
+			'hex'               => array( array( '#000000', '#FFFFFF' ), 'wp-duotone-custom-000000-ffffff' ),
+			'short-hex'         => array( array( '#000', '#fff' ), 'wp-duotone-custom-000000-ffffff' ),
+			'rgb-and-hsl'       => array( array( 'rgb(255, 0, 0)', 'hsl(240, 100%, 50%)' ), 'wp-duotone-custom-ff0000-0000ff' ),
+			'alpha'             => array( array( '#000000', 'rgba(255, 255, 255, 0.5)' ), 'wp-duotone-custom-000000-ffffff80' ),
+			'three-colors'      => array( array( '#000', '#f00', '#fff' ), 'wp-duotone-custom-000000-ff0000-ffffff' ),
+			'named-color'       => array( array( 'red', '#fff' ), null ),
+			'markup'            => array( array( '#000', '<script>' ), null ),
+			'nested-array'      => array( array( array( '#000' ), '#fff' ), null ),
+			'single-color'      => array( array( '#000' ), null ),
+			'associative-array' => array(
+				array(
+					'dark'  => '#000',
+					'light' => '#fff',
+				),
+				null,
+			),
+			'string'            => array( 'var:preset|duotone|blue-orange', null ),
+			'empty-array'       => array( array(), null ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_get_custom_filter_id
+	 *
+	 * @covers ::get_custom_filter_id
+	 */
+	public function test_get_custom_filter_id( $colors, $expected ) {
+		$this->assertSame( $expected, WP_Duotone_Gutenberg::get_custom_filter_id( $colors ) );
+	}
+
+	/**
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_render_duotone_support_global_styles_custom_colors() {
+		$set_user_duotone = static function ( $theme_json ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => array(
+						'blocks' => array(
+							'core/image' => array(
+								'filter' => array( 'duotone' => array( '#000000', '#ff0000' ) ),
+							),
+						),
+					),
+				)
+			);
+		};
+		add_filter( 'wp_theme_json_data_user', $set_user_duotone );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		$block_names_property = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'global_styles_block_names' );
+		$svg_data_property    = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'used_svg_filter_data' );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$block_names_property->setAccessible( true );
+			$svg_data_property->setAccessible( true );
+		}
+		$wp_duotone = new WP_Duotone_Gutenberg();
+		$block_names_property->setValue( $wp_duotone, null );
+		$svg_data_property->setValue( $wp_duotone, array() );
+
+		$block         = array(
+			'blockName' => 'core/image',
+			'attrs'     => array(),
+		);
+		$wp_block      = new WP_Block( $block );
+		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
+		$actual_html   = WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block );
+
+		ob_start();
+		WP_Duotone_Gutenberg::output_footer_assets();
+		$footer = ob_get_clean();
+
+		remove_filter( 'wp_theme_json_data_user', $set_user_duotone );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		$block_names_property->setValue( $wp_duotone, null );
+		$svg_data_property->setValue( $wp_duotone, array() );
+
+		$this->assertSame( '<figure class="wp-block-image size-full wp-duotone-custom-000000-ff0000"><img src="/my-image.jpg" /></figure>', $actual_html );
+		$this->assertStringContainsString( '<filter id="wp-duotone-custom-000000-ff0000">', $footer );
+		$this->assertStringContainsString( 'tableValues="0 1"', $footer );
+	}
 }

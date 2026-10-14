@@ -3968,6 +3968,83 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
+	 */
+	public function test_remove_insecure_properties_keeps_only_valid_custom_duotone_colors() {
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/image'               => array(
+							'filter' => array(
+								'duotone' => array( '#000000', 'rgb(255, 0, 0)' ),
+							),
+						),
+						'core/cover'               => array(
+							'filter' => array(
+								'duotone' => array( 'red', '<script>' ),
+							),
+						),
+						'core/post-featured-image' => array(
+							'filter' => array(
+								'duotone' => array( array( '#000000' ), '#ffffff' ),
+							),
+						),
+						'core/site-logo'           => array(
+							'filter' => array(
+								'duotone' => array( '#000000' ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/image' => array(
+						'filter' => array(
+							'duotone' => array( '#000000', 'rgb(255, 0, 0)' ),
+						),
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	public function test_get_stylesheet_outputs_custom_duotone_as_svg_filter_url() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/image' => array(
+							'filter' => array(
+								'duotone' => array( '#000000', '#ff0000' ),
+							),
+						),
+						'core/cover' => array(
+							'filter' => array(
+								'duotone' => array( 'red', '<script>' ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ) );
+
+		$this->assertStringContainsString( '.wp-block-image img, .wp-block-image .components-placeholder){filter: url(#wp-duotone-custom-000000-ff0000);}', $stylesheet );
+		$this->assertStringNotContainsString( 'script', $stylesheet );
+		$this->assertStringNotContainsString( 'wp-block-cover', $stylesheet );
+	}
+
 	public function test_remove_insecure_properties_removes_unsafe_styles_sub_properties() {
 		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
 			array(
