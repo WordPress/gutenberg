@@ -135,7 +135,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 	 * @param array $expected   The expected code, path and severity.
 	 */
 	public function test_dropped_values_are_reported( $theme_json, $expected ) {
-		$diagnostics = WP_Theme_JSON_Gutenberg::get_sanitization_diagnostics( $theme_json );
+		$diagnostics = gutenberg_validate_theme_json( $theme_json );
 
 		$this->assertCount( 1, $diagnostics, 'Exactly one diagnostic is expected: ' . wp_json_encode( $diagnostics ) );
 		$this->assertSame( $expected, array( $diagnostics[0]['code'], $diagnostics[0]['path'], $diagnostics[0]['severity'] ) );
@@ -187,8 +187,17 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSame( array(), WP_Theme_JSON_Sanitizer_Gutenberg::collect( static function () {} ) );
 	}
 
+	public function test_non_object_input_is_reported_and_nothing_else() {
+		$diagnostics = gutenberg_validate_theme_json( 'not a structure' );
+
+		$this->assertCount( 1, $diagnostics );
+		$this->assertSame( 'theme_json_invalid_type', $diagnostics[0]['code'] );
+		$this->assertSame( array(), $diagnostics[0]['path'] );
+		$this->assertSame( 'string', $diagnostics[0]['data']['actual'] );
+	}
+
 	public function test_missing_version_is_reported_and_nothing_else() {
-		$diagnostics = WP_Theme_JSON_Gutenberg::get_sanitization_diagnostics(
+		$diagnostics = gutenberg_validate_theme_json(
 			array(
 				'styles' => array( 'invention' => array() ),
 			)
@@ -200,7 +209,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	public function test_registered_values_produce_no_diagnostics() {
-		$diagnostics = WP_Theme_JSON_Gutenberg::get_sanitization_diagnostics(
+		$diagnostics = gutenberg_validate_theme_json(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
@@ -237,7 +246,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 		$theme_json = json_decode( file_get_contents( dirname( __DIR__ ) . '/lib/theme.json' ), true );
 
 		$this->assertIsArray( $theme_json, 'lib/theme.json must be valid JSON.' );
-		$this->assertSame( array(), WP_Theme_JSON_Gutenberg::get_sanitization_diagnostics( $theme_json ) );
+		$this->assertSame( array(), gutenberg_validate_theme_json( $theme_json ) );
 	}
 
 	/**
@@ -265,7 +274,7 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertIsArray( $theme_json, 'Fixture must be valid JSON.' );
 
-		$codes = array_column( WP_Theme_JSON_Gutenberg::get_sanitization_diagnostics( $theme_json ), 'code' );
+		$codes = array_column( gutenberg_validate_theme_json( $theme_json ), 'code' );
 
 		$this->assertSame( array(), array_diff( $codes, array( 'theme_json_unregistered_block', 'theme_json_unregistered_variation' ) ) );
 	}
