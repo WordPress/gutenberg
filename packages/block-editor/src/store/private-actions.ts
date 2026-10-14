@@ -9,6 +9,7 @@ import type {
 	InsertionPoint,
 	RemovalPromptMessage,
 	Settings,
+	State,
 	StyleOverride,
 	TreeBlock,
 } from './types';
@@ -433,7 +434,7 @@ export function stopEditingContentOnlySection() {
  * @return Action object.
  */
 export const setZoomLevel =
-	( zoom: number = 100 ) =>
+	( zoom: State[ 'zoomLevel' ] = 100 ) =>
 	( { select, dispatch }: BlockEditorThunkArgs ) => {
 		// When switching to zoom-out mode, we need to select the parent section
 		if ( zoom !== 100 ) {
