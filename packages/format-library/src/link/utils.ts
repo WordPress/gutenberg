@@ -77,6 +77,11 @@ export function isValidHref( href: string ): boolean {
 		return false;
 	}
 
+	// Validate anchor links before checking for a URL protocol.
+	if ( trimmedHref.startsWith( '#' ) ) {
+		return isValidFragment( trimmedHref );
+	}
+
 	// Does the href start with something that looks like a URL protocol?
 	if ( /^\S+:/.test( trimmedHref ) ) {
 		const protocol = getProtocol( trimmedHref );
@@ -112,11 +117,6 @@ export function isValidHref( href: string ): boolean {
 		if ( fragment && ! isValidFragment( fragment ) ) {
 			return false;
 		}
-	}
-
-	// Validate anchor links.
-	if ( trimmedHref.startsWith( '#' ) && ! isValidFragment( trimmedHref ) ) {
-		return false;
 	}
 
 	return true;

@@ -38,6 +38,9 @@ describe( 'isValidHref', () => {
 			expect(
 				isValidHref( 'http://example.org#path/after/fragment' )
 			).toBe( true );
+			expect( isValidHref( 'http://example.org#:~:text=example' ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'returns false for invalid urls', () => {
@@ -84,6 +87,7 @@ describe( 'isValidHref', () => {
 			expect( isValidHref( '#yes-it-is' ) ).toBe( true );
 			expect( isValidHref( '#yes-it-is?' ) ).toBe( true );
 			expect( isValidHref( '#yes-it-is/' ) ).toBe( true );
+			expect( isValidHref( '#:~:text=example' ) ).toBe( true );
 		} );
 
 		it( 'returns false for invalid anchor links', () => {
