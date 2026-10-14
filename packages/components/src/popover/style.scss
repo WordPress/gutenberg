@@ -57,8 +57,9 @@ $shadow-popover-border-top-only-alternate: 0 #{-$border-width} 0 $gray-900;
 	}
 
 	// Forced colors removes box-shadow. The transparent outline is drawn as the system text color instead.
+	// Exclusions stay in :where() so a consumer outline, such as the caption toolbar's `outline: none`, still wins.
 	@media (forced-colors: active) {
-		.components-popover:not(.is-unstyled):not(.is-expanded) & {
+		.components-popover:where(:not(.is-unstyled):not(.is-expanded)) & {
 			outline: var(--wpds-border-width-xs) solid transparent;
 		}
 	}
