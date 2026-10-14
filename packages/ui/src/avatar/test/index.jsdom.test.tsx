@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
+import type { Avatar as _Avatar } from '@base-ui/react/avatar';
 import * as Avatar from '../index';
 
 afterEach( () => vi.useRealTimers() );
@@ -69,10 +70,12 @@ describe( 'Avatar custom rendering', () => {
 	it.each( [ 'Fallback', 'Initials' ] as const )(
 		'passes image loading state to custom %s rendering',
 		( part ) => {
-			const customRender: React.ComponentProps<
-				typeof Avatar.Fallback
-			>[ 'render' ] = ( elementProps, state ) => (
-				<span { ...elementProps } title={ state.imageLoadingStatus } />
+			// The public render type only advertises props; verify runtime state with an optional parameter.
+			const customRender = (
+				elementProps: React.ComponentPropsWithRef< 'span' >,
+				state?: _Avatar.Fallback.State
+			) => (
+				<span { ...elementProps } title={ state?.imageLoadingStatus } />
 			);
 			const fallback =
 				part === 'Fallback' ? (
