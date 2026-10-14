@@ -41,6 +41,12 @@ export const SECTIONS: SectionDefinition[] = [
 		keep: 'end',
 	},
 	{
+		id: 'playground',
+		heading: '🛝 Playground',
+		scope: 'pr-state',
+		budget: 1000,
+	},
+	{
 		id: 'labels',
 		heading: '🏷️ Labels',
 		scope: 'pr-state',
