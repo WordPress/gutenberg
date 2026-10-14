@@ -17,10 +17,14 @@ const TESTS_CONFIG_FILE = '.wp-env.test.json';
  * Tests may run from a subdirectory of the project, such as an npm workspace
  * for the end-to-end tests run via `npm exec --workspace`, while the `wp-env`
  * config files are at the project root. So this searches upward from the
- * starting directory for the nearest directory with a `.wp-env.json` or
+ * starting directory for the nearest directory with a `.wp-env.json`,
+ * `.wp-env.override.json` (which `wp-env` accepts on its own) or
  * `.wp-env.test.json`, but not above the project root, so that an unrelated
  * config in an enclosing directory is never picked up. Without a project root
  * containing the starting directory, only the starting directory is used.
+ *
+ * A `.wp-env.test.override.json` alone does not count, since `wp-env` only
+ * reads it along with the `.wp-env.test.json` it overrides.
  *
  * @param {string}           fromDirectory The directory to start from, usually the current working directory.
  * @param {string|undefined} rootDirectory The project root, usually `npm_config_local_prefix` as set by npm.
@@ -45,8 +49,8 @@ function findConfigDirectory( fromDirectory, rootDirectory ) {
 		directory = path.dirname( directory )
 	) {
 		if (
-			[ '.wp-env.json', TESTS_CONFIG_FILE ].some( ( fileName ) =>
-				existsSync( path.join( directory, fileName ) )
+			[ '.wp-env.json', '.wp-env.override.json', TESTS_CONFIG_FILE ].some(
+				( fileName ) => existsSync( path.join( directory, fileName ) )
 			)
 		) {
 			return directory;

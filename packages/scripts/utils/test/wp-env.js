@@ -3,7 +3,15 @@ import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
 import { rimrafSync } from 'rimraf';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	afterAll,
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
 const require = createRequire( import.meta.url );
 const { findConfigDirectory, getTestsBaseUrl } = require( '../wp-env' );
 
@@ -33,7 +41,7 @@ describe( 'findConfigDirectory', () => {
 		expect( findConfigDirectory( workspace, root ) ).toBe( workspace );
 	} );
 
-	it.each( [ '.wp-env.json', '.wp-env.test.json' ] )(
+	it.each( [ '.wp-env.json', '.wp-env.override.json', '.wp-env.test.json' ] )(
 		'finds a %s at the project root from a workspace directory',
 		( fileName ) => {
 			writeFile( root, fileName );
@@ -41,6 +49,12 @@ describe( 'findConfigDirectory', () => {
 			expect( findConfigDirectory( workspace, root ) ).toBe( root );
 		}
 	);
+
+	it( 'ignores a .wp-env.test.override.json without the config it overrides', () => {
+		writeFile( root, '.wp-env.test.override.json' );
+
+		expect( findConfigDirectory( workspace, root ) ).toBe( workspace );
+	} );
 
 	it( 'returns the nearest directory with a config', () => {
 		const intermediate = path.dirname( workspace );
@@ -86,17 +100,12 @@ describe( 'findConfigDirectory', () => {
 } );
 
 /*
- * The real loadConfig() from @wordpress/env looks up the latest WordPress
- * version over the network unless the config sets `core`, so these tests use
- * stand-ins that return the shapes it produces:
- *
- * - Without the deprecated `testsEnvironment`, `env` has only `development`,
- *   whose port comes from the loaded config file and its override (for
- *   example `.wp-env.test.json` and `.wp-env.test.override.json`).
- * - With `testsEnvironment`, and in versions of @wordpress/env before
- *   `--config` support, `env` also has `tests`.
+ * These tests use stand-ins for loadConfig() to check what it is called with,
+ * and how the result is read, including results from versions of
+ * @wordpress/env before `--config` support, which always have a `tests`
+ * environment. The tests further below use the real loadConfig().
  */
-describe( 'getTestsBaseUrl', () => {
+describe( 'getTestsBaseUrl with a stand-in loadConfig', () => {
 	let configDirectory;
 
 	beforeEach( () => {
@@ -182,5 +191,150 @@ describe( 'getTestsBaseUrl', () => {
 		await expect(
 			getTestsBaseUrl( loadConfig, configDirectory )
 		).resolves.toBeNull();
+	} );
+} );
+
+/*
+ * The real loadConfig() from @wordpress/env merges each config file with its
+ * override and the WP_ENV_* environment variables. Parsing the default config
+ * looks up the latest WordPress version over the network, so that lookup is
+ * replaced before the config modules are loaded, as in the tests of
+ * @wordpress/env itself.
+ */
+describe( 'getTestsBaseUrl with the loadConfig from @wordpress/env', () => {
+	const envConfigPath = require.resolve( '@wordpress/env/lib/config' );
+	const envLibPath = path.dirname( path.dirname( envConfigPath ) );
+	const configModulePaths = [
+		envConfigPath,
+		path.join( envLibPath, 'config', 'load-config.js' ),
+		path.join( envLibPath, 'config', 'parse-config.js' ),
+	];
+	const wordpressModule = require( path.join( envLibPath, 'wordpress.js' ) );
+	const originalGetLatestWordPressVersion =
+		wordpressModule.getLatestWordPressVersion;
+	wordpressModule.getLatestWordPressVersion = async () => '100.0.0';
+	for ( const modulePath of configModulePaths ) {
+		delete require.cache[ modulePath ];
+	}
+	const { loadConfig } = require( envConfigPath );
+
+	let root;
+	let originalEnv;
+
+	const writeConfig = ( fileName, config, directory = root ) =>
+		fs.writeFileSync(
+			path.join( directory, fileName ),
+			JSON.stringify( config )
+		);
+
+	beforeEach( () => {
+		root = fs.mkdtempSync(
+			path.join( os.tmpdir(), 'wp-scripts-wp-env-config-' )
+		);
+
+		originalEnv = { ...process.env };
+		process.env.WP_ENV_HOME = path.join( root, 'wp-env-home' );
+		delete process.env.WP_ENV_PORT;
+		delete process.env.WP_ENV_TESTS_PORT;
+	} );
+
+	afterEach( () => {
+		rimrafSync( root );
+		process.env = originalEnv;
+	} );
+
+	afterAll( () => {
+		wordpressModule.getLatestWordPressVersion =
+			originalGetLatestWordPressVersion;
+		for ( const modulePath of configModulePaths ) {
+			delete require.cache[ modulePath ];
+		}
+	} );
+
+	/*
+	 * Projects that test against a `.wp-env.test.json` disable the deprecated
+	 * tests environment in both configs, as Gutenberg does. Without that,
+	 * `wp-env` still adds a tests environment on the default port 8889.
+	 */
+	const writeSplitConfigs = () => {
+		writeConfig( '.wp-env.json', { testsEnvironment: false, port: 8888 } );
+		writeConfig( '.wp-env.test.json', {
+			testsEnvironment: false,
+			port: 8889,
+		} );
+	};
+
+	it( 'uses the port from the override of the tests config', async () => {
+		writeSplitConfigs();
+		writeConfig( '.wp-env.override.json', { port: 8891 } );
+		writeConfig( '.wp-env.test.override.json', { port: 8991 } );
+
+		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
+			'http://localhost:8991'
+		);
+	} );
+
+	it( 'uses the port of the tests config when it has no override', async () => {
+		writeSplitConfigs();
+		writeConfig( '.wp-env.override.json', { port: 8891 } );
+
+		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
+			'http://localhost:8889'
+		);
+	} );
+
+	it( 'uses the port from the WP_ENV_PORT environment variable over the override', async () => {
+		writeSplitConfigs();
+		writeConfig( '.wp-env.test.override.json', { port: 8991 } );
+		process.env.WP_ENV_PORT = '9999';
+
+		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
+			'http://localhost:9999'
+		);
+	} );
+
+	it( 'uses the development port from the override when there is no tests config or environment', async () => {
+		writeConfig( '.wp-env.json', { testsEnvironment: false, port: 8888 } );
+		writeConfig( '.wp-env.override.json', { port: 8890 } );
+
+		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
+			'http://localhost:8890'
+		);
+	} );
+
+	it( 'uses the default tests port when the tests environment is not disabled', async () => {
+		writeConfig( '.wp-env.json', { port: 8888 } );
+		writeConfig( '.wp-env.override.json', { port: 8890 } );
+
+		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
+			'http://localhost:8889'
+		);
+	} );
+
+	it( 'uses the tests port from the override when the deprecated tests environment is enabled', async () => {
+		writeConfig( '.wp-env.json', {
+			port: 8888,
+			testsEnvironment: true,
+		} );
+		writeConfig( '.wp-env.override.json', { testsPort: 8991 } );
+
+		await expect( getTestsBaseUrl( loadConfig, root ) ).resolves.toBe(
+			'http://localhost:8991'
+		);
+	} );
+
+	it( 'uses the override of the tests config found from a workspace directory', async () => {
+		const workspace = path.join( root, 'test', 'e2e' );
+		fs.mkdirSync( workspace, { recursive: true } );
+		writeConfig( 'package.json', { name: 'e2e-tests' }, workspace );
+		writeSplitConfigs();
+		writeConfig( '.wp-env.test.override.json', { port: 8991 } );
+
+		await expect(
+			getTestsBaseUrl(
+				loadConfig,
+				findConfigDirectory( workspace, root )
+			)
+		).resolves.toBe( 'http://localhost:8991' );
 	} );
 } );
