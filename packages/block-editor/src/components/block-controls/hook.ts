@@ -5,7 +5,10 @@ import {
 	mayDisplayParentControlsKey,
 } from '../block-edit/context';
 
-export default function useBlockControlsFill( group, shareWithChildBlocks ) {
+export default function useBlockControlsFill(
+	group: string,
+	shareWithChildBlocks: boolean
+) {
 	const context = useBlockEditContext();
 	if ( context[ mayDisplayControlsKey ] ) {
 		return groups[ group ]?.Fill;

@@ -8,10 +8,14 @@ import {
 import warning from '@wordpress/warning';
 import groups from './groups';
 import { unlock } from '../../lock-unlock';
+import type { BlockControlsSlotProps } from './types';
 
 const { ComponentsContext } = unlock( privateApis );
 
-export default function BlockControlsSlot( { group = 'default', ...props } ) {
+export default function BlockControlsSlot( {
+	group = 'default',
+	...props
+}: BlockControlsSlotProps ) {
 	const toolbarState = useContext( ToolbarContext );
 	const contextState = useContext( ComponentsContext );
 	const fillProps = useMemo(
