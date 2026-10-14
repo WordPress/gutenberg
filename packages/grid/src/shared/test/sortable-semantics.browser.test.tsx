@@ -1,14 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { userEvent } from 'vitest/browser';
+import { render } from 'vitest-browser-react';
+import { describe, expect, it } from 'vitest';
 import { useId } from '@wordpress/element';
 import { DashboardGrid } from '../../dashboard-grid';
 import { DashboardLanes } from '../../dashboard-lanes';
-
-class MockResizeObserver {
-	observe() {}
-	unobserve() {}
-	disconnect() {}
-}
 
 function Tile( {
 	children,
@@ -32,16 +28,7 @@ function MetricControl() {
 	);
 }
 
-beforeEach( () => {
-	vi.stubGlobal( 'ResizeObserver', MockResizeObserver );
-} );
-
-afterEach( () => {
-	vi.unstubAllGlobals();
-	vi.useRealTimers();
-} );
-
-/* eslint-disable testing-library/no-container, testing-library/no-node-access */
+/* eslint-disable testing-library/no-node-access */
 describe.each( [
 	[ 'DashboardGrid', DashboardGrid ],
 	[ 'DashboardLanes', DashboardLanes ],
@@ -51,8 +38,8 @@ describe.each( [
 		[ 'a pinned item', true, false ],
 	] as const )(
 		'preserves interactive content semantics in %s',
-		( __, editMode, draggable ) => {
-			const { container } = render(
+		async ( __, editMode, draggable ) => {
+			const { container } = await render(
 				<Dashboard
 					layout={ [ { key: 'a', width: 1, draggable } ] }
 					columns={ 2 }
@@ -103,8 +90,7 @@ describe.each( [
 	] as const )(
 		'retains keyboard activation and focus for %s',
 		async ( __, draggable, roleDescription ) => {
-			vi.useFakeTimers();
-			const { container } = render(
+			const { container } = await render(
 				<Dashboard
 					layout={ [ { key: 'a', width: 1, draggable } ] }
 					columns={ 2 }
@@ -121,18 +107,16 @@ describe.each( [
 			expect( activator ).toHaveAttribute( 'aria-disabled', 'false' );
 			expect( activator ).toHaveAttribute( 'aria-describedby' );
 			activator.focus();
-			fireEvent.keyDown( activator, { code: 'Space' } );
-			act( () => {
-				vi.runOnlyPendingTimers();
-			} );
-			expect( activator ).toHaveAttribute( 'aria-pressed', 'true' );
-			fireEvent.keyDown( activator, { code: 'Escape' } );
-			await act( async () => {
-				vi.runOnlyPendingTimers();
-			} );
-			expect( activator ).not.toHaveAttribute( 'aria-pressed' );
+			await userEvent.keyboard( '[Space]' );
+			await expect
+				.poll( () => activator.getAttribute( 'aria-pressed' ) )
+				.toBe( 'true' );
+			await userEvent.keyboard( '[Escape]' );
+			await expect
+				.poll( () => activator.hasAttribute( 'aria-pressed' ) )
+				.toBe( false );
 			expect( activator ).toHaveFocus();
 		}
 	);
 } );
-/* eslint-enable testing-library/no-container, testing-library/no-node-access */
+/* eslint-enable testing-library/no-node-access */
