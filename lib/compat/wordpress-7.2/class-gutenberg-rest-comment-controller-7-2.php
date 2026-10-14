@@ -56,10 +56,10 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	/**
 	 * Checks whether the request type is an internal comment type (note or reaction).
 	 *
-	 * @param string|null $type The comment type from the request.
+	 * @param mixed $type The comment type from the request.
 	 * @return bool True if the type is one of the internal comment types.
 	 */
-	protected function is_note_or_reaction( ?string $type ): bool {
+	protected function is_note_or_reaction( $type ): bool {
 		return in_array( $type, array( 'note', 'reaction' ), true );
 	}
 
@@ -364,8 +364,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 */
 	public function create_item_permissions_check( $request ) {
 		// START CHANGE: Treat `reaction` like `note`.
-		// `type` is not validated on create, so it may not be a string.
-		$is_note = is_string( $request['type'] ) && $this->is_note_or_reaction( $request['type'] );
+		$is_note = $this->is_note_or_reaction( $request['type'] );
 		// END CHANGE.
 
 		if ( ! is_user_logged_in() && $is_note ) {
@@ -795,7 +794,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		// START CHANGE: Treat `reaction` like `note`.
 		// Don't check for duplicates or flooding for notes and reactions.
 		$prepared_comment['comment_approved'] =
-			is_string( $prepared_comment['comment_type'] ) && $this->is_note_or_reaction( $prepared_comment['comment_type'] ) ?
+			$this->is_note_or_reaction( $prepared_comment['comment_type'] ) ?
 			'1' :
 			wp_allow_comment( $prepared_comment, true );
 		// END CHANGE.
