@@ -30,6 +30,10 @@
 -   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
 
 
+### Internal
+
+-   Convert the remaining `utils` modules and the `state-utils` and `useCachedTruthy` hook helpers to TypeScript ([#84629](https://github.com/WordPress/gutenberg/pull/84629)).
+
 ## 18.1.0 (2026-10-07)
 
 ### New Features

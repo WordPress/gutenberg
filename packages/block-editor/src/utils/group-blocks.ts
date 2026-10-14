@@ -1,3 +1,8 @@
+import type {
+	Block,
+	BlockBlockTransform,
+	NormalizedBlockTransform,
+} from '@wordpress/blocks';
 import {
 	findTransform,
 	getBlockTransforms,
@@ -11,19 +16,22 @@ import {
  * block's own transform changes what the block is (a quote's transform to
  * group dissolves the quote into its inner blocks).
  *
- * @param {WPBlock[]} blocks            Blocks to group.
- * @param {string}    groupingBlockName Name of the grouping block.
+ * @param blocks            Blocks to group.
+ * @param groupingBlockName Name of the grouping block.
  *
- * @return {?WPBlock[]} The grouped blocks, or null.
+ * @return The grouped blocks, or null.
  */
-export function groupBlocks( blocks, groupingBlockName ) {
+export function groupBlocks(
+	blocks: Block[],
+	groupingBlockName: string
+): Block[] | null {
 	const groupingBlockTransform = findTransform(
 		getBlockTransforms( 'from', groupingBlockName ),
 		( transform ) =>
 			transform.type === 'block' &&
-			transform.isMultiBlock &&
+			!! transform.isMultiBlock &&
 			transform.blocks.includes( '*' )
-	);
+	) as NormalizedBlockTransform< BlockBlockTransform > | null;
 
 	if ( groupingBlockTransform?.__experimentalConvert ) {
 		const result = groupingBlockTransform.__experimentalConvert( blocks );

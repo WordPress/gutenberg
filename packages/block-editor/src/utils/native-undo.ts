@@ -5,17 +5,17 @@ import { useRefEffect } from '@wordpress/compose';
  * HTML editing field, a search field), registered through `useNativeUndo`.
  * The editor history must not act on events originating within them.
  */
-const nativeUndoNodes = new WeakSet();
+const nativeUndoNodes = new WeakSet< Element >();
 
 /**
  * Returns a ref that marks an element (and its descendants) as relying on
  * the browser's own undo, so the editor history leaves the undo and redo
  * shortcuts alone within it.
  *
- * @return {Function} Ref callback.
+ * @return Ref callback.
  */
 export function useNativeUndo() {
-	return useRefEffect( ( node ) => {
+	return useRefEffect< Element >( ( node ) => {
 		nativeUndoNodes.add( node );
 		return () => {
 			nativeUndoNodes.delete( node );
@@ -31,15 +31,15 @@ export function useNativeUndo() {
  * element, so the real target is resolved through the frame's focused
  * element.
  *
- * @param {KeyboardEvent} event Keyboard event.
+ * @param event Keyboard event.
  *
- * @return {boolean} Whether the element relies on the browser's own undo.
+ * @return Whether the element relies on the browser's own undo.
  */
-export function usesNativeUndo( event ) {
-	let { target } = event;
+export function usesNativeUndo( event: KeyboardEvent ): boolean {
+	let target = event.target as Element | null | undefined;
 
 	if ( target?.nodeName === 'IFRAME' ) {
-		target = target.contentDocument?.activeElement;
+		target = ( target as HTMLIFrameElement ).contentDocument?.activeElement;
 	}
 
 	while ( target ) {

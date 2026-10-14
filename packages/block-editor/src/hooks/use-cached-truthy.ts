@@ -6,7 +6,7 @@ import { useState, useEffect } from '@wordpress/element';
  * @param {any} value
  * @return {any} value
  */
-export function useCachedTruthy( value ) {
+export function useCachedTruthy< T >( value: T ): T {
 	const [ cachedValue, setCachedValue ] = useState( value );
 	useEffect( () => {
 		if ( value ) {
