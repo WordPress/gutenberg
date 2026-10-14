@@ -146,6 +146,7 @@ const GridVisualizerGrid = forwardRef(
 							gridElement={ gridElement }
 							gridInfo={ gridInfo }
 							childGridRect={ childGridRect }
+							isDroppingAllowed={ isDroppingAllowed }
 						/>
 					) : (
 						<AutoGridVisualizer
@@ -184,6 +185,7 @@ function ManualGridVisualizer( {
 	gridElement,
 	gridInfo,
 	childGridRect,
+	isDroppingAllowed,
 } ) {
 	const [ dropTarget, setDropTarget ] = useState( null );
 
@@ -232,13 +234,18 @@ function ManualGridVisualizer( {
 						column,
 						row
 					);
-					let color = gridInfo.currentColor;
-					if ( isChildGridCell ) {
-						color = 'transparent';
-					}
 					const isCellOccupied = occupiedRects.some( ( rect ) =>
 						rect.contains( column, row )
 					);
+					// The lines of cells that blocks are in are only drawn
+					// over the blocks while one is dragged, to line it up.
+					let color = gridInfo.currentColor;
+					if (
+						isChildGridCell ||
+						( isCellOccupied && ! isDroppingAllowed )
+					) {
+						color = 'transparent';
+					}
 					return (
 						<GridVisualizerCell
 							key={ `${ row }-${ column }` }
