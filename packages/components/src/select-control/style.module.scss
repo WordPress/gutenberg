@@ -1,0 +1,102 @@
+@use "../utils/theme-variables" as *;
+
+.root {
+	color: $components-color-foreground;
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
+	cursor: pointer;
+
+	&:where(.is-disabled) {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+		cursor: default;
+	}
+}
+
+.root.root:where(.is-minimal) {
+	// Keep the minimal layout over Flex in either stylesheet order.
+	display: inline-flex;
+}
+
+.input.input.input {
+	// Match the existing specificity over wp-admin's form styles.
+	--_wp-components-select-control-padding: 12px;
+	appearance: none;
+	background: transparent;
+	box-sizing: border-box;
+	border: none;
+	box-shadow: none !important;
+	color: currentColor;
+	cursor: inherit;
+	display: block;
+	font-family: inherit;
+	font-size: 16px;
+	line-height: 1.3;
+	margin: 0;
+	width: 100%;
+	max-width: none;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+
+	@media (min-width: 600px) {
+		font-size: 13px;
+	}
+
+	&:where(.is-small, .is-compact) {
+		--_wp-components-select-control-padding: 8px;
+	}
+
+	&:where(:not(.is-multiple)) {
+		height: 40px;
+		min-height: 40px;
+		padding-top: 0;
+		padding-bottom: 0;
+
+		&:where(.is-small) {
+			height: 24px;
+			min-height: 24px;
+		}
+
+		&:where(.is-compact) {
+			height: 32px;
+			min-height: 32px;
+		}
+	}
+
+	&:where(.is-multiple) {
+		// Preserve native height for multiple selection.
+		overflow: auto;
+		padding-top: var(--_wp-components-select-control-padding);
+		padding-bottom: var(--_wp-components-select-control-padding);
+	}
+
+	/* stylelint-disable logical-css/require-logical-properties -- Preserve locale-based chevron padding independently of a consumer's direction. */
+	padding-left: var(--_wp-components-select-control-padding);
+	padding-right: calc(var(--_wp-components-select-control-padding) + 18px);
+	&:where(.is-rtl) {
+		padding-left: calc(var(--_wp-components-select-control-padding) + 18px);
+		padding-right: var(--_wp-components-select-control-padding);
+	}
+	/* stylelint-enable logical-css/require-logical-properties */
+
+	&:where(.is-minimal) {
+		field-sizing: content;
+	}
+}
+
+.down-arrow {
+	margin-inline-end: -4px;
+	line-height: 0;
+}
+
+.suffix {
+	position: absolute;
+	pointer-events: none;
+
+	/* stylelint-disable logical-css/require-logical-properties -- Match the locale-based chevron position. */
+	right: 0;
+	&:where(.is-rtl) {
+		right: auto;
+		left: 0;
+	}
+	/* stylelint-enable logical-css/require-logical-properties */
+}
