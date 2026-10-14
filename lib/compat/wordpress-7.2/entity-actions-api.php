@@ -11,25 +11,25 @@
  * entity along with its actions: its default export maps action ids to the
  * properties of each action that are JavaScript. An entity can have several
  * modules. Each module applies to the actions it was registered with, see
- * {@see wp_get_registered_action_modules()}.
+ * {@see wp_get_registered_entity_action_modules()}.
  *
- * Actions are registered on the `wp_actions_api_init` action, and only there,
- * with {@see wp_register_actions()} and {@see wp_unregister_actions()}. The
+ * Actions are registered on the `wp_entity_actions_api_init` action, and only there,
+ * with {@see wp_register_entity_actions()} and {@see wp_unregister_entity_actions()}. The
  * other functions read the registry.
  *
  * The functions are defined when core does not ship them. When it does, the
  * core functions read the plugin registry, which replaces the core one on
- * `init`, see {@see WP_Actions_Registry_Gutenberg}.
+ * `init`, see {@see WP_Entity_Actions_Registry_Gutenberg}.
  *
  * @package gutenberg
  */
 
-if ( ! function_exists( 'wp_register_actions' ) ) {
+if ( ! function_exists( 'wp_register_entity_actions' ) ) {
 	/**
 	 * Registers actions for an entity, see
-	 * {@see WP_Actions_Registry::register()}.
+	 * {@see WP_Entity_Actions_Registry::register()}.
 	 *
-	 * It only runs on the `wp_actions_api_init` action.
+	 * It only runs on the `wp_entity_actions_api_init` action.
 	 *
 	 * @since 7.2.0
 	 *
@@ -43,17 +43,17 @@ if ( ! function_exists( 'wp_register_actions' ) ) {
 	 * @return string[] The ids of the actions registered, in the order of the
 	 *                  call. Empty when none is.
 	 */
-	function wp_register_actions( $origin, $kind, $name, $actions, $script_module = null ) {
-		return WP_Actions_Registry::get_instance()->register( $origin, $kind, $name, $actions, $script_module );
+	function wp_register_entity_actions( $origin, $kind, $name, $actions, $script_module = null ) {
+		return WP_Entity_Actions_Registry::get_instance()->register( $origin, $kind, $name, $actions, $script_module );
 	}
 }
 
-if ( ! function_exists( 'wp_unregister_actions' ) ) {
+if ( ! function_exists( 'wp_unregister_entity_actions' ) ) {
 	/**
 	 * Unregisters actions of an entity, see
-	 * {@see WP_Actions_Registry::unregister()}.
+	 * {@see WP_Entity_Actions_Registry::unregister()}.
 	 *
-	 * It only runs on the `wp_actions_api_init` action.
+	 * It only runs on the `wp_entity_actions_api_init` action.
 	 *
 	 * @since 7.2.0
 	 *
@@ -64,12 +64,12 @@ if ( ! function_exists( 'wp_unregister_actions' ) ) {
 	 * @return array[] The list of the definitions unregistered, in
 	 *                 registration order. Empty when none is.
 	 */
-	function wp_unregister_actions( $kind, $name, $ids = null ) {
-		return WP_Actions_Registry::get_instance()->unregister( $kind, $name, $ids );
+	function wp_unregister_entity_actions( $kind, $name, $ids = null ) {
+		return WP_Entity_Actions_Registry::get_instance()->unregister( $kind, $name, $ids );
 	}
 }
 
-if ( ! function_exists( 'wp_get_registered_actions' ) ) {
+if ( ! function_exists( 'wp_get_registered_entity_actions' ) ) {
 	/**
 	 * Returns the actions registered for the given entity.
 	 *
@@ -79,12 +79,12 @@ if ( ! function_exists( 'wp_get_registered_actions' ) ) {
 	 *                 registration order. Empty until the `init` action has
 	 *                 completed: a read before then is refused.
 	 */
-	function wp_get_registered_actions( $kind, $name ) {
-		return WP_Actions_Registry::get_instance()->get_registered( $kind, $name );
+	function wp_get_registered_entity_actions( $kind, $name ) {
+		return WP_Entity_Actions_Registry::get_instance()->get_registered( $kind, $name );
 	}
 }
 
-if ( ! function_exists( 'wp_get_registered_action_modules' ) ) {
+if ( ! function_exists( 'wp_get_registered_entity_action_modules' ) ) {
 	/**
 	 * Returns the ids of the script modules registered for the given entity.
 	 *
@@ -96,12 +96,12 @@ if ( ! function_exists( 'wp_get_registered_action_modules' ) ) {
 	 *                                 `init` action has completed: a read
 	 *                                 before then is refused.
 	 */
-	function wp_get_registered_action_modules( $kind, $name ) {
-		return WP_Actions_Registry::get_instance()->get_registered_action_modules( $kind, $name );
+	function wp_get_registered_entity_action_modules( $kind, $name ) {
+		return WP_Entity_Actions_Registry::get_instance()->get_registered_action_modules( $kind, $name );
 	}
 }
 
-if ( ! function_exists( 'wp_get_all_registered_action_modules' ) ) {
+if ( ! function_exists( 'wp_get_all_registered_entity_action_modules' ) ) {
 	/**
 	 * Returns the ids of all script modules registered for any entity.
 	 *
@@ -112,12 +112,12 @@ if ( ! function_exists( 'wp_get_all_registered_action_modules' ) ) {
 	 *                                                completed: a read before
 	 *                                                then is refused.
 	 */
-	function wp_get_all_registered_action_modules() {
-		return WP_Actions_Registry::get_instance()->get_all_registered_action_modules();
+	function wp_get_all_registered_entity_action_modules() {
+		return WP_Entity_Actions_Registry::get_instance()->get_all_registered_action_modules();
 	}
 }
 
-if ( ! function_exists( '_wp_add_action_modules_to_editor_script' ) ) {
+if ( ! function_exists( '_wp_add_entity_action_modules_to_editor_script' ) ) {
 	/**
 	 * Declares the script modules of the entity actions as dependencies of the
 	 * editor script.
@@ -130,7 +130,7 @@ if ( ! function_exists( '_wp_add_action_modules_to_editor_script' ) ) {
 	 * prerequisites depend on it. A dynamic dependency is only listed in the
 	 * import map; the module is fetched when it is imported.
 	 *
-	 * Reading the registry fires `wp_actions_api_init`, so the actions and their
+	 * Reading the registry fires `wp_entity_actions_api_init`, so the actions and their
 	 * script modules are registered on demand. It only reads the registry on the
 	 * pages that load the editor script, not on every admin request (heartbeat,
 	 * Ajax, other screens). It runs on `admin_footer`, the last action before the
@@ -146,7 +146,7 @@ if ( ! function_exists( '_wp_add_action_modules_to_editor_script' ) ) {
 	 *
 	 * @param WP_Scripts|null $scripts The scripts registry. Defaults to the global one.
 	 */
-	function _wp_add_action_modules_to_editor_script( $scripts = null ) {
+	function _wp_add_entity_action_modules_to_editor_script( $scripts = null ) {
 		if ( ! $scripts instanceof WP_Scripts ) {
 			$scripts = wp_scripts();
 		}
@@ -157,7 +157,7 @@ if ( ! function_exists( '_wp_add_action_modules_to_editor_script' ) ) {
 			return;
 		}
 
-		$kinds = wp_get_all_registered_action_modules();
+		$kinds = wp_get_all_registered_entity_action_modules();
 		if ( empty( $kinds ) ) {
 			return;
 		}
@@ -191,5 +191,5 @@ if ( ! function_exists( '_wp_add_action_modules_to_editor_script' ) ) {
 			$scripts->add_data( 'wp-editor', 'module_dependencies', $dependencies );
 		}
 	}
-	add_action( 'admin_footer', '_wp_add_action_modules_to_editor_script', 10, 0 );
+	add_action( 'admin_footer', '_wp_add_entity_action_modules_to_editor_script', 10, 0 );
 }

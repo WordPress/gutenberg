@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! class_exists( 'WP_Actions_Registry' ) ) {
+if ( ! class_exists( 'WP_Entity_Actions_Registry' ) ) {
 
 	/**
 	 * Holds the actions registered for entities.
@@ -19,13 +19,13 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 	 * is stored. To change a registered action, unregister it and register it
 	 * again.
 	 *
-	 * Actions are registered on the `wp_actions_api_init` action, and only
-	 * there, with wp_register_actions() and wp_unregister_actions():
+	 * Actions are registered on the `wp_entity_actions_api_init` action, and only
+	 * there, with wp_register_entity_actions() and wp_unregister_entity_actions():
 	 * register() and unregister() refuse to run while the action is not
 	 * firing.
 	 *
 	 * The registry is filled lazily: the first time its actions are read, it
-	 * fires the `wp_actions_api_init` action, on which the actions of every
+	 * fires the `wp_entity_actions_api_init` action, on which the actions of every
 	 * entity are registered. A read before `init` has completed is refused,
 	 * see initialize().
 	 *
@@ -37,7 +37,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 	 *
 	 * @access private
 	 */
-	class WP_Actions_Registry {
+	class WP_Entity_Actions_Registry {
 
 		/**
 		 * The values DataViews supports for the properties of an action that
@@ -70,7 +70,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		protected $action_modules = array();
 
 		/**
-		 * Whether the `wp_actions_api_init` action has fired since the registry
+		 * Whether the `wp_entity_actions_api_init` action has fired since the registry
 		 * was created.
 		 *
 		 * @var bool
@@ -78,7 +78,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		protected $initialized = false;
 
 		/**
-		 * Whether the registry is firing the `wp_actions_api_init` action, the
+		 * Whether the registry is firing the `wp_entity_actions_api_init` action, the
 		 * only time register() and unregister() run.
 		 *
 		 * @var bool
@@ -88,14 +88,14 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		/**
 		 * The singleton instance.
 		 *
-		 * @var WP_Actions_Registry|null
+		 * @var WP_Entity_Actions_Registry|null
 		 */
 		protected static $instance = null;
 
 		/**
 		 * Returns the singleton instance.
 		 *
-		 * @return WP_Actions_Registry The registry.
+		 * @return WP_Entity_Actions_Registry The registry.
 		 */
 		public static function get_instance() {
 			if ( null === self::$instance ) {
@@ -133,7 +133,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		 *                                   the JavaScript parts of the actions, if any.
 		 * @return string[] The ids of the actions registered, in the order of the
 		 *                  call. Empty when none is, when called outside the
-		 *                  `wp_actions_api_init` action, or when an argument is
+		 *                  `wp_entity_actions_api_init` action, or when an argument is
 		 *                  invalid.
 		 */
 		public function register( $origin, $kind, $name, $actions, $script_module = null ) {
@@ -281,7 +281,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		 * action is forgotten). Unregistering every action forgets the entity:
 		 * its registered actions and script modules.
 		 *
-		 * Like register(), it only runs on the `wp_actions_api_init` action, and
+		 * Like register(), it only runs on the `wp_entity_actions_api_init` action, and
 		 * an invalid entity is reported and unregisters nothing. An id that is
 		 * not a non-empty string is reported and skipped, like a definition
 		 * register() cannot store.
@@ -293,11 +293,11 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		 * @return array[] The list of the definitions unregistered, in
 		 *                 registration order, as get_registered() returns them.
 		 *                 Empty when none of the actions is registered, when
-		 *                 called outside the `wp_actions_api_init` action, or
+		 *                 called outside the `wp_entity_actions_api_init` action, or
 		 *                 when the entity is invalid.
 		 */
 		public function unregister( $kind, $name, $ids = null ) {
-			if ( ! $this->doing_actions_api_init( __METHOD__ ) || ! $this->validate_entity( __METHOD__, $kind, $name ) ) {
+			if ( ! $this->doing_entity_actions_api_init( __METHOD__ ) || ! $this->validate_entity( __METHOD__, $kind, $name ) ) {
 				return array();
 			}
 
@@ -415,7 +415,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		}
 
 		/**
-		 * Fires the `wp_actions_api_init` action the first time the registry
+		 * Fires the `wp_entity_actions_api_init` action the first time the registry
 		 * is read.
 		 *
 		 * The read is refused until `init` has completed. The registry holds the
@@ -437,7 +437,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			if ( ! did_action( 'init' ) || doing_action( 'init' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					__( 'The registered actions cannot be read until the `init` action has completed: the post types and supports they derive from are registered on `init`. Read them once `init` has completed, or hook `wp_actions_api_init`.', 'gutenberg' ),
+					__( 'The registered actions cannot be read until the `init` action has completed: the post types and supports they derive from are registered on `init`. Read them once `init` has completed, or hook `wp_entity_actions_api_init`.', 'gutenberg' ),
 					'7.2.0'
 				);
 				return;
@@ -450,8 +450,8 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			/**
 			 * Fires the first time the registered actions are read, after `init`.
 			 *
-			 * Register or remove actions here, with wp_register_actions() and
-			 * wp_unregister_actions(): it is the only time they run.
+			 * Register or remove actions here, with wp_register_entity_actions() and
+			 * wp_unregister_entity_actions(): it is the only time they run.
 			 *
 			 * The first read happens wherever the actions are needed: while
 			 * handling a REST request as well as on `admin_footer` of the pages
@@ -463,14 +463,14 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			 */
 			$this->initializing = true;
 			try {
-				do_action( 'wp_actions_api_init' );
+				do_action( 'wp_entity_actions_api_init' );
 			} finally {
 				$this->initializing = false;
 			}
 		}
 
 		/**
-		 * Checks that the registry is firing the `wp_actions_api_init` action,
+		 * Checks that the registry is firing the `wp_entity_actions_api_init` action,
 		 * as register() and unregister() require.
 		 *
 		 * Outside the action a registration would either come before the
@@ -483,14 +483,14 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		 * @param string $method The calling method, for the notice.
 		 * @return bool Whether the action is firing.
 		 */
-		protected function doing_actions_api_init( $method ) {
+		protected function doing_entity_actions_api_init( $method ) {
 			if ( $this->initializing ) {
 				return true;
 			}
 
 			_doing_it_wrong(
 				$method,
-				__( 'Actions can only be registered and unregistered on the `wp_actions_api_init` action.', 'gutenberg' ),
+				__( 'Actions can only be registered and unregistered on the `wp_entity_actions_api_init` action.', 'gutenberg' ),
 				'7.2.0'
 			);
 			return false;
@@ -505,11 +505,11 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		 * @param mixed  $name          The entity name.
 		 * @param mixed  $actions       The action definitions.
 		 * @param mixed  $script_module The script module id, if any.
-		 * @return bool Whether the call may proceed: the `wp_actions_api_init`
+		 * @return bool Whether the call may proceed: the `wp_entity_actions_api_init`
 		 *              action is firing and the arguments are valid.
 		 */
 		protected function validate_arguments( $method, $origin, $kind, $name, $actions, $script_module ) {
-			if ( ! $this->doing_actions_api_init( $method ) ) {
+			if ( ! $this->doing_entity_actions_api_init( $method ) ) {
 				return false;
 			}
 

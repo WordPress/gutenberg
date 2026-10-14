@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Gutenberg_REST_Actions_Controller_7_2 class
+ * REST API: Gutenberg_REST_Entity_Actions_Controller_7_2 class
  *
  * @package gutenberg
  */
@@ -10,14 +10,14 @@
  * registered for a given entity type.
  *
  * The actions are the ones registered on the server on the
- * `wp_actions_api_init` action: the serializable part of each action, plus
+ * `wp_entity_actions_api_init` action: the serializable part of each action, plus
  * the script modules that provide the JavaScript parts (callbacks, modals,
  * eligibility checks, icons), each with the ids of the actions it applies
  * to. The client merges both into the actions it shows.
  *
  * @since 7.2.0
  */
-class Gutenberg_REST_Actions_Controller_7_2 extends WP_REST_Controller {
+class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 
 	/**
 	 * Constructor.
@@ -184,7 +184,7 @@ class Gutenberg_REST_Actions_Controller_7_2 extends WP_REST_Controller {
 		$name = $request->get_param( 'name' );
 
 		$script_modules = array();
-		foreach ( wp_get_registered_action_modules( $kind, $name ) as $module => $action_ids ) {
+		foreach ( wp_get_registered_entity_action_modules( $kind, $name ) as $module => $action_ids ) {
 			$script_modules[] = array(
 				// A numeric module id is an integer as an array key.
 				'id'      => (string) $module,
@@ -195,7 +195,7 @@ class Gutenberg_REST_Actions_Controller_7_2 extends WP_REST_Controller {
 		$response = array(
 			'kind'           => $kind,
 			'name'           => $name,
-			'actions'        => wp_get_registered_actions( $kind, $name ),
+			'actions'        => wp_get_registered_entity_actions( $kind, $name ),
 			'script_modules' => $script_modules,
 		);
 

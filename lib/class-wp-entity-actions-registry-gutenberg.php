@@ -5,20 +5,20 @@
  * @package gutenberg
  */
 
-class WP_Actions_Registry_Gutenberg extends WP_Actions_Registry {
+class WP_Entity_Actions_Registry_Gutenberg extends WP_Entity_Actions_Registry {
 
 	/**
 	 * Returns the shared registry instance.
 	 *
 	 * This class intentionally does not redeclare the static `$instance`
-	 * property, so that it can be shared between `WP_Actions_Registry` and
-	 * `WP_Actions_Registry_Gutenberg`.
+	 * property, so that it can be shared between `WP_Entity_Actions_Registry` and
+	 * `WP_Entity_Actions_Registry_Gutenberg`.
 	 *
 	 * In other words, consumers can (and should) continue to call
-	 * `WP_Actions_Registry::get_instance()` to access the registry, but they
-	 * will receive an instance of `WP_Actions_Registry_Gutenberg`.
+	 * `WP_Entity_Actions_Registry::get_instance()` to access the registry, but they
+	 * will receive an instance of `WP_Entity_Actions_Registry_Gutenberg`.
 	 *
-	 * @return WP_Actions_Registry_Gutenberg The registry.
+	 * @return WP_Entity_Actions_Registry_Gutenberg The registry.
 	 */
 	public static function get_instance() {
 		if ( ! self::$instance instanceof self ) {
@@ -32,14 +32,14 @@ class WP_Actions_Registry_Gutenberg extends WP_Actions_Registry {
 			 *
 			 * This means that, in practice, it's likely impossible that we
 			 * find ourselves in a situation where there is data in the
-			 * properties of the instance of `WP_Actions_Registry` that needs
-			 * to be copied to the instance of `WP_Actions_Registry_Gutenberg`.
+			 * properties of the instance of `WP_Entity_Actions_Registry` that needs
+			 * to be copied to the instance of `WP_Entity_Actions_Registry_Gutenberg`.
 			 *
 			 * THUS, THE ASSIGNMENTS BELOW REFLECT AN ABUNDANCE OF CAUTION AND
 			 * NOT AN ACTUAL NEED.
 			 *
-			 * @see WP_Actions_Registry::initialize()
-			 * @see WP_Actions_Registry::doing_actions_api_init()
+			 * @see WP_Entity_Actions_Registry::initialize()
+			 * @see WP_Entity_Actions_Registry::doing_entity_actions_api_init()
 			 */
 			if ( null !== $core_registry ) {
 				$registry->actions        = $core_registry->actions;
@@ -56,9 +56,9 @@ class WP_Actions_Registry_Gutenberg extends WP_Actions_Registry {
 
 /**
  * Replaces the core actions registry with the plugin one, so that all code
- * using `WP_Actions_Registry::get_instance()` receives it.
+ * using `WP_Entity_Actions_Registry::get_instance()` receives it.
  */
-function gutenberg_override_wp_actions_registry() {
-	WP_Actions_Registry_Gutenberg::get_instance();
+function gutenberg_override_wp_entity_actions_registry() {
+	WP_Entity_Actions_Registry_Gutenberg::get_instance();
 }
-add_action( 'init', 'gutenberg_override_wp_actions_registry', 1 );
+add_action( 'init', 'gutenberg_override_wp_entity_actions_registry', 1 );

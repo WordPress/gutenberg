@@ -1,12 +1,12 @@
 <?php
 /**
- * Unit tests covering Gutenberg_REST_Actions_Controller_7_2 functionality.
+ * Unit tests covering Gutenberg_REST_Entity_Actions_Controller_7_2 functionality.
  *
  * @package gutenberg
  *
- * @coversDefaultClass Gutenberg_REST_Actions_Controller_7_2
+ * @coversDefaultClass Gutenberg_REST_Entity_Actions_Controller_7_2
  */
-class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
+class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 
 	/**
 	 * The REST route the controller registers.
@@ -58,7 +58,7 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 	 * Tears down each test.
 	 *
 	 * Resetting the registry drops the actions a test registered; the next
-	 * read fires `wp_actions_api_init` again. The test case removes the
+	 * read fires `wp_entity_actions_api_init` again. The test case removes the
 	 * callbacks the test hooked.
 	 */
 	public function tear_down() {
@@ -70,19 +70,19 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 	/**
 	 * Resets the registry: drops the singleton instance and puts an empty
 	 * plugin registry in its place, as `init` does, so its first read fires
-	 * `wp_actions_api_init` again.
+	 * `wp_entity_actions_api_init` again.
 	 */
 	private static function reset_registry() {
-		$instance = new ReflectionProperty( WP_Actions_Registry::class, 'instance' );
+		$instance = new ReflectionProperty( WP_Entity_Actions_Registry::class, 'instance' );
 		if ( PHP_VERSION_ID < 80100 ) {
 			$instance->setAccessible( true );
 		}
 		$instance->setValue( null, null );
-		WP_Actions_Registry_Gutenberg::get_instance();
+		WP_Entity_Actions_Registry_Gutenberg::get_instance();
 	}
 
 	/**
-	 * Registers actions on `wp_actions_api_init` for the duration of the test,
+	 * Registers actions on `wp_entity_actions_api_init` for the duration of the test,
 	 * with the `test-plugin` origin: the registry is reset on tear down.
 	 *
 	 * Registering only runs on the action, so the registration is hooked to
@@ -98,12 +98,12 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 	private function register_actions( $kind, $name, $actions, $module = null ) {
 		$registered = array();
 		$callback   = static function () use ( &$registered, $kind, $name, $actions, $module ) {
-			$registered = wp_register_actions( 'test-plugin', $kind, $name, $actions, $module );
+			$registered = wp_register_entity_actions( 'test-plugin', $kind, $name, $actions, $module );
 		};
-		add_action( 'wp_actions_api_init', $callback );
+		add_action( 'wp_entity_actions_api_init', $callback );
 
 		self::reset_registry();
-		WP_Actions_Registry::get_instance()->get_all_registered();
+		WP_Entity_Actions_Registry::get_instance()->get_all_registered();
 
 		return $registered;
 	}
@@ -136,8 +136,8 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertArrayHasKey( self::ROUTE, $routes );
 		$this->assertCount( 1, $routes[ self::ROUTE ], 'The route should be registered once.' );
-		$this->assertInstanceOf( 'Gutenberg_REST_Actions_Controller_7_2', $routes[ self::ROUTE ][0]['callback'][0] );
-		$this->assertSame( PHP_INT_MAX, has_action( 'rest_api_init', 'gutenberg_register_actions_controller_endpoints' ), 'The route is registered after the routes of core, to override its controller.' );
+		$this->assertInstanceOf( 'Gutenberg_REST_Entity_Actions_Controller_7_2', $routes[ self::ROUTE ][0]['callback'][0] );
+		$this->assertSame( PHP_INT_MAX, has_action( 'rest_api_init', 'gutenberg_register_entity_actions_controller_endpoints' ), 'The route is registered after the routes of core, to override its controller.' );
 	}
 
 	/**
@@ -149,7 +149,7 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 	 */
 	public function test_the_route_of_a_taxonomy_with_the_same_base_is_kept() {
 		global $wp_rest_server;
-		$this->setExpectedIncorrectUsage( 'Gutenberg_REST_Actions_Controller_7_2::is_route_of_entity_items' );
+		$this->setExpectedIncorrectUsage( 'Gutenberg_REST_Entity_Actions_Controller_7_2::is_route_of_entity_items' );
 		register_taxonomy( 'actions', 'post', array( 'show_in_rest' => true ) );
 
 		try {
@@ -506,7 +506,7 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 	 * @covers ::get_action_schema
 	 */
 	public function test_get_item_schema() {
-		$controller = new Gutenberg_REST_Actions_Controller_7_2();
+		$controller = new Gutenberg_REST_Entity_Actions_Controller_7_2();
 		$schema     = $controller->get_item_schema();
 
 		$this->assertSame( array( 'kind', 'name', 'actions', 'script_modules' ), array_keys( $schema['properties'] ) );
@@ -548,7 +548,7 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 
 		wp_set_current_user( self::$editor_id );
 		$response = $this->dispatch_request( 'postType', 'page' );
-		$schema   = ( new Gutenberg_REST_Actions_Controller_7_2() )->get_item_schema();
+		$schema   = ( new Gutenberg_REST_Entity_Actions_Controller_7_2() )->get_item_schema();
 
 		$this->assertTrue( rest_validate_value_from_schema( $response->get_data(), $schema ) );
 	}
