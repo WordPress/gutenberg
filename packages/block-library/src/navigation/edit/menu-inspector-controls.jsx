@@ -3,7 +3,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, Spinner } from '@wordpress/components';
+import { PanelBody, Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
@@ -52,7 +52,7 @@ const MainContent = ( {
 	}
 
 	if ( isLoading ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	const description = navigationMenu

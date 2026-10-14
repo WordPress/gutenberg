@@ -1,7 +1,5 @@
-import {
-	Spinner,
-	SelectControl as WCSelectControl,
-} from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -18,25 +16,31 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 	}, [] );
 
 	if ( ! widgetTypes ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	if ( widgetTypes.length === 0 ) {
 		return __( 'There are no widgets available.' );
 	}
 
+	const items = [
+		{ value: '', label: __( 'Select widget' ) },
+		...widgetTypes.map( ( widgetType ) => ( {
+			value: widgetType.id,
+			label: widgetType.name,
+		} ) ),
+	];
+
 	return (
-		<WCSelectControl
+		<SelectControl
 			label={ __( 'Legacy widget' ) }
-			value={ selectedId ?? '' }
-			options={ [
-				{ value: '', label: __( 'Select widget' ) },
-				...widgetTypes.map( ( widgetType ) => ( {
-					value: widgetType.id,
-					label: widgetType.name,
-				} ) ),
-			] }
-			onChange={ ( value ) => {
+			value={
+				items.find( ( item ) => item.value === selectedId ) ??
+				items[ 0 ]
+			}
+			items={ items }
+			onValueChange={ ( item ) => {
+				const value = item?.value;
 				if ( value ) {
 					const selected = widgetTypes.find(
 						( widgetType ) => widgetType.id === value

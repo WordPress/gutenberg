@@ -39,6 +39,7 @@ const GradientAnglePicker = ( {
 				orientation: {
 					type: 'angular',
 					value: `${ newAngle }`,
+					unit: 'deg',
 				},
 			} )
 		);
@@ -74,6 +75,7 @@ const GradientTypePicker = ( {
 				orientation: {
 					type: 'angular' as const,
 					value: `${ lastLinearOrientationAngle.current }`,
+					unit: 'deg',
 				},
 				type: 'linear-gradient',
 			} satisfies LinearGradientNode )
