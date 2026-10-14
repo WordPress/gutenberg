@@ -1174,8 +1174,6 @@ export default function TypographyPanel( {
 						// local only on user change.
 						value={ localTextIndent ?? inheritedTextIndent }
 						onChange={ setTextIndentValue }
-						__unstableInputWidth="auto"
-						withSlider
 						hasBottomMargin={ isGlobalStyles }
 						placeholder={
 							isTextIndentPlaceholder
