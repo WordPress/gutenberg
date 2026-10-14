@@ -63,8 +63,8 @@ export interface WidgetHost {
 	actions?: WidgetHostActions;
 
 	/**
-	 * Translated title of the widget the host renders, for accessible names
-	 * built inside the widget. Absent: the widget names its content itself.
+	 * Translated title of the widget the host renders. Absent: the widget
+	 * names its content itself.
 	 */
 	title?: string;
 }
