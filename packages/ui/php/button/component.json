@@ -1,0 +1,45 @@
+{
+	"name": "button",
+	"example": { "label": "Save changes" },
+	"props": {
+		"label": { "type": "string", "required": true },
+		"tone": {
+			"type": "string",
+			"enum": [ "brand", "neutral" ],
+			"default": "brand"
+		},
+		"variant": {
+			"type": "string",
+			"enum": [ "solid", "outline", "minimal", "unstyled" ],
+			"default": "solid"
+		},
+		"size": {
+			"type": "string",
+			"enum": [ "default", "compact", "small" ],
+			"default": "default"
+		},
+		"type": {
+			"type": "string",
+			"enum": [ "button", "submit", "reset" ],
+			"default": "button",
+			"slot": true
+		},
+		"disabled": { "type": "boolean", "default": false },
+		"loading": { "type": "boolean", "default": false },
+		"class": { "type": "string", "default": "" }
+	},
+	"render": [
+		"Button",
+		{
+			"tone": "$tone",
+			"variant": "$variant",
+			"size": "$size",
+			"type": "$type",
+			"disabled": "$disabled",
+			"loading": "$loading",
+			"className": "$class",
+			"focusableWhenDisabled": false
+		},
+		"$label"
+	]
+}
