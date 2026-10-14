@@ -154,16 +154,17 @@
 		cursor: var(--_wp-components-input-control-drag-cursor);
 	}
 
-	&:disabled {
+	&:where(:disabled) {
 		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 
 		@media (forced-colors: active) {
 			color: GrayText;
 		}
 
-		&::placeholder {
-			color: var(--wpds-color-foreground-interactive-neutral-disabled);
-		}
+	}
+
+	&:disabled::placeholder {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
 	}
 
 	&::-webkit-input-placeholder {
