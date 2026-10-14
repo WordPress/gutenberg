@@ -96,6 +96,7 @@ jobs:
                       packages/*/build-style
                       packages/*/build-types
                       packages/*/build-wp
+                      packages/*/build-php
                       packages/*/src/library/*.tsx
                       packages/*/src/library/index.ts
                       packages/*/src/worker-code.ts
