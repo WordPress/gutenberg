@@ -7,6 +7,10 @@
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 -   Stop normalizing deprecated style state aliases and falling back to legacy style paths; global styles must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
 
+### Enhancements
+
+-   Output a custom duotone, a list of colors in a block's `filter.duotone`, as `filter: url(#id)` with a matching SVG filter, including in block style variations ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ## 1.24.0 (2026-10-07)
 
 ### New Features

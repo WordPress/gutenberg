@@ -21,7 +21,7 @@ import {
 } from '../utils/common';
 import { getBlockSelector } from './selectors';
 import { getTypographyFontSizeValue } from '../utils/typography';
-import { getDuotoneFilter } from '../utils/duotone';
+import { getCustomDuotoneFilterId, getDuotoneFilter } from '../utils/duotone';
 import { kebabCase } from '../utils/string';
 import { getGapCSSValue } from '../utils/gap';
 import { setBackgroundStyleDefaults } from '../utils/background';
@@ -664,6 +664,15 @@ export function getStylesDeclarations(
 				blockStyles,
 				pathToValue
 			);
+
+			// A custom duotone is a list of colors, rendered as an SVG filter.
+			if ( key === 'filter' && Array.isArray( styleValue ) ) {
+				const filterId = getCustomDuotoneFilterId( styleValue );
+				if ( filterId ) {
+					declarations.push( `filter: url(#${ filterId })` );
+				}
+				return declarations;
+			}
 
 			// Root-level padding styles don't currently support strings with CSS shorthand values.
 			// This may change: https://github.com/WordPress/gutenberg/issues/40132.
@@ -1993,9 +2002,21 @@ export function generateSvgFilters(
 	blockSelectors: BlockSelectors
 ): string[] {
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
-	return nodesWithSettings.flatMap( ( { presets } ) => {
+	const presetFilters = nodesWithSettings.flatMap( ( { presets } ) => {
 		return getPresetsSvgFilters( presets );
 	} );
+
+	// Custom duotones set in block styles, keyed by id to output each once.
+	const customFilters: Record< string, string > = {};
+	getNodesWithStyles( tree, blockSelectors ).forEach( ( { styles } ) => {
+		const colors = styles?.filter?.duotone;
+		const filterId = getCustomDuotoneFilterId( colors );
+		if ( filterId && ! customFilters[ filterId ] ) {
+			customFilters[ filterId ] = getDuotoneFilter( filterId, colors );
+		}
+	} );
+
+	return [ ...presetFilters, ...Object.values( customFilters ) ];
 }
 
 const getSelectorsConfig = ( blockType: BlockType, rootSelector: string ) => {

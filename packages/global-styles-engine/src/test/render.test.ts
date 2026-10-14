@@ -1859,6 +1859,41 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'should output a custom duotone as an SVG filter url', () => {
+			const tree = {
+				styles: {
+					blocks: {
+						'core/image': {
+							filter: { duotone: [ '#000', 'rgb(255, 0, 0)' ] },
+						},
+						'core/cover': {
+							filter: { duotone: [ 'red', '<script>' ] },
+						},
+					},
+				},
+			};
+
+			const blockSelectors = {
+				'core/image': {
+					selector: '.wp-image',
+					duotoneSelector: '.wp-image img',
+				},
+				'core/cover': {
+					selector: '.wp-cover',
+					duotoneSelector: '.wp-cover img',
+				},
+			};
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				blockSelectors
+			);
+			expect( result ).toContain(
+				'.wp-image img{filter: url(#wp-duotone-custom-000000-ff0000);}'
+			);
+			expect( result ).not.toContain( '.wp-cover img' );
+		} );
+
 		it( 'should output content and wide size variables if values are specified', () => {
 			const tree = {
 				settings: {
@@ -2095,6 +2130,60 @@ describe( 'global styles renderer', () => {
 			expect( assets ).toContain( 'wp-duotone-midnight' );
 			expect( assets ).toContain( 'wp-duotone-grayscale' );
 			expect( assets ).toContain( 'wp-duotone-custom-duotone-1' );
+		} );
+
+		it( 'should output one SVG filter per custom duotone used in block styles', () => {
+			mockedSelect.mockReturnValue( {
+				getBlockStyles: () => [],
+			} );
+
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/image': {
+							filter: { duotone: [ '#000000', '#ff0000' ] },
+						},
+						'core/cover': {
+							filter: { duotone: [ '#000', '#f00' ] },
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/image',
+					selectors: {
+						root: '.wp-block-image',
+						filter: { duotone: '.wp-block-image img' },
+					},
+				},
+				{
+					name: 'core/cover',
+					selectors: {
+						root: '.wp-block-cover',
+						filter: { duotone: '.wp-block-cover img' },
+					},
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles( config, blockTypes );
+			const assets = styles
+				.find( ( s: any ) => s.__unstableType === 'svgs' )
+				.assets.join( '' );
+
+			expect(
+				assets.match( /<filter id="wp-duotone-custom-000000-ff0000">/g )
+			).toHaveLength( 1 );
+			expect( assets ).toContain( 'tableValues="0 1"' );
+
+			const css = styles.map( ( s: any ) => s.css ?? '' ).join( '' );
+			expect( css ).toContain(
+				':root :where(.wp-block-image img){filter: url(#wp-duotone-custom-000000-ff0000);}'
+			);
+			expect( css ).not.toContain( '#000000,#ff0000' );
 		} );
 
 		describe( 'block gap support', () => {
