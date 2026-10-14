@@ -8,6 +8,8 @@ The session also holds named edits other than crop: `session.edits`, set with `s
 
 `session.reset()` puts every slice back to its starting state in one undo entry: default geometry and crop options, no edits, same image. The Reset button calls it; it does not compose per-slice resets itself.
 
+Sidebar panels are React: a `MediaEditorPanel` rendered anywhere inside the editor announces `{ name, title, order, mediaTypes }` while mounted and fills a slot with its content, and the sidebar turns the mounted panels into tabs. Core's Crop and Details panels are rendered with that component, so the editor itself exercises the extension point. A plugin renders one from a `registerPlugin` callback in the `media-editor` scope, which the editor mounts through `PluginArea` inside the session provider, so `useMediaEditor()` gives the plugin the whole session. This follows the post editor's `PluginSidebar`: plugin UI arrives as components through Slot/Fill, not as entries in a store.
+
 ## Use the Session With the Canvas
 
 Use the media editor session when image editor state must share history with controls such as aspect ratio. The session owns history and gesture boundaries; pass its `imageEditor` controller to `<ImageEditorCanvas>`.
