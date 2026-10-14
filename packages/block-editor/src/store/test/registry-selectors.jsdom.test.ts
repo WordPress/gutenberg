@@ -14,31 +14,53 @@ import {
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
 import { select, dispatch } from '@wordpress/data';
+import type { BlockConfiguration } from '@wordpress/blocks';
 import { store } from '../';
 import { isFiltered } from '../utils';
+import type { TreeBlock } from '../types';
+
+type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
+	? T
+	: T extends object
+		? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
+		: T;
+
+/*
+ * Fixtures set only the fields the selector under test reads, down to the
+ * inner blocks, so this marks the deliberately partial blocks and types.
+ */
+function partial< T >( fixture: DeepPartial< T > ) {
+	return fixture as T;
+}
 
 describe( 'selectors', () => {
 	beforeEach( () => {
-		registerBlockType( 'core/test-block-a', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'design',
-			title: 'Test Block A',
-			icon: 'test',
-			keywords: [ 'testing' ],
-		} );
+		registerBlockType(
+			'core/test-block-a',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'design',
+				title: 'Test Block A',
+				icon: 'test',
+				keywords: [ 'testing' ],
+			} )
+		);
 
-		registerBlockType( 'core/test-block-b', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'text',
-			title: 'Test Block B',
-			icon: 'test',
-			keywords: [ 'testing' ],
-			supports: {
-				multiple: false,
-			},
-		} );
+		registerBlockType(
+			'core/test-block-b',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'text',
+				title: 'Test Block B',
+				icon: 'test',
+				keywords: [ 'testing' ],
+				supports: {
+					multiple: false,
+				},
+			} )
+		);
 	} );
 
 	afterEach( async () => {
@@ -110,21 +132,24 @@ describe( 'selectors', () => {
 		} );
 		it( 'should return empty array if only patterns hidden from UI exist', () => {
 			expect(
-				select( store ).__experimentalGetAllowedPatterns( {
-					blocks: { byClientId: new Map() },
-					blockListSettings: new Map(),
-					settings: {
-						__experimentalBlockPatterns: [
-							{
-								name: 'pattern-c',
-								title: 'pattern hidden from UI',
-								inserter: false,
-								content:
-									'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
-							},
-						],
-					},
-				} )
+				select( store ).__experimentalGetAllowedPatterns(
+					// @ts-expect-error The test passes a state where the root client ID goes.
+					{
+						blocks: { byClientId: new Map() },
+						blockListSettings: new Map(),
+						settings: {
+							__experimentalBlockPatterns: [
+								{
+									name: 'pattern-c',
+									title: 'pattern hidden from UI',
+									inserter: false,
+									content:
+										'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
+								},
+							],
+						},
+					}
+				)
 			).toHaveLength( 0 );
 		} );
 	} );
@@ -162,7 +187,7 @@ describe( 'selectors', () => {
 		} );
 		it( 'should return existing pattern properly parsed', () => {
 			const { name, blocks } =
-				select( store ).__experimentalGetParsedPattern( 'pattern-a' );
+				select( store ).__experimentalGetParsedPattern( 'pattern-a' )!;
 			expect( name ).toEqual( 'pattern-a' );
 			expect( blocks ).toHaveLength( 1 );
 			expect( blocks[ 0 ] ).toEqual(
@@ -174,7 +199,7 @@ describe( 'selectors', () => {
 		it( 'should return hidden from UI pattern when requested', () => {
 			const { name, blocks, inserter } = select(
 				store
-			).__experimentalGetParsedPattern( 'pattern-hidden-from-ui' );
+			).__experimentalGetParsedPattern( 'pattern-hidden-from-ui' )!;
 			expect( name ).toEqual( 'pattern-hidden-from-ui' );
 			expect( inserter ).toBeFalsy();
 			expect( blocks ).toHaveLength( 2 );
@@ -337,17 +362,18 @@ describe( 'selectors', () => {
 		describe( 'should return empty array', () => {
 			it( 'when no blocks are selected', () => {
 				expect(
+					// @ts-expect-error Deliberately no blocks.
 					select( store ).__experimentalGetPatternTransformItems()
 				).toEqual( [] );
 			} );
 			it( 'when a selected block has inner blocks', () => {
-				const blocks = [
+				const blocks = partial< TreeBlock[] >( [
 					{ name: 'core/test-block-a', innerBlocks: [] },
 					{
 						name: 'core/test-block-b',
 						innerBlocks: [ { name: 'some inner block' } ],
 					},
-				];
+				] );
 				expect(
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
@@ -355,14 +381,14 @@ describe( 'selectors', () => {
 				).toEqual( [] );
 			} );
 			it( 'when a selected block has controlled inner blocks', () => {
-				const blocks = [
+				const blocks = partial< TreeBlock[] >( [
 					{ name: 'core/test-block-a', innerBlocks: [] },
 					{
 						name: 'core/test-block-b',
 						clientId: 'block2-clientId',
 						innerBlocks: [],
 					},
-				];
+				] );
 				expect(
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
@@ -370,9 +396,9 @@ describe( 'selectors', () => {
 				).toEqual( [] );
 			} );
 			it( 'when no patterns are available based on the selected blocks', () => {
-				const blocks = [
+				const blocks = partial< TreeBlock[] >( [
 					{ name: 'block-with-no-patterns', innerBlocks: [] },
-				];
+				] );
 				expect(
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
@@ -382,9 +408,9 @@ describe( 'selectors', () => {
 		} );
 		describe( 'should return proper results', () => {
 			it( 'when a single block is selected', () => {
-				const blocks = [
+				const blocks = partial< TreeBlock[] >( [
 					{ name: 'core/test-block-b', innerBlocks: [] },
-				];
+				] );
 				const patterns =
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
@@ -397,11 +423,11 @@ describe( 'selectors', () => {
 				);
 			} );
 			it( 'when different multiple blocks are selected', () => {
-				const blocks = [
+				const blocks = partial< TreeBlock[] >( [
 					{ name: 'core/test-block-b', innerBlocks: [] },
 					{ name: 'test/block-b', innerBlocks: [] },
 					{ name: 'some other block', innerBlocks: [] },
-				];
+				] );
 				const patterns =
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks
@@ -419,12 +445,12 @@ describe( 'selectors', () => {
 				);
 			} );
 			it( 'when multiple blocks are selected containing multiple times the same block', () => {
-				const blocks = [
+				const blocks = partial< TreeBlock[] >( [
 					{ name: 'core/test-block-b', innerBlocks: [] },
 					{ name: 'some other block', innerBlocks: [] },
 					{ name: 'core/test-block-a', innerBlocks: [] },
 					{ name: 'core/test-block-b', innerBlocks: [] },
-				];
+				] );
 				const patterns =
 					select( store ).__experimentalGetPatternTransformItems(
 						blocks

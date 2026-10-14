@@ -20,11 +20,31 @@ import {
 import { RawHTML } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
 import { select, dispatch } from '@wordpress/data';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import * as selectors from '../selectors';
 import { store } from '../';
 import { lock } from '../../lock-unlock';
 import { sectionRootClientIdKey } from '../private-keys';
 import { isFiltered } from '../utils';
+import type { State } from '../types';
+
+type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
+	? T
+	: T extends Node
+		? T
+		: T extends Map< infer K, infer V >
+			? Map< K, DeepPartial< V > >
+			: T extends object
+				? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
+				: T;
+
+/*
+ * Fixtures set only the fields the selector under test reads, down to the
+ * blocks in the maps, so this marks the deliberately partial states.
+ */
+function partial< T >( fixture: DeepPartial< T > ) {
+	return fixture as T;
+}
 
 const {
 	getBlockName,
@@ -88,135 +108,172 @@ const {
 } = selectors;
 
 describe( 'selectors', () => {
-	let cachedSelectors;
+	let cachedSelectors: Array< { clear?: () => void } >;
 
 	beforeAll( () => {
-		cachedSelectors = Object.entries( selectors )
+		cachedSelectors = Object.entries(
+			selectors as Record< string, { clear?: () => void } >
+		)
 			.filter( ( [ , selector ] ) => selector.clear )
 			.map( ( [ , selector ] ) => selector );
 	} );
 
 	beforeEach( () => {
-		registerBlockType( 'core/block', {
-			apiVersion: 3,
-			save: () => null,
-			category: 'reusable',
-			title: 'Reusable Block Stub',
-			supports: {
-				inserter: false,
-			},
-		} );
-
-		registerBlockType( 'core/test-block-a', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'design',
-			title: 'Test Block A',
-			icon: 'test',
-			keywords: [ 'testing' ],
-		} );
-
-		registerBlockType( 'core/test-block-b', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'text',
-			title: 'Test Block B',
-			icon: 'test',
-			keywords: [ 'testing' ],
-			supports: {
-				multiple: false,
-			},
-		} );
-
-		registerBlockType( 'core/test-block-c', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'text',
-			title: 'Test Block C',
-			icon: 'test',
-			keywords: [ 'testing' ],
-			parent: [ 'core/test-block-b' ],
-		} );
-
-		registerBlockType( 'core/freeform', {
-			apiVersion: 3,
-			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
-			category: 'text',
-			title: 'Test Freeform Content Handler',
-			icon: 'test',
-			attributes: {
-				content: {
-					type: 'string',
+		registerBlockType(
+			'core/block',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: () => null,
+				category: 'reusable',
+				title: 'Reusable Block Stub',
+				supports: {
+					inserter: false,
 				},
-			},
-		} );
+			} )
+		);
 
-		registerBlockType( 'core/post-content-child', {
-			apiVersion: 3,
-			save: () => null,
-			category: 'text',
-			title: 'Test Block Post Content Child',
-			icon: 'test',
-			keywords: [ 'testing' ],
-			parent: [ 'core/post-content' ],
-		} );
+		registerBlockType(
+			'core/test-block-a',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'design',
+				title: 'Test Block A',
+				icon: 'test',
+				keywords: [ 'testing' ],
+			} )
+		);
 
-		registerBlockType( 'core/test-block-ancestor', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'text',
-			title: 'Test Block required as ancestor',
-			icon: 'test',
-			keywords: [ 'testing' ],
-		} );
-
-		registerBlockType( 'core/test-block-parent', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'text',
-			title: 'Test Block required as parent',
-			icon: 'test',
-			keywords: [ 'testing' ],
-		} );
-
-		registerBlockType( 'core/test-block-requires-ancestor', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'text',
-			title: 'Test Block that requires ancestor',
-			icon: 'test',
-			keywords: [ 'testing' ],
-			ancestor: [ 'core/test-block-ancestor' ],
-		} );
-
-		registerBlockType( 'core/test-block-requires-ancestor-parent', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'text',
-			title: 'Test Block that requires both ancestor and parent',
-			icon: 'test',
-			keywords: [ 'testing' ],
-			parent: [ 'core/test-block-parent' ],
-			ancestor: [ 'core/test-block-ancestor' ],
-		} );
-
-		registerBlockType( 'core/test-content-block', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'text',
-			title: 'Test Content Block',
-			icon: 'test',
-			attributes: {
-				text: {
-					type: 'string',
-					role: 'content',
+		registerBlockType(
+			'core/test-block-b',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'text',
+				title: 'Test Block B',
+				icon: 'test',
+				keywords: [ 'testing' ],
+				supports: {
+					multiple: false,
 				},
-			},
-		} );
+			} )
+		);
+
+		registerBlockType(
+			'core/test-block-c',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'text',
+				title: 'Test Block C',
+				icon: 'test',
+				keywords: [ 'testing' ],
+				parent: [ 'core/test-block-b' ],
+			} )
+		);
+
+		registerBlockType(
+			'core/freeform',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => (
+					<RawHTML>{ props.attributes.content as string }</RawHTML>
+				),
+				category: 'text',
+				title: 'Test Freeform Content Handler',
+				icon: 'test',
+				attributes: {
+					content: {
+						type: 'string',
+					},
+				},
+			} )
+		);
+
+		registerBlockType(
+			'core/post-content-child',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Test Block Post Content Child',
+				icon: 'test',
+				keywords: [ 'testing' ],
+				parent: [ 'core/post-content' ],
+			} )
+		);
+
+		registerBlockType(
+			'core/test-block-ancestor',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'text',
+				title: 'Test Block required as ancestor',
+				icon: 'test',
+				keywords: [ 'testing' ],
+			} )
+		);
+
+		registerBlockType(
+			'core/test-block-parent',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'text',
+				title: 'Test Block required as parent',
+				icon: 'test',
+				keywords: [ 'testing' ],
+			} )
+		);
+
+		registerBlockType(
+			'core/test-block-requires-ancestor',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'text',
+				title: 'Test Block that requires ancestor',
+				icon: 'test',
+				keywords: [ 'testing' ],
+				ancestor: [ 'core/test-block-ancestor' ],
+			} )
+		);
+
+		registerBlockType(
+			'core/test-block-requires-ancestor-parent',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'text',
+				title: 'Test Block that requires both ancestor and parent',
+				icon: 'test',
+				keywords: [ 'testing' ],
+				parent: [ 'core/test-block-parent' ],
+				ancestor: [ 'core/test-block-ancestor' ],
+			} )
+		);
+
+		registerBlockType(
+			'core/test-content-block',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'text',
+				title: 'Test Content Block',
+				icon: 'test',
+				attributes: {
+					text: {
+						type: 'string',
+						role: 'content',
+					},
+				},
+			} )
+		);
 
 		setFreeformContentHandlerName( 'core/freeform' );
 
-		cachedSelectors.forEach( ( { clear } ) => clear() );
+		cachedSelectors.forEach( ( { clear } ) => clear!() );
 	} );
 
 	afterEach( () => {
@@ -232,19 +289,21 @@ describe( 'selectors', () => {
 		unregisterBlockType( 'core/test-block-requires-ancestor-parent' );
 		unregisterBlockType( 'core/test-content-block' );
 
+		// @ts-expect-error Deliberately resets the handler to no block.
 		setFreeformContentHandlerName( undefined );
 	} );
 
 	describe( 'getBlockName', () => {
 		it( 'returns null if no block by clientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
+					// @ts-expect-error A plain object, which `getBlockName` never reads.
 					attributes: {},
 					order: new Map(),
 					parents: new Map(),
 				},
-			};
+			} );
 
 			const name = getBlockName(
 				state,
@@ -255,7 +314,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'returns block name', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -283,7 +342,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			const name = getBlockName(
 				state,
@@ -296,7 +355,7 @@ describe( 'selectors', () => {
 
 	describe( 'getBlock', () => {
 		it( 'should return the block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -331,7 +390,7 @@ describe( 'selectors', () => {
 					),
 					controlledInnerBlocks: new Set(),
 				},
-			};
+			} );
 
 			expect( getBlock( state, '123' ) ).toBe(
 				state.blocks.tree.get( '123' )
@@ -339,7 +398,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return null if the block is not present in state', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -357,7 +416,7 @@ describe( 'selectors', () => {
 					),
 					controlledInnerBlocks: new Set(),
 				},
-			};
+			} );
 
 			expect( getBlock( state, '123' ) ).toBe( null );
 		} );
@@ -365,7 +424,7 @@ describe( 'selectors', () => {
 
 	describe( 'getBlocks', () => {
 		it( 'should return the ordered blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -414,17 +473,17 @@ describe( 'selectors', () => {
 					),
 					controlledInnerBlocks: new Set(),
 				},
-			};
+			} );
 
 			expect( getBlocks( state ) ).toBe(
-				state.blocks.tree.get( '' ).innerBlocks
+				state.blocks.tree.get( '' )!.innerBlocks
 			);
 		} );
 	} );
 
 	describe( 'getBlockParents', () => {
 		it( 'should return parent blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					parents: new Map(
 						Object.entries( {
@@ -454,15 +513,9 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					cache: {
-						'client-id-01': {},
-						'client-id-02': {},
-						'client-id-03': {},
-						'client-id-04': {},
-					},
 					controlledInnerBlocks: new Set(),
 				},
-			};
+			} );
 
 			expect( getBlockParents( state, 'client-id-04' ) ).toEqual( [
 				'client-id-01',
@@ -475,7 +528,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockParentsByBlockName', () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				parents: new Map(
 					Object.entries( {
@@ -510,16 +563,9 @@ describe( 'selectors', () => {
 						},
 					} )
 				),
-				cache: {
-					'client-id-01': {},
-					'client-id-02': {},
-					'client-id-03': {},
-					'client-id-04': {},
-					'client-id-05': {},
-				},
 				controlledInnerBlocks: new Set(),
 			},
-		};
+		} );
 		it( 'should return parent blocks', () => {
 			expect(
 				getBlockParentsByBlockName(
@@ -562,7 +608,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getClientIdsOfDescendants', () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				byClientId: new Map(
 					Object.entries( {
@@ -684,7 +730,7 @@ describe( 'selectors', () => {
 				),
 				controlledInnerBlocks: new Set(),
 			},
-		};
+		} );
 
 		it( 'should return the ids of any descendants in sequential order, given an array of clientIds', () => {
 			expect( getClientIdsOfDescendants( state, [ 'uuid-10' ] ) ).toEqual(
@@ -710,7 +756,7 @@ describe( 'selectors', () => {
 
 	describe( 'getClientIdsWithDescendants', () => {
 		it( 'should return the ids for top-level blocks and their descendants of any depth (for nested blocks) in sequential order.', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -831,7 +877,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 			expect( getClientIdsWithDescendants( state ) ).toEqual( [
 				'uuid-6',
 				'uuid-8',
@@ -851,7 +897,7 @@ describe( 'selectors', () => {
 
 	describe( 'getBlockCount', () => {
 		it( 'should return the number of top-level blocks in the post', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -871,13 +917,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockCount( state ) ).toBe( 2 );
 		} );
 
 		it( 'should return the number of blocks in a nested context', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -907,7 +953,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockCount( state, '123' ) ).toBe( 2 );
 		} );
@@ -915,18 +961,18 @@ describe( 'selectors', () => {
 
 	describe( 'hasSelectedBlock', () => {
 		it( 'should return false if no selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( hasSelectedBlock( state ) ).toBe( false );
 		} );
 
 		it( 'should return false if multi-selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {
 						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
@@ -935,13 +981,13 @@ describe( 'selectors', () => {
 						clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 					},
 				},
-			};
+			} );
 
 			expect( hasSelectedBlock( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if singular selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {
 						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
@@ -950,14 +996,14 @@ describe( 'selectors', () => {
 						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 					},
 				},
-			};
+			} );
 
 			expect( hasSelectedBlock( state ) ).toBe( true );
 		} );
 	} );
 
 	describe( 'getGlobalBlockCount', () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				byClientId: new Map(
 					Object.entries( {
@@ -985,7 +1031,7 @@ describe( 'selectors', () => {
 					} )
 				),
 			},
-		};
+		} );
 
 		it( 'should return the global number of blocks in the post', () => {
 			expect( getGlobalBlockCount( state ) ).toBe( 2 );
@@ -996,14 +1042,14 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return 0 if no blocks exist', () => {
-			const emptyState = {
+			const emptyState = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
 				},
-			};
+			} );
 			expect( getGlobalBlockCount( emptyState ) ).toBe( 0 );
 			expect( getGlobalBlockCount( emptyState, 'core/heading' ) ).toBe(
 				0
@@ -1012,7 +1058,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlocksByName', () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				byClientId: new Map(
 					Object.entries( {
@@ -1050,7 +1096,7 @@ describe( 'selectors', () => {
 					} )
 				),
 			},
-		};
+		} );
 
 		it( 'should return the clientIds of blocks of a given type', () => {
 			expect( getBlocksByName( state, 'core/heading' ) ).toStrictEqual( [
@@ -1077,29 +1123,29 @@ describe( 'selectors', () => {
 
 	describe( 'getSelectedBlockClientId', () => {
 		it( 'should return null if no block is selected', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( getSelectedBlockClientId( state ) ).toBe( null );
 		} );
 
 		it( 'should return null if there is multi selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '23' },
 					selectionEnd: { clientId: '123' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlockClientId( state ) ).toBe( null );
 		} );
 
 		it( 'should return the selected block ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -1113,7 +1159,7 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '23' },
 					selectionEnd: { clientId: '23' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlockClientId( state ) ).toEqual( '23' );
 		} );
@@ -1121,7 +1167,7 @@ describe( 'selectors', () => {
 
 	describe( 'getSelectedBlock', () => {
 		it( 'should return null if no block is selected', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -1163,13 +1209,13 @@ describe( 'selectors', () => {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( getSelectedBlock( state ) ).toBe( null );
 		} );
 
 		it( 'should return null if there is multi selection', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -1211,13 +1257,13 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '23' },
 					selectionEnd: { clientId: '123' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlock( state ) ).toBe( null );
 		} );
 
 		it( 'should return the selected block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -1260,7 +1306,7 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '23' },
 					selectionEnd: { clientId: '23' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlock( state ) ).toEqual(
 				getBlock( state, '23' )
@@ -1270,18 +1316,21 @@ describe( 'selectors', () => {
 
 	describe( 'getBlockRootClientId', () => {
 		it( 'should return null if the block does not exist', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(),
 					parents: new Map(),
 				},
-			};
+			} );
 
-			expect( getBlockRootClientId( state, 56 ) ).toBeNull();
+			expect(
+				// @ts-expect-error Deliberately a number, which no block uses.
+				getBlockRootClientId( state, 56 )
+			).toBeNull();
 		} );
 
 		it( 'should return root ClientId relative the block ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1298,7 +1347,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockRootClientId( state, '56' ) ).toBe( '123' );
 		} );
@@ -1306,18 +1355,18 @@ describe( 'selectors', () => {
 
 	describe( 'getBlockHierarchyRootClientId', () => {
 		it( 'should return the given block if the block has no parents', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(),
 					parents: new Map(),
 				},
-			};
+			} );
 
 			expect( getBlockHierarchyRootClientId( state, '56' ) ).toBe( '56' );
 		} );
 
 		it( 'should return root ClientId relative the block ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1334,13 +1383,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockHierarchyRootClientId( state, 'c' ) ).toBe( 'a' );
 		} );
 
 		it( 'should return the top level root ClientId relative the block ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1359,7 +1408,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockHierarchyRootClientId( state, 'e' ) ).toBe( 'a' );
 		} );
@@ -1367,7 +1416,7 @@ describe( 'selectors', () => {
 
 	describe( 'getSelectedBlockClientIds', () => {
 		it( 'should return empty if there is no selection', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1385,13 +1434,13 @@ describe( 'selectors', () => {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [] );
 		} );
 
 		it( 'should return the selected block clientId if there is a selection', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1412,13 +1461,13 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '2' },
 					selectionEnd: { clientId: '2' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [ '2' ] );
 		} );
 
 		it( 'should return selected block clientIds if there is multi selection', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1439,7 +1488,7 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '2' },
 					selectionEnd: { clientId: '4' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [
 				'4',
@@ -1449,7 +1498,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return selected block clientIds if there is multi selection (nested context)', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1475,7 +1524,7 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '7' },
 					selectionEnd: { clientId: '9' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlockClientIds( state ) ).toEqual( [
 				'9',
@@ -1487,7 +1536,7 @@ describe( 'selectors', () => {
 
 	describe( 'getMultiSelectedBlockClientIds', () => {
 		it( 'should return empty if there is no multi selection', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1505,13 +1554,13 @@ describe( 'selectors', () => {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [] );
 		} );
 
 		it( 'should return selected block clientIds if there is multi selection', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1532,7 +1581,7 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '2' },
 					selectionEnd: { clientId: '4' },
 				},
-			};
+			} );
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
 				'4',
@@ -1542,7 +1591,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return selected block clientIds if there is multi selection (nested context)', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1568,7 +1617,7 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '7' },
 					selectionEnd: { clientId: '9' },
 				},
-			};
+			} );
 
 			expect( getMultiSelectedBlockClientIds( state ) ).toEqual( [
 				'9',
@@ -1580,7 +1629,7 @@ describe( 'selectors', () => {
 
 	describe( 'getMultiSelectedBlocks', () => {
 		it( 'should return the same reference on subsequent invocations of empty selection', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -1591,7 +1640,7 @@ describe( 'selectors', () => {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( getMultiSelectedBlocks( state ) ).toBe(
 				getMultiSelectedBlocks( state )
@@ -1601,23 +1650,23 @@ describe( 'selectors', () => {
 
 	describe( 'getMultiSelectedBlocksStartClientId', () => {
 		it( 'returns null if there is no multi selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( getMultiSelectedBlocksStartClientId( state ) ).toBeNull();
 		} );
 
 		it( 'returns multi selection start', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '2' },
 					selectionEnd: { clientId: '4' },
 				},
-			};
+			} );
 
 			expect( getMultiSelectedBlocksStartClientId( state ) ).toBe( '2' );
 		} );
@@ -1625,23 +1674,23 @@ describe( 'selectors', () => {
 
 	describe( 'getMultiSelectedBlocksEndClientId', () => {
 		it( 'returns null if there is no multi selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( getMultiSelectedBlocksEndClientId( state ) ).toBeNull();
 		} );
 
 		it( 'returns multi selection end', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '2' },
 					selectionEnd: { clientId: '4' },
 				},
-			};
+			} );
 
 			expect( getMultiSelectedBlocksEndClientId( state ) ).toBe( '4' );
 		} );
@@ -1649,7 +1698,7 @@ describe( 'selectors', () => {
 
 	describe( 'getBlockOrder', () => {
 		it( 'should return the ordered block ClientIds of top-level blocks by default', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1663,13 +1712,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockOrder( state ) ).toEqual( [ '123', '23' ] );
 		} );
 
 		it( 'should return the ordered block ClientIds at a specified rootClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1685,7 +1734,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockOrder( state, '123' ) ).toEqual( [ '456' ] );
 		} );
@@ -1693,7 +1742,7 @@ describe( 'selectors', () => {
 
 	describe( 'getBlockIndex', () => {
 		it( 'should return the block order', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1707,13 +1756,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockIndex( state, '23' ) ).toBe( 1 );
 		} );
 
 		it( 'should return the block order (nested context)', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1730,7 +1779,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getBlockIndex( state, '56' ) ).toBe( 1 );
 		} );
@@ -1738,7 +1787,7 @@ describe( 'selectors', () => {
 
 	describe( 'getPreviousBlockClientId', () => {
 		it( 'should return the previous block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1752,7 +1801,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getPreviousBlockClientId( state, '23' ) ).toEqual( '123' );
 		} );
@@ -1777,13 +1826,14 @@ describe( 'selectors', () => {
 				},
 			};
 
+			// @ts-expect-error The selector no longer takes a root client ID.
 			expect( getPreviousBlockClientId( state, '56', '123' ) ).toEqual(
 				'456'
 			);
 		} );
 
 		it( 'should return null for the first block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1797,7 +1847,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getPreviousBlockClientId( state, '123' ) ).toBeNull();
 		} );
@@ -1823,6 +1873,7 @@ describe( 'selectors', () => {
 			};
 
 			expect(
+				// @ts-expect-error The selector no longer takes a root client ID.
 				getPreviousBlockClientId( state, '456', '123' )
 			).toBeNull();
 		} );
@@ -1830,7 +1881,7 @@ describe( 'selectors', () => {
 
 	describe( 'getNextBlockClientId', () => {
 		it( 'should return the following block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1844,7 +1895,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getNextBlockClientId( state, '123' ) ).toEqual( '23' );
 		} );
@@ -1869,13 +1920,14 @@ describe( 'selectors', () => {
 				},
 			};
 
+			// @ts-expect-error The selector no longer takes a root client ID.
 			expect( getNextBlockClientId( state, '456', '123' ) ).toEqual(
 				'56'
 			);
 		} );
 
 		it( 'should return null for the last block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -1889,7 +1941,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( getNextBlockClientId( state, '23' ) ).toBeNull();
 		} );
@@ -1914,51 +1966,52 @@ describe( 'selectors', () => {
 				},
 			};
 
+			// @ts-expect-error The selector no longer takes a root client ID.
 			expect( getNextBlockClientId( state, '56', '123' ) ).toBeNull();
 		} );
 	} );
 
 	describe( 'isBlockSelected', () => {
 		it( 'should return true if the block is selected', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '123' },
 					selectionEnd: { clientId: '123' },
 				},
-			};
+			} );
 
 			expect( isBlockSelected( state, '123' ) ).toBe( true );
 		} );
 
 		it( 'should return false if a multi-selection range exists', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '123' },
 					selectionEnd: { clientId: '124' },
 				},
-			};
+			} );
 
 			expect( isBlockSelected( state, '123' ) ).toBe( false );
 		} );
 
 		it( 'should return false if the block is not selected', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( isBlockSelected( state, '23' ) ).toBe( false );
 		} );
 
 		it( 'should return false if there is no client ID', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( isBlockSelected( state, undefined ) ).toBe( false );
 		} );
@@ -1966,7 +2019,7 @@ describe( 'selectors', () => {
 
 	describe( 'hasSelectedInnerBlock', () => {
 		it( 'should return false if the selected block is a child of the given ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '5' },
 					selectionEnd: { clientId: '5' },
@@ -1985,13 +2038,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( hasSelectedInnerBlock( state, '4' ) ).toBe( false );
 		} );
 
 		it( 'should return true if the selected block is a child of the given ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '3' },
 					selectionEnd: { clientId: '3' },
@@ -2010,13 +2063,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( hasSelectedInnerBlock( state, '4' ) ).toBe( true );
 		} );
 
 		it( 'should return true if a multi selection exists that contains children of the block with the given ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -2037,12 +2090,12 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '2' },
 					selectionEnd: { clientId: '4' },
 				},
-			};
+			} );
 			expect( hasSelectedInnerBlock( state, '6' ) ).toBe( true );
 		} );
 
 		it( 'should return false if a multi selection exists bot does not contains children of the block with the given ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map(
 						Object.entries( {
@@ -2063,12 +2116,12 @@ describe( 'selectors', () => {
 					selectionStart: { clientId: '5' },
 					selectionEnd: { clientId: '4' },
 				},
-			};
+			} );
 			expect( hasSelectedInnerBlock( state, '3' ) ).toBe( false );
 		} );
 
 		it( 'should return true for a deep check if the selected block is a descendant of the given ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '3' },
 					selectionEnd: { clientId: '3' },
@@ -2087,7 +2140,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
 			expect( hasSelectedInnerBlock( state, '2', true ) ).toBe( true );
@@ -2097,7 +2150,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return false for a deep check if the given ClientId is the selected block itself', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '3' },
 					selectionEnd: { clientId: '3' },
@@ -2116,13 +2169,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( hasSelectedInnerBlock( state, '3', true ) ).toBe( false );
 		} );
 
 		it( 'should return true for a deep check if a multi selection contains a descendant of the block with the given ClientId', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '2' },
 					selectionEnd: { clientId: '3' },
@@ -2144,7 +2197,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
 			// '3' is selected, and it is not its own ancestor.
@@ -2172,24 +2225,24 @@ describe( 'selectors', () => {
 				),
 			};
 
-			const state = {
+			const state = partial< State >( {
 				blocks,
 				selection: {
 					selectionStart: { clientId: '2' },
 					selectionEnd: { clientId: '2' },
 				},
-			};
+			} );
 
 			expect( hasSelectedInnerBlock( state, '1', true ) ).toBe( true );
 			expect( hasSelectedInnerBlock( state, '4', true ) ).toBe( false );
 
-			const nextState = {
+			const nextState = partial< State >( {
 				blocks,
 				selection: {
 					selectionStart: { clientId: '5' },
 					selectionEnd: { clientId: '5' },
 				},
-			};
+			} );
 
 			expect( hasSelectedInnerBlock( nextState, '1', true ) ).toBe(
 				false
@@ -2202,7 +2255,7 @@ describe( 'selectors', () => {
 
 	describe( 'isBlockWithinSelection', () => {
 		it( 'should return true if the block is selected but not the last', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '5' },
 					selectionEnd: { clientId: '3' },
@@ -2223,13 +2276,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( isBlockWithinSelection( state, '4' ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is the last selected', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '5' },
 					selectionEnd: { clientId: '3' },
@@ -2250,13 +2303,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( isBlockWithinSelection( state, '3' ) ).toBe( false );
 		} );
 
 		it( 'should return false if the block is not selected', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: '5' },
 					selectionEnd: { clientId: '3' },
@@ -2277,13 +2330,13 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( isBlockWithinSelection( state, '2' ) ).toBe( false );
 		} );
 
 		it( 'should return false if there is no selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
@@ -2304,7 +2357,7 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 
 			expect( isBlockWithinSelection( state, '4' ) ).toBe( false );
 		} );
@@ -2312,18 +2365,18 @@ describe( 'selectors', () => {
 
 	describe( 'hasMultiSelection', () => {
 		it( 'should return false if no selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect( hasMultiSelection( state ) ).toBe( false );
 		} );
 
 		it( 'should return false if singular selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {
 						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
@@ -2332,13 +2385,13 @@ describe( 'selectors', () => {
 						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
 					},
 				},
-			};
+			} );
 
 			expect( hasMultiSelection( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if multi-selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {
 						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
@@ -2347,14 +2400,14 @@ describe( 'selectors', () => {
 						clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 					},
 				},
-			};
+			} );
 
 			expect( hasMultiSelection( state ) ).toBe( true );
 		} );
 	} );
 
 	describe( 'isBlockMultiSelected', () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				order: new Map(
 					Object.entries( {
@@ -2375,7 +2428,7 @@ describe( 'selectors', () => {
 				selectionStart: { clientId: '2' },
 				selectionEnd: { clientId: '4' },
 			},
-		};
+		} );
 
 		it( 'should return true if the block is multi selected', () => {
 			expect( isBlockMultiSelected( state, '3' ) ).toBe( true );
@@ -2387,7 +2440,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isFirstMultiSelectedBlock', () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				order: new Map(
 					Object.entries( {
@@ -2408,7 +2461,7 @@ describe( 'selectors', () => {
 				selectionStart: { clientId: '2' },
 				selectionEnd: { clientId: '4' },
 			},
-		};
+		} );
 
 		it( 'should return true if the block is first in multi selection', () => {
 			expect( isFirstMultiSelectedBlock( state, '4' ) ).toBe( true );
@@ -2421,19 +2474,19 @@ describe( 'selectors', () => {
 
 	describe( 'getBlockMode', () => {
 		it( 'should return "visual" if unset', () => {
-			const state = {
+			const state = partial< State >( {
 				blocksMode: {},
-			};
+			} );
 
 			expect( getBlockMode( state, '123' ) ).toEqual( 'visual' );
 		} );
 
 		it( 'should return the block mode', () => {
-			const state = {
+			const state = partial< State >( {
 				blocksMode: {
 					123: 'html',
 				},
-			};
+			} );
 
 			expect( getBlockMode( state, '123' ) ).toEqual( 'html' );
 		} );
@@ -2441,17 +2494,17 @@ describe( 'selectors', () => {
 
 	describe( 'isTyping', () => {
 		it( 'should return the isTyping flag if the block is selected', () => {
-			const state = {
+			const state = partial< State >( {
 				isTyping: true,
-			};
+			} );
 
 			expect( isTyping( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if the block is not selected', () => {
-			const state = {
+			const state = partial< State >( {
 				isTyping: false,
-			};
+			} );
 
 			expect( isTyping( state ) ).toBe( false );
 		} );
@@ -2459,16 +2512,16 @@ describe( 'selectors', () => {
 
 	describe( 'isDraggingBlocks', () => {
 		it( 'should return true if a block is being dragged', () => {
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks: [ 'block-client-id' ],
-			};
+			} );
 			expect( isDraggingBlocks( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if a block is not being dragged', () => {
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks: [],
-			};
+			} );
 			expect( isDraggingBlocks( state ) ).toBe( false );
 		} );
 	} );
@@ -2476,39 +2529,39 @@ describe( 'selectors', () => {
 	describe( 'getDraggedBlockClientIds', () => {
 		it( 'returns the draggedBlocks state', () => {
 			const draggedBlocks = [ 'block-client-id' ];
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks,
-			};
+			} );
 			expect( getDraggedBlockClientIds( state ) ).toBe( draggedBlocks );
 		} );
 	} );
 
 	describe( 'isBlockBeingDragged', () => {
 		it( 'returns true if the given client id is one of the blocks being dragged', () => {
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks: [ 'block-1', 'block-2', 'block-3' ],
-			};
+			} );
 			expect( isBlockBeingDragged( state, 'block-2' ) ).toBe( true );
 		} );
 
 		it( 'returns false if the given client id is not one of the blocks being dragged', () => {
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks: [ 'block-1', 'block-2', 'block-3' ],
-			};
+			} );
 			expect( isBlockBeingDragged( state, 'block-4' ) ).toBe( false );
 		} );
 
 		it( 'returns false if no blocks are being dragged', () => {
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks: [],
-			};
+			} );
 			expect( isBlockBeingDragged( state, 'block-1' ) ).toBe( false );
 		} );
 	} );
 
 	describe( 'isAncestorBeingDragged', () => {
 		it( 'returns true if the given client id is a child of one of the blocks being dragged', () => {
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks: [ 'block-1_grandparent' ],
 				blocks: {
 					parents: new Map(
@@ -2518,12 +2571,12 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( true );
 		} );
 
 		it( 'returns false if the given client id does not have an ancestor being dragged', () => {
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks: [ 'block-2_grandparent' ],
 				blocks: {
 					parents: new Map(
@@ -2533,12 +2586,12 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'returns false if no blocks are being dragged', () => {
-			const state = {
+			const state = partial< State >( {
 				draggedBlocks: [],
 				blocks: {
 					parents: new Map(
@@ -2548,24 +2601,24 @@ describe( 'selectors', () => {
 						} )
 					),
 				},
-			};
+			} );
 			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
 		} );
 	} );
 
 	describe( 'isSelectionEnabled', () => {
 		it( 'should return true if selection is enable', () => {
-			const state = {
+			const state = partial< State >( {
 				isSelectionEnabled: true,
-			};
+			} );
 
 			expect( isSelectionEnabled( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if selection is disabled', () => {
-			const state = {
+			const state = partial< State >( {
 				isSelectionEnabled: false,
-			};
+			} );
 
 			expect( isSelectionEnabled( state ) ).toBe( false );
 		} );
@@ -2573,7 +2626,7 @@ describe( 'selectors', () => {
 
 	describe( 'getBlockInsertionPoint', () => {
 		it( 'should return the explicitly assigned insertion point', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: 'clientId2' },
 					selectionEnd: { clientId: 'clientId2' },
@@ -2609,7 +2662,7 @@ describe( 'selectors', () => {
 					rootClientId: undefined,
 					index: 0,
 				},
-			};
+			} );
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
@@ -2618,7 +2671,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return an object for the selected block', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: 'clientId1' },
 					selectionEnd: { clientId: 'clientId1' },
@@ -2647,7 +2700,7 @@ describe( 'selectors', () => {
 					),
 				},
 				insertionCue: null,
-			};
+			} );
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
@@ -2656,7 +2709,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should cache and return the same object if state has not changed', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: 'clientId1' },
 					selectionEnd: { clientId: 'clientId1' },
@@ -2685,7 +2738,7 @@ describe( 'selectors', () => {
 					),
 				},
 				insertionCue: null,
-			};
+			} );
 
 			const insertionPoint1 = getBlockInsertionPoint( state );
 			const insertionPoint2 = getBlockInsertionPoint( state );
@@ -2694,7 +2747,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return an object for the nested selected block', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: 'clientId2' },
 					selectionEnd: { clientId: 'clientId2' },
@@ -2727,7 +2780,7 @@ describe( 'selectors', () => {
 					),
 				},
 				insertionCue: null,
-			};
+			} );
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: 'clientId1',
@@ -2736,7 +2789,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return an object for the last multi selected clientId', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: { clientId: 'clientId1' },
 					selectionEnd: { clientId: 'clientId2' },
@@ -2769,7 +2822,7 @@ describe( 'selectors', () => {
 					),
 				},
 				insertionCue: null,
-			};
+			} );
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
@@ -2778,7 +2831,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return an object for the last block if no selection', () => {
-			const state = {
+			const state = partial< State >( {
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
@@ -2811,7 +2864,7 @@ describe( 'selectors', () => {
 					),
 				},
 				insertionCue: null,
-			};
+			} );
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
@@ -2822,20 +2875,20 @@ describe( 'selectors', () => {
 
 	describe( 'isBlockInsertionPointVisible', () => {
 		it( 'should return false if no assigned insertion point', () => {
-			const state = {
+			const state = partial< State >( {
 				insertionCue: null,
-			};
+			} );
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
 		it( 'should return true if assigned insertion point', () => {
-			const state = {
+			const state = partial< State >( {
 				insertionCue: {
 					rootClientId: undefined,
 					index: 5,
 				},
-			};
+			} );
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
 		} );
@@ -2843,7 +2896,7 @@ describe( 'selectors', () => {
 
 	describe( 'canInsertBlockType', () => {
 		it( 'should deny blocks that are not registered', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -2853,12 +2906,12 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
+			} );
 			expect( canInsertBlockType( state, 'core/invalid' ) ).toBe( false );
 		} );
 
 		it( 'should deny blocks that are not allowed by the editor', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -2870,14 +2923,14 @@ describe( 'selectors', () => {
 				settings: {
 					allowedBlockTypes: [],
 				},
-			};
+			} );
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
 			);
 		} );
 
 		it( 'should allow blocks that are allowed by the editor', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -2889,14 +2942,14 @@ describe( 'selectors', () => {
 				settings: {
 					allowedBlockTypes: [ 'core/test-block-a' ],
 				},
-			};
+			} );
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				true
 			);
 		} );
 
 		it( 'should deny blocks when the editor has a template lock', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -2908,14 +2961,14 @@ describe( 'selectors', () => {
 				settings: {
 					templateLock: 'all',
 				},
-			};
+			} );
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
 			);
 		} );
 
 		it( 'should deny blocks when the editor has a disabled editing mode', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -2929,14 +2982,14 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
+			} );
 			expect( canInsertBlockType( state, 'core/test-block-a' ) ).toBe(
 				false
 			);
 		} );
 
 		it( 'should deny blocks that restrict parent from being inserted into the root', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -2946,14 +2999,14 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
+			} );
 			expect( canInsertBlockType( state, 'core/test-block-c' ) ).toBe(
 				false
 			);
 		} );
 
 		it( 'should deny blocks that restrict parent from being inserted into a restricted parent', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -2971,14 +3024,14 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
 			).toBe( false );
 		} );
 
 		it( 'should allow blocks to be inserted into an allowed parent', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3000,14 +3053,14 @@ describe( 'selectors', () => {
 					} )
 				),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
 			).toBe( true );
 		} );
 
 		it( 'should deny blocks from being inserted into a block that does not allow inner blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3029,14 +3082,14 @@ describe( 'selectors', () => {
 					} )
 				),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
 			).toBe( true );
 		} );
 
 		it( 'should deny restricted blocks from being inserted into a block that restricts allowedBlocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3060,14 +3113,14 @@ describe( 'selectors', () => {
 					} )
 				),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'block1' )
 			).toBe( false );
 		} );
 
 		it( 'should allow allowed blocks to be inserted into a block that restricts allowedBlocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3091,14 +3144,14 @@ describe( 'selectors', () => {
 					} )
 				),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'block1' )
 			).toBe( true );
 		} );
 
 		it( 'should deny blocks from being inserted into a block that has a disabled editing mode', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3120,14 +3173,14 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'block1' )
 			).toBe( false );
 		} );
 
 		it( 'should prioritise parent over allowedBlocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3151,14 +3204,14 @@ describe( 'selectors', () => {
 					} )
 				),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-c', 'block1' )
 			).toBe( true );
 		} );
 
 		it( 'should deny blocks that restrict parent to core/post-content when not in editor root', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3176,14 +3229,14 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/post-content-child', 'block1' )
 			).toBe( false );
 		} );
 
 		it( 'should allow blocks that restrict parent to core/post-content when in editor root', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
@@ -3193,14 +3246,14 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/post-content-child' )
 			).toBe( true );
 		} );
 
 		it( 'should allow blocks to be inserted in a descendant of a required ancestor', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3234,7 +3287,7 @@ describe( 'selectors', () => {
 					} )
 				),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType(
 					state,
@@ -3245,7 +3298,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should prevent blocks from being inserted within sections', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3271,7 +3324,7 @@ describe( 'selectors', () => {
 					} )
 				),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-a', 'block1' )
 			).toBe( false );
@@ -3281,7 +3334,7 @@ describe( 'selectors', () => {
 			// When the parent has contentOnly editing mode but is NOT
 			// within a section hierarchy, the contentOnly insertion
 			// restriction does not apply.
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3320,7 +3373,7 @@ describe( 'selectors', () => {
 						parent: 'contentOnly',
 					} )
 				),
-			};
+			} );
 			expect(
 				canInsertBlockType( state, 'core/test-block-b', 'parent' )
 			).toBe( true );
@@ -3330,7 +3383,7 @@ describe( 'selectors', () => {
 			// When a contentOnly container is inside a section and is not
 			// the section root or a content-to-content match, the
 			// contentOnly insertion restriction blocks it.
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3372,7 +3425,7 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
-			};
+			} );
 			// A content block into a non-content container that is not the
 			// section root is blocked by the contentOnly gating.
 			expect(
@@ -3388,7 +3441,7 @@ describe( 'selectors', () => {
 			// When the container is a content block and the block being
 			// inserted is also a content block, insertion is allowed
 			// even within a section (content-to-content match).
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3430,7 +3483,7 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect(
 				canInsertBlockType(
 					state,
@@ -3441,7 +3494,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should allow blocks to be inserted if both parent and ancestor restrictions are met', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3476,7 +3529,7 @@ describe( 'selectors', () => {
 					[ 'block3', {} ],
 				] ),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType(
 					state,
@@ -3487,7 +3540,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should deny blocks from being inserted outside a required ancestor', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3521,7 +3574,7 @@ describe( 'selectors', () => {
 					[ 'block3', {} ],
 				] ),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType(
 					state,
@@ -3532,7 +3585,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should deny blocks from being inserted outside of a required ancestor, even if parent matches', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3566,7 +3619,7 @@ describe( 'selectors', () => {
 					[ 'block3', {} ],
 				] ),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType(
 					state,
@@ -3577,7 +3630,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should deny blocks from being inserted inside ancestor if parent restricts allowedBlocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3611,7 +3664,7 @@ describe( 'selectors', () => {
 					],
 				] ),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType(
 					state,
@@ -3622,7 +3675,7 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should deny blocks from being inserted inside ancestor if parent restriction is not met', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3652,7 +3705,7 @@ describe( 'selectors', () => {
 					[ 'block2', {} ],
 				] ),
 				settings: {},
-			};
+			} );
 			expect(
 				canInsertBlockType(
 					state,
@@ -3665,7 +3718,7 @@ describe( 'selectors', () => {
 
 	describe( 'canInsertBlocks', () => {
 		it( 'should allow blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3697,12 +3750,12 @@ describe( 'selectors', () => {
 					],
 				] ),
 				settings: {},
-			};
+			} );
 			expect( canInsertBlocks( state, [ '2' ], '1' ) ).toBe( true );
 		} );
 
 		it( 'should deny blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -3730,7 +3783,7 @@ describe( 'selectors', () => {
 					} )
 				),
 				settings: {},
-			};
+			} );
 			expect( canInsertBlocks( state, [ '2', '3' ], '1' ) ).toBe( false );
 		} );
 	} );
@@ -3809,25 +3862,32 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'surfaces innerContent on a block variation inserter item', () => {
-			registerBlockType( 'core/html', {
-				apiVersion: 3,
-				save: () => null,
-				category: 'widgets',
-				title: 'Custom HTML',
-				variations: [
-					{
-						name: 'card',
-						title: 'Card',
-						innerContent: [ '<div class="card">', null, '</div>' ],
-						innerBlocks: [ [ 'core/test-block-a' ] ],
-					},
-				],
-			} );
+			registerBlockType(
+				'core/html',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: () => null,
+					category: 'widgets',
+					title: 'Custom HTML',
+					variations: [
+						{
+							name: 'card',
+							title: 'Card',
+							innerContent: [
+								'<div class="card">',
+								null,
+								'</div>',
+							],
+							innerBlocks: [ [ 'core/test-block-a' ] ],
+						},
+					],
+				} )
+			);
 
 			const items = select( store ).getInserterItems();
 			const variationItem = items.find(
 				( item ) => item.id === 'core/html/card'
-			);
+			)!;
 
 			expect( variationItem.innerContent ).toEqual( [
 				'<div class="card">',
@@ -3841,7 +3901,9 @@ describe( 'selectors', () => {
 				variationItem.name,
 				variationItem.initialAttributes,
 				createBlocksFromInnerBlocksTemplate(
-					variationItem.innerBlocks
+					variationItem.innerBlocks as Parameters<
+						typeof createBlocksFromInnerBlocksTemplate
+					>[ 0 ]
 				),
 				variationItem.innerContent
 			);
@@ -3995,12 +4057,13 @@ describe( 'selectors', () => {
 			const items = select( store ).getInserterItems();
 			const testBlockBItem = items.find(
 				( item ) => item.id === 'core/test-block-b'
-			);
+			)!;
 			expect( testBlockBItem.isDisabled ).toBe( true );
 		} );
 
 		it( 'should set a frecency', async () => {
 			for ( let i = 0; i < 10; i++ ) {
+				// @ts-expect-error The action JSDoc marks the optional parameters as only nullable.
 				await dispatch( store ).insertBlocks( [
 					{
 						clientId: 'block1',
@@ -4013,76 +4076,90 @@ describe( 'selectors', () => {
 			const items = select( store ).getInserterItems();
 			const reusableBlock2Item = items.find(
 				( item ) => item.id === 'core/test-block-b'
-			);
+			)!;
 			expect( reusableBlock2Item.frecency ).toBe( 40 );
 		} );
 	} );
 
 	describe( 'getBlockTransformItems', () => {
 		beforeAll( () => {
-			registerBlockType( 'core/with-tranforms-a', {
-				apiVersion: 3,
-				category: 'text',
-				title: 'Transforms a',
-				edit: () => {},
-				save: () => {},
-				transforms: {
-					to: [
-						{
-							type: 'block',
-							blocks: [ 'core/with-tranforms-b' ],
-							transform: () => {},
-						},
-						{
-							type: 'block',
-							blocks: [ 'core/with-tranforms-c' ],
-							transform: () => {},
-						},
-						{
-							type: 'block',
-							blocks: [
-								'core/with-tranforms-b',
-								'core/with-tranforms-c',
-							],
-							transform: () => {},
-							isMultiBlock: true,
-						},
-					],
-				},
-			} );
-			registerBlockType( 'core/with-tranforms-b', {
-				apiVersion: 3,
-				category: 'text',
-				title: 'Transforms b',
-				edit: () => {},
-				save: () => {},
-				transforms: {
-					to: [
-						{
-							type: 'block',
-							blocks: [ 'core/with-tranforms-a' ],
-							transform: () => {},
-						},
-					],
-				},
-			} );
-			registerBlockType( 'core/with-tranforms-c', {
-				apiVersion: 3,
-				category: 'text',
-				title: 'Transforms c',
-				edit: () => {},
-				save: () => {},
-				transforms: {
-					to: [
-						{
-							type: 'block',
-							blocks: [ 'core/with-tranforms-a' ],
-							transform: () => {},
-						},
-					],
-				},
-				supports: { multiple: false },
-			} );
+			registerBlockType(
+				'core/with-tranforms-a',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					category: 'text',
+					title: 'Transforms a',
+					edit: () => {},
+					save: () => {},
+					transforms: {
+						to: [
+							{
+								type: 'block',
+								blocks: [ 'core/with-tranforms-b' ],
+								// @ts-expect-error The test never runs the transform, so it returns nothing.
+								transform: () => {},
+							},
+							{
+								type: 'block',
+								blocks: [ 'core/with-tranforms-c' ],
+								// @ts-expect-error The test never runs the transform, so it returns nothing.
+								transform: () => {},
+							},
+							{
+								type: 'block',
+								blocks: [
+									'core/with-tranforms-b',
+									'core/with-tranforms-c',
+								],
+								// @ts-expect-error The test never runs the transform, so it returns nothing.
+								transform: () => {},
+								isMultiBlock: true,
+							},
+						],
+					},
+				} )
+			);
+			registerBlockType(
+				'core/with-tranforms-b',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					category: 'text',
+					title: 'Transforms b',
+					edit: () => {},
+					save: () => {},
+					transforms: {
+						to: [
+							{
+								type: 'block',
+								blocks: [ 'core/with-tranforms-a' ],
+								// @ts-expect-error The test never runs the transform, so it returns nothing.
+								transform: () => {},
+							},
+						],
+					},
+				} )
+			);
+			registerBlockType(
+				'core/with-tranforms-c',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					category: 'text',
+					title: 'Transforms c',
+					edit: () => {},
+					save: () => {},
+					transforms: {
+						to: [
+							{
+								type: 'block',
+								blocks: [ 'core/with-tranforms-a' ],
+								// @ts-expect-error The test never runs the transform, so it returns nothing.
+								transform: () => {},
+							},
+						],
+					},
+					supports: { multiple: false },
+				} )
+			);
 		} );
 		afterAll( () => {
 			[
@@ -4092,20 +4169,21 @@ describe( 'selectors', () => {
 			].forEach( unregisterBlockType );
 		} );
 		it( 'should properly return block type items', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
-					cache: {},
 					blockEditingModes: new Map(),
 				},
 				settings: {},
 				preferences: {},
 				blockListSettings: new Map(),
-			};
-			const blocks = [ { name: 'core/with-tranforms-a' } ];
+			} );
+			const blocks = partial< Block[] >( [
+				{ name: 'core/with-tranforms-a' },
+			] );
 			const items = getBlockTransformItems( state, blocks );
 			expect( items ).toHaveLength( 2 );
 			const returnedProps = Object.keys( items[ 0 ] );
@@ -4133,25 +4211,24 @@ describe( 'selectors', () => {
 			);
 		} );
 		it( 'should support single block object', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
-					cache: {},
 					blockEditingModes: new Map(),
 				},
 				settings: {},
 				preferences: {},
 				blockListSettings: new Map(),
-			};
-			const block = { name: 'core/with-tranforms-a' };
+			} );
+			const block = partial< Block >( { name: 'core/with-tranforms-a' } );
 			const items = getBlockTransformItems( state, block );
 			expect( items ).toHaveLength( 2 );
 		} );
 		it( 'should return only eligible blocks for transformation - `allowedBlocks`', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -4172,7 +4249,6 @@ describe( 'selectors', () => {
 							block2: 'block1',
 						} )
 					),
-					cache: {},
 					controlledInnerBlocks: new Set(),
 					blockEditingModes: new Map(),
 				},
@@ -4187,16 +4263,16 @@ describe( 'selectors', () => {
 					],
 					[ 'block2', {} ],
 				] ),
-			};
-			const blocks = [
+			} );
+			const blocks = partial< Block[] >( [
 				{ clientId: 'block2', name: 'core/with-tranforms-a' },
-			];
+			] );
 			const items = getBlockTransformItems( state, blocks, 'block1' );
 			expect( items ).toHaveLength( 1 );
 			expect( items[ 0 ].name ).toEqual( 'core/with-tranforms-c' );
 		} );
 		it( 'should take into account the usage of blocks settings `multiple` - if multiple blocks of the same type are allowed', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -4235,8 +4311,10 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
-			const blocks = [ { name: 'core/with-tranforms-a' } ];
+			} );
+			const blocks = partial< Block[] >( [
+				{ name: 'core/with-tranforms-a' },
+			] );
 			const items = getBlockTransformItems( state, blocks );
 			expect( items ).toHaveLength( 2 );
 			expect( items ).toEqual(
@@ -4253,13 +4331,12 @@ describe( 'selectors', () => {
 			);
 		} );
 		it( 'should set frecency', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
-					cache: {},
 					blockEditingModes: new Map(),
 				},
 				preferences: {
@@ -4269,8 +4346,10 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
-			const blocks = [ { name: 'core/with-tranforms-c' } ];
+			} );
+			const blocks = partial< Block[] >( [
+				{ name: 'core/with-tranforms-c' },
+			] );
 			const items = getBlockTransformItems( state, blocks );
 			expect( items ).toHaveLength( 1 );
 			expect( items[ 0 ] ).toEqual(
@@ -4282,48 +4361,54 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should use variation metadata for transformation items', () => {
-			registerBlockType( 'core/variation-transform-source', {
-				apiVersion: 3,
-				category: 'text',
-				title: 'Variation Transform Source',
-				edit: () => {},
-				save: () => {},
-				transforms: {
-					to: [
+			registerBlockType(
+				'core/variation-transform-source',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					category: 'text',
+					title: 'Variation Transform Source',
+					edit: () => {},
+					save: () => {},
+					transforms: {
+						to: [
+							{
+								type: 'block',
+								blocks: [ 'core/variation-transform-target' ],
+								variationName: 'grid',
+								// @ts-expect-error The test never runs the transform, so it returns nothing.
+								transform: () => {},
+							},
+						],
+					},
+				} )
+			);
+			registerBlockType(
+				'core/variation-transform-target',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					category: 'design',
+					title: 'Group',
+					icon: 'group',
+					edit: () => {},
+					save: () => {},
+					variations: [
 						{
-							type: 'block',
-							blocks: [ 'core/variation-transform-target' ],
-							variationName: 'grid',
-							transform: () => {},
+							name: 'grid',
+							title: 'Grid',
+							icon: 'grid',
+							attributes: { layout: { type: 'grid' } },
+							scope: [ 'transform' ],
 						},
 					],
-				},
-			} );
-			registerBlockType( 'core/variation-transform-target', {
-				apiVersion: 3,
-				category: 'design',
-				title: 'Group',
-				icon: 'group',
-				edit: () => {},
-				save: () => {},
-				variations: [
-					{
-						name: 'grid',
-						title: 'Grid',
-						icon: 'grid',
-						attributes: { layout: { type: 'grid' } },
-						scope: [ 'transform' ],
-					},
-				],
-			} );
+				} )
+			);
 
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
 					parents: new Map(),
-					cache: {},
 					blockEditingModes: new Map(),
 				},
 				preferences: {
@@ -4336,8 +4421,10 @@ describe( 'selectors', () => {
 				},
 				blockListSettings: new Map(),
 				settings: {},
-			};
-			const blocks = [ { name: 'core/variation-transform-source' } ];
+			} );
+			const blocks = partial< Block[] >( [
+				{ name: 'core/variation-transform-source' },
+			] );
 
 			try {
 				const items = getBlockTransformItems( state, blocks );
@@ -4360,17 +4447,17 @@ describe( 'selectors', () => {
 
 	describe( 'isValidTemplate', () => {
 		it( 'should return true if template is valid', () => {
-			const state = {
+			const state = partial< State >( {
 				template: { isValid: true },
-			};
+			} );
 
 			expect( isValidTemplate( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if template is not valid', () => {
-			const state = {
+			const state = partial< State >( {
 				template: { isValid: false },
-			};
+			} );
 
 			expect( isValidTemplate( state ) ).toBe( false );
 		} );
@@ -4378,10 +4465,10 @@ describe( 'selectors', () => {
 
 	describe( 'getTemplate', () => {
 		it( 'should return the template object', () => {
-			const template = [];
-			const state = {
+			const template: unknown[] = [];
+			const state = partial< State >( {
 				settings: { template },
-			};
+			} );
 
 			expect( getTemplate( state ) ).toBe( template );
 		} );
@@ -4389,15 +4476,15 @@ describe( 'selectors', () => {
 
 	describe( 'getTemplateLock', () => {
 		it( 'should return the general template lock if no clientId was specified', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: { templateLock: 'all' },
-			};
+			} );
 
 			expect( getTemplateLock( state ) ).toBe( 'all' );
 		} );
 
 		it( 'should return false if the specified clientId was not found', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: { templateLock: 'all' },
 				blockListSettings: new Map( [
 					[
@@ -4407,13 +4494,13 @@ describe( 'selectors', () => {
 						},
 					],
 				] ),
-			};
+			} );
 
 			expect( getTemplateLock( state, 'ribs' ) ).toBe( false );
 		} );
 
 		it( 'should return false if template lock was not set on the specified block', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: { templateLock: 'all' },
 				blockListSettings: new Map( [
 					[
@@ -4423,13 +4510,13 @@ describe( 'selectors', () => {
 						},
 					],
 				] ),
-			};
+			} );
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
 		} );
 
 		it( 'should return the template lock for the specified clientId', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: { templateLock: 'all' },
 				blockListSettings: new Map( [
 					[
@@ -4439,13 +4526,13 @@ describe( 'selectors', () => {
 						},
 					],
 				] ),
-			};
+			} );
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( 'insert' );
 		} );
 
 		it( 'should return false if the block has contentOnly template lock and is an edited section', () => {
-			const state = {
+			const state = partial< State >( {
 				editedContentOnlySection: 'chicken',
 				blockListSettings: new Map( [
 					[
@@ -4455,7 +4542,7 @@ describe( 'selectors', () => {
 						},
 					],
 				] ),
-			};
+			} );
 
 			expect( getTemplateLock( state, 'chicken' ) ).toBe( false );
 		} );
@@ -4463,7 +4550,7 @@ describe( 'selectors', () => {
 
 	describe( 'getBlockListSettings', () => {
 		it( 'should return the settings of a block', () => {
-			const state = {
+			const state = partial< State >( {
 				blockListSettings: new Map( [
 					[
 						'chicken',
@@ -4478,7 +4565,7 @@ describe( 'selectors', () => {
 						},
 					],
 				] ),
-			};
+			} );
 
 			expect( getBlockListSettings( state, 'chicken' ) ).toEqual( {
 				setting1: false,
@@ -4486,9 +4573,9 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return undefined if settings for the block don’t exist', () => {
-			const state = {
+			const state = partial< State >( {
 				blockListSettings: new Map(),
-			};
+			} );
 
 			expect( getBlockListSettings( state, 'chicken' ) ).toBe(
 				undefined
@@ -4498,7 +4585,7 @@ describe( 'selectors', () => {
 
 	describe( '__experimentalGetBlockListSettingsForBlocks', () => {
 		it( 'should return the settings for a set of blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blockListSettings: new Map( [
 					[
 						'test-1-dummy-clientId',
@@ -4527,7 +4614,7 @@ describe( 'selectors', () => {
 						},
 					],
 				] ),
-			};
+			} );
 
 			const targetBlocksClientIds = [
 				'test-1-dummy-clientId',
@@ -4552,7 +4639,7 @@ describe( 'selectors', () => {
 
 		it( 'should return empty object if settings for the blocks don’t exist', () => {
 			// Does not include target Block clientIds.
-			const state = {
+			const state = partial< State >( {
 				blockListSettings: new Map( [
 					[
 						'test-2-dummy-clientId',
@@ -4568,7 +4655,7 @@ describe( 'selectors', () => {
 						},
 					],
 				] ),
-			};
+			} );
 
 			const targetBlocksClientIds = [
 				'test-1-dummy-clientId',
@@ -4586,11 +4673,11 @@ describe( 'selectors', () => {
 
 	describe( '__experimentalGetLastBlockAttributeChanges', () => {
 		it( 'returns the last block attributes change', () => {
-			const state = {
+			const state = partial< State >( {
 				lastBlockAttributesChange: {
 					block1: { fruit: 'bananas' },
 				},
-			};
+			} );
 
 			const result = __experimentalGetLastBlockAttributeChanges( state );
 
@@ -4623,13 +4710,13 @@ describe( 'selectors', () => {
 		};
 
 		it( 'should not be defined if there is no block selected', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks,
 				selection: {
 					selectionStart: {},
 					selectionEnd: {},
 				},
-			};
+			} );
 
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'd' )
@@ -4637,13 +4724,13 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should not be defined if selected block has no parent', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks,
 				selection: {
 					selectionStart: { clientId: 'b' },
 					selectionEnd: { clientId: 'b' },
 				},
-			};
+			} );
 
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'b' )
@@ -4651,13 +4738,13 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should not be defined if selected block has no common parent with given block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks,
 				selection: {
 					selectionStart: { clientId: 'd' },
 					selectionEnd: { clientId: 'd' },
 				},
-			};
+			} );
 
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'f' )
@@ -4665,13 +4752,13 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return block id if selected block is ancestor of given block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks,
 				selection: {
 					selectionStart: { clientId: 'c' },
 					selectionEnd: { clientId: 'c' },
 				},
-			};
+			} );
 
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'a' )
@@ -4679,13 +4766,13 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return block id if selected block is nested child of given block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks,
 				selection: {
 					selectionStart: { clientId: 'e' },
 					selectionEnd: { clientId: 'e' },
 				},
-			};
+			} );
 
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'a' )
@@ -4693,13 +4780,13 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return block id if selected block has common parent with given block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks,
 				selection: {
 					selectionStart: { clientId: 'e' },
 					selectionEnd: { clientId: 'e' },
 				},
-			};
+			} );
 
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'c' )
@@ -4708,9 +4795,9 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getActiveBlockIdByBlockName', () => {
-		let state;
+		let state: State;
 		beforeEach( () => {
-			state = {
+			state = partial< State >( {
 				selection: {
 					selectionStart: {
 						clientId: 'client-id-04',
@@ -4753,13 +4840,6 @@ describe( 'selectors', () => {
 							},
 						} )
 					),
-					cache: {
-						'client-id-01': {},
-						'client-id-02': {},
-						'client-id-03': {},
-						'client-id-04': {},
-						'client-id-05': {},
-					},
 					order: new Map(
 						Object.entries( {
 							'client-id-03': [ 'client-id-04', 'client-id-05' ],
@@ -4767,7 +4847,7 @@ describe( 'selectors', () => {
 					),
 					controlledInnerBlocks: new Set(),
 				},
-			};
+			} );
 		} );
 		it( 'Should return first active matching block (including self) when single block selected', () => {
 			expect(
@@ -4799,12 +4879,12 @@ describe( 'selectors', () => {
 			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 			const source = 'inserter_menu';
 
-			const state = {
+			const state = partial< State >( {
 				lastBlockInserted: {
 					clientIds: [ expectedClientId ],
 					source,
 				},
-			};
+			} );
 
 			expect(
 				wasBlockJustInserted( state, expectedClientId, source )
@@ -4816,12 +4896,12 @@ describe( 'selectors', () => {
 			const unexpectedClientId = '62bfsed4-d5e9-43ba-b7f9-c77cf565756s';
 			const source = 'inserter_menu';
 
-			const state = {
+			const state = partial< State >( {
 				lastBlockInserted: {
 					clientIds: [ unexpectedClientId ],
 					source,
 				},
-			};
+			} );
 
 			expect(
 				wasBlockJustInserted( state, expectedClientId, source )
@@ -4832,11 +4912,11 @@ describe( 'selectors', () => {
 			const clientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 			const expectedSource = 'inserter_menu';
 
-			const state = {
+			const state = partial< State >( {
 				lastBlockInserted: {
 					clientIds: [ clientId ],
 				},
-			};
+			} );
 
 			expect(
 				wasBlockJustInserted( state, clientId, expectedSource )
@@ -4849,7 +4929,7 @@ describe( 'selectors', () => {
 			// When the parent has contentOnly editing mode but is NOT
 			// within a section, the contentOnly removal restriction
 			// does not apply.
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -4880,7 +4960,7 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'parent', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect( canRemoveBlock( state, 'child' ) ).toBe( true );
 		} );
 
@@ -4888,7 +4968,7 @@ describe( 'selectors', () => {
 			// When the parent is within a section and has contentOnly
 			// editing mode, blocks in a non-insertable container
 			// cannot be removed.
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -4933,7 +5013,7 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect( canRemoveBlock( state, 'child' ) ).toBe( false );
 		} );
 
@@ -4941,7 +5021,7 @@ describe( 'selectors', () => {
 			// When both the container and the child are content blocks,
 			// the contentOnly gating allows removal
 			// (content-to-content match).
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -4986,7 +5066,7 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect( canRemoveBlock( state, 'child' ) ).toBe( true );
 		} );
 
@@ -4996,7 +5076,7 @@ describe( 'selectors', () => {
 			// remains.
 			const previousDefaultBlockName = getDefaultBlockName();
 			setDefaultBlockName( 'core/test-content-block' );
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -5048,21 +5128,24 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect( canRemoveBlock( state, 'child1' ) ).toBe( true );
-			setDefaultBlockName( previousDefaultBlockName );
+			setDefaultBlockName( previousDefaultBlockName! );
 		} );
 	} );
 
 	describe( 'static inner content (Custom HTML block)', () => {
 		beforeEach( () => {
-			registerBlockType( 'core/html', {
-				apiVersion: 3,
-				save: () => null,
-				category: 'text',
-				title: 'Custom HTML',
-				icon: 'test',
-			} );
+			registerBlockType(
+				'core/html',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: () => null,
+					category: 'text',
+					title: 'Custom HTML',
+					icon: 'test',
+				} )
+			);
 		} );
 
 		afterEach( () => {
@@ -5072,43 +5155,44 @@ describe( 'selectors', () => {
 		// The Custom HTML block parent with a child container, which has a
 		// child of its own. The direct child is fixed in place; the grandchild
 		// is regular, fully editable content.
-		const buildState = () => ( {
-			blocks: {
-				byClientId: new Map(
-					Object.entries( {
-						parent: { name: 'core/html' },
-						child: { name: 'core/test-block-b' },
-						grandchild: { name: 'core/test-block-b' },
-					} )
-				),
-				attributes: new Map(
-					Object.entries( {
-						parent: {},
-						child: {},
-						grandchild: {},
-					} )
-				),
-				parents: new Map(
-					Object.entries( {
-						parent: '',
-						child: 'parent',
-						grandchild: 'child',
-					} )
-				),
-				order: new Map( [
-					[ '', [ 'parent' ] ],
-					[ 'parent', [ 'child' ] ],
-					[ 'child', [ 'grandchild' ] ],
+		const buildState = () =>
+			partial< State >( {
+				blocks: {
+					byClientId: new Map(
+						Object.entries( {
+							parent: { name: 'core/html' },
+							child: { name: 'core/test-block-b' },
+							grandchild: { name: 'core/test-block-b' },
+						} )
+					),
+					attributes: new Map(
+						Object.entries( {
+							parent: {},
+							child: {},
+							grandchild: {},
+						} )
+					),
+					parents: new Map(
+						Object.entries( {
+							parent: '',
+							child: 'parent',
+							grandchild: 'child',
+						} )
+					),
+					order: new Map( [
+						[ '', [ 'parent' ] ],
+						[ 'parent', [ 'child' ] ],
+						[ 'child', [ 'grandchild' ] ],
+					] ),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map( [
+					[ 'parent', {} ],
+					[ 'child', {} ],
 				] ),
-				blockEditingModes: new Map(),
-			},
-			blockListSettings: new Map( [
-				[ 'parent', {} ],
-				[ 'child', {} ],
-			] ),
-			settings: {},
-			derivedBlockEditingModes: new Map(),
-		} );
+				settings: {},
+				derivedBlockEditingModes: new Map(),
+			} );
 
 		it( 'prevents removing a direct child', () => {
 			expect( canRemoveBlock( buildState(), 'child' ) ).toBe( false );
@@ -5142,7 +5226,7 @@ describe( 'selectors', () => {
 			// When the parent has contentOnly editing mode but is NOT
 			// within a section, the contentOnly move restriction does
 			// not apply.
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -5173,7 +5257,7 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'parent', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect( canMoveBlock( state, 'child' ) ).toBe( true );
 		} );
 
@@ -5181,7 +5265,7 @@ describe( 'selectors', () => {
 			// When the parent is within a section and has contentOnly
 			// editing mode, blocks in a non-insertable container
 			// cannot be moved.
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -5226,7 +5310,7 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect( canMoveBlock( state, 'child' ) ).toBe( false );
 		} );
 
@@ -5234,7 +5318,7 @@ describe( 'selectors', () => {
 			// When both the container and the child are content blocks,
 			// the contentOnly gating allows moving
 			// (content-to-content match).
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(
 						Object.entries( {
@@ -5279,7 +5363,7 @@ describe( 'selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'container', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect( canMoveBlock( state, 'child' ) ).toBe( true );
 		} );
 	} );
@@ -5292,51 +5376,75 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 	// returned results, because third party blocks can be registered earlier than
 	// the core blocks (usually by using the `init` action), thus affecting the display order.
 	beforeEach( () => {
-		registerBlockType( 'plugin/block-a', {
-			apiVersion: 3,
-			save() {},
-			category: 'text',
-			title: 'Plugin Block A',
-			icon: 'test',
-		} );
-		registerBlockType( 'another-plugin/block-b', {
-			apiVersion: 3,
-			save() {},
-			category: 'text',
-			title: 'Another Plugin Block B',
-			icon: 'test',
-		} );
-		registerBlockType( 'plugin/block-c-with-variations', {
-			apiVersion: 3,
-			save() {},
-			category: 'text',
-			title: 'Plugin Block C with variations',
-			icon: 'test',
-			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
-		} );
-		registerBlockType( 'core/block', {
-			apiVersion: 3,
-			save() {},
-			category: 'text',
-			title: 'Core Block A',
-		} );
-		registerBlockType( 'core/test-block-a', {
-			apiVersion: 3,
-			save: ( props ) => props.attributes.text,
-			category: 'design',
-			title: 'Core Block B',
-			icon: 'test',
-			keywords: [ 'testing' ],
-		} );
-		registerBlockType( 'core/test-block-with-variations', {
-			apiVersion: 3,
-			save() {},
-			category: 'text',
-			title: 'Core Block C with variations',
-			icon: 'test',
-			keywords: [ 'testing' ],
-			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
-		} );
+		registerBlockType(
+			'plugin/block-a',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save() {},
+				category: 'text',
+				title: 'Plugin Block A',
+				icon: 'test',
+			} )
+		);
+		registerBlockType(
+			'another-plugin/block-b',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save() {},
+				category: 'text',
+				title: 'Another Plugin Block B',
+				icon: 'test',
+			} )
+		);
+		registerBlockType(
+			'plugin/block-c-with-variations',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save() {},
+				category: 'text',
+				title: 'Plugin Block C with variations',
+				icon: 'test',
+				variations: [
+					{ name: 'variation-a' },
+					{ name: 'variation-b' },
+				],
+			} )
+		);
+		registerBlockType(
+			'core/block',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save() {},
+				category: 'text',
+				title: 'Core Block A',
+			} )
+		);
+		registerBlockType(
+			'core/test-block-a',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save: ( props ) => props.attributes.text as string,
+				category: 'design',
+				title: 'Core Block B',
+				icon: 'test',
+				keywords: [ 'testing' ],
+			} )
+		);
+		registerBlockType(
+			'core/test-block-with-variations',
+			partial< BlockConfiguration >( {
+				apiVersion: 3,
+				save() {},
+				category: 'text',
+				title: 'Core Block C with variations',
+				icon: 'test',
+				keywords: [ 'testing' ],
+				variations: [
+					{ name: 'variation-a' },
+					{ name: 'variation-b' },
+				],
+			} )
+		);
 	} );
 	afterEach( () => {
 		[
@@ -5371,7 +5479,7 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdWithClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
 
 	it( "should return a stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				order: new Map(
 					Object.entries( {
@@ -5381,7 +5489,7 @@ describe( '__unstableGetClientIdWithClientIdsTree', () => {
 					} )
 				),
 			},
-		};
+		} );
 
 		expect(
 			__unstableGetClientIdWithClientIdsTree( state, 'foo' )
@@ -5403,7 +5511,7 @@ describe( '__unstableGetClientIdsTree', () => {
 		"wp.data.select( 'core/block-editor' ).__unstableGetClientIdsTree is deprecated since version 6.3 and will be removed in version 6.5.";
 
 	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				order: new Map(
 					Object.entries( {
@@ -5413,7 +5521,7 @@ describe( '__unstableGetClientIdsTree', () => {
 					} )
 				),
 			},
-		};
+		} );
 
 		expect( __unstableGetClientIdsTree( state, 'foo' ) ).toEqual( [
 			{
@@ -5426,7 +5534,7 @@ describe( '__unstableGetClientIdsTree', () => {
 	} );
 
 	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
-		const state = {
+		const state = partial< State >( {
 			blocks: {
 				order: new Map(
 					Object.entries( {
@@ -5436,7 +5544,7 @@ describe( '__unstableGetClientIdsTree', () => {
 					} )
 				),
 			},
-		};
+		} );
 
 		expect( __unstableGetClientIdsTree( state ) ).toEqual( [
 			{
@@ -5455,12 +5563,12 @@ describe( '__unstableGetClientIdsTree', () => {
 } );
 
 describe( 'getBlockEditingMode', () => {
-	const baseState = {
+	const baseState = partial< State >( {
 		blocks: {
 			blockEditingModes: new Map(),
 		},
 		derivedBlockEditingModes: new Map(),
-	};
+	} );
 
 	const hasContentRoleAttribute = vi.fn( () => false );
 	const get = vi.fn( () => 'edit' );
@@ -5471,6 +5579,7 @@ describe( 'getBlockEditingMode', () => {
 		hasContentRoleAttribute,
 	} );
 
+	// @ts-expect-error The store binds the registry, which the test mocks.
 	getBlockEditingMode.registry = {
 		select: vi.fn( () => mockedSelectors ),
 	};
@@ -5485,28 +5594,28 @@ describe( 'getBlockEditingMode', () => {
 	} );
 
 	it( 'should return disabled if explicitly set', () => {
-		const state = {
+		const state = partial< State >( {
 			...baseState,
 			blocks: {
 				blockEditingModes: new Map( [
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
 				] ),
 			},
-		};
+		} );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'disabled' );
 	} );
 
 	it( 'should return contentOnly if explicitly set', () => {
-		const state = {
+		const state = partial< State >( {
 			...baseState,
 			blocks: {
 				blockEditingModes: new Map( [
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
 				] ),
 			},
-		};
+		} );
 		expect(
 			getBlockEditingMode( state, 'b3247f75-fd94-4fef-97f9-5bfd162cc416' )
 		).toBe( 'contentOnly' );
@@ -5514,7 +5623,7 @@ describe( 'getBlockEditingMode', () => {
 
 	describe( 'derived block editing modes override standard block editing modes', () => {
 		it( 'should return default if explicitly set', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					blockEditingModes: new Map( [
@@ -5527,7 +5636,7 @@ describe( 'getBlockEditingMode', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'default' ],
 				] ),
-			};
+			} );
 			expect(
 				getBlockEditingMode(
 					state,
@@ -5537,7 +5646,7 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'should return disabled if explicitly set', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					blockEditingModes: new Map( [
@@ -5550,7 +5659,7 @@ describe( 'getBlockEditingMode', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
 				] ),
-			};
+			} );
 			expect(
 				getBlockEditingMode(
 					state,
@@ -5560,7 +5669,7 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'should return contentOnly if explicitly set', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					blockEditingModes: new Map( [
@@ -5570,7 +5679,7 @@ describe( 'getBlockEditingMode', () => {
 				derivedBlockEditingModes: new Map( [
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'contentOnly' ],
 				] ),
-			};
+			} );
 			expect(
 				getBlockEditingMode(
 					state,
@@ -5582,16 +5691,19 @@ describe( 'getBlockEditingMode', () => {
 
 	describe( 'getSelectedBlockStyleState', () => {
 		it( 'returns default when no clientId is passed', () => {
-			const state = {};
+			const state = partial< State >( {} );
 
-			expect( getSelectedBlockStyleState( state, undefined ) ).toEqual( {
+			expect(
+				// @ts-expect-error Deliberately no client ID.
+				getSelectedBlockStyleState( state, undefined )
+			).toEqual( {
 				viewport: 'default',
 				pseudo: 'default',
 			} );
 		} );
 
 		it( 'returns default when the block has no selected state', () => {
-			const state = {};
+			const state = partial< State >( {} );
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: 'default',
@@ -5600,13 +5712,13 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'returns the per-block pseudo with the global viewport', () => {
-			const state = {
+			const state = partial< State >( {
 				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					value: { pseudo: ':hover' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: '@mobile',
@@ -5615,11 +5727,11 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'returns default pseudo when the selected state has no value', () => {
-			const state = {
+			const state = partial< State >( {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 				},
-			};
+			} );
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: 'default',
@@ -5628,13 +5740,13 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'returns the global viewport even when another block holds the per-block state', () => {
-			const state = {
+			const state = partial< State >( {
 				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-2',
 					value: { pseudo: ':hover' },
 				},
-			};
+			} );
 
 			expect( getSelectedBlockStyleState( state, 'client-1' ) ).toEqual( {
 				viewport: '@mobile',
@@ -5645,7 +5757,7 @@ describe( 'getBlockEditingMode', () => {
 
 	describe( 'hasSelectedBlockStyleState', () => {
 		it( 'returns false when the block has no selected state', () => {
-			const state = {};
+			const state = partial< State >( {} );
 
 			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
 				false
@@ -5653,12 +5765,12 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'returns false when another block has the selected state', () => {
-			const state = {
+			const state = partial< State >( {
 				selectedBlockStyleState: {
 					clientId: 'client-2',
 					value: { viewport: 'default', pseudo: ':hover' },
 				},
-			};
+			} );
 
 			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
 				false
@@ -5666,13 +5778,13 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'returns true when a global viewport state is selected', () => {
-			const state = {
+			const state = partial< State >( {
 				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					value: { pseudo: 'default' },
 				},
-			};
+			} );
 
 			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
 				true
@@ -5680,12 +5792,12 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'returns true when a pseudo state is selected', () => {
-			const state = {
+			const state = partial< State >( {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					value: { viewport: 'default', pseudo: ':hover' },
 				},
-			};
+			} );
 
 			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
 				true
@@ -5693,13 +5805,13 @@ describe( 'getBlockEditingMode', () => {
 		} );
 
 		it( 'returns true when global viewport and per-block pseudo states are selected', () => {
-			const state = {
+			const state = partial< State >( {
 				styleStateViewport: '@mobile',
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					value: { pseudo: ':hover' },
 				},
-			};
+			} );
 
 			expect( hasSelectedBlockStyleState( state, 'client-1' ) ).toBe(
 				true

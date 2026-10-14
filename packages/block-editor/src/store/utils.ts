@@ -1,5 +1,7 @@
+import type { Block } from '@wordpress/blocks';
 import { parse } from '@wordpress/blocks';
 import { parse as grammarParse } from '@wordpress/block-serialization-default-parser';
+import type { select as globalSelect } from '@wordpress/data';
 import {
 	selectBlockPatternsKey,
 	userPatternCategoriesSelectKey,
@@ -13,15 +15,26 @@ import {
 } from './private-selectors';
 import { getBlockEditingMode, getBlockRootClientId } from './selectors';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
+import type {
+	BlockAttributes,
+	BlockPattern,
+	State,
+	UserPattern,
+	UserPatternCategory,
+} from './types';
+
+type ParsedPattern = BlockPattern & { blocks: Block[] };
+type SettingsSelector = ( select: typeof globalSelect ) => unknown;
+type GrammarBlock = ReturnType< typeof grammarParse >[ number ];
 
 export const isFiltered = Symbol( 'isFiltered' );
-const parsedPatternCache = new WeakMap();
-const grammarMapCache = new WeakMap();
+const parsedPatternCache = new WeakMap< BlockPattern, ParsedPattern >();
+const grammarMapCache = new WeakMap< BlockPattern, GrammarBlock[] >();
 
 export function mapUserPattern(
-	userPattern,
-	__experimentalUserPatternCategories = []
-) {
+	userPattern: UserPattern,
+	__experimentalUserPatternCategories: UserPatternCategory[] = []
+): BlockPattern {
 	return {
 		name: `core/block/${ userPattern.id }`,
 		id: userPattern.id,
@@ -38,7 +51,7 @@ export function mapUserPattern(
 	};
 }
 
-function parsePattern( pattern ) {
+function parsePattern( pattern: BlockPattern ): ParsedPattern {
 	const blocks = parse( pattern.content, {
 		__unstableSkipMigrationLogs: true,
 	} );
@@ -49,7 +62,9 @@ function parsePattern( pattern ) {
 				...( blocks[ 0 ].attributes.metadata || {} ),
 				categories: pattern.categories,
 				patternName: pattern.name,
-				name: blocks[ 0 ].attributes.metadata?.name || pattern.title,
+				name:
+					( blocks[ 0 ].attributes as BlockAttributes ).metadata
+						?.name || pattern.title,
 			},
 		};
 	}
@@ -59,7 +74,7 @@ function parsePattern( pattern ) {
 	};
 }
 
-export function getParsedPattern( pattern ) {
+export function getParsedPattern( pattern: BlockPattern ) {
 	let parsedPattern = parsedPatternCache.get( pattern );
 	if ( ! parsedPattern ) {
 		parsedPattern = parsePattern( pattern );
@@ -68,7 +83,7 @@ export function getParsedPattern( pattern ) {
 	return parsedPattern;
 }
 
-export function getGrammar( pattern ) {
+export function getGrammar( pattern: BlockPattern ): GrammarBlock[] {
 	let grammarMap = grammarMapCache.get( pattern );
 	if ( ! grammarMap ) {
 		grammarMap = grammarParse( pattern.content );
@@ -79,7 +94,11 @@ export function getGrammar( pattern ) {
 	return grammarMap;
 }
 
-export const checkAllowList = ( list, item, defaultResult = null ) => {
+export const checkAllowList = (
+	list: unknown,
+	item: string | null | undefined,
+	defaultResult: boolean | null = null
+) => {
 	if ( typeof list === 'boolean' ) {
 		return list;
 	}
@@ -95,18 +114,21 @@ export const checkAllowList = ( list, item, defaultResult = null ) => {
 	return defaultResult;
 };
 
-export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
+export const checkAllowListRecursive = (
+	blocks: Array< Block | GrammarBlock >,
+	allowedBlockTypes: unknown
+) => {
 	if ( typeof allowedBlockTypes === 'boolean' ) {
 		return allowedBlockTypes;
 	}
 
 	const blocksQueue = [ ...blocks ];
 	while ( blocksQueue.length > 0 ) {
-		const block = blocksQueue.shift();
+		const block = blocksQueue.shift()!;
 
 		const isAllowed = checkAllowList(
 			allowedBlockTypes,
-			block.name || block.blockName,
+			( block as Block ).name || ( block as GrammarBlock ).blockName,
 			true
 		);
 		if ( ! isAllowed ) {
@@ -121,49 +143,64 @@ export const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	return true;
 };
 
-export const getAllPatternsDependants = ( select ) => ( state ) => {
-	return [
-		state.settings.__experimentalBlockPatterns,
-		state.settings[ userPatternCategoriesSelectKey ]?.( select ) ??
-			state.settings.__experimentalUserPatternCategories,
-		state.settings.__experimentalReusableBlocks,
-		state.settings[ selectBlockPatternsKey ]?.( select ),
-		state.blockPatterns,
-		unlock( select( STORE_NAME ) ).getReusableBlocks(),
-	];
-};
+export const getAllPatternsDependants =
+	( select: typeof globalSelect ) => ( state: State ) => {
+		return [
+			state.settings.__experimentalBlockPatterns,
+			(
+				state.settings[ userPatternCategoriesSelectKey ] as
+					SettingsSelector | undefined
+			 )?.( select ) ??
+				state.settings.__experimentalUserPatternCategories,
+			state.settings.__experimentalReusableBlocks,
+			(
+				state.settings[ selectBlockPatternsKey ] as
+					SettingsSelector | undefined
+			 )?.( select ),
+			// @ts-expect-error The store has no `blockPatterns`, so this is always undefined.
+			state.blockPatterns,
+			unlock( select( STORE_NAME ) ).getReusableBlocks(),
+		];
+	};
 
-export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
-	return [
-		state.blockListSettings.get( rootClientId ),
-		state.blocks.byClientId.get( rootClientId ),
-		state.blocks.order.get( rootClientId || '' ),
-		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
-		getBlockEditingMode( state, rootClientId ),
-		getSectionRootClientId( state ),
-		isSectionBlock( state, rootClientId ),
-		getParentSectionBlock( state, rootClientId ),
-	];
-};
+// Callers pass `select`, which the dependants do not need.
+export const getInsertBlockTypeDependants: (
+	select?: typeof globalSelect
+) => ( state: State, rootClientId?: string | null ) => unknown[] =
+	() => ( state: State, rootClientId?: string | null ) => {
+		return [
+			state.blockListSettings.get( rootClientId! ),
+			state.blocks.byClientId.get( rootClientId! ),
+			state.blocks.order.get( rootClientId || '' ),
+			state.settings.allowedBlockTypes,
+			state.settings.templateLock,
+			getBlockEditingMode( state, rootClientId! ),
+			getSectionRootClientId( state ),
+			isSectionBlock( state, rootClientId! ),
+			getParentSectionBlock( state, rootClientId! ),
+		];
+	};
 
 /**
  * Returns the containers above the root that a block can be inserted into
  * instead, closest first: the section root for the top level, otherwise the
  * ancestors.
  *
- * @param {Object}  state        Editor state.
- * @param {?string} rootClientId Root client ID.
+ * @param state        Editor state.
+ * @param rootClientId Root client ID.
  *
- * @return {string[]} Client IDs of the fallback containers.
+ * @return Client IDs of the fallback containers.
  */
-export function getFallbackInsertionRoots( state, rootClientId ) {
+export function getFallbackInsertionRoots(
+	state: State,
+	rootClientId?: string | null
+): string[] {
 	if ( ! rootClientId ) {
 		const sectionRootClientId = getSectionRootClientId( state );
 		return sectionRootClientId ? [ sectionRootClientId ] : [];
 	}
 
-	const roots = [];
+	const roots: string[] = [];
 	let current = getBlockRootClientId( state, rootClientId );
 	while ( current !== null ) {
 		roots.push( current );

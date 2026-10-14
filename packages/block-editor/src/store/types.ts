@@ -1,4 +1,4 @@
-import type { Block } from '@wordpress/blocks';
+import type { Block, BlockTypeIcon, BlockVariation } from '@wordpress/blocks';
 import type { BlockEditingMode } from '../components/block-editing-mode';
 import type { InserterMediaCategory } from './actions';
 
@@ -8,6 +8,7 @@ export interface BlockAttributes {
 		patternName?: string;
 		bindings?: Record< string, unknown >;
 	};
+	lock?: { move?: boolean; remove?: boolean; edit?: boolean };
 	[ key: string ]: unknown;
 }
 
@@ -61,6 +62,94 @@ export interface BlockSelection {
 	offset?: number;
 }
 
+export interface BlockPattern {
+	name: string;
+	title?: string;
+	content: string;
+	categories?: Array< string | number >;
+	blocks?: Block[];
+	id?: number;
+	type?: string;
+	syncStatus?: string;
+	blockTypes?: string[];
+	inserter?: boolean;
+	[ key: string ]: unknown;
+}
+
+/**
+ * A user pattern as returned by the REST API.
+ */
+export interface UserPattern {
+	id: number;
+	title?: { raw?: string };
+	content: { raw: string };
+	wp_pattern_category?: number[];
+	wp_pattern_sync_status?: string;
+}
+
+export interface UserPatternCategory {
+	id: number;
+	slug: string;
+}
+
+export type InserterVariation = BlockVariation & { isSearchOnly?: boolean };
+
+/**
+ * An item shown in the inserter or in the block transforms list.
+ */
+export interface InserterItem {
+	/**
+	 * Unique identifier for the item.
+	 */
+	id: string;
+	/**
+	 * The type of block to create.
+	 */
+	name: string;
+	/**
+	 * Title of the item, as it appears in the inserter.
+	 */
+	title?: string;
+	/**
+	 * Icon for the item, as it appears in the inserter.
+	 */
+	icon?: BlockTypeIcon;
+	/**
+	 * Whether or not the user should be prevented from inserting this item.
+	 */
+	isDisabled: boolean;
+	/**
+	 * Heuristic that combines frequency and recency.
+	 */
+	frecency: number;
+	/**
+	 * Attributes to pass to the newly created block.
+	 */
+	initialAttributes?: Record< string, unknown >;
+	/**
+	 * Block category that the item is associated with.
+	 */
+	category?: string;
+	/**
+	 * Keywords that can be searched to find this item.
+	 */
+	keywords?: string[];
+	description?: string;
+	parent?: string[];
+	ancestor?: string[];
+	variations?: InserterVariation[];
+	variationName?: string;
+	example?: unknown;
+	innerBlocks?: InserterVariation[ 'innerBlocks' ];
+	innerContent?: InserterVariation[ 'innerContent' ];
+	isSearchOnly?: boolean;
+	content?: string;
+	blocks?: Block[];
+	syncStatus?: string;
+	isAllowedInCurrentRoot?: boolean;
+	utility?: number;
+}
+
 export type InitialPosition = 0 | -1 | null;
 
 export type HistoryMode = 'merge' | 'ignore';
@@ -98,8 +187,8 @@ export interface BlocksState {
 }
 
 export interface SelectionState {
-	selectionStart?: BlockSelection;
-	selectionEnd?: BlockSelection;
+	selectionStart: BlockSelection;
+	selectionEnd: BlockSelection;
 }
 
 /**

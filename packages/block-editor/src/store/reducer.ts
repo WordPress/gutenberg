@@ -1472,7 +1472,11 @@ function selectionHelper( state: BlockSelection = {}, action: Action ) {
  *
  * @return Updated state.
  */
-export function selection( state: State[ 'selection' ] = {}, action: Action ) {
+export function selection(
+	// The first action fills both fields through `selectionHelper`.
+	state = {} as State[ 'selection' ],
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SELECTION_CHANGE':
 			if ( action.clientId ) {
