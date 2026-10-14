@@ -13,6 +13,7 @@ import {
 	unregisterBlockType,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import {
 	isBlockInterfaceHidden,
 	getLastInsertedBlocksClientIds,
@@ -42,23 +43,43 @@ import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
 import reducer from '../reducer';
 import { unlock } from '../../lock-unlock';
+import type { BlockVisibility } from '../../components/block-visibility/use-block-visibility';
+import type { BlockAttributes, BlockWithoutAttributes, State } from '../types';
 
 const { editableRootKey } = unlock( blocksPrivateApis );
+
+type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
+	? T
+	: T extends Node
+		? T
+		: T extends Map< infer K, infer V >
+			? Map< K, DeepPartial< V > >
+			: T extends object
+				? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
+				: T;
+
+/*
+ * Fixtures set only the fields the selector under test reads, down to the
+ * blocks in the maps, so this marks the deliberately partial states.
+ */
+function partial< T >( fixture: DeepPartial< T > ) {
+	return fixture as T;
+}
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
 		it( 'should return the true if toggled true in state', () => {
-			const state = {
+			const state = partial< State >( {
 				isBlockInterfaceHidden: true,
-			};
+			} );
 
 			expect( isBlockInterfaceHidden( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if toggled false in state', () => {
-			const state = {
+			const state = partial< State >( {
 				isBlockInterfaceHidden: false,
-			};
+			} );
 
 			expect( isBlockInterfaceHidden( state ) ).toBe( false );
 		} );
@@ -66,9 +87,9 @@ describe( 'private selectors', () => {
 
 	describe( 'getLastInsertedBlocksClientIds', () => {
 		it( 'should return undefined if no blocks have been inserted', () => {
-			const state = {
+			const state = partial< State >( {
 				lastBlockInserted: {},
-			};
+			} );
 
 			expect( getLastInsertedBlocksClientIds( state ) ).toEqual(
 				undefined
@@ -76,11 +97,11 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return clientIds if blocks have been inserted', () => {
-			const state = {
+			const state = partial< State >( {
 				lastBlockInserted: {
 					clientIds: [ '123456', '78910' ],
 				},
-			};
+			} );
 
 			expect( getLastInsertedBlocksClientIds( state ) ).toEqual( [
 				'123456',
@@ -94,15 +115,21 @@ describe( 'private selectors', () => {
 		const blockWithoutListViewSupport = 'core/test-no-list-view-support';
 
 		const createState = (
-			blockName,
-			{ allowedBlocks, innerBlocks = [] } = {}
+			blockName: string,
+			{
+				allowedBlocks,
+				innerBlocks = [],
+			}: {
+				allowedBlocks?: string[] | boolean;
+				innerBlocks?: string[];
+			} = {}
 		) => {
 			const blockListSettings = new Map();
 			if ( allowedBlocks !== undefined ) {
 				blockListSettings.set( 'client-1', { allowedBlocks } );
 			}
 
-			return {
+			return partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'client-1', { name: blockName } ],
@@ -111,23 +138,29 @@ describe( 'private selectors', () => {
 					parents: new Map(),
 				},
 				blockListSettings,
-			};
+			} );
 		};
 
 		beforeAll( () => {
-			registerBlockType( blockWithListViewSupport, {
-				apiVersion: 3,
-				title: 'List View support',
-				category: 'text',
-				supports: {
-					listView: true,
-				},
-			} );
-			registerBlockType( blockWithoutListViewSupport, {
-				apiVersion: 3,
-				title: 'No List View support',
-				category: 'text',
-			} );
+			registerBlockType(
+				blockWithListViewSupport,
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					title: 'List View support',
+					category: 'text',
+					supports: {
+						listView: true,
+					},
+				} )
+			);
+			registerBlockType(
+				blockWithoutListViewSupport,
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					title: 'No List View support',
+					category: 'text',
+				} )
+			);
 		} );
 
 		afterAll( () => {
@@ -228,7 +261,7 @@ describe( 'private selectors', () => {
 
 	describe( 'isSelectedBlockStyleStateShownOnCanvas', () => {
 		it( 'returns true when the block has no canvas preview state', () => {
-			const state = {};
+			const state = partial< State >( {} );
 
 			expect(
 				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
@@ -236,12 +269,12 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'returns the canvas preview state for the block', () => {
-			const state = {
+			const state = partial< State >( {
 				selectedBlockStyleState: {
 					clientId: 'client-1',
 					showStateOnCanvas: false,
 				},
-			};
+			} );
 
 			expect(
 				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
@@ -249,12 +282,12 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'returns true when another block has canvas preview state', () => {
-			const state = {
+			const state = partial< State >( {
 				selectedBlockStyleState: {
 					clientId: 'client-2',
 					showStateOnCanvas: false,
 				},
-			};
+			} );
 
 			expect(
 				isSelectedBlockStyleStateShownOnCanvas( state, 'client-1' )
@@ -332,6 +365,7 @@ describe( 'private selectors', () => {
 
 		const hasContentRoleAttribute = vi.fn( () => false );
 		const get = vi.fn( () => 'edit' );
+		// @ts-expect-error The store binds the registry, which the test mocks.
 		getBlockEditingMode.registry = {
 			select: vi.fn( () => ( {
 				hasContentRoleAttribute,
@@ -340,14 +374,14 @@ describe( 'private selectors', () => {
 		};
 
 		it( 'should return false when top level block is not disabled', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
 					blockEditingModes: new Map(),
 				},
 				derivedBlockEditingModes: new Map(),
-			};
+			} );
 			expect(
 				isBlockSubtreeDisabled(
 					state,
@@ -357,7 +391,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return true when top level block is disabled and there are no editing modes within it', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -371,7 +405,7 @@ describe( 'private selectors', () => {
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
 					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
 				] ),
-			};
+			} );
 			expect(
 				isBlockSubtreeDisabled(
 					state,
@@ -381,7 +415,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return true when top level block is disabled via inheritance and there are no editing modes within it', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -395,7 +429,7 @@ describe( 'private selectors', () => {
 					[ 'b3247f75-fd94-4fef-97f9-5bfd162cc416', 'disabled' ],
 					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
 				] ),
-			};
+			} );
 			expect(
 				isBlockSubtreeDisabled(
 					state,
@@ -405,7 +439,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return true when top level block is disabled and there are disabled editing modes within it', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -419,7 +453,7 @@ describe( 'private selectors', () => {
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
 				] ),
-			};
+			} );
 			expect(
 				isBlockSubtreeDisabled(
 					state,
@@ -429,7 +463,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return false when top level block is disabled and there are non-disabled editing modes within it', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -443,7 +477,7 @@ describe( 'private selectors', () => {
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
 				] ),
-			};
+			} );
 			expect(
 				isBlockSubtreeDisabled(
 					state,
@@ -453,7 +487,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return false when top level block is disabled via inheritance and there are non-disabled editing modes within it', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -469,7 +503,7 @@ describe( 'private selectors', () => {
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 					[ 'e178812d-ce5e-48c7-a945-8ae4ffcbbb7c', 'disabled' ],
 				] ),
-			};
+			} );
 			expect(
 				isBlockSubtreeDisabled(
 					state,
@@ -545,14 +579,14 @@ describe( 'private selectors', () => {
 			] ),
 		};
 		it( 'should return tree containing only clientId and innerBlocks', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
 					blockEditingModes: new Map(),
 				},
 				derivedBlockEditingModes: new Map(),
-			};
+			} );
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
 					clientId: '6cf70164-9097-4460-bcbf-200560546988',
@@ -586,14 +620,14 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return a subtree when rootBlockClientId is given', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
 					blockEditingModes: new Map(),
 				},
 				derivedBlockEditingModes: new Map(),
-			};
+			} );
 			expect(
 				getEnabledClientIdsTree(
 					state,
@@ -621,7 +655,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should filter out disabled blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -641,7 +675,7 @@ describe( 'private selectors', () => {
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
-			};
+			} );
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
 					clientId: 'b26fc763-417d-4f01-b81c-2ec61e14a972',
@@ -664,7 +698,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'filters out disabled blocks when a content-only section is being edited', () => {
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -686,7 +720,7 @@ describe( 'private selectors', () => {
 				derivedBlockEditingModes: new Map( [
 					[ '6cf70164-9097-4460-bcbf-200560546988', 'disabled' ],
 				] ),
-			};
+			} );
 			expect( getEnabledClientIdsTree( state ) ).toEqual( [
 				{
 					clientId: 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337',
@@ -720,113 +754,123 @@ describe( 'private selectors', () => {
 		const TEST_CONTENT_BLOCK = 'core/test-list-view-content-block';
 		const TEST_STRUCTURE_BLOCK = 'core/test-list-view-structure-block';
 
-		const createBaseState = () => ( {
-			settings: {},
-			blocks: {
-				byClientId: new Map( [
-					[
-						'header',
-						{
-							name: TEST_STRUCTURE_BLOCK,
-						},
-					],
-					[
-						'edited-pattern',
-						{
-							name: TEST_STRUCTURE_BLOCK,
-						},
-					],
-					[
-						'edited-content',
-						{
-							name: TEST_CONTENT_BLOCK,
-						},
-					],
-					[
-						'other-pattern',
-						{
-							name: TEST_STRUCTURE_BLOCK,
-						},
-					],
-					[
-						'other-content',
-						{
-							name: TEST_CONTENT_BLOCK,
-						},
-					],
-					[
-						'other-structure',
-						{
-							name: TEST_STRUCTURE_BLOCK,
-						},
-					],
-				] ),
-				attributes: new Map( [
-					[
-						'edited-pattern',
-						{
-							metadata: {
-								patternName: 'test/edited-pattern',
+		const createBaseState = () =>
+			partial< State >( {
+				settings: {},
+				blocks: {
+					byClientId: new Map( [
+						[
+							'header',
+							{
+								name: TEST_STRUCTURE_BLOCK,
 							},
-						},
-					],
-					[
-						'other-pattern',
-						{
-							metadata: {
-								patternName: 'test/other-pattern',
+						],
+						[
+							'edited-pattern',
+							{
+								name: TEST_STRUCTURE_BLOCK,
 							},
-						},
-					],
+						],
+						[
+							'edited-content',
+							{
+								name: TEST_CONTENT_BLOCK,
+							},
+						],
+						[
+							'other-pattern',
+							{
+								name: TEST_STRUCTURE_BLOCK,
+							},
+						],
+						[
+							'other-content',
+							{
+								name: TEST_CONTENT_BLOCK,
+							},
+						],
+						[
+							'other-structure',
+							{
+								name: TEST_STRUCTURE_BLOCK,
+							},
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'edited-pattern',
+							{
+								metadata: {
+									patternName: 'test/edited-pattern',
+								},
+							},
+						],
+						[
+							'other-pattern',
+							{
+								metadata: {
+									patternName: 'test/other-pattern',
+								},
+							},
+						],
+					] ),
+					order: new Map( [
+						[ '', [ 'header', 'edited-pattern', 'other-pattern' ] ],
+						[ 'header', [] ],
+						[ 'edited-pattern', [ 'edited-content' ] ],
+						[ 'edited-content', [] ],
+						[
+							'other-pattern',
+							[ 'other-content', 'other-structure' ],
+						],
+						[ 'other-content', [] ],
+						[ 'other-structure', [] ],
+					] ),
+					parents: new Map( [
+						[ 'header', '' ],
+						[ 'edited-pattern', '' ],
+						[ 'edited-content', 'edited-pattern' ],
+						[ 'other-pattern', '' ],
+						[ 'other-content', 'other-pattern' ],
+						[ 'other-structure', 'other-pattern' ],
+					] ),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map(),
+				editedContentOnlySection: 'edited-pattern',
+				derivedBlockEditingModes: new Map( [
+					[ 'header', 'disabled' ],
+					[ 'other-pattern', 'disabled' ],
+					[ 'other-content', 'disabled' ],
+					[ 'other-structure', 'disabled' ],
 				] ),
-				order: new Map( [
-					[ '', [ 'header', 'edited-pattern', 'other-pattern' ] ],
-					[ 'header', [] ],
-					[ 'edited-pattern', [ 'edited-content' ] ],
-					[ 'edited-content', [] ],
-					[ 'other-pattern', [ 'other-content', 'other-structure' ] ],
-					[ 'other-content', [] ],
-					[ 'other-structure', [] ],
-				] ),
-				parents: new Map( [
-					[ 'header', '' ],
-					[ 'edited-pattern', '' ],
-					[ 'edited-content', 'edited-pattern' ],
-					[ 'other-pattern', '' ],
-					[ 'other-content', 'other-pattern' ],
-					[ 'other-structure', 'other-pattern' ],
-				] ),
-				blockEditingModes: new Map(),
-			},
-			blockListSettings: new Map(),
-			editedContentOnlySection: 'edited-pattern',
-			derivedBlockEditingModes: new Map( [
-				[ 'header', 'disabled' ],
-				[ 'other-pattern', 'disabled' ],
-				[ 'other-content', 'disabled' ],
-				[ 'other-structure', 'disabled' ],
-			] ),
-		} );
+			} );
 
 		beforeAll( () => {
-			registerBlockType( TEST_CONTENT_BLOCK, {
-				apiVersion: 3,
-				title: 'Test content block',
-				category: 'text',
-				attributes: {
-					content: {
-						type: 'string',
-						role: 'content',
+			registerBlockType(
+				TEST_CONTENT_BLOCK,
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					title: 'Test content block',
+					category: 'text',
+					attributes: {
+						content: {
+							type: 'string',
+							role: 'content',
+						},
 					},
-				},
-				save: () => null,
-			} );
-			registerBlockType( TEST_STRUCTURE_BLOCK, {
-				apiVersion: 3,
-				title: 'Test structure block',
-				category: 'design',
-				save: () => null,
-			} );
+					save: () => null,
+				} )
+			);
+			registerBlockType(
+				TEST_STRUCTURE_BLOCK,
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					title: 'Test structure block',
+					category: 'design',
+					save: () => null,
+				} )
+			);
 		} );
 
 		afterAll( () => {
@@ -865,7 +909,7 @@ describe( 'private selectors', () => {
 
 		it( 'keeps descendants of explicitly disabled blocks hidden', () => {
 			const baseState = createBaseState();
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -873,9 +917,9 @@ describe( 'private selectors', () => {
 						...baseState.blocks.byClientId,
 						[
 							'header-content',
-							{
+							partial< BlockWithoutAttributes >( {
 								name: TEST_CONTENT_BLOCK,
-							},
+							} ),
 						],
 					] ),
 					order: new Map( [
@@ -893,7 +937,7 @@ describe( 'private selectors', () => {
 					...baseState.derivedBlockEditingModes,
 					[ 'header-content', 'disabled' ],
 				] ),
-			};
+			} );
 
 			expect( getListViewClientIdsTree( state ) ).toEqual( [
 				{
@@ -919,7 +963,7 @@ describe( 'private selectors', () => {
 
 		it( 'includes blocks with explicit modes inside explicitly disabled parents', () => {
 			const baseState = createBaseState();
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				blocks: {
 					...baseState.blocks,
@@ -927,9 +971,9 @@ describe( 'private selectors', () => {
 						...baseState.blocks.byClientId,
 						[
 							'header-content',
-							{
+							partial< BlockWithoutAttributes >( {
 								name: TEST_CONTENT_BLOCK,
-							},
+							} ),
 						],
 					] ),
 					order: new Map( [
@@ -950,7 +994,7 @@ describe( 'private selectors', () => {
 					...baseState.derivedBlockEditingModes,
 					[ 'header-content', 'disabled' ],
 				] ),
-			};
+			} );
 
 			expect( getListViewClientIdsTree( state ) ).toEqual( [
 				{
@@ -993,7 +1037,7 @@ describe( 'private selectors', () => {
 
 		it( 'uses section-block settings when deciding which disabled blocks were already hidden', () => {
 			const baseState = createBaseState();
-			const state = {
+			const state = partial< State >( {
 				...baseState,
 				settings: {
 					disableContentOnlyForTemplateParts: true,
@@ -1054,7 +1098,7 @@ describe( 'private selectors', () => {
 					[ 'template-part', 'disabled' ],
 					[ 'template-part-structure', 'disabled' ],
 				] ),
-			};
+			} );
 
 			expect( getListViewClientIdsTree( state ) ).toEqual( [
 				{
@@ -1079,15 +1123,15 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'returns the same tree when section-only state changes outside of a content-only section edit', () => {
-			const state = {
+			const state = partial< State >( {
 				...createBaseState(),
 				editedContentOnlySection: undefined,
 				derivedBlockEditingModes: new Map(),
-			};
+			} );
 			const tree = getListViewClientIdsTree( state );
 
 			// None of this is read unless a content-only section is edited.
-			const nextState = {
+			const nextState = partial< State >( {
 				...state,
 				blocks: {
 					...state.blocks,
@@ -1098,7 +1142,7 @@ describe( 'private selectors', () => {
 					[ 'header', { templateLock: 'contentOnly' } ],
 				] ),
 				settings: { ...state.settings },
-			};
+			} );
 
 			expect( getListViewClientIdsTree( nextState ) ).toBe( tree );
 		} );
@@ -1123,7 +1167,7 @@ describe( 'private selectors', () => {
 				},
 			] );
 
-			const nextState = {
+			const nextState = partial< State >( {
 				...state,
 				blocks: {
 					...state.blocks,
@@ -1132,7 +1176,7 @@ describe( 'private selectors', () => {
 						{ metadata: {} }
 					),
 				},
-			};
+			} );
 
 			// It is no longer a section, so its structural child is shown.
 			expect( getListViewClientIdsTree( nextState ) ).toEqual( [
@@ -1156,16 +1200,24 @@ describe( 'private selectors', () => {
 		// The memoization above is only reachable if the reducer preserves
 		// these references through a keystroke.
 		it( 'should keep its dependants referentially stable while typing', () => {
-			const block = ( clientId ) => ( {
-				clientId,
-				name: TEST_CONTENT_BLOCK,
-				attributes: { content: clientId },
-				innerBlocks: [],
-			} );
-			const state = reducer( reducer( undefined, { type: '@@init' } ), {
-				type: 'RESET_BLOCKS',
-				blocks: [ block( 'a' ), block( 'b' ) ],
-			} );
+			const block = ( clientId: string ) =>
+				partial< Block >( {
+					clientId,
+					name: TEST_CONTENT_BLOCK,
+					attributes: { content: clientId },
+					innerBlocks: [],
+				} );
+			const state = reducer(
+				reducer(
+					undefined,
+					// @ts-expect-error Deliberately unknown action type.
+					{ type: '@@init' }
+				),
+				{
+					type: 'RESET_BLOCKS',
+					blocks: [ block( 'a' ), block( 'b' ) ],
+				}
+			);
 
 			const next = reducer( state, {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
@@ -1186,7 +1238,7 @@ describe( 'private selectors', () => {
 
 	describe( 'getEnabledBlockParents', () => {
 		it( 'should return an empty array if block is at the root', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: {},
 				blocks: {
 					parents: new Map( [
@@ -1199,7 +1251,7 @@ describe( 'private selectors', () => {
 					blockEditingModes: new Map(),
 				},
 				derivedBlockEditingModes: new Map(),
-			};
+			} );
 			expect(
 				getEnabledBlockParents(
 					state,
@@ -1209,7 +1261,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return non-disabled parents', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: {},
 				blocks: {
 					parents: new Map( [
@@ -1252,7 +1304,7 @@ describe( 'private selectors', () => {
 					[ '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f', 'disabled' ],
 				] ),
 				blockListSettings: new Map(),
-			};
+			} );
 			expect(
 				getEnabledBlockParents(
 					state,
@@ -1262,7 +1314,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should order from bottom to top if ascending is true', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: {},
 				blocks: {
 					parents: new Map( [
@@ -1304,7 +1356,7 @@ describe( 'private selectors', () => {
 					[ 'ef45d5fd-5234-4fd5-ac4f-c3736c7f9337', 'disabled' ],
 				] ),
 				blockListSettings: new Map(),
-			};
+			} );
 			expect(
 				getEnabledBlockParents(
 					state,
@@ -1320,17 +1372,17 @@ describe( 'private selectors', () => {
 
 	describe( 'isDragging', () => {
 		it( 'should return true if the dragging state is true', () => {
-			const state = {
+			const state = partial< State >( {
 				isDragging: true,
-			};
+			} );
 
 			expect( isDragging( state ) ).toBe( true );
 		} );
 
 		it( 'should return false if the dragging state is false', () => {
-			const state = {
+			const state = partial< State >( {
 				isDragging: false,
-			};
+			} );
 
 			expect( isDragging( state ) ).toBe( false );
 		} );
@@ -1338,9 +1390,9 @@ describe( 'private selectors', () => {
 
 	describe( 'getExpandedBlock', () => {
 		it( 'should return the expanded block', () => {
-			const state = {
+			const state = partial< State >( {
 				expandedBlock: '9b9c5c3f-2e46-4f02-9e14-9fe9515b958f',
-			};
+			} );
 
 			expect( getExpandedBlock( state ) ).toBe(
 				'9b9c5c3f-2e46-4f02-9e14-9fe9515b958f'
@@ -1350,7 +1402,7 @@ describe( 'private selectors', () => {
 
 	describe( 'getStyleOverrides', () => {
 		it( 'sorts overrides by the order of the blocks they belong to', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					order: new Map( [ [ '', [ 'block-1', 'block-2' ] ] ] ),
 				},
@@ -1359,7 +1411,7 @@ describe( 'private selectors', () => {
 					[ 'override-1', { clientId: 'block-1', css: '.a{}' } ],
 					[ 'override-global', { css: '.global{}' } ],
 				] ),
-			};
+			} );
 
 			expect( getStyleOverrides( state ) ).toEqual( [
 				[ 'override-global', { css: '.global{}' } ],
@@ -1371,23 +1423,23 @@ describe( 'private selectors', () => {
 
 	describe( 'getBlockStyles', () => {
 		it( 'should return an empty object when no client IDs are provided', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					attributes: new Map(),
 				},
-			};
+			} );
 			const result = getBlockStyles( state, [] );
 			expect( result ).toEqual( {} );
 		} );
 
 		it( 'should return styles for a single block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					attributes: new Map( [
 						[ 'block-1', { style: { color: 'red' } } ],
 					] ),
 				},
-			};
+			} );
 			const result = getBlockStyles( state, [ 'block-1' ] );
 			expect( result ).toEqual( {
 				'block-1': { color: 'red' },
@@ -1395,7 +1447,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return styles for multiple blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					attributes: new Map( [
 						[ 'block-1', { style: { color: 'red' } } ],
@@ -1403,7 +1455,7 @@ describe( 'private selectors', () => {
 						[ 'block-3', { style: { margin: '10px' } } ],
 					] ),
 				},
-			};
+			} );
 			const result = getBlockStyles( state, [
 				'block-1',
 				'block-2',
@@ -1417,7 +1469,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return undefined for blocks without styles', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					attributes: new Map( [
 						[ 'block-1', { style: { color: 'red' } } ],
@@ -1425,7 +1477,7 @@ describe( 'private selectors', () => {
 						[ 'block-3', { style: { margin: '10px' } } ],
 					] ),
 				},
-			};
+			} );
 			const result = getBlockStyles( state, [
 				'block-1',
 				'block-2',
@@ -1439,13 +1491,13 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return undefined for non-existent blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					attributes: new Map( [
 						[ 'block-1', { style: { color: 'red' } } ],
 					] ),
 				},
-			};
+			} );
 			const result = getBlockStyles( state, [
 				'block-1',
 				'non-existent-block',
@@ -1459,19 +1511,19 @@ describe( 'private selectors', () => {
 
 	describe( 'isEditLockedBlock', () => {
 		it( 'returns false when block has no lock attribute', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'block-1', { clientId: 'block-1' } ],
 					] ),
 					attributes: new Map( [ [ 'block-1', {} ] ] ),
 				},
-			};
+			} );
 			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'returns false when block has lock attribute but edit is false', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'block-1', { clientId: 'block-1' } ],
@@ -1480,12 +1532,12 @@ describe( 'private selectors', () => {
 						[ 'block-1', { lock: { edit: false, move: true } } ],
 					] ),
 				},
-			};
+			} );
 			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'returns true when block has lock attribute with edit set to true', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'block-1', { clientId: 'block-1' } ],
@@ -1494,42 +1546,46 @@ describe( 'private selectors', () => {
 						[ 'block-1', { lock: { edit: true } } ],
 					] ),
 				},
-			};
+			} );
 			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
 		it( 'returns false when block has no attributes', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
 				},
-			};
+			} );
 			expect( isEditLockedBlock( state, 'block-1' ) ).toBe( false );
 		} );
 	} );
 
 	describe( 'isMoveLockedBlock', () => {
-		const createState = ( templateLock, blockLock ) => ( {
-			blocks: {
-				byClientId: new Map( [
-					[ 'block-1', { clientId: 'block-1' } ],
-					[ 'parent-block', { clientId: 'parent-block' } ],
+		const createState = (
+			templateLock: string | null,
+			blockLock: BlockAttributes[ 'lock' ] | null
+		) =>
+			partial< State >( {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+						[ 'parent-block', { clientId: 'parent-block' } ],
+					] ),
+					attributes: new Map( [
+						[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+						[ 'parent-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'block-1', 'parent-block' ],
+						[ 'parent-block', '' ],
+					] ),
+				},
+				settings: {},
+				blockListSettings: new Map( [
+					[ 'parent-block', templateLock ? { templateLock } : {} ],
 				] ),
-				attributes: new Map( [
-					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
-					[ 'parent-block', {} ],
-				] ),
-				parents: new Map( [
-					[ 'block-1', 'parent-block' ],
-					[ 'parent-block', '' ],
-				] ),
-			},
-			settings: {},
-			blockListSettings: new Map( [
-				[ 'parent-block', templateLock ? { templateLock } : {} ],
-			] ),
-		} );
+			} );
 
 		it( 'returns false when block has no lock and no templateLock', () => {
 			const state = createState( null, null );
@@ -1563,26 +1619,30 @@ describe( 'private selectors', () => {
 	} );
 
 	describe( 'isRemoveLockedBlock', () => {
-		const createState = ( templateLock, blockLock ) => ( {
-			blocks: {
-				byClientId: new Map( [
-					[ 'block-1', { clientId: 'block-1' } ],
-					[ 'parent-block', { clientId: 'parent-block' } ],
+		const createState = (
+			templateLock: string | null,
+			blockLock: BlockAttributes[ 'lock' ] | null
+		) =>
+			partial< State >( {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+						[ 'parent-block', { clientId: 'parent-block' } ],
+					] ),
+					attributes: new Map( [
+						[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+						[ 'parent-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'block-1', 'parent-block' ],
+						[ 'parent-block', '' ],
+					] ),
+				},
+				settings: {},
+				blockListSettings: new Map( [
+					[ 'parent-block', templateLock ? { templateLock } : {} ],
 				] ),
-				attributes: new Map( [
-					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
-					[ 'parent-block', {} ],
-				] ),
-				parents: new Map( [
-					[ 'block-1', 'parent-block' ],
-					[ 'parent-block', '' ],
-				] ),
-			},
-			settings: {},
-			blockListSettings: new Map( [
-				[ 'parent-block', templateLock ? { templateLock } : {} ],
-			] ),
-		} );
+			} );
 
 		it( 'returns false when block has no lock and no templateLock', () => {
 			const state = createState( null, null );
@@ -1621,26 +1681,30 @@ describe( 'private selectors', () => {
 	} );
 
 	describe( 'isLockedBlock', () => {
-		const createState = ( templateLock, blockLock ) => ( {
-			blocks: {
-				byClientId: new Map( [
-					[ 'block-1', { clientId: 'block-1' } ],
-					[ 'parent-block', { clientId: 'parent-block' } ],
+		const createState = (
+			templateLock: string | null,
+			blockLock: BlockAttributes[ 'lock' ] | null
+		) =>
+			partial< State >( {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { clientId: 'block-1' } ],
+						[ 'parent-block', { clientId: 'parent-block' } ],
+					] ),
+					attributes: new Map( [
+						[ 'block-1', blockLock ? { lock: blockLock } : {} ],
+						[ 'parent-block', {} ],
+					] ),
+					parents: new Map( [
+						[ 'block-1', 'parent-block' ],
+						[ 'parent-block', '' ],
+					] ),
+				},
+				settings: {},
+				blockListSettings: new Map( [
+					[ 'parent-block', templateLock ? { templateLock } : {} ],
 				] ),
-				attributes: new Map( [
-					[ 'block-1', blockLock ? { lock: blockLock } : {} ],
-					[ 'parent-block', {} ],
-				] ),
-				parents: new Map( [
-					[ 'block-1', 'parent-block' ],
-					[ 'parent-block', '' ],
-				] ),
-			},
-			settings: {},
-			blockListSettings: new Map( [
-				[ 'parent-block', templateLock ? { templateLock } : {} ],
-			] ),
-		} );
+			} );
 
 		it( 'returns false when block is not locked in any way', () => {
 			const state = createState( null, null );
@@ -1698,34 +1762,43 @@ describe( 'private selectors', () => {
 	describe( 'isBlockHiddenAnywhere', () => {
 		beforeAll( () => {
 			// Register a block with visibility support
-			registerBlockType( 'core/test-block-with-visibility', {
-				apiVersion: 3,
-				save: () => null,
-				category: 'text',
-				title: 'Test Block With Visibility',
-				supports: {
-					visibility: true,
-				},
-			} );
+			registerBlockType(
+				'core/test-block-with-visibility',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: () => null,
+					category: 'text',
+					title: 'Test Block With Visibility',
+					supports: {
+						visibility: true,
+					},
+				} )
+			);
 
 			// Register a block without visibility support
-			registerBlockType( 'core/test-block-without-visibility', {
-				apiVersion: 3,
-				save: () => null,
-				category: 'text',
-				title: 'Test Block Without Visibility',
-				supports: {
-					visibility: false,
-				},
-			} );
+			registerBlockType(
+				'core/test-block-without-visibility',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: () => null,
+					category: 'text',
+					title: 'Test Block Without Visibility',
+					supports: {
+						visibility: false,
+					},
+				} )
+			);
 
 			// Register a block with no supports defined (defaults to true for visibility)
-			registerBlockType( 'core/test-block-default-visibility', {
-				apiVersion: 3,
-				save: () => null,
-				category: 'text',
-				title: 'Test Block Default Visibility',
-			} );
+			registerBlockType(
+				'core/test-block-default-visibility',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: () => null,
+					category: 'text',
+					title: 'Test Block Default Visibility',
+				} )
+			);
 		} );
 
 		afterAll( () => {
@@ -1735,7 +1808,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return false when block has visibility support and is not hidden', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -1754,13 +1827,13 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should return true when block has visibility support and is hidden', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -1779,13 +1852,13 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( true );
 		} );
 
 		it( 'should return false when block does not have visibility support', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -1804,7 +1877,7 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			// Even though blockVisibility is false, the block doesn't support visibility,
 			// so it should return false
@@ -1812,7 +1885,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'should return false when block has default visibility support and is not hidden', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -1831,13 +1904,13 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should return true when block has default visibility support and is hidden', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -1856,13 +1929,13 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( true );
 		} );
 
 		it( 'should return false when block has no metadata', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -1872,13 +1945,13 @@ describe( 'private selectors', () => {
 					] ),
 					attributes: new Map( [ [ 'block-1', {} ] ] ),
 				},
-			};
+			} );
 
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should return false when block has metadata but no blockVisibility property', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -1897,13 +1970,13 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should ignore viewport visibility for unavailable breakpoints', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: {
 					__experimentalFeatures: {
 						viewport: {
@@ -1933,13 +2006,13 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should use tablet visibility for a single tablet breakpoint', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: {
 					__experimentalFeatures: {
 						viewport: {
@@ -1970,18 +2043,18 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( true );
 		} );
 
 		it( 'should handle non-existent block gracefully', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
 				},
-			};
+			} );
 
 			// When block doesn't exist, getBlockName returns null,
 			// and hasBlockSupport should handle null gracefully
@@ -1993,15 +2066,18 @@ describe( 'private selectors', () => {
 
 	describe( 'isBlockHiddenAtViewport', () => {
 		beforeAll( () => {
-			registerBlockType( 'core/test-block-with-visibility', {
-				apiVersion: 3,
-				save: () => null,
-				category: 'text',
-				title: 'Test Block With Visibility',
-				supports: {
-					visibility: true,
-				},
-			} );
+			registerBlockType(
+				'core/test-block-with-visibility',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: () => null,
+					category: 'text',
+					title: 'Test Block With Visibility',
+					supports: {
+						visibility: true,
+					},
+				} )
+			);
 		} );
 
 		afterAll( () => {
@@ -2009,7 +2085,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'returns true when block is hidden everywhere', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -2028,7 +2104,7 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect(
 				isBlockHiddenAtViewport( state, 'block-1', 'Desktop' )
@@ -2036,7 +2112,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'returns visibility based on the requested viewport', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[
@@ -2060,7 +2136,7 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect(
 				isBlockHiddenAtViewport( state, 'block-1', 'Mobile' )
@@ -2071,7 +2147,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'ignores viewport visibility for unavailable breakpoints', () => {
-			const state = {
+			const state = partial< State >( {
 				settings: {
 					__experimentalFeatures: {
 						viewport: {
@@ -2101,7 +2177,7 @@ describe( 'private selectors', () => {
 						],
 					] ),
 				},
-			};
+			} );
 
 			expect(
 				isBlockHiddenAtViewport( state, 'block-1', 'Tablet' )
@@ -2110,36 +2186,40 @@ describe( 'private selectors', () => {
 	} );
 
 	describe( 'isBlockHiddenAnywhere in different devices', () => {
-		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
-			settings: {
-				[ deviceTypeKey ]: deviceType,
-			},
-			blocks: {
-				byClientId: new Map( [
-					[
-						'test-block',
-						{
-							name: 'core/paragraph',
-							attributes: {
+		const createState = (
+			blockVisibility?: BlockVisibility,
+			deviceType: string = 'Desktop'
+		) =>
+			partial< State >( {
+				settings: {
+					[ deviceTypeKey ]: deviceType,
+				},
+				blocks: {
+					byClientId: new Map( [
+						[
+							'test-block',
+							{
+								name: 'core/paragraph',
+								attributes: {
+									metadata: {
+										blockVisibility,
+									},
+								},
+							},
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'test-block',
+							{
 								metadata: {
 									blockVisibility,
 								},
 							},
-						},
-					],
-				] ),
-				attributes: new Map( [
-					[
-						'test-block',
-						{
-							metadata: {
-								blockVisibility,
-							},
-						},
-					],
-				] ),
-			},
-		} );
+						],
+					] ),
+				},
+			} );
 
 		it( 'returns true when block is hidden at any viewport (mobile)', () => {
 			const state = createState(
@@ -2188,6 +2268,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns false when block is visible at all viewports', () => {
 			const state = createState(
+				// @ts-expect-error Not the `{ viewport }` shape, so no viewport hides the block.
 				{ mobile: true, tablet: true, desktop: true },
 				'Desktop'
 			);
@@ -2198,17 +2279,17 @@ describe( 'private selectors', () => {
 
 	describe( 'getViewportModalClientIds', () => {
 		it( 'should return null when modal is not open', () => {
-			const state = {
+			const state = partial< State >( {
 				viewportModalClientIds: null,
-			};
+			} );
 			expect( getViewportModalClientIds( state ) ).toBeNull();
 		} );
 
 		it( 'should return client IDs when modal is open', () => {
 			const clientIds = [ 'client-1', 'client-2' ];
-			const state = {
+			const state = partial< State >( {
 				viewportModalClientIds: clientIds,
-			};
+			} );
 			expect( getViewportModalClientIds( state ) ).toEqual( clientIds );
 		} );
 	} );
@@ -2221,12 +2302,19 @@ describe( 'private selectors', () => {
 			disableContentOnlyForTemplateParts,
 			templateLock,
 			rootTemplateLock,
+		}: {
+			blockName?: string;
+			patternName?: string;
+			disableContentOnlyForUnsyncedPatterns?: boolean;
+			disableContentOnlyForTemplateParts?: boolean;
+			templateLock?: string;
+			rootTemplateLock?: string;
 		} = {} ) => {
 			const clientId = 'block-1';
 			const rootClientId = '';
 			const attributes = patternName ? { metadata: { patternName } } : {};
 
-			return {
+			return partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ clientId, { name: blockName } ],
@@ -2252,7 +2340,7 @@ describe( 'private selectors', () => {
 						: {} ),
 				},
 				editedContentOnlySection: undefined,
-			};
+			} );
 		};
 
 		it( 'should return true for blocks with patternName by default', () => {
@@ -2311,7 +2399,7 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'returns false when nested inside another section block', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'outer-pattern', { name: 'core/group' } ],
@@ -2335,25 +2423,25 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
-			};
+			} );
 			// inner-pattern is nested inside outer-pattern (also a section),
 			// so it is not considered a section itself.
 			expect( isSectionBlock( state, 'inner-pattern' ) ).toBe( false );
 		} );
 
 		it( 'returns false when the block itself is the editedContentOnlySection', () => {
-			const state = {
+			const state = partial< State >( {
 				...createState( {
 					patternName: 'my-pattern',
 				} ),
 				editedContentOnlySection: 'block-1',
-			};
+			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'returns false when the block is nested within the editedContentOnlySection', () => {
 			// Create a nested structure: outer-pattern > block-1 (with patternName)
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'outer-pattern', { name: 'core/group' } ],
@@ -2374,7 +2462,7 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'outer-pattern',
-			};
+			} );
 			// block-1 has a patternName, so would normally be a section,
 			// but since its parent (outer-pattern) is being edited, it's not.
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
@@ -2382,7 +2470,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns true for section blocks outside the editedContentOnlySection', () => {
 			// Create a structure with two sibling patterns
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'pattern-a', { name: 'core/group' } ],
@@ -2400,25 +2488,31 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-a',
-			};
+			} );
 			// pattern-b is not the edited section and not within it
 			expect( isSectionBlock( state, 'pattern-b' ) ).toBe( true );
 		} );
 	} );
 
 	describe( 'isSyncedBlock', () => {
-		const createState = ( { blockName, patternName } = {} ) => ( {
-			blocks: {
-				byClientId: new Map( [ [ 'block-1', { name: blockName } ] ] ),
-				attributes: new Map( [
-					[
-						'block-1',
-						patternName ? { metadata: { patternName } } : {},
-					],
-				] ),
-				parents: new Map( [ [ 'block-1', '' ] ] ),
-			},
-		} );
+		const createState = ( {
+			blockName,
+			patternName,
+		}: { blockName?: string; patternName?: string } = {} ) =>
+			partial< State >( {
+				blocks: {
+					byClientId: new Map( [
+						[ 'block-1', { name: blockName } ],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							patternName ? { metadata: { patternName } } : {},
+						],
+					] ),
+					parents: new Map( [ [ 'block-1', '' ] ] ),
+				},
+			} );
 
 		it( 'returns true for synced patterns', () => {
 			const state = createState( { blockName: 'core/block' } );
@@ -2444,20 +2538,20 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'returns true for a synced block whose pattern is being edited', () => {
-			const state = {
+			const state = partial< State >( {
 				...createState( {
 					blockName: 'core/template-part',
 					patternName: 'my-pattern',
 				} ),
 				editedContentOnlySection: 'block-1',
-			};
+			} );
 			expect( isSyncedBlock( state, 'block-1' ) ).toBe( true );
 		} );
 	} );
 
 	describe( 'getParentSectionBlock', () => {
 		it( 'returns undefined when there are no parent section blocks', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'block-1', { name: 'core/paragraph' } ],
@@ -2468,12 +2562,12 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
-			};
+			} );
 			expect( getParentSectionBlock( state, 'block-1' ) ).toBeUndefined();
 		} );
 
 		it( 'returns the parent section block clientId', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'pattern-block', { name: 'core/group' } ],
@@ -2494,14 +2588,14 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: undefined,
-			};
+			} );
 			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
 				'pattern-block'
 			);
 		} );
 
 		it( 'returns undefined when the parent is the editedContentOnlySection', () => {
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'pattern-block', { name: 'core/group' } ],
@@ -2522,7 +2616,7 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-block',
-			};
+			} );
 			// Since pattern-block is the edited section, it's no longer
 			// considered a parent section for inner-block
 			expect(
@@ -2532,7 +2626,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns undefined for deeply nested blocks when an ancestor is the editedContentOnlySection', () => {
 			// Structure: outer-pattern > nested-pattern > deep-block
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'outer-pattern', { name: 'core/group' } ],
@@ -2559,7 +2653,7 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'outer-pattern',
-			};
+			} );
 			// When outer-pattern is being edited, nested-pattern is no longer
 			// a section (tested above), so deep-block has no parent section
 			expect(
@@ -2569,7 +2663,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns the correct parent when editedContentOnlySection is set but not in ancestry', () => {
 			// Structure: pattern-a > inner-block, pattern-b (sibling)
-			const state = {
+			const state = partial< State >( {
 				blocks: {
 					byClientId: new Map( [
 						[ 'pattern-a', { name: 'core/group' } ],
@@ -2590,7 +2684,7 @@ describe( 'private selectors', () => {
 				blockListSettings: new Map(),
 				settings: {},
 				editedContentOnlySection: 'pattern-b',
-			};
+			} );
 			// pattern-a is not being edited, so inner-block still has pattern-a as parent
 			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
 				'pattern-a'
@@ -2600,19 +2694,25 @@ describe( 'private selectors', () => {
 
 	describe( 'canHostEditableRoot', () => {
 		beforeEach( () => {
-			registerBlockType( 'core/test-editable-root', {
-				apiVersion: 3,
-				save: () => null,
-				category: 'text',
-				title: 'Editable root',
-				[ editableRootKey ]: true,
-			} );
-			registerBlockType( 'core/test-plain', {
-				apiVersion: 3,
-				save: () => null,
-				category: 'text',
-				title: 'Plain',
-			} );
+			registerBlockType(
+				'core/test-editable-root',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: () => null,
+					category: 'text',
+					title: 'Editable root',
+					[ editableRootKey ]: true,
+				} )
+			);
+			registerBlockType(
+				'core/test-plain',
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					save: () => null,
+					category: 'text',
+					title: 'Plain',
+				} )
+			);
 		} );
 
 		afterEach( () => {
@@ -2620,30 +2720,31 @@ describe( 'private selectors', () => {
 			unregisterBlockType( 'core/test-plain' );
 		} );
 
-		const createState = () => ( {
-			blocks: {
-				byClientId: new Map( [
-					[ 'a', { name: 'core/test-editable-root' } ],
-					[ 'b', { name: 'core/test-editable-root' } ],
-				] ),
-				attributes: new Map( [
-					[ 'a', { content: 'a' } ],
-					[ 'b', { content: 'b' } ],
-				] ),
-				order: new Map( [
-					[ '', [ 'a', 'b' ] ],
-					[ 'a', [] ],
-					[ 'b', [] ],
-				] ),
-				parents: new Map( [
-					[ 'a', '' ],
-					[ 'b', '' ],
-				] ),
-				blockEditingModes: new Map(),
-			},
-			derivedBlockEditingModes: new Map(),
-			blocksMode: {},
-		} );
+		const createState = () =>
+			partial< State >( {
+				blocks: {
+					byClientId: new Map( [
+						[ 'a', { name: 'core/test-editable-root' } ],
+						[ 'b', { name: 'core/test-editable-root' } ],
+					] ),
+					attributes: new Map( [
+						[ 'a', { content: 'a' } ],
+						[ 'b', { content: 'b' } ],
+					] ),
+					order: new Map( [
+						[ '', [ 'a', 'b' ] ],
+						[ 'a', [] ],
+						[ 'b', [] ],
+					] ),
+					parents: new Map( [
+						[ 'a', '' ],
+						[ 'b', '' ],
+					] ),
+					blockEditingModes: new Map(),
+				},
+				derivedBlockEditingModes: new Map(),
+				blocksMode: {},
+			} );
 
 		it( 'should return true for a block supporting editableRoot with editable siblings', () => {
 			expect( canHostEditableRoot( createState(), 'a' ) ).toBe( true );
@@ -2672,9 +2773,12 @@ describe( 'private selectors', () => {
 			expect( canHostEditableRoot( state, 'a' ) ).toBe( true );
 
 			// Change the uncached result without touching a dependant.
-			state.blocks.byClientId.set( 'a', { name: 'core/test-plain' } );
+			state.blocks.byClientId.set(
+				'a',
+				partial< BlockWithoutAttributes >( { name: 'core/test-plain' } )
+			);
 
-			const nextState = {
+			const nextState = partial< State >( {
 				...state,
 				blocks: {
 					...state.blocks,
@@ -2683,7 +2787,7 @@ describe( 'private selectors', () => {
 						[ 'b', { content: 'b' } ],
 					] ),
 				},
-			};
+			} );
 
 			expect( canHostEditableRoot( nextState, 'a' ) ).toBe( true );
 
@@ -2694,16 +2798,24 @@ describe( 'private selectors', () => {
 		// The memoization above is only reachable if the reducer preserves
 		// these references through a keystroke.
 		it( 'should keep its dependants referentially stable while typing', () => {
-			const block = ( clientId ) => ( {
-				clientId,
-				name: 'core/test-editable-root',
-				attributes: { content: clientId },
-				innerBlocks: [],
-			} );
-			const state = reducer( reducer( undefined, { type: '@@init' } ), {
-				type: 'RESET_BLOCKS',
-				blocks: [ block( 'a' ), block( 'b' ) ],
-			} );
+			const block = ( clientId: string ) =>
+				partial< Block >( {
+					clientId,
+					name: 'core/test-editable-root',
+					attributes: { content: clientId },
+					innerBlocks: [],
+				} );
+			const state = reducer(
+				reducer(
+					undefined,
+					// @ts-expect-error Deliberately unknown action type.
+					{ type: '@@init' }
+				),
+				{
+					type: 'RESET_BLOCKS',
+					blocks: [ block( 'a' ), block( 'b' ) ],
+				}
+			);
 
 			const next = reducer( state, {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
