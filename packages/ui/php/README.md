@@ -1,6 +1,6 @@
 # Server-rendered components (experimental)
 
-Lets PHP-rendered admin screens use `@wordpress/ui` components, as explored in [#84036](https://github.com/WordPress/gutenberg/issues/84036). The PHP markup isn't written by hand: the build renders the React components and PHP fills in the result, so there is one implementation to maintain. It runs behind the `gutenberg-ui-php-components` experiment.
+Lets PHP-rendered admin screens use `@wordpress/ui` components, as explored in [#84036](https://github.com/WordPress/gutenberg/issues/84036). The PHP markup isn't written by hand: the build renders the React components and PHP fills in the result, so there is one implementation to maintain. It runs behind the `gutenberg-ui-php-components` experiment, with a preview page under Tools → UI Components.
 
 ```php
 echo gutenberg_get_ui_component( 'button', array( 'label' => __( 'Save' ), 'type' => 'submit' ) );
@@ -14,7 +14,7 @@ Each component has a folder here with a `component.json`:
 
 -   `props` is the PHP contract, a JSON schema per prop. Props with a fixed set of values (an `enum` or a boolean) are variants. Free-form strings are slots.
 -   `render` maps the props to the React element, as `[ type, props, ...children ]`, where `"$name"` is a prop.
--   `example` gives the props for the checks.
+-   `example` gives the props for the preview page and the checks.
 -   `deprecations` (optional) keeps renamed props and values working. See [Versioning](#versioning-and-backward-compatibility).
 
 `bin/build-php.mjs` runs after the package build. It renders the React element for every combination of variants, with placeholders for the slots, and stores each render as a snapshot in `build-php/manifest.php`. PHP picks the snapshot for the props it gets, then escapes and fills in the slots. Strings React translates with `__()`, such as Button's "Loading" label, are caught through the `i18n.gettext` filter while rendering snapshots, and PHP translates them with `translate()` in the same text domain. `_x()` and `_n()` aren't supported yet; the build fails if their text reaches the markup. The stylesheet is compiled by `@wordpress/build` from the same CSS modules React uses, so class names match.
@@ -27,7 +27,7 @@ React changes far more often than PHP callers can adapt, so every kind of change
 
 | React change | What happens |
 | --- | --- |
-| CSS changes | `style.css` is regenerated. Nothing to do. |
+| CSS changes | `style.css` is regenerated. Nothing to do. `test/e2e/specs/admin/ui-components-php.spec.js` screenshots each example rendered by PHP with the PHP stylesheet, and as React's markup with all of the package's styles, and compares them pixel by pixel. |
 | Markup or class changes | Snapshots are regenerated. `php/<name>/snapshot.html` is out of date, the build warns and the PHPUnit check fails until it's updated with `npm run update-php-snapshots --workspace @wordpress/ui`. The diff shows reviewers the PHP impact. |
 | A prop or value is renamed or removed | The build fails: the variant no longer changes the markup. |
 | A component is renamed or removed | The build fails: the `render` mapping points at a missing export. |

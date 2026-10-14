@@ -112,7 +112,7 @@ function gutenberg_initialize_experiments_settings() {
 				array(
 					'id'          => 'gutenberg-ui-php-components',
 					'label'       => __( 'UI components for PHP screens', 'gutenberg' ),
-					'description' => __( 'Lets PHP-rendered admin screens render @wordpress/ui components.', 'gutenberg' ),
+					'description' => __( 'Lets PHP-rendered admin screens render @wordpress/ui components, and adds a preview page under Tools.', 'gutenberg' ),
 				),
 				array(
 					'id'          => 'gutenberg-dashboard-widgets',

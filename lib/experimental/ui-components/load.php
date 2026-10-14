@@ -4,13 +4,14 @@
  * `gutenberg-ui-php-components` experiment.
  *
  * This file is the Gutenberg adapter: it points the renderer at the plugin's
- * build output and registers the assets. The renderer
+ * build output, registers the assets and adds the preview page. The renderer
  * and the component definitions don't depend on Gutenberg.
  *
  * @package gutenberg
  */
 
 require_once __DIR__ . '/class-gutenberg-ui-components.php';
+require_once __DIR__ . '/preview-page.php';
 
 /**
  * Returns the shared component renderer.
