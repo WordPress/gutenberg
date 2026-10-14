@@ -26,6 +26,10 @@ _Returns_
 
 - `DOMRect | null`: The rectangle.
 
+### ContentSchema
+
+Schema of the content allowed inside an element, keyed by tag name.
+
 ### documentHasSelection
 
 Check whether the current document has a selection. This includes focus in input fields, textareas, and general rich-text selection.
@@ -110,7 +114,7 @@ _Parameters_
 
 _Returns_
 
-- `Partial<ContentSchema>`: Schema.
+- `ContentSchema`: Schema.
 
 ### getRectangleFromRange
 
@@ -122,7 +126,7 @@ _Parameters_
 
 _Returns_
 
-- `DOMRect?`: The rectangle.
+- `DOMRect | null`: The rectangle.
 
 ### getScrollContainer
 
@@ -131,7 +135,7 @@ Given a DOM node, finds the closest scrollable container node or the node itself
 _Parameters_
 
 - _node_ `Element | null`: Node from which to start.
-- _direction_ `?string`: Direction of scrollable container to search for ('vertical', 'horizontal', 'all'). Defaults to 'vertical'.
+- _direction_ `'vertical' | 'horizontal' | 'all'`: Direction of scrollable container to search for ('vertical', 'horizontal', 'all'). Defaults to 'vertical'.
 
 _Returns_
 
@@ -146,17 +150,13 @@ _Parameters_
 - _newNode_ `Node`: Node to be inserted.
 - _referenceNode_ `Node`: Node after which to perform the insertion.
 
-_Returns_
-
-- `void`:
-
 ### isEmpty
 
 Recursively checks if an element is empty. An element is not empty if it contains text or contains elements with attributes such as images.
 
 _Parameters_
 
-- _element_ `Element`: The element to check.
+- _element_ `Node`: The element to check.
 
 _Returns_
 
@@ -180,7 +180,7 @@ Detects if element is a form element.
 
 _Parameters_
 
-- _element_ `Element`: The element to check.
+- _element_ `Element | null | undefined`: The element to check.
 
 _Returns_
 
@@ -319,10 +319,6 @@ _Parameters_
 
 - _node_ `Node`: Node to be removed.
 
-_Returns_
-
-- `void`:
-
 ### removeInvalidHTML
 
 Given a schema, unwraps or removes nodes, attributes and classes on HTML.
@@ -330,7 +326,7 @@ Given a schema, unwraps or removes nodes, attributes and classes on HTML.
 _Parameters_
 
 - _HTML_ `string`: The HTML to clean up.
-- _schema_ `import('./clean-node-list').Schema`: Schema for the HTML.
+- _schema_ `Schema`: Schema for the HTML.
 - _inline_ `boolean`: Whether to clean for inline mode.
 
 _Returns_
@@ -345,10 +341,6 @@ _Parameters_
 
 - _processedNode_ `Element`: Node to be removed.
 - _newNode_ `Element`: Node to be inserted in its place.
-
-_Returns_
-
-- `void`:
 
 ### replaceTag
 
@@ -375,6 +367,18 @@ _Returns_
 
 - `string`: The sanitized HTML.
 
+### Schema
+
+Schema that `cleanNodeList` and `removeInvalidHTML` clean HTML against, keyed by tag name.
+
+### SchemaItem
+
+The rules for a single tag in a `Schema`.
+
+### SemanticElementDefinition
+
+The attributes and children allowed for an element in a `ContentSchema`.
+
 ### unwrap
 
 Unwrap the given node. This means any child nodes are moved to the parent.
@@ -382,10 +386,6 @@ Unwrap the given node. This means any child nodes are moved to the parent.
 _Parameters_
 
 - _node_ `Node`: The node to unwrap.
-
-_Returns_
-
-- `void`:
 
 ### wrap
 

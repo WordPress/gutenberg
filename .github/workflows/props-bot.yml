@@ -27,16 +27,19 @@ on:
         types:
             - submitted
 
-# Cancels all previous runs for a pull request that have not completed, which
-# is also what keeps two gathers from writing their lists out of order.
+# Queues runs for a pull request in order, which keeps two gathers from writing
+# their lists out of order. Runs wait for a runner for minutes at busy times, so
+# cancelling superseded ones instead left most events with a cancelled check.
 concurrency:
     # Keyed by the pull request, which each of the three events carries in a
-    # different place. Two kinds of run stand apart, or they would cancel a
-    # refresh and then do nothing in its place: a label event that is not
+    # different place. Two kinds of run stand apart, or they would hold up a
+    # refresh while doing nothing themselves: a label event that is not
     # `props-bot`, whose jobs all skip, and a fork's review run, whose token
     # cannot write.
     group: ${{ github.workflow }}-${{ ( github.event.action != 'labeled' || github.event.label.name == 'props-bot' ) && ( github.event_name != 'pull_request_review' || github.event.pull_request.head.repo.full_name == github.repository ) && ( github.event.number || github.event.issue.number || github.event.pull_request.number ) || github.run_id }}
-    cancel-in-progress: true
+    cancel-in-progress: false
+    # The default would still cancel a pending run once a newer one arrived.
+    queue: max
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.

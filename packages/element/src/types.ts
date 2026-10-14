@@ -1,7 +1,7 @@
 import type { ReactElement } from 'react';
 
 /**
- * Mirrors `TransformedText` from @wordpress/i18n.
+ * Mirrors `TransformedText` from `@wordpress/i18n`.
  * We don't import directly to avoid a circular dependency.
  */
 type TransformedText< T extends string > = string & {

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 11.17.0 (2026-10-07)
+
 ### New Features
 
 -   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime, including versions older than 10.4 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
@@ -17,6 +23,7 @@
 ### Internal
 
 -   Update `@wp-playground/cli` to 3.1.56, which replaces the `fs-ext` optional dependency, compiled with `node-gyp` at install time, with `fs-ext-extra-prebuilt`, which ships prebuilt binaries and works without running install scripts ([#84012](https://github.com/WordPress/gutenberg/pull/84012)).
+-   Update `simple-git` to v4, which has better TypeScript support ([#84137](https://github.com/WordPress/gutenberg/pull/84137)).
 
 ## 11.16.0 (2026-09-23)
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/boot",
-	"version": "0.23.0",
+	"version": "0.24.0",
 	"description": "Minimal boot package for WordPress admin pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,14 +19,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build-module",
 		"build-style",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"module": "build-module/index.mjs",
 	"exports": {
