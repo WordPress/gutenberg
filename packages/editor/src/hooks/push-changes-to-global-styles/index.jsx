@@ -7,7 +7,9 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 import {
 	getBlockType,
 	hasBlockSupport,
@@ -558,26 +560,70 @@ function PushChangesToGlobalStylesControl( {
 	);
 }
 
-function StyleSourcesControl( { name, attributes, setAttributes } ) {
+/**
+ * The one entry point to a block's styles while the inheritance UI is on: a
+ * summary row with the number of changes, opening the review modal. It stands
+ * in for "Apply globally", whose job the modal takes over.
+ *
+ * @param {Object}   props               Component props.
+ * @param {string}   props.name          Block name.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Block attribute setter.
+ */
+function StyleChangesControl( { name, attributes, setAttributes } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { rows } = useStyleSources( name, attributes );
+	const changeCount = rows.filter( ( row ) => row.isChanged ).length;
 
 	return (
 		<BaseControl
-			className="editor-push-changes-to-global-styles-control"
-			help={ __(
-				'See where each of this block’s styles comes from, and reset the ones changed on this block.'
+			className="editor-style-changes-control"
+			help={ sprintf(
+				// translators: %s: Title of the block e.g. 'Button'.
+				__(
+					'See where this block’s styles come from. Reset changes, or apply them to all %s blocks.'
+				),
+				getBlockType( name ).title
 			) }
 		>
-			<Button
-				__next40pxDefaultSize
-				variant="secondary"
-				onClick={ () => setIsModalOpen( true ) }
-			>
-				{ __( 'Where styles come from' ) }
-			</Button>
+			<BaseControl.VisualLabel>
+				{ __( 'Styles' ) }
+			</BaseControl.VisualLabel>
+			<div className="editor-style-changes-control__item">
+				<Button
+					__next40pxDefaultSize
+					className="editor-style-changes-control__toggle"
+					aria-haspopup="dialog"
+					onClick={ () => setIsModalOpen( true ) }
+				>
+					<Stack direction="column" gap="xs">
+						<span className="editor-style-changes-control__count">
+							{ changeCount
+								? sprintf(
+										// translators: %d: Number of styles changed on the block.
+										_n(
+											'%d style change',
+											'%d style changes',
+											changeCount
+										),
+										changeCount
+									)
+								: __( 'No style changes' ) }
+						</span>
+						<span className="editor-style-changes-control__actions">
+							{ __( 'Compare, reset or apply' ) }
+						</span>
+					</Stack>
+					<Icon
+						icon={ isRTL() ? chevronLeft : chevronRight }
+						size={ 24 }
+					/>
+				</Button>
+			</div>
 			{ isModalOpen && (
 				<StyleSourcesModalContainer
 					name={ name }
+					rows={ rows }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					onRequestClose={ () => setIsModalOpen( false ) }
@@ -587,15 +633,15 @@ function StyleSourcesControl( { name, attributes, setAttributes } ) {
 	);
 }
 
-// Only mounted while the modal is open, so the rows aren't worked out for
+// Only mounted while the modal is open, so the push rows aren't worked out for
 // every selected block.
 function StyleSourcesModalContainer( {
 	name,
+	rows,
 	attributes,
 	setAttributes,
 	onRequestClose,
 } ) {
-	const { rows, variationTitle } = useStyleSources( name, attributes );
 	const { rows: changeRows, pushChanges } = usePushChangesToGlobalStyles(
 		name,
 		attributes,
@@ -620,7 +666,6 @@ function StyleSourcesModalContainer( {
 		<StyleSourcesModal
 			name={ name }
 			rows={ rows }
-			variationTitle={ variationTitle }
 			onReset={ onReset }
 			canApply={ canApply }
 			onApply={ onApply }
@@ -647,9 +692,10 @@ function PushChangesToGlobalStyles( props ) {
 
 	return (
 		<InspectorAdvancedControls>
-			<PushChangesToGlobalStylesControl { ...props } />
-			{ isGlobalStylesInheritanceIndicatorUIEnabled() && (
-				<StyleSourcesControl { ...props } />
+			{ isGlobalStylesInheritanceIndicatorUIEnabled() ? (
+				<StyleChangesControl { ...props } />
+			) : (
+				<PushChangesToGlobalStylesControl { ...props } />
 			) }
 		</InspectorAdvancedControls>
 	);

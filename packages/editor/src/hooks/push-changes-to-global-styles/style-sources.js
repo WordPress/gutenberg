@@ -6,6 +6,7 @@ import { unlock } from '../../lock-unlock';
 import {
 	formatStyleValue,
 	formatBorderRadius,
+	formatBorderShorthand,
 	formatSpacingShorthand,
 	formatBlockGap,
 } from './format-style-value';
@@ -21,20 +22,14 @@ export const STYLE_PROPERTY = {
 };
 
 /**
- * Global Styles sections, keyed by the first part of a style path, used to
- * name the root layer (e.g. "Typography style").
+ * Names for the root layer, keyed by the first part of a style path. Root only
+ * reaches a block through text color and typography (see `resolveStyle`).
  *
  * @type {Record<string, string>}
  */
-const ROOT_SECTION_LABELS = {
-	typography: __( 'Typography' ),
-	color: __( 'Colors' ),
-	spacing: __( 'Layout' ),
-	dimensions: __( 'Layout' ),
-	border: __( 'Border' ),
-	shadow: __( 'Shadow' ),
-	background: __( 'Background' ),
-	filter: __( 'Filters' ),
+const ROOT_LABELS = {
+	typography: __( 'Site typography' ),
+	color: __( 'Site colors' ),
 };
 
 /**
@@ -73,6 +68,46 @@ const isSet = ( value ) =>
 		! Array.isArray( value ) &&
 		Object.keys( value ).length === 0
 	);
+
+// Values that only defer to something else or switch a style off. A row with
+// one of these says nothing about where the block's look comes from.
+const NO_VALUES = [ 'inherit', 'none', 'transparent none' ];
+
+const hasValue = ( value ) =>
+	isSet( value ) &&
+	! (
+		typeof value === 'string' &&
+		NO_VALUES.includes( value.trim().toLowerCase() )
+	);
+
+// Rows follow the inspector: text color sits in Typography, then Color,
+// Dimensions, Border and Shadow.
+const ROW_ORDER = [
+	'color.text',
+	'typography.fontFamily',
+	'typography.fontSize',
+	'typography.fontWeight',
+	'typography.fontStyle',
+	'typography.lineHeight',
+	'typography.letterSpacing',
+	'typography.textDecoration',
+	'typography.textTransform',
+	'color',
+	'spacing',
+	'dimensions',
+	'border',
+	'shadow',
+];
+
+const getRowRank = ( pathKey ) => {
+	const rank = ROW_ORDER.findIndex(
+		( key ) => pathKey === key || pathKey.startsWith( `${ key }.` )
+	);
+	return rank === -1 ? ROW_ORDER.length : rank;
+};
+
+// The all-sides border leaves that fold into one "Border" row.
+const BORDER_LEAVES = [ 'border.width', 'border.style', 'border.color' ];
 
 /**
  * Names the Global Styles element that supplied a leaf. Only elements in
@@ -121,14 +156,7 @@ export function getSourceLabel(
 		case 'root': {
 			// Element styles set on the root read as their property's section.
 			const sectionKey = path[ 0 ] === 'elements' ? path[ 2 ] : path[ 0 ];
-			const section = ROOT_SECTION_LABELS[ sectionKey ];
-			return section
-				? sprintf(
-						// translators: %s: Global Styles section name e.g. 'Typography'.
-						__( '%s style' ),
-						section
-					)
-				: __( 'Site style' );
+			return ROOT_LABELS[ sectionKey ] ?? __( 'Site styles' );
 		}
 		case 'element':
 			if ( ! elementName ) {
@@ -151,7 +179,7 @@ export function getSourceLabel(
 			}
 			return sprintf(
 				// translators: %s: Block style variation name e.g. 'Outline'.
-				__( '“%s” block style variation' ),
+				__( '%s style' ),
 				variationTitle
 			);
 		default:
@@ -179,6 +207,9 @@ export function formatSourceValue( pathKey, value, resolve ) {
 	if ( pathKey === 'border.radius' ) {
 		return formatBorderRadius( value );
 	}
+	if ( pathKey === 'border' ) {
+		return formatBorderShorthand( value );
+	}
 	return formatStyleValue( value );
 }
 
@@ -199,7 +230,9 @@ function getLeafPaths( object, path = [] ) {
  * controls show, with its value and where that value comes from.
  *
  * A row is changed when the block sets the style itself. A changed row with
- * nothing underneath still gets a row, with `replaces` set to `null`.
+ * nothing underneath still gets a row, with `replaces` set to `null`. A style
+ * the block doesn't set gets a row only when Global Styles gives it a real
+ * value, not `inherit` or `none`.
  *
  * @param {Object}     options
  * @param {string[][]} options.stylePaths Style paths the block supports.
@@ -208,7 +241,7 @@ function getLeafPaths( object, path = [] ) {
  * @param {Function}   options.getLabel   Label for a style path.
  * @param {Function}   options.getSource  Source copy for `( source, leafPath )`.
  *
- * @return {Array<Object>} Rows, in style path order.
+ * @return {Array<Object>} Rows, in inspector order.
  */
 export function getStyleSourceRows( {
 	stylePaths,
@@ -241,7 +274,7 @@ export function getStyleSourceRows( {
 			: getValueFromObjectPath( localStyle, path );
 		const inheritedValue = getValueFromObjectPath( inherited, path );
 		const isChanged = isSet( localValue );
-		const inheritedSource = isSet( inheritedValue )
+		const inheritedSource = hasValue( inheritedValue )
 			? sourcesFor( pathKey )
 			: null;
 
@@ -292,7 +325,47 @@ export function getStyleSourceRows( {
 		}
 	}
 
-	return rows;
+	return groupInheritedBorder( rows, getLabel ).sort(
+		( a, b ) => getRowRank( a.id ) - getRowRank( b.id )
+	);
+}
+
+/**
+ * Folds the inherited border width, style and color rows into one "Border"
+ * row, so they read as one CSS value. Left alone when the block sets any of
+ * them, as each changed row can be reset on its own.
+ *
+ * @param {Array<Object>} rows     Style source rows.
+ * @param {Function}      getLabel Label for a style path.
+ *
+ * @return {Array<Object>} The rows, with the border rows folded.
+ */
+function groupInheritedBorder( rows, getLabel ) {
+	const borderRows = rows.filter( ( row ) =>
+		BORDER_LEAVES.includes( row.id )
+	);
+	if (
+		borderRows.length < 2 ||
+		borderRows.some( ( row ) => row.isChanged )
+	) {
+		return rows;
+	}
+	const value = Object.fromEntries(
+		borderRows.map( ( row ) => [ row.path[ 1 ], row.value ] )
+	);
+	const sources = [ ...new Set( borderRows.map( ( row ) => row.source ) ) ];
+	return [
+		...rows.filter( ( row ) => ! borderRows.includes( row ) ),
+		{
+			id: 'border',
+			path: [ 'border' ],
+			label: getLabel( [ 'border' ] ),
+			isChanged: false,
+			value,
+			source: sources.join( ', ' ),
+			replaces: null,
+		},
+	];
 }
 
 /**
