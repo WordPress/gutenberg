@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMediaEditorContext } from '../media-editor-provider';
 import { getMediaTypeFromMimeType } from '../../utils';
@@ -80,7 +80,6 @@ export default function MediaEditorCanvas( {
 
 	useEffect( () => {
 		if (
-			cropperImage ||
 			! mediaUrl ||
 			! Number.isFinite( mediaWidth ) ||
 			! Number.isFinite( mediaHeight ) ||
@@ -94,7 +93,7 @@ export default function MediaEditorCanvas( {
 			naturalWidth: mediaWidth,
 			naturalHeight: mediaHeight,
 		} );
-	}, [ cropperImage, mediaUrl, mediaWidth, mediaHeight, setSourceImage ] );
+	}, [ mediaUrl, mediaWidth, mediaHeight, setSourceImage ] );
 
 	const isImage = mediaType.type === 'image';
 
@@ -139,7 +138,7 @@ export default function MediaEditorCanvas( {
 		<div className="media-editor-canvas">
 			{ status === 'loading' && (
 				<div className="media-editor-canvas__spinner">
-					<Spinner />
+					<WCSpinner />
 				</div>
 			) }
 			{ /*

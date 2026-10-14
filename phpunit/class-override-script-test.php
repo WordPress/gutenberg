@@ -54,6 +54,45 @@ class Override_Script_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that translations are set when the script depends on wp-i18n.
+	 */
+	public function test_sets_translations_when_depending_on_wp_i18n() {
+		global $wp_scripts;
+
+		gutenberg_override_script(
+			$wp_scripts,
+			'gutenberg-dummy-script',
+			'https://example.com/',
+			array( 'wp-i18n' ),
+			'version',
+			false
+		);
+
+		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
+		$this->assertSame( 'default', $script->textdomain );
+	}
+
+	/**
+	 * Tests that translations are not set when the script does not depend on wp-i18n.
+	 */
+	public function test_does_not_set_translations_without_wp_i18n() {
+		global $wp_scripts;
+
+		gutenberg_override_script(
+			$wp_scripts,
+			'gutenberg-dummy-script',
+			'https://example.com/',
+			array( 'dependency' ),
+			'version',
+			false
+		);
+
+		$script = $wp_scripts->query( 'gutenberg-dummy-script', 'registered' );
+		$this->assertNull( $script->textdomain );
+		$this->assertSame( array( 'dependency' ), $script->deps );
+	}
+
+	/**
 	 * Tests that script properties are overridden.
 	 */
 	public function test_replaces_registered_properties() {

@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useRef, useLayoutEffect } from '@wordpress/element';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as editPostStore } from '../../../store';
@@ -70,7 +70,7 @@ function MetaBoxesArea( { location } ) {
 	return (
 		<div className={ classes } ref={ nativeUndoRef }>
 			{ isSaving && (
-				<Spinner className="edit-post-meta-boxes-area__spinner" />
+				<WCSpinner className="edit-post-meta-boxes-area__spinner" />
 			) }
 			<div
 				className="edit-post-meta-boxes-area__container"

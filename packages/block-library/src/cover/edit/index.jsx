@@ -8,7 +8,11 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Placeholder, SandBox, Spinner } from '@wordpress/components';
+import {
+	Placeholder,
+	SandBox,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
 import {
 	compose,
 	useMergeRefs,
@@ -564,10 +568,17 @@ function CoverEdit( {
 			return;
 		}
 
+		const previousImage = { id, url: propsRef.current.attributes.url };
+		let isUndone = false;
 		openMediaEditorModal( {
 			id,
 			onClose: () => {
 				editMediaButtonRef.current?.focus();
+			},
+			onUndo: () => {
+				isUndone = true;
+				setIsSwappingMedia( false );
+				setAttributes( previousImage );
 			},
 			onUpdate: async ( { id: newId, url: newUrl } ) => {
 				if ( typeof newId !== 'number' ) {
@@ -590,6 +601,10 @@ function CoverEdit( {
 				if ( newUrl ) {
 					const averageBackgroundColor =
 						await getMediaColor( newUrl );
+					// Snackbar Undo can run while the image color is loading.
+					if ( isUndone ) {
+						return;
+					}
 
 					// Read latest values after await to avoid stale closures.
 					const {
@@ -882,7 +897,7 @@ function CoverEdit( {
 					</div>
 				) }
 				{ isEmbedVideoBackground && ! embedHtml && isFetchingEmbed && (
-					<Spinner />
+					<WCSpinner />
 				) }
 
 				{ showOverlay && (
@@ -907,7 +922,7 @@ function CoverEdit( {
 					/>
 				) }
 
-				{ ( isUploadingMedia || isSwappingMedia ) && <Spinner /> }
+				{ ( isUploadingMedia || isSwappingMedia ) && <WCSpinner /> }
 
 				<CoverPlaceholder
 					disableMediaButtons

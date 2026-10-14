@@ -1,4 +1,5 @@
 import { __, sprintf } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import {
 	// eslint-disable-next-line @wordpress/use-recommended-components
 	ButtonLink,
@@ -6,7 +7,6 @@ import {
 	Link,
 	Stack,
 	Tooltip,
-	inertValue,
 } from '@wordpress/ui';
 import { HostLink } from '@wordpress/widget-primitives';
 import type {
@@ -127,7 +127,6 @@ export function WidgetFooter( {
 			align="center"
 			gap="lg"
 			className={ styles[ 'widget-footer' ] }
-			// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 			inert={ inertValue( editMode ) }
 		>
 			{ highActions.length > 0 && (

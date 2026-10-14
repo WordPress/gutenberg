@@ -7,8 +7,8 @@ import { useViewConfig } from '@wordpress/views';
 import { MediaEdit } from '@wordpress/fields';
 import { loadEditorAssets } from '@wordpress/lazy-editor';
 import { useEffect, useState } from '@wordpress/element';
-import { inertValue } from '@wordpress/ui';
 import { decodeEntities } from '@wordpress/html-entities';
+import { inertValue } from '@wordpress/react-inert-value';
 import styles from './style.module.scss';
 
 type SiteSettings = {
@@ -45,7 +45,6 @@ function MediaEditWithEditorAssets( props: any ) {
 		<div
 			aria-busy={ ! isReady || undefined }
 			style={ ! isReady ? { opacity: 0.6 } : undefined }
-			// @ts-expect-error inert not typed properly
 			inert={ inertValue( ! isReady ) }
 		>
 			<MediaEdit { ...props } />

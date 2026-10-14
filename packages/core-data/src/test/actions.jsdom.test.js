@@ -12,7 +12,7 @@ import {
 	__experimentalBatch,
 } from '../actions';
 import { getEntitySyncManager } from '../entity-sync';
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 vi.mock( import( '../batch' ), async ( importOriginal ) => {
 	const { createBatch } = await importOriginal();
@@ -23,7 +23,7 @@ vi.mock( import( '../batch' ), async ( importOriginal ) => {
 	};
 } );
 
-vi.mock( '../entity-sync', () => ( {
+vi.mock( import( '../entity-sync' ), () => ( {
 	getEntitySyncManager: vi.fn(),
 } ) );
 
@@ -69,6 +69,7 @@ describe( 'editEntityRecord', () => {
 				content: 'Original Content',
 			} ),
 			getUndoManager: () => ( {
+				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
 		};
@@ -107,6 +108,7 @@ describe( 'editEntityRecord', () => {
 				},
 			} ),
 			getUndoManager: () => ( {
+				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
 		};
@@ -152,6 +154,7 @@ describe( 'editEntityRecord', () => {
 				meta: { existingKey: 'existingValue' },
 			} ),
 			getUndoManager: () => ( {
+				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
 		};
@@ -193,6 +196,7 @@ describe( 'editEntityRecord', () => {
 				meta: { key1: 'value1' },
 			} ),
 			getUndoManager: () => ( {
+				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
 		};
@@ -231,6 +235,7 @@ describe( 'editEntityRecord', () => {
 				title: 'Edited Title',
 			} ),
 			getUndoManager: () => ( {
+				hasRedo: vi.fn( () => false ),
 				addRecord: vi.fn(),
 			} ),
 		};
@@ -285,6 +290,7 @@ describe( 'editEntityRecord', () => {
 					},
 				} ),
 				getUndoManager: () => ( {
+					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
 			};
@@ -328,6 +334,7 @@ describe( 'editEntityRecord', () => {
 					meta: { key1: 'value1' },
 				} ),
 				getUndoManager: () => ( {
+					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
 			};
@@ -382,6 +389,7 @@ describe( 'editEntityRecord', () => {
 					meta: { existingKey: 'existingValue' },
 				} ),
 				getUndoManager: () => ( {
+					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
 			};
@@ -416,6 +424,7 @@ describe( 'editEntityRecord', () => {
 				getRawEntityRecord: () => ( { id: 1, title: 'Original' } ),
 				getEditedEntityRecord: () => ( { id: 1, title: 'Original' } ),
 				getUndoManager: () => ( {
+					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
 			};
@@ -471,6 +480,7 @@ describe( 'editEntityRecord', () => {
 					meta: { existingKey: 'existingValue' },
 				} ),
 				getUndoManager: () => ( {
+					hasRedo: vi.fn( () => false ),
 					addRecord: vi.fn(),
 				} ),
 			};

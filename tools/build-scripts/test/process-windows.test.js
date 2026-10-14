@@ -3,11 +3,11 @@ import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import spawn from 'cross-spawn';
 import { spawnWatchProcess, stopWatchProcess } from '../process.mjs';
 
-vi.mock( 'node:child_process', async ( importOriginal ) => ( {
+vi.mock( import( 'node:child_process' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	execFileSync: vi.fn(),
 } ) );
-vi.mock( 'cross-spawn', () => ( { default: vi.fn() } ) );
+vi.mock( import( 'cross-spawn' ), () => ( { default: vi.fn() } ) );
 
 const platformDescriptor = Object.getOwnPropertyDescriptor(
 	process,

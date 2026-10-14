@@ -27,7 +27,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are hidden 1`] =
       >
         <path
           d="M5 4.75H13M5 19.25H13"
-          vector-effect="non-scaling-stroke"
         />
         <rect
           fill="currentColor"
@@ -71,7 +70,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
         >
           <path
             d="M5 5H19M5 19H19"
-            vector-effect="non-scaling-stroke"
           />
           <rect
             fill="currentColor"
@@ -105,7 +103,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
         >
           <path
             d="M5 4.75H13M5 19.25H13"
-            vector-effect="non-scaling-stroke"
           />
           <rect
             fill="currentColor"
@@ -139,7 +136,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
         >
           <path
             d="M5 4.75H19M5 19.25H19"
-            vector-effect="non-scaling-stroke"
           />
           <rect
             fill="currentColor"
@@ -173,7 +169,6 @@ exports[`BlockAlignmentUI > should match snapshot when controls are visible 1`] 
         >
           <path
             d="M11 4.75H19M11 19.25H19"
-            vector-effect="non-scaling-stroke"
           />
           <rect
             fill="currentColor"

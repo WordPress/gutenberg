@@ -2,12 +2,28 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Remove the dot that marks blocks with user styles in the block list. The filter to show only those blocks stays ([#84657](https://github.com/WordPress/gutenberg/pull/84657)).
+-   Font Library: Mark installed font variants in font collections ([#84023](https://github.com/WordPress/gutenberg/pull/84023)).
+
+### Bug Fixes
+
+-   Font Library: Load all installed font families, not only the first 10 ([#84684](https://github.com/WordPress/gutenberg/pull/84684)).
+
+## 1.24.0 (2026-10-07)
+
 ### Enhancements
 
 -   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
 
 ### Internal
 
+-   Font Library: Replace `ProgressBar` with `Progress` from `@wordpress/ui`. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
 -   Font Library: Use the public `Menu` from `@wordpress/ui` for font collection actions ([#82965](https://github.com/WordPress/gutenberg/pull/82965)).
 
 ## 1.23.0 (2026-09-23)

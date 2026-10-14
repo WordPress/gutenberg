@@ -3,7 +3,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { createInterpolateElement } from '@wordpress/element';
-import { inertValue } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
 import CommentsForm from '../../post-comments-form/form';
 
 export default function PostCommentsPlaceholder( { postType, postId } ) {

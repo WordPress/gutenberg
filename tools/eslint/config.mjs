@@ -35,7 +35,7 @@ try {
 
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
- * reference is strictly identical. Because the @wordpress/eslint-plugin
+ * reference is strictly identical. Because the `@wordpress/eslint-plugin`
  * configs are assembled from separate sub-configs that each carry their own
  * copy of the plugin object, we normalise them here so that every occurrence
  * of the same plugin name resolves to a single shared reference.
@@ -70,6 +70,21 @@ function dedupePlugins( configs ) {
 const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 const TS_EXT = '@([cm]ts|ts|tsx)';
 const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
+
+const vitestLintFiles = [
+	...vitestTestPatterns,
+	`**/test/**/*.${ SCRIPT_EXT }`,
+	`**/__tests__/**/*.${ SCRIPT_EXT }`,
+	`test/unit/config/**/*.${ SCRIPT_EXT }`,
+	'packages/block-serialization-spec-parser/shared-tests.js',
+];
+const vitestLintIgnores = [
+	'test/e2e/**',
+	'test/performance/**',
+	'test/storybook-playwright/**',
+	'test/ai-development/**',
+	'**/fixtures/**',
+];
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -388,6 +403,7 @@ export default dedupePlugins( [
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
 						SelectControl: 'WCSelectControl',
+						Spinner: 'WCSpinner',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
@@ -534,6 +550,8 @@ export default dedupePlugins( [
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,
 		],
+		// Tests load styles directly instead of using WordPress's enqueue path.
+		ignores: vitestLintFiles,
 		rules: {
 			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
@@ -587,25 +605,10 @@ export default dedupePlugins( [
 	// Use the public Vitest baseline for suites and shared unit-test helpers.
 	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
 		...config,
-		files: [
-			...vitestTestPatterns,
-			`**/test/**/*.${ SCRIPT_EXT }`,
-			`**/__tests__/**/*.${ SCRIPT_EXT }`,
-			`test/unit/config/**/*.${ SCRIPT_EXT }`,
-			'packages/block-serialization-spec-parser/shared-tests.js',
-		],
-		ignores: [
-			'test/e2e/**',
-			'test/performance/**',
-			'test/storybook-playwright/**',
-			'test/ai-development/**',
-			'**/fixtures/**',
-		],
+		files: vitestLintFiles,
+		ignores: vitestLintIgnores,
 		rules: {
 			...config.rules,
-			'vitest/valid-describe-callback': 'error',
-			'vitest/valid-expect-in-promise': 'error',
-			'vitest/valid-title': [ 'error', { allowArguments: true } ],
 			'vitest/require-awaited-expect-poll': 'error',
 			// These checks were enabled by Jest's baseline but are not recommended
 			// Vitest rules. Keep their existing enforcement during the switch.
@@ -640,6 +643,18 @@ export default dedupePlugins( [
 			],
 		},
 	} ) ),
+	{
+		// Dynamic imports let import/no-unresolved check JavaScript mock paths.
+		// TypeScript mock imports remain owned by validateVitestPolicy.
+		files: vitestLintFiles.map( ( pattern ) => [
+			pattern,
+			'**/*.{js,jsx,mjs,cjs}',
+		] ),
+		ignores: vitestLintIgnores,
+		rules: {
+			'vitest/prefer-import-in-mock': 'error',
+		},
+	},
 	// Recognize only the assertion helpers used by these files. Avoid a global
 	// expect* wildcard, which would also accept unrelated function calls.
 	...[
@@ -837,7 +852,7 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/utils/colors-values.js' ],
+		ignores: [ 'packages/components/src/utils/colors-values.ts' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',
@@ -846,14 +861,14 @@ export default dedupePlugins( [
 					selector:
 						':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 					message:
-						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.ts instead.',
 				},
 				{
 					selector:
 						// Allow overriding definitions, but not access with var()
 						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 					message:
-						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.ts instead.',
 				},
 			],
 		},

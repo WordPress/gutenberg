@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Spinner, Composite } from '@wordpress/components';
+import { Spinner as WCSpinner, Composite } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getBlockType } from '@wordpress/blocks';
@@ -123,7 +123,7 @@ function DownloadableBlockListItem( { item, onClick } ) {
 							/>
 							{ isInstalling ? (
 								<span className="block-directory-downloadable-block-list-item__spinner">
-									<Spinner />
+									<WCSpinner />
 								</span>
 							) : (
 								<BlockRatings rating={ rating } />

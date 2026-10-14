@@ -95,6 +95,38 @@ describe( 'FocalPointPicker', () => {
 				}, true )
 			).toBe( true );
 		} );
+
+		it( 'ends the drag when the pointer is released over an iframe', async () => {
+			const onDragEnd = vi.fn();
+			const onChange = vi.fn();
+
+			await render(
+				<>
+					<Picker
+						{ ...props }
+						onChange={ onChange }
+						onDragEnd={ onDragEnd }
+					/>
+					<iframe
+						title="Editor canvas"
+						srcDoc="<body>canvas</body>"
+						style={ {
+							display: 'block',
+							width: 240,
+							height: 160,
+						} }
+					/>
+				</>
+			);
+
+			await userEvent.dragAndDrop(
+				screen.getByRole( 'button' ),
+				screen.getByTitle( 'Editor canvas' )
+			);
+
+			expect( onDragEnd ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+		} );
 	} );
 
 	describe( 'resolvePoint handling', () => {

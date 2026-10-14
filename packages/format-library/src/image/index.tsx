@@ -103,6 +103,12 @@ function InlineUI( {
 			<form
 				className="block-editor-format-toolbar__image-container-content"
 				onSubmit={ ( event ) => {
+					event.preventDefault();
+
+					if ( value.start === undefined ) {
+						return;
+					}
+
 					const newReplacements = value.replacements.slice();
 
 					newReplacements[ value.start ] = {
@@ -120,8 +126,6 @@ function InlineUI( {
 						...value,
 						replacements: newReplacements,
 					} );
-
-					event.preventDefault();
 				} }
 			>
 				<Stack direction="column" gap="lg">

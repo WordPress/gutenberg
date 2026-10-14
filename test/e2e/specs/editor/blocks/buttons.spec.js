@@ -392,12 +392,17 @@ test.describe( 'Buttons', () => {
 			.getByRole( 'option', { name: 'Gradient: Purple to yellow' } )
 			.click();
 
+		// Background support renders on the server, so the gradient is absent from the saved markup.
+		await expect(
+			editor.canvas.locator( '.wp-block-button__link' )
+		).toHaveCSS( 'background-image', /gradient/ );
+
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"gradient\":\"purple-to-yellow\"} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-purple-to-yellow-gradient-background has-background wp-element-button\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"background\":{\"gradient\":\"var:preset|gradient|purple-to-yellow\"}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
@@ -437,8 +442,8 @@ test.describe( 'Buttons', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-background wp-element-button\" style=\"background:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"background\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);

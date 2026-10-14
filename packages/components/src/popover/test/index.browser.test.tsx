@@ -10,6 +10,7 @@ import {
 	placementToMotionAnimationProps,
 } from '../utils';
 import Popover from '..';
+import '../style.scss';
 import { Provider as SlotFillProvider } from '../../slot-fill';
 import type { PopoverProps } from '../types';
 import { PopoverInsideIframeRenderedInExternalSlot } from './utils/index.js';
@@ -841,6 +842,112 @@ describe( 'Popover', () => {
 				expect( onFocusOutside ).toHaveBeenCalledTimes( 1 );
 			} );
 		} );
+	} );
+
+	it( 'hints at transform only while it is being repositioned', async () => {
+		await render(
+			<Popover animate={ false } data-testid="popover-element">
+				Inside popover
+			</Popover>
+		);
+
+		const popover = screen.getByTestId( 'popover-element' );
+
+		// Positioning has just run, so the compositing hint is on.
+		expect( getComputedStyle( popover ).willChange ).toBe( 'transform' );
+
+		// Once the popover settles, the hint is dropped so the popover stops
+		// occupying a compositing layer of its own, which is what makes
+		// Chrome render it blurry.
+		await waitFor( () =>
+			expect( getComputedStyle( popover ).willChange ).toBe( 'auto' )
+		);
+	} );
+
+	it( 'hints at transform again when a settled popover moves, until it stops moving', async () => {
+		const Test = ( { mainAxis }: { mainAxis: number } ) => (
+			<Popover
+				placement="right-start"
+				offset={ { mainAxis, crossAxis: 0 } }
+				animate={ false }
+				flip={ false }
+				shift={ false }
+				data-testid="popover-element"
+			>
+				Inside popover
+			</Popover>
+		);
+		const { rerender } = await render( <Test mainAxis={ 0 } /> );
+
+		const popover = screen.getByTestId( 'popover-element' );
+		await waitFor( () =>
+			expect( getComputedStyle( popover ).willChange ).toBe( 'auto' )
+		);
+
+		vi.useFakeTimers( { toFake: [ 'setTimeout', 'clearTimeout' ] } );
+		try {
+			const moveTo = async ( mainAxis: number ) => {
+				const { left } = popover.getBoundingClientRect();
+				await rerender( <Test mainAxis={ mainAxis } /> );
+				// `waitFor` stalls on the fake timers and `vi.waitFor` advances
+				// them, so poll on real timers instead.
+				await expect
+					.poll( () => popover.getBoundingClientRect().left )
+					.toBeCloseTo( left + 10 );
+			};
+
+			// Moving the settled popover brings the hint back.
+			await moveTo( 10 );
+			expect( getComputedStyle( popover ).willChange ).toBe(
+				'transform'
+			);
+
+			// Moving again before the idle timeout keeps the hint on past the
+			// first timeout.
+			vi.advanceTimersByTime( 150 );
+			await moveTo( 20 );
+			vi.advanceTimersByTime( 150 );
+			expect( getComputedStyle( popover ).willChange ).toBe(
+				'transform'
+			);
+
+			// Once the popover stops moving, the hint is dropped.
+			vi.advanceTimersByTime( 50 );
+			expect( getComputedStyle( popover ).willChange ).toBe( 'auto' );
+		} finally {
+			vi.useRealTimers();
+		}
+	} );
+
+	it( 'drops the transform hint when the popover moves into a slot without repositioning', async () => {
+		const Test = ( { hasSlot }: { hasSlot: boolean } ) => (
+			<SlotFillProvider>
+				<Popover animate={ false } data-testid="popover-element">
+					Inside popover
+				</Popover>
+				{ hasSlot && <Popover.Slot /> }
+			</SlotFillProvider>
+		);
+		const { rerender } = await render( <Test hasSlot={ false } /> );
+
+		const inlinePopover = screen.getByTestId( 'popover-element' );
+		await waitFor( () =>
+			expect( getComputedStyle( inlinePopover ).willChange ).toBe(
+				'auto'
+			)
+		);
+
+		// Mounting the slot swaps in a new floating element at the same
+		// coordinates, and that one has to lose the hint too.
+		await rerender( <Test hasSlot /> );
+
+		const slottedPopover = screen.getByTestId( 'popover-element' );
+		expect( slottedPopover ).not.toBe( inlinePopover );
+		await waitFor( () =>
+			expect( getComputedStyle( slottedPopover ).willChange ).toBe(
+				'auto'
+			)
+		);
 	} );
 
 	it( 'should call a consumer-provided onKeyDown alongside close-on-Escape', async () => {

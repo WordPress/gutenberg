@@ -5,7 +5,7 @@ import { default as BrowserURL, getPostEditURL } from '../';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 
-vi.mock( '@wordpress/data/src/components/use-select', () => ( {
+vi.mock( import( '../../../../../data/src/components/use-select' ), () => ( {
 	default: vi.fn(),
 } ) );
 

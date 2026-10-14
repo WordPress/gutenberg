@@ -13,6 +13,7 @@ import {
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
 import { getItemTitle, isTemplateOrTemplatePart } from './utils';
+import { hasActionLink } from '../fields/utils';
 import type { CoreDataError, PostWithPermissions } from '../types';
 
 const permanentlyDeletePost: Action< PostWithPermissions > = {
@@ -25,7 +26,12 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 			return false;
 		}
 		const { status, permissions } = item;
-		return status === 'trash' && permissions?.delete;
+		if ( ! status || status === 'auto-draft' || ! permissions?.delete ) {
+			return false;
+		}
+
+		// Without the trash link, deleting is permanent.
+		return status === 'trash' || ! hasActionLink( item, 'wp:action-trash' );
 	},
 	hideModalHeader: true,
 	modalFocusOnMount: 'firstContentElement',

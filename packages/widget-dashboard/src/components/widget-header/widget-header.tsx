@@ -2,7 +2,8 @@ import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import { useResizeObserver } from '@wordpress/compose';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Card, Icon, Stack, inertValue } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Card, Icon, Stack } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
 import { WidgetInfotip } from './widget-header-infotip';
 import { useIsTruncated } from './use-is-truncated';
@@ -158,7 +159,6 @@ export function WidgetHeader( {
 					align="center"
 					gap="sm"
 					className={ styles.identity }
-					// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 					inert={ inertValue( editMode ) }
 				>
 					{ widgetType.icon && (
