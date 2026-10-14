@@ -187,11 +187,11 @@ export type Settings = Record< string | symbol, unknown > & {
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect
-	) => UserPattern[];
+	) => UserPattern[] | null;
 	[ sectionRootClientIdKey ]?: string;
 	[ selectBlockPatternsKey ]?: (
 		select: typeof globalSelect
-	) => BlockPattern[];
+	) => BlockPattern[] | undefined;
 	[ userPatternCategoriesSelectKey ]?: (
 		select: typeof globalSelect
 	) => UserPatternCategory[];
