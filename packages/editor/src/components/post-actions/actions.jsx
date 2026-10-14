@@ -3,7 +3,6 @@ import { useMemo, useEffect } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { useActions } from '../../dataviews/actions-loader';
 import { useSetAsHomepageAction } from './set-as-homepage';
 import { useSetAsPostsPageAction } from './set-as-posts-page';
 
@@ -17,7 +16,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		},
 		[ postType ]
 	);
-	const serverActions = useActions( { kind: 'postType', name: postType } );
 
 	const shouldShowHomepageActions = useSelect(
 		( select ) => {
@@ -75,15 +73,7 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 	}, [ registerPostTypeSchema, postType ] );
 
 	return useMemo( () => {
-		// The actions registered on the server follow the ones of the store,
-		// and cannot take their ids.
-		let actions = [
-			...defaultActions,
-			...serverActions.filter(
-				( action ) =>
-					! defaultActions.some( ( { id } ) => id === action.id )
-			),
-		];
+		let actions = [ ...defaultActions ];
 		if ( shouldShowHomepageActions ) {
 			actions.push( setAsHomepageAction, setAsPostsPageAction );
 		}
@@ -158,7 +148,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 		context,
 		defaultActions,
 		onActionPerformed,
-		serverActions,
 		setAsHomepageAction,
 		setAsPostsPageAction,
 		shouldShowHomepageActions,

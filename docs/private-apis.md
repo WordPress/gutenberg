@@ -199,12 +199,10 @@ Private exports:
 ### `core` store
 
 Private actions:
-- `receiveActionsConfig`
 - `receiveRegisteredPostMeta`
 - `editMediaEntity`
 
 Private selectors:
-- `getActionsConfig`
 - `getBlockPatternsForPostType`
 - `getEntityRecordPermissions`
 - `getEntityRecordsPermissions`

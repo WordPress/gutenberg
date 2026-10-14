@@ -8,7 +8,6 @@ import {
 	canUser,
 	getAutosaves,
 	getCurrentUser,
-	getActionsConfig,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
 vi.mock( import( '@wordpress/api-fetch' ) );
@@ -1098,44 +1097,5 @@ describe( 'getCurrentUser', () => {
 		expect( dispatch.receiveCurrentUser ).toHaveBeenCalledWith(
 			SUCCESSFUL_RESPONSE
 		);
-	} );
-} );
-
-describe( 'getActionsConfig', () => {
-	it( 'requests the actions of the entity and receives them', async () => {
-		const config = {
-			kind: 'postType',
-			name: 'page',
-			actions: [ { id: 'rename-post' } ],
-			script_modules: [],
-		};
-		const dispatch = Object.assign( vi.fn(), {
-			receiveActionsConfig: vi.fn(),
-		} );
-		triggerFetch.mockResolvedValue( config );
-
-		await getActionsConfig( 'postType', 'page' )( { dispatch } );
-
-		expect( triggerFetch ).toHaveBeenCalledWith( {
-			path: '/wp/v2/actions?kind=postType&name=page',
-		} );
-		expect( dispatch.receiveActionsConfig ).toHaveBeenCalledWith(
-			'postType',
-			'page',
-			config
-		);
-	} );
-
-	it( 'rejects without receiving anything when the request fails', async () => {
-		const dispatch = Object.assign( vi.fn(), {
-			receiveActionsConfig: vi.fn(),
-		} );
-		const error = { code: 'rest_forbidden', message: 'Forbidden.' };
-		triggerFetch.mockRejectedValue( error );
-
-		await expect(
-			getActionsConfig( 'postType', 'page' )( { dispatch } )
-		).rejects.toBe( error );
-		expect( dispatch.receiveActionsConfig ).not.toHaveBeenCalled();
 	} );
 } );

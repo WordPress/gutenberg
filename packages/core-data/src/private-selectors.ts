@@ -335,25 +335,6 @@ export function getViewConfig(
 }
 
 /**
- * Returns the actions registered on the server for the given entity, as the
- * `/wp/v2/actions` REST API route returns them: the serializable part of each
- * action, and the script modules providing their JavaScript parts.
- *
- * @param state Data state.
- * @param kind  Entity kind.
- * @param name  Entity name.
- *
- * @return The actions config, or undefined if not loaded.
- */
-export function getActionsConfig(
-	state: State,
-	kind: string,
-	name: string
-): Record< string, any > | undefined {
-	return state.actionsConfigs?.[ kind ]?.[ name ];
-}
-
-/**
  * Returns the current sync connection status across all entities. Prioritizes
  * disconnected states, then connecting, then connected.
  *

@@ -1224,19 +1224,3 @@ export const getViewConfig =
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
 	};
-
-/**
- * Requests the actions registered on the server for a given entity from the
- * REST API.
- *
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
- */
-export const getActionsConfig =
-	( kind, name ) =>
-	async ( { dispatch } ) => {
-		const config = await apiFetch( {
-			path: addQueryArgs( '/wp/v2/actions', { kind, name } ),
-		} );
-		dispatch.receiveActionsConfig( kind, name, config );
-	};

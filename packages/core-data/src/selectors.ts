@@ -49,7 +49,6 @@ export interface State {
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
-	actionsConfigs: Record< string, Record< string, Record< string, any > > >;
 }
 
 type EntityRecordKey = string | number;
