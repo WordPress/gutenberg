@@ -69,18 +69,21 @@ describe( 'Avatar initials', () => {
 	it.each( [
 		[ '  Alex   Morgan  ', 'AM' ],
 		[ 'Alex', 'A' ],
-		[ 'Alex Morgan Smith', 'AM' ],
-		[ 'e\u0301lodie Dubois', 'E\u0301D' ],
+		[ 'Alex Morgan Smith', 'AS' ],
+		[ 'e\u0301lodie Marie Dubois', 'E\u0301D' ],
 		[ '李 小龙', '李小' ],
-		[ '👩🏽‍💻 Morgan', '👩🏽‍💻M' ],
-	] )( 'shows complete initials for %s', ( name, initials ) => {
-		render(
-			<Avatar.Root>
-				<Avatar.Initials name={ name } />
-			</Avatar.Root>
-		);
-		expect( screen.getByText( initials ) ).toBeInTheDocument();
-	} );
+		[ '👩🏽‍💻 Alex Morgan', '👩🏽‍💻M' ],
+	] )(
+		'shows complete first and last initials for %s',
+		( name, initials ) => {
+			render(
+				<Avatar.Root>
+					<Avatar.Initials name={ name } />
+				</Avatar.Root>
+			);
+			expect( screen.getByText( initials ) ).toBeInTheDocument();
+		}
+	);
 
 	it.each( [ undefined, '', '   ' ] )(
 		'shows the person fallback for a blank name %s',

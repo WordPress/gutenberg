@@ -11,7 +11,7 @@
 
 ### New Features
 
--   `Avatar`: Add `Avatar.Initials` for complete Unicode initials and a borderless person icon as the default fallback ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
+-   `Avatar`: Add `Avatar.Initials` using the first and last words with complete Unicode characters, and a borderless person icon as the default fallback ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
 
 -   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, a neutral border, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
 -   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
