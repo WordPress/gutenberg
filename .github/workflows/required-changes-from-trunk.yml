@@ -2,7 +2,8 @@ name: Required changes from trunk
 
 on:
     pull_request_target:
-        types: [opened, synchronize, reopened, ready_for_review, edited]
+        types:
+            [opened, synchronize, reopened, ready_for_review, edited, stacked]
         branches: [trunk]
     push:
         branches: [trunk]
