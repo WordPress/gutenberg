@@ -4,21 +4,24 @@ on:
     # closed: cherry-pick when a labeled PR is merged.
     # labeled: cherry-pick when a label is added after the PR is merged.
     # Using pull_request_target instead of pull_request so that the workflow
-    # has access to repository secrets for fork PRs.
+    # has access to repository secrets for fork PRs. The workflow never checks
+    # out or runs code from the PR head: it only cherry-picks the merge commit,
+    # which is already on trunk.
     # https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#pull_request_target
     pull_request_target:
         types: [closed, labeled]
         branches:
             - trunk
 
-# Ensure that new jobs wait for the previous job to finish.
-concurrency:
-    group: ${{ github.workflow }}
-    cancel-in-progress: false
-
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
 permissions: {}
+
+env:
+    # The Gutenberg backport label is versionless (the fast, two-week cadence
+    # makes a per-release label impractical). The target release branch is
+    # resolved by picking the highest `release/X.Y` branch.
+    BACKPORT_LABEL: 'Backport to Gutenberg RC'
 
 jobs:
     cherry-pick:
@@ -27,38 +30,23 @@ jobs:
             contents: write
             issues: write
             pull-requests: write
-        if: github.event.pull_request.merged == true
+        # Only run for merged PRs carrying the backport label. For `labeled`
+        # events, only react to the backport label itself, so that adding an
+        # unrelated label to a merged PR does not retry a failed cherry-pick.
+        if: >-
+            github.event.pull_request.merged == true &&
+            contains( github.event.pull_request.labels.*.name, 'Backport to Gutenberg RC' ) &&
+            ( github.event.action == 'closed' || github.event.label.name == 'Backport to Gutenberg RC' )
+        # Serialize cherry-picks so that concurrent pushes to the release
+        # branch do not race. Declared at the job level so that the many
+        # unrelated trunk merges (skipped by the `if` above) never enter the
+        # group and replace a pending backport run.
+        concurrency:
+            group: ${{ github.workflow }}
+            cancel-in-progress: false
         steps:
-            - name: Determine if label should trigger cherry-pick
-              id: label-check
-              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
-              with:
-                  script: |
-                      const pr = context.payload.pull_request;
-                      const commit_sha = pr.merge_commit_sha;
-                      const pr_number = pr.number;
-                      console.log(`Commit SHA: ${commit_sha}`);
-                      console.log(`PR: ${pr_number}`);
-                      core.exportVariable('commit_sha', commit_sha);
-                      core.exportVariable('pr_number', pr_number);
-
-                      // The Gutenberg backport label is versionless (fast,
-                      // two-week cadence makes a per-release label impractical).
-                      // The target release branch is resolved later by picking
-                      // the highest `release/X.Y` branch.
-                      const targetLabel = 'Backport to Gutenberg RC';
-                      const labels = pr.labels.map(label => label.name);
-                      console.log(`Labels: ${labels}`);
-                      if (labels.includes(targetLabel)) {
-                        console.log(`Matched label: ${targetLabel}`);
-                        core.exportVariable('cherry_pick', 'true');
-                      } else {
-                        core.exportVariable('cherry_pick', 'false');
-                      }
-
             - name: Checkout repository
-              if: env.cherry_pick == 'true'
-              uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   fetch-depth: 0
@@ -66,91 +54,113 @@ jobs:
 
             - name: Determine target release branch
               id: target-branch
-              if: env.cherry_pick == 'true'
               run: |
-                  # Pick the highest `release/X.Y` branch (semver sort).
-                  VERSION="$(git for-each-ref --format='%(refname:short)' 'refs/remotes/origin/release/*' \
-                    | sed 's#^origin/release/##' \
+                  # Pick the highest `release/X.Y` branch (version sort). Only
+                  # match plain `X.Y` names so that scratch branches such as
+                  # `release/24.2-cherry-pick` are never picked as the target.
+                  VERSION="$(git for-each-ref --format='%(refname:lstrip=4)' 'refs/remotes/origin/release/' \
+                    | grep -E '^[0-9]+\.[0-9]+$' \
                     | sort -V \
                     | tail -1)"
                   if [ -z "$VERSION" ]; then
-                    echo "No release/* branch found; nothing to cherry-pick to." >&2
+                    echo "No release/X.Y branch found; nothing to cherry-pick to." >&2
                     exit 1
                   fi
                   echo "Highest release branch version: $VERSION"
-                  echo "version=$VERSION" >> "$GITHUB_ENV"
+                  echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
             - name: Set up Git
-              if: env.cherry_pick == 'true'
               run: |
                   git config --global user.name "Gutenberg Repository Automation"
                   git config --global user.email "gutenberg@wordpress.org"
 
             - name: Cherry-pick the commit
               id: cherry-pick
-              if: env.cherry_pick == 'true'
+              env:
+                  TARGET_BRANCH: release/${{ steps.target-branch.outputs.version }}
+                  COMMIT_SHA: ${{ github.event.pull_request.merge_commit_sha }}
               run: |
-                  TARGET_BRANCH="release/${version}"
-                  COMMIT_SHA="${commit_sha}"
                   echo "Target branch: $TARGET_BRANCH"
                   echo "Commit SHA: $COMMIT_SHA"
                   git checkout "$TARGET_BRANCH"
-                  git cherry-pick "$COMMIT_SHA" || echo "cherry-pick-failed" > result
-                  if [ -f result ] && grep -q "cherry-pick-failed" result; then
-                    echo "conflict=true" >> "$GITHUB_ENV"
-                    git cherry-pick --abort
-                  else
-                    CHERRY_PICK_SHA="$(git rev-parse HEAD)"
-                    echo "conflict=false" >> "$GITHUB_ENV"
-                    echo "cherry_pick_sha=$CHERRY_PICK_SHA" >> "$GITHUB_ENV"
+                  if git cherry-pick "$COMMIT_SHA"; then
+                    echo "conflict=false" >> "$GITHUB_OUTPUT"
+                    echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
                     git push origin "$TARGET_BRANCH"
+                  else
+                    echo "conflict=true" >> "$GITHUB_OUTPUT"
+                    git cherry-pick --abort
                   fi
 
-            - name: Remove cherry-pick label
-              if: env.cherry_pick == 'true' && env.conflict == 'false'
+            - name: Update the PR labels and milestone
+              if: steps.cherry-pick.outputs.conflict == 'false'
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  VERSION: ${{ steps.target-branch.outputs.version }}
               with:
                   script: |
-                      const prNumber = process.env.pr_number;
+                      const prNumber = context.payload.pull_request.number;
                       await github.rest.issues.removeLabel({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         issue_number: prNumber,
-                        name: 'Backport to Gutenberg RC'
+                        name: process.env.BACKPORT_LABEL
                       });
 
+                      // Move the PR to the release milestone so that it is
+                      // included in the changelog, as `npm run other:cherry-pick`
+                      // does.
+                      const milestoneTitle = `Gutenberg ${process.env.VERSION}`;
+                      const milestones = await github.paginate(
+                        github.rest.issues.listMilestones,
+                        {
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          state: 'all',
+                          per_page: 100
+                        }
+                      );
+                      const milestone = milestones.find(m => m.title === milestoneTitle);
+                      if (milestone) {
+                        await github.rest.issues.update({
+                          owner: context.repo.owner,
+                          repo: context.repo.repo,
+                          issue_number: prNumber,
+                          milestone: milestone.number
+                        });
+                      } else {
+                        core.warning(`Milestone "${milestoneTitle}" not found; leaving the PR milestone unchanged.`);
+                      }
+
             - name: Comment on the PR
-              if: env.cherry_pick == 'true' && env.conflict == 'false'
+              if: steps.cherry-pick.outputs.conflict == 'false'
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  TARGET_BRANCH: release/${{ steps.target-branch.outputs.version }}
+                  CHERRY_PICK_SHA: ${{ steps.cherry-pick.outputs.sha }}
               with:
                   script: |
-                      const prNumber = process.env.pr_number;
-                      const cherryPickSha = process.env.cherry_pick_sha;
-                      const targetBranch = `release/${process.env.version}`;
-                      console.log(`prNumber: ${prNumber}`);
-                      console.log(`cherryPickSha: ${cherryPickSha}`);
-                      console.log(`targetBranch: ${targetBranch}`);
+                      const { TARGET_BRANCH: targetBranch, CHERRY_PICK_SHA: cherryPickSha } = process.env;
                       await github.rest.issues.createComment({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
-                        issue_number: prNumber,
+                        issue_number: context.payload.pull_request.number,
                         body: `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${cherryPickSha}`
                       });
 
             - name: Comment on the PR about conflict
-              if: env.cherry_pick == 'true' && env.conflict == 'true'
+              if: steps.cherry-pick.outputs.conflict == 'true'
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  TARGET_BRANCH: release/${{ steps.target-branch.outputs.version }}
+                  COMMIT_SHA: ${{ github.event.pull_request.merge_commit_sha }}
               with:
                   script: |
-                      const prNumber = process.env.pr_number;
-                      const commitSha = process.env.commit_sha;
-                      const targetBranch = `release/${process.env.version}`;
-                      console.log(`prNumber: ${prNumber}`);
-                      console.log(`targetBranch: ${targetBranch}`);
+                      const { TARGET_BRANCH: targetBranch, COMMIT_SHA: commitSha } = process.env;
                       await github.rest.issues.createComment({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
-                        issue_number: prNumber,
+                        issue_number: context.payload.pull_request.number,
                         body: `There was a conflict while trying to cherry-pick the commit to the ${targetBranch} branch. Please resolve the conflict manually and create a PR to the ${targetBranch} branch.
 
                         PRs to ${targetBranch} are similar to PRs to trunk, but you should base your PR on the ${targetBranch} branch instead of trunk.

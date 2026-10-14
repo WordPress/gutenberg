@@ -204,6 +204,8 @@ There are a couple of ways you might be made aware of these bugs as a release ma
 
 #### Automated cherry-picking
 
+When a PR labeled `Backport to Gutenberg RC` is merged to `trunk`, or the label is added after the merge, the [Auto Cherry-Pick to Gutenberg Release](https://github.com/WordPress/gutenberg/blob/trunk/.github/workflows/cherry-pick-gutenberg-release.yml) workflow cherry-picks it onto the highest `release/X.Y` branch, removes the label, sets the milestone, and comments on the PR with the target branch. If the cherry-pick conflicts, the label stays and the workflow comments with instructions for a manual cherry-pick. Check the target branch in that comment: between a stable release and the next release branch being cut, the highest branch is the one that has already shipped.
+
 The cherry-picking process can be automated with the `npm run other:cherry-pick "[Insert Label]"` script, which is included in Gutenberg. You will need to use the label `Backport to Gutenberg RC` when running the command and ensure all PRs that need cherry-picking have the label assigned.
 
 <div class="callout callout-warning">
