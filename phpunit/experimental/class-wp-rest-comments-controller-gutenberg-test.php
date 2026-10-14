@@ -852,8 +852,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_note( $post_id, self::$editor_id );
 
-		// Insert a competing reaction while the request is mid-flight (after
-		// its pre-insert check, before its own insert).
+		/*
+		 * Insert a competing reaction while the request is mid-flight (after
+		 * its pre-insert check, before its own insert).
+		 */
 		$injected = false;
 		$inject   = function ( $prepared ) use ( $note_id, $post_id, &$injected ) {
 			if ( ! $injected && isset( $prepared['comment_type'] ) && 'reaction' === $prepared['comment_type'] ) {
@@ -1079,9 +1081,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			)
 		);
 
-		// Recount from the database so the assertion exercises the
-		// filtered `wp_update_comment_count_now()` query directly rather
-		// than the incremental adjustments comment creation applied.
+		/*
+		 * Recount from the database so the assertion exercises the
+		 * filtered `wp_update_comment_count_now()` query directly rather
+		 * than the incremental adjustments comment creation applied.
+		 */
 		wp_update_comment_count_now( $post_id );
 		clean_post_cache( $post_id );
 
@@ -1427,8 +1431,10 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$survivor_id = 0;
 		$deleted     = false;
 
-		// Stand in for the competing request's cleanup: it keeps the earliest
-		// row and deletes this request's later one, which lands first.
+		/*
+		 * Stand in for the competing request's cleanup: it keeps the earliest
+		 * row and deletes this request's later one, which lands first.
+		 */
 		$race = function ( $comment_id, $comment ) use ( &$survivor_id, &$deleted ) {
 			if ( ! $deleted && 'reaction' === $comment->comment_type && (int) $comment_id !== $survivor_id ) {
 				$deleted = true;
@@ -1436,9 +1442,11 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			}
 		};
 
-		// Insert the competing row after this request's pre-insert uniqueness
-		// check has passed, so it takes the earlier ID. Arm the cleanup only
-		// once that row exists, so its own insert does not trigger it.
+		/*
+		 * Insert the competing row after this request's pre-insert uniqueness
+		 * check has passed, so it takes the earlier ID. Arm the cleanup only
+		 * once that row exists, so its own insert does not trigger it.
+		 */
 		$inject = function ( $prepared ) use ( $note_id, $post_id, $race, &$survivor_id ) {
 			if ( ! $survivor_id && isset( $prepared['comment_type'] ) && 'reaction' === $prepared['comment_type'] ) {
 				$survivor_id = wp_insert_comment(
