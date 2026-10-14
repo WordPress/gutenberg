@@ -56,19 +56,10 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	background-color: transparent;
 }
 
-.rich-text .non-breaking-space {
-	position: relative;
-
-	&::after {
-		content: "";
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		width: 4px;
-		height: 4px;
-		margin: -2px 0 0 -2px;
-		border-radius: 50%;
-		background-color: $alert-red;
-		pointer-events: none;
-	}
+// Mark non-breaking spaces only where they are selected. The selection
+// pseudo-element allows no shapes, so the dot is a short dotted underline
+// raised to the middle of the line.
+.non-breaking-space::selection {
+	text-decoration: underline dotted $alert-red 4px;
+	text-underline-offset: -0.45em;
 }

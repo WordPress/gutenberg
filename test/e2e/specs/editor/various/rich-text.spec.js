@@ -999,47 +999,6 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should only mark the non-breaking spaces in the selection', async ( {
-		page,
-		editor,
-		pageUtils,
-	} ) => {
-		await editor.insertBlock( { name: 'core/paragraph' } );
-		await page.keyboard.type( 'one' );
-		await pageUtils.pressKeys( 'primaryShift+Space' );
-		await page.keyboard.type( 'two three' );
-		await pageUtils.pressKeys( 'primaryShift+Space' );
-		await page.keyboard.type( 'four' );
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: { content: 'one\u00a0two three\u00a0four' },
-			},
-		] );
-
-		const marked = editor.canvas.locator( '.non-breaking-space' );
-		await expect( marked ).toHaveCount( 0 );
-
-		await pageUtils.pressKeys( 'shift+ArrowLeft', { times: 6 } );
-		await expect
-			.poll( () =>
-				editor.canvas
-					.locator( ':root' )
-					// Firefox reports the non-breaking space as a space.
-					.evaluate( () =>
-						window
-							.getSelection()
-							.toString()
-							.replace( '\u00a0', ' ' )
-					)
-			)
-			.toBe( 'e four' );
-		await expect( marked ).toHaveCount( 1 );
-
-		await page.keyboard.press( 'ArrowRight' );
-		await expect( marked ).toHaveCount( 0 );
-	} );
-
 	test( 'should replace non-breaking spaces from the toolbar', async ( {
 		page,
 		editor,

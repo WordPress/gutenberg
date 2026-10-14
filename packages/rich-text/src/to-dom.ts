@@ -283,41 +283,11 @@ export function apply( {
 		doc: current.ownerDocument,
 	} );
 
-	// Updating the tree can reset the live selection, so read its direction
-	// first: a selection extended backward must keep extending backward.
-	const isBackward = isSelectionBackward( current );
-
 	applyValue( body, current );
 
 	if ( value.start !== undefined && ! __unstableDomOnly ) {
-		applySelection( selection, current, isBackward );
+		applySelection( selection, current );
 	}
-}
-
-/**
- * Whether the live selection inside the element ends before it starts.
- *
- * @param current The editable element.
- */
-function isSelectionBackward( current: HTMLElement ) {
-	const { ownerDocument } = current;
-	const selection = ownerDocument.defaultView!.getSelection();
-
-	if (
-		! selection ||
-		selection.isCollapsed ||
-		! selection.anchorNode ||
-		! selection.focusNode ||
-		! current.contains( selection.anchorNode )
-	) {
-		return false;
-	}
-
-	const range = ownerDocument.createRange();
-	range.setStart( selection.anchorNode, selection.anchorOffset );
-	// Setting an end before the start collapses the range.
-	range.setEnd( selection.focusNode, selection.focusOffset );
-	return range.collapsed;
 }
 
 export function applyValue( future: Node, current: Node ) {
@@ -391,8 +361,7 @@ export function applyValue( future: Node, current: Node ) {
 
 export function applySelection(
 	{ startPath, endPath }: ToDomSelection,
-	current: HTMLElement,
-	isBackward = false
+	current: HTMLElement
 ) {
 	const { node: startContainer, offset: startOffset } = getNodeByPath(
 		current,
@@ -422,16 +391,7 @@ export function applySelection(
 		selection.removeAllRanges();
 	}
 
-	if ( isBackward && ! range.collapsed ) {
-		selection.setBaseAndExtent(
-			endContainer,
-			endOffset,
-			startContainer,
-			startOffset
-		);
-	} else {
-		selection.addRange( range );
-	}
+	selection.addRange( range );
 
 	// This function is not intended to cause a shift in focus. Since the above
 	// selection manipulations may shift focus, ensure that focus is restored to
