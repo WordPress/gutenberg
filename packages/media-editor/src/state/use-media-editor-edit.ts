@@ -4,9 +4,9 @@ import { useMediaEditor } from './media-editor-state-provider';
 import type { EditValue } from './types';
 
 /**
- * What a panel gets for the one edit it owns. Nothing else of the
- * session is exposed: the panel sets its value and marks gestures, and
- * the session handles history, dirty state and reset.
+ * One named edit, with its default applied. A shortcut over
+ * `useMediaEditor()`, not a fence: a panel that also drives the
+ * cropper or loads new pixels uses the session directly.
  */
 export interface MediaEditorEdit< V extends EditValue > {
 	/** The current value, or the default when the edit is not set. */
@@ -25,6 +25,12 @@ export interface MediaEditorEdit< V extends EditValue > {
 
 /**
  * Read and write one named edit in the media editor session.
+ *
+ * Panels drive the editor through the session (`useMediaEditor()`):
+ * the cropper, crop options, edits, the source image, reset and
+ * history are all theirs to call. This hook covers the common case of
+ * a panel that owns one value: it applies the panel's default and
+ * keeps the session clean when the value returns to it.
  *
  * The default lives here, with the panel, not in the session: the
  * session only knows an edit that is set. Define the default once,
