@@ -3819,6 +3819,8 @@ export function hasSelectedBlockStyleState( state: State, clientId: string ) {
 
 	return (
 		selectedState.viewport !== DEFAULT_BLOCK_STYLE_STATE.viewport ||
+		( selectedState.custom ?? DEFAULT_BLOCK_STYLE_STATE.custom ) !==
+			DEFAULT_BLOCK_STYLE_STATE.custom ||
 		selectedState.pseudo !== DEFAULT_BLOCK_STYLE_STATE.pseudo
 	);
 }

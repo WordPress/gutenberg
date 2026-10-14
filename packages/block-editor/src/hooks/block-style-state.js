@@ -6,6 +6,7 @@ const DEFAULT_STATE_VALUE = 'default';
 
 export const DEFAULT_BLOCK_STYLE_STATE = {
 	viewport: DEFAULT_STATE_VALUE,
+	custom: DEFAULT_STATE_VALUE,
 	pseudo: DEFAULT_STATE_VALUE,
 };
 
@@ -48,6 +49,19 @@ export function hasPseudoBlockStyleState( selectedState ) {
 }
 
 /**
+ * Returns true when a custom style state is selected, such as Navigation
+ * Link's `-current` state for the current menu item.
+ *
+ * @param {Object} selectedState Selected block style state.
+ * @return {boolean} Whether a custom state is selected.
+ */
+export function hasCustomBlockStyleState( selectedState ) {
+	return (
+		!! selectedState?.custom && selectedState.custom !== DEFAULT_STATE_VALUE
+	);
+}
+
+/**
  * Returns true when the default style state is selected.
  *
  * @param {Object} selectedState Selected block style state.
@@ -56,12 +70,17 @@ export function hasPseudoBlockStyleState( selectedState ) {
 export function isDefaultBlockStyleState( selectedState ) {
 	return (
 		! hasViewportBlockStyleState( selectedState ) &&
+		! hasCustomBlockStyleState( selectedState ) &&
 		! hasPseudoBlockStyleState( selectedState )
 	);
 }
 
 /**
  * Returns the style object path for the selected block style state.
+ *
+ * The viewport comes first because it wraps the rule in a media query, while
+ * the custom and pseudo states both refine the block's selector. For example,
+ * Mobile, Current and Hover are stored at `style['@mobile']['-current'][':hover']`.
  *
  * @param {Object} selectedState Selected block style state.
  * @return {string[]} Object path for the selected state styles.
@@ -71,9 +90,11 @@ function getStyleStatePath( selectedState ) {
 		return [];
 	}
 
-	return [ selectedState.viewport, selectedState.pseudo ].filter(
-		( state ) => state && state !== DEFAULT_STATE_VALUE
-	);
+	return [
+		selectedState.viewport,
+		selectedState.custom,
+		selectedState.pseudo,
+	].filter( ( state ) => state && state !== DEFAULT_STATE_VALUE );
 }
 
 /**
