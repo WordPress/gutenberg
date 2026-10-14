@@ -15,7 +15,7 @@ globalThis.wpVitest.mockResizeObserver();
 function ChartWidget() {
 	const { title } = useWidgetHost();
 
-	return <figure aria-label={ `${ title } chart` } />;
+	return <figure aria-label={ `Chart: ${ title }` } />;
 }
 
 const widgetTypes: WidgetType[] = [
@@ -53,7 +53,7 @@ describe( 'widget host title', () => {
 
 		expect(
 			await screen.findByRole( 'figure', {
-				name: 'Sales by device chart',
+				name: 'Chart: Sales by device',
 			} )
 		).toBeInTheDocument();
 	} );
