@@ -418,6 +418,17 @@ function GridVisualizerDropLayer( {
 } ) {
 	const layerRef = useRef();
 	const lastTargetRef = useRef( null );
+	// Where the dragged block was grabbed, for the length of the drag.
+	const grabRef = useRef( null );
+	const isDragging = useSelect(
+		( select ) => select( blockEditorStore ).isDraggingBlocks(),
+		[]
+	);
+	useEffect( () => {
+		if ( ! isDragging ) {
+			grabRef.current = null;
+		}
+	}, [ isDragging ] );
 	const blockEditorSelectors = unlock( useSelect( blockEditorStore ) );
 	const { getBlockAttributes, getBlockRootClientId } = blockEditorSelectors;
 	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
@@ -481,13 +492,39 @@ function GridVisualizerDropLayer( {
 
 		const layerRect = layer.getBoundingClientRect();
 		const scale = layer.offsetWidth / layerRect.width || 1;
-		// The pointer is the center of the block, measured by the area it
-		// takes up in the grid, without its rotation, so a rotated block lands
-		// by the cells it takes up. Blocks dragged in from elsewhere are the
-		// size of the cells they span, up to the size of the grid.
+		const x = ( event.clientX - layerRect.left ) * scale;
+		const y = ( event.clientY - layerRect.top ) * scale;
+
+		// A block dragged by its body keeps the point it was grabbed at
+		// under the pointer, which the first move over the grid finds inside
+		// it. A block dragged by its handle, or from outside the grid, is
+		// centered on the pointer.
+		if ( grabRef.current?.srcClientId !== srcClientId ) {
+			const isGrabbed =
+				srcPixelRect &&
+				x >= srcPixelRect.left &&
+				x <= srcPixelRect.right &&
+				y >= srcPixelRect.top &&
+				y <= srcPixelRect.bottom;
+			grabRef.current = {
+				srcClientId,
+				grab: isGrabbed
+					? {
+							grabX: x - srcPixelRect.left,
+							grabY: y - srcPixelRect.top,
+						}
+					: {},
+			};
+		}
+
+		// The block is measured by the area it takes up in the grid, without
+		// its rotation, so a rotated block lands by the cells it takes up.
+		// Blocks dragged in from elsewhere are the size of the cells they
+		// span, up to the size of the grid.
 		const landing = getGridDropTarget( {
-			x: ( event.clientX - layerRect.left ) * scale,
-			y: ( event.clientY - layerRect.top ) * scale,
+			x,
+			y,
+			...grabRef.current.grab,
 			columnTracks,
 			rowTracks,
 			columnSpan,
