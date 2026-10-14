@@ -1076,6 +1076,12 @@ class WP_Theme_JSON_Gutenberg {
 		$new_theme_json = $theme_json;
 		$variations     = $new_theme_json['styles']['variations'];
 
+		foreach ( array_keys( $variations ) as $variation_name ) {
+			if ( ! in_array( $variation_name, array_merge( array(), ...array_values( $valid_variations ) ), true ) ) {
+				WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_unregistered_variation', array( 'styles', 'variations', $variation_name ) );
+			}
+		}
+
 		foreach ( $valid_variations as $block_type => $registered_variations ) {
 			foreach ( $registered_variations as $variation_name ) {
 				$block_level_data = $new_theme_json['styles']['blocks'][ $block_type ]['variations'][ $variation_name ] ?? array();
@@ -1160,69 +1166,6 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	protected static function sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations ) {
 		return WP_Theme_JSON_Sanitizer_Gutenberg::sanitize( $input, $valid_block_names, $valid_element_names, $valid_variations );
-	}
-
-	/**
-	 * Reports what sanitization would drop or coerce in a theme.json structure, without constructing an object.
-	 *
-	 * Runs the same migration, shared block style variation unwrapping and sanitization steps as the
-	 * constructor, recording a diagnostic wherever a value is removed or replaced. Paths refer to the
-	 * structure as given, before migration.
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param array  $theme_json A structure that follows the theme.json schema.
-	 * @param string $origin     Optional. What source of data this object represents.
-	 *                           One of 'blocks', 'default', 'theme', or 'custom'. Default 'theme'.
-	 * @return array[] Diagnostics, each with `code`, `category`, `severity`, `path`, `message` and `data` keys.
-	 *                 Empty when nothing would be dropped or coerced.
-	 */
-	public static function get_sanitization_diagnostics( $theme_json, $origin = 'theme' ) {
-		if ( ! in_array( $origin, static::VALID_ORIGINS, true ) ) {
-			$origin = 'theme';
-		}
-
-		return WP_Theme_JSON_Sanitizer_Gutenberg::collect(
-			static function () use ( $theme_json, $origin ) {
-				if ( ! is_array( $theme_json ) ) {
-					WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic(
-						'theme_json_invalid_type',
-						array(),
-						array(
-							'expected' => 'object',
-							'value'    => $theme_json,
-						)
-					);
-					return;
-				}
-
-				if ( ! isset( $theme_json['version'] ) ) {
-					// Migration replaces the whole structure with an empty one, so there is nothing further to report.
-					WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_missing_version', array() );
-					return;
-				}
-
-				$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
-
-				$blocks_metadata     = static::get_blocks_metadata();
-				$valid_block_names   = array_keys( $blocks_metadata );
-				$valid_element_names = array_keys( static::ELEMENTS );
-				$valid_variations    = static::get_valid_block_style_variations( $blocks_metadata );
-
-				// Shared variations are merged into their blocks, or dropped when no block registers them.
-				if ( isset( $theme_json['styles']['variations'] ) && is_array( $theme_json['styles']['variations'] ) ) {
-					$registered_variations = array_merge( array(), ...array_values( $valid_variations ) );
-					foreach ( array_keys( $theme_json['styles']['variations'] ) as $variation_name ) {
-						if ( ! in_array( $variation_name, $registered_variations, true ) ) {
-							WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_unregistered_variation', array( 'styles', 'variations', $variation_name ) );
-						}
-					}
-				}
-
-				$theme_json = static::unwrap_shared_block_style_variations( $theme_json, $valid_variations );
-				WP_Theme_JSON_Sanitizer_Gutenberg::sanitize( $theme_json, $valid_block_names, $valid_element_names, $valid_variations );
-			}
-		);
 	}
 
 	/**
