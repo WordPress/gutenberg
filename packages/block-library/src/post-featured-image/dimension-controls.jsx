@@ -81,20 +81,12 @@ const DimensionControls = ( {
 	} );
 
 	const setDimensionAttributes = ( nextDimensions ) => {
-		const nextImageDimensions = {
-			...nextDimensions,
-			width:
-				! nextDimensions.width && nextDimensions.height
-					? 'auto'
-					: nextDimensions.width,
-		};
-
 		setAttributes(
 			getDimensionUpdateAttributes( {
 				style,
 				selectedState: selectedStyleState,
 				hasSelectedStyleState,
-				nextDimensions: nextImageDimensions,
+				nextDimensions,
 				dimensionKeyMap: { scale: 'objectFit' },
 				dimensionKeys: DIMENSION_KEYS,
 			} )
@@ -116,6 +108,8 @@ const DimensionControls = ( {
 			defaultAspectRatio="auto"
 			scaleOptions={ scaleOptions }
 			unitsOptions={ units }
+			// The block's stylesheet stretches the image to the container width.
+			hasImplicitWidth
 		/>
 	);
 };
