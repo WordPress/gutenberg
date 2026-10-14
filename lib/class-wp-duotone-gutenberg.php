@@ -802,6 +802,33 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Enqueues the SVG filter, and the custom property for a preset, that a
+	 * global styles duotone value needs, without any block CSS.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string|string[] $duotone A preset slug, e.g. 'blue-orange', or a list of colors.
+	 */
+	private static function enqueue_global_style_filter( $duotone ) {
+		if ( is_array( $duotone ) ) {
+			$filter_id = self::get_custom_filter_id( $duotone );
+
+			self::$used_svg_filter_data[ $filter_id ] = array(
+				'slug'   => substr( $filter_id, strlen( 'wp-duotone-' ) ),
+				'colors' => $duotone,
+			);
+			return;
+		}
+
+		$filter_id = self::get_filter_id( $duotone );
+		$presets   = self::get_all_global_styles_presets();
+		if ( isset( $presets[ $filter_id ] ) ) {
+			self::$used_global_styles_presets[ $filter_id ] = $presets[ $filter_id ];
+			self::$used_svg_filter_data[ $filter_id ]       = $presets[ $filter_id ];
+		}
+	}
+
+	/**
 	 * Registers the style and colors block attributes for block types that support it.
 	 *
 	 * @since 6.3.0
@@ -1094,24 +1121,15 @@ class WP_Duotone_Gutenberg {
 				// SVG filter and block CSS.
 				self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data );
 			}
-		} elseif ( $has_global_styles_duotone && is_array( $global_styles_block_names[ $block['blockName'] ] ) ) {
-			$colors       = $global_styles_block_names[ $block['blockName'] ];
-			$filter_id    = self::get_custom_filter_id( $colors ); // e.g. 'wp-duotone-custom-000000-ffffff'.
-			$filter_value = self::get_filter_url( $filter_id ); // e.g. 'url(#wp-duotone-custom-000000-ffffff)'.
-			$filter_data  = array(
-				'slug'   => substr( $filter_id, strlen( 'wp-duotone-' ) ),
-				'colors' => $colors,
-			);
-
-			// SVG filter and block CSS.
-			self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data );
 		} elseif ( $has_global_styles_duotone ) {
-			$slug         = $global_styles_block_names[ $block['blockName'] ]; // e.g. 'blue-orange'.
-			$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-blue-orange'.
-			$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--blue-orange)'.
-
-			// CSS custom property, SVG filter, and block CSS.
-			self::enqueue_global_styles_preset( $filter_id, $duotone_selector, $filter_value );
+			/*
+			 * The theme.json stylesheet already applies the block type's duotone
+			 * with a `:root :where()` rule, so a block style variation can follow
+			 * it at the same specificity. Only the SVG filter, and the custom
+			 * property for a preset, are needed here: no class and no block CSS,
+			 * which would out-rank the variation.
+			 */
+			self::enqueue_global_style_filter( $global_styles_block_names[ $block['blockName'] ] );
 		}
 
 		// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
