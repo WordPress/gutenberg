@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   `test-playwright` and `test-e2e`: When `WP_BASE_URL` is not set, run the tests against the port of the `wp-env` environment that the project tests with. A project with a `.wp-env.test.json` uses that config merged with its `.wp-env.test.override.json`, and otherwise `.wp-env.json` merged with its `.wp-env.override.json`, plus any `WP_ENV_*` environment variables. The port is that of the tests environment if the config enables one, and otherwise of the development environment. The config files are also found when the tests run from an npm workspace subdirectory. Previously such projects silently fell back to `http://localhost:8889`, which may belong to another project's environment.
+-   `test-playwright` and `test-e2e`: When `WP_BASE_URL` is not set, run the tests against the port of the `wp-env` environment that the project tests with. A project with a `.wp-env.test.json` uses that config merged with its `.wp-env.test.override.json`, and otherwise `.wp-env.json` merged with its `.wp-env.override.json`, plus any `WP_ENV_*` environment variables. The port is that of the tests environment if the config enables one, and otherwise of the development environment. The config files are also found when the tests run from an npm workspace subdirectory. Previously such projects silently fell back to `http://localhost:8889`, which may belong to another project's environment ([#84654](https://github.com/WordPress/gutenberg/pull/84654)).
 
 ## 36.1.0 (2026-10-07)
 
