@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! class_exists( 'WP_Fields_Registry' ) ) {
+if ( ! class_exists( 'WP_Entity_Fields_Registry' ) ) {
 
 	/**
 	 * Holds the fields registered for entities.
@@ -20,13 +20,13 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 	 * register_collection() adds the fields a folder declares, see it for the
 	 * format.
 	 *
-	 * Fields are registered on the `wp_fields_api_init` action, and only
-	 * there, with wp_register_fields(), wp_update_fields(), and
-	 * wp_unregister_fields(): register(), update(), and unregister() refuse
+	 * Fields are registered on the `wp_entity_fields_api_init` action, and only
+	 * there, with wp_register_entity_fields(), wp_update_entity_fields(), and
+	 * wp_unregister_entity_fields(): register(), update(), and unregister() refuse
 	 * to run while the action is not firing.
 	 *
 	 * The registry is filled lazily: the first time its fields are read, it
-	 * fires the `wp_fields_api_init` action, on which the default fields of every
+	 * fires the `wp_entity_fields_api_init` action, on which the default fields of every
 	 * post type and the fields of plugins are registered. A read before `init`
 	 * has completed is refused, see initialize().
 	 *
@@ -38,7 +38,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 	 *
 	 * @access private
 	 */
-	class WP_Fields_Registry {
+	class WP_Entity_Fields_Registry {
 
 		/**
 		 * Registered fields, as kind => name => array of field id => definition.
@@ -60,7 +60,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		protected $field_modules = array();
 
 		/**
-		 * Whether the `wp_fields_api_init` action has fired since the registry
+		 * Whether the `wp_entity_fields_api_init` action has fired since the registry
 		 * was created.
 		 *
 		 * @var bool
@@ -70,14 +70,14 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		/**
 		 * The singleton instance.
 		 *
-		 * @var WP_Fields_Registry|null
+		 * @var WP_Entity_Fields_Registry|null
 		 */
 		protected static $instance = null;
 
 		/**
 		 * Returns the singleton instance.
 		 *
-		 * @return WP_Fields_Registry The registry.
+		 * @return WP_Entity_Fields_Registry The registry.
 		 */
 		public static function get_instance() {
 			if ( null === self::$instance ) {
@@ -113,7 +113,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 *                                   the JavaScript parts of the fields, if any.
 		 * @return string[] The ids of the fields registered, in the order of the
 		 *                  call. Empty when none is, when called outside the
-		 *                  `wp_fields_api_init` action, or when an argument is
+		 *                  `wp_entity_fields_api_init` action, or when an argument is
 		 *                  invalid.
 		 */
 		public function register( $origin, $kind, $name, $fields, $script_module = null ) {
@@ -205,7 +205,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 * of each field, once; the rest of the `origin` property cannot be
 		 * updated, and any `origin` the definition sets is ignored.
 		 *
-		 * Like register(), it only runs on the `wp_fields_api_init` action.
+		 * Like register(), it only runs on the `wp_entity_fields_api_init` action.
 		 *
 		 * @param string      $origin        Who updates the fields: `core`, or
 		 *                                   the slug of the plugin or theme.
@@ -217,7 +217,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 *                                   the JavaScript parts of the fields, if any.
 		 * @return string[] The ids of the fields updated, in the order of the
 		 *                  call. Empty when none is, when called outside the
-		 *                  `wp_fields_api_init` action, or when an argument is
+		 *                  `wp_entity_fields_api_init` action, or when an argument is
 		 *                  invalid.
 		 */
 		public function update( $origin, $kind, $name, $fields, $script_module = null ) {
@@ -280,7 +280,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 * no field is forgotten). Unregistering every field forgets the entity:
 		 * its registered fields and script modules.
 		 *
-		 * Like register(), it only runs on the `wp_fields_api_init` action, and an
+		 * Like register(), it only runs on the `wp_entity_fields_api_init` action, and an
 		 * invalid entity is reported and unregisters nothing. An id that is not a
 		 * non-empty string is reported and skipped, like a definition register()
 		 * cannot store.
@@ -292,11 +292,11 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 * @return array[] The list of the definitions unregistered, in
 		 *                 registration order, as get_registered() returns them.
 		 *                 Empty when none of the fields is registered, when
-		 *                 called outside the `wp_fields_api_init` action, or when
+		 *                 called outside the `wp_entity_fields_api_init` action, or when
 		 *                 the entity is invalid.
 		 */
 		public function unregister( $kind, $name, $ids = null ) {
-			if ( ! $this->doing_fields_api_init( __METHOD__ ) || ! $this->validate_entity( __METHOD__, $kind, $name ) ) {
+			if ( ! $this->doing_entity_fields_api_init( __METHOD__ ) || ! $this->validate_entity( __METHOD__, $kind, $name ) ) {
 				return array();
 			}
 
@@ -361,16 +361,16 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 * registered on it before, in the alphabetical order of their folders.
 		 * register() skips a field already registered for the entity, and
 		 * registers the rest of the collection. Like register(), it does not check
-		 * that the entity exists: the `/wp/v2/fields` route only serves the fields
+		 * that the entity exists: the `/wp/v2/entity-fields` route only serves the fields
 		 * of the entities the REST API exposes.
 		 *
 		 * Fields that apply to several entities, such as the defaults every post
 		 * type derives from its supports, are registered in code: a
-		 * `wp_fields_api_init` callback can read their definitions from files with
+		 * `wp_entity_fields_api_init` callback can read their definitions from files with
 		 * get_collection_fields() and register them on each entity with
 		 * register().
 		 *
-		 * Like register(), it only runs on the `wp_fields_api_init` action. An
+		 * Like register(), it only runs on the `wp_entity_fields_api_init` action. An
 		 * invalid configuration is reported with _doing_it_wrong() and skipped.
 		 *
 		 * @since 7.2.0
@@ -378,10 +378,10 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 * @param string $directory The directory of the collection.
 		 * @return bool Whether the collection is valid and all of its fields are
 		 *              registered. True as well when it has no fields; false when
-		 *              called outside the `wp_fields_api_init` action.
+		 *              called outside the `wp_entity_fields_api_init` action.
 		 */
 		public function register_collection( $directory ) {
-			if ( ! $this->doing_fields_api_init( __METHOD__ ) ) {
+			if ( ! $this->doing_entity_fields_api_init( __METHOD__ ) ) {
 				return false;
 			}
 
@@ -495,7 +495,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		}
 
 		/**
-		 * Fires the `wp_fields_api_init` action the first time the registry
+		 * Fires the `wp_entity_fields_api_init` action the first time the registry
 		 * is read.
 		 *
 		 * The read is refused until `init` has completed. The registry holds the
@@ -517,7 +517,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 			if ( ! did_action( 'init' ) || doing_action( 'init' ) ) {
 				_doing_it_wrong(
 					__METHOD__,
-					__( 'The registered fields cannot be read until the `init` action has completed: the post types and supports they derive from are registered on `init`. Read them once `init` has completed, or hook `wp_fields_api_init`.', 'gutenberg' ),
+					__( 'The registered fields cannot be read until the `init` action has completed: the post types and supports they derive from are registered on `init`. Read them once `init` has completed, or hook `wp_entity_fields_api_init`.', 'gutenberg' ),
 					'7.2.0'
 				);
 				return;
@@ -530,8 +530,8 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 			/**
 			 * Fires the first time the registered fields are read, after `init`.
 			 *
-			 * Register or adjust fields here, with wp_register_fields(),
-			 * wp_update_fields(), and wp_unregister_fields(): it is the only
+			 * Register or adjust fields here, with wp_register_entity_fields(),
+			 * wp_update_entity_fields(), and wp_unregister_entity_fields(): it is the only
 			 * time they run.
 			 *
 			 * The first read happens wherever the fields are needed: while
@@ -542,11 +542,11 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 			 *
 			 * @since 7.2.0
 			 */
-			do_action( 'wp_fields_api_init' );
+			do_action( 'wp_entity_fields_api_init' );
 		}
 
 		/**
-		 * Checks that the `wp_fields_api_init` action is firing, as register(),
+		 * Checks that the `wp_entity_fields_api_init` action is firing, as register(),
 		 * update(), and unregister() require.
 		 *
 		 * Outside the action a registration would either come before the
@@ -557,14 +557,14 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 * @param string $method The calling method, for the notice.
 		 * @return bool Whether the action is firing.
 		 */
-		protected function doing_fields_api_init( $method ) {
-			if ( doing_action( 'wp_fields_api_init' ) ) {
+		protected function doing_entity_fields_api_init( $method ) {
+			if ( doing_action( 'wp_entity_fields_api_init' ) ) {
 				return true;
 			}
 
 			_doing_it_wrong(
 				$method,
-				__( 'Fields can only be registered, updated, and unregistered on the `wp_fields_api_init` action.', 'gutenberg' ),
+				__( 'Fields can only be registered, updated, and unregistered on the `wp_entity_fields_api_init` action.', 'gutenberg' ),
 				'7.2.0'
 			);
 			return false;
@@ -582,7 +582,7 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 * @param array[] $fields The field definitions.
 		 */
 		protected function report_unknown_types( $method, $kind, $name, $fields ) {
-			$type_schema = ( new Gutenberg_REST_Fields_Controller_7_2() )->get_item_schema()['properties']['fields']['items']['properties']['type'];
+			$type_schema = ( new Gutenberg_REST_Entity_Fields_Controller_7_2() )->get_item_schema()['properties']['fields']['items']['properties']['type'];
 			$unknown     = array();
 			foreach ( $fields as $field ) {
 				if ( ! isset( $field['type'] ) ) {
@@ -618,11 +618,11 @@ if ( ! class_exists( 'WP_Fields_Registry' ) ) {
 		 * @param mixed  $name          The entity name.
 		 * @param mixed  $fields        The field definitions.
 		 * @param mixed  $script_module The script module id, if any.
-		 * @return bool Whether the call may proceed: the `wp_fields_api_init` action
+		 * @return bool Whether the call may proceed: the `wp_entity_fields_api_init` action
 		 *              is firing and the arguments are valid.
 		 */
 		protected function validate_arguments( $method, $origin, $kind, $name, $fields, $script_module ) {
-			if ( ! $this->doing_fields_api_init( $method ) ) {
+			if ( ! $this->doing_entity_fields_api_init( $method ) ) {
 				return false;
 			}
 
