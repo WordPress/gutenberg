@@ -69,7 +69,7 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 		const mergedRef = useMergeRefs( [ ref, positionerRef ] );
 		const [ measuredAnchor, setMeasuredAnchor ] =
 			useState< PositionerProps[ 'anchor' ] >();
-		const lastOffsetRef = useRef< number >();
+		const lastOffsetRef = useRef< number >( 0 );
 		const defaultProps = isSubmenu
 			? MENU_SUBMENU_POPUP_POSITIONER_PROPS
 			: ITEM_POPUP_POSITIONER_PROPS;
@@ -93,7 +93,7 @@ const Positioner = forwardRef< HTMLDivElement, PositionerProps >(
 					positioner.hidden ||
 					positioner.hasAttribute( 'data-closed' )
 				) {
-					return lastOffsetRef.current ?? 0;
+					return lastOffsetRef.current;
 				}
 				const trigger = props.anchor
 					? undefined

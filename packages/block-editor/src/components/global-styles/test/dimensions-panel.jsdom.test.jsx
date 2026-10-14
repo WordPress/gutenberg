@@ -580,7 +580,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 		} );
 	} );
 
-	describe( 'aspectRatio (native <select> archetype)', () => {
+	describe( 'aspectRatio (select control archetype)', () => {
 		it( 'preselects the inherited aspectRatio option as at-rest with inherited-value treatment', () => {
 			renderPanel( {
 				value: {},
@@ -591,7 +591,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const aspectSelect = screen.getByRole( 'combobox', {
 				name: /aspect ratio/i,
 			} );
-			expect( aspectSelect ).toHaveValue( '16/9' );
+			expect( aspectSelect ).toHaveTextContent( /^Wide$/ );
 		} );
 
 		it( 'renders a locally-set aspectRatio as the selected value with the local-override hook', () => {
@@ -604,7 +604,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const aspectSelect = screen.getByRole( 'combobox', {
 				name: /aspect ratio/i,
 			} );
-			expect( aspectSelect ).toHaveValue( '1' );
+			expect( aspectSelect ).toHaveTextContent( /^Square$/ );
 			// A local override now gets the same local-override flag as
 			// every other control, so the inline reset button can attach.
 			// The button itself is portaled and covered by the
@@ -640,7 +640,13 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			const aspectSelect = screen.getByRole( 'combobox', {
 				name: /aspect ratio/i,
 			} );
-			await user.selectOptions( aspectSelect, '1' );
+			await user.click( aspectSelect );
+			await user.click(
+				await screen.findByRole( 'option', {
+					name: 'Square',
+					exact: true,
+				} )
+			);
 
 			expect( onChange ).toHaveBeenCalled();
 			const lastCall = onChange.mock.calls.at( -1 )[ 0 ];

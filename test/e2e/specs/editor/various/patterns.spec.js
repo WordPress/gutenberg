@@ -1,4 +1,8 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Unsynced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
@@ -1385,5 +1389,147 @@ test.describe( 'Synced pattern - entity navigation', () => {
 
 		// The pattern block should still be selected.
 		await expect( patternBlock ).toHaveClass( /is-selected/ );
+	} );
+} );
+
+test.describe( 'Synced pattern - read-only access', () => {
+	let postId;
+
+	/**
+	 * Opens an editor page in a new browser context, logged in as the author.
+	 *
+	 * @param {Object} browser      Playwright browser.
+	 * @param {Object} requestUtils Request utils.
+	 * @param {string} path         Admin path to open.
+	 * @return {Promise<Object>} The page and its context.
+	 */
+	async function openAsAuthor( browser, requestUtils, path ) {
+		const context = await browser.newContext( {
+			baseURL: requestUtils.baseURL,
+			storageState: { cookies: [], origins: [] },
+		} );
+		const page = await context.newPage();
+		await page.goto( '/wp-login.php' );
+		await page
+			.getByLabel( 'Username or Email Address' )
+			.fill( 'patternauthor' );
+		await page
+			.getByLabel( 'Password', { exact: true } )
+			.fill( 'patternauthorpassword' );
+		await page.getByRole( 'button', { name: 'Log In' } ).click();
+		await page.waitForURL( '**/wp-admin/**' );
+
+		await page.goto( path );
+		await page.waitForFunction( () => !! window.wp?.data );
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'welcomeGuide', false );
+		} );
+
+		return { page, context };
+	}
+
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllBlocks();
+		const author = await requestUtils.createUser( {
+			username: 'patternauthor',
+			email: 'patternauthor@example.com',
+			password: 'patternauthorpassword',
+			roles: [ 'author' ],
+		} );
+		// An administrator's pattern, which an author can use but not edit.
+		const { id } = await requestUtils.createBlock( {
+			title: 'Administrator pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Read-only pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+		const post = await requestUtils.createPost( {
+			title: 'Author post',
+			status: 'draft',
+			author: author.id,
+			content: `<!-- wp:block {"ref":${ id }} /-->`,
+		} );
+		postId = post.id;
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllPosts();
+		await requestUtils.deleteAllBlocks();
+		await requestUtils.deleteAllUsers();
+	} );
+
+	// Check for regressions of https://github.com/WordPress/gutenberg/issues/11343.
+	test( 'renders for a user who cannot edit it, without "Edit original"', async ( {
+		browser,
+		requestUtils,
+	} ) => {
+		const { page, context } = await openAsAuthor(
+			browser,
+			requestUtils,
+			`/wp-admin/post.php?post=${ postId }&action=edit`
+		);
+
+		const editor = new Editor( { page } );
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		await expect(
+			patternBlock.getByText( 'Read-only pattern content' )
+		).toBeVisible();
+
+		await editor.selectBlocks( patternBlock );
+		await editor.openDocumentSettingsSidebar();
+		const blockInspector = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await expect(
+			blockInspector.getByRole( 'heading', {
+				name: 'Administrator pattern',
+			} )
+		).toBeVisible();
+		await expect(
+			blockInspector.getByRole( 'button', { name: 'Edit original' } )
+		).toBeHidden();
+
+		await editor.showBlockToolbar();
+		await expect(
+			page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Edit original' } )
+		).toBeHidden();
+
+		await context.close();
+	} );
+
+	test( 'can be detached by a user who cannot edit it', async ( {
+		browser,
+		requestUtils,
+	} ) => {
+		const { page, context } = await openAsAuthor(
+			browser,
+			requestUtils,
+			`/wp-admin/post.php?post=${ postId }&action=edit`
+		);
+		const editor = new Editor( { page } );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Read-only pattern content' },
+			},
+		] );
+
+		await context.close();
 	} );
 } );
