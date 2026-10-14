@@ -228,7 +228,6 @@ function VideoEdit( {
 						mediaUrl={ src }
 						filename={ getFilename( src ) }
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="video/*"
 						onSelect={ onSelectVideo }
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
