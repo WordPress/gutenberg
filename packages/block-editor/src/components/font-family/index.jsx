@@ -58,6 +58,7 @@ export default function FontFamilyControl( {
 	const selectedValue =
 		options.find( ( option ) => option.value === ( value || null ) ) ??
 		options[ 0 ];
+	const selectedHint = showSelectedHint && selectedValue.description;
 
 	return (
 		<Field.Root
@@ -65,7 +66,7 @@ export default function FontFamilyControl( {
 			disabled={ disabled }
 		>
 			<Field.Label
-				className="components-base-control__label"
+				className="block-editor-font-family-control__label"
 				hideFromVision={ hideLabelFromVision }
 			>
 				{ label }
@@ -77,10 +78,10 @@ export default function FontFamilyControl( {
 				disabled={ disabled }
 			>
 				<Select.Trigger size={ size } { ...props }>
-					{ showSelectedHint && selectedValue.description ? (
+					{ selectedHint ? (
 						<>
 							{ selectedValue.label }
-							<span> { selectedValue.description }</span>
+							<span aria-hidden="true"> { selectedHint }</span>
 						</>
 					) : undefined }
 				</Select.Trigger>
@@ -110,6 +111,7 @@ export default function FontFamilyControl( {
 						__( 'Currently selected: %s' ),
 						selectedValue.label
 					) }
+				{ selectedHint && ` ${ selectedHint }` }
 			</VisuallyHidden>
 		</Field.Root>
 	);

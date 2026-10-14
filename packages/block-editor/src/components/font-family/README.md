@@ -74,4 +74,4 @@ The current font family value.
 
 The component uses `Field` and `Select` from `@wordpress/ui`. It accepts `label`, `hideLabelFromVision`, `describedBy`, `disabled`, and `size`, including the `small` size. Other button props, such as focus and pointer callbacks, are passed to the select trigger. The `onChange` callback receives the font family string, including an empty string for Default.
 
-An `options` prop can override the generated options using the legacy `{ key, name, style, className, hint }` shape. The control maps these options to the new select's items. `showSelectedHint` also displays the selected option's hint in the trigger.
+An `options` prop can override the generated options using the legacy `{ key, name, style, className, hint }` shape. The control maps these options to the new select's items. With `showSelectedHint`, the selected hint stays visible in the trigger and is exposed separately as an accessible description.

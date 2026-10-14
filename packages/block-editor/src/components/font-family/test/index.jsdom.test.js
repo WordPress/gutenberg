@@ -42,7 +42,6 @@ it.each( [
 	{
 		Component: FontFamilyControl,
 		label: 'Font',
-		description: 'Choose the font family',
 		props: {
 			fontFamilies: [ { name: 'Serif', fontFamily: 'serif' } ],
 			value: 'serif',
@@ -52,14 +51,13 @@ it.each( [
 	{
 		Component: FontAppearanceControl,
 		label: 'Appearance',
-		description: 'Currently selected font appearance: Regular',
 		props: {
 			value: { fontStyle: 'normal', fontWeight: '400' },
 		},
 	},
 ] )(
-	'$label preserves forwarded trigger callbacks and its description',
-	async ( { Component, label, description, props } ) => {
+	'$label preserves forwarded trigger callbacks',
+	async ( { Component, label, props } ) => {
 		const user = userEvent.setup();
 		const onFocus = vi.fn();
 		const onBlur = vi.fn();
@@ -73,10 +71,50 @@ it.each( [
 			} )
 		);
 		const trigger = screen.getByRole( 'combobox', { name: label } );
-		expect( trigger ).toHaveAccessibleDescription( description );
 		await user.tab();
+		expect( trigger ).toHaveFocus();
 		expect( onFocus ).toHaveBeenCalledTimes( 1 );
 		await user.tab();
 		expect( onBlur ).toHaveBeenCalledTimes( 1 );
 	}
 );
+
+it( 'keeps the selected font hint visible and exposes it as an accessible description', () => {
+	render(
+		createElement( FontFamilyControl, {
+			fontFamilies: [ { name: 'Serif', fontFamily: 'serif' } ],
+			value: 'serif',
+			onChange: vi.fn(),
+			options: [
+				{
+					key: 'serif',
+					name: 'Serif',
+					hint: 'A font for body text',
+				},
+			],
+			showSelectedHint: true,
+			describedBy: 'Choose the font family',
+		} )
+	);
+	const trigger = screen.getByRole( 'combobox', { name: 'Font' } );
+	expect( trigger ).toHaveTextContent( 'Serif A font for body text' );
+	expect( trigger ).toHaveAccessibleDescription(
+		'Choose the font family A font for body text'
+	);
+	expect( screen.getByText( 'A font for body text' ) ).toHaveAttribute(
+		'aria-hidden',
+		'true'
+	);
+} );
+
+it( "exposes the font appearance's label and selected value without a generated description", () => {
+	render(
+		createElement( FontAppearanceControl, {
+			value: { fontStyle: 'normal', fontWeight: '400' },
+			onChange: vi.fn(),
+		} )
+	);
+	const trigger = screen.getByRole( 'combobox', { name: 'Appearance' } );
+	expect( trigger ).toHaveTextContent( 'Regular' );
+	expect( trigger ).toHaveAccessibleDescription( '' );
+} );
