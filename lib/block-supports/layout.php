@@ -1085,10 +1085,7 @@ function gutenberg_unique_id_from_values( array $data, string $prefix = '' ): st
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type            = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	$block_supports_layout = block_has_support( $block_type, array( 'layout' ), false ) || block_has_support( $block_type, array( '__experimentalLayout' ), false );
-	$style_attr            = gutenberg_resolve_style_state_aliases(
-		$block['attrs']['style'] ?? array(),
-		$block['blockName']
-	);
+	$style_attr            = $block['attrs']['style'] ?? array();
 	/*
 	 * Children of manual grids publish their row span for mobile stacking, as part of the grid
 	 * interactivity experiment, even when they have no child layout of their own.

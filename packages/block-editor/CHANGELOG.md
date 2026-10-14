@@ -4,14 +4,20 @@
 
 ### Breaking Changes
 
+-   `ImageSizeControl`: The event in the `onChangeImage` callback's `{ event }` argument now comes from popup selection rather than a native select change. Read the selected value from the `slug` argument rather than `event.target.value` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
+
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### New Features
 
 -   Add a rotate block support, behind the `gutenberg-block-rotation` experiment: blocks get a Rotation control in their Dimensions panel unless they opt out with `supports.rotate: false`, stored in `style.rotate` with viewport overrides, and rotated with the CSS `rotate` property ([#84505](https://github.com/WordPress/gutenberg/pull/84505)).
+-   Typography: Add a Gradient control that fills the text with a gradient, shown when `settings.background.backgroundClip` allows the `text` value, or when the block declares the support and a theme has not set it ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
+-   Background: Add a Clip control for choosing the box a background is painted into, shown when `settings.background.backgroundClip` allows a value other than `text` ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 
 ### Enhancements
 
+-   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
+-   `BlockBreadcrumb`: Use the `Breadcrumb` component from `@wordpress/ui` to collapse overflowing ancestors into a menu while preserving block selection and document-root activation, including multi-block selections. Use block titles when renamed labels are blank after stripping HTML. Accept a `className` for consumer-specific layout ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   Inserter: Replace random tips with info notices using the same light-bulb icon and style keyboard hints as keys ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, every row of a manual placement grid is the same height, and a manual placement grid without a minimum column width takes its height from its width with `aspect-ratio: columns / rows`, so all its cells are the same size, close to square, whatever their content. Wherever its cells have a fixed size, the grid sets `--wp--style--grid-cells: fixed` so that blocks can fill their cells, and grids nested inside it reset that to `auto` ([#84499](https://github.com/WordPress/gutenberg/pull/84499)).
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, dragging a block in a manual placement grid snaps it to cells: one drop zone covers the grid, the pointer marks the center of the dragged block, the cells it will land in and any blocks it will overlap are shown, and the block stays in place, dimmed, while it is dragged. Dropped outside the grid, the block moves to wherever it lands. Drags of several blocks fall through to the block flow, and a block bigger than the grid shrinks to fit it ([#84500](https://github.com/WordPress/gutenberg/pull/84500)).
@@ -20,10 +26,17 @@
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, pressing on an empty cell of a manual placement grid with a mouse or pen and dragging selects a rectangle of cells. On release, the inserter opens, and the block inserted covers the selected cells. The block always gets a placement in the default style state, fitted to the grid's columns and rows, and when a viewport is selected, also the drawn cells for that viewport. Blocks inserted into a cell of a manual grid now keep the style they were inserted with, such as a pattern's root block styles ([#84503](https://github.com/WordPress/gutenberg/pull/84503)).
 -   Grid: Behind the `gutenberg-grid-interactivity` experiment, manual placement grids stack their blocks on mobile, full width, in block order, keeping their row spans and setting `--wp--style--grid-cells: auto` so blocks stop filling cells, unless "Stack on mobile" is turned off (`layout.stackOnMobile`, which can also be set in the mobile state). In the Mobile state, the canvas tools and block settings work from the stack: the first edit gives the grid its own mobile layout matching the stack, then applies the edit, as one undo step ([#84509](https://github.com/WordPress/gutenberg/pull/84509)).
 -   Grid: Behind the `gutenberg-grid-interactivity` and `gutenberg-block-rotation` experiments, a selected block in a manual placement grid has a rotate handle on the canvas. Dragging it previews the angle, snapping to multiples of 15° unless Shift is held, and releasing it stores the rotate support's `style.rotate` for the selected style state as one undo step; Escape cancels. The resize handles follow the block's rotation, and dragged blocks land by the cells they take up, without their rotation. Blocks of a grid stacked on mobile are shown unrotated, and images there keep their own size ([#84512](https://github.com/WordPress/gutenberg/pull/84512)).
+-   Apply formats from the toolbar and keyboard shortcuts to text selected across blocks, when every selected block is only a rich text field ([#58913](https://github.com/WordPress/gutenberg/pull/58913)).
+-   Inserter: Redesign the Media tab around a single DataViews grid, in place of the category list and flyout panel. One search covers the tab, media types are tabs, and other sources (the post's attached images, Openverse, anything registered through the public API) are chosen from a menu beside the search ([#82749](https://github.com/WordPress/gutenberg/pull/82749)).
 
 ### Bug Fixes
 
+-   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+-   Block Toolbar: Keep `__unstableBlockToolbarLastItem` fills out of the placeholder toolbar shown on small screens while no block is selected ([#84554](https://github.com/WordPress/gutenberg/pull/84554)).
+-   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
+-   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
+
 
 ## 18.1.0 (2026-10-07)
 

@@ -18,6 +18,7 @@ import useClickSelection from './use-click-selection';
 import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
+import { useMultiBlockFormatShortcuts } from '../rich-text/multi-block-format-edit';
 
 export function useWritingFlow() {
 	const [ before, ref, after ] = useTabNav();
@@ -36,6 +37,7 @@ export function useWritingFlow() {
 			ref,
 			useEditableRootEventHandlers(),
 			useClipboardHandler(),
+			useMultiBlockFormatShortcuts(),
 			useInput(),
 			useEditableRoot(),
 			useHomeEnd(),

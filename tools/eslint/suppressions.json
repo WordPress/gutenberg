@@ -387,11 +387,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-list/subdirectory-icon.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-list/use-block-props/index.js": {
 		"react-hooks/immutability": {
 			"count": 2
@@ -1206,7 +1201,7 @@
 	},
 	"packages/block-editor/src/components/global-styles/typography-panel.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 2
+			"count": 1
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -1433,25 +1428,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/inserter/media-tab/media-list.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/inserter/media-tab/media-panel.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inserter/media-tab/media-preview.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inserter/media-tab/media-tab.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1938,9 +1915,6 @@
 		}
 	},
 	"packages/block-editor/src/components/rich-text/index.jsx": {
-		"react-hooks/refs": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4769,11 +4743,6 @@
 			"count": 2
 		}
 	},
-	"packages/components/src/navigator/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2
@@ -4795,11 +4764,6 @@
 		},
 		"react-hooks/refs": {
 			"count": 4
-		}
-	},
-	"packages/components/src/range-control/styles/range-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
 		}
 	},
 	"packages/components/src/select-control/styles/select-control-styles.ts": {
@@ -4837,11 +4801,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/unit-control/styles/unit-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/utils/base-label.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4867,7 +4826,7 @@
 			"count": 4
 		}
 	},
-	"packages/components/src/utils/rtl.js": {
+	"packages/components/src/utils/rtl.ts": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -7186,6 +7145,16 @@
 			"count": 1
 		}
 	},
+	"packages/editor/src/components/viewport-status/index.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/editor/src/components/viewport-status/test/index.browser.test.jsx": {
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
 	"packages/editor/src/components/visual-editor/edit-template-blocks-notification.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7917,7 +7886,7 @@
 			"count": 1
 		}
 	},
-	"packages/rich-text/src/hook/index.js": {
+	"packages/rich-text/src/hook/index.ts": {
 		"react-hooks/refs": {
 			"count": 8
 		}
