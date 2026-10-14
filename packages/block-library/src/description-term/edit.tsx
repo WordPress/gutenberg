@@ -1,10 +1,9 @@
 import { __ } from '@wordpress/i18n';
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { RichText, useBlockProps } from '@wordpress/block-editor';
-import { useMergeRefs } from '@wordpress/compose';
 import type { BlockEditProps, Block } from '@wordpress/blocks';
 import type { RichTextData } from '@wordpress/rich-text';
-import useKeyboardTransform from './use-keyboard-transform';
+import useGuidedEnterAtEnd from '../description-list/use-guided-enter-at-end';
 
 type DescriptionListItemAttributes = {
 	content: string | RichTextData;
@@ -32,19 +31,16 @@ export default function Edit( {
 }: DescriptionListItemEditProps ) {
 	const { content, placeholder } = attributes;
 	const blockProps = useBlockProps();
-	const keyboardTransformRef = useKeyboardTransform( {
-		attributes,
+	const onSplitAtEnd = useGuidedEnterAtEnd( {
 		blockName: 'core/description-term',
 		clientId,
 	} );
-	const ref = useMergeRefs( [ blockProps.ref, keyboardTransformRef ] );
 
 	return (
 		<RichText
 			identifier="content"
 			tagName="dt"
 			{ ...blockProps }
-			ref={ ref }
 			value={ content }
 			onChange={ ( newContent: string ) =>
 				setAttributes( { content: newContent } )
@@ -53,6 +49,7 @@ export default function Edit( {
 			onReplace={ onReplace }
 			onRemove={ onRemove }
 			placeholder={ placeholder || __( 'Term' ) }
+			__unstableOnSplitAtEnd={ onSplitAtEnd }
 		/>
 	);
 }
