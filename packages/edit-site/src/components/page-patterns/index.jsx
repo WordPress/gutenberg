@@ -21,6 +21,7 @@ import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
 import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
+import InstalledThemePatterns from './installed-theme-patterns';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
@@ -57,7 +58,15 @@ function usePagePatternsHeader( type, categoryId ) {
 	return { title, description };
 }
 
-export default function DataviewsPatterns() {
+export default function PagePatterns() {
+	const { query } = useLocation();
+	if ( query.installedTheme ) {
+		return <InstalledThemePatterns stylesheet={ query.installedTheme } />;
+	}
+	return <DataviewsPatterns />;
+}
+
+function DataviewsPatterns() {
 	const { path, query } = useLocation();
 	const { postType = 'wp_block', categoryId: categoryIdFromURL } = query;
 	const history = useHistory();

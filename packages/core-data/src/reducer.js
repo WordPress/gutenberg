@@ -552,6 +552,23 @@ export function blockPatterns( state = [], action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the patterns registered by each theme, keyed by stylesheet.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function themeBlockPatterns( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_THEME_BLOCK_PATTERNS':
+			return { ...state, [ action.stylesheet ]: action.patterns };
+	}
+
+	return state;
+}
+
 export function blockPatternCategories( state = [], action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_BLOCK_PATTERN_CATEGORIES':
@@ -768,6 +785,7 @@ export default combineReducers( {
 	userPermissions,
 	autosaves,
 	blockPatterns,
+	themeBlockPatterns,
 	blockPatternCategories,
 	userPatternCategories,
 	navigationFallbackId,

@@ -10,7 +10,12 @@ import {
 	normalizeString,
 	searchItems,
 } from './utils/search-ranking';
-import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
+import {
+	getPopulatedCategories,
+	installedThemePatternsCategory,
+	INSERTER_PATTERN_TYPES,
+} from './components/inserter/block-patterns-tab/utils';
+import { withInstalledThemePatterns } from './store/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { PrivateBlockInspectorEditOriginal } from './components/block-inspector/edit-original-slot-fill';
@@ -40,6 +45,7 @@ import {
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
 	selectBlockPatternsKey,
+	selectInstalledThemePatternsKey,
 	reusableBlocksSelectKey,
 	userPatternCategoriesSelectKey,
 	globalStylesDataKey,
@@ -123,6 +129,10 @@ lock( privateApis, {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
+	selectInstalledThemePatternsKey,
+	withInstalledThemePatterns,
+	installedThemePatternsCategory,
+	INSERTER_PATTERN_TYPES,
 	requiresWrapperOnCopy,
 	PrivateInserterLibrary,
 	reusableBlocksSelectKey,

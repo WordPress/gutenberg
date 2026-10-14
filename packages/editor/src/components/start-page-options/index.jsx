@@ -4,6 +4,7 @@ import {
 	Modal,
 	CheckboxControl as WCCheckboxControl,
 	SearchControl,
+	Spinner,
 } from '@wordpress/components';
 import { Stack, Tabs, Text } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
@@ -26,23 +27,42 @@ import {
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-const { getPopulatedCategories, searchItems } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	getPopulatedCategories,
+	searchItems,
+	installedThemePatternsCategory,
+	withInstalledThemePatterns,
+	selectInstalledThemePatternsKey,
+	INSERTER_PATTERN_TYPES,
+} = unlock( blockEditorPrivateApis );
 
 const ALL_PATTERNS_CATEGORY = {
 	name: 'allPatterns',
 	label: _x( 'All', 'patterns' ),
 };
 
-export function useStartPatterns() {
+const INSTALLED_THEME_PATTERNS_OPTIONS = {
+	[ withInstalledThemePatterns ]: true,
+};
+
+/**
+ * Returns the patterns that can be used to start a new page.
+ *
+ * @param {boolean} includeInstalledThemes Whether to include the patterns from
+ *                                         other installed themes.
+ * @return {Array} The start patterns.
+ */
+export function useStartPatterns( includeInstalledThemes = false ) {
 	// A pattern is a start pattern if it includes 'core/post-content' in its blockTypes,
 	// and it has no postTypes declared and the current post type is page or if
 	// the current post type is part of the postTypes declared.
-	const { blockPatternsWithPostContentBlockType, postType } = useSelect(
+	const { patterns, postType } = useSelect(
 		( select ) => {
-			const { getPatternsByBlockTypes, getBlocksByName } =
-				select( blockEditorStore );
+			const {
+				getPatternsByBlockTypes,
+				getBlocksByName,
+				__experimentalGetAllowedPatterns,
+			} = select( blockEditorStore );
 			const { getCurrentPostType, getRenderingMode } =
 				select( editorStore );
 			const rootClientId =
@@ -50,18 +70,23 @@ export function useStartPatterns() {
 					? ''
 					: getBlocksByName( 'core/post-content' )?.[ 0 ];
 			return {
-				blockPatternsWithPostContentBlockType: getPatternsByBlockTypes(
-					'core/post-content',
-					rootClientId
-				),
+				patterns: includeInstalledThemes
+					? __experimentalGetAllowedPatterns(
+							rootClientId,
+							INSTALLED_THEME_PATTERNS_OPTIONS
+						)
+					: getPatternsByBlockTypes(
+							'core/post-content',
+							rootClientId
+						),
 				postType: getCurrentPostType(),
 			};
 		},
-		[]
+		[ includeInstalledThemes ]
 	);
 
 	return useMemo( () => {
-		if ( ! blockPatternsWithPostContentBlockType?.length ) {
+		if ( ! patterns?.length ) {
 			return [];
 		}
 
@@ -69,27 +94,34 @@ export function useStartPatterns() {
 		 * Filter patterns without postTypes declared if the current postType is page
 		 * or patterns that declare the current postType in its post type array.
 		 */
-		return blockPatternsWithPostContentBlockType.filter( ( pattern ) => {
+		return patterns.filter( ( pattern ) => {
 			return (
-				( postType === 'page' && ! pattern.postTypes ) ||
-				( Array.isArray( pattern.postTypes ) &&
-					pattern.postTypes.includes( postType ) )
+				pattern.blockTypes?.includes( 'core/post-content' ) &&
+				( ( postType === 'page' && ! pattern.postTypes ) ||
+					( Array.isArray( pattern.postTypes ) &&
+						pattern.postTypes.includes( postType ) ) )
 			);
 		} );
-	}, [ postType, blockPatternsWithPostContentBlockType ] );
+	}, [ postType, patterns ] );
 }
 
 function useStartPatternCategories( startPatterns ) {
-	const { registeredCategories, userCategories } = useSelect( ( select ) => {
-		return {
-			// The block editor settings already merge the categories from the
-			// REST API with the ones added through `block_editor_settings_all`.
-			registeredCategories:
-				select( blockEditorStore ).getSettings()
-					.__experimentalBlockPatternCategories,
-			userCategories: select( coreStore ).getUserPatternCategories(),
-		};
-	}, [] );
+	const { registeredCategories, userCategories, hasInstalledThemePatterns } =
+		useSelect( ( select ) => {
+			const settings = select( blockEditorStore ).getSettings();
+			return {
+				// The block editor settings already merge the categories from the
+				// REST API with the ones added through `block_editor_settings_all`.
+				registeredCategories:
+					settings.__experimentalBlockPatternCategories,
+				userCategories: select( coreStore ).getUserPatternCategories(),
+				// Patterns from other installed themes load once their tab is
+				// open, so the tab is offered whenever the editor can provide
+				// them.
+				hasInstalledThemePatterns:
+					!! settings[ selectInstalledThemePatternsKey ],
+			};
+		}, [] );
 
 	return useMemo( () => {
 		const allCategories = [ ...( registeredCategories ?? [] ) ];
@@ -104,18 +136,35 @@ function useStartPatternCategories( startPatterns ) {
 		} );
 
 		const categories = getPopulatedCategories(
-			startPatterns,
+			startPatterns.filter(
+				( pattern ) =>
+					pattern.type !== INSERTER_PATTERN_TYPES.installedTheme
+			),
 			allCategories
 		);
 
 		// Filtering is not useful when no start pattern belongs to a
 		// registered category.
-		if ( categories.every( ( { name } ) => name === 'uncategorized' ) ) {
+		const hasRegisteredCategories = ! categories.every(
+			( { name } ) => name === 'uncategorized'
+		);
+		if ( ! hasRegisteredCategories && ! hasInstalledThemePatterns ) {
 			return [];
 		}
 
-		return [ ALL_PATTERNS_CATEGORY, ...categories ];
-	}, [ startPatterns, registeredCategories, userCategories ] );
+		return [
+			ALL_PATTERNS_CATEGORY,
+			...( hasRegisteredCategories ? categories : [] ),
+			...( hasInstalledThemePatterns
+				? [ installedThemePatternsCategory ]
+				: [] ),
+		];
+	}, [
+		startPatterns,
+		registeredCategories,
+		userCategories,
+		hasInstalledThemePatterns,
+	] );
 }
 
 function PatternSelection( { blockPatterns, onChoosePattern } ) {
@@ -150,7 +199,17 @@ function StartPageOptionsModal( { onClose } ) {
 	);
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const startPatterns = useStartPatterns();
+	const isInstalledThemesCategory =
+		selectedCategory === installedThemePatternsCategory.name;
+	const startPatterns = useStartPatterns( isInstalledThemesCategory );
+	const isLoadingInstalledThemePatterns = useSelect(
+		( select ) =>
+			isInstalledThemesCategory &&
+			unlock(
+				select( blockEditorStore )
+			).isLoadingInstalledThemePatterns(),
+		[ isInstalledThemesCategory ]
+	);
 	const patternCategories = useStartPatternCategories( startPatterns );
 	const hasCategories = patternCategories.length > 0;
 	const hasStartPattern = startPatterns.length > 0;
@@ -167,7 +226,12 @@ function StartPageOptionsModal( { onClose } ) {
 
 	const filteredStartPatterns = useMemo( () => {
 		let patterns = startPatterns;
-		if ( activeCategory !== ALL_PATTERNS_CATEGORY.name ) {
+		if ( activeCategory === installedThemePatternsCategory.name ) {
+			patterns = patterns.filter(
+				( pattern ) =>
+					pattern.type === INSERTER_PATTERN_TYPES.installedTheme
+			);
+		} else if ( activeCategory !== ALL_PATTERNS_CATEGORY.name ) {
 			patterns = patterns.filter( ( pattern ) =>
 				activeCategory === 'uncategorized'
 					? ! pattern.categories?.some( ( patternCategory ) =>
@@ -232,19 +296,23 @@ function StartPageOptionsModal( { onClose } ) {
 							tabIndex={ -1 }
 							className="editor-start-page-options__modal-content has-pattern-categories"
 						>
-							{ filteredStartPatterns.length > 0 ? (
+							{ filteredStartPatterns.length > 0 && (
 								<PatternSelection
 									blockPatterns={ filteredStartPatterns }
 									onChoosePattern={ handleClose }
 								/>
-							) : (
-								<Text
-									render={ <p /> }
-									className="editor-start-page-options__no-results"
-								>
-									{ __( 'No results found.' ) }
-								</Text>
 							) }
+							{ ! filteredStartPatterns.length &&
+								isLoadingInstalledThemePatterns && <Spinner /> }
+							{ ! filteredStartPatterns.length &&
+								! isLoadingInstalledThemePatterns && (
+									<Text
+										render={ <p /> }
+										className="editor-start-page-options__no-results"
+									>
+										{ __( 'No results found.' ) }
+									</Text>
+								) }
 						</Tabs.Panel>
 					) ) }
 				</Tabs.Root>

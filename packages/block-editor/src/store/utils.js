@@ -15,6 +15,10 @@ import { getBlockEditingMode, getBlockRootClientId } from './selectors';
 import { INSERTER_PATTERN_TYPES } from '../components/inserter/block-patterns-tab/utils';
 
 export const isFiltered = Symbol( 'isFiltered' );
+// Opts in to the patterns from installed themes other than the active one.
+export const withInstalledThemePatterns = Symbol(
+	'withInstalledThemePatterns'
+);
 const parsedPatternCache = new WeakMap();
 const grammarMapCache = new WeakMap();
 

@@ -20,6 +20,7 @@ import {
 } from '@wordpress/data';
 import {
 	isFiltered,
+	withInstalledThemePatterns,
 	checkAllowListRecursive,
 	checkAllowList,
 	getAllPatternsDependants,
@@ -2897,10 +2898,14 @@ export const __experimentalGetParsedPattern = createRegistrySelector(
 	}
 );
 
-const getAllowedPatternsDependants = ( select ) => ( state, rootClientId ) => [
-	...getAllPatternsDependants( select )( state ),
-	...getInsertBlockTypeDependants( select )( state, rootClientId ),
-];
+const getAllowedPatternsDependants =
+	( select ) => ( state, rootClientId, options ) => [
+		...getAllPatternsDependants( select )( state ),
+		...getInsertBlockTypeDependants( select )( state, rootClientId ),
+		options?.[ withInstalledThemePatterns ]
+			? unlock( select( STORE_NAME ) ).getInstalledThemePatterns()
+			: null,
+	];
 
 const patternsWithParsedBlocks = new WeakMap();
 function enhancePatternWithParsedBlocks( pattern ) {
@@ -2933,8 +2938,12 @@ export const __experimentalGetAllowedPatterns = createRegistrySelector(
 				rootClientId = null,
 				options = DEFAULT_INSERTER_OPTIONS
 			) => {
-				const { getAllPatterns } = unlock( select( STORE_NAME ) );
-				const patterns = getAllPatterns();
+				const { getAllPatterns, getInstalledThemePatterns } = unlock(
+					select( STORE_NAME )
+				);
+				const patterns = options[ withInstalledThemePatterns ]
+					? [ ...getAllPatterns(), ...getInstalledThemePatterns() ]
+					: getAllPatterns();
 				const { allowedBlockTypes } = getSettings( state );
 				const parsedPatterns = patterns
 					.filter( ( { inserter = true } ) => !! inserter )

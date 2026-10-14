@@ -4,6 +4,7 @@ export const INSERTER_PATTERN_TYPES = {
 	user: 'user',
 	theme: 'theme',
 	directory: 'directory',
+	installedTheme: 'installed-theme',
 };
 
 export const INSERTER_SYNC_TYPES = {
@@ -24,6 +25,11 @@ export const myPatternsCategory = {
 export const starterPatternsCategory = {
 	name: 'core/starter-content',
 	label: __( 'Starter content' ),
+};
+
+export const installedThemePatternsCategory = {
+	name: 'installedThemePatterns',
+	label: __( 'Other themes' ),
 };
 
 function hasRegisteredCategory( pattern, allCategories ) {

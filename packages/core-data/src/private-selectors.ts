@@ -49,6 +49,101 @@ export const getBlockPatternsForPostType = createRegistrySelector(
 );
 
 /**
+ * Returns the patterns a theme registers, as if it were the active theme.
+ *
+ * @param state      Data state.
+ * @param stylesheet Theme stylesheet.
+ *
+ * @return The theme's patterns, or undefined if they haven't loaded yet.
+ */
+export function getThemeBlockPatterns(
+	state: State,
+	stylesheet: string
+): Array< any > | undefined {
+	return state.themeBlockPatterns[ stylesheet ];
+}
+
+/**
+ * Returns the patterns that installed themes, other than the active theme and
+ * its parent, would add if they were activated. Each pattern is marked with
+ * the stylesheet of the theme it comes from.
+ *
+ * @return The patterns, or undefined while they load.
+ */
+export const getInstalledThemePatterns = createRegistrySelector(
+	( select: any ) =>
+		createSelector(
+			( state: State ) => {
+				const {
+					getEntityRecords,
+					getCurrentTheme,
+					getBlockPatterns,
+					hasFinishedResolution,
+				} = select( STORE_NAME );
+				const themes = getEntityRecords( 'root', 'theme' );
+				const currentTheme = getCurrentTheme();
+				if (
+					! themes ||
+					! currentTheme ||
+					! hasFinishedResolution( 'getBlockPatterns' )
+				) {
+					return undefined;
+				}
+
+				const otherThemes = themes.filter(
+					( { stylesheet }: { stylesheet: string } ) =>
+						stylesheet !== currentTheme.stylesheet &&
+						stylesheet !== currentTheme.template
+				);
+				// Request every theme up front so they load in parallel.
+				otherThemes.forEach(
+					( { stylesheet }: { stylesheet: string } ) =>
+						unlock( select( STORE_NAME ) ).getThemeBlockPatterns(
+							stylesheet
+						)
+				);
+				if (
+					otherThemes.some(
+						( { stylesheet }: { stylesheet: string } ) =>
+							! state.themeBlockPatterns[ stylesheet ]
+					)
+				) {
+					return undefined;
+				}
+
+				// Core, plugin and active theme patterns are already available,
+				// so only keep what each theme would add on top of them.
+				const activePatternNames = new Set(
+					getBlockPatterns().map(
+						( { name }: { name: string } ) => name
+					)
+				);
+				return otherThemes.flatMap(
+					( { stylesheet }: { stylesheet: string } ) =>
+						state.themeBlockPatterns[ stylesheet ]
+							.filter(
+								( { name }: any ) =>
+									! activePatternNames.has( name )
+							)
+							.map( ( pattern: any ) => ( {
+								...pattern,
+								theme: stylesheet,
+							} ) )
+				);
+			},
+			( state: State ) => [
+				select( STORE_NAME ).getEntityRecords( 'root', 'theme' ),
+				select( STORE_NAME ).getCurrentTheme(),
+				select( STORE_NAME ).getBlockPatterns(),
+				select( STORE_NAME ).hasFinishedResolution(
+					'getBlockPatterns'
+				),
+				state.themeBlockPatterns,
+			]
+		)
+);
+
+/**
  * Returns the entity records permissions for the given entity record ids.
  */
 export const getEntityRecordsPermissions = createRegistrySelector( ( select ) =>

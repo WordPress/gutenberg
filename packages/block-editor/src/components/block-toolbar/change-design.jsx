@@ -9,9 +9,12 @@ import { cloneBlock } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import { withInstalledThemePatterns } from '../../store/utils';
 import BlockPatternsList from '../block-patterns-list';
 
 const EMPTY_ARRAY = [];
+// Other installed themes can offer designs for the same category.
+const ALLOWED_PATTERNS_OPTIONS = { [ withInstalledThemePatterns ]: true };
 const MAX_PATTERNS_TO_SHOW = 6;
 const POPOVER_PROPS = {
 	placement: 'bottom-start',
@@ -34,7 +37,10 @@ export default function ChangeDesign( { clientId } ) {
 			// See: https://github.com/WordPress/gutenberg/pull/64736.
 			const _patterns =
 				_categories.length > 0
-					? __experimentalGetAllowedPatterns( rootBlock )
+					? __experimentalGetAllowedPatterns(
+							rootBlock,
+							ALLOWED_PATTERNS_OPTIONS
+						)
 					: EMPTY_ARRAY;
 			return {
 				categories: _categories,

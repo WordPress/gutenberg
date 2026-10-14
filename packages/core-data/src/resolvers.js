@@ -794,6 +794,26 @@ export const getBlockPatterns =
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
+/**
+ * Requests the patterns a theme registers, loading the theme through a theme
+ * preview the same way activating it would.
+ *
+ * @param {string} stylesheet Theme stylesheet.
+ */
+export const getThemeBlockPatterns =
+	( stylesheet ) =>
+	async ( { dispatch } ) => {
+		let patterns = [];
+		try {
+			patterns = await fetchBlockPatterns( {
+				wp_theme_preview: stylesheet,
+			} );
+		} catch {
+			// A theme that fails to load in a preview has no patterns to offer.
+		}
+		dispatch.receiveThemeBlockPatterns( stylesheet, patterns );
+	};
+
 export const getBlockPatternCategories =
 	() =>
 	async ( { dispatch } ) => {

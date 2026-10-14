@@ -102,6 +102,7 @@ const {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
+	selectInstalledThemePatternsKey,
 	reusableBlocksSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
@@ -115,6 +116,10 @@ const {
 	mediaSideloadFromUrlKey,
 	openMediaEditorModalKey,
 } = unlock( privateApis );
+
+function selectInstalledThemePatterns( select ) {
+	return unlock( select( coreStore ) ).getInstalledThemePatterns();
+}
 
 /**
  * React hook used to compute the block editor settings to use for the post editor.
@@ -140,6 +145,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isDistractionFree,
 		keepCaretInsideBlock,
 		hasUploadPermissions,
+		canReadThemes,
 		hiddenBlockTypes,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
@@ -235,6 +241,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userCanCreatePages: canUser( 'create', {
 					kind: 'postType',
 					name: 'page',
+				} ),
+				// Patterns from other installed themes need to list and
+				// preview them.
+				canReadThemes: canUser( 'read', {
+					kind: 'root',
+					name: 'theme',
 				} ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
@@ -408,6 +420,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? patterns
 					: undefined;
 			},
+			[ selectInstalledThemePatternsKey ]: canReadThemes
+				? selectInstalledThemePatterns
+				: undefined,
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
@@ -470,6 +485,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		keepCaretInsideBlock,
 		settings,
 		hasUploadPermissions,
+		canReadThemes,
 		blockPatterns,
 		blockPatternCategories,
 		inserterMediaCategories,
