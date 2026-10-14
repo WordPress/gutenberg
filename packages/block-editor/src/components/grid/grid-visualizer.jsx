@@ -239,17 +239,14 @@ function ManualGridVisualizer( {
 					);
 					// The lines of cells that blocks are in are only drawn
 					// over the blocks while one is dragged, to line it up.
-					let color = gridInfo.currentColor;
-					if (
-						isChildGridCell ||
-						( isCellOccupied && ! isDroppingAllowed )
-					) {
-						color = 'transparent';
-					}
+					const hasLines =
+						! isChildGridCell &&
+						( ! isCellOccupied || isDroppingAllowed );
 					return (
 						<GridVisualizerCell
 							key={ `${ row }-${ column }` }
-							color={ color }
+							color={ gridInfo.currentColor }
+							lineStyle={ hasLines ? 'contrasting' : 'none' }
 						>
 							{ ! isCellOccupied && ! isChildGridCell && (
 								<GridVisualizerAppender
@@ -274,12 +271,25 @@ function ManualGridVisualizer( {
 	);
 }
 
-function GridVisualizerCell( { color, children } ) {
+/**
+ * A cell of the grid visualizer.
+ *
+ * @param {Object}                       props
+ * @param {string}                       props.color     The grid's text color.
+ * @param {'color'|'contrasting'|'none'} props.lineStyle Lines in the grid's text color, lines that stand out on any background, or no lines.
+ * @param {import('react').ReactNode}    props.children  The cell's content.
+ */
+function GridVisualizerCell( { color, lineStyle = 'color', children } ) {
 	return (
 		<div
-			className="block-editor-grid-visualizer__cell"
+			className={ clsx( 'block-editor-grid-visualizer__cell', {
+				'has-contrasting-lines': lineStyle === 'contrasting',
+			} ) }
 			style={ {
-				boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`,
+				boxShadow:
+					lineStyle === 'color'
+						? `inset 0 0 0 1px color-mix(in srgb, ${ color } 20%, #0000)`
+						: undefined,
 				color,
 			} }
 		>
