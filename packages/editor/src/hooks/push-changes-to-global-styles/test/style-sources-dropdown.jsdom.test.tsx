@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import StyleSourcesDropdown from '../style-sources-dropdown';
 
 const changedRows = [
@@ -77,6 +77,35 @@ async function openPopover( setAttributes = vi.fn() ) {
 	return user;
 }
 
+// Resets empty the rows, as the real hook would after the update.
+function ResettableBlock() {
+	const [ blockAttributes, setBlockAttributes ] = useState( attributes );
+	const applyGloballyRef = useRef< HTMLButtonElement >( null );
+	return (
+		<>
+			<button ref={ applyGloballyRef }>Apply globally</button>
+			<StyleSourcesDropdown
+				name="core/button"
+				attributes={ blockAttributes }
+				setAttributes={ ( next ) => {
+					rows.changed = [];
+					setBlockAttributes( { ...blockAttributes, ...next } );
+				} }
+				fallbackFocusRef={ applyGloballyRef }
+			/>
+		</>
+	);
+}
+
+async function openResettableBlock() {
+	const user = userEvent.setup();
+	render( <ResettableBlock /> );
+	await user.click(
+		screen.getByRole( 'button', { name: 'See 2 style changes' } )
+	);
+	return user;
+}
+
 describe( 'StyleSourcesDropdown', () => {
 	it( 'hides the link when nothing is changed on the block', () => {
 		rows.changed = [];
@@ -140,26 +169,7 @@ describe( 'StyleSourcesDropdown', () => {
 	} );
 
 	it( 'keeps focus in the popover once the last change is reset', async () => {
-		// Resets empty the rows, as the real hook would after the update.
-		function Block() {
-			const [ blockAttributes, setBlockAttributes ] =
-				useState( attributes );
-			return (
-				<StyleSourcesDropdown
-					name="core/button"
-					attributes={ blockAttributes }
-					setAttributes={ ( next ) => {
-						rows.changed = [];
-						setBlockAttributes( { ...blockAttributes, ...next } );
-					} }
-				/>
-			);
-		}
-		const user = userEvent.setup();
-		render( <Block /> );
-		await user.click(
-			screen.getByRole( 'button', { name: 'See 2 style changes' } )
-		);
+		const user = await openResettableBlock();
 
 		await user.click( screen.getByRole( 'button', { name: 'Reset all' } ) );
 		rows.changed = changedRows;
@@ -170,5 +180,22 @@ describe( 'StyleSourcesDropdown', () => {
 		expect(
 			screen.queryByRole( 'button', { name: 'Reset all' } )
 		).not.toBeInTheDocument();
+	} );
+
+	it( 'moves focus to Apply globally when closing without the link', async () => {
+		const user = await openResettableBlock();
+
+		await user.click( screen.getByRole( 'button', { name: 'Reset all' } ) );
+		await user.keyboard( '{Escape}' );
+		rows.changed = changedRows;
+
+		expect(
+			screen.queryByRole( 'button', { name: /style change/ } )
+		).not.toBeInTheDocument();
+		await waitFor( () =>
+			expect(
+				screen.getByRole( 'button', { name: 'Apply globally' } )
+			).toHaveFocus()
+		);
 	} );
 } );

@@ -5,7 +5,7 @@ import {
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
-import { useMemo, useRef, useState } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { reset as resetIcon } from '@wordpress/icons';
 import { Stack, Tooltip } from '@wordpress/ui';
@@ -36,6 +36,7 @@ interface StyleSourcesProps {
 	name: string;
 	attributes: Record< string, any >;
 	setAttributes: ( attributes: Record< string, any > ) => void;
+	fallbackFocusRef?: React.RefObject< HTMLElement | null >;
 }
 
 function StyleSourceValue( { row }: { row: StyleSourceRow } ) {
@@ -208,15 +209,17 @@ function StyleSourcesContent( {
  * the inspector, listing the styles changed on this block and the ones it
  * takes from Global Styles.
  *
- * @param props               Component props.
- * @param props.name          Block name.
- * @param props.attributes    Block attributes.
- * @param props.setAttributes Updates the block attributes.
+ * @param props                  Component props.
+ * @param props.name             Block name.
+ * @param props.attributes       Block attributes.
+ * @param props.setAttributes    Updates the block attributes.
+ * @param props.fallbackFocusRef Takes focus on close when the link is gone.
  */
 export default function StyleSourcesDropdown( {
 	name,
 	attributes,
 	setAttributes,
+	fallbackFocusRef,
 }: StyleSourcesProps ) {
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
 		null
@@ -236,10 +239,35 @@ export default function StyleSourcesDropdown( {
 		[ popoverAnchor ]
 	);
 
+	// Closing after the last reset removes the link the popover would return
+	// focus to, so focus would fall to the document body. The check waits for
+	// the popover's own focus return.
+	const [ closeCount, setCloseCount ] = useState( 0 );
+	useEffect( () => {
+		if ( ! closeCount || ! popoverAnchor ) {
+			return;
+		}
+		const { ownerDocument } = popoverAnchor;
+		const { defaultView } = ownerDocument;
+		const timeout = defaultView?.setTimeout( () => {
+			const { activeElement, body } = ownerDocument;
+			if (
+				! popoverAnchor.querySelector( 'button' ) &&
+				( ! activeElement || activeElement === body )
+			) {
+				fallbackFocusRef?.current?.focus();
+			}
+		} );
+		return () => defaultView?.clearTimeout( timeout );
+	}, [ closeCount, popoverAnchor, fallbackFocusRef ] );
+
 	return (
 		<div className="editor-style-sources__control" ref={ setPopoverAnchor }>
 			<Dropdown
 				popoverProps={ popoverProps }
+				onToggle={ ( willOpen ) =>
+					! willOpen && setCloseCount( ( count ) => count + 1 )
+				}
 				contentClassName="editor-style-sources__popover"
 				focusOnMount
 				renderToggle={ ( { isOpen, onToggle } ) =>

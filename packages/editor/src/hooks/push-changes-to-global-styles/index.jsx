@@ -14,7 +14,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo, useCallback, useRef, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -439,6 +439,7 @@ function PushChangesToGlobalStylesControl( {
 	name,
 	attributes,
 	setAttributes,
+	buttonRef,
 } ) {
 	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
 
@@ -521,6 +522,7 @@ function PushChangesToGlobalStylesControl( {
 				{ __( 'Styles' ) }
 			</BaseControl.VisualLabel>
 			<Button
+				ref={ buttonRef }
 				__next40pxDefaultSize
 				variant="secondary"
 				accessibleWhenDisabled
@@ -542,6 +544,7 @@ function PushChangesToGlobalStylesControl( {
 }
 
 function PushChangesToGlobalStyles( props ) {
+	const applyGloballyRef = useRef();
 	const blockEditingMode = useBlockEditingMode();
 	const isBlockBasedTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
@@ -559,9 +562,15 @@ function PushChangesToGlobalStyles( props ) {
 
 	return (
 		<InspectorAdvancedControls>
-			<PushChangesToGlobalStylesControl { ...props } />
+			<PushChangesToGlobalStylesControl
+				{ ...props }
+				buttonRef={ applyGloballyRef }
+			/>
 			{ isGlobalStylesInheritanceIndicatorUIEnabled() && (
-				<StyleSourcesDropdown { ...props } />
+				<StyleSourcesDropdown
+					{ ...props }
+					fallbackFocusRef={ applyGloballyRef }
+				/>
 			) }
 		</InspectorAdvancedControls>
 	);
