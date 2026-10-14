@@ -4,6 +4,9 @@ import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
+import type { Block, BlockType } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
+import type { Dispatch, SetStateAction } from 'react';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
@@ -19,34 +22,53 @@ import {
 } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import type { StyleOverride } from '../store/types';
+import type { StyleSettings } from '../components/global-styles/types';
+import type {
+	BlockEditFeature,
+	BlockEditHookProps,
+	BlockListBlockFeature,
+	BlockListBlockHookProps,
+	BlockSaveFeature,
+	BlockWrapperProps,
+	CleanedObject,
+	StyleOverrideOptions,
+} from './types';
 
 /**
  * Removed falsy values from nested object.
  *
- * @param {*} object
- * @return {*} Object cleaned from falsy values
+ * @param object
+ * @return Object cleaned from falsy values
  */
-export const cleanEmptyObject = ( object ) => {
+export const cleanEmptyObject = < T, >(
+	object: T
+): CleanedObject< T > | undefined => {
 	if ( ! isPlainObject( object ) ) {
-		return object;
+		// Only plain objects are cleaned, so anything else keeps its type.
+		return object as CleanedObject< T >;
 	}
 
-	const cleanedNestedObjects = Object.entries( object )
-		.map( ( [ key, value ] ) => [ key, cleanEmptyObject( value ) ] )
+	const cleanedNestedObjects: [ string, unknown ][] = Object.entries( object )
+		.map( ( [ key, value ] ): [ string, unknown ] => [
+			key,
+			cleanEmptyObject( value ),
+		] )
 		.filter( ( [ , value ] ) => value !== undefined );
+	// The cleaned object keeps the shape, with the empty values left out.
 	return ! cleanedNestedObjects.length
 		? undefined
-		: Object.fromEntries( cleanedNestedObjects );
+		: ( Object.fromEntries( cleanedNestedObjects ) as CleanedObject< T > );
 };
 
 export function transformStyles(
-	activeSupports,
-	migrationPaths,
-	result,
-	source,
-	index,
-	results
-) {
+	activeSupports: Record< string, boolean >,
+	migrationPaths: Record< string, string[][] >,
+	result: Block,
+	source: Block[],
+	index: number,
+	results: Block[]
+): Block {
 	// If there are no active supports return early.
 	if (
 		Object.values( activeSupports ?? {} ).every(
@@ -86,11 +108,12 @@ export function transformStyles(
 				if ( styleValue ) {
 					returnBlock = {
 						...returnBlock,
+						// Setting a path on the attributes object keeps it an object.
 						attributes: setImmutably(
 							returnBlock.attributes,
 							path,
 							styleValue
-						),
+						) as Block[ 'attributes' ],
 					};
 				}
 			} );
@@ -103,18 +126,20 @@ export function transformStyles(
  * Check whether serialization of specific block support feature or set should
  * be skipped.
  *
- * @param {string|Object} blockNameOrType Block name or block type object.
- * @param {string}        featureSet      Name of block support feature set.
- * @param {string}        feature         Name of the individual feature to check.
+ * @param blockNameOrType Block name or block type object.
+ * @param featureSet      Name of block support feature set.
+ * @param feature         Name of the individual feature to check.
  *
- * @return {boolean} Whether serialization should occur.
+ * @return Whether serialization should occur.
  */
 export function shouldSkipSerialization(
-	blockNameOrType,
-	featureSet,
-	feature
-) {
-	const support = getBlockSupport( blockNameOrType, featureSet );
+	blockNameOrType: string | BlockType,
+	featureSet: string,
+	feature?: string
+): boolean | undefined {
+	// Block supports are not validated against a schema.
+	const support = getBlockSupport( blockNameOrType, featureSet ) as
+		{ __experimentalSkipSerialization?: boolean | unknown[] } | undefined;
 	const skipSerialization = support?.__experimentalSkipSerialization;
 
 	if ( Array.isArray( skipSerialization ) ) {
@@ -124,7 +149,10 @@ export function shouldSkipSerialization(
 	return skipSerialization;
 }
 
-const pendingStyleOverrides = new WeakMap();
+const pendingStyleOverrides = new WeakMap<
+	DataRegistry,
+	[ string, StyleOverride ][]
+>();
 
 /**
  * Override a block editor settings style. Leave the ID blank to create a new
@@ -135,7 +163,13 @@ const pendingStyleOverrides = new WeakMap();
  *                               a new style.
  * @param {string}  override.css CSS to apply.
  */
-export function useStyleOverride( { id, css } ) {
+export function useStyleOverride( {
+	id,
+	css,
+}: {
+	id?: string | null;
+	css: string;
+} ) {
 	return usePrivateStyleOverride( { id, css } );
 }
 
@@ -146,7 +180,7 @@ export function usePrivateStyleOverride( {
 	__unstableType,
 	variation,
 	clientId,
-} = {} ) {
+}: StyleOverrideOptions = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -172,13 +206,15 @@ export function usePrivateStyleOverride( {
 		if ( ! pendingStyleOverrides.get( registry ) ) {
 			pendingStyleOverrides.set( registry, [] );
 		}
-		pendingStyleOverrides.get( registry ).push( [ _id, override ] );
+		pendingStyleOverrides.get( registry )!.push( [ _id, override ] );
 		window.queueMicrotask( () => {
 			if ( pendingStyleOverrides.get( registry )?.length ) {
 				registry.batch( () => {
-					pendingStyleOverrides.get( registry ).forEach( ( args ) => {
-						setStyleOverride( ...args );
-					} );
+					pendingStyleOverrides
+						.get( registry )!
+						.forEach( ( args ) => {
+							setStyleOverride( ...args );
+						} );
 					pendingStyleOverrides.set( registry, [] );
 				} );
 			}
@@ -192,7 +228,7 @@ export function usePrivateStyleOverride( {
 				pendingStyleOverrides.set(
 					registry,
 					pendingStyleOverrides
-						.get( registry )
+						.get( registry )!
 						.filter( ( [ currentId ] ) => currentId !== _id )
 				);
 			} else {
@@ -218,12 +254,15 @@ export function usePrivateStyleOverride( {
  * This object can be passed as a prop to all the Styles UI components
  * (TypographyPanel, DimensionsPanel...).
  *
- * @param {string} name         Block name.
- * @param {*}      parentLayout Parent layout.
+ * @param name         Block name.
+ * @param parentLayout Parent layout.
  *
- * @return {Object} Settings object.
+ * @return Settings object.
  */
-export function useBlockSettings( name, parentLayout ) {
+export function useBlockSettings(
+	name: string,
+	parentLayout?: unknown
+): StyleSettings {
 	const [
 		backgroundImage,
 		backgroundSize,
@@ -538,10 +577,11 @@ export function useBlockSettings( name, parentLayout ) {
 		shadow,
 	] );
 
-	return useSettingsForBlockElement( rawSettings, name );
+	// Theme.json settings arrive untyped.
+	return useSettingsForBlockElement( rawSettings as StyleSettings, name );
 }
 
-export function createBlockEditFilter( features ) {
+export function createBlockEditFilter( features: BlockEditFeature[] ) {
 	// We don't want block controls to re-render when typing inside a block.
 	// `memo` will prevent re-renders unless props change, so only pass the
 	// needed props and not the whole attributes object.
@@ -550,7 +590,7 @@ export function createBlockEditFilter( features ) {
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
 		( OriginalBlockEdit ) =>
-			function WithBlockEditHooks( props ) {
+			function WithBlockEditHooks( props: BlockEditHookProps ) {
 				const context = useBlockEditContext();
 				// CAUTION: code added before this line will be executed for all
 				// blocks, not just those that support the feature! Code added
@@ -558,13 +598,16 @@ export function createBlockEditFilter( features ) {
 				// performance.
 				return [
 					...features.map( ( feature, i ) => {
+						// Every feature was mapped above to carry its memoized `Edit`.
 						const {
 							Edit,
 							hasSupport,
 							attributeKeys = [],
 							shareWithChildBlocks,
 							supportsPatternEditing,
-						} = feature;
+						} = feature as BlockEditFeature & {
+							Edit: BlockEditFeature[ 'edit' ];
+						};
 						// Explicit `false` hides the feature during pattern editing,
 						// even when the block is selected.
 						if (
@@ -592,7 +635,7 @@ export function createBlockEditFilter( features ) {
 							return null;
 						}
 
-						const neededProps = {};
+						const neededProps: Record< string, unknown > = {};
 						for ( const key of attributeKeys ) {
 							if ( props.attributes[ key ] ) {
 								neededProps[ key ] = props.attributes[ key ];
@@ -630,9 +673,16 @@ function BlockProps( {
 	useBlockProps: hook,
 	setAllWrapperProps,
 	...props
+}: {
+	index: number;
+	useBlockProps: BlockListBlockFeature[ 'useBlockProps' ];
+	setAllWrapperProps: Dispatch<
+		SetStateAction< ( BlockWrapperProps | undefined )[] >
+	>;
+	[ prop: string ]: unknown;
 } ) {
 	const wrapperProps = hook( props );
-	const setWrapperProps = ( next ) =>
+	const setWrapperProps = ( next: BlockWrapperProps | undefined ) =>
 		setAllWrapperProps( ( prev ) => {
 			const nextAll = [ ...prev ];
 			nextAll[ index ] = next;
@@ -653,13 +703,15 @@ function BlockProps( {
 
 const BlockPropsPure = memo( BlockProps );
 
-export function createBlockListBlockFilter( features ) {
+export function createBlockListBlockFilter(
+	features: BlockListBlockFeature[]
+) {
 	const withBlockListBlockHooks = createHigherOrderComponent(
 		( BlockListBlock ) =>
-			function WithBlockListBlockHooks( props ) {
-				const [ allWrapperProps, setAllWrapperProps ] = useState(
-					Array( features.length ).fill( undefined )
-				);
+			function WithBlockListBlockHooks( props: BlockListBlockHookProps ) {
+				const [ allWrapperProps, setAllWrapperProps ] = useState<
+					( BlockWrapperProps | undefined )[]
+				>( Array( features.length ).fill( undefined ) );
 				return [
 					...features.map( ( feature, i ) => {
 						const {
@@ -669,7 +721,7 @@ export function createBlockListBlockFilter( features ) {
 							isMatch,
 						} = feature;
 
-						const neededProps = {};
+						const neededProps: Record< string, unknown > = {};
 						for ( const key of attributeKeys ) {
 							if ( props.attributes[ key ] ) {
 								neededProps[ key ] = props.attributes[ key ];
@@ -707,9 +759,13 @@ export function createBlockListBlockFilter( features ) {
 					<BlockListBlock
 						key="edit"
 						{ ...props }
-						wrapperProps={ allWrapperProps
-							.filter( Boolean )
-							.reduce( ( acc, wrapperProps ) => {
+						wrapperProps={
+							// `filter( Boolean )` drops the unset wrapper props.
+							(
+								allWrapperProps.filter(
+									Boolean
+								) as BlockWrapperProps[]
+							 ).reduce( ( acc, wrapperProps ) => {
 								return {
 									...acc,
 									...wrapperProps,
@@ -722,7 +778,8 @@ export function createBlockListBlockFilter( features ) {
 										...wrapperProps.style,
 									},
 								};
-							}, props.wrapperProps || {} ) }
+							}, props.wrapperProps || {} )
+						}
 					/>,
 				];
 			},
@@ -735,12 +792,16 @@ export function createBlockListBlockFilter( features ) {
 	);
 }
 
-export function createBlockSaveFilter( features ) {
-	function extraPropsFromHooks( props, name, attributes ) {
+export function createBlockSaveFilter( features: BlockSaveFeature[] ) {
+	function extraPropsFromHooks(
+		props: Record< string, unknown >,
+		name: BlockType,
+		attributes: Record< string, unknown >
+	) {
 		return features.reduce( ( accu, feature ) => {
 			const { hasSupport, attributeKeys = [], addSaveProps } = feature;
 
-			const neededAttributes = {};
+			const neededAttributes: Record< string, unknown > = {};
 			for ( const key of attributeKeys ) {
 				if ( attributes[ key ] ) {
 					neededAttributes[ key ] = attributes[ key ];
@@ -768,7 +829,7 @@ export function createBlockSaveFilter( features ) {
 	addFilter(
 		'blocks.getSaveContent.extraProps',
 		'core/editor/hooks',
-		( props ) => {
+		( props: Record< string, unknown > ) => {
 			// Previously we had a filter deleting the className if it was an empty
 			// string. That filter is no longer running, so now we need to delete it
 			// here.
