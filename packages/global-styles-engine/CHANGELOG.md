@@ -7,6 +7,10 @@
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 -   Stop normalizing deprecated style state aliases and falling back to legacy style paths; global styles must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
 
+### Bug Fixes
+
+-   Scope element selectors inside blocks with `scopeSelector`, so a comma inside parentheses, such as in the `textInput` element's `input:where(...)`, no longer splits the selector. Block element selectors are now scoped the same way as on the server.
+
 ## 1.24.0 (2026-10-07)
 
 ### New Features
