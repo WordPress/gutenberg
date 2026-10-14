@@ -84,6 +84,10 @@ function readFirstArgument( gradient: string, start: number ) {
  * Only the first argument is searched, at its top level, so a color stop like
  * `color-mix( in srgb, … )` is never mistaken for one.
  *
+ * This is a workaround until `gradient-parser` supports color interpolation
+ * methods. It can be removed once an upstream release does:
+ * https://github.com/rafaelcaricio/gradient-parser/issues/57
+ *
  * @param gradient CSS gradient.
  */
 function extractColorInterpolation( gradient: string ) {
