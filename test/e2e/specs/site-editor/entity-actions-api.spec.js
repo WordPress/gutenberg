@@ -135,6 +135,64 @@ test.describe( 'Entity actions API', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'replaces a core action, keeping its JavaScript parts', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const binPage = await createPage( requestUtils, {
+			title: 'Bin Page',
+		} );
+		await admin.visitSiteEditor( { postType: 'page' } );
+		await openRowActions( page, 'Bin Page' );
+
+		// The core action is gone, under its label and as a primary action.
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Trash…' } )
+		).toHaveCount( 0 );
+		await expect(
+			page
+				.getByRole( 'row', { name: /Bin Page/ } )
+				.getByRole( 'button', { name: 'Trash…' } )
+		).toHaveCount( 0 );
+
+		// The substitute opens the confirmation of the core action.
+		await page.getByRole( 'menuitem', { name: 'Move to bin…' } ).click();
+		const dialog = page.getByRole( 'dialog' );
+		await expect( dialog ).toContainText(
+			'Are you sure you want to move "Bin Page" to the trash?'
+		);
+		await dialog.getByRole( 'button', { name: 'Trash' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: '"Bin Page" moved to the trash.' } )
+		).toBeVisible();
+		await expect
+			.poll(
+				async () =>
+					(
+						await requestUtils.rest( {
+							path: `/wp/v2/pages/${ binPage.id }`,
+						} )
+					).status
+			)
+			.toBe( 'trash' );
+	} );
+
+	test( 'removes a core action', async ( { admin, page, requestUtils } ) => {
+		await createPage( requestUtils, { title: 'Single Page' } );
+		await admin.visitSiteEditor( { postType: 'page' } );
+		await openRowActions( page, 'Single Page' );
+
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Rename…' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Duplicate…' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'shows the actions in the editor inspector', async ( {
 		admin,
 		editor,
@@ -152,12 +210,14 @@ test.describe( 'Entity actions API', () => {
 			.getByRole( 'button', { name: 'Actions' } )
 			.click();
 
-		// The core actions show along with the action registered on the server.
-		await expect(
-			page.getByRole( 'menuitem', { name: 'Duplicate…' } )
-		).toBeVisible();
 		await expect(
 			page.getByRole( 'menuitem', { name: 'Close comments' } )
 		).toBeVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Move to bin…' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Duplicate…' } )
+		).toHaveCount( 0 );
 	} );
 } );

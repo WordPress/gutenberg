@@ -7,7 +7,7 @@
  * Extends the actions of Pages through the entity actions API, one self-contained
  * function per case. Every case registers its actions on
  * `wp_entity_actions_api_init`, the action the registry fires the first time its
- * actions are read, after `init`.
+ * actions are read, after `init`, once the core actions are registered.
  *
  * 1. `add_action_with_script_module`: an action
  *    (`gutenberg-test-entity-actions-api/close-comments`) whose data is registered
@@ -16,6 +16,10 @@
  *    `gutenberg-test-entity-actions-api/archive` action no registration names: the
  *    module augments the actions it was registered with, so the entry is
  *    ignored and the action is not shown.
+ * 2. `replace_action`: a substitute for a core action (`move-to-trash`),
+ *    unregistered and registered again with a new label, and with the script
+ *    module of the core action, which keeps its JavaScript parts.
+ * 3. `remove_action`: the removal of a core action (`duplicate-post`).
  *
  * @package gutenberg-test-entity-actions-api
  */
@@ -57,3 +61,40 @@ function gutenberg_test_entity_actions_api_add_action_with_script_module() {
 	);
 }
 add_action( 'wp_entity_actions_api_init', 'gutenberg_test_entity_actions_api_add_action_with_script_module' );
+
+/**
+ * Case 2: a substitute for a core action (`move-to-trash`). Unregistering
+ * drops its definition and detaches its script module, so the registration
+ * that follows is the whole action: a new label, and not primary, so it moves
+ * from the row to the actions menu. Registered with the script module of the
+ * core action, it keeps its eligibility and its confirmation modal. The
+ * default priority runs after the core actions: there is nothing to
+ * unregister before.
+ */
+function gutenberg_test_entity_actions_api_replace_action() {
+	wp_unregister_entity_actions( 'postType', 'page', array( 'move-to-trash' ) );
+	wp_register_entity_actions(
+		'gutenberg-test-entity-actions-api',
+		'postType',
+		'page',
+		array(
+			array(
+				'id'                => 'move-to-trash',
+				'label'             => 'Move to bin…',
+				'supportsBulk'      => true,
+				'hideModalHeader'   => true,
+				'modalFocusOnMount' => 'firstContentElement',
+			),
+		),
+		'@wordpress/core-actions/post_type_supports'
+	);
+}
+add_action( 'wp_entity_actions_api_init', 'gutenberg_test_entity_actions_api_replace_action' );
+
+/**
+ * Case 3: the removal of a core action (`duplicate-post`).
+ */
+function gutenberg_test_entity_actions_api_remove_action() {
+	wp_unregister_entity_actions( 'postType', 'page', array( 'duplicate-post' ) );
+}
+add_action( 'wp_entity_actions_api_init', 'gutenberg_test_entity_actions_api_remove_action' );
