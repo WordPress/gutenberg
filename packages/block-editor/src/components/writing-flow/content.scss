@@ -7,6 +7,6 @@
 	position: fixed;
 	z-index: z-index(".block-editor-writing-flow__selection-box");
 	pointer-events: none;
-	border: $border-width solid var(--wp-admin-theme-color);
-	background-color: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+	border: $border-width solid var(--wpds-color-stroke-interactive-brand);
+	background-color: color-mix(in srgb, var(--wpds-color-background-interactive-brand-strong) 10%, transparent);
 }
