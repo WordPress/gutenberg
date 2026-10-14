@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Export `compileStyleFile()` and `compileCss()` from `@wordpress/build/compile-style`, so a package can emit its styles in another form with the same scoped class names as the JavaScript build.
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

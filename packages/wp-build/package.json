@@ -35,6 +35,7 @@
 		".": {
 			"import": "./lib/build.mjs"
 		},
+		"./compile-style": "./lib/compile-style-file.mjs",
 		"./package.json": "./package.json"
 	},
 	"bin": {
