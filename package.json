@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.1.0",
+	"version": "24.2.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -93,14 +93,16 @@
 		"@wordpress/stylelint-tools": "file:./tools/stylelint",
 		"concurrently": "^9.2.1",
 		"cross-env": "^7.0.3",
+		"eslint": "^10.0.0",
 		"husky": "^7.0.0",
 		"lerna": "^10.0.1",
 		"lint-staged": "^16.4.0",
+		"prettier": "npm:wp-prettier@^3.9.6",
+		"stylelint": "^17.14.1",
 		"syncpack": "^15.3.1",
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
-		"jsdom": "26.1.0",
 		"sockjs": {
 			"uuid": "^11.1.1"
 		},

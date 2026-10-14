@@ -7,22 +7,17 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { COLORS } from '../utils';
-import { floatClamp, useControlledRangeValue } from './utils';
+import {
+	floatClamp,
+	useControlledRangeValue,
+	getCSSWideKeyword,
+} from './utils';
 import { clamp } from '../utils/math';
 import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
-import {
-	ActionRightWrapper,
-	AfterIconWrapper,
-	BeforeIconWrapper,
-	InputNumber,
-	Root,
-	Track,
-	ThumbWrapper,
-	Thumb,
-	Wrapper,
-} from './styles/range-control-styles';
+import NumberControl from '../number-control';
+import styles from './style.module.scss';
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { space } from '../utils/space';
@@ -126,8 +121,13 @@ function UnforwardedRangeControl(
 
 	const classes = clsx( 'components-range-control', className );
 
+	const colorKeyword = getCSSWideKeyword( colorProp );
+	const trackColorKeyword = getCSSWideKeyword( trackColor );
+
 	const wrapperClasses = clsx(
 		'components-range-control__wrapper',
+		styles.wrapper,
+		colorKeyword && styles[ `color-${ colorKeyword }` ],
 		!! marks && 'is-marked'
 	);
 
@@ -226,16 +226,25 @@ function UnforwardedRangeControl(
 			id={ `${ id }` }
 			help={ help }
 		>
-			<Root className="components-range-control__root">
-				{ beforeIcon && (
-					<BeforeIconWrapper>
-						<Icon icon={ beforeIcon } />
-					</BeforeIconWrapper>
+			<div
+				className={ clsx(
+					'components-range-control__root',
+					styles.root,
+					{ [ styles[ 'is-rtl' ] ]: isRTL() }
 				) }
-				<Wrapper
+			>
+				{ beforeIcon && (
+					<span className={ styles[ 'before-icon' ] }>
+						<Icon icon={ beforeIcon } />
+					</span>
+				) }
+				<div
 					className={ wrapperClasses }
-					color={ colorProp }
-					marks={ !! marks }
+					style={
+						{
+							'--_wp-components-range-control-color': colorProp,
+						} as React.CSSProperties
+					}
 				>
 					<InputRange
 						{ ...otherProps }
@@ -265,24 +274,43 @@ function UnforwardedRangeControl(
 						step={ step }
 						value={ rangeFillValue }
 					/>
-					<Track
+					<span
 						aria-hidden
-						className="components-range-control__track"
-						disabled={ disabled }
-						style={ { width: fillValueOffset } }
-						trackColor={ trackColor }
+						className={ clsx(
+							'components-range-control__track',
+							styles.track,
+							{ [ styles[ 'is-disabled' ] ]: disabled },
+							! disabled &&
+								trackColorKeyword &&
+								styles[ `background-${ trackColorKeyword }` ]
+						) }
+						{ ...{ disabled } }
+						style={
+							{
+								width: fillValueOffset,
+								'--_wp-components-range-control-track-color':
+									trackColor || 'currentColor',
+							} as React.CSSProperties
+						}
 					/>
-					<ThumbWrapper
-						className="components-range-control__thumb-wrapper"
+					<span
+						className={ clsx(
+							'components-range-control__thumb-wrapper',
+							styles[ 'thumb-wrapper' ],
+							{ [ styles[ 'is-disabled' ] ]: disabled }
+						) }
 						style={ offsetStyle }
-						disabled={ disabled }
+						{ ...{ disabled } }
 					>
-						<Thumb
+						<span
 							aria-hidden
-							isFocused={ isThumbFocused }
-							disabled={ disabled }
+							className={ clsx( styles.thumb, {
+								[ styles[ 'is-disabled' ] ]: disabled,
+								[ styles[ 'is-focused' ] ]: isThumbFocused,
+							} ) }
+							{ ...{ disabled } }
 						/>
-					</ThumbWrapper>
+					</span>
 					{ enableTooltip && (
 						<SimpleTooltip
 							className="components-range-control__tooltip"
@@ -294,16 +322,19 @@ function UnforwardedRangeControl(
 							value={ value }
 						/>
 					) }
-				</Wrapper>
+				</div>
 				{ afterIcon && (
-					<AfterIconWrapper>
+					<span className={ styles[ 'after-icon' ] }>
 						<Icon icon={ afterIcon } />
-					</AfterIconWrapper>
+					</span>
 				) }
 				{ hasInputField && (
-					<InputNumber
+					<NumberControl
 						aria-label={ label }
-						className="components-range-control__number"
+						className={ clsx(
+							'components-range-control__number',
+							styles[ 'input-number' ]
+						) }
 						disabled={ disabled }
 						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
@@ -319,7 +350,7 @@ function UnforwardedRangeControl(
 					/>
 				) }
 				{ allowReset && (
-					<ActionRightWrapper>
+					<span className={ styles[ 'action-right' ] }>
 						<Button
 							className="components-range-control__reset"
 							// If the RangeControl itself is disabled, the reset button shouldn't be in the tab sequence.
@@ -341,9 +372,9 @@ function UnforwardedRangeControl(
 						>
 							{ __( 'Reset' ) }
 						</Button>
-					</ActionRightWrapper>
+					</span>
 				) }
-			</Root>
+			</div>
 		</BaseControl>
 	);
 }

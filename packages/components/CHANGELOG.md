@@ -4,8 +4,51 @@
 
 ### Breaking Changes
 
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
+    -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
+    -   `RangeControl` ([#84562](https://github.com/WordPress/gutenberg/pull/84562))
+    -   `Tabs` ([#84332](https://github.com/WordPress/gutenberg/pull/84332))
+    -   `NumberControl` ([#84330](https://github.com/WordPress/gutenberg/pull/84330))
+    -   `TimePicker` ([#84331](https://github.com/WordPress/gutenberg/pull/84331))
+    -   `CustomSelectControl` and `CustomSelectControlV2` ([#84131](https://github.com/WordPress/gutenberg/pull/84131))
+    -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
+    -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Deprecations
+
+-   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+### Bug Fixes
+
+-   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
+-   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
+-   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
+-   `Tabs`: Restore the `fit-content` width of horizontal tab lists, which stretched to full width after the SCSS Modules migration ([#84626](https://github.com/WordPress/gutenberg/pull/84626)).
+-   `Snackbar`: Return focus to the previously focused control when dismissing a focused snackbar outside SnackbarList, including portaled snackbars ([#84342](https://github.com/WordPress/gutenberg/pull/84342)).
+-   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
+-   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
+-   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
+-   `ToolsPanel`: Use setting-first accessible action labels without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
+-   `DropdownMenu`: Keep the menu closed on ArrowDown when the toggle is disabled ([#84556](https://github.com/WordPress/gutenberg/pull/84556)).
+-   `Modal`: Keep an accessible name on the dialog when `title` is combined with `__experimentalHideHeader`. The heading that `aria-labelledby` referenced is not rendered in that case, so the title is now applied as the dialog's `aria-label` instead ([#82645](https://github.com/WordPress/gutenberg/pull/82645)).
+-   `ColorPicker`: Make the HSL and RGB input labels translatable, and name the Hue and Alpha inputs after their color format ([#70214](https://github.com/WordPress/gutenberg/pull/70214)).
+-   `CustomGradientPicker`: Use the bundled `gradient-parser` types, preserve gradient angles when editing, and keep unsupported gradient syntax on the existing fallback path ([#84582](https://github.com/WordPress/gutenberg/pull/84582)).
+
+### Internal
+
+-   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
+-   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
+
+## 42.0.0 (2026-10-07)
+
+### Breaking Changes
+
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `FontSizePicker` ([#84126](https://github.com/WordPress/gutenberg/pull/84126))
+    -   `PaletteEdit` ([#84130](https://github.com/WordPress/gutenberg/pull/84130)).
     -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
     -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
     -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
@@ -31,6 +74,8 @@
 -   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
 
 ### Bug Fixes
+
+-   `CustomGradientPicker`: Extend the clickable area of control points and the plus button to the full height of the gradient bar ([#84124](https://github.com/WordPress/gutenberg/pull/84124)).
 
 -   `Popover`: Keep the `will-change: transform` hint only while the popover is moving, so its content is no longer left on a compositing layer that Chrome can render blurry ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
 -   `RadioControl`: Keep radio circles visually 16px at all viewport widths while retaining a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).

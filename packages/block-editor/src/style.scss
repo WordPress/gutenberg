@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/default-custom-properties";
 @use "@wordpress/base-styles/mixins" as *;
 @use "./autocompleters/style.scss" as *;
+@use "./components/background-clip-control/style.scss" as *;
 @use "./components/background-image-control/style.scss" as *;
 @use "./components/block-alignment-control/style.scss" as *;
 @use "./components/block-canvas/style.scss" as *;
@@ -9,7 +10,6 @@
 @use "./components/block-tools/style.scss" as *;
 @use "./components/block-lock/style.scss" as *;
 @use "./components/block-allowed-blocks/style.scss" as *;
-@use "./components/block-breadcrumb/style.scss" as *;
 @use "./components/block-card/style.scss" as *;
 @use "./components/block-compare/style.scss" as *;
 @use "./components/block-draggable/style.scss" as *;

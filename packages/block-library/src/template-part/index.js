@@ -72,7 +72,7 @@ export const init = () => {
 					return false;
 				}
 			}
-			return true;
+			return canInsert;
 		}
 	);
 
