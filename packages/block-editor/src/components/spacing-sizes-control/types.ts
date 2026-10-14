@@ -5,5 +5,5 @@ export type SideValues = Partial< Record< Side | 'all', string | undefined > >;
 export interface SpacingSize {
 	name?: string;
 	slug: string | number;
-	size?: string;
+	size?: string | number;
 }
