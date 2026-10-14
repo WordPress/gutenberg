@@ -1781,7 +1781,7 @@ function renderStylesNode(
 						? getPseudoRuleSelector(
 								selectorForRule,
 								selectorSuffix
-						  )
+							)
 						: `:root :where(${ selectorForRule })`;
 					const rules = declarations.join( ';' );
 					ruleset += `${ featureRuleSelector }{${ rules };}`;
