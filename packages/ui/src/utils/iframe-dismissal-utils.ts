@@ -75,6 +75,7 @@ export function isInsideCurrentPopup( event: Event, trigger: Element ) {
 type IframePressListenersOptions = {
 	enabled: boolean;
 	onClick?: ( event: Event ) => void;
+	onMouseDown?: ( event: Event ) => void;
 	onPointerDown: ( event: Event ) => void;
 	ownerDocument: Document | null;
 };
@@ -88,7 +89,8 @@ type IframePressListenersOptions = {
 export function useIframePressListeners(
 	options: IframePressListenersOptions
 ) {
-	const { enabled, onClick, onPointerDown, ownerDocument } = options;
+	const { enabled, onClick, onMouseDown, onPointerDown, ownerDocument } =
+		options;
 	useEffect( () => {
 		if ( ! enabled || ! ownerDocument ) {
 			return;
@@ -100,6 +102,9 @@ export function useIframePressListeners(
 		): ( () => void ) => {
 			if ( listenForPointerDown ) {
 				document.addEventListener( 'pointerdown', onPointerDown, true );
+				if ( onMouseDown ) {
+					document.addEventListener( 'mousedown', onMouseDown, true );
+				}
 				if ( onClick ) {
 					document.addEventListener( 'click', onClick, true );
 				}
@@ -168,6 +173,13 @@ export function useIframePressListeners(
 						onPointerDown,
 						true
 					);
+					if ( onMouseDown ) {
+						document.removeEventListener(
+							'mousedown',
+							onMouseDown,
+							true
+						);
+					}
 					if ( onClick ) {
 						document.removeEventListener( 'click', onClick, true );
 					}
@@ -176,5 +188,5 @@ export function useIframePressListeners(
 		};
 
 		return observeDocument( ownerDocument, false );
-	}, [ enabled, onClick, onPointerDown, ownerDocument ] );
+	}, [ enabled, onClick, onMouseDown, onPointerDown, ownerDocument ] );
 }

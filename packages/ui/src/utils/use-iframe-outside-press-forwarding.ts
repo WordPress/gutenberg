@@ -21,14 +21,17 @@ function dispatchOutsidePress( event: Event, ownerDocument: Document ) {
 		return;
 	}
 
-	const PointerEventConstructor = ownerDocument.defaultView?.PointerEvent;
-	if ( ! PointerEventConstructor ) {
+	const EventConstructor =
+		event.type === 'mousedown'
+			? ownerDocument.defaultView?.MouseEvent
+			: ownerDocument.defaultView?.PointerEvent;
+	if ( ! EventConstructor ) {
 		return;
 	}
 
 	const pointerEvent = event as PointerEvent;
 	frameElement.dispatchEvent(
-		new PointerEventConstructor( event.type, {
+		new EventConstructor( event.type, {
 			bubbles: true,
 			button: pointerEvent.button,
 			detail: pointerEvent.detail,
@@ -47,7 +50,7 @@ type IframeOutsidePressForwardingOptions< TEventDetails > = {
 
 /**
  * Forwards outside same-origin iframe presses for non-modal form popups.
- * Dispatches pointerdown and click on the containing iframe for Base UI dismissal.
+ * Dispatches pointer and mouse presses on the containing iframe for Base UI dismissal.
  * Requires a trigger captured from an opening onOpenChange notification.
  *
  * @param options Popup state and open-change handler.
@@ -82,6 +85,7 @@ export function useIframeOutsidePressForwarding<
 	useIframePressListeners( {
 		enabled: open && modal === false && ! disabled && trigger !== null,
 		onClick: handleIframePress,
+		onMouseDown: handleIframePress,
 		onPointerDown: handleIframePress,
 		ownerDocument: trigger?.ownerDocument ?? null,
 	} );
