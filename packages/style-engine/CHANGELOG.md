@@ -12,7 +12,7 @@
 
 ### Enhancements
 
--   Output spacing preset values for `typography.textIndent` as CSS custom properties in the PHP style engine.
+-   Output spacing preset values for `typography.textIndent` as CSS custom properties in the PHP style engine ([#84669](https://github.com/WordPress/gutenberg/pull/84669)).
 
 ## 2.57.0 (2026-10-07)
 
