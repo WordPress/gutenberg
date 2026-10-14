@@ -764,13 +764,29 @@ class Tests_Actions_API extends WP_UnitTestCase {
 					'label' => 'Numeric id',
 				),
 				$this->action( 'share' ),
+				$this->action( '0' ),
 			)
 		);
 
-		$this->assertSame( array( 'feature', 'share' ), $registered, 'The valid definitions are registered.' );
+		$this->assertSame( array( 'feature', 'share', '0' ), $registered, 'The valid definitions are registered, `0` included.' );
 		$this->assertCount( 1, $reported );
 		$this->assertStringContainsString( 'postType "page"', $reported[0], 'The notice names the entity.' );
-		$this->assertStringContainsString( 'skipped: #2, #3, #4', $reported[0], 'The notice names the positions of the invalid definitions.' );
+		$this->assertStringContainsString( 'skipped: #2, #3, #4.', $reported[0], 'The notice names the positions of the invalid definitions.' );
+		$this->assertStringContainsString( 'The rest of the actions of the call are stored.', $reported[0] );
+	}
+
+	/**
+	 * A call whose definitions are all invalid registers nothing, and its
+	 * notice does not mention the rest of the call.
+	 */
+	public function test_a_call_with_only_invalid_definitions_registers_nothing() {
+		$this->setExpectedIncorrectUsage( 'WP_Actions_Registry::register' );
+		$reported   = &$this->record_notices( 'WP_Actions_Registry::register' );
+		$registered = $this->register_actions( 'postType', 'page', array( array( 'label' => 'No id' ) ) );
+
+		$this->assertSame( array(), $registered );
+		$this->assertCount( 1, $reported );
+		$this->assertStringNotContainsString( 'The rest of the actions', $reported[0] );
 	}
 
 	/**
@@ -860,6 +876,47 @@ class Tests_Actions_API extends WP_UnitTestCase {
 		$ids = array_column( wp_get_registered_actions( 'postType', 'page' ), 'id' );
 		$this->assertContains( 'rename-post', $ids, 'A definition in place of an id is skipped, not matched.' );
 		$this->assertNotContains( 'move-to-trash', $ids );
+	}
+
+	/**
+	 * A call whose ids are all invalid unregisters nothing, and its notice
+	 * does not mention the rest of the call.
+	 */
+	public function test_unregistering_only_invalid_ids_unregisters_nothing() {
+		$this->setExpectedIncorrectUsage( 'WP_Actions_Registry::unregister' );
+		$reported     = &$this->record_notices( 'WP_Actions_Registry::unregister' );
+		$unregistered = null;
+		$this->on_actions_api_init(
+			static function () use ( &$unregistered ) {
+				$unregistered = wp_unregister_actions( 'postType', 'page', array( '' ) );
+			}
+		);
+
+		$this->assertSame( array(), $unregistered );
+		$this->assertCount( 2, wp_get_registered_actions( 'postType', 'page' ) );
+		$this->assertCount( 1, $reported );
+		$this->assertStringNotContainsString( 'The rest of the actions', $reported[0] );
+	}
+
+	/**
+	 * Reading the actions or the script modules of an entity whose kind or
+	 * name is not a non-empty string is reported, and returns nothing.
+	 */
+	public function test_reading_an_invalid_entity_is_reported() {
+		$this->setExpectedIncorrectUsage( 'WP_Actions_Registry::get_registered' );
+		$this->setExpectedIncorrectUsage( 'WP_Actions_Registry::get_registered_action_modules' );
+
+		$this->assertSame( array(), wp_get_registered_actions( 'postType', array( 'page' ) ) );
+		$this->assertSame( array(), wp_get_registered_action_modules( '', 'page' ) );
+	}
+
+	/**
+	 * A numeric script module id is read back as a string, like any other.
+	 */
+	public function test_a_numeric_module_id_is_read_as_a_string() {
+		$this->register_actions( 'postType', 'page', array( $this->action( 'feature' ) ), '123' );
+
+		$this->assertSame( array( 'core/defaults', '123' ), wp_get_all_registered_action_modules()['postType']['page'] );
 	}
 
 	/**

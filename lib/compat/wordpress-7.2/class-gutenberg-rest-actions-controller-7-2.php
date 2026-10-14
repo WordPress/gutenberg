@@ -47,11 +47,13 @@ class Gutenberg_REST_Actions_Controller_7_2 extends WP_REST_Controller {
 						'kind' => array(
 							'description' => __( 'Entity kind.', 'gutenberg' ),
 							'type'        => 'string',
+							'minLength'   => 1,
 							'required'    => true,
 						),
 						'name' => array(
 							'description' => __( 'Entity name.', 'gutenberg' ),
 							'type'        => 'string',
+							'minLength'   => 1,
 							'required'    => true,
 						),
 					),
@@ -184,7 +186,8 @@ class Gutenberg_REST_Actions_Controller_7_2 extends WP_REST_Controller {
 		$script_modules = array();
 		foreach ( wp_get_registered_action_modules( $kind, $name ) as $module => $action_ids ) {
 			$script_modules[] = array(
-				'id'      => $module,
+				// A numeric module id is an integer as an array key.
+				'id'      => (string) $module,
 				'actions' => array_values( $action_ids ),
 			);
 		}

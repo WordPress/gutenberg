@@ -368,7 +368,7 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Both `kind` and `name` are required.
+	 * Both `kind` and `name` are required, and cannot be empty.
 	 *
 	 * @covers ::register_routes
 	 */
@@ -380,6 +380,26 @@ class Tests_REST_Actions_Controller extends WP_Test_REST_TestCase {
 
 		$missing_kind = $this->dispatch_request( null, 'page' );
 		$this->assertErrorResponse( 'rest_missing_callback_param', $missing_kind, 400 );
+
+		$empty_kind = $this->dispatch_request( '', 'page' );
+		$this->assertErrorResponse( 'rest_invalid_param', $empty_kind, 400 );
+
+		$empty_name = $this->dispatch_request( 'postType', '' );
+		$this->assertErrorResponse( 'rest_invalid_param', $empty_name, 400 );
+	}
+
+	/**
+	 * A numeric script module id is returned as a string, like any other.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_returns_a_numeric_module_id_as_a_string() {
+		wp_set_current_user( self::$editor_id );
+		$this->register_actions( 'postType', 'page', array( array( 'id' => 'feature' ) ), '123' );
+
+		$script_modules = $this->dispatch_request()->get_data()['script_modules'];
+
+		$this->assertSame( '123', end( $script_modules )['id'] );
 	}
 
 	/**

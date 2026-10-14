@@ -346,8 +346,12 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		 * @param string $kind The entity kind (e.g. `postType`).
 		 * @param string $name The entity name (e.g. `page`).
 		 * @return array[] The list of action definitions, in registration order.
+		 *                 Empty when the entity is invalid.
 		 */
 		public function get_registered( $kind, $name ) {
+			if ( ! $this->validate_entity( __METHOD__, $kind, $name ) ) {
+				return array();
+			}
 			$this->initialize();
 			return array_values( $this->actions[ $kind ][ $name ] ?? array() );
 		}
@@ -376,9 +380,13 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 		 * @param string $name The entity name (e.g. `page`).
 		 * @return array<string, string[]> The ids of the actions each module
 		 *                                 applies to, keyed by module id, in
-		 *                                 registration order.
+		 *                                 registration order. Empty when the
+		 *                                 entity is invalid.
 		 */
 		public function get_registered_action_modules( $kind, $name ) {
+			if ( ! $this->validate_entity( __METHOD__, $kind, $name ) ) {
+				return array();
+			}
 			$this->initialize();
 			return $this->action_modules[ $kind ][ $name ] ?? array();
 		}
@@ -394,7 +402,13 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			$this->initialize();
 			return array_map(
 				static function ( $entities ) {
-					return array_map( 'array_keys', $entities );
+					return array_map(
+						static function ( $modules ) {
+							// A numeric module id is an integer as an array key.
+							return array_map( 'strval', array_keys( $modules ) );
+						},
+						$entities
+					);
 				},
 				$this->action_modules
 			);
@@ -572,7 +586,7 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			$valid   = array();
 			$invalid = array();
 			foreach ( $actions as $position => $action ) {
-				if ( is_array( $action ) && ! empty( $action['id'] ) && is_string( $action['id'] ) ) {
+				if ( is_array( $action ) && isset( $action['id'] ) && is_string( $action['id'] ) && '' !== $action['id'] ) {
 					$valid[] = $action;
 				} else {
 					$invalid[] = '#' . ( $position + 1 );
@@ -580,17 +594,17 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			}
 
 			if ( $invalid ) {
-				_doing_it_wrong(
-					$method,
-					sprintf(
-						/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of positions, e.g. #2, #4. */
-						__( 'Every action definition must be an array with a non-empty string `id`. These definitions of %1$s "%2$s" are skipped: %3$s. The rest of the actions of the call are stored.', 'gutenberg' ),
-						$kind,
-						$name,
-						implode( ', ', $invalid )
-					),
-					'7.2.0'
+				$message = sprintf(
+					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of positions, e.g. #2, #4. */
+					__( 'Every action definition must be an array with a non-empty string `id`. These definitions of %1$s "%2$s" are skipped: %3$s.', 'gutenberg' ),
+					$kind,
+					$name,
+					implode( ', ', $invalid )
 				);
+				if ( $valid ) {
+					$message .= ' ' . __( 'The rest of the actions of the call are stored.', 'gutenberg' );
+				}
+				_doing_it_wrong( $method, $message, '7.2.0' );
 			}
 
 			return $valid;
@@ -619,17 +633,17 @@ if ( ! class_exists( 'WP_Actions_Registry' ) ) {
 			}
 
 			if ( $invalid ) {
-				_doing_it_wrong(
-					$method,
-					sprintf(
-						/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of positions, e.g. #2, #4. */
-						__( 'Every action id must be a non-empty string. These ids of %1$s "%2$s" are skipped: %3$s. The rest of the actions of the call are unregistered.', 'gutenberg' ),
-						$kind,
-						$name,
-						implode( ', ', $invalid )
-					),
-					'7.2.0'
+				$message = sprintf(
+					/* translators: 1: Entity kind, e.g. postType. 2: Entity name, e.g. page. 3: Comma-separated list of positions, e.g. #2, #4. */
+					__( 'Every action id must be a non-empty string. These ids of %1$s "%2$s" are skipped: %3$s.', 'gutenberg' ),
+					$kind,
+					$name,
+					implode( ', ', $invalid )
 				);
+				if ( $valid ) {
+					$message .= ' ' . __( 'The rest of the actions of the call are unregistered.', 'gutenberg' );
+				}
+				_doing_it_wrong( $method, $message, '7.2.0' );
 			}
 
 			return $valid;
