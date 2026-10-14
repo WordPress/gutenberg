@@ -228,6 +228,9 @@ if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
 }
 if ( is_dir( __DIR__ . '/../build/scripts/core-actions' ) ) {
 	require_once __DIR__ . '/../build/scripts/core-actions/index.php';
+	// The plugin registers its copy of the core actions instead of the one
+	// WordPress ships, which would otherwise register them first.
+	remove_action( 'wp_entity_actions_api_init', 'register_core_entity_actions', 0 );
 }
 
 // Block supports overrides.
