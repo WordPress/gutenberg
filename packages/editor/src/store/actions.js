@@ -319,7 +319,19 @@ export const savePost =
 				error,
 				options,
 			} );
-			if ( args.length ) {
+			// A failed manual save is the notice to act on, so a failed autosave
+			// doesn't add a second one next to it.
+			const isManualSaveFailureShown =
+				options.isAutosave &&
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.some(
+						( notice ) =>
+							notice.id === 'editor-save' &&
+							notice.status === 'error'
+					);
+			if ( args.length && ! isManualSaveFailureShown ) {
 				const [ noticeMessage ] = args;
 				if (
 					error.message &&

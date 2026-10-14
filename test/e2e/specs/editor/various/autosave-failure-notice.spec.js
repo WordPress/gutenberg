@@ -6,6 +6,9 @@ const {
 const AUTOSAVE_FAILED =
 	'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.';
 
+const UPDATING_FAILED_OFFLINE =
+	'Updating failed because you were offline. Please verify your connection and try again.';
+
 const withDetails = ( details ) =>
 	`${ AUTOSAVE_FAILED } <details class="editor-save-error-details"><summary>Show details</summary><span class="editor-save-error-details__message">${ details }</span></details>`;
 
@@ -334,22 +337,23 @@ test.describe( 'Autosave failure notice', () => {
 				.toEqual( [ 'Draft saved.' ] );
 		} );
 
-		test( 'failed manual save notice stays after an autosave succeeds', async ( {
-			admin,
+		test( 'notice is replaced by a failed manual save', async ( {
 			autosaveFailure,
 			context,
 			page,
 			pageUtils,
-			requestUtils,
 		} ) => {
-			const { id } = await requestUtils.createPost( {
-				title: 'Published',
-				status: 'publish',
-			} );
-			await admin.editPost( id );
-			await autosaveFailure.edit();
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
+			expect( await autosaveFailure.getNotices() ).toEqual( [
+				AUTOSAVE_FAILED,
+			] );
+
 			await context.setOffline( true );
 			await pageUtils.pressKeys( 'primary+s' );
+			await expect
+				.poll( autosaveFailure.getNotices )
+				.toEqual( [ UPDATING_FAILED_OFFLINE ] );
 			await expect
 				.poll( () =>
 					page.evaluate( () =>
@@ -358,11 +362,51 @@ test.describe( 'Autosave failure notice', () => {
 				)
 				.toBe( false );
 			await context.setOffline( false );
-
-			await autosaveFailure.autosave();
-			expect( await autosaveFailure.getNotices() ).toEqual( [
-				'Updating failed because you were offline. Please verify your connection and try again.',
-			] );
 		} );
+
+		for ( const status of [ 'draft', 'publish' ] ) {
+			test( `failed manual save notice stays through later autosaves (${ status })`, async ( {
+				admin,
+				autosaveFailure,
+				context,
+				page,
+				pageUtils,
+				requestUtils,
+			} ) => {
+				const { id } = await requestUtils.createPost( {
+					title: 'Manual save',
+					status,
+				} );
+				await admin.editPost( id );
+				await autosaveFailure.edit();
+				await context.setOffline( true );
+				await pageUtils.pressKeys( 'primary+s' );
+				await expect
+					.poll( () =>
+						page.evaluate( () =>
+							window.wp.data
+								.select( 'core/editor' )
+								.isSavingPost()
+						)
+					)
+					.toBe( false );
+				await context.setOffline( false );
+				expect( await autosaveFailure.getNotices() ).toEqual( [
+					UPDATING_FAILED_OFFLINE,
+				] );
+
+				await autosaveFailure.fail( 'dropped-connection' );
+				await autosaveFailure.autosave();
+				expect( await autosaveFailure.getNotices() ).toEqual( [
+					UPDATING_FAILED_OFFLINE,
+				] );
+
+				await autosaveFailure.stopFailing();
+				await autosaveFailure.autosave();
+				expect( await autosaveFailure.getNotices() ).toEqual( [
+					UPDATING_FAILED_OFFLINE,
+				] );
+			} );
+		}
 	} );
 } );
