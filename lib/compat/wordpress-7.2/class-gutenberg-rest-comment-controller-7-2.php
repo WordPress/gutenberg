@@ -1126,26 +1126,6 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 
 		return $links;
 	}
-
-	/**
-	 * Checks if comment content is allowed.
-	 *
-	 * Extends the 6.9 implementation to also allow reaction content
-	 * (emoji hex keys are always valid content).
-	 *
-	 * @since 7.2.0
-	 *
-	 * @param array $prepared_comment The prepared comment data.
-	 * @return bool True if the content is allowed, false otherwise.
-	 */
-	protected function check_is_comment_content_allowed( $prepared_comment ) {
-		// Note reactions always have content (the emoji hex key).
-		if ( isset( $prepared_comment['comment_type'] ) && 'reaction' === $prepared_comment['comment_type'] ) {
-			return true;
-		}
-
-		return parent::check_is_comment_content_allowed( $prepared_comment );
-	}
 }
 
 /**
