@@ -9,8 +9,10 @@ vi.mock( import( '@wordpress/api-fetch' ) );
 
 const featureCallback = vi.fn();
 
-// The script module the `useActions` tests import.
-vi.mock( 'acme/actions', () => ( {
+// The script module the `useActions` tests import. It only exists as this
+// mock, so it is mocked for the dynamic import of the loader with
+// `vi.doMock()`: `vi.mock( import() )` needs a module TypeScript resolves.
+vi.doMock( 'acme/actions', () => ( {
 	default: { 'acme/feature': { callback: featureCallback } },
 } ) );
 
