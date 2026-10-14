@@ -161,6 +161,38 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 		$this->assertStringStartsWith( 'https://example.org/my-plugin/ui/', wp_styles()->registered['my-plugin-ui-components']->src );
 	}
 
+	/**
+	 * @dataProvider data_loose_booleans
+	 *
+	 * @param mixed $value A value `rest_validate_value_from_schema()` accepts as a boolean.
+	 */
+	public function test_accepts_the_values_wordpress_treats_as_booleans( $value ) {
+		$this->assertSame(
+			gutenberg_get_ui_component(
+				'button',
+				array(
+					'label'    => 'Save',
+					'disabled' => true,
+				)
+			),
+			gutenberg_get_ui_component(
+				'button',
+				array(
+					'label'    => 'Save',
+					'disabled' => $value,
+				)
+			)
+		);
+	}
+
+	public function data_loose_booleans() {
+		return array(
+			'int'    => array( 1 ),
+			'string' => array( '1' ),
+			'word'   => array( 'true' ),
+		);
+	}
+
 	public function test_escapes_text_and_attribute_slots() {
 		$html = gutenberg_get_ui_component(
 			'button',

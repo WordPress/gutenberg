@@ -299,7 +299,8 @@ final class Gutenberg_UI_Components {
 				continue;
 			}
 
-			$validated[ $prop ] = $props[ $prop ];
+			// Validation accepts `1` or `'true'` for a boolean; the snapshot key needs the real type.
+			$validated[ $prop ] = rest_sanitize_value_from_schema( $props[ $prop ], $prop_schema, $prop );
 		}
 
 		return $validated;
