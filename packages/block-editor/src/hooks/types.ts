@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import type { BlockType } from '@wordpress/blocks';
+import type { BlockType, ColorProps } from '@wordpress/blocks';
 
 /**
  * The viewport and pseudo state whose styles a block's controls edit.
@@ -133,3 +133,14 @@ export type CleanedObject< T > = T extends ( ...args: never[] ) => unknown
 		: T extends object
 			? { [ K in keyof T ]?: CleanedObject< T[ K ] > }
 			: T;
+
+/**
+ * A block's `color` support. Supports are read as declared, so a boolean
+ * support reads like an object with no keys.
+ */
+export type ColorSupport = Partial< ColorProps > & { gradient?: boolean };
+
+/**
+ * A block's `__experimentalBorder` support, or `true` for all its features.
+ */
+export type BorderSupport = true | Record< string, unknown >;
