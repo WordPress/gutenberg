@@ -3,12 +3,20 @@ import { renderToString } from 'react-dom/server';
 import useMediaQuery from '../';
 import useViewportMatch from '../../use-viewport-match';
 
-const MediaQueryComponent = ( { query } ) => {
+const MediaQueryComponent = ( { query }: { query?: string } ) => {
 	const result = useMediaQuery( query );
 	return `useMediaQuery: ${ result }`;
 };
 
-const ViewportMatchComponent = ( { breakpoint, operator } ) => {
+type ViewportMatchParams = Parameters< typeof useViewportMatch >;
+
+const ViewportMatchComponent = ( {
+	breakpoint,
+	operator,
+}: {
+	breakpoint: ViewportMatchParams[ 0 ];
+	operator: ViewportMatchParams[ 1 ];
+} ) => {
 	const result = useViewportMatch( breakpoint, operator );
 	return `useViewportMatch: ${ result }`;
 };

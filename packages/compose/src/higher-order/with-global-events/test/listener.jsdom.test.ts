@@ -12,12 +12,14 @@ import Listener from '../listener';
 describe( 'Listener', () => {
 	const createHandler = () => ( { handleEvent: vi.fn() } );
 
-	let listener, _addEventListener, _removeEventListener;
+	let listener: Listener;
+	let _addEventListener: typeof window.addEventListener;
+	let _removeEventListener: typeof window.removeEventListener;
 	beforeAll( () => {
-		_addEventListener = global.window.addEventListener;
-		_removeEventListener = global.window.removeEventListener;
-		global.window.addEventListener = vi.fn();
-		global.window.removeEventListener = vi.fn();
+		_addEventListener = window.addEventListener;
+		_removeEventListener = window.removeEventListener;
+		window.addEventListener = vi.fn();
+		window.removeEventListener = vi.fn();
 	} );
 
 	beforeEach( () => {
@@ -26,8 +28,8 @@ describe( 'Listener', () => {
 	} );
 
 	afterAll( () => {
-		global.window.addEventListener = _addEventListener;
-		global.window.removeEventListener = _removeEventListener;
+		window.addEventListener = _addEventListener;
+		window.removeEventListener = _removeEventListener;
 	} );
 
 	describe( '#add()', () => {
@@ -76,7 +78,7 @@ describe( 'Listener', () => {
 			const handler = createHandler();
 			listener.add( 'resize', handler );
 
-			const event = { type: 'resize' };
+			const event = { type: 'resize' } as Event;
 
 			listener.handleEvent( event );
 
@@ -89,7 +91,7 @@ describe( 'Listener', () => {
 			listener.add( 'resize', handler );
 			listener.add( 'resize', handler );
 
-			const event = { type: 'resize' };
+			const event = { type: 'resize' } as Event;
 
 			listener.handleEvent( event );
 

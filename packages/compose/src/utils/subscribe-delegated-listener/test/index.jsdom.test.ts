@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import subscribeDelegatedListener from '..';
 
 describe( 'subscribeDelegatedListener', () => {
-	let root;
-	let target;
+	let root: HTMLElement;
+	let target: HTMLElement;
 
 	beforeEach( () => {
 		// Build a nested DOM:
@@ -23,7 +23,11 @@ describe( 'subscribeDelegatedListener', () => {
 		document.body.removeChild( root );
 	} );
 
-	function fire( element, type = 'click', init = { bubbles: true } ) {
+	function fire(
+		element: Element,
+		type = 'click',
+		init = { bubbles: true }
+	) {
 		element.dispatchEvent( new Event( type, init ) );
 	}
 
@@ -54,7 +58,7 @@ describe( 'subscribeDelegatedListener', () => {
 	} );
 
 	test( 'bubble phase: nested subscribers fire inner-to-outer', () => {
-		const order = [];
+		const order: string[] = [];
 		subscribeDelegatedListener( root, 'click', () =>
 			order.push( 'outer' )
 		);
@@ -66,7 +70,7 @@ describe( 'subscribeDelegatedListener', () => {
 	} );
 
 	test( 'capture phase: nested subscribers fire outer-to-inner', () => {
-		const order = [];
+		const order: string[] = [];
 		subscribeDelegatedListener(
 			root,
 			'click',
@@ -151,7 +155,7 @@ describe( 'subscribeDelegatedListener', () => {
 		// that by passing a duck-typed Document-like object.
 		const iframe = document.createElement( 'iframe' );
 		document.body.appendChild( iframe );
-		const iframeDoc = iframe.contentDocument;
+		const iframeDoc = iframe.contentDocument!;
 		const iframeTarget = iframeDoc.createElement( 'span' );
 		iframeDoc.body.appendChild( iframeTarget );
 
@@ -160,7 +164,9 @@ describe( 'subscribeDelegatedListener', () => {
 			subscribeDelegatedListener( iframeTarget, 'click', cb )
 		).not.toThrow();
 		iframeTarget.dispatchEvent(
-			new iframe.contentWindow.Event( 'click', { bubbles: true } )
+			new ( iframe.contentWindow as typeof window ).Event( 'click', {
+				bubbles: true,
+			} )
 		);
 		expect( cb ).toHaveBeenCalledTimes( 1 );
 		document.body.removeChild( iframe );
