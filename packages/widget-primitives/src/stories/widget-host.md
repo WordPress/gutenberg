@@ -46,6 +46,16 @@ actions: {
 
 The list carries data, not UI: placement and materialization stay the host's. The widget's side is `useWidgetActions`, and the Actions page covers how the list joins the declared actions.
 
+## The `title` capability
+
+```ts
+title: string;
+```
+
+The translated title of the widget the host renders: the one the host shows in its header, translated on the server from `widget.json`. A widget reads it to build accessible names, so a focusable chart says what it shows without a second, hardcoded copy of the title.
+
+The host passes the string, not the id of its title element. `aria-labelledby` joins text in a fixed order, and a name such as "Sales by device chart" must reorder for locales that put the word for chart first.
+
 ## Providing it
 
 A route that renders the dashboard supplies its matcher and its router's link. The value's identity drives the provider's memoized merge, so keep it stable: a module constant when it is static, `useMemo` when it derives from component state:
@@ -94,6 +104,19 @@ const host = useMemo< WidgetHost >(
 
 A host that mounts an instance twice, as a drag preview does, keeps each render's list apart, so one unmounting does not withdraw the other's.
 
+### `title`, per instance
+
+The same nested provider carries the title of the widget it wraps:
+
+```tsx
+const host = useMemo< WidgetHost >(
+	() => ( { title: widgetType.title } ),
+	[ widgetType.title ]
+);
+```
+
+A host with no title to give, such as a story that mounts a render component directly, leaves it out.
+
 ## Consuming it
 
 Most consumers touch the seam here and nowhere else. `HostLink` reads the capability and decides: the host's `Link` on a match, a plain anchor otherwise. A new document never routes, because a router link buys nothing for it, and `HostLink` reads that off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.
@@ -113,6 +136,17 @@ It composes through the `render` prop of a UI link, which merges its own anchor 
 `Link`, `ButtonLink` and `Menu.LinkItem` take the same anchor props, so one composition serves all three. A consumer that needs the answer before it renders reads `match` itself.
 
 `useWidgetHost` stays available for a capability no component covers yet, or an answer a consumer needs before it renders.
+
+`title` is one of those. A widget builds its names from it and falls back to its own name when it is absent:
+
+```tsx
+const { title } = useWidgetHost();
+const name = title
+	? sprintf( /* translators: %s: widget title */ __( '%s chart' ), title )
+	: __( 'Chart' );
+
+return <Chart aria-label={ name } />;
+```
 
 The **WithHostLink** story runs it against a demo router, with a toggle that removes the capability from the host bag.
 
