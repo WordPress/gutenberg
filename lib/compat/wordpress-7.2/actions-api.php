@@ -141,9 +141,8 @@ if ( ! function_exists( '_wp_add_action_modules_to_editor_script' ) ) {
 	 * The registry only accepts registrations while the action fires, so the
 	 * modules declared here are the modules of every action the page can show.
 	 *
-	 * When called by the `admin_footer` action, `$scripts` is the hook suffix of
-	 * the page and the global registry is used. In other scenarios (tests), the
-	 * scripts are given directly.
+	 * The `admin_footer` action passes it no argument, so the global registry is
+	 * used. In other scenarios (tests), the scripts are given directly.
 	 *
 	 * @param WP_Scripts|null $scripts The scripts registry. Defaults to the global one.
 	 */
@@ -192,7 +191,7 @@ if ( ! function_exists( '_wp_add_action_modules_to_editor_script' ) ) {
 			$scripts->add_data( 'wp-editor', 'module_dependencies', $dependencies );
 		}
 	}
-	add_action( 'admin_footer', '_wp_add_action_modules_to_editor_script' );
+	add_action( 'admin_footer', '_wp_add_action_modules_to_editor_script', 10, 0 );
 }
 
 if ( ! function_exists( '_wp_preload_entity_actions' ) ) {
