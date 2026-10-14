@@ -24,7 +24,7 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 	 */
 	public function __construct() {
 		$this->namespace = 'wp/v2';
-		$this->rest_base = 'actions';
+		$this->rest_base = 'entity-actions';
 	}
 
 	/**
@@ -87,7 +87,7 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 				_doing_it_wrong(
 					__METHOD__,
 					sprintf(
-						/* translators: 1: REST route, e.g. /wp/v2/actions. 2: Post type or taxonomy name. */
+						/* translators: 1: REST route, e.g. /wp/v2/entity-actions. 2: Post type or taxonomy name. */
 						__( 'The %1$s route serves the items of the "%2$s" post type or taxonomy, so the actions of entities are not available.', 'gutenberg' ),
 						'/' . $this->namespace . '/' . $this->rest_base,
 						$object->name
@@ -115,7 +115,7 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 
 		if ( null === $capability ) {
 			return new WP_Error(
-				'rest_actions_invalid_entity',
+				'rest_entity_actions_invalid_entity',
 				__( 'Invalid entity kind or name.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
@@ -214,7 +214,7 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'actions',
+			'title'      => 'entity-actions',
 			'type'       => 'object',
 			'properties' => array(
 				'kind'           => array(

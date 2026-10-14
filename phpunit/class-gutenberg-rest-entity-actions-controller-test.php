@@ -11,7 +11,7 @@ class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 	/**
 	 * The REST route the controller registers.
 	 */
-	const ROUTE = '/wp/v2/actions';
+	const ROUTE = '/wp/v2/entity-actions';
 
 	/**
 	 * Administrator user id (has `edit_theme_options` and `manage_options`).
@@ -150,14 +150,14 @@ class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 	public function test_the_route_of_a_taxonomy_with_the_same_base_is_kept() {
 		global $wp_rest_server;
 		$this->setExpectedIncorrectUsage( 'Gutenberg_REST_Entity_Actions_Controller_7_2::is_route_of_entity_items' );
-		register_taxonomy( 'actions', 'post', array( 'show_in_rest' => true ) );
+		register_taxonomy( 'entity-actions', 'post', array( 'show_in_rest' => true ) );
 
 		try {
 			$wp_rest_server = null;
 			$handlers       = rest_get_server()->get_routes()[ self::ROUTE ];
 			$response       = rest_get_server()->dispatch( new WP_REST_Request( 'GET', self::ROUTE ) );
 		} finally {
-			unregister_taxonomy( 'actions' );
+			unregister_taxonomy( 'entity-actions' );
 			$wp_rest_server = null;
 		}
 
@@ -244,7 +244,7 @@ class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 
 		$response = $this->dispatch_request( 'postType', 'nonexistent_post_type' );
 
-		$this->assertErrorResponse( 'rest_actions_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_actions_invalid_entity', $response, 404 );
 	}
 
 	/**
@@ -275,7 +275,7 @@ class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 		}
 
 		$this->assertSame( array( 'secret' ), $registered, 'The registry accepts the actions.' );
-		$this->assertErrorResponse( 'rest_actions_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_actions_invalid_entity', $response, 404 );
 	}
 
 	/**
@@ -310,7 +310,7 @@ class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 
 		$response = $this->dispatch_request( 'taxonomy', 'nonexistent_taxonomy' );
 
-		$this->assertErrorResponse( 'rest_actions_invalid_entity', $response, 404 );
+		$this->assertErrorResponse( 'rest_entity_actions_invalid_entity', $response, 404 );
 	}
 
 	/**
