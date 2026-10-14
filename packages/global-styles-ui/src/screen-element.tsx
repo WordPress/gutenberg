@@ -10,12 +10,14 @@ import type {
 import { ScreenHeader } from './screen-header';
 import ElementPreview from './element-preview';
 import { useSetting, useStyle, useCanEditCSS } from './hooks';
-import { normalizeBorderStyle } from './border-utils';
 import { unlock } from './lock-unlock';
 import { getValidPseudoStates } from './utils';
-// Elements get the same default background size as blocks when an image has
-// none, both in the editor and on the front end.
-import { BACKGROUND_BLOCK_DEFAULT_VALUES } from './screen-block';
+// Elements store borders and show background image defaults the same way as
+// blocks, so they share the block screen's handling.
+import {
+	BACKGROUND_BLOCK_DEFAULT_VALUES,
+	normalizeBorderStyle,
+} from './screen-block';
 
 const {
 	useSettingsForBlockElement,
