@@ -24,7 +24,7 @@ export default function PostRevisionSummary() {
 		},
 		[]
 	);
-	if ( ! revisionId ) {
+	if ( ! revisionId && ! isViewingBrowserBackup ) {
 		return null;
 	}
 	return (

@@ -15,10 +15,7 @@ import {
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../utils/device-type';
 import { unlock } from '../lock-unlock';
-import {
-	BROWSER_BACKUP_NOTICE_ID,
-	BROWSER_BACKUP_REVISION_ID,
-} from './constants';
+import { BROWSER_BACKUP_NOTICE_ID } from './constants';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -694,44 +691,26 @@ export function setShowRevisionDiff( showDiff ) {
 
 /**
  * Opens the revisions view on the backup kept in the browser, compared with
- * what the editor shows. The backup is only kept in memory, nothing is saved.
+ * what the editor shows. Nothing is saved.
  *
  * @param {Object} backup         The backup.
  * @param {string} backup.title   The backed up title.
  * @param {string} backup.content The backed up content.
  * @param {string} backup.excerpt The backed up excerpt.
  * @param {number} [backup.time]  When the backup was made, in milliseconds.
+ * @return {Object} Action object.
  */
-export const viewBrowserBackup =
-	( { title, content, excerpt, time } ) =>
-	async ( { select, dispatch, registry } ) => {
-		const postType = select.getCurrentPostType();
-		const postId = select.getCurrentPostId();
-		const revisionKey =
-			registry.select( coreStore ).getEntityConfig( 'postType', postType )
-				?.revisionKey || 'id';
-
-		// Holds every field the revisions view reads, so nothing is requested
-		// from the server for it.
-		await registry.dispatch( coreStore ).receiveRevisions(
-			'postType',
-			postType,
-			postId,
-			{
-				id: BROWSER_BACKUP_REVISION_ID,
-				[ revisionKey ]: BROWSER_BACKUP_REVISION_ID,
-				date: time ? new Date( time ).toISOString() : null,
-				modified: null,
-				author: null,
-				meta: {},
-				title: { raw: title },
-				excerpt: { raw: excerpt },
-				content: { raw: content },
-			},
-			{ context: 'edit' }
-		);
-		dispatch.setCurrentRevisionId( BROWSER_BACKUP_REVISION_ID );
+export function viewBrowserBackup( { title, content, excerpt, time } ) {
+	return {
+		type: 'VIEW_BROWSER_BACKUP',
+		backup: {
+			date: time ? new Date( time ).toISOString() : undefined,
+			title: { raw: title },
+			content: { raw: content },
+			excerpt: { raw: excerpt },
+		},
 	};
+}
 
 /**
  * Replaces the editor's content with the browser backup shown in the
@@ -739,16 +718,8 @@ export const viewBrowserBackup =
  */
 export const restoreBrowserBackup =
 	() =>
-	async ( { select, dispatch, registry } ) => {
-		const backup = registry
-			.select( coreStore )
-			.getRevision(
-				'postType',
-				select.getCurrentPostType(),
-				select.getCurrentPostId(),
-				BROWSER_BACKUP_REVISION_ID,
-				{ context: 'edit' }
-			);
+	( { select, dispatch, registry } ) => {
+		const backup = select.getBrowserBackup();
 		if ( ! backup ) {
 			return;
 		}

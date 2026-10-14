@@ -455,6 +455,24 @@ export function revisionId( state = null, action ) {
 }
 
 /**
+ * Reducer for the browser backup shown in the revisions view, shaped like a
+ * revision, or null when it isn't shown.
+ *
+ * @param {Object|null} state  Current backup.
+ * @param {Object}      action Dispatched action.
+ * @return {Object|null} Updated state.
+ */
+export function browserBackup( state = null, action ) {
+	switch ( action.type ) {
+		case 'VIEW_BROWSER_BACKUP':
+			return action.backup;
+		case 'SET_CURRENT_REVISION_ID':
+			return null;
+	}
+	return state;
+}
+
+/**
  * Reducer for the current revisions page number.
  *
  * @param {number} state  Current page number.
@@ -532,6 +550,7 @@ export default combineReducers( {
 	stylesPath,
 	showStylebook,
 	revisionId,
+	browserBackup,
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,

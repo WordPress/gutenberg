@@ -28,13 +28,10 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 		sidebarIsOpened,
 	} = useSelect( ( select ) => {
 		const editor = unlock( select( editorStore ) );
-		const _isViewingBrowserBackup = editor.isViewingBrowserBackup();
 		return {
 			currentRevisionId: editor.getCurrentRevisionId(),
-			isViewingBrowserBackup: _isViewingBrowserBackup,
-			browserBackupDate: _isViewingBrowserBackup
-				? editor.getCurrentRevision()?.date
-				: undefined,
+			isViewingBrowserBackup: editor.isViewingBrowserBackup(),
+			browserBackupDate: editor.getBrowserBackup()?.date,
 			sidebarIsOpened:
 				!! select( interfaceStore ).getActiveComplementaryArea(
 					'core'
@@ -48,7 +45,7 @@ function RevisionsHeader( { showDiff, onToggleDiff } ) {
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 
-	const canRestore = !! currentRevisionId;
+	const canRestore = !! currentRevisionId || isViewingBrowserBackup;
 
 	const handleRestore = () => {
 		if ( isViewingBrowserBackup ) {

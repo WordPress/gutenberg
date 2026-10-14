@@ -55,14 +55,14 @@ export default function PostCardPanel( {
 				getPostIcon,
 				getCurrentPostType,
 				isRevisionsMode,
-				getCurrentRevision,
+				getShownVersion,
 			} = unlock( select( editorStore ) );
 			let _title = '';
 
 			// In revisions mode, use the current revision.
 			if ( isRevisionsMode() ) {
 				const parentPostType = getCurrentPostType();
-				const _record = getCurrentRevision();
+				const _record = getShownVersion();
 				_title = _record?.title?.rendered || _record?.title?.raw || '';
 				return {
 					postTitle: _title,
