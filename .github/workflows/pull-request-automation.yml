@@ -97,7 +97,7 @@ jobs:
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   section: playground
-                  body: '[Preview this pull request in WordPress Playground](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }}). It loads the latest build of this pull request once the "Build Gutenberg Plugin Zip" workflow has finished.'
+                  body: '[Preview this PR in WordPress Playground](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }}). Requires the "Build Gutenberg Plugin Zip" workflow to succeed.'
                   pr-number: ${{ github.event.pull_request.number }}
                   require-base: ${{ github.event.repository.default_branch }}
 
