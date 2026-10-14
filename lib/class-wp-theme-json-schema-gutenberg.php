@@ -48,6 +48,18 @@ class WP_Theme_JSON_Schema_Gutenberg {
 	 */
 	public static function migrate( $theme_json, $origin = 'theme' ) {
 		if ( ! isset( $theme_json['version'] ) ) {
+			if ( ! is_array( $theme_json ) ) {
+				WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic(
+					'theme_json_invalid_type',
+					array(),
+					array(
+						'expected' => 'object',
+						'value'    => $theme_json,
+					)
+				);
+			} else {
+				WP_Theme_JSON_Sanitizer_Gutenberg::add_diagnostic( 'theme_json_missing_version', array() );
+			}
 			$theme_json = array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 			);
