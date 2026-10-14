@@ -30,10 +30,10 @@ import {
 } from './utils';
 
 function getAreaRadioId( value: string, instanceId: number ) {
-	return `fields-create-template-part-modal__area-option-${ value }-${ instanceId }`;
+	return `patterns-create-template-part-modal__area-option-${ value }-${ instanceId }`;
 }
 function getAreaRadioDescriptionId( value: string, instanceId: number ) {
-	return `fields-create-template-part-modal__area-option-description-${ value }-${ instanceId }`;
+	return `patterns-create-template-part-modal__area-option-description-${ value }-${ instanceId }`;
 }
 
 type CreateTemplatePartModalContentsProps = {
@@ -48,7 +48,6 @@ type CreateTemplatePartModalContentsProps = {
 
 /**
  * A React component that renders a modal for creating a template part. The modal displays a title and the contents for creating the template part.
- * This component should not live in this package, it should be moved to a dedicated package responsible for managing template.
  * @param props            The component props.
  * @param props.modalTitle
  */
@@ -68,7 +67,7 @@ export default function CreateTemplatePartModal( {
 		<Modal
 			title={ modalTitle || defaultModalTitle }
 			onRequestClose={ restProps.closeModal }
-			overlayClassName="fields-create-template-part-modal"
+			overlayClassName="patterns-create-template-part-modal"
 			focusOnMount="firstContentElement"
 			size="medium"
 		>
@@ -99,7 +98,6 @@ const getTemplatePartIcon = ( areaOrIconName: string ) => {
 
 /**
  * A React component that renders the content of a model for creating a template part.
- * This component should not live in this package; it should be moved to a dedicated package responsible for managing template.
  *
  * @param {Object}   props                             - The component props.
  * @param {string}   [props.defaultArea=uncategorized] - The default area for the template part.
@@ -193,18 +191,18 @@ export function CreateTemplatePartModalContents( {
 					onChange={ setTitle }
 					required
 				/>
-				<fieldset className="fields-create-template-part-modal__area-fieldset">
+				<fieldset className="patterns-create-template-part-modal__area-fieldset">
 					<BaseControl.VisualLabel as="legend">
 						{ __( 'Area' ) }
 					</BaseControl.VisualLabel>
-					<div className="fields-create-template-part-modal__area-radio-group">
+					<div className="patterns-create-template-part-modal__area-radio-group">
 						{ ( defaultTemplatePartAreas ?? [] ).map(
 							( item: TemplatePartArea ) => {
 								const icon = getTemplatePartIcon( item.icon );
 								return (
 									<div
 										key={ item.area }
-										className="fields-create-template-part-modal__area-radio-wrapper"
+										className="patterns-create-template-part-modal__area-radio-wrapper"
 									>
 										<input
 											type="radio"
@@ -212,7 +210,7 @@ export function CreateTemplatePartModalContents( {
 												item.area,
 												instanceId
 											) }
-											name={ `fields-create-template-part-modal__area-${ instanceId }` }
+											name={ `patterns-create-template-part-modal__area-${ instanceId }` }
 											value={ item.area }
 											checked={ area === item.area }
 											onChange={ () => {
@@ -225,23 +223,23 @@ export function CreateTemplatePartModalContents( {
 										/>
 										<WCIcon
 											icon={ icon }
-											className="fields-create-template-part-modal__area-radio-icon"
+											className="patterns-create-template-part-modal__area-radio-icon"
 										/>
 										<label
 											htmlFor={ getAreaRadioId(
 												item.area,
 												instanceId
 											) }
-											className="fields-create-template-part-modal__area-radio-label"
+											className="patterns-create-template-part-modal__area-radio-label"
 										>
 											{ item.label }
 										</label>
 										<WCIcon
 											icon={ check }
-											className="fields-create-template-part-modal__area-radio-checkmark"
+											className="patterns-create-template-part-modal__area-radio-checkmark"
 										/>
 										<p
-											className="fields-create-template-part-modal__area-radio-description"
+											className="patterns-create-template-part-modal__area-radio-description"
 											id={ getAreaRadioDescriptionId(
 												item.area,
 												instanceId
