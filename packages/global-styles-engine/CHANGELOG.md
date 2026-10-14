@@ -9,7 +9,7 @@
 
 ### Bug Fixes
 
--   Scope element selectors inside blocks with `scopeSelector`, so a comma inside parentheses, such as in the `textInput` element's `input:where(...)`, no longer splits the selector. Block element selectors are now scoped the same way as on the server.
+-   Scope element selectors inside blocks with `scopeSelector`, so a comma inside parentheses, such as in the `textInput` element's `input:where(...)`, no longer splits the selector. Block element selectors are now scoped the same way as on the server ([#84740](https://github.com/WordPress/gutenberg/pull/84740)).
 
 ## 1.24.0 (2026-10-07)
 
