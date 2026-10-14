@@ -154,15 +154,6 @@
 	clear: both;
 }
 
-// The canvas transition is for device previews. Its height follows the meta
-// box pane and the content, which should not lag behind a pin, unpin, or drag.
-.has-metaboxes .interface-interface-skeleton__content iframe[name="editor-canvas"] {
-	@media not ( prefers-reduced-motion ) {
-		transition-property: all, height;
-		transition-duration: 400ms, 0s;
-	}
-}
-
 // When the pane is pinned the editors should allow shrinking so the meta box
 // pane remains visible and reachable. Apply common sizing to both editors, then
 // specialise overflow handling per editor so scroll behavior is correct.
@@ -187,23 +178,12 @@
 	}
 }
 
-// Inline meta boxes follow the canvas in this scroller. The canvas grows with
-// the post instead of scrolling inside the iframe, which otherwise shows a
-// second scrollbar and sticks when the scroll hands off.
-.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main.is-inline) {
-	.editor-visual-editor {
-		max-height: none;
-		overflow: visible;
-	}
-
-	.block-editor-iframe__container,
-	.block-editor-iframe__scale-container {
-		height: auto;
-	}
-
-	.editor-text-editor {
-		flex: 0 0 100%;
-	}
+// Inline meta boxes follow the visual editor in this scroller, so nothing else
+// bounds its height. Fill the content area as when pinned: a canvas sized to
+// its content (see the `fitContent` prop of the editor iframe) grows past it,
+// and a width-constrained canvas (device preview) is sized from it.
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main.is-inline) .editor-visual-editor {
+	min-height: 100%;
 }
 
 .edit-post-layout__snackbar {

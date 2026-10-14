@@ -125,134 +125,36 @@ const DEFAULT_PINNED_HEIGHT = '50%';
 // Dragging within the session is not capped.
 const MAX_RESTORED_HEIGHT = '80%';
 
-function MetaBoxesMain() {
-	const [ isOpen, openHeight, isPinnedPreference, hasAnyVisible ] = useSelect(
-		( select ) => {
-			const { get } = select( preferencesStore );
-			const { isMetaBoxLocationVisible } = select( editPostStore );
-			return [
-				!! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
-				get( 'core/edit-post', 'metaBoxesMainOpenHeight' ),
-				get( 'core/edit-post', 'metaBoxesMainIsPinned' ),
-				// Sidebar meta boxes render in the settings sidebar. Counting
-				// them here showed an empty pane on post types that only
-				// register side meta boxes.
+function useMetaBoxesMainState() {
+	return useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		const { isMetaBoxLocationVisible } = select( editPostStore );
+		const openHeight = get( 'core/edit-post', 'metaBoxesMainOpenHeight' );
+		return {
+			isOpen: !! get( 'core/edit-post', 'metaBoxesMainIsOpen' ),
+			openHeight,
+			// Users who already saved a pane height stay pinned without a
+			// stored flag.
+			isPinned:
+				get( 'core/edit-post', 'metaBoxesMainIsPinned' ) ??
+				typeof openHeight === 'number',
+			// Sidebar meta boxes render in the settings sidebar. Counting
+			// them here showed an empty pane on post types that only
+			// register side meta boxes.
+			hasAnyVisible:
 				isMetaBoxLocationVisible( 'normal' ) ||
-					isMetaBoxLocationVisible( 'advanced' ),
-			];
-		},
-		[]
-	);
+				isMetaBoxLocationVisible( 'advanced' ),
+		};
+	}, [] );
+}
+
+function MetaBoxesMain() {
+	const { isOpen, openHeight, isPinned, hasAnyVisible } =
+		useMetaBoxesMainState();
 	const { set: setPreference } = useDispatch( preferencesStore );
-	// Users who already saved a pane height stay pinned without a stored flag.
-	const isPinned = isPinnedPreference ?? typeof openHeight === 'number';
 	// Pixel height from a drag in this session. While set, the 80% restore cap
 	// does not apply, including if the pane is collapsed and opened again.
 	const [ sessionHeight, setSessionHeight ] = useState();
-
-	// While inline, grow the canvas iframe to its content so the content area
-	// is the only scroller. An inner iframe scrollbar plus the outer one sticks
-	// at the handoff and shows both bars. A layout effect so switching modes is
-	// sized and scrolled before paint.
-	useLayoutEffect( () => {
-		if ( isPinned || ! hasAnyVisible ) {
-			return;
-		}
-		const content = document.querySelector(
-			'.interface-interface-skeleton__content'
-		);
-		if ( ! content ) {
-			return;
-		}
-
-		let iframe;
-		// Kept current because cleanup runs after the pinned layout has
-		// already clamped the content area's scrollTop to 0.
-		let contentScrollTop = content.scrollTop;
-		const onContentScroll = () => {
-			contentScrollTop = content.scrollTop;
-		};
-		// The iframe document keeps a scroll offset even with overflow hidden,
-		// which would hide the top of the post. Hand it to the content area.
-		const moveFrameScrollToContent = () => {
-			const scroller = iframe?.contentDocument?.scrollingElement;
-			if ( scroller?.scrollTop ) {
-				content.scrollTop += scroller.scrollTop;
-				scroller.scrollTop = 0;
-			}
-		};
-		const sync = () => {
-			const body = iframe?.contentDocument?.body;
-			if ( ! body ) {
-				return;
-			}
-			// In-flow boxes only. The canvas cover is absolutely positioned at
-			// the iframe height, and the document stretches to the iframe, so
-			// measuring either would grow the frame forever.
-			const { top } = body.getBoundingClientRect();
-			let bottom = top;
-			for ( const child of body.children ) {
-				const { position } = window.getComputedStyle( child );
-				if ( position !== 'absolute' && position !== 'fixed' ) {
-					bottom = Math.max(
-						bottom,
-						child.getBoundingClientRect().bottom
-					);
-				}
-			}
-			const padding =
-				parseFloat( window.getComputedStyle( body ).paddingBottom ) ||
-				0;
-			const height = Math.max(
-				Math.ceil( bottom - top + padding ),
-				content.clientHeight
-			);
-			iframe.style.height = `${ height }px`;
-		};
-		const resizeObserver = new window.ResizeObserver( sync );
-		const watch = ( frame ) => {
-			const doc = frame?.contentDocument;
-			if ( ! doc?.body ) {
-				return;
-			}
-			iframe = frame;
-			resizeObserver.disconnect();
-			resizeObserver.observe( doc.documentElement );
-			resizeObserver.observe( content );
-			doc.documentElement.style.overflow = 'hidden';
-			doc.addEventListener( 'scroll', moveFrameScrollToContent );
-			sync();
-			moveFrameScrollToContent();
-		};
-		// The canvas can mount, or replace its document, after this runs.
-		// Load does not bubble, so listen in the capture phase.
-		const onLoad = ( { target } ) => {
-			if ( target.matches?.( 'iframe[name="editor-canvas"]' ) ) {
-				watch( target );
-			}
-		};
-
-		content.addEventListener( 'load', onLoad, true );
-		content.addEventListener( 'scroll', onContentScroll );
-		watch( content.querySelector( 'iframe[name="editor-canvas"]' ) );
-
-		return () => {
-			content.removeEventListener( 'load', onLoad, true );
-			content.removeEventListener( 'scroll', onContentScroll );
-			resizeObserver.disconnect();
-			const doc = iframe?.contentDocument;
-			if ( ! doc ) {
-				return;
-			}
-			doc.removeEventListener( 'scroll', moveFrameScrollToContent );
-			doc.documentElement.style.overflow = '';
-			iframe.style.height = '';
-			// Pinned, the iframe scrolls and the content area does not, so
-			// move the reading position back into the iframe.
-			content.scrollTop = 0;
-			doc.scrollingElement.scrollTop = contentScrollTop;
-		};
-	}, [ isPinned, hasAnyVisible ] );
 
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
@@ -292,6 +194,36 @@ function MetaBoxesMain() {
 		metaBoxesMainRef,
 		effectSizeConstraints,
 	] );
+
+	// Inline, the content area scrolls the canvas; pinned, the canvas scrolls
+	// itself (the canvas hands its own offset back when unpinned). Carry the
+	// content area's offset into the canvas when pinning. It is tracked while
+	// inline because the content area has already stopped scrolling, and so
+	// reset to 0, by the time the pinned layout is in place.
+	const inlineScrollTopRef = useRef( 0 );
+	useLayoutEffect( () => {
+		const content = metaBoxesMainRef.current?.closest(
+			'.interface-interface-skeleton__content'
+		);
+		if ( ! content ) {
+			return;
+		}
+		if ( isPinned ) {
+			const canvas = content.querySelector(
+				'iframe[name="editor-canvas"]'
+			)?.contentDocument;
+			if ( canvas ) {
+				canvas.scrollingElement.scrollTop = inlineScrollTopRef.current;
+			}
+			return;
+		}
+		const track = () => {
+			inlineScrollTopRef.current = content.scrollTop;
+		};
+		track();
+		content.addEventListener( 'scroll', track );
+		return () => content.removeEventListener( 'scroll', track );
+	}, [ isPinned ] );
 
 	const separatorRef = useRef();
 	const separatorHelpId = useId();
@@ -617,6 +549,20 @@ function Layout( {
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
 
+	const showMetaBoxesMain = ! isDistractionFree && showMetaBoxes;
+	const { isPinned: areMetaBoxesPinned, hasAnyVisible: hasMainMetaBoxes } =
+		useMetaBoxesMainState();
+	// Inline meta boxes follow the canvas in the content area, which then has
+	// to scroll both. The canvas is sized to its content so it does not scroll
+	// on its own as well.
+	const iframeProps = useMemo(
+		() => ( {
+			fitContent:
+				showMetaBoxesMain && hasMainMetaBoxes && ! areMetaBoxesPinned,
+		} ),
+		[ showMetaBoxesMain, hasMainMetaBoxes, areMetaBoxesPinned ]
+	);
+
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected
 		? 'block-selection-edit'
@@ -756,14 +702,14 @@ function Layout( {
 								// eslint-disable-next-line jsx-a11y/no-autofocus
 								autoFocus={ ! isWelcomeGuideVisible }
 								onActionPerformed={ onActionPerformed }
+								iframeProps={ iframeProps }
 								extraSidebarPanels={
 									showMetaBoxes && (
 										<MetaBoxes location="side" />
 									)
 								}
 								extraContent={
-									! isDistractionFree &&
-									showMetaBoxes && <MetaBoxesMain />
+									showMetaBoxesMain && <MetaBoxesMain />
 								}
 							>
 								<PostLockedModal />

@@ -391,8 +391,16 @@ function VisualEditor( {
 
 	const isNavigationPreview = postType === NAVIGATION_POST_TYPE && isPreview;
 
+	// A canvas sized by the resizable wrapper (device previews, resizable post
+	// types) cannot also take its height from its content.
+	const fitContent = !! iframeProps?.fitContent && ! enableResizing;
+
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
-		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
+		! isPreview && renderingMode === 'post-only' && ! isDesignPostType,
+		// The space is a share of the canvas height, which would in turn
+		// follow the space. The scroll container around a fitted canvas
+		// provides the room to scroll instead.
+		! fitContent
 	);
 
 	const shouldConstrainCanvasHeight =
@@ -496,6 +504,7 @@ function VisualEditor( {
 					// Horizontal padding leaves room for the resize handles
 					// that appear on the left/right of a resizable canvas.
 					'has-horizontal-padding': isFocusedEntity || enableResizing,
+					'is-fit-content': fitContent,
 				}
 			) }
 		>
@@ -515,6 +524,7 @@ function VisualEditor( {
 					height="100%"
 					iframeProps={ {
 						...iframeProps,
+						fitContent,
 						style: iframeProps?.style,
 					} }
 				>

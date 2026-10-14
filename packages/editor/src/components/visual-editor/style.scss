@@ -36,6 +36,12 @@
 		padding-right: $grid-unit-30;
 	}
 
+	// A canvas sized to its content grows past the available height instead
+	// of scrolling.
+	&.is-fit-content {
+		max-height: none;
+	}
+
 	// Keeps extra scrollbars from appearing when block toolbars overflow.
 	overflow: hidden;
 

@@ -8,7 +8,11 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 const CSS =
 	':root :where(.editor-styles-wrapper)::after {content: ""; display: block; height: 40vh;}';
 
-export function usePaddingAppender( enabled ) {
+/**
+ * @param {boolean} enabled   Whether clicking below the last block appends a block.
+ * @param {boolean} withSpace Whether to add the space below the last block.
+ */
+export function usePaddingAppender( enabled, withSpace = true ) {
 	const registry = useRegistry();
 	const effect = useRefEffect(
 		( node ) => {
@@ -63,5 +67,5 @@ export function usePaddingAppender( enabled ) {
 		},
 		[ registry ]
 	);
-	return enabled ? [ effect, CSS ] : [];
+	return enabled ? [ effect, withSpace ? CSS : '' ] : [];
 }
