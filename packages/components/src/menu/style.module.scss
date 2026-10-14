@@ -83,7 +83,7 @@
 	cursor: var(--wpds-cursor-control);
 
 	position: relative;
-	min-height: 32px;
+	min-height: $grid-unit-40;
 	box-sizing: border-box;
 
 	/* Occupy the width of all grid columns (ie. full width) */
@@ -164,13 +164,13 @@
 	.checkbox-item > &,
 	.radio-item > & {
 		/* Same width as the check icons */
-		min-width: 24px;
+		min-width: $grid-unit-30;
 	}
 
 	.checkbox-item > &,
 	.radio-item > &,
 	&:not(:empty) {
-		margin-inline-end: 8px;
+		margin-inline-end: $grid-unit-10;
 	}
 
 	display: flex;
@@ -199,7 +199,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 12px;
+	gap: $grid-unit-15;
 
 	pointer-events: none;
 }
@@ -209,7 +209,7 @@
 
 	display: inline-flex;
 	flex-direction: column;
-	gap: 4px;
+	gap: $grid-unit-05;
 }
 
 .item-suffix-wrapper {
@@ -220,7 +220,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 12px;
+	gap: $grid-unit-15;
 
 	color: $components-color-gray-700;
 
@@ -243,8 +243,8 @@
 	/* Occupy the width of all grid columns (ie. full width) */
 	grid-column: 1 / -1;
 
-	padding-block-start: 12px;
-	padding-block-end: 8px;
+	padding-block-start: $grid-unit-15;
+	padding-block-end: $grid-unit-10;
 	padding-inline: $grid-unit-15;
 }
 
@@ -256,7 +256,7 @@
 	height: $border-width;
 	background-color: $components-color-gray-200;
 	/* Align with menu items' content */
-	margin-block: 8px;
+	margin-block: $grid-unit-10;
 	margin-inline: $grid-unit-15;
 
 	/* Only visible in Windows High Contrast mode */
