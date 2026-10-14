@@ -149,7 +149,7 @@ vi.mock( import( '@wordpress/private-apis' ), () => ( {
 // `store` export to hand to `useSelect`, but in these tests `useSelect`
 // is already mocked to a Proxy-driven stub and never actually touches
 // the store. Providing a stub avoids the private-APIs unlock that
-// the real `store/index.js` performs at module load.
+// the real `store/index.ts` performs at module load.
 vi.mock( import( '../../store' ), () => ( {
 	__esModule: true,
 	store: { name: 'core/block-editor' },

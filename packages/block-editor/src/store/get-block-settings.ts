@@ -5,6 +5,12 @@ import {
 import { applyFilters } from '@wordpress/hooks';
 import { getValueFromObjectPath } from '../utils/object';
 import { getBlockName, getSettings, getBlockAttributes } from './selectors';
+import type {
+	FeatureSettings,
+	PresetsByOrigin,
+	Settings,
+	State,
+} from './types';
 
 const blockedPaths = [
 	'color',
@@ -14,7 +20,7 @@ const blockedPaths = [
 	'spacing',
 ];
 
-const deprecatedFlags = {
+const deprecatedFlags: Record< string, ( settings: Settings ) => unknown > = {
 	'color.palette': ( settings ) => settings.colors,
 	'color.gradients': ( settings ) => settings.gradients,
 	'color.custom': ( settings ) =>
@@ -45,7 +51,7 @@ const deprecatedFlags = {
 	'spacing.padding': ( settings ) => settings.enableCustomSpacing,
 };
 
-const prefixedFlags = {
+const prefixedFlags: Record< string, string > = {
 	/*
 	 * These were only available in the plugin
 	 * and can be removed when the minimum WordPress version
@@ -77,22 +83,26 @@ const prefixedFlags = {
  *
  * @see https://github.com/WordPress/gutenberg/pull/34485
  *
- * @param {string} path Path to desired value in settings.
- * @return {string}     The value for defined setting.
+ * @param path Path to desired value in settings.
+ * @return     The value for defined setting.
  */
-const removeCustomPrefixes = ( path ) => {
+const removeCustomPrefixes = ( path: string ): string => {
 	return prefixedFlags[ path ] || path;
 };
 
-export function getBlockSettings( state, clientId, ...paths ) {
+export function getBlockSettings(
+	state: State,
+	clientId: string | null,
+	...paths: string[]
+): unknown[] {
 	const blockName = getBlockName( state, clientId );
-	const candidates = [];
+	const candidates: string[] = [];
 
 	if ( clientId ) {
-		let id = clientId;
+		let id: string | undefined = clientId;
 		do {
 			const name = getBlockName( state, id );
-			if ( hasBlockSupport( name, '__experimentalSettings', false ) ) {
+			if ( hasBlockSupport( name!, '__experimentalSettings', false ) ) {
 				candidates.push( id );
 			}
 		} while ( ( id = state.blocks.parents.get( id ) ) );
@@ -128,14 +138,16 @@ export function getBlockSettings( state, clientId, ...paths ) {
 			const candidateAtts = getBlockAttributes(
 				state,
 				candidateClientId
-			);
+			)!;
 			result =
 				getValueFromObjectPath(
-					candidateAtts.settings?.blocks?.[ blockName ],
+					// Attribute values are not validated against a schema.
+					( candidateAtts.settings as FeatureSettings | undefined )
+						?.blocks?.[ blockName! ],
 					normalizedPath
 				) ??
 				getValueFromObjectPath(
-					candidateAtts.settings,
+					candidateAtts.settings as FeatureSettings | undefined,
 					normalizedPath
 				);
 			if ( result !== undefined ) {
@@ -162,8 +174,14 @@ export function getBlockSettings( state, clientId, ...paths ) {
 
 		// Return if the setting was found in either the block instance or the store.
 		if ( result !== undefined ) {
-			if ( PATHS_WITH_OVERRIDE[ normalizedPath ] ) {
-				return result.custom ?? result.theme ?? result.default;
+			if (
+				(
+					PATHS_WITH_OVERRIDE as Record< string, boolean | undefined >
+				 )[ normalizedPath ]
+			) {
+				// Theme.json values are not validated against a schema.
+				const presets = result as PresetsByOrigin;
+				return presets.custom ?? presets.theme ?? presets.default;
 			}
 			return result;
 		}
