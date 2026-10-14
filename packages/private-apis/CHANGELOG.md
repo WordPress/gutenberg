@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Allow `@wordpress/core-fields` to use private APIs: the fields it registers on the server read private selectors of `@wordpress/core-data` (`getTemplateId`, `getHomePage`, and `getPostsPageId`) and private components of `@wordpress/media-utils` (`MediaEdit` and `MediaEditControl`) ([#83368](https://github.com/WordPress/gutenberg/pull/83368)).
+-   Allow `@wordpress/core-fields` to use private APIs: the fields it registers on the server read private selectors of `@wordpress/core-data` (`getTemplateId`, `getHomePage`, and `getPostsPageId`) and private components of `@wordpress/media-utils` (`MediaEdit` and `MediaEditControl`) ([#84696](https://github.com/WordPress/gutenberg/pull/84696)).
 
 ## 2.0.0 (2026-10-07)
 
