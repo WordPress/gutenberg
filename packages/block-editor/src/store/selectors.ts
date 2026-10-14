@@ -278,7 +278,7 @@ export function __unstableGetClientIdsTree(
 			version: '6.5',
 		}
 	);
-	return getClientIdsTree( state, rootClientId! );
+	return getClientIdsTree( state, rootClientId );
 }
 
 /**

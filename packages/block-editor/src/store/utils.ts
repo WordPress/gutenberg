@@ -24,7 +24,6 @@ import type {
 } from './types';
 
 type ParsedPattern = BlockPattern & { blocks: Block[] };
-type SettingsSelector = ( select: typeof globalSelect ) => unknown;
 type GrammarBlock = ReturnType< typeof grammarParse >[ number ];
 
 export const isFiltered = Symbol( 'isFiltered' );
@@ -147,16 +146,10 @@ export const getAllPatternsDependants =
 	( select: typeof globalSelect ) => ( state: State ) => {
 		return [
 			state.settings.__experimentalBlockPatterns,
-			(
-				state.settings[ userPatternCategoriesSelectKey ] as
-					SettingsSelector | undefined
-			 )?.( select ) ??
+			state.settings[ userPatternCategoriesSelectKey ]?.( select ) ??
 				state.settings.__experimentalUserPatternCategories,
 			state.settings.__experimentalReusableBlocks,
-			(
-				state.settings[ selectBlockPatternsKey ] as
-					SettingsSelector | undefined
-			 )?.( select ),
+			state.settings[ selectBlockPatternsKey ]?.( select ),
 			// @ts-expect-error The store has no `blockPatterns`, so this is always undefined.
 			state.blockPatterns,
 			unlock( select( STORE_NAME ) ).getReusableBlocks(),
