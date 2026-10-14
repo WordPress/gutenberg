@@ -30,15 +30,12 @@ const { store: mediaEditorStore } = unlock( mediaEditorPrivateApis );
 
 const EMPTY_OBJECT = {};
 
-let reusableBlocksCache = {};
-
 /**
  * The synced patterns the inserter offers: every pattern the user can read.
  *
- * Patterns load in the `edit` context, which the `core/block` block reuses,
- * but that context only includes the patterns the user can edit. An author
- * can still use an administrator's pattern, so the patterns only the `view`
- * context returns are added after them.
+ * They load in the `view` context. The `edit` context only includes the
+ * patterns the user can edit, and an author can still use an administrator's
+ * pattern. Every pattern the user can edit, they can also read.
  *
  * @param {(store: Object) => Object} select Registry select.
  * @return {?Object[]} Pattern records, or null while loading.
@@ -46,34 +43,11 @@ let reusableBlocksCache = {};
 function __experimentalReusableBlocksSelect( select ) {
 	const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 	const { getEntityRecords } = select( coreStore );
-	const editable = getEntityRecords( 'postType', 'wp_block', {
-		per_page: -1,
-		[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
-	} );
-	const readable = getEntityRecords( 'postType', 'wp_block', {
+	return getEntityRecords( 'postType', 'wp_block', {
 		per_page: -1,
 		context: 'view',
 		[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
 	} );
-
-	// Keep the result's reference stable, since selectors memoize on it.
-	if (
-		reusableBlocksCache.editable !== editable ||
-		reusableBlocksCache.readable !== readable
-	) {
-		const editableIds = new Set( editable?.map( ( { id } ) => id ) );
-		const readOnly =
-			readable?.filter( ( { id } ) => ! editableIds.has( id ) ) ?? [];
-		reusableBlocksCache = {
-			editable,
-			readable,
-			result: readOnly.length
-				? [ ...( editable ?? [] ), ...readOnly ]
-				: editable,
-		};
-	}
-
-	return reusableBlocksCache.result;
 }
 
 function __experimentalUserPatternCategoriesSelect( select ) {
