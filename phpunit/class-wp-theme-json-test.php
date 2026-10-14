@@ -4017,6 +4017,81 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 
+	/**
+	 * @covers WP_Theme_JSON_Gutenberg::remove_insecure_properties
+	 */
+	public function test_remove_insecure_properties_keeps_valid_custom_duotone_colors_in_variations() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'duotone-section',
+				'label' => 'Duotone section',
+			)
+		);
+
+		$actual = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/image' => array(
+							'variations' => array(
+								'rounded' => array(
+									'filter' => array( 'duotone' => array( '#000000', '#ff0000' ) ),
+								),
+							),
+						),
+						'core/group' => array(
+							'variations' => array(
+								'duotone-section' => array(
+									'blocks' => array(
+										'core/image' => array(
+											'filter' => array( 'duotone' => array( '#ff0000', '#00ff00' ) ),
+										),
+										'core/cover' => array(
+											'filter' => array( 'duotone' => array( 'red', '<script>' ) ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/group', 'duotone-section' );
+
+		$expected = array(
+			'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+			'styles'  => array(
+				'blocks' => array(
+					'core/image' => array(
+						'variations' => array(
+							'rounded' => array(
+								'filter' => array( 'duotone' => array( '#000000', '#ff0000' ) ),
+							),
+						),
+					),
+					'core/group' => array(
+						'variations' => array(
+							'duotone-section' => array(
+								'blocks' => array(
+									'core/image' => array(
+										'filter' => array( 'duotone' => array( '#ff0000', '#00ff00' ) ),
+									),
+									// Inner block nodes are kept even when every style is removed.
+									'core/cover' => array(),
+								),
+							),
+						),
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
 	public function test_get_stylesheet_outputs_custom_duotone_as_svg_filter_url() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(

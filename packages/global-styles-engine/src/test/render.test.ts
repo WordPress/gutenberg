@@ -2186,6 +2186,86 @@ describe( 'global styles renderer', () => {
 			expect( css ).not.toContain( '#000000,#ff0000' );
 		} );
 
+		it( 'should output custom duotones set in block style variations', () => {
+			mockedSelect.mockReturnValue( {
+				getBlockStyles: ( name: string ) =>
+					name === 'core/image'
+						? [ { name: 'rounded', label: 'Rounded' } ]
+						: [ { name: 'section-1', label: 'Section 1' } ],
+			} );
+
+			const config = {
+				version: 3,
+				settings: {},
+				styles: {
+					blocks: {
+						'core/image': {
+							variations: {
+								rounded: {
+									filter: {
+										duotone: [ '#000000', '#ff0000' ],
+									},
+								},
+							},
+						},
+						'core/group': {
+							variations: {
+								'section-1': {
+									blocks: {
+										'core/image': {
+											filter: {
+												duotone: [
+													'#ff0000',
+													'#00ff00',
+												],
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			};
+
+			const blockTypes = [
+				{
+					name: 'core/image',
+					selectors: {
+						root: '.wp-block-image',
+						filter: { duotone: '.wp-block-image img' },
+					},
+				},
+				{
+					name: 'core/group',
+					selectors: { root: '.wp-block-group' },
+				},
+			];
+
+			const [ styles ] = generateGlobalStyles(
+				config as unknown as GlobalStylesConfig,
+				blockTypes,
+				{ styleOptions: { variationStyles: true } }
+			);
+			const assets = styles
+				.find( ( s: any ) => s.__unstableType === 'svgs' )
+				.assets.join( '' );
+			const css = styles.map( ( s: any ) => s.css ?? '' ).join( '' );
+
+			expect( assets ).toContain(
+				'<filter id="wp-duotone-custom-000000-ff0000">'
+			);
+			expect( assets ).toContain(
+				'<filter id="wp-duotone-custom-ff0000-00ff00">'
+			);
+			expect( css ).toContain(
+				'.is-style-rounded img){filter: url(#wp-duotone-custom-000000-ff0000);}'
+			);
+			expect( css ).toContain(
+				'.is-style-section-1 .wp-block-image img){filter: url(#wp-duotone-custom-ff0000-00ff00);}'
+			);
+		} );
+
 		describe( 'block gap support', () => {
 			const blockTypes = [
 				{

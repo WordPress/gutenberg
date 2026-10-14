@@ -54,6 +54,26 @@ class WP_Duotone_Gutenberg {
 	private static $global_styles_block_names;
 
 	/**
+	 * Duotone filters used by block style variations in global styles, keyed
+	 * on the block name they apply to, then on the filter ID. Includes the
+	 * block types styled inside a variation, such as an Image in a section style.
+	 *
+	 * Example:
+	 *  [
+	 *      'core/image' => [
+	 *          'wp-duotone-custom-000000-ffffff' => [
+	 *              'data'      => [ 'slug' => 'custom-000000-ffffff', 'colors' => [ '#000000', '#ffffff' ] ],
+	 *              'is_preset' => false,
+	 *          ],
+	 *      ],
+	 *       …
+	 *  ]
+	 *
+	 * @var ?array<string, array<string, array>>
+	 */
+	private static $global_styles_variation_filters;
+
+	/**
 	 * An array of duotone filter data from global, theme, and custom presets.
 	 *
 	 * Example:
@@ -903,6 +923,93 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Collects the duotone filters used by block style variations in global styles.
+	 *
+	 * The theme.json stylesheet already outputs the `filter` declarations for
+	 * variations. This finds the SVG filters and preset custom properties those
+	 * declarations need.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @return array<string, array<string, array>> Filters keyed on block name, then on filter ID.
+	 */
+	private static function get_all_global_style_variation_filters() {
+		if ( isset( self::$global_styles_variation_filters ) ) {
+			return self::$global_styles_variation_filters;
+		}
+
+		self::$global_styles_variation_filters = array();
+
+		$theme_json = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data()->get_raw_data();
+		foreach ( $theme_json['styles']['blocks'] ?? array() as $block_name => $block_styles ) {
+			foreach ( $block_styles['variations'] ?? array() as $variation_styles ) {
+				self::add_global_style_variation_filter( $block_name, $variation_styles['filter']['duotone'] ?? null );
+
+				foreach ( $variation_styles['blocks'] ?? array() as $inner_block_name => $inner_block_styles ) {
+					self::add_global_style_variation_filter( $inner_block_name, $inner_block_styles['filter']['duotone'] ?? null );
+				}
+			}
+		}
+
+		return self::$global_styles_variation_filters;
+	}
+
+	/**
+	 * Records the filter for one variation's duotone value, if it needs one.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $block_name   The block name the value applies to.
+	 * @param mixed  $duotone_attr The duotone value, e.g. a preset reference or a list of colors.
+	 */
+	private static function add_global_style_variation_filter( $block_name, $duotone_attr ) {
+		if ( is_array( $duotone_attr ) ) {
+			$filter_id = self::get_custom_filter_id( $duotone_attr );
+			if ( null !== $filter_id ) {
+				self::$global_styles_variation_filters[ $block_name ][ $filter_id ] = array(
+					'data'      => array(
+						'slug'   => substr( $filter_id, strlen( 'wp-duotone-' ) ),
+						'colors' => $duotone_attr,
+					),
+					'is_preset' => false,
+				);
+			}
+			return;
+		}
+
+		if ( ! self::is_preset( $duotone_attr ) ) {
+			return;
+		}
+
+		$filter_id = self::get_filter_id( self::get_slug_from_attribute( $duotone_attr ) );
+		self::$global_styles_variation_filters[ $block_name ][ $filter_id ] = array(
+			'data'      => self::get_all_global_styles_presets()[ $filter_id ],
+			'is_preset' => true,
+		);
+	}
+
+	/**
+	 * Enqueues the SVG filters, and the custom properties for presets, used by
+	 * a block type's style variations.
+	 *
+	 * Every filter for the block type is enqueued, whichever variation the block
+	 * uses, since a block can also pick one up from a section style on an ancestor.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param string $block_name The block name.
+	 */
+	private static function enqueue_global_style_variation_filters( $block_name ) {
+		$filters = self::get_all_global_style_variation_filters()[ $block_name ] ?? array();
+		foreach ( $filters as $filter_id => $filter ) {
+			self::$used_svg_filter_data[ $filter_id ] = $filter['data'];
+			if ( $filter['is_preset'] ) {
+				self::$used_global_styles_presets[ $filter_id ] = $filter['data'];
+			}
+		}
+	}
+
+	/**
 	 * Ensure all possible global style block names are ready.
 	 * This function is deprecated, as it's no longer necessary to handle this manually.
 	 * It is kept to ensure external users of this method don't break.
@@ -934,6 +1041,8 @@ class WP_Duotone_Gutenberg {
 		if ( ! $duotone_selector ) {
 			return $block_content;
 		}
+
+		self::enqueue_global_style_variation_filters( $block['blockName'] );
 
 		$global_styles_block_names = self::get_all_global_style_block_names();
 

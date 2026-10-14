@@ -184,54 +184,132 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers ::render_duotone_support
+	 * Renders a block with the given user global styles, then resets the cached data.
+	 *
+	 * @param array $styles The user global styles.
+	 * @param array $block  The parsed block.
+	 * @return array The rendered block HTML, the footer assets and the used preset filter IDs.
 	 */
-	public function test_gutenberg_render_duotone_support_global_styles_custom_colors() {
-		$set_user_duotone = static function ( $theme_json ) {
+	private function render_with_user_global_styles( $styles, $block ) {
+		$set_user_styles = static function ( $theme_json ) use ( $styles ) {
 			return $theme_json->update_with(
 				array(
 					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-					'styles'  => array(
-						'blocks' => array(
-							'core/image' => array(
-								'filter' => array( 'duotone' => array( '#000000', '#ff0000' ) ),
-							),
-						),
-					),
+					'styles'  => $styles,
 				)
 			);
 		};
-		add_filter( 'wp_theme_json_data_user', $set_user_duotone );
-		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
-		$block_names_property = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'global_styles_block_names' );
-		$svg_data_property    = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'used_svg_filter_data' );
-		if ( PHP_VERSION_ID < 80100 ) {
-			$block_names_property->setAccessible( true );
-			$svg_data_property->setAccessible( true );
+		$wp_duotone      = new WP_Duotone_Gutenberg();
+		$properties      = array();
+		foreach ( array( 'global_styles_block_names', 'global_styles_variation_filters', 'used_svg_filter_data', 'used_global_styles_presets' ) as $name ) {
+			$properties[ $name ] = new ReflectionProperty( 'WP_Duotone_Gutenberg', $name );
+			if ( PHP_VERSION_ID < 80100 ) {
+				$properties[ $name ]->setAccessible( true );
+			}
 		}
-		$wp_duotone = new WP_Duotone_Gutenberg();
-		$block_names_property->setValue( $wp_duotone, null );
-		$svg_data_property->setValue( $wp_duotone, array() );
+		$reset = static function () use ( $properties, $wp_duotone ) {
+			foreach ( $properties as $name => $property ) {
+				$property->setValue( $wp_duotone, str_starts_with( $name, 'used_' ) ? array() : null );
+			}
+		};
 
-		$block         = array(
-			'blockName' => 'core/image',
-			'attrs'     => array(),
-		);
-		$wp_block      = new WP_Block( $block );
+		add_filter( 'wp_theme_json_data_user', $set_user_styles );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		$reset();
+
 		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
-		$actual_html   = WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, $wp_block );
+		$html          = WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, new WP_Block( $block ) );
+		$used_presets  = array_keys( $properties['used_global_styles_presets']->getValue() );
 
 		ob_start();
 		WP_Duotone_Gutenberg::output_footer_assets();
 		$footer = ob_get_clean();
 
-		remove_filter( 'wp_theme_json_data_user', $set_user_duotone );
+		remove_filter( 'wp_theme_json_data_user', $set_user_styles );
 		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
-		$block_names_property->setValue( $wp_duotone, null );
-		$svg_data_property->setValue( $wp_duotone, array() );
+		$reset();
 
-		$this->assertSame( '<figure class="wp-block-image size-full wp-duotone-custom-000000-ff0000"><img src="/my-image.jpg" /></figure>', $actual_html );
+		return array( $html, $footer, $used_presets );
+	}
+
+	/**
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_render_duotone_support_global_styles_custom_colors() {
+		list( $html, $footer ) = $this->render_with_user_global_styles(
+			array(
+				'blocks' => array(
+					'core/image' => array(
+						'filter' => array( 'duotone' => array( '#000000', '#ff0000' ) ),
+					),
+				),
+			),
+			array(
+				'blockName' => 'core/image',
+				'attrs'     => array(),
+			)
+		);
+
+		$this->assertSame( '<figure class="wp-block-image size-full wp-duotone-custom-000000-ff0000"><img src="/my-image.jpg" /></figure>', $html );
 		$this->assertStringContainsString( '<filter id="wp-duotone-custom-000000-ff0000">', $footer );
 		$this->assertStringContainsString( 'tableValues="0 1"', $footer );
+	}
+
+	/**
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_render_duotone_support_global_styles_variations() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'duotone-section',
+				'label' => 'Duotone section',
+			)
+		);
+
+		list( $html, $footer, $used_presets ) = $this->render_with_user_global_styles(
+			array(
+				'blocks' => array(
+					'core/image' => array(
+						'variations' => array(
+							'rounded' => array(
+								'filter' => array( 'duotone' => array( '#000000', '#ff0000' ) ),
+							),
+						),
+					),
+					'core/cover' => array(
+						'variations' => array(
+							'rounded' => array(
+								'filter' => array( 'duotone' => array( '#0000ff', '#ffffff' ) ),
+							),
+						),
+					),
+					'core/group' => array(
+						'variations' => array(
+							'duotone-section' => array(
+								'blocks' => array(
+									'core/image' => array(
+										'filter' => array( 'duotone' => 'var:preset|duotone|blue-orange' ),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			array(
+				'blockName' => 'core/image',
+				'attrs'     => array( 'className' => 'is-style-rounded' ),
+			)
+		);
+
+		unregister_block_style( 'core/group', 'duotone-section' );
+
+		// The variation CSS comes from theme.json, so the block gets no class.
+		$this->assertSame( '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>', $html );
+		$this->assertStringContainsString( '<filter id="wp-duotone-custom-000000-ff0000">', $footer );
+		$this->assertStringContainsString( '<filter id="wp-duotone-blue-orange">', $footer );
+		$this->assertSame( array( 'wp-duotone-blue-orange' ), $used_presets );
+		$this->assertStringNotContainsString( 'wp-duotone-custom-0000ff-ffffff', $footer, 'A variation filter for another block type is not output.' );
 	}
 }
