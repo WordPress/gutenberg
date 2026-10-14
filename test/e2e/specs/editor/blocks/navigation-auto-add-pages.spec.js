@@ -119,7 +119,7 @@ test.describe( 'Navigation block: Auto add pages', () => {
 		).toContainText( 'Auto added page', { timeout: 10000 } );
 	} );
 
-	test( 'the setting can be turned off from the block settings', async ( {
+	test( 'turning the setting off is saved with the post', async ( {
 		admin,
 		editor,
 		page,
@@ -150,7 +150,26 @@ test.describe( 'Navigation block: Auto add pages', () => {
 		await toggle.click();
 		await expect( toggle ).not.toBeChecked();
 
-		// The setting saves on its own, without the post being saved.
+		// The change is a pending edit to the menu, saved with everything
+		// else, so the top bar offers to save and the server is untouched.
+		const topBar = page.getByRole( 'region', { name: 'Editor top bar' } );
+		await expect(
+			topBar.getByRole( 'button', { name: 'Save', exact: true } )
+		).toBeVisible();
+		const pendingMenu = await requestUtils.rest( {
+			path: `/wp/v2/navigation/${ menu.id }`,
+			params: { context: 'edit' },
+		} );
+		expect( pendingMenu.meta[ META_KEY ] ).toBe( true );
+
+		await topBar
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+
 		await expect
 			.poll( async () => {
 				const savedMenu = await requestUtils.rest( {
@@ -160,11 +179,6 @@ test.describe( 'Navigation block: Auto add pages', () => {
 				return savedMenu.meta[ META_KEY ];
 			} )
 			.toBe( false );
-		await expect(
-			page
-				.getByRole( 'region', { name: 'Editor top bar' } )
-				.getByRole( 'button', { name: 'Publish', exact: true } )
-		).toBeVisible();
 
 		const savedMenu = await requestUtils.rest( {
 			path: `/wp/v2/navigation/${ menu.id }`,
