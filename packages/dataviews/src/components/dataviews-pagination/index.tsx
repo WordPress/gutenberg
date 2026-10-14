@@ -84,16 +84,7 @@ export function DataViewsPageSelect( { className }: { className?: string } ) {
 								variant="minimal"
 								aria-label={ __( 'Current page' ) }
 							/>
-							<Select.Popup
-								width="content"
-								positioner={
-									// Item alignment currently removes the popup height limit.
-									// Anchor the popup instead so long page lists stay scrollable.
-									<Select.Positioner
-										alignItemWithTrigger={ false }
-									/>
-								}
-							>
+							<Select.Popup width="content">
 								{ pageSelectOptions.map( ( option ) => (
 									<Select.Item
 										key={ option.value }
