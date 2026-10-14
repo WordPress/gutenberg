@@ -149,7 +149,7 @@ _Related_
 
 ### privateApis
 
-Private @wordpress/compose APIs.
+Private `@wordpress/compose` APIs.
 
 ### pure
 

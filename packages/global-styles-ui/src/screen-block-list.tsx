@@ -8,7 +8,7 @@ import {
 	__experimentalText as WCText,
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, VisuallyHidden } from '@wordpress/ui';
+import { Menu } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
@@ -141,10 +141,9 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 
 interface BlockMenuItemProps {
 	block: any;
-	isCustomized: boolean;
 }
 
-function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
+function BlockMenuItem( { block }: BlockMenuItemProps ) {
 	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
@@ -160,17 +159,6 @@ function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
 					icon={ block.icon }
 				/>
 				<FlexItem>{ block.title }</FlexItem>
-				{ isCustomized && (
-					<>
-						<VisuallyHidden>
-							{ __( 'Has custom styles' ) }
-						</VisuallyHidden>
-						<span
-							aria-hidden="true"
-							className="global-styles-ui-block-types-item__indicator"
-						/>
-					</>
-				) }
 			</HStack>
 		</NavigationButtonAsItem>
 	);
@@ -286,7 +274,6 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 				filteredBlockTypes.map( ( block ) => (
 					<BlockMenuItem
 						block={ block }
-						isCustomized={ customizedBlockNames.has( block.name ) }
 						key={ 'menu-itemblock-' + block.name }
 					/>
 				) )

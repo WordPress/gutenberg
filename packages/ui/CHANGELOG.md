@@ -4,6 +4,9 @@
 
 ### Breaking Changes
 
+-   `Select`, `Autocomplete`, `Combobox`, and the select controls: `actionsRef` no longer keeps closed popups mounted. For externally controlled exit animations, call `eventDetails.preventUnmountOnClose()` in `onOpenChange` when closing, then `actionsRef.current?.unmount()` when the animation ends. Close through `actionsRef.current?.close()` to run that handler. Automatic CSS exit animations need no migration. See [Base UI's migration guide](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
+-   The `actionsRef` types for these components now require `close()`. Add it to manually constructed action objects and ref stubs. See [Base UI #5734](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
+-   `Autocomplete`, `Combobox`, and the searchable selects and controls: `onItemHighlighted` now receives native events. Accept `MouseEvent | PointerEvent` for pointer highlights, handle `none` when typing or clearing and `pointer` when hovering after keyboard navigation, and avoid canceling or stopping the event unless intended. See [Base UI #5838](https://github.com/mui/base-ui/pull/5838) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### New Features
@@ -13,6 +16,9 @@
 
 ### Enhancements
 
+-   `Dialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84379](https://github.com/WordPress/gutenberg/pull/84379)).
+-   `Drawer`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84380](https://github.com/WordPress/gutenberg/pull/84380)).
+-   `Dialog`: Add an opt-in `auto` popup size that fits content within the responsive minimum and viewport inset ([#84559](https://github.com/WordPress/gutenberg/pull/84559)).
 -   `Select`, `Combobox`, `Autocomplete`, and the select controls: Tighten popup item spacing, use 16px selection indicators, and align group labels and separators with item content ([#84393](https://github.com/WordPress/gutenberg/pull/84393)).
 -   `Button`, `IconButton`: Use the shared `Spinner` for loading indicators ([#84321](https://github.com/WordPress/gutenberg/pull/84321)).
 -   `useEnableWpCompatOverlaySlot`: Mark as recommended for use in a WordPress environment ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
@@ -26,8 +32,15 @@
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
 
+### Internal
+
+-   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
+
 ### Documentation
 
+-   `Tabs`: Preserve intrinsic icon styles in the tab icons and tooltips story ([#84618](https://github.com/WordPress/gutenberg/pull/84618)).
+
+-   Document accessible naming for Combobox popups ([#84551](https://github.com/WordPress/gutenberg/pull/84551)).
 -   Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect, and SearchableChipSelect ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
 -   `Menu`: Clarify icon and description usage, document mixed icon alignment and current layout defaults, and favor short, clear labels ([#84020](https://github.com/WordPress/gutenberg/pull/84020)).
 
