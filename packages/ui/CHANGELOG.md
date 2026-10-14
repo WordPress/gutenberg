@@ -16,6 +16,7 @@
 
 ### Enhancements
 
+-   `Tabs`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Dialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84379](https://github.com/WordPress/gutenberg/pull/84379)).
 -   `Drawer`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84380](https://github.com/WordPress/gutenberg/pull/84380)).
 -   `Dialog`: Add an opt-in `auto` popup size that fits content within the responsive minimum and viewport inset ([#84559](https://github.com/WordPress/gutenberg/pull/84559)).
