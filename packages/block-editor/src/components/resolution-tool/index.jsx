@@ -1,7 +1,5 @@
-import {
-	SelectControl as WCSelectControl,
-	__experimentalToolsPanelItem as ToolsPanelItem,
-} from '@wordpress/components';
+import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 
 const DEFAULT_SIZE_OPTIONS = [
@@ -42,12 +40,16 @@ export default function ResolutionTool( {
 			panelId={ panelId }
 			resetAllFilter={ resetAllFilter }
 		>
-			<WCSelectControl
+			<SelectControl
 				label={ __( 'Resolution' ) }
-				value={ displayValue }
-				options={ options }
-				onChange={ onChange }
-				help={ __( 'Select the size of the source image.' ) }
+				value={
+					options.find( ( item ) => item.value === displayValue ) ??
+					options.find( ( item ) => ! item.disabled ) ??
+					null
+				}
+				items={ options }
+				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+				description={ __( 'Select the size of the source image.' ) }
 			/>
 		</ToolsPanelItem>
 	);

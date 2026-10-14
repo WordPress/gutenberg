@@ -275,7 +275,8 @@ export function PrivateBlockToolbar( {
 					showSwitchSectionStyleButton && (
 						<SwitchSectionStyle clientId={ blockClientIds[ 0 ] } />
 					) }
-				{ ! areSelectedBlocksHiddenOnViewport &&
+				{ ! isPlaceholder &&
+					! areSelectedBlocksHiddenOnViewport &&
 					shouldShowVisualToolbar && (
 						<>
 							{ ! isSectionContainer && (

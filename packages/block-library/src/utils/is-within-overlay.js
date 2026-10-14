@@ -5,7 +5,7 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../navigation/constants';
 /**
  * Checks if the current editing context is within a navigation overlay template part.
  *
- * This utility exists because @wordpress/block-library cannot depend on @wordpress/editor
+ * This utility exists because `@wordpress/block-library` cannot depend on `@wordpress/editor`
  * as a package dependency. Blocks can be loaded into non-post block editors, so we must
  * access the 'core/editor' store by string literal rather than importing it.
  *

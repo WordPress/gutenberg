@@ -18,13 +18,14 @@ import {
 	useBlockProps,
 	useBlockEditingMode,
 	__experimentalUseColorProps as useColorProps,
+	useBackgroundProps,
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetShadowClassesAndStyles as useShadowProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
 import { getBlockBindingsSource } from '@wordpress/blocks';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -68,6 +69,15 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
+	// Stable so the memoized icon grid items don't re-render.
+	const onChangeIcon = useCallback(
+		( name ) => {
+			setAttributes( { icon: name } );
+			setInserterOpen( false );
+		},
+		[ setAttributes ]
+	);
+
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 	const { isIconBindingReadOnly = false, iconBindingReadOnlyMessage } =
 		useSelect(
@@ -102,6 +112,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 		);
 
 	const colorProps = useColorProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
 	// Only padding is applied to the inner SVG element, matching the front
 	// end. The margin support is serialized to the block wrapper instead.
 	const spacingProps = useSpacingProps( {
@@ -276,6 +287,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 						wrapperProps={ {
 							className: clsx(
 								colorProps.className,
+								backgroundProps.className,
 								borderProps.className,
 								spacingProps.className,
 								dimensionsProps.className,
@@ -283,6 +295,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 							),
 							style: {
 								...colorProps.style,
+								...backgroundProps.style,
 								...borderProps.style,
 								...shadowProps.style,
 								...spacingProps.style,
@@ -314,10 +327,7 @@ export function Edit( { attributes, setAttributes, isSelected, context } ) {
 				<CustomInserterModal
 					onClose={ () => setInserterOpen( false ) }
 					value={ attributes.icon }
-					onChange={ ( name ) => {
-						setAttributes( { icon: name } );
-						setInserterOpen( false );
-					} }
+					onChange={ onChangeIcon }
 				/>
 			) }
 		</>

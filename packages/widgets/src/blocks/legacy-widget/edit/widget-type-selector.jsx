@@ -1,4 +1,4 @@
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { SelectControl } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -16,7 +16,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 	}, [] );
 
 	if ( ! widgetTypes ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	if ( widgetTypes.length === 0 ) {

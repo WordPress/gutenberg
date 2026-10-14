@@ -3,7 +3,7 @@ import {
 	Notice,
 } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
-import { useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { default as transformStyles } from '../../utils/transform-styles';
 
@@ -60,15 +60,42 @@ function getCSSValidationError( css ) {
 export default function AdvancedPanel( {
 	value,
 	onChange,
-	inheritedValue = value,
+	inheritedValue,
 	help,
 } ) {
-	// Custom CSS
-	const customCSS = inheritedValue?.css;
+	// Custom CSS. Prefer the local override in `value` (scoped to the
+	// currently selected style state); when there isn't one, fall back to
+	// `inheritedValue` (e.g. the theme.json + user merged CSS for that same
+	// state) so the field previews what already applies, same as other
+	// inheritable style controls. Falls back to an empty string, never
+	// `undefined`, so the textarea doesn't retain a previous state's
+	// uncontrolled DOM value when switching between style states.
+	const hasOwnCSS = typeof value?.css === 'string' && value.css.trim() !== '';
+	const customCSS = ( hasOwnCSS ? value.css : inheritedValue?.css ) ?? '';
 	const [ cssError, setCSSError ] = useState( () =>
 		getCSSValidationError( customCSS )
 	);
+
+	// Tracks the last value this component itself produced via onChange/onBlur,
+	// so the effect below can tell an external change (e.g. switching to a
+	// different style state) apart from the change it just caused itself.
+	const ownValueRef = useRef( customCSS );
+
+	// Re-validate whenever the edited CSS changes for a reason other than
+	// this component's own onChange/onBlur handlers, e.g. switching to a
+	// different style state. Skipping the component's own changes keeps the
+	// full (slower) validation off the hot typing path; it already runs via
+	// handleOnChange/handleOnBlur below.
+	useEffect( () => {
+		if ( customCSS === ownValueRef.current ) {
+			return;
+		}
+		ownValueRef.current = customCSS;
+		setCSSError( getCSSValidationError( customCSS ) );
+	}, [ customCSS ] );
+
 	function handleOnChange( newValue ) {
+		ownValueRef.current = newValue;
 		onChange( {
 			...value,
 			css: newValue,
@@ -77,7 +104,9 @@ export default function AdvancedPanel( {
 		setCSSError( getMarkupValidationError( newValue ) );
 	}
 	function handleOnBlur( event ) {
-		setCSSError( getCSSValidationError( event?.target?.value ) );
+		const newValue = event?.target?.value;
+		ownValueRef.current = newValue;
+		setCSSError( getCSSValidationError( newValue ) );
 	}
 
 	return (
