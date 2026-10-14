@@ -244,13 +244,7 @@ function BlockMenuItem( { block }: BlockMenuItemProps ) {
 	);
 }
 
-function ElementMenuItem( {
-	element,
-	isCustomized,
-}: {
-	element: ElementItem;
-	isCustomized: boolean;
-} ) {
+function ElementMenuItem( { element }: { element: ElementItem } ) {
 	return (
 		<NavigationButtonAsItem path={ '/blocks/elements/' + element.name }>
 			<HStack justify="flex-start" spacing={ 2 }>
@@ -259,17 +253,6 @@ function ElementMenuItem( {
 					icon={ element.icon }
 				/>
 				<FlexItem>{ ELEMENTS[ element.name ].title }</FlexItem>
-				{ isCustomized && (
-					<>
-						<VisuallyHidden>
-							{ __( 'Has custom styles' ) }
-						</VisuallyHidden>
-						<span
-							aria-hidden="true"
-							className="global-styles-ui-block-types-item__indicator"
-						/>
-					</>
-				) }
 			</HStack>
 		</NavigationButtonAsItem>
 	);
@@ -448,9 +431,6 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 							<ElementMenuItem
 								key={ element.name }
 								element={ element }
-								isCustomized={ customizedElementNames.has(
-									element.name
-								) }
 							/>
 						) ) }
 					</ItemGroup>
