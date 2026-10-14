@@ -60,6 +60,14 @@
 		}
 	}
 
+	// In the placeholder the icon is disabled like the rest of the toolbar.
+	.is-placeholder & .components-button.block-editor-block-toolbar__block-icon-button[aria-disabled="true"] {
+		&,
+		&:hover {
+			color: $gray-600;
+		}
+	}
+
 	&.is-synced,
 	&.is-connected {
 		.block-editor-block-toolbar__block-icon {
@@ -298,9 +306,6 @@
 		gap: $grid-unit-15;
 		.block-editor-block-patterns-list__list-item {
 			margin-bottom: 0;
-		}
-		.block-editor-inserter__media-list__list-item {
-			min-height: 100px;
 		}
 	}
 }

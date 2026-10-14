@@ -11,6 +11,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
@@ -47,18 +48,20 @@ export default function PostNavigationLinkEdit( {
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 
 	/*
-	 * Border, shadow and spacing serialization is skipped for this block so the
-	 * styles are not applied to the empty wrapper the front end renders when
-	 * there is no adjacent post. The editor always renders the link, so they
-	 * always apply here.
+	 * Border, dimensions, shadow and spacing serialization is skipped for this
+	 * block so the styles are not applied to the empty wrapper the front end
+	 * renders when there is no adjacent post. The editor always renders the
+	 * link, so they always apply here.
 	 */
 	const borderProps = useBorderProps( attributes );
+	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const blockProps = useBlockProps( {
 		className: borderProps.className,
 		style: {
 			...borderProps.style,
+			...dimensionsProps.style,
 			...shadowProps.style,
 			...spacingProps.style,
 		},

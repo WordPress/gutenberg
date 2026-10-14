@@ -28,7 +28,11 @@ const gradientValue = {
 	},
 };
 
-function registerWithSkip( { colorSkip, backgroundSkip } = {} ) {
+function registerWithSkip( {
+	colorSkip,
+	backgroundSkip,
+	backgroundClip = true,
+} = {} ) {
 	registerBlockType( BLOCK_NAME, {
 		apiVersion: 3,
 		title: 'Test block',
@@ -43,6 +47,7 @@ function registerWithSkip( { colorSkip, backgroundSkip } = {} ) {
 			background: {
 				backgroundImage: true,
 				gradient: true,
+				backgroundClip,
 				__experimentalSkipSerialization: backgroundSkip,
 			},
 		},
@@ -125,6 +130,92 @@ describe( 'color useBlockProps has-background', () => {
 		).toHaveLength( 1 );
 	} );
 
+	it.each( [
+		[ 'a background image', imageValue ],
+		[ 'a background gradient', gradientValue ],
+	] )( 'is not added for %s clipped to the text', ( _label, style ) => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				background: { ...style.background, backgroundClip: 'text' },
+			} )
+		).not.toContain( 'has-background' );
+	} );
+
+	it( 'is added for a gradient clipped to a box', () => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				background: {
+					...gradientValue.background,
+					backgroundClip: 'padding-box',
+				},
+			} )
+		).toEqual( [ 'has-background' ] );
+	} );
+
+	it( 'is added for a text clip whose serialization is skipped', () => {
+		registerWithSkip( { backgroundSkip: [ 'backgroundClip' ] } );
+		expect(
+			getClassNames( {
+				background: {
+					...gradientValue.background,
+					backgroundClip: 'text',
+				},
+			} )
+		).toEqual( [ 'has-background' ] );
+	} );
+
+	it( 'is not added for a background color clipped to the text', () => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				...colorValue,
+				background: { backgroundClip: 'text' },
+			} )
+		).not.toContain( 'has-background' );
+	} );
+
+	it( 'is added for a background color clipped to a box', () => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				...colorValue,
+				background: { backgroundClip: 'padding-box' },
+			} )
+		).toContain( 'has-background' );
+	} );
+
+	it( 'is added for a background color when the text clip is skipped', () => {
+		registerWithSkip( { backgroundSkip: [ 'backgroundClip' ] } );
+		expect(
+			getClassNames( {
+				...colorValue,
+				background: { backgroundClip: 'text' },
+			} )
+		).toContain( 'has-background' );
+	} );
+
+	it( 'is added for a background color when the clip is unsupported', () => {
+		registerWithSkip( { backgroundClip: false } );
+		expect(
+			getClassNames( {
+				...colorValue,
+				background: { backgroundClip: 'text' },
+			} )
+		).toContain( 'has-background' );
+	} );
+
+	it( 'is still added for a color gradient over a text clip', () => {
+		registerWithSkip();
+		expect(
+			getClassNames( {
+				...colorGradientValue,
+				background: { backgroundClip: 'text' },
+			} )
+		).toContain( 'has-background' );
+	} );
+
 	it( 'follows the background gradient skip separately from the image', () => {
 		registerWithSkip( { backgroundSkip: [ 'backgroundImage' ] } );
 		expect(
@@ -135,5 +226,55 @@ describe( 'color useBlockProps has-background', () => {
 				},
 			} )
 		).toEqual( [ 'has-background' ] );
+	} );
+} );
+
+describe( 'color addSaveProps', () => {
+	const fontSizeValue = { typography: { fontSize: '20px' } };
+	const linkValue = { elements: { link: { color: { text: '#1d4d3a' } } } };
+
+	function registerWithLink( colorSkip ) {
+		registerBlockType( BLOCK_NAME, {
+			apiVersion: 3,
+			title: 'Test block',
+			category: 'design',
+			save: () => null,
+			supports: {
+				color: {
+					gradients: true,
+					link: true,
+					__experimentalSkipSerialization: colorSkip,
+				},
+			},
+		} );
+	}
+
+	afterEach( () => {
+		unregisterBlockType( BLOCK_NAME );
+	} );
+
+	it( 'adds no className key when only the link color serializes and none is set', () => {
+		registerWithLink( [ 'text', 'background', 'gradients' ] );
+		expect(
+			color.addSaveProps( {}, BLOCK_NAME, { style: fontSizeValue } )
+		).toStrictEqual( {} );
+	} );
+
+	it( 'adds has-link-color when only the link color serializes', () => {
+		registerWithLink( [ 'text', 'background', 'gradients' ] );
+		expect(
+			color.addSaveProps( {}, BLOCK_NAME, {
+				style: { ...fontSizeValue, ...linkValue },
+			} )
+		).toEqual( { className: 'has-link-color' } );
+	} );
+
+	it( 'still adds the className key when other colors serialize', () => {
+		registerWithLink();
+		expect(
+			Object.keys(
+				color.addSaveProps( {}, BLOCK_NAME, { style: fontSizeValue } )
+			)
+		).toEqual( [ 'className' ] );
 	} );
 } );
