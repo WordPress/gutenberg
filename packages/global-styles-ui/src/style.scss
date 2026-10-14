@@ -63,6 +63,10 @@
 	}
 }
 
+.global-styles-ui-element-block-overrides {
+	padding: variables.$grid-unit-20;
+}
+
 .global-styles-ui-block-types-item-list__no-results {
 	padding-top: variables.$grid-unit-20;
 }
