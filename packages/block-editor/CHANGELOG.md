@@ -37,6 +37,7 @@
 -   Convert the store reducer to TypeScript and add the store `State` and `Action` types ([#84624](https://github.com/WordPress/gutenberg/pull/84624)).
 -   Convert the store selectors and `store/utils` to TypeScript ([#84631](https://github.com/WordPress/gutenberg/pull/84631)).
 -   Convert the store private selectors to TypeScript and type the editor settings the store reads ([#84662](https://github.com/WordPress/gutenberg/pull/84662)).
+-   Convert the store actions and private actions to TypeScript and add the store thunk arguments type ([#84672](https://github.com/WordPress/gutenberg/pull/84672)).
 
 ## 18.1.0 (2026-10-07)
 
