@@ -1042,7 +1042,7 @@ h3 {
 {% end %}
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
+The `link` and `button` elements support the `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, and `:any-link` pseudo selectors. The `select` element supports `:hover`, `:focus`, `:focus-visible`, and `:active`.
 
 ```json
 "elements": {
