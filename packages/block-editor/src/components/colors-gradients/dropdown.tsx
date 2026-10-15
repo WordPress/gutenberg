@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ComponentProps, ReactNode } from 'react';
 import {
 	Button,
 	ColorIndicator,
@@ -12,15 +13,28 @@ import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { reset as resetIcon } from '@wordpress/icons';
 import ColorGradientControl from './control';
+import type {
+	ColorGradientSetting,
+	ColorGradientSettingsDropdownProps,
+} from './types';
 
 // When the `ColorGradientSettingsDropdown` controls are being rendered to a
 // `ToolsPanel` they must be wrapped in a `ToolsPanelItem`.
-const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
+const WithToolsPanelItem = ( {
+	setting,
+	children,
+	panelId,
+	...props
+}: Partial< ComponentProps< typeof ToolsPanelItem > > & {
+	setting: ColorGradientSetting;
+	children: ReactNode;
+} ) => {
+	// A set value implies its change handler.
 	const clearValue = () => {
 		if ( setting.colorValue ) {
-			setting.onColorChange();
+			setting.onColorChange!();
 		} else if ( setting.gradientValue ) {
-			setting.onGradientChange();
+			setting.onGradientChange!();
 		}
 	};
 	return (
@@ -28,7 +42,8 @@ const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
 			hasValue={ () => {
 				return !! setting.colorValue || !! setting.gradientValue;
 			} }
-			label={ setting.label }
+			// Every setting rendered in a `ToolsPanel` has a label.
+			label={ setting.label! }
 			onDeselect={ clearValue }
 			isShownByDefault={
 				setting.isShownByDefault !== undefined
@@ -50,11 +65,18 @@ const WithToolsPanelItem = ( { setting, children, panelId, ...props } ) => {
 	);
 };
 
-const LabeledColorIndicator = ( { colorValue, label } ) => (
+const LabeledColorIndicator = ( {
+	colorValue,
+	label,
+}: {
+	colorValue?: string | null;
+	label?: string;
+} ) => (
 	<HStack justify="flex-start">
 		<ColorIndicator
 			className="block-editor-panel-color-gradient-settings__color-indicator"
-			colorValue={ colorValue }
+			// A `null` style value sets no background, like `undefined`.
+			colorValue={ colorValue as string | undefined }
 		/>
 		<FlexItem
 			className="block-editor-panel-color-gradient-settings__color-name"
@@ -68,8 +90,24 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 // Renders a color dropdown's toggle as an `Item` if it is within an `ItemGroup`
 // or as a `Button` if it isn't e.g. the controls are being rendered in
 // a `ToolsPanel`.
-const renderToggle = ( settings ) =>
-	function Toggle( { onToggle, isOpen } ) {
+const renderToggle = (
+	settings: Pick<
+		ColorGradientSetting,
+		| 'clearable'
+		| 'colorValue'
+		| 'gradientValue'
+		| 'onColorChange'
+		| 'onGradientChange'
+		| 'label'
+	>
+) =>
+	function Toggle( {
+		onToggle,
+		isOpen,
+	}: {
+		onToggle: () => void;
+		isOpen: boolean;
+	} ) {
 		const {
 			clearable,
 			colorValue,
@@ -78,7 +116,7 @@ const renderToggle = ( settings ) =>
 			onGradientChange,
 			label,
 		} = settings;
-		const colorButtonRef = useRef( undefined );
+		const colorButtonRef = useRef< HTMLButtonElement >( undefined );
 
 		const toggleProps = {
 			onClick: onToggle,
@@ -90,11 +128,12 @@ const renderToggle = ( settings ) =>
 			ref: colorButtonRef,
 		};
 
+		// A set value implies its change handler.
 		const clearValue = () => {
 			if ( colorValue ) {
-				onColorChange();
+				onColorChange!();
 			} else if ( gradientValue ) {
-				onGradientChange();
+				onGradientChange!();
 			}
 		};
 
@@ -145,8 +184,8 @@ export default function ColorGradientSettingsDropdown( {
 	settings,
 	__experimentalIsRenderedInSidebar,
 	...props
-} ) {
-	let popoverProps;
+}: ColorGradientSettingsDropdownProps ) {
+	let popoverProps: ComponentProps< typeof Dropdown >[ 'popoverProps' ];
 	if ( __experimentalIsRenderedInSidebar ) {
 		popoverProps = {
 			placement: 'left-start',

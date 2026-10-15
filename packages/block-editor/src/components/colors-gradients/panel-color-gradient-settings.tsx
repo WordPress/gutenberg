@@ -7,6 +7,7 @@ import { useRegistry } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import ColorGradientSettingsDropdown from './dropdown';
 import useColorsAndGradientsPalettes from './use-multiple-origin-colors-and-gradients';
+import type { PanelColorGradientSettingsProps } from './types';
 
 const colorsAndGradientKeys = [
 	'colors',
@@ -27,8 +28,11 @@ export const PanelColorGradientSettingsInner = ( {
 	showTitle = true,
 	__experimentalIsRenderedInSidebar,
 	enableAlpha,
-} ) => {
-	const panelId = useInstanceId( PanelColorGradientSettingsInner );
+}: PanelColorGradientSettingsProps ) => {
+	// `ToolsPanel` only compares the id, so the numeric instance ID works.
+	const panelId = useInstanceId(
+		PanelColorGradientSettingsInner
+	) as unknown as string;
 	const { batch } = useRegistry();
 	if (
 		( ! colors || colors.length === 0 ) &&
@@ -55,7 +59,8 @@ export const PanelColorGradientSettingsInner = ( {
 				className
 			) }
 			hasInnerWrapper
-			label={ showTitle ? title : undefined }
+			// `ToolsPanel` hides its header without a label.
+			label={ ( showTitle ? title : undefined ) as string }
 			resetAll={ () => {
 				batch( () => {
 					settings.forEach(
@@ -65,10 +70,11 @@ export const PanelColorGradientSettingsInner = ( {
 							onColorChange,
 							onGradientChange,
 						} ) => {
+							// A set value implies its change handler.
 							if ( colorValue ) {
-								onColorChange();
+								onColorChange!();
 							} else if ( gradientValue ) {
-								onGradientChange();
+								onGradientChange!();
 							}
 						}
 					);
@@ -102,7 +108,9 @@ export const PanelColorGradientSettingsInner = ( {
 	);
 };
 
-const PanelColorGradientSettingsSelect = ( props ) => {
+const PanelColorGradientSettingsSelect = (
+	props: PanelColorGradientSettingsProps
+) => {
 	const colorGradientSettings = useColorsAndGradientsPalettes();
 	return (
 		<PanelColorGradientSettingsInner
@@ -111,7 +119,9 @@ const PanelColorGradientSettingsSelect = ( props ) => {
 	);
 };
 
-const PanelColorGradientSettings = ( props ) => {
+const PanelColorGradientSettings = (
+	props: PanelColorGradientSettingsProps
+) => {
 	if (
 		colorsAndGradientKeys.every( ( key ) => props.hasOwnProperty( key ) )
 	) {
