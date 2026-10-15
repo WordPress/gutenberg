@@ -12,6 +12,7 @@ import type { store } from '.';
 import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
 import type {
+	currentUserIdSelectKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
@@ -241,6 +242,7 @@ export interface UserPattern {
 	content: { raw: string };
 	wp_pattern_category?: number[];
 	wp_pattern_sync_status?: string;
+	author?: number;
 }
 
 export interface UserPatternCategory {
@@ -372,6 +374,9 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalFeatures?: FeatureSettings;
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
+	[ currentUserIdSelectKey ]?: (
+		select: typeof globalSelect
+	) => number | undefined;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect
