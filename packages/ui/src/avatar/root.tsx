@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import type { RootProps } from './types';
 import resetStyles from '../utils/css/resets.module.css';
+import defenseStyles from '../utils/css/global-css-defense.module.css';
 import styles from './style.module.css';
 
 /**
@@ -31,6 +32,7 @@ export const Root = forwardRef< HTMLSpanElement, RootProps >(
 				ref={ ref }
 				className={ clsx(
 					resetStyles[ 'box-sizing' ],
+					defenseStyles.span,
 					styles.root,
 					styles[ `is-${ size }` ],
 					shape === 'square' && styles[ 'is-square' ],
