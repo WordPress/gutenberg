@@ -132,4 +132,8 @@ export type AutocompleteStatusProps = ComponentProps<
 	children?: React.ReactNode;
 };
 
+export type AutocompleteTriggerProps = ComponentProps<
+	typeof _Autocomplete.Trigger
+>;
+
 export type AutocompleteValueProps = _Autocomplete.Value.Props;

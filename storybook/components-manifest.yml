@@ -168,6 +168,13 @@
             - className
             - render
             - style
+      - name: Autocomplete.Trigger
+        props:
+            - className
+            - disabled
+            - nativeButton
+            - render
+            - style
       - name: Autocomplete.Value
         props:
             - children

@@ -6,10 +6,16 @@ import {
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { Button as UIButton, Menu } from '@wordpress/ui';
+import { ThemeProvider } from '@wordpress/theme';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import ReactionDisplay, {
+	getReactedHexKeys,
+} from './reactions/reaction-display';
+import { AddReactionButton } from './reactions/add-reaction-button';
+import { useReaction } from './reactions/use-reaction';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -50,7 +56,9 @@ export function Note( {
 	onEditNote,
 	onDeleteNote,
 	onResolve,
+	isThreadResolved = false,
 } ) {
+	const { reactions, toggleReaction } = useReaction( note );
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
 
@@ -77,6 +85,11 @@ export function Note( {
 	}, [ rawContent ] );
 
 	const canResolve = note.parent === 0;
+	const hasReactions = getReactedHexKeys( reactions ).length > 0;
+	// Not while editing: the trigger floats over the note's corner, which
+	// during an edit is the form's own text field. Not on a resolved thread
+	// either, where reactions can no longer be toggled.
+	const canReact = isSelected && actionState !== 'edit' && ! isThreadResolved;
 	const metaStatus = note.meta?._wp_note_status;
 	const isResolutionNote =
 		metaStatus === 'resolved' || metaStatus === 'reopen';
@@ -209,9 +222,58 @@ export function Note( {
 		<NoteCard
 			note={ note }
 			actions={ actions }
+			className="editor-collab-sidebar-panel__note"
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
-			{ body }
+			<div className="editor-collab-sidebar-panel__note-body">
+				{ body }
+				{ ( hasReactions || canReact ) && (
+					// The editor sets `cornerRadius="none"`, but reactions
+					// read as badges rather than controls, so the row opts
+					// into the pill shape the Design System's `pronounced`
+					// preset gives a small Button.
+					<ThemeProvider cornerRadius="pronounced">
+						<div
+							className={ clsx(
+								'editor-collab-sidebar-panel__reactions',
+								{
+									// Nothing to sit beside yet, so the
+									// trigger floats in the note's top corner
+									// rather than making the card taller for
+									// an option nobody has taken up.
+									'is-floating': ! hasReactions,
+								}
+							) }
+						>
+							{ /*
+							 * Reactions are information about the note, so
+							 * unlike its actions they stay visible once the
+							 * thread is deselected.
+							 */ }
+							<ReactionDisplay
+								noteId={ note.id }
+								reactions={ reactions }
+								disabled={ isThreadResolved }
+								onToggleReaction={ toggleReaction }
+							>
+								{ /*
+								 * Trails the pills, in the same tree position
+								 * whether or not there are any: a different
+								 * position once the first reaction lands would
+								 * remount the open picker's trigger and drop
+								 * focus to the body.
+								 */ }
+								{ canReact && (
+									<AddReactionButton
+										reactions={ reactions }
+										onToggleReaction={ toggleReaction }
+									/>
+								) }
+							</ReactionDisplay>
+						</div>
+					</ThemeProvider>
+				) }
+			</div>
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

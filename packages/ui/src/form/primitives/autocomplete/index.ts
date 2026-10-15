@@ -17,5 +17,6 @@ export { Root } from './root';
 export { Row } from './row';
 export { Separator } from './separator';
 export { Status } from './status';
+export { Trigger } from './trigger';
 export { useFilteredItems } from './use-filtered-items';
 export { Value } from './value';
