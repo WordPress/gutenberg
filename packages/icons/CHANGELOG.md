@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Generate `inlined-icons.php` with the SVG markup of the icons in the `core-admin` collection, so that WordPress can render them without reading and sanitizing their files ([#84552](https://github.com/WordPress/gutenberg/pull/84552)).
+
 ## 18.0.0 (2026-10-07)
 
 ### Breaking Changes
