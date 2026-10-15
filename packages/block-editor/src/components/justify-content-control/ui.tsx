@@ -1,3 +1,4 @@
+import type { ComponentProps, ComponentType } from 'react';
 import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import {
 	justifyLeft,
@@ -7,6 +8,7 @@ import {
 	justifyStretch,
 } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import type { JustifyContentUIProps, JustifyContentValue } from './types';
 
 const icons = {
 	left: justifyLeft,
@@ -23,11 +25,11 @@ function JustifyContentUI( {
 	value,
 	popoverProps,
 	isToolbar,
-} ) {
+}: JustifyContentUIProps ) {
 	// If the control is already selected we want a click
 	// again on the control to deselect the item, so we
 	// call onChange( undefined )
-	const handleClick = ( next ) => {
+	const handleClick = ( next: JustifyContentValue ) => {
 		if ( next === value ) {
 			onChange( undefined );
 		} else {
@@ -74,7 +76,13 @@ function JustifyContentUI( {
 		},
 	];
 
-	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	// Both take these props; `ToolbarGroup`'s types also require a `title`
+	// for a collapsed group, which was never passed.
+	const UIComponent = (
+		isToolbar ? ToolbarGroup : ToolbarDropdownMenu
+	) as ComponentType<
+		ComponentProps< typeof ToolbarDropdownMenu > & { isCollapsed?: boolean }
+	>;
 	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
@@ -83,7 +91,8 @@ function JustifyContentUI( {
 			popoverProps={ popoverProps }
 			label={ __( 'Change items justification' ) }
 			controls={ allControls.filter( ( elem ) =>
-				allowedControls.includes( elem.name )
+				// Every control is named after a justification.
+				allowedControls.includes( elem.name as JustifyContentValue )
 			) }
 			{ ...extraProps }
 		/>

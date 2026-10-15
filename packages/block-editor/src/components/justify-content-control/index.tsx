@@ -1,10 +1,11 @@
 import JustifyContentUI from './ui';
+import type { JustifyContentControlProps } from './types';
 
-const JustifyContentControl = ( props ) => {
+const JustifyContentControl = ( props: JustifyContentControlProps ) => {
 	return <JustifyContentUI { ...props } isToolbar={ false } />;
 };
 
-const JustifyToolbar = ( props ) => {
+const JustifyToolbar = ( props: JustifyContentControlProps ) => {
 	return <JustifyContentUI { ...props } isToolbar />;
 };
 
