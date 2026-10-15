@@ -46,6 +46,7 @@
 -   `ColorPicker`: Make the HSL and RGB input labels translatable, and name the Hue and Alpha inputs after their color format ([#70214](https://github.com/WordPress/gutenberg/pull/70214)).
 -   `CustomGradientPicker`: Use the bundled `gradient-parser` types, preserve gradient angles when editing, and keep unsupported gradient syntax on the existing fallback path ([#84582](https://github.com/WordPress/gutenberg/pull/84582)).
 -   `CustomGradientPicker`: Keep the color interpolation method of a gradient, such as `in oklch`, when editing it, instead of replacing the gradient with the default one ([#84383](https://github.com/WordPress/gutenberg/pull/84383)).
+-   `BaseControl`: Remove the unsupported `as` prop from the component types and documentation ([#70064](https://github.com/WordPress/gutenberg/pull/70064)).
 
 ### Internal
 
