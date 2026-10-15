@@ -272,7 +272,7 @@ describe( 'Post actions', () => {
 			] );
 		} );
 
-		it( 'adds a details action for save failures with a plain-text error message', async () => {
+		it( 'passes a plain-text server message as the notice details', async () => {
 			const post = {
 				id: postId,
 				type: 'post',
@@ -332,56 +332,79 @@ describe( 'Post actions', () => {
 			);
 		} );
 
-		it( 'strips markup from a server message rather than dropping it', async () => {
-			const post = {
-				id: postId,
-				type: 'post',
-				title: 'bar',
-				content: 'bar',
-				excerpt: 'crackers',
-				status: 'publish',
-			};
-
-			apiFetch.setFetchHandler( async ( options ) => {
-				const method = getMethod( options );
-				const { path } = options;
-
-				if (
-					method === 'PUT' &&
-					path.startsWith( `/wp/v2/posts/${ postId }` )
-				) {
-					throw {
-						code: 'test_save_failure',
-						message:
-							'<p>The <strong>title</strong> was rejected.</p><p>Try again.</p>',
-					};
-				}
-
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
+		it.each( [
+			[
+				// Two paragraphs, so two sentences, rather than run together.
+				'separates paragraphs with line breaks',
+				'<p>The <strong>title</strong> was rejected.</p><p>Try again.</p>',
+				'The title was rejected.\nTry again.',
+			],
+			[
+				'keeps the target of a link',
+				'<p>There has been a critical error on this website.</p><p><a href="https://wordpress.org/documentation/article/faq-troubleshooting/">Learn more about troubleshooting WordPress.</a></p>',
+				'There has been a critical error on this website.\nLearn more about troubleshooting WordPress. (https://wordpress.org/documentation/article/faq-troubleshooting/)',
+			],
+			[
+				'keeps a link target only once when it is also the text',
+				'See <a href="https://example.com/help">https://example.com/help</a>',
+				'See https://example.com/help',
+			],
+			[
+				'leaves out a link target that is not a web address',
+				'<a href="javascript:alert(1)">Fix it</a> now.',
+				'Fix it now.',
+			],
+			[
+				'leaves out scripts and styles',
+				'<style>p { color: red; }</style><p>Rejected.</p><script>alert( 1 );</script>',
+				'Rejected.',
+			],
+		] )(
+			'converts markup in a server message to plain text: %s',
+			async ( _description, message, expectedDetails ) => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'bar',
+					content: 'bar',
+					excerpt: 'crackers',
+					status: 'publish',
 				};
-			} );
 
-			const registry = createRegistryWithStores();
+				apiFetch.setFetchHandler( async ( options ) => {
+					const method = getMethod( options );
+					const { path } = options;
 
-			registry
-				.dispatch( coreStore )
-				.receiveEntityRecords( 'postType', 'post', post );
+					if (
+						method === 'PUT' &&
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						throw { code: 'test_save_failure', message };
+					}
 
-			registry.dispatch( editorStore ).setupEditor( post, {
-				content: 'new bar',
-			} );
+					throw {
+						code: 'unknown_path',
+						message: `Unknown path: ${ method } ${ path }`,
+					};
+				} );
 
-			await registry.dispatch( editorStore ).savePost();
+				const registry = createRegistryWithStores();
 
-			const [ notice ] = registry.select( noticesStore ).getNotices();
-			// Two paragraphs, so two sentences: `stripHTML` joins text nodes with
-			// nothing between them, which would run them together.
-			expect( notice.details ).toBe(
-				'The title was rejected.\nTry again.'
-			);
-		} );
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', 'post', post );
+
+				registry.dispatch( editorStore ).setupEditor( post, {
+					content: 'new bar',
+				} );
+
+				await registry.dispatch( editorStore ).savePost();
+
+				const [ notice ] = registry.select( noticesStore ).getNotices();
+				expect( notice.details ).toBe( expectedDetails );
+				expect( notice.__unstableHTML ).toBeUndefined();
+			}
+		);
 
 		it( 'keeps a server message that only looks like markup', async () => {
 			const post = {

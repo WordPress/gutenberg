@@ -14,6 +14,7 @@
 -   The post summary of the DataForm-based inspector, the media editor, and the private `usePostFields` hook, through which the site editor screens get their fields, read the fields of the post type from the server, through the Entity fields API. The media editor also lays out the attachment fields with the form of the attachment view configuration ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
+-   Save failures: Pass the server's message as the notice's `details`, as plain text with links kept as `text (URL)`, rather than building escaped HTML behind `__unstableHTML`. The notice shows it behind "Show details" and offers to copy it with the message ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 
 ### Deprecations
 
@@ -76,7 +77,6 @@
 -   Add category filtering and search to the "Choose a pattern" modal shown when creating a new page or post. Only the categories containing start patterns for the current post type are listed, with labels pulled from the registered pattern categories ([#81396](https://github.com/WordPress/gutenberg/pull/81396)).
 -   `PostLastRevisionPanel`: Show the revisions button's focus ring with the design system's outline instead of a legacy box-shadow that doubled up with `Button`'s own ring ([#82955](https://github.com/WordPress/gutenberg/pull/82955)).
 -   Global Styles sidebar: Give the revisions screen a bounded height so its DataViews timeline scrolls internally and the pagination footer stays pinned to the bottom ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
--   Save failures: Carry the server's account of a failure on the notice's new `detail`, rather than building it into the message as escaped HTML behind `__unstableHTML`. The notice offers it for copying, ready to paste into a search or an assistant, and markup in a server message is stripped rather than the message being dropped ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 
 ### Bug Fixes
 
