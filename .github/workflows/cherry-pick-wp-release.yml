@@ -128,7 +128,7 @@ jobs:
                       const prNumber = process.env.pr_number;
                       const cherryPickSha = process.env.cherry_pick_sha;
                       const targetBranch = `wp/${process.env.version}`;
-                      const workflowUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+                      const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`cherryPickSha: ${cherryPickSha}`);
                       console.log(`targetBranch: ${targetBranch}`);
@@ -147,7 +147,7 @@ jobs:
                       const prNumber = process.env.pr_number;
                       const commitSha = process.env.commit_sha;
                       const targetBranch = `wp/${process.env.version}`;
-                      const workflowUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+                      const workflowUrl = `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`targetBranch: ${targetBranch}`);
                       await github.rest.issues.createComment({
