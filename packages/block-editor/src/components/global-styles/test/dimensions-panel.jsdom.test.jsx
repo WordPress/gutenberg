@@ -838,4 +838,81 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expectLocalOverride();
 		} );
 	} );
+
+	describe( 'gap visualization triggers (onVisualize)', () => {
+		it( 'calls onVisualize("gap") on hover and focus, and onVisualize(false) on leave and blur for UnitControl', () => {
+			const onVisualize = vi.fn();
+			renderPanel( {
+				value: {},
+				settings: baseSettings,
+				onVisualize,
+			} );
+
+			const gapInput = screen.getByLabelText( /block spacing/i );
+
+			fireEvent.mouseOver( gapInput );
+			expect( onVisualize ).toHaveBeenCalledWith( 'gap' );
+
+			fireEvent.mouseOut( gapInput );
+			expect( onVisualize ).toHaveBeenCalledWith( false );
+
+			fireEvent.focus( gapInput );
+			expect( onVisualize ).toHaveBeenCalledWith( 'gap' );
+
+			fireEvent.blur( gapInput );
+			expect( onVisualize ).toHaveBeenCalledWith( false );
+		} );
+
+		it( 'calls onVisualize("gap") on hover and focus, and onVisualize(false) on leave and blur for BoxControl (axial)', () => {
+			const onVisualize = vi.fn();
+			renderPanel( {
+				value: {},
+				settings: settingsWithAxialGap,
+				onVisualize,
+			} );
+
+			const blockSpacingControl = screen.getByRole( 'group', {
+				name: 'Block spacing',
+			} );
+			const axialInput =
+				within( blockSpacingControl ).getByRole( 'textbox' );
+
+			fireEvent.mouseOver( axialInput );
+			expect( onVisualize ).toHaveBeenCalledWith( 'gap' );
+
+			fireEvent.mouseOut( axialInput );
+			expect( onVisualize ).toHaveBeenCalledWith( false );
+
+			fireEvent.focus( axialInput );
+			expect( onVisualize ).toHaveBeenCalledWith( 'gap' );
+
+			fireEvent.blur( axialInput );
+			expect( onVisualize ).toHaveBeenCalledWith( false );
+		} );
+
+		it( 'calls onVisualize("gap") on hover and focus, and onVisualize(false) on leave and blur for SpacingSizesControl', () => {
+			const onVisualize = vi.fn();
+			renderPanel( {
+				value: {},
+				settings: settingsWithSpacingPresets,
+				onVisualize,
+			} );
+
+			const slider = screen.getByRole( 'slider', {
+				name: /block spacing/i,
+			} );
+
+			fireEvent.mouseOver( slider );
+			expect( onVisualize ).toHaveBeenCalledWith( 'gap' );
+
+			fireEvent.mouseOut( slider );
+			expect( onVisualize ).toHaveBeenCalledWith( false );
+
+			fireEvent.focus( slider );
+			expect( onVisualize ).toHaveBeenCalledWith( 'gap' );
+
+			fireEvent.blur( slider );
+			expect( onVisualize ).toHaveBeenCalledWith( false );
+		} );
+	} );
 } );

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
-import { render } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { TypographyPanel } from '../typography';
@@ -24,6 +24,7 @@ import { BackgroundImagePanel } from '../background';
 const mockHookRecorder = { calls: [] };
 const mockPanelRecorder = { calls: [] };
 const mockInheritedReturn = { value: {} };
+const mockInterfaceRecorder = { hideCalls: 0, showCalls: 0 };
 
 vi.mock(
 	import( '../../components/global-styles/inherited-value-context' ),
@@ -139,10 +140,22 @@ vi.mock( import( '@wordpress/private-apis' ), () => ( {
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules: () => ( {
 		lock: () => {},
 		unlock: () => ( {
-			hideBlockInterface: () => undefined,
-			showBlockInterface: () => undefined,
+			hideBlockInterface: () => {
+				mockInterfaceRecorder.hideCalls++;
+			},
+			showBlockInterface: () => {
+				mockInterfaceRecorder.showCalls++;
+			},
 		} ),
 	} ),
+} ) );
+
+vi.mock( import( '../gap-visualizer' ), () => ( {
+	__esModule: true,
+	GapVisualizer: ( props ) => (
+		<div data-testid="gap-visualizer" data-client-id={ props.clientId } />
+	),
+	getLayoutContainer: ( el ) => el,
 } ) );
 
 // Short-circuit the block-editor store graph. The wrappers need the
@@ -182,6 +195,8 @@ beforeEach( () => {
 	mockHookRecorder.calls = [];
 	mockPanelRecorder.calls = [];
 	mockInheritedReturn.value = {};
+	mockInterfaceRecorder.hideCalls = 0;
+	mockInterfaceRecorder.showCalls = 0;
 	mockUseSelectImpl.fn = () => undefined;
 	useSelect.mockImplementation( ( mapSelect ) => {
 		// Feed mapSelect a synthetic `select()` that returns an object
@@ -507,5 +522,91 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 		expect( mockPanelRecorder.calls[ 0 ][ 1 ].inheritedValue ).toEqual(
 			{}
 		);
+	} );
+
+	// TODO: Once support for grid/default/constrained layout is introduced in a future PR,
+	// update this test to assert that GapVisualizer is rendered for these layout types.
+	test.each( [ 'grid', 'default', 'constrained' ] )(
+		'DimensionsPanel hovering %s layout does not call hideBlockInterface and renders nothing',
+		( layoutType ) => {
+			mockUseSelectImpl.fn = () => ( {
+				style: {},
+				className: '',
+				layout: { type: layoutType },
+			} );
+
+			render(
+				<DimensionsPanel
+					clientId={ `block-${ layoutType }` }
+					name="core/group"
+					setAttributes={ () => {} }
+					settings={ { spacing: { blockGap: true } } }
+				/>
+			);
+
+			const [ , props ] = mockPanelRecorder.calls.at( -1 );
+			act( () => {
+				props.onVisualize( 'gap' );
+			} );
+
+			expect( mockInterfaceRecorder.hideCalls ).toBe( 0 );
+			expect(
+				screen.queryByTestId( 'gap-visualizer' )
+			).not.toBeInTheDocument();
+		}
+	);
+
+	test( 'DimensionsPanel hovering flex blocks calls hideBlockInterface and renders GapVisualizer', () => {
+		mockInterfaceRecorder.hideCalls = 0;
+		mockPanelRecorder.calls = [];
+		mockUseSelectImpl.fn = () => ( {
+			style: {},
+			className: '',
+			layout: { type: 'flex' },
+		} );
+
+		render(
+			<DimensionsPanel
+				clientId="block-flex"
+				name="core/group"
+				setAttributes={ () => {} }
+				settings={ { spacing: { blockGap: true } } }
+			/>
+		);
+
+		const [ , props ] = mockPanelRecorder.calls.at( -1 );
+		act( () => {
+			props.onVisualize( 'gap' );
+		} );
+
+		expect( mockInterfaceRecorder.hideCalls ).toBeGreaterThan( 0 );
+		expect( screen.getByTestId( 'gap-visualizer' ) ).toBeInTheDocument();
+	} );
+
+	test( 'DimensionsPanel hovering Columns block calls hideBlockInterface and renders GapVisualizer', () => {
+		mockInterfaceRecorder.hideCalls = 0;
+		mockPanelRecorder.calls = [];
+		mockUseSelectImpl.fn = () => ( {
+			style: {},
+			className: '',
+			layout: undefined,
+		} );
+
+		render(
+			<DimensionsPanel
+				clientId="block-columns"
+				name="core/columns"
+				setAttributes={ () => {} }
+				settings={ { spacing: { blockGap: true } } }
+			/>
+		);
+
+		const [ , props ] = mockPanelRecorder.calls.at( -1 );
+		act( () => {
+			props.onVisualize( 'gap' );
+		} );
+
+		expect( mockInterfaceRecorder.hideCalls ).toBeGreaterThan( 0 );
+		expect( screen.getByTestId( 'gap-visualizer' ) ).toBeInTheDocument();
 	} );
 } );

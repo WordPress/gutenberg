@@ -606,6 +606,7 @@ export default function DimensionsPanel( {
 	};
 	const resetGapValue = () => setGapValue( undefined );
 	const hasGapValue = () => hasValue( value?.spacing?.blockGap );
+	const onMouseOverGap = () => onVisualize( 'gap' );
 
 	// Min Height
 	const showMinHeightControl = hasMinHeight( settings );
@@ -997,6 +998,12 @@ export default function DimensionsPanel( {
 								values={ gapValues }
 								allowReset={ false }
 								splitOnAxis={ isAxialGap }
+								inputProps={ {
+									onMouseOver: onMouseOverGap,
+									onMouseOut: onMouseLeaveControls,
+									onFocus: onMouseOverGap,
+									onBlur: onMouseLeaveControls,
+								} }
 							/>
 						) : (
 							<UnitControl
@@ -1010,6 +1017,10 @@ export default function DimensionsPanel( {
 										? inheritedGapForSingleInput
 										: undefined
 								}
+								onMouseOver={ onMouseOverGap }
+								onMouseOut={ onMouseLeaveControls }
+								onFocus={ onMouseOverGap }
+								onBlur={ onMouseLeaveControls }
 							/>
 						) ) }
 					{ showSpacingPresetsControl && (
@@ -1022,6 +1033,10 @@ export default function DimensionsPanel( {
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
 							values={ gapValues }
 							allowReset={ false }
+							onMouseOver={ onMouseOverGap }
+							onMouseOut={ onMouseLeaveControls }
+							onFocus={ onMouseOverGap }
+							onBlur={ onMouseLeaveControls }
 						/>
 					) }
 				</InheritanceToolsPanelItem>

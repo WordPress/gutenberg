@@ -10,6 +10,9 @@ import {
 } from '../components/global-styles';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
 import { MarginVisualizer, PaddingVisualizer } from './spacing-visualizer';
+import { GapVisualizer } from './gap-visualizer';
+import { getLayoutContainer } from './gap-visualizer/measure-utils';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { cleanEmptyObject, shouldSkipSerialization } from './utils';
@@ -26,20 +29,26 @@ export const SPACING_SUPPORT_KEY = 'spacing';
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
-function useVisualizer() {
+function useVisualizer( isPropertyVisualizable ) {
 	const [ property, setProperty ] = useState( false );
 	const { hideBlockInterface, showBlockInterface } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	const isVisualizerActive =
+		!! property &&
+		( typeof isPropertyVisualizable === 'function'
+			? isPropertyVisualizable( property )
+			: true );
+
 	useEffect( () => {
-		if ( ! property ) {
+		if ( ! isVisualizerActive ) {
 			showBlockInterface();
 		} else {
 			hideBlockInterface();
 		}
-	}, [ property, showBlockInterface, hideBlockInterface ] );
+	}, [ isVisualizerActive, showBlockInterface, hideBlockInterface ] );
 
-	return [ property, setProperty ];
+	return [ isVisualizerActive ? property : false, setProperty ];
 }
 
 function DimensionsInspectorControl( { children, resetAllFilter } ) {
@@ -92,7 +101,40 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		selectedState
 	);
 
-	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
+	const blockElement = useBlockElement( clientId );
+	const hasBlockGapSupport = !! settings?.spacing?.blockGap;
+
+	const isPropertyVisualizable = useCallback(
+		( prop ) => {
+			if ( prop === 'gap' ) {
+				if ( ! hasBlockGapSupport ) {
+					return false;
+				}
+				if ( layout?.type ) {
+					return layout.type === 'flex';
+				}
+				if ( blockElement ) {
+					const layoutContainer = getLayoutContainer( blockElement );
+					if ( layoutContainer ) {
+						const defaultView =
+							blockElement.ownerDocument?.defaultView || window;
+						const display =
+							defaultView.getComputedStyle(
+								layoutContainer
+							).display;
+						return display === 'flex' || display === 'inline-flex';
+					}
+				}
+				return name === 'core/columns';
+			}
+			return true;
+		},
+		[ blockElement, hasBlockGapSupport, layout?.type, name ]
+	);
+
+	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer(
+		isPropertyVisualizable
+	);
 	const value = isStateSelected
 		? getStyleForState( style, selectedState )
 		: style;
@@ -166,6 +208,11 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 						clientId={ clientId }
 						value={ value }
 					/>
+				) }
+			{ ! isStateSelected &&
+				hasBlockGapSupport &&
+				visualizedProperty === 'gap' && (
+					<GapVisualizer clientId={ clientId } />
 				) }
 		</>
 	);
