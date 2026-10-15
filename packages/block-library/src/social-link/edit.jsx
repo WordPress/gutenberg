@@ -24,7 +24,8 @@ import {
 } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { keyboardReturn } from '@wordpress/icons';
+import { external, keyboardReturn } from '@wordpress/icons';
+import { InputControl } from '@wordpress/ui';
 import { store as blocksStore } from '@wordpress/blocks';
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -195,14 +196,31 @@ const SocialLinkEdit = ( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls>
+			<InspectorControls group="content">
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
-						setAttributes( { label: undefined } );
+						setAttributes( { url: undefined, label: undefined } );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
+					<ToolsPanelItem
+						isShownByDefault
+						label={ __( 'Link' ) }
+						hasValue={ () => !! url }
+						onDeselect={ () => {
+							setAttributes( { url: undefined } );
+						} }
+					>
+						<InputControl
+							type="url"
+							label={ __( 'Link' ) }
+							value={ url || '' }
+							onValueChange={ ( value ) =>
+								setAttributes( { url: value } )
+							}
+						/>
+					</ToolsPanelItem>
 					<ToolsPanelItem
 						isShownByDefault
 						label={ __( 'Text' ) }
@@ -223,6 +241,19 @@ const SocialLinkEdit = ( {
 							placeholder={ socialLinkName }
 						/>
 					</ToolsPanelItem>
+					{ !! url && (
+						<Button
+							variant="secondary"
+							href={ url }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+							className="navigation-link-to__action-button"
+						>
+							{ __( 'View' ) }
+						</Button>
+					) }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
