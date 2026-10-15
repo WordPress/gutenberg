@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Preserve tile content semantics when dragging is disabled in `DashboardGrid` and `DashboardLanes` ([#82511](https://github.com/WordPress/gutenberg/pull/82511)).
+-   Preserve tile content semantics when dragging is disabled in `DashboardGrid` and `DashboardLanes` ([#84869](https://github.com/WordPress/gutenberg/pull/84869)).
 
 ### Internal
 
