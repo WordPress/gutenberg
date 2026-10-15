@@ -68,13 +68,18 @@ function gutenberg_ui_components_enqueue_preview_assets( $hook_suffix ) {
  * With `&sample=php` the page shows only the PHP render of each example, with
  * the PHP stylesheet. With `&sample=react` it shows only React's render, with
  * every stylesheet of the package instead, so a stylesheet the PHP build left
- * out shows up as a difference between the two.
+ * out shows up as a difference between the two. That stylesheet is only built
+ * for the visual check and isn't shipped with the plugin, so without it the
+ * page shows in full.
  *
  * @return string 'php', 'react', or an empty string for the full page.
  */
 function gutenberg_ui_components_get_sample_mode() {
 	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Read-only display option.
 	$mode = isset( $_GET['sample'] ) ? sanitize_key( $_GET['sample'] ) : '';
+	if ( 'react' === $mode && ! is_readable( gutenberg_dir_path() . 'packages/ui/build-php/test/all-styles.css' ) ) {
+		return '';
+	}
 	return in_array( $mode, array( 'php', 'react' ), true ) ? $mode : '';
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_ui_components_enqueue_preview_assets' );
