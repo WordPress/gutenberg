@@ -1,11 +1,11 @@
 import {
 	Button,
-	CustomSelectControl,
 	Icon as WCIcon,
 	RangeControl,
 	__experimentalHStack as HStack,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
+import { Select } from '@wordpress/ui';
 import { usePrevious } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { settings } from '@wordpress/icons';
@@ -143,8 +143,8 @@ export default function PresetInputControl( {
 	}
 
 	const options = selectListOptions.map( ( size, index ) => ( {
-		key: index,
-		name: size.name,
+		value: index,
+		label: size.name,
 	} ) );
 
 	const resolvedPresetValue = isValuePreset( value, presetType )
@@ -266,38 +266,50 @@ export default function PresetInputControl( {
 				/>
 			) }
 			{ hasPresets && ! showRangeControl && ! showCustomValueControl && (
-				<CustomSelectControl
-					className="preset-input-control__custom-select-control"
-					hideLabelFromVision
-					label={ ariaLabel }
-					onBlur={ onMouseOut }
-					onChange={ ( selection ) => {
+				<Select.Root
+					items={ options }
+					onValueChange={ ( selection ) => {
+						if ( ! selection ) {
+							return;
+						}
 						if (
 							showCustomValueInSelectList &&
-							selection.selectedItem.key === options.length - 1
+							selection.value === options.length - 1
 						) {
 							setShowCustomValueControl( true );
 						} else {
 							onChange(
 								getNewPresetValue(
-									selection.selectedItem.key,
+									selection.value,
 									'selectList'
 								)
 							);
 						}
 					} }
-					onFocus={ onMouseOver }
-					onMouseOut={ onMouseOut }
-					onMouseOver={ onMouseOver }
-					options={ options }
 					value={
-						// passing empty string as a fallback to continue using the
-						// component in controlled mode
 						options.find(
-							( option ) => option.key === currentValue
-						) || ''
+							( option ) => option.value === currentValue
+						) ?? options[ 0 ]
 					}
-				/>
+				>
+					<Select.Trigger
+						className="preset-input-control__custom-select-control"
+						aria-label={ ariaLabel }
+						onBlur={ onMouseOut }
+						onFocus={ onMouseOver }
+						onMouseOut={ onMouseOut }
+						onMouseOver={ onMouseOver }
+					/>
+					<Select.Popup>
+						{ options.map( ( option ) => (
+							<Select.Item key={ option.value } value={ option }>
+								<Select.ItemLabel>
+									{ option.label }
+								</Select.ItemLabel>
+							</Select.Item>
+						) ) }
+					</Select.Popup>
+				</Select.Root>
 			) }
 			{ hasPresets && ! disableCustomValues && (
 				<Button

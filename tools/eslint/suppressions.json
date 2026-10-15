@@ -929,9 +929,6 @@
 		}
 	},
 	"packages/block-editor/src/components/date-format-picker/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2286,11 +2283,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/test/settings.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/test/style.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2307,11 +2299,6 @@
 		}
 	},
 	"packages/block-editor/src/hooks/typography.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/utils.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -8101,11 +8088,6 @@
 		}
 	},
 	"test/storybook-playwright/storybook/decorators/with-custom-controls.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"test/unit/config/emotion-compiler.vitest.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

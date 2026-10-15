@@ -104,9 +104,9 @@ add_action( 'init', function () {
 }, 0 );
 PHP
 step "Starting the server"
-# Without the JIT: compiling WordPress on the first request takes longer
-# than the request's 30 second limit on the CI runner.
-PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -d opcache.jit=disable -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
+# Without the JIT, and with a 120 second request limit: on the CI runner,
+# the first requests can take longer than the default 30 seconds.
+PHP_CLI_SERVER_WORKERS=8 php -d memory_limit=512M -d max_execution_time=120 -d opcache.jit=disable -S "127.0.0.1:$PORT" -t "$WP_DIR" > "$ROOT/test/ios/build/server.log" 2>&1 &
 SERVER_PID=$!
 # The server's workers are its child processes: stop them too.
 trap 'pkill -P "$SERVER_PID" 2>/dev/null; kill "$SERVER_PID" 2>/dev/null || true' EXIT
