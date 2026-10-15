@@ -32,28 +32,18 @@ function registerSchema( postType: string, supports: Record< string, any > ) {
 }
 
 describe( 'registerPostTypeSchema', () => {
-	it( 'registers the actions of a post type, but leaves its fields to the server', async () => {
-		const { getEntityActions, getEntityFields } = await registerSchema(
-			'page',
-			{ title: true, editor: true, author: true, comments: true }
-		);
-
-		expect( getEntityActions( 'postType', 'page' ).length ).toBeGreaterThan(
-			0
-		);
-		expect( getEntityFields( 'postType', 'page' ) ).toEqual( [] );
-	} );
-
-	it( 'still registers the fields of attachments on the client', async () => {
-		const { getEntityFields } = await registerSchema( 'attachment', {
+	it( 'registers the actions of a post type', async () => {
+		const { getEntityActions } = await registerSchema( 'page', {
 			title: true,
+			editor: true,
 			author: true,
+			comments: true,
 		} );
 
 		expect(
-			getEntityFields( 'postType', 'attachment' ).map(
+			getEntityActions( 'postType', 'page' ).map(
 				( { id }: { id: string } ) => id
 			)
-		).toContain( 'alt_text' );
+		).toContain( 'rename-post' );
 	} );
 } );

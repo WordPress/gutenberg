@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
-import { act, renderHook, waitFor } from '@testing-library/react';
+import { renderHook, waitFor } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { mergePluginFields, resolveFieldsConfig, useFields } from '..';
+import { resolveFieldsConfig, useFields } from '..';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -122,34 +122,6 @@ describe( 'resolveFieldsConfig', () => {
 	} );
 } );
 
-describe( 'mergePluginFields', () => {
-	const serverFields = [
-		{ id: 'title', label: 'Title' },
-		{ id: 'author', label: 'Author' },
-	];
-
-	it( 'returns the server fields themselves when no plugin field is registered', () => {
-		expect( mergePluginFields( serverFields, [] ) ).toBe( serverFields );
-	} );
-
-	it( 'adds the plugin fields after the server ones', () => {
-		const rating = { id: 'rating', label: 'Rating' };
-
-		expect( mergePluginFields( serverFields, [ rating ] ) ).toEqual( [
-			...serverFields,
-			rating,
-		] );
-	} );
-
-	it( 'leaves out the plugin fields whose id the server returns', () => {
-		expect(
-			mergePluginFields( serverFields, [
-				{ id: 'author', label: 'Written by' },
-			] )
-		).toBe( serverFields );
-	} );
-} );
-
 describe( 'useFields', () => {
 	function createRegistryWithStores() {
 		const registry = createRegistry();
@@ -189,28 +161,6 @@ describe( 'useFields', () => {
 		} );
 	} );
 
-	it( 'requests nothing when it is not enabled', () => {
-		const registry = createRegistryWithStores();
-		const { result } = renderHook(
-			() =>
-				useFields( {
-					kind: 'postType',
-					name: 'attachment',
-					isEnabled: false,
-				} ),
-			{
-				wrapper: ( { children } ) => (
-					<RegistryProvider value={ registry }>
-						{ children }
-					</RegistryProvider>
-				),
-			}
-		);
-
-		expect( result.current ).toEqual( { fields: [], isLoading: false } );
-		expect( apiFetch ).not.toHaveBeenCalled();
-	} );
-
 	it( 'returns an error instead of an empty list when the request fails', async () => {
 		const restError = {
 			code: 'rest_forbidden',
@@ -242,63 +192,18 @@ describe( 'useFields', () => {
 		);
 	} );
 
-	it( 'adds the fields a plugin registers on the client, unless the server has their id', async () => {
-		vi.mocked( apiFetch ).mockResolvedValue( SERVER_CONFIG );
-		const registry = createRegistryWithStores();
-		const { registerEntityField } = unlock(
-			registry.dispatch( editorStore )
-		);
-		// A plugin adds a field of its own, and one with a server id.
-		registerEntityField( 'postType', 'page', {
-			id: 'rating',
-			label: 'Rating',
-		} );
-		registerEntityField( 'postType', 'page', {
-			id: 'author',
-			label: 'Written by',
-		} );
-
-		const { result } = renderUseFields( registry );
-
-		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
-		expect( result.current.fields.map( ( { id } ) => id ) ).toEqual( [
-			'date_added',
-			'author',
-			'comment_status',
-			'rating',
-		] );
-		expect( result.current.fields[ 1 ].label ).toBe( 'Author' );
-	} );
-
-	it( 'follows the fields a plugin registers once the server ones loaded', async () => {
+	it( 'shares the resolution with a caller of the selector outside React', async () => {
 		vi.mocked( apiFetch ).mockResolvedValue( SERVER_CONFIG );
 		const registry = createRegistryWithStores();
 
+		// A route loader resolves the selector before the screen renders.
+		const loaded = await unlock(
+			registry.resolveSelect( editorStore )
+		).getEntityFields( 'postType', 'page' );
 		const { result } = renderUseFields( registry );
-		await waitFor( () => expect( result.current.isLoading ).toBe( false ) );
-		const serverFields = result.current.fields;
 
-		act( () => {
-			unlock( registry.dispatch( editorStore ) ).registerEntityField(
-				'postType',
-				'page',
-				{ id: 'rating', label: 'Rating' }
-			);
-		} );
-		expect( result.current.fields.map( ( { id } ) => id ) ).toEqual( [
-			'date_added',
-			'author',
-			'comment_status',
-			'rating',
-		] );
-
-		act( () => {
-			unlock( registry.dispatch( editorStore ) ).unregisterEntityField(
-				'postType',
-				'page',
-				'rating'
-			);
-		} );
-		expect( result.current.fields ).toBe( serverFields );
+		expect( result.current.isLoading ).toBe( false );
+		expect( result.current.fields ).toBe( loaded );
+		expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

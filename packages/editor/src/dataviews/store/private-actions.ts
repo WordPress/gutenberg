@@ -16,22 +16,8 @@ import {
 	resetPost,
 	deletePost,
 	duplicateTemplatePart,
-	titleField,
 } from '@wordpress/fields';
-import {
-	altTextField,
-	attachedToField,
-	authorField as mediaAuthorField,
-	captionField,
-	dateAddedField,
-	descriptionField as mediaDescriptionField,
-	filenameField,
-	filesizeField,
-	mediaDimensionsField,
-	mimeTypeField,
-} from '@wordpress/media-fields';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
 
 export function registerEntityAction< Item >(
@@ -60,29 +46,25 @@ export function unregisterEntityAction(
 	};
 }
 
-export function registerEntityField< Item >(
+/**
+ * Receives the fields of an entity, as the `getEntityFields` resolver
+ * resolves them from the server.
+ *
+ * @param kind   Entity kind.
+ * @param name   Entity name.
+ * @param fields The fields.
+ * @return Action object.
+ */
+export function receiveEntityFields< Item >(
 	kind: string,
 	name: string,
-	config: Field< Item >
+	fields: Field< Item >[]
 ) {
 	return {
-		type: 'REGISTER_ENTITY_FIELD' as const,
+		type: 'RECEIVE_ENTITY_FIELDS' as const,
 		kind,
 		name,
-		config,
-	};
-}
-
-export function unregisterEntityField(
-	kind: string,
-	name: string,
-	fieldId: string
-) {
-	return {
-		type: 'UNREGISTER_ENTITY_FIELD' as const,
-		kind,
-		name,
-		fieldId,
+		fields,
 	};
 }
 
@@ -93,31 +75,6 @@ export function setIsReady( kind: string, name: string ) {
 		name,
 	};
 }
-
-/*
- * Media fields for the attachment post type.
- *
- * Field order follows a logical grouping:
- * 1. Metadata fields in panels (date, author, file info)
- * 2. Core editable fields (title, alt text, caption, description)
- *
- * Note: media_thumbnail is not included as it's shown in the canvas preview
- */
-const ORDERED_MEDIA_FIELDS = [
-	// Metadata in panels (collapsed by default).
-	dateAddedField,
-	mediaAuthorField,
-	filenameField,
-	mimeTypeField,
-	filesizeField,
-	mediaDimensionsField,
-	attachedToField,
-	// Regular layout fields (always visible).
-	titleField,
-	altTextField,
-	captionField,
-	mediaDescriptionField,
-];
 
 export const registerPostTypeSchema =
 	( postType: string ) =>
@@ -188,24 +145,12 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// Only the attachment fields are registered on the client. The other
-		// post types read their fields from the server, see `useFields`.
-		const fields =
-			postType === ATTACHMENT_POST_TYPE ? ORDERED_MEDIA_FIELDS : [];
-
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
 				unlock( registry.dispatch( editorStore ) ).registerEntityAction(
 					'postType',
 					postType,
 					action
-				);
-			} );
-			fields.forEach( ( field ) => {
-				unlock( registry.dispatch( editorStore ) ).registerEntityField(
-					'postType',
-					postType,
-					field
 				);
 			} );
 		} );
