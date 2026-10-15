@@ -274,4 +274,20 @@
 		}
 
 	}
+
+	@layer compositions {
+		.popup .search-input {
+			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-gap-xs);
+		}
+
+		.popup .search-input-prefix {
+			/* Match the borderless item icon column, accounting for the input border. */
+			--wp-ui-input-layout-prefix-padding-start: calc(var(--wpds-dimension-padding-xs) - var(--wpds-border-width-xs));
+		}
+
+		.popup .search-input-icon {
+			width: var(--wpds-dimension-size-2xs);
+			height: var(--wpds-dimension-size-2xs);
+		}
+	}
 }
