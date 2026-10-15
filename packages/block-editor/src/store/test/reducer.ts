@@ -39,6 +39,7 @@ import {
 	blockListSettings,
 	settings,
 	lastBlockAttributesChange,
+	blockMetadataRevision,
 	lastBlockInserted,
 	expandedBlock,
 	zoomLevel,
@@ -3798,6 +3799,50 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( new Map() );
+		} );
+	} );
+
+	describe( 'blockMetadataRevision', () => {
+		it( 'bumps when an update changes a block’s metadata', () => {
+			expect(
+				blockMetadataRevision( 0, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					clientIds: [ 'a' ],
+					attributes: { metadata: { name: 'Card' } },
+				} )
+			).toBe( 1 );
+			expect(
+				blockMetadataRevision( 1, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					clientIds: [ 'a', 'b' ],
+					attributes: { a: {}, b: { metadata: {} } },
+					options: { uniqueByBlock: true },
+				} )
+			).toBe( 2 );
+			expect(
+				blockMetadataRevision( 2, {
+					type: 'UPDATE_BLOCK',
+					clientId: 'a',
+					updates: { attributes: { metadata: {} } },
+				} )
+			).toBe( 3 );
+		} );
+
+		it( 'stays the same when an update leaves metadata alone', () => {
+			expect(
+				blockMetadataRevision( 4, {
+					type: 'UPDATE_BLOCK_ATTRIBUTES',
+					clientIds: [ 'a' ],
+					attributes: { content: 'Typing' },
+				} )
+			).toBe( 4 );
+			expect(
+				blockMetadataRevision( 4, {
+					type: 'UPDATE_BLOCK',
+					clientId: 'a',
+					updates: {},
+				} )
+			).toBe( 4 );
 		} );
 	} );
 

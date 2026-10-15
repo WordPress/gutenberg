@@ -5370,6 +5370,116 @@ describe( 'selectors', () => {
 			} );
 			expect( canMoveBlock( state, 'child' ) ).toBe( true );
 		} );
+
+		describe( 'groups in patterns', () => {
+			// A pattern holding a named table with two named cards. The
+			// pattern is `core/block` when it's synced.
+			const createState = ( {
+				allowReordering = true,
+				sectionName = 'core/test-block-b',
+			}: { allowReordering?: boolean; sectionName?: string } = {} ) =>
+				partial< State >( {
+					blocks: {
+						byClientId: new Map(
+							Object.entries( {
+								section: { name: sectionName },
+								table: { name: 'core/test-block-a' },
+								lite: { name: 'core/test-block-a' },
+								'lite-heading': {
+									name: 'core/test-content-block',
+								},
+								premium: { name: 'core/test-block-a' },
+								'premium-heading': {
+									name: 'core/test-content-block',
+								},
+							} )
+						),
+						attributes: new Map(
+							Object.entries( {
+								section: {
+									metadata: { patternName: 'test-pattern' },
+								},
+								table: {
+									metadata: {
+										name: 'Pricing table',
+										allowReordering,
+									},
+								},
+								lite: { metadata: { name: 'Lite' } },
+								'lite-heading': {},
+								premium: { metadata: { name: 'Premium' } },
+								'premium-heading': {},
+							} )
+						),
+						parents: new Map(
+							Object.entries( {
+								section: '',
+								table: 'section',
+								lite: 'table',
+								'lite-heading': 'lite',
+								premium: 'table',
+								'premium-heading': 'premium',
+							} )
+						),
+						order: new Map( [
+							[ '', [ 'section' ] ],
+							[ 'section', [ 'table' ] ],
+							[ 'table', [ 'lite', 'premium' ] ],
+							[ 'lite', [ 'lite-heading' ] ],
+							[ 'premium', [ 'premium-heading' ] ],
+						] ),
+						blockEditingModes: new Map(),
+					},
+					blockListSettings: new Map(),
+					settings: {},
+					derivedBlockEditingModes: new Map( [
+						[ 'table', 'disabled' ],
+						[ 'lite', 'disabled' ],
+						[ 'lite-heading', 'contentOnly' ],
+						[ 'premium', 'disabled' ],
+						[ 'premium-heading', 'contentOnly' ],
+					] ),
+				} );
+
+			const experimentWindow = window as {
+				__experimentalPatternGrouping?: boolean;
+			};
+
+			beforeEach( () => {
+				experimentWindow.__experimentalPatternGrouping = true;
+			} );
+
+			afterEach( () => {
+				delete experimentWindow.__experimentalPatternGrouping;
+			} );
+
+			it( 'allows moving a group when its container allows reordering', () => {
+				expect( canMoveBlock( createState(), 'lite' ) ).toBe( true );
+			} );
+
+			it( 'prevents moving a group when its container does not allow reordering', () => {
+				expect(
+					canMoveBlock(
+						createState( { allowReordering: false } ),
+						'lite'
+					)
+				).toBe( false );
+			} );
+
+			it( 'prevents moving a group inside a synced pattern', () => {
+				expect(
+					canMoveBlock(
+						createState( { sectionName: 'core/block' } ),
+						'lite'
+					)
+				).toBe( false );
+			} );
+
+			it( 'prevents moving a group while the experiment is off', () => {
+				delete experimentWindow.__experimentalPatternGrouping;
+				expect( canMoveBlock( createState(), 'lite' ) ).toBe( false );
+			} );
+		} );
 	} );
 } );
 

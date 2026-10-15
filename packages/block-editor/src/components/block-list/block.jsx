@@ -647,6 +647,7 @@ function BlockListBlockProvider( props ) {
 				isDragging,
 				__unstableHasActiveBlockOverlayActive,
 				getSelectedBlocksInitialCaretPosition,
+				isContentGroupBlock,
 			} = unlock( select( blockEditorStore ) );
 			const blockWithoutAttributes =
 				getBlockWithoutAttributes( clientId ) ??
@@ -765,12 +766,15 @@ function BlockListBlockProvider( props ) {
 				isEditingContentOnlySection:
 					getEditedContentOnlySection() === clientId,
 				blockEditingMode,
+				// A group in a pattern can be selected to reorder it, but its
+				// design stays locked, so it doesn't show its own controls.
 				mayDisplayControls:
-					_isSelected ||
-					( isFirstMultiSelectedBlock( clientId ) &&
-						getMultiSelectedBlockClientIds().every(
-							( id ) => getBlockName( id ) === blockName
-						) ),
+					! isContentGroupBlock( clientId ) &&
+					( _isSelected ||
+						( isFirstMultiSelectedBlock( clientId ) &&
+							getMultiSelectedBlockClientIds().every(
+								( id ) => getBlockName( id ) === blockName
+							) ) ),
 				mayDisplayParentControls:
 					_hasBlockSupport(
 						getBlockName( clientId ),

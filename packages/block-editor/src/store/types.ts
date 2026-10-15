@@ -492,6 +492,7 @@ export interface State {
 		insertUsage: Record< string, { time?: number; count: number } >;
 	};
 	lastBlockAttributesChange: Record< string, BlockAttributes > | null;
+	blockMetadataRevision: number;
 	lastFocus: LastFocus | null | false;
 	expandedBlock: string | null;
 	highlightedBlock: string | null | undefined;

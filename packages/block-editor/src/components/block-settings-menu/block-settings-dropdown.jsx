@@ -99,6 +99,7 @@ export function BlockSettingsDropdown( {
 				canMoveBlocks,
 				getBlockIndex,
 				getBlockCount,
+				isContentGroupBlock,
 			} = unlock( select( blockEditorStore ) );
 
 			const { getActiveBlockVariation } = select( blocksStore );
@@ -120,8 +121,12 @@ export function BlockSettingsDropdown( {
 				previousBlockClientId:
 					getPreviousBlockClientId( firstBlockClientId ),
 				selectedBlockClientIds: getSelectedBlockClientIds(),
+				// A group in a pattern gets the content-only menu, so that
+				// reordering it doesn't come with a way to change its design.
 				isContentOnly:
-					getBlockEditingMode( firstBlockClientId ) === 'contentOnly',
+					getBlockEditingMode( firstBlockClientId ) ===
+						'contentOnly' ||
+					isContentGroupBlock( firstBlockClientId ),
 				isZoomOut: _isZoomOut(),
 				canEdit: canEditBlock( firstBlockClientId ),
 				canMove: canMoveBlocks( clientIds ),

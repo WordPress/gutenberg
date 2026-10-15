@@ -2020,6 +2020,53 @@ export function lastBlockAttributesChange(
 }
 
 /**
+ * Returns whether an attribute update touches a block's `metadata` attribute.
+ *
+ * @param action Dispatched action.
+ *
+ * @return Whether `metadata` is part of the update.
+ */
+function hasMetadataUpdate( action: Action ) {
+	if ( action.type === 'UPDATE_BLOCK' ) {
+		return (
+			!! action.updates.attributes &&
+			Object.hasOwn( action.updates.attributes, 'metadata' )
+		);
+	}
+
+	if ( action.type === 'UPDATE_BLOCK_ATTRIBUTES' ) {
+		return action.clientIds.some( ( clientId ) => {
+			const attributes = action.options?.uniqueByBlock
+				? action.attributes[ clientId ]
+				: action.attributes;
+			return !! attributes && Object.hasOwn( attributes, 'metadata' );
+		} );
+	}
+
+	return false;
+}
+
+/**
+ * Reducer returning a revision that changes whenever a block's `metadata`
+ * attribute may have changed without the block tree changing shape.
+ *
+ * Selectors that read `metadata`, like a block's name, depend on this instead
+ * of on `state.blocks.attributes`, which changes on every keystroke. Changes
+ * to the tree's shape are covered by `state.blocks.order`.
+ *
+ * @param state  Current revision.
+ * @param action Dispatched action.
+ *
+ * @return Updated revision.
+ */
+export function blockMetadataRevision(
+	state: State[ 'blockMetadataRevision' ] = 0,
+	action: Action
+) {
+	return hasMetadataUpdate( action ) ? state + 1 : state;
+}
+
+/**
  * Reducer returning current highlighted block.
  *
  * @param state  Current highlighted block.
@@ -2596,6 +2643,7 @@ const combinedReducers = combineReducers( {
 	settings,
 	preferences,
 	lastBlockAttributesChange,
+	blockMetadataRevision,
 	lastFocus,
 	expandedBlock,
 	highlightedBlock,

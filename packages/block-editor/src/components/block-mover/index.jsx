@@ -6,6 +6,7 @@ import { __ } from '@wordpress/i18n';
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 function BlockMover( { clientIds, hideDragHandle } ) {
 	const {
@@ -15,6 +16,7 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 		isLast,
 		orientation,
 		isManualGrid,
+		isContentGroup,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -24,7 +26,8 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				getBlockOrder,
 				getBlockRootClientId,
 				getBlockAttributes,
-			} = select( blockEditorStore );
+				isContentGroupBlock,
+			} = unlock( select( blockEditorStore ) );
 			const normalizedClientIds = Array.isArray( clientIds )
 				? clientIds
 				: [ clientIds ];
@@ -39,6 +42,11 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 
 			return {
 				canMove: canMoveBlocks( clientIds ),
+				// A group in a pattern can't be dragged, since its container
+				// is disabled and has nowhere to drop it.
+				isContentGroup: normalizedClientIds.some( ( clientId ) =>
+					isContentGroupBlock( clientId )
+				),
 				rootClientId: _rootClientId,
 				isFirst: firstIndex === 0,
 				isLast: lastIndex === blockOrder.length - 1,
@@ -70,7 +78,7 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				'is-horizontal': orientation === 'horizontal',
 			} ) }
 		>
-			{ ! hideDragHandle && (
+			{ ! hideDragHandle && ! isContentGroup && (
 				<BlockDraggable clientIds={ clientIds } fadeWhenDisabled>
 					{ ( draggableProps ) => (
 						<Button

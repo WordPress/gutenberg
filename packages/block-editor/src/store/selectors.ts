@@ -39,6 +39,8 @@ import {
 	getSectionRootClientId,
 	isSectionBlock,
 	getParentSectionBlock,
+	isContentGroupBlock,
+	allowsContentGroupReordering,
 	isZoomOut,
 	isContainerInsertableToInContentOnlyMode,
 	getClientIdWithClientIdsTree,
@@ -2211,6 +2213,18 @@ export function canMoveBlock( state: State, clientId: string ) {
 	const rootTemplateLock = getTemplateLock( state, rootClientId );
 	if ( rootTemplateLock === 'all' ) {
 		return false;
+	}
+
+	// A group can be reordered among its siblings when its container allows
+	// it. Not in a synced pattern, though: its blocks belong to the pattern.
+	if ( isContentGroupBlock( state, clientId ) ) {
+		return (
+			allowsContentGroupReordering( state, rootClientId ?? '' ) &&
+			! getBlockParents( state, clientId ).some(
+				( parentClientId ) =>
+					getBlockName( state, parentClientId ) === 'core/block'
+			)
+		);
 	}
 
 	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );

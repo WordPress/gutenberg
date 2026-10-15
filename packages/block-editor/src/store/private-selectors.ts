@@ -37,6 +37,7 @@ import {
 	isIsolatedEditorKey,
 } from './private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import { isPatternGroupingEnabled } from '../utils/pattern-grouping';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
 import type {
@@ -312,6 +313,109 @@ export const canHostEditableRoot = createSelector(
 );
 
 /**
+ * Returns whether any descendant of the block is edited as content.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the block has a content-only descendant.
+ */
+function hasContentOnlyDescendant( state: State, clientId: string ): boolean {
+	return getBlockOrder( state, clientId ).some(
+		( innerClientId ) =>
+			getBlockEditingMode( state, innerClientId ) === 'contentOnly' ||
+			hasContentOnlyDescendant( state, innerClientId )
+	);
+}
+
+/**
+ * Returns whether a block is a group inside a content-only pattern.
+ *
+ * A pattern author makes a container a group by naming it. Its design stays
+ * locked, but it's shown in List View and the Content panel so people can
+ * tell which content belongs together, and it can be selected. A name only
+ * makes a group when there's content under it to group.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the block.
+ *
+ * @return Whether the block is a group.
+ */
+export function isContentGroupBlock( state: State, clientId: string ) {
+	return (
+		isPatternGroupingEnabled() &&
+		getBlockEditingMode( state, clientId ) === 'disabled' &&
+		!! getBlockAttributes( state, clientId )?.metadata?.name &&
+		!! getParentSectionBlock( state, clientId ) &&
+		hasContentOnlyDescendant( state, clientId )
+	);
+}
+
+/**
+ * Returns whether the groups directly inside a block can be reordered while
+ * the pattern's design is locked. A pattern author allows it by setting
+ * `metadata.allowReordering` on the container, for example a grid of cards.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the container.
+ *
+ * @return Whether its groups can be reordered.
+ */
+export function allowsContentGroupReordering( state: State, clientId: string ) {
+	return (
+		isPatternGroupingEnabled() &&
+		!! getBlockAttributes( state, clientId )?.metadata?.allowReordering
+	);
+}
+
+function getContentTreeUnmemoized(
+	state: State,
+	rootClientId: string
+): ClientIdsTreeNode[] {
+	return getBlockOrder( state, rootClientId ).flatMap( ( clientId ) => {
+		// Content inside a block with its own List View panel is edited there.
+		const innerBlocks = shouldRenderBlockListView( state, clientId )
+			? []
+			: getContentTreeUnmemoized( state, clientId );
+
+		if ( getBlockEditingMode( state, clientId ) === 'contentOnly' ) {
+			return [ { clientId, innerBlocks: [] }, ...innerBlocks ];
+		}
+
+		if ( isContentGroupBlock( state, clientId ) ) {
+			return innerBlocks.length ? [ { clientId, innerBlocks } ] : [];
+		}
+
+		return innerBlocks;
+	} );
+}
+
+/**
+ * Returns the tree the Content panel shows for a content-only section: its
+ * content blocks in document order, nested under the groups they belong to.
+ * Without groups, the tree is a flat list.
+ *
+ * @param state    Global application state.
+ * @param clientId Client ID of the section block.
+ *
+ * @return Tree of content blocks and groups.
+ */
+export const getContentTree = createSelector(
+	getContentTreeUnmemoized,
+	( state: State ) => [
+		state.blocks.order,
+		state.blocks.parents,
+		state.blocks.byClientId,
+		state.derivedBlockEditingModes,
+		state.blocks.blockEditingModes,
+		state.blockListSettings,
+		state.blockMetadataRevision,
+		state.editedContentOnlySection,
+		state.settings,
+	]
+);
+
+/**
  * Returns the block tree displayed by List View.
  *
  * @param state        Global application state.
@@ -340,6 +444,12 @@ function getListViewClientIdsTreeUnmemoized(
 
 			if ( hasExplicitDisabledParent( _state, clientId ) ) {
 				return false;
+			}
+
+			// A group stays disabled, so its design is locked, but it's shown
+			// so people can tell which content belongs together.
+			if ( isContentGroupBlock( _state, clientId ) ) {
+				return true;
 			}
 
 			// When a contentOnly section is being edited, there's some special handling.
@@ -412,6 +522,8 @@ export const getListViewClientIdsTree = createSelector(
 		state.blocks.blockEditingModes,
 		state.blocks.parents,
 		state.editedContentOnlySection,
+		// Groups are named containers, so a rename can add or remove one.
+		state.blockMetadataRevision,
 		// The state below is only read to resolve a block's parent section,
 		// which the tree does only while a content-only section is being
 		// edited. Depending on it otherwise rebuilds the tree on every
