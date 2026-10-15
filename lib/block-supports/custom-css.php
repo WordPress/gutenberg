@@ -303,7 +303,7 @@ function gutenberg_register_custom_css_support( $block_type ) {
  * Removes `css` keys from a block's `style` attribute, including any nested
  * under pseudo-state (`:hover`) or viewport-state (`@mobile`) sub-objects.
  *
- * @since 7.1.0
+ * @since 7.2.0
  *
  * @param array $style The block's `style` attribute.
  * @return array The style attribute with all `css` keys removed.
