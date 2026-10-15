@@ -8,6 +8,8 @@ import { unlock } from '../../../lock-unlock';
 /** @typedef {import('../../../store/types').InserterMediaCategory} InserterMediaCategory */
 /** @typedef {import('../../../store/types').InserterMediaResponse} InserterMediaResponse */
 
+const EMPTY_MEDIA_LIST = [];
+
 /**
  * Normalizes the result of a media category's `fetch`, which may be either a
  * plain array of media items or an `InserterMediaResponse` carrying pagination
@@ -17,8 +19,6 @@ import { unlock } from '../../../lock-unlock';
  * @param {InserterMediaItem[]|InserterMediaResponse|undefined} result The raw `fetch` result.
  * @return {{ mediaItems: InserterMediaItem[], totalItems: number|undefined, totalPages: number|undefined }} The normalized result.
  */
-const EMPTY_MEDIA_LIST = [];
-
 function normalizeFetchResult( result ) {
 	if ( Array.isArray( result ) ) {
 		return { mediaItems: result };

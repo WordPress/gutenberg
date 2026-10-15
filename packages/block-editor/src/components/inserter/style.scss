@@ -507,17 +507,18 @@ $media-grid-loading-min-height: 500px;
 		padding: 0 $grid-unit-20;
 	}
 
-	// Holds roughly the height of a full page of results while they load, so
-	// the panel doesn't collapse and then grow again as they arrive. Tuned
-	// for the sidebar's width, where a page is four rows of two square tiles;
-	// a wider inserter fits more per row and so overshoots a little. The
-	// empty state deliberately doesn't get this, as it should stay compact.
+	// Where the placeholder replaces a loaded grid, it reserves roughly a full
+	// page of height so the panel doesn't collapse and grow back. Sized for
+	// the sidebar, where a page is four rows of two square tiles.
 	.block-editor-inserter__media-grid__loading {
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		width: 100%;
-		min-height: $media-grid-loading-min-height;
+
+		&.is-replacing-results {
+			min-height: $media-grid-loading-min-height;
+		}
 	}
 
 	.block-editor-inserter__media-grid__footer {
