@@ -3,12 +3,14 @@ import {
 	findTransform,
 	getBlockTransforms,
 	hasBlockSupport,
+	serialize,
 	switchToBlockType,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
 	isEntirelySelected,
+	__unstableStripHTML as stripHTML,
 } from '@wordpress/dom';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -40,6 +42,29 @@ function isBlockEntirelySelected( ownerDocument, clientId ) {
 	return (
 		!! blockElement?.isContentEditable && isEntirelySelected( blockElement )
 	);
+}
+
+/**
+ * Whether copying the given block preserves the selected text. Content that
+ * is not part of the serialized block, like bound attributes or dynamic
+ * content, would be lost when copying the block instead of the text.
+ *
+ * @param {Document} ownerDocument The block's document.
+ * @param {Object}   block         The block to copy.
+ *
+ * @return {boolean} Whether copying the block preserves the selected text.
+ */
+function isTextPreservedOnBlockCopy( ownerDocument, block ) {
+	const selectedText = ownerDocument.defaultView
+		.getSelection()
+		.toString()
+		.trim();
+
+	if ( ! selectedText ) {
+		return true;
+	}
+
+	return !! stripHTML( serialize( block ) ).trim();
 }
 
 export default function useClipboardHandler() {
@@ -86,13 +111,19 @@ export default function useClipboardHandler() {
 			// block, like a caption, are not the block element and keep
 			// the native copy.
 			// Whether the entire text of a single selected block is
-			// copied, in which case the block itself is copied.
+			// copied, in which case the block itself is copied, unless
+			// the text isn't part of the serialized block, like bound
+			// content, which would otherwise be lost.
 			const isWholeSingleBlockCopy =
 				event.type === 'copy' &&
 				! hasMultiSelection() &&
 				isBlockEntirelySelected(
 					event.target.ownerDocument,
 					selectedBlockClientIds[ 0 ]
+				) &&
+				isTextPreservedOnBlockCopy(
+					event.target.ownerDocument,
+					getBlocksByClientId( selectedBlockClientIds )[ 0 ]
 				);
 
 			// Let native copy/paste behaviour take over in input fields.
