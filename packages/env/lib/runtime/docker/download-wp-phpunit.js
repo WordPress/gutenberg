@@ -160,46 +160,59 @@ function getTestSuiteRefs( wpVersion ) {
 /**
  * Fetches and checks out the first of the given refs that exists.
  *
- * A ref that does not exist moves on to the next one. Any other error, such as
- * a network failure, is thrown.
+ * The refs that exist are listed with a single `git ls-remote` call, so a
+ * missing ref is detected without parsing git's (possibly translated) error
+ * messages and without a failed fetch for each one.
  *
  * @param {import('simple-git').SimpleGit} git  The SimpleGit instance for the PHPUnit suite directory.
  * @param {TestSuiteRef[]}                 refs The refs to try, in order.
  * @param {(message: string) => void}      log  Logs a debug message.
  */
 async function fetchTestSuite( git, refs, log ) {
-	for ( const [ index, ref ] of refs.entries() ) {
-		const label = `${ ref.type } ${ ref.name }`;
-		log( `Fetching ${ label }.` );
-		try {
-			await git.raw( [
-				'fetch',
-				'origin',
-				...( ref.type === 'tag' ? [ 'tag' ] : [] ),
-				ref.name,
-				'--depth',
-				'1',
-			] );
-		} catch ( error ) {
-			const isLast = index === refs.length - 1;
-			if (
-				isLast ||
-				! /couldn't find remote ref/i.test( error.message )
-			) {
-				throw error;
-			}
-			log( `${ label } does not exist.` );
-			continue;
-		}
+	const getFullName = ( { type, name } ) =>
+		`refs/${ type === 'tag' ? 'tags' : 'heads' }/${ name }`;
 
-		/*
-		 * Check out what was just fetched. A local branch of the same name would
-		 * still point at whatever an earlier run cloned.
-		 */
-		log( `Checking out ${ label }.` );
-		await git.checkout( 'FETCH_HEAD' );
-		return;
+	log( 'Listing the matching refs in WordPress/wordpress-develop.' );
+	const output = await git.raw( [
+		'ls-remote',
+		'origin',
+		...refs.map( getFullName ),
+	] );
+	const existing = new Set(
+		output
+			.split( '\n' )
+			.map( ( line ) => line.split( '\t' )[ 1 ] )
+			.filter( Boolean )
+	);
+
+	const ref = refs.find( ( candidate ) =>
+		existing.has( getFullName( candidate ) )
+	);
+	if ( ! ref ) {
+		throw new Error(
+			`Could not find the PHPUnit test library in WordPress/wordpress-develop. Tried: ${ refs
+				.map( ( { type, name } ) => `${ type } ${ name }` )
+				.join( ', ' ) }.`
+		);
 	}
+
+	const label = `${ ref.type } ${ ref.name }`;
+	log( `Fetching ${ label }.` );
+	await git.raw( [
+		'fetch',
+		'origin',
+		...( ref.type === 'tag' ? [ 'tag' ] : [] ),
+		ref.name,
+		'--depth',
+		'1',
+	] );
+
+	/*
+	 * Check out what was just fetched. A local branch of the same name would
+	 * still point at whatever an earlier run cloned.
+	 */
+	log( `Checking out ${ label }.` );
+	await git.checkout( 'FETCH_HEAD' );
 }
 
 module.exports = downloadWPPHPUnit;
