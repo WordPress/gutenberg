@@ -45,15 +45,27 @@ concurrency:
 # Any needed permissions should be configured at the job level.
 permissions: {}
 
+env:
+    # Sections are truncated at write from this commit on. A base without it,
+    # a release branch or a stack cut before it, carries writers that would
+    # re-cut the props list, so it keeps the standalone comment.
+    PR_META_WRITERS_SHA: d5eff1a2e1201f8644b2732d46fe0320670ef93e
+    # A review runs this file from the merge ref, so a target still carrying
+    # the old routing would recreate the standalone comment. The resolve job
+    # looks for this line in the target's copy.
+    PROPS_ROUTING: pr-meta-props-routing-2
+
 jobs:
     pull-request:
         name: Resolve the pull request target
         runs-on: 'ubuntu-24.04'
         permissions:
             pull-requests: read
+            # Reading the target's copy of this workflow.
+            contents: read
         timeout-minutes: 5
         outputs:
-            base-ref: ${{ steps.pull-request.outputs.result }}
+            routing-current: ${{ steps.pull-request.outputs.result }}
         # The job will run when pull requests are open, ready for review and:
         #
         # - A comment is added to the pull request.
@@ -83,13 +95,28 @@ jobs:
                         ...context.repo,
                         pull_number: context.issue.number,
                       } );
-                      return data.base.ref;
+                      // A target carrying this routing also holds `PR_META_WRITERS_SHA`.
+                      try {
+                        const { data: file } = await github.rest.repos.getContent( {
+                          ...context.repo,
+                          path: '.github/workflows/props-bot.yml',
+                          ref: data.base.ref,
+                        } );
+                        return Buffer.from( file.content, 'base64' )
+                          .toString()
+                          .includes( `PROPS_ROUTING: ${ process.env.PROPS_ROUTING }` );
+                      } catch ( error ) {
+                        if ( error.status === 404 ) {
+                          return false;
+                        }
+                        throw error;
+                      }
 
     # Collects a list of contributor props for the PR meta comment to post.
     props-bot:
         name: Generate a list of props
         needs: pull-request
-        if: ${{ needs.pull-request.outputs.base-ref == github.event.repository.default_branch }}
+        if: ${{ needs.pull-request.outputs.routing-current == 'true' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             # Read is enough: the action posts nothing, see `post-comment`.
@@ -108,12 +135,12 @@ jobs:
                   # it to an output and posts nothing itself.
                   post-comment: false
 
-    # Other branches retain standalone props until their shared writers have
-    # been updated. Otherwise the base gate would discard every fresh list.
+    # Other branches retain standalone props until they carry this routing and
+    # its writers. Otherwise the base gate would discard every fresh list.
     standalone-props:
         name: Update the standalone props comment
         needs: pull-request
-        if: ${{ needs.pull-request.outputs.base-ref != github.event.repository.default_branch }}
+        if: ${{ needs.pull-request.outputs.routing-current == 'false' }}
         runs-on: 'ubuntu-24.04'
         permissions:
             pull-requests: write
@@ -189,10 +216,10 @@ jobs:
                   # yet know where each of the three events carries this.
                   pr-number: ${{ github.event.number || github.event.issue.number || github.event.pull_request.number }}
                   # This workflow also runs from the default branch for a pull
-                  # request targeting a release branch, whose own writers are
-                  # older and would re-cut the section. They need the action
-                  # before this section may appear there.
-                  require-base: ${{ github.event.repository.default_branch }}
+                  # request targeting a branch whose own writers are older and
+                  # would re-cut the section. They need the action before this
+                  # section may appear there.
+                  require-base-contains: ${{ env.PR_META_WRITERS_SHA }}
                   # Retires the standalone comment on pull requests open before
                   # this landed, so no one copies its list once it stops moving.
                   # Editing a comment notifies nobody, so an unlinked

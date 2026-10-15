@@ -99,7 +99,8 @@ jobs:
                   section: playground
                   body: '[![Preview in WordPress Playground](https://img.shields.io/badge/Preview-WordPress%20Playground-3858e9?logo=wordpress)](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }})'
                   pr-number: ${{ github.event.pull_request.number }}
-                  require-base: ${{ github.event.repository.default_branch }}
+                  # Sections are truncated at write from this commit on.
+                  require-base-contains: d5eff1a2e1201f8644b2732d46fe0320670ef93e
 
     account-link:
         name: Prompt for a WordPress.org profile

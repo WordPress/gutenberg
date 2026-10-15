@@ -53,7 +53,7 @@ A section is truncated when it is written, not when it is rendered, so this revi
 
 That sets the order for backporting to a release branch. This action goes first, on its own; the workflow that adds a section goes after. A branch whose action still truncates at render will cut a section written by another branch, so giving it a producer before the action is what creates the mixed pair.
 
-A workflow triggered by `pull_request_target` or `issue_comment` runs from the default branch whatever the pull request targets, so it reaches release branch pull requests before that branch has been backported anything. `require-base` holds a section back until then: the writer does nothing unless the pull request targets the branch named, so pass `${{ github.event.repository.default_branch }}` and drop it once every release branch carries this action.
+A workflow triggered by `pull_request_target` or `issue_comment` runs from the default branch whatever the pull request targets, so it reaches release branch pull requests before that branch has been backported anything. `require-base-contains` holds a section back until then: the writer does nothing unless the branch the pull request targets contains the commit named, so pass the one that made sections truncate at write (d5eff1a2e1201f8644b2732d46fe0320670ef93e) and drop it once every release branch and open stack carries this action. A stacked pull request targeting a feature branch cut after that commit still gets the section.
 
 ## Adding a section
 
