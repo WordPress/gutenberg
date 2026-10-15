@@ -1,10 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { speak } from '@wordpress/a11y';
-import { check, copy } from '@wordpress/icons';
-import { IconButton } from '../../icon-button';
 import { Text } from '../../text';
 import * as Collapsible from '../../collapsible';
 import * as Notice from '../index';
@@ -12,8 +9,6 @@ import * as Notice from '../index';
 type StoryArgs = ComponentProps< typeof Notice.Root > & {
 	message: string;
 	details: string;
-	copyButton?: 'icon' | 'text';
-	actionsAtBottom?: boolean;
 };
 
 const meta: Meta< StoryArgs > = {
@@ -31,47 +26,43 @@ export default meta;
 
 type Story = StoryObj< StoryArgs >;
 
-function CopyDetailsButton( {
-	details,
-	presentation,
-}: {
-	details: string;
-	presentation: 'icon' | 'text';
-} ) {
-	const [ copied, setCopied ] = useState( false );
-	const copyRef = useCopyToClipboard< HTMLButtonElement >( details, () => {
-		setCopied( true );
-		speak( 'Details copied to clipboard.', 'polite' );
+const CONFIRMATION_TIMEOUT = 4000;
+
+function CopyButton( { text, label }: { text: string; label: string } ) {
+	const [ hasCopied, setHasCopied ] = useState( false );
+	const copyRef = useCopyToClipboard< HTMLButtonElement >( text, () => {
+		setHasCopied( true );
 	} );
 
-	if ( presentation === 'text' ) {
-		return (
-			<>
-				<Notice.ActionButton ref={ copyRef } variant="outline">
-					Copy details
-				</Notice.ActionButton>
-				{ copied && (
-					<Text
-						variant="body-sm"
-						aria-hidden="true"
-						style={ { alignSelf: 'center' } }
-					>
-						Copied
-					</Text>
-				) }
-			</>
-		);
-	}
+	useEffect( () => {
+		setHasCopied( false );
+	}, [ text ] );
+
+	useEffect( () => {
+		if ( ! hasCopied ) {
+			return;
+		}
+
+		const timeoutId = setTimeout( () => {
+			setHasCopied( false );
+		}, CONFIRMATION_TIMEOUT );
+
+		return () => clearTimeout( timeoutId );
+	}, [ hasCopied ] );
 
 	return (
-		<IconButton
-			ref={ copyRef }
-			label="Copy details"
-			icon={ copied ? check : copy }
-			size="compact"
-			variant="outline"
-			tone="neutral"
-		/>
+		<>
+			<Notice.ActionButton ref={ copyRef } variant="outline">
+				{ label }
+			</Notice.ActionButton>
+			<Text
+				variant="body-sm"
+				role="status"
+				style={ { alignSelf: 'center' } }
+			>
+				{ hasCopied ? 'Copied' : '' }
+			</Text>
+		</>
 	);
 }
 
@@ -82,43 +73,8 @@ export const WithDetails: Story = {
 		details:
 			'The title was rejected by a server-side rule.\nRemove "Break save" from the title, then try again.',
 	},
-	render: function NoticeWithDetails( {
-		intent,
-		message,
-		details,
-		copyButton = 'icon',
-		actionsAtBottom = false,
-	} ) {
+	render: function NoticeWithDetails( { intent, message, details } ) {
 		const [ open, setOpen ] = useState( false );
-
-		const actions = (
-			<Notice.Actions key="actions">
-				<Collapsible.Trigger
-					render={ <Notice.ActionButton variant="outline" /> }
-				>
-					{ open ? 'Hide details' : 'Show details' }
-				</Collapsible.Trigger>
-				<CopyDetailsButton
-					key={ details }
-					details={ details }
-					presentation={ copyButton }
-				/>
-			</Notice.Actions>
-		);
-		const panel = (
-			<Collapsible.Panel
-				key="details"
-				hiddenUntilFound
-				render={ <Notice.Description render={ <div /> } /> }
-				style={ {
-					marginBlockStart: 'var(--wpds-dimension-gap-sm)',
-					whiteSpace: 'pre-wrap',
-					overflowWrap: 'anywhere',
-				} }
-			>
-				{ details }
-			</Collapsible.Panel>
-		);
 
 		return (
 			<Collapsible.Root
@@ -127,27 +83,31 @@ export const WithDetails: Story = {
 				render={ <Notice.Root intent={ intent } /> }
 			>
 				<Notice.Description>{ message }</Notice.Description>
-				{ actionsAtBottom ? [ panel, actions ] : [ actions, panel ] }
+				<Notice.Actions>
+					<Collapsible.Trigger
+						render={ <Notice.ActionButton variant="outline" /> }
+					>
+						{ open ? 'Hide details' : 'Show details' }
+					</Collapsible.Trigger>
+					<CopyButton
+						text={ `${ message }\n\n${ details }` }
+						label={
+							intent === 'error' ? 'Copy error' : 'Copy message'
+						}
+					/>
+				</Notice.Actions>
+				<Collapsible.Panel
+					hiddenUntilFound
+					render={ <Notice.Description render={ <div /> } /> }
+					style={ {
+						marginBlockStart: 'var(--wpds-dimension-gap-sm)',
+						whiteSpace: 'pre-wrap',
+						overflowWrap: 'anywhere',
+					} }
+				>
+					{ details }
+				</Collapsible.Panel>
 			</Collapsible.Root>
 		);
-	},
-};
-
-export const TextCopyButton: Story = {
-	...WithDetails,
-	args: { ...WithDetails.args, copyButton: 'text' },
-};
-
-export const ActionsAtBottom: Story = {
-	...WithDetails,
-	args: { ...WithDetails.args, actionsAtBottom: true },
-};
-
-export const TextCopyButtonWithActionsAtBottom: Story = {
-	...WithDetails,
-	args: {
-		...WithDetails.args,
-		copyButton: 'text',
-		actionsAtBottom: true,
 	},
 };
