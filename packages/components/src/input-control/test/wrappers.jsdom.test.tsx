@@ -1,6 +1,5 @@
 import { expect, it } from 'vitest';
-import { screen } from '@testing-library/react';
-import { render } from 'vitest-browser-react';
+import { render, screen } from '@testing-library/react';
 import type { ComponentPropsWithoutRef } from 'react';
 import { createRef, forwardRef } from '@wordpress/element';
 import InputControlPrefixWrapper from '../input-prefix-wrapper';
@@ -28,9 +27,9 @@ it.each( [
 	{ name: 'suffix', Component: InputControlSuffixWrapper },
 ] )(
 	'preserves the $name wrapper element, ref, and consumer props',
-	async ( { name, Component } ) => {
+	( { name, Component } ) => {
 		const ref = createRef< HTMLSpanElement >();
-		await render(
+		render(
 			<Component
 				as="span"
 				ref={ ref }
@@ -46,7 +45,7 @@ it.each( [
 		expect( ref.current ).toBe( wrapper );
 		expect( wrapper ).toHaveAttribute( 'title', 'Wrapper' );
 		expect( wrapper ).toHaveClass( 'consumer' );
-		expect( wrapper ).toHaveStyle( { paddingInlineEnd: '7px' } );
+		expect( wrapper.style ).toMatchObject( { paddingInlineEnd: '7px' } );
 	}
 );
 
@@ -63,9 +62,9 @@ it.each( [
 	},
 ] )(
 	'forwards size and variant to a custom $name target',
-	async ( { name, Component, expectedPrefix } ) => {
+	( { name, Component, expectedPrefix } ) => {
 		const ref = createRef< HTMLSpanElement >();
-		await render(
+		render(
 			<Component
 				as={ CustomTarget }
 				size="small"
