@@ -10,7 +10,7 @@ globalThis.wpVitest.mockMatchMedia();
 const SPIN = STEP * SPIN_FACTOR;
 
 const ControlledLineHeightControl = () => {
-	const [ value, setValue ] = useState();
+	const [ value, setValue ] = useState< string | number >();
 	return <LineHeightControl value={ value } onChange={ setValue } />;
 };
 
