@@ -61,6 +61,7 @@ jobs:
                   name: failures-artifacts--${{ matrix.part }}
                   path: artifacts/test-results
                   if-no-files-found: ignore
+                  retention-days: 14
 
             - name: Archive flaky tests report
               uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -86,6 +87,7 @@ jobs:
                   # Retain the merged artifacts in case of a rerun.
                   pattern: failures-artifacts*
                   delete-merged: true
+                  retention-days: 14
 
             - name: Merge flaky tests reports
               id: merge-flaky-tests-reports
