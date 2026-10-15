@@ -19,6 +19,7 @@
 
 ### Enhancements
 
+-   `Avatar`: Explore CSS-only colored fallbacks with native contrast and contrast-limited foreground tinting, retaining neutral fallbacks when the required features are unavailable.
 -   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
