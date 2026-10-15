@@ -283,6 +283,8 @@ jobs:
               with:
                   path: ./gutenberg${{ ! matrix.IS_GUTENBERG_PLUGIN && '-wordpress-develop' || '' }}.zip
                   archive: false
+                  # Pull request builds only need to outlive Playground previews of active pull requests.
+                  retention-days: ${{ github.event_name == 'pull_request' && 14 || 90 }}
 
             - name: Build release notes draft
               if: ${{ matrix.IS_GUTENBERG_PLUGIN && needs.bump-version.outputs.new_version }}
