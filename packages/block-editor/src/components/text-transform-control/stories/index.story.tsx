@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import TextTransformControl from '../';
 
-const meta = {
+const meta: Meta< typeof TextTransformControl > = {
 	id: 'blockeditor-texttransformcontrol',
 	title: 'Editor/Block Editor/TextTransformControl',
 	component: TextTransformControl,
@@ -18,6 +19,7 @@ const meta = {
 		onChange: {
 			action: 'onChange',
 			control: {
+				// @ts-expect-error Storybook types omit `null`, which hides the control.
 				type: null,
 			},
 			description: 'Handles change in text transform selection.',
@@ -35,6 +37,7 @@ const meta = {
 			},
 		},
 		value: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'Currently selected text transform.',
 			table: {
@@ -46,9 +49,11 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState();
+		const [ value, setValue ] = useState< string >();
 
 		return (
 			<TextTransformControl
