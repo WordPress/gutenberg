@@ -6,6 +6,9 @@ const {
 const AUTOSAVE_FAILED =
 	'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.';
 
+const UPDATING_FAILED_OFFLINE =
+	'Updating failed because you were offline. Please verify your connection and try again.';
+
 const withDetails = ( details ) =>
 	`${ AUTOSAVE_FAILED } <details class="editor-save-error-details"><summary>Show details</summary><span class="editor-save-error-details__message">${ details }</span></details>`;
 
@@ -303,9 +306,8 @@ test.describe( 'Autosave failure notice', () => {
 			} );
 		}
 
-		test( 'notice stays after a later autosave succeeds', async ( {
+		test( 'notice is removed after a later autosave succeeds', async ( {
 			autosaveFailure,
-			page,
 		} ) => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
@@ -315,17 +317,105 @@ test.describe( 'Autosave failure notice', () => {
 
 			await autosaveFailure.stopFailing();
 			await autosaveFailure.autosave();
-			expect(
-				await page.evaluate( () =>
-					window.wp.data
-						.select( 'core/editor' )
-						.didPostSaveRequestFail()
-				)
-			).toBe( false );
-			// TODO: Remove the failure notice once an autosave succeeds.
+			expect( await autosaveFailure.getNotices() ).toEqual( [] );
+		} );
+
+		test( 'notice is replaced by the outcome of a manual save', async ( {
+			autosaveFailure,
+			pageUtils,
+		} ) => {
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
 				AUTOSAVE_FAILED,
 			] );
+
+			await autosaveFailure.stopFailing();
+			await pageUtils.pressKeys( 'primary+s' );
+			await expect
+				.poll( autosaveFailure.getNotices )
+				.toEqual( [ 'Draft saved.' ] );
 		} );
+
+		test( 'notice is replaced by a failed manual save', async ( {
+			autosaveFailure,
+			context,
+			page,
+			pageUtils,
+		} ) => {
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
+			expect( await autosaveFailure.getNotices() ).toEqual( [
+				AUTOSAVE_FAILED,
+			] );
+
+			await context.setOffline( true );
+			await pageUtils.pressKeys( 'primary+s' );
+			await expect
+				.poll( autosaveFailure.getNotices )
+				.toEqual( [ UPDATING_FAILED_OFFLINE ] );
+			await expect
+				.poll( () =>
+					page.evaluate( () =>
+						window.wp.data.select( 'core/editor' ).isSavingPost()
+					)
+				)
+				.toBe( false );
+			await context.setOffline( false );
+		} );
+
+		for ( const [ status, afterAutosave, afterManualSave ] of [
+			// TODO: Should a manual save stay possible, so it creates a revision?
+			[ 'draft', [], [] ],
+			[ 'publish', [ UPDATING_FAILED_OFFLINE ], [ 'Post updated.' ] ],
+		] ) {
+			test( `failed manual save notice is cleared once nothing is left to save (${ status })`, async ( {
+				admin,
+				autosaveFailure,
+				context,
+				page,
+				pageUtils,
+				requestUtils,
+			} ) => {
+				const { id } = await requestUtils.createPost( {
+					title: 'Manual save',
+					status,
+				} );
+				await admin.editPost( id );
+				await autosaveFailure.edit();
+				await context.setOffline( true );
+				await pageUtils.pressKeys( 'primary+s' );
+				await expect
+					.poll( () =>
+						page.evaluate( () =>
+							window.wp.data
+								.select( 'core/editor' )
+								.isSavingPost()
+						)
+					)
+					.toBe( false );
+				await context.setOffline( false );
+				expect( await autosaveFailure.getNotices() ).toEqual( [
+					UPDATING_FAILED_OFFLINE,
+				] );
+
+				await autosaveFailure.fail( 'dropped-connection' );
+				await autosaveFailure.autosave();
+				expect( await autosaveFailure.getNotices() ).toEqual( [
+					UPDATING_FAILED_OFFLINE,
+				] );
+
+				await autosaveFailure.stopFailing();
+				await autosaveFailure.autosave();
+				expect( await autosaveFailure.getNotices() ).toEqual(
+					afterAutosave
+				);
+
+				await pageUtils.pressKeys( 'primary+s' );
+				await expect
+					.poll( autosaveFailure.getNotices )
+					.toEqual( afterManualSave );
+			} );
+		}
 	} );
 } );

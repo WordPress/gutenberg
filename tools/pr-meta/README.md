@@ -57,7 +57,7 @@ A workflow triggered by `pull_request_target` or `issue_comment` runs from the d
 
 ## Adding a section
 
-Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and character budget. Headings lead with an emoji, so a reader scanning a comment of seven sections can find theirs without reading any of them. The budgets must sum, with the headings and markers, to less than GitHub's 65536-character comment limit; a test covers that.
+Add it to `SECTIONS` in `src/sections.ts` with an id, heading, scope and character budget. Headings lead with an emoji, so a reader scanning a comment of eight sections can find theirs without reading any of them. A section whose body labels itself, like the Playground badge, can leave the heading out. The budgets must sum, with the headings and markers, to less than GitHub's 65536-character comment limit; a test covers that.
 
 A producer renders its markdown without knowing where it will sit, so any headings in a body are demoted to sit below the section heading, keeping their relative hierarchy. Headings inside a code fence are left alone, and a body deep enough to need a seventh level flattens at the sixth, markdown having no more. Setext headings, the ones underlined with `=` or `-`, are not demoted.
 

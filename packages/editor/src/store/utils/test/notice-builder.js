@@ -154,7 +154,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ 'publish', 'publish' ],
 			[
 				'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.',
-				defaultExpectedAction,
+				{ id: 'editor-autosave' },
 			],
 			{ isAutosave: true },
 		],

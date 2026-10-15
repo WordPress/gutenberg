@@ -345,9 +345,7 @@ function Fields( {
 			return;
 		}
 		const [ clientId ] = clientIds;
-		const block = registry
-			.select( blockEditorStore )
-			.getBlock( clientId ) as { attributes: Record< string, unknown > };
+		const block = registry.select( blockEditorStore ).getBlock( clientId )!;
 		registry.batch( () => {
 			selectionChange( clientId, keys[ 0 ], start, end );
 			replaceBlocks(
