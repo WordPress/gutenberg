@@ -50,7 +50,7 @@
 		{ "path": "packages/interactivity-router/tsconfig.full-page.json" },
 		{ "path": "packages/interface/tsconfig.build.json" },
 		{ "path": "packages/is-shallow-equal/tsconfig.build.json" },
-		{ "path": "packages/kebab-case" },
+		{ "path": "packages/kebab-case/tsconfig.build.json" },
 		{ "path": "packages/keycodes/tsconfig.build.json" },
 		{ "path": "packages/keyboard-shortcuts" },
 		{ "path": "packages/latex-to-mathml" },
