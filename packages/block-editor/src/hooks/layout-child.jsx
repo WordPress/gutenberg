@@ -381,6 +381,18 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		].join( '' );
 	}
 
+	// A block in a manual placement grid stays in place while it is dragged,
+	// so the browser's drag image must not show. WebKit ignores the drag
+	// image set for a block when the drag starts on an image, and shows the
+	// image instead, so images leave the drag to the block.
+	if (
+		parentLayout.type === 'grid' &&
+		parentLayout.isManualPlacement &&
+		window.__experimentalEnableGridInteractivity
+	) {
+		css += `${ selector } img { -webkit-user-drag: none; }`;
+	}
+
 	useStyleOverride( { css } );
 
 	// Only attach a container class if there is generated CSS to be attached.
