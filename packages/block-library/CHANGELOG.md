@@ -21,6 +21,7 @@
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
 -   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it ([#82232](https://github.com/WordPress/gutenberg/pull/82232)).
 -   Cover: Decode the oEmbed iframe source before parsing it, so an embedded background video keeps the parameters the provider sent ([#83770](https://github.com/WordPress/gutenberg/pull/83770)).
+-   Image: Fit the lightbox overlay to the visible screen in iOS Safari, so the enlarged image is centered and page content no longer shows around the browser toolbars ([#84739](https://github.com/WordPress/gutenberg/pull/84739)).
 
 ## 11.2.0 (2026-10-07)
 
