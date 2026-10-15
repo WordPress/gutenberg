@@ -312,6 +312,19 @@ function ButtonEdit( props ) {
 		onKeyDown,
 	} );
 	const blockEditingMode = useBlockEditingMode();
+	// Inside a Navigation block every item edits from a Settings panel, so a
+	// Button there gets one too. Elsewhere it appears only in content-only
+	// editing, where the toolbar's link controls are hidden.
+	const isInsideNavigation = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getBlockParentsByBlockName(
+				clientId,
+				'core/navigation'
+			).length,
+		[ clientId ]
+	);
+	const hasContentControls =
+		blockEditingMode === 'contentOnly' || isInsideNavigation;
 
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
 	const isURLSet = !! url;
@@ -566,7 +579,7 @@ function ButtonEdit( props ) {
 					/>
 				</Popover>
 			) }
-			{ blockEditingMode === 'contentOnly' && (
+			{ hasContentControls && (
 				<InspectorControls group="content">
 					<ContentControls
 						attributes={ attributes }

@@ -814,4 +814,75 @@ test.describe( 'Buttons', () => {
 			).toBeHidden();
 		} );
 	} );
+
+	test.describe( 'Inside a Navigation block', () => {
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMenus();
+		} );
+
+		test( 'shows the content settings panel in the sidebar', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				content:
+					'<!-- wp:buttons --><div class="wp-block-buttons">' +
+					'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://wordpress.org/">Testing</a></div><!-- /wp:button -->' +
+					'</div><!-- /wp:buttons -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+
+			// A Button in a menu edits like the links beside it.
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'heading', { name: 'Settings' } )
+			).toBeVisible();
+			await expect(
+				settings.getByRole( 'textbox', { name: 'Text' } )
+			).toHaveValue( 'Testing' );
+			await expect(
+				settings.getByRole( 'button', { name: /^Link to/ } )
+			).toHaveText( /wordpress\.org/ );
+			await expect(
+				settings.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			).toBeVisible();
+		} );
+
+		test( 'keeps the usual inspector outside a Navigation block', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/buttons',
+				innerBlocks: [
+					{ name: 'core/button', attributes: { text: 'Testing' } },
+				],
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Button', exact: true } )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+
+			const settings = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			await expect(
+				settings.getByRole( 'heading', { name: 'Settings' } )
+			).toBeHidden();
+			await expect(
+				settings.getByRole( 'textbox', { name: 'Text' } )
+			).toBeHidden();
+		} );
+	} );
 } );
