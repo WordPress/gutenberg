@@ -2,15 +2,16 @@
  * Script module of the `wp_block` collection:
  * `@wordpress/core-actions/wp_block`.
  *
- * The actions patterns have on top of the defaults. Its default export maps
- * the id of each action to the action.
+ * The actions patterns have on top of the defaults. Their data is declared in
+ * `src/index.php`; the default export maps the id of each action to its
+ * JavaScript parts.
  */
 
-import type { Action } from '@wordpress/dataviews';
+import type { ActionsScriptParts } from '../types';
 import duplicatePattern from './duplicate-pattern/action';
 import exportPattern from './export-pattern/action';
 
-const actions: Record< string, Action< any > > = {
+const actions: ActionsScriptParts = {
 	'duplicate-pattern': duplicatePattern,
 	'export-pattern': exportPattern,
 };

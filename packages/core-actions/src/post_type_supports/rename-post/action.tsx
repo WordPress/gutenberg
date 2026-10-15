@@ -10,7 +10,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
 import { store as noticesStore } from '@wordpress/notices';
 import { unlock } from '../../lock-unlock';
 import {
@@ -20,15 +19,12 @@ import {
 	isTemplatePart,
 } from '../../shared/utils';
 import type { CoreDataError, PostWithPermissions } from '../../shared/types';
+import type { ActionScriptParts } from '../../types';
 
 // Patterns.
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 
-const renamePost: Action< PostWithPermissions > = {
-	id: 'rename-post',
-	label: __( 'Rename…' ),
-	modalHeader: __( 'Rename' ),
-	modalFocusOnMount: 'firstContentElement',
+const renamePost: ActionScriptParts< PostWithPermissions > = {
 	isEligible( post ) {
 		if ( post.status === 'trash' ) {
 			return false;

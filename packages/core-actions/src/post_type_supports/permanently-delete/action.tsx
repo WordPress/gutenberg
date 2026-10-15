@@ -1,7 +1,6 @@
 import { store as coreStore } from '@wordpress/core-data';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import type { Action } from '@wordpress/dataviews';
 import { trash } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
@@ -15,11 +14,9 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { getItemTitle, isTemplateOrTemplatePart } from '../../shared/utils';
 import { hasActionLink } from '../../shared/has-action-link';
 import type { CoreDataError, PostWithPermissions } from '../../shared/types';
+import type { ActionScriptParts } from '../../types';
 
-const permanentlyDeletePost: Action< PostWithPermissions > = {
-	id: 'permanently-delete',
-	label: __( 'Permanently delete…' ),
-	supportsBulk: true,
+const permanentlyDeletePost: ActionScriptParts< PostWithPermissions > = {
 	icon: trash,
 	isEligible( item ) {
 		if ( isTemplateOrTemplatePart( item ) || item.type === 'wp_block' ) {
@@ -33,8 +30,6 @@ const permanentlyDeletePost: Action< PostWithPermissions > = {
 		// Without the trash link, deleting is permanent.
 		return status === 'trash' || ! hasActionLink( item, 'wp:action-trash' );
 	},
-	hideModalHeader: true,
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =

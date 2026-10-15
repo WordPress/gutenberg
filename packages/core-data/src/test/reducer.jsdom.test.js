@@ -9,6 +9,7 @@ import {
 	undoManagerReference,
 	undoManager,
 	fieldsConfigs,
+	actionsConfigs,
 } from '../reducer';
 
 describe( 'entities', () => {
@@ -599,5 +600,30 @@ describe( 'fieldsConfigs', () => {
 
 		expect( state[ 'a/b' ].c.fields ).toEqual( [ { id: 'first' } ] );
 		expect( state.a[ 'b/c' ].fields ).toEqual( [ { id: 'second' } ] );
+	} );
+} );
+
+describe( 'actionsConfigs', () => {
+	it( 'returns an empty object by default', () => {
+		expect( actionsConfigs( undefined, {} ) ).toEqual( {} );
+	} );
+
+	it( 'keys the received configs by kind, then name', () => {
+		const pageConfig = { kind: 'postType', name: 'page', actions: [] };
+		const postConfig = { kind: 'postType', name: 'post', actions: [] };
+		const state = deepFreeze( {
+			postType: { page: pageConfig },
+		} );
+
+		expect(
+			actionsConfigs( state, {
+				type: 'RECEIVE_ACTIONS_CONFIG',
+				kind: 'postType',
+				name: 'post',
+				config: postConfig,
+			} )
+		).toEqual( {
+			postType: { page: pageConfig, post: postConfig },
+		} );
 	} );
 } );

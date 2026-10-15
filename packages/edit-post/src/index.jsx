@@ -220,6 +220,13 @@ async function preloadResolutions( postType, postId ) {
 							postId
 						),
 						core.getAutosaves( postType, postId ),
+						// The actions of the post type, which the post actions
+						// register with `registerPostTypeSchema`. A failure
+						// leaves them to that request, so it must not cut the
+						// rest of the kickoff short.
+						unlock( core )
+							.getActionsConfig( 'postType', postType )
+							.catch( () => {} ),
 						core.getDefaultTemplateId( { slug: 'front-page' } ),
 						core.canUser( 'create', {
 							kind: 'postType',

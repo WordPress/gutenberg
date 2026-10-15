@@ -3,12 +3,14 @@
  * `@wordpress/core-actions/post_type_supports`.
  *
  * The default actions of every post type, each registered on the post types
- * that support it or on every post type, see `registerPostTypeSchema()` in
- * `@wordpress/editor`. Its default export maps the id of each action to the
- * action.
+ * that support it or on every post type, see wp_register_core_actions() in
+ * `src/index.php`. The data of each action is declared there; the client
+ * reads it from the `wp/v2/entity-actions` route. Its default export maps the
+ * id of each action to its JavaScript parts, which the client merges into the
+ * action with the same id.
  */
 
-import type { Action } from '@wordpress/dataviews';
+import type { ActionsScriptParts } from '../types';
 import deletePost from './delete-post/action';
 import duplicatePost from './duplicate-post/action';
 import moveToTrash from './move-to-trash/action';
@@ -20,7 +22,7 @@ import restore from './restore/action';
 import viewPost from './view-post/action';
 import viewPostRevisions from './view-post-revisions/action';
 
-const actions: Record< string, Action< any > > = {
+const actions: ActionsScriptParts = {
 	'delete-post': deletePost,
 	'duplicate-post': duplicatePost,
 	'move-to-trash': moveToTrash,

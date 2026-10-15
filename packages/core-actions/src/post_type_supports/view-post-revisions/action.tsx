@@ -1,11 +1,9 @@
 import { addQueryArgs } from '@wordpress/url';
 import { __, sprintf } from '@wordpress/i18n';
-import type { Action } from '@wordpress/dataviews';
 import type { Post } from '../../shared/types';
+import type { ActionScriptParts } from '../../types';
 
-const viewPostRevisions: Action< Post > = {
-	id: 'view-post-revisions',
-	context: 'list',
+const viewPostRevisions: ActionScriptParts< Post > = {
 	label( items ) {
 		const revisionsCount =
 			items[ 0 ]._links?.[ 'version-history' ]?.[ 0 ]?.count ?? 0;

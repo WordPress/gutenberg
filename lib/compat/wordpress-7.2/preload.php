@@ -6,6 +6,33 @@
  */
 
 /**
+ * Returns the paths of a route that serve the given post types, skipping the
+ * post types that are not registered.
+ *
+ * @param string   $route      The route, `/wp/v2/entity-fields` or `/wp/v2/entity-actions`.
+ * @param string[] $post_types The post types.
+ * @return string[] One path of the route per post type, in the order the post
+ *                  types are given, without duplicates.
+ */
+function _gutenberg_get_post_type_preload_paths( $route, $post_types ) {
+	$paths = array();
+	foreach ( array_unique( $post_types ) as $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			continue;
+		}
+		$paths[] = add_query_arg(
+			array(
+				'kind' => 'postType',
+				'name' => $post_type,
+			),
+			$route
+		);
+	}
+
+	return $paths;
+}
+
+/**
  * Returns the paths that serve the fields of the given post types, skipping
  * the post types that are not registered.
  *
@@ -17,21 +44,22 @@
  *                  order the post types are given, without duplicates.
  */
 function _gutenberg_get_post_type_fields_preload_paths( $post_types ) {
-	$paths = array();
-	foreach ( array_unique( $post_types ) as $post_type ) {
-		if ( ! post_type_exists( $post_type ) ) {
-			continue;
-		}
-		$paths[] = add_query_arg(
-			array(
-				'kind' => 'postType',
-				'name' => $post_type,
-			),
-			'/wp/v2/entity-fields'
-		);
-	}
+	return _gutenberg_get_post_type_preload_paths( '/wp/v2/entity-fields', $post_types );
+}
 
-	return $paths;
+/**
+ * Returns the paths that serve the actions of the given post types, skipping
+ * the post types that are not registered.
+ *
+ * A path must match the request of the `getActionsConfig` core data resolver,
+ * see packages/core-data/src/resolvers.js.
+ *
+ * @param string[] $post_types The post types.
+ * @return string[] One path of the `wp/v2/entity-actions` route per post type,
+ *                  in the order the post types are given, without duplicates.
+ */
+function _gutenberg_get_post_type_actions_preload_paths( $post_types ) {
+	return _gutenberg_get_post_type_preload_paths( '/wp/v2/entity-actions', $post_types );
 }
 
 /**
@@ -99,3 +127,40 @@ function _gutenberg_preload_entity_fields( $paths, $context ) {
 	);
 }
 add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
+
+/**
+ * Preloads the actions of the post types the editor shows actions for.
+ *
+ * The editors read them from the `wp/v2/entity-actions` route when they
+ * register the actions of a post type, see `registerPostTypeSchema()` in
+ * packages/editor/src/dataviews/store/private-actions.ts:
+ *
+ * - The post editor, for the actions of the edited post. It resolves the
+ *   preloaded path before it mounts, see `preloadResolutions()` in
+ *   packages/edit-post/src/index.js.
+ * - The site editor, for the edited post, if any, and the post types of the
+ *   screen it opens on, as for the fields.
+ *
+ * @param array                   $paths   REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Block editor context.
+ * @return array Filtered preload paths.
+ */
+function _gutenberg_preload_entity_actions( $paths, $context ) {
+	if ( 'core/edit-post' !== $context->name && 'core/edit-site' !== $context->name ) {
+		return $paths;
+	}
+
+	$post_types = array();
+	if ( isset( $context->post ) ) {
+		$post_types[] = $context->post->post_type;
+	}
+	if ( 'core/edit-site' === $context->name ) {
+		$post_types = array_merge( $post_types, _gutenberg_get_site_editor_screen_post_types() );
+	}
+
+	return array_merge(
+		$paths,
+		_gutenberg_get_post_type_actions_preload_paths( $post_types )
+	);
+}
+add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_actions', 10, 2 );

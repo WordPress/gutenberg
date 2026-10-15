@@ -9,18 +9,19 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
 import type { BasePost, CoreDataError } from '../../shared/types';
 import { getItemTitle } from '../../shared/utils';
+import type { ActionScriptParts } from '../../types';
 
-const duplicatePost: Action< BasePost > = {
-	id: 'duplicate-post',
-	label: _x( 'Duplicate…', 'action label' ),
-	modalHeader: _x( 'Duplicate', 'action label' ),
+const duplicatePost: ActionScriptParts< BasePost > = {
 	isEligible( { status } ) {
+		// @ts-expect-error `globalThis` has no index signature for this build-time global.
+		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
+			// Outside Gutenberg, disable duplication.
+			return false;
+		}
 		return status !== 'trash';
 	},
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item, setItem ] = useState< BasePost >( {
 			...items[ 0 ],

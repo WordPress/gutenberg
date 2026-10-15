@@ -2,29 +2,31 @@
 
 The actions WordPress core registers for its entities, such as "Rename", "Duplicate" or "Move to trash". They are shown in the DataViews lists of the site editor and in the inspector of the editor.
 
-Each collection of actions is a script module, which `registerPostTypeSchema()` of `@wordpress/editor` imports on demand to register the actions of a post type. The actions moved here from `@wordpress/fields`.
+WordPress core registers these actions on the server, through the Entity actions API, like a plugin registers its own: see `wp_register_core_actions()` in `src/index.php`. The client reads them from the `wp/v2/entity-actions` route, imports the script modules registered along with them, and merges their JavaScript parts in, see `registerPostTypeSchema()` of `@wordpress/editor`. The actions moved here from `@wordpress/fields`.
 
-## Collections
+## Script modules
 
-The actions of this package live in folders of `src`, one per collection:
+The JavaScript parts of the actions live in folders of `src`, one script module per folder:
 
 -   `post_type_supports`: the default actions of every post type (`delete-post`, `duplicate-post`, `move-to-trash`, `order-pages`, `permanently-delete`, `rename-post`, `reset-post`, `restore`, `view-post`, and `view-post-revisions`).
 -   `wp_block`: the actions patterns have on top of the defaults (`duplicate-pattern` and `export-pattern`).
 -   `wp_template_part`: the actions template parts have on top of the defaults (`duplicate-template-part`).
 
-Each action has a folder named after its id, with the action in `action.tsx`. The `index.ts` of each collection is its script module, whose default export maps the id of each action to the action.
+Each action has a folder named after its id, with its JavaScript parts in `action.tsx`: what PHP cannot serialize, such as `callback`, `RenderModal`, `isEligible`, `icon`, or a `label` that depends on the items. Its data (`label`, `isPrimary`, `supportsBulk`, `modalHeader`, …) is declared in `src/index.php`. The `index.ts` of each folder is its script module, whose default export maps the id of each action to its JavaScript parts.
 
-`registerPostTypeSchema()` decides which post type gets which action:
+`wp_register_core_actions()` decides which post type gets which action, in this order:
 
 -   `view-post`, for the viewable post types.
 -   `view-post-revisions`, for the post types supporting `revisions`.
--   `duplicate-post`, for the post types the user can create, except templates, template parts, and patterns. Only in the Gutenberg plugin.
+-   `duplicate-post`, for the post types the user can create, except templates, template parts, and patterns. Only in the Gutenberg plugin: elsewhere, it applies to no post.
 -   `duplicate-template-part`, for template parts, when the user can create them and the theme is a block theme.
 -   `duplicate-pattern`, for patterns, when the user can create them.
 -   `rename-post`, for the post types supporting `title`.
 -   `order-pages`, for the post types supporting `page-attributes`.
 -   `export-pattern`, for patterns.
 -   `restore`, `reset-post`, `delete-post`, `move-to-trash`, and `permanently-delete`, for every post type. Each one checks which posts it applies to.
+
+A plugin hooking `wp_entity_actions_api_init` at the default priority sees the core actions registered, and can unregister them with `wp_unregister_entity_actions()`.
 
 ## Prerequisites
 
@@ -42,13 +44,13 @@ _This package assumes that your code will run in an ES2015+ environment. If you'
 
 ## Usage
 
-The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to a DataViews action:
+The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to its JavaScript parts, which complete the action the `wp/v2/entity-actions` route returns:
 
 ```js
-const { default: actions } = await import(
+const { default: parts } = await import(
 	'@wordpress/core-actions/post_type_supports'
 );
-const renamePost = actions[ 'rename-post' ];
+const renamePost = { ...serverAction, ...parts[ 'rename-post' ] };
 ```
 
 ## Contributing to this package

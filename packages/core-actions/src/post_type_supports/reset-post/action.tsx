@@ -11,11 +11,11 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 import { getItemTitle, isTemplateOrTemplatePart } from '../../shared/utils';
 import type { CoreDataError, Template, TemplatePart } from '../../shared/types';
+import type { ActionScriptParts } from '../../types';
 
 const isTemplateRevertable = (
 	templateOrTemplatePart: Template | TemplatePart
@@ -167,9 +167,7 @@ const revertTemplate = async (
 	}
 };
 
-const resetPostAction: Action< Template | TemplatePart > = {
-	id: 'reset-post',
-	label: __( 'Reset…' ),
+const resetPostAction: ActionScriptParts< Template | TemplatePart > = {
 	isEligible: ( item ) => {
 		return (
 			isTemplateOrTemplatePart( item ) &&
@@ -179,9 +177,6 @@ const resetPostAction: Action< Template | TemplatePart > = {
 		);
 	},
 	icon: backup,
-	supportsBulk: true,
-	hideModalHeader: true,
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 

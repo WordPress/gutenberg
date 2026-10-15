@@ -1,12 +1,8 @@
 import { external } from '@wordpress/icons';
-import { _x } from '@wordpress/i18n';
-import type { Action } from '@wordpress/dataviews';
 import type { BasePost } from '../../shared/types';
+import type { ActionScriptParts } from '../../types';
 
-const viewPost: Action< BasePost > = {
-	id: 'view-post',
-	label: _x( 'View', 'verb' ),
-	isPrimary: true,
+const viewPost: ActionScriptParts< BasePost > = {
 	icon: external,
 	isEligible( post ) {
 		return post.status !== 'trash';

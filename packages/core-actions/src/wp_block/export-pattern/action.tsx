@@ -4,9 +4,9 @@ import removeAccents from 'remove-accents';
 import { downloadBlob } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
 import { download } from '@wordpress/icons';
-import type { Action } from '@wordpress/dataviews';
 import type { Pattern } from '../../shared/types';
 import { getItemTitle } from '../../shared/utils';
+import type { ActionScriptParts } from '../../types';
 
 function getJsonFromItem( item: Pattern ) {
 	return JSON.stringify(
@@ -24,11 +24,8 @@ function getJsonFromItem( item: Pattern ) {
 	);
 }
 
-const exportPattern: Action< Pattern > = {
-	id: 'export-pattern',
-	label: __( 'Export as JSON' ),
+const exportPattern: ActionScriptParts< Pattern > = {
 	icon: download,
-	supportsBulk: true,
 	isEligible: ( item ) => item.type === 'wp_block',
 	callback: async ( items ) => {
 		if ( items.length === 1 ) {

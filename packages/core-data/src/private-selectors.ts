@@ -371,6 +371,42 @@ export function getFieldsConfig(
 }
 
 /**
+ * The actions registered on the server for an entity, as returned by the
+ * `/wp/v2/entity-actions` route.
+ */
+export interface ActionsConfig {
+	kind: string;
+	name: string;
+	/**
+	 * The serializable part of each action, in registration order.
+	 */
+	actions: Array< { id: string } & Record< string, any > >;
+	/**
+	 * The script modules providing the JavaScript parts of the actions, in
+	 * registration order, with the ids of the actions each provides.
+	 */
+	script_modules: Array< { id: string; actions: string[] } >;
+}
+
+/**
+ * Returns the actions registered on the server for the given entity, as the
+ * `/wp/v2/entity-actions` REST API route returns them.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The actions config, or undefined if not loaded.
+ */
+export function getActionsConfig(
+	state: State,
+	kind: string,
+	name: string
+): ActionsConfig | undefined {
+	return state.actionsConfigs?.[ kind ]?.[ name ];
+}
+
+/**
  * Returns the current sync connection status across all entities. Prioritizes
  * disconnected states, then connecting, then connected.
  *

@@ -68,8 +68,8 @@ function _gutenberg_get_route_view_config_preload_paths() {
 }
 
 /**
- * Preloads the fields of the post types the route being loaded lists or edits,
- * and the view config it resolves before it renders.
+ * Preloads the fields and the actions of the post types the route being loaded
+ * lists or edits, and the view config it resolves before it renders.
  *
  * A page booted by `@wordpress/boot` prints a preloading middleware of its own
  * with the paths every one of its routes needs, see the `page.php` template of
@@ -83,8 +83,11 @@ function _gutenberg_get_route_view_config_preload_paths() {
  * attached to the handle and printed along with it.
  */
 function _gutenberg_preload_route_entity_fields() {
-	$paths = array_merge(
-		_gutenberg_get_post_type_fields_preload_paths( _gutenberg_get_route_post_types() ),
+	$post_types = _gutenberg_get_route_post_types();
+	$paths      = array_merge(
+		_gutenberg_get_post_type_fields_preload_paths( $post_types ),
+		// The media editor shows no actions of its attachment.
+		_gutenberg_get_post_type_actions_preload_paths( array_diff( $post_types, array( 'attachment' ) ) ),
 		_gutenberg_get_route_view_config_preload_paths()
 	);
 	if ( empty( $paths ) ) {

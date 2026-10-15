@@ -1,9 +1,10 @@
 import { store as coreStore } from '@wordpress/core-data';
 import type { Action, Field } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
-import type { PostType } from '@wordpress/fields';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { resolveActionsConfig } from '../actions-loader/resolve-actions-config';
+import type { ActionsConfig } from '../actions-loader/resolve-actions-config';
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -61,43 +62,18 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
-type CoreActions = Record< string, Action< any > >;
-
 /**
- * Imports the script modules of the core actions a post type may get: the
- * default actions, and the actions of patterns and template parts.
+ * Registers the actions of a post type, once: the actions registered on the
+ * server, as the `/wp/v2/entity-actions` route returns them through the
+ * private `getActionsConfig` selector of the core data store, with the
+ * JavaScript parts of their script modules merged in. Then fires
+ * `core.registerPostTypeSchema`, for plugins to register their own actions.
  *
- * A module that fails to load is reported and skipped, so the post type
- * still gets the actions of the other modules.
+ * Which actions a post type gets is decided on the server. When the request
+ * fails, the post type gets no server action, and the hook still fires.
  *
  * @param postType The post type.
- * @return The actions of each module, keyed by action id.
  */
-async function importCoreActionModules(
-	postType: string
-): Promise< [ CoreActions, CoreActions, CoreActions ] > {
-	const results = await Promise.allSettled( [
-		import( '@wordpress/core-actions/post_type_supports' ),
-		postType === 'wp_block'
-			? import( '@wordpress/core-actions/wp_block' )
-			: undefined,
-		postType === 'wp_template_part'
-			? import( '@wordpress/core-actions/wp_template_part' )
-			: undefined,
-	] );
-	return results.map( ( result ) => {
-		if ( result.status === 'rejected' ) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`Could not load the core actions of the ${ postType } post type.`,
-				result.reason
-			);
-			return {};
-		}
-		return result.value?.default ?? {};
-	} ) as [ CoreActions, CoreActions, CoreActions ];
-}
-
 export const registerPostTypeSchema =
 	( postType: string ) =>
 	async ( { registry }: { registry: any } ) => {
@@ -114,86 +90,19 @@ export const registerPostTypeSchema =
 			postType
 		);
 
-		// Start importing the script modules of the core actions while the
-		// post type, the permissions, and the theme resolve.
-		const coreActionModules = importCoreActionModules( postType );
-
-		const postTypeConfig = ( await registry
-			.resolveSelect( coreStore )
-			.getPostType( postType ) ) as PostType;
-
-		const canCreate = await registry
-			.resolveSelect( coreStore )
-			.canUser( 'create', {
-				kind: 'postType',
-				name: postType,
-			} );
-		const currentTheme = await registry
-			.resolveSelect( coreStore )
-			.getCurrentTheme();
-
-		const [
-			postTypeSupportsActions,
-			wpBlockActions,
-			wpTemplatePartActions,
-		] = await coreActionModules;
-		const {
-			'view-post': viewPost,
-			'view-post-revisions': viewPostRevisions,
-			'duplicate-post': duplicatePost,
-			'rename-post': renamePost,
-			'order-pages': reorderPage,
-			restore: restorePost,
-			'reset-post': resetPost,
-			'delete-post': deletePost,
-			'move-to-trash': trashPost,
-			'permanently-delete': permanentlyDeletePost,
-		} = postTypeSupportsActions;
-		const {
-			'duplicate-pattern': duplicatePattern,
-			'export-pattern': exportPattern,
-		} = wpBlockActions;
-		const { 'duplicate-template-part': duplicateTemplatePart } =
-			wpTemplatePartActions;
-
-		let canDuplicate =
-			! [ 'wp_block', 'wp_template_part', 'wp_template' ].includes(
-				postTypeConfig.slug
-			) &&
-			canCreate &&
-			duplicatePost;
-
-		// @ts-expect-error `globalThis` has no index signature for this build-time global.
-		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
-			// Outside Gutenberg, disable duplication.
-			canDuplicate = undefined;
+		let actions: Action< any >[] = [];
+		try {
+			const config: ActionsConfig | undefined = await unlock(
+				registry.resolveSelect( coreStore )
+			).getActionsConfig( 'postType', postType );
+			actions = config ? await resolveActionsConfig( config ) : [];
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				`Could not load the actions of the ${ postType } post type.`,
+				error
+			);
 		}
-
-		const actions = [
-			postTypeConfig.viewable ? viewPost : undefined,
-			!! postTypeConfig.supports?.revisions
-				? viewPostRevisions
-				: undefined,
-			canDuplicate,
-			postTypeConfig.slug === 'wp_template_part' &&
-			canCreate &&
-			currentTheme?.is_block_theme
-				? duplicateTemplatePart
-				: undefined,
-			canCreate && postTypeConfig.slug === 'wp_block'
-				? duplicatePattern
-				: undefined,
-			postTypeConfig.supports?.title ? renamePost : undefined,
-			postTypeConfig.supports?.[ 'page-attributes' ]
-				? reorderPage
-				: undefined,
-			postTypeConfig.slug === 'wp_block' ? exportPattern : undefined,
-			restorePost,
-			resetPost,
-			deletePost,
-			trashPost,
-			permanentlyDeletePost,
-		].filter( Boolean );
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {

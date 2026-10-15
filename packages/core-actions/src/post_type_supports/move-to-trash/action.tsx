@@ -10,15 +10,12 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
 import { getItemTitle } from '../../shared/utils';
 import { hasActionLink } from '../../shared/has-action-link';
 import type { CoreDataError, PostWithPermissions } from '../../shared/types';
+import type { ActionScriptParts } from '../../types';
 
-const trashPost: Action< PostWithPermissions > = {
-	id: 'move-to-trash',
-	label: _x( 'Trash…', 'verb' ),
-	isPrimary: true,
+const trashPost: ActionScriptParts< PostWithPermissions > = {
 	icon: trash,
 	isEligible( item ) {
 		if ( item.type === 'wp_template_part' || item.type === 'wp_block' ) {
@@ -37,9 +34,6 @@ const trashPost: Action< PostWithPermissions > = {
 			hasActionLink( item, 'wp:action-trash' )
 		);
 	},
-	supportsBulk: true,
-	hideModalHeader: true,
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const { createSuccessNotice, createErrorNotice } =
