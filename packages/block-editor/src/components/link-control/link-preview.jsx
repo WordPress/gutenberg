@@ -130,6 +130,7 @@ export default function LinkPreview( {
 								<Link
 									className="block-editor-link-control__preview-title"
 									href={ value.url }
+									openInNewTab
 								>
 									<Truncate numberOfLines={ 1 }>
 										{ displayTitle }
