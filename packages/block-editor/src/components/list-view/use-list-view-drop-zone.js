@@ -167,11 +167,10 @@ function getNextNonDraggedBlock( blocksData, index ) {
  * the indentation of the next level of nesting. The vertical position of the
  * cursor must also be within the block.
  *
- * @param {WPPoint}                       point        The point representing the cursor position when dragging.
- * @param {DOMRect|{left, right, bottom}} rect         The block's rectangle. The caller may extend `bottom`
- *                                                     past the row, see `getListViewDropTarget`.
- * @param {number}                        nestingLevel The nesting level of the block.
- * @param {boolean}                       rtl          Whether the editor is in RTL mode.
+ * @param {WPPoint} point        The point representing the cursor position when dragging.
+ * @param {DOMRect} rect         The rectangle.
+ * @param {number}  nestingLevel The nesting level of the block.
+ * @param {boolean} rtl          Whether the editor is in RTL mode.
  */
 function isNestingGesture( point, rect, nestingLevel = 1, rtl = false ) {
 	const blockIndentPosition = rtl
@@ -287,6 +286,7 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 	const nextBlock = getNextNonDraggedBlock( blocksData, candidateBlockIndex );
 	const lastBlock = blocksData[ blocksData.length - 1 ];
 	const nestingRect = {
+		top: candidateRect.top,
 		left: candidateRect.left,
 		right: candidateRect.right,
 		bottom: Math.max(
