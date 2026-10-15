@@ -11,33 +11,16 @@ import {
 	pickPrimaryNote,
 } from './utils';
 
-/*
- * Hex alpha suffix for the tint painted behind the marker's text. One low value
- * for every state, on purpose: the tint sits behind the glyphs, so raising it
- * eats into whatever text/background contrast the theme already provides, and
- * the canvas background comes from `theme.json`, so the composited result
- * cannot be measured from CSS. (0x40 ≈ 25%.)
- */
+// Hex alpha (~25%) for the note tint, kept low to preserve text contrast.
 const TINT_ALPHA = '40';
 
-/*
- * Thickness of the rule drawn under a note, at rest and when emphasized. Fixed
- * pixels rather than an em value: it has to stay distinct from a hyperlink's
- * underline at body size without turning into a bar under a heading.
- */
+// Fixed pixels so the rule stays distinct from link underlines at any size.
 const RULE_THICKNESS = '1.5px';
 const RULE_THICKNESS_EMPHASIZED = '3px';
 
 /**
- * The stroke color for a note's rule: the author's color with a share of
- * `currentColor` mixed in.
- *
- * Pure author color would be the clearest signal, but the canvas can be light
- * or dark and the palette is fixed, so some of the seven colors would land
- * under the 3:1 non-text contrast minimum on one of them. Mixing in 30% of the
- * text color is the least dilution that holds the floor on both: at 70% author
- * share every palette color clears 3:1 against a white and a near-black
- * canvas, with orange right at the line (3.0:1 on white).
+ * Returns the author's color mixed with 30% `currentColor`, which keeps every
+ * palette color above 3:1 contrast on light and dark canvases.
  *
  * @param {string} color The author's `#RRGGBB` color.
  * @return {string} A CSS color value.
@@ -47,13 +30,7 @@ function ruleColor( color ) {
 }
 
 /**
- * The underline drawn beneath an inline marker's text.
- *
- * Present at rest, not only on hover or selection: a reader has to be able to
- * see which text carries a note without interacting with anything first, which
- * is the whole reason the marking exists. Selecting the note is then a thicker
- * version of the same rule - a silhouette change rather than a stronger wash,
- * so it costs the theme's text contrast nothing.
+ * Returns the underline declarations for an inline note marker.
  *
  * @param {string} color     The author's `#RRGGBB` color.
  * @param {string} thickness Rule thickness.
@@ -68,18 +45,12 @@ function underline( color, thickness ) {
 	);
 }
 
-// Reset the browser's default `<mark>` styling so the per-author rules below
-// are what readers actually see (without it, `mark` ships with a bright yellow
-// background in every browser). The `core/note` anchor marker serializes as a
-// `<mark>` and would otherwise inherit the yellow default in the editor canvas.
+// Removes the browser's default yellow `<mark>` background from note markers.
 const BASE_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
 
 /*
- * Forced colors (e.g. Windows High Contrast) drop the per-author tints, so
- * annotated text falls back to the system `Mark`/`MarkText` pair: the palette
- * the user chose for highlighted text, legible by construction. The base reset
- * above set the background to `transparent`, which survives the forcing, so
- * the pair has to be restated here.
+ * In forced colors mode, paints markers with the system highlight colors.
+ * Restated because BASE_RESET's transparent background survives forcing.
  */
 const FORCED_COLORS_HIGHLIGHT =
 	'background-color:Mark;color:MarkText;text-decoration-color:MarkText;';
@@ -87,14 +58,10 @@ const FORCED_COLORS_HIGHLIGHT =
 const FORCED_COLORS_RESET = `@media (forced-colors: active){mark.wp-note{${ FORCED_COLORS_HIGHLIGHT }}}`;
 
 /**
- * Derive the block-level highlights from the note threads: a thread marks its
- * whole block when no in-content `core/note` marker carries its id (an inline
- * note's marker is its anchor, so markerless means block-level). A block can
- * hold several; one color has to win, so the primary thread (the same one the
- * avatar indicator surfaces) decides.
+ * Returns one highlight per block that has block-level notes.
  *
- * Pure helper: block attributes are read through the passed selector so it can
- * be unit-tested without a store.
+ * A thread is block-level when its block contains no `core/note` marker with
+ * its id. When a block has several, the primary thread supplies the color.
  *
  * @param {Array}    threads            Unresolved note threads (each with `id`, `author` and `blockClientId`).
  * @param {Function} getBlockAttributes Block-editor selector.
@@ -129,19 +96,8 @@ export function getBlockLevelHighlights( threads, getBlockAttributes ) {
 }
 
 /**
- * Build the CSS rule set that tints each inline-note marker with its author's
- * avatar color. Pure helper extracted so it can be unit-tested without React.
- *
- * Each marker gets a tint and an underline at rest, so which text carries a
- * note is legible without hovering or selecting anything. The tint stays at a
- * single low alpha in every state; only selecting the note thickens the
- * underline, so marking a note can cost the theme's text contrast the one fixed
- * amount and never more. Hover changes nothing: it is decorative, and a
- * silhouette change there reads as noise.
- *
- * Under forced colors the tint is unavailable, so a marker is painted with the
- * system `Mark`/`MarkText` pair instead, the highlight the user's palette
- * defines for exactly this.
+ * Builds CSS that tints and underlines each inline note marker in its
+ * author's color. The selected note gets a thicker underline.
  *
  * @param {Array}       threads    Unresolved note threads (each with `id` and `author`).
  * @param {string|null} selectedId ID of the currently selected note, if any.
@@ -155,8 +111,6 @@ export function buildHighlightCss( threads, selectedId = null ) {
 			continue;
 		}
 		const color = getAvatarBorderColor( thread.author ?? 0 );
-		// The `core/note` format serializes the id into `data-id`, so the marker
-		// can be targeted directly without a separate annotation layer.
 		const sel = getNoteMarkerSelector( thread.id );
 		markerSelectors.push( sel );
 		rules.push(
@@ -171,12 +125,7 @@ export function buildHighlightCss( threads, selectedId = null ) {
 			);
 		}
 	}
-	/*
-	 * Under forced colors the per-note tint gives way to the system highlight
-	 * pair. Emitted last and carrying the same specificity as the per-note
-	 * rules, so it is the cascade and not `!important` that settles which one
-	 * applies.
-	 */
+	// Emitted last so it overrides the per-note rules without `!important`.
 	if ( markerSelectors.length > 0 ) {
 		rules.push(
 			`@media (forced-colors: active){${ markerSelectors.join(
@@ -188,26 +137,8 @@ export function buildHighlightCss( threads, selectedId = null ) {
 }
 
 /**
- * Build the CSS rule set that marks a whole block whose note is attached at
- * the block level. Block-level notes carry no in-content `<mark>` to target, so
- * the block is matched by its client id instead.
- *
- * Every block gets the same treatment, whatever it holds: a tinted overlay on
- * its `::after` with a rule drawn all the way around. The underline stays an
- * inline-note signal, so a block-level note reads as "this block", not as text
- * that was marked. An overlay rather than a background on the block itself,
- * because a background is hidden behind an image and would replace a block's
- * own background color. The overlay ignores pointer events, so the block stays
- * editable through it.
- *
- * Both are present at rest, with no hover or selected variant, so an annotated
- * block is legible as one without clicking anything. Hovering or selecting the
- * note draws the block's own outline instead, which is what already signals
- * "this block" everywhere else in the editor.
- *
- * Under forced colors the tint is stripped by the browser, so each annotated
- * block gets a dashed outline instead, dashed so it cannot be mistaken for the
- * solid outline the editor draws on the selected block.
+ * Builds CSS that covers each block with a block-level note in a tinted,
+ * bordered overlay in its author's color.
  *
  * @param {Array} blockHighlights Block-level notes (each with `clientId`, `id` and `author`).
  * @return {string} A serialized CSS string targeting the blocks' wrapper elements.
@@ -221,27 +152,19 @@ export function buildBlockHighlightCss( blockHighlights ) {
 			continue;
 		}
 		const color = getAvatarBorderColor( highlight.author ?? 0 );
-		// Client ids are generated UUIDs, but escape `"`/`\` defensively since
-		// this composes a quoted attribute value.
+		// Escape defensively, since the id goes into a quoted attribute selector.
 		const escapedClientId = String( highlight.clientId ).replace(
 			/["\\]/g,
 			'\\$&'
 		);
 		const blockSel = `[data-block="${ escapedClientId }"]`;
 		blockSelectors.push( blockSel );
-		// A multi-selected block is left out so the editor's selection overlay
-		// owns the pseudo-element outright.
+		// Multi-selected blocks use `::after` for the selection overlay.
 		const overlaySel = `${ blockSel }:not(.is-multi-selected)::after`;
 		overlaySelectors.push( overlaySel );
 		/*
-		 * Block wrappers are position:relative and the overlay sits above the
-		 * content, so `inset:0` hugs the block exactly with no reflow.
-		 *
-		 * The editor draws its hover, highlight and focus outline on this same
-		 * `::after` (the `selected-block-focus` mixin), setting `outline` and
-		 * `box-shadow`. The rule is a border so the two share no property and
-		 * both show together, whatever the specificity or load order.
-		 * (`::before` is not free either: cover, spacer and separator use it.)
+		 * Uses `border`, not `outline`, because the editor's focus styles set
+		 * `outline` and `box-shadow` on this same `::after`.
 		 */
 		rules.push(
 			`${ overlaySel }{content:"";position:absolute;inset:0;pointer-events:none;background-color:${ color }${ TINT_ALPHA };border:${ RULE_THICKNESS } solid ${ ruleColor(
@@ -251,10 +174,8 @@ export function buildBlockHighlightCss( blockHighlights ) {
 	}
 	if ( blockSelectors.length > 0 ) {
 		/*
-		 * The overlay's border is dropped, since the forcing would turn it
-		 * into a solid ring beside the dashed outline. Same selectors as the
-		 * resting rules, so it is source order and not `!important` that
-		 * settles the cascade.
+		 * Forced colors: a dashed outline replaces the tint, and the border is
+		 * dropped so it is not mistaken for the selected-block outline.
 		 */
 		rules.push(
 			`@media (forced-colors: active){${ blockSelectors.join(
@@ -268,22 +189,9 @@ export function buildBlockHighlightCss( blockHighlights ) {
 }
 
 /**
- * Injects per-note background rules into the editor canvas so inline-note
- * markers carry their author's avatar color. The `core/note` format serializes
- * each marker as `<mark class="wp-note" data-id="{noteId}">`, which we target
- * directly. Notes attached at the block level have no marker, so the whole
- * block is marked instead, by a tinted overlay.
+ * Highlights noted content in the editor canvas with each author's color.
  *
- * Uses `useStyleOverride` so the styles reach the iframed canvas; a plain
- * `<style>` element rendered in the sidebar would only affect the parent doc.
- *
- * Inline markers are underlined and block-level notes ruled at rest, so
- * annotated content is legible without interaction. Markers thicken their
- * underline when the matching thread is selected; block-level tints stay flat
- * and let the block's own outline carry that state.
- *
- * While the notes are hidden only the `<mark>` reset is kept, so the canvas
- * shows no trace of them, the same as hiding comments in a word processor.
+ * Styles are injected with `useStyleOverride` so they reach the iframed canvas.
  *
  * @param {Object}      props
  * @param {Array}       props.threads      Unresolved note threads.
@@ -296,10 +204,10 @@ export function NoteHighlightStyles( { threads, selectedId, isHidden } ) {
 		( select ) => select( coreStore ).getCurrentUser()?.id,
 		[]
 	);
-	// Which threads are block-level depends on block attributes (a thread is
-	// inline iff its marker exists in the block), so the CSS is derived in
-	// `useSelect` to track attribute edits. It returns the finished string:
-	// strict-equality on a primitive keeps re-renders to actual changes.
+	/*
+	 * Derived in `useSelect` so attribute edits update which notes are
+	 * block-level. Returning a string avoids re-renders when nothing changed.
+	 */
 	const css = useSelect(
 		( select ) => {
 			if ( isHidden ) {
@@ -307,7 +215,7 @@ export function NoteHighlightStyles( { threads, selectedId, isHidden } ) {
 			}
 			const { getBlockAttributes } = select( blockEditorStore );
 			return (
-				// An unsent note's draft marker is tinted like a thread of its author.
+				// Tints the unsent draft marker in the current user's color.
 				buildHighlightCss(
 					[ ...threads, { id: 'new', author: currentUserId } ],
 					selectedId
