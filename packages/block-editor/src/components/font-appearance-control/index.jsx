@@ -110,13 +110,13 @@ export default function FontAppearanceControl( props ) {
 		selectOptions = weightOptions();
 	}
 
-	// Find current selection by comparing font style & weight against options,
-	// and fall back to the Default option if there is no matching option.
 	const items = selectOptions.map( ( option ) => ( {
 		value: option.key,
 		label: option.name,
 		style: option.style,
 	} ) );
+	// Find current selection by comparing font style & weight against options,
+	// and fall back to the Default option if there is no matching option.
 	const currentSelection =
 		items.find(
 			( option ) =>
