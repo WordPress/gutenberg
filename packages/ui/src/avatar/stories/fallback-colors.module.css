@@ -3,7 +3,7 @@
 
 	@layer compositions {
 		.gallery {
-			max-inline-size: 960px;
+			max-inline-size: 1200px;
 			overflow-x: auto;
 			font-family: var(--wpds-typography-font-family-body);
 			font-size: var(--wpds-typography-font-size-sm);
@@ -46,17 +46,22 @@
 			}
 
 			@supports (color: color(from green srgb-linear round(up, r) g b / 1)) {
-				.wcag {
+				.wcag,
+				.translucent {
 					--_wp-ui-avatar-exploration-background: rgb(from var(--_wp-ui-avatar-exploration-color) clamp(0, r, 255) clamp(0, g, 255) clamp(0, b, 255) / 1);
 					--_wp-ui-avatar-exploration-luminance: calc(0.2126 * r + 0.7152 * g + 0.0722 * b);
 					--_wp-ui-avatar-exploration-light: round(up, clamp(0, calc(0.1791287847 - var(--_wp-ui-avatar-exploration-luminance)), 1));
 
 					background-color: var(--_wp-ui-avatar-exploration-background);
-					color: color(from var(--_wp-ui-avatar-exploration-background) srgb-linear var(--_wp-ui-avatar-exploration-light) var(--_wp-ui-avatar-exploration-light) var(--_wp-ui-avatar-exploration-light) / 1);
+					color: color(from var(--_wp-ui-avatar-exploration-background) srgb-linear var(--_wp-ui-avatar-exploration-light) var(--_wp-ui-avatar-exploration-light) var(--_wp-ui-avatar-exploration-light) / var(--_wp-ui-avatar-exploration-foreground-alpha, 1));
 
 					> svg {
 						color: inherit;
 					}
+				}
+
+				.translucent {
+					--_wp-ui-avatar-exploration-foreground-alpha: var(--_wp-ui-avatar-exploration-opacity, 0.8);
 				}
 			}
 		}

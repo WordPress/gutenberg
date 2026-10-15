@@ -111,14 +111,26 @@ export const Interactive: Story = {
 	),
 };
 
-/** Compare neutral, native contrast, WCAG black/white, and contrast-limited tinted fallbacks. */
-export const FallbackColors: Story = {
-	args: { color: '#008a20', size: 'lg' },
-	render: ( args ) => {
+/** Compare neutral, black/white, contrast-limited tint, and translucent fallbacks. */
+export const FallbackColors: StoryObj<
+	React.ComponentProps< typeof Avatar.Root > & { foregroundOpacity: number }
+> = {
+	args: { color: '#008a20', size: 'lg', foregroundOpacity: 0.8 },
+	argTypes: {
+		foregroundOpacity: {
+			name: 'Foreground opacity',
+			control: { type: 'range', min: 0, max: 1, step: 0.005 },
+			description:
+				'The text and icon alpha in the translucent comparison.',
+		},
+	},
+	render: ( { foregroundOpacity, ...args } ) => {
 		const colors = [
 			[ 'Custom color', args.color ?? '#008a20' ],
 			[ 'Bright green', '#00e050' ],
 			[ 'Dark green', '#064e3b' ],
+			[ 'Gray below crossover', '#757575' ],
+			[ 'Gray above crossover', '#767676' ],
 			[ 'Midtone gray', '#777777' ],
 			[ 'Yellow', '#fbbf24' ],
 			[ 'Cyan', '#00cfff' ],
@@ -129,14 +141,29 @@ export const FallbackColors: Story = {
 			[ 'Native black/white', 'native' ],
 			[ 'WCAG black/white', 'wcag' ],
 			[ 'Tinted foreground', 'tinted' ],
+			[ 'Foreground alpha', 'translucent' ],
 		];
 		return (
-			<div className={ explorationStyles.gallery }>
+			<div
+				className={ explorationStyles.gallery }
+				style={
+					{
+						'--_wp-ui-avatar-exploration-opacity':
+							foregroundOpacity,
+					} as React.CSSProperties
+				}
+			>
 				<p>
 					Change the custom color, size, and shape in Controls. Filled
 					fallbacks use opaque sRGB colors. The tinted column falls
 					back to native black/white, then neutral, as feature support
 					allows.
+				</p>
+				<p>
+					The foreground alpha column uses{ ' ' }
+					{ ( foregroundOpacity * 100 ).toFixed( 1 ) }% opacity over
+					the opaque fill. Lowering opacity can reduce contrast below
+					4.5:1. Adjust Foreground opacity in Controls.
 				</p>
 				<table>
 					<thead>
