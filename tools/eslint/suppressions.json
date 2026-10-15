@@ -6867,9 +6867,6 @@
 		}
 	},
 	"packages/editor/src/components/template-validation-notice/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
