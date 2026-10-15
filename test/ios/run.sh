@@ -132,6 +132,9 @@ fi
 
 step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
+# The simulator hides the software keyboard once it has seen a hardware
+# keyboard, and the tests type on it.
+xcrun simctl spawn "$UDID" defaults write com.apple.keyboard.preferences AutomaticMinimizationEnabled -bool NO
 
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
