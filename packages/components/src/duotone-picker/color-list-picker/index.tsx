@@ -32,10 +32,7 @@ function ColorOption( {
 				aria-controls={ contentId }
 				icon={
 					value ? (
-						<ColorIndicator
-							colorValue={ value }
-							className="components-color-list-picker__swatch-color"
-						/>
+						<ColorIndicator colorValue={ value } />
 					) : (
 						<Icon icon={ swatch } />
 					)

@@ -18,7 +18,7 @@ export default function PatternTitleView( { item }: { item: CommonPost } ) {
 					<VisuallyHidden>{ lockMessage }</VisuallyHidden>
 					<Tooltip.Root>
 						<Tooltip.Trigger
-							render={ <Icon icon={ lockSmall } size={ 24 } /> }
+							render={ <Icon icon={ lockSmall } size={ 20 } /> }
 						/>
 						<Tooltip.Popup>{ lockMessage }</Tooltip.Popup>
 					</Tooltip.Root>

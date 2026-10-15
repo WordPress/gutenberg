@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   `$icon-size` is now `20px` (previously `24px`) ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
 
 ## 13.3.0 (2026-10-07)
 

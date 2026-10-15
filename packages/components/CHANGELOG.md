@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `Icon` now renders at 20px by default for all icon types, including SVG icons (previously 24px except Dashicons) ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
     -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
@@ -30,6 +31,7 @@
 
 ### Bug Fixes
 
+-   `DuotonePicker`: Keep the color label aligned when a color is set or cleared, now that the swatch and the unset icon are both 20px ([#84105](https://github.com/WordPress/gutenberg/pull/84105)).
 -   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
 -   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))

@@ -24,6 +24,7 @@
 		.icon {
 			grid-row: 1;
 			grid-column: 1;
+			margin-block-start: calc((var(--icon-height) - var(--wpds-dimension-size-xs)) / 2);
 			margin-inline-end: var(--wpds-dimension-gap-xs);
 			color: var(--wp-ui-notice-decorative-icon-color);
 		}
