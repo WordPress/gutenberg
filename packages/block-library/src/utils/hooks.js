@@ -3,7 +3,6 @@ import { useLayoutEffect, useEffect, useRef } from '@wordpress/element';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Returns whether the current user can edit the given entity.
@@ -27,11 +26,11 @@ export function useCanEditEntity( kind, name, recordId ) {
 /**
  * Handles uploading a media file from a blob URL on mount.
  *
- * @param {Object}   args              Upload media arguments.
- * @param {string}   args.url          Blob URL.
- * @param {?Array}   args.allowedTypes Array of allowed media types.
- * @param {Function} args.onChange     Function called when the media is uploaded.
- * @param {Function} args.onError      Function called when an error happens.
+ * @param {Object}   [args]              Upload media arguments.
+ * @param {string}   [args.url]          Blob URL.
+ * @param {?Array}   [args.allowedTypes] Array of allowed media types.
+ * @param {Function} [args.onChange]     Function called when the media is uploaded.
+ * @param {Function} [args.onError]      Function called when an error happens.
  */
 export function useUploadMediaFromBlobURL( args = {} ) {
 	const latestArgsRef = useRef( args );
@@ -99,15 +98,4 @@ export function useDefaultAvatar() {
 	return avatarURL;
 }
 
-export function useToolsPanelDropdownMenuProps() {
-	const isMobile = useViewportMatch( 'medium', '<' );
-	return ! isMobile
-		? {
-				popoverProps: {
-					placement: 'left-start',
-					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
-					offset: 259,
-				},
-			}
-		: {};
-}
+export { useToolsPanelDropdownMenuProps } from './use-tools-panel-dropdown-menu-props';
