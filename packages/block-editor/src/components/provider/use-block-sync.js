@@ -1,3 +1,4 @@
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { useContext, useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
@@ -309,8 +310,23 @@ export default function useBlockSync( {
 	// Determine if blocks need to be reset when they change.
 	// Also restores selection from context after blocks are set.
 	useEffect( () => {
-		const isOutgoing =
+		const lastOutgoing =
+			pendingChangesRef.current.outgoing[
+				pendingChangesRef.current.outgoing.length - 1
+			];
+
+		const isOutgoingByRef =
 			pendingChangesRef.current.outgoing.includes( controlledBlocks );
+
+		// If referential check failed, check if controlledBlocks semantically matches
+		// the change we just dispatched (handles cases where clearUnchangedEdits drops
+		// the edit in core-data and returns the persisted record array reference).
+		const isOutgoingByValue =
+			! isOutgoingByRef &&
+			lastOutgoing !== undefined &&
+			fastDeepEqual( lastOutgoing, controlledBlocks );
+
+		const isOutgoing = isOutgoingByRef || isOutgoingByValue;
 		const storeMatch = getBlocks( clientId ) === controlledBlocks;
 
 		if ( isOutgoing ) {
@@ -320,11 +336,7 @@ export default function useBlockSync( {
 			// still occur if the value is modified (not equal by reference),
 			// to allow that the consumer may apply modifications to reflect
 			// back on the editor.
-			if (
-				pendingChangesRef.current.outgoing[
-					pendingChangesRef.current.outgoing.length - 1
-				] === controlledBlocks
-			) {
+			if ( isOutgoingByValue || lastOutgoing === controlledBlocks ) {
 				pendingChangesRef.current.outgoing = [];
 			}
 		} else if ( ! storeMatch ) {
