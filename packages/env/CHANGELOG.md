@@ -13,6 +13,7 @@
 -   Reject a `phpVersion` or `WP_ENV_PHP_VERSION` that is not only a version number, such as `8.2-apache` or `abc8`, instead of failing later because the Docker image does not exist ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 -   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors ([#82478](https://github.com/WordPress/gutenberg/pull/82478)).
 -   Point the `bullseye-security` apt sources of the bullseye-based WordPress images (PHP 7.3, 7.4, and 8.0) at `archive.debian.org` instead of dropping them, so the images keep receiving Debian security updates ([#85469](https://github.com/WordPress/gutenberg/pull/85469)).
+-   Download the PHPUnit test library for a WordPress alpha, beta or RC version from its `X.Y` branch of `WordPress/wordpress-develop` when that branch exists, instead of always from trunk. A maintenance branch between point releases, such as `7.1.4-alpha`, no longer gets trunk's tests, which can depend on code only trunk has. Cached test libraries now also update to the fetched version instead of staying on the first one downloaded ([#84758](https://github.com/WordPress/gutenberg/pull/84758)).
 
 ## 11.11.0 (2026-07-14)
 
