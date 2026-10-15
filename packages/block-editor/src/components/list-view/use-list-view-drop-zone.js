@@ -165,33 +165,15 @@ function getNextNonDraggedBlock( blocksData, index ) {
  *
  * Determined based on nesting level indentation of the current block, plus
  * the indentation of the next level of nesting. The vertical position of the
- * cursor must also be within the block, or in the gap between the block and
- * the next block.
+ * cursor must also be within the block.
  *
- * While dragging, the rows are displaced to make room for the drop indicator
- * while the dragged block keeps its own row: when the dragged block sits above
- * the target, the target row shifts up by the dragged block's height, and the
- * drop indicator opens a gap between the target and the block after it, under
- * the cursor; when the dragged block is the last row, the gap is its own slot.
- * A nesting gesture over that gap still targets the block above it, otherwise
- * the next `dragover` reads the displaced rows, drops the nesting, and the
- * rows shift back.
- *
- * @param {WPPoint} point        The point representing the cursor position when dragging.
- * @param {DOMRect} rect         The rectangle.
- * @param {number}  nestingLevel The nesting level of the block.
- * @param {boolean} rtl          Whether the editor is in RTL mode.
- * @param {number}  [bottom]     The lowest vertical position that still counts as the block:
- *                               the top of the next block, or the end of the list, when a gap
- *                               separates them.
+ * @param {WPPoint}                       point        The point representing the cursor position when dragging.
+ * @param {DOMRect|{left, right, bottom}} rect         The block's rectangle. The caller may extend `bottom`
+ *                                                     past the row, see `getListViewDropTarget`.
+ * @param {number}                        nestingLevel The nesting level of the block.
+ * @param {boolean}                       rtl          Whether the editor is in RTL mode.
  */
-function isNestingGesture(
-	point,
-	rect,
-	nestingLevel = 1,
-	rtl = false,
-	bottom = rect.bottom
-) {
+function isNestingGesture( point, rect, nestingLevel = 1, rtl = false ) {
 	const blockIndentPosition = rtl
 		? rect.right - nestingLevel * NESTING_LEVEL_INDENTATION
 		: rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
@@ -200,7 +182,7 @@ function isNestingGesture(
 		? point.x < blockIndentPosition - NESTING_LEVEL_INDENTATION
 		: point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION;
 
-	return isNestingHorizontalGesture && point.y < bottom;
+	return isNestingHorizontalGesture && point.y < rect.bottom;
 }
 
 // Block navigation is always a vertical list, so only allow dropping
@@ -290,7 +272,30 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 	);
 
 	const isDraggingBelow = candidateEdge === 'bottom';
+
+	// While dragging, the rows displace to make room for the drop indicator,
+	// but the dragged rows keep their slot. When the dragged block sits above
+	// the candidate, the candidate shifts up by the dragged block's height and
+	// the indicator opens a gap between the candidate and the next row, under
+	// the cursor. When the dragged block is the last row, that gap is its own
+	// slot. For the nesting gesture, the candidate extends over that gap, to
+	// the top of the next row that is not being dragged, or to the end of the
+	// list when none follows. Otherwise the next `dragover` finds the cursor
+	// below the candidate, drops the nesting, and the rows shift back.
+	// Rows are contiguous when nothing is displaced, so the extended bottom
+	// then equals the candidate's own.
 	const nextBlock = getNextNonDraggedBlock( blocksData, candidateBlockIndex );
+	const lastBlock = blocksData[ blocksData.length - 1 ];
+	const nestingRect = {
+		left: candidateRect.left,
+		right: candidateRect.right,
+		bottom: Math.max(
+			candidateRect.bottom,
+			nextBlock
+				? nextBlock.element.getBoundingClientRect().top
+				: lastBlock.element.getBoundingClientRect().bottom
+		),
+	};
 
 	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to nest the block as a child.
@@ -305,21 +310,9 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 			candidateBlockData.isExpanded ) ||
 			isNestingGesture(
 				position,
-				candidateRect,
+				nestingRect,
 				candidateBlockParents.length,
-				rtl,
-				// The block extends to the next block when the drop indicator
-				// displaces the rows and opens a gap between them. Dragged
-				// rows keep their slot, so when none follows, the block
-				// extends to the end of the list, over the dragged slot.
-				Math.max(
-					candidateRect.bottom,
-					nextBlock
-						? nextBlock.element.getBoundingClientRect().top
-						: blocksData[
-								blocksData.length - 1
-							].element.getBoundingClientRect().bottom
-				)
+				rtl
 			) )
 	) {
 		// If the block is expanded, insert the block as the first child.
