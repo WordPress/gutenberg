@@ -17,6 +17,7 @@
 -   Notes: Keep the canvas from scrolling to the top when adding a floating note on a scrolled post ([#84639](https://github.com/WordPress/gutenberg/pull/84639)).
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+-   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
 
 ### Internal
 
