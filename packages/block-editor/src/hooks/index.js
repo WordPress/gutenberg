@@ -32,6 +32,7 @@ import './metadata';
 import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
 import listView from './list-view';
+import contentGroupReordering from './content-group-reordering';
 import './block-renaming';
 import './grid-visualizer';
 import AutoRegisterControls from './auto-inspector-controls';
@@ -53,6 +54,7 @@ createBlockEditFilter(
 		childLayout,
 		allowedBlocks,
 		listView,
+		contentGroupReordering,
 		AutoRegisterControls,
 	].filter( Boolean )
 );

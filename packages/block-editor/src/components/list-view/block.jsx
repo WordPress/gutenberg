@@ -119,6 +119,7 @@ function ListViewBlock( {
 		positionLabel,
 		isSynced,
 		isLocked,
+		isContentGroup,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -129,6 +130,7 @@ function ListViewBlock( {
 				getEditedContentOnlySection,
 				isSyncedBlock,
 				isLockedBlock,
+				isContentGroupBlock,
 			} = unlock( select( blockEditorStore ) );
 			const settings = getSettings();
 			const attributes = getBlockAttributes( clientId );
@@ -146,12 +148,16 @@ function ListViewBlock( {
 				positionLabel: getPositionTypeLabel( attributes ),
 				isSynced: isSyncedBlock( clientId ),
 				isLocked: isLockedBlock( clientId ),
+				isContentGroup: isContentGroupBlock( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 
 	const isDisabled = blockEditingMode === 'disabled';
+	// A group in a pattern is disabled so its design stays locked, but unlike
+	// other disabled rows it can be selected, expanded and reordered.
+	const isInert = isDisabled && ! isContentGroup;
 	const canRename =
 		!! blockName && hasBlockSupport( blockName, 'renaming', true );
 
@@ -559,7 +565,7 @@ function ListViewBlock( {
 
 	const hasSiblings = siblingBlockCount > 0;
 	const canShowBlockActions = showBlockActions && ! isDisabled;
-	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isDisabled;
+	const hasRenderedMovers = showBlockMovers && hasSiblings && ! isInert;
 	const moverCellClassName = clsx(
 		'block-editor-list-view-block__mover-cell',
 		{ 'is-visible': isHovered || isSelected }
@@ -592,7 +598,7 @@ function ListViewBlock( {
 		'is-displacement-down': displacement === 'down',
 		'is-after-dragged-blocks': isAfterDraggedBlocks,
 		'is-nesting': isNesting,
-		'is-disabled': isDisabled,
+		'is-disabled': isInert,
 	} );
 
 	// Only include all selected blocks if the currently clicked on block
@@ -604,7 +610,7 @@ function ListViewBlock( {
 		: [ clientId ];
 
 	const getListViewBlockTabIndex = ( rovingTabIndex ) => {
-		if ( isDisabled ) {
+		if ( isInert ) {
 			return -1;
 		}
 
@@ -621,10 +627,10 @@ function ListViewBlock( {
 			className={ classes }
 			isDragged={ isDragged }
 			onKeyDown={ onKeyDown }
-			onMouseEnter={ isDisabled ? undefined : onMouseEnter }
-			onMouseLeave={ isDisabled ? undefined : onMouseLeave }
-			onFocus={ isDisabled ? undefined : onMouseEnter }
-			onBlur={ isDisabled ? undefined : onMouseLeave }
+			onMouseEnter={ isInert ? undefined : onMouseEnter }
+			onMouseLeave={ isInert ? undefined : onMouseLeave }
+			onFocus={ isInert ? undefined : onMouseEnter }
+			onBlur={ isInert ? undefined : onMouseLeave }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }
@@ -650,7 +656,7 @@ function ListViewBlock( {
 							}
 							onMouseDown={ onMouseDown }
 							onToggleExpanded={
-								isDisabled ? undefined : toggleExpanded
+								isInert ? undefined : toggleExpanded
 							}
 							ref={ ref }
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
@@ -660,7 +666,7 @@ function ListViewBlock( {
 							selectedClientIds={ selectedClientIds }
 							ariaDescribedBy={ descriptionId }
 							visibilityLabel={ blockVisibilityDescription }
-							isDisabled={ isDisabled }
+							isDisabled={ isInert }
 						/>
 						<AriaReferencedText id={ descriptionId }>
 							{ [

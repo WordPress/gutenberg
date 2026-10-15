@@ -19,6 +19,15 @@ import { ListViewContentFill } from './list-view-content-popover';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
 
+/**
+ * Renders controls into a group of the block inspector.
+ *
+ * @param {Object}                      props                  Component props.
+ * @param {import( 'react' ).ReactNode} props.children         The controls.
+ * @param {string}                      [props.group]          The inspector group to render into.
+ * @param {Function}                    [props.resetAllFilter] Resets the controls' attributes
+ *                                                             when a tools panel resets all.
+ */
 export default function InspectorControlsFill( {
 	children,
 	group = 'default',

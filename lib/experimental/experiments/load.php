@@ -34,6 +34,11 @@ function gutenberg_initialize_experiments_settings() {
 					'label'       => __( 'Grid interactivity', 'gutenberg' ),
 					'description' => __( 'Enables enhancements to the Grid block that let you move and resize items in the editor canvas.', 'gutenberg' ),
 				),
+				array(
+					'id'          => 'gutenberg-pattern-grouping',
+					'label'       => __( 'Pattern grouping', 'gutenberg' ),
+					'description' => __( 'Shows named blocks inside patterns as groups in List View and the Content panel, so you can tell which content belongs together. Groups can be reordered where the pattern allows it.', 'gutenberg' ),
+				),
 			),
 		),
 		array(

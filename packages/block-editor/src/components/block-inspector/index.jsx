@@ -562,7 +562,10 @@ const BlockInspectorSingleBlock = ( {
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
-					<ContentTab contentClientIds={ contentClientIds } />
+					<ContentTab
+						clientId={ renderedBlockClientId }
+						contentClientIds={ contentClientIds }
+					/>
 					<InspectorControls.Slot group="content" />
 					<InspectorControls.Slot group="list" ref={ listViewRef } />
 					<ListViewContentPopover listViewRef={ listViewRef } />

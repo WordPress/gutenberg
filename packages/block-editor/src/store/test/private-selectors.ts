@@ -38,6 +38,9 @@ import {
 	shouldRenderBlockListView,
 	getStyleOverrides,
 	canHostEditableRoot,
+	isContentGroupBlock,
+	allowsContentGroupReordering,
+	getContentTree,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -2846,6 +2849,229 @@ describe( 'private selectors', () => {
 			after.forEach( ( dependant, index ) => {
 				expect( dependant ).toBe( before[ index ] );
 			} );
+		} );
+	} );
+
+	describe( 'pattern grouping', () => {
+		const CONTENT_BLOCK = 'core/test-grouping-content-block';
+		const STRUCTURE_BLOCK = 'core/test-grouping-structure-block';
+
+		// A pricing pattern: a named table holding two named cards, a named
+		// container with only design inside, and a note after the table.
+		const createState = ( {
+			tableName = 'Pricing table',
+		}: { tableName?: string } = {} ) =>
+			partial< State >( {
+				settings: {},
+				blocks: {
+					byClientId: new Map(
+						[
+							[ 'pattern', STRUCTURE_BLOCK ],
+							[ 'table', STRUCTURE_BLOCK ],
+							[ 'lite', STRUCTURE_BLOCK ],
+							[ 'lite-heading', CONTENT_BLOCK ],
+							[ 'premium', STRUCTURE_BLOCK ],
+							[ 'premium-heading', CONTENT_BLOCK ],
+							[ 'divider', STRUCTURE_BLOCK ],
+							[ 'divider-line', STRUCTURE_BLOCK ],
+							[ 'note', CONTENT_BLOCK ],
+						].map( ( [ clientId, name ] ) => [
+							clientId,
+							{ name },
+						] )
+					),
+					attributes: new Map( [
+						[
+							'pattern',
+							{ metadata: { patternName: 'test/pricing' } },
+						],
+						[
+							'table',
+							{
+								metadata: {
+									name: tableName,
+									allowReordering: true,
+								},
+							},
+						],
+						[ 'lite', { metadata: { name: 'Lite' } } ],
+						[ 'premium', { metadata: { name: 'Premium' } } ],
+						[ 'divider', { metadata: { name: 'Divider' } } ],
+					] ),
+					order: new Map( [
+						[ '', [ 'pattern' ] ],
+						[ 'pattern', [ 'table', 'divider', 'note' ] ],
+						[ 'table', [ 'lite', 'premium' ] ],
+						[ 'lite', [ 'lite-heading' ] ],
+						[ 'premium', [ 'premium-heading' ] ],
+						[ 'divider', [ 'divider-line' ] ],
+					] ),
+					parents: new Map( [
+						[ 'pattern', '' ],
+						[ 'table', 'pattern' ],
+						[ 'lite', 'table' ],
+						[ 'lite-heading', 'lite' ],
+						[ 'premium', 'table' ],
+						[ 'premium-heading', 'premium' ],
+						[ 'divider', 'pattern' ],
+						[ 'divider-line', 'divider' ],
+						[ 'note', 'pattern' ],
+					] ),
+					blockEditingModes: new Map(),
+				},
+				blockListSettings: new Map(),
+				derivedBlockEditingModes: new Map( [
+					[ 'table', 'disabled' ],
+					[ 'lite', 'disabled' ],
+					[ 'lite-heading', 'contentOnly' ],
+					[ 'premium', 'disabled' ],
+					[ 'premium-heading', 'contentOnly' ],
+					[ 'divider', 'disabled' ],
+					[ 'divider-line', 'disabled' ],
+					[ 'note', 'contentOnly' ],
+				] ),
+			} );
+
+		beforeAll( () => {
+			registerBlockType(
+				CONTENT_BLOCK,
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					title: 'Test content block',
+					category: 'text',
+					attributes: {
+						content: { type: 'string', role: 'content' },
+					},
+					save: () => null,
+				} )
+			);
+			registerBlockType(
+				STRUCTURE_BLOCK,
+				partial< BlockConfiguration >( {
+					apiVersion: 3,
+					title: 'Test structure block',
+					category: 'design',
+					save: () => null,
+				} )
+			);
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( CONTENT_BLOCK );
+			unregisterBlockType( STRUCTURE_BLOCK );
+		} );
+
+		const setExperiment = ( enabled: boolean ) => {
+			( globalThis as { window?: object } ).window = enabled
+				? { __experimentalPatternGrouping: true }
+				: undefined;
+		};
+
+		beforeEach( () => setExperiment( true ) );
+		afterEach( () => setExperiment( false ) );
+
+		it( 'makes named containers with content in them groups, at any depth', () => {
+			const state = createState();
+
+			expect( isContentGroupBlock( state, 'table' ) ).toBe( true );
+			expect( isContentGroupBlock( state, 'lite' ) ).toBe( true );
+			// Only design in it, so nothing to group.
+			expect( isContentGroupBlock( state, 'divider' ) ).toBe( false );
+			// Not disabled, so not locked inside the pattern.
+			expect( isContentGroupBlock( state, 'pattern' ) ).toBe( false );
+		} );
+
+		it( 'leaves unnamed containers out', () => {
+			const state = createState( { tableName: '' } );
+
+			expect( isContentGroupBlock( state, 'table' ) ).toBe( false );
+			expect( isContentGroupBlock( state, 'lite' ) ).toBe( true );
+		} );
+
+		it( 'does nothing while the experiment is off', () => {
+			setExperiment( false );
+			const state = createState();
+
+			expect( isContentGroupBlock( state, 'table' ) ).toBe( false );
+			expect( allowsContentGroupReordering( state, 'table' ) ).toBe(
+				false
+			);
+			expect( getContentTree( state, 'pattern' ) ).toEqual( [
+				{ clientId: 'lite-heading', innerBlocks: [] },
+				{ clientId: 'premium-heading', innerBlocks: [] },
+				{ clientId: 'note', innerBlocks: [] },
+			] );
+		} );
+
+		it( 'reads whether a container allows reordering from its metadata', () => {
+			const state = createState();
+
+			expect( allowsContentGroupReordering( state, 'table' ) ).toBe(
+				true
+			);
+			expect( allowsContentGroupReordering( state, 'lite' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'nests content under its groups in the Content panel', () => {
+			expect( getContentTree( createState(), 'pattern' ) ).toEqual( [
+				{
+					clientId: 'table',
+					innerBlocks: [
+						{
+							clientId: 'lite',
+							innerBlocks: [
+								{ clientId: 'lite-heading', innerBlocks: [] },
+							],
+						},
+						{
+							clientId: 'premium',
+							innerBlocks: [
+								{
+									clientId: 'premium-heading',
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+				},
+				{ clientId: 'note', innerBlocks: [] },
+			] );
+		} );
+
+		it( 'shows groups in List View', () => {
+			expect( getListViewClientIdsTree( createState() ) ).toEqual( [
+				{
+					clientId: 'pattern',
+					innerBlocks: [
+						{
+							clientId: 'table',
+							innerBlocks: [
+								{
+									clientId: 'lite',
+									innerBlocks: [
+										{
+											clientId: 'lite-heading',
+											innerBlocks: [],
+										},
+									],
+								},
+								{
+									clientId: 'premium',
+									innerBlocks: [
+										{
+											clientId: 'premium-heading',
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{ clientId: 'note', innerBlocks: [] },
+					],
+				},
+			] );
 		} );
 	} );
 } );

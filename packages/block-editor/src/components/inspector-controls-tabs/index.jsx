@@ -183,6 +183,7 @@ export default function InspectorControlsTabs( {
 				</Tabs.TabList>
 				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
 					<ContentTab
+						clientId={ clientId }
 						contentClientIds={ contentClientIds }
 						onSwitchToListView={ switchToListView }
 						hasListViewTab={ hasListViewTab }

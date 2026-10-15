@@ -8,6 +8,7 @@ import useScrollWhenDragging from './use-scroll-when-dragging';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { isDropTargetValid } from '../use-block-drop-zone';
+import { unlock } from '../../lock-unlock';
 
 const BlockDraggable = ( {
 	appendToOwnerDocument,
@@ -34,7 +35,8 @@ const BlockDraggable = ( {
 				getBlockName,
 				getBlockAttributes,
 				isBlockInsertionPointVisible,
-			} = select( blockEditorStore );
+				isContentGroupBlock,
+			} = unlock( select( blockEditorStore ) );
 			const { getBlockType: _getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
@@ -46,7 +48,13 @@ const BlockDraggable = ( {
 
 			return {
 				srcRootClientId: rootClientId,
-				isDraggable: canMoveBlocks( clientIds ),
+				// A group in a pattern is reordered with the movers. Its
+				// container is disabled, so a drag would have nowhere to land.
+				isDraggable:
+					canMoveBlocks( clientIds ) &&
+					! clientIds.some( ( clientId ) =>
+						isContentGroupBlock( clientId )
+					),
 				icon: variation?.icon || _getBlockType( blockName )?.icon,
 				visibleInserter: isBlockInsertionPointVisible(),
 				getBlockType: _getBlockType,
