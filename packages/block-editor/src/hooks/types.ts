@@ -144,3 +144,9 @@ export type ColorSupport = Partial< ColorProps > & { gradient?: boolean };
  * A block's `__experimentalBorder` support, or `true` for all its features.
  */
 export type BorderSupport = true | Record< string, unknown >;
+
+/**
+ * A block gap style: one value for both axes, or a `top` (row) and `left`
+ * (column) value.
+ */
+export type BlockGapValue = string | { top?: string; left?: string };
