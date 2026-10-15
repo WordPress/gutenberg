@@ -322,6 +322,36 @@ describe( 'getListViewDropTarget', () => {
 		} );
 	} );
 
+	it( 'should drop below an expanded block whose only child is the dragged block, instead of nesting back into it', () => {
+		// The dragged block is the sole child of block-1, so block-1 has no
+		// other children to drop among; the inner block count still includes
+		// the dragged block.
+		const soleChildBlocksData = [
+			{ ...blocksData[ 0 ], innerBlockCount: 1 },
+			{ ...blocksData[ 1 ], isDraggedBlock: true, innerBlockCount: 0 },
+			{ ...blocksData[ 3 ], element: blocksData[ 2 ].element },
+		];
+
+		// Over the block's own level, short of the nesting indentation.
+		[
+			{ position: { x: 50, y: 90 }, rtl: false },
+			{ position: { x: 260, y: 90 }, rtl: true },
+		].forEach( ( { position, rtl } ) => {
+			const target = getListViewDropTarget(
+				soleChildBlocksData,
+				position,
+				rtl
+			);
+
+			expect( target ).toEqual( {
+				blockIndex: 1,
+				clientId: 'block-1',
+				dropPosition: 'bottom',
+				rootClientId: '',
+			} );
+		} );
+	} );
+
 	describe( 'while the drop indicator displaces the rows', () => {
 		// Models the list view while a block is dragged downward: the dragged
 		// block keeps its row, the rows between it and the target shift up to

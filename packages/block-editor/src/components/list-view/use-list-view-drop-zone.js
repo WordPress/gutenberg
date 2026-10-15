@@ -291,17 +291,29 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 		),
 	};
 
+	// An expanded block's children follow it in the tree, so dragging below
+	// the block drops among them. The dragged blocks do not count: when the
+	// candidate's only children are being dragged, nothing follows it, and
+	// dropping below the block moves them out of it.
+	const hasVisibleChildren =
+		candidateBlockData.isExpanded &&
+		blocksData.some(
+			( blockData ) =>
+				blockData.rootClientId === candidateBlockData.clientId &&
+				! blockData.isDraggedBlock
+		);
+
 	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to nest the block as a child.
-	// If the block already has inner blocks, and is expanded, this should be treated
-	// as nesting since the next block in the tree will be the first child.
-	// However, if the block is collapsed, dragging beneath the block should
-	// still be allowed, as the next visible block in the tree will be a sibling.
+	// If the block has children that are not being dragged, and is expanded,
+	// this should be treated as nesting since the next block in the tree will
+	// be the first child. However, if the block is collapsed, dragging beneath
+	// the block should still be allowed, as the next visible block in the tree
+	// will be a sibling.
 	if (
 		isDraggingBelow &&
 		candidateBlockData.canInsertDraggedBlocksAsChild &&
-		( ( candidateBlockData.innerBlockCount > 0 &&
-			candidateBlockData.isExpanded ) ||
+		( hasVisibleChildren ||
 			isNestingGesture(
 				position,
 				nestingRect,

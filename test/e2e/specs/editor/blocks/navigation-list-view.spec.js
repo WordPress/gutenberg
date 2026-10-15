@@ -831,6 +831,47 @@ test.describe( 'Navigation block - List view editing', () => {
 			item( 'Item 2' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
 		).toBeVisible();
 	} );
+
+	test( 'moves the only item of a submenu out of it by dragging it below the submenu', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-submenu {"label":"Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} -->
+<!-- wp:navigation-link {"label":"Child","type":"custom","url":"https://wordpress.org/child","kind":"custom"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+		const item = ( name ) =>
+			listView.getByRole( 'gridcell', { name, exact: true } );
+
+		await expect(
+			item( 'Child' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
+		).toBeVisible();
+
+		// The submenu's only child is the dragged block, so dropping below the
+		// submenu at the top level must not count as dropping among its
+		// children.
+		await dragListViewBlockTo( editor, {
+			from: item( 'Child' ),
+			to: item( 'Item 1' ),
+			indentation: 1,
+		} );
+
+		await expect(
+			item( 'Child' ).filter( { hasText: 'Block 2 of 3, Level 1.' } )
+		).toBeVisible();
+	} );
 } );
 
 /**
