@@ -72,11 +72,11 @@ export interface BlockPopoverInbetweenProps
 	/**
 	 * The client ID of the block before the popover.
 	 */
-	previousClientId: string;
+	previousClientId: string | undefined;
 	/**
 	 * The client ID of the block after the popover.
 	 */
-	nextClientId: string;
+	nextClientId: string | undefined;
 	children?: ReactNode;
 	operation?: string;
 	nearestSide?: string;

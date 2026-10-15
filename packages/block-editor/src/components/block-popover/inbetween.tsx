@@ -35,23 +35,26 @@ function BlockPopoverInbetween( {
 				isBlockVisible,
 			} = select( blockEditorStore );
 
+			// At least one neighboring block is set.
 			const _rootClientId = getBlockRootClientId(
-				previousClientId ?? nextClientId
+				( previousClientId ?? nextClientId )!
 			);
 			return {
 				orientation:
 					getBlockListSettings( _rootClientId )?.orientation ||
 					'vertical',
 				rootClientId: _rootClientId,
+				// An absent neighboring block is looked up as a missing one.
 				isVisible:
-					isBlockVisible( previousClientId ) &&
-					isBlockVisible( nextClientId ),
+					isBlockVisible( previousClientId as string ) &&
+					isBlockVisible( nextClientId as string ),
 			};
 		},
 		[ previousClientId, nextClientId ]
 	);
-	const previousElement = useBlockElement( previousClientId );
-	const nextElement = useBlockElement( nextClientId );
+	// An absent neighboring block has no element.
+	const previousElement = useBlockElement( previousClientId as string );
+	const nextElement = useBlockElement( nextClientId as string );
 	const isVertical = orientation === 'vertical';
 
 	const popoverAnchor = useMemo( () => {
