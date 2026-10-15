@@ -51,21 +51,28 @@ describe( 'getTestSuiteRefs', () => {
 } );
 
 /**
- * Creates a fake SimpleGit instance whose fetches fail for the given refs.
+ * Creates a fake SimpleGit instance whose `ls-remote` lists the given refs.
  *
- * @param {Object<string, string>} failures Error messages, keyed by the ref name whose fetch fails.
+ * @param {string[]} existing The full names of the refs that exist, such as `refs/heads/trunk`.
+ * @param {?Error}   error    An error for every git command to throw.
  * @return {Object} The fake, which records each call in `calls`.
  */
-function createGit( failures = {} ) {
+function createGit( existing = [], error = null ) {
 	const calls = [];
 	return {
 		calls,
 		async raw( args ) {
 			calls.push( [ 'raw', ...args ] );
-			const name = args[ args.length - 3 ];
-			if ( failures[ name ] ) {
-				throw new Error( failures[ name ] );
+			if ( error ) {
+				throw error;
 			}
+			if ( args[ 0 ] === 'ls-remote' ) {
+				return existing
+					.filter( ( ref ) => args.includes( ref ) )
+					.map( ( ref ) => `0123abcd\t${ ref }\n` )
+					.join( '' );
+			}
+			return '';
 		},
 		async checkout( ref ) {
 			calls.push( [ 'checkout', ref ] );
@@ -77,47 +84,66 @@ const noop = () => {};
 
 describe( 'fetchTestSuite', () => {
 	it( 'fetches a tag and checks out what was fetched', async () => {
-		const git = createGit();
-		await fetchTestSuite( git, [ { type: 'tag', name: '7.1.3' } ], noop );
+		const git = createGit( [ 'refs/tags/7.1.3', 'refs/heads/7.1' ] );
+		await fetchTestSuite(
+			git,
+			[
+				{ type: 'tag', name: '7.1.3' },
+				{ type: 'branch', name: '7.1' },
+			],
+			noop
+		);
 		expect( git.calls ).toEqual( [
+			[
+				'raw',
+				'ls-remote',
+				'origin',
+				'refs/tags/7.1.3',
+				'refs/heads/7.1',
+			],
 			[ 'raw', 'fetch', 'origin', 'tag', '7.1.3', '--depth', '1' ],
 			[ 'checkout', 'FETCH_HEAD' ],
 		] );
 	} );
 
 	it( 'uses the first branch that exists', async () => {
-		const git = createGit();
+		const git = createGit( [ 'refs/heads/7.1', 'refs/heads/trunk' ] );
 		await fetchTestSuite(
 			git,
 			[ { type: 'branch', name: '7.1' }, TRUNK ],
 			noop
 		);
 		expect( git.calls ).toEqual( [
+			[
+				'raw',
+				'ls-remote',
+				'origin',
+				'refs/heads/7.1',
+				'refs/heads/trunk',
+			],
 			[ 'raw', 'fetch', 'origin', '7.1', '--depth', '1' ],
 			[ 'checkout', 'FETCH_HEAD' ],
 		] );
 	} );
 
 	it( 'falls back to trunk when the branch does not exist yet', async () => {
-		const git = createGit( {
-			7.2: "fatal: couldn't find remote ref 7.2",
-		} );
+		const git = createGit( [ 'refs/heads/trunk' ] );
 		await fetchTestSuite(
 			git,
 			[ { type: 'branch', name: '7.2' }, TRUNK ],
 			noop
 		);
-		expect( git.calls ).toEqual( [
-			[ 'raw', 'fetch', 'origin', '7.2', '--depth', '1' ],
+		expect( git.calls.slice( 1 ) ).toEqual( [
 			[ 'raw', 'fetch', 'origin', 'trunk', '--depth', '1' ],
 			[ 'checkout', 'FETCH_HEAD' ],
 		] );
 	} );
 
-	it( 'does not fall back on other errors', async () => {
-		const git = createGit( {
-			7.1: 'fatal: unable to access the repository',
-		} );
+	it( 'throws when listing the refs fails', async () => {
+		const git = createGit(
+			[],
+			new Error( 'fatal: unable to access the repository' )
+		);
 		await expect(
 			fetchTestSuite(
 				git,
@@ -128,13 +154,18 @@ describe( 'fetchTestSuite', () => {
 		expect( git.calls ).toHaveLength( 1 );
 	} );
 
-	it( 'throws when the last ref does not exist', async () => {
-		const git = createGit( {
-			'7.1.9': "fatal: couldn't find remote ref refs/tags/7.1.9",
-		} );
+	it( 'throws when none of the refs exist', async () => {
+		const git = createGit();
 		await expect(
-			fetchTestSuite( git, [ { type: 'tag', name: '7.1.9' } ], noop )
-		).rejects.toThrow( "couldn't find remote ref" );
+			fetchTestSuite(
+				git,
+				[
+					{ type: 'tag', name: '7.1.9' },
+					{ type: 'branch', name: '7.1' },
+				],
+				noop
+			)
+		).rejects.toThrow( 'Tried: tag 7.1.9, branch 7.1.' );
 		expect( git.calls ).toHaveLength( 1 );
 	} );
 } );
