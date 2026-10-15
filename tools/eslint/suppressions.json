@@ -1577,6 +1577,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/link-control/css-classes-setting.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 2
+		}
+	},
 	"packages/block-editor/src/components/link-control/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -1622,6 +1627,11 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
+		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"packages/block-editor/src/components/link-control/test/css-classes-setting.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -7273,16 +7283,6 @@
 	},
 	"packages/format-library/src/language/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/format-library/src/link/css-classes-setting.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/format-library/src/link/test/css-classes-setting.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},

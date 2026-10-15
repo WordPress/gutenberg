@@ -18,6 +18,7 @@ import {
 import {
 	LinkControl,
 	store as blockEditorStore,
+	privateApis as blockEditorPrivateApis,
 	// @ts-expect-error Block Editor not fully typed yet.
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -25,8 +26,9 @@ import type { RichTextValue } from '@wordpress/rich-text';
 import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import type { LinkFormatAttributes } from './utils';
 import { link as settings } from './index';
-import CSSClassesSettingComponent from './css-classes-setting';
-import type { CSSClassesSettingProps } from './css-classes-setting';
+import { unlock } from '../lock-unlock';
+
+const { cssClassesLinkSetting } = unlock( blockEditorPrivateApis );
 
 interface LinkValue {
 	url?: string;
@@ -55,21 +57,7 @@ const LINK_SETTINGS = [
 		id: 'nofollow',
 		title: __( 'Mark as nofollow' ),
 	},
-	{
-		id: 'cssClasses',
-		title: __( 'Additional CSS class(es)' ),
-		render: (
-			setting: CSSClassesSettingProps[ 'setting' ],
-			value: CSSClassesSettingProps[ 'value' ],
-			onChange: CSSClassesSettingProps[ 'onChange' ]
-		) => (
-			<CSSClassesSettingComponent
-				setting={ setting }
-				value={ value }
-				onChange={ onChange }
-			/>
-		),
-	},
+	cssClassesLinkSetting,
 ];
 
 function InlineLinkUI( {

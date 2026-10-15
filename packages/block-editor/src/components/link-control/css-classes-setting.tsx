@@ -95,4 +95,25 @@ const CSSClassesSettingComponent = ( {
 	);
 };
 
+/**
+ * LinkControl setting for editing a link's CSS classes. Add it to the
+ * `settings` prop of `LinkControl`; the value is read from and written to
+ * `cssClasses` on the link value.
+ */
+export const cssClassesLinkSetting = {
+	id: 'cssClasses',
+	title: __( 'Additional CSS class(es)' ),
+	render: (
+		setting: CSSClassesSettingProps[ 'setting' ],
+		value: CSSClassesSettingProps[ 'value' ],
+		onChange: CSSClassesSettingProps[ 'onChange' ]
+	) => (
+		<CSSClassesSettingComponent
+			setting={ setting }
+			value={ value }
+			onChange={ onChange }
+		/>
+	),
+};
+
 export default CSSClassesSettingComponent;
