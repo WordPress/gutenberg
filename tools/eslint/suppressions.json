@@ -846,32 +846,18 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/colors-gradients/control.jsx": {
+	"packages/block-editor/src/components/colors-gradients/control.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/colors-gradients/dropdown.jsx": {
+	"packages/block-editor/src/components/colors-gradients/dropdown.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.jsx": {
+	"packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/colors-gradients/test/control.browser.test.jsx": {
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
