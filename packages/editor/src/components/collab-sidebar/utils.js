@@ -1,5 +1,10 @@
 import { _x } from '@wordpress/i18n';
-import { create, getActiveFormat, RichTextData } from '@wordpress/rich-text';
+import {
+	create,
+	getActiveFormat,
+	RichTextData,
+	toHTMLString,
+} from '@wordpress/rich-text';
 import { NOTE_FORMAT_NAME } from './constants';
 
 /**
@@ -177,6 +182,114 @@ export function findNoteRange( value, noteId ) {
 }
 
 /**
+ * Walk a block's attribute values, including the ones nested in another
+ * attribute (e.g. table cells). A nested value is keyed by its dot-separated
+ * path, which is what its `RichText` reports as the selection's attribute key.
+ *
+ * @param {?Object} attributes Block attributes, or null/undefined when unloaded.
+ * @param {string}  [prefix]   Path of the attribute being walked.
+ * @yield {[string, unknown]} Attribute key and value.
+ */
+function* getAttributeEntries( attributes, prefix ) {
+	for ( const [ key, value ] of Object.entries( attributes ?? {} ) ) {
+		const attributeKey = prefix ? `${ prefix }.${ key }` : key;
+		if (
+			value &&
+			typeof value === 'object' &&
+			! ( value instanceof RichTextData )
+		) {
+			yield* getAttributeEntries( value, attributeKey );
+		} else {
+			yield [ attributeKey, value ];
+		}
+	}
+}
+
+/**
+ * Read the attribute value a selection's attribute key points to; see
+ * `getAttributeEntries` for nested keys.
+ *
+ * @param {?Object} attributes   Block attributes.
+ * @param {string}  attributeKey Attribute key, or the path of a nested value.
+ * @return {unknown} Attribute value, or undefined when there is none.
+ */
+export function getAttributeByKey( attributes, attributeKey ) {
+	if ( ! attributes || ! attributeKey ) {
+		return undefined;
+	}
+	if ( Object.hasOwn( attributes, attributeKey ) ) {
+		return attributes[ attributeKey ];
+	}
+	return attributeKey
+		.split( '.' )
+		.reduce( ( value, key ) => value?.[ key ], attributes );
+}
+
+/**
+ * Build the attributes update that writes `value` to an attribute key. A
+ * nested value can't be updated on its own, so its top-level attribute is
+ * copied with the value replaced.
+ *
+ * @param {Object}  attributes   Block attributes.
+ * @param {string}  attributeKey Attribute key, or the path of a nested value.
+ * @param {unknown} value        New value.
+ * @return {Object} Attributes to pass to `updateBlockAttributes`.
+ */
+export function setAttributeByKey( attributes, attributeKey, value ) {
+	if (
+		Object.hasOwn( attributes, attributeKey ) ||
+		! attributeKey.includes( '.' )
+	) {
+		return { [ attributeKey ]: value };
+	}
+	const [ topLevelKey, ...path ] = attributeKey.split( '.' );
+	const setIn = ( node, [ key, ...rest ] ) => {
+		const copy = Array.isArray( node ) ? [ ...node ] : { ...node };
+		copy[ key ] = rest.length ? setIn( node[ key ], rest ) : value;
+		return copy;
+	};
+	return { [ topLevelKey ]: setIn( attributes[ topLevelKey ], path ) };
+}
+
+/**
+ * Whether a block attribute value holds rich text. A `rich-text` attribute
+ * holds a `RichTextData`, and a `string` attribute edited through `RichText`
+ * holds the same content as an HTML string.
+ *
+ * @param {unknown} value Block attribute value.
+ * @return {boolean} Whether the value is rich text.
+ */
+function isRichText( value ) {
+	return value instanceof RichTextData || typeof value === 'string';
+}
+
+/**
+ * Convert a rich-text record to the type of the attribute value it replaces.
+ *
+ * @param {Object}  record A rich-text record (`{ text, formats, … }`).
+ * @param {unknown} value  Existing block attribute value.
+ * @return {RichTextData|string} New value, of the same type as the existing one.
+ */
+function fromRichTextRecord( record, value ) {
+	return value instanceof RichTextData
+		? new RichTextData( record )
+		: toHTMLString( { value: record } );
+}
+
+/**
+ * Plain text of a rich-text attribute value.
+ *
+ * @param {unknown} value Block attribute value (RichTextData, string, or other).
+ * @return {?string} Text, or null when the value isn't rich text.
+ */
+export function getRichTextText( value ) {
+	if ( value instanceof RichTextData ) {
+		return value.text;
+	}
+	return typeof value === 'string' ? create( { html: value } ).text : null;
+}
+
+/**
  * Locate a note's in-content `core/note` marker across all of a block's
  * attributes. The marker (carrying `data-id`) is the single source of truth for
  * an inline note's anchor: a note is inline iff a marker with its id exists in
@@ -188,11 +301,8 @@ export function findNoteRange( value, noteId ) {
  * @return {?{attributeKey: string, start: number, end: number}} Anchor or null when no marker is found.
  */
 export function findNoteInBlock( attributes, noteId ) {
-	if ( ! attributes ) {
-		return null;
-	}
-	for ( const attributeKey of Object.keys( attributes ) ) {
-		const range = findNoteRange( attributes[ attributeKey ], noteId );
+	for ( const [ attributeKey, value ] of getAttributeEntries( attributes ) ) {
+		const range = findNoteRange( value, noteId );
 		if ( range ) {
 			return { attributeKey, start: range.start, end: range.end };
 		}
@@ -400,18 +510,18 @@ export function readInlineSelection( getSelectionStart, getSelectionEnd ) {
 }
 
 /**
- * Wrap a rich-text range with a core/note marker. Returns a new
- * RichTextData ready to write back into block attributes, or null when the
- * incoming value isn't a rich-text instance (legacy/string attributes).
+ * Wrap a rich-text range with a core/note marker. Returns a new value of the
+ * same type, ready to write back into block attributes, or null when the
+ * incoming value isn't rich text.
  *
  * @param {unknown} value Existing block attribute value.
  * @param {number}  id    New note id to embed as `data-id`.
  * @param {number}  start Range start offset.
  * @param {number}  end   Range end offset.
- * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
+ * @return {?(RichTextData|string)} Wrapped value or null when the attribute isn't rich text.
  */
 export function wrapInlineNote( value, id, start, end ) {
-	if ( ! ( value instanceof RichTextData ) ) {
+	if ( ! isRichText( value ) ) {
 		return null;
 	}
 	const record = applyNoteFormat(
@@ -420,7 +530,7 @@ export function wrapInlineNote( value, id, start, end ) {
 		start,
 		end
 	);
-	return new RichTextData( record );
+	return fromRichTextRecord( record, value );
 }
 
 /**
@@ -432,13 +542,14 @@ export function wrapInlineNote( value, id, start, end ) {
  * would wipe co-located notes; this filters by `data-id` to drop only the target
  * marker.
  *
- * @param {unknown}       value  Block attribute value (RichTextData or other).
+ * @param {unknown}       value  Block attribute value (RichTextData, string, or other).
  * @param {number|string} noteId Note id whose marker should be removed.
- * @return {?RichTextData} A new value with the marker removed, or null when the
- *                         attribute isn't rich text or carries no such marker.
+ * @return {?(RichTextData|string)} A new value of the same type with the marker
+ *                                  removed, or null when the attribute isn't
+ *                                  rich text or carries no such marker.
  */
 export function removeNoteFormat( value, noteId ) {
-	if ( ! ( value instanceof RichTextData ) ) {
+	if ( ! isRichText( value ) ) {
 		return null;
 	}
 	const target = String( noteId );
@@ -464,7 +575,7 @@ export function removeNoteFormat( value, noteId ) {
 			delete formats[ index ];
 		}
 	} );
-	return changed ? new RichTextData( { ...record, formats } ) : null;
+	return changed ? fromRichTextRecord( { ...record, formats }, value ) : null;
 }
 
 /**
@@ -472,12 +583,16 @@ export function removeNoteFormat( value, noteId ) {
  *
  * @param {?Object}       attributes Block attributes.
  * @param {number|string} noteId     Note id whose marker to remove.
- * @return {?{attributeKey: string, start: number, end: number, value: RichTextData}} Marker range and the new attribute value, or null when no marker.
+ * @return {?{attributeKey: string, start: number, end: number, value: RichTextData|string}} Marker range and the new attribute value, or null when no marker.
  */
 export function removeInlineNote( attributes, noteId ) {
 	const found = findNoteInBlock( attributes, noteId );
 	const value =
-		found && removeNoteFormat( attributes[ found.attributeKey ], noteId );
+		found &&
+		removeNoteFormat(
+			getAttributeByKey( attributes, found.attributeKey ),
+			noteId
+		);
 	return value ? { ...found, value } : null;
 }
 
@@ -539,7 +654,7 @@ export function getNoteAtCaret( attributes, selectionStart, selectionEnd ) {
 	) {
 		return null;
 	}
-	const formats = getFormats( attributes?.[ attributeKey ] );
+	const formats = getFormats( getAttributeByKey( attributes, attributeKey ) );
 	if ( ! formats ) {
 		return undefined;
 	}
@@ -562,7 +677,7 @@ export function getNoteAtCaret( attributes, selectionStart, selectionEnd ) {
  */
 function getInlineNoteIds( attributes ) {
 	const ids = new Set();
-	for ( const value of Object.values( attributes ?? {} ) ) {
+	for ( const [ , value ] of getAttributeEntries( attributes ) ) {
 		getFormats( value )?.forEach( ( stack ) => {
 			for ( const format of stack ?? [] ) {
 				if ( format.type === NOTE_FORMAT_NAME ) {
