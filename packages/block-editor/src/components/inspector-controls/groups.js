@@ -18,8 +18,8 @@ const InspectorControlsPosition = createSlotFill( 'InspectorControlsPosition' );
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
-const InspectorControlsStyleStates = createSlotFill(
-	'InspectorControlsStyleStates'
+const InspectorControlsStyleState = createSlotFill(
+	'InspectorControlsStyleState'
 );
 const InspectorControlsListView = createSlotFill( 'InspectorControlsListView' );
 const InspectorControlsStyles = createSlotFill( 'InspectorControlsStyles' );
@@ -44,7 +44,7 @@ const groups = {
 	settings: InspectorControlsDefault, // Alias for default.
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,
-	styleStates: InspectorControlsStyleStates,
+	'style-state': InspectorControlsStyleState,
 };
 
 export default groups;
@@ -56,6 +56,6 @@ export const PrivateInspectorControlsAllowedBlocks = createSlotFill(
 
 // Private slot for the "Advanced" panel shown while editing a style state, so
 // it always renders after every other style state panel.
-export const PrivateInspectorControlsStyleStatesAdvanced = createSlotFill(
-	Symbol( 'PrivateInspectorControlsStyleStatesAdvanced' )
+export const PrivateInspectorControlsStyleStateAdvanced = createSlotFill(
+	Symbol( 'PrivateInspectorControlsStyleStateAdvanced' )
 );
