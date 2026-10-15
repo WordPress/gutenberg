@@ -4,6 +4,7 @@ import * as Avatar from '../index';
 import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
+import explorationStyles from './fallback-colors.module.css';
 
 // Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
 // Used under the Unsplash License: https://unsplash.com/license
@@ -108,6 +109,102 @@ export const Interactive: Story = {
 			) ) }
 		</Stack>
 	),
+};
+
+/** Compare neutral, native contrast, WCAG black/white, and contrast-limited tinted fallbacks. */
+export const FallbackColors: Story = {
+	args: { color: '#008a20', size: 'lg' },
+	render: ( args ) => {
+		const colors = [
+			[ 'Custom color', args.color ?? '#008a20' ],
+			[ 'Bright green', '#00e050' ],
+			[ 'Dark green', '#064e3b' ],
+			[ 'Midtone gray', '#777777' ],
+			[ 'Yellow', '#fbbf24' ],
+			[ 'Cyan', '#00cfff' ],
+			[ 'Theme color', 'var(--wpds-color-stroke-surface-brand)' ],
+		];
+		const approaches = [
+			[ 'Neutral', 'neutral' ],
+			[ 'Native black/white', 'native' ],
+			[ 'WCAG black/white', 'wcag' ],
+			[ 'Tinted foreground', 'tinted' ],
+		];
+		return (
+			<div className={ explorationStyles.gallery }>
+				<p>
+					Change the custom color, size, and shape in Controls. Filled
+					fallbacks use opaque sRGB colors. The tinted column falls
+					back to native black/white, then neutral, as feature support
+					allows.
+				</p>
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">Color</th>
+							{ approaches.map( ( [ label ] ) => (
+								<th key={ label } scope="col">
+									{ label }
+								</th>
+							) ) }
+						</tr>
+					</thead>
+					<tbody>
+						{ colors.map( ( [ label, color ] ) => (
+							<tr key={ label }>
+								<th scope="row">{ label }</th>
+								{ approaches.map( ( [ approach, variant ] ) => (
+									<td key={ approach }>
+										<Stack gap="lg" align="center">
+											<Avatar.Root
+												{ ...args }
+												color={ color }
+												aria-hidden="true"
+												style={
+													{
+														'--_wp-ui-avatar-exploration-color':
+															color,
+													} as React.CSSProperties
+												}
+											>
+												<Avatar.Initials
+													name="Alex Morgan"
+													className={
+														explorationStyles[
+															variant
+														]
+													}
+												/>
+											</Avatar.Root>
+											<Avatar.Root
+												{ ...args }
+												color={ color }
+												aria-hidden="true"
+												style={
+													{
+														'--_wp-ui-avatar-exploration-color':
+															color,
+													} as React.CSSProperties
+												}
+											>
+												<Avatar.Fallback
+													className={
+														explorationStyles[
+															variant
+														]
+													}
+												/>
+											</Avatar.Root>
+										</Stack>
+									</td>
+								) ) }
+							</tr>
+						) ) }
+					</tbody>
+				</table>
+			</div>
+		);
+	},
 };
 
 /** Square avatars use the theme's corner radius for buttons and controls. */

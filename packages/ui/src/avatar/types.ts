@@ -7,7 +7,9 @@ export type RootProps = Omit<
 > & {
 	/**
 	 * The color of an optional ring around the avatar. Accepts any CSS color,
-	 * including CSS variables. The image and fallback keep their own colors.
+	 * including CSS variables. Without an image, supporting browsers also use
+	 * an opaque sRGB fill derived from this color and a contrasting foreground.
+	 * Other browsers retain the neutral fallback. Images keep their own colors.
 	 * The ring paints over the avatar's inner edge without changing its layout size.
 	 */
 	color?: React.CSSProperties[ 'color' ];
