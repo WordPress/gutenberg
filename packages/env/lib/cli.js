@@ -47,9 +47,9 @@ const withSpinner = ( command ) => ( ...args ) => {
 				'err' in error &&
 				'out' in error
 			) {
-				// Error is a docker-compose error. That means something docker-related failed.
+				// Error is a docker compose error. That means something docker-related failed.
 				// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
-				spinner.fail( 'Error while running docker-compose command.' );
+				spinner.fail( 'Error while running docker compose command.' );
 				if ( error.out ) {
 					process.stdout.write( error.out );
 				}
