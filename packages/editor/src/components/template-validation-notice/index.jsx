@@ -1,7 +1,8 @@
+import { speak } from '@wordpress/a11y';
 import { __experimentalConfirmDialog as ConfirmDialog } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { Notice } from '@wordpress/ui';
 
@@ -12,6 +13,17 @@ export default function TemplateValidationNotice() {
 	}, [] );
 	const { setTemplateValidity, synchronizeTemplate } =
 		useDispatch( blockEditorStore );
+	const message = __(
+		'The content of your post doesn’t match the template assigned to your post type.'
+	);
+
+	// `Notice.Root` does not announce itself, so announce the notice when
+	// the template becomes invalid.
+	useEffect( () => {
+		if ( ! isValid ) {
+			speak( message );
+		}
+	}, [ isValid, message ] );
 
 	if ( isValid ) {
 		return null;
@@ -23,11 +35,7 @@ export default function TemplateValidationNotice() {
 				className="editor-template-validation-notice"
 				intent="warning"
 			>
-				<Notice.Description>
-					{ __(
-						'The content of your post doesn’t match the template assigned to your post type.'
-					) }
-				</Notice.Description>
+				<Notice.Description>{ message }</Notice.Description>
 				<Notice.Actions>
 					<Notice.ActionButton
 						variant="outline"
