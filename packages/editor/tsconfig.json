@@ -36,7 +36,7 @@
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../interface/tsconfig.build.json" },
-		{ "path": "../kebab-case" },
+		{ "path": "../kebab-case/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../keyboard-shortcuts" },
 		{ "path": "../media-editor/tsconfig.build.json" },

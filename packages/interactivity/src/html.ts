@@ -17,7 +17,14 @@ interface TrustedHTML {
  */
 interface TrustedTypePolicyFactory {
 	isHTML: ( value: unknown ) => value is TrustedHTML;
+	/** Empty trusted HTML accepted by HTML sinks without a policy. */
+	readonly emptyHTML: TrustedHTML;
 }
+
+/** Empty HTML accepted by HTML sinks, including under Trusted Types enforcement. */
+export const emptyHTML =
+	( globalThis as { trustedTypes?: TrustedTypePolicyFactory } ).trustedTypes
+		?.emptyHTML ?? '';
 
 declare const dangerousHTMLBrand: unique symbol;
 
@@ -46,8 +53,8 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
 
 /**
  * Marks a string (or native `TrustedHTML`) as trusted so the `data-wp-html`
- * directive renders it as markup instead of leaving the bound element's
- * content untouched.
+ * directive renders it as markup. Any value other than a token empties the
+ * bound element.
  *
  * This function never sanitizes or otherwise processes the HTML passed
  * here, the same responsibility you take on using `dangerouslySetInnerHTML`
@@ -65,18 +72,14 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
  * returned is ever rendered as HTML.
  *
  * This package creates no Trusted Types policy of its own. On a site that
- * enforces Trusted Types with no default policy, a plain `string` argument
- * causes the browser to reject the eventual `element.innerHTML` write, and
- * the element's existing content is left in place. Pass a `TrustedHTML`
- * value from the site's own policy instead —
- * `asDangerousHTML( myPolicy.createHTML( markup ) )` — and it's passed
- * through to the DOM unchanged.
+ * enforces Trusted Types, pass a `TrustedHTML` value from the site's own
+ * policy: `asDangerousHTML( policy.createHTML( markup ) )`. A rejected value
+ * empties the element.
  *
  * "Trusted" here only means the `data-wp-html` directive will render it and
  * the Interactivity API won't process directives inside it. It's still live
- * browser HTML once rendered — that a `<script>` tag inside won't execute
- * is an artifact of how `innerHTML` works, not a security boundary. Content
- * that isn't safe to render as HTML isn't made safe by this function.
+ * browser HTML once rendered. Content that isn't safe to render as HTML
+ * isn't made safe by this function.
  *
  * @param  html Raw HTML string, or a native `TrustedHTML` value from a
  *              site-provided Trusted Types policy, to render.
