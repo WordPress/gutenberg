@@ -74,6 +74,79 @@ export const IconFallback: Story = {
 	),
 };
 
+/**
+ * Use an unframed fallback for an icon that already has its own outline.
+ * The fallback keeps its natural size; the root's size and shape apply when an
+ * image loads. Keep the fallback directly inside `Avatar.Root`.
+ */
+export const UnframedFallback: Story = {
+	render: ( args ) => (
+		<Avatar.Root { ...args }>
+			<Avatar.Fallback variant="unframed">
+				<Icon icon={ commentAuthorAvatar } />
+			</Avatar.Fallback>
+		</Avatar.Root>
+	),
+};
+
+/**
+ * Prefer the image even when the name is missing. Supply initials for named
+ * authors and a standalone icon when initials cannot be computed. Avatar owns
+ * image loading and failures; the application chooses the fallback content.
+ * These examples cover loaded, failed, and missing images for both cases.
+ */
+export const AuthorFallbacks: Story = {
+	name: 'Author images and fallbacks',
+	render: ( args ) => (
+		<Stack direction="column" gap="lg">
+			{ [
+				{ name: 'Alex Morgan', src: IMAGE_SRC, state: 'Loaded image' },
+				{
+					name: 'Alex Morgan',
+					src: 'data:image/png;base64,invalid',
+					state: 'Failed image',
+				},
+				{ name: 'Alex Morgan', src: undefined, state: 'Missing image' },
+				{ name: undefined, src: IMAGE_SRC, state: 'Loaded image' },
+				{
+					name: undefined,
+					src: 'data:image/png;base64,invalid',
+					state: 'Failed image',
+				},
+				{ name: undefined, src: undefined, state: 'Missing image' },
+			].map( ( { name, src, state } ) => {
+				const initials = name
+					?.trim()
+					.split( /\s+/ )
+					.slice( 0, 2 )
+					.map( ( word ) => Array.from( word )[ 0 ] )
+					.join( '' )
+					.toUpperCase();
+				return (
+					<Stack
+						key={ `${ name }-${ state }` }
+						gap="sm"
+						align="center"
+					>
+						<Avatar.Root { ...args } aria-hidden="true">
+							<Avatar.Fallback
+								variant={ initials ? 'default' : 'unframed' }
+							>
+								{ initials || (
+									<Icon icon={ commentAuthorAvatar } />
+								) }
+							</Avatar.Fallback>
+							<Avatar.Image src={ src } alt="" keepMounted />
+						</Avatar.Root>
+						<Text>{ name || 'Unnamed author' }</Text>
+						<Text>{ state }</Text>
+					</Stack>
+				);
+			} ) }
+		</Stack>
+	),
+};
+
 /** An image that fails to load leaves the fallback visible. */
 export const FailedImage: Story = {
 	render: ( args ) => (
