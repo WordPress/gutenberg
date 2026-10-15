@@ -276,7 +276,7 @@ function validateEntrySpacing(
 
 	for ( let i = 1; i < unreleased.lines.length; i++ ) {
 		const line = unreleased.lines[ i ];
-		if ( line === '' ) {
+		if ( line.trim() === '' ) {
 			continue;
 		}
 		const isTopLevel = /^-\s+/.test( line );
@@ -284,7 +284,7 @@ function validateEntrySpacing(
 			inEntry = false;
 			continue;
 		}
-		if ( inEntry && unreleased.lines[ i - 1 ] === '' ) {
+		if ( inEntry && unreleased.lines[ i - 1 ].trim() === '' ) {
 			errors.push(
 				`${ filePath }:${
 					unreleased.start + i + 1
