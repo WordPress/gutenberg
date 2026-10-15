@@ -413,12 +413,21 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 
 	const isActiveCompositeItem = useCallback(
 		( item: Item, idToCheck: string ) => {
-			// All composite items use the same prefix in their IDs.
-			return idToCheck.startsWith(
-				generateCompositeItemIdPrefix( item )
+			// Compare against the exact composite item IDs of the row. A
+			// prefix check would also match other rows whose ID starts with
+			// this row's ID (e.g. `1` and `12`).
+			const idPrefix = generateCompositeItemIdPrefix( item );
+			return (
+				idToCheck === generateItemWrapperCompositeId( idPrefix ) ||
+				idToCheck === generateDropdownTriggerCompositeId( idPrefix ) ||
+				actions.some(
+					( action ) =>
+						idToCheck ===
+						generatePrimaryActionCompositeId( idPrefix, action.id )
+				)
 			);
 		},
-		[ generateCompositeItemIdPrefix ]
+		[ actions, generateCompositeItemIdPrefix ]
 	);
 
 	// Controlled state for the active composite item.
