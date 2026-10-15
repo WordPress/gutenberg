@@ -9,7 +9,7 @@
 
 ### New Features
 
--   Add the `color.placeholder` block support ([#71382](https://github.com/WordPress/gutenberg/issues/71382)).
+-   Add the `color.placeholder` block support ([#84861](https://github.com/WordPress/gutenberg/pull/84861)).
 
 ### Bug Fixes
 

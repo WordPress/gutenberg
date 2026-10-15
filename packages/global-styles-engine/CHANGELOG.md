@@ -9,7 +9,7 @@
 
 ### New Features
 
--   Accept `color.placeholder` as a valid theme.json setting ([#71382](https://github.com/WordPress/gutenberg/issues/71382)).
+-   Accept `color.placeholder` as a valid theme.json setting ([#84861](https://github.com/WordPress/gutenberg/pull/84861)).
 
 ## 1.24.0 (2026-10-07)
 
