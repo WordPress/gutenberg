@@ -1,5 +1,88 @@
 import { describe, expect, it } from 'vitest';
-import { isValidHref, getFormatBoundary } from '../utils';
+import { createLinkFormat, isValidHref, getFormatBoundary } from '../utils';
+
+describe( 'createLinkFormat', () => {
+	it( 'preserves metadata not owned by the link controls without mutating the active format', () => {
+		const attributes = Object.freeze( {
+			url: 'https://old.example',
+			_id: 'manual-id',
+			pluginValue: 'registered metadata',
+		} );
+		const unregisteredAttributes = Object.freeze( {
+			'data-pizza': 'Pepperoni',
+			'aria-label': 'Accessible label',
+			title: 'Tooltip',
+		} );
+		const activeFormat = Object.freeze( {
+			type: 'core/link',
+			attributes,
+			unregisteredAttributes,
+		} );
+
+		const format = createLinkFormat(
+			{ url: 'https://new.example' },
+			activeFormat
+		);
+
+		expect( format.attributes ).toEqual( {
+			url: 'https://new.example',
+			_id: 'manual-id',
+			pluginValue: 'registered metadata',
+		} );
+		expect( format.unregisteredAttributes ).toEqual(
+			unregisteredAttributes
+		);
+		expect( activeFormat.attributes ).toBe( attributes );
+		expect( attributes.url ).toBe( 'https://old.example' );
+	} );
+
+	it( 'replaces managed settings while retaining the separate HTML id', () => {
+		const format = createLinkFormat(
+			{
+				url: 'https://new.example',
+				opensInNewWindow: false,
+				nofollow: false,
+				cssClasses: ' ',
+			},
+			{
+				type: 'core/link',
+				attributes: {
+					url: 'https://old.example',
+					type: 'post',
+					id: '42',
+					_id: 'manual-id',
+					target: '_blank',
+					rel: 'noopener nofollow',
+					class: 'old-class',
+				},
+			}
+		);
+
+		expect( format.attributes ).toEqual( {
+			url: 'https://new.example',
+			_id: 'manual-id',
+		} );
+	} );
+
+	it( 'creates a new link with only its supplied settings', () => {
+		expect(
+			createLinkFormat( {
+				url: 'https://new.example',
+				opensInNewWindow: true,
+				nofollow: true,
+				cssClasses: '  button  ',
+			} )
+		).toEqual( {
+			type: 'core/link',
+			attributes: {
+				url: 'https://new.example',
+				target: '_blank',
+				rel: 'noopener nofollow',
+				class: 'button',
+			},
+		} );
+	} );
+} );
 
 describe( 'isValidHref', () => {
 	it( 'returns true if the href cannot be recognised as a url or an anchor link', () => {

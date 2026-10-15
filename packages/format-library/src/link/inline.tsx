@@ -14,6 +14,7 @@ import {
 	split,
 	concat,
 	useAnchor,
+	getActiveFormat,
 } from '@wordpress/rich-text';
 import {
 	LinkControl,
@@ -83,6 +84,16 @@ function InlineLinkUI( {
 	focusOnMount,
 }: InlineLinkUIProps ) {
 	const richLinkTextValue = getRichTextValueFromSelection( value, isActive );
+	const currentFormat = isActive
+		? getActiveFormat(
+				{
+					...richLinkTextValue,
+					start: 0,
+					end: richLinkTextValue.text.length,
+				},
+				'core/link'
+			)
+		: undefined;
 
 	// Get the text content minus any HTML tags.
 	const richTextText = richLinkTextValue.text;
@@ -143,17 +154,20 @@ function InlineLinkUI( {
 		};
 
 		const newUrl = prependHTTPS( nextValue?.url ?? '' );
-		const linkFormat = createLinkFormat( {
-			url: newUrl,
-			type: nextValue.type,
-			id:
-				nextValue.id !== undefined && nextValue.id !== null
-					? String( nextValue.id )
-					: undefined,
-			opensInNewWindow: nextValue.opensInNewTab,
-			nofollow: nextValue.nofollow,
-			cssClasses: nextValue.cssClasses,
-		} );
+		const linkFormat = createLinkFormat(
+			{
+				url: newUrl,
+				type: nextValue.type,
+				id:
+					nextValue.id !== undefined && nextValue.id !== null
+						? String( nextValue.id )
+						: undefined,
+				opensInNewWindow: nextValue.opensInNewTab,
+				nofollow: nextValue.nofollow,
+				cssClasses: nextValue.cssClasses,
+			},
+			currentFormat
+		);
 
 		const newText = nextValue.title || newUrl;
 

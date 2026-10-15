@@ -132,22 +132,37 @@ export function isValidHref( href: string ): boolean {
  * @param options.opensInNewWindow Whether this link will open in a new window.
  * @param options.nofollow         Whether this link is marked as no follow relationship.
  * @param options.cssClasses       The CSS classes to apply to the link.
+ * @param currentFormat            The existing link format whose other attributes should be retained.
  * @return The final format object.
  */
-export function createLinkFormat( {
-	url,
-	type,
-	id,
-	opensInNewWindow,
-	nofollow,
-	cssClasses,
-}: LinkFormatOptions ): LinkFormat {
+export function createLinkFormat(
+	{
+		url,
+		type,
+		id,
+		opensInNewWindow,
+		nofollow,
+		cssClasses,
+	}: LinkFormatOptions,
+	currentFormat?: RichTextFormat
+): LinkFormat {
 	const format: LinkFormat = {
+		...currentFormat,
 		type: 'core/link',
 		attributes: {
+			...currentFormat?.attributes,
 			url,
 		},
 	};
+	for ( const attribute of [
+		'type',
+		'id',
+		'target',
+		'rel',
+		'class',
+	] as const ) {
+		delete format.attributes[ attribute ];
+	}
 
 	if ( type ) {
 		format.attributes.type = type;
