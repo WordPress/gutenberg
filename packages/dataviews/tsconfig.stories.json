@@ -32,7 +32,7 @@
 		{ "path": "../hooks" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../kebab-case" },
+		{ "path": "../kebab-case/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },

@@ -1004,6 +1004,61 @@ test.describe( 'Synced pattern', () => {
 		] );
 	} );
 
+	test( 'shows the saved edits after editing the original and going back', async ( {
+		page,
+		requestUtils,
+		editor,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Synced pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Before Edit</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+		await editor.publishPost();
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Edit original' } )
+			.click();
+
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+		await expect(
+			editorTopBar.getByRole( 'heading', {
+				name: 'Synced pattern',
+				level: 1,
+			} )
+		).toBeVisible();
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.fill( 'After Edit' );
+		await editorTopBar.getByRole( 'button', { name: 'Save' } ).click();
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Pattern updated.' } )
+		).toBeVisible();
+
+		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.getByText( 'After Edit' )
+		).toBeVisible();
+	} );
+
 	test( 'can be created, inserted, and converted to a regular block', async ( {
 		page,
 		editor,
@@ -1395,6 +1450,41 @@ test.describe( 'Synced pattern - entity navigation', () => {
 test.describe( 'Synced pattern - read-only access', () => {
 	let postId;
 
+	/**
+	 * Opens an editor page in a new browser context, logged in as the author.
+	 *
+	 * @param {Object} browser      Playwright browser.
+	 * @param {Object} requestUtils Request utils.
+	 * @param {string} path         Admin path to open.
+	 * @return {Promise<Object>} The page and its context.
+	 */
+	async function openAsAuthor( browser, requestUtils, path ) {
+		const context = await browser.newContext( {
+			baseURL: requestUtils.baseURL,
+			storageState: { cookies: [], origins: [] },
+		} );
+		const page = await context.newPage();
+		await page.goto( '/wp-login.php' );
+		await page
+			.getByLabel( 'Username or Email Address' )
+			.fill( 'patternauthor' );
+		await page
+			.getByLabel( 'Password', { exact: true } )
+			.fill( 'patternauthorpassword' );
+		await page.getByRole( 'button', { name: 'Log In' } ).click();
+		await page.waitForURL( '**/wp-admin/**' );
+
+		await page.goto( path );
+		await page.waitForFunction( () => !! window.wp?.data );
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/preferences' )
+				.set( 'core/edit-post', 'welcomeGuide', false );
+		} );
+
+		return { page, context };
+	}
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllBlocks();
 		const author = await requestUtils.createUser( {
@@ -1430,28 +1520,23 @@ test.describe( 'Synced pattern - read-only access', () => {
 		browser,
 		requestUtils,
 	} ) => {
-		const context = await browser.newContext( {
-			baseURL: requestUtils.baseURL,
-			storageState: { cookies: [], origins: [] },
-		} );
-		const page = await context.newPage();
-		await page.goto( '/wp-login.php' );
-		await page
-			.getByLabel( 'Username or Email Address' )
-			.fill( 'patternauthor' );
-		await page
-			.getByLabel( 'Password', { exact: true } )
-			.fill( 'patternauthorpassword' );
-		await page.getByRole( 'button', { name: 'Log In' } ).click();
-		await page.waitForURL( '**/wp-admin/**' );
+		const { page, context } = await openAsAuthor(
+			browser,
+			requestUtils,
+			`/wp-admin/post.php?post=${ postId }&action=edit`
+		);
 
-		await page.goto( `/wp-admin/post.php?post=${ postId }&action=edit` );
-		await page.waitForFunction( () => !! window.wp?.data );
-		await page.evaluate( () => {
-			window.wp.data
-				.dispatch( 'core/preferences' )
-				.set( 'core/edit-post', 'welcomeGuide', false );
+		// The pattern loads without a request the server refuses.
+		const refusedRequests = [];
+		page.on( 'response', ( response ) => {
+			if (
+				response.url().includes( '/wp/v2/blocks' ) &&
+				response.status() === 403
+			) {
+				refusedRequests.push( response.url() );
+			}
 		} );
+		await page.reload();
 
 		const editor = new Editor( { page } );
 		const patternBlock = editor.canvas.getByRole( 'document', {
@@ -1481,6 +1566,68 @@ test.describe( 'Synced pattern - read-only access', () => {
 				.getByRole( 'toolbar', { name: 'Block tools' } )
 				.getByRole( 'button', { name: 'Edit original' } )
 		).toBeHidden();
+		expect( refusedRequests ).toEqual( [] );
+
+		await context.close();
+	} );
+
+	test( 'can be detached by a user who cannot edit it', async ( {
+		browser,
+		requestUtils,
+	} ) => {
+		const { page, context } = await openAsAuthor(
+			browser,
+			requestUtils,
+			`/wp-admin/post.php?post=${ postId }&action=edit`
+		);
+		const editor = new Editor( { page } );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
+		);
+		await editor.clickBlockOptionsMenuItem( 'Detach' );
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Detach' } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Read-only pattern content' },
+			},
+		] );
+
+		await context.close();
+	} );
+
+	test( 'can be inserted by a user who cannot edit it', async ( {
+		browser,
+		requestUtils,
+	} ) => {
+		const { page, context } = await openAsAuthor(
+			browser,
+			requestUtils,
+			'/wp-admin/post-new.php'
+		);
+		const editor = new Editor( { page } );
+
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+		await page
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Administrator pattern' );
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: 'Administrator pattern' } )
+			.click();
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.getByText( 'Read-only pattern content' )
+		).toBeVisible();
 
 		await context.close();
 	} );
