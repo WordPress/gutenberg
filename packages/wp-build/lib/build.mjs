@@ -138,6 +138,8 @@ const baseDefine = {
 			false
 	),
 };
+// Keep esbuild's module condition when enabling development exports.
+const developmentConditions = [ 'development', 'module' ];
 const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
 	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
@@ -613,6 +615,7 @@ async function bundlePackage( packageName, options = {} ) {
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
 				define: getDefine( true ),
+				conditions: developmentConditions,
 				plugins: [
 					...baseBundlePlugins,
 					wordpressExternalsPlugin(
@@ -708,6 +711,7 @@ async function bundlePackage( packageName, options = {} ) {
 						platform: 'browser',
 						minify: false,
 						define: getDefine( true ),
+						conditions: developmentConditions,
 						plugins: [
 							styleRuntimeAliasPlugin(),
 							wordpressExternalsPlugin(
@@ -1706,6 +1710,7 @@ async function buildRoute( routeName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						styleRuntimeAliasPlugin(),
 						wordpressExternalsPlugin(
@@ -1757,6 +1762,7 @@ async function buildRoute( routeName ) {
 				target: getEsbuildTarget(),
 				minify: false,
 				define: getDefine( true ),
+				conditions: developmentConditions,
 				plugins: [
 					...createStyleBundlingPlugins( routeDir ),
 					wordpressExternalsPlugin(
@@ -1867,6 +1873,7 @@ async function buildWidget( widgetName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						...createStyleBundlingPlugins( widgetDir ),
 						wordpressExternalsPlugin(
@@ -1917,6 +1924,7 @@ async function buildWidget( widgetName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						styleRuntimeAliasPlugin(),
 						wordpressExternalsPlugin(
