@@ -78,12 +78,19 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			return;
 		}
 
-		// While the canvas has focus, select the rich text field in the
-		// store and let it place its caret. Focusing it here would move
-		// focus off an editing host and back, which resets the iOS
-		// keyboard's capitalization.
+		// When the rich text field will take focus itself (focus is in its
+		// container or was lost to the body), select it in the store and
+		// let it place its caret. Focusing it here would move focus off an
+		// editing host and back, which resets the iOS keyboard's
+		// capitalization.
 		const attributeKey = target.dataset.wpBlockAttributeKey;
-		if ( attributeKey && ownerDocument.hasFocus() ) {
+		const { activeElement: focused, body } = ownerDocument;
+		const container = target.parentElement?.closest( '[contenteditable]' );
+		if (
+			attributeKey &&
+			ownerDocument.hasFocus() &&
+			( focused === body || container?.contains( focused ) )
+		) {
 			const selectionStart = getSelectionStart();
 			if (
 				selectionStart.clientId === clientId &&
