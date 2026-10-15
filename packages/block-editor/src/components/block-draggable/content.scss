@@ -20,3 +20,17 @@
 		content: none !important;
 	}
 }
+
+// A multi selection drag shows two of the dragged blocks as cards and
+// hides the rest.
+[data-drag-pile] .block-editor-block-list__layout .is-dragging {
+	&:not([data-drag-pile]) {
+		visibility: hidden;
+	}
+
+	&[data-drag-pile] {
+		position: relative;
+		z-index: 999;
+		box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.15);
+	}
+}

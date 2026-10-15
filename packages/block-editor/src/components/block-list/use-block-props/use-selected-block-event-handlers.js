@@ -141,45 +141,23 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				ownerDocument.addEventListener( 'dragend', restore );
 			}
 
-			/**
-			 * Adds the multi-selection drag visuals to the pressed block that
-			 * the block drag lifts: the block is held by its top left corner,
-			 * the next selected block slides out from underneath it, slightly
-			 * turned, and a count of the dragged blocks sits on its top right
-			 * corner. The rest of the selection hides in place.
-			 *
-			 * @param {DragEvent} event     Drag start event.
-			 * @param {string[]}  clientIds The dragged block client IDs.
-			 * @param {DOMRect}   rect      The pressed block's rectangle.
-			 * @param {number}    inverted  The inverse of the canvas scale.
-			 */
+			// Adds the multi-selection drag visuals to the pressed block that
+			// the block drag lifts: it is held by its top left corner, the next
+			// selected block peeks out from underneath it, and a count of the
+			// dragged blocks sits on its top right corner.
 			function startPile( event, clientIds, rect, inverted ) {
 				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
-				const blockNodes = clientIds
-					.map( ( selectedClientId ) =>
-						selectedClientId === clientId
-							? node
-							: ownerDocument.querySelector(
-									`[data-block="${ selectedClientId }"]`
-								)
-					)
-					.filter( Boolean );
-				const index = blockNodes.indexOf( node );
-				const backNode =
-					blockNodes[ index + 1 ] ?? blockNodes[ index - 1 ];
-				const restNodes = blockNodes.filter(
-					( blockNode ) =>
-						blockNode !== node && blockNode !== backNode
+				const index = clientIds.indexOf( clientId );
+				const backNode = ownerDocument.querySelector(
+					`[data-block="${
+						clientIds[ index + 1 ] ?? clientIds[ index - 1 ]
+					}"]`
 				);
-				const restoreCallbacks = [];
-				const shadow = '4px 4px 8px rgba(0, 0, 0, 0.15)';
-				// Every block scales towards the same diagonal, and only ever
-				// down.
+				// Scales a block down to a fixed diagonal.
 				const cardScale = ( { width, height } ) =>
 					Math.min( 1, 420 / Math.hypot( width, height ) );
-				// Moves a block's top left corner to x, y. Scaling and turning
-				// happen around the center, hence the compensation.
+				// Moves a block's top left corner to x, y, compensating for
+				// scaling around the center.
 				const toTransform = ( from, x, y, scale, turn = 0 ) =>
 					`translate(${
 						( x - from.left - ( from.width * ( 1 - scale ) ) / 2 ) *
@@ -188,23 +166,21 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 						( y - from.top - ( from.height * ( 1 - scale ) ) / 2 ) *
 						inverted
 					}px) scale(${ scale }) rotate(${ turn }deg)`;
-
-				// The pointer holds the block just inside its top left corner.
-				const grabOffset = 4;
-				const left = event.clientX - grabOffset;
-				const top = event.clientY - grabOffset;
+				const left = event.clientX - 4;
+				const top = event.clientY - 4;
 				const scale = cardScale( rect );
 				const width = rect.width * scale;
 				const height = rect.height * scale;
 
-				// Keeps the slot styling for dragged blocks off the cards.
+				// Hides the rest of the selection and keeps the slot styling
+				// off the cards.
+				ownerDocument.documentElement.dataset.dragPile = 'true';
 				node.dataset.dragPile = 'true';
 				node.style.transformOrigin = '50% 50%';
 				node.style.transform = toTransform( rect, left, top, scale );
 				node.style.opacity = '';
-				node.style.boxShadow = shadow;
-				restoreCallbacks.push( () => delete node.dataset.dragPile );
 
+				let restoreBackNode;
 				if ( backNode ) {
 					const backRect = backNode.getBoundingClientRect();
 					const backScale = cardScale( backRect );
@@ -215,74 +191,35 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					backNode.id = null;
 					backNode.after( backClone );
 					backNode.dataset.dragPile = 'true';
+					restoreBackNode = () => {
+						backNode.setAttribute( 'style', backStyle ?? '' );
+						delete backNode.dataset.dragPile;
+						backNode.id = backId;
+						backClone.remove();
+					};
 
 					const { style } = backNode;
-					style.position = 'relative';
-					style.zIndex = '999';
-					style.transformOrigin = '50% 50%';
-					style.boxShadow = shadow;
 					if (
 						isColorTransparent(
-							defaultView.getComputedStyle( backNode )
-								.backgroundColor
+							ownerDocument.defaultView.getComputedStyle(
+								backNode
+							).backgroundColor
 						)
 					) {
-						let parentElement = backNode;
-						while (
-							( parentElement = parentElement.parentElement )
-						) {
-							const { backgroundColor } =
-								defaultView.getComputedStyle( parentElement );
-							if ( ! isColorTransparent( backgroundColor ) ) {
-								style.backgroundColor = backgroundColor;
-								break;
-							}
-						}
+						style.backgroundColor = node.style.backgroundColor;
 					}
-
-					// It starts centered under the pressed block, then slides
-					// out a little to the left with its bottom edge peeking
-					// out below.
-					const backWidth = backRect.width * backScale;
-					const backHeight = backRect.height * backScale;
-					style.transform = toTransform(
-						backRect,
-						left + ( width - backWidth ) / 2,
-						top + ( height - backHeight ) / 2,
-						backScale
-					);
-					void backNode.offsetHeight;
+					// Slides out to the left with its bottom edge peeking out
+					// below the pressed block.
 					style.transition = 'transform 0.2s ease-out';
 					style.transform = toTransform(
 						backRect,
 						left - 12,
-						top + height + 24 - backHeight,
+						top + height + 24 - backRect.height * backScale,
 						backScale,
 						1.5
 					);
-
-					restoreCallbacks.push( () => {
-						if ( backStyle === null ) {
-							backNode.removeAttribute( 'style' );
-						} else {
-							backNode.setAttribute( 'style', backStyle );
-						}
-						delete backNode.dataset.dragPile;
-						backNode.id = backId;
-						backClone.remove();
-					} );
 				}
 
-				for ( const blockNode of restNodes ) {
-					const { visibility } = blockNode.style;
-					blockNode.style.visibility = 'hidden';
-					restoreCallbacks.push( () => {
-						blockNode.style.visibility = visibility;
-					} );
-				}
-
-				// Most of the selection may be hidden, so the cards alone do
-				// not tell how many blocks are dragged.
 				const countBadge = ownerDocument.createElement( 'div' );
 				countBadge.className = 'block-editor-block-list__drag-count';
 				countBadge.textContent = String( clientIds.length );
@@ -290,11 +227,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 
 				function positionCountBadge( clientX, clientY ) {
 					countBadge.style.left = `${
-						( clientX - grabOffset + width ) * inverted - 12
+						( clientX - 4 + width ) * inverted - 12
 					}px`;
-					countBadge.style.top = `${
-						( clientY - grabOffset ) * inverted - 12
-					}px`;
+					countBadge.style.top = `${ ( clientY - 4 ) * inverted - 12 }px`;
 				}
 				positionCountBadge( event.clientX, event.clientY );
 
@@ -308,7 +243,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 						positionCountBadge( clientX, clientY );
 					},
 					end() {
-						restoreCallbacks.forEach( ( restore ) => restore() );
+						delete ownerDocument.documentElement.dataset.dragPile;
+						delete node.dataset.dragPile;
+						restoreBackNode?.();
 						countBadge.remove();
 					},
 				};
@@ -420,7 +357,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					'pointerEvents',
 					'opacity',
 					'backgroundColor',
-					'boxShadow',
 				] ) {
 					originalNodeProperties[ property ] = node.style[ property ];
 				}

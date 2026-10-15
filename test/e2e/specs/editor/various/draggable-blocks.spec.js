@@ -601,8 +601,12 @@ test.describe( 'Draggable block', () => {
 			.poll( () => spacerBlock.evaluate( ( n ) => n.style.position ) )
 			.toBe( 'relative' );
 		await expect
-			.poll( () => separatorBlock.evaluate( ( n ) => n.style.position ) )
-			.toBe( 'relative' );
+			.poll( () =>
+				separatorBlock.evaluate( ( n ) =>
+					n.hasAttribute( 'data-drag-pile' )
+				)
+			)
+			.toBe( true );
 		await expect(
 			editor.canvas.locator( '.block-editor-block-list__drag-count' )
 		).toHaveText( '2' );
@@ -626,8 +630,12 @@ test.describe( 'Draggable block', () => {
 			.poll( () => spacerBlock.evaluate( ( n ) => n.style.position ) )
 			.toBe( '' );
 		await expect
-			.poll( () => separatorBlock.evaluate( ( n ) => n.style.position ) )
-			.toBe( '' );
+			.poll( () =>
+				separatorBlock.evaluate( ( n ) =>
+					n.hasAttribute( 'data-drag-pile' )
+				)
+			)
+			.toBe( false );
 		await expect(
 			editor.canvas.locator( '.block-editor-block-list__drag-count' )
 		).toHaveCount( 0 );
