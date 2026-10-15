@@ -400,7 +400,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 					onActionPerformed={ onActionPerformed }
 				/>
 				{ fieldsError && (
-					<Notice.Root intent="error">
+<Notice.Root intent="error" role="alert">
 						<Notice.Description>
 							{ fieldsError.message }
 						</Notice.Description>
