@@ -131,10 +131,21 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 	};
 }
 
+/**
+ * The media categories available, and whether or not the list has been resolved.
+ * `hasResolved` allows a consumer to distinguish between "no categories available"
+ * and "still determining available categories." (i.e. categories are loading)
+ *
+ * @param {string} [rootClientId] The client id of the insertion point.
+ * @return {{ categories: InserterMediaCategory[], hasResolved: boolean }} The categories, and whether they have been worked out yet.
+ */
 export function useMediaCategories( rootClientId ) {
 	const [ categories, setCategories ] = useState(
 		/** @type {InserterMediaCategory[]} */ ( [] )
 	);
+	// Stays true once set: a later run (the insertion point moved, say)
+	// refreshes the list in place rather than emptying the tab again.
+	const [ hasResolved, setHasResolved ] = useState( false );
 
 	const inserterMediaCategories = useSelect(
 		( select ) =>
@@ -167,6 +178,7 @@ export function useMediaCategories( rootClientId ) {
 			// If `inserterMediaCategories` is not defined in
 			// block editor settings, do not show any media categories.
 			if ( ! inserterMediaCategories ) {
+				setHasResolved( true );
 				return;
 			}
 			// Loop through categories to check if they have at least one media item.
@@ -213,6 +225,7 @@ export function useMediaCategories( rootClientId ) {
 			if ( !! _categories.length ) {
 				setCategories( _categories );
 			}
+			setHasResolved( true );
 		} )();
 	}, [
 		canInsertImage,
@@ -220,5 +233,5 @@ export function useMediaCategories( rootClientId ) {
 		canInsertAudio,
 		inserterMediaCategories,
 	] );
-	return categories;
+	return { categories, hasResolved };
 }

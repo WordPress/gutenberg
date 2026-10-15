@@ -1,6 +1,24 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useMediaResults } from '../hooks';
+import { useMediaCategories, useMediaResults } from '../hooks';
+import { lock } from '../../../../lock-unlock';
+
+// `useMediaCategories` reads the registered categories and the insertion
+// point's permissions from the store. Stand in for both, so the tests only
+// exercise what the hook does with them.
+const { storeStub } = vi.hoisted( () => ( {
+	storeStub: {
+		getInserterMediaCategories: vi.fn(),
+		canInsertBlockType: vi.fn( () => true ),
+	},
+} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: ( mapSelect ) => mapSelect( () => storeStub ),
+} ) );
+// The hook reaches the category list through `unlock`, so the stub has to be
+// locked rather than mocked: the store itself unlocks at import time.
+lock( storeStub, storeStub );
 
 describe( 'useMediaResults', () => {
 	const createCategory = ( name, items ) => ( {
@@ -259,5 +277,47 @@ describe( 'useMediaResults', () => {
 
 		expect( fetch ).toHaveBeenCalledTimes( 1 );
 		expect( result.current.mediaList ).toEqual( [ { id: 1 } ] );
+	} );
+} );
+
+describe( 'useMediaCategories', () => {
+	const imagesCategory = {
+		name: 'images',
+		mediaType: 'image',
+		fetch: vi.fn( async () => [ { id: 1 } ] ),
+	};
+
+	beforeEach( () => {
+		storeStub.getInserterMediaCategories.mockReturnValue( [
+			imagesCategory,
+		] );
+	} );
+
+	it( 'reports the categories once it has worked out which have media', async () => {
+		const { result } = renderHook( () => useMediaCategories() );
+
+		// Finding out takes a request per category, so there is nothing to
+		// report yet.
+		expect( result.current.hasResolved ).toBe( false );
+		expect( result.current.categories ).toEqual( [] );
+
+		await waitFor( () =>
+			expect( result.current.hasResolved ).toBe( true )
+		);
+		expect( result.current.categories ).toEqual( [ imagesCategory ] );
+	} );
+
+	it( 'resolves with no categories when none has media', async () => {
+		storeStub.getInserterMediaCategories.mockReturnValue( [
+			{ ...imagesCategory, fetch: vi.fn( async () => [] ) },
+		] );
+		const { result } = renderHook( () => useMediaCategories() );
+
+		// An empty list is the answer here, not the absence of one, which is
+		// the difference the tab needs to show "no results" rather than wait.
+		await waitFor( () =>
+			expect( result.current.hasResolved ).toBe( true )
+		);
+		expect( result.current.categories ).toEqual( [] );
 	} );
 } );
