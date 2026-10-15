@@ -2,21 +2,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import type { Action, Field } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
 import type { PostType } from '@wordpress/fields';
-import {
-	viewPost,
-	viewPostRevisions,
-	duplicatePost,
-	duplicatePattern,
-	reorderPage,
-	exportPattern,
-	permanentlyDeletePost,
-	restorePost,
-	trashPost,
-	renamePost,
-	resetPost,
-	deletePost,
-	duplicateTemplatePart,
-} from '@wordpress/fields';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -76,6 +61,43 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
+type CoreActions = Record< string, Action< any > >;
+
+/**
+ * Imports the script modules of the core actions a post type may get: the
+ * default actions, and the actions of patterns and template parts.
+ *
+ * A module that fails to load is reported and skipped, so the post type
+ * still gets the actions of the other modules.
+ *
+ * @param postType The post type.
+ * @return The actions of each module, keyed by action id.
+ */
+async function importCoreActionModules(
+	postType: string
+): Promise< [ CoreActions, CoreActions, CoreActions ] > {
+	const results = await Promise.allSettled( [
+		import( '@wordpress/core-actions/post_type_supports' ),
+		postType === 'wp_block'
+			? import( '@wordpress/core-actions/wp_block' )
+			: undefined,
+		postType === 'wp_template_part'
+			? import( '@wordpress/core-actions/wp_template_part' )
+			: undefined,
+	] );
+	return results.map( ( result ) => {
+		if ( result.status === 'rejected' ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				`Could not load the core actions of the ${ postType } post type.`,
+				result.reason
+			);
+			return {};
+		}
+		return result.value?.default ?? {};
+	} ) as [ CoreActions, CoreActions, CoreActions ];
+}
+
 export const registerPostTypeSchema =
 	( postType: string ) =>
 	async ( { registry }: { registry: any } ) => {
@@ -92,6 +114,10 @@ export const registerPostTypeSchema =
 			postType
 		);
 
+		// Start importing the script modules of the core actions while the
+		// post type, the permissions, and the theme resolve.
+		const coreActionModules = importCoreActionModules( postType );
+
 		const postTypeConfig = ( await registry
 			.resolveSelect( coreStore )
 			.getPostType( postType ) ) as PostType;
@@ -105,6 +131,30 @@ export const registerPostTypeSchema =
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
+
+		const [
+			postTypeSupportsActions,
+			wpBlockActions,
+			wpTemplatePartActions,
+		] = await coreActionModules;
+		const {
+			'view-post': viewPost,
+			'view-post-revisions': viewPostRevisions,
+			'duplicate-post': duplicatePost,
+			'rename-post': renamePost,
+			'order-pages': reorderPage,
+			restore: restorePost,
+			'reset-post': resetPost,
+			'delete-post': deletePost,
+			'move-to-trash': trashPost,
+			'permanently-delete': permanentlyDeletePost,
+		} = postTypeSupportsActions;
+		const {
+			'duplicate-pattern': duplicatePattern,
+			'export-pattern': exportPattern,
+		} = wpBlockActions;
+		const { 'duplicate-template-part': duplicateTemplatePart } =
+			wpTemplatePartActions;
 
 		let canDuplicate =
 			! [ 'wp_block', 'wp_template_part', 'wp_template' ].includes(
