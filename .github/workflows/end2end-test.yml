@@ -188,6 +188,7 @@ jobs:
                   name: html-report--attempt-${{ github.run_attempt }}
                   path: playwright-report
                   if-no-files-found: ignore
+                  retention-days: 14
 
             # Flaky tests are only reported as a comment on the pull request. The
             # merge step above only sets `artifact-id` when a report was produced,
