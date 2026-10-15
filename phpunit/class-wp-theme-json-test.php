@@ -352,10 +352,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				'color'  => true,
 			),
 			'color'      => array(
-				'link'    => true,
-				'heading' => true,
-				'button'  => true,
-				'caption' => true,
+				'link'        => true,
+				'heading'     => true,
+				'button'      => true,
+				'caption'     => true,
+				'placeholder' => true,
 			),
 			'dimensions' => array(
 				'aspectRatio' => true,
@@ -396,10 +397,11 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'color'  => true,
 					),
 					'color'      => array(
-						'link'    => true,
-						'heading' => true,
-						'button'  => true,
-						'caption' => true,
+						'link'        => true,
+						'heading'     => true,
+						'button'      => true,
+						'caption'     => true,
+						'placeholder' => true,
 					),
 					'dimensions' => array(
 						'aspectRatio' => true,

@@ -72,6 +72,9 @@ export function useSettingsForBlockElement(
 			caption:
 				updatedSettings.color?.caption &&
 				supportedStyles.includes( 'captionColor' ),
+			placeholder:
+				updatedSettings.color?.placeholder &&
+				supportedStyles.includes( 'placeholderColor' ),
 		};
 
 		// Some blocks can enable background colors but disable gradients.

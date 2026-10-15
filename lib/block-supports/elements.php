@@ -32,7 +32,7 @@ function gutenberg_should_add_elements_class_name( $block, $options ) {
 	}
 
 	$element_color_properties = array(
-		'button'  => array(
+		'button'    => array(
 			'skip'  => $options['button']['skip'] ?? false,
 			'paths' => array(
 				array( 'button', 'color', 'text' ),
@@ -40,14 +40,14 @@ function gutenberg_should_add_elements_class_name( $block, $options ) {
 				array( 'button', 'color', 'gradient' ),
 			),
 		),
-		'link'    => array(
+		'link'      => array(
 			'skip'  => $options['link']['skip'] ?? false,
 			'paths' => array(
 				array( 'link', 'color', 'text' ),
 				array( 'link', ':hover', 'color', 'text' ),
 			),
 		),
-		'heading' => array(
+		'heading'   => array(
 			'skip'  => $options['heading']['skip'] ?? false,
 			'paths' => array(
 				array( 'heading', 'color', 'text' ),
@@ -71,6 +71,12 @@ function gutenberg_should_add_elements_class_name( $block, $options ) {
 				array( 'h6', 'color', 'text' ),
 				array( 'h6', 'color', 'background' ),
 				array( 'h6', 'color', 'gradient' ),
+			),
+		),
+		'textInput' => array(
+			'skip'  => $options['textInput']['skip'] ?? false,
+			'paths' => array(
+				array( 'textInput', '::placeholder', 'color', 'text' ),
 			),
 		),
 	);
@@ -134,18 +140,21 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 	$skip_link_color_serialization         = wp_should_skip_block_supports_serialization( $block_type, 'color', 'link' );
 	$skip_heading_color_serialization      = wp_should_skip_block_supports_serialization( $block_type, 'color', 'heading' );
 	$skip_button_color_serialization       = wp_should_skip_block_supports_serialization( $block_type, 'color', 'button' );
+	$skip_placeholder_color_serialization  = wp_should_skip_block_supports_serialization( $block_type, 'color', 'placeholder' );
 	$skips_all_element_color_serialization = $skip_link_color_serialization &&
 		$skip_heading_color_serialization &&
-		$skip_button_color_serialization;
+		$skip_button_color_serialization &&
+		$skip_placeholder_color_serialization;
 
 	if ( $skips_all_element_color_serialization ) {
 		return $parsed_block;
 	}
 
 	$options = array(
-		'button'  => array( 'skip' => $skip_button_color_serialization ),
-		'link'    => array( 'skip' => $skip_link_color_serialization ),
-		'heading' => array( 'skip' => $skip_heading_color_serialization ),
+		'button'    => array( 'skip' => $skip_button_color_serialization ),
+		'link'      => array( 'skip' => $skip_link_color_serialization ),
+		'heading'   => array( 'skip' => $skip_heading_color_serialization ),
+		'textInput' => array( 'skip' => $skip_placeholder_color_serialization ),
 	);
 
 	if ( ! gutenberg_should_add_elements_class_name( $parsed_block, $options ) ) {
@@ -159,20 +168,26 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 
 	// Generate element styles based on selector and store in style engine for enqueuing.
 	$element_types = array(
-		'button'  => array(
+		'button'    => array(
 			'selector' => ".$class_name .wp-element-button, .$class_name .wp-block-button__link",
 			'skip'     => $skip_button_color_serialization,
 		),
-		'link'    => array(
+		'link'      => array(
 			// :where(:not) matches theme.json selector.
 			'selector'       => ".$class_name a:where(:not(.wp-element-button))",
 			'hover_selector' => ".$class_name a:where(:not(.wp-element-button)):hover",
 			'skip'           => $skip_link_color_serialization,
 		),
-		'heading' => array(
+		'heading'   => array(
 			'selector' => ".$class_name h1, .$class_name h2, .$class_name h3, .$class_name h4, .$class_name h5, .$class_name h6",
 			'skip'     => $skip_heading_color_serialization,
 			'elements' => array( 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ),
+		),
+		'textInput' => array(
+			// Matches the theme.json textInput element selector.
+			'selector'             => ".$class_name textarea, .$class_name input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])",
+			'placeholder_selector' => ".$class_name textarea::placeholder, .$class_name input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])::placeholder",
+			'skip'                 => $skip_placeholder_color_serialization,
 		),
 	);
 
@@ -198,6 +213,16 @@ function gutenberg_render_elements_support_styles( $parsed_block ) {
 					$element_style_object[':hover'],
 					array(
 						'selector' => $element_config['hover_selector'],
+						'context'  => 'block-supports',
+					)
+				);
+			}
+
+			if ( isset( $element_style_object['::placeholder'], $element_config['placeholder_selector'] ) ) {
+				gutenberg_style_engine_get_styles(
+					$element_style_object['::placeholder'],
+					array(
+						'selector' => $element_config['placeholder_selector'],
 						'context'  => 'block-supports',
 					)
 				);

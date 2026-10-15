@@ -189,6 +189,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'elements', 'heading', 'color', 'background' ],
 		support: [ 'color', 'heading' ],
 	},
+	placeholderColor: {
+		value: [ 'elements', 'textInput', '::placeholder', 'color', 'text' ],
+		support: [ 'color', 'placeholder' ],
+	},
 	fontFamily: {
 		value: [ 'typography', 'fontFamily' ],
 		support: [ 'typography', '__experimentalFontFamily' ],

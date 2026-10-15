@@ -314,6 +314,11 @@
 							"type": "boolean",
 							"default": false
 						},
+						"placeholder": {
+							"description": "This property adds block controls which allow the user to set the placeholder text color of the text inputs and textareas in a block. Placeholder color is disabled by default.\n\nPlaceholder color presets are sourced from the editor-color-palette theme support.\n\nWhen the block declares support for color.placeholder, its attributes definition is extended to include the style attribute",
+							"type": "boolean",
+							"default": false
+						},
 						"enableContrastChecker": {
 							"description": "Determines whether the contrast checker widget displays in the block editor UI.\n\nThe contrast checker appears only if the block declares support for color. It tests the readability of color combinations and warns if there is a potential issue. The property is enabled by default.\n\nSet to `false` to explicitly disable.",
 							"type": "boolean",

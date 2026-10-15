@@ -289,6 +289,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		isPlaceholderEnabled,
 		shadow,
 		defaultTextShadowPresetsEnabled,
 		customTextShadowPresets,
@@ -359,6 +360,7 @@ export function useBlockSettings( name, parentLayout ) {
 		'color.text',
 		'color.heading',
 		'color.button',
+		'color.placeholder',
 		'shadow',
 		'typography.defaultTextShadowPresets',
 		'typography.textShadowPresets.custom',
@@ -400,6 +402,7 @@ export function useBlockSettings( name, parentLayout ) {
 				link: isLinkEnabled,
 				heading: isHeadingEnabled,
 				button: isButtonEnabled,
+				placeholder: isPlaceholderEnabled,
 				text: isTextEnabled,
 			},
 			typography: {
@@ -535,6 +538,7 @@ export function useBlockSettings( name, parentLayout ) {
 		isTextEnabled,
 		isHeadingEnabled,
 		isButtonEnabled,
+		isPlaceholderEnabled,
 		shadow,
 	] );
 

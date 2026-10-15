@@ -661,6 +661,28 @@ describe( 'getResponsiveStateCSSRules', () => {
 			'@media (width <= 480px){.wp-elements-1 a:where(:not(.wp-element-button)) { color: blue; }}',
 		] );
 	} );
+
+	it( 'appends the placeholder pseudo-element to each text input selector', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					'@mobile': {
+						elements: {
+							textInput: {
+								'::placeholder': {
+									color: { text: 'blue' },
+								},
+							},
+						},
+					},
+				},
+				'core/paragraph',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			'@media (width <= 480px){.wp-elements-1 textarea::placeholder, .wp-elements-1 input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])::placeholder { color: blue; }}',
+		] );
+	} );
 } );
 
 describe( 'getCanvasStateStyleValue', () => {

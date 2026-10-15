@@ -189,6 +189,7 @@
 					"color": "#9b51e0"
 				}
 			],
+			"placeholder": true,
 			"text": true
 		},
 		"dimensions": {

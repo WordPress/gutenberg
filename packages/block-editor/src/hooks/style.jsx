@@ -4,6 +4,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	mergeGlobalStyles,
 	privateApis as globalStylesEnginePrivateApis,
+	splitSelectorList,
 } from '@wordpress/global-styles-engine';
 import {
 	getBlockSupport,
@@ -1049,12 +1050,18 @@ export default {
 // Defines which element types are supported, including their hover styles or
 // any other elements that have been included under a single element type
 // e.g. heading and h1-h6.
+// `feature` is the color support key when it differs from the element type.
 const elementTypes = [
 	{ elementType: 'button' },
 	{ elementType: 'link', pseudo: [ ':hover' ] },
 	{
 		elementType: 'heading',
 		elements: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
+	},
+	{
+		elementType: 'textInput',
+		feature: 'placeholder',
+		pseudo: [ '::placeholder' ],
 	},
 ];
 
@@ -1080,11 +1087,11 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 
 	const rules = [];
 
-	elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
+	elementTypes.forEach( ( { elementType, feature, pseudo, elements } ) => {
 		const skipSerialization = shouldSkipSerialization(
 			blockName,
 			COLOR_SUPPORT_KEY,
-			elementType
+			feature ?? elementType
 		);
 
 		if ( skipSerialization ) {
@@ -1110,7 +1117,12 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 							compileCSS( elementStyles[ pseudoSelector ], {
 								selector: scopeSelector(
 									baseSelector,
-									`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
+									splitSelectorList( ELEMENTS[ elementType ] )
+										.map(
+											( part ) =>
+												`${ part.trim() }${ pseudoSelector }`
+										)
+										.join( ', ' )
 								),
 							} )
 						);

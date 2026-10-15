@@ -283,6 +283,11 @@
 							"description": "Allow users to set caption colors in a block.",
 							"type": "boolean",
 							"default": true
+						},
+						"placeholder": {
+							"description": "Allow users to set placeholder text colors in a block.",
+							"type": "boolean",
+							"default": true
 						}
 					},
 					"additionalProperties": false

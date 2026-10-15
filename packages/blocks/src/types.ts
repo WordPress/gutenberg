@@ -1037,6 +1037,16 @@ export interface ColorProps {
 	heading?: boolean;
 
 	/**
+	 * This property adds block controls which allow the user
+	 * to set the placeholder text color of inputs in a block.
+	 *
+	 * (default) false
+	 *
+	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-placeholder
+	 */
+	placeholder?: boolean;
+
+	/**
 	 * Whether to enable the contrast checker for the block.
 	 *
 	 * (default) true

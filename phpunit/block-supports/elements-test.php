@@ -226,6 +226,29 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 				'block_markup'    => '<p id="anchor">Hello <a href="http://www.wordpress.org/">WordPress</a>!</p>',
 				'expected_markup' => '/^<p class="wp-elements-(?:[a-f0-9]{32}|[0-9]+)" id="anchor">Hello <a href="http:\/\/www.wordpress.org\/">WordPress<\/a>!<\/p>$/',
 			),
+			'placeholder styles with serialization skipped' => array(
+				'color_settings'  => array(
+					'placeholder'                     => true,
+					'__experimentalSkipSerialization' => true,
+				),
+				'elements_styles' => array(
+					'textInput' => array(
+						'::placeholder' => array( 'color' => array( 'text' => 'var:preset|color|vivid-red' ) ),
+					),
+				),
+				'block_markup'    => '<form><input type="text" placeholder="Name" /></form>',
+				'expected_markup' => '/^<form><input type="text" placeholder="Name" \/><\/form>$/',
+			),
+			'placeholder styles apply class to wrapper'    => array(
+				'color_settings'  => array( 'placeholder' => true ),
+				'elements_styles' => array(
+					'textInput' => array(
+						'::placeholder' => array( 'color' => array( 'text' => 'var:preset|color|vivid-red' ) ),
+					),
+				),
+				'block_markup'    => '<form><input type="text" placeholder="Name" /></form>',
+				'expected_markup' => '/^<form class="wp-elements-(?:[a-f0-9]{32}|[0-9]+)"><input type="text" placeholder="Name" \/><\/form>$/',
+			),
 		);
 	}
 
@@ -377,6 +400,27 @@ class WP_Block_Supports_Elements_Test extends WP_UnitTestCase {
 					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h4' . $color_css_rules .
 					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h5' . $color_css_rules .
 					'.wp-elements-(?:[a-f0-9]{32}|[0-9]+) h6' . $color_css_rules . '$/',
+			),
+			'placeholder styles are not applied if serialization is skipped' => array(
+				'color_settings'  => array(
+					'placeholder'                     => true,
+					'__experimentalSkipSerialization' => true,
+				),
+				'elements_styles' => array(
+					'textInput' => array(
+						'::placeholder' => array( 'color' => $color_styles ),
+					),
+				),
+				'expected_styles' => '/^$/',
+			),
+			'placeholder styles are applied'             => array(
+				'color_settings'  => array( 'placeholder' => true ),
+				'elements_styles' => array(
+					'textInput' => array(
+						'::placeholder' => array( 'color' => $color_styles ),
+					),
+				),
+				'expected_styles' => '/^' . preg_quote( '.wp-elements-' ) . '(?:[a-f0-9]{32}|[0-9]+)' . preg_quote( ' textarea::placeholder, .wp-elements-' ) . '(?:[a-f0-9]{32}|[0-9]+)' . preg_quote( ' input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url])::placeholder' ) . $color_css_rules . '$/',
 			),
 		);
 	}

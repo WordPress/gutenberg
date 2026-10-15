@@ -1,5 +1,6 @@
 import { useViewportMatch } from '@wordpress/compose';
 import { createContext, useContext } from '@wordpress/element';
+import { splitSelectorList } from '@wordpress/global-styles-engine';
 import type { ToolsPanelPopoverProps } from './types';
 
 /**
@@ -64,8 +65,9 @@ export function scopeSelector(
 		return selector;
 	}
 
-	const scopes = scope.split( ',' );
-	const selectors = selector.split( ',' );
+	// Commas inside :where() or :is() are not list separators.
+	const scopes = splitSelectorList( scope );
+	const selectors = splitSelectorList( selector );
 
 	const selectorsScoped: string[] = [];
 	scopes.forEach( ( outer ) => {
