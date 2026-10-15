@@ -13,12 +13,14 @@
 -   Icon: Speed up loading icons in the icon library ([#84327](https://github.com/WordPress/gutenberg/pull/84327)).
 -   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#84308](https://github.com/WordPress/gutenberg/pull/84308)).
 -   Cover: Stop an uploaded background video on the front end when the visitor prefers reduced motion ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
+-   Image: Animate touch-swipe navigation in the gallery lightbox so the image follows the finger and slides off on commit, with a quick fade-in for the next image ([#79114](https://github.com/WordPress/gutenberg/pull/79114)).
 
 ### Bug Fixes
 
 -   Media & Text: Replace deprecated `word-break: break-word` and prevent long content from widening the text column. Nested blocks that only override `word-break` can now wrap long unbroken text mid-word ([#82580](https://github.com/WordPress/gutenberg/pull/82580)).
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
 -   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it ([#82232](https://github.com/WordPress/gutenberg/pull/82232)).
+-   Cover: Decode the oEmbed iframe source before parsing it, so an embedded background video keeps the parameters the provider sent ([#83770](https://github.com/WordPress/gutenberg/pull/83770)).
 
 ## 11.2.0 (2026-10-07)
 
