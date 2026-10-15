@@ -248,30 +248,6 @@ export default function useClipboardHandler() {
 					return;
 				}
 
-				// Pasting over an entirely selected block replaces it, the
-				// equivalent of pasting into an empty block. Blocks that
-				// cannot be inserted in its place, like a list in a list, are
-				// converted below instead.
-				if (
-					! hasMultiSelection() &&
-					isBlockEntirelySelected(
-						event.target.ownerDocument,
-						firstSelectedClientId
-					) &&
-					blocks.every( ( block ) =>
-						canInsertBlockType( block.name, rootClientId )
-					)
-				) {
-					replaceBlocks(
-						selectedBlockClientIds,
-						blocks,
-						blocks.length - 1,
-						-1
-					);
-					event.preventDefault();
-					return;
-				}
-
 				const [ firstSelectedClientId ] = selectedBlockClientIds;
 				const rootClientId = getBlockRootClientId(
 					firstSelectedClientId
@@ -306,7 +282,24 @@ export default function useClipboardHandler() {
 					}
 				}
 
-				__unstableSplitSelection( newBlocks );
+				// Pasting over an entirely selected block replaces it, the
+				// equivalent of pasting into an empty block.
+				if (
+					! hasMultiSelection() &&
+					isBlockEntirelySelected(
+						event.target.ownerDocument,
+						firstSelectedClientId
+					)
+				) {
+					replaceBlocks(
+						selectedBlockClientIds,
+						newBlocks,
+						newBlocks.length - 1,
+						-1
+					);
+				} else {
+					__unstableSplitSelection( newBlocks );
+				}
 				event.preventDefault();
 			}
 		}
