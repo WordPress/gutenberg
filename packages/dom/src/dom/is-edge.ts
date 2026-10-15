@@ -103,19 +103,34 @@ export default function isEdge(
 	// (`caretRangeFromPoint` returns nothing for a point outside it, upon
 	// which `scrollIfNoRange` scrolls the container's edge into view to
 	// measure, e.g. on every arrow press within a container taller than the
-	// viewport). When the edge is outside the viewport and the selection is
-	// within it, they are at least a viewport boundary apart along that
-	// axis, so the selection cannot be at the edge. Check each axis
+	// viewport). When a container is taller than the viewport and the edge
+	// is outside while the selection is within it, they are far apart along
+	// that axis, so the selection cannot be at the edge. Check each axis
 	// separately: the vertical check must not be short-circuited by a
 	// horizontally overflowing container, and vice versa.
+	// For containers that fit within the viewport (or when the selection is
+	// near the edge), the edge must be measured directly (scrolling slightly
+	// into view if needed) so arrow navigation can traverse blocks.
 	const isFarFromVerticalEdge =
-		( y < 0 || y > defaultView.innerHeight ) &&
+		containerRect.height > defaultView.innerHeight &&
 		rangeRect.top >= 0 &&
-		rangeRect.bottom <= defaultView.innerHeight;
+		rangeRect.bottom <= defaultView.innerHeight &&
+		( isReverse
+			? y < 0 &&
+				rangeRect.top - containerRect.top > defaultView.innerHeight / 2
+			: y > defaultView.innerHeight &&
+				containerRect.bottom - rangeRect.bottom >
+					defaultView.innerHeight / 2 );
 	const isFarFromHorizontalEdge =
-		( x < 0 || x > defaultView.innerWidth ) &&
+		containerRect.width > defaultView.innerWidth &&
 		rangeRect.left >= 0 &&
-		rangeRect.right <= defaultView.innerWidth;
+		rangeRect.right <= defaultView.innerWidth &&
+		( isReverseDir
+			? x < 0 &&
+				rangeRect.left - containerRect.left > defaultView.innerWidth / 2
+			: x > defaultView.innerWidth &&
+				containerRect.right - rangeRect.right >
+					defaultView.innerWidth / 2 );
 
 	if (
 		isFarFromVerticalEdge ||
@@ -124,9 +139,19 @@ export default function isEdge(
 		return false;
 	}
 
-	const testRange = scrollIfNoRange( container, isReverse, () =>
-		hiddenCaretRangeFromPoint( ownerDocument, x, y, container )
-	);
+	const getTestRange = () => {
+		const rect = container.getBoundingClientRect();
+		const testX = isReverseDir ? rect.left + 1 : rect.right - 1;
+		const testY = isReverse ? rect.top + 1 : rect.bottom - 1;
+		return hiddenCaretRangeFromPoint(
+			ownerDocument,
+			testX,
+			testY,
+			container
+		);
+	};
+
+	const testRange = scrollIfNoRange( container, isReverse, getTestRange );
 
 	if ( ! testRange ) {
 		return false;
@@ -138,11 +163,17 @@ export default function isEdge(
 		return false;
 	}
 
+	const updatedRangeRect = getRectangleFromRange( range ) || rangeRect;
+	const updatedCollapsedRangeRect =
+		getRectangleFromRange( collapsedRange ) || collapsedRangeRect;
+
 	const verticalSide = isReverse ? 'top' : 'bottom';
 	const horizontalSide = isReverseDir ? 'left' : 'right';
-	const verticalDiff = testRect[ verticalSide ] - rangeRect[ verticalSide ];
+	const verticalDiff =
+		testRect[ verticalSide ] - updatedRangeRect[ verticalSide ];
 	const horizontalDiff =
-		testRect[ horizontalSide ] - collapsedRangeRect[ horizontalSide ];
+		testRect[ horizontalSide ] -
+		updatedCollapsedRangeRect[ horizontalSide ];
 
 	// Allow the position to be 1px off.
 	const hasVerticalDiff = Math.abs( verticalDiff ) <= 1;
