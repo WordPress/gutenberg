@@ -1,10 +1,14 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
+import type { Gradient } from '@wordpress/global-styles-engine';
 import { useBlockEditContext } from '../block-edit';
 import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
+import type { UseGradientOptions } from './types';
 
-export function __experimentalGetGradientClass( gradientSlug ) {
+export function __experimentalGetGradientClass(
+	gradientSlug: string | undefined
+): string | undefined {
 	if ( ! gradientSlug ) {
 		return undefined;
 	}
@@ -19,15 +23,18 @@ export function __experimentalGetGradientClass( gradientSlug ) {
  *
  * @return {string} Gradient value.
  */
-export function getGradientValueBySlug( gradients, slug ) {
+export function getGradientValueBySlug(
+	gradients: Gradient[] | undefined,
+	slug: string | undefined
+): string | undefined {
 	const gradient = gradients?.find( ( g ) => g.slug === slug );
 	return gradient && gradient.gradient;
 }
 
 export function __experimentalGetGradientObjectByGradientValue(
-	gradients,
-	value
-) {
+	gradients: Gradient[] | undefined,
+	value: string | undefined
+): Gradient | undefined {
 	const gradient = gradients?.find( ( g ) => g.gradient === value );
 	return gradient;
 }
@@ -39,7 +46,10 @@ export function __experimentalGetGradientObjectByGradientValue(
  * @param {string} value     Gradient value
  * @return {string} Gradient slug.
  */
-export function getGradientSlugByValue( gradients, value ) {
+export function getGradientSlugByValue(
+	gradients: Gradient[] | undefined,
+	value: string | undefined
+): string | undefined {
 	const gradient = __experimentalGetGradientObjectByGradientValue(
 		gradients,
 		value
@@ -50,7 +60,7 @@ export function getGradientSlugByValue( gradients, value ) {
 function useGradient( {
 	gradientAttribute = 'gradient',
 	customGradientAttribute = 'customGradient',
-} = {} ) {
+}: UseGradientOptions = {} ) {
 	const { clientId } = useBlockEditContext();
 
 	const [
@@ -63,20 +73,24 @@ function useGradient( {
 		'color.gradients.default'
 	);
 	const allGradients = useMemo(
+		// The settings list the palettes' gradients.
 		() => [
-			...( userGradientPalette || [] ),
-			...( themeGradientPalette || [] ),
-			...( defaultGradientPalette || [] ),
+			...( ( userGradientPalette as Gradient[] | undefined ) || [] ),
+			...( ( themeGradientPalette as Gradient[] | undefined ) || [] ),
+			...( ( defaultGradientPalette as Gradient[] | undefined ) || [] ),
 		],
 		[ userGradientPalette, themeGradientPalette, defaultGradientPalette ]
 	);
 	const { gradient, customGradient } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
-			const attributes = getBlockAttributes( clientId ) || {};
+			// The hook is used within a block, which has a client ID.
+			const attributes = getBlockAttributes( clientId! ) || {};
 			return {
-				customGradient: attributes[ customGradientAttribute ],
-				gradient: attributes[ gradientAttribute ],
+				// The gradient attributes hold a value and a slug.
+				customGradient: attributes[ customGradientAttribute ] as
+					string | undefined,
+				gradient: attributes[ gradientAttribute ] as string | undefined,
 			};
 		},
 		[ clientId, gradientAttribute, customGradientAttribute ]
@@ -84,19 +98,21 @@ function useGradient( {
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const setGradient = useCallback(
-		( newGradientValue ) => {
+		( newGradientValue?: string ) => {
 			const slug = getGradientSlugByValue(
 				allGradients,
 				newGradientValue
 			);
 			if ( slug ) {
-				updateBlockAttributes( clientId, {
+				// The hook is used within a block, which has a client ID.
+				updateBlockAttributes( clientId!, {
 					[ gradientAttribute ]: slug,
 					[ customGradientAttribute ]: undefined,
 				} );
 				return;
 			}
-			updateBlockAttributes( clientId, {
+			// The hook is used within a block, which has a client ID.
+			updateBlockAttributes( clientId!, {
 				[ gradientAttribute ]: undefined,
 				[ customGradientAttribute ]: newGradientValue,
 			} );
