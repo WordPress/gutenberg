@@ -13,6 +13,10 @@
 -   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
 -   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
 
+### Bug Fixes
+
+-   Raw handling: drop the empty bookmark links Word adds to headings instead of pasting them as `<a></a>` ([#83524](https://github.com/WordPress/gutenberg/pull/83524)).
+
 ## 16.2.0 (2026-10-07)
 
 ### Bug Fixes
