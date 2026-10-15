@@ -4,12 +4,13 @@ import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import Warning from '../warning';
+import type { MultipleUsageWarningProps } from './types';
 
 export function MultipleUsageWarning( {
 	originalBlockClientId,
 	name,
 	onReplace,
-} ) {
+}: MultipleUsageWarningProps ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const blockType = getBlockType( name );
 
