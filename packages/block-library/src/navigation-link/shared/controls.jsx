@@ -1,18 +1,31 @@
 import {
 	Button,
+	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	CheckboxControl as WCCheckboxControl,
 	TextControl,
 	TextareaControl as WCTextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import LinkContentControls from '../../utils/link-content-controls';
+import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
+import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery } from '../link-ui';
 import { useLinkPreview } from './use-link-preview';
 import { useIsInvalidLink } from './use-is-invalid-link';
+import { unlock } from '../../lock-unlock';
+
+const { LinkPicker, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Get a human-readable entity type name.
@@ -64,6 +77,7 @@ export function Controls( {
 	isLinkEditable = true,
 } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	// Use the entity binding hook for UI state (help text, link preview, etc.)
 	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
@@ -105,6 +119,11 @@ export function Controls( {
 		[]
 	);
 
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
+
 	const blockEditingMode = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getBlockEditingMode( clientId ),
@@ -121,55 +140,20 @@ export function Controls( {
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
 
-	const editButton = !! url &&
-		hasUrlBinding &&
-		isBoundEntityAvailable &&
-		entityRecord?.id &&
-		attributes.kind === 'post-type' &&
-		onNavigateToEntityRecord && (
-			<Button
-				variant="secondary"
-				onClick={ () => {
-					onNavigateToEntityRecord( {
-						postId: entityRecord.id,
-						postType: attributes.type,
-					} );
-				} }
-				__next40pxDefaultSize
-				className="navigation-link-to__action-button"
-			>
-				{ __( 'Edit' ) }
-			</Button>
-		);
+	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
+	const isViewableUrl =
+		!! url &&
+		( ! isHashLink( url ) ||
+			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
+
+	// Construct full URL for viewing (prepend home URL for absolute paths starting with /)
+	const viewUrl =
+		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
 	return (
-		<LinkContentControls
-			text={ label }
-			onTextChange={ ( labelValue ) =>
-				setAttributes( { label: labelValue } )
-			}
-			url={ url }
-			preview={ preview }
-			onLinkSelect={ handleLinkChange }
-			onLinkRemove={ () =>
-				setAttributes( {
-					url: undefined,
-					id: undefined,
-					kind: undefined,
-					type: undefined,
-				} )
-			}
-			suggestionsQuery={ getSuggestionsQuery(
-				attributes.type,
-				attributes.kind
-			) }
-			linkHelp={ helpText ? helpText : undefined }
-			opensInNewTab={ opensInNewTab }
-			onOpensInNewTabChange={ ( value ) =>
-				setAttributes( { opensInNewTab: value } )
-			}
-			isLinkEditable={ isLinkEditable }
-			onResetAll={ () => {
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () => {
 				setAttributes( {
 					label: '',
 					url: '',
@@ -178,8 +162,103 @@ export function Controls( {
 					opensInNewTab: false,
 				} );
 			} }
-			actions={ editButton }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
+			<ToolsPanelItem
+				hasValue={ () => !! label }
+				label={ __( 'Text' ) }
+				onDeselect={ () => setAttributes( { label: '' } ) }
+				isShownByDefault
+			>
+				<TextControl
+					label={ __( 'Text' ) }
+					value={ label ? stripHTML( label ) : '' }
+					onChange={ ( labelValue ) => {
+						setAttributes( { label: labelValue } );
+					} }
+					autoComplete="off"
+				/>
+			</ToolsPanelItem>
+
+			{ isLinkEditable && (
+				<>
+					<ToolsPanelItem
+						hasValue={ () => !! url }
+						label={ __( 'Link to' ) }
+						onDeselect={ () =>
+							setAttributes( {
+								url: undefined,
+								id: undefined,
+								kind: undefined,
+								type: undefined,
+							} )
+						}
+						isShownByDefault
+					>
+						<LinkPicker
+							preview={ preview }
+							onSelect={ handleLinkChange }
+							suggestionsQuery={ getSuggestionsQuery(
+								attributes.type,
+								attributes.kind
+							) }
+							label={ __( 'Link to' ) }
+							help={ helpText ? helpText : undefined }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => !! opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () =>
+							setAttributes( { opensInNewTab: false } )
+						}
+						isShownByDefault
+					>
+						<WCCheckboxControl
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { opensInNewTab: value } )
+							}
+						/>
+					</ToolsPanelItem>
+
+					{ !! url &&
+						hasUrlBinding &&
+						isBoundEntityAvailable &&
+						entityRecord?.id &&
+						attributes.kind === 'post-type' &&
+						onNavigateToEntityRecord && (
+							<Button
+								variant="secondary"
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: entityRecord.id,
+										postType: attributes.type,
+									} );
+								} }
+								__next40pxDefaultSize
+								className="navigation-link-to__action-button"
+							>
+								{ __( 'Edit' ) }
+							</Button>
+						) }
+					{ isViewableUrl && (
+						<Button
+							variant="secondary"
+							href={ viewUrl }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+							className="navigation-link-to__action-button"
+						>
+							{ __( 'View' ) }
+						</Button>
+					) }
+				</>
+			) }
+
 			<ToolsPanelItem
 				hasValue={ () => !! description }
 				label={ __( 'Description' ) }
@@ -216,7 +295,7 @@ export function Controls( {
 					) }
 				/>
 			</ToolsPanelItem>
-		</LinkContentControls>
+		</ToolsPanel>
 	);
 }
 /**
