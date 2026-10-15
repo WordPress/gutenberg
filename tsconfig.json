@@ -18,6 +18,7 @@
 		{ "path": "packages/core-data" },
 		{ "path": "packages/dataviews" },
 		{ "path": "packages/dataviews/tsconfig.stories.json" },
+		{ "path": "packages/date" },
 		{ "path": "packages/deprecated" },
 		{ "path": "packages/design-system-mcp" },
 		{ "path": "packages/dom-ready" },
