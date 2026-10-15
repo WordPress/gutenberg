@@ -4,6 +4,7 @@ import { colord, extend } from 'colord';
 import { __, sprintf } from '@wordpress/i18n';
 import { Notice } from '@wordpress/components';
 import { speak } from '@wordpress/a11y';
+import type { ContrastCheckerProps, ContrastWarning } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
@@ -14,19 +15,19 @@ extend( [ namesPlugin, a11yPlugin ] );
  * contrast warning indicators, which surface the result without rendering
  * a notice.
  *
- * @param {Object}  props
- * @param {string}  [props.backgroundColor]         Background color.
- * @param {string}  [props.fallbackBackgroundColor] Fallback background color.
- * @param {string}  [props.fallbackTextColor]       Fallback text color.
- * @param {string}  [props.fallbackLinkColor]       Fallback link color.
- * @param {number}  [props.fontSize]                Font size value in pixels.
- * @param {boolean} [props.isLargeText]             Whether the text is large.
- * @param {string}  [props.textColor]               Text color.
- * @param {string}  [props.linkColor]               Link color.
- * @param {string}  [props.messageOverride]         Caller-provided copy used in place of the generic guidance.
- * @param {boolean} [props.enableAlphaChecker]      Whether to warn about transparent text.
+ * @param props
+ * @param props.backgroundColor         Background color.
+ * @param props.fallbackBackgroundColor Fallback background color.
+ * @param props.fallbackTextColor       Fallback text color.
+ * @param props.fallbackLinkColor       Fallback link color.
+ * @param props.fontSize                Font size value in pixels.
+ * @param props.isLargeText             Whether the text is large.
+ * @param props.textColor               Text color.
+ * @param props.linkColor               Link color.
+ * @param props.messageOverride         Caller-provided copy used in place of the generic guidance.
+ * @param props.enableAlphaChecker      Whether to warn about transparent text.
  *
- * @return {?Object} `{ message, speakMessage }` when contrast is insufficient, otherwise `null`.
+ * @return `{ message, speakMessage }` when contrast is insufficient, otherwise `null`.
  */
 export function getContrastWarning( {
 	backgroundColor,
@@ -39,7 +40,7 @@ export function getContrastWarning( {
 	linkColor,
 	messageOverride,
 	enableAlphaChecker = false,
-} ) {
+}: ContrastCheckerProps ): ContrastWarning | null {
 	const currentBackgroundColor = backgroundColor || fallbackBackgroundColor;
 
 	// Must have a background color.
@@ -71,7 +72,9 @@ export function getContrastWarning( {
 	const isReadableOptions = {
 		level: 'AA',
 		size:
-			isLargeText || ( isLargeText !== false && fontSize >= 24 )
+			// An unset font size compares as `false`.
+			isLargeText ||
+			( isLargeText !== false && ( fontSize as number ) >= 24 )
 				? 'large'
 				: 'small',
 	};
@@ -86,7 +89,10 @@ export function getContrastWarning( {
 		const colordTextColor = colord( item.color );
 		const isColordTextReadable = colordTextColor.isReadable(
 			colordBackgroundColor,
-			isReadableOptions
+			// `colord` reads any size but `large` as normal.
+			isReadableOptions as Parameters<
+				typeof colordTextColor.isReadable
+			>[ 1 ]
 		);
 		const textHasTransparency = colordTextColor.alpha() < 1;
 
@@ -144,7 +150,7 @@ export function getContrastWarning( {
 	return { message, speakMessage };
 }
 
-function ContrastChecker( props ) {
+function ContrastChecker( props: ContrastCheckerProps ) {
 	const warning = getContrastWarning( props );
 
 	if ( ! warning ) {
