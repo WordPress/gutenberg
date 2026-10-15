@@ -1,5 +1,5 @@
-# Generated into an Xcode project by xcodegen (see run.sh). XCUITest needs a
-# host app even though the tests only drive Safari.
+# Generated into an Xcode project by xcodegen (see run.sh). The tests drive
+# the editor in the host app's web view.
 name: GutenbergIOS
 options:
     bundleIdPrefix: org.wordpress.gutenberg.tests
@@ -12,6 +12,13 @@ targets:
         type: application
         platform: iOS
         sources: [Host]
+        info:
+            path: build/Host-Info.plist
+            properties:
+                UILaunchScreen: {}
+                # WordPress is served over plain HTTP.
+                NSAppTransportSecurity:
+                    NSAllowsArbitraryLoads: true
         settings:
             INFOPLIST_KEY_UILaunchScreen_Generation: YES
     SafariTests:
