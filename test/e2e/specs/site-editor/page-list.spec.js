@@ -369,7 +369,7 @@ test.describe( 'Page List', () => {
 					// Targets newly created pages which are published by default.
 					has: page.getByRole( 'cell', { name: 'Published' } ),
 				} );
-			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
 		} );
 
 		test.afterAll( async ( { requestUtils } ) => {
@@ -594,7 +594,7 @@ test.describe( 'Page List', () => {
 				bulkActions.getByRole( 'checkbox', { name: 'Deselect all' } )
 			).toBeChecked();
 			await bulkActions
-				.getByRole( 'button', { name: 'Quick Edit' } )
+				.getByRole( 'button', { name: 'Bulk edit' } )
 				.click();
 
 			const modal = page.locator( '.dataviews-action-modal__quick-edit' );
@@ -651,7 +651,7 @@ test.describe( 'Page List', () => {
 			const row = page.getByRole( 'row', {
 				name: new RegExp( PAGE_TITLE ),
 			} );
-			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
+			await row.getByRole( 'button', { name: 'Quick edit' } ).click();
 
 			// Open the date field for editing.
 			const editButton = page.getByRole( 'button', {
