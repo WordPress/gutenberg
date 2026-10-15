@@ -27,7 +27,20 @@
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 -   Block Toolbar: Keep `__unstableBlockToolbarLastItem` fills out of the placeholder toolbar shown on small screens while no block is selected ([#84554](https://github.com/WordPress/gutenberg/pull/84554)).
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
+-   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
 
+
+### Internal
+
+-   Convert the remaining `utils` modules and the `state-utils` and `useCachedTruthy` hook helpers to TypeScript ([#84629](https://github.com/WordPress/gutenberg/pull/84629)).
+-   Convert the `private-keys`, `constants` and `array` store modules to TypeScript ([#84616](https://github.com/WordPress/gutenberg/pull/84616)).
+-   Convert the store reducer to TypeScript and add the store `State` and `Action` types ([#84624](https://github.com/WordPress/gutenberg/pull/84624)).
+-   Convert the store selectors and `store/utils` to TypeScript ([#84631](https://github.com/WordPress/gutenberg/pull/84631)).
+-   Convert the store private selectors to TypeScript and type the editor settings the store reads ([#84662](https://github.com/WordPress/gutenberg/pull/84662)).
+-   Convert the store actions and private actions to TypeScript and add the store thunk arguments type ([#84672](https://github.com/WordPress/gutenberg/pull/84672)).
+-   Convert the block edit context, block context, block icon, block editing mode, `useSettings`, block refs, Global Styles utils and inheritance, and spacing size utils to TypeScript ([#84625](https://github.com/WordPress/gutenberg/pull/84625)).
+-   Convert the store defaults, `getBlockSettings` and the store index to TypeScript and type the theme.json settings the store reads ([#84677](https://github.com/WordPress/gutenberg/pull/84677)).
+-   Type `isValueSpacingPreset` as returning a boolean, since it returns `false` for custom values ([#84730](https://github.com/WordPress/gutenberg/pull/84730)).
 
 ## 18.1.0 (2026-10-07)
 
