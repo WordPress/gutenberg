@@ -5,11 +5,19 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { BlockControls, BlockAlignmentControl } from '../components';
 import useAvailableAlignments, {
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import type {
+	AlignAttributes,
+	AlignEditProps,
+	AlignSupport,
+	BlockListBlockFeatureProps,
+	BlockWrapperProps,
+} from './types';
 
 /**
  * An array which includes all possible valid alignments,
@@ -35,18 +43,18 @@ const WIDE_ALIGNMENTS = [ 'wide', 'full' ];
  * Takes into consideration the aligns supported by a block, if the block supports wide controls or not and if theme supports wide controls or not.
  * Exported just for testing purposes, not exported outside the module.
  *
- * @param {?boolean|string[]} blockAlign          Aligns supported by the block.
- * @param {?boolean}          hasWideBlockSupport True if block supports wide alignments. And False otherwise.
- * @param {?boolean}          hasWideEnabled      True if theme supports wide alignments. And False otherwise.
+ * @param blockAlign          Aligns supported by the block.
+ * @param hasWideBlockSupport True if block supports wide alignments. And False otherwise.
+ * @param hasWideEnabled      True if theme supports wide alignments. And False otherwise.
  *
- * @return {string[]} Valid alignments.
+ * @return Valid alignments.
  */
 export function getValidAlignments(
-	blockAlign,
-	hasWideBlockSupport = true,
-	hasWideEnabled = true
-) {
-	let validAlignments;
+	blockAlign?: boolean | string[] | null,
+	hasWideBlockSupport: boolean | null = true,
+	hasWideEnabled: boolean | null = true
+): string[] {
+	let validAlignments: string[];
 	if ( Array.isArray( blockAlign ) ) {
 		validAlignments = ALL_ALIGNMENTS.filter( ( value ) =>
 			blockAlign.includes( value )
@@ -73,11 +81,11 @@ export function getValidAlignments(
 /**
  * Filters registered block settings, extending attributes to include `align`.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-export function addAttribute( settings ) {
+export function addAttribute( settings: BlockType ): BlockType {
 	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( 'type' in ( settings.attributes?.align ?? {} ) ) {
 		return settings;
@@ -102,13 +110,14 @@ function BlockEditAlignmentToolbarControlsPure( {
 	name: blockName,
 	align,
 	setAttributes,
-} ) {
+}: AlignEditProps ) {
 	// Compute the block valid alignments by taking into account,
 	// if the theme supports wide alignments or not and the layout's
 	// available alignments. We do that for conditionally rendering
 	// Slot.
 	const blockAllowedAlignments = getValidAlignments(
-		getBlockSupport( blockName, 'align' ),
+		// The `align` support is a boolean or a list of alignments.
+		getBlockSupport( blockName, 'align' ) as AlignSupport,
 		hasBlockSupport( blockName, 'alignWide', true )
 	);
 
@@ -124,7 +133,7 @@ function BlockEditAlignmentToolbarControlsPure( {
 		return null;
 	}
 
-	const updateAlignment = ( nextAlign ) => {
+	const updateAlignment = ( nextAlign: string | undefined ) => {
 		if ( ! nextAlign ) {
 			const blockType = getBlockType( blockName );
 			const blockDefaultAlign = blockType?.attributes?.align?.default;
@@ -159,14 +168,15 @@ export default {
 	useBlockProps,
 	addSaveProps: addAssignedAlign,
 	attributeKeys: [ 'align' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, 'align', false );
 	},
 };
 
-function useBlockProps( { name, align } ) {
+function useBlockProps( { name, align }: BlockListBlockFeatureProps ) {
 	const blockAllowedAlignments = getValidAlignments(
-		getBlockSupport( name, 'align' ),
+		// The `align` support is a boolean or a list of alignments.
+		getBlockSupport( name, 'align' ) as AlignSupport,
 		hasBlockSupport( name, 'alignWide', true )
 	);
 	const validAlignments = useAvailableAlignments( blockAllowedAlignments );
@@ -182,15 +192,20 @@ function useBlockProps( { name, align } ) {
  * Override props assigned to save component to inject alignment class name if
  * block supports it.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type.
- * @param {Object} attributes Block attributes.
+ * @param props      Additional props applied to save element.
+ * @param blockType  Block type.
+ * @param attributes Block attributes.
  *
- * @return {Object} Filtered props applied to save element.
+ * @return Filtered props applied to save element.
  */
-export function addAssignedAlign( props, blockType, attributes ) {
+export function addAssignedAlign(
+	props: BlockWrapperProps,
+	blockType: BlockType | string,
+	attributes: AlignAttributes
+): BlockWrapperProps {
 	const { align } = attributes;
-	const blockAlign = getBlockSupport( blockType, 'align' );
+	// The `align` support is a boolean or a list of alignments.
+	const blockAlign = getBlockSupport( blockType, 'align' ) as AlignSupport;
 	const hasWideBlockSupport = hasBlockSupport( blockType, 'alignWide', true );
 
 	// Compute valid alignments without taking into account if
@@ -199,7 +214,8 @@ export function addAssignedAlign( props, blockType, attributes ) {
 	const isAlignValid = getValidAlignments(
 		blockAlign,
 		hasWideBlockSupport
-	).includes( align );
+		// An unset alignment is never valid.
+	).includes( align as string );
 	if ( isAlignValid ) {
 		props.className = clsx( `align${ align }`, props.className );
 	}
