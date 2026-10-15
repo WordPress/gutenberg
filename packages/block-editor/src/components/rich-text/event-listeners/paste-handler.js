@@ -98,7 +98,20 @@ export default ( props ) => ( element ) => {
 				onChange( transformed );
 			} else {
 				const valueToInsert = create( { html: content } );
-				addActiveFormats( valueToInsert, value.activeFormats );
+
+				// Check if the content being pasted contains links
+				const contentHasLinks = content && content.includes( '<a ' );
+
+				// If content has links, don't apply active link formats to avoid nesting
+				let activeFormatsToApply = value.activeFormats;
+				if ( contentHasLinks && activeFormatsToApply ) {
+					// Filter out link formats from active formats
+					activeFormatsToApply = activeFormatsToApply.filter(
+						( format ) => format && format.type !== 'core/link'
+					);
+				}
+
+				addActiveFormats( valueToInsert, activeFormatsToApply );
 				onChange( insert( value, valueToInsert ) );
 			}
 		}
