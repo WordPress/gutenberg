@@ -2,10 +2,18 @@ import { subDays, subYears } from 'date-fns';
 import { describe, expect, it } from 'vitest';
 import filterSortAndPaginate from '../filter-sort-and-paginate';
 import { data, fields } from '../../dataviews/stories/fixtures';
+import type { Field, Filter, Operator, SortDirection } from '../../types';
 
 describe( 'filters', () => {
 	it( 'should return empty if the data is empty', () => {
-		expect( filterSortAndPaginate( null, {}, [] ) ).toStrictEqual( {
+		expect(
+			filterSortAndPaginate(
+				// @ts-expect-error `data` is typed as an array, but a missing value returns empty results.
+				null,
+				{ type: 'table' },
+				[]
+			)
+		).toStrictEqual( {
 			data: [],
 			paginationInfo: { totalItems: 0, totalPages: 0 },
 		} );
@@ -16,6 +24,7 @@ describe( 'filters', () => {
 			filterSortAndPaginate(
 				data,
 				{
+					type: 'table',
 					filters: [],
 				},
 				[]
@@ -30,6 +39,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				search: 'Neptu',
 				filters: [],
 			},
@@ -45,6 +55,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				search: 'earth',
 				filters: [],
 			},
@@ -60,6 +71,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				search: 'nete ven',
 				filters: [],
 			},
@@ -79,6 +91,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				search: 'Moon',
 				filters: [],
 			},
@@ -106,6 +119,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				search: 'planet',
 				filters: [],
 			},
@@ -123,6 +137,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'type',
@@ -142,6 +157,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'type',
@@ -178,6 +194,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'type',
@@ -197,6 +214,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -217,6 +235,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'type',
@@ -247,6 +266,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -271,6 +291,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'categories',
@@ -290,6 +311,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'categories',
@@ -324,6 +346,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'categories',
@@ -359,6 +382,7 @@ describe( 'filters', () => {
 			const { data: result } = filterSortAndPaginate(
 				data,
 				{
+					type: 'table',
 					filters: [
 						{ field: fieldId, operator: 'isAll', value: [ value ] },
 					],
@@ -373,6 +397,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'categories',
@@ -401,6 +426,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'type',
@@ -439,6 +465,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -456,6 +483,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -473,6 +501,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -490,6 +519,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -509,6 +539,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'title',
@@ -527,6 +558,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'description',
@@ -583,6 +615,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'title',
@@ -600,6 +633,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -621,6 +655,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -642,6 +677,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -663,6 +699,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -684,6 +721,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -704,7 +742,7 @@ describe( 'filters', () => {
 			{ title: 'Test Item 1', date: '2019-03-01T00:00:00Z' },
 			{ title: 'Test Item 2', date: '2019-03-02' },
 		];
-		const testFields = [
+		const testFields: Field< ( typeof testData )[ number ] >[] = [
 			{
 				id: 'date',
 				type: 'datetime',
@@ -715,6 +753,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			testData,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -733,6 +772,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -755,7 +795,7 @@ describe( 'filters', () => {
 			{ title: 'Test Item 1', date: '2019-03-01T00:00:00Z' },
 			{ title: 'Test Item 2', date: '2019-03-02T00:00:00Z' },
 		];
-		const testFields = [
+		const testFields: Field< ( typeof testData )[ number ] >[] = [
 			{
 				id: 'date',
 				type: 'datetime',
@@ -766,6 +806,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			testData,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -784,6 +825,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -804,6 +846,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -823,7 +866,7 @@ describe( 'filters', () => {
 			{ id: 2, price: 2.58 },
 			{ id: 3, price: 3.1 },
 		];
-		const decimalFields = [
+		const decimalFields: Field< ( typeof decimalData )[ number ] >[] = [
 			{
 				id: 'price',
 				type: 'number',
@@ -837,6 +880,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			decimalData,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'price',
@@ -855,6 +899,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -875,6 +920,7 @@ describe( 'filters', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'satellites',
@@ -893,10 +939,13 @@ describe( 'filters', () => {
 			{ title: 'Recent', date: subDays( new Date(), 5 ) },
 			{ title: 'Old', date: subDays( new Date(), 14 ) },
 		];
-		const testFields = [ { id: 'date', type: 'datetime', label: 'Date' } ];
+		const testFields: Field< ( typeof testData )[ number ] >[] = [
+			{ id: 'date', type: 'datetime', label: 'Date' },
+		];
 		const { data: result } = filterSortAndPaginate(
 			testData,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -916,10 +965,13 @@ describe( 'filters', () => {
 			{ title: 'Recent', date: subDays( new Date(), 5 ) },
 			{ title: 'Old', date: subDays( new Date(), 14 ) },
 		];
-		const testFields = [ { id: 'date', type: 'datetime', label: 'Date' } ];
+		const testFields: Field< ( typeof testData )[ number ] >[] = [
+			{ id: 'date', type: 'datetime', label: 'Date' },
+		];
 		const { data: result } = filterSortAndPaginate(
 			testData,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -939,10 +991,13 @@ describe( 'filters', () => {
 			{ title: 'Recent', date: subYears( new Date(), 1 ) },
 			{ title: 'Old', date: subYears( new Date(), 5 ) },
 		];
-		const testFields = [ { id: 'date', type: 'datetime', label: 'Date' } ];
+		const testFields: Field< ( typeof testData )[ number ] >[] = [
+			{ id: 'date', type: 'datetime', label: 'Date' },
+		];
 		const { data: result } = filterSortAndPaginate(
 			testData,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -962,10 +1017,13 @@ describe( 'filters', () => {
 			{ title: 'Recent', date: subYears( new Date(), 1 ) },
 			{ title: 'Old', date: subYears( new Date(), 5 ) },
 		];
-		const testFields = [ { id: 'date', type: 'datetime', label: 'Date' } ];
+		const testFields: Field< ( typeof testData )[ number ] >[] = [
+			{ id: 'date', type: 'datetime', label: 'Date' },
+		];
 		const { data: result } = filterSortAndPaginate(
 			testData,
 			{
+				type: 'table',
 				filters: [
 					{
 						field: 'date',
@@ -981,17 +1039,28 @@ describe( 'filters', () => {
 	} );
 
 	describe( 'time fields', () => {
-		const timeData = [
+		type TimeItem = { title: string; opensAt?: string };
+
+		const timeData: TimeItem[] = [
 			{ title: 'Early', opensAt: '08:00' },
 			{ title: 'Mid', opensAt: '13:00' },
 			{ title: 'Late', opensAt: '19:00' },
 		];
-		const timeFields = [ { id: 'opensAt', type: 'time', label: 'Opens' } ];
+		const timeFields: Field< TimeItem >[] = [
+			{ id: 'opensAt', type: 'time', label: 'Opens' },
+		];
 
-		const filterBy = ( operator, value, items = timeData ) =>
+		const filterBy = (
+			operator: Operator,
+			value: Filter[ 'value' ],
+			items = timeData
+		) =>
 			filterSortAndPaginate(
 				items,
-				{ filters: [ { field: 'opensAt', operator, value } ] },
+				{
+					type: 'table',
+					filters: [ { field: 'opensAt', operator, value } ],
+				},
 				timeFields
 			).data.map( ( item ) => item.title );
 
@@ -1097,12 +1166,14 @@ describe( 'sorting', () => {
 			{ title: 'Early', opensAt: '09:00:30' },
 			{ title: 'Earliest', opensAt: '09:00' },
 		];
-		const timeFields = [ { id: 'opensAt', type: 'time', label: 'Opens' } ];
+		const timeFields: Field< ( typeof timeData )[ number ] >[] = [
+			{ id: 'opensAt', type: 'time', label: 'Opens' },
+		];
 
-		const sortBy = ( direction ) =>
+		const sortBy = ( direction: SortDirection ) =>
 			filterSortAndPaginate(
 				timeData,
-				{ sort: { field: 'opensAt', direction } },
+				{ type: 'table', sort: { field: 'opensAt', direction } },
 				timeFields
 			).data.map( ( item ) => item.title );
 
@@ -1122,6 +1193,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'title', direction: 'desc' },
 				groupBy: { field: 'type', direction: 'asc' },
 			},
@@ -1176,6 +1248,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'title', direction: 'desc' },
 				groupBy: { field: 'type', direction: 'desc' },
 			},
@@ -1235,6 +1308,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'satellites', direction: 'desc' },
 			},
 			fields
@@ -1250,6 +1324,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'title', direction: 'desc' },
 				filters: [
 					{
@@ -1270,6 +1345,7 @@ describe( 'sorting', () => {
 		const { data: resultDesc } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'date', direction: 'desc' },
 			},
 			fields
@@ -1288,6 +1364,7 @@ describe( 'sorting', () => {
 		const { data: resultAsc } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'date', direction: 'asc' },
 			},
 			fields
@@ -1304,6 +1381,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'satellites', direction: 'desc' },
 			},
 			// Remove type information for satellites field to test sorting untyped fields.
@@ -1324,6 +1402,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'title', direction: 'desc' },
 				filters: [
 					{
@@ -1347,6 +1426,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				groupBy: { field: 'type', direction: 'asc' },
 			},
 			fields
@@ -1369,6 +1449,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				groupBy: { field: 'description', direction: 'asc' },
 				filters: [
 					{
@@ -1393,6 +1474,7 @@ describe( 'sorting', () => {
 		const { data: result } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				sort: { field: 'description', direction: 'asc' },
 				filters: [
 					{
@@ -1419,6 +1501,7 @@ describe( 'pagination', () => {
 		const { data: result, paginationInfo } = filterSortAndPaginate(
 			data,
 			{
+				type: 'table',
 				perPage: 2,
 				page: 2,
 				filters: [],
