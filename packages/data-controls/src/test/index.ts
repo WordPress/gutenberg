@@ -11,12 +11,14 @@ describe( 'controls', () => {
 			mockedTriggerFetch.mockClear();
 		} );
 		it( 'invokes the triggerFetch function', () => {
-			controls.API_FETCH( { request: '' } );
+			controls.API_FETCH( { request: { path: '' } } );
 			expect( mockedTriggerFetch ).toHaveBeenCalledTimes( 1 );
 		} );
 		it( 'invokes the triggerFetch function with the passed in request', () => {
-			controls.API_FETCH( { request: 'foo' } );
-			expect( mockedTriggerFetch ).toHaveBeenCalledWith( 'foo' );
+			controls.API_FETCH( { request: { path: 'foo' } } );
+			expect( mockedTriggerFetch ).toHaveBeenCalledWith( {
+				path: 'foo',
+			} );
 		} );
 	} );
 } );

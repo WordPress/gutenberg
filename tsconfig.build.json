@@ -21,7 +21,7 @@
 		{ "path": "packages/core-abilities" },
 		{ "path": "packages/core-data/tsconfig.build.json" },
 		{ "path": "packages/data" },
-		{ "path": "packages/data-controls" },
+		{ "path": "packages/data-controls/tsconfig.build.json" },
 		{ "path": "packages/dataviews/tsconfig.build.json" },
 		{ "path": "packages/date/tsconfig.build.json" },
 		{ "path": "packages/deprecated/tsconfig.build.json" },
