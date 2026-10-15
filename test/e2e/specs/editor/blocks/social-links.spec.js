@@ -24,7 +24,7 @@ test.describe( 'Social Icons', () => {
 		await editor.canvas.locator( '[data-type="core/social-link"]' ).click();
 		await editor.openDocumentSettingsSidebar();
 
-		// The link comes first, then the text, as for a navigation link.
+		// Text, then the link beside its View button, as for a navigation link.
 		const settings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
@@ -35,7 +35,7 @@ test.describe( 'Social Icons', () => {
 		await expect( linkInput ).toHaveValue( 'https://wordpress.org/' );
 		await expect(
 			settings.getByRole( 'textbox' ).first()
-		).toHaveAccessibleName( 'Link' );
+		).toHaveAccessibleName( 'Text' );
 		const textInput = settings.getByRole( 'textbox', { name: 'Text' } );
 		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
 		await expect(
@@ -45,7 +45,16 @@ test.describe( 'Social Icons', () => {
 		// Clicking the icon on the canvas opened its link popover; clicking a
 		// field closes it the way a person would.
 		await linkInput.click();
+
+		// View waits for a valid URL.
+		await linkInput.fill( 'wordpress.org/news' );
+		await expect(
+			settings.getByRole( 'link', { name: 'View' } )
+		).toBeHidden();
 		await linkInput.fill( 'https://wordpress.org/news/' );
+		await expect(
+			settings.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/news/' );
 		await textInput.click();
 		await textInput.fill( 'WP' );
 

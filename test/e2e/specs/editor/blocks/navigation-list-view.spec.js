@@ -1049,7 +1049,7 @@ test.describe( 'Navigation block - List view editing', () => {
 			.getByRole( 'tabpanel', { name: 'List View' } )
 			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
 
-		// The popover offers the icon's link first, then its text.
+		// The popover offers the icon's text and link.
 		await listView.getByRole( 'link', { name: 'WordPress' } ).click();
 
 		const popover = page.locator(
@@ -1062,7 +1062,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect( linkInput ).toHaveValue( 'https://wordpress.org/' );
 		await expect(
 			popover.getByRole( 'textbox' ).first()
-		).toHaveAccessibleName( 'Link' );
+		).toHaveAccessibleName( 'Text' );
 		const textInput = popover.getByRole( 'textbox', { name: 'Text' } );
 		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
 		await expect(
