@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
+import type { ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import BlockAlignmentUI from '../ui';
 import { LayoutProvider } from '../../block-list/layout';
 import { BlockEditorProvider } from '../../provider';
+import type { Layout } from '../../../layouts/types';
 
 describe( 'BlockAlignmentUI', () => {
 	const alignment = 'left';
@@ -124,7 +126,11 @@ describe( 'BlockAlignmentUI', () => {
  */
 const THEME_LAYOUT = { contentSize: '600px', wideSize: '1200px' };
 
-function renderWithTheme( ui, layout = THEME_LAYOUT, settings = {} ) {
+function renderWithTheme(
+	ui: ReactElement,
+	layout: Layout = THEME_LAYOUT,
+	settings: Record< string, unknown > = {}
+) {
 	return render(
 		<BlockEditorProvider
 			value={ [] }
@@ -268,7 +274,7 @@ describe( 'BlockAlignmentUI when the theme withholds alignments', () => {
 		onChange.mockClear();
 	} );
 
-	async function openMenuForTheme( layout ) {
+	async function openMenuForTheme( layout?: Layout ) {
 		const user = userEvent.setup();
 		renderWithTheme(
 			<BlockAlignmentUI onChange={ onChange } controls={ controls } />,
@@ -327,7 +333,7 @@ describe( 'BlockAlignmentUI on a theme without layout support', () => {
 		onChange.mockClear();
 	} );
 
-	async function openMenuWithAlignWide( alignWide ) {
+	async function openMenuWithAlignWide( alignWide: boolean ) {
 		const user = userEvent.setup();
 		renderWithTheme(
 			<BlockAlignmentUI onChange={ onChange } controls={ controls } />,
