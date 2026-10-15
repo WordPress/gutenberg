@@ -236,11 +236,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-context/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-controls/fill.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -320,16 +315,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-heading-level-dropdown/stories/index.story.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-icon/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-icon/test/index.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -944,9 +929,6 @@
 		}
 	},
 	"packages/block-editor/src/components/date-format-picker/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		},
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1122,16 +1104,6 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/inheritance/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/inheritance/test/index.browser.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -1428,25 +1400,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/inserter/media-tab/media-list.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/inserter/media-tab/media-panel.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inserter/media-tab/media-preview.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inserter/media-tab/media-tab.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2329,11 +2283,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/test/settings.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/test/style.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2350,11 +2299,6 @@
 		}
 	},
 	"packages/block-editor/src/hooks/typography.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/utils.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -2391,11 +2335,6 @@
 		}
 	},
 	"packages/block-editor/src/layouts/test/grid.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/store/test/selectors.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4756,16 +4695,6 @@
 			"count": 3
 		}
 	},
-	"packages/components/src/menu/styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/navigator/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/number-control/index.tsx": {
 		"react-hooks/refs": {
 			"count": 2
@@ -4787,11 +4716,6 @@
 		},
 		"react-hooks/refs": {
 			"count": 4
-		}
-	},
-	"packages/components/src/range-control/styles/range-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
 		}
 	},
 	"packages/components/src/select-control/styles/select-control-styles.ts": {
@@ -4829,11 +4753,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/unit-control/styles/unit-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/utils/base-label.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4869,68 +4788,8 @@
 			"count": 1
 		}
 	},
-	"packages/compose/src/higher-order/pure/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/higher-order/with-global-events/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/higher-order/with-global-events/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/higher-order/with-instance-id/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/higher-order/with-state/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/higher-order/with-state/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/compose/src/hooks/use-dialog/index.ts": {
 		"react-hooks/immutability": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-disabled/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-drop-zone/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-focus-outside/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-instance-id/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-media-query/test/index.browser.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-media-query/test/ssr.jsx": {
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -4939,33 +4798,8 @@
 			"count": 1
 		}
 	},
-	"packages/compose/src/hooks/use-merge-refs/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-observable-value/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/compose/src/hooks/use-previous/index.ts": {
 		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-state-with-history/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/hooks/use-viewport-match/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/compose/src/utils/create-higher-order-component/test/index.jsx": {
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -8254,11 +8088,6 @@
 		}
 	},
 	"test/storybook-playwright/storybook/decorators/with-custom-controls.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"test/unit/config/emotion-compiler.vitest.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}

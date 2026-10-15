@@ -1,5 +1,5 @@
 import { Page } from '@wordpress/admin-ui';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useDispatch } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
@@ -139,7 +139,7 @@ function ExperimentsPage() {
 	}, [ experiments ] );
 
 	if ( experiments === null || ! siteSettings ) {
-		return <Spinner />;
+		return <WCSpinner />;
 	}
 
 	return (

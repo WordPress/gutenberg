@@ -1,5 +1,5 @@
 import { diffLines } from 'diff';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -201,7 +201,7 @@ export function RevisionsCodeDiff( {
 	if ( ! revision || isPreviousRevisionLoading ) {
 		return (
 			<div className="editor-revisions-canvas__loading">
-				<Spinner />
+				<WCSpinner />
 			</div>
 		);
 	}

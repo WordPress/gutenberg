@@ -1088,9 +1088,7 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		$this->theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
-		if ( isset( $this->theme_json['styles'] ) ) {
-			$this->theme_json['styles'] = gutenberg_resolve_style_state_aliases( $this->theme_json['styles'] );
-		}
+
 		$blocks_metadata     = static::get_blocks_metadata();
 		$valid_block_names   = array_keys( $blocks_metadata );
 		$valid_element_names = array_keys( static::ELEMENTS );
@@ -4942,9 +4940,6 @@ class WP_Theme_JSON_Gutenberg {
 		$sanitized = array();
 
 		$theme_json = WP_Theme_JSON_Schema_Gutenberg::migrate( $theme_json, $origin );
-		if ( isset( $theme_json['styles'] ) ) {
-			$theme_json['styles'] = gutenberg_resolve_style_state_aliases( $theme_json['styles'] );
-		}
 
 		$blocks_metadata     = static::get_blocks_metadata();
 		$valid_block_names   = array_keys( $blocks_metadata );
