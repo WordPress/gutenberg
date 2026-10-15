@@ -14,6 +14,39 @@
 class Tests_Blocks_Render_Tabs extends WP_UnitTestCase {
 
 	/**
+	 * Passes the keyboard activation setting to the front-end context.
+	 *
+	 * @dataProvider data_auto_activate
+	 * @covers ::block_core_tabs_render_block_callback
+	 *
+	 * @param array $attributes Block attributes.
+	 * @param bool  $expected   Expected activation setting.
+	 */
+	public function test_should_pass_auto_activate_to_interactivity_context( array $attributes, bool $expected ): void {
+		$rendered_block = do_blocks(
+			'<!-- wp:tabs ' . wp_json_encode( $attributes ) . ' -->'
+			. '<div class="wp-block-tabs"></div><!-- /wp:tabs -->'
+		);
+		$processor      = new WP_HTML_Tag_Processor( $rendered_block );
+		$this->assertTrue( $processor->next_tag( array( 'class_name' => 'wp-block-tabs' ) ) );
+		$context = json_decode( $processor->get_attribute( 'data-wp-context' ), true );
+		$this->assertSame( $expected, $context['autoActivate'] );
+	}
+
+	/**
+	 * Activation settings, including existing blocks without the attribute.
+	 *
+	 * @return array[] Test cases.
+	 */
+	public function data_auto_activate(): array {
+		return array(
+			'default'  => array( array(), false ),
+			'disabled' => array( array( 'autoActivate' => false ), false ),
+			'enabled'  => array( array( 'autoActivate' => true ), true ),
+		);
+	}
+
+	/**
 	 * @covers ::block_core_tabs_render_callback
 	 * @covers ::block_core_tab_list_render_callback
 	 */
