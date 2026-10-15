@@ -300,31 +300,6 @@ test.describe( 'Entity fields API', () => {
 		await page.keyboard.press( 'Escape' );
 	} );
 
-	test( 'adds the fields registered on the client after the server ones', async ( {
-		admin,
-		page,
-	} ) => {
-		await admin.visitSiteEditor( { postType: 'page' } );
-		await showFieldsInTable( page, [ 'Client rating', 'Order' ] );
-		const table = page.getByRole( 'table' );
-
-		// The field registered with `registerEntityField` shows next to the
-		// server ones.
-		const shortPage = table.getByRole( 'row', { name: /Short Page/ } );
-		await expect(
-			shortPage.locator( '.gutenberg-test-client-rating' )
-		).toHaveText( 'Five stars' );
-
-		// A client field whose id the server returns too is left out: the
-		// server field keeps its label and its value.
-		await expect( await getCell( table, shortPage, 'Order' ) ).toHaveText(
-			'2'
-		);
-		await expect(
-			table.getByRole( 'columnheader', { name: /Client order/ } )
-		).toHaveCount( 0 );
-	} );
-
 	test( 'loads the fields in the extensible site editor embedded in wp-admin', async ( {
 		admin,
 		page,

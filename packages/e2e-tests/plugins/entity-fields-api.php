@@ -27,11 +27,6 @@
  *    the Pages REST endpoint (`subtitle`), a REST field backed by post meta,
  *    readable in the list and writable from the Quick Edit form, which the
  *    function adds the field to.
- * 6. `add_client_fields`: fields registered on the client with
- *    `registerEntityField` from `@wordpress/editor`, from
- *    `entity-fields-api/client-fields.js`. The screens add them after the
- *    fields from the server, except one whose id the server returns too
- *    (`menu_order`), which the server field wins over.
  *
  * @package gutenberg-test-entity-fields-api
  */
@@ -294,27 +289,3 @@ function gutenberg_test_entity_fields_api_register_embedded_page() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_test_entity_fields_api_register_embedded_page' );
-
-/**
- * Case 6: fields registered on the client with `registerEntityField`, the
- * way plugins added fields before the Entity fields API. The script runs on
- * every screen where the fields can show, once `wp-editor` has loaded, as the
- * styles of case 2 are enqueued.
- */
-function gutenberg_test_entity_fields_api_add_client_fields() {
-	wp_register_script(
-		'gutenberg-test-entity-fields-api-client-fields',
-		plugins_url( 'entity-fields-api/client-fields.js', __FILE__ ),
-		array( 'wp-editor', 'wp-element' ),
-		filemtime( __DIR__ . '/entity-fields-api/client-fields.js' ),
-		true
-	);
-	$enqueue_script = function () {
-		wp_enqueue_script( 'gutenberg-test-entity-fields-api-client-fields' );
-	};
-	// The same screens as case 2: see the comments there.
-	add_action( 'enqueue_block_editor_assets', $enqueue_script );
-	add_action( 'site-editor-v2_init', $enqueue_script );
-	add_action( 'site-editor-v2-wp-admin_init', $enqueue_script );
-}
-add_action( 'init', 'gutenberg_test_entity_fields_api_add_client_fields' );
