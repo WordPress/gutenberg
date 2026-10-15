@@ -6,6 +6,22 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+let emptyDragImage;
+
+/**
+ * Gets a transparent image, to use as a drag image that shows nothing.
+ *
+ * @return {HTMLImageElement} A transparent 1x1 image.
+ */
+function getEmptyDragImage() {
+	if ( ! emptyDragImage ) {
+		emptyDragImage = new window.Image();
+		emptyDragImage.src =
+			'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+	}
+	return emptyDragImage;
+}
+
 function isColorTransparent( color ) {
 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
 }
@@ -41,6 +57,10 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			if ( ! isSelected ) {
 				return;
 			}
+
+			// Load the empty drag image before a drag can start, as a drag
+			// image that hasn't loaded yet isn't used.
+			getEmptyDragImage();
 
 			/**
 			 * Interprets keydown event intent to remove or insert after block if
@@ -125,6 +145,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				dragElement.style.width = '1px';
 				dragElement.style.height = '1px';
 				dragElement.style.position = 'fixed';
+				dragElement.style.visibility = 'hidden';
+				ownerDocument.body.appendChild( dragElement );
+				event.dataTransfer.setDragImage( dragElement, 0, 0 );
 
 				// In a manual placement grid, the grid shows the cells the
 				// block will land in, so the block stays in place, dimmed,
@@ -132,26 +155,20 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				const rootLayout = getBlockAttributes(
 					getBlockRootClientId( clientId )
 				)?.layout;
-				const isInManualGrid =
+				if (
 					rootLayout?.type === 'grid' &&
 					rootLayout.isManualPlacement &&
-					window.__experimentalEnableGridInteractivity;
+					window.__experimentalEnableGridInteractivity
+				) {
+					// Chrome ignores the drag image above and shows its own,
+					// such as a copy of a dragged image. Elsewhere the block
+					// follows the pointer and covers it, but not here.
+					event.dataTransfer.setDragImage(
+						getEmptyDragImage(),
+						0,
+						0
+					);
 
-				if ( isInManualGrid ) {
-					// Chrome doesn't paint a hidden drag image, and shows a
-					// copy of the block under the pointer instead. That copy
-					// is covered when the block follows the pointer, but not
-					// in a grid, so the drag image is an empty element just
-					// off screen.
-					dragElement.style.top = '-1px';
-					dragElement.style.left = '-1px';
-				} else {
-					dragElement.style.visibility = 'hidden';
-				}
-				ownerDocument.body.appendChild( dragElement );
-				event.dataTransfer.setDragImage( dragElement, 0, 0 );
-
-				if ( isInManualGrid ) {
 					const originalOpacity = node.style.opacity;
 					node.style.opacity = '0.5';
 
