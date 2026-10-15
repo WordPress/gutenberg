@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add Description List, Description Term, and Description Detail blocks.
+-   Add Description List, Description Term, and Description Detail blocks ([#81728](https://github.com/WordPress/gutenberg/pull/81728)).
 
 ### Breaking Changes
 
