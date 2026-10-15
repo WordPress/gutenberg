@@ -8,6 +8,8 @@ import {
 	it,
 	vi,
 } from 'vitest';
+import type { Mock } from 'vitest';
+import type { ReactElement } from 'react';
 import {
 	fireEvent,
 	render as baseRender,
@@ -16,9 +18,11 @@ import {
 	within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
 import { SlotFillProvider } from '@wordpress/components';
 import { useState, createElement } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import type { useDispatch } from '@wordpress/data';
 import { useReducedMotion } from '@wordpress/compose';
 import LinkControl from '../';
 import {
@@ -28,14 +32,19 @@ import {
 } from './fixtures';
 import { expectValidatedInputControlDeprecationIfCalled } from '../../url-input/test/fixtures/validated-input-control-deprecation';
 import { CREATE_TYPE } from '../constants';
+import type {
+	LinkControlSetting,
+	LinkControlSuggestion,
+	LinkControlValue,
+} from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockScrollIntoView();
 const mockFetchSearchSuggestions = vi.fn();
 
-function getExpectedVisualTypeName( type ) {
-	const builtInLabels = {
+function getExpectedVisualTypeName( type: string ) {
+	const builtInLabels: Record< string, string > = {
 		post: 'Post',
 		page: 'Page',
 		post_tag: 'Tag',
@@ -53,11 +62,14 @@ function getExpectedVisualTypeName( type ) {
  * to an undefined value which will ensure that the code under test does not call `fetchRichUrlData`. Only
  * when we are testing the "rich previews" to we update this value with a true mock.
  */
-let mockFetchRichUrlData;
+let mockFetchRichUrlData: Mock | undefined;
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
+	// The stub stands in for every store's actions.
+	useDispatch: ( () => ( {
+		saveEntityRecords: vi.fn(),
+	} ) ) as unknown as typeof useDispatch,
 	useSelect: vi.fn(),
 } ) );
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
@@ -66,8 +78,8 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 } ) );
 
 beforeEach( () => {
-	useReducedMotion.mockReturnValue( true );
-	useSelect.mockImplementation( () => ( {
+	( useReducedMotion as Mock ).mockReturnValue( true );
+	( useSelect as Mock ).mockImplementation( () => ( {
 		fetchSearchSuggestions: mockFetchSearchSuggestions,
 		fetchRichUrlData: mockFetchRichUrlData,
 	} ) );
@@ -81,7 +93,7 @@ afterEach( () => {
 	mockFetchRichUrlData?.mockReset(); // Conditionally reset as it may NOT be a mock.
 } );
 
-function render( ui ) {
+function render( ui: ReactElement ) {
 	return baseRender( ui, { wrapper: SlotFillProvider } );
 }
 
@@ -98,9 +110,9 @@ function render( ui ) {
  *
  * because the event sent has a `keyCode` of `0`.
  *
- * @param {Element} element Element to trigger the event on.
+ * @param element Element to trigger the event on.
  */
-function triggerArrowUp( element ) {
+function triggerArrowUp( element: Element ) {
 	fireEvent.keyDown( element, {
 		key: 'ArrowUp',
 		keyCode: 38,
@@ -120,9 +132,9 @@ function triggerArrowUp( element ) {
  *
  * because the event sent has a `keyCode` of `0`.
  *
- * @param {Element} element Element to trigger the event on.
+ * @param element Element to trigger the event on.
  */
-function triggerArrowDown( element ) {
+function triggerArrowDown( element: Element ) {
 	fireEvent.keyDown( element, {
 		key: 'ArrowDown',
 		keyCode: 40,
@@ -142,9 +154,9 @@ function triggerArrowDown( element ) {
  *
  * because the event sent has a `keyCode` of `0`.
  *
- * @param {Element} element Element to trigger the event on.
+ * @param element Element to trigger the event on.
  */
-function triggerEnter( element ) {
+function triggerEnter( element: Element ) {
 	fireEvent.keyDown( element, {
 		key: 'Enter',
 		keyCode: 13,
@@ -181,7 +193,7 @@ describe( 'Basic rendering', () => {
 	it( 'should have aria-selected attribute only on the highlighted item', async () => {
 		const user = userEvent.setup();
 
-		let resolver;
+		let resolver: ( ( value?: unknown ) => void ) | undefined;
 		mockFetchSearchSuggestions.mockImplementation(
 			() =>
 				new Promise( ( resolve ) => {
@@ -205,7 +217,7 @@ describe( 'Basic rendering', () => {
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
 		// Make the search suggestions fetch return a response.
-		resolver( fauxEntitySuggestions );
+		resolver!( fauxEntitySuggestions );
 
 		const resultsList = await screen.findByRole( 'listbox', {
 			name: 'Search results for "Hello"',
@@ -350,7 +362,7 @@ describe( 'Basic rendering', () => {
 				name: 'Edit link',
 			} );
 
-			await user.click( editButton );
+			await user.click( editButton! );
 
 			expect(
 				screen.getByRole( 'combobox', { name: 'Search or type URL' } )
@@ -429,7 +441,7 @@ describe( 'Basic rendering', () => {
 			} );
 			expect( unLinkButton ).toBeVisible();
 
-			await user.click( unLinkButton );
+			await user.click( unLinkButton! );
 
 			expect( mockOnRemove ).toHaveBeenCalled();
 		} );
@@ -450,7 +462,7 @@ describe( 'Basic rendering', () => {
 			} );
 			expect( unLinkButton ).toBeVisible();
 
-			await user.click( unLinkButton );
+			await user.click( unLinkButton! );
 
 			expect( mockOnRemove ).toHaveBeenCalled();
 
@@ -467,7 +479,7 @@ describe( 'Searching for a link', () => {
 		const user = userEvent.setup();
 		const searchTerm = 'Hello';
 
-		let resolver;
+		let resolver: ( ( value?: unknown ) => void ) | undefined;
 		mockFetchSearchSuggestions.mockImplementation(
 			() =>
 				new Promise( ( resolve ) => {
@@ -489,7 +501,7 @@ describe( 'Searching for a link', () => {
 		expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
 
 		// make the search suggestions fetch return a response
-		resolver( fauxEntitySuggestions );
+		resolver!( fauxEntitySuggestions );
 
 		expect( await screen.findByRole( 'listbox' ) ).toBeVisible();
 		expect( screen.queryByRole( 'presentation' ) ).not.toBeInTheDocument();
@@ -614,7 +626,7 @@ describe( 'Searching for a link', () => {
 		// than the trimmed search term (ie: no whitespace).
 		expect(
 			searchResultTextHighlightElements.every(
-				( mark ) => mark.innerHTML === 'Hello'
+				( mark ) => mark!.innerHTML === 'Hello'
 			)
 		).toBe( true );
 
@@ -812,7 +824,7 @@ describe( 'Manual link entry', () => {
 				);
 
 				// Attempt to submit the empty search value in the input.
-				await user.click( submitButton );
+				await user.click( submitButton! );
 
 				// Verify the UI hasn't allowed submission because
 				// the search input is still visible.
@@ -839,7 +851,8 @@ describe( 'Manual link entry', () => {
 			const initialLink = fauxEntitySuggestions[ 0 ];
 
 			const LinkControlConsumer = () => {
-				const [ link, setLink ] = useState( initialLink );
+				const [ link, setLink ] =
+					useState< LinkControlValue >( initialLink );
 
 				return (
 					<LinkControl
@@ -865,7 +878,7 @@ describe( 'Manual link entry', () => {
 				name: 'Edit link',
 			} );
 
-			await user.click( editButton );
+			await user.click( editButton! );
 
 			await toggleSettingsDrawer( user );
 
@@ -888,7 +901,7 @@ describe( 'Manual link entry', () => {
 			} );
 
 			// Cancel the editing process.
-			await user.click( cancelButton );
+			await user.click( cancelButton! );
 
 			linkPreview = screen.getByRole( 'group', {
 				name: 'Manage link',
@@ -901,7 +914,7 @@ describe( 'Manual link entry', () => {
 				name: 'Edit link',
 			} );
 
-			await user.click( editButton );
+			await user.click( editButton! );
 
 			await toggleSettingsDrawer( user );
 
@@ -916,7 +929,10 @@ describe( 'Manual link entry', () => {
 
 			// Expect to see the original link values and **not** the changed values.
 			expect( searchInput ).toHaveValue( initialLink.url );
-			expect( textInput ).toHaveValue( initialLink.text );
+			expect( textInput ).toHaveValue(
+				// @ts-expect-error The fixture has no `text`, so this expects no value.
+				initialLink.text
+			);
 		} );
 
 		it( 'should call onCancel callback when cancelling if provided', async () => {
@@ -935,7 +951,7 @@ describe( 'Manual link entry', () => {
 				name: 'Cancel',
 			} );
 
-			await user.click( cancelButton );
+			await user.click( cancelButton! );
 
 			// Verify the consumer can handle the cancellation.
 			expect( mockOnCancel ).toHaveBeenCalled();
@@ -1016,7 +1032,9 @@ describe( 'Link submission', () => {
 		const user = userEvent.setup();
 
 		const LinkControlConsumer = () => {
-			const [ link, setLink ] = useState( fauxEntitySuggestions[ 0 ] );
+			const [ link, setLink ] = useState< LinkControlValue >(
+				fauxEntitySuggestions[ 0 ]
+			);
 
 			return (
 				<LinkControl
@@ -1212,7 +1230,7 @@ describe( 'Default search suggestions', () => {
 } );
 
 describe( 'Creating Entities (eg: Posts, Pages)', () => {
-	const noResults = [];
+	const noResults: LinkControlSuggestion[] = [];
 	beforeEach( () => {
 		// Force returning empty results for existing Pages. Doing this means that the only item
 		// shown should be "Create Page" suggestion because there will be no search suggestions
@@ -1228,9 +1246,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		'should allow creating a link for a valid Entity title "%s" (%s)',
 		async ( entityNameText ) => {
 			const user = userEvent.setup();
-			let resolver;
-			const createSuggestion = ( title ) =>
-				new Promise( ( resolve ) => {
+			let resolver: ( ( value?: unknown ) => void ) | undefined;
+			const createSuggestion = ( title: string ) =>
+				new Promise< LinkControlSuggestion >( ( resolve ) => {
 					resolver = () =>
 						resolve( {
 							title,
@@ -1241,10 +1259,13 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				} );
 
 			const LinkControlConsumer = () => {
-				const [ link, setLink ] = useState( null );
+				const [ link, setLink ] = useState< LinkControlValue | null >(
+					null
+				);
 
 				return (
 					<LinkControl
+						// @ts-expect-error `null` stands for no link yet.
 						value={ link }
 						onChange={ ( suggestion ) => {
 							setLink( suggestion );
@@ -1292,7 +1313,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 
 			// Resolve the `createSuggestion` promise.
-			resolver();
+			resolver!();
 
 			const currentLink = await screen.findByRole( 'group', {
 				name: 'Manage link',
@@ -1306,10 +1327,13 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 	it( 'should allow createSuggestion prop to return a non-Promise value', async () => {
 		const user = userEvent.setup();
 		const LinkControlConsumer = () => {
-			const [ link, setLink ] = useState( null );
+			const [ link, setLink ] = useState< LinkControlValue | null >(
+				null
+			);
 
 			return (
 				<LinkControl
+					// @ts-expect-error `null` stands for no link yet.
 					value={ link }
 					onChange={ ( suggestion ) => {
 						setLink( suggestion );
@@ -1357,10 +1381,13 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const entityNameText = 'A new page to be created';
 
 		const LinkControlConsumer = () => {
-			const [ link, setLink ] = useState( null );
+			const [ link, setLink ] = useState< LinkControlValue | null >(
+				null
+			);
 
 			return (
 				<LinkControl
+					// @ts-expect-error `null` stands for no link yet.
 					value={ link }
 					onChange={ ( suggestion ) => {
 						setLink( suggestion );
@@ -1418,6 +1445,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const LinkControlConsumer = () => {
 			return (
 				<LinkControl
+					// @ts-expect-error Only the presence of a handler matters here.
 					createSuggestion={ () => {} }
 					createSuggestionButtonText="Custom suggestion text"
 				/>
@@ -1449,7 +1477,12 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		it.each( [ [ undefined ], [ null ], [ false ] ] )(
 			'should not show not show an option to create an entity when "createSuggestion" handler is %s',
 			async ( handler ) => {
-				render( <LinkControl createSuggestion={ handler } /> );
+				render(
+					<LinkControl
+						// @ts-expect-error Covers falsy handlers other than `undefined`.
+						createSuggestion={ handler }
+					/>
+				);
 
 				// Search Input UI.
 				const searchInput = screen.getByRole( 'combobox', {
@@ -1580,7 +1613,7 @@ describe( 'Selecting links', () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
+			const [ link ] = useState< LinkControlValue >( selectedLink );
 
 			return <LinkControl value={ link } />;
 		};
@@ -1607,7 +1640,8 @@ describe( 'Selecting links', () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
-			const [ link, setLink ] = useState( selectedLink );
+			const [ link, setLink ] =
+				useState< LinkControlValue >( selectedLink );
 
 			return (
 				<LinkControl
@@ -1620,7 +1654,7 @@ describe( 'Selecting links', () => {
 		render( <LinkControlConsumer /> );
 
 		// Required in order to select the button below.
-		let currentLinkUI = screen.getByRole( 'group', {
+		let currentLinkUI: HTMLElement | null = screen.getByRole( 'group', {
 			name: 'Manage link',
 		} );
 		const currentLinkBtn = within( currentLinkUI ).getByRole( 'button', {
@@ -1661,7 +1695,7 @@ describe( 'Selecting links', () => {
 			async ( type, searchTerm, selectedLink ) => {
 				const user = userEvent.setup();
 				const LinkControlConsumer = () => {
-					const [ link, setLink ] = useState();
+					const [ link, setLink ] = useState< LinkControlValue >();
 
 					return (
 						<LinkControl
@@ -1812,7 +1846,7 @@ describe( 'Addition Settings UI', () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
+			const [ link ] = useState< LinkControlValue >( selectedLink );
 
 			return <LinkControl value={ link } />;
 		};
@@ -1828,7 +1862,7 @@ describe( 'Addition Settings UI', () => {
 		const selectedLink = fauxEntitySuggestions[ 0 ];
 
 		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
+			const [ link ] = useState< LinkControlValue >( selectedLink );
 
 			return <LinkControl value={ link } forceIsEditingLink />;
 		};
@@ -1843,7 +1877,7 @@ describe( 'Addition Settings UI', () => {
 
 		expect( settingsToggle ).toBeVisible();
 
-		await user.click( settingsToggle );
+		await user.click( settingsToggle! );
 
 		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'true' );
 
@@ -1853,7 +1887,7 @@ describe( 'Addition Settings UI', () => {
 
 		expect( newTabSettingInput ).toBeVisible();
 
-		await user.click( settingsToggle );
+		await user.click( settingsToggle! );
 
 		expect( settingsToggle ).toHaveAttribute( 'aria-expanded', 'false' );
 		expect( newTabSettingInput ).not.toBeVisible();
@@ -1864,7 +1898,7 @@ describe( 'Addition Settings UI', () => {
 		const expectedSettingText = 'Open in new tab';
 
 		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
+			const [ link ] = useState< LinkControlValue >( selectedLink );
 
 			return <LinkControl value={ link } forceIsEditingLink />;
 		};
@@ -1901,7 +1935,7 @@ describe( 'Addition Settings UI', () => {
 		];
 
 		const LinkControlConsumer = () => {
-			const [ link ] = useState( selectedLink );
+			const [ link ] = useState< LinkControlValue >( selectedLink );
 
 			return (
 				<LinkControl
@@ -1968,7 +2002,7 @@ describe( 'Addition Settings UI', () => {
 		} );
 
 		// toggle the checkbox
-		await user.click( opensInNewTabToggle );
+		await user.click( opensInNewTabToggle! );
 
 		// Check settings are **not** directly submitted
 		// which would trigger the onChange handler.
@@ -1979,7 +2013,7 @@ describe( 'Addition Settings UI', () => {
 		expect( submitButton ).toBeEnabled();
 
 		// Submit the changed setting value using the Apply button
-		await user.click( submitButton );
+		await user.click( submitButton! );
 
 		// Assert the value is updated.
 		expect( mockOnChange ).toHaveBeenCalledWith(
@@ -2043,6 +2077,7 @@ describe( 'Post types', () => {
 			searchResultElements.forEach( ( resultItem, index ) => {
 				expect(
 					screen.queryByText(
+						// @ts-expect-error `queryByText` takes a matcher, not an element.
 						resultItem,
 						fauxEntitySuggestions[ index ].type
 					)
@@ -2071,7 +2106,7 @@ describe( 'Rich link previews', () => {
 	} );
 
 	it( 'should not fetch or display rich previews by default', async () => {
-		mockFetchRichUrlData.mockImplementation( () =>
+		mockFetchRichUrlData!.mockImplementation( () =>
 			Promise.resolve( {
 				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
 				icon: 'https://s.w.org/favicon.ico?2',
@@ -2094,7 +2129,7 @@ describe( 'Rich link previews', () => {
 	} );
 
 	it( 'should display a rich preview when data is available', async () => {
-		mockFetchRichUrlData.mockImplementation( () =>
+		mockFetchRichUrlData!.mockImplementation( () =>
 			Promise.resolve( {
 				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
 				icon: 'https://s.w.org/favicon.ico?2',
@@ -2114,7 +2149,7 @@ describe( 'Rich link previews', () => {
 	} );
 
 	it( 'should not display placeholders for the image and description if neither is available in the data', async () => {
-		mockFetchRichUrlData.mockImplementation( () =>
+		mockFetchRichUrlData!.mockImplementation( () =>
 			Promise.resolve( {
 				title: '',
 				icon: 'https://s.w.org/favicon.ico?2',
@@ -2148,7 +2183,7 @@ describe( 'Rich link previews', () => {
 	} );
 
 	it( 'should display a fallback when title is missing from rich data', async () => {
-		mockFetchRichUrlData.mockImplementation( () =>
+		mockFetchRichUrlData!.mockImplementation( () =>
 			Promise.resolve( {
 				icon: 'https://s.w.org/favicon.ico?2',
 				description:
@@ -2168,13 +2203,13 @@ describe( 'Rich link previews', () => {
 		const titlePreview = screen.getByText( selectedLink.title );
 
 		// eslint-disable-next-line testing-library/no-node-access
-		expect( titlePreview.parentElement.parentElement ).toHaveClass(
+		expect( titlePreview.parentElement!.parentElement ).toHaveClass(
 			'block-editor-link-control__preview-title'
 		);
 	} );
 
 	it( 'should display a fallback when icon is missing from rich data', async () => {
-		mockFetchRichUrlData.mockImplementation( () =>
+		mockFetchRichUrlData!.mockImplementation( () =>
 			Promise.resolve( {
 				title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
 				description:
@@ -2197,9 +2232,9 @@ describe( 'Rich link previews', () => {
 		);
 
 		// eslint-disable-next-line testing-library/no-node-access
-		const fallBackIcon = iconPreview.querySelector( 'svg' );
+		const fallBackIcon = iconPreview!.querySelector( 'svg' );
 		// eslint-disable-next-line testing-library/no-node-access
-		const richIcon = iconPreview.querySelector( 'img' );
+		const richIcon = iconPreview!.querySelector( 'img' );
 
 		expect( fallBackIcon ).toBeVisible();
 		expect( richIcon ).not.toBeInTheDocument();
@@ -2208,8 +2243,8 @@ describe( 'Rich link previews', () => {
 	it.each( [ 'image', 'description' ] )(
 		'should not display the rich %s when it is missing from the data',
 		async ( dataItem ) => {
-			mockFetchRichUrlData.mockImplementation( () => {
-				const data = {
+			mockFetchRichUrlData!.mockImplementation( () => {
+				const data: Record< string, string > = {
 					title: 'Blog Tool, Publishing Platform, and CMS \u2014 WordPress.org',
 					icon: 'https://s.w.org/favicon.ico?2',
 					description:
@@ -2245,7 +2280,7 @@ describe( 'Rich link previews', () => {
 	] )(
 		'should not display a rich preview when data is %s',
 		async ( _descriptor, data ) => {
-			mockFetchRichUrlData.mockImplementation( async () => data );
+			mockFetchRichUrlData!.mockImplementation( async () => data );
 
 			render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
@@ -2266,7 +2301,7 @@ describe( 'Rich link previews', () => {
 	it( 'should display in loading state when rich data is being fetched', async () => {
 		const nonResolvingPromise = () => new Promise( () => {} );
 
-		mockFetchRichUrlData.mockImplementation( nonResolvingPromise );
+		mockFetchRichUrlData!.mockImplementation( nonResolvingPromise );
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
@@ -2281,7 +2316,7 @@ describe( 'Rich link previews', () => {
 	it( 'should remove fetching UI indicators and fallback to standard preview if request for rich preview results in an error', async () => {
 		const simulateFailedFetch = () => Promise.reject();
 
-		mockFetchRichUrlData.mockImplementation( simulateFailedFetch );
+		mockFetchRichUrlData!.mockImplementation( simulateFailedFetch );
 
 		render( <LinkControl value={ selectedLink } hasRichPreviews /> );
 
@@ -2406,7 +2441,7 @@ describe( 'Controlling link title text', () => {
 
 		const textInput = screen.queryByRole( 'textbox', { name: 'Text' } );
 
-		await user.clear( textInput );
+		await user.clear( textInput! );
 		await user.keyboard( textValue );
 
 		expect( textInput ).toHaveValue( textValue );
@@ -2415,7 +2450,7 @@ describe( 'Controlling link title text', () => {
 			name: 'Apply',
 		} );
 
-		await user.click( submitButton );
+		await user.click( submitButton! );
 
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -2444,11 +2479,11 @@ describe( 'Controlling link title text', () => {
 
 		expect( textInput ).toBeVisible();
 
-		await user.clear( textInput );
+		await user.clear( textInput! );
 		await user.keyboard( newTextValue );
 
 		// Attempt to submit the empty search value in the input.
-		triggerEnter( textInput );
+		triggerEnter( textInput! );
 
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -2483,7 +2518,7 @@ describe( 'Controlling link title text', () => {
 
 		expect( textInput ).toBeVisible();
 
-		await user.clear( textInput );
+		await user.clear( textInput! );
 		await user.keyboard( textValue );
 
 		// Was originally title: 'Hello Page', but we've changed it.
@@ -2968,7 +3003,7 @@ describe( 'Custom settings rendering', () => {
 	it( 'renders custom settings with valid render functions', async () => {
 		const user = userEvent.setup();
 		const mockRender = vi.fn(
-			// eslint-disable-next-line no-unused-vars
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			( setting, value, onChange ) =>
 				createElement(
 					'div',
@@ -3011,7 +3046,7 @@ describe( 'Custom settings rendering', () => {
 	it( 'renders only valid settings when mixed with invalid ones', async () => {
 		const user = userEvent.setup();
 		const validRender = vi.fn(
-			// eslint-disable-next-line no-unused-vars
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
 			( setting, value, onChange ) =>
 				createElement(
 					'div',
@@ -3020,7 +3055,7 @@ describe( 'Custom settings rendering', () => {
 				)
 		);
 
-		const settings = [
+		const settings: LinkControlSetting[] = [
 			{
 				id: 'validSetting',
 				title: 'Valid Setting',
@@ -3029,6 +3064,7 @@ describe( 'Custom settings rendering', () => {
 			{
 				id: 'invalidSetting',
 				title: 'Invalid Setting',
+				// @ts-expect-error An invalid `render` is skipped.
 				render: 'not a function',
 			},
 			{
@@ -3416,7 +3452,7 @@ describe( 'inputValue prop', () => {
 			name: 'Search or type URL',
 		} );
 
-		expect( searchInput.value ).toBe( 'wordpress' );
+		expect( ( searchInput as HTMLInputElement ).value ).toBe( 'wordpress' );
 	} );
 
 	it( 'should not use inputValue when value.url is provided', () => {
@@ -3436,7 +3472,9 @@ describe( 'inputValue prop', () => {
 			name: 'Search or type URL',
 		} );
 
-		expect( searchInput.value ).toBe( 'https://example.com' );
+		expect( ( searchInput as HTMLInputElement ).value ).toBe(
+			'https://example.com'
+		);
 	} );
 
 	it( 'should respect user input over inputValue after user types', async () => {
@@ -3449,13 +3487,13 @@ describe( 'inputValue prop', () => {
 		} );
 
 		// Initial value from inputValue
-		expect( searchInput.value ).toBe( 'wordpress' );
+		expect( ( searchInput as HTMLInputElement ).value ).toBe( 'wordpress' );
 
 		// User types something
 		await user.clear( searchInput );
 		await user.type( searchInput, 'example' );
 
-		expect( searchInput.value ).toBe( 'example' );
+		expect( ( searchInput as HTMLInputElement ).value ).toBe( 'example' );
 	} );
 
 	it( 'should respect empty string after user clears input, not revert to inputValue', async () => {
@@ -3468,13 +3506,13 @@ describe( 'inputValue prop', () => {
 		} );
 
 		// Initial value from inputValue
-		expect( searchInput.value ).toBe( 'wordpress' );
+		expect( ( searchInput as HTMLInputElement ).value ).toBe( 'wordpress' );
 
 		// User clears the input
 		await user.clear( searchInput );
 
 		// Should be empty, NOT revert to "wordpress"
-		expect( searchInput.value ).toBe( '' );
+		expect( ( searchInput as HTMLInputElement ).value ).toBe( '' );
 	} );
 
 	it( 'should call onInputChange when user types, with observable pattern', async () => {
@@ -3508,10 +3546,10 @@ function getSettingsDrawerToggle() {
 	} );
 }
 
-async function toggleSettingsDrawer( user ) {
+async function toggleSettingsDrawer( user: UserEvent ) {
 	const settingsToggle = getSettingsDrawerToggle();
 
-	await user.click( settingsToggle );
+	await user.click( settingsToggle! );
 }
 
 describe( 'Link preview with entity data from navigation blocks', () => {
@@ -3564,7 +3602,7 @@ describe( 'Link preview with entity data from navigation blocks', () => {
 
 	describe( 'Entity status badges', () => {
 		it( 'should display badges in link preview when entity provides badges', () => {
-			const linkWithBadges = {
+			const linkWithBadges: LinkControlValue = {
 				url: 'https://example.com/my-page',
 				title: 'My Test Page',
 				badges: [
@@ -3643,7 +3681,7 @@ describe( 'Front page and blog home labelling', () => {
 
 		// Posts and terms are separate tables, so a term can share an id with
 		// the page set as the front page.
-		useSelect.mockImplementation( () => ( {
+		( useSelect as Mock ).mockImplementation( () => ( {
 			fetchSearchSuggestions: () => Promise.resolve( [ aCategory ] ),
 			fetchRichUrlData: mockFetchRichUrlData,
 			pageOnFront: 1,
@@ -3748,7 +3786,7 @@ describe( 'Transforming suggestions', () => {
 			...suggestions,
 		] );
 
-		useSelect.mockImplementation( () => ( {
+		( useSelect as Mock ).mockImplementation( () => ( {
 			fetchSearchSuggestions: () => Promise.resolve( [] ),
 			fetchRichUrlData: mockFetchRichUrlData,
 			pageOnFront: 1,

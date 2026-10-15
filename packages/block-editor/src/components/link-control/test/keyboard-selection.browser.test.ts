@@ -7,6 +7,7 @@ import { createElement, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import LinkControl from '../';
 import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
+import type { LinkControlValue } from '../types';
 
 const mockFetchSearchSuggestions = vi.fn();
 
@@ -21,7 +22,7 @@ beforeEach( () => {
 	vi.mocked( useDispatch ).mockReturnValue( {
 		saveEntityRecords: vi.fn(),
 	} );
-	useSelect.mockImplementation( () => ( {
+	vi.mocked( useSelect ).mockImplementation( () => ( {
 		fetchSearchSuggestions: mockFetchSearchSuggestions,
 		fetchRichUrlData: undefined,
 	} ) );
@@ -54,7 +55,7 @@ describe( 'LinkControl keyboard selection', () => {
 		async ( type, searchTerm, selectedLink, selectionSteps ) => {
 			const user = userEvent.setup();
 			function LinkControlConsumer() {
-				const [ link, setLink ] = useState();
+				const [ link, setLink ] = useState< LinkControlValue >();
 
 				return createElement( LinkControl, {
 					value: link,

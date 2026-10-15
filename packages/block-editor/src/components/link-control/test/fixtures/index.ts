@@ -33,14 +33,14 @@ export const fauxEntitySuggestions = [
 	},
 ];
 
-/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const fetchFauxEntitySuggestions = (
 	val = '',
-	{ isInitialSuggestions } = {}
+	{ isInitialSuggestions }: { isInitialSuggestions?: boolean } = {}
 ) => {
 	const suggestions = isInitialSuggestions
 		? fauxEntitySuggestions.slice( 0, 3 )
 		: fauxEntitySuggestions;
 	return Promise.resolve( suggestions );
 };
-/* eslint-enable no-unused-vars */
+/* eslint-enable @typescript-eslint/no-unused-vars */
