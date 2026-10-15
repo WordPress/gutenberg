@@ -24,8 +24,9 @@ import {
 } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { external, keyboardReturn } from '@wordpress/icons';
-import { InputControl } from '@wordpress/ui';
+import { external, keyboardReturn, link } from '@wordpress/icons';
+import { Icon, InputControl, InputLayout } from '@wordpress/ui';
+import { isURL } from '@wordpress/url';
 import { store as blocksStore } from '@wordpress/blocks';
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
@@ -206,23 +207,6 @@ const SocialLinkEdit = ( {
 				>
 					<ToolsPanelItem
 						isShownByDefault
-						label={ __( 'Link' ) }
-						hasValue={ () => !! url }
-						onDeselect={ () => {
-							setAttributes( { url: undefined } );
-						} }
-					>
-						<InputControl
-							type="url"
-							label={ __( 'Link' ) }
-							value={ url || '' }
-							onValueChange={ ( value ) =>
-								setAttributes( { url: value } )
-							}
-						/>
-					</ToolsPanelItem>
-					<ToolsPanelItem
-						isShownByDefault
 						label={ __( 'Text' ) }
 						hasValue={ () => !! label }
 						onDeselect={ () => {
@@ -241,7 +225,29 @@ const SocialLinkEdit = ( {
 							placeholder={ socialLinkName }
 						/>
 					</ToolsPanelItem>
-					{ !! url && (
+					<ToolsPanelItem
+						isShownByDefault
+						label={ __( 'Link' ) }
+						hasValue={ () => !! url }
+						onDeselect={ () => {
+							setAttributes( { url: undefined } );
+						} }
+					>
+						<InputControl
+							type="url"
+							label={ __( 'Link' ) }
+							value={ url || '' }
+							onValueChange={ ( value ) =>
+								setAttributes( { url: value } )
+							}
+							prefix={
+								<InputLayout.Slot padding="minimal">
+									<Icon icon={ link } />
+								</InputLayout.Slot>
+							}
+						/>
+					</ToolsPanelItem>
+					{ !! url && isURL( url ) && (
 						<Button
 							variant="secondary"
 							href={ url }
