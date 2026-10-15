@@ -1265,6 +1265,26 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( '繁体字 ' ) ).toBe( '繁体字' );
 	} );
 
+	it( 'Keeps the combining marks of scripts that need them', () => {
+		expect( cleanForSlug( 'अलग-अलग प्रकार के प्लंबिंग ट्रैप्स' ) ).toBe(
+			'अलग-अलग-प्रकार-के-प्लंबिंग-ट्रैप्स'
+		);
+		expect( cleanForSlug( 'हिंदी व्याकरण' ) ).toBe( 'हिंदी-व्याकरण' );
+		expect( cleanForSlug( 'தமிழ் மொழி' ) ).toBe( 'தமிழ்-மொழி' );
+		expect( cleanForSlug( 'Cre\u0300me Bru\u0302le\u0301e' ) ).toBe(
+			'creme-brulee'
+		);
+	} );
+
+	it( 'Drops emoji variation selectors and keycap marks', () => {
+		expect( cleanForSlug( 'I \u2764\uFE0F WordPress' ) ).toBe(
+			'i-wordpress'
+		);
+		expect( cleanForSlug( 'Step 1\uFE0F\u20E3 done \u2714\uFE0F' ) ).toBe(
+			'step-1-done'
+		);
+	} );
+
 	it( 'Should trim multiple leading and trailing dashes', () => {
 		expect( cleanForSlug( '  -Is th@t Déjà_vu- 	' ) ).toBe(
 			'is-tht-deja_vu'
