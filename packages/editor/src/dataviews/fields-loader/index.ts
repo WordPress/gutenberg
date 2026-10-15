@@ -224,9 +224,10 @@ export function useFields< Item = any >( {
 					kind,
 					name,
 				] ) as unknown,
-				pluginFields: unlock(
-					_select( editorStore )
-				).getEntityPluginFields( kind, name ) as Field< Item >[],
+				pluginFields: unlock( _select( editorStore ) ).getEntityFields(
+					kind,
+					name
+				) as Field< Item >[],
 			};
 		},
 		[ kind, name, isEnabled ]

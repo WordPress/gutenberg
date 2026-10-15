@@ -242,18 +242,11 @@ describe( 'useFields', () => {
 		);
 	} );
 
-	it( 'adds the fields a plugin registers on the client, but not the default ones', async () => {
+	it( 'adds the fields a plugin registers on the client, unless the server has their id', async () => {
 		vi.mocked( apiFetch ).mockResolvedValue( SERVER_CONFIG );
 		const registry = createRegistryWithStores();
 		const { registerEntityField } = unlock(
 			registry.dispatch( editorStore )
-		);
-		// The editor registers its defaults, which the server registers too.
-		registerEntityField(
-			'postType',
-			'page',
-			{ id: 'slug', label: 'Slug' },
-			{ isDefault: true }
 		);
 		// A plugin adds a field of its own, and one with a server id.
 		registerEntityField( 'postType', 'page', {

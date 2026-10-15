@@ -23,7 +23,6 @@ import {
 import {
 	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
-	getEntityPluginFields as _getEntityPluginFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
 import { unlock } from '../lock-unlock';
@@ -181,10 +180,6 @@ export function isEntityReady( state, ...args ) {
 
 export function getEntityFields( state, ...args ) {
 	return _getEntityFields( state.dataviews, ...args );
-}
-
-export function getEntityPluginFields( state, ...args ) {
-	return _getEntityPluginFields( state.dataviews, ...args );
 }
 
 /**

@@ -16,37 +16,7 @@ import {
 	resetPost,
 	deletePost,
 	duplicateTemplatePart,
-	excerptField,
-	featuredImageField,
-	dateField,
-	parentField,
-	passwordField,
-	commentStatusField,
-	pingStatusField,
-	discussionField,
-	slugField,
-	statusField,
-	authorField,
-	templateAuthorField,
-	templatePartAuthorField,
 	titleField,
-	templateField,
-	templateTitleField,
-	pageTitleField,
-	patternTitleField,
-	patternDescriptionField,
-	patternSyncStatusField,
-	notesField,
-	scheduledDateField,
-	lastEditedDateField,
-	formatField,
-	postContentInfoField,
-	stickyField,
-	descriptionField,
-	readOnlyDescriptionField,
-	postsPerPageField,
-	siteDiscussionField,
-	postsPageTitleField,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -61,23 +31,8 @@ import {
 	mimeTypeField,
 } from '@wordpress/media-fields';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
-import postPreviewField from '../fields/content-preview';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
-
-/**
- * Check if a post type supports editor notes.
- *
- * @param supports The post type supports object.
- * @return Whether editor notes are supported.
- */
-function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
-	const editor = supports?.editor;
-	if ( Array.isArray( editor ) ) {
-		return !! editor[ 0 ]?.notes;
-	}
-	return false;
-}
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -105,33 +60,16 @@ export function unregisterEntityAction(
 	};
 }
 
-/**
- * Registers a field of an entity.
- *
- * @param kind              Entity kind.
- * @param name              Entity name.
- * @param config            Field configuration.
- * @param options           Options.
- * @param options.isDefault Whether the field is one of the defaults the editor
- *                          registers itself, rather than a field a plugin
- *                          registers with the public `registerEntityField`.
- *                          The server registers the defaults too, so the
- *                          screens that read the fields from the server only
- *                          add the ones a plugin registered.
- * @return Action object.
- */
 export function registerEntityField< Item >(
 	kind: string,
 	name: string,
-	config: Field< Item >,
-	{ isDefault = false }: { isDefault?: boolean } = {}
+	config: Field< Item >
 ) {
 	return {
 		type: 'REGISTER_ENTITY_FIELD' as const,
 		kind,
 		name,
 		config,
-		isDefault,
 	};
 }
 
@@ -210,9 +148,6 @@ export const registerPostTypeSchema =
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
-		const { disablePostFormats } = registry
-			.select( editorStore )
-			.getEditorSettings();
 
 		let canDuplicate =
 			! [ 'wp_block', 'wp_template_part', 'wp_template' ].includes(
@@ -253,92 +188,10 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// Handle attachment post type separately with media-specific fields
-		let fields;
-
-		if ( postType === ATTACHMENT_POST_TYPE ) {
-			fields = ORDERED_MEDIA_FIELDS;
-		} else {
-			const postTypeSlug = postTypeConfig.slug;
-			const isDesignPostType = DESIGN_POST_TYPES.includes( postTypeSlug );
-			const isPattern = postTypeSlug === 'wp_block';
-			// `post-thumbnails` is `true` or the list of post types the theme
-			// opted in.
-			const postThumbnails =
-				currentTheme?.theme_supports?.[ 'post-thumbnails' ];
-			const themeSupportsThumbnails = Array.isArray( postThumbnails )
-				? postThumbnails.includes( postTypeSlug )
-				: !! postThumbnails;
-
-			fields = [
-				postTypeConfig.supports?.thumbnail &&
-					themeSupportsThumbnails &&
-					featuredImageField,
-				! isDesignPostType &&
-					postTypeConfig.supports?.author &&
-					authorField,
-				postTypeSlug === 'wp_template' && templateAuthorField,
-				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
-				! isDesignPostType && statusField,
-				! isDesignPostType && dateField,
-				! isDesignPostType && scheduledDateField,
-				lastEditedDateField,
-				// There is no post type support flag for permalinks, and
-				// `viewable` alone is not the full condition (the type must
-				// also be public), so the field also checks each post.
-				! isDesignPostType && postTypeConfig.viewable && slugField,
-				! isDesignPostType &&
-					postTypeConfig.supports?.excerpt &&
-					excerptField,
-				isPattern &&
-					postTypeConfig.supports?.excerpt &&
-					patternDescriptionField,
-				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-				postTypeConfig.supports?.comments && commentStatusField,
-				postTypeConfig.supports?.trackbacks && pingStatusField,
-				( postTypeConfig.supports?.comments ||
-					postTypeConfig.supports?.trackbacks ) &&
-					discussionField,
-				! isDesignPostType && templateField,
-				postTypeConfig.supports?.[ 'post-formats' ] &&
-					! disablePostFormats &&
-					formatField,
-				( ! isDesignPostType || isPattern ) &&
-					postTypeConfig.supports?.editor &&
-					postContentInfoField,
-				! isDesignPostType && passwordField,
-				postTypeSlug === 'post' && stickyField,
-				postTypeSlug === 'wp_template' && descriptionField,
-				postTypeSlug === 'wp_template' && readOnlyDescriptionField,
-				// The `home`/`index` template summary exposes a few fields that
-				// target other entities (`root/site` and the posts page).
-				// `DataFormPostSummary` overrides them to read/write the right
-				// entity and to control their visibility.
-				postTypeSlug === 'wp_template' && postsPageTitleField,
-				postTypeSlug === 'wp_template' && postsPerPageField,
-				postTypeSlug === 'wp_template' && siteDiscussionField,
-				postTypeConfig.supports?.editor &&
-					postTypeConfig.viewable &&
-					postPreviewField,
-				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
-				isPattern && patternSyncStatusField,
-			].filter( Boolean );
-			if ( postTypeConfig.supports?.title ) {
-				let _titleField;
-				if ( postType === 'page' ) {
-					_titleField = pageTitleField;
-				} else if ( postType === 'wp_template' ) {
-					_titleField = templateTitleField;
-				} else if (
-					[ 'wp_block', 'wp_template_part' ].includes( postType )
-				) {
-					_titleField = patternTitleField;
-				} else {
-					_titleField = titleField;
-				}
-				fields.push( _titleField );
-			}
-		}
+		// Only the attachment fields are registered on the client. The other
+		// post types read their fields from the server, see `useFields`.
+		const fields =
+			postType === ATTACHMENT_POST_TYPE ? ORDERED_MEDIA_FIELDS : [];
 
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
@@ -352,8 +205,7 @@ export const registerPostTypeSchema =
 				unlock( registry.dispatch( editorStore ) ).registerEntityField(
 					'postType',
 					postType,
-					field,
-					{ isDefault: true }
+					field
 				);
 			} );
 		} );
