@@ -52,6 +52,9 @@
 			"attribute": "rel",
 			"role": "content"
 		},
+		"linkClass": {
+			"type": "string"
+		},
 		"placeholder": {
 			"type": "string"
 		},

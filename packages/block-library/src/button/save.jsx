@@ -16,6 +16,7 @@ export default function save( { attributes } ) {
 		type,
 		fontSize,
 		linkTarget,
+		linkClass,
 		rel,
 		style,
 		text,
@@ -35,6 +36,7 @@ export default function save( { attributes } ) {
 		colorProps.className,
 		borderProps.className,
 		typographyProps.className,
+		linkClass,
 		{
 			// For backwards compatibility add style that isn't provided via
 			// block support.

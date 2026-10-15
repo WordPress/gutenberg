@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/button",
+		"isValid": true,
+		"attributes": {
+			"tagName": "a",
+			"type": "button",
+			"url": "https://wordpress.org/",
+			"text": "My button",
+			"linkClass": "btn btn-primary"
+		},
+		"innerBlocks": []
+	}
+]

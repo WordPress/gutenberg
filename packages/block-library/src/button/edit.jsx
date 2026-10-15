@@ -49,7 +49,9 @@ import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
-const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+const { HTMLElementControl, cssClassesLinkSetting } = unlock(
+	blockEditorPrivateApis
+);
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [
@@ -58,6 +60,7 @@ const LINK_SETTINGS = [
 		id: 'nofollow',
 		title: __( 'Mark as nofollow' ),
 	},
+	cssClassesLinkSetting,
 ];
 
 function useEnter( clientId ) {
@@ -137,6 +140,7 @@ function ButtonEdit( props ) {
 	const {
 		tagName,
 		linkTarget,
+		linkClass,
 		placeholder,
 		rel,
 		style,
@@ -263,8 +267,8 @@ function ButtonEdit( props ) {
 	// Memoize link value to avoid overriding the LinkControl's internal state.
 	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/51256.
 	const linkValue = useMemo(
-		() => ( { url, opensInNewTab, nofollow } ),
-		[ url, opensInNewTab, nofollow ]
+		() => ( { url, opensInNewTab, nofollow, cssClasses: linkClass } ),
+		[ url, opensInNewTab, nofollow, linkClass ]
 	);
 
 	const useEnterRef = useEnter( clientId );
@@ -353,6 +357,7 @@ function ButtonEdit( props ) {
 						backgroundProps.className,
 						borderProps.className,
 						typographyProps.className,
+						linkClass,
 						{
 							// For backwards compatibility add style that isn't
 							// provided via block support.
@@ -408,15 +413,17 @@ function ButtonEdit( props ) {
 							url: newURL,
 							opensInNewTab: newOpensInNewTab,
 							nofollow: newNofollow,
+							cssClasses: newCssClasses,
 						} ) =>
-							setAttributes(
-								getUpdatedLinkAttributes( {
+							setAttributes( {
+								...getUpdatedLinkAttributes( {
 									rel,
 									url: newURL,
 									opensInNewTab: newOpensInNewTab,
 									nofollow: newNofollow,
-								} )
-							)
+								} ),
+								linkClass: newCssClasses || undefined,
+							} )
 						}
 						onRemove={ () => {
 							unlink();

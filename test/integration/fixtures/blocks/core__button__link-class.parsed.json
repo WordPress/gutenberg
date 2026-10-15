@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/button",
+		"attrs": {
+			"linkClass": "btn btn-primary"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link btn btn-primary wp-element-button\" href=\"https://wordpress.org/\">My button</a></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-button\"><a class=\"wp-block-button__link btn btn-primary wp-element-button\" href=\"https://wordpress.org/\">My button</a></div>\n"
+		]
+	}
+]
