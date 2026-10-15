@@ -260,9 +260,8 @@ function validateEntryLinks(
 }
 
 /**
- * Rejects blank lines between top-level entries in an Unreleased subsection.
- * One blank line would make the whole list loose. Blank lines before nested
- * children stay allowed, as in `validateEntryLinks`.
+ * Rejects blank lines inside an Unreleased list, whether between entries or
+ * within an entry. One blank line would make the whole list loose.
  *
  * @param unreleased Unreleased section.
  * @param filePath   Path for error messages.
@@ -277,17 +276,23 @@ function validateEntrySpacing(
 
 	for ( let i = 1; i < unreleased.lines.length; i++ ) {
 		const line = unreleased.lines[ i ];
-		if ( /^-\s+/.test( line ) ) {
-			if ( inEntry && unreleased.lines[ i - 1 ] === '' ) {
-				errors.push(
-					`${ filePath }:${
-						unreleased.start + i + 1
-					}: blank line between Unreleased entries. Entries in a subsection must not be separated by blank lines.`
-				);
-			}
-			inEntry = true;
-		} else if ( line !== '' && ! /^\s/.test( line ) ) {
+		if ( line === '' ) {
+			continue;
+		}
+		const isTopLevel = /^-\s+/.test( line );
+		if ( ! isTopLevel && ! /^\s/.test( line ) ) {
 			inEntry = false;
+			continue;
+		}
+		if ( inEntry && unreleased.lines[ i - 1 ] === '' ) {
+			errors.push(
+				`${ filePath }:${
+					unreleased.start + i + 1
+				}: blank line inside an Unreleased list. Entries and their nested lines must not be separated by blank lines.`
+			);
+		}
+		if ( isTopLevel ) {
+			inEntry = true;
 		}
 	}
 

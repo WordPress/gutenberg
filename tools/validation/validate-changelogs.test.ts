@@ -51,16 +51,19 @@ describe( 'validateChangelog', () => {
 		expect( errors ).toEqual( [] );
 	} );
 
-	test( 'accepts a nested PR link after a blank line under the parent bullet', () => {
+	test( 'finds a nested PR link after a blank line under the parent bullet', () => {
 		const errors = validateChangelog(
 			changelog( `### Breaking Changes
 
 -   Parent description:
 
     -   \`Child\` ([#82570](https://github.com/WordPress/gutenberg/pull/82570))
-` )
+` ),
+			{ filePath: 'packages/ui/CHANGELOG.md' }
 		);
-		expect( errors ).toEqual( [] );
+		expect( errors ).toEqual( [
+			'packages/ui/CHANGELOG.md:9: blank line inside an Unreleased list. Entries and their nested lines must not be separated by blank lines.',
+		] );
 	} );
 
 	test( 'accepts a PR link on a soft-wrapped continuation line', () => {
@@ -174,25 +177,8 @@ describe( 'validateChangelog', () => {
 			{ filePath: 'packages/ui/CHANGELOG.md' }
 		);
 		expect( errors ).toEqual( [
-			'packages/ui/CHANGELOG.md:9: blank line between Unreleased entries. Entries in a subsection must not be separated by blank lines.',
+			'packages/ui/CHANGELOG.md:9: blank line inside an Unreleased list. Entries and their nested lines must not be separated by blank lines.',
 		] );
-	} );
-
-	test( 'accepts a blank line before nested children followed by another entry', () => {
-		const errors = validateChangelog(
-			changelog( `### Breaking Changes
-
--   Parent description:
-
-    -   \`Child\` ([#82570](https://github.com/WordPress/gutenberg/pull/82570))
--   Another change ([#82571](https://github.com/WordPress/gutenberg/pull/82571)).
-
-### Bug Fixes
-
--   Fixed something ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
-` )
-		);
-		expect( errors ).toEqual( [] );
 	} );
 
 	test( 'requirePr checks for this pull request link under Unreleased', () => {
