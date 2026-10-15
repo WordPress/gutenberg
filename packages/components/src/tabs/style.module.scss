@@ -190,7 +190,6 @@
 		&::after {
 			content: "";
 			inset: 0;
-			border-radius: 0;
 			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 		}
 	}

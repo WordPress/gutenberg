@@ -99,7 +99,6 @@
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
 		&::before {
 			inset: 0;
-			border-radius: 0;
 			outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		}
 
