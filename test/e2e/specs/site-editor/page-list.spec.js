@@ -629,6 +629,36 @@ test.describe( 'Page List', () => {
 				modal.getByRole( 'button', { name: 'Edit Status' } )
 			).toBeFocused();
 		} );
+
+		test( 'keeps mobile grid selection visible and restores focus after cancelling', async ( {
+			page,
+		} ) => {
+			await page.setViewportSize( { width: 390, height: 844 } );
+			await page.getByRole( 'button', { name: 'Layout' } ).click();
+			await page.getByRole( 'menuitemradio', { name: 'Grid' } ).click();
+			await page.getByRole( 'checkbox', { name: 'Select all' } ).click();
+			const selection = page.getByRole( 'checkbox', {
+				name: 'Deselect all',
+			} );
+			await expect( selection ).toBeChecked();
+			const toolbar = page.locator( '.dataviews-bulk-actions' );
+			await toolbar.getByRole( 'button', { name: 'Actions' } ).click();
+			await expect(
+				page.getByRole( 'menuitem', { name: 'Bulk edit' } )
+			).toBeVisible();
+			await expect( selection ).toBeInViewport( { ratio: 1 } );
+			await expect(
+				toolbar.getByText( /items selected/ )
+			).toBeInViewport( { ratio: 1 } );
+			await page.keyboard.press( 'Escape' );
+			await toolbar.getByRole( 'button', { name: 'Cancel' } ).click();
+			await expect(
+				page.getByRole( 'checkbox', {
+					name: 'Select all',
+					exact: true,
+				} )
+			).toBeFocused();
+		} );
 	} );
 
 	test.describe( 'Quick Edit Date Timezone Consistency', () => {
