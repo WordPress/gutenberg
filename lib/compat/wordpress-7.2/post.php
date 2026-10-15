@@ -18,3 +18,21 @@ function gutenberg_add_wp_block_author_support() {
 	add_post_type_support( 'wp_block', 'author' );
 }
 add_action( 'init', 'gutenberg_add_wp_block_author_support' );
+
+/**
+ * Keeps patterns when their author is deleted.
+ *
+ * Now that `wp_block` supports `author`, deleting a user would also delete
+ * their patterns, which may be used across the site.
+ *
+ * @param array  $args      Arguments for registering a post type.
+ * @param string $post_type Post type key.
+ * @return array Filtered arguments.
+ */
+function gutenberg_keep_wp_block_on_user_delete( $args, $post_type ) {
+	if ( 'wp_block' === $post_type ) {
+		$args['delete_with_user'] = false;
+	}
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_keep_wp_block_on_user_delete', 10, 2 );
