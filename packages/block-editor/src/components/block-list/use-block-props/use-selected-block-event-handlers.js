@@ -130,8 +130,8 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				event.dataTransfer.setDragImage( dragElement, 0, 0 );
 
 				// In a manual placement grid, the grid shows the cells the
-				// block will land in, so the block stays in place, dimmed,
-				// instead of following the pointer.
+				// block will land in, so the block stays in place, hidden by
+				// the grid, instead of following the pointer.
 				const rootLayout = getBlockAttributes(
 					getBlockRootClientId( clientId )
 				)?.layout;
@@ -140,9 +140,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					rootLayout.isManualPlacement &&
 					window.__experimentalEnableGridInteractivity
 				) {
-					const originalOpacity = node.style.opacity;
-					node.style.opacity = '0.5';
-
 					// The grid's drop layer is in the editor's document,
 					// outside the canvas, and a drop there can re-render the
 					// block, after which its `dragend` no longer reaches the
@@ -185,7 +182,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 								endGridDrag
 							);
 						}
-						node.style.opacity = originalOpacity;
 						dragElement.remove();
 						stopDraggingBlocks();
 						document.body.classList.remove(
