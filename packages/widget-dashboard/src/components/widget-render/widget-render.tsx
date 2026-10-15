@@ -21,7 +21,8 @@ interface WidgetRenderProps {
  * the widget renders read-only: it receives no `setAttributes`.
  *
  * Lends the widget the `actions` capability, bound to this render of the
- * instance.
+ * instance, and the translated `title` of its type, the one the widget
+ * header shows.
  *
  * @param {WidgetRenderProps} props Component props.
  */
@@ -66,8 +67,9 @@ export function WidgetRender( { widget, widgetType }: WidgetRenderProps ) {
 						actions
 					),
 			},
+			title: widgetType.title,
 		} ),
-		[ runtimeActions, widget.uuid, renderId ]
+		[ runtimeActions, widget.uuid, renderId, widgetType.title ]
 	);
 
 	return (
