@@ -61,41 +61,58 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
-type CoreActions = Record< string, Action< any > >;
+/**
+ * Reads the actions of a settled import of a core actions script module.
+ *
+ * A module that failed to load is reported and yields no actions, so the
+ * post type still gets the actions of the other modules.
+ *
+ * @param result   The settled import of the module, or of nothing when the
+ *                 post type does not need the module.
+ * @param postType The post type.
+ * @return The actions of the module, keyed by action id.
+ */
+function getLoadedActions< Module extends { default: object } >(
+	result: PromiseSettledResult< Module | undefined >,
+	postType: string
+): Partial< Module[ 'default' ] > {
+	if ( result.status === 'rejected' ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Could not load the core actions of the ${ postType } post type.`,
+			result.reason
+		);
+		return {};
+	}
+	return result.value?.default ?? {};
+}
 
 /**
  * Imports the script modules of the core actions a post type may get: the
  * default actions, and the actions of patterns and template parts.
  *
- * A module that fails to load is reported and skipped, so the post type
- * still gets the actions of the other modules.
+ * The literal `import()`s keep the modules as dependencies of the editor
+ * script, and their types check the action ids the schema reads below.
  *
  * @param postType The post type.
  * @return The actions of each module, keyed by action id.
  */
-async function importCoreActionModules(
-	postType: string
-): Promise< [ CoreActions, CoreActions, CoreActions ] > {
-	const results = await Promise.allSettled( [
-		import( '@wordpress/core-actions/post_type_supports' ),
-		postType === 'wp_block'
-			? import( '@wordpress/core-actions/wp_block' )
-			: undefined,
-		postType === 'wp_template_part'
-			? import( '@wordpress/core-actions/wp_template_part' )
-			: undefined,
-	] );
-	return results.map( ( result ) => {
-		if ( result.status === 'rejected' ) {
-			// eslint-disable-next-line no-console
-			console.warn(
-				`Could not load the core actions of the ${ postType } post type.`,
-				result.reason
-			);
-			return {};
-		}
-		return result.value?.default ?? {};
-	} ) as [ CoreActions, CoreActions, CoreActions ];
+async function importCoreActionModules( postType: string ) {
+	const [ postTypeSupports, wpBlock, wpTemplatePart ] =
+		await Promise.allSettled( [
+			import( '@wordpress/core-actions/post_type_supports' ),
+			postType === 'wp_block'
+				? import( '@wordpress/core-actions/wp_block' )
+				: undefined,
+			postType === 'wp_template_part'
+				? import( '@wordpress/core-actions/wp_template_part' )
+				: undefined,
+		] );
+	return [
+		getLoadedActions( postTypeSupports, postType ),
+		getLoadedActions( wpBlock, postType ),
+		getLoadedActions( wpTemplatePart, postType ),
+	] as const;
 }
 
 export const registerPostTypeSchema =

@@ -14,6 +14,7 @@
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
+		{ "path": "../patterns" },
 		{ "path": "../private-apis" },
 		{ "path": "../url" }
 	]

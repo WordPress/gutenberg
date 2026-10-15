@@ -9,8 +9,8 @@
 import type { Action } from '@wordpress/dataviews';
 import duplicateTemplatePart from './duplicate-template-part/action';
 
-const actions: Record< string, Action< any > > = {
+const actions = {
 	'duplicate-template-part': duplicateTemplatePart,
-};
+} satisfies Record< string, Action< any > >;
 
 export default actions;

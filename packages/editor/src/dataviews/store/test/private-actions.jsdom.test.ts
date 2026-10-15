@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import postTypeSupports from '@wordpress/core-actions/post_type_supports';
@@ -9,11 +9,6 @@ import { lock, unlock } from '../../../lock-unlock';
 import { registerPostTypeSchema } from '../private-actions';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
-
-// The script module of the template part actions fails to load in these tests.
-vi.mock( import( '@wordpress/core-actions/wp_template_part' ), () =>
-	Promise.reject( new Error( 'Failed to fetch' ) )
-);
 
 const POST_TYPES = {
 	page: {
@@ -47,7 +42,7 @@ const POST_TYPES = {
  */
 async function register( postType: keyof typeof POST_TYPES ) {
 	const actions: Action< any >[] = [];
-	const editorSelectors = { getEditorSettings: () => ( {} ) };
+	const editorSelectors = {};
 	lock( editorSelectors, { isEntityReady: () => false } );
 	const editorActions = {};
 	lock( editorActions, {
@@ -97,6 +92,13 @@ function registerSchema( postType: string, supports: Record< string, any > ) {
 }
 
 describe( 'registerPostTypeSchema', () => {
+	afterEach( async () => {
+		// Undo the mock of the last test. Like the mock, it takes effect on the
+		// next import from this file.
+		vi.doUnmock( import( '@wordpress/core-actions/wp_template_part' ) );
+		await import( '@wordpress/core-actions/wp_template_part' );
+	} );
+
 	it( 'registers the actions of a post type', async () => {
 		const { getEntityActions } = await registerSchema( 'page', {
 			title: true,
@@ -128,7 +130,7 @@ describe( 'registerPostTypeSchema', () => {
 			'permanently-delete',
 		] );
 		for ( const action of actions ) {
-			expect( action ).toBe( postTypeSupports[ action.id ] );
+			expect( Object.values( postTypeSupports ) ).toContain( action );
 		}
 	} );
 
@@ -150,7 +152,37 @@ describe( 'registerPostTypeSchema', () => {
 		expect( actions ).toContain( wpBlock[ 'export-pattern' ] );
 	} );
 
+	it( 'registers the template part actions from their script module', async () => {
+		const { default: wpTemplatePart } =
+			await import( '@wordpress/core-actions/wp_template_part' );
+		const { actions, actionIds } = await register( 'wp_template_part' );
+
+		expect( actionIds ).toEqual( [
+			'view-post-revisions',
+			'duplicate-template-part',
+			'rename-post',
+			'restore',
+			'reset-post',
+			'delete-post',
+			'move-to-trash',
+			'permanently-delete',
+		] );
+		expect( actions ).toContain(
+			wpTemplatePart[ 'duplicate-template-part' ]
+		);
+	} );
+
 	it( 'registers the other actions when a script module fails to load', async () => {
+		// The script module of the template part actions fails to load. A mock
+		// queued by `vi.doMock()` only takes effect once this file imports a
+		// module, so import it here before the schema does.
+		vi.doMock( import( '@wordpress/core-actions/wp_template_part' ), () =>
+			Promise.reject( new Error( 'Failed to fetch' ) )
+		);
+		await expect(
+			import( '@wordpress/core-actions/wp_template_part' )
+		).rejects.toThrow();
+
 		const { actionIds } = await register( 'wp_template_part' );
 
 		expect( actionIds ).toEqual( [

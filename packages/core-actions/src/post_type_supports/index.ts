@@ -20,7 +20,7 @@ import restore from './restore/action';
 import viewPost from './view-post/action';
 import viewPostRevisions from './view-post-revisions/action';
 
-const actions: Record< string, Action< any > > = {
+const actions = {
 	'delete-post': deletePost,
 	'duplicate-post': duplicatePost,
 	'move-to-trash': moveToTrash,
@@ -31,6 +31,6 @@ const actions: Record< string, Action< any > > = {
 	restore,
 	'view-post': viewPost,
 	'view-post-revisions': viewPostRevisions,
-};
+} satisfies Record< string, Action< any > >;
 
 export default actions;

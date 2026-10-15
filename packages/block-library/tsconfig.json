@@ -22,6 +22,7 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
+		{ "path": "../patterns" },
 		{ "path": "../private-apis" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities/tsconfig.build.json" },

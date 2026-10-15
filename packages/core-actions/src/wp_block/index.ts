@@ -10,9 +10,9 @@ import type { Action } from '@wordpress/dataviews';
 import duplicatePattern from './duplicate-pattern/action';
 import exportPattern from './export-pattern/action';
 
-const actions: Record< string, Action< any > > = {
+const actions = {
 	'duplicate-pattern': duplicatePattern,
 	'export-pattern': exportPattern,
-};
+} satisfies Record< string, Action< any > >;
 
 export default actions;

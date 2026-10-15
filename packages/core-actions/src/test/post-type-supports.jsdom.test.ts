@@ -20,7 +20,7 @@ describe( 'post_type_supports', () => {
 		}
 	} );
 
-	it( 'does not offer to view or restore a post in the trash', () => {
+	it( 'offers to restore a post in the trash, not to view or trash it', () => {
 		const post = {
 			id: 1,
 			type: 'post',

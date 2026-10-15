@@ -95,5 +95,5 @@ export type PostWithPermissions = Post & {
 	};
 };
 
-// Will be unnecessary after typescript 5.0 upgrade.
+// The rejection of a core-data request: a REST error object, not an `Error`.
 export type CoreDataError = { message?: string; code?: string };
