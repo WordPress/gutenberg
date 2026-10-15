@@ -297,3 +297,53 @@ function gutenberg_register_post_trash_action_link( $post_type, $post_type_objec
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_post_trash_action_link', 10, 3 );
 }
 add_action( 'registered_post_type', 'gutenberg_register_post_trash_action_link', 10, 2 );
+
+/**
+ * Adds the `search_columns` parameter to the search endpoint.
+ *
+ * Lets callers limit a post search to specific columns, e.g. titles only, as
+ * the posts endpoints already allow.
+ *
+ * @param array $endpoints The REST API endpoints.
+ * @return array The filtered endpoints.
+ */
+function gutenberg_add_search_columns_to_search_endpoint( $endpoints ) {
+	if ( empty( $endpoints['/wp/v2/search'] ) ) {
+		return $endpoints;
+	}
+
+	foreach ( $endpoints['/wp/v2/search'] as $index => $endpoint ) {
+		if ( ! is_int( $index ) || ! isset( $endpoint['args'] ) ) {
+			continue;
+		}
+
+		$endpoints['/wp/v2/search'][ $index ]['args']['search_columns'] = array(
+			'default'     => array(),
+			'description' => __( 'Array of column names to be searched. Only applies to post searches.', 'gutenberg' ),
+			'type'        => 'array',
+			'items'       => array(
+				'enum' => array( 'post_title', 'post_content', 'post_excerpt' ),
+				'type' => 'string',
+			),
+		);
+	}
+
+	return $endpoints;
+}
+add_filter( 'rest_endpoints', 'gutenberg_add_search_columns_to_search_endpoint' );
+
+/**
+ * Passes the search endpoint's `search_columns` parameter to the post search query.
+ *
+ * @param array           $query_args Query arguments for the post search.
+ * @param WP_REST_Request $request    The REST request.
+ * @return array The filtered query arguments.
+ */
+function gutenberg_add_search_columns_to_post_search_query( $query_args, $request ) {
+	if ( ! empty( $request['search_columns'] ) ) {
+		$query_args['search_columns'] = $request['search_columns'];
+	}
+
+	return $query_args;
+}
+add_filter( 'rest_post_search_query', 'gutenberg_add_search_columns_to_post_search_query', 10, 2 );
