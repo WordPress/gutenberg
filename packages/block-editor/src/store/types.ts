@@ -222,6 +222,7 @@ export interface BlockSelection {
 export interface BlockPattern {
 	name: string;
 	title?: string;
+	description?: string;
 	content: string;
 	categories?: Array< string | number >;
 	blocks?: Block[];

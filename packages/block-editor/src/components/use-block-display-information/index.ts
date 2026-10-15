@@ -9,29 +9,18 @@ import { __ } from '@wordpress/i18n';
 import { symbol } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-
-/** @typedef {import('@wordpress/blocks').WPIcon} WPIcon */
-
-/**
- * Contains basic block's information for display reasons.
- *
- * @typedef {Object} WPBlockDisplayInformation
- *
- * @property {boolean} isSynced    True if is a reusable block or template part
- * @property {string}  title       Human-readable block type label.
- * @property {WPIcon}  icon        Block type icon.
- * @property {string}  description A detailed block type description.
- * @property {string}  anchor      HTML anchor.
- * @property {name}    name        A custom, human readable name for the block.
- */
+import type { BlockEditorThunkArgs } from '../../store/types';
+import type { BlockDisplayAttributes, BlockDisplayInformation } from './types';
 
 /**
  * Get the display label for a block's position type.
  *
- * @param {Object} attributes Block attributes.
- * @return {string} The position type label.
+ * @param attributes Block attributes.
+ * @return The position type label.
  */
-export function getPositionTypeLabel( attributes ) {
+export function getPositionTypeLabel(
+	attributes: BlockDisplayAttributes | null
+): string | null {
 	const positionType = attributes?.style?.position?.type;
 
 	if ( positionType === 'sticky' ) {
@@ -57,10 +46,12 @@ export function getPositionTypeLabel( attributes ) {
  * If no blockType is found with the provided clientId, returns null.
  *
  * @param {string} clientId Block's client id.
- * @return {?WPBlockDisplayInformation} Block's display information, or `null` when the block or its type not found.
+ * @return {?BlockDisplayInformation} Block's display information, or `null` when the block or its type not found.
  */
 
-export default function useBlockDisplayInformation( clientId ) {
+export default function useBlockDisplayInformation(
+	clientId: string
+): BlockDisplayInformation | null {
 	return useSelect(
 		( select ) => {
 			if ( ! clientId ) {
@@ -75,13 +66,18 @@ export default function useBlockDisplayInformation( clientId ) {
 			} = blockEditorSelect;
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
-			const blockName = getBlockName( clientId );
+			// A missing block has no block type, which returns early below.
+			const blockName = getBlockName( clientId )!;
 			const blockType = getBlockType( blockName );
 			if ( ! blockType ) {
 				return null;
 			}
-			const attributes = getBlockAttributes( clientId );
-			const { isSectionBlock } = unlock( blockEditorSelect );
+			// Attributes are not validated against the block type's schema.
+			const attributes = getBlockAttributes(
+				clientId
+			) as BlockDisplayAttributes;
+			const { isSectionBlock } =
+				unlock< BlockEditorThunkArgs[ 'select' ] >( blockEditorSelect );
 
 			// Check if this block is a pattern
 			const patternName = attributes?.metadata?.patternName;
