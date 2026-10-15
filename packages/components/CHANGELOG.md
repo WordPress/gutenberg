@@ -23,7 +23,7 @@
 -   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
 -   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
--   `StyleProvider`: Add a `nonce` prop that is added to the `<style>` elements Emotion injects, for documents with a strict Content Security Policy. It can also be set for every `StyleProvider`, including the ones in `Modal` and `Popover`, through the context system ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `StyleProvider`: Add a `nonce` prop that is added to the `<style>` elements Emotion injects, for documents with a strict Content Security Policy. It can also be set for every `StyleProvider`, including the ones in `Modal` and `Popover`, through the context system ([#84843](https://github.com/WordPress/gutenberg/pull/84843)).
 
 ### Deprecations
 
