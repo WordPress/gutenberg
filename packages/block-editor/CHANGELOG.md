@@ -23,6 +23,10 @@
 -   Apply formats from the toolbar and keyboard shortcuts to text selected across blocks, when every selected block is only a rich text field ([#58913](https://github.com/WordPress/gutenberg/pull/58913)).
 -   Inserter: Redesign the Media tab around a single DataViews grid, in place of the category list and flyout panel. One search covers the tab, media types are tabs, and other sources (the post's attached images, Openverse, anything registered through the public API) are chosen from a menu beside the search ([#82749](https://github.com/WordPress/gutenberg/pull/82749)).
 
+### Deprecations
+
+-   `Autocomplete`: deprecate the component. Pass completers to `RichText` through its `autocompleters` prop ([#83542](https://github.com/WordPress/gutenberg/pull/83542)).
+
 ### Bug Fixes
 
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
