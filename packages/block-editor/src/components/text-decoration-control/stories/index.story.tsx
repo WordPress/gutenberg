@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import TextDecorationControl from '../';
 
-const meta = {
+const meta: Meta< typeof TextDecorationControl > = {
 	id: 'blockeditor-textdecorationcontrol',
 	title: 'Editor/Block Editor/TextDecorationControl',
 	component: TextDecorationControl,
@@ -15,6 +16,7 @@ const meta = {
 	},
 	argTypes: {
 		value: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'Currently selected text decoration.',
 			table: {
@@ -25,6 +27,7 @@ const meta = {
 		},
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'Handles change in text decoration selection.',
 			table: {
@@ -45,9 +48,11 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState();
+		const [ value, setValue ] = useState< string >();
 		return (
 			<TextDecorationControl
 				{ ...args }
