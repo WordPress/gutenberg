@@ -113,12 +113,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				const hadDraggable = node.getAttribute( 'draggable' );
 				node.setAttribute( 'draggable', 'true' );
 				const editables = [
-					node.parentElement?.closest( '[contenteditable="true"]' ),
-					event.target.closest?.( '[contenteditable="true"]' ),
-				].filter(
-					( element, index, all ) =>
-						element && all.indexOf( element ) === index
-				);
+					node.parentElement.closest( '[contenteditable="true"]' ),
+					event.target.closest( '[contenteditable="true"]' ),
+				].filter( Boolean );
 
 				for ( const element of editables ) {
 					element.contentEditable = 'false';
