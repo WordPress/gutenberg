@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo } from '@wordpress/element';
-import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner as WCSpinner,
@@ -145,44 +145,55 @@ function ReusableBlockEdit( {
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 } ) {
-	// Render the pattern from its `view` record, which every user who can read
-	// it can load. Once its `edit` record is loaded, for example by "Edit
-	// original", render that instead: core-data doesn't update `view` records,
-	// so they'd miss the pattern's edits and saves.
-	const hasEditRecord = useSelect(
-		( select ) =>
-			select( coreStore ).hasEntityRecord( 'postType', 'wp_block', ref ),
-		[ ref ]
-	);
-	const [ editedBlocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: hasEditRecord ? ref : 0,
-	} );
-	const { viewRecord, hasResolvedViewRecord } = useSelect(
+	const { record, editedBlocks, patternContent, isResolving } = useSelect(
 		( select ) => {
-			if ( hasEditRecord ) {
-				return {};
+			const {
+				hasEntityRecord,
+				getEditedEntityRecord,
+				getEntityRecord,
+				hasFinishedResolution,
+			} = select( coreStore );
+			// Prefer the `edit` record once it's loaded, for example by "Edit
+			// original", so the pattern's edits and saves show up straight
+			// away. core-data doesn't update `view` records.
+			if ( hasEntityRecord( 'postType', 'wp_block', ref ) ) {
+				const editedRecord = getEditedEntityRecord(
+					'postType',
+					'wp_block',
+					ref
+				);
+				return {
+					record: editedRecord,
+					editedBlocks: editedRecord.blocks,
+					patternContent: editedRecord.content,
+					isResolving: false,
+				};
 			}
+			// Otherwise use the `view` record, which every user who can read
+			// the pattern can load, even if they can't edit it.
 			const args = [ 'postType', 'wp_block', ref, { context: 'view' } ];
-			const { getEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const viewRecord = getEntityRecord( ...args );
 			return {
-				viewRecord: getEntityRecord( ...args ),
-				hasResolvedViewRecord: hasFinishedResolution(
-					'getEntityRecord',
-					args
-				),
+				record: viewRecord,
+				patternContent: viewRecord?.content?.raw,
+				isResolving:
+					! viewRecord &&
+					! hasFinishedResolution( 'getEntityRecord', args ),
 			};
 		},
-		[ hasEditRecord, ref ]
+		[ ref ]
 	);
-	const viewContent = viewRecord?.content?.raw;
-	const viewBlocks = useMemo(
-		() => ( viewContent ? parse( viewContent ) : EMPTY_ARRAY ),
-		[ viewContent ]
-	);
-	const blocks = hasEditRecord ? editedBlocks : viewBlocks;
-	const isResolving = ! hasEditRecord && ! hasResolvedViewRecord;
-	const isMissing = ! hasEditRecord && ! isResolving && ! viewRecord;
+	const blocks = useMemo( () => {
+		if ( editedBlocks ) {
+			return editedBlocks;
+		}
+		// Once the pattern is edited, its `content` is a function that
+		// serializes its blocks, which are returned above.
+		return typeof patternContent === 'string' && patternContent
+			? parse( patternContent )
+			: EMPTY_ARRAY;
+	}, [ editedBlocks, patternContent ] );
+	const isMissing = ! isResolving && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
