@@ -2491,6 +2491,236 @@ test.describe( 'List (@firefox)', () => {
 		] );
 	} );
 
+	test.describe( 'should keep the nested list when copying a text selection across the nesting boundary (#71317)', () => {
+		const nestedItem = ( content ) => ( {
+			name: 'core/list-item',
+			attributes: { content },
+		} );
+
+		// The outer "item 2" item, whole, with its nested list.
+		const copiedList = {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: 'item 2' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								nestedItem( 'item 2.1' ),
+								nestedItem( 'item 2.2' ),
+							],
+						},
+					],
+				},
+			],
+		};
+
+		test.beforeEach( async ( { editor } ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'item 1' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [ nestedItem( 'item 1.1' ) ],
+							},
+						],
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'item 2' },
+						innerBlocks: [
+							{
+								name: 'core/list',
+								innerBlocks: [
+									nestedItem( 'item 2.1' ),
+									nestedItem( 'item 2.2' ),
+								],
+							},
+						],
+					},
+				],
+			} );
+		} );
+
+		async function dragFromItemToNestedItem( { editor, page } ) {
+			const outer = await editor.canvas
+				.getByText( 'item 2', { exact: true } )
+				.boundingBox();
+			const nested = await editor.canvas
+				.getByText( 'item 2.2', { exact: true } )
+				.boundingBox();
+			await page.mouse.move(
+				outer.x + outer.width / 2,
+				outer.y + outer.height / 2
+			);
+			await page.mouse.down();
+			await page.mouse.move(
+				nested.x + nested.width / 2,
+				nested.y + nested.height / 2,
+				{ steps: 10 }
+			);
+			await page.mouse.up();
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
+			);
+		}
+
+		async function pasteIntoNewParagraph( { editor, pageUtils } ) {
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await pageUtils.pressKeys( 'primary+v' );
+		}
+
+		test( 'should copy an item with its nested list when dragging a selection from the item into a nested item', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const [ original ] = await editor.getBlocks();
+
+			await dragFromItemToNestedItem( { editor, page } );
+			await pageUtils.pressKeys( 'primary+c' );
+			await pasteIntoNewParagraph( { editor, pageUtils } );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ original, copiedList ] );
+		} );
+
+		test( 'should copy an item with its nested list when extending a text selection from the item into a nested item', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const [ original ] = await editor.getBlocks();
+
+			// Place the caret at the end of "item 2", then extend the
+			// selection forward past the nesting boundary into "item 2.1".
+			await editor.canvas.getByText( 'item 2', { exact: true } ).click();
+			await page.keyboard.press( 'End' );
+			await pageUtils.pressKeys( 'shift+ArrowRight', { times: 2 } );
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
+			);
+
+			await pageUtils.pressKeys( 'primary+c' );
+			await pasteIntoNewParagraph( { editor, pageUtils } );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ original, copiedList ] );
+		} );
+
+		test( 'should paste a copied item with its nested list into an empty list item', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await dragFromItemToNestedItem( { editor, page } );
+			await pageUtils.pressKeys( 'primary+c' );
+
+			// Create an empty top-level item at the end of the list: Enter
+			// at the end of "item 2.2" adds an empty nested item, and Enter
+			// again outdents it.
+			await editor.canvas
+				.getByText( 'item 2.2', { exact: true } )
+				.click();
+			await page.keyboard.press( 'End' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.press( 'Enter' );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			// The empty item is replaced by the copied item, whole.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{ attributes: { content: 'item 1' } },
+						{ attributes: { content: 'item 2' } },
+						...copiedList.innerBlocks,
+					],
+				},
+			] );
+		} );
+
+		test( 'should paste a copied item with its nested list at the end of a list item', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await dragFromItemToNestedItem( { editor, page } );
+			await pageUtils.pressKeys( 'primary+c' );
+
+			await editor.canvas
+				.getByText( 'item 1.1', { exact: true } )
+				.click();
+			await page.keyboard.press( 'End' );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			// The copied item's text joins "item 1.1", and its nested list
+			// comes along.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{
+							attributes: { content: 'item 1' },
+							innerBlocks: [
+								{
+									name: 'core/list',
+									innerBlocks: [
+										{
+											attributes: {
+												content: 'item 1.1item 2',
+											},
+											innerBlocks:
+												copiedList.innerBlocks[ 0 ]
+													.innerBlocks,
+										},
+									],
+								},
+							],
+						},
+						{ attributes: { content: 'item 2' } },
+					],
+				},
+			] );
+		} );
+
+		test( 'should cut an item with its nested list when dragging a selection from the item into a nested item', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await dragFromItemToNestedItem( { editor, page } );
+			await pageUtils.pressKeys( 'primary+x' );
+
+			// The item is removed whole, together with its nested list.
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/list',
+					innerBlocks: [
+						{
+							name: 'core/list-item',
+							attributes: { content: 'item 1' },
+						},
+					],
+				},
+			] );
+
+			await pasteIntoNewParagraph( { editor, pageUtils } );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ { name: 'core/list' }, copiedList ] );
+		} );
+	} );
+
 	test( 'should select the outer item fully when extending a selection down into its nested item', async ( {
 		editor,
 		page,
