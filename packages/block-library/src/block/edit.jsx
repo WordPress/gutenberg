@@ -145,54 +145,55 @@ function ReusableBlockEdit( {
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 } ) {
-	const { record, editedBlocks, patternContent, isResolving } = useSelect(
+	const { record, isResolving } = useSelect(
 		( select ) => {
-			const {
-				hasEntityRecord,
-				getEditedEntityRecord,
-				getEntityRecord,
-				hasFinishedResolution,
-			} = select( coreStore );
 			// Prefer the `edit` record once it's loaded, for example by "Edit
 			// original", so the pattern's edits and saves show up straight
 			// away. core-data doesn't update `view` records.
-			if ( hasEntityRecord( 'postType', 'wp_block', ref ) ) {
-				const editedRecord = getEditedEntityRecord(
+			if (
+				select( coreStore ).hasEntityRecord(
 					'postType',
 					'wp_block',
 					ref
-				);
+				)
+			) {
 				return {
-					record: editedRecord,
-					editedBlocks: editedRecord.blocks,
-					patternContent: editedRecord.content,
+					record: select( coreStore ).getEditedEntityRecord(
+						'postType',
+						'wp_block',
+						ref
+					),
 					isResolving: false,
 				};
 			}
 			// Otherwise use the `view` record, which every user who can read
 			// the pattern can load, even if they can't edit it.
 			const args = [ 'postType', 'wp_block', ref, { context: 'view' } ];
-			const viewRecord = getEntityRecord( ...args );
+			const viewRecord = select( coreStore ).getEntityRecord( ...args );
 			return {
 				record: viewRecord,
-				patternContent: viewRecord?.content?.raw,
 				isResolving:
 					! viewRecord &&
-					! hasFinishedResolution( 'getEntityRecord', args ),
+					! select( coreStore ).hasFinishedResolution(
+						'getEntityRecord',
+						args
+					),
 			};
 		},
 		[ ref ]
 	);
 	const blocks = useMemo( () => {
-		if ( editedBlocks ) {
-			return editedBlocks;
+		if ( record?.blocks ) {
+			return record.blocks;
 		}
-		// Once the pattern is edited, its `content` is a function that
-		// serializes its blocks, which are returned above.
+		// The `view` record's content is an object with its raw value, the
+		// `edit` record's is the raw value itself. Once edited, it's a function
+		// that serializes the blocks returned above.
+		const patternContent = record?.content?.raw ?? record?.content;
 		return typeof patternContent === 'string' && patternContent
 			? parse( patternContent )
 			: EMPTY_ARRAY;
-	}, [ editedBlocks, patternContent ] );
+	}, [ record ] );
 	const isMissing = ! isResolving && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
