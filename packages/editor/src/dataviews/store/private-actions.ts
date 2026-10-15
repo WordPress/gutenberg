@@ -105,16 +105,33 @@ export function unregisterEntityAction(
 	};
 }
 
+/**
+ * Registers a field of an entity.
+ *
+ * @param kind              Entity kind.
+ * @param name              Entity name.
+ * @param config            Field configuration.
+ * @param options           Options.
+ * @param options.isDefault Whether the field is one of the defaults the editor
+ *                          registers itself, rather than a field a plugin
+ *                          registers with the public `registerEntityField`.
+ *                          The server registers the defaults too, so the
+ *                          screens that read the fields from the server only
+ *                          add the ones a plugin registered.
+ * @return Action object.
+ */
 export function registerEntityField< Item >(
 	kind: string,
 	name: string,
-	config: Field< Item >
+	config: Field< Item >,
+	{ isDefault = false }: { isDefault?: boolean } = {}
 ) {
 	return {
 		type: 'REGISTER_ENTITY_FIELD' as const,
 		kind,
 		name,
 		config,
+		isDefault,
 	};
 }
 
@@ -335,7 +352,8 @@ export const registerPostTypeSchema =
 				unlock( registry.dispatch( editorStore ) ).registerEntityField(
 					'postType',
 					postType,
-					field
+					field,
+					{ isDefault: true }
 				);
 			} );
 		} );

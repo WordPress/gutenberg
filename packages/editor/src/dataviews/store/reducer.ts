@@ -11,9 +11,14 @@ type ReduxAction =
 export type ActionState = Record< string, Record< string, Action< any >[] > >;
 export type FieldsState = Record< string, Record< string, Field< any >[] > >;
 export type ReadyState = Record< string, Record< string, boolean > >;
+export type DefaultFieldIdsState = Record<
+	string,
+	Record< string, Record< string, true > >
+>;
 export type State = {
 	actions: ActionState;
 	fields: FieldsState;
+	defaultFieldIds: DefaultFieldIdsState;
 	isReady: ReadyState;
 };
 
@@ -97,8 +102,50 @@ function fields( state: FieldsState = {}, action: ReduxAction ) {
 	return state;
 }
 
+/*
+ * The ids of the fields the editor registers itself, as defaults, keyed by
+ * kind, then name. Any other field in `fields` was registered by a plugin.
+ * A later registration of the same id decides what the field is.
+ */
+function defaultFieldIds(
+	state: DefaultFieldIdsState = {},
+	action: ReduxAction
+) {
+	switch ( action.type ) {
+		case 'REGISTER_ENTITY_FIELD':
+		case 'UNREGISTER_ENTITY_FIELD': {
+			const fieldId =
+				action.type === 'REGISTER_ENTITY_FIELD'
+					? action.config.id
+					: action.fieldId;
+			const isDefault =
+				action.type === 'REGISTER_ENTITY_FIELD' && action.isDefault;
+			const ids = state[ action.kind ]?.[ action.name ] ?? {};
+			if ( !! ids[ fieldId ] === isDefault ) {
+				return state;
+			}
+			const nextIds: Record< string, true > = { ...ids };
+			if ( isDefault ) {
+				nextIds[ fieldId ] = true;
+			} else {
+				delete nextIds[ fieldId ];
+			}
+			return {
+				...state,
+				[ action.kind ]: {
+					...state[ action.kind ],
+					[ action.name ]: nextIds,
+				},
+			};
+		}
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	actions,
 	fields,
+	defaultFieldIds,
 	isReady,
 } );
