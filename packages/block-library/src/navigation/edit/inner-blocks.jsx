@@ -45,10 +45,8 @@ export default function NavigationInnerBlocks( {
 		[ clientId ]
 	);
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		'wp_navigation'
-	);
+	const [ blocks, onInput, onChange, { selection, onChangeSelection } ] =
+		useEntityBlockEditor( 'postType', 'wp_navigation' );
 
 	// When the block is selected itself or has a top level item selected that
 	// doesn't itself have children, show the standard appender. Else show no
@@ -76,6 +74,8 @@ export default function NavigationInnerBlocks( {
 			value: blocks,
 			onInput,
 			onChange,
+			selection,
+			onChangeSelection,
 			prioritizedInserterBlocks: PRIORITIZED_INSERTER_BLOCKS,
 			defaultBlock: DEFAULT_BLOCK,
 			directInsert: true,
