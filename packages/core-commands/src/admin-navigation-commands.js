@@ -52,6 +52,7 @@ export function useAdminNavigationCommands( menuCommands ) {
 				name: menuCommand.name,
 				label,
 				searchLabel: label,
+				keywords: menuCommand.keywords,
 				category: 'view',
 				callback: ( { close } ) => {
 					document.location = menuCommand.url;
