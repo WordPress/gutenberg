@@ -71,7 +71,7 @@ describe( 'Controls', () => {
 		expect( screen.getByLabelText( 'Text' ) ).toBeInTheDocument();
 		expect( screen.getByText( 'Link to' ) ).toBeInTheDocument();
 		expect(
-			screen.getByRole( 'checkbox', { name: 'Open in new tab' } )
+			screen.getByLabelText( 'Open in new tab' )
 		).toBeInTheDocument();
 		expect( screen.getByLabelText( 'Description' ) ).toBeInTheDocument();
 		expect( screen.getByLabelText( 'Rel attribute' ) ).toBeInTheDocument();
@@ -120,9 +120,7 @@ describe( 'Controls', () => {
 		} );
 
 		// Test checkbox change
-		const checkbox = screen.getByRole( 'checkbox', {
-			name: 'Open in new tab',
-		} );
+		const checkbox = screen.getByLabelText( 'Open in new tab' );
 		fireEvent.click( checkbox );
 		expect( defaultProps.setAttributes ).toHaveBeenCalledWith( {
 			opensInNewTab: true,
