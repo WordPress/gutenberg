@@ -2311,11 +2311,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/utils.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/layouts/constrained.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
