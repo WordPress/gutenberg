@@ -1,5 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
+import type { BlockMetadata, BlockWithMetadata } from './types';
 
 const META_ATTRIBUTE_NAME = 'metadata';
 
@@ -8,10 +10,10 @@ const META_ATTRIBUTE_NAME = 'metadata';
  *
  * see: https://github.com/WordPress/gutenberg/pull/40393/files#r864632012
  *
- * @param {Object} blockTypeSettings Original block settings.
- * @return {Object} Filtered block settings.
+ * @param blockTypeSettings Original block settings.
+ * @return Filtered block settings.
  */
-export function addMetaAttribute( blockTypeSettings ) {
+export function addMetaAttribute( blockTypeSettings: BlockType ): BlockType {
 	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( blockTypeSettings?.attributes?.[ META_ATTRIBUTE_NAME ]?.type ) {
 		return blockTypeSettings;
@@ -30,13 +32,18 @@ export function addMetaAttribute( blockTypeSettings ) {
 /**
  * Add metadata transforms.
  *
- * @param {Object} result  The transformed block.
- * @param {Array}  source  Original blocks transformed.
- * @param {number} index   Index of the transformed block.
- * @param {Array}  results All blocks that resulted from the transformation.
- * @return {Object} Modified transformed block.
+ * @param result  The transformed block.
+ * @param source  Original blocks transformed.
+ * @param index   Index of the transformed block.
+ * @param results All blocks that resulted from the transformation.
+ * @return Modified transformed block.
  */
-export function addTransforms( result, source, index, results ) {
+export function addTransforms(
+	result: BlockWithMetadata,
+	source: BlockWithMetadata[],
+	index: number,
+	results: BlockWithMetadata[]
+): BlockWithMetadata {
 	// If the condition verifies we are probably in the presence of a wrapping transform
 	// e.g: nesting paragraphs in a group or columns and in that case the metadata should not be kept.
 	if ( results.length === 1 && result.innerBlocks.length === source.length ) {
@@ -68,7 +75,7 @@ export function addTransforms( result, source, index, results ) {
 		return result;
 	}
 
-	const preservedMetadata = {};
+	const preservedMetadata: BlockMetadata = {};
 
 	// Notes
 	if ( sourceMetadata.noteId && ! result.attributes?.metadata?.noteId ) {

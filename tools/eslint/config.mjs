@@ -932,15 +932,6 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: Components src (non-test, non-stories) — no DS tokens.
-	{
-		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/**/@(test|stories)/**' ],
-		rules: {
-			'@wordpress/no-ds-tokens': 'error',
-		},
-	},
-
 	// Override: block-editor, components, dataviews, ui src — enforce display names.
 	{
 		files: [

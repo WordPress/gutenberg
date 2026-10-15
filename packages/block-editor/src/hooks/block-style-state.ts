@@ -1,6 +1,7 @@
 import { createContext, useContext } from '@wordpress/element';
 import { cleanEmptyObject } from './utils';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
+import type { BlockStyle, BlockStyleState, ResetAllFilter } from './types';
 
 const DEFAULT_STATE_VALUE = 'default';
 
@@ -16,19 +17,21 @@ export const BlockStyleStateProvider = BlockStyleStateContext.Provider;
 /**
  * Returns the current block style state.
  *
- * @return {Object} The current block style state.
+ * @return The current block style state.
  */
-export function useBlockStyleState() {
+export function useBlockStyleState(): BlockStyleState {
 	return useContext( BlockStyleStateContext );
 }
 
 /**
  * Returns true when a viewport style state is selected.
  *
- * @param {Object} selectedState Selected block style state.
- * @return {boolean} Whether a viewport state is selected.
+ * @param selectedState Selected block style state.
+ * @return Whether a viewport state is selected.
  */
-export function hasViewportBlockStyleState( selectedState ) {
+export function hasViewportBlockStyleState(
+	selectedState: BlockStyleState | undefined
+): boolean {
 	return (
 		!! selectedState?.viewport &&
 		selectedState.viewport !== DEFAULT_STATE_VALUE
@@ -38,10 +41,12 @@ export function hasViewportBlockStyleState( selectedState ) {
 /**
  * Returns true when a pseudo style state is selected.
  *
- * @param {Object} selectedState Selected block style state.
- * @return {boolean} Whether a pseudo state is selected.
+ * @param selectedState Selected block style state.
+ * @return Whether a pseudo state is selected.
  */
-export function hasPseudoBlockStyleState( selectedState ) {
+export function hasPseudoBlockStyleState(
+	selectedState: BlockStyleState | undefined
+): boolean {
 	return (
 		!! selectedState?.pseudo && selectedState.pseudo !== DEFAULT_STATE_VALUE
 	);
@@ -50,10 +55,12 @@ export function hasPseudoBlockStyleState( selectedState ) {
 /**
  * Returns true when the default style state is selected.
  *
- * @param {Object} selectedState Selected block style state.
- * @return {boolean} Whether the default style state is selected.
+ * @param selectedState Selected block style state.
+ * @return Whether the default style state is selected.
  */
-export function isDefaultBlockStyleState( selectedState ) {
+export function isDefaultBlockStyleState(
+	selectedState: BlockStyleState | undefined
+): boolean {
 	return (
 		! hasViewportBlockStyleState( selectedState ) &&
 		! hasPseudoBlockStyleState( selectedState )
@@ -63,17 +70,20 @@ export function isDefaultBlockStyleState( selectedState ) {
 /**
  * Returns the style object path for the selected block style state.
  *
- * @param {Object} selectedState Selected block style state.
- * @return {string[]} Object path for the selected state styles.
+ * @param selectedState Selected block style state.
+ * @return Object path for the selected state styles.
  */
-function getStyleStatePath( selectedState ) {
+function getStyleStatePath(
+	selectedState: BlockStyleState | undefined
+): string[] {
 	if ( isDefaultBlockStyleState( selectedState ) ) {
 		return [];
 	}
 
-	return [ selectedState.viewport, selectedState.pseudo ].filter(
+	// A non-default state is always set, and the filter drops the unset parts.
+	return [ selectedState!.viewport, selectedState!.pseudo ].filter(
 		( state ) => state && state !== DEFAULT_STATE_VALUE
-	);
+	) as string[];
 }
 
 /**
@@ -89,12 +99,16 @@ function getStyleStatePath( selectedState ) {
  * const stateStyle = getStyleForState( attributes.style, state ) || {};
  * ```
  */
-export function getStyleForState( style, selectedState ) {
+export function getStyleForState(
+	style: BlockStyle | undefined,
+	selectedState: BlockStyleState | undefined
+): BlockStyle | undefined {
 	const path = getStyleStatePath( selectedState );
 	if ( ! path.length ) {
 		return style;
 	}
-	return getValueFromObjectPath( style, path );
+	// Style attributes are not validated against a schema.
+	return getValueFromObjectPath( style, path ) as BlockStyle | undefined;
 }
 
 /**
@@ -117,20 +131,32 @@ export function getStyleForState( style, selectedState ) {
  * } );
  * ```
  */
-export function setStyleForState( style, selectedState, newStyle ) {
+export function setStyleForState(
+	style: BlockStyle | undefined,
+	selectedState: BlockStyleState | undefined,
+	newStyle: BlockStyle | undefined
+): BlockStyle | undefined {
 	const path = getStyleStatePath( selectedState );
 	if ( ! path.length ) {
 		return cleanEmptyObject( newStyle );
 	}
-	return cleanEmptyObject( setImmutably( style, path, newStyle ) );
+	// Setting a path on the style object keeps it an object.
+	return cleanEmptyObject(
+		setImmutably( style, path, newStyle ) as BlockStyle
+	);
 }
 
-export function scopeResetAllFilterToState( selectedState, resetAllFilter ) {
+export function scopeResetAllFilterToState<
+	Filter extends ResetAllFilter | undefined,
+>(
+	selectedState: BlockStyleState | undefined,
+	resetAllFilter: Filter
+): Filter | ResetAllFilter {
 	if ( ! resetAllFilter || isDefaultBlockStyleState( selectedState ) ) {
 		return resetAllFilter;
 	}
 
-	return ( attributes ) => {
+	return ( attributes: { style?: BlockStyle } ) => {
 		const existingStateStyle =
 			getStyleForState( attributes?.style, selectedState ) || {};
 		const updatedStateAttributes = resetAllFilter( {

@@ -13,10 +13,11 @@ describe( 'generated className', () => {
 	};
 
 	describe( 'addSaveProps', () => {
+		// Filters return `unknown`; this one returns the save props.
 		const addSaveProps = applyFilters.bind(
 			null,
 			'blocks.getSaveContent.extraProps'
-		);
+		) as ( ...args: unknown[] ) => Record< string, unknown >;
 
 		it( 'should do nothing if the block settings do not define generated className support', () => {
 			const attributes = { className: 'foo' };
