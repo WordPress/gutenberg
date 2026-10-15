@@ -469,7 +469,7 @@ export interface RemovalPromptData {
 export interface SelectedBlockStyleState {
 	clientId: string;
 	showStateOnCanvas: boolean;
-	value: Record< string, unknown > & { pseudo: string };
+	value: Record< string, unknown > & { custom?: string; pseudo: string };
 }
 
 export interface State {

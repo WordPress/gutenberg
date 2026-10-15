@@ -503,6 +503,87 @@ function gutenberg_get_block_state_style_rules( $state_styles, $block_type, $rul
 }
 
 /**
+ * Returns the suffix that scopes a block-instance selector to a custom state,
+ * such as Navigation Link's `-current`.
+ *
+ * The block declares the selector it matches in a custom state in
+ * `selectors.states`, for example `.wp-block-navigation .current-menu-item`.
+ * Wrapping that selector in `:is()` lets it follow the instance class, so the
+ * instance styles apply only while the block's wrapper matches it, as in
+ * `.wp-states-1a2b3c4d:is(.wp-block-navigation .current-menu-item)`.
+ *
+ * Mirror of `getCustomStateSelectorSuffix()` in
+ * packages/block-editor/src/hooks/state-utils.ts.
+ *
+ * @param WP_Block_Type $block_type Block type.
+ * @param string        $state      Custom state key, e.g. `-current`.
+ * @return string|null The selector suffix, or null when the block declares no
+ *                     selector for the state.
+ */
+function gutenberg_get_custom_state_selector_suffix( $block_type, $state ) {
+	$selector = $block_type->selectors['states'][ $state ] ?? null;
+	if ( ! is_string( $selector ) || '' === trim( $selector ) ) {
+		return null;
+	}
+
+	return ':is(' . trim( $selector ) . ')';
+}
+
+/**
+ * Builds the state style rules for a custom state, including its nested
+ * pseudo states, e.g. `style['-current'][':hover']`.
+ *
+ * Each rule carries a `scope`, the custom state's selector suffix, which is
+ * added to the block-instance class rather than to the end of the rule's
+ * selector. A feature selector then keeps the state on the block's wrapper.
+ *
+ * Mirror of `getCustomStateCSSRules()` in
+ * packages/block-editor/src/hooks/style.jsx.
+ *
+ * @param array         $custom_state_style      The custom state's style object.
+ * @param string        $scope                   Selector suffix for the custom state.
+ * @param string[]      $supported_pseudo_states Pseudo states the block supports.
+ * @param WP_Block_Type $block_type              Block type.
+ * @param string|null   $rules_group             Optional CSS grouping rule, e.g. a media query.
+ * @param array         $base_style              Styles the custom state layers over.
+ * @return array[] State style rules.
+ */
+function gutenberg_get_custom_state_style_rules( $custom_state_style, $scope, $supported_pseudo_states, $block_type, $rules_group, $base_style ) {
+	$root_style = gutenberg_get_root_state_style(
+		$custom_state_style,
+		array_merge( array( 'elements' ), $supported_pseudo_states )
+	);
+	$css_rules  = gutenberg_get_block_state_style_rules(
+		array( '' => $root_style ),
+		$block_type,
+		$rules_group,
+		$base_style
+	);
+
+	foreach ( $supported_pseudo_states as $pseudo_state ) {
+		if ( empty( $custom_state_style[ $pseudo_state ] ) || ! is_array( $custom_state_style[ $pseudo_state ] ) ) {
+			continue;
+		}
+
+		$css_rules = array_merge(
+			$css_rules,
+			gutenberg_get_block_state_style_rules(
+				array( $pseudo_state => $custom_state_style[ $pseudo_state ] ),
+				$block_type,
+				$rules_group,
+				gutenberg_merge_state_style_objects( $base_style, $root_style )
+			)
+		);
+	}
+
+	foreach ( $css_rules as $index => $css_rule ) {
+		$css_rules[ $index ]['scope'] = $scope;
+	}
+
+	return $css_rules;
+}
+
+/**
  * Returns a unique class for a set of state style rules.
  *
  * @param string $block_name Block name.
@@ -689,13 +770,21 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 	}
 
 	$supported_pseudo_states  = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
+	$supported_custom_states  = WP_Theme_JSON_Gutenberg::VALID_BLOCK_CUSTOM_STATES[ $block_name ] ?? array();
+	$nested_state_keys        = array_merge( array( 'elements' ), $supported_pseudo_states, $supported_custom_states );
 	$css_rules                = array();
-	$default_root_style       = gutenberg_get_root_state_style(
-		$style,
-		array_merge( array( 'elements' ), $supported_pseudo_states )
-	);
+	$default_root_style       = gutenberg_get_root_state_style( $style, $nested_state_keys );
 	$viewport_settings        = gutenberg_get_global_settings( array( 'viewport' ) );
 	$responsive_media_queries = WP_Theme_JSON_Gutenberg::get_viewport_media_queries( $viewport_settings );
+
+	// A custom state applies only when the block declares its selector.
+	$custom_state_scopes = array();
+	foreach ( $supported_custom_states as $custom_state ) {
+		$scope = gutenberg_get_custom_state_selector_suffix( $block_type, $custom_state );
+		if ( null !== $scope ) {
+			$custom_state_scopes[ $custom_state ] = $scope;
+		}
+	}
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		if ( empty( $style[ $pseudo_state ] ) || ! is_array( $style[ $pseudo_state ] ) ) {
@@ -713,15 +802,30 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 		);
 	}
 
+	foreach ( $custom_state_scopes as $custom_state => $scope ) {
+		if ( empty( $style[ $custom_state ] ) || ! is_array( $style[ $custom_state ] ) ) {
+			continue;
+		}
+
+		$css_rules = array_merge(
+			$css_rules,
+			gutenberg_get_custom_state_style_rules(
+				$style[ $custom_state ],
+				$scope,
+				$supported_pseudo_states,
+				$block_type,
+				null,
+				$default_root_style
+			)
+		);
+	}
+
 	foreach ( $responsive_media_queries as $breakpoint => $media_query ) {
 		if ( empty( $style[ $breakpoint ] ) || ! is_array( $style[ $breakpoint ] ) ) {
 			continue;
 		}
 
-		$root_state_style = gutenberg_get_root_state_style(
-			$style[ $breakpoint ],
-			array_merge( array( 'elements' ), $supported_pseudo_states )
-		);
+		$root_state_style = gutenberg_get_root_state_style( $style[ $breakpoint ], $nested_state_keys );
 
 		if ( ! empty( $root_state_style ) ) {
 			$css_rules = array_merge(
@@ -788,6 +892,11 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 			}
 		}
 
+		$breakpoint_base_style = gutenberg_merge_state_style_objects(
+			$default_root_style,
+			$root_state_style
+		);
+
 		foreach ( $supported_pseudo_states as $pseudo_state ) {
 			if ( empty( $style[ $breakpoint ][ $pseudo_state ] ) || ! is_array( $style[ $breakpoint ][ $pseudo_state ] ) ) {
 				continue;
@@ -799,10 +908,25 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 					array( $pseudo_state => $style[ $breakpoint ][ $pseudo_state ] ),
 					$block_type,
 					$media_query,
-					gutenberg_merge_state_style_objects(
-						$default_root_style,
-						$root_state_style
-					)
+					$breakpoint_base_style
+				)
+			);
+		}
+
+		foreach ( $custom_state_scopes as $custom_state => $scope ) {
+			if ( empty( $style[ $breakpoint ][ $custom_state ] ) || ! is_array( $style[ $breakpoint ][ $custom_state ] ) ) {
+				continue;
+			}
+
+			$css_rules = array_merge(
+				$css_rules,
+				gutenberg_get_custom_state_style_rules(
+					$style[ $breakpoint ][ $custom_state ],
+					$scope,
+					$supported_pseudo_states,
+					$block_type,
+					$media_query,
+					$breakpoint_base_style
 				)
 			);
 		}
@@ -842,8 +966,9 @@ function gutenberg_render_block_states_support( $block_content, $block ) {
 				)
 			);
 		}
+		// A custom state scopes the instance class, as in `.wp-states-1a2b3c4d:is(.wp-block-navigation .current-menu-item)`.
 		$selector             = gutenberg_build_state_selector(
-			".$unique_class",
+			".$unique_class" . ( $rule['scope'] ?? '' ),
 			$rule['selector'],
 			$rule['state'],
 			$block_name

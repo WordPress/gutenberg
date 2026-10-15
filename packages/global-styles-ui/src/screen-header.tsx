@@ -28,10 +28,13 @@ interface ScreenHeaderProps {
 	 */
 	onBack?: () => void;
 	viewportStates?: StateDefinition[];
+	customStates?: StateDefinition[];
 	pseudoStates?: StateDefinition[];
 	selectedViewport?: string;
+	selectedCustomState?: string;
 	selectedPseudoState?: string;
 	onChangeViewport?: ( value: string ) => void;
+	onChangeCustomState?: ( value: string ) => void;
 	onChangePseudoState?: ( value: string ) => void;
 	showResponsiveStateControls?: boolean;
 }
@@ -41,10 +44,13 @@ export function ScreenHeader( {
 	description,
 	onBack,
 	viewportStates,
+	customStates,
 	pseudoStates,
 	selectedViewport = 'default',
+	selectedCustomState = 'default',
 	selectedPseudoState = 'default',
 	onChangeViewport,
+	onChangeCustomState,
 	onChangePseudoState,
 	showResponsiveStateControls = true,
 }: ScreenHeaderProps ) {
@@ -88,13 +94,20 @@ export function ScreenHeader( {
 													? viewportStates
 													: []
 											}
+											customStates={ customStates }
 											pseudoStates={ pseudoStates }
 											viewportValue={ selectedViewport }
+											customStateValue={
+												selectedCustomState
+											}
 											pseudoStateValue={
 												selectedPseudoState
 											}
 											onChangeViewport={
 												onChangeViewport
+											}
+											onChangeCustomState={
+												onChangeCustomState
 											}
 											onChangePseudoState={
 												onChangePseudoState
@@ -102,8 +115,12 @@ export function ScreenHeader( {
 										/>
 										<StateControlBadges
 											viewportStates={ viewportStates }
+											customStates={ customStates }
 											pseudoStates={ pseudoStates }
 											viewportValue={ selectedViewport }
+											customStateValue={
+												selectedCustomState
+											}
 											pseudoStateValue={
 												selectedPseudoState
 											}

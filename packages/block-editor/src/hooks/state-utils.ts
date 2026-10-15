@@ -199,6 +199,37 @@ export function buildStateSelector(
 }
 
 /**
+ * Returns the suffix that scopes a block-instance selector to a custom state,
+ * such as Navigation Link's `-current`.
+ *
+ * The block declares the selector it matches in a custom state in
+ * `selectors.states`, for example `.wp-block-navigation .current-menu-item`.
+ * Wrapping that selector in `:is()` lets it follow the instance selector, so
+ * instance styles apply only while the block's wrapper matches it, as in
+ * `.wp-elements-1:is(.wp-block-navigation .current-menu-item)`.
+ *
+ * Mirror of `gutenberg_get_custom_state_selector_suffix()` in PHP.
+ *
+ * @param name  Block name.
+ * @param state Custom state key, e.g. `-current`.
+ * @return The selector suffix, or null when the block declares no selector for
+ *         the state.
+ */
+export function getCustomStateSelectorSuffix(
+	name: string,
+	state: string
+): string | null {
+	const states = getBlockType( name )?.selectors?.states;
+	const selector =
+		states && typeof states === 'object' ? states[ state ] : undefined;
+	if ( typeof selector !== 'string' || ! selector.trim() ) {
+		return null;
+	}
+
+	return `:is(${ selector.trim() })`;
+}
+
+/**
  * Builds the CSS selector used to preview a state on the editor canvas,
  * scoped to a specific block instance via its `data-block` attribute.
  *

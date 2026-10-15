@@ -2454,6 +2454,7 @@ export function selectedBlockStyleState(
 				clientId: action.clientId,
 				showStateOnCanvas,
 				value: {
+					custom: 'default',
 					pseudo: 'default',
 					...previousValue,
 					...action.value,
@@ -2473,6 +2474,7 @@ export function selectedBlockStyleState(
 				clientId: action.clientId,
 				showStateOnCanvas: action.value,
 				value: {
+					custom: 'default',
 					pseudo: 'default',
 					...previousValue,
 				},
