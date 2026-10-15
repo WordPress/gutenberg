@@ -142,11 +142,11 @@ function getTestSuiteRefs( wpVersion ) {
 		return [ trunk ];
 	}
 
-	if ( /-(?:alpha|beta|rc)/i.test( wpVersion ) ) {
-		const branch = wpVersion.match( /^(\d+\.\d+)(?:\.\d+)?-/ );
-		return branch
-			? [ { type: 'branch', name: branch[ 1 ] }, trunk ]
-			: [ trunk ];
+	const preRelease = wpVersion.match(
+		/^(\d+\.\d+)(?:\.\d+)?-(?:alpha|beta|rc)/i
+	);
+	if ( preRelease ) {
+		return [ { type: 'branch', name: preRelease[ 1 ] }, trunk ];
 	}
 
 	/*
