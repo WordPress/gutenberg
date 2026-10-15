@@ -40,6 +40,7 @@
 -   Convert the store actions and private actions to TypeScript and add the store thunk arguments type ([#84672](https://github.com/WordPress/gutenberg/pull/84672)).
 -   Convert the block edit context, block context, block icon, block editing mode, `useSettings`, block refs, Global Styles utils and inheritance, and spacing size utils to TypeScript ([#84625](https://github.com/WordPress/gutenberg/pull/84625)).
 -   Convert the store defaults, `getBlockSettings` and the store index to TypeScript and type the theme.json settings the store reads ([#84677](https://github.com/WordPress/gutenberg/pull/84677)).
+-   Type `isValueSpacingPreset` as returning a boolean, since it returns `false` for custom values ([#84730](https://github.com/WordPress/gutenberg/pull/84730)).
 
 ## 18.1.0 (2026-10-07)
 
