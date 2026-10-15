@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   The pages, templates, and patterns lists and the Quick Edit form read their fields from the server, through the Entity fields API. The fields registered with `registerEntityField` from `@wordpress/editor` still show, after the server ones ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   The pages, templates, and patterns lists and the Quick Edit form read their fields from the server, through the Entity fields API. Fields registered with `registerEntityField` from `@wordpress/editor` no longer show: register them on the server ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 
 ## 7.6.0 (2026-10-07)
 
