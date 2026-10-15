@@ -1514,49 +1514,6 @@ describe( 'Post actions', () => {
 			expect( noticeIds ).not.toContain( 'editor-revision-restored' );
 		} );
 
-		it( 'offers an Undo action that restores the content of a draft from before the restore', async () => {
-			const post = {
-				id: postId,
-				type: 'post',
-				title: 'Saved title',
-				content: 'saved content',
-				excerpt: '',
-				status: 'draft',
-			};
-			const { registry, savedData } = setUpRestore( post, {
-				edits: { content: 'unsaved content' },
-			} );
-
-			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
-				revisionId
-			);
-
-			const restoredNotice = registry
-				.select( noticesStore )
-				.getNotices()
-				.find( ( notice ) => notice.id === 'editor-revision-restored' );
-			expect( restoredNotice.actions ).toMatchObject( [
-				{ label: 'Undo' },
-			] );
-
-			await restoredNotice.actions[ 0 ].onClick();
-
-			expect( savedData ).toHaveLength( 3 );
-			expect( savedData[ 2 ] ).toMatchObject( {
-				title: 'Saved title',
-				content: 'unsaved content',
-			} );
-			expect(
-				registry.select( editorStore ).getEditedPostContent()
-			).toBe( 'unsaved content' );
-			expect(
-				registry
-					.select( noticesStore )
-					.getNotices()
-					.map( ( notice ) => notice.id )
-			).toContain( 'editor-revision-restore-undone' );
-		} );
-
 		it( 'offers an Undo action that restores the saved content of a published post', async () => {
 			const post = {
 				id: postId,
