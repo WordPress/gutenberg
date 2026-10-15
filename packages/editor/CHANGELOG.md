@@ -15,6 +15,7 @@
 
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+-   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
 
 ### Internal
 
@@ -61,9 +62,6 @@
 
 ### Bug Fixes
 
--   `EditorInterface`: Apply the `showListViewByDefault` preference when the editor enters edit mode, so every editor built on the package honors it — including the extensible site editor, which previously ignored it. The logic moves here from `edit-post` and `edit-site`.
--   `StylesCanvas`: In preview mode, render edge to edge without the close button and Escape handler. There the canvas is the whole surface rather than a frame opened over an editing session, and whatever opened it owns closing it.
--   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
 -   Tags and other flat taxonomies: Chip remove buttons are named Remove and described by the term, instead of repeating the term in the button name ([#82863](https://github.com/WordPress/gutenberg/pull/82863)).
 -   Distraction free: Raise the top bar above the notices overlay while it is revealed by hover or keyboard focus, so its controls are visible when focused instead of operable but hidden behind a notice. Also repoint the rule that overlays notices in distraction-free mode at the class the interface renders today ([#80349](https://github.com/WordPress/gutenberg/pull/80349)).
 -   Notes: Focus the text field when editing a note ([#81930](https://github.com/WordPress/gutenberg/pull/81930)).
