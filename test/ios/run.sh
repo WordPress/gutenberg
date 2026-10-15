@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Runs the Safari tests against the plugin in this checkout on an iOS
+# Runs the iOS tests against the plugin in this checkout on an iOS
 # simulator. Needs macOS with Xcode, xcodegen, PHP with SQLite and a
 # built plugin (npm run build). Set WP_PORT to serve WordPress on
 # another port and SIMULATOR_UDID to pick a device.
@@ -132,29 +132,6 @@ fi
 
 step "Waiting for the simulator"
 xcrun simctl bootstatus "$UDID" -b
-# Safari's tips cover the page on a fresh simulator, and a tap then only
-# closes the tip.
-xcrun simctl spawn "$UDID" defaults write com.apple.mobilesafari com.apple.TipKit.HideAllTips -bool YES
-# Safari's first launch on a fresh simulator takes most of a minute, and
-# the simulator then loses the test's first tap. Launch it once here.
-step "Starting Safari once"
-# launch returns once Safari runs, however long that takes; openurl gives
-# up after a few seconds, so it only hands the page to a running Safari.
-xcrun simctl launch "$UDID" com.apple.mobilesafari > /dev/null
-xcrun simctl openurl "$UDID" "$WP_BASE_URL/wp-login.php?warm-up"
-for _ in $( seq 1 120 ); do
-	grep -q "wp-login.php?warm-up" "$ROOT/test/ios/build/server.log" && break
-	sleep 1
-done
-grep -q "wp-login.php?warm-up" "$ROOT/test/ios/build/server.log" ||
-	{ echo "Safari did not open the page"; exit 1; }
-# The login is remembered in a cookie, which outlives the server: start
-# Safari without cookies from an earlier run.
-xcrun simctl terminate "$UDID" com.apple.mobilesafari 2>/dev/null || true
-SAFARI_DATA=$( xcrun simctl get_app_container "$UDID" com.apple.mobilesafari data )
-if [[ -n "$SAFARI_DATA" && -d "$SAFARI_DATA" ]]; then
-	rm -f "$SAFARI_DATA"/Library/Cookies/*.binarycookies
-fi
 
 step "Generating the Xcode project"
 ( cd test/ios && xcodegen generate --quiet )
@@ -163,7 +140,7 @@ rm -rf test/ios/build/results.xcresult
 STATUS=0
 TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
-	-scheme SafariTests \
+	-scheme EditorTests \
 	-destination "id=${UDID}" \
 	-derivedDataPath test/ios/build \
 	-resultBundlePath test/ios/build/results.xcresult \
