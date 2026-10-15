@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
+import { store as coreStore } from '@wordpress/core-data';
 import { isAppleOS } from '@wordpress/keycodes';
 import { store as editorStore } from '../../../store';
 import { createEditorRegistry, ExcerptEditor } from './fixtures/editor';
@@ -21,8 +22,8 @@ function pressUndo( target: HTMLElement, redo = false ) {
 }
 
 describe( 'PostExcerpt undo', () => {
-	it( 'leaves undo inside an uncommitted excerpt to the browser', () => {
-		const registry = createEditorRegistry();
+	it( 'leaves undo inside an uncommitted excerpt to the browser', async () => {
+		const registry = await createEditorRegistry();
 		render( <ExcerptEditor registry={ registry } updateOnBlur /> );
 		const textarea = screen.getByRole( 'textbox' );
 		fireEvent.change( textarea, { target: { value: 'Local draft' } } );
@@ -38,8 +39,8 @@ describe( 'PostExcerpt undo', () => {
 		).toBe( 'Original excerpt' );
 	} );
 
-	it( 'leaves redo inside an uncommitted excerpt to the browser', () => {
-		const registry = createEditorRegistry();
+	it( 'leaves redo inside an uncommitted excerpt to the browser', async () => {
+		const registry = await createEditorRegistry();
 		registry.dispatch( editorStore ).undo();
 		render( <ExcerptEditor registry={ registry } updateOnBlur /> );
 		const textarea = screen.getByRole( 'textbox' );
@@ -53,8 +54,8 @@ describe( 'PostExcerpt undo', () => {
 		).toBe( 'Original title' );
 	} );
 
-	it( 'keeps editor undo for excerpts that update on each change', () => {
-		const registry = createEditorRegistry();
+	it( 'keeps editor undo for excerpts that update on each change', async () => {
+		const registry = await createEditorRegistry();
 		render( <ExcerptEditor registry={ registry } /> );
 		const textarea = screen.getByRole( 'textbox' );
 		fireEvent.change( textarea, { target: { value: 'Changed excerpt' } } );
@@ -68,8 +69,8 @@ describe( 'PostExcerpt undo', () => {
 		).toBe( 'Edited title' );
 	} );
 
-	it( 'keeps editor redo for excerpts that update on each change', () => {
-		const registry = createEditorRegistry();
+	it( 'keeps editor redo for excerpts that update on each change', async () => {
+		const registry = await createEditorRegistry();
 		render( <ExcerptEditor registry={ registry } /> );
 		const textarea = screen.getByRole( 'textbox' );
 		fireEvent.change( textarea, { target: { value: 'Changed excerpt' } } );
@@ -81,8 +82,8 @@ describe( 'PostExcerpt undo', () => {
 		expect( textarea ).toHaveValue( 'Changed excerpt' );
 	} );
 
-	it( 'commits the local excerpt on blur and allows undo outside the field', () => {
-		const registry = createEditorRegistry();
+	it( 'commits the local excerpt on blur and allows undo outside the field', async () => {
+		const registry = await createEditorRegistry();
 		render( <ExcerptEditor registry={ registry } updateOnBlur /> );
 		const textarea = screen.getByRole( 'textbox' );
 		fireEvent.change( textarea, { target: { value: 'Local draft' } } );
@@ -99,8 +100,8 @@ describe( 'PostExcerpt undo', () => {
 		).toBe( 'Original excerpt' );
 	} );
 
-	it( 'restores editor shortcuts when switching to immediate updates', () => {
-		const registry = createEditorRegistry();
+	it( 'restores editor shortcuts when switching to immediate updates', async () => {
+		const registry = await createEditorRegistry();
 		const { rerender } = render(
 			<ExcerptEditor registry={ registry } updateOnBlur />
 		);
@@ -112,5 +113,18 @@ describe( 'PostExcerpt undo', () => {
 		expect(
 			registry.select( editorStore ).getEditedPostAttribute( 'title' )
 		).toBe( 'Original title' );
+	} );
+
+	it( 'settles the preloaded post without making a REST request', async () => {
+		const fetchSpy = vi.spyOn( globalThis, 'fetch' );
+		try {
+			const registry = await createEditorRegistry();
+			await registry
+				.resolveSelect( coreStore )
+				.getEditedEntityRecord( 'postType', 'post', 1 );
+			expect( fetchSpy ).not.toHaveBeenCalled();
+		} finally {
+			fetchSpy.mockRestore();
+		}
 	} );
 } );

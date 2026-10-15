@@ -12,7 +12,7 @@ import { store as editorStore } from '../../../../store';
 import EditorKeyboardShortcuts from '../../../global-keyboard-shortcuts';
 import PostExcerpt from '../../';
 
-export function createEditorRegistry() {
+export async function createEditorRegistry() {
 	const registry = createRegistry();
 	registry.register( blockEditorStore );
 	registry.register( coreStore );
@@ -39,8 +39,18 @@ export function createEditorRegistry() {
 	registry
 		.dispatch( coreStore )
 		.receiveEntityRecords( 'postType', 'post', post );
+	// Preloaded data must be resolved before selectors can schedule a REST request.
+	registry
+		.dispatch( coreStore )
+		.finishResolution( 'getEntityRecord', [ 'postType', 'post', post.id ] );
+	await registry
+		.resolveSelect( coreStore )
+		.getEntityRecord( 'postType', 'post', post.id );
 	registry.dispatch( editorStore ).setupEditor( post, {} );
 	registry.dispatch( editorStore ).editPost( { title: 'Edited title' } );
+	await registry
+		.resolveSelect( coreStore )
+		.getRawEntityRecord( 'postType', 'post', post.id );
 	for ( const [ name, modifier ] of [
 		[ 'undo', 'primary' ],
 		[ 'redo', 'primaryShift' ],
@@ -59,7 +69,7 @@ export function ExcerptEditor( {
 	registry,
 	updateOnBlur = false,
 }: {
-	registry: ReturnType< typeof createEditorRegistry >;
+	registry: Awaited< ReturnType< typeof createEditorRegistry > >;
 	updateOnBlur?: boolean;
 } ) {
 	return (

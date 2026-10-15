@@ -7,7 +7,7 @@ import { createEditorRegistry, ExcerptEditor } from './fixtures/editor';
 
 describe( 'PostExcerpt native history', () => {
 	it( 'undoes and redoes local typing without changing the editor history', async () => {
-		const registry = createEditorRegistry();
+		const registry = await createEditorRegistry();
 		const screen = await render(
 			<ExcerptEditor registry={ registry } updateOnBlur />
 		);
