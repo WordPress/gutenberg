@@ -58,7 +58,10 @@ function CopyButton( { text, label }: { text: string; label: string } ) {
 			<Text
 				variant="body-sm"
 				role="status"
-				style={ { alignSelf: 'center' } }
+				style={ {
+					alignSelf: 'center',
+					color: 'var(--wp-ui-notice-text-color)',
+				} }
 			>
 				{ hasCopied ? 'Copied' : '' }
 			</Text>
@@ -75,6 +78,7 @@ export const WithDetails: Story = {
 	},
 	render: function NoticeWithDetails( { intent, message, details } ) {
 		const [ open, setOpen ] = useState( false );
+		const hasDetails = details.trim().length > 0;
 
 		return (
 			<Collapsible.Root
@@ -84,30 +88,84 @@ export const WithDetails: Story = {
 			>
 				<Notice.Description>{ message }</Notice.Description>
 				<Notice.Actions>
-					<Collapsible.Trigger
-						render={ <Notice.ActionButton variant="outline" /> }
-					>
-						{ open ? 'Hide details' : 'Show details' }
-					</Collapsible.Trigger>
+					{ hasDetails && (
+						<Collapsible.Trigger
+							render={ <Notice.ActionButton variant="outline" /> }
+						>
+							{ open ? 'Hide details' : 'Show details' }
+						</Collapsible.Trigger>
+					) }
 					<CopyButton
-						text={ `${ message }\n\n${ details }` }
+						text={
+							hasDetails
+								? `${ message }\n\n${ details }`
+								: message
+						}
 						label={
 							intent === 'error' ? 'Copy error' : 'Copy message'
 						}
 					/>
 				</Notice.Actions>
-				<Collapsible.Panel
-					hiddenUntilFound
-					render={ <Notice.Description render={ <div /> } /> }
-					style={ {
-						marginBlockStart: 'var(--wpds-dimension-gap-sm)',
-						whiteSpace: 'pre-wrap',
-						overflowWrap: 'anywhere',
-					} }
-				>
-					{ details }
-				</Collapsible.Panel>
+				{ hasDetails && (
+					<Collapsible.Panel
+						render={ <Notice.Description render={ <div /> } /> }
+						style={ {
+							marginBlockStart: 'var(--wpds-dimension-gap-sm)',
+							whiteSpace: 'pre-wrap',
+							overflowWrap: 'anywhere',
+						} }
+					>
+						{ details }
+					</Collapsible.Panel>
+				) }
 			</Collapsible.Root>
+		);
+	},
+};
+
+export const WithNativeDetails: Story = {
+	args: WithDetails.args,
+	render: function NoticeWithNativeDetails( { intent, message, details } ) {
+		const hasDetails = details.trim().length > 0;
+
+		return (
+			<Notice.Root intent={ intent }>
+				<Notice.Description>{ message }</Notice.Description>
+				{ hasDetails && (
+					<Notice.Description
+						render={ <details /> }
+						style={ {
+							marginBlockStart: 'var(--wpds-dimension-gap-sm)',
+							overflowWrap: 'anywhere',
+						} }
+					>
+						<summary style={ { cursor: 'pointer' } }>
+							Details
+						</summary>
+						<div
+							style={ {
+								marginBlockStart:
+									'var(--wpds-dimension-gap-sm)',
+								whiteSpace: 'pre-wrap',
+							} }
+						>
+							{ details }
+						</div>
+					</Notice.Description>
+				) }
+				<Notice.Actions>
+					<CopyButton
+						text={
+							hasDetails
+								? `${ message }\n\n${ details }`
+								: message
+						}
+						label={
+							intent === 'error' ? 'Copy error' : 'Copy message'
+						}
+					/>
+				</Notice.Actions>
+			</Notice.Root>
 		);
 	},
 };
