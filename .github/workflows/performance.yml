@@ -124,6 +124,7 @@ jobs:
                       ${{ env.WP_ARTIFACTS_PATH }}/traces
                       ${{ env.WP_ARTIFACTS_PATH }}/build
                   if-no-files-found: ignore
+                  retention-days: 14
 
             - name: Publish performance results
               if: github.event_name == 'push'
@@ -140,3 +141,4 @@ jobs:
                   name: failures-artifacts
                   path: ${{ env.WP_ARTIFACTS_PATH }}
                   if-no-files-found: ignore
+                  retention-days: 14
