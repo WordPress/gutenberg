@@ -8,6 +8,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import type { KeyboardEvent } from 'react';
+import type {
+	BlockColorsStyleSelectorProps,
+	ColorSelectorIconProps,
+	ColorSelectorWrappers,
+} from './types';
 
 const ColorSelectorSVGIcon = () => (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
@@ -18,13 +24,13 @@ const ColorSelectorSVGIcon = () => (
 /**
  * Color Selector Icon component.
  *
- * @param {Object} props           Component properties.
- * @param {Object} props.style     Style object.
- * @param {string} props.className Class name for component.
+ * @param props           Component properties.
+ * @param props.style     Style object.
+ * @param props.className Class name for component.
  *
- * @return {*} React Icon component.
+ * @return React Icon component.
  */
-const ColorSelectorIcon = ( { style, className } ) => {
+const ColorSelectorIcon = ( { style, className }: ColorSelectorIconProps ) => {
 	return (
 		<div className="block-library-colors-selector__icon-container">
 			<div
@@ -40,15 +46,24 @@ const ColorSelectorIcon = ( { style, className } ) => {
 /**
  * Renders the Colors Selector Toolbar with the icon button.
  *
- * @param {Object} props                 Component properties.
- * @param {Object} props.TextColor       Text color component that wraps icon.
- * @param {Object} props.BackgroundColor Background color component that wraps icon.
+ * @param props                 Component properties.
+ * @param props.TextColor       Text color component that wraps icon.
+ * @param props.BackgroundColor Background color component that wraps icon.
  *
- * @return {*} React toggle button component.
+ * @return React toggle button component.
  */
-const renderToggleComponent = ( { TextColor, BackgroundColor } ) =>
-	function ToggleComponent( { onToggle, isOpen } ) {
-		const openOnArrowDown = ( event ) => {
+const renderToggleComponent = ( {
+	TextColor,
+	BackgroundColor,
+}: ColorSelectorWrappers ) =>
+	function ToggleComponent( {
+		onToggle,
+		isOpen,
+	}: {
+		onToggle: () => void;
+		isOpen: boolean;
+	} ) {
+		const openOnArrowDown = ( event: KeyboardEvent ) => {
 			if ( ! isOpen && event.keyCode === DOWN ) {
 				event.preventDefault();
 				onToggle();
@@ -74,7 +89,10 @@ const renderToggleComponent = ( { TextColor, BackgroundColor } ) =>
 		);
 	};
 
-const BlockColorsStyleSelector = ( { children, ...other } ) => {
+const BlockColorsStyleSelector = ( {
+	children,
+	...other
+}: BlockColorsStyleSelectorProps ) => {
 	deprecated( `wp.blockEditor.BlockColorsStyleSelector`, {
 		alternative: 'block supports API',
 		since: '6.1',
