@@ -18,17 +18,23 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '1',
+					isValid: true,
 					attributes: { metadata: { noteId: 1 } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
+					clientId: '2',
+					isValid: true,
 					attributes: { metadata: { noteId: 2 } },
 					innerBlocks: [],
 				},
 			];
 			const result = {
 				name: 'core/bar',
+				clientId: '3',
+				isValid: true,
 				attributes: {},
 				innerBlocks: source,
 			};
@@ -41,6 +47,8 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '4',
+					isValid: true,
 					attributes: { metadata: { noteId: 1 } },
 					innerBlocks: [],
 				},
@@ -48,11 +56,15 @@ describe( 'metadata', () => {
 			const results = [
 				{
 					name: 'core/bar',
+					clientId: '5',
+					isValid: true,
 					attributes: {},
 					innerBlocks: [],
 				},
 				{
 					name: 'core/bar',
+					clientId: '6',
+					isValid: true,
 					attributes: {},
 					innerBlocks: [],
 				},
@@ -71,17 +83,23 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '7',
+					isValid: true,
 					attributes: { metadata: { noteId: 1 } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
+					clientId: '8',
+					isValid: true,
 					attributes: { metadata: { noteId: 2 } },
 					innerBlocks: [],
 				},
 			];
 			const result = {
 				name: 'core/bar',
+				clientId: '9',
+				isValid: true,
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -94,16 +112,22 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '10',
+					isValid: true,
 					attributes: { metadata: { noteId: 1 } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
+					clientId: '11',
+					isValid: true,
 					attributes: { metadata: { noteId: 2 } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
+					clientId: '12',
+					isValid: true,
 					attributes: { metadata: { noteId: 3 } },
 					innerBlocks: [],
 				},
@@ -111,11 +135,15 @@ describe( 'metadata', () => {
 			const results = [
 				{
 					name: 'core/bar',
+					clientId: '13',
+					isValid: true,
 					attributes: {},
 					innerBlocks: [],
 				},
 				{
 					name: 'core/bar',
+					clientId: '14',
+					isValid: true,
 					attributes: {},
 					innerBlocks: [],
 				},
@@ -133,11 +161,15 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '15',
+					isValid: true,
 					attributes: { metadata: { noteId: 1 } },
 					innerBlocks: [],
 				},
 				{
 					name: 'core/foo',
+					clientId: '16',
+					isValid: true,
 					attributes: { metadata: { noteId: 2 } },
 					innerBlocks: [],
 				},
@@ -145,11 +177,17 @@ describe( 'metadata', () => {
 			const results = [
 				{
 					name: 'core/bar',
+					clientId: '17',
+					isValid: true,
 					attributes: { metadata: { noteId: 1 } },
+					innerBlocks: [],
 				},
 				{
 					name: 'core/bar',
+					clientId: '18',
+					isValid: true,
 					attributes: { metadata: { noteId: 2 } },
+					innerBlocks: [],
 				},
 			];
 
@@ -168,12 +206,16 @@ describe( 'metadata', () => {
 
 		it( 'should preserve custom name metadata', () => {
 			registerBlockType( 'core/bar', {
+				attributes: {},
+				category: 'text',
 				apiVersion: 3,
 				title: 'Bar',
 			} );
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '19',
+					isValid: true,
 					attributes: {
 						metadata: { name: 'Custom Name' },
 					},
@@ -182,18 +224,22 @@ describe( 'metadata', () => {
 			];
 			const result = {
 				name: 'core/bar',
+				clientId: '20',
+				isValid: true,
 				attributes: {},
 				innerBlocks: [],
 			};
 			const transformed = addTransforms( result, source, 0, [ result ] );
 
-			expect( transformed.attributes.metadata.name ).toBe(
+			expect( transformed.attributes.metadata?.name ).toBe(
 				'Custom Name'
 			);
 		} );
 
 		it( 'should not preserve custom name metadata when target block does not support renaming', () => {
 			registerBlockType( 'core/bar', {
+				attributes: {},
+				category: 'text',
 				apiVersion: 3,
 				title: 'Bar',
 				supports: {
@@ -204,6 +250,8 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '21',
+					isValid: true,
 					attributes: {
 						metadata: { name: 'Custom Name' },
 					},
@@ -212,6 +260,8 @@ describe( 'metadata', () => {
 			];
 			const result = {
 				name: 'core/bar',
+				clientId: '22',
+				isValid: true,
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -222,6 +272,8 @@ describe( 'metadata', () => {
 
 		it( 'should preserve block visibility metadata', () => {
 			registerBlockType( 'core/bar', {
+				attributes: {},
+				category: 'text',
 				apiVersion: 3,
 				title: 'Bar',
 			} );
@@ -229,6 +281,8 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '23',
+					isValid: true,
 					attributes: {
 						metadata: { blockVisibility: false },
 					},
@@ -237,6 +291,8 @@ describe( 'metadata', () => {
 			];
 			const result = {
 				name: 'core/bar',
+				clientId: '24',
+				isValid: true,
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -249,6 +305,8 @@ describe( 'metadata', () => {
 
 		it( 'should not preserve block visibility metadata when target block does not support it', () => {
 			registerBlockType( 'core/bar', {
+				attributes: {},
+				category: 'text',
 				apiVersion: 3,
 				title: 'Bar',
 				supports: {
@@ -259,6 +317,8 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '25',
+					isValid: true,
 					attributes: {
 						metadata: { blockVisibility: false },
 					},
@@ -267,6 +327,8 @@ describe( 'metadata', () => {
 			];
 			const result = {
 				name: 'core/bar',
+				clientId: '26',
+				isValid: true,
 				attributes: {},
 				innerBlocks: [],
 			};
@@ -281,6 +343,8 @@ describe( 'metadata', () => {
 			const source = [
 				{
 					name: 'core/foo',
+					clientId: '27',
+					isValid: true,
 					attributes: {
 						metadata: {
 							noteId: 1,
@@ -293,6 +357,8 @@ describe( 'metadata', () => {
 			];
 			const result = {
 				name: 'core/bar',
+				clientId: '28',
+				isValid: true,
 				attributes: {
 					metadata: {
 						noteId: 2,

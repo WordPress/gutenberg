@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
-import type { BlockType, ColorProps } from '@wordpress/blocks';
+import type { Block, BlockType, ColorProps } from '@wordpress/blocks';
+import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 
 /**
  * The viewport and pseudo state whose styles a block's controls edit.
@@ -150,3 +151,18 @@ export type BorderSupport = true | Record< string, unknown >;
  * (column) value.
  */
 export type BlockGapValue = string | { top?: string; left?: string };
+
+/**
+ * The `metadata` attribute every block gets.
+ */
+export interface BlockMetadata {
+	name?: string;
+	noteId?: unknown;
+	blockVisibility?: BlockVisibility;
+	[ key: string ]: unknown;
+}
+
+/**
+ * A block whose `metadata` attribute is read.
+ */
+export type BlockWithMetadata = Block< { metadata?: BlockMetadata } >;
