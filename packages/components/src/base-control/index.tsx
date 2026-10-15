@@ -16,7 +16,7 @@ import { contextConnectWithoutRef, useContextSystem } from '../context';
 export { useBaseControlProps } from './hooks';
 
 const UnconnectedBaseControl = (
-	props: WordPressComponentProps< BaseControlProps, null >
+	props: WordPressComponentProps< BaseControlProps, null, false >
 ) => {
 	const {
 		id,

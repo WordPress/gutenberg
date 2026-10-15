@@ -11,6 +11,16 @@ import {
 	setSettings,
 	humanTimeDiff,
 } from '../';
+import type { L10nSettings } from '../';
+
+type LocaleNameKey = 'months' | 'monthsShort' | 'weekdays' | 'weekdaysShort';
+
+/**
+ * The default settings list the month and weekday names as arrays, which the
+ * locale tests map over.
+ */
+type L10nWithNameArrays = Omit< L10nSettings, LocaleNameKey > &
+	Record< LocaleNameKey, string[] >;
 
 describe( 'isInTheFuture', () => {
 	it( 'should return true if the date is in the future', () => {
@@ -33,7 +43,7 @@ describe( 'isInTheFuture', () => {
 		// Set a timezone in the future.
 		setSettings( {
 			...settings,
-			timezone: { offset: '4', string: '' },
+			timezone: { ...settings.timezone, offset: 4, string: '' },
 		} );
 		// Create a Date object 1 minute in the past.
 		let date = new Date( Number( getDate() ) - 1000 * 60 );
@@ -81,7 +91,7 @@ describe( 'Function date', () => {
 			const settings = getSettings();
 
 			// Simulate different locale.
-			const l10n = settings.l10n;
+			const l10n = settings.l10n as L10nWithNameArrays;
 			setSettings( {
 				...settings,
 				l10n: {
@@ -118,7 +128,11 @@ describe( 'Function date', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -144,7 +158,7 @@ describe( 'Function date', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: '' },
+			timezone: { ...settings.timezone, offset: -4, string: '' },
 		} );
 
 		// Check.
@@ -170,7 +184,11 @@ describe( 'Function date', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -191,7 +209,11 @@ describe( 'Function date', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -206,6 +228,7 @@ describe( 'Function date', () => {
 		formattedDate = dateNoI18n(
 			'Y-m-d H:i',
 			'2019-06-18T11:00:00.000Z',
+			// @ts-expect-error `date()` types `timezone` as a string, but its JSDoc and `buildMoment()` accept a numeric UTC offset.
 			8
 		);
 		expect( formattedDate ).toBe( '2019-06-18 19:00' );
@@ -213,6 +236,7 @@ describe( 'Function date', () => {
 		formattedDate = dateNoI18n(
 			'Y-m-d H:i',
 			'2019-06-18T11:00:00.000Z',
+			// @ts-expect-error `date()` types `timezone` as a string, but its JSDoc and `buildMoment()` accept a numeric UTC offset.
 			480
 		);
 		expect( formattedDate ).toBe( '2019-06-18 19:00' );
@@ -252,7 +276,7 @@ describe( 'Function gmdate', () => {
 			const settings = getSettings();
 
 			// Simulate different locale.
-			const l10n = settings.l10n;
+			const l10n = settings.l10n as L10nWithNameArrays;
 			setSettings( {
 				...settings,
 				l10n: {
@@ -289,7 +313,11 @@ describe( 'Function gmdate', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -331,7 +359,7 @@ describe( 'Function dateI18n', () => {
 			const settings = getSettings();
 
 			// Simulate different locale.
-			const l10n = settings.l10n;
+			const l10n = settings.l10n as L10nWithNameArrays;
 			setSettings( {
 				...settings,
 				l10n: {
@@ -369,7 +397,11 @@ describe( 'Function dateI18n', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -395,7 +427,7 @@ describe( 'Function dateI18n', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: '' },
+			timezone: { ...settings.timezone, offset: -4, string: '' },
 		} );
 
 		// Check.
@@ -421,7 +453,11 @@ describe( 'Function dateI18n', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -442,7 +478,11 @@ describe( 'Function dateI18n', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -474,7 +514,11 @@ describe( 'Function dateI18n', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check that offset 0 formats in UTC, not site timezone.
@@ -497,7 +541,11 @@ describe( 'Function dateI18n', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -518,7 +566,11 @@ describe( 'Function dateI18n', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -564,7 +616,7 @@ describe( 'Function gmdateI18n', () => {
 			const settings = getSettings();
 
 			// Simulate different locale.
-			const l10n = settings.l10n;
+			const l10n = settings.l10n as L10nWithNameArrays;
 			setSettings( {
 				...settings,
 				l10n: {
@@ -601,7 +653,11 @@ describe( 'Function gmdateI18n', () => {
 		// Simulate different timezone.
 		setSettings( {
 			...settings,
-			timezone: { offset: -4, string: 'America/New_York' },
+			timezone: {
+				...settings.timezone,
+				offset: -4,
+				string: 'America/New_York',
+			},
 		} );
 
 		// Check.
@@ -640,8 +696,8 @@ describe( 'Moment.js Localization', () => {
 		expect( newSettings.l10n.locale ).toBe( settings.l10n.locale );
 
 		// Test the changed values.
-		expect( newSettings.l10n.relative.mm ).toBe( '%d localized minutes' );
-		expect( newSettings.l10n.relative.hh ).toBe( '%d localized hours' );
+		expect( newSettings.l10n.relative!.mm ).toBe( '%d localized minutes' );
+		expect( newSettings.l10n.relative!.hh ).toBe( '%d localized hours' );
 
 		// Restore default settings.
 		setSettings( settings );
@@ -693,7 +749,10 @@ describe( 'WP timezone zone recovery', () => {
 	function destroyWPZone() {
 		// moment-timezone stores zones in an internal object.
 		// Removing 'wp' simulates a third-party moment-timezone reload.
-		const zones = momentLib.tz._zones;
+		// `_zones` is internal, so moment-timezone's types do not declare it.
+		const zones = (
+			momentLib.tz as unknown as { _zones: Record< string, unknown > }
+		 )._zones;
 		delete zones.wp;
 	}
 
@@ -701,7 +760,7 @@ describe( 'WP timezone zone recovery', () => {
 		const settings = getSettings();
 		setSettings( {
 			...settings,
-			timezone: { offset: 4, string: '' },
+			timezone: { ...settings.timezone, offset: 4, string: '' },
 		} );
 
 		destroyWPZone();
@@ -718,7 +777,7 @@ describe( 'WP timezone zone recovery', () => {
 		const settings = getSettings();
 		setSettings( {
 			...settings,
-			timezone: { offset: 4, string: '' },
+			timezone: { ...settings.timezone, offset: 4, string: '' },
 		} );
 
 		destroyWPZone();
@@ -734,7 +793,7 @@ describe( 'WP timezone zone recovery', () => {
 		const settings = getSettings();
 		setSettings( {
 			...settings,
-			timezone: { offset: 4, string: '' },
+			timezone: { ...settings.timezone, offset: 4, string: '' },
 		} );
 
 		destroyWPZone();

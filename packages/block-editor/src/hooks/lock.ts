@@ -1,13 +1,14 @@
 import { addFilter } from '@wordpress/hooks';
+import type { BlockType } from '@wordpress/blocks';
 
 /**
  * Filters registered block settings, extending attributes to include `lock`.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-export function addAttribute( settings ) {
+export function addAttribute( settings: BlockType ): BlockType {
 	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( 'type' in ( settings.attributes?.lock ?? {} ) ) {
 		return settings;

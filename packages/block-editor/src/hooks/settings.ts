@@ -1,10 +1,11 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 
-const hasSettingsSupport = ( blockType ) =>
+const hasSettingsSupport = ( blockType: BlockType ): boolean =>
 	hasBlockSupport( blockType, '__experimentalSettings', false );
 
-function addAttribute( settings ) {
+function addAttribute( settings: BlockType ): BlockType {
 	if ( ! hasSettingsSupport( settings ) ) {
 		return settings;
 	}

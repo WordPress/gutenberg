@@ -10,10 +10,11 @@ describe( 'with settings', () => {
 	};
 
 	describe( 'addAttribute', () => {
+		// Filters return `unknown`; this one returns the block settings.
 		const addAttribute = applyFilters.bind(
 			null,
 			'blocks.registerBlockType'
-		);
+		) as ( ...args: unknown[] ) => Record< string, unknown >;
 
 		it( 'does not have settings att if settings block support is not enabled', () => {
 			const settings = addAttribute( {
