@@ -23,6 +23,10 @@ function parseDirectiveName( directiveName: string ): {
 
 	// Finds the first "--" to separate the prefix.
 	const suffixIndex = name.indexOf( '--' );
+	// A prefix cannot start with "-" and a leading "--" is empty.
+	if ( suffixIndex === 0 || name[ 0 ] === '-' ) {
+		return null;
+	}
 
 	// If "--" is not found, everything is part of the prefix.
 	if ( suffixIndex === -1 ) {

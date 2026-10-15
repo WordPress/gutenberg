@@ -1,13 +1,14 @@
 import { describe, expect, it, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
-import { screen, waitFor, within } from '@testing-library/react';
+import { act, screen, waitFor, within } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import { useState } from '@wordpress/element';
 import PaletteEdit, {
 	getNameAndSlugForPosition,
 	deduplicateElementSlugs,
 } from '..';
 import Modal from '../../modal';
-import type { PaletteElement } from '../types';
+import type { Color, PaletteElement } from '../types';
 
 const noop = () => {};
 
@@ -256,6 +257,7 @@ describe( 'PaletteEdit', () => {
 			name: 'color',
 			props: { colors },
 			buttonName: 'Primary',
+			dialogName: 'Edit: Primary',
 			editorRole: 'textbox' as const,
 			editorName: 'Hex color',
 		},
@@ -263,6 +265,7 @@ describe( 'PaletteEdit', () => {
 			name: 'gradient',
 			props: { gradients },
 			buttonName: 'Gradient: Pale ocean',
+			dialogName: 'Edit: Pale ocean',
 			editorRole: 'combobox' as const,
 			editorName: 'Type',
 		},
@@ -270,12 +273,13 @@ describe( 'PaletteEdit', () => {
 			name: 'duotone',
 			props: { duotones, colorPalette: colors },
 			buttonName: 'Duotone: Purple and yellow',
+			dialogName: 'Edit: Purple and yellow',
 			editorRole: 'button' as const,
 			editorName: /Shadows/,
 		},
 	] )(
 		'shows $name swatches as named command buttons that open the editor',
-		async ( { props, buttonName, editorRole, editorName } ) => {
+		async ( { props, buttonName, dialogName, editorRole, editorName } ) => {
 			await render( <PaletteEdit { ...defaultProps } { ...props } /> );
 
 			const group = screen.getByRole( 'group', { name: 'Test label' } );
@@ -294,9 +298,91 @@ describe( 'PaletteEdit', () => {
 			await userEvent.click( swatch );
 			await waitFor( () => {
 				expect(
+					screen.getByRole( 'dialog', { name: dialogName } )
+				).toBeVisible();
+				expect(
 					screen.getByRole( editorRole, { name: editorName } )
 				).toBeVisible();
 			} );
+		}
+	);
+
+	it.each( [
+		{ view: 'swatches', action: 'Close' },
+		{ view: 'details', action: 'Close' },
+		{ view: 'swatches', action: 'Escape' },
+		{ view: 'details', action: 'Escape' },
+	] )(
+		'retains live edits and returns focus when dismissed with $action in $view',
+		async ( { view, action } ) => {
+			const onChange = vi.fn();
+			function ControlledPalette() {
+				const [ value, setValue ] = useState< Color[] >( colors );
+				return (
+					<PaletteEdit
+						{ ...defaultProps }
+						colors={ value }
+						onChange={ ( nextColors ) => {
+							onChange( nextColors );
+							setValue( nextColors ?? [] );
+						} }
+					/>
+				);
+			}
+			await render( <ControlledPalette /> );
+			if ( view === 'details' ) {
+				await userEvent.click(
+					screen.getByRole( 'button', { name: 'Color options' } )
+				);
+				await userEvent.click(
+					await screen.findByRole( 'menuitem', {
+						name: 'Show details',
+					} )
+				);
+			}
+			const swatch = screen.getByRole( 'button', {
+				name: view === 'details' ? 'Edit: Primary' : 'Primary',
+			} );
+			swatch.focus();
+			await userEvent.keyboard( '{Enter}' );
+			const dialog = await screen.findByRole( 'dialog', {
+				name: 'Edit: Primary',
+			} );
+			const closeButtons = within( dialog ).getAllByRole( 'button', {
+				name: 'Close',
+			} );
+			expect( closeButtons ).toHaveLength( 2 );
+			for ( const button of closeButtons ) {
+				expect( button ).toHaveAttribute( 'tabindex', '-1' );
+				const { width, height } = button.getBoundingClientRect();
+				expect( width ).toBeLessThanOrEqual( 1 );
+				expect( height ).toBeLessThanOrEqual( 1 );
+			}
+			const input = within( dialog ).getByRole( 'textbox', {
+				name: 'Hex color',
+			} );
+			await userEvent.fill( input, 'ff0000' );
+			await waitFor( () =>
+				expect( onChange ).toHaveBeenCalledWith( [
+					{ ...colors[ 0 ], color: '#ff0000' },
+					colors[ 1 ],
+				] )
+			);
+			if ( action === 'Close' ) {
+				// Activate as assistive technology does, without moving the
+				// pointer to a control that is intentionally visually hidden.
+				act( () => closeButtons[ view === 'details' ? 1 : 0 ].click() );
+			} else {
+				await userEvent.keyboard( '{Escape}' );
+			}
+			await waitFor( () => {
+				expect( dialog ).not.toBeInTheDocument();
+				expect( swatch ).toHaveFocus();
+			} );
+			await userEvent.click( swatch );
+			expect(
+				await screen.findByRole( 'textbox', { name: 'Hex color' } )
+			).toHaveValue( 'FF0000' );
 		}
 	);
 

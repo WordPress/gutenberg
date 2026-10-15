@@ -54,8 +54,7 @@ export interface PopupProps
 	portal?: ReactElement< Omit< PortalProps, 'children' > >;
 
 	/**
-	 * Renders the dialog at a preset width (excluding additional padding from
-	 * the viewport edges).
+	 * Controls the dialog width, excluding the viewport inset.
 	 *
 	 * Height is not directly controlled by `size`: for every value except
 	 * `'full'`, the dialog fits its content up to the viewport height
@@ -67,10 +66,15 @@ export interface PopupProps
 	 * - `'large'` — wide max-width.
 	 * - `'stretch'` — no max-width, stretches to fill available width.
 	 * - `'full'` — stretches to fill available width and height.
+	 * - `'auto'`: Fits content between the responsive minimum and available
+	 *   viewport width. The minimum is 320px below a 480px viewport and 400px
+	 *   otherwise, limited by the available width.
+	 *
+	 * Constrain wide content, such as images, to the available content width.
 	 *
 	 * @default 'medium'
 	 */
-	size?: 'small' | 'medium' | 'large' | 'stretch' | 'full';
+	size?: 'small' | 'medium' | 'large' | 'stretch' | 'full' | 'auto';
 }
 
 export interface ActionProps extends ComponentProps< typeof Button > {

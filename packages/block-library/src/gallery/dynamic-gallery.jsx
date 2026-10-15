@@ -5,7 +5,7 @@ import {
 	Notice,
 	PanelBody,
 	Placeholder,
-	Spinner,
+	Spinner as WCSpinner,
 	ToolbarButton,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
@@ -351,7 +351,7 @@ export function GalleryDynamicView( {
 						label={ __( 'Gallery' ) }
 						instructions={ emptyInstructions }
 					>
-						{ isResolvingDynamic && <Spinner /> }
+						{ isResolvingDynamic && <WCSpinner /> }
 					</Placeholder>
 				) }
 				<Caption

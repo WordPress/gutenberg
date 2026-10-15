@@ -13,6 +13,7 @@ import {
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
+import { PrivateBlockInspectorEditOriginal } from './components/block-inspector/edit-original-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { showPlaceholderKey as blockToolbarShowPlaceholderKey } from './components/block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
@@ -83,11 +84,12 @@ import { isElementVisible } from './utils/dom';
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
 /**
- * Private @wordpress/block-editor APIs.
+ * Private `@wordpress/block-editor` APIs.
  */
 export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
+	PrivateBlockInspectorEditOriginal,
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,
 	ExperimentalBlockEditorProvider,
