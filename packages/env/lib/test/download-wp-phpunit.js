@@ -43,8 +43,10 @@ describe( 'getTestSuiteRefs', () => {
 		}
 	);
 
-	it( 'uses trunk for a pre-release without an X.Y version', () => {
-		expect( getTestSuiteRefs( 'trunk-alpha' ) ).toEqual( [ TRUNK ] );
+	it( 'uses any other version as a tag', () => {
+		expect( getTestSuiteRefs( 'custom' ) ).toEqual( [
+			{ type: 'tag', name: 'custom' },
+		] );
 	} );
 } );
 
