@@ -90,6 +90,7 @@
 		&::before {
 			top: var(--wpds-dimension-padding-md);
 			inset-inline-start: 0;
+			z-index: 1;
 			width: var(--wp-admin-border-width-focus);
 			height: max(0px, calc(var(--selected-height, 0) * 1px - 2 * var(--wpds-dimension-padding-md)));
 			transform: translateY(calc(var(--selected-top, 0) * 1px));
@@ -188,8 +189,9 @@
 
 		&::after {
 			content: "";
-			inset: var(--wpds-dimension-padding-xs);
-			inset-inline-start: var(--wpds-dimension-padding-sm);
+			inset: 0;
+			border-radius: 0;
+			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 		}
 	}
 }

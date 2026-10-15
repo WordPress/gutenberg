@@ -98,8 +98,9 @@
 
 	.components-tab-panel__tabs[aria-orientation="vertical"] & {
 		&::before {
-			inset: var(--wpds-dimension-padding-xs);
-			inset-inline-start: var(--wpds-dimension-padding-sm);
+			inset: 0;
+			border-radius: 0;
+			outline-offset: calc(-1 * var(--wpds-border-width-focus));
 		}
 
 		& .components-tab-panel__tabs-item-label {
