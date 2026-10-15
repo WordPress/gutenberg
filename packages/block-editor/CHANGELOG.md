@@ -29,6 +29,7 @@
 -   Block Toolbar: Keep `__unstableBlockToolbarLastItem` fills out of the placeholder toolbar shown on small screens while no block is selected ([#84554](https://github.com/WordPress/gutenberg/pull/84554)).
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
 -   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
+-   Paste: Keep the nested list of a copied list item when pasting it into another list item, and paste into an empty list item instead of doing nothing ([#84115](https://github.com/WordPress/gutenberg/pull/84115)).
 
 
 ### Internal
@@ -60,7 +61,6 @@
 ### Bug Fixes
 
 -   Block Mover: Restrict button sizing styles to the mover buttons so visually hidden descriptions do not overflow the block toolbar ([#84114](https://github.com/WordPress/gutenberg/pull/84114)).
--   Paste: Keep the nested list of a copied list item when pasting it into another list item, and paste into an empty list item instead of doing nothing ([#84115](https://github.com/WordPress/gutenberg/pull/84115)).
 -   Block inspector: Restore the Settings tab for a block whose only advanced tool is "Allowed blocks" (e.g. a container with `allowedBlocks` and no anchor), by counting the allowed-blocks fills when deciding whether to show the tab. The control is also now hidden while editing a section (pattern) block, matching the other inspector controls ([#84067](https://github.com/WordPress/gutenberg/pull/84067)).
 -   Fix the translator comments for the "blocks moved" and "blocks added" screen reader messages, which described the count as a block name ([#83555](https://github.com/WordPress/gutenberg/pull/83555)).
 -   `BlockCompare`: Show whitespace differences in the Resolve Block dialog. The markup's spaces and blank lines are kept instead of collapsed by the browser, and each added or removed line break gets a visible marker, so a diff made only of whitespace no longer looks identical on both sides. The dialog also shows the markup of a converted Custom HTML block, which is kept in its `innerContent` rather than produced by `save`, instead of an empty diff ([#82397](https://github.com/WordPress/gutenberg/pull/82397)).
