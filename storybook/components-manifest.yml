@@ -1730,7 +1730,7 @@
       - ref
       - required
       - size
-      - triggerContent
+      - trigger
       - value
   subcomponents:
       - name: SelectControl.Group
@@ -1772,6 +1772,17 @@
             - className
             - render
             - style
+      - name: SelectControl.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
+            - style
+            - variant
 - name: Shortcut
   props:
       - className

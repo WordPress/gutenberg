@@ -1,3 +1,4 @@
+import { action } from 'storybook/actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { SelectControl } from '../';
 import {
@@ -13,6 +14,7 @@ const meta: Meta< typeof SelectControl > = {
 	id: 'design-system-components-form-selectcontrol',
 	component: SelectControl,
 	subcomponents: {
+		'SelectControl.Trigger': SelectControl.Trigger,
 		'SelectControl.Group': SelectControl.Group,
 		'SelectControl.GroupLabel': SelectControl.GroupLabel,
 		'SelectControl.Item': SelectControl.Item,
@@ -70,6 +72,24 @@ export const WithCustomPlaceholder: Story = {
 	args: {
 		...Default.args,
 		placeholder: 'Choose an item',
+	},
+};
+
+/**
+ * Pass a `SelectControl.Trigger` element to `trigger` to customize the button's
+ * props, including focus and blur handlers. Trigger props override the control's
+ * `size` and `placeholder`. Pass children to customize its content.
+ */
+export const WithCustomTriggerProps: Story = {
+	args: {
+		...Default.args,
+		trigger: (
+			<SelectControl.Trigger
+				variant="minimal"
+				onFocus={ action( 'onFocus' ) }
+				onBlur={ action( 'onBlur' ) }
+			/>
+		),
 	},
 };
 
@@ -274,8 +294,8 @@ const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
 );
 
 /**
- * To customize what is rendered inside the trigger element, pass a
- * render function to the `triggerContent` prop.
+ * To customize what is rendered inside the trigger element, pass children
+ * to `SelectControl.Trigger`. A render function receives the selected item.
  *
  * The item list can be customized by passing an array of
  * `SelectControl.Item` as children. Note that the `label` prop of a `SelectControl.Item`
@@ -287,7 +307,11 @@ export const WithCustomTriggerAndItems: Story = {
 		items: userOptions,
 		label: 'Label',
 		description: 'This is the description.',
-		triggerContent: ( item ) => <User user={ item } />,
+		trigger: (
+			<SelectControl.Trigger>
+				{ ( item ) => <User user={ item } /> }
+			</SelectControl.Trigger>
+		),
 		children: [
 			userOptions.map( ( item ) => (
 				<SelectControl.Item
@@ -308,9 +332,9 @@ export const WithCustomTriggerAndItems: Story = {
 
 /**
  * By default, the `items` array is used to render both the Trigger
- * and the Item list. Passing a custom `triggerContent` or `children` in addition
+ * and the Item list. Passing a custom `trigger` or `children` in addition
  * to `items` will override that particular aspect of the behavior.
- * In other words, if you pass both an `items` array and a custom `triggerContent`,
+ * In other words, if you pass both an `items` array and a custom `trigger`,
  * the Item list in the popover will still be rendered based on the `items` array.
  */
 export const WithItemsArrayAndPartialCustomization: Story = {

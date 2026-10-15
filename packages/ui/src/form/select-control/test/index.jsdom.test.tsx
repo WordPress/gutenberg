@@ -139,7 +139,11 @@ describe( 'SelectControl', () => {
 				label="Country"
 				items={ mockItems }
 				defaultValue={ mockItems[ 1 ] }
-				triggerContent={ ( item ) => `Selected ${ item.label }` }
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => `Selected ${ item.label }` }
+					</SelectControl.Trigger>
+				}
 			/>
 		);
 
