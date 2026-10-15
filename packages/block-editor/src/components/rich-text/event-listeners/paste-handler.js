@@ -133,7 +133,21 @@ export default ( props ) => ( element ) => {
 			mode = 'BLOCKS';
 		}
 
+		const {
+			getSelectedBlockClientId,
+			getBlockRootClientId,
+			canInsertBlockType,
+		} = registry.select( blockEditorStore );
+		const selectedClientId = getSelectedBlockClientId();
+		const convertLatexToMath = canInsertBlockType(
+			'core/math',
+			selectedClientId
+				? getBlockRootClientId( selectedClientId )
+				: undefined
+		);
+
 		const content = pasteHandler( {
+			convertLatexToMath,
 			HTML: html,
 			plainText,
 			mode,

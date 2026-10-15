@@ -506,6 +506,7 @@ _Parameters_
 - _options.plainText_ `RawHandlerOptions[ 'plainText' ]`: Plain text version.
 - _options.mode_ `RawHandlerOptions[ 'mode' ]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 - _options.tagName_ `RawHandlerOptions[ 'tagName' ]`: The tag into which content will be inserted.
+- _options.convertLatexToMath_ `RawHandlerOptions[ 'convertLatexToMath' ]`: Whether plain text LaTeX may become a Math block.
 
 _Returns_
 
