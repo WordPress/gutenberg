@@ -14,7 +14,7 @@ export interface MediaUploadCheckProps {
 /**
  * Props of `MediaUpload`, implemented through the `editor.MediaUpload` filter.
  */
-export interface MediaUploadProps {
+export interface MediaUploadProps< Media = unknown > {
 	/**
 	 * The types of the media to upload or select from the media library,
 	 * either a general mime type such as 'image' or a complete one such as
@@ -39,10 +39,10 @@ export interface MediaUploadProps {
 	 */
 	onClose?: () => void;
 	/**
-	 * Called after `onClose` with the selected media, which come from the
-	 * filter's implementation and are untyped here.
+	 * Called after `onClose` with the selected media, whose shape comes from
+	 * the filter's implementation and is supplied by the caller.
 	 */
-	onSelect: ( media: unknown ) => void;
+	onSelect: ( media: Media ) => void;
 	/**
 	 * Title displayed in the media modal.
 	 */

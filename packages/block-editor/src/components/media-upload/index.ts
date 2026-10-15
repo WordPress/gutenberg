@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ReactNode } from 'react';
 import { withFilters } from '@wordpress/components';
 import type { MediaUploadProps } from './types';
 
@@ -16,4 +16,6 @@ const MediaUpload = (): null => null;
  */
 export default withFilters( 'editor.MediaUpload' )(
 	MediaUpload
-) as unknown as ComponentType< MediaUploadProps >; // `withFilters` erases the props of the filter's implementation.
+) as unknown as < Media = unknown >(
+	props: MediaUploadProps< Media >
+) => ReactNode; // `withFilters` erases the props of the filter's implementation.
