@@ -1,0 +1,5 @@
+// Overrides the inline `white-space: pre-wrap` PlainText sets on the editable
+// when the title is a link (editable is nested inside the block wrapper).
+.wp-block-post-title.has-fit-text > * {
+	white-space: inherit !important;
+}
