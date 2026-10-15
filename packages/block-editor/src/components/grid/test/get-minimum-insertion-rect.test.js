@@ -16,13 +16,12 @@ function toPlain( rect ) {
 	};
 }
 
-function getRect( rect, occupiedRects ) {
+function getRect( rect ) {
 	return toPlain(
 		getMinimumInsertionRect( {
 			rect: new GridRect( rect ),
 			columnTracks,
 			rowTracks,
-			occupiedRects,
 			minimumWidth: 160,
 			minimumHeight: 160,
 		} )
@@ -80,37 +79,22 @@ describe( 'getMinimumInsertionRect()', () => {
 		} );
 	} );
 
-	it( 'grows around cells that other blocks cover', () => {
-		// A block covers the column to the right of the cell.
+	it( 'stays smaller than the minimum in a grid that is too small', () => {
 		expect(
-			getRect( { columnStart: 3, rowStart: 1 }, [
-				new GridRect( {
-					columnStart: 4,
-					rowStart: 1,
-					rowSpan: 6,
-				} ),
-			] )
+			toPlain(
+				getMinimumInsertionRect( {
+					rect: new GridRect( { columnStart: 2, rowStart: 1 } ),
+					columnTracks: getGridTracks( '40px 40px', 10 ),
+					rowTracks: getGridTracks( '40px 40px 40px', 10 ),
+					minimumWidth: 160,
+					minimumHeight: 160,
+				} )
+			)
 		).toEqual( {
 			columnStart: 1,
 			rowStart: 1,
-			columnSpan: 3,
-			rowSpan: 4,
-		} );
-	} );
-
-	it( 'stays smaller than the minimum when no free cells are left', () => {
-		expect(
-			getRect( { columnStart: 2, rowStart: 2 }, [
-				new GridRect( { columnStart: 1, rowStart: 1, columnSpan: 6 } ),
-				new GridRect( { columnStart: 1, rowStart: 2 } ),
-				new GridRect( { columnStart: 4, rowStart: 2, rowSpan: 5 } ),
-				new GridRect( { columnStart: 1, rowStart: 4, columnSpan: 3 } ),
-			] )
-		).toEqual( {
-			columnStart: 2,
-			rowStart: 2,
 			columnSpan: 2,
-			rowSpan: 2,
+			rowSpan: 3,
 		} );
 	} );
 
