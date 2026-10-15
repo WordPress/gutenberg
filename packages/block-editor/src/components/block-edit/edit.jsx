@@ -90,6 +90,9 @@ const EditWithGeneratedProps = ( props ) => {
 			for ( const [ attributeName, binding ] of Object.entries(
 				blockBindings
 			) ) {
+				if ( ! binding ) {
+					continue;
+				}
 				const { source: sourceName, args: sourceArgs } = binding;
 				const source = registeredSources[ sourceName ];
 				if (

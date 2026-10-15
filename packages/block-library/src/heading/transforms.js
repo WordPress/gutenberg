@@ -34,9 +34,10 @@ const transforms = {
 						...getTransformedAttributes(
 							_attributes,
 							'core/heading',
-							( { content: contentBinding } ) => ( {
-								content: contentBinding,
-							} )
+							( { content: contentBinding } ) =>
+								contentBinding
+									? { content: contentBinding }
+									: undefined
 						),
 						content,
 						anchor,
@@ -140,9 +141,10 @@ const transforms = {
 						...getTransformedAttributes(
 							_attributes,
 							'core/paragraph',
-							( { content: contentBinding } ) => ( {
-								content: contentBinding,
-							} )
+							( { content: contentBinding } ) =>
+								contentBinding
+									? { content: contentBinding }
+									: undefined
 						),
 						content,
 						...( textAlign && {
