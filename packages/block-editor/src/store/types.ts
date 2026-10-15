@@ -7,6 +7,10 @@ import type {
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { BlockEditingMode } from '../components/block-editing-mode';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
+import type {
+	FetchLinkSuggestions,
+	FetchRichUrlData,
+} from '../components/link-control/types';
 import type { WPDropOperation } from '../components/use-on-block-drop/types';
 import type { Bindings } from '../utils/block-bindings';
 import type { store } from '.';
@@ -364,6 +368,8 @@ export interface PresetsByOrigin {
 export type Settings = Record< string | symbol, unknown > & {
 	allowedBlockTypes?: boolean | string[];
 	allowedMimeTypes?: Record< string, string > | null;
+	pageForPosts?: number;
+	pageOnFront?: number;
 	canLockBlocks?: boolean;
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
@@ -372,6 +378,8 @@ export type Settings = Record< string | symbol, unknown > & {
 	templateLock?: string | false;
 	__experimentalBlockPatterns?: BlockPattern[];
 	__experimentalFeatures?: FeatureSettings;
+	__experimentalFetchLinkSuggestions?: FetchLinkSuggestions;
+	__experimentalFetchRichUrlData?: FetchRichUrlData;
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
 	[ isIsolatedEditorKey ]?: boolean;

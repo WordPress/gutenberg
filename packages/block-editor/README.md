@@ -790,7 +790,7 @@ Pre-populate the search input with a default value:
 
 _Parameters_
 
-- _props_ `WPLinkControlProps`: Component props.
+- _props_ `LinkControlProps`: Component props.
 
 ### MediaPlaceholder
 

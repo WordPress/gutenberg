@@ -1,12 +1,24 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState, useRef } from '@wordpress/element';
+import type {
+	LinkControlCreateSuggestionProp,
+	LinkControlSuggestion,
+} from './types';
 
-export default function useCreatePage( handleCreatePage ) {
-	const cancelableCreateSuggestion = useRef();
+interface CancelablePromise< T > {
+	promise: Promise< T >;
+	cancel: () => void;
+}
+
+export default function useCreatePage(
+	handleCreatePage: LinkControlCreateSuggestionProp | undefined
+) {
+	const cancelableCreateSuggestion =
+		useRef< CancelablePromise< LinkControlSuggestion > >( undefined );
 	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
-	const [ errorMessage, setErrorMessage ] = useState( null );
+	const [ errorMessage, setErrorMessage ] = useState< string | null >( null );
 
-	const createPage = async function ( suggestionTitle ) {
+	const createPage = async function ( suggestionTitle?: string ) {
 		setIsCreatingPage( true );
 		setErrorMessage( null );
 
@@ -16,17 +28,21 @@ export default function useCreatePage( handleCreatePage ) {
 			cancelableCreateSuggestion.current = makeCancelable(
 				// Using Promise.resolve to allow createSuggestion to return a
 				// non-Promise based value.
-				Promise.resolve( handleCreatePage( suggestionTitle ) )
+				// LinkControl only offers creation when `createSuggestion` is set.
+				Promise.resolve(
+					handleCreatePage!( suggestionTitle as string )
+				)
 			);
 
 			return await cancelableCreateSuggestion.current.promise;
 		} catch ( error ) {
-			if ( error && error.isCanceled ) {
+			// A rejection carries either the cancel marker or an error.
+			if ( error && ( error as { isCanceled?: boolean } ).isCanceled ) {
 				return; // bail if canceled to avoid setting state
 			}
 
 			setErrorMessage(
-				error.message ||
+				( error as Error ).message ||
 					__(
 						'An unknown error occurred during creation. Please try again.'
 					)
@@ -61,12 +77,14 @@ export default function useCreatePage( handleCreatePage ) {
  * cancelled.
  * See: https://reactjs.org/blog/2015/12/16/ismounted-antipattern.html
  *
- * @param {Promise} promise the Promise to make cancelable
+ * @param promise the Promise to make cancelable
  */
-const makeCancelable = ( promise ) => {
+const makeCancelable = < T >(
+	promise: Promise< T >
+): CancelablePromise< T > => {
 	let hasCanceled_ = false;
 
-	const wrappedPromise = new Promise( ( resolve, reject ) => {
+	const wrappedPromise = new Promise< T >( ( resolve, reject ) => {
 		promise.then(
 			( val ) =>
 				hasCanceled_ ? reject( { isCanceled: true } ) : resolve( val ),

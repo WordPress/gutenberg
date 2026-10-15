@@ -1,8 +1,22 @@
 import { useSelect } from '@wordpress/data';
 import { useEffect, useReducer } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
+import type { RichUrlData } from './types';
 
-function reducer( state, action ) {
+interface RichUrlDataState {
+	richData: RichUrlData | null;
+	isFetching: boolean;
+}
+
+type RichUrlDataAction =
+	| { type: 'RESOLVED'; richData: RichUrlData | null }
+	| { type: 'ERROR' }
+	| { type: 'LOADING' };
+
+function reducer(
+	state: RichUrlDataState,
+	action: RichUrlDataAction
+): RichUrlDataState {
 	switch ( action.type ) {
 		case 'RESOLVED':
 			return {
@@ -22,11 +36,14 @@ function reducer( state, action ) {
 				isFetching: true,
 			};
 		default:
-			throw new Error( `Unexpected action type ${ action.type }` );
+			// Unreachable for typed callers.
+			throw new Error(
+				`Unexpected action type ${ ( action as { type: string } ).type }`
+			);
 	}
 }
 
-function useRemoteUrlData( url ) {
+function useRemoteUrlData( url: string | null | undefined ) {
 	const [ state, dispatch ] = useReducer( reducer, {
 		richData: null,
 		isFetching: false,
@@ -39,7 +56,7 @@ function useRemoteUrlData( url ) {
 		};
 	}, [] );
 
-	useEffect( () => {
+	useEffect( (): ( () => void ) | void => {
 		// Only make the request if we have an actual URL
 		// and the fetching util is available. In some editors
 		// there may not be such a util.

@@ -4,10 +4,20 @@ import isURLLike from './is-url-like';
 import normalizeUrl from './normalize-url';
 import { CREATE_TYPE } from './constants';
 import { store as blockEditorStore } from '../../store';
+import type {
+	FetchLinkSuggestions,
+	FetchLinkSuggestionsHandler,
+	LinkControlSuggestion,
+	LinkSuggestionsQuery,
+	TransformSuggestions,
+} from './types';
 
-export const handleNoop = () => Promise.resolve( [] );
+export const handleNoop = (): Promise< LinkControlSuggestion[] > =>
+	Promise.resolve( [] );
 
-export const handleDirectEntry = ( val ) => {
+export const handleDirectEntry = (
+	val: string
+): Promise< LinkControlSuggestion[] > => {
 	const { url, type } = normalizeUrl( val );
 
 	return Promise.resolve( [
@@ -21,17 +31,18 @@ export const handleDirectEntry = ( val ) => {
 };
 
 const handleEntitySearch = async (
-	val,
-	suggestionsQuery,
-	fetchSearchSuggestions,
-	withCreateSuggestion,
-	pageOnFront,
-	pageForPosts,
-	transformSuggestions
-) => {
+	val: string,
+	suggestionsQuery: LinkSuggestionsQuery,
+	fetchSearchSuggestions: FetchLinkSuggestions | undefined,
+	withCreateSuggestion: boolean | undefined,
+	pageOnFront: number | undefined,
+	pageForPosts: number | undefined,
+	transformSuggestions: TransformSuggestions | null | undefined
+): Promise< LinkControlSuggestion[] > => {
 	const { isInitialSuggestions } = suggestionsQuery;
 
-	let results = await fetchSearchSuggestions( val, suggestionsQuery );
+	// Entity search needs the editor's suggestions fetcher.
+	let results = await fetchSearchSuggestions!( val, suggestionsQuery );
 
 	if ( transformSuggestions ) {
 		results = await transformSuggestions( results, {
@@ -90,10 +101,10 @@ const handleEntitySearch = async (
 };
 
 export default function useSearchHandler(
-	suggestionsQuery,
-	allowDirectEntry,
-	withCreateSuggestion,
-	transformSuggestions
+	suggestionsQuery: LinkSuggestionsQuery,
+	allowDirectEntry: boolean,
+	withCreateSuggestion: boolean | undefined,
+	transformSuggestions: TransformSuggestions | null | undefined
 ) {
 	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
 		( select ) => {
@@ -109,12 +120,15 @@ export default function useSearchHandler(
 		[]
 	);
 
-	const directEntryHandler = allowDirectEntry
+	const directEntryHandler: FetchLinkSuggestionsHandler = allowDirectEntry
 		? handleDirectEntry
 		: handleNoop;
 
 	return useCallback(
-		( val, { isInitialSuggestions } ) => {
+		(
+			val: string,
+			{ isInitialSuggestions }: { isInitialSuggestions?: boolean }
+		) => {
 			return isURLLike( val )
 				? directEntryHandler( val, { isInitialSuggestions } )
 				: handleEntitySearch(

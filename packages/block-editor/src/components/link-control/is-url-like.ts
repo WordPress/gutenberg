@@ -3,20 +3,20 @@ import { getProtocol, isValidProtocol, isValidFragment } from '@wordpress/url';
 /**
  * Checks if a value is a hash/anchor link (e.g., #section).
  *
- * @param {string} val The value to check.
- * @return {boolean} True if the value is a valid hash link.
+ * @param val The value to check.
+ * @return True if the value is a valid hash link.
  */
-export function isHashLink( val ) {
+export function isHashLink( val: string | undefined ): boolean | undefined {
 	return val?.startsWith( '#' ) && isValidFragment( val );
 }
 
 /**
  * Checks if a value is a relative path (e.g., /page, ./page, ../page).
  *
- * @param {string} val The value to check.
- * @return {boolean} True if the value is a relative path.
+ * @param val The value to check.
+ * @return True if the value is a relative path.
  */
-export function isRelativePath( val ) {
+export function isRelativePath( val: string | undefined ): boolean | undefined {
 	return (
 		val?.startsWith( '/' ) ||
 		val?.startsWith( './' ) ||
@@ -38,11 +38,11 @@ export function isRelativePath( val ) {
  * - Relative paths: `/handbook`, `./page`, `../parent`
  * - Hash links: `#section`
  *
- * @param {string} val the candidate for being URL-like (or not).
+ * @param val the candidate for being URL-like (or not).
  *
- * @return {boolean} whether or not the value is potentially a URL.
+ * @return whether or not the value is potentially a URL.
  */
-export default function isURLLike( val ) {
+export default function isURLLike( val: string ): boolean | undefined {
 	const hasSpaces = val.includes( ' ' );
 
 	if ( hasSpaces ) {
@@ -50,7 +50,8 @@ export default function isURLLike( val ) {
 	}
 
 	const protocol = getProtocol( val );
-	const protocolIsValid = isValidProtocol( protocol );
+	// `isValidProtocol` rejects a missing protocol.
+	const protocolIsValid = isValidProtocol( protocol as string );
 
 	const mayBeTLD = hasPossibleTLD( val );
 
@@ -68,11 +69,11 @@ export default function isURLLike( val ) {
 /**
  * Checks if a given URL has a valid Top-Level Domain (TLD).
  *
- * @param {string} url       - The URL to check.
- * @param {number} maxLength - The maximum length of the TLD.
- * @return {boolean} Returns true if the URL has a valid TLD, false otherwise.
+ * @param url       - The URL to check.
+ * @param maxLength - The maximum length of the TLD.
+ * @return Returns true if the URL has a valid TLD, false otherwise.
  */
-function hasPossibleTLD( url, maxLength = 6 ) {
+function hasPossibleTLD( url: string, maxLength = 6 ): boolean {
 	// Clean the URL by removing anything after the first occurrence of "?" or "#".
 	const cleanedURL = url.split( /[?#]/ )[ 0 ];
 

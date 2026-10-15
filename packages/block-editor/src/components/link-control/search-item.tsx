@@ -15,8 +15,16 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { safeDecodeURI, filterURLForDisplay, getPath } from '@wordpress/url';
 import { pipe } from '@wordpress/compose';
 import deprecated from '@wordpress/deprecated';
+import type { ComponentProps } from 'react';
+import type {
+	LinkControlSearchItemProps,
+	LinkControlSuggestion,
+} from './types';
 
-const TYPES = {
+const TYPES: Record<
+	string,
+	{ icon: ComponentProps< typeof Icon >[ 'icon' ]; label: string }
+> = {
 	post: {
 		icon: postList,
 		label: __( 'Post' ),
@@ -39,16 +47,20 @@ const TYPES = {
 	},
 };
 
-function SearchItemIcon( { isURL, suggestion } ) {
-	let icon = null;
+function SearchItemIcon( {
+	isURL,
+	suggestion,
+}: Pick< LinkControlSearchItemProps, 'isURL' | 'suggestion' > ) {
+	let icon: ComponentProps< typeof Icon >[ 'icon' ] | null = null;
 
 	// A suggestion added by `transformSuggestions` can bring its own icon.
 	if ( suggestion.icon ) {
 		icon = suggestion.icon;
 	} else if ( isURL ) {
 		icon = globe;
-	} else if ( suggestion.type in TYPES ) {
-		icon = TYPES[ suggestion.type ].icon;
+		// An absent type is looked up as `'undefined'`, which is not in `TYPES`.
+	} else if ( ( suggestion.type as string ) in TYPES ) {
+		icon = TYPES[ suggestion.type as string ].icon;
 		if ( suggestion.type === 'page' ) {
 			if ( suggestion.isFrontPage ) {
 				icon = home;
@@ -73,10 +85,10 @@ function SearchItemIcon( { isURL, suggestion } ) {
 
 /**
  * Adds a leading slash to a url if it doesn't already have one.
- * @param {string} url the url to add a leading slash to.
- * @return {string} the url with a leading slash.
+ * @param url the url to add a leading slash to.
+ * @return the url with a leading slash.
  */
-function addLeadingSlash( url ) {
+function addLeadingSlash( url: string ): string {
 	const trimmedURL = url?.trim();
 
 	if ( ! trimmedURL?.length ) {
@@ -86,7 +98,7 @@ function addLeadingSlash( url ) {
 	return url?.replace( /^\/?/, '/' );
 }
 
-function removeTrailingSlash( url ) {
+function removeTrailingSlash( url: string ): string {
 	const trimmedURL = url?.trim();
 
 	if ( ! trimmedURL?.length ) {
@@ -97,11 +109,14 @@ function removeTrailingSlash( url ) {
 }
 
 const partialRight =
-	( fn, ...partialArgs ) =>
-	( ...args ) =>
+	< Args extends unknown[], PartialArgs extends unknown[], Return >(
+		fn: ( ...args: [ ...Args, ...PartialArgs ] ) => Return,
+		...partialArgs: PartialArgs
+	) =>
+	( ...args: Args ) =>
 		fn( ...args, ...partialArgs );
 
-const defaultTo = ( d ) => ( v ) => {
+const defaultTo = ( d: string ) => ( v: string | null | undefined ) => {
 	return v === null || v === undefined || v !== v ? d : v;
 };
 
@@ -111,22 +126,26 @@ const defaultTo = ( d ) => ( v ) => {
  * - filters it (removes protocol, www, etc.).
  * - truncates it if necessary.
  * - adds a leading slash.
- * @param {string} url the url.
- * @return {string} the processed url to display.
+ * @param url the url.
+ * @return the processed url to display.
  */
-function getURLForDisplay( url ) {
+function getURLForDisplay( url: string | undefined ): string | undefined {
 	if ( ! url ) {
 		return url;
 	}
 
+	// `pipe` does not carry the composed return type.
 	return pipe(
 		safeDecodeURI,
 		getPath,
 		defaultTo( '' ),
-		partialRight( filterURLForDisplay, 24 ),
+		partialRight< [ string ], [ number ], string >(
+			filterURLForDisplay,
+			24
+		),
 		removeTrailingSlash,
 		addLeadingSlash
-	)( url );
+	)( url ) as string;
 }
 
 export const LinkControlSearchItem = ( {
@@ -136,7 +155,7 @@ export const LinkControlSearchItem = ( {
 	onClick,
 	isURL = false,
 	shouldShowType = false,
-} ) => {
+}: LinkControlSearchItemProps ) => {
 	const info = isURL
 		? __( 'Press ENTER to add this link' )
 		: getURLForDisplay( suggestion.url );
@@ -150,19 +169,25 @@ export const LinkControlSearchItem = ( {
 				<SearchItemIcon suggestion={ suggestion } isURL={ isURL } />
 			}
 			onClick={ onClick }
-			shortcut={ shouldShowType && getVisualTypeName( suggestion ) }
+			// `MenuItem` renders no shortcut for `false`.
+			shortcut={
+				( shouldShowType && getVisualTypeName( suggestion ) ) as
+					string | undefined
+			}
 			className="block-editor-link-control__search-item"
 		>
 			<TextHighlight
 				// The component expects a plain text string.
-				text={ stripHTML( suggestion.title ) }
-				highlight={ searchTerm }
+				// Search results always carry a title.
+				text={ stripHTML( suggestion.title as string ) }
+				// Results are shown once a search ran.
+				highlight={ searchTerm as string }
 			/>
 		</MenuItem>
 	);
 };
 
-function getVisualTypeName( suggestion ) {
+function getVisualTypeName( suggestion: LinkControlSuggestion ) {
 	if ( suggestion.isFrontPage ) {
 		return __( 'Front page' );
 	}
@@ -177,8 +202,9 @@ function getVisualTypeName( suggestion ) {
 	}
 
 	// Provide translated labels for built-in post types. Ideally, the API would return the localised CPT or taxonomy label.
-	if ( suggestion.type in TYPES ) {
-		return TYPES[ suggestion.type ].label;
+	// An absent type is looked up as `'undefined'`, which is not in `TYPES`.
+	if ( ( suggestion.type as string ) in TYPES ) {
+		return TYPES[ suggestion.type as string ].label;
 	}
 
 	return suggestion.type;
@@ -186,7 +212,9 @@ function getVisualTypeName( suggestion ) {
 
 export default LinkControlSearchItem;
 
-export const __experimentalLinkControlSearchItem = ( props ) => {
+export const __experimentalLinkControlSearchItem = (
+	props: LinkControlSearchItemProps
+) => {
 	deprecated( 'wp.blockEditor.__experimentalLinkControlSearchItem', {
 		since: '6.8',
 	} );

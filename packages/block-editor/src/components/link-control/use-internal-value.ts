@@ -1,8 +1,13 @@
 import { useState } from '@wordpress/element';
 import fastDeepEqual from 'fast-deep-equal';
+import type { LinkControlValue } from './types';
 
-export default function useInternalValue( value ) {
-	const [ internalValue, setInternalValue ] = useState( value || {} );
+export default function useInternalValue(
+	value: LinkControlValue | undefined
+) {
+	const [ internalValue, setInternalValue ] = useState<
+		LinkControlValue | undefined
+	>( value || {} );
 	const [ previousValue, setPreviousValue ] = useState( value );
 
 	// If the value prop changes, update the internal state.
@@ -14,14 +19,14 @@ export default function useInternalValue( value ) {
 		setInternalValue( value );
 	}
 
-	const setInternalURLInputValue = ( nextValue ) => {
+	const setInternalURLInputValue = ( nextValue: string | undefined ) => {
 		setInternalValue( {
 			...internalValue,
 			url: nextValue,
 		} );
 	};
 
-	const setInternalTextInputValue = ( nextValue ) => {
+	const setInternalTextInputValue = ( nextValue: string ) => {
 		setInternalValue( {
 			...internalValue,
 			title: nextValue,
@@ -29,7 +34,7 @@ export default function useInternalValue( value ) {
 	};
 
 	const createSetInternalSettingValueHandler =
-		( settingsKeys ) => ( nextValue ) => {
+		( settingsKeys: string[] ) => ( nextValue: LinkControlValue ) => {
 			// Only apply settings values which are defined in the settings prop.
 			const settingsUpdates = Object.keys( nextValue ).reduce(
 				( acc, key ) => {
@@ -38,7 +43,7 @@ export default function useInternalValue( value ) {
 					}
 					return acc;
 				},
-				{}
+				{} as LinkControlValue
 			);
 
 			setInternalValue( {
@@ -53,5 +58,5 @@ export default function useInternalValue( value ) {
 		setInternalURLInputValue,
 		setInternalTextInputValue,
 		createSetInternalSettingValueHandler,
-	];
+	] as const;
 }

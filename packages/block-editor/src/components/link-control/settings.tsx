@@ -1,20 +1,26 @@
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
+import type { LinkControlSetting, LinkControlSettingsProps } from './types';
 
 const noop = () => {};
 
-const LinkControlSettings = ( { value, onChange = noop, settings } ) => {
+const LinkControlSettings = ( {
+	value,
+	onChange = noop,
+	settings,
+}: LinkControlSettingsProps ) => {
 	if ( ! settings || ! settings.length ) {
 		return null;
 	}
 
-	const handleSettingChange = ( setting ) => ( newValue ) => {
-		onChange( {
-			...value,
-			[ setting.id ]: newValue,
-		} );
-	};
+	const handleSettingChange =
+		( setting: LinkControlSetting ) => ( newValue: boolean ) => {
+			onChange( {
+				...value,
+				[ setting.id ]: newValue,
+			} );
+		};
 
 	const theSettings = settings
 		.map( ( setting ) => {

@@ -1,3 +1,4 @@
+import type { FormEvent, KeyboardEvent, RefObject } from 'react';
 import { forwardRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
@@ -5,15 +6,25 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+import type {
+	LinkControlSearchInputProps,
+	LinkControlSearchResultsProps,
+	LinkControlSuggestion,
+} from './types';
+import type { URLInputSuggestionsProps } from '../url-input/types';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
 // which will cause an unintended http request.
-const noopSearchHandler = () => Promise.resolve( [] );
+const noopSearchHandler = (): Promise< LinkControlSuggestion[] > =>
+	Promise.resolve( [] );
 
 const noop = () => {};
 
-const LinkControlSearchInput = forwardRef(
+const LinkControlSearchInput = forwardRef<
+	HTMLInputElement,
+	LinkControlSearchInputProps
+>(
 	(
 		{
 			value,
@@ -26,7 +37,7 @@ const LinkControlSearchInput = forwardRef(
 			onChange = noop,
 			onSelect = noop,
 			showSuggestions = true,
-			renderSuggestions = ( props ) => (
+			renderSuggestions = ( props: LinkControlSearchResultsProps ) => (
 				<LinkControlSearchResults { ...props } />
 			),
 			fetchSuggestions = null,
@@ -53,27 +64,34 @@ const LinkControlSearchInput = forwardRef(
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
 
-		const [ focusedSuggestion, setFocusedSuggestion ] = useState();
+		const [ focusedSuggestion, setFocusedSuggestion ] = useState<
+			LinkControlSuggestion | undefined
+		>();
 
 		/**
 		 * Handles the user moving between different suggestions. Does not handle
 		 * choosing an individual item.
 		 *
-		 * @param {string} selection  the url of the selected suggestion.
-		 * @param {Object} suggestion the suggestion object.
+		 * @param selection  the url of the selected suggestion.
+		 * @param suggestion the suggestion object.
 		 */
-		const onInputChange = ( selection, suggestion ) => {
+		const onInputChange = (
+			selection: string,
+			suggestion?: LinkControlSuggestion
+		) => {
 			onChange( selection );
 			setFocusedSuggestion( suggestion );
 		};
 
-		const handleRenderSuggestions = ( props ) =>
+		const handleRenderSuggestions = ( props: URLInputSuggestionsProps ) =>
 			renderSuggestions( {
 				...props,
 				withCreateSuggestion,
 				createSuggestionButtonText,
 				suggestionsQuery,
-				handleSuggestionClick: ( suggestion ) => {
+				handleSuggestionClick: (
+					suggestion: LinkControlSuggestion
+				) => {
 					if ( props.handleSuggestionClick ) {
 						props.handleSuggestionClick( suggestion );
 					}
@@ -81,8 +99,10 @@ const LinkControlSearchInput = forwardRef(
 				},
 			} );
 
-		const onSuggestionSelected = async ( selectedSuggestion ) => {
-			let suggestion = selectedSuggestion;
+		const onSuggestionSelected = async (
+			selectedSuggestion: LinkControlSuggestion
+		) => {
+			let suggestion: LinkControlSuggestion | void = selectedSuggestion;
 			if ( CREATE_TYPE === selectedSuggestion.type ) {
 				// Create a new page and call onSelect with the output from the onCreateSuggestion callback.
 				try {
@@ -145,7 +165,10 @@ const LinkControlSearchInput = forwardRef(
 					// on browser validation when enhancements land to base level components:
 					// https://github.com/WordPress/gutenberg/pull/75188#issuecomment-3861757260
 					required={ false }
-					onSubmit={ ( suggestion, event ) => {
+					onSubmit={ (
+						suggestion: LinkControlSuggestion | null,
+						event: FormEvent | KeyboardEvent
+					) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 
 						// If there is no suggestion and the value (ie: any manually entered URL) is empty
@@ -158,7 +181,8 @@ const LinkControlSearchInput = forwardRef(
 							);
 						}
 					} }
-					inputRef={ ref }
+					// LinkControl passes a ref object.
+					inputRef={ ref as RefObject< HTMLInputElement | null > }
 					suffix={ suffix }
 					disabled={ isEntity }
 				/>
@@ -170,7 +194,9 @@ const LinkControlSearchInput = forwardRef(
 
 export default LinkControlSearchInput;
 
-export const __experimentalLinkControlSearchInput = ( props ) => {
+export const __experimentalLinkControlSearchInput = (
+	props: LinkControlSearchInputProps
+) => {
 	deprecated( 'wp.blockEditor.__experimentalLinkControlSearchInput', {
 		since: '6.8',
 	} );
