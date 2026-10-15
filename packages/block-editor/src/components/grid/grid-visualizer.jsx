@@ -12,7 +12,10 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import {
+	useBlockElement,
+	useBlockElementRef,
+} from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import {
 	range,
@@ -186,6 +189,39 @@ function ManualGridVisualizer( {
 	childGridRect,
 } ) {
 	const [ dropTarget, setDropTarget ] = useState( null );
+
+	// A block dragged within the grid is hidden while it is dragged, so that
+	// the cells it would land in are all that shows of it.
+	const draggedChildClientId = useSelect(
+		( select ) => {
+			const { isDraggingBlocks, getBlockRootClientId } =
+				select( blockEditorStore );
+			if ( ! isDraggingBlocks() ) {
+				return null;
+			}
+			const clientId = getBlockToPlaceInGrid(
+				select( blockEditorStore ),
+				gridClientId
+			);
+			return clientId && getBlockRootClientId( clientId ) === gridClientId
+				? clientId
+				: null;
+		},
+		[ gridClientId ]
+	);
+	const draggedChildRef = useRef();
+	useBlockElementRef( draggedChildClientId, draggedChildRef );
+	useEffect( () => {
+		const element = draggedChildRef.current;
+		if ( ! element ) {
+			return;
+		}
+		const originalOpacity = element.style.opacity;
+		element.style.opacity = '0';
+		return () => {
+			element.style.opacity = originalOpacity;
+		};
+	}, [ draggedChildClientId ] );
 
 	const gridItemStyles = useSelect(
 		( select ) => {
