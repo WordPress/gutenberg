@@ -13,7 +13,7 @@
  * @param mixed $style_node A style node, possibly containing a `css` key.
  * @return bool Whether the node has a non-empty custom CSS string.
  */
-function gutenberg_has_custom_css( $style_node ) {
+function gutenberg_custom_css_has_value( $style_node ) {
 	return is_array( $style_node )
 		&& isset( $style_node['css'] )
 		&& is_string( $style_node['css'] )
@@ -41,7 +41,7 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name, $responsiv
 
 	$supported_pseudo_states = WP_Theme_JSON_Gutenberg::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ?? array();
 
-	if ( gutenberg_has_custom_css( $style ) ) {
+	if ( gutenberg_custom_css_has_value( $style ) ) {
 		$entries[] = array(
 			'css'         => $style['css'],
 			'pseudo'      => null,
@@ -51,7 +51,7 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name, $responsiv
 
 	foreach ( $supported_pseudo_states as $pseudo_state ) {
 		$pseudo_style = $style[ $pseudo_state ] ?? null;
-		if ( gutenberg_has_custom_css( $pseudo_style ) ) {
+		if ( gutenberg_custom_css_has_value( $pseudo_style ) ) {
 			$entries[] = array(
 				'css'         => $pseudo_style['css'],
 				'pseudo'      => $pseudo_state,
@@ -66,7 +66,7 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name, $responsiv
 			continue;
 		}
 
-		if ( gutenberg_has_custom_css( $breakpoint_style ) ) {
+		if ( gutenberg_custom_css_has_value( $breakpoint_style ) ) {
 			$entries[] = array(
 				'css'         => $breakpoint_style['css'],
 				'pseudo'      => null,
@@ -76,7 +76,7 @@ function gutenberg_get_custom_css_state_entries( $style, $block_name, $responsiv
 
 		foreach ( $supported_pseudo_states as $pseudo_state ) {
 			$breakpoint_pseudo_style = $breakpoint_style[ $pseudo_state ] ?? null;
-			if ( gutenberg_has_custom_css( $breakpoint_pseudo_style ) ) {
+			if ( gutenberg_custom_css_has_value( $breakpoint_pseudo_style ) ) {
 				$entries[] = array(
 					'css'         => $breakpoint_pseudo_style['css'],
 					'pseudo'      => $pseudo_state,
@@ -303,7 +303,7 @@ function gutenberg_register_custom_css_support( $block_type ) {
  * Removes `css` keys from a block's `style` attribute, including any nested
  * under pseudo-state (`:hover`) or viewport-state (`@mobile`) sub-objects.
  *
- * @since 7.1.0
+ * @since 7.2.0
  *
  * @param array $style The block's `style` attribute.
  * @return array The style attribute with all `css` keys removed.
@@ -316,7 +316,7 @@ function gutenberg_strip_custom_css_from_style_array( $style ) {
 	unset( $style['css'] );
 
 	foreach ( $style as $key => $value ) {
-		if ( is_array( $value ) && ( str_starts_with( $key, ':' ) || str_starts_with( $key, '@' ) ) ) {
+		if ( is_string( $key ) && is_array( $value ) && ( str_starts_with( $key, ':' ) || str_starts_with( $key, '@' ) ) ) {
 			$nested_style = gutenberg_strip_custom_css_from_style_array( $value );
 			if ( empty( $nested_style ) ) {
 				unset( $style[ $key ] );

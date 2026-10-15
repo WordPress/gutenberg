@@ -11,7 +11,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import InspectorControls from '../components/inspector-controls';
-import { PrivateInspectorControlsStyleStatesAdvanced } from '../components/inspector-controls/groups';
+import { PrivateInspectorControlsStyleStateAdvanced } from '../components/inspector-controls/groups';
 import AdvancedPanel, {
 	validateCSS,
 } from '../components/global-styles/advanced-panel';
@@ -181,9 +181,9 @@ function CustomCSSControl( {
 
 	if ( isStateSelected ) {
 		return (
-			<PrivateInspectorControlsStyleStatesAdvanced.Fill>
+			<PrivateInspectorControlsStyleStateAdvanced.Fill>
 				<PanelBody title={ __( 'Advanced' ) }>{ panel }</PanelBody>
-			</PrivateInspectorControlsStyleStatesAdvanced.Fill>
+			</PrivateInspectorControlsStyleStateAdvanced.Fill>
 		);
 	}
 

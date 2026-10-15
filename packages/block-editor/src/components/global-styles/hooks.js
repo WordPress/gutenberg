@@ -199,6 +199,18 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
+		// Core's theme.json sets no default, so block support alone allows
+		// a text gradient.
+		if (
+			supportedStyles.includes( 'backgroundClip' ) &&
+			updatedSettings.background?.backgroundClip === undefined
+		) {
+			updatedSettings.background = {
+				...updatedSettings.background,
+				backgroundClip: [ 'text' ],
+			};
+		}
+
 		updatedSettings.shadow = supportedStyles.includes( 'shadow' )
 			? updatedSettings.shadow
 			: false;
