@@ -5,6 +5,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
+import type { TextDecorationControlProps } from './types';
 
 const TEXT_DECORATIONS = [
 	{
@@ -27,18 +28,18 @@ const TEXT_DECORATIONS = [
 /**
  * Control to facilitate text decoration selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.value     Currently selected text decoration.
- * @param {Function} props.onChange  Handles change in text decoration selection.
- * @param {string}   props.className Additional class name to apply.
+ * @param props           Component props.
+ * @param props.value     Currently selected text decoration.
+ * @param props.onChange  Handles change in text decoration selection.
+ * @param props.className Additional class name to apply.
  *
- * @return {Element} Text decoration control.
+ * @return Text decoration control.
  */
 export default function TextDecorationControl( {
 	value,
 	onChange,
 	className,
-} ) {
+}: TextDecorationControlProps ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
@@ -49,7 +50,12 @@ export default function TextDecorationControl( {
 			) }
 			value={ value }
 			onChange={ ( newValue ) => {
-				onChange( newValue === value ? undefined : newValue );
+				// The options' values are strings.
+				onChange(
+					newValue === value
+						? undefined
+						: ( newValue as string | undefined )
+				);
 			} }
 		>
 			{ TEXT_DECORATIONS.map( ( option ) => {
