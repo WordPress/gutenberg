@@ -182,18 +182,19 @@ function ReusableBlockEdit( {
 		},
 		[ ref ]
 	);
+	// The `view` record's content is an object with its raw value, the
+	// `edit` record's is the raw value itself.
+	const patternContent = record?.content?.raw ?? record?.content;
 	const blocks = useMemo( () => {
 		if ( record?.blocks ) {
 			return record.blocks;
 		}
-		// The `view` record's content is an object with its raw value, the
-		// `edit` record's is the raw value itself. Once edited, it's a function
-		// that serializes the blocks returned above.
-		const patternContent = record?.content?.raw ?? record?.content;
+		// Once the pattern is edited, its content is a function that
+		// serializes its blocks, which are returned above.
 		return typeof patternContent === 'string' && patternContent
 			? parse( patternContent )
 			: EMPTY_ARRAY;
-	}, [ record ] );
+	}, [ record?.blocks, patternContent ] );
 	const isMissing = ! isResolving && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
