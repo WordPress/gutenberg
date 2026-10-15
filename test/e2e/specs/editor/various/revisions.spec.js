@@ -38,6 +38,18 @@ test.describe( 'Post revisions', () => {
 		// Save draft again to create second revision.
 		await editor.saveDraft();
 
+		// An autosave of the author's own draft updates the post without
+		// creating a revision. Reload so that the editor has no unsaved edits.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.type( ' - Autosaved' );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+		await page.reload();
+
 		// Open the post settings sidebar and click the Revisions button.
 		await editor.openDocumentSettingsSidebar();
 		const settingsSidebar = page.getByRole( 'region', {
@@ -90,6 +102,23 @@ test.describe( 'Post revisions', () => {
 			},
 		] );
 
+		// The autosaved content that was replaced is now stored as a revision.
+		const hasAutosavedRevision = () =>
+			page.evaluate( async () => {
+				const postId = window.wp.data
+					.select( 'core/editor' )
+					.getCurrentPostId();
+				const revisions = await window.wp.apiFetch( {
+					path: `/wp/v2/posts/${ postId }/revisions?context=edit`,
+				} );
+				return revisions.some( ( revision ) =>
+					revision.content.raw.includes(
+						'Original content - Updated content - Autosaved'
+					)
+				);
+			} );
+		await expect.poll( hasAutosavedRevision ).toBe( true );
+
 		// Undo the restore.
 		await restoredNotice.getByRole( 'button', { name: 'Undo' } ).click();
 		await expect(
@@ -103,7 +132,9 @@ test.describe( 'Post revisions', () => {
 		const contentBeforeRestore = [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'Original content - Updated content' },
+				attributes: {
+					content: 'Original content - Updated content - Autosaved',
+				},
 			},
 		];
 		await expect

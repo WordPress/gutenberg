@@ -17,9 +17,6 @@ const requestIdleCallback = window.requestIdleCallback
 	? window.requestIdleCallback
 	: window.requestAnimationFrame;
 
-// Statuses where saving the post does not change what visitors can see.
-const UNPUBLISHED_POST_STATUSES = [ 'auto-draft', 'draft', 'pending' ];
-
 let hasStorageSupport;
 
 /**
@@ -134,7 +131,7 @@ function useAutosaveNotice() {
 
 		const { createWarningNotice, removeNotice } =
 			registry.dispatch( noticesStore );
-		const { editPost, resetEditorBlocks, savePost } =
+		const { editPost, resetEditorBlocks } =
 			registry.dispatch( editorStore );
 
 		const id = 'wpEditorAutosaveRestore';
@@ -148,40 +145,7 @@ function useAutosaveNotice() {
 				actions: [
 					{
 						label: __( 'Restore the backup' ),
-						async onClick() {
-							const {
-								getCurrentPostAttribute,
-								didPostSaveRequestFail,
-								isEditedPostDirty,
-							} = registry.select( editorStore );
-
-							// Save the current content first so that it is
-							// stored as a revision. Autosaves of an author's
-							// own draft update the post without creating a
-							// revision, so the next autosave could otherwise
-							// overwrite content that isn't stored anywhere
-							// else. If a save is already in progress, this
-							// save is skipped.
-							if (
-								UNPUBLISHED_POST_STATUSES.includes(
-									getCurrentPostAttribute( 'status' )
-								) &&
-								UNPUBLISHED_POST_STATUSES.includes(
-									getEditedPostAttribute( 'status' )
-								)
-							) {
-								await savePost();
-								// savePost shows its own notice on failure. A
-								// save stopped by a filter records no error, so
-								// also check for unsaved edits.
-								if (
-									didPostSaveRequestFail() ||
-									isEditedPostDirty()
-								) {
-									return;
-								}
-							}
-
+						onClick() {
 							const {
 								content: editsContent,
 								...editsWithoutContent
