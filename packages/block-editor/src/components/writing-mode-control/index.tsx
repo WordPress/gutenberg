@@ -5,6 +5,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
+import type { WritingModeControlProps } from './types';
 
 const WRITING_MODES = [
 	{
@@ -22,14 +23,18 @@ const WRITING_MODES = [
 /**
  * Control to facilitate writing mode selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.className Class name to add to the control.
- * @param {string}   props.value     Currently selected writing mode.
- * @param {Function} props.onChange  Handles change in the writing mode selection.
+ * @param props           Component props.
+ * @param props.className Class name to add to the control.
+ * @param props.value     Currently selected writing mode.
+ * @param props.onChange  Handles change in the writing mode selection.
  *
- * @return {Element} Writing Mode control.
+ * @return Writing Mode control.
  */
-export default function WritingModeControl( { className, value, onChange } ) {
+export default function WritingModeControl( {
+	className,
+	value,
+	onChange,
+}: WritingModeControlProps ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
@@ -37,7 +42,12 @@ export default function WritingModeControl( { className, value, onChange } ) {
 			className={ clsx( 'block-editor-writing-mode-control', className ) }
 			value={ value }
 			onChange={ ( newValue ) => {
-				onChange( newValue === value ? undefined : newValue );
+				// The options' values are strings.
+				onChange(
+					newValue === value
+						? undefined
+						: ( newValue as string | undefined )
+				);
 			} }
 		>
 			{ WRITING_MODES.map( ( option ) => {
