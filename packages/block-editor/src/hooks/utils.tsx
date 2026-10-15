@@ -28,6 +28,7 @@ import type {
 	BlockEditFeature,
 	BlockEditHookProps,
 	BlockListBlockFeature,
+	BlockListBlockFeatureProps,
 	BlockListBlockHookProps,
 	BlockSaveFeature,
 	BlockWrapperProps,
@@ -679,8 +680,7 @@ function BlockProps( {
 	setAllWrapperProps: Dispatch<
 		SetStateAction< ( BlockWrapperProps | undefined )[] >
 	>;
-	[ prop: string ]: unknown;
-} ) {
+} & BlockListBlockFeatureProps ) {
 	const wrapperProps = hook( props );
 	const setWrapperProps = ( next: BlockWrapperProps | undefined ) =>
 		setAllWrapperProps( ( prev ) => {

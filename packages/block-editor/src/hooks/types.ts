@@ -80,11 +80,21 @@ export interface BlockEditFeature extends BlockSupportFeatureBase {
 }
 
 /**
+ * The props `createBlockListBlockFilter` passes to `useBlockProps`: the block
+ * name and client ID, plus the set attributes listed in `attributeKeys`.
+ */
+export interface BlockListBlockFeatureProps {
+	name: string;
+	clientId: string;
+	[ attribute: string ]: unknown;
+}
+
+/**
  * A block support that adds props to the block wrapper in the editor.
  */
 export interface BlockListBlockFeature extends BlockSupportFeatureBase {
 	useBlockProps: (
-		props: Record< string, unknown >
+		props: BlockListBlockFeatureProps
 	) => BlockWrapperProps | undefined;
 	isMatch?: ( attributes: Record< string, unknown > ) => boolean;
 }
