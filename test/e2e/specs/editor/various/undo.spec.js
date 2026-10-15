@@ -701,14 +701,18 @@ test.describe( 'undo', () => {
 		await editor.canvas
 			.locator( 'role=document[name="Add default block"i]' )
 			.click();
-		await page.keyboard.type( 'before pause' );
-		await editor.page.waitForTimeout( 1000 );
-		await page.keyboard.type( ' after pause' );
+		await page.keyboard.type( 'one' );
+		await page.evaluate( () =>
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.__unstableMarkLastChangeAsPersistent()
+		);
+		await page.keyboard.type( ' two' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'before pause after pause' },
+				attributes: { content: 'one two' },
 			},
 		] );
 
@@ -717,13 +721,13 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'before pause' },
+				attributes: { content: 'one' },
 			},
 		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
-			startOffset: 'before pause'.length,
-			endOffset: 'before pause'.length,
+			startOffset: 'one'.length,
+			endOffset: 'one'.length,
 		} );
 
 		// The browser undo went through the editor history, so the editor
@@ -733,13 +737,13 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
-				attributes: { content: 'before pause after pause' },
+				attributes: { content: 'one two' },
 			},
 		] );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
-			startOffset: 'before pause after pause'.length,
-			endOffset: 'before pause after pause'.length,
+			startOffset: 'one two'.length,
+			endOffset: 'one two'.length,
 		} );
 	} );
 } );

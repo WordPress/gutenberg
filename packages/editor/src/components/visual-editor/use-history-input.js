@@ -1,4 +1,4 @@
-import { useDispatch } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
@@ -12,7 +12,7 @@ const { usesNativeUndo } = unlock( blockEditorPrivateApis );
  * the browser change the content outside the editor history.
  */
 export function useHistoryInput() {
-	const { undo, redo } = useDispatch( editorStore );
+	const registry = useRegistry();
 
 	return useRefEffect(
 		( node ) => {
@@ -41,6 +41,8 @@ export function useHistoryInput() {
 					timeout = undefined;
 				} );
 
+				const { undo, redo } = registry.dispatch( editorStore );
+
 				if ( inputType === 'historyUndo' ) {
 					undo();
 				} else {
@@ -55,6 +57,6 @@ export function useHistoryInput() {
 				node.ownerDocument.defaultView.clearTimeout( timeout );
 			};
 		},
-		[ undo, redo ]
+		[ registry ]
 	);
 }
