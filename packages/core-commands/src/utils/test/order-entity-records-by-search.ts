@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import { orderEntityRecordsBySearch } from '../order-entity-records-by-search';
 
 const mockData = [
@@ -77,5 +77,35 @@ describe( 'orderEntityRecordsBySearch', () => {
 			'Single',
 			'Single Product',
 		] );
+	} );
+	it( 'preserves the original array when the search is empty', () => {
+		expect( orderEntityRecordsBySearch( mockData ) ).toBe( mockData );
+	} );
+
+	it( 'keeps case-insensitive matches and non-matches in their original order', () => {
+		const records = [
+			{ id: 1, title: { raw: 'Other' } },
+			{ id: 2, title: { raw: 'SINGLE' } },
+			{ id: 3 },
+			{ id: 4, title: { raw: 'Single Product' } },
+			{ id: 5, title: {} },
+		];
+		const originalRecords = [ ...records ];
+		const result = orderEntityRecordsBySearch( records, 'single' );
+
+		expect( result ).toEqual( [
+			records[ 1 ],
+			records[ 3 ],
+			records[ 0 ],
+			records[ 2 ],
+			records[ 4 ],
+		] );
+		expect( records ).toEqual( originalRecords );
+		expectTypeOf( result ).toEqualTypeOf< typeof records >();
+	} );
+
+	it( 'retains the non-array input guard for JavaScript consumers', () => {
+		// @ts-expect-error JavaScript callers can pass values outside the typed contract.
+		expect( orderEntityRecordsBySearch( {} ) ).toEqual( [] );
 	} );
 } );

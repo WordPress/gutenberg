@@ -8,10 +8,17 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs, getPath } from '@wordpress/url';
 import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
+import type { CommandConfig, CommandLoaderHook } from '@wordpress/commands';
+import type { WpTemplate, WpTemplatePart } from '@wordpress/core-data';
 import { unlock } from './lock-unlock';
 import { orderEntityRecordsBySearch } from './utils/order-entity-records-by-search';
+import type {
+	NavigationPostType,
+	NavigationTemplateType,
+	RouterPrivateApis,
+} from './private-types';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory } = unlock< RouterPrivateApis >( routerPrivateApis );
 
 const icons = {
 	post,
@@ -20,7 +27,7 @@ const icons = {
 	wp_template_part: symbolFilled,
 };
 
-function useDebouncedValue( value ) {
+function useDebouncedValue( value: string ) {
 	const [ debouncedValue, setDebouncedValue ] = useState( '' );
 	const debounced = useDebounce( setDebouncedValue, 250 );
 
@@ -46,7 +53,7 @@ function getSiteEditorPage() {
 }
 
 // Helper to map routes for experimental site editor
-function mapRoute( path ) {
+function mapRoute( path: string ) {
 	if ( ! window.__experimentalExtensibleSiteEditor ) {
 		return path;
 	}
@@ -75,7 +82,9 @@ function isInSiteEditor() {
 	);
 }
 
-const getNavigationCommandLoaderPerPostType = ( postType ) =>
+const getNavigationCommandLoaderPerPostType = (
+	postType: NavigationPostType
+): CommandLoaderHook =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
 		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
@@ -127,9 +136,9 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 			[ delayedSearch ]
 		);
 
-		const commands = useMemo( () => {
-			return ( records ?? [] ).map( ( record ) => {
-				const command = {
+		const commands = useMemo< CommandConfig[] >( () => {
+			return ( records ?? [] ).map< CommandConfig >( ( record ) => {
+				const command: Omit< CommandConfig, 'callback' > = {
 					name: postType + '-' + record.id,
 					searchLabel: record.title?.rendered + ' ' + record.id,
 					label: record.title?.rendered
@@ -188,7 +197,9 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 		};
 	};
 
-const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
+const getNavigationCommandLoaderPerTemplate = (
+	templateType: NavigationTemplateType
+): CommandLoaderHook =>
 	function useNavigationCommandLoader( { search } ) {
 		const history = useHistory();
 		const { isBlockBasedTheme, canCreateTemplate } = useSelect(
@@ -208,7 +219,11 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 			const { getEntityRecords } = select( coreStore );
 			const query = { per_page: -1 };
 			return {
-				records: getEntityRecords( 'postType', templateType, query ),
+				records: getEntityRecords< WpTemplate | WpTemplatePart >(
+					'postType',
+					templateType,
+					query
+				),
 				isLoading: ! select( coreStore ).hasFinishedResolution(
 					'getEntityRecords',
 					[ 'postType', templateType, query ]
@@ -225,9 +240,10 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 			return orderEntityRecordsBySearch( records, search ).slice( 0, 10 );
 		}, [ records, search ] );
 
-		const commands = useMemo( () => {
+		const commands = useMemo< CommandConfig[] >( () => {
 			if (
 				! canCreateTemplate ||
+				// @ts-expect-error Preserve the existing boolean/string comparison during migration.
 				( ! isBlockBasedTheme && ! templateType === 'wp_template_part' )
 			) {
 				return [];
@@ -235,9 +251,9 @@ const getNavigationCommandLoaderPerTemplate = ( templateType ) =>
 			const isSiteEditor = getPath( window.location.href )?.includes(
 				'site-editor.php'
 			);
-			const result = [];
+			const result: CommandConfig[] = [];
 			result.push(
-				...orderedRecords.map( ( record ) => {
+				...orderedRecords.map< CommandConfig >( ( record ) => {
 					return {
 						name: templateType + '-' + record.id,
 						searchLabel: record.title?.rendered + ' ' + record.id,
@@ -323,8 +339,8 @@ const getSiteEditorBasicNavigationCommands = () =>
 					} ),
 				};
 			}, [] );
-		const commands = useMemo( () => {
-			const result = [];
+		const commands = useMemo< CommandConfig[] >( () => {
+			const result: CommandConfig[] = [];
 
 			if ( canCreateTemplate && isBlockBasedTheme ) {
 				// Go to Styles command
@@ -450,7 +466,7 @@ const getGlobalStylesOpenCssCommands = () =>
 			};
 		}, [] );
 
-		const commands = useMemo( () => {
+		const commands = useMemo< CommandConfig[] >( () => {
 			if ( ! canEditCSS || ! isBlockBasedTheme ) {
 				return [];
 			}
@@ -485,7 +501,7 @@ const getGlobalStylesOpenCssCommands = () =>
 		};
 	};
 
-export function useSiteEditorNavigationCommands( isNetworkAdmin ) {
+export function useSiteEditorNavigationCommands( isNetworkAdmin?: boolean ) {
 	useCommandLoader( {
 		name: 'core/edit-site/navigate-pages',
 		hook: getNavigationCommandLoaderPerPostType( 'page' ),
