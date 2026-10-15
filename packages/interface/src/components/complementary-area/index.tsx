@@ -139,11 +139,8 @@ function ComplementaryAreaFill( {
 }
 
 /**
- * Overlays a dot on the pinned toolbar toggle, flagging that the area has
- * something new.
- *
- * Without a badge the toggle is returned untouched, so the pinned items row -
- * and the flex layout every other sidebar relies on - gains no extra wrapper.
+ * Overlays a dot on the pinned toolbar toggle. Without a badge the toggle is
+ * returned unwrapped.
  */
 function PinnedToggle( {
 	badge,
@@ -161,7 +158,6 @@ function PinnedToggle( {
 	return (
 		<div className="interface-complementary-area__pinned-toggle">
 			{ children }
-			{ /* Announced through the toggle's accessible label instead. */ }
 			<span
 				className="interface-complementary-area__badge"
 				aria-hidden="true"
