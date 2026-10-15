@@ -172,6 +172,8 @@ function ReusableBlockEdit( {
 			const viewRecord = select( coreStore ).getEntityRecord( ...args );
 			return {
 				record: viewRecord,
+				// Not `isResolving`: resolution starts after a timeout, so on the
+				// first render it'd read as missing and flash the warning.
 				isResolving:
 					! viewRecord &&
 					! select( coreStore ).hasFinishedResolution(
