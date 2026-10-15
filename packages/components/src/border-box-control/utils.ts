@@ -112,7 +112,7 @@ export function splitBoxShorthand( value: string ): string[] {
 export function unpackBoxShorthand< T extends string | number | undefined >(
 	value: T
 ): { top: T; right: T; bottom: T; left: T } {
-	if ( typeof value !== 'string' || ! value.trim().includes( ' ' ) ) {
+	if ( typeof value !== 'string' ) {
 		return {
 			top: value,
 			right: value,

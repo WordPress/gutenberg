@@ -260,6 +260,21 @@ describe( 'BorderBoxControl Utils', () => {
 				left: { color: 'black', style: 'solid', width: '4px' },
 			} );
 		} );
+
+		it( 'should unpack shorthand border widths separated by tabs or newlines into individual sides', () => {
+			const borderWithTabs = {
+				color: 'currentColor',
+				style: 'solid',
+				width: '0\t0\t0\t2px',
+			};
+
+			expect( getSplitBorders( borderWithTabs ) ).toEqual( {
+				top: { color: 'currentColor', style: 'solid', width: '0' },
+				right: { color: 'currentColor', style: 'solid', width: '0' },
+				bottom: { color: 'currentColor', style: 'solid', width: '0' },
+				left: { color: 'currentColor', style: 'solid', width: '2px' },
+			} );
+		} );
 	} );
 
 	describe( 'splitBoxShorthand', () => {
@@ -283,6 +298,21 @@ describe( 'BorderBoxControl Utils', () => {
 				'0',
 				'0',
 				'calc(var(--base) * 2)',
+			] );
+		} );
+
+		it( 'should split values separated by tabs or newlines', () => {
+			expect( splitBoxShorthand( '0\t0\t0\t2px' ) ).toEqual( [
+				'0',
+				'0',
+				'0',
+				'2px',
+			] );
+			expect( splitBoxShorthand( '10px\n20px\n30px\n40px' ) ).toEqual( [
+				'10px',
+				'20px',
+				'30px',
+				'40px',
 			] );
 		} );
 	} );
@@ -347,6 +377,21 @@ describe( 'BorderBoxControl Utils', () => {
 				right: '1px 2px 3px 4px 5px',
 				bottom: '1px 2px 3px 4px 5px',
 				left: '1px 2px 3px 4px 5px',
+			} );
+		} );
+
+		it( 'should unpack box shorthands separated by tabs or newlines', () => {
+			expect( unpackBoxShorthand( '0\t0\t0\t2px' ) ).toEqual( {
+				top: '0',
+				right: '0',
+				bottom: '0',
+				left: '2px',
+			} );
+			expect( unpackBoxShorthand( '10px\n20px' ) ).toEqual( {
+				top: '10px',
+				right: '20px',
+				bottom: '10px',
+				left: '20px',
 			} );
 		} );
 	} );
