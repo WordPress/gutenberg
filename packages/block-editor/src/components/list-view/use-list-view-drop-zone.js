@@ -272,17 +272,11 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 
 	const isDraggingBelow = candidateEdge === 'bottom';
 
-	// While dragging, the rows displace to make room for the drop indicator,
-	// but the dragged rows keep their slot. When the dragged block sits above
-	// the candidate, the candidate shifts up by the dragged block's height and
-	// the indicator opens a gap between the candidate and the next row, under
-	// the cursor. When the dragged block is the last row, that gap is its own
-	// slot. For the nesting gesture, the candidate extends over that gap, to
-	// the top of the next row that is not being dragged, or to the end of the
-	// list when none follows. Otherwise the next `dragover` finds the cursor
-	// below the candidate, drops the nesting, and the rows shift back.
-	// Rows are contiguous when nothing is displaced, so the extended bottom
-	// then equals the candidate's own.
+	// While dragging, the drop indicator displaces the rows, so a gap can open
+	// below the candidate under the cursor. Count that gap as part of the
+	// candidate for the nesting gesture, otherwise the next `dragover` sees the
+	// cursor below the candidate and cancels the nesting. Without displacement
+	// the rows touch, and this bottom equals the candidate's own.
 	const nextBlock = getNextNonDraggedBlock( blocksData, candidateBlockIndex );
 	const lastBlock = blocksData[ blocksData.length - 1 ];
 	const nestingRect = {
