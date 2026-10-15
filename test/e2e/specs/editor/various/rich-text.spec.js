@@ -5,6 +5,105 @@ test.describe( 'RichText (@firefox, @webkit)', () => {
 		await admin.createNewPost();
 	} );
 
+	test( 'should strip line breaks when pasting with disableLineBreaks enabled', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Register a minimal block with disableLineBreaks so the test is not
+		// coupled to core/site-title ever gaining line-break support.
+		await page.evaluate( () => {
+			const { registerBlockType } = window.wp.blocks;
+			const { useBlockProps, RichText } = window.wp.blockEditor;
+			const el = window.wp.element.createElement;
+
+			registerBlockType( 'test/disable-line-breaks', {
+				apiVersion: 3,
+				title: 'Test Disable Line Breaks',
+				category: 'text',
+				attributes: {
+					value: {
+						type: 'string',
+						source: 'html',
+						selector: 'p',
+					},
+				},
+				edit( { attributes, setAttributes } ) {
+					return el(
+						'p',
+						useBlockProps(),
+						el( RichText, {
+							'aria-label': 'Test content',
+							value: attributes.value,
+							onChange( value ) {
+								setAttributes( { value } );
+							},
+							disableLineBreaks: true,
+						} )
+					);
+				},
+				save( { attributes } ) {
+					return el(
+						'p',
+						useBlockProps.save(),
+						el( RichText.Content, { value: attributes.value } )
+					);
+				},
+			} );
+		} );
+
+		await editor.insertBlock( { name: 'test/disable-line-breaks' } );
+
+		await editor.canvas
+			.locator( 'role=textbox[name="Test content"]' )
+			.click();
+
+		const multiLineContent = 'First\nSecond\nThird';
+		pageUtils.setClipboardData( {
+			plainText: multiLineContent,
+			html: multiLineContent.replace( /\n/g, '<br/>' ),
+		} );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'Backspace' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		const renderedText = editor.canvas.locator(
+			'role=textbox[name="Test content"]'
+		);
+		await expect( renderedText ).toHaveText( 'First Second Third' );
+
+		await page.evaluate( () => {
+			window.wp.blocks.unregisterBlockType( 'test/disable-line-breaks' );
+		} );
+	} );
+
+	test( 'should not strip line breaks when pasting with disableLineBreaks diabled', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
+
+		const multiLineContent = 'First\nSecond\nThird';
+		pageUtils.setClipboardData( {
+			plainText: multiLineContent,
+			html: multiLineContent.replace( /\n/g, '<br/>' ),
+		} );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'Backspace' );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First<br>Second<br>Third' },
+			},
+		] );
+	} );
+
 	test( 'should handle change in tag name gracefully', async ( {
 		page,
 		editor,
