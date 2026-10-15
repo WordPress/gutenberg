@@ -4,12 +4,12 @@ import XCTest
 /// the caret is at the start of an empty field, and only when the field
 /// was focused once the key that got it there has been handled. Desktop
 /// browsers have no such keyboard, so these tests read the shift key of
-/// the software keyboard in Safari on a simulator.
+/// the software keyboard on a simulator.
 final class AutoCapitalizationTests: XCTestCase {
-	let safari = XCUIApplication( bundleIdentifier: "com.apple.mobilesafari" )
+	let app = XCUIApplication()
 
-	var web: XCUIElement { safari.webViews.firstMatch }
-	var keyboard: XCUIElement { safari.keyboards.firstMatch }
+	var web: XCUIElement { app.webViews.firstMatch }
+	var keyboard: XCUIElement { app.keyboards.firstMatch }
 
 	/// Whichever editable field has the keyboard right now. Elements are
 	/// live queries, so this follows the focus.
@@ -23,26 +23,21 @@ final class AutoCapitalizationTests: XCTestCase {
 		// The first synthesized touch of a run can lose its lift inside the
 		// simulator: backboardd registers the virtual digitizer after its
 		// first event arrives. Spend that touch on the status bar of the home
-		// screen, before Safari is up, where it changes nothing.
+		// screen, before the app is up, where it changes nothing.
 		let springboard = XCUIApplication( bundleIdentifier: "com.apple.springboard" )
 		springboard.coordinate( withNormalizedOffset: CGVector( dx: 0.5, dy: 0.01 ) ).tap()
 	}
 
-	/// Each test leaves its post open and unsaved. Ending Safari keeps the
-	/// next test from inheriting that page, its keyboard and its focus, and
-	/// skips the unsaved changes prompt a navigation would raise. The login
-	/// cookie is on disk and survives.
+	/// Each test leaves its post open and unsaved. Ending the app keeps the
+	/// next test from inheriting that page, its keyboard and its focus.
 	override func tearDownWithError() throws {
-		safari.terminate()
+		app.terminate()
 	}
 
 	func openNewPost() {
 		let base = ProcessInfo.processInfo.environment[ "WP_BASE_URL" ] ?? "http://127.0.0.1:9400"
-		// Opened by the system, not through the app: XCUITest cannot launch
-		// Safari itself, only attach to it.
-		XCUIDevice.shared.system.open( URL( string: base + "/wp-admin/post-new.php" )! )
-		safari.activate()
-		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
+		app.launchEnvironment[ "START_URL" ] = base + "/wp-admin/post-new.php"
+		app.launch()
 		XCTAssertTrue( web.waitForExistence( timeout: 60 ), "The editor did not load" )
 	}
 
@@ -124,9 +119,12 @@ final class AutoCapitalizationTests: XCTestCase {
 	func testReturnStartsTheNextFieldCapitalized() throws {
 		openNewPost()
 
-		// A new post focuses its title once the editor has loaded, which on
-		// a runner takes a minute or more.
-		waitForFocus( on: "Add title", "The new post did not focus its title", timeout: 240 )
+		// The editor loads in a minute or more on a runner. A web view only
+		// shows the keyboard for a field the user tapped, so tap the title.
+		let title = web.textViews[ "Add title" ]
+		XCTAssertTrue( title.waitForExistence( timeout: 240 ), "The editor did not load" )
+		title.tap()
+		waitForFocus( on: "Add title", "The tap did not focus the title" )
 		waitForKeyboard()
 		assertCapitalized( "An empty title should start capitalized" )
 
