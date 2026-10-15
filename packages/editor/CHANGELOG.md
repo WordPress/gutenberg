@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   The post summary of the DataForm-based inspector and the private `usePostFields` hook, through which the site editor screens get their fields, read the fields of the post type from the server, through the Entity fields API. The attachment fields still come from the editor. The fields registered with `registerEntityField` still show on these screens, after the server ones, unless the server returns a field with the same id. A default field unregistered with `unregisterEntityField` still shows on these screens: unregister it on the server, with `wp_unregister_entity_fields()`, instead ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 

@@ -12,7 +12,7 @@
 
 ### Internal
 
--   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 
 ## 8.2.0 (2026-10-07)
 
