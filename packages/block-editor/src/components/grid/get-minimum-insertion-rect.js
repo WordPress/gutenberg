@@ -5,10 +5,11 @@ import { GridRect } from './utils';
  * grid, so that blocks that start out as a placeholder, such as Image, can
  * show it. Narrower than 160px, `Placeholder` switches to its small layout,
  * which has no buttons. In its medium layout, the placeholders of Image,
- * Video, Gallery, Audio, File and Embed are up to 240px tall.
+ * Video, Gallery, Audio, File and Embed are up to 240px tall, and Cover's,
+ * whose color swatches wrap when it's narrower, needs about 300px each way.
  */
-export const MINIMUM_INSERTION_WIDTH = 160;
-export const MINIMUM_INSERTION_HEIGHT = 240;
+export const MINIMUM_INSERTION_WIDTH = 300;
+export const MINIMUM_INSERTION_HEIGHT = 300;
 
 /**
  * Gets the size in pixels of a range of tracks, including the gaps between
