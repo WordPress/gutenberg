@@ -179,13 +179,28 @@ export const Sizes: Story = {
 
 /** Hide the avatar from assistive technology when the name is shown beside it. */
 export const WithVisibleName: Story = {
+	args: { size: 'sm' },
 	render: ( args ) => (
-		<Stack gap="sm" align="center">
-			<Avatar.Root { ...args } aria-hidden="true">
-				<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-				<Avatar.Image src={ IMAGE_SRC } alt="" />
-			</Avatar.Root>
-			<Text>Alex Morgan</Text>
+		<Stack direction="column" gap="md">
+			<Stack gap="sm" align="center">
+				<Avatar.Root { ...args } aria-hidden="true">
+					<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
+					<Avatar.Image src={ IMAGE_SRC } alt="" />
+				</Avatar.Root>
+				<Text>Alex Morgan</Text>
+			</Stack>
+			<Stack gap="sm" align="center">
+				<Avatar.Root { ...args } aria-hidden="true">
+					<Avatar.Fallback>AM</Avatar.Fallback>
+				</Avatar.Root>
+				<Text>Alex Morgan</Text>
+			</Stack>
+			<Stack gap="sm" align="center">
+				<Avatar.Root { ...args } aria-hidden="true">
+					<Avatar.Fallback />
+				</Avatar.Root>
+				<Text>Alex Morgan</Text>
+			</Stack>
 		</Stack>
 	),
 };

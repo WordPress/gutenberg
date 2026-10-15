@@ -101,6 +101,7 @@
 
 			> .person-icon {
 				/* Keep the head visible and crop the torso at the bottom of the frame. */
+				color: var(--wpds-color-stroke-surface-neutral);
 				inline-size: 110%;
 				block-size: 110%;
 				translate: 0 15%;
