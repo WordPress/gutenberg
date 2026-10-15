@@ -158,7 +158,6 @@ export default function useBlockSync( {
 		getSelectionStart,
 		getSelectionEnd,
 		getBlockParents,
-		getBlockRootClientId,
 		areInnerBlocksControlled,
 	} = registry.select( blockEditorStore );
 
@@ -263,21 +262,13 @@ export default function useBlockSync( {
 			return false;
 		}
 
-		// Otherwise find the controller the selected block belongs to. Only
-		// the nearest one matters, and it is usually the immediate parent — a
-		// menu item sits directly inside its Navigation block — so walk up and
-		// stop at the first controller rather than collecting every ancestor.
-		let parentClientId = getBlockRootClientId( currentStartClientId );
-		while ( parentClientId ) {
-			if ( areInnerBlocksControlled( parentClientId ) ) {
-				return parentClientId !== clientId;
-			}
-			parentClientId = getBlockRootClientId( parentClientId );
-		}
-
-		// The selection is in the root block list, which belongs to no
-		// controller.
-		return false;
+		// Otherwise the nearest controller above the selected block holds
+		// it. No controller means the selection is in the root block list,
+		// which belongs to no controller.
+		const holder = getBlockParents( currentStartClientId, true ).find(
+			areInnerBlocksControlled
+		);
+		return holder !== undefined && holder !== clientId;
 	};
 
 	// Whether the controlled value has the same structure as the clones
