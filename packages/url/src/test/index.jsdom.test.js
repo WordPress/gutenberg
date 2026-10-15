@@ -698,6 +698,13 @@ describe( 'addQueryArgs', () => {
 				currency: 'USD',
 			} )
 		).toBe( 'https://example.com/?currency=USD#donate?amount=10' );
+
+		// Also test merging query params when the fragment has a question mark.
+		expect(
+			addQueryArgs( 'https://example.com/?page=1#donate?amount=10', {
+				currency: 'USD',
+			} )
+		).toBe( 'https://example.com/?page=1&currency=USD#donate?amount=10' );
 	} );
 
 	it( 'should return URL argument unaffected if no query arguments to append', () => {
