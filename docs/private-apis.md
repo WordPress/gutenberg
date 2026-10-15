@@ -289,15 +289,13 @@ Private exports:
 Private actions:
 - `createTemplate`
 - `hideBlockTypes`
-- `registerEntityAction`
+- `receiveEntityActions`
 - `registerPostTypeActions`
 - `removeTemplates`
 - `revertTemplate`
 - `saveDirtyEntities`
 - `setCurrentTemplateId`
-- `setIsReady`
 - `showBlockTypes`
-- `unregisterEntityAction`
 
 Private selectors:
 - `getEntityActions`
@@ -306,7 +304,6 @@ Private selectors:
 - `getListViewToggleRef`
 - `getPostBlocksByName`
 - `getPostIcon`
-- `isEntityReady`
 
 ## edit-post
 

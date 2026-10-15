@@ -1,5 +1,5 @@
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -66,11 +66,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 
 	const setAsHomepageAction = useSetAsHomepageAction();
 	const setAsPostsPageAction = useSetAsPostsPageAction();
-
-	const { registerPostTypeSchema } = unlock( useDispatch( editorStore ) );
-	useEffect( () => {
-		registerPostTypeSchema( postType );
-	}, [ registerPostTypeSchema, postType ] );
 
 	return useMemo( () => {
 		let actions = [ ...defaultActions ];

@@ -131,9 +131,9 @@ add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fi
 /**
  * Preloads the actions of the post types the editor shows actions for.
  *
- * The editors read them from the `wp/v2/entity-actions` route when they
- * register the actions of a post type, see `registerPostTypeSchema()` in
- * packages/editor/src/dataviews/store/private-actions.ts:
+ * The editors read them from the `wp/v2/entity-actions` route when they show
+ * the actions of a post type, see the `getEntityActions` resolver in
+ * packages/editor/src/dataviews/store/private-resolvers.ts:
  *
  * - The post editor, for the actions of the edited post. It resolves the
  *   preloaded path before it mounts, see `preloadResolutions()` in

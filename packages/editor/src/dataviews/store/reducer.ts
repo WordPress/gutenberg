@@ -2,63 +2,30 @@ import { combineReducers } from '@wordpress/data';
 import type { Action, Field } from '@wordpress/dataviews';
 
 type ReduxAction =
-	| ReturnType< typeof import( './private-actions' ).registerEntityAction >
-	| ReturnType< typeof import( './private-actions' ).unregisterEntityAction >
-	| ReturnType< typeof import( './private-actions' ).receiveEntityFields >
-	| ReturnType< typeof import( './private-actions' ).setIsReady >;
+	| ReturnType< typeof import( './private-actions' ).receiveEntityActions >
+	| ReturnType< typeof import( './private-actions' ).receiveEntityFields >;
 
 export type ActionState = Record< string, Record< string, Action< any >[] > >;
 export type FieldsState = Record< string, Record< string, Field< any >[] > >;
-export type ReadyState = Record< string, Record< string, boolean > >;
 export type State = {
 	actions: ActionState;
 	fields: FieldsState;
-	isReady: ReadyState;
 };
 
-function isReady( state: ReadyState = {}, action: ReduxAction ) {
-	switch ( action.type ) {
-		case 'SET_IS_READY':
-			return {
-				...state,
-				[ action.kind ]: {
-					...state[ action.kind ],
-					[ action.name ]: true,
-				},
-			};
-	}
-
-	return state;
-}
-
+/*
+ * The actions of each entity, keyed by kind, then name, as the
+ * `getEntityActions` resolver receives them from the server.
+ */
 function actions( state: ActionState = {}, action: ReduxAction ) {
 	switch ( action.type ) {
-		case 'REGISTER_ENTITY_ACTION':
+		case 'RECEIVE_ENTITY_ACTIONS':
 			return {
 				...state,
 				[ action.kind ]: {
 					...state[ action.kind ],
-					[ action.name ]: [
-						...(
-							state[ action.kind ]?.[ action.name ] ?? []
-						).filter(
-							( _action ) => _action.id !== action.config.id
-						),
-						action.config,
-					],
+					[ action.name ]: action.actions,
 				},
 			};
-		case 'UNREGISTER_ENTITY_ACTION': {
-			return {
-				...state,
-				[ action.kind ]: {
-					...state[ action.kind ],
-					[ action.name ]: (
-						state[ action.kind ]?.[ action.name ] ?? []
-					).filter( ( _action ) => _action.id !== action.actionId ),
-				},
-			};
-		}
 	}
 
 	return state;
@@ -86,5 +53,4 @@ function fields( state: FieldsState = {}, action: ReduxAction ) {
 export default combineReducers( {
 	actions,
 	fields,
-	isReady,
 } );

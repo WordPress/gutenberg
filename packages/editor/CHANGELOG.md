@@ -9,12 +9,13 @@
 ### Enhancements
 
 -   The post summary of the DataForm-based inspector, the media editor, and the private `usePostFields` hook, through which the site editor screens get their fields, read the fields of the post type from the server, through the Entity fields API. The media editor also lays out the attachment fields with the form of the attachment view configuration ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
--   The actions of a post type, in the post editor and the site editor lists, come from the server, through the Entity actions API: which actions a post type gets is decided there, and a plugin can register or unregister actions in PHP, with `wp_register_entity_actions()` and `wp_unregister_entity_actions()` on the `wp_entity_actions_api_init` action, and a script module for their JavaScript parts. `registerEntityAction` keeps working.
+-   The actions of a post type, in the post editor and the site editor lists, come from the server, through the Entity actions API: which actions a post type gets is decided there, and a plugin can register or unregister actions in PHP, with `wp_register_entity_actions()` and `wp_unregister_entity_actions()` on the `wp_entity_actions_api_init` action, and a script module for their JavaScript parts.
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 
 ### Deprecations
 
+-   `registerEntityAction` and `unregisterEntityAction`, which only had an effect in the Gutenberg plugin, are deprecated and have no effect anymore: the actions of an entity are registered on the server. Register and unregister them in PHP, with `wp_register_entity_actions()` and `wp_unregister_entity_actions()` on the `wp_entity_actions_api_init` action, and a script module for their JavaScript parts. The `core.registerPostTypeSchema` hook, which fired for registering actions, no longer fires.
 -   `registerEntityField` and `unregisterEntityField`, which only had an effect in the Gutenberg plugin, are deprecated and have no effect anymore: the fields of an entity are registered on the server. Register and unregister them in PHP, with `wp_register_entity_fields()` and `wp_unregister_entity_fields()` on the `wp_entity_fields_api_init` action, and a script module for their JavaScript parts ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 
 ### Bug Fixes

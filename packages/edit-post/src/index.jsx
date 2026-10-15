@@ -221,7 +221,7 @@ async function preloadResolutions( postType, postId ) {
 						),
 						core.getAutosaves( postType, postId ),
 						// The actions of the post type, which the post actions
-						// register with `registerPostTypeSchema`. A failure
+						// read with `getEntityActions`. A failure
 						// leaves them to that request, so it must not cut the
 						// rest of the kickoff short.
 						unlock( core )

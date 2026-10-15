@@ -1,14 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
+import apiFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { addAction, removeAction } from '@wordpress/hooks';
 import postTypeSupports from '@wordpress/core-actions/post_type_supports';
 import wpBlock from '@wordpress/core-actions/wp_block';
 import { store as editorStore } from '../../../store';
-import { lock, unlock } from '../../../lock-unlock';
-import { registerPostTypeSchema } from '../private-actions';
+import { unlock } from '../../../lock-unlock';
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
+
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 // The script module of the template part actions fails to load in these tests.
 vi.mock( import( '@wordpress/core-actions/wp_template_part' ), () =>
@@ -46,48 +47,39 @@ function serverConfig(
 }
 
 /**
- * Runs `registerPostTypeSchema()` against a registry whose core data store
- * answers the actions request with the given config, or the given error.
+ * Resolves the actions of a post type against a registry whose actions
+ * request answers with the given config, or rejects with the given error.
  *
  * @param postType The post type.
- * @param config   The actions config, or the error the request rejects with.
- * @return The private selectors of the editor store, and how many requests
- *         were made.
+ * @param response The actions config, or the error the request rejects with.
+ * @return The registry and the resolved actions.
  */
-async function registerSchema( postType: string, config: unknown ) {
-	const registry = createRegistry();
-	registry.register( editorStore );
-	const getActionsConfig = vi.fn( async () => {
-		if ( config instanceof Error ) {
-			throw config;
+async function resolveActions( postType: string, response: unknown ) {
+	vi.mocked( apiFetch ).mockImplementation( async () => {
+		if ( response instanceof Error ) {
+			throw response;
 		}
-		return config;
+		return response;
 	} );
-	const coreSelectors = {};
-	lock( coreSelectors, { getActionsConfig } );
-	const resolveSelect = ( store: any ) =>
-		store === coreStore ? coreSelectors : registry.resolveSelect( store );
-	const schemaRegistry = { ...registry, resolveSelect };
+	const registry = createRegistry();
+	registry.register( coreStore );
+	registry.register( editorStore );
 
-	await registerPostTypeSchema( postType )( { registry: schemaRegistry } );
-	// A second registration does nothing.
-	await registerPostTypeSchema( postType )( { registry: schemaRegistry } );
+	const actions = await unlock(
+		registry.resolveSelect( editorStore )
+	).getEntityActions( 'postType', postType );
 
-	return {
-		selectors: unlock( registry.select( editorStore ) ),
-		requests: getActionsConfig.mock.calls,
-	};
+	return { registry, actions };
 }
 
-describe( 'registerPostTypeSchema', () => {
-	it( 'registers the server actions, in the server order, with the parts of their script module', async () => {
+describe( 'getEntityActions', () => {
+	it( 'resolves the server actions, in the server order, with the parts of their script module', async () => {
 		const ids = [ 'view-post', 'rename-post', 'move-to-trash' ];
-		const { selectors, requests } = await registerSchema(
+		const { actions } = await resolveActions(
 			'page',
 			serverConfig( 'page', ids )
 		);
 
-		const actions = selectors.getEntityActions( 'postType', 'page' );
 		expect( actions.map( ( { id }: { id: string } ) => id ) ).toEqual(
 			ids
 		);
@@ -96,11 +88,13 @@ describe( 'registerPostTypeSchema', () => {
 			label: 'Label of rename-post',
 			...postTypeSupports[ 'rename-post' ],
 		} );
-		expect( requests ).toEqual( [ [ 'postType', 'page' ] ] );
+		expect( apiFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/entity-actions?kind=postType&name=page',
+		} );
 	} );
 
 	it( 'merges the actions of several script modules', async () => {
-		const { selectors } = await registerSchema(
+		const { actions } = await resolveActions(
 			'wp_block',
 			serverConfig(
 				'wp_block',
@@ -114,7 +108,6 @@ describe( 'registerPostTypeSchema', () => {
 			)
 		);
 
-		const actions = selectors.getEntityActions( 'postType', 'wp_block' );
 		expect( actions.map( ( { id }: { id: string } ) => id ) ).toEqual( [
 			'rename-post',
 			'duplicate-pattern',
@@ -124,7 +117,7 @@ describe( 'registerPostTypeSchema', () => {
 	} );
 
 	it( 'leaves out the actions of a script module that fails to load', async () => {
-		const { selectors } = await registerSchema(
+		const { actions } = await resolveActions(
 			'wp_template_part',
 			serverConfig(
 				'wp_template_part',
@@ -138,11 +131,9 @@ describe( 'registerPostTypeSchema', () => {
 			)
 		);
 
-		expect(
-			selectors
-				.getEntityActions( 'postType', 'wp_template_part' )
-				.map( ( { id }: { id: string } ) => id )
-		).toEqual( [ 'rename-post' ] );
+		expect( actions.map( ( { id }: { id: string } ) => id ) ).toEqual( [
+			'rename-post',
+		] );
 		expect( console ).toHaveWarnedWith(
 			'Could not load the script module @wordpress/core-actions/wp_template_part of the actions of postType/wp_template_part.',
 			expect.any( Error )
@@ -152,24 +143,25 @@ describe( 'registerPostTypeSchema', () => {
 		);
 	} );
 
-	it( 'registers no server action when the request fails, and still fires the hook', async () => {
-		const registered = vi.fn();
-		addAction( 'core.registerPostTypeSchema', 'test/schema', registered );
+	it( 'has no action when the request fails', async () => {
+		const error = { code: 'rest_forbidden', message: 'Forbidden.' };
+		vi.mocked( apiFetch ).mockRejectedValue( error );
+		const registry = createRegistry();
+		registry.register( coreStore );
+		registry.register( editorStore );
+		const selectors = unlock( registry.select( editorStore ) );
+		selectors.getEntityActions( 'postType', 'page' );
 
-		const { selectors } = await registerSchema(
-			'page',
-			new Error( 'Forbidden' )
+		await vi.waitFor( () =>
+			expect(
+				selectors.getResolutionError( 'getEntityActions', [
+					'postType',
+					'page',
+				] )
+			).toBe( error )
 		);
-		removeAction( 'core.registerPostTypeSchema', 'test/schema' );
-
 		expect( selectors.getEntityActions( 'postType', 'page' ) ).toEqual(
 			[]
-		);
-		expect( registered ).toHaveBeenCalledTimes( 1 );
-		expect( registered ).toHaveBeenCalledWith( 'page' );
-		expect( console ).toHaveWarnedWith(
-			'Could not load the actions of the page post type.',
-			expect.any( Error )
 		);
 	} );
 } );

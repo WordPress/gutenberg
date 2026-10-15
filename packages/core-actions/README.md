@@ -2,7 +2,7 @@
 
 The actions WordPress core registers for its entities, such as "Rename", "Duplicate" or "Move to trash". They are shown in the DataViews lists of the site editor and in the inspector of the editor.
 
-WordPress core registers these actions on the server, through the Entity actions API, like a plugin registers its own: see `wp_register_core_actions()` in `src/index.php`. The client reads them from the `wp/v2/entity-actions` route, imports the script modules registered along with them, and merges their JavaScript parts in, see `registerPostTypeSchema()` of `@wordpress/editor`. The actions moved here from `@wordpress/fields`.
+WordPress core registers these actions on the server, through the Entity actions API, like a plugin registers its own: see `wp_register_core_actions()` in `src/index.php`. The client reads them from the `wp/v2/entity-actions` route, imports the script modules registered along with them, and merges their JavaScript parts in, see the `getEntityActions` resolver of `@wordpress/editor`. The actions moved here from `@wordpress/fields`.
 
 ## Script modules
 
