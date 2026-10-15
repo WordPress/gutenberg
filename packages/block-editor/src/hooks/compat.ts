@@ -1,7 +1,8 @@
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { addFilter } from '@wordpress/hooks';
 
-function migrateLightBlockWrapper( settings ) {
+function migrateLightBlockWrapper( settings: BlockType ): BlockType {
 	const { apiVersion = 1 } = settings;
 	if (
 		apiVersion < 2 &&

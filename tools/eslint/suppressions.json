@@ -2286,11 +2286,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/test/settings.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/test/style.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2307,11 +2302,6 @@
 		}
 	},
 	"packages/block-editor/src/hooks/typography.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/utils.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
