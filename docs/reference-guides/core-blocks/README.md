@@ -323,7 +323,7 @@ Create a list of terms and descriptions.
 -	**Name:** [core/description-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-description-list/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Allowed Blocks:** core/description-term, core/description-detail
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), listView, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), listView, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Description Term
 

@@ -20,43 +20,21 @@ export default function useGuidedEnterAtEnd( {
 	const registry = useRegistry();
 
 	return useCallback( () => {
-		const select = registry.select( blockEditorStore );
-		const dispatch = registry.dispatch( blockEditorStore );
 		const {
 			canInsertBlockType,
 			getBlockIndex,
 			getBlockOrder,
 			getBlockRootClientId,
-		} = select;
-		const { insertBlocks, selectionChange } = dispatch;
-		const rootClientId = getBlockRootClientId?.( clientId );
-
-		if (
-			! rootClientId ||
-			typeof getBlockOrder !== 'function' ||
-			typeof getBlockIndex !== 'function' ||
-			typeof selectionChange !== 'function'
-		) {
-			return;
-		}
-
+		} = registry.select( blockEditorStore );
+		const { insertBlocks, selectionChange } =
+			registry.dispatch( blockEditorStore );
+		const rootClientId = getBlockRootClientId( clientId );
 		const blockIndex = getBlockIndex( clientId );
-		if ( blockIndex < 0 ) {
-			return;
-		}
-
 		const blockOrder = getBlockOrder( rootClientId );
 		const nextClientId = blockOrder[ blockIndex + 1 ];
 
 		if ( nextClientId ) {
 			selectionChange( nextClientId, 'content', 0, 0 );
-			return;
-		}
-
-		if (
-			typeof insertBlocks !== 'function' ||
-			typeof canInsertBlockType !== 'function'
-		) {
 			return;
 		}
 

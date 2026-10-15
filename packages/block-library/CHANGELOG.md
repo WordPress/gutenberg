@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add Description List, Description Term, and Description Detail blocks.
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -85,10 +89,6 @@
 ### Breaking Changes
 
 -   Remove the experimental Form, Input Field, Form Submit Button, and Form Submission Notification blocks, along with the "Form and input blocks" experiment that gated them.
-
-### New Features
-
--   Add Description List, Description Term, and Description Detail blocks.
 
 ### Enhancements
 

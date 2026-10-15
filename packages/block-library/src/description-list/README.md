@@ -36,13 +36,9 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`spacing`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#spacing):
   - `margin`: `true`
   - `padding`: `true`
+- [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
+  - `clientNavigation`: `true`
 - [`listView`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#listview): `true`
-
-## CSS Selectors
-
-_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
-
-- **border**: `.wp-block-description-list`
 
 ## Block Markup
 

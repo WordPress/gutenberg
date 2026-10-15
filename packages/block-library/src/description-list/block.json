@@ -47,10 +47,11 @@
 			}
 		},
 		"__unstablePasteTextInline": true,
+		"__experimentalOnMerge": true,
+		"interactivity": {
+			"clientNavigation": true
+		},
 		"listView": true
-	},
-	"selectors": {
-		"border": ".wp-block-description-list"
 	},
 	"style": "wp-block-description-list"
 }

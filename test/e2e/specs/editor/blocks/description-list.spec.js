@@ -437,6 +437,93 @@ test.describe( 'Description List', () => {
 		] );
 	} );
 
+	test( 'should paste a copied term outside the list wrapped in a list', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'API' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: {
+						content: 'Application programming interface',
+					},
+				},
+			],
+		} );
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: Description Term',
+			} )
+		);
+		await pageUtils.pressKeys( 'primary+c' );
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/description-list' },
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
+						attributes: { content: 'API' },
+					},
+				],
+			},
+		] );
+	} );
+
+	test( 'should move into the first term on ArrowDown from the block above', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Before' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'API' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: {
+						content: 'Application programming interface',
+					},
+				},
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+		await page.keyboard.press( 'End' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.type( 'S' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'Before' } },
+			{
+				name: 'core/description-list',
+				innerBlocks: [
+					{
+						name: 'core/description-term',
+						attributes: { content: 'APIS' },
+					},
+					{ name: 'core/description-detail' },
+				],
+			},
+		] );
+	} );
+
 	// Enter in an empty trailing detail keeps appending pairs instead of leaving the list.
 	test.fixme( 'should exit the list on Enter in an empty trailing detail', async ( {
 		editor,
