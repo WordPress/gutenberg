@@ -149,6 +149,46 @@ test.describe( 'Autosave', () => {
 		).toBe( 1 );
 	} );
 
+	test( 'should show the backup in blocks that read the post', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/post-excerpt' } );
+		await editor.insertBlock( { name: 'core/post-title' } );
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).editPost( {
+				title: 'Saved title',
+				excerpt: 'Saved excerpt',
+			} )
+		);
+		await pageUtils.pressKeys( 'primary+s' );
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Draft saved' } )
+			.waitFor();
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).editPost( {
+				title: 'Backup title',
+				excerpt: 'Backup excerpt',
+			} )
+		);
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
+		);
+		await page.reload();
+
+		await page.getByRole( 'button', { name: 'View the backup' } ).click();
+		await expect(
+			editor.canvas.locator( '.wp-block-post-excerpt__excerpt' )
+		).toHaveText( 'Backup excerpt' );
+		await expect(
+			editor.canvas.locator(
+				'.wp-block-post-title:not(.editor-post-title)'
+			)
+		).toHaveText( 'Backup title' );
+	} );
+
 	test( "shouldn't contaminate other posts", async ( {
 		admin,
 		editor,

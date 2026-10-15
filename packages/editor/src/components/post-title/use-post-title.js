@@ -16,41 +16,33 @@ import { diffRevisionHTML } from '../post-revisions-preview/block-diff';
  * @return {Object} An object containing the current title and a function to update the title.
  */
 export default function usePostTitle() {
-	const { postType, postId, previousTitle, browserBackupTitle } = useSelect(
-		( select ) => {
-			const {
-				getCurrentPostType,
-				getCurrentPostId,
-				isRevisionsMode,
-				isShowingRevisionDiff,
-				getComparedVersion,
-				getBrowserBackup,
-			} = unlock( select( editorStore ) );
-			const isDiffing = isRevisionsMode() && isShowingRevisionDiff();
+	const { postType, postId, previousTitle } = useSelect( ( select ) => {
+		const {
+			getCurrentPostType,
+			getCurrentPostId,
+			isRevisionsMode,
+			isShowingRevisionDiff,
+			getComparedVersion,
+		} = unlock( select( editorStore ) );
+		const isDiffing = isRevisionsMode() && isShowingRevisionDiff();
 
-			return {
-				postType: getCurrentPostType(),
-				postId: getCurrentPostId(),
-				// The oldest revision has nothing to compare against, so its
-				// whole title reads as added.
-				previousTitle: isDiffing
-					? ( getComparedVersion()?.title?.raw ?? '' )
-					: undefined,
-				// The browser backup isn't a revision, so it isn't provided
-				// through the entity.
-				browserBackupTitle: getBrowserBackup()?.title.raw,
-			};
-		},
-		[]
-	);
+		return {
+			postType: getCurrentPostType(),
+			postId: getCurrentPostId(),
+			// The oldest revision has nothing to compare against, so its whole
+			// title reads as added.
+			previousTitle: isDiffing
+				? ( getComparedVersion()?.title?.raw ?? '' )
+				: undefined,
+		};
+	}, [] );
 
-	const [ entityTitle, setTitle ] = useEntityProp(
+	const [ title, setTitle ] = useEntityProp(
 		'postType',
 		postType,
 		'title',
 		postId
 	);
-	const title = browserBackupTitle ?? entityTitle;
 
 	const value = useMemo(
 		() =>
