@@ -16,7 +16,8 @@
 	// visible label as `.components-input-control__label`, so it must be
 	// targeted too or those controls silently miss the inherited treatment.
 	.components-base-control__label,
-	.components-input-control__label {
+	.components-input-control__label,
+	.block-editor-font-appearance-control__label {
 		text-decoration-line: underline;
 		text-decoration-style: dotted;
 		text-decoration-thickness: 1px;
