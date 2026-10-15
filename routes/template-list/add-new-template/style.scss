@@ -157,8 +157,15 @@
 	}
 
 	.template-list-add-new-template__custom-template-button,
+	.template-list-add-new-template__template-list__loading,
 	.template-list-add-new-template__template-list__prompt {
 		grid-column: 1 / -1;
+	}
+
+	.template-list-add-new-template__template-list__loading {
+		// Roughly the height of one row of templates, so the modal does
+		// not jump when the list replaces the spinner.
+		min-height: $grid-unit-80 * 2;
 	}
 }
 
