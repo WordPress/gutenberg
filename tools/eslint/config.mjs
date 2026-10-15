@@ -126,8 +126,8 @@ const typeScriptOnlyFiles = [
 		.map( ( fileName ) =>
 			fileName.replace( 'tsconfig.json', `@(src|test)/**/*.${ JS_EXT }` )
 		),
-	`routes/*/**/*.${ JS_EXT }`,
-	`tools/*/**/*.${ JS_EXT }`,
+	`routes/**/*.${ JS_EXT }`,
+	`tools/**/*.${ JS_EXT }`,
 ];
 
 // All files from bundled packages: packages not registered as WordPress
