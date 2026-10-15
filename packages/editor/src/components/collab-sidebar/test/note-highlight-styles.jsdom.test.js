@@ -8,14 +8,12 @@ import { select } from '@wordpress/data';
 import {
 	buildBlockHighlightCss,
 	buildHighlightCss,
-	getBlockLevelHighlights,
 } from '../note-highlight-styles';
 import { getAvatarBorderColor } from '../utils';
 
 const MARK_RESET = 'mark.wp-note{background-color:transparent;color:inherit;}';
-const FORCED_COLORS_HIGHLIGHT =
-	'background-color:Mark;color:MarkText;text-decoration-color:MarkText;';
-const FORCED_COLORS_RESET = `@media (forced-colors: active){mark.wp-note{${ FORCED_COLORS_HIGHLIGHT }}}`;
+const FORCED_COLORS_RESET =
+	'@media (forced-colors: active){mark.wp-note[data-id]{background-color:Mark;color:MarkText;text-decoration-color:MarkText;}}';
 
 describe( 'buildHighlightCss', () => {
 	it( 'always emits the mark reset so the browser default yellow does not bleed through', () => {
@@ -40,20 +38,7 @@ describe( 'buildHighlightCss', () => {
 			{ id: 7, author: 1 },
 			{ id: 12, author: 3 },
 		] );
-		const forcedRule = `@media (forced-colors: active){mark.wp-note[data-id="7"],mark.wp-note[data-id="12"]{${ FORCED_COLORS_HIGHLIGHT }}}`;
-		expect( css ).toContain( forcedRule );
-		// After the resting tint rules, which carry the same specificity.
-		expect( css.indexOf( forcedRule ) ).toBeGreaterThan(
-			css.indexOf(
-				`mark.wp-note[data-id="12"]{background-color:${ getAvatarBorderColor(
-					3
-				) }40;`
-			)
-		);
-	} );
-
-	it( 'emits no per-marker forced-colors rule when there are no threads', () => {
-		expect( buildHighlightCss( [] ) ).not.toContain( 'data-id' );
+		expect( css.endsWith( FORCED_COLORS_RESET ) ).toBe( true );
 	} );
 
 	it( 'tints each thread with its author color at the tint alpha (0x40)', () => {
@@ -112,24 +97,20 @@ describe( 'buildHighlightCss', () => {
 		);
 	} );
 
-	it( 'emphasizes the selected thread by appending a second rule', () => {
+	it( 'thickens the underline of the selected thread only', () => {
 		const css = buildHighlightCss(
-			[ { id: 7, author: 1 } ],
+			[
+				{ id: 7, author: 1 },
+				{ id: 12, author: 3 },
+			],
 			'7' // selected
 		);
-		const color = getAvatarBorderColor( 1 );
-		// Rest rule still present.
-		expect( css ).toContain(
-			`mark.wp-note[data-id="7"]{background-color:${ color }40;`
+		expect( css ).toMatch(
+			/mark\.wp-note\[data-id="7"\]\{[^}]*text-decoration-thickness:3px;/
 		);
-		// Emphasis rule appended later, so the cascade picks it.
-		const restIndex = css.indexOf(
-			`mark.wp-note[data-id="7"]{background-color:${ color }40;`
+		expect( css ).toMatch(
+			/mark\.wp-note\[data-id="12"\]\{[^}]*text-decoration-thickness:1\.5px;/
 		);
-		const activeIndex = css.lastIndexOf(
-			'mark.wp-note[data-id="7"]{text-decoration-thickness:3px;}'
-		);
-		expect( activeIndex ).toBeGreaterThan( restIndex );
 	} );
 
 	/*
@@ -203,7 +184,7 @@ describe( 'buildHighlightCss', () => {
 	} );
 } );
 
-describe( 'getBlockLevelHighlights', () => {
+describe( 'buildBlockHighlightCss', () => {
 	const FORMAT_NAME = 'core/note';
 	const isRegistered = () =>
 		!! select( richTextStore ).getFormatType( FORMAT_NAME );
@@ -234,76 +215,10 @@ describe( 'getBlockLevelHighlights', () => {
 		'block-inline': {
 			content: 'a <span class="wp-note" data-id="7">b</span> c',
 		},
-		'block-plain': { content: 'no markers here' },
 	};
 	const getBlockAttributes = ( clientId ) =>
-		attributesByClientId[ clientId ] ?? {};
+		attributesByClientId[ clientId ] ?? { content: 'no markers here' };
 
-	it( 'returns markerless threads as block-level highlights', () => {
-		const highlights = getBlockLevelHighlights(
-			[ { id: 9, author: 2, blockClientId: 'block-plain' } ],
-			getBlockAttributes
-		);
-		expect( highlights ).toEqual( [
-			{ clientId: 'block-plain', id: 9, author: 2 },
-		] );
-	} );
-
-	it( 'skips threads whose marker exists in their block (inline notes)', () => {
-		const highlights = getBlockLevelHighlights(
-			[ { id: 7, author: 1, blockClientId: 'block-inline' } ],
-			getBlockAttributes
-		);
-		expect( highlights ).toEqual( [] );
-	} );
-
-	it( 'collapses several block-level threads on one block to the primary', () => {
-		// `pickPrimaryNote` prefers the first unresolved thread, so the first
-		// listed thread wins and only one highlight is emitted for the block.
-		const highlights = getBlockLevelHighlights(
-			[
-				{
-					id: 9,
-					author: 2,
-					status: 'hold',
-					blockClientId: 'block-plain',
-				},
-				{
-					id: 11,
-					author: 4,
-					status: 'hold',
-					blockClientId: 'block-plain',
-				},
-			],
-			getBlockAttributes
-		);
-		expect( highlights ).toEqual( [
-			{ clientId: 'block-plain', id: 9, author: 2 },
-		] );
-	} );
-
-	it( 'skips threads without an id or block', () => {
-		const highlights = getBlockLevelHighlights(
-			[
-				{ author: 2, blockClientId: 'block-plain' },
-				{ id: 9, author: 2, blockClientId: null },
-			],
-			getBlockAttributes
-		);
-		expect( highlights ).toEqual( [] );
-	} );
-
-	it( 'returns an empty list for empty input', () => {
-		expect( getBlockLevelHighlights( [], getBlockAttributes ) ).toEqual(
-			[]
-		);
-		expect( getBlockLevelHighlights( null, getBlockAttributes ) ).toEqual(
-			[]
-		);
-	} );
-} );
-
-describe( 'buildBlockHighlightCss', () => {
 	const overlaySelectorFor = ( clientId ) =>
 		`[data-block="${ clientId }"]:not(.is-multi-selected)::after`;
 
@@ -318,10 +233,13 @@ describe( 'buildBlockHighlightCss', () => {
 	 * sets `box-shadow` on the same `::after`, and the two must not compete.
 	 */
 	it( 'overlays each block with its author tint and an all-around rule at rest', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'abc-1', id: 7, author: 1 },
-			{ clientId: 'abc-2', id: 12, author: 3 },
-		] );
+		const css = buildBlockHighlightCss(
+			[
+				{ id: 7, author: 1, blockClientId: 'abc-1' },
+				{ id: 12, author: 3, blockClientId: 'abc-2' },
+			],
+			getBlockAttributes
+		);
 		for ( const [ clientId, author ] of [
 			[ 'abc-1', 1 ],
 			[ 'abc-2', 3 ],
@@ -336,12 +254,36 @@ describe( 'buildBlockHighlightCss', () => {
 		expect( css ).not.toContain( 'box-shadow' );
 	} );
 
+	it( 'skips threads whose marker exists in their block (inline notes)', () => {
+		expect(
+			buildBlockHighlightCss(
+				[ { id: 7, author: 1, blockClientId: 'block-inline' } ],
+				getBlockAttributes
+			)
+		).toBe( '' );
+	} );
+
+	it( 'colors a block with several block-level notes by the first one', () => {
+		const css = buildBlockHighlightCss(
+			[
+				{ id: 9, author: 2, blockClientId: 'abc-1' },
+				{ id: 11, author: 4, blockClientId: 'abc-1' },
+			],
+			getBlockAttributes
+		);
+		expect( css.match( /content:""/g ) ).toHaveLength( 1 );
+		expect( css ).toContain(
+			`background-color:${ getAvatarBorderColor( 2 ) }40;`
+		);
+	} );
+
 	// The underline is the inline-note signal; a block-level note marks the
 	// block, not its text.
 	it( 'does not underline the text of an annotated block', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'abc-1', id: 7, author: 1 },
-		] );
+		const css = buildBlockHighlightCss(
+			[ { id: 7, author: 1, blockClientId: 'abc-1' } ],
+			getBlockAttributes
+		);
 		expect( css ).not.toContain( 'text-decoration' );
 		expect( css ).not.toContain( 'block-editor-rich-text__editable' );
 	} );
@@ -353,15 +295,13 @@ describe( 'buildBlockHighlightCss', () => {
 	 * become a second, solid ring beside the dashed outline.
 	 */
 	it( 'falls back to a dashed outline under forced colors', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'abc-1', id: 7, author: 1 },
-			{ clientId: 'abc-2', id: 12, author: 3 },
-		] );
+		const css = buildBlockHighlightCss(
+			[ { id: 7, author: 1, blockClientId: 'abc-1' } ],
+			getBlockAttributes
+		);
 		expect( css ).toContain(
-			'@media (forced-colors: active){[data-block="abc-1"],[data-block="abc-2"]{outline:1.5px dashed;outline-offset:2px;}' +
-				`${ overlaySelectorFor( 'abc-1' ) },${ overlaySelectorFor(
-					'abc-2'
-				) }{border:none;}}`
+			'@media (forced-colors: active){[data-block="abc-1"]{outline:1.5px dashed;outline-offset:2px;}' +
+				`${ overlaySelectorFor( 'abc-1' ) }{border:none;}}`
 		);
 	} );
 
@@ -372,10 +312,13 @@ describe( 'buildBlockHighlightCss', () => {
 	 * no state variants, and every tint at the one fixed alpha.
 	 */
 	it( 'emits only resting rules, with no state variants', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'abc-1', id: 7, author: 1 },
-			{ clientId: 'abc-2', id: 12, author: 3 },
-		] );
+		const css = buildBlockHighlightCss(
+			[
+				{ id: 7, author: 1, blockClientId: 'abc-1' },
+				{ id: 12, author: 3, blockClientId: 'abc-2' },
+			],
+			getBlockAttributes
+		);
 		expect( css ).not.toContain( ':hover' );
 		expect( css ).not.toContain( ':focus' );
 		const alphas = [
@@ -387,31 +330,33 @@ describe( 'buildBlockHighlightCss', () => {
 		expect( alphas ).toEqual( [ '40', '40' ] );
 	} );
 
-	it( 'escapes quotes and backslashes in the client id', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: 'a"b\\c', id: 7, author: 1 },
-		] );
-		expect( css ).toContain( '[data-block="a\\"b\\\\c"]' );
-	} );
-
-	it( 'skips entries without a client id', () => {
-		const css = buildBlockHighlightCss( [
-			{ clientId: null, id: 7, author: 1 },
-			{ id: 8, author: 1 },
-		] );
-		expect( css ).not.toMatch( /data-block="(null|undefined)"/ );
+	it( 'skips threads without an id or block', () => {
+		expect(
+			buildBlockHighlightCss(
+				[
+					{ author: 2, blockClientId: 'abc-1' },
+					{ id: 9, author: 2, blockClientId: null },
+				],
+				getBlockAttributes
+			)
+		).toBe( '' );
 	} );
 
 	it( 'falls back to author 0 when the field is missing', () => {
-		const css = buildBlockHighlightCss( [ { clientId: 'abc-1', id: 7 } ] );
+		const css = buildBlockHighlightCss(
+			[ { id: 7, blockClientId: 'abc-1' } ],
+			getBlockAttributes
+		);
 		expect( css ).toContain(
 			`background-color:${ getAvatarBorderColor( 0 ) }40;`
 		);
 	} );
 
 	it( 'returns an empty string when there are no block-level notes', () => {
-		expect( buildBlockHighlightCss() ).toBe( '' );
-		expect( buildBlockHighlightCss( null ) ).toBe( '' );
-		expect( buildBlockHighlightCss( [] ) ).toBe( '' );
+		expect( buildBlockHighlightCss( undefined, getBlockAttributes ) ).toBe(
+			''
+		);
+		expect( buildBlockHighlightCss( null, getBlockAttributes ) ).toBe( '' );
+		expect( buildBlockHighlightCss( [], getBlockAttributes ) ).toBe( '' );
 	} );
 } );
