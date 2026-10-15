@@ -54,6 +54,7 @@
 -   Convert the zoom out and content only section hooks to TypeScript ([#84731](https://github.com/WordPress/gutenberg/pull/84731)).
 -   Convert `BlockControls` to TypeScript ([#84733](https://github.com/WordPress/gutenberg/pull/84733)).
 -   Convert the flow layout to TypeScript ([#84734](https://github.com/WordPress/gutenberg/pull/84734)).
+-   Convert BlockPopover, the color and gradient controls, BlockTitle, useBlockDisplayInformation and MediaUpload to TypeScript ([#84813](https://github.com/WordPress/gutenberg/pull/84813)).
 
 ## 18.1.0 (2026-10-07)
 
