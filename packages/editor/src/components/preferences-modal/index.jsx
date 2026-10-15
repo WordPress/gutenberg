@@ -270,6 +270,14 @@ function PreferencesModalContents( { extraSections = {} } ) {
 								) }
 								label={ __( 'Spotlight mode' ) }
 							/>
+							<PreferenceToggleControl
+								scope="core"
+								featureName="showNonBreakingSpaces"
+								help={ __(
+									'Outlines non-breaking spaces while you edit. The outlines never appear on your site.'
+								) }
+								label={ __( 'Show non-breaking spaces' ) }
+							/>
 							{ extraSections?.appearance }
 						</PreferencesModalSection>
 					),

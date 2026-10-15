@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Non-breaking space format: Skip the editor markers when the `core` `showNonBreakingSpaces` preference is `false` ([#84592](https://github.com/WordPress/gutenberg/pull/84592)).
 -   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
 ## 5.57.0 (2026-10-07)

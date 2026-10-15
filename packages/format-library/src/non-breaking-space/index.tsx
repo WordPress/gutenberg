@@ -4,6 +4,7 @@ import type { RichTextValue } from '@wordpress/rich-text';
 // @ts-expect-error Block Editor not fully typed yet.
 import { RichTextShortcut } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
+import { store as preferencesStore } from '@wordpress/preferences';
 import type { FormatEditProps } from '../types';
 
 const name = 'core/non-breaking-space';
@@ -55,11 +56,29 @@ export const nonBreakingSpace = {
 			</>
 		);
 	},
-	__experimentalCreatePrepareEditableTree(): (
+	__experimentalGetPropsForEditableTreePreparation( select: any ) {
+		return {
+			// Defaults to enabled when unset.
+			isEnabled:
+				select( preferencesStore ).get(
+					'core',
+					'showNonBreakingSpaces'
+				) ?? true,
+		};
+	},
+	__experimentalCreatePrepareEditableTree( {
+		isEnabled,
+	}: {
+		isEnabled: boolean;
+	} ): (
 		formats: RichTextValue[ 'formats' ],
 		text: string
 	) => RichTextValue[ 'formats' ] {
 		return ( formats, text ) => {
+			if ( ! isEnabled ) {
+				return formats;
+			}
+
 			const NBSP = '\u00a0';
 			// Not a complete `RichTextValue`: the callback only receives
 			// `formats` and `text`. The assertion is safe because `applyFormat`
