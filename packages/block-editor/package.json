@@ -47,7 +47,7 @@
 		"build-style/**",
 		"src/**/*.scss",
 		"src/index.js",
-		"src/store/index.js",
+		"src/store/index.ts",
 		"src/hooks/**",
 		"build/index.cjs",
 		"build/store/index.cjs",

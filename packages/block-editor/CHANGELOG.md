@@ -23,6 +23,7 @@
 
 ### Bug Fixes
 
+-   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
 -   Block Toolbar: Keep `__unstableBlockToolbarLastItem` fills out of the placeholder toolbar shown on small screens while no block is selected ([#84554](https://github.com/WordPress/gutenberg/pull/84554)).
@@ -38,6 +39,9 @@
 -   Convert the store selectors and `store/utils` to TypeScript ([#84631](https://github.com/WordPress/gutenberg/pull/84631)).
 -   Convert the store private selectors to TypeScript and type the editor settings the store reads ([#84662](https://github.com/WordPress/gutenberg/pull/84662)).
 -   Convert the store actions and private actions to TypeScript and add the store thunk arguments type ([#84672](https://github.com/WordPress/gutenberg/pull/84672)).
+-   Convert the block edit context, block context, block icon, block editing mode, `useSettings`, block refs, Global Styles utils and inheritance, and spacing size utils to TypeScript ([#84625](https://github.com/WordPress/gutenberg/pull/84625)).
+-   Convert the store defaults, `getBlockSettings` and the store index to TypeScript and type the theme.json settings the store reads ([#84677](https://github.com/WordPress/gutenberg/pull/84677)).
+-   Type `isValueSpacingPreset` as returning a boolean, since it returns `false` for custom values ([#84730](https://github.com/WordPress/gutenberg/pull/84730)).
 
 ## 18.1.0 (2026-10-07)
 

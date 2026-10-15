@@ -1184,17 +1184,41 @@ export interface BlockSupports {
 	 */
 	background?: {
 		/**
+		 * Enable background clip control, including clipping to the text.
+		 *
+		 * (default) false
+		 */
+		backgroundClip?: boolean;
+		/**
 		 * Enable background image control.
 		 *
 		 * (default) false
 		 */
 		backgroundImage?: boolean;
 		/**
+		 * Enable background position control.
+		 *
+		 * (default) false
+		 */
+		backgroundPosition?: boolean;
+		/**
+		 * Enable background repeat control.
+		 *
+		 * (default) false
+		 */
+		backgroundRepeat?: boolean;
+		/**
 		 * Enable background size control.
 		 *
 		 * (default) false
 		 */
 		backgroundSize?: boolean;
+		/**
+		 * Enable background gradient control.
+		 *
+		 * (default) false
+		 */
+		gradient?: boolean;
 	};
 
 	/**

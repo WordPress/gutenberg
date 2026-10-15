@@ -3,9 +3,9 @@ import { render } from 'vitest-browser-react';
 import { image } from '@wordpress/icons';
 import BlockIcon from '../';
 
-function getIconWrapper( container ) {
+function getIconWrapper( container: HTMLElement ) {
 	// The wrapper is intentionally non-semantic.
-	return container.firstChild;
+	return container.firstChild as Element;
 }
 
 describe( 'BlockIcon', () => {

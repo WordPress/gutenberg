@@ -17,7 +17,7 @@ import { unlock } from '../../lock-unlock';
  * const [ fixed, sticky ] = useSettings( 'position.fixed', 'position.sticky' );
  * ```
  */
-export function useSettings( ...paths ) {
+export function useSettings( ...paths: string[] ): unknown[] {
 	const { clientId = null } = useBlockEditContext();
 	return useSelect(
 		( select ) =>
@@ -44,10 +44,11 @@ export function useSettings( ...paths ) {
  * const isEnabled = useSetting( 'typography.dropCap' );
  * ```
  */
-export function useSetting( path ) {
+export function useSetting( path: string ) {
 	deprecated( 'wp.blockEditor.useSetting', {
 		since: '6.5',
 		alternative: 'wp.blockEditor.useSettings',
+		// @ts-expect-error `deprecated` has no `note` option, so this is ignored.
 		note: 'The new useSettings function can retrieve multiple settings at once, with better performance.',
 	} );
 

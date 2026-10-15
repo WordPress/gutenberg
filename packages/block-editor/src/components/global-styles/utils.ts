@@ -1,12 +1,16 @@
 import { useViewportMatch } from '@wordpress/compose';
 import { createContext, useContext } from '@wordpress/element';
+import type { ToolsPanelPopoverProps } from './types';
 
 /**
  * Popover props for ToolsPanel dropdown menus (`dropdown`) and item popovers
  * (`item`). Defaults to the editor sidebar; consumers rendering the panels
  * elsewhere provide their own values.
  */
-export const ToolsPanelPopoverPropsContext = createContext( {
+export const ToolsPanelPopoverPropsContext = createContext< {
+	dropdown: ToolsPanelPopoverProps;
+	item: ToolsPanelPopoverProps;
+} >( {
 	dropdown: {
 		placement: 'left-start',
 		// Inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
@@ -27,16 +31,9 @@ export function useToolsPanelDropdownMenuProps() {
 }
 
 /**
- * @typedef {Pick<
- *   NonNullable<import('react').ComponentProps<import('@wordpress/components').Dropdown>['popoverProps']>,
- *   'placement' | 'offset' | 'shift'
- * >} ToolsPanelPopoverProps
- */
-
-/**
  * Popover props for a tools panel item.
  *
- * @return {ToolsPanelPopoverProps} Popover props for a tools panel item.
+ * @return Popover props for a tools panel item.
  */
 export function useToolsPanelItemPopoverProps() {
 	return useContext( ToolsPanelPopoverPropsContext ).item;
@@ -54,12 +51,15 @@ export function useToolsPanelItemPopoverProps() {
  * // merged is '.a > .x, .a .y, .b .c > .x, .b .c .y'
  * ```
  *
- * @param {string} scope    Selector to scope to.
- * @param {string} selector Original selector.
+ * @param scope    Selector to scope to.
+ * @param selector Original selector.
  *
- * @return {string} Scoped selector.
+ * @return Scoped selector.
  */
-export function scopeSelector( scope, selector ) {
+export function scopeSelector(
+	scope: string | null | undefined,
+	selector: string
+) {
 	if ( ! scope || ! selector ) {
 		return selector;
 	}
@@ -67,7 +67,7 @@ export function scopeSelector( scope, selector ) {
 	const scopes = scope.split( ',' );
 	const selectors = selector.split( ',' );
 
-	const selectorsScoped = [];
+	const selectorsScoped: string[] = [];
 	scopes.forEach( ( outer ) => {
 		selectors.forEach( ( inner ) => {
 			selectorsScoped.push( `${ outer.trim() } ${ inner.trim() }` );
@@ -86,11 +86,13 @@ export function scopeSelector( scope, selector ) {
  * Lives here rather than beside its siblings in `hooks/duotone` because that
  * module imports the filters panel, so the panel cannot import back from it.
  *
- * @param {string|string[]|undefined} duotone A duotone style value.
+ * @param duotone A duotone style value.
  *
- * @return {string|undefined} The preset slug, if the value references one.
+ * @return The preset slug, if the value references one.
  */
-export function getDuotoneSlugFromPreset( duotone ) {
+export function getDuotoneSlugFromPreset(
+	duotone: string | string[] | undefined
+): string | undefined {
 	if ( typeof duotone !== 'string' ) {
 		return undefined;
 	}

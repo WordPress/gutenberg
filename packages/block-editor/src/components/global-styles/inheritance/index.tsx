@@ -6,6 +6,12 @@ import {
 } from '@wordpress/components';
 import { reset as resetIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import type { MouseEvent } from 'react';
+import type { ClassValue } from 'clsx';
+import type {
+	InheritanceResetButtonProps,
+	InheritanceToolsPanelItemProps,
+} from './types';
 
 /**
  * Whether the inspector marks up which controls are showing an inherited
@@ -23,10 +29,11 @@ import { __ } from '@wordpress/i18n';
  * down as a prop, and `undefined` would trigger a receiving component's own
  * default parameter.
  *
- * @return {boolean} Whether the indicator treatment is enabled.
+ * @return Whether the indicator treatment is enabled.
  */
 export const isGlobalStylesInheritanceIndicatorUIEnabled = () =>
-	!! window.__experimentalGlobalStylesInheritanceUI;
+	!! ( window as { __experimentalGlobalStylesInheritanceUI?: boolean } )
+		.__experimentalGlobalStylesInheritanceUI;
 
 /**
  * Returns props to spread onto a wrapping `<InheritanceToolsPanelItem>`
@@ -51,20 +58,20 @@ export const isGlobalStylesInheritanceIndicatorUIEnabled = () =>
  *         …
  *     >
  *
- * @param {boolean}             isInherited      Control is inheriting at rest.
- * @param {boolean}             hasLocalOverride Local override is set AND
- *                                               there is an inherited value
- *                                               being overridden.
- * @param {string|Array|Object} [baseClassName]  Optional className(s) to fold
- *                                               into the returned `className`.
+ * @param isInherited      Control is inheriting at rest.
+ * @param hasLocalOverride Local override is set AND
+ *                         there is an inherited value
+ *                         being overridden.
+ * @param [baseClassName]  Optional className(s) to fold
+ *                         into the returned `className`.
  *
- * @return {{ className?: string, isInherited: boolean, hasLocalOverride: boolean }} Props for the wrapping
+ * @return Props for the wrapping
  *                                  `InheritanceToolsPanelItem`.
  */
 export function getInheritanceProps(
-	isInherited,
-	hasLocalOverride,
-	baseClassName
+	isInherited: unknown,
+	hasLocalOverride: unknown,
+	baseClassName?: ClassValue
 ) {
 	const inheritedOnly = !! isInherited && ! hasLocalOverride;
 	const className = clsx( baseClassName, {
@@ -89,13 +96,12 @@ export function getInheritanceProps(
  * override so the control falls back to its inherited value — the same
  * action the `ToolsPanel` menu performs via `onDeselect`.
  *
- * @param {Object}   props
- * @param {Function} props.onResetToInherited Reset handler.
- * @param {string}   [props.className]        Optional className for the button.
- *
- * @return {Element} The reset button.
+ * @return The reset button.
  */
-export function InheritanceResetButton( { onResetToInherited, className } ) {
+export function InheritanceResetButton( {
+	onResetToInherited,
+	className,
+}: InheritanceResetButtonProps ) {
 	return (
 		// Intentionally small (14×14) circular control; exempt from the
 		// 40px default-size enforcement rule.
@@ -110,7 +116,7 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
 				'has-local-override-from-global-styles__reset',
 				className
 			) }
-			onClick={ ( event ) => {
+			onClick={ ( event: MouseEvent ) => {
 				// Prevent the click from reaching any wrapping
 				// `<label htmlFor>` association, which would otherwise
 				// focus/activate the inner control.
@@ -147,17 +153,7 @@ export function InheritanceResetButton( { onResetToInherited, className } ) {
  * background image) pass `showLocalOverrideActionsInLabel={ false }` so the
  * item does not render a second reset dot.
  *
- * @param {Object}                    props
- * @param {?string}                   props.className                         Item className.
- * @param {boolean}                   props.isInherited                       Value is inherited at rest. Accepted so the `getInheritanceProps` spread does not leak onto the underlying `ToolsPanelItem`; the inherited treatment is applied via `className`.
- * @param {boolean}                   props.hasLocalOverride                  Local override is set.
- * @param {import('react').ReactNode} props.label                             Control label.
- * @param {?Function}                 props.onDeselect                        Reset handler.
- * @param {boolean}                   [props.showLocalOverrideActionsInLabel] Render the reset dot here (default true).
- * @param {boolean}                   [props.hasInlineEndToggle]              The control renders a 24x24 toggle (linked/unlink, units switch) at its inline-end; offset the reset dot to sit just to its inline-start (default false).
- * @param {import('react').ReactNode} props.children                          The control.
- *
- * @return {Element} The panel item.
+ * @return The panel item.
  */
 export function InheritanceToolsPanelItem( {
 	className,
@@ -173,7 +169,7 @@ export function InheritanceToolsPanelItem( {
 	hasInlineEndToggle = false,
 	children,
 	...rest
-} ) {
+}: InheritanceToolsPanelItemProps ) {
 	const showResetAffordance =
 		hasLocalOverride && showLocalOverrideActionsInLabel;
 

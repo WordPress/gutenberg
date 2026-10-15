@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
@@ -138,8 +139,12 @@ describe( 'getInheritanceProps', () => {
 } );
 
 describe( 'InheritanceToolsPanelItem inherited state', () => {
-	async function renderInheritedItem( label, labelClassName ) {
+	async function renderInheritedItem(
+		label: string,
+		labelClassName: string
+	) {
 		return await render(
+			// @ts-expect-error The test omits `resetAll`, which these items never call.
 			<ToolsPanel label="Panel" panelId="panel">
 				<InheritanceToolsPanelItem
 					{ ...getInheritanceProps( true, false ) }
@@ -187,8 +192,11 @@ describe( 'InheritanceToolsPanelItem inherited state', () => {
 } );
 
 describe( 'InheritanceToolsPanelItem local-override reset dot', () => {
-	async function renderItem( props ) {
+	async function renderItem(
+		props: Partial< ComponentProps< typeof InheritanceToolsPanelItem > >
+	) {
 		return await render(
+			// @ts-expect-error The test omits `resetAll`, which these items never call.
 			<ToolsPanel label="Panel" panelId="panel">
 				<InheritanceToolsPanelItem
 					label="Line height"

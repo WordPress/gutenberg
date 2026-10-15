@@ -25,6 +25,7 @@ export const storeConfig = {
  */
 export const store = createReduxStore( STORE_NAME, {
 	...storeConfig,
+	// @ts-expect-error `persist` is a persistence plugin option `ReduxStoreConfig` omits.
 	persist: [ 'preferences' ],
 } );
 
