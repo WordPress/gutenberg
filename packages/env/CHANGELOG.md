@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a `mariadbVersion` option and `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the Docker runtime, including versions older than 10.4 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Explain why `wp-env start` fails when a database was last used by a newer MariaDB version, which MariaDB cannot downgrade from ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Make `wp db` commands, and so `wp-env reset`, work with a `mariadbVersion` older than 11.4. The MariaDB client in the CLI image requires TLS, which those servers do not offer, so the CLI image now runs the client without verifying the server certificate, as WP-CLI does from db-command 3.0 ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+
 ### Bug Fixes
 
+-   Reject a `phpVersion` or `WP_ENV_PHP_VERSION` that is not only a version number, such as `8.2-apache` or `abc8`, instead of failing later because the Docker image does not exist ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
 -   Point the apt sources of the bullseye-based WordPress images (PHP 7.4 and 8.0) at `archive.debian.org`, so building them no longer fails now that Debian 11 has reached end-of-life and left the regular mirrors ([#82478](https://github.com/WordPress/gutenberg/pull/82478)).
 
 ## 11.11.0 (2026-07-14)
