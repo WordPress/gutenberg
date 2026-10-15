@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   `createNotice`: Accept a `detail` option, holding a fuller account of what went wrong as plain text for when the message cannot say everything a developer needs. It reaches the rendered notice, where it sits behind a disclosure and is offered for copying together with the message ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+-   `InlineNotices`: Render notices with the `@wordpress/ui` `Notice`. The markup changes: the `.components-notice*` classes are gone, each notice has the `notices-inline-notices__notice` class, and each list has the `notices-inline-notices__list` class. Each notice still announces its message when it is created ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 
 ### Bug Fixes
 
