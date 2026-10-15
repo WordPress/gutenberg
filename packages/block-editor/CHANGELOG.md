@@ -24,6 +24,7 @@
 
 ### Bug Fixes
 
+-   List View: Keep the nesting drag-and-drop gesture when the block is dragged downward, so dropping on the bottom half of the next block with a rightward offset nests it there instead of dropping it as a sibling ([#84856](https://github.com/WordPress/gutenberg/pull/84856)).
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
 -   Inserter: Only show the block-section separator when both sections contain blocks, avoiding a double border above the tip ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
