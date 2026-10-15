@@ -1532,4 +1532,35 @@ test.describe( 'Synced pattern - read-only access', () => {
 
 		await context.close();
 	} );
+
+	test( 'can be inserted by a user who cannot edit it', async ( {
+		browser,
+		requestUtils,
+	} ) => {
+		const { page, context } = await openAsAuthor(
+			browser,
+			requestUtils,
+			'/wp-admin/post-new.php'
+		);
+		const editor = new Editor( { page } );
+
+		await page
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+			.click();
+		await page
+			.getByRole( 'searchbox', { name: 'Search' } )
+			.fill( 'Administrator pattern' );
+		await page
+			.getByRole( 'listbox', { name: 'Patterns' } )
+			.getByRole( 'option', { name: 'Administrator pattern' } )
+			.click();
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Pattern' } )
+				.getByText( 'Read-only pattern content' )
+		).toBeVisible();
+
+		await context.close();
+	} );
 } );
