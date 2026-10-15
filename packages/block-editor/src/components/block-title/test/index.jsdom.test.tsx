@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import BlockTitle from '../';
 
-const blockTypeMap = {
+const blockTypeMap: Record< string, { title: string } | null > = {
 	'name-not-exists': null,
 	'name-exists': { title: 'Block Title' },
 	'name-with-label': { title: 'Block With Label' },
@@ -12,7 +13,7 @@ const blockTypeMap = {
 	'reusable-block': { title: 'Reusable Block' },
 };
 
-const blockLabelMap = {
+const blockLabelMap: Record< string, string > = {
 	'Block With Label': 'Test Label',
 	'Block With Long Label':
 		'This is a longer label than typical for blocks to have.',
@@ -24,12 +25,13 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 	const actualImplementation = await importOriginal();
 	return {
 		...actualImplementation,
-		isReusableBlock( { title } ) {
+		// The mocks only read the block type's title.
+		isReusableBlock: ( ( { title }: { title: string } ) => {
 			return title === 'Reusable Block';
-		},
-		__experimentalGetBlockLabel( { title } ) {
+		} ) as typeof actualImplementation.isReusableBlock,
+		__experimentalGetBlockLabel: ( ( { title }: { title: string } ) => {
 			return blockLabelMap[ title ] || title;
-		},
+		} ) as typeof actualImplementation.__experimentalGetBlockLabel,
 	};
 } );
 
@@ -41,15 +43,18 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 
 describe( 'BlockTitle', () => {
 	it( 'renders nothing if name is falsey', () => {
-		useSelect.mockImplementation( () => null );
+		( useSelect as Mock ).mockImplementation( () => null );
 
-		const { container } = render( <BlockTitle /> );
+		const { container } = render(
+			// @ts-expect-error The missing `clientId` is deliberate.
+			<BlockTitle />
+		);
 
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
 	it( 'renders nothing if block type does not exist', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'name-not-exists',
 				getBlockType: () => null,
@@ -64,10 +69,10 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'renders title if block type exists', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'name-exists',
-				getBlockType: ( name ) => blockTypeMap[ name ],
+				getBlockType: ( name: string ) => blockTypeMap[ name ],
 				getBlockAttributes: () => null,
 				getActiveBlockVariation: () => null,
 			} ) )
@@ -79,10 +84,10 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'renders label if it is set', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'name-with-label',
-				getBlockType: ( name ) => blockTypeMap[ name ],
+				getBlockType: ( name: string ) => blockTypeMap[ name ],
 				getBlockAttributes: () => null,
 			} ) )
 		);
@@ -93,10 +98,10 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'should prioritize reusable block title over title', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'reusable-block',
-				getBlockType: ( name ) => blockTypeMap[ name ],
+				getBlockType: ( name: string ) => blockTypeMap[ name ],
 				getBlockAttributes: () => ( { ref: 1 } ),
 			} ) )
 		);
@@ -108,10 +113,10 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'should prioritize block label over title', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'name-with-custom-label',
-				getBlockType: ( name ) => blockTypeMap[ name ],
+				getBlockType: ( name: string ) => blockTypeMap[ name ],
 				getBlockAttributes: () => null,
 			} ) )
 		);
@@ -125,10 +130,10 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'should default to block variation title if no reusable title or block name is available', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'name-exists',
-				getBlockType: ( name ) => blockTypeMap[ name ],
+				getBlockType: ( name: string ) => blockTypeMap[ name ],
 				getBlockAttributes: () => null,
 				getActiveBlockVariation: () => ( {
 					title: 'Block Variation Label',
@@ -142,10 +147,10 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'truncates the label with custom truncate length', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'name-with-long-label',
-				getBlockType: ( name ) => blockTypeMap[ name ],
+				getBlockType: ( name: string ) => blockTypeMap[ name ],
 				getBlockAttributes: () => null,
 			} ) )
 		);
@@ -161,10 +166,10 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'should not truncate the label if maximum length is undefined', () => {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getBlockName: () => 'name-with-long-label',
-				getBlockType: ( name ) => blockTypeMap[ name ],
+				getBlockType: ( name: string ) => blockTypeMap[ name ],
 				getBlockAttributes: () => null,
 			} ) )
 		);
