@@ -253,7 +253,6 @@ function ManualGridVisualizer( {
 									gridClientId={ gridClientId }
 									gridElement={ gridElement }
 									gridInfo={ gridInfo }
-									occupiedRects={ occupiedRects }
 								/>
 							) }
 						</GridVisualizerCell>
@@ -264,7 +263,6 @@ function ManualGridVisualizer( {
 				gridClientId={ gridClientId }
 				gridElement={ gridElement }
 				gridInfo={ gridInfo }
-				occupiedRects={ occupiedRects }
 			/>
 			<GridVisualizerDropLayer
 				gridClientId={ gridClientId }
@@ -683,7 +681,6 @@ function GridVisualizerAppender( {
 	gridClientId,
 	gridElement,
 	gridInfo,
-	occupiedRects,
 	isInitiallyOpen = false,
 	onClose,
 } ) {
@@ -724,7 +721,8 @@ function GridVisualizerAppender( {
 					return;
 				}
 				// Cells can be too small for the block to show its
-				// placeholder, so it gets more of them if they're free.
+				// placeholder, so it gets more of them, even if that covers
+				// other blocks.
 				const rect = getMinimumInsertionRect( {
 					rect: new GridRect( {
 						columnStart: column,
@@ -733,7 +731,6 @@ function GridVisualizerAppender( {
 						rowSpan,
 					} ),
 					...getGridTrackPositions( gridElement ),
-					occupiedRects,
 				} );
 				updateBlockAttributes( block.clientId, {
 					style: getInsertedChildLayoutStyle(
@@ -766,17 +763,11 @@ function GridVisualizerAppender( {
  * inserter for the one cell, as before.
  *
  * @param {Object}      props
- * @param {string}      props.gridClientId  Client ID of the grid block.
- * @param {HTMLElement} props.gridElement   The grid element in the canvas.
- * @param {Object}      props.gridInfo      Grid info, from `getGridInfo`.
- * @param {GridRect[]}  props.occupiedRects The cells the grid's blocks cover.
+ * @param {string}      props.gridClientId Client ID of the grid block.
+ * @param {HTMLElement} props.gridElement  The grid element in the canvas.
+ * @param {Object}      props.gridInfo     Grid info, from `getGridInfo`.
  */
-function GridVisualizerMarquee( {
-	gridClientId,
-	gridElement,
-	gridInfo,
-	occupiedRects,
-} ) {
+function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 	const anchorRef = useRef();
 	const [ marquee, setMarquee ] = useState( null );
 
@@ -973,7 +964,6 @@ function GridVisualizerMarquee( {
 							gridClientId={ gridClientId }
 							gridElement={ gridElement }
 							gridInfo={ gridInfo }
-							occupiedRects={ occupiedRects }
 							isInitiallyOpen
 							onClose={ () => setMarquee( null ) }
 						/>
