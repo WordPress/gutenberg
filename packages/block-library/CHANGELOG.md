@@ -12,6 +12,7 @@
 -   Icon: Speed up loading icons in the icon library ([#84327](https://github.com/WordPress/gutenberg/pull/84327)).
 -   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#84308](https://github.com/WordPress/gutenberg/pull/84308)).
 -   Cover: Stop an uploaded background video on the front end when the visitor prefers reduced motion ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
+-   List Item: Keep the `value` attribute on `<li>` elements and add an "Custom number" setting in ordered lists, so a custom item number is no longer lost when a list is edited or migrated ([#47286](https://github.com/WordPress/gutenberg/issues/47286)).
 
 ### Bug Fixes
 

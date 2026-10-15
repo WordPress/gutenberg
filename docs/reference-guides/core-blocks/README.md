@@ -452,7 +452,7 @@ An individual item within a list.
 -	**Parent:** core/list
 -	**Allowed Blocks:** core/list
 -	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, gradients, link, text), interactivity (clientNavigation), shadow, spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~, ~~html~~
--	**Attributes:** content, placeholder
+-	**Attributes:** content, placeholder, value
 
 ## Login/out
 

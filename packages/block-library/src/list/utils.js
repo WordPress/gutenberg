@@ -29,11 +29,13 @@ export function createListBlockFromDOMElement( listElement ) {
 			children.reverse();
 			const [ nestedList, ...nodes ] = children;
 
+			const value = listItem.getAttribute( 'value' ) ?? undefined;
 			const hasNestedList =
 				nestedList?.tagName === 'UL' || nestedList?.tagName === 'OL';
 			if ( ! hasNestedList ) {
 				return createBlock( 'core/list-item', {
 					content: listItem.innerHTML,
+					value,
 				} );
 			}
 			const htmlNodes = nodes.map( ( node ) => {
@@ -45,6 +47,7 @@ export function createListBlockFromDOMElement( listElement ) {
 			htmlNodes.reverse();
 			const childAttributes = {
 				content: htmlNodes.join( '' ).trim(),
+				value,
 			};
 			const childInnerBlocks = [
 				createListBlockFromDOMElement( nestedList ),
