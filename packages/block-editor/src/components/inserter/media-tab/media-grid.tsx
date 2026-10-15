@@ -3,7 +3,7 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { DataViews } from '@wordpress/dataviews';
 import type { Action, Field, View } from '@wordpress/dataviews';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { Stack, Tabs } from '@wordpress/ui';
 import InserterDraggableBlocks from '../../inserter-draggable-blocks';
 import MediaSearch from './media-search';
@@ -13,9 +13,10 @@ import type { MediaItem, MediaType } from './types';
 type MediaGridProps = {
 	// Results.
 	/**
-	 * The items for the current page, or `undefined` before the first fetch.
+	 * The items for the current page. Empty until the requested source
+	 * resolves, so the previous source's items never show under a new tab.
 	 */
-	mediaList?: MediaItem[];
+	mediaList: MediaItem[];
 	isLoading: boolean;
 	totalItems?: number;
 	totalPages?: number;
@@ -69,7 +70,6 @@ type MediaGridProps = {
 	footer?: ReactNode;
 };
 
-const EMPTY_ARRAY: MediaItem[] = [];
 // A 120px minimum gives two columns at the inserter's width (the grid derives
 // its column count from the container width and this size).
 const GRID_LAYOUT = {
@@ -112,7 +112,7 @@ function MediaGridPreview( {
 					{ preview }
 					{ isInserting && (
 						<div className="block-editor-inserter__media-grid__spinner">
-							<Spinner />
+							<WCSpinner />
 						</div>
 					) }
 				</div>
@@ -250,14 +250,12 @@ export default function MediaGrid( {
 
 	return (
 		<DataViews
-			data={ mediaList ?? EMPTY_ARRAY }
+			data={ mediaList }
 			fields={ fields }
 			view={ view }
 			onChangeView={ onChangeView }
 			actions={ actions }
-			// Until the first fetch resolves there is nothing to show, so
-			// count that as loading rather than as an empty result.
-			isLoading={ isLoading || mediaList === undefined }
+			isLoading={ isLoading }
 			paginationInfo={ paginationInfo }
 			defaultLayouts={ DEFAULT_LAYOUTS }
 			getItemId={ getItemId }

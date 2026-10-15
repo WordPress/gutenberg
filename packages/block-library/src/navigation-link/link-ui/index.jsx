@@ -13,7 +13,8 @@ import {
 	useEffect,
 	forwardRef,
 } from '@wordpress/element';
-import { useResourcePermissions } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -112,10 +113,6 @@ function UnforwardedLinkUI( props, ref ) {
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
 	const addBlockButtonRef = useRef();
-	const permissions = useResourcePermissions( {
-		kind: 'postType',
-		name: postType,
-	} );
 
 	// Use the entity binding hook to get binding status
 	const { isBoundEntityAvailable } = useEntityBinding( {
@@ -193,6 +190,19 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const blockEditingMode = useBlockEditingMode();
 	const canAddBlock = blockEditingMode !== 'disabled';
+	const canAddPage = useSelect(
+		( select ) => {
+			if ( ! canAddBlock || type !== 'page' ) {
+				return false;
+			}
+
+			return !! select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'page',
+			} );
+		},
+		[ canAddBlock, type ]
+	);
 
 	// Blocks are listed in the search results only when the "Add block"
 	// button would be shown: the link has no URL yet and the block is not
@@ -275,11 +285,7 @@ function UnforwardedLinkUI( props, ref ) {
 									setAddingPage={ () => {
 										setAddingPage( true );
 									} }
-									canAddPage={
-										blockEditingMode !== 'disabled' &&
-										permissions?.canCreate &&
-										type === 'page'
-									}
+									canAddPage={ canAddPage }
 									canAddBlock={ canAddBlock }
 								/>
 							);
