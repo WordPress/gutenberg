@@ -1,6 +1,6 @@
 import type { ElementType, ReactNode, RefObject } from 'react';
 import type { createSlotFill } from '@wordpress/components';
-import type { ResetAllFilter } from '../../hooks/types';
+import type { ResetAllContext, ResetAllFilter } from '../../hooks/types';
 
 /**
  * A slot and fill pair.
@@ -43,15 +43,6 @@ export interface BlockSupportSlotContainerProps {
 		[ prop: string ]: unknown;
 	};
 	[ prop: string ]: unknown;
-}
-
-/**
- * The block a reset-all filter resets.
- */
-export interface ResetAllContext {
-	attributes: Record< string, unknown >;
-	clientId: string;
-	name: string | null;
 }
 
 /**
