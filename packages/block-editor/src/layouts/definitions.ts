@@ -1,8 +1,10 @@
+import type { LayoutDefinition } from './types';
+
 // Layout definitions keyed by layout type.
 // Provides a common definition of slugs, classnames, base styles, and spacing styles for each layout type.
 // If making changes or additions to layout definitions, be sure to update the corresponding PHP definitions in
 // `block-supports/layout.php` so that the server-side and client-side definitions match.
-export const LAYOUT_DEFINITIONS = {
+export const LAYOUT_DEFINITIONS: Record< string, LayoutDefinition > = {
 	default: {
 		name: 'default',
 		slug: 'flow',

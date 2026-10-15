@@ -4,21 +4,22 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
 import { unlock } from '../../lock-unlock';
+import type { StyleSettings } from './types';
 
 /**
  * React hook that overrides a global settings object with block and element specific settings.
  *
- * @param {Object}     parentSettings Settings object.
- * @param {blockName?} blockName      Block name.
- * @param {element?}   element        Element name.
+ * @param parentSettings Settings object.
+ * @param blockName      Block name.
+ * @param element        Element name.
  *
- * @return {Object} Merge of settings and supports.
+ * @return Merge of settings and supports.
  */
 export function useSettingsForBlockElement(
-	parentSettings,
-	blockName,
-	element
-) {
+	parentSettings: StyleSettings,
+	blockName?: string,
+	element?: string
+): StyleSettings {
 	const { supportedStyles, supports } = useSelect(
 		( select ) => {
 			return {
@@ -26,14 +27,15 @@ export function useSettingsForBlockElement(
 					select( blocksStore )
 				).getSupportedStyles( blockName, element ),
 				supports:
-					select( blocksStore ).getBlockType( blockName )?.supports,
+					// The root Global Styles screens pass no name, which finds no type.
+					select( blocksStore ).getBlockType( blockName! )?.supports,
 			};
 		},
 		[ blockName, element ]
 	);
 
 	return useMemo( () => {
-		const updatedSettings = { ...parentSettings };
+		const updatedSettings: StyleSettings = { ...parentSettings };
 
 		if ( ! supportedStyles.includes( 'fontSize' ) ) {
 			updatedSettings.typography = {
@@ -138,7 +140,7 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'padding', 'margin', 'blockGap' ].forEach( ( key ) => {
+		( [ 'padding', 'margin', 'blockGap' ] as const ).forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
@@ -146,9 +148,13 @@ export function useSettingsForBlockElement(
 				};
 			}
 
+			// A boolean support has no `sides`, so it reads as undefined.
 			const sides = Array.isArray( supports?.spacing?.[ key ] )
 				? supports?.spacing?.[ key ]
-				: supports?.spacing?.[ key ]?.sides;
+				: (
+						supports?.spacing?.[ key ] as
+							{ sides?: string[] } | undefined
+					 )?.sides;
 			// Check if spacing type is supported before adding sides.
 			if ( sides?.length && updatedSettings.spacing?.[ key ] ) {
 				updatedSettings.spacing = {
@@ -219,7 +225,7 @@ export function useSettingsForBlockElement(
 	}, [ parentSettings, supportedStyles, supports ] );
 }
 
-export function useColorsPerOrigin( settings ) {
+export function useColorsPerOrigin( settings: StyleSettings | undefined ) {
 	const customColors = settings?.color?.palette?.custom;
 	const themeColors = settings?.color?.palette?.theme;
 	const defaultColors = settings?.color?.palette?.default;
@@ -267,7 +273,7 @@ export function useColorsPerOrigin( settings ) {
 	] );
 }
 
-export function useGradientsPerOrigin( settings ) {
+export function useGradientsPerOrigin( settings: StyleSettings | undefined ) {
 	const customGradients = settings?.color?.gradients?.custom;
 	const themeGradients = settings?.color?.gradients?.theme;
 	const defaultGradients = settings?.color?.gradients?.default;
@@ -320,11 +326,13 @@ export function useGradientsPerOrigin( settings ) {
  * the Color, Background, and Typography style panels, so the common preamble
  * is defined once rather than repeated in each panel.
  *
- * @param {Object} settings Style settings object.
+ * @param settings Style settings object.
  *
- * @return {Object} Shared color/gradient palette data and helpers.
+ * @return Shared color/gradient palette data and helpers.
  */
-export function useColorGradientSettings( settings ) {
+export function useColorGradientSettings(
+	settings: StyleSettings | undefined
+) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	const areCustomSolidsEnabled = settings?.color?.custom;
@@ -333,13 +341,13 @@ export function useColorGradientSettings( settings ) {
 		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
 		[ colors ]
 	);
-	const decodeValue = ( rawValue ) =>
+	const decodeValue = ( rawValue: string ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	// When a slug is provided it is used directly: two presets can share the
 	// same gradient string, and matching by string alone would collapse them
 	// onto whichever entry appears first. Without a slug, fall back to
 	// matching the gradient string against the presets.
-	const encodeGradientValue = ( gradientValue, slug ) => {
+	const encodeGradientValue = ( gradientValue: string, slug?: string ) => {
 		if ( slug ) {
 			return 'var:preset|gradient|' + slug;
 		}

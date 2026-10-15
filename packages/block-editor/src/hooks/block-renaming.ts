@@ -1,14 +1,16 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
+import type { BlockMetadata } from './types';
 
 /**
  * Filters registered block settings, adding an `__experimentalLabel` callback if one does not already exist.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-export function addLabelCallback( settings ) {
+export function addLabelCallback( settings: BlockType ): BlockType {
 	// If blocks provide their own label callback, do not override it.
 	if ( settings.__experimentalLabel ) {
 		return settings;
@@ -22,8 +24,12 @@ export function addLabelCallback( settings ) {
 
 	// Check whether block metadata is supported before using it.
 	if ( supportsBlockNaming ) {
-		settings.__experimentalLabel = ( attributes, { context } ) => {
-			const { metadata } = attributes;
+		settings.__experimentalLabel = (
+			attributes,
+			{ context }
+		): string | void => {
+			// Block attributes are not validated against a schema.
+			const { metadata } = attributes as { metadata?: BlockMetadata };
 
 			// In the list view and breadcrumb, use the block's name attribute as the label.
 			if (

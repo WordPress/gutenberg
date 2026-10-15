@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { useSettingsForBlockElement } from '../hooks';
+import type { StyleSettings } from '../types';
 
 describe( 'useSettingsForBlockElement background clip', () => {
 	const WITH_CLIP = 'test/with-clip';
@@ -12,12 +13,14 @@ describe( 'useSettingsForBlockElement background clip', () => {
 			apiVersion: 3,
 			title: 'With clip',
 			category: 'text',
+			attributes: {},
 			supports: { background: { gradient: true, backgroundClip: true } },
 		} );
 		registerBlockType( WITHOUT_CLIP, {
 			apiVersion: 3,
 			title: 'Without clip',
 			category: 'text',
+			attributes: {},
 			supports: { background: { gradient: true } },
 		} );
 	} );
@@ -27,7 +30,7 @@ describe( 'useSettingsForBlockElement background clip', () => {
 		unregisterBlockType( WITHOUT_CLIP );
 	} );
 
-	const getClipSetting = ( settings, blockName ) =>
+	const getClipSetting = ( settings: StyleSettings, blockName?: string ) =>
 		renderHook( () => useSettingsForBlockElement( settings, blockName ) )
 			.result.current.background?.backgroundClip;
 

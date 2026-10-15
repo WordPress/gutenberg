@@ -1,17 +1,21 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport, getBlockDefaultClassName } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 
 /**
  * Override props assigned to save component to inject generated className if
  * block supports it. This is only applied if the block's save result is an
  * element and not a markup string.
  *
- * @param {Object} extraProps Additional props applied to save element.
- * @param {Object} blockType  Block type.
+ * @param extraProps Additional props applied to save element.
+ * @param blockType  Block type.
  *
- * @return {Object} Filtered props applied to save element.
+ * @return Filtered props applied to save element.
  */
-export function addGeneratedClassName( extraProps, blockType ) {
+export function addGeneratedClassName(
+	extraProps: Record< string, unknown >,
+	blockType: BlockType
+): Record< string, unknown > {
 	// Adding the generated className.
 	if ( hasBlockSupport( blockType, 'className', true ) ) {
 		if ( typeof extraProps.className === 'string' ) {
