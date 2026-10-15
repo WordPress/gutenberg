@@ -181,8 +181,8 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 	}
 
 	/**
-	 * A route of the extensible site editor preloads the fields of the post
-	 * types its screen shows.
+	 * A route of the extensible site editor, or of the media editor page,
+	 * preloads the fields of the post types its screen shows.
 	 *
 	 * @dataProvider data_routes_and_their_post_types
 	 *
@@ -216,6 +216,7 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 			'pattern list'          => array( '/patterns/list/user', array( 'wp_block' ) ),
 			'navigation'            => array( '/navigation', array( 'wp_navigation' ) ),
 			'navigation list'       => array( '/navigation/list', array( 'wp_navigation' ) ),
+			'media editor'          => array( '/media-editor/12', array( 'attachment' ) ),
 			'home'                  => array( '/', array() ),
 			'styles'                => array( '/styles', array() ),
 			'a post type-less type' => array( '/types', array() ),

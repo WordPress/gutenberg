@@ -105,11 +105,11 @@ add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fi
  * from its `p` query arg.
  *
  * The routes are the entry points in /routes whose screens make up the
- * extensible site editor. A route that shows no post fields, such as
- * `/styles`, contributes no post type. The paths without a screen of their
- * own (`/templates`, `/patterns`, `/types/<post type>`, …) redirect
- * client-side to their list route, and are what the menu items of the page
- * link to, so they preload what the list they land on needs.
+ * extensible site editor and the media editor page. A route that shows no
+ * post fields, such as `/styles`, contributes no post type. The paths without
+ * a screen of their own (`/templates`, `/patterns`, `/types/<post type>`, …)
+ * redirect client-side to their list route, and are what the menu items of
+ * the page link to, so they preload what the list they land on needs.
  *
  * @return string[] The post types, empty for any other route.
  */
@@ -133,6 +133,8 @@ function _gutenberg_get_route_post_types() {
 			return array( 'wp_block' );
 		case 'navigation':
 			return array( 'wp_navigation' );
+		case 'media-editor':
+			return array( 'attachment' );
 	}
 	return array();
 }
@@ -175,3 +177,4 @@ function _gutenberg_preload_route_entity_fields() {
 	);
 }
 add_action( 'site-editor-v2_init', '_gutenberg_preload_route_entity_fields' );
+add_action( 'media-editor-wp-admin_init', '_gutenberg_preload_route_entity_fields' );
