@@ -32,11 +32,12 @@
 		.has-color::after {
 			content: "";
 			position: absolute;
-			/* Match the outer border edge of the root's padding-box containing block. */
+			/* Paint inside the root's border box, leaving outer focus rings separate. */
 			inset: calc(-1 * var(--wpds-border-width-xs));
 			border-radius: inherit;
-			outline: var(--wpds-border-width-focus) solid var(--_wp-ui-avatar-color);
-			outline-offset: var(--wpds-border-width-focus);
+			border:
+				var(--wpds-border-width-focus) solid
+				var(--_wp-ui-avatar-color);
 			pointer-events: none;
 		}
 
