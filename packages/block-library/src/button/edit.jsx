@@ -7,7 +7,14 @@ import {
 	useMemo,
 	createInterpolateElement,
 } from '@wordpress/element';
-import { TextControl, ToolbarButton, Popover } from '@wordpress/components';
+import {
+	Button,
+	TextControl,
+	ToolbarButton,
+	Popover,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import {
 	BlockControls,
 	InspectorControls,
@@ -28,7 +35,9 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
-import { link } from '@wordpress/icons';
+import { external, link } from '@wordpress/icons';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	createBlock,
 	cloneBlock,
@@ -41,15 +50,19 @@ import {
 	privateApis as composePrivateApis,
 } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Link } from '@wordpress/ui';
+import { CheckboxControl, Link } from '@wordpress/ui';
 import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { useLinkPreview } from '../navigation-link/shared/use-link-preview';
 import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
-const { HTMLElementControl } = unlock( blockEditorPrivateApis );
+const { HTMLElementControl, LinkPicker, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [
@@ -121,6 +134,129 @@ function useEnter( clientId ) {
 			true
 		);
 	}, [] );
+}
+
+/**
+ * The content controls shown in the block inspector's Content tab and in the
+ * List View popover, mirroring the Navigation Link block's panel.
+ *
+ * @param {Object}                         props
+ * @param {Object}                         props.attributes     Block attributes.
+ * @param {( attributes: Object ) => void} props.setAttributes  Updates block attributes.
+ * @param {boolean}                        props.isLinkEditable Whether the link fields are shown.
+ */
+function ContentControls( { attributes, setAttributes, isLinkEditable } ) {
+	const { text, url, rel, linkTarget } = attributes;
+	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
+	const nofollow = !! rel?.includes( NOFOLLOW_REL );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	const homeUrl = useSelect(
+		( select ) =>
+			select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+				?.home,
+		[]
+	);
+	const preview = useLinkPreview( { url } );
+
+	// Hash links and relative paths other than site-root paths can't be
+	// opened on their own.
+	const isViewableUrl =
+		!! url &&
+		( ! isHashLink( url ) ||
+			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
+	const viewUrl =
+		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
+
+	const setLink = ( changes ) =>
+		setAttributes(
+			getUpdatedLinkAttributes( {
+				rel,
+				url,
+				opensInNewTab,
+				nofollow,
+				...changes,
+			} )
+		);
+
+	return (
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () =>
+				setAttributes( {
+					text: '',
+					url: undefined,
+					linkTarget: undefined,
+					rel: undefined,
+				} )
+			}
+			dropdownMenuProps={ dropdownMenuProps }
+		>
+			<ToolsPanelItem
+				hasValue={ () => !! text?.length }
+				label={ __( 'Text' ) }
+				onDeselect={ () => setAttributes( { text: '' } ) }
+				isShownByDefault
+			>
+				<TextControl
+					label={ __( 'Text' ) }
+					value={ text ? stripHTML( text.toString() ) : '' }
+					onChange={ ( value ) => setAttributes( { text: value } ) }
+					autoComplete="off"
+				/>
+			</ToolsPanelItem>
+			{ isLinkEditable && (
+				<>
+					<ToolsPanelItem
+						hasValue={ () => !! url }
+						label={ __( 'Link to' ) }
+						onDeselect={ () =>
+							setAttributes( {
+								url: undefined,
+								linkTarget: undefined,
+								rel: undefined,
+							} )
+						}
+						isShownByDefault
+					>
+						<LinkPicker
+							preview={ preview }
+							onSelect={ ( { url: newUrl } ) =>
+								setLink( { url: newUrl } )
+							}
+							label={ __( 'Link to' ) }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						hasValue={ () => opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () => setLink( { opensInNewTab: false } ) }
+						isShownByDefault
+					>
+						<CheckboxControl
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onCheckedChange={ ( value ) =>
+								setLink( { opensInNewTab: value } )
+							}
+						/>
+					</ToolsPanelItem>
+					{ isViewableUrl && (
+						<Button
+							variant="secondary"
+							href={ viewUrl }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+							className="navigation-link-to__action-button"
+						>
+							{ __( 'View' ) }
+						</Button>
+					) }
+				</>
+			) }
+		</ToolsPanel>
+	);
 }
 
 function ButtonEdit( props ) {
@@ -429,6 +565,15 @@ function ButtonEdit( props ) {
 						createSuggestionButtonText={ createButtonText }
 					/>
 				</Popover>
+			) }
+			{ blockEditingMode === 'contentOnly' && (
+				<InspectorControls group="content">
+					<ContentControls
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						isLinkEditable={ isLinkTag && ! lockUrlControls }
+					/>
+				</InspectorControls>
 			) }
 			<InspectorControls group="advanced">
 				<HTMLElementControl
