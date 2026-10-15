@@ -848,10 +848,11 @@ export function usePickNote( { drafts, onDiscard } ) {
  * Focuses the selected note's thread when the selection asks for it. Lives
  * with the threads' DOM: the sidebar ref is only set once they render.
  *
- * @param {Object} props
- * @param {Object} props.sidebarRef Ref to the sidebar element.
+ * @param {Object}  props
+ * @param {Object}  props.sidebarRef Ref to the sidebar element.
+ * @param {boolean} props.isPlaced   Whether the selected thread is positioned; focusing it earlier scrolls the canvas to the top.
  */
-export function useNoteFocus( { sidebarRef } ) {
+export function useNoteFocus( { sidebarRef, isPlaced } ) {
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const { selectedNote, noteFocused } = useSelect( ( select ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
@@ -864,7 +865,7 @@ export function useNoteFocus( { sidebarRef } ) {
 	}, [] );
 
 	useEffect( () => {
-		if ( ! noteFocused || ! selectedNote ) {
+		if ( ! noteFocused || ! selectedNote || ! isPlaced ) {
 			return;
 		}
 		focusNoteThread(
@@ -874,7 +875,7 @@ export function useNoteFocus( { sidebarRef } ) {
 		);
 		// Re-select without the flag so the focus happens once.
 		selectNote( selectedNote );
-	}, [ noteFocused, selectedNote, selectNote, sidebarRef ] );
+	}, [ noteFocused, selectedNote, isPlaced, selectNote, sidebarRef ] );
 }
 
 const subscribeNoop = () => () => {};

@@ -172,10 +172,10 @@ describe( 'Breadcrumb hierarchy selection', () => {
 			await render( <SelectionTrail focusEditor={ focusEditor } /> );
 			await userEvent.tab();
 			await userEvent.keyboard( '{Enter}' );
-			const group = page.getByRole( 'group', {
+			const list = page.getByRole( 'list', {
 				name: 'Block hierarchy',
 			} );
-			await expect.element( group ).toBeVisible();
+			await expect.element( list ).toBeVisible();
 			await expect
 				.element( page.getByRole( 'navigation' ) )
 				.not.toBeInTheDocument();
@@ -237,7 +237,7 @@ describe( 'Breadcrumb hierarchy selection', () => {
 				.not.toBeInTheDocument();
 			await expect
 				.element(
-					page.getByRole( 'group', { name: 'Block hierarchy' } )
+					page.getByRole( 'list', { name: 'Block hierarchy' } )
 				)
 				.toBeVisible();
 			const focusTarget = focusEditor
@@ -351,7 +351,7 @@ describe( 'Breadcrumb hierarchy selection', () => {
 			.toHaveFocus();
 	} );
 
-	it( 'preserves group semantics when resize collapses every ancestor and transfers focus to overflow', async () => {
+	it( 'preserves list semantics when resize collapses every ancestor and transfers focus to overflow', async () => {
 		const view = await render( <SelectionTrail keepSelection /> );
 		await userEvent.tab();
 		await view.rerender( <SelectionTrail width={ 80 } keepSelection /> );
@@ -360,7 +360,7 @@ describe( 'Breadcrumb hierarchy selection', () => {
 		} );
 		await expect.element( trigger ).toHaveFocus();
 		await expect
-			.element( page.getByRole( 'group', { name: 'Block hierarchy' } ) )
+			.element( page.getByRole( 'list', { name: 'Block hierarchy' } ) )
 			.toBeVisible();
 		await expect
 			.element( page.getByRole( 'navigation' ) )

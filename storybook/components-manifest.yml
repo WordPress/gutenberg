@@ -181,7 +181,6 @@
 - name: BaseControl
   props:
       - __nextHasNoMarginBottom
-      - as
       - children
       - className
       - help

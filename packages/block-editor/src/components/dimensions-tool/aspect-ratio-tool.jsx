@@ -1,4 +1,4 @@
-import { SelectControl as WCSelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
@@ -100,11 +100,17 @@ export default function AspectRatioTool( {
 			isShownByDefault={ isShownByDefault }
 			panelId={ panelId }
 		>
-			<WCSelectControl
+			<SelectControl
 				label={ __( 'Aspect ratio' ) }
-				value={ displayValue }
-				options={ resolvedOptions }
-				onChange={ onChange }
+				value={
+					resolvedOptions.find(
+						( item ) => item.value === displayValue
+					) ??
+					resolvedOptions.find( ( item ) => ! item.disabled ) ??
+					null
+				}
+				items={ resolvedOptions.filter( ( item ) => ! item.hidden ) }
+				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
 			/>
 		</InheritanceToolsPanelItem>
 	);

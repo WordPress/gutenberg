@@ -10,11 +10,22 @@
 
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Notes: Show a dot on the "All notes" toolbar toggle when unresolved notes have activity you have not seen. Your own notes never count, and opening the sidebar or selecting a thread clears it. Opening "All notes" highlights the threads that were unseen, with their replies expanded, until they scroll into view ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
+-   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 
 ### Bug Fixes
 
+-   `PostTaxonomiesFlatTermSelector`: Pressing Enter adds the typed terms, and comma-separated names are added as separate terms ([#84601](https://github.com/WordPress/gutenberg/pull/84601)).
+-   Notes: Keep the canvas from scrolling to the top when adding a floating note on a scrolled post ([#84639](https://github.com/WordPress/gutenberg/pull/84639)).
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+-   `PostPanelRow`: Wrap long unbroken values (such as an author name or email) inside the row instead of overflowing the Post sidebar ([#84165](https://github.com/WordPress/gutenberg/pull/84165)).
+-   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
+-   Notes: Stop announcing the "Add note" block menu item as opening a dialog ([#84818](https://github.com/WordPress/gutenberg/pull/84818)).
+-   `EditorProvider`: Keep a preview canvas from restoring a block selection written to the entity by another editor, such as the site editor's navigation sidebar ([#84832](https://github.com/WordPress/gutenberg/pull/84832)).
+
+### Internal
+
+-   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 
 ## 15.2.0 (2026-10-07)
 

@@ -10,6 +10,10 @@
 
 -   `ComplementaryArea`: Add `badge` and `badgeLabel` props, rendering a dot over the pinned toolbar toggle ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 
+### Internal
+
+-   Remove misplaced block breadcrumb styles ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+
 ## 10.3.0 (2026-10-07)
 
 ## 10.2.0 (2026-09-23)
