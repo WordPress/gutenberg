@@ -168,19 +168,22 @@ function getNextNonDraggedBlock( blocksData, index ) {
  * cursor must also be within the block, or in the gap between the block and
  * the next block.
  *
- * While dragging, the rows are displaced to make room for the drop indicator:
- * when the dragged block sits above the target, the target row shifts up by
- * the dragged block's height, and the drop indicator opens a gap between the
- * target and the block after it, under the cursor. A nesting gesture over that
- * gap still targets the block above it, otherwise the next `dragover` reads
- * the displaced rows, drops the nesting, and the rows shift back.
+ * While dragging, the rows are displaced to make room for the drop indicator
+ * while the dragged block keeps its own row: when the dragged block sits above
+ * the target, the target row shifts up by the dragged block's height, and the
+ * drop indicator opens a gap between the target and the block after it, under
+ * the cursor; when the dragged block is the last row, the gap is its own slot.
+ * A nesting gesture over that gap still targets the block above it, otherwise
+ * the next `dragover` reads the displaced rows, drops the nesting, and the
+ * rows shift back.
  *
  * @param {WPPoint} point        The point representing the cursor position when dragging.
  * @param {DOMRect} rect         The rectangle.
  * @param {number}  nestingLevel The nesting level of the block.
  * @param {boolean} rtl          Whether the editor is in RTL mode.
- * @param {number}  [bottom]     The lowest vertical position that still counts as the block;
- *                               the top of the next block when a gap separates them.
+ * @param {number}  [bottom]     The lowest vertical position that still counts as the block:
+ *                               the top of the next block, or the end of the list, when a gap
+ *                               separates them.
  */
 function isNestingGesture(
 	point,
@@ -306,13 +309,17 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 				candidateBlockParents.length,
 				rtl,
 				// The block extends to the next block when the drop indicator
-				// displaces the rows and opens a gap between them.
-				nextBlock
-					? Math.max(
-							candidateRect.bottom,
-							nextBlock.element.getBoundingClientRect().top
-						)
-					: candidateRect.bottom
+				// displaces the rows and opens a gap between them. Dragged
+				// rows keep their slot, so when none follows, the block
+				// extends to the end of the list, over the dragged slot.
+				Math.max(
+					candidateRect.bottom,
+					nextBlock
+						? nextBlock.element.getBoundingClientRect().top
+						: blocksData[
+								blocksData.length - 1
+							].element.getBoundingClientRect().bottom
+				)
 			) )
 	) {
 		// If the block is expanded, insert the block as the first child.

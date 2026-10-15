@@ -418,6 +418,38 @@ describe( 'getListViewDropTarget', () => {
 			} );
 		} );
 
+		it( "should keep nesting into the block above the dragged last block when the cursor is over the dragged block's slot", () => {
+			// The dragged block is the last row; it keeps its slot while the
+			// rows above do not move, so the gap below the target is the
+			// dragged block's own row.
+			const draggedLastBlocksData = [
+				{ ...displacedBlocksData[ 1 ], blockIndex: 0 },
+				{
+					...displacedBlocksData[ 0 ],
+					blockIndex: 1,
+					element: { getBoundingClientRect: () => rect( 100, 150 ) },
+				},
+			];
+
+			[
+				{ position: { x: 250, y: 125 }, rtl: false },
+				{ position: { x: 50, y: 125 }, rtl: true },
+			].forEach( ( { position, rtl } ) => {
+				const target = getListViewDropTarget(
+					draggedLastBlocksData,
+					position,
+					rtl
+				);
+
+				expect( target ).toEqual( {
+					blockIndex: 0,
+					clientId: 'target',
+					dropPosition: 'inside',
+					rootClientId: 'target',
+				} );
+			} );
+		} );
+
 		it( 'should not nest into the last block when the cursor is below it', () => {
 			[
 				{ position: { x: 250, y: 230 }, rtl: false },
