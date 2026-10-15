@@ -481,32 +481,6 @@ export function getBrowserBackup( state ) {
 	return state.browserBackup;
 }
 
-let editorContentRevision;
-
-/**
- * Returns the editor's current content shaped like a revision, keeping the
- * same object while the content is unchanged.
- *
- * @param {string} title   The edited title.
- * @param {string} content The edited content.
- * @param {string} excerpt The edited excerpt.
- * @return {Object} The content as a revision.
- */
-function getEditorContentRevision( title, content, excerpt ) {
-	if (
-		editorContentRevision?.title.raw !== title ||
-		editorContentRevision?.content.raw !== content ||
-		editorContentRevision?.excerpt.raw !== excerpt
-	) {
-		editorContentRevision = {
-			title: { raw: title },
-			content: { raw: content },
-			excerpt: { raw: excerpt },
-		};
-	}
-	return editorContentRevision;
-}
-
 /**
  * Returns the current revision object in revisions mode.
  *
@@ -667,18 +641,31 @@ export const getShownVersion = createRegistrySelector(
  * @param {Object} state Global application state.
  * @return {Object|null|undefined} The compared version, shaped like a revision.
  */
-export const getComparedVersion = createRegistrySelector(
-	( select ) => ( state ) => {
-		const editor = unlock( select( STORE_NAME ) );
-		if ( ! state.browserBackup ) {
-			return editor.getPreviousRevision();
+export const getComparedVersion = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			const editor = unlock( select( STORE_NAME ) );
+			if ( ! state.browserBackup ) {
+				return editor.getPreviousRevision();
+			}
+			return {
+				title: { raw: editor.getEditedPostAttribute( 'title' ) },
+				content: { raw: editor.getEditedPostContent() },
+				excerpt: { raw: editor.getEditedPostAttribute( 'excerpt' ) },
+			};
+		},
+		( state ) => {
+			const editor = unlock( select( STORE_NAME ) );
+			return state.browserBackup
+				? [
+						state.browserBackup,
+						editor.getEditedPostAttribute( 'title' ),
+						editor.getEditedPostContent(),
+						editor.getEditedPostAttribute( 'excerpt' ),
+					]
+				: [ state.browserBackup, editor.getPreviousRevision() ];
 		}
-		return getEditorContentRevision(
-			editor.getEditedPostAttribute( 'title' ),
-			editor.getEditedPostContent(),
-			editor.getEditedPostAttribute( 'excerpt' )
-		);
-	}
+	)
 );
 
 /**
