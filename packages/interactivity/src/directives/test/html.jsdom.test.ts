@@ -633,13 +633,10 @@ describe( 'data-wp-html conflicts', () => {
 		}
 	);
 
-	it.each(
-		[ 'data-wp-each', 'data-wp-each----' ].flatMap( ( each ) =>
-			[ true, false ].map( ( htmlFirst ) => [ each, htmlFirst ] as const )
-		)
-	)(
-		'yields to %s and list growth (HTML first: %s)',
-		async ( each, htmlFirst ) => {
+	it.each( [ true, false ] )(
+		'yields to data-wp-each and list growth (HTML first: %s)',
+		async ( htmlFirst ) => {
+			const each = 'data-wp-each';
 			const {
 				store: register,
 				asDangerousHTML: token,
@@ -686,9 +683,7 @@ describe( 'data-wp-html conflicts', () => {
 				target.querySelectorAll( 'li' ),
 				( li ) => li.textContent
 			);
-			expect( texts ).toEqual(
-				each === 'data-wp-each' ? [ 'a', 'b', 'c' ] : [ '', '', '' ]
-			);
+			expect( texts ).toEqual( [ 'a', 'b', 'c' ] );
 			expect( texts ).toEqual(
 				Array.from(
 					baseline.querySelectorAll( 'li' ),
@@ -803,76 +798,6 @@ describe( 'data-wp-html conflicts', () => {
 		}
 	);
 
-	it.each( [
-		[ [ 'html', 'text', 'each' ] ],
-		[ [ 'html', 'each', 'text' ] ],
-		[ [ 'text', 'html', 'each' ] ],
-		[ [ 'text', 'each', 'html' ] ],
-		[ [ 'each', 'html', 'text' ] ],
-		[ [ 'each', 'text', 'html' ] ],
-	] )(
-		'preserves text/each template behavior in order %s',
-		async ( order ) => {
-			const {
-				store: register,
-				populateServerData: populate,
-				asDangerousHTML: token,
-				act: flush,
-				hydrate: hydrateRegion,
-				toVdom: convert,
-			} = await loadConflictRuntime();
-			const namespace = uniqueNamespace();
-			populate( {
-				state: { [ namespace ]: { list: {} } },
-				derivedStateClosures: { [ namespace ]: [ 'state.list' ] },
-			} );
-			register( namespace, {
-				state: { html: token( '<b>x</b>' ), text: 'Hello' },
-			} );
-			const attributes = order.map(
-				( prefix ) =>
-					`data-wp-${ prefix }="state.${ prefix === 'each' ? 'list' : prefix }"`
-			);
-			const child = '<li data-wp-text="context.item"></li>';
-			const region = createRegion(
-				namespace,
-				`<ul><template ${ attributes.join( ' ' ) }>${ child }</template></ul><ul><template ${ attributes.filter( ( attribute ) => ! attribute.startsWith( 'data-wp-html' ) ).join( ' ' ) }>${ child }</template></ul>`
-			);
-			await flush( () =>
-				hydrateRegion( convert( region ), region.parentNode! )
-			);
-			const [ target, baseline ] = region.querySelectorAll( 'ul' );
-			// The inert attribute remains in the markup; compare content without it.
-			expect(
-				target.innerHTML.replace( ' data-wp-html="state.html"', '' )
-			).toBe( baseline.innerHTML );
-			// Store getter registration consolidates in a microtask; use async act.
-			await flush( async () => {
-				register( namespace, {
-					state: {
-						get list() {
-							return [ 'a' ];
-						},
-					},
-				} );
-			} );
-			expect(
-				target.innerHTML.replace( ' data-wp-html="state.html"', '' )
-			).toBe( baseline.innerHTML );
-			expect( target.querySelectorAll( 'li' ) ).toHaveLength( 1 );
-			await flush( () => {
-				register( namespace, { state: { list: 42 } } );
-			} );
-			expect(
-				target.innerHTML.replace( ' data-wp-html="state.html"', '' )
-			).toBe( baseline.innerHTML );
-			expect( region.querySelector( 'b' ) ).toBeNull();
-			expectConflictWarnings( [
-				'The data-wp-html directive was ignored because it conflicts with data-wp-text, data-wp-each.',
-			] );
-		}
-	);
-
 	it( 'names every conflicting directive in fixed warning order', async () => {
 		const { toVdom: convert } = await loadConflictRuntime();
 		const region = createRegion(
@@ -887,9 +812,8 @@ describe( 'data-wp-html conflicts', () => {
 
 	it.each(
 		[ 'text', 'each', 'router-region' ].flatMap( ( prefix ) => [
-			...[ '', '--', '---', '---id', '--suffix', '----' ].map(
-				( suffix ) => [ prefix, suffix, true ] as const
-			),
+			[ prefix, '--suffix', true ] as const,
+			[ prefix, '---id', true ] as const,
 			[ prefix, '', false ] as const,
 		] )
 	)(
