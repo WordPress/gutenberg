@@ -12,7 +12,7 @@
 
 ### Bug Fixes
 
--   Link: Preserve manually added attributes and HTML IDs when editing an existing inline link.
+-   Link: Preserve manually added attributes and HTML IDs when editing an existing inline link ([#84841](https://github.com/WordPress/gutenberg/pull/84841)).
 
 ## 5.57.0 (2026-10-07)
 
