@@ -76,3 +76,4 @@ jobs:
       with:
         name: failures-artifacts
         path: artifacts
+        retention-days: 14
