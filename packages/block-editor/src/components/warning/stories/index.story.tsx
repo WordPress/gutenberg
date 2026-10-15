@@ -1,8 +1,9 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import Warning from '../';
 
-const meta = {
+const meta: Meta< typeof Warning > = {
 	id: 'blockeditor-warning',
 	title: 'Editor/Block Editor/Warning',
 	component: Warning,
@@ -52,13 +53,15 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	args: {
 		children: __( 'This block ran into an issue.' ),
 	},
 };
 
-export const WithActions = {
+export const WithActions: Story = {
 	args: {
 		...Default.args,
 		actions: [
@@ -69,7 +72,7 @@ export const WithActions = {
 	},
 };
 
-export const WithSecondaryActions = {
+export const WithSecondaryActions: Story = {
 	args: {
 		...Default.args,
 		secondaryActions: [
