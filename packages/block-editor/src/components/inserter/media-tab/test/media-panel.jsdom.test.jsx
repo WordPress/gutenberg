@@ -9,14 +9,15 @@ globalThis.wpVitest.mockMatchMedia();
 // Keep the panel's data + async surface out of the test: return a small,
 // non-empty result set so the grid renders. The mock is a spy so tests can
 // assert on the query the panel sends.
-const { useMediaResults } = vi.hoisted( () => ( {
-	useMediaResults: vi.fn( () => ( {
+const { useMediaResults, defaultResults } = vi.hoisted( () => {
+	const defaults = () => ( {
 		mediaList: [
 			{ id: 1, title: 'Example', url: 'https://example.com/1' },
 		],
 		isLoading: false,
-	} ) ),
-} ) );
+	} );
+	return { useMediaResults: vi.fn( defaults ), defaultResults: defaults };
+} );
 vi.mock( import( '../hooks' ), () => ( {
 	useMediaResults,
 } ) );
@@ -25,11 +26,19 @@ vi.mock( import( '../hooks' ), () => ( {
 // lets tests drive its search and paging callbacks.
 vi.mock( import( '../media-grid' ), () => ( {
 	__esModule: true,
-	default: ( { actions, onChangeSearch, onChangePage, page, footer } ) => (
+	default: ( {
+		actions,
+		onChangeSearch,
+		onChangePage,
+		page,
+		footer,
+		isLoading,
+	} ) => (
 		<div
 			data-testid="media-grid"
 			data-actions={ actions.map( ( action ) => action.id ).join( ',' ) }
 			data-page={ page }
+			data-loading={ String( isLoading ) }
 		>
 			<button onClick={ () => onChangeSearch( 'sunset' ) }>search</button>
 			<button onClick={ () => onChangePage( 2 ) }>next page</button>
@@ -81,7 +90,9 @@ const getGridActions = () =>
 	screen.getByTestId( 'media-grid' ).getAttribute( 'data-actions' );
 
 beforeEach( () => {
-	useMediaResults.mockClear();
+	// Reset rather than clear, so a test's own results don't leak into the next.
+	useMediaResults.mockReset();
+	useMediaResults.mockImplementation( defaultResults );
 } );
 
 describe( 'MediaCategoryPanel attach/detach gating', () => {
@@ -173,6 +184,36 @@ describe( 'MediaCategoryPanel querying', () => {
 		await user.click( screen.getByRole( 'button', { name: 'search' } ) );
 		expect( lastQuery() ).toEqual(
 			expect.objectContaining( { page: 1, search: 'sunset' } )
+		);
+	} );
+
+	it( 'reports the grid as idle while switching source, even mid-fetch', () => {
+		// A fetch is already in flight (paging, say) when another source is
+		// asked for, so `isLoading` never falls back to false on its own.
+		useMediaResults.mockReturnValue( {
+			mediaList: [],
+			isLoading: true,
+			isSwitchingSource: true,
+		} );
+		renderPanel( baseCategory );
+
+		expect( screen.getByTestId( 'media-grid' ) ).toHaveAttribute(
+			'data-loading',
+			'false'
+		);
+	} );
+
+	it( 'reports the grid as loading while refetching the current source', () => {
+		useMediaResults.mockReturnValue( {
+			mediaList: [ { id: 1, url: 'https://example.com/1' } ],
+			isLoading: true,
+			isSwitchingSource: false,
+		} );
+		renderPanel( baseCategory );
+
+		expect( screen.getByTestId( 'media-grid' ) ).toHaveAttribute(
+			'data-loading',
+			'true'
 		);
 	} );
 } );
