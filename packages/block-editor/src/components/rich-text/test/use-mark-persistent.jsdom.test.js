@@ -5,13 +5,11 @@ import { useMarkPersistent } from '../use-mark-persistent';
 
 const markPersistent = vi.fn();
 
-// `text` is what the rich text record held when the hook rendered;
-// `liveText` is what it holds by the time layout effects run.
-function props( html, text = html, activeFormats = [], liveText = text ) {
+function props( html, text = html, activeFormats = [] ) {
 	return {
 		html,
 		value: { text, activeFormats },
-		getValue: () => ( { text: liveText, activeFormats } ),
+		isSelected: true,
 		onMarkPersistent: markPersistent,
 	};
 }
@@ -88,20 +86,39 @@ describe( 'useMarkPersistent', () => {
 		expect( markPersistent ).toHaveBeenCalledTimes( 1 );
 	} );
 
-	// When the html changes from outside, such as another container editing
-	// the same entity, useRichText applies it to its record in a layout
-	// effect of its own, so the record seen at render time is one change
-	// behind. The hook has to judge the change by the live record.
-	it( 'treats an external html change as typing when the record has not caught up', () => {
+	// A field that is not selected cannot be typed or formatted in. A change
+	// reaching it comes from elsewhere, such as another container editing
+	// the same entity, and must not end the typing run happening there.
+	it( 'does not mark while the field is not selected', () => {
+		const { rerender } = renderHook( useMarkPersistent, {
+			initialProps: { ...props( 'a' ), isSelected: false },
+		} );
+
+		// The record lags one change behind an html change from outside.
+		rerender( { ...props( 'ab', 'a' ), isSelected: false } );
+		rerender( { ...props( 'ab' ), isSelected: false } );
+		rerender( {
+			...props( '<strong>a</strong>b', 'ab' ),
+			isSelected: false,
+		} );
+		vi.runAllTimers();
+
+		expect( markPersistent ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps tracking the value while not selected', () => {
 		const { rerender } = renderHook( useMarkPersistent, {
 			initialProps: props( 'a' ),
 		} );
 
-		rerender( props( 'ab', 'a', [], 'ab' ) );
+		rerender( { ...props( 'ab' ), isSelected: false } );
 		rerender( props( 'ab' ) );
+		vi.runAllTimers();
 
+		// Nothing changed since the field was selected again.
 		expect( markPersistent ).not.toHaveBeenCalled();
 
+		rerender( props( 'abc' ) );
 		vi.advanceTimersByTime( 1000 );
 
 		expect( markPersistent ).toHaveBeenCalledTimes( 1 );
