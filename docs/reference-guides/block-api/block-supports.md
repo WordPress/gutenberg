@@ -1081,6 +1081,8 @@ A spacing property may define an array of allowable sides – 'top', 'right', 'b
 
 Axial sides are defined with the `vertical` and `horizontal` terms, and display a single UI control for each axial pair (for example, `vertical` controls both the top and bottom sides). A spacing property may support arbitrary individual sides **or** axial sides, but not a mix of both.
 
+`margin` can also be an object with `sides` and `unconstrainedSides`. The block shows `sides` by default, and `unconstrainedSides` when its parent layout is not constrained, since a constrained layout forces horizontal margins to `auto`.
+
 Note: `blockGap` accepts `vertical` and `horizontal` axial sides, which adjust gap column and row values. `blockGap` doesn't support arbitrary sides.
 
 ```js

@@ -45,7 +45,10 @@
 		},
 		"shadow": true,
 		"spacing": {
-			"margin": [ "top", "bottom" ],
+			"margin": {
+				"sides": [ "top", "bottom" ],
+				"unconstrainedSides": [ "top", "right", "bottom", "left" ]
+			},
 			"padding": true,
 			"blockGap": [ "horizontal", "vertical" ],
 			"__experimentalDefaultControls": {

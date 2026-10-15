@@ -597,6 +597,35 @@
 										"type": "string",
 										"enum": [ "vertical", "horizontal" ]
 									}
+								},
+								{
+									"type": "object",
+									"properties": {
+										"sides": {
+											"type": "array",
+											"items": {
+												"type": "string",
+												"enum": [
+													"top",
+													"right",
+													"left",
+													"bottom"
+												]
+											}
+										},
+										"unconstrainedSides": {
+											"type": "array",
+											"items": {
+												"type": "string",
+												"enum": [
+													"top",
+													"right",
+													"left",
+													"bottom"
+												]
+											}
+										}
+									}
 								}
 							]
 						},
