@@ -577,13 +577,18 @@ test.describe( 'Page List', () => {
 	} );
 
 	test.describe( 'Bulk Quick Edit', () => {
-		test( 'shows the bulk-editable fields for the selected pages', async ( {
+		test( 'keeps bulk-editable fields accessible after table sorting', async ( {
 			page,
 		} ) => {
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
 			const table = page.getByRole( 'table' );
+			await page.getByRole( 'button', { name: 'View options' } ).click();
+			await page
+				.getByRole( 'combobox', { name: 'Sort by' } )
+				.selectOption( { label: 'Title' } );
+			await page.keyboard.press( 'Escape' );
 			await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
 			// The extensible site editor keeps the selection in the URL, so
 			// the checkbox only flips once the route has re-rendered.
@@ -611,6 +616,16 @@ test.describe( 'Page List', () => {
 					modal.getByRole( 'button', { name } )
 				).toBeVisible();
 			}
+			await modal.getByRole( 'button', { name: 'Edit Status' } ).click();
+			const pending = page.getByRole( 'radio', {
+				name: 'Pending Review',
+			} );
+			await pending.check();
+			await expect( pending ).toBeChecked();
+			await page.keyboard.press( 'Escape' );
+			await expect(
+				modal.getByRole( 'button', { name: 'Edit Status' } )
+			).toBeFocused();
 		} );
 	} );
 

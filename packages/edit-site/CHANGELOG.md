@@ -12,6 +12,7 @@
 
 ### Bug Fixes
 
+-   Keep Quick edit popovers accessible after opening View options ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 -   Label the quick edit action as Bulk edit when multiple pages are selected ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 
 ## 7.6.0 (2026-10-07)
