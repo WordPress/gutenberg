@@ -468,11 +468,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-popover/stories/index.story.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-preview/auto.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
