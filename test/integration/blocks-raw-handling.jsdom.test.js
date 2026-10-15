@@ -701,4 +701,56 @@ describe( 'rawHandler', () => {
 			expect( innerBlock.attributes.sizeSlug ).toBeUndefined();
 		} );
 	} );
+
+	describe( 'isBlockTypeAllowed', () => {
+		it( 'should convert a URL to an embed when no check is given', () => {
+			const HTML = '<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>';
+			const blocks = rawHandler( { HTML } );
+			expect( blocks.map( ( { name } ) => name ) ).toEqual( [
+				'core/embed',
+			] );
+		} );
+
+		it( 'should fall back to a paragraph when embeds are not allowed', () => {
+			const HTML = '<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>';
+			const blocks = rawHandler( {
+				HTML,
+				isBlockTypeAllowed: ( name ) => name !== 'core/embed',
+			} );
+			expect( blocks.map( ( { name } ) => name ) ).toEqual( [
+				'core/paragraph',
+			] );
+			expect( blocks[ 0 ].attributes.content.toString() ).toBe(
+				'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+			);
+		} );
+
+		it( 'should keep a shortcode as is when its block is not allowed', () => {
+			const HTML = '<p>[gallery ids="1,2,3"]</p>';
+			const blocks = rawHandler( {
+				HTML,
+				isBlockTypeAllowed: ( name ) => name !== 'core/gallery',
+			} );
+			expect( blocks.map( ( { name } ) => name ) ).toEqual( [
+				'core/shortcode',
+			] );
+			expect( blocks[ 0 ].attributes.text ).toBe(
+				'[gallery ids="1,2,3"]'
+			);
+		} );
+
+		it( 'should check shortcodes before and after a converted one', () => {
+			const HTML =
+				'<p>[gallery ids="1,2,3"]</p><p>[caption id="attachment_1" width="300"]<img src="a.png" /> Caption[/caption]</p><p>[gallery ids="4,5"]</p>';
+			const blocks = rawHandler( {
+				HTML,
+				isBlockTypeAllowed: ( name ) => name !== 'core/gallery',
+			} );
+			expect( blocks.map( ( { name } ) => name ) ).toEqual( [
+				'core/shortcode',
+				'core/image',
+				'core/shortcode',
+			] );
+		} );
+	} );
 } );

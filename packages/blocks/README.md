@@ -529,8 +529,9 @@ const blocks = rawHandler( { HTML: '<p>Hello</p><p>World</p>' } );
 
 _Parameters_
 
-- _options_ `{ HTML?: string; }`: Options.
+- _options_ `{ HTML?: string; isBlockTypeAllowed?: ( blockName: string ) => boolean; }`: Options.
 - _options.HTML_ `string`: The HTML to convert.
+- _options.isBlockTypeAllowed_ `( blockName: string ) => boolean`: Optional callback that returns whether a block type can be created. Transforms to block types it rejects are skipped, so the content falls back to another block.
 
 _Returns_
 

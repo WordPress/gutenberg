@@ -30,7 +30,7 @@
 -   Block Toolbar: Show a generic icon and accessible name on the phone placeholder's block button when no default block type is registered ([#84533](https://github.com/WordPress/gutenberg/pull/84533)).
 -   Fix pasting multi-line text into an empty Preformatted or Poetry block, which replaced the block with Paragraph blocks instead of keeping the text inside it ([#83552](https://github.com/WordPress/gutenberg/pull/83552)).
 -   `RichText`: Apply the formats at the caret to pasted text after a previous paste or undo, and when pasting plain text with `__unstablePastePlainText`, instead of splitting the format around it ([#84303](https://github.com/WordPress/gutenberg/pull/84303)).
-
+-   Convert to blocks: Skip block types that are not allowed, so converting Custom HTML or an invalid block no longer does nothing when the content would create a disallowed block ([#84183](https://github.com/WordPress/gutenberg/pull/84183)).
 
 ### Internal
 

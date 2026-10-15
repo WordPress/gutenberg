@@ -9,6 +9,8 @@ function BlockHTMLConvertButton( { clientId } ) {
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	);
+	const { canInsertBlockType, getBlockRootClientId } =
+		useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 
 	if ( ! block || block.name !== 'core/html' ) {
@@ -20,7 +22,14 @@ function BlockHTMLConvertButton( { clientId } ) {
 			onClick={ () =>
 				replaceBlocks(
 					clientId,
-					rawHandler( { HTML: getBlockContent( block ) } )
+					rawHandler( {
+						HTML: getBlockContent( block ),
+						isBlockTypeAllowed: ( name ) =>
+							canInsertBlockType(
+								name,
+								getBlockRootClientId( clientId )
+							),
+					} )
 				)
 			}
 		>

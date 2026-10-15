@@ -22,6 +22,7 @@
 -   Accordion Heading: Anchor notes to the selected title text instead of the whole block ([#84497](https://github.com/WordPress/gutenberg/pull/84497)).
 -   Navigation: Keep the flex layout on a Navigation block inserted into a navigation overlay, so block spacing applies to it ([#82232](https://github.com/WordPress/gutenberg/pull/82232)).
 -   Cover: Decode the oEmbed iframe source before parsing it, so an embedded background video keeps the parameters the provider sent ([#83770](https://github.com/WordPress/gutenberg/pull/83770)).
+-   Classic: "Convert to blocks" skips block types that are not allowed, so the conversion no longer does nothing when the content would create a disallowed block ([#84183](https://github.com/WordPress/gutenberg/pull/84183)).
 
 ## 11.2.0 (2026-10-07)
 
