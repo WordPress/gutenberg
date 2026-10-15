@@ -4,37 +4,25 @@ import { directive, isDefaultDirectiveSuffix } from '../hooks';
 import { useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
-import { isDangerousHTML, getDangerousHTML } from '../html';
+import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
 
-// A single, frozen object reused for every render of every `data-wp-html`
-// element. Preact only writes `dangerouslySetInnerHTML` to the DOM itself
-// when the `__html` value it's given differs from the previous render's; by
-// never changing it, Preact's own diffing never touches this element's
-// content, leaving that entirely to the `useLayoutEffect` below. This also
-// keeps Preact from clearing the element when a render doesn't resolve to
-// trusted HTML, which it would otherwise do for an element that previously
-// had `dangerouslySetInnerHTML` but no longer does.
-const STABLE_EMPTY_HTML = Object.freeze( { __html: '' } );
-
-// data-wp-html — Inner HTML binding, for content explicitly trusted via `asDangerousHTML()`.
+// data-wp-html — Inner HTML binding for explicitly trusted content.
 directive(
 	'html',
 	( { directives: { html: htmlEntries }, element, evaluate } ) => {
+		// Default entry; unsupported variants retain their original props.
 		const entry = htmlEntries.find( isDefaultDirectiveSuffix );
-		// Persists the last trusted HTML value actually resolved, so a later
-		// value that isn't trusted HTML (a plain string, `null`, `undefined`,
-		// a pending getter…) leaves the existing content in place instead of
-		// clearing it.
-		const lastValue = useRef<
-			ReturnType< typeof getDangerousHTML > | undefined
-		>( undefined );
-		// The string (or serialized `TrustedHTML`) representation of the
-		// value last successfully written to the DOM, so the effect below
-		// can skip repeating a write — and, if it previously failed, a
-		// warning — for a value it has already applied. A `TrustedHTML`
-		// object returned fresh from a getter on every render wouldn't
-		// otherwise compare equal to the previous render's by reference.
-		const lastWrittenKey = useRef< string | undefined >( undefined );
+		// Serialized HTML last applied or rejected; non-token values reset it
+		// to empty HTML so returning tokens are applied again after a removal.
+		const lastAppliedKey = useRef< string | undefined >( undefined );
+		// Fixed at the first render. Preact writes only when creating the node;
+		// all later writes, including navigation updates, belong to the effect.
+		const preactHtml = useRef< {
+			/** Empty HTML or the pending fallback applied only at creation. */
+			__html: string;
+		} >();
+		// Evaluated value, or undefined when evaluation or its function throws.
+		let result;
 
 		if ( ! entry ) {
 			if ( globalThis.SCRIPT_DEBUG ) {
@@ -47,83 +35,72 @@ directive(
 				warnUniqueIdNotSupported( 'html', entry.uniqueId );
 			}
 		} else {
-			let result;
 			try {
 				result = evaluate( entry );
-			} catch {
-				result = undefined;
-			}
-			if ( result !== PENDING_GETTER ) {
 				if ( typeof result === 'function' ) {
 					result = result();
 				}
-				if ( isDangerousHTML( result ) ) {
-					lastValue.current = getDangerousHTML( result );
-				}
+			} catch {
+				// An unavailable getter or function is a silent empty value.
+				result = undefined;
 			}
 		}
 
-		const resolvedValue = lastValue.current;
+		// Only supported default entries own the element's content.
+		const active = !! entry && ! entry.uniqueId;
+		// Pending values are the only values that leave content unchanged.
+		const pending = result === PENDING_GETTER;
+		// Tokens alone authorize non-empty HTML at the DOM boundary.
+		const trusted = isDangerousHTML( result );
+		// Current token payload or the policy-free removal value.
+		const resolvedValue = trusted ? getDangerousHTML( result ) : emptyHTML;
 
-		// Preact doesn't apply `dangerouslySetInnerHTML` while hydrating, on
-		// the assumption that server-rendered content already matches what
-		// would be rendered. That assumption doesn't hold here: the server
-		// intentionally leaves `data-wp-html` unprocessed, so the element's
-		// content has to be applied here — the same way `data-wp-style`
-		// re-applies styles after hydration.
+		// Hydration never writes Preact's __html. Apply the current value only
+		// after commit, adopting exactly matching unwritten server nodes.
 		useLayoutEffect( () => {
-			if ( resolvedValue === undefined ) {
+			if ( ! active || pending ) {
 				return;
 			}
-
+			if ( ! trusted && result !== null && result !== undefined ) {
+				warn(
+					'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.'
+				);
+			}
 			const key = String( resolvedValue );
-			if ( lastWrittenKey.current === key ) {
+			if ( lastAppliedKey.current === key ) {
 				return;
 			}
-
 			const node = ( element.ref as RefObject< HTMLElement > ).current!;
-
-			// Before the first write, the element still holds its
-			// server-rendered content. If that already serializes to the
-			// same HTML, keep its nodes instead of replacing them with
-			// identical ones, which would lose focus, selection, form input,
-			// or embedded media state.
 			if (
-				lastWrittenKey.current === undefined &&
+				lastAppliedKey.current === undefined &&
 				node.innerHTML === key
 			) {
-				lastWrittenKey.current = key;
+				lastAppliedKey.current = key;
 				return;
 			}
-
 			try {
-				// `resolvedValue` may be a native `TrustedHTML` value from a
-				// site-provided policy, which the DOM lib types this project
-				// currently targets don't yet know `innerHTML` accepts.
+				// DOM typings do not yet accept native TrustedHTML values.
 				node.innerHTML = resolvedValue as unknown as string;
-				lastWrittenKey.current = key;
 			} catch ( error ) {
-				// Most likely a site enforcing Trusted Types with no default
-				// policy, given a plain string. Leave the existing content
-				// (server-rendered, or from a previous successful write) in
-				// place rather than clearing it, and don't retry until the
-				// value itself changes.
-				lastWrittenKey.current = key;
+				// A rejected token empties the element using the policy-free empty
+				// TrustedHTML value. Do not retry until the value changes.
+				node.innerHTML = emptyHTML as unknown as string;
 				if ( globalThis.SCRIPT_DEBUG ) {
 					warn(
-						`data-wp-html: the browser rejected this HTML value, so the element's existing content was left in place. ${ error }`
+						`data-wp-html: the browser rejected this HTML value, so the element was emptied. ${ error }`
 					);
 				}
 			}
-		}, [ resolvedValue, element.ref ] );
+			lastAppliedKey.current = key;
+		}, [ result, active, pending, trusted, resolvedValue, element.ref ] );
 
-		if ( resolvedValue === undefined ) {
-			// Nothing has ever resolved to trusted HTML for this element:
-			// leave the pre-existing (usually server-rendered) content as is.
-			return;
+		if ( active ) {
+			preactHtml.current ??=
+				pending && element.props.dangerouslySetInnerHTML?.__html
+					? element.props.dangerouslySetInnerHTML
+					: { __html: emptyHTML as unknown as string };
+			element.props.dangerouslySetInnerHTML = preactHtml.current;
+			element.props.children = undefined;
 		}
-
-		element.props.dangerouslySetInnerHTML = STABLE_EMPTY_HTML;
-		element.props.children = undefined;
 	}
 );

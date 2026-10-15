@@ -438,6 +438,7 @@ $block-inserter-tabs-height: 44px;
 // below it the panel keeps this height and the tab panel scrolls instead,
 // rather than everything collapsing.
 $media-panel-min-height: 320px;
+$media-grid-loading-min-height: 500px;
 
 .block-editor-inserter__media-panel {
 	display: flex;
@@ -504,6 +505,20 @@ $media-panel-min-height: 320px;
 	.dataviews-no-results,
 	.dataviews-loading {
 		padding: 0 $grid-unit-20;
+	}
+
+	// Where the placeholder replaces a loaded grid, it reserves roughly a full
+	// page of height so the panel doesn't collapse and grow back. Sized for
+	// the sidebar, where a page is four rows of two square tiles.
+	.block-editor-inserter__media-grid__loading {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 100%;
+
+		&.is-replacing-results {
+			min-height: $media-grid-loading-min-height;
+		}
 	}
 
 	.block-editor-inserter__media-grid__footer {
