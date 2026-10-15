@@ -25,6 +25,24 @@ export default function useClickSelection() {
 
 			function onPointerDown( event ) {
 				pointerType = event.pointerType;
+
+				// Editable elements in non-editable regions of the wrapper
+				// (e.g. the post title) are read-only on iOS while it is an
+				// editing host (see content.scss). Stop hosting so the press
+				// reaches them.
+				const editable = event.target.closest?.(
+					'[contenteditable="true"]'
+				);
+				if (
+					placesCaretOnTap &&
+					editable &&
+					editable !== node &&
+					node.contentEditable === 'true' &&
+					editable.parentElement.closest( '[contenteditable]' )
+						?.contentEditable === 'false'
+				) {
+					setContentEditableWrapper( node, false );
+				}
 			}
 
 			function onMouseDown( event ) {
