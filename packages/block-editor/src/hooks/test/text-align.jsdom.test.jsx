@@ -79,13 +79,13 @@ describe( 'textAlign', () => {
 			).toBe( 'block' );
 		} );
 
-		it( 'uses the style-states slot when responsive editing has a viewport state', () => {
+		it( 'uses the style-state slot when responsive editing has a viewport state', () => {
 			expect(
 				getTextAlignControlGroup( true, {
 					viewport: '@mobile',
 					pseudo: 'default',
 				} )
-			).toBe( 'style-states' );
+			).toBe( 'style-state' );
 		} );
 	} );
 

@@ -27,7 +27,7 @@ import { BlockInspectorPreTabsSlot } from './inspector-pre-tabs-slot-fill';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import { SectionStyleControls } from '../inspector-controls-tabs/styles-tab';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
-import { PrivateInspectorControlsStyleStatesAdvanced } from '../inspector-controls/groups';
+import { PrivateInspectorControlsStyleStateAdvanced } from '../inspector-controls/groups';
 import InspectorControlsLastItem from '../inspector-controls/last-item';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
@@ -152,10 +152,10 @@ function StyleStateInspectorSlots( {
 				</>
 			) }
 			{ ! isDefaultBlockStyleState( selectedBlockStyleState ) && (
-				<InspectorControls.Slot group="style-states" />
+				<InspectorControls.Slot group="style-state" />
 			) }
 			{ ! isDefaultBlockStyleState( selectedBlockStyleState ) && (
-				<PrivateInspectorControlsStyleStatesAdvanced.Slot />
+				<PrivateInspectorControlsStyleStateAdvanced.Slot />
 			) }
 		</>
 	);

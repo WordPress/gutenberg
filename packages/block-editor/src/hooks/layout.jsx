@@ -614,7 +614,7 @@ function LayoutPanelPure( {
 						isResponsiveEditing &&
 						hasViewportBlockStyleState( selectedState ) &&
 						! hasPseudoBlockStyleState( selectedState )
-							? 'style-states'
+							? 'style-state'
 							: 'block'
 					}
 					name={ blockName }
