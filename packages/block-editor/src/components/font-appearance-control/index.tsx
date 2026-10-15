@@ -1,16 +1,26 @@
 import { Field, Select } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
+import type { FontAppearanceControlProps, FontAppearanceValue } from './types';
+
+interface FontAppearanceOption {
+	key: string | undefined;
+	name: string | undefined;
+	style: FontAppearanceValue;
+}
 
 /**
  * Adjusts font appearance field label in case either font styles or weights
  * are disabled.
  *
- * @param {boolean} hasFontStyles  Whether font styles are enabled and present.
- * @param {boolean} hasFontWeights Whether font weights are enabled and present.
- * @return {string} A label representing what font appearance is being edited.
+ * @param hasFontStyles  Whether font styles are enabled and present.
+ * @param hasFontWeights Whether font weights are enabled and present.
+ * @return A label representing what font appearance is being edited.
  */
-const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
+const getFontAppearanceLabel = (
+	hasFontStyles: boolean,
+	hasFontWeights: boolean
+): string => {
 	if ( ! hasFontStyles ) {
 		return __( 'Font weight' );
 	}
@@ -25,11 +35,13 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
 /**
  * Control to display font style and weight options of the active font.
  *
- * @param {Object} props Component props.
+ * @param props Component props.
  *
- * @return {Element} Font appearance control.
+ * @return Font appearance control.
  */
-export default function FontAppearanceControl( props ) {
+export default function FontAppearanceControl(
+	props: FontAppearanceControlProps
+) {
 	const {
 		/**
 		 * Start opting into the larger default height that will become the default size in a future version.
@@ -67,7 +79,7 @@ export default function FontAppearanceControl( props ) {
 
 	// Generates select options for combined font styles and weights.
 	const combineOptions = () => {
-		const combinedOptions = [ defaultOption ];
+		const combinedOptions: FontAppearanceOption[] = [ defaultOption ];
 		if ( combinedStyleAndWeightOptions ) {
 			combinedOptions.push( ...combinedStyleAndWeightOptions );
 		}
@@ -76,7 +88,7 @@ export default function FontAppearanceControl( props ) {
 
 	// Generates select options for font styles only.
 	const styleOptions = () => {
-		const combinedOptions = [ defaultOption ];
+		const combinedOptions: FontAppearanceOption[] = [ defaultOption ];
 		fontStyles.forEach( ( { name, value } ) => {
 			combinedOptions.push( {
 				key: value,
@@ -89,7 +101,7 @@ export default function FontAppearanceControl( props ) {
 
 	// Generates select options for font weights only.
 	const weightOptions = () => {
-		const combinedOptions = [ defaultOption ];
+		const combinedOptions: FontAppearanceOption[] = [ defaultOption ];
 		fontWeights.forEach( ( { name, value } ) => {
 			combinedOptions.push( {
 				key: value,
