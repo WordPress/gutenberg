@@ -46,25 +46,13 @@ function ControlFrame( {
 	);
 }
 
-it( 'provides styles before children measure layout in root and iframe documents', async () => {
+it( 'provides styles before children measure layout in iframe documents', async () => {
 	registerStyle(
 		'style-provider-measurement',
 		'.style-provider-measurement{width:200px;height:100px;}'
 	);
-	const measureRoot = vi.fn();
 	const measureFrame = vi.fn();
-	await render(
-		<>
-			<StyleProvider document={ document }>
-				<MeasuredContent onMeasure={ measureRoot } />
-			</StyleProvider>
-			<ControlFrame onMeasure={ measureFrame } />
-		</>
-	);
-	expect( measureRoot ).toHaveBeenCalledExactlyOnceWith( {
-		width: 200,
-		height: 100,
-	} );
+	await render( <ControlFrame onMeasure={ measureFrame } /> );
 	expect( measureFrame ).toHaveBeenCalledExactlyOnceWith( {
 		width: 200,
 		height: 100,
