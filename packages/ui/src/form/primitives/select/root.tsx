@@ -1,7 +1,10 @@
 import { Select as _Select } from '@base-ui/react/select';
 import type { SelectRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
-import { useIframeOutsidePressForwarding } from '../../../utils/use-iframe-outside-press-forwarding';
+import {
+	IframeOutsidePressContext,
+	useIframeOutsidePressForwarding,
+} from '../../../utils/use-iframe-outside-press-forwarding';
 
 /**
  * A component that lets users choose one option from a list.
@@ -17,7 +20,7 @@ import { useIframeOutsidePressForwarding } from '../../../utils/use-iframe-outsi
  * provide `isItemEqualToValue`.
  */
 export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
-	const iframeOutsidePressForwardingProps =
+	const { popupRef, ...iframeOutsidePressForwardingProps } =
 		useIframeOutsidePressForwarding< _Select.Root.OpenChangeEventDetails >(
 			{
 				defaultOpen: props.defaultOpen,
@@ -31,10 +34,12 @@ export function Root< Value = unknown >( props: SelectRootProps< Value > ) {
 
 	return (
 		<DirectionProvider>
-			<_Select.Root< Value, false >
-				{ ...props }
-				{ ...iframeOutsidePressForwardingProps }
-			/>
+			<IframeOutsidePressContext.Provider value={ popupRef }>
+				<_Select.Root< Value, false >
+					{ ...props }
+					{ ...iframeOutsidePressForwardingProps }
+				/>
+			</IframeOutsidePressContext.Provider>
 		</DirectionProvider>
 	);
 }

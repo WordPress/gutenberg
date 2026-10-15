@@ -1,6 +1,8 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import clsx from 'clsx';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useContext } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { IframeOutsidePressContext } from '../../../utils/use-iframe-outside-press-forwarding';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
@@ -13,9 +15,11 @@ export const Popup = forwardRef< HTMLDivElement, ComboboxPopupProps >(
 		{ className, portal, positioner, width, ...restProps },
 		ref
 	) {
+		const popupRef = useContext( IframeOutsidePressContext );
+		const mergedRef = useMergeRefs( [ ref, popupRef ] );
 		const popupContent = (
 			<_Combobox.Popup
-				ref={ ref }
+				ref={ mergedRef }
 				className={ clsx(
 					itemPopupStyles.popup,
 					getItemPopupWidthClassName( width ),

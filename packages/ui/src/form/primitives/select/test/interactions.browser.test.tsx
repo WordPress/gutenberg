@@ -1,10 +1,12 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, within, waitFor } from '@testing-library/react';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
+import { createPortal } from '@wordpress/element';
 import * as Select from '../index';
 import {
 	addCanvasButton,
+	addIframeButton,
 	tapCanvasButton,
 } from '../../../test/fixtures/iframe';
 
@@ -134,4 +136,117 @@ describe( 'Select interactions', () => {
 			).not.toBeInTheDocument();
 		} );
 	} );
+
+	it.each( [
+		{ sibling: false, touch: false },
+		{ sibling: true, touch: false },
+		{ sibling: false, touch: true },
+		{ sibling: true, touch: true },
+	] )(
+		'closes a non-modal Select portaled to another document and delivers the iframe press (sibling: $sibling, touch: $touch)',
+		async ( { sibling, touch } ) => {
+			const onCanvasClick = vi.fn();
+			const onPopupClick = vi.fn();
+			const onOpenChange = vi.fn();
+			await render(
+				<>
+					<iframe title="Component frame" width="400" height="250" />
+					{ sibling && (
+						<iframe
+							title="Popup document"
+							width="400"
+							height="250"
+						/>
+					) }
+				</>
+			);
+			const componentDocument =
+				screen.getByTitle< HTMLIFrameElement >(
+					'Component frame'
+				).contentDocument;
+			const popupDocument = sibling
+				? screen.getByTitle< HTMLIFrameElement >( 'Popup document' )
+						.contentDocument
+				: document;
+			if ( ! componentDocument || ! popupDocument ) {
+				throw new Error( 'Expected same-origin iframe documents.' );
+			}
+			await render(
+				createPortal(
+					<>
+						<Select.Root
+							modal={ false }
+							onOpenChange={ onOpenChange }
+						>
+							<Select.Trigger>Select</Select.Trigger>
+							<Select.Popup
+								portal={
+									<Select.Portal
+										container={ popupDocument.body }
+									/>
+								}
+							>
+								<Select.Item value="First">
+									<Select.ItemLabel>First</Select.ItemLabel>
+								</Select.Item>
+								<iframe
+									title="Popup frame"
+									width="150"
+									height="50"
+								/>
+							</Select.Popup>
+						</Select.Root>
+						<iframe
+							title="Editor canvas"
+							style={ { position: 'fixed', left: 200, top: 100 } }
+						/>
+					</>,
+					componentDocument.body
+				)
+			);
+			addIframeButton(
+				within(
+					componentDocument.body
+				).getByTitle< HTMLIFrameElement >( 'Editor canvas' ),
+				onCanvasClick
+			);
+			const componentFrame = page.frameLocator(
+				page.getByTitle( 'Component frame' )
+			);
+			await componentFrame.getByRole( 'combobox' ).click();
+			const popupFrame = sibling
+				? page.frameLocator( page.getByTitle( 'Popup document' ) )
+				: page;
+			const option = popupFrame.getByRole( 'option', { name: 'First' } );
+			await expect.element( option ).toBeVisible();
+			const popupIframe = within(
+				popupDocument.body
+			).getByTitle< HTMLIFrameElement >( 'Popup frame' );
+			addIframeButton( popupIframe, onPopupClick );
+			await page
+				.frameLocator( popupFrame.getByTitle( 'Popup frame' ) )
+				.getByRole( 'button', { name: 'Edit block' } )
+				.click();
+			expect( onPopupClick ).toHaveBeenCalledTimes( 1 );
+			await expect.element( option ).toBeVisible();
+
+			if ( touch ) {
+				await tapCanvasButton( componentDocument );
+			} else {
+				await page
+					.frameLocator(
+						componentFrame.getByTitle( 'Editor canvas' )
+					)
+					.getByRole( 'button', { name: 'Edit block' } )
+					.click();
+			}
+
+			await expect.element( option ).not.toBeInTheDocument();
+			expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
+			expect( onOpenChange ).toHaveBeenLastCalledWith(
+				false,
+				expect.objectContaining( { reason: 'outside-press' } )
+			);
+		}
+	);
 } );

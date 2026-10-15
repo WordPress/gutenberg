@@ -4,6 +4,16 @@ import { cdp, page } from 'vitest/browser';
 
 export function addCanvasButton( onClick: () => void ) {
 	const iframe = screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
+	addIframeButton( iframe, onClick );
+	return page
+		.frameLocator( page.elementLocator( iframe ) )
+		.getByRole( 'button', { name: 'Edit block' } );
+}
+
+export function addIframeButton(
+	iframe: HTMLIFrameElement,
+	onClick: () => void
+) {
 	const iframeDocument = iframe.contentDocument;
 	if ( ! iframeDocument ) {
 		throw new Error( 'Expected a same-origin iframe document.' );
@@ -13,13 +23,12 @@ export function addCanvasButton( onClick: () => void ) {
 	button.textContent = 'Edit block';
 	button.addEventListener( 'click', onClick );
 	iframeDocument.body.appendChild( button );
-	return page
-		.frameLocator( page.elementLocator( iframe ) )
-		.getByRole( 'button', { name: 'Edit block' } );
 }
 
-export async function tapCanvasButton() {
-	const iframe = screen.getByTitle< HTMLIFrameElement >( 'Editor canvas' );
+export async function tapCanvasButton( ownerDocument = document ) {
+	const iframe = within( ownerDocument.body ).getByTitle< HTMLIFrameElement >(
+		'Editor canvas'
+	);
 	const iframeDocument = iframe.contentDocument;
 	if ( ! iframeDocument ) {
 		throw new Error( 'Expected a same-origin iframe document.' );
