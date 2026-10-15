@@ -28,7 +28,7 @@ And each folder of fields may have:
 
 ### The default fields of every post type
 
-`register_core_post_type_supports_fields()`, in `src/index.php`, registers the fields of `post_type_supports` on every post type exposed in the REST API, from what each supports, or whatever it supports:
+`wp_register_core_post_type_supports_fields()`, in `src/index.php`, registers the fields of `post_type_supports` on every post type exposed in the REST API, from what each supports, or whatever it supports:
 
 - `author`, for the post types supporting `author`.
 - `comment_status`, for the post types supporting `comments`.

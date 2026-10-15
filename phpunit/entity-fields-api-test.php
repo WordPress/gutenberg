@@ -654,7 +654,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 			strtr(
 				$source,
 				array(
-					'register_core_post_type_supports_fields' => 'gutenberg_register_core_post_type_supports_fields',
+					'wp_register_core_post_type_supports_fields' => 'gutenberg_register_core_post_type_supports_fields',
 					'wp_register_core_field_collections' => 'gutenberg_register_core_field_collections',
 				)
 			),
@@ -706,7 +706,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	public function test_the_core_collections_are_registered_at_priority_zero() {
 		$this->assertSame( 0, has_action( 'wp_entity_fields_api_init', 'gutenberg_register_core_field_collections' ) );
 		$this->assertFalse( function_exists( 'wp_register_core_field_collections' ), 'The Gutenberg build prefixes the function.' );
-		$this->assertFalse( function_exists( 'register_core_post_type_supports_fields' ), 'The Gutenberg build prefixes the function.' );
+		$this->assertFalse( function_exists( 'wp_register_core_post_type_supports_fields' ), 'The Gutenberg build prefixes the function.' );
 	}
 
 	/**

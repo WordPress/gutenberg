@@ -4,7 +4,7 @@
  * plugin registers its own.
  *
  * The default fields every post type derives from its supports are
- * registered in code, see register_core_post_type_supports_fields(). Their
+ * registered in code, see wp_register_core_post_type_supports_fields(). Their
  * definitions are the `field.php` files of the `post_type_supports` folder. The
  * post types whose fields differ from the defaults unregister the ones they
  * do not get, as a plugin would, see wp_register_core_field_collections().
@@ -52,7 +52,7 @@
  *
  * @since 7.2.0
  */
-function register_core_post_type_supports_fields() {
+function wp_register_core_post_type_supports_fields() {
 	$definitions = wp_get_entity_field_collection_fields( __DIR__ . '/post_type_supports' );
 
 	foreach ( get_post_types( array( 'show_in_rest' => true ) ) as $post_type ) {
@@ -103,7 +103,7 @@ function register_core_post_type_supports_fields() {
  */
 function wp_register_core_field_collections() {
 	// Defaults registered for all post types based on their supports.
-	register_core_post_type_supports_fields();
+	wp_register_core_post_type_supports_fields();
 
 	// page: unregister unwanted default fields, and register its own.
 	wp_unregister_entity_fields( 'postType', 'page', array( 'title' ) );
