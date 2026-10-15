@@ -13,7 +13,7 @@ export const MINIMUM_INSERTION_HEIGHT = 300;
 
 /**
  * Gets the size in pixels of a range of tracks, including the gaps between
- * them.
+ * them, rounded so that a fraction of a pixel doesn't cost a track.
  *
  * @param {Array<{start: number, end: number}>} tracks The grid tracks.
  * @param {number}                              start  Index of the first track, starting at 1.
@@ -22,7 +22,7 @@ export const MINIMUM_INSERTION_HEIGHT = 300;
  * @return {number} The size of the tracks.
  */
 function getTracksSize( tracks, start, end ) {
-	return tracks[ end - 1 ].end - tracks[ start - 1 ].start;
+	return Math.round( tracks[ end - 1 ].end - tracks[ start - 1 ].start );
 }
 
 /**

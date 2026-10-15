@@ -133,6 +133,28 @@ describe( 'getMinimumInsertionRect()', () => {
 		} );
 	} );
 
+	it( "doesn't add a track for a fraction of a pixel", () => {
+		expect(
+			toPlain(
+				getMinimumInsertionRect( {
+					rect: new GridRect( { columnStart: 1, rowStart: 1 } ),
+					columnTracks: getGridTracks(
+						'41.66px 41.66px 41.66px',
+						10
+					),
+					rowTracks: getGridTracks( '41.66px 41.66px 41.66px', 10 ),
+					minimumWidth: 145,
+					minimumHeight: 145,
+				} )
+			)
+		).toEqual( {
+			columnStart: 1,
+			rowStart: 1,
+			columnSpan: 3,
+			rowSpan: 3,
+		} );
+	} );
+
 	it( "doesn't change cells outside the grid's tracks", () => {
 		expect( getRect( { columnStart: 7, rowStart: 1 } ) ).toEqual( {
 			columnStart: 7,
