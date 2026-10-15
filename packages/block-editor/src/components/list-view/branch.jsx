@@ -57,6 +57,21 @@ function countBlocks(
 
 const noop = () => {};
 
+/**
+ * Whether any of the blocks, or any block nested inside them, is selected.
+ *
+ * @param {Array} blocks            Block tree.
+ * @param {Array} selectedClientIds Selected block client IDs.
+ * @return {boolean} Whether the selection is within the blocks.
+ */
+function hasSelectedBlock( blocks, selectedClientIds ) {
+	return blocks.some(
+		( block ) =>
+			isClientIdSelected( block.clientId, selectedClientIds ) ||
+			hasSelectedBlock( block.innerBlocks ?? [], selectedClientIds )
+	);
+}
+
 function ListViewBranch( props ) {
 	const {
 		blocks,
@@ -105,9 +120,15 @@ function ListViewBranch( props ) {
 		return null;
 	}
 
-	// Only show the appender at the first level.
-	const showAppender = showAppenderProp && level === 1;
 	const filteredBlocks = blocks.filter( Boolean );
+	// The first level always shows the appender. A nested level shows it while
+	// its parent, or any block inside the parent, is selected, so the
+	// appender sits at the end of the list the user is working in.
+	const showAppender =
+		showAppenderProp &&
+		( level === 1 ||
+			isClientIdSelected( parentId, selectedClientIds ) ||
+			hasSelectedBlock( filteredBlocks, selectedClientIds ) );
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
@@ -251,6 +272,7 @@ function ListViewBranch( props ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
+						showAppender={ showAppenderProp }
 					/>
 				) }
 			</AsyncModeProvider>
