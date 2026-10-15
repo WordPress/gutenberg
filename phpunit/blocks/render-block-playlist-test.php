@@ -522,4 +522,60 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 		$this->assertCount( 3, $context['tracks'] );
 		$this->assertSame( array( 'track-0', 'track-1', 'track-2' ), $context['tracks'] );
 	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_renders_when_tracks_have_src_without_id() {
+		$markup = $this->build_playlist_markup(
+			array(),
+			array(
+				array(
+					'title' => 'Song One',
+					'src'   => 'http://example.com/song1.mp3',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$this->assertStringContainsString( 'wp-block-playlist__waveform-player', $output );
+		$this->assertStringContainsString( 'class="wp-block-playlist-track__button"', $output );
+
+		$state    = wp_interactivity_state( 'core/playlist' );
+		$playlist = reset( $state['playlists'] );
+		$this->assertArrayHasKey( 'track-0', $playlist['tracks'] );
+		$this->assertSame( 'http://example.com/song1.mp3', $playlist['tracks']['track-0']['url'] );
+		$this->assertSame( 'Song One', $playlist['tracks']['track-0']['title'] );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_playlist_track_renders_without_id() {
+		$output = do_blocks(
+			'<!-- wp:playlist-track {"title":"Song One","src":"http://example.com/song1.mp3"} /-->'
+		);
+
+		$this->assertStringContainsString( 'class="wp-block-playlist-track__button"', $output );
+		$this->assertStringContainsString( 'Song One', $output );
+	}
+
+	/**
+	 * @covers ::render_block_core_playlist
+	 * @covers ::render_block_core_playlist_track
+	 */
+	public function test_returns_empty_when_tracks_have_no_source() {
+		$markup = $this->build_playlist_markup(
+			array(),
+			array(
+				array(
+					'title' => 'Track without source or id',
+				),
+			)
+		);
+
+		$output = do_blocks( $markup );
+		$this->assertEmpty( trim( $output ) );
+	}
 }
