@@ -301,9 +301,19 @@ export default function useArrowNav() {
 				return;
 			}
 
+			// Abort if our current target is not a candidate for navigation
+			// (e.g. preserve native input behaviors).
+			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
+				return;
+			}
+
 			// A block selected without a text selection within it (e.g. an
 			// image or spacer) has no native selection to extend: start a
-			// block multi-selection with the adjacent block.
+			// block multi-selection with the adjacent block. This must come
+			// after the candidate check above: a native text field within the
+			// block (e.g. the textarea of a block edited as HTML) has no
+			// attribute key in the store but does have its own selection,
+			// which shift+arrow should extend natively.
 			if (
 				shiftKey &&
 				getSelectedBlockClientId() &&
@@ -318,12 +328,6 @@ export default function useArrowNav() {
 					multiSelect( selectedClientId, nextClientId );
 					event.preventDefault();
 				}
-				return;
-			}
-
-			// Abort if our current target is not a candidate for navigation
-			// (e.g. preserve native input behaviors).
-			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
 				return;
 			}
 
