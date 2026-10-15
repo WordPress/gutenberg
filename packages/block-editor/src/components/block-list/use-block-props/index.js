@@ -247,6 +247,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-selected': isSelected,
 				'is-highlighted': isHighlighted,
 				'is-multi-selected': isMultiSelected,
+				'is-movable-multi-selected': isMultiSelected && canMove,
 				'is-partially-selected': isPartiallySelected,
 				'is-reusable': isReusable,
 				'is-dragging': isDragging,

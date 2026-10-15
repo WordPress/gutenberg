@@ -915,4 +915,51 @@ test.describe( 'Draggable block', () => {
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
 		] );
 	} );
+
+	test( 'does not drag a multi-selection of locked blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		const paragraphs = await multiSelectTwoParagraphs( {
+			editor,
+			page,
+			pageUtils,
+		} );
+		await page.evaluate( () => {
+			const { getSelectedBlockClientIds } =
+				window.wp.data.select( 'core/block-editor' );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( getSelectedBlockClientIds(), {
+					lock: { move: true },
+				} );
+		} );
+		await expect(
+			paragraphs
+				.nth( 0 )
+				.evaluate(
+					( n ) =>
+						n.ownerDocument.defaultView.getComputedStyle( n ).cursor
+				)
+		).resolves.not.toBe( 'grab' );
+
+		const box = await paragraphs.nth( 0 ).boundingBox();
+		await page.mouse.move( box.x + box.width - 20, box.y + box.height / 2 );
+		await page.mouse.down();
+		const landingBox = await paragraphs.nth( 2 ).boundingBox();
+		await page.mouse.move(
+			landingBox.x + 40,
+			landingBox.y + landingBox.height - 2,
+			{ steps: 10 }
+		);
+		expect( await isDraggingBlocks( page ) ).toBe( false );
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+			{ name: 'core/paragraph', attributes: { content: 'Landing' } },
+		] );
+	} );
 } );
