@@ -36,6 +36,8 @@ const CUSTOM_VALUE_SETTINGS = {
 	svmax: { max: 100, steps: 1 },
 	lvmax: { max: 100, steps: 1 },
 	dvmax: { max: 100, steps: 1 },
+	lh: { max: 10, steps: 0.1 },
+	rlh: { max: 10, steps: 0.1 },
 };
 
 export default function SpacingInputControl( {

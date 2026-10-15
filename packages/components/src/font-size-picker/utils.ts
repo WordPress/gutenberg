@@ -11,7 +11,7 @@ export function isSimpleCssValue(
 	value: NonNullable< FontSizePickerProps[ 'value' ] >
 ) {
 	const sizeRegex =
-		/^[\d\.]+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)?$/i;
+		/^[\d\.]+(px|em|rem|vw|vh|%|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax|lh|rlh)?$/i;
 	return sizeRegex.test( String( value ) );
 }
 
