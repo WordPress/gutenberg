@@ -189,6 +189,28 @@ describe( 'useFields', () => {
 		} );
 	} );
 
+	it( 'requests nothing when it is not enabled', () => {
+		const registry = createRegistryWithStores();
+		const { result } = renderHook(
+			() =>
+				useFields( {
+					kind: 'postType',
+					name: 'attachment',
+					isEnabled: false,
+				} ),
+			{
+				wrapper: ( { children } ) => (
+					<RegistryProvider value={ registry }>
+						{ children }
+					</RegistryProvider>
+				),
+			}
+		);
+
+		expect( result.current ).toEqual( { fields: [], isLoading: false } );
+		expect( apiFetch ).not.toHaveBeenCalled();
+	} );
+
 	it( 'returns an error instead of an empty list when the request fails', async () => {
 		const restError = {
 			code: 'rest_forbidden',

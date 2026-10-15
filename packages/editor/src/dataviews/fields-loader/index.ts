@@ -182,9 +182,12 @@ export function mergePluginFields< Item >(
  * follow the server ones, unless the server returns a field with the same id,
  * and update as plugins register them.
  *
- * @param config      The entity.
- * @param config.kind Entity kind (e.g. `postType`).
- * @param config.name Entity name (e.g. `page`).
+ * @param config           The entity.
+ * @param config.kind      Entity kind (e.g. `postType`).
+ * @param config.name      Entity name (e.g. `page`).
+ * @param config.isEnabled Whether to request the fields. When `false`, the
+ *                         hook requests nothing and returns no fields, for a
+ *                         caller that reads them from elsewhere.
  * @return The fields, the server ones first, in the server order (empty until
  *         they load), whether they are still loading, and the error when they
  *         could not be requested.
@@ -192,9 +195,11 @@ export function mergePluginFields< Item >(
 export function useFields< Item = any >( {
 	kind,
 	name,
+	isEnabled = true,
 }: {
 	kind: string;
 	name: string;
+	isEnabled?: boolean;
 } ): {
 	fields: Field< Item >[];
 	isLoading: boolean;
@@ -202,6 +207,13 @@ export function useFields< Item = any >( {
 } {
 	const { config, error, pluginFields } = useSelect(
 		( _select ) => {
+			if ( ! isEnabled ) {
+				return {
+					config: undefined,
+					error: undefined,
+					pluginFields: EMPTY_FIELDS as Field< Item >[],
+				};
+			}
 			const { getFieldsConfig, getResolutionError } = unlock(
 				_select( coreStore )
 			);
@@ -217,7 +229,7 @@ export function useFields< Item = any >( {
 				).getEntityPluginFields( kind, name ) as Field< Item >[],
 			};
 		},
-		[ kind, name ]
+		[ kind, name, isEnabled ]
 	);
 
 	const [ resolved, setResolved ] = useState< {
@@ -255,6 +267,9 @@ export function useFields< Item = any >( {
 		[ serverFields, pluginFields ]
 	);
 
+	if ( ! isEnabled ) {
+		return { fields: EMPTY_FIELDS, isLoading: false };
+	}
 	if ( normalizedError ) {
 		return {
 			fields: EMPTY_FIELDS,

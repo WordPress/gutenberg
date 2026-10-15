@@ -4,6 +4,8 @@ import type { Field } from '@wordpress/dataviews';
 import type { BasePostWithEmbeddedAuthor } from '@wordpress/fields';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
+import { useFields } from '../../dataviews/fields-loader';
 
 function usePostFields( {
 	postType,
@@ -15,17 +17,28 @@ function usePostFields( {
 		registerPostTypeSchema( postType );
 	}, [ registerPostTypeSchema, postType ] );
 
-	const { fields } = useSelect(
-		( select ) => {
-			const { getEntityFields } = unlock( select( editorStore ) );
-			return {
-				fields: getEntityFields( 'postType', postType ),
-			};
-		},
-		[ postType ]
+	// The media editor keeps the attachment fields the editor registers
+	// itself; the other post types read theirs from the server.
+	const isAttachment = postType === ATTACHMENT_POST_TYPE;
+
+	const clientFields = useSelect(
+		( select ) =>
+			isAttachment
+				? unlock( select( editorStore ) ).getEntityFields(
+						'postType',
+						postType
+					)
+				: undefined,
+		[ isAttachment, postType ]
 	);
 
-	return fields;
+	const { fields: serverFields } = useFields< BasePostWithEmbeddedAuthor >( {
+		kind: 'postType',
+		name: postType,
+		isEnabled: ! isAttachment,
+	} );
+
+	return isAttachment ? clientFields : serverFields;
 }
 
 /**
