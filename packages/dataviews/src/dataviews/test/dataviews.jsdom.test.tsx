@@ -13,7 +13,7 @@ import type { Action, SupportedLayouts, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
 globalThis.wpVitest.mockMatchMedia();
-
+globalThis.wpVitest.mockPointerEvent();
 globalThis.wpVitest.mockCSSSupports();
 type Data = {
 	id: number;
