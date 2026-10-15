@@ -1,14 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { forwardRef } from '@wordpress/element';
-import { commentAuthorAvatar } from '@wordpress/icons';
 import * as Avatar from '../index';
-import { Icon } from '../../icon';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 
-// Profile illustration by Boxicons: https://unsplash.com/illustrations/simple-black-outline-of-a-person-icon-s4_txsqJZ7M
+// Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
+// Used under the Unsplash License: https://unsplash.com/license
 const IMAGE_SRC =
-	'https://images.unsplash.com/vector-1776244476031-db2aa624a2a0?w=128&h=128&fit=crop&fm=jpg';
+	'https://images.unsplash.com/vector-1753200161282-0c2bef060ac4?w=128&h=128&fit=crop&fm=jpg';
 
 const meta: Meta< typeof Avatar.Root > = {
 	title: 'Components/@wordpress-ui/Avatar',
@@ -17,6 +16,7 @@ const meta: Meta< typeof Avatar.Root > = {
 	subcomponents: {
 		'Avatar.Image': Avatar.Image,
 		'Avatar.Fallback': Avatar.Fallback,
+		'Avatar.Initials': Avatar.Initials,
 	},
 	parameters: {
 		componentStatus: {
@@ -57,20 +57,52 @@ export const FallbackOnly: Story = {
 	),
 };
 
-/** Supply a profile icon from `@wordpress/icons` as fallback content. */
+/** Omit fallback content to display the borderless person silhouette. */
 export const IconFallback: Story = {
 	render: ( args ) => (
 		<Avatar.Root { ...args }>
-			<Avatar.Fallback>
-				<Icon
-					icon={ commentAuthorAvatar }
-					style={ {
-						inlineSize: '75%',
-						blockSize: '75%',
-					} }
-				/>
-			</Avatar.Fallback>
+			<Avatar.Fallback />
 		</Avatar.Root>
+	),
+};
+
+/** Derive complete initials from a display name, or use the person silhouette. */
+export const Initials: StoryObj< typeof Avatar.Initials > = {
+	args: { name: 'Alex Morgan' },
+	argTypes: {
+		name: { control: 'text' },
+		locale: { control: 'text' },
+	},
+	render: ( { name, locale, delay } ) => (
+		<Avatar.Root role="img" aria-label={ name || 'Unknown person' }>
+			<Avatar.Initials name={ name } locale={ locale } delay={ delay } />
+		</Avatar.Root>
+	),
+};
+
+/** Missing images display the fallback immediately despite a delay. */
+export const MissingImage: Story = {
+	render: ( args ) => (
+		<Avatar.Root { ...args }>
+			<Avatar.Initials name="Alex Morgan" delay={ 300 } />
+			<Avatar.Image alt="" />
+		</Avatar.Root>
+	),
+};
+
+/** Decorative avatars retain their layout inside an admin tree item. */
+export const InTree: Story = {
+	render: ( args ) => (
+		<div role="tree">
+			<div role="treeitem">
+				<Stack align="center" gap="sm">
+					<Avatar.Root { ...args } aria-hidden="true">
+						<Avatar.Initials name="Alex Morgan" />
+					</Avatar.Root>
+					<Text>Alex Morgan</Text>
+				</Stack>
+			</div>
+		</div>
 	),
 };
 
@@ -125,6 +157,20 @@ export const Sizes: Story = {
 							)
 						) }
 					</Stack>
+					<Stack gap="md" align="center">
+						{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map(
+							( size ) => (
+								<Avatar.Root
+									{ ...args }
+									key={ size }
+									size={ size }
+									shape={ shape }
+								>
+									<Avatar.Fallback />
+								</Avatar.Root>
+							)
+						) }
+					</Stack>
 				</Stack>
 			) ) }
 		</Stack>
@@ -133,13 +179,28 @@ export const Sizes: Story = {
 
 /** Hide the avatar from assistive technology when the name is shown beside it. */
 export const WithVisibleName: Story = {
+	args: { size: 'sm' },
 	render: ( args ) => (
-		<Stack gap="sm" align="center">
-			<Avatar.Root { ...args } aria-hidden="true">
-				<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-				<Avatar.Image src={ IMAGE_SRC } alt="" />
-			</Avatar.Root>
-			<Text>Alex Morgan</Text>
+		<Stack direction="column" gap="md">
+			<Stack gap="sm" align="center">
+				<Avatar.Root { ...args } aria-hidden="true">
+					<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
+					<Avatar.Image src={ IMAGE_SRC } alt="" />
+				</Avatar.Root>
+				<Text>Alex Morgan</Text>
+			</Stack>
+			<Stack gap="sm" align="center">
+				<Avatar.Root { ...args } aria-hidden="true">
+					<Avatar.Fallback>AM</Avatar.Fallback>
+				</Avatar.Root>
+				<Text>Alex Morgan</Text>
+			</Stack>
+			<Stack gap="sm" align="center">
+				<Avatar.Root { ...args } aria-hidden="true">
+					<Avatar.Fallback />
+				</Avatar.Root>
+				<Text>Alex Morgan</Text>
+			</Stack>
 		</Stack>
 	),
 };

@@ -38,7 +38,19 @@ export type ImageProps = Omit<
 
 export type FallbackProps = ComponentProps< typeof _Avatar.Fallback > & {
 	/**
-	 * The initials, icon, or other content to show until the image loads.
+	 * Custom fallback content. Omit to display the standard person icon.
 	 */
 	children?: React.ReactNode;
+};
+
+export type InitialsProps = Omit< FallbackProps, 'children' > & {
+	/**
+	 * The person's display name. Blank names use the standard person fallback.
+	 */
+	name?: string;
+	/**
+	 * Locale used for character segmentation and uppercase conversion.
+	 * Defaults to the runtime's locale.
+	 */
+	locale?: string;
 };
