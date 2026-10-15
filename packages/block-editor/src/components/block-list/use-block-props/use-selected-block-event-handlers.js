@@ -6,22 +6,6 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-let emptyDragImage;
-
-/**
- * Gets a transparent image, to use as a drag image that shows nothing.
- *
- * @return {HTMLImageElement} A transparent 1x1 image.
- */
-function getEmptyDragImage() {
-	if ( ! emptyDragImage ) {
-		emptyDragImage = new window.Image();
-		emptyDragImage.src =
-			'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-	}
-	return emptyDragImage;
-}
-
 function isColorTransparent( color ) {
 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
 }
@@ -57,10 +41,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			if ( ! isSelected ) {
 				return;
 			}
-
-			// Load the empty drag image before a drag can start, as a drag
-			// image that hasn't loaded yet isn't used.
-			getEmptyDragImage();
 
 			/**
 			 * Interprets keydown event intent to remove or insert after block if
@@ -160,15 +140,6 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					rootLayout.isManualPlacement &&
 					window.__experimentalEnableGridInteractivity
 				) {
-					// Chrome ignores the drag image above and shows its own,
-					// such as a copy of a dragged image. Elsewhere the block
-					// follows the pointer and covers it, but not here.
-					event.dataTransfer.setDragImage(
-						getEmptyDragImage(),
-						0,
-						0
-					);
-
 					const originalOpacity = node.style.opacity;
 					node.style.opacity = '0.5';
 
