@@ -367,6 +367,7 @@ export interface PresetsByOrigin {
  */
 export type Settings = Record< string | symbol, unknown > & {
 	allowedBlockTypes?: boolean | string[];
+	alignWide?: boolean;
 	allowedMimeTypes?: Record< string, string > | null;
 	pageForPosts?: number;
 	pageOnFront?: number;
@@ -374,6 +375,7 @@ export type Settings = Record< string | symbol, unknown > & {
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
+	supportsLayout?: boolean;
 	template?: BlockTemplate;
 	templateLock?: string | false;
 	__experimentalBlockPatterns?: BlockPattern[];
@@ -382,6 +384,7 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalFetchRichUrlData?: FetchRichUrlData;
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
+	__unstableIsBlockBasedTheme?: boolean;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect

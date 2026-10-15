@@ -1,3 +1,4 @@
+import type { ComponentProps, ComponentType } from 'react';
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
@@ -8,6 +9,8 @@ import {
 } from '@wordpress/components';
 import { useAlignmentMenu } from './use-available-alignments';
 import { BLOCK_ALIGNMENTS_CONTROLS, DEFAULT_CONTROL } from './constants';
+import type { BlockAlignmentUIProps } from './types';
+import type { LayoutAlignment } from '../../layouts/types';
 
 function BlockAlignmentUI( {
 	value,
@@ -17,7 +20,7 @@ function BlockAlignmentUI( {
 	isCollapsed = true,
 	label = __( 'Align block' ),
 	description,
-} ) {
+}: BlockAlignmentUIProps ) {
 	/*
 	 * Wide and Full are the alignments users look for and fail to find. When a
 	 * parent layout does not offer them they disappear from this menu with no
@@ -32,7 +35,9 @@ function BlockAlignmentUI( {
 		return null;
 	}
 
-	const menuControls = [ ...enabledControls ];
+	const menuControls: ( LayoutAlignment & { isUnavailable?: boolean } )[] = [
+		...enabledControls,
+	];
 	const enabledNames = menuControls.map( ( { name } ) => name );
 
 	// Unavailable alignments sit where they would have sat had they been
@@ -46,15 +51,22 @@ function BlockAlignmentUI( {
 		} ) )
 	);
 
-	function onChangeAlignment( align ) {
+	function onChangeAlignment( align: string ) {
 		onChange( [ value, 'none' ].includes( align ) ? undefined : align );
 	}
 
-	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
+	// An unset value looks up no control.
+	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value as string ];
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
-	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	// Both take these props; `ToolbarGroup`'s types also require a `title`
+	// for a collapsed group, which was never passed.
+	const UIComponent = (
+		isToolbar ? ToolbarGroup : ToolbarDropdownMenu
+	) as ComponentType<
+		ComponentProps< typeof ToolbarDropdownMenu > & { isCollapsed?: boolean }
+	>;
 	const commonProps = {
 		icon: activeAlignmentControl
 			? activeAlignmentControl.icon
@@ -77,7 +89,7 @@ function BlockAlignmentUI( {
 			}
 		: {
 				toggleProps: description ? { description } : {},
-				children: ( { onClose } ) => {
+				children: ( { onClose }: { onClose: () => void } ) => {
 					return (
 						<>
 							<MenuGroup className="block-editor-block-alignment-control__menu-group">
