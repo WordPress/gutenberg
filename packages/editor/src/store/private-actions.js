@@ -877,8 +877,10 @@ export const restoreRevision =
 		// Save the current content first so that it is stored as a revision
 		// and the restore can be undone. Only do this when neither the saved
 		// nor the edited status is public, so that unsaved edits are not
-		// published.
+		// published. A post that can't be saved has no title, content, or
+		// excerpt to keep.
 		const shouldSaveCurrentContent =
+			select.isEditedPostSaveable() &&
 			UNPUBLISHED_POST_STATUSES.includes(
 				select.getCurrentPostAttribute( 'status' )
 			) &&
