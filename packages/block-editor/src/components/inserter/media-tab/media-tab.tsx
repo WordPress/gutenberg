@@ -37,7 +37,8 @@ function MediaTab( {
 	 */
 	onInsert: ( block: unknown ) => void;
 } ) {
-	const mediaCategories = useMediaCategories( rootClientId );
+	const { categories: mediaCategories, hasResolved } =
+		useMediaCategories( rootClientId );
 
 	// `MediaLibraryButton` hands the selection over untyped, since what the
 	// modal returns depends on which picker the `editor.MediaUpload` filter
@@ -134,7 +135,9 @@ function MediaTab( {
 			);
 
 	if ( ! category ) {
-		return <InserterNoResults />;
+		// Before the categories resolve there is nothing to show yet, which
+		// isn't the same as having nothing to show.
+		return hasResolved ? <InserterNoResults /> : null;
 	}
 
 	return (
