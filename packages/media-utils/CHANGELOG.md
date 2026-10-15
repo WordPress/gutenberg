@@ -10,6 +10,7 @@
 
 ### Bug Fixes
 
+-   Fix the Gallery image editor failing to open for images in an existing gallery ([#81285](https://github.com/WordPress/gutenberg/pull/81285)).
 -   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
 -   `MediaUpload`: Fix `allowedTypes` being ignored when `gallery` prop is `true` ([#78257](https://github.com/WordPress/gutenberg/pull/78257)).
 
