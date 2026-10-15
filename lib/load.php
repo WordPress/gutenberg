@@ -225,6 +225,17 @@ if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
 	}
 	require_once __DIR__ . '/../build/scripts/core-fields/index.php';
 }
+if ( is_dir( __DIR__ . '/../build/scripts/core-actions' ) ) {
+	/*
+	 * Remove the WordPress core callback registering the same actions, or every
+	 * action is registered twice and the second registration is refused.
+	 */
+	$core_actions_priority = has_action( 'wp_entity_actions_api_init', 'wp_register_core_actions' );
+	if ( false !== $core_actions_priority ) {
+		remove_action( 'wp_entity_actions_api_init', 'wp_register_core_actions', $core_actions_priority );
+	}
+	require_once __DIR__ . '/../build/scripts/core-actions/index.php';
+}
 
 // Block supports overrides.
 require __DIR__ . '/block-supports/settings.php';

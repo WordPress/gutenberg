@@ -19,9 +19,13 @@ class Tests_Entity_Actions_API extends WP_UnitTestCase {
 	 * Sets up each test: the default actions of the tests are registered at
 	 * priority 0, so every test runs against a registry holding actions
 	 * registered before the callbacks hooked at the default priority run.
+	 *
+	 * They replace the actions of WordPress core, which are tested on their
+	 * own, see Tests_Core_Actions. The test case hooks those back on tear down.
 	 */
 	public function set_up() {
 		parent::set_up();
+		remove_action( 'wp_entity_actions_api_init', 'gutenberg_register_core_actions', 0 );
 		add_action( 'wp_entity_actions_api_init', array( __CLASS__, 'register_default_actions' ), 0 );
 	}
 

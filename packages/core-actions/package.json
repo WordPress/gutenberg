@@ -49,6 +49,16 @@
 		"./wp_block": "./build-module/wp_block/index.mjs",
 		"./wp_template_part": "./build-module/wp_template_part/index.mjs"
 	},
+	"wpCopyFiles": {
+		"files": [
+			"src/**/*.php"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_"
+			}
+		}
+	},
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
