@@ -187,6 +187,32 @@ describe( 'InlineNotices', () => {
 		} );
 	} );
 
+	describe( 'actions', () => {
+		it( 'does not run a disabled action, even one with a URL', async () => {
+			const user = userEvent.setup();
+			const onClick = vi.fn();
+			// `disabled` is not in the `NoticeAction` type, but notices have
+			// long passed it on to the action button.
+			const actions = [
+				{ label: 'Button action', onClick, disabled: true },
+				{ label: 'Link action', url: '#link', onClick, disabled: true },
+			];
+			await renderWithNotice( 'info', { actions } );
+
+			for ( const name of [ 'Button action', 'Link action' ] ) {
+				const action = screen.getByRole( 'button', { name } );
+				expect( action ).toHaveAttribute( 'aria-disabled', 'true' );
+				// Force the click, as Playwright does not click disabled elements.
+				await user.click( action, { force: true } );
+			}
+
+			expect( onClick ).not.toHaveBeenCalled();
+			expect(
+				screen.queryByRole( 'link', { name: 'Link action' } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'announcements', () => {
 		it( 'announces the message but not the details', async () => {
 			await renderWithNotice( 'error', { details: DETAILS } );

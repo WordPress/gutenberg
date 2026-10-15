@@ -18,6 +18,7 @@ type NoticeAction = NoticeActionType & {
 	className?: string;
 	variant?: string;
 	isPrimary?: boolean;
+	disabled?: boolean;
 };
 
 type InlineNoticeProps = {
@@ -58,11 +59,12 @@ function useAnnouncement( notice: NoticeType ) {
 }
 
 function NoticeActionControl( {
-	action: { label, url, onClick, className, variant, isPrimary },
+	action: { label, url, onClick, className, variant, isPrimary, disabled },
 }: {
 	action: NoticeAction;
 } ) {
-	if ( url ) {
+	// A link cannot be disabled, so a disabled action is always a button.
+	if ( url && ! disabled ) {
 		return (
 			<Notice.ActionLink
 				href={ url }
@@ -79,6 +81,7 @@ function NoticeActionControl( {
 			variant={ variant === 'primary' || isPrimary ? 'solid' : 'outline' }
 			onClick={ onClick }
 			className={ className }
+			disabled={ disabled }
 		>
 			{ label }
 		</Notice.ActionButton>
