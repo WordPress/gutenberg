@@ -3,7 +3,6 @@ import { Stack } from '@wordpress/ui';
 
 export function FloatingContainer( {
 	floating,
-	containerRef,
 	className,
 	style,
 	children,
@@ -14,7 +13,7 @@ export function FloatingContainer( {
 		<Stack
 			direction="column"
 			className={ clsx( className, { 'is-floating': isFloating } ) }
-			ref={ isFloating ? floating.ref : containerRef }
+			ref={ isFloating ? floating.ref : undefined }
 			style={
 				isFloating
 					? {

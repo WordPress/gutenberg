@@ -901,18 +901,12 @@ export function scrollNoteThreadIntoView( noteId, container ) {
 	} );
 }
 
-/*
- * Note timestamps are compared as strings throughout the helpers below.
- * `date_gmt` arrives from the comments endpoint as a fixed-width, zero-padded
- * `Y-m-d\TH:i:s` string, so lexicographic order is chronological order. Parsing
- * these into `Date` objects would be worse than useless here: a date-time
- * without an offset is interpreted as *local* time, so a value produced by the
- * client would not be comparable with one produced by the server.
- */
+// `date_gmt` is a fixed-width `Y-m-d\TH:i:s` string, so the helpers below
+// compare timestamps as strings. Parsing them as `Date` would read them as
+// local time.
 
 /**
- * Returns the most recent activity timestamp across the given note threads,
- * counting both the threads themselves and their replies.
+ * Returns the newest `date_gmt` across the given note threads and their replies.
  *
  * @param {Array} threads Note threads, each optionally carrying a `reply` array.
  * @return {?string} Newest `date_gmt` found, or `null` when there is none.
@@ -931,62 +925,43 @@ export function getLatestNoteActivity( threads ) {
 }
 
 /**
- * Lists the note threads carrying activity the current user has not seen yet.
+ * Whether any of the threads, or their replies, has activity by somebody other
+ * than the current user since `lastSeen`.
  *
- * A thread is listed once however many unseen replies it holds, and only activity
- * authored by somebody else counts - your own note never badges your own
- * toolbar. Pass only the threads that should be eligible (unresolved ones);
- * resolving a thread is not activity a badge should surface.
- *
- * @param {Array}   threads       Eligible note threads, each optionally carrying a `reply` array.
- * @param {?string} lastSeen      `date_gmt` the user last looked at this post's notes. A missing value means nothing has been seen yet.
- * @param {?number} currentUserId Id of the user the count is for.
- * @return {Array} Ids of the threads with unseen activity.
+ * @param {Array}   threads       Note threads, each optionally carrying a `reply` array.
+ * @param {?string} lastSeen      `date_gmt` the user last saw the post's notes, if ever.
+ * @param {?number} currentUserId Current user id. Without it nothing counts.
+ * @return {boolean} Whether there is unseen activity.
  */
-export function getUnseenNoteIds( threads, lastSeen, currentUserId ) {
-	// Without a known viewer there is no way to tell whose activity is whose,
-	// and listing every thread would badge the user for their own notes.
-	if ( ! threads?.length || ! currentUserId ) {
-		return [];
+export function hasUnseenNoteActivity( threads, lastSeen, currentUserId ) {
+	if ( ! currentUserId ) {
+		return false;
 	}
-
-	return threads
-		.filter( ( thread ) =>
-			[ thread, ...( thread?.reply ?? [] ) ].some(
-				( entry ) =>
-					!! entry?.date_gmt &&
-					entry.author !== currentUserId &&
-					( ! lastSeen || entry.date_gmt > lastSeen )
-			)
+	return ( threads ?? [] ).some( ( thread ) =>
+		[ thread, ...( thread?.reply ?? [] ) ].some(
+			( entry ) =>
+				!! entry?.date_gmt &&
+				entry.author !== currentUserId &&
+				( ! lastSeen || entry.date_gmt > lastSeen )
 		)
-		.map( ( thread ) => thread.id );
+	);
 }
 
 /**
- * Records a post's "notes last seen" timestamp, keeping the map bounded.
+ * Records a post's "notes last seen" timestamp, keeping only the `limit` most
+ * recently seen posts.
  *
  * @param {?Object} lastSeen  Existing `{ [ postId ]: date_gmt }` map.
  * @param {number}  postId    Post the timestamp belongs to.
- * @param {string}  timestamp `date_gmt` of the newest activity the user has been shown.
+ * @param {string}  timestamp Newest `date_gmt` the user has been shown.
  * @param {number}  limit     How many posts to keep.
- * @return {Object} New map. The existing one is never mutated.
+ * @return {Object} New map.
  */
 export function setNotesLastSeen( lastSeen, postId, timestamp, limit ) {
-	const next = { ...lastSeen, [ postId ]: timestamp };
-	const postIds = Object.keys( next );
-	if ( postIds.length <= limit ) {
-		return next;
+	const entries = Object.entries( { ...lastSeen, [ postId ]: timestamp } );
+	if ( entries.length <= limit ) {
+		return Object.fromEntries( entries );
 	}
-
-	// Keep the most recently seen posts and drop the rest.
-	postIds.sort( ( a, b ) => {
-		if ( next[ a ] === next[ b ] ) {
-			return 0;
-		}
-		return next[ a ] > next[ b ] ? -1 : 1;
-	} );
-
-	return Object.fromEntries(
-		postIds.slice( 0, limit ).map( ( id ) => [ id, next[ id ] ] )
-	);
+	entries.sort( ( [ , a ], [ , b ] ) => b.localeCompare( a ) );
+	return Object.fromEntries( entries.slice( 0, limit ) );
 }

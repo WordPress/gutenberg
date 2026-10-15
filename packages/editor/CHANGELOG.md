@@ -9,7 +9,7 @@
 ### Enhancements
 
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
--   Notes: Show a dot on the "All notes" toolbar toggle when unresolved notes have activity you have not seen. Your own notes never count, and opening the sidebar or selecting a thread clears it. Opening "All notes" highlights the threads that were unseen, with their replies expanded, until they scroll into view ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
+-   Notes: Show a dot on the "All notes" toolbar toggle when unresolved notes have activity you have not seen. Your own notes never count, and opening the sidebar or selecting a thread clears it ([#81951](https://github.com/WordPress/gutenberg/pull/81951)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 
 ### Bug Fixes

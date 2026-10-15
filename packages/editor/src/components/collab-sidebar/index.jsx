@@ -65,10 +65,7 @@ function NotesSidebar( { postId, drafts } ) {
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	const { hasUnseenNotes, highlightedNoteIds } = useUnseenNotes( {
-		postId,
-		notes,
-	} );
+	const hasUnseenNotes = useUnseenNotes( { postId, notes } );
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
@@ -201,19 +198,11 @@ function NotesSidebar( { postId, drafts } ) {
 					}
 					icon={ commentIcon }
 					badge={ hasUnseenNotes }
-					badgeLabel={
-						hasUnseenNotes
-							? __( 'All notes, new activity' )
-							: undefined
-					}
+					badgeLabel={ __( 'All notes, new activity' ) }
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NoteDraftsContext.Provider value={ drafts }>
-						<Notes
-							notes={ notes }
-							sidebarRef={ sidebarRef }
-							highlightedNoteIds={ highlightedNoteIds }
-						/>
+						<Notes notes={ notes } sidebarRef={ sidebarRef } />
 					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }

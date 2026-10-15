@@ -4,7 +4,6 @@ import { Button } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import {
 	useDebounce,
-	useRefEffect,
 	__experimentalUseFocusOutside as useFocusOutside,
 } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -30,9 +29,6 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
-
-// How long, in milliseconds, an unseen thread stays highlighted once in view.
-const UNSEEN_HIGHLIGHT_DURATION = 2000;
 
 function NoteReply( { note, onEditNote, onAddReply, onCancel } ) {
 	const { initialValue, setDraft } = useNoteDraft( note.id );
@@ -84,7 +80,6 @@ export function NoteThread( {
 	onDiscard,
 	onDeleteNote,
 	isSelected,
-	isUnseen = false,
 	sidebarRef,
 	floating,
 	onKeyDown,
@@ -106,42 +101,6 @@ export function NoteThread( {
 	const isKeyboardTabbingRef = useRef( false );
 	// Minimized threads expand only while focused, not on block selection.
 	const [ hasFocus, setHasFocus ] = useState( false );
-
-	// An unseen thread is highlighted until it has been in view for a moment,
-	// then fades.
-	const [ hasBeenSeen, setHasBeenSeen ] = useState( false );
-	const unseenRef = useRefEffect(
-		( element ) => {
-			if ( ! isUnseen || hasBeenSeen ) {
-				return;
-			}
-			const view = element.ownerDocument.defaultView;
-			let timeoutId;
-			const observer = new view.IntersectionObserver(
-				( [ entry ] ) => {
-					// Linger long enough to be noticed, restarting if the
-					// thread is scrolled away first.
-					view.clearTimeout( timeoutId );
-					if ( entry.isIntersecting ) {
-						timeoutId = view.setTimeout(
-							() => setHasBeenSeen( true ),
-							UNSEEN_HIGHLIGHT_DURATION
-						);
-					}
-				},
-				// Peeking in at the edge of the sidebar doesn't count.
-				{ rootMargin: '-15% 0px' }
-			);
-			observer.observe( element );
-			return () => {
-				observer.disconnect();
-				view.clearTimeout( timeoutId );
-			};
-		},
-		[ isUnseen, hasBeenSeen ]
-	);
-	// Unseen threads show all their replies, since those may be what's new.
-	const isExpanded = isSelected || isUnseen;
 
 	const registerThread = floating?.registerThread;
 	const unregisterThread = floating?.unregisterThread;
@@ -255,7 +214,7 @@ export function NoteThread( {
 		stripHTML( note.content?.rendered ),
 		10
 	);
-	const threadLabel = !! note.blockClientId
+	const ariaLabel = !! note.blockClientId
 		? sprintf(
 				// translators: %s: note excerpt
 				__( 'Note: %s' ),
@@ -266,13 +225,6 @@ export function NoteThread( {
 				__( 'Original block deleted. Note: %s' ),
 				noteExcerpt
 			);
-	const ariaLabel = isUnseen
-		? sprintf(
-				// translators: %s: note label, e.g. "Note: Please rework this".
-				__( '%s, new activity' ),
-				threadLabel
-			)
-		: threadLabel;
 
 	if ( isFloating && note.id === 'new' ) {
 		return (
@@ -292,12 +244,9 @@ export function NoteThread( {
 			floating={
 				isFloating ? { y: floating.y, ref: floatingRef } : undefined
 			}
-			containerRef={ unseenRef }
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 				'has-focus': hasFocus,
-				'is-unseen': isUnseen && ! hasBeenSeen,
-				'was-unseen': isUnseen && hasBeenSeen,
 			} ) }
 			id={ `note-thread-${ note.id }` }
 			gap="md"
@@ -349,7 +298,7 @@ export function NoteThread( {
 				onDeleteNote={ onDeleteNote }
 				onResolve={ handleResolve }
 			/>
-			{ isExpanded &&
+			{ isSelected &&
 				allReplies.map( ( reply ) => (
 					<Note
 						key={ reply.id }
@@ -360,7 +309,7 @@ export function NoteThread( {
 						onDeleteNote={ onDeleteNote }
 					/>
 				) ) }
-			{ ! isExpanded && restReplies.length > 0 && (
+			{ ! isSelected && restReplies.length > 0 && (
 				<Stack
 					direction="row"
 					align="center"
@@ -388,7 +337,7 @@ export function NoteThread( {
 					</Button>
 				</Stack>
 			) }
-			{ ! isExpanded && lastReply && (
+			{ ! isSelected && lastReply && (
 				<Note
 					note={ lastReply }
 					parentNote={ note }
