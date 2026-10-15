@@ -2,7 +2,7 @@
 	"$schema": "./schemas/json/wp-env.json",
 	"testsEnvironment": false,
 	"port": 8889,
-	"core": "WordPress/WordPress",
+	"core": "WordPress/WordPress#7.1-branch",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"config": {
