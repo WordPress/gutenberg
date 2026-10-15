@@ -13,7 +13,7 @@
  * @param mixed $style_node A style node, possibly containing a `css` key.
  * @return bool Whether the node has a non-empty custom CSS string.
  */
-function gutenberg_has_custom_css( $style_node ) {
+function gutenberg_custom_css_has_value( $style_node ) {
 	return is_array( $style_node )
 		&& isset( $style_node['css'] )
 		&& is_string( $style_node['css'] )
@@ -316,7 +316,7 @@ function gutenberg_strip_custom_css_from_style_array( $style ) {
 	unset( $style['css'] );
 
 	foreach ( $style as $key => $value ) {
-		if ( is_array( $value ) && ( str_starts_with( $key, ':' ) || str_starts_with( $key, '@' ) ) ) {
+		if ( is_string( $key ) && is_array( $value ) && ( str_starts_with( $key, ':' ) || str_starts_with( $key, '@' ) ) ) {
 			$nested_style = gutenberg_strip_custom_css_from_style_array( $value );
 			if ( empty( $nested_style ) ) {
 				unset( $style[ $key ] );
