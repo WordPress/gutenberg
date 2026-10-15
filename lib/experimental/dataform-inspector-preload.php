@@ -24,9 +24,7 @@ function gutenberg_dataform_inspector_preload_paths( $paths, $context ) {
 
 	// `DataFormPostSummary` reads the fields of the post type through
 	// `useFields`, from the `wp/v2/entity-fields` route.
-	if ( function_exists( '_gutenberg_get_post_type_fields_preload_paths' ) ) {
-		$paths = array_merge( $paths, _gutenberg_get_post_type_fields_preload_paths( array( $context->post->post_type ) ) );
-	}
+	$paths = array_merge( $paths, _gutenberg_get_post_type_fields_preload_paths( array( $context->post->post_type ) ) );
 
 	return $paths;
 }
