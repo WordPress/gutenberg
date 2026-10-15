@@ -258,6 +258,7 @@ supports: {
     -   `gradients`: type `boolean`, default value `false`
     -   `heading`: type `boolean`, default value `false`
     -   `link`: type `boolean`, default value `false`
+    -   `placeholder`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
 
 This value signals that a block supports some of the properties related to color. When this value is present, the block editor will show UI controls for the user to set their values.
@@ -552,6 +553,49 @@ When the block declares support for `color.link`, the attributes definition is e
                 }
             }
         }
+    }
+    ```
+
+### color.placeholder
+
+This property adds block controls which allow the user to set the placeholder text color of the text inputs and textareas in a block. Placeholder colors are disabled by default.
+
+To enable placeholder color support, set `color.placeholder` to `true`.
+
+```js
+supports: {
+	color: {
+		placeholder: true
+	}
+}
+```
+
+Placeholder color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
+
+When the block declares support for `color.placeholder`, the attributes definition is extended to include the `style` attribute:
+
+-   `style`: an attribute of `object` type with no default assigned.
+
+    When a placeholder color is selected, the color value is stored in the `style.elements.textInput.::placeholder.color.text` attribute. The same path is used by the `textInput` element in `theme.json`.
+
+    The block can apply a default placeholder color by specifying its own attribute with a default. For example:
+
+    ```js
+    attributes: {
+        style: {
+            type: 'object',
+            default: {
+                elements: {
+                    textInput: {
+                        '::placeholder': {
+                            color: {
+                                text: 'var:preset|color|contrast',
+                            },
+                        },
+                    },
+                },
+            },
+        },
     }
     ```
 

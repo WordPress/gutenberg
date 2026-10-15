@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
@@ -10,6 +10,7 @@ import ColorPanel, {
 	useHasHeadingPanel,
 	useHasButtonPanel,
 	useHasCaptionPanel,
+	useHasPlaceholderPanel,
 } from '../color-panel';
 
 // The inheritance treatment sits behind the
@@ -83,6 +84,13 @@ describe( 'useHasColorPanel', () => {
 	it( 'should be true when caption element is enabled', async () => {
 		const { result } = await renderHook( () =>
 			useHasColorPanel( settingsWithColors( { caption: true } ) )
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'should be true when placeholder color is enabled', async () => {
+		const { result } = await renderHook( () =>
+			useHasColorPanel( settingsWithColors( { placeholder: true } ) )
 		);
 		expect( result.current ).toBeTruthy();
 	} );
@@ -193,6 +201,22 @@ describe( 'element color hooks', () => {
 		);
 		expect( result.current ).toBeTruthy();
 	} );
+
+	it( 'useHasPlaceholderPanel is truthy when placeholder is enabled with colors', async () => {
+		const { result } = await renderHook( () =>
+			useHasPlaceholderPanel(
+				settingsWithColors( { placeholder: true } )
+			)
+		);
+		expect( result.current ).toBeTruthy();
+	} );
+
+	it( 'useHasPlaceholderPanel is falsy without colors or custom colors', async () => {
+		const { result } = await renderHook( () =>
+			useHasPlaceholderPanel( { color: { placeholder: true } } )
+		);
+		expect( result.current ).toBeFalsy();
+	} );
 } );
 
 // Inherited Global Styles label treatment for the controls the Color
@@ -259,6 +283,52 @@ describe( 'ColorPanel — duplicate-hex preset slug identity', () => {
 		// must follow the stored slug; matching by hex would mark both.
 		expect( swatches[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		expect( swatches[ 0 ] ).toHaveAttribute( 'aria-selected', 'false' );
+	} );
+} );
+
+describe( 'ColorPanel — placeholder', () => {
+	it( 'stores the placeholder color under the textInput element', async () => {
+		const onChange = vi.fn();
+		await render(
+			<ColorPanel
+				value={ {} }
+				settings={ settingsWithColors( { placeholder: true } ) }
+				onChange={ onChange }
+				panelId="test-panel"
+			/>
+		);
+
+		await userEvent.click(
+			screen.getByRole( 'button', { name: /^Placeholder/ } )
+		);
+		await userEvent.click(
+			await screen.findByRole( 'option', { name: 'Red' } )
+		);
+
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			elements: {
+				textInput: {
+					'::placeholder': {
+						color: { text: 'var:preset|color|red' },
+					},
+				},
+			},
+		} );
+	} );
+
+	it( 'does not render the placeholder control when it is disabled', async () => {
+		await render(
+			<ColorPanel
+				value={ {} }
+				settings={ settingsWithColors( { link: true } ) }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+
+		expect(
+			screen.queryByRole( 'button', { name: /^Placeholder/ } )
+		).not.toBeInTheDocument();
 	} );
 } );
 

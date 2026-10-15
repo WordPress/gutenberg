@@ -25,12 +25,14 @@ function gutenberg_register_colors_support( $block_type ) {
 	$has_link_colors_support       = $color_support['link'] ?? false;
 	$has_button_colors_support     = $color_support['button'] ?? false;
 	$has_heading_colors_support    = $color_support['heading'] ?? false;
+	$has_placeholder_color_support = $color_support['placeholder'] ?? false;
 	$has_color_support             = $has_text_colors_support ||
 		$has_background_colors_support ||
 		$has_gradients_support ||
 		$has_link_colors_support ||
 		$has_button_colors_support ||
-		$has_heading_colors_support;
+		$has_heading_colors_support ||
+		$has_placeholder_color_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();

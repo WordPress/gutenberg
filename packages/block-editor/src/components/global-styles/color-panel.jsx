@@ -17,7 +17,7 @@ import {
 import { isGlobalStylesInheritanceIndicatorUIEnabled } from './inheritance';
 
 // Despite the "ColorPanel" name, this gates only the element-level color
-// controls (link, heading, button, caption, h1–h6) — surfaced as the
+// controls (link, heading, button, caption, placeholder, h1–h6) — surfaced as the
 // "Elements" panel in the block inspector and the "Colors" screen in
 // Global Styles. Top-level text and background color moved to the
 // Typography and Background panels, so this returns false for blocks
@@ -27,8 +27,15 @@ export function useHasColorPanel( settings ) {
 	const hasHeadingPanel = useHasHeadingPanel( settings );
 	const hasButtonPanel = useHasButtonPanel( settings );
 	const hasCaptionPanel = useHasCaptionPanel( settings );
+	const hasPlaceholderPanel = useHasPlaceholderPanel( settings );
 
-	return hasLinkPanel || hasHeadingPanel || hasButtonPanel || hasCaptionPanel;
+	return (
+		hasLinkPanel ||
+		hasHeadingPanel ||
+		hasButtonPanel ||
+		hasCaptionPanel ||
+		hasPlaceholderPanel
+	);
 }
 
 export function useHasTextPanel( settings ) {
@@ -51,6 +58,14 @@ export function useHasCaptionPanel( settings ) {
 	const colors = useColorsPerOrigin( settings );
 	return (
 		settings?.color?.caption &&
+		( colors?.length > 0 || settings?.color?.custom )
+	);
+}
+
+export function useHasPlaceholderPanel( settings ) {
+	const colors = useColorsPerOrigin( settings );
+	return (
+		settings?.color?.placeholder &&
 		( colors?.length > 0 || settings?.color?.custom )
 	);
 }
@@ -129,6 +144,7 @@ const DEFAULT_CONTROLS = {
 	heading: true,
 	button: true,
 	caption: true,
+	placeholder: true,
 };
 
 export default function ColorPanel( {
@@ -208,6 +224,34 @@ export default function ColorPanel( {
 		onChange( newValue );
 	};
 
+	// Placeholder text of the inputs inside the block.
+	const showPlaceholderPanel = useHasPlaceholderPanel( settings );
+	const placeholderPath = [
+		'elements',
+		'textInput',
+		'::placeholder',
+		'color',
+		'text',
+	];
+	const placeholderColor = decodeInheritedColor(
+		inheritedValue?.elements?.textInput?.[ '::placeholder' ]?.color?.text
+	);
+	const userPlaceholderColor = decodeValue(
+		value?.elements?.textInput?.[ '::placeholder' ]?.color?.text
+	);
+	const setPlaceholderColor = ( newColor, newSlug ) => {
+		onChange(
+			setImmutably(
+				value,
+				placeholderPath,
+				encodeColorValueWithPalette( allColors, newColor, newSlug )
+			)
+		);
+	};
+	const resetPlaceholder = () => {
+		onChange( setImmutably( value, placeholderPath, undefined ) );
+	};
+
 	const showCaptionPanel = useHasCaptionPanel( settings );
 	const showButtonPanel = useHasButtonPanel( settings );
 	const showHeadingPanel = useHasHeadingPanel( settings );
@@ -277,7 +321,7 @@ export default function ColorPanel( {
 
 	const resetAllFilter = useCallback(
 		( previousValue ) => {
-			return {
+			const newValue = {
 				...previousValue,
 				elements: {
 					...previousValue?.elements,
@@ -299,6 +343,11 @@ export default function ColorPanel( {
 					}, {} ),
 				},
 			};
+			return setImmutably(
+				newValue,
+				[ 'elements', 'textInput', '::placeholder', 'color' ],
+				undefined
+			);
 		},
 		[ elements ]
 	);
@@ -357,6 +406,40 @@ export default function ColorPanel( {
 					isPlaceholder:
 						userHoverLinkColor === undefined &&
 						hoverLinkColor !== undefined,
+				},
+			],
+		},
+		showPlaceholderPanel && {
+			key: 'placeholder',
+			label: __( 'Placeholder' ),
+			hasValue: () => !! userPlaceholderColor,
+			resetValue: resetPlaceholder,
+			isShownByDefault: defaultControls.placeholder,
+			indicators: [ userPlaceholderColor ?? placeholderColor ],
+			isPlaceholder:
+				userPlaceholderColor === undefined &&
+				placeholderColor !== undefined,
+			hasInheritedValue: placeholderColor !== undefined,
+			tabs: [
+				{
+					key: 'placeholder',
+					label: __( 'Text' ),
+					inheritedValue: placeholderColor,
+					inheritedSlug: extractPresetSlug(
+						inheritedValue?.elements?.textInput?.[ '::placeholder' ]
+							?.color?.text,
+						'color'
+					),
+					userSlug: extractPresetSlug(
+						value?.elements?.textInput?.[ '::placeholder' ]?.color
+							?.text,
+						'color'
+					),
+					setValue: setPlaceholderColor,
+					userValue: userPlaceholderColor,
+					isPlaceholder:
+						userPlaceholderColor === undefined &&
+						placeholderColor !== undefined,
 				},
 			],
 		},

@@ -406,6 +406,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 7.1.0 Added `viewport` property.
 	 * @since 7.2.0 Added `typography.textShadow`, `typography.textShadowPresets`,
 	 *              and `typography.defaultTextShadowPresets`.
+	 * @since 7.2.0 Added `color.placeholder`.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -441,6 +442,7 @@ class WP_Theme_JSON_Gutenberg {
 			'heading'          => null,
 			'button'           => null,
 			'caption'          => null,
+			'placeholder'      => null,
 			'palette'          => null,
 			'text'             => null,
 		),
@@ -1030,6 +1032,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.0.0
 	 * @since 6.2.0 Added `dimensions.minHeight` and `position.sticky`.
 	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.2.0 Added `color.placeholder`.
 	 * @var array
 	 */
 	const APPEARANCE_TOOLS_OPT_INS = array(
@@ -1044,6 +1047,7 @@ class WP_Theme_JSON_Gutenberg {
 		array( 'color', 'heading' ),
 		array( 'color', 'button' ),
 		array( 'color', 'caption' ),
+		array( 'color', 'placeholder' ),
 		array( 'dimensions', 'aspectRatio' ),
 		array( 'dimensions', 'height' ),
 		array( 'dimensions', 'minHeight' ),
