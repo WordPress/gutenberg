@@ -4,8 +4,8 @@
 
 ### Breaking Changes
 
+-   Date format and preset selectors now use `@wordpress/ui`. They no longer render `.components-custom-select-control` or its item and hint classes, the `has-hint` modifier, the legacy `.components-input-base`, `.components-input-control__container`, `.components-input-control__backdrop`, `.components-input-control__suffix`, and `.components-input-control-suffix-wrapper` classes, `.components-base-control__label`, or `.block-editor-date-format-picker__custom-format-select-control__custom-option`. Control-specific root classes are retained. Update overrides that target the removed classes to use control-specific hooks or Design System theme tokens. Popup items are now portaled outside the control root, so root-descendant selectors no longer reach them ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   `ImageSizeControl`: The event in the `onChangeImage` callback's `{ event }` argument now comes from popup selection rather than a native select change. Read the selected value from the `slug` argument rather than `event.target.value` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
-
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
 ### New Features
@@ -15,6 +15,7 @@
 
 ### Enhancements
 
+-   Migrate date format and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, forwarded trigger props, and control-specific root CSS hooks. Also migrate the date format switch, custom input, link, and layout, and simplify the aspect-ratio control's option rendering ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).
 -   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 -   `BlockBreadcrumb`: Use the `Breadcrumb` component from `@wordpress/ui` to collapse overflowing ancestors into a menu while preserving block selection and document-root activation, including multi-block selections. Use block titles when renamed labels are blank after stripping HTML. Accept a `className` for consumer-specific layout ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
