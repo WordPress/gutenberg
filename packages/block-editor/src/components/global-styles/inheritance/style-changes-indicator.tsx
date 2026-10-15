@@ -52,7 +52,7 @@ function getRowSource( row: StyleChangeRow ) {
 			/* translators: 1: Replaced value, e.g. "Medium". 2: Where it is set, e.g. "Button element". */
 			__( 'Was %1$s · %2$s' ),
 			getStyleValueDisplay( row.path, row.inheritedValue ).text,
-			row.sourceLabel
+			row.sourceLabel ?? ''
 		);
 	}
 	if ( row.status === 'local' ) {
@@ -72,9 +72,7 @@ function StyleValue( { row }: { row: StyleChangeRow } ) {
 		>
 			{ color && <ColorIndicator colorValue={ color } /> }
 			<Tooltip.Root>
-				<Tooltip.Trigger render={ <Truncate /> }>
-					{ text }
-				</Tooltip.Trigger>
+				<Tooltip.Trigger render={ <Truncate>{ text }</Truncate> } />
 				<Tooltip.Popup>{ text }</Tooltip.Popup>
 			</Tooltip.Root>
 		</Stack>
@@ -126,6 +124,7 @@ function StyleChangesList( {
 		<div className="block-editor-style-changes">
 			<InspectorPopoverHeader
 				title={ __( 'Style changes' ) }
+				help={ undefined }
 				onClose={ onClose }
 			/>
 			<section className="block-editor-style-changes__group">
@@ -252,7 +251,7 @@ export default function StyleChangesIndicator( {
 		[ clientId ]
 	);
 	const blockEditContext = useMemo(
-		() => ( { name: blockName, clientId, isSelected: true } ),
+		() => ( { name: blockName ?? '', clientId, isSelected: true } ),
 		[ blockName, clientId ]
 	);
 	if (
