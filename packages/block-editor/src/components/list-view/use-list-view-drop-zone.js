@@ -165,14 +165,30 @@ function getNextNonDraggedBlock( blocksData, index ) {
  *
  * Determined based on nesting level indentation of the current block, plus
  * the indentation of the next level of nesting. The vertical position of the
- * cursor must also be within the block.
+ * cursor must also be within the block, or in the gap between the block and
+ * the next block.
+ *
+ * While dragging, the rows are displaced to make room for the drop indicator:
+ * when the dragged block sits above the target, the target row shifts up by
+ * the dragged block's height, and the drop indicator opens a gap between the
+ * target and the block after it, under the cursor. A nesting gesture over that
+ * gap still targets the block above it, otherwise the next `dragover` reads
+ * the displaced rows, drops the nesting, and the rows shift back.
  *
  * @param {WPPoint} point        The point representing the cursor position when dragging.
  * @param {DOMRect} rect         The rectangle.
  * @param {number}  nestingLevel The nesting level of the block.
  * @param {boolean} rtl          Whether the editor is in RTL mode.
+ * @param {number}  [bottom]     The lowest vertical position that still counts as the block;
+ *                               the top of the next block when a gap separates them.
  */
-function isNestingGesture( point, rect, nestingLevel = 1, rtl = false ) {
+function isNestingGesture(
+	point,
+	rect,
+	nestingLevel = 1,
+	rtl = false,
+	bottom = rect.bottom
+) {
 	const blockIndentPosition = rtl
 		? rect.right - nestingLevel * NESTING_LEVEL_INDENTATION
 		: rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
@@ -181,7 +197,7 @@ function isNestingGesture( point, rect, nestingLevel = 1, rtl = false ) {
 		? point.x < blockIndentPosition - NESTING_LEVEL_INDENTATION
 		: point.x > blockIndentPosition + NESTING_LEVEL_INDENTATION;
 
-	return isNestingHorizontalGesture && point.y < rect.bottom;
+	return isNestingHorizontalGesture && point.y < bottom;
 }
 
 // Block navigation is always a vertical list, so only allow dropping
@@ -271,6 +287,7 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 	);
 
 	const isDraggingBelow = candidateEdge === 'bottom';
+	const nextBlock = getNextNonDraggedBlock( blocksData, candidateBlockIndex );
 
 	// If the user is dragging towards the bottom of the block check whether
 	// they might be trying to nest the block as a child.
@@ -287,7 +304,15 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 				position,
 				candidateRect,
 				candidateBlockParents.length,
-				rtl
+				rtl,
+				// The block extends to the next block when the drop indicator
+				// displaces the rows and opens a gap between them.
+				nextBlock
+					? Math.max(
+							candidateRect.bottom,
+							nextBlock.element.getBoundingClientRect().top
+						)
+					: candidateRect.bottom
 			) )
 	) {
 		// If the block is expanded, insert the block as the first child.
@@ -316,10 +341,6 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 			rtl
 		)
 	) {
-		const nextBlock = getNextNonDraggedBlock(
-			blocksData,
-			candidateBlockIndex
-		);
 		const currentLevel = candidateBlockData.nestingLevel;
 		const nextLevel = nextBlock ? nextBlock.nestingLevel : 1;
 

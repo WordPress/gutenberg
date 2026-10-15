@@ -703,7 +703,141 @@ test.describe( 'Navigation block - List view editing', () => {
 			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
 		).toBeVisible();
 	} );
+
+	test( 'nests and un-nests menu items by dragging across the indentation', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content: `<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"https://wordpress.org/1","kind":"custom"} /-->
+<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"https://wordpress.org/2","kind":"custom"} /-->
+<!-- wp:navigation-link {"label":"Item 3","type":"custom","url":"https://wordpress.org/3","kind":"custom"} /-->`,
+		} );
+
+		await editor.insertBlock( { name: 'core/navigation' } );
+		await editor.openDocumentSettingsSidebar();
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+			description: 'Structure for navigation menu: Test Menu',
+		} );
+		const item = ( name ) =>
+			listView.getByRole( 'gridcell', { name, exact: true } );
+
+		await expect( item( 'Item 3' ) ).toBeVisible();
+
+		await test.step( 'dragging an item down and to the right nests it in the item above', async () => {
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 1' ),
+				to: item( 'Item 2' ),
+				indentation: 2,
+			} );
+
+			// Item 2 becomes a submenu holding Item 1.
+			await expect(
+				item( 'Item 1' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+			await expect(
+				item( 'Item 2' ).filter( { hasText: 'Block 1 of 2, Level 1.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'dragging an item down and to the left moves it out of the submenu', async () => {
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 1' ),
+				to: item( 'Item 3' ),
+				indentation: 1,
+			} );
+
+			await expect(
+				item( 'Item 1' ).filter( { hasText: 'Block 3 of 3, Level 1.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'dragging an item up and to the right nests it in the item above', async () => {
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 3' ),
+				to: item( 'Item 2' ),
+				indentation: 2,
+			} );
+
+			await expect(
+				item( 'Item 3' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+
+		await test.step( 'dragging a nested item to the left of its level un-nests it', async () => {
+			// Put a second item in the submenu so there is a row to drop below.
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 1' ),
+				to: item( 'Item 3' ),
+				indentation: 2,
+			} );
+			await expect(
+				item( 'Item 1' ).filter( { hasText: 'Block 2 of 2, Level 2.' } )
+			).toBeVisible();
+
+			await dragListViewBlockTo( editor, {
+				from: item( 'Item 1' ),
+				to: item( 'Item 3' ),
+				indentation: 1,
+			} );
+
+			await expect(
+				item( 'Item 1' ).filter( { hasText: 'Block 2 of 2, Level 1.' } )
+			).toBeVisible();
+			await expect(
+				item( 'Item 3' ).filter( { hasText: 'Block 1 of 1, Level 2.' } )
+			).toBeVisible();
+		} );
+	} );
 } );
+
+/**
+ * Drags a List View row onto the bottom half of another row, with the cursor
+ * over the given indentation level, and drops it there.
+ *
+ * @param {Object} editor              Editor utils.
+ * @param {Object} options
+ * @param {Object} options.from        Locator of the dragged row's cell.
+ * @param {Object} options.to          Locator of the target row's cell.
+ * @param {number} options.indentation Nesting level to hold the cursor over. `1` is the
+ *                                     target's own level, `2` nests inside it.
+ */
+async function dragListViewBlockTo( editor, { from, to, indentation } ) {
+	const { page } = editor;
+	// The drop zone measures the cursor against positions 24px apart from the
+	// row's left edge, one per nesting level, and rounds to the nearest one.
+	// Stay a few pixels right of the requested level's position so the
+	// rounding resolves to that level.
+	const NESTING_LEVEL_INDENTATION = 24;
+	const fromRow = from.locator( 'xpath=ancestor::*[@role="row"][1]' );
+	const toRow = to.locator( 'xpath=ancestor::*[@role="row"][1]' );
+	const fromRect = await fromRow.boundingBox();
+	const toRect = await toRow.boundingBox();
+	const x =
+		toRect.x +
+		NESTING_LEVEL_INDENTATION * indentation +
+		NESTING_LEVEL_INDENTATION / 4;
+	const y = toRect.y + toRect.height * 0.75;
+
+	await from.hover();
+	await page.mouse.down();
+	await page.mouse.move( x, fromRect.y + fromRect.height / 2, { steps: 5 } );
+	await page.mouse.move( x, y, { steps: 20 } );
+	// Dispatch a final dragover at the drop position; see
+	// https://playwright.dev/docs/input#dragging-manually
+	await page.mouse.move( x + 1, y, { steps: 2 } );
+
+	// Disable reason: Need to wait until the throttle timeout of 250ms has passed.
+	/* eslint-disable playwright/no-wait-for-timeout */
+	await editor.page.waitForTimeout( 300 );
+	/* eslint-enable playwright/no-wait-for-timeout */
+
+	await page.mouse.up();
+}
 
 class LinkControl {
 	constructor( { page } ) {
