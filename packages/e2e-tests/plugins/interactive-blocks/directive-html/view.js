@@ -7,7 +7,12 @@ const policy = window.trustedTypes?.createPolicy( 'directive-html', {
 const { state } = store( 'directive-html', {
 	state: {
 		html: null,
-		rejected: null,
+		// Matches the server-rendered fallback, so it renders before the
+		// rejected value replaces it.
+		rejected: asDangerousHTML(
+			policy?.createHTML( '<p>Rejected fallback</p>' ) ??
+				'<p>Rejected fallback</p>'
+		),
 		empty: null,
 		list: [ 'a', 'b' ],
 		hydration: 'hydrated',

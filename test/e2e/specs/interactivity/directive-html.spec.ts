@@ -94,6 +94,7 @@ test.describe( 'data-wp-html', () => {
 		await expect.poll( () => target.innerHTML() ).toBe( '' );
 		expect( await violations() ).toEqual( [] );
 		expect( pageErrors ).toEqual( [] );
+		expect( await rejected.innerHTML() ).toBe( '<p>Rejected fallback</p>' );
 		await page.getByTestId( 'set rejected html' ).click();
 		await expect.poll( violations ).toEqual( [
 			{

@@ -103,18 +103,40 @@ describe( 'router regions in HTML directive content', () => {
 		);
 	} );
 
-	test( 'never initializes an island in fallback content inside an updated region', async () => {
+	test( 'never initializes islands in fallback or inserted content inside an updated region', async () => {
+		const island = ( text: string ) =>
+			`<div data-wp-interactive="${ namespace }" data-wp-init="actions.mark"><p>${ text }</p></div>`;
+		store( namespace, {
+			state: {
+				// Inserted content holding an island that must stay inert.
+				html: asDangerousHTML( island( 'inserted' ) ),
+			},
+		} );
+		// The destination declares `state.pending` as derived state the client
+		// hasn't defined, so its fallback stays in place.
+		const serverData = JSON.stringify( {
+			state: { [ namespace ]: { pending: {} } },
+			derivedStateClosures: { [ namespace ]: [ 'state.pending' ] },
+		} );
 		const current = hydrateHtml( regionHtml( '<p>current</p>' ) );
 
 		await navigate(
 			regionHtml(
-				`<div data-wp-html="state.html"><div data-wp-interactive="${ namespace }" data-wp-init="actions.mark"><p>static</p></div></div>`
-			)
+				`<div data-wp-html="state.pending">${ island(
+					'fallback'
+				) }</div><div data-wp-html="state.html"><p>replaced</p></div>`
+			) +
+				`<script type="application/json" id="wp-script-module-data-@wordpress/interactivity">${ serverData }</script>`
 		);
 
-		expect(
-			current.querySelector( '[data-wp-html]' )!
-		).toBeEmptyDOMElement();
+		const [ fallback, inserted ] =
+			current.querySelectorAll( '[data-wp-html]' );
+		expect( fallback.querySelector( '[data-wp-init]' ) ).toHaveTextContent(
+			/^fallback$/
+		);
+		expect( inserted.querySelector( '[data-wp-init]' ) ).toHaveTextContent(
+			/^inserted$/
+		);
 		expect( marks ).toBe( 0 );
 	} );
 } );
