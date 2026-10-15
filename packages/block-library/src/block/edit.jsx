@@ -1,11 +1,7 @@
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo } from '@wordpress/element';
-import {
-	useEntityRecord,
-	store as coreStore,
-	useEntityBlockEditor,
-} from '@wordpress/core-data';
+import { store as coreStore, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner as WCSpinner,
@@ -149,46 +145,44 @@ function ReusableBlockEdit( {
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 } ) {
-	const { record, hasResolved } = useEntityRecord(
-		'postType',
-		'wp_block',
-		ref
+	// Render the pattern from its `view` record, which every user who can read
+	// it can load. Once its `edit` record is loaded, for example by "Edit
+	// original", render that instead: core-data doesn't update `view` records,
+	// so they'd miss the pattern's edits and saves.
+	const hasEditRecord = useSelect(
+		( select ) =>
+			select( coreStore ).hasEntityRecord( 'postType', 'wp_block', ref ),
+		[ ref ]
 	);
-	const [ editableBlocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
+	const [ editedBlocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
+		id: hasEditRecord ? ref : 0,
 	} );
-
-	// A user who can read the pattern but not edit it can't load it in the
-	// `edit` context. Its `view` context has the content too, so render that.
-	const isUnavailableToEdit = hasResolved && ! record;
-	const { readOnlyRecord, hasResolvedReadOnly } = useSelect(
+	const { viewRecord, hasResolvedViewRecord } = useSelect(
 		( select ) => {
-			if ( ! isUnavailableToEdit ) {
+			if ( hasEditRecord ) {
 				return {};
 			}
 			const args = [ 'postType', 'wp_block', ref, { context: 'view' } ];
 			const { getEntityRecord, hasFinishedResolution } =
 				select( coreStore );
 			return {
-				readOnlyRecord: getEntityRecord( ...args ),
-				hasResolvedReadOnly: hasFinishedResolution(
+				viewRecord: getEntityRecord( ...args ),
+				hasResolvedViewRecord: hasFinishedResolution(
 					'getEntityRecord',
 					args
 				),
 			};
 		},
-		[ isUnavailableToEdit, ref ]
+		[ hasEditRecord, ref ]
 	);
-	const readOnlyContent = readOnlyRecord?.content?.raw;
-	const readOnlyBlocks = useMemo(
-		() => ( readOnlyContent ? parse( readOnlyContent ) : EMPTY_ARRAY ),
-		[ readOnlyContent ]
+	const viewContent = viewRecord?.content?.raw;
+	const viewBlocks = useMemo(
+		() => ( viewContent ? parse( viewContent ) : EMPTY_ARRAY ),
+		[ viewContent ]
 	);
-	const blocks = editableBlocks?.length ? editableBlocks : readOnlyBlocks;
-	const isResolving = isUnavailableToEdit
-		? ! hasResolvedReadOnly
-		: ! hasResolved;
-	const isMissing = ! isResolving && ! record && ! readOnlyRecord;
+	const blocks = hasEditRecord ? editedBlocks : viewBlocks;
+	const isResolving = ! hasEditRecord && ! hasResolvedViewRecord;
+	const isMissing = ! hasEditRecord && ! isResolving && ! viewRecord;
 
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
