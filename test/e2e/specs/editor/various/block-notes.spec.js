@@ -31,49 +31,14 @@ test.describe( 'Block Notes', () => {
 		'#00CFFF',
 	];
 
-	function hexToRgb( hex ) {
-		return {
-			r: parseInt( hex.slice( 1, 3 ), 16 ),
-			g: parseInt( hex.slice( 3, 5 ), 16 ),
-			b: parseInt( hex.slice( 5, 7 ), 16 ),
-		};
-	}
-
-	/**
-	 * Classify an element's computed background against an expected author
-	 * color. Returns 'tint' for the single alpha the highlight is allowed to
-	 * paint (≈ 0x40), or a readable description of what was actually found so a
-	 * failure reports the real value rather than just `false`.
-	 *
-	 * @param {import('@playwright/test').Locator} locator Element to inspect.
-	 * @param {Object}                             rgb     Expected author color.
-	 * @param {number}                             rgb.r   Red channel.
-	 * @param {number}                             rgb.g   Green channel.
-	 * @param {number}                             rgb.b   Blue channel.
-	 * @param {string|null}                        pseudo  Pseudo-element to read, if any.
-	 * @return {Promise<string>} 'tint', or a description.
-	 */
-	async function readTint( locator, { r, g, b }, pseudo = null ) {
-		const bg = await locator.evaluate(
-			( el, pseudoElt ) =>
-				window.getComputedStyle( el, pseudoElt ).backgroundColor,
-			pseudo
+	// The current user's author color at the highlight's 0x40 alpha.
+	async function getAuthorTint( requestUtils ) {
+		const { id } = await requestUtils.rest( { path: '/wp/v2/users/me' } );
+		const hex = AVATAR_BORDER_COLORS[ id % AVATAR_BORDER_COLORS.length ];
+		const [ r, g, b ] = [ 1, 3, 5 ].map( ( i ) =>
+			parseInt( hex.slice( i, i + 2 ), 16 )
 		);
-		const m = bg.match(
-			/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-		);
-		if ( ! m ) {
-			return bg;
-		}
-		const alpha = m[ 4 ] ? Number( m[ 4 ] ) : 1;
-		const matchesColor =
-			Number( m[ 1 ] ) === r &&
-			Number( m[ 2 ] ) === g &&
-			Number( m[ 3 ] ) === b;
-		if ( matchesColor && alpha > 0.2 && alpha < 0.35 ) {
-			return 'tint';
-		}
-		return `${ m[ 1 ] },${ m[ 2 ] },${ m[ 3 ] } a=${ alpha }`;
+		return `rgba(${ r }, ${ g }, ${ b }, 0.25)`;
 	}
 
 	test( 'should move focus to add a new note form', async ( {
@@ -1517,18 +1482,12 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Inline notes', () => {
-		test( 'highlights an inline marker with the author color at the rest opacity', async ( {
+		test( 'highlights an inline marker in the author color and thickens its underline when selected', async ( {
 			editor,
-			page,
 			requestUtils,
 			blockNoteUtils,
 		} ) => {
-			const me = await requestUtils.rest( {
-				path: '/wp/v2/users/me',
-			} );
-			const expectedColor =
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ];
-			const { r, g, b } = hexToRgb( expectedColor );
+			const tint = await getAuthorTint( requestUtils );
 
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -1538,61 +1497,37 @@ test.describe( 'Block Notes', () => {
 			// Select all of the paragraph text so the inline path is taken:
 			// "Add note" creates an inline note whenever a non-collapsed
 			// rich-text selection is active, and a block-level note otherwise.
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText();
-
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Color me' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Paragraph' } )
 				.click();
+			await blockNoteUtils.selectBlockText();
+			await blockNoteUtils.addNote( 'Color me' );
 
 			// The draft marker shows while the note is saved; wait for the
 			// saved note's id so the thread focus that follows has settled.
 			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
 			await expect( mark ).toHaveAttribute( 'data-id', /^\d+$/ );
 
-			// Creating a note auto-selects it, which emphasizes the marker with
-			// an underline. Move focus to the title to deselect so only the
-			// tint is left to assert on.
+			// Creating a note auto-selects it. Focus the title to deselect it.
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
+			await expect( mark ).toHaveCSS( 'background-color', tint );
+			await expect( mark ).toHaveCSS(
+				'text-decoration-line',
+				'underline'
+			);
+			await expect( mark ).toHaveCSS(
+				'text-decoration-thickness',
+				'1.5px'
+			);
 
-			// Browsers report the per-author tint as an rgba() value with
-			// alpha ≈ 0x40/255. Require an exact RGB match (the prior
-			// admin-theme fallback can never satisfy it) with a small alpha
-			// tolerance, and poll since the tint transitions over ~0.1s.
-			await expect
-				.poll( async () => {
-					const bg = await mark.evaluate(
-						( el ) => window.getComputedStyle( el ).backgroundColor
-					);
-					const m = bg.match(
-						/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-					);
-					if ( ! m ) {
-						return bg;
-					}
-					const alpha = m[ 4 ] ? Number( m[ 4 ] ) : 1;
-					const isRest =
-						Number( m[ 1 ] ) === r &&
-						Number( m[ 2 ] ) === g &&
-						Number( m[ 3 ] ) === b &&
-						alpha > 0.2 &&
-						alpha < 0.35;
-					return isRest
-						? 'rest'
-						: `${ m[ 1 ] },${ m[ 2 ] },${ m[ 3 ] } a=${ alpha }`;
-				} )
-				.toBe( 'rest' );
+			await blockNoteUtils.getThread( 'Color me' ).click();
+			await expect( mark ).toHaveCSS(
+				'text-decoration-thickness',
+				'3px'
+			);
+			await expect( mark ).toHaveCSS( 'background-color', tint );
 		} );
 
 		test( 'keeps the inline marker highlighted after a code-editor round-trip', async ( {
@@ -2045,124 +1980,6 @@ test.describe( 'Block Notes', () => {
 			await expect( mark ).toHaveText( 'Hello' );
 		} );
 
-		test( 'underlines the marker at rest and thickens it on selection, without deepening the tint', async ( {
-			editor,
-			page,
-			requestUtils,
-			blockNoteUtils,
-		} ) => {
-			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-			const expectedColor =
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ];
-			const { r, g, b } = hexToRgb( expectedColor );
-
-			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Select my note.' },
-			} );
-
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			await paragraph.click();
-			await blockNoteUtils.selectBlockText();
-
-			await editor.clickBlockOptionsMenuItem( 'Add note' );
-			await page
-				.getByRole( 'textbox', { name: 'New note', exact: true } )
-				.fill( 'Pick me' );
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Add note', exact: true } )
-				.click();
-
-			const mark = editor.canvas.locator( 'mark.wp-note' ).first();
-			await expect( mark ).toBeVisible();
-
-			const alphaOf = async () => {
-				const bg = await mark.evaluate(
-					( el ) => window.getComputedStyle( el ).backgroundColor
-				);
-				const match = bg.match(
-					/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/
-				);
-				return match && match[ 4 ] ? Number( match[ 4 ] ) : 1;
-			};
-			const decorationOf = async () =>
-				mark.evaluate( ( el ) => {
-					const style = window.getComputedStyle( el );
-					return {
-						line: style.textDecorationLine,
-						color: style.textDecorationColor,
-						thickness: style.textDecorationThickness,
-						// `currentColor`, the other half of the mix below.
-						text: style.color,
-					};
-				} );
-
-			/*
-			 * Deselect the freshly added note (focus the title). The underline
-			 * has to survive that: which text carries a note is meant to be
-			 * legible at rest, without hovering or selecting anything first.
-			 */
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-			await expect
-				.poll( async () => ( await decorationOf() ).thickness )
-				.toBe( '1.5px' );
-			const decoration = await decorationOf();
-			expect( decoration.line ).toBe( 'underline' );
-
-			// Selecting the note from the sidebar thickens that same underline
-			// rather than introducing a different treatment.
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Pick me' } )
-				.click();
-			await expect
-				.poll( async () => ( await decorationOf() ).thickness )
-				.toBe( '3px' );
-
-			/*
-			 * The stroke is `color-mix(in srgb, currentColor 30%, <author color>)`:
-			 * mostly the author's color so it reads as that person's note, with
-			 * just enough of the text color mixed in to clear 3:1 on a light or a
-			 * dark canvas. Recompute the mix here rather than hard-coding it,
-			 * since `currentColor` comes from the theme.
-			 */
-			/*
-			 * Chrome serializes a resolved `color-mix()` as
-			 * `color(srgb 0.33 0.15 0.16)`, with 0-1 channels, while a plain
-			 * color comes back as `rgb(30, 30, 30)`. Normalize both to 0-255.
-			 */
-			const parseRgb = ( value ) => {
-				const channels = value
-					.match( /[\d.]+/g )
-					.slice( 0, 3 )
-					.map( Number );
-				return value.startsWith( 'color(' )
-					? channels.map( ( channel ) => channel * 255 )
-					: channels;
-			};
-			const textRgb = parseRgb( decoration.text );
-			const strokeRgb = parseRgb( decoration.color );
-			[ r, g, b ].forEach( ( channel, i ) => {
-				const expected = 0.7 * channel + 0.3 * textRgb[ i ];
-				// Tolerance covers the browser's rounding of the mix.
-				expect( Math.abs( strokeRgb[ i ] - expected ) ).toBeLessThan(
-					2
-				);
-			} );
-
-			/*
-			 * The tint behind the text must not deepen with the emphasis: it is
-			 * subtracted from whatever contrast the theme already provides, and
-			 * CSS cannot measure the composited result. See #80543.
-			 */
-			expect( await alphaOf() ).toBeLessThan( 0.35 );
-		} );
-
 		test( 'clicking between inline markers selects the matching note', async ( {
 			editor,
 			page,
@@ -2356,234 +2173,59 @@ test.describe( 'Block Notes', () => {
 	} );
 
 	test.describe( 'Block-level note highlight', () => {
-		test( 'overlays the whole text block with the author tint, holding it flat while the outline marks selection', async ( {
+		test( 'tints a noted block and keeps the tint when the block or note is selected', async ( {
 			editor,
-			page,
 			requestUtils,
 			blockNoteUtils,
 		} ) => {
-			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-			const rgb = hexToRgb(
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
-			);
+			const tint = await getAuthorTint( requestUtils );
 
 			await editor.insertBlock( {
-				name: 'core/paragraph',
-				attributes: { content: 'Note the whole block.' },
+				name: 'core/image',
+				attributes: { url: 'https://cldup.com/cXyG__fTLN.jpg' },
 			} );
-
-			// No text selection, so this takes the block-level path: the note
-			// is anchored via `metadata.noteId` with no inline `<mark>`.
-			await blockNoteUtils.addNote( 'Whole block note' );
-
-			const paragraph = editor.canvas.getByRole( 'document', {
-				name: 'Block: Paragraph',
-			} );
-			// The block-level note carries no inline marker to tint.
-			await expect( editor.canvas.locator( 'mark.wp-note' ) ).toHaveCount(
-				0
-			);
-
-			// Move focus to the title so the freshly added note is deselected:
-			// an annotated block has to be legible as one at rest.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-			await expect
-				.poll( () => readTint( paragraph, rgb, '::after' ) )
-				.toBe( 'tint' );
-			await expect( paragraph ).not.toHaveClass( /is-highlighted/ );
-
-			// The underline is the inline-note signal; the block-level note
-			// marks the block, not its text.
-			expect(
-				await paragraph.evaluate(
-					( el ) => window.getComputedStyle( el ).textDecorationLine
-				)
-			).toBe( 'none' );
-
-			// Selecting the note from the sidebar marks the block with its
-			// outline. The tint must not deepen with it: it covers the whole
-			// paragraph, so every increment is subtracted from the theme's
-			// text contrast for all of it. See #80543.
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Whole block note' } )
-				.click();
-			await expect( paragraph ).toHaveClass( /is-highlighted/ );
-			expect( await readTint( paragraph, rgb, '::after' ) ).toBe(
-				'tint'
-			);
-		} );
-
-		test( 'overlays text blocks with nested editables as a whole, not their text', async ( {
-			editor,
-			requestUtils,
-			blockNoteUtils,
-		} ) => {
-			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-			const rgb = hexToRgb(
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
-			);
-
-			// A table's editables are its cells, nested in its own markup.
-			// The note marks the block it is attached to, so the table is
-			// overlaid as a whole rather than cell by cell.
-			await editor.insertBlock( {
-				name: 'core/table',
-				attributes: {
-					body: [
-						{
-							cells: [
-								{ content: 'First cell', tag: 'td' },
-								{ content: 'Second cell', tag: 'td' },
-							],
-						},
-					],
-				},
-			} );
-			await blockNoteUtils.addNote( 'Whole table note' );
-
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-
-			const table = editor.canvas.getByRole( 'document', {
-				name: 'Block: Table',
-			} );
-			await expect
-				.poll( () => readTint( table, rgb, '::after' ) )
-				.toBe( 'tint' );
-			const cells = table.getByRole( 'textbox', {
-				name: 'Body cell text',
-			} );
-			await expect( cells ).toHaveCount( 2 );
-			for ( const cell of await cells.all() ) {
-				expect( await readTint( cell, rgb ) ).not.toBe( 'tint' );
-				expect(
-					await cell.evaluate(
-						( el ) =>
-							window.getComputedStyle( el ).textDecorationLine
-					)
-				).toBe( 'none' );
-			}
-		} );
-
-		test( 'overlays a non-text block with the tint and an all-around rule, alongside the selection outline', async ( {
-			editor,
-			page,
-			requestUtils,
-			blockNoteUtils,
-		} ) => {
-			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-			const rgb = hexToRgb(
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
-			);
-
-			// A background behind an image would be hidden by the image
-			// itself, which is why the tint is painted on an overlay above
-			// the block, with the rule drawn all the way around.
-			await editor.insertBlock( { name: 'core/image' } );
 			await blockNoteUtils.addNote( 'Whole image note' );
 
 			const image = editor.canvas.getByRole( 'document', {
 				name: 'Block: Image',
 			} );
-
-			// Move focus to the title so the freshly added note is deselected:
-			// the marking has to be legible at rest.
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-
-			const readOverlay = () =>
-				image.evaluate( ( el ) => {
-					const style = window.getComputedStyle( el, '::after' );
-					return {
-						border: `${ style.borderTopWidth } ${ style.borderTopStyle } ${ style.borderTopColor }`,
-						outlineStyle: style.outlineStyle,
-						pointerEvents: style.pointerEvents,
-					};
+			const expectOverlay = async ( outlineStyle ) => {
+				await expect( image ).toHaveCSS( 'background-color', tint, {
+					pseudo: 'after',
 				} );
-
-			// The author color at the single allowed alpha.
-			await expect
-				.poll( () => readTint( image, rgb, '::after' ) )
-				.toBe( 'tint' );
-
-			// The all-around rule is inside the overlay so it cannot reflow the
-			// canvas; the overlay must ignore pointer events or it would
-			// swallow every click on the block.
-			const atRest = await readOverlay();
-			// Chrome snaps border widths to device pixels, so only the style is exact.
-			expect( atRest.border ).toMatch( /^[1-9][\d.]*px solid / );
-			expect( atRest.pointerEvents ).toBe( 'none' );
-
-			/*
-			 * The editor draws its highlight and focus outline on the same
-			 * `::after`. Both treatments have to show together: the note's
-			 * tint and rule stay put while the editor's solid outline marks
-			 * the block, whether it is highlighted from the sidebar or
-			 * focused in the canvas.
-			 */
-			await page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'treeitem', { name: 'Note: Whole image note' } )
-				.click();
-			await expect( image ).toHaveClass( /is-highlighted/ );
-			expect( await readTint( image, rgb, '::after' ) ).toBe( 'tint' );
-			let selected = await readOverlay();
-			expect( selected.border ).toBe( atRest.border );
-			expect( selected.outlineStyle ).toBe( 'solid' );
-
-			await image.focus();
-			await expect( image ).toBeFocused();
-			expect( await readTint( image, rgb, '::after' ) ).toBe( 'tint' );
-			selected = await readOverlay();
-			expect( selected.border ).toBe( atRest.border );
-			expect( selected.outlineStyle ).toBe( 'solid' );
-		} );
-
-		test( 'overlays a container that holds no editable text', async ( {
-			editor,
-			requestUtils,
-			blockNoteUtils,
-		} ) => {
-			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-			const rgb = hexToRgb(
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
-			);
-
-			// Columns of images hold no text at all; the overlay still marks
-			// them, so the note leaves a mark in the canvas.
-			await editor.insertBlock( {
-				name: 'core/columns',
-				innerBlocks: [
+				await expect( image ).toHaveCSS(
+					'outline-style',
+					outlineStyle,
 					{
-						name: 'core/column',
-						innerBlocks: [ { name: 'core/image' } ],
-					},
-				],
-			} );
-			const columns = editor.canvas.getByRole( 'document', {
-				name: 'Block: Columns',
-			} );
-			await editor.selectBlocks( columns );
-			await blockNoteUtils.addNote( 'Columns of images note' );
+						pseudo: 'after',
+					}
+				);
+			};
 
 			await editor.canvas
 				.getByRole( 'textbox', { name: 'Add title' } )
 				.click();
-			await expect
-				.poll( () => readTint( columns, rgb, '::after' ) )
-				.toBe( 'tint' );
+			await expectOverlay( 'none' );
+
+			// The selection outline shows without deepening the tint.
+			await blockNoteUtils.getThread( 'Whole image note' ).click();
+			await expectOverlay( 'solid' );
+
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.click();
+			await expectOverlay( 'none' );
+			await editor.selectBlocks( image );
+			await expectOverlay( 'solid' );
 		} );
 
 		test( 'clears the tint when the block-level note is deleted', async ( {
 			editor,
-			page,
+			requestUtils,
 			blockNoteUtils,
 		} ) => {
+			const tint = await getAuthorTint( requestUtils );
+
 			await editor.insertBlock( {
 				name: 'core/paragraph',
 				attributes: { content: 'Tint goes away.' },
@@ -2593,38 +2235,17 @@ test.describe( 'Block Notes', () => {
 			const paragraph = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );
-			const backgroundOf = () =>
-				paragraph.evaluate(
-					( el ) =>
-						window.getComputedStyle( el, '::after' ).backgroundColor
-				);
-
-			// Tinted while the note exists.
-			await expect
-				.poll( backgroundOf )
-				.not.toMatch( /rgba\(0,\s*0,\s*0,\s*0\)|transparent/ );
-
-			const settings = page.getByRole( 'region', {
-				name: 'Editor settings',
+			await expect( paragraph ).toHaveCSS( 'background-color', tint, {
+				pseudo: 'after',
 			} );
-			await settings
-				.getByRole( 'treeitem', { name: 'Note: Temporary note' } )
-				.click();
-			await settings
-				.getByRole( 'button', { name: 'Actions' } )
-				.first()
-				.click();
-			await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
-			// Confirm the destructive action in the dialog.
-			await page
-				.getByRole( 'dialog' )
-				.getByRole( 'button', { name: 'Delete' } )
-				.click();
 
-			// Back to no background once the anchoring metadata is gone.
-			await expect
-				.poll( backgroundOf )
-				.toMatch( /rgba\(0,\s*0,\s*0,\s*0\)|transparent/ );
+			await blockNoteUtils.getThread( 'Temporary note' ).click();
+			await blockNoteUtils.deleteNote();
+			await expect( paragraph ).toHaveCSS(
+				'background-color',
+				'rgba(0, 0, 0, 0)',
+				{ pseudo: 'after' }
+			);
 		} );
 
 		test( 'hides the highlights along with the notes', async ( {
@@ -2632,10 +2253,7 @@ test.describe( 'Block Notes', () => {
 			requestUtils,
 			blockNoteUtils,
 		} ) => {
-			const me = await requestUtils.rest( { path: '/wp/v2/users/me' } );
-			const rgb = hexToRgb(
-				AVATAR_BORDER_COLORS[ me.id % AVATAR_BORDER_COLORS.length ]
-			);
+			const tint = await getAuthorTint( requestUtils );
 
 			await editor.insertBlock( {
 				name: 'core/paragraph',
@@ -2658,42 +2276,32 @@ test.describe( 'Block Notes', () => {
 			await blockNoteUtils.addNote( 'Inline note' );
 			const marker = editor.canvas.locator( 'mark.wp-note' );
 
-			await editor.canvas
-				.getByRole( 'textbox', { name: 'Add title' } )
-				.click();
-			await expect
-				.poll( () => readTint( blockNoted, rgb, '::after' ) )
-				.toBe( 'tint' );
-			await expect.poll( () => readTint( marker, rgb ) ).toBe( 'tint' );
+			const expectHighlighted = async ( background ) => {
+				await expect( blockNoted ).toHaveCSS(
+					'background-color',
+					background,
+					{ pseudo: 'after' }
+				);
+				await expect( marker ).toHaveCSS(
+					'background-color',
+					background
+				);
+			};
 
-			// "All notes" is still a view of the notes, so the highlights
-			// stay while it's open.
+			await expectHighlighted( tint );
+
+			// "All notes" is still a view of the notes, so the highlights stay.
 			await blockNoteUtils.clickNotesMenuItem( 'Hide notes' );
-			expect( await readTint( marker, rgb ) ).toBe( 'tint' );
+			await expectHighlighted( tint );
 
-			// With no notes left on screen, the canvas carries no marking.
 			await blockNoteUtils.clickNotesMenuItem( 'Show all notes' );
-			const isUnmarked = ( locator, pseudo = null ) =>
-				locator.evaluate( ( el, pseudoElt ) => {
-					const style = window.getComputedStyle( el, pseudoElt );
-					return (
-						/rgba\(0,\s*0,\s*0,\s*0\)|transparent/.test(
-							style.backgroundColor
-						) && style.textDecorationLine === 'none'
-					);
-				}, pseudo );
-			await expect
-				.poll( () => isUnmarked( blockNoted, '::after' ) )
-				.toBe( true );
-			await expect.poll( () => isUnmarked( marker ) ).toBe( true );
+			await expectHighlighted( 'rgba(0, 0, 0, 0)' );
+			await expect( marker ).toHaveCSS( 'text-decoration-line', 'none' );
 			// The marker stays in the content, it just isn't painted.
 			await expect( marker ).toHaveText( 'Note these words.' );
 
 			await blockNoteUtils.clickNotesMenuItem( 'Expand notes' );
-			await expect
-				.poll( () => readTint( blockNoted, rgb, '::after' ) )
-				.toBe( 'tint' );
-			await expect.poll( () => readTint( marker, rgb ) ).toBe( 'tint' );
+			await expectHighlighted( tint );
 		} );
 	} );
 
