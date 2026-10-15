@@ -1,3 +1,4 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import ColorPaletteControl from '../control';
 
@@ -18,6 +19,7 @@ export default {
 	argTypes: {
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			table: {
 				type: { summary: 'function' },
@@ -51,9 +53,11 @@ export default {
 			},
 		},
 	},
-};
+} satisfies Meta< typeof ColorPaletteControl >;
 
-export const Default = {
+type Story = StoryObj< typeof ColorPaletteControl >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
 		const [ color, setColor ] = useState( args.value );
 
@@ -64,7 +68,8 @@ export const Default = {
 					value={ color }
 					onChange={ ( newColor ) => {
 						setColor( newColor );
-						onChange( newColor );
+						// Storybook passes the `onChange` action.
+						onChange!( newColor );
 					} }
 				/>
 			</div>
