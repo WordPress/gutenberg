@@ -186,6 +186,27 @@
 }
 
 .show-icon-labels {
+	// Text labels make the toolbar long, so let it wrap instead of
+	// overflowing the available width (e.g. behind an open sidebar).
+	.block-editor-block-contextual-toolbar {
+		background-color: transparent;
+
+		.block-editor-block-toolbar {
+			flex-wrap: wrap;
+			overflow: visible;
+			max-width: 100%;
+
+			.block-editor-block-toolbar__slot {
+				flex-wrap: wrap;
+			}
+
+			.components-toolbar-group {
+				background-color: $white;
+			}
+		}
+	}
+
+
 	.block-editor-block-toolbar {
 		.components-button.has-icon:where(:not(.has-text)) {
 			width: auto;

@@ -52,7 +52,8 @@
 	left: calc(50% - #{$button-size-small * 0.5});
 }
 
-.block-editor-block-list__block-side-inserter-popover .components-popover__content > div {
+.block-editor-block-list__block-side-inserter-popover
+.components-popover__content > div {
 	pointer-events: none;
 
 	> * {
@@ -80,7 +81,8 @@
 	}
 }
 
-.block-editor-block-list__insertion-point-inserter .block-editor-inserter__toggle.components-button.has-icon {
+.block-editor-block-list__insertion-point-inserter
+.block-editor-inserter__toggle.components-button.has-icon {
 	background: var(--wp-admin-theme-color);
 	&:hover {
 		background: $gray-900;
@@ -101,7 +103,6 @@
 }
 
 .components-popover.block-editor-block-list__block-popover {
-
 	// Position the block toolbar.
 	.block-editor-block-contextual-toolbar {
 		pointer-events: all;
@@ -122,7 +123,9 @@
 
 		// Make room for the inserter next to the parent selector.
 		&.has-parent:has(.block-editor-block-parent-selector__inserter) {
-			margin-left: calc(#{$grid-unit-60} + #{$grid-unit-30} + #{$grid-unit-15} + #{$grid-unit-10} + 2 * #{$border-width});
+			margin-left:
+				calc(#{$grid-unit-60} + #{$grid-unit-30} + #{$grid-unit-15} +
+				#{$grid-unit-10} + 2 * #{$border-width});
 			.show-icon-labels & {
 				margin-left: 0;
 			}
@@ -145,8 +148,7 @@
 
 	.is-dragging-components-draggable & {
 		opacity: 0;
-		@media not ( prefers-reduced-motion ) {
-
+		@media not (prefers-reduced-motion) {
 			// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
 			// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
 			animation: hide-during-dragging 1ms linear forwards;
@@ -163,7 +165,9 @@
 		// class the container carries when the inserter is in it; only the
 		// detached position and the full border are its own.
 		&:has(.block-editor-block-parent-selector__inserter) {
-			left: calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$grid-unit-15} - #{$grid-unit-10} - 3 * #{$border-width});
+			left:
+				calc(-#{$grid-unit-60} - #{$grid-unit-30} - #{$grid-unit-15} -
+				#{$grid-unit-10} - 3 * #{$border-width});
 			border: $border-width solid $gray-900;
 			border-radius: $radius-small;
 			// The box paints the background, like the toolbar box does for
@@ -267,6 +271,43 @@
 
 	// Show Icon Label Styles
 	.show-icon-labels & {
+		// The popover content is sized to max-content, so cap it at the canvas
+		// width (the viewport of the iframe) to let the toolbar wrap.
+		.components-popover__content {
+			max-width: fit-content;
+		}
+
+		// Groups can wrap onto several rows, so each one carries its own
+		// border instead of the toolbar having a single outer border.
+		.block-editor-block-contextual-toolbar {
+			border: none;
+		}
+
+		.block-editor-block-contextual-toolbar .block-editor-block-toolbar {
+			padding: 0 $border-width $border-width 0;
+
+			.components-toolbar-group,
+			.components-toolbar {
+				border: $border-width solid $gray-900;
+				margin: 0 (-$border-width) (-$border-width) 0;
+				padding: 0;
+
+				//Nested groups shouldn't duplicate border styles.
+				.components-toolbar-group {
+					border: none;
+					margin: 0;
+				}
+			}
+
+			.block-editor-block-parent-selector,
+			.block-editor-block-parent-selector__button {
+				border: none;
+				margin: 0;
+			}
+			.block-editor-block-parent-selector:not(:has(.components-toolbar-group)) {
+				margin-top: 1px;
+			}
+		}
 
 		.block-editor-block-parent-selector {
 			position: relative;
@@ -285,7 +326,8 @@
 	display: none;
 }
 
-.components-popover.block-editor-block-popover__inbetween .block-editor-button-pattern-inserter__button {
+.components-popover.block-editor-block-popover__inbetween
+.block-editor-button-pattern-inserter__button {
 	pointer-events: all;
 	position: absolute;
 	transform: translateX(-50%) translateY(-50%);
