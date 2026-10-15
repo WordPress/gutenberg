@@ -1,6 +1,8 @@
 import { useMemo, useRef } from '@wordpress/element';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 import { kebabCase } from '@wordpress/kebab-case';
+import type { ComponentType } from 'react';
+import type { Color } from '@wordpress/global-styles-engine';
 import {
 	getColorClassName,
 	getColorObjectByColorValue,
@@ -8,6 +10,11 @@ import {
 	getMostReadableColor,
 } from './utils';
 import { useSettings } from '../use-settings';
+import type { ColorType, WithColorsProps } from './types';
+
+type ColorPaletteHOC = (
+	Inner: ComponentType< WithColorsProps >
+) => ComponentType< WithColorsProps >;
 
 /**
  * Capitalizes the first letter in a string.
@@ -16,21 +23,21 @@ import { useSettings } from '../use-settings';
  *
  * @return {string} Capitalized string.
  */
-const upperFirst = ( [ firstLetter, ...rest ] ) =>
+const upperFirst = ( [ firstLetter, ...rest ]: string ): string =>
 	firstLetter.toUpperCase() + rest.join( '' );
 
 /**
  * Higher order component factory for injecting the `colorsArray` argument as
  * the colors prop in the `withCustomColors` HOC.
  *
- * @param {Array} colorsArray An array of color objects.
+ * @param colorsArray An array of color objects.
  *
- * @return {Function} The higher order component.
+ * @return The higher order component.
  */
-const withCustomColorPalette = ( colorsArray ) =>
+const withCustomColorPalette = ( colorsArray: Color[] ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) =>
-			function WithCustomColorPalette( props ) {
+		( WrappedComponent: ComponentType< WithColorsProps > ) =>
+			function WithCustomColorPalette( props: WithColorsProps ) {
 				return <WrappedComponent { ...props } colors={ colorsArray } />;
 			},
 		'withCustomColorPalette'
@@ -40,23 +47,24 @@ const withCustomColorPalette = ( colorsArray ) =>
  * Higher order component factory for injecting the editor colors as the
  * `colors` prop in the `withColors` HOC.
  *
- * @return {Function} The higher order component.
+ * @return The higher order component.
  */
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
-		( WrappedComponent ) =>
-			function WithEditorColorPalette( props ) {
+		( WrappedComponent: ComponentType< WithColorsProps > ) =>
+			function WithEditorColorPalette( props: WithColorsProps ) {
 				const [ userPalette, themePalette, defaultPalette ] =
 					useSettings(
 						'color.palette.custom',
 						'color.palette.theme',
 						'color.palette.default'
 					);
+				// The settings list the palettes' colors.
 				const allColors = useMemo(
 					() => [
-						...( userPalette || [] ),
-						...( themePalette || [] ),
-						...( defaultPalette || [] ),
+						...( ( userPalette as Color[] | undefined ) || [] ),
+						...( ( themePalette as Color[] | undefined ) || [] ),
+						...( ( defaultPalette as Color[] | undefined ) || [] ),
 					],
 					[ userPalette, themePalette, defaultPalette ]
 				);
@@ -69,28 +77,38 @@ const withEditorColorPalette = () =>
  * Helper function used with `createHigherOrderComponent` to create
  * higher order components for managing color logic.
  *
- * @param {Array}    colorTypes       An array of color types (e.g. 'backgroundColor, borderColor).
- * @param {Function} withColorPalette A HOC for injecting the 'colors' prop into the WrappedComponent.
+ * @param colorTypes       An array of color types (e.g. 'backgroundColor, borderColor).
+ * @param withColorPalette A HOC for injecting the 'colors' prop into the WrappedComponent.
  *
- * @return {Component} The component that can be used as a HOC.
+ * @return The component that can be used as a HOC.
  */
-function createColorHOC( colorTypes, withColorPalette ) {
-	const colorMap = colorTypes.reduce( ( colorObject, colorType ) => {
-		return {
-			...colorObject,
-			...( typeof colorType === 'string'
-				? { [ colorType ]: kebabCase( colorType ) }
-				: colorType ),
-		};
-	}, {} );
+function createColorHOC(
+	colorTypes: ColorType[],
+	withColorPalette: ColorPaletteHOC
+) {
+	const colorMap = colorTypes.reduce< Record< string, string > >(
+		( colorObject, colorType ) => {
+			return {
+				...colorObject,
+				...( typeof colorType === 'string'
+					? { [ colorType ]: kebabCase( colorType ) }
+					: colorType ),
+			};
+		},
+		{}
+	);
 
+	// `compose` loses the types of the components it composes.
 	return compose( [
 		withColorPalette,
-		( WrappedComponent ) => {
-			return function WithColors( props ) {
+		( WrappedComponent: ComponentType< WithColorsProps > ) => {
+			return function WithColors( props: WithColorsProps ) {
 				const { colors: _colors, ...passedProps } = props;
 				const { attributes, setAttributes } = passedProps;
-				const prevColorPropsRef = useRef( null );
+				const prevColorPropsRef = useRef< Record<
+					string,
+					{ color?: string }
+				> | null >( null );
 
 				const colorProps = useMemo( () => {
 					const prevColorProps = prevColorPropsRef.current;
@@ -107,8 +125,11 @@ function createColorHOC( colorTypes, withColorPalette ) {
 								const colorObject =
 									getColorObjectByAttributeValues(
 										_colors,
-										attributes[ colorAttributeName ],
-										attributes[ customAttr ]
+										// The color attributes hold a slug and a value.
+										attributes[ colorAttributeName ] as
+											string | null | undefined,
+										attributes[ customAttr ] as
+											string | null | undefined
 									);
 
 								const prevColorValue =
@@ -125,7 +146,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 												),
 											};
 
-								const setter = ( newColorValue ) => {
+								const setter = ( newColorValue?: string ) => {
 									const resolvedColorObject =
 										getColorObjectByColorValue(
 											_colors,
@@ -159,8 +180,9 @@ function createColorHOC( colorTypes, withColorPalette ) {
 
 				const colorUtils = useMemo(
 					() => ( {
-						getMostReadableColor: ( colorValue ) =>
-							getMostReadableColor( _colors, colorValue ),
+						getMostReadableColor: ( colorValue?: string ) =>
+							// The palette HOC always passes the colors.
+							getMostReadableColor( _colors!, colorValue ),
 					} ),
 					[ _colors ]
 				);
@@ -176,7 +198,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 				);
 			};
 		},
-	] );
+	] ) as ColorPaletteHOC;
 }
 
 /**
@@ -201,8 +223,8 @@ function createColorHOC( colorTypes, withColorPalette ) {
  *
  * @return {Function} Higher-order component.
  */
-export function createCustomColorsHOC( colorsArray ) {
-	return ( ...colorTypes ) => {
+export function createCustomColorsHOC( colorsArray: Color[] ) {
+	return ( ...colorTypes: ColorType[] ) => {
 		const withColorPalette = withCustomColorPalette( colorsArray );
 		return createHigherOrderComponent(
 			createColorHOC( colorTypes, withColorPalette ),
@@ -235,7 +257,7 @@ export function createCustomColorsHOC( colorsArray ) {
  *
  * @return {Function} Higher-order component.
  */
-export default function withColors( ...colorTypes ) {
+export default function withColors( ...colorTypes: ColorType[] ) {
 	const withColorPalette = withEditorColorPalette();
 	return createHigherOrderComponent(
 		createColorHOC( colorTypes, withColorPalette ),
