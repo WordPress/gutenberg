@@ -4952,7 +4952,7 @@
 	},
 	"packages/block-library/src/navigation-link/shared/controls.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 2
 		},
 		"gutenberg/use-typescript": {
 			"count": 1
