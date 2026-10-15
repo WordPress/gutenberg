@@ -690,6 +690,58 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
 		await expect( field ).toHaveValue( '<p>markup</p>EDIT' );
 	} );
+
+	test( 'should run the editor undo for the browser undo @webkit', async ( {
+		page,
+		pageUtils,
+		editor,
+		undoUtils,
+		browserName,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'before pause' );
+		await editor.page.waitForTimeout( 1000 );
+		await page.keyboard.type( ' after pause' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before pause after pause' },
+			},
+		] );
+
+		await undoUtils.browserUndo( { editor, browserName } );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before pause' },
+			},
+		] );
+		await expect.poll( undoUtils.getSelection ).toEqual( {
+			blockIndex: 0,
+			startOffset: 'before pause'.length,
+			endOffset: 'before pause'.length,
+		} );
+
+		// The browser undo went through the editor history, so the editor
+		// can redo it.
+		await pageUtils.pressKeys( 'primaryShift+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'before pause after pause' },
+			},
+		] );
+		await expect.poll( undoUtils.getSelection ).toEqual( {
+			blockIndex: 0,
+			startOffset: 'before pause after pause'.length,
+			endOffset: 'before pause after pause'.length,
+		} );
+	} );
 } );
 
 test.describe( 'Media Library modal undo', () => {
@@ -768,6 +820,36 @@ class UndoUtils {
 		this.page = page;
 
 		this.getSelection = this.getSelection.bind( this );
+	}
+
+	/**
+	 * Runs the browser's own undo command, the one the Edit menu runs.
+	 *
+	 * @param {Object} options
+	 * @param {Object} options.editor
+	 * @param {string} options.browserName
+	 */
+	async browserUndo( { editor, browserName } ) {
+		if ( browserName === 'webkit' ) {
+			await editor.canvas
+				.locator( ':root' )
+				.evaluate( () => document.execCommand( 'undo' ) );
+			return;
+		}
+
+		// Chromium runs editing commands attached to a key event, so attach
+		// undo to a key that has no shortcut.
+		const session = await this.page.context().newCDPSession( this.page );
+		for ( const type of [ 'rawKeyDown', 'keyUp' ] ) {
+			await session.send( 'Input.dispatchKeyEvent', {
+				type,
+				key: 'F13',
+				code: 'F13',
+				windowsVirtualKeyCode: 124,
+				commands: type === 'rawKeyDown' ? [ 'undo' ] : [],
+			} );
+		}
+		await session.detach();
 	}
 
 	async getSelection() {
