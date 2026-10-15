@@ -58,6 +58,7 @@
 -   Convert the flow layout to TypeScript ([#84734](https://github.com/WordPress/gutenberg/pull/84734)).
 -   Convert BlockPopover, the color and gradient controls, BlockTitle, useBlockDisplayInformation and MediaUpload to TypeScript ([#84813](https://github.com/WordPress/gutenberg/pull/84813)).
 -   Convert `LinkControl` and `URLInput` to TypeScript ([#84844](https://github.com/WordPress/gutenberg/pull/84844)).
+-   Convert `Warning`, `BlockEdit` and `PrivateBlockContext`, the `BlockControls` test and the store performance test to TypeScript ([#84846](https://github.com/WordPress/gutenberg/pull/84846)).
 
 ## 18.1.0 (2026-10-07)
 
