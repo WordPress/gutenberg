@@ -20,6 +20,7 @@
 -   `PostPanelRow`: Wrap long unbroken values (such as an author name or email) inside the row instead of overflowing the Post sidebar ([#84165](https://github.com/WordPress/gutenberg/pull/84165)).
 -   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
 -   Notes: Stop announcing the "Add note" block menu item as opening a dialog ([#84818](https://github.com/WordPress/gutenberg/pull/84818)).
+-   `EditorProvider`: Keep a preview canvas from restoring a block selection written to the entity by another editor, such as the site editor's navigation sidebar ([#84832](https://github.com/WordPress/gutenberg/pull/84832)).
 
 ### Internal
 
