@@ -5,6 +5,7 @@
 ### Enhancements
 
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
+-   Social Icon: Add a Link field and a View button to the Settings panel and show it in the content tab, so the link can be edited from the inspector and from the List View popover in a content-only section ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 
 ### Bug Fixes
 
