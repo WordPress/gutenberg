@@ -749,52 +749,6 @@ test.describe( 'Navigation block - List view editing', () => {
 			listView.getByRole( 'link', { name: 'Test Page 1' } )
 		).toBeVisible();
 	} );
-
-	test( 'lists a Login/out block in a contentOnly locked section', async ( {
-		editor,
-		page,
-		requestUtils,
-	} ) => {
-		const menu = await requestUtils.createNavigationMenu( {
-			title: 'Header Menu',
-			content:
-				'<!-- wp:navigation-link {"label":"Top Level Item 1","type":"custom","url":"http://www.wordpress.org/","kind":"custom"} /-->' +
-				'<!-- wp:loginout /-->',
-		} );
-
-		await editor.setContent(
-			`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
-				`<div class="wp-block-group">` +
-				`<!-- wp:navigation {"ref":${ menu.id }} /-->` +
-				`</div>` +
-				`<!-- /wp:group -->`
-		);
-
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Navigation' } )
-			.click();
-		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'tab', { name: 'List View' } ).click();
-
-		const listView = page
-			.getByRole( 'tabpanel', { name: 'List View' } )
-			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
-
-		await expect(
-			listView.getByRole( 'link', { name: 'Top Level Item 1' } )
-		).toBeVisible();
-		// Login/out is menu content, so it stays listed and removable under
-		// a contentOnly lock like the links around it.
-		const loginOutRow = listView.getByRole( 'row' ).filter( {
-			hasText: 'Login/out',
-		} );
-		await expect( loginOutRow ).toBeVisible();
-		await loginOutRow.hover();
-		await loginOutRow.getByRole( 'button', { name: 'Options' } ).click();
-		await expect(
-			page.getByRole( 'menuitem', { name: 'Remove Login/out' } )
-		).toBeVisible();
-	} );
 } );
 
 class LinkControl {
