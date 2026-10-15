@@ -30,6 +30,7 @@
 
 ### Bug Fixes
 
+-   `ExternalLink`: Keep the new-tab indicator with the preceding text when wrapping. The icon now participates in inline text layout, which can affect custom sizing, vertical margins, and anchor-level underlines.
 -   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
 -   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
