@@ -1,5 +1,6 @@
 import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
 import type { BasePostWithEmbeddedAuthor } from '@wordpress/fields';
 import { unlock } from '../../lock-unlock';
@@ -18,10 +19,25 @@ function usePostFields( {
 		registerPostTypeSchema( postType );
 	}, [ registerPostTypeSchema, postType ] );
 
-	return useFields< BasePostWithEmbeddedAuthor >( {
+	const { fields, error } = useFields< BasePostWithEmbeddedAuthor >( {
 		kind: 'postType',
 		name: postType,
-	} ).fields;
+	} );
+
+	// The callers only get the fields, so a failed request would leave their
+	// screen without fields and without a word. The notice id is per post
+	// type, so the screens that share the fields show it once.
+	const { createErrorNotice } = useDispatch( noticesStore );
+	useEffect( () => {
+		if ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+				id: `editor-post-fields-${ postType }`,
+			} );
+		}
+	}, [ createErrorNotice, error, postType ] );
+
+	return fields;
 }
 
 /**
