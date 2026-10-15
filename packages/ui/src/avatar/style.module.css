@@ -29,6 +29,17 @@
 			vertical-align: middle;
 		}
 
+		.has-color::after {
+			content: "";
+			position: absolute;
+			/* Match the outer border edge of the root's padding-box containing block. */
+			inset: calc(-1 * var(--wpds-border-width-xs));
+			border-radius: inherit;
+			outline: var(--wpds-border-width-focus) solid var(--_wp-ui-avatar-color);
+			outline-offset: var(--wpds-border-width-focus);
+			pointer-events: none;
+		}
+
 		.is-square {
 			border-radius: var(--wpds-border-radius-sm);
 		}

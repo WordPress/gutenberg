@@ -30,6 +30,9 @@ const meta: Meta< typeof Avatar.Root > = {
 		role: 'img',
 		'aria-label': 'Alex Morgan',
 	},
+	argTypes: {
+		color: { control: 'color' },
+	},
 	render: ( args ) => (
 		<Avatar.Root { ...args }>
 			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
@@ -42,6 +45,25 @@ export default meta;
 type Story = StoryObj< typeof Avatar.Root >;
 
 export const Default: Story = {};
+
+/** The optional color ring leaves images, initials, and the person fallback unchanged. */
+export const WithColor: Story = {
+	args: { color: '#008a20' },
+	render: ( args ) => (
+		<Stack gap="lg" align="center">
+			<Avatar.Root { ...args }>
+				<Avatar.Fallback />
+				<Avatar.Image src={ IMAGE_SRC } alt="" />
+			</Avatar.Root>
+			<Avatar.Root { ...args }>
+				<Avatar.Initials name="Alex Morgan" />
+			</Avatar.Root>
+			<Avatar.Root { ...args }>
+				<Avatar.Fallback />
+			</Avatar.Root>
+		</Stack>
+	),
+};
 
 /** Square avatars use the theme's corner radius for buttons and controls. */
 export const Square: Story = {
