@@ -350,7 +350,7 @@ function _gutenberg_get_entity_view_config_posttype_wp_block( $data ) {
 			'slug'  => 'all-patterns',
 		),
 		array(
-			'title' => __( 'My patterns', 'gutenberg' ),
+			'title' => __( 'Site patterns', 'gutenberg' ),
 			'slug'  => 'my-patterns',
 		),
 	);
