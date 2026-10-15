@@ -23,7 +23,8 @@ function getRect( rect, occupiedRects ) {
 			columnTracks,
 			rowTracks,
 			occupiedRects,
-			minimumSize: 160,
+			minimumWidth: 160,
+			minimumHeight: 160,
 		} )
 	);
 }
@@ -110,6 +111,25 @@ describe( 'getMinimumInsertionRect()', () => {
 			rowStart: 2,
 			columnSpan: 2,
 			rowSpan: 2,
+		} );
+	} );
+
+	it( 'grows each axis to its own minimum', () => {
+		expect(
+			toPlain(
+				getMinimumInsertionRect( {
+					rect: new GridRect( { columnStart: 1, rowStart: 1 } ),
+					columnTracks,
+					rowTracks,
+					minimumWidth: 90,
+					minimumHeight: 200,
+				} )
+			)
+		).toEqual( {
+			columnStart: 1,
+			rowStart: 1,
+			columnSpan: 2,
+			rowSpan: 5,
 		} );
 	} );
 

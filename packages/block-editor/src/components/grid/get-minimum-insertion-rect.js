@@ -2,11 +2,13 @@ import { GridRect } from './utils';
 
 /**
  * The smallest width and height, in pixels, of a block inserted into a manual
- * grid. Blocks that start out as a placeholder, such as Image, need about this
- * much room to show it: it's where `Placeholder` switches from its small
- * layout to its medium one.
+ * grid, so that blocks that start out as a placeholder, such as Image, can
+ * show it. Narrower than 160px, `Placeholder` switches to its small layout,
+ * which has no buttons. In its medium layout, the placeholders of Image,
+ * Video, Gallery, Audio, File and Embed are up to 240px tall.
  */
-export const MINIMUM_INSERTION_SIZE = 160;
+export const MINIMUM_INSERTION_WIDTH = 160;
+export const MINIMUM_INSERTION_HEIGHT = 240;
 
 /**
  * Gets the size in pixels of a range of tracks, including the gaps between
@@ -24,7 +26,7 @@ function getTracksSize( tracks, start, end ) {
 
 /**
  * Grows a range of cells, where a block is about to be inserted, until it is
- * at least a minimum size in pixels. It grows to the right and down first,
+ * at least a minimum width and height in pixels. It grows to the right and down first,
  * then to the left and up, one track at a time and in turn along each axis.
  * It never grows past the grid's tracks or into cells other blocks cover, so
  * it may stay smaller than the minimum. A range that is already big enough is
@@ -35,7 +37,8 @@ function getTracksSize( tracks, start, end ) {
  * @param {Array<{start: number, end: number}>} options.columnTracks  The grid's column tracks.
  * @param {Array<{start: number, end: number}>} options.rowTracks     The grid's row tracks.
  * @param {GridRect[]}                          options.occupiedRects The cells other blocks cover.
- * @param {number}                              options.minimumSize   The smallest width and height, in pixels.
+ * @param {number}                              options.minimumWidth  The smallest width, in pixels.
+ * @param {number}                              options.minimumHeight The smallest height, in pixels.
  *
  * @return {GridRect} The cells the block should cover.
  */
@@ -44,7 +47,8 @@ export function getMinimumInsertionRect( {
 	columnTracks,
 	rowTracks,
 	occupiedRects = [],
-	minimumSize = MINIMUM_INSERTION_SIZE,
+	minimumWidth = MINIMUM_INSERTION_WIDTH,
+	minimumHeight = MINIMUM_INSERTION_HEIGHT,
 } ) {
 	if (
 		rect.columnEnd > columnTracks.length ||
@@ -120,11 +124,11 @@ export function getMinimumInsertionRect( {
 		if ( canGrowColumns ) {
 			canGrowColumns =
 				getTracksSize( columnTracks, columnStart, columnEnd ) <
-					minimumSize && growColumns();
+					minimumWidth && growColumns();
 		}
 		if ( canGrowRows ) {
 			canGrowRows =
-				getTracksSize( rowTracks, rowStart, rowEnd ) < minimumSize &&
+				getTracksSize( rowTracks, rowStart, rowEnd ) < minimumHeight &&
 				growRows();
 		}
 	}
