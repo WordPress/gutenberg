@@ -34,6 +34,12 @@ function isEligibleForHeaderScopeMigration(
 	return tableHasHeaderCellsWithoutScope( blockAttributes );
 }
 
+/**
+ * Adds `scope="col"` to header `<th>` cells that do not already define `scope`.
+ *
+ * @param {Object} attributes Block attributes before migration.
+ * @return {Object} Block attributes with `head` cells updated where applicable.
+ */
 function migrateHeaderCellScope( attributes ) {
 	const migratedHead = attributes.head?.map( ( row ) => ( {
 		...row,
