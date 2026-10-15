@@ -1,12 +1,12 @@
 # `docgen`
 
-`docgen` helps you to generate the _public API_ of your code. Given an entry point file, it outputs the ES6 export statements and their corresponding JSDoc comments in human-readable format. It also supports TypeScript via the TypeScript babel plugin.
+`docgen` helps you to generate the _public API_ of your code. Given an entry point file, it outputs the ES6 export statements and their corresponding JSDoc comments in human-readable format. It also supports TypeScript.
 
 Some characteristics:
 
 - If the export statement doesn't contain any JSDoc, it'll look up for JSDoc up to the declaration.
 - It can resolve relative dependencies, either files or directories. For example, `import default from './dependency'` will find `dependency.js` or `dependency/index.js`
-- For TypeScript support, all types must be explicitly annotated as the TypeScript Babel plugin is unable to consume inferred types (it does not run the TS compiler, after all—it merely parses TypeScript). For example, all function return types must be explicitly annotated if they are to be documented by `docgen`.
+- For TypeScript support, all types must be explicitly annotated because `docgen` parses TypeScript without running the TypeScript compiler or inferring types. For example, all function return types must be explicitly annotated if they are to be documented by `docgen`.
 
 ## Installation
 
@@ -45,7 +45,7 @@ This command will generate a file named `entry-point-api.md` containing all the 
 
 `@wordpress/docgen` follows the default [project-wide configuration of Babel](https://babeljs.io/docs/en/next/config-files#project-wide-configuration). Like Babel, it will automatically search for a `babel.config.json` file, or an equivalent one using the [supported extensions](https://babeljs.io/docs/en/next/config-files#supported-file-extensions), in the project root directory.
 
-Without it, `@wordpress/docgen` runs with the default option. In other words, it cannot parse JSX or other advanced syntaxes.
+JSX and TypeScript are supported without a Babel configuration. TypeScript parsing follows the `.ts`, `.tsx`, `.mts`, and `.cts` file extensions. Use a Babel configuration for other syntax extensions.
 
 ## Examples
 

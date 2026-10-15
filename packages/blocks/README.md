@@ -205,7 +205,7 @@ Returns the block support value for a feature, if defined.
 _Parameters_
 
 - _nameOrType_ `string | BlockType`: Block name or type object
-- _feature_ `string`: Feature to retrieve
+- _feature_ `string | string[]`: Feature to retrieve, as a dot-separated path or an array of path segments
 - _defaultSupports_ `unknown`: Default value to return if not explicitly defined
 
 _Returns_
@@ -340,7 +340,7 @@ Returns true if the block defines support for a feature, or false otherwise.
 _Parameters_
 
 - _nameOrType_ `string | BlockType`: Block name or type object.
-- _feature_ `string`: Feature to test.
+- _feature_ `string | string[]`: Feature to test, as a dot-separated path or an array of path segments.
 - _defaultSupports_ `boolean`: Whether feature is supported by default if not explicitly defined.
 
 _Returns_
