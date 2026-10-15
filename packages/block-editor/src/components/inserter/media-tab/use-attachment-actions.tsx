@@ -7,7 +7,8 @@ import DetachConfirmation from './detach-confirmation';
 import type { MediaItem } from './types';
 
 type InserterMediaCategory =
-	import( '../../../store/actions' ).InserterMediaCategory;
+	import( '../../../store/types' ).InserterMediaCategory;
+type InserterMediaItem = import( '../../../store/types' ).InserterMediaItem;
 
 /**
  * A core media category: the public interface plus the private capabilities
@@ -180,7 +181,13 @@ export function useAttachmentActions( {
 				callback: ( [ media ]: MediaItem[] ) => {
 					// `open` returns null when a popup blocker steps in.
 					window
-						.open( category.getReportUrl?.( media ), '_blank' )
+						.open(
+							// Only external sources report items, and their titles are strings.
+							category.getReportUrl?.(
+								media as InserterMediaItem
+							),
+							'_blank'
+						)
 						?.focus();
 				},
 			} );
