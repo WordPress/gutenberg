@@ -1,4 +1,4 @@
-import type { Component, ComponentDetail } from './types.ts';
+import type { Component, ComponentDetail, Pattern } from './types.ts';
 
 /**
  * Format a component's name, package, and description as markdown.
@@ -85,6 +85,33 @@ export function formatComponentDetail( detail: ComponentDetail ): string {
 			}
 			lines.push( '' );
 		}
+	}
+
+	return lines.join( '\n' );
+}
+
+/**
+ * Format the pattern list as markdown.
+ *
+ * @param patterns - The patterns to format.
+ * @return Formatted markdown.
+ */
+export function formatPatterns( patterns: Pattern[] ): string {
+	const lines = [
+		'# WordPress Design System Patterns',
+		'',
+		'Call `get_pattern_details` with a slug for the full guidance.',
+	];
+
+	for ( const pattern of patterns ) {
+		lines.push(
+			'',
+			`## ${ pattern.title }`,
+			'',
+			`**Slug:** \`${ pattern.slug }\``,
+			'',
+			pattern.description
+		);
 	}
 
 	return lines.join( '\n' );

@@ -50,3 +50,16 @@ export interface ComponentDetail {
 		description?: string;
 	} >;
 }
+
+export interface ManifestDoc {
+	id: string;
+	title?: string;
+	content?: string;
+}
+
+export interface Pattern {
+	slug: string;
+	title: string;
+	description: string;
+	content: string;
+}
