@@ -14,6 +14,10 @@
 
 -   `InlineNotices`: Render notices with the `@wordpress/ui` `Notice`. The markup changes: the `.components-notice*` classes are gone, each notice has the `notices-inline-notices__notice` class, and each list has the `notices-inline-notices__list` class. Each notice still announces its message when it is created ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 
+### Deprecations
+
+-   `createNotice`: Deprecate the `__unstableHTML` option. Pass the message as plain text, and any longer account as `details` ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
 ### Bug Fixes
 
 -   `InlineNotices`: Render nothing when every child renders nothing ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).

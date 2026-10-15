@@ -141,6 +141,8 @@ describe( 'InlineNotices', () => {
 			expect(
 				screen.queryByRole( 'button', { name: 'Copy error' } )
 			).not.toBeInTheDocument();
+			// `__unstableHTML` is deprecated.
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

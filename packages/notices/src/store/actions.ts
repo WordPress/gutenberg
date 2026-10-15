@@ -1,3 +1,4 @@
+import deprecated from '@wordpress/deprecated';
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
 import type { NoticeOptions, ReducerAction } from './types';
 
@@ -54,6 +55,13 @@ export function createNotice(
 	// strings. To avoid setting expectation that e.g. a React Element could be
 	// supported, cast to a string.
 	content = String( content );
+
+	if ( __unstableHTML ) {
+		deprecated( 'The `__unstableHTML` option of `createNotice`', {
+			since: '7.2',
+			hint: 'Pass the message as plain text, and any longer account of what happened as `details`.',
+		} );
+	}
 
 	return {
 		type: 'CREATE_NOTICE',
