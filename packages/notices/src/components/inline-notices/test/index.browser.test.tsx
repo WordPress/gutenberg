@@ -121,6 +121,47 @@ describe( 'InlineNotices', () => {
 			expect( screen.getByRole( 'status' ) ).toBeEmptyDOMElement();
 		} );
 
+		it( 'links the web addresses in the details', async () => {
+			const user = userEvent.setup();
+			await renderWithNotice( 'error', {
+				details:
+					'Learn more about troubleshooting WordPress. (https://wordpress.org/documentation/article/faq-troubleshooting/)\nOr see https://example.com/help.',
+			} );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Show details' } )
+			);
+
+			const links = screen.getAllByRole( 'link' );
+			expect(
+				links.map( ( link ) => link.getAttribute( 'href' ) )
+			).toEqual( [
+				// The closing parenthesis and the full stop end the
+				// sentence, not the address.
+				'https://wordpress.org/documentation/article/faq-troubleshooting/',
+				'https://example.com/help',
+			] );
+			// A link must not take the user away from unsaved changes.
+			expect( links[ 0 ] ).toHaveAttribute( 'target', '_blank' );
+		} );
+
+		it( 'copies the details as they are, without changing their links', async () => {
+			const user = userEvent.setup();
+			const writeText = vi
+				.spyOn( navigator.clipboard, 'writeText' )
+				.mockResolvedValue();
+			const details = 'See https://example.com/help.';
+			await renderWithNotice( 'error', { details } );
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Copy error' } )
+			);
+
+			expect( writeText ).toHaveBeenCalledWith(
+				`${ MESSAGE }\n\n${ details }`
+			);
+		} );
+
 		it( 'labels the copy button by status', async () => {
 			await renderWithNotice( 'warning', { details: DETAILS } );
 

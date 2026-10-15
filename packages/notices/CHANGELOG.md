@@ -8,7 +8,7 @@
 
 ### New Features
 
--   `createNotice`: Add a `details` option, for longer plain text that supplements the message. `InlineNotices` shows it behind a "Show details" disclosure, with a button to copy the message and the details together ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+-   `createNotice`: Add a `details` option, for longer plain text that supplements the message. `InlineNotices` shows it behind a "Show details" disclosure, with a button to copy the message and the details together. Web addresses in the details are links that open in a new tab ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
 
 ### Enhancements
 

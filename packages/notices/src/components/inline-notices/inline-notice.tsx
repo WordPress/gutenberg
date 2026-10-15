@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
 import CopyButton from './copy-button';
+import DetailsText from './details-text';
 import type {
 	Notice as NoticeType,
 	NoticeAction as NoticeActionType,
@@ -147,7 +148,7 @@ export default function InlineNotice( {
 					className="notices-inline-notices__details"
 					render={ <Notice.Description render={ <div /> } /> }
 				>
-					{ details }
+					<DetailsText>{ details }</DetailsText>
 				</Collapsible.Panel>
 			) }
 			{ isDismissible && (
