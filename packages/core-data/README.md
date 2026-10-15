@@ -267,7 +267,7 @@ Returns an action object signalling that the fallback Navigation Menu id has bee
 
 _Parameters_
 
-- _fallbackId_ `integer`: the id of the fallback Navigation Menu
+- _fallbackId_ `number`: the integer id of the fallback Navigation Menu
 
 _Returns_
 
