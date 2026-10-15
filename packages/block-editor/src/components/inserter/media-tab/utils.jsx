@@ -1,7 +1,11 @@
 import { createBlock } from '@wordpress/blocks';
 import { inertValue } from '@wordpress/react-inert-value';
+import FilePreview from './file-preview';
 
-const mediaTypeTag = { image: 'img', video: 'video', audio: 'audio' };
+// Media types that preview as themselves. Anything missing here has no visual
+// of its own and falls back to `FilePreview`: audio today, and file types
+// added later. Video stays an element, as it paints its first frame.
+const mediaTypeTag = { image: 'img', video: 'video' };
 
 /** @typedef {import('./hooks').InserterMediaItem} InserterMediaItem */
 
@@ -51,11 +55,10 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 		attributes.src = mediaSrc;
 	}
 	const PreviewTag = mediaTypeTag[ mediaType ];
-	const preview = (
+	const preview = PreviewTag ? (
 		<PreviewTag
 			src={ media.previewUrl || mediaSrc }
 			alt={ alt }
-			controls={ mediaType === 'audio' ? true : undefined }
 			inert={ inertValue( true ) }
 			onError={ ( { currentTarget } ) => {
 				// Fall back to the media source if the preview cannot be loaded.
@@ -64,6 +67,8 @@ export function getBlockAndPreviewFromMedia( media, mediaType ) {
 				}
 			} }
 		/>
+	) : (
+		<FilePreview url={ mediaSrc } mediaType={ mediaType } />
 	);
 	return [ createBlock( `core/${ mediaType }`, attributes ), preview ];
 }
