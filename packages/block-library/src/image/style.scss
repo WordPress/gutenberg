@@ -346,9 +346,9 @@
 	}
 
 	.scrim {
-		// Fixed, so iOS Safari extends its color behind the browser toolbars.
-		position: fixed;
-		inset: 0;
+		width: 100%;
+		height: 100%;
+		position: absolute;
 		z-index: 2000000;
 		background-color: rgb(255, 255, 255);
 		opacity: 0.9;

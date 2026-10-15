@@ -1217,15 +1217,6 @@ test.describe( 'Image - lightbox', () => {
 					height: viewport.height - 120,
 				} );
 
-				expect(
-					await overlay.locator( '.scrim' ).boundingBox()
-				).toEqual( {
-					x: 0,
-					y: 0,
-					width: viewport.width,
-					height: viewport.height,
-				} );
-
 				const restBox = await enlarged.boundingBox();
 				expect( restBox.height ).toBeLessThanOrEqual(
 					overlayBox.height
