@@ -208,6 +208,7 @@ export function QuickEditModal( {
 
 	return (
 		<Modal
+			size="small"
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
 			onRequestClose={ closeModal }
