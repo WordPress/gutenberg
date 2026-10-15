@@ -9,7 +9,8 @@ import {
 	privateApis as blockEditorPrivateApis,
 	__experimentalUseBlockPreview as useBlockPreview,
 } from '@wordpress/block-editor';
-import { parse } from '@wordpress/blocks';
+import { parse, createBlock } from '@wordpress/blocks';
+import { escapeHTML } from '@wordpress/escape-html';
 import {
 	useEntityProp,
 	useEntityBlockEditor,
@@ -38,8 +39,32 @@ function ReadOnlyContent( {
 	);
 	const blockProps = useBlockProps( { className: layoutClassNames } );
 	const blocks = useMemo( () => {
-		return content?.raw ? parse( content.raw ) : [];
+		if ( ! content?.raw ) {
+			return [];
+		}
+		const parsedBlocks = parse( content.raw );
+		const moreIndex = parsedBlocks.findIndex(
+			( block ) => block.name === 'core/more'
+		);
+		if ( moreIndex === -1 ) {
+			return parsedBlocks;
+		}
+		// Use the custom text from the More block, falling back to the core default.
+		let moreText = __( '(more&hellip;)' );
+		if ( parsedBlocks[ moreIndex ].attributes.customText ) {
+			moreText = escapeHTML(
+				parsedBlocks[ moreIndex ].attributes.customText
+			);
+		}
+		// Add the read more link after the content before the More block.
+		return [
+			...parsedBlocks.slice( 0, moreIndex ),
+			createBlock( 'core/paragraph', {
+				content: `<a href="#" class="more-link">${ moreText }</a>`,
+			} ),
+		];
 	}, [ content?.raw ] );
+
 	const blockPreviewProps = useBlockPreview( {
 		blocks,
 		props: blockProps,
