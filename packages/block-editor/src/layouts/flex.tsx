@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import { __, _x } from '@wordpress/i18n';
 import {
 	justifyLeft,
@@ -30,9 +31,20 @@ import {
 } from '../components';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import type {
+	Layout,
+	LayoutAlignment,
+	LayoutBlockSupport,
+	LayoutControlProps,
+	LayoutInspectorControlsProps,
+	LayoutStyleArgs,
+	LayoutToolbarControlsProps,
+} from './types';
+import type { JustifyContentValue } from '../components/justify-content-control/types';
+import type { BlockVerticalAlignment } from '../components/block-vertical-alignment-control/types';
 
 // Used with the default, horizontal flex orientation.
-const justifyContentMap = {
+const justifyContentMap: Record< string, string > = {
 	left: 'flex-start',
 	right: 'flex-end',
 	center: 'center',
@@ -40,14 +52,14 @@ const justifyContentMap = {
 };
 
 // Used with the vertical (column) flex orientation.
-const alignItemsMap = {
+const alignItemsMap: Record< string, string > = {
 	left: 'flex-start',
 	right: 'flex-end',
 	center: 'center',
 	stretch: 'stretch',
 };
 
-const verticalAlignmentMap = {
+const verticalAlignmentMap: Record< string, string > = {
 	top: 'flex-start',
 	center: 'center',
 	bottom: 'flex-end',
@@ -60,7 +72,10 @@ const defaultAlignments = {
 	vertical: 'top',
 };
 
-const verticalAlignmentOptions = {
+const verticalAlignmentOptions: Record<
+	BlockVerticalAlignment,
+	{ icon: ReactElement; label: string }
+> = {
 	top: {
 		icon: justifyTop,
 		label: _x( 'Align top', 'Block vertical alignment setting' ),
@@ -88,7 +103,7 @@ const flexWrapOptions = [ 'wrap', 'nowrap' ];
 export default {
 	name: 'flex',
 	label: __( 'Flex' ),
-	hasInspectorControls( layoutBlockSupport = {} ) {
+	hasInspectorControls( layoutBlockSupport: LayoutBlockSupport = {} ) {
 		const {
 			allowOrientation = true,
 			allowJustification = true,
@@ -109,14 +124,14 @@ export default {
 		layoutBlockSupport = {},
 		resetLayout = {},
 		clientId,
-	} ) {
+	}: LayoutInspectorControlsProps ) {
 		const {
 			allowOrientation = true,
 			allowJustification = true,
 			allowVerticalAlignment = true,
 			allowWrap = true,
 		} = layoutBlockSupport;
-		const hasLayoutValue = ( key, defaultValue ) =>
+		const hasLayoutValue = ( key: string, defaultValue?: unknown ) =>
 			( layout?.[ key ] ?? defaultValue ) !==
 			( resetLayout?.[ key ] ?? defaultValue );
 		const hasJustificationValue = () =>
@@ -249,7 +264,7 @@ export default {
 		onChange,
 		layoutBlockSupport,
 		controlsGroup = 'block',
-	} ) {
+	}: LayoutToolbarControlsProps ) {
 		const { allowVerticalAlignment = true, allowJustification = true } =
 			layoutBlockSupport;
 
@@ -288,12 +303,12 @@ export default {
 		hasBlockGapSupport,
 		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
-	} ) {
+	}: LayoutStyleArgs ): string {
 		const hasViewportOverrides = viewportOverrides !== undefined;
 		const effectiveLayout = hasViewportOverrides
 			? { ...layout, ...viewportOverrides }
 			: layout;
-		const hasViewportOverride = ( key ) =>
+		const hasViewportOverride = ( key: string ) =>
 			Object.hasOwn( viewportOverrides || {}, key );
 		const { orientation = 'horizontal' } = effectiveLayout;
 
@@ -319,19 +334,22 @@ export default {
 		const hasBlockGapOverride =
 			! hasViewportOverrides ||
 			Object.hasOwn( style?.spacing || {}, 'blockGap' );
+		// An unset value maps to no rule.
 		const justifyContent =
-			justifyContentMap[ effectiveLayout.justifyContent ];
-		const flexWrap = flexWrapOptions.includes( effectiveLayout.flexWrap )
+			justifyContentMap[ effectiveLayout.justifyContent as string ];
+		const flexWrap = flexWrapOptions.includes(
+			effectiveLayout.flexWrap as string
+		)
 			? effectiveLayout.flexWrap
 			: 'wrap';
 		const verticalAlignment =
-			verticalAlignmentMap[ effectiveLayout.verticalAlignment ];
+			verticalAlignmentMap[ effectiveLayout.verticalAlignment as string ];
 		const alignItems =
-			alignItemsMap[ effectiveLayout.justifyContent ] ||
+			alignItemsMap[ effectiveLayout.justifyContent as string ] ||
 			alignItemsMap.left;
 
 		let output = '';
-		const rules = [];
+		const rules: string[] = [];
 
 		const shouldOutputFlexWrap =
 			! hasViewportOverrides || hasViewportOverride( 'flexWrap' );
@@ -393,22 +411,27 @@ export default {
 		}
 		return output;
 	},
-	getOrientation( layout ) {
+	getOrientation( layout: Layout ): string {
 		const { orientation = 'horizontal' } = layout;
 		return orientation;
 	},
-	getAlignments() {
+	getAlignments(): LayoutAlignment[] {
 		return [];
 	},
 };
 
-function getDefaultVerticalAlignment( { orientation = 'horizontal' } = {} ) {
+function getDefaultVerticalAlignment( {
+	orientation = 'horizontal',
+}: Layout = {} ) {
 	return orientation === 'horizontal'
 		? defaultAlignments.horizontal
 		: defaultAlignments.vertical;
 }
 
-function getCompatibleVerticalAlignment( verticalAlignment, orientation ) {
+function getCompatibleVerticalAlignment(
+	verticalAlignment: string | undefined,
+	orientation: string | undefined
+) {
 	if (
 		( orientation === 'horizontal' &&
 			verticalAlignment === 'space-between' ) ||
@@ -420,7 +443,9 @@ function getCompatibleVerticalAlignment( verticalAlignment, orientation ) {
 	return verticalAlignment;
 }
 
-function getVerticalAlignmentControls( orientation ) {
+function getVerticalAlignmentControls(
+	orientation: string
+): BlockVerticalAlignment[] {
 	return orientation === 'horizontal'
 		? [ 'top', 'center', 'bottom', 'stretch' ]
 		: [ 'top', 'center', 'bottom', 'space-between' ];
@@ -430,16 +455,17 @@ function FlexLayoutVerticalAlignmentControl( {
 	layout,
 	onChange,
 	isToolbar = false,
-} ) {
+}: LayoutControlProps ) {
 	const { orientation = 'horizontal' } = layout;
 
 	const { verticalAlignment = getDefaultVerticalAlignment( layout ) } =
 		layout;
 
-	const onVerticalAlignmentChange = ( value ) => {
+	const onVerticalAlignmentChange = ( value?: string | number ) => {
 		onChange( {
 			...layout,
-			verticalAlignment: value,
+			// The controls only offer vertical alignments.
+			verticalAlignment: value as string | undefined,
 		} );
 	};
 	const controls = getVerticalAlignmentControls( orientation );
@@ -448,7 +474,8 @@ function FlexLayoutVerticalAlignmentControl( {
 		return (
 			<BlockVerticalAlignmentControl
 				onChange={ onVerticalAlignmentChange }
-				value={ verticalAlignment }
+				// The layout stores one of the offered alignments.
+				value={ verticalAlignment as BlockVerticalAlignment }
 				controls={ controls }
 			/>
 		);
@@ -476,23 +503,29 @@ function FlexLayoutVerticalAlignmentControl( {
 	);
 }
 
+// Keeps the placement a literal, as the popover props require.
 const POPOVER_PROPS = {
 	placement: 'bottom-start',
-};
+} as const;
 
 function FlexLayoutJustifyContentControl( {
 	layout,
 	onChange,
 	isToolbar = false,
-} ) {
+}: LayoutControlProps ) {
 	const { justifyContent = 'left', orientation = 'horizontal' } = layout;
-	const onJustificationChange = ( value ) => {
+	const onJustificationChange = ( value?: string | number ) => {
 		onChange( {
 			...layout,
-			justifyContent: value,
+			// The controls only offer justifications.
+			justifyContent: value as string | undefined,
 		} );
 	};
-	const allowedControls = [ 'left', 'center', 'right' ];
+	const allowedControls: JustifyContentValue[] = [
+		'left',
+		'center',
+		'right',
+	];
 	if ( orientation === 'horizontal' ) {
 		allowedControls.push( 'space-between' );
 	} else {
@@ -502,14 +535,19 @@ function FlexLayoutJustifyContentControl( {
 		return (
 			<JustifyContentControl
 				allowedControls={ allowedControls }
-				value={ justifyContent }
+				// The layout stores one of the allowed justifications.
+				value={ justifyContent as JustifyContentValue }
 				onChange={ onJustificationChange }
 				popoverProps={ POPOVER_PROPS }
 			/>
 		);
 	}
 
-	const justificationOptions = [
+	const justificationOptions: {
+		value: string;
+		icon: ReactElement;
+		label: string;
+	}[] = [
 		{
 			value: 'left',
 			icon: justifyLeft,
@@ -561,7 +599,7 @@ function FlexLayoutJustifyContentControl( {
 	);
 }
 
-function FlexWrapControl( { layout, onChange } ) {
+function FlexWrapControl( { layout, onChange }: LayoutControlProps ) {
 	const { flexWrap = 'wrap' } = layout;
 	return (
 		<ToggleControl
@@ -577,7 +615,7 @@ function FlexWrapControl( { layout, onChange } ) {
 	);
 }
 
-function OrientationControl( { layout, onChange } ) {
+function OrientationControl( { layout, onChange }: LayoutControlProps ) {
 	const {
 		orientation = 'horizontal',
 		verticalAlignment,
@@ -609,7 +647,8 @@ function OrientationControl( { layout, onChange } ) {
 				}
 				return onChange( {
 					...layout,
-					orientation: value,
+					// The options are the two orientations.
+					orientation: value as string,
 					verticalAlignment: newVerticalAlignment,
 					justifyContent: newJustification,
 				} );
