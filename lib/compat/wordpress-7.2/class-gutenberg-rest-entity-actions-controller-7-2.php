@@ -183,6 +183,12 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 		$kind = $request->get_param( 'kind' );
 		$name = $request->get_param( 'name' );
 
+		$action_schema = $this->get_action_schema();
+		$actions       = array();
+		foreach ( wp_get_registered_entity_actions( $kind, $name ) as $action ) {
+			$actions[] = gutenberg_rest_cast_empty_objects_from_schema( $action, $action_schema );
+		}
+
 		$script_modules = array();
 		foreach ( wp_get_registered_entity_action_modules( $kind, $name ) as $module => $action_ids ) {
 			$script_modules[] = array(
@@ -195,7 +201,7 @@ class Gutenberg_REST_Entity_Actions_Controller_7_2 extends WP_REST_Controller {
 		$response = array(
 			'kind'           => $kind,
 			'name'           => $name,
-			'actions'        => wp_get_registered_entity_actions( $kind, $name ),
+			'actions'        => $actions,
 			'script_modules' => $script_modules,
 		);
 
