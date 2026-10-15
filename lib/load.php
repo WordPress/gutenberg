@@ -206,6 +206,17 @@ if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
 	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-gutenberg.php';
 	require_once __DIR__ . '/../build/scripts/style-engine/style-engine-gutenberg.php';
 }
+if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
+	/*
+	 * Remove the WordPress core callback registering the same fields, or every
+	 * field is registered twice and the second registration is refused.
+	 */
+	$core_field_collections_priority = has_action( 'wp_entity_fields_api_init', 'wp_register_core_field_collections' );
+	if ( false !== $core_field_collections_priority ) {
+		remove_action( 'wp_entity_fields_api_init', 'wp_register_core_field_collections', $core_field_collections_priority );
+	}
+	require_once __DIR__ . '/../build/scripts/core-fields/index.php';
+}
 
 // Block supports overrides.
 require __DIR__ . '/block-supports/settings.php';
