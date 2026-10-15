@@ -260,6 +260,13 @@ export const registerPostTypeSchema =
 				! isDesignPostType &&
 					postTypeConfig.supports?.author &&
 					authorField,
+				// Patterns are sorted client-side, where the author's ID
+				// isn't a useful order, like the template authors.
+				isPattern &&
+					postTypeConfig.supports?.author && {
+						...authorField,
+						enableSorting: false,
+					},
 				postTypeSlug === 'wp_template' && templateAuthorField,
 				postTypeSlug === 'wp_template_part' && templatePartAuthorField,
 				! isDesignPostType && statusField,
