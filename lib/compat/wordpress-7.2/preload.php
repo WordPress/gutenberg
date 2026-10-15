@@ -140,7 +140,27 @@ function _gutenberg_get_route_post_types() {
 }
 
 /**
- * Preloads the fields of the post types the route being loaded lists or edits.
+ * Returns the paths of the view config the route being loaded resolves before
+ * it renders.
+ *
+ * Only the media editor route does: its loader resolves the `form` of the
+ * attachment view config, see routes/media-editor/route.ts. It is the only
+ * route whose post type is `attachment`. A path must match the request of the
+ * `getViewConfig` core data resolver, `_fields` included.
+ *
+ * @return string[] The paths of the `wp/v2/view-config` route, empty for any other route.
+ */
+function _gutenberg_get_route_view_config_preload_paths() {
+	if ( array( 'attachment' ) !== _gutenberg_get_route_post_types() ) {
+		return array();
+	}
+
+	return array( '/wp/v2/view-config?kind=postType&name=attachment&_fields=form' );
+}
+
+/**
+ * Preloads the fields of the post types the route being loaded lists or edits,
+ * and the view config it resolves before it renders.
  *
  * A page booted by `@wordpress/boot` prints a preloading middleware of its own
  * with the paths every one of its routes needs, see the `page.php` template of
@@ -154,7 +174,10 @@ function _gutenberg_get_route_post_types() {
  * attached to the handle and printed along with it.
  */
 function _gutenberg_preload_route_entity_fields() {
-	$paths = _gutenberg_get_post_type_fields_preload_paths( _gutenberg_get_route_post_types() );
+	$paths = array_merge(
+		_gutenberg_get_post_type_fields_preload_paths( _gutenberg_get_route_post_types() ),
+		_gutenberg_get_route_view_config_preload_paths()
+	);
 	if ( empty( $paths ) ) {
 		return;
 	}

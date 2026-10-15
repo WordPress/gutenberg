@@ -243,6 +243,37 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Only the media editor route preloads a view config: the form its loader
+	 * resolves before the route renders.
+	 */
+	public function test_the_media_editor_route_preloads_the_attachment_form() {
+		$_GET['p'] = '/media-editor/12';
+		$this->assertSame(
+			array( '/wp/v2/view-config?kind=postType&name=attachment&_fields=form' ),
+			_gutenberg_get_route_view_config_preload_paths()
+		);
+
+		$_GET['p'] = '/types/page/list/all';
+		$this->assertSame( array(), _gutenberg_get_route_view_config_preload_paths() );
+	}
+
+	/**
+	 * The attachment form reaches the media editor route along with the
+	 * attachment fields.
+	 */
+	public function test_the_media_editor_route_prints_the_preloaded_form() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+		$_GET['p'] = '/media-editor/12';
+
+		_gutenberg_preload_route_entity_fields();
+		$script = $this->get_preloaded_inline_script();
+
+		$this->assertStringContainsString( 'fields?kind=postType&name=attachment', $script );
+		$this->assertStringContainsString( 'view-config?kind=postType&name=attachment&_fields=form', $script );
+		$this->assertStringContainsString( '"form"', $script );
+	}
+
+	/**
 	 * A route that shows no post fields prints nothing.
 	 */
 	public function test_a_route_without_post_fields_preloads_nothing() {
