@@ -15,15 +15,17 @@ describe( 'getTestSuiteRefs', () => {
 		expect( getTestSuiteRefs( '' ) ).toEqual( [ TRUNK ] );
 	} );
 
-	it( 'uses the tag of a patch release', () => {
+	it( 'tries the tag of a patch release before its branch', () => {
 		expect( getTestSuiteRefs( '7.1.3' ) ).toEqual( [
 			{ type: 'tag', name: '7.1.3' },
+			{ type: 'branch', name: '7.1' },
 		] );
 	} );
 
 	it( 'adds the .0 that wordpress-develop tags use to a non-patch release', () => {
 		expect( getTestSuiteRefs( '7.1' ) ).toEqual( [
 			{ type: 'tag', name: '7.1.0' },
+			{ type: 'branch', name: '7.1' },
 		] );
 	} );
 
@@ -135,6 +137,22 @@ describe( 'fetchTestSuite', () => {
 		);
 		expect( git.calls.slice( 1 ) ).toEqual( [
 			[ 'raw', 'fetch', 'origin', 'trunk', '--depth', '1' ],
+			[ 'checkout', 'FETCH_HEAD' ],
+		] );
+	} );
+
+	it( 'falls back to the branch when the tag does not exist yet', async () => {
+		const git = createGit( [ 'refs/heads/7.1' ] );
+		await fetchTestSuite(
+			git,
+			[
+				{ type: 'tag', name: '7.1.4' },
+				{ type: 'branch', name: '7.1' },
+			],
+			noop
+		);
+		expect( git.calls.slice( 1 ) ).toEqual( [
+			[ 'raw', 'fetch', 'origin', '7.1', '--depth', '1' ],
 			[ 'checkout', 'FETCH_HEAD' ],
 		] );
 	} );

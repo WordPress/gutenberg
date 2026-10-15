@@ -127,7 +127,8 @@ async function downloadTestSuite(
  * Gets the WordPress/wordpress-develop refs to try, in order, for the PHPUnit
  * library that matches a WordPress version.
  *
- * A release uses its tag. A pre-release (alpha, beta or RC) uses its `X.Y`
+ * A release uses its tag, and falls back to its `X.Y` branch in case the tag
+ * has not been created yet. A pre-release (alpha, beta or RC) uses its `X.Y`
  * branch, which exists from the moment that version branches off trunk, and
  * falls back to trunk before then. This keeps a maintenance branch between
  * point releases, such as 7.1.4-alpha, on that branch's tests instead of
@@ -149,12 +150,19 @@ function getTestSuiteRefs( wpVersion ) {
 		return [ { type: 'branch', name: preRelease[ 1 ] }, trunk ];
 	}
 
+	const release = wpVersion.match( /^(\d+\.\d+)(\.\d+)?$/ );
+	if ( ! release ) {
+		return [ { type: 'tag', name: wpVersion } ];
+	}
+
 	/*
 	 * WordPress/wordpress-develop uses X.Y.Z tags, but WordPress reports X.Y
 	 * for non-patch releases.
 	 */
-	const tag = /^\d+\.\d+$/.test( wpVersion ) ? `${ wpVersion }.0` : wpVersion;
-	return [ { type: 'tag', name: tag } ];
+	return [
+		{ type: 'tag', name: release[ 2 ] ? wpVersion : `${ wpVersion }.0` },
+		{ type: 'branch', name: release[ 1 ] },
+	];
 }
 
 /**
