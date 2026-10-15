@@ -13,6 +13,7 @@ export const PLUGIN_FILES = [
 	'packages/icons/src/library/*.svg',
 	'packages/ui/build-php/manifest.php',
 	'packages/ui/build-php/style.css',
+	'packages/ui/build-php/test/examples.json',
 	'build',
 	'build-module',
 	'readme.txt',

@@ -84,8 +84,25 @@ export function getBreakingChanges(
 	}
 
 	for ( const [ prop, schema ] of Object.entries( current ) ) {
-		if ( schema.required && ! released[ prop ]?.required ) {
+		if ( ! schema.required || released[ prop ]?.required ) {
+			continue;
+		}
+
+		// A required prop renamed with a deprecation: existing calls pass the
+		// old name, which maps to this one, so they keep working as long as
+		// the old prop was required too and the type didn't change.
+		const renamedFrom = deprecations.find(
+			( deprecation ) =>
+				deprecation.replacement === prop &&
+				deprecation.value === undefined &&
+				released[ deprecation.prop ]?.required
+		)?.prop;
+		if ( ! renamedFrom ) {
 			problems.push( `${ name }: the "${ prop }" prop became required.` );
+		} else if ( released[ renamedFrom ].type !== schema.type ) {
+			problems.push(
+				`${ name }: the "${ prop }" prop, renamed from "${ renamedFrom }", changed from ${ released[ renamedFrom ].type } to ${ schema.type }.`
+			);
 		}
 	}
 

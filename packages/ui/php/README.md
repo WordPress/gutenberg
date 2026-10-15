@@ -25,8 +25,8 @@ This works for components whose props have a fixed set of values or are plain te
 
 A PHP component is a subset of the React one: markup and CSS only, with no JavaScript. A prop is only exposed when the snapshot alone gets its behavior right, and a check covers that behavior.
 
--   **Text** props are plain text, escaped with `esc_html()`. They can't contain markup.
--   **Attribute** props are escaped with `esc_attr()`, or `esc_url()` for URLs.
+-   **Text** props are plain text, escaped as React escapes them. They can't contain markup, and entities show as written, as in React: `&hellip;` shows as `&hellip;`, not `…`. Decode a string that is already HTML-encoded, such as the result of `get_the_title()`, before passing it.
+-   **Attribute** props are escaped the same way, or with `esc_url()` for URLs.
 -   **No other content.** A component takes no children beyond what its props declare.
 
 For Button:

@@ -1,6 +1,3 @@
-/* eslint-disable @wordpress/no-ds-tokens -- This file is the package's plain-value
-   mapping to design system tokens. The build plugin injects generated fallbacks. */
-
 const white = '#fff';
 
 // Matches the grays in @wordpress/base-styles
@@ -72,8 +69,6 @@ const UI = {
 	darkGrayPlaceholder: `color-mix(in srgb, ${ THEME.foreground }, transparent 38%)`,
 	lightGrayPlaceholder: `color-mix(in srgb, ${ THEME.background }, transparent 35%)`,
 };
-
-/* eslint-enable @wordpress/no-ds-tokens */
 
 export const COLORS = Object.freeze( {
 	/**

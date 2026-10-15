@@ -14,7 +14,7 @@
 -   `Avatar`: Add `Avatar.Initials` using the first and last words with complete Unicode characters, and a borderless person icon as the default fallback ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
 -   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, a neutral border, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
 -   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
--   Experimental: build a server-rendered version of `Button` for PHP admin screens into `build-php/`, generated from the React components and declared in `php/<component>/component.json`.
+-   Experimental: build a server-rendered version of `Button` for PHP admin screens into `build-php/`, generated from the React components and declared in `php/<component>/component.json` ([#84714](https://github.com/WordPress/gutenberg/pull/84714)).
 
 ### Enhancements
 
@@ -29,6 +29,7 @@
 
 ### Bug Fixes
 
+-   `Select`: Keep long popup lists scrollable when item alignment falls back to anchored positioning or the popup opens through touch ([#84682](https://github.com/WordPress/gutenberg/pull/84682)).
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
 -   `Avatar`: Show missing and failed image fallbacks immediately despite a delay, preserve custom fallback rendering, scale fallback SVGs with the avatar, and preserve decorative avatar layout and typography inside wp-admin trees ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
 -   `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of its wrapper, while retaining navigation landmark labels for page breadcrumbs ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).

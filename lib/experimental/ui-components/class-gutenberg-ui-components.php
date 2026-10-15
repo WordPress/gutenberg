@@ -279,23 +279,38 @@ final class Gutenberg_UI_Components {
 				if ( 'text' === $placeholder[1] ) {
 					// A string React translates with `__()`, such as a "Dismiss" label.
 					list( $text, $domain ) = $component['texts'][ $placeholder[2] ];
-					$text                  = translate( $text, $domain ); // phpcs:ignore WordPress.WP.I18n -- Strings from the React components.
-					return '' !== $attribute ? esc_attr( $text ) : esc_html( $text );
+					return self::esc_plain_text( translate( $text, $domain ) ); // phpcs:ignore WordPress.WP.I18n -- Strings from the React components.
 				}
 
 				$value = (string) $props[ $placeholder[2] ];
 				if ( '' !== $attribute ) {
 					// React blocks `javascript:` URLs; esc_url() does the same here.
-					return in_array( $attribute, array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : esc_attr( $value );
+					return in_array( $attribute, array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : self::esc_plain_text( $value );
 				}
 				if ( isset( $component['props'][ $placeholder[2] ]['format'] ) && 'html' === $component['props'][ $placeholder[2] ]['format'] ) {
 					// HTML props are printed as is; callers escape what they pass.
 					return $value;
 				}
-				return esc_html( $value );
+				return self::esc_plain_text( $value );
 			},
 			$this->get_markup( $component, $props )
 		);
+	}
+
+	/**
+	 * Escapes plain text for HTML text or an attribute value, as React does.
+	 *
+	 * React escapes `&`, `<`, `>`, `"` and `'` in every string and never reads
+	 * entities in it, so any entity a caller passes shows as written. Unlike
+	 * `esc_html()` and `esc_attr()`, which leave existing entities alone, this
+	 * does the same. Props are plain text: decode a string that is already
+	 * HTML-encoded, such as the result of `get_the_title()`, first.
+	 *
+	 * @param string $text Plain text.
+	 * @return string Escaped text.
+	 */
+	private static function esc_plain_text( $text ) {
+		return htmlspecialchars( (string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
 	}
 
 	/**

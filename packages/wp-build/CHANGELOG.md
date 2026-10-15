@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Enhancements
-
--   Export `compileStyleFile()` and `compileCss()` from `@wordpress/build/compile-style`, so a package can emit its styles in another form with the same scoped class names as the JavaScript build.
-
 ### Breaking Changes
 
 -   Remove the automatic Babel processing for `packages/components`, including the Emotion transform, implicit project Babel configuration support, and build-time dependencies. Projects that rely on these transforms must run Babel separately before `@wordpress/build` ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
@@ -13,6 +9,7 @@
 
 ### Enhancements
 
+-   Export `compileStyleFile()` and `compileCss()` from `@wordpress/build/compile-style`, so a package can emit its styles in another form with the same scoped class names as the JavaScript build ([#84714](https://github.com/WordPress/gutenberg/pull/84714)).
 -   Resolve development bundles with the `development` and `module` export conditions, enabling runtime diagnostics such as unsupported Emotion component selectors ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
 
 ### Bug Fixes
