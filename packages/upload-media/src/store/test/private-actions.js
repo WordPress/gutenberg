@@ -1400,7 +1400,7 @@ describe( 'private actions', () => {
 			...itemOverrides,
 		} );
 
-		const makeHarness = ( item ) => {
+		const makeHarness = ( item, settings = {} ) => {
 			const addSideloadItem = vi.fn();
 			const dispatch = {
 				addSideloadItem,
@@ -1413,6 +1413,7 @@ describe( 'private actions', () => {
 					allImageSizes: {
 						thumbnail: { width: 150, height: 150, crop: true },
 					},
+					...settings,
 				} ),
 			};
 			return { select, dispatch, addSideloadItem };
@@ -1465,22 +1466,29 @@ describe( 'private actions', () => {
 			// Images over the big-image threshold were already rotated by
 			// vips while scaling, so no separate rotated original is stored,
 			// matching WordPress core.
-			const item = makeItem(
-				{ exif_orientation: 6 },
-				{
-					file: new File( [ 'fake' ], 'photo-scaled.jpg', {
-						type: 'image/jpeg',
-					} ),
-				}
-			);
-			const { select, dispatch, addSideloadItem } = makeHarness( item );
+			const originalCreateImageBitmap = global.createImageBitmap;
+			global.createImageBitmap = vi.fn( async () => ( {
+				width: 4000,
+				height: 3000,
+				close: vi.fn(),
+			} ) );
 
-			await generateThumbnails( item.id )( { select, dispatch } );
+			try {
+				const item = makeItem( { exif_orientation: 6 } );
+				const { select, dispatch, addSideloadItem } = makeHarness(
+					item,
+					{ bigImageSizeThreshold: 2560 }
+				);
 
-			expect( vipsRotateImage ).not.toHaveBeenCalled();
-			expect(
-				sideloadedSize( addSideloadItem, 'original' )
-			).toBeUndefined();
+				await generateThumbnails( item.id )( { select, dispatch } );
+
+				expect( vipsRotateImage ).not.toHaveBeenCalled();
+				expect(
+					sideloadedSize( addSideloadItem, 'original' )
+				).toBeUndefined();
+			} finally {
+				global.createImageBitmap = originalCreateImageBitmap;
+			}
 		} );
 
 		it( 'rotates AVIF sub-sizes from the client-parsed EXIF orientation', async () => {
