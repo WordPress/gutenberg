@@ -11,12 +11,15 @@
 
 ### New Features
 
+-   `Avatar`: Add `Avatar.Initials` using the first and last words with complete Unicode characters, and a borderless person icon as the default fallback ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
 -   Add `Avatar.Root`, `Avatar.Image`, and `Avatar.Fallback` for profile images with customizable fallbacks, circle and square shapes, a neutral border, five sizes from 16px to 64px, and a reduced-motion-aware image fade. ([#84145](https://github.com/WordPress/gutenberg/pull/84145))
 -   `Breadcrumb`: Add `ButtonItem` ancestors for hierarchy selection, current-only trails, and customizable `CurrentItem` `aria-current` ([#84156](https://github.com/WordPress/gutenberg/pull/84156)).
 -   Experimental: build a server-rendered version of `Button` for PHP admin screens into `build-php/`, generated from the React components and declared in `php/<component>/component.json`.
 
 ### Enhancements
 
+-   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
+-   `Tabs`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Dialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84379](https://github.com/WordPress/gutenberg/pull/84379)).
 -   `Drawer`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving explicit container overrides, including null to delay rendering ([#84380](https://github.com/WordPress/gutenberg/pull/84380)).
 -   `Dialog`: Add an opt-in `auto` popup size that fits content within the responsive minimum and viewport inset ([#84559](https://github.com/WordPress/gutenberg/pull/84559)).
@@ -26,9 +29,12 @@
 
 ### Bug Fixes
 
+-   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
+-   `Avatar`: Show missing and failed image fallbacks immediately despite a delay, preserve custom fallback rendering, scale fallback SVGs with the avatar, and preserve decorative avatar layout and typography inside wp-admin trees ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
 -   `Breadcrumb`: Apply hierarchy-selection labels to the ordered list instead of its wrapper, while retaining navigation landmark labels for page breadcrumbs ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb`: Align button, link, and current-item padding, separate button hover backgrounds from separators, and preserve list semantics in Safari ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
 -   `Breadcrumb.CurrentItem`: Exclude false values from the `aria-current` type ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+-   `Notice`: Tint controls and their focus rings with the notice intent color and preserve title colors when composed with `Text` ([#84571](https://github.com/WordPress/gutenberg/pull/84571)).
 -   `Popover`, `Menu`, `Tooltip`, `Select`, `Autocomplete`, and `Combobox`: Preserve an explicit null portal container so popup content waits until its target is available ([#84370](https://github.com/WordPress/gutenberg/pull/84370)).
 -   `Menu`, `Popover`: Keep popups open when the user interacts with an iframe inside the popup. ([#83870](https://github.com/WordPress/gutenberg/pull/83870))
 -   `AlertDialog`: Use the WordPress compatibility overlay slot as the default portal container when available, preserving an explicit null container to delay rendering ([#83878](https://github.com/WordPress/gutenberg/pull/83878)).
@@ -40,7 +46,6 @@
 ### Documentation
 
 -   `Tabs`: Preserve intrinsic icon styles in the tab icons and tooltips story ([#84618](https://github.com/WordPress/gutenberg/pull/84618)).
-
 -   Document accessible naming for Combobox popups ([#84551](https://github.com/WordPress/gutenberg/pull/84551)).
 -   Add popup width stories for Autocomplete, Combobox, Select, SearchableSelect, and SearchableChipSelect ([#84320](https://github.com/WordPress/gutenberg/pull/84320)).
 -   `Menu`: Clarify icon and description usage, document mixed icon alignment and current layout defaults, and favor short, clear labels ([#84020](https://github.com/WordPress/gutenberg/pull/84020)).

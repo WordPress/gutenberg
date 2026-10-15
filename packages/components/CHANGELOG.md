@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
     -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
     -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
     -   `RangeControl` ([#84562](https://github.com/WordPress/gutenberg/pull/84562))
@@ -18,6 +19,9 @@
 
 ### Enhancements
 
+-   `ExternalLink`: Use a small border radius for consistent focus rings ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
+-   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
+-   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
 
 ### Deprecations
@@ -29,8 +33,10 @@
 -   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
 -   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
+-   `Tabs`: Use semantic interaction colors for unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Tabs`: Restore the `fit-content` width of horizontal tab lists, which stretched to full width after the SCSS Modules migration ([#84626](https://github.com/WordPress/gutenberg/pull/84626)).
 -   `Snackbar`: Return focus to the previously focused control when dismissing a focused snackbar outside SnackbarList, including portaled snackbars ([#84342](https://github.com/WordPress/gutenberg/pull/84342)).
+-   `Notice`: Tint dismiss controls and their focus rings with the notice status color ([#84571](https://github.com/WordPress/gutenberg/pull/84571)).
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
@@ -39,6 +45,7 @@
 -   `Modal`: Keep an accessible name on the dialog when `title` is combined with `__experimentalHideHeader`. The heading that `aria-labelledby` referenced is not rendered in that case, so the title is now applied as the dialog's `aria-label` instead ([#82645](https://github.com/WordPress/gutenberg/pull/82645)).
 -   `ColorPicker`: Make the HSL and RGB input labels translatable, and name the Hue and Alpha inputs after their color format ([#70214](https://github.com/WordPress/gutenberg/pull/70214)).
 -   `CustomGradientPicker`: Use the bundled `gradient-parser` types, preserve gradient angles when editing, and keep unsupported gradient syntax on the existing fallback path ([#84582](https://github.com/WordPress/gutenberg/pull/84582)).
+-   `BaseControl`: Remove the unsupported `as` prop from the component types and documentation ([#70064](https://github.com/WordPress/gutenberg/pull/70064)).
 
 ### Internal
 

@@ -345,3 +345,39 @@ export const WithNonFocusablePanels: StoryObj< typeof Tabs.Root > = {
 		],
 	},
 };
+
+/**
+ * Resize the container to compare painted tab padding with actual overflow.
+ */
+export const MinimalTabsOverflow: StoryObj< typeof Tabs.Root > = {
+	render: () => (
+		<div
+			style={ {
+				width: 140,
+				padding: 16,
+				resize: 'horizontal',
+				overflow: 'auto',
+				boxSizing: 'content-box',
+			} }
+		>
+			<Tabs.Root defaultValue="Content">
+				<Tabs.List
+					variant="minimal"
+					aria-label="Resizable minimal tabs"
+					style={ { maxWidth: '100%' } }
+				>
+					{ [ 'Content', 'Settings', 'Preview' ].map( ( label ) => (
+						<Tabs.Tab key={ label } value={ label }>
+							{ label }
+						</Tabs.Tab>
+					) ) }
+				</Tabs.List>
+				{ [ 'Content', 'Settings', 'Preview' ].map( ( label ) => (
+					<Tabs.Panel key={ label } value={ label }>
+						<ThemedParagraph>{ label } panel</ThemedParagraph>
+					</Tabs.Panel>
+				) ) }
+			</Tabs.Root>
+		</div>
+	),
+};
