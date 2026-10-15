@@ -260,6 +260,41 @@ function validateEntryLinks(
 }
 
 /**
+ * Rejects blank lines between top-level entries in an Unreleased subsection.
+ * One blank line would make the whole list loose. Blank lines before nested
+ * children stay allowed, as in `validateEntryLinks`.
+ *
+ * @param unreleased Unreleased section.
+ * @param filePath   Path for error messages.
+ * @return Error messages.
+ */
+function validateEntrySpacing(
+	unreleased: UnreleasedSection,
+	filePath: string
+): string[] {
+	const errors: string[] = [];
+	let inEntry = false;
+
+	for ( let i = 1; i < unreleased.lines.length; i++ ) {
+		const line = unreleased.lines[ i ];
+		if ( /^-\s+/.test( line ) ) {
+			if ( inEntry && unreleased.lines[ i - 1 ] === '' ) {
+				errors.push(
+					`${ filePath }:${
+						unreleased.start + i + 1
+					}: blank line between Unreleased entries. Entries in a subsection must not be separated by blank lines.`
+				);
+			}
+			inEntry = true;
+		} else if ( line !== '' && ! /^\s/.test( line ) ) {
+			inEntry = false;
+		}
+	}
+
+	return errors;
+}
+
+/**
  * Markdown link for a Gutenberg pull request.
  *
  * @param pr Pull request number.
@@ -350,6 +385,7 @@ export function validateChangelog(
 		...validateSubsectionHeadings( unreleased, filePath ),
 		...validateSectionTitles( unreleased, filePath ),
 		...validateEntryLinks( unreleased, filePath ),
+		...validateEntrySpacing( unreleased, filePath ),
 		...placementErrors,
 		...( options.requirePr
 			? validateRequiredPrLink( unreleased, filePath, options.requirePr )
