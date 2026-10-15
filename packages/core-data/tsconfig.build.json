@@ -23,6 +23,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../sync/tsconfig.build.json" },
+		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../undo-manager" },
 		{ "path": "../url" },
 		{ "path": "../warning" }
