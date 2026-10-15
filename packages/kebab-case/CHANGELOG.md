@@ -8,7 +8,7 @@
 
 ### Internal
 
--   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations.
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#84825](https://github.com/WordPress/gutenberg/pull/84825)).
 
 ## 1.4.0 (2026-10-07)
 
