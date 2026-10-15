@@ -2768,11 +2768,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/inserter/test/fixtures/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/inserter/test/get-appender-label.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -3054,11 +3049,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/link-control/test/fixtures/index.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -3967,11 +3957,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/url-input/test/fixtures/validated-input-control-deprecation.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -9026,11 +9011,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/query/test/fixtures/index.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -17240,6 +17220,361 @@
 	},
 	"test/unit/config/setup.vitest.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
+			"count": 1
+		}
+	},
+	"tools/agents/setup-skills.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/agents/test/setup-skills.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/build.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/clean.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/dev.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/packages/build-vendors.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/packages/check-build-type-declaration-files.cjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/packages/check-esm-package-types-helpers.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/packages/check-esm-package-types.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/packages/codemod-react-legacy-element.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/packages/generate-worker-placeholders.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/packages/resolve-trace-source-maps.cjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/process.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/test/check-esm-package-types.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/test/process-windows.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/test/process.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/build-scripts/typecheck.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/are-api-docs-unstaged.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/gen-block-lib-list.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/gen-components-docs/get-subcomponent-descriptions.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/gen-components-docs/get-tags-from-storybook.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/gen-components-docs/index.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/gen-components-docs/markdown/index.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/gen-components-docs/markdown/props.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/gen-manifest.cjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/gen-theme-reference.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/generate-block-docs.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/manifest.cjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/docs/update-api-docs.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/monorepo/wpds/generate-admin-scheme-tokens.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/cherry-pick.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/cli.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/commands/changelog.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/commands/common.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/commands/packages.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/commands/performance.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/commands/test/changelog.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/commands/test/common.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/commands/test/packages.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/config.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/find-reusable-plugin-artifacts.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/generate-php-sync-issue.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/lib/logger.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/lib/milestone.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/lib/sanitize-branch-name.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/lib/test/version.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/lib/utils.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/lib/version.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/log-performance-results.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/resolve-performance-branches.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/test/cherry-pick.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/test/cli.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/test/find-reusable-plugin-artifacts.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/release/test/resolve-performance-branches.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/stylelint/config.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/stylelint/test/no-duplicate-selectors.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/stylelint/test/utils/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/check-installed-deps.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/check-licenses.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/check-local-changes.cjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/check-private-apis.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/check-root-dependencies.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/read-npm-pack-result.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/read-npm-pack-result.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/test-create-block.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/test-vitest-consumers.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/validate-package-contents.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/validate-package-contents.test.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/validate-package-lock.cjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/validate-tsconfig.mjs": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/validation/validate-tsconfig.test.js": {
+		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

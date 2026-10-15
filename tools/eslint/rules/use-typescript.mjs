@@ -1,7 +1,7 @@
 /**
  * Reports every JavaScript file it runs on. The config scopes it to the
- * packages that are TypeScript only, so only new files fail: the existing
- * ones stay in suppressions.json until they are converted.
+ * trees where new files must be TypeScript, so only new files fail: the
+ * existing ones stay in suppressions.json until they are converted.
  */
 
 /** @type {import('eslint').Rule.RuleModule} */
@@ -9,13 +9,12 @@ export default {
 	meta: {
 		type: 'problem',
 		docs: {
-			description:
-				'Require TypeScript files in packages that are TypeScript only.',
+			description: 'Require new files to be TypeScript.',
 		},
 		schema: [],
 		messages: {
 			useTypeScript:
-				'This package is TypeScript only. Create the file as .ts or .tsx instead.',
+				'New files in this package must be TypeScript: use .ts, .tsx, .mts or .cts.',
 		},
 	},
 	create( context ) {

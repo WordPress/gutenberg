@@ -76,6 +76,7 @@ function dedupePlugins( configs ) {
 const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 const TS_EXT = '@([cm]ts|ts|tsx)';
 const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
+const JS_EXT = '@([cm]js|js|jsx)';
 
 const vitestLintFiles = [
 	...vitestTestPatterns,
@@ -116,16 +117,17 @@ const typedFiles = globSync( 'packages/*/package.json', {
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
 
 /*
- * Source and test trees of the packages wired into the TypeScript program.
- * Routes keep their sources at the package root.
+ * Source and test trees of the packages wired into the TypeScript program,
+ * plus routes and tools, which keep their sources at the workspace root.
  */
 const typeScriptOnlyFiles = [
 	...globSync( 'packages/*/tsconfig.json', { cwd: rootDir, posix: true } )
 		.sort()
 		.map( ( fileName ) =>
-			fileName.replace( 'tsconfig.json', '@(src|test)/**/*.{js,jsx}' )
+			fileName.replace( 'tsconfig.json', `@(src|test)/**/*.${ JS_EXT }` )
 		),
-	'routes/*/**/*.{js,jsx}',
+	`routes/*/**/*.${ JS_EXT }`,
+	`tools/*/**/*.${ JS_EXT }`,
 ];
 
 // All files from bundled packages: packages not registered as WordPress
@@ -553,6 +555,15 @@ export default dedupePlugins( [
 	// suppressed, so only new ones fail.
 	{
 		files: typeScriptOnlyFiles,
+		ignores: [
+			'**/fixtures/**',
+			// Editors load the ESLint config with their own Node, which
+			// may not strip types.
+			'tools/eslint/**',
+			// Published as plain modules through package.json exports.
+			'tools/react-18/**',
+			'tools/react-19/**',
+		],
 		plugins: {
 			gutenberg: gutenbergPlugin,
 		},
