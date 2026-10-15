@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import TextAlignmentControl from '../';
 
-const meta = {
+const meta: Meta< typeof TextAlignmentControl > = {
 	id: 'blockeditor-textalignmentcontrol',
 	title: 'Editor/Block Editor/TextAlignmentControl',
 	component: TextAlignmentControl,
@@ -16,6 +17,7 @@ const meta = {
 	},
 	argTypes: {
 		value: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'Currently selected text alignment value.',
 			table: {
@@ -26,6 +28,7 @@ const meta = {
 		},
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'Handles change in text alignment selection.',
 			table: {
@@ -54,9 +57,11 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState();
+		const [ value, setValue ] = useState< string >();
 		return (
 			<TextAlignmentControl
 				{ ...args }
