@@ -114,6 +114,8 @@ jobs:
                   name: build-assets
                   path: |
                       ./build/
+                  # Only consumed by the jobs of this run, including re-runs.
+                  retention-days: 3
 
     test-php:
         name: PHP ${{ matrix.php }}${{ matrix.multisite && ' multisite' || '' }} on Linux
