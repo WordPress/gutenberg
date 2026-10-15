@@ -59,6 +59,46 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * React renders of every combination of variants, with real values.
+	 *
+	 * @return array
+	 */
+	public function data_combinations() {
+		$file = dirname( __DIR__, 2 ) . '/packages/ui/build-php/test/combinations.json';
+		if ( ! is_readable( $file ) ) {
+			return array( 'not built' => array( null ) );
+		}
+
+		$cases = array();
+		foreach ( json_decode( file_get_contents( $file ), true ) as $combination ) {
+			$name = array();
+			foreach ( $combination['props'] as $prop => $value ) {
+				$name[] = $prop . '=' . ( is_bool( $value ) ? var_export( $value, true ) : $value );
+			}
+			$cases[ $combination['component'] . ': ' . implode( ', ', $name ) ] = array( $combination );
+		}
+		return $cases;
+	}
+
+	/**
+	 * PHP builds most combinations from a base render plus what each variant
+	 * changes, so every one of them must still match React exactly.
+	 *
+	 * @dataProvider data_combinations
+	 *
+	 * @param array|null $combination Props with the React render.
+	 */
+	public function test_rebuilds_every_combination_like_react( $combination ) {
+		$html = gutenberg_get_ui_component( $combination['component'], $combination['props'] );
+
+		$this->assertSame(
+			self::normalize_html( $combination['html'] ),
+			self::normalize_html( $html ),
+			"React:\n{$combination['html']}\nPHP:\n{$html}"
+		);
+	}
+
+	/**
 	 * Components with a committed snapshot.
 	 *
 	 * @return array
@@ -108,10 +148,17 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 								),
 							),
 							'variants'     => array( 'intent' ),
-							'snapshots'    => array(
-								'intent=neutral' => array( '<span>', array( 'slot', 'label', 'text' ), '</span>' ),
-								'intent=warning' => array( '<span class="warning">', array( 'slot', 'label', 'text' ), '</span>' ),
+							'base'         => '<span>__wpuislot_label__text__</span>',
+							'changes'      => array(
+								'intent=warning' => array(
+									array(
+										'tag'      => 0,
+										'addClass' => array( 'warning' ),
+									),
+								),
 							),
+							'exceptions'   => array(),
+							'texts'        => array(),
 							'deprecations' => array(
 								array(
 									'prop'        => 'text',
@@ -304,7 +351,9 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 					sort( $classes );
 					$value = implode( ' ', $classes );
 				} elseif ( 'style' === $name ) {
-					$value = preg_replace( '/\s*([:;])\s*/', '$1', trim( (string) $value, ' ;' ) );
+					$declarations = explode( ';', preg_replace( '/\s*([:;])\s*/', '$1', trim( (string) $value, ' ;' ) ) );
+					sort( $declarations );
+					$value = implode( ';', $declarations );
 				}
 				$attributes[ $name ] = true === $value ? '' : $value;
 			}

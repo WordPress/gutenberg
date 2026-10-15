@@ -8,10 +8,11 @@
  * part of the contract and change with `@wordpress/ui`.
  *
  * The markup comes from `packages/ui/build-php/manifest.php`, which the build
- * generates by rendering the React components: one snapshot per combination
- * of variant props, with slots for the free-form props. Rendering picks the
- * snapshot and fills in the slots and translated strings, so there is no markup
- * to maintain here.
+ * generates by rendering the React components: a base render, what each
+ * variant value changes, and full snapshots for the combinations those
+ * changes can't rebuild, with placeholders for the free-form props. Rendering
+ * applies the changes and fills in the placeholders and translated strings,
+ * so there is no markup to maintain here.
  *
  * @package gutenberg
  */
@@ -154,7 +155,7 @@ final class Gutenberg_UI_Components {
 
 		$this->enqueue_assets();
 
-		return $this->fill_snapshot( $component, $props );
+		return $this->fill_placeholders( $component, $props );
 	}
 
 	/**
@@ -175,43 +176,126 @@ final class Gutenberg_UI_Components {
 	}
 
 	/**
-	 * Fills in a snapshot's slots and translated strings.
+	 * Builds the markup for the given props, with placeholders still in it.
+	 *
+	 * Starts from the base render and applies what each variant value
+	 * changes: classes, attributes and inline styles, per tag. Combinations
+	 * those changes can't rebuild, such as a variant that swaps an icon, are
+	 * stored as full snapshots instead. The build checks every combination, so
+	 * this always matches what React renders.
+	 *
+	 * @param array $component Component metadata.
+	 * @param array $props     Validated props.
+	 * @return string Markup with placeholders.
+	 */
+	private function get_markup( $component, $props ) {
+		$key = $this->get_snapshot_key( $component, $props );
+		if ( isset( $component['exceptions'][ $key ] ) ) {
+			return $component['exceptions'][ $key ];
+		}
+
+		$changes_by_tag = array();
+		foreach ( explode( '&', $key ) as $variant ) {
+			foreach ( $component['changes'][ $variant ] ?? array() as $change ) {
+				$changes_by_tag[ $change['tag'] ][] = $change;
+			}
+		}
+		if ( ! $changes_by_tag ) {
+			return $component['base'];
+		}
+
+		$processor = new WP_HTML_Tag_Processor( $component['base'] );
+		$tag       = -1;
+		while ( $processor->next_tag() ) {
+			++$tag;
+			foreach ( $changes_by_tag[ $tag ] ?? array() as $change ) {
+				foreach ( $change['removeClass'] ?? array() as $class_name ) {
+					$processor->remove_class( $class_name );
+				}
+				foreach ( $change['addClass'] ?? array() as $class_name ) {
+					$processor->add_class( $class_name );
+				}
+				if ( isset( $change['style'] ) ) {
+					$processor->set_attribute( 'style', $this->change_style( (string) $processor->get_attribute( 'style' ), $change['style'] ) );
+				}
+				foreach ( $change['set'] ?? array() as $name => $value ) {
+					$processor->set_attribute( $name, $value );
+				}
+				foreach ( $change['remove'] ?? array() as $name ) {
+					$processor->remove_attribute( $name );
+				}
+			}
+		}
+
+		return $processor->get_updated_html();
+	}
+
+	/**
+	 * Sets or removes declarations in an inline style.
+	 *
+	 * @param string $style   Inline style.
+	 * @param array  $changes Value per property, or null to remove it.
+	 * @return string Inline style.
+	 */
+	private function change_style( $style, $changes ) {
+		$declarations = array();
+		foreach ( array_filter( explode( ';', $style ) ) as $declaration ) {
+			list( $property, $value )          = array_pad( explode( ':', $declaration, 2 ), 2, '' );
+			$declarations[ trim( $property ) ] = trim( $value );
+		}
+		foreach ( $changes as $property => $value ) {
+			if ( null === $value ) {
+				unset( $declarations[ $property ] );
+			} else {
+				$declarations[ $property ] = $value;
+			}
+		}
+
+		$style = array();
+		foreach ( $declarations as $property => $value ) {
+			$style[] = $property . ':' . $value;
+		}
+		return implode( ';', $style );
+	}
+
+	/**
+	 * Fills in the slots and translated strings of the markup.
+	 *
+	 * Each placeholder says where it is, such as `__wpuislot_label__text__`
+	 * or `__wpuislot_type__attr_type__`, so it's escaped for that context.
+	 * Everything is replaced in one pass, so filled-in values are never read
+	 * as placeholders themselves.
 	 *
 	 * @param array $component Component metadata.
 	 * @param array $props     Validated props.
 	 * @return string Component HTML.
 	 */
-	private function fill_snapshot( $component, $props ) {
-		$html = '';
-		foreach ( $component['snapshots'][ $this->get_snapshot_key( $component, $props ) ] as $part ) {
-			if ( is_string( $part ) ) {
-				$html .= $part;
-				continue;
-			}
+	private function fill_placeholders( $component, $props ) {
+		return preg_replace_callback(
+			'/__wpui(slot|text)_([a-z0-9_]+?)__(?:attr_([a-z0-9-]+)|text)__/',
+			static function ( $placeholder ) use ( $component, $props ) {
+				$attribute = $placeholder[3] ?? '';
 
-			switch ( $part[0] ) {
-				case 'slot':
-					$value = (string) $props[ $part[1] ];
-					if ( 'attribute' === $part[2] ) {
-						// React blocks `javascript:` URLs; esc_url() does the same here.
-						$html .= in_array( $part[3], array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : esc_attr( $value );
-					} elseif ( isset( $component['props'][ $part[1] ]['format'] ) && 'html' === $component['props'][ $part[1] ]['format'] ) {
-						// HTML props are printed as is; callers escape what they pass.
-						$html .= $value;
-					} else {
-						$html .= esc_html( $value );
-					}
-					break;
-
-				case 'text':
+				if ( 'text' === $placeholder[1] ) {
 					// A string React translates with `__()`, such as a "Dismiss" label.
-					$text  = translate( $part[1], $part[2] ); // phpcs:ignore WordPress.WP.I18n -- Strings from the React components.
-					$html .= 'attribute' === $part[3] ? esc_attr( $text ) : esc_html( $text );
-					break;
-			}
-		}
+					list( $text, $domain ) = $component['texts'][ $placeholder[2] ];
+					$text                  = translate( $text, $domain ); // phpcs:ignore WordPress.WP.I18n -- Strings from the React components.
+					return '' !== $attribute ? esc_attr( $text ) : esc_html( $text );
+				}
 
-		return $html;
+				$value = (string) $props[ $placeholder[2] ];
+				if ( '' !== $attribute ) {
+					// React blocks `javascript:` URLs; esc_url() does the same here.
+					return in_array( $attribute, array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : esc_attr( $value );
+				}
+				if ( isset( $component['props'][ $placeholder[2] ]['format'] ) && 'html' === $component['props'][ $placeholder[2] ]['format'] ) {
+					// HTML props are printed as is; callers escape what they pass.
+					return $value;
+				}
+				return esc_html( $value );
+			},
+			$this->get_markup( $component, $props )
+		);
 	}
 
 	/**

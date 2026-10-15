@@ -15,8 +15,10 @@
  *   - `deprecations` Optional. Props and values kept working after a rename.
  *
  * The build renders the React element once for every combination of variants,
- * with placeholders for the slots, and turns each render into a snapshot: the
- * markup split into literal HTML and the slots PHP fills in.
+ * with placeholders for the slots. It stores one base render and what each
+ * variant value changes, and checks that those changes rebuild every
+ * combination exactly. Combinations they don't rebuild, such as a variant that
+ * swaps an element, are stored as full snapshots.
  *
  * It also checks what keeps PHP in step with React:
  *
@@ -58,8 +60,8 @@ import {
 import {
 	formatSnapshotFile,
 	stripRuntimeAttributes,
-	toSnapshot,
 } from './php/snapshots.mjs';
+import { compileVariantChanges } from './php/variant-changes.mjs';
 import {
 	getBreakingChanges,
 	getContract,
@@ -208,11 +210,39 @@ async function buildComponent( file, context ) {
 		);
 	}
 
-	// Turn the renders into snapshots.
-	const snapshots = {};
-	for ( const [ key, { html } ] of renders ) {
-		snapshots[ key ] = toSnapshot( html, translations.texts );
+	// Keep one base render and what each variant value changes, with full
+	// snapshots only for the combinations those changes don't rebuild.
+	const defaults = Object.fromEntries(
+		variants.map( ( { prop, values } ) => [
+			prop,
+			component.props[ prop ].default ?? values[ 0 ],
+		] )
+	);
+	const { base, changes, exceptions } = compileVariantChanges(
+		variants,
+		defaults,
+		renders
+	);
+
+	// The strings React translates, by placeholder index.
+	const texts = {};
+	for ( const { html } of renders.values() ) {
+		for ( const [ , index ] of html.matchAll( /__wpuitext_([0-9]+)__/g ) ) {
+			const { text, domain } = translations.texts[ Number( index ) ];
+			texts[ index ] = [ text, domain ];
+		}
 	}
+
+	// Every combination rendered with real values, for the PHPUnit check that
+	// PHP rebuilds each one exactly.
+	result.combinations = [ ...renders.values() ].map( ( { combination } ) => {
+		const props = { ...component.example, ...combination };
+		return {
+			component: component.name,
+			props,
+			html: render( getExampleValues( component, props ) ),
+		};
+	} );
 
 	// Render the examples with real values. A variant that doesn't change the
 	// markup means React no longer reads the prop, for example after a rename.
@@ -285,9 +315,13 @@ async function buildComponent( file, context ) {
 	result.entry = {
 		props: component.props,
 		variants: variants.map( ( { prop } ) => prop ),
-		snapshots,
+		base,
+		changes,
+		exceptions,
+		texts,
 		deprecations: component.deprecations ?? [],
 	};
+	result.combinationCount = renders.size;
 
 	return result;
 }
@@ -386,14 +420,24 @@ return ${ json2php.make( { linebreak: '\n', indent: '\t' } )( manifest ) };
 			'\t'
 		) + '\n'
 	);
+	await writeFile(
+		path.join( TEST_DIR, 'combinations.json' ),
+		JSON.stringify(
+			results.flatMap( ( result ) => result.combinations ),
+			null,
+			'\t'
+		) + '\n'
+	);
 
 	console.log(
 		`Built PHP components: ${ results
 			.map(
-				( { name, entry } ) =>
-					`${ name } (${
-						Object.keys( entry.snapshots ).length
-					} variants)`
+				( { name, entry, combinationCount } ) =>
+					`${ name } (${ combinationCount } combinations: a base, ${
+						Object.keys( entry.changes ).length
+					} changes and ${
+						Object.keys( entry.exceptions ).length
+					} full snapshots)`
 			)
 			.join( ', ' ) }.`
 	);
