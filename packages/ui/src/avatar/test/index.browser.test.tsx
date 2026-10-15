@@ -54,6 +54,7 @@ function luminance( color: string ) {
 
 describe( 'Avatar layout', () => {
 	it( 'keeps tinted initials readable on bright, dark, and midtone backgrounds', async () => {
+		const crossover = ( Math.sqrt( 21 ) - 1 ) / 20;
 		const colors = [
 			'#00e050',
 			'#064e3b',
@@ -64,12 +65,29 @@ describe( 'Avatar layout', () => {
 			'#879f11',
 			'#0f766e',
 			'#00cfff',
+			'#757575',
+			'#767676',
 			'#777777',
 			'#999999',
 			'#000000',
 			'#ffffff',
 			'#00800080',
 			'color(display-p3 1 0 0)',
+			// The 4.5:1 limits and the point where black and white have equal contrast.
+			...[
+				0.175,
+				crossover - 0.000001,
+				crossover,
+				crossover + 0.000001,
+				1.05 / 4.5 - 0.05,
+			].flatMap( ( background ) => [
+				`color(srgb-linear ${ background } ${ background } ${ background })`,
+				`color(srgb-linear ${ background / 0.2126 } 0 0)`,
+				`color(srgb-linear 0 ${ background / 0.7152 } 0)`,
+				`color(srgb-linear 0.25 ${
+					( background - 0.2126 * 0.25 - 0.0722 ) / 0.7152
+				} 1)`,
+			] ),
 		];
 		await render(
 			<ThemeProvider>
