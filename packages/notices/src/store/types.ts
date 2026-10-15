@@ -43,12 +43,12 @@ export type Notice = {
 	spokenMessage: string | null;
 
 	/**
-	 * A fuller account of what went wrong, as plain text, for when the message
-	 * cannot say everything a developer needs. It sits behind a disclosure and
-	 * is offered for copying together with the message. Only applies when type
-	 * is `default`.
+	 * Longer plain text that supplements the message, such as the reason a
+	 * server gave for a failure. It is shown behind a "Show details"
+	 * disclosure, and a copy button copies it together with the message. Only
+	 * applies when type is `default`.
 	 */
-	detail?: string;
+	details?: string;
 
 	/**
 	 * Notice message as raw HTML. Intended to serve primarily for compatibility of server-rendered notices,
@@ -140,12 +140,12 @@ export type NoticeOptions = {
 	onDismiss?: VoidFunction;
 
 	/**
-	 * A fuller account of what went wrong, as plain text, for when the message
-	 * cannot say everything a developer needs. It sits behind a disclosure and
-	 * is offered for copying together with the message. Only applies when type
-	 * is set to `default`.
+	 * Longer plain text that supplements the message, such as the reason a
+	 * server gave for a failure. It is shown behind a "Show details"
+	 * disclosure, and a copy button copies it together with the message. Only
+	 * applies when type is set to `default`.
 	 */
-	detail?: string;
+	details?: string;
 
 	/**
 	 * Notice message as raw HTML. Intended to serve primarily for compatibility of server-rendered notices,

@@ -11,3 +11,14 @@
 	max-width: 100vw;
 	box-sizing: border-box;
 }
+
+.notices-inline-notices__details {
+	margin-block-start: var(--wpds-dimension-gap-sm);
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+
+.notices-inline-notices__copy-status {
+	align-self: center;
+	font-size: var(--wpds-typography-font-size-sm);
+}

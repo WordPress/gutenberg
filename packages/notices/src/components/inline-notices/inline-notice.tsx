@@ -1,8 +1,9 @@
 import { speak } from '@wordpress/a11y';
-import { RawHTML, useEffect } from '@wordpress/element';
+import { RawHTML, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Notice, VisuallyHidden } from '@wordpress/ui';
+import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
+import CopyButton from './copy-button';
 import type {
 	Notice as NoticeType,
 	NoticeAction as NoticeActionType,
@@ -39,8 +40,8 @@ function getStatusLabel( status: NoticeType[ 'status' ] ) {
 
 /**
  * Announces a notice when it is created, including when a new notice replaces
- * one with the same ID. Only the message is announced: action labels are not
- * part of the message.
+ * one with the same ID. Only the message is announced: details are read when
+ * the user opens them, and action labels are not part of the message.
  *
  * @param notice The notice to announce.
  */
@@ -87,20 +88,25 @@ export default function InlineNotice( {
 	notice,
 	onRemove,
 }: InlineNoticeProps ) {
-	const { status, content, __unstableHTML, isDismissible, onDismiss } =
-		notice;
+	const {
+		status,
+		content,
+		details,
+		__unstableHTML,
+		isDismissible,
+		onDismiss,
+	} = notice;
 	const actions = notice.actions as NoticeAction[];
+	const [ isOpen, setIsOpen ] = useState( false );
 
 	useAnnouncement( notice );
 
-	return (
-		<Notice.Root
-			intent={ status }
-			className={ clsx(
-				'notices-inline-notices__notice',
-				`is-${ status }`
-			) }
-		>
+	// Copying HTML content would put its tags on the clipboard.
+	const canCopy = !! details && ! __unstableHTML;
+	const hasActions = actions.length > 0 || !! details;
+
+	const children = (
+		<>
 			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
 			{ __unstableHTML ? (
 				<Notice.Description render={ <div /> }>
@@ -109,12 +115,40 @@ export default function InlineNotice( {
 			) : (
 				<Notice.Description>{ content }</Notice.Description>
 			) }
-			{ actions.length > 0 && (
+			{ hasActions && (
 				<Notice.Actions>
 					{ actions.map( ( action, index ) => (
 						<NoticeActionControl key={ index } action={ action } />
 					) ) }
+					{ !! details && (
+						<Collapsible.Trigger
+							render={ <Notice.ActionButton variant="outline" /> }
+						>
+							{ isOpen
+								? __( 'Hide details' )
+								: __( 'Show details' ) }
+						</Collapsible.Trigger>
+					) }
+					{ canCopy && (
+						<CopyButton
+							text={ `${ content }\n\n${ details }` }
+							label={
+								status === 'error'
+									? __( 'Copy error' )
+									: __( 'Copy message' )
+							}
+						/>
+					) }
 				</Notice.Actions>
+			) }
+			{ !! details && (
+				<Collapsible.Panel
+					hiddenUntilFound
+					className="notices-inline-notices__details"
+					render={ <Notice.Description render={ <div /> } /> }
+				>
+					{ details }
+				</Collapsible.Panel>
 			) }
 			{ isDismissible && (
 				<Notice.CloseIconButton
@@ -125,6 +159,25 @@ export default function InlineNotice( {
 					} }
 				/>
 			) }
-		</Notice.Root>
+		</>
+	);
+
+	const rootProps = {
+		intent: status,
+		className: clsx( 'notices-inline-notices__notice', `is-${ status }` ),
+	};
+
+	if ( ! details ) {
+		return <Notice.Root { ...rootProps }>{ children }</Notice.Root>;
+	}
+
+	return (
+		<Collapsible.Root
+			open={ isOpen }
+			onOpenChange={ setIsOpen }
+			render={ <Notice.Root { ...rootProps } /> }
+		>
+			{ children }
+		</Collapsible.Root>
 	);
 }

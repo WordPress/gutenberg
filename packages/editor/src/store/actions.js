@@ -369,7 +369,7 @@ export const savePost =
 				) {
 					args[ 1 ] = {
 						...args[ 1 ],
-						detail: getFailureDetail( error.message ),
+						details: getFailureDetail( error.message ),
 					};
 				}
 
