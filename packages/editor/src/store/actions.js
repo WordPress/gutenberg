@@ -391,14 +391,20 @@ export const savePost =
 				args.length &&
 				! ( options.isAutosave && isManualSaveFailureShown )
 			) {
-				if (
+				// A PHP fatal error's message, with its stack trace, comes in
+				// `data.error`, apart from the generic message WordPress shows.
+				const phpError = error.data?.error?.message;
+				const details = [
 					error.message &&
 					! CLIENT_GENERATED_ERROR_CODES.includes( error.code )
-				) {
-					args[ 1 ] = {
-						...args[ 1 ],
-						details: getFailureDetails( error.message ),
-					};
+						? getFailureDetails( error.message )
+						: '',
+					typeof phpError === 'string' ? phpError.trim() : '',
+				]
+					.filter( Boolean )
+					.join( '\n\n' );
+				if ( details ) {
+					args[ 1 ] = { ...args[ 1 ], details };
 				}
 
 				registry.dispatch( noticesStore ).createErrorNotice( ...args );

@@ -76,12 +76,15 @@ test.describe( 'Autosave failure notice', () => {
 	} );
 
 	for ( const [ title, failure, notice ] of [
-		// TODO: Show the PHP error the response includes in `data.error`.
 		[
 			'PHP fatal error',
 			'fatal-error',
+			// The stack trace's paths and line numbers depend on the
+			// WordPress version, so only its start is checked.
 			withDetails(
-				'There has been a critical error on this website.\nLearn more about troubleshooting WordPress. (https://wordpress.org/documentation/article/faq-troubleshooting/)'
+				expect.stringMatching(
+					/^There has been a critical error on this website\.\nLearn more about troubleshooting WordPress\. \(https:\/\/wordpress\.org\/documentation\/article\/faq-troubleshooting\/\)\n\nUncaught Error: Call to undefined function gutenberg_test_autosave_undefined_function\(\) in .+\nStack trace:\n#0 /
+				)
 			),
 		],
 		[

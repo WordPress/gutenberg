@@ -406,6 +406,76 @@ describe( 'Post actions', () => {
 			}
 		);
 
+		it.each( [
+			[
+				'adds the PHP error a fatal error reports to the details',
+				{
+					code: 'internal_server_error',
+					message:
+						'<p>There has been a critical error on this website.</p>',
+					data: {
+						status: 500,
+						error: {
+							type: 1,
+							message:
+								'Uncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
+						},
+					},
+				},
+				'There has been a critical error on this website.\n\nUncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
+			],
+			[
+				'ignores a PHP error message that is not a string',
+				{
+					code: 'internal_server_error',
+					message: 'Server error.',
+					data: { status: 500, error: { message: [ 'unexpected' ] } },
+				},
+				'Server error.',
+			],
+		] )( '%s', async ( _description, serverError, expectedDetails ) => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'publish',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					throw serverError;
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice.details ).toBe( expectedDetails );
+		} );
+
 		it( 'keeps a server message that only looks like markup', async () => {
 			const post = {
 				id: postId,
