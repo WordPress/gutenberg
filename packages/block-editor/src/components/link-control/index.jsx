@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import {
 	Button,
-	Spinner,
+	Spinner as WCSpinner,
 	Notice,
 	TextControl,
 	__experimentalHStack as HStack,
@@ -657,7 +657,7 @@ function LinkControl( {
 		>
 			{ isCreatingPage && (
 				<div className="block-editor-link-control__loading">
-					<Spinner /> { __( 'Creating' ) }…
+					<WCSpinner /> { __( 'Creating' ) }…
 				</div>
 			) }
 
