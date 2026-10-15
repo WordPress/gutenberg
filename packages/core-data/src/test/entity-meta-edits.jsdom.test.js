@@ -818,6 +818,34 @@ describe( 'saving edited post metadata', () => {
 		} );
 	} );
 
+	it( 'ignores a disabled partial-edit flag for a metadata replacement', () => {
+		const custom = {
+			id: 1,
+			meta: { first: 'saved first', second: 'saved second' },
+		};
+		actions.addEntities( [
+			{
+				kind: 'custom',
+				name: 'record',
+				baseURL: '/custom/v1/records',
+				partialEdits: { meta: false },
+			},
+		] );
+		actions.receiveEntityRecords( 'custom', 'record', custom );
+		actions.finishResolution( 'getEntityRecord', [
+			'custom',
+			'record',
+			1,
+		] );
+		actions.editEntityRecord( 'custom', 'record', 1, {
+			meta: { first: 'edited first' },
+		} );
+
+		expect(
+			selectors.getEditedEntityRecord( 'custom', 'record', 1 ).meta
+		).toEqual( { first: 'edited first' } );
+	} );
+
 	it( 'preserves merged-edit request semantics for a custom entity', async () => {
 		const custom = {
 			id: 1,

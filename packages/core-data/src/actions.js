@@ -692,6 +692,9 @@ export const saveEntityRecord =
 					for ( const key of Object.keys(
 						entityConfig.partialEdits || {}
 					) ) {
+						if ( ! entityConfig.partialEdits[ key ] ) {
+							continue;
+						}
 						merged[ key ] = {
 							...persistedRecord?.[ key ],
 							...record[ key ],
@@ -724,7 +727,11 @@ export const saveEntityRecord =
 					for ( const key of Object.keys(
 						entityConfig.partialEdits || {}
 					) ) {
-						if ( syncEdits && key in syncEdits ) {
+						if (
+							entityConfig.partialEdits[ key ] &&
+							syncEdits &&
+							key in syncEdits
+						) {
 							autosaveData[ key ] = {
 								...data[ key ],
 								...syncEdits[ key ],

@@ -1046,7 +1046,7 @@ export const getEditedEntityRecord = createSelector(
 		const { partialEdits = {} } =
 			getEntityConfig( state, kind, name ) || {};
 		for ( const key of Object.keys( partialEdits ) ) {
-			if ( edited?.[ key ] !== undefined ) {
+			if ( partialEdits[ key ] && edited?.[ key ] !== undefined ) {
 				merged[ key ] = { ...raw?.[ key ], ...edited[ key ] };
 			}
 		}
