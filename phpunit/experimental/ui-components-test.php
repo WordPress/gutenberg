@@ -207,6 +207,28 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Entities in props are plain text, as in React: named, numeric or not,
+	 * they show as written instead of being read as entities.
+	 */
+	public function test_keeps_entities_in_text_and_attribute_slots_literal() {
+		$processor = new WP_HTML_Tag_Processor(
+			gutenberg_get_ui_component(
+				'button',
+				array(
+					'label' => 'Tom &amp; Jerry &hellip; &#8217; &lt;b&gt;',
+					'class' => 'is-&amp;',
+				)
+			)
+		);
+
+		$processor->next_tag( 'button' );
+		$this->assertContains( 'is-&amp;', explode( ' ', $processor->get_attribute( 'class' ) ) );
+
+		$processor->next_token();
+		$this->assertSame( 'Tom &amp; Jerry &hellip; &#8217; &lt;b&gt;', $processor->get_modifiable_text() );
+	}
+
+	/**
 	 * @expectedIncorrectUsage Gutenberg_UI_Components::render
 	 */
 	public function test_unknown_component_renders_nothing() {

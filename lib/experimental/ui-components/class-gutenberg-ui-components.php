@@ -194,24 +194,39 @@ final class Gutenberg_UI_Components {
 					$value = (string) $props[ $part[1] ];
 					if ( 'attribute' === $part[2] ) {
 						// React blocks `javascript:` URLs; esc_url() does the same here.
-						$html .= in_array( $part[3], array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : esc_attr( $value );
+						$html .= in_array( $part[3], array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : self::esc_plain_text( $value );
 					} elseif ( isset( $component['props'][ $part[1] ]['format'] ) && 'html' === $component['props'][ $part[1] ]['format'] ) {
 						// HTML props are printed as is; callers escape what they pass.
 						$html .= $value;
 					} else {
-						$html .= esc_html( $value );
+						$html .= self::esc_plain_text( $value );
 					}
 					break;
 
 				case 'text':
 					// A string React translates with `__()`, such as a "Dismiss" label.
-					$text  = translate( $part[1], $part[2] ); // phpcs:ignore WordPress.WP.I18n -- Strings from the React components.
-					$html .= 'attribute' === $part[3] ? esc_attr( $text ) : esc_html( $text );
+					$html .= self::esc_plain_text( translate( $part[1], $part[2] ) ); // phpcs:ignore WordPress.WP.I18n -- Strings from the React components.
 					break;
 			}
 		}
 
 		return $html;
+	}
+
+	/**
+	 * Escapes plain text for HTML text or an attribute value, as React does.
+	 *
+	 * React escapes `&`, `<`, `>`, `"` and `'` in every string and never reads
+	 * entities in it, so any entity a caller passes shows as written. Unlike
+	 * `esc_html()` and `esc_attr()`, which leave existing entities alone, this
+	 * does the same. Props are plain text: decode a string that is already
+	 * HTML-encoded, such as the result of `get_the_title()`, first.
+	 *
+	 * @param string $text Plain text.
+	 * @return string Escaped text.
+	 */
+	private static function esc_plain_text( $text ) {
+		return htmlspecialchars( (string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
 	}
 
 	/**
