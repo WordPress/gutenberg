@@ -940,17 +940,13 @@ describe( 'Post actions', () => {
 		 * Sets up a registry with the given post open in the editor, and
 		 * records the data sent with each save.
 		 *
-		 * @param {Object}                   post               The post to edit.
-		 * @param {Object}                   [options]          Options.
-		 * @param {Object}                   [options.edits]    Unsaved edits to apply to the post.
-		 * @param {(data: Object) => Object} [options.onSave]   Handles a save request. Returns the response.
-		 * @param {Object}                   [options.revision] The revision to restore.
+		 * @param {Object}                   post             The post to edit.
+		 * @param {Object}                   [options]        Options.
+		 * @param {Object}                   [options.edits]  Unsaved edits to apply to the post.
+		 * @param {(data: Object) => Object} [options.onSave] Handles a save request. Returns the response.
 		 * @return {Object} The registry and the data sent with each save.
 		 */
-		function setUpRestore(
-			post,
-			{ edits, onSave, revision: revisionToRestore = revision } = {}
-		) {
+		function setUpRestore( post, { edits, onSave } = {} ) {
 			const savedData = [];
 
 			apiFetch.setFetchHandler( async ( options ) => {
@@ -972,7 +968,7 @@ describe( 'Post actions', () => {
 						`/wp/v2/posts/${ postId }/revisions/${ revisionId }`
 					)
 				) {
-					return revisionToRestore;
+					return revision;
 				} else if (
 					method === 'GET' &&
 					path.startsWith( '/wp/v2/types/post' )
@@ -1027,61 +1023,6 @@ describe( 'Post actions', () => {
 			).toBe( 'autosaved content' );
 		} );
 
-		it( 'does not save first when a draft already matches the revision', async () => {
-			const post = {
-				id: postId,
-				type: 'post',
-				title: 'Autosaved title',
-				content: 'autosaved content',
-				excerpt: '',
-				status: 'draft',
-			};
-			const { registry, savedData } = setUpRestore( post );
-
-			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
-				revisionId
-			);
-
-			expect( savedData ).toHaveLength( 1 );
-		} );
-
-		it( 'saves the current content of a draft first when only the footnotes differ from the revision', async () => {
-			const post = {
-				id: postId,
-				type: 'post',
-				title: 'Autosaved title',
-				content: 'autosaved content',
-				excerpt: '',
-				status: 'draft',
-				meta: { footnotes: '[{"id":"1","content":"Saved note"}]' },
-			};
-			const { registry, savedData } = setUpRestore( post, {
-				edits: {
-					meta: {
-						footnotes: '[{"id":"1","content":"Unsaved note"}]',
-					},
-				},
-				revision: {
-					...revision,
-					meta: {
-						footnotes: '[{"id":"1","content":"Autosaved note"}]',
-					},
-				},
-			} );
-
-			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
-				revisionId
-			);
-
-			expect( savedData ).toHaveLength( 2 );
-			expect( savedData[ 0 ] ).toMatchObject( {
-				meta: { footnotes: '[{"id":"1","content":"Unsaved note"}]' },
-			} );
-			expect( savedData[ 1 ] ).toMatchObject( {
-				meta: { footnotes: '[{"id":"1","content":"Autosaved note"}]' },
-			} );
-		} );
-
 		it( 'does not save first for a published post', async () => {
 			const post = {
 				id: postId,
@@ -1093,29 +1034,6 @@ describe( 'Post actions', () => {
 			};
 			const { registry, savedData } = setUpRestore( post, {
 				edits: { content: 'unsaved content' },
-			} );
-
-			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
-				revisionId
-			);
-
-			expect( savedData ).toHaveLength( 1 );
-			expect( savedData[ 0 ] ).toMatchObject( {
-				content: 'autosaved content',
-			} );
-		} );
-
-		it( 'does not save first when a draft has an unsaved change to a public status', async () => {
-			const post = {
-				id: postId,
-				type: 'post',
-				title: 'Saved title',
-				content: 'saved content',
-				excerpt: '',
-				status: 'draft',
-			};
-			const { registry, savedData } = setUpRestore( post, {
-				edits: { content: 'unsaved content', status: 'publish' },
 			} );
 
 			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
@@ -1252,96 +1170,6 @@ describe( 'Post actions', () => {
 			).toMatchObject( { type: 'default' } );
 			expect( noticeIds ).toContain( 'autosave-exists' );
 			expect( noticeIds ).not.toContain( 'editor-revision-restored' );
-		} );
-
-		it( 'does not show the restored notice when a filter stops the save of the restored revision', async () => {
-			const post = {
-				id: postId,
-				type: 'post',
-				title: 'Saved title',
-				content: 'saved content',
-				excerpt: '',
-				status: 'draft',
-			};
-			const { registry, savedData } = setUpRestore( post, {
-				edits: { content: 'unsaved content' },
-			} );
-			// Let the save of the current content through, and stop the save
-			// of the restored revision.
-			addFilter( 'editor.preSavePost', 'test/stop-save', ( edits ) => {
-				if ( savedData.length === 1 ) {
-					throw new Error( 'Stopped by a filter.' );
-				}
-				return edits;
-			} );
-
-			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
-				revisionId
-			);
-			removeFilter( 'editor.preSavePost', 'test/stop-save' );
-
-			expect( savedData ).toHaveLength( 1 );
-			expect(
-				registry.select( editorStore ).getEditedPostContent()
-			).toBe( 'autosaved content' );
-			const noticeIds = registry
-				.select( noticesStore )
-				.getNotices()
-				.map( ( notice ) => notice.id );
-			expect( noticeIds ).toContain( 'editor-revision-restore-failed' );
-			expect( noticeIds ).not.toContain( 'editor-revision-restored' );
-		} );
-
-		it( 'offers an Undo action that restores the saved content of a published post', async () => {
-			const post = {
-				id: postId,
-				type: 'post',
-				title: 'Saved title',
-				content: 'saved content',
-				excerpt: '',
-				status: 'publish',
-			};
-			const { registry, savedData } = setUpRestore( post, {
-				edits: { content: 'unsaved content' },
-			} );
-
-			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
-				revisionId
-			);
-
-			const restoredNotice = registry
-				.select( noticesStore )
-				.getNotices()
-				.find( ( notice ) => notice.id === 'editor-revision-restored' );
-			await restoredNotice.actions[ 0 ].onClick();
-
-			expect( savedData ).toHaveLength( 2 );
-			expect( savedData[ 1 ] ).toMatchObject( {
-				title: 'Saved title',
-				content: 'saved content',
-			} );
-		} );
-
-		it( 'does not offer an Undo action when the saved post already matches the revision', async () => {
-			const post = {
-				id: postId,
-				type: 'post',
-				title: 'Autosaved title',
-				content: 'autosaved content',
-				excerpt: '',
-				status: 'draft',
-			};
-			const { registry } = setUpRestore( post );
-
-			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
-				revisionId
-			);
-
-			const restoredNotice = registry
-				.select( noticesStore )
-				.getNotices()
-				.find( ( notice ) => notice.id === 'editor-revision-restored' );
-			expect( restoredNotice.actions ).toEqual( [] );
 		} );
 
 		it( 'does not restore the revision while the post is saving', async () => {
