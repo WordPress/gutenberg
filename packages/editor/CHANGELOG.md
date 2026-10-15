@@ -30,6 +30,8 @@
 ### Internal
 
 -   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+-   Import the core actions `registerPostTypeSchema()` registers from the `@wordpress/core-actions` script modules instead of `@wordpress/fields` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Take `CreateTemplatePartModal` from the private APIs of `@wordpress/patterns` instead of `@wordpress/fields`, and remove it from the private APIs of the editor ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 
 ## 15.2.0 (2026-10-07)
 
