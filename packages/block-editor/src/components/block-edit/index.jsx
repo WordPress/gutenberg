@@ -10,6 +10,7 @@ import {
 	blockEditingModeKey,
 	blockBindingsKey,
 	isPreviewModeKey,
+	isMultiSelectedKey,
 	isInListViewBlockSupportTreeKey,
 } from './context';
 import { MultipleUsageWarning } from './multiple-usage-warning';
@@ -31,6 +32,7 @@ export default function BlockEdit( {
 	mayDisplayPatternEditingControls,
 	blockEditingMode,
 	isPreviewMode,
+	isMultiSelected,
 	// The remaining props are passed through the BlockEdit filters and are thus
 	// public API!
 	...props
@@ -76,6 +78,7 @@ export default function BlockEdit( {
 					[ blockEditingModeKey ]: blockEditingMode,
 					[ blockBindingsKey ]: bindings,
 					[ isPreviewModeKey ]: isPreviewMode,
+					[ isMultiSelectedKey ]: isMultiSelected,
 					[ isInListViewBlockSupportTreeKey ]:
 						isInListViewBlockSupportTree,
 				} ),
@@ -92,6 +95,7 @@ export default function BlockEdit( {
 					blockEditingMode,
 					bindings,
 					isPreviewMode,
+					isMultiSelected,
 					isInListViewBlockSupportTree,
 				]
 			) }

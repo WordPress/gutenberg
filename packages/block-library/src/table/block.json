@@ -159,9 +159,18 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
-		"color": {
+		"background": {
 			"__experimentalSkipSerialization": true,
+			"gradient": true
+		},
+		"color": {
+			"__experimentalSkipSerialization": [
+				"text",
+				"background",
+				"gradients"
+			],
 			"gradients": true,
+			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true

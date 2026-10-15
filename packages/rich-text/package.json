@@ -41,7 +41,7 @@
 	"types": "build-types",
 	"sideEffects": [
 		"src/**/*.scss",
-		"src/index.js",
+		"src/index.ts",
 		"src/store/index.ts",
 		"build/index.cjs",
 		"build/store/index.cjs",

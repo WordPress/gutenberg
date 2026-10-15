@@ -2,7 +2,7 @@ import clsx from 'clsx';
 import {
 	Placeholder,
 	SelectControl as WCSelectControl,
-	Spinner,
+	Spinner as WCSpinner,
 	ToggleControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -337,7 +337,7 @@ export default function CategoriesEdit( {
 			</InspectorControls>
 			{ isResolving && (
 				<Placeholder icon={ pin } label={ __( 'Terms' ) }>
-					<Spinner />
+					<WCSpinner />
 				</Placeholder>
 			) }
 			{ ! isResolving && categories?.length === 0 && (
