@@ -31,3 +31,20 @@ Default.args = {
 	children: 'WordPress',
 	href: 'https://wordpress.org',
 };
+
+export const Wrapping: StoryFn< typeof ExternalLink > = ( args ) => (
+	<p
+		style={ {
+			width: '24ch',
+			textAlign: 'center',
+			fontSize: 16,
+			lineHeight: 1.5,
+		} }
+	>
+		<ExternalLink { ...args } /> your visitors use to find your site.
+	</p>
+);
+Wrapping.args = {
+	children: 'Discover the terms and phrases',
+	href: 'https://wordpress.org',
+};

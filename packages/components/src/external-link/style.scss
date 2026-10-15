@@ -33,7 +33,11 @@
 
 .components-external-link__icon {
 	line-height: 1;
-	display: inline-block;
 	margin-inline-start: var(--wpds-dimension-padding-xs);
 	font-weight: var(--wpds-typography-font-weight-default);
+
+	&::before {
+		// WORD JOINER prevents a break before the arrow, including in CJK text.
+		content: "\2060";
+	}
 }
