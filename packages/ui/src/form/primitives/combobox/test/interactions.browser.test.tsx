@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, within, waitFor } from '@testing-library/react';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
+import { createPortal } from '@wordpress/element';
 import * as Combobox from '../index';
 import { addCanvasButton } from '../../../test/fixtures/iframe';
 
@@ -90,6 +91,72 @@ describe( 'Combobox interactions', () => {
 				screen.queryByRole( 'option', { name: 'First' } )
 			).not.toBeInTheDocument();
 		} );
+		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'closes a non-modal Combobox rendered in an iframe on nested iframe press', async () => {
+		const onCanvasClick = vi.fn();
+		await render(
+			<iframe title="Component frame" width="800" height="600" />
+		);
+		const iframe =
+			screen.getByTitle< HTMLIFrameElement >( 'Component frame' );
+		const iframeDocument = iframe.contentDocument;
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+
+		await render(
+			createPortal(
+				<>
+					<Combobox.Root items={ [ 'First' ] } modal={ false }>
+						<Combobox.Input aria-label="Search" />
+						<Combobox.Popup
+							portal={
+								<Combobox.Portal
+									container={ iframeDocument.body }
+								/>
+							}
+						>
+							<Combobox.List>
+								<Combobox.Item value="First">
+									<Combobox.ItemLabel>
+										First
+									</Combobox.ItemLabel>
+								</Combobox.Item>
+							</Combobox.List>
+						</Combobox.Popup>
+					</Combobox.Root>
+					<iframe
+						title="Nested canvas"
+						style={ { position: 'fixed', left: 400, top: 300 } }
+					/>
+				</>,
+				iframeDocument.body
+			)
+		);
+		const nestedIframe = within(
+			iframeDocument.body
+		).getByTitle< HTMLIFrameElement >( 'Nested canvas' );
+		const nestedDocument = nestedIframe.contentDocument;
+		if ( ! nestedDocument ) {
+			throw new Error( 'Expected a nested same-origin iframe document.' );
+		}
+		const button = nestedDocument.createElement( 'button' );
+		button.textContent = 'Edit block';
+		button.addEventListener( 'click', onCanvasClick );
+		nestedDocument.body.appendChild( button );
+
+		const frame = page.frameLocator( page.getByTitle( 'Component frame' ) );
+		const option = frame.getByRole( 'option', { name: 'First' } );
+		await frame.getByRole( 'combobox', { name: 'Search' } ).fill( 'F' );
+		await expect.element( option ).toBeVisible();
+		await page
+			.frameLocator( frame.getByTitle( 'Nested canvas' ) )
+			.getByRole( 'button', { name: 'Edit block' } )
+			.click();
+
+		await expect.element( option ).not.toBeInTheDocument();
 		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

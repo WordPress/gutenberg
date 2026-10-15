@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { screen, waitFor } from '@testing-library/react';
+import { screen, within, waitFor } from '@testing-library/react';
 import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
+import { createPortal } from '@wordpress/element';
 import * as Autocomplete from '../index';
 import { addCanvasButton } from '../../../test/fixtures/iframe';
 
@@ -100,6 +101,72 @@ describe( 'Autocomplete interactions', () => {
 				screen.queryByRole( 'option', { name: 'First' } )
 			).not.toBeInTheDocument();
 		} );
+		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'closes a non-modal Autocomplete rendered in an iframe on nested iframe press', async () => {
+		const onCanvasClick = vi.fn();
+		await render(
+			<iframe title="Component frame" width="800" height="600" />
+		);
+		const iframe =
+			screen.getByTitle< HTMLIFrameElement >( 'Component frame' );
+		const iframeDocument = iframe.contentDocument;
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+
+		await render(
+			createPortal(
+				<>
+					<Autocomplete.Root items={ [ 'First' ] } modal={ false }>
+						<Autocomplete.Input aria-label="Search" />
+						<Autocomplete.Popup
+							portal={
+								<Autocomplete.Portal
+									container={ iframeDocument.body }
+								/>
+							}
+						>
+							<Autocomplete.List>
+								<Autocomplete.Item value="First">
+									<Autocomplete.ItemLabel>
+										First
+									</Autocomplete.ItemLabel>
+								</Autocomplete.Item>
+							</Autocomplete.List>
+						</Autocomplete.Popup>
+					</Autocomplete.Root>
+					<iframe
+						title="Nested canvas"
+						style={ { position: 'fixed', left: 400, top: 300 } }
+					/>
+				</>,
+				iframeDocument.body
+			)
+		);
+		const nestedIframe = within(
+			iframeDocument.body
+		).getByTitle< HTMLIFrameElement >( 'Nested canvas' );
+		const nestedDocument = nestedIframe.contentDocument;
+		if ( ! nestedDocument ) {
+			throw new Error( 'Expected a nested same-origin iframe document.' );
+		}
+		const button = nestedDocument.createElement( 'button' );
+		button.textContent = 'Edit block';
+		button.addEventListener( 'click', onCanvasClick );
+		nestedDocument.body.appendChild( button );
+
+		const frame = page.frameLocator( page.getByTitle( 'Component frame' ) );
+		const option = frame.getByRole( 'option', { name: 'First' } );
+		await frame.getByRole( 'combobox', { name: 'Search' } ).fill( 'F' );
+		await expect.element( option ).toBeVisible();
+		await page
+			.frameLocator( frame.getByTitle( 'Nested canvas' ) )
+			.getByRole( 'button', { name: 'Edit block' } )
+			.click();
+
+		await expect.element( option ).not.toBeInTheDocument();
 		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
 	} );
 } );

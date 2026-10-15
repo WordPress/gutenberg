@@ -101,11 +101,14 @@ export function useIframeOutsidePressForwarding<
 		}
 
 		setUncontrolledOpen( nextOpen );
-		const eventTarget = eventDetails.event.target;
+		const eventTarget = eventDetails.event.target as Node | null;
+		const ElementConstructor =
+			getNodeDocument( eventTarget )?.defaultView?.Element;
 		setTrigger(
 			nextOpen
 				? ( eventDetails.trigger ??
-						( eventTarget instanceof Element
+						( ElementConstructor &&
+						eventTarget instanceof ElementConstructor
 							? eventTarget
 							: null ) )
 				: null
