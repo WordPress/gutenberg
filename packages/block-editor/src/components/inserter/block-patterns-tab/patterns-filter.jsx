@@ -13,14 +13,16 @@ import {
 	sitePatternsCategory,
 	INSERTER_SYNC_TYPES,
 	INSERTER_PATTERN_TYPES,
-	INSERTER_AUTHOR_TYPES,
+	MY_PATTERNS_SOURCE_FILTER,
 } from './utils';
 
+const USER_SOURCE_FILTERS = [
+	INSERTER_PATTERN_TYPES.user,
+	MY_PATTERNS_SOURCE_FILTER,
+];
+
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
-	sourceFilter !== 'all' && sourceFilter !== 'user';
-const getShouldHideSourcesFilter = ( category ) => {
-	return category.name === sitePatternsCategory.name;
-};
+	sourceFilter !== 'all' && ! USER_SOURCE_FILTERS.includes( sourceFilter );
 
 const PATTERN_SOURCE_MENU_OPTIONS = [
 	{
@@ -39,26 +41,23 @@ const PATTERN_SOURCE_MENU_OPTIONS = [
 		value: INSERTER_PATTERN_TYPES.user,
 		label: __( 'User' ),
 	},
-];
-
-const PATTERN_AUTHOR_MENU_OPTIONS = [
 	{
-		value: 'all',
-		label: _x( 'All', 'patterns' ),
-	},
-	{
-		value: INSERTER_AUTHOR_TYPES.currentUser,
+		value: MY_PATTERNS_SOURCE_FILTER,
 		label: __( 'My patterns' ),
 	},
 ];
 
+// In the `sitePatterns` category only user patterns are listed, so only the user
+// source options apply.
+const SITE_PATTERNS_SOURCE_MENU_OPTIONS = PATTERN_SOURCE_MENU_OPTIONS.filter(
+	( option ) => USER_SOURCE_FILTERS.includes( option.value )
+);
+
 export function PatternsFilter( {
 	setPatternSyncFilter,
 	setPatternSourceFilter,
-	setPatternAuthorFilter,
 	patternSyncFilter,
 	patternSourceFilter,
-	patternAuthorFilter,
 	scrollContainerRef,
 	category,
 } ) {
@@ -66,8 +65,10 @@ export function PatternsFilter( {
 	// we do this by deriving from props rather than calling setPatternSourceFilter otherwise
 	// the user may be confused when switching to another category if the haven't explicitly set
 	// this filter themselves.
+	const isSitePatternsCategory = category.name === sitePatternsCategory.name;
 	const currentPatternSourceFilter =
-		category.name === sitePatternsCategory.name
+		isSitePatternsCategory &&
+		! USER_SOURCE_FILTERS.includes( patternSourceFilter )
 			? INSERTER_PATTERN_TYPES.user
 			: patternSourceFilter;
 
@@ -77,14 +78,11 @@ export function PatternsFilter( {
 		currentPatternSourceFilter
 	);
 
-	// We also hide the directory and theme source filter if the category is `sitePatterns`
-	// otherwise there will only be one option available.
-	const shouldHideSourcesFilter = getShouldHideSourcesFilter( category );
-
-	// The author filter is only shown while only user patterns are listed, as
-	// they're the only ones with an author on this site.
-	const shouldShowAuthorFilter =
-		currentPatternSourceFilter === INSERTER_PATTERN_TYPES.user;
+	// We also hide the directory and theme source options if the category is
+	// `sitePatterns`, as it only lists user patterns.
+	const sourceMenuOptions = isSitePatternsCategory
+		? SITE_PATTERNS_SOURCE_MENU_OPTIONS
+		: PATTERN_SOURCE_MENU_OPTIONS;
 
 	const patternSyncMenuOptions = useMemo(
 		() => [
@@ -142,36 +140,19 @@ export function PatternsFilter( {
 			>
 				{ () => (
 					<>
-						{ ! shouldHideSourcesFilter && (
-							<MenuGroup label={ __( 'Source' ) }>
-								<MenuItemsChoice
-									choices={ PATTERN_SOURCE_MENU_OPTIONS }
-									onSelect={ ( value ) => {
-										handleSetSourceFilterChange( value );
-										scrollContainerRef.current?.scrollTo(
-											0,
-											0
-										);
-									} }
-									value={ currentPatternSourceFilter }
-								/>
-							</MenuGroup>
-						) }
-						{ shouldShowAuthorFilter && (
-							<MenuGroup label={ __( 'Author' ) }>
-								<MenuItemsChoice
-									choices={ PATTERN_AUTHOR_MENU_OPTIONS }
-									onSelect={ ( value ) => {
-										setPatternAuthorFilter( value );
-										scrollContainerRef.current?.scrollTo(
-											0,
-											0
-										);
-									} }
-									value={ patternAuthorFilter }
-								/>
-							</MenuGroup>
-						) }
+						<MenuGroup label={ __( 'Source' ) }>
+							<MenuItemsChoice
+								choices={ sourceMenuOptions }
+								onSelect={ ( value ) => {
+									handleSetSourceFilterChange( value );
+									scrollContainerRef.current?.scrollTo(
+										0,
+										0
+									);
+								} }
+								value={ currentPatternSourceFilter }
+							/>
+						</MenuGroup>
 						<MenuGroup label={ __( 'Type' ) }>
 							<MenuItemsChoice
 								choices={ patternSyncMenuOptions }

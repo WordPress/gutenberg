@@ -11,9 +11,9 @@ export const INSERTER_SYNC_TYPES = {
 	unsynced: 'unsynced',
 };
 
-export const INSERTER_AUTHOR_TYPES = {
-	currentUser: 'currentUser',
-};
+// The "My patterns" source filter value. It narrows the user patterns down to
+// the ones the current user created.
+export const MY_PATTERNS_SOURCE_FILTER = 'myPatterns';
 
 export const allPatternsCategory = {
 	name: 'allPatterns',
@@ -74,12 +74,7 @@ export function getPopulatedCategories( patterns, allCategories ) {
 	return categories;
 }
 
-export function isPatternFiltered(
-	pattern,
-	sourceFilter,
-	syncFilter,
-	authorFilter
-) {
+export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
 	const isDirectoryPattern =
 		pattern.source === 'core' ||
@@ -105,15 +100,16 @@ export function isPatternFiltered(
 
 	// If user source selected, filter out theme patterns.
 	if (
-		sourceFilter === INSERTER_PATTERN_TYPES.user &&
+		( sourceFilter === INSERTER_PATTERN_TYPES.user ||
+			sourceFilter === MY_PATTERNS_SOURCE_FILTER ) &&
 		pattern.type !== INSERTER_PATTERN_TYPES.user
 	) {
 		return true;
 	}
 
-	// If the current user's patterns are selected, filter out everyone else's.
+	// If "My patterns" source selected, filter out everyone else's patterns.
 	if (
-		authorFilter === INSERTER_AUTHOR_TYPES.currentUser &&
+		sourceFilter === MY_PATTERNS_SOURCE_FILTER &&
 		! pattern.isCurrentUserPattern
 	) {
 		return true;

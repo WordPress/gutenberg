@@ -1615,7 +1615,7 @@ test.describe( 'Synced pattern - inserter categories', () => {
 
 		await page.getByRole( 'button', { name: 'Filter patterns' } ).click();
 		await page
-			.getByRole( 'group', { name: 'Author' } )
+			.getByRole( 'group', { name: 'Source' } )
 			.getByRole( 'menuitemradio', { name: 'My patterns' } )
 			.click();
 		await expect(

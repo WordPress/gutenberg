@@ -42,16 +42,6 @@ export function PatternCategoryPreviews( {
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
-	const [ patternAuthorFilter, setPatternAuthorFilter ] = useState( 'all' );
-
-	// The author filter only applies while only user patterns are listed, so
-	// it doesn't linger unseen in categories where it isn't shown.
-	const isUserSource =
-		category.name === sitePatternsCategory.name ||
-		patternSourceFilter === INSERTER_PATTERN_TYPES.user;
-	const currentPatternAuthorFilter = isUserSource
-		? patternAuthorFilter
-		: 'all';
 
 	const availableCategories = usePatternCategories(
 		rootClientId,
@@ -65,8 +55,7 @@ export function PatternCategoryPreviews( {
 					isPatternFiltered(
 						pattern,
 						patternSourceFilter,
-						patternSyncFilter,
-						currentPatternAuthorFilter
+						patternSyncFilter
 					)
 				) {
 					return false;
@@ -110,7 +99,6 @@ export function PatternCategoryPreviews( {
 			category.name,
 			patternSourceFilter,
 			patternSyncFilter,
-			currentPatternAuthorFilter,
 		]
 	);
 
@@ -138,13 +126,6 @@ export function PatternCategoryPreviews( {
 		},
 		[ setPatternSourceFilter, changePage ]
 	);
-	const onSetPatternAuthorFilter = useCallback(
-		( value ) => {
-			setPatternAuthorFilter( value );
-			changePage( 1 );
-		},
-		[ setPatternAuthorFilter, changePage ]
-	);
 
 	return (
 		<>
@@ -166,10 +147,8 @@ export function PatternCategoryPreviews( {
 					<PatternsFilter
 						patternSyncFilter={ patternSyncFilter }
 						patternSourceFilter={ patternSourceFilter }
-						patternAuthorFilter={ currentPatternAuthorFilter }
 						setPatternSyncFilter={ onSetPatternSyncFilter }
 						setPatternSourceFilter={ onSetPatternSourceFilter }
-						setPatternAuthorFilter={ onSetPatternAuthorFilter }
 						scrollContainerRef={ scrollContainerRef }
 						category={ category }
 					/>
