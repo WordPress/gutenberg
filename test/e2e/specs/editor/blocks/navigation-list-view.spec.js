@@ -970,6 +970,84 @@ test.describe( 'Navigation block - List view editing', () => {
 			}, clientId )
 		).toEqual( { linkTarget: undefined, rel: undefined } );
 	} );
+
+	test( 'edits a Social Icon from the List View popover in a contentOnly locked section', async ( {
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content:
+				navMenuBlocksFixture.content +
+				`<!-- wp:social-links -->` +
+				`<ul class="wp-block-social-links">` +
+				`<!-- wp:social-link {"url":"https://wordpress.org/","service":"wordpress"} /-->` +
+				`</ul>` +
+				`<!-- /wp:social-links -->`,
+		} );
+
+		await editor.setContent(
+			`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+				`<div class="wp-block-group">` +
+				`<!-- wp:navigation {"ref":${ menu.id }} /-->` +
+				`</div>` +
+				`<!-- /wp:group -->`
+		);
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+
+		// The popover offers the icon's link first, then its text.
+		await listView.getByRole( 'link', { name: 'WordPress' } ).click();
+
+		const popover = page.locator(
+			'.block-editor-inspector-list-view-content-popover'
+		);
+		await expect(
+			popover.getByRole( 'heading', { name: 'Settings' } )
+		).toBeVisible();
+		const linkInput = popover.getByRole( 'textbox', { name: 'Link' } );
+		await expect( linkInput ).toHaveValue( 'https://wordpress.org/' );
+		await expect(
+			popover.getByRole( 'textbox' ).first()
+		).toHaveAccessibleName( 'Link' );
+		const textInput = popover.getByRole( 'textbox', { name: 'Text' } );
+		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
+		await expect(
+			page.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/' );
+
+		// Edits reach the block.
+		await textInput.fill( 'WP' );
+		await linkInput.fill( 'https://wordpress.org/news/' );
+
+		await expect(
+			page.getByRole( 'link', { name: 'View' } )
+		).toHaveAttribute( 'href', 'https://wordpress.org/news/' );
+		const socialLink = editor.canvas.locator(
+			'[data-type="core/social-link"]'
+		);
+		expect(
+			await page.evaluate(
+				( id ) =>
+					window.wp.data
+						.select( 'core/block-editor' )
+						.getBlockAttributes( id ),
+				await socialLink.getAttribute( 'data-block' )
+			)
+		).toMatchObject( {
+			label: 'WP',
+			url: 'https://wordpress.org/news/',
+		} );
+	} );
 } );
 
 /**
