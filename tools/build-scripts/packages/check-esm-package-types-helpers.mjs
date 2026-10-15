@@ -70,15 +70,19 @@ export function packPackage( { directory, packageJson }, packDestination ) {
 		);
 	}
 
-	let packResults;
+	let packOutput;
 	try {
-		packResults = JSON.parse( result.stdout );
+		packOutput = JSON.parse( result.stdout );
 	} catch {
 		throw new Error(
 			`Could not parse packed file list for ${ packageJson.name }.`
 		);
 	}
-	if ( ! Array.isArray( packResults ) || packResults.length !== 1 ) {
+	/* npm v12 keys `pack --json` output by package name; older versions return an array. */
+	const packResults = Array.isArray( packOutput )
+		? packOutput
+		: Object.values( packOutput );
+	if ( packResults.length !== 1 ) {
 		throw new Error(
 			`Unexpected packed file list for ${ packageJson.name }.`
 		);

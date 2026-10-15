@@ -15,7 +15,7 @@ import { restoreFocus, copyToClipboard } from '../use-copy-to-clipboard';
  *           timeout.
  */
 export default function useCopyOnClick(
-	ref: RefObject< string | Element | NodeListOf< Element > >,
+	ref: RefObject< string | Element | NodeListOf< Element > | null >,
 	text: string | ( () => string ),
 	timeout: number = 4000
 ): boolean {

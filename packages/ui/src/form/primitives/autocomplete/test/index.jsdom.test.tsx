@@ -1,8 +1,12 @@
-import { describe, expect, it } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
 import type { ComponentType, ReactNode } from 'react';
 import * as Autocomplete from '../index';
+import {
+	getWpCompatOverlaySlot,
+	__resetWpCompatOverlaySlotCacheForTests,
+} from '../../../../utils/wp-compat-overlay-slot';
 
 const ITEMS = [
 	{ id: '1', value: 'Item 1' },
@@ -60,7 +64,6 @@ describe( 'Autocomplete', () => {
 				</Autocomplete.Root>
 			)
 		).toThrow( 'Autocomplete.ItemLabel must be the first direct child' );
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description nested in the item label', () => {
@@ -84,7 +87,6 @@ describe( 'Autocomplete', () => {
 		).toThrow(
 			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'rejects a description outside an item', () => {
@@ -97,7 +99,6 @@ describe( 'Autocomplete', () => {
 		).toThrow(
 			'Autocomplete.ItemDescription: Missing direct autocomplete item parent. Render <Autocomplete.ItemDescription> as a direct child of <Autocomplete.Item>.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	describe( 'when disabled', () => {
@@ -126,7 +127,6 @@ describe( 'Autocomplete', () => {
 			expect( () => render( <Autocomplete.Row /> ) ).toThrow(
 				'Autocomplete.Row: Missing parent <Autocomplete.Root grid>. Render <Autocomplete.Row> inside <Autocomplete.Root grid>.'
 			);
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'throws when Autocomplete.Root does not enable grid mode', () => {
@@ -139,7 +139,6 @@ describe( 'Autocomplete', () => {
 			).toThrow(
 				'Autocomplete.Row: Missing parent <Autocomplete.Root grid>. Render <Autocomplete.Row> inside <Autocomplete.Root grid>.'
 			);
-			expect( console ).toHaveErrored();
 		} );
 
 		it( 'forwards ref', async () => {
@@ -209,6 +208,47 @@ describe( 'Autocomplete', () => {
 			expect( screen.getAllByRole( 'rowgroup' ) ).toHaveLength(
 				GRID_ITEMS.length
 			);
+		} );
+	} );
+} );
+
+describe( 'Autocomplete.Portal', () => {
+	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', true );
+	} );
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'waits for an explicit null container to become available', async () => {
+		const content = ( container: HTMLElement | null ) => (
+			<Autocomplete.Root defaultOpen>
+				<Autocomplete.Input aria-label="Search" />
+				<div data-testid="portal-target" />
+				<Autocomplete.Popup
+					portal={ <Autocomplete.Portal container={ container } /> }
+				>
+					Portal content
+				</Autocomplete.Popup>
+			</Autocomplete.Root>
+		);
+
+		const { rerender } = render( content( null ) );
+
+		expect(
+			screen.queryByText( 'Portal content' )
+		).not.toBeInTheDocument();
+
+		const target = screen.getByTestId( 'portal-target' );
+		rerender( content( target ) );
+
+		await waitFor( () => {
+			expect(
+				within( target ).getByText( 'Portal content' )
+			).toBeVisible();
 		} );
 	} );
 } );

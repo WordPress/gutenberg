@@ -5,6 +5,7 @@ const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
+const browserslistConfig = require( '@wordpress/browserslist-config' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
@@ -14,7 +15,6 @@ const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 const PhpFilePathsPlugin = require( '../plugins/php-file-paths-plugin' );
 const RtlCssPlugin = require( '../plugins/rtlcss-webpack-plugin' );
 const {
-	fromConfigRoot,
 	hasBabelConfig,
 	hasArgInCLI,
 	hasCssnanoConfig,
@@ -32,7 +32,8 @@ const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 let target = 'browserslist';
 if ( ! browserslist.findConfig( '.' ) ) {
-	target += ':' + fromConfigRoot( '.browserslistrc' );
+	// Pass queries, not a config `extends`, which resolves from the consumer's cwd.
+	target += ':' + browserslistConfig.join( ', ' );
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
 const hasBlocksManifest = getAsBooleanFromENV( 'WP_BLOCKS_MANIFEST' );

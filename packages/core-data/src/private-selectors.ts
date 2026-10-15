@@ -3,7 +3,6 @@ import type { ConnectionStatus } from '@wordpress/sync';
 import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
-import { getEntitySyncManager } from './entity-sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
@@ -11,16 +10,14 @@ type EntityRecordKey = string | number;
 const EMPTY_OBJECT = {};
 
 /**
- * Returns the previous edit from the current undo offset
- * for the entity records edits history, if any.
+ * Returns the undo manager holding the entity records edits history.
  *
  * @param state State tree.
  *
  * @return The undo manager.
  */
 export function getUndoManager( state: State ) {
-	// A registered entity sync manager may substitute its own undo manager.
-	return getEntitySyncManager()?.undoManager ?? state.undoManager;
+	return state.undoManager;
 }
 
 /**

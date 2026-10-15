@@ -14,16 +14,27 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	const { isBlockBasedTheme, canCreate } = useSelect( ( select ) => {
-		return {
-			isBlockBasedTheme:
-				select( coreStore ).getCurrentTheme()?.is_block_theme,
-			canCreate:
-				select( blockEditorStore ).canInsertBlockType(
-					'core/template-part'
+	const clientId = clientIds?.[ 0 ];
+	const { isBlockBasedTheme, canCreate } = useSelect(
+		( select ) => {
+			const { getBlockRootClientId, canInsertBlockType } =
+				select( blockEditorStore );
+
+			const rootClientId = clientId
+				? getBlockRootClientId( clientId )
+				: undefined;
+
+			return {
+				isBlockBasedTheme:
+					select( coreStore ).getCurrentTheme()?.is_block_theme,
+				canCreate: canInsertBlockType(
+					'core/template-part',
+					rootClientId
 				),
-		};
-	}, [] );
+			};
+		},
+		[ clientId ]
+	);
 
 	if ( ! isBlockBasedTheme || ! canCreate ) {
 		return null;

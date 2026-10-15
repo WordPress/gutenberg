@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
-import { inertValue } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';

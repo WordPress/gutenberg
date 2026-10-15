@@ -89,28 +89,20 @@ function useFitText( { fitText, name, clientId } ) {
 			return;
 		}
 
-		// Get or create style element with unique ID
-		const styleId = `fit-text-${ clientId }`;
-		let styleElement = blockElement.ownerDocument.getElementById( styleId );
-		if ( ! styleElement ) {
-			styleElement = blockElement.ownerDocument.createElement( 'style' );
-			styleElement.id = styleId;
-			blockElement.ownerDocument.head.appendChild( styleElement );
-		}
-
-		const blockSelector = `#block-${ clientId }`;
-
+		// Size the measured element itself: a block rendered once per item in
+		// a loop shares its client ID, so a rule keyed to it would size every
+		// copy at once. Mirrors the front end in `fit-text-frontend.ts`.
 		const applyFontSizeStyle = ( size ) => {
 			if ( size === 0 ) {
-				styleElement.textContent = '';
+				blockElement.style.removeProperty( 'font-size' );
 			} else {
-				styleElement.textContent = `${ blockSelector } { font-size: ${ size }px !important; }`;
+				blockElement.style.setProperty( 'font-size', `${ size }px` );
 			}
 		};
 
 		const optimalSize = optimizeFitText( blockElement, applyFontSizeStyle );
 		setFontSize( optimalSize );
-	}, [ blockElement, clientId, hasFitTextSupport, fitText ] );
+	}, [ blockElement, hasFitTextSupport, fitText ] );
 
 	useEffect( () => {
 		if (
@@ -175,12 +167,7 @@ function useFitText( { fitText, name, clientId } ) {
 				resizeObserver.disconnect();
 			}
 
-			const styleId = `fit-text-${ clientId }`;
-			const styleElement =
-				currentElement.ownerDocument.getElementById( styleId );
-			if ( styleElement ) {
-				styleElement.remove();
-			}
+			currentElement.style.removeProperty( 'font-size' );
 		};
 	}, [
 		fitText,

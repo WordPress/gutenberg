@@ -67,6 +67,21 @@ describe( 'ContentEditableControl', () => {
 		expect( textbox ).toHaveAttribute( 'contenteditable', 'false' );
 	} );
 
+	it( 'keeps a disabled field focusable but out of the tab order', () => {
+		const { rerender } = render( <ContentEditableControl label="Note" /> );
+
+		expect( screen.getByRole( 'textbox' ) ).not.toHaveAttribute(
+			'tabindex'
+		);
+
+		rerender( <ContentEditableControl label="Note" disabled /> );
+
+		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute(
+			'tabindex',
+			'-1'
+		);
+	} );
+
 	it( 'exposes `required` via aria-required', () => {
 		render( <ContentEditableControl label="Note" required /> );
 

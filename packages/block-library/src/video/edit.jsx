@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Spinner,
+	Spinner as WCSpinner,
 	Placeholder,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
@@ -13,12 +13,13 @@ import {
 	MediaReplaceFlow,
 	useBlockProps,
 	useBlockEditingMode,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
-import { inertValue } from '@wordpress/ui';
 import { useReducedMotion } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
@@ -69,6 +70,7 @@ function VideoEdit( {
 		width && height ? `${ width } / ${ height }` : undefined;
 	const videoStyle = {
 		...( aspectRatio && { aspectRatio } ),
+		...getDimensionsClassesAndStyles( attributes ).style,
 		...getShadowClassesAndStyles( attributes ).style,
 	};
 	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
@@ -279,7 +281,7 @@ function VideoEdit( {
 				>
 					<Tracks tracks={ tracks } />
 				</video>
-				{ !! temporaryURL && <Spinner /> }
+				{ !! temporaryURL && <WCSpinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

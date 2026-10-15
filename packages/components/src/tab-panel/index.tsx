@@ -214,7 +214,11 @@ const UnforwardedTabPanel = (
 								/>
 							}
 						>
-							{ ! tab.icon && tab.title }
+							{ ! tab.icon && (
+								<span className="components-tab-panel__tabs-item-label">
+									{ tab.title }
+								</span>
+							) }
 						</Ariakit.Tab>
 					);
 				} ) }

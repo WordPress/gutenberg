@@ -2,7 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getScrollContainer } from '@wordpress/dom';
 import { createBoardStore } from '../board-store';
 
-vi.mock( '@wordpress/dom', () => ( { getScrollContainer: vi.fn() } ) );
+vi.mock( import( '@wordpress/dom' ), () => ( {
+	getScrollContainer: vi.fn(),
+} ) );
 
 let observers;
 

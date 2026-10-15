@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import { Button, Spinner, Composite } from '@wordpress/components';
+import { Button, Spinner as WCSpinner, Composite } from '@wordpress/components';
 import {
 	useCallback,
 	useEffect,
@@ -12,8 +12,9 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
+import { inertValue } from '@wordpress/react-inert-value';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, Stack, VisuallyHidden, inertValue } from '@wordpress/ui';
+import { Menu, Stack, VisuallyHidden } from '@wordpress/ui';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
@@ -665,7 +666,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					className="dataviews-loading-more"
 					aria-hidden={ ! isLoading }
 				>
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>

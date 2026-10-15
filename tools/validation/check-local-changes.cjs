@@ -1,6 +1,6 @@
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 
-SimpleGit()
+simpleGit()
 	.diff( [ '-U0' ] )
 	.then( ( diff ) => {
 		// npm will introduce changes to a `package-lock.json` file for optional

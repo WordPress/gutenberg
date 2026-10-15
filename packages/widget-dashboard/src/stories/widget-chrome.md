@@ -15,7 +15,7 @@ The chrome reads the widget type and materializes each field in one of three are
 
 ![One widget type materialized as a tile of three areas: the header takes the identity, the high-relevance attributes, and the low-relevance actions; the content takes the render module fed with the attribute values; the footer takes the promoted actions.](./assets/tile-anatomy.svg)
 
-The header takes the identity (`icon`, `title`, `help`), the high-relevance `attributes` inline plus the settings trigger for the full schema, and the low-relevance `actions` in the More menu. The content belongs to the render module, fed the attribute values. The footer takes the promoted `actions`.
+The header takes the identity (`icon`, `title`, `help`), the high-relevance `attributes` inline plus the settings trigger for the full schema, and the low-relevance `actions` in the More menu. The content belongs to the render module, fed the attribute values. The footer takes the promoted `actions`. Both surfaces also take the actions the mounted instance declares through `useWidgetActions`.
 
 Wherever a link action lands, one rule applies: a target the host recognizes as one of its own routes mounts the host router's link and navigates client-side; every other link, and any `download` or `openInNewTab`, keeps the plain anchor.
 
@@ -69,7 +69,7 @@ A persistent strip under the body, for the actions the widget promotes.
 -   **`medium`.** Compact affordances on the trailing edge: icon-only with a declared icon, text links otherwise.
 -   **`low`** (default). The header's More menu.
 
-Every affordance is a real anchor: middle-click, copy address, and download survive.
+Every link is a real anchor: middle-click, copy address, and download survive. A `callback` action mounts a button.
 
 The divider spans the tile, and the body above keeps no bottom padding, so scrolled content runs flush against it.
 

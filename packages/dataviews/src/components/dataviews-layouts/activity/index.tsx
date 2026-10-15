@@ -1,6 +1,7 @@
 import clsx from 'clsx';
-import { Spinner } from '@wordpress/components';
-import { Stack, inertValue } from '@wordpress/ui';
+import { Spinner as WCSpinner } from '@wordpress/components';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Stack } from '@wordpress/ui';
 import type { ViewActivityProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
 import ActivityGroup from './activity-group';
@@ -52,7 +53,6 @@ export default function ViewActivity< Item >(
 				direction="column"
 				gap="sm"
 				className={ wrapperClassName }
-				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ inertValue( isInert ) }
 			>
 				{ groupedEntries.map(
@@ -81,14 +81,13 @@ export default function ViewActivity< Item >(
 			<div
 				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
-				// @ts-expect-error `inert` is not declared in React 18's HTML attribute types.
 				inert={ inertValue( isInert ) }
 			>
 				<ActivityItems< Item > { ...props } />
 			</div>
 			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>

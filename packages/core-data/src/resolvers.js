@@ -226,10 +226,8 @@ export const getEntityRecord =
 							query
 						);
 					},
-					onUndoStackChange: ( undoState ) => {
-						dispatch.__unstableNotifySyncUndoManagerChange(
-							undoState
-						);
+					onUndoLevelOpened: () => {
+						dispatch.recordSyncUndoLevel( kind, name, key );
 					},
 				} );
 			}

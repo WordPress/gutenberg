@@ -144,7 +144,7 @@ export type RangeControlProps = Pick<
 		 *
 		 * @default () => void
 		 */
-		onChange?: ( value?: number ) => void;
+		onChange?: ( value: number | undefined ) => void;
 		/**
 		 * Callback for when `RangeControl` input gains focus.
 		 *
