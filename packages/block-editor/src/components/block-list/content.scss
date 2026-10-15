@@ -441,10 +441,11 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
-// While the writing flow wrapper is an editing host, editable elements within
-// its non-editable regions (e.g. the post title) are read-only: iOS otherwise
-// drags selection handles into them, and focus follows the selection there.
-[contenteditable="true"] [contenteditable="false"] [contenteditable="true"] {
+// While a finger is down on the writing flow wrapper as an editing host,
+// editable elements within its non-editable regions (e.g. the post title) are
+// read-only: iOS otherwise drags selection handles into them, and focus
+// follows the selection there.
+[contenteditable="true"][data-touching] [contenteditable="false"] [contenteditable="true"] {
 	// stylelint-disable-next-line property-no-deprecated -- The only way to make an element read-only in CSS.
 	-webkit-user-modify: read-only;
 	-webkit-user-select: none;

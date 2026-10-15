@@ -25,22 +25,21 @@ export default function useClickSelection() {
 
 			function onPointerDown( event ) {
 				pointerType = event.pointerType;
+			}
 
-				// Editable elements in non-editable regions of the wrapper
-				// (e.g. the post title) are read-only while it is an editing
-				// host (see content.scss). Stop hosting so the press reaches
-				// them.
-				const editable = event.target.closest?.(
-					'[contenteditable="true"]'
-				);
-				if (
-					editable &&
-					editable !== node &&
-					node.contentEditable === 'true' &&
-					editable.parentElement.closest( '[contenteditable]' )
-						?.contentEditable === 'false'
-				) {
-					setContentEditableWrapper( node, false );
+			// While a finger is down outside the non-editable regions of the
+			// wrapper, the editable elements within them (e.g. the post
+			// title) are read-only (see content.scss), so a selection handle
+			// dragged there stays out of them.
+			function onTouchStart( event ) {
+				if ( ! event.target.closest?.( '[contenteditable="false"]' ) ) {
+					node.setAttribute( 'data-touching', '' );
+				}
+			}
+
+			function onTouchEnd( event ) {
+				if ( ! event.touches.length ) {
+					node.removeAttribute( 'data-touching' );
 				}
 			}
 
@@ -136,11 +135,18 @@ export default function useClickSelection() {
 			}
 
 			node.addEventListener( 'pointerdown', onPointerDown );
+			node.addEventListener( 'touchstart', onTouchStart );
+			node.addEventListener( 'touchend', onTouchEnd );
+			node.addEventListener( 'touchcancel', onTouchEnd );
 			node.addEventListener( 'mousedown', onMouseDown );
 
 			return () => {
 				node.removeEventListener( 'pointerdown', onPointerDown );
+				node.removeEventListener( 'touchstart', onTouchStart );
+				node.removeEventListener( 'touchend', onTouchEnd );
+				node.removeEventListener( 'touchcancel', onTouchEnd );
 				node.removeEventListener( 'mousedown', onMouseDown );
+				node.removeAttribute( 'data-touching' );
 			};
 		},
 		[
