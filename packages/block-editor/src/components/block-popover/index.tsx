@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
 import { useMergeRefs } from '@wordpress/compose';
 import { Popover } from '@wordpress/components';
 import {
@@ -10,6 +11,7 @@ import {
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
 import { rectUnion, getElementBounds } from '../../utils/dom';
+import type { BlockPopoverProps, PrivateBlockPopoverProps } from './types';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
@@ -22,8 +24,8 @@ function BlockPopover(
 		__unstableContentRef,
 		shift = true,
 		...props
-	},
-	ref
+	}: PrivateBlockPopoverProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const selectedElement = useBlockElement( clientId );
 	const lastSelectedElement = useBlockElement( bottomClientId ?? clientId );
@@ -37,7 +39,7 @@ function BlockPopover(
 		forceRecomputePopoverDimensions,
 	] = useReducer(
 		// Module is there to make sure that the counter doesn't overflow.
-		( s ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
+		( s: number ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
 		0
 	);
 
@@ -53,7 +55,7 @@ function BlockPopover(
 			return;
 		}
 
-		let rafId;
+		let rafId: number | null | undefined;
 		const observer = new window.MutationObserver( () => {
 			if ( rafId ) {
 				return;
@@ -133,8 +135,8 @@ function BlockPopover(
 export const PrivateBlockPopover = forwardRef( BlockPopover );
 
 const PublicBlockPopover = (
-	{ clientId, bottomClientId, children, ...props },
-	ref
+	{ clientId, bottomClientId, children, ...props }: BlockPopoverProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) => (
 	<PrivateBlockPopover
 		{ ...props }
