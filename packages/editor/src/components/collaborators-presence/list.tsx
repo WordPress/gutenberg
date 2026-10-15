@@ -51,6 +51,7 @@ export function CollaboratorsList( {
 			anchor={ popoverAnchor }
 			placement="bottom"
 			offset={ 8 }
+			shift
 			className="editor-collaborators-presence__list"
 			onClose={ () => setIsPopoverVisible( false ) }
 		>
