@@ -51,7 +51,7 @@ jobs:
 
     safari:
         name: Safari on an iOS simulator
-        # The iOS simulator and keyboard only run on Apple hardware.
+        # Safari and the iOS keyboard only run on Apple hardware.
         runs-on: macos-15
         needs: build
         timeout-minutes: 40

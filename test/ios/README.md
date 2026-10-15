@@ -1,12 +1,7 @@
 # iOS tests
 
-XCUITest suites that drive the editor on an iOS simulator, for behavior only
+XCUITest suites that drive the editor in a web view on an iOS simulator, for behavior only
 touch gestures show, such as selecting text with the selection handles.
-
-The editor runs in a web view in the test app (`Host`), set up like Safari on
-an iPhone: the keyboard covers the page instead of resizing it, the user agent
-is Safari's, and every launch starts without cookies. The app launches the
-same way every time, which Safari did not.
 
 Run them on macOS with Xcode and [xcodegen](https://github.com/yonaskolb/XcodeGen)
 installed and PHP 8 with SQLite, after building the plugin:

@@ -140,7 +140,7 @@ rm -rf test/ios/build/results.xcresult
 STATUS=0
 TEST_RUNNER_WP_BASE_URL="$WP_BASE_URL" xcodebuild test \
 	-project test/ios/GutenbergIOS.xcodeproj \
-	-scheme EditorTests \
+	-scheme SafariTests \
 	-destination "id=${UDID}" \
 	-derivedDataPath test/ios/build \
 	-resultBundlePath test/ios/build/results.xcresult \

@@ -21,17 +21,17 @@ targets:
                     NSAllowsArbitraryLoads: true
         settings:
             INFOPLIST_KEY_UILaunchScreen_Generation: YES
-    EditorTests:
+    SafariTests:
         type: bundle.ui-testing
         platform: iOS
-        sources: [EditorTests]
+        sources: [SafariTests]
         dependencies:
             - target: Host
 schemes:
-    EditorTests:
+    SafariTests:
         build:
             targets:
                 Host: all
-                EditorTests: [test]
+                SafariTests: [test]
         test:
-            targets: [EditorTests]
+            targets: [SafariTests]
