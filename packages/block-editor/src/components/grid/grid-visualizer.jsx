@@ -30,6 +30,7 @@ import {
 } from './get-grid-drop-target';
 import { getAlignmentGuides } from './get-alignment-guides';
 import { getInsertedChildLayoutStyle } from './get-inserted-child-layout-style';
+import { getMinimumInsertionRect } from './get-minimum-insertion-rect';
 import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
@@ -250,7 +251,9 @@ function ManualGridVisualizer( {
 									column={ column }
 									row={ row }
 									gridClientId={ gridClientId }
+									gridElement={ gridElement }
 									gridInfo={ gridInfo }
+									occupiedRects={ occupiedRects }
 								/>
 							) }
 						</GridVisualizerCell>
@@ -261,6 +264,7 @@ function ManualGridVisualizer( {
 				gridClientId={ gridClientId }
 				gridElement={ gridElement }
 				gridInfo={ gridInfo }
+				occupiedRects={ occupiedRects }
 			/>
 			<GridVisualizerDropLayer
 				gridClientId={ gridClientId }
@@ -677,7 +681,9 @@ function GridVisualizerAppender( {
 	columnSpan = 1,
 	rowSpan = 1,
 	gridClientId,
+	gridElement,
 	gridInfo,
+	occupiedRects,
 	isInitiallyOpen = false,
 	onClose,
 } ) {
@@ -717,15 +723,22 @@ function GridVisualizerAppender( {
 					onClose?.();
 					return;
 				}
+				// Cells can be too small for the block to show its
+				// placeholder, so it gets more of them if they're free.
+				const rect = getMinimumInsertionRect( {
+					rect: new GridRect( {
+						columnStart: column,
+						rowStart: row,
+						columnSpan,
+						rowSpan,
+					} ),
+					...getGridTrackPositions( gridElement ),
+					occupiedRects,
+				} );
 				updateBlockAttributes( block.clientId, {
 					style: getInsertedChildLayoutStyle(
 						getBlockAttributes( block.clientId )?.style,
-						new GridRect( {
-							columnStart: column,
-							rowStart: row,
-							columnSpan,
-							rowSpan,
-						} ),
+						rect,
 						getSelectedBlockStyleState( block.clientId ),
 						getBlockAttributes( gridClientId )?.layout
 					),
@@ -735,7 +748,10 @@ function GridVisualizerAppender( {
 					[ block.clientId ],
 					gridClientId,
 					gridClientId,
-					getNumberOfBlocksBeforeCell( column, row )
+					getNumberOfBlocksBeforeCell(
+						rect.columnStart,
+						rect.rowStart
+					)
 				);
 				onClose?.();
 			} }
@@ -750,11 +766,17 @@ function GridVisualizerAppender( {
  * inserter for the one cell, as before.
  *
  * @param {Object}      props
- * @param {string}      props.gridClientId Client ID of the grid block.
- * @param {HTMLElement} props.gridElement  The grid element in the canvas.
- * @param {Object}      props.gridInfo     Grid info, from `getGridInfo`.
+ * @param {string}      props.gridClientId  Client ID of the grid block.
+ * @param {HTMLElement} props.gridElement   The grid element in the canvas.
+ * @param {Object}      props.gridInfo      Grid info, from `getGridInfo`.
+ * @param {GridRect[]}  props.occupiedRects The cells the grid's blocks cover.
  */
-function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
+function GridVisualizerMarquee( {
+	gridClientId,
+	gridElement,
+	gridInfo,
+	occupiedRects,
+} ) {
 	const anchorRef = useRef();
 	const [ marquee, setMarquee ] = useState( null );
 
@@ -949,7 +971,9 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 							columnSpan={ marquee.rect.columnSpan }
 							rowSpan={ marquee.rect.rowSpan }
 							gridClientId={ gridClientId }
+							gridElement={ gridElement }
 							gridInfo={ gridInfo }
+							occupiedRects={ occupiedRects }
 							isInitiallyOpen
 							onClose={ () => setMarquee( null ) }
 						/>
