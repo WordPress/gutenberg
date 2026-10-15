@@ -13,6 +13,7 @@ describe( 'createCustomColorsHOC', () => {
 			withCustomColors( 'backgroundColor' )( BaseComponent );
 
 		render(
+			// @ts-expect-error The setter is never called here.
 			<EnhancedComponent attributes={ { backgroundColor: null } } />
 		);
 
@@ -41,7 +42,16 @@ describe( 'createCustomColorsHOC', () => {
 		] );
 		const EnhancedComponent = withCustomColors( 'backgroundColor' )(
 			( props ) => (
-				<button onClick={ () => props.setBackgroundColor( 'ff0000' ) }>
+				<button
+					onClick={ () =>
+						// The HOC passes a setter for each color.
+						(
+							props.setBackgroundColor as (
+								value: string
+							) => void
+						 )( 'ff0000' )
+					}
+				>
 					Test Me
 				</button>
 			)
@@ -71,7 +81,16 @@ describe( 'createCustomColorsHOC', () => {
 		] );
 		const EnhancedComponent = withCustomColors( 'backgroundColor' )(
 			( props ) => (
-				<button onClick={ () => props.setBackgroundColor( '000000' ) }>
+				<button
+					onClick={ () =>
+						// The HOC passes a setter for each color.
+						(
+							props.setBackgroundColor as (
+								value: string
+							) => void
+						 )( '000000' )
+					}
+				>
 					Test Me
 				</button>
 			)
