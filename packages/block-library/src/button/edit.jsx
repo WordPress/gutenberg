@@ -56,6 +56,7 @@ import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useLinkPreview } from '../navigation-link/shared/use-link-preview';
+import { getSuggestionsQuery } from '../navigation-link/link-ui';
 import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
@@ -223,6 +224,8 @@ function ContentControls( { attributes, setAttributes, isLinkEditable } ) {
 							onSelect={ ( { url: newUrl } ) =>
 								setLink( { url: newUrl } )
 							}
+							// Like a navigation link, offer pages before anything is typed.
+							suggestionsQuery={ getSuggestionsQuery() }
 							label={ __( 'Link to' ) }
 						/>
 					</ToolsPanelItem>
