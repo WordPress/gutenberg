@@ -221,7 +221,7 @@ function ItemsPerPageControl() {
 					<ToggleGroupControlOption
 						key={ value }
 						value={ value }
-						label={ value.toString() }
+						label={ value.toLocaleString() }
 					/>
 				);
 			} ) }
