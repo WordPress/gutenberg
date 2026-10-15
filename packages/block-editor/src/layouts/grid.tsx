@@ -18,8 +18,14 @@ import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import type {
+	LayoutAlignment,
+	LayoutControlProps,
+	LayoutInspectorControlsProps,
+	LayoutStyleArgs,
+} from './types';
 
-const RANGE_CONTROL_MAX_VALUES = {
+const RANGE_CONTROL_MAX_VALUES: Record< string, number > = {
 	px: 600,
 	'%': 100,
 	vw: 100,
@@ -68,7 +74,7 @@ export default {
 		layoutBlockSupport = {},
 		resetLayout = {},
 		clientId,
-	} ) {
+	}: LayoutInspectorControlsProps ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
 
 		// Always show both column and minimum width controls in Auto mode.
@@ -81,7 +87,7 @@ export default {
 		// automatically, so the control is irrelevant in manual placement mode.
 		const showFillControl = ! layout?.isManualPlacement;
 		const defaultColumnCount = layout.isManualPlacement ? 3 : undefined;
-		const hasLayoutValue = ( key, defaultValue ) =>
+		const hasLayoutValue = ( key: string, defaultValue?: unknown ) =>
 			( layout?.[ key ] ?? defaultValue ) !==
 			( resetLayout?.[ key ] ?? defaultValue );
 		const hasGridTypeValue = () =>
@@ -197,12 +203,12 @@ export default {
 		hasBlockGapSupport,
 		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
-	} ) {
+	}: LayoutStyleArgs ): string {
 		const hasViewportOverrides = viewportOverrides !== undefined;
 		const effectiveLayout = hasViewportOverrides
 			? { ...layout, ...viewportOverrides }
 			: layout;
-		const hasViewportOverride = ( key ) =>
+		const hasViewportOverride = ( key: string ) =>
 			Object.hasOwn( viewportOverrides || {}, key );
 		const {
 			minimumColumnWidth = null,
@@ -259,13 +265,16 @@ export default {
 			Object.hasOwn( style?.spacing || {}, 'blockGap' );
 
 		let output = '';
-		const rules = [];
+		const rules: string[] = [];
 		const shouldOutputGridColumns =
 			! hasViewportOverrides ||
 			hasViewportOverride( 'minimumColumnWidth' ) ||
 			hasViewportOverride( 'columnCount' ) ||
 			hasViewportOverride( 'autoFit' ) ||
-			( hasBlockGapOverride && minimumColumnWidth && columnCount > 0 );
+			( hasBlockGapOverride &&
+				minimumColumnWidth &&
+				// A `null` count compares as `false`.
+				( columnCount as number ) > 0 );
 		const shouldOutputGridRows =
 			( ! hasViewportOverrides || hasViewportOverride( 'rowCount' ) ) &&
 			columnCount &&
@@ -274,20 +283,26 @@ export default {
 		if (
 			shouldOutputGridColumns &&
 			minimumColumnWidth &&
-			columnCount > 0
+			( columnCount as number ) > 0
 		) {
 			const blockGapBoxControlValue = blockGapValue
-				? getGapBoxControlValueFromStyle( style.spacing.blockGap )
+				? // A block gap value comes from the style's block gap.
+					getGapBoxControlValueFromStyle( style!.spacing!.blockGap )
 				: undefined;
 			let blockGapToUse =
 				getSpacingPresetCssVar( blockGapBoxControlValue?.left ) ||
 				fallbackGapValue;
 			// Ensure 0 values have a unit so they work in calc().
-			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
+			// The gap is a string; the number check is kept from before.
+			if (
+				blockGapToUse === '0' ||
+				( blockGapToUse as string | number ) === 0
+			) {
 				blockGapToUse = '0px';
 			}
 			const maxValue = `max(min( ${ minimumColumnWidth }, 100%), ( 100% - (${ blockGapToUse }*${
-				columnCount - 1
+				// Checked to be above zero just above.
+				columnCount! - 1
 			}) ) / ${ columnCount })`;
 			rules.push(
 				`grid-template-columns: repeat(${ autoPlacement }, minmax(${ maxValue }, 1fr))`
@@ -340,23 +355,27 @@ export default {
 		}
 		return output;
 	},
-	getOrientation() {
+	getOrientation(): string {
 		return 'horizontal';
 	},
-	getAlignments() {
+	getAlignments(): LayoutAlignment[] {
 		return [];
 	},
 };
 
 // Enables setting minimum width of grid items.
-function GridLayoutMinimumWidthControl( { layout, onChange } ) {
+function GridLayoutMinimumWidthControl( {
+	layout,
+	onChange,
+}: LayoutControlProps ) {
 	const { minimumColumnWidth, columnCount, isManualPlacement } = layout;
 	const defaultValue = isManualPlacement || columnCount ? null : '12rem';
 	const value = minimumColumnWidth || defaultValue;
 	const [ quantity, unit = 'rem' ] =
-		parseQuantityAndUnitFromRawValue( value );
+		// A `null` value parses as no quantity.
+		parseQuantityAndUnitFromRawValue( value as string | undefined );
 
-	const handleSliderChange = ( next ) => {
+	const handleSliderChange = ( next?: number ) => {
 		onChange( {
 			...layout,
 			minimumColumnWidth: [ next, unit ].join( '' ),
@@ -364,17 +383,19 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 	};
 
 	// Mostly copied from HeightControl.
-	const handleUnitChange = ( newUnit ) => {
+	const handleUnitChange = ( newUnit?: string ) => {
 		// Attempt to smooth over differences between currentUnit and newUnit.
 		// This should slightly improve the experience of switching between unit types.
 		let newValue;
 
-		if ( [ 'em', 'rem' ].includes( newUnit ) && unit === 'px' ) {
+		// The unit control always passes a unit.
+		if ( [ 'em', 'rem' ].includes( newUnit as string ) && unit === 'px' ) {
 			// Convert pixel value to an approximate of the new unit, assuming a root size of 16px.
-			newValue = ( quantity / 16 ).toFixed( 2 ) + newUnit;
+			// An absent quantity converts to `NaN`, as before.
+			newValue = ( ( quantity as number ) / 16 ).toFixed( 2 ) + newUnit;
 		} else if ( [ 'em', 'rem' ].includes( unit ) && newUnit === 'px' ) {
 			// Convert to pixel value assuming a root size of 16px.
-			newValue = Math.round( quantity * 16 ) + newUnit;
+			newValue = Math.round( ( quantity as number ) * 16 ) + newUnit;
 		}
 
 		onChange( {
@@ -399,7 +420,8 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 							} );
 						} }
 						onUnitChange={ handleUnitChange }
-						value={ value }
+						// A `null` value shows an empty field.
+						value={ value as string | undefined }
 						units={ units }
 						min={ 0 }
 						label={ __( 'Minimum column width' ) }
@@ -432,7 +454,7 @@ function GridLayoutColumnsAndRowsControl( {
 	layout,
 	onChange,
 	allowSizingOnChildren,
-} ) {
+}: LayoutControlProps & { allowSizingOnChildren?: boolean } ) {
 	// Allow unsetting the column count in Auto mode.
 	const defaultColumnCount = undefined;
 	const {
@@ -460,7 +482,8 @@ function GridLayoutColumnsAndRowsControl( {
 								const newColumnCount =
 									value === '' || value === '0'
 										? defaultNewColumnCount
-										: parseInt( value, 10 );
+										: // Only an absent value is not a string.
+											parseInt( value as string, 10 );
 								onChange( {
 									...layout,
 									columnCount: newColumnCount,
@@ -481,13 +504,15 @@ function GridLayoutColumnsAndRowsControl( {
 									const newRowCount =
 										value === '' || value === '0'
 											? 1
-											: parseInt( value, 10 );
+											: // Only an absent value is not a string.
+												parseInt( value as string, 10 );
 									onChange( {
 										...layout,
 										rowCount: newRowCount,
 									} );
 								} }
-								value={ rowCount }
+								// A `null` count shows an empty field.
+								value={ rowCount as number | undefined }
 								min={ 1 }
 								label={ __( 'Rows' ) }
 							/>
@@ -498,7 +523,15 @@ function GridLayoutColumnsAndRowsControl( {
 									onChange( {
 										...layout,
 										columnCount:
-											value === '' || value === '0'
+											// The string checks are kept from before.
+											( value as
+												| number
+												| string
+												| undefined ) === '' ||
+											( value as
+												| number
+												| string
+												| undefined ) === '0'
 												? 1
 												: value,
 									} )
@@ -519,7 +552,7 @@ function GridLayoutColumnsAndRowsControl( {
 
 // Enables stretching grid columns to fill the available space (auto-fit)
 // instead of leaving empty tracks at the end of a row (auto-fill).
-function GridLayoutFillControl( { layout, onChange } ) {
+function GridLayoutFillControl( { layout, onChange }: LayoutControlProps ) {
 	const { autoFit = false } = layout;
 
 	return (
@@ -540,7 +573,7 @@ function GridLayoutFillControl( { layout, onChange } ) {
 }
 
 // Enables switching between grid types
-function GridLayoutTypeControl( { layout, onChange } ) {
+function GridLayoutTypeControl( { layout, onChange }: LayoutControlProps ) {
 	const { columnCount, rowCount, minimumColumnWidth, isManualPlacement } =
 		layout;
 
@@ -558,7 +591,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 
 	const gridPlacement = isManualPlacement ? 'manual' : 'auto';
 
-	const onChangeType = ( value ) => {
+	const onChangeType = ( value?: string | number ) => {
 		if ( value === 'manual' ) {
 			setTempMinimumColumnWidth( minimumColumnWidth || '12rem' );
 		} else {
