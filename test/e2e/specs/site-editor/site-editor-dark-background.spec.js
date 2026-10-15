@@ -20,7 +20,15 @@ test.describe( 'Site editor with dark background theme', () => {
 	test.describe( 'Site editor iframe body', () => {
 		test( 'Should have the is-dark-theme CSS class', async ( {
 			editor,
+			page,
 		} ) => {
+			// The v2 home shows the front end, so open its template first.
+			if ( isSiteEditorV2 ) {
+				await page
+					.getByRole( 'button', { name: 'Edit template' } )
+					.click();
+			}
+
 			const canvasBody = editor.canvas.locator( 'body' );
 
 			await expect( canvasBody ).toHaveClass( /is-dark-theme/ );
@@ -44,7 +52,15 @@ test.describe( 'Site editor with light background theme and theme variations', (
 	test.describe( 'Site editor iframe body', () => {
 		test( 'Should not have the is-dark-theme CSS class', async ( {
 			editor,
+			page,
 		} ) => {
+			// The v2 home shows the front end, so open its template first.
+			if ( isSiteEditorV2 ) {
+				await page
+					.getByRole( 'button', { name: 'Edit template' } )
+					.click();
+			}
+
 			const canvasBody = editor.canvas.locator( 'body' );
 
 			await expect( canvasBody ).not.toHaveClass( /is-dark-theme/ );

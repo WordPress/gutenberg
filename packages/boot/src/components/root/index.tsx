@@ -37,11 +37,17 @@ export default function Root() {
 	const routeContentModule = ( currentMatch?.loaderData as any )
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
+	const isStageShown = ( currentMatch?.loaderData as any )?.stage as
+		boolean | undefined;
 
 	useRouteTitle();
 
 	// Mobile sidebar state
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
+	const hasMobileDrawer =
+		isMobileViewport &&
+		( !! canvas?.isPreview ||
+			( canvas === null && isStageShown === false ) );
 	const [ isMobileSidebarOpen, setIsMobileSidebarOpen ] = useState( false );
 	const disableMotion = useReducedMotion();
 	// Close mobile sidebar on viewport resize and path change
@@ -170,34 +176,31 @@ export default function Root() {
 											className={ clsx( styles.canvas, {
 												[ styles[
 													'has-mobile-drawer'
-												] ]:
-													canvas?.isPreview &&
-													isMobileViewport,
+												] ]: hasMobileDrawer,
 											} ) }
 										>
-											{ canvas?.isPreview &&
-												isMobileViewport && (
-													<div
-														className={
-															styles[
-																'mobile-sidebar-drawer'
-															]
+											{ hasMobileDrawer && (
+												<div
+													className={
+														styles[
+															'mobile-sidebar-drawer'
+														]
+													}
+												>
+													<Button
+														icon={ menu }
+														onClick={ () =>
+															setIsMobileSidebarOpen(
+																true
+															)
 														}
-													>
-														<Button
-															icon={ menu }
-															onClick={ () =>
-																setIsMobileSidebarOpen(
-																	true
-																)
-															}
-															label={ __(
-																'Open navigation panel'
-															) }
-															size="compact"
-														/>
-													</div>
-												) }
+														label={ __(
+															'Open navigation panel'
+														) }
+														size="compact"
+													/>
+												</div>
+											) }
 											<ErrorBoundary>
 												<CanvasRenderer
 													canvas={ canvas }
