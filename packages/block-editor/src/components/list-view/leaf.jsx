@@ -4,6 +4,7 @@ import { __experimentalTreeGridRow as TreeGridRow } from '@wordpress/components'
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import useMovingAnimation from '../use-moving-animation';
+import useDropLandingAnimation from './use-drop-landing-animation';
 
 const AnimatedTreeGridRow = animated( TreeGridRow );
 
@@ -22,13 +23,25 @@ const ListViewLeaf = forwardRef(
 		},
 		ref
 	) => {
+		const clientId = props[ 'data-block' ];
+
 		const animationRef = useMovingAnimation( {
-			clientId: props[ 'data-block' ],
+			clientId,
 			enableAnimation: true,
 			triggerAnimationOnChange: path,
+			// Rows are already shown in their new positions while dragging,
+			// so they don't need to animate there on drop. The dragged row
+			// lands with `useDropLandingAnimation` instead.
+			animateWhileDragging: false,
 		} );
 
-		const mergedRef = useMergeRefs( [ ref, animationRef ] );
+		const landingRef = useDropLandingAnimation( {
+			clientId,
+			isDragged,
+			path,
+		} );
+
+		const mergedRef = useMergeRefs( [ ref, animationRef, landingRef ] );
 
 		return (
 			<AnimatedTreeGridRow

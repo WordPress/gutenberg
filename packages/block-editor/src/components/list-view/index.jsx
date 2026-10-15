@@ -372,7 +372,6 @@ function ListViewComponent(
 	return (
 		<AsyncModeProvider value>
 			<ListViewDropIndicatorPreview
-				draggedBlockClientId={ firstDraggedBlockClientId }
 				listViewRef={ elementRef }
 				blockDropTarget={ blockDropTarget }
 			/>

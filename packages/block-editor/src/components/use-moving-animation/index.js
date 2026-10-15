@@ -10,6 +10,15 @@ import { store as blockEditorStore } from '../../store';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
+/**
+ * Spring settings for the moving animation.
+ */
+export const MOVING_ANIMATION_CONFIG = {
+	mass: 5,
+	tension: 2000,
+	friction: 200,
+};
+
 function getAbsolutePosition( element ) {
 	return {
 		top: element.offsetTop,
@@ -28,11 +37,17 @@ function getAbsolutePosition( element ) {
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object} $1                          Options
- * @param {*}      $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
- * @param {string} $1.clientId
+ * @param {Object}  $1                          Options
+ * @param {*}       $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param {string}  $1.clientId
+ * @param {boolean} [$1.animateWhileDragging]   Whether to animate when the position changes while blocks
+ *                                              are being dragged, e.g. on drop. Defaults to true.
  */
-function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
+function useMovingAnimation( {
+	triggerAnimationOnChange,
+	clientId,
+	animateWhileDragging = true,
+} ) {
 	const ref = useRef();
 	const {
 		isTyping,
@@ -110,6 +125,12 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			return;
 		}
 
+		// Skip the animation when the caller has already shown where the
+		// element moves to while dragging.
+		if ( isDragging && ! animateWhileDragging ) {
+			return;
+		}
+
 		// Make sure the other blocks move under the selected block(s). This has to
 		// clear the in-block UI of the blocks being moved past (z-index 1 and 2),
 		// which a plain `1` ties with and loses to on DOM order. Matches
@@ -119,7 +140,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		const controller = new Controller( {
 			x: 0,
 			y: 0,
-			config: { mass: 5, tension: 2000, friction: 200 },
+			config: MOVING_ANIMATION_CONFIG,
 			onChange( { value } ) {
 				if ( ! ref.current ) {
 					return;
@@ -155,6 +176,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 	}, [
 		previous,
 		prevRect,
+		animateWhileDragging,
 		clientId,
 		isTyping,
 		getGlobalBlockCount,

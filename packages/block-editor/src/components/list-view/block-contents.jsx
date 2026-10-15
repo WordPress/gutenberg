@@ -1,7 +1,8 @@
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { useInsertedBlockClientId, useListViewContext } from './context';
+import ListViewDragChip, { getDragChipSnapshot } from './drag-chip';
 
 /**
  * Renders the additional block content for the row of the block that was just
@@ -48,6 +49,9 @@ const ListViewBlockContents = forwardRef(
 			? selectedClientIds
 			: [ clientId ];
 
+		const { listViewInstanceId, treeGridElementRef } = useListViewContext();
+		const [ dragChipSnapshot, setDragChipSnapshot ] = useState();
+
 		return (
 			<>
 				<InsertedBlockContent clientId={ clientId } />
@@ -55,6 +59,14 @@ const ListViewBlockContents = forwardRef(
 					appendToOwnerDocument
 					clientIds={ draggableClientIds }
 					cloneClassname="block-editor-list-view-draggable-chip"
+					dragComponent={
+						<ListViewDragChip
+							clientId={ clientId }
+							count={ draggableClientIds.length }
+							listViewInstanceId={ listViewInstanceId }
+							snapshot={ dragChipSnapshot }
+						/>
+					}
 				>
 					{ ( { draggable, onDragStart, onDragEnd } ) => (
 						<ListViewBlockSelectButton
@@ -64,7 +76,15 @@ const ListViewBlockContents = forwardRef(
 							onClick={ onClick }
 							onToggleExpanded={ onToggleExpanded }
 							draggable={ draggable }
-							onDragStart={ onDragStart }
+							onDragStart={ ( event ) => {
+								setDragChipSnapshot(
+									getDragChipSnapshot(
+										event,
+										treeGridElementRef?.current
+									)
+								);
+								onDragStart?.( event );
+							} }
 							onDragEnd={ onDragEnd }
 							isExpanded={ isExpanded }
 							{ ...props }
