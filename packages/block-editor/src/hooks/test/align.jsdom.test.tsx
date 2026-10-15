@@ -1,10 +1,12 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import type { ReactNode } from 'react';
 import { applyFilters } from '@wordpress/hooks';
 import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import type { BlockEditProps, BlockType } from '@wordpress/blocks';
 import { getValidAlignments, addAssignedAlign } from '../align';
 
 const noop = () => {};
@@ -15,7 +17,9 @@ describe( 'align', () => {
 		save: noop,
 		category: 'text',
 		title: 'block title',
-		edit: ( { children } ) => <>{ children }</>,
+		edit: ( { children }: BlockEditProps & { children?: ReactNode } ) => (
+			<>{ children }</>
+		),
 	};
 
 	afterEach( () => {
@@ -31,7 +35,10 @@ describe( 'align', () => {
 		);
 
 		it( 'should do nothing if the block settings does not define align support', () => {
-			const settings = filterRegisterBlockType( blockSettings );
+			// The filter returns the settings it is given.
+			const settings = filterRegisterBlockType(
+				blockSettings
+			) as Partial< BlockType >;
 
 			expect( settings.attributes ).toBeUndefined();
 		} );
@@ -42,7 +49,7 @@ describe( 'align', () => {
 				supports: {
 					align: true,
 				},
-			} );
+			} ) as Partial< BlockType >;
 
 			expect( settings.attributes ).toHaveProperty( 'align' );
 		} );
@@ -140,7 +147,11 @@ describe( 'align', () => {
 
 	describe( 'addAssignedAlign', () => {
 		it( 'should do nothing if block does not support align', () => {
-			registerBlockType( 'core/foo', blockSettings );
+			registerBlockType(
+				'core/foo',
+				// @ts-expect-error The test block defines no attributes.
+				blockSettings
+			);
 
 			const props = addAssignedAlign(
 				{
@@ -158,12 +169,16 @@ describe( 'align', () => {
 		} );
 
 		it( 'should do add align classname if block supports align', () => {
-			registerBlockType( 'core/foo', {
-				...blockSettings,
-				supports: {
-					align: true,
-				},
-			} );
+			registerBlockType(
+				'core/foo',
+				// @ts-expect-error The test block defines no attributes.
+				{
+					...blockSettings,
+					supports: {
+						align: true,
+					},
+				}
+			);
 
 			const props = addAssignedAlign(
 				{
