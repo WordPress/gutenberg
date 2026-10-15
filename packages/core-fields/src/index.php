@@ -7,7 +7,7 @@
  * registered in code, see register_core_post_type_supports_fields(). Their
  * definitions are the `field.php` files of the `post_type_supports` folder. The
  * post types whose fields differ from the defaults unregister the ones they
- * do not get, as a plugin would, see register_core_field_collections().
+ * do not get, as a plugin would, see wp_register_core_field_collections().
  *
  * The fields of a single entity, a post type or the site, are declarative
  * collections, the other folders next to this file, see
@@ -44,7 +44,7 @@
  * - `title`, for the post types supporting `title`.
  *
  * It makes no exception for any post type: the fields a post type does not
- * get are unregistered afterwards, see register_core_field_collections().
+ * get are unregistered afterwards, see wp_register_core_field_collections().
  *
  * Only some fields have JavaScript parts, but every field is registered
  * with the script module of the folder: a post type supporting only
@@ -101,7 +101,7 @@ function register_core_post_type_supports_fields() {
  *
  * @since 7.2.0
  */
-function register_core_field_collections() {
+function wp_register_core_field_collections() {
 	// Defaults registered for all post types based on their supports.
 	register_core_post_type_supports_fields();
 
@@ -131,4 +131,4 @@ function register_core_field_collections() {
 	// Register fields for root/site (entity/kind).
 	wp_register_entity_field_collection( __DIR__ . '/root_site' );
 }
-add_action( 'wp_entity_fields_api_init', 'register_core_field_collections', 0 );
+add_action( 'wp_entity_fields_api_init', 'wp_register_core_field_collections', 0 );

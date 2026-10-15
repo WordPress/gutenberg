@@ -52,7 +52,7 @@ And each folder of fields may have:
 
 It reads their definitions with `wp_get_entity_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_type_supports` module.
 
-It makes no exception for any post type. A post type whose fields differ from the defaults unregisters the ones it does not get, once they are registered. Core does it like a plugin would, in `register_core_field_collections()` in `src/index.php`, after the defaults are registered and before the collection of the post type is:
+It makes no exception for any post type. A post type whose fields differ from the defaults unregisters the ones it does not get, once they are registered. Core does it like a plugin would, in `wp_register_core_field_collections()` in `src/index.php`, after the defaults are registered and before the collection of the post type is:
 
 - Templates and template parts unregister `author`, which the `wp_template` and `wp_template_part` collections define for them.
 - Templates, template parts, and patterns unregister `excerpt`, which is their description. The template and pattern collections define their own description fields.
@@ -85,7 +85,7 @@ There is no precedence between collections: the registry skips a field already r
 
 ### Loading
 
-`src/index.php` registers the core fields through the public Entity fields API, exactly as a plugin registers its own. `register_core_field_collections()` runs on the `wp_entity_fields_api_init` action at priority 0: it registers the defaults first, unregisters the ones the core post types do not get, then calls `wp_register_entity_field_collection()` for each collection, listed explicitly. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
+`src/index.php` registers the core fields through the public Entity fields API, exactly as a plugin registers its own. `wp_register_core_field_collections()` runs on the `wp_entity_fields_api_init` action at priority 0: it registers the defaults first, unregisters the ones the core post types do not get, then calls `wp_register_entity_field_collection()` for each collection, listed explicitly. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
 
 `wp_register_entity_field_collection( $directory )` reads one collection and registers its fields, after the fields registered on the entity before, in the alphabetical order of their folders. Like `wp_register_entity_fields()`, it only runs on the `wp_entity_fields_api_init` action. Like the registry, it does not check that the entity exists: the `/wp/v2/entity-fields` route only serves the fields of the entities the REST API exposes. It returns whether the collection is valid and the registry accepted all of its fields.
 
