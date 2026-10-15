@@ -349,7 +349,7 @@ The returned value is used to change the inner content of the element: `<div>val
 
 ### `wp-html`
 
-It sets the inner HTML of an element from a value created with `asDangerousHTML()`, exported from `@wordpress/interactivity`. Because rendering arbitrary HTML is a security concern, a plain string is never rendered as HTML, by design: the plugin's JavaScript has to explicitly opt in. The server doesn't process this directive, so the element's server-rendered content is the fallback until hydration.
+It sets the inner HTML of an element from a value created with `asDangerousHTML()`, exported from `@wordpress/interactivity`. Because rendering arbitrary HTML is a security concern, a plain string is never rendered as HTML, by design: the plugin's JavaScript has to explicitly opt in.
 
 ```html
 <div data-wp-interactive="myPlugin">
@@ -386,7 +386,7 @@ To keep showing the fallback, return a pending value, not `null`. After [client-
 
 #### Inert content
 
-Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Router regions nested in the content aren't excluded from [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md) yet. Outside any interactive region, the attribute does nothing and the element is plain markup.
+Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup.
 
 #### Conflicts with other directives
 
