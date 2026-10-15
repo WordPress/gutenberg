@@ -1,8 +1,14 @@
+import type { ComponentType } from 'react';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import type { Color } from '@wordpress/global-styles-engine';
 import { useSettings } from '../use-settings';
+import type { WithColorContextProps } from './types';
 
-export default createHigherOrderComponent( ( WrappedComponent ) => {
-	return function WithColorContext( props ) {
+type Inner = ComponentType< WithColorContextProps >;
+type Palette = Color[] | undefined;
+
+export default createHigherOrderComponent( ( WrappedComponent: Inner ) => {
+	return function WithColorContext( props: WithColorContextProps ) {
 		// Get the default colors, theme colors, and custom colors
 		const [
 			defaultColors,
@@ -18,13 +24,17 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 			'color.defaultPalette'
 		);
 
+		// The settings list the palettes' colors.
 		const _colors = enableDefaultColors
 			? [
-					...( themeColors || [] ),
-					...( defaultColors || [] ),
-					...( customColors || [] ),
+					...( ( themeColors as Palette ) || [] ),
+					...( ( defaultColors as Palette ) || [] ),
+					...( ( customColors as Palette ) || [] ),
 				]
-			: [ ...( themeColors || [] ), ...( customColors || [] ) ];
+			: [
+					...( ( themeColors as Palette ) || [] ),
+					...( ( customColors as Palette ) || [] ),
+				];
 
 		const { colors = _colors, disableCustomColors = ! enableCustomColors } =
 			props;
