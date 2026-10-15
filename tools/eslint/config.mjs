@@ -9,6 +9,7 @@ import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import useTypeScript from './rules/use-typescript.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -16,6 +17,11 @@ import {
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const gutenbergPlugin = {
+	rules: {
+		'use-typescript': useTypeScript,
+	},
+};
 const gutenbergStorybookPlugin = {
 	rules: {
 		'no-non-module-stylesheet-imports': require( '../../storybook/eslint/no-non-module-stylesheet-imports.js' ),
@@ -108,6 +114,19 @@ const typedFiles = globSync( 'packages/*/package.json', {
 	.sort()
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
+
+/*
+ * Source and test trees of the packages wired into the TypeScript program.
+ * Routes keep their sources at the package root.
+ */
+const typeScriptOnlyFiles = [
+	...globSync( 'packages/*/tsconfig.json', { cwd: rootDir, posix: true } )
+		.sort()
+		.map( ( fileName ) =>
+			fileName.replace( 'tsconfig.json', '@(src|test)/**/*.{js,jsx}' )
+		),
+	'routes/*/**/*.{js,jsx}',
+];
 
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
@@ -527,6 +546,18 @@ export default dedupePlugins( [
 					} ),
 				},
 			],
+		},
+	},
+
+	// Override: TypeScript-only packages. Existing JavaScript files are
+	// suppressed, so only new ones fail.
+	{
+		files: typeScriptOnlyFiles,
+		plugins: {
+			gutenberg: gutenbergPlugin,
+		},
+		rules: {
+			'gutenberg/use-typescript': 'error',
 		},
 	},
 
