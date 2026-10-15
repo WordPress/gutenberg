@@ -91,19 +91,35 @@ describe( 'It should serialize a gradient', () => {
 
 	test( 'serializeGradientOrientation', () => {
 		expect(
-			serializeGradientOrientation( { type: 'angular', value: '40' } )
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '40',
+				unit: 'deg',
+			} )
 		).toBe( '40deg' );
 
 		expect(
-			serializeGradientOrientation( { type: 'angular', value: '0' } )
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '0',
+				unit: 'deg',
+			} )
 		).toBe( '0deg' );
+
+		expect(
+			serializeGradientOrientation( {
+				type: 'angular',
+				value: '0.25',
+				unit: 'turn',
+			} )
+		).toBe( '0.25turn' );
 	} );
 
 	test( 'serializeGradient', () => {
 		expect(
 			serializeGradient( {
 				type: 'linear-gradient',
-				orientation: { type: 'angular', value: '40' },
+				orientation: { type: 'angular', value: '40', unit: 'deg' },
 				colorStops: [
 					{
 						type: 'rgba',
@@ -160,7 +176,7 @@ describe( 'It should serialize a gradient', () => {
 		expect(
 			serializeGradient( {
 				type: 'linear-gradient',
-				orientation: { type: 'angular', value: '0' },
+				orientation: { type: 'angular', value: '0', unit: 'deg' },
 				colorStops: [
 					{
 						type: 'rgba',
