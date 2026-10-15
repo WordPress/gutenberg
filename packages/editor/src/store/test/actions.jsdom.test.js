@@ -926,6 +926,12 @@ describe( 'Post actions', () => {
 	describe( 'restoreRevision()', () => {
 		const revisionId = 12;
 
+		// Remove the filters added by tests, including when a test fails.
+		afterEach( () => {
+			removeFilter( 'editor.preSavePost', 'test/stop-save' );
+			removeFilter( 'editor.preSavePost', 'test/hold-save' );
+		} );
+
 		const revision = {
 			id: revisionId,
 			date: '2026-10-13T10:00:00',
@@ -1104,7 +1110,6 @@ describe( 'Post actions', () => {
 			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
 				revisionId
 			);
-			removeFilter( 'editor.preSavePost', 'test/stop-save' );
 
 			expect( savedData ).toHaveLength( 0 );
 			expect(
@@ -1204,7 +1209,6 @@ describe( 'Post actions', () => {
 			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
 				revisionId
 			);
-			removeFilter( 'editor.preSavePost', 'test/hold-save' );
 
 			expect(
 				registry.select( editorStore ).getEditedPostContent()
