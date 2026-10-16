@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { findTransform, pasteHandler } from '@wordpress/blocks';
 import { parseDropEvent, onFilesDrop, onHTMLDrop, onBlockDrop } from '..';
 
@@ -28,7 +29,9 @@ describe( 'parseDropEvent', () => {
 			},
 		};
 
-		expect( parseDropEvent( event ) ).toEqual( rawDataTransfer );
+		expect( parseDropEvent( event as unknown as DragEvent ) ).toEqual(
+			rawDataTransfer
+		);
 	} );
 
 	it( 'defaults any missing values to null', () => {
@@ -44,7 +47,7 @@ describe( 'parseDropEvent', () => {
 			},
 		};
 
-		expect( parseDropEvent( event ) ).toEqual( {
+		expect( parseDropEvent( event as unknown as DragEvent ) ).toEqual( {
 			srcRootClientId: null,
 			srcIndex: null,
 			blocks: null,
@@ -68,7 +71,9 @@ describe( 'parseDropEvent', () => {
 			},
 		};
 
-		expect( parseDropEvent( event ) ).toEqual( expected );
+		expect( parseDropEvent( event as unknown as DragEvent ) ).toEqual(
+			expected
+		);
 	} );
 
 	it( 'returns an object with null values if the event has no dataTransfer property', () => {
@@ -81,7 +86,9 @@ describe( 'parseDropEvent', () => {
 		};
 		const event = {};
 
-		expect( parseDropEvent( event ) ).toEqual( expected );
+		expect( parseDropEvent( event as unknown as DragEvent ) ).toEqual(
+			expected
+		);
 	} );
 } );
 
@@ -89,8 +96,8 @@ describe( 'onBlockDrop', () => {
 	it( 'does nothing if the event is not a block type drop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
-		const getBlockIndex = noop;
-		const getClientIdsOfDescendants = noop;
+		const getBlockIndex = noop as () => number;
+		const getClientIdsOfDescendants = noop as () => string[];
 		const moveBlocks = vi.fn();
 
 		const event = {
@@ -103,6 +110,7 @@ describe( 'onBlockDrop', () => {
 			},
 		};
 
+		// @ts-expect-error The remaining arguments are not read by these drops.
 		const eventHandler = onBlockDrop(
 			targetRootClientId,
 			targetBlockIndex,
@@ -110,7 +118,7 @@ describe( 'onBlockDrop', () => {
 			getClientIdsOfDescendants,
 			moveBlocks
 		);
-		eventHandler( event );
+		eventHandler( event as unknown as DragEvent );
 
 		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
@@ -120,7 +128,7 @@ describe( 'onBlockDrop', () => {
 		const targetBlockIndex = 0;
 		// Target and source block index is the same.
 		const getBlockIndex = vi.fn( () => targetBlockIndex );
-		const getClientIdsOfDescendants = noop;
+		const getClientIdsOfDescendants = noop as () => string[];
 		const moveBlocks = vi.fn();
 
 		const event = {
@@ -136,6 +144,7 @@ describe( 'onBlockDrop', () => {
 			},
 		};
 
+		// @ts-expect-error The remaining arguments are not read by these drops.
 		const eventHandler = onBlockDrop(
 			targetRootClientId,
 			targetBlockIndex,
@@ -143,7 +152,7 @@ describe( 'onBlockDrop', () => {
 			getClientIdsOfDescendants,
 			moveBlocks
 		);
-		eventHandler( event );
+		eventHandler( event as unknown as DragEvent );
 
 		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
@@ -152,7 +161,7 @@ describe( 'onBlockDrop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		const getBlockIndex = vi.fn( () => 6 );
-		const getClientIdsOfDescendants = noop;
+		const getClientIdsOfDescendants = noop as () => string[];
 		const moveBlocks = vi.fn();
 
 		const event = {
@@ -168,6 +177,7 @@ describe( 'onBlockDrop', () => {
 			},
 		};
 
+		// @ts-expect-error The remaining arguments are not read by these drops.
 		const eventHandler = onBlockDrop(
 			targetRootClientId,
 			targetBlockIndex,
@@ -175,7 +185,7 @@ describe( 'onBlockDrop', () => {
 			getClientIdsOfDescendants,
 			moveBlocks
 		);
-		eventHandler( event );
+		eventHandler( event as unknown as DragEvent );
 
 		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
@@ -200,6 +210,7 @@ describe( 'onBlockDrop', () => {
 			},
 		};
 
+		// @ts-expect-error The remaining arguments are not read by these drops.
 		const eventHandler = onBlockDrop(
 			targetRootClientId,
 			targetBlockIndex,
@@ -207,7 +218,7 @@ describe( 'onBlockDrop', () => {
 			getClientIdsOfDescendants,
 			moveBlocks
 		);
-		eventHandler( event );
+		eventHandler( event as unknown as DragEvent );
 
 		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
@@ -218,7 +229,7 @@ describe( 'onBlockDrop', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;
 		const getBlockIndex = vi.fn( () => 1 );
-		const getClientIdsOfDescendants = () => [];
+		const getClientIdsOfDescendants = (): string[] => [];
 		const moveBlocks = vi.fn();
 
 		const event = {
@@ -233,6 +244,7 @@ describe( 'onBlockDrop', () => {
 			},
 		};
 
+		// @ts-expect-error The remaining arguments are not read by these drops.
 		const eventHandler = onBlockDrop(
 			targetRootClientId,
 			targetBlockIndex,
@@ -240,7 +252,7 @@ describe( 'onBlockDrop', () => {
 			getClientIdsOfDescendants,
 			moveBlocks
 		);
-		eventHandler( event );
+		eventHandler( event as unknown as DragEvent );
 
 		expect( moveBlocks ).toHaveBeenCalledWith(
 			sourceClientIds,
@@ -256,7 +268,7 @@ describe( 'onBlockDrop', () => {
 		const targetBlockIndex = 5;
 		const getBlockIndex = vi.fn( () => 1 );
 		// Dragged block is being dropped as a descendant of itself.
-		const getClientIdsOfDescendants = () => [];
+		const getClientIdsOfDescendants = (): string[] => [];
 		const moveBlocks = vi.fn();
 
 		const event = {
@@ -274,6 +286,7 @@ describe( 'onBlockDrop', () => {
 
 		const insertIndex = targetBlockIndex - sourceClientIds.length;
 
+		// @ts-expect-error The remaining arguments are not read by these drops.
 		const eventHandler = onBlockDrop(
 			targetRootClientId,
 			targetBlockIndex,
@@ -281,7 +294,7 @@ describe( 'onBlockDrop', () => {
 			getClientIdsOfDescendants,
 			moveBlocks
 		);
-		eventHandler( event );
+		eventHandler( event as unknown as DragEvent );
 
 		expect( moveBlocks ).toHaveBeenCalledWith(
 			sourceClientIds,
@@ -294,7 +307,7 @@ describe( 'onBlockDrop', () => {
 describe( 'onFilesDrop', () => {
 	it( 'does nothing if hasUploadPermissions is false', () => {
 		const updateBlockAttributes = vi.fn();
-		const canInsertBlockType = noop;
+		const canInsertBlockType = noop as () => boolean;
 		const insertOrReplaceBlocks = vi.fn();
 		const targetRootClientId = '1';
 		const getSettings = vi.fn( () => ( {} ) );
@@ -306,6 +319,7 @@ describe( 'onFilesDrop', () => {
 			canInsertBlockType,
 			insertOrReplaceBlocks
 		);
+		// @ts-expect-error The handler returns before reading the files.
 		onFileDropHandler();
 
 		expect( findTransform ).not.toHaveBeenCalled();
@@ -315,10 +329,10 @@ describe( 'onFilesDrop', () => {
 	it( 'does nothing if the block has no matching file transforms', () => {
 		// Test the scenario of 'no transforms' by mocking findTransform
 		// to have no return value.
-		findTransform.mockImplementation( noop );
+		( findTransform as Mock ).mockImplementation( noop );
 		const updateBlockAttributes = noop;
 		const insertOrReplaceBlocks = vi.fn();
-		const canInsertBlockType = noop;
+		const canInsertBlockType = noop as () => boolean;
 		const targetRootClientId = '1';
 		const getSettings = vi.fn( () => ( {
 			mediaUpload: true,
@@ -331,6 +345,7 @@ describe( 'onFilesDrop', () => {
 			canInsertBlockType,
 			insertOrReplaceBlocks
 		);
+		// @ts-expect-error The handler returns before reading the files.
 		onFileDropHandler();
 
 		expect( findTransform ).toHaveBeenCalled();
@@ -343,9 +358,9 @@ describe( 'onFilesDrop', () => {
 		// function that returns a value.
 		const blocks = 'blocks';
 		const transformation = { transform: vi.fn( () => blocks ) };
-		findTransform.mockImplementation( () => transformation );
+		( findTransform as Mock ).mockImplementation( () => transformation );
 		const updateBlockAttributes = noop;
-		const canInsertBlockType = noop;
+		const canInsertBlockType = noop as () => boolean;
 		const insertOrReplaceBlocks = vi.fn();
 		const targetRootClientId = '1';
 		const getSettings = vi.fn( () => ( {
@@ -360,7 +375,7 @@ describe( 'onFilesDrop', () => {
 			insertOrReplaceBlocks
 		);
 		const files = 'test';
-		onFileDropHandler( files );
+		onFileDropHandler( files as unknown as File[] );
 
 		expect( findTransform ).toHaveBeenCalled();
 		expect( transformation.transform ).toHaveBeenCalledWith(
@@ -373,10 +388,11 @@ describe( 'onFilesDrop', () => {
 
 describe( 'onHTMLDrop', () => {
 	it( 'does nothing if the HTML cannot be converted into blocks', () => {
-		pasteHandler.mockImplementation( () => [] );
+		( pasteHandler as Mock ).mockImplementation( () => [] );
 		const insertOrReplaceBlocks = vi.fn();
 
 		const eventHandler = onHTMLDrop( insertOrReplaceBlocks );
+		// @ts-expect-error The mocked paste handler ignores the HTML.
 		eventHandler();
 
 		expect( insertOrReplaceBlocks ).not.toHaveBeenCalled();
@@ -384,10 +400,11 @@ describe( 'onHTMLDrop', () => {
 
 	it( 'inserts blocks if the HTML can be converted into blocks', () => {
 		const blocks = [ 'blocks' ];
-		pasteHandler.mockImplementation( () => blocks );
+		( pasteHandler as Mock ).mockImplementation( () => blocks );
 		const insertOrReplaceBlocks = vi.fn();
 
 		const eventHandler = onHTMLDrop( insertOrReplaceBlocks );
+		// @ts-expect-error The mocked paste handler ignores the HTML.
 		eventHandler();
 
 		expect( insertOrReplaceBlocks ).toHaveBeenCalledWith( blocks );
