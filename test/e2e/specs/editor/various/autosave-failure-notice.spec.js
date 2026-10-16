@@ -4,7 +4,7 @@ const {
 } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const AUTOSAVE_FAILED =
-	'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.';
+	'Auto-save failed. Keep this page open and save manually.';
 
 const UPDATING_FAILED_OFFLINE =
 	'Updating failed because you were offline. Please verify your connection and try again.';
@@ -174,7 +174,7 @@ test.describe( 'Autosave failure notice', () => {
 		await autosaveFailure.autosave();
 		await context.setOffline( false );
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			'Auto-save failed because you were offline. We’ll try to save a backup in this browser. Please verify your connection and save manually.',
+			'Auto-save failed because you were offline. Keep this page open and save manually once you’re back online.',
 		] );
 	} );
 
