@@ -48,6 +48,26 @@ describe( 'MediaPlaceholder types', () => {
 		expect( [ single, gallery ] ).toHaveLength( 2 );
 	} );
 
+	it( 'accepts inline media with metadata', () => {
+		const onSelect: ( media: unknown ) => void = () => {};
+
+		const single = (
+			<FilteredMediaPlaceholder
+				value={ { id: 1, url: 'a.png', alt: 'Description' } }
+				onSelect={ onSelect }
+			/>
+		);
+		const gallery = (
+			<FilteredMediaPlaceholder
+				value={ [ { id: 1, url: 'a.png', alt: 'Description' } ] }
+				onSelect={ onSelect }
+				multiple
+			/>
+		);
+
+		expect( [ single, gallery ] ).toHaveLength( 2 );
+	} );
+
 	it( 'passes the files to onSelect when they are not uploaded', () => {
 		const onSelectImage: ( media: Image ) => void = () => {};
 		const onSelectImageOrFiles: (

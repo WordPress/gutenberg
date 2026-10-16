@@ -19,11 +19,13 @@ export interface MediaPlaceholderMedia {
 /**
  * Props of `MediaPlaceholder`, except the upload handling.
  */
-interface MediaPlaceholderBaseProps {
+interface MediaPlaceholderBaseProps<
+	Value extends MediaPlaceholderMedia = MediaPlaceholderMedia,
+> {
 	/**
 	 * Media item, or items of a gallery, selected when the library opens.
 	 */
-	value?: MediaPlaceholderMedia | MediaPlaceholderMedia[];
+	value?: Value | Value[];
 	/**
 	 * Media types to allow, either a general mime type such as 'image' or a
 	 * complete one such as 'image/gif'. All are allowed when unset.
@@ -95,33 +97,35 @@ interface MediaPlaceholderBaseProps {
  * Props of `MediaPlaceholder`. The shape of the media comes from the upload
  * and media library implementations and is supplied by the caller.
  */
-export type MediaPlaceholderProps< Media = unknown > =
-	MediaPlaceholderBaseProps &
-		(
-			| {
-					/**
-					 * Whether to upload selected files.
-					 */
-					handleUpload?: true;
-					/**
-					 * Called with the selected or uploaded media.
-					 */
-					onSelect: ( media: Media ) => void;
-			  }
-			| {
-					/**
-					 * Whether to upload selected files, or a function that
-					 * decides it.
-					 */
-					handleUpload:
-						boolean | ( ( files: ArrayLike< File > ) => boolean );
-					/**
-					 * Called with the selected or uploaded media, or with the
-					 * selected files when they are not uploaded.
-					 */
-					onSelect: ( media: Media | ArrayLike< File > ) => void;
-			  }
-		);
+export type MediaPlaceholderProps<
+	Media = unknown,
+	Value extends MediaPlaceholderMedia = MediaPlaceholderMedia,
+> = MediaPlaceholderBaseProps< Value > &
+	(
+		| {
+				/**
+				 * Whether to upload selected files.
+				 */
+				handleUpload?: true;
+				/**
+				 * Called with the selected or uploaded media.
+				 */
+				onSelect: ( media: Media ) => void;
+		  }
+		| {
+				/**
+				 * Whether to upload selected files, or a function that
+				 * decides it.
+				 */
+				handleUpload:
+					boolean | ( ( files: ArrayLike< File > ) => boolean );
+				/**
+				 * Called with the selected or uploaded media, or with the
+				 * selected files when they are not uploaded.
+				 */
+				onSelect: ( media: Media | ArrayLike< File > ) => void;
+		  }
+	);
 
 /**
  * Props of the popover inserting media from a URL.

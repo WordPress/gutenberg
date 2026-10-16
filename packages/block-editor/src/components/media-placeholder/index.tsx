@@ -592,6 +592,9 @@ export function MediaPlaceholder( {
  */
 export default withFilters( 'editor.MediaPlaceholder' )(
 	MediaPlaceholder
-) as unknown as < Media = unknown >(
-	props: MediaPlaceholderProps< Media >
+) as unknown as <
+	Media = unknown,
+	Value extends MediaPlaceholderMedia = MediaPlaceholderMedia,
+>(
+	props: MediaPlaceholderProps< Media, Value >
 ) => ReactNode; // `withFilters` erases the props of the filtered component.
