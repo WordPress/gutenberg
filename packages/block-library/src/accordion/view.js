@@ -4,23 +4,22 @@ import { store, getContext } from '@wordpress/interactivity';
 // This is used to prevent the hash from being handled multiple times.
 let hashHandled = false;
 
-const { actions } = store(
+const { state, actions } = store(
 	'core/accordion',
 	{
 		state: {
 			get isOpen() {
-				const { id, accordionItems } = getContext();
+				const { id, accordionItems, openByDefault } = getContext();
 				const accordionItem = accordionItems.find(
 					( item ) => item.id === id
 				);
-				return accordionItem ? accordionItem.isOpen : false;
+				// Until the item registers itself on init, fall back to the
+				// initial state so hydration matches the server-rendered
+				// markup and no layout shift occurs.
+				return accordionItem ? accordionItem.isOpen : openByDefault;
 			},
 			get isHidden() {
-				const { id, accordionItems } = getContext();
-				const accordionItem = accordionItems.find(
-					( item ) => item.id === id
-				);
-				return accordionItem?.isOpen ? null : 'until-found';
+				return state.isOpen ? null : 'until-found';
 			},
 		},
 		actions: {
