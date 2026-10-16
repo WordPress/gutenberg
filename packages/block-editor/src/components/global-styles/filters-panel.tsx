@@ -14,6 +14,8 @@ import { __, _x } from '@wordpress/i18n';
 import { useCallback, useMemo, useRef } from '@wordpress/element';
 import { reset as resetIcon } from '@wordpress/icons';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import type { ComponentProps } from 'react';
+import type { Color, Duotone } from '@wordpress/global-styles-engine';
 import {
 	useToolsPanelDropdownMenuProps,
 	useToolsPanelItemPopoverProps,
@@ -26,11 +28,24 @@ import {
 	InheritanceResetButton,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
+import type {
+	FiltersPanelProps,
+	PanelResetAllFilter,
+	StyleSettings,
+	StyleToolsPanelProps,
+	StyleValue,
+} from './types';
 
-const EMPTY_ARRAY = [];
-function useMultiOriginColorPresets(
-	settings,
-	{ presetSetting, defaultSetting }
+const EMPTY_ARRAY: never[] = [];
+function useMultiOriginColorPresets< K extends 'duotone' | 'palette' >(
+	settings: StyleSettings | undefined,
+	{
+		presetSetting,
+		defaultSetting,
+	}: {
+		presetSetting: K;
+		defaultSetting: 'defaultDuotone' | 'defaultPalette';
+	}
 ) {
 	const disableDefault = ! settings?.color?.[ defaultSetting ];
 	const userPresets =
@@ -40,24 +55,28 @@ function useMultiOriginColorPresets(
 	const defaultPresets =
 		settings?.color?.[ presetSetting ]?.default || EMPTY_ARRAY;
 	return useMemo(
-		() => [
-			...userPresets,
-			...themePresets,
-			...( disableDefault ? EMPTY_ARRAY : defaultPresets ),
-		],
+		() =>
+			// The presets of a setting are all of its kind.
+			[
+				...userPresets,
+				...themePresets,
+				...( disableDefault ? EMPTY_ARRAY : defaultPresets ),
+			] as ( K extends 'duotone' ? Duotone : Color )[],
 		[ disableDefault, userPresets, themePresets, defaultPresets ]
 	);
 }
 
-export function useHasFiltersPanel( settings ) {
+export function useHasFiltersPanel( settings: StyleSettings ) {
 	return useHasDuotoneControl( settings );
 }
 
-function useHasDuotoneControl( settings ) {
+function useHasDuotoneControl( settings: StyleSettings ) {
+	// The filters panel gets resolved color settings. An object of presets
+	// has no length, so it reads as none.
 	return (
-		settings.color.customDuotone ||
-		settings.color.defaultDuotone ||
-		settings.color.duotone.length > 0
+		settings.color!.customDuotone ||
+		settings.color!.defaultDuotone ||
+		( settings.color!.duotone as unknown[] ).length > 0
 	);
 }
 
@@ -67,7 +86,7 @@ function FiltersToolsPanel( {
 	value,
 	panelId,
 	children,
-} ) {
+}: StyleToolsPanelProps ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -86,11 +105,17 @@ function FiltersToolsPanel( {
 	);
 }
 
-const DEFAULT_CONTROLS = {
+const DEFAULT_CONTROLS: Record< string, boolean > = {
 	duotone: true,
 };
 
-const LabeledColorIndicator = ( { indicator, label } ) => (
+const LabeledColorIndicator = ( {
+	indicator,
+	label,
+}: {
+	indicator?: string[] | 'unset';
+	label: string;
+} ) => (
 	<Stack
 		className="block-editor-panel-duotone-settings__label-row"
 		direction="row"
@@ -112,10 +137,22 @@ const LabeledColorIndicator = ( { indicator, label } ) => (
 	</Stack>
 );
 
-const renderToggle = ( duotone, resetConfig ) =>
-	function Toggle( { onToggle, isOpen } ) {
+const renderToggle = (
+	duotone: string[] | 'unset' | undefined,
+	resetConfig: {
+		hasLocalValue: boolean;
+		hasLocalOverride: boolean;
+		onReset: () => void;
+	}
+) =>
+	function Toggle( {
+		onToggle,
+		isOpen,
+	}: Parameters<
+		ComponentProps< typeof Dropdown >[ 'renderToggle' ]
+	>[ 0 ] ) {
 		const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
-		const duotoneButtonRef = useRef( undefined );
+		const duotoneButtonRef = useRef< HTMLButtonElement >( undefined );
 
 		const toggleProps = {
 			onClick: onToggle,
@@ -172,17 +209,22 @@ export default function FiltersPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
-} ) {
+}: FiltersPanelProps ) {
 	const popoverProps = {
 		...useToolsPanelItemPopoverProps(),
 		className: 'block-editor-duotone-control__popover',
 		headerTitle: __( 'Duotone' ),
 	};
-	const decodeValue = ( rawValue ) =>
-		getValueFromVariable( { settings }, '', rawValue );
+	const decodeValue = ( rawValue: StyleValue | string[] ) =>
+		// A color array is returned as is.
+		getValueFromVariable( { settings }, '', rawValue as StyleValue );
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
-	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
+	const inheritanceProps = (
+		isInherited: boolean,
+		hasLocalOverride: boolean,
+		className?: string
+	) =>
 		getInheritanceProps(
 			showInheritanceLabelIndicators && isInherited,
 			showInheritanceLabelIndicators && hasLocalOverride,
@@ -204,15 +246,18 @@ export default function FiltersPanel( {
 	const duotone = localDuotone ?? inheritedDuotone;
 	// Read from the raw value, since decoding resolves a preset reference to
 	// its colors and two presets can hold the same pair.
-	const localDuotoneSlug = getDuotoneSlugFromPreset( value?.filter?.duotone );
+	// Duotone styles are preset references or colors.
+	const localDuotoneSlug = getDuotoneSlugFromPreset(
+		value?.filter?.duotone as string | string[] | undefined
+	);
 	const inheritedDuotoneSlug = getDuotoneSlugFromPreset(
-		inheritedValue?.filter?.duotone
+		inheritedValue?.filter?.duotone as string | string[] | undefined
 	);
 	const duotoneSlug =
 		localDuotone !== undefined ? localDuotoneSlug : inheritedDuotoneSlug;
 	const isDuotonePlaceholder =
 		localDuotone === undefined && inheritedDuotone !== undefined;
-	const setDuotone = ( newValue, slug ) => {
+	const setDuotone = ( newValue?: string[] | 'unset', slug?: string ) => {
 		// A slug identifies the picked preset exactly. Falling back to a value
 		// match cannot tell two presets holding the same colors apart.
 		const presetSlug =
@@ -227,7 +272,11 @@ export default function FiltersPanel( {
 	};
 	// Commit the inherited value when the user clicks the active preset
 	// while the picker is showing inherited duotone at rest.
-	const setDuotoneWithInheritedCommit = ( newValue, index, slug ) => {
+	const setDuotoneWithInheritedCommit = (
+		newValue?: string[] | 'unset',
+		index?: number,
+		slug?: string
+	) => {
 		if (
 			newValue === undefined &&
 			isDuotonePlaceholder &&
@@ -246,15 +295,19 @@ export default function FiltersPanel( {
 		hasDuotone() &&
 		inheritedDuotone !== undefined;
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			filter: {
-				...previousValue.filter,
-				duotone: undefined,
-			},
-		};
-	}, [] );
+	const resetAllFilter: PanelResetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				filter: {
+					// Reset all passes the current styles.
+					...previousValue!.filter,
+					duotone: undefined,
+				},
+			};
+		},
+		[]
+	);
 
 	return (
 		<Wrapper
