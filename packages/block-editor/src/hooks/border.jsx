@@ -557,9 +557,7 @@ function useBlockProps( { name, clientId, borderColor, style } ) {
 				select( blockEditorStore );
 			const attrs = getBlockAttributes( clientId );
 			const blockNode =
-				getSettings()?.[ globalStylesDataKey ]?.styles?.blocks?.[
-					name
-				];
+				getSettings()?.[ globalStylesDataKey ]?.blocks?.[ name ];
 			const registeredStyles =
 				select( blocksStore ).getBlockStyles( name );
 			const variationName = getVariationNameFromClass(
