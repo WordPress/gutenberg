@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Internal
+
+-   `MediaEdit`: Use the design system focus ring, which the copy in `@wordpress/fields` received in [#83854](https://github.com/WordPress/gutenberg/pull/83854) after the private API was added.
+
 ## 5.57.0 (2026-10-07)
 
 ### Bug Fixes

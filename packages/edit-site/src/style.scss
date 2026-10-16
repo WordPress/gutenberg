@@ -2,7 +2,6 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/default-custom-properties";
 @use "@wordpress/dataviews/build-style/style.css" as dataviews;
-@use "@wordpress/fields/build-style/style.css" as fields;
 @use "@wordpress/global-styles-ui/build-style/style.css" as global-styles-ui;
 @use "./components/add-new-template/style.scss" as *;
 @use "./components/block-editor/style.scss" as *;
