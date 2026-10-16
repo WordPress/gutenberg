@@ -1,0 +1,254 @@
+name: Auto Cherry-Pick to Gutenberg Release
+
+on:
+    # push: pick up a labeled PR as soon as it is merged.
+    # schedule: pick up a label added after the PR was merged.
+    # Each run sweeps every merged PR that still carries the backport label,
+    # so the workflow never runs in the context of a PR (no
+    # pull_request_target) and works the same for PRs from forks.
+    push:
+        branches:
+            - trunk
+    schedule:
+        - cron: '*/15 * * * *'
+    workflow_dispatch:
+
+# Serialize runs so that pushes to the release branch never race. A pending
+# run replaced by a newer one loses nothing: every run sweeps all labeled PRs.
+concurrency:
+    group: ${{ github.workflow }}
+    cancel-in-progress: false
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+env:
+    # The Gutenberg backport label is versionless (the fast, two-week cadence
+    # makes a per-release label impractical). The target release branch is
+    # resolved by picking the highest `release/X.Y` branch.
+    BACKPORT_LABEL: 'Backport to Gutenberg RC'
+    # Hidden marker left in the conflict comment, so a PR that failed to
+    # cherry-pick onto a given branch is not retried (and commented on) on
+    # every run. It carries the target branch, so the PR is retried once
+    # against the next release branch.
+    CONFLICT_MARKER: '<!-- gutenberg-release-cherry-pick-conflict:'
+
+jobs:
+    cherry-pick:
+        runs-on: 'ubuntu-24.04'
+        if: github.repository == 'WordPress/gutenberg'
+        permissions:
+            # Pushing uses GUTENBERG_TOKEN; GITHUB_TOKEN only reads code.
+            contents: read
+            issues: write
+            pull-requests: write
+        steps:
+            - name: Find PRs to cherry-pick
+              id: find
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              with:
+                  script: |
+                      const { owner, repo } = context.repo;
+
+                      // Pick the highest `release/X.Y` branch. Only match plain
+                      // `X.Y` names so that scratch branches such as
+                      // `release/24.2-cherry-pick` are never picked as the target.
+                      const refs = await github.paginate(
+                        github.rest.git.listMatchingRefs,
+                        { owner, repo, ref: 'heads/release/', per_page: 100 }
+                      );
+                      const versions = refs
+                        .map(({ ref }) => ref.replace('refs/heads/release/', ''))
+                        .filter(version => /^\d+\.\d+$/.test(version))
+                        .sort((a, b) => {
+                          const [aMajor, aMinor] = a.split('.').map(Number);
+                          const [bMajor, bMinor] = b.split('.').map(Number);
+                          return aMajor - bMajor || aMinor - bMinor;
+                        });
+                      const version = versions.at(-1);
+                      if (!version) {
+                        core.setFailed('No release/X.Y branch found; nothing to cherry-pick to.');
+                        return;
+                      }
+                      const targetBranch = `release/${version}`;
+                      const marker = `${process.env.CONFLICT_MARKER} ${targetBranch} -->`;
+                      core.info(`Target branch: ${targetBranch}`);
+
+                      const issues = await github.paginate(
+                        github.rest.issues.listForRepo,
+                        { owner, repo, state: 'closed', labels: process.env.BACKPORT_LABEL, per_page: 100 }
+                      );
+                      const prs = [];
+                      for (const issue of issues) {
+                        if (!issue.pull_request?.merged_at) {
+                          continue;
+                        }
+                        const { data: pr } = await github.rest.pulls.get({
+                          owner,
+                          repo,
+                          pull_number: issue.number
+                        });
+                        if (pr.base.ref !== 'trunk') {
+                          core.info(`#${pr.number}: not merged to trunk, skipping.`);
+                          continue;
+                        }
+                        const comments = await github.paginate(
+                          github.rest.issues.listComments,
+                          { owner, repo, issue_number: pr.number, per_page: 100 }
+                        );
+                        if (comments.some(comment => comment.body?.includes(marker))) {
+                          core.info(`#${pr.number}: already conflicted on ${targetBranch}, skipping.`);
+                          continue;
+                        }
+                        prs.push({
+                          number: pr.number,
+                          sha: pr.merge_commit_sha,
+                          mergedAt: pr.merged_at
+                        });
+                      }
+
+                      // Cherry-pick in merge order, as the manual process does.
+                      prs.sort((a, b) => a.mergedAt.localeCompare(b.mergedAt));
+                      core.info(`PRs to cherry-pick: ${prs.map(pr => `#${pr.number}`).join(', ') || 'none'}`);
+                      core.setOutput('version', version);
+                      core.setOutput('prs', JSON.stringify(prs));
+                      core.setOutput('count', prs.length);
+
+            - name: Checkout repository
+              if: steps.find.outputs.count > 0
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: release/${{ steps.find.outputs.version }}
+                  token: ${{ secrets.GUTENBERG_TOKEN }}
+                  fetch-depth: 0
+                  persist-credentials: true
+
+            - name: Cherry-pick and report
+              if: steps.find.outputs.count > 0
+              uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  PRS: ${{ steps.find.outputs.prs }}
+                  VERSION: ${{ steps.find.outputs.version }}
+              with:
+                  script: |
+                      const { owner, repo } = context.repo;
+                      const prs = JSON.parse(process.env.PRS);
+                      const targetBranch = `release/${process.env.VERSION}`;
+
+                      await exec.exec('git', ['config', 'user.name', 'Gutenberg Repository Automation']);
+                      await exec.exec('git', ['config', 'user.email', 'gutenberg@wordpress.org']);
+
+                      const picked = [];
+                      const alreadyPicked = [];
+                      const conflicted = [];
+                      for (const pr of prs) {
+                        const exitCode = await exec.exec('git', ['cherry-pick', pr.sha], { ignoreReturnCode: true });
+                        if (exitCode === 0) {
+                          const { stdout } = await exec.getExecOutput('git', ['rev-parse', 'HEAD']);
+                          picked.push({ ...pr, cherryPickSha: stdout.trim() });
+                          continue;
+                        }
+                        // A failed pick without conflicted files is an empty one:
+                        // the change is already on the branch (picked by hand
+                        // without removing the label).
+                        const { stdout: unmerged } = await exec.getExecOutput(
+                          'git',
+                          ['diff', '--name-only', '--diff-filter=U']
+                        );
+                        if (!unmerged.trim()) {
+                          await exec.exec('git', ['cherry-pick', '--skip']);
+                          alreadyPicked.push(pr);
+                        } else {
+                          await exec.exec('git', ['cherry-pick', '--abort'], { ignoreReturnCode: true });
+                          conflicted.push(pr);
+                        }
+                      }
+
+                      // Push before touching any PR, so that a failed push (for
+                      // example, a concurrent manual push) leaves every label in
+                      // place for the next run to retry.
+                      if (picked.length) {
+                        await exec.exec('git', ['push', 'origin', targetBranch]);
+                      }
+
+                      // Move the PRs to the release milestone so that they are
+                      // included in the changelog, as `npm run other:cherry-pick`
+                      // does.
+                      const milestoneTitle = `Gutenberg ${process.env.VERSION}`;
+                      const milestones = await github.paginate(
+                        github.rest.issues.listMilestones,
+                        { owner, repo, state: 'all', per_page: 100 }
+                      );
+                      const milestone = milestones.find(m => m.title === milestoneTitle);
+                      if (!milestone) {
+                        core.warning(`Milestone "${milestoneTitle}" not found; leaving PR milestones unchanged.`);
+                      }
+
+                      for (const pr of [...picked, ...alreadyPicked]) {
+                        await github.rest.issues.removeLabel({
+                          owner,
+                          repo,
+                          issue_number: pr.number,
+                          name: process.env.BACKPORT_LABEL
+                        });
+                        if (milestone) {
+                          await github.rest.issues.update({
+                            owner,
+                            repo,
+                            issue_number: pr.number,
+                            milestone: milestone.number
+                          });
+                        }
+                        await github.rest.issues.createComment({
+                          owner,
+                          repo,
+                          issue_number: pr.number,
+                          body: pr.cherryPickSha
+                            ? `I just cherry-picked this PR to the ${targetBranch} branch to get it included in the next release: ${pr.cherryPickSha}`
+                            : `This PR is already on the ${targetBranch} branch, so I removed the \`${process.env.BACKPORT_LABEL}\` label.`
+                        });
+                      }
+
+                      for (const pr of conflicted) {
+                        await github.rest.issues.createComment({
+                          owner,
+                          repo,
+                          issue_number: pr.number,
+                          body: `${process.env.CONFLICT_MARKER} ${targetBranch} -->
+                      There was a conflict while trying to cherry-pick the commit to the ${targetBranch} branch. Please resolve the conflict manually and create a PR to the ${targetBranch} branch, then remove the \`${process.env.BACKPORT_LABEL}\` label.
+
+                      PRs to ${targetBranch} are similar to PRs to trunk, but you should base your PR on the ${targetBranch} branch instead of trunk.
+
+                      \`\`\`
+                      # Checkout the ${targetBranch} branch instead of trunk.
+                      git checkout ${targetBranch}
+
+                      # Create a new branch for your PR.
+                      git checkout -b my-branch
+
+                      # Cherry-pick the commit.
+                      git cherry-pick ${pr.sha}
+
+                      # Check which files have conflicts.
+                      git status
+
+                      # Resolve the conflict...
+                      # Add the resolved files to the staging area.
+                      git status
+                      git add .
+                      git cherry-pick --continue
+
+                      # Push the branch to the repository
+                      git push origin my-branch
+
+                      # Create a PR and set the base to the ${targetBranch} branch.
+                      # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request.
+                      \`\`\`
+                      `
+                        });
+                      }
+
+                      if (conflicted.length) {
+                        core.warning(`Could not cherry-pick: ${conflicted.map(pr => `#${pr.number}`).join(', ')}`);
+                      }
