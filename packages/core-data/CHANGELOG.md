@@ -9,6 +9,11 @@
 ### Bug Fixes
 
 -   Correct the `useResourcePermissions` return type to match its permission and resolution object, including permissions for entity resources with an ID ([#84521](https://github.com/WordPress/gutenberg/pull/84521)).
+-   Keep read-only taxonomy term data out of collaborative edits so stale counts and links do not mark unchanged categories as dirty ([#84838](https://github.com/WordPress/gutenberg/pull/84838)).
+
+### Internal
+
+-   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 
 ## 8.2.0 (2026-10-07)
 

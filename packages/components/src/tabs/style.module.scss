@@ -10,7 +10,7 @@
 		flex-direction: column;
 	}
 
-	:where([aria-orientation="horizontal"]) {
+	&:where([aria-orientation="horizontal"]) {
 		width: fit-content;
 	}
 
@@ -27,7 +27,7 @@
 
 	@media not (prefers-reduced-motion) {
 		&[data-indicator-animated]::before {
-			transition-property: transform, border-radius, border-block;
+			transition-property: transform;
 			transition-duration: 0.2s;
 			transition-timing-function: ease-out;
 		}
@@ -38,6 +38,7 @@
 		position: absolute;
 		pointer-events: none;
 		transform-origin: var(--direction-start) top;
+		color: var(--wpds-color-foreground-interactive-neutral);
 
 		// Windows high contrast mode.
 		outline: 2px solid transparent;
@@ -70,38 +71,29 @@
 			transform:
 				translateX(calc(var(--selected-start) * var(--direction-factor) * 1px))
 				scaleX(calc(var(--selected-width, 0) / var(--antialiasing-factor)));
-			border-bottom:
-				var(--wp-admin-border-width-focus) solid
-				$components-color-gray-700;
+			border-bottom: var(--wp-admin-border-width-focus) solid currentColor;
 		}
 	}
+	&:has(
+		[aria-selected="true"]:not([aria-disabled="true"])[data-focus-visible]
+	)::before {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
+
 	&[aria-orientation="vertical"] {
-		&::before {
-			/* Adjusting the border radius to match the scaling in the y axis. */
-			border-radius:
-				$radius-small /
-				calc($radius-small /
-				(var(--selected-height, 0) / var(--antialiasing-factor)));
-			top: 0;
-			inset-inline-start: 0;
-			width: 100%;
-			height: calc(var(--antialiasing-factor) * 1px);
-			transform:
-				translateY(calc(var(--selected-top, 0) * 1px))
-				scaleY(calc(var(--selected-height, 0) / var(--antialiasing-factor)));
-			background-color: $components-color-gray-100;
+		@media not (prefers-reduced-motion) {
+			&[data-indicator-animated]::before {
+				transition-property: transform, height;
+			}
 		}
-		&[data-select-on-move="true"]:has(
-			:is(:focus-visible, [data-focus-visible])
-		)::before {
-			box-sizing: border-box;
-			border:
-				var(--wp-admin-border-width-focus) solid
-				$components-color-accent;
-			/* Adjusting the border width to match the scaling in the y axis. */
-			border-block-width:
-				calc(var(--wp-admin-border-width-focus, 1px) /
-				(var(--selected-height, 0) / var(--antialiasing-factor)));
+
+		&::before {
+			top: var(--wpds-dimension-padding-md);
+			inset-inline-start: 0;
+			width: var(--wp-admin-border-width-focus);
+			height: max(0px, calc(var(--selected-height, 0) * 1px - 2 * var(--wpds-dimension-padding-md)));
+			transform: translateY(calc(var(--selected-top, 0) * 1px));
+			background-color: currentColor;
 		}
 	}
 }
@@ -124,15 +116,28 @@
 		font-family: $font-family-body;
 		font-weight: 400;
 		font-size: $font-size-medium;
-		color: $components-color-foreground;
+		color: var(--wpds-color-foreground-interactive-neutral);
+
+		&:is([aria-selected="true"], [aria-disabled="true"]) {
+			cursor: default;
+		}
 
 		&[aria-disabled="true"] {
-			cursor: default;
 			color: var(--wpds-color-foreground-interactive-neutral-disabled);
 		}
 
-		&:not([aria-disabled="true"]):is(:hover, [data-focus-visible]) {
-			color: $components-color-foreground;
+		&:not([aria-disabled="true"]):is(
+			:not([aria-selected="true"]):hover,
+			:not([aria-selected="true"]):active,
+			[data-focus-visible]
+		) {
+			color: var(--wpds-color-foreground-interactive-neutral-active);
+
+			&::after,
+			& .tab-children::after {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+				opacity: 1;
+			}
 		}
 
 		&:focus:not(:disabled) {
@@ -140,17 +145,18 @@
 			outline: none;
 		}
 
-		// Focus indicator.
+		// Interaction background and focus indicator.
 		position: relative;
-		&::after {
+		isolation: isolate;
+		&::after,
+		& .tab-children::after {
 			position: absolute;
+			z-index: -1;
 			pointer-events: none;
 
 			// Draw the indicator.
 			// Outline works for Windows high contrast mode as well.
-			outline:
-				var(--wp-admin-border-width-focus) solid
-				$components-color-accent;
+			outline: var(--wp-admin-border-width-focus) solid transparent;
 			border-radius: $radius-small;
 
 			// Animation
@@ -161,7 +167,9 @@
 			}
 		}
 
-		&[data-focus-visible]::after {
+		&[data-focus-visible]::after,
+		&[data-focus-visible] .tab-children::after {
+			outline-color: $components-color-accent;
 			opacity: 1;
 		}
 	}
@@ -173,21 +181,13 @@
 
 		&::after {
 			content: "";
-			inset: 12px;
+			inset: var(--wpds-dimension-padding-md);
 		}
 	}
 
 	[aria-orientation="vertical"] & {
-		padding: 8px 12px;
-		min-height: 40px;
-
-		&[aria-selected="true"] {
-			fill: currentColor;
-		}
-	}
-	[aria-orientation="vertical"][data-select-on-move="false"] &::after {
-		content: "";
-		inset: var(--wp-admin-border-width-focus);
+		padding: var(--wpds-dimension-padding-md);
+		min-height: var(--wpds-dimension-size-lg);
 	}
 }
 
@@ -201,30 +201,14 @@
 		justify-content: center;
 	}
 	[aria-orientation="vertical"] & {
+		flex-grow: 0;
+		position: relative;
 		justify-content: start;
-	}
-}
 
-.tab-chevron {
-	flex-shrink: 0;
-	margin-inline-end: -4px;
-	[aria-orientation="horizontal"] & {
-		display: none;
-	}
-	opacity: 0;
-	[role="tab"]:is([aria-selected="true"], [data-focus-visible], :hover) & {
-		opacity: 1;
-	}
-	// The chevron is transitioned into existence when selectOnMove is enabled,
-	// because otherwise it looks jarring, as it shows up outside of the focus
-	// indicator that's being animated at the same time.
-	@media not (prefers-reduced-motion) {
-		[data-select-on-move="true"] [role="tab"]:is([aria-selected="true"]) & {
-			transition: opacity 0.15s 0.15s linear;
+		&::after {
+			content: "";
+			inset: calc(-1 * var(--wpds-dimension-padding-xs));
 		}
-	}
-	&:dir(rtl) {
-		rotate: 180deg;
 	}
 }
 

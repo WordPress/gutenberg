@@ -31,4 +31,14 @@ describe( 'convertComplementaryAreas', () => {
 
 		expect( convertComplementaryAreas( input ) ).toEqual( expectedOutput );
 	} );
+
+	it( 'does not mutate its input', () => {
+		const input = {
+			'core/edit-post': { complementaryArea: 'edit-post/block' },
+		};
+		const snapshot = structuredClone( input );
+
+		convertComplementaryAreas( input );
+		expect( input ).toEqual( snapshot );
+	} );
 } );
