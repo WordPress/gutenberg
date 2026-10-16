@@ -51,6 +51,73 @@ export const Wrapping: Story = {
 	),
 };
 
+export const Truncation: Story = {
+	...OpenInNewTab,
+	args: {
+		...OpenInNewTab.args,
+		children:
+			'Discover the terms and phrases your visitors use to find your site.',
+	},
+	argTypes: {
+		variant: { control: false },
+	},
+	render: ( args ) => (
+		<Stack direction="row" gap="2xl">
+			{ ( [ 'ltr', 'rtl' ] as const ).map( ( dir ) => (
+				<Stack direction="column" gap="lg" dir={ dir } key={ dir }>
+					<Text variant="heading-sm">{ dir.toUpperCase() }</Text>
+					{ ( [ 'default', 'unstyled' ] as const ).map(
+						( variant ) => (
+							<Stack direction="column" gap="xs" key={ variant }>
+								<Text variant="heading-sm">{ variant }</Text>
+								<Text variant="body-sm">Ellipsis on Link</Text>
+								<Text
+									variant="body-md"
+									render={
+										<Link { ...args } variant={ variant } />
+									}
+									style={ {
+										display: 'block',
+										width: '24ch',
+										overflow: 'hidden',
+										whiteSpace: 'nowrap',
+										textOverflow: 'ellipsis',
+									} }
+								>
+									{ args.children }
+								</Text>
+								<Text variant="body-sm">
+									Ellipsis on parent
+								</Text>
+								<Text
+									variant="body-md"
+									render={ <p /> }
+									style={ {
+										width: '24ch',
+										overflow: 'hidden',
+										whiteSpace: 'nowrap',
+										textOverflow: 'ellipsis',
+									} }
+								>
+									<Link { ...args } variant={ variant } />
+								</Text>
+							</Stack>
+						)
+					) }
+				</Stack>
+			) ) }
+		</Stack>
+	),
+};
+
+export const TruncationAtIcon: Story = {
+	...Truncation,
+	args: {
+		...Truncation.args,
+		children: 'Discover the terms and phrases',
+	},
+};
+
 /**
  * Note: `tone` has no effect on `unstyled` variant
  */
