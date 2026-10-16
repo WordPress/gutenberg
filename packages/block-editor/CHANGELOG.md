@@ -76,6 +76,7 @@
 -   Convert `BlockEditorProvider`, `ExperimentalBlockEditorProvider`, `withRegistryProvider`, `useBlockSync`, `BlockRefsProvider`, the selection context and `useMediaUploadSettings` to TypeScript ([#84915](https://github.com/WordPress/gutenberg/pull/84915)).
 -   Convert `WritingFlow` and its hooks to TypeScript ([#84918](https://github.com/WordPress/gutenberg/pull/84918)).
 -   Convert `Iframe`, `EditorStyles`, `NavigableToolbar`, `CopyHandler` and `BlockBreadcrumb` to TypeScript ([#84922](https://github.com/WordPress/gutenberg/pull/84922)).
+-   Convert `MediaPlaceholder` and `ImageEditor` to TypeScript ([#84923](https://github.com/WordPress/gutenberg/pull/84923)).
 
 ## 18.1.0 (2026-10-07)
 
