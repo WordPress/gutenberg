@@ -109,24 +109,9 @@ export default function AspectRatioTool( {
 					resolvedOptions.find( ( item ) => ! item.disabled ) ??
 					null
 				}
-				items={ resolvedOptions }
+				items={ resolvedOptions.filter( ( item ) => ! item.hidden ) }
 				onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
-			>
-				{ resolvedOptions
-					.filter( ( item ) => ! item.hidden )
-					.map( ( item ) => (
-						<SelectControl.Item
-							key={ item.value }
-							value={ item }
-							label={ item.label }
-							disabled={ item.disabled }
-						>
-							<SelectControl.ItemLabel>
-								{ item.label }
-							</SelectControl.ItemLabel>
-						</SelectControl.Item>
-					) ) }
-			</SelectControl>
+			/>
 		</InheritanceToolsPanelItem>
 	);
 }
