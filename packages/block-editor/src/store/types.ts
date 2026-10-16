@@ -319,6 +319,7 @@ export type InitialPosition = 0 | -1 | null;
 export type HistoryMode = 'merge' | 'ignore';
 
 export type BlockListSettings = Record< string, unknown > & {
+	orientation?: 'horizontal' | 'vertical';
 	templateLock?: string | false;
 	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
 	directInsert?: boolean;
