@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import { Component } from '@wordpress/element';
 import { describe, expect, it } from 'vitest';
 import withFontSizes from '../with-font-sizes';
 import type { FontSizeObject } from '../types';
@@ -13,6 +14,32 @@ describe( 'withFontSizes types', () => {
 			fontSize: FontSizeObject;
 			label: string;
 		} > = () => null;
+		const WithFontSize = withFontSizes( 'fontSize' )( Labeled );
+
+		const withLabel = (
+			<WithFontSize
+				label="Size"
+				attributes={ {} }
+				setAttributes={ () => {} }
+			/>
+		);
+		const withoutLabel = (
+			// @ts-expect-error The own props stay required.
+			<WithFontSize attributes={ {} } setAttributes={ () => {} } />
+		);
+
+		expect( [ withLabel, withoutLabel ] ).toHaveLength( 2 );
+	} );
+
+	it( 'infers the props of a wrapped class component', () => {
+		class Labeled extends Component< {
+			fontSize: FontSizeObject;
+			label: string;
+		} > {
+			render() {
+				return null;
+			}
+		}
 		const WithFontSize = withFontSizes( 'fontSize' )( Labeled );
 
 		const withLabel = (

@@ -1,6 +1,6 @@
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
-import type { ComponentType } from 'react';
+import type { ComponentClass, ComponentType, FunctionComponent } from 'react';
 import type { FontSizePreset } from '@wordpress/global-styles-engine';
 import { getFontSize, getFontSizeClass } from './utils';
 import { useSettings } from '../use-settings';
@@ -243,9 +243,10 @@ export default < Name extends string >( ...fontSizeNames: Name[] ) => {
 			>
 		>,
 	>(
-		WrappedComponent: ComponentType<
-			Props & InjectedFontSizesProps< Name >
-		>
+		WrappedComponent:
+			| FunctionComponent< Props & InjectedFontSizesProps< Name > >
+			// A class component's `props` type must match, so it takes its own props.
+			| ComponentClass< Props >
 	) => ComponentType<
 		Omit< Props, keyof InjectedFontSizesProps< Name > > &
 			Pick< WithFontSizesProps, 'attributes' | 'setAttributes' >
