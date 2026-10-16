@@ -19,6 +19,7 @@
 	display: inline-flex;
 	align-items: center;
 	gap: var(--wpds-dimension-gap-xs);
+	text-decoration: inherit;
 }
 
 /*
