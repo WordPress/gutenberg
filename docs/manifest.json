@@ -2328,6 +2328,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-actions",
+		"slug": "packages-core-actions",
+		"markdown_source": "../packages/core-actions/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-commands",
 		"slug": "packages-core-commands",
 		"markdown_source": "../packages/core-commands/README.md",

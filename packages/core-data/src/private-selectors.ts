@@ -335,6 +335,42 @@ export function getViewConfig(
 }
 
 /**
+ * The fields registered on the server for an entity, as returned by the
+ * `/wp/v2/entity-fields` route.
+ */
+export interface FieldsConfig {
+	kind: string;
+	name: string;
+	/**
+	 * The serializable part of each field, in registration order.
+	 */
+	fields: Array< { id: string } & Record< string, any > >;
+	/**
+	 * The script modules providing the JavaScript parts of the fields, in
+	 * registration order, with the ids of the fields each provides.
+	 */
+	script_modules: Array< { id: string; fields: string[] } >;
+}
+
+/**
+ * Returns the fields registered on the server for the given entity, as the
+ * `/wp/v2/entity-fields` REST API route returns them.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ *
+ * @return The fields config, or undefined if not loaded.
+ */
+export function getFieldsConfig(
+	state: State,
+	kind: string,
+	name: string
+): FieldsConfig | undefined {
+	return state.fieldsConfigs?.[ kind ]?.[ name ];
+}
+
+/**
  * Returns the current sync connection status across all entities. Prioritizes
  * disconnected states, then connecting, then connected.
  *

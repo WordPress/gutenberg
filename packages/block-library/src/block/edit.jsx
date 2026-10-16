@@ -1,11 +1,7 @@
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRef, useMemo } from '@wordpress/element';
-import {
-	useEntityRecord,
-	store as coreStore,
-	useEntityBlockEditor,
-} from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner as WCSpinner,
@@ -149,46 +145,59 @@ function ReusableBlockEdit( {
 	__unstableParentLayout: parentLayout,
 	setAttributes,
 } ) {
-	const { record, hasResolved } = useEntityRecord(
-		'postType',
-		'wp_block',
-		ref
-	);
-	const [ editableBlocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
-		id: ref,
-	} );
-
-	// A user who can read the pattern but not edit it can't load it in the
-	// `edit` context. Its `view` context has the content too, so render that.
-	const isUnavailableToEdit = hasResolved && ! record;
-	const { readOnlyRecord, hasResolvedReadOnly } = useSelect(
+	const { record, isResolving } = useSelect(
 		( select ) => {
-			if ( ! isUnavailableToEdit ) {
-				return {};
+			// Prefer the `edit` record once it's loaded, for example by "Edit
+			// original", so the pattern's edits and saves show up straight
+			// away. core-data doesn't update `view` records.
+			if (
+				select( coreStore ).hasEntityRecord(
+					'postType',
+					'wp_block',
+					ref
+				)
+			) {
+				return {
+					record: select( coreStore ).getEditedEntityRecord(
+						'postType',
+						'wp_block',
+						ref
+					),
+					isResolving: false,
+				};
 			}
+			// Otherwise use the `view` record, which every user who can read
+			// the pattern can load, even if they can't edit it.
 			const args = [ 'postType', 'wp_block', ref, { context: 'view' } ];
-			const { getEntityRecord, hasFinishedResolution } =
-				select( coreStore );
+			const viewRecord = select( coreStore ).getEntityRecord( ...args );
 			return {
-				readOnlyRecord: getEntityRecord( ...args ),
-				hasResolvedReadOnly: hasFinishedResolution(
-					'getEntityRecord',
-					args
-				),
+				record: viewRecord,
+				// Not `isResolving`: resolution starts after a timeout, so on the
+				// first render it'd read as missing and flash the warning.
+				isResolving:
+					! viewRecord &&
+					! select( coreStore ).hasFinishedResolution(
+						'getEntityRecord',
+						args
+					),
 			};
 		},
-		[ isUnavailableToEdit, ref ]
+		[ ref ]
 	);
-	const readOnlyContent = readOnlyRecord?.content?.raw;
-	const readOnlyBlocks = useMemo(
-		() => ( readOnlyContent ? parse( readOnlyContent ) : EMPTY_ARRAY ),
-		[ readOnlyContent ]
-	);
-	const blocks = editableBlocks?.length ? editableBlocks : readOnlyBlocks;
-	const isResolving = isUnavailableToEdit
-		? ! hasResolvedReadOnly
-		: ! hasResolved;
-	const isMissing = ! isResolving && ! record && ! readOnlyRecord;
+	// The `view` record's content is an object with its raw value, the
+	// `edit` record's is the raw value itself.
+	const patternContent = record?.content?.raw ?? record?.content;
+	const blocks = useMemo( () => {
+		if ( record?.blocks ) {
+			return record.blocks;
+		}
+		// Once the pattern is edited, its content is a function that
+		// serializes its blocks, which are returned above.
+		return typeof patternContent === 'string' && patternContent
+			? parse( patternContent )
+			: EMPTY_ARRAY;
+	}, [ record?.blocks, patternContent ] );
+	const isMissing = ! isResolving && ! record;
 
 	const { __unstableMarkLastChangeAsPersistent } =
 		useDispatch( blockEditorStore );
