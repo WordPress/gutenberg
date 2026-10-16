@@ -1,3 +1,6 @@
+// File extensions that should bypass client-side navigation.
+const imageExtensions = [ '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg' ];
+
 // Check if the link is valid for client-side navigation.
 const isValidLink = ( ref: HTMLAnchorElement ) =>
 	ref &&
@@ -8,7 +11,11 @@ const isValidLink = ( ref: HTMLAnchorElement ) =>
 	! ref.pathname.startsWith( '/wp-admin' ) &&
 	! ref.pathname.startsWith( '/wp-login.php' ) &&
 	! ref.getAttribute( 'href' ).startsWith( '#' ) &&
-	! new URL( ref.href ).searchParams.has( '_wpnonce' );
+	! new URL( ref.href ).searchParams.has( '_wpnonce' ) &&
+	// skip image links
+	! imageExtensions.some( ( ext ) =>
+		ref.pathname.toLowerCase().endsWith( ext )
+	);
 
 // Check if the event is valid for client-side navigation.
 const isValidEvent = ( event: MouseEvent ) =>
