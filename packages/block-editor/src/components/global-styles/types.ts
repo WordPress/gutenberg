@@ -51,7 +51,13 @@ export interface StyleSettings {
 		gradient?: boolean;
 		backgroundClip?: boolean | string[];
 	};
-	border?: Record< string, unknown >;
+	border?: Record< string, unknown > & {
+		color?: boolean;
+		radius?: boolean;
+		style?: boolean;
+		width?: boolean;
+		radiusSizes?: Record< string, RadiusSizePreset[] >;
+	};
 	color?: Record< string, unknown > & {
 		palette?: PresetsPerOrigin< Color >;
 		gradients?: PresetsPerOrigin< Gradient > | NoPresets;
@@ -142,13 +148,44 @@ export interface PanelBackgroundStyle extends Omit<
 }
 
 /**
+ * The border of one side, or of all sides at once.
+ */
+export interface PanelBorderSide {
+	color?: StyleValue;
+	style?: StyleValue;
+	width?: StyleValue;
+}
+
+/**
+ * The radius of each corner.
+ */
+export interface PanelBorderRadius {
+	topLeft?: StyleValue;
+	topRight?: StyleValue;
+	bottomLeft?: StyleValue;
+	bottomRight?: StyleValue;
+}
+
+/**
+ * The border styles a style panel edits, flat or split by side.
+ */
+export interface PanelBorderStyle extends PanelBorderSide {
+	radius?: StyleValue | PanelBorderRadius;
+	top?: PanelBorderSide;
+	right?: PanelBorderSide;
+	bottom?: PanelBorderSide;
+	left?: PanelBorderSide;
+	[ key: string ]: unknown;
+}
+
+/**
  * The block or global styles a style panel edits, as stored.
  */
 export interface PanelStyle {
 	color?: Record< string, StyleValue >;
 	typography?: Record< string, StyleValue >;
 	background?: PanelBackgroundStyle;
-	border?: Record< string, StyleValue | Record< string, StyleValue > >;
+	border?: PanelBorderStyle;
 	spacing?: Record< string, StyleValue | Record< string, StyleValue > >;
 	dimensions?: Record< string, StyleValue >;
 	filter?: Record< string, StyleValue | string[] >;
@@ -457,6 +494,34 @@ export interface FiltersPanelProps {
 	inheritedValue?: PanelStyle;
 	/** The settings of the block or element. */
 	settings: StyleSettings;
+	/** ID of the panel. */
+	panelId?: string | null;
+	/** Which controls are shown by default. */
+	defaultControls?: Record< string, boolean | undefined >;
+	/** Whether controls show where their value is inherited from. */
+	showInheritanceLabelIndicators?: boolean;
+}
+
+/**
+ * A border radius preset from theme.json.
+ */
+export interface RadiusSizePreset {
+	name: string;
+	slug: string;
+	size: string;
+}
+
+export interface BorderPanelProps {
+	/** The tools panel the controls render in. */
+	as?: ComponentType< StyleToolsPanelProps >;
+	/** The styles the panel edits. */
+	value?: PanelStyle;
+	/** Called with the changed styles. */
+	onChange: ( value: PanelStyle ) => void;
+	/** The styles inherited from global styles. */
+	inheritedValue?: PanelStyle;
+	/** The settings of the block or element. */
+	settings?: StyleSettings;
 	/** ID of the panel. */
 	panelId?: string | null;
 	/** Which controls are shown by default. */
