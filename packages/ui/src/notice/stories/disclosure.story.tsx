@@ -3,7 +3,6 @@ import type { ComponentProps } from 'react';
 import { useEffect, useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { Text } from '../../text';
-import * as Collapsible from '../../collapsible';
 import * as Notice from '../index';
 
 type StoryArgs = Pick< ComponentProps< typeof Notice.Root >, 'intent' > & {
@@ -86,55 +85,6 @@ export const WithDetails: Story = {
 			'The title was rejected by a server-side rule.\nRemove "Break save" from the title, then try again.',
 	},
 	render: function NoticeWithDetails( { intent, message, details } ) {
-		const [ open, setOpen ] = useState( false );
-		const hasDetails = details.trim().length > 0;
-
-		return (
-			<Collapsible.Root
-				open={ open }
-				onOpenChange={ setOpen }
-				render={ <Notice.Root intent={ intent } /> }
-			>
-				<Notice.Description>{ message }</Notice.Description>
-				<Notice.Actions>
-					{ hasDetails && (
-						<Collapsible.Trigger
-							render={ <Notice.ActionButton variant="outline" /> }
-						>
-							{ open ? 'Hide details' : 'Show details' }
-						</Collapsible.Trigger>
-					) }
-					<CopyButton
-						text={
-							hasDetails
-								? `${ message }\n\n${ details }`
-								: message
-						}
-						label={
-							intent === 'error' ? 'Copy error' : 'Copy message'
-						}
-					/>
-				</Notice.Actions>
-				{ hasDetails && (
-					<Collapsible.Panel
-						render={ <Notice.Description render={ <div /> } /> }
-						style={ {
-							marginBlockStart: 'var(--wpds-dimension-gap-sm)',
-							whiteSpace: 'pre-wrap',
-							overflowWrap: 'anywhere',
-						} }
-					>
-						{ details }
-					</Collapsible.Panel>
-				) }
-			</Collapsible.Root>
-		);
-	},
-};
-
-export const WithNativeDetails: Story = {
-	args: WithDetails.args,
-	render: function NoticeWithNativeDetails( { intent, message, details } ) {
 		const hasDetails = details.trim().length > 0;
 
 		return (
