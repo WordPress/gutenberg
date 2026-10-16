@@ -2,6 +2,9 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { Button, Placeholder } from '@wordpress/components';
 import { layout } from '@wordpress/icons';
+import type { ComponentProps } from 'react';
+import type { BlockTypeIconDescriptor } from '@wordpress/blocks';
+import type { BlockVariationPickerProps } from './types';
 
 function BlockVariationPicker( {
 	icon = layout,
@@ -10,7 +13,7 @@ function BlockVariationPicker( {
 	variations,
 	onSelect,
 	allowSkip,
-} ) {
+}: BlockVariationPickerProps ) {
 	const classes = clsx( 'block-editor-block-variation-picker', {
 		'has-many-variations': variations.length > 4,
 	} );
@@ -37,10 +40,17 @@ function BlockVariationPicker( {
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
+							// A variation icon is a descriptor or the icon itself.
 							icon={
-								variation.icon && variation.icon.src
-									? variation.icon.src
-									: variation.icon
+								( variation.icon &&
+								( variation.icon as BlockTypeIconDescriptor )
+									.src
+									? (
+											variation.icon as BlockTypeIconDescriptor
+										 ).src
+									: variation.icon ) as ComponentProps<
+									typeof Button
+								>[ 'icon' ]
 							}
 							iconSize={ 48 }
 							onClick={ () => onSelect( variation ) }
