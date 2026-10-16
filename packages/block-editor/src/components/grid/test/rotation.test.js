@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+	getBoundingBoxCornerStyle,
 	getRotatedBoundingRect,
 	getRotatedOverlayStyle,
 	getRotationFromPointer,
@@ -188,4 +189,72 @@ describe( 'getRotatedBoundingRect()', () => {
 			expect( other.bottom ).toBeCloseTo( rotated.bottom );
 		}
 	} );
+} );
+
+describe( 'getBoundingBoxCornerStyle()', () => {
+	// Resolves a `calc()` of `cqw`, `cqh` and `px` for an overlay size.
+	function resolve( value, width, height ) {
+		const [ , cqw, cqh, px ] = value.match(
+			/^calc\((-?[\d.]+)cqw \+ (-?[\d.]+)cqh \+ (-?[\d.]+)px\)$/
+		);
+		return (
+			( Number( cqw ) * width ) / 100 +
+			( Number( cqh ) * height ) / 100 +
+			Number( px )
+		);
+	}
+
+	// Where a point in the overlay, from its top-left corner, is on screen
+	// relative to the overlay's center, once the overlay is turned.
+	function toScreen( x, y, width, height, angle ) {
+		const radians = ( angle * Math.PI ) / 180;
+		const localX = x - width / 2;
+		const localY = y - height / 2;
+		return {
+			x: localX * Math.cos( radians ) - localY * Math.sin( radians ),
+			y: localX * Math.sin( radians ) + localY * Math.cos( radians ),
+		};
+	}
+
+	it( 'is under the bottom right corner of an unrotated block', () => {
+		expect( getBoundingBoxCornerStyle( 0, 8 ) ).toEqual( {
+			left: 'calc(100cqw + 0cqh + 0px)',
+			top: 'calc(0cqw + 100cqh + 8px)',
+			transformOrigin: '0 0',
+			transform: 'rotate(0deg) translateX(-100%)',
+		} );
+	} );
+
+	it.each( [ 30, 90, 135, -60, 180 ] )(
+		'is under the bounding box corner at %d°',
+		( angle ) => {
+			const width = 200;
+			const height = 100;
+			const { left, top, transform } = getBoundingBoxCornerStyle(
+				angle,
+				8
+			);
+			const point = toScreen(
+				resolve( left, width, height ),
+				resolve( top, width, height ),
+				width,
+				height,
+				angle
+			);
+			const { right, bottom } = getRotatedBoundingRect(
+				{
+					left: -width / 2,
+					top: -height / 2,
+					right: width / 2,
+					bottom: height / 2,
+				},
+				angle
+			);
+			expect( point.x ).toBeCloseTo( right, 2 );
+			expect( point.y ).toBeCloseTo( bottom + 8, 2 );
+			expect( transform ).toBe(
+				`rotate(${ -angle }deg) translateX(-100%)`
+			);
+		}
+	);
 } );

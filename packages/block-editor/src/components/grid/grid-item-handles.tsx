@@ -1,7 +1,11 @@
 import type { ReactNode } from 'react';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
+import { getBoundingBoxCornerStyle } from './rotation';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
+
+// Space between the block's bounding box and the toolbar, in pixels.
+const TOOLBAR_GAP = 8;
 
 interface GridItemHandlesProps {
 	/** Client ID of the grid item. */
@@ -16,8 +20,10 @@ interface GridItemHandlesProps {
  * A small toolbar of handles under the bottom right corner of a selected grid
  * item.
  *
- * It sits in an overlay that turns with the block, and turns the other way,
- * so that it stays upright like the block toolbar.
+ * It sits in an overlay that turns with the block, which the rotate handle
+ * turns the block around. On a rotated block, it stays upright like the block
+ * toolbar, under the bottom right corner of the block's bounding box, so it
+ * stays in the same place at any angle.
  */
 export function GridItemHandles( {
 	clientId,
@@ -41,7 +47,7 @@ export function GridItemHandles( {
 			<div className="block-editor-grid-item-handles__box">
 				<div
 					className="block-editor-grid-item-handles__toolbar"
-					style={ { rotate: `${ -angle }deg` } }
+					style={ getBoundingBoxCornerStyle( angle, TOOLBAR_GAP ) }
 				>
 					{ children }
 				</div>

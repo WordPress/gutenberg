@@ -117,6 +117,52 @@ export function getRotatedOverlayStyle( { width, height, angle } ) {
 }
 
 /**
+ * Gets the style that places an element under the bottom right corner of a
+ * rotated block's bounding box, upright, from inside an overlay that turns with
+ * the block (see `getRotatedOverlayStyle`).
+ *
+ * The corner's position in the overlay depends on both the overlay's width and
+ * height, so the overlay must be a size container: the position is given in
+ * `cqw` and `cqh` units, and follows the overlay's size without measuring it.
+ * The element turns back by the same angle around its top-left corner, and is
+ * moved left by its own width, so that its top-right corner is at the point.
+ *
+ * @param {number} angle Rotation of the overlay in degrees.
+ * @param {number} gap   Space between the bounding box and the element, in pixels.
+ *
+ * @return {Object} Style properties for the element.
+ */
+export function getBoundingBoxCornerStyle( angle, gap ) {
+	const radians = ( angle * Math.PI ) / 180;
+	const cos = Math.cos( radians );
+	const sin = Math.sin( radians );
+	const absCos = Math.abs( cos );
+	const absSin = Math.abs( sin );
+	const round = ( value ) => Math.round( value * 10000 ) / 10000;
+	// The corner is half the bounding box's size from the center, turned back
+	// into the overlay's frame. Each term is a share of the overlay's width or
+	// height, or of the gap.
+	const left = [
+		round( ( ( 1 + cos * absCos + sin * absSin ) / 2 ) * 100 ),
+		round( ( ( cos * absSin + sin * absCos ) / 2 ) * 100 ),
+		round( sin * gap ),
+	];
+	const top = [
+		round( ( ( cos * absSin - sin * absCos ) / 2 ) * 100 ),
+		round( ( ( 1 + cos * absCos - sin * absSin ) / 2 ) * 100 ),
+		round( cos * gap ),
+	];
+	const toCalc = ( [ width, height, pixels ] ) =>
+		`calc(${ width }cqw + ${ height }cqh + ${ pixels }px)`;
+	return {
+		left: toCalc( left ),
+		top: toCalc( top ),
+		transformOrigin: '0 0',
+		transform: `rotate(${ -angle }deg) translateX(-100%)`,
+	};
+}
+
+/**
  * Gets the bounding box of a rectangle rotated around its center.
  *
  * @param {{left: number, top: number, right: number, bottom: number}} rect  The unrotated rectangle.
