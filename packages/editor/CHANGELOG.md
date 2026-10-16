@@ -9,6 +9,10 @@
 -   Every action of a post type now comes from the server: `usePostActions` shows the actions the `wp/v2/entity-actions` route returns, merged with the JavaScript parts of the script modules registered along with them, and `registerPostTypeSchema()` registers no action. When the actions cannot be loaded, a notice says so ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
 -   `registerEntityAction` and `unregisterEntityAction`, only available in the Gutenberg plugin, have no effect. They still warn, and they no longer register or unregister anything: every action of an entity is registered on the server. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for their JavaScript parts ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
 
+### New Features
+
+-   Notes: allow reacting to a note with an emoji. Reactions display as pill buttons on the note with per-emoji counts, backed by a new `reaction` comment type. The add-reaction trigger fades in on hover or focus in the note's top corner, so a note with no reactions costs no vertical space for the option ([#76767](https://github.com/WordPress/gutenberg/pull/76767)).
+
 ### Enhancements
 
 -   `usePostActions` no longer adds the "Set as homepage" and "Set as posts page" actions to pages: they moved to `@wordpress/core-actions`, which registers them on the server for the users who can manage the site settings when the theme has no `front-page` template, so a plugin can remove them with `wp_unregister_entity_actions()`. The pages they apply to come from the `wp:action-set-homepage` and `wp:action-set-posts-page` REST links ([#84932](https://github.com/WordPress/gutenberg/pull/84932)).
