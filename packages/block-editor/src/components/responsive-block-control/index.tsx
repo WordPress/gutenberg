@@ -3,8 +3,9 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
 import { ToggleControl } from '@wordpress/components';
 import ResponsiveBlockControlLabel from './label';
+import type { ResponsiveBlockControlProps } from './types';
 
-function ResponsiveBlockControl( props ) {
+function ResponsiveBlockControl( props: ResponsiveBlockControlProps ) {
 	const {
 		title,
 		property,
