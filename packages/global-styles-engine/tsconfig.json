@@ -9,7 +9,7 @@
 		{ "path": "../blocks" },
 		{ "path": "../data" },
 		{ "path": "../i18n/tsconfig.build.json" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../style-engine" }
 	],
 	// Listed files have pre-existing type errors; include them once fixed.
