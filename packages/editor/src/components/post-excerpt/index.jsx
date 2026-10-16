@@ -1,4 +1,5 @@
 import { __ } from '@wordpress/i18n';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import {
 	ExternalLink,
 	TextareaControl as WCTextareaControl,
@@ -7,6 +8,9 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { useNativeUndo } = unlock( blockEditorPrivateApis );
 
 /**
  * Renders an editable textarea for the post excerpt.
@@ -49,6 +53,7 @@ export default function PostExcerpt( {
 		[]
 	);
 	const { editPost } = useDispatch( editorStore );
+	const nativeUndoRef = useNativeUndo();
 	const [ localExcerpt, setLocalExcerpt ] = useState(
 		decodeEntities( excerpt )
 	);
@@ -62,6 +67,7 @@ export default function PostExcerpt( {
 	return (
 		<div className="editor-post-excerpt">
 			<WCTextareaControl
+				ref={ updateOnBlur ? nativeUndoRef : undefined }
 				label={ label }
 				hideLabelFromVision={ hideLabelFromVision }
 				className="editor-post-excerpt__textarea"

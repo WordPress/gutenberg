@@ -648,6 +648,56 @@ test.describe( 'undo', () => {
 		await expect( textarea ).toHaveValue( '<p>second</p>EDIT' );
 	} );
 
+	test( 'should leave undo to the browser inside the excerpt popover', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'The paragraph must stay unchanged.' );
+
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await expect( paragraph ).toHaveText(
+			'The paragraph must stay unchanged.'
+		);
+
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'Post', exact: true } ).click();
+		await page.getByRole( 'button', { name: 'Add an excerpt…' } ).click();
+
+		const excerpt = page.getByRole( 'textbox', {
+			name: 'Write an excerpt (optional)',
+		} );
+		await excerpt.click();
+		await page.keyboard.type( 'x' );
+		await expect( excerpt ).toHaveValue( 'x' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect( excerpt ).toHaveValue( '' );
+		await expect( excerpt ).toBeFocused();
+		await expect( paragraph ).toHaveText(
+			'The paragraph must stay unchanged.'
+		);
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'The paragraph must stay unchanged.' },
+			},
+		] );
+
+		// Redo also verifies that the popover kept its native undo history.
+		await pageUtils.pressKeys( 'primaryShift+z' );
+		await expect( excerpt ).toHaveValue( 'x' );
+		await expect( paragraph ).toHaveText(
+			'The paragraph must stay unchanged.'
+		);
+	} );
+
 	test( 'should leave undo to the browser inside the Custom HTML dialog', async ( {
 		page,
 		pageUtils,
