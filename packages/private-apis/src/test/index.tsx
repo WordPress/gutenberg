@@ -11,6 +11,10 @@ beforeEach( () => {
 const requiredConsent =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
+type PrivateApis = ReturnType<
+	typeof __dangerousOptInToUnstableAPIsOnlyForCoreModules
+>;
+
 describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 	it( 'Should require a consent string', () => {
 		expect( () => {
@@ -42,7 +46,7 @@ describe( '__dangerousOptInToUnstableAPIsOnlyForCoreModules', () => {
 } );
 
 describe( 'lock(), unlock()', () => {
-	let lock, unlock;
+	let lock: PrivateApis[ 'lock' ], unlock: PrivateApis[ 'unlock' ];
 	beforeEach( () => {
 		// This would live in @privateApis/test:
 		// Opt-in to private APIs
@@ -115,7 +119,7 @@ describe( 'lock(), unlock()', () => {
 } );
 
 describe( 'Specific use-cases of sharing private APIs', () => {
-	let lock, unlock;
+	let lock: PrivateApis[ 'lock' ], unlock: PrivateApis[ 'unlock' ];
 	beforeEach( () => {
 		// This would live in @privateApis/test:
 		// Opt-in to private APIs
@@ -174,9 +178,9 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 		 * The publicly exported function does not have any private
 		 * arguments.
 		 *
-		 * @param {any} data The data to log
+		 * @param data The data to log
 		 */
-		function logData( data ) {
+		function logData( data: unknown ) {
 			// Internally, it calls the private version of the function
 			// with fixed default values for the private arguments.
 			__privateLogData( data, 'plain' );
@@ -186,10 +190,10 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 		 * "locked" inside of the public logData function. It can be unlocked by any
 		 * participant of the private importing system.
 		 *
-		 * @param {any}    data            The data to log
-		 * @param {string} __privateFormat The logging format to use.
+		 * @param data            The data to log
+		 * @param __privateFormat The logging format to use.
 		 */
-		function __privateLogData( data, __privateFormat ) {
+		function __privateLogData( data: unknown, __privateFormat: string ) {
 			if ( __privateFormat === 'table' ) {
 				// eslint-disable-next-line no-console
 				console.table( data );
@@ -225,12 +229,11 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 	} );
 
 	it( 'Should enable exporting React Components with private private properties', () => {
-		// eslint-disable-next-line jsdoc/require-param
 		/**
 		 * The publicly exported component does not have any private
 		 * properties.
 		 */
-		function DataTable( { data } ) {
+		function DataTable( { data }: { data: string[][] } ) {
 			// Internally, it calls the private version of the function
 			// with fixed default values for the private arguments.
 			return (
@@ -240,13 +243,18 @@ describe( 'Specific use-cases of sharing private APIs', () => {
 				/>
 			);
 		}
-		// eslint-disable-next-line jsdoc/require-param
 		/**
 		 * The private private component is not publicly exported. Instead, it's
 		 * "locked" inside of the public logData function. It can be unlocked by any
 		 * participant of the private importing system.
 		 */
-		function PrivateDataTable( { data, __privateFancyFormatting } ) {
+		function PrivateDataTable( {
+			data,
+			__privateFancyFormatting,
+		}: {
+			data: string[][];
+			__privateFancyFormatting: boolean;
+		} ) {
 			const className = __privateFancyFormatting
 				? 'savage-css'
 				: 'regular-css';
