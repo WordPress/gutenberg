@@ -25,6 +25,7 @@
 
 ### Bug Fixes
 
+-   Fix copying fully selected bound text so resolved content and inline formatting are copied ([#84389](https://github.com/WordPress/gutenberg/pull/84389)).
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
 -   List View: Show the appender when the container is contentOnly ([#84713](https://github.com/WordPress/gutenberg/pull/84713)).
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).

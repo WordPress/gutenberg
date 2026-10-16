@@ -415,6 +415,98 @@ test.describe( 'Post Meta source', () => {
 			).toHaveText( 'Movie field default value' );
 		} );
 
+		test( 'should copy the resolved text and formatting when all bound text is selected', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await page.evaluate( () => {
+				window.wp.data.dispatch( 'core/editor' ).editPost( {
+					meta: { movie_field: 'Bound <strong>text</strong>' },
+				} );
+			} );
+			const bindings = {
+				content: {
+					source: 'core/post-meta',
+					args: { key: 'movie_field' },
+				},
+			};
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: '', metadata: { bindings } },
+			} );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText( 'Bound text' );
+			await expect( paragraphBlock.locator( 'strong' ) ).toHaveText(
+				'text'
+			);
+			await paragraphBlock.click();
+			await pageUtils.pressKeys( 'primary+a' );
+
+			const copiedContent = await paragraphBlock.evaluate(
+				( element ) => {
+					const clipboardData = new DataTransfer();
+					element.dispatchEvent(
+						new ClipboardEvent( 'copy', {
+							bubbles: true,
+							cancelable: true,
+							clipboardData,
+						} )
+					);
+					return {
+						plainText: clipboardData.getData( 'text/plain' ),
+						html: clipboardData.getData( 'text/html' ),
+					};
+				}
+			);
+
+			expect( copiedContent ).toEqual( {
+				plainText: 'Bound text',
+				html: 'Bound <strong>text</strong>',
+			} );
+			expect( await editor.getBlocks() ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '', metadata: { bindings } },
+				},
+			] );
+		} );
+
+		test( 'should preserve the binding when copying a block with a collapsed selection', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			const bindings = {
+				content: {
+					source: 'core/post-meta',
+					args: { key: 'movie_field' },
+				},
+			};
+			const boundParagraph = {
+				name: 'core/paragraph',
+				attributes: { content: '', metadata: { bindings } },
+			};
+			await editor.insertBlock( boundParagraph );
+			const paragraphBlock = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlock ).toHaveText(
+				'Movie field default value'
+			);
+			await paragraphBlock.click();
+			await page.keyboard.press( 'ArrowRight' );
+			await pageUtils.pressKeys( 'primary+c' );
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await pageUtils.pressKeys( 'primary+v' );
+
+			await expect
+				.poll( editor.getBlocks )
+				.toMatchObject( [ boundParagraph, boundParagraph ] );
+		} );
+
 		test( 'should fall back to the key when custom field is not accessible', async ( {
 			editor,
 		} ) => {
