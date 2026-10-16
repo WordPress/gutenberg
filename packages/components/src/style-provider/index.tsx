@@ -1,7 +1,7 @@
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import * as uuid from 'uuid';
-import { useLayoutEffect } from '@wordpress/element';
+import { useInsertionEffect } from '@wordpress/element';
 import { registerDocument } from '@wordpress/style-runtime';
 import type { StyleProviderProps } from './types';
 
@@ -31,7 +31,8 @@ const memoizedCreateCacheWithContainer = ( container: HTMLElement ) => {
 export function StyleProvider( props: StyleProviderProps ) {
 	const { children, document } = props;
 
-	useLayoutEffect( () => {
+	// Inject module styles before children measure layout, including in iframes.
+	useInsertionEffect( () => {
 		if ( ! document ) {
 			return;
 		}

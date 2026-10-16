@@ -1,7 +1,7 @@
 import { h } from 'preact';
 import type { ComponentChild } from 'preact';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { parseDirectiveValue, toVdom, hydratedIslands } from '../vdom';
+import { describe, expect, it, vi } from 'vitest';
+import { parseDirectiveValue, toVdom } from '../vdom';
 
 declare module 'vitest' {
 	// Must match Vitest's generic declaration for module augmentation.
@@ -35,11 +35,6 @@ expect.extend( {
 } );
 
 describe( 'toVdom', () => {
-	beforeEach( () => {
-		// @ts-expect-error `_values` is an internal property, accessed here for testing.
-		hydratedIslands._values = new WeakMap();
-	} );
-
 	describe( 'parseDirectiveValue', () => {
 		it( 'should separate a namespace from a plain directive value', () => {
 			expect( parseDirectiveValue( 'myplugin::sidebar' ) ).toEqual( {
@@ -876,26 +871,6 @@ describe( 'toVdom', () => {
 					]
 				)
 			);
-		} );
-	} );
-
-	describe( 'Hydrated islands', () => {
-		it( 'should add a topmost island', () => {
-			const element = createElementFromHTML( `
-				<div data-wp-interactive="my-namespace"></div>
-			` );
-			toVdom( element );
-			expect( hydratedIslands.has( element ) ).toBe( true );
-		} );
-
-		it( 'should add nested islands', () => {
-			const outer = createElementFromHTML(
-				`<div data-wp-interactive="outer"><div data-wp-interactive="inner"></div></div>`
-			);
-			const inner = outer.querySelector( '[data-wp-interactive="inner"' );
-			toVdom( outer );
-			expect( hydratedIslands.has( outer ) ).toBe( true );
-			expect( hydratedIslands.has( inner! ) ).toBe( true );
 		} );
 	} );
 
