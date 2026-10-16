@@ -26,6 +26,7 @@
 -   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
 -   `Snackbar`: Keep snackbars that have an action on screen for 10 seconds instead of 6 before they are dismissed automatically ([#84842](https://github.com/WordPress/gutenberg/pull/84842)).
+-   `Tabs`: Show the tab panel's focus ring with the design system's outline instead of a legacy box-shadow ([#84914](https://github.com/WordPress/gutenberg/pull/84914)).
 
 ### Deprecations
 
