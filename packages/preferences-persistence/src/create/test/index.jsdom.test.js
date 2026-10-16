@@ -12,6 +12,7 @@ describe( 'create', () => {
 	afterEach( () => {
 		mockedApiFetch.mockReset();
 		vi.restoreAllMocks();
+		window.localStorage.clear();
 	} );
 
 	describe( 'set', () => {
@@ -157,6 +158,50 @@ describe( 'create', () => {
 			vi.spyOn( global.Storage.prototype, 'getItem' ).mockReturnValueOnce(
 				'null'
 			);
+
+			const { get } = create();
+			expect( await get() ).toEqual( {} );
+		} );
+
+		it( 'returns a new empty object for each persistence layer', async () => {
+			mockedApiFetch.mockResolvedValue( {
+				meta: { persisted_preferences: null },
+			} );
+
+			const first = await create().get();
+			first.core = { fixedToolbar: true };
+			expect( await create().get() ).toEqual( {} );
+		} );
+
+		it( 'fetches when the preloaded data is not an object', async () => {
+			mockedApiFetch.mockResolvedValueOnce( {
+				meta: {
+					persisted_preferences: { core: { fixedToolbar: true } },
+				},
+			} );
+
+			const { get } = create( { preloadedData: [] } );
+			expect( await get() ).toEqual( { core: { fixedToolbar: true } } );
+			expect( mockedApiFetch ).toHaveBeenCalled();
+		} );
+
+		it( 'migrates data from the REST API', async () => {
+			mockedApiFetch.mockResolvedValueOnce( {
+				meta: {
+					persisted_preferences: {
+						'core/edit-post': { fixedToolbar: true },
+					},
+				},
+			} );
+
+			const { get } = create();
+			expect( await get() ).toEqual( { core: { fixedToolbar: true } } );
+		} );
+
+		it( 'ignores an empty array from the REST API', async () => {
+			mockedApiFetch.mockResolvedValueOnce( {
+				meta: { persisted_preferences: [] },
+			} );
 
 			const { get } = create();
 			expect( await get() ).toEqual( {} );

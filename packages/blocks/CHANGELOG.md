@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Stop normalizing deprecated responsive style state aliases while parsing blocks; saved style attributes must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
+
+### Bug Fixes
+
+-   `getBlockSupport` and `hasBlockSupport`: Accept the feature as an array of path segments in the types, as the store selectors and runtime already do ([#84708](https://github.com/WordPress/gutenberg/pull/84708)).
+-   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
+-   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
+
+## 16.2.0 (2026-10-07)
+
 ### Bug Fixes
 
 -   `pasteHandler`: Give each pasted data-URI image a unique filename, so uploading several images pasted at once (for example from Google Docs) no longer collides server-side and overwrites images with each other ([#79480](https://github.com/WordPress/gutenberg/pull/79480)).

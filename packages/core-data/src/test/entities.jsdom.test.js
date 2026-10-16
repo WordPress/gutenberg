@@ -7,7 +7,7 @@ import {
 	additionalEntityConfigLoaders,
 } from '../entities';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 vi.mock( import( '../utils/crdt' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	applyPostChangesToCRDTDoc: vi.fn(),

@@ -73,14 +73,16 @@ _Type_
 
 ## Unit testing deprecations
 
-Each deprecation message is logged only once per loaded instance of this package. The exported `logged` object tracks the full message text, so an earlier test can prevent a later test from observing the same warning. Resetting a console spy does not clear this state.
+Each deprecation message is logged only once per loaded instance of this package. The exported `logged` object tracks the full message text. Resetting a console spy does not clear this state.
 
-For a suite that exercises a deprecated feature, mark its message as logged in `beforeEach` to suppress it during tests of other behavior. Delete that entry before testing the warning itself, and clean it up in `afterEach` so tests do not depend on their execution order. Limit cleanup to the messages the suite uses.
+Gutenberg's internal Vitest setup clears `logged` before each test in Node, jsdom, and Browser Mode. Suites do not need their own deprecation-history cleanup. If every test that triggers a deprecation asserts the warning, no interaction with `logged` is needed. A message still logs only once within a test. See [Expected console calls](/docs/contributors/code/testing-overview.md#expected-console-calls).
+
+For a suite that exercises a deprecated feature, mark its message as logged in `beforeEach` to suppress it during tests of other behavior. Delete that entry before testing the warning itself.
 
 This example uses Vitest and the `toHaveWarnedWith` matcher provided by Gutenberg's test setup:
 
 ```js
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import deprecated, { logged } from '@wordpress/deprecated';
 
 const DEPRECATION_MESSAGE = 'legacyFeature is deprecated.';
@@ -88,10 +90,6 @@ const DEPRECATION_MESSAGE = 'legacyFeature is deprecated.';
 describe( 'legacyFeature', () => {
 	beforeEach( () => {
 		logged[ DEPRECATION_MESSAGE ] = true;
-	} );
-
-	afterEach( () => {
-		delete logged[ DEPRECATION_MESSAGE ];
 	} );
 
 	it( 'warns that the feature is deprecated', () => {
@@ -105,7 +103,7 @@ describe( 'legacyFeature', () => {
 
 Setting a `logged` entry also prevents the `deprecated` action from firing. Leave the entry absent when testing that action.
 
-If every test that triggers a deprecation already asserts the warning, delete the message's entry in both `beforeEach` and `afterEach` instead of marking it as logged. This keeps the warning assertions independent without suppressing them.
+If your test setup does not clear `logged`, an earlier test can prevent a later test from observing the same warning. Delete the entries for messages your suite uses in `beforeEach` and `afterEach` to keep tests independent. For tests that suppress a warning, set its entry in `beforeEach` instead of deleting it. Limit cleanup to the messages the suite uses.
 
 ## Contributing to this package
 

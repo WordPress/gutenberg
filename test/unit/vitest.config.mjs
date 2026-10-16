@@ -6,7 +6,6 @@ import { defineConfig } from 'vitest/config';
 import { createVitePlugins } from './config/vite-plugins.mjs';
 import { createPlaywrightProvider } from './config/playwright-provider.mjs';
 import { createBrowserTraceArtifacts } from './config/browser-traces.mjs';
-import { createPostcssBrowserPlugin } from '../../storybook/postcss-browser-plugin.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -102,6 +101,13 @@ export default defineConfig( {
 				replacement: path.join(
 					ROOT_DIR,
 					'test/unit/config/video-conversion-worker-code-stub.vitest.js'
+				),
+			},
+			{
+				find: /^@wordpress\/core-actions\/([^/]+)$/,
+				replacement: path.join(
+					ROOT_DIR,
+					'packages/core-actions/src/$1'
 				),
 			},
 			{
@@ -210,9 +216,6 @@ export default defineConfig( {
 				 */
 				root: CONFIG_DIR,
 				optimizeDeps: {
-					rolldownOptions: {
-						plugins: [ createPostcssBrowserPlugin( ROOT_DIR ) ],
-					},
 					entries: vitestTests.browser.map( ( testPath ) =>
 						path.join( ROOT_DIR, testPath )
 					),
@@ -244,8 +247,6 @@ export default defineConfig( {
 						),
 						isolationSetupFile,
 					],
-					// Revisit the interceptor warning once this fix ships:
-					// https://github.com/vitest-dev/vitest/pull/11377
 					browser: {
 						enabled: true,
 						headless: true,

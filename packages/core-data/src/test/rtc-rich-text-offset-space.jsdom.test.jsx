@@ -15,7 +15,7 @@ import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 import { getRootMap } from '../utils/crdt-utils';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 const postTypeConfig = {
 	kind: 'postType',

@@ -4,7 +4,6 @@ import { render } from 'vitest-browser-react';
 import { ContextSystemProvider } from '../../context';
 import { ToolsPanel, ToolsPanelItem } from '..';
 // The cascade contract includes Button's global icon-button defaults.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../button/style.scss';
 
 const defaultProps = {

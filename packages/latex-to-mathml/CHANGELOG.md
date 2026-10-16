@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 1.25.0 (2026-10-07)
+
 ### Bug Fixes
 
 -   Write `columnalign` on the cells of `aligned`, `cases` and tagged equations, so the alignment is part of the MathML, and strip the classes temml adds for its own stylesheet ([#83164](https://github.com/WordPress/gutenberg/pull/83164)).

@@ -226,10 +226,8 @@ export const getEntityRecord =
 							query
 						);
 					},
-					onUndoStackChange: ( undoState ) => {
-						dispatch.__unstableNotifySyncUndoManagerChange(
-							undoState
-						);
+					onUndoLevelOpened: () => {
+						dispatch.recordSyncUndoLevel( kind, name, key );
 					},
 				} );
 			}
@@ -1225,4 +1223,20 @@ export const getViewConfig =
 			path: addQueryArgs( '/wp/v2/view-config', query ),
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
+	};
+
+/**
+ * Requests the fields registered on the server for a given entity from the
+ * REST API.
+ *
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ */
+export const getFieldsConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/entity-fields', { kind, name } ),
+		} );
+		dispatch.receiveFieldsConfig( kind, name, config );
 	};

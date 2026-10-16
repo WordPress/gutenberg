@@ -5,7 +5,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import PostTaxonomies from '../';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 vi.hoisted( () => globalThis.wpVitest.mockMatchMedia() );
 

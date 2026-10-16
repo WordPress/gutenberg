@@ -500,6 +500,14 @@ function Layout( {
 						} );
 					}
 					break;
+				case 'permanently-delete':
+					{
+						document.location.href = addQueryArgs( 'edit.php', {
+							deleted: 1,
+							post_type: items[ 0 ].type,
+						} );
+					}
+					break;
 				case 'duplicate-post':
 					{
 						const newItem = items[ 0 ];
@@ -561,7 +569,14 @@ function Layout( {
 						<div { ...navigateRegionsProps }>
 							<Editor
 								settings={ editorSettings }
-								initialEdits={ initialEdits }
+								// The initial edits belong to the post the editor was
+								// opened with, not to entities navigated to from it.
+								initialEdits={
+									currentPostId === initialPostId &&
+									currentPostType === initialPostType
+										? initialEdits
+										: undefined
+								}
 								postType={ currentPostType }
 								postId={ currentPostId }
 								templateId={ templateId }

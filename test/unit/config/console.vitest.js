@@ -1,4 +1,10 @@
 import { aroundEach, beforeAll, beforeEach, expect, vi } from 'vitest';
+import { logged } from '@wordpress/deprecated';
+
+beforeEach( () => {
+	// Reset log-once state alongside the console spies so tests remain independent.
+	Object.keys( logged ).forEach( ( key ) => delete logged[ key ] );
+} );
 
 const supportedMatchers = {
 	error: 'toHaveErrored',

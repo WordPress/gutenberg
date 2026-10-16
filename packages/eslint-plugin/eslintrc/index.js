@@ -1,5 +1,5 @@
 /**
- * Legacy eslintrc compatibility wrapper for @wordpress/eslint-plugin.
+ * Legacy eslintrc compatibility wrapper for `@wordpress/eslint-plugin`.
  *
  * This module converts the flat config arrays exported by the plugin
  * into eslintrc-compatible config objects, allowing consumers still

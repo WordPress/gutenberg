@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '@wordpress/data';
 
@@ -9,10 +9,6 @@ const DEPRECATION_MESSAGE =
 
 beforeEach( () => {
 	logged[ DEPRECATION_MESSAGE ] = true;
-} );
-
-afterEach( () => {
-	delete logged[ DEPRECATION_MESSAGE ];
 } );
 
 const testStore = {

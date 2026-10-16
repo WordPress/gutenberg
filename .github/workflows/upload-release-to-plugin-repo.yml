@@ -284,6 +284,12 @@ jobs:
                   sparse-checkout: tools/release
                   persist-credentials: false
 
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
+
             - name: Install Subversion
               run: |
                   sudo apt-get update -y && sudo apt-get install -y subversion
@@ -318,7 +324,7 @@ jobs:
                   path: trunk
 
             - name: Publish and verify the release
-              run: bash tools/release/publish-to-svn.sh "$GITHUB_WORKSPACE/trunk" trunk
+              run: node tools/release/publish-to-svn.mts "$GITHUB_WORKSPACE/trunk" trunk
 
     upload-tag:
         name: Publish as tag
@@ -349,6 +355,12 @@ jobs:
                   sparse-checkout: tools/release
                   persist-credentials: false
 
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: .nvmrc
+                  package-manager-cache: false
+
             - name: Install Subversion
               run: |
                   sudo apt-get update -y && sudo apt-get install -y subversion
@@ -375,4 +387,4 @@ jobs:
                   path: ${{ needs.get-release-metadata.outputs.version }}
 
             - name: Publish and verify the release
-              run: bash tools/release/publish-to-svn.sh "$GITHUB_WORKSPACE/$VERSION" tag
+              run: node tools/release/publish-to-svn.mts "$GITHUB_WORKSPACE/$VERSION" tag

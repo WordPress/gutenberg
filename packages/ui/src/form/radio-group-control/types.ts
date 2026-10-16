@@ -1,8 +1,8 @@
-import type { RadioGroup } from '../primitives';
+import type { RadioGroupProps } from '../primitives/radio-group/types';
 import type { ControlProps } from '../types';
 
 export type RadioGroupControlProps = Omit<
-	React.ComponentProps< typeof RadioGroup >,
+	RadioGroupProps< string >,
 	'children'
 > &
 	ControlProps & {

@@ -131,8 +131,11 @@ export default function BlockBindingsAttributeControl( {
 				} )
 			}
 		>
-			<Menu.Root disabled={ ! hasCompatibleFields }>
-				<Menu.Trigger render={ <Item /> }>
+			<Menu.Root>
+				<Menu.Trigger
+					disabled={ ! hasCompatibleFields }
+					render={ <Item /> }
+				>
 					<VStack
 						className="block-editor-bindings__item"
 						spacing={ 0 }

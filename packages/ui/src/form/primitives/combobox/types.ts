@@ -145,7 +145,13 @@ export type ComboboxPopupProps = ComponentProps< typeof _Combobox.Popup > &
 export type ComboboxRootProps<
 	Value,
 	Multiple extends boolean | undefined = false,
-> = _Combobox.Root.Props< Value, Multiple >;
+	Item = Value,
+> = _Combobox.Root.Props< Value, Multiple, Item >;
+
+export type ComboboxSeparatorProps = Omit<
+	ComponentProps< typeof _Combobox.Separator >,
+	'orientation'
+>;
 
 export type ComboboxStatusProps = ComponentProps< typeof _Combobox.Status > & {
 	children?: React.ReactNode;

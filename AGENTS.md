@@ -81,6 +81,7 @@ For full architecture details, see `docs/explanations/architecture/`.
 
 ## Common pitfalls
 
+-   Dependencies are isolated, not hoisted: `.npmrc` sets `install-strategy = "linked"`. Packages live in `node_modules/.store/` and are symlinked only into the `node_modules` of the workspaces that declare them, so a near-empty root `node_modules` (or a missing `node_modules/typescript`) is expected and does not mean the install failed. To check an install, look for `node_modules/.store/` (`ls -a`, since it is a dotfile) or just run the npm script you need.
 -   Do not add dependencies to the root `package.json`. Add them to the workspace that uses them, or create a new workspace under `tools/` (or `test/` for test infrastructure). See [Workspace Development](docs/contributors/code/workspace-development.md).
 -   Published package runtime files and emitted type declarations must resolve through the package's declared dependency surface; never rely on root hoisting or workspace links. Prefer fixing accidentally leaked public types over adding an unrelated heavy dependency, and run `npm run lint:published-deps` when changing package dependencies or exported types.
 -   PHP features in `lib/compat/` MUST go in the `wordpress-X.Y/` directory for their intended WordPress release. Inspect the available compatibility directories first; do not assume the newest one is right.

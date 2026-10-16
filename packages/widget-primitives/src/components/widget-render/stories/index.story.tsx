@@ -1018,7 +1018,7 @@ The widget declares where to go; the application decides how to get there. \`Hos
 
 **Takeaway**
 
-Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`LinkButton\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
+Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`ButtonLink\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
 `,
 			},
 		},
