@@ -11,7 +11,6 @@ export interface EditorStylesStyle extends Partial< EditorStyle > {
 	id?: string;
 	__unstableType?: string;
 	assets?: string;
-	[ key: string ]: unknown;
 }
 
 /**
