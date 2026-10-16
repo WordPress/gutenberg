@@ -10353,16 +10353,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/utils/box-sizing.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/utils/rtl.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/utils/test/polymorphic-element.jsdom.test.tsx": {
 		"no-restricted-imports": {
 			"count": 1
