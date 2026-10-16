@@ -1,6 +1,9 @@
 type Comparable = string | number | undefined;
-type SortItem = Record< string, Comparable >;
-type SortField< T > = string | ( ( item: T ) => Comparable );
+type SortItem = object;
+type ComparableKey< T > = {
+	[ K in keyof T ]: T[ K ] extends Comparable ? K : never;
+}[ keyof T ];
+type SortField< T > = ComparableKey< T > | ( ( item: T ) => Comparable );
 
 /**
  * Mirrors the `>` operator for `Comparable` values: lexicographic when both
@@ -35,8 +38,8 @@ const comparator = < T extends SortItem >(
 			cmpA = field( a );
 			cmpB = field( b );
 		} else {
-			cmpA = a[ field ];
-			cmpB = b[ field ];
+			cmpA = a[ field ] as Comparable;
+			cmpB = b[ field ] as Comparable;
 		}
 
 		if ( isGreater( cmpA, cmpB ) ) {
