@@ -8,7 +8,7 @@ import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { User } from '@wordpress/core-data';
-import type { BasePostWithEmbeddedAuthor } from '@wordpress/fields';
+import type { BasePostWithEmbeddedAuthor } from '../../dataviews/types';
 
 function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 	// Revisions don't embed their author, so fetch the user record unless the
