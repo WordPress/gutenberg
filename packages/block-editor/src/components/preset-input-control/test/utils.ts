@@ -30,12 +30,16 @@ describe( 'isValuePreset', () => {
 
 	it( 'should return false for undefined or null values', () => {
 		expect( isValuePreset( undefined, 'spacing' ) ).toBe( false );
+		// @ts-expect-error Covers a `null` value.
 		expect( isValuePreset( null, 'spacing' ) ).toBe( false );
 	} );
 
 	it( 'should return false for non-string values', () => {
+		// @ts-expect-error Covers a value that is not a string.
 		expect( isValuePreset( 10, 'spacing' ) ).toBe( false );
+		// @ts-expect-error Covers a value that is not a string.
 		expect( isValuePreset( {}, 'spacing' ) ).toBe( false );
+		// @ts-expect-error Covers a value that is not a string.
 		expect( isValuePreset( [], 'spacing' ) ).toBe( false );
 	} );
 
@@ -53,6 +57,7 @@ describe( 'getPresetSlug', () => {
 	it( 'should return undefined for empty values', () => {
 		expect( getPresetSlug( '', 'spacing' ) ).toBe( undefined );
 		expect( getPresetSlug( undefined, 'spacing' ) ).toBe( undefined );
+		// @ts-expect-error Covers a `null` value.
 		expect( getPresetSlug( null, 'spacing' ) ).toBe( undefined );
 	} );
 
@@ -112,6 +117,7 @@ describe( 'getSliderValueFromPreset', () => {
 		expect( getSliderValueFromPreset( '0', mockPresets, 'spacing' ) ).toBe(
 			0
 		);
+		// @ts-expect-error Covers a numeric value.
 		expect( getSliderValueFromPreset( 0, mockPresets, 'spacing' ) ).toBe(
 			0
 		);
@@ -317,6 +323,7 @@ describe( 'getPresetValueFromCustomValue', () => {
 			getPresetValueFromCustomValue( '', mockPresets, 'spacing' )
 		).toBe( '' );
 		expect(
+			// @ts-expect-error Covers a `null` value.
 			getPresetValueFromCustomValue( null, mockPresets, 'spacing' )
 		).toBe( null );
 	} );
@@ -415,6 +422,7 @@ describe( 'getPresetValueFromCustomValue', () => {
 			getPresetValueFromCustomValue( '10', mixedPresets, 'spacing' )
 		).toBe( 'var:preset|spacing|small' );
 		expect(
+			// @ts-expect-error Covers a numeric value.
 			getPresetValueFromCustomValue( 20, mixedPresets, 'spacing' )
 		).toBe( 'var:preset|spacing|medium' );
 	} );

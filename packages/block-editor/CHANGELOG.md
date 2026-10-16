@@ -65,6 +65,7 @@
 -   Convert the color utilities, `withColors`, the gradient utilities, `ColorPalette`, `PanelColorSettings`, `BlockColorsStyleSelector` and `ContrastChecker` to TypeScript ([#84875](https://github.com/WordPress/gutenberg/pull/84875)).
 -   Convert the block visibility, block lock and block bindings components to TypeScript ([#84876](https://github.com/WordPress/gutenberg/pull/84876)).
 -   Convert `DimensionsTool`, `ResolutionTool` and `ImageSizeControl` to TypeScript ([#84877](https://github.com/WordPress/gutenberg/pull/84877)).
+-   Convert `PresetInputControl` to TypeScript ([#84878](https://github.com/WordPress/gutenberg/pull/84878)).
 
 ## 18.1.0 (2026-10-07)
 
