@@ -104,6 +104,7 @@ export default function useSelectionObserver() {
 	const {
 		getBlockParents,
 		getBlockSelectionStart,
+		isDraggingBlocks,
 		isMultiSelecting,
 		getSelectionStart,
 		getSelectionEnd,
@@ -140,6 +141,13 @@ export default function useSelectionObserver() {
 			}
 
 			function onSelectionChange( event ) {
+				// While blocks are being dragged, the selection is driven
+				// by the drag, not by the caret the press may have left
+				// behind.
+				if ( isDraggingBlocks() ) {
+					return;
+				}
+
 				const selection = defaultView.getSelection();
 
 				if ( ! selection.rangeCount ) {
