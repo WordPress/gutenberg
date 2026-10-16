@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 // Give the revisions inspector a bounded height so the timeline scrolls
 // internally and the picker's pagination stays pinned to the bottom.
 //
@@ -43,4 +45,49 @@
 .editor-sidebar__panel .editor-post-revisions-timeline {
 	flex: 1;
 	min-height: 0;
+}
+
+.editor-post-revisions-timeline__author-avatar {
+	flex-shrink: 0;
+	overflow: hidden;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+	align-items: center;
+	justify-content: left;
+	display: flex;
+
+	img {
+		width: $grid-unit-20;
+		height: $grid-unit-20;
+		object-fit: cover;
+		opacity: 0;
+		border-radius: 100%;
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
+	}
+
+	&.is-loaded {
+		img {
+			opacity: 1;
+		}
+	}
+}
+
+.editor-post-revisions-timeline__author-icon {
+	display: flex;
+	flex-shrink: 0;
+	width: $grid-unit-30;
+	height: $grid-unit-30;
+
+	svg {
+		margin-left: -$grid-unit-05;
+		fill: currentColor;
+	}
+}
+
+.editor-post-revisions-timeline__author-name {
+	text-overflow: ellipsis;
+	overflow: hidden;
 }

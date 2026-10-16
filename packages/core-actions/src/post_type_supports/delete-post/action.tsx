@@ -9,14 +9,18 @@ import {
 } from '@wordpress/components';
 // @ts-expect-error `@wordpress/patterns` is not typed yet.
 import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
-import type { Action } from '@wordpress/dataviews';
 import { decodeEntities } from '@wordpress/html-entities';
 import {
 	getItemTitle,
 	isTemplateOrTemplatePart,
 	isTemplateRemovable,
 } from '../../shared/utils';
-import type { Pattern, Template, TemplatePart } from '../../shared/types';
+import type {
+	Pattern,
+	Template,
+	TemplatePart,
+	ActionScriptParts,
+} from '../../shared/types';
 import type { NoticeSettings } from './delete-post-with-notices';
 import { deletePostWithNotices } from './delete-post-with-notices';
 import { unlock } from '../../lock-unlock';
@@ -26,10 +30,7 @@ const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 // This action is used for templates, patterns and template parts.
 // Every other post type uses the similar `trashPostAction` which
 // moves the post to trash.
-const deletePostAction: Action< Template | TemplatePart | Pattern > = {
-	id: 'delete-post',
-	label: __( 'Delete…' ),
-	isPrimary: true,
+const deletePost: ActionScriptParts< Template | TemplatePart | Pattern > = {
 	icon: trash,
 	isEligible( post ) {
 		if ( isTemplateOrTemplatePart( post ) ) {
@@ -38,9 +39,6 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 		// We can only remove user patterns.
 		return post.type === PATTERN_TYPES.user;
 	},
-	supportsBulk: true,
-	hideModalHeader: true,
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ isBusy, setIsBusy ] = useState( false );
 		const isResetting = items.every(
@@ -198,6 +196,7 @@ const deletePostAction: Action< Template | TemplatePart | Pattern > = {
 };
 
 /**
- * Delete action for Templates, Patterns and Template Parts.
+ * The JavaScript parts of the delete action for Templates, Patterns and
+ * Template Parts; its data is in `action.php`.
  */
-export default deletePostAction;
+export default deletePost;
