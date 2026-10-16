@@ -2,8 +2,11 @@ import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import type { BlockEditVisuallyButtonProps } from './types';
 
-export default function BlockEditVisuallyButton( { clientIds } ) {
+export default function BlockEditVisuallyButton( {
+	clientIds,
+}: BlockEditVisuallyButtonProps ) {
 	// Edit visually only works for single block selection.
 	const clientId = clientIds.length === 1 ? clientIds[ 0 ] : undefined;
 	const canEditVisually = useSelect(
@@ -22,7 +25,8 @@ export default function BlockEditVisuallyButton( { clientIds } ) {
 		<ToolbarGroup>
 			<ToolbarButton
 				onClick={ () => {
-					toggleBlockMode( clientId );
+					// The button only renders for a single block.
+					toggleBlockMode( clientId! );
 				} }
 			>
 				{ __( 'Edit visually' ) }

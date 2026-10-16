@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import HeadingLevelDropdown from '../';
 
-const meta = {
+const meta: Meta< typeof HeadingLevelDropdown > = {
 	id: 'blockeditor-headingleveldropdown',
 	title: 'Editor/Block Editor/HeadingLevelDropdown',
 	component: HeadingLevelDropdown,
@@ -16,6 +17,7 @@ const meta = {
 	},
 	argTypes: {
 		value: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'The chosen heading level.',
 		},
@@ -26,6 +28,7 @@ const meta = {
 		},
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'Function called with the selected value changes.',
 		},
@@ -34,7 +37,9 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState( args.value );
 

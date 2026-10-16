@@ -1,7 +1,9 @@
+import type { ComponentProps } from 'react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import BlockAlignmentMatrixControl from '../';
 
-const meta = {
+const meta: Meta< typeof BlockAlignmentMatrixControl > = {
 	id: 'blockeditor-blockalignmentmatrixcontrol',
 	title: 'Editor/Block Editor/BlockAlignmentMatrixControl',
 	component: BlockAlignmentMatrixControl,
@@ -25,6 +27,7 @@ const meta = {
 		},
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			table: {
 				type: { summary: 'function' },
@@ -42,6 +45,7 @@ const meta = {
 			description: 'Whether the control should be disabled.',
 		},
 		value: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			table: {
 				type: { summary: 'string' },
@@ -54,16 +58,22 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState();
+		const [ value, setValue ] =
+			useState<
+				ComponentProps< typeof BlockAlignmentMatrixControl >[ 'value' ]
+			>();
 
 		return (
 			<BlockAlignmentMatrixControl
 				{ ...args }
 				value={ value }
 				onChange={ ( ...changeArgs ) => {
-					onChange( ...changeArgs );
+					// Storybook passes an action.
+					onChange!( ...changeArgs );
 					setValue( ...changeArgs );
 				} }
 			/>
