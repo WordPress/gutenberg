@@ -2,28 +2,22 @@ import { Icon as WCIcon } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 import { audio, file } from '@wordpress/icons';
 import { getFilename } from '@wordpress/url';
-import type { MediaType } from './types';
 
-// Icons for media that has no preview of its own. Audio is the only such type
-// the inserter can show today; the default covers types added later, such as
-// documents.
-const PREVIEW_ICONS: Partial< Record< MediaType, React.JSX.Element > > = {
+const PREVIEW_ICONS: Record< string, React.JSX.Element > = {
 	audio,
 };
 
 /**
- * Stands in for media with nothing to show: the type's icon above the file's
- * name, in place of an empty tile or a player squeezed into one.
+ * An icon and a filename, for media with no visual preview of its own.
  */
 export default function FilePreview( {
 	url,
 	mediaType,
 }: {
 	url: string;
-	mediaType: MediaType;
+	mediaType: string;
 } ) {
-	// External sources can hand us a URL with no filename in it, in which case
-	// the icon stands alone.
+	// A URL doesn't always include a filename, in which case the icon renders on its own.
 	const filename = getFilename( url );
 	return (
 		<Stack
