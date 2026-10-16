@@ -1,14 +1,15 @@
 {
 	"name": "@wordpress/fields",
 	"version": "0.49.0",
-	"description": "The fields WordPress core registers on the server for the Entity fields API: their PHP declarations and the script modules of their JavaScript parts.",
+	"description": "The fields and actions WordPress core registers on the server for the Entity fields and Entity actions APIs: their PHP declarations and the script modules of their JavaScript parts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
 		"dataviews",
-		"fields"
+		"fields",
+		"actions"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields/README.md",
 	"repository": {
@@ -39,7 +40,19 @@
 		"./root_site": "./build-module/entity-fields/root_site/index.mjs",
 		"./wp_block": "./build-module/entity-fields/wp_block/index.mjs",
 		"./wp_template": "./build-module/entity-fields/wp_template/index.mjs",
-		"./wp_template_part": "./build-module/entity-fields/wp_template_part/index.mjs"
+		"./wp_template_part": "./build-module/entity-fields/wp_template_part/index.mjs",
+		"./entity-actions/post_type_supports": {
+			"path": "./build-module/entity-actions/post_type_supports/index.mjs",
+			"id": "@wordpress/actions/post_type_supports"
+		},
+		"./entity-actions/wp_block": {
+			"path": "./build-module/entity-actions/wp_block/index.mjs",
+			"id": "@wordpress/actions/wp_block"
+		},
+		"./entity-actions/wp_template_part": {
+			"path": "./build-module/entity-actions/wp_template_part/index.mjs",
+			"id": "@wordpress/actions/wp_template_part"
+		}
 	},
 	"wpCopyFiles": {
 		"files": [
@@ -55,6 +68,9 @@
 		"src/**/*.module.css"
 	],
 	"dependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/blob": "file:../blob",
+		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
@@ -67,11 +83,14 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/patterns": "file:../patterns",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/ui": "file:../ui",
 		"@wordpress/url": "file:../url",
 		"@wordpress/wordcount": "file:../wordcount",
+		"change-case": "^4.1.2",
+		"client-zip": "^2.4.5",
 		"clsx": "^2.1.1",
 		"remove-accents": "^0.5.0"
 	},

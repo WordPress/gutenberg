@@ -11,7 +11,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
-import { unlock } from '../../lock-unlock';
+import { unlock } from '../../../lock-unlock';
 import {
 	getItemTitle,
 	isTemplateRemovable,

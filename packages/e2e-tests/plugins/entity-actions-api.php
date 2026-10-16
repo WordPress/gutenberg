@@ -92,7 +92,7 @@ function gutenberg_test_entity_actions_api_replace_action() {
 				)
 			),
 		),
-		'@wordpress/core-actions/post_type_supports'
+		'@wordpress/actions/post_type_supports'
 	);
 }
 add_action( 'wp_entity_actions_api_init', 'gutenberg_test_entity_actions_api_replace_action' );

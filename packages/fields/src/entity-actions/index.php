@@ -81,7 +81,7 @@ function register_core_entity_actions() {
 				// The id comes first, like in the actions registered directly.
 				$definitions[ $key ] = array_merge( array( 'id' => $id ), $require( __DIR__ . "/{$key}/action.php" ) );
 			}
-			wp_register_entity_actions( 'core', 'postType', $name, array( $definitions[ $key ] ), "@wordpress/core-actions/{$module}" );
+			wp_register_entity_actions( 'core', 'postType', $name, array( $definitions[ $key ] ), "@wordpress/actions/{$module}" );
 		}
 	}
 }

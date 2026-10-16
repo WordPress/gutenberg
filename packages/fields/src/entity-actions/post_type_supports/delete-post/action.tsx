@@ -23,7 +23,7 @@ import type {
 } from '../../shared/types';
 import type { NoticeSettings } from './delete-post-with-notices';
 import { deletePostWithNotices } from './delete-post-with-notices';
-import { unlock } from '../../lock-unlock';
+import { unlock } from '../../../lock-unlock';
 
 const { PATTERN_TYPES } = unlock( patternsPrivateApis );
 

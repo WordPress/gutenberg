@@ -11,17 +11,17 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	/**
 	 * The script module of the actions of every post type.
 	 */
-	const POST_TYPE_SUPPORTS = '@wordpress/core-actions/post_type_supports';
+	const POST_TYPE_SUPPORTS = '@wordpress/actions/post_type_supports';
 
 	/**
 	 * The script module of the actions of patterns.
 	 */
-	const WP_BLOCK = '@wordpress/core-actions/wp_block';
+	const WP_BLOCK = '@wordpress/actions/wp_block';
 
 	/**
 	 * The script module of the actions of template parts.
 	 */
-	const WP_TEMPLATE_PART = '@wordpress/core-actions/wp_template_part';
+	const WP_TEMPLATE_PART = '@wordpress/actions/wp_template_part';
 
 	/**
 	 * The actions every post type has, each checking which posts it applies
@@ -365,7 +365,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 				'postType',
 				'page',
 				array( array_merge( $trash[0], array( 'label' => 'Bin…' ) ) ),
-				'@wordpress/core-actions/post_type_supports'
+				'@wordpress/actions/post_type_supports'
 			);
 		};
 		add_action( 'wp_entity_actions_api_init', $callback );
