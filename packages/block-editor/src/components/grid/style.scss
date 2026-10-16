@@ -470,7 +470,7 @@
 .block-editor-grid-item-handles {
 	// Specificity to override the z-index and pointer-events set by .components-popover.
 	&.block-editor-grid-item-handles.block-editor-grid-item-handles {
-		z-index: z-index(".block-editor-grid-visualizer");
+		z-index: z-index(".block-editor-grid-item-handles");
 
 		.components-popover__content * {
 			pointer-events: none;
