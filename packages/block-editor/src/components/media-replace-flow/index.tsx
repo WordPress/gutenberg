@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ChangeEvent, KeyboardEvent, ReactNode } from 'react';
 import { __, _x } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import {
@@ -25,6 +26,11 @@ import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
 import { store as blockEditorStore } from '../../store';
 import { getComputedAcceptAttribute } from '../media-placeholder/utils';
+import type { MediaUploadFunction } from '../provider/types';
+import type {
+	MediaReplaceFlowInnerProps,
+	MediaReplaceFlowProps,
+} from './types';
 
 const noop = () => {};
 let uniqueId = 0;
@@ -53,12 +59,13 @@ const MediaReplaceFlow = ( {
 	popoverProps,
 	renderToggle,
 	className,
-} ) => {
+}: MediaReplaceFlowInnerProps ) => {
 	const { mediaUpload, allowedMimeTypes } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
 		return {
-			mediaUpload: settings.mediaUpload,
+			mediaUpload: settings.mediaUpload as
+				MediaUploadFunction | undefined,
 			allowedMimeTypes: settings.allowedMimeTypes,
 		};
 	}, [] );
@@ -74,7 +81,7 @@ const MediaReplaceFlow = ( {
 		[ allowedTypes, allowedMimeTypes, accept ]
 	);
 
-	const onUploadError = ( message ) => {
+	const onUploadError = ( message: string ) => {
 		const safeMessage = stripHTML( message );
 		if ( onError ) {
 			onError( safeMessage );
@@ -95,7 +102,7 @@ const MediaReplaceFlow = ( {
 		}, 1000 );
 	};
 
-	const selectMedia = ( media, closeMenu ) => {
+	const selectMedia = ( media: unknown, closeMenu: () => void ) => {
 		const hasMedia = !! ( mediaURL || mediaId || mediaIds?.length );
 		if ( useFeaturedImage && onToggleFeaturedImage ) {
 			onToggleFeaturedImage();
@@ -111,27 +118,33 @@ const MediaReplaceFlow = ( {
 		removeNotice( errorNoticeID );
 	};
 
-	const uploadFiles = ( event, closeMenu ) => {
-		const files = event.target.files;
+	const uploadFiles = (
+		event: ChangeEvent< HTMLInputElement >,
+		closeMenu: () => void
+	) => {
+		// A file input always has a file list.
+		const files = event.target.files!;
 		if ( ! handleUpload ) {
 			closeMenu();
 			return onSelect( files );
 		}
 		onFilesUpload( files );
-		mediaUpload( {
+		// Uploads only start where the user can upload media.
+		mediaUpload!( {
 			allowedTypes,
 			filesList: files,
-			onFileChange: ( [ media ] ) => {
+			onFileChange: ( [ media ]: unknown[] ) => {
 				selectMedia( media, closeMenu );
 			},
 			onError: onUploadError,
 		} );
 	};
 
-	const openOnArrowDown = ( event ) => {
+	const openOnArrowDown = ( event: KeyboardEvent< HTMLElement > ) => {
 		if ( event.keyCode === DOWN ) {
 			event.preventDefault();
-			event.target.click();
+			// The toggle receiving the key is a button.
+			( event.target as HTMLElement ).click();
 		}
 	};
 
@@ -261,7 +274,8 @@ const MediaReplaceFlow = ( {
 								settings={ [] }
 								showSuggestions={ false }
 								onChange={ ( { url } ) => {
-									onSelectURL( url );
+									// Submitting the URL input passes its URL.
+									onSelectURL( url! );
 								} }
 								searchInputPlaceholder={ __(
 									'Paste or type URL'
@@ -287,4 +301,6 @@ export default compose( [
 		};
 	} ),
 	withFilters( 'editor.MediaReplaceFlow' ),
-] )( MediaReplaceFlow );
+] )( MediaReplaceFlow ) as < Media = unknown >(
+	props: MediaReplaceFlowProps< Media >
+) => ReactNode; // `compose` erases the props of the composed component.
