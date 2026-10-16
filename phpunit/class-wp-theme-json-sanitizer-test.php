@@ -118,6 +118,41 @@ class WP_Theme_JSON_Sanitizer_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				array( 'theme_json_invalid_type', array( 'styles' ), 'dropped' ),
 			),
+			'preset item that is not an object'        => array(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array( 'color' => array( 'palette' => array( 'red' ) ) ),
+				),
+				array( 'theme_json_invalid_type', array( 'settings', 'color', 'palette', 0 ), 'dropped' ),
+			),
+			'preset slug that is not scalar'           => array(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'typography' => array(
+							'fontSizes' => array(
+								array(
+									'slug' => array( 'small' ),
+									'name' => 'Small',
+									'size' => '12px',
+								),
+							),
+						),
+					),
+				),
+				array( 'theme_json_invalid_type', array( 'settings', 'typography', 'fontSizes', 0, 'slug' ), 'dropped' ),
+			),
+			'origin-keyed preset item that is not an object' => array(
+				array(
+					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'settings' => array(
+						'blocks' => array(
+							'core/paragraph' => array( 'color' => array( 'palette' => array( 'custom' => array( 'red' ) ) ) ),
+						),
+					),
+				),
+				array( 'theme_json_invalid_type', array( 'settings', 'blocks', 'core/paragraph', 'color', 'palette', 'custom', 0 ), 'dropped' ),
+			),
 			'viewport breakpoint replaced by defaults' => array(
 				array(
 					'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,

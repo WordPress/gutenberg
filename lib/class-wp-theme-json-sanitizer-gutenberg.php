@@ -349,10 +349,6 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 			$result = static::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ], array( $subtree ) );
 
 			if ( 'settings' === $subtree ) {
-				// Preset leaves are untyped in VALID_SETTINGS, but consumers read `$preset['slug']` as a string.
-				$is_valid_preset = static function ( $preset ) {
-					return is_array( $preset ) && ( ! isset( $preset['slug'] ) || is_scalar( $preset['slug'] ) );
-				};
 				// Presets live at the root of `settings` and under each `settings.blocks.<name>`.
 				$preset_node_paths = array( array() );
 				if ( isset( $result['blocks'] ) && is_array( $result['blocks'] ) ) {
@@ -368,11 +364,11 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 							continue;
 						}
 						if ( isset( $presets[0] ) ) {
-							$presets = array_values( array_filter( $presets, $is_valid_preset ) );
+							$presets = static::remove_invalid_preset_items( $presets, array_merge( array( 'settings' ), $path ) );
 						} else {
 							foreach ( WP_Theme_JSON_Gutenberg::VALID_ORIGINS as $origin ) {
 								if ( isset( $presets[ $origin ] ) && is_array( $presets[ $origin ] ) ) {
-									$presets[ $origin ] = array_values( array_filter( $presets[ $origin ], $is_valid_preset ) );
+									$presets[ $origin ] = static::remove_invalid_preset_items( $presets[ $origin ], array_merge( array( 'settings' ), $path, array( $origin ) ) );
 								}
 							}
 						}
@@ -404,6 +400,49 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 		}
 
 		return $output;
+	}
+
+	/**
+	 * Removes preset items that are not objects, or whose slug is not scalar, and reports them.
+	 *
+	 * Preset leaves are untyped in VALID_SETTINGS, but consumers read `$preset['slug']` as a string.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param array $items Preset items.
+	 * @param array $path  Path of the list within the theme.json structure, used in diagnostics.
+	 * @return array The valid items, re-indexed.
+	 */
+	private static function remove_invalid_preset_items( $items, $path ) {
+		$valid = array();
+
+		foreach ( $items as $index => $item ) {
+			if ( ! is_array( $item ) ) {
+				static::add_diagnostic(
+					'theme_json_invalid_type',
+					array_merge( $path, array( $index ) ),
+					array(
+						'expected' => 'object',
+						'value'    => $item,
+					)
+				);
+				continue;
+			}
+			if ( isset( $item['slug'] ) && ! is_scalar( $item['slug'] ) ) {
+				static::add_diagnostic(
+					'theme_json_invalid_type',
+					array_merge( $path, array( $index, 'slug' ) ),
+					array(
+						'expected' => 'scalar',
+						'value'    => $item['slug'],
+					)
+				);
+				continue;
+			}
+			$valid[] = $item;
+		}
+
+		return $valid;
 	}
 
 	/**
@@ -638,6 +677,10 @@ class WP_Theme_JSON_Sanitizer_Gutenberg {
 				if ( 'boolean' === $data['expected'] ) {
 					/* translators: %s: dot-separated theme.json path. */
 					return sprintf( __( '"%s" must be a boolean.', 'gutenberg' ), $dotted );
+				}
+				if ( 'scalar' === $data['expected'] ) {
+					/* translators: %s: dot-separated theme.json path. */
+					return sprintf( __( '"%s" must be a string or a number.', 'gutenberg' ), $dotted );
 				}
 				/* translators: %s: dot-separated theme.json path. */
 				return sprintf( __( '"%s" must be an object.', 'gutenberg' ), $dotted );
