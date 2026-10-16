@@ -27,6 +27,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
 import { isBlobURL } from '@wordpress/blob';
 import { getResolvedValue } from '@wordpress/global-styles-engine';
+import type { ComponentProps, RefObject } from 'react';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { hasBackgroundImageValue } from '../global-styles/background-panel';
 import {
 	InheritanceResetButton,
@@ -40,6 +42,17 @@ import {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 } from '../../store/private-keys';
+import type { MediaUploadFunction } from '../provider/types';
+import type { PanelBackgroundStyle, StyleValue } from '../global-styles/types';
+import type {
+	BackgroundControlsPanelProps,
+	BackgroundImageControlProps,
+	BackgroundImageControlsProps,
+	BackgroundImageMedia,
+	BackgroundSizeControlsProps,
+	FocalPoint,
+	InspectorImagePreviewItemProps,
+} from './types';
 
 const IMAGE_BACKGROUND_TYPE = 'image';
 
@@ -47,12 +60,13 @@ const noop = () => {};
 
 /**
  * Focuses the toggle button.
- * @param {Object} containerRef - ref object containing current element
+ * @param containerRef - ref object containing current element
  */
-const focusToggleButton = ( containerRef ) => {
+const focusToggleButton = ( containerRef: RefObject< HTMLElement | null > ) => {
 	// Use requestAnimationFrame to ensure DOM updates are complete
 	window.requestAnimationFrame( () => {
-		const [ toggleButton ] = focus.tabbable.find( containerRef?.current );
+		// The container is mounted while its controls are used.
+		const [ toggleButton ] = focus.tabbable.find( containerRef?.current! );
 		if ( ! toggleButton ) {
 			return;
 		}
@@ -66,10 +80,10 @@ const focusToggleButton = ( containerRef ) => {
 /**
  * Get the help text for the background size control.
  *
- * @param {string} value backgroundSize value.
- * @return {string}      Translated help text.
+ * @param value backgroundSize value.
+ * @return Translated help text.
  */
-function backgroundSizeHelpText( value ) {
+function backgroundSizeHelpText( value: StyleValue ) {
 	if ( value === 'cover' || value === undefined ) {
 		return __( 'Image covers the space evenly.' );
 	}
@@ -83,16 +97,22 @@ function backgroundSizeHelpText( value ) {
  * Converts decimal x and y coords from FocalPointPicker to percentage-based values
  * to use as backgroundPosition value.
  *
- * @param {{x?:number, y?:number}} value FocalPointPicker coords.
- * @return {string}      				 backgroundPosition value.
+ * @param value FocalPointPicker coords.
+ * @return backgroundPosition value.
  */
-export const coordsToBackgroundPosition = ( value ) => {
-	if ( ! value || ( isNaN( value.x ) && isNaN( value.y ) ) ) {
+export const coordsToBackgroundPosition = (
+	value: FocalPoint | undefined
+): string | undefined => {
+	// `isNaN` treats a missing coordinate as `NaN`.
+	if (
+		! value ||
+		( isNaN( value.x as number ) && isNaN( value.y as number ) )
+	) {
 		return undefined;
 	}
 
-	const x = isNaN( value.x ) ? 0.5 : value.x;
-	const y = isNaN( value.y ) ? 0.5 : value.y;
+	const x = isNaN( value.x as number ) ? 0.5 : ( value.x as number );
+	const y = isNaN( value.y as number ) ? 0.5 : ( value.y as number );
 
 	return `${ x * 100 }% ${ y * 100 }%`;
 };
@@ -100,17 +120,22 @@ export const coordsToBackgroundPosition = ( value ) => {
 /**
  * Converts backgroundPosition value to x and y coords for FocalPointPicker.
  *
- * @param {string} value backgroundPosition value.
- * @return {{x?:number, y?:number}}       FocalPointPicker coords.
+ * @param value backgroundPosition value.
+ * @return FocalPointPicker coords.
  */
-export const backgroundPositionToCoords = ( value ) => {
+export const backgroundPositionToCoords = (
+	value: string | undefined
+): FocalPoint => {
 	if ( ! value ) {
 		return { x: undefined, y: undefined };
 	}
 
-	let [ x, y ] = value.split( ' ' ).map( ( v ) => parseFloat( v ) / 100 );
-	x = isNaN( x ) ? undefined : x;
-	y = isNaN( y ) ? x : y;
+	let [ x, y ]: ( number | undefined )[] = value
+		.split( ' ' )
+		.map( ( v ) => parseFloat( v ) / 100 );
+	// `isNaN` treats a missing coordinate as `NaN`.
+	x = isNaN( x as number ) ? undefined : x;
+	y = isNaN( y as number ) ? x : y;
 
 	return { x, y };
 };
@@ -122,7 +147,7 @@ function InspectorImagePreviewItem( {
 	filename,
 	label,
 	onToggleCallback = noop,
-} ) {
+}: InspectorImagePreviewItemProps ) {
 	const { isOpen, ...restToggleProps } = toggleProps;
 
 	useEffect( () => {
@@ -182,7 +207,7 @@ function BackgroundControlsPanel( {
 	onReset,
 	hasLocalOverride,
 	containerRef,
-} ) {
+}: BackgroundControlsPanelProps ) {
 	const popoverProps = {
 		...useToolsPanelItemPopoverProps(),
 		className: 'block-editor-global-styles-background-panel__popover',
@@ -192,7 +217,8 @@ function BackgroundControlsPanel( {
 		return;
 	}
 
-	const imgLabel = label || getFilename( imgUrl ) || __( 'Image' );
+	// `getFilename` returns nothing for a missing URL.
+	const imgLabel = label || getFilename( imgUrl as string ) || __( 'Image' );
 
 	return (
 		<Dropdown
@@ -282,15 +308,17 @@ function BackgroundImageControls( {
 	displayInPanel,
 	defaultValues,
 	containerRef,
-} ) {
+}: BackgroundImageControlsProps ) {
 	const [ isUploading, setIsUploading ] = useState( false );
 	const { getSettings } = useSelect( blockEditorStore );
 
-	const { id, title, url } = style?.background?.backgroundImage || {
-		...inheritedValue?.background?.backgroundImage,
-	};
+	// A theme.json string has no media properties.
+	const { id, title, url } = ( style?.background?.backgroundImage || {
+		...( inheritedValue?.background
+			?.backgroundImage as BackgroundImageMedia ),
+	} ) as BackgroundImageMedia;
 	const { createErrorNotice } = useDispatch( noticesStore );
-	const onUploadError = ( message ) => {
+	const onUploadError = ( message: string ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 		setIsUploading( false );
 	};
@@ -304,7 +332,11 @@ function BackgroundImageControls( {
 			)
 		);
 
-	const onSelectMedia = ( media ) => {
+	const onSelectMedia = (
+		media:
+			| ( BackgroundImageMedia & { media_type?: string; type?: string } )
+			| undefined
+	) => {
 		if ( ! media || ! media.url ) {
 			resetBackgroundImage();
 			setIsUploading( false );
@@ -364,7 +396,7 @@ function BackgroundImageControls( {
 	 * Sets an image entered as a direct URL. There is no attachment `id`:
 	 * `source: 'url'` records that the image is externally hosted.
 	 */
-	const onSelectURL = ( newURL ) => {
+	const onSelectURL = ( newURL: string ) => {
 		if ( ! newURL || newURL === url ) {
 			return;
 		}
@@ -380,12 +412,13 @@ function BackgroundImageControls( {
 	};
 
 	// Drag and drop callback, restricting image to one.
-	const onFilesDrop = ( filesList ) => {
-		getSettings().mediaUpload( {
+	const onFilesDrop = ( filesList: File[] ) => {
+		// Dropping files is offered where media can be uploaded.
+		( getSettings().mediaUpload as MediaUploadFunction )( {
 			allowedTypes: [ IMAGE_BACKGROUND_TYPE ],
 			filesList,
 			onFileChange( [ image ] ) {
-				onSelectMedia( image );
+				onSelectMedia( image as BackgroundImageMedia );
 			},
 			onError: onUploadError,
 			multiple: false,
@@ -412,7 +445,8 @@ function BackgroundImageControls( {
 	// display usefully nor re-apply without breaking the image, and removing
 	// an inherited image stores the `'none'` sentinel string.
 	const currentURL = /^https?:\/\//.test( rawURL ?? '' ) ? rawURL : undefined;
-	const imgLabel = title || getFilename( url ) || __( 'Image' );
+	// `getFilename` returns nothing for a missing URL.
+	const imgLabel = title || getFilename( url as string ) || __( 'Image' );
 
 	return (
 		<div className="block-editor-global-styles-background-panel__image-tools-panel-item">
@@ -471,7 +505,7 @@ function BackgroundSizeControls( {
 	style,
 	inheritedValue,
 	defaultValues,
-} ) {
+}: BackgroundSizeControlsProps ) {
 	/*
 	 * Read local and inherited values separately so each sub-control can
 	 * show the inherited value while marking the control as inherited.
@@ -489,10 +523,14 @@ function BackgroundSizeControls( {
 
 	const sizeValue = localSizeValue || inheritedSizeValue;
 	const repeatValue = localRepeatValue || inheritedRepeatValue;
+	// A theme.json string has no media properties.
 	const imageValue =
-		style?.background?.backgroundImage?.url ||
-		inheritedValue?.background?.backgroundImage?.url;
-	const isUploadedImage = style?.background?.backgroundImage?.id;
+		( style?.background?.backgroundImage as BackgroundImageMedia )?.url ||
+		( inheritedValue?.background?.backgroundImage as BackgroundImageMedia )
+			?.url;
+	const isUploadedImage = (
+		style?.background?.backgroundImage as BackgroundImageMedia
+	 )?.id;
 	const positionValue = localPositionValue || inheritedPositionValue;
 	const attachmentValue = localAttachmentValue || inheritedAttachmentValue;
 
@@ -511,7 +549,8 @@ function BackgroundSizeControls( {
 	 * In this case set the value to 'tile'.
 	 */
 	currentValueForToggle = ! [ 'cover', 'contain', 'auto' ].includes(
-		currentValueForToggle
+		// Size values are keywords or lengths.
+		currentValueForToggle as string
 	)
 		? 'auto'
 		: currentValueForToggle;
@@ -525,7 +564,7 @@ function BackgroundSizeControls( {
 		( currentValueForToggle === 'cover' && repeatValue === undefined )
 	);
 
-	const updateBackgroundSize = ( next ) => {
+	const updateBackgroundSize = ( next?: string | number ) => {
 		// When switching to 'contain' toggle the repeat off.
 		let nextRepeat = repeatValue;
 		let nextPosition = positionValue;
@@ -553,7 +592,12 @@ function BackgroundSizeControls( {
 			 * the image's focus point is visible.
 			 * This is in-editor only to assist with the user experience.
 			 */
-			if ( !! style?.background?.backgroundImage?.id ) {
+			// A theme.json string has no media properties.
+			if (
+				!! (
+					style?.background?.backgroundImage as BackgroundImageMedia
+				 )?.id
+			) {
 				nextPosition = '50% 0';
 			}
 		}
@@ -576,7 +620,7 @@ function BackgroundSizeControls( {
 		);
 	};
 
-	const updateBackgroundPosition = ( next ) => {
+	const updateBackgroundPosition = ( next: FocalPoint ) => {
 		onChange(
 			setImmutably(
 				style,
@@ -614,8 +658,14 @@ function BackgroundSizeControls( {
 		<VStack spacing={ 3 } className="single-column">
 			<FocalPointPicker
 				label={ __( 'Focal point' ) }
-				url={ imageValue }
-				value={ backgroundPositionToCoords( backgroundPositionValue ) }
+				// The picker shows no image without a URL.
+				url={ imageValue as string }
+				// The picker centers a missing coordinate.
+				value={
+					backgroundPositionToCoords(
+						backgroundPositionValue as string | undefined
+					) as ComponentProps< typeof FocalPointPicker >[ 'value' ]
+				}
 				onChange={ updateBackgroundPosition }
 			/>
 			<ToggleControl
@@ -625,11 +675,12 @@ function BackgroundSizeControls( {
 			/>
 			<ToggleGroupControl
 				label={ __( 'Size' ) }
-				value={ currentValueForToggle }
+				// Size values are keywords or lengths.
+				value={ currentValueForToggle as string }
 				onChange={ updateBackgroundSize }
 				isBlock
 				help={ backgroundSizeHelpText(
-					sizeValue || defaultValues?.backgroundSize
+					( sizeValue || defaultValues?.backgroundSize ) as StyleValue
 				) }
 			>
 				<ToggleGroupControlOption
@@ -661,7 +712,8 @@ function BackgroundSizeControls( {
 				<UnitControl
 					aria-label={ __( 'Background image width' ) }
 					onChange={ updateBackgroundSize }
-					value={ sizeValue }
+					// Size values are keywords or lengths.
+					value={ sizeValue as string | undefined }
 					__unstableInputWidth="100px"
 					min={ 0 }
 					placeholder={ __( 'Auto' ) }
@@ -688,7 +740,7 @@ export default function BackgroundImagePanel( {
 	settings,
 	defaultValues = {},
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
-} ) {
+}: BackgroundImageControlProps ) {
 	/*
 	 * Resolve inherited `ref` pointers for background controls.
 	 */
@@ -696,12 +748,15 @@ export default function BackgroundImagePanel( {
 		const { getSettings } = select( blockEditorStore );
 		const _settings = getSettings();
 		return {
-			globalStyles: _settings[ globalStylesDataKey ],
-			_links: _settings[ globalStylesLinksDataKey ],
+			// The settings hold the global styles data and their links.
+			globalStyles: _settings[ globalStylesDataKey ] as
+				GlobalStylesConfig[ 'styles' ] | undefined,
+			_links: _settings[ globalStylesLinksDataKey ] as
+				GlobalStylesConfig[ '_links' ] | undefined,
 		};
 	}, [] );
 	const resolvedInheritedValue = useMemo( () => {
-		const resolvedValues = {
+		const resolvedValues: { background: PanelBackgroundStyle } = {
 			background: {},
 		};
 
@@ -712,7 +767,7 @@ export default function BackgroundImagePanel( {
 		Object.entries( inheritedValue?.background ).forEach(
 			( [ key, backgroundValue ] ) => {
 				resolvedValues.background[ key ] = getResolvedValue(
-					backgroundValue,
+					backgroundValue as StyleValue,
 					{
 						styles: globalStyles,
 						_links,
@@ -730,9 +785,11 @@ export default function BackgroundImagePanel( {
 			} )
 		);
 
-	const { title, url } = value?.background?.backgroundImage || {
-		...resolvedInheritedValue?.background?.backgroundImage,
-	};
+	// A theme.json string has no media properties.
+	const { title, url } = ( value?.background?.backgroundImage || {
+		...( resolvedInheritedValue?.background
+			?.backgroundImage as BackgroundImageMedia ),
+	} ) as BackgroundImageMedia;
 	const localHasImageValue = hasBackgroundImageValue( value );
 	const hasImageValue =
 		localHasImageValue || hasBackgroundImageValue( resolvedInheritedValue );
@@ -757,7 +814,7 @@ export default function BackgroundImagePanel( {
 			settings?.background?.backgroundRepeat );
 
 	const [ isDropDownOpen, setIsDropDownOpen ] = useState( false );
-	const containerRef = useRef();
+	const containerRef = useRef< HTMLDivElement >( null );
 
 	return (
 		<div
