@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Field, Select, VisuallyHidden } from '@wordpress/ui';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 
 export default function FontFamilyControl( {
@@ -57,8 +57,12 @@ export default function FontFamilyControl( {
 
 	const selectedValue =
 		options.find( ( option ) => option.value === ( value || null ) ) ??
-		options[ 0 ];
-	const selectedHint = showSelectedHint && selectedValue.description;
+		options[ 0 ] ??
+		null;
+	const selectedHint = showSelectedHint && selectedValue?.description;
+	const description = [ describedBy, selectedHint ]
+		.filter( Boolean )
+		.join( ' ' );
 
 	return (
 		<Field.Root
@@ -81,7 +85,13 @@ export default function FontFamilyControl( {
 					{ selectedHint ? (
 						<>
 							{ selectedValue.label }
-							<span aria-hidden="true"> { selectedHint }</span>
+							<span
+								className="block-editor-font-family-control__hint"
+								aria-hidden="true"
+							>
+								{ ' ' }
+								{ selectedHint }
+							</span>
 						</>
 					) : undefined }
 				</Select.Trigger>
@@ -104,15 +114,11 @@ export default function FontFamilyControl( {
 					) ) }
 				</Select.Popup>
 			</Select.Root>
-			<VisuallyHidden render={ <Field.Description /> }>
-				{ describedBy ||
-					sprintf(
-						// translators: %s: The selected option.
-						__( 'Currently selected: %s' ),
-						selectedValue.label
-					) }
-				{ selectedHint && ` ${ selectedHint }` }
-			</VisuallyHidden>
+			{ description && (
+				<VisuallyHidden render={ <Field.Description /> }>
+					{ description }
+				</VisuallyHidden>
+			) }
 		</Field.Root>
 	);
 }
