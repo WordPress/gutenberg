@@ -250,7 +250,7 @@ describe( 'Undo Manager', () => {
 		const undoRecord = manager.undo();
 		expect( undoRecord ).not.toBeUndefined();
 		// b is included in the changes.
-		expect( Object.keys( undoRecord[ 0 ].changes ) ).toEqual( [
+		expect( Object.keys( undoRecord![ 0 ].changes ) ).toEqual( [
 			'a',
 			'b',
 		] );
