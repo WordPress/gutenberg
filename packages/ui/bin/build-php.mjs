@@ -12,7 +12,6 @@
  *   - `render`       The React element to render for those props, as
  *                    `[ type, props, ...children ]`, where `"$name"` refers to a prop.
  *   - `example`      Props for the preview page and the checks below.
- *   - `deprecations` Optional. Props and values kept working after a rename.
  *
  * The build renders the React element once for every combination of variants,
  * with placeholders for the slots. It stores one base render and what each
@@ -26,17 +25,14 @@
  *   - `php/<name>/snapshot.html` holds the example markup. When React changes,
  *     it's out of date until updated with `--update-snapshots`, so the change
  *     shows up in review and the PHPUnit check fails until then.
- *   - `php/<name>/contract.lock.json` holds the props of the last release and
- *     a fingerprint of its markup. Removing a prop or value fails the build
- *     unless it's listed in `deprecations`, and markup changes are listed for
- *     the release notes. Release tooling updates it with `--update-contracts`.
+ *   - Translated strings aren't supported yet, so the build fails if one
+ *     reaches the markup rather than writing the English text into it.
  *
  * Writes everything else to `build-php/`, which is never committed.
  *
  * Runs after `wp-build` (as `build:wp`), because it renders the built package.
  * Each step lives in a module in `bin/php/`: rendering (`render.mjs`),
- * snapshots (`snapshots.mjs`), contracts (`contracts.mjs`) and stylesheets
- * (`stylesheets.mjs`).
+ * snapshots (`snapshots.mjs`) and stylesheets (`stylesheets.mjs`).
  */
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -53,7 +49,6 @@ import {
 	getExampleValues,
 	getSlotValues,
 	getSnapshotKey,
-	getTextPlaceholder,
 	getUnreadPropRemover,
 	getVariants,
 } from './php/render.mjs';
@@ -62,11 +57,6 @@ import {
 	stripRuntimeAttributes,
 } from './php/snapshots.mjs';
 import { compileVariantChanges } from './php/variant-changes.mjs';
-import {
-	getBreakingChanges,
-	getContract,
-	getMarkupFingerprint,
-} from './php/contracts.mjs';
 import { compileStylesheets, getUsedStylesheets } from './php/stylesheets.mjs';
 
 const PACKAGE_DIR = path.resolve(
@@ -79,21 +69,20 @@ const OUT_DIR = path.join( PACKAGE_DIR, 'build-php' );
 const TEST_DIR = path.join( OUT_DIR, 'test' );
 
 const UPDATE_SNAPSHOTS = process.argv.includes( '--update-snapshots' );
-const UPDATE_CONTRACTS = process.argv.includes( '--update-contracts' );
 
 /**
- * Makes the strings React translates come out as placeholders while rendering
- * snapshots, so PHP translates them instead of using the English text. Only
- * `__()` is supported; other functions fail the build if their text is
- * rendered, until they're needed.
+ * Makes strings React translates come out as a marker while rendering
+ * snapshots. PHP components don't support translations yet, so the build
+ * fails if the marker reaches the markup, rather than writing the English
+ * text into it. It can't fail on the call itself: components call `__()` for
+ * text they don't always render, such as Button's loading announcement.
  *
  * Hooks into the `@wordpress/hooks` instance `@wordpress/i18n` uses, which is
  * the one the built package imports.
  *
- * @return {Promise<Object>} `start()` and `stop()` the placeholders, and the
- *         `texts` seen so far, by placeholder index.
+ * @return {Promise<Object>} `start()` and `stop()` the marker.
  */
-const UNSUPPORTED_TRANSLATION = '__wpuitext_unsupported__';
+const TRANSLATED_TEXT = '__wpuitext__';
 
 async function catchTranslations() {
 	const requireFromI18n = createRequire(
@@ -111,32 +100,10 @@ async function catchTranslations() {
 			)
 		).href
 	);
-	const texts = [];
 	let active = false;
 
-	defaultHooks.addFilter(
-		'i18n.gettext',
-		'wordpress/ui/build-php',
-		( translation, text, domain = 'default' ) => {
-			if ( ! active ) {
-				return translation;
-			}
-			let index = texts.findIndex(
-				( item ) => item.text === text && item.domain === domain
-			);
-			if ( index === -1 ) {
-				index = texts.push( { text, domain } ) - 1;
-			}
-			return getTextPlaceholder( index );
-		}
-	);
-	// Other functions return a marker the build fails on if it reaches the
-	// markup. It can't fail on the call itself: `isRTL()` calls `_x()` too.
-	// TODO: Support them when a component needs it. `_x()` only needs the
-	// context recorded for PHP's `translate_with_gettext_context()`. `_n()`
-	// depends on a number known at render time, so the number has to become a
-	// prop and PHP has to pick the form with `_n()`.
 	for ( const hook of [
+		'i18n.gettext',
 		'i18n.gettext_with_context',
 		'i18n.ngettext',
 		'i18n.ngettext_with_context',
@@ -144,21 +111,19 @@ async function catchTranslations() {
 		defaultHooks.addFilter(
 			hook,
 			'wordpress/ui/build-php',
-			( translation ) =>
-				active ? UNSUPPORTED_TRANSLATION : translation
+			( translation ) => ( active ? TRANSLATED_TEXT : translation )
 		);
 	}
 
 	return {
-		texts,
 		start: () => ( active = true ),
 		stop: () => ( active = false ),
 	};
 }
 
 /**
- * Builds one component: renders its snapshots and examples, and checks it
- * against React and its released contract.
+ * Builds one component: renders its snapshots and examples, and checks them
+ * against React.
  *
  * @param {string} file    Path of its `component.json`, relative to the package.
  * @param {Object} context Shared build state: the built package (`ui`), the
@@ -196,9 +161,9 @@ async function buildComponent( file, context ) {
 		translations.start();
 		const html = render( values );
 		translations.stop();
-		if ( html.includes( UNSUPPORTED_TRANSLATION ) ) {
+		if ( html.includes( TRANSLATED_TEXT ) ) {
 			throw new Error(
-				`${ component.name } renders text translated with \`_x()\` or \`_n()\`, which PHP components don't support yet.`
+				`${ component.name } renders translated text, which PHP components don't support yet.`
 			);
 		}
 		renders.set( getSnapshotKey( variants, combination ), {
@@ -223,15 +188,6 @@ async function buildComponent( file, context ) {
 		defaults,
 		renders
 	);
-
-	// The strings React translates, by placeholder index.
-	const texts = {};
-	for ( const { html } of renders.values() ) {
-		for ( const [ , index ] of html.matchAll( /__wpuitext_([0-9]+)__/g ) ) {
-			const { text, domain } = translations.texts[ Number( index ) ];
-			texts[ index ] = [ text, domain ];
-		}
-	}
 
 	// Every combination rendered with real values, for the PHPUnit check that
 	// PHP rebuilds each one exactly.
@@ -286,31 +242,6 @@ async function buildComponent( file, context ) {
 		result.staleSnapshot = path.relative( ROOT_DIR, snapshotFile );
 	}
 
-	// The lock records the props and a fingerprint of the markup as of the
-	// last release.
-	const contractFile = path.join( dir, 'contract.lock.json' );
-	const contract = {
-		props: getContract( component ),
-		markup: getMarkupFingerprint( snapshot ),
-	};
-	if ( UPDATE_CONTRACTS ) {
-		await writeFile(
-			contractFile,
-			JSON.stringify( contract, null, '\t' ) + '\n'
-		);
-	} else if ( existsSync( contractFile ) ) {
-		const released = JSON.parse( await readFile( contractFile, 'utf8' ) );
-		result.problems.push(
-			...getBreakingChanges(
-				component.name,
-				released.props,
-				contract.props,
-				component.deprecations
-			)
-		);
-		result.markupChanged = released.markup !== contract.markup;
-	}
-
 	result.name = component.name;
 	result.entry = {
 		props: component.props,
@@ -318,8 +249,6 @@ async function buildComponent( file, context ) {
 		base,
 		changes,
 		exceptions,
-		texts,
-		deprecations: component.deprecations ?? [],
 	};
 	result.combinationCount = renders.size;
 
@@ -441,15 +370,6 @@ return ${ json2php.make( { linebreak: '\n', indent: '\t' } )( manifest ) };
 			)
 			.join( ', ' ) }.`
 	);
-
-	const changedMarkup = results.filter( ( result ) => result.markupChanged );
-	if ( changedMarkup.length ) {
-		console.log(
-			`\nMarkup changed since the last release, for the release notes: ${ changedMarkup
-				.map( ( { name } ) => name )
-				.join( ', ' ) }.`
-		);
-	}
 
 	const staleSnapshots = results
 		.map( ( result ) => result.staleSnapshot )

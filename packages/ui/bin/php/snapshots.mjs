@@ -3,7 +3,6 @@
  * reviewable `snapshot.html` files.
  */
 export const SLOT_PATTERN = /__wpuislot_([a-z0-9_]+)__/;
-export const TEXT_PATTERN = /__wpuitext_([0-9]+)__/;
 
 /**
  * Removes attributes that only Base UI's JavaScript reads, such as

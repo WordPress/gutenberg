@@ -9,7 +9,7 @@
  * ignores the tone, don't combine. Every combination is checked, and the ones
  * that the changes don't rebuild exactly are kept as full snapshots.
  */
-import { SLOT_PATTERN, TEXT_PATTERN } from './snapshots.mjs';
+import { SLOT_PATTERN } from './snapshots.mjs';
 
 /**
  * Marks each placeholder with where it is, so PHP knows how to escape what it
@@ -20,19 +20,19 @@ import { SLOT_PATTERN, TEXT_PATTERN } from './snapshots.mjs';
  * @return {string} HTML.
  */
 export function markPlaceholderContext( html ) {
-	const pattern = new RegExp(
-		[ SLOT_PATTERN.source, TEXT_PATTERN.source ].join( '|' ),
-		'g'
+	return html.replace(
+		new RegExp( SLOT_PATTERN.source, 'g' ),
+		( match, slot, offset ) => {
+			const before = html.slice( 0, offset );
+			const inTag = before.lastIndexOf( '<' ) > before.lastIndexOf( '>' );
+			const attribute = inTag
+				? before.match( /([^\s=<]+)="[^"]*$/ )?.[ 1 ]
+				: null;
+			return attribute
+				? `${ match }attr_${ attribute }__`
+				: `${ match }text__`;
+		}
 	);
-	return html.replace( pattern, ( match, slot, text, offset ) => {
-		const before = html.slice( 0, offset );
-		const inTag = before.lastIndexOf( '<' ) > before.lastIndexOf( '>' );
-		const attribute = inTag
-			? before.match( /([^\s=<]+)="[^"]*$/ )?.[ 1 ]
-			: null;
-		const name = slot ? `__wpuislot_${ slot }__` : `__wpuitext_${ text }__`;
-		return attribute ? `${ name }attr_${ attribute }__` : `${ name }text__`;
-	} );
 }
 
 /**
