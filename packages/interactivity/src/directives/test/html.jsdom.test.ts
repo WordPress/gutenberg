@@ -13,7 +13,7 @@ import '../index'; // Registers all core directives, including `html`.
 import { toVdom } from '../../vdom';
 import { populateServerData, store } from '../../store';
 import { asDangerousHTML, type DangerousHTML } from '../../html';
-import { getScope, resetScope } from '../../scopes';
+import { getContext, getScope, resetScope } from '../../scopes';
 
 /** Preserves the renderer's directive registry between isolated runtimes. */
 let originalVNodeHook: typeof options.vnode;
@@ -80,6 +80,536 @@ function recordHtmlWrites( target: HTMLElement ): string[] {
 }
 
 describe( 'data-wp-html', () => {
+	it.each( [ false, true ] )(
+		'keeps server HTML representations through hydration and re-rendering (SCRIPT_DEBUG: %s)',
+		async ( debug ) => {
+			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+			for ( const listed of [ false, true ] ) {
+				const runtime = await loadConflictRuntime();
+				const namespace = uniqueNamespace();
+				const representation = JSON.parse( '{"wpServerHtml":true}' );
+				runtime.populateServerData( {
+					state: {
+						[ namespace ]: {
+							html: representation,
+							active: false,
+						},
+					},
+					...( listed && {
+						derivedStateClosures: {
+							[ namespace ]: [ 'state.html' ],
+						},
+					} ),
+				} );
+				const { state } = runtime.store( namespace, {
+					state: { active: false },
+				} );
+				const region = createRegion(
+					namespace,
+					'<div data-wp-html="state.html" data-wp-class--active="state.active"><p>Server</p></div>'
+				);
+				const target = region.querySelector( 'div' )!;
+				const serverNode = target.firstElementChild;
+				const writes = recordHtmlWrites( target );
+				const mutations: MutationRecord[] = [];
+				const observer = new MutationObserver( ( records ) =>
+					mutations.push( ...records )
+				);
+				observer.observe( target, { childList: true } );
+				const warnings = vi.spyOn( console, 'warn' );
+				const warningCount = warnings.mock.calls.length;
+
+				await runtime.act( () =>
+					runtime.hydrate(
+						runtime.toVdom( region ),
+						region.parentNode!
+					)
+				);
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+				expect( target.firstElementChild ).toBe( serverNode );
+				expect( writes ).toEqual( [] );
+				expect( mutations ).toHaveLength( 0 );
+				expect( warnings.mock.calls.slice( warningCount ) ).toEqual(
+					[]
+				);
+
+				await runtime.act( () => {
+					state.active = true;
+				} );
+				await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+				expect( target ).toHaveClass( 'active' );
+				expect( target.firstElementChild ).toBe( serverNode );
+				expect( writes ).toEqual( [] );
+				expect( mutations ).toHaveLength( 0 );
+				expect( warnings.mock.calls.slice( warningCount ) ).toEqual(
+					[]
+				);
+				observer.disconnect();
+			}
+		}
+	);
+
+	it.each( [ false, true ] )(
+		'keeps context representations from direct and function references until a token replaces them (SCRIPT_DEBUG: %s)',
+		async ( debug ) => {
+			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+			const namespace = uniqueNamespace();
+			const representation = JSON.parse( '{"wpServerHtml":true}' );
+			let context!: { html: unknown };
+			const { state } = store( namespace, {
+				state: { active: false },
+				callbacks: {
+					getHtml() {
+						context = getContext< { html: unknown } >();
+						return context.html;
+					},
+				},
+			} );
+			const region = createRegion(
+				namespace,
+				`<div data-wp-context='${ JSON.stringify( { html: representation } ) }'><div data-wp-html="context.html"><p>Server</p></div><div data-wp-html="callbacks.getHtml" data-wp-class--active="state.active"><p>Server</p></div></div>`
+			);
+			const targets = Array.from(
+				region.querySelectorAll< HTMLElement >( '[data-wp-html]' )
+			);
+			const serverNodes = targets.map(
+				( target ) => target.firstElementChild
+			);
+			const writes = Array.from( targets, recordHtmlWrites );
+			const mutations = targets.map( () => [] as MutationRecord[] );
+			const observers = Array.from( targets, ( target, index ) => {
+				const observer = new MutationObserver( ( records ) =>
+					mutations[ index ].push( ...records )
+				);
+				observer.observe( target, { childList: true } );
+				return observer;
+			} );
+			const warnings = vi.spyOn( console, 'warn' );
+			const warningCount = warnings.mock.calls.length;
+
+			await act( () => hydrate( toVdom( region ), region.parentNode! ) );
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			expect(
+				Array.from( targets, ( target ) => target.firstElementChild )
+			).toEqual( serverNodes );
+			expect( writes ).toEqual( [ [], [] ] );
+			expect( mutations ).toEqual( [ [], [] ] );
+			expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [] );
+
+			await act( () => {
+				state.active = true;
+			} );
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			expect( targets[ 1 ] ).toHaveClass( 'active' );
+			expect(
+				Array.from( targets, ( target ) => target.firstElementChild )
+			).toEqual( serverNodes );
+			expect( writes ).toEqual( [ [], [] ] );
+			expect( mutations ).toEqual( [ [], [] ] );
+			expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [] );
+
+			await act( () => {
+				context.html = asDangerousHTML( '<p>Client</p>' );
+			} );
+			expect(
+				Array.from( targets, ( target ) => target.innerHTML )
+			).toEqual( [ '<p>Client</p>', '<p>Client</p>' ] );
+			expect( writes ).toEqual( [
+				[ '<p>Client</p>' ],
+				[ '<p>Client</p>' ],
+			] );
+			expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [] );
+			observers.forEach( ( observer ) => observer.disconnect() );
+		}
+	);
+
+	it( 'adopts matching token HTML after the representation even after an earlier differently spelled write', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const { state } = runtime.store( namespace, {
+			state: { html: { wpServerHtml: true } as unknown },
+		} );
+		const currentHTML = '<p><a href="/x">Same</a></p>';
+		const region = createRegion(
+			namespace,
+			`<div data-wp-html="state.html">${ currentHTML }</div>`
+		);
+		const target = region.querySelector( 'div' )!;
+		const serverNode = target.firstElementChild;
+		const writes = recordHtmlWrites( target );
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		expect( writes ).toEqual( [] );
+		expect( target.firstElementChild ).toBe( serverNode );
+
+		const differentlySpelled = '<p><a href=/x>Same</a></p>';
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML( differentlySpelled );
+		} );
+		expect( writes ).toEqual( [ differentlySpelled ] );
+		const writtenNode = target.firstElementChild;
+		expect( target.innerHTML ).toBe( currentHTML );
+
+		await runtime.act( () => {
+			state.html = { wpServerHtml: true };
+		} );
+		expect( writes ).toEqual( [ differentlySpelled ] );
+		expect( target.firstElementChild ).toBe( writtenNode );
+
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML( currentHTML );
+		} );
+		expect( writes ).toEqual( [ differentlySpelled ] );
+		expect( target.firstElementChild ).toBe( writtenNode );
+	} );
+
+	it( 'retains existing writes for token and pending transitions after a prior write', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const differentlySpelled = '<p><a href=/x>Same</a></p>';
+		const serializedHTML = '<p><a href="/x">Same</a></p>';
+		const { state } = runtime.store( namespace, {
+			state: { html: runtime.asDangerousHTML( differentlySpelled ) },
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>Fallback</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+		const writes = recordHtmlWrites( target );
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		expect( writes ).toEqual( [ differentlySpelled ] );
+		expect( target.innerHTML ).toBe( serializedHTML );
+
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML( serializedHTML );
+		} );
+		expect( writes ).toEqual( [ differentlySpelled, serializedHTML ] );
+		expect( target.innerHTML ).toBe( serializedHTML );
+
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML( differentlySpelled );
+		} );
+		expect( writes ).toEqual( [
+			differentlySpelled,
+			serializedHTML,
+			differentlySpelled,
+		] );
+		expect( target.innerHTML ).toBe( serializedHTML );
+
+		await runtime.act( () => {
+			runtime.populateServerData( {
+				state: { [ namespace ]: { html: {} } },
+				derivedStateClosures: { [ namespace ]: [ 'state.html' ] },
+			} );
+		} );
+		expect( writes ).toEqual( [
+			differentlySpelled,
+			serializedHTML,
+			differentlySpelled,
+		] );
+		expect( target.innerHTML ).toBe( serializedHTML );
+
+		let registeredState!: { markup: string };
+		await runtime.act( async () => {
+			( { state: registeredState } = runtime.store( namespace, {
+				state: {
+					markup: serializedHTML,
+					get html(): DangerousHTML {
+						return runtime.asDangerousHTML(
+							registeredState.markup
+						);
+					},
+				},
+			} ) );
+		} );
+		expect( writes ).toEqual( [
+			differentlySpelled,
+			serializedHTML,
+			differentlySpelled,
+			serializedHTML,
+		] );
+		expect( target.innerHTML ).toBe( serializedHTML );
+	} );
+
+	it( 'preserves representation content through changes to and from other values', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const { state } = runtime.store( namespace, {
+			state: {
+				html: { wpServerHtml: true } as unknown,
+			},
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>Server</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+		const serverNode = target.firstElementChild;
+		const writes = recordHtmlWrites( target );
+		const mutations: MutationRecord[] = [];
+		const observer = new MutationObserver( ( records ) =>
+			mutations.push( ...records )
+		);
+		observer.observe( target, { childList: true } );
+		const warnings = vi.spyOn( console, 'warn' );
+		const warningCount = warnings.mock.calls.length;
+		const representation = { wpServerHtml: true };
+
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [] );
+		expect( mutations ).toHaveLength( 0 );
+
+		await runtime.act( () => {
+			state.html = JSON.parse( JSON.stringify( representation ) );
+		} );
+		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [] );
+		expect( mutations ).toHaveLength( 0 );
+
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML( '<p>Server</p>' );
+		} );
+		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [] );
+		expect( mutations ).toHaveLength( 0 );
+
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML( '<p>Client</p>' );
+		} );
+		const clientNode = target.firstElementChild;
+		expect( target.innerHTML ).toBe( '<p>Client</p>' );
+		expect( writes ).toEqual( [ '<p>Client</p>' ] );
+		expect( mutations ).toHaveLength( 1 );
+
+		await runtime.act( () => {
+			state.html = { wpServerHtml: true };
+		} );
+		expect( target.firstElementChild ).toBe( clientNode );
+		expect( writes ).toEqual( [ '<p>Client</p>' ] );
+		expect( mutations ).toHaveLength( 1 );
+
+		await runtime.act( () => {
+			state.html = null;
+		} );
+		expect( target ).toBeEmptyDOMElement();
+		expect( writes ).toEqual( [ '<p>Client</p>', '' ] );
+		expect( mutations ).toHaveLength( 2 );
+
+		await runtime.act( () => {
+			state.html = { wpServerHtml: true };
+		} );
+		expect( target ).toBeEmptyDOMElement();
+		expect( writes ).toEqual( [ '<p>Client</p>', '' ] );
+		expect( mutations ).toHaveLength( 2 );
+
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML( '<b>a</b>' );
+		} );
+		expect( target.innerHTML ).toBe( '<b>a</b>' );
+		expect( writes ).toEqual( [ '<p>Client</p>', '', '<b>a</b>' ] );
+		expect( mutations ).toHaveLength( 3 );
+
+		await runtime.act( () => {
+			state.html = { wpServerHtml: true };
+		} );
+		expect( target.innerHTML ).toBe( '<b>a</b>' );
+		expect( writes ).toEqual( [ '<p>Client</p>', '', '<b>a</b>' ] );
+		expect( mutations ).toHaveLength( 3 );
+
+		await runtime.act( () => {
+			state.html = '<i>s</i>';
+		} );
+		expect( target ).toBeEmptyDOMElement();
+		expect( writes ).toEqual( [ '<p>Client</p>', '', '<b>a</b>', '' ] );
+		expect( mutations ).toHaveLength( 4 );
+		expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [
+			[
+				'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.',
+			],
+		] );
+		expect( console ).toHaveWarnedWith(
+			'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.'
+		);
+
+		await runtime.act( () => {
+			state.html = { wpServerHtml: true };
+		} );
+		expect( target ).toBeEmptyDOMElement();
+		expect( writes ).toEqual( [ '<p>Client</p>', '', '<b>a</b>', '' ] );
+		expect( mutations ).toHaveLength( 4 );
+		expect( warnings.mock.calls.slice( warningCount ) ).toHaveLength( 1 );
+		observer.disconnect();
+	} );
+
+	it( 'keeps representation content, including empty content, without interpreting extra markup properties', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+		for ( const representation of [
+			{
+				wpServerHtml: true,
+				html: '<img src=x onerror=alert(1)>',
+			},
+			{ wpServerHtml: true, __html: '<b>x</b>' },
+			{ wpServerHtml: true },
+		] ) {
+			const runtime = await loadConflictRuntime();
+			const namespace = uniqueNamespace();
+			const { state } = runtime.store( namespace, {
+				state: { html: representation as unknown, active: false },
+			} );
+			const startingHTML =
+				'html' in representation || '__html' in representation
+					? '<p>Server</p>'
+					: '';
+			const region = createRegion(
+				namespace,
+				`<div data-wp-html="state.html" data-wp-class--active="state.active">${ startingHTML }</div>`
+			);
+			const target = region.querySelector( 'div' )!;
+			const serverNode = target.firstElementChild;
+			const writes = recordHtmlWrites( target );
+			const warnings = vi.spyOn( console, 'warn' );
+			const warningCount = warnings.mock.calls.length;
+			await runtime.act( () =>
+				runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+			);
+			await runtime.act( () => {
+				state.active = true;
+			} );
+			expect( target.innerHTML ).toBe( startingHTML );
+			expect( target.firstElementChild ).toBe( serverNode );
+			expect( target.querySelector( 'img, b' ) ).toBeNull();
+			expect( writes ).toEqual( [] );
+			expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [] );
+		}
+	} );
+
+	it( 'keeps plain objects invalid while recognizing a listed empty object as pending', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+		for ( const html of [ {}, { title: 'x' }, { html: '<b>x</b>' } ] ) {
+			const runtime = await loadConflictRuntime();
+			const namespace = uniqueNamespace();
+			runtime.store( namespace, { state: { html } } );
+			const region = createRegion(
+				namespace,
+				'<div data-wp-html="state.html"><p>Server</p></div>'
+			);
+			const warnings = vi.spyOn( console, 'warn' );
+			const warningCount = warnings.mock.calls.length;
+			await runtime.act( () =>
+				runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+			);
+			expect( region.querySelector( 'div' ) ).toBeEmptyDOMElement();
+			expect( region.querySelector( 'b' ) ).toBeNull();
+			expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [
+				[
+					'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.',
+				],
+			] );
+			expect( console ).toHaveWarnedWith(
+				'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.'
+			);
+		}
+
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		runtime.populateServerData( {
+			state: { [ namespace ]: { html: {} } },
+			derivedStateClosures: { [ namespace ]: [ 'state.html' ] },
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>Server</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+		const serverNode = target.firstElementChild;
+		const warnings = vi.spyOn( console, 'warn' );
+		const warningCount = warnings.mock.calls.length;
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		expect( target.firstElementChild ).toBe( serverNode );
+		expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [] );
+	} );
+
+	it.each( [
+		[ 'data-wp-html--x="state.html"', '<p>Server</p>' ],
+		[ 'data-wp-html="state.html" data-wp-text="state.text"', 'Hello' ],
+	] )(
+		'keeps the existing suffix and conflict behavior for %s',
+		async ( attributes, expected ) => {
+			vi.stubGlobal( 'SCRIPT_DEBUG', true );
+			const results: { content: string; warnings: unknown[][] }[] = [];
+			for ( const html of [ {}, { wpServerHtml: true } ] ) {
+				const runtime = await loadConflictRuntime();
+				const namespace = uniqueNamespace();
+				runtime.store( namespace, {
+					state: { html, text: 'Hello' },
+				} );
+				const region = createRegion(
+					namespace,
+					`<div ${ attributes }><p>Server</p></div>`
+				);
+				const warnings = vi.spyOn( console, 'warn' );
+				const start = warnings.mock.calls.length;
+				await runtime.act( () =>
+					runtime.hydrate(
+						runtime.toVdom( region ),
+						region.parentNode!
+					)
+				);
+				const target = region.querySelector( 'div' )!;
+				results.push( {
+					content: target.innerHTML,
+					warnings: warnings.mock.calls.slice( start ),
+				} );
+				expect( target.innerHTML ).toBe( expected );
+				expect( console ).toHaveWarnedWith(
+					attributes.includes( '--x' )
+						? 'The usage of data-wp-html--suffix is not supported. Please use data-wp-html instead.'
+						: 'The data-wp-html directive was ignored because it conflicts with data-wp-text.'
+				);
+			}
+			expect( results[ 1 ] ).toEqual( results[ 0 ] );
+		}
+	);
+
+	it( 'recognizes a server representation after a later plain-object store merge', async () => {
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		runtime.populateServerData( {
+			state: { [ namespace ]: { html: { wpServerHtml: true } } },
+		} );
+		const { state } = runtime.store( namespace, {
+			state: { html: { title: 'merged' }, active: false },
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html" data-wp-class--active="state.active"><p>Server</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+		const serverNode = target.firstElementChild;
+		const writes = recordHtmlWrites( target );
+		const warnings = vi.spyOn( console, 'warn' );
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		await runtime.act( () => {
+			state.active = true;
+		} );
+		expect( target.firstElementChild ).toBe( serverNode );
+		expect( writes ).toEqual( [] );
+		expect( warnings ).not.toHaveBeenCalled();
+	} );
+
 	it( 'renders trusted HTML from asDangerousHTML()', async () => {
 		const namespace = uniqueNamespace();
 		const { state } = store( namespace, {

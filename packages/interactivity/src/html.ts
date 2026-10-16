@@ -53,8 +53,9 @@ const trustedHtmlByToken = new WeakMap< DangerousHTML, string | TrustedHTML >();
 
 /**
  * Marks a string (or native `TrustedHTML`) as trusted so the `data-wp-html`
- * directive renders it as markup. Any value other than a token empties the
- * bound element.
+ * directive renders it as markup. Other values empty the bound element,
+ * except the server's token representation, which keeps existing content
+ * without rendering markup.
  *
  * This function never sanitizes or otherwise processes the HTML passed
  * here, the same responsibility you take on using `dangerouslySetInnerHTML`
@@ -130,6 +131,23 @@ export function isDangerousHTML( value: unknown ): value is DangerousHTML {
 		typeof value === 'object' &&
 		value !== null &&
 		trustedHtmlByToken.has( value as DangerousHTML )
+	);
+}
+
+/**
+ * Checks whether a plain object is the server representation of a dangerous HTML token.
+ *
+ * @param value Value to check.
+ * @return Whether the value is the server token representation.
+ */
+export function isServerHTMLRepresentation(
+	value: unknown
+): value is Record< string, unknown > {
+	return (
+		typeof value === 'object' &&
+		value !== null &&
+		( value as Record< string, unknown > ).constructor === Object &&
+		( value as Record< string, unknown > ).wpServerHtml === true
 	);
 }
 

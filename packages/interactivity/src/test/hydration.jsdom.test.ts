@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act } from 'preact/test-utils';
 import '../directives';
 import { hydrateRegions, initialVdom } from '../hydration';
@@ -18,9 +18,35 @@ function uniqueNamespace(): string {
 	return `test/hydration-${ ++namespaceCount }`;
 }
 
+/**
+ * Records content writes while preserving the element's native DOM behavior.
+ *
+ * @param target The element whose content writes should be observed.
+ * @return The HTML values written to the element, in order.
+ */
+function recordHtmlWrites( target: HTMLElement ): string[] {
+	const descriptor = Object.getOwnPropertyDescriptor(
+		Element.prototype,
+		'innerHTML'
+	)!;
+	const writes: string[] = [];
+	Object.defineProperty( target, 'innerHTML', {
+		configurable: true,
+		get: () => descriptor.get!.call( target ),
+		set: ( value: string ) => {
+			writes.push( value );
+			descriptor.set!.call( target, value );
+		},
+	} );
+	return writes;
+}
+
 describe( 'hydrateRegions', () => {
 	beforeEach( () => {
 		document.body.innerHTML = '';
+	} );
+	afterEach( () => {
+		vi.unstubAllGlobals();
 	} );
 
 	it.each( [ false, true ] )(
@@ -220,4 +246,137 @@ describe( 'hydrateRegions', () => {
 			/^updated$/
 		);
 	} );
+
+	it.each( [ false, true ] )(
+		'hydrates data-wp-each items with server HTML representations (SCRIPT_DEBUG: %s)',
+		async ( debug ) => {
+			vi.stubGlobal( 'SCRIPT_DEBUG', debug );
+			const defaultNamespace = uniqueNamespace();
+			const customNamespace = uniqueNamespace();
+			const itemNamespace = uniqueNamespace();
+			const representation = JSON.parse( '{"wpServerHtml":true}' );
+			populateServerData( {
+				state: {
+					[ defaultNamespace ]: {
+						list: [
+							{ html: representation },
+							{ html: representation },
+						],
+					},
+					[ customNamespace ]: {
+						list: [
+							{ html: representation },
+							{ html: representation },
+						],
+					},
+					[ itemNamespace ]: {
+						list: [ representation, representation ],
+					},
+				},
+			} );
+			const { state: defaultState } = store( defaultNamespace, {
+				state: {},
+			} );
+			const defaultListState = defaultState as {
+				list: Array< { html: unknown } >;
+			};
+
+			document.body.innerHTML = `
+				<div id="default" data-wp-interactive="${ defaultNamespace }">
+					<template data-wp-each="state.list"><div><span data-wp-html="context.item.html"><i>Fallback</i></span></div></template>
+					<div data-wp-each-child="${ defaultNamespace }::state.list"><span id="default-one" data-wp-html="context.item.html"><b>one</b></span></div>
+					<div data-wp-each-child="${ defaultNamespace }::state.list"><span id="default-two" data-wp-html="context.item.html"><b>two</b></span></div>
+				</div>
+				<div id="custom" data-wp-interactive="${ customNamespace }">
+					<template data-wp-each--entry="state.list"><div><span data-wp-html="context.entry.html"><i>Fallback</i></span></div></template>
+					<div data-wp-each-child="${ customNamespace }::state.list"><span id="custom-one" data-wp-html="context.entry.html"><b>one</b></span></div>
+					<div data-wp-each-child="${ customNamespace }::state.list"><span id="custom-two" data-wp-html="context.entry.html"><b>two</b></span></div>
+				</div>
+				<div id="item" data-wp-interactive="${ itemNamespace }">
+					<template data-wp-each="state.list"><div><span data-wp-html="context.item"><i>Fallback</i></span></div></template>
+					<div data-wp-each-child="${ itemNamespace }::state.list"><span id="item-one" data-wp-html="context.item"><b>one</b></span></div>
+					<div data-wp-each-child="${ itemNamespace }::state.list"><span id="item-two" data-wp-html="context.item"><b>two</b></span></div>
+				</div>
+			`;
+			const targets = [
+				...document.querySelectorAll< HTMLElement >(
+					'#default-one, #default-two, #custom-one, #custom-two, #item-one, #item-two'
+				),
+			];
+			const serverNodes = targets.map(
+				( target ) => target.firstElementChild
+			);
+			const writes = targets.map( recordHtmlWrites );
+			const mutations = targets.map( () => [] as MutationRecord[] );
+			const observers = targets.map( ( target, index ) => {
+				const observer = new MutationObserver( ( records ) =>
+					mutations[ index ].push( ...records )
+				);
+				observer.observe( target, { childList: true } );
+				return observer;
+			} );
+			const warnings = vi.spyOn( console, 'warn' );
+			const warningCount = warnings.mock.calls.length;
+
+			await act( () => hydrateRegions() );
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			expect(
+				targets.map( ( target ) => target.firstElementChild )
+			).toEqual( serverNodes );
+			expect( writes ).toEqual( [ [], [], [], [], [], [] ] );
+			expect( mutations ).toEqual( [ [], [], [], [], [], [] ] );
+			expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [] );
+
+			await act( () => {
+				defaultListState.list = [
+					...defaultListState.list,
+					{ html: JSON.parse( JSON.stringify( representation ) ) },
+				];
+			} );
+			const defaultSpans = Array.from(
+				document.querySelectorAll< HTMLElement >(
+					'#default [data-wp-html]'
+				)
+			);
+			expect( defaultSpans ).toHaveLength( 3 );
+			expect( defaultSpans[ 0 ].firstElementChild ).toBe(
+				serverNodes[ 0 ]
+			);
+			expect( defaultSpans[ 1 ].firstElementChild ).toBe(
+				serverNodes[ 1 ]
+			);
+			expect( defaultSpans[ 2 ].innerHTML ).toBe( '<i>Fallback</i>' );
+
+			await act( () => {
+				defaultListState.list[ 0 ].html = JSON.parse(
+					JSON.stringify( representation )
+				);
+			} );
+			expect( defaultSpans[ 0 ].firstElementChild ).toBe(
+				serverNodes[ 0 ]
+			);
+			expect( writes[ 0 ] ).toEqual( [] );
+
+			await act( () => {
+				defaultListState.list[ 0 ].html =
+					asDangerousHTML( '<b>new</b>' );
+			} );
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+			expect( defaultSpans.map( ( span ) => span.innerHTML ) ).toEqual( [
+				'<b>new</b>',
+				'<b>two</b>',
+				'<i>Fallback</i>',
+			] );
+			expect( writes ).toEqual( [
+				[ '<b>new</b>' ],
+				[],
+				[],
+				[],
+				[],
+				[],
+			] );
+			expect( warnings.mock.calls.slice( warningCount ) ).toEqual( [] );
+			observers.forEach( ( observer ) => observer.disconnect() );
+		}
+	);
 } );
