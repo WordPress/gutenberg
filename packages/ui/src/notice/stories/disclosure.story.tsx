@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
 import { useEffect, useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { Text } from '../../text';
 import * as Notice from '../index';
 
 type StoryArgs = Pick< ComponentProps< typeof Notice.Root >, 'intent' > & {
@@ -63,16 +62,9 @@ function CopyButton( { text, label }: { text: string; label: string } ) {
 			<Notice.ActionButton ref={ copyRef } variant="outline">
 				{ label }
 			</Notice.ActionButton>
-			<Text
-				variant="body-sm"
-				role="status"
-				style={ {
-					alignSelf: 'center',
-					color: 'var(--wp-ui-notice-text-color)',
-				} }
-			>
+			<Notice.Description role="status" style={ { alignSelf: 'center' } }>
 				{ hasCopied ? 'Copied' : '' }
-			</Text>
+			</Notice.Description>
 		</>
 	);
 }
