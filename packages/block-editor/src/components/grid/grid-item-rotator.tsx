@@ -1,3 +1,4 @@
+import type { PointerEvent } from 'react';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { rotateRight, Icon } from '@wordpress/icons';
@@ -124,6 +125,56 @@ export function GridItemRotator( {
 		}
 	}
 
+	function startRotation( event: PointerEvent< HTMLDivElement > ) {
+		if ( event.button !== 0 || ! boxRef.current || rotationRef.current ) {
+			return;
+		}
+		event.preventDefault();
+		event.stopPropagation();
+		const handle = event.currentTarget;
+		// The box turns around its center, so the center of
+		// its bounding box is the block's center.
+		const rect = boxRef.current.getBoundingClientRect();
+		const onKeyDown = ( keyEvent: KeyboardEvent ) => {
+			if ( keyEvent.key === 'Escape' ) {
+				// Claim the key, so that the canvas doesn't
+				// also move focus away from the block.
+				keyEvent.preventDefault();
+				endRotation();
+				setPreview( null );
+			}
+		};
+		// Focus can be in the canvas or in the editor around
+		// it. Listen in the capture phase, so that Escape is
+		// handled before anything else in either document.
+		const documents = [
+			...new Set( [ blockElement.ownerDocument, handle.ownerDocument ] ),
+		];
+		const centerX = rect.left + rect.width / 2;
+		const centerY = rect.top + rect.height / 2;
+		rotationRef.current = {
+			handle,
+			documents,
+			pointerId: event.pointerId,
+			centerX,
+			centerY,
+			offset:
+				angle -
+				getPointerAngle( {
+					centerX,
+					centerY,
+					pointerX: event.clientX,
+					pointerY: event.clientY,
+				} ),
+			value: angle,
+			onKeyDown,
+		};
+		handle.setPointerCapture( event.pointerId );
+		for ( const ownerDocument of documents ) {
+			ownerDocument.addEventListener( 'keydown', onKeyDown, true );
+		}
+	}
+
 	return (
 		<BlockPopoverCover
 			className="block-editor-grid-item-handles"
@@ -140,67 +191,22 @@ export function GridItemRotator( {
 					className="block-editor-grid-item-handles__rotate"
 					label={ __( 'Rotate' ) }
 					angle={ previewAngle ?? angle }
-					onPointerDown={ ( event ) => {
+					onPointerDown={ startRotation }
+					onPointerMove={ ( event ) => {
+						// When a pointer is pressed while the browser thinks
+						// one of its buttons is already down, the press comes
+						// as a move with the button that changed, and not as a
+						// `pointerdown`. WebKit does that for the first press
+						// after a drag that started outside the canvas, such
+						// as from a drag handle.
 						if (
-							event.button !== 0 ||
-							! boxRef.current ||
-							rotationRef.current
+							! rotationRef.current &&
+							event.button === 0 &&
+							event.buttons === 1
 						) {
+							startRotation( event );
 							return;
 						}
-						event.preventDefault();
-						event.stopPropagation();
-						const handle = event.currentTarget;
-						// The box turns around its center, so the center of
-						// its bounding box is the block's center.
-						const rect = boxRef.current.getBoundingClientRect();
-						const onKeyDown = ( keyEvent: KeyboardEvent ) => {
-							if ( keyEvent.key === 'Escape' ) {
-								// Claim the key, so that the canvas doesn't
-								// also move focus away from the block.
-								keyEvent.preventDefault();
-								endRotation();
-								setPreview( null );
-							}
-						};
-						// Focus can be in the canvas or in the editor around
-						// it. Listen in the capture phase, so that Escape is
-						// handled before anything else in either document.
-						const documents = [
-							...new Set( [
-								blockElement.ownerDocument,
-								handle.ownerDocument,
-							] ),
-						];
-						const centerX = rect.left + rect.width / 2;
-						const centerY = rect.top + rect.height / 2;
-						rotationRef.current = {
-							handle,
-							documents,
-							pointerId: event.pointerId,
-							centerX,
-							centerY,
-							offset:
-								angle -
-								getPointerAngle( {
-									centerX,
-									centerY,
-									pointerX: event.clientX,
-									pointerY: event.clientY,
-								} ),
-							value: angle,
-							onKeyDown,
-						};
-						handle.setPointerCapture( event.pointerId );
-						for ( const ownerDocument of documents ) {
-							ownerDocument.addEventListener(
-								'keydown',
-								onKeyDown,
-								true
-							);
-						}
-					} }
-					onPointerMove={ ( event ) => {
 						const rotation = rotationRef.current;
 						if ( ! rotation ) {
 							return;
