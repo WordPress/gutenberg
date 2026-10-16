@@ -4550,16 +4550,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/focal-point-picker/styles/focal-point-style.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/form-file-upload/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1
