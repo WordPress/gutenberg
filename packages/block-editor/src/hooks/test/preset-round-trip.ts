@@ -22,16 +22,19 @@ import {
 	getPresetValueFromCustomValue,
 	isValuePreset,
 } from '../../components/preset-input-control/utils';
+import type { Preset } from '../../components/preset-input-control/types';
 
 // Border-radius equivalents of the spacing helpers above. The per-domain
 // implementations were consolidated into the generic preset-input-control
 // helpers, which take the preset type as an extra argument.
 const BORDER_RADIUS_PRESET_TYPE = 'border-radius';
-const getCustomRadiusValue = ( value, presets ) =>
+const getCustomRadiusValue = ( value: string | undefined, presets: Preset[] ) =>
 	getCustomValueFromPreset( value, presets, BORDER_RADIUS_PRESET_TYPE );
-const getRadiusPresetFromCustom = ( value, presets ) =>
-	getPresetValueFromCustomValue( value, presets, BORDER_RADIUS_PRESET_TYPE );
-const isValueRadiusPreset = ( value ) =>
+const getRadiusPresetFromCustom = (
+	value: string | undefined,
+	presets: Preset[]
+) => getPresetValueFromCustomValue( value, presets, BORDER_RADIUS_PRESET_TYPE );
+const isValueRadiusPreset = ( value: string | undefined ) =>
 	isValuePreset( value, BORDER_RADIUS_PRESET_TYPE );
 
 // Fixture: a minimal merged GlobalStylesConfig sized just large enough
@@ -114,29 +117,36 @@ const PRESETS = {
  * from (1) at save() time, so clearing (1) clears the class downstream —
  * verified indirectly by asserting (1) is undefined after reset.
  *
- * @param {Object}  attributes   Block attributes object.
- * @param {?string} slugAttrName Per-domain slug attribute key, or null.
- * @param {string}  stylePath    Dotted style sub-path to clear.
- * @return {Object} New attributes with the reset surfaces cleared.
+ * @param attributes   Block attributes object.
+ * @param slugAttrName Per-domain slug attribute key, or null.
+ * @param stylePath    Dotted style sub-path to clear.
+ * @return New attributes with the reset surfaces cleared.
  */
-function simulateResetAll( attributes, slugAttrName, stylePath ) {
-	const next = { ...attributes };
+function simulateResetAll< T extends Record< string, unknown > >(
+	attributes: T,
+	slugAttrName: string | null,
+	stylePath: string
+): T {
+	const next: Record< string, unknown > = { ...attributes };
 	if ( slugAttrName ) {
 		next[ slugAttrName ] = undefined;
 	}
 	if ( stylePath ) {
 		const segments = stylePath.split( '.' );
 		next.style = JSON.parse( JSON.stringify( next.style || {} ) );
-		let node = next.style;
+		// The style attribute nests objects along the style path.
+		let node = next.style as Record< string, unknown >;
 		for ( let i = 0; i < segments.length - 1; i++ ) {
 			if ( ! node[ segments[ i ] ] ) {
-				return next;
+				// Clearing leaves keeps the shape of the attributes.
+				return next as T;
 			}
-			node = node[ segments[ i ] ];
+			node = node[ segments[ i ] ] as Record< string, unknown >;
 		}
 		node[ segments[ segments.length - 1 ] ] = undefined;
 	}
-	return next;
+	// Clearing leaves keeps the shape of the attributes.
+	return next as T;
 }
 
 // ---------------------------------------------------------------------------
@@ -393,7 +403,7 @@ describe( 'border-radius preset round-trip', () => {
 // ---------------------------------------------------------------------------
 describe( 'explicit-empty handling per domain', () => {
 	// Reproduce `resolveStyle`'s emptiness predicate verbatim.
-	function isEmpty( v ) {
+	function isEmpty( v: unknown ) {
 		if ( v === '' || v === null || v === undefined ) {
 			return true;
 		}
