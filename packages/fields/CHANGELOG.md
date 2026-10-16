@@ -7,6 +7,9 @@
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 -   Remove the `deletePost`, `duplicatePattern`, `duplicatePost`, `duplicateTemplatePart`, `exportPattern`, `permanentlyDeletePost`, `renamePost`, `reorderPage`, `resetPost`, `restorePost`, `trashPost`, `viewPost` and `viewPostRevisions` actions, which moved to the `@wordpress/core-actions` script modules ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 -   Remove `CreateTemplatePartModal`, which moved to the private APIs of `@wordpress/patterns` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Remove the `authorField`, `commentStatusField`, `dateField`, `descriptionField`, `discussionField`, `excerptField`, `featuredImageField`, `formatField`, `lastEditedDateField`, `notesField`, `pageTitleField`, `parentField`, `passwordField`, `patternDescriptionField`, `patternSyncStatusField`, `patternTitleField`, `pingStatusField`, `postContentInfoField`, `postsPageTitleField`, `postsPerPageField`, `readOnlyDescriptionField`, `scheduledDateField`, `siteDiscussionField`, `slugField`, `statusField`, `stickyField`, `templateAuthorField`, `templateField`, `templatePartAuthorField`, `templateTitleField` and `titleField` fields, which moved to the `@wordpress/core-fields` script modules ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
+-   Remove `orderField`, which nothing used ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
+-   Remove the `BasePost`, `BasePostWithEmbeddedAuthor`, `Pattern` and `PostType` types, which only described the records of the removed fields ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
 
 ### Enhancements
 
