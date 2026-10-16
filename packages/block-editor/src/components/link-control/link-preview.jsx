@@ -131,6 +131,11 @@ export default function LinkPreview( {
 									className="block-editor-link-control__preview-title"
 									href={ value.url }
 									openInNewTab
+									onClick={ ( event ) => {
+										if ( value.url?.startsWith( '#' ) ) {
+											event.preventDefault();
+										}
+									} }
 								>
 									<Truncate numberOfLines={ 1 }>
 										{ displayTitle }
