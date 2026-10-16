@@ -358,3 +358,66 @@ export interface BlockStyleVariationOverridesWithConfigProps {
 	 */
 	config?: GlobalStylesConfig;
 }
+
+/**
+ * The position of a block, as stored in its `style.position` attribute.
+ */
+export interface PositionStyle {
+	type?: string;
+	top?: string;
+	right?: string;
+	bottom?: string;
+	left?: string;
+}
+
+/**
+ * A block style that may set a position.
+ */
+export type PositionBlockStyle = BlockStyle & { position?: PositionStyle };
+
+/**
+ * Props of the position block support panel.
+ */
+export interface PositionPanelProps {
+	style?: PositionBlockStyle;
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
+
+/**
+ * The attributes the position block support reads.
+ */
+export interface PositionAttributes {
+	style?: PositionBlockStyle;
+}
+
+/**
+ * Block props carrying the position attributes.
+ */
+export interface PositionValueProps {
+	attributes: PositionAttributes;
+}
+
+/**
+ * Props of `resetPosition`.
+ */
+export interface ResetPositionProps {
+	attributes?: PositionAttributes;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
+
+/**
+ * Options of `getPositionCSS`.
+ */
+export interface PositionCSSOptions {
+	selector: string;
+	style?: PositionBlockStyle;
+}
+
+/**
+ * Options of `getResponsivePositionCSS`.
+ */
+export interface ResponsivePositionCSSOptions extends PositionCSSOptions {
+	viewportSettings?: unknown;
+}

@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -17,6 +18,18 @@ import {
 } from './block-style-state';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import type {
+	BlockListBlockFeatureProps,
+	BlockSupportEditProps,
+	PositionAttributes,
+	PositionBlockStyle,
+	PositionCSSOptions,
+	PositionPanelProps,
+	PositionStyle,
+	PositionValueProps,
+	ResetPositionProps,
+	ResponsivePositionCSSOptions,
+} from './types';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -41,21 +54,24 @@ const FIXED_OPTION = {
 	description: __( 'The block will not move when the page is scrolled.' ),
 };
 
-const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ];
-const VALID_POSITION_TYPES = [ 'sticky', 'fixed' ];
+const POSITION_SIDES = [ 'top', 'right', 'bottom', 'left' ] as const;
+const VALID_POSITION_TYPES: Array< string | undefined > = [ 'sticky', 'fixed' ];
 
 /**
  * Get calculated position CSS.
  *
- * @param {Object} props          Component props.
- * @param {string} props.selector Selector to use.
- * @param {Object} props.style    Style object.
- * @return {string} The generated CSS rules.
+ * @param props          Component props.
+ * @param props.selector Selector to use.
+ * @param props.style    Style object.
+ * @return The generated CSS rules.
  */
-export function getPositionCSS( { selector, style } ) {
+export function getPositionCSS( {
+	selector,
+	style,
+}: PositionCSSOptions ): string {
 	let output = '';
 
-	const { type: positionType } = style?.position || {};
+	const { type: positionType }: PositionStyle = style?.position || {};
 
 	if ( ! VALID_POSITION_TYPES.includes( positionType ) ) {
 		return output;
@@ -66,7 +82,8 @@ export function getPositionCSS( { selector, style } ) {
 
 	POSITION_SIDES.forEach( ( side ) => {
 		if ( style?.position?.[ side ] !== undefined ) {
-			output += `${ side }: ${ style.position[ side ] };`;
+			// The check above found the side.
+			output += `${ side }: ${ style!.position![ side ] };`;
 		}
 	} );
 
@@ -86,23 +103,25 @@ export function getPositionCSS( { selector, style } ) {
  * viewport's position configuration. Generated rules are wrapped in the
  * matching breakpoint media query.
  *
- * @param {Object} props                  Component props.
- * @param {string} props.selector         Selector to use.
- * @param {Object} props.style            Style object.
- * @param {Object} props.viewportSettings Viewport breakpoint settings.
- * @return {string} The generated CSS rules.
+ * @param props                  Component props.
+ * @param props.selector         Selector to use.
+ * @param props.style            Style object.
+ * @param props.viewportSettings Viewport breakpoint settings.
+ * @return The generated CSS rules.
  */
 export function getResponsivePositionCSS( {
 	selector,
 	style,
 	viewportSettings,
-} ) {
+}: ResponsivePositionCSSOptions ): string {
 	return Object.entries( getResponsiveMediaQueries( viewportSettings ) )
 		.map( ( [ viewport, mediaQuery ] ) => {
-			const viewportPosition = getStyleForState( style, {
-				viewport,
-				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-			} )?.position;
+			const viewportPosition = (
+				getStyleForState( style, {
+					viewport,
+					pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				} ) as PositionBlockStyle | undefined
+			 )?.position;
 
 			if ( ! viewportPosition ) {
 				return '';
@@ -137,23 +156,29 @@ export function getResponsivePositionCSS( {
  * Returns the position types used across the default and responsive viewport
  * states of a style object.
  *
- * @param {Object} style            Style object.
- * @param {Object} viewportSettings Viewport breakpoint settings.
- * @return {string[]} Position types, in default-then-viewport order.
+ * @param style            Style object.
+ * @param viewportSettings Viewport breakpoint settings.
+ * @return Position types, in default-then-viewport order.
  */
-function getPositionTypes( style, viewportSettings ) {
-	const types = new Set();
+function getPositionTypes(
+	style: PositionBlockStyle | undefined,
+	viewportSettings: unknown
+): Array< string | undefined > {
+	const types = new Set< string | undefined >();
 
 	if ( VALID_POSITION_TYPES.includes( style?.position?.type ) ) {
-		types.add( style.position.type );
+		// The check above found the position type.
+		types.add( style!.position!.type );
 	}
 
 	Object.keys( getResponsiveMediaQueries( viewportSettings ) ).forEach(
 		( viewport ) => {
-			const viewportPosition = getStyleForState( style, {
-				viewport,
-				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-			} )?.position;
+			const viewportPosition = (
+				getStyleForState( style, {
+					viewport,
+					pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+				} ) as PositionBlockStyle | undefined
+			 )?.position;
 			const type = viewportPosition
 				? { ...style?.position, ...viewportPosition }.type
 				: undefined;
@@ -170,35 +195,45 @@ function getPositionTypes( style, viewportSettings ) {
 /**
  * Determines if there is sticky position support.
  *
- * @param {string|Object} blockType Block name or Block Type object.
+ * @param blockType Block name or Block Type object.
  *
- * @return {boolean} Whether there is support.
+ * @return Whether there is support.
  */
-export function hasStickyPositionSupport( blockType ) {
+export function hasStickyPositionSupport(
+	blockType: string | BlockType
+): boolean {
 	const support = getBlockSupport( blockType, POSITION_SUPPORT_KEY );
-	return !! ( true === support || support?.sticky );
+	return !! (
+		true === support ||
+		( support as { sticky?: boolean } | undefined )?.sticky
+	);
 }
 
 /**
  * Determines if there is fixed position support.
  *
- * @param {string|Object} blockType Block name or Block Type object.
+ * @param blockType Block name or Block Type object.
  *
- * @return {boolean} Whether there is support.
+ * @return Whether there is support.
  */
-export function hasFixedPositionSupport( blockType ) {
+export function hasFixedPositionSupport(
+	blockType: string | BlockType
+): boolean {
 	const support = getBlockSupport( blockType, POSITION_SUPPORT_KEY );
-	return !! ( true === support || support?.fixed );
+	return !! (
+		true === support ||
+		( support as { fixed?: boolean } | undefined )?.fixed
+	);
 }
 
 /**
  * Determines if there is position support.
  *
- * @param {string|Object} blockType Block name or Block Type object.
+ * @param blockType Block name or Block Type object.
  *
- * @return {boolean} Whether there is support.
+ * @return Whether there is support.
  */
-export function hasPositionSupport( blockType ) {
+export function hasPositionSupport( blockType: string | BlockType ): boolean {
 	const support = getBlockSupport( blockType, POSITION_SUPPORT_KEY );
 	return !! support;
 }
@@ -206,10 +241,11 @@ export function hasPositionSupport( blockType ) {
 /**
  * Checks if there is a current value in the position block support attributes.
  *
- * @param {Object} props Block props.
- * @return {boolean} Whether or not the block has a position value set.
+ * @param props            Block props.
+ * @param props.attributes Block attributes.
+ * @return Whether or not the block has a position value set.
  */
-export function hasPositionValue( props ) {
+export function hasPositionValue( props: PositionValueProps ): boolean {
 	return props.attributes.style?.position?.type !== undefined;
 }
 
@@ -217,10 +253,12 @@ export function hasPositionValue( props ) {
  * Checks if the block is currently set to a sticky or fixed position.
  * This check is helpful for determining how to position block toolbars or other elements.
  *
- * @param {Object} attributes Block attributes.
- * @return {boolean} Whether or not the block is set to a sticky or fixed position.
+ * @param attributes Block attributes.
+ * @return Whether or not the block is set to a sticky or fixed position.
  */
-export function hasStickyOrFixedPositionValue( attributes ) {
+export function hasStickyOrFixedPositionValue(
+	attributes?: PositionAttributes
+): boolean {
 	const positionType = attributes?.style?.position?.type;
 	return positionType === 'sticky' || positionType === 'fixed';
 }
@@ -229,12 +267,15 @@ export function hasStickyOrFixedPositionValue( attributes ) {
  * Resets the position block support attributes. This can be used when disabling
  * the position support controls for a block via a `ToolsPanel`.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.attributes    Block's attributes.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param props               Block props.
+ * @param props.attributes    Block's attributes.
+ * @param props.setAttributes Function to set block's attributes.
  */
-export function resetPosition( { attributes = {}, setAttributes } ) {
-	const { style = {} } = attributes;
+export function resetPosition( {
+	attributes = {},
+	setAttributes,
+}: ResetPositionProps ) {
+	const { style = {} }: { style?: PositionBlockStyle } = attributes;
 
 	setAttributes( {
 		style: cleanEmptyObject( {
@@ -254,33 +295,37 @@ export function resetPosition( { attributes = {}, setAttributes } ) {
 /**
  * Custom hook that checks if position settings have been disabled.
  *
- * @param {string} name The name of the block.
+ * @param $0      Block props.
+ * @param $0.name The name of the block.
  *
- * @return {boolean} Whether padding setting is disabled.
+ * @return Whether padding setting is disabled.
  */
-export function useIsPositionDisabled( { name: blockName } = {} ) {
+export function useIsPositionDisabled( {
+	name: blockName,
+}: { name?: string } = {} ): boolean {
 	const [ allowFixed, allowSticky ] = useSettings(
 		'position.fixed',
 		'position.sticky'
 	);
 	const isDisabled = ! allowFixed && ! allowSticky;
 
-	return ! hasPositionSupport( blockName ) || isDisabled;
+	// Callers pass the block name.
+	return ! hasPositionSupport( blockName as string ) || isDisabled;
 }
 
 /*
  * Position controls rendered in an inspector control panel.
  *
- * @param {Object} props
+ * @param props
  *
- * @return {Element} Position panel.
+ * @return Position panel.
  */
 export function PositionPanelPure( {
 	style = {},
 	clientId,
 	name: blockName,
 	setAttributes,
-} ) {
+}: PositionPanelProps ) {
 	const allowFixed = hasFixedPositionSupport( blockName );
 	const allowSticky = hasStickyPositionSupport( blockName );
 
@@ -306,7 +351,8 @@ export function PositionPanelPure( {
 		( ! selectedState.pseudo ||
 			selectedState.pseudo === DEFAULT_BLOCK_STYLE_STATE.pseudo );
 	const stateStyle = isViewportState
-		? getStyleForState( style, selectedState )
+		? ( getStyleForState( style, selectedState ) as
+				PositionBlockStyle | undefined )
 		: undefined;
 	// Viewport states inherit the default viewport's position type.
 	const value = isViewportState
@@ -326,7 +372,11 @@ export function PositionPanelPure( {
 			: null;
 
 	const options = useMemo( () => {
-		const availableOptions = [ DEFAULT_OPTION ];
+		const availableOptions: Array< {
+			value: string;
+			label: string;
+			description?: string;
+		} > = [ DEFAULT_OPTION ];
 		// Display options if they are allowed, or if a block already has a valid value set.
 		// This allows for a block to be switched off from a position type that is not allowed.
 		if ( allowSticky || value === STICKY_OPTION.value ) {
@@ -338,7 +388,7 @@ export function PositionPanelPure( {
 		return availableOptions;
 	}, [ allowFixed, allowSticky, value ] );
 
-	const onChangeType = ( next ) => {
+	const onChangeType = ( next: string | null ) => {
 		// For now, use a hard-coded `0px` value for the position.
 		// `0px` is preferred over `0` as it can be used in `calc()` functions.
 		// In the future, it could be useful to allow for an offset value.
@@ -390,12 +440,14 @@ export function PositionPanelPure( {
 			<SelectControl
 				label={ __( 'Position' ) }
 				hideLabelFromVision
-				description={ stickyHelpText }
+				// A `null` description renders nothing.
+				description={ stickyHelpText as string | undefined }
 				popupWidth="anchor"
 				items={ options }
 				value={ selectedOption }
 				onValueChange={ ( selectedItem ) => {
-					onChangeType( selectedItem.value );
+					// The select has no empty choice.
+					onChangeType( selectedItem!.value );
 				} }
 			/>
 		</InspectorControls>
@@ -403,16 +455,17 @@ export function PositionPanelPure( {
 }
 
 export default {
-	edit: function Edit( props ) {
+	edit: function Edit( props: BlockSupportEditProps ) {
 		const isPositionDisabled = useIsPositionDisabled( props );
 		if ( isPositionDisabled ) {
 			return null;
 		}
-		return <PositionPanelPure { ...props } />;
+		// The block support passes the style attribute among the props.
+		return <PositionPanelPure { ...( props as PositionPanelProps ) } />;
 	},
 	useBlockProps,
 	attributeKeys: [ 'style' ],
-	hasSupport( name ) {
+	hasSupport( name: string ) {
 		return hasBlockSupport( name, POSITION_SUPPORT_KEY );
 	},
 };
@@ -420,7 +473,10 @@ export default {
 // Used for generating the instance ID
 const POSITION_BLOCK_PROPS_REFERENCE = {};
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( {
+	name,
+	style,
+}: BlockListBlockFeatureProps & { style?: PositionBlockStyle } ) {
 	const hasPositionBlockSupport = hasBlockSupport(
 		name,
 		POSITION_SUPPORT_KEY
@@ -436,7 +492,7 @@ function useBlockProps( { name, style } ) {
 
 	// Get CSS string for the current position values, including any
 	// responsive viewport state values.
-	let css;
+	let css: string | undefined;
 	if ( allowPositionStyles ) {
 		css = [
 			getPositionCSS( {
@@ -463,7 +519,8 @@ function useBlockProps( { name, style } ) {
 			: undefined
 	);
 
-	useStyleOverride( { css } );
+	// An unset CSS string removes the override.
+	useStyleOverride( { css: css as string } );
 
 	return { className };
 }
