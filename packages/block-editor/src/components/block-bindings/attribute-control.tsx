@@ -20,6 +20,10 @@ import BlockBindingsSourceFieldsList from './source-fields-list';
 import useBlockBindingsUtils from './use-block-bindings-utils';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
+import type {
+	BlockBindingsAttributeControlProps,
+	BlockBindingsField,
+} from './types';
 
 /**
  * Renders a control for viewing and editing a block attribute binding.
@@ -35,7 +39,7 @@ export default function BlockBindingsAttributeControl( {
 	attribute,
 	binding,
 	blockName,
-} ) {
+}: BlockBindingsAttributeControlProps ) {
 	const { updateBlockBindings } = useBlockBindingsUtils();
 	const isMobile = useViewportMatch( 'medium', '<' );
 
@@ -58,7 +62,7 @@ export default function BlockBindingsAttributeControl( {
 			const attributeType =
 				_attribute?.type === 'rich-text' ? 'string' : _attribute?.type;
 
-			const sourceFields = {};
+			const sourceFields: Record< string, BlockBindingsField[] > = {};
 			Object.entries( getAllBlockBindingsSources() ).forEach(
 				( [ sourceName, source ] ) => {
 					const fieldsList = getBlockBindingsSourceFieldsList(
@@ -69,7 +73,8 @@ export default function BlockBindingsAttributeControl( {
 						return;
 					}
 					const compatibleFieldsList = fieldsList.filter(
-						( field ) => field.type === attributeType
+						( field: BlockBindingsField ) =>
+							field.type === attributeType
 					);
 					if ( compatibleFieldsList.length ) {
 						sourceFields[ sourceName ] = compatibleFieldsList;
@@ -93,7 +98,8 @@ export default function BlockBindingsAttributeControl( {
 		! canUpdateBlockBindings || ! hasCompatibleFields;
 
 	const { source: boundSourceName, args } = binding || {};
-	const source = getBlockBindingsSource( boundSourceName );
+	// An unset name finds no source.
+	const source = getBlockBindingsSource( boundSourceName as string );
 
 	let displayText;
 	let isValid = true;
@@ -111,7 +117,8 @@ export default function BlockBindingsAttributeControl( {
 		displayText = __( 'Source not registered' );
 	} else {
 		displayText =
-			compatibleFields?.[ boundSourceName ]?.find( ( field ) =>
+			// A found source has a name.
+			compatibleFields?.[ boundSourceName as string ]?.find( ( field ) =>
 				fastDeepEqual( field.args, args )
 			)?.label ||
 			source?.label ||
@@ -122,18 +129,20 @@ export default function BlockBindingsAttributeControl( {
 		<ToolsPanelItem
 			hasValue={ () => !! binding }
 			label={ attribute }
+			// `false` reads as no handler.
 			onDeselect={
-				!! hasCompatibleFields &&
-				( () => {
-					updateBlockBindings( {
-						[ attribute ]: undefined,
-					} );
-				} )
+				( !! hasCompatibleFields &&
+					( () => {
+						updateBlockBindings( {
+							[ attribute ]: undefined,
+						} );
+					} ) ) as ( () => void ) | undefined
 			}
 		>
 			<Menu.Root>
 				<Menu.Trigger
 					disabled={ ! hasCompatibleFields }
+					// @ts-expect-error The trigger passes its children to the item.
 					render={ <Item /> }
 				>
 					<VStack

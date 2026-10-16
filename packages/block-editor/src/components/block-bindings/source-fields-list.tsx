@@ -7,6 +7,11 @@ import { useViewportMatch } from '@wordpress/compose';
 import { Menu } from '@wordpress/ui';
 import useBlockBindingsUtils from './use-block-bindings-utils';
 import BlockContext from '../block-context';
+import type {
+	BlockBindingsField,
+	BlockBindingsSourceFieldsListItemProps,
+	BlockBindingsSourceFieldsListProps,
+} from './types';
 
 function BlockBindingsSourceFieldsListItem( {
 	args,
@@ -14,7 +19,7 @@ function BlockBindingsSourceFieldsListItem( {
 	field,
 	source,
 	sourceKey,
-} ) {
+}: BlockBindingsSourceFieldsListItemProps ) {
 	const itemBindings = useMemo(
 		() => ( {
 			source: sourceKey,
@@ -28,7 +33,8 @@ function BlockBindingsSourceFieldsListItem( {
 	const blockContext = useContext( BlockContext );
 	const values = useSelect(
 		( select ) =>
-			source.getValues( {
+			// A source offering fields provides their values.
+			source.getValues!( {
 				select,
 				context: blockContext,
 				bindings: {
@@ -63,7 +69,7 @@ export default function BlockBindingsSourceFieldsList( {
 	attribute,
 	sourceKey,
 	fields,
-} ) {
+}: BlockBindingsSourceFieldsListProps ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	// Only render source if it has compatible fields.
@@ -71,7 +77,8 @@ export default function BlockBindingsSourceFieldsList( {
 		return null;
 	}
 
-	const source = getBlockBindingsSource( sourceKey );
+	// Fields come from a registered source.
+	const source = getBlockBindingsSource( sourceKey )!;
 
 	return (
 		<Menu.SubmenuRoot key={ sourceKey }>
@@ -89,7 +96,7 @@ export default function BlockBindingsSourceFieldsList( {
 				}
 			>
 				<Menu.Group>
-					{ fields.map( ( field ) => (
+					{ fields.map( ( field: BlockBindingsField ) => (
 						<BlockBindingsSourceFieldsListItem
 							key={
 								sourceKey + JSON.stringify( field.args ) ||
