@@ -255,17 +255,24 @@ export function isDropTargetValid(
 
 	// Work out if dragged blocks have an allowed parent and if so
 	// check target block matches the allowed parent.
-	const draggedBlockTypes = draggedBlockNames.map( ( name ) =>
-		getBlockType( name )
-	);
+	const draggedBlockTypes = draggedBlockNames.map( ( name ) => {
+		const blockType = getBlockType( name );
+		return {
+			name,
+			parent: blockType.parent || [],
+		};
+	} );
 	const targetMatchesDraggedBlockParents = draggedBlockTypes.every(
 		( block ) => {
+			const [ firstParent ] = draggedBlockTypes[ 0 ]?.parent || [];
 			const [ allowedParentName ] = block?.parent || [];
-			if ( ! allowedParentName ) {
+			if ( ! firstParent && ! allowedParentName ) {
 				return true;
 			}
-
-			return allowedParentName === targetBlockName;
+			return (
+				firstParent === allowedParentName ||
+				allowedParentName === targetBlockName
+			);
 		}
 	);
 
