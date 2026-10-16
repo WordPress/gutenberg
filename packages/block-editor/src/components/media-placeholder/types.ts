@@ -14,13 +14,12 @@ export interface MediaPlaceholderMedia {
 	id?: number;
 	url?: string;
 	src?: string;
-	[ key: string ]: unknown;
 }
 
 /**
- * Props of `MediaPlaceholder`.
+ * Props of `MediaPlaceholder`, except the upload handling.
  */
-export interface MediaPlaceholderProps< Media = unknown > {
+interface MediaPlaceholderBaseProps {
 	/**
 	 * Media item, or items of a gallery, selected when the library opens.
 	 */
@@ -58,10 +57,6 @@ export interface MediaPlaceholderProps< Media = unknown > {
 	 * holding `Shift` or `Ctrl`/`Cmd`.
 	 */
 	multiple?: boolean | string;
-	/**
-	 * Whether to upload selected files, or a function that decides it.
-	 */
-	handleUpload?: boolean | ( ( files: ArrayLike< File > ) => boolean );
 	disableDropZone?: boolean;
 	/**
 	 * Whether to only render the drop zone UI.
@@ -69,11 +64,6 @@ export interface MediaPlaceholderProps< Media = unknown > {
 	dropZoneUIOnly?: boolean;
 	disableMediaButtons?: boolean;
 	onError?: ( message: string ) => void;
-	/**
-	 * Called with the selected or uploaded media, whose shape comes from the
-	 * upload and media library implementations and is supplied by the caller.
-	 */
-	onSelect: ( media: Media ) => void;
 	onCancel?: () => void;
 	/**
 	 * Called with a URL inserted from the URL input.
@@ -100,6 +90,38 @@ export interface MediaPlaceholderProps< Media = unknown > {
 	placeholder?: ( content: ReactNode ) => ReactNode;
 	style?: CSSProperties;
 }
+
+/**
+ * Props of `MediaPlaceholder`. The shape of the media comes from the upload
+ * and media library implementations and is supplied by the caller.
+ */
+export type MediaPlaceholderProps< Media = unknown > =
+	MediaPlaceholderBaseProps &
+		(
+			| {
+					/**
+					 * Whether to upload selected files.
+					 */
+					handleUpload?: true;
+					/**
+					 * Called with the selected or uploaded media.
+					 */
+					onSelect: ( media: Media ) => void;
+			  }
+			| {
+					/**
+					 * Whether to upload selected files, or a function that
+					 * decides it.
+					 */
+					handleUpload:
+						boolean | ( ( files: ArrayLike< File > ) => boolean );
+					/**
+					 * Called with the selected or uploaded media, or with the
+					 * selected files when they are not uploaded.
+					 */
+					onSelect: ( media: Media | ArrayLike< File > ) => void;
+			  }
+		);
 
 /**
  * Props of the popover inserting media from a URL.
