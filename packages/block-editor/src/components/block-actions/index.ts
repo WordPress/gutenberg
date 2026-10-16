@@ -1,14 +1,16 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import usePasteStyles from '../use-paste-styles';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
+import type { BlockActionsProps } from './types';
 
 export default function BlockActions( {
 	clientIds,
 	children,
 	__experimentalUpdateSelection: updateSelection,
-} ) {
+}: BlockActionsProps ) {
 	const { getDefaultBlockName, getGroupingBlockName } =
 		useSelect( blocksStore );
 	const selected = useSelect(
@@ -21,7 +23,8 @@ export default function BlockActions( {
 				canRemoveBlocks,
 			} = select( blockEditorStore );
 
-			const blocks = getBlocksByClientId( clientIds );
+			// The blocks to act on exist.
+			const blocks = getBlocksByClientId( clientIds ) as Block[];
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const canInsertDefaultBlock = canInsertBlockType(
 				getDefaultBlockName(),
@@ -97,8 +100,10 @@ export default function BlockActions( {
 			const groupingBlockName = getGroupingBlockName();
 
 			const newBlocks = groupBlocks(
-				getBlocksByClientId( clientIds ),
-				groupingBlockName
+				// The blocks to act on exist.
+				getBlocksByClientId( clientIds ) as Block[],
+				// Grouping is only offered when a grouping block is registered.
+				groupingBlockName!
 			);
 
 			if ( ! newBlocks ) {
@@ -124,7 +129,8 @@ export default function BlockActions( {
 			}
 		},
 		async onPasteStyles() {
-			await pasteStyles( getBlocksByClientId( clientIds ) );
+			// The blocks to act on exist.
+			await pasteStyles( getBlocksByClientId( clientIds ) as Block[] );
 		},
 	} );
 }
