@@ -6,17 +6,18 @@ import { __, sprintf } from '@wordpress/i18n';
 import BlockIcon from '../block-icon';
 import { useShowHoveredOrFocusedGestures } from '../block-toolbar/utils';
 import { store as blockEditorStore } from '../../store';
+import type { BlockParentSelectorMenuItemProps } from './types';
 
 export default function BlockParentSelectorMenuItem( {
 	parentClientId,
 	parentBlockType,
-} ) {
+}: BlockParentSelectorMenuItemProps ) {
 	const isSmallViewport = useViewportMatch( 'medium', '<' );
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
-	const menuItemRef = useRef();
+	const menuItemRef = useRef< HTMLButtonElement >( null );
 	const gesturesProps = useShowHoveredOrFocusedGestures( {
 		ref: menuItemRef,
 		highlightParent: true,

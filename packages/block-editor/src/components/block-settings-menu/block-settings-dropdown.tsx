@@ -10,6 +10,8 @@ import { Children, cloneElement } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { pipe, useCopyToClipboard } from '@wordpress/compose';
+import type { ComponentProps } from 'react';
+import type { Block } from '@wordpress/blocks';
 import BlockActions from '../block-actions';
 import NoteIconSlotFill from '../../components/collab/note-icon-slot';
 import BlockHTMLConvertButton from './block-html-convert-button';
@@ -19,8 +21,9 @@ import BlockParentSelectorMenuItem from './block-parent-selector-menu-item';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
+import type { BlockSettingsDropdownProps, CopyMenuItemProps } from './types';
 
-const POPOVER_PROPS = {
+const POPOVER_PROPS: ComponentProps< typeof DropdownMenu >[ 'popoverProps' ] = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
 };
@@ -32,17 +35,19 @@ function CopyMenuItem( {
 	shortcut,
 	eventType = 'copy',
 	__experimentalUpdateSelection: updateSelection = false,
-} ) {
+}: CopyMenuItemProps ) {
 	const { getBlocksByClientId } = useSelect( blockEditorStore );
 	const { removeBlocks } = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 	const ref = useCopyToClipboard(
-		() => serialize( getBlocksByClientId( clientIds ) ),
+		// The copied blocks exist.
+		() => serialize( getBlocksByClientId( clientIds ) as Block[] ),
 		() => {
 			switch ( eventType ) {
 				case 'copy':
 				case 'copyStyles':
-					onCopy();
+					// Copy items always come with a copy handler.
+					onCopy!();
 					notifyCopy( eventType, clientIds );
 					break;
 				case 'cut':
@@ -69,7 +74,7 @@ export function BlockSettingsDropdown( {
 	__experimentalSelectBlock,
 	isContentOnlyListView,
 	...props
-} ) {
+}: BlockSettingsDropdownProps ) {
 	// Get the client id of the current block for this menu, if one is set.
 	const count = clientIds.length;
 	const firstBlockClientId = clientIds[ 0 ];
@@ -139,6 +144,7 @@ export function BlockSettingsDropdown( {
 
 	const { moveBlocksDown, moveBlocksUp } = useDispatch( blockEditorStore );
 
+	// `MenuItem` renders no shortcut for `null`.
 	const shortcuts = useSelect( ( select ) => {
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		return {
@@ -154,11 +160,13 @@ export function BlockSettingsDropdown( {
 			insertBefore: getShortcutRepresentation(
 				'core/block-editor/insert-before'
 			),
-		};
+		} as Record< string, string | undefined >;
 	}, [] );
 	const hasSelectedBlocks = selectedBlockClientIds.length > 0;
 
-	async function updateSelectionAfterDuplicate( clientIdsPromise ) {
+	async function updateSelectionAfterDuplicate(
+		clientIdsPromise: Promise< string[] | undefined >
+	) {
 		if ( ! __experimentalSelectBlock ) {
 			return;
 		}
@@ -377,7 +385,8 @@ export function BlockSettingsDropdown( {
 								) }
 								{ typeof children === 'function'
 									? children( { onClose } )
-									: Children.map( ( child ) =>
+									: // @ts-expect-error Passes the callback as the children, so no child is cloned.
+										Children.map( ( child ) =>
 											cloneElement( child, { onClose } )
 										) }
 								{ canRemove && (

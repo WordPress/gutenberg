@@ -3,10 +3,14 @@ import { MenuItem } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import type { BlockModeToggleProps } from './types';
 
 const noop = () => {};
 
-export default function BlockModeToggle( { clientId, onToggle = noop } ) {
+export default function BlockModeToggle( {
+	clientId,
+	onToggle = noop,
+}: BlockModeToggleProps ) {
 	const { blockType, mode, enabled } = useSelect(
 		( select ) => {
 			const { getBlock, getBlockMode, getSettings } =
