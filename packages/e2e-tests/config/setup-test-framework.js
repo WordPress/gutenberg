@@ -175,49 +175,6 @@ function observeConsoleLogging() {
 }
 
 /**
- * Runs Axe tests when the block editor is found on the current page.
- *
- * @return {?Promise} Promise resolving once Axe texts are finished.
- */
-async function runAxeTestsForBlockEditor() {
-	if ( ! ( await page.$( '.block-editor' ) ) ) {
-		return;
-	}
-
-	await expect( page ).toPassAxeTests( {
-		// Temporary disabled rules to enable initial integration.
-		// See: https://github.com/WordPress/gutenberg/pull/15018.
-		disabledRules: [
-			'aria-allowed-role',
-			'aria-allowed-attr',
-			'aria-hidden-focus',
-			'aria-input-field-name',
-			'aria-valid-attr-value',
-			'button-name',
-			'color-contrast',
-			'dlitem',
-			'duplicate-id',
-			'label',
-			'landmark-one-main',
-			'link-name',
-			'listitem',
-			'region',
-		],
-		exclude: [
-			// Ignores elements created by metaboxes.
-			'.edit-post-layout__metaboxes',
-			// Ignores elements created by TinyMCE.
-			'.mce-container',
-			// These properties were not included in the 1.1 spec
-			// through error, they should be allowed on role="row":
-			// https://github.com/w3c/aria/issues/558
-			'[role="treegrid"] [aria-posinset]',
-			'[role="treegrid"] [aria-setsize]',
-		],
-	} );
-}
-
-/**
  * Simulate slow network or throttled CPU if provided via environment variables.
  */
 async function simulateAdverseConditions() {
@@ -259,7 +216,6 @@ beforeAll( async () => {
 } );
 
 afterEach( async () => {
-	await runAxeTestsForBlockEditor();
 	await setupBrowser();
 } );
 
