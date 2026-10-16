@@ -5,6 +5,7 @@ import {
 	findNearestFontStyle,
 	findNearestStyleAndWeight,
 } from '../typography-utils';
+import type { StyleSettings } from '../types';
 
 describe( 'typography utils', () => {
 	describe( 'getMergedFontFamiliesAndFontFamilyFaces', () => {
@@ -211,7 +212,8 @@ describe( 'typography utils', () => {
 			it( `${ message }`, () => {
 				expect(
 					getMergedFontFamiliesAndFontFamilyFaces(
-						settings,
+						// The cases hold theme.json settings.
+						settings as StyleSettings | undefined,
 						fontFamily
 					)
 				).toEqual( expected );
