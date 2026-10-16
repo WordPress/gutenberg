@@ -1,4 +1,4 @@
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
@@ -34,7 +34,7 @@ export default function DataViewsSelectionCheckbox< Item >( {
 		titleField?.getValue?.( { item } ) || __( '(no title)' );
 
 	return (
-		<CheckboxControl
+		<WCCheckboxControl
 			className={ SELECTION_CHECKBOX_CLASS }
 			aria-label={ selectionLabel }
 			aria-disabled={ disabled }

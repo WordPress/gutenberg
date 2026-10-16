@@ -19,7 +19,6 @@ describe( 'Modal', () => {
 				aria={ { describedby: 'description-id' } }
 				onRequestClose={ noop }
 			>
-				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<p id="description-id">Description</p>
 			</Modal>
 		);
@@ -32,7 +31,6 @@ describe( 'Modal', () => {
 	it( 'applies the aria-labelledby attribute when provided', () => {
 		render(
 			<Modal aria={ { labelledby: 'title-id' } } onRequestClose={ noop }>
-				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<h1 id="title-id">Modal Title Text</h1>
 			</Modal>
 		);
@@ -48,12 +46,26 @@ describe( 'Modal', () => {
 				aria={ { labelledby: 'title-id' } }
 				onRequestClose={ noop }
 			>
-				{ /* eslint-disable-next-line no-restricted-syntax */ }
 				<h1 id="title-id">Modal Title Text</h1>
 			</Modal>
 		);
 		expect( screen.getByRole( 'dialog' ) ).toHaveAccessibleName(
 			'Modal Title Attribute'
+		);
+	} );
+
+	it( 'keeps the title as the accessible name when the header is hidden', () => {
+		render(
+			<Modal
+				title="Test Title"
+				__experimentalHideHeader
+				onRequestClose={ noop }
+			>
+				<p>Modal content</p>
+			</Modal>
+		);
+		expect( screen.getByRole( 'dialog' ) ).toHaveAccessibleName(
+			'Test Title'
 		);
 	} );
 

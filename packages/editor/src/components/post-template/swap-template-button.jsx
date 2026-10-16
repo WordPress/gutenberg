@@ -1,7 +1,9 @@
 import { useMemo, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __experimentalBlockPatternsList as BlockPatternsList } from '@wordpress/block-editor';
-import { MenuItem, Modal, SearchControl } from '@wordpress/components';
+import { Modal, SearchControl } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -40,25 +42,15 @@ export function SwapTemplateModal( { onRequestClose, onSelect } ) {
 }
 
 export default function SwapTemplateButton( { onClick } ) {
-	const [ showModal, setShowModal ] = useState( false );
 	const availableTemplates = useAvailableTemplates();
 
 	return (
-		<>
-			<MenuItem
-				disabled={ ! availableTemplates?.length }
-				accessibleWhenDisabled
-				onClick={ () => setShowModal( true ) }
-			>
-				{ __( 'Change template' ) }
-			</MenuItem>
-			{ showModal && (
-				<SwapTemplateModal
-					onRequestClose={ () => setShowModal( false ) }
-					onSelect={ onClick }
-				/>
-			) }
-		</>
+		<Menu.Item
+			disabled={ ! availableTemplates?.length }
+			onClick={ onClick }
+		>
+			<Menu.ItemLabel>{ __( 'Change template' ) }</Menu.ItemLabel>
+		</Menu.Item>
 	);
 }
 

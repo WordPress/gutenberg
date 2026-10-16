@@ -6,11 +6,13 @@ import DataViewsPicker from '../index';
 import { LAYOUT_PICKER_GRID } from '../../constants';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { ActionButton, MediaFit, View } from '../../types';
+import FreeCompositionComponent from './free-composition';
 import { data, fields, type SpaceObject } from './fixtures';
 
 const meta = {
 	tags: [ 'manifest' ],
-	title: 'DataViews/DataViewsPicker',
+	id: 'dataviews-dataviewspicker',
+	title: 'Design System/DataViews/DataViewsPicker',
 	component: DataViewsPicker,
 } as Meta< typeof DataViewsPicker >;
 
@@ -239,6 +241,24 @@ Default.parameters = {
 	// FIXME: Picker UI nests interactive controls (nested-interactive).
 	// See: https://github.com/WordPress/gutenberg/issues/81596
 	a11y: { test: 'todo' },
+};
+
+export const FreeComposition = {
+	render: FreeCompositionComponent,
+	args: { pagination: 'page-select' as const },
+	argTypes: {
+		pagination: {
+			control: 'select',
+			options: [ 'page-select', 'page-navigation' ],
+			description:
+				'Which pagination part the composed footer keeps: the "Page N of M" select, or the previous/next buttons',
+		},
+	},
+	parameters: {
+		// FIXME: Picker UI nests interactive controls (nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
 };
 
 export const WithModal = ( {

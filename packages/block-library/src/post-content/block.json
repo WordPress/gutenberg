@@ -30,7 +30,8 @@
 			}
 		},
 		"dimensions": {
-			"minHeight": true
+			"minHeight": true,
+			"minWidth": true
 		},
 		"shadow": true,
 		"spacing": {
@@ -44,6 +45,7 @@
 		},
 		"color": {
 			"gradients": true,
+			"button": true,
 			"heading": true,
 			"link": true,
 			"__experimentalDefaultControls": {
@@ -54,6 +56,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

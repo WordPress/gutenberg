@@ -47,6 +47,30 @@ describe( 'SearchableSelect', () => {
 		mockedWarning.mockClear();
 	} );
 
+	it( 'describes default items without adding the description to the trigger', async () => {
+		await render(
+			<SearchableSelect
+				aria-label="Fruit"
+				items={ [
+					{
+						value: 'apple',
+						label: 'Apple',
+						description: 'Fresh fruit.',
+					},
+				] }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Fruit' } );
+		await userEvent.click( trigger );
+		const option = await screen.findByRole( 'option', { name: 'Apple' } );
+		expect( option ).toHaveAccessibleDescription( 'Fresh fruit.' );
+
+		await userEvent.click( option );
+		expect( trigger ).toHaveTextContent( 'Apple' );
+		expect( trigger ).not.toHaveTextContent( 'Fresh fruit.' );
+	} );
+
 	it( 'passes aria-label and aria-describedby props to the appropriate components', async () => {
 		const user = userEvent;
 
@@ -57,7 +81,6 @@ describe( 'SearchableSelect', () => {
 					aria-describedby="searchable-select-description"
 					items={ ITEMS }
 				/>
-				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 				<p id="searchable-select-description">My description</p>
 			</>
 		);
@@ -82,7 +105,6 @@ describe( 'SearchableSelect', () => {
 
 		await render(
 			<>
-				{ /* eslint-disable-next-line no-restricted-syntax -- stable test ids */ }
 				<p id="searchable-select-label">My label</p>
 				<SearchableSelect
 					aria-labelledby="searchable-select-label"
@@ -184,7 +206,9 @@ describe( 'SearchableSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableSelect.ItemLabel>
+										{ item.label }
+									</SearchableSelect.ItemLabel>
 								</SearchableSelect.Item>
 							) }
 						</SearchableSelect.Collection>
@@ -226,7 +250,9 @@ describe( 'SearchableSelect', () => {
 									key={ item.value }
 									value={ item }
 								>
-									{ item.label }
+									<SearchableSelect.ItemLabel>
+										{ item.label }
+									</SearchableSelect.ItemLabel>
 								</SearchableSelect.Item>
 							) }
 						</SearchableSelect.Collection>
@@ -334,7 +360,9 @@ describe( 'SearchableSelect', () => {
 							key={ item.value }
 							value={ item }
 						>
-							{ item.label }
+							<SearchableSelect.ItemLabel>
+								{ item.label }
+							</SearchableSelect.ItemLabel>
 						</SearchableSelect.Item>
 					) }
 				/>
@@ -382,7 +410,9 @@ describe( 'SearchableSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableSelect.ItemLabel>
+											{ item.label }
+										</SearchableSelect.ItemLabel>
 									</SearchableSelect.Item>
 								) }
 							</SearchableSelect.Collection>
@@ -436,7 +466,9 @@ describe( 'SearchableSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableSelect.ItemLabel>
+											{ item.label }
+										</SearchableSelect.ItemLabel>
 									</SearchableSelect.Item>
 								) }
 							</SearchableSelect.Collection>
@@ -590,7 +622,9 @@ describe( 'SearchableSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableSelect.ItemLabel>
+											{ item.label }
+										</SearchableSelect.ItemLabel>
 									</SearchableSelect.Item>
 								) }
 							</SearchableSelect.Collection>

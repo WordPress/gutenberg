@@ -4,7 +4,7 @@ Internal tooling for maintaining this monorepo. The workspace is private: it giv
 
 ## TypeScript
 
-`tsconfig/base.json` holds the compiler options every TypeScript project in the repo inherits, and `tsconfig/dev.base.json` extends it for the test and story files that never emit declarations.
+`tsconfig/base.json` holds the compiler options every TypeScript project in the repo inherits, and `tsconfig/dev.base.json` extends it for the test and story files that never emit declarations. The files are named `tsconfig.base.json` and `tsconfig.dev.base.json` on disk so editors match them against their `tsconfig.*.json` pattern and allow comments; the [subpath export](package.json) maps the shorter specifier onto them.
 
 ```json
 {
@@ -28,3 +28,7 @@ See the TypeScript section of [`packages/README.md`](../../packages/README.md) f
 ## Experimental API audit
 
 `npm run --workspace @wordpress/monorepo-tools list-experimental-apis` prints a Markdown list of every `__experimental` API in `packages/` and `lib/`, each linked to a GitHub search for it. Release leads run it to audit experimental APIs ahead of a major WordPress release, as in [the WordPress 6.2 audit](https://github.com/WordPress/gutenberg/issues/47196).
+
+## Admin design tokens experiment
+
+`wpds/generate-admin-scheme-tokens.mjs` writes the per-colour-scheme design token stylesheet for the admin design tokens experiment, `lib/experimental/wpds-admin/css/05-scheme-tokens.css`. Run it with `npm run wpds:admin-scheme-tokens --workspace @wordpress/monorepo-tools` after changing the theme's colour ramps or the admin colour schemes. It is temporary; the generated file's header says what replaces it.

@@ -1,10 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { ComponentPropsWithoutRef, ComponentType } from 'react';
-// Form controls read these stylesheets, normally enqueued by WordPress.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/components/build-style/style.css';
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
-import '@wordpress/dataviews/build-style/style.css';
 import { DataForm, useFormValidity } from '@wordpress/dataviews';
 import type { DataFormControlProps, Field, Form } from '@wordpress/dataviews';
 import {
@@ -155,7 +150,8 @@ const resolveDemoModule = async () => ( {
 } );
 
 const meta: Meta< typeof WidgetRender > = {
-	title: 'Widget Primitives/WidgetRender',
+	id: 'widget-primitives-widgetrender',
+	title: 'Widgets/Primitives/WidgetRender',
 	component: WidgetRender,
 	tags: [ 'status-experimental' ],
 	parameters: {
@@ -854,7 +850,7 @@ const DEMO_NAVIGATE_EVENT = 'wp-widget-primitives-demo-navigate';
 const RouteLink = forwardRef<
 	HTMLAnchorElement,
 	{ path: string } & Omit< ComponentPropsWithoutRef< 'a' >, 'href' >
->( function RouteLink( { path, onClick, children, ...props }, ref ) {
+>( function UnforwardedRouteLink( { path, onClick, children, ...props }, ref ) {
 	return (
 		<a
 			ref={ ref }
@@ -1022,7 +1018,7 @@ The widget declares where to go; the application decides how to get there. \`Hos
 
 **Takeaway**
 
-Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`LinkButton\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
+Consumers write one composition, \`render={ <HostLink href={ action.href } /> }\` on their UI link, and never branch on the capability themselves. \`Link\`, \`ButtonLink\` and \`Menu.LinkItem\` take the same anchor props, so the same line serves all three.
 `,
 			},
 		},

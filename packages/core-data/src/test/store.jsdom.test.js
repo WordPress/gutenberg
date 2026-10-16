@@ -3,7 +3,7 @@ import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 function createTestRegistry() {
 	const registry = createRegistry();
@@ -241,6 +241,11 @@ describe( 'clearEntityRecordEdits', () => {
 		const select = registry.select( coreDataStore );
 
 		dispatch.receiveEntityRecords( 'postType', 'post', post );
+		dispatch.finishResolution( 'getEntityRecord', [
+			'postType',
+			'post',
+			post.id,
+		] );
 		dispatch.editEntityRecord( 'postType', 'post', post.id, {
 			slug: 'updated-slug',
 		} );

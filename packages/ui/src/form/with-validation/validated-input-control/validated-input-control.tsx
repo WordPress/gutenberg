@@ -16,7 +16,7 @@ import type { ValidatedControlProps } from '../types';
 export const ValidatedInputControl = forwardRef<
 	HTMLInputElement,
 	React.ComponentProps< typeof InputControl > & ValidatedControlProps
->( function ValidatedInputControl(
+>( function UnforwardedValidatedInputControl(
 	{ required, markWhenOptional, customValidity, ...restProps },
 	forwardedRef
 ) {

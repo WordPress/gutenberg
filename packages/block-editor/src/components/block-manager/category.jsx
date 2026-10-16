@@ -1,6 +1,6 @@
 import { useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import BlockTypesChecklist from './checklist';
 
 function BlockManagerCategory( {
@@ -75,7 +75,7 @@ function BlockManagerCategory( {
 			aria-labelledby={ titleId }
 			className="block-editor-block-manager__category"
 		>
-			<CheckboxControl
+			<WCCheckboxControl
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
 				className="block-editor-block-manager__category-title"

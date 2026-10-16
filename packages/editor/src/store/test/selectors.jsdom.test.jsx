@@ -2796,7 +2796,7 @@ describe( 'selectors', () => {
 			};
 			expect( canUserUseUnfilteredHTML( state ) ).toBe( true );
 		} );
-		it( 'should return false if the _links object doesnt contain the property wp:action-unfiltered-html', () => {
+		it( "should return false if the _links object doesn't contain the property wp:action-unfiltered-html", () => {
 			const state = {
 				currentPost: {
 					_links: {},

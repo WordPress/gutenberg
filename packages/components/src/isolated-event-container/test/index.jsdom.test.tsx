@@ -1,10 +1,19 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { logged } from '@wordpress/deprecated';
 import IsolatedEventContainer from '..';
+
+const DEPRECATION_MESSAGE =
+	'wp.components.IsolatedEventContainer is deprecated since version 5.7.';
+
+beforeEach( () => {
+	logged[ DEPRECATION_MESSAGE ] = true;
+} );
 
 describe( 'IsolatedEventContainer', () => {
 	it( 'should pass props to container', async () => {
+		delete logged[ DEPRECATION_MESSAGE ];
 		const user = userEvent.setup();
 		const clickHandler = vi.fn();
 		render(

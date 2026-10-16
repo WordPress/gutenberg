@@ -13,7 +13,7 @@ const semverOption = [ '--semver <semver>', 'Semantic Versioning', 'patch' ];
 const ciOption = [ '-c, --ci', 'Run in CI (non interactive)' ];
 const repositoryPathOption = [
 	'--repository-path <repository-path>',
-	'Relative path to the git repository.',
+	'Path to the git repository, relative to the working directory or absolute.',
 ];
 
 program

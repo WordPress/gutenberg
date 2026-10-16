@@ -2,8 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
-		"types": [ "gutenberg-env" ],
-		"checkJs": false
+		"types": [ "gutenberg-env" ]
 	},
 	"references": [
 		{ "path": "../a11y/tsconfig.build.json" },
@@ -16,9 +15,9 @@
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../latex-to-mathml" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }

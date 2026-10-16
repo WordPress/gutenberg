@@ -267,13 +267,6 @@
 }
 
 
-.dataviews-view-table-selection-checkbox {
-	--checkbox-input-size: 24px;
-	@include break-small() {
-		--checkbox-input-size: 16px;
-	}
-}
-
 .dataviews-column-primary__media {
 	max-width: 60px;
 	min-width: var(--wpds-dimension-size-md);

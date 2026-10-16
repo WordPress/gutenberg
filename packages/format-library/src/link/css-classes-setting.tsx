@@ -3,10 +3,18 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalInputControl as WCInputControl,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
-import type { CSSClassesSettingProps } from '../types';
+
+/**
+ * Props for the Link UI's "Additional CSS class(es)" setting.
+ */
+export interface CSSClassesSettingProps {
+	setting: { id: string; title: string };
+	value?: { cssClasses?: string };
+	onChange: ( newValue: { cssClasses?: string } ) => void;
+}
 
 /**
  * CSSClassesSettingComponent
@@ -60,7 +68,7 @@ const CSSClassesSettingComponent = ( {
 				{ setting.title }
 			</VisuallyHidden>
 			<Stack direction="column" gap="md">
-				<CheckboxControl
+				<WCCheckboxControl
 					label={ setting.title }
 					onChange={ handleCheckboxChange }
 					checked={ isSettingActive || hasValue }

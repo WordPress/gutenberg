@@ -427,7 +427,7 @@ test.describe( 'Post Summary', () => {
 			await requestUtils.deleteAllUsers();
 		} );
 
-		test( 'hides the date, author and password fields for a contributor', async ( {
+		test( 'locks the status and slug and hides the date and author fields for a contributor', async ( {
 			browser,
 			requestUtils,
 		} ) => {
@@ -461,23 +461,26 @@ test.describe( 'Post Summary', () => {
 				page,
 			} );
 			await expect(
-				summary.getByRole( 'button', { name: 'Edit Status' } )
+				summary.getByText( 'Draft', { exact: true } )
 			).toBeVisible();
+			await expect(
+				summary.getByRole( 'button', { name: 'Edit Status' } )
+			).toBeHidden();
 			await expect(
 				summary.getByRole( 'button', { name: 'Edit Date' } )
 			).toBeHidden();
 			await expect(
 				summary.getByRole( 'button', { name: 'Edit Author' } )
 			).toBeHidden();
-
-			await summary
-				.getByRole( 'button', { name: 'Edit Status' } )
-				.click();
 			await expect(
-				page.getByRole( 'radio', { name: 'Draft' } )
+				summary.getByText( 'contributor-draft', { exact: true } )
+			).toBeVisible();
+			await summary.getByRole( 'button', { name: 'Edit Slug' } ).click();
+			await expect(
+				page.getByRole( 'link', { name: /\?p=\d+/ } )
 			).toBeVisible();
 			await expect(
-				page.getByRole( 'checkbox', { name: 'Password protected' } )
+				page.getByRole( 'textbox', { name: 'Link' } )
 			).toBeHidden();
 
 			await context.close();
@@ -493,13 +496,13 @@ test.describe( 'Post Summary', () => {
 			await admin.createNewPost();
 			const summary = await openPostSummary( { editor, page } );
 
-			await expect(
-				summary.getByText( 'Add an excerpt', { exact: true } )
-			).toBeVisible();
+			const editButton = summary.getByRole( 'button', {
+				name: 'Edit Excerpt',
+			} );
+			// An empty excerpt renders only the label next to the edit button.
+			await expect( editButton.locator( '..' ) ).toHaveText( 'Excerpt' );
 
-			await summary
-				.getByRole( 'button', { name: 'Edit Excerpt' } )
-				.click();
+			await editButton.click();
 			await page
 				.getByRole( 'textbox', { name: 'Excerpt' } )
 				.fill( 'A DataForm excerpt.' );

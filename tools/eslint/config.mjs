@@ -7,9 +7,9 @@ import storybookPlugin from 'eslint-plugin-storybook';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
-import jestPlugin from 'eslint-plugin-jest';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import useTypeScript from './rules/use-typescript.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -17,6 +17,16 @@ import {
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const gutenbergPlugin = {
+	rules: {
+		'use-typescript': useTypeScript,
+	},
+};
+const gutenbergStorybookPlugin = {
+	rules: {
+		'no-non-module-stylesheet-imports': require( '../../storybook/eslint/no-non-module-stylesheet-imports.js' ),
+	},
+};
 const vitestTestsByProject = getVitestTestsByProject(
 	discoverTestFiles( rootDir )
 );
@@ -31,7 +41,7 @@ try {
 
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
- * reference is strictly identical. Because the @wordpress/eslint-plugin
+ * reference is strictly identical. Because the `@wordpress/eslint-plugin`
  * configs are assembled from separate sub-configs that each carry their own
  * copy of the plugin object, we normalise them here so that every occurrence
  * of the same plugin name resolves to a single shared reference.
@@ -66,6 +76,22 @@ function dedupePlugins( configs ) {
 const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 const TS_EXT = '@([cm]ts|ts|tsx)';
 const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
+const JS_EXT = '@([cm]js|js|jsx)';
+
+const vitestLintFiles = [
+	...vitestTestPatterns,
+	`**/test/**/*.${ SCRIPT_EXT }`,
+	`**/__tests__/**/*.${ SCRIPT_EXT }`,
+	`test/unit/config/**/*.${ SCRIPT_EXT }`,
+	'packages/block-serialization-spec-parser/shared-tests.js',
+];
+const vitestLintIgnores = [
+	'test/e2e/**',
+	'test/performance/**',
+	'test/storybook-playwright/**',
+	'test/ai-development/**',
+	'**/fixtures/**',
+];
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -89,6 +115,20 @@ const typedFiles = globSync( 'packages/*/package.json', {
 	.sort()
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
+
+/*
+ * Source and test trees of the packages wired into the TypeScript program,
+ * plus routes and tools, which keep their sources at the workspace root.
+ */
+const typeScriptOnlyFiles = [
+	...globSync( 'packages/*/tsconfig.json', { cwd: rootDir, posix: true } )
+		.sort()
+		.map( ( fileName ) =>
+			fileName.replace( 'tsconfig.json', `@(src|test)/**/*.${ JS_EXT }` )
+		),
+	`routes/**/*.${ JS_EXT }`,
+	`tools/**/*.${ JS_EXT }`,
+];
 
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
@@ -127,7 +167,7 @@ const restrictedImports = [
 	{
 		name: '@emotion/css',
 		message:
-			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+			'Please use SCSS Modules for styles and `clsx` to compose class names.',
 	},
 	{
 		name: '@wordpress/edit-post',
@@ -202,6 +242,11 @@ const UI_RESTRICTED_IMPORTS = {
 	patterns: [ lockUnlockRestrictedPattern ],
 };
 
+const noStringLiteralIds = {
+	selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+	message: 'Do not use string literals for IDs; use useId hook instead.',
+};
+
 const restrictedSyntax = [
 	{
 		selector:
@@ -214,10 +259,7 @@ const restrictedSyntax = [
 			'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
 		message: 'Prefer page.waitForSelector instead.',
 	},
-	{
-		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-		message: 'Do not use string literals for IDs; use useId hook instead.',
-	},
+	noStringLiteralIds,
 	{
 		selector: 'JSXAttribute[name.name="__nextHasNoMarginBottom"]',
 		message: 'The `__nextHasNoMarginBottom` prop is no longer needed.',
@@ -352,6 +394,7 @@ export default dedupePlugins( [
 					'ts-check': false,
 				},
 			],
+			'jsdoc/escape-inline-tags': 'error',
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
@@ -378,9 +421,11 @@ export default dedupePlugins( [
 						// wp-ui Autocomplete is not a replacement for wp-components Autocomplete, but we need to avoid name clashes.
 						Autocomplete: 'WCAutocomplete',
 						Badge: 'WCBadge',
+						CheckboxControl: 'WCCheckboxControl',
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
 						SelectControl: 'WCSelectControl',
+						Spinner: 'WCSpinner',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
@@ -506,7 +551,28 @@ export default dedupePlugins( [
 		},
 	},
 
-	// Override: React src + storybook — stylesheet and component rules.
+	// Override: TypeScript-only packages. Existing JavaScript files are
+	// suppressed, so only new ones fail.
+	{
+		files: typeScriptOnlyFiles,
+		ignores: [
+			'**/fixtures/**',
+			// Editors load the ESLint config with their own Node, which
+			// may not strip types.
+			'tools/eslint/**',
+			// Published as plain modules through package.json exports.
+			'tools/react-18/**',
+			'tools/react-19/**',
+		],
+		plugins: {
+			gutenberg: gutenbergPlugin,
+		},
+		rules: {
+			'gutenberg/use-typescript': 'error',
+		},
+	},
+
+	// Override: React src + storybook — component rules.
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
@@ -515,9 +581,22 @@ export default dedupePlugins( [
 			`storybook/stories/**/*.${ SCRIPT_EXT }`,
 		],
 		rules: {
-			'@wordpress/no-non-module-stylesheet-imports': 'error',
 			'@wordpress/components-no-unsafe-button-disabled': 'error',
 			'@wordpress/components-no-missing-40px-size-prop': 'error',
+		},
+	},
+
+	// Override: React src — non-module stylesheet imports.
+	{
+		files: [
+			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`routes/**/*.${ SCRIPT_EXT }`,
+			`widgets/**/*.${ SCRIPT_EXT }`,
+		],
+		// Tests load styles directly instead of using WordPress's enqueue path.
+		ignores: vitestLintFiles,
+		rules: {
+			'@wordpress/no-non-module-stylesheet-imports': 'error',
 		},
 	},
 
@@ -566,29 +645,96 @@ export default dedupePlugins( [
 			...vitestTestPatterns,
 		],
 	} ) ),
-	// The Jest plugin also supports Vitest. Keep these active rules until the
-	// separate suite-wide migration to the public Vitest lint configuration.
-	{
-		plugins: jestPlugin.configs[ 'flat/recommended' ].plugins,
-		files: vitestTestPatterns,
-		settings: {
-			jest: {
-				globalPackage: 'vitest',
-			},
-		},
+	// Use the public Vitest baseline for suites and shared unit-test helpers.
+	...wpPlugin.configs[ 'test-unit' ].map( ( config ) => ( {
+		...config,
+		files: vitestLintFiles,
+		ignores: vitestLintIgnores,
 		rules: {
-			...jestPlugin.configs[ 'flat/recommended' ].rules,
-			// Preserve existing test patterns while changing runners. These rules
-			// newly flag valid patterns once the globals are imported from Vitest.
-			'jest/no-conditional-expect': 'off',
-			// Jest release deprecations do not apply to Vitest.
-			'jest/no-deprecated-functions': 'off',
-			'jest/valid-describe-callback': 'off',
-			'jest/valid-expect-in-promise': 'off',
-			'jest/valid-title': 'off',
+			...config.rules,
+			'vitest/require-awaited-expect-poll': 'error',
+			// These checks were enabled by Jest's baseline but are not recommended
+			// Vitest rules. Keep their existing enforcement during the switch.
+			'vitest/no-alias-methods': 'error',
+			'vitest/no-done-callback': 'error',
+			'vitest/no-test-prefixes': 'error',
+			// Vitest has no no-jasmine-globals equivalent.
+			'no-restricted-globals': [
+				'error',
+				{
+					name: 'jasmine',
+					message: 'Use the vi and expect APIs from Vitest instead.',
+				},
+				{
+					name: 'spyOn',
+					message: 'Use vi.spyOn() from Vitest instead.',
+				},
+				{
+					name: 'spyOnProperty',
+					message:
+						'Use vi.spyOn() from Vitest with a get or set accessor instead.',
+				},
+				{
+					name: 'fail',
+					message: 'Use expect.fail() from Vitest instead.',
+				},
+				{
+					name: 'pending',
+					message:
+						'Use the Vitest test context skip() method instead.',
+				},
+			],
+		},
+	} ) ),
+	{
+		// Dynamic imports let import/no-unresolved check JavaScript mock paths.
+		// TypeScript mock imports remain owned by validateVitestPolicy.
+		files: vitestLintFiles.map( ( pattern ) => [
+			pattern,
+			'**/*.{js,jsx,mjs,cjs}',
+		] ),
+		ignores: vitestLintIgnores,
+		rules: {
+			'vitest/prefer-import-in-mock': 'error',
 		},
 	},
-
+	// Recognize only the assertion helpers used by these files. Avoid a global
+	// expect* wildcard, which would also accept unrelated function calls.
+	...[
+		[
+			'packages/components/src/flex/test/index.browser.test.tsx',
+			[ 'expectCustomProperty' ],
+		],
+		[
+			'packages/components/src/spacer/test/index.browser.test.tsx',
+			[ 'expectCustomProperties' ],
+		],
+		[
+			'packages/components/src/form-token-field/test/index.jsdom.test.tsx',
+			[
+				'expectTokensToBeInTheDocument',
+				'expectTokensNotToBeInTheDocument',
+				'expectEscapedProperly',
+				'expectVisibleSuggestionsToBe',
+			],
+		],
+		[
+			'packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.jsx',
+			[ 'expectPlaceholderState' ],
+		],
+		[
+			'test/unit/scripts/test/vitest-policy-rules.test.js',
+			[ 'expectValid', 'expectViolation' ],
+		],
+	].map( ( [ file, helpers ] ) => ( {
+		files: [ file ],
+		rules: {
+			'vitest/expect-expect': [
+				'error',
+				{ assertFunctionNames: [ 'expect', 'assert', ...helpers ] },
+			],
+		},
+	} ) ),
 	// This compilation fixture is transformed as source, not run as a test.
 	{
 		files: [ 'packages/babel-preset-default/test/fixtures/input.js' ],
@@ -720,11 +866,19 @@ export default dedupePlugins( [
 	// Override: Storybook story files — disable rules-of-hooks for the
 	// `render` method pattern (hooks in a lowercase function) and
 	// static-components for inline factories used in story setup.
+	// Reject non-module stylesheet imports. The production stylesheet
+	// import rule does not apply; Storybook loads package CSS through
+	// package-styles/config.js, not the enqueue path.
 	{
 		files: [ `**/@(storybook|stories)/**/*.${ SCRIPT_EXT }` ],
+		plugins: {
+			'gutenberg-storybook': gutenbergStorybookPlugin,
+		},
 		rules: {
 			'react-hooks/rules-of-hooks': 'off',
 			'react-hooks/static-components': 'off',
+			'gutenberg-storybook/no-non-module-stylesheet-imports': 'error',
+			'@wordpress/no-non-module-stylesheet-imports': 'off',
 		},
 	},
 
@@ -741,7 +895,7 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/utils/colors-values.js' ],
+		ignores: [ 'packages/components/src/utils/colors-values.ts' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',
@@ -750,15 +904,34 @@ export default dedupePlugins( [
 					selector:
 						':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 					message:
-						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.ts instead.',
 				},
 				{
 					selector:
 						// Allow overriding definitions, but not access with var()
 						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 					message:
-						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.ts instead.',
 				},
+			],
+		},
+	},
+
+	// Override: Tests and Storybook — allow literal `id` attributes.
+	// Later than the components re-spread of `restrictedSyntax`. Ignore
+	// Playwright specs; `**/test/**` would replace their `$`/`$$` list.
+	{
+		files: [
+			`**/@(__mocks__|__tests__|test)/**/*.${ SCRIPT_EXT }`,
+			`**/@(storybook|stories)/**/*.${ SCRIPT_EXT }`,
+		],
+		ignores: [ 'test/e2e/**', 'test/performance/**' ],
+		rules: {
+			'no-restricted-syntax': [
+				'error',
+				...restrictedSyntax.filter(
+					( rule ) => rule !== noStringLiteralIds
+				),
 			],
 		},
 	},
@@ -798,15 +971,6 @@ export default dedupePlugins( [
 			'@wordpress/no-dom-globals-in-constructor': 'error',
 			'@wordpress/no-dom-globals-in-react-cc-render': 'error',
 			'@wordpress/no-dom-globals-in-react-fc': 'error',
-		},
-	},
-
-	// Override: Components src (non-test, non-stories) — no DS tokens.
-	{
-		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/**/@(test|stories)/**' ],
-		rules: {
-			'@wordpress/no-ds-tokens': 'error',
 		},
 	},
 
@@ -917,6 +1081,37 @@ export default dedupePlugins( [
 		},
 	},
 
+	// Override: block-library — the waveform player's default entry initializes
+	// every `[data-waveform-player]` element on the page when it is imported.
+	{
+		files: [ 'packages/block-library/**' ],
+		rules: {
+			'no-restricted-imports': [
+				'error',
+				{
+					paths: [
+						...restrictedImports,
+						{
+							name: '@arraypress/waveform-player',
+							message:
+								'This entry initializes every `[data-waveform-player]` element on the page, including markup the Playlist block does not own. Import `@arraypress/waveform-player/no-autoinit` instead.',
+						},
+					],
+					patterns: [
+						{
+							group: [
+								'@arraypress/waveform-player/*',
+								'!@arraypress/waveform-player/no-autoinit',
+							],
+							message:
+								'Only `@arraypress/waveform-player/no-autoinit` skips the scan that initializes every `[data-waveform-player]` element on the page.',
+						},
+					],
+				},
+			],
+		},
+	},
+
 	// Override: bundled packages — restrict private-apis imports, both direct
 	// and via each package's local `lock-unlock` wrapper module.
 	// `packages/ui` is excluded because this entry would replace its more
@@ -1009,20 +1204,6 @@ export default dedupePlugins( [
 	},
 
 	// --- Merged package-level configs ---
-
-	// From packages/block-serialization-spec-parser/.eslintrc.json:
-	// Add test-unit config for shared-tests.js with jest/no-export off.
-	{
-		...jestPlugin.configs[ 'flat/recommended' ],
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-	},
-	{
-		files: [ 'packages/block-serialization-spec-parser/shared-tests.js' ],
-		rules: {
-			'jest/no-deprecated-functions': 'off',
-			'jest/no-export': 'off',
-		},
-	},
 
 	// From packages/dependency-extraction-webpack-plugin/lib/.eslintrc.json:
 	// Add Node.js globals for the lib directory.

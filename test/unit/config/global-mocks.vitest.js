@@ -21,18 +21,21 @@ if ( typeof globalThis.structuredClone === 'undefined' ) {
 		JSON.parse( JSON.stringify( value ) );
 }
 
-vi.mock( '@wordpress/block-editor/src/hooks/list-view', () => ( {
-	LIST_VIEW_SUPPORT_KEY: 'listView',
-	hasListViewSupport: vi.fn( () => false ),
-	ListViewPanel: vi.fn( () => null ),
-	default: {
-		edit: vi.fn( () => null ),
-		hasSupport: vi.fn( () => false ),
-		attributeKeys: [],
-	},
-} ) );
+vi.mock(
+	import( '../../../packages/block-editor/src/hooks/list-view' ),
+	() => ( {
+		LIST_VIEW_SUPPORT_KEY: 'listView',
+		hasListViewSupport: vi.fn( () => false ),
+		ListViewPanel: vi.fn( () => null ),
+		default: {
+			edit: vi.fn( () => null ),
+			hasSupport: vi.fn( () => false ),
+			attributeKeys: [],
+		},
+	} )
+);
 
-vi.mock( 'client-zip', () => ( {
+vi.mock( import( 'client-zip' ), () => ( {
 	downloadZip: vi.fn(),
 } ) );
 
@@ -51,7 +54,7 @@ if ( ! globalThis.TextEncoder ) {
 globalThis.Blob = BlobPolyfill;
 globalThis.File = FilePolyfill;
 
-vi.mock( '@testing-library/user-event', async () => {
+vi.mock( import( '@testing-library/user-event' ), async () => {
 	if ( typeof globalThis.window === 'undefined' ) {
 		return {};
 	}

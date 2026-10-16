@@ -1078,7 +1078,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 			}
 		}
 
-		$this->assertEquals(
+		$this->assertSame(
 			$expected_class,
 			$actual_class,
 			'Expected class not found in the rendered output, probably because of a different hash.'

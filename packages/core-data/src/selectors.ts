@@ -17,8 +17,8 @@ import {
 	isNumericID,
 	getUserPermissionCacheKey,
 } from './utils';
-import { getSyncManager } from './sync';
 import type * as ET from './entity-types';
+import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -38,10 +38,7 @@ export interface State {
 	themeGlobalStyleVariations: Record< string, string >;
 	themeGlobalStyleRevisions: Record< number, Array< object > >;
 	undoManager: UndoManager;
-	syncUndoManagerState: {
-		hasRedo: boolean;
-		hasUndo: boolean;
-	};
+	undoManagerReference: Record< string, never >;
 	userPermissions: Record< string, boolean >;
 	users: UserState;
 	navigationFallbackId: EntityRecordKey;
@@ -53,6 +50,11 @@ export interface State {
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
+	fieldsConfigs: Record< string, Record< string, FieldsConfig > >;
+	entityActionsConfigs: Record<
+		string,
+		Record< string, EntityActionsConfig >
+	>;
 }
 
 type EntityRecordKey = string | number;
@@ -389,7 +391,7 @@ export interface GetEntityRecord {
 			query?: GetRecordsHttpQuery
 		): Promise< EntityRecord | undefined >;
 	};
-	__unstableNormalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
+	normalizeArgs?: ( args: EntityRecordArgs ) => EntityRecordArgs;
 }
 
 /**
@@ -447,7 +449,7 @@ export const getEntityRecord = ( <
  * @param args EntityRecordArgs the selector arguments.
  * @return EntityRecordArgs the normalized arguments.
  */
-getEntityRecord.__unstableNormalizeArgs = (
+getEntityRecord.normalizeArgs = (
 	args: EntityRecordArgs
 ): EntityRecordArgs => {
 	const newArgs = [ ...args ] as EntityRecordArgs;
@@ -1230,9 +1232,6 @@ export function getRedoEdit( state: State ): Optional< any > {
  * @return Whether there is a previous edit or not.
  */
 export function hasUndo( state: State ): boolean {
-	if ( getSyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasUndo;
-	}
 	return getUndoManager( state ).hasUndo();
 }
 
@@ -1245,9 +1244,6 @@ export function hasUndo( state: State ): boolean {
  * @return Whether there is a next edit or not.
  */
 export function hasRedo( state: State ): boolean {
-	if ( getSyncManager()?.undoManager ) {
-		return state.syncUndoManagerState.hasRedo;
-	}
 	return getUndoManager( state ).hasRedo();
 }
 

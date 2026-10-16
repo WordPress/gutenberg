@@ -1,18 +1,75 @@
+@use "@wordpress/base-styles/animations" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-.interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
-	box-shadow: none;
+// Threads collapse to avatar pills, showing the author on hover or focus.
+// Selecting the block only highlights its thread; focusing it expands it.
+@mixin minimized-threads {
+	.editor-collab-sidebar-panel__thread.is-floating:not(.is-selected.has-focus) {
+		left: auto;
+		padding: $grid-unit-10;
+
+		.editor-collab-sidebar-panel__deleted-block-notice,
+		.editor-collab-sidebar-panel__more-reply-separator,
+		.editor-collab-sidebar-panel__note ~ .editor-collab-sidebar-panel__note,
+		.editor-collab-sidebar-panel__note > :not(:first-child),
+		.editor-collab-sidebar-panel__note-actions {
+			display: none;
+		}
+
+		.editor-collab-sidebar-panel__user-info {
+			white-space: nowrap;
+		}
+
+		&:not(:hover, :focus-within) .editor-collab-sidebar-panel__user-info {
+			display: none;
+		}
+	}
 }
 
-.editor-collab-sidebar__header {
-	display: none;
-}
-
-.editor-collab-sidebar {
+// Pointer events pass through to the canvas, except on threads.
+.editor-collab-sidebar-overlay {
 	height: 100%;
-	overflow: hidden;
+	// Fades in while "All notes" closes, so notes don't show twice.
+	@include animation__fade-in(var(--wpds-motion-duration-lg), 0s, var(--wpds-motion-easing-balanced));
+
+	&.is-minimized {
+		@include minimized-threads;
+	}
+
+	// The canvas margin's compact tier. Keep in sync with `canvas-margin.js`.
+	@container (width < 880px) {
+		@include minimized-threads;
+	}
+
+	.editor-collab-sidebar-panel {
+		// A real scroller, mirrored with the canvas by `useFloatingBoard`.
+		// No anchoring, so a thread that grows doesn't move the panel.
+		overflow-y: auto;
+		overflow-anchor: none;
+		scrollbar-width: none;
+
+		// Gives the panel the canvas's scroll range, whatever their heights.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			width: 1px;
+			height: calc(100% + var(--canvas-scroll-range, 0px));
+		}
+	}
+
+	// The margin spans the canvas scrollbar; shift the panel off it.
+	.editor-resizable-editor.has-canvas-margin & .editor-collab-sidebar-panel {
+		margin-inline-start: calc(-1 * var(--canvas-scrollbar-width, 0px));
+		margin-inline-end: var(--canvas-scrollbar-width, 0px);
+	}
+
+	.editor-collab-sidebar-panel__thread,
+	.editor-collab-sidebar-panel__add-note {
+		pointer-events: auto;
+	}
 }
 
 .editor-collab-sidebar-panel {
@@ -48,14 +105,20 @@
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
-		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
-		// so each thread tracks the canvas scroll.
-		transform: translateY(var(--canvas-scroll, 0));
-		will-change: transform;
-		// Keep the reply input reachable when a thread is taller than the viewport
-		// (e.g. many replies on short content where the canvas can't scroll).
+		// Inherits `--canvas-offset` from the panel (set by `useFloatingBoard`)
+		// so each thread tracks the canvas frame. The panel's scroll tracks the
+		// canvas scroll.
+		transform: translateY(var(--canvas-offset, 0px));
+		// Keep the reply input reachable when a thread is taller than the
+		// viewport (e.g. many replies).
 		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
 		overflow-y: auto;
+
+		// Ease reflows, e.g. on selection change. The first positioning starts
+		// from `top: auto`, which doesn't animate.
+		@media (prefers-reduced-motion: no-preference) {
+			transition: top var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
+		}
 	}
 }
 
@@ -94,6 +157,10 @@
 
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
+
+	p {
+		margin-top: 0;
+	}
 
 	p:last-child {
 		margin-bottom: 0;

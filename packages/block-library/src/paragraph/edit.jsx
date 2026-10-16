@@ -19,7 +19,6 @@ import { getBlockSupport } from '@wordpress/blocks';
 import { formatLTR } from '@wordpress/icons';
 import { useOnEnter } from './use-enter';
 import useDeprecatedAlign from './deprecated-attributes';
-import { unlock } from '../lock-unlock';
 
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
@@ -48,8 +47,7 @@ function DropCapControl( { clientId, attributes, setAttributes, name } ) {
 	const [ isDropCapFeatureEnabled ] = useSettings( 'typography.dropCap' );
 	const hasSelectedStyleState = useSelect(
 		( select ) => {
-			const { hasSelectedStyleState: hasSelectedBlockStyleState } =
-				unlock( select( blockEditorStore ) );
+			const { hasSelectedBlockStyleState } = select( blockEditorStore );
 
 			return hasSelectedBlockStyleState( clientId );
 		},

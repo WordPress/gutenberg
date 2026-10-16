@@ -4,6 +4,126 @@
 
 ### Breaking Changes
 
+-   The component context system no longer merges Emotion-registered classes in `className`. Compose dependent Emotion styles before passing the resulting class name ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
+    -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724))
+    -   `FocalPointPicker` ([#84736](https://github.com/WordPress/gutenberg/pull/84736))
+    -   `InputControl`, `InputControlPrefixWrapper`, and `InputControlSuffixWrapper` ([#84728](https://github.com/WordPress/gutenberg/pull/84728)).
+    -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
+    -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
+    -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
+    -   `RangeControl` ([#84562](https://github.com/WordPress/gutenberg/pull/84562))
+    -   `Tabs` ([#84332](https://github.com/WordPress/gutenberg/pull/84332))
+    -   `NumberControl` ([#84330](https://github.com/WordPress/gutenberg/pull/84330))
+    -   `TimePicker` ([#84331](https://github.com/WordPress/gutenberg/pull/84331))
+    -   `CustomSelectControl` and `CustomSelectControlV2` ([#84131](https://github.com/WordPress/gutenberg/pull/84131))
+    -   `DateTimePicker` ([#84129](https://github.com/WordPress/gutenberg/pull/84129))
+    -   `ColorPicker` ([#84128](https://github.com/WordPress/gutenberg/pull/84128))
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `ExternalLink`: Use a small border radius for consistent focus rings ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
+-   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
+-   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
+-   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
+-   `Snackbar`: Keep snackbars that have an action on screen for 10 seconds instead of 6 before they are dismissed automatically ([#84842](https://github.com/WordPress/gutenberg/pull/84842)).
+-   `Tabs`: Show the tab panel's focus ring with the design system's outline instead of a legacy box-shadow ([#84914](https://github.com/WordPress/gutenberg/pull/84914)).
+
+### Deprecations
+
+-   `Tip`: Deprecate in favor of `Notice` from `@wordpress/ui`, preserving the legacy component for existing consumers ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+### Bug Fixes
+
+-   `StyleProvider`: Register module styles before children measure layout in iframe documents ([#84736](https://github.com/WordPress/gutenberg/pull/84736)).
+-   `BorderBoxControl`: Unpack multi-value CSS box shorthand strings (such as `"0 0 0 2px"`) into individual side widths when splitting borders ([#84826](https://github.com/WordPress/gutenberg/pull/84826)).
+-   `SelectControl`: Preserve the minimal variant's inline layout in iframe documents ([#84732](https://github.com/WordPress/gutenberg/pull/84732)).
+-   `DatePicker`: Keep month navigation in a grid in iframe documents ([#84724](https://github.com/WordPress/gutenberg/pull/84724)).
+-   `InputControl`: Preserve the label wrapper's maximum width in iframe documents ([#84728](https://github.com/WordPress/gutenberg/pull/84728)).
+-   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
+-   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
+-   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
+-   `Tabs`: Use semantic interaction colors for unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
+-   `Tabs`: Restore the `fit-content` width of horizontal tab lists, which stretched to full width after the SCSS Modules migration ([#84626](https://github.com/WordPress/gutenberg/pull/84626)).
+-   `Snackbar`: Return focus to the previously focused control when dismissing a focused snackbar outside SnackbarList, including portaled snackbars ([#84342](https://github.com/WordPress/gutenberg/pull/84342)).
+-   `Notice`: Tint dismiss controls and their focus rings with the notice status color ([#84571](https://github.com/WordPress/gutenberg/pull/84571)).
+-   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
+-   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
+-   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
+-   `ToolsPanel`: Use setting-first accessible action labels without changing the menu design ([#84341](https://github.com/WordPress/gutenberg/pull/84341)).
+-   `DropdownMenu`: Keep the menu closed on ArrowDown when the toggle is disabled ([#84556](https://github.com/WordPress/gutenberg/pull/84556)).
+-   `Modal`: Keep an accessible name on the dialog when `title` is combined with `__experimentalHideHeader`. The heading that `aria-labelledby` referenced is not rendered in that case, so the title is now applied as the dialog's `aria-label` instead ([#82645](https://github.com/WordPress/gutenberg/pull/82645)).
+-   `ColorPicker`: Make the HSL and RGB input labels translatable, and name the Hue and Alpha inputs after their color format ([#70214](https://github.com/WordPress/gutenberg/pull/70214)).
+-   `CustomGradientPicker`: Use the bundled `gradient-parser` types, preserve gradient angles when editing, and keep unsupported gradient syntax on the existing fallback path ([#84582](https://github.com/WordPress/gutenberg/pull/84582)).
+-   `CustomGradientPicker`: Keep the color interpolation method of a gradient, such as `in oklch`, when editing it, instead of replacing the gradient with the default one ([#84383](https://github.com/WordPress/gutenberg/pull/84383)).
+-   `BaseControl`: Remove the unsupported `as` prop from the component types and documentation ([#70064](https://github.com/WordPress/gutenberg/pull/70064)).
+
+### Internal
+
+-   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
+-   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
+-   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
+
+## 42.0.0 (2026-10-07)
+
+### Breaking Changes
+
+-   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
+-   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `FontSizePicker` ([#84126](https://github.com/WordPress/gutenberg/pull/84126))
+    -   `PaletteEdit` ([#84130](https://github.com/WordPress/gutenberg/pull/84130)).
+    -   `CustomGradientPicker` ([#82576](https://github.com/WordPress/gutenberg/pull/82576))
+    -   `Text` ([#82573](https://github.com/WordPress/gutenberg/pull/82573))
+    -   `Card`, `CardBody`, `CardHeader`, `CardFooter`, `CardMedia`, `CardDivider` ([#82577](https://github.com/WordPress/gutenberg/pull/82577))
+
+### Enhancements
+
+-   `FormToggle`, `ToggleControl`: Mark as not recommended for use in a WordPress environment, in favour of `Switch` and `SwitchControl` from `@wordpress/ui` ([#84097](https://github.com/WordPress/gutenberg/pull/84097)).
+-   `ProgressBar`: Mark as not recommended and direct consumers to `Progress` from `@wordpress/ui` ([#84021](https://github.com/WordPress/gutenberg/pull/84021)).
+-   `CheckboxControl`: Mark as not recommended for use in a WordPress environment, in favour of `CheckboxControl` from `@wordpress/ui` ([#83771](https://github.com/WordPress/gutenberg/pull/83771)).
+-   `RadioControl`: Mark as not recommended for use in a WordPress environment, in favour of `RadioGroupControl` from `@wordpress/ui` ([#83872](https://github.com/WordPress/gutenberg/pull/83872)).
+-   `RadioControl`: Match the `@wordpress/ui` Radio colors ([#83270](https://github.com/WordPress/gutenberg/pull/83270)).
+-   `Notice`: Mark as not recommended in favor of `Notice` from `@wordpress/ui` ([#82685](https://github.com/WordPress/gutenberg/pull/82685)).
+-   `CheckboxControl`: Keep the default checkbox at 16px on narrow screens while retaining a 24px click target ([#83612](https://github.com/WordPress/gutenberg/pull/83612)).
+-   `FormToggle`: Match the `@wordpress/ui` `Switch` track, thumb, and border colors across unchecked, checked, hover, and disabled states ([#83773](https://github.com/WordPress/gutenberg/pull/83773)).
+-   `InputControl`, `SelectControl`, `CustomSelectControl`: Darken the field border on hover to the active stroke color used by `@wordpress/ui`. Disabled and borderless fields keep their resting border ([#83306](https://github.com/WordPress/gutenberg/pull/83306)).
+-   `TextControl`: Use the `@wordpress/ui` disabled text, placeholder, and border colors, and keep the field background instead of the gray disabled fill from wp-admin ([#83307](https://github.com/WordPress/gutenberg/pull/83307)).
+-   `ItemGroup`: Use design system's outline focus ring instead of previous box-shadow implementation ([#83764](https://github.com/WordPress/gutenberg/pull/83764)).
+-   `ColorPalette`: Show the custom color button's focus ring with the design system's outline instead of a legacy inset box-shadow ([#83841](https://github.com/WordPress/gutenberg/pull/83841)).
+-   Use the `inertValue` helper to set `inert` attributes, for better React 18/19 compatibility ([#83871](https://github.com/WordPress/gutenberg/pull/83871)).
+
+### Deprecations
+
+-   Deprecate `Badge` in the private APIs; use `Badge` from `@wordpress/ui` instead. ([#82379](https://github.com/WordPress/gutenberg/pull/82379)).
+
+### Bug Fixes
+
+-   `CustomGradientPicker`: Extend the clickable area of control points and the plus button to the full height of the gradient bar ([#84124](https://github.com/WordPress/gutenberg/pull/84124)).
+
+-   `Popover`: Keep the `will-change: transform` hint only while the popover is moving, so its content is no longer left on a compositing layer that Chrome can render blurry ([#77359](https://github.com/WordPress/gutenberg/pull/77359)).
+-   `RadioControl`: Keep radio circles visually 16px at all viewport widths while retaining a 24px pointer target ([#83840](https://github.com/WordPress/gutenberg/pull/83840)).
+-   `Text`: Make single-line truncation and `isBlock` overrides consistent across the main document and iframes ([#82573](https://github.com/WordPress/gutenberg/pull/82573)).
+-   `CardDivider`: Apply the Card's width, display, and border color consistently inside iframes ([#82577](https://github.com/WordPress/gutenberg/pull/82577)).
+-   `BorderControl`, `BorderBoxControl`: Stop offering `%` as a width unit, since `border-width` does not accept percentages. A width already set in `%` keeps showing its unit ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
+-   `UnitControl`: After clearing a value whose unit is not in `units`, give the next typed value the unit shown in the select instead of the cleared one ([#83492](https://github.com/WordPress/gutenberg/pull/83492)).
+-   `ResizableBox`: Update `re-resizable` to `6.11.2`, which supports React 18 and renders the top and left handles before the content so focus order matches visual order ([#83754](https://github.com/WordPress/gutenberg/pull/83754)).
+-   `SandBox`: Send the page URL as the referrer from iframes inside `allowSameOrigin` sandboxes in Safari, fixing embed previews that require a referrer, such as YouTube's "Error 153" ([#84014](https://github.com/WordPress/gutenberg/pull/84014)).
+-   `PaletteEdit`: Keep an item's slug when it is renamed, so blocks and styles that reference the preset keep working ([#83750](https://github.com/WordPress/gutenberg/pull/83750)).
+-   `FocalPointPicker`: End a drag when the pointer is released outside the control, including over the editor canvas ([#83348](https://github.com/WordPress/gutenberg/pull/83348)).
+-   `ContentEditableControl`: Keep a disabled field focusable (out of the tab order), so a field disabled while it has focus keeps it instead of dropping focus on the body ([#84083](https://github.com/WordPress/gutenberg/pull/84083)).
+
+### Internal
+
+-   `Menu`: Deprecate the private API while preserving it for older bundled consumers. Target removal for WordPress 7.3 after package compatibility checks pass ([#82947](https://github.com/WordPress/gutenberg/pull/82947)).
+-   Fix internal `WordPressComponent` polymorphic typings to avoid unsupported `as` props unintentionally surfacing ([#82704](https://github.com/WordPress/gutenberg/pull/82704)).
+-   `ProgressBar`: Use the WordPress Design System color tokens. ([#83779](https://github.com/WordPress/gutenberg/pull/83779)).
+
+## 41.0.0 (2026-09-23)
+
+### Breaking Changes
+
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `BoxControl` ([#82570](https://github.com/WordPress/gutenberg/pull/82570))
     -   `Grid` ([#82571](https://github.com/WordPress/gutenberg/pull/82571))
@@ -11,6 +131,7 @@
 
 ### Enhancements
 
+-   `CheckboxControl`: Match the `@wordpress/ui` default border, hover, and disabled icon colors ([#83271](https://github.com/WordPress/gutenberg/pull/83271)).
 -   `SelectControl`: Mark as not recommended for use in a WordPress environment, in favour of `SelectControl` from `@wordpress/ui` ([#83030](https://github.com/WordPress/gutenberg/pull/83030)).
 -   `PaletteEdit`: Use standard menu semantics and keyboard navigation for palette option actions through `Menu` from `@wordpress/ui` ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
 -   `CheckboxControl`: Match the `@wordpress/ui` checkmark size and disabled fill ([#82555](https://github.com/WordPress/gutenberg/pull/82555)).
@@ -19,15 +140,28 @@
 -   `Autocomplete`: Show focus ring with the design system's outline instead of previous box-shadow implementation ([#82766](https://github.com/WordPress/gutenberg/pull/82766)).
 -   `CustomGradientPicker`: Show the control point's focus ring with the design system's outline and a contrasting backing to separate it from the gradient ([#82834](https://github.com/WordPress/gutenberg/pull/82834)).
 
+### Deprecations
+
+-   `ZStack`: Deprecate the component, planned for removal in WordPress 7.4. Write your own CSS instead ([#83344](https://github.com/WordPress/gutenberg/pull/83344)).
+-   `ResponsiveWrapper`: Deprecate the component, planned for removal in WordPress 7.4. Use the CSS `aspect-ratio` property instead ([#83347](https://github.com/WordPress/gutenberg/pull/83347)).
+-   `Scrollable`: Deprecate the component, planned for removal in WordPress 7.4 ([#83273](https://github.com/WordPress/gutenberg/pull/83273)).
+-   `Elevation`: Deprecate the component, planned for removal in WordPress 7.4 ([#83269](https://github.com/WordPress/gutenberg/pull/83269)).
+-   `Divider`: Deprecate the component, planned for removal in WordPress 7.4 ([#83040](https://github.com/WordPress/gutenberg/pull/83040)).
+
 ### Bug Fixes
 
+-   `BaseControl`, `CheckboxControl`, `RadioControl`, `ToggleControl`: Use the design system foreground color for labels so they stay the correct color instead of inheriting the surrounding text color ([#83318](https://github.com/WordPress/gutenberg/pull/83318)).
+-   `FocalPointPicker`: Keep a surrounding scroll container from gaining a horizontal scrollbar when the focal point sits on an edge, without clipping the handle ([#68915](https://github.com/WordPress/gutenberg/pull/68915)).
 -   `Card`: Keep shadow radii aligned with the Card's actual radius regardless of render order ([#82572](https://github.com/WordPress/gutenberg/pull/82572)).
 -   `SelectControl`: Stop forcing a fill on the chevron icon, so the stroke-based chevron renders as a line again instead of a filled shape ([#82949](https://github.com/WordPress/gutenberg/pull/82949)).
 -   `BorderBoxControl`: Restore the split borders layout. The top and bottom controls are centred across the row and the right control sits at the end of its column again, after `BorderControl`'s own `margin: 0` began overriding both ([#82939](https://github.com/WordPress/gutenberg/pull/82939)).
 -   `PaletteEdit`: Separate adjacent header action buttons so their focus rings do not overlap ([#82768](https://github.com/WordPress/gutenberg/pull/82768)).
+-   `Draggable`: Render `__experimentalDragComponent` only while a drag is in progress, so long lists of draggables such as the block inserter no longer render a hidden drag preview per item ([#83423](https://github.com/WordPress/gutenberg/pull/83423)).
+-   `Flex`, `Grid`: Stop watching the viewport for props that are given a single value rather than an array of breakpoint values. Each instance previously called `window.matchMedia()` and subscribed a `resize` listener that could never change its result ([#83423](https://github.com/WordPress/gutenberg/pull/83423)).
 
 ### Internal
 
+-   Update Ariakit to 0.4.40 ([#83278](https://github.com/WordPress/gutenberg/pull/83278)).
 -   Remove obsolete Jest test dependencies and types ([#82975](https://github.com/WordPress/gutenberg/pull/82975)).
 -   Remove the obsolete Jest console test dependency and matcher types ([#82843](https://github.com/WordPress/gutenberg/pull/82843)).
 -   Update Ariakit to 0.4.39 and run affected interaction coverage in Browser Mode ([#82831](https://github.com/WordPress/gutenberg/pull/82831)).

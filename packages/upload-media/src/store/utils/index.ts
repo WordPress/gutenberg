@@ -57,10 +57,14 @@ interface VipsResizeOptions {
 	 * Maximum output bit depth.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether animated images should keep their animation when resized.
+	 */
+	preserveAnimation?: boolean;
 }
 
 /**
- * Cached dynamic import promise for @wordpress/vips/worker.
+ * Cached dynamic import promise for `@wordpress/vips/worker`.
  *
  * The module contains ~10MB of inlined WASM code. By using a dynamic import,
  * the WASM is only loaded when vips functions are actually called at image
@@ -78,7 +82,7 @@ let vipsModulePromise:
 let vipsModule: typeof import( '@wordpress/vips/worker' ) | undefined;
 
 /**
- * Lazily loads and caches the @wordpress/vips/worker module.
+ * Lazily loads and caches the `@wordpress/vips/worker` module.
  *
  * @return The vips worker module.
  */
@@ -208,6 +212,7 @@ export async function vipsResizeImage(
 		quality,
 		stripMeta,
 		maxBitdepth,
+		preserveAnimation,
 	} = options;
 
 	if ( signal?.aborted ) {
@@ -221,6 +226,7 @@ export async function vipsResizeImage(
 			quality,
 			stripMeta,
 			maxBitdepth,
+			preserveAnimation,
 		} );
 
 	let fileName = file.name;
