@@ -280,3 +280,25 @@ export function useStyleWithResolvedBackground(
 		return { ...style, background };
 	}, [ style, merged ] );
 }
+
+/**
+ * Whether the current user may edit custom CSS in Global Styles.
+ *
+ * The capability is reported as a link on the global styles record rather
+ * than as a user capability.
+ */
+export function useCanEditCSS(): boolean {
+	return useSelect( ( select ) => {
+		const { getEntityRecord, __experimentalGetCurrentGlobalStylesId } =
+			select( coreStore );
+
+		const globalStylesId = __experimentalGetCurrentGlobalStylesId();
+		const globalStyles = globalStylesId
+			? getEntityRecord( 'root', 'globalStyles', globalStylesId )
+			: undefined;
+
+		return !! ( globalStyles as GlobalStylesConfig )?._links?.[
+			'wp:action-edit-css'
+		];
+	}, [] );
+}
