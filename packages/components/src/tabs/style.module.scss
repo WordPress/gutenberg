@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 @use "../utils/theme-variables" as *;
 
 .tab-list {
@@ -214,16 +215,11 @@
 
 .tab-panel {
 	&:focus {
-		box-shadow: none;
 		outline: none;
 	}
 
 	&[data-focus-visible] {
-		box-shadow:
-			0 0 0 var(--wp-admin-border-width-focus)
-			$components-color-accent;
-		// Windows high contrast mode.
-		outline: 2px solid transparent;
+		@include outset-ring__focus();
 		outline-offset: 0;
 	}
 }
