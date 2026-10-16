@@ -41,6 +41,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/internal-regex': null,
 	},
 	rules: {
 		'jest/expect-expect': 'off',
