@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+-   `MediaEdit`: Use design system's outine focus ring instead of previous box-shadow based implementation.
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
