@@ -13,12 +13,20 @@ import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { keyboardReturn } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
+import type { ChangeEvent, FormEvent, ReactNode } from 'react';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
 import { store as blockEditorStore } from '../../store';
 import { parseDropEvent } from '../use-on-block-drop';
 import { getComputedAcceptAttribute } from './utils';
+import type { MediaUploadFunction } from '../provider/types';
+import type {
+	InsertFromURLPopoverProps,
+	MediaPlaceholderMedia,
+	MediaPlaceholderProps,
+	URLSelectionUIProps,
+} from './types';
 const noop = () => {};
 
 const InsertFromURLPopover = ( {
@@ -27,7 +35,7 @@ const InsertFromURLPopover = ( {
 	onSubmit,
 	onClose,
 	popoverAnchor,
-} ) => (
+}: InsertFromURLPopoverProps ) => (
 	<URLPopover anchor={ popoverAnchor } onClose={ onClose }>
 		<form
 			className="block-editor-media-placeholder__url-input-form"
@@ -55,10 +63,16 @@ const InsertFromURLPopover = ( {
 	</URLPopover>
 );
 
-const URLSelectionUI = ( { src, onChangeSrc, onSelectURL } ) => {
+const URLSelectionUI = ( {
+	src,
+	onChangeSrc,
+	onSelectURL,
+}: URLSelectionUIProps ) => {
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
+		null
+	);
 	const [ isURLInputVisible, setIsURLInputVisible ] = useState( false );
 
 	const openURLInput = () => {
@@ -69,7 +83,7 @@ const URLSelectionUI = ( { src, onChangeSrc, onSelectURL } ) => {
 		popoverAnchor?.focus();
 	};
 
-	const onSubmitSrc = ( event ) => {
+	const onSubmitSrc = ( event: FormEvent< HTMLFormElement > ) => {
 		event.preventDefault();
 		if ( src && onSelectURL ) {
 			onSelectURL( src );
@@ -130,7 +144,7 @@ export function MediaPlaceholder( {
 	mediaLibraryButton,
 	placeholder,
 	style,
-} ) {
+}: MediaPlaceholderProps ) {
 	if ( deprecatedOnHTMLDrop ) {
 		deprecated( 'wp.blockEditor.MediaPlaceholder onHTMLDrop prop', {
 			since: '6.2',
@@ -142,15 +156,17 @@ export function MediaPlaceholder( {
 		const { getSettings } = select( blockEditorStore );
 		const settings = getSettings();
 		return {
-			mediaUpload: settings.mediaUpload,
+			mediaUpload: settings.mediaUpload as
+				MediaUploadFunction | undefined,
 			allowedMimeTypes: settings.allowedMimeTypes,
 		};
 	}, [] );
-	const [ src, setSrc ] = useState( '' );
+	const [ src, setSrc ] = useState< string | undefined >( '' );
 
 	useEffect( () => {
-		setSrc( value?.src ?? '' );
-	}, [ value?.src ] );
+		// Galleries have no `src`.
+		setSrc( ( value as MediaPlaceholderMedia )?.src ?? '' );
+	}, [ ( value as MediaPlaceholderMedia )?.src ] );
 
 	const computedAccept = useMemo(
 		() =>
@@ -173,7 +189,7 @@ export function MediaPlaceholder( {
 		);
 	};
 
-	const onFilesUpload = ( files ) => {
+	const onFilesUpload = ( files: ArrayLike< File > ) => {
 		if (
 			! handleUpload ||
 			( typeof handleUpload === 'function' && ! handleUpload( files ) )
@@ -181,7 +197,7 @@ export function MediaPlaceholder( {
 			return onSelect( files );
 		}
 		onFilesPreUpload( files );
-		let setMedia;
+		let setMedia: ( media: MediaPlaceholderMedia[] ) => void;
 		if ( multiple ) {
 			if ( addToGallery ) {
 				// Since the setMedia function runs multiple times per upload group
@@ -191,11 +207,14 @@ export function MediaPlaceholder( {
 				// values.
 
 				// Define an array to store urls from newMedia between subsequent function calls.
-				let lastMediaPassed = [];
+				let lastMediaPassed: { id?: number; urlSlug: string }[] = [];
 				setMedia = ( newMedia ) => {
 					// Remove any images this upload group is responsible for (lastMediaPassed).
 					// Their replacements are contained in newMedia.
-					const filteredMedia = ( value ?? [] ).filter( ( item ) => {
+					// Galleries pass their list of media.
+					const filteredMedia = (
+						( value as MediaPlaceholderMedia[] ) ?? []
+					).filter( ( item ) => {
 						// If Item has id, only remove it if lastMediaPassed has an item with that id.
 						if ( item.id ) {
 							return ! lastMediaPassed.some(
@@ -204,8 +223,9 @@ export function MediaPlaceholder( {
 							);
 						}
 						// Compare transient images via .includes since gallery may append extra info onto the url.
+						// Uploaded media have a URL.
 						return ! lastMediaPassed.some( ( { urlSlug } ) =>
-							item.url.includes( urlSlug )
+							item.url!.includes( urlSlug )
 						);
 					} );
 					// Return the filtered media array along with newMedia.
@@ -213,8 +233,8 @@ export function MediaPlaceholder( {
 					// Reset lastMediaPassed and set it with ids and urls from newMedia.
 					lastMediaPassed = newMedia.map( ( media ) => {
 						// Add everything up to '.fileType' to compare via .includes.
-						const cutOffIndex = media.url.lastIndexOf( '.' );
-						const urlSlug = media.url.slice( 0, cutOffIndex );
+						const cutOffIndex = media.url!.lastIndexOf( '.' );
+						const urlSlug = media.url!.slice( 0, cutOffIndex );
 						return { id: media.id, urlSlug };
 					} );
 				};
@@ -224,16 +244,21 @@ export function MediaPlaceholder( {
 		} else {
 			setMedia = ( [ media ] ) => onSelect( media );
 		}
-		mediaUpload( {
+		// Uploads only start where the user can upload media.
+		mediaUpload!( {
 			allowedTypes,
 			filesList: files,
-			onFileChange: setMedia,
+			// The upload passes the uploaded media.
+			onFileChange: setMedia as (
+				attachments: Array< Record< string, unknown > >
+			) => void,
 			onError,
-			multiple,
+			// `add` allows multiple files like `true`.
+			multiple: multiple as boolean,
 		} );
 	};
 
-	async function handleBlocksDrop( event ) {
+	async function handleBlocksDrop( event: globalThis.DragEvent ) {
 		const { blocks } = parseDropEvent( event );
 
 		if ( ! blocks?.length ) {
@@ -249,11 +274,14 @@ export function MediaPlaceholder( {
 				}
 				return new Promise( ( resolve, reject ) => {
 					window
-						.fetch( block.attributes.url )
+						// Media blocks without an ID have a URL.
+						.fetch( block.attributes.url as string )
 						.then( ( response ) => response.blob() )
 						.then( ( blob ) =>
-							mediaUpload( {
-								filesList: [ blob ],
+							// Uploads only start where the user can upload media.
+							mediaUpload!( {
+								// The upload reads a blob like a file.
+								filesList: [ blob as File ],
 								additionalData: {
 									title: block.attributes.title,
 									alt_text: block.attributes.alt,
@@ -272,7 +300,8 @@ export function MediaPlaceholder( {
 						.catch( () => resolve( block.attributes.url ) );
 				} );
 			} )
-		).catch( ( err ) => onError( err ) );
+			// Callers that accept dropped blocks handle errors.
+		).catch( ( err ) => onError!( err ) );
 
 		if ( ! uploadedMediaList?.length ) {
 			return;
@@ -281,11 +310,12 @@ export function MediaPlaceholder( {
 		onSelect( multiple ? uploadedMediaList : uploadedMediaList[ 0 ] );
 	}
 
-	const onUpload = ( event ) => {
-		onFilesUpload( event.target.files );
+	const onUpload = ( event: ChangeEvent< HTMLInputElement > ) => {
+		// A file input has a file list.
+		onFilesUpload( event.target.files! );
 	};
 
-	const defaultRenderPlaceholder = ( content ) => {
+	const defaultRenderPlaceholder = ( content: ReactNode ) => {
 		let { instructions, title } = labels;
 
 		if ( ! mediaUpload && ! onSelectURL ) {
@@ -386,7 +416,8 @@ export function MediaPlaceholder( {
 					return (
 						types.length > 0 &&
 						types.every( ( type ) =>
-							allowedTypes.includes( type )
+							// Callers that accept dropped blocks set the allowed types.
+							allowedTypes!.includes( type )
 						) &&
 						( multiple ? true : types.length === 1 )
 					);
@@ -441,7 +472,7 @@ export function MediaPlaceholder( {
 	};
 
 	const renderMediaUploadChecked = () => {
-		const defaultButton = ( { open } ) => {
+		const defaultButton = ( { open }: { open: () => void } ) => {
 			return (
 				<Button
 					__next40pxDefaultSize
@@ -458,14 +489,16 @@ export function MediaPlaceholder( {
 		const uploadMediaLibraryButton = (
 			<MediaUpload
 				addToGallery={ addToGallery }
-				gallery={ multiple && onlyAllowsImages() }
+				// `add` allows multiple files like `true`.
+				gallery={ ( multiple && onlyAllowsImages() ) as boolean }
 				multiple={ multiple }
 				onSelect={ onSelect }
 				allowedTypes={ allowedTypes }
 				mode="browse"
 				value={
 					Array.isArray( value )
-						? value.map( ( { id } ) => id )
+						? // Media in a gallery have IDs.
+							( value.map( ( { id } ) => id ) as number[] )
 						: value.id
 				}
 				render={ libraryButton }
@@ -557,4 +590,11 @@ export function MediaPlaceholder( {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md
  */
-export default withFilters( 'editor.MediaPlaceholder' )( MediaPlaceholder );
+export default withFilters( 'editor.MediaPlaceholder' )(
+	MediaPlaceholder
+) as unknown as <
+	Media = unknown,
+	Value extends MediaPlaceholderMedia = MediaPlaceholderMedia,
+>(
+	props: MediaPlaceholderProps< Media, Value >
+) => ReactNode; // `withFilters` erases the props of the filtered component.
