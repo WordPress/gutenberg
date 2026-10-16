@@ -3,7 +3,7 @@ import type {
 	BlockEditProps as BlockTypeEditProps,
 } from '@wordpress/blocks';
 import type { BlockEditingMode } from '../block-editing-mode';
-import type { BlockAttributes } from '../../store/types';
+import type { BlockAttributes, InitialPosition } from '../../store/types';
 import type {
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
@@ -44,7 +44,14 @@ export interface BlockEditPublicProps extends Partial<
 	 * not from the updater form.
 	 */
 	setAttributes?: ( attributes: Record< string, unknown > ) => void;
-	onReplace?: ( blocks: Block[] ) => void;
+	/**
+	 * Replaces the block, selecting the block at `indexToSelect`.
+	 */
+	onReplace?: (
+		blocks: Block | Block[],
+		indexToSelect?: number | null,
+		initialPosition?: InitialPosition
+	) => void;
 	__unstableLayoutClassNames?: string;
 	[ prop: string ]: unknown;
 }
