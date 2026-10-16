@@ -1490,7 +1490,7 @@
 	},
 	"packages/block-editor/src/components/link-control/link-preview.jsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 2
 		},
 		"react/jsx-filename-extension": {
 			"count": 1

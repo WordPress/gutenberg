@@ -227,7 +227,7 @@ $block-editor-link-control-number-of-actions: 1;
 			font-weight: 400;
 		}
 
-		.components-external-link__icon {
+		& > [role="img"] {
 			position: absolute;
 			width: 1px;
 			height: 1px;
