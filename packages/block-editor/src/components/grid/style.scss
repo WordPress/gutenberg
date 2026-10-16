@@ -501,7 +501,6 @@
 	box-sizing: border-box;
 	min-width: $button-size-compact;
 	height: $button-size-compact;
-	padding: 0 $grid-unit-05;
 	// The same border as the block toolbar. No stroke token is as dark.
 	border: var(--wpds-border-width-xs) solid $gray-900;
 	border-radius: var(--wpds-border-radius-sm);
