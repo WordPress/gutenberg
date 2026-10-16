@@ -2,6 +2,7 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
+import type { RefObject } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElementRef } from '../block-list/use-block-props/use-block-refs';
 
@@ -13,8 +14,13 @@ export default function SkipToSelectedBlock() {
 		( select ) => select( blockEditorStore ).getBlockSelectionStart(),
 		[]
 	);
-	const ref = useRef();
-	useBlockElementRef( selectedBlockClientId, ref );
+	const ref = useRef< HTMLElement | null | undefined >( undefined );
+	useBlockElementRef(
+		// An unset ID matches no block element.
+		selectedBlockClientId as string,
+		// The ref receives the selected block's element, or `null`.
+		ref as RefObject< Element | null >
+	);
 	const onClick = () => {
 		ref.current?.focus();
 	};
