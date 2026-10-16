@@ -122,7 +122,12 @@ export function GridItemRotator( {
 		const box = event.currentTarget.closest(
 			'.block-editor-grid-item-handles__box'
 		);
-		if ( event.button !== 0 || ! box || rotationRef.current ) {
+		if (
+			event.button !== 0 ||
+			! blockElement ||
+			! box ||
+			rotationRef.current
+		) {
 			return;
 		}
 		event.preventDefault();
