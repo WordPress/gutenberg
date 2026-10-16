@@ -217,6 +217,27 @@ export interface CustomClassNameEditProps {
 }
 
 /**
+ * A block's `align` support: all alignments, none, or a list of them.
+ */
+export type AlignSupport = boolean | string[] | undefined;
+
+/**
+ * The attributes the align support reads.
+ */
+export interface AlignAttributes {
+	align?: string;
+}
+
+/**
+ * Props of the align toolbar control.
+ */
+export interface AlignEditProps {
+	name: string;
+	align?: string;
+	setAttributes: BlockSupportEditProps[ 'setAttributes' ];
+}
+
+/**
  * A block whose `className` attribute is read.
  */
 export type BlockWithClassName = Block< { className?: string } >;
