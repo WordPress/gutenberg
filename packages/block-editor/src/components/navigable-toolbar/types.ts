@@ -26,7 +26,7 @@ export interface NavigableToolbarProps {
 	 */
 	__experimentalOnIndexChange?: ( index: number ) => void;
 	orientation?: 'horizontal' | 'vertical';
-	'aria-label'?: string;
+	'aria-label': string;
 	[ prop: string ]: unknown;
 }
 

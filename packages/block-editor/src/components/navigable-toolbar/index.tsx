@@ -261,8 +261,7 @@ export default function NavigableToolbar( {
 	if ( isAccessibleToolbar ) {
 		return (
 			<Toolbar
-				// Callers label the toolbar.
-				label={ props[ 'aria-label' ] as string }
+				label={ props[ 'aria-label' ] }
 				ref={ toolbarRef }
 				orientation={ orientation }
 				{ ...props }
