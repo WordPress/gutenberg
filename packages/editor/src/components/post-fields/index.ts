@@ -2,7 +2,7 @@ import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import type { Field } from '@wordpress/dataviews';
-import type { BasePostWithEmbeddedAuthor } from '@wordpress/fields';
+import type { BasePostWithEmbeddedAuthor } from '../../dataviews/types';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import { useFields } from '../../dataviews/fields-loader';
@@ -12,8 +12,8 @@ function usePostFields( {
 }: {
 	postType: string;
 } ): Field< BasePostWithEmbeddedAuthor >[] {
-	// The fields come from the server. The schema still registers the
-	// actions of the post type, and fires `core.registerPostTypeSchema`.
+	// The fields come from the server. The schema only fires
+	// `core.registerPostTypeSchema`, for the code listening to it.
 	const { registerPostTypeSchema } = unlock( useDispatch( editorStore ) );
 	useEffect( () => {
 		registerPostTypeSchema( postType );

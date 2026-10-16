@@ -32,5 +32,8 @@ const { state } = store( 'directive-html', {
 		setRejected() {
 			state.rejected = asDangerousHTML( '<b>x</b>' );
 		},
+		setServerHtml() {
+			state.serverHtml = asDangerousHTML( '<p>Client HTML</p>' );
+		},
 	},
 } );
