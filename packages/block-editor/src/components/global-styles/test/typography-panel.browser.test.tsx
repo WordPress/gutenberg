@@ -2,7 +2,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
+import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
+import type { StyleSettings, TypographyPanelProps } from '../types';
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
@@ -23,7 +25,7 @@ afterEach( () => {
  * @param {Object} props Props to override the defaults.
  * @return {ReturnType<typeof render>} The `render()` result.
  */
-async function renderPanel( props ) {
+async function renderPanel( props: Partial< TypographyPanelProps > ) {
 	return await render(
 		<TypographyPanel
 			value={ {} }
@@ -36,10 +38,10 @@ async function renderPanel( props ) {
 }
 
 // Scoped to the panel: the notice is also announced into a body live region.
-const textGradientNotice = ( container ) =>
+const textGradientNotice = ( container: HTMLElement ) =>
 	within( container ).queryByText( /replaces the text color/ );
 
-const backgroundOverrideNotice = ( container ) =>
+const backgroundOverrideNotice = ( container: HTMLElement ) =>
 	within( container ).queryByText( /^Setting a text gradient/ );
 
 /**
@@ -51,7 +53,10 @@ const backgroundOverrideNotice = ( container ) =>
  * @param {string}        toggleName Accessible name of the menu toggle.
  * @param {string|RegExp} itemName   Accessible name of the menu item.
  */
-async function activatePanelMenuItem( toggleName, itemName ) {
+async function activatePanelMenuItem(
+	toggleName: string | RegExp,
+	itemName: string | RegExp
+) {
 	await userEvent.click( screen.getByRole( 'button', { name: toggleName } ) );
 	const item = await screen.findByRole( 'menuitem', { name: itemName } );
 	item.focus();
@@ -66,7 +71,7 @@ async function activatePanelMenuItem( toggleName, itemName ) {
  * being committed, and that local overrides remain the source of truth.
  */
 
-const baseSettings = {
+const baseSettings: StyleSettings = {
 	typography: {
 		lineHeight: true,
 		letterSpacing: true,
@@ -196,7 +201,8 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 		// touched path; no other path is mutated, and no inherited
 		// value is copied into the local payload.
 		expect( onChange ).toHaveBeenCalled();
-		const lastCall = onChange.mock.calls.at( -1 )[ 0 ];
+		// The panel called `onChange`.
+		const lastCall = onChange.mock.calls.at( -1 )![ 0 ];
 		// NumberControl emits the value as a string; the existing
 		// setTextColumns setter passes it through without coercion.
 		// What matters here is that *only* the touched leaf is
@@ -435,7 +441,8 @@ describe( 'TypographyPanel — inheritedValue round-trip', () => {
 			await user.click( underline );
 
 			expect( onChange ).toHaveBeenCalled();
-			const lastCall = onChange.mock.calls.at( -1 )[ 0 ];
+			// The panel called `onChange`.
+			const lastCall = onChange.mock.calls.at( -1 )![ 0 ];
 			expect( lastCall ).toEqual( {
 				typography: { textDecoration: 'underline' },
 			} );
@@ -666,7 +673,13 @@ describe( 'useHasTypographyPanel', () => {
 			useHasTypographyPanel( {
 				typography: {
 					fontFamilies: {
-						theme: [ { slug: 'sans', fontFamily: 'sans-serif' } ],
+						// Only the slug and family are read.
+						theme: [
+							{
+								slug: 'sans',
+								fontFamily: 'sans-serif',
+							} as FontFamilyPreset,
+						],
 					},
 				},
 			} )
@@ -933,7 +946,7 @@ describe( 'TypographyPanel layout className preserved regardless of inheritance 
 		typography: { lineHeight: '1.5', letterSpacing: '1px' },
 	};
 
-	const getItem = ( name ) => {
+	const getItem = ( name: string | RegExp ) => {
 		const control = screen.getByRole( 'spinbutton', { name } );
 		// The layout class sits on the wrapping ToolsPanelItem, which has no role.
 		// eslint-disable-next-line testing-library/no-node-access
@@ -1005,7 +1018,7 @@ describe( 'TypographyPanel text gradient', () => {
 
 	const shownControls = { textColor: true, textGradient: true };
 
-	const withClip = ( backgroundClip ) => ( {
+	const withClip = ( backgroundClip?: boolean | string[] ) => ( {
 		...gradientSettings,
 		background: { ...gradientSettings.background, backgroundClip },
 	} );
@@ -1075,7 +1088,8 @@ describe( 'TypographyPanel text gradient', () => {
 		const swatches = await screen.findAllByRole( 'option' );
 		await userEvent.click( swatches[ 0 ] );
 
-		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		// The panel called `onChange`.
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
 		expect( result.background.gradient ).toBe(
 			'var:preset|gradient|purple-blue'
 		);
@@ -1097,7 +1111,8 @@ describe( 'TypographyPanel text gradient', () => {
 		const swatches = await screen.findAllByRole( 'option' );
 		await userEvent.click( swatches[ 0 ] );
 
-		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		// The panel called `onChange`.
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
 		expect( result.color.gradient ).toBeUndefined();
 	} );
 
@@ -1257,7 +1272,8 @@ describe( 'TypographyPanel text gradient', () => {
 
 		await activatePanelMenuItem( 'Typography options', /reset all/i );
 
-		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		// The panel called `onChange`.
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
 		expect( result.background.gradient ).toBeUndefined();
 		expect( result.background.backgroundClip ).toBeUndefined();
 	} );
@@ -1312,7 +1328,8 @@ describe( 'TypographyPanel text gradient', () => {
 			await activatePanelMenuItem( 'Typography options', /reset all/i );
 
 			// Unsetting would fall back to the Default state's text clip.
-			const result = onChange.mock.calls.at( -1 )[ 0 ];
+			// The panel called `onChange`.
+			const result = onChange.mock.calls.at( -1 )![ 0 ];
 			expect( result.background.gradient ).toBeUndefined();
 			expect( result.background.backgroundClip ).toBe( 'border-box' );
 		} );
