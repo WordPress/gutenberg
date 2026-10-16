@@ -310,3 +310,24 @@ export interface SpacingVisualizerBaseProps {
 	computeStyle: ( blockElement: Element ) => CSSProperties;
 	forceShow?: boolean;
 }
+
+/**
+ * The computed colors of a rendered block.
+ */
+export interface BlockElementColors {
+	textColor?: string;
+	backgroundColor?: string;
+	linkColor?: string;
+}
+
+/**
+ * Options of `useBlockColorContrastWarning`.
+ */
+export interface UseBlockColorContrastWarningOptions {
+	clientId: string;
+	name?: string;
+	enabled?: boolean;
+	checkTextColor?: boolean;
+	checkLinkColor?: boolean;
+	messageOverride?: string;
+}
