@@ -56,7 +56,7 @@ interface MediaPlaceholderBaseProps {
 	 * Whether to allow selecting multiple files. `add` allows it without
 	 * holding `Shift` or `Ctrl`/`Cmd`.
 	 */
-	multiple?: boolean | string;
+	multiple?: boolean | 'add';
 	disableDropZone?: boolean;
 	/**
 	 * Whether to only render the drop zone UI.
