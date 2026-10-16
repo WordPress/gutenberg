@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import DateFormatPicker from '../';
 
-export default {
+const meta: Meta< typeof DateFormatPicker > = {
 	id: 'blockeditor-dateformatpicker',
 	title: 'Editor/Block Editor/DateFormatPicker',
 	component: DateFormatPicker,
@@ -24,6 +25,7 @@ export default {
 			},
 		},
 		format: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description:
 				'The selected date format. If `null`, _Default_ is selected.',
@@ -33,6 +35,7 @@ export default {
 		},
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description:
 				'Called when a selection is made. If `null`, _Default_ is selected.',
@@ -43,12 +46,16 @@ export default {
 	},
 };
 
-export const Default = {
+export default meta;
+
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	args: {
 		defaultFormat: 'M j, Y',
 	},
 	render: function Template( { onChange, ...args } ) {
-		const [ format, setFormat ] = useState();
+		const [ format, setFormat ] = useState< string | null >( null );
 		return (
 			<DateFormatPicker
 				{ ...args }
