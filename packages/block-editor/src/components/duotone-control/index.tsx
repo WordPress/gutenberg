@@ -10,6 +10,8 @@ import { __ } from '@wordpress/i18n';
 import { DOWN } from '@wordpress/keycodes';
 import { Icon, filter } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import type { KeyboardEvent } from 'react';
+import type { DuotoneControlProps } from './types';
 
 function DuotoneControl( {
 	id: idProp,
@@ -20,7 +22,7 @@ function DuotoneControl( {
 	value,
 	selectedSlug,
 	onChange,
-} ) {
+}: DuotoneControlProps ) {
 	let toolbarIcon;
 	if ( value === 'unset' ) {
 		toolbarIcon = (
@@ -43,7 +45,7 @@ function DuotoneControl( {
 				headerTitle: __( 'Duotone' ),
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => {
-				const openOnArrowDown = ( event ) => {
+				const openOnArrowDown = ( event: KeyboardEvent ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
 						onToggle();
