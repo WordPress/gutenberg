@@ -6,7 +6,7 @@ import {
 	withSyncEvent,
 } from '@wordpress/interactivity';
 
-/** HTML values selected by each page's server context. */
+/** HTML tokens selected by each page's server context. */
 const tokens = {
 	/** Initial or matching destination HTML. */
 	T: asDangerousHTML( '<p>T</p>' ),
@@ -18,18 +18,14 @@ const { state } = store( 'router-html', {
 	state: {
 		/** Always empty, including on a kept node. */
 		never: null,
-		/** Returns the destination token, server representation, null, or pending. */
+		/** Returns the destination token, null, or a pending derived value. */
 		get html() {
 			if ( getServerContext().value === 'pending' ) {
 				return state.late;
 			}
-			if ( getContext().resolved ) {
-				return tokens.U;
-			}
-			if ( getServerContext().value === 'representation' ) {
-				return state.serverHtml;
-			}
-			return tokens[ getServerContext().value ] ?? null;
+			return getContext().resolved
+				? tokens.U
+				: ( tokens[ getServerContext().value ] ?? null );
 		},
 		/** Reports the destination's own serialized value selection. */
 		get value() {

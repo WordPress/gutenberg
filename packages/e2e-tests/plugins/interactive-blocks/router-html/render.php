@@ -8,15 +8,6 @@
 $attributes = get_defined_vars()['attributes'];
 $page       = $attributes['page'];
 
-if ( 'representation' === $attributes['value'] ) {
-	wp_interactivity_state(
-		'router-html',
-		array(
-			'serverHtml' => array( 'wpServerHtml' => true ),
-		)
-	);
-}
-
 if ( 'pending' === $attributes['value'] ) {
 	wp_interactivity_state(
 		'router-html',

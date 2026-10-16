@@ -17,11 +17,9 @@ directive(
 	( { directives: { html: htmlEntries }, element, evaluate } ) => {
 		// Default entry; unsupported variants retain their original props.
 		const entry = htmlEntries.find( isDefaultDirectiveSuffix );
-		// HTML last applied or rejected; removals record empty HTML so returning
-		// tokens are applied again after the content is removed.
+		// Serialized HTML last applied or rejected; non-token values reset it
+		// to empty HTML so returning tokens are applied again after a removal.
 		const lastAppliedKey = useRef< string | undefined >( undefined );
-		// Records whether the previous value kept content as a server token.
-		const wasServerHTMLRepresentation = useRef( false );
 		// Fixed at the first render. Preact writes only when creating the node;
 		// all later writes, including navigation updates, belong to the effect.
 		const preactHtml = useRef< {
@@ -64,38 +62,33 @@ directive(
 		// Current token payload or the policy-free removal value.
 		const resolvedValue = trusted ? getDangerousHTML( result ) : emptyHTML;
 
-		// Apply after commit; matching server nodes or content kept for the
-		// representation can be adopted without another innerHTML write.
+		// Hydration never writes Preact's __html. Apply the current value only
+		// after commit, adopting exactly matching unwritten server nodes.
 		useLayoutEffect( () => {
 			if ( ! active ) {
 				return;
 			}
 			if ( preserveContent ) {
-				wasServerHTMLRepresentation.current = serverHTMLRepresentation;
+				// Content kept for the server representation may differ from
+				// what was last applied, so the next token is compared with the
+				// DOM, as at hydration.
+				if ( serverHTMLRepresentation ) {
+					lastAppliedKey.current = undefined;
+				}
 				return;
 			}
-			const leavingServerHTMLRepresentation =
-				wasServerHTMLRepresentation.current;
-			wasServerHTMLRepresentation.current = false;
 			if ( ! trusted && result !== null && result !== undefined ) {
 				warn(
 					'data-wp-html: the value is not trusted HTML. Use asDangerousHTML() to explicitly trust the markup.'
 				);
 			}
 			const key = String( resolvedValue );
-			// A rejected write may cache this key without leaving its HTML in the
-			// element, so inspect the current DOM before using the cache after the
-			// server representation.
-			if (
-				lastAppliedKey.current === key &&
-				! leavingServerHTMLRepresentation
-			) {
+			if ( lastAppliedKey.current === key ) {
 				return;
 			}
 			const node = ( element.ref as RefObject< HTMLElement > ).current!;
 			if (
-				( lastAppliedKey.current === undefined ||
-					leavingServerHTMLRepresentation ) &&
+				lastAppliedKey.current === undefined &&
 				node.innerHTML === key
 			) {
 				lastAppliedKey.current = key;
