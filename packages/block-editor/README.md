@@ -670,11 +670,11 @@ Dropdown for selecting a heading level (1 through 6) or paragraph (0).
 
 _Parameters_
 
-- _props_ `WPHeadingLevelDropdownProps`: Component props.
+- _props_ `HeadingLevelDropdownProps`: Component props.
 
 _Returns_
 
-- `ComponentType`: The toolbar.
+- `ReactElement`: The toolbar.
 
 ### HeightControl
 
