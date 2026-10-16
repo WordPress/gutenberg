@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Preserve spacing and alignment of prefix icons in footer links that open in a new tab ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
+-   Preserve spacing and alignment of icons in footer links that open in a new tab ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
 
 ### Internal
 

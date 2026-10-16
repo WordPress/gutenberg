@@ -142,6 +142,7 @@ export function WidgetFooter( {
 						) : (
 							<Link
 								key={ action.id }
+								className={ styles[ 'link-action' ] }
 								download={ action.download }
 								openInNewTab={ action.openInNewTab }
 								render={ <HostLink href={ action.href } /> }
