@@ -1,14 +1,7 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { logged } from '@wordpress/deprecated';
+import { describe, expect, it } from 'vitest';
 import { getFontSizeClass } from '../utils';
 
 describe( 'getFontSizeClass()', () => {
-	afterEach( () => {
-		for ( const key in logged ) {
-			delete logged[ key ];
-		}
-	} );
-
 	it( 'Should return the correct font size class when given a string', () => {
 		const fontSizeClass = getFontSizeClass( '14px' );
 		expect( fontSizeClass ).toBe( 'has-14-px-font-size' );

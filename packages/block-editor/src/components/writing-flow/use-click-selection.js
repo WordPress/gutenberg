@@ -4,6 +4,13 @@ import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId } from '../../utils/dom';
 
+// iOS WebKit places the caret on the tap itself, before the mouse events it
+// synthesizes from it. Other engines place it in the mousedown's default
+// action, which must run there.
+const placesCaretOnTap =
+	typeof window !== 'undefined' &&
+	!! window.CSS?.supports?.( '-webkit-touch-callout', 'none' );
+
 export default function useClickSelection() {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const {
@@ -14,6 +21,12 @@ export default function useClickSelection() {
 	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
+			let pointerType;
+
+			function onPointerDown( event ) {
+				pointerType = event.pointerType;
+			}
+
 			function onMouseDown( event ) {
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
@@ -23,6 +36,24 @@ export default function useClickSelection() {
 
 				const startClientId = getBlockSelectionStart();
 				const clickedClientId = getBlockClientId( event.target );
+
+				// A tap in the block the wrapper hosts, with the caret already
+				// placed by the tap: all the default action would do is focus
+				// the nearest focusable element (the field, its block element
+				// or a container), which the handover moves straight back to
+				// the wrapper. On iOS that flicker cancels the double tap word
+				// selection.
+				if (
+					placesCaretOnTap &&
+					pointerType === 'touch' &&
+					clickedClientId &&
+					clickedClientId === startClientId &&
+					node.contentEditable === 'true' &&
+					node.ownerDocument.activeElement === node
+				) {
+					event.preventDefault();
+					return;
+				}
 
 				if ( event.shiftKey ) {
 					// When selecting a single block in a document by holding the shift key,
@@ -87,9 +118,11 @@ export default function useClickSelection() {
 				}
 			}
 
+			node.addEventListener( 'pointerdown', onPointerDown );
 			node.addEventListener( 'mousedown', onMouseDown );
 
 			return () => {
+				node.removeEventListener( 'pointerdown', onPointerDown );
 				node.removeEventListener( 'mousedown', onMouseDown );
 			};
 		},

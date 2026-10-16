@@ -6,8 +6,10 @@ import {
 	userPermissions,
 	autosaves,
 	currentUser,
-	syncUndoManagerState,
+	undoManagerReference,
 	undoManager,
+	fieldsConfigs,
+	entityActionsConfigs,
 } from '../reducer';
 
 describe( 'entities', () => {
@@ -539,33 +541,109 @@ describe( 'undoManager', () => {
 	} );
 } );
 
-describe( 'syncUndoManagerState', () => {
-	it( 'stores sync undo manager availability', () => {
-		const state = syncUndoManagerState( undefined, {
-			type: 'SYNC_UNDO_MANAGER_CHANGE',
-			hasRedo: false,
-			hasUndo: true,
+describe( 'undoManagerReference', () => {
+	it( 'changes when the entity sync manager records an undo level', () => {
+		const originalState = undoManagerReference( undefined, {} );
+
+		expect(
+			undoManagerReference( originalState, {
+				type: 'EDIT_ENTITY_RECORD',
+			} )
+		).toBe( originalState );
+		expect(
+			undoManagerReference( originalState, {
+				type: 'RECORD_SYNC_UNDO_LEVEL',
+			} )
+		).not.toBe( originalState );
+	} );
+} );
+
+describe( 'fieldsConfigs', () => {
+	it( 'returns an empty object by default', () => {
+		expect( fieldsConfigs( undefined, {} ) ).toEqual( {} );
+	} );
+
+	it( 'keys the received configs by kind, then name', () => {
+		const pageConfig = { kind: 'postType', name: 'page', fields: [] };
+		const postConfig = { kind: 'postType', name: 'post', fields: [] };
+		const state = deepFreeze( {
+			postType: { page: pageConfig },
 		} );
 
-		expect( state ).toEqual( {
-			hasRedo: false,
-			hasUndo: true,
+		expect(
+			fieldsConfigs( state, {
+				type: 'RECEIVE_FIELDS_CONFIG',
+				kind: 'postType',
+				name: 'post',
+				config: postConfig,
+			} )
+		).toEqual( {
+			postType: { page: pageConfig, post: postConfig },
 		} );
 	} );
 
-	it( 'updates sync undo manager availability', () => {
-		const state = syncUndoManagerState(
-			{ hasRedo: false, hasUndo: true },
+	it( 'keeps entities whose kind and name join into the same string apart', () => {
+		const state = fieldsConfigs(
+			fieldsConfigs( undefined, {
+				type: 'RECEIVE_FIELDS_CONFIG',
+				kind: 'a/b',
+				name: 'c',
+				config: { fields: [ { id: 'first' } ] },
+			} ),
 			{
-				type: 'SYNC_UNDO_MANAGER_CHANGE',
-				hasRedo: true,
-				hasUndo: false,
+				type: 'RECEIVE_FIELDS_CONFIG',
+				kind: 'a',
+				name: 'b/c',
+				config: { fields: [ { id: 'second' } ] },
 			}
 		);
 
-		expect( state ).toEqual( {
-			hasRedo: true,
-			hasUndo: false,
+		expect( state[ 'a/b' ].c.fields ).toEqual( [ { id: 'first' } ] );
+		expect( state.a[ 'b/c' ].fields ).toEqual( [ { id: 'second' } ] );
+	} );
+} );
+
+describe( 'entityActionsConfigs', () => {
+	it( 'returns an empty object by default', () => {
+		expect( entityActionsConfigs( undefined, {} ) ).toEqual( {} );
+	} );
+
+	it( 'keys the received configs by kind, then name', () => {
+		const pageConfig = { kind: 'postType', name: 'page', actions: [] };
+		const postConfig = { kind: 'postType', name: 'post', actions: [] };
+		const state = deepFreeze( {
+			postType: { page: pageConfig },
 		} );
+
+		expect(
+			entityActionsConfigs( state, {
+				type: 'RECEIVE_ENTITY_ACTIONS_CONFIG',
+				kind: 'postType',
+				name: 'post',
+				config: postConfig,
+			} )
+		).toEqual( {
+			postType: { page: pageConfig, post: postConfig },
+		} );
+	} );
+
+	it( 'keeps entities whose kind and name join into the same string apart', () => {
+		const state = entityActionsConfigs(
+			entityActionsConfigs( undefined, {
+				type: 'RECEIVE_ENTITY_ACTIONS_CONFIG',
+				kind: 'a/b',
+				name: 'c',
+				config: { actions: [ { id: 'first' } ] },
+			} ),
+			{
+				type: 'RECEIVE_ENTITY_ACTIONS_CONFIG',
+				kind: 'a',
+				name: 'b/c',
+				config: { actions: [ { id: 'second' } ] },
+			}
+		);
+
+		expect( state[ 'a/b' ].c.actions ).toEqual( [ { id: 'first' } ] );
+		expect( state.a[ 'b/c' ].actions ).toEqual( [ { id: 'second' } ] );
 	} );
 } );

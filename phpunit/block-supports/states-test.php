@@ -146,6 +146,147 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a state escaping a text clip stops the inherited gradient painting.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_adds_background_image_reset_when_a_state_escapes_a_text_clip() {
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'background-clip' => 'border-box' ),
+			array( 'background' => array( 'backgroundClip' => 'border-box' ) ),
+			array( 'background' => array( 'backgroundClip' => 'text' ) )
+		);
+
+		$this->assertSame(
+			array(
+				'background-clip'  => 'border-box',
+				'background-image' => 'unset',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that a background the state paints itself is kept.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_no_background_image_reset_when_the_state_paints_its_own_background() {
+		$state_style = array(
+			'background' => array(
+				'backgroundClip' => 'padding-box',
+				'gradient'       => 'linear-gradient(135deg, #ff0000, #0000ff)',
+			),
+		);
+
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'background-clip' => 'padding-box' ),
+			$state_style,
+			array( 'background' => array( 'backgroundClip' => 'text' ) )
+		);
+
+		$this->assertSame( array( 'background-clip' => 'padding-box' ), $actual );
+	}
+
+	/**
+	 * Tests that a box clip is left alone when nothing above it clips to text.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_no_background_image_reset_without_an_inherited_text_clip() {
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'background-clip' => 'padding-box' ),
+			array( 'background' => array( 'backgroundClip' => 'padding-box' ) ),
+			array( 'background' => array( 'backgroundImage' => array( 'url' => 'image.png' ) ) )
+		);
+
+		$this->assertSame( array( 'background-clip' => 'padding-box' ), $actual );
+	}
+
+	/**
+	 * Tests that a text color set under a text clip is painted.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_adds_text_fill_reset_for_a_text_color_under_a_text_clip() {
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'color' => '#ff0000' ),
+			array( 'color' => array( 'text' => '#ff0000' ) ),
+			array( 'background' => array( 'backgroundClip' => 'text' ) )
+		);
+
+		$this->assertSame(
+			array(
+				'color'                   => '#ff0000',
+				'-webkit-text-fill-color' => 'currentColor',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that a text color is painted under a text clip from global styles,
+	 * which the block's own styles do not show.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_adds_text_fill_reset_for_a_text_color_without_a_known_text_clip() {
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'color' => '#ff0000' ),
+			array( 'color' => array( 'text' => '#ff0000' ) ),
+			array()
+		);
+
+		$this->assertSame(
+			array(
+				'color'                   => '#ff0000',
+				'-webkit-text-fill-color' => 'currentColor',
+			),
+			$actual
+		);
+	}
+
+	/**
+	 * Tests that the fill is left alone when the state paints its own gradient.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_no_text_fill_reset_when_the_state_paints_its_own_gradient() {
+		$state_style = array(
+			'color'      => array( 'text' => '#ff0000' ),
+			'background' => array( 'gradient' => 'linear-gradient(135deg, #ff0000, #0000ff)' ),
+		);
+
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'color' => '#ff0000' ),
+			$state_style,
+			array( 'background' => array( 'backgroundClip' => 'text' ) )
+		);
+
+		$this->assertSame( array( 'color' => '#ff0000' ), $actual );
+	}
+
+	/**
+	 * Tests that the fill is left to the style engine when the state sets its own clip.
+	 *
+	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 */
+	public function test_no_text_fill_reset_when_the_state_sets_its_own_clip() {
+		$state_style = array(
+			'color'      => array( 'text' => '#ff0000' ),
+			'background' => array( 'backgroundClip' => 'text' ),
+		);
+
+		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
+			array( 'color' => '#ff0000' ),
+			$state_style,
+			array( 'background' => array( 'backgroundClip' => 'text' ) )
+		);
+
+		$this->assertSame( array( 'color' => '#ff0000' ), $actual );
+	}
+
+	/**
 	 * Tests that background-image reset is not added when the state also sets a legacy gradient.
 	 *
 	 * @covers ::gutenberg_get_state_declarations_with_background_resets
@@ -331,6 +472,179 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$this->assertSame(
 			'.wp-states-test:not(.foo, .bar) .inner:hover, .wp-states-test .fallback:hover',
 			$actual
+		);
+	}
+
+	/**
+	 * Tests that a leading compound naming a different block is kept as an
+	 * ancestor, and the instance class goes on the block's own compound.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 * @covers ::gutenberg_get_state_selector_ancestor
+	 *
+	 * @dataProvider data_build_state_selector_with_block_name
+	 *
+	 * @param string $block_name     Block name.
+	 * @param string $block_selector Block or feature selector.
+	 * @param string $expected       Expected scoped selector.
+	 */
+	public function test_build_state_selector_with_block_name( $block_name, $block_selector, $expected ) {
+		$this->assertSame(
+			$expected,
+			gutenberg_build_state_selector( '.wp-states-test', $block_selector, ':hover', $block_name )
+		);
+	}
+
+	/**
+	 * Tests that the selectors registered by core blocks scope to their own element.
+	 *
+	 * The cases above pass selectors as literals, so a change to a block's
+	 * `block.json` would not reach them. This one reads what the block actually
+	 * registers, and fails if a selector changes into a shape the scoping does
+	 * not handle.
+	 *
+	 * @covers ::gutenberg_build_state_selector
+	 * @covers ::gutenberg_get_state_selector_ancestor
+	 *
+	 * @dataProvider data_registered_block_selectors_scope_to_their_own_element
+	 *
+	 * @param string $block_name Block name.
+	 * @param string $feature    Key in the block's `selectors` metadata.
+	 */
+	public function test_registered_block_selectors_scope_to_their_own_element( $block_name, $feature ) {
+		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
+
+		if ( ! $block_type || empty( $block_type->selectors[ $feature ] ) ) {
+			$this->markTestSkipped( "$block_name does not register a '$feature' selector." );
+		}
+
+		$scoped = gutenberg_build_state_selector(
+			'.wp-states-test',
+			$block_type->selectors[ $feature ],
+			':hover',
+			$block_name
+		);
+
+		/*
+		 * The instance class sits on the block's own element, so the state
+		 * selector has to end on that class rather than describe a descendant
+		 * of it.
+		 */
+		$this->assertStringEndsWith(
+			'.wp-states-test:hover',
+			$scoped,
+			"The scoped '$feature' selector for $block_name does not land on the block's own element."
+		);
+	}
+
+	/**
+	 * Data provider for test_registered_block_selectors_scope_to_their_own_element().
+	 *
+	 * @return array<string, array<string, string>>
+	 */
+	public function data_registered_block_selectors_scope_to_their_own_element() {
+		// Only selectors that target the block's own element belong here. A
+		// feature selector for a descendant, such as a link inside the block,
+		// ends on that descendant by design.
+		return array(
+			'list item root'   => array(
+				'block_name' => 'core/list-item',
+				'feature'    => 'root',
+			),
+			'list item border' => array(
+				'block_name' => 'core/list-item',
+				'feature'    => 'border',
+			),
+		);
+	}
+
+	/**
+	 * Data provider for test_build_state_selector_with_block_name().
+	 *
+	 * @return array<string, array<string, string>>
+	 */
+	public function data_build_state_selector_with_block_name(): array {
+		return array(
+			'own class'                              => array(
+				'block_name'     => 'core/paragraph',
+				'block_selector' => '.wp-block-paragraph',
+				'expected'       => '.wp-states-test:hover',
+			),
+			'tag name'                               => array(
+				'block_name'     => 'core/paragraph',
+				'block_selector' => 'p',
+				'expected'       => '.wp-states-test:hover',
+			),
+			'own class with modifier'                => array(
+				'block_name'     => 'core/x',
+				'block_selector' => '.wp-block-x.is-style-y',
+				'expected'       => '.wp-states-test.is-style-y:hover',
+			),
+			'own class with descendant'              => array(
+				'block_name'     => 'core/search',
+				'block_selector' => '.wp-block-search .wp-block-search__input',
+				'expected'       => '.wp-states-test .wp-block-search__input:hover',
+			),
+			'ancestor block with child combinator'   => array(
+				'block_name'     => 'core/list-item',
+				'block_selector' => '.wp-block-list > li',
+				'expected'       => '.wp-block-list > .wp-states-test:hover',
+			),
+			'ancestor block with :not()'             => array(
+				'block_name'     => 'core/list-item',
+				'block_selector' => '.wp-block-list:not(.wp-block-list .wp-block-list) > li',
+				'expected'       => '.wp-block-list:not(.wp-block-list .wp-block-list) > .wp-states-test:hover',
+			),
+			'ancestor block with element descendant' => array(
+				'block_name'     => 'core/list-item',
+				'block_selector' => '.wp-block-list > li a',
+				'expected'       => '.wp-block-list > .wp-states-test a:hover',
+			),
+			'other block with nested block element'  => array(
+				'block_name'     => 'test/state-button',
+				'block_selector' => '.wp-block-button .wp-block-button__link',
+				'expected'       => '.wp-states-test .wp-block-button__link:hover',
+			),
+			'selector list'                          => array(
+				'block_name'     => 'core/list-item',
+				'block_selector' => '.wp-block-list > li, .wp-block-list-item .inner',
+				'expected'       => '.wp-block-list > .wp-states-test:hover, .wp-states-test .inner:hover',
+			),
+		);
+	}
+
+	/**
+	 * Tests that a List Item responsive value is scoped to the `li` itself.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_responsive_state_scopes_ancestor_root_selector_to_block_wrapper() {
+		$this->ensure_block_registered(
+			'core/list-item',
+			array( 'root' => '.wp-block-list > li' )
+		);
+
+		$block = array(
+			'blockName' => 'core/list-item',
+			'attrs'     => array(
+				'style' => array(
+					'@mobile' => array(
+						'color' => array(
+							'background' => '#ff00d0',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( '<li>Item</li>', $block );
+
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.wp-block-list > .' . $matches[0] . '{background-color:#ff00d0 !important;background-image:unset !important;}}',
+			$actual_stylesheet
 		);
 	}
 
@@ -897,7 +1211,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 
 		$this->assertStringContainsString(
-			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;}}',
+			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;-webkit-text-fill-color:currentColor !important;}}',
 			$actual_stylesheet
 		);
 	}
@@ -938,38 +1252,6 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 
 		$this->assertStringContainsString(
 			'@media (width <= 480px){.' . $matches[0] . '{text-align:right !important;}}',
-			$actual_stylesheet
-		);
-	}
-
-	public function test_legacy_responsive_root_state_generates_media_query_scoped_css() {
-		$this->ensure_block_registered( 'core/paragraph' );
-
-		$block_content = '<p class="wp-block-paragraph">Hello</p>';
-		$block         = array(
-			'blockName' => 'core/paragraph',
-			'attrs'     => array(
-				'style' => array(
-					'mobile' => array(
-						'color' => array(
-							'text' => '#ff0000',
-						),
-					),
-				),
-			),
-		);
-
-		$actual = gutenberg_render_block_states_support( $block_content, $block );
-
-		$this->assertMatchesRegularExpression(
-			'/^<p class="wp-block-paragraph (wp-states-[a-f0-9]{8})">Hello<\/p>$/',
-			$actual
-		);
-		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
-		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
-
-		$this->assertStringContainsString(
-			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;}}',
 			$actual_stylesheet
 		);
 	}
@@ -1208,60 +1490,6 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 				'@media (width <= 480px){.' . $container_class . ' > *{margin-block-start:0;margin-block-end:0;}}',
 				$actual_stylesheet
 			);
-			$this->assertStringContainsString(
-				'@media (width <= 480px){.' . $container_class . ' > * + *{margin-block-start:12px;margin-block-end:0;}}',
-				$actual_stylesheet
-			);
-		} finally {
-			remove_theme_support( 'appearance-tools' );
-			WP_Theme_JSON_Resolver::clean_cached_data();
-		}
-	}
-
-	public function test_legacy_responsive_block_gap_state_generates_layout_spacing_css() {
-		$this->ensure_block_registered(
-			'test/legacy-responsive-flow-layout-state',
-			array(),
-			array(
-				'layout'  => array(
-					'default' => array(
-						'type' => 'default',
-					),
-				),
-				'spacing' => array(
-					'blockGap' => true,
-				),
-			)
-		);
-
-		add_theme_support( 'appearance-tools' );
-		WP_Theme_JSON_Resolver::clean_cached_data();
-
-		try {
-			$block_content = '<div class="wp-block-test"><p>One</p><p>Two</p></div>';
-			$block         = array(
-				'blockName'    => 'test/legacy-responsive-flow-layout-state',
-				'innerContent' => array( '<div class="wp-block-test">', null, '</div>' ),
-				'attrs'        => array(
-					'layout' => array(
-						'type' => 'default',
-					),
-					'style'  => array(
-						'mobile' => array(
-							'spacing' => array(
-								'blockGap' => '12px',
-							),
-						),
-					),
-				),
-			);
-
-			$actual = gutenberg_render_layout_support_flag( $block_content, $block );
-			preg_match( '/wp-container-test-legacy-responsive-flow-layout-state-is-layout-[a-f0-9]{8}/', $actual, $matches );
-			$this->assertNotEmpty( $matches, "wp-container class missing in: $actual" );
-			$container_class   = $matches[0];
-			$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
-
 			$this->assertStringContainsString(
 				'@media (width <= 480px){.' . $container_class . ' > * + *{margin-block-start:12px;margin-block-end:0;}}',
 				$actual_stylesheet

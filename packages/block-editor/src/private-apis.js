@@ -13,7 +13,9 @@ import {
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
+import { PrivateBlockInspectorEditOriginal } from './components/block-inspector/edit-original-slot-fill';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
+import { showPlaceholderKey as blockToolbarShowPlaceholderKey } from './components/block-toolbar';
 import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
 import { isDefaultBlockStyleState } from './hooks/block-style-state';
 import BlockQuickNavigation from './components/block-quick-navigation';
@@ -54,7 +56,6 @@ import {
 	openMediaEditorModalKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
-import { PrivateRichText } from './components/rich-text/';
 import { PrivateBlockPopover } from './components/block-popover';
 import { PrivateInserterLibrary } from './components/inserter/library';
 import { PrivatePublishDateTimePicker } from './components/publish-date-time-picker';
@@ -83,11 +84,12 @@ import { isElementVisible } from './utils/dom';
 const { getDuotoneFilter } = unlock( globalStylesEnginePrivateApis );
 
 /**
- * Private @wordpress/block-editor APIs.
+ * Private `@wordpress/block-editor` APIs.
  */
 export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
+	PrivateBlockInspectorEditOriginal,
 	ExperimentalBlockCanvas,
 	BlockCanvasCover,
 	ExperimentalBlockEditorProvider,
@@ -100,6 +102,7 @@ lock( privateApis, {
 	ResizableBoxPopover,
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
+	blockToolbarShowPlaceholderKey,
 	cleanEmptyObject,
 	isDefaultBlockStyleState,
 	usePrivateStyleOverride,
@@ -121,7 +124,6 @@ lock( privateApis, {
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
 	requiresWrapperOnCopy,
-	PrivateRichText,
 	PrivateInserterLibrary,
 	reusableBlocksSelectKey,
 	userPatternCategoriesSelectKey,

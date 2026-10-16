@@ -3,13 +3,12 @@ import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
-import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
-	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	taxonomySyncConfig,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -301,26 +300,6 @@ export const prePersistPostType = async (
 		}
 	}
 
-	// Add meta for the persisted CRDT document during real post saves so the
-	// saved post and CRDT snapshot are committed in the same request. We don't
-	// want a post save to fail but a CRDT update to succeed or vice versa.
-	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
-	if ( window.__experimentalEnableRealTimeCollaboration && persistedRecord ) {
-		const objectType = `postType/${ name }`;
-		const objectId = persistedRecord.id;
-		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
-			objectType,
-			objectId
-		);
-
-		if ( serializedDoc ) {
-			newEdits.meta = {
-				...edits.meta,
-				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
-			};
-		}
-	}
-
 	return newEdits;
 };
 
@@ -495,7 +474,7 @@ async function loadTaxonomyEntities() {
 		};
 
 		if ( window.__experimentalEnableRealTimeCollaboration ) {
-			entity.syncConfig = defaultSyncConfig;
+			entity.syncConfig = taxonomySyncConfig;
 		}
 
 		return entity;

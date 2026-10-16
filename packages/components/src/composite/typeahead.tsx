@@ -7,7 +7,7 @@ import type { CompositeTypeaheadProps } from './types';
 export const CompositeTypeahead = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeTypeaheadProps, 'div', false >
->( function CompositeTypeahead( props, ref ) {
+>( function UnforwardedCompositeTypeahead( props, ref ) {
 	const context = useCompositeContext();
 
 	// @ts-expect-error The store prop is undocumented and only used by the

@@ -126,11 +126,12 @@ Block breadcrumb component, displaying the hierarchy of the current block select
 _Parameters_
 
 - _props_ `Object`: Component props.
-- _props.rootLabelText_ `string`: Translated label for the root element of the breadcrumb trail.
+- _props.rootLabelText_ `[string]`: Translated label for the root element of the breadcrumb trail.
+- _props.className_ `[string]`: Additional class name for the breadcrumb navigation.
 
 _Returns_
 
-- `Element`: Block Breadcrumb.
+- `React.JSX.Element`: Block Breadcrumb.
 
 ### BlockCanvas
 
@@ -430,6 +431,18 @@ _Returns_
 _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/font-sizes/README.md>
+
+### getBackgroundClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's background support attributes.
+
+_Parameters_
+
+- _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+- `Object`: Background block support derived CSS classes & styles.
 
 ### getColorClassName
 
@@ -871,7 +884,7 @@ _Returns_
 
 ### privateApis
 
-Private @wordpress/block-editor APIs.
+Private `@wordpress/block-editor` APIs.
 
 ### RecursionProvider
 
@@ -1033,6 +1046,20 @@ _Related_
 
 - <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
 
+### useBackgroundProps
+
+Derives the background related props for a block from its background block support attributes.
+
+Prefer this in edit components so editor settings can be resolved later without a new API.
+
+_Parameters_
+
+- _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+- `Object`: ClassName & style props from background block support.
+
 ### useBlockBindingsUtils
 
 Retrieves the existing utils needed to update the block `bindings` metadata. They can be used to create, modify, or remove connections from the existing block attributes.
@@ -1099,7 +1126,7 @@ _Parameters_
 
 _Returns_
 
-- `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
+- `?BlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
 
 ### useBlockEditContext
 

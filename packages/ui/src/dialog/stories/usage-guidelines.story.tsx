@@ -29,7 +29,7 @@ export const DialogForFocusedTask: Story = {
 			<Dialog.Popup size="small">
 				<Dialog.Header>
 					<Dialog.Title>Add tax rate</Dialog.Title>
-					<Dialog.CloseIcon />
+					<Dialog.CloseIconButton />
 				</Dialog.Header>
 				<Dialog.Content>
 					<Stack direction="column" gap="sm">
@@ -85,7 +85,7 @@ export const DrawerForContextualEditing: Story = {
 			<Drawer.Popup size="medium">
 				<Drawer.Header>
 					<Drawer.Title>Order details</Drawer.Title>
-					<Drawer.CloseIcon />
+					<Drawer.CloseIconButton />
 				</Drawer.Header>
 				<Drawer.Content>
 					<Stack direction="column" gap="md">

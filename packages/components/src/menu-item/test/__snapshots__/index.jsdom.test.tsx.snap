@@ -31,7 +31,6 @@ exports[`MenuItem > should match snapshot when all props provided 1`] = `
   >
     <path
       d="M4 10H20M4 14H8M10 14H14M16 14H20"
-      vector-effect="non-scaling-stroke"
     />
   </svg>
 </button>
@@ -94,7 +93,6 @@ exports[`MenuItem > should match snapshot when isSelected and role are optionall
   >
     <path
       d="M4 10H20M4 14H8M10 14H14M16 14H20"
-      vector-effect="non-scaling-stroke"
     />
   </svg>
 </button>
