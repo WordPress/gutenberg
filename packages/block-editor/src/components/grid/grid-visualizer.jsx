@@ -914,6 +914,15 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 		}
 
 		function onPointerMove( event ) {
+			// When a pointer is pressed while the browser thinks one of its
+			// buttons is already down, the press comes as a move with the
+			// button that changed, and not as a `pointerdown`. WebKit does
+			// that for the first press after a drag that started outside
+			// the canvas, such as from a drag handle.
+			if ( ! drag && event.button === 0 && event.buttons === 1 ) {
+				onPointerDown( event );
+				return;
+			}
 			if (
 				! drag ||
 				drag.isCancelled ||
