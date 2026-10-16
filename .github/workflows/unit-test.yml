@@ -71,6 +71,10 @@ jobs:
 
     env:
       LOCAL_PHP: ${{ matrix.php }}-fpm
+      # The WordPress 5.6 test library refuses PHPUnit 8 and newer, which the
+      # `wordpressdevelop/phpunit` image ships for PHP 8.0. PHP 7.2 and newer
+      # run the Composer-installed PHPUnit 7.5 instead.
+      PHPUNIT: ${{ ( matrix.php == '5.6' || matrix.php == '7.0' ) && 'phpunit' || 'php /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit' }}
 
     strategy:
       fail-fast: false
@@ -109,13 +113,17 @@ jobs:
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 
+    # `phpunit/bootstrap.php` needs `vendor/autoload.php`, which the `pretest-unit-php` npm scripts used to install.
+    - name: Install Composer dependencies
+      run: npm run wp-env run composer 'install --no-interaction'
+
     - name: Running the tests
       if: ${{ ! matrix.multisite }}
-      run: npm run test-unit-php
+      run: npm run wp-env run phpunit "$PHPUNIT -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose"
 
     - name: Running the tests (multisite)
       if: ${{ matrix.multisite }}
-      run: npm run test-unit-php-multisite
+      run: npm run wp-env run phpunit "WP_MULTISITE=1 $PHPUNIT -c /var/www/html/wp-content/plugins/gutenberg/phpunit/multisite.xml --verbose"
 
   phpcs:
     name: PHP coding standards
