@@ -96,6 +96,12 @@
 		display: flex;
 	}
 
+	// Clear floats to not push the block out of its position.
+	&.alignwide,
+	&.alignfull {
+		clear: both;
+	}
+
 	.wp-block-cover__inner-container {
 		position: relative; // Needed for the inner container to be positioned above other elements with absolute positioning.
 		width: 100%;
