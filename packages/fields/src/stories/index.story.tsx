@@ -1,40 +1,8 @@
 import { useState } from '@wordpress/element';
 import type { Field, View, Form } from '@wordpress/dataviews';
 import { DataForm, DataViews } from '@wordpress/dataviews';
-import { authorField, orderField } from '../fields';
-import type { BasePost, BasePostWithEmbeddedAuthor } from '../types';
-
-// Mock users for the story.
-const mockUsers = [
-	{
-		id: 1,
-		name: 'John Doe',
-		avatar_urls: {
-			'24': 'https://gravatar.com/avatar?d=retro&s=24',
-			'48': 'https://gravatar.com/avatar?d=retro&s=48',
-			'96': 'https://gravatar.com/avatar?d=retro&s=96',
-		},
-	},
-	{
-		id: 2,
-		name: 'Jane Smith',
-		avatar_urls: {
-			'24': 'https://gravatar.com/avatar/2?d=retro&s=24',
-			'48': 'https://gravatar.com/avatar/2?d=retro&s=48',
-			'96': 'https://gravatar.com/avatar/2?d=retro&s=96',
-		},
-	},
-];
-
-// Override author field with mock getElements for Storybook.
-const authorFieldForStory: Field< any > = {
-	...authorField,
-	getElements: async () =>
-		mockUsers.map( ( { id, name } ) => ( {
-			value: id,
-			label: name,
-		} ) ),
-};
+import { orderField } from '../fields';
+import type { BasePost } from '../types';
 
 export default {
 	id: 'fields-base-fields',
@@ -65,20 +33,13 @@ const sampleBasePost: BasePost = {
 	template: 'single',
 };
 
-const samplePostWithAuthor: BasePostWithEmbeddedAuthor = {
-	...sampleBasePost,
-	_embedded: {
-		author: [ { ...mockUsers[ 0 ] } ],
-	},
-};
-
 // Create a showcase of all base fields.
-const showcaseFields: Field< any >[] = [ authorFieldForStory, orderField ];
+const showcaseFields: Field< any >[] = [ orderField ];
 
 const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
-	const [ data, setData ] = useState( samplePostWithAuthor );
+	const [ data, setData ] = useState( sampleBasePost );
 
-	const handleChange = ( updates: Partial< BasePostWithEmbeddedAuthor > ) => {
+	const handleChange = ( updates: Partial< BasePost > ) => {
 		setData( ( prev ) => ( { ...prev, ...updates } ) );
 	};
 
@@ -87,7 +48,7 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 		layout: {
 			type,
 		},
-		fields: [ 'author', 'menu_order' ],
+		fields: [ 'menu_order' ],
 	};
 
 	return (
@@ -130,7 +91,7 @@ export const DataViewsPreview = () => {
 		descriptionField: undefined,
 		mediaField: undefined,
 	} );
-	const [ data ] = useState( [ samplePostWithAuthor ] );
+	const [ data ] = useState( [ sampleBasePost ] );
 
 	const paginationInfo = {
 		totalItems: 1,
