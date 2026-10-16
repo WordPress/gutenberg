@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -30,8 +31,8 @@ const variations = [
 describe( 'BlockVariationTransforms', () => {
 	beforeEach( () => {
 		updateBlockAttributes.mockReset();
-		useDispatch.mockReturnValue( { updateBlockAttributes } );
-		useSelect.mockReturnValue( {
+		( useDispatch as Mock ).mockReturnValue( { updateBlockAttributes } );
+		( useSelect as Mock ).mockReturnValue( {
 			activeBlockVariation: variations[ 0 ],
 			variations,
 			canEdit: true,
@@ -60,7 +61,7 @@ describe( 'BlockVariationTransforms', () => {
 
 	it( 'reflects a variation that becomes active after the first render', async () => {
 		const user = userEvent.setup();
-		useSelect.mockReturnValue( {
+		( useSelect as Mock ).mockReturnValue( {
 			activeBlockVariation: undefined,
 			variations,
 			canEdit: true,
@@ -79,7 +80,7 @@ describe( 'BlockVariationTransforms', () => {
 		} );
 		expect( plainVariation ).not.toBeChecked();
 
-		useSelect.mockReturnValue( {
+		( useSelect as Mock ).mockReturnValue( {
 			activeBlockVariation: variations[ 0 ],
 			variations,
 			canEdit: true,
