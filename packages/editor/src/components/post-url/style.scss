@@ -22,7 +22,6 @@
 .editor-post-url__front-page-link {
 	// Match padding on tertiary buttons for alignment.
 	padding: $grid-unit-15 * 0.5 $grid-unit-15;
-	border-radius: $radius-small;
 	color: var(--wp-admin-theme-color);
 
 	&:hover {
@@ -31,9 +30,7 @@
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		color: var(--wp-admin-theme-color);
-		outline: 3px solid #0000;
 	}
 }
 
@@ -46,12 +43,6 @@
 // there is no way currently to control the padding when adding prefix/suffix.
 .editor-post-url__input input.components-input-control__input {
 	padding-inline-start: 0 !important;
-}
-
-.editor-post-url__panel-toggle,
-.editor-post-parent__panel-toggle {
-	word-break: normal;
-	overflow-wrap: anywhere;
 }
 
 .editor-post-url__intro {
