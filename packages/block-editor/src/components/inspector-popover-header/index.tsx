@@ -7,13 +7,14 @@ import {
 import { closeSmall } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { Text } from '@wordpress/ui';
+import type { InspectorPopoverHeaderProps } from './types';
 
 export default function InspectorPopoverHeader( {
 	title,
 	help,
 	actions = [],
 	onClose,
-} ) {
+}: InspectorPopoverHeaderProps ) {
 	return (
 		<VStack className="block-editor-inspector-popover-header" spacing={ 4 }>
 			<HStack alignment="center">
@@ -32,7 +33,10 @@ export default function InspectorPopoverHeader( {
 						className="block-editor-inspector-popover-header__action"
 						label={ label }
 						icon={ icon }
-						variant={ ! icon && 'tertiary' }
+						// `false` keeps the default variant.
+						variant={
+							( ! icon && 'tertiary' ) as 'tertiary' | undefined
+						}
 						onClick={ onClick }
 					>
 						{ ! icon && label }
