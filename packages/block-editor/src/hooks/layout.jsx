@@ -11,11 +11,12 @@ import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
-	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
+	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	ToggleControl,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { group, row, stack, grid } from '@wordpress/icons';
 import { kebabCase } from '@wordpress/kebab-case';
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
@@ -38,6 +39,13 @@ import {
 } from './block-style-state';
 
 const VARIATION_PREFIX = 'is-style-';
+
+const LAYOUT_TYPE_ICONS = {
+	default: stack,
+	flex: row,
+	constrained: group,
+	grid,
+};
 
 const layoutBlockSupportKey = 'layout';
 const CHILD_LAYOUT_KEYS = [
@@ -646,9 +654,10 @@ function LayoutTypeSwitcher( { type, onChange } ) {
 		>
 			{ getLayoutTypes().map( ( { name, label } ) => {
 				return (
-					<ToggleGroupControlOption
+					<ToggleGroupControlOptionIcon
 						key={ name }
 						value={ name }
+						icon={ LAYOUT_TYPE_ICONS[ name ] }
 						label={ label }
 					/>
 				);
