@@ -14,7 +14,7 @@
 -   Video: Don't autoplay on the front end when the visitor prefers reduced motion ([#84308](https://github.com/WordPress/gutenberg/pull/84308)).
 -   Cover: Stop an uploaded background video on the front end when the visitor prefers reduced motion ([#83853](https://github.com/WordPress/gutenberg/pull/83853)).
 -   Image: Animate touch-swipe navigation in the gallery lightbox so the image follows the finger and slides off on commit, with a quick fade-in for the next image ([#79114](https://github.com/WordPress/gutenberg/pull/79114)).
--   Button: Add custom CSS classes to the link from the link settings, so theme button classes such as `.btn` can style it ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   Button: Add custom CSS classes to the link from the link settings, so theme button classes such as `.btn` can style it ([#84891](https://github.com/WordPress/gutenberg/pull/84891)).
 
 ### Bug Fixes
 
