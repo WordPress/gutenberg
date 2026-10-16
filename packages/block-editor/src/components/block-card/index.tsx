@@ -14,8 +14,12 @@ import { getBlockType } from '@wordpress/blocks';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
+import type { BlockCardProps, OptionalParentSelectButtonProps } from './types';
 
-function OptionalParentSelectButton( { children, onClick } ) {
+function OptionalParentSelectButton( {
+	children,
+	onClick,
+}: OptionalParentSelectButtonProps ) {
 	if ( ! onClick ) {
 		return children;
 	}
@@ -51,20 +55,20 @@ function OptionalParentSelectButton( { children, onClick } ) {
  * }
  * ```
  *
- * @param {Object}        props                         Component props.
- * @param {string}        props.title                   The title of the block.
- * @param {string|Object} props.icon                    The icon of the block. This can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
- * @param {string}        props.description             The description of the block.
- * @param {Object}        [props.blockType]             Deprecated: Object containing block type data.
- * @param {string}        [props.className]             Additional classes to apply to the card.
- * @param {string}        [props.name]                  Custom block name to display before the title.
- * @param {string}        [props.allowParentNavigation] Show a back arrow to the parent block in some situations.
- * @param {string}        [props.parentClientId]        The parent clientId, if this card is for a parent block.
- * @param {string}        [props.isChild]               Whether the block card is for a child block, in which case, indent the block using an arrow.
- * @param {string}        [props.clientId]              Whether the block card is for a child block, in which case, indent the block using an arrow.
- * @param {Element}       [props.controls]              Controls rendered beside the block title.
- * @param {Element}       [props.children]              Children.
- * @return {Element}                        Block card component.
+ * @param props                       Component props.
+ * @param props.title                 The title of the block.
+ * @param props.icon                  The icon of the block. This can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/), or a custom `svg` element.
+ * @param props.description           The description of the block.
+ * @param props.blockType             Deprecated: Object containing block type data.
+ * @param props.className             Additional classes to apply to the card.
+ * @param props.name                  Custom block name to display before the title.
+ * @param props.allowParentNavigation Show a back arrow to the parent block in some situations.
+ * @param props.parentClientId        The parent clientId, if this card is for a parent block.
+ * @param props.isChild               Whether the block card is for a child block, in which case, indent the block using an arrow.
+ * @param props.clientId              Whether the block card is for a child block, in which case, indent the block using an arrow.
+ * @param props.controls              Controls rendered beside the block title.
+ * @param props.children              Children.
+ * @return Block card component.
  */
 function BlockCard( {
 	title,
@@ -79,7 +83,7 @@ function BlockCard( {
 	children,
 	clientId,
 	controls,
-} ) {
+}: BlockCardProps ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
 			since: '5.7',
@@ -97,8 +101,9 @@ function BlockCard( {
 				unlock( select( blockEditorStore ) );
 
 			// Find the top-most parent block that participates in List View.
-			const parents = getBlockParents( clientId, false );
-			const foundParentId = parents.find( ( parentId ) =>
+			// Parent navigation is only allowed for a block's card.
+			const parents = getBlockParents( clientId!, false );
+			const foundParentId = parents.find( ( parentId: string ) =>
 				shouldRenderBlockListView( parentId )
 			);
 
@@ -140,8 +145,9 @@ function BlockCard( {
 										? sprintf(
 												/* translators: %s: The name of the parent block. */
 												__( 'Go to "%s" block' ),
+												// A selected parent block is registered.
 												getBlockType( parentBlockName )
-													?.title
+													?.title as string
 											)
 										: __( 'Go to parent block' )
 								}
@@ -179,7 +185,8 @@ function BlockCard( {
 									{ ! parentClientId &&
 										! isChild &&
 										!! name?.length && (
-											<Badge>{ title }</Badge>
+											// A named card has a title.
+											<Badge>{ title as string }</Badge>
 										) }
 								</TitleElement>
 								{ children }
