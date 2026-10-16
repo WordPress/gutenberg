@@ -1,9 +1,11 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useReducer } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import ResolutionTool from '..';
+import type { ResolutionToolProps } from '../types';
 
 export default {
 	id: 'blockeditor-resolutioncontrol',
@@ -21,12 +23,14 @@ export default {
 	},
 	argTypes: {
 		value: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'Currently selected resolution value.',
 			table: { type: { summary: 'string' } },
 		},
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'Handles change in resolution selection.',
 			table: {
@@ -57,6 +61,7 @@ export default {
 			},
 		},
 		panelId: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'ID of the parent tools panel.',
 			table: {
@@ -64,21 +69,34 @@ export default {
 			},
 		},
 	},
+} satisfies Meta< typeof ResolutionTool >;
+
+type StoryArgs = Omit< Partial< ResolutionToolProps >, 'onChange' > & {
+	label?: string;
+	onChange?: ( value?: string ) => void;
 };
 
-export const Default = ( {
+export const Default: StoryFn< StoryArgs > = ( {
 	label,
 	panelId,
 	onChange: onChangeProp,
 	...props
 } ) => {
 	const [ attributes, setAttributes ] = useReducer(
-		( prevState, nextState ) => ( { ...prevState, ...nextState } ),
+		(
+			prevState: Record< string, unknown >,
+			nextState: Record< string, unknown >
+		) => ( { ...prevState, ...nextState } ),
 		{}
 	);
-	const { resolution } = attributes;
-	const resetAll = ( resetFilters = [] ) => {
-		let newAttributes = {};
+	// The story stores the resolution as a string.
+	const { resolution } = attributes as { resolution?: string };
+	const resetAll = (
+		resetFilters: ( (
+			attributes: Record< string, unknown >
+		) => Record< string, unknown > )[] = []
+	) => {
+		let newAttributes: Record< string, unknown > = {};
 
 		resetFilters.forEach( ( resetFilter ) => {
 			newAttributes = {
@@ -88,12 +106,14 @@ export const Default = ( {
 		} );
 
 		setAttributes( newAttributes );
-		onChangeProp( undefined );
+		// Storybook passes the `onChange` action.
+		onChangeProp!( undefined );
 	};
 	return (
 		<Panel>
 			<ToolsPanel
-				label={ label }
+				// The story args set the label.
+				label={ label as string }
 				panelId={ panelId }
 				resetAll={ resetAll }
 			>
@@ -101,7 +121,8 @@ export const Default = ( {
 					panelId={ panelId }
 					onChange={ ( newValue ) => {
 						setAttributes( { resolution: newValue } );
-						onChangeProp( newValue );
+						// Storybook passes the `onChange` action.
+						onChangeProp!( newValue );
 					} }
 					value={ resolution }
 					resetAllFilter={ () => ( {

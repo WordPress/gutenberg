@@ -1,9 +1,11 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import AspectRatioTool from '../aspect-ratio-tool';
+import type { AspectRatioToolProps } from '../types';
 
 export default {
 	id: 'blockeditor-dimensionstool-aspectratiotool',
@@ -14,13 +16,18 @@ export default {
 		panelId: { control: false },
 		onChange: { action: 'changed' },
 	},
-};
+} satisfies Meta< typeof AspectRatioTool >;
 
-export const Default = ( { panelId, onChange: onChangeProp, ...props } ) => {
-	const [ value, setValue ] = useState( undefined );
+export const Default: StoryFn< AspectRatioToolProps > = ( {
+	panelId,
+	onChange: onChangeProp,
+	...props
+} ) => {
+	const [ value, setValue ] = useState< string | undefined >( undefined );
 	const resetAll = () => {
 		setValue( undefined );
-		onChangeProp( undefined );
+		// Storybook passes the `onChange` action.
+		onChangeProp!( undefined );
 	};
 	return (
 		<Panel>
@@ -33,7 +40,8 @@ export const Default = ( { panelId, onChange: onChangeProp, ...props } ) => {
 					panelId={ panelId }
 					onChange={ ( nextValue ) => {
 						setValue( nextValue );
-						onChangeProp( nextValue );
+						// Storybook passes the `onChange` action.
+						onChangeProp!( nextValue );
 					} }
 					value={ value }
 					{ ...props }

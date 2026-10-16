@@ -8,6 +8,7 @@ import {
 import { SelectControl } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import useDimensionHandler from './use-dimension-handler';
+import type { ImageSizeControlProps } from './types';
 
 const IMAGE_SIZE_PRESETS = [ 25, 50, 75, 100 ];
 const noop = () => {};
@@ -15,15 +16,24 @@ const noop = () => {};
 /**
  * Get scaled width and height for the given scale.
  *
- * @param {number} scale       The scale to get the scaled width and height for.
- * @param {number} imageWidth  The image width.
- * @param {number} imageHeight The image height.
+ * @param scale       The scale to get the scaled width and height for.
+ * @param imageWidth  The image width.
+ * @param imageHeight The image height.
  *
- * @return {Object} The scaled width and height.
+ * @return The scaled width and height.
  */
-function getScaledWidthAndHeight( scale, imageWidth, imageHeight ) {
-	const scaledWidth = Math.round( imageWidth * ( scale / 100 ) );
-	const scaledHeight = Math.round( imageHeight * ( scale / 100 ) );
+function getScaledWidthAndHeight(
+	scale: number,
+	imageWidth: number | string | undefined,
+	imageHeight: number | string | undefined
+) {
+	// A string size is coerced and an unknown one scales to `NaN`, as before.
+	const scaledWidth = Math.round(
+		( imageWidth as number ) * ( scale / 100 )
+	);
+	const scaledHeight = Math.round(
+		( imageHeight as number ) * ( scale / 100 )
+	);
 
 	return {
 		scaledWidth,
@@ -42,7 +52,7 @@ export default function ImageSizeControl( {
 	height,
 	onChange,
 	onChangeImage = noop,
-} ) {
+}: ImageSizeControlProps ) {
 	const { currentHeight, currentWidth, updateDimension, updateDimensions } =
 		useDimensionHandler( height, width, imageHeight, imageWidth, onChange );
 
@@ -50,16 +60,17 @@ export default function ImageSizeControl( {
 	 * Updates the dimensions for the given scale.
 	 * Handler for toggle group control change.
 	 *
-	 * @param {number} scale The scale to update the dimensions for.
+	 * @param scale The scale to update the dimensions for.
 	 */
-	const handleUpdateDimensions = ( scale ) => {
+	const handleUpdateDimensions = ( scale?: string | number ) => {
 		if ( undefined === scale ) {
 			updateDimensions();
 			return;
 		}
 
 		const { scaledWidth, scaledHeight } = getScaledWidthAndHeight(
-			scale,
+			// The preset values are numbers.
+			scale as number,
 			imageWidth,
 			imageHeight
 		);
@@ -112,10 +123,17 @@ export default function ImageSizeControl( {
 			) }
 			{ isResizable && (
 				<>
-					<HStack align="baseline" spacing="4">
+					<HStack
+						// @ts-expect-error `HStack` passes `align` on to `Flex`.
+						align="baseline"
+						spacing="4"
+					>
 						<NumberControl
 							label={ __( 'Width' ) }
-							value={ currentWidth }
+							// A `null` size shows an empty field.
+							value={
+								currentWidth as number | string | undefined
+							}
 							min={ 1 }
 							onChange={ ( value ) =>
 								updateDimension( 'width', value )
@@ -123,7 +141,10 @@ export default function ImageSizeControl( {
 						/>
 						<NumberControl
 							label={ __( 'Height' ) }
-							value={ currentHeight }
+							// A `null` size shows an empty field.
+							value={
+								currentHeight as number | string | undefined
+							}
 							min={ 1 }
 							onChange={ ( value ) =>
 								updateDimension( 'height', value )

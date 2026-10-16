@@ -1,8 +1,9 @@
 import { __experimentalToolsPanelItem as ToolsPanelItem } from '@wordpress/components';
 import { SelectControl } from '@wordpress/ui';
 import { __, _x } from '@wordpress/i18n';
+import type { ResolutionOption, ResolutionToolProps } from './types';
 
-const DEFAULT_SIZE_OPTIONS = [
+const DEFAULT_SIZE_OPTIONS: ResolutionOption[] = [
 	{
 		label: _x( 'Thumbnail', 'Image size option for resolution control' ),
 		value: 'thumbnail',
@@ -29,7 +30,7 @@ export default function ResolutionTool( {
 	defaultValue = DEFAULT_SIZE_OPTIONS[ 0 ].value,
 	isShownByDefault = true,
 	resetAllFilter,
-} ) {
+}: ResolutionToolProps ) {
 	const displayValue = value ?? defaultValue;
 	return (
 		<ToolsPanelItem

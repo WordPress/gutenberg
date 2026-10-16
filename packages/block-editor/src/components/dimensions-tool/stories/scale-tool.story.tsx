@@ -1,9 +1,11 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import ScaleTool from '../scale-tool';
+import type { ScaleToolProps } from '../types';
 
 export default {
 	id: 'blockeditor-dimensionstool-scaletool',
@@ -14,10 +16,14 @@ export default {
 		panelId: { control: false },
 		onChange: { action: 'changed' },
 	},
-};
+} satisfies Meta< typeof ScaleTool >;
 
-export const Default = ( { panelId, onChange: onChangeProp, ...props } ) => {
-	const [ value, setValue ] = useState( undefined );
+export const Default: StoryFn< ScaleToolProps > = ( {
+	panelId,
+	onChange: onChangeProp,
+	...props
+} ) => {
+	const [ value, setValue ] = useState< string | undefined >( undefined );
 	const resetAll = () => {
 		setValue( undefined );
 		onChangeProp( undefined );

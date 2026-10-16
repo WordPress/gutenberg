@@ -1,9 +1,11 @@
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import {
 	Panel,
 	__experimentalToolsPanel as ToolsPanel,
 } from '@wordpress/components';
 import DimensionsTool from '..';
+import type { Dimensions, DimensionsToolProps } from '../types';
 
 export default {
 	id: 'blockeditor-dimensionstool-dimensionstool',
@@ -14,15 +16,20 @@ export default {
 		panelId: { control: false },
 		onChange: { action: 'changed' },
 	},
-};
+} satisfies Meta< typeof DimensionsTool >;
 
 const EMPTY_OBJECT = {};
 
-export const Default = ( { panelId, onChange, ...props } ) => {
-	const [ value, setValue ] = useState( EMPTY_OBJECT );
+export const Default: StoryFn< DimensionsToolProps > = ( {
+	panelId,
+	onChange,
+	...props
+} ) => {
+	const [ value, setValue ] = useState< Dimensions >( EMPTY_OBJECT );
 	const resetAll = () => {
 		setValue( EMPTY_OBJECT );
-		onChange( EMPTY_OBJECT );
+		// Storybook passes the `onChange` action.
+		onChange!( EMPTY_OBJECT );
 	};
 	return (
 		<Panel>
@@ -35,7 +42,8 @@ export const Default = ( { panelId, onChange, ...props } ) => {
 					panelId={ panelId }
 					onChange={ ( nextValue ) => {
 						setValue( nextValue );
-						onChange( nextValue );
+						// Storybook passes the `onChange` action.
+						onChange!( nextValue );
 					} }
 					value={ value }
 					{ ...props }

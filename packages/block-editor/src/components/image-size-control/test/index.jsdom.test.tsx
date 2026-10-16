@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { ByRoleOptions } from '@testing-library/react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import ImageSizeControl from '../index';
@@ -297,7 +298,7 @@ describe( 'ImageSizeControl', () => {
 				await screen.findByRole( 'option', {
 					name: 'Thumbnail',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( mockOnChangeImage ).toHaveBeenCalledTimes( 1 );
@@ -321,7 +322,10 @@ describe( 'ImageSizeControl', () => {
 
 			await user.tab();
 			await user.keyboard( '{Enter}' );
-			await screen.findByRole( 'option', { name: 'Large', exact: true } );
+			await screen.findByRole( 'option', {
+				name: 'Large',
+				exact: true,
+			} as ByRoleOptions );
 			await user.keyboard( '{ArrowDown}{Enter}' );
 
 			expect( mockOnChangeImage ).toHaveBeenCalledTimes( 1 );
