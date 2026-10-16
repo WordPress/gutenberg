@@ -1,7 +1,16 @@
 import { describe, expect, it } from 'vitest';
 import { getDropTargetPosition } from '..';
+import type { BlockListOrientation, DropTargetBlockData } from '../types';
 
-const elementData = [
+interface ElementData {
+	top: number;
+	right: number;
+	bottom: number;
+	left: number;
+	isUnmodifiedDefaultBlock?: boolean;
+}
+
+const elementData: ElementData[] = [
 	{
 		top: 0,
 		left: 0,
@@ -23,25 +32,31 @@ const elementData = [
 ];
 
 const mapElements =
-	( orientation ) =>
-	( { top, right, bottom, left, isUnmodifiedDefaultBlock }, index ) => {
+	( orientation: BlockListOrientation ) =>
+	(
+		{ top, right, bottom, left, isUnmodifiedDefaultBlock }: ElementData,
+		index: number
+	): DropTargetBlockData => {
 		return {
 			isUnmodifiedDefaultBlock: !! isUnmodifiedDefaultBlock,
 			blockIndex: index,
 			getBoundingClientRect() {
-				return orientation === 'vertical'
-					? {
-							top,
-							right,
-							bottom,
-							left,
-						}
-					: {
-							top: left,
-							bottom: right,
-							left: top,
-							right: bottom,
-						};
+				// The drop target position only reads the edges.
+				return (
+					orientation === 'vertical'
+						? {
+								top,
+								right,
+								bottom,
+								left,
+							}
+						: {
+								top: left,
+								bottom: right,
+								left: top,
+								right: bottom,
+							}
+				) as DOMRect;
 			},
 		};
 	};
