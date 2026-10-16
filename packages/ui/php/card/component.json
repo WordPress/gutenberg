@@ -14,15 +14,5 @@
 		{ "className": "$class" },
 		[ "Card.Header", {}, [ "Card.Title", {}, "$title" ] ],
 		[ "Card.Content", {}, "$content" ]
-	],
-	"compositionExamples": [
-		{
-			"name": "with a button",
-			"props": { "title": "Settings" },
-			"content": {
-				"component": "button",
-				"props": { "label": "Save changes", "variant": "outline" }
-			}
-		}
 	]
 }

@@ -49,7 +49,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 * @param array|null $example Example props with the React render.
 	 */
 	public function test_renders_the_same_markup_as_react( $example ) {
-		$html = (string) gutenberg_get_ui_component( $example['component'], $example['props'], $example['content'] ?? null );
+		$html = (string) gutenberg_ui_components_render_example( $example );
 
 		$this->assertSame(
 			self::normalize_html( $example['html'] ),
@@ -89,7 +89,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 * @param array|null $combination Props with the React render.
 	 */
 	public function test_rebuilds_every_combination_like_react( $combination ) {
-		$html = (string) gutenberg_get_ui_component( $combination['component'], $combination['props'], $combination['content'] ?? null );
+		$html = (string) gutenberg_ui_components_render_example( $combination );
 
 		$this->assertSame(
 			self::normalize_html( $combination['html'] ),
@@ -225,40 +225,26 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Components React rendered inside another one's content.
-	 *
-	 * @return array
+	 * An example's content can be another component, like a block example's
+	 * `innerBlocks`.
 	 */
-	public function data_compositions() {
-		$file = dirname( __DIR__, 2 ) . '/packages/ui/build-php/test/compositions.json';
-		if ( ! is_readable( $file ) ) {
-			return array( 'not built' => array( null ) );
-		}
-
-		$cases = array();
-		foreach ( json_decode( file_get_contents( $file ), true ) as $composition ) {
-			$cases[ $composition['component'] . ': ' . $composition['name'] ] = array( $composition );
-		}
-		return $cases;
-	}
-
-	/**
-	 * A component passed as another one's content comes out exactly as React
-	 * nests them.
-	 *
-	 * @dataProvider data_compositions
-	 *
-	 * @param array|null $composition Outer and inner props with the React render.
-	 */
-	public function test_composes_components_like_react( $composition ) {
-		$inner = gutenberg_get_ui_component( $composition['content']['component'], $composition['content']['props'] );
-		$html  = (string) gutenberg_get_ui_component( $composition['component'], $composition['props'], $inner );
+	public function test_renders_an_example_with_a_component_as_content() {
+		$html = (string) gutenberg_ui_components_render_example(
+			array(
+				'component' => 'card',
+				'props'     => array( 'title' => 'Settings' ),
+				'content'   => array(
+					'component' => 'button',
+					'props'     => array( 'label' => 'Save' ),
+				),
+			)
+		);
 
 		$this->assertSame(
-			self::normalize_html( $composition['html'] ),
-			self::normalize_html( $html ),
-			"React:\n{$composition['html']}\nPHP:\n{$html}"
+			(string) gutenberg_get_ui_component( 'card', array( 'title' => 'Settings' ), gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ) ),
+			$html
 		);
+		$this->assertSame( 1, substr_count( $html, '<button' ) );
 	}
 
 	public function test_returns_safe_html_that_prints_like_a_string() {

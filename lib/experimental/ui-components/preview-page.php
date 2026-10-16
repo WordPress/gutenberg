@@ -26,6 +26,24 @@ function gutenberg_ui_components_get_examples() {
 }
 
 /**
+ * Renders an example with PHP.
+ *
+ * An example's content is text, or another component as
+ * `{ component, props }`, like a block example's `innerBlocks`.
+ *
+ * @param array $example Example, as the build writes it.
+ * @return Gutenberg_UI_Safe_HTML Component HTML.
+ */
+function gutenberg_ui_components_render_example( $example ) {
+	$content = $example['content'] ?? null;
+	if ( is_array( $content ) && isset( $content['component'] ) ) {
+		$content = gutenberg_get_ui_component( $content['component'], $content['props'] ?? array() );
+	}
+
+	return gutenberg_get_ui_component( $example['component'], $example['props'], $content );
+}
+
+/**
  * Registers the preview page.
  */
 function gutenberg_ui_components_add_preview_page() {
@@ -114,7 +132,7 @@ function gutenberg_ui_components_render_preview_page() {
 		$mode = gutenberg_ui_components_get_sample_mode();
 		if ( $mode ) :
 			foreach ( gutenberg_ui_components_get_examples() as $example ) :
-				$html = 'php' === $mode ? gutenberg_get_ui_component( $example['component'], $example['props'], $example['content'] ?? null ) : $example['html'];
+				$html = 'php' === $mode ? gutenberg_ui_components_render_example( $example ) : $example['html'];
 				?>
 				<div class="gutenberg-ui-preview-sample" data-example="<?php echo esc_attr( $example['component'] . ': ' . $example['name'] ); ?>" style="width: 280px; margin-bottom: 16px;">
 					<?php gutenberg_ui_components_print( $html ); ?>
@@ -191,7 +209,7 @@ function gutenberg_ui_components_render_preview_page() {
 				<?php foreach ( gutenberg_ui_components_get_examples() as $example ) : ?>
 					<tr>
 						<td><code><?php echo esc_html( $example['component'] . ': ' . $example['name'] ); ?></code></td>
-						<td><?php gutenberg_ui_components_print( gutenberg_get_ui_component( $example['component'], $example['props'], $example['content'] ?? null ) ); ?></td>
+						<td><?php gutenberg_ui_components_print( gutenberg_ui_components_render_example( $example ) ); ?></td>
 						<td><?php gutenberg_ui_components_print( $example['html'] ); ?></td>
 					</tr>
 				<?php endforeach; ?>

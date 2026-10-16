@@ -12,12 +12,11 @@
  *   - `render`       The React element to render for those props, as
  *                    `[ type, props, ...children ]`, where `"$name"` refers to a prop.
  *   - `example`      Props for the preview page and the checks below, and
- *                    its `content` for components that accept it.
+ *                    its `content` for components that accept it: text, or
+ *                    another component as `{ component, props }`, like a
+ *                    block example's `innerBlocks`.
  *   - `content`      Optional. Whether the component accepts content, rendered
  *                    where `render` uses `"$content"`.
- *   - `compositionExamples`
- *                    Optional. Components to render inside the content, for
- *                    the check that PHP composes them as React nests them.
  *
  * The build renders the React element once for every combination of variants,
  * with placeholders for the slots. It stores one base render and what each
@@ -169,8 +168,24 @@ async function buildComponent( component, context ) {
 			`${ component.name } accepts content, but its \`render\` mapping doesn't use \`"$content"\`.`
 		);
 	}
-	const { content: exampleContent, ...exampleProps } =
+	const { content: exampleContentSpec, ...exampleProps } =
 		component.example ?? {};
+	// Content can be another component, rendered inside this one as React
+	// nests them, so the checks cover composition too.
+	let exampleContent = exampleContentSpec;
+	if ( exampleContentSpec?.component ) {
+		const inner = definitions.get( exampleContentSpec.component );
+		if ( ! inner ) {
+			throw new Error(
+				`${ component.name }: its example's content uses an unknown component "${ exampleContentSpec.component }".`
+			);
+		}
+		exampleContent = createNode(
+			inner.render,
+			getExampleValues( inner, exampleContentSpec.props ?? {} ),
+			ui
+		);
+	}
 	const withContent = ( values, content ) =>
 		component.content ? { ...values, content } : values;
 	const render = ( values ) =>
@@ -243,7 +258,7 @@ async function buildComponent( component, context ) {
 		return {
 			component: component.name,
 			props,
-			content: exampleContent,
+			content: exampleContentSpec,
 			html: render(
 				withContent(
 					getExampleValues( component, props ),
@@ -264,38 +279,11 @@ async function buildComponent( component, context ) {
 		component: component.name,
 		name,
 		props,
-		content: exampleContent,
+		content: exampleContentSpec,
 		html: render(
 			withContent( getExampleValues( component, props ), exampleContent )
 		),
 	} ) );
-
-	// Components rendered inside this one's content, as React would nest them,
-	// for the PHPUnit check that composing them in PHP gives the same markup.
-	result.compositions = ( component.compositionExamples ?? [] ).map(
-		( { name, props = {}, content } ) => {
-			const inner = definitions.get( content.component );
-			if ( ! inner ) {
-				throw new Error(
-					`${ component.name }: the "${ name }" composition uses an unknown component "${ content.component }".`
-				);
-			}
-			const node = createNode(
-				inner.render,
-				getExampleValues( inner, content.props ?? {} ),
-				ui
-			);
-			return {
-				component: component.name,
-				name,
-				props,
-				content,
-				html: render(
-					withContent( getExampleValues( component, props ), node )
-				),
-			};
-		}
-	);
 	const ignoreUnreadProps = getUnreadPropRemover( component );
 	const [ example, ...variations ] = result.examples;
 	for ( const variation of variations ) {
@@ -437,14 +425,6 @@ return ${ json2php.make( { linebreak: '\n', indent: '\t' } )( manifest ) };
 		path.join( TEST_DIR, 'examples.json' ),
 		JSON.stringify(
 			results.flatMap( ( result ) => result.examples ),
-			null,
-			'\t'
-		) + '\n'
-	);
-	await writeFile(
-		path.join( TEST_DIR, 'compositions.json' ),
-		JSON.stringify(
-			results.flatMap( ( result ) => result.compositions ),
 			null,
 			'\t'
 		) + '\n'
