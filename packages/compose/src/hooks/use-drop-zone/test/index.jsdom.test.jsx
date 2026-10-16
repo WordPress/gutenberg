@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from '@wordpress/element';
 import useDropZone from '../';
 
@@ -49,5 +49,29 @@ describe( 'useDropZone', () => {
 		expect( screen.getByRole( 'region' ) ).toHaveAttribute(
 			'data-is-drop-zone'
 		);
+	} );
+
+	it( 'ends a drag that reaches the drop zone without a `dragenter` on the document', () => {
+		const onDragStart = vi.fn();
+		const onDragEnd = vi.fn();
+		const Component = () => {
+			const dropZoneRef = useDropZone( { onDragStart, onDragEnd } );
+
+			return (
+				<div role="region" ref={ dropZoneRef }>
+					Drop Zone
+				</div>
+			);
+		};
+		render( <Component /> );
+
+		// Chrome can send `dragover` to an iframe without a `dragenter`
+		// first, after a previous drag left the iframe over an element of
+		// the parent document.
+		fireEvent.dragOver( screen.getByRole( 'region' ) );
+		expect( onDragStart ).toHaveBeenCalledTimes( 1 );
+
+		fireEvent.dragEnd( document );
+		expect( onDragEnd ).toHaveBeenCalledTimes( 1 );
 	} );
 } );
