@@ -16386,14 +16386,6 @@
 			"count": 1
 		}
 	},
-	"packages/private-apis/src/test/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/redux-routine/src/test/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
