@@ -15,11 +15,18 @@ import { Badge, Link } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
 import {
+	McpConnectorSettings,
+	useMcpApplicationPasswords,
+	useMcpEndpoint,
+	type ApplicationPasswordsData,
+} from './mcp-connector';
+import {
 	OpenAILogo,
 	ClaudeLogo,
 	GeminiLogo,
 	AkismetLogo,
 	DefaultConnectorLogo,
+	WordPressLogo,
 } from './logos';
 
 const { store: connectorsStore } = unlock( connectorsPrivateApis );
@@ -40,6 +47,7 @@ interface ConnectorData {
 interface ConnectorScriptModuleData {
 	connectors?: Record< string, ConnectorData >;
 	isFileModDisabled?: boolean;
+	applicationPasswords?: ApplicationPasswordsData;
 }
 
 function getConnectorScriptModuleData(): ConnectorScriptModuleData {
@@ -65,11 +73,16 @@ export function getIsFileModDisabled(): boolean {
 	return !! getConnectorScriptModuleData().isFileModDisabled;
 }
 
+function getApplicationPasswordsData(): ApplicationPasswordsData | undefined {
+	return getConnectorScriptModuleData().applicationPasswords;
+}
+
 const CONNECTOR_LOGOS: Record< string, React.ComponentType > = {
 	google: GeminiLogo,
 	openai: OpenAILogo,
 	anthropic: ClaudeLogo,
 	akismet: AkismetLogo,
+	'mcp-adapter': WordPressLogo,
 };
 
 function getConnectorLogo(
@@ -381,6 +394,84 @@ function ApplicationPasswordConnector( {
 	);
 }
 
+function McpConnector( {
+	name,
+	description,
+	logo,
+	plugin,
+}: ConnectorRenderProps ) {
+	const pluginSlug = getPluginSlug( plugin?.file );
+	const applicationPasswords = getApplicationPasswordsData();
+
+	const {
+		pluginStatus,
+		canInstallPlugins,
+		canActivatePlugins,
+		isExpanded,
+		isBusy,
+		handleButtonClick,
+		getButtonLabel,
+	} = useConnectorPlugin( {
+		file: plugin?.file,
+		settingName: '',
+		connectorName: name,
+		isInstalled: plugin?.isInstalled,
+		isActivated: plugin?.isActivated,
+	} );
+	// Load before the card opens, so opening it does not wait on requests.
+	const isAdapterActive = pluginStatus === 'active';
+	const endpoint = useMcpEndpoint( isAdapterActive );
+	const { passwords, setPasswords } = useMcpApplicationPasswords(
+		applicationPasswords,
+		isAdapterActive
+	);
+	const showUnavailableBadge =
+		( pluginStatus === 'not-installed' && canInstallPlugins === false ) ||
+		( pluginStatus === 'inactive' && canActivatePlugins === false );
+
+	const actionButtonRef = useRef< HTMLButtonElement >( null );
+
+	return (
+		<ConnectorItem
+			className={
+				pluginSlug ? `connector-item--${ pluginSlug }` : undefined
+			}
+			logo={ logo }
+			name={ name }
+			description={ description }
+			actionArea={
+				<ConnectorActionArea
+					isConnected={ false }
+					showUnavailableBadge={ showUnavailableBadge }
+					pluginSlug={ pluginSlug }
+					isExpanded={ isExpanded }
+					isBusy={ isBusy }
+					pluginStatus={ pluginStatus }
+					actionButtonRef={ actionButtonRef }
+					handleButtonClick={ handleButtonClick }
+					getButtonLabel={ () => {
+						if ( isExpanded && ! isBusy ) {
+							return __( 'Close' );
+						}
+						return passwords?.length
+							? __( 'Manage' )
+							: getButtonLabel();
+					} }
+				/>
+			}
+		>
+			{ isExpanded && isAdapterActive && (
+				<McpConnectorSettings
+					endpoint={ endpoint }
+					applicationPasswords={ applicationPasswords }
+					passwords={ passwords }
+					onPasswordsChange={ setPasswords }
+				/>
+			) }
+		</ConnectorItem>
+	);
+}
+
 // Register connectors from server-provided connector data.
 export function registerDefaultConnectors() {
 	const connectors = getConnectorData();
@@ -412,7 +503,12 @@ export function registerDefaultConnectors() {
 		const existing = unlock( select( connectorsStore ) ).getConnector(
 			connectorName
 		);
-		if ( authentication.method === 'api_key' && ! existing?.render ) {
+		if ( connectorId === 'mcp-adapter' && ! existing?.render ) {
+			args.render = McpConnector;
+		} else if (
+			authentication.method === 'api_key' &&
+			! existing?.render
+		) {
 			args.render = ApiKeyConnector;
 		} else if (
 			authentication.method === 'application_password' &&

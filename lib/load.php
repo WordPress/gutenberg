@@ -147,6 +147,7 @@ require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // WordPress 7.2 compat.
+require __DIR__ . '/compat/wordpress-7.2/connectors.php';
 require __DIR__ . '/compat/wordpress-7.2/kses.php';
 require __DIR__ . '/compat/wordpress-7.2/media.php';
 

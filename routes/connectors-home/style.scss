@@ -29,6 +29,45 @@ $sticky-header-clearance: 120px;
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
+	.connector-mcp__code input {
+		font-family: monospace;
+
+		// wp-admin gives read-only inputs a gray background, which would only
+		// cover the input and not its copy button.
+		&[readonly] {
+			background-color: transparent;
+		}
+	}
+
+	.connector-mcp__passwords {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+		border: 1px solid $gray-300;
+		border-radius: 4px;
+	}
+
+	.connector-mcp__password {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin: 0;
+		padding: 12px 16px;
+
+		&:not(:first-child) {
+			border-top: 1px solid $gray-300;
+		}
+	}
+
+	.connector-mcp__password-name {
+		font-weight: var(--wpds-typography-font-weight-emphasis);
+	}
+
+	.connector-mcp__password-details {
+		color: $gray-700;
+	}
+
 	&__file-mods-notice {
 		margin-bottom: 16px;
 	}
