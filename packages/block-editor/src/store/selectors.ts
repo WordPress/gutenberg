@@ -1153,7 +1153,7 @@ export function __unstableSelectionHasUnmergeableBlock( state: State ) {
  */
 export function __unstableIsSelectionMergeable(
 	state: State,
-	isForward: boolean
+	isForward?: boolean
 ) {
 	const selectionAnchor = getSelectionStart( state );
 	const selectionFocus = getSelectionEnd( state );

@@ -14,14 +14,12 @@
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	],
-	/*
-	 * Only the TypeScript sources are checked. The JavaScript sources stay
-	 * unchecked, and the package stays untyped for its consumers through the
-	 * `paths` of the base configuration.
-	 */
+	// Only the TypeScript sources are checked. The JavaScript sources stay
+	// unchecked, and the package stays untyped for its consumers through the
+	// `paths` of the base configuration.
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
 }
