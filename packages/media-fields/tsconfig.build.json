@@ -14,6 +14,6 @@
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import postTypeSupports from '../post_type_supports';
 
 describe( 'post_type_supports', () => {
-	it( 'maps the id of each default action to the action', () => {
+	it( 'maps the id of each default action to its JavaScript parts', () => {
 		expect( Object.keys( postTypeSupports ) ).toEqual( [
 			'delete-post',
 			'duplicate-post',
@@ -15,8 +15,13 @@ describe( 'post_type_supports', () => {
 			'view-post',
 			'view-post-revisions',
 		] );
-		for ( const [ id, action ] of Object.entries( postTypeSupports ) ) {
-			expect( action.id ).toBe( id );
+		for ( const parts of Object.values( postTypeSupports ) ) {
+			// The data of the action, such as its id and label, is
+			// registered on the server.
+			expect( parts ).not.toHaveProperty( 'id' );
+			expect( 'callback' in parts || 'RenderModal' in parts ).toBe(
+				true
+			);
 		}
 	} );
 
