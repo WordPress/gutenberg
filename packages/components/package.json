@@ -50,7 +50,6 @@
 	"dependencies": {
 		"@ariakit/react": "^0.4.41",
 		"@date-fns/utc": "^2.1.1",
-		"@emotion/is-prop-valid": "^1.4.0",
 		"@floating-ui/react-dom": "^2.1.9",
 		"@types/highlight-words-core": "^1.2.1",
 		"@use-gesture/react": "^10.3.1",
