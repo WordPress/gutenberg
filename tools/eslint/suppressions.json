@@ -6508,11 +6508,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation-link/link-ui/test/get-suggestions-query.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation-link/save.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -6583,11 +6578,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation-link/shared/test/use-link-preview.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation-link/shared/update-attributes.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -6619,11 +6609,6 @@
 		}
 	},
 	"packages/block-library/src/navigation-link/shared/use-is-invalid-link.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/navigation-link/shared/use-link-preview.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
