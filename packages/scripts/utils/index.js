@@ -1,5 +1,6 @@
 const { getAsBooleanFromENV } = require( './process' );
 const {
+	extractOptionFromArgs,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
@@ -29,10 +30,10 @@ const {
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 } = require( './block-json' );
-const { extractWpEnvConfigArg, getTestsBaseUrl } = require( './wp-env' );
+const { getTestsBaseUrl } = require( './wp-env' );
 
 module.exports = {
-	extractWpEnvConfigArg,
+	extractOptionFromArgs,
 	fromConfigRoot,
 	fromProjectRoot,
 	fromScriptsRoot,

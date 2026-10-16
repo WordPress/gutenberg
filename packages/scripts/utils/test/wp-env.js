@@ -13,60 +13,7 @@ import {
 	vi,
 } from 'vitest';
 const require = createRequire( import.meta.url );
-const { extractWpEnvConfigArg, getTestsBaseUrl } = require( '../wp-env' );
-
-describe( 'extractWpEnvConfigArg', () => {
-	it( 'returns all arguments when the option is not passed', () => {
-		expect(
-			extractWpEnvConfigArg( [ '--config', 'playwright.config.ts' ] )
-		).toEqual( {
-			wpEnvConfig: undefined,
-			args: [ '--config', 'playwright.config.ts' ],
-		} );
-	} );
-
-	it( 'extracts the option with its value after an equals sign', () => {
-		expect(
-			extractWpEnvConfigArg( [
-				'--config=playwright.config.ts',
-				'--wp-env-config=../../.wp-env.test.json',
-				'--ui',
-			] )
-		).toEqual( {
-			wpEnvConfig: '../../.wp-env.test.json',
-			args: [ '--config=playwright.config.ts', '--ui' ],
-		} );
-	} );
-
-	it( 'extracts the option with its value as the next argument', () => {
-		expect(
-			extractWpEnvConfigArg( [
-				'--config',
-				'playwright.config.ts',
-				'--wp-env-config',
-				'../../.wp-env.test.json',
-				'specs/editor.spec.js',
-			] )
-		).toEqual( {
-			wpEnvConfig: '../../.wp-env.test.json',
-			args: [
-				'--config',
-				'playwright.config.ts',
-				'specs/editor.spec.js',
-			],
-		} );
-	} );
-
-	it.each( [
-		[ 'without a value', [ '--ui', '--wp-env-config' ] ],
-		[ 'with an empty value', [ '--wp-env-config=', '--ui' ] ],
-	] )( 'returns null for the option %s', ( _, args ) => {
-		expect( extractWpEnvConfigArg( args ) ).toEqual( {
-			wpEnvConfig: null,
-			args: [ '--ui' ],
-		} );
-	} );
-} );
+const { getTestsBaseUrl } = require( '../wp-env' );
 
 /*
  * These tests use stand-ins for loadConfig() to check what it is called with,

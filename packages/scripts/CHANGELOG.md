@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   `test-e2e` and `test-playwright`: Add a `--wp-env-config` option for the custom config file that the environment for the tests is started from with `wp-env --config`, such as `.wp-env.test.json`. When `WP_BASE_URL` is not set, the tests run on the port from that file merged with its override file, such as `.wp-env.test.override.json`, and any `WP_ENV_*` environment variables ([#84654](https://github.com/WordPress/gutenberg/pull/84654)).
+-   `test-e2e` and `test-playwright`: Add a `--base-url` option for the URL of the site the tests run against, such as one not served by `wp-env`. It takes precedence over the `WP_BASE_URL` environment variable and over any `wp-env` config, including one passed with `--wp-env-config` ([#84654](https://github.com/WordPress/gutenberg/pull/84654)).
 
 ### Bug Fixes
 

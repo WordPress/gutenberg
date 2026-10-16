@@ -14,6 +14,34 @@ const getArgFromCLI = ( arg ) => {
 
 const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
+/**
+ * Separates an option of a script from the other CLI arguments, which are
+ * passed on to a tool that rejects options it does not know, like Playwright.
+ *
+ * The option accepts its value either as `<name>=<value>` or as
+ * `<name> <value>`. When it is passed more than once, the last value wins.
+ *
+ * @param {string[]} args CLI arguments.
+ * @param {string}   name Name of the option, including the leading dashes.
+ *
+ * @return {{value: string|null|undefined, args: string[]}} The value of the option, if passed (null when it has no value), and the remaining arguments.
+ */
+const extractOptionFromArgs = ( args, name ) => {
+	let value;
+	const remainingArgs = [];
+	for ( let i = 0; i < args.length; i++ ) {
+		if ( args[ i ] === name ) {
+			value = args[ i + 1 ] ?? null;
+			i++;
+		} else if ( args[ i ].startsWith( `${ name }=` ) ) {
+			value = args[ i ].slice( name.length + 1 ) || null;
+		} else {
+			remainingArgs.push( args[ i ] );
+		}
+	}
+	return { value, args: remainingArgs };
+};
+
 // Flags that never take a value, so `--fix file.js` isn't read as `--fix=file.js`.
 // stylelint's `--fix` does take an optional mode though, so drop that first.
 const getFileArgsFromCLI = () => {
@@ -90,6 +118,7 @@ const spawnScript = ( scriptName, args = [], nodeArgs = [] ) => {
 };
 
 module.exports = {
+	extractOptionFromArgs,
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,

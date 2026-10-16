@@ -11,7 +11,7 @@ process.on( 'unhandledRejection', ( err ) => {
 const { dirname, resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
 const {
-	extractWpEnvConfigArg,
+	extractOptionFromArgs,
 	fromConfigRoot,
 	hasProjectFile,
 	hasArgInCLI,
@@ -20,14 +20,35 @@ const {
 	getTestsBaseUrl,
 } = require( '../utils' );
 
-const { wpEnvConfig, args: playwrightArgs } =
-	extractWpEnvConfigArg( getArgsFromCLI() );
+const { value: wpEnvConfig, args: argsWithoutWpEnvConfig } =
+	extractOptionFromArgs( getArgsFromCLI(), '--wp-env-config' );
+const { value: baseUrl, args: playwrightArgs } = extractOptionFromArgs(
+	argsWithoutWpEnvConfig,
+	'--base-url'
+);
 
 if ( wpEnvConfig === null ) {
 	console.error(
 		'Error: The --wp-env-config option requires the path to a wp-env config file.'
 	);
 	process.exit( 1 );
+}
+
+if ( baseUrl !== undefined ) {
+	try {
+		new URL( baseUrl );
+	} catch {
+		console.error(
+			'Error: The --base-url option requires an absolute URL, such as http://localhost:8889.'
+		);
+		process.exit( 1 );
+	}
+
+	// The site the tests run against is named explicitly, so it takes
+	// precedence over the WP_BASE_URL environment variable and any wp-env
+	// config, including one passed with --wp-env-config. This lets a URL be
+	// passed to a package script which already passes --wp-env-config.
+	process.env.WP_BASE_URL = baseUrl;
 }
 
 /**
@@ -46,7 +67,7 @@ try {
 	loadConfig = require( '@wordpress/env/lib/config' ).loadConfig;
 } catch {
 	console.log(
-		'Notice: Could not find @wordpress/env package. Using WP_BASE_URL environment variable or else the default http://localhost:8889 URL for tests.'
+		'Notice: Could not find @wordpress/env package. Using the --base-url option, the WP_BASE_URL environment variable, or else the default http://localhost:8889 URL for tests.'
 	);
 }
 
@@ -104,9 +125,9 @@ if ( loadConfig && ! process.env.WP_BASE_URL ) {
 		loadConfig,
 		customConfigPath ? dirname( customConfigPath ) : resolve( '.' ),
 		customConfigPath
-	).then( ( baseUrl ) => {
-		if ( baseUrl ) {
-			process.env.WP_BASE_URL = baseUrl;
+	).then( ( envBaseUrl ) => {
+		if ( envBaseUrl ) {
+			process.env.WP_BASE_URL = envBaseUrl;
 		}
 		spawnProcess();
 	} );
