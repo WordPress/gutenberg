@@ -44,3 +44,9 @@
 	// Corresponds to the size of the text control input in the block inspector.
 	width: 250px;
 }
+
+// The inspector is narrower than the URL input's default minimum width.
+.wp-block-social-link__link-input.block-editor-url-input {
+	min-width: 0;
+	width: 100%;
+}
