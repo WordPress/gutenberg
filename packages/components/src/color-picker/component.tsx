@@ -13,7 +13,7 @@ import {
 } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { Select } from '@wordpress/ui';
+import { Select, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import { useContextSystem, contextConnect } from '../context';
 import { HStack } from '../h-stack';
 import { Flex } from '../flex';
@@ -52,6 +52,8 @@ const UnconnectedColorPicker = (
 	props: ColorPickerProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
+	useEnableWpCompatOverlaySlot();
+
 	const {
 		enableAlpha = false,
 		color: colorProp,
