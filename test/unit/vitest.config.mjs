@@ -104,13 +104,6 @@ export default defineConfig( {
 				),
 			},
 			{
-				find: /^@wordpress\/core-actions\/([^/]+)$/,
-				replacement: path.join(
-					ROOT_DIR,
-					'packages/core-actions/src/$1'
-				),
-			},
-			{
 				find: /^@wordpress\/([^/]+)\/src\/(.+)$/,
 				replacement: path.join( ROOT_DIR, 'packages/$1/src/$2' ),
 			},
