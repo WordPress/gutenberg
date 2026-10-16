@@ -318,7 +318,7 @@ describe( 'ColorPanel — inherited Global Styles label treatment', () => {
 	// block panel's palette. It must fall back to the preset's CSS custom
 	// property so the swatch paints instead of rendering black.
 	describe( 'inherited preset missing from the palette', () => {
-		function getSwatchStyles( container ) {
+		function getSwatchStyles( container: HTMLElement ) {
 			return Array.from(
 				// eslint-disable-next-line testing-library/no-node-access
 				container.querySelectorAll( '.component-color-indicator' )
