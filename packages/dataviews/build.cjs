@@ -35,4 +35,10 @@ esbuild.build( {
 	jsx: 'automatic',
 	logLevel: 'info',
 	format: 'esm',
+	sourcemap: false,
+	minify: true,
+	// Optional but sometimes helps ensure aggressive simplification:
+	minifySyntax: true,
+	minifyWhitespace: true,
+	minifyIdentifiers: true,
 } );
