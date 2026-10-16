@@ -270,7 +270,6 @@ export default function PresetInputControl( {
 					label={ ariaLabel }
 					hideLabelFromVision
 					items={ options }
-					popupWidth="anchor"
 					onValueChange={ ( selection ) => {
 						if ( ! selection ) {
 							return;
