@@ -3,7 +3,16 @@ import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { useEffect, useState } from '@wordpress/element';
+import type { ByRoleOptions } from '@testing-library/react';
 import DimensionsTool from '../';
+import type { Dimensions, DimensionsToolProps } from '../types';
+
+// `ByRole` queries ignore `exact`; the casts keep the options as written.
+
+interface ExampleProps extends Partial< DimensionsToolProps > {
+	initialValue?: Dimensions;
+	onChange: ( value: Dimensions ) => void;
+}
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -25,7 +34,7 @@ const ASPECT_RATIO_OPTIONS = [
 	},
 ];
 
-function Example( { initialValue, onChange, ...props } ) {
+function Example( { initialValue, onChange, ...props }: ExampleProps ) {
 	const [ value, setValue ] = useState( initialValue );
 	const resetAll = () => {
 		setValue( EMPTY_OBJECT );
@@ -51,7 +60,13 @@ function Example( { initialValue, onChange, ...props } ) {
 
 // Holds the value like `Example`, but also lets a test update it from the
 // outside, the way `updateBlockAttributes`, undo, or another client would.
-function ExternallyUpdatedExample( { initialValue, onChange, updateRef } ) {
+function ExternallyUpdatedExample( {
+	initialValue,
+	onChange,
+	updateRef,
+}: ExampleProps & {
+	updateRef: { current: ( ( value: Dimensions ) => void ) | null };
+} ) {
 	const [ value, setValue ] = useState( initialValue );
 	useEffect( () => {
 		updateRef.current = setValue;
@@ -73,7 +88,7 @@ function ExternallyUpdatedExample( { initialValue, onChange, updateRef } ) {
 	);
 }
 
-function ControlledExample( { value, onChange, ...props } ) {
+function ControlledExample( { value, onChange, ...props }: ExampleProps ) {
 	return (
 		<ToolsPanel
 			label="Dimensions"
@@ -208,7 +223,9 @@ describe( 'DimensionsTool', () => {
 		it( 'restores the scale that was set externally', async () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
-			const updateRef = { current: null };
+			const updateRef: {
+				current: ( ( value: Dimensions ) => void ) | null;
+			} = { current: null };
 
 			render(
 				<ExternallyUpdatedExample
@@ -220,7 +237,8 @@ describe( 'DimensionsTool', () => {
 
 			// Update the scale from outside the component.
 			await act( async () =>
-				updateRef.current( { aspectRatio: '16/9', scale: 'contain' } )
+				// Rendering ran the effect that sets the updater.
+				updateRef.current!( { aspectRatio: '16/9', scale: 'contain' } )
 			);
 
 			// Clearing and setting the aspect ratio again restores the scale.
@@ -231,7 +249,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: 'Original',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 			await user.click(
 				screen.getByRole( 'combobox', { name: 'Aspect ratio' } )
@@ -240,7 +258,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: '4/3',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( onChange ).toHaveBeenLastCalledWith( {
@@ -252,7 +270,9 @@ describe( 'DimensionsTool', () => {
 		it( 'restores the aspect ratio that was set externally', async () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
-			const updateRef = { current: null };
+			const updateRef: {
+				current: ( ( value: Dimensions ) => void ) | null;
+			} = { current: null };
 
 			render(
 				<ExternallyUpdatedExample
@@ -264,7 +284,8 @@ describe( 'DimensionsTool', () => {
 
 			// Update the aspect ratio from outside the component.
 			await act( async () =>
-				updateRef.current( { aspectRatio: '4/3', scale: 'cover' } )
+				// Rendering ran the effect that sets the updater.
+				updateRef.current!( { aspectRatio: '4/3', scale: 'cover' } )
 			);
 
 			// Setting both a width and a height replaces the aspect ratio with
@@ -314,7 +335,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: '16/9',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
@@ -360,7 +381,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: '16/9',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
@@ -406,7 +427,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: '16/9',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
@@ -452,7 +473,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: '16/9',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
@@ -498,7 +519,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: 'Original',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
@@ -536,7 +557,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: 'Original',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
@@ -576,7 +597,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: 'Original',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 
 			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
@@ -892,6 +913,7 @@ describe( 'DimensionsTool', () => {
 			await user.type( heightInput, '6' );
 			expect( aspectRatioSelect ).toHaveTextContent( /^Custom$/ );
 
+			// @ts-expect-error `clear` takes no text, so the extra argument is ignored.
 			await user.clear( widthInput, '' );
 			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
@@ -929,7 +951,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: 'Original',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 			expect( aspectRatioSelect ).toHaveTextContent( /^Original$/ );
 
@@ -938,7 +960,7 @@ describe( 'DimensionsTool', () => {
 				await screen.findByRole( 'option', {
 					name: '16/9',
 					exact: true,
-				} )
+				} as ByRoleOptions )
 			);
 			expect( aspectRatioSelect ).toHaveTextContent( /^16\/9$/ );
 
