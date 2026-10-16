@@ -5,10 +5,12 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useContext, useMemo, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
+import { MenuInsertedBlockContext } from './menu-inserted-block-context';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 
@@ -28,8 +30,10 @@ const PAGES_QUERY = [
 	},
 ];
 
-// The link popover opens the way the item settings popover does: beside the
-// row, top edges aligned. Same props as the List View content popover.
+// An item added from an item's options menu opens its link popover the way
+// the item settings popover opens: beside the row, top edges aligned. Same
+// props as the List View content popover. An item added from the appender
+// keeps the default placement, under the row, since the appender spawned it.
 const LINK_POPOVER_PROPS = {
 	placement: 'left-start',
 	offset: 35,
@@ -51,11 +55,15 @@ function ListViewLinkUI( props: {
 		( window as any ).wp.blockLibrary.privateApis
 	);
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const { isMarked } = useContext( MenuInsertedBlockContext );
+	const isFromMenu = isMarked( props.insertedBlockClientId );
 
 	return (
 		<NavigationLinkUI
 			{ ...props }
-			popoverProps={ isMobile ? undefined : LINK_POPOVER_PROPS }
+			popoverProps={
+				isFromMenu && ! isMobile ? LINK_POPOVER_PROPS : undefined
+			}
 		/>
 	);
 }
@@ -105,11 +113,24 @@ export default function NavigationMenuContent( {
 	const { openListViewContentPanel } = unlock(
 		useDispatch( blockEditorStore )
 	);
+	// A ref rather than state: it only needs reading when the popover renders,
+	// and an item inserted later from the appender never matches a stale value.
+	const menuInsertedBlock = useRef< string | null >( null );
+	const menuInsertedBlockContext = useMemo(
+		() => ( {
+			mark: ( clientId: string ) => {
+				menuInsertedBlock.current = clientId;
+			},
+			isMarked: ( clientId: string ) =>
+				menuInsertedBlock.current === clientId,
+		} ),
+		[]
+	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
-		<>
+		<MenuInsertedBlockContext.Provider value={ menuInsertedBlockContext }>
 			{ ! isLoading && (
 				<PrivateListView
 					rootClientId={ listViewRootClientId }
@@ -124,6 +145,6 @@ export default function NavigationMenuContent( {
 			<div className="navigation-edit-editor__hidden-blocks">
 				<BlockList />
 			</div>
-		</>
+		</MenuInsertedBlockContext.Provider>
 	);
 }

@@ -1,6 +1,7 @@
 import { chevronUp, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuItem, MenuGroup } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
@@ -9,6 +10,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { MenuInsertedBlockContext } from './menu-inserted-block-context';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -90,6 +92,8 @@ export default function LeafMoreMenu( {
 		[ clientId ]
 	);
 
+	const { mark: markMenuInserted } = useContext( MenuInsertedBlockContext );
+
 	// Insert a sibling the way the List View appender does: without
 	// selecting it, and registering it as the inserted block so its row
 	// renders the link popover anchored to itself. Selecting it instead
@@ -101,6 +105,7 @@ export default function LeafMoreMenu( {
 			insertableBlock.attributes
 		);
 		insertBlock( block, index, rootClientId, false );
+		markMenuInserted( block.clientId );
 		setInsertedBlockClientId( block.clientId );
 	};
 

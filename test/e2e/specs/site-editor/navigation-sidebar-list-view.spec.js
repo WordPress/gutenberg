@@ -76,11 +76,16 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 			// The LinkUI popover should open and immediately focus the search input.
 			await expect( linkControlSearch ).toBeFocused();
-			// The new item's row is the one before the appender's.
-			await expectLinkPopoverBesideRow(
-				page,
-				listView.getByRole( 'row' ).nth( -2 )
-			);
+			// The popover opens under the new item's row, the one before the
+			// appender's, as the appender spawned it. Items added from an
+			// item's options menu open theirs beside the row instead. The
+			// classic sidebar is too narrow to fit it under the row.
+			if ( isSiteEditorV2 ) {
+				await expectLinkPopoverUnderRow(
+					page,
+					listView.getByRole( 'row' ).nth( -2 )
+				);
+			}
 
 			// Search for and select the page.
 			await linkControl.useLinkControlSearch( 'Test Page 2' );
@@ -398,33 +403,67 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 	} );
 } );
 
+function getLinkPopover( page ) {
+	return page
+		.getByRole( 'dialog', { name: 'Add link' } )
+		.locator(
+			'xpath=ancestor::*[contains(concat(" ", @class, " "), " components-popover ")]'
+		);
+}
+
+/**
+ * Polls the link popover's position against a row's until `isPlaced` holds.
+ * Either box can still be moving right after the popover opens.
+ *
+ * @param {import('@playwright/test').Page}                 page     The page.
+ * @param {import('@playwright/test').Locator}              row      The List View row.
+ * @param {(popoverBox: Object, rowBox: Object) => boolean} isPlaced Receives the popover's and the row's bounding boxes.
+ */
+async function expectLinkPopoverPlacement( page, row, isPlaced ) {
+	const popover = getLinkPopover( page );
+	await expect( popover ).toBeVisible();
+	await expect
+		.poll( async () =>
+			isPlaced( await popover.boundingBox(), await row.boundingBox() )
+		)
+		.toBe( true );
+}
+
 /**
  * The link popover opens the way the item settings popover does: beside the
  * row it was opened for, with its top edge on the row's top edge. An
- * unanchored popover lands in the corner of the screen instead, and a popover
- * placed under the row covers the rows that follow.
+ * unanchored popover lands in the corner of the screen instead.
  *
  * @param {import('@playwright/test').Page}    page The page.
  * @param {import('@playwright/test').Locator} row  The List View row.
  */
 async function expectLinkPopoverBesideRow( page, row ) {
-	const popover = page
-		.getByRole( 'dialog', { name: 'Add link' } )
-		.locator(
-			'xpath=ancestor::*[contains(concat(" ", @class, " "), " components-popover ")]'
-		);
-	await expect( popover ).toBeVisible();
-	await expect
-		.poll( async () => {
-			const rowBox = await row.boundingBox();
-			const popoverBox = await popover.boundingBox();
-			const isTopAligned = Math.abs( popoverBox.y - rowBox.y ) <= 2;
-			const isBeside =
-				popoverBox.x >= rowBox.x + rowBox.width ||
-				popoverBox.x + popoverBox.width <= rowBox.x;
-			return isTopAligned && isBeside;
-		} )
-		.toBe( true );
+	await expectLinkPopoverPlacement(
+		page,
+		row,
+		( popoverBox, rowBox ) =>
+			Math.abs( popoverBox.y - rowBox.y ) <= 2 &&
+			( popoverBox.x >= rowBox.x + rowBox.width ||
+				popoverBox.x + popoverBox.width <= rowBox.x )
+	);
+}
+
+/**
+ * The link popover opens under the row it was opened for, with its top edge
+ * on the row's bottom edge.
+ *
+ * @param {import('@playwright/test').Page}    page The page.
+ * @param {import('@playwright/test').Locator} row  The List View row.
+ */
+async function expectLinkPopoverUnderRow( page, row ) {
+	await expectLinkPopoverPlacement(
+		page,
+		row,
+		( popoverBox, rowBox ) =>
+			Math.abs( popoverBox.y - ( rowBox.y + rowBox.height ) ) <= 2 &&
+			popoverBox.x < rowBox.x + rowBox.width &&
+			popoverBox.x + popoverBox.width > rowBox.x
+	);
 }
 
 class LinkControl {
