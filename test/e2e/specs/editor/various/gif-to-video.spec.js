@@ -109,95 +109,6 @@ class GifToVideoUtils {
 	}
 
 	/**
-	 * Upload the animated GIF fixture to a new Image block and count the
-	 * frames of the full size and of its `medium` and `thumbnail` sub-sizes.
-	 *
-	 * @param {Object} fixtures              Test fixtures.
-	 * @param {Object} fixtures.editor       Editor fixture.
-	 * @param {Object} fixtures.requestUtils Request utils fixture.
-	 * @return {Promise<{full: number, medium: number, thumbnail: number}>} Frame counts.
-	 */
-	async uploadAnimatedGifAndCountSubSizeFrames( { editor, requestUtils } ) {
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Add default block' } )
-		).toBeVisible();
-
-		await editor.insertBlock( { name: 'core/image' } );
-
-		const imageBlock = editor.canvas.locator(
-			'role=document[name="Block: Image"i]'
-		);
-		await expect( imageBlock ).toBeVisible();
-
-		await this.upload(
-			imageBlock.locator( 'data-testid=form-file-upload-input' ),
-			ANIMATED_GIF_FIXTURE
-		);
-
-		await this.waitForUploadQueueEmpty( 60_000 );
-
-		const uploadedImage = await this.page.evaluate( () =>
-			window.wp.data
-				.select( 'core/block-editor' )
-				.getBlocks()
-				.find( ( block ) => block.name === 'core/image' )
-		);
-		const attachmentId = uploadedImage.attributes.id;
-		expect( attachmentId ).toBeDefined();
-
-		// The sub-sizes are recorded in the attachment metadata shortly
-		// after the queue drains.
-		let media;
-		await expect
-			.poll(
-				async () => {
-					media = await requestUtils.rest( {
-						method: 'GET',
-						path: `/wp/v2/media/${ attachmentId }`,
-					} );
-					const sizes = media.media_details?.sizes;
-					return [
-						sizes?.medium?.source_url,
-						sizes?.thumbnail?.source_url,
-					];
-				},
-				{ timeout: 30_000 }
-			)
-			.toEqual( [
-				expect.stringMatching( /\.gif$/i ),
-				expect.stringMatching( /\.gif$/i ),
-			] );
-
-		return this.page.evaluate(
-			async ( urls ) => {
-				const countFrames = async ( url ) => {
-					const data = await ( await fetch( url ) ).arrayBuffer();
-					const decoder = new window.ImageDecoder( {
-						data,
-						type: 'image/gif',
-					} );
-					try {
-						await decoder.tracks.ready;
-						return decoder.tracks.selectedTrack?.frameCount ?? 0;
-					} finally {
-						decoder.close();
-					}
-				};
-				return {
-					full: await countFrames( urls.full ),
-					medium: await countFrames( urls.medium ),
-					thumbnail: await countFrames( urls.thumbnail ),
-				};
-			},
-			{
-				full: media.source_url,
-				medium: media.media_details.sizes.medium.source_url,
-				thumbnail: media.media_details.sizes.thumbnail.source_url,
-			}
-		);
-	}
-
-	/**
 	 * Skip this test if the GIF-to-video path is not active.
 	 *
 	 * The conversion requires:
@@ -503,64 +414,94 @@ test.describe( 'Video conversion: animated GIF to video', () => {
 		expect( posterDimensions ).toEqual( { width: 100, height: 100 } );
 	} );
 
-	test( 'generates animated sub-sizes for animated GIFs, including cropped ones', async ( {
+	test( 'generates static first-frame sub-sizes for animated GIFs, matching core', async ( {
 		editor,
+		page,
 		gifToVideoUtils,
 		requestUtils,
 	} ) => {
 		/*
-		 * Sub-sizes keep the animation by default. Cropped sizes such as
-		 * `thumbnail` cut every frame with the same rectangle.
-		 * See https://github.com/WordPress/gutenberg/issues/80383.
+		 * WordPress core's server-side editors (GD, Imagick) flatten animated
+		 * images to the first frame when generating sub-sizes, and
+		 * wp_calculate_image_srcset() keeps flattened sub-sizes and the
+		 * animated full-size image from mixing. The client-side path must
+		 * match: re-encoding a full animated GIF per sub-size took tens of
+		 * seconds per size for long GIFs and produced sub-sizes larger than
+		 * the original. See
+		 * https://github.com/WordPress/gutenberg/issues/80266.
 		 */
-		const frameCounts =
-			await gifToVideoUtils.uploadAnimatedGifAndCountSubSizeFrames( {
-				editor,
-				requestUtils,
-			} );
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Add default block' } )
+		).toBeVisible();
 
-		// Not an exact match against the source: the sub-sizes are written
-		// by cgifsave with an inter-frame error tolerance, which is free to
-		// coalesce frames. Keeping the animation is what matters, not
-		// reproducing the frame count.
+		await editor.insertBlock( { name: 'core/image' } );
+
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await gifToVideoUtils.upload(
+			imageBlock.locator( 'data-testid=form-file-upload-input' ),
+			ANIMATED_GIF_FIXTURE
+		);
+
+		await gifToVideoUtils.waitForUploadQueueEmpty( 60_000 );
+
+		const uploadedImage = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/block-editor' )
+				.getBlocks()
+				.find( ( block ) => block.name === 'core/image' )
+		);
+		const attachmentId = uploadedImage.attributes.id;
+		expect( attachmentId ).toBeDefined();
+
+		// The medium sub-size (uncropped) is recorded in the attachment
+		// metadata shortly after the queue drains.
+		let media;
+		await expect
+			.poll(
+				async () => {
+					media = await requestUtils.rest( {
+						method: 'GET',
+						path: `/wp/v2/media/${ attachmentId }`,
+					} );
+					return media.media_details?.sizes?.medium?.source_url;
+				},
+				{ timeout: 30_000 }
+			)
+			.toMatch( /\.gif$/i );
+
+		// The source GIF is animated (the fixture has 12 frames); its
+		// uncropped medium sub-size must be a static single frame.
+		const frameCounts = await page.evaluate(
+			async ( { fullUrl, mediumUrl } ) => {
+				const countFrames = async ( url ) => {
+					const data = await ( await fetch( url ) ).arrayBuffer();
+					const decoder = new window.ImageDecoder( {
+						data,
+						type: 'image/gif',
+					} );
+					try {
+						await decoder.tracks.ready;
+						return decoder.tracks.selectedTrack?.frameCount ?? 0;
+					} finally {
+						decoder.close();
+					}
+				};
+				return {
+					full: await countFrames( fullUrl ),
+					medium: await countFrames( mediumUrl ),
+				};
+			},
+			{
+				fullUrl: media.source_url,
+				mediumUrl: media.media_details.sizes.medium.source_url,
+			}
+		);
+
 		expect( frameCounts.full ).toBeGreaterThan( 1 );
-		expect( frameCounts.medium ).toBeGreaterThan( 1 );
-		expect( frameCounts.thumbnail ).toBeGreaterThan( 1 );
-	} );
-
-	test.describe( 'with the wp_generate_animated_image_subsizes filter returning false', () => {
-		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.activatePlugin(
-				'gutenberg-test-animated-image-subsizes'
-			);
-		} );
-
-		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.deactivatePlugin(
-				'gutenberg-test-animated-image-subsizes'
-			);
-		} );
-
-		test( 'generates static first-frame sub-sizes, matching core', async ( {
-			editor,
-			gifToVideoUtils,
-			requestUtils,
-		} ) => {
-			/*
-			 * WordPress core's server-side editors (GD, Imagick) flatten
-			 * animated images to the first frame when generating sub-sizes.
-			 * Sites that turn animated sub-sizes off get the same result.
-			 * See https://github.com/WordPress/gutenberg/issues/80266.
-			 */
-			const frameCounts =
-				await gifToVideoUtils.uploadAnimatedGifAndCountSubSizeFrames( {
-					editor,
-					requestUtils,
-				} );
-
-			expect( frameCounts.full ).toBeGreaterThan( 1 );
-			expect( frameCounts.medium ).toBe( 1 );
-			expect( frameCounts.thumbnail ).toBe( 1 );
-		} );
+		expect( frameCounts.medium ).toBe( 1 );
 	} );
 } );

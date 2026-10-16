@@ -233,16 +233,58 @@ describe( 'resizeImage', () => {
 			);
 		} );
 
+		it( 'loads all frames of an uncropped animated WebP', async () => {
+			const webpFile = new File( [ '<BLOB>' ], 'example.webp', {
+				lastModified: 1234567891,
+				type: 'image/webp',
+			} );
+			const buffer = await webpFile.arrayBuffer();
+
+			// Three frames stacked into one 300px-tall image.
+			mockState.height = 300;
+
+			await resizeImage(
+				'itemId',
+				buffer,
+				'image/webp',
+				{
+					width: 100,
+					height: 100,
+				},
+				{ preserveAnimation: true }
+			);
+
+			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
+				height: 100,
+				size: 'down',
+				option_string: '[n=-1]',
+			} );
+			// The gifsave tuning does not apply to webpsave.
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.webp',
+				expect.not.objectContaining( {
+					interframe_maxerror: expect.anything(),
+				} )
+			);
+			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+				'.webp',
+				expect.not.objectContaining( {
+					effort: expect.anything(),
+				} )
+			);
+		} );
+
 		describe( 'cropped sizes', () => {
 			const resizeAnimation = async (
 				crop: ImageSizeCrop[ 'crop' ],
-				smartCrop = false
+				smartCrop = false,
+				type: 'image/gif' | 'image/webp' = 'image/gif'
 			) => {
-				const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+				const file = new File( [ '<BLOB>' ], 'example', {
 					lastModified: 1234567891,
-					type: 'image/gif',
+					type,
 				} );
-				const buffer = await gifFile.arrayBuffer();
+				const buffer = await file.arrayBuffer();
 
 				// Three 200x100 frames stacked into one 300px-tall image.
 				mockState.width = 200;
@@ -252,7 +294,7 @@ describe( 'resizeImage', () => {
 				const result = await resizeImage(
 					'itemId',
 					buffer,
-					'image/gif',
+					type,
 					{ width: 100, height: 100, crop },
 					{ preserveAnimation: true, smartCrop }
 				);
@@ -339,6 +381,40 @@ describe( 'resizeImage', () => {
 					expect.objectContaining( {
 						effort: 2,
 						interframe_maxerror: 8,
+					} )
+				);
+			} );
+
+			it( 'crops every frame of an animated WebP with the same rectangle', async () => {
+				const { buffer } = await resizeAnimation(
+					true,
+					false,
+					'image/webp'
+				);
+
+				expect( mockThumbnailBuffer ).toHaveBeenCalledWith(
+					buffer,
+					200,
+					{
+						height: 100,
+						size: 'down',
+						option_string: '[n=-1]',
+					}
+				);
+				expect( mockCrop.mock.calls ).toEqual( [
+					[ 50, 0, 100, 100 ],
+					[ 50, 100, 100, 100 ],
+					[ 50, 200, 100, 100 ],
+				] );
+				const joined = mockArrayjoin.mock.results[ 0 ].value;
+				expect( joined.setInt ).toHaveBeenCalledWith(
+					'page-height',
+					100
+				);
+				expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+					'.webp',
+					expect.not.objectContaining( {
+						interframe_maxerror: expect.anything(),
 					} )
 				);
 			} );
@@ -526,35 +602,47 @@ describe( 'resizeImage', () => {
 			expect( mockWriteToBuffer ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'has no effect on still image formats', async () => {
-			const jpegFile = new File( [ '<BLOB>' ], 'example.jpg', {
-				lastModified: 1234567891,
-				type: 'image/jpeg',
-			} );
-			const buffer = await jpegFile.arrayBuffer();
+		/*
+		 * APNG and AVIF image sequences are animated too, but the bundled
+		 * libvips cannot keep their frames, so they flatten like a still.
+		 */
+		it.each( [ 'image/jpeg', 'image/png', 'image/avif' ] )(
+			'has no effect on %s',
+			async ( type ) => {
+				const file = new File( [ '<BLOB>' ], 'example', {
+					lastModified: 1234567891,
+					type,
+				} );
+				const buffer = await file.arrayBuffer();
 
-			await resizeImage(
-				'itemId',
-				buffer,
-				'image/jpeg',
-				{
-					width: 100,
-					height: 100,
-				},
-				{ preserveAnimation: true }
-			);
+				await resizeImage(
+					'itemId',
+					buffer,
+					type,
+					{
+						width: 100,
+						height: 100,
+					},
+					{ preserveAnimation: true }
+				);
 
-			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
-				height: 100,
-				size: 'down',
-			} );
-			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
-				'.jpeg',
-				expect.not.objectContaining( {
-					interframe_maxerror: expect.anything(),
-				} )
-			);
-		} );
+				expect( mockThumbnailBuffer ).toHaveBeenCalledWith(
+					buffer,
+					100,
+					{
+						height: 100,
+						size: 'down',
+					}
+				);
+				expect( mockArrayjoin ).not.toHaveBeenCalled();
+				expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+					`.${ type.split( '/' )[ 1 ] }`,
+					expect.not.objectContaining( {
+						interframe_maxerror: expect.anything(),
+					} )
+				);
+			}
+		);
 	} );
 
 	it( 'resizes with center crop', async () => {
