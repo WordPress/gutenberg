@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Speed up hydration by only parsing object-like directive values as JSON and reading attributes with `getAttributeNames()` ([#81699](https://github.com/WordPress/gutenberg/pull/81699)).
+
 ### Bug Fixes
 
 -   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core ([#81023](https://github.com/WordPress/gutenberg/pull/81023)).
