@@ -66,6 +66,7 @@
 -   Convert `DimensionsTool`, `ResolutionTool` and `ImageSizeControl` to TypeScript ([#84877](https://github.com/WordPress/gutenberg/pull/84877)).
 -   Convert `PresetInputControl` to TypeScript ([#84878](https://github.com/WordPress/gutenberg/pull/84878)).
 -   Convert `URLPopover` and `LinkPicker` to TypeScript ([#84879](https://github.com/WordPress/gutenberg/pull/84879)).
+-   Convert `BorderRadiusControl` and `DimensionControl` to TypeScript ([#84880](https://github.com/WordPress/gutenberg/pull/84880)).
 
 ## 18.1.0 (2026-10-07)
 
