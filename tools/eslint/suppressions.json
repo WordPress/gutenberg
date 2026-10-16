@@ -10378,12 +10378,7 @@
 			"count": 6
 		}
 	},
-	"packages/core-actions/src/page/set-as-homepage/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/core-actions/src/page/set-as-posts-page/action.tsx": {
+	"packages/core-actions/src/page/set-site-page-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
 		}
