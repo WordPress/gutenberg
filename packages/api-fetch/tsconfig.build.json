@@ -4,6 +4,6 @@
 	"references": [
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../private-apis" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }
