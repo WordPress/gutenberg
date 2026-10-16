@@ -3,6 +3,7 @@ import { userEvent } from 'vitest/browser';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
 import TypographyPanel from '../typography-panel';
+import type { PanelStyle, TypographyPanelProps } from '../types';
 
 // Coverage for `TypographyPanel` with the `gutenberg-global-styles-inheritance-ui`
 // experiment off, which is what WordPress Core gets. Deleted rather than set to
@@ -43,7 +44,7 @@ const PALETTE_SETTINGS = {
 	},
 };
 
-async function renderPanel( props ) {
+async function renderPanel( props: Partial< TypographyPanelProps > ) {
 	return await render(
 		<TypographyPanel
 			value={ {} }
@@ -55,7 +56,7 @@ async function renderPanel( props ) {
 	);
 }
 
-const getItem = ( name ) => {
+const getItem = ( name: string | RegExp ) => {
 	const control = screen.getByRole( 'spinbutton', { name } );
 	// The class hooks sit on the wrapping ToolsPanelItem, which has no role.
 	// eslint-disable-next-line testing-library/no-node-access
@@ -145,7 +146,7 @@ describe( 'TypographyPanel with the indicator experiment off', () => {
 } );
 
 describe( 'TypographyPanel setTextColor link sync', () => {
-	async function pickRed( value, inheritedValue ) {
+	async function pickRed( value: PanelStyle, inheritedValue?: PanelStyle ) {
 		const onChange = vi.fn();
 		await render(
 			<TypographyPanel
