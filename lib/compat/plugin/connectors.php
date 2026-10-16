@@ -49,7 +49,7 @@ function _gutenberg_connectors_add_settings_menu_item(): void {
  * @phpstan-return array<non-falsy-string|array{ non-falsy-string, 'GET'|'OPTIONS' }>
  */
 function _gutenberg_connectors_preload_paths( array $preload_paths ): array {
-	// getEntityRecord( 'root', 'site' ) in stage.tsx / use-connector-plugin.ts.
+	// getEntityRecord( 'root', 'site' ) in use-connector-plugin.ts / ai-plugin-callout.tsx.
 	$preload_paths[] = '/wp/v2/settings';
 
 	// canUser( 'create', { kind: 'root', name: 'plugin' } ) in stage.tsx.
