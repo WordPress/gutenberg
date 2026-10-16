@@ -4,7 +4,7 @@
 	"name": "core/heading",
 	"title": "Heading",
 	"category": "text",
-	"description": "Introduce new sections and organize content to help visitors (and search engines) understand the structure of your content.",
+	"description": "Introduces new sections and organizes content to help visitors (and search engines) understand the structure of your content.",
 	"keywords": [ "title", "subtitle" ],
 	"textdomain": "default",
 	"attributes": {

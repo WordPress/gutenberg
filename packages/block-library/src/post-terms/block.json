@@ -4,7 +4,7 @@
 	"name": "core/post-terms",
 	"title": "Post Terms",
 	"category": "theme",
-	"description": "Post terms.",
+	"description": "Displays post terms.",
 	"textdomain": "default",
 	"attributes": {
 		"term": {
