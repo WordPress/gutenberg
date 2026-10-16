@@ -166,7 +166,7 @@ function render_block_core_post_navigation_link( $attributes, $content ) {
  * }
  */
 function block_core_post_navigation_link_get_support_styles( $attributes ) {
-	$block_styles  = $attributes['style'] ?? array();
+	$block_styles      = $attributes['style'] ?? array();
 	$background        = $block_styles['background'] ?? array();
 	$background_styles = array(
 		'backgroundImage'      => $background['backgroundImage'] ?? null,
