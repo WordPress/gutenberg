@@ -4,7 +4,7 @@ import type { EditorStylesStyle } from '../editor-styles/types';
 
 export interface BlockPreviewProps {
 	/** A block instance (object) or an array of blocks to be previewed. */
-	blocks?: Block | Block[];
+	blocks?: Block | Block[] | null;
 	/**
 	 * Width of the preview container in pixels. Controls at what size the
 	 * blocks will be rendered inside the preview.
@@ -36,7 +36,7 @@ export interface ScaledBlockPreviewProps extends AutoBlockPreviewProps {
 
 export interface UseBlockPreviewOptions {
 	/** Block objects. */
-	blocks: Block | Block[];
+	blocks: Block[];
 	/**
 	 * Optional. Props to pass to the element. Must contain the ref if one is
 	 * defined.

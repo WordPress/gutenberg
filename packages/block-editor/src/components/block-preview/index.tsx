@@ -161,7 +161,6 @@ export function useBlockPreview( {
 			props.className,
 			'block-editor-block-preview__live-content'
 		),
-		// A single block has no length.
-		children: ( blocks as Block[] )?.length ? children : null,
+		children: blocks?.length ? children : null,
 	};
 }
