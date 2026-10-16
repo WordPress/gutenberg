@@ -878,6 +878,7 @@
       - iconPosition
       - info
       - isDestructive
+      - isPressed
       - isSelected
       - label
       - role
