@@ -4,7 +4,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 // @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { BlockTitle, store as blockEditorStore } from '@wordpress/block-editor';
-import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
+import {
+	createBlock,
+	hasBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
@@ -13,17 +17,18 @@ const POPOVER_PROPS = {
 
 export default function LeafMoreMenu( {
 	clientId,
+	setInsertedBlockClientId,
 	...props
 }: {
 	clientId: string;
+	setInsertedBlockClientId: ( clientId: string | null ) => void;
 } ) {
 	const {
 		moveBlocksDown,
 		moveBlocksUp,
 		removeBlocks,
 		duplicateBlocks,
-		insertBeforeBlock,
-		insertAfterBlock,
+		insertBlock,
 	} = useDispatch( blockEditorStore );
 
 	const removeLabel = sprintf(
@@ -32,45 +37,72 @@ export default function LeafMoreMenu( {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
-	const { rootClientId, canDuplicate, canInsertBlock, isFirst, isLast } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlockRootClientId,
-					getBlockName,
-					canInsertBlockType,
-					getDirectInsertBlock,
-					getBlockIndex,
-					getBlockCount,
-				} = select( blockEditorStore );
-				const { getDefaultBlockName } = select( blocksStore );
+	const {
+		rootClientId,
+		blockIndex,
+		insertableBlock,
+		canDuplicate,
+		canInsertBlock,
+		isFirst,
+		isLast,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockRootClientId,
+				getBlockName,
+				canInsertBlockType,
+				getDirectInsertBlock,
+				getBlockIndex,
+				getBlockCount,
+			} = select( blockEditorStore );
+			const { getDefaultBlockName } = select( blocksStore );
 
-				const _rootClientId = getBlockRootClientId( clientId );
-				const _blockName = getBlockName( clientId );
-				const canInsertDefaultBlock = canInsertBlockType(
-					getDefaultBlockName(),
-					_rootClientId
-				);
-				const directInsertBlock = _rootClientId
-					? getDirectInsertBlock( _rootClientId )
-					: null;
+			const _rootClientId = getBlockRootClientId( clientId );
+			const _blockName = getBlockName( clientId );
+			const canInsertDefaultBlock = canInsertBlockType(
+				getDefaultBlockName(),
+				_rootClientId
+			);
+			const directInsertBlock = _rootClientId
+				? getDirectInsertBlock( _rootClientId )
+				: null;
+			const _blockIndex = getBlockIndex( clientId );
 
-				return {
-					rootClientId: _rootClientId,
-					canDuplicate:
-						hasBlockSupport( _blockName, 'multiple', true ) &&
-						canInsertBlockType( _blockName, _rootClientId ),
-					canInsertBlock:
-						( canInsertDefaultBlock || !! directInsertBlock ) &&
-						canInsertBlockType( _blockName, _rootClientId ),
-					isFirst: getBlockIndex( clientId ) === 0,
-					isLast:
-						getBlockIndex( clientId ) ===
-						getBlockCount( _rootClientId ) - 1,
-				};
-			},
-			[ clientId ]
+			return {
+				rootClientId: _rootClientId,
+				blockIndex: _blockIndex,
+				// What "Add before" and "Add after" insert: the parent's
+				// direct-insert block (a Navigation Link in a menu), else
+				// the editor's default block.
+				insertableBlock: directInsertBlock ?? {
+					name: getDefaultBlockName(),
+				},
+				canDuplicate:
+					hasBlockSupport( _blockName, 'multiple', true ) &&
+					canInsertBlockType( _blockName, _rootClientId ),
+				canInsertBlock:
+					( canInsertDefaultBlock || !! directInsertBlock ) &&
+					canInsertBlockType( _blockName, _rootClientId ),
+				isFirst: _blockIndex === 0,
+				isLast: _blockIndex === getBlockCount( _rootClientId ) - 1,
+			};
+		},
+		[ clientId ]
+	);
+
+	// Insert a sibling the way the List View appender does: without
+	// selecting it, and registering it as the inserted block so its row
+	// renders the link popover anchored to itself. Selecting it instead
+	// would have the hidden canvas block open its own popover, which has
+	// nothing visible to anchor to.
+	const insertSibling = ( index: number ) => {
+		const block = createBlock(
+			insertableBlock.name,
+			insertableBlock.attributes
 		);
+		insertBlock( block, index, rootClientId, false );
+		setInsertedBlockClientId( block.clientId );
+	};
 
 	return (
 		<DropdownMenu
@@ -118,7 +150,7 @@ export default function LeafMoreMenu( {
 							<>
 								<MenuItem
 									onClick={ () => {
-										insertBeforeBlock( clientId );
+										insertSibling( blockIndex );
 										onClose();
 									} }
 								>
@@ -126,7 +158,7 @@ export default function LeafMoreMenu( {
 								</MenuItem>
 								<MenuItem
 									onClick={ () => {
-										insertAfterBlock( clientId );
+										insertSibling( blockIndex + 1 );
 										onClose();
 									} }
 								>

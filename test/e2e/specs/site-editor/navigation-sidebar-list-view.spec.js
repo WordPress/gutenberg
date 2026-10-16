@@ -1,5 +1,7 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.describe( 'Navigation sidebar - list view editing', () => {
 	const navMenuFixture = {
 		title: 'Test Navigation Menu',
@@ -312,6 +314,89 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect(
 				listView.getByRole( 'link', { name: 'No URL' } )
 			).toBeVisible();
+		} );
+	} );
+
+	test( 'anchors the link popover to an item added from the options menu', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		// The classic sidebar's options menu has no "Add before" / "Add after".
+		test.skip(
+			! isSiteEditorV2,
+			'Only the extensible site editor offers these options.'
+		);
+
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Test Navigation Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"First Item","type":"custom","url":"http://www.wordpress.org/first/","kind":"custom"} /-->' +
+				'<!-- wp:navigation-link {"label":"Second Item","type":"custom","url":"http://www.wordpress.org/second/","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		// The appender takes a row of its own at the end of the list.
+		const rows = listView.getByRole( 'row' );
+		const linkDialog = page.getByRole( 'dialog', { name: 'Add link' } );
+
+		// The popover must sit right under the row it was opened for, not in
+		// the corner of the screen where an unanchored popover lands.
+		async function expectDialogAnchoredTo( row ) {
+			await expect( linkDialog ).toBeVisible();
+			const rowBox = await row.boundingBox();
+			const dialogBox = await linkDialog.boundingBox();
+			expect( dialogBox.y ).toBeGreaterThanOrEqual( rowBox.y );
+			expect( dialogBox.y ).toBeLessThan( rowBox.y + rowBox.height + 40 );
+			expect( dialogBox.x + dialogBox.width ).toBeGreaterThan( rowBox.x );
+			expect( dialogBox.x ).toBeLessThan( rowBox.x + rowBox.width );
+		}
+
+		await test.step( 'adds after the first item', async () => {
+			await expect( rows ).toHaveCount( 3 );
+			await rows
+				.filter( { hasText: 'First Item' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add after' } ).click();
+
+			await expect( rows ).toHaveCount( 4 );
+			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+			await expectDialogAnchoredTo( rows.nth( 1 ) );
+		} );
+
+		await test.step( 'removes the empty item when the popover closes', async () => {
+			await page.keyboard.press( 'Escape' );
+
+			await expect( linkDialog ).toBeHidden();
+			await expect( rows ).toHaveCount( 3 );
+		} );
+
+		await test.step( 'adds before the second item', async () => {
+			await rows
+				.filter( { hasText: 'Second Item' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add before' } ).click();
+
+			await expect( rows ).toHaveCount( 4 );
+			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+			await expectDialogAnchoredTo( rows.nth( 1 ) );
+
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+			await expect( linkDialog ).toBeHidden();
+			await expect( rows.nth( 0 ) ).toContainText( 'First Item' );
+			await expect( rows.nth( 1 ) ).toContainText( 'Test Page 1' );
+			await expect( rows.nth( 2 ) ).toContainText( 'Second Item' );
 		} );
 	} );
 } );
