@@ -1352,88 +1352,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/dimensions-tool/aspect-ratio-tool.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/scale-tool.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/stories/aspect-ratio-tool.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/stories/index.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/stories/scale-tool.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/stories/width-height-tool.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/dimensions-tool/width-height-tool.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/duotone-control/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1869,28 +1787,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/image-size-control/index.jsx": {
+	"packages/block-editor/src/components/image-size-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/image-size-control/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/image-size-control/use-dimension-handler.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/index.js": {
@@ -2792,22 +2691,6 @@
 		}
 	},
 	"packages/block-editor/src/components/resizable-box-popover/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/resolution-tool/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/resolution-tool/stories/index.story.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
