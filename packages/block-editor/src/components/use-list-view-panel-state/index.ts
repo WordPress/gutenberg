@@ -9,10 +9,10 @@ import { unlock } from '../../lock-unlock';
  * ListView remounting. The expandRevision is included in the ListView component's key
  * prop. When it changes, the component will remount with fresh isExpanded=true state.
  *
- * @param {string} clientId Block client ID.
- * @return {Object} Panel state and handlers with isOpened (boolean), expandRevision (number), and handleToggle (function).
+ * @param clientId Block client ID.
+ * @return Panel state and handlers with isOpened (boolean), expandRevision (number), and handleToggle (function).
  */
-export default function useListViewPanelState( clientId ) {
+export default function useListViewPanelState( clientId: string ) {
 	const { isOpened, expandRevision } = useSelect(
 		( select ) => {
 			const { isListViewPanelOpened, getListViewExpandRevision } = unlock(
@@ -29,7 +29,7 @@ export default function useListViewPanelState( clientId ) {
 	const { __unstableToggleListViewPanel: toggleListViewPanel } =
 		useDispatch( blockEditorStore );
 
-	const handleToggle = ( opened ) => {
+	const handleToggle = ( opened: boolean ) => {
 		toggleListViewPanel( clientId, opened );
 	};
 
