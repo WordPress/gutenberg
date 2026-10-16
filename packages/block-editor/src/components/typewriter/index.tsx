@@ -1,20 +1,22 @@
 import { useRefEffect } from '@wordpress/compose';
 import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import type { TypewriterProps } from './types';
 
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
 
 export function useTypewriter() {
-	return useRefEffect( ( node ) => {
+	return useRefEffect< HTMLElement >( ( node ) => {
 		const { ownerDocument } = node;
-		const { defaultView } = ownerDocument;
+		// A node attached to a document has a window.
+		const defaultView = ownerDocument.defaultView!;
 
-		let scrollResizeRafId;
-		let onKeyDownRafId;
+		let scrollResizeRafId: number | null | undefined;
+		let onKeyDownRafId: number | null | undefined;
 
-		let caretRect;
+		let caretRect: DOMRect | null | undefined;
 
 		function onScrollResize() {
 			if ( scrollResizeRafId ) {
@@ -27,7 +29,7 @@ export function useTypewriter() {
 			} );
 		}
 
-		function onKeyDown( event ) {
+		function onKeyDown( event: KeyboardEvent ) {
 			// Ensure the any remaining request is cancelled.
 			if ( onKeyDownRafId ) {
 				defaultView.cancelAnimationFrame( onKeyDownRafId );
@@ -44,9 +46,10 @@ export function useTypewriter() {
 		 * Maintains the scroll position after a selection change caused by a
 		 * keyboard event.
 		 *
-		 * @param {KeyboardEvent} event Keyboard event.
+		 * @param event         Keyboard event.
+		 * @param event.keyCode The code of the pressed key.
 		 */
-		function maintainCaretPosition( { keyCode } ) {
+		function maintainCaretPosition( { keyCode }: KeyboardEvent ) {
 			if ( ! isSelectionEligibleForScroll() ) {
 				return;
 			}
@@ -177,7 +180,8 @@ export function useTypewriter() {
 		 * - The selection must be within editable content.
 		 */
 		function isSelectionEligibleForScroll() {
-			const { anchorNode } = defaultView.getSelection();
+			// The window of an attached document has a selection.
+			const { anchorNode } = defaultView.getSelection()!;
 
 			if ( ! anchorNode || ! node.contains( anchorNode ) ) {
 				return false;
@@ -187,7 +191,9 @@ export function useTypewriter() {
 				anchorNode.nodeType === anchorNode.ELEMENT_NODE
 					? anchorNode
 					: anchorNode.parentElement;
-			return !! element?.isContentEditable;
+			// Only HTML elements have `isContentEditable`.
+			return !! ( element as { isContentEditable?: boolean } | null )
+				?.isContentEditable;
 		}
 
 		// When the user scrolls or resizes, the scroll position should be
@@ -217,13 +223,14 @@ export function useTypewriter() {
 				computeCaretRectOnSelectionChange
 			);
 
-			defaultView.cancelAnimationFrame( scrollResizeRafId );
-			defaultView.cancelAnimationFrame( onKeyDownRafId );
+			// Cancelling an unset frame is a no-op.
+			defaultView.cancelAnimationFrame( scrollResizeRafId as number );
+			defaultView.cancelAnimationFrame( onKeyDownRafId as number );
 		};
 	}, [] );
 }
 
-function Typewriter( { children } ) {
+function Typewriter( { children }: TypewriterProps ) {
 	return (
 		<div ref={ useTypewriter() } className="block-editor__typewriter">
 			{ children }
@@ -235,10 +242,10 @@ function Typewriter( { children } ) {
  * The exported component. The implementation of Typewriter faced technical
  * challenges in Internet Explorer, and is simply skipped, rendering the given
  * props children instead.
- *
- * @type {Component}
  */
-const TypewriterOrIEBypass = isIE ? ( props ) => props.children : Typewriter;
+const TypewriterOrIEBypass = isIE
+	? ( props: TypewriterProps ) => props.children
+	: Typewriter;
 
 /**
  * Ensures that the text selection keeps the same vertical distance from the
