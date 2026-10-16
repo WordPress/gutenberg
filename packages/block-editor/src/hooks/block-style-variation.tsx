@@ -10,16 +10,22 @@ import { usePrivateStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { unlock } from '../lock-unlock';
+import type {
+	BlockListBlockFeatureProps,
+	BlockStyleVariationOverridesWithConfigProps,
+	OverrideStylesProps,
+	StyleOverrideOptions,
+} from './types';
 
 const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
 
 const VARIATION_PREFIX = 'is-style-';
 
-function getVariationMatches( className ) {
+function getVariationMatches( className?: string ): string[] {
 	if ( ! className ) {
 		return [];
 	}
-	return className.split( /\s+/ ).reduce( ( matches, name ) => {
+	return className.split( /\s+/ ).reduce< string[] >( ( matches, name ) => {
 		if ( name.startsWith( VARIATION_PREFIX ) ) {
 			const match = name.slice( VARIATION_PREFIX.length );
 			if ( match !== 'default' ) {
@@ -33,12 +39,15 @@ function getVariationMatches( className ) {
 /**
  * Get the first block style variation that has been registered from the class string.
  *
- * @param {string} className        CSS class string for a block.
- * @param {Array}  registeredStyles Currently registered block styles.
+ * @param className        CSS class string for a block.
+ * @param registeredStyles Currently registered block styles.
  *
- * @return {string|null} The name of the first registered variation.
+ * @return The name of the first registered variation.
  */
-export function getVariationNameFromClass( className, registeredStyles = [] ) {
+export function getVariationNameFromClass(
+	className?: string,
+	registeredStyles: Array< { name: string } > = []
+): string | null {
 	// The global flag affects how capturing groups work in JS. So the regex
 	// below will only return full CSS classes not just the variation name.
 	const matches = getVariationMatches( className );
@@ -56,7 +65,7 @@ export function getVariationNameFromClass( className, registeredStyles = [] ) {
 }
 
 // A helper component to apply a style override using the useStyleOverride hook.
-function OverrideStyles( { override } ) {
+function OverrideStyles( { override }: OverrideStylesProps ): undefined {
 	usePrivateStyleOverride( override );
 }
 
@@ -67,11 +76,13 @@ function OverrideStyles( { override } ) {
  * useStyleOverride to apply the new styles to the editor. Its use is
  * subject to change.
  *
- * @param {Object} props        Props.
- * @param {Object} props.config A global styles object, containing settings and styles.
- * @return {React.JSX.Element}  An array of new block variation overrides.
+ * @param props        Props.
+ * @param props.config A global styles object, containing settings and styles.
+ * @return An array of new block variation overrides.
  */
-export function BlockStyleVariationOverridesWithConfig( { config } ) {
+export function BlockStyleVariationOverridesWithConfig( {
+	config,
+}: BlockStyleVariationOverridesWithConfigProps ) {
 	const { overrides } = useSelect(
 		( select ) => ( {
 			overrides: unlock( select( blockEditorStore ) ).getStyleOverrides(),
@@ -84,8 +95,8 @@ export function BlockStyleVariationOverridesWithConfig( { config } ) {
 		if ( ! overrides?.length ) {
 			return;
 		}
-		const newOverrides = [];
-		const overriddenClientIds = [];
+		const newOverrides: StyleOverrideOptions[] = [];
+		const overriddenClientIds: string[] = [];
 		for ( const [ , override ] of overrides ) {
 			if (
 				override?.variation &&
@@ -96,7 +107,8 @@ export function BlockStyleVariationOverridesWithConfig( { config } ) {
 				 */
 				! overriddenClientIds.includes( override.clientId )
 			) {
-				const blockName = getBlockName( override.clientId );
+				// Overrides belong to blocks in the editor.
+				const blockName = getBlockName( override.clientId )!;
 				const configStyles =
 					config?.styles?.blocks?.[ blockName ]?.variations?.[
 						override.variation
@@ -173,7 +185,11 @@ export function BlockStyleVariationOverridesWithConfig( { config } ) {
 	);
 }
 
-function useBlockStyleVariation( name, variation, clientId ) {
+function useBlockStyleVariation(
+	name: string,
+	variation: string | null,
+	clientId: string
+) {
 	const { globalSettings, globalStyles } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
@@ -213,7 +229,11 @@ function useBlockStyleVariation( name, variation, clientId ) {
 // Rather than leveraging `useInstanceId` here, the `clientId` is used.
 // This is so that the variation style override's ID is predictable
 // when the order of applied style variations changes.
-function useBlockProps( { name, className, clientId } ) {
+function useBlockProps( {
+	name,
+	className,
+	clientId,
+}: BlockListBlockFeatureProps & { className?: string } ) {
 	const { getBlockStyles } = useSelect( blocksStore );
 
 	const registeredStyles = getBlockStyles( name );
@@ -274,6 +294,7 @@ function useBlockProps( { name, className, clientId } ) {
 export default {
 	hasSupport: () => true,
 	attributeKeys: [ 'className' ],
-	isMatch: ( { className } ) => getVariationMatches( className ).length > 0,
+	isMatch: ( { className }: { className?: string } ) =>
+		getVariationMatches( className ).length > 0,
 	useBlockProps,
 };

@@ -5,6 +5,7 @@ import type {
 	BlockType,
 	ColorProps,
 } from '@wordpress/blocks';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockEditorThunkArgs } from '../store/types';
 import type { Bindings } from '../utils/block-bindings';
@@ -339,4 +340,21 @@ export interface UseBlockColorContrastWarningOptions {
 export interface BlockBindingsPanelProps {
 	name: string;
 	metadata?: { bindings?: Bindings };
+}
+
+/**
+ * Props of the component applying one style override.
+ */
+export interface OverrideStylesProps {
+	override: StyleOverrideOptions;
+}
+
+/**
+ * Props of `BlockStyleVariationOverridesWithConfig`.
+ */
+export interface BlockStyleVariationOverridesWithConfigProps {
+	/**
+	 * A global styles object, containing settings and styles.
+	 */
+	config?: GlobalStylesConfig;
 }
