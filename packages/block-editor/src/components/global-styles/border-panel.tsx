@@ -8,6 +8,7 @@ import {
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import type { ComponentProps } from 'react';
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
 import {
@@ -21,13 +22,26 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
+import type {
+	BorderPanelProps,
+	PanelBorderRadius,
+	PanelBorderStyle,
+	PanelResetAllFilter,
+	StyleSettings,
+	StyleToolsPanelProps,
+	StyleValue,
+} from './types';
 
-export function useHasBorderPanel( settings ) {
+type BorderBoxValue = ComponentProps< typeof BorderBoxControl >[ 'value' ];
+
+export function useHasBorderPanel( settings: StyleSettings | undefined ) {
 	const controls = Object.values( useHasBorderPanelControls( settings ) );
 	return controls.some( Boolean );
 }
 
-export function useHasBorderPanelControls( settings ) {
+export function useHasBorderPanelControls(
+	settings: StyleSettings | undefined
+) {
 	const controls = {
 		hasBorderColor: useHasBorderColorControl( settings ),
 		hasBorderRadius: useHasBorderRadiusControl( settings ),
@@ -39,23 +53,23 @@ export function useHasBorderPanelControls( settings ) {
 	return controls;
 }
 
-function useHasBorderColorControl( settings ) {
+function useHasBorderColorControl( settings: StyleSettings | undefined ) {
 	return settings?.border?.color;
 }
 
-function useHasBorderRadiusControl( settings ) {
+function useHasBorderRadiusControl( settings: StyleSettings | undefined ) {
 	return settings?.border?.radius;
 }
 
-function useHasBorderStyleControl( settings ) {
+function useHasBorderStyleControl( settings: StyleSettings | undefined ) {
 	return settings?.border?.style;
 }
 
-function useHasBorderWidthControl( settings ) {
+function useHasBorderWidthControl( settings: StyleSettings | undefined ) {
 	return settings?.border?.width;
 }
 
-function useHasShadowControl( settings ) {
+function useHasShadowControl( settings: StyleSettings | undefined ) {
 	const shadows = useShadowPresets( settings );
 	return !! settings?.shadow && shadows.length > 0;
 }
@@ -67,7 +81,7 @@ function BorderToolsPanel( {
 	panelId,
 	children,
 	label,
-} ) {
+}: StyleToolsPanelProps ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -76,7 +90,8 @@ function BorderToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ label }
+			// The border panel passes its heading.
+			label={ label! }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			dropdownMenuProps={ dropdownMenuProps }
@@ -86,7 +101,7 @@ function BorderToolsPanel( {
 	);
 }
 
-const DEFAULT_CONTROLS = {
+const DEFAULT_CONTROLS: Record< string, boolean > = {
 	radius: true,
 	color: true,
 	width: true,
@@ -102,23 +117,28 @@ export default function BorderPanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
-} ) {
+}: BorderPanelProps ) {
 	const colors = useColorsPerOrigin( settings );
 	const itemPopoverProps = useToolsPanelItemPopoverProps();
 	const areCustomSolidsEnabled = settings?.color?.custom;
 	const decodeValue = useCallback(
-		( rawValue ) => getValueFromVariable( { settings }, '', rawValue ),
+		( rawValue: StyleValue ) =>
+			getValueFromVariable( { settings }, '', rawValue ),
 		[ settings ]
 	);
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
-	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
+	const inheritanceProps = (
+		isInherited: boolean,
+		hasLocalOverride: boolean,
+		className?: string
+	) =>
 		getInheritanceProps(
 			showInheritanceLabelIndicators && isInherited,
 			showInheritanceLabelIndicators && hasLocalOverride,
 			className
 		);
-	const encodeColorValue = ( colorValue ) => {
+	const encodeColorValue = ( colorValue: StyleValue ) => {
 		const allColors = colors.flatMap(
 			( { colors: originColors } ) => originColors
 		);
@@ -131,24 +151,29 @@ export default function BorderPanel( {
 	};
 	// Decode a `border` sub-tree (handles split borders + flat shape).
 	const decodeBorder = useCallback(
-		( source ) => {
+		( source: PanelBorderStyle | undefined ): BorderBoxValue => {
 			if ( ! source ) {
 				return undefined;
 			}
-			if ( hasSplitBorders( source ) ) {
+			// The stored border has the shape the control edits.
+			if ( hasSplitBorders( source as BorderBoxValue ) ) {
 				const out = { ...source };
-				[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
-					out[ side ] = {
-						...out[ side ],
-						color: decodeValue( out[ side ]?.color ),
-					};
-				} );
-				return out;
+				( [ 'top', 'right', 'bottom', 'left' ] as const ).forEach(
+					( side ) => {
+						out[ side ] = {
+							...out[ side ],
+							color: decodeValue( out[ side ]?.color ),
+						};
+					}
+				);
+				// The decoded border holds the colors the control shows.
+				return out as BorderBoxValue;
 			}
+			// The decoded border holds the colors the control shows.
 			return {
 				...source,
 				color: source.color ? decodeValue( source.color ) : undefined,
-			};
+			} as BorderBoxValue;
 		},
 		[ decodeValue ]
 	);
@@ -166,12 +191,13 @@ export default function BorderPanel( {
 		() => decodeBorder( inheritedValue?.border ),
 		[ inheritedValue?.border, decodeBorder ]
 	);
+	// The stored border has the shape the control edits.
 	const isBorderPlaceholder =
-		! isDefinedBorder( value?.border ) &&
+		! isDefinedBorder( value?.border as BorderBoxValue ) &&
 		!! inheritedBorder &&
 		isDefinedBorder( inheritedBorder );
 	const border = isBorderPlaceholder ? inheritedBorder : localBorder;
-	const setBorder = ( newBorder ) =>
+	const setBorder = ( newBorder: PanelBorderStyle | undefined ) =>
 		onChange( { ...value, border: newBorder } );
 	const showBorderColor = useHasBorderColorControl( settings );
 	const showBorderStyle = useHasBorderStyleControl( settings );
@@ -187,11 +213,20 @@ export default function BorderPanel( {
 		if ( typeof value?.border?.radius !== 'object' ) {
 			return decodeValue( value?.border?.radius );
 		}
+		// An object radius holds each corner.
 		return {
-			topLeft: decodeValue( value?.border?.radius?.topLeft ),
-			topRight: decodeValue( value?.border?.radius?.topRight ),
-			bottomLeft: decodeValue( value?.border?.radius?.bottomLeft ),
-			bottomRight: decodeValue( value?.border?.radius?.bottomRight ),
+			topLeft: decodeValue(
+				( value?.border?.radius as PanelBorderRadius )?.topLeft
+			),
+			topRight: decodeValue(
+				( value?.border?.radius as PanelBorderRadius )?.topRight
+			),
+			bottomLeft: decodeValue(
+				( value?.border?.radius as PanelBorderRadius )?.bottomLeft
+			),
+			bottomRight: decodeValue(
+				( value?.border?.radius as PanelBorderRadius )?.bottomRight
+			),
 		};
 	}, [ value?.border?.radius, decodeValue ] );
 	const inheritedBorderRadius = useMemo( () => {
@@ -199,22 +234,33 @@ export default function BorderPanel( {
 		if ( typeof rawRadius !== 'object' ) {
 			return decodeValue( rawRadius );
 		}
+		// An object radius holds each corner.
 		return {
-			topLeft: decodeValue( rawRadius?.topLeft ),
-			topRight: decodeValue( rawRadius?.topRight ),
-			bottomLeft: decodeValue( rawRadius?.bottomLeft ),
-			bottomRight: decodeValue( rawRadius?.bottomRight ),
+			topLeft: decodeValue( ( rawRadius as PanelBorderRadius )?.topLeft ),
+			topRight: decodeValue(
+				( rawRadius as PanelBorderRadius )?.topRight
+			),
+			bottomLeft: decodeValue(
+				( rawRadius as PanelBorderRadius )?.bottomLeft
+			),
+			bottomRight: decodeValue(
+				( rawRadius as PanelBorderRadius )?.bottomRight
+			),
 		};
 	}, [ inheritedValue?.border?.radius, decodeValue ] );
 	// Spread the local border, not the merged display value, or setting a
 	// radius bakes the inherited border into the local override. Mirror of
 	// the guard in `onBorderChange`.
-	const setBorderRadius = ( newBorderRadius ) =>
-		setBorder( { ...value?.border, radius: newBorderRadius } );
+	const setBorderRadius = (
+		newBorderRadius: StyleValue | PanelBorderRadius | undefined
+	) => setBorder( { ...value?.border, radius: newBorderRadius } );
 	const hasBorderRadius = () => {
 		const borderValues = value?.border?.radius;
 		if ( typeof borderValues === 'object' ) {
-			return Object.entries( borderValues ).some( ( [ , v ] ) => !! v );
+			// An object radius holds each corner.
+			return Object.entries( borderValues as PanelBorderRadius ).some(
+				( [ , v ] ) => !! v
+			);
 		}
 		return !! borderValues;
 	};
@@ -270,7 +316,7 @@ export default function BorderPanel( {
 	// to the preset. Reading the same list the popover renders is what keeps
 	// the two in step.
 	const shadowPresets = useShadowPresets( settings );
-	const setShadow = ( newValue ) => {
+	const setShadow = ( newValue?: string ) => {
 		// The list runs default, theme, custom, so searching backwards picks
 		// the most specific origin when more than one defines the same shadow
 		// value — a newly added custom preset starts out identical to the
@@ -294,7 +340,7 @@ export default function BorderPanel( {
 	// Re-route it to an explicit commit of the inherited value, so clicking
 	// the visible preselected preset is the user's "accept this inherited
 	// value" affordance.
-	const setShadowWithInheritedCommit = ( newValue ) => {
+	const setShadowWithInheritedCommit = ( newValue?: string ) => {
 		if ( isShadowPlaceholder && newValue === undefined ) {
 			setShadow( inheritedShadow );
 			return;
@@ -320,20 +366,25 @@ export default function BorderPanel( {
 		setBorder( undefined );
 	};
 
-	const onBorderChange = ( newBorder ) => {
+	const onBorderChange = ( newBorder: BorderBoxValue ) => {
 		// Ensure we have a visible border style when a border width or
 		// color is being selected.
-		const updatedBorder = { ...newBorder };
+		const updatedBorder: PanelBorderStyle = { ...newBorder };
 
-		if ( hasSplitBorders( updatedBorder ) ) {
-			[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
-				if ( updatedBorder[ side ] ) {
-					updatedBorder[ side ] = {
-						...updatedBorder[ side ],
-						color: encodeColorValue( updatedBorder[ side ]?.color ),
-					};
+		// The border is the one the control passed.
+		if ( hasSplitBorders( updatedBorder as BorderBoxValue ) ) {
+			( [ 'top', 'right', 'bottom', 'left' ] as const ).forEach(
+				( side ) => {
+					if ( updatedBorder[ side ] ) {
+						updatedBorder[ side ] = {
+							...updatedBorder[ side ],
+							color: encodeColorValue(
+								updatedBorder[ side ]?.color
+							),
+						};
+					}
 				}
-			} );
+			);
 		} else if ( updatedBorder ) {
 			updatedBorder.color = encodeColorValue( updatedBorder.color );
 		}
@@ -357,13 +408,16 @@ export default function BorderPanel( {
 		} );
 	};
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			border: undefined,
-			shadow: undefined,
-		};
-	}, [] );
+	const resetAllFilter: PanelResetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				border: undefined,
+				shadow: undefined,
+			};
+		},
+		[]
+	);
 
 	const showBorderByDefault =
 		defaultControls?.color || defaultControls?.width;
@@ -385,11 +439,15 @@ export default function BorderPanel( {
 				<InheritanceToolsPanelItem
 					{ ...inheritanceProps(
 						isBorderPlaceholder,
-						isDefinedBorder( value?.border ) &&
+						// The stored border has the shape the control edits.
+						isDefinedBorder( value?.border as BorderBoxValue ) &&
 							!! inheritedBorder &&
 							isDefinedBorder( inheritedBorder )
 					) }
-					hasValue={ () => isDefinedBorder( value?.border ) }
+					// The stored border has the shape the control edits.
+					hasValue={ () =>
+						isDefinedBorder( value?.border as BorderBoxValue )
+					}
 					label={ __( 'Border' ) }
 					hasInlineEndToggle
 					onDeselect={ () => resetBorder() }
