@@ -104,6 +104,7 @@ const developmentFiles = [
 // script module workspaces outside `packages/`.
 const packageJsonFiles = [
 	'packages/*/package.json',
+	'entity-actions/package.json',
 	'entity-fields/package.json',
 ];
 
@@ -541,6 +542,7 @@ export default dedupePlugins( [
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`entity-actions/src/**/*.${ SCRIPT_EXT }`,
 			`entity-fields/src/**/*.${ SCRIPT_EXT }`,
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,
@@ -556,6 +558,7 @@ export default dedupePlugins( [
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`entity-actions/src/**/*.${ SCRIPT_EXT }`,
 			`entity-fields/src/**/*.${ SCRIPT_EXT }`,
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,

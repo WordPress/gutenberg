@@ -96,7 +96,7 @@ const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
  * outside `packages/`, keyed by folder name, which is also their name in the
  * `@wordpress` scope.
  */
-const PACKAGE_DIRS = [ 'packages/*', 'entity-fields' ];
+const PACKAGE_DIRS = [ 'packages/*', 'entity-fields', 'entity-actions' ];
 
 /** @type {Map<string, string>} Package name → absolute package directory. */
 const packageDirs = new Map(

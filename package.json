@@ -36,7 +36,8 @@
 		"handlePrefix": "wp",
 		"packageDirs": [
 			"packages",
-			"entity-fields"
+			"entity-fields",
+			"entity-actions"
 		],
 		"pages": [
 			{
@@ -226,6 +227,7 @@
 		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"
 	},
 	"workspaces": [
+		"entity-actions",
 		"entity-fields",
 		"packages/*",
 		"routes/*",

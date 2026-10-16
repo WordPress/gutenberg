@@ -1,4 +1,4 @@
-# Core Actions
+# Entity actions
 
 The actions WordPress core registers for its entities, such as "Rename", "Duplicate" or "Move to trash". They are shown in the DataViews lists of the site editor and in the inspector of the editor.
 
@@ -34,11 +34,11 @@ The modules use the `wp.*` globals the `wp-editor` script loads, such as `wp.dat
 
 ## Usage
 
-The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to the properties of the DataViews action that PHP cannot serialize, which complete the action the `/wp/v2/entity-actions` route returns:
+The package provides the `@wordpress/entity-actions/post_type_supports`, `@wordpress/entity-actions/wp_block`, and `@wordpress/entity-actions/wp_template_part` script modules. Their default export maps the id of each action to the properties of the DataViews action that PHP cannot serialize, which complete the action the `/wp/v2/entity-actions` route returns:
 
 ```js
 const { default: actions } = await import(
-	'@wordpress/core-actions/post_type_supports'
+	'@wordpress/entity-actions/post_type_supports'
 );
 const renamePost = { ...actionFromTheServer, ...actions[ 'rename-post' ] };
 ```
@@ -61,7 +61,7 @@ add_action( 'wp_entity_actions_api_init', function () {
 				array( 'label' => __( 'Move to the bin…', 'acme' ) )
 			),
 		),
-		'@wordpress/core-actions/post_type_supports'
+		'@wordpress/entity-actions/post_type_supports'
 	);
 } );
 ```

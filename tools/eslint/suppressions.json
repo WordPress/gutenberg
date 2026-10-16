@@ -1,4 +1,39 @@
 {
+	"entity-actions/src/post_type_supports/delete-post/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"entity-actions/src/post_type_supports/duplicate-post/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"entity-actions/src/post_type_supports/move-to-trash/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"entity-actions/src/post_type_supports/order-pages/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"entity-actions/src/post_type_supports/permanently-delete/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"entity-actions/src/post_type_supports/rename-post/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"entity-actions/src/post_type_supports/reset-post/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
 	"packages/admin-ui/src/lock-unlock.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -4671,41 +4706,6 @@
 	"packages/connectors/src/connector-item.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
-		}
-	},
-	"packages/core-actions/src/post_type_supports/delete-post/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/core-actions/src/post_type_supports/duplicate-post/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/core-actions/src/post_type_supports/move-to-trash/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/core-actions/src/post_type_supports/order-pages/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/core-actions/src/post_type_supports/permanently-delete/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/core-actions/src/post_type_supports/rename-post/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/core-actions/src/post_type_supports/reset-post/action.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
 		}
 	},
 	"packages/core-commands/src/index.jsx": {

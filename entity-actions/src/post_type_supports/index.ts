@@ -1,6 +1,6 @@
 /**
  * Script module of the `post_type_supports` collection:
- * `@wordpress/core-actions/post_type_supports`.
+ * `@wordpress/entity-actions/post_type_supports`.
  *
  * The default actions of every post type, each registered on the post types
  * that support it or on every post type. The data of each action is in its

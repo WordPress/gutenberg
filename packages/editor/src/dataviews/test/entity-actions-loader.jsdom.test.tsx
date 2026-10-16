@@ -19,7 +19,7 @@ vi.doMock( 'acme/actions', () => ( {
 	default: { 'acme/feature': { callback: featureCallback } },
 } ) );
 
-const CORE_MODULE = '@wordpress/core-actions/post_type_supports';
+const CORE_MODULE = '@wordpress/entity-actions/post_type_supports';
 
 const CONFIG = {
 	kind: 'postType',

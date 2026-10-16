@@ -1,6 +1,6 @@
 /**
  * Script module of the `wp_block` collection:
- * `@wordpress/core-actions/wp_block`.
+ * `@wordpress/entity-actions/wp_block`.
  *
  * The actions patterns have on top of the defaults. Its default export maps
  * the id of each action to its JavaScript parts, which the client merges into

@@ -34,7 +34,7 @@
 ### Internal
 
 -   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
--   Import the core actions `registerPostTypeSchema()` registers from the `@wordpress/core-actions` script modules instead of `@wordpress/fields` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Import the core actions `registerPostTypeSchema()` registers from the `@wordpress/entity-actions/<collection>` script modules instead of `@wordpress/fields` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 -   Take `CreateTemplatePartModal` from the private APIs of `@wordpress/patterns` instead of `@wordpress/fields`, and remove it from the private APIs of the editor ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 -   The `core/editor` store no longer holds the actions of an entity: its private `registerEntityAction`, `unregisterEntityAction` and `getEntityActions` are gone ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
 

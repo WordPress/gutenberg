@@ -2,6 +2,7 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"references": [
 		{ "path": "./tsconfig.build.json" },
+		{ "path": "entity-actions" },
 		{ "path": "entity-fields" },
 		{ "path": "packages/a11y" },
 		{ "path": "packages/abilities" },
@@ -16,7 +17,6 @@
 		{ "path": "packages/components/tsconfig.stories.json" },
 		{ "path": "packages/compose" },
 		{ "path": "packages/connectors" },
-		{ "path": "packages/core-actions" },
 		{ "path": "packages/core-data" },
 		{ "path": "packages/data-controls" },
 		{ "path": "packages/dataviews" },

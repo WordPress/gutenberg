@@ -35,6 +35,7 @@ const pkgDirs = [
 		.readdirSync( packagesDir )
 		.map( ( dir ) => path.join( packagesDir, dir ) ),
 	path.join( ROOT_DIR, 'entity-fields' ),
+	path.join( ROOT_DIR, 'entity-actions' ),
 ];
 
 for ( const pkgDir of pkgDirs ) {
