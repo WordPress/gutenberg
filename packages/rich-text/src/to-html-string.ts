@@ -21,7 +21,7 @@ export function toHTMLString( {
 }: {
 	value: RichTextValue;
 	preserveWhiteSpace?: boolean;
-} ) {
+} ): string {
 	const tree = toTree< HTMLTreeNode >( {
 		value,
 		preserveWhiteSpace,

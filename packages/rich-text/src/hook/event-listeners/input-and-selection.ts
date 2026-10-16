@@ -72,13 +72,22 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		}
 
 		const currentValue = createRecord();
-		const { start, activeFormats: oldActiveFormats = [] } = record.current;
+		const { start } = record.current;
+
+		if ( start === undefined || currentValue.start === undefined ) {
+			handleChange( currentValue );
+			return;
+		}
 
 		// When a non-collapsed selection is deleted (not replaced with new
 		// text), the old active formats refer to the deleted content and
 		// should not be carried forward.
 		const clearFormats =
 			! isCollapsed( record.current ) && currentValue.start <= start;
+		const oldActiveFormats = getActiveFormats(
+			record.current,
+			EMPTY_ACTIVE_FORMATS
+		);
 
 		// Update the formats between the last and new caret position.
 		const change = updateFormats( {
@@ -97,8 +106,8 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 				anchorOffset: number;
 				focusNode: Node | null;
 				focusOffset: number;
-				processedStart: number;
-				processedEnd: number;
+				processedStart: number | undefined;
+				processedEnd: number | undefined;
 		  }
 		| undefined;
 

@@ -26,9 +26,9 @@ export function RichTextShortcut( {
 			}
 		}
 
-		keyboardShortcuts!.add( callback );
+		keyboardShortcuts.add( callback );
 		return () => {
-			keyboardShortcuts!.delete( callback );
+			keyboardShortcuts.delete( callback );
 		};
 	}, [ character, type, keyboardShortcuts, stableOnUse ] );
 
