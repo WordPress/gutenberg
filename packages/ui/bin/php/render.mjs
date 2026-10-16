@@ -13,15 +13,6 @@ import { createElement } from 'react';
 export const getSlotPlaceholder = ( name ) => `__wpuislot_${ name }__`;
 
 /**
- * The placeholder rendered in place of a string React translates, such as
- * Notice's "Dismiss" label.
- *
- * @param {number} index Index of the string in the build's list.
- * @return {string} Placeholder.
- */
-export const getTextPlaceholder = ( index ) => `__wpuitext_${ index }__`;
-
-/**
  * Lists the variants of a component: props with a fixed set of values.
  *
  * @param {Object} component Component definition.
