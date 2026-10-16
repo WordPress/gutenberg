@@ -297,3 +297,45 @@ function gutenberg_register_post_trash_action_link( $post_type, $post_type_objec
 	add_filter( "rest_prepare_{$post_type}", 'gutenberg_add_post_trash_action_link', 10, 3 );
 }
 add_action( 'registered_post_type', 'gutenberg_register_post_trash_action_link', 10, 2 );
+
+/**
+ * Adds the `action-set-homepage` and `action-set-posts-page` links to the
+ * pages the current user can set as the homepage or as the posts page.
+ *
+ * A page can be set as either when it's published and it's neither the
+ * homepage nor the posts page yet. Both change the site settings, so they
+ * require `manage_options`, like the settings route.
+ *
+ * The links depend on the site settings, so a client that changes the
+ * homepage or the posts page requests the affected pages again.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     Post object.
+ * @param WP_REST_Request  $request  Request object.
+ * @return WP_REST_Response The response object.
+ */
+function gutenberg_add_page_homepage_action_links( $response, $post, $request ) {
+	if (
+		! $post instanceof WP_Post ||
+		'edit' !== $request['context'] ||
+		'publish' !== $post->post_status ||
+		! current_user_can( 'manage_options' ) ||
+		(int) get_option( 'page_on_front' ) === $post->ID ||
+		(int) get_option( 'page_for_posts' ) === $post->ID
+	) {
+		return $response;
+	}
+
+	// Targets the `self` link, so responses whose `_fields` leave out
+	// `_links` are skipped.
+	$links = $response->get_links();
+	if ( empty( $links['self'][0]['href'] ) ) {
+		return $response;
+	}
+
+	$response->add_link( 'https://api.w.org/action-set-homepage', $links['self'][0]['href'] );
+	$response->add_link( 'https://api.w.org/action-set-posts-page', $links['self'][0]['href'] );
+
+	return $response;
+}
+add_filter( 'rest_prepare_page', 'gutenberg_add_page_homepage_action_links', 10, 3 );
