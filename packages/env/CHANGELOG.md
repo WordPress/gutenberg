@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Download the PHPUnit test library for a WordPress alpha, beta or RC version from its `X.Y` branch of `WordPress/wordpress-develop` when that branch exists, instead of always from trunk. A maintenance branch between point releases, such as `7.1.4-alpha`, no longer gets trunk's tests, which can depend on code only trunk has. A release falls back to its `X.Y` branch when its tag does not exist yet. Cached test libraries now also update to the fetched version instead of staying on the first one downloaded ([#84758](https://github.com/WordPress/gutenberg/pull/84758)).
+
 ## 11.17.0 (2026-10-07)
 
 ### New Features
