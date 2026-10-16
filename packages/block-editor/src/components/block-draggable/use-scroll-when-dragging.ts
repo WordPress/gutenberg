@@ -1,5 +1,6 @@
 import { getScrollContainer } from '@wordpress/dom';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
+import type { DragEvent } from 'react';
 
 const SCROLL_INACTIVE_DISTANCE_PX = 50;
 const SCROLL_INTERVAL_MS = 25;
@@ -10,15 +11,21 @@ const VELOCITY_MULTIPLIER =
 /**
  * React hook that scrolls the scroll container when a block is being dragged.
  *
- * @return {Function[]} `startScrolling`, `scrollOnDragOver`, `stopScrolling`
- *                      functions to be called in `onDragStart`, `onDragOver`
- *                      and `onDragEnd` events respectively.
+ * @return `startScrolling`, `scrollOnDragOver`, `stopScrolling`
+ *         functions to be called in `onDragStart`, `onDragOver`
+ *         and `onDragEnd` events respectively.
  */
-export default function useScrollWhenDragging() {
-	const dragStartYRef = useRef( null );
-	const velocityYRef = useRef( null );
-	const scrollParentYRef = useRef( null );
-	const scrollEditorIntervalRef = useRef( null );
+export default function useScrollWhenDragging(): [
+	( event: DragEvent ) => void,
+	( event: DragEvent ) => void,
+	() => void,
+] {
+	const dragStartYRef = useRef< number | null >( null );
+	const velocityYRef = useRef< number | null >( null );
+	const scrollParentYRef = useRef< HTMLElement | null | undefined >( null );
+	const scrollEditorIntervalRef = useRef< ReturnType<
+		typeof setInterval
+	> | null >( null );
 
 	// Clear interval when unmounting.
 	useEffect(
@@ -31,11 +38,14 @@ export default function useScrollWhenDragging() {
 		[]
 	);
 
-	const startScrolling = useCallback( ( event ) => {
+	const startScrolling = useCallback( ( event: DragEvent ) => {
 		dragStartYRef.current = event.clientY;
 
 		// Find nearest parent(s) to scroll.
-		scrollParentYRef.current = getScrollContainer( event.target );
+		// The drag starts on an element, inside an HTML scroll container.
+		scrollParentYRef.current = getScrollContainer(
+			event.target as HTMLElement
+		) as HTMLElement | undefined;
 
 		scrollEditorIntervalRef.current = setInterval( () => {
 			if ( scrollParentYRef.current && velocityYRef.current ) {
@@ -51,13 +61,14 @@ export default function useScrollWhenDragging() {
 		}, SCROLL_INTERVAL_MS );
 	}, [] );
 
-	const scrollOnDragOver = useCallback( ( event ) => {
+	const scrollOnDragOver = useCallback( ( event: DragEvent ) => {
 		if ( ! scrollParentYRef.current ) {
 			return;
 		}
 		const scrollParentHeight = scrollParentYRef.current.offsetHeight;
 		const offsetDragStartPosition =
-			dragStartYRef.current - scrollParentYRef.current.offsetTop;
+			// The drag start position is set while scrolling.
+			dragStartYRef.current! - scrollParentYRef.current.offsetTop;
 		const offsetDragPosition =
 			event.clientY - scrollParentYRef.current.offsetTop;
 
