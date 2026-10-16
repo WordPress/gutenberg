@@ -17,6 +17,11 @@
 	}
 }
 
+// Mirrors MIN_WIDTH in utils.js, as a stylesheet rule so a minimum width from Global Styles can win.
+:where(.wp-block-search__inside-wrapper) {
+	min-width: 220px;
+}
+
 .wp-block-search__inspector-controls {
 	.components-base-control {
 		// Counteract the margin added by the block inspector.

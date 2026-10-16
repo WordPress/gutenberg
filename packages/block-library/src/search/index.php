@@ -384,6 +384,20 @@ function styles_for_block_core_search( $attributes ) {
 		);
 	}
 
+	// Add minimum width and height styles.
+	$dimensions_styles = wp_style_engine_get_styles(
+		array(
+			'dimensions' => array(
+				'minWidth'  => $attributes['style']['dimensions']['minWidth'] ?? null,
+				'minHeight' => $attributes['style']['dimensions']['minHeight'] ?? null,
+			),
+		)
+	);
+
+	if ( ! empty( $dimensions_styles['css'] ) ) {
+		$wrapper_styles[] = $dimensions_styles['css'];
+	}
+
 	// Add border width and color styles.
 	apply_block_core_search_border_styles( $attributes, 'width', $wrapper_styles, $button_styles, $input_styles );
 	apply_block_core_search_border_styles( $attributes, 'color', $wrapper_styles, $button_styles, $input_styles );
