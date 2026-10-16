@@ -490,13 +490,11 @@
 	position: relative;
 	width: 100%;
 	height: 100%;
-	// The toolbar is placed in container units of the box.
-	container-type: size;
 }
 
-// A small block toolbar outside the block, under the bottom right corner of
-// its bounding box and clear of the resize handle in the middle of the bottom
-// side. It is placed by `getBoundingBoxCornerStyle()`.
+// A small block toolbar outside the block, under its lowest corner and clear
+// of the resize handle in the middle of the bottom side. It is placed by
+// `getCornerToolbarStyle()`.
 .block-editor-grid-item-handles__toolbar {
 	position: absolute;
 	display: flex;

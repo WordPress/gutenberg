@@ -668,6 +668,7 @@ function GridTools( {
 				<GridItemHandles
 					clientId={ clientId }
 					angle={ previewRotate ?? rotate }
+					anchorAngle={ rotate }
 				>
 					{ showDragHandle && (
 						<GridItemDragHandle

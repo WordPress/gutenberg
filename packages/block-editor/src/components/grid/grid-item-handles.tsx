@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
+import { useMemo } from '@wordpress/element';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
-import { getBoundingBoxCornerStyle } from './rotation';
+import { getCornerToolbarStyle, getLowestCorner } from './rotation';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 
-// Space between the block's bounding box and the toolbar, in pixels.
+// Space between the block and the toolbar, in pixels.
 const TOOLBAR_GAP = 8;
 
 interface GridItemHandlesProps {
@@ -12,6 +13,11 @@ interface GridItemHandlesProps {
 	clientId: string;
 	/** Rotation of the grid item in degrees, including a previewed one. */
 	angle: number;
+	/**
+	 * Rotation of the grid item in degrees, without a previewed one. The
+	 * toolbar is under the block's lowest corner at this angle.
+	 */
+	anchorAngle: number;
 	/** The handles. */
 	children: ReactNode;
 }
@@ -22,16 +28,22 @@ interface GridItemHandlesProps {
  *
  * It sits in an overlay that turns with the block, which the rotate handle
  * turns the block around. On a rotated block, it stays upright like the block
- * toolbar, under the bottom right corner of the block's bounding box, so it
- * stays in the same place at any angle.
+ * toolbar, under the block's lowest corner. While the block turns, it follows
+ * that corner, and it moves to the new lowest corner once the rotation is
+ * released.
  */
 export function GridItemHandles( {
 	clientId,
 	angle,
+	anchorAngle,
 	children,
 }: GridItemHandlesProps ) {
 	const blockElement = useBlockElement( clientId ) as HTMLElement | null;
 	const overlayStyle = useRotatedOverlayStyle( blockElement, angle );
+	const corner = useMemo(
+		() => getLowestCorner( anchorAngle ),
+		[ anchorAngle ]
+	);
 
 	if ( ! blockElement ) {
 		return null;
@@ -47,7 +59,11 @@ export function GridItemHandles( {
 			<div className="block-editor-grid-item-handles__box">
 				<div
 					className="block-editor-grid-item-handles__toolbar"
-					style={ getBoundingBoxCornerStyle( angle, TOOLBAR_GAP ) }
+					style={ getCornerToolbarStyle(
+						angle,
+						corner,
+						TOOLBAR_GAP
+					) }
 				>
 					{ children }
 				</div>

@@ -116,47 +116,73 @@ export function getRotatedOverlayStyle( { width, height, angle } ) {
 	};
 }
 
+// Sines and cosines this close to 0 count as 0, so that the corners of a
+// level edge count as level.
+const EPSILON = 1e-9;
+
+function getSign( value ) {
+	if ( Math.abs( value ) < EPSILON ) {
+		return 0;
+	}
+	return value > 0 ? 1 : -1;
+}
+
 /**
- * Gets the style that places an element under the bottom right corner of a
- * rotated block's bounding box, upright, from inside an overlay that turns with
- * the block (see `getRotatedOverlayStyle`).
+ * Gets the lowest corner of a block rotated around its center, on screen.
+ * When two corners are equally low, on a level bottom edge, it is the one on
+ * the right. The lowest corner only depends on the angle, not on the block's
+ * size.
  *
- * The corner's position in the overlay depends on both the overlay's width and
- * height, so the overlay must be a size container: the position is given in
- * `cqw` and `cqh` units, and follows the overlay's size without measuring it.
- * The element turns back by the same angle around its top-left corner, and is
- * moved left by its own width, so that its top-right corner is at the point.
+ * @param {number} angle Rotation in degrees.
  *
- * @param {number} angle Rotation of the overlay in degrees.
- * @param {number} gap   Space between the bounding box and the element, in pixels.
+ * @return {{x: number, y: number}} The corner in the block's own frame: `x` is
+ *                                  -1 for its left edge and 1 for its right
+ *                                  edge, and `y` is -1 for its top edge and 1
+ *                                  for its bottom edge.
+ */
+export function getLowestCorner( angle ) {
+	const radians = ( angle * Math.PI ) / 180;
+	const sin = getSign( Math.sin( radians ) );
+	const cos = getSign( Math.cos( radians ) );
+	// The lowest corner is on the side of the sine across the block and of the
+	// cosine along it. On a level edge, one of them is 0, and the corner on
+	// the right of the screen is picked instead.
+	if ( sin === 0 ) {
+		return { x: cos, y: cos };
+	}
+	if ( cos === 0 ) {
+		return { x: sin, y: -sin };
+	}
+	return { x: sin, y: cos };
+}
+
+/**
+ * Gets the style that places an element upright under a corner of a rotated
+ * block, from inside an overlay that turns with the block (see
+ * `getRotatedOverlayStyle`).
+ *
+ * The corner is at a fixed place in the overlay, so the element follows it
+ * while the block turns. Its top-left corner is placed a gap below the block's
+ * corner on screen, and it turns back by the block's angle around that point
+ * and moves left by its own width, so that it is upright with its top-right
+ * corner there.
+ *
+ * @param {number}                 angle  Rotation of the overlay in degrees.
+ * @param {{x: number, y: number}} corner The corner, as returned by `getLowestCorner`.
+ * @param {number}                 gap    Space between the corner and the element, in pixels.
  *
  * @return {Object} Style properties for the element.
  */
-export function getBoundingBoxCornerStyle( angle, gap ) {
+export function getCornerToolbarStyle( angle, corner, gap ) {
 	const radians = ( angle * Math.PI ) / 180;
-	const cos = Math.cos( radians );
-	const sin = Math.sin( radians );
-	const absCos = Math.abs( cos );
-	const absSin = Math.abs( sin );
 	const round = ( value ) => Math.round( value * 10000 ) / 10000;
-	// The corner is half the bounding box's size from the center, turned back
-	// into the overlay's frame. Each term is a share of the overlay's width or
-	// height, or of the gap.
-	const left = [
-		round( ( ( 1 + cos * absCos + sin * absSin ) / 2 ) * 100 ),
-		round( ( ( cos * absSin + sin * absCos ) / 2 ) * 100 ),
-		round( sin * gap ),
-	];
-	const top = [
-		round( ( ( cos * absSin - sin * absCos ) / 2 ) * 100 ),
-		round( ( ( 1 + cos * absCos - sin * absSin ) / 2 ) * 100 ),
-		round( cos * gap ),
-	];
-	const toCalc = ( [ width, height, pixels ] ) =>
-		`calc(${ width }cqw + ${ height }cqh + ${ pixels }px)`;
+	// The gap points down the screen, which is turned back by the block's
+	// angle in the overlay.
+	const gapX = round( Math.sin( radians ) * gap );
+	const gapY = round( Math.cos( radians ) * gap );
 	return {
-		left: toCalc( left ),
-		top: toCalc( top ),
+		left: `calc(${ ( ( corner.x + 1 ) / 2 ) * 100 }% + ${ gapX }px)`,
+		top: `calc(${ ( ( corner.y + 1 ) / 2 ) * 100 }% + ${ gapY }px)`,
 		transformOrigin: '0 0',
 		transform: `rotate(${ -angle }deg) translateX(-100%)`,
 	};
