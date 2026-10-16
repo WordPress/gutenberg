@@ -153,6 +153,12 @@ export const FallbackColors: Story = {
 					Transparent colors become opaque, and out-of-gamut channels
 					are clipped to sRGB.
 				</p>
+				<p>
+					Development warnings are best-effort. They do not resolve
+					CSS variables or detect every unsupported expression. The
+					absence of a warning does not guarantee sufficient contrast.
+					See Unsupported Colors for examples.
+				</p>
 				<table>
 					<thead>
 						<tr>
@@ -213,6 +219,102 @@ export const FallbackColors: Story = {
 										</Stack>
 									</td>
 								) ) }
+							</tr>
+						) ) }
+					</tbody>
+				</table>
+			</div>
+		);
+	},
+};
+
+/** Demonstrate unsupported fills and the limits of development warnings. */
+export const UnsupportedColors: Story = {
+	args: { size: 'lg' },
+	parameters: {
+		// This demonstration intentionally reproduces insufficient contrast.
+		// Keep the accessibility findings visible without failing other stories.
+		a11y: { test: 'todo' },
+	},
+	render: ( args ) => {
+		const examples = [
+			[
+				'currentColor',
+				'Keyword scan detects the foreground dependency.',
+			],
+			[
+				'color-mix(in srgb, currentColor 50%, red)',
+				'Keyword scan detects the foreground dependency.',
+			],
+			[
+				'var(--_wp-ui-avatar-unsupported-color)',
+				'The variable resolves to currentColor. Not detected.',
+			],
+			[
+				String.raw`\63 urrentColor`,
+				'Escaped currentColor. Not detected.',
+			],
+			[
+				'var(--_wp-ui-avatar-missing-color)',
+				'The variable is undefined. Not detected.',
+			],
+			[ 'not-a-color', 'CSS.supports() rejects the color.' ],
+			[ 'inherit', 'CSS.supports() rejects the relative-color fill.' ],
+		];
+		return (
+			<div
+				className={ `${ explorationStyles.gallery } ${ explorationStyles.unsupported }` }
+				role="region"
+				aria-label="Unsupported Avatar colors"
+				tabIndex={ 0 }
+			>
+				<p>
+					These examples intentionally use unsupported colors. A fill
+					that depends on its foreground can lose contrast. Invalid
+					colors and missing variables can remove the fill.
+				</p>
+				<p>
+					In supporting browsers, development builds warn about
+					explicit <code>currentColor</code> tokens and values
+					rejected by <code>CSS.supports()</code>. Warnings are
+					best-effort and deduplicated. They do not resolve CSS
+					variables or detect every unsupported expression, including
+					escaped keywords. The absence of a warning does not
+					guarantee sufficient contrast.
+				</p>
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">Color</th>
+							<th scope="col">Fallbacks</th>
+							<th scope="col">Best-effort validation</th>
+						</tr>
+					</thead>
+					<tbody>
+						{ examples.map( ( [ color, explanation ] ) => (
+							<tr key={ color }>
+								<th scope="row">
+									<code>{ color }</code>
+								</th>
+								<td>
+									<Stack gap="lg" align="center">
+										<Avatar.Root
+											{ ...args }
+											color={ color }
+											aria-hidden="true"
+										>
+											<Avatar.Initials name="Alex Morgan" />
+										</Avatar.Root>
+										<Avatar.Root
+											{ ...args }
+											color={ color }
+											aria-hidden="true"
+										>
+											<Avatar.Fallback />
+										</Avatar.Root>
+									</Stack>
+								</td>
+								<td>{ explanation }</td>
 							</tr>
 						) ) }
 					</tbody>

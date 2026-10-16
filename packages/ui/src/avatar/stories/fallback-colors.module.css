@@ -23,11 +23,15 @@
 
 		.neutral {
 			background-color: var(--wpds-color-background-surface-neutral-weak);
-			color: var(--wpds-color-foreground-content-neutral);
+			color: var(--wpds-color-foreground-content-neutral-weak);
 
 			> svg {
 				color: var(--wpds-color-stroke-surface-neutral-strong);
 			}
+		}
+
+		.unsupported {
+			--_wp-ui-avatar-unsupported-color: currentColor;
 		}
 
 		/* Explicit comparison treatments; the capped tint uses the component defaults. */

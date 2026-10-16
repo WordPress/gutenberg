@@ -15,7 +15,12 @@ export type RootProps = Omit<
 	 * The colored fallback's fill must resolve independently of its foreground.
 	 * `currentColor`, including through CSS variables or color functions, is
 	 * unsupported for colored fallbacks and can produce insufficient contrast.
+	 * CSS-wide keywords such as `inherit` cannot be used as fallback fills.
 	 * Alpha is discarded, and out-of-gamut channels are clipped to sRGB.
+	 *
+	 * Development warnings are best-effort. They do not resolve CSS variables
+	 * or detect every unsupported expression, including escaped keywords.
+	 * The absence of a warning does not guarantee sufficient contrast.
 	 */
 	color?: React.CSSProperties[ 'color' ];
 	/**
