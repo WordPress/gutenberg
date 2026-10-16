@@ -39,31 +39,29 @@ jobs:
                       const pr_number = pr.number;
                       console.log(`Commit SHA: ${commit_sha}`);
                       console.log(`PR: ${pr_number}`);
-                      core.exportVariable('commit_sha', commit_sha);
-                      core.exportVariable('pr_number', pr_number);
+                      core.setOutput('commit_sha', commit_sha);
+                      core.setOutput('pr_number', pr_number);
 
                       const labels = pr.labels.map(label => label.name);
                       console.log(`Labels: ${labels}`);
                       const regex = /^Backport to WP ([0-9]+\.[0-9]+) Beta\/RC$/;
                       let matched = false;
+                      let version = '';
                       for (const label of labels) {
                         const match = label.match(regex);
                         if (match) {
-                          const version = match[1];
+                          version = match[1];
                           console.log(`Matched label: ${label}`);
                           console.log(`Extracted version: ${version}`);
-                          core.exportVariable('cherry_pick', 'true');
-                          core.exportVariable('version', version);
                           matched = true;
                           break;
                         }
                       }
-                      if (!matched) {
-                        core.exportVariable('cherry_pick', 'false');
-                      }
+                      core.setOutput('cherry_pick', matched.toString());
+                      core.setOutput('version', version);
 
             - name: Checkout repository
-              if: env.cherry_pick == 'true'
+              if: steps.label-check.outputs.cherry_pick == 'true'
               uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
@@ -71,38 +69,42 @@ jobs:
                   persist-credentials: true
 
             - name: Set up Git
-              if: env.cherry_pick == 'true'
+              if: steps.label-check.outputs.cherry_pick == 'true'
               run: |
                   git config --global user.name "Gutenberg Repository Automation"
                   git config --global user.email "gutenberg@wordpress.org"
 
             - name: Cherry-pick the commit
               id: cherry-pick
-              if: env.cherry_pick == 'true'
+              if: steps.label-check.outputs.cherry_pick == 'true'
+              env:
+                  VERSION: ${{ steps.label-check.outputs.version }}
+                  COMMIT_SHA: ${{ steps.label-check.outputs.commit_sha }}
               run: |
-                  TARGET_BRANCH="wp/${version}"
-                  COMMIT_SHA="${commit_sha}"
+                  TARGET_BRANCH="wp/${VERSION}"
                   echo "Target branch: $TARGET_BRANCH"
                   echo "Commit SHA: $COMMIT_SHA"
                   git checkout "$TARGET_BRANCH"
                   git cherry-pick "$COMMIT_SHA" || echo "cherry-pick-failed" > result
                   if [ -f result ] && grep -q "cherry-pick-failed" result; then
-                    echo "conflict=true" >> "$GITHUB_ENV"
+                    echo "conflict=true" >> "$GITHUB_OUTPUT"
                     git cherry-pick --abort
                   else
                     CHERRY_PICK_SHA="$(git rev-parse HEAD)"
-                    echo "conflict=false" >> "$GITHUB_ENV"
-                    echo "cherry_pick_sha=$CHERRY_PICK_SHA" >> "$GITHUB_ENV"
+                    echo "conflict=false" >> "$GITHUB_OUTPUT"
+                    echo "cherry_pick_sha=$CHERRY_PICK_SHA" >> "$GITHUB_OUTPUT"
                     git push origin "$TARGET_BRANCH"
                   fi
-
             - name: Remove cherry-pick label
-              if: env.cherry_pick == 'true' && env.conflict == 'false'
+              if: steps.label-check.outputs.cherry_pick == 'true' && steps.cherry-pick.outputs.conflict == 'false'
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  PR_NUMBER: ${{ steps.label-check.outputs.pr_number }}
+                  VERSION: ${{ steps.label-check.outputs.version }}
               with:
                   script: |
-                      const prNumber = process.env.pr_number;
-                      const version = process.env.version;
+                      const prNumber = Number(process.env.PR_NUMBER);
+                      const version = process.env.VERSION;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`version: ${version}`);
                       const oldLabel = `Backport to WP ${version} Beta/RC`;
@@ -121,13 +123,17 @@ jobs:
                       });
 
             - name: Comment on the PR
-              if: env.cherry_pick == 'true' && env.conflict == 'false'
+              if: steps.label-check.outputs.cherry_pick == 'true' && steps.cherry-pick.outputs.conflict == 'false'
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  PR_NUMBER: ${{ steps.label-check.outputs.pr_number }}
+                  VERSION: ${{ steps.label-check.outputs.version }}
+                  CHERRY_PICK_SHA: ${{ steps.cherry-pick.outputs.cherry_pick_sha }}
               with:
                   script: |
-                      const prNumber = process.env.pr_number;
-                      const cherryPickSha = process.env.cherry_pick_sha;
-                      const targetBranch = `wp/${process.env.version}`;
+                      const prNumber = Number(process.env.PR_NUMBER);
+                      const cherryPickSha = process.env.CHERRY_PICK_SHA;
+                      const targetBranch = `wp/${process.env.VERSION}`;
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`cherryPickSha: ${cherryPickSha}`);
                       console.log(`targetBranch: ${targetBranch}`);
@@ -139,47 +145,59 @@ jobs:
                       });
 
             - name: Comment on the PR about conflict
-              if: env.cherry_pick == 'true' && env.conflict == 'true'
+              if: steps.label-check.outputs.cherry_pick == 'true' && steps.cherry-pick.outputs.conflict == 'true'
               uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+              env:
+                  PR_NUMBER: ${{ steps.label-check.outputs.pr_number }}
+                  COMMIT_SHA: ${{ steps.label-check.outputs.commit_sha }}
+                  VERSION: ${{ steps.label-check.outputs.version }}
               with:
                   script: |
-                      const prNumber = process.env.pr_number;
-                      const commitSha = process.env.commit_sha;
-                      const targetBranch = `wp/${process.env.version}`;
+                      const prNumber = Number(process.env.PR_NUMBER);
+                      const commitSha = process.env.COMMIT_SHA;
+                      const shortSha = commitSha.substring(0, 7);
+                      const targetBranch = `wp/${process.env.VERSION}`;
+                      const targetBranchSlug = targetBranch.replace(/\//g, '-');
+                      const newBranchName = `cherry-pick/${shortSha}-to-${targetBranchSlug}-from-${prNumber}`;
+
                       console.log(`prNumber: ${prNumber}`);
                       console.log(`targetBranch: ${targetBranch}`);
+                      console.log(`newBranchName: ${newBranchName}`);
+
+                      const commentBody = [
+                        `There was a conflict while trying to cherry-pick the commit to the \`${targetBranch}\` branch. Please resolve the conflict manually and create a PR to the \`${targetBranch}\` branch.`,
+                        '',
+                        `PRs to \`${targetBranch}\` are similar to PRs to \`trunk\`, but you should base your PR on the \`${targetBranch}\` branch instead of \`trunk\`.`,
+                        '',
+                        '```bash',
+                        `# Checkout the ${targetBranch} branch instead of trunk.`,
+                        `git checkout ${targetBranch}`,
+                        '',
+                        `# Create a new branch for your PR.`,
+                        `git checkout -b ${newBranchName}`,
+                        '',
+                        `# Cherry-pick the commit.`,
+                        `git cherry-pick ${commitSha}`,
+                        '',
+                        `# Check which files have conflicts (if any).`,
+                        'git status',
+                        '',
+                        `# (If conflicts occur) Resolve the conflict, stage the files, and continue:`,
+                        '# git add .',
+                        '# git cherry-pick --continue',
+                        '',
+                        `# Push the branch to the repository (or your fork).`,
+                        `git push origin ${newBranchName}`,
+                        '```',
+                        '',
+                        '### Create the Pull Request',
+                        `- **Using GitHub CLI**: \`gh pr create --base ${targetBranch} --web\``,
+                        `- **Manually via web UI**: Make sure to [set the base branch to ${targetBranch}](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request).`
+                      ].join('\n');
+
                       await github.rest.issues.createComment({
                         owner: context.repo.owner,
                         repo: context.repo.repo,
                         issue_number: prNumber,
-                        body: `There was a conflict while trying to cherry-pick the commit to the ${targetBranch} branch. Please resolve the conflict manually and create a PR to the ${targetBranch} branch.
-
-                        PRs to ${targetBranch} are similar to PRs to trunk, but you should base your PR on the ${targetBranch} branch instead of trunk.
-
-                        \`\`\`
-                        # Checkout the ${targetBranch} branch instead of trunk.
-                        git checkout ${targetBranch}
-
-                        # Create a new branch for your PR.
-                        git checkout -b my-branch
-
-                        # Cherry-pick the commit.
-                        git cherry-pick ${commitSha}
-
-                        # Check which files have conflicts.
-                        git status
-
-                        # Resolve the conflict...
-                        # Add the resolved files to the staging area.
-                        git status
-                        git add .
-                        git cherry-pick --continue
-
-                        # Push the branch to the repository
-                        git push origin my-branch
-
-                        # Create a PR and set the base to the ${targetBranch} branch.
-                        # See https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-base-branch-of-a-pull-request.
-                        \`\`\`
-                        `
+                        body: commentBody
                       });
