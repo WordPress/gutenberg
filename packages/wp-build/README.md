@@ -272,6 +272,20 @@ This allows your packages to consume third-party dependencies as externals:
 
 If `handlePrefix` is omitted, it defaults to the namespace key (e.g., `"woo"` → `woo-cart`).
 
+### `wpPlugin.packageDirs`
+
+The folders that hold your packages, relative to the root `package.json`. Defaults to `[ "packages" ]`. Each entry is either a folder of packages (`"packages"` means every `packages/<name>` folder with a `package.json`) or a single package folder (a folder with its own `package.json`, like `"my-package"`):
+
+```json
+{
+	"wpPlugin": {
+		"packageDirs": [ "packages", "modules", "my-package" ]
+	}
+}
+```
+
+A package's folder name names its build output (`build/scripts/<name>`, `build/modules/<name>`, `build/styles/<name>`), so the build fails if two packages share a folder name. Watch mode watches the `src` folder of every package found this way.
+
 ### `wpPlugin.pages` (Experimental)
 
 Define admin pages that support routes. Each page gets generated PHP functions for route registration and can be extended by other plugins.

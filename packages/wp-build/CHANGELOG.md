@@ -9,6 +9,7 @@
 
 ### Enhancements
 
+-   Add the `wpPlugin.packageDirs` option to build packages from folders other than `packages/`, either folders of packages or single package folders.
 -   Resolve development bundles with the `development` and `module` export conditions, enabling runtime diagnostics such as unsupported Emotion component selectors ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
 
 ### Bug Fixes

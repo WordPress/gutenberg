@@ -25,6 +25,7 @@ import {
 	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { DEFAULT_PACKAGE_DIRS, getPackageDirs } from './package-dirs.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
@@ -70,7 +71,6 @@ try {
 }
 
 const ROOT_DIR = process.cwd();
-const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
 const ASSET_EXTENSIONS = 'json';
@@ -81,24 +81,32 @@ const IGNORE_PATTERNS = [
 	'**/*.{spec,test}.*',
 ];
 
-/**
- * Get all package names from the packages directory.
- *
- * @return {string[]} Array of package names.
- */
-function getAllPackages() {
-	return glob
-		.sync( normalizePath( path.join( PACKAGES_DIR, '*', 'package.json' ) ) )
-		.map( ( packageJsonPath ) =>
-			path.basename( path.dirname( packageJsonPath ) )
-		);
-}
-
-const PACKAGES = getAllPackages();
 const ROOT_PACKAGE_JSON = getPackageInfoFromFile(
 	path.join( ROOT_DIR, 'package.json' )
 );
 const WP_PLUGIN_CONFIG = ROOT_PACKAGE_JSON.wpPlugin || {};
+
+// Package folder name → absolute package directory, for every package in the
+// folders listed by `wpPlugin.packageDirs`.
+const PACKAGE_DIRS = getPackageDirs(
+	ROOT_DIR,
+	WP_PLUGIN_CONFIG.packageDirs ?? DEFAULT_PACKAGE_DIRS
+);
+const PACKAGES = Array.from( PACKAGE_DIRS.keys() );
+
+/**
+ * Get the directory of a package from its folder name.
+ *
+ * @param {string} packageName Package folder name.
+ * @return {string} Absolute package directory.
+ */
+function getPackageDir( packageName ) {
+	const packageDir = PACKAGE_DIRS.get( packageName );
+	if ( ! packageDir ) {
+		throw new Error( `Unknown package: ${ packageName }` );
+	}
+	return packageDir;
+}
 const SCRIPT_GLOBAL = WP_PLUGIN_CONFIG.scriptGlobal;
 const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
@@ -201,7 +209,9 @@ function getSassOptions( workingDir ) {
 			// Root node_modules (for npm hoisted deps)
 			path.join( ROOT_DIR, 'node_modules' ),
 			// For local imports like @use "mixins"
-			path.join( PACKAGES_DIR, 'base-styles' ),
+			...( PACKAGE_DIRS.has( 'base-styles' )
+				? [ PACKAGE_DIRS.get( 'base-styles' ) ]
+				: [] ),
 		],
 	};
 }
@@ -519,7 +529,7 @@ function resolveEntryPoint( packageDir, packageJson ) {
  */
 async function bundlePackage( packageName, options = {} ) {
 	const {
-		sourceDir = PACKAGES_DIR,
+		sourceDir,
 		handlePrefix = HANDLE_PREFIX,
 		scriptGlobal = SCRIPT_GLOBAL,
 		packageNamespace = PACKAGE_NAMESPACE,
@@ -528,9 +538,11 @@ async function bundlePackage( packageName, options = {} ) {
 	const builtModules = [];
 	const builtScripts = [];
 	const builtStyles = [];
-	const packageDir = path.join( sourceDir, packageName );
+	const packageDir = sourceDir
+		? path.join( sourceDir, packageName )
+		: getPackageDir( packageName );
 	const packageJson = getPackageInfoFromFile(
-		path.join( sourceDir, packageName, 'package.json' )
+		path.join( packageDir, 'package.json' )
 	);
 
 	const builds = [];
@@ -934,7 +946,7 @@ async function inferStyleDependencies( scriptDependencies, packageName ) {
 
 	const styleDeps = [];
 	// Get the resolve directory for context-aware package resolution
-	const resolveDir = path.join( PACKAGES_DIR, packageName );
+	const resolveDir = getPackageDir( packageName );
 
 	for ( const scriptHandle of scriptDependencies ) {
 		// Skip non-package dependencies (like 'react', 'lodash', etc.)
@@ -1296,9 +1308,9 @@ async function generatePagesPhp( pageData, replacements ) {
  */
 async function transpilePackage( packageName ) {
 	const startTime = Date.now();
-	const packageDir = path.join( PACKAGES_DIR, packageName );
+	const packageDir = getPackageDir( packageName );
 	const packageJson = getPackageInfoFromFile(
-		path.join( PACKAGES_DIR, packageName, 'package.json' )
+		path.join( packageDir, 'package.json' )
 	);
 
 	if ( ! packageJson ) {
@@ -1508,9 +1520,9 @@ async function transpilePackage( packageName ) {
  * @return {Promise<number|null>} Build time in milliseconds, or null if no styles.
  */
 async function compileStyles( packageName ) {
-	const packageDir = path.join( PACKAGES_DIR, packageName );
+	const packageDir = getPackageDir( packageName );
 	const packageJson = getPackageInfoFromFile(
-		path.join( PACKAGES_DIR, packageName, 'package.json' )
+		path.join( packageDir, 'package.json' )
 	);
 
 	// Get SCSS entry point patterns from package.json, default to root-level only
@@ -1628,12 +1640,7 @@ function isPackageSourceFile( filename ) {
 		return false;
 	}
 
-	return PACKAGES.some( ( packageName ) => {
-		const packagePath = normalizePath(
-			path.join( 'packages', packageName )
-		);
-		return relativePath.startsWith( packagePath + '/' );
-	} );
+	return getPackageName( filename ) !== null;
 }
 
 /**
@@ -1647,9 +1654,9 @@ function getPackageName( filename ) {
 		path.relative( process.cwd(), filename )
 	);
 
-	for ( const packageName of PACKAGES ) {
+	for ( const [ packageName, packageDir ] of PACKAGE_DIRS ) {
 		const packagePath = normalizePath(
-			path.join( 'packages', packageName )
+			path.relative( process.cwd(), packageDir )
 		);
 		if ( relativePath.startsWith( packagePath + '/' ) ) {
 			return packageName;
@@ -2306,7 +2313,7 @@ async function buildAll( baseUrlExpression ) {
 	const fullToPackageJson = new Map();
 	for ( const pkg of PACKAGES ) {
 		const packageJson = getPackageInfoFromFile(
-			path.join( PACKAGES_DIR, pkg, 'package.json' )
+			path.join( getPackageDir( pkg ), 'package.json' )
 		);
 		shortToFull.set( pkg, packageJson.name );
 		fullToShort.set( packageJson.name, pkg );
@@ -2502,7 +2509,7 @@ async function watchMode() {
 	const fullToPackageJson = new Map();
 	for ( const pkg of PACKAGES ) {
 		const packageJson = getPackageInfoFromFile(
-			path.join( PACKAGES_DIR, pkg, 'package.json' )
+			path.join( getPackageDir( pkg ), 'package.json' )
 		);
 		shortToFull.set( pkg, packageJson.name );
 		fullToShort.set( packageJson.name, pkg );
@@ -2640,7 +2647,7 @@ async function watchMode() {
 	}
 
 	const watchPaths = PACKAGES.map( ( packageName ) =>
-		path.join( PACKAGES_DIR, packageName, 'src' )
+		path.join( getPackageDir( packageName ), 'src' )
 	);
 
 	const watcher = chokidar.watch( watchPaths, {
