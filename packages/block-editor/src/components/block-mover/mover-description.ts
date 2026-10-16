@@ -1,6 +1,10 @@
 import { __, sprintf, isRTL } from '@wordpress/i18n';
+import type { BlockMoverDirection, BlockMoverOrientation } from './types';
 
-const getMovementDirection = ( moveDirection, orientation ) => {
+const getMovementDirection = (
+	moveDirection: BlockMoverDirection,
+	orientation: BlockMoverOrientation | undefined
+) => {
 	if ( moveDirection === 'up' ) {
 		if ( orientation === 'horizontal' ) {
 			return isRTL() ? 'right' : 'left';
@@ -18,28 +22,28 @@ const getMovementDirection = ( moveDirection, orientation ) => {
 /**
  * Return a label for the block movement controls depending on block position.
  *
- * @param {number}  selectedCount Number of blocks selected.
- * @param {string}  type          Block type - in the case of a single block, should
- *                                define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
- * @param {number}  firstIndex    The index (position - 1) of the first block selected.
- * @param {boolean} isFirst       This is the first block.
- * @param {boolean} isLast        This is the last block.
- * @param {number}  dir           Direction of movement (> 0 is considered to be going
- *                                down, < 0 is up).
- * @param {string}  orientation   The orientation of the block movers, vertical or
- *                                horizontal.
+ * @param selectedCount Number of blocks selected.
+ * @param type          Block type - in the case of a single block, should
+ *                      define its 'type'. I.e. 'Text', 'Heading', 'Image' etc.
+ * @param firstIndex    The index (position - 1) of the first block selected.
+ * @param isFirst       This is the first block.
+ * @param isLast        This is the last block.
+ * @param dir           Direction of movement (> 0 is considered to be going
+ *                      down, < 0 is up).
+ * @param orientation   The orientation of the block movers, vertical or
+ *                      horizontal.
  *
- * @return {string | undefined} Label for the block movement controls.
+ * @return Label for the block movement controls.
  */
 export function getBlockMoverDescription(
-	selectedCount,
-	type,
-	firstIndex,
-	isFirst,
-	isLast,
-	dir,
-	orientation
-) {
+	selectedCount: number,
+	type: string,
+	firstIndex: number,
+	isFirst: boolean,
+	isLast: boolean,
+	dir: number,
+	orientation?: BlockMoverOrientation
+): string | void {
 	const position = firstIndex + 1;
 
 	if ( selectedCount > 1 ) {
@@ -215,25 +219,25 @@ export function getBlockMoverDescription(
 /**
  * Return a label for the block movement controls depending on block position.
  *
- * @param {number}  selectedCount Number of blocks selected.
- * @param {number}  firstIndex    The index (position - 1) of the first block selected.
- * @param {boolean} isFirst       This is the first block.
- * @param {boolean} isLast        This is the last block.
- * @param {number}  dir           Direction of movement (> 0 is considered to be going
- *                                down, < 0 is up).
- * @param {string}  orientation   The orientation of the block movers, vertical or
- *                                horizontal.
+ * @param selectedCount Number of blocks selected.
+ * @param firstIndex    The index (position - 1) of the first block selected.
+ * @param isFirst       This is the first block.
+ * @param isLast        This is the last block.
+ * @param dir           Direction of movement (> 0 is considered to be going
+ *                      down, < 0 is up).
+ * @param orientation   The orientation of the block movers, vertical or
+ *                      horizontal.
  *
- * @return {string | undefined} Label for the block movement controls.
+ * @return Label for the block movement controls.
  */
 export function getMultiBlockMoverDescription(
-	selectedCount,
-	firstIndex,
-	isFirst,
-	isLast,
-	dir,
-	orientation
-) {
+	selectedCount: number,
+	firstIndex: number,
+	isFirst: boolean,
+	isLast: boolean,
+	dir: number,
+	orientation?: BlockMoverOrientation
+): string | void {
 	const position = firstIndex + 1;
 
 	if ( isFirst && isLast ) {

@@ -6,8 +6,9 @@ import { __ } from '@wordpress/i18n';
 import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
 import { store as blockEditorStore } from '../../store';
+import type { BlockMoverProps } from './types';
 
-function BlockMover( { clientIds, hideDragHandle } ) {
+function BlockMover( { clientIds, hideDragHandle }: BlockMoverProps ) {
 	const {
 		canMove,
 		rootClientId,
@@ -35,7 +36,11 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 				normalizedClientIds[ normalizedClientIds.length - 1 ]
 			);
 			const blockOrder = getBlockOrder( _rootClientId );
-			const { layout = {} } = getBlockAttributes( _rootClientId ) ?? {};
+			// The layout attribute of a container describes its grid.
+			const { layout = {} } = ( getBlockAttributes( _rootClientId! ) ??
+				{} ) as {
+				layout?: { type?: string; isManualPlacement?: boolean };
+			};
 
 			return {
 				canMove: canMoveBlocks( clientIds ),
@@ -80,7 +85,8 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 							label={ __( 'Drag' ) }
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
-							tabIndex="-1"
+							// React renders the string attribute as is.
+							tabIndex={ '-1' as unknown as number }
 							{ ...draggableProps }
 						/>
 					) }
