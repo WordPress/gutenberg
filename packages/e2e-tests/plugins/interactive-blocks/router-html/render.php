@@ -55,6 +55,9 @@ if ( 'pending' === $attributes['value'] ) {
 		<p data-testid="page-content">content from <?php echo esc_html( $page ); ?></p>
 		<div data-testid="kept-html" data-wp-html="state.html"><i><?php echo 'one' === $page ? 'one' : 'two'; ?></i></div>
 		<div data-testid="never-html" data-wp-html="state.never"><i><?php echo 'one' === $page ? 'never one' : 'never two'; ?></i></div>
+		<?php if ( 'two' === $page && 'pending' === $attributes['value'] ) : ?>
+			<div data-testid="added-html" data-wp-html="state.late"><p>B fallback</p><script>window.fallbackRuns = ( window.fallbackRuns || 0 ) + 1;</script></div>
+		<?php endif; ?>
 		<p data-testid="value" data-wp-text="state.value">not hydrated</p>
 		<button data-wp-on--click="actions.resolve">Resolve HTML</button>
 		<?php if ( ! empty( $attributes['next'] ) ) : ?>
