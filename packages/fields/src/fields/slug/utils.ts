@@ -1,6 +1,6 @@
 import { cleanForSlug } from '@wordpress/url';
 import type { BasePost } from '../../types';
-import { getItemTitle } from '../../actions/utils';
+import { getItemTitle } from '../utils';
 
 export const getSlug = ( item: BasePost ): string => {
 	if ( typeof item !== 'object' ) {
