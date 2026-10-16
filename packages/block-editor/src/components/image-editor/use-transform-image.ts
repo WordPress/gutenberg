@@ -1,25 +1,29 @@
 import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { applyFilters } from '@wordpress/hooks';
 import { useImageCropper } from '@wordpress/image-cropper';
+import type { ImageEditorProps, TransformImage } from './types';
 
 export default function useTransformImage( {
 	url,
 	naturalWidth,
 	naturalHeight,
-} ) {
-	const [ editedUrl, setEditedUrl ] = useState();
+}: Pick<
+	ImageEditorProps,
+	'url' | 'naturalWidth' | 'naturalHeight'
+> ): TransformImage {
+	const [ editedUrl, setEditedUrl ] = useState< string >();
 	const { cropperState, setCropperState } = useImageCropper();
 	const { zoom, aspectRatio, crop, croppedArea } = cropperState;
 
 	const setZoom = useCallback(
-		( newZoom ) => {
+		( newZoom: number ) => {
 			setCropperState( { zoom: newZoom } );
 		},
 		[ setCropperState ]
 	);
 
 	const setAspectRatio = useCallback(
-		( newAspect ) => {
+		( newAspect: number ) => {
 			setCropperState( { aspectRatio: newAspect } );
 		},
 		[ setCropperState ]
@@ -53,7 +57,7 @@ export default function useTransformImage( {
 		}
 
 		if ( angle === 0 ) {
-			setEditedUrl();
+			setEditedUrl( undefined );
 			setInternalRotation( angle );
 			const newAspectRatio = shouldResetAspect
 				? aspectRatio
@@ -68,7 +72,7 @@ export default function useTransformImage( {
 			return;
 		}
 
-		function editImage( event ) {
+		function editImage( event: Event & { target: HTMLImageElement } ) {
 			const canvas = document.createElement( 'canvas' );
 
 			let translateX = 0;
@@ -90,14 +94,16 @@ export default function useTransformImage( {
 				translateY = canvas.height;
 			}
 
-			const context = canvas.getContext( '2d' );
+			// A new canvas has a 2D context.
+			const context = canvas.getContext( '2d' )!;
 
 			context.translate( translateX, translateY );
 			context.rotate( ( angle * Math.PI ) / 180 );
 			context.drawImage( event.target, 0, 0 );
 
 			canvas.toBlob( ( blob ) => {
-				setEditedUrl( URL.createObjectURL( blob ) );
+				// A canvas with a drawn image converts to a blob.
+				setEditedUrl( URL.createObjectURL( blob! ) );
 				setInternalRotation( angle );
 				const newAspectRatio = shouldResetAspect
 					? aspectRatio
@@ -114,7 +120,8 @@ export default function useTransformImage( {
 
 		const el = new window.Image();
 		el.src = url;
-		el.onload = editImage;
+		// Load events target the image.
+		el.onload = editImage as ( event: Event ) => void;
 
 		const imgCrossOrigin = applyFilters(
 			'media.crossOrigin',

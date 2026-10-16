@@ -1,8 +1,15 @@
 import { createContext, useContext, useMemo } from '@wordpress/element';
 import useSaveImage from './use-save-image';
 import useTransformImage from './use-transform-image';
+import type {
+	ImageEditingContextValue,
+	ImageEditingProviderProps,
+} from './types';
 
-const ImageEditingContext = createContext( {} );
+// The provider always supplies the value.
+const ImageEditingContext = createContext< ImageEditingContextValue >(
+	{} as ImageEditingContextValue
+);
 ImageEditingContext.displayName = 'ImageEditingContext';
 
 export const useImageEditingContext = () => useContext( ImageEditingContext );
@@ -15,7 +22,7 @@ export default function ImageEditingProvider( {
 	onFinishEditing,
 	onSaveImage,
 	children,
-} ) {
+}: ImageEditingProviderProps ) {
 	const transformImage = useTransformImage( {
 		url,
 		naturalWidth,

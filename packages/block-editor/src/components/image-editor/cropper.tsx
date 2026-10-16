@@ -3,6 +3,7 @@ import { Spinner as WCSpinner } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
 import { ImageCropper as ImageCropperComponent } from '@wordpress/image-cropper';
 import { useImageEditingContext } from './context';
+import type { ImageEditorCropperProps } from './types';
 
 export default function ImageCropper( {
 	url,
@@ -11,15 +12,18 @@ export default function ImageCropper( {
 	naturalHeight,
 	naturalWidth,
 	borderProps,
-} ) {
+}: ImageEditorCropperProps ) {
 	const { isInProgress, editedUrl, rotation } = useImageEditingContext();
 	const [ contentResizeListener, { width: clientWidth } ] =
 		useResizeObserver();
 
-	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
+	// Arithmetic reads an unmeasured width as 0.
+	let editedHeight =
+		height || ( ( clientWidth as number ) * naturalHeight ) / naturalWidth;
 
 	if ( rotation % 180 === 90 ) {
-		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
+		editedHeight =
+			( ( clientWidth as number ) * naturalWidth ) / naturalHeight;
 	}
 
 	const area = (
@@ -33,7 +37,8 @@ export default function ImageCropper( {
 			) }
 			style={ {
 				...borderProps?.style,
-				width: width || clientWidth,
+				// An unmeasured width is left unset.
+				width: ( width || clientWidth ) as number | undefined,
 				height: editedHeight,
 			} }
 		>

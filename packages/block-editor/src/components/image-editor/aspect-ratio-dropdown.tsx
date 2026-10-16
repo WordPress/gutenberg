@@ -1,9 +1,11 @@
 import { check, aspectRatio as aspectRatioIcon } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import type { ComponentProps } from 'react';
 import { useSettings } from '../use-settings';
 import { POPOVER_PROPS } from './constants';
 import { useImageEditingContext } from './context';
+import type { AspectRatioGroupProps, AspectRatioOption } from './types';
 
 function AspectRatioGroup( {
 	aspectRatios,
@@ -11,7 +13,7 @@ function AspectRatioGroup( {
 	label,
 	onClick,
 	value,
-} ) {
+}: AspectRatioGroupProps ) {
 	return (
 		<MenuGroup label={ label }>
 			{ aspectRatios.map( ( { name, slug, ratio } ) => (
@@ -32,7 +34,7 @@ function AspectRatioGroup( {
 	);
 }
 
-export function ratioToNumber( str ) {
+export function ratioToNumber( str: string ): number {
 	// TODO: support two-value aspect ratio?
 	// https://css-tricks.com/almanac/properties/a/aspect-ratio/#aa-it-can-take-two-values
 	const [ a, b, ...rest ] = str.split( '/' ).map( Number );
@@ -48,22 +50,31 @@ export function ratioToNumber( str ) {
 	return b ? a / b : a;
 }
 
-function presetRatioAsNumber( { ratio, ...rest } ) {
+function presetRatioAsNumber( {
+	ratio,
+	...rest
+}: AspectRatioOption ): AspectRatioOption & { ratio: number } {
 	return {
-		ratio: ratioToNumber( ratio ),
+		// Preset ratios are strings.
+		ratio: ratioToNumber( ratio as string ),
 		...rest,
 	};
 }
 
-export default function AspectRatioDropdown( { toggleProps } ) {
+export default function AspectRatioDropdown( {
+	toggleProps,
+}: {
+	toggleProps: ComponentProps< typeof DropdownMenu >[ 'toggleProps' ];
+} ) {
 	const { isInProgress, aspect, setAspect, defaultAspect } =
 		useImageEditingContext();
 
+	// The aspect ratio settings are lists of options and a flag.
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',
 		'dimensions.aspectRatios.theme',
 		'dimensions.defaultAspectRatios'
-	);
+	) as [ AspectRatioOption[], AspectRatioOption[], boolean ];
 
 	return (
 		<DropdownMenu
@@ -77,7 +88,8 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 					<AspectRatioGroup
 						isDisabled={ isInProgress }
 						onClick={ ( newAspect ) => {
-							setAspect( newAspect );
+							// Theme ratios pass their setting as given.
+							setAspect( newAspect as number );
 							onClose();
 						} }
 						value={ aspect }
@@ -100,7 +112,8 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							label={ __( 'Theme' ) }
 							isDisabled={ isInProgress }
 							onClick={ ( newAspect ) => {
-								setAspect( newAspect );
+								// Theme ratios pass their setting as given.
+								setAspect( newAspect as number );
 								onClose();
 							} }
 							value={ aspect }
@@ -112,7 +125,8 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							label={ __( 'Landscape' ) }
 							isDisabled={ isInProgress }
 							onClick={ ( newAspect ) => {
-								setAspect( newAspect );
+								// Theme ratios pass their setting as given.
+								setAspect( newAspect as number );
 								onClose();
 							} }
 							value={ aspect }
@@ -126,7 +140,8 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							label={ __( 'Portrait' ) }
 							isDisabled={ isInProgress }
 							onClick={ ( newAspect ) => {
-								setAspect( newAspect );
+								// Theme ratios pass their setting as given.
+								setAspect( newAspect as number );
 								onClose();
 							} }
 							value={ aspect }

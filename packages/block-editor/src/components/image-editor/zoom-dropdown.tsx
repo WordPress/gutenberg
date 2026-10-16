@@ -31,7 +31,10 @@ export default function ZoomDropdown() {
 						min={ MIN_ZOOM }
 						max={ MAX_ZOOM }
 						value={ Math.round( zoom * 100 ) }
-						onChange={ ( newZoom ) => setZoom( newZoom / 100 ) }
+						// Arithmetic reads a cleared value as 0.
+						onChange={ ( newZoom ) =>
+							setZoom( ( newZoom as number ) / 100 )
+						}
 					/>
 				</DropdownContentWrapper>
 			) }

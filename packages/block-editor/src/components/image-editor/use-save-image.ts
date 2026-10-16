@@ -5,6 +5,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { store as blockEditorStore } from '../../store';
 import { mediaEditKey } from '../../store/private-keys';
+import type { EditMediaEntity, SaveImage, SaveImageOptions } from './types';
 
 const messages = {
 	crop: __( 'Image cropped.' ),
@@ -19,14 +20,20 @@ export default function useSaveImage( {
 	id,
 	onSaveImage,
 	onFinishEditing,
-} ) {
+}: SaveImageOptions ): SaveImage {
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const [ isInProgress, setIsInProgress ] = useState( false );
 	const { editMediaEntity } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
-			editMediaEntity: settings?.[ mediaEditKey ],
+			// The editor sets the media edit function under a private key.
+			editMediaEntity: (
+				settings as unknown as Record<
+					symbol,
+					EditMediaEntity | undefined
+				>
+			 )?.[ mediaEditKey ],
 		};
 	}, [] );
 
@@ -50,7 +57,10 @@ export default function useSaveImage( {
 
 		setIsInProgress( true );
 
-		const modifiers = [];
+		const modifiers: {
+			type: string;
+			args: Record< string, number >;
+		}[] = [];
 
 		if ( rotation > 0 ) {
 			modifiers.push( {
@@ -63,14 +73,15 @@ export default function useSaveImage( {
 
 		// The crop script may return some very small, sub-pixel values when the image was not cropped.
 		// Crop only when the new size has changed by more than 0.1%.
-		if ( crop.width < 99.9 || crop.height < 99.9 ) {
+		// The cropper reports the cropped area once the image loads.
+		if ( crop!.width < 99.9 || crop!.height < 99.9 ) {
 			modifiers.push( {
 				type: 'crop',
 				args: {
-					left: crop.x,
-					top: crop.y,
-					width: crop.width,
-					height: crop.height,
+					left: crop!.x,
+					top: crop!.y,
+					width: crop!.width,
+					height: crop!.height,
 				},
 			} );
 		}
@@ -101,27 +112,31 @@ export default function useSaveImage( {
 					url: savedImage.source_url,
 				} );
 
-				createSuccessNotice( messages[ modifierType ], {
-					type: 'snackbar',
-					actions: [
-						{
-							label: __( 'Undo' ),
-							onClick: () => {
-								onSaveImage( {
-									id,
-									url,
-								} );
+				createSuccessNotice(
+					messages[ modifierType as keyof typeof messages ],
+					{
+						type: 'snackbar',
+						actions: [
+							{
+								label: __( 'Undo' ),
+								onClick: () => {
+									onSaveImage( {
+										id,
+										url,
+									} );
+								},
 							},
-						},
-					],
-				} );
+						],
+					}
+				);
 			}
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(
 					/* translators: %s: Error message. */
 					__( 'Could not edit image. %s' ),
-					stripHTML( error.message )
+					// Media edit rejections carry a message.
+					stripHTML( ( error as Error ).message )
 				),
 				{
 					id: 'image-editing-error',
