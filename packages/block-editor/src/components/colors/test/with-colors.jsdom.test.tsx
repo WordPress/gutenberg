@@ -142,4 +142,14 @@ describe( 'withColors types', () => {
 
 		expect( [ withLabel, withoutLabel ] ).toHaveLength( 2 );
 	} );
+
+	it( 'rejects injected props of another type', () => {
+		const Mistyped: ComponentType< { setBackgroundColor: number } > = () =>
+			null;
+
+		// @ts-expect-error The wrapper passes a function.
+		const WithColorMistyped = withColors( 'backgroundColor' )( Mistyped );
+
+		expect( WithColorMistyped ).toBeDefined();
+	} );
 } );
