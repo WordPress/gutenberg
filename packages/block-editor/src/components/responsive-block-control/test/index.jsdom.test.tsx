@@ -3,11 +3,15 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Fragment, useState } from '@wordpress/element';
 import { SelectControl as WCSelectControl } from '@wordpress/components';
+import type { ReactNode } from 'react';
 import ResponsiveBlockControl from '../index';
+import type { ResponsiveBlockControlViewport } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
 const inputId = 'input-12345678';
+
+const noop = () => {};
 
 const sizeOptions = [
 	{
@@ -28,7 +32,10 @@ const sizeOptions = [
 	},
 ];
 
-const renderTestDefaultControlComponent = ( labelComponent, device ) => {
+const renderTestDefaultControlComponent = (
+	labelComponent: ReactNode,
+	device: ResponsiveBlockControlViewport
+) => {
 	return (
 		<>
 			<WCSelectControl label={ labelComponent } options={ sizeOptions } />
@@ -40,14 +47,14 @@ const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 	);
 };
 
-function getDefaultControlGroup( container ) {
+function getDefaultControlGroup( container: HTMLElement ) {
 	// TODO: Use a user-facing query to fetch this.
 	return container.querySelector(
 		'.block-editor-responsive-block-control__group:not(.is-responsive)'
 	);
 }
 
-function getResponsiveControlGroup( container ) {
+function getResponsiveControlGroup( container: HTMLElement ) {
 	// TODO: Use a user-facing query to fetch this.
 	return container.querySelector(
 		'.block-editor-responsive-block-control__group.is-responsive'
@@ -58,6 +65,7 @@ describe( 'Basic rendering', () => {
 	it( 'should render with required props', () => {
 		const { container } = render(
 			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
 				title="Padding"
 				property="padding"
 				renderDefaultControl={ renderTestDefaultControlComponent }
@@ -93,7 +101,9 @@ describe( 'Basic rendering', () => {
 
 	it( 'should not render without valid legend', () => {
 		const { container } = render(
+			// @ts-expect-error Testing a missing title.
 			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
 				property="padding"
 				renderDefaultControl={ renderTestDefaultControlComponent }
 			/>
@@ -104,7 +114,9 @@ describe( 'Basic rendering', () => {
 
 	it( 'should not render without valid property', () => {
 		const { container } = render(
+			// @ts-expect-error Testing a missing property.
 			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
 				title="Padding"
 				renderDefaultControl={ renderTestDefaultControlComponent }
 			/>
@@ -115,7 +127,12 @@ describe( 'Basic rendering', () => {
 
 	it( 'should not render without valid default control render prop', () => {
 		const { container } = render(
-			<ResponsiveBlockControl title="Padding" property="padding" />
+			// @ts-expect-error Testing a missing default control.
+			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
+				title="Padding"
+				property="padding"
+			/>
 		);
 
 		expect( container ).toBeEmptyDOMElement();
@@ -126,6 +143,7 @@ describe( 'Basic rendering', () => {
 			'Utilise a matching padding value on all viewports';
 		render(
 			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
 				title="Padding"
 				property="padding"
 				renderDefaultControl={ renderTestDefaultControlComponent }
@@ -149,6 +167,7 @@ describe( 'Basic rendering', () => {
 
 		render(
 			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
 				title="Padding"
 				property="padding"
 				renderDefaultControl={ renderTestDefaultControlComponent }
@@ -169,6 +188,7 @@ describe( 'Default and Responsive modes', () => {
 	it( 'should render in responsive mode when isResponsive prop is set to true', () => {
 		const { container } = render(
 			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
 				title="Padding"
 				property="padding"
 				isResponsive
@@ -209,6 +229,7 @@ describe( 'Default and Responsive modes', () => {
 
 		render(
 			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
 				title="Padding"
 				property="padding"
 				isResponsive
@@ -220,7 +241,7 @@ describe( 'Default and Responsive modes', () => {
 		const defaultRenderControlCall = 1;
 
 		// Get array of labels which match those in the custom viewports provided
-		const responsiveViewportsLabels = [];
+		const responsiveViewportsLabels: HTMLElement[] = [];
 		customViewportSet.forEach( ( { label } ) => {
 			responsiveViewportsLabels.push(
 				screen.getByRole( 'combobox', {
@@ -293,25 +314,28 @@ describe( 'Default and Responsive modes', () => {
 	it( 'should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode', () => {
 		const spyRenderDefaultControl = vi.fn();
 
-		const mockRenderResponsiveControls = vi.fn( ( viewports ) => {
-			return viewports.map( ( { id, label } ) => {
-				return (
-					<Fragment key={ `${ inputId }-${ id }` }>
-						<label htmlFor={ `${ inputId }-${ id }` }>
-							Custom Viewport { label }
-						</label>
-						<input
-							id={ `${ inputId }-${ id }` }
-							defaultValue={ label }
-							type="range"
-						/>
-					</Fragment>
-				);
-			} );
-		} );
+		const mockRenderResponsiveControls = vi.fn(
+			( viewports: ResponsiveBlockControlViewport[] ) => {
+				return viewports.map( ( { id, label } ) => {
+					return (
+						<Fragment key={ `${ inputId }-${ id }` }>
+							<label htmlFor={ `${ inputId }-${ id }` }>
+								Custom Viewport { label }
+							</label>
+							<input
+								id={ `${ inputId }-${ id }` }
+								defaultValue={ label }
+								type="range"
+							/>
+						</Fragment>
+					);
+				} );
+			}
+		);
 
 		render(
 			<ResponsiveBlockControl
+				onIsResponsiveChange={ noop }
 				title="Padding"
 				property="padding"
 				isResponsive
