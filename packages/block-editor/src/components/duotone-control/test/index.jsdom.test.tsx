@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
 import DuotoneControl from '../';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -26,7 +27,7 @@ const COLOR_PALETTE = [
 	{ color: '#ffffff', name: 'White', slug: 'white' },
 ];
 
-async function openControl( user ) {
+async function openControl( user: UserEvent ) {
 	await user.click(
 		screen.getByRole( 'button', { name: 'Apply duotone filter' } )
 	);
