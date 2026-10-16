@@ -1,7 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
 import { describe, expect, it } from 'vitest';
+import type { Block } from '@wordpress/blocks';
 import BlockCompare from '../';
+import type { InvalidBlock } from '../types';
 
 const noop = () => {};
 
@@ -9,10 +11,10 @@ const noop = () => {};
  * Creates the block the convertor returns: a Custom HTML block, whose markup
  * lives in `innerContent` rather than being produced by `save`.
  *
- * @param {string} html Block markup.
- * @return {Object} Block object.
+ * @param html Block markup.
+ * @return Block object.
  */
-function createHTMLBlock( html ) {
+function createHTMLBlock( html: string ): Block {
 	return {
 		clientId: 'converted',
 		name: 'core/html',
@@ -23,10 +25,11 @@ function createHTMLBlock( html ) {
 	};
 }
 
-function renderCompare( originalContent, convertedBlock ) {
+function renderCompare( originalContent: string, convertedBlock: Block ) {
 	render(
 		createElement( BlockCompare, {
-			block: { originalContent },
+			// Only the original markup of the block is compared.
+			block: { originalContent } as InvalidBlock,
 			onKeep: noop,
 			onConvert: noop,
 			convertor: () => convertedBlock,
@@ -36,7 +39,7 @@ function renderCompare( originalContent, convertedBlock ) {
 }
 
 // Keeps whitespace, which Testing Library collapses by default.
-const keepWhitespace = ( text ) => text;
+const keepWhitespace = ( text: string ) => text;
 
 describe( 'BlockCompare', () => {
 	it( 'shows the markup and preview of a converted Custom HTML block', () => {
