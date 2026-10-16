@@ -4,6 +4,7 @@ import { dragHandle, Icon } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
+import { GridItemHandle } from './grid-item-handle';
 import { startGridItemDrag } from './start-grid-item-drag';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 
@@ -12,7 +13,7 @@ interface GridItemDragHandleProps {
 	clientId: string;
 	/** Client ID of the grid. */
 	gridClientId: string;
-	/** Rotation of the grid item in degrees, so the handle turns with it. */
+	/** Rotation of the grid item in degrees, so the handle stays upright. */
 	angle: number;
 }
 
@@ -46,13 +47,15 @@ export function GridItemDragHandle( {
 			additionalStyles={ overlayStyle }
 		>
 			<div className="block-editor-grid-item-handles__box">
-				<div
+				{ /*
+				 * Keyboard users move blocks with the movers in the block
+				 * toolbar.
+				 */ }
+				<GridItemHandle
 					className="block-editor-grid-item-handles__drag"
-					title={ __( 'Drag' ) }
+					label={ __( 'Drag' ) }
+					angle={ angle }
 					draggable
-					// The handle only works with a pointer. Keyboard users
-					// move blocks with the movers in the block toolbar.
-					aria-hidden="true"
 					onDragStart={ ( event ) => {
 						startGridItemDrag( event.nativeEvent, {
 							clientId,
@@ -63,8 +66,8 @@ export function GridItemDragHandle( {
 						} );
 					} }
 				>
-					<Icon icon={ dragHandle } size={ 16 } />
-				</div>
+					<Icon icon={ dragHandle } />
+				</GridItemHandle>
 			</div>
 		</BlockPopoverCover>
 	);
