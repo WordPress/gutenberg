@@ -1,21 +1,30 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useEffect } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
+import { store as noticesStore } from '@wordpress/notices';
+import { useEntityActions } from '../../dataviews/entity-actions-loader';
 import { useSetAsHomepageAction } from './set-as-homepage';
 import { useSetAsPostsPageAction } from './set-as-posts-page';
 
 export function usePostActions( { postType, onActionPerformed, context } ) {
-	const { defaultActions } = useSelect(
-		( select ) => {
-			const { getEntityActions } = unlock( select( editorStore ) );
-			return {
-				defaultActions: getEntityActions( 'postType', postType ),
-			};
-		},
-		[ postType ]
-	);
+	const { actions: defaultActions, error } = useEntityActions( {
+		kind: 'postType',
+		name: postType,
+	} );
+
+	// Without its actions, a screen has no way to act on its items, so the
+	// notice stays until it is dismissed. Its id keeps a single notice per
+	// post type, however many components show the actions.
+	const { createErrorNotice } = useDispatch( noticesStore );
+	useEffect( () => {
+		if ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+				id: `editor-actions-${ postType }`,
+				explicitDismiss: true,
+			} );
+		}
+	}, [ createErrorNotice, error, postType ] );
 
 	const shouldShowHomepageActions = useSelect(
 		( select ) => {
@@ -66,11 +75,6 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 
 	const setAsHomepageAction = useSetAsHomepageAction();
 	const setAsPostsPageAction = useSetAsPostsPageAction();
-
-	const { registerPostTypeSchema } = unlock( useDispatch( editorStore ) );
-	useEffect( () => {
-		registerPostTypeSchema( postType );
-	}, [ registerPostTypeSchema, postType ] );
 
 	return useMemo( () => {
 		let actions = [ ...defaultActions ];
