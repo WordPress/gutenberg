@@ -65,10 +65,10 @@ function ColorSamples( props: React.ComponentProps< typeof Avatar.Root > ) {
 	);
 }
 
-/** Compare image rings and colored fallbacks across both shapes and all five sizes. */
+/** Compare image rings and colored fallbacks with shared size and shape controls. */
 export const WithColor: Story = {
-	args: { color: '#008a20' },
-	parameters: { controls: { include: [ 'color' ] } },
+	args: { color: '#008a20', shape: 'circle' },
+	parameters: { controls: { include: [ 'color', 'size', 'shape' ] } },
 	render: ( args ) => {
 		const colors = [
 			...new Set( [
@@ -84,7 +84,6 @@ export const WithColor: Story = {
 				'#ffffff',
 			] ),
 		];
-		const sizes = [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const;
 		return (
 			<div
 				className={ styles.gallery }
@@ -93,9 +92,9 @@ export const WithColor: Story = {
 				tabIndex={ 0 }
 			>
 				<p>
-					Each size shows an image, initials, and the person icon.
-					Both shapes appear for every color. Change Color in Controls
-					to update the first sample.
+					Each color shows an image, initials, and the person icon.
+					Use Size and Shape in Controls to update every sample.
+					Change Color to update the first sample.
 				</p>
 				<p>
 					Initials target at least 4.5:1 contrast and the person icon
@@ -108,48 +107,27 @@ export const WithColor: Story = {
 					<thead>
 						<tr>
 							<th scope="col">Color</th>
-							<th scope="col">Shape</th>
-							{ sizes.map( ( size ) => (
-								<th key={ size } scope="col">
-									<code>{ size }</code>
-								</th>
-							) ) }
+							<th scope="col">Image / initials / person icon</th>
 						</tr>
 					</thead>
-					{ colors.map( ( color, index ) => (
-						<tbody key={ color }>
-							{ ( [ 'circle', 'square' ] as const ).map(
-								( shape, shapeIndex ) => (
-									<tr key={ shape }>
-										{ shapeIndex === 0 && (
-											<th scope="rowgroup" rowSpan={ 2 }>
-												{ index === 0 && (
-													<>
-														Custom
-														<br />
-													</>
-												) }
-												<code>{ color }</code>
-											</th>
-										) }
-										<th scope="row">
-											<code>{ shape }</code>
-										</th>
-										{ sizes.map( ( size ) => (
-											<td key={ size }>
-												<ColorSamples
-													{ ...args }
-													color={ color }
-													shape={ shape }
-													size={ size }
-												/>
-											</td>
-										) ) }
-									</tr>
-								)
-							) }
-						</tbody>
-					) ) }
+					<tbody>
+						{ colors.map( ( color, index ) => (
+							<tr key={ color }>
+								<th scope="row">
+									{ index === 0 && (
+										<>
+											Custom
+											<br />
+										</>
+									) }
+									<code>{ color }</code>
+								</th>
+								<td>
+									<ColorSamples { ...args } color={ color } />
+								</td>
+							</tr>
+						) ) }
+					</tbody>
 				</table>
 			</div>
 		);
