@@ -27,14 +27,19 @@ import {
 	removeQueryArgs,
 	safeDecodeURI,
 } from '../';
-import wptData from './fixtures/wpt-data';
+import wptData from './fixtures/wpt-data.json';
 
 const vitestURL = globalThis.URL;
 
 beforeAll( () => {
 	// Vitest replaces JSDOM's URL constructor with Node's implementation.
 	// Keep the browser parsing behavior exercised by these fixtures.
-	globalThis.URL = globalThis.jsdom.window.URL;
+	// The JSDOM environment sets a `jsdom` global that the types do not declare.
+	globalThis.URL = (
+		globalThis as typeof globalThis & {
+			jsdom: { window: { URL: typeof URL } };
+		}
+	 ).jsdom.window.URL;
 } );
 
 afterAll( () => {
@@ -42,12 +47,14 @@ afterAll( () => {
 } );
 
 describe( 'isURL', () => {
-	it.each( wptData.map( ( { input, failure } ) => [ input, !! failure ] ) )(
-		'%s',
-		( input, isFailure ) => {
-			expect( isURL( input ) ).toBe( ! isFailure );
-		}
-	);
+	it.each(
+		wptData.map( ( { input, failure } ): [ string, boolean ] => [
+			input,
+			!! failure,
+		] )
+	)( '%s', ( input, isFailure ) => {
+		expect( isURL( input ) ).toBe( ! isFailure );
+	} );
 } );
 
 describe( 'isEmail', () => {
@@ -172,7 +179,10 @@ describe( 'isValidProtocol', () => {
 	} );
 
 	it( 'returns false if the protocol is invalid', () => {
-		expect( isValidProtocol() ).toBe( false );
+		expect(
+			// @ts-expect-error `isValidProtocol` expects a string; a missing protocol is invalid.
+			isValidProtocol()
+		).toBe( false );
 		expect( isValidProtocol( '' ) ).toBe( false );
 		expect( isValidProtocol( ' http: ' ) ).toBe( false );
 		expect( isValidProtocol( 'http :' ) ).toBe( false );
@@ -234,7 +244,10 @@ describe( 'isValidAuthority', () => {
 	} );
 
 	it( 'returns false if the authority is invalid', () => {
-		expect( isValidAuthority() ).toBe( false );
+		expect(
+			// @ts-expect-error `isValidAuthority` expects a string; a missing authority is invalid.
+			isValidAuthority()
+		).toBe( false );
 		expect( isValidAuthority( '' ) ).toBe( false );
 		expect( isValidAuthority( 'inv alid.website.com' ) ).toBe( false );
 		expect( isValidAuthority( 'test#.com' ) ).toBe( false );
@@ -274,7 +287,10 @@ describe( 'getPath', () => {
 	} );
 
 	it( 'returns undefined when the provided value does not contain a URL path', () => {
-		expect( getPath() ).toBeUndefined();
+		expect(
+			// @ts-expect-error `getPath` expects a string; a missing URL has no path.
+			getPath()
+		).toBeUndefined();
 		expect( getPath( '' ) ).toBeUndefined();
 		expect( getPath( 'https://wordpress.org#test' ) ).toBeUndefined();
 		expect( getPath( 'https://wordpress.org/' ) ).toBeUndefined();
@@ -301,7 +317,10 @@ describe( 'isValidPath', () => {
 	} );
 
 	it( 'returns false if the path is invalid', () => {
-		expect( isValidPath() ).toBe( false );
+		expect(
+			// @ts-expect-error `isValidPath` expects a string; a missing path is invalid.
+			isValidPath()
+		).toBe( false );
 		expect( isValidPath( '' ) ).toBe( false );
 		expect( isValidPath( 'path /with/spaces' ) ).toBe( false );
 		expect( isValidPath( 'path/with/number/symbol#' ) ).toBe( false );
@@ -340,8 +359,18 @@ describe( 'getFilename', () => {
 		);
 		expect( getFilename( 'a/path/' ) ).toBe( undefined );
 		expect( getFilename( '/' ) ).toBe( undefined );
-		expect( getFilename( undefined ) ).toBe( undefined );
-		expect( getFilename( null ) ).toBe( undefined );
+		expect(
+			getFilename(
+				// @ts-expect-error `getFilename` expects a string; a nullish URL has no filename.
+				undefined
+			)
+		).toBe( undefined );
+		expect(
+			getFilename(
+				// @ts-expect-error `getFilename` expects a string; a nullish URL has no filename.
+				null
+			)
+		).toBe( undefined );
 	} );
 } );
 
@@ -486,7 +515,10 @@ describe( 'isValidQueryString', () => {
 	} );
 
 	it( 'returns false if the query string is invalid', () => {
-		expect( isValidQueryString() ).toBe( false );
+		expect(
+			// @ts-expect-error `isValidQueryString` expects a string; a missing query string is invalid.
+			isValidQueryString()
+		).toBe( false );
 		expect( isValidQueryString( '' ) ).toBe( false );
 		expect( isValidQueryString( '?test=false' ) ).toBe( false );
 		expect( isValidQueryString( ' test=false ' ) ).toBe( false );
@@ -509,11 +541,13 @@ describe( 'getPathAndQueryString', () => {
 	} );
 	it( 'combines the results of `getPath` and `getQueryString`', async () => {
 		vi.doMock( import( '../get-path' ), () => ( {
+			// @ts-expect-error The mock reads `path` from the object the test passes in place of a URL.
 			getPath( { path } = {} ) {
 				return path;
 			},
 		} ) );
 		vi.doMock( import( '../get-query-string' ), () => ( {
+			// @ts-expect-error The mock reads `queryString` from the object the test passes in place of a URL.
 			getQueryString( { queryString } = {} ) {
 				return queryString;
 			},
@@ -521,22 +555,34 @@ describe( 'getPathAndQueryString', () => {
 		const { getPathAndQueryString } =
 			await import( '../get-path-and-query-string' );
 		expect(
-			getPathAndQueryString( {
-				path: 'path',
-				queryString: 'queryString',
-			} )
+			getPathAndQueryString(
+				// @ts-expect-error The mocked `getPath` and `getQueryString` read their parts from an object.
+				{
+					path: 'path',
+					queryString: 'queryString',
+				}
+			)
 		).toBe( '/path?queryString' );
 		expect(
-			getPathAndQueryString( {
-				queryString: 'queryString',
-			} )
+			getPathAndQueryString(
+				// @ts-expect-error The mocked `getPath` and `getQueryString` read their parts from an object.
+				{
+					queryString: 'queryString',
+				}
+			)
 		).toBe( '/?queryString' );
 		expect(
-			getPathAndQueryString( {
-				path: 'path',
-			} )
+			getPathAndQueryString(
+				// @ts-expect-error The mocked `getPath` and `getQueryString` read their parts from an object.
+				{
+					path: 'path',
+				}
+			)
 		).toBe( '/path' );
-		expect( getPathAndQueryString() ).toBe( '/' );
+		expect(
+			// @ts-expect-error The mocked `getPath` and `getQueryString` default to an empty object.
+			getPathAndQueryString()
+		).toBe( '/' );
 	} );
 } );
 
@@ -1146,7 +1192,10 @@ describe( 'filterURLForDisplay', () => {
 	it( 'should return an empty string if the url is empty or falsy', () => {
 		let url = filterURLForDisplay( '' );
 		expect( url ).toBe( '' );
-		url = filterURLForDisplay( null );
+		url = filterURLForDisplay(
+			// @ts-expect-error `filterURLForDisplay` expects a string; a falsy URL displays as empty.
+			null
+		);
 		expect( url ).toBe( '' );
 	} );
 	it( 'should remove protocol', () => {
@@ -1242,11 +1291,19 @@ describe( 'cleanForSlug', () => {
 	} );
 
 	it( 'Should return an empty string for missing argument', () => {
-		expect( cleanForSlug() ).toBe( '' );
+		expect(
+			// @ts-expect-error `cleanForSlug` expects a string; a missing value makes an empty slug.
+			cleanForSlug()
+		).toBe( '' );
 	} );
 
 	it( 'Should return an empty string for falsy argument', () => {
-		expect( cleanForSlug( null ) ).toBe( '' );
+		expect(
+			cleanForSlug(
+				// @ts-expect-error `cleanForSlug` expects a string; a falsy value makes an empty slug.
+				null
+			)
+		).toBe( '' );
 	} );
 
 	it( 'Should not allow characters used internally in rich-text', () => {

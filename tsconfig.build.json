@@ -89,7 +89,7 @@
 		{ "path": "packages/ui/tsconfig.build.json" },
 		{ "path": "packages/undo-manager/tsconfig.build.json" },
 		{ "path": "packages/upload-media/tsconfig.build.json" },
-		{ "path": "packages/url" },
+		{ "path": "packages/url/tsconfig.build.json" },
 		{ "path": "packages/video-conversion/tsconfig.build.json" },
 		{ "path": "packages/viewport" },
 		{ "path": "packages/views/tsconfig.build.json" },

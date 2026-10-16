@@ -8,6 +8,6 @@
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../private-apis" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }

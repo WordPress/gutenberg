@@ -16,6 +16,6 @@
 		{ "path": "../notices/tsconfig.build.json" },
 		{ "path": "../patterns" },
 		{ "path": "../private-apis" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }
