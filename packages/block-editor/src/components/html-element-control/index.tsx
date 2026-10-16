@@ -4,18 +4,19 @@ import { SelectControl } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { htmlElementMessages } from './messages';
+import type { HTMLElementControlProps, HTMLElementOption } from './types';
 
 /**
  * Renders a SelectControl for choosing HTML elements with validation
  * to prevent duplicate <main> elements.
  *
- * @param {Object}                    props          Component props.
- * @param {string}                    props.tagName  The current HTML tag name.
- * @param {(tagName: string) => void} props.onChange Function to call when the tag is changed.
- * @param {string}                    props.clientId Optional. The client ID of the block. Used to check for existing <main> elements.
- * @param {Array}                     props.options  SelectControl options (optional).
+ * @param props          Component props.
+ * @param props.tagName  The current HTML tag name.
+ * @param props.onChange Function to call when the tag is changed.
+ * @param props.clientId Optional. The client ID of the block. Used to check for existing <main> elements.
+ * @param props.options  SelectControl options (optional).
  *
- * @return {Component} The HTML element select control with validation.
+ * @return The HTML element select control with validation.
  */
 export default function HTMLElementControl( {
 	tagName,
@@ -30,7 +31,7 @@ export default function HTMLElementControl( {
 		{ label: '<aside>', value: 'aside' },
 		{ label: '<footer>', value: 'footer' },
 	],
-} ) {
+}: HTMLElementControlProps ) {
 	const checkForMainTag =
 		!! clientId && options.some( ( option ) => option.value === 'main' );
 
@@ -56,7 +57,7 @@ export default function HTMLElementControl( {
 	);
 
 	// Create a modified options array that disables the main option if needed.
-	const modifiedOptions = options.map( ( option ) => {
+	const modifiedOptions = options.map( ( option ): HTMLElementOption => {
 		if (
 			option.value === 'main' &&
 			hasMainElementElsewhere &&

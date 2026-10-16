@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Messages providing helpful descriptions for HTML elements.
  */
-export const htmlElementMessages = {
+export const htmlElementMessages: Record< string, string > = {
 	a: __(
 		'The <a> element should be used for links that navigate to a different page or to a different section within the same page.'
 	),
