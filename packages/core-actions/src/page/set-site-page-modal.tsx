@@ -69,13 +69,15 @@ export function SetSitePageModal( {
 				select( coreStore );
 			const settings = getEntityRecord( 'root', 'site' ) as
 				Partial< Settings > | undefined;
+			const currentId = settings?.[ setting ];
 			return {
 				siteSettings: settings,
-				currentPage: getEntityRecord(
-					'postType',
-					'page',
-					settings?.[ setting ]
-				) as BasePost | undefined,
+				// A setting holding no page is `0`, and `getEntityRecord()`
+				// without a key would request the whole collection.
+				currentPage: currentId
+					? ( getEntityRecord( 'postType', 'page', currentId ) as
+							BasePost | undefined )
+					: undefined,
 				isSaving: isSavingEntityRecord( 'root', 'site' ),
 			};
 		},
