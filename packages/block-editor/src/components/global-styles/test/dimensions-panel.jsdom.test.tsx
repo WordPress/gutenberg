@@ -3,6 +3,7 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import DimensionsPanel from '../dimensions-panel';
+import type { DimensionsPanelProps } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -136,7 +137,10 @@ const settingsWithSpacingPresets = {
 };
 
 // Render helper that fills in the boilerplate props every test repeats.
-function renderPanel( props ) {
+function renderPanel(
+	props: Omit< DimensionsPanelProps, 'onChange' > &
+		Partial< Pick< DimensionsPanelProps, 'onChange' > >
+) {
 	return render(
 		<DimensionsPanel
 			onChange={ () => {} }
@@ -159,7 +163,10 @@ function expectLocalOverride() {
 // Asserts the placeholder treatment for a control. A control can inherit a
 // value while showing no placeholder when the inherited sides differ
 // (BoxControl cannot render a per-side placeholder).
-function expectPlaceholderState( el, placeholder ) {
+function expectPlaceholderState(
+	el: HTMLElement,
+	placeholder?: string | null
+) {
 	if ( placeholder ) {
 		expect( el ).toHaveAttribute( 'placeholder', placeholder );
 	} else {
@@ -170,7 +177,7 @@ function expectPlaceholderState( el, placeholder ) {
 // `getByLabelText` for the DimensionControl archetype matches both the inner
 // UnitControl input and the sibling RangeControl slider, so filter to the
 // text input element by class.
-const getDimensionInput = ( label ) =>
+const getDimensionInput = ( label: RegExp ) =>
 	screen
 		.getAllByLabelText( label )
 		.find( ( el ) =>
@@ -184,11 +191,10 @@ const getPaddingAllSides = () =>
 	);
 
 const getPaddingSliders = () =>
-	screen
-		.getAllByRole( 'slider' )
-		.filter( ( s ) =>
-			/padding/i.test( s.getAttribute( 'aria-label' ) || '' )
-		);
+	// Sliders are range inputs.
+	( screen.getAllByRole( 'slider' ) as HTMLInputElement[] ).filter( ( s ) =>
+		/padding/i.test( s.getAttribute( 'aria-label' ) || '' )
+	);
 
 describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 	describe( 'layout content width', () => {
@@ -265,7 +271,8 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			await user.type( contentInput, '800px' );
 
 			expect( onChange ).toHaveBeenCalled();
-			const lastCall = onChange.mock.calls.at( -1 )[ 0 ];
+			// The change was asserted above.
+			const lastCall = onChange.mock.calls.at( -1 )![ 0 ];
 
 			// The committed change is local-only at the touched leaf path;
 			// no inherited value (wideSize, blockGap) is copied into the
@@ -567,10 +574,12 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 
 			const minHeightInput = getDimensionInput( /minimum height/i );
 			expect( minHeightInput ).toBeDefined();
-			await user.type( minHeightInput, '500' );
+			// The input was asserted above.
+			await user.type( minHeightInput!, '500' );
 
 			expect( onChange ).toHaveBeenCalled();
-			const lastCall = onChange.mock.calls.at( -1 )[ 0 ];
+			// The change was asserted above.
+			const lastCall = onChange.mock.calls.at( -1 )![ 0 ];
 
 			// The committed change is local-only at the touched leaf path;
 			// no other inherited dimension (width) is copied into the
@@ -644,12 +653,14 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			await user.click(
 				await screen.findByRole( 'option', {
 					name: 'Square',
+					// @ts-expect-error Role queries ignore `exact`.
 					exact: true,
 				} )
 			);
 
 			expect( onChange ).toHaveBeenCalled();
-			const lastCall = onChange.mock.calls.at( -1 )[ 0 ];
+			// The change was asserted above.
+			const lastCall = onChange.mock.calls.at( -1 )![ 0 ];
 			expect( lastCall?.dimensions?.aspectRatio ).toBe( '1' );
 			// minHeight from inheritedValue must not be copied into the
 			// committed local value (strip-not-copy).
@@ -706,11 +717,12 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 					settings: settingsWithSpacingPresets,
 				} );
 
-				const sliders = screen
-					.getAllByRole( 'slider' )
-					.filter( ( s ) =>
-						match.test( s.getAttribute( 'aria-label' ) || '' )
-					);
+				// Sliders are range inputs.
+				const sliders = (
+					screen.getAllByRole( 'slider' ) as HTMLInputElement[]
+				 ).filter( ( s ) =>
+					match.test( s.getAttribute( 'aria-label' ) || '' )
+				);
 				expect( sliders.length ).toBeGreaterThan( 0 );
 				expect(
 					sliders.every( ( s ) => s.value === sliderValue )
@@ -817,7 +829,8 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				.getAllByLabelText( /minimum height/i )
 				.find(
 					( input ) =>
-						input.tagName === 'INPUT' && input.value === '0'
+						input.tagName === 'INPUT' &&
+						( input as HTMLInputElement ).value === '0'
 				);
 			expect( minHeightInput ).toBeDefined();
 			expect( minHeightInput ).toHaveValue( 0 );
