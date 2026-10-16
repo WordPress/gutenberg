@@ -9,6 +9,10 @@
 ### Bug Fixes
 
 -   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core ([#81023](https://github.com/WordPress/gutenberg/pull/81023)).
+-   `data-wp-html` now follows its value on every update and after navigation: tokens render, pending values keep the content, anything else empties the element. Throwing getters and functions no longer break rendering. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   `data-wp-html` is ignored, with a warning, when combined with `data-wp-text`, `data-wp-each` or `data-wp-router-region` on the same element. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Interactive islands inside server-rendered `data-wp-each-child` items are no longer hydrated twice. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Functions called from directive values restore the caller's scope when they throw. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
 
 ### Internal
 

@@ -709,7 +709,7 @@ Displays the next or previous post link that is adjacent to the current post.
 
 -	**Name:** [core/post-navigation-link](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/core-block-post-navigation-link/)
 -	**Category:** [theme](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-theme/)
--	**Supports:** anchor, color (background, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, background (backgroundImage, backgroundSize, gradient), color (background, link, text), dimensions (minHeight, minWidth), interactivity (clientNavigation), shadow, spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~, ~~reusable~~
 -	**Attributes:** arrow, label, linkLabel, showTitle, taxonomy, type
 
 ## Post Template
@@ -877,7 +877,7 @@ Help visitors find your content.
 
 -	**Name:** [core/search](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/core-block-search/)
 -	**Category:** [widgets](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-widgets/)
--	**Supports:** align (center, left, right), anchor, background (gradient), color (background, gradients, text), interactivity, shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** align (center, left, right), anchor, background (gradient), color (background, gradients, text), dimensions (minHeight, minWidth), interactivity, shadow, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** buttonPosition, buttonText, buttonUseIcon, label, placeholder, query, showLabel, tagName, width, widthUnit
 
 ## Separator
