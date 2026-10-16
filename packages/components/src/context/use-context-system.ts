@@ -1,9 +1,9 @@
+import clsx from 'clsx';
 import type { ReactNode } from 'react';
 import warn from '@wordpress/warning';
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
 import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
-import { useCx } from '../utils/hooks/use-cx';
 import type { ConnectedProps } from './types';
 
 /**
@@ -41,9 +41,7 @@ export function useContextSystem< P extends { className?: string } >(
 		renderChildren?: ( props: P ) => ReactNode;
 	} = initialMergedProps;
 
-	const cx = useCx();
-
-	const classes = cx(
+	const classes = clsx(
 		getStyledClassNameFromKey( namespace ),
 		props.className
 	);
