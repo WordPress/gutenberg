@@ -12,7 +12,7 @@ Relevant docs and discussions:
 
 -   **CRDT document**: A [Yjs `Y.Doc`](https://docs.yjs.dev/api/y.doc) that holds synced entity data. CRDTs (Conflict-free Replicated Data Types) allow concurrent edits from multiple peers to be merged automatically without conflicts.
 -   **Sync manager**: Orchestrates the lifecycle of synced entities: creating CRDT documents, connecting providers, attaching observers, and coordinating updates.
--   **Provider**: A transport layer that syncs CRDT document updates between peers. The default provider uses HTTP polling; plugins can substitute their own provider via the `sync.providers` filter.
+-   **Provider**: A transport layer that syncs CRDT document updates between peers. The Real-Time Collaboration experiment uses HTTP polling by default; plugins can replace it via the `sync.providers` filter.
 -   **Awareness**: Ephemeral presence state (e.g., cursor positions, user identity) shared between peers. Unlike CRDT document state, awareness is not persisted.
 -   **Sync config**: An entity-level configuration object that defines how local changes are written to the CRDT document and how remote changes are extracted from it. See the `SyncConfig` type in `src/types.ts`.
 -   **Origin**: A value attached to each Yjs transaction to identify the source of a change (e.g., local editor, sync manager, undo manager, or remote peer). Origins are used to decide which changes should trigger store updates and which should be tracked by the undo manager.
@@ -21,10 +21,10 @@ Relevant docs and discussions:
 
 Each synced entity gets its own `Y.Doc` with two root-level `Y.Map` entries:
 
-| Key        | Constant              | Purpose                                                                                                                                                                                |
-| ---------- | --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `document` | `CRDT_RECORD_MAP_KEY` | Holds the entity record data (the synced properties).                                                                                                                                  |
-| `state`    | `CRDT_STATE_MAP_KEY`  | Metadata about the CRDT document and the entity: a schema version number (`version`), the timestamp of the last save (`savedAt`), and the client ID of the peer who saved (`savedBy`). |
+| Key        | Constant              | Purpose                                                                                                                                                                                                                                       |
+| ---------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `document` | `CRDT_RECORD_MAP_KEY` | Holds the entity record data (the synced properties).                                                                                                                                                                                         |
+| `state`    | `CRDT_STATE_MAP_KEY`  | Metadata about the CRDT document and the entity: a schema version number (`version`) and the last user-facing entity save (`savedAt`/`savedBy`). Peers refetch records on `savedAt`; collaborator save notifications use `savedAt`/`savedBy`. |
 
 These constants are defined in `src/config.ts`.
 
@@ -38,7 +38,8 @@ The sync manager (`src/manager.ts`) orchestrates the lifecycle of synced entitie
 -   **`unload(objectType, objectId)`**: Disconnect providers, remove observers, and destroy the `Y.Doc`.
 -   **`getAwareness(objectType, objectId)`**: Return the awareness instance for the entity, if one exists.
 -   **`createPersistedCRDTDoc(objectType, objectId)`**: Serialize the entity's CRDT document for persistence (see "Persistence" below).
--   **`undoManager`**: The sync-aware undo manager, lazily created when the first entity is loaded (see "Undo / redo" below).
+-   **`undoManager`**: The undo history of the loaded entities, created with the sync manager (see "Undo / redo" below).
+-   **`isLoaded(objectType, objectId)`**: Whether an entity was loaded for syncing and not unloaded since. `core-data` uses it to leave the undo history of such records to this manager.
 
 ### Data flow
 
@@ -60,12 +61,13 @@ The sync config "owns" the sync behavior of the entity; it has sole knowledge of
 
 A provider is a transport layer that syncs Yjs document updates between peers. This package uses a pluggable provider system defined in `src/providers/`.
 
-### Default: HTTP polling
+### Default HTTP polling provider
 
-The default provider (`src/providers/http-polling/`) uses HTTP polling to exchange updates with a central sync server. A shared polling manager batches updates for all rooms (entities) into a single request per poll cycle. See [the HTTP polling README](./src/providers/http-polling/README.md) for full details including the REST API format, sync protocol, and compaction.
+When the **Real-Time Collaboration** experiment is enabled, the default provider (`src/providers/http-polling/`) uses HTTP polling to exchange updates with a central sync server. Plugins can replace the polling provider through the `sync.providers` filter. A shared polling manager batches updates for all rooms (entities) into a single request per poll cycle. See [the HTTP polling README](./src/providers/http-polling/README.md) for full details including the REST API format, sync protocol, and compaction.
 
--   Poll interval: 1 second when editing alone, 250ms when collaborators are detected.
--   On errors, the interval backs off exponentially (up to 30 seconds).
+-   Poll interval: 4 seconds when editing alone, 1 second when collaborators are detected.
+-   The `sync.pollingManager.pollingInterval` and `sync.pollingManager.pollingIntervalWithCollaborators` filters can make active-tab polling faster, but slower values are clamped to the defaults.
+-   On errors, the interval backs off according to the retry schedule before continuing at 30-second automatic retries.
 -   Awareness state is sent and received alongside document updates in the same poll request.
 
 ### Custom providers
@@ -118,9 +120,9 @@ Awareness provides ephemeral presence information (cursor positions, user identi
 
 ## Undo / redo
 
-The `SyncUndoManager` (`src/undo-manager.ts`) replaces the default WordPress undo manager when synced entities are in use. It wraps Yjs's built-in undo functionality.
+The `SyncUndoManager` (`syncManager.undoManager`) is the undo history of the loaded entities. Each loaded entity keeps its own undo manager (`src/undo-manager.ts`), backed by a Yjs `UndoManager`, next to its document in the sync manager's entity state. It is not the editor's undo manager and does not order levels across entities: `core-data` keeps its own undo manager for every entity and delegates to this one only for the levels that belong here, naming the entity each time.
 
--   **Lazy creation**: The undo manager is created when the first entity is loaded. If no entities are synced, the default WordPress undo manager is used.
--   **Automatic tracking**: Unlike the default undo manager, which explicitly records each edit, the `SyncUndoManager` relies on Yjs to track changes to observed `Y.Map` instances. Only changes with the local editor origin are tracked.
--   **Capture grouping**: Changes within 500ms of each other are grouped into a single undo step, preventing mid-word undo breaks.
--   **Limitation**: Once created, the `SyncUndoManager` only tracks synced entities. Edits to non-synced entities are not included in the undo stack.
+-   **Automatic tracking**: Unlike the default undo manager, which explicitly records each edit, the `SyncUndoManager` relies on Yjs to track changes to observed `Y.Map` instances. Only changes with the local editor origin are tracked. `core-data` does not record edits to loaded entities itself (it asks `isLoaded`).
+-   **Reporting levels**: Each time Yjs opens a new undo level for a record, the record's `onUndoLevelOpened` handler runs. `core-data` records a placeholder for the level in its own undo manager, naming the entity that opened it, next to the records of entities that are not synced, so both are undone in the order they were made. When that placeholder is undone or redone, `core-data` calls `undo(objectType, objectId)` or `redo(objectType, objectId)` here for that entity. An entity that was unloaded has no undo manager left, so its levels move nothing and never move another entity.
+-   **Capture grouping**: Changes within 500ms of each other are grouped into a single undo step, preventing mid-word undo breaks. `stopCapturing()` closes the current level of every entity; `core-data` calls it when it records an edit itself, so a later synced change cannot merge into a level that is no longer on top. `clearRedo()` drops the redo levels of every entity when another edit ends the redo history. When one entity opens a level, the others are closed and lose their redo levels the same way.
+-   **Deferred changes**: Local changes to a document are deferred when editing alone (see `update`). Reading or moving the history flushes them first, so their levels keep their place in the order.

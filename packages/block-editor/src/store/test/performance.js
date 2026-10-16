@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { beforeAll, describe, expect, it } from 'vitest';
 import reducer from '../reducer';
 
 describe( 'performance', () => {
@@ -15,14 +13,20 @@ describe( 'performance', () => {
 	}
 
 	let preparedState;
-
-	it( 'should reset blocks', () => {
+	beforeAll( () => {
 		preparedState = reducer( state, {
 			type: 'RESET_BLOCKS',
 			blocks,
 		} );
-		expect( preparedState ).toBeDefined();
-	} );
+	}, 60_000 );
+
+	it( 'should reset blocks', () => {
+		const updatedState = reducer( state, {
+			type: 'RESET_BLOCKS',
+			blocks,
+		} );
+		expect( updatedState ).toBeDefined();
+	}, 60_000 );
 
 	it( 'should update blocks', () => {
 		const updatedState = reducer( preparedState, {

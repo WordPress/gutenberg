@@ -1,86 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import type { Action, Field } from '@wordpress/dataviews';
 import { doAction } from '@wordpress/hooks';
 import type { PostType } from '@wordpress/fields';
-import {
-	viewPost,
-	viewPostRevisions,
-	duplicatePost,
-	duplicatePattern,
-	reorderPage,
-	exportPattern,
-	permanentlyDeletePost,
-	restorePost,
-	trashPost,
-	renamePost,
-	resetPost,
-	deletePost,
-	duplicateTemplatePart,
-	excerptField,
-	featuredImageField,
-	dateField,
-	parentField,
-	passwordField,
-	commentStatusField,
-	pingStatusField,
-	discussionField,
-	slugField,
-	statusField,
-	authorField,
-	titleField,
-	templateField,
-	templateTitleField,
-	pageTitleField,
-	patternTitleField,
-	notesField,
-	scheduledDateField,
-	formatField,
-	postContentInfoField,
-	stickyField,
-} from '@wordpress/fields';
-import {
-	altTextField,
-	attachedToField,
-	authorField as mediaAuthorField,
-	captionField,
-	dateAddedField,
-	descriptionField,
-	filenameField,
-	filesizeField,
-	mediaDimensionsField,
-	mimeTypeField,
-} from '@wordpress/media-fields';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE, DESIGN_POST_TYPES } from '../../store/constants';
-import postPreviewField from '../fields/content-preview';
 import { unlock } from '../../lock-unlock';
-
-declare global {
-	interface Window {
-		__experimentalTemplateActivate?: boolean;
-	}
-}
-
-/**
- * Check if a post type supports editor notes.
- *
- * @param supports The post type supports object.
- * @return Whether editor notes are supported.
- */
-function hasEditorNotesSupport( supports?: PostType[ 'supports' ] ): boolean {
-	const editor = supports?.editor;
-	if ( Array.isArray( editor ) ) {
-		return !! editor[ 0 ]?.notes;
-	}
-	return false;
-}
 
 export function registerEntityAction< Item >(
 	kind: string,
@@ -108,29 +31,25 @@ export function unregisterEntityAction(
 	};
 }
 
-export function registerEntityField< Item >(
+/**
+ * Receives the fields of an entity, as the `getEntityFields` resolver
+ * resolves them from the server.
+ *
+ * @param kind   Entity kind.
+ * @param name   Entity name.
+ * @param fields The fields.
+ * @return Action object.
+ */
+export function receiveEntityFields< Item >(
 	kind: string,
 	name: string,
-	config: Field< Item >
+	fields: Field< Item >[]
 ) {
 	return {
-		type: 'REGISTER_ENTITY_FIELD' as const,
+		type: 'RECEIVE_ENTITY_FIELDS' as const,
 		kind,
 		name,
-		config,
-	};
-}
-
-export function unregisterEntityField(
-	kind: string,
-	name: string,
-	fieldId: string
-) {
-	return {
-		type: 'UNREGISTER_ENTITY_FIELD' as const,
-		kind,
-		name,
-		fieldId,
+		fields,
 	};
 }
 
@@ -142,30 +61,59 @@ export function setIsReady( kind: string, name: string ) {
 	};
 }
 
-/*
- * Media fields for the attachment post type.
+/**
+ * Reads the actions of a settled import of a core actions script module.
  *
- * Field order follows a logical grouping:
- * 1. Metadata fields in panels (date, author, file info)
- * 2. Core editable fields (title, alt text, caption, description)
+ * A module that failed to load is reported and yields no actions, so the
+ * post type still gets the actions of the other modules.
  *
- * Note: media_thumbnail is not included as it's shown in the canvas preview
+ * @param result   The settled import of the module, or of nothing when the
+ *                 post type does not need the module.
+ * @param postType The post type.
+ * @return The actions of the module, keyed by action id.
  */
-const ORDERED_MEDIA_FIELDS = [
-	// Metadata in panels (collapsed by default).
-	dateAddedField,
-	mediaAuthorField,
-	filenameField,
-	mimeTypeField,
-	filesizeField,
-	mediaDimensionsField,
-	attachedToField,
-	// Regular layout fields (always visible).
-	titleField,
-	altTextField,
-	captionField,
-	descriptionField,
-];
+function getLoadedActions< Module extends { default: object } >(
+	result: PromiseSettledResult< Module | undefined >,
+	postType: string
+): Partial< Module[ 'default' ] > {
+	if ( result.status === 'rejected' ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Could not load the core actions of the ${ postType } post type.`,
+			result.reason
+		);
+		return {};
+	}
+	return result.value?.default ?? {};
+}
+
+/**
+ * Imports the script modules of the core actions a post type may get: the
+ * default actions, and the actions of patterns and template parts.
+ *
+ * The literal `import()`s keep the modules as dependencies of the editor
+ * script, and their types check the action ids the schema reads below.
+ *
+ * @param postType The post type.
+ * @return The actions of each module, keyed by action id.
+ */
+async function importCoreActionModules( postType: string ) {
+	const [ postTypeSupports, wpBlock, wpTemplatePart ] =
+		await Promise.allSettled( [
+			import( '@wordpress/core-actions/post_type_supports' ),
+			postType === 'wp_block'
+				? import( '@wordpress/core-actions/wp_block' )
+				: undefined,
+			postType === 'wp_template_part'
+				? import( '@wordpress/core-actions/wp_template_part' )
+				: undefined,
+		] );
+	return [
+		getLoadedActions( postTypeSupports, postType ),
+		getLoadedActions( wpBlock, postType ),
+		getLoadedActions( wpTemplatePart, postType ),
+	] as const;
+}
 
 export const registerPostTypeSchema =
 	( postType: string ) =>
@@ -183,6 +131,10 @@ export const registerPostTypeSchema =
 			postType
 		);
 
+		// Start importing the script modules of the core actions while the
+		// post type, the permissions, and the theme resolve.
+		const coreActionModules = importCoreActionModules( postType );
+
 		const postTypeConfig = ( await registry
 			.resolveSelect( coreStore )
 			.getPostType( postType ) ) as PostType;
@@ -196,31 +148,41 @@ export const registerPostTypeSchema =
 		const currentTheme = await registry
 			.resolveSelect( coreStore )
 			.getCurrentTheme();
-		const { disablePostFormats } = registry
-			.select( editorStore )
-			.getEditorSettings();
+
+		const [
+			postTypeSupportsActions,
+			wpBlockActions,
+			wpTemplatePartActions,
+		] = await coreActionModules;
+		const {
+			'view-post': viewPost,
+			'view-post-revisions': viewPostRevisions,
+			'duplicate-post': duplicatePost,
+			'rename-post': renamePost,
+			'order-pages': reorderPage,
+			restore: restorePost,
+			'reset-post': resetPost,
+			'delete-post': deletePost,
+			'move-to-trash': trashPost,
+			'permanently-delete': permanentlyDeletePost,
+		} = postTypeSupportsActions;
+		const {
+			'duplicate-pattern': duplicatePattern,
+			'export-pattern': exportPattern,
+		} = wpBlockActions;
+		const { 'duplicate-template-part': duplicateTemplatePart } =
+			wpTemplatePartActions;
 
 		let canDuplicate =
-			! [ 'wp_block', 'wp_template_part' ].includes(
+			! [ 'wp_block', 'wp_template_part', 'wp_template' ].includes(
 				postTypeConfig.slug
 			) &&
 			canCreate &&
 			duplicatePost;
 
-		// @ts-ignore
+		// @ts-expect-error `globalThis` has no index signature for this build-time global.
 		if ( ! globalThis.IS_GUTENBERG_PLUGIN ) {
-			// Outside Gutenberg, disable duplication except for wp_template.
-			if ( 'wp_template' !== postTypeConfig.slug ) {
-				canDuplicate = undefined;
-			}
-		}
-
-		// When template activation experiment is disabled, templates cannot be duplicated.
-		// @ts-ignore
-		if (
-			postTypeConfig.slug === 'wp_template' &&
-			! window?.__experimentalTemplateActivate
-		) {
+			// Outside Gutenberg, disable duplication.
 			canDuplicate = undefined;
 		}
 
@@ -229,7 +191,6 @@ export const registerPostTypeSchema =
 			!! postTypeConfig.supports?.revisions
 				? viewPostRevisions
 				: undefined,
-			// @ts-ignore
 			canDuplicate,
 			postTypeConfig.slug === 'wp_template_part' &&
 			canCreate &&
@@ -251,74 +212,12 @@ export const registerPostTypeSchema =
 			permanentlyDeletePost,
 		].filter( Boolean );
 
-		// Handle attachment post type separately with media-specific fields
-		let fields;
-
-		if ( postType === ATTACHMENT_POST_TYPE ) {
-			fields = ORDERED_MEDIA_FIELDS;
-		} else {
-			fields = [
-				postTypeConfig.supports?.thumbnail &&
-					currentTheme?.theme_supports?.[ 'post-thumbnails' ] &&
-					featuredImageField,
-				postTypeConfig.supports?.author && authorField,
-				statusField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					dateField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					scheduledDateField,
-				slugField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					postTypeConfig.supports?.excerpt &&
-					excerptField,
-				postTypeConfig.supports?.[ 'page-attributes' ] && parentField,
-				postTypeConfig.supports?.comments && commentStatusField,
-				postTypeConfig.supports?.trackbacks && pingStatusField,
-				( postTypeConfig.supports?.comments ||
-					postTypeConfig.supports?.trackbacks ) &&
-					discussionField,
-				templateField,
-				postTypeConfig.supports?.[ 'post-formats' ] &&
-					! disablePostFormats &&
-					formatField,
-				! DESIGN_POST_TYPES.includes( postTypeConfig.slug ) &&
-					postTypeConfig.supports?.editor &&
-					postContentInfoField,
-				passwordField,
-				postTypeConfig.slug === 'post' && stickyField,
-				postTypeConfig.supports?.editor &&
-					postTypeConfig.viewable &&
-					postPreviewField,
-				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
-			].filter( Boolean );
-			if ( postTypeConfig.supports?.title ) {
-				let _titleField;
-				if ( postType === 'page' ) {
-					_titleField = pageTitleField;
-				} else if ( postType === 'wp_template' ) {
-					_titleField = templateTitleField;
-				} else if ( postType === 'wp_block' ) {
-					_titleField = patternTitleField;
-				} else {
-					_titleField = titleField;
-				}
-				fields.push( _titleField );
-			}
-		}
-
 		registry.batch( () => {
 			actions.forEach( ( action ) => {
 				unlock( registry.dispatch( editorStore ) ).registerEntityAction(
 					'postType',
 					postType,
 					action
-				);
-			} );
-			fields.forEach( ( field ) => {
-				unlock( registry.dispatch( editorStore ) ).registerEntityField(
-					'postType',
-					postType,
-					field
 				);
 			} );
 		} );

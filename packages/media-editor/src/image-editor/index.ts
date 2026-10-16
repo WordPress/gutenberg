@@ -8,14 +8,15 @@
  */
 
 // React surface.
-export { useCropperState } from './react/hooks';
+export { useCropperReducer, buildCropperSetters } from './react/hooks';
 export { Cropper, CropperProvider, useCropper } from './react/components';
-export type { UseCropperStateReturn } from './react/hooks';
+export type { CropperController, CropperSetters } from './react/hooks';
 export type { CropperProps } from './react/components';
 
 // State and extension types.
 export type {
 	CropperState,
+	CropperAction,
 	TransformOperation,
 	NormalizedPoint,
 	NormalizedRect,
@@ -25,11 +26,18 @@ export type {
 	HandlePosition,
 } from './core';
 
-// Deterministic cropper helpers.
+// Deterministic cropper helpers. The reducer + containment + state
+// equality helpers are exported so consumers can build composite
+// stores that delegate cropper actions (see `useMediaEditorState` for
+// the media editor's composite store).
 export {
 	DEFAULT_STATE,
 	DEFAULT_ASPECT_RATIOS,
 	ORIGINAL_ASPECT_RATIO,
+	cropperReducer,
+	enforceContainment,
+	areCropperStatesEqual,
+	computeInscribedRect,
 	getSourceRegion,
 	getSourceRegionPercent,
 	applyOperationToState,

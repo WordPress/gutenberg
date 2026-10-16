@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../../store';
 import NavigationItem from './navigation-item';
 import DrilldownItem from './drilldown-item';
@@ -24,7 +17,7 @@ function Navigation() {
 		useSidebarParent();
 	const menuItems = useSelect(
 		( select ) =>
-			// @ts-ignore
+			// @ts-expect-error Store types are not available when selecting by store name.
 			select( STORE_NAME ).getMenuItems() as MenuItem[],
 		[]
 	);
@@ -72,14 +65,13 @@ function Navigation() {
 			navigationKey={ navigationKey }
 			onNavigate={ handleNavigate }
 			content={
-				<>
+				<div role="list">
 					{ items.map( ( item: MenuItem ) => {
 						if ( item.parent_type === 'dropdown' ) {
 							return (
 								<DropdownItem
 									key={ item.id }
 									id={ item.id }
-									className="boot-navigation-item"
 									icon={ item.icon }
 									shouldShowPlaceholder={ hasRealIcons }
 									isExpanded={ parentDropdownId === item.id }
@@ -117,7 +109,7 @@ function Navigation() {
 							</NavigationItem>
 						);
 					} ) }
-				</>
+				</div>
 			}
 		/>
 	);

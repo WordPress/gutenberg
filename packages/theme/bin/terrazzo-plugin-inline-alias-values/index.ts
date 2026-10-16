@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { type Plugin, type TokenNormalized } from '@terrazzo/parser';
 
 interface InlineAliasValuesOptions {

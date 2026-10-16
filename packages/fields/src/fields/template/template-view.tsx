@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import type { WpTemplate } from '@wordpress/core-data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { getItemTitle } from '../../actions/utils';
+import { getItemTitle } from '../utils';
 import type { BasePost } from '../../types';
 import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
 

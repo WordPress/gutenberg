@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { resolveSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import type { BasePost } from '../../types';
 
 // All WP post formats, sorted alphabetically by translated name.
@@ -47,11 +40,8 @@ const formatField: Field< BasePost > = {
 	getElements: async () => {
 		const themeSupports =
 			await resolveSelect( coreStore ).getThemeSupports();
-		return POST_FORMATS.filter(
-			( f ) =>
-				( themeSupports?.formats as string[] | undefined )?.includes(
-					f.id
-				)
+		return POST_FORMATS.filter( ( f ) =>
+			( themeSupports?.formats as string[] | undefined )?.includes( f.id )
 		).map( ( f ) => ( { value: f.id, label: f.caption } ) );
 	},
 };

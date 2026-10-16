@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
 
 export default function useDimensionHandler(

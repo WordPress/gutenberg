@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../../context';
 import type { ToggleGroupControlOptionProps } from '../types';
 import { ToggleGroupControlOptionBase } from '../toggle-group-control-option-base';
+import { useToggleGroupControlContext } from '../context';
 
 function UnforwardedToggleGroupControlOption(
 	props: WordPressComponentProps<
@@ -23,6 +13,7 @@ function UnforwardedToggleGroupControlOption(
 	>,
 	ref: ForwardedRef< any >
 ) {
+	useToggleGroupControlContext( 'ToggleGroupControlOption' );
 	const { label, ...restProps } = props;
 	const optionLabel = restProps[ 'aria-label' ] || label;
 	return (
@@ -52,7 +43,6 @@ function UnforwardedToggleGroupControlOption(
  *       label="my label"
  *       value="vertical"
  *       isBlock
- *       __next40pxDefaultSize
  *     >
  *       <ToggleGroupControlOption value="horizontal" label="Horizontal" />
  *       <ToggleGroupControlOption value="vertical" label="Vertical" />

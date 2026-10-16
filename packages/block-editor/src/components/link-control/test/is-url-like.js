@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import isURLLike, { isHashLink, isRelativePath } from '../is-url-like';
 
 describe( 'isURLLike', () => {

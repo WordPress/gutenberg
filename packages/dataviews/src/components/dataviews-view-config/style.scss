@@ -1,6 +1,5 @@
 .dataviews-view-config {
 	width: 320px;
-	/* stylelint-disable-next-line property-no-unknown -- the linter needs to be updated to accepted the container-type property */
 	container-type: inline-size;
 	font-size: var(--wpds-typography-font-size-md);
 	line-height: var(--wpds-typography-line-height-sm);
@@ -75,7 +74,7 @@
 	right: var(--wpds-dimension-gap-xs);
 	width: var(--wpds-dimension-gap-xs);
 	height: var(--wpds-dimension-gap-xs);
-	background: var(--wpds-color-bg-interactive-brand-strong);
+	background: var(--wpds-color-background-interactive-brand-strong);
 	border-radius: 50%;
 	pointer-events: none;
 }

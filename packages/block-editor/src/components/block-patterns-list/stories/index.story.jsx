@@ -1,15 +1,8 @@
-/**
- * External dependencies
- */
 import { fn } from 'storybook/test';
-
-/**
- * Internal dependencies
- */
+import blockLibraryStyles from '@wordpress/block-library/build-style/style.css?raw';
 import BlockPatternsList from '../';
 import { ExperimentalBlockEditorProvider } from '../../provider';
 import patterns from './fixtures';
-import blockLibraryStyles from '../../../../../block-library/build-style/style.css?raw';
 
 const blockEditorSettings = {
 	styles: [ { css: blockLibraryStyles } ],
@@ -17,7 +10,8 @@ const blockEditorSettings = {
 
 export default {
 	component: BlockPatternsList,
-	title: 'BlockEditor/BlockPatternsList',
+	id: 'blockeditor-blockpatternslist',
+	title: 'Editor/Block Editor/BlockPatternsList',
 };
 
 export const Default = {

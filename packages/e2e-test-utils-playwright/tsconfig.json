@@ -1,6 +1,6 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"incremental": false,
 		"composite": false,
@@ -9,8 +9,6 @@
 		"noEmit": false,
 		"outDir": "build",
 		"sourceMap": true,
-		"declaration": true,
-		"declarationMap": true,
 		"emitDeclarationOnly": false,
 		"allowJs": true,
 		"checkJs": false

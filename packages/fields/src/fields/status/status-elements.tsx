@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	trash,
 	drafts,

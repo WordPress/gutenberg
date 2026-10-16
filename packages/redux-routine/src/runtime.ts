@@ -1,14 +1,7 @@
-/**
- * External dependencies
- */
 import type { Control } from 'rungen';
 import { create } from 'rungen';
 import isPromise from 'is-promise';
 import type { Dispatch, AnyAction } from 'redux';
-
-/**
- * Internal dependencies
- */
 import { isActionOfType, isAction } from './is-action';
 
 /**

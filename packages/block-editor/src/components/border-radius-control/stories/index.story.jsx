@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BorderRadiusControl from '../';
 
 const meta = {
-	title: 'BlockEditor/BorderRadiusControl',
+	id: 'blockeditor-borderradiuscontrol',
+	title: 'Editor/Block Editor/BorderRadiusControl',
 	component: BorderRadiusControl,
 	parameters: {
 		docs: {

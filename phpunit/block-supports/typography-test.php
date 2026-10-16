@@ -284,6 +284,39 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that a classname is generated for a text shadow preset.
+	 *
+	 * @covers ::wp_apply_typography_support
+	 */
+	public function test_should_generate_classname_for_text_shadow() {
+		$this->test_block_name = 'test/text-shadow-with-class';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'style' => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'typography' => array(
+						'textShadow' => true,
+					),
+				),
+			)
+		);
+		$registry   = WP_Block_Type_Registry::get_instance();
+		$block_type = $registry->get_registered( $this->test_block_name );
+		$block_atts = array( 'textShadow' => 'light' );
+
+		$actual   = gutenberg_apply_typography_support( $block_type, $block_atts );
+		$expected = array( 'class' => 'has-light-text-shadow' );
+
+		$this->assertSame( $expected, $actual );
+	}
+
+	/**
 	 * Tests generating font size values, including fluid formulae, from fontSizes preset.
 	 *
 	 * @covers ::wp_get_typography_font_size_value
@@ -292,7 +325,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_font_size_preset_fixtures
 	 *
-	 * @param array  $font_size                     {
+	 * @param array  $font_size       {
 	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
 	 *
 	 *     @type string $name Name of the font size preset.
@@ -810,7 +843,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_font_size_preset_should_use_fluid_typography_deprecated_fixtures
 	 *
-	 * @param array  $font_size                     {
+	 * @param array  $font_size                   {
 	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
 	 *
 	 *     @type string $name Name of the font size preset.
@@ -818,7 +851,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *     @type string $size CSS font-size value, including units where applicable.
 	 * }
 	 * @param bool   $should_use_fluid_typography An override to switch fluid typography "on". Can be used for unit testing.
-	 * @param string $expected_output Expected output of gutenberg_get_typography_font_size_value().
+	 * @param string $expected_output             Expected output of gutenberg_get_typography_font_size_value().
 	 */
 	public function test_gutenberg_get_typography_font_size_value_should_use_fluid_typography_deprecated( $font_size, $should_use_fluid_typography, $expected_output ) {
 		$actual = gutenberg_get_typography_font_size_value( $font_size, $should_use_fluid_typography );
@@ -858,7 +891,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_generate_should_override_theme_settings_fixtures
 	 *
-	 * @param array  $font_size                     {
+	 * @param array  $font_size       {
 	 *     Required. A font size as represented in the fontSizes preset format as seen in theme.json.
 	 *
 	 *     @type string $name Name of the font size preset.
@@ -1241,7 +1274,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *
 	 * @dataProvider data_get_computed_fluid_typography_value
 	 *
-	 * @param array  $args {
+	 * @param array  $args            {
 	 *      Optional. An associative array of values to calculate a fluid formula for font size. Default is empty array.
 	 *
 	 *     @type string $maximum_viewport_width Maximum size up to which type will have fluidity.
@@ -1250,7 +1283,7 @@ class WP_Block_Supports_Typography_Test extends WP_UnitTestCase {
 	 *     @type string $minimum_font_size      Minimum font size for any clamp() calculation.
 	 *     @type int    $scale_factor           A scale factor to determine how fast a font scales within boundaries.
 	 * }
-	 * @param string $expected_output             Expected value of style property from gutenberg_apply_typography_support().
+	 * @param string $expected_output Expected value of style property from gutenberg_apply_typography_support().
 	 */
 	public function test_get_computed_fluid_typography_value( $args, $expected_output ) {
 		$actual = gutenberg_get_computed_fluid_typography_value( $args );

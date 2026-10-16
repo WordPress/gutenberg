@@ -1,12 +1,8 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-
-/**
- * Internal dependencies
- */
-const { recordRequests } = require( './record-requests' );
+const {
+	recordRequests,
+	waitForRequestsToSettle,
+} = require( './record-requests' );
 
 test.describe( 'Preload', () => {
 	let pageId;
@@ -14,6 +10,11 @@ test.describe( 'Preload', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
 		await requestUtils.resetPreferences();
+		// Posts left behind by earlier specs change the startup requests:
+		// with at least one post, emptytheme's index template query loop
+		// renders the Post Excerpt block, whose editor component fetches
+		// /wp/v2/types/post?context=edit.
+		await requestUtils.deleteAllPosts();
 		const pg = await requestUtils.createPage( {
 			content:
 				'<!-- wp:heading -->\n<h2 class="wp-block-heading">Hello</h2>\n<!-- /wp:heading -->',
@@ -39,8 +40,7 @@ test.describe( 'Preload', () => {
 			.locator( '[data-block]' )
 			.first()
 			.waitFor();
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
@@ -50,9 +50,7 @@ test.describe( 'Preload', () => {
 		expect( Array.from( new Set( requests ) ).sort() ).toEqual(
 			[
 				'GET /wp/v2/posts?context=edit&offset=0&order=desc&orderby=date&per_page=10&ignore_sticky=false',
-				'GET /wp/v2/taxonomies?context=view',
 				'GET /wp/v2/template-parts/emptytheme//header?context=edit',
-				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
 				'OPTIONS /wp/v2/settings',
 				'POST /wp/v2/users/me',
 			].sort()
@@ -74,8 +72,7 @@ test.describe( 'Preload', () => {
 			.getByRole( 'document', { name: 'Block: Heading' } )
 			.filter( { hasText: 'Hello' } )
 			.waitFor();
-		// eslint-disable-next-line playwright/no-networkidle
-		await page.waitForLoadState( 'networkidle' );
+		await waitForRequestsToSettle( requests );
 		stop();
 
 		// `POST /wp/v2/users/me` (preferences persistence) occasionally
@@ -86,14 +83,12 @@ test.describe( 'Preload', () => {
 			[
 				`GET /wp/v2/comments?context=edit&post=${ pageId }&type=note&status=all&per_page=100`,
 				`GET /wp/v2/pages/${ pageId }/autosaves?context=edit`,
-				'GET /wp/v2/taxonomies?context=edit&per_page=100',
-				'GET /wp/v2/taxonomies?context=view',
+				'GET /wp/v2/taxonomies?context=edit',
 				'GET /wp/v2/templates/lookup?slug=front-page',
 				'GET /wp/v2/types/page?context=edit',
 				'GET /wp/v2/users/1?context=view&_fields=id%2Cname',
 				'GET /wp/v2/users/me',
 				'GET /wp/v2/view-config?kind=postType&name=page',
-				'GET /wp/v2/wp_pattern_category?context=view&per_page=100&_fields=id%2Cname%2Cdescription%2Cslug',
 				'OPTIONS /wp/v2/settings',
 				'OPTIONS /wp/v2/templates',
 				'POST /wp/v2/users/me',

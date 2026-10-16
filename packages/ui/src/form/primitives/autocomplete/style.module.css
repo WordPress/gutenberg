@@ -1,7 +1,9 @@
-@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
 
-@layer wp-ui-components {
-	.positioner {
-		z-index: var(--wp-ui-autocomplete-z-index, initial);
+	@layer components {
+		.positioner {
+			z-index: var(--wp-ui-autocomplete-z-index, initial);
+		}
 	}
 }

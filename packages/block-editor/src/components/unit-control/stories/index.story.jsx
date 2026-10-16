@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import UnitControl from '../';
 
 const meta = {
-	title: 'BlockEditor/UnitControl',
+	id: 'blockeditor-unitcontrol',
+	title: 'Editor/Block Editor/UnitControl',
 	component: UnitControl,
 	parameters: {
 		docs: {

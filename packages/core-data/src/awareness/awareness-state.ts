@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { REMOVAL_DELAY_IN_MS } from './config';
 import { TypedAwareness } from './typed-awareness';
 import type { EnhancedState, EqualityFieldCheck } from './types';
