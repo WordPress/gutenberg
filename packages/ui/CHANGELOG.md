@@ -19,7 +19,7 @@
 
 ### Enhancements
 
--   `Avatar`: Explore CSS-only colored fallbacks with native contrast and contrast-limited foreground tinting, targeting 4.5:1 for text and 3:1 for the person icon and retaining neutral fallbacks when the required features are unavailable. Add best-effort development warnings for unsupported colors and use the weak neutral content token for neutral initials ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
+-   `Avatar`: Add CSS-only colored fallbacks with contrast-limited foreground tinting, targeting 4.5:1 for text and 3:1 for the person icon and retaining neutral fallbacks when the required features are unavailable. Add best-effort development warnings for unsupported colors and use the weak neutral content token for neutral initials ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
