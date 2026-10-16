@@ -72,11 +72,13 @@ export interface StyleSettings {
 	dimensions?: Record< string, unknown >;
 	layout?: Record< string, unknown >;
 	parentLayout?: unknown;
-	shadow?: {
-		defaultPresets?: boolean;
-		presets?: PresetsPerOrigin< ShadowPreset >;
-		[ setting: string ]: unknown;
-	};
+	shadow?:
+		| false
+		| {
+				defaultPresets?: boolean;
+				presets?: PresetsPerOrigin< ShadowPreset >;
+				[ setting: string ]: unknown;
+		  };
 	spacing?: Record< string, unknown >;
 	typography?: TypographyStyleSettings;
 }

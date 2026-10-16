@@ -13,18 +13,29 @@ import { useMemo, useRef } from '@wordpress/element';
 import { shadow as shadowIcon, Icon, check, reset } from '@wordpress/icons';
 import clsx from 'clsx';
 import { Tooltip } from '@wordpress/ui';
+import type { ComponentProps } from 'react';
 import { InheritanceResetButton } from './inheritance';
 import { useToolsPanelItemPopoverProps } from './utils';
+import type {
+	ShadowIndicatorProps,
+	ShadowPopoverContainerProps,
+	ShadowPopoverProps,
+	ShadowPreset,
+	ShadowPresetsProps,
+	StyleSettings,
+} from './types';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
- *
- * @type {Array}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: ShadowPreset[] = [];
 
-export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
+export function ShadowPopoverContainer( {
+	shadow,
+	onShadowChange,
+	settings,
+}: ShadowPopoverContainerProps ) {
 	const shadows = useShadowPresets( settings );
 	const presets = useMemo( () => {
 		if ( ! shadows.length ) {
@@ -66,7 +77,11 @@ export function ShadowPopoverContainer( { shadow, onShadowChange, settings } ) {
 	);
 }
 
-export function ShadowPresets( { presets, activeShadow, onSelect } ) {
+export function ShadowPresets( {
+	presets,
+	activeShadow,
+	onSelect,
+}: ShadowPresetsProps ) {
 	return ! presets ? null : (
 		<Composite
 			role="listbox"
@@ -89,7 +104,13 @@ export function ShadowPresets( { presets, activeShadow, onSelect } ) {
 	);
 }
 
-export function ShadowIndicator( { type, label, isActive, onSelect, shadow } ) {
+export function ShadowIndicator( {
+	type,
+	label,
+	isActive,
+	onSelect,
+	shadow,
+}: ShadowIndicatorProps ) {
 	return (
 		<Tooltip.Root>
 			<Tooltip.Trigger
@@ -135,7 +156,7 @@ export function ShadowPopover( {
 	hasLocalValue = !! shadow,
 	hasLocalOverride = false,
 	onReset,
-} ) {
+}: ShadowPopoverProps ) {
 	const popoverProps = useToolsPanelItemPopoverProps();
 
 	return (
@@ -163,10 +184,23 @@ export function ShadowPopover( {
 	);
 }
 
-function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
+function renderShadowToggle(
+	shadow: string | undefined,
+	onShadowChange: ( shadow?: string ) => void,
+	resetConfig: {
+		hasLocalValue: boolean;
+		hasLocalOverride: boolean;
+		onReset: () => void;
+	}
+) {
 	const { hasLocalValue, hasLocalOverride, onReset } = resetConfig;
-	return function ShadowToggle( { onToggle, isOpen } ) {
-		const shadowButtonRef = useRef( undefined );
+	return function ShadowToggle( {
+		onToggle,
+		isOpen,
+	}: Parameters<
+		ComponentProps< typeof Dropdown >[ 'renderToggle' ]
+	>[ 0 ] ) {
+		const shadowButtonRef = useRef< HTMLButtonElement >( undefined );
 
 		const toggleProps = {
 			onClick: onToggle,
@@ -228,11 +262,13 @@ function renderShadowToggle( shadow, onShadowChange, resetConfig ) {
  * popover's preset list and the mapping of a chosen shadow back to the preset
  * it came from, so what is shown and what is stored cannot drift apart.
  *
- * @param {Object} settings Theme.json settings for the current context.
+ * @param settings Theme.json settings for the current context.
  *
- * @return {Array} The shadow presets.
+ * @return The shadow presets.
  */
-export function useShadowPresets( settings ) {
+export function useShadowPresets(
+	settings: StyleSettings | undefined
+): ShadowPreset[] {
 	return useMemo( () => {
 		if ( ! settings?.shadow ) {
 			return EMPTY_ARRAY;
