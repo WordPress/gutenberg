@@ -33,16 +33,40 @@ export function snapAngle( angle, { snap = true } = {} ) {
 }
 
 /**
+ * Gets the direction of the pointer from the center of a block, in degrees.
+ * Straight below the center is 0°, and the angle grows clockwise.
+ *
+ * @param {Object} options
+ * @param {number} options.centerX  Horizontal position of the block's center.
+ * @param {number} options.centerY  Vertical position of the block's center.
+ * @param {number} options.pointerX Horizontal position of the pointer.
+ * @param {number} options.pointerY Vertical position of the pointer.
+ *
+ * @return {number} The direction in degrees, in [-180, 180].
+ */
+export function getPointerAngle( { centerX, centerY, pointerX, pointerY } ) {
+	return (
+		( -Math.atan2( pointerX - centerX, pointerY - centerY ) * 180 ) /
+		Math.PI
+	);
+}
+
+/**
  * Works out the rotation of a block from where the rotate handle is being
- * dragged. The handle sits below the block, so a pointer straight below the
- * block's center is 0°, and moving it clockwise around the center rotates the
+ * dragged. Moving the pointer clockwise around the block's center rotates the
  * block clockwise.
+ *
+ * The offset is the difference between the block's rotation and the
+ * pointer's direction when the drag started. With it, the block turns by as
+ * much as the pointer does, wherever the handle is, rather than jumping to
+ * the pointer's direction.
  *
  * @param {Object}  options
  * @param {number}  options.centerX  Horizontal position of the block's center.
  * @param {number}  options.centerY  Vertical position of the block's center.
  * @param {number}  options.pointerX Horizontal position of the pointer.
  * @param {number}  options.pointerY Vertical position of the pointer.
+ * @param {number}  options.offset   Degrees added to the pointer's direction.
  * @param {boolean} options.snap     Whether to pull towards multiples of 15°.
  *
  * @return {number} The rotation in degrees, in (-180, 180].
@@ -52,11 +76,11 @@ export function getRotationFromPointer( {
 	centerY,
 	pointerX,
 	pointerY,
+	offset = 0,
 	snap = true,
 } ) {
 	const angle =
-		( -Math.atan2( pointerX - centerX, pointerY - centerY ) * 180 ) /
-		Math.PI;
+		getPointerAngle( { centerX, centerY, pointerX, pointerY } ) + offset;
 	return snapAngle( angle, { snap } );
 }
 
