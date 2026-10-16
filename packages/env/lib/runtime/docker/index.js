@@ -546,9 +546,9 @@ class DockerRuntime {
 
 		if ( environment === 'all' || environment === 'development' ) {
 			tasks.push(
-				resetDatabase( 'development', config )
-					.then( () => configureWordPress( 'development', config ) )
-					.catch( () => {} )
+				resetDatabase( 'development', config ).then( () =>
+					configureWordPress( 'development', config )
+				)
 			);
 		}
 
@@ -557,13 +557,20 @@ class DockerRuntime {
 			( environment === 'all' || environment === 'tests' )
 		) {
 			tasks.push(
-				resetDatabase( 'tests', config )
-					.then( () => configureWordPress( 'tests', config ) )
-					.catch( () => {} )
+				resetDatabase( 'tests', config ).then( () =>
+					configureWordPress( 'tests', config )
+				)
 			);
 		}
 
-		await Promise.all( tasks );
+		// Let every environment finish before reporting a failure, so that a
+		// reset which fails in one environment does not leave the other one
+		// half done, and the failure reaches the caller instead of being lost.
+		const results = await Promise.allSettled( tasks );
+		const failure = results.find( ( { status } ) => status === 'rejected' );
+		if ( failure ) {
+			throw failure.reason;
+		}
 
 		spinner.text = `Reset ${ description }.`;
 	}
