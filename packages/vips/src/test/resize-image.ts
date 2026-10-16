@@ -5,8 +5,11 @@ import type { ImageSizeCrop } from '../types';
 
 const {
 	MockVipsImage,
+	MockImage,
+	mockArrayjoin,
 	mockCrop,
 	mockResize,
+	mockSmartcrop,
 	mockState,
 	mockThumbnailBuffer,
 	mockWriteToBuffer,
@@ -46,8 +49,13 @@ const {
 		width = state.width;
 		height = state.height;
 		pageHeight = state.pageHeight;
+		xoffset = 0;
+		yoffset = 0;
 		crop = cropMock;
 		resize = resizeMock;
+		smartcrop = smartcropMock;
+		copy = vi.fn( () => this );
+		setInt = vi.fn();
 		writeToBuffer = writeToBufferMock;
 		/*
 		 * Mirrors libvips: reading a field the image does not carry throws rather
@@ -72,17 +80,23 @@ const {
 	const thumbnailBufferMock = vi.fn( () => new ImageMock() );
 	const cropMock = vi.fn( () => new ImageMock() );
 	const resizeMock = vi.fn( () => new ImageMock() );
+	const smartcropMock = vi.fn( () => new ImageMock() );
+	const arrayjoinMock = vi.fn( () => new ImageMock() );
 	const newFromBufferMock = vi.fn( () => new ImageMock() );
 
 	class VipsImageMock {
 		static thumbnailBuffer = thumbnailBufferMock;
 		static newFromBuffer = newFromBufferMock;
+		static arrayjoin = arrayjoinMock;
 	}
 
 	return {
 		MockVipsImage: VipsImageMock,
+		MockImage: ImageMock,
+		mockArrayjoin: arrayjoinMock,
 		mockCrop: cropMock,
 		mockResize: resizeMock,
+		mockSmartcrop: smartcropMock,
 		mockState: state,
 		mockThumbnailBuffer: thumbnailBufferMock,
 		mockWriteToBuffer: writeToBufferMock,
@@ -146,7 +160,7 @@ describe( 'resizeImage', () => {
 		expect( mockCrop ).not.toHaveBeenCalled();
 	} );
 
-	it( 'resizes animated images from the first frame only', async () => {
+	it( 'resizes animated images from the first frame only by default', async () => {
 		const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
 			lastModified: 1234567891,
 			type: 'image/gif',
@@ -219,36 +233,143 @@ describe( 'resizeImage', () => {
 			);
 		} );
 
-		it( 'flattens cropped sizes to the first frame', async () => {
-			const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
-				lastModified: 1234567891,
-				type: 'image/gif',
-			} );
-			const buffer = await gifFile.arrayBuffer();
+		describe( 'cropped sizes', () => {
+			const resizeAnimation = async (
+				crop: ImageSizeCrop[ 'crop' ],
+				smartCrop = false
+			) => {
+				const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+					lastModified: 1234567891,
+					type: 'image/gif',
+				} );
+				const buffer = await gifFile.arrayBuffer();
 
-			await resizeImage(
-				'itemId',
-				buffer,
-				'image/gif',
-				{
-					width: 100,
-					height: 100,
-					crop: true,
-				},
-				{ preserveAnimation: true }
-			);
+				// Three 200x100 frames stacked into one 300px-tall image.
+				mockState.width = 200;
+				mockState.height = 300;
+				mockState.pageHeight = 100;
 
-			expect( mockThumbnailBuffer ).toHaveBeenCalledWith( buffer, 100, {
-				height: 100,
-				crop: 'centre',
-				size: 'down',
+				const result = await resizeImage(
+					'itemId',
+					buffer,
+					'image/gif',
+					{ width: 100, height: 100, crop },
+					{ preserveAnimation: true, smartCrop }
+				);
+
+				return { buffer, result };
+			};
+
+			it( 'scales the animation to cover the size without cropping it', async () => {
+				const { buffer } = await resizeAnimation( true );
+
+				/*
+				 * `thumbnail` would flatten a cropped animation to its first
+				 * frame, so it only resizes here.
+				 */
+				expect( mockThumbnailBuffer ).toHaveBeenCalledTimes( 1 );
+				expect( mockThumbnailBuffer ).toHaveBeenCalledWith(
+					buffer,
+					200,
+					{
+						height: 100,
+						size: 'down',
+						option_string: '[n=-1]',
+					}
+				);
 			} );
-			expect( mockWriteToBuffer ).toHaveBeenCalledWith(
-				'.gif',
-				expect.not.objectContaining( {
-					interframe_maxerror: expect.anything(),
-				} )
-			);
+
+			it( 'centre-crops every frame with the same rectangle', async () => {
+				await resizeAnimation( true );
+
+				expect( mockCrop.mock.calls ).toEqual( [
+					[ 50, 0, 100, 100 ],
+					[ 50, 100, 100, 100 ],
+					[ 50, 200, 100, 100 ],
+				] );
+				expect( mockArrayjoin ).toHaveBeenCalledWith(
+					[
+						expect.any( Object ),
+						expect.any( Object ),
+						expect.any( Object ),
+					],
+					{ across: 1 }
+				);
+				const joined = mockArrayjoin.mock.results[ 0 ].value;
+				expect( joined.setInt ).toHaveBeenCalledWith(
+					'page-height',
+					100
+				);
+			} );
+
+			it( 'crops every frame at a fixed position', async () => {
+				await resizeAnimation( [ 'right', 'top' ] );
+
+				expect( mockCrop.mock.calls ).toEqual( [
+					[ 100, 0, 100, 100 ],
+					[ 100, 100, 100, 100 ],
+					[ 100, 200, 100, 100 ],
+				] );
+			} );
+
+			it( 'picks the smart crop from the first frame and applies it to all of them', async () => {
+				mockSmartcrop.mockImplementationOnce( () =>
+					Object.assign( new MockImage(), { xoffset: -30 } )
+				);
+
+				await resizeAnimation( true, true );
+
+				expect( mockSmartcrop ).toHaveBeenCalledTimes( 1 );
+				expect( mockSmartcrop ).toHaveBeenCalledWith( 100, 100, {
+					interesting: 'attention',
+				} );
+				expect( mockCrop.mock.calls ).toEqual( [
+					[ 0, 0, 200, 100 ],
+					[ 30, 0, 100, 100 ],
+					[ 30, 100, 100, 100 ],
+					[ 30, 200, 100, 100 ],
+				] );
+			} );
+
+			it( 'tunes gifsave for the cropped animation', async () => {
+				await resizeAnimation( true );
+
+				expect( mockWriteToBuffer ).toHaveBeenCalledWith(
+					'.gif',
+					expect.objectContaining( {
+						effort: 2,
+						interframe_maxerror: 8,
+					} )
+				);
+			} );
+
+			it( 'crops a single-frame GIF as a still image', async () => {
+				const gifFile = new File( [ '<BLOB>' ], 'example.gif', {
+					lastModified: 1234567891,
+					type: 'image/gif',
+				} );
+				const buffer = await gifFile.arrayBuffer();
+
+				await resizeImage(
+					'itemId',
+					buffer,
+					'image/gif',
+					{ width: 100, height: 100, crop: true },
+					{ preserveAnimation: true }
+				);
+
+				expect( mockThumbnailBuffer ).toHaveBeenCalledWith(
+					buffer,
+					100,
+					{
+						height: 100,
+						crop: 'centre',
+						size: 'down',
+						option_string: '[n=-1]',
+					}
+				);
+				expect( mockArrayjoin ).not.toHaveBeenCalled();
+			} );
 		} );
 
 		it( 'leaves gifsave at its defaults for a static GIF', async () => {

@@ -140,14 +140,14 @@ The client snaps the cap to the depths the AVIF encoder supports (8, 10, or 12 b
 
 ### Animated image sub-sizes
 
-The `wp_generate_animated_image_subsizes` filter controls whether sub-sizes of animated images (such as GIFs) keep their animation. By default, sub-sizes are generated from the first frame only, matching WordPress core's server-side behavior. Returning `true` opts the site into animated sub-sizes:
+The `wp_generate_animated_image_subsizes` filter controls whether sub-sizes of animated GIF and WebP images keep their animation. By default they do, including cropped sizes such as `thumbnail`, which cut every frame with the same crop. Returning `false` generates sub-sizes from the first frame only, matching WordPress core's server-side behavior:
 
 ```php
-// Generate animated sub-sizes for animated images.
-add_filter( 'wp_generate_animated_image_subsizes', '__return_true' );
+// Generate static sub-sizes from the first frame of animated images.
+add_filter( 'wp_generate_animated_image_subsizes', '__return_false' );
 ```
 
-Only uncropped sub-sizes keep their animation; cropped sizes (such as `thumbnail`) are always generated from the first frame. Animated sub-sizes take longer to encode and produce larger files than static ones — for long animations, each sub-size can approach the original file's size. Uploads that take the server-side path also still produce static sub-sizes, as core has no animated resize support.
+Animated sub-sizes take longer to encode and produce larger files than static ones; for long animations, each sub-size can approach the original file's size. An animation too large to decode in the browser's memory budget falls back to a static sub-size. Uploads that take the server-side path still produce static sub-sizes, as core has no animated resize support.
 
 ## Supported file formats
 

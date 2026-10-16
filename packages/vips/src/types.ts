@@ -56,9 +56,9 @@ export interface ResizeImageOptions {
 	maxBitdepth?: number;
 	/**
 	 * Whether animated images should keep their animation when resized,
-	 * from the `wp_generate_animated_image_subsizes` filter. Only applies
-	 * to uncropped resizes; cropped sizes always flatten to the first
-	 * frame. Defaults to false (matching WordPress core).
+	 * cropped or not, from the `wp_generate_animated_image_subsizes`
+	 * filter. Defaults to false, which flattens them to the first frame
+	 * like WordPress core.
 	 */
 	preserveAnimation?: boolean;
 }

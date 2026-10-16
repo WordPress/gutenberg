@@ -58,12 +58,12 @@ const BYTES_PER_PIXEL = 4;
 const ANIMATION_MEMORY_BUDGET = 0.5 * 1024 * 1024 * 1024;
 
 /**
- * Warns that an animation was flattened despite the site opting in.
+ * Warns that an animation was flattened even though it was asked to keep it.
  *
- * A site reaches this only by enabling `wp_generate_animated_image_subsizes`,
- * so silently producing a static sub-size would look like the filter had no
- * effect. `ANIMATION_MEMORY_BUDGET` is a deliberate over-estimate, so this is
- * also the signal that tells someone tuning it which uploads it turned away.
+ * Silently producing a static sub-size would look like
+ * `wp_generate_animated_image_subsizes` had no effect.
+ * `ANIMATION_MEMORY_BUDGET` is a deliberate over-estimate, so this is also
+ * the signal that tells someone tuning it which uploads it turned away.
  *
  * @param frames         Frame count of the source animation.
  * @param width          Width of a single frame, in pixels.
@@ -326,6 +326,42 @@ export async function compressImage(
 }
 
 /**
+ * Works out where a positional crop starts within a resized image.
+ *
+ * The result can be negative when the image is smaller than the crop.
+ *
+ * @param position   Horizontal and vertical crop position.
+ * @param width      Width of the resized image.
+ * @param height     Height of the resized image (of one frame, if animated).
+ * @param cropWidth  Width of the crop.
+ * @param cropHeight Height of the crop.
+ * @return The top-left corner of the crop.
+ */
+function getCropOrigin(
+	position: Exclude< ImageSizeCrop[ 'crop' ], boolean | undefined >,
+	width: number,
+	height: number,
+	cropWidth: number,
+	cropHeight: number
+): { left: number; top: number } {
+	let left = 0;
+	if ( 'center' === position[ 0 ] ) {
+		left = ( width - cropWidth ) / 2;
+	} else if ( 'right' === position[ 0 ] ) {
+		left = width - cropWidth;
+	}
+
+	let top = 0;
+	if ( 'center' === position[ 1 ] ) {
+		top = ( height - cropHeight ) / 2;
+	} else if ( 'bottom' === position[ 1 ] ) {
+		top = height - cropHeight;
+	}
+
+	return { left, top };
+}
+
+/**
  * Applies resize and optional crop logic to produce a thumbnail.
  *
  * Handles three crop modes: no crop (simple downscale), boolean `true`
@@ -403,19 +439,13 @@ function applyResizeAndCrop<
 
 	const image = createThumbnail( resizeWidth, thumbnailOptions );
 
-	let left = 0;
-	if ( 'center' === target.crop[ 0 ] ) {
-		left = ( image.width - target.width ) / 2;
-	} else if ( 'right' === target.crop[ 0 ] ) {
-		left = image.width - target.width;
-	}
-
-	let top = 0;
-	if ( 'center' === target.crop[ 1 ] ) {
-		top = ( image.height - target.height ) / 2;
-	} else if ( 'bottom' === target.crop[ 1 ] ) {
-		top = image.height - target.height;
-	}
+	let { left, top } = getCropOrigin(
+		target.crop,
+		image.width,
+		image.height,
+		target.width,
+		target.height
+	);
 
 	// Address rounding errors where `left` or `top` become negative integers
 	// and `target.width` / `target.height` are bigger than the actual dimensions.
@@ -654,6 +684,95 @@ function resizeHighBitDepth<
 }
 
 /**
+ * Resizes and crops every frame of an animation to the same rectangle.
+ *
+ * `thumbnail` flattens a multi-frame image to its first frame when it crops,
+ * so the animation is instead scaled to cover the target size, the crop
+ * rectangle is worked out once, and each frame is cut with it.
+ *
+ * @param vips           Vips instance.
+ * @param buffer         Original file buffer.
+ * @param optionString   Load options that keep every frame.
+ * @param resize         Target dimensions and crop mode.
+ * @param originalWidth  Width of the source image.
+ * @param originalHeight Height of one frame of the source image.
+ * @param smartCrop      Whether to use saliency-aware cropping.
+ * @return The resized and cropped animation.
+ */
+function resizeAndCropAnimation(
+	vips: typeof Vips,
+	buffer: ArrayBuffer,
+	optionString: string,
+	resize: ImageSizeCrop,
+	originalWidth: number,
+	originalHeight: number,
+	smartCrop: boolean
+): Vips.Image {
+	const targetWidth = resize.width;
+	const targetHeight =
+		resize.height || ( originalHeight / originalWidth ) * resize.width;
+
+	// Cover the target without upscaling, as `thumbnail` does when cropping.
+	const scale = Math.min(
+		1,
+		Math.max( targetWidth / originalWidth, targetHeight / originalHeight )
+	);
+	const resized = vips.Image.thumbnailBuffer(
+		buffer,
+		Math.ceil( originalWidth * scale ),
+		{
+			option_string: optionString,
+			height: Math.ceil( originalHeight * scale ),
+			size: 'down',
+		}
+	);
+
+	const frameWidth = resized.width;
+	const frameHeight = resized.pageHeight;
+	const cropWidth = Math.min( frameWidth, Math.round( targetWidth ) );
+	const cropHeight = Math.min( frameHeight, Math.round( targetHeight ) );
+
+	let left: number;
+	let top: number;
+	if ( Array.isArray( resize.crop ) ) {
+		( { left, top } = getCropOrigin(
+			resize.crop,
+			frameWidth,
+			frameHeight,
+			cropWidth,
+			cropHeight
+		) );
+	} else if ( smartCrop ) {
+		// Pick the area from the first frame. `smartcrop` reports where it
+		// cut as a negative offset.
+		const firstFrame = resized
+			.crop( 0, 0, frameWidth, frameHeight )
+			.smartcrop( cropWidth, cropHeight, { interesting: 'attention' } );
+		left = -firstFrame.xoffset;
+		top = -firstFrame.yoffset;
+	} else {
+		left = ( frameWidth - cropWidth ) / 2;
+		top = ( frameHeight - cropHeight ) / 2;
+	}
+	left = Math.max( 0, Math.round( left ) );
+	top = Math.max( 0, Math.round( top ) );
+
+	const frames = [];
+	for ( let i = 0; i < resized.height / frameHeight; i++ ) {
+		frames.push(
+			resized.crop( left, i * frameHeight + top, cropWidth, cropHeight )
+		);
+	}
+
+	// `arrayjoin` keeps the first frame's metadata, such as the frame delays
+	// and loop count, but not the new frame height. `setInt` mutates, so
+	// produce a unique copy first.
+	const animation = vips.Image.arrayjoin( frames, { across: 1 } ).copy();
+	animation.setInt( 'page-height', cropHeight );
+	return animation;
+}
+
+/**
  * Resizes an image using vips.
  *
  * UltraHDR JPEGs are auto-detected and preserved: libvips's `uhdrload*`
@@ -661,24 +780,19 @@ function resizeHighBitDepth<
  * decode the gain map alongside the base image, and `jpegsave*` delegates
  * to `uhdrsave*` on output when a gain map is attached.
  *
- * Sub-sizes of animated images are generated from the first frame only
- * by default, matching WordPress core's server-side behavior: both GD and
- * Imagick flatten animated images when resizing, and
- * `wp_calculate_image_srcset()` prevents flattened sub-sizes and the
- * animated full-size image from mixing in a srcset. Loading all frames
- * (`[n=-1]`) re-encodes a full animated GIF per sub-size, which takes tens
- * of seconds for long animations and can produce sub-sizes larger than the
- * original file.
- * See https://github.com/WordPress/gutenberg/issues/80266.
- *
- * Sites can opt into animated sub-sizes via the
- * `wp_generate_animated_image_subsizes` filter, carried here as the
- * `preserveAnimation` option. Cropped sizes always flatten to the first
- * frame (per-frame cropping is not supported), also matching the
- * pre-existing behavior. Animations whose decoded frames would not fit the
- * WASM heap also flatten to the first frame, so an opted-in site gets a
- * static sub-size rather than a failed upload.
+ * Sub-sizes of animated GIF and WebP images keep every frame when
+ * `preserveAnimation` is set, as it is by default from the
+ * `wp_generate_animated_image_subsizes` filter. Cropped sizes cut every
+ * frame with the same rectangle. Animations whose decoded frames would not
+ * fit the WASM heap flatten to the first frame, so the upload gets a static
+ * sub-size rather than failing.
  * See https://github.com/WordPress/gutenberg/issues/80383.
+ *
+ * Without `preserveAnimation`, sub-sizes are generated from the first frame
+ * only, matching WordPress core's server-side behavior: both GD and Imagick
+ * flatten animated images when resizing. Re-encoding every frame takes
+ * longer, and can produce sub-sizes larger than the original file.
+ * See https://github.com/WordPress/gutenberg/issues/80266.
  *
  * @param id      Item ID.
  * @param buffer  Original file buffer.
@@ -717,7 +831,7 @@ export async function resizeImage(
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
 
-		if ( preserveAnimation && supportsAnimation( type ) && ! resize.crop ) {
+		if ( preserveAnimation && supportsAnimation( type ) ) {
 			strOptions = '[n=-1]';
 			( loadOptions as LoadOptions< typeof type > ).n = -1;
 		}
@@ -737,8 +851,7 @@ export async function resizeImage(
 		 * for a long animation needs far more memory than the single-frame
 		 * dimensions suggest. Rather than let the resize abort the whole
 		 * upload when that exceeds the WASM heap, fall back to a first-frame
-		 * sub-size, which is what this image would have produced before the
-		 * `wp_generate_animated_image_subsizes` opt-in.
+		 * sub-size, as WordPress core generates.
 		 */
 		let frames = 1;
 		if ( strOptions ) {
@@ -777,33 +890,46 @@ export async function resizeImage(
 		const isHighBitDepth = saveBitdepth > 8;
 		const sourceImage = image;
 
-		image = applyResizeAndCrop(
-			resize,
-			width,
-			pageHeight,
-			smartCrop,
-			( resizeWidth, thumbnailOptions ) => {
-				if ( isHighBitDepth ) {
-					const resized = resizeHighBitDepth(
-						sourceImage,
+		if ( frames > 1 && resize.crop ) {
+			image = resizeAndCropAnimation(
+				vips,
+				buffer,
+				strOptions,
+				resize,
+				width,
+				pageHeight,
+				smartCrop
+			);
+			image.onProgress = onProgress;
+		} else {
+			image = applyResizeAndCrop(
+				resize,
+				width,
+				pageHeight,
+				smartCrop,
+				( resizeWidth, thumbnailOptions ) => {
+					if ( isHighBitDepth ) {
+						const resized = resizeHighBitDepth(
+							sourceImage,
+							resizeWidth,
+							thumbnailOptions
+						);
+						resized.onProgress = onProgress;
+						return resized;
+					}
+					if ( strOptions ) {
+						thumbnailOptions.option_string = strOptions;
+					}
+					const thumb = vips.Image.thumbnailBuffer(
+						buffer,
 						resizeWidth,
 						thumbnailOptions
 					);
-					resized.onProgress = onProgress;
-					return resized;
+					thumb.onProgress = onProgress;
+					return thumb;
 				}
-				if ( strOptions ) {
-					thumbnailOptions.option_string = strOptions;
-				}
-				const thumb = vips.Image.thumbnailBuffer(
-					buffer,
-					resizeWidth,
-					thumbnailOptions
-				);
-				thumb.onProgress = onProgress;
-				return thumb;
-			}
-		);
+			);
+		}
 
 		const saveOptions = buildSaveOptions( {
 			type,
@@ -831,7 +957,7 @@ export async function resizeImage(
 		 * of 16 was ~50% slower and more than doubled the mean per-pixel
 		 * colour error against the default, to save 1.7% of the file size.
 		 *
-		 * This is keyed off the frame count rather than the opt-in: the
+		 * This is keyed off the frame count rather than the option: the
 		 * inter-frame tolerance means nothing for a single frame, so a static
 		 * GIF would only pay the lower effort in worse compression.
 		 * See https://github.com/WordPress/gutenberg/issues/80266.
