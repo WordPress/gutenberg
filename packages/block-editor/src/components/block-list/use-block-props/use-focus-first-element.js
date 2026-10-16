@@ -5,7 +5,8 @@ import {
 	isTextField,
 	placeCaretAtHorizontalEdge,
 } from '@wordpress/dom';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { RichTextData } from '@wordpress/rich-text';
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
@@ -22,8 +23,14 @@ import { unlock } from '../../../lock-unlock';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
-		unlock( useSelect( blockEditorStore ) );
+	const {
+		isBlockSelected,
+		isMultiSelecting,
+		isZoomOut,
+		getSelectionStart,
+		getBlockAttributes,
+	} = unlock( useSelect( blockEditorStore ) );
+	const { selectionChange } = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
@@ -71,6 +78,38 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 			return;
 		}
 
+		// When the rich text field will take focus itself (focus is in its
+		// container or was lost to the body), select it in the store and
+		// let it place its caret. Focusing it here would move focus off an
+		// editing host and back, which resets the iOS keyboard's
+		// capitalization.
+		const attributeKey = target.dataset.wpBlockAttributeKey;
+		const { activeElement: focused, body } = ownerDocument;
+		const container = target.parentElement?.closest( '[contenteditable]' );
+		if (
+			attributeKey &&
+			ownerDocument.hasFocus() &&
+			( focused === body || container?.contains( focused ) )
+		) {
+			const selectionStart = getSelectionStart();
+			if (
+				selectionStart.clientId === clientId &&
+				selectionStart.attributeKey
+			) {
+				return;
+			}
+			const value = getBlockAttributes( clientId )?.[ attributeKey ];
+			let offset = 0;
+			if ( isReverse ) {
+				offset =
+					value instanceof RichTextData
+						? value.length
+						: RichTextData.fromHTMLString( value ?? '' ).length;
+			}
+			selectionChange( clientId, attributeKey, offset, offset );
+			return;
+		}
+
 		// Check to see if element is focussable before a generic caret insert.
 		if ( ! ref.current.getAttribute( 'contenteditable' ) ) {
 			const focusElement = focus.tabbable.findNext( ref.current );
@@ -105,7 +144,7 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		if ( ! ( hasCaret && isDeliberate ) ) {
 			placeCaretAtHorizontalEdge( target, isReverse );
 		}
-	}, [ initialPosition, clientId ] );
+	}, [ initialPosition, clientId, selectionChange ] );
 
 	return ref;
 }
