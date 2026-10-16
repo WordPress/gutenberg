@@ -6,10 +6,6 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
-### Bug Fixes
-
--   Preserve spacing and alignment of icons in footer links that open in a new tab ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
-
 ### Internal
 
 -   Type the dashboard commands with `CommandConfig` from `@wordpress/commands` ([#84315](https://github.com/WordPress/gutenberg/pull/84315)).
