@@ -477,7 +477,8 @@
 		}
 
 		.block-editor-grid-item-handles__rotate,
-		.block-editor-grid-item-handles__rotate * {
+		.block-editor-grid-item-handles__rotate *,
+		.block-editor-grid-item-handles__drag {
 			pointer-events: all;
 		}
 	}
@@ -489,9 +490,9 @@
 	height: 100%;
 }
 
-.block-editor-grid-item-handles__rotate {
+.block-editor-grid-item-handles__rotate,
+.block-editor-grid-item-handles__drag {
 	position: absolute;
-	bottom: -$grid-unit-40;
 	left: 50%;
 	display: flex;
 	align-items: center;
@@ -514,11 +515,28 @@
 	&::before {
 		content: "";
 		position: absolute;
-		bottom: 100%;
 		left: 50%;
 		width: $border-width;
 		height: $grid-unit-10;
 		background: var(--wp-admin-theme-color);
+	}
+}
+
+// Below the block.
+.block-editor-grid-item-handles__rotate {
+	bottom: -$grid-unit-40;
+
+	&::before {
+		bottom: 100%;
+	}
+}
+
+// Above the block, where its toolbar would be if the grid didn't show it.
+.block-editor-grid-item-handles__drag {
+	top: -$grid-unit-40;
+
+	&::before {
+		top: 100%;
 	}
 }
 

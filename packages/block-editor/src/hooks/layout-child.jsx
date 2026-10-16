@@ -11,6 +11,7 @@ import {
 	GridItemResizer,
 	GridItemMovers,
 	GridItemRotator,
+	GridItemDragHandle,
 	useUpdateGridChildLayout,
 	isGridStackedOnMobile,
 	getStackedLayouts,
@@ -450,6 +451,7 @@ function GridTools( {
 		selectedState,
 		parentStyle,
 		blockEditingMode,
+		canMove,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -459,6 +461,7 @@ function GridTools( {
 				getBlockAttributes,
 				getSettings,
 				getSelectedBlockStyleState,
+				canMoveBlock,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
@@ -493,6 +496,7 @@ function GridTools( {
 				selectedState: getSelectedBlockStyleState( clientId ),
 				parentStyle: parentAttributes?.style,
 				blockEditingMode: getBlockEditingMode( clientId ),
+				canMove: canMoveBlock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -618,6 +622,11 @@ function GridTools( {
 		! hasPseudoBlockStyleState( selectedState ) &&
 		isRotateEnabled( name );
 
+	// Text blocks can't be dragged by their body, so every block that can be
+	// moved gets a handle that drags it the way a body drag does.
+	const showDragHandle =
+		isManualGrid && ! isBlockItselfCurrentlyHidden && canMove;
+
 	function updateLayout( layout ) {
 		updateGridChildLayout( clientId, layout );
 	}
@@ -654,6 +663,13 @@ function GridTools( {
 					angle={ rotate }
 					onPreview={ setPreviewRotate }
 					onChange={ updateRotate }
+				/>
+			) }
+			{ showDragHandle && (
+				<GridItemDragHandle
+					clientId={ clientId }
+					gridClientId={ rootClientId }
+					angle={ previewRotate ?? rotate }
 				/>
 			) }
 			{ isManualGrid && (
