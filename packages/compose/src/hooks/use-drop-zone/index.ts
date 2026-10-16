@@ -108,6 +108,12 @@ export default function useDropZone( {
 			}
 
 			function onDragOver( event: DragEvent ): void {
+				// Chrome can send `dragover` to an iframe without a `dragenter`
+				// first, after a previous drag left the iframe over an element
+				// of the parent document. Start the drag here too, so that
+				// its end is still handled.
+				maybeDragStart( event );
+
 				if ( ! event.defaultPrevented && _onDragOver ) {
 					onDragOverEvent( event );
 				}
