@@ -19,7 +19,7 @@ import {
 	pending,
 	notAllowed,
 } from '@wordpress/icons';
-import { DESIGN_POST_TYPES } from '../../store/constants';
+import { DESIGN_POST_TYPES, PATTERN_POST_TYPE } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
 import PostSticky from '../post-sticky';
 import { PrivatePostSchedule } from '../post-schedule';
@@ -61,6 +61,12 @@ export const STATUS_OPTIONS = [
 		description: __( 'Visible to everyone.' ),
 	},
 ];
+
+// A synced pattern that isn't published renders nothing wherever it's used,
+// so patterns only offer the two statuses that keep that predictable.
+const PATTERN_STATUS_OPTIONS = STATUS_OPTIONS.filter( ( { value } ) =>
+	[ 'draft', 'publish' ].includes( value )
+);
 
 export default function PostStatus() {
 	const { status, date, password, postId, postType, canEdit } = useSelect(
@@ -105,7 +111,9 @@ export default function PostStatus() {
 		[ popoverAnchor ]
 	);
 
-	if ( DESIGN_POST_TYPES.includes( postType ) ) {
+	const isPattern = postType === PATTERN_POST_TYPE;
+
+	if ( DESIGN_POST_TYPES.includes( postType ) && ! isPattern ) {
 		return null;
 	}
 
@@ -186,7 +194,11 @@ export default function PostStatus() {
 										className="editor-change-status__options"
 										hideLabelFromVision
 										label={ __( 'Status' ) }
-										options={ STATUS_OPTIONS }
+										options={
+											isPattern
+												? PATTERN_STATUS_OPTIONS
+												: STATUS_OPTIONS
+										}
 										onChange={ handleStatus }
 										selected={
 											status === 'auto-draft'
@@ -204,7 +216,7 @@ export default function PostStatus() {
 											/>
 										</div>
 									) }
-									{ status !== 'private' && (
+									{ status !== 'private' && ! isPattern && (
 										<VStack
 											as="fieldset"
 											spacing={ 4 }
