@@ -170,6 +170,33 @@ describe( 'withColors types', () => {
 		expect( [ withLabel, withoutLabel ] ).toHaveLength( 2 );
 	} );
 
+	it( 'accepts injected values that fit the declared props', () => {
+		const Labeled: ComponentType< {
+			setBackgroundColor: ( color: string ) => void;
+			label: string;
+		} > = () => null;
+		const WithColor = withColors( 'backgroundColor' )( Labeled );
+
+		expect(
+			<WithColor
+				label="Color"
+				attributes={ {} }
+				setAttributes={ () => {} }
+			/>
+		).toBeDefined();
+	} );
+
+	it( 'rejects injected values that do not fit the declared props', () => {
+		const Narrow: ComponentType< {
+			backgroundColor: { color: string };
+		} > = () => null;
+
+		// @ts-expect-error The injected color can be unset.
+		const WithColor = withColors( 'backgroundColor' )( Narrow );
+
+		expect( WithColor ).toBeDefined();
+	} );
+
 	it( 'rejects injected props of another type', () => {
 		const Mistyped: ComponentType< { setBackgroundColor: number } > = () =>
 			null;

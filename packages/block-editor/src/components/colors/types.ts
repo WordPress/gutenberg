@@ -1,5 +1,6 @@
 import type { ComponentClass, ComponentType, FunctionComponent } from 'react';
 import type { Color } from '@wordpress/global-styles-engine';
+import type { IncompatibleInjectedProps } from '../font-sizes/types';
 
 /**
  * A color, either a palette entry or just a custom color.
@@ -50,19 +51,13 @@ export type InjectedColorsProps< Name extends string > = {
  * The higher-order component `withColors` returns for the given color
  * attribute names.
  */
-export type WithColorsHOC< Name extends string > = <
-	// Any injected prop the component declares must take the injected type.
-	Props extends Partial<
-		Pick<
-			InjectedColorsProps< Name >,
-			keyof Props & keyof InjectedColorsProps< Name >
-		>
-	>,
->(
-	WrappedComponent:
+export type WithColorsHOC< Name extends string > = < Props >(
+	WrappedComponent: (
 		| FunctionComponent< Props & InjectedColorsProps< Name > >
 		// A class component's `props` type must match, so it takes its own props.
 		| ComponentClass< Props >
+	) &
+		IncompatibleInjectedProps< Props, InjectedColorsProps< Name > >
 ) => ComponentType<
 	Omit< Props, keyof InjectedColorsProps< Name > > &
 		Pick< WithColorsProps, 'attributes' | 'setAttributes' >
