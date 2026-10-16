@@ -382,6 +382,170 @@ test.describe( 'Post Meta source', () => {
 			await editor.openDocumentSettingsSidebar();
 		} );
 
+		for ( const copyMethod of [ 'keyboard', 'menu', 'list view' ] ) {
+			test( `should copy resolved bound block content through the ${ copyMethod } and preserve its binding on paste`, async ( {
+				editor,
+				page,
+				pageUtils,
+				context,
+			} ) => {
+				await context.grantPermissions( [
+					'clipboard-read',
+					'clipboard-write',
+				] );
+				await page.evaluate( () =>
+					navigator.clipboard.writeText( 'Uncopied' )
+				);
+				const modifier =
+					process.platform === 'darwin' ? 'Meta' : 'Control';
+				await page.evaluate( () => {
+					window.wp.data.dispatch( 'core/editor' ).editPost( {
+						meta: { movie_field: 'Bound <strong>text</strong>' },
+					} );
+				} );
+				const bindings = {
+					content: {
+						source: 'core/post-meta',
+						args: { key: 'movie_field' },
+					},
+				};
+				const boundParagraph = {
+					name: 'core/paragraph',
+					attributes: { content: '', metadata: { bindings } },
+				};
+				await editor.insertBlock( boundParagraph );
+				const paragraphBlock = editor.canvas.getByRole( 'document', {
+					name: 'Block: Paragraph',
+				} );
+				await expect( paragraphBlock ).toHaveText( 'Bound text' );
+				await paragraphBlock.click();
+				if ( copyMethod === 'menu' ) {
+					await editor.clickBlockToolbarButton( 'Options' );
+					await page
+						.getByRole( 'menu', { name: 'Options' } )
+						.getByRole( 'menuitem' )
+						.filter( {
+							has: page.getByText( 'Copy', { exact: true } ),
+						} )
+						.click();
+				} else if ( copyMethod === 'list view' ) {
+					await pageUtils.pressKeys( 'access+o' );
+					await page
+						.getByRole( 'treegrid', {
+							name: 'Block navigation structure',
+						} )
+						.getByRole( 'gridcell', {
+							name: 'Paragraph',
+							exact: true,
+						} )
+						.click();
+					await page.keyboard.press( `${ modifier }+c` );
+				} else {
+					await page.keyboard.press( `${ modifier }+c` );
+				}
+
+				await expect
+					.poll( () =>
+						page.evaluate( () => navigator.clipboard.readText() )
+					)
+					.toBe( 'Bound text' );
+				const clipboardHtml = await page.evaluate( async () => {
+					const items = await navigator.clipboard.read();
+					const item = items.find( ( entry ) =>
+						entry.types.includes( 'text/html' )
+					);
+					return ( await item.getType( 'text/html' ) ).text();
+				} );
+				expect( clipboardHtml ).toContain(
+					'<p>Bound <strong>text</strong></p>'
+				);
+				expect( await editor.getBlocks() ).toMatchObject( [
+					boundParagraph,
+				] );
+				if ( copyMethod === 'list view' ) {
+					await pageUtils.pressKeys( 'access+o' );
+				}
+				await editor.insertBlock( { name: 'core/paragraph' } );
+				await page.keyboard.press( `${ modifier }+v` );
+				await expect.poll( editor.getBlocks ).toMatchObject( [
+					boundParagraph,
+					{
+						name: 'core/paragraph',
+						attributes: {
+							content: 'Bound <strong>text</strong>',
+							metadata: { bindings },
+						},
+					},
+				] );
+			} );
+		}
+
+		test( 'should copy resolved text in a mixed block selection without changing the original blocks', async ( {
+			editor,
+			page,
+			context,
+		} ) => {
+			await context.grantPermissions( [
+				'clipboard-read',
+				'clipboard-write',
+			] );
+			await page.evaluate( () =>
+				navigator.clipboard.writeText( 'Uncopied' )
+			);
+			const modifier = process.platform === 'darwin' ? 'Meta' : 'Control';
+			const bindings = {
+				content: {
+					source: 'core/post-meta',
+					args: { key: 'movie_field' },
+				},
+			};
+			const boundParagraph = {
+				name: 'core/paragraph',
+				attributes: { content: '', metadata: { bindings } },
+			};
+			const normalParagraph = {
+				name: 'core/paragraph',
+				attributes: { content: 'Normal paragraph for comparison' },
+			};
+			await editor.insertBlock( boundParagraph );
+			await editor.insertBlock( normalParagraph );
+			const paragraphBlocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Paragraph',
+			} );
+			await expect( paragraphBlocks.first() ).toHaveText(
+				'Movie field default value'
+			);
+			await paragraphBlocks.first().click();
+			await page.keyboard.press( 'Home' );
+			await paragraphBlocks.last().click( { modifiers: [ 'Shift' ] } );
+			await page.keyboard.press( `${ modifier }+c` );
+			await expect
+				.poll( () =>
+					page.evaluate( () => navigator.clipboard.readText() )
+				)
+				.toBe(
+					'Movie field default value\n\nNormal paragraph for comparison'
+				);
+			expect( await editor.getBlocks() ).toMatchObject( [
+				boundParagraph,
+				normalParagraph,
+			] );
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.press( `${ modifier }+v` );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				boundParagraph,
+				normalParagraph,
+				{
+					name: 'core/paragraph',
+					attributes: {
+						content: 'Movie field default value',
+						metadata: { bindings },
+					},
+				},
+				normalParagraph,
+			] );
+		} );
+
 		test( 'should show the custom field value of that specific post', async ( {
 			editor,
 		} ) => {

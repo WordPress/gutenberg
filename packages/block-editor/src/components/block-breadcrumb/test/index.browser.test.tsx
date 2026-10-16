@@ -65,7 +65,13 @@ it( 'clears selection and focuses the editor canvas from the document button', a
 	const refsMap = observableMap();
 	await render(
 		<RegistryProvider value={ registry }>
-			<BlockRefs.Provider value={ { refsMap, eventHandlers: new Map() } }>
+			<BlockRefs.Provider
+				value={ {
+					refsMap,
+					eventHandlers: new Map(),
+					attributesForCopy: new Map(),
+				} }
+			>
 				<div
 					className="editor-styles-wrapper"
 					role="group"

@@ -12,11 +12,17 @@ import {
 } from '@wordpress/dom';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import { useContext } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
-import { setClipboardBlocks, setContentEditableWrapper } from './utils';
+import {
+	getBoundPartialBlockForCopy,
+	setClipboardBlocks,
+	setContentEditableWrapper,
+} from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
+import { BlockRefs } from '../provider/block-refs-provider';
 
 /**
  * Whether the DOM selection entirely spans the content of the given block,
@@ -44,6 +50,7 @@ function isBlockEntirelySelected( ownerDocument, clientId ) {
 
 export default function useClipboardHandler() {
 	const registry = useRegistry();
+	const { attributesForCopy } = useContext( BlockRefs );
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
@@ -56,6 +63,8 @@ export default function useClipboardHandler() {
 		__unstableGetSelectedBlocksWithPartialSelection,
 		canInsertBlockType,
 		getBlockRootClientId,
+		getSelectionStart,
+		getSelectionEnd,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -145,16 +154,45 @@ export default function useClipboardHandler() {
 					} else {
 						const [ head, tail ] =
 							__unstableGetSelectedBlocksWithPartialSelection();
-						const inBetweenBlocks = getBlocksByClientId(
-							selectedBlockClientIds.slice(
-								1,
-								selectedBlockClientIds.length - 1
-							)
+						const selectedBlocks = getBlocksByClientId(
+							selectedBlockClientIds
 						);
-						blocks = [ head, ...inBetweenBlocks, tail ];
+						const selectionAnchor = getSelectionStart();
+						const selectionFocus = getSelectionEnd();
+						const [ selectionHead, selectionTail ] =
+							selectionAnchor.clientId ===
+							selectedBlocks[ 0 ].clientId
+								? [ selectionAnchor, selectionFocus ]
+								: [ selectionFocus, selectionAnchor ];
+						blocks = [
+							getBoundPartialBlockForCopy(
+								selectedBlocks[ 0 ],
+								head,
+								attributesForCopy,
+								{
+									attributeKey: selectionHead.attributeKey,
+									startOffset: selectionHead.offset,
+								}
+							),
+							...selectedBlocks.slice( 1, -1 ),
+							getBoundPartialBlockForCopy(
+								selectedBlocks[ selectedBlocks.length - 1 ],
+								tail,
+								attributesForCopy,
+								{
+									attributeKey: selectionTail.attributeKey,
+									endOffset: selectionTail.offset,
+								}
+							),
+						];
 					}
 
-					setClipboardBlocks( event, blocks, registry );
+					setClipboardBlocks(
+						event,
+						blocks,
+						registry,
+						attributesForCopy
+					);
 				}
 			}
 
