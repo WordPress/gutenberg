@@ -1,5 +1,7 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
+const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
+
 test.describe( 'Navigation sidebar - list view editing', () => {
 	const navMenuFixture = {
 		title: 'Test Navigation Menu',
@@ -74,6 +76,22 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 			// The LinkUI popover should open and immediately focus the search input.
 			await expect( linkControlSearch ).toBeFocused();
+			// The popover opens under the new item's row, the one before the
+			// appender's, as the appender spawned it. Items added from an
+			// item's options menu open theirs beside the row instead. The
+			// classic sidebar is too narrow to fit it under the row.
+			if ( isSiteEditorV2 ) {
+				await expectLinkPopoverUnderRow(
+					page,
+					listView.getByRole( 'row' ).nth( -2 )
+				);
+				// The new item is selected, so the row shows which item
+				// the popover edits.
+				await expectSelectedRow(
+					listView,
+					listView.getByRole( 'row' ).nth( -2 )
+				);
+			}
 
 			// Search for and select the page.
 			await linkControl.useLinkControlSearch( 'Test Page 2' );
@@ -91,6 +109,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect( linkControlSearch ).toBeFocused();
 			await page.keyboard.press( 'Escape' );
 			await expect( linkControlSearch ).toBeHidden();
+			await expect( appender ).toBeFocused();
+			if ( isSiteEditorV2 ) {
+				// The removed item leaves nothing selected behind.
+				await expectSelectedRow( listView, null );
+			}
 		} );
 
 		await test.step( 'can create a new page', async () => {
@@ -314,7 +337,177 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test( 'anchors the link popover to an item added from the options menu', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		// The classic sidebar's options menu has no "Add before" / "Add after".
+		test.skip(
+			! isSiteEditorV2,
+			'Only the extensible site editor offers these options.'
+		);
+
+		const createdMenu = await requestUtils.createNavigationMenu( {
+			title: 'Test Navigation Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"First Item","type":"custom","url":"http://www.wordpress.org/first/","kind":"custom"} /-->' +
+				'<!-- wp:navigation-link {"label":"Second Item","type":"custom","url":"http://www.wordpress.org/second/","kind":"custom"} /-->',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		// The appender takes a row of its own at the end of the list.
+		const rows = listView.getByRole( 'row' );
+		const linkDialog = page.getByRole( 'dialog', { name: 'Add link' } );
+
+		async function expectDialogAnchoredTo( row ) {
+			await expectLinkPopoverBesideRow( page, row );
+		}
+
+		await test.step( 'adds after the first item', async () => {
+			await expect( rows ).toHaveCount( 3 );
+			await rows
+				.filter( { hasText: 'First Item' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add after' } ).click();
+
+			await expect( rows ).toHaveCount( 4 );
+			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+			await expectDialogAnchoredTo( rows.nth( 1 ) );
+			// The new item is selected, so the row shows which item the
+			// popover edits.
+			await expect( rows.nth( 1 ) ).toHaveClass( /\bis-selected\b/ );
+		} );
+
+		await test.step( 'removes the empty item when the popover closes', async () => {
+			await page.keyboard.press( 'Escape' );
+
+			await expect( linkDialog ).toBeHidden();
+			await expect( rows ).toHaveCount( 3 );
+			await expect( listView.locator( '.is-selected' ) ).toHaveCount( 0 );
+		} );
+
+		await test.step( 'adds before the second item', async () => {
+			await rows
+				.filter( { hasText: 'Second Item' } )
+				.getByRole( 'button', { name: 'Options' } )
+				.click();
+			await page.getByRole( 'menuitem', { name: 'Add before' } ).click();
+
+			await expect( rows ).toHaveCount( 4 );
+			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
+			await expectDialogAnchoredTo( rows.nth( 1 ) );
+			await expect( rows.nth( 1 ) ).toHaveClass( /\bis-selected\b/ );
+
+			await linkControl.useLinkControlSearch( 'Test Page 1' );
+
+			await expect( linkDialog ).toBeHidden();
+			await expect( rows.nth( 0 ) ).toContainText( 'First Item' );
+			await expect( rows.nth( 1 ) ).toContainText( 'Test Page 1' );
+			await expect( rows.nth( 2 ) ).toContainText( 'Second Item' );
+			// The item stays selected once its link is set.
+			await expect( rows.nth( 1 ) ).toHaveClass( /\bis-selected\b/ );
+		} );
+	} );
 } );
+
+/**
+ * Asserts which List View row is selected, or that none is.
+ *
+ * @param {import('@playwright/test').Locator}      listView The List View.
+ * @param {import('@playwright/test').Locator|null} row      The selected row, or null for none.
+ */
+async function expectSelectedRow( listView, row ) {
+	if ( row ) {
+		await expect( row ).toHaveClass( /\bis-selected\b/ );
+	} else {
+		await expect( listView.locator( '.is-selected' ) ).toHaveCount( 0 );
+	}
+}
+
+function getLinkPopover( page ) {
+	return page
+		.getByRole( 'dialog', { name: 'Add link' } )
+		.locator(
+			'xpath=ancestor::*[contains(concat(" ", @class, " "), " components-popover ")]'
+		);
+}
+
+/**
+ * Polls the link popover's position against a row's until `isPlaced` holds.
+ * Either box can still be moving right after the popover opens.
+ *
+ * @param {import('@playwright/test').Page}                 page     The page.
+ * @param {import('@playwright/test').Locator}              row      The List View row.
+ * @param {(popoverBox: Object, rowBox: Object) => boolean} isPlaced Receives the popover's and the row's bounding boxes.
+ */
+async function expectLinkPopoverPlacement( page, row, isPlaced ) {
+	const popover = getLinkPopover( page );
+	await expect( popover ).toBeVisible();
+	await expect
+		.poll( async () =>
+			isPlaced( await popover.boundingBox(), await row.boundingBox() )
+		)
+		.toBe( true );
+
+	// The link control's own spacing stays inside the popover: a popover
+	// content box without a scroll container lets that margin collapse out
+	// of it, and the search field then touches the popover's top edge.
+	const dialogBox = await page
+		.getByRole( 'dialog', { name: 'Add link' } )
+		.boundingBox();
+	const contentBox = await popover
+		.locator( '.components-popover__content' )
+		.boundingBox();
+	expect( dialogBox.y - contentBox.y ).toBeGreaterThanOrEqual( 8 );
+}
+
+/**
+ * The link popover opens the way the item settings popover does: beside the
+ * row it was opened for, with its top edge on the row's top edge. An
+ * unanchored popover lands in the corner of the screen instead.
+ *
+ * @param {import('@playwright/test').Page}    page The page.
+ * @param {import('@playwright/test').Locator} row  The List View row.
+ */
+async function expectLinkPopoverBesideRow( page, row ) {
+	await expectLinkPopoverPlacement(
+		page,
+		row,
+		( popoverBox, rowBox ) =>
+			Math.abs( popoverBox.y - rowBox.y ) <= 2 &&
+			( popoverBox.x >= rowBox.x + rowBox.width ||
+				popoverBox.x + popoverBox.width <= rowBox.x )
+	);
+}
+
+/**
+ * The link popover opens under the row it was opened for, with its top edge
+ * on the row's bottom edge.
+ *
+ * @param {import('@playwright/test').Page}    page The page.
+ * @param {import('@playwright/test').Locator} row  The List View row.
+ */
+async function expectLinkPopoverUnderRow( page, row ) {
+	await expectLinkPopoverPlacement(
+		page,
+		row,
+		( popoverBox, rowBox ) =>
+			Math.abs( popoverBox.y - ( rowBox.y + rowBox.height ) ) <= 2 &&
+			popoverBox.x < rowBox.x + rowBox.width &&
+			popoverBox.x + popoverBox.width > rowBox.x
+	);
+}
 
 class LinkControl {
 	constructor( { page } ) {
