@@ -20,7 +20,7 @@ const CONFIG = {
 		{ id: 'comment_status', type: 'text', label: 'Comments' },
 	],
 	script_modules: [
-		{ id: '@wordpress/core-fields', fields: [ 'author' ] },
+		{ id: '@wordpress/fields/post_type_supports', fields: [ 'author' ] },
 		{ id: 'acme/fields', fields: [ 'author', 'comment_status' ] },
 	],
 };
@@ -41,7 +41,7 @@ describe( 'resolveFieldsConfig', () => {
 	it( 'keeps the server order and merges the parts of each field in', async () => {
 		const coreRender = () => null;
 		const fields = await resolveFieldsConfig( CONFIG, async ( id ) =>
-			id === '@wordpress/core-fields'
+			id === '@wordpress/fields/post_type_supports'
 				? { default: { author: { render: coreRender } } }
 				: { default: {} }
 		);
@@ -65,7 +65,9 @@ describe( 'resolveFieldsConfig', () => {
 		const core = deferred< unknown >();
 		const plugin = deferred< unknown >();
 		const resolving = resolveFieldsConfig( CONFIG, ( id ) =>
-			id === '@wordpress/core-fields' ? core.promise : plugin.promise
+			id === '@wordpress/fields/post_type_supports'
+				? core.promise
+				: plugin.promise
 		);
 
 		// The plugin module finishes first; core, listed earlier, must not
@@ -82,7 +84,10 @@ describe( 'resolveFieldsConfig', () => {
 			{
 				...CONFIG,
 				script_modules: [
-					{ id: '@wordpress/core-fields', fields: [ 'author' ] },
+					{
+						id: '@wordpress/fields/post_type_supports',
+						fields: [ 'author' ],
+					},
 				],
 			},
 			async () => ( {
@@ -106,7 +111,7 @@ describe( 'resolveFieldsConfig', () => {
 	it( 'keeps the server data of the fields whose module fails to load', async () => {
 		const pluginRender = () => null;
 		const fields = await resolveFieldsConfig( CONFIG, async ( id ) => {
-			if ( id === '@wordpress/core-fields' ) {
+			if ( id === '@wordpress/fields/post_type_supports' ) {
 				throw new Error( 'Network error' );
 			}
 			return { default: { author: { render: pluginRender } } };

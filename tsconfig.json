@@ -17,7 +17,6 @@
 		{ "path": "packages/connectors" },
 		{ "path": "packages/core-actions" },
 		{ "path": "packages/core-data" },
-		{ "path": "packages/core-fields" },
 		{ "path": "packages/data-controls" },
 		{ "path": "packages/dataviews" },
 		{ "path": "packages/dataviews/tsconfig.stories.json" },

@@ -3,7 +3,6 @@ const BUNDLED_PACKAGES = [
 	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
-	'@wordpress/fields',
 	'@wordpress/global-styles-engine',
 	'@wordpress/global-styles-ui',
 	'@wordpress/grid',

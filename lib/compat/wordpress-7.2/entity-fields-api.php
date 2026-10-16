@@ -20,8 +20,8 @@
  * a `wp_entity_fields_api_init` callback registers with
  * {@see wp_register_entity_field_collection()}. A collection is for a single
  * entity. WordPress core registers its own fields this way, from
- * packages/core-fields: the defaults every post type derives from its
- * supports in code, the fields of single post types as collections.
+ * packages/fields/src/entity-fields: the defaults every post type derives
+ * from its supports in code, the fields of single post types as collections.
  *
  * The functions are defined when core does not ship them. When it does, the
  * core functions read the plugin registry, which replaces the core one on

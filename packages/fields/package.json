@@ -1,13 +1,14 @@
 {
 	"name": "@wordpress/fields",
 	"version": "0.49.0",
-	"description": "DataViews is a component that provides an API to render datasets using different types of layouts (table, grid, list, etc.).",
+	"description": "The fields WordPress core registers on the server for the Entity fields API: their PHP declarations and the script modules of their JavaScript parts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-		"dataviews"
+		"dataviews",
+		"fields"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields/README.md",
 	"repository": {
@@ -23,36 +24,43 @@
 	},
 	"files": [
 		"src",
-		"build",
 		"build-module",
-		"build-style",
-		"build-types"
+		"build-types",
+		"*.md"
 	],
-	"main": "build/index.cjs",
-	"module": "build-module/index.mjs",
+	"module": "build-module/entity-fields/post_type_supports/index.mjs",
 	"exports": {
-		".": {
-			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.mjs",
-			"require": "./build/index.cjs"
-		},
-		"./package.json": "./package.json",
-		"./build-style/*": "./build-style/*"
+		"./package.json": "./package.json"
 	},
-	"types": "build-types",
+	"wpScriptModuleExports": {
+		"./attachment": "./build-module/entity-fields/attachment/index.mjs",
+		"./page": "./build-module/entity-fields/page/index.mjs",
+		"./post_type_supports": "./build-module/entity-fields/post_type_supports/index.mjs",
+		"./root_site": "./build-module/entity-fields/root_site/index.mjs",
+		"./wp_block": "./build-module/entity-fields/wp_block/index.mjs",
+		"./wp_template": "./build-module/entity-fields/wp_template/index.mjs",
+		"./wp_template_part": "./build-module/entity-fields/wp_template_part/index.mjs"
+	},
+	"wpCopyFiles": {
+		"files": [
+			"src/**/*.php"
+		],
+		"transforms": {
+			"php": {
+				"functionPrefix": "gutenberg_"
+			}
+		}
+	},
 	"sideEffects": [
-		"build-style/**",
-		"src/**/*.scss"
+		"src/**/*.module.css"
 	],
 	"dependencies": {
-		"@react-spring/web": "^10.1.2",
-		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/base-styles": "file:../base-styles",
-		"@wordpress/blob": "file:../blob",
 		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/date": "file:../date",
 		"@wordpress/element": "file:../element",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
@@ -60,12 +68,14 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/style-runtime": "file:../style-runtime",
 		"@wordpress/ui": "file:../ui",
-		"clsx": "^2.1.1"
+		"@wordpress/url": "file:../url",
+		"@wordpress/wordcount": "file:../wordcount",
+		"clsx": "^2.1.1",
+		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
-		"@testing-library/react": "^16.3.3",
-		"@wordpress/hooks": "file:../hooks",
 		"vitest": "^5.0.3"
 	},
 	"peerDependencies": {

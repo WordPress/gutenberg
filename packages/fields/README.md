@@ -1,91 +1,118 @@
 # Fields
 
-This package provides core elements for the DataView library, designed to simplify the creation and management of data display elements in WordPress.
+The fields WordPress core registers on the server for the Entity fields API: their PHP declarations and the script modules of their JavaScript parts, side by side.
 
-## Installation
+The package has no JavaScript entry point to import. WordPress registers its PHP and its script modules, and the editor loads each script module on demand, by its id.
 
-Install the module
+## Entity fields
 
-```bash
-npm install @wordpress/fields --save
+The Entity fields API declares fields in PHP. What PHP cannot serialize, such as a field's `render` component or its `getElements` callback, ships in a script module registered along with the fields. The `src/entity-fields` folder holds both halves of the fields WordPress core registers, grouped in folders.
+
+### Default fields and field collections
+
+The fields live in folders of `src/entity-fields`:
+
+- `post_type_supports`: the default fields of every post type exposed in the REST API, each derived from a support of the post type or given to every post type (`author`, `comment_status`, `date`, `discussion`, `excerpt`, `featured_media`, `format`, `last_edited_date`, `notesCount`, `parent`, `password`, `ping_status`, `post-content-info`, `scheduled_date`, `slug`, `status`, `sticky`, `template`, `title`). They are registered in code, see below.
+- `page`: the fields pages have instead of the defaults (`title`, with a badge for the homepage, the posts page, and the privacy policy page).
+- `wp_template`: the fields templates have instead of the defaults (`author`, the theme, plugin, site, or user providing the template, `description`, `description_readonly`, the description of the templates themes and plugins provide, and `title`), plus the reading settings shown for `home` and `index` templates (`posts_page_title`, `posts_per_page`, and `default_comment_status`).
+- `wp_template_part`: the fields template parts have instead of the defaults (`author`, the theme, plugin, site, or user providing the template part, and `title`).
+- `wp_block`: the fields patterns have instead of the defaults (`excerpt`, their description, `sync-status`, and `title`).
+- `attachment`: the fields of the media editor ported to the server so far (`alt_text`, `attached_to`, `author`, `caption`, `date`, `description`, `filename`, `filesize`, `media_dimensions`, `media_thumbnail`, `mime_type`, `modified`, `title`), instead of all the defaults.
+- `root_site`: the fields of the site, the `site` entity of the `root` kind, shown in the identity screen of the site editor (`description`, its tagline, `site_icon`, `site_logo`, and `title`). The site is not a post type, so it gets no defaults.
+
+Each field has a folder:
+
+- `<field>/field.php` returns the serializable part of the field: `type`, `label`, `elements`, `filterBy`, and so on. The id of the field is the name of its folder, unless the file sets an `id`.
+- `<field>/field.tsx`, when the field has JavaScript parts, exports them as `fieldExtensions`.
+
+And each folder of fields may have:
+
+- `index.ts`, when some of its fields have JavaScript parts: its script module, whose default export maps the id of each of those fields to its `fieldExtensions`.
+- `index.php`, for the fields of a single entity: the configuration of a field collection, a plain array described below. It defines no function and hooks nothing. `post_type_supports` has none.
+
+### The default fields of every post type
+
+`wp_register_core_post_type_supports_fields()`, in `src/entity-fields/index.php`, registers the fields of `post_type_supports` on every post type exposed in the REST API, from what each supports, or whatever it supports:
+
+- `author`, for the post types supporting `author`.
+- `comment_status`, for the post types supporting `comments`.
+- `date`, for every post type but the design ones.
+- `discussion`, for the post types supporting `comments` or `trackbacks`.
+- `excerpt`, for the post types supporting `excerpt`.
+- `featured_media`, for the post types supporting `thumbnail` when the theme supports post thumbnails for them, which a theme may opt into for some post types only.
+- `format`, for the post types supporting `post-formats` when the theme supports post formats. Its elements are the formats of the theme, plus `standard`.
+- `last_edited_date`, for every post type.
+- `notesCount`, for the post types whose `editor` support has the `notes` argument, as with `'supports' => array( 'editor' => array( 'notes' => true ) )`.
+- `parent`, for the post types supporting `page-attributes`.
+- `password`, for every post type but the design ones.
+- `ping_status`, for the post types supporting `trackbacks`.
+- `post-content-info`, for the post types supporting `editor`.
+- `scheduled_date`, for every post type but the design ones.
+- `slug`, for the viewable post types but the design ones.
+- `status`, for every post type but the design ones.
+- `sticky`, for posts, the only post type with sticky posts.
+- `template`, for every post type but the design ones.
+- `title`, for the post types supporting `title`.
+
+It reads their definitions with `wp_get_entity_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/fields/post_type_supports` module.
+
+It makes no exception for any post type. A post type whose fields differ from the defaults unregisters the ones it does not get, once they are registered. Core does it like a plugin would, in `wp_register_core_field_collections()` in `src/entity-fields/index.php`, after the defaults are registered and before the collection of the post type is:
+
+- Templates and template parts unregister `author`, which the `wp_template` and `wp_template_part` collections define for them.
+- Templates, template parts, and patterns unregister `excerpt`, which is their description. The template and pattern collections define their own description fields.
+- Templates, template parts, and navigation menus unregister `post-content-info`, since their content is not text to read.
+- The design post types (templates, template parts, patterns, and navigation menus) unregister the fields about publishing a post (`date`, `password`, `scheduled_date`, `slug`, `status`) and the `template` that renders a post, since they lay out a site rather than publish content.
+- Pages, templates, template parts, and patterns unregister `title`, since their collections define their own title fields.
+- Attachments unregister every default, since the media editor has its own fields.
+
+### Collection configuration
+
+The array the `index.php` of a collection returns has these keys:
+
+- `origin` (required): who registers the fields, `'core'` for every collection of this package. It becomes the `origin.registeredBy` of each field.
+- `kind` (required): the entity kind, e.g. `'postType'`.
+- `name` (required): the entity name, e.g. `'wp_template'`.
+- `module` (optional): the id of the script module of the collection, written out (`'@wordpress/fields/<collection>'`). Every field of the collection is registered with it, including the fields without JavaScript parts.
+
+An invalid configuration is reported with `_doing_it_wrong()` and skipped. For example, `wp_template/index.php`:
+
+```php
+return array(
+	'origin' => 'core',
+	'kind'   => 'postType',
+	'name'   => 'wp_template',
+	'module' => '@wordpress/fields/wp_template',
+);
 ```
 
-## Setup
+There is no precedence between collections: the registry skips a field already registered for the entity, reporting the duplicate with `_doing_it_wrong()`, and registers the rest of the collection. A collection redefining a default field needs that field unregistered first.
 
-This package requires CSS from this package and from multiple dependency packages.
+### Loading
 
-### Within WordPress
+`src/entity-fields/index.php` registers the core fields through the public Entity fields API, exactly as a plugin registers its own. `wp_register_core_field_collections()` runs on the `wp_entity_fields_api_init` action at priority 0: it registers the defaults first, unregisters the ones the core post types do not get, then calls `wp_register_entity_field_collection()` for each collection, listed explicitly. The action fires once `init` has completed, when the supports of the post types are final, and a plugin hooking it at the default priority sees the core fields registered, and can update or unregister them.
 
-To ensure proper load order, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+`wp_register_entity_field_collection( $directory )` reads one collection and registers its fields, after the fields registered on the entity before, in the alphabetical order of their folders. Like `wp_register_entity_fields()`, it only runs on the `wp_entity_fields_api_init` action. Like the registry, it does not check that the entity exists: the `/wp/v2/entity-fields` route only serves the fields of the entities the REST API exposes. It returns whether the collection is valid and the registry accepted all of its fields.
 
-WordPress registers no handle for this package's own stylesheet, so load it with your plugin's script:
+A plugin does the same with its own collections:
 
-```js
-import '@wordpress/fields/build-style/style.css';
+```php
+add_action(
+	'wp_entity_fields_api_init',
+	function () {
+		// Books do not get the default comment status.
+		wp_unregister_entity_fields( 'postType', 'book', array( 'comment_status' ) );
+		wp_register_entity_field_collection( __DIR__ . '/fields/book' );
+	}
+);
 ```
 
-### Outside WordPress
+The source PHP is written as it is in WordPress core. The Gutenberg build copies the PHP files to `build/scripts/fields`, `lib/load.php` loads `build/scripts/fields/entity-fields/index.php`, and the build prefixes the functions defined in them with `gutenberg_`; the `index.php` and `field.php` files of the collections come out as they are. The functions of the Entity fields API keep their names: the plugin defines them when WordPress does not. The build only prefixes the calls to a function in the file that defines it, which is why the functions of the entity fields all live in `src/entity-fields/index.php`. A new collection needs its folder, an entry in `src/entity-fields/index.php` and, if it has JavaScript parts, an entry in `wpScriptModuleExports`.
 
-Install and load these stylesheets in your application:
+The client never imports these modules statically. The editor imports the script module of a collection on demand, when the `/wp/v2/entity-fields` route lists it for an entity, and merges each entry into the field with the same id among the fields registered with that module. That is why each collection with JavaScript parts has a module of its own: `post_type_supports` and `wp_template` both have an `author` field.
 
-```bash
-npm install @wordpress/fields @wordpress/theme @wordpress/components
-```
+### Script modules
 
-```js
-import '@wordpress/theme/design-tokens.css';
-import '@wordpress/components/build-style/style.css';
-import '@wordpress/fields/build-style/style.css';
-```
-
-RTL versions of the stylesheets are available in the same paths, but with `-rtl` appended to the filename (`style-rtl.css`). The design tokens stylesheet is universal and does not have a separate RTL version.
-
-## Usage
-
-<!-- START TOKEN(Autogenerated API docs) -->
-
-### MediaEdit
-
-A media edit control component that provides a media picker UI with upload functionality for selecting WordPress media attachments. Supports both the traditional WordPress media library and the experimental DataViews media modal.
-
-This component is intended to be used as the `Edit` property of a field definition when registering fields with `registerEntityField` from `@wordpress/editor`.
-
-_Usage_
-
-```tsx
-import { MediaEdit } from '@wordpress/fields';
-import type { DataFormControlProps } from '@wordpress/dataviews';
-
-const featuredImageField = {
-	id: 'featured_media',
-	type: 'media',
-	label: 'Featured Image',
-	Edit: ( props: DataFormControlProps< MyPostType > ) => (
-		<MediaEdit { ...props } allowedTypes={ [ 'image' ] } />
-	),
-};
-```
-
-_Parameters_
-
-- _props_ `MediaEditProps<Item>`: - The component props.
-- _props.data_ `Item`: - The item being edited.
-- _props.field_ `Object`: - The field configuration with getValue and setValue methods.
-- _props.onChange_ `Function`: - Callback function when the media selection changes.
-- _props.allowedTypes_ `[string[]]`: - Array of allowed media types. Use `['*']` to allow all file types. Default `['image']`.
-- _props.multiple_ `[boolean]`: - Whether to allow multiple media selections. Default `false`.
-- _props.hideLabelFromVision_ `[boolean]`: - Whether the label should be hidden from vision.
-- _props.isExpanded_ `[boolean]`: - Whether to render in an expanded form. Default `false`.
-
-_Returns_
-
-- `React.JSX.Element`: The media edit control component.
-
-### MediaEditProps
-
-Undocumented declaration.
-
-<!-- END TOKEN(Autogenerated API docs) -->
+The package provides the `@wordpress/fields/attachment`, `@wordpress/fields/page`, `@wordpress/fields/post_type_supports`, `@wordpress/fields/root_site`, `@wordpress/fields/wp_block`, `@wordpress/fields/wp_template`, and `@wordpress/fields/wp_template_part` script modules. Their default export follows the `FieldsScriptParts` shape defined in [`src/entity-fields/types.ts`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/fields/src/entity-fields/types.ts), the same one a plugin's own field module follows.
 
 ## Contributing to this package
 

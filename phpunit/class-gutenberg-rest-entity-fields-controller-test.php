@@ -417,11 +417,11 @@ class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame(
 			array(
 				array(
-					'id'     => '@wordpress/core-fields/post_type_supports',
+					'id'     => '@wordpress/fields/post_type_supports',
 					'fields' => array_values( array_diff( $ids, array( 'title' ) ) ),
 				),
 				array(
-					'id'     => '@wordpress/core-fields/page',
+					'id'     => '@wordpress/fields/page',
 					'fields' => array( 'title' ),
 				),
 			),
@@ -448,7 +448,7 @@ class Tests_REST_Entity_Fields_Controller extends WP_Test_REST_TestCase {
 		$this->assertSame( wp_get_registered_entity_fields( 'postType', 'wp_block' ), $data['fields'] );
 		$this->assertSame(
 			array( 'excerpt', 'sync-status', 'title' ),
-			$modules['@wordpress/core-fields/wp_block']
+			$modules['@wordpress/fields/wp_block']
 		);
 	}
 
