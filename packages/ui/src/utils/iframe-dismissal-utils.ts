@@ -1,12 +1,4 @@
-import type { RefObject } from 'react';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-
-type Actions = { close: () => void };
-
-type OpenChangeHandler< EventDetails > = (
-	open: boolean,
-	eventDetails: EventDetails
-) => void;
+import { useEffect } from '@wordpress/element';
 
 function getIframeDocument( iframe: HTMLIFrameElement ) {
 	try {
@@ -31,13 +23,20 @@ function forEachIframe(
 	element.querySelectorAll( 'iframe' ).forEach( callback );
 }
 
-function getNodeDocument( node: Node | null ) {
+export function getNodeDocument( node: Node | null ) {
 	return node?.nodeType === Node.DOCUMENT_NODE
 		? ( node as Document )
 		: ( node?.ownerDocument ?? null );
 }
 
-function isInsideCurrentPopup( event: Event, trigger: Element ) {
+/**
+ * Checks whether an iframe event belongs to the trigger's aria-controls popup.
+ * Walks containing frames and respects Base UI's data-rootownerid ownership.
+ *
+ * @param event   Event from an iframe document.
+ * @param trigger Trigger identifying the popup via aria-controls.
+ */
+export function isInsideCurrentPopup( event: Event, trigger: Element ) {
 	const popupId = trigger.getAttribute( 'aria-controls' );
 	if ( ! popupId ) {
 		return false;
@@ -73,15 +72,25 @@ function isInsideCurrentPopup( event: Event, trigger: Element ) {
 	return false;
 }
 
-function useCloseOnIframePointerDown( {
-	enabled,
-	onPointerDown,
-	ownerDocument,
-}: {
+type IframePressListenersOptions = {
 	enabled: boolean;
+	onClick?: ( event: Event ) => void;
+	onMouseDown?: ( event: Event ) => void;
 	onPointerDown: ( event: Event ) => void;
 	ownerDocument: Document | null;
-} ) {
+};
+
+/**
+ * Listens for presses in descendant same-origin iframe documents.
+ * Tracks nested frames, reloads, and DOM changes, and cleans up listeners.
+ *
+ * @param options Listener callbacks, document, and enabled state.
+ */
+export function useIframePressListeners(
+	options: IframePressListenersOptions
+) {
+	const { enabled, onClick, onMouseDown, onPointerDown, ownerDocument } =
+		options;
 	useEffect( () => {
 		if ( ! enabled || ! ownerDocument ) {
 			return;
@@ -93,6 +102,12 @@ function useCloseOnIframePointerDown( {
 		): ( () => void ) => {
 			if ( listenForPointerDown ) {
 				document.addEventListener( 'pointerdown', onPointerDown, true );
+				if ( onMouseDown ) {
+					document.addEventListener( 'mousedown', onMouseDown, true );
+				}
+				if ( onClick ) {
+					document.addEventListener( 'click', onClick, true );
+				}
 			}
 
 			const iframeCleanups = new Map< HTMLIFrameElement, () => void >();
@@ -158,81 +173,20 @@ function useCloseOnIframePointerDown( {
 						onPointerDown,
 						true
 					);
+					if ( onMouseDown ) {
+						document.removeEventListener(
+							'mousedown',
+							onMouseDown,
+							true
+						);
+					}
+					if ( onClick ) {
+						document.removeEventListener( 'click', onClick, true );
+					}
 				}
 			};
 		};
 
 		return observeDocument( ownerDocument, false );
-	}, [ enabled, onPointerDown, ownerDocument ] );
-}
-
-/*
- * Temporary bridge for https://github.com/mui/base-ui/issues/5410#issuecomment-5376507925.
- * Base UI listens for outside presses only in the popup's owner document,
- * but pointer events do not cross document boundaries. Once the minimum Base
- * UI version fixes this, delete this hook's import, call, and prop spread from
- * `Menu.Root` and `Popover.Root`, then pass their `onOpenChange` handlers
- * directly to the Base UI roots again.
- */
-export function useIframeDismissalBridge<
-	TActions extends Actions,
-	TEventDetails extends {
-		isCanceled: boolean;
-		trigger: Element | undefined;
-	},
->( {
-	actionsRef,
-	defaultOpen,
-	disabled,
-	modal,
-	onOpenChange,
-	open: openProp,
-}: {
-	actionsRef?: RefObject< TActions | null >;
-	defaultOpen?: boolean;
-	disabled?: boolean;
-	modal?: boolean | 'trap-focus';
-	onOpenChange: OpenChangeHandler< TEventDetails >;
-	open?: boolean;
-} ) {
-	const fallbackActionsRef = useRef< TActions | null >( null );
-	const resolvedActionsRef = actionsRef ?? fallbackActionsRef;
-	const [ uncontrolledOpen, setUncontrolledOpen ] = useState(
-		defaultOpen ?? false
-	);
-	const [ trigger, setTrigger ] = useState< Element | null >( null );
-	const open = openProp ?? uncontrolledOpen;
-	const handleIframePointerDown = useCallback(
-		( event: Event ) => {
-			if ( trigger && ! isInsideCurrentPopup( event, trigger ) ) {
-				resolvedActionsRef.current?.close();
-			}
-		},
-		[ resolvedActionsRef, trigger ]
-	);
-
-	useCloseOnIframePointerDown( {
-		enabled: open && modal === false && ! disabled && trigger !== null,
-		onPointerDown: handleIframePointerDown,
-		ownerDocument: trigger?.ownerDocument ?? null,
-	} );
-
-	const handleOpenChange: OpenChangeHandler< TEventDetails > = (
-		nextOpen,
-		eventDetails
-	) => {
-		onOpenChange( nextOpen, eventDetails );
-
-		if ( eventDetails.isCanceled ) {
-			return;
-		}
-
-		setUncontrolledOpen( nextOpen );
-		setTrigger( nextOpen ? ( eventDetails.trigger ?? null ) : null );
-	};
-
-	return {
-		actionsRef: resolvedActionsRef,
-		onOpenChange: handleOpenChange,
-	};
+	}, [ enabled, onClick, onMouseDown, onPointerDown, ownerDocument ] );
 }

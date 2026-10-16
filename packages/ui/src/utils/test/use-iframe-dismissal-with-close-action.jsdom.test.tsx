@@ -3,7 +3,7 @@ import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IframeDismissalHarness } from './fixtures/iframe-dismissal-harness';
 
-describe( 'useIframeDismissalBridge', () => {
+describe( 'useIframeDismissalWithCloseAction', () => {
 	it( 'does not close for presses inside a popup portaled to an iframe', async () => {
 		const user = userEvent.setup();
 		const iframe = document.createElement( 'iframe' );

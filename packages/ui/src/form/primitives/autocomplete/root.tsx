@@ -2,6 +2,10 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import type { AutocompleteRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import { AutocompleteGridContext } from './context';
+import {
+	IframeOutsidePressContext,
+	useIframeOutsidePressForwarding,
+} from '../../../utils/use-iframe-outside-press-forwarding';
 
 /**
  * Low-level primitive for an autocomplete input that suggests options as
@@ -15,10 +19,27 @@ import { AutocompleteGridContext } from './context';
 export const Root: typeof _Autocomplete.Root = function Root(
 	props: AutocompleteRootProps
 ) {
+	const { popupRef, ...iframeOutsidePressForwardingProps } =
+		useIframeOutsidePressForwarding< _Autocomplete.Root.OpenChangeEventDetails >(
+			{
+				defaultOpen: props.defaultOpen,
+				disabled: props.disabled,
+				modal: props.modal ?? false,
+				onOpenChange: ( nextOpen, eventDetails ) =>
+					props.onOpenChange?.( nextOpen, eventDetails ),
+				open: props.open,
+			}
+		);
+
 	return (
 		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>
 			<DirectionProvider>
-				<_Autocomplete.Root { ...props } />
+				<IframeOutsidePressContext.Provider value={ popupRef }>
+					<_Autocomplete.Root
+						{ ...props }
+						{ ...iframeOutsidePressForwardingProps }
+					/>
+				</IframeOutsidePressContext.Provider>
 			</DirectionProvider>
 		</AutocompleteGridContext.Provider>
 	);
