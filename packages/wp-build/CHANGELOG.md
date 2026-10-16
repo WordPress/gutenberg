@@ -9,6 +9,7 @@
 
 ### Enhancements
 
+-   Let a `wpScriptModuleExports` entry declare its own script module ID with `{ "path": "...", "id": "..." }` instead of the one generated from the package name and export key, and fail the build when two script modules register the same ID.
 -   Resolve development bundles with the `development` and `module` export conditions, enabling runtime diagnostics such as unsupported Emotion component selectors ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).
 
 ### Bug Fixes

@@ -3,6 +3,7 @@ import path from 'path';
 import { createHash } from 'crypto';
 import { camelCase } from 'change-case';
 import { getPackageInfo } from './package-utils.mjs';
+import { getScriptModuleExports } from './script-module-utils.mjs';
 
 /**
  * Generate a content hash from file contents.
@@ -78,40 +79,39 @@ export function createWordpressExternalsPlugin(
 				 * A package is considered a script module if it has wpScriptModuleExports
 				 * and the specific import path (root or subpath) is declared in wpScriptModuleExports.
 				 *
+				 * An export that declares its own script module ID (`{ path, id }`)
+				 * cannot be imported through the package name: the import would
+				 * name a module that is never registered. Load it by its ID with
+				 * a runtime `import()` instead.
+				 *
 				 * @param {import('./package-utils.mjs').PackageJson} packageJson Package.json object.
 				 * @param {string|null}                               subpath     Subpath after package name, or null for root import.
 				 * @return {boolean} True if the import is a script module.
 				 */
 				function isScriptModuleImport( packageJson, subpath ) {
-					const { wpScriptModuleExports } = packageJson;
+					const exportName = subpath ? `./${ subpath }` : '.';
+					const scriptModuleExport = getScriptModuleExports(
+						packageJson.wpScriptModuleExports,
+						packageJson.name
+					).find( ( entry ) => entry.exportName === exportName );
 
-					if ( ! wpScriptModuleExports ) {
+					if ( ! scriptModuleExport ) {
 						return false;
 					}
 
-					// Root import: @wordpress/package-name
-					if ( ! subpath ) {
-						if ( typeof wpScriptModuleExports === 'string' ) {
-							return true;
-						}
-						if (
-							typeof wpScriptModuleExports === 'object' &&
-							wpScriptModuleExports[ '.' ]
-						) {
-							return true;
-						}
-						return false;
+					if ( scriptModuleExport.id ) {
+						throw new Error(
+							`Cannot import "${ packageJson.name }${
+								subpath ? `/${ subpath }` : ''
+							}": the export registers the script module "${
+								scriptModuleExport.id
+							}", which can only be loaded at runtime with import( '${
+								scriptModuleExport.id
+							}' ).`
+						);
 					}
 
-					// Subpath import: @wordpress/package-name/subpath
-					if (
-						typeof wpScriptModuleExports === 'object' &&
-						wpScriptModuleExports[ `./${ subpath }` ]
-					) {
-						return true;
-					}
-
-					return false;
+					return true;
 				}
 
 				// Map of vendor packages to their global variables and handles

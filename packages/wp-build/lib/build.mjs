@@ -27,6 +27,11 @@ import {
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
+import {
+	assertUniqueScriptModuleIds,
+	getScriptModuleExports,
+	getScriptModuleId,
+} from './script-module-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -643,17 +648,14 @@ async function bundlePackage( packageName, options = {} ) {
 			packageName
 		);
 
-		const exports =
-			typeof packageJson.wpScriptModuleExports === 'string'
-				? { '.': packageJson.wpScriptModuleExports }
-				: packageJson.wpScriptModuleExports;
+		const scriptModuleExports = getScriptModuleExports(
+			packageJson.wpScriptModuleExports,
+			packageJson.name
+		);
 
-		for ( const [ exportName, exportPath ] of Object.entries( exports ) ) {
-			const fileName =
-				exportName === '.'
-					? 'index'
-					: exportName.replace( /^\.\//, '' );
-			const entryPoint = path.join( packageDir, exportPath );
+		for ( const scriptModuleExport of scriptModuleExports ) {
+			const { fileName, entryPath } = scriptModuleExport;
+			const entryPoint = path.join( packageDir, entryPath );
 			const baseFileName = path.basename( fileName );
 
 			// Skip non-minified build and sourcemaps for WASM-inlined workers
@@ -725,10 +727,13 @@ async function bundlePackage( packageName, options = {} ) {
 				);
 			}
 
-			const scriptModuleId =
-				exportName === '.'
-					? `@${ packageNamespace }/${ packageName }`
-					: `@${ packageNamespace }/${ packageName }/${ fileName }`;
+			// The ID comes from the export key, unless the export declares
+			// its own. The output path always comes from the key.
+			const scriptModuleId = getScriptModuleId(
+				scriptModuleExport,
+				packageNamespace,
+				packageName
+			);
 
 			builtModules.push( {
 				id: scriptModuleId,
@@ -2355,6 +2360,9 @@ async function buildAll( baseUrlExpression ) {
 			}
 		} )
 	);
+
+	// Two modules registering the same ID would silently shadow each other.
+	assertUniqueScriptModuleIds( modules );
 
 	// Normalize PAGES config to support both string and object formats
 	const normalizedPages = PAGES.map( ( page ) => {

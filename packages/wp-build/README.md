@@ -99,6 +99,21 @@ Define script module entry points:
 }
 ```
 
+Each export registers a script module whose ID comes from the package namespace, the package name and the export key: in a package `@wordpress/foo`, the `./interactivity` key registers `@wordpress/foo/interactivity`, and a `.` key registers `@wordpress/foo`. The value can be the entry point, or an object with the entry point as `path` and the script module ID to register as `id`:
+
+```json
+{
+	"wpScriptModuleExports": {
+		"./entity-actions/wp_block": {
+			"path": "./build-module/entity-actions/wp_block/index.mjs",
+			"id": "@wordpress/actions/wp_block"
+		}
+	}
+}
+```
+
+The output path still comes from the export key (`build/modules/<package>/entity-actions/wp_block.js` here). The build fails when two exports, in the same package or in different ones, register the same ID. A module with an `id` cannot be imported through the package name (`import '@my/package/entity-actions/wp_block'` fails the build); load it at runtime with `import( '@wordpress/actions/wp_block' )`.
+
 ### `wpScriptDefaultExport`
 
 Handle default export wrapping:

@@ -10,6 +10,13 @@ const packageJsonCache = new Map();
 const packagePathCache = new Map();
 
 /**
+ * Script module exports: the root entry point, or a map of export names to an
+ * entry point or to `{ path, id }`, where `id` replaces the generated ID.
+ *
+ * @typedef {string|Record<string, string|{path: string, id?: string}>} ScriptModuleExports
+ */
+
+/**
  * @typedef  {Object} PackageJson
  *
  * @property {string}                 name                    Package name.
@@ -23,7 +30,7 @@ const packagePathCache = new Map();
  * @property {Record<string, string>} [devDependencies]       Development dependencies.
  * @property {Record<string, string>} [peerDependencies]      Peer dependencies.
  * @property {string[]}               [wpScript]              WordPress script handles for dependency extraction.
- * @property {Record<string, string>} [wpScriptModuleExports] WordPress script module exports.
+ * @property {ScriptModuleExports}    [wpScriptModuleExports] WordPress script module exports.
  * @property {Object}                 [sideEffects]           Side effects configuration for tree shaking.
  * @property {string}                 [publishConfig]         NPM publish configuration.
  * @property {Record<string, string>} [scripts]               NPM scripts.
