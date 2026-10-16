@@ -17,6 +17,7 @@ import {
 	VIEWS,
 	getInitialView,
 } from './utils';
+import type { Side, SideValues, SpacingSizesControlProps } from './types';
 
 /**
  * A flexible control for managing spacing values in the block editor. Supports single, axial,
@@ -72,7 +73,7 @@ export default function SpacingSizesControl( {
 	sides = ALL_SIDES,
 	useSelect,
 	values,
-} ) {
+}: SpacingSizesControlProps ) {
 	const spacingSizes = useSpacingSizes();
 	const inputValues = values || DEFAULT_VALUES;
 	const hasOneSide = sides?.length === 1;
@@ -87,7 +88,7 @@ export default function SpacingSizesControl( {
 		setView( view === VIEWS.axial ? VIEWS.custom : VIEWS.axial );
 	};
 
-	const handleOnChange = ( nextValue ) => {
+	const handleOnChange = ( nextValue: SideValues ) => {
 		const newValues = { ...values, ...nextValue };
 		onChange( newValues );
 	};
@@ -122,7 +123,10 @@ export default function SpacingSizesControl( {
 	};
 
 	const sideLabel =
-		ALL_SIDES.includes( view ) && showSideInLabel ? LABELS[ view ] : '';
+		// A single side view is named after its side.
+		ALL_SIDES.includes( view as Side ) && showSideInLabel
+			? LABELS[ view as Side ]
+			: '';
 
 	const label = sprintf(
 		// translators: 1: Type of spacing being modified (Padding, Margin, etc.). 2: The side of the block being modified (Top, Bottom, Left, etc.).

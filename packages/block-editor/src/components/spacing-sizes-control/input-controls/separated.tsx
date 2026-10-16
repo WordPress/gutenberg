@@ -5,6 +5,7 @@ import {
 	ICONS,
 	getPresetValueFromCustomValue,
 } from '../utils';
+import type { Side, SideValues, SpacingInputControlsProps } from '../types';
 
 export default function SeparatedInputControls( {
 	minimumCustomValue,
@@ -15,18 +16,21 @@ export default function SeparatedInputControls( {
 	spacingSizes,
 	type,
 	values,
-} ) {
+}: SpacingInputControlsProps ) {
 	// Filter sides if custom configuration provided, maintaining default order.
 	const filteredSides = sides?.length
 		? ALL_SIDES.filter( ( side ) => sides.includes( side ) )
 		: ALL_SIDES;
 
-	const createHandleOnChange = ( side ) => ( next ) => {
+	const createHandleOnChange = ( side: Side ) => ( next?: string ) => {
 		// Encode the existing value into the preset value if the passed in value matches the value of one of the spacingSizes.
 		const nextValues = {
-			...Object.keys( values ).reduce( ( acc, key ) => {
+			...Object.keys( values ).reduce<
+				Record< string, string | undefined >
+			>( ( acc, key ) => {
 				acc[ key ] = getPresetValueFromCustomValue(
-					values[ key ],
+					// The keys come from the side values.
+					values[ key as keyof SideValues ],
 					spacingSizes
 				);
 				return acc;
