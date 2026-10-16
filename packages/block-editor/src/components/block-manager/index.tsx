@@ -10,22 +10,23 @@ import { useEffect, useState } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import BlockManagerCategory from './category';
+import type { BlockManagerProps } from './types';
 
 /**
  * Provides a list of blocks with checkboxes.
  *
- * @param {Object}   props                    Props.
- * @param {Array}    props.blockTypes         An array of blocks.
- * @param {Array}    props.selectedBlockTypes An array of selected blocks.
- * @param {Function} props.onChange           Function to be called when the selected blocks change.
- * @param {boolean}  props.showSelectAll      Whether to show the select all checkbox.
+ * @param props                    Props.
+ * @param props.blockTypes         An array of blocks.
+ * @param props.selectedBlockTypes An array of selected blocks.
+ * @param props.onChange           Function to be called when the selected blocks change.
+ * @param props.showSelectAll      Whether to show the select all checkbox.
  */
 export default function BlockManager( {
 	blockTypes,
 	selectedBlockTypes,
 	onChange,
 	showSelectAll = true,
-} ) {
+}: BlockManagerProps ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ search, setSearch ] = useState( '' );
 	const { categories, isMatchingSearchTerm } = useSelect( ( select ) => {
@@ -86,7 +87,8 @@ export default function BlockManager( {
 				/>
 			) }
 			<div
-				tabIndex="0"
+				// The attribute takes the string as given.
+				tabIndex={ '0' as unknown as number }
 				role="region"
 				aria-label={ __( 'Available block types' ) }
 				className="block-editor-block-manager__results"

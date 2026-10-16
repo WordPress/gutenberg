@@ -1,18 +1,20 @@
 import { useCallback } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
+import type { BlockType } from '@wordpress/blocks';
 import BlockTypesChecklist from './checklist';
+import type { BlockManagerCategoryProps } from './types';
 
 function BlockManagerCategory( {
 	title,
 	blockTypes,
 	selectedBlockTypes,
 	onChange,
-} ) {
+}: BlockManagerCategoryProps ) {
 	const instanceId = useInstanceId( BlockManagerCategory );
 
 	const toggleVisible = useCallback(
-		( blockType, nextIsChecked ) => {
+		( blockType: BlockType, nextIsChecked: boolean ) => {
 			if ( nextIsChecked ) {
 				onChange( [ ...selectedBlockTypes, blockType ] );
 			} else {
@@ -27,7 +29,7 @@ function BlockManagerCategory( {
 	);
 
 	const toggleAllVisible = useCallback(
-		( nextIsChecked ) => {
+		( nextIsChecked: boolean ) => {
 			if ( nextIsChecked ) {
 				onChange( [
 					...selectedBlockTypes,
@@ -80,7 +82,12 @@ function BlockManagerCategory( {
 				onChange={ toggleAllVisible }
 				className="block-editor-block-manager__category-title"
 				indeterminate={ isIndeterminate }
-				label={ <span id={ titleId }>{ title }</span> }
+				// The label renders as a node, so the title can carry its ID.
+				label={
+					(
+						<span id={ titleId }>{ title }</span>
+					 ) as unknown as string
+				}
 			/>
 			<BlockTypesChecklist
 				blockTypes={ blockTypes }
