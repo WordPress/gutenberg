@@ -1,14 +1,21 @@
 import { __ } from '@wordpress/i18n';
 import { MenuGroup } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
+import type { BlockStyle } from '@wordpress/blocks';
 import BlockStylesMenuItems from '../block-styles/menu-items';
 import useStylesForBlocks from '../block-styles/use-styles-for-block';
 import { replaceActiveStyle } from '../block-styles/utils';
 import PreviewBlockPopover from './preview-block-popover';
+import type { BlockStylesMenuProps } from './types';
 
-export default function BlockStylesMenu( { hoveredBlock, onSwitch } ) {
+export default function BlockStylesMenu( {
+	hoveredBlock,
+	onSwitch,
+}: BlockStylesMenuProps ) {
 	const { clientId } = hoveredBlock;
-	const [ hoveredStyle, setHoveredStyle ] = useState( null );
+	const [ hoveredStyle, setHoveredStyle ] = useState< BlockStyle | null >(
+		null
+	);
 	const {
 		onSelect,
 		stylesToRender,

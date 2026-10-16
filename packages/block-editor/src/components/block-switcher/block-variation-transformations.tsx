@@ -6,13 +6,25 @@ import {
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
+import type { BlockVariation } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
+import type {
+	BlockVariationTransformationItemProps,
+	BlockVariationTransformationsProps,
+	UseBlockVariationTransformsArgs,
+} from './types';
 
-const EMPTY_OBJECT = {};
+const EMPTY_OBJECT: {
+	activeBlockVariation?: BlockVariation;
+	blockVariationTransformations?: BlockVariation[];
+} = {};
 
-export function useBlockVariationTransforms( { clientIds, blocks } ) {
+export function useBlockVariationTransforms( {
+	clientIds,
+	blocks,
+}: UseBlockVariationTransformsArgs ) {
 	const { activeBlockVariation, blockVariationTransformations } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, canRemoveBlocks } =
@@ -33,7 +45,8 @@ export function useBlockVariationTransforms( { clientIds, blocks } ) {
 				),
 				activeBlockVariation: getActiveBlockVariation(
 					firstBlock.name,
-					getBlockAttributes( firstBlock.clientId )
+					// The selected block exists.
+					getBlockAttributes( firstBlock.clientId )!
 				),
 			};
 		},
@@ -51,18 +64,20 @@ const BlockVariationTransformations = ( {
 	transformations,
 	onSelect,
 	blocks,
-} ) => {
-	const [ hoveredTransformItemName, setHoveredTransformItemName ] =
-		useState();
+}: BlockVariationTransformationsProps ) => {
+	const [ hoveredTransformItemName, setHoveredTransformItemName ] = useState<
+		string | null
+	>();
 	return (
 		<>
 			{ hoveredTransformItemName && (
 				<PreviewBlockPopover
 					blocks={ cloneBlock(
 						blocks[ 0 ],
+						// The hovered variation is one of the transformations.
 						transformations.find(
 							( { name } ) => name === hoveredTransformItemName
-						).attributes
+						)!.attributes
 					) }
 				/>
 			) }
@@ -82,7 +97,7 @@ function BlockVariationTransformationItem( {
 	item,
 	onSelect,
 	setHoveredTransformItemName,
-} ) {
+}: BlockVariationTransformationItemProps ) {
 	const { name, icon, title } = item;
 	return (
 		<MenuItem
