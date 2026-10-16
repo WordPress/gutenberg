@@ -49,11 +49,14 @@ export default function CopyButton( { text, label }: CopyButtonProps ) {
 			{ /*
 			 * The region stays mounted, so screen readers announce the
 			 * confirmation when it fills in. It is the only announcement of
-			 * the copy.
+			 * the copy. It is a description so it has the notice's text color.
 			 */ }
-			<span role="status" className="notices-inline-notices__copy-status">
+			<Notice.Description
+				role="status"
+				className="notices-inline-notices__copy-status"
+			>
 				{ hasCopied ? __( 'Copied' ) : '' }
-			</span>
+			</Notice.Description>
 		</>
 	);
 }

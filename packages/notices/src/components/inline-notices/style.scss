@@ -16,9 +16,15 @@
 	margin-block-start: var(--wpds-dimension-gap-sm);
 	white-space: pre-wrap;
 	overflow-wrap: anywhere;
+
+	// Closed details stay in the page so find-in-page can reach them, so
+	// their spacing would otherwise leave an empty area under the actions.
+	&[hidden] {
+		margin-block-start: 0;
+		padding-block: 0;
+	}
 }
 
 .notices-inline-notices__copy-status {
 	align-self: center;
-	font-size: var(--wpds-typography-font-size-sm);
 }

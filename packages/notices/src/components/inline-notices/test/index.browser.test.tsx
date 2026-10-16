@@ -65,8 +65,11 @@ describe( 'InlineNotices', () => {
 			expect( trigger ).toHaveAccessibleName( 'Show details' );
 		} );
 
-		it( 'shows no disclosure or copy button without details', async () => {
-			await renderWithNotice( 'error' );
+		it.each( [
+			[ 'without details', undefined ],
+			[ 'with details that are only white space', ' \n ' ],
+		] )( 'shows no disclosure or copy button %s', async ( _, details ) => {
+			await renderWithNotice( 'error', { details } );
 
 			expect(
 				screen.queryByRole( 'button', { name: 'Show details' } )

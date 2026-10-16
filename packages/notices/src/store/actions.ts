@@ -71,7 +71,11 @@ export function createNotice(
 			status,
 			content,
 			spokenMessage: speak ? content : null,
-			details: details ? String( details ) : undefined,
+			// Details with nothing to read would open an empty panel.
+			details:
+				details && String( details ).trim()
+					? String( details )
+					: undefined,
 			__unstableHTML,
 			isDismissible,
 			actions,
