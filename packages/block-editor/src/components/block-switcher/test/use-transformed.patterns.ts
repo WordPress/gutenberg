@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { unregisterBlockType, registerBlockType } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import {
 	transformMatchingBlock,
 	getPatternTransformedBlocks,
@@ -49,16 +50,18 @@ describe( 'use-transformed-patterns', () => {
 	} );
 	describe( 'transformMatchingBlock', () => {
 		it( 'should properly update the matching block - No retained block attributes', () => {
+			// A partial block, with what the utilities read.
 			const match = {
 				clientId: 'block-2',
 				name: 'core/test-block-2',
 				attributes: { align: 'center' },
-			};
+			} as unknown as Block;
+			// A partial block, with what the utilities read.
 			const selectedBlock = {
 				clientId: 'selected-block-2',
 				name: 'core/test-block-2',
 				attributes: { align: 'right', content: 'hi' },
-			};
+			} as unknown as Block;
 			transformMatchingBlock( match, selectedBlock );
 			expect( match ).toEqual(
 				expect.objectContaining( {
@@ -72,6 +75,7 @@ describe( 'use-transformed-patterns', () => {
 			);
 		} );
 		it( 'should properly update the matching block - WITH retained block attributes', () => {
+			// A partial block, with what the utilities read.
 			const match = {
 				clientId: 'block-1',
 				name: 'core/test-block-1',
@@ -81,7 +85,8 @@ describe( 'use-transformed-patterns', () => {
 					level: 3,
 					color: 'red',
 				},
-			};
+			} as unknown as Block;
+			// A partial block, with what the utilities read.
 			const selectedBlock = {
 				clientId: 'selected-block-1',
 				name: 'core/test-block-1',
@@ -91,7 +96,7 @@ describe( 'use-transformed-patterns', () => {
 					level: 1,
 					color: 'green',
 				},
-			};
+			} as unknown as Block;
 			transformMatchingBlock( match, selectedBlock );
 			expect( match ).toEqual(
 				expect.objectContaining( {
@@ -108,6 +113,7 @@ describe( 'use-transformed-patterns', () => {
 		} );
 	} );
 	describe( 'getPatternTransformedBlocks', () => {
+		// A partial blocks, with what the utilities read.
 		const patternBlocks = [
 			{
 				clientId: 'client-1',
@@ -170,16 +176,17 @@ describe( 'use-transformed-patterns', () => {
 				attributes: { content: 'top level block 3', color: 'purple' },
 				innerBlocks: [],
 			},
-		];
+		] as unknown as Block[];
 		describe( 'return nothing', () => {
 			it( 'when no match is found', () => {
+				// A partial blocks, with what the utilities read.
 				const selectedBlocks = [
 					{
 						clientId: 'selected-1',
 						name: 'selected-1',
 						innerBlocks: [],
 					},
-				];
+				] as unknown as Block[];
 				const res = getPatternTransformedBlocks(
 					selectedBlocks,
 					patternBlocks
@@ -187,6 +194,7 @@ describe( 'use-transformed-patterns', () => {
 				expect( res ).toBeUndefined();
 			} );
 			it( 'when not ALL blocks are matched', () => {
+				// A partial blocks, with what the utilities read.
 				const selectedBlocks = [
 					{
 						clientId: 'selected-1',
@@ -202,7 +210,7 @@ describe( 'use-transformed-patterns', () => {
 						name: 'not in pattern',
 						innerBlocks: [],
 					},
-				];
+				] as unknown as Block[];
 				const res = getPatternTransformedBlocks(
 					selectedBlocks,
 					patternBlocks
@@ -212,6 +220,7 @@ describe( 'use-transformed-patterns', () => {
 		} );
 		describe( 'return properly transformed pattern blocks', () => {
 			it( 'when single block is selected', () => {
+				// A partial blocks, with what the utilities read.
 				const selectedBlocks = [
 					{
 						clientId: 'selected-1',
@@ -222,7 +231,7 @@ describe( 'use-transformed-patterns', () => {
 						},
 						innerBlocks: [],
 					},
-				];
+				] as unknown as Block[];
 				const res = getPatternTransformedBlocks(
 					selectedBlocks,
 					patternBlocks
@@ -256,6 +265,7 @@ describe( 'use-transformed-patterns', () => {
 				 * so top level blocks' InnerBlocks are search before trying
 				 * the next top level pattern's block.
 				 */
+				// A partial blocks, with what the utilities read.
 				const selectedBlocks = [
 					{
 						clientId: 'selected-1',
@@ -284,7 +294,7 @@ describe( 'use-transformed-patterns', () => {
 						},
 						innerBlocks: [],
 					},
-				];
+				] as unknown as Block[];
 				const res = getPatternTransformedBlocks(
 					selectedBlocks,
 					patternBlocks

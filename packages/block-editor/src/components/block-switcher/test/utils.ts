@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { unregisterBlockType, registerBlockType } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { getMatchingBlockByName, getRetainedBlockAttributes } from '../utils';
 
 describe( 'BlockSwitcher - utils', () => {
@@ -64,6 +65,7 @@ describe( 'BlockSwitcher - utils', () => {
 	} );
 	describe( 'getMatchingBlockByName', () => {
 		it( 'should return nothing if no match is found', () => {
+			// A partial block, with what the utilities read.
 			const block = {
 				clientId: 'client-1',
 				name: 'test-1',
@@ -74,11 +76,12 @@ describe( 'BlockSwitcher - utils', () => {
 						innerBlocks: [],
 					},
 				],
-			};
+			} as unknown as Block;
 			const res = getMatchingBlockByName( block, 'not-a-match' );
 			expect( res ).toBeUndefined();
 		} );
 		it( 'should return nothing if provided block has already been consumed', () => {
+			// A partial block, with what the utilities read.
 			const block = {
 				clientId: 'client-1',
 				name: 'test-1',
@@ -94,7 +97,7 @@ describe( 'BlockSwitcher - utils', () => {
 						innerBlocks: [],
 					},
 				],
-			};
+			} as unknown as Block;
 			const res = getMatchingBlockByName(
 				block,
 				'test-1-2',
@@ -104,11 +107,12 @@ describe( 'BlockSwitcher - utils', () => {
 		} );
 		describe( 'should return the matched block', () => {
 			it( 'if top level block', () => {
+				// A partial block, with what the utilities read.
 				const block = {
 					clientId: 'client-1',
 					name: 'test-1',
 					innerBlocks: [],
-				};
+				} as unknown as Block;
 				const res = getMatchingBlockByName(
 					block,
 					'test-1',
@@ -123,6 +127,7 @@ describe( 'BlockSwitcher - utils', () => {
 				);
 			} );
 			it( 'if nested block', () => {
+				// A partial block, with what the utilities read.
 				const block = {
 					clientId: 'client-1',
 					name: 'test-1',
@@ -144,7 +149,7 @@ describe( 'BlockSwitcher - utils', () => {
 							],
 						},
 					],
-				};
+				} as unknown as Block;
 				const res = getMatchingBlockByName(
 					block,
 					'test-1-2-1',
