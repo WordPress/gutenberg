@@ -518,21 +518,21 @@ function styles_for_block_core_search( $attributes ) {
 		}
 	}
 
-	// Background skips serialization, so it follows color onto the same element.
-	if ( ! empty( $attributes['style']['background']['gradient'] ) ) {
-		$background_styles = wp_style_engine_get_styles(
-			array(
+	// Background skips serialization, so it follows color onto the same element. Search only supports a gradient.
+	$background_styles = wp_get_background_classes_and_styles(
+		array(
+			'style' => array(
 				'background' => array(
-					'gradient' => $attributes['style']['background']['gradient'],
+					'gradient' => $attributes['style']['background']['gradient'] ?? null,
 				),
-			)
-		);
-		if ( ! empty( $background_styles['css'] ) ) {
-			if ( $use_input_for_colors ) {
-				$input_styles[] = $background_styles['css'];
-			} else {
-				$button_styles[] = $background_styles['css'];
-			}
+			),
+		)
+	);
+	if ( ! empty( $background_styles['style'] ) ) {
+		if ( $use_input_for_colors ) {
+			$input_styles[] = $background_styles['style'];
+		} else {
+			$button_styles[] = $background_styles['style'];
 		}
 	}
 
