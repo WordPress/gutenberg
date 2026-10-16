@@ -198,6 +198,12 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
 	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
 	'core/navigation-link': [ ':hover', ':focus', ':focus-visible', ':active' ],
+	'core/navigation-submenu': [
+		':hover',
+		':focus',
+		':focus-visible',
+		':active',
+	],
 };
 
 // The valid pseudo-selectors that can be used for elements.
