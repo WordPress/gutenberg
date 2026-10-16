@@ -10,7 +10,7 @@ import {
 	hydrateRegions,
 	getRegionRootFragment,
 } from './hydration';
-import { parseDirectiveValue, toVdom } from './vdom';
+import { parseDirectiveName, parseDirectiveValue, toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
 import { getScope } from './scopes';
@@ -52,6 +52,12 @@ export { useState, useRef } from 'preact/hooks';
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 
+/**
+ * Grants internal consumers access to runtime and renderer utilities.
+ *
+ * @param lock Acknowledgement of the private API compatibility contract.
+ * @return Internal APIs for directive parsing, hydration and rendering.
+ */
 export const privateApis = (
 	lock: 'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 ) => {
@@ -60,6 +66,8 @@ export const privateApis = (
 			getRegionRootFragment,
 			initialVdomPromise,
 			toVdom,
+			// Parses directive attribute names for internal consumers.
+			parseDirectiveName,
 			// Shares the directive-value interpretation with internal consumers.
 			parseDirectiveValue,
 			directive,
