@@ -335,6 +335,98 @@ describe( 'data-wp-html', () => {
 		expect( target.innerHTML ).toBe( serializedHTML );
 	} );
 
+	it( 'writes an accepted token after a rejected token and the server representation', async () => {
+		vi.stubGlobal( 'SCRIPT_DEBUG', true );
+		const runtime = await loadConflictRuntime();
+		const namespace = uniqueNamespace();
+		const html = '<p><a href=/x>Same</a></p>';
+		const serializedHTML = '<p><a href="/x">Same</a></p>';
+		const trustedHTML = {
+			toString: () => html,
+			toJSON: () => html,
+		};
+		const trustedSerializedHTML = {
+			toString: () => serializedHTML,
+			toJSON: () => serializedHTML,
+		};
+		vi.stubGlobal( 'trustedTypes', {
+			isHTML: ( value: unknown ) =>
+				value === trustedHTML || value === trustedSerializedHTML,
+		} );
+		const { state } = runtime.store( namespace, {
+			state: { html: runtime.asDangerousHTML( html ) as unknown },
+		} );
+		const region = createRegion(
+			namespace,
+			'<div data-wp-html="state.html"><p>Server</p></div>'
+		);
+		const target = region.querySelector( 'div' )!;
+		const descriptor = Object.getOwnPropertyDescriptor(
+			Element.prototype,
+			'innerHTML'
+		)!;
+		const writes: string[] = [];
+		Object.defineProperty( target, 'innerHTML', {
+			/** Allows the accessor to be discarded with the element. */
+			configurable: true,
+			/** Serializes the element's current content. */
+			get: () => descriptor.get!.call( target ),
+			/**
+			 * Rejects untrusted strings as a Trusted Types-enforcing browser does.
+			 *
+			 * @param value HTML assigned to the element.
+			 */
+			set: ( value: string ) => {
+				writes.push( String( value ) );
+				if ( typeof value === 'string' && value !== '' ) {
+					throw new TypeError(
+						'This document requires TrustedHTML.'
+					);
+				}
+				descriptor.set!.call( target, value );
+			},
+		} );
+		const warnings = vi.spyOn( console, 'warn' );
+		const warningStart = warnings.mock.calls.length;
+
+		await runtime.act( () =>
+			runtime.hydrate( runtime.toVdom( region ), region.parentNode! )
+		);
+		expect( target ).toBeEmptyDOMElement();
+		expect( writes ).toEqual( [ html, '' ] );
+		expect( console ).toHaveWarnedWith(
+			'data-wp-html: the browser rejected this HTML value, so the element was emptied. TypeError: This document requires TrustedHTML.'
+		);
+
+		await runtime.act( () => {
+			state.html = { wpServerHtml: true };
+		} );
+		expect( target ).toBeEmptyDOMElement();
+		expect( writes ).toEqual( [ html, '' ] );
+
+		const writesBeforeAcceptedToken = writes.length;
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML( trustedHTML as never );
+		} );
+		expect( target.innerHTML ).toBe( serializedHTML );
+		expect( writes ).toHaveLength( writesBeforeAcceptedToken + 1 );
+		expect( writes.at( -1 ) ).toBe( html );
+		const renderedNode = target.firstElementChild;
+
+		await runtime.act( () => {
+			state.html = { wpServerHtml: true };
+		} );
+		const writesBeforeMatchingToken = writes.length;
+		await runtime.act( () => {
+			state.html = runtime.asDangerousHTML(
+				trustedSerializedHTML as never
+			);
+		} );
+		expect( target.firstElementChild ).toBe( renderedNode );
+		expect( writes ).toHaveLength( writesBeforeMatchingToken );
+		expect( warnings.mock.calls.slice( warningStart ) ).toHaveLength( 1 );
+	} );
+
 	it( 'preserves representation content through changes to and from other values', async () => {
 		vi.stubGlobal( 'SCRIPT_DEBUG', true );
 		const runtime = await loadConflictRuntime();

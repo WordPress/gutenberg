@@ -83,7 +83,13 @@ directive(
 				);
 			}
 			const key = String( resolvedValue );
-			if ( lastAppliedKey.current === key ) {
+			// A rejected write may cache this key without leaving its HTML in the
+			// element, so inspect the current DOM before using the cache after the
+			// server representation.
+			if (
+				lastAppliedKey.current === key &&
+				! leavingServerHTMLRepresentation
+			) {
 				return;
 			}
 			const node = ( element.ref as RefObject< HTMLElement > ).current!;
