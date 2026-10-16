@@ -90,3 +90,28 @@ export function getDuotoneFilter( id: string, colors: string[] ) {
 	</defs>
 </svg>`;
 }
+
+/**
+ * Stable filter id for a custom duotone, a raw list of colors. Mirrors
+ * `WP_Duotone_Gutenberg::get_custom_filter_id()`, so the same colors map to
+ * the same id in the editor and on the front end.
+ *
+ * @param colors The duotone value, e.g. `[ '#000', '#fff' ]`.
+ *
+ * @return The filter id, or undefined when the value is not a list of at least two valid colors.
+ */
+export function getCustomDuotoneFilterId( colors: unknown ) {
+	if (
+		! Array.isArray( colors ) ||
+		colors.length < 2 ||
+		! colors.every(
+			( color ) => typeof color === 'string' && colord( color ).isValid()
+		)
+	) {
+		return undefined;
+	}
+	const hexColors = colors.map( ( color ) =>
+		colord( color ).toHex().slice( 1 )
+	);
+	return `wp-duotone-custom-${ hexColors.join( '-' ) }`;
+}

@@ -150,4 +150,216 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $reflection->invoke( null, $data_attr ) );
 	}
+
+	public function data_get_custom_filter_id() {
+		return array(
+			'hex'               => array( array( '#000000', '#FFFFFF' ), 'wp-duotone-custom-000000-ffffff' ),
+			'short-hex'         => array( array( '#000', '#fff' ), 'wp-duotone-custom-000000-ffffff' ),
+			'rgb-and-hsl'       => array( array( 'rgb(255, 0, 0)', 'hsl(240, 100%, 50%)' ), 'wp-duotone-custom-ff0000-0000ff' ),
+			'alpha'             => array( array( '#000000', 'rgba(255, 255, 255, 0.5)' ), 'wp-duotone-custom-000000-ffffff80' ),
+			'three-colors'      => array( array( '#000', '#f00', '#fff' ), 'wp-duotone-custom-000000-ff0000-ffffff' ),
+			'named-color'       => array( array( 'red', '#fff' ), null ),
+			'markup'            => array( array( '#000', '<script>' ), null ),
+			'nested-array'      => array( array( array( '#000' ), '#fff' ), null ),
+			'single-color'      => array( array( '#000' ), null ),
+			'associative-array' => array(
+				array(
+					'dark'  => '#000',
+					'light' => '#fff',
+				),
+				null,
+			),
+			'string'            => array( 'var:preset|duotone|blue-orange', null ),
+			'empty-array'       => array( array(), null ),
+		);
+	}
+
+	/**
+	 * @dataProvider data_get_custom_filter_id
+	 *
+	 * @covers ::get_custom_filter_id
+	 */
+	public function test_get_custom_filter_id( $colors, $expected ) {
+		$this->assertSame( $expected, WP_Duotone_Gutenberg::get_custom_filter_id( $colors ) );
+	}
+
+	/**
+	 * Renders a block with the given user global styles, then resets the cached data.
+	 *
+	 * @param array $styles The user global styles.
+	 * @param array $block  The parsed block.
+	 * @return array The rendered block HTML, the footer assets, the used preset filter IDs and the block CSS rules.
+	 */
+	private function render_with_user_global_styles( $styles, $block ) {
+		$set_user_styles = static function ( $theme_json ) use ( $styles ) {
+			return $theme_json->update_with(
+				array(
+					'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+					'styles'  => $styles,
+				)
+			);
+		};
+		$wp_duotone      = new WP_Duotone_Gutenberg();
+		$properties      = array();
+		foreach ( array( 'global_styles_block_names', 'global_styles_variation_filters', 'used_svg_filter_data', 'used_global_styles_presets', 'block_css_declarations' ) as $name ) {
+			$properties[ $name ] = new ReflectionProperty( 'WP_Duotone_Gutenberg', $name );
+			if ( PHP_VERSION_ID < 80100 ) {
+				$properties[ $name ]->setAccessible( true );
+			}
+		}
+		$reset = static function () use ( $properties, $wp_duotone ) {
+			foreach ( $properties as $name => $property ) {
+				$property->setValue( $wp_duotone, str_starts_with( $name, 'global_' ) ? null : array() );
+			}
+		};
+
+		add_filter( 'wp_theme_json_data_user', $set_user_styles );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		$reset();
+
+		$block_content = '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>';
+		$html          = WP_Duotone_Gutenberg::render_duotone_support( $block_content, $block, new WP_Block( $block ) );
+		$used_presets  = array_keys( $properties['used_global_styles_presets']->getValue() );
+		$css_rules     = $properties['block_css_declarations']->getValue();
+
+		ob_start();
+		WP_Duotone_Gutenberg::output_footer_assets();
+		$footer = ob_get_clean();
+
+		remove_filter( 'wp_theme_json_data_user', $set_user_styles );
+		WP_Theme_JSON_Resolver_Gutenberg::clean_cached_data();
+		$reset();
+
+		return array( $html, $footer, $used_presets, $css_rules );
+	}
+
+	public function data_global_styles_duotone() {
+		return array(
+			'custom colors' => array( array( '#000000', '#ff0000' ), 'wp-duotone-custom-000000-ff0000', array() ),
+			'preset'        => array( 'var:preset|duotone|blue-orange', 'wp-duotone-blue-orange', array( 'wp-duotone-blue-orange' ) ),
+		);
+	}
+
+	/**
+	 * The theme.json stylesheet applies a block type's duotone, so a block
+	 * style variation can follow it at the same specificity. Only the SVG and
+	 * the preset custom property come from here.
+	 *
+	 * @dataProvider data_global_styles_duotone
+	 *
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_render_duotone_support_global_styles_adds_no_class_or_block_css( $duotone, $filter_id, $expected_presets ) {
+		list( $html, $footer, $used_presets, $css_rules ) = $this->render_with_user_global_styles(
+			array(
+				'blocks' => array(
+					'core/image' => array(
+						'filter' => array( 'duotone' => $duotone ),
+					),
+				),
+			),
+			array(
+				'blockName' => 'core/image',
+				'attrs'     => array(),
+			)
+		);
+
+		$this->assertSame( '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>', $html );
+		$this->assertSame( array(), $css_rules );
+		$this->assertStringContainsString( '<filter id="' . $filter_id . '">', $footer );
+		$this->assertSame( $expected_presets, $used_presets );
+	}
+
+	/**
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_render_duotone_support_instance_keeps_its_class_and_block_css_over_global_styles() {
+		list( $html, , , $css_rules ) = $this->render_with_user_global_styles(
+			array(
+				'blocks' => array(
+					'core/image' => array(
+						'filter' => array( 'duotone' => 'var:preset|duotone|blue-orange' ),
+					),
+				),
+			),
+			array(
+				'blockName' => 'core/image',
+				'attrs'     => array( 'style' => array( 'color' => array( 'duotone' => array( '#000000', '#ff0000' ) ) ) ),
+			)
+		);
+
+		$this->assertMatchesRegularExpression( '/class="wp-block-image size-full (wp-duotone-000000-ff0000-\d+)"/', $html );
+		$this->assertCount( 1, $css_rules );
+		$this->assertMatchesRegularExpression( '/^\.wp-duotone-000000-ff0000-\d+\.wp-block-image img/', $css_rules[0]['selector'] );
+	}
+
+	/**
+	 * @covers ::render_duotone_support
+	 */
+	public function test_gutenberg_render_duotone_support_global_styles_variations() {
+		register_block_style(
+			'core/image',
+			array(
+				'name'  => 'duotone-preset',
+				'label' => 'Duotone preset',
+			)
+		);
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'duotone-section',
+				'label' => 'Duotone section',
+			)
+		);
+
+		list( $html, $footer, $used_presets ) = $this->render_with_user_global_styles(
+			array(
+				'blocks' => array(
+					'core/image' => array(
+						'variations' => array(
+							'rounded'        => array(
+								'filter' => array( 'duotone' => array( '#000000', '#ff0000' ) ),
+							),
+							'duotone-preset' => array(
+								'filter' => array( 'duotone' => 'var:preset|duotone|midnight' ),
+							),
+						),
+					),
+					'core/cover' => array(
+						'variations' => array(
+							'rounded' => array(
+								'filter' => array( 'duotone' => array( '#0000ff', '#ffffff' ) ),
+							),
+						),
+					),
+					'core/group' => array(
+						'variations' => array(
+							'duotone-section' => array(
+								'blocks' => array(
+									'core/image' => array(
+										'filter' => array( 'duotone' => 'var:preset|duotone|blue-orange' ),
+									),
+								),
+							),
+						),
+					),
+				),
+			),
+			array(
+				'blockName' => 'core/image',
+				'attrs'     => array( 'className' => 'is-style-rounded' ),
+			)
+		);
+
+		unregister_block_style( 'core/image', 'duotone-preset' );
+		unregister_block_style( 'core/group', 'duotone-section' );
+
+		// The variation CSS comes from theme.json, so the block gets no class.
+		$this->assertSame( '<figure class="wp-block-image size-full"><img src="/my-image.jpg" /></figure>', $html );
+		$this->assertStringContainsString( '<filter id="wp-duotone-custom-000000-ff0000">', $footer );
+		$this->assertStringContainsString( '<filter id="wp-duotone-midnight">', $footer );
+		$this->assertStringContainsString( '<filter id="wp-duotone-blue-orange">', $footer );
+		$this->assertSame( array( 'wp-duotone-midnight', 'wp-duotone-blue-orange' ), $used_presets );
+		$this->assertStringNotContainsString( 'wp-duotone-custom-0000ff-ffffff', $footer, 'A variation filter for another block type is not output.' );
+	}
 }

@@ -1732,10 +1732,15 @@
 					"type": "object",
 					"properties": {
 						"duotone": {
-							"description": "Sets the duotone filter.",
+							"description": "Sets the duotone filter: a preset reference, a CSS value such as `unset`, or a list of custom colors from dark to light.",
 							"oneOf": [
 								{ "type": "string" },
-								{ "$ref": "#/definitions/refComplete" }
+								{ "$ref": "#/definitions/refComplete" },
+								{
+									"type": "array",
+									"items": { "type": "string" },
+									"minItems": 2
+								}
 							]
 						}
 					},

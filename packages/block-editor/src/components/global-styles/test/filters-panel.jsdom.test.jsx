@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import FiltersPanel from '../filters-panel';
+import FiltersPanel, { useHasFiltersPanel } from '../filters-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -270,5 +270,104 @@ describe( 'FiltersPanel — duplicate duotone presets', () => {
 		expect( onChange ).toHaveBeenCalledWith( {
 			filter: { duotone: 'var:preset|duotone|custom-duotone-2' },
 		} );
+	} );
+} );
+
+describe( 'FiltersPanel: custom duotone', () => {
+	it( 'offers custom duotone when the settings allow it', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<FiltersPanel
+				value={ {} }
+				settings={ {
+					color: { ...baseSettings.color, custom: true },
+				} }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+		await openDuotone( user );
+
+		expect( screen.getByText( 'Shadows' ) ).toBeInTheDocument();
+		expect( screen.getByText( 'Highlights' ) ).toBeInTheDocument();
+	} );
+
+	it( 'hides custom duotone when color.customDuotone is false', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<FiltersPanel
+				value={ {} }
+				settings={ {
+					color: {
+						...baseSettings.color,
+						custom: true,
+						customDuotone: false,
+					},
+				} }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+		await openDuotone( user );
+
+		expect( screen.queryByText( 'Shadows' ) ).not.toBeInTheDocument();
+	} );
+
+	it( 'hides custom duotone when there are no palette colors and custom colors are off', async () => {
+		const user = userEvent.setup();
+
+		render(
+			<FiltersPanel
+				value={ {} }
+				settings={ {
+					color: {
+						...baseSettings.color,
+						custom: false,
+						palette: {},
+					},
+				} }
+				onChange={ () => {} }
+				panelId="test-panel"
+			/>
+		);
+		await openDuotone( user );
+
+		expect( screen.queryByText( 'Shadows' ) ).not.toBeInTheDocument();
+	} );
+} );
+
+describe( 'useHasFiltersPanel', () => {
+	it( 'is true for theme duotone presets when custom and default duotone are off', () => {
+		expect(
+			useHasFiltersPanel( {
+				color: {
+					customDuotone: false,
+					defaultDuotone: false,
+					duotone: {
+						theme: [
+							{
+								name: 'Blue and orange',
+								slug: 'blue-orange',
+								colors: [ '#0000ff', '#ff8800' ],
+							},
+						],
+					},
+				},
+			} )
+		).toBe( true );
+	} );
+
+	it( 'is false when only default presets exist and default duotone is off', () => {
+		expect(
+			useHasFiltersPanel( {
+				color: {
+					customDuotone: false,
+					defaultDuotone: false,
+					duotone: baseSettings.color.duotone,
+				},
+			} )
+		).toBe( false );
 	} );
 } );
