@@ -8,18 +8,12 @@ import { useKeyboardHighlight } from '../../../utils/item-popup/keyboard-highlig
 
 export const List = forwardRef< HTMLDivElement, ComboboxListProps >(
 	function UnforwardedList( { className, ...restProps }, ref ) {
-		const { onPointerHighlight } = useKeyboardHighlight();
+		const { listProps } = useKeyboardHighlight();
 		return (
 			<_Combobox.List
 				className={ clsx( itemPopupStyles.list, className ) }
 				ref={ ref }
-				{ ...mergeProps(
-					{
-						onPointerMoveCapture: onPointerHighlight,
-						onPointerDownCapture: onPointerHighlight,
-					},
-					restProps
-				) }
+				{ ...mergeProps( listProps, restProps ) }
 			/>
 		);
 	}

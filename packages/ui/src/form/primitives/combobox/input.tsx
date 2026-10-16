@@ -25,20 +25,12 @@ export const Input = forwardRef< HTMLInputElement, ComboboxInputProps >(
 		{ render = DEFAULT_RENDER, ...restProps },
 		ref
 	) {
-		const { onInputFocusChange, onPointerHighlight } =
-			useKeyboardHighlight();
+		const { inputProps } = useKeyboardHighlight();
 		return (
 			<_Combobox.Input
 				ref={ ref }
 				render={ render }
-				{ ...mergeProps(
-					{
-						onFocusCapture: () => onInputFocusChange( true ),
-						onBlurCapture: () => onInputFocusChange( false ),
-						onPointerDownCapture: onPointerHighlight,
-					},
-					restProps
-				) }
+				{ ...mergeProps( inputProps, restProps ) }
 			/>
 		);
 	}

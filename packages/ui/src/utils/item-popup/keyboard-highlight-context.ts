@@ -8,12 +8,18 @@ import {
 
 export const KeyboardHighlightContext = createContext< {
 	keyboardHighlight: boolean;
-	onPointerHighlight: () => void;
-	onInputFocusChange: ( focused: boolean ) => void;
+	inputProps: Pick<
+		_Combobox.Input.Props,
+		'onFocusCapture' | 'onBlurCapture' | 'onPointerDownCapture'
+	>;
+	listProps: Pick<
+		_Combobox.List.Props,
+		'onPointerMoveCapture' | 'onPointerDownCapture'
+	>;
 } >( {
 	keyboardHighlight: false,
-	onPointerHighlight: () => {},
-	onInputFocusChange: () => {},
+	inputProps: {},
+	listProps: {},
 } );
 
 export const useKeyboardHighlight = () =>
@@ -29,14 +35,21 @@ export function useKeyboardHighlightState< Value >(
 ) {
 	const [ keyboardHighlight, setKeyboardHighlight ] = useState( false );
 	const [ inputFocused, setInputFocused ] = useState( false );
-	const keyboardHighlightContext = useMemo(
-		() => ( {
+	const keyboardHighlightContext = useMemo( () => {
+		const onPointerHighlight = () => setKeyboardHighlight( false );
+		return {
 			keyboardHighlight: keyboardHighlight && inputFocused,
-			onPointerHighlight: () => setKeyboardHighlight( false ),
-			onInputFocusChange: setInputFocused,
-		} ),
-		[ keyboardHighlight, inputFocused ]
-	);
+			inputProps: {
+				onFocusCapture: () => setInputFocused( true ),
+				onBlurCapture: () => setInputFocused( false ),
+				onPointerDownCapture: onPointerHighlight,
+			},
+			listProps: {
+				onPointerMoveCapture: onPointerHighlight,
+				onPointerDownCapture: onPointerHighlight,
+			},
+		};
+	}, [ keyboardHighlight, inputFocused ] );
 	const handleOpenChange: NonNullable<
 		HighlightCallbacks< Value >[ 'onOpenChange' ]
 	> = ( open, eventDetails ) => {
