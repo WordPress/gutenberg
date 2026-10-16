@@ -114,11 +114,17 @@
 	.editor-header:has(> .editor-header__center) & {
 		grid-column: 4 / -1;
 	}
-	justify-self: end;
 	display: inline-flex;
 	align-items: center;
 	flex-wrap: nowrap;
 	padding-right: $grid-unit-05;
+	width: 100%;
+	justify-content: inherit;
+
+	@include break-mobile () {
+		justify-self: end;
+		width: min-content;
+	}
 
 	@include break-small () {
 		padding-right: $grid-unit-10;
