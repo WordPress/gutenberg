@@ -1406,14 +1406,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 	test( 'should show format toolbar when selecting text from the left edge of a block', async ( {
 		editor,
 		page,
-		browserName,
 	} ) => {
-		// eslint-disable-next-line playwright/no-skipped-test
-		test.skip(
-			browserName === 'chromium',
-			'Chromium does not extend a selection from non-editable padding into editable text.'
-		);
-
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello world' },
