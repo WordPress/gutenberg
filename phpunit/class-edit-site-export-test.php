@@ -31,7 +31,7 @@ class Edit_Site_Export_Test extends WP_UnitTestCase {
 
 		// Open ZIP file and make sure the directories exist.
 		$zip = new ZipArchive();
-		$zip->open( $filename, ZipArchive::RDONLY );
+		$zip->open( $filename );
 		$has_theme_dir                = $zip->locateName( 'theme/' ) !== false;
 		$has_block_templates_dir      = $zip->locateName( 'theme/block-templates/' ) !== false;
 		$has_block_template_parts_dir = $zip->locateName( 'theme/block-template-parts/' ) !== false;
@@ -41,7 +41,7 @@ class Edit_Site_Export_Test extends WP_UnitTestCase {
 
 		// ZIP file contains at least one HTML file.
 		$has_html_files = false;
-		$num_files      = $zip->count();
+		$num_files      = $zip->numFiles; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		for ( $i = 0; $i < $num_files; $i++ ) {
 			$filename = $zip->getNameIndex( $i );
 			if ( '.html' === substr( $filename, -5 ) ) {
