@@ -22,8 +22,8 @@ vi.mock( import( '../hooks/use-spacing-sizes' ), () => ( {
 } ) );
 
 vi.mock( import( '../../use-settings' ), () => ( {
-	useSettings: vi.fn( ( ...keys ) => {
-		const defaults = {
+	useSettings: vi.fn( ( ...keys: string[] ) => {
+		const defaults: Record< string, unknown > = {
 			'spacing.units': [ 'px', 'em', 'rem' ],
 			'spacing.spacingSizes.custom': [],
 			'spacing.spacingSizes.theme': [],

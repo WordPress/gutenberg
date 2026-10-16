@@ -21,6 +21,7 @@
  */
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect } from '@wordpress/data';
@@ -51,8 +52,8 @@ vi.mock( import( '../hooks/use-spacing-sizes' ), () => ( {
 
 // Mock useSettings hook
 vi.mock( import( '../../use-settings' ), () => ( {
-	useSettings: vi.fn( ( ...keys ) => {
-		const defaults = {
+	useSettings: vi.fn( ( ...keys: string[] ) => {
+		const defaults: Record< string, unknown > = {
 			'spacing.units': [ 'px', 'em', 'rem' ],
 			'spacing.spacingSizes.custom': [],
 			'spacing.spacingSizes.theme': [],
@@ -72,7 +73,7 @@ describe( 'SpacingSizesControl', () => {
 
 	beforeEach( () => {
 		mockOnChange.mockClear();
-		useSelect.mockReturnValue( false ); // disableCustomSpacingSizes = false
+		( useSelect as Mock ).mockReturnValue( false ); // disableCustomSpacingSizes = false
 	} );
 
 	describe( 'Basic Rendering', () => {
@@ -731,11 +732,11 @@ describe( 'SpacingSizesControl', () => {
 
 		// Mock the large preset set
 		beforeEach( () => {
-			useSpacingSizes.mockReturnValue( largeSpacingSizes );
+			( useSpacingSizes as Mock ).mockReturnValue( largeSpacingSizes );
 		} );
 
 		afterEach( () => {
-			useSpacingSizes.mockReturnValue( [
+			( useSpacingSizes as Mock ).mockReturnValue( [
 				{ name: 'None', slug: '0', size: 0 },
 				{ name: 'Small', slug: '20', size: '0.5rem' },
 				{ name: 'Medium', slug: '40', size: '1rem' },
@@ -941,7 +942,9 @@ describe( 'SpacingSizesControl', () => {
 				{ name: 'Huge', slug: '100', size: '5rem' },
 			];
 
-			useSpacingSizes.mockReturnValueOnce( customSpacingSizes );
+			( useSpacingSizes as Mock ).mockReturnValueOnce(
+				customSpacingSizes
+			);
 
 			render(
 				<SpacingSizesControl { ...defaultProps } values={ undefined } />
@@ -957,7 +960,9 @@ describe( 'SpacingSizesControl', () => {
 				{ name: 'Theme Large', slug: 'theme-lg', size: '2.25rem' },
 			];
 
-			useSpacingSizes.mockReturnValueOnce( themeSpacingSizes );
+			( useSpacingSizes as Mock ).mockReturnValueOnce(
+				themeSpacingSizes
+			);
 
 			render(
 				<SpacingSizesControl
@@ -1041,7 +1046,7 @@ describe( 'SpacingSizesControl', () => {
 
 	describe( 'Integration with Settings', () => {
 		it( 'respects disableCustomSpacingSizes setting', () => {
-			useSelect.mockReturnValue( true ); // disableCustomSpacingSizes = true
+			( useSelect as Mock ).mockReturnValue( true ); // disableCustomSpacingSizes = true
 
 			render(
 				<SpacingSizesControl { ...defaultProps } values={ undefined } />
@@ -1054,7 +1059,7 @@ describe( 'SpacingSizesControl', () => {
 		} );
 
 		it( 'shows custom toggle when custom sizes are enabled', () => {
-			useSelect.mockReturnValue( false ); // disableCustomSpacingSizes = false
+			( useSelect as Mock ).mockReturnValue( false ); // disableCustomSpacingSizes = false
 
 			render(
 				<SpacingSizesControl { ...defaultProps } values={ undefined } />
