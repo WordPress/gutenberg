@@ -79,6 +79,12 @@ function {{PREFIX}}_register_package_scripts( $scripts ) {
 			$version,
 			true
 		);
+
+		// The script modules the script imports, which WordPress adds to the
+		// import map of the pages loading the script.
+		if ( ! empty( $asset['module_dependencies'] ) ) {
+			$scripts->add_data( $script_data['handle'], 'module_dependencies', $asset['module_dependencies'] );
+		}
 	}
 }
 

@@ -147,6 +147,51 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test( 'does not select blocks in the canvas preview when editing from the sidebar', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const canvas = page.frameLocator( 'iframe[name="editor-canvas"]' );
+		const blockToolbar = page.getByRole( 'toolbar', {
+			name: 'Block tools',
+		} );
+
+		await expect( canvas.getByText( 'Existing Item' ) ).toBeVisible();
+
+		// Select an item, then add a new one from the appender. The edit is
+		// what carries the sidebar's selection over to the entity.
+		await listView.getByRole( 'link', { name: 'Existing Item' } ).click();
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+		await linkControl.useLinkControlSearch( 'Test Page 2' );
+		await expect(
+			listView.getByRole( 'link', { name: 'Test Page 2' } )
+		).toBeVisible();
+
+		// The preview picks up the change without adopting the selection.
+		await expect( canvas.getByText( 'Test Page 2' ) ).toBeVisible();
+		await expect( blockToolbar ).toBeHidden();
+		expect(
+			await page.evaluate( () =>
+				window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectedBlockClientId()
+			)
+		).toBeNull();
+	} );
 } );
 
 class LinkControl {

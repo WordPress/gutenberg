@@ -236,21 +236,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-controls/fill.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-controls/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-controls/slot.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-controls/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -483,31 +468,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-popover/cover.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-popover/drop-zone.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-popover/inbetween.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-popover/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-popover/stories/index.story.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-preview/auto.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -646,11 +606,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-title/stories/index.story.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-title/test/index.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -861,32 +816,18 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/colors-gradients/control.jsx": {
+	"packages/block-editor/src/components/colors-gradients/control.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/colors-gradients/dropdown.jsx": {
+	"packages/block-editor/src/components/colors-gradients/dropdown.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.jsx": {
+	"packages/block-editor/src/components/colors-gradients/panel-color-gradient-settings.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/colors-gradients/test/control.browser.test.jsx": {
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -1496,41 +1437,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/inspector-controls/block-support-slot-container.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inspector-controls/block-support-tools-panel.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inspector-controls/fill.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inspector-controls/index.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inspector-controls/last-item.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inspector-controls/list-view-content-popover.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inspector-controls/slot.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/inspector-popover-header/index.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -2080,11 +1986,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/use-block-display-information/test/index.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/warning/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -2130,17 +2031,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/anchor.jsx": {
+	"packages/block-editor/src/hooks/anchor.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/auto-inspector-controls.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/background.jsx": {
@@ -2174,11 +2067,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/custom-class-name.jsx": {
+	"packages/block-editor/src/hooks/custom-class-name.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2269,11 +2159,6 @@
 		}
 	},
 	"packages/block-editor/src/hooks/test/background.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/test/custom-class-name.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
@@ -4808,6 +4693,41 @@
 			"count": 6
 		}
 	},
+	"packages/core-actions/src/post_type_supports/delete-post/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"packages/core-actions/src/post_type_supports/duplicate-post/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"packages/core-actions/src/post_type_supports/move-to-trash/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"packages/core-actions/src/post_type_supports/order-pages/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"packages/core-actions/src/post_type_supports/permanently-delete/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"packages/core-actions/src/post_type_supports/rename-post/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
+	"packages/core-actions/src/post_type_supports/reset-post/action.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 3
+		}
+	},
 	"packages/core-commands/src/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -7108,57 +7028,6 @@
 			"count": 1
 		}
 	},
-	"packages/fields/src/actions/delete-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/actions/duplicate-pattern.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/actions/duplicate-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/actions/permanently-delete-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/actions/rename-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/actions/reorder-page.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/actions/reset-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/actions/trash-post.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/components/create-template-part-modal/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 4
-		}
-	},
 	"packages/fields/src/components/media-edit/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
@@ -7672,6 +7541,11 @@
 		},
 		"react/jsx-filename-extension": {
 			"count": 1
+		}
+	},
+	"packages/patterns/src/components/create-template-part-modal/index.tsx": {
+		"@wordpress/use-recommended-components": {
+			"count": 4
 		}
 	},
 	"packages/patterns/src/components/duplicate-pattern-modal.jsx": {
