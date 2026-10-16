@@ -33,6 +33,7 @@
 
 ### Bug Fixes
 
+-   `Avatar`: Use the strong neutral stroke color for the person fallback to provide sufficient non-text contrast ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   Keep the `Link` new-tab indicator with the preceding text when wrapping ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
 -   `Select`: Keep long popup lists scrollable when item alignment falls back to anchored positioning or the popup opens through touch ([#84682](https://github.com/WordPress/gutenberg/pull/84682)).
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
