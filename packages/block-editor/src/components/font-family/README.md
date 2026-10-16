@@ -44,7 +44,7 @@ The component accepts the following props:
 ### onChange
 
 A function that receives the new font family value.
-If onChange is called without any parameter, it should reset the value, attending to what reset means in that context, e.g., set the font family to undefined or set the font family a starting value.
+Selecting Default calls `onChange` with an empty string to reset the font family.
 
 - Type: `function`
 - Required: Yes
@@ -71,7 +71,3 @@ The current font family value.
 - Type: `String`
 - Required: No
 - Default: ''
-
-The component uses `Field` and `Select` from `@wordpress/ui`. It accepts `label`, `hideLabelFromVision`, `describedBy`, `disabled`, and `size`, including the `small` size. Other button props, such as focus and pointer callbacks, are passed to the select trigger. The `onChange` callback receives the font family string, including an empty string for Default.
-
-An `options` prop can override the generated options using the legacy `{ key, name, style, className, hint }` shape. The control maps these options to the new select's items. With `showSelectedHint`, the selected hint stays visible in the trigger and is exposed separately as an accessible description.
