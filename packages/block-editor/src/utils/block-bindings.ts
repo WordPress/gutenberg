@@ -1,5 +1,5 @@
-type Binding = { source?: string };
-type Bindings = Record< string, Binding >;
+type Binding = { source?: string; args?: Record< string, unknown > };
+export type Bindings = Record< string, Binding >;
 type BlockBindingsSource = { usesContext?: readonly string[] };
 
 const DEFAULT_ATTRIBUTE = '__default';
