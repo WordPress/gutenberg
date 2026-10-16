@@ -6,6 +6,7 @@
 			--_gcd-a-border-radius: var(--wpds-border-radius-sm);
 
 			border-radius: var(--wpds-border-radius-sm);
+			text-decoration: none;
 			text-underline-offset: 0.2em;
 			text-decoration-thickness: from-font;
 		}
@@ -50,16 +51,21 @@
 			text-decoration: none;
 		}
 
-		/* Link icon pattern — arrow rendered via ::after pseudo-element to avoid
-		 * Twemoji replacement and text-selection issues. The icon is an
-		 * inline-block so the link underline stays scoped to the text. */
+		.link-contents {
+			text-decoration: underline;
+			text-decoration-color: inherit;
+			text-decoration-thickness: inherit;
+		}
+
+		/* Keep the icon inline so it stays with the preceding word. Underline
+		 * only the text wrapper, since inline descendants cannot cancel an
+		 * ancestor's underline. Use generated content to avoid Twemoji
+		 * replacement and including the arrow when copying link text. */
 
 		.link-icon {
 			line-height: 1;
-			display: inline-block;
 			margin-inline-start: var(--wpds-dimension-padding-xs);
 			font-weight: var(--wpds-typography-font-weight-default);
-			text-decoration: none;
 		}
 
 		.link-icon::after {

@@ -48,7 +48,13 @@ export const Link = forwardRef< HTMLAnchorElement, LinkProps >(
 				target: target ?? ( openInNewTab ? '_blank' : undefined ),
 				children: (
 					<>
-						{ children }
+						{ variant === 'unstyled' ? (
+							children
+						) : (
+							<span className={ styles[ 'link-contents' ] }>
+								{ children }
+							</span>
+						) }
 						{ shouldShowNewTabIndicator && (
 							<span
 								className={ styles[ 'link-icon' ] }

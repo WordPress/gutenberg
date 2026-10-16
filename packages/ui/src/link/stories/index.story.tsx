@@ -34,6 +34,23 @@ export const OpenInNewTab: Story = {
 	},
 };
 
+export const Wrapping: Story = {
+	...OpenInNewTab,
+	args: {
+		...OpenInNewTab.args,
+		children: 'Discover the terms and phrases',
+	},
+	render: ( args ) => (
+		<Text
+			variant="body-md"
+			render={ <p /> }
+			style={ { width: '24ch', textAlign: 'center' } }
+		>
+			<Link { ...args } /> your visitors use to find your site.
+		</Text>
+	),
+};
+
 /**
  * Note: `tone` has no effect on `unstyled` variant
  */
