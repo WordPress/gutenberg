@@ -60,7 +60,7 @@
 			]
 		},
 		"parent": {
-			"description": "Setting parent lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an ‘Add to Cart’ block to only be available within a ‘Product’ block.",
+			"description": "Setting parent lets a block require that it is only available when nested within the specified blocks. For example, you might want to allow an ‘Add to Cart’ block to only be available within a ‘Product’ block. Omit the property for no parent restriction; an empty array matches no parent, including the root, so the block cannot be inserted anywhere.",
 			"type": "array",
 			"items": {
 				"type": "string"
