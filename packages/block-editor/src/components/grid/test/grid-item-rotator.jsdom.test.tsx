@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createEvent, fireEvent, render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { GridItemRotator } from '../grid-item-rotator';
 
 let blockElement: HTMLElement | null = null;
@@ -8,18 +7,6 @@ let blockElement: HTMLElement | null = null;
 vi.mock( import( '../../block-list/use-block-props/use-block-refs' ), () => ( {
 	useBlockElement: () => blockElement,
 } ) );
-// The overlay's position is not under test here.
-vi.mock( import( '../use-rotated-overlay-style' ), () => ( {
-	useRotatedOverlayStyle: () => undefined,
-} ) );
-vi.mock( import( '../../block-popover/cover' ), async () => {
-	const { forwardRef } = await import( '@wordpress/element' );
-	return {
-		default: forwardRef< HTMLDivElement, { children?: ReactNode } >(
-			( { children }, ref ) => <div ref={ ref }>{ children }</div>
-		),
-	};
-} );
 
 // The box is not laid out, so the block's center is at 0, 0. A pointer to its
 // left is a quarter turn clockwise, and one straight above it is half a turn.
@@ -52,14 +39,17 @@ function getInlineRotate() {
 function renderRotator( props: { angle?: number } = {} ) {
 	const onChange = vi.fn();
 	const onPreview = vi.fn();
+	// The rotation turns around the center of the box of handles.
 	const view = render(
-		<GridItemRotator
-			clientId="block"
-			angle={ 0 }
-			onChange={ onChange }
-			onPreview={ onPreview }
-			{ ...props }
-		/>
+		<div className="block-editor-grid-item-handles__box">
+			<GridItemRotator
+				clientId="block"
+				angle={ 0 }
+				onChange={ onChange }
+				onPreview={ onPreview }
+				{ ...props }
+			/>
+		</div>
 	);
 	const handle = screen.getByTitle( 'Rotate' );
 	return { ...view, handle, onChange, onPreview };
@@ -103,10 +93,33 @@ describe( 'GridItemRotator', () => {
 	it( 'writes nothing when the angle does not change', () => {
 		const { handle, onChange } = renderRotator( { angle: 90 } );
 
-		fireEvent.pointerDown( handle, { button: 0, pointerId: 1 } );
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			pointerId: 1,
+			...QUARTER_TURN,
+		} );
 		fireEvent.pointerMove( handle, { pointerId: 1, ...QUARTER_TURN } );
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
 		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'turns the block by as much as the pointer turns', () => {
+		const { handle, onChange } = renderRotator( { angle: 30 } );
+
+		// The drag starts a quarter turn from below the center, as it does
+		// from a handle in a corner, and the block doesn't jump there.
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			pointerId: 1,
+			...QUARTER_TURN,
+		} );
+		fireEvent.pointerMove( handle, { pointerId: 1, ...QUARTER_TURN } );
+		expect( getInlineRotate() ).toBe( '30deg' );
+		fireEvent.pointerMove( handle, { pointerId: 1, ...HALF_TURN } );
+		expect( getInlineRotate() ).toBe( '120deg' );
+
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+		expect( onChange ).toHaveBeenCalledWith( 120 );
 	} );
 
 	it( 'cancels on Escape, claiming the key, and writes nothing', () => {

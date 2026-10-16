@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { rotateRight, Icon } from '@wordpress/icons';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
-import BlockPopoverCover from '../block-popover/cover';
 import { GridItemHandle } from './grid-item-handle';
-import { getRotationFromPointer } from './rotation';
-import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
+import { getPointerAngle, getRotationFromPointer } from './rotation';
 import { setInlineStyle } from './utils';
 
 interface GridItemRotatorProps {
@@ -26,6 +24,8 @@ interface Rotation {
 	pointerId: number;
 	centerX: number;
 	centerY: number;
+	/** The rotation minus the pointer's direction when the drag started. */
+	offset: number;
 	value: number;
 	onKeyDown: ( event: KeyboardEvent ) => void;
 }
@@ -46,8 +46,8 @@ function removeKeyListeners( rotation: Rotation ) {
 }
 
 /**
- * A handle outside the bottom corner of a selected grid item, for rotating it
- * on the canvas.
+ * A handle for rotating a selected grid item on the canvas, in its toolbar of
+ * handles.
  *
  * While dragging, the rotation is previewed with an inline `rotate` style on
  * the block element, which wins over the rotate support's class rules, and
@@ -63,17 +63,12 @@ export function GridItemRotator( {
 	onChange,
 }: GridItemRotatorProps ) {
 	const blockElement = useBlockElement( clientId ) as HTMLElement | null;
-	const boxRef = useRef< HTMLDivElement >( null );
 	const rotationRef = useRef< Rotation | null >( null );
 	const onPreviewRef = useRef( onPreview );
 	useEffect( () => {
 		onPreviewRef.current = onPreview;
 	}, [ onPreview ] );
 	const [ previewAngle, setPreviewAngle ] = useState< number | null >( null );
-	const overlayStyle = useRotatedOverlayStyle(
-		blockElement,
-		previewAngle ?? angle
-	);
 
 	// Don't leave a preview behind if the handle goes away mid-rotation, for
 	// example when the block is deselected.
@@ -123,118 +118,116 @@ export function GridItemRotator( {
 	}
 
 	return (
-		<BlockPopoverCover
-			className="block-editor-grid-item-handles"
-			clientId={ clientId }
-			__unstablePopoverSlot="__unstable-block-tools-after"
-			additionalStyles={ overlayStyle }
-		>
-			<div ref={ boxRef } className="block-editor-grid-item-handles__box">
-				{ /*
-				 * Keyboard users rotate blocks with the Rotation control in
-				 * the block settings.
-				 */ }
-				<GridItemHandle
-					className="block-editor-grid-item-handles__rotate"
-					label={ __( 'Rotate' ) }
-					angle={ previewAngle ?? angle }
-					onPointerDown={ ( event ) => {
-						if (
-							event.button !== 0 ||
-							! boxRef.current ||
-							rotationRef.current
-						) {
-							return;
-						}
-						event.preventDefault();
-						event.stopPropagation();
-						const handle = event.currentTarget;
-						// The box turns around its center, so the center of
-						// its bounding box is the block's center.
-						const rect = boxRef.current.getBoundingClientRect();
-						const onKeyDown = ( keyEvent: KeyboardEvent ) => {
-							if ( keyEvent.key === 'Escape' ) {
-								// Claim the key, so that the canvas doesn't
-								// also move focus away from the block.
-								keyEvent.preventDefault();
-								endRotation();
-								setPreview( null );
-							}
-						};
-						// Focus can be in the canvas or in the editor around
-						// it. Listen in the capture phase, so that Escape is
-						// handled before anything else in either document.
-						const documents = [
-							...new Set( [
-								blockElement.ownerDocument,
-								handle.ownerDocument,
-							] ),
-						];
-						rotationRef.current = {
-							handle,
-							documents,
-							pointerId: event.pointerId,
-							centerX: rect.left + rect.width / 2,
-							centerY: rect.top + rect.height / 2,
-							value: angle,
-							onKeyDown,
-						};
-						handle.setPointerCapture( event.pointerId );
-						for ( const ownerDocument of documents ) {
-							ownerDocument.addEventListener(
-								'keydown',
-								onKeyDown,
-								true
-							);
-						}
-					} }
-					onPointerMove={ ( event ) => {
-						const rotation = rotationRef.current;
-						if ( ! rotation ) {
-							return;
-						}
-						rotation.value = getRotationFromPointer( {
-							centerX: rotation.centerX,
-							centerY: rotation.centerY,
+		// Keyboard users rotate blocks with the Rotation control in the block
+		// settings.
+		<GridItemHandle
+			className="block-editor-grid-item-handles__rotate"
+			label={ __( 'Rotate' ) }
+			onPointerDown={ ( event ) => {
+				const box = event.currentTarget.closest(
+					'.block-editor-grid-item-handles__box'
+				);
+				if ( event.button !== 0 || ! box || rotationRef.current ) {
+					return;
+				}
+				event.preventDefault();
+				event.stopPropagation();
+				const handle = event.currentTarget;
+				// The box turns around its center, so the center of
+				// its bounding box is the block's center.
+				const rect = box.getBoundingClientRect();
+				const onKeyDown = ( keyEvent: KeyboardEvent ) => {
+					if ( keyEvent.key === 'Escape' ) {
+						// Claim the key, so that the canvas doesn't
+						// also move focus away from the block.
+						keyEvent.preventDefault();
+						endRotation();
+						setPreview( null );
+					}
+				};
+				// Focus can be in the canvas or in the editor around
+				// it. Listen in the capture phase, so that Escape is
+				// handled before anything else in either document.
+				const documents = [
+					...new Set( [
+						blockElement.ownerDocument,
+						handle.ownerDocument,
+					] ),
+				];
+				const centerX = rect.left + rect.width / 2;
+				const centerY = rect.top + rect.height / 2;
+				rotationRef.current = {
+					handle,
+					documents,
+					pointerId: event.pointerId,
+					centerX,
+					centerY,
+					offset:
+						angle -
+						getPointerAngle( {
+							centerX,
+							centerY,
 							pointerX: event.clientX,
 							pointerY: event.clientY,
-							snap: ! event.shiftKey,
-						} );
-						setPreview( rotation.value );
-					} }
-					onPointerUp={ () => {
-						const rotation = rotationRef.current;
-						if ( ! rotation ) {
-							return;
-						}
-						endRotation();
-						setPreview( null );
-						if ( rotation.value !== angle ) {
-							onChange( rotation.value );
-						}
-					} }
-					onPointerCancel={ () => {
-						if ( ! rotationRef.current ) {
-							return;
-						}
-						endRotation();
-						setPreview( null );
-					} }
-				>
-					{ /* While rotating, the handle shows the angle instead. */ }
-					{ previewAngle === null ? (
-						<Icon icon={ rotateRight } />
-					) : (
-						<span className="block-editor-grid-item-handles__angle">
-							{ sprintf(
-								/* translators: %d: Rotation angle in degrees. */
-								__( '%d°' ),
-								previewAngle
-							) }
-						</span>
+						} ),
+					value: angle,
+					onKeyDown,
+				};
+				handle.setPointerCapture( event.pointerId );
+				for ( const ownerDocument of documents ) {
+					ownerDocument.addEventListener(
+						'keydown',
+						onKeyDown,
+						true
+					);
+				}
+			} }
+			onPointerMove={ ( event ) => {
+				const rotation = rotationRef.current;
+				if ( ! rotation ) {
+					return;
+				}
+				rotation.value = getRotationFromPointer( {
+					centerX: rotation.centerX,
+					centerY: rotation.centerY,
+					pointerX: event.clientX,
+					pointerY: event.clientY,
+					offset: rotation.offset,
+					snap: ! event.shiftKey,
+				} );
+				setPreview( rotation.value );
+			} }
+			onPointerUp={ () => {
+				const rotation = rotationRef.current;
+				if ( ! rotation ) {
+					return;
+				}
+				endRotation();
+				setPreview( null );
+				if ( rotation.value !== angle ) {
+					onChange( rotation.value );
+				}
+			} }
+			onPointerCancel={ () => {
+				if ( ! rotationRef.current ) {
+					return;
+				}
+				endRotation();
+				setPreview( null );
+			} }
+		>
+			{ /* While rotating, the handle shows the angle instead. */ }
+			{ previewAngle === null ? (
+				<Icon icon={ rotateRight } />
+			) : (
+				<span className="block-editor-grid-item-handles__angle">
+					{ sprintf(
+						/* translators: %d: Rotation angle in degrees. */
+						__( '%d°' ),
+						previewAngle
 					) }
-				</GridItemHandle>
-			</div>
-		</BlockPopoverCover>
+				</span>
+			) }
+		</GridItemHandle>
 	);
 }

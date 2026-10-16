@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import {
 	createBlock,
 	registerBlockType,
@@ -30,12 +31,18 @@ vi.mock(
 	} )
 );
 // Only the rotate handle is under test, so the other grid tools render
-// nothing and the handle is a marker.
+// nothing, the toolbar of handles only renders its children, and the handle
+// is a marker.
 vi.mock( import( '../../components/grid' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	GridVisualizer: () => <></>,
 	GridItemResizer: () => <></>,
 	GridItemMovers: () => <></>,
+	GridItemHandles: ( { children }: { children: ReactNode } ) => (
+		<>{ children }</>
+	),
+	GridItemDragHandle: () => <></>,
+	GridItemDeleteHandle: () => <></>,
 	GridItemRotator: () => <div data-testid="grid-item-rotator" />,
 } ) );
 

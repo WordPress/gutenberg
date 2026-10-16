@@ -3,6 +3,8 @@ export { GridItemResizer } from './grid-item-resizer';
 export { GridItemMovers } from './grid-item-movers';
 export { GridItemRotator } from './grid-item-rotator';
 export { GridItemDragHandle } from './grid-item-drag-handle';
+export { GridItemDeleteHandle } from './grid-item-delete-handle';
+export { GridItemHandles } from './grid-item-handles';
 export { GridRowResizer } from './grid-row-resizer';
 export { useGridLayoutSync } from './use-grid-layout-sync';
 export { useUpdateGridChildLayout } from './use-update-grid-child-layout';

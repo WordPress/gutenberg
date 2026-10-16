@@ -12,6 +12,8 @@ import {
 	GridItemMovers,
 	GridItemRotator,
 	GridItemDragHandle,
+	GridItemDeleteHandle,
+	GridItemHandles,
 	useUpdateGridChildLayout,
 	isGridStackedOnMobile,
 	getStackedLayouts,
@@ -452,6 +454,7 @@ function GridTools( {
 		parentStyle,
 		blockEditingMode,
 		canMove,
+		canRemove,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -462,6 +465,7 @@ function GridTools( {
 				getSettings,
 				getSelectedBlockStyleState,
 				canMoveBlock,
+				canRemoveBlock,
 			} = unlock( select( blockEditorStore ) );
 			const _rootClientId = getBlockRootClientId( clientId );
 
@@ -497,6 +501,7 @@ function GridTools( {
 				parentStyle: parentAttributes?.style,
 				blockEditingMode: getBlockEditingMode( clientId ),
 				canMove: canMoveBlock( clientId ),
+				canRemove: canRemoveBlock( clientId ),
 			};
 		},
 		[ clientId ]
@@ -626,6 +631,8 @@ function GridTools( {
 	// moved gets a handle that drags it the way a body drag does.
 	const showDragHandle =
 		isManualGrid && ! isBlockItselfCurrentlyHidden && canMove;
+	const showDeleteHandle =
+		isManualGrid && ! isBlockItselfCurrentlyHidden && canRemove;
 
 	function updateLayout( layout ) {
 		updateGridChildLayout( clientId, layout );
@@ -657,20 +664,29 @@ function GridTools( {
 					angle={ previewRotate ?? rotate }
 				/>
 			) }
-			{ showRotator && (
-				<GridItemRotator
+			{ ( showDragHandle || showRotator || showDeleteHandle ) && (
+				<GridItemHandles
 					clientId={ clientId }
-					angle={ rotate }
-					onPreview={ setPreviewRotate }
-					onChange={ updateRotate }
-				/>
-			) }
-			{ showDragHandle && (
-				<GridItemDragHandle
-					clientId={ clientId }
-					gridClientId={ rootClientId }
 					angle={ previewRotate ?? rotate }
-				/>
+				>
+					{ showDragHandle && (
+						<GridItemDragHandle
+							clientId={ clientId }
+							gridClientId={ rootClientId }
+						/>
+					) }
+					{ showRotator && (
+						<GridItemRotator
+							clientId={ clientId }
+							angle={ rotate }
+							onPreview={ setPreviewRotate }
+							onChange={ updateRotate }
+						/>
+					) }
+					{ showDeleteHandle && (
+						<GridItemDeleteHandle clientId={ clientId } />
+					) }
+				</GridItemHandles>
 			) }
 			{ isManualGrid && (
 				<GridItemMovers
