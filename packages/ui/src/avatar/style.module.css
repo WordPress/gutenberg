@@ -122,18 +122,28 @@
 
 		@media not (forced-colors: active) {
 			@supports (color: rgb(from green r g b / 1)) and (color: color(from green srgb-linear round(up, r) g b / 1)) {
-				.has-color > .fallback {
+				.has-color {
 					/* Use an opaque sRGB fill so contrast does not depend on the surrounding surface. */
 					--_wp-ui-avatar-background: rgb(from var(--_wp-ui-avatar-color) clamp(0, r, 255) clamp(0, g, 255) clamp(0, b, 255) / 1);
+				}
+
+				.has-color > .fallback {
 					--_wp-ui-avatar-contrast-target: 4.55;
 
 					background-color: var(--_wp-ui-avatar-background);
 				}
 
+				.has-color:has(> .fallback)::after,
 				.has-color > .fallback > .person-icon {
 					--_wp-ui-avatar-contrast-target: 3.05;
 				}
 
+				.has-color:has(> .fallback)::after {
+					/* Join the cropped person strokes to the ring; loaded images keep the supplied ring color. */
+					border-color: currentColor;
+				}
+
+				.has-color:has(> .fallback)::after,
 				.has-color > .fallback,
 				.has-color > .fallback > .person-icon {
 					/* These channel expressions resolve inside the relative color below. */
@@ -142,7 +152,7 @@
 					--_wp-ui-avatar-light-foreground: round(up, clamp(0, calc(0.1791287847 - var(--_wp-ui-avatar-luminance)), 1));
 					/*
 					 * Solve the WCAG ratio for the maximum mix toward the background.
-					 * Targets include a small rounding margin above 4.5:1 for text and 3:1 for the person icon.
+					 * Targets include a small rounding margin above 4.5:1 for text and 3:1 for the person icon and fallback ring.
 					 * Denominator floors avoid division by zero for black and white.
 					 */
 					--_wp-ui-avatar-dark-tint: clamp(0, calc(((var(--_wp-ui-avatar-luminance) + 0.05) / var(--_wp-ui-avatar-contrast-target) - 0.05) / max(0.000001, var(--_wp-ui-avatar-luminance))), 1);
