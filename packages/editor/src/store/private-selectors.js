@@ -21,7 +21,6 @@ import {
 	getCurrentPostRevisionsCount,
 } from './selectors';
 import {
-	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
@@ -170,10 +169,6 @@ export const getPostIcon = createRegistrySelector(
 	}
 );
 
-export function getEntityActions( state, ...args ) {
-	return _getEntityActions( state.dataviews, ...args );
-}
-
 export function isEntityReady( state, ...args ) {
 	return _isEntityReady( state.dataviews, ...args );
 }
@@ -183,7 +178,7 @@ export function getEntityFields( state, ...args ) {
 }
 
 /**
- * Similar to getBlocksByName in @wordpress/block-editor, but only returns the top-most
+ * Similar to getBlocksByName in `@wordpress/block-editor`, but only returns the top-most
  * blocks that aren't descendants of the query block.
  *
  * @param {Object}       state      Global application state.
@@ -321,6 +316,31 @@ export const getCanvasWidth = createRegistrySelector(
 		return state.canvasWidth;
 	}
 );
+
+/**
+ * Get the calculated canvas height published by the visual editor.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|undefined} Canvas height in pixels, or undefined when unconstrained or zoomed out.
+ */
+export const getCanvasHeight = createRegistrySelector(
+	( select ) => ( state ) => {
+		if ( unlock( select( blockEditorStore ) ).isZoomOut() ) {
+			return undefined;
+		}
+		return state.canvasHeight;
+	}
+);
+
+/**
+ * Get the measured canvas width, independently of the requested width.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|undefined} Rendered canvas width in pixels.
+ */
+export function getPhysicalCanvasWidth( state ) {
+	return state.physicalCanvasWidth;
+}
 
 /**
  * Returns the current revisions page number.

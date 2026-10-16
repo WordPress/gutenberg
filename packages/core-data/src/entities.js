@@ -6,9 +6,9 @@ import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
-	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	taxonomySyncConfig,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -475,7 +475,7 @@ async function loadTaxonomyEntities() {
 		};
 
 		if ( window.__experimentalEnableRealTimeCollaboration ) {
-			entity.syncConfig = defaultSyncConfig;
+			entity.syncConfig = taxonomySyncConfig;
 		}
 
 		return entity;

@@ -65,7 +65,7 @@ interface VipsResizeOptions {
 }
 
 /**
- * Cached dynamic import promise for @wordpress/vips/worker.
+ * Cached dynamic import promise for `@wordpress/vips/worker`.
  *
  * The module contains ~10MB of inlined WASM code. By using a dynamic import,
  * the WASM is only loaded when vips functions are actually called at image
@@ -83,7 +83,7 @@ let vipsModulePromise:
 let vipsModule: typeof import( '@wordpress/vips/worker' ) | undefined;
 
 /**
- * Lazily loads and caches the @wordpress/vips/worker module.
+ * Lazily loads and caches the `@wordpress/vips/worker` module.
  *
  * @return The vips worker module.
  */
