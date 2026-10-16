@@ -41,6 +41,7 @@
 
 ### Internal
 
+-   Add `parseDirectiveName` to the `privateApis` bundle. It splits a `data-wp-` attribute name into the directive prefix, suffix and unique ID, the same way the runtime does, so `@wordpress/interactivity-router` can recognize `data-wp-html` content when it ignores router regions and `attachTo` targets inside it. It is not a supported public API, and `toVdom()` behaves as before. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 -   Add `afterNextFrame`, `getScope`, and `parseDirectiveValue` to the `privateApis` bundle. `@wordpress/interactivity-router` uses the scheduling and scope seams to publish navigation lifecycle state, while the shared directive-value interpretation keeps the directive runtime, page preparation, and initiator attribution consistent. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
 
 ## 6.56.0 (2026-09-23)
