@@ -93,10 +93,6 @@ _Returns_
 
 Undocumented declaration.
 
-### orderField
-
-Order field for BasePost.
-
 ### Pattern
 
 Undocumented declaration.
