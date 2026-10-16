@@ -14,20 +14,12 @@ export const Input = forwardRef< HTMLInputElement, AutocompleteInputProps >(
 		{ render = DEFAULT_RENDER, ...restProps },
 		ref
 	) {
-		const { onInputFocusChange, onPointerHighlight } =
-			useKeyboardHighlight();
+		const { inputProps } = useKeyboardHighlight();
 		return (
 			<_Autocomplete.Input
 				ref={ ref }
 				render={ render }
-				{ ...mergeProps(
-					{
-						onFocusCapture: () => onInputFocusChange( true ),
-						onBlurCapture: () => onInputFocusChange( false ),
-						onPointerDownCapture: onPointerHighlight,
-					},
-					restProps
-				) }
+				{ ...mergeProps( inputProps, restProps ) }
 			/>
 		);
 	}
