@@ -56,7 +56,7 @@ function useDimensionSizes( presets?: DimensionSizes ): Preset[] {
  * @param {Object}                     props
  * @param {?string}                    props.label          A label for the control.
  * @param {( value: string ) => void } props.onChange       Called when the dimension value changes.
- * @param {string}                     props.value          The current dimension value.
+ * @param {string|number}              props.value          The current dimension value.
  * @param {?string}                    props.placeholder    Placeholder text for the custom-value input.
  * @param {?string}                    props.className      Additional CSS class on the wrapping fieldset.
  * @param {?Object}                    props.dimensionSizes Optional dimension size presets. Falls back to settings from the store.
@@ -178,7 +178,8 @@ export default function DimensionControl( {
 				selectedUnit={ selectedUnit }
 				showTooltip
 				units={ units }
-				value={ value }
+				// PresetInputControl reads a numeric value at runtime.
+				value={ value as string | undefined }
 			/>
 		</fieldset>
 	);

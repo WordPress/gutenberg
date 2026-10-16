@@ -76,7 +76,8 @@ function getCornerValue(
 	}
 
 	// Handle object values (longhand)
-	return values?.[ corner ];
+	// PresetInputControl reads a stored number such as `0` at runtime.
+	return values?.[ corner ] as string | undefined;
 }
 
 /**

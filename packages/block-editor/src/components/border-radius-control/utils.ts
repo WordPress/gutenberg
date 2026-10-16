@@ -144,7 +144,6 @@ export function hasDefinedValues( values?: BorderRadiusValues ): boolean {
 	// An object represents longhand border radius values, if any are set
 	// flag values as being defined.
 	const filteredValues = Object.values( values ).filter( ( value ) => {
-		// @ts-expect-error A stored radius may be the number `0`.
 		return !! value || value === 0;
 	} );
 
@@ -198,9 +197,16 @@ export function convertPresetsToCustomValues(
 	// The keys of corner values are corners.
 	( Object.keys( values ) as BorderRadiusCorner[] ).forEach( ( key ) => {
 		const value = values[ key ];
-		if ( isValuePreset( value, BORDER_RADIUS_PRESET_TYPE ) ) {
+		if (
+			// `isValuePreset` reads a stored number as no preset.
+			isValuePreset(
+				value as string | undefined,
+				BORDER_RADIUS_PRESET_TYPE
+			)
+		) {
 			const customValue = getCustomValueFromPreset(
-				value,
+				// A preset value is a string.
+				value as string,
 				presets,
 				BORDER_RADIUS_PRESET_TYPE
 			);

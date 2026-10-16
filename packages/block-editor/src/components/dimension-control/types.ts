@@ -24,7 +24,7 @@ export interface DimensionControlProps {
 	/**
 	 * The current dimension value.
 	 */
-	value?: string;
+	value?: string | number;
 	/**
 	 * Placeholder text for the custom-value input.
 	 */

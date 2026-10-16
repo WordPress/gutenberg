@@ -23,11 +23,12 @@ export type BorderRadiusConvertedValues = Partial<
 >;
 
 /**
- * Border radius values, either a shorthand value or one per corner. Global
- * styles also pass the shared radius of an inherited value as `all`.
+ * Border radius values, either a shorthand value or one per corner, where a
+ * stored corner may be the number `0`. Global styles also pass the shared
+ * radius of an inherited value as `all`.
  */
 export type BorderRadiusValues =
-	string | ( BorderRadiusCornerValues & { all?: string } );
+	string | ( BorderRadiusConvertedValues & { all?: string } );
 
 /**
  * The selected units of the flat radius and each corner.
@@ -50,9 +51,10 @@ export interface BorderRadiusPresets {
  */
 export interface BorderRadiusControlProps {
 	/**
-	 * Callback to handle onChange.
+	 * Callback to handle onChange. Corners the change leaves alone keep their
+	 * stored values, which may be the number `0`.
 	 */
-	onChange: ( values: BorderRadiusCornerValues ) => void;
+	onChange: ( values: BorderRadiusConvertedValues ) => void;
 	/**
 	 * Border radius values.
 	 */
