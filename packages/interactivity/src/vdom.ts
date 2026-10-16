@@ -10,17 +10,18 @@ const isObject = ( item: unknown ): item is Record< string, unknown > =>
 const invalidCharsRegex = /[^a-z0-9-_]/i;
 
 /**
- * Parses the prefix, optional suffix and unique ID of a directive attribute.
+ * Splits a directive attribute name into its prefix, suffix and unique ID.
  *
  * @param directiveName The full attribute name, starting with `data-wp-`.
- * @return The parsed name, or null when it contains invalid characters.
+ * @return The parsed name, or null when the part after `data-wp-` contains
+ *         unsupported characters or starts with a hyphen.
  */
 export function parseDirectiveName( directiveName: string ): {
-	/** The directive name before its optional suffix and unique ID. */
+	/** The directive name, such as `on` in `data-wp-on--click`. */
 	prefix: string;
-	/** The directive's suffix, or null for a default entry. */
+	/** The suffix after `--`, or null when absent or empty. */
 	suffix: string | null;
-	/** The directive entry's unique ID, or null when absent. */
+	/** The unique ID after `---`, or null when absent or empty. */
 	uniqueId: string | null;
 } | null {
 	const name = directiveName.substring( 8 );

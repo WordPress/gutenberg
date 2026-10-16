@@ -9,12 +9,17 @@ const { parseDirectiveName } = privateApis(
 const directivePrefix = 'data-wp-';
 
 /**
- * Finds the nearest inclusive ancestor whose content belongs to `data-wp-html`.
- * Inside an interactive region, a default HTML entry owns content only when no
- * text, each or router-region entry takes precedence, as in `toVdom()`.
+ * Finds the closest element, starting with `element` itself, whose content is
+ * inert `data-wp-html` content.
+ *
+ * Inside an interactive region, this mirrors `toVdom()`: the element has a
+ * `data-wp-html` entry without a suffix (as parsed by `parseDirectiveName()`;
+ * a unique ID is allowed), and no `data-wp-text`, `data-wp-each` or
+ * `data-wp-router-region` entry with any suffix or unique ID. Keep both in
+ * sync; `test/html-directive-element.jsdom.test.ts` compares them.
  *
  * @param element The element to start from, or null.
- * @return The nearest qualifying element, or null when none exists.
+ * @return The closest such element, or null when there is none.
  */
 export function closestHtmlDirectiveElement(
 	element: Element | null

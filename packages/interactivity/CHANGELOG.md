@@ -17,7 +17,7 @@
 ### Internal
 
 -   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo` and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).
--   Add `parseDirectiveName` to the `privateApis` bundle. It splits a `data-wp-` attribute name into the directive prefix, suffix and unique ID, the same way the runtime does, so `@wordpress/interactivity-router` can recognize `data-wp-html` content when it ignores router regions and `attachTo` targets inside it. It is not a supported public API, and `toVdom()` behaves as before. ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Expose `parseDirectiveName()` through `privateApis()` for the router ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
 
 ## 7.0.0 (2026-10-07)
 

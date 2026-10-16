@@ -33,13 +33,15 @@ const interactiveAttr = `data-wp-interactive`;
 const regionsSelector = `[${ interactiveAttr }][${ regionAttr }], [${ interactiveAttr }] [${ interactiveAttr }][${ regionAttr }]`;
 
 /**
- * Finds router regions outside HTML directive content, in document order.
+ * Finds router regions outside `data-wp-html` content, in document order.
  *
- * Only ancestors are checked: a region can carry a yielding HTML directive
- * itself. Nested router regions remain available for their parent's render.
+ * The check starts at the region's parent, because `data-wp-router-region`
+ * takes precedence over `data-wp-html` on the region itself. Regions nested in
+ * other regions are kept, so `preparePage()` can handle them as part of their
+ * parent's content.
  *
  * @param dom Document whose regions should be discovered.
- * @return Router region elements outside inert HTML content.
+ * @return Router region elements outside `data-wp-html` content.
  */
 const discoverRegions = ( dom: Document ): Element[] =>
 	Array.from( dom.querySelectorAll( regionsSelector ) ).filter(
@@ -221,7 +223,7 @@ const fetchPage = async ( url: string, { html }: { html: string } ) => {
  *
  * This function analyzes the provided DOM document and creates a virtual DOM
  * representation of regions marked with a `router-region` directive outside
- * HTML directive content.
+ * `data-wp-html` content.
  * It also extracts and preloads associated styles and scripts to prepare for
  * rendering the page.
  *
@@ -285,10 +287,12 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 };
 
 /**
- * Finds the first attachment target outside HTML directive elements and content.
+ * Finds the first element matching `selector` in the live document that
+ * neither has inert `data-wp-html` content nor sits inside it.
  *
  * @param selector CSS selector resolved against the live document.
- * @return First usable element, or null for no match or an invalid selector.
+ * @return The first usable element, or null if none exists or the selector
+ *         is invalid.
  */
 const resolveAttachTarget = ( selector: string ): Element | null => {
 	try {
@@ -314,8 +318,9 @@ const resolveAttachTarget = ( selector: string ): Element | null => {
 const renderPage = ( page: Page ) => {
 	applyStyles( page.styles );
 
-	// Render-local content, retaining prototype-free region ids and excluding
-	// attachments without a usable target.
+	// Keep skipped attachments out of this render without changing the cache.
+	// A null prototype prevents deleted ids such as `constructor` from resolving
+	// to inherited properties when attachment fragments look them up later.
 	const regions: Page[ 'regions' ] = Object.assign(
 		Object.create( null ),
 		page.regions

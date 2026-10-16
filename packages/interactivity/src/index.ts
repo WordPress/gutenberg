@@ -52,12 +52,6 @@ export { useState, useRef } from 'preact/hooks';
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 
-/**
- * Grants internal consumers access to runtime and renderer utilities.
- *
- * @param lock Acknowledgement of the private API compatibility contract.
- * @return Internal APIs for directive parsing, hydration and rendering.
- */
 export const privateApis = (
 	lock: 'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 ) => {

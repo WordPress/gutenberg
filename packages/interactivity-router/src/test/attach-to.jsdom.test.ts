@@ -241,7 +241,8 @@ describe( 'attachment targets', () => {
 			expect(
 				document.querySelectorAll( '[data-overlay]' )
 			).toHaveLength( 0 );
-			// A direct navigation supplies the absent-attempt control.
+			// Control: a region attached on its first attempt, to compare with
+			// the retried attachment below.
 			await actions.navigate( pageUrl( 'control' ), {
 				...quiet,
 				html: pageHtml(

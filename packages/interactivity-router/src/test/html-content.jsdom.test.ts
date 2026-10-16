@@ -86,7 +86,8 @@ describe( 'router regions in HTML directive content', () => {
 				const current = hydrateHtml( regionHtml( '<p>A</p>' ) );
 				// A missing region unmounts its root, not just its children.
 				const container = current.parentElement!;
-				// A common parent exercises the nested-region undefined sentinel.
+				// Inside a parent region, an unfiltered copy would be recorded as a
+				// nested region (`undefined`) and keep the current content.
 				const wrap = ( content: string ) =>
 					nested
 						? `<div data-wp-interactive="${ namespace }" data-wp-router-region="${ namespace }/s">${ content }</div>`

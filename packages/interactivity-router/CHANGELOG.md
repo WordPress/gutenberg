@@ -8,7 +8,8 @@
 
 ### Bug Fixes
 
--   Ignore `data-wp-router-region` elements inside `data-wp-html` content during client-side navigation, on the initial page and on every fetched, prefetched, or history-restored page, and never use an element inside `data-wp-html` content, or a `data-wp-html` element itself, as an `attachTo` target: a region's `attachTo` now resolves to the first matching element outside `data-wp-html` content. A region whose `attachTo` has no usable target (no match, only unusable matches, or an invalid selector) is now skipped while the rest of the navigation completes; previously, a selector that matched nothing threw and stopped the render. ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Ignore router regions and `attachTo` targets inside `data-wp-html` content ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+-   Fix navigation breaking when an `attachTo` selector matches nothing or is invalid ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
 
 ## 2.57.0 (2026-10-07)
 
