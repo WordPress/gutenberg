@@ -11,13 +11,14 @@ import { useDispatch } from '@wordpress/data';
 import { Text } from '@wordpress/ui';
 import { store as blockEditorStore } from '../../store';
 import BlockManager from '../block-manager';
+import type { BlockAllowedBlocksModalProps } from './types';
 
 export default function BlockAllowedBlocksModal( {
 	clientId,
 	blockTypes,
 	selectedBlockTypes,
 	onClose,
-} ) {
+}: BlockAllowedBlocksModalProps ) {
 	const [ currentSelectedBlockTypes, setCurrentSelectedBlockTypes ] =
 		useState( selectedBlockTypes );
 
