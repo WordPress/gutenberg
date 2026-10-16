@@ -8829,11 +8829,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/utils/test/polymorphic-element.jsdom.test.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/compose/src/hooks/use-dialog/index.ts": {
 		"react-hooks/immutability": {
 			"count": 1
