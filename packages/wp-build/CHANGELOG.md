@@ -14,6 +14,7 @@
 ### Bug Fixes
 
 -   Check that `SCRIPT_DEBUG` is defined before reading it in the generated `build/scripts.php` and `build/styles.php`, like the other generated files, so they no longer throw an `Error` when loaded without WordPress defining the constant ([#83633](https://github.com/WordPress/gutenberg/pull/83633)).
+-   Add `generate_animated_image_subsizes` to the page template `/?_fields=` preload path, keeping it in sync with the `_fields` list in `@wordpress/core-data` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 
 ### Internal
 
