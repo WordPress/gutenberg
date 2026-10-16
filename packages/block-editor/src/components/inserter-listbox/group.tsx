@@ -1,8 +1,12 @@
 import { forwardRef, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
+import type { ComponentPropsWithoutRef, ForwardedRef } from 'react';
 
-function InserterListboxGroup( props, ref ) {
+function InserterListboxGroup(
+	props: ComponentPropsWithoutRef< 'div' >,
+	ref: ForwardedRef< HTMLDivElement >
+) {
 	const [ shouldSpeak, setShouldSpeak ] = useState( false );
 
 	useEffect( () => {
