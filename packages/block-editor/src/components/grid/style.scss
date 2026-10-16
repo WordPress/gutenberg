@@ -37,10 +37,12 @@
 	// with a dark edge beside a light one, so that it stands out on any
 	// background, whatever the blocks under it look like. An empty cell is
 	// also drawn on its own while it is hovered or focused, or its inserter is
-	// open, to show the cell that a click inserts a block into.
+	// open, to show the cell that a click inserts a block into. Hovering only
+	// counts once the pointer has moved since the last drag (see
+	// `isHoverPending` in grid-visualizer.jsx).
 	.block-editor-grid-visualizer.is-dropping-allowed &.has-contrasting-lines::before,
 	.block-editor-grid-visualizer__grid:has(> .block-editor-grid-visualizer__marquee) > &.has-contrasting-lines::before,
-	&.has-contrasting-lines:hover::before,
+	.block-editor-grid-visualizer__grid:not(.is-hover-pending) > &.has-contrasting-lines:hover::before,
 	&.has-contrasting-lines:has(.block-editor-grid-visualizer__appender:focus, .block-editor-grid-visualizer__appender[aria-expanded="true"])::before {
 		content: "";
 		position: absolute;
@@ -79,7 +81,8 @@
 
 	}
 
-	&:hover .block-editor-grid-visualizer__appender,
+	// See `isHoverPending` in grid-visualizer.jsx.
+	.block-editor-grid-visualizer__grid:not(.is-hover-pending) > &:hover .block-editor-grid-visualizer__appender,
 	.block-editor-grid-visualizer__appender:focus {
 		opacity: 1;
 		background-color: color-mix(in srgb, currentColor  20%, #0000);
