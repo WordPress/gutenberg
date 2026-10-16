@@ -2,11 +2,11 @@ import { __ } from '@wordpress/i18n';
 import { ATTACHMENT_POST_TYPE } from '../constants';
 
 const AUTO_SAVE_FAILURE_NOTICE = __(
-	'Auto-save failed. Keep this page open and save manually.'
+	'Auto-save failed. You can also save manually.'
 );
 
 const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
-	'Auto-save failed because you were offline. Keep this page open and save manually once you’re back online.'
+	'Auto-save failed because you were offline. You can also save manually once you’re back online.'
 );
 
 /**

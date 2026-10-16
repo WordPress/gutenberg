@@ -153,7 +153,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			'',
 			[ 'publish', 'publish' ],
 			[
-				'Auto-save failed. Keep this page open and save manually.',
+				'Auto-save failed. You can also save manually.',
 				{ id: 'editor-autosave' },
 			],
 			{ isAutosave: true },
