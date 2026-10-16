@@ -373,6 +373,9 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect( rows ).toHaveCount( 4 );
 			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
 			await expectDialogAnchoredTo( rows.nth( 1 ) );
+			// The new item is selected, so the row shows which item the
+			// popover edits.
+			await expect( rows.nth( 1 ) ).toHaveClass( /\bis-selected\b/ );
 		} );
 
 		await test.step( 'removes the empty item when the popover closes', async () => {
@@ -380,6 +383,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 
 			await expect( linkDialog ).toBeHidden();
 			await expect( rows ).toHaveCount( 3 );
+			await expect( listView.locator( '.is-selected' ) ).toHaveCount( 0 );
 		} );
 
 		await test.step( 'adds before the second item', async () => {
@@ -392,6 +396,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect( rows ).toHaveCount( 4 );
 			await expect( linkControl.getLinkControlSearch() ).toBeFocused();
 			await expectDialogAnchoredTo( rows.nth( 1 ) );
+			await expect( rows.nth( 1 ) ).toHaveClass( /\bis-selected\b/ );
 
 			await linkControl.useLinkControlSearch( 'Test Page 1' );
 
@@ -399,6 +404,8 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect( rows.nth( 0 ) ).toContainText( 'First Item' );
 			await expect( rows.nth( 1 ) ).toContainText( 'Test Page 1' );
 			await expect( rows.nth( 2 ) ).toContainText( 'Second Item' );
+			// The item stays selected once its link is set.
+			await expect( rows.nth( 1 ) ).toHaveClass( /\bis-selected\b/ );
 		} );
 	} );
 } );
@@ -427,6 +434,17 @@ async function expectLinkPopoverPlacement( page, row, isPlaced ) {
 			isPlaced( await popover.boundingBox(), await row.boundingBox() )
 		)
 		.toBe( true );
+
+	// The link control's own spacing stays inside the popover: a popover
+	// content box without a scroll container lets that margin collapse out
+	// of it, and the search field then touches the popover's top edge.
+	const dialogBox = await page
+		.getByRole( 'dialog', { name: 'Add link' } )
+		.boundingBox();
+	const contentBox = await popover
+		.locator( '.components-popover__content' )
+		.boundingBox();
+	expect( dialogBox.y - contentBox.y ).toBeGreaterThanOrEqual( 8 );
 }
 
 /**

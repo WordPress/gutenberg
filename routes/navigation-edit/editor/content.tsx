@@ -5,14 +5,14 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useContext, useMemo, useRef } from '@wordpress/element';
+import { useContext, useEffect, useMemo, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 import { MenuInsertedBlockContext } from './menu-inserted-block-context';
 
-const { PrivateListView } = unlock( blockEditorPrivateApis );
+const { PrivateListView, useBlockElement } = unlock( blockEditorPrivateApis );
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.jsx.
 const MAX_PAGE_COUNT = 100;
@@ -32,12 +32,14 @@ const PAGES_QUERY = [
 
 // An item added from an item's options menu opens its link popover the way
 // the item settings popover opens: beside the row, top edges aligned. Same
-// props as the List View content popover. An item added from the appender
-// keeps the default placement, under the row, since the appender spawned it.
+// placement as the List View content popover, but the popover keeps its
+// scroll container (`resize`): without it the link control's own top margin
+// collapses out of the popover's content box. An item added from the
+// appender keeps the default placement, under the row, since the appender
+// spawned it.
 const LINK_POPOVER_PROPS = {
 	placement: 'left-start',
 	offset: 35,
-	resize: false,
 } as const;
 
 function ListViewLinkUI( props: {
@@ -57,6 +59,18 @@ function ListViewLinkUI( props: {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const { isMarked } = useContext( MenuInsertedBlockContext );
 	const isFromMenu = isMarked( props.insertedBlockClientId );
+
+	// Select the item added from the menu, so its row shows which item the
+	// popover edits. Only once its block has mounted in the hidden canvas: a
+	// Navigation Link that mounts already selected opens its own link popover
+	// and selects its parent instead.
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const blockElement = useBlockElement( props.insertedBlockClientId );
+	useEffect( () => {
+		if ( isFromMenu && blockElement ) {
+			selectBlock( props.insertedBlockClientId );
+		}
+	}, [ isFromMenu, blockElement, props.insertedBlockClientId, selectBlock ] );
 
 	return (
 		<NavigationLinkUI
