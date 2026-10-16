@@ -379,11 +379,11 @@ The element shows what its reference resolves to, calling it first when it is a 
 
 -   A value returned by `asDangerousHTML()` renders its HTML.
 -   A pending value, which is server-computed derived state that the client hasn't defined yet, keeps the current content. This is how the server-rendered fallback stays visible while a store loads.
--   The object `{ "wpServerHtml": true }`, the stand-in for an `asDangerousHTML()` value in the page's data, keeps the current content the same way. It does so wherever the value comes from: `state`, `context`, or a [`data-wp-each`](#wp-each) item. It never renders anything itself. It has to be a plain object whose `wpServerHtml` property is `true`; the other properties it carries, markup included, are ignored and never rendered. An object that isn't plain, such as one with a `constructor` property of its own, isn't recognized and falls under the last rule below. When an `asDangerousHTML()` value replaces it, the element keeps its nodes if their HTML already equals the token's HTML exactly, and otherwise renders the token's HTML.
+-   The object `{ "wpServerHtml": true }`, which stands for an `asDangerousHTML()` value in the page's data, keeps the current content the same way, whether it comes from `state`, `context` or a [`data-wp-each`](#wp-each) item. It never renders anything itself: other properties it carries are ignored.
 -   `null` and `undefined` empty the element. So do a path that doesn't exist and a getter or function that throws.
--   Anything else, plain strings and other objects (`{}` included) among them, empties the element, and a warning is shown in development mode.
+-   Anything else, including plain strings and other objects, empties the element, and a warning is shown in development mode.
 
-To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page.
+To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. Known limitation: when that value is `{ "wpServerHtml": true }`, the element keeps the content it had before navigating instead of the new page's server-rendered content.
 
 #### Inert content
 
