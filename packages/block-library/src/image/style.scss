@@ -301,7 +301,10 @@
 		top: 50%;
 		left: 50%;
 		transform-origin: top left;
-		transform: translate(-50%, -50%);
+		// `--wp--lightbox-drag-offset` is set on this element by `view.js` while
+		// a swipe is in progress, and the slide and fade that follow a swipe are
+		// scripted animations rather than rules here.
+		transform: translate(calc(-50% + var(--wp--lightbox-drag-offset, 0px)), -50%);
 		width: var(--wp--lightbox-container-width);
 		height: var(--wp--lightbox-container-height);
 		z-index: 2000001;

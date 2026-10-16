@@ -28,7 +28,9 @@ export function replace(
 		| ( ( match: string, ...rest: unknown[] ) => string | RichTextContent )
 ) {
 	text = text.replace( pattern, ( match, ...rest ) => {
-		const offset = rest[ rest.length - 2 ];
+		// A pattern with named groups passes the `groups` object last.
+		const hasGroups = typeof rest[ rest.length - 1 ] === 'object';
+		const offset: number = rest[ rest.length - ( hasGroups ? 3 : 2 ) ];
 		let newText = replacement;
 		let newFormats;
 		let newReplacements;
@@ -60,7 +62,7 @@ export function replace(
 				replacements.slice( offset + match.length )
 			);
 
-		if ( start ) {
+		if ( start !== undefined ) {
 			start = end = offset + newText.length;
 		}
 

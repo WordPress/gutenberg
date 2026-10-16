@@ -223,14 +223,9 @@ describe( 'ColorPicker', () => {
 			await user.click( formatSelector );
 			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
-			const hueSliders = screen.getAllByRole( 'slider', {
-				name: 'Hue',
+			const hueSlider = screen.getByRole( 'slider', {
+				name: 'Hue (HSL H value)',
 			} );
-			expect( hueSliders ).toHaveLength( 2 );
-
-			// Reason for the `!` post-fix expression operator: if the check above
-			// doesn't fail, we're guaranteed that `hueSlider` is not undefined.
-			const hueSlider = hueSliders.at( -1 )!;
 			const saturationSlider = screen.getByRole( 'slider', {
 				name: 'Saturation',
 			} );
@@ -238,7 +233,7 @@ describe( 'ColorPicker', () => {
 				name: 'Lightness',
 			} );
 			const hueNumberInput = screen.getByRole( 'spinbutton', {
-				name: 'Hue',
+				name: 'Hue (HSL H value)',
 			} );
 			const saturationNumberInput = screen.getByRole( 'spinbutton', {
 				name: 'Saturation',
@@ -366,7 +361,9 @@ describe( 'ColorPicker', () => {
 			);
 			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
-			const hueSliders = screen.getAllByRole( 'slider', { name: 'Hue' } );
+			const hueSliders = screen.getAllByRole( 'slider', {
+				name: 'Hue (HSL H value)',
+			} );
 			const hueSlider = hueSliders.at( -1 )!;
 			const saturationSlider = screen.getByRole( 'slider', {
 				name: 'Saturation',
@@ -375,7 +372,7 @@ describe( 'ColorPicker', () => {
 				name: 'Lightness',
 			} );
 			const hueNumberInput = screen.getByRole( 'spinbutton', {
-				name: 'Hue',
+				name: 'Hue (HSL H value)',
 			} );
 			const saturationNumberInput = screen.getByRole( 'spinbutton', {
 				name: 'Saturation',
@@ -423,7 +420,7 @@ describe( 'ColorPicker', () => {
 				);
 
 				const hueSlider = screen
-					.getAllByRole( 'slider', { name: 'Hue' } )
+					.getAllByRole( 'slider', { name: 'Hue (HSL H value)' } )
 					.at( -1 )!;
 				const saturationSlider = screen.getByRole( 'slider', {
 					name: 'Saturation',
@@ -494,7 +491,7 @@ describe( 'ColorPicker', () => {
 			onChange.mockClear();
 
 			const hueSlider = screen
-				.getAllByRole( 'slider', { name: 'Hue' } )
+				.getAllByRole( 'slider', { name: 'Hue (HSL H value)' } )
 				.at( -1 )!;
 			await userEvent.fill( hueSlider, '90' );
 			expect( onChange ).not.toHaveBeenCalled();
@@ -558,13 +555,15 @@ describe( 'ColorPicker', () => {
 			);
 			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
-			const hueSliders = screen.getAllByRole( 'slider', { name: 'Hue' } );
+			const hueSliders = screen.getAllByRole( 'slider', {
+				name: 'Hue (HSL H value)',
+			} );
 			const hueSlider = hueSliders.at( -1 )!;
 			const saturationSlider = screen.getByRole( 'slider', {
 				name: 'Saturation',
 			} );
 			const hueNumberInput = screen.getByRole( 'spinbutton', {
-				name: 'Hue',
+				name: 'Hue (HSL H value)',
 			} );
 
 			// Set a specific hue first
@@ -594,7 +593,7 @@ describe( 'ColorPicker', () => {
 			expect( hueNumberInput ).toHaveValue( 200 );
 		} );
 		describe.each( [
-			[ 'hue', 'Hue', '#aad52a' ],
+			[ 'hue', 'Hue (HSL H value)', '#aad52a' ],
 			[ 'saturation', 'Saturation', '#20dfdf' ],
 			[ 'lightness', 'Lightness', '#95eaea' ],
 		] )( 'HSL inputs', ( colorInput, inputLabel, expected ) => {
@@ -779,7 +778,7 @@ describe( 'ColorPicker', () => {
 			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 
 			const hueSlider = screen
-				.getAllByRole( 'slider', { name: 'Hue' } )
+				.getAllByRole( 'slider', { name: 'Hue (HSL H value)' } )
 				.at( -1 )!;
 			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
@@ -864,7 +863,7 @@ describe( 'ColorPicker', () => {
 			expectPointerPosition( pointer, { top: 100 } );
 
 			const hueSlider = screen
-				.getAllByRole( 'slider', { name: 'Hue' } )
+				.getAllByRole( 'slider', { name: 'Hue (HSL H value)' } )
 				.at( -1 )!;
 			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
@@ -905,7 +904,7 @@ describe( 'ColorPicker', () => {
 			expectPointerPosition( pointer, { top: 0, left: 0 } );
 
 			const hueSlider = screen
-				.getAllByRole( 'slider', { name: 'Hue' } )
+				.getAllByRole( 'slider', { name: 'Hue (HSL H value)' } )
 				.at( -1 )!;
 			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
@@ -935,7 +934,7 @@ describe( 'ColorPicker', () => {
 			await userEvent.fill( lightnessSlider, '100' );
 
 			const hueSlider = screen
-				.getAllByRole( 'slider', { name: 'Hue' } )
+				.getAllByRole( 'slider', { name: 'Hue (HSL H value)' } )
 				.at( -1 )!;
 			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
@@ -966,7 +965,7 @@ describe( 'ColorPicker', () => {
 			);
 			await user.click( screen.getByRole( 'option', { name: 'HSL' } ) );
 			const hueSlider = screen
-				.getAllByRole( 'slider', { name: 'Hue' } )
+				.getAllByRole( 'slider', { name: 'Hue (HSL H value)' } )
 				.at( -1 )!;
 			await userEvent.fill( hueSlider, '200' );
 			await waitFor( () => expect( hueSlider ).toHaveValue( '200' ) );
@@ -1046,18 +1045,13 @@ describe( 'ColorPicker', () => {
 			);
 
 			const alphaInput = screen.getByRole( 'spinbutton', {
-				name: 'Alpha',
+				name: `Alpha (${ formatLabel } A value)`,
 			} );
 			expect( alphaInput ).toBeVisible();
 
-			const alphaSliders = screen.getAllByRole( 'slider', {
-				name: 'Alpha',
+			const alphaSlider = screen.getByRole( 'slider', {
+				name: `Alpha (${ formatLabel } A value)`,
 			} );
-
-			expect( alphaSliders ).toHaveLength( 2 );
-
-			// Choose the second slider which is the actual slider of type: input[type="range"]
-			const alphaSlider = alphaSliders.at( -1 )!;
 
 			expect( alphaSlider ).toHaveValue( '50' );
 			expect( alphaInput ).toHaveValue( 50 );

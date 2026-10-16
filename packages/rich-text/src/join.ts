@@ -15,7 +15,7 @@ import type { RichTextContent, RichTextValue } from './types';
 export function join(
 	values: RichTextContent[],
 	separator: string | RichTextContent = ''
-) {
+): RichTextValue {
 	if ( typeof separator === 'string' ) {
 		separator = create( { text: separator } );
 	}
@@ -29,5 +29,5 @@ export function join(
 			),
 			text: accumulator.text + separator.text + text,
 		} ) )
-	) as RichTextValue;
+	);
 }

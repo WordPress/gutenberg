@@ -284,6 +284,32 @@ export const savePost =
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
+		const isManualSaveFailureShown = registry
+			.select( noticesStore )
+			.getNotices()
+			.some(
+				( notice ) =>
+					notice.id === 'editor-save' && notice.status === 'error'
+			);
+
+		// An earlier autosave failure is resolved by a successful autosave, and
+		// replaced by the outcome of a manual save.
+		if ( ! error || ! options.isAutosave ) {
+			registry.dispatch( noticesStore ).removeNotice( 'editor-autosave' );
+		}
+
+		// An autosave of a draft saves the post itself, so it can leave nothing
+		// to save manually.
+		// TODO: Should a manual save stay possible, so it creates a revision?
+		if (
+			! error &&
+			options.isAutosave &&
+			isManualSaveFailureShown &&
+			! select.isEditedPostDirty()
+		) {
+			registry.dispatch( noticesStore ).removeNotice( 'editor-save' );
+		}
+
 		// Attach any images in the post that aren't attached to a post yet. Not
 		// awaited: it shouldn't hold up the editor showing "Saved", and it
 		// handles its own errors.
@@ -313,7 +339,12 @@ export const savePost =
 				error,
 				options,
 			} );
-			if ( args.length ) {
+			// A failed manual save is the notice to act on, so a failed autosave
+			// doesn't add a second one next to it.
+			if (
+				args.length &&
+				! ( options.isAutosave && isManualSaveFailureShown )
+			) {
 				const [ noticeMessage ] = args;
 				if (
 					error.message &&

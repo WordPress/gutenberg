@@ -111,7 +111,7 @@ function useRichTextBase( {
 			formats: parsed.formats,
 			replacements: parsed.replacements,
 			activeFormats,
-		} as RichTextRecord;
+		};
 		if ( disableFormats ) {
 			recordRef.current.formats = Array( value.length );
 			recordRef.current.replacements = Array( value.length );
@@ -121,8 +121,8 @@ function useRichTextBase( {
 				recordRef.current
 			);
 		}
-		recordRef.current.start = selectionStart!;
-		recordRef.current.end = selectionEnd!;
+		recordRef.current.start = selectionStart;
+		recordRef.current.end = selectionEnd;
 	}
 
 	if ( ! recordRef.current ) {
@@ -133,8 +133,8 @@ function useRichTextBase( {
 	) {
 		recordRef.current = {
 			...recordRef.current,
-			start: selectionStart!,
-			end: selectionEnd!,
+			start: selectionStart,
+			end: selectionEnd,
 			activeFormats: undefined,
 		};
 	}
