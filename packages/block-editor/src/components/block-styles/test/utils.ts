@@ -18,21 +18,24 @@ describe( 'getActiveStyle', () => {
 		const styles = [ { name: 'small' }, { name: 'big', isDefault: true } ];
 		const className = 'custom-className';
 
-		expect( getActiveStyle( styles, className ).name ).toBe( 'big' );
+		// A style matches the class name, or is the default.
+		expect( getActiveStyle( styles, className )!.name ).toBe( 'big' );
 	} );
 
 	it( 'Should return the active style', () => {
 		const styles = [ { name: 'small' }, { name: 'big', isDefault: true } ];
 		const className = 'this-is-custom is-style-small';
 
-		expect( getActiveStyle( styles, className ).name ).toBe( 'small' );
+		// A style matches the class name, or is the default.
+		expect( getActiveStyle( styles, className )!.name ).toBe( 'small' );
 	} );
 
 	it( 'Should return the first active style', () => {
 		const styles = [ { name: 'small' }, { name: 'big', isDefault: true } ];
 		const className = 'this-is-custom is-style-small is-style-big';
 
-		expect( getActiveStyle( styles, className ).name ).toBe( 'small' );
+		// A style matches the class name, or is the default.
+		expect( getActiveStyle( styles, className )!.name ).toBe( 'small' );
 	} );
 } );
 
