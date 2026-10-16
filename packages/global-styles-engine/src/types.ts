@@ -179,12 +179,27 @@ export interface LayoutSettings {
 }
 
 /**
+ * Size preset definition, such as a spacing or border radius size
+ */
+export interface SizePreset extends BasePreset {
+	size: string;
+}
+
+/**
  * Spacing settings
  */
 export interface SpacingSettings {
 	padding?: string | Record< string, string >;
 	margin?: string | Record< string, string >;
 	blockGap?: string;
+	spacingSizes?: SizePreset[] | Record< string, SizePreset[] >;
+}
+
+/**
+ * Border settings
+ */
+export interface BorderSettings {
+	radiusSizes?: SizePreset[] | Record< string, SizePreset[] >;
 }
 
 // =============================================================================
@@ -203,6 +218,7 @@ export interface GlobalStylesSettings {
 	typography?: TypographySettings;
 	layout?: LayoutSettings;
 	spacing?: SpacingSettings;
+	border?: BorderSettings;
 	color?: {
 		palette?:
 			| Color[]
