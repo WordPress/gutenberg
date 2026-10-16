@@ -3,8 +3,9 @@ import { MenuItem } from '@wordpress/components';
 import { rawHandler, getBlockContent } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import type { BlockHTMLConvertButtonProps } from './types';
 
-function BlockHTMLConvertButton( { clientId } ) {
+function BlockHTMLConvertButton( { clientId }: BlockHTMLConvertButtonProps ) {
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]

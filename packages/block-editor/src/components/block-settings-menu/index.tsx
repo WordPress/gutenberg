@@ -1,8 +1,12 @@
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 import BlockSettingsDropdown from './block-settings-dropdown';
 import NoteIconToolbarSlotFill from '../../components/collab/note-icon-toolbar-slot';
+import type { BlockSettingsMenuProps } from './types';
 
-export function BlockSettingsMenu( { clientIds, ...props } ) {
+export function BlockSettingsMenu( {
+	clientIds,
+	...props
+}: BlockSettingsMenuProps ) {
 	return (
 		<ToolbarGroup>
 			<NoteIconToolbarSlotFill.Slot fillProps={ { clientIds } } />
