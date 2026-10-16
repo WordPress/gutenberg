@@ -5,6 +5,8 @@ import {
 } from '@wordpress/components';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import type { ComponentProps } from 'react';
+import type { Block } from '@wordpress/blocks';
 import {
 	useConvertToGroupButtonProps,
 	ConvertToGroupButton,
@@ -14,10 +16,17 @@ import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 import { BlockVisibilityViewportMenuItem } from '../block-visibility';
+import type {
+	BlockSettingsMenuControlsProps,
+	BlockSettingsMenuControlsSlotProps,
+} from './types';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
-const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+const BlockSettingsMenuControlsSlot = ( {
+	fillProps,
+	clientIds = null,
+}: BlockSettingsMenuControlsSlotProps ) => {
 	const {
 		selectedBlocks,
 		selectedClientIds,
@@ -40,9 +49,10 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 				selectedClientIds: ids,
 				isContentOnly:
 					getBlockEditingMode( ids[ 0 ] ) === 'contentOnly',
-				canToggleSelectedBlocksVisibility: getBlocksByClientId(
-					ids
-				).every( ( block ) =>
+				// The selected blocks exist.
+				canToggleSelectedBlocksVisibility: (
+					getBlocksByClientId( ids ) as Block[]
+				 ).every( ( block ) =>
 					hasBlockSupport( block.name, 'visibility', true )
 				),
 				canEdit: canEditBlock( ids[ 0 ] ),
@@ -79,6 +89,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 		>
 			{ ( fills ) => {
 				if (
+					// @ts-expect-error Compares the negated fill count with 0, true without fills.
 					! fills?.length > 0 &&
 					! showConvertToGroupButton &&
 					! showLockButton
@@ -114,7 +125,10 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 							fillProps?.count === 1 &&
 							! isContentOnly && (
 								<BlockModeToggle
-									clientId={ fillProps?.firstBlockClientId }
+									// The menu of a single block passes its client ID.
+									clientId={
+										fillProps?.firstBlockClientId as string
+									}
 									onToggle={ fillProps?.onClose }
 								/>
 							) }
@@ -131,10 +145,15 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
  * @param {Object} props Fill props.
  * @return {Element} Element.
  */
-function BlockSettingsMenuControls( { ...props } ) {
+function BlockSettingsMenuControls( {
+	...props
+}: BlockSettingsMenuControlsProps ) {
 	return (
 		<StyleProvider document={ document }>
-			<Fill { ...props } />
+			<Fill
+				// The slot passes the fill props the children are typed with.
+				{ ...( props as ComponentProps< typeof Fill > ) }
+			/>
 		</StyleProvider>
 	);
 }
