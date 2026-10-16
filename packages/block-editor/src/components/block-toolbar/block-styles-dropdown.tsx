@@ -1,13 +1,14 @@
 import { __ } from '@wordpress/i18n';
 import { DropdownMenu, ToolbarGroup, ToolbarItem } from '@wordpress/components';
 import BlockStylesMenu from '../block-switcher/block-styles-menu';
+import type { BlockStylesDropdownProps } from './types';
 
 export default function BlockStylesDropdown( {
 	clientIds,
 	children,
 	label,
 	text,
-} ) {
+}: BlockStylesDropdownProps ) {
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>

@@ -8,6 +8,7 @@ import {
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { store as preferencesStore } from '@wordpress/preferences';
+import type { SelectFunction } from '@wordpress/data';
 import BlockSwitcher from '../block-switcher';
 import BlockIcon from '../block-icon';
 import BlockStylesDropdown from './block-styles-dropdown';
@@ -16,8 +17,15 @@ import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { store as blockEditorStore } from '../../store';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
+import type { BlockToolbarIconProps, BlockToolbarIconVariant } from './types';
 
-function getBlockIconVariant( { select, clientIds } ) {
+function getBlockIconVariant( {
+	select,
+	clientIds,
+}: {
+	select: SelectFunction;
+	clientIds: string[];
+} ): BlockToolbarIconVariant {
 	if ( ! clientIds.length ) {
 		return 'default';
 	}
@@ -42,7 +50,9 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const isSingleBlock = clientIds.length === 1;
 	const blockName = isSingleBlock && getBlockName( clientIds[ 0 ] );
 	const hasBlockStyles =
-		isSingleBlock && !! getBlockStyles( blockName )?.length;
+		isSingleBlock &&
+		// Only read for a single block, which exists.
+		!! getBlockStyles( blockName as string )?.length;
 	const hasPatternNameInSelection = clientIds.some(
 		( id ) =>
 			!! getBlockAttributes( id )?.metadata?.patternName &&
@@ -89,10 +99,21 @@ function getBlockIconVariant( { select, clientIds } ) {
 	return 'default';
 }
 
-function getBlockIcon( { select, clientIds } ) {
+function getBlockIcon( {
+	select,
+	clientIds,
+}: {
+	select: SelectFunction;
+	clientIds: string[];
+} ) {
 	// Without blocks the icon stands in for the default block, falling back to the generic block icon when no default block type is registered.
 	if ( ! clientIds.length ) {
-		return getBlockType( getDefaultBlockName() )?.icon ?? blockDefault;
+		return (
+			getBlockType(
+				// `getBlockType` returns nothing without a default block.
+				getDefaultBlockName()!
+			)?.icon ?? blockDefault
+		);
 	}
 
 	const { getBlockName, getBlockAttributes, getBlock, isSectionBlock } =
@@ -128,7 +149,10 @@ function getBlockIcon( { select, clientIds } ) {
 	return isSelectionOfSameType ? blockType?.icon : copy;
 }
 
-export default function BlockToolbarIcon( { clientIds, isSynced } ) {
+export default function BlockToolbarIcon( {
+	clientIds,
+	isSynced,
+}: BlockToolbarIconProps ) {
 	const { icon, showIconLabels, variant } = useSelect(
 		( select ) => {
 			return {
@@ -146,16 +170,21 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 		[ clientIds ]
 	);
 
+	// The selected blocks have a title.
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: clientIds?.[ 0 ],
 		maximumLength: 35,
-	} );
+	} ) as string;
 
 	const isSingleBlock = clientIds.length === 1;
 	const showBlockTitle = isSingleBlock && isSynced && ! showIconLabels;
 	let label = isSingleBlock ? blockTitle : __( 'Multiple blocks selected' );
 	if ( ! clientIds.length ) {
-		label = getBlockType( getDefaultBlockName() )?.title ?? __( 'Block' );
+		label =
+			getBlockType(
+				// `getBlockType` returns nothing without a default block.
+				getDefaultBlockName()!
+			)?.title ?? __( 'Block' );
 	}
 	// Used to hide the block icon when the showIconLabels preference is enabled, or to display the template title when it's a template.
 	const text = showBlockTitle && blockTitle ? blockTitle : undefined;

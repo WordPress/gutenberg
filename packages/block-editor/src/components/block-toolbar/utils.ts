@@ -1,6 +1,11 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useRef, useEffect } from '@wordpress/element';
+import type { SyntheticEvent } from 'react';
 import { store as blockEditorStore } from '../../store';
+import type {
+	UseDebouncedShowGesturesOptions,
+	UseShowHoveredOrFocusedGesturesOptions,
+} from './types';
 
 const { clearTimeout, setTimeout } = window;
 const DEBOUNCE_TIMEOUT = 200;
@@ -8,35 +13,38 @@ const DEBOUNCE_TIMEOUT = 200;
 /**
  * Hook that creates debounced callbacks when the node is hovered or focused.
  *
- * @param {Object}  props                       Component props.
- * @param {Object}  props.ref                   Element reference.
- * @param {boolean} props.isFocused             Whether the component has current focus.
- * @param {number}  props.highlightParent       Whether to highlight the parent block. It defaults in highlighting the selected block.
- * @param {number}  [props.debounceTimeout=250] Debounce timeout in milliseconds.
+ * @param props                 Component props.
+ * @param props.ref             Element reference.
+ * @param props.isFocused       Whether the component has current focus.
+ * @param props.highlightParent Whether to highlight the parent block. It defaults in highlighting the selected block.
+ * @param props.debounceTimeout Debounce timeout in milliseconds.
  */
 function useDebouncedShowGestures( {
 	ref,
 	isFocused,
 	highlightParent,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
-} ) {
+}: UseDebouncedShowGesturesOptions ) {
 	const { getSelectedBlockClientId, getBlockRootClientId } =
 		useSelect( blockEditorStore );
 	const { toggleBlockHighlight } = useDispatch( blockEditorStore );
-	const timeoutRef = useRef();
+	const timeoutRef = useRef< ReturnType< typeof setTimeout > >( undefined );
 	const isDistractionFree = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().isDistractionFree,
 		[]
 	);
-	const handleOnChange = ( nextIsFocused ) => {
+	const handleOnChange = ( nextIsFocused: boolean ) => {
 		if ( nextIsFocused && isDistractionFree ) {
 			return;
 		}
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const clientId = highlightParent
-			? getBlockRootClientId( selectedBlockClientId )
-			: selectedBlockClientId;
+		// Without a selected block, nothing is highlighted.
+		const clientId = (
+			highlightParent
+				? getBlockRootClientId( selectedBlockClientId as string )
+				: selectedBlockClientId
+		) as string;
 		toggleBlockHighlight( clientId, nextIsFocused );
 	};
 
@@ -57,7 +65,7 @@ function useDebouncedShowGestures( {
 		}
 	};
 
-	const debouncedShowGestures = ( event ) => {
+	const debouncedShowGestures = ( event?: SyntheticEvent ) => {
 		if ( event ) {
 			event.stopPropagation();
 		}
@@ -66,7 +74,7 @@ function useDebouncedShowGestures( {
 		handleOnChange( true );
 	};
 
-	const debouncedHideGestures = ( event ) => {
+	const debouncedHideGestures = ( event?: SyntheticEvent ) => {
 		if ( event ) {
 			event.stopPropagation();
 		}
@@ -103,16 +111,16 @@ function useDebouncedShowGestures( {
  * Hook that provides gesture events for DOM elements
  * that interact with the isFocused state.
  *
- * @param {Object} props                         Component props.
- * @param {Object} props.ref                     Element reference.
- * @param {number} [props.highlightParent=false] Whether to highlight the parent block. It defaults to highlighting the selected block.
- * @param {number} [props.debounceTimeout=250]   Debounce timeout in milliseconds.
+ * @param props                 Component props.
+ * @param props.ref             Element reference.
+ * @param props.highlightParent Whether to highlight the parent block. It defaults to highlighting the selected block.
+ * @param props.debounceTimeout Debounce timeout in milliseconds.
  */
 export function useShowHoveredOrFocusedGestures( {
 	ref,
 	highlightParent = false,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
-} ) {
+}: UseShowHoveredOrFocusedGesturesOptions ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const { debouncedShowGestures, debouncedHideGestures } =
 		useDebouncedShowGestures( {

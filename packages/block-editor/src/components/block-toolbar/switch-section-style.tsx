@@ -13,6 +13,7 @@ import { replaceActiveStyle } from '../block-styles/utils';
 import { store as blockEditorStore } from '../../store';
 import { globalStylesDataKey } from '../../store/private-keys';
 import { unlock } from '../../lock-unlock';
+import type { ClientIdProps } from './types';
 
 const { getVariationStyle } = unlock( globalStylesEnginePrivateApis );
 
@@ -34,7 +35,7 @@ const styleIcon = (
 	</SVG>
 );
 
-function SwitchSectionStyle( { clientId } ) {
+function SwitchSectionStyle( { clientId }: ClientIdProps ) {
 	const { stylesToRender, activeStyle, className } = useStylesForBlocks( {
 		clientId,
 	} );
