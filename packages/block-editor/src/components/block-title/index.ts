@@ -1,4 +1,5 @@
 import useBlockDisplayTitle from './use-block-display-title';
+import type { BlockTitleProps } from './types';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -17,6 +18,10 @@ import useBlockDisplayTitle from './use-block-display-title';
  *
  * @return {React.JSX.Element} Block title.
  */
-export default function BlockTitle( { clientId, maximumLength, context } ) {
+export default function BlockTitle( {
+	clientId,
+	maximumLength,
+	context,
+}: BlockTitleProps ) {
 	return useBlockDisplayTitle( { clientId, maximumLength, context } );
 }

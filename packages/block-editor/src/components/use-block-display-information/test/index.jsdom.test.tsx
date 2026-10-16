@@ -1,26 +1,34 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { symbol } from '@wordpress/icons';
 import useBlockDisplayInformation from '../';
+import type { unlock } from '../../../lock-unlock';
+import type { BlockDisplayAttributes, BlockDisplayInformation } from '../types';
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	useSelect: vi.fn(),
 } ) );
 vi.mock( import( '../../../lock-unlock' ), () => ( {
-	unlock: ( value ) => ( {
+	// Returns the selectors themselves, with the private ones mixed in.
+	unlock: ( ( value: object ) => ( {
 		registerPrivateActions: vi.fn(),
 		registerPrivateSelectors: vi.fn(),
 		...value,
-	} ),
+	} ) ) as typeof unlock,
 } ) );
 
 const groupIcon = 'group-icon';
 const templatePartIcon = 'template-part-icon';
 
-function TestComponent( { onChange } ) {
+function TestComponent( {
+	onChange,
+}: {
+	onChange: ( information: BlockDisplayInformation | null ) => void;
+} ) {
 	const blockInformation = useBlockDisplayInformation( 'client-id' );
 	useEffect( () => {
 		onChange( blockInformation );
@@ -50,8 +58,19 @@ function setupUseSelect( {
 	},
 	getActiveBlockVariation = () => null,
 	isSectionBlock = true,
+}: {
+	attributes?: BlockDisplayAttributes;
+	blockName?: string;
+	blockType?: {
+		name: string;
+		title: string;
+		icon: string;
+		description: string;
+	};
+	getActiveBlockVariation?: () => null;
+	isSectionBlock?: boolean;
 } = {} ) {
-	useSelect.mockImplementation( ( mapSelect ) =>
+	( useSelect as Mock ).mockImplementation( ( mapSelect ) =>
 		mapSelect( () => ( {
 			getBlockName: () => blockName,
 			getBlockAttributes: () => attributes,

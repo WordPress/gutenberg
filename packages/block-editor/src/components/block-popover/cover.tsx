@@ -1,6 +1,8 @@
+import type { CSSProperties, ForwardedRef, ReactNode } from 'react';
 import { useEffect, useState, useMemo, forwardRef } from '@wordpress/element';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { PrivateBlockPopover } from '.';
+import type { BlockPopoverCoverProps } from './types';
 
 function BlockPopoverCover(
 	{
@@ -10,12 +12,13 @@ function BlockPopoverCover(
 		shift = false,
 		additionalStyles,
 		...props
-	},
-	ref
+	}: BlockPopoverCoverProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	bottomClientId ??= clientId;
 
-	const selectedElement = useBlockElement( clientId );
+	// Block wrappers are HTML elements.
+	const selectedElement = useBlockElement( clientId ) as HTMLElement | null;
 
 	return (
 		<PrivateBlockPopover
@@ -43,6 +46,10 @@ function CoverContainer( {
 	selectedElement,
 	additionalStyles = {},
 	children,
+}: {
+	selectedElement: HTMLElement;
+	additionalStyles?: CSSProperties;
+	children?: ReactNode;
 } ) {
 	const [ width, setWidth ] = useState( selectedElement.offsetWidth );
 	const [ height, setHeight ] = useState( selectedElement.offsetHeight );
@@ -56,7 +63,7 @@ function CoverContainer( {
 		return () => observer.disconnect();
 	}, [ selectedElement ] );
 
-	const style = useMemo( () => {
+	const style = useMemo< CSSProperties >( () => {
 		return {
 			position: 'absolute',
 			width,

@@ -1,6 +1,12 @@
 import { useMemo } from '@wordpress/element';
 import { _x } from '@wordpress/i18n';
+import type { Color, Gradient } from '@wordpress/global-styles-engine';
 import { useSettings } from '../use-settings';
+import type {
+	ColorOrigin,
+	GradientOrigin,
+	MultipleOriginColorsAndGradients,
+} from './types';
 
 /**
  * Retrieves color and gradient related settings.
@@ -8,9 +14,10 @@ import { useSettings } from '../use-settings';
  * The arrays for colors and gradients are made up of color palettes from each
  * origin i.e. "Core", "Theme", and "User".
  *
- * @return {Object} Color and gradient related settings.
+ * @return Color and gradient related settings.
  */
-export default function useMultipleOriginColorsAndGradients() {
+export default function useMultipleOriginColorsAndGradients(): MultipleOriginColorsAndGradients {
+	// Settings are untyped.
 	const [
 		enableCustomColors,
 		customColors,
@@ -33,15 +40,27 @@ export default function useMultipleOriginColorsAndGradients() {
 		'color.gradients.theme',
 		'color.gradients.default',
 		'color.defaultGradients'
-	);
+	) as [
+		boolean | undefined,
+		Color[] | undefined,
+		Color[] | undefined,
+		Color[] | undefined,
+		boolean | undefined,
+		boolean | undefined,
+		Gradient[] | undefined,
+		Gradient[] | undefined,
+		Gradient[] | undefined,
+		boolean | undefined,
+	];
 
+	// The remaining settings are assigned below.
 	const colorGradientSettings = {
 		disableCustomColors: ! enableCustomColors,
 		disableCustomGradients: ! enableCustomGradients,
-	};
+	} as MultipleOriginColorsAndGradients;
 
 	colorGradientSettings.colors = useMemo( () => {
-		const result = [];
+		const result: ColorOrigin[] = [];
 		if ( themeColors && themeColors.length ) {
 			result.push( {
 				name: _x(
@@ -85,7 +104,7 @@ export default function useMultipleOriginColorsAndGradients() {
 	] );
 
 	colorGradientSettings.gradients = useMemo( () => {
-		const result = [];
+		const result: GradientOrigin[] = [];
 		if ( themeGradients && themeGradients.length ) {
 			result.push( {
 				name: _x(

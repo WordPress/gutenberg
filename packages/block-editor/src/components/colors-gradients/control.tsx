@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ComponentProps } from 'react';
 import { __ } from '@wordpress/i18n';
 import {
 	BaseControl,
@@ -10,6 +11,9 @@ import {
 } from '@wordpress/components';
 import { useSettings } from '../use-settings';
 import { unlock } from '../../lock-unlock';
+import type { ColorGradientControlProps, ColorGradientOptions } from './types';
+
+export type NoticeProps = ComponentProps< typeof Notice >;
 
 const { Tabs } = unlock( componentsPrivateApis );
 const colorsAndGradientKeys = [
@@ -40,7 +44,7 @@ function ColorGradientControlInner( {
 	enableAlpha,
 	headingLevel,
 	noticeProps,
-} ) {
+}: ColorGradientControlProps ) {
 	const canChooseAColor =
 		onColorChange &&
 		( ( colors && colors.length > 0 ) || ! disableCustomColors );
@@ -52,12 +56,14 @@ function ColorGradientControlInner( {
 		return null;
 	}
 
+	// `canChooseAColor` and `canChooseAGradient` imply their handlers are set.
 	const colorPaletteOnChange = canChooseAGradient
-		? ( newColor, _index, newSlug ) => {
-				onColorChange( newColor, newSlug );
-				onGradientChange();
+		? ( newColor?: string, _index?: number, newSlug?: string ) => {
+				onColorChange!( newColor, newSlug );
+				onGradientChange!();
 			}
-		: ( newColor, _index, newSlug ) => onColorChange( newColor, newSlug );
+		: ( newColor?: string, _index?: number, newSlug?: string ) =>
+				onColorChange!( newColor, newSlug );
 
 	const colorPalette = (
 		<ColorPalette
@@ -96,11 +102,11 @@ function ColorGradientControlInner( {
 				onChange={
 					canChooseAColor
 						? ( newGradient, _index, newSlug ) => {
-								onGradientChange( newGradient, newSlug );
-								onColorChange();
+								onGradientChange!( newGradient, newSlug );
+								onColorChange!();
 							}
 						: ( newGradient, _index, newSlug ) =>
-								onGradientChange( newGradient, newSlug )
+								onGradientChange!( newGradient, newSlug )
 				}
 				{ ...{ gradients, disableCustomGradients } }
 				__experimentalIsRenderedInSidebar={
@@ -112,7 +118,7 @@ function ColorGradientControlInner( {
 		),
 	};
 
-	const renderPanelType = ( type ) => (
+	const renderPanelType = ( type: string ) => (
 		<div className="block-editor-color-gradient-control__panel">
 			{ tabPanels[ type ] }
 		</div>
@@ -179,13 +185,19 @@ function ColorGradientControlInner( {
 	);
 }
 
-function ColorGradientControlSelect( props ) {
+function ColorGradientControlSelect( props: ColorGradientControlProps ) {
+	// Settings are untyped.
 	const [ colors, gradients, customColors, customGradients ] = useSettings(
 		'color.palette',
 		'color.gradients',
 		'color.custom',
 		'color.customGradient'
-	);
+	) as [
+		ColorGradientOptions[ 'colors' ],
+		ColorGradientOptions[ 'gradients' ],
+		boolean | undefined,
+		boolean | undefined,
+	];
 
 	return (
 		<ColorGradientControlInner
@@ -198,7 +210,7 @@ function ColorGradientControlSelect( props ) {
 	);
 }
 
-function ColorGradientControl( props ) {
+function ColorGradientControl( props: ColorGradientControlProps ) {
 	if (
 		colorsAndGradientKeys.every( ( key ) => props.hasOwnProperty( key ) )
 	) {

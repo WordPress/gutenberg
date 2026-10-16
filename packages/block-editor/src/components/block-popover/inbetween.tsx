@@ -6,6 +6,7 @@ import { isRTL } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import usePopoverScroll from './use-popover-scroll';
+import type { BlockPopoverInbetweenProps } from './types';
 
 const MAX_POPOVER_RECOMPUTE_COUNTER = Number.MAX_SAFE_INTEGER;
 
@@ -18,11 +19,11 @@ function BlockPopoverInbetween( {
 	operation = 'insert',
 	nearestSide = 'right',
 	...props
-} ) {
+}: BlockPopoverInbetweenProps ) {
 	// This is a temporary hack to get the inbetween inserter to recompute properly.
 	const [ popoverRecomputeCounter, forcePopoverRecompute ] = useReducer(
 		// Module is there to make sure that the counter doesn't overflow.
-		( s ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
+		( s: number ) => ( s + 1 ) % MAX_POPOVER_RECOMPUTE_COUNTER,
 		0
 	);
 
@@ -34,23 +35,26 @@ function BlockPopoverInbetween( {
 				isBlockVisible,
 			} = select( blockEditorStore );
 
+			// At least one neighboring block is set.
 			const _rootClientId = getBlockRootClientId(
-				previousClientId ?? nextClientId
+				( previousClientId ?? nextClientId )!
 			);
 			return {
 				orientation:
 					getBlockListSettings( _rootClientId )?.orientation ||
 					'vertical',
 				rootClientId: _rootClientId,
+				// An absent neighboring block is looked up as a missing one.
 				isVisible:
-					isBlockVisible( previousClientId ) &&
-					isBlockVisible( nextClientId ),
+					isBlockVisible( previousClientId as string ) &&
+					isBlockVisible( nextClientId as string ),
 			};
 		},
 		[ previousClientId, nextClientId ]
 	);
-	const previousElement = useBlockElement( previousClientId );
-	const nextElement = useBlockElement( nextClientId );
+	// An absent neighboring block has no element.
+	const previousElement = useBlockElement( previousClientId as string );
+	const nextElement = useBlockElement( nextClientId as string );
 	const isVertical = orientation === 'vertical';
 
 	const popoverAnchor = useMemo( () => {
@@ -80,13 +84,14 @@ function BlockPopoverInbetween( {
 					? nextElement.getBoundingClientRect()
 					: null;
 
+				// At least one of the elements exists, see the check above.
 				let left = 0;
 				let top = 0;
 				let width = 0;
 				let height = 0;
 
 				if ( operation === 'group' ) {
-					const targetRect = nextRect || previousRect;
+					const targetRect = ( nextRect || previousRect )!;
 					top = targetRect.top;
 					// No spacing is likely around blocks in this operation.
 					// So width of the inserter containing rect is set to 0.
@@ -100,11 +105,11 @@ function BlockPopoverInbetween( {
 							: targetRect.right - 2;
 				} else if ( isVertical ) {
 					// vertical
-					top = previousRect ? previousRect.bottom : nextRect.top;
+					top = previousRect ? previousRect.bottom : nextRect!.top;
 					width =
 						nextRect && previousRect
 							? ( previousRect.width + nextRect.width ) / 2
-							: ( previousRect || nextRect ).width;
+							: ( previousRect || nextRect )!.width;
 					height =
 						nextRect && previousRect
 							? nextRect.top - previousRect.bottom
@@ -112,16 +117,16 @@ function BlockPopoverInbetween( {
 					left =
 						nextRect && previousRect
 							? ( previousRect.left + nextRect.left ) / 2
-							: ( previousRect || nextRect ).left;
+							: ( previousRect || nextRect )!.left;
 				} else {
-					top = previousRect ? previousRect.top : nextRect.top;
+					top = previousRect ? previousRect.top : nextRect!.top;
 					height = previousRect
 						? previousRect.height
-						: nextRect.height;
+						: nextRect!.height;
 
 					if ( isRTL() ) {
 						// non vertical, rtl
-						left = nextRect ? nextRect.right : previousRect.left;
+						left = nextRect ? nextRect.right : previousRect!.left;
 						width =
 							previousRect && nextRect
 								? previousRect.left - nextRect.right
@@ -130,7 +135,7 @@ function BlockPopoverInbetween( {
 						// non vertical, ltr
 						left = previousRect
 							? previousRect.right
-							: nextRect.left;
+							: nextRect!.left;
 						width =
 							previousRect && nextRect
 								? nextRect.left - previousRect.right
@@ -193,7 +198,8 @@ function BlockPopoverInbetween( {
 		if ( ! previousElement ) {
 			return;
 		}
-		previousElement.ownerDocument.defaultView.addEventListener(
+		// Block elements live in a document with a window.
+		previousElement.ownerDocument.defaultView!.addEventListener(
 			'resize',
 			forcePopoverRecompute
 		);

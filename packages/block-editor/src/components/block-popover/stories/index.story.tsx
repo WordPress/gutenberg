@@ -1,3 +1,4 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import {
 	createBlock,
 	registerBlockType,
@@ -19,7 +20,7 @@ const clientIds = BLOCK_LABELS.map(
 	( label, index ) => `example-block-${ index + 1 }`
 );
 
-function ExampleEdit( { attributes } ) {
+function ExampleEdit( { attributes }: { attributes: { content?: string } } ) {
 	return <p { ...useBlockProps() }>{ attributes.content }</p>;
 }
 
@@ -73,7 +74,7 @@ const clientIdLabels = Object.fromEntries(
 	clientIds.map( ( clientId, index ) => [ clientId, `Block ${ index + 1 }` ] )
 );
 
-const meta = {
+const meta: Meta< typeof BlockPopover > = {
 	id: 'blockeditor-blockpopover',
 	title: 'Editor/Block Editor/BlockPopover',
 	component: BlockPopover,
@@ -142,7 +143,9 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	args: {
 		clientId: clientIds[ 1 ],
 		children: 'This is a block popover example.',
