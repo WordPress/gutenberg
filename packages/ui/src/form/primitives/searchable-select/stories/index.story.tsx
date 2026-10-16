@@ -1,3 +1,4 @@
+import { action } from 'storybook/actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 import { Fragment } from '@wordpress/element';
@@ -18,6 +19,7 @@ const meta: Meta< typeof SearchableSelect > = {
 	id: 'design-system-components-form-primitives-searchableselect',
 	component: SearchableSelect,
 	subcomponents: {
+		'SearchableSelect.Trigger': SearchableSelect.Trigger,
 		'SearchableSelect.Group': SearchableSelect.Group,
 		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
 		'SearchableSelect.Separator': SearchableSelect.Separator,
@@ -98,7 +100,7 @@ const CustomFruitItem = ( { label }: { label: string } ) => (
 
 /**
  * To customize what is rendered inside the trigger element, pass a
- * render function to the `triggerContent` prop.
+ * render function as the children of `SearchableSelect.Trigger` through `trigger`.
  *
  * The item list can be customized by passing a render function as `children`,
  * returning a `Item` subcomponent for each item.
@@ -107,14 +109,40 @@ export const WithCustomTriggerAndItems: Story = {
 	args: {
 		...Default.args,
 		defaultValue: ITEMS[ 0 ],
-		triggerContent: ( item: ( typeof ITEMS )[ 0 ] | null ) =>
-			item ? <CustomFruitItem label={ item.label } /> : null,
+		trigger: (
+			<SearchableSelect.Trigger>
+				{ ( item ) =>
+					item ? <CustomFruitItem label={ item.label } /> : null
+				}
+			</SearchableSelect.Trigger>
+		),
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableSelect.Item key={ item.value } value={ item }>
 				<SearchableSelect.ItemLabel>
 					😋 { item.label }
 				</SearchableSelect.ItemLabel>
 			</SearchableSelect.Item>
+		),
+	},
+};
+
+/**
+ * Pass a `SearchableSelect.Trigger` element to `trigger` to customize button
+ * props and content independently of the popup items.
+ */
+export const WithCustomTrigger: Story = {
+	args: {
+		...Default.args,
+		defaultValue: ITEMS[ 0 ],
+		trigger: (
+			<SearchableSelect.Trigger
+				onFocus={ action( 'onFocus' ) }
+				onBlur={ action( 'onBlur' ) }
+			>
+				{ ( item ) =>
+					item ? <CustomFruitItem label={ item.label } /> : null
+				}
+			</SearchableSelect.Trigger>
 		),
 	},
 };
