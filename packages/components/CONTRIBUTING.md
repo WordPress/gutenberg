@@ -444,7 +444,7 @@ Check the declarations that win in composed components and in each destination d
 
 `StyleProvider` registers a document with `@wordpress/style-runtime` for CSS Module delivery. Preserve its insertion-effect timing and cleanup. Applications rendering their own Emotion styles in another document must configure their own cache or styling instance. See [styles across documents](/packages/theme/README.md#across-documents-iframes-and-other-portals) for the destination stylesheet and cache requirements.
 
-Start with existing tests and stories. Use Node or jsdom for DOM structure, semantics, props, refs, and state. Use Browser Mode for real styles, specificity, custom-property resolution, layout, focus, and scrolling. Load the styles that the consumer uses. Class assertions and snapshots alone do not prove that CSS loads or wins.
+Start with existing tests and stories. Use jsdom for DOM structure, semantics, props, refs, and state. Use Browser Mode for real styles, specificity, custom-property resolution, layout, focus, and scrolling. Load the styles that the consumer uses. Class assertions and snapshots alone do not prove that CSS loads or wins.
 
 Check the states and consumers affected by the change, including portals, iframes, RTL, consumer overrides, and nested instances when relevant. For cross-document behavior, use an attached iframe with a real document and assert a computed style there. Follow the [testing overview](/docs/contributors/code/testing-overview.md#folder-structure), and add coverage only for a concrete risk that existing tests do not protect.
 
