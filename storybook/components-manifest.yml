@@ -1782,7 +1782,6 @@
             - render
             - size
             - style
-            - variant
 - name: Shortcut
   props:
       - className

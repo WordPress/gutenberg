@@ -127,7 +127,6 @@ export const WithCustomTriggerProps: Story = {
 		defaultValue: userOptions[ 0 ],
 		trigger: (
 			<SelectControl.Trigger
-				variant="minimal"
 				onFocus={ action( 'onFocus' ) }
 				onBlur={ action( 'onBlur' ) }
 			>

@@ -21,7 +21,7 @@ export type SelectItem = {
 
 export type SelectControlTriggerProps = Omit<
 	SelectTriggerProps,
-	'size' | 'children'
+	'size' | 'children' | 'variant'
 > & {
 	/**
 	 * The size of the trigger.
