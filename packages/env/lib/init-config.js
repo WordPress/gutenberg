@@ -98,6 +98,12 @@ module.exports = async function initConfig( {
 };
 
 function dockerFileContents( image, xdebugMode ) {
+	// The newest Xdebug requires PHP 8.0, so skip installing it when it's off (the default).
+	if ( xdebugMode === 'off' ) {
+		return `FROM ${ image }
+`;
+	}
+
 	const isLinux = os.type() === 'Linux';
 	// Discover client host does not appear to work on macOS with Docker.
 	const clientDetectSettings = isLinux
