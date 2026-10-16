@@ -231,6 +231,31 @@
 				}
 			]
 		},
+		"backdropFilter": {
+			"defaultPresets": true,
+			"presets": [
+				{
+					"name": "Light haze",
+					"slug": "light",
+					"backdropFilter": "blur(6px)"
+				},
+				{
+					"name": "Frost",
+					"slug": "frost",
+					"backdropFilter": "blur(12px) saturate(150%)"
+				},
+				{
+					"name": "Heavy blur",
+					"slug": "heavy",
+					"backdropFilter": "blur(24px)"
+				},
+				{
+					"name": "Vibrancy",
+					"slug": "vibrancy",
+					"backdropFilter": "blur(16px) saturate(180%) brightness(1.05)"
+				}
+			]
+		},
 		"shadow": {
 			"defaultPresets": true,
 			"presets": [
