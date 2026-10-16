@@ -5,7 +5,7 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-import { Spinner, TextControl } from '@wordpress/components';
+import { Spinner as WCSpinner, TextControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
@@ -68,7 +68,7 @@ export default function PostTermsEdit( {
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>
-				{ isLoading && hasPost && <Spinner /> }
+				{ isLoading && hasPost && <WCSpinner /> }
 				{ ! isLoading && ( isSelected || prefix ) && (
 					<RichText
 						identifier="prefix"

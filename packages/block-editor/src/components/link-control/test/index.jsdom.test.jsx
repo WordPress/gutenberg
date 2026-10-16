@@ -1591,7 +1591,8 @@ describe( 'Selecting links', () => {
 			name: 'Manage link',
 		} );
 		const currentLinkAnchor = screen.getByRole( 'link', {
-			name: `${ selectedLink.title } (opens in a new tab)`,
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: `${ selectedLink.title }(opens in a new tab)`,
 		} );
 
 		expect( currentLink ).toBeVisible();
@@ -1692,7 +1693,8 @@ describe( 'Selecting links', () => {
 				await user.click( firstSearchSuggestion );
 
 				const currentLinkAnchor = screen.getByRole( 'link', {
-					name: `${ selectedLink.title } (opens in a new tab)`,
+					// TODO: jsdom-only name; browsers separate the notice with a space.
+					name: `${ selectedLink.title }(opens in a new tab)`,
 				} );
 
 				// Check that this suggestion is now shown as selected.
@@ -2655,7 +2657,8 @@ describe( 'Entity handling', () => {
 
 		// Click on a different entity suggestion
 		const differentSuggestion = screen.getByRole( 'option', {
-			name: 'Different Page /different-page Page',
+			// TODO: jsdom-only name; browsers separate title, URL and type with spaces.
+			name: 'Different Page/different-pagePage',
 		} );
 		await user.click( differentSuggestion );
 

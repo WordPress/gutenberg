@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
+	useBackgroundProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __, _x } from '@wordpress/i18n';
@@ -100,8 +101,13 @@ function TableEdit( {
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
 
-	const colorProps = useColorProps( attributes );
+	// Mirror of save: `has-link-color` belongs on the figure only.
+	const colorProps = useColorProps( {
+		...attributes,
+		style: { ...attributes.style, elements: undefined },
+	} );
 	const borderProps = useBorderProps( attributes );
+	const backgroundProps = useBackgroundProps( attributes );
 	const textAlign = attributes?.style?.typography?.textAlign;
 	const blockEditingMode = useBlockEditingMode();
 
@@ -527,6 +533,7 @@ function TableEdit( {
 					className={ clsx(
 						colorProps.className,
 						borderProps.className,
+						backgroundProps.className,
 						{
 							'has-fixed-layout': hasFixedLayout,
 							[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -538,7 +545,11 @@ function TableEdit( {
 							),
 						}
 					) }
-					style={ { ...colorProps.style, ...borderProps.style } }
+					style={ {
+						...colorProps.style,
+						...borderProps.style,
+						...backgroundProps.style,
+					} }
 				>
 					{ renderedSections }
 				</table>
