@@ -5,6 +5,12 @@ import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 type CustomSelectControlProps = ComponentProps< typeof CustomSelectControl >;
 
 /**
+ * A font family the control offers, labelled by its name or its CSS value.
+ */
+export type FontFamilyOption = Pick< FontFamilyPreset, 'fontFamily' > &
+	Partial< FontFamilyPreset >;
+
+/**
  * Props of `FontFamilyControl`.
  */
 export interface FontFamilyControlProps extends Partial<
@@ -28,6 +34,6 @@ export interface FontFamilyControlProps extends Partial<
 	/**
 	 * The font families to choose from, in place of the block's settings.
 	 */
-	fontFamilies?: FontFamilyPreset[];
+	fontFamilies?: FontFamilyOption[];
 	className?: string;
 }
