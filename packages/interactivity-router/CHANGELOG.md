@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Ignore `data-wp-router-region` elements inside `data-wp-html` content during client-side navigation, on the initial page and on every fetched, prefetched, or history-restored page, and never use an element inside `data-wp-html` content, or a `data-wp-html` element itself, as an `attachTo` target: a region's `attachTo` now resolves to the first matching element outside `data-wp-html` content. A region whose `attachTo` has no usable target (no match, only unusable matches, or an invalid selector) is now skipped while the rest of the navigation completes; previously, a selector that matched nothing threw and stopped the render. ([#84919](https://github.com/WordPress/gutenberg/pull/84919)).
+
 ## 2.57.0 (2026-10-07)
 
 ### New Features
@@ -15,7 +19,6 @@
 ### Bug Fixes
 
 -   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpretation exposed through `@wordpress/interactivity`'s private API. Previously, navigation keyed those regions under a different id or `undefined` and never updated them. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
--   Ignore `data-wp-router-region` elements inside `data-wp-html` content during client-side navigation, on the initial page and on every fetched, prefetched, or history-restored page, and never use an element inside `data-wp-html` content, or a `data-wp-html` element itself, as an `attachTo` target: a region's `attachTo` now resolves to the first matching element outside `data-wp-html` content. A region whose `attachTo` has no usable target (no match, only unusable matches, or an invalid selector) is now skipped while the rest of the navigation completes; previously, a selector that matched nothing threw and stopped the render. ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
 
 ## 2.56.0 (2026-09-23)
 
