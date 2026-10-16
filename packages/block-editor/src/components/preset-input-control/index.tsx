@@ -22,6 +22,7 @@ import {
 	isValuePreset,
 } from './utils';
 import CustomValueControls from './custom-value-controls';
+import type { Preset, PresetInputControlProps } from './types';
 
 /**
  * PresetInputControl component for selecting preset values or entering custom values.
@@ -30,29 +31,29 @@ import CustomValueControls from './custom-value-controls';
  * Allows toggling to custom value mode with a UnitControl and RangeControl.
  * Handles unit tracking and conversion between preset and custom values.
  *
- * @param {Object}   props                     Component props.
- * @param {boolean}  props.allowNegativeOnDrag Whether to allow negative values during drag operations.
- * @param {string}   props.ariaLabel           Accessible label for the control.
- * @param {string}   props.className           Optional CSS class name.
- * @param {Object}   props.customValueSettings Optional custom value settings for max/steps per unit.
- * @param {boolean}  props.disableCustomValues Whether to disable custom value input.
- * @param {Object}   props.icon                Icon to display alongside the control.
- * @param {boolean}  props.isMixed             Whether the current value is mixed (multiple values).
- * @param {number}   props.minimumCustomValue  Minimum allowed custom value.
- * @param {Function} props.onChange            Callback when value changes.
- * @param {Function} props.onMouseOut          Callback for mouse out events.
- * @param {Function} props.onMouseOver         Callback for mouse over events.
- * @param {Function} props.onUnitChange        Callback when unit changes.
- * @param {string}   props.placeholder         Placeholder text forwarded to the inner UnitControl when
- *                                             rendered in custom-value mode.
- * @param {Array}    props.presets             Array of preset objects with name, slug, and size.
- * @param {string}   props.presetType          Type of preset (e.g., 'spacing', 'border-radius').
- * @param {string}   props.selectedUnit        Currently selected unit (e.g., 'px', 'em').
- * @param {boolean}  props.showTooltip         Whether to show tooltip on custom UnitControl.
- * @param {Array}    props.units               Array of available unit objects (can include max and step).
- * @param {string}   props.value               Current value (preset or custom).
+ * @param props                     Component props.
+ * @param props.allowNegativeOnDrag Whether to allow negative values during drag operations.
+ * @param props.ariaLabel           Accessible label for the control.
+ * @param props.className           Optional CSS class name.
+ * @param props.customValueSettings Optional custom value settings for max/steps per unit.
+ * @param props.disableCustomValues Whether to disable custom value input.
+ * @param props.icon                Icon to display alongside the control.
+ * @param props.isMixed             Whether the current value is mixed (multiple values).
+ * @param props.minimumCustomValue  Minimum allowed custom value.
+ * @param props.onChange            Callback when value changes.
+ * @param props.onMouseOut          Callback for mouse out events.
+ * @param props.onMouseOver         Callback for mouse over events.
+ * @param props.onUnitChange        Callback when unit changes.
+ * @param props.placeholder         Placeholder text forwarded to the inner UnitControl when
+ *                                  rendered in custom-value mode.
+ * @param props.presets             Array of preset objects with name, slug, and size.
+ * @param props.presetType          Type of preset (e.g., 'spacing', 'border-radius').
+ * @param props.selectedUnit        Currently selected unit (e.g., 'px', 'em').
+ * @param props.showTooltip         Whether to show tooltip on custom UnitControl.
+ * @param props.units               Array of available unit objects (can include max and step).
+ * @param props.value               Current value (preset or custom).
  *
- * @return {Element} The PresetInputControl component.
+ * @return The PresetInputControl component.
  */
 export default function PresetInputControl( {
 	allowNegativeOnDrag = false,
@@ -74,7 +75,7 @@ export default function PresetInputControl( {
 	selectedUnit,
 	showTooltip,
 	units,
-} ) {
+}: PresetInputControlProps ) {
 	const value = useMemo(
 		() => getPresetValueFromCustomValue( valueProp, presets, presetType ),
 		[ valueProp, presets, presetType ]
@@ -100,7 +101,7 @@ export default function PresetInputControl( {
 			! isValuePreset( value, presetType )
 	);
 
-	let currentValue = null;
+	let currentValue: number | string | null | undefined = null;
 
 	const previousValue = usePrevious( value );
 
@@ -122,7 +123,7 @@ export default function PresetInputControl( {
 		( ! isValuePreset( value, presetType ) ||
 			( isValuePreset( value, presetType ) && isMixed ) );
 
-	let selectListOptions = presets;
+	let selectListOptions: Preset[] = presets;
 	if ( showCustomValueInSelectList ) {
 		selectListOptions = [
 			...presets,
@@ -163,7 +164,7 @@ export default function PresetInputControl( {
 	const max =
 		unitConfig?.max ?? customValueSettings[ computedUnit ]?.max ?? 10;
 
-	const handleCustomValueChange = ( newValue ) => {
+	const handleCustomValueChange = ( newValue?: string ) => {
 		// Treat empty or undefined as an explicit clear and propagate undefined.
 		if ( newValue === undefined || newValue === '' ) {
 			onChange( undefined );
@@ -177,14 +178,19 @@ export default function PresetInputControl( {
 
 		onChange( newValue );
 	};
-	const handleCustomValueSliderChange = ( next ) => {
+	const handleCustomValueSliderChange = ( next?: number ) => {
 		onChange( [ next, computedUnit ].join( '' ) );
 	};
-	const customTooltipContent = ( newValue ) =>
-		value === undefined ? undefined : presets[ newValue ]?.name;
+	const customTooltipContent = ( newValue?: number | '' | null ) =>
+		// The tooltip gets the slider position.
+		value === undefined ? undefined : presets[ newValue as number ]?.name;
 
-	const getNewPresetValue = ( next, controlType ) => {
-		const newValue = parseInt( next, 10 );
+	const getNewPresetValue = (
+		next: number | string | undefined,
+		controlType?: string
+	) => {
+		// `parseInt` reads a number as its string form.
+		const newValue = parseInt( next as string, 10 );
 
 		if ( controlType === 'selectList' ) {
 			if ( newValue === 0 && presets[ 0 ]?.slug === '0' ) {
@@ -196,7 +202,8 @@ export default function PresetInputControl( {
 		} else if ( newValue === 0 ) {
 			return '0';
 		}
-		return `var:preset|${ presetType }|${ presets[ next ]?.slug }`;
+		// The next value is a preset index.
+		return `var:preset|${ presetType }|${ presets[ next as number ]?.slug }`;
 	};
 
 	return (
@@ -235,8 +242,10 @@ export default function PresetInputControl( {
 			) }
 			{ hasPresets && showRangeControl && ! showCustomValueControl && (
 				<RangeControl
-					aria-valuenow={ currentValue }
-					aria-valuetext={ presets[ currentValue ]?.name }
+					// In preset mode the current value is a slider position.
+					aria-valuenow={ currentValue as number | undefined }
+					// In preset mode the current value is a slider position.
+					aria-valuetext={ presets[ currentValue as number ]?.name }
 					className="preset-input-control__preset-range"
 					hideLabelFromVision
 					initialPosition={ 0 }
@@ -261,7 +270,7 @@ export default function PresetInputControl( {
 					onMouseOver={ onMouseOver }
 					renderTooltipContent={ customTooltipContent }
 					step={ 1 }
-					value={ currentValue }
+					value={ currentValue as number | undefined }
 					withInputField={ false }
 				/>
 			) }

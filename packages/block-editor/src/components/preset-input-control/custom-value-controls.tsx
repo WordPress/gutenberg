@@ -3,6 +3,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { Tooltip } from '@wordpress/ui';
+import type { CustomValueControlsProps } from './types';
 
 /**
  * CustomValueControls component for handling custom value input.
@@ -10,28 +11,28 @@ import { Tooltip } from '@wordpress/ui';
  * Renders a UnitControl and RangeControl for custom value input mode.
  * Handles conditional tooltip wrapping and drag event coordination.
  *
- * @param {Object}   props
- * @param {boolean}  props.allowNegativeOnDrag       Whether to allow negative values during drag operations.
- * @param {string}   props.ariaLabel                 Accessible label for the controls.
- * @param {string}   props.allPlaceholder            Placeholder text (e.g., "Mixed").
- * @param {number}   props.minValue                  Minimum allowed value.
- * @param {number}   props.parsedQuantity            The numeric part of the current value.
- * @param {string}   props.computedUnit              The unit part of the current value.
- * @param {Array}    props.units                     Array of available unit objects.
- * @param {boolean}  props.isMixed                   Whether the current value is mixed.
- * @param {number}   props.step                      Step value for the range control.
- * @param {number}   props.max                       Maximum value for the range control.
- * @param {boolean}  props.showTooltip               Whether to wrap UnitControl in a tooltip.
- * @param {string}   props.value                     Current value for drag event checks.
- * @param {number}   props.minimumCustomValue        Minimum custom value for drag end reset.
- * @param {Function} props.onCustomValueChange       Callback when UnitControl value changes.
- * @param {Function} props.onCustomValueSliderChange Callback when RangeControl value changes.
- * @param {Function} props.onUnitChange              Callback when unit changes.
- * @param {Function} props.onMouseOut                Mouse out event handler.
- * @param {Function} props.onMouseOver               Mouse over event handler.
- * @param {Function} props.setMinValue               Function to set minimum value state.
+ * @param props
+ * @param props.allowNegativeOnDrag       Whether to allow negative values during drag operations.
+ * @param props.ariaLabel                 Accessible label for the controls.
+ * @param props.allPlaceholder            Placeholder text (e.g., "Mixed").
+ * @param props.minValue                  Minimum allowed value.
+ * @param props.parsedQuantity            The numeric part of the current value.
+ * @param props.computedUnit              The unit part of the current value.
+ * @param props.units                     Array of available unit objects.
+ * @param props.isMixed                   Whether the current value is mixed.
+ * @param props.step                      Step value for the range control.
+ * @param props.max                       Maximum value for the range control.
+ * @param props.showTooltip               Whether to wrap UnitControl in a tooltip.
+ * @param props.value                     Current value for drag event checks.
+ * @param props.minimumCustomValue        Minimum custom value for drag end reset.
+ * @param props.onCustomValueChange       Callback when UnitControl value changes.
+ * @param props.onCustomValueSliderChange Callback when RangeControl value changes.
+ * @param props.onUnitChange              Callback when unit changes.
+ * @param props.onMouseOut                Mouse out event handler.
+ * @param props.onMouseOver               Mouse over event handler.
+ * @param props.setMinValue               Function to set minimum value state.
  *
- * @return {Element} The CustomValueControls component.
+ * @return The CustomValueControls component.
  */
 export default function CustomValueControls( {
 	allowNegativeOnDrag,
@@ -53,7 +54,7 @@ export default function CustomValueControls( {
 	onMouseOut,
 	onMouseOver,
 	setMinValue,
-} ) {
+}: CustomValueControlsProps ) {
 	const unitControl = (
 		<UnitControl
 			className="preset-input-control__unit-control"
@@ -69,7 +70,8 @@ export default function CustomValueControls( {
 			onMouseOver={ onMouseOver }
 			units={ units }
 			value={ [ parsedQuantity, computedUnit ].join( '' ) }
-			placeholder={ allPlaceholder }
+			// A `null` placeholder renders none.
+			placeholder={ allPlaceholder as string | undefined }
 			onDragStart={ () => {
 				if ( allowNegativeOnDrag && value?.charAt( 0 ) === '-' ) {
 					setMinValue( 0 );
