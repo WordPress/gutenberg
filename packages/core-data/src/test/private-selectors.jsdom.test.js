@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import deepFreeze from 'deep-freeze';
-import { getFieldsConfig, getUndoManager } from '../private-selectors';
+import {
+	getEntityActionsConfig,
+	getFieldsConfig,
+	getUndoManager,
+} from '../private-selectors';
 
 describe( 'getUndoManager', () => {
 	it( 'returns the undo manager held in state', () => {
@@ -31,5 +35,27 @@ describe( 'getFieldsConfig', () => {
 
 		expect( getFieldsConfig( state, 'postType', 'page' ) ).toBe( config );
 		expect( getFieldsConfig( state, 'postType', 'post' ) ).toBeUndefined();
+	} );
+} );
+
+describe( 'getEntityActionsConfig', () => {
+	it( 'returns undefined until the actions of the entity are received', () => {
+		const state = { entityActionsConfigs: {} };
+
+		expect(
+			getEntityActionsConfig( state, 'postType', 'page' )
+		).toBeUndefined();
+	} );
+
+	it( 'returns the received actions of the entity', () => {
+		const config = { kind: 'postType', name: 'page', actions: [] };
+		const state = { entityActionsConfigs: { postType: { page: config } } };
+
+		expect( getEntityActionsConfig( state, 'postType', 'page' ) ).toBe(
+			config
+		);
+		expect(
+			getEntityActionsConfig( state, 'postType', 'post' )
+		).toBeUndefined();
 	} );
 } );
