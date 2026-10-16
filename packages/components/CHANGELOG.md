@@ -6,7 +6,8 @@
 
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
-    -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724)).
+    -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724))
+    -   `FocalPointPicker` ([#84736](https://github.com/WordPress/gutenberg/pull/84736))
     -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
     -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
     -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
@@ -33,6 +34,7 @@
 
 ### Bug Fixes
 
+-   `StyleProvider`: Register module styles before children measure layout in iframe documents ([#84736](https://github.com/WordPress/gutenberg/pull/84736)).
 -   `BorderBoxControl`: Unpack multi-value CSS box shorthand strings (such as `"0 0 0 2px"`) into individual side widths when splitting borders ([#84826](https://github.com/WordPress/gutenberg/pull/84826)).
 -   `SelectControl`: Preserve the minimal variant's inline layout in iframe documents ([#84732](https://github.com/WordPress/gutenberg/pull/84732)).
 -   `DatePicker`: Keep month navigation in a grid in iframe documents ([#84724](https://github.com/WordPress/gutenberg/pull/84724)).

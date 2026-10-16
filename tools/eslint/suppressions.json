@@ -4550,16 +4550,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/focal-point-picker/styles/focal-point-picker-style.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
-	"packages/components/src/focal-point-picker/styles/focal-point-style.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/form-file-upload/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -7032,79 +7022,6 @@
 	"packages/fields/src/components/media-edit/use-moving-animation.ts": {
 		"react-hooks/refs": {
 			"count": 3
-		}
-	},
-	"packages/fields/src/fields/author/author-view.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/excerpt/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/fields/src/fields/parent/parent-edit.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/password/edit.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		}
-	},
-	"packages/fields/src/fields/pattern-sync-status/index.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/pattern-title/view.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/ping-status/index.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/post-content-info/post-content-info-view.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 2
-		}
-	},
-	"packages/fields/src/fields/slug/slug-edit.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 3
-		},
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/fields/src/fields/slug/slug-view.tsx": {
-		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/status/status-view.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/template/hooks.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/template/template-edit.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/fields/src/fields/title/view.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/fields/src/lock-unlock.ts": {
