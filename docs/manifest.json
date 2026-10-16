@@ -108,6 +108,12 @@
 		"parent": "fundamentals"
 	},
 	{
+		"title": "Styling blocks",
+		"slug": "styling-blocks",
+		"markdown_source": "../docs/getting-started/fundamentals/styling-blocks.md",
+		"parent": "fundamentals"
+	},
+	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
