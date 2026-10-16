@@ -95,9 +95,11 @@ describe( 'getAllValue', () => {
 
 	describe( 'when provided invalid values', () => {
 		it( 'should return undefined when passed an array', () => {
+			// @ts-expect-error An array is not a valid value.
 			expect( getAllValue( [] ) ).toBe( undefined );
 		} );
 		it( 'should return undefined when passed a boolean', () => {
+			// @ts-expect-error A boolean is not a valid value.
 			expect( getAllValue( false ) ).toBe( undefined );
 		} );
 		it( 'should return undefined when passed undefined', () => {
@@ -229,6 +231,7 @@ describe( 'hasMixedValues', () => {
 describe( 'hasDefinedValues', () => {
 	it( 'should return false when passed a falsy value', () => {
 		expect( hasDefinedValues( undefined ) ).toBe( false );
+		// @ts-expect-error `null` is not a valid value.
 		expect( hasDefinedValues( null ) ).toBe( false );
 		expect( hasDefinedValues( '' ) ).toBe( false );
 	} );
