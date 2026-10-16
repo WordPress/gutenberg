@@ -50,10 +50,8 @@ export type InjectedColorsProps< Name extends string > = {
  * The higher-order component `withColors` returns for the given color
  * attribute names.
  */
-export type WithColorsHOC< Name extends string > = <
-	Props extends InjectedColorsProps< Name >,
->(
-	WrappedComponent: ComponentType< Props >
+export type WithColorsHOC< Name extends string > = < Props >(
+	WrappedComponent: ComponentType< Props & InjectedColorsProps< Name > >
 ) => ComponentType<
 	Omit< Props, keyof InjectedColorsProps< Name > > &
 		Pick< WithColorsProps, 'attributes' | 'setAttributes' >

@@ -1,7 +1,9 @@
+import type { ComponentType } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createCustomColorsHOC } from '../with-colors';
+import withColors, { createCustomColorsHOC } from '../with-colors';
+import type { ColorObject } from '../types';
 
 describe( 'createCustomColorsHOC', () => {
 	it( 'provides the wrapped component with color values and setter functions as props', () => {
@@ -111,5 +113,33 @@ describe( 'createCustomColorsHOC', () => {
 			backgroundColor: undefined,
 			customBackgroundColor: '000000',
 		} );
+	} );
+} );
+
+/*
+ * These checks run at type-check time: each `@ts-expect-error` fails the
+ * type check if the line below it stops being a type error.
+ */
+describe( 'withColors types', () => {
+	it( 'infers the props of the wrapped component', () => {
+		const Labeled: ComponentType< {
+			backgroundColor: ColorObject;
+			label: string;
+		} > = () => null;
+		const WithColor = withColors( 'backgroundColor' )( Labeled );
+
+		const withLabel = (
+			<WithColor
+				label="Color"
+				attributes={ {} }
+				setAttributes={ () => {} }
+			/>
+		);
+		const withoutLabel = (
+			// @ts-expect-error The own props stay required.
+			<WithColor attributes={ {} } setAttributes={ () => {} } />
+		);
+
+		expect( [ withLabel, withoutLabel ] ).toHaveLength( 2 );
 	} );
 } );
