@@ -25,6 +25,10 @@
 
 -   `__unstableGeneratePreviewStateStyles` accepts an element name, such as `link`, as well as a block name ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
 
+### Internal
+
+Accept the boolean and sides forms of the `padding`, `margin` and `blockGap` spacing settings ([#84989](https://github.com/WordPress/gutenberg/pull/84989)).
+
 ## 1.24.0 (2026-10-07)
 
 ### New Features
