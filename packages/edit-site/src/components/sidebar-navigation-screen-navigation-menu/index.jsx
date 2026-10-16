@@ -83,6 +83,7 @@ export default function SidebarNavigationScreenNavigationMenu( { backPath } ) {
 					<ScreenNavigationMoreMenu
 						menuId={ navigationMenu?.id }
 						menuTitle={ decodeEntities( menuTitle ) }
+						menuSlug={ navigationMenu?.slug }
 						onDelete={ _handleDelete }
 						onSave={ _handleSave }
 						onDuplicate={ _handleDuplicate }

@@ -3,10 +3,12 @@ import type { RequestUtils } from './index';
 export interface MenuData {
 	title: string;
 	content: string;
+	slug?: string;
 }
 export interface NavigationMenu {
 	id: number;
 	content: string;
+	slug: string;
 	status: 'publish' | 'future' | 'draft' | 'pending' | 'private';
 }
 
