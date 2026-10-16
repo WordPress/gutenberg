@@ -538,8 +538,7 @@ $media-panel-min-height: 320px;
 
 	}
 
-	// Audio, and in future any other file with no visual of its own, previews
-	// as its type icon above its filename.
+	// A file with no visual of its own previews as an icon and filename.
 	.block-editor-inserter__media-grid__file-preview {
 		box-sizing: border-box;
 		width: 100%;
