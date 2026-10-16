@@ -303,8 +303,7 @@ export const WithSeparator: Story = {
  * is used as the string to match against in the typeahead functionality, while the
  * item content is determined by `children`.
  */
-export const WithCustomTriggerAndItems: Story = {
-	name: 'With Custom Items',
+export const WithCustomItems: Story = {
 	args: {
 		items: userOptions,
 		label: 'Label',
