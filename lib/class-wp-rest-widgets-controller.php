@@ -402,7 +402,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				$widget_class = get_class( $update_control['callback'][0] );
 				$new_object   = new $widget_class(
 					$input_widget['id_base'],
-					$input_widget['name'],
+					isset( $input_widget['name'] ) ? $input_widget['name'] : null,
 					$input_widget['settings']
 				);
 				$new_object->_set( $number );
