@@ -21,6 +21,7 @@ function TestWrapper() {
 				onSelect={ noop }
 				onSelectURL={ setMediaURL }
 				onError={ noop }
+				// @ts-expect-error Not a prop of MediaReplaceFlow.
 				onCloseModal={ noop }
 			/>
 		</SlotFillProvider>
