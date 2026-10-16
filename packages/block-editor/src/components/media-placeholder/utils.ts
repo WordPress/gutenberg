@@ -5,17 +5,17 @@
  * This ensures users can only select file types that the server can handle,
  * preventing upload failures (e.g., HEIC files when server lacks support).
  *
- * @param {Array}  allowedTypes     - List of allowed media types (e.g., ['image', 'video']).
- * @param {Object} allowedMimeTypes - Map of allowed MIME types from server settings.
- * @param {string} accept           - Optional explicit accept attribute to use.
+ * @param allowedTypes     - List of allowed media types (e.g., ['image', 'video']).
+ * @param allowedMimeTypes - Map of allowed MIME types from server settings.
+ * @param accept           - Optional explicit accept attribute to use.
  *
- * @return {string|undefined} Computed accept attribute value, or undefined if no restrictions apply.
+ * @return Computed accept attribute value, or undefined if no restrictions apply.
  */
 export function getComputedAcceptAttribute(
-	allowedTypes,
-	allowedMimeTypes,
-	accept
-) {
+	allowedTypes?: string[] | null,
+	allowedMimeTypes?: Record< string, string > | null,
+	accept?: string
+): string | undefined {
 	// If accept prop is explicitly provided, use it as is.
 	if ( accept ) {
 		return accept;
@@ -39,7 +39,7 @@ export function getComputedAcceptAttribute(
 	}
 
 	// Build a list of specific MIME types based on allowedTypes.
-	const acceptedMimeTypes = [];
+	const acceptedMimeTypes: string[] = [];
 
 	for ( const [ , mimeType ] of Object.entries( allowedMimeTypes ) ) {
 		// Check if this MIME type matches any of the allowedTypes.
