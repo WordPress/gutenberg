@@ -100,6 +100,17 @@ describe( 'Button', () => {
 			);
 		} );
 
+		it( 'should render a spinner over the accessible label when isBusy is true', async () => {
+			await render( <Button isBusy>Saving…</Button> );
+			const button = screen.getByRole( 'button', { name: 'Saving…' } );
+
+			expect( button ).toHaveClass( 'is-busy' );
+			expect( button ).toBeEnabled();
+			expect(
+				screen.getByTestId( 'components-button-busy-spinner' )
+			).toBeInTheDocument();
+		} );
+
 		it( 'should render a button element with has-text when the text is not the first child', async () => {
 			const isBusy = false;
 

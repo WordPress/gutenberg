@@ -180,34 +180,40 @@
       - style
 - name: Button
   props:
-      - __experimentalIsFocusable
-      - __next40pxDefaultSize
-      - accessibleWhenDisabled
+      - aria-pressed
       - children
-      - describedBy
-      - description
+      - className
       - disabled
-      - href
-      - icon
-      - iconPosition
-      - iconSize
-      - isBusy
-      - isDefault
-      - isDestructive
-      - isLink
-      - isPressed
-      - isPrimary
-      - isSecondary
-      - isSmall
-      - isTertiary
-      - label
-      - shortcut
-      - showTooltip
+      - focusableWhenDisabled
+      - loading
+      - loadingAnnouncement
+      - nativeButton
+      - render
       - size
-      - target
-      - text
-      - tooltipPosition
+      - style
+      - tone
       - variant
+  subcomponents:
+      - name: Button.Icon
+        props:
+            - icon
+            - size
+- name: ButtonLink
+  props:
+      - children
+      - className
+      - openInNewTab
+      - render
+      - size
+      - style
+      - target
+      - tone
+      - variant
+  subcomponents:
+      - name: ButtonLink.Icon
+        props:
+            - icon
+            - size
 - name: Calendar
   props:
       - autoFocus
@@ -779,6 +785,24 @@
   props:
       - icon
       - size
+- name: IconButton
+  props:
+      - aria-pressed
+      - className
+      - disabled
+      - focusableWhenDisabled
+      - icon
+      - label
+      - loading
+      - loadingAnnouncement
+      - nativeButton
+      - positioner
+      - render
+      - shortcut
+      - size
+      - style
+      - tone
+      - variant
 - name: Input
   props:
       - className

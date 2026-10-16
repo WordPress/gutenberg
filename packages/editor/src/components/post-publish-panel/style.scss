@@ -90,10 +90,6 @@
 	display: inline-flex;
 	align-items: center;
 
-	&.is-busy .dashicon {
-		display: none;
-	}
-
 	.dashicon {
 		margin-right: -$grid-unit-05;
 	}
