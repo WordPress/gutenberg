@@ -4588,11 +4588,6 @@
 			"count": 4
 		}
 	},
-	"packages/components/src/select-control/styles/select-control-styles.ts": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/slot-fill/slot.tsx": {
 		"react-hooks/refs": {
 			"count": 1
