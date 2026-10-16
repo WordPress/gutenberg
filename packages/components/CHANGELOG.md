@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers that need Emotion styles in another document must provide their own Emotion `CacheProvider`; `StyleProvider` continues to register CSS Module styles. This includes:
+-   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers using `@emotion/react` or `@emotion/styled` that relied on StyleProvider's cross-document cache must provide their own cache and `CacheProvider`; `StyleProvider` continues to register CSS Module styles. This includes:
     -   Context-system class-name composition ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
     -   `StyleProvider` cache removal ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
     -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
