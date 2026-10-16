@@ -479,9 +479,8 @@
 			pointer-events: none;
 		}
 
-		.block-editor-grid-item-handles__rotate,
-		.block-editor-grid-item-handles__rotate *,
-		.block-editor-grid-item-handles__drag {
+		.block-editor-grid-item-handle,
+		.block-editor-grid-item-handle * {
 			pointer-events: all;
 		}
 	}
@@ -493,67 +492,43 @@
 	height: 100%;
 }
 
-.block-editor-grid-item-handles__rotate,
-.block-editor-grid-item-handles__drag {
+// Looks like a block toolbar with a single button.
+.block-editor-grid-item-handle {
 	position: absolute;
-	left: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: $grid-unit-30;
-	height: $grid-unit-30;
-	margin-left: -$grid-unit-15;
-	border-radius: 50%;
-	background: $white;
-	color: $gray-900;
-	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color), $elevation-x-small;
+	box-sizing: border-box;
+	min-width: $button-size-compact;
+	height: $button-size-compact;
+	padding: 0 $grid-unit-05;
+	// The same border as the block toolbar. No stroke token is as dark.
+	border: var(--wpds-border-width-xs) solid $gray-900;
+	border-radius: var(--wpds-border-radius-sm);
+	background: var(--wpds-color-background-surface-neutral-strong);
+	color: var(--wpds-color-foreground-interactive-neutral);
 	cursor: grab;
 	touch-action: none;
+
+	&:hover {
+		color: var(--wp-admin-theme-color);
+	}
 
 	&:active {
 		cursor: grabbing;
 	}
-
-	// Connects the handle to the block.
-	&::before {
-		content: "";
-		position: absolute;
-		left: 50%;
-		width: $border-width;
-		height: $grid-unit-10;
-		background: var(--wp-admin-theme-color);
-	}
 }
 
-// Below the block.
+// Outside the bottom right corner, clear of the resize handles in the middle
+// of each side.
 .block-editor-grid-item-handles__rotate {
-	bottom: -$grid-unit-40;
-
-	&::before {
-		bottom: 100%;
-	}
-}
-
-// Above the block, where its toolbar would be if the grid didn't show it.
-.block-editor-grid-item-handles__drag {
-	top: -$grid-unit-40;
-
-	&::before {
-		top: 100%;
-	}
+	right: -($button-size-compact + $grid-unit-10);
+	bottom: -($button-size-compact + $grid-unit-10);
 }
 
 .block-editor-grid-item-handles__angle {
-	position: absolute;
-	bottom: -$grid-unit-80;
-	left: 50%;
-	margin-left: -$grid-unit-30;
-	width: $grid-unit-60;
-	padding: 2px 0;
-	border-radius: $radius-small;
-	background: $gray-900;
-	color: $white;
+	padding: 0 $grid-unit-05;
 	font-family: $default-font;
-	font-size: $helptext-font-size;
-	text-align: center;
+	font-size: $default-font-size;
+	font-variant-numeric: tabular-nums;
 }
