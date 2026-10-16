@@ -12,6 +12,6 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../priority-queue/tsconfig.build.json" },
 		{ "path": "../private-apis" },
-		{ "path": "../undo-manager" }
+		{ "path": "../undo-manager/tsconfig.build.json" }
 	]
 }

@@ -373,6 +373,7 @@ export default dedupePlugins( [
 					'ts-check': false,
 				},
 			],
+			'jsdoc/escape-inline-tags': 'error',
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
@@ -928,15 +929,6 @@ export default dedupePlugins( [
 			'@wordpress/no-dom-globals-in-constructor': 'error',
 			'@wordpress/no-dom-globals-in-react-cc-render': 'error',
 			'@wordpress/no-dom-globals-in-react-fc': 'error',
-		},
-	},
-
-	// Override: Components src (non-test, non-stories) — no DS tokens.
-	{
-		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/**/@(test|stories)/**' ],
-		rules: {
-			'@wordpress/no-ds-tokens': 'error',
 		},
 	},
 
