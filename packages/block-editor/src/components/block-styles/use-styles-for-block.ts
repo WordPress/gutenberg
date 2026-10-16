@@ -5,18 +5,27 @@ import {
 	getBlockFromExample,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import type { Block, BlockStyle, BlockType } from '@wordpress/blocks';
+import type { SelectFunction } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { getActiveStyle, getRenderedStyles, replaceActiveStyle } from './utils';
 import { store as blockEditorStore } from '../../store';
+import type {
+	StylesForBlocksSelection,
+	UseStylesForBlocksArguments,
+} from './types';
 
 /**
  *
- * @param {WPBlock}     block Block object.
- * @param {WPBlockType} type  Block type settings.
- * @return {WPBlock}          A generic block ready for styles preview.
+ * @param block Block object.
+ * @param type  Block type settings.
+ * @return A generic block ready for styles preview.
  */
-function useGenericPreviewBlock( block, type ) {
-	return useMemo( () => {
+function useGenericPreviewBlock(
+	block: Block | null | undefined,
+	type: BlockType | undefined
+): Block | void {
+	return useMemo( (): Block | void => {
 		const example = type?.example;
 		const blockName = type?.name;
 
@@ -35,18 +44,17 @@ function useGenericPreviewBlock( block, type ) {
 }
 
 /**
- * @typedef useStylesForBlocksArguments
- * @property {string}     clientId Block client ID.
- * @property {() => void} onSwitch Block style switch callback function.
- */
-
-/**
  *
- * @param {useStylesForBlocksArguments} useStylesForBlocks arguments.
- * @return {Object}                                         Results of the select methods.
+ * @param useStylesForBlocks          arguments.
+ * @param useStylesForBlocks.clientId Block client ID.
+ * @param useStylesForBlocks.onSwitch Block style switch callback function.
+ * @return Results of the select methods.
  */
-export default function useStylesForBlocks( { clientId, onSwitch } ) {
-	const selector = ( select ) => {
+export default function useStylesForBlocks( {
+	clientId,
+	onSwitch,
+}: UseStylesForBlocksArguments ) {
+	const selector = ( select: SelectFunction ): StylesForBlocksSelection => {
 		const { getBlock } = select( blockEditorStore );
 		const block = getBlock( clientId );
 
@@ -60,7 +68,7 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 			block: ! blockType?.example ? block : null,
 			blockType,
 			styles: getBlockStyles( block.name ),
-			className: block.attributes.className || '',
+			className: ( block.attributes.className as string ) || '',
 		};
 	};
 	const { styles, block, blockType, className } = useSelect( selector, [
@@ -68,10 +76,15 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 	] );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const stylesToRender = getRenderedStyles( styles );
-	const activeStyle = getActiveStyle( stylesToRender, className );
+	// The rendered styles include a default, so a style is active unless
+	// there are none to render.
+	const activeStyle = getActiveStyle(
+		stylesToRender,
+		className
+	) as BlockStyle;
 	const genericPreviewBlock = useGenericPreviewBlock( block, blockType );
 
-	const onSelect = ( style ) => {
+	const onSelect = ( style: BlockStyle ) => {
 		const styleClassName = replaceActiveStyle(
 			className,
 			activeStyle,
@@ -80,7 +93,8 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 		updateBlockAttributes( clientId, {
 			className: styleClassName,
 		} );
-		onSwitch();
+		// Callers selecting styles pass the switch callback.
+		onSwitch!();
 	};
 
 	return {

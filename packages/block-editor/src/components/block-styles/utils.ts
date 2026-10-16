@@ -1,15 +1,19 @@
 import TokenList from '@wordpress/token-list';
 import { _x } from '@wordpress/i18n';
+import type { BlockStyle } from '@wordpress/blocks';
 
 /**
  * Returns the active style from the given className.
  *
- * @param {Array}  styles    Block styles.
- * @param {string} className Class name
+ * @param styles    Block styles.
+ * @param className Class name
  *
- * @return {?Object} The active style.
+ * @return The active style.
  */
-export function getActiveStyle( styles, className ) {
+export function getActiveStyle(
+	styles: BlockStyle[] | undefined,
+	className: string | undefined
+): BlockStyle | undefined {
 	for ( const style of new TokenList( className ).values() ) {
 		if ( style.indexOf( 'is-style-' ) === -1 ) {
 			continue;
@@ -30,13 +34,17 @@ export function getActiveStyle( styles, className ) {
 /**
  * Replaces the active style in the block's className.
  *
- * @param {string}  className   Class name.
- * @param {?Object} activeStyle The replaced style.
- * @param {Object}  newStyle    The replacing style.
+ * @param className   Class name.
+ * @param activeStyle The replaced style.
+ * @param newStyle    The replacing style.
  *
- * @return {string} The updated className.
+ * @return The updated className.
  */
-export function replaceActiveStyle( className, activeStyle, newStyle ) {
+export function replaceActiveStyle(
+	className: string | undefined,
+	activeStyle: BlockStyle | null | undefined,
+	newStyle: BlockStyle
+): string {
 	const list = new TokenList( className );
 
 	if ( activeStyle ) {
@@ -54,11 +62,13 @@ export function replaceActiveStyle( className, activeStyle, newStyle ) {
  * act as a fallback for when there is no active style applied to a block. The default item also serves
  * as a switch on the frontend to deactivate non-default styles.
  *
- * @param {Array} styles Block styles.
+ * @param styles Block styles.
  *
- * @return {Array<Object?>}        The style collection.
+ * @return The style collection.
  */
-export function getRenderedStyles( styles ) {
+export function getRenderedStyles(
+	styles: BlockStyle[] | null | undefined
+): BlockStyle[] {
 	if ( ! styles || styles.length === 0 ) {
 		return [];
 	}
@@ -78,10 +88,12 @@ export function getRenderedStyles( styles ) {
 /**
  * Returns a style object from a collection of styles where that style object is the default block style.
  *
- * @param {Array} styles Block styles.
+ * @param styles Block styles.
  *
- * @return {?Object}        The default style object, if found.
+ * @return The default style object, if found.
  */
-export function getDefaultStyle( styles ) {
+export function getDefaultStyle(
+	styles?: BlockStyle[]
+): BlockStyle | undefined {
 	return styles?.find( ( style ) => style.isDefault );
 }

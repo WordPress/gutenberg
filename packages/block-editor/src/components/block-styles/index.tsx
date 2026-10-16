@@ -10,19 +10,25 @@ import {
 // eslint-disable-next-line @wordpress/use-recommended-components
 import { Button } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import type { BlockStyle } from '@wordpress/blocks';
 import PreviewBlockPopover from '../block-switcher/preview-block-popover';
 import useStylesForBlocks from './use-styles-for-block';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
 import { getDefaultStyle, replaceActiveStyle } from './utils';
 import { store as blockEditorStore } from '../../store';
+import type { BlockStylesProps } from './types';
 
 const noop = () => {};
 
-const getCompositeItemId = ( instanceId, style ) =>
+const getCompositeItemId = ( instanceId: string, style: BlockStyle ) =>
 	`${ instanceId }-${ style.name }`;
 
 // Block Styles component for the Settings Sidebar.
-function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
+function BlockStyles( {
+	clientId,
+	onSwitch = noop,
+	onHoverClassName = noop,
+}: BlockStylesProps ) {
 	const canEdit = useSelect(
 		( select ) => select( blockEditorStore ).canEditBlock( clientId ),
 		[ clientId ]
@@ -37,8 +43,11 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		clientId,
 		onSwitch,
 	} );
-	const [ hoveredStyle, setHoveredStyle ] = useState( null );
-	const [ blockStylesAnchor, setBlockStylesAnchor ] = useState( null );
+	const [ hoveredStyle, setHoveredStyle ] = useState< BlockStyle | null >(
+		null
+	);
+	const [ blockStylesAnchor, setBlockStylesAnchor ] =
+		useState< HTMLDivElement | null >( null );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const instanceId = useInstanceId(
 		BlockStyles,
@@ -46,7 +55,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	);
 
 	const styleRows = useMemo( () => {
-		const rows = [];
+		const rows: BlockStyle[][] = [];
 		for ( let i = 0; i < ( stylesToRender?.length ?? 0 ); i += 2 ) {
 			rows.push( stylesToRender.slice( i, i + 2 ) );
 		}
@@ -77,16 +86,20 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		return null;
 	}
 
-	const debouncedSetHoveredStyle = debounce( setHoveredStyle, 250 );
+	const debouncedSetHoveredStyle = debounce(
+		// `debounce` takes callbacks with unknown arguments.
+		setHoveredStyle as ( ...args: unknown[] ) => void,
+		250
+	);
 
-	const onSelectStylePreview = ( style ) => {
+	const onSelectStylePreview = ( style: BlockStyle ) => {
 		onSelect( style );
 		onHoverClassName( null );
 		setHoveredStyle( null );
 		debouncedSetHoveredStyle.cancel();
 	};
 
-	const styleItemHandler = ( item ) => {
+	const styleItemHandler = ( item: BlockStyle | null ) => {
 		if ( hoveredStyle === item ) {
 			debouncedSetHoveredStyle.cancel();
 			return;
@@ -95,7 +108,7 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 		onHoverClassName( item?.name ?? null );
 	};
 
-	const onSetActiveId = ( nextActiveId ) => {
+	const onSetActiveId = ( nextActiveId: string | null | undefined ) => {
 		const nextStyle = stylesToRender.find(
 			( style ) =>
 				getCompositeItemId( instanceId, style ) === nextActiveId
@@ -112,7 +125,8 @@ function BlockStyles( { clientId, onSwitch = noop, onHoverClassName = noop } ) {
 	};
 
 	const onDeselect = () => {
-		onSelectStylePreview( defaultStyle );
+		// The rendered styles include a default.
+		onSelectStylePreview( defaultStyle! );
 	};
 
 	return (
