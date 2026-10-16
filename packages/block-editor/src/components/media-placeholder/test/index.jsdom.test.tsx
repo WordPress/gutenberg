@@ -5,6 +5,7 @@ import { MediaPlaceholder } from '../';
 vi.mock( import( '../../media-upload/check' ), () => ( {
 	default: () => null,
 } ) );
+// @ts-expect-error The `useSelect` mock returns no settings.
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	useSelect: () => ( {} ),
@@ -12,6 +13,9 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 
 describe( 'MediaPlaceholder', () => {
 	it( 'renders successfully when allowedTypes property is not specified', () => {
-		expect( () => render( <MediaPlaceholder multiple /> ) ).not.toThrow();
+		expect( () =>
+			// @ts-expect-error The test renders without a selection handler.
+			render( <MediaPlaceholder multiple /> )
+		).not.toThrow();
 	} );
 } );

@@ -41,6 +41,7 @@ describe( 'getComputedAcceptAttribute', () => {
 	it( 'returns wildcard format when allowedMimeTypes is not an object', () => {
 		const result = getComputedAcceptAttribute(
 			[ 'image' ],
+			// @ts-expect-error Tests the guard against a setting that is not an object.
 			'not-an-object',
 			undefined
 		);
