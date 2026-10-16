@@ -10,6 +10,7 @@ jobs:
     name: Admin - 1
 
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
     - uses: actions/checkout@v2
@@ -52,6 +53,7 @@ jobs:
     name: Admin - 2
 
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
     - uses: actions/checkout@v2
@@ -94,6 +96,7 @@ jobs:
     name: Admin - 3
 
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
     - uses: actions/checkout@v2
@@ -136,6 +139,7 @@ jobs:
     name: Admin - 4
 
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
     - uses: actions/checkout@v2
