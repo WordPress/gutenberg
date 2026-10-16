@@ -1,23 +1,7 @@
 import { useState } from '@wordpress/element';
 import type { Field, View, Form } from '@wordpress/dataviews';
 import { DataForm, DataViews } from '@wordpress/dataviews';
-import {
-	authorField,
-	commentStatusField,
-	dateField,
-	orderField,
-	passwordField,
-	slugField,
-	statusField,
-	titleField,
-} from '../fields';
-// Fields not yet covered:
-// featuredImageField,
-// pageTitleField,
-// parentField,
-// patternTitleField,
-// templateField,
-// templateTitleField,
+import { authorField, orderField } from '../fields';
 import type { BasePost, BasePostWithEmbeddedAuthor } from '../types';
 
 // Mock users for the story.
@@ -89,19 +73,7 @@ const samplePostWithAuthor: BasePostWithEmbeddedAuthor = {
 };
 
 // Create a showcase of all base fields.
-// This does not include fields that require more complex setups,
-// however this could be extended in the future, by setting up the data
-// stores to contain entities like pages, users, media, etc.
-const showcaseFields: Field< any >[] = [
-	titleField,
-	slugField,
-	statusField,
-	dateField,
-	authorFieldForStory,
-	commentStatusField,
-	passwordField,
-	orderField,
-];
+const showcaseFields: Field< any >[] = [ authorFieldForStory, orderField ];
 
 const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 	const [ data, setData ] = useState( samplePostWithAuthor );
@@ -115,16 +87,7 @@ const DataFormsComponent = ( { type }: { type: 'regular' | 'panel' } ) => {
 		layout: {
 			type,
 		},
-		fields: [
-			'title',
-			'slug',
-			'status',
-			'date',
-			'author',
-			'comment_status',
-			'password',
-			'menu_order',
-		],
+		fields: [ 'author', 'menu_order' ],
 	};
 
 	return (
@@ -163,7 +126,7 @@ export const DataViewsPreview = () => {
 	const [ view, setView ] = useState< View >( {
 		type: 'table',
 		fields: showcaseFields.map( ( f ) => f.id ),
-		titleField: 'title',
+		titleField: undefined,
 		descriptionField: undefined,
 		mediaField: undefined,
 	} );
