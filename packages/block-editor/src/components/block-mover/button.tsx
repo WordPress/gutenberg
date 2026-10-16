@@ -13,10 +13,19 @@ import {
 	chevronUp,
 	chevronDown,
 } from '@wordpress/icons';
+import type { MouseEvent } from 'react';
 import { getBlockMoverDescription } from './mover-description';
 import { store as blockEditorStore } from '../../store';
+import type {
+	BlockMoverButtonProps,
+	BlockMoverDirection,
+	BlockMoverOrientation,
+} from './types';
 
-const getArrowIcon = ( direction, orientation ) => {
+const getArrowIcon = (
+	direction: BlockMoverDirection,
+	orientation: BlockMoverOrientation
+) => {
 	if ( direction === 'up' ) {
 		if ( orientation === 'horizontal' ) {
 			return isRTL() ? chevronRight : chevronLeft;
@@ -31,7 +40,10 @@ const getArrowIcon = ( direction, orientation ) => {
 	return null;
 };
 
-const getMovementDirectionLabel = ( moveDirection, orientation ) => {
+const getMovementDirectionLabel = (
+	moveDirection: BlockMoverDirection,
+	orientation: BlockMoverOrientation
+) => {
 	if ( moveDirection === 'up' ) {
 		if ( orientation === 'horizontal' ) {
 			return isRTL() ? __( 'Move right' ) : __( 'Move left' );
@@ -46,7 +58,10 @@ const getMovementDirectionLabel = ( moveDirection, orientation ) => {
 	return null;
 };
 
-const BlockMoverButton = forwardRef(
+const BlockMoverButton = forwardRef<
+	HTMLButtonElement,
+	BlockMoverButtonProps & { direction: BlockMoverDirection }
+>(
 	(
 		{ clientIds, direction, orientation: moverOrientation, ...props },
 		ref
@@ -110,7 +125,7 @@ const BlockMoverButton = forwardRef(
 		const moverFunction =
 			direction === 'up' ? moveBlocksUp : moveBlocksDown;
 
-		const onClick = ( event ) => {
+		const onClick = ( event: MouseEvent< HTMLButtonElement > ) => {
 			moverFunction( clientIds, rootClientId );
 			if ( props.onClick ) {
 				props.onClick( event );
@@ -130,10 +145,11 @@ const BlockMoverButton = forwardRef(
 						`is-${ direction }-button`
 					) }
 					icon={ getArrowIcon( direction, orientation ) }
+					// Both directions have a label.
 					label={ getMovementDirectionLabel(
 						direction,
 						orientation
-					) }
+					)! }
 					tooltipPosition={
 						! isMobileViewport &&
 						direction === 'down' &&
@@ -143,7 +159,10 @@ const BlockMoverButton = forwardRef(
 					}
 					aria-describedby={ hasBlocks ? descriptionId : undefined }
 					{ ...props }
-					onClick={ isDisabled ? null : onClick }
+					// The button ignores a `null` click handler.
+					onClick={
+						( isDisabled ? null : onClick ) as typeof onClick
+					}
 					disabled={ isDisabled }
 					accessibleWhenDisabled
 					shortcut={ displayShortcut.secondary( keyCharacter ) }
@@ -155,14 +174,19 @@ const BlockMoverButton = forwardRef(
 							__( '%1$s (%2$s)' ),
 							getBlockMoverDescription(
 								blocksCount,
-								blockType && blockType.title,
+								// A described block has a block type.
+								( blockType && blockType.title ) as string,
 								firstIndex,
 								isFirst,
 								isLast,
 								direction === 'up' ? -1 : 1,
 								orientation
-							),
-							shortcutAriaLabel.secondary( keyCharacter )
+								// The mover is shown for positions it can describe.
+							) as string,
+							// The secondary modifier has a label.
+							shortcutAriaLabel.secondary(
+								keyCharacter
+							) as string
 						) }
 					</VisuallyHidden>
 				) }
@@ -171,10 +195,16 @@ const BlockMoverButton = forwardRef(
 	}
 );
 
-export const BlockMoverUpButton = forwardRef( ( props, ref ) => {
+export const BlockMoverUpButton = forwardRef<
+	HTMLButtonElement,
+	BlockMoverButtonProps
+>( ( props, ref ) => {
 	return <BlockMoverButton direction="up" ref={ ref } { ...props } />;
 } );
 
-export const BlockMoverDownButton = forwardRef( ( props, ref ) => {
+export const BlockMoverDownButton = forwardRef<
+	HTMLButtonElement,
+	BlockMoverButtonProps
+>( ( props, ref ) => {
 	return <BlockMoverButton direction="down" ref={ ref } { ...props } />;
 } );
