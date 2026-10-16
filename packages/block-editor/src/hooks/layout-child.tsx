@@ -21,6 +21,18 @@ import {
 	hasViewportBlockStyleState,
 	setStyleForState,
 } from './block-style-state';
+import type {
+	BlockStyleState,
+	BlockListBlockFeatureProps,
+	ChildLayoutBlockStyle,
+	ChildLayoutControlsPureProps,
+	ChildLayoutRule,
+	ChildLayoutStyleRulesOptions,
+	GridToolsProps,
+	ResponsiveChildLayoutStylesOptions,
+} from './types';
+import type { ChildLayout } from '../components/child-layout-control/types';
+import type { Layout, LayoutBlockSupport } from '../layouts/types';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -41,11 +53,12 @@ const FLEX_SIZE_VALUES = [
 	FLEX_CHILD_LAYOUT_VALUES.fixed,
 ];
 
-function isFlexSizeValue( value ) {
-	return FLEX_SIZE_VALUES.includes( value );
+function isFlexSizeValue( value: string | undefined ) {
+	// `includes` finds no match for `undefined`.
+	return FLEX_SIZE_VALUES.includes( value as string );
 }
 
-function serializeRule( { selector, declarations } ) {
+function serializeRule( { selector, declarations }: ChildLayoutRule ) {
 	return `${ selector } {
 		${ Object.entries( declarations )
 			.map( ( [ property, value ] ) => `${ property }: ${ value }` )
@@ -59,7 +72,7 @@ export function getChildLayoutStyleRules( {
 	viewportOverrides,
 	parentLayout = {},
 	includeContainerQuery = true,
-} ) {
+}: ChildLayoutStyleRulesOptions ): ChildLayoutRule[] {
 	const hasViewportOverrides = viewportOverrides !== undefined;
 	const effectiveLayout = hasViewportOverrides
 		? {
@@ -67,7 +80,7 @@ export function getChildLayoutStyleRules( {
 				...viewportOverrides,
 			}
 		: layout;
-	const hasViewportOverride = ( key ) =>
+	const hasViewportOverride = ( key: string ) =>
 		Object.hasOwn( viewportOverrides || {}, key );
 	const {
 		selfStretch,
@@ -79,9 +92,9 @@ export function getChildLayoutStyleRules( {
 	} = effectiveLayout;
 	const baseSelfStretch = layout.selfStretch;
 	const { columnCount, minimumColumnWidth } = parentLayout;
-	const rules = [];
+	const rules: ChildLayoutRule[] = [];
 
-	const declarations = {};
+	const declarations: Record< string, string > = {};
 	if (
 		! hasViewportOverrides ||
 		hasViewportOverride( 'selfStretch' ) ||
@@ -158,7 +171,8 @@ export function getChildLayoutStyleRules( {
 			( columnSpan || columnStart ) &&
 			( minimumColumnWidth || ! columnCount )
 		) {
-			let parentColumnValue = parseFloat( minimumColumnWidth );
+			// `parseFloat` gives `NaN` for a missing width, handled below.
+			let parentColumnValue = parseFloat( minimumColumnWidth as string );
 			/**
 			 * 12rem is the default minimumColumnWidth value.
 			 * If parentColumnValue is not a number, default to 12.
@@ -168,14 +182,18 @@ export function getChildLayoutStyleRules( {
 			}
 
 			let parentColumnUnit = minimumColumnWidth?.replace(
-				parentColumnValue,
+				// `replace` converts the number to its string.
+				parentColumnValue as unknown as string,
 				''
 			);
 			/**
 			 * Check that parent column unit is either 'px', 'rem' or 'em'.
 			 * If not, default to 'rem'.
 			 */
-			if ( ! [ 'px', 'rem', 'em' ].includes( parentColumnUnit ) ) {
+			// A missing unit matches none, so it defaults below.
+			if (
+				! [ 'px', 'rem', 'em' ].includes( parentColumnUnit as string )
+			) {
 				parentColumnUnit = 'rem';
 			}
 
@@ -186,7 +204,8 @@ export function getChildLayoutStyleRules( {
 			} else if ( columnSpan ) {
 				numColsToBreakAt = columnSpan;
 			} else {
-				numColsToBreakAt = columnStart;
+				// Only reached with a column start.
+				numColsToBreakAt = columnStart!;
 			}
 
 			const defaultGapValue = parentColumnUnit === 'px' ? 24 : 1.5;
@@ -223,7 +242,7 @@ export function getChildLayoutStyles( {
 	layout = {},
 	parentLayout = {},
 	includeContainerQuery = true,
-} ) {
+}: ChildLayoutStyleRulesOptions ) {
 	return getChildLayoutStyleRules( {
 		selector,
 		layout,
@@ -246,7 +265,7 @@ export function getResponsiveChildLayoutStyles( {
 	selector,
 	parentLayout = {},
 	viewportSettings,
-} ) {
+}: ResponsiveChildLayoutStylesOptions ) {
 	const baseLayout = style?.layout ?? {};
 
 	return Object.entries( getResponsiveMediaQueries( viewportSettings ) )
@@ -254,7 +273,8 @@ export function getResponsiveChildLayoutStyles( {
 			const viewportLayout = getStyleForState( style, {
 				viewport,
 				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-			} )?.layout;
+				// A style state holds the child layout it overrides.
+			} )?.layout as ChildLayout | undefined;
 			if ( ! viewportLayout || ! Object.keys( viewportLayout ).length ) {
 				return '';
 			}
@@ -277,12 +297,16 @@ export function getResponsiveChildLayoutStyles( {
 /**
  * Merges child layout changes into the active layout style state.
  *
- * @param {Object|undefined} style         Block style attributes.
- * @param {Object}           layout        Child layout changes.
- * @param {Object}           selectedState Selected block style state.
- * @return {Object|undefined} Updated block style attributes.
+ * @param style         Block style attributes.
+ * @param layout        Child layout changes.
+ * @param selectedState Selected block style state.
+ * @return Updated block style attributes.
  */
-export function getUpdatedChildLayoutStyle( style, layout, selectedState ) {
+export function getUpdatedChildLayoutStyle(
+	style: ChildLayoutBlockStyle | undefined,
+	layout: ChildLayout,
+	selectedState: BlockStyleState | undefined
+): ChildLayoutBlockStyle | undefined {
 	if ( ! hasViewportBlockStyleState( selectedState ) ) {
 		return {
 			...style,
@@ -294,10 +318,13 @@ export function getUpdatedChildLayoutStyle( style, layout, selectedState ) {
 	}
 
 	const layoutState = {
-		viewport: selectedState.viewport,
+		// A viewport state is selected here.
+		viewport: selectedState!.viewport,
 		pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
 	};
-	const stateStyle = getStyleForState( style, layoutState );
+	// A style state holds the child layout it overrides.
+	const stateStyle = getStyleForState( style, layoutState ) as
+		ChildLayoutBlockStyle | undefined;
 
 	return setStyleForState( style, layoutState, {
 		...stateStyle,
@@ -308,19 +335,24 @@ export function getUpdatedChildLayoutStyle( style, layout, selectedState ) {
 	} );
 }
 
-function useBlockPropsChildLayoutStyles( { style } ) {
+function useBlockPropsChildLayoutStyles( {
+	style,
+}: BlockListBlockFeatureProps & { style?: ChildLayoutBlockStyle } ) {
 	const { shouldRenderChildLayoutStyles, viewportSettings } = useSelect(
 		( select ) => {
 			const settings = select( blockEditorStore ).getSettings();
 			return {
 				shouldRenderChildLayoutStyles: ! settings.disableLayoutStyles,
-				viewportSettings: settings?.__experimentalFeatures?.viewport,
+				// The editor features hold the viewport settings.
+				viewportSettings: settings?.__experimentalFeatures?.viewport as
+					Record< string, unknown > | undefined,
 			};
 		}
 	);
 	const layout = style?.layout ?? {};
 	const { columnStart, rowStart, columnSpan, rowSpan } = layout;
-	const parentLayout = useLayout() || {};
+	// The layout context holds the parent block's layout.
+	const parentLayout = ( useLayout() as Layout | undefined ) || {};
 	const id = useInstanceId( LAYOUT_CHILD_BLOCK_PROPS_REFERENCE );
 	const selector = `.wp-container-content-${ id }`;
 
@@ -369,8 +401,14 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 	return { className: `wp-container-content-${ id }` };
 }
 
-function ChildLayoutControlsPure( { clientId, style, setAttributes } ) {
-	const parentLayout = useLayout() || {};
+function ChildLayoutControlsPure( {
+	clientId,
+	style,
+	setAttributes,
+}: ChildLayoutControlsPureProps ) {
+	// The layout context merges the parent's layout and its support.
+	const parentLayout =
+		( useLayout() as ( Layout & LayoutBlockSupport ) | undefined ) || {};
 	const {
 		type: parentLayoutType = 'default',
 		allowSizingOnChildren = false,
@@ -400,7 +438,7 @@ function GridTools( {
 	allowSizingOnChildren,
 	isManualPlacement,
 	parentLayout,
-} ) {
+}: GridToolsProps ) {
 	const {
 		rootClientId,
 		isVisible,
@@ -500,7 +538,7 @@ function GridTools( {
 		} );
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
-	const [ resizerBounds, setResizerBounds ] = useState();
+	const [ resizerBounds, setResizerBounds ] = useState< HTMLElement >();
 
 	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
@@ -510,7 +548,7 @@ function GridTools( {
 
 	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
 
-	function updateLayout( layout ) {
+	function updateLayout( layout: ChildLayout ) {
 		setAttributes( {
 			style: getUpdatedChildLayoutStyle( style, layout, selectedState ),
 		} );
