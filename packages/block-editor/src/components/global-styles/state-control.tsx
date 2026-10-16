@@ -2,22 +2,24 @@ import { __, sprintf } from '@wordpress/i18n';
 import { check, chevronDown, moreVertical } from '@wordpress/icons';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
+import type { ComponentProps } from 'react';
+import type { StateControlProps } from './types';
 
 /**
  * State control for managing viewport and pseudo-state styles.
  * Displays a dropdown menu with separate groups for each selector.
  *
- * @param {Object}   props                     Component props.
- * @param {Array}    props.viewportStates      Array of available viewport states.
- * @param {Array}    props.pseudoStates        Array of available pseudo states.
- * @param {string}   props.viewportValue       Currently selected viewport value.
- * @param {string}   props.pseudoStateValue    Currently selected pseudo state value.
- * @param {Function} props.onChangeViewport    Callback when viewport selection changes.
- * @param {Function} props.onChangePseudoState Callback when pseudo state selection changes.
- * @param {boolean}  props.showText            Whether to show text label on the toggle. Default true.
- * @param {Object}   props.popoverProps        Popover props for the dropdown menu.
- * @param {Element}  props.children            Optional menu content rendered after the state groups.
- * @return {Element|null} State control component.
+ * @param props                     Component props.
+ * @param props.viewportStates      Array of available viewport states.
+ * @param props.pseudoStates        Array of available pseudo states.
+ * @param props.viewportValue       Currently selected viewport value.
+ * @param props.pseudoStateValue    Currently selected pseudo state value.
+ * @param props.onChangeViewport    Callback when viewport selection changes.
+ * @param props.onChangePseudoState Callback when pseudo state selection changes.
+ * @param props.showText            Whether to show text label on the toggle. Default true.
+ * @param props.popoverProps        Popover props for the dropdown menu.
+ * @param props.children            Optional menu content rendered after the state groups.
+ * @return State control component.
  */
 export default function StateControl( {
 	viewportStates = [],
@@ -29,7 +31,7 @@ export default function StateControl( {
 	showText = true,
 	popoverProps = {},
 	children,
-} ) {
+}: StateControlProps ) {
 	if ( ! viewportStates.length && ! pseudoStates.length ) {
 		return null;
 	}
@@ -52,7 +54,7 @@ export default function StateControl( {
 	const hasViewportOptions = viewportStates.length > 0;
 	const hasPseudoStateOptions = pseudoStates.length > 0;
 	const triggerLabel = __( 'States' );
-	const activeStates = [];
+	const activeStates: { key: string; label: string }[] = [];
 
 	if ( hasViewportOptions && viewportValue !== 'default' ) {
 		const selectedViewport = viewportOptions.find(
@@ -84,9 +86,10 @@ export default function StateControl( {
 		? activeStates.map( ( state ) => state.label ).join( ', ' )
 		: __( 'Default' );
 	const icon = showText ? chevronDown : moreVertical;
-	const toggleProps = showText
-		? { size: 'compact', iconPosition: 'right' }
-		: { size: 'small' };
+	const toggleProps: ComponentProps< typeof DropdownMenu >[ 'toggleProps' ] =
+		showText
+			? { size: 'compact', iconPosition: 'right' }
+			: { size: 'small' };
 
 	return (
 		<Stack
