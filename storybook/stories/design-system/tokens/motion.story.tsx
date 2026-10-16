@@ -168,7 +168,11 @@ function MotionDemo() {
 							label="Duration"
 							items={ DURATION_OPTIONS }
 							defaultValue={ DEFAULT_DURATION_OPTION }
-							triggerContent={ ( item ) => item.value }
+							trigger={
+								<SelectControl.Trigger>
+									{ ( item ) => item.value }
+								</SelectControl.Trigger>
+							}
 							onValueChange={ ( item ) => {
 								if (
 									! item ||

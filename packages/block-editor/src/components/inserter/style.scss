@@ -550,11 +550,32 @@ $media-grid-loading-min-height: 500px;
 			height: 100%;
 			object-fit: contain;
 		}
+	}
 
-		audio {
-			width: 100%;
-			position: absolute;
-			bottom: 0;
+	// A file with no visual of its own previews as an icon and filename.
+	.block-editor-inserter__media-grid__file-preview {
+		box-sizing: border-box;
+		width: 100%;
+		height: 100%;
+		padding: 0 $grid-unit-20;
+		color: $gray-700;
+		text-align: center;
+		container-type: inline-size;
+	}
+
+	.block-editor-inserter__media-grid__file-preview__name {
+		// A top margin rather than a gap on the stack, so the icon stays
+		// centred when there's no filename to show.
+		margin-top: $grid-unit-05;
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		font-size: $helptext-font-size;
+
+		// Too narrow to read, so the icon carries it alone.
+		@container (max-width: 90px) {
+			display: none;
 		}
 	}
 
