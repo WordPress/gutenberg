@@ -5,6 +5,8 @@ import {
 	Dropdown,
 	AlignmentMatrixControl,
 } from '@wordpress/components';
+import type { KeyboardEvent } from 'react';
+import type { BlockAlignmentMatrixControlProps } from './types';
 
 const noop = () => {};
 
@@ -39,7 +41,9 @@ const noop = () => {};
  * @param {boolean}  props.isDisabled Whether the control should be disabled.
  * @return {Element} The BlockAlignmentMatrixControl component.
  */
-function BlockAlignmentMatrixControl( props ) {
+function BlockAlignmentMatrixControl(
+	props: BlockAlignmentMatrixControlProps
+) {
 	const {
 		label = __( 'Change matrix alignment' ),
 		onChange = noop,
@@ -53,7 +57,7 @@ function BlockAlignmentMatrixControl( props ) {
 		<Dropdown
 			popoverProps={ { placement: 'bottom-start' } }
 			renderToggle={ ( { onToggle, isOpen } ) => {
-				const openOnArrowDown = ( event ) => {
+				const openOnArrowDown = ( event: KeyboardEvent ) => {
 					if ( ! isOpen && event.keyCode === DOWN ) {
 						event.preventDefault();
 						onToggle();
