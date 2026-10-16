@@ -73,6 +73,49 @@ test.describe( 'Meta boxes', () => {
 		await expect( field ).toHaveValue( 'META' );
 	} );
 
+	test( 'should let a meta box move into the sidebar after reopening it', async ( {
+		editor,
+		page,
+	} ) => {
+		// Keep the new order out of the user's saved meta box order.
+		await page.route( '**/wp-admin/admin-ajax.php', ( route ) =>
+			route.request().postData()?.includes( 'action=meta-box-order' )
+				? route.fulfill( { body: '1' } )
+				: route.continue()
+		);
+
+		const settings = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Settings', exact: true } );
+		await editor.openDocumentSettingsSidebar();
+		await settings.click();
+
+		await page
+			.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
+			.click( { position: { x: 40, y: 10 } } );
+		const metaBox = page.locator( '#gutenberg-test-meta-box' );
+		const moveDown = metaBox.getByRole( 'button', { name: 'Move down' } );
+
+		// With the sidebar closed, move the box to the last visible area.
+		while (
+			( await moveDown.getAttribute( 'aria-disabled' ) ) !== 'true'
+		) {
+			await moveDown.click();
+		}
+
+		await settings.click();
+		await expect( moveDown ).toHaveAttribute( 'aria-disabled', 'false' );
+
+		while (
+			( await moveDown.getAttribute( 'aria-disabled' ) ) !== 'true'
+		) {
+			await moveDown.click();
+		}
+		await expect(
+			page.locator( '#side-sortables #gutenberg-test-meta-box' )
+		).toBeVisible();
+	} );
+
 	test( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async ( {
 		admin,
 		editor,
