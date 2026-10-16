@@ -1,13 +1,14 @@
 import { useMemo } from '@wordpress/element';
+import type { Settings } from '../../store/types';
 
 /**
  * React hook used to compute the media upload settings to use in the post editor.
  *
- * @param {Object} settings Media upload settings prop.
+ * @param settings Media upload settings prop.
  *
- * @return {Object} Media upload settings.
+ * @return Media upload settings.
  */
-function useMediaUploadSettings( settings = {} ) {
+function useMediaUploadSettings( settings: Settings = {} ) {
 	return useMemo(
 		() => ( {
 			mediaUpload: settings.mediaUpload,

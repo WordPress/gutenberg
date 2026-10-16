@@ -1,4 +1,5 @@
 import { createContext } from '@wordpress/element';
+import type { SelectionContextValue } from './types';
 
 const noop = () => {};
 
@@ -10,7 +11,7 @@ const noop = () => {};
  *                   block editor tree on every keystroke.
  * - `onChangeSelection`: Callback to report selection changes with external IDs back to the entity.
  */
-export const SelectionContext = createContext( {
+export const SelectionContext = createContext< SelectionContextValue >( {
 	getSelection: () => undefined,
 	onChangeSelection: noop,
 } );
