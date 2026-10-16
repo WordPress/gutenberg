@@ -31,7 +31,7 @@ test.describe( 'Social Icons', () => {
 		await expect(
 			settings.getByRole( 'heading', { name: 'Settings' } )
 		).toBeVisible();
-		const linkInput = settings.getByRole( 'textbox', { name: 'Link' } );
+		const linkInput = settings.getByRole( 'combobox', { name: 'Link' } );
 		await expect( linkInput ).toHaveValue( 'https://wordpress.org/' );
 		await expect(
 			settings.getByRole( 'textbox' ).first()
