@@ -3,7 +3,7 @@ import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { isNavigationCandidate } from '../use-arrow-nav';
 
 describe( 'isNavigationCandidate', () => {
-	let elements;
+	let elements: Record< string, HTMLElement >;
 	beforeAll( () => {
 		elements = {};
 
@@ -17,7 +17,8 @@ describe( 'isNavigationCandidate', () => {
 		elements.inputNumber.setAttribute( 'type', 'number' );
 
 		elements.contentEditable = document.createElement( 'p' );
-		elements.contentEditable.contentEditable = true;
+		// The DOM stringifies the boolean.
+		elements.contentEditable.contentEditable = true as unknown as string;
 	} );
 
 	it( 'should return true if vertically navigating input without modifier', () => {

@@ -6,7 +6,7 @@ import { store as blockEditorStore } from '../../store';
 export default function useUndoAutomaticChange() {
 	const { didAutomaticChange, getSettings } = useSelect( blockEditorStore );
 
-	function onKeyDown( event ) {
+	function onKeyDown( event: KeyboardEvent ) {
 		const { keyCode } = event;
 
 		if ( event.defaultPrevented ) {
@@ -31,7 +31,7 @@ export default function useUndoAutomaticChange() {
 		__experimentalUndo();
 	}
 
-	return useRefEffect( ( element ) => {
+	return useRefEffect< HTMLElement >( ( element ) => {
 		element.addEventListener( 'keydown', onKeyDown );
 		return () => {
 			element.removeEventListener( 'keydown', onKeyDown );

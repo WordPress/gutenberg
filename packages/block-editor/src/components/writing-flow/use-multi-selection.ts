@@ -1,9 +1,10 @@
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import type { SelectFunction } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 
-function selector( select ) {
+function selector( select: SelectFunction ) {
 	const {
 		isMultiSelecting,
 		getMultiSelectedBlockClientIds,
@@ -37,7 +38,7 @@ export default function useMultiSelection() {
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
@@ -77,7 +78,8 @@ export default function useMultiSelection() {
 			// happens BEFORE selection removal.
 			setContentEditableWrapper( node, true );
 
-			defaultView.getSelection().removeAllRanges();
+			// A mounted element's window has a selection.
+			defaultView!.getSelection()!.removeAllRanges();
 		},
 		[
 			hasMultiSelection,

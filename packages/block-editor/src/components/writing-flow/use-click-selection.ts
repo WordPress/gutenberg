@@ -19,15 +19,15 @@ export default function useClickSelection() {
 		getSelectionStart,
 		hasMultiSelection,
 	} = useSelect( blockEditorStore );
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
-			let pointerType;
+			let pointerType: string | undefined;
 
-			function onPointerDown( event ) {
+			function onPointerDown( event: PointerEvent ) {
 				pointerType = event.pointerType;
 			}
 
-			function onMouseDown( event ) {
+			function onMouseDown( event: MouseEvent ) {
 				// The main button.
 				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 				if ( ! isSelectionEnabled() || event.button !== 0 ) {
@@ -35,7 +35,10 @@ export default function useClickSelection() {
 				}
 
 				const startClientId = getBlockSelectionStart();
-				const clickedClientId = getBlockClientId( event.target );
+				// Mouse events reach the listener from nodes.
+				const clickedClientId = getBlockClientId(
+					event.target as Node
+				);
 
 				// A tap in the block the wrapper hosts, with the caret already
 				// placed by the tap: all the default action would do is focus
@@ -81,8 +84,9 @@ export default function useClickSelection() {
 						// click: the near edge of the selected block, so the
 						// whole block ends up within the extended selection.
 						const { ownerDocument } = node;
+						// A mounted element's window has a selection.
 						const selection =
-							ownerDocument.defaultView.getSelection();
+							ownerDocument.defaultView!.getSelection()!;
 						const blockElement =
 							! attributeKey &&
 							ownerDocument.getElementById(
@@ -99,7 +103,7 @@ export default function useClickSelection() {
 							const isForward =
 								// eslint-disable-next-line no-bitwise
 								blockElement.compareDocumentPosition(
-									event.target
+									event.target as Node
 								) & node.DOCUMENT_POSITION_FOLLOWING;
 							selection.setPosition(
 								blockElement,
@@ -114,7 +118,8 @@ export default function useClickSelection() {
 					// multiselection, as focus can be incurred by starting a
 					// multiselection (focus moved to first block's multi-
 					// controls).
-					selectBlock( clickedClientId );
+					// A click outside blocks passes no client ID, as before.
+					selectBlock( clickedClientId as string );
 				}
 			}
 

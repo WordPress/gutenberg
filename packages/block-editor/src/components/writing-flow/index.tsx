@@ -3,6 +3,7 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
+import type { ForwardedRef, ReactElement, RefCallback } from 'react';
 import useEditableRoot from './use-editable-root';
 import useHomeEnd from './use-home-end';
 import useMultiSelection from './use-multi-selection';
@@ -19,8 +20,13 @@ import useInput from './use-input';
 import useClipboardHandler from './use-clipboard-handler';
 import { store as blockEditorStore } from '../../store';
 import { useMultiBlockFormatShortcuts } from '../rich-text/multi-block-format-edit';
+import type { WritingFlowProps } from './types';
 
-export function useWritingFlow() {
+export function useWritingFlow(): [
+	ReactElement,
+	RefCallback< HTMLElement >,
+	ReactElement,
+] {
 	const [ before, ref, after ] = useTabNav();
 	const hasMultiSelection = useSelect(
 		( select ) => select( blockEditorStore ).hasMultiSelection(),
@@ -48,17 +54,19 @@ export function useWritingFlow() {
 			useSelectAll(),
 			useArrowNav(),
 			usePreviewModeNav(),
-			useRefEffect(
+			useRefEffect< HTMLElement >(
 				( node ) => {
 					node.tabIndex = 0;
-					node.dataset.hasMultiSelection = hasMultiSelection;
+					// The DOM stringifies the boolean.
+					node.dataset.hasMultiSelection =
+						hasMultiSelection as unknown as string;
 					// The wrapper is the canvas root: an editing host while
 					// a selection spans blocks or the selected block
 					// supports `editableRoot`, explicitly not one otherwise,
 					// so it can always be found as the outermost editable
 					// ancestor of a field.
 					if ( ! node.hasAttribute( 'contenteditable' ) ) {
-						node.contentEditable = false;
+						node.contentEditable = false as unknown as string;
 					}
 
 					if ( ! hasMultiSelection ) {
@@ -94,7 +102,10 @@ export function useWritingFlow() {
 	];
 }
 
-function WritingFlow( { children, ...props }, forwardedRef ) {
+function WritingFlow(
+	{ children, ...props }: WritingFlowProps,
+	forwardedRef: ForwardedRef< HTMLDivElement >
+) {
 	const [ before, ref, after ] = useWritingFlow();
 	return (
 		<>

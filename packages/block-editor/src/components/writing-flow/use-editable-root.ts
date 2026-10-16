@@ -23,7 +23,7 @@ export default function useEditableRoot() {
 		);
 	}, [] );
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( ! enabled ) {
 				return;
@@ -52,15 +52,16 @@ export default function useEditableRoot() {
 			// pending caret placement. The selection observer moves focus
 			// once the selection lands.
 			const { activeElement } = node.ownerDocument;
-			const selection = node.ownerDocument.defaultView.getSelection();
+			// A mounted element's window has a selection.
+			const selection = node.ownerDocument.defaultView!.getSelection()!;
 			if (
 				activeElement !== node &&
-				activeElement?.isContentEditable &&
+				( activeElement as HTMLElement | null )?.isContentEditable &&
 				node.contains( activeElement ) &&
 				getBlockClientId( activeElement ) ===
 					getSelectedBlockClientId() &&
 				selection.anchorNode &&
-				activeElement.contains( selection.anchorNode )
+				activeElement!.contains( selection.anchorNode )
 			) {
 				node.focus();
 			}
@@ -87,9 +88,9 @@ export default function useEditableRoot() {
 				// selection through its focus handler.
 				if ( node.ownerDocument.activeElement === node ) {
 					const editable = getSelectionEditableElement(
-						node.ownerDocument.defaultView.getSelection(),
+						node.ownerDocument.defaultView!.getSelection()!,
 						node
-					);
+					) as HTMLElement | undefined;
 					if (
 						editable &&
 						getBlockClientId( editable ) ===

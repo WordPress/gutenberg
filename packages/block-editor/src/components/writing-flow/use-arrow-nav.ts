@@ -24,13 +24,17 @@ import { setContentEditableWrapper } from './utils';
  * Returns true if the element should consider edge navigation upon a keyboard
  * event of the given directional key code, or false otherwise.
  *
- * @param {Element} element     HTML element to test.
- * @param {number}  keyCode     KeyboardEvent keyCode to test.
- * @param {boolean} hasModifier Whether a modifier is pressed.
+ * @param element     HTML element to test.
+ * @param keyCode     KeyboardEvent keyCode to test.
+ * @param hasModifier Whether a modifier is pressed.
  *
- * @return {boolean} Whether element should consider edge navigation.
+ * @return Whether element should consider edge navigation.
  */
-export function isNavigationCandidate( element, keyCode, hasModifier ) {
+export function isNavigationCandidate(
+	element: Element,
+	keyCode: number,
+	hasModifier: boolean
+): boolean {
 	const isVertical = keyCode === UP || keyCode === DOWN;
 	const { tagName } = element;
 	const elementType = element.getAttribute( 'type' );
@@ -47,7 +51,8 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 				'time',
 				'week',
 			];
-			return ! verticalInputTypes.includes( elementType );
+			// A missing type is not in the list.
+			return ! verticalInputTypes.includes( elementType as string );
 		}
 		return true;
 	}
@@ -65,7 +70,7 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 			'reset',
 			'submit',
 		];
-		return simpleInputTypes.includes( elementType );
+		return simpleInputTypes.includes( elementType as string );
 	}
 
 	// Native textareas should not navigate horizontally.
@@ -77,21 +82,21 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
  * direction. A preference is made toward text fields, falling back to the block
  * focus stop if no other candidates exist for the block.
  *
- * @param {Element} target           Currently focused text field.
- * @param {boolean} isReverse        True if considering as the first field.
- * @param {Element} containerElement Element containing all blocks.
- * @param {boolean} onlyVertical     Whether to only consider tabbable elements
- *                                   that are visually above or under the
- *                                   target.
+ * @param target           Currently focused text field.
+ * @param isReverse        True if considering as the first field.
+ * @param containerElement Element containing all blocks.
+ * @param onlyVertical     Whether to only consider tabbable elements
+ *                         that are visually above or under the
+ *                         target.
  *
- * @return {?Element} Optimal tab target, if one exists.
+ * @return Optimal tab target, if one exists.
  */
 export function getClosestTabbable(
-	target,
-	isReverse,
-	containerElement,
-	onlyVertical
-) {
+	target: Element,
+	isReverse: boolean,
+	containerElement: Element,
+	onlyVertical?: boolean
+): HTMLElement | undefined {
 	// Since the current focus target is not guaranteed to be a text field, find
 	// all focusables. Tabbability is considered later.
 	let focusableNodes = focus.focusable.find( containerElement );
@@ -104,22 +109,23 @@ export function getClosestTabbable(
 	// assumed this can only be reached if the target is focusable (on its
 	// keydown event), so no need to verify it exists in the set.
 	focusableNodes = focusableNodes.slice(
-		focusableNodes.indexOf( target ) + 1
+		focusableNodes.indexOf( target as HTMLElement ) + 1
 	);
 
-	let targetRect;
+	let targetRect: DOMRect;
 
 	if ( onlyVertical ) {
 		targetRect = target.getBoundingClientRect();
 	}
 
-	function isTabCandidate( node ) {
+	function isTabCandidate( node: HTMLElement ) {
 		// Skip if there's only one child that is content editable (and thus a
 		// better candidate).
 		if (
 			node.children.length === 1 &&
-			isInSameBlock( node, node.firstElementChild ) &&
-			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
+			// The node has a single child element.
+			isInSameBlock( node, node.firstElementChild! ) &&
+			node.firstElementChild!.getAttribute( 'contenteditable' ) === 'true'
 		) {
 			return;
 		}
@@ -127,7 +133,10 @@ export function getClosestTabbable(
 		// Wrappers that merge with the text flow dissolve into it: their
 		// content is the better candidate. Any other container is a
 		// boundary the caret stops on.
-		const blockType = getBlockType( node.getAttribute( 'data-type' ) );
+		// `getBlockType` finds no block type for a missing name.
+		const blockType = getBlockType(
+			node.getAttribute( 'data-type' ) as string
+		);
 		if (
 			node.contentEditable !== 'true' &&
 			getBlockClientId( node ) &&
@@ -192,17 +201,20 @@ export default function useArrowNav() {
 		__unstableIsFullySelected,
 	} = useSelect( blockEditorStore );
 	const { selectBlock, multiSelect } = useDispatch( blockEditorStore );
-	return useRefEffect( ( node ) => {
+	return useRefEffect< HTMLElement >( ( node ) => {
 		// Here a DOMRect is stored while moving the caret vertically so
 		// vertical position of the start position can be restored. This is to
 		// recreate browser behaviour across blocks.
-		let verticalRect;
+		let verticalRect: DOMRect | null | undefined;
 
 		function onMouseDown() {
 			verticalRect = null;
 		}
 
-		function isClosestTabbableABlock( target, isReverse ) {
+		function isClosestTabbableABlock(
+			target: Element,
+			isReverse: boolean
+		) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
@@ -211,7 +223,7 @@ export default function useArrowNav() {
 			return closestTabbable && getBlockClientId( closestTabbable );
 		}
 
-		function onKeyDown( event ) {
+		function onKeyDown( event: KeyboardEvent ) {
 			// Abort if navigation has already been handled (e.g. RichText
 			// inline boundaries).
 			if ( event.defaultPrevented ) {
@@ -224,11 +236,13 @@ export default function useArrowNav() {
 			// wrapper; resolve the editable element containing the selection.
 			const target =
 				( event.target === node &&
-					getSelectionEditableElement(
-						node.ownerDocument.defaultView.getSelection(),
+					( getSelectionEditableElement(
+						// A mounted element's window has a selection.
+						node.ownerDocument.defaultView!.getSelection()!,
 						node
-					) ) ||
-				event.target;
+					) as HTMLElement | undefined ) ) ||
+				// Key events reach the listener from elements.
+				( event.target as HTMLElement );
 			const isUp = keyCode === UP;
 			const isDown = keyCode === DOWN;
 			const isLeft = keyCode === LEFT;
@@ -263,7 +277,8 @@ export default function useArrowNav() {
 					// nesting ancestor keeps its native selection, which
 					// the browser extends natively (and the observer
 					// promotes to the common level).
-					const selection = defaultView.getSelection();
+					// A mounted element's window has a selection.
+					const selection = defaultView!.getSelection()!;
 					if (
 						__unstableIsFullySelected() &&
 						( ! selection.rangeCount || selection.isCollapsed )
@@ -272,12 +287,13 @@ export default function useArrowNav() {
 							getMultiSelectedBlocksStartClientId();
 						const focusClientId =
 							getMultiSelectedBlocksEndClientId();
+						// A multi-selection has a start and an end.
 						const nextClientId = isReverse
-							? getPreviousBlockClientId( focusClientId )
-							: getNextBlockClientId( focusClientId );
+							? getPreviousBlockClientId( focusClientId! )
+							: getNextBlockClientId( focusClientId! );
 
 						if ( nextClientId ) {
-							multiSelect( anchorClientId, nextClientId );
+							multiSelect( anchorClientId!, nextClientId );
 							event.preventDefault();
 						}
 					}
@@ -292,10 +308,11 @@ export default function useArrowNav() {
 
 				event.preventDefault();
 
+				// A multi-selection has a start and an end.
 				if ( isReverse ) {
-					selectBlock( getMultiSelectedBlocksStartClientId() );
+					selectBlock( getMultiSelectedBlocksStartClientId()! );
 				} else {
-					selectBlock( getMultiSelectedBlocksEndClientId(), -1 );
+					selectBlock( getMultiSelectedBlocksEndClientId()!, -1 );
 				}
 
 				return;
@@ -310,12 +327,13 @@ export default function useArrowNav() {
 				! getSelectionStart().attributeKey
 			) {
 				const selectedClientId = getSelectedBlockClientId();
+				// The check above makes sure a block is selected.
 				const nextClientId = isReverse
-					? getPreviousBlockClientId( selectedClientId )
-					: getNextBlockClientId( selectedClientId );
+					? getPreviousBlockClientId( selectedClientId! )
+					: getNextBlockClientId( selectedClientId! );
 
 				if ( nextClientId ) {
-					multiSelect( selectedClientId, nextClientId );
+					multiSelect( selectedClientId!, nextClientId );
 					event.preventDefault();
 				}
 				return;
@@ -337,7 +355,7 @@ export default function useArrowNav() {
 			if ( ! isVertical ) {
 				verticalRect = null;
 			} else if ( ! verticalRect ) {
-				verticalRect = computeCaretRect( defaultView );
+				verticalRect = computeCaretRect( defaultView! );
 			}
 
 			// In the case of RTL scripts, right means previous and left means
@@ -355,7 +373,7 @@ export default function useArrowNav() {
 						// natively escape into surrounding editable elements
 						// (e.g. the post title), so keep it inside the block
 						// by extending it to the block's edge.
-						const selection = defaultView.getSelection();
+						const selection = defaultView!.getSelection()!;
 						selection.extend(
 							target,
 							isReverse ? 0 : target.childNodes.length
@@ -384,13 +402,14 @@ export default function useArrowNav() {
 						// When Alt is pressed, place the caret at the furthest
 						// horizontal edge and the furthest vertical edge.
 						altKey ? ! isReverse : isReverse,
-						altKey ? undefined : verticalRect
+						// The rect is set on the first vertical key press.
+						altKey ? undefined : verticalRect!
 					);
 					event.preventDefault();
 				}
 			} else if (
 				isHorizontal &&
-				defaultView.getSelection().isCollapsed &&
+				defaultView!.getSelection()!.isCollapsed &&
 				isHorizontalEdge( target, isReverseDir ) &&
 				! keepCaretInsideBlock
 			) {
@@ -399,7 +418,11 @@ export default function useArrowNav() {
 					isReverseDir,
 					node
 				);
-				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+				// `placeCaretAtHorizontalEdge` ignores a missing element.
+				placeCaretAtHorizontalEdge(
+					closestTabbable as HTMLElement,
+					isReverse
+				);
 				event.preventDefault();
 			}
 		}

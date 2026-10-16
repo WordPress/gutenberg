@@ -8,6 +8,9 @@ import {
 	getBlockTransforms,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import type { Block, BlockFilesTransform } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
+import type { ClipboardEvent as ReactClipboardEvent } from 'react';
 import { getPasteEventData } from '../../utils/pasting';
 import { store as blockEditorStore } from '../../store';
 
@@ -17,12 +20,16 @@ export const requiresWrapperOnCopy = Symbol( 'requiresWrapperOnCopy' );
  * Sets the clipboard data for the provided blocks, with both HTML and plain
  * text representations.
  *
- * @param {ClipboardEvent} event    Clipboard event.
- * @param {WPBlock[]}      blocks   Blocks to set as clipboard data.
- * @param {Object}         registry The registry to select from.
+ * @param event    Clipboard event.
+ * @param blocks   Blocks to set as clipboard data.
+ * @param registry The registry to select from.
  */
-export function setClipboardBlocks( event, blocks, registry ) {
-	let _blocks = blocks;
+export function setClipboardBlocks(
+	event: ClipboardEvent | ReactClipboardEvent,
+	blocks: Block[],
+	registry: DataRegistry
+) {
+	let _blocks: Block | Block[] = blocks;
 
 	const [ firstBlock ] = blocks;
 
@@ -31,7 +38,12 @@ export function setClipboardBlocks( event, blocks, registry ) {
 			.select( blocksStore )
 			.getBlockType( firstBlock.name );
 
-		if ( firstBlockType[ requiresWrapperOnCopy ] ) {
+		// Block types opt in through a private symbol key.
+		if (
+			( firstBlockType as unknown as Record< symbol, unknown > )[
+				requiresWrapperOnCopy
+			]
+		) {
 			const { getBlockRootClientId, getBlockName, getBlockAttributes } =
 				registry.select( blockEditorStore );
 			const wrapperBlockClientId = getBlockRootClientId(
@@ -40,9 +52,10 @@ export function setClipboardBlocks( event, blocks, registry ) {
 			const wrapperBlockName = getBlockName( wrapperBlockClientId );
 
 			if ( wrapperBlockName ) {
+				// A named wrapper block exists, so it has attributes.
 				_blocks = createBlock(
 					wrapperBlockName,
-					getBlockAttributes( wrapperBlockClientId ),
+					getBlockAttributes( wrapperBlockClientId! )!,
 					_blocks
 				);
 			}
@@ -51,44 +64,58 @@ export function setClipboardBlocks( event, blocks, registry ) {
 
 	const serialized = serialize( _blocks );
 
-	event.clipboardData.setData( 'text/plain', toPlainText( serialized ) );
-	event.clipboardData.setData( 'text/html', serialized );
+	// Copy and cut events carry clipboard data.
+	event.clipboardData!.setData( 'text/plain', toPlainText( serialized ) );
+	event.clipboardData!.setData( 'text/html', serialized );
 }
 
 /**
  * Returns the blocks to be pasted from the clipboard event.
  *
- * @param {ClipboardEvent} event                    The clipboard event.
- * @param {boolean}        canUserUseUnfilteredHTML Whether the user can or can't post unfiltered HTML.
- * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
+ * @param event                    The clipboard event.
+ * @param event.clipboardData
+ * @param canUserUseUnfilteredHTML Whether the user can or can't post unfiltered HTML.
+ * @return A list of blocks.
  */
-export function getPasteBlocks( event, canUserUseUnfilteredHTML ) {
-	const { plainText, html, files } = getPasteEventData( event );
-	let blocks = [];
+export function getPasteBlocks(
+	event: { clipboardData: DataTransfer },
+	canUserUseUnfilteredHTML?: boolean
+): Block[] {
+	// Callers pass paste events, whose clipboard data can be read.
+	const { plainText, html, files } = getPasteEventData( event )!;
+	let blocks: Block[] = [];
 
 	if ( files.length ) {
 		const fromTransforms = getBlockTransforms( 'from' );
 		blocks = files
-			.reduce( ( accumulator, file ) => {
+			.reduce< ( Block | Block[] )[] >( ( accumulator, file ) => {
 				const transformation = findTransform(
 					fromTransforms,
 					( transform ) =>
 						transform.type === 'files' &&
-						transform.isMatch( [ file ] )
+						// Files transforms define a matcher.
+						transform.isMatch!( [ file ] )
 				);
 				if ( transformation ) {
-					accumulator.push( transformation.transform( [ file ] ) );
+					accumulator.push(
+						// The predicate only matches files transforms, which transform.
+						( transformation as BlockFilesTransform ).transform!( [
+							file,
+						] )
+					);
 				}
 				return accumulator;
 			}, [] )
 			.flat();
 	} else {
+		// The `BLOCKS` mode returns blocks.
 		blocks = pasteHandler( {
 			HTML: html,
 			plainText,
 			mode: 'BLOCKS',
+			// @ts-expect-error `pasteHandler` ignores this option.
 			canUserUseUnfilteredHTML,
-		} );
+		} ) as Block[];
 	}
 
 	return blocks;
@@ -98,10 +125,10 @@ export function getPasteBlocks( event, canUserUseUnfilteredHTML ) {
  * Given a string of HTML representing serialized blocks, returns the plain
  * text extracted after stripping the HTML of any tags and fixing line breaks.
  *
- * @param {string} html Serialized blocks.
- * @return {string} The plain-text content with any html removed.
+ * @param html Serialized blocks.
+ * @return The plain-text content with any html removed.
  */
-function toPlainText( html ) {
+function toPlainText( html: string ): string {
 	// Manually handle BR tags as line breaks prior to `stripHTML` call
 	html = html.replace( /<br>/g, '\n' );
 
@@ -117,29 +144,30 @@ function toPlainText( html ) {
  * active editing host it must present as a named multiline textbox, per the
  * WAI-ARIA textbox role, which requires an accessible name.
  *
- * @param {HTMLElement} node          Wrapper element.
- * @param {boolean}     value         Whether the wrapper should be an
- *                                    editing host.
- * @param {Object}      options
- * @param {boolean}     options.focus Move focus to the wrapper when it
- *                                    becomes an editing host (Firefox does
- *                                    not automatically move it). Default
- *                                    true.
+ * @param node          Wrapper element.
+ * @param value         Whether the wrapper should be an
+ *                      editing host.
+ * @param options
+ * @param options.focus Move focus to the wrapper when it
+ *                      becomes an editing host (Firefox does
+ *                      not automatically move it). Default
+ *                      true.
  *
- * @return {boolean} Whether the wrapper is an editing host now.
+ * @return Whether the wrapper is an editing host now.
  */
 export function setContentEditableWrapper(
-	node,
-	value,
-	{ focus = true } = {}
-) {
+	node: HTMLElement,
+	value: boolean,
+	{ focus = true }: { focus?: boolean } = {}
+): boolean {
 	// Check first: this is called on every selection change, and setting
 	// contentEditable triggers a style recalculation.
 	if ( node.contentEditable === String( value ) ) {
 		return value;
 	}
 
-	node.contentEditable = value;
+	// The DOM stringifies the boolean.
+	node.contentEditable = value as unknown as string;
 
 	if ( ! value ) {
 		node.removeAttribute( 'role' );

@@ -375,6 +375,7 @@ export type Settings = Record< string | symbol, unknown > & {
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
+	__experimentalUndo?: () => void;
 	supportsLayout?: boolean;
 	template?: BlockTemplate;
 	templateLock?: string | false;

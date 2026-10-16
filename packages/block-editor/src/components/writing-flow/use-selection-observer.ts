@@ -16,22 +16,23 @@ const { ownsSelection } = unlock( richTextPrivateApis );
  * Extract the selection start node from the selection. When the anchor node is
  * not a text node, the selection offset is the index of a child node.
  *
- * @param {Selection} selection The selection.
+ * @param selection The selection.
  *
- * @return {Element} The selection start node.
+ * @return The selection start node.
  */
-function extractSelectionStartNode( selection ) {
+function extractSelectionStartNode( selection: Selection ): Node {
+	// Callers only read a selection with a range.
 	const { anchorNode, anchorOffset } = selection;
 
-	if ( anchorNode.nodeType === anchorNode.TEXT_NODE ) {
-		return anchorNode;
+	if ( anchorNode!.nodeType === anchorNode!.TEXT_NODE ) {
+		return anchorNode!;
 	}
 
 	if ( anchorOffset === 0 ) {
-		return anchorNode;
+		return anchorNode!;
 	}
 
-	return anchorNode.childNodes[ anchorOffset - 1 ];
+	return anchorNode!.childNodes[ anchorOffset - 1 ];
 }
 
 /**
@@ -39,21 +40,25 @@ function extractSelectionStartNode( selection ) {
  * a text node, the selection offset is the index of a child node. The selection
  * reaches up to but excluding that child node.
  *
- * @param {Selection} selection     The selection.
- * @param {boolean}   isTripleClick Whether the selection comes from a triple
- *                                  click.
+ * @param selection     The selection.
+ * @param isTripleClick Whether the selection comes from a triple
+ *                      click.
  *
- * @return {Element} The selection start node.
+ * @return The selection start node.
  */
-function extractSelectionEndNode( selection, isTripleClick ) {
+function extractSelectionEndNode(
+	selection: Selection,
+	isTripleClick: boolean
+): Node {
+	// Callers only read a selection with a range.
 	const { focusNode, focusOffset } = selection;
 
-	if ( focusNode.nodeType === focusNode.TEXT_NODE ) {
-		return focusNode;
+	if ( focusNode!.nodeType === focusNode!.TEXT_NODE ) {
+		return focusNode!;
 	}
 
-	if ( focusOffset === focusNode.childNodes.length ) {
-		return focusNode;
+	if ( focusOffset === focusNode!.childNodes.length ) {
+		return focusNode!;
 	}
 
 	// A triple click selects the paragraph, but the browser extends the
@@ -68,13 +73,14 @@ function extractSelectionEndNode( selection, isTripleClick ) {
 		isSelectionForward( selection ) &&
 		isTripleClick
 	) {
-		return focusNode.previousSibling ?? focusNode.parentElement;
+		// A node at offset 0 of a forward selection has a parent.
+		return ( focusNode!.previousSibling ?? focusNode!.parentElement )!;
 	}
 
-	return focusNode.childNodes[ focusOffset ];
+	return focusNode!.childNodes[ focusOffset ];
 }
 
-function findDepth( a, b ) {
+function findDepth( a: string[], b: string[] ) {
 	let depth = 0;
 
 	while ( a[ depth ] === b[ depth ] ) {
@@ -84,10 +90,12 @@ function findDepth( a, b ) {
 	return depth;
 }
 
-function getRichTextElement( node ) {
+function getRichTextElement( node: Node ) {
 	const element =
-		node.nodeType === node.ELEMENT_NODE ? node : node.parentElement;
-	return element?.closest( '[data-wp-block-attribute-key]' );
+		node.nodeType === node.ELEMENT_NODE
+			? ( node as Element )
+			: node.parentElement;
+	return element?.closest< HTMLElement >( '[data-wp-block-attribute-key]' );
 }
 
 /**
@@ -110,14 +118,15 @@ export default function useSelectionObserver() {
 		getSelectedBlockClientId,
 		canHostEditableRoot,
 	} = unlock( useSelect( blockEditorStore ) );
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			const { ownerDocument } = node;
+			// A mounted element's document has a window.
 			const { defaultView } = ownerDocument;
 
 			let isTripleClick = false;
 
-			function onMouseDown( event ) {
+			function onMouseDown( event: MouseEvent ) {
 				isTripleClick = event.detail === 3;
 				// A shift+click makes a multi-selection: mark the gesture as
 				// in progress so the clicked block's focus handler does not
@@ -129,7 +138,8 @@ export default function useSelectionObserver() {
 				if (
 					event.shiftKey &&
 					getBlockSelectionStart() !==
-						getBlockClientId( event.target )
+						// Mouse events reach the listener from nodes.
+						getBlockClientId( event.target as Node )
 				) {
 					startMultiSelect();
 				}
@@ -139,8 +149,9 @@ export default function useSelectionObserver() {
 				isTripleClick = false;
 			}
 
-			function onSelectionChange( event ) {
-				const selection = defaultView.getSelection();
+			function onSelectionChange( event: Event | MouseEvent ) {
+				// A window has a selection.
+				const selection = defaultView!.getSelection()!;
 
 				if ( ! selection.rangeCount ) {
 					return;
@@ -165,7 +176,9 @@ export default function useSelectionObserver() {
 				// that don't support text selection might be involved, and we might
 				// update the clientIds to multi-select blocks.
 				// For now we check if the event is a `mouse` event.
-				const isClickShift = event.shiftKey && event.type === 'mouseup';
+				const isClickShift =
+					( event as MouseEvent ).shiftKey &&
+					event.type === 'mouseup';
 				if ( selection.isCollapsed && ! isClickShift ) {
 					const collapsedClientId = getBlockClientId( startNode );
 
@@ -197,7 +210,8 @@ export default function useSelectionObserver() {
 						const { activeElement } = ownerDocument;
 						if (
 							activeElement !== node &&
-							activeElement?.isContentEditable &&
+							( activeElement as HTMLElement | null )
+								?.isContentEditable &&
 							node.contains( activeElement ) &&
 							getBlockClientId( activeElement ) ===
 								collapsedClientId
@@ -221,12 +235,14 @@ export default function useSelectionObserver() {
 							ownerDocument.activeElement === node &&
 							ownerDocument.hasFocus()
 						) {
-							let element =
+							let element: Element | null | undefined =
 								startNode.nodeType === startNode.ELEMENT_NODE
-									? startNode
+									? ( startNode as Element )
 									: startNode.parentElement;
 							element = element?.closest( '[contenteditable]' );
-							element?.focus();
+							(
+								element as HTMLElement | null | undefined
+							 )?.focus();
 						}
 					}
 					return;
@@ -240,7 +256,9 @@ export default function useSelectionObserver() {
 				// text selection has been clicked.
 				if ( isClickShift ) {
 					const selectedClientId = getBlockSelectionStart();
-					const clickedClientId = getBlockClientId( event.target );
+					const clickedClientId = getBlockClientId(
+						event.target as Node | null
+					);
 					// `endClientId` is not defined if we end the selection by clicking a non-selectable block.
 					// We need to check if there was already a selection with a non-selectable focusNode.
 					const focusNodeIsNonSelectable =
@@ -275,11 +293,13 @@ export default function useSelectionObserver() {
 				// selection.
 				if (
 					event.type === 'mouseup' &&
-					! event.shiftKey &&
+					! ( event as MouseEvent ).shiftKey &&
 					! isMultiSelecting() &&
 					startClientId === endClientId
 				) {
-					const clickedClientId = getBlockClientId( event.target );
+					const clickedClientId = getBlockClientId(
+						event.target as Node | null
+					);
 					if (
 						clickedClientId &&
 						clickedClientId !== startClientId
@@ -362,14 +382,18 @@ export default function useSelectionObserver() {
 								selectionChange( selectionUpdate );
 							}
 						} else {
-							selectBlock( startClientId );
+							// A selection within a block has its client ID.
+							selectBlock( startClientId as string );
 						}
 					} else {
-						multiSelect( startClientId, startClientId );
+						multiSelect(
+							startClientId as string,
+							startClientId as string
+						);
 					}
 				} else {
 					const startPath = [
-						...getBlockParents( startClientId ),
+						...getBlockParents( startClientId as string ),
 						startClientId,
 					];
 					const endPath = [
@@ -434,7 +458,11 @@ export default function useSelectionObserver() {
 							},
 						} );
 					} else {
-						multiSelect( startClientId, endClientId );
+						// A selection across blocks has both client IDs.
+						multiSelect(
+							startClientId as string,
+							endClientId as string
+						);
 					}
 				}
 			}
@@ -443,8 +471,9 @@ export default function useSelectionObserver() {
 			// event or a keydown may fire before the store has been updated
 			// with a cross block selection that was just made. Sync it before
 			// the handlers that read the store run.
-			function ensureMultiBlockSelectionSync( event ) {
-				const selection = defaultView.getSelection();
+			function ensureMultiBlockSelectionSync( event: Event ) {
+				// A window has a selection.
+				const selection = defaultView!.getSelection()!;
 
 				if ( ! selection.rangeCount || selection.isCollapsed ) {
 					return;
@@ -481,17 +510,17 @@ export default function useSelectionObserver() {
 				'selectionchange',
 				onSelectionChange
 			);
-			function onMouseUp( event ) {
+			function onMouseUp( event: MouseEvent ) {
 				onSelectionChange( event );
 				stopMultiSelect();
 			}
 
-			defaultView.addEventListener( 'mouseup', onMouseUp );
+			defaultView!.addEventListener( 'mouseup', onMouseUp );
 			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'keydown', onKeyDown );
 			// On the window, so it runs before any document listener that
 			// reads the store on keydown, whatever order they were added in.
-			defaultView.addEventListener(
+			defaultView!.addEventListener(
 				'keydown',
 				ensureMultiBlockSelectionSync,
 				true
@@ -516,10 +545,10 @@ export default function useSelectionObserver() {
 					'selectionchange',
 					onSelectionChange
 				);
-				defaultView.removeEventListener( 'mouseup', onMouseUp );
+				defaultView!.removeEventListener( 'mouseup', onMouseUp );
 				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'keydown', onKeyDown );
-				defaultView.removeEventListener(
+				defaultView!.removeEventListener(
 					'keydown',
 					ensureMultiBlockSelectionSync,
 					true

@@ -5,6 +5,7 @@ import {
 	hasBlockSupport,
 	switchToBlockType,
 } from '@wordpress/blocks';
+import type { Block, BlockFilesTransform } from '@wordpress/blocks';
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
@@ -17,19 +18,21 @@ import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { setClipboardBlocks, setContentEditableWrapper } from './utils';
 import { getPasteEventData } from '../../utils/pasting';
 import { getBlockClientId } from '../../utils/dom';
+import type { WritingFlowClipboardEvent } from './types';
 
 /**
  * Whether the DOM selection entirely spans the content of the given block,
  * and the block's editable element is the block element itself, like a
  * heading or a paragraph, not a field within a larger block, like a caption.
  *
- * @param {Document} ownerDocument The block's document.
- * @param {string}   clientId      The block's client ID.
+ * @param ownerDocument The block's document.
+ * @param clientId      The block's client ID.
  *
- * @return {boolean} Whether the block is entirely selected.
+ * @return Whether the block is entirely selected.
  */
-function isBlockEntirelySelected( ownerDocument, clientId ) {
-	const selection = ownerDocument.defaultView.getSelection();
+function isBlockEntirelySelected( ownerDocument: Document, clientId: string ) {
+	// The editor's document has a window with a selection.
+	const selection = ownerDocument.defaultView!.getSelection()!;
 
 	if ( getBlockClientId( selection.anchorNode ) !== clientId ) {
 		return false;
@@ -67,8 +70,8 @@ export default function useClipboardHandler() {
 	} = useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
-	return useRefEffect( ( node ) => {
-		function handler( event ) {
+	return useRefEffect< HTMLElement >( ( node ) => {
+		function handler( event: WritingFlowClipboardEvent ) {
 			if ( event.defaultPrevented ) {
 				// This was likely already handled in rich-text/use-paste-handler.js.
 				return;
@@ -91,21 +94,23 @@ export default function useClipboardHandler() {
 				event.type === 'copy' &&
 				! hasMultiSelection() &&
 				isBlockEntirelySelected(
-					event.target.ownerDocument,
+					( event.target as Element ).ownerDocument,
 					selectedBlockClientIds[ 0 ]
 				);
 
 			// Let native copy/paste behaviour take over in input fields.
 			// But always handle multiple selected blocks.
 			if ( ! hasMultiSelection() ) {
-				const { ownerDocument } = event.target;
+				// Clipboard events reach the listener from elements.
+				const { ownerDocument } = event.target as Element;
 				// If copying, only consider actual text selection as selection.
 				// Otherwise, any focus on an input field is considered.
 				const hasSelection =
 					event.type === 'copy' || event.type === 'cut'
 						? documentHasUncollapsedSelection( ownerDocument )
 						: documentHasSelection( ownerDocument ) &&
-							! ownerDocument.activeElement.isContentEditable;
+							! ( ownerDocument.activeElement as HTMLElement )
+								.isContentEditable;
 
 				// Let native copy behaviour take over in input fields.
 				if ( hasSelection && ! isWholeSingleBlockCopy ) {
@@ -113,7 +118,7 @@ export default function useClipboardHandler() {
 				}
 			}
 
-			const { activeElement } = event.target.ownerDocument;
+			const { activeElement } = ( event.target as Element ).ownerDocument;
 
 			if ( ! node.contains( activeElement ) ) {
 				return;
@@ -138,7 +143,7 @@ export default function useClipboardHandler() {
 					__unstableExpandSelection();
 				} else {
 					notifyCopy( event.type, selectedBlockClientIds );
-					let blocks;
+					let blocks: ( Block | null )[];
 					// Check if we have partial selection.
 					if ( shouldHandleWholeBlocks ) {
 						blocks = getBlocksByClientId( selectedBlockClientIds );
@@ -154,7 +159,8 @@ export default function useClipboardHandler() {
 						blocks = [ head, ...inBetweenBlocks, tail ];
 					}
 
-					setClipboardBlocks( event, blocks, registry );
+					// The selected blocks exist.
+					setClipboardBlocks( event, blocks as Block[], registry );
 				}
 			}
 
@@ -166,7 +172,8 @@ export default function useClipboardHandler() {
 					removeBlocks( selectedBlockClientIds );
 				} else {
 					setContentEditableWrapper(
-						event.target.ownerDocument.activeElement,
+						( event.target as Element ).ownerDocument
+							.activeElement as HTMLElement,
 						false
 					);
 					__unstableDeleteSelection();
@@ -178,13 +185,17 @@ export default function useClipboardHandler() {
 					mediaUpload,
 				} = getSettings();
 				const isInternal =
-					event.clipboardData.getData( 'rich-text' ) === 'true';
+					// Paste events carry clipboard data.
+					event.clipboardData!.getData( 'rich-text' ) === 'true';
 				if ( isInternal ) {
 					return;
 				}
-				const { plainText, html, files } = getPasteEventData( event );
+				// Paste events carry readable clipboard data.
+				const { plainText, html, files } = getPasteEventData(
+					event as { clipboardData: DataTransfer }
+				)!;
 				const isFullySelected = __unstableIsFullySelected();
-				let blocks = [];
+				let blocks: Block[] | string = [];
 
 				if ( files.length ) {
 					if ( ! mediaUpload ) {
@@ -194,26 +205,34 @@ export default function useClipboardHandler() {
 
 					const fromTransforms = getBlockTransforms( 'from' );
 					blocks = files
-						.reduce( ( accumulator, file ) => {
-							const transformation = findTransform(
-								fromTransforms,
-								( transform ) =>
-									transform.type === 'files' &&
-									transform.isMatch( [ file ] )
-							);
-							if ( transformation ) {
-								accumulator.push(
-									transformation.transform( [ file ] )
+						.reduce< ( Block | Block[] )[] >(
+							( accumulator, file ) => {
+								const transformation = findTransform(
+									fromTransforms,
+									( transform ) =>
+										transform.type === 'files' &&
+										// Files transforms define a matcher.
+										transform.isMatch!( [ file ] )
 								);
-							}
-							return accumulator;
-						}, [] )
+								if ( transformation ) {
+									accumulator.push(
+										// The predicate only matches files transforms, which transform.
+										(
+											transformation as BlockFilesTransform
+										 ).transform!( [ file ] )
+									);
+								}
+								return accumulator;
+							},
+							[]
+						)
 						.flat();
 				} else {
 					blocks = pasteHandler( {
 						HTML: html,
 						plainText,
 						mode: isFullySelected ? 'BLOCKS' : 'AUTO',
+						// @ts-expect-error `pasteHandler` ignores this option.
 						canUserUseUnfilteredHTML,
 					} );
 				}
@@ -239,7 +258,8 @@ export default function useClipboardHandler() {
 				if (
 					! hasMultiSelection() &&
 					! hasBlockSupport(
-						getBlockName( selectedBlockClientIds[ 0 ] ),
+						// The selected block has a name.
+						getBlockName( selectedBlockClientIds[ 0 ] )!,
 						'splitting',
 						false
 					) &&
@@ -253,7 +273,7 @@ export default function useClipboardHandler() {
 				if (
 					! hasMultiSelection() &&
 					isBlockEntirelySelected(
-						event.target.ownerDocument,
+						( event.target as Element ).ownerDocument,
 						selectedBlockClientIds[ 0 ]
 					)
 				) {
@@ -272,7 +292,7 @@ export default function useClipboardHandler() {
 					firstSelectedClientId
 				);
 
-				const newBlocks = [];
+				const newBlocks: Block[] = [];
 
 				for ( const block of blocks ) {
 					if ( canInsertBlockType( block.name, rootClientId ) ) {
@@ -286,7 +306,8 @@ export default function useClipboardHandler() {
 						const rootBlockName = getBlockName( rootClientId );
 						const switchedBlocks =
 							block.name !== rootBlockName
-								? switchToBlockType( block, rootBlockName )
+								? // A block that cannot be inserted has a root block.
+									switchToBlockType( block, rootBlockName! )
 								: [ block ];
 
 						if ( ! switchedBlocks ) {

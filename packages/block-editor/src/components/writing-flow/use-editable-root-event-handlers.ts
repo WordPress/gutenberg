@@ -4,6 +4,11 @@ import { useContext } from '@wordpress/element';
 import { store as blockEditorStore } from '../../store';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
 import { BlockRefs } from '../provider/block-refs-provider';
+import type {
+	BlockEventHandler,
+	BlockEventHandlers,
+	BlockSyntheticEvent,
+} from './types';
 
 // The React `on*` props the host bridges, mapped to their DOM event type. Only
 // editing events are redirected under `editableRoot` (the wrapper becomes the
@@ -12,7 +17,7 @@ import { BlockRefs } from '../provider/block-refs-provider';
 // bridging. React prop names don't map to DOM types by lowercasing in general
 // (onChange is `input`, onDoubleClick is `dblclick`), so the mapping is
 // explicit, which also locks the bridged surface to events React actually fires.
-const SUPPORTED_EVENTS = {
+const SUPPORTED_EVENTS: Record< string, string > = {
 	onKeyDown: 'keydown',
 	onKeyUp: 'keyup',
 	onBeforeInput: 'beforeinput',
@@ -31,18 +36,23 @@ const EVENT_TYPES = Object.values( SUPPORTED_EVENTS );
  * block's merged `wrapperProps`, keyed by DOM event type. Used by the block to
  * register them (see `useRegisterBlockEventHandlers`).
  *
- * @param {Object} props Props to read handlers from.
+ * @param props Props to read handlers from.
  *
- * @return {Object|undefined} The handlers by event type, or undefined when
- *                            there are none.
+ * @return The handlers by event type, or undefined when
+ *         there are none.
  */
-export function getEventHandlers( props ) {
-	let handlers;
+export function getEventHandlers(
+	props: Record< string, unknown >
+): BlockEventHandlers | undefined {
+	let handlers: BlockEventHandlers | undefined;
 
 	for ( const name in SUPPORTED_EVENTS ) {
 		if ( typeof props[ name ] === 'function' ) {
 			handlers = handlers || {};
-			handlers[ SUPPORTED_EVENTS[ name ] ] = props[ name ];
+			// The check above makes it a function.
+			handlers[ SUPPORTED_EVENTS[ name ] ] = props[
+				name
+			] as BlockEventHandler;
 		}
 	}
 
@@ -82,7 +92,7 @@ const KEYBOARD_EVENT_INTERFACE = [
 	'which',
 ];
 const INPUT_EVENT_INTERFACE = [ ...EVENT_INTERFACE, 'data' ];
-const EVENT_INTERFACES = {
+const EVENT_INTERFACES: Record< string, string[] > = {
 	keydown: KEYBOARD_EVENT_INTERFACE,
 	keyup: KEYBOARD_EVENT_INTERFACE,
 	beforeinput: INPUT_EVENT_INTERFACE,
@@ -104,15 +114,18 @@ const EVENT_INTERFACES = {
  * real target (the editing host above it), and `currentTarget` is reassigned as
  * the event bubbles from block to block.
  *
- * @param {Event}       nativeEvent The event to wrap.
- * @param {HTMLElement} target      The element to report as the target.
+ * @param nativeEvent The event to wrap.
+ * @param target      The element to report as the target.
  *
- * @return {Object} The synthetic event.
+ * @return The synthetic event.
  */
-function createBlockSyntheticEvent( nativeEvent, target ) {
+function createBlockSyntheticEvent(
+	nativeEvent: Event,
+	target: Element | undefined
+): BlockSyntheticEvent {
 	let propagationStopped = false;
 
-	const syntheticEvent = {
+	const syntheticEvent: BlockSyntheticEvent = {
 		nativeEvent,
 		type: nativeEvent.type,
 		target,
@@ -139,7 +152,10 @@ function createBlockSyntheticEvent( nativeEvent, target ) {
 	};
 
 	for ( const property of EVENT_INTERFACES[ nativeEvent.type ] ) {
-		const value = nativeEvent[ property ];
+		// The interface tables list properties of the event type.
+		const value = ( nativeEvent as unknown as Record< string, unknown > )[
+			property
+		];
 		syntheticEvent[ property ] =
 			typeof value === 'function' ? value.bind( nativeEvent ) : value;
 	}
@@ -172,9 +188,9 @@ export default function useEditableRootEventHandlers() {
 	const { hasMultiSelection, getBlockParents } =
 		useSelect( blockEditorStore );
 	const { refsMap, eventHandlers } = useContext( BlockRefs );
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
-			function onEvent( event ) {
+			function onEvent( event: Event ) {
 				// Only act on real events targeting the host itself, while it
 				// is the editing host for a single block and some block has a
 				// handler to call.
@@ -188,14 +204,17 @@ export default function useEditableRootEventHandlers() {
 					return;
 				}
 
-				const selection = node.ownerDocument.defaultView.getSelection();
+				// A mounted element's window has a selection.
+				const selection =
+					node.ownerDocument.defaultView!.getSelection()!;
 
 				if ( ! selection.rangeCount ) {
 					return;
 				}
 
 				const editable = getSelectionEditableElement( selection, node );
-				const clientId = getBlockClientId( editable );
+				// An absent element has no client ID.
+				const clientId = getBlockClientId( editable as Element | null );
 
 				if ( ! clientId ) {
 					return;
@@ -212,7 +231,7 @@ export default function useEditableRootEventHandlers() {
 					...getBlockParents( clientId, true ),
 				];
 
-				let syntheticEvent;
+				let syntheticEvent: BlockSyntheticEvent | undefined;
 				for ( const ancestorClientId of clientIds ) {
 					const handler =
 						eventHandlers.get( ancestorClientId )?.current?.[
@@ -232,7 +251,8 @@ export default function useEditableRootEventHandlers() {
 					}
 
 					syntheticEvent.currentTarget = element;
-					handler( syntheticEvent );
+					// The element is only resolved for blocks with a handler.
+					handler!( syntheticEvent );
 
 					if ( syntheticEvent.isPropagationStopped() ) {
 						break;
