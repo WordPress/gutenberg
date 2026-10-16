@@ -81,6 +81,18 @@ export interface WithFontSizesProps {
 }
 
 /**
+ * The props `withFontSizes` injects for the given font size attribute names:
+ * the font size object of each name and its `set<Name>` setter.
+ */
+export type InjectedFontSizesProps< Name extends string > = {
+	[ N in Name ]: FontSizeObject & { class?: string };
+} & {
+	[ N in Name as `set${ Capitalize< N > }` ]: (
+		fontSizeValue?: number | string
+	) => void;
+};
+
+/**
  * The font size objects `withFontSizes` passes, keyed by attribute name.
  */
 export type WithFontSizesState = Record<

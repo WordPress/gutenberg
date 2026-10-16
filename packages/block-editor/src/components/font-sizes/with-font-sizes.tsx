@@ -6,6 +6,7 @@ import { getFontSize, getFontSizeClass } from './utils';
 import { useSettings } from '../use-settings';
 import type {
 	FontSizeSetters,
+	InjectedFontSizesProps,
 	WithFontSizesProps,
 	WithFontSizesState,
 } from './types';
@@ -32,7 +33,7 @@ const upperFirst = ( [ firstLetter, ...rest ]: string ): string =>
  *
  * @return {Function} Higher-order component.
  */
-export default ( ...fontSizeNames: string[] ) => {
+export default < Name extends string >( ...fontSizeNames: Name[] ) => {
 	/*
 	 * Computes an object whose key is the font size attribute name as passed in the array,
 	 * and the value is the custom font size attribute name.
@@ -48,6 +49,7 @@ export default ( ...fontSizeNames: string[] ) => {
 		{} as Record< string, string >
 	);
 
+	// The outer cast types the props each call injects.
 	return createHigherOrderComponent(
 		// `compose` loses the types of the components it composes.
 		compose( [
@@ -232,5 +234,10 @@ export default ( ...fontSizeNames: string[] ) => {
 			Inner: ComponentType< WithFontSizesProps >
 		) => ComponentType< WithFontSizesProps >,
 		'withFontSizes'
-	);
+	) as < Props extends InjectedFontSizesProps< Name > >(
+		WrappedComponent: ComponentType< Props >
+	) => ComponentType<
+		Omit< Props, keyof InjectedFontSizesProps< Name > > &
+			Pick< WithFontSizesProps, 'attributes' | 'setAttributes' >
+	>;
 };
