@@ -100,19 +100,3 @@ export const Standalone: Story = {
 		</Text>
 	),
 };
-
-export const Wrapping: Story = {
-	args: {
-		children: 'Discover the terms and phrases',
-		href: '#',
-		openInNewTab: true,
-	},
-	render: ( args ) => (
-		<Text
-			variant="body-md"
-			render={ <p style={ { width: '24ch', textAlign: 'center' } } /> }
-		>
-			<Link { ...args } /> your visitors use to find your site.
-		</Text>
-	),
-};
