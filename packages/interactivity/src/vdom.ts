@@ -23,6 +23,10 @@ function parseDirectiveName( directiveName: string ): {
 
 	// Finds the first "--" to separate the prefix.
 	const suffixIndex = name.indexOf( '--' );
+	// A prefix cannot start with "-" and a leading "--" is empty.
+	if ( suffixIndex === 0 || name[ 0 ] === '-' ) {
+		return null;
+	}
 
 	// If "--" is not found, everything is part of the prefix.
 	if ( suffixIndex === -1 ) {
@@ -97,8 +101,6 @@ export function parseDirectiveValue( rawValue: string ): {
 
 	return { namespace, value };
 }
-
-export const hydratedIslands = new WeakSet();
 
 /**
  * Recursive function that transforms a DOM tree into vDOM.
@@ -195,10 +197,6 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
-		if ( island ) {
-			hydratedIslands.add( elementNode );
-		}
-
 		if ( directives.length ) {
 			props.__directives = directives.reduce<
 				Record< string, Array< DirectiveEntry > >
@@ -240,6 +238,20 @@ export function toVdom( root: Node ): ComponentChild {
 			}
 		}
 
+		if ( props.__directives?.html ) {
+			const conflictingPrefixes = [
+				'text',
+				'each',
+				'router-region',
+			].filter( ( prefix ) => prefix in props.__directives );
+			if ( conflictingPrefixes.length ) {
+				warn(
+					`The data-wp-html directive was ignored because it conflicts with ${ conflictingPrefixes.map( ( prefix ) => `data-wp-${ prefix }` ).join( ', ' ) }.`
+				);
+				delete props.__directives.html;
+			}
+		}
+
 		const hasDefaultHtmlDirective = props.__directives?.html?.some(
 			( { suffix }: DirectiveEntry ) => suffix === null
 		);
@@ -252,18 +264,6 @@ export function toVdom( root: Node ): ComponentChild {
 			// vnodes, since the directive writes to the DOM directly rather
 			// than through Preact's own props diffing (see
 			// `directives/html.ts`).
-			//
-			// Any interactive islands inside are marked as already hydrated
-			// so `hydrateRegions()` doesn't also initialize them
-			// independently; nested router regions aren't excluded yet and
-			// may still process on their own.
-			if ( hasDefaultHtmlDirective ) {
-				elementNode
-					.querySelectorAll( '[data-wp-interactive]' )
-					.forEach( ( islandNode ) => {
-						hydratedIslands.add( islandNode );
-					} );
-			}
 			props.dangerouslySetInnerHTML = {
 				__html: elementNode.innerHTML,
 			};

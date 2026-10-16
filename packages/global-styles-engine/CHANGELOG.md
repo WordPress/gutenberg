@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Stop normalizing deprecated style state aliases and falling back to legacy style paths; global styles must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
 
 ## 1.24.0 (2026-10-07)
 

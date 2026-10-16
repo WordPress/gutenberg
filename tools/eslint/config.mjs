@@ -35,7 +35,7 @@ try {
 
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
- * reference is strictly identical. Because the @wordpress/eslint-plugin
+ * reference is strictly identical. Because the `@wordpress/eslint-plugin`
  * configs are assembled from separate sub-configs that each carry their own
  * copy of the plugin object, we normalise them here so that every occurrence
  * of the same plugin name resolves to a single shared reference.
@@ -373,6 +373,7 @@ export default dedupePlugins( [
 					'ts-check': false,
 				},
 			],
+			'jsdoc/escape-inline-tags': 'error',
 			'react/jsx-boolean-value': 'error',
 			'react/jsx-curly-brace-presence': [
 				'error',
@@ -403,6 +404,7 @@ export default dedupePlugins( [
 						Icon: 'WCIcon',
 						__experimentalInputControl: 'WCInputControl',
 						SelectControl: 'WCSelectControl',
+						Spinner: 'WCSpinner',
 						TextareaControl: 'WCTextareaControl',
 						Tooltip: 'WCTooltip',
 					},
@@ -851,7 +853,7 @@ export default dedupePlugins( [
 	// Override: Components src — restrict admin theme and components color vars.
 	{
 		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/utils/colors-values.js' ],
+		ignores: [ 'packages/components/src/utils/colors-values.ts' ],
 		rules: {
 			'no-restricted-syntax': [
 				'error',
@@ -860,14 +862,14 @@ export default dedupePlugins( [
 					selector:
 						':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 					message:
-						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'--wp-admin-theme-* variables do not support component theming. Use variables from the COLORS object in packages/components/src/utils/colors-values.ts instead.',
 				},
 				{
 					selector:
 						// Allow overriding definitions, but not access with var()
 						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 					message:
-						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.js instead.',
+						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Use variables from the COLORS object in packages/components/src/utils/colors-values.ts instead.',
 				},
 			],
 		},
@@ -927,15 +929,6 @@ export default dedupePlugins( [
 			'@wordpress/no-dom-globals-in-constructor': 'error',
 			'@wordpress/no-dom-globals-in-react-cc-render': 'error',
 			'@wordpress/no-dom-globals-in-react-fc': 'error',
-		},
-	},
-
-	// Override: Components src (non-test, non-stories) — no DS tokens.
-	{
-		files: [ 'packages/components/src/**' ],
-		ignores: [ 'packages/components/src/**/@(test|stories)/**' ],
-		rules: {
-			'@wordpress/no-ds-tokens': 'error',
 		},
 	},
 

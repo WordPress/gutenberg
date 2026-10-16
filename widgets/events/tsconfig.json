@@ -14,7 +14,7 @@
 		{ "path": "../../packages/core-data/tsconfig.build.json" },
 		{ "path": "../../packages/data" },
 		{ "path": "../../packages/dataviews/tsconfig.build.json" },
-		{ "path": "../../packages/date" },
+		{ "path": "../../packages/date/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/icons/tsconfig.build.json" },

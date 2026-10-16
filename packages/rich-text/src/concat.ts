@@ -30,7 +30,7 @@ export function mergePair< T extends RichTextContent >(
  *
  * @return A new value combining all given records.
  */
-export function concat( ...values: RichTextContent[] ) {
+export function concat( ...values: RichTextContent[] ): RichTextValue {
 	return normaliseFormats(
 		values.reduce< RichTextValue >( mergePair, create() )
 	);

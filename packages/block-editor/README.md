@@ -884,7 +884,7 @@ _Returns_
 
 ### privateApis
 
-Private @wordpress/block-editor APIs.
+Private `@wordpress/block-editor` APIs.
 
 ### RecursionProvider
 
@@ -1126,7 +1126,7 @@ _Parameters_
 
 _Returns_
 
-- `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
+- `?BlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
 
 ### useBlockEditContext
 

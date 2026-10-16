@@ -1,4 +1,4 @@
-import type { RichTextContent, RichTextValue } from './types';
+import type { RichTextValue } from './types';
 
 /**
  * Split a Rich Text value in two at the given `startIndex` and `endIndex`, or
@@ -15,7 +15,7 @@ export function split(
 	richTextValue: RichTextValue,
 	string?: number | string,
 	endIndex?: number
-) {
+): RichTextValue[] | undefined {
 	if ( typeof string !== 'string' ) {
 		return splitAtSelection( richTextValue, string, endIndex );
 	}
@@ -26,7 +26,7 @@ export function split(
 
 	return text.split( string ).map( ( substring ) => {
 		const startIndex = nextStart;
-		const value: RichTextContent & { start?: number; end?: number } = {
+		const value: RichTextValue = {
 			formats: formats.slice( startIndex, startIndex + substring.length ),
 			replacements: replacements.slice(
 				startIndex,
@@ -51,7 +51,7 @@ export function split(
 			}
 		}
 
-		return value as RichTextValue;
+		return value;
 	} );
 }
 
@@ -60,7 +60,7 @@ function splitAtSelection(
 	startIndex = start,
 	endIndex = end
 ) {
-	if ( start === undefined || end === undefined ) {
+	if ( startIndex === undefined || endIndex === undefined ) {
 		return;
 	}
 
@@ -77,5 +77,5 @@ function splitAtSelection(
 		end: 0,
 	};
 
-	return [ before, after ] as RichTextValue[];
+	return [ before, after ];
 }

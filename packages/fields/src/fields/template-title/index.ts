@@ -1,7 +1,7 @@
 import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import type { Template } from '../../types';
-import { getItemTitle } from '../../actions/utils';
+import { getItemTitle } from '../utils';
 import TitleView from '../title/view';
 
 const templateTitleField: Field< Template > = {
