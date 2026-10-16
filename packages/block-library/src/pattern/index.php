@@ -23,6 +23,7 @@ function register_block_core_pattern() {
  * Renders the `core/pattern` block on the server.
  *
  * @since 6.3.0 Backwards compatibility: blocks with no `syncStatus` attribute do not receive block wrapper.
+ * @since 7.2.0 Renders user patterns referenced as `core/block/{id}`, matching the editor.
  *
  * @global WP_Embed $wp_embed Used to process embedded content within patterns
  *
@@ -38,10 +39,28 @@ function render_block_core_pattern( $attributes ) {
 		return '';
 	}
 
-	$registry = WP_Block_Patterns_Registry::get_instance();
+	// The editor names user patterns `core/block/{id}`, so resolve those
+	// to the `wp_block` post rather than the patterns registry.
+	if ( str_starts_with( $slug, 'core/block/' ) ) {
+		$user_pattern = get_post( absint( substr( $slug, strlen( 'core/block/' ) ) ) );
+		if (
+			! $user_pattern ||
+			'wp_block' !== $user_pattern->post_type ||
+			'publish' !== $user_pattern->post_status ||
+			! empty( $user_pattern->post_password )
+		) {
+			return '';
+		}
 
-	if ( ! $registry->is_registered( $slug ) ) {
-		return '';
+		$content = apply_block_hooks_to_content_from_post_object( $user_pattern->post_content, $user_pattern );
+	} else {
+		$registry = WP_Block_Patterns_Registry::get_instance();
+
+		if ( ! $registry->is_registered( $slug ) ) {
+			return '';
+		}
+
+		$content = $registry->get_registered( $slug )['content'];
 	}
 
 	if ( isset( $seen_refs[ $slug ] ) ) {
@@ -54,9 +73,6 @@ function render_block_core_pattern( $attributes ) {
 			sprintf( __( '[block rendering halted for pattern "%s"]' ), $slug ) :
 			'';
 	}
-
-	$pattern = $registry->get_registered( $slug );
-	$content = $pattern['content'];
 
 	$seen_refs[ $slug ] = true;
 
