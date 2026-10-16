@@ -11,6 +11,8 @@ export type RootProps = Omit<
 	 * an opaque sRGB fill derived from this color and a contrasting foreground.
 	 * Other browsers retain the neutral fallback. Images keep their own colors.
 	 * The ring paints over the avatar's inner edge without changing its layout size.
+	 * Foreground tinting targets at least 4.5:1 contrast for text and 3:1 for
+	 * the default person icon when the fill resolves independently.
 	 *
 	 * The colored fallback's fill must resolve independently of its foreground.
 	 * `currentColor`, including through CSS variables or color functions, is

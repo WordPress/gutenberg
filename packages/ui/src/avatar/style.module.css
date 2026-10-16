@@ -136,17 +136,29 @@
 
 				@supports (color: color(from green srgb-linear round(up, r) g b / 1)) {
 					.has-color > .fallback {
+						--_wp-ui-avatar-contrast-target: 4.55;
+					}
+
+					.has-color > .fallback > .person-icon {
+						--_wp-ui-avatar-contrast-target: 3.05;
+					}
+
+					.has-color > .fallback,
+					.has-color > .fallback > .person-icon {
+						--_wp-ui-avatar-tint-limit: 0.2;
+
 						/* These channel expressions resolve inside the relative color below. */
 						--_wp-ui-avatar-luminance: calc(0.2126 * r + 0.7152 * g + 0.0722 * b);
 						/* The black/white crossover from the WCAG contrast formula is (sqrt(21) - 1) / 20. */
 						--_wp-ui-avatar-light-foreground: round(up, clamp(0, calc(0.1791287847 - var(--_wp-ui-avatar-luminance)), 1));
 						/*
 						 * Solve the WCAG ratio for the maximum mix toward the background.
-						 * Target 4.55:1 for a small rounding margin, with tint capped at 20%.
+						 * Targets include a small rounding margin above 4.5:1 for text and 3:1 for the person icon.
+						 * Cap the tint at 20%.
 						 * Denominator floors avoid division by zero for black and white.
 						 */
-						--_wp-ui-avatar-dark-tint: clamp(0, calc(((var(--_wp-ui-avatar-luminance) + 0.05) / 4.55 - 0.05) / max(0.000001, var(--_wp-ui-avatar-luminance))), 0.2);
-						--_wp-ui-avatar-light-tint: clamp(0, calc((1.05 - 4.55 * (var(--_wp-ui-avatar-luminance) + 0.05)) / max(0.000001, 1 - var(--_wp-ui-avatar-luminance))), 0.2);
+						--_wp-ui-avatar-dark-tint: clamp(0, calc(((var(--_wp-ui-avatar-luminance) + 0.05) / var(--_wp-ui-avatar-contrast-target) - 0.05) / max(0.000001, var(--_wp-ui-avatar-luminance))), var(--_wp-ui-avatar-tint-limit));
+						--_wp-ui-avatar-light-tint: clamp(0, calc((1.05 - var(--_wp-ui-avatar-contrast-target) * (var(--_wp-ui-avatar-luminance) + 0.05)) / max(0.000001, 1 - var(--_wp-ui-avatar-luminance))), var(--_wp-ui-avatar-tint-limit));
 						--_wp-ui-avatar-tint: calc(var(--_wp-ui-avatar-light-foreground) * var(--_wp-ui-avatar-light-tint) + (1 - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-dark-tint));
 
 						/* Linear sRGB mixing keeps the resulting luminance within the calculated bounds. */

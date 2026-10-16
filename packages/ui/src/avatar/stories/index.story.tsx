@@ -142,9 +142,11 @@ export const FallbackColors: Story = {
 					allows.
 				</p>
 				<p>
-					Both tints target 4.55:1 contrast. The capped tint blends at
-					most 20% of the background into black or white. The uncapped
-					tint uses the full blend that retains the target contrast.
+					Both tints target 4.55:1 contrast for initials and 3.05:1
+					for the person icon, with a small margin above 4.5:1 and
+					3:1. The capped tint blends at most 20% of the background
+					into black or white. The uncapped tint uses the full blend
+					that retains the target contrast.
 				</p>
 				<p>
 					Colored fallbacks do not support <code>currentColor</code>,
