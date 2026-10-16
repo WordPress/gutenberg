@@ -2,14 +2,15 @@ import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { UseFlashEditableBlocksOptions } from './types';
 
 export function useFlashEditableBlocks( {
 	clientId = '',
 	isEnabled = true,
-} = {} ) {
+}: UseFlashEditableBlocksOptions = {} ) {
 	const { getEnabledClientIdsTree } = unlock( useSelect( blockEditorStore ) );
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( element ) => {
 			if ( ! isEnabled ) {
 				return;
@@ -17,8 +18,8 @@ export function useFlashEditableBlocks( {
 
 			const flashEditableBlocks = () => {
 				getEnabledClientIdsTree( clientId ).forEach(
-					( { clientId: id } ) => {
-						const block = element.querySelector(
+					( { clientId: id }: { clientId: string } ) => {
+						const block = element.querySelector< HTMLElement >(
 							`[data-block="${ id }"]`
 						);
 						if ( ! block ) {
@@ -33,10 +34,13 @@ export function useFlashEditableBlocks( {
 				);
 			};
 
-			const handleClick = ( event ) => {
+			const handleClick = ( event: MouseEvent ) => {
 				const shouldFlash =
 					event.target === element ||
-					event.target.classList.contains( 'is-root-container' );
+					// Clicks target elements.
+					( event.target as Element ).classList.contains(
+						'is-root-container'
+					);
 				if ( ! shouldFlash ) {
 					return;
 				}
