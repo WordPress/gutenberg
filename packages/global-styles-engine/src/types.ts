@@ -199,6 +199,10 @@ export interface SpacingSettings {
  * Border settings
  */
 export interface BorderSettings {
+	color?: boolean;
+	radius?: boolean;
+	style?: boolean;
+	width?: boolean;
 	radiusSizes?: Record< string, SizePreset[] >;
 }
 
