@@ -9,7 +9,7 @@ import {
 import { copySmall } from '@wordpress/icons';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useEffect, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import type { DataFormControlProps } from '@wordpress/dataviews';
@@ -37,17 +37,12 @@ const SlugEdit = ( {
 	const isEditable =
 		PERMALINK_POSTNAME_REGEX.test( permalinkTemplate ) &&
 		hasActionLink( data, 'wp:action-publish' );
-	const originalSlugRef = useRef( slug );
-	const slugToDisplay = slug || originalSlugRef.current;
-	const permalink = isEditable
-		? `${ permalinkPrefix }${ slugToDisplay }${ permalinkSuffix }`
-		: safeDecodeURIComponent( data.link || '' );
-
-	useEffect( () => {
-		if ( slug && originalSlugRef.current === undefined ) {
-			originalSlugRef.current = slug;
-		}
-	}, [ slug ] );
+	// A post without a slug or a title has no pretty permalink yet, so use its
+	// plain one (`?p=ID`).
+	const permalink =
+		isEditable && slug
+			? `${ permalinkPrefix }${ slug }${ permalinkSuffix }`
+			: safeDecodeURIComponent( data.link || '' );
 
 	const onChangeControl = useCallback(
 		( newValue?: string ) =>
@@ -109,11 +104,6 @@ const SlugEdit = ( {
 						onChange={ ( newValue?: string ) => {
 							onChangeControl( newValue );
 						} }
-						onBlur={ () => {
-							if ( slug === '' ) {
-								onChangeControl( originalSlugRef.current );
-							}
-						} }
 						aria-describedby={ postUrlSlugDescriptionId }
 					/>
 					<div className="fields-controls__slug-help">
@@ -124,15 +114,21 @@ const SlugEdit = ( {
 							className="fields-controls__slug-help-link"
 							href={ permalink }
 						>
-							<span className="fields-controls__slug-help-prefix">
-								{ permalinkPrefix }
-							</span>
-							<span className="fields-controls__slug-help-slug">
-								{ slugToDisplay }
-							</span>
-							<span className="fields-controls__slug-help-suffix">
-								{ permalinkSuffix }
-							</span>
+							{ slug ? (
+								<>
+									<span className="fields-controls__slug-help-prefix">
+										{ permalinkPrefix }
+									</span>
+									<span className="fields-controls__slug-help-slug">
+										{ slug }
+									</span>
+									<span className="fields-controls__slug-help-suffix">
+										{ permalinkSuffix }
+									</span>
+								</>
+							) : (
+								permalink
+							) }
 						</ExternalLink>
 					</div>
 				</VStack>

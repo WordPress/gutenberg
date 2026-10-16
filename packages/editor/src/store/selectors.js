@@ -980,6 +980,11 @@ export function getPermalink( state ) {
 	const { prefix, postName, suffix } = permalinkParts;
 
 	if ( isPermalinkEditable( state ) ) {
+		// A post without a slug or a title has no pretty permalink yet, so
+		// use its plain one (`?p=ID`).
+		if ( ! postName ) {
+			return getCurrentPostAttribute( state, 'link' ) ?? null;
+		}
 		return prefix + postName + suffix;
 	}
 
@@ -987,35 +992,23 @@ export function getPermalink( state ) {
 }
 
 /**
- * Returns the slug for the post being edited, preferring a manually edited or
- * saved value if one exists, then the server-generated slug from the post
- * entity, then a JS approximation of the current post title, and finally the
- * post ID.
+ * Returns the slug for the post being edited: the edited or saved slug if one
+ * is set, otherwise the slug derived from the current title, which is what
+ * WordPress uses when the post is published. Returns an empty string for a
+ * post with neither.
  *
- * The server generates its slug from the saved title, so it is only used while
- * the title is unchanged. It is never used for an auto-draft, whose saved title
- * is the `Auto Draft` placeholder and which autosaves don't refresh.
+ * The server-generated slug isn't used: it comes from the saved title, so it
+ * lags behind title edits, and for a new post it comes from the `Auto Draft`
+ * placeholder.
  *
  * @param {Object} state Editor state.
  *
  * @return {string} The current slug to be displayed in the editor
  */
 export function getEditedPostSlug( state ) {
-	const slug = getEditedPostAttribute( state, 'slug' );
-	if ( slug ) {
-		return slug;
-	}
-
-	const title = getEditedPostAttribute( state, 'title' );
-	const isGeneratedSlugCurrent =
-		getCurrentPostAttribute( state, 'status' ) !== 'auto-draft' &&
-		title === getCurrentPostAttribute( state, 'title' );
-
 	return (
-		( isGeneratedSlugCurrent &&
-			getEditedPostAttribute( state, 'generated_slug' ) ) ||
-		cleanForSlug( title ) ||
-		getCurrentPostId( state )
+		getEditedPostAttribute( state, 'slug' ) ||
+		cleanForSlug( getEditedPostAttribute( state, 'title' ) )
 	);
 }
 

@@ -100,4 +100,44 @@ test.describe( 'Sidebar Permalink', () => {
 		} );
 		expect( post.slug ).toBe( 'hello-slug' );
 	} );
+
+	test( 'should derive the slug from the title after an autosave', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello Slug' );
+
+		// An autosave of a new post saves the title to the post itself.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		await expect(
+			page.getByRole( 'button', { name: 'Change link: hello-slug' } )
+		).toBeVisible();
+	} );
+
+	test( 'should not show a slug for a post without a title', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
+
+		await page.getByRole( 'button', { name: 'Change link: None' } ).click();
+
+		// Without a slug, the post only has its plain permalink.
+		await expect(
+			page.getByRole( 'textbox', { name: 'Slug' } )
+		).toHaveValue( '' );
+		await expect(
+			page.getByRole( 'link', { name: /\?p=\d+/ } )
+		).toBeVisible();
+	} );
 } );

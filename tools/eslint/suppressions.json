@@ -7087,14 +7087,6 @@
 	"packages/fields/src/fields/slug/slug-edit.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		},
-		"react-hooks/refs": {
-			"count": 2
-		}
-	},
-	"packages/fields/src/fields/slug/slug-view.tsx": {
-		"react-hooks/refs": {
-			"count": 1
 		}
 	},
 	"packages/fields/src/fields/status/status-view.tsx": {

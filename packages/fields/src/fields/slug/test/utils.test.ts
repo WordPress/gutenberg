@@ -15,34 +15,35 @@ describe( 'getSlug', () => {
 		expect(
 			getSlug(
 				createPost( {
-					status: 'draft',
+					status: 'publish',
 					slug: 'custom-slug',
-					generated_slug: 'sample-post',
+					title: 'Edited Title',
 				} )
 			)
 		).toBe( 'custom-slug' );
 	} );
 
-	it( 'returns the server-generated slug if no slug exists', () => {
+	it( 'derives the slug from the current title, not the server-generated slug', () => {
 		expect(
 			getSlug(
 				createPost( {
 					status: 'draft',
-					generated_slug: 'server-generated-slug',
-				} )
-			)
-		).toBe( 'server-generated-slug' );
-	} );
-
-	it( 'ignores the server-generated slug of an auto-draft', () => {
-		expect(
-			getSlug(
-				createPost( {
-					status: 'auto-draft',
 					title: 'Hello Slug',
 					generated_slug: 'auto-draft',
 				} )
 			)
 		).toBe( 'hello-slug' );
+	} );
+
+	it( 'returns an empty string for a post without a slug or a title', () => {
+		expect(
+			getSlug(
+				createPost( {
+					status: 'auto-draft',
+					title: '',
+					generated_slug: 'auto-draft',
+				} )
+			)
+		).toBe( '' );
 	} );
 } );

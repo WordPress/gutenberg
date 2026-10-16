@@ -143,9 +143,9 @@ export default function PostURL( { onClose } ) {
 									}
 								} }
 								onBlur={ ( event ) => {
-									// Without a slug the field shows a fallback, which for
-									// a new post is the `auto-draft` placeholder. Writing
-									// it would pin that value as the post slug.
+									// Without a slug the field shows the slug derived from
+									// the title. Writing it would pin that value, so the
+									// slug would stop following the title.
 									if ( hasSlug ) {
 										editPost( {
 											slug: cleanForSlug(
@@ -168,15 +168,22 @@ export default function PostURL( { onClose } ) {
 									href={ postLink }
 									target="_blank"
 								>
-									<span className="editor-post-url__link-prefix">
-										{ permalinkPrefix }
-									</span>
-									<span className="editor-post-url__link-slug">
-										{ postSlug }
-									</span>
-									<span className="editor-post-url__link-suffix">
-										{ permalinkSuffix }
-									</span>
+									{ postSlug ? (
+										<>
+											<span className="editor-post-url__link-prefix">
+												{ permalinkPrefix }
+											</span>
+											<span className="editor-post-url__link-slug">
+												{ postSlug }
+											</span>
+											<span className="editor-post-url__link-suffix">
+												{ permalinkSuffix }
+											</span>
+										</>
+									) : (
+										// Without a slug the post only has its plain permalink.
+										permalink
+									) }
 								</ExternalLink>
 							</p>
 						</>
