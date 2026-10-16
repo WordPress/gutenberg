@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "77516059d8dedfbc7168fce9a7574aba",
+    "content-hash": "bb4eb6809364707b84ed0f640b8d1799",
     "packages": [
         {
             "name": "composer/installers",
@@ -2218,16 +2218,16 @@
         },
         {
             "name": "wp-phpunit/wp-phpunit",
-            "version": "5.6.0",
+            "version": "5.7.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/wp-phpunit/wp-phpunit.git",
-                "reference": "7130a214573cc8c12a0f8fe8a74b18b453bce1e9"
+                "reference": "d97ece673cc78aa9835f87d937f86b1bf8e0fc8c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/7130a214573cc8c12a0f8fe8a74b18b453bce1e9",
-                "reference": "7130a214573cc8c12a0f8fe8a74b18b453bce1e9",
+                "url": "https://api.github.com/repos/wp-phpunit/wp-phpunit/zipball/d97ece673cc78aa9835f87d937f86b1bf8e0fc8c",
+                "reference": "d97ece673cc78aa9835f87d937f86b1bf8e0fc8c",
                 "shasum": ""
             },
             "type": "library",
@@ -2262,7 +2262,70 @@
                 "issues": "https://github.com/wp-phpunit/issues",
                 "source": "https://github.com/wp-phpunit/wp-phpunit"
             },
-            "time": "2020-12-09T18:06:02+00:00"
+            "time": "2021-11-10T19:49:28+00:00"
+        },
+        {
+            "name": "yoast/phpunit-polyfills",
+            "version": "1.1.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Yoast/PHPUnit-Polyfills.git",
+                "reference": "41aaac462fbd80feb8dd129e489f4bbc53fe26b0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Yoast/PHPUnit-Polyfills/zipball/41aaac462fbd80feb8dd129e489f4bbc53fe26b0",
+                "reference": "41aaac462fbd80feb8dd129e489f4bbc53fe26b0",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4",
+                "phpunit/phpunit": "^4.8.36 || ^5.7.21 || ^6.0 || ^7.0 || ^8.0 || ^9.0"
+            },
+            "require-dev": {
+                "php-parallel-lint/php-console-highlighter": "^1.0.0",
+                "php-parallel-lint/php-parallel-lint": "^1.4.0",
+                "yoast/yoastcs": "^3.2.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-main": "4.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "phpunitpolyfills-autoload.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Team Yoast",
+                    "email": "support@yoast.com",
+                    "homepage": "https://yoast.com"
+                },
+                {
+                    "name": "Contributors",
+                    "homepage": "https://github.com/Yoast/PHPUnit-Polyfills/graphs/contributors"
+                }
+            ],
+            "description": "Set of polyfills for changed PHPUnit functionality to allow for creating PHPUnit cross-version compatible tests",
+            "homepage": "https://github.com/Yoast/PHPUnit-Polyfills",
+            "keywords": [
+                "phpunit",
+                "polyfill",
+                "testing"
+            ],
+            "support": {
+                "issues": "https://github.com/Yoast/PHPUnit-Polyfills/issues",
+                "security": "https://github.com/Yoast/PHPUnit-Polyfills/security/policy",
+                "source": "https://github.com/Yoast/PHPUnit-Polyfills"
+            },
+            "time": "2025-08-10T04:54:36+00:00"
         }
     ],
     "aliases": [],
