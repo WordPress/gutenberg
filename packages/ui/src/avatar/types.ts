@@ -9,13 +9,12 @@ export type RootProps = Omit<
 	 * The color of an optional ring around the avatar. Accepts any CSS color,
 	 * including CSS variables. Without an image, supporting browsers also use
 	 * an opaque sRGB fill derived from this color and a contrasting foreground.
-	 * The fallback ring uses the same tint as the default person icon.
+	 * Colored fallbacks have no border. Forced-colors mode retains a visible border.
 	 * Other browsers retain the neutral fallback. Images keep their own colors
 	 * and the supplied ring color.
 	 * The ring paints over the avatar's inner edge without changing its layout size.
 	 * Foreground tinting targets at least 4.5:1 contrast for text and 3:1 for
-	 * the default person icon and fallback ring against the fill when it resolves
-	 * independently. The decorative ring has no contrast target against the page.
+	 * the default person icon when the fill resolves independently.
 	 *
 	 * The colored fallback's fill must resolve independently of its foreground.
 	 * `currentColor`, including through CSS variables or color functions, is

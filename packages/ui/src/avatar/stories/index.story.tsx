@@ -48,7 +48,7 @@ type Story = StoryObj< typeof Avatar.Root >;
 
 export const Default: Story = {};
 
-/** Loaded images keep the supplied ring color. Fallback rings use the person icon's tint. */
+/** Loaded images keep the supplied ring color. Colored fallbacks have no border. */
 export const WithColor: Story = {
 	args: { color: '#008a20' },
 	render: ( args ) => (
@@ -178,10 +178,11 @@ export const FallbackColors: Story = {
 					Foregrounds blend toward the background until they reach
 					4.55:1 contrast for initials or 3.05:1 for the person icon.
 					These targets include a small margin above 4.5:1 and 3:1.
-					Fallback rings use the same tint as the person icon.
-					Browsers without the required color math retain neutral
-					fallbacks. See Unsupported Colors for input limitations and
-					the limits of best-effort development warnings.
+					Colored fallbacks have no border. Forced-colors mode keeps a
+					visible border. Browsers without the required color math
+					retain neutral fallbacks. See Unsupported Colors for input
+					limitations and the limits of best-effort development
+					warnings.
 				</p>
 				<table>
 					<thead>
