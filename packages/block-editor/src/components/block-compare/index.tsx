@@ -4,6 +4,7 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlockContent } from '@wordpress/blocks';
 import BlockView from './block-view';
+import type { BlockCompareProps, ConvertedBlocks } from './types';
 
 /**
  * Renders the text of an added or removed diff part, marking each of its
@@ -11,10 +12,10 @@ import BlockView from './block-view';
  * at a bare line break, so without the symbol a difference made of blank lines
  * cannot be seen.
  *
- * @param {string} value Text of the diff part.
- * @return {Array} Text pieces, with a marker before each newline.
+ * @param value Text of the diff part.
+ * @return Text pieces, with a marker before each newline.
  */
-function getChangedValue( value ) {
+function getChangedValue( value: string ) {
 	return value.split( /(\n)/ ).map( ( piece, index ) =>
 		piece === '\n' ? (
 			<Fragment key={ index }>
@@ -38,8 +39,8 @@ function BlockCompare( {
 	onConvert,
 	convertor,
 	convertButtonText,
-} ) {
-	function getDifference( originalContent, newContent ) {
+}: BlockCompareProps ) {
+	function getDifference( originalContent: string, newContent: string ) {
 		const difference = diffChars( originalContent, newContent );
 
 		return difference.map( ( item, pos ) => {
@@ -57,7 +58,7 @@ function BlockCompare( {
 		} );
 	}
 
-	function getConvertedContent( convertedBlock ) {
+	function getConvertedContent( convertedBlock: ConvertedBlocks ) {
 		// The convertor may return an array of items or a single item.
 		const newBlocks = Array.isArray( convertedBlock )
 			? convertedBlock

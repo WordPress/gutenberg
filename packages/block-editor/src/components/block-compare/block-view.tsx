@@ -1,6 +1,7 @@
 import { Button } from '@wordpress/components';
 import { RawHTML } from '@wordpress/element';
 import { safeHTML } from '@wordpress/dom';
+import type { BlockViewProps } from './types';
 
 export default function BlockView( {
 	title,
@@ -9,7 +10,7 @@ export default function BlockView( {
 	action,
 	actionText,
 	className,
-} ) {
+}: BlockViewProps ) {
 	return (
 		<div className={ className }>
 			<div className="block-editor-block-compare__content">
@@ -30,7 +31,8 @@ export default function BlockView( {
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
-					tabIndex="0"
+					// React renders the string attribute as is.
+					tabIndex={ '0' as unknown as number }
 					onClick={ action }
 				>
 					{ actionText }
