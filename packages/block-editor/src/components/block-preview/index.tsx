@@ -3,14 +3,18 @@ import { useDisabled, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { memo, useMemo } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
+import type { MemoExoticComponent, Ref } from 'react';
+import type { Block } from '@wordpress/blocks';
 import { ExperimentalBlockEditorProvider } from '../provider';
 import AutoHeightBlockPreview from './auto';
 import EditorStyles from '../editor-styles';
 import { store as blockEditorStore } from '../../store';
 import { BlockListItems } from '../block-list';
 import { Async } from './async';
+import type { EditorStylesStyle } from '../editor-styles/types';
+import type { BlockPreviewProps, UseBlockPreviewOptions } from './types';
 
-const EMPTY_ADDITIONAL_STYLES = [];
+const EMPTY_ADDITIONAL_STYLES: EditorStylesStyle[] = [];
 
 export function BlockPreview( {
 	blocks,
@@ -20,7 +24,7 @@ export function BlockPreview( {
 	// Deprecated props:
 	__experimentalMinHeight,
 	__experimentalPadding,
-} ) {
+}: BlockPreviewProps ) {
 	if ( __experimentalMinHeight ) {
 		minHeight = __experimentalMinHeight;
 		deprecated( 'The __experimentalMinHeight prop', {
@@ -57,13 +61,15 @@ export function BlockPreview( {
 		[ blocks ]
 	);
 
-	if ( ! blocks || blocks.length === 0 ) {
+	// A single block has no length.
+	if ( ! blocks || ( blocks as Block[] ).length === 0 ) {
 		return null;
 	}
 
 	return (
 		<ExperimentalBlockEditorProvider
-			value={ renderedBlocks }
+			// The preview renders only with blocks.
+			value={ renderedBlocks as Block[] }
 			settings={ settings }
 		>
 			<AutoHeightBlockPreview
@@ -75,7 +81,10 @@ export function BlockPreview( {
 	);
 }
 
-const MemoizedBlockPreview = memo( BlockPreview );
+// `Async` is attached below.
+const MemoizedBlockPreview = memo( BlockPreview ) as MemoExoticComponent<
+	typeof BlockPreview
+> & { Async: typeof Async };
 
 MemoizedBlockPreview.Async = Async;
 
@@ -101,13 +110,17 @@ export default MemoizedBlockPreview;
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
- * @param {Object}    options        Preview options.
- * @param {WPBlock[]} options.blocks Block objects.
- * @param {Object}    options.props  Optional. Props to pass to the element. Must contain
- *                                   the ref if one is defined.
- * @param {Object}    options.layout Layout settings to be used in the preview.
+ * @param options        Preview options.
+ * @param options.blocks Block objects.
+ * @param options.props  Optional. Props to pass to the element. Must contain
+ *                       the ref if one is defined.
+ * @param options.layout Layout settings to be used in the preview.
  */
-export function useBlockPreview( { blocks, props = {}, layout } ) {
+export function useBlockPreview( {
+	blocks,
+	props = {},
+	layout,
+}: UseBlockPreviewOptions ) {
 	const originalSettings = useSelect(
 		( select ) => select( blockEditorStore ).getSettings(),
 		[]
@@ -121,7 +134,11 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 		[ originalSettings ]
 	);
 	const disabledRef = useDisabled();
-	const ref = useMergeRefs( [ props.ref, disabledRef ] );
+	// `useMergeRefs` skips a missing ref.
+	const ref = useMergeRefs( [
+		props.ref as Ref< HTMLElement >,
+		disabledRef,
+	] );
 	const renderedBlocks = useMemo(
 		() => ( Array.isArray( blocks ) ? blocks : [ blocks ] ),
 		[ blocks ]
@@ -144,6 +161,7 @@ export function useBlockPreview( { blocks, props = {}, layout } ) {
 			props.className,
 			'block-editor-block-preview__live-content'
 		),
-		children: blocks?.length ? children : null,
+		// A single block has no length.
+		children: ( blocks as Block[] )?.length ? children : null,
 	};
 }

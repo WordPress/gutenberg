@@ -6,19 +6,21 @@ import BlockList from '../block-list';
 import Iframe from '../iframe';
 import EditorStyles from '../editor-styles';
 import { store } from '../../store';
+import type { EditorStylesStyle } from '../editor-styles/types';
+import type { AutoBlockPreviewProps, ScaledBlockPreviewProps } from './types';
 
 // This is used to avoid rendering the block list if the sizes change.
 const MemoizedBlockList = memo( BlockList );
 
 const MAX_HEIGHT = 2000;
-const EMPTY_ADDITIONAL_STYLES = [];
+const EMPTY_ADDITIONAL_STYLES: EditorStylesStyle[] = [];
 
 function ScaledBlockPreview( {
 	viewportWidth,
 	containerWidth,
 	minHeight,
 	additionalStyles = EMPTY_ADDITIONAL_STYLES,
-} ) {
+}: ScaledBlockPreviewProps ) {
 	if ( ! viewportWidth ) {
 		viewportWidth = containerWidth;
 	}
@@ -28,7 +30,8 @@ function ScaledBlockPreview( {
 	const { styles } = useSelect( ( select ) => {
 		const settings = select( store ).getSettings();
 		return {
-			styles: settings.styles,
+			// The settings hold the editor styles.
+			styles: settings.styles as EditorStylesStyle[] | undefined,
 		};
 	}, [] );
 
@@ -63,7 +66,10 @@ function ScaledBlockPreview( {
 				// See https://github.com/WordPress/gutenberg/pull/52921 for more info.
 				aspectRatio,
 				maxHeight:
-					contentHeight > MAX_HEIGHT ? MAX_HEIGHT * scale : undefined,
+					// A `null` height compares as 0.
+					( contentHeight as number ) > MAX_HEIGHT
+						? MAX_HEIGHT * scale
+						: undefined,
 				minHeight,
 			} }
 		>
@@ -88,7 +94,8 @@ function ScaledBlockPreview( {
 				style={ {
 					position: 'absolute',
 					width: viewportWidth,
-					height: contentHeight,
+					// React sets no height for `null`.
+					height: contentHeight as number | undefined,
 					pointerEvents: 'none',
 					// This is a catch-all max-height for patterns.
 					// See: https://github.com/WordPress/gutenberg/pull/38175.
@@ -107,7 +114,7 @@ function ScaledBlockPreview( {
 	);
 }
 
-export default function AutoBlockPreview( props ) {
+export default function AutoBlockPreview( props: AutoBlockPreviewProps ) {
 	const [ containerResizeListener, { width: containerWidth } ] =
 		useResizeObserver();
 

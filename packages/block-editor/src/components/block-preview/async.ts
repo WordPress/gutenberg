@@ -1,13 +1,16 @@
 import { useEffect, useState, flushSync } from '@wordpress/element';
 import { createQueue } from '@wordpress/priority-queue';
+import type { AsyncProps } from './types';
 
 const blockPreviewQueue = createQueue();
 
 /**
  * Renders a component at the next idle time.
- * @param {*} props
+ * @param props
+ * @param props.children
+ * @param props.placeholder
  */
-export function Async( { children, placeholder } ) {
+export function Async( { children, placeholder }: AsyncProps ) {
 	const [ shouldRender, setShouldRender ] = useState( false );
 
 	// In the future, we could try to use startTransition here, but currently
