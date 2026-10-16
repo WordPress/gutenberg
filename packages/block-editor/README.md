@@ -691,7 +691,7 @@ _Parameters_
 - _props_ `Object`:
 - _props.label_ `?string`: A label for the control.
 - _props.onChange_ `( value: string ) => void`: Called when the height changes.
-- _props.value_ `string`: The current height value.
+- _props.value_ `string|number`: The current height value.
 
 _Returns_
 

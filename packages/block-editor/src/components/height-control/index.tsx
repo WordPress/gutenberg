@@ -12,8 +12,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import deprecated from '@wordpress/deprecated';
 import { useSettings } from '../use-settings';
+import type { HeightControlProps } from './types';
 
-const RANGE_CONTROL_CUSTOM_SETTINGS = {
+const RANGE_CONTROL_CUSTOM_SETTINGS: Record<
+	string,
+	{ max: number; step: number }
+> = {
 	px: { max: 1000, step: 1 },
 	'%': { max: 100, step: 1 },
 	vw: { max: 100, step: 1 },
@@ -54,7 +58,7 @@ const RANGE_CONTROL_CUSTOM_SETTINGS = {
  * @param {Object}                     props
  * @param {?string}                    props.label    A label for the control.
  * @param {( value: string ) => void } props.onChange Called when the height changes.
- * @param {string}                     props.value    The current height value.
+ * @param {string|number}              props.value    The current height value.
  *
  * @return {Component} The component to be rendered.
  */
@@ -62,17 +66,19 @@ export default function HeightControl( {
 	label = __( 'Height' ),
 	onChange,
 	value,
-} ) {
+}: HeightControlProps ) {
 	deprecated( 'wp.blockEditor.HeightControl', {
 		since: '7.0',
 		version: '7.2',
 		alternative: 'wp.blockEditor.DimensionControl',
 	} );
-	const customRangeValue = parseFloat( value );
+	// `parseFloat` reads a number as its string form, and unset as `NaN`.
+	const customRangeValue = parseFloat( value as string );
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: availableUnits || [
+		// The setting lists unit names.
+		availableUnits: ( availableUnits as string[] | undefined ) || [
 			'%',
 			'px',
 			'em',
@@ -90,17 +96,20 @@ export default function HeightControl( {
 		units[ 0 ]?.value ||
 		'px';
 
-	const handleSliderChange = ( next ) => {
+	const handleSliderChange = ( next?: number ) => {
 		onChange( [ next, selectedUnit ].join( '' ) );
 	};
 
-	const handleUnitChange = ( newUnit ) => {
+	const handleUnitChange = ( newUnit?: string ) => {
 		// Attempt to smooth over differences between currentUnit and newUnit.
 		// This should slightly improve the experience of switching between unit types.
-		const [ currentValue, currentUnit ] =
-			parseQuantityAndUnitFromRawValue( value );
+		// An unset quantity computes `NaN`, which matches no branch.
+		const [ currentValue, currentUnit ] = parseQuantityAndUnitFromRawValue(
+			value
+		) as [ number, string ];
 
-		if ( [ 'em', 'rem' ].includes( newUnit ) && currentUnit === 'px' ) {
+		// The unit select always passes a unit.
+		if ( [ 'em', 'rem' ].includes( newUnit! ) && currentUnit === 'px' ) {
 			// Convert pixel value to an approximate of the new unit, assuming a root size of 16px.
 			onChange( ( currentValue / 16 ).toFixed( 2 ) + newUnit );
 		} else if (
@@ -136,11 +145,11 @@ export default function HeightControl( {
 				'svmax',
 				'lvmax',
 				'dvmax',
-			].includes( newUnit ) &&
+			].includes( newUnit! ) &&
 			currentValue > 100
 		) {
 			// When converting to `%` or viewport-relative units, cap the new value at 100.
-			onChange( 100 + newUnit );
+			onChange( 100 + newUnit! );
 		}
 	};
 
