@@ -40,12 +40,12 @@ const BYTES_PER_PIXEL = 4;
 /**
  * Memory budget (in bytes) for decoding every frame of an animated image.
  *
- * wasm-vips grows its WASM heap up to 2 GiB (wasm-vips 0.0.19), though growth
- * can fail on memory-constrained devices, so an animation loaded with
- * `[n=-1]` — every frame stacked into one tall image — costs at most
- * frames * width * pageHeight * 4 bytes. A long animation of otherwise modest
- * dimensions can therefore exhaust the heap even though a single frame is
- * small. ~0.75 GiB leaves headroom for the resize and re-encode steps.
+ * An animation loaded with `[n=-1]` (every frame stacked into one tall image)
+ * costs at most frames * width * pageHeight * 4 bytes, so a long animation of
+ * otherwise modest dimensions can exhaust the heap even though a single frame
+ * is small. wasm-vips 0.0.19 grows its heap up to 2 GiB, but growth can fail
+ * on memory-constrained devices, so ~0.75 GiB leaves headroom for that and
+ * for the resize and re-encode steps.
  *
  * The estimate is the fully materialized frame stack, which is an upper bound:
  * libvips streams the sequential load/resize/save pipeline, so real peak usage
