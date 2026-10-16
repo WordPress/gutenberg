@@ -6,6 +6,14 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Keep read-only taxonomy term data out of collaborative edits so stale counts and links do not mark unchanged categories as dirty ([#84838](https://github.com/WordPress/gutenberg/pull/84838)).
+
+### Internal
+
+-   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+
 ## 8.2.0 (2026-10-07)
 
 ### Enhancements
