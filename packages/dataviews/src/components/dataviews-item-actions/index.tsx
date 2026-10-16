@@ -8,6 +8,7 @@ import { useViewportMatch } from '@wordpress/compose';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
 import { Menu, Stack } from '@wordpress/ui';
 import { kebabCase } from '@wordpress/kebab-case';
+import useEligibleActions from '../../hooks/use-eligible-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
 
 export interface ActionTriggerProps< Item > {
@@ -166,20 +167,11 @@ export default function ItemActions< Item >( {
 	isCompact,
 }: ItemActionsProps< Item > ) {
 	const registry = useRegistry();
-	const { primaryActions, eligibleActions } = useMemo( () => {
-		// If an action is eligible for all items, doesn't need
-		// to provide the `isEligible` function.
-		const _eligibleActions = actions.filter(
-			( action ) => ! action.isEligible || action.isEligible( item )
-		);
-		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary
-		);
-		return {
-			primaryActions: _primaryActions,
-			eligibleActions: _eligibleActions,
-		};
-	}, [ actions, item ] );
+	const eligibleActions = useEligibleActions( actions, item );
+	const primaryActions = useMemo(
+		() => eligibleActions.filter( ( action ) => action.isPrimary ),
+		[ eligibleActions ]
+	);
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 

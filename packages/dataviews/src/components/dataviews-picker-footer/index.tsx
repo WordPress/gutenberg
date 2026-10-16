@@ -11,8 +11,9 @@ import { __ } from '@wordpress/i18n';
 import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
-import type { Action } from '../../types';
+import type { Action, ActionButton as ActionButtonType } from '../../types';
 import getFooterMessage from '../../utils/get-footer-message';
+import useEligibleItems from '../../hooks/use-eligible-items';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -89,6 +90,54 @@ function BulkSelectionCheckbox< Item >( {
 	);
 }
 
+function ActionButton< Item >( {
+	action,
+	items,
+	selection,
+	actionInProgress,
+	setActionInProgress,
+}: {
+	action: ActionButtonType< Item >;
+	items: Item[];
+	selection: string[];
+	actionInProgress: string | null;
+	setActionInProgress: ( actionId: string | null ) => void;
+} ) {
+	const registry = useRegistry();
+	const { id, label, icon, isPrimary, isEligible, callback } = action;
+
+	// `items` holds the current page's selection only, so an action without
+	// `isEligible` stays enabled for a selection made on other pages.
+	const eligibleItems = useEligibleItems( action, items );
+	const _label = typeof label === 'string' ? label : label( items );
+	const variant = isPrimary ? 'primary' : 'tertiary';
+	const isInProgress = id === actionInProgress;
+
+	return (
+		<Button
+			accessibleWhenDisabled
+			icon={ icon }
+			disabled={
+				isInProgress ||
+				! selection?.length ||
+				( !! isEligible && ! eligibleItems.length )
+			}
+			isBusy={ isInProgress }
+			onClick={ async () => {
+				setActionInProgress( id );
+				await callback( eligibleItems, {
+					registry,
+				} );
+				setActionInProgress( null );
+			} }
+			size="compact"
+			variant={ variant }
+		>
+			{ _label }
+		</Button>
+	);
+}
+
 function ActionButtons< Item >( {
 	actions,
 	items,
@@ -98,7 +147,6 @@ function ActionButtons< Item >( {
 	items: Item[];
 	selection: string[];
 } ) {
-	const registry = useRegistry();
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
@@ -112,43 +160,15 @@ function ActionButtons< Item >( {
 					return null;
 				}
 
-				const { id, label, icon, isPrimary, isEligible, callback } =
-					action;
-
-				// `items` holds the current page's selection only, so an
-				// action without `isEligible` stays enabled for a selection
-				// made on other pages.
-				const eligibleItems = isEligible
-					? items.filter( ( item ) => isEligible( item ) )
-					: items;
-				const _label =
-					typeof label === 'string' ? label : label( items );
-				const variant = isPrimary ? 'primary' : 'tertiary';
-				const isInProgress = id === actionInProgress;
-
 				return (
-					<Button
-						key={ id }
-						accessibleWhenDisabled
-						icon={ icon }
-						disabled={
-							isInProgress ||
-							! selection?.length ||
-							( !! isEligible && ! eligibleItems.length )
-						}
-						isBusy={ isInProgress }
-						onClick={ async () => {
-							setActionInProgress( id );
-							await callback( eligibleItems, {
-								registry,
-							} );
-							setActionInProgress( null );
-						} }
-						size="compact"
-						variant={ variant }
-					>
-						{ _label }
-					</Button>
+					<ActionButton
+						key={ action.id }
+						action={ action }
+						items={ items }
+						selection={ selection }
+						actionInProgress={ actionInProgress }
+						setActionInProgress={ setActionInProgress }
+					/>
 				);
 			} ) }
 		</Stack>

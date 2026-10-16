@@ -1,6 +1,11 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+	createReduxStore,
+	createRegistry,
+	RegistryProvider,
+} from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import DataViews from '../index';
 import {
@@ -113,6 +118,30 @@ const data: Data[] = [
 		order: 1,
 	},
 ];
+
+// A store holding the id of the only item the actions of the eligibility tests
+// are eligible for.
+const eligibilityStore = createReduxStore( 'test/eligibility', {
+	reducer: (
+		state = { eligibleId: 1 },
+		action: { type: string; id?: number }
+	) =>
+		action.type === 'SET_ELIGIBLE_ID'
+			? { eligibleId: action.id as number }
+			: state,
+	actions: {
+		setEligibleId: ( id: number ) => ( { type: 'SET_ELIGIBLE_ID', id } ),
+	},
+	selectors: {
+		getEligibleId: ( state: { eligibleId: number } ) => state.eligibleId,
+	},
+} );
+
+function createEligibilityRegistry() {
+	const registry = createRegistry();
+	registry.register( eligibilityStore );
+	return registry;
+}
 
 function DataViewWrapper( {
 	view: additionalView,
@@ -747,6 +776,121 @@ describe( 'DataViews component', () => {
 			expect(
 				restore.mock.calls[ 0 ][ 0 ].map( ( item: Data ) => item.id )
 			).toEqual( [ 1 ] );
+		} );
+
+		it( 'evaluates `isEligible` with the registry again when the data it reads changes', () => {
+			const registry = createEligibilityRegistry();
+			const isEligible = vi.fn(
+				( item: Data, context: { registry: typeof registry } ) =>
+					context.registry
+						.select( eligibilityStore )
+						.getEligibleId() === item.id
+			);
+			render(
+				<RegistryProvider value={ registry }>
+					<DataViewWrapper
+						view={ {
+							...DEFAULT_VIEW,
+							fields: [ 'author' ],
+							titleField: 'title',
+						} }
+						actions={ [
+							{
+								id: 'feature',
+								label: 'Feature',
+								isPrimary: true,
+								isEligible,
+								callback: vi.fn(),
+							},
+						] }
+					/>
+				</RegistryProvider>
+			);
+			// The titles of the rows offering the action.
+			const getRowsWithAction = () =>
+				screen
+					.getAllByRole( 'row' )
+					.filter(
+						( row ) =>
+							!! within( row ).queryByRole( 'button', {
+								name: 'Feature',
+							} )
+					)
+					.map(
+						( row ) =>
+							data.find(
+								( item ) =>
+									!! within( row ).queryByText( item.title )
+							)?.title
+					);
+
+			expect( isEligible ).toHaveBeenCalledWith( data[ 0 ], {
+				registry,
+			} );
+			expect( getRowsWithAction() ).toEqual( [ data[ 0 ].title ] );
+
+			act( () => {
+				registry.dispatch( eligibilityStore ).setEligibleId( 2 );
+			} );
+
+			expect( getRowsWithAction() ).toEqual( [ data[ 1 ].title ] );
+		} );
+
+		it( 'evaluates the eligibility of bulk actions again when the data it reads changes', async () => {
+			const registry = createEligibilityRegistry();
+			render(
+				<RegistryProvider value={ registry }>
+					<DataViewWrapper
+						view={ {
+							...DEFAULT_VIEW,
+							fields: [ 'author' ],
+							titleField: 'title',
+						} }
+						actions={ [
+							{
+								id: 'archive',
+								label: 'Archive',
+								supportsBulk: true,
+								isEligible: (
+									item: Data,
+									context: { registry: typeof registry }
+								) =>
+									context.registry
+										.select( eligibilityStore )
+										.getEligibleId() === item.id,
+								callback: vi.fn(),
+							},
+						] }
+					/>
+				</RegistryProvider>
+			);
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+
+			const user = userEvent.setup();
+			await user.click(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			);
+			expect(
+				screen.getByRole( 'button', { name: 'Archive' } )
+			).toBeInTheDocument();
+
+			// The selected item is no longer eligible, so the bulk action is
+			// no longer offered, and only the second item can be selected.
+			act( () => {
+				registry.dispatch( eligibilityStore ).setEligibleId( 2 );
+			} );
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Archive' } )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 0 ].title } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+			expect(
+				screen.getByRole( 'checkbox', { name: data[ 1 ].title } )
+			).toHaveAttribute( 'aria-disabled', 'false' );
 		} );
 	} );
 

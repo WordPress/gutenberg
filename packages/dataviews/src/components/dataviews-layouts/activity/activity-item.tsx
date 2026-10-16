@@ -5,6 +5,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { Stack, VisuallyHidden } from '@wordpress/ui';
 import ItemActions, { PrimaryActions } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
+import useEligibleActions from '../../../hooks/use-eligible-actions';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 import type { NormalizedField, ViewActivityProps } from '../../../types';
 
@@ -41,20 +42,11 @@ function ActivityItem< Item >(
 	const registry = useRegistry();
 	const { paginationInfo } = useContext( DataViewsContext );
 
-	const { primaryActions, eligibleActions } = useMemo( () => {
-		// If an action is eligible for all items, doesn't need
-		// to provide the `isEligible` function.
-		const _eligibleActions = actions.filter(
-			( action ) => ! action.isEligible || action.isEligible( item )
-		);
-		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary
-		);
-		return {
-			primaryActions: _primaryActions,
-			eligibleActions: _eligibleActions,
-		};
-	}, [ actions, item ] );
+	const eligibleActions = useEligibleActions( actions, item );
+	const primaryActions = useMemo(
+		() => eligibleActions.filter( ( action ) => action.isPrimary ),
+		[ eligibleActions ]
+	);
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const density = view.layout?.density ?? 'balanced';

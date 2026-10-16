@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { createRegistry } from '@wordpress/data';
 import postTypeSupports from '../post_type_supports';
 
 describe( 'post_type_supports', () => {
@@ -34,12 +35,15 @@ describe( 'post_type_supports', () => {
 			content: '',
 			permissions: { delete: true, update: true },
 		};
-		expect( postTypeSupports[ 'view-post' ].isEligible?.( post ) ).toBe(
-			false
+		const context = { registry: createRegistry() };
+		expect(
+			postTypeSupports[ 'view-post' ].isEligible?.( post, context )
+		).toBe( false );
+		expect( postTypeSupports.restore.isEligible?.( post, context ) ).toBe(
+			true
 		);
-		expect( postTypeSupports.restore.isEligible?.( post ) ).toBe( true );
-		expect( postTypeSupports[ 'move-to-trash' ].isEligible?.( post ) ).toBe(
-			false
-		);
+		expect(
+			postTypeSupports[ 'move-to-trash' ].isEligible?.( post, context )
+		).toBe( false );
 	} );
 } );

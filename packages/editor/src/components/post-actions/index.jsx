@@ -36,13 +36,19 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 	}, [ item, permissions ] );
 	const allActions = usePostActions( { postType, onActionPerformed } );
 
-	const actions = useMemo( () => {
-		return allActions.filter( ( action ) => {
-			return (
-				! action.isEligible || action.isEligible( itemWithPermissions )
-			);
-		} );
-	}, [ allActions, itemWithPermissions ] );
+	// Eligibility is evaluated in `useSelect`, so it's evaluated again when
+	// the data it reads changes.
+	const actions = useSelect(
+		( select, registry ) => {
+			return allActions.filter( ( action ) => {
+				return (
+					! action.isEligible ||
+					action.isEligible( itemWithPermissions, { registry } )
+				);
+			} );
+		},
+		[ allActions, itemWithPermissions ]
+	);
 
 	return (
 		<>

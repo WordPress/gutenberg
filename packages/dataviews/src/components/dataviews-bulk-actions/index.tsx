@@ -5,7 +5,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
-import { useRegistry } from '@wordpress/data';
+import { useRegistry, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -15,6 +15,7 @@ import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
+import useEligibleItems from '../../hooks/use-eligible-items';
 
 interface ActionWithModalProps< Item > {
 	action: ActionModalType< Item >;
@@ -53,12 +54,13 @@ function ActionWithModal< Item >( {
 
 export function hasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
-	item: Item
+	item: Item,
+	registry: ReturnType< typeof useRegistry >
 ) {
 	return actions.some(
 		( action ) =>
 			action.supportsBulk &&
-			( ! action.isEligible || action.isEligible( item ) )
+			( ! action.isEligible || action.isEligible( item, { registry } ) )
 	);
 }
 
@@ -66,8 +68,9 @@ export function useHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	item: Item
 ) {
-	return useMemo(
-		() => hasAPossibleBulkAction( actions, item ),
+	return useSelect(
+		( select, registry ) =>
+			hasAPossibleBulkAction( actions, item, registry ),
 		[ actions, item ]
 	);
 }
@@ -76,8 +79,11 @@ export function useSomeItemHasAPossibleBulkAction< Item >(
 	actions: Action< Item >[],
 	data: Item[]
 ) {
-	return useMemo(
-		() => data.some( ( item ) => hasAPossibleBulkAction( actions, item ) ),
+	return useSelect(
+		( select, registry ) =>
+			data.some( ( item ) =>
+				hasAPossibleBulkAction( actions, item, registry )
+			),
 		[ actions, data ]
 	);
 }
@@ -99,15 +105,19 @@ export function BulkSelectionCheckbox< Item >( {
 	getItemId,
 	disableSelectAll = false,
 }: BulkSelectionCheckboxProps< Item > ) {
-	const selectableItems = useMemo( () => {
-		return data.filter( ( item ) => {
-			return actions.some(
-				( action ) =>
-					action.supportsBulk &&
-					( ! action.isEligible || action.isEligible( item ) )
-			);
-		} );
-	}, [ data, actions ] );
+	const selectableItems = useSelect(
+		( select, registry ) => {
+			return data.filter( ( item ) => {
+				return actions.some(
+					( action ) =>
+						action.supportsBulk &&
+						( ! action.isEligible ||
+							action.isEligible( item, { registry } ) )
+				);
+			} );
+		},
+		[ data, actions ]
+	);
 	const selectedItems = data.filter(
 		( item ) =>
 			selection.includes( getItemId( item ) ) &&
@@ -215,11 +225,7 @@ function ActionButton< Item >( {
 	setActionInProgress,
 }: ActionButtonProps< Item > ) {
 	const registry = useRegistry();
-	const selectedEligibleItems = useMemo( () => {
-		return selectedItems.filter( ( item ) => {
-			return ! action.isEligible || action.isEligible( item );
-		} );
-	}, [ action, selectedItems ] );
+	const selectedEligibleItems = useEligibleItems( action, selectedItems );
 	if ( 'RenderModal' in action ) {
 		return (
 			<ActionWithModal
@@ -341,13 +347,18 @@ function FooterContent< Item >( {
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-	const selectableItems = useMemo( () => {
-		return data.filter( ( item ) => {
-			return bulkActions.some(
-				( action ) => ! action.isEligible || action.isEligible( item )
-			);
-		} );
-	}, [ data, bulkActions ] );
+	const selectableItems = useSelect(
+		( select, registry ) => {
+			return data.filter( ( item ) => {
+				return bulkActions.some(
+					( action ) =>
+						! action.isEligible ||
+						action.isEligible( item, { registry } )
+				);
+			} );
+		},
+		[ data, bulkActions ]
+	);
 
 	const selectedItems = useMemo( () => {
 		return data.filter(
@@ -357,15 +368,16 @@ function FooterContent< Item >( {
 		);
 	}, [ selection, data, getItemId, selectableItems ] );
 
-	const actionsToShow = useMemo(
-		() =>
+	const actionsToShow = useSelect(
+		( select, registry ) =>
 			actions.filter( ( action ) => {
 				return (
 					action.supportsBulk &&
 					( ! isMobile || action.icon ) &&
 					selectedItems.some(
 						( item ) =>
-							! action.isEligible || action.isEligible( item )
+							! action.isEligible ||
+							action.isEligible( item, { registry } )
 					)
 				);
 			} ),

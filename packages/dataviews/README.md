@@ -1118,7 +1118,7 @@ Icon to show for primary actions.
 
 ### `isEligible`
 
-Function that determines whether the action can be performed for a given record.
+Function that determines whether the action can be performed for a given record. Its second argument has the data `registry`, as the one of `callback` does, so the eligibility can depend on the data of the stores. The eligibility is evaluated again when the data it reads through the registry changes.
 
 -   Type: `function`
 -   Optional. If not present, action is considered eligible for all items.
@@ -1127,6 +1127,16 @@ Function that determines whether the action can be performed for a given record.
 ```js
 {
 	isEligible: ( item ) => item.status === 'published';
+}
+```
+
+or
+
+```js
+{
+	isEligible: ( item, { registry } ) =>
+		registry.select( coreStore ).getEntityRecord( 'root', 'site' )
+			?.page_on_front !== item.id;
 }
 ```
 

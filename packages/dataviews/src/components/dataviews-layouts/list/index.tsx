@@ -4,7 +4,6 @@ import { Button, Spinner as WCSpinner, Composite } from '@wordpress/components';
 import {
 	useCallback,
 	useEffect,
-	useMemo,
 	useRef,
 	useState,
 	useContext,
@@ -18,6 +17,7 @@ import { Menu, Stack, VisuallyHidden } from '@wordpress/ui';
 import { ActionsMenuGroup, ActionModal } from '../../dataviews-item-actions';
 import DataViewsContext from '../../dataviews-context';
 import { useDelayedLoading } from '../../../hooks/use-delayed-loading';
+import useEligibleActions from '../../../hooks/use-eligible-actions';
 import type {
 	Action,
 	NormalizedField,
@@ -168,20 +168,10 @@ function ListItem< Item >( {
 		}
 	}, [ isSelected ] );
 
-	const { primaryAction, eligibleActions } = useMemo( () => {
-		// If an action is eligible for all items, doesn't need
-		// to provide the `isEligible` function.
-		const _eligibleActions = actions.filter(
-			( action ) => ! action.isEligible || action.isEligible( item )
-		);
-		const _primaryActions = _eligibleActions.filter(
-			( action ) => action.isPrimary
-		);
-		return {
-			primaryAction: _primaryActions[ 0 ],
-			eligibleActions: _eligibleActions,
-		};
-	}, [ actions, item ] );
+	const eligibleActions = useEligibleActions( actions, item );
+	const primaryAction = eligibleActions.find(
+		( action ) => action.isPrimary
+	);
 
 	const hasOnlyOnePrimaryAction = primaryAction && actions.length === 1;
 

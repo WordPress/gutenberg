@@ -667,8 +667,16 @@ interface ActionBase< Item > {
 
 	/**
 	 * Whether the item passed as an argument supports the current action.
+	 *
+	 * It receives the data `registry`, as `callback` does, and it's evaluated
+	 * again when the data it reads through the registry changes.
 	 */
-	isEligible?: ( item: Item ) => boolean;
+	isEligible?: (
+		item: Item,
+		context: {
+			registry: any;
+		}
+	) => boolean;
 
 	/**
 	 * Whether the action can be used as a bulk action.
