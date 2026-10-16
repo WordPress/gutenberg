@@ -8,6 +8,7 @@ import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { BlockEditingMode } from '../components/block-editing-mode';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { WPDropOperation } from '../components/use-on-block-drop/types';
+import type { Bindings } from '../utils/block-bindings';
 import type { store } from '.';
 import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
@@ -23,7 +24,7 @@ export interface BlockAttributes {
 	metadata?: Record< string, unknown > & {
 		name?: string;
 		patternName?: string;
-		bindings?: Record< string, unknown >;
+		bindings?: Bindings;
 		blockVisibility?: BlockVisibility;
 	};
 	lock?: { move?: boolean; remove?: boolean; edit?: boolean };

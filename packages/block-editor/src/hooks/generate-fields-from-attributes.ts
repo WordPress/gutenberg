@@ -1,3 +1,6 @@
+import type { Field, FieldTypeName, Form } from '@wordpress/dataviews';
+import type { AutoGenerateAttribute } from './types';
+
 /**
  * Generates DataForm field definitions from block attributes.
  *
@@ -9,12 +12,14 @@
  * function processes only those pre-validated attributes.
  * See https://github.com/WordPress/wordpress-develop/blob/8f6d31266deecd7eea258bd3d45597355cce13d0/src/wp-includes/block-supports/auto-register.php#L30
  *
- * @param {Object} attributes - Block type attributes from block registration
- * @return {{ fields: Array, form: Object }} DataForm fields and form definitions
+ * @param attributes - Block type attributes from block registration
+ * @return DataForm fields and form definitions
  */
-export function generateFieldsFromAttributes( attributes ) {
-	const fields = [];
-	const fieldIds = [];
+export function generateFieldsFromAttributes(
+	attributes: Record< string, AutoGenerateAttribute >
+): { fields: Field< Record< string, unknown > >[]; form: Form } {
+	const fields: Field< Record< string, unknown > >[] = [];
+	const fieldIds: string[] = [];
 
 	Object.entries( attributes ).forEach( ( [ name, def ] ) => {
 		if ( ! def.autoGenerateControl ) {
@@ -37,18 +42,22 @@ export function generateFieldsFromAttributes( attributes ) {
 /**
  * Creates a DataForm field definition from a block attribute definition.
  *
- * @param {string} name - The attribute name
- * @param {Object} def  - The attribute definition from block.json
- * @return {Object|null} DataForm field definition or null if type not supported
+ * @param name - The attribute name
+ * @param def  - The attribute definition from block.json
+ * @return DataForm field definition
  */
-function createFieldFromAttribute( name, def ) {
+function createFieldFromAttribute(
+	name: string,
+	def: AutoGenerateAttribute
+): Field< Record< string, unknown > > {
 	const type = def.type;
-	const field = {
+	const field: Field< Record< string, unknown > > = {
 		id: name,
 		label: def.label || name,
 		// Only 'string' needs mapping to 'text'; others are 1:1 with DataForm types.
 		// This mapping will be unnecessary once #74105 lands.
-		type: type === 'string' ? 'text' : type,
+		// PHP only marks attributes whose type DataForm supports.
+		type: ( type === 'string' ? 'text' : type ) as FieldTypeName,
 	};
 
 	// Add elements for enums (DataForm idiom)

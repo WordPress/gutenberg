@@ -52,6 +52,7 @@
 -   Convert the block attribute filter hooks to TypeScript ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
 -   Convert `InspectorControls` to TypeScript ([#84725](https://github.com/WordPress/gutenberg/pull/84725)).
 -   Convert the anchor and custom class name hooks to TypeScript ([#84726](https://github.com/WordPress/gutenberg/pull/84726)).
+-   Convert the auto-generated inspector controls to TypeScript ([#84727](https://github.com/WordPress/gutenberg/pull/84727)).
 
 ## 18.1.0 (2026-10-07)
 
