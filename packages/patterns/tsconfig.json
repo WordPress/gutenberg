@@ -18,10 +18,8 @@
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../url" }
 	],
-	/*
-	 * Only the TypeScript sources are checked. The JavaScript sources stay
-	 * unchecked, and the package stays untyped for its consumers through the
-	 * `paths` of the base configuration.
-	 */
+	// Only the TypeScript sources are checked. The JavaScript sources stay
+	// unchecked, and the package stays untyped for its consumers through the
+	// `paths` of the base configuration.
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
 }

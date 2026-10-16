@@ -4545,11 +4545,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/date-time/date-picker/styles.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/draggable/index.tsx": {
 		"react-hooks/refs": {
 			"count": 1
