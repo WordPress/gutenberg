@@ -6,6 +6,7 @@ import {
 	cornerTopLeft,
 	cornerTopRight,
 } from '@wordpress/icons';
+import type { Preset } from '../preset-input-control/types';
 
 export const DEFAULT_VALUES = {
 	topLeft: undefined,
@@ -16,7 +17,7 @@ export const DEFAULT_VALUES = {
 
 export const RANGE_CONTROL_MAX_SIZE = 8;
 
-export const EMPTY_ARRAY = [];
+export const EMPTY_ARRAY: Preset[] = [];
 
 export const CORNERS = {
 	all: __( 'Border radius' ),

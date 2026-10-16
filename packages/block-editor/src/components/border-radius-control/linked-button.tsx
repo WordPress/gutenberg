@@ -1,8 +1,12 @@
 import { Button } from '@wordpress/components';
 import { link, linkOff } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import type { BorderRadiusLinkedButtonProps } from './types';
 
-export default function LinkedButton( { isLinked, ...props } ) {
+export default function LinkedButton( {
+	isLinked,
+	...props
+}: BorderRadiusLinkedButtonProps ) {
 	const label = isLinked ? __( 'Unlink radii' ) : __( 'Link radii' );
 
 	return (

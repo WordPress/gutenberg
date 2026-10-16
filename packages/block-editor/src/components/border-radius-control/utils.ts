@@ -3,6 +3,13 @@ import {
 	getCustomValueFromPreset,
 	isValuePreset,
 } from '../preset-input-control/utils';
+import type { Preset } from '../preset-input-control/types';
+import type {
+	BorderRadiusCorner,
+	BorderRadiusConvertedValues,
+	BorderRadiusUnits,
+	BorderRadiusValues,
+} from './types';
 
 const BORDER_RADIUS_PRESET_TYPE = 'border-radius';
 
@@ -16,10 +23,10 @@ const BORDER_RADIUS_PRESET_TYPE = 'border-radius';
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#description
  *
- * @param {Array<any>} inputArray Array of items to check.
- * @return {any}                  The item with the most occurrences.
+ * @param inputArray Array of items to check.
+ * @return The item with the most occurrences.
  */
-export function mode( inputArray ) {
+export function mode< T >( inputArray: T[] ): T | undefined {
 	const arr = [ ...inputArray ];
 	return arr
 		.sort(
@@ -37,10 +44,10 @@ export function mode( inputArray ) {
  * - If individual corner selections, the most common of those will be used
  * - Failing any unit selections a default of 'px' is returned.
  *
- * @param {Object} selectedUnits Unit selections for flat radius & each corner.
- * @return {string} Most common CSS unit from current selections. Default: `px`.
+ * @param selectedUnits Unit selections for flat radius & each corner.
+ * @return Most common CSS unit from current selections. Default: `px`.
  */
-export function getAllUnit( selectedUnits = {} ) {
+export function getAllUnit( selectedUnits: BorderRadiusUnits = {} ): string {
 	const { flat, ...cornerUnits } = selectedUnits;
 	return (
 		flat || mode( Object.values( cornerUnits ).filter( Boolean ) ) || 'px'
@@ -50,10 +57,12 @@ export function getAllUnit( selectedUnits = {} ) {
 /**
  * Gets the 'all' input value and unit from values data.
  *
- * @param {Object|string} values Radius values.
- * @return {string}              A value + unit for the 'all' input.
+ * @param values Radius values.
+ * @return A value + unit for the 'all' input.
  */
-export function getAllValue( values = {} ) {
+export function getAllValue(
+	values: BorderRadiusValues = {}
+): string | undefined {
 	/**
 	 * Border radius support was originally a single pixel value.
 	 *
@@ -90,10 +99,10 @@ export function getAllValue( values = {} ) {
 /**
  * Checks to determine if values are mixed.
  *
- * @param {Object} values Radius values.
- * @return {boolean}      Whether values are mixed.
+ * @param values Radius values.
+ * @return Whether values are mixed.
  */
-export function hasMixedValues( values = {} ) {
+export function hasMixedValues( values: BorderRadiusValues = {} ): boolean {
 	if ( typeof values === 'string' ) {
 		return false;
 	}
@@ -119,10 +128,10 @@ export function hasMixedValues( values = {} ) {
 /**
  * Checks to determine if values are defined.
  *
- * @param {Object} values Radius values.
- * @return {boolean}      Whether values are mixed.
+ * @param values Radius values.
+ * @return Whether values are mixed.
  */
-export function hasDefinedValues( values ) {
+export function hasDefinedValues( values?: BorderRadiusValues ): boolean {
 	if ( ! values ) {
 		return false;
 	}
@@ -144,18 +153,19 @@ export function hasDefinedValues( values ) {
 /**
  * Converts a control value into a preset value.
  *
- * @param {number} controlValue to convert to preset value.
- * @param {string} controlType  Type of control
- * @param {Array}  presets      Array of current radius preset value objects.
+ * @param controlValue to convert to preset value.
+ * @param controlType  Type of control
+ * @param presets      Array of current radius preset value objects.
  *
- * @return {string} The custom value for use in Range control.
+ * @return The custom value for use in Range control.
  */
 export function getPresetValueFromControlValue(
-	controlValue,
-	controlType,
-	presets
-) {
-	const size = parseInt( controlValue, 10 );
+	controlValue: number,
+	controlType: string,
+	presets: Preset[]
+): string | undefined {
+	// `parseInt` reads a number as its string form.
+	const size = parseInt( controlValue as unknown as string, 10 );
 	if ( controlType === 'selectList' ) {
 		if ( size === 0 ) {
 			return undefined;
@@ -170,22 +180,33 @@ export function getPresetValueFromControlValue(
 /**
  * Converts all preset values in a values object to their custom equivalents.
  *
- * @param {Object} values  Values object to convert
- * @param {Array}  presets Array of current border radius preset objects
+ * @param values  Values object to convert
+ * @param presets Array of current border radius preset objects
  *
- * @return {Object} Values with presets converted to custom values
+ * @return Values with presets converted to custom values
  */
-export function convertPresetsToCustomValues( values, presets ) {
+export function convertPresetsToCustomValues(
+	values: BorderRadiusValues | undefined,
+	presets: Preset[]
+): BorderRadiusValues | BorderRadiusConvertedValues | undefined {
 	if ( ! values || typeof values !== 'object' ) {
 		return values;
 	}
 
-	const converted = {};
-	Object.keys( values ).forEach( ( key ) => {
+	const converted: BorderRadiusConvertedValues = {};
+	// The keys of corner values are corners.
+	( Object.keys( values ) as BorderRadiusCorner[] ).forEach( ( key ) => {
 		const value = values[ key ];
-		if ( isValuePreset( value, BORDER_RADIUS_PRESET_TYPE ) ) {
+		if (
+			// `isValuePreset` reads a stored number as no preset.
+			isValuePreset(
+				value as string | undefined,
+				BORDER_RADIUS_PRESET_TYPE
+			)
+		) {
 			const customValue = getCustomValueFromPreset(
-				value,
+				// A preset value is a string.
+				value as string,
 				presets,
 				BORDER_RADIUS_PRESET_TYPE
 			);

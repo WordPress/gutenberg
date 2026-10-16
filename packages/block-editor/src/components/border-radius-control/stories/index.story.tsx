@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import BorderRadiusControl from '../';
 
-const meta = {
+const meta: Meta< typeof BorderRadiusControl > = {
 	id: 'blockeditor-borderradiuscontrol',
 	title: 'Editor/Block Editor/BorderRadiusControl',
 	component: BorderRadiusControl,
@@ -23,6 +24,7 @@ const meta = {
 		},
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			table: {
 				type: { summary: 'function' },
@@ -34,7 +36,9 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
 		const [ values, setValues ] = useState( args.values );
 
