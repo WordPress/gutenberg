@@ -117,6 +117,20 @@ jobs:
     - name: Install Composer dependencies
       run: npm run wp-env run composer 'install --no-interaction'
 
+    # PHP 5.6 and 7.0 run the PHPUnit bundled in their `phpunit` image, but
+    # the test bootstrap still loads `vendor/autoload.php`, and they can't
+    # parse the locked `phpunit/phpunit` 7.5, which needs PHP 7.1. It can't be
+    # removed either, because `yoast/phpunit-polyfills` requires it, so these
+    # versions swap it for the newest release they support.
+    - name: Install a PHPUnit release this PHP version can load
+      if: ${{ matrix.php == '5.6' || matrix.php == '7.0' }}
+      env:
+        PLATFORM_PHP: ${{ matrix.php == '5.6' && '5.6.20' || '7.0.33' }}
+        PHPUNIT_VERSION: ${{ matrix.php == '5.6' && '^5.7.21' || '^6.5' }}
+      run: |
+        npm run wp-env run composer "config platform.php $PLATFORM_PHP"
+        npm run wp-env run composer "require --dev phpunit/phpunit:$PHPUNIT_VERSION --with-all-dependencies --no-interaction"
+
     - name: Running the tests
       if: ${{ ! matrix.multisite }}
       run: npm run wp-env run phpunit "$PHPUNIT -c /var/www/html/wp-content/plugins/gutenberg/phpunit.xml.dist --verbose"
