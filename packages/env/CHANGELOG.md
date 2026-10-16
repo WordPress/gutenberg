@@ -5,6 +5,7 @@
 ### New Features
 
 -   Add a `WP_ENV_MARIADB_VERSION` environment variable to choose the MariaDB version used by the database container ([#83751](https://github.com/WordPress/gutenberg/pull/83751)).
+-   Add a `WP_ENV_PHP_VERSION` environment variable to choose the PHP version used by the WordPress and WP-CLI containers. It defaults to PHP 7.4, the highest version WordPress 5.5 supports, instead of the `wordpress` and `wordpress:cli` images' default.
 
 ### Bug Fixes
 
