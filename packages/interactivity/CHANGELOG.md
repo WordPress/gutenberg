@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `data-wp-html` keeps the element's current content, as it does for a pending value, when its value is `{ "wpServerHtml": true }`, the stand-in for an `asDangerousHTML()` value in the page's data. It does so wherever the value comes from: `state`, `context`, or a `data-wp-each` item. It never renders anything itself, and other values, `{}` included, behave as before. When an `asDangerousHTML()` value replaces it, the element keeps its nodes if their HTML already equals the token's HTML exactly, and otherwise renders the token's HTML ([#00000](https://github.com/WordPress/gutenberg/pull/00000)).
+
 ### Bug Fixes
 
 -   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core ([#81023](https://github.com/WordPress/gutenberg/pull/81023)).
