@@ -9,6 +9,7 @@ import jestDomPlugin from 'eslint-plugin-jest-dom';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import tseslint from 'typescript-eslint';
 import wpBuildConfig from '../../packages/wp-build/eslint-overrides.cjs';
+import useTypeScript from './rules/use-typescript.mjs';
 import {
 	discoverTestFiles,
 	getVitestTestsByProject,
@@ -16,6 +17,11 @@ import {
 const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
+const gutenbergPlugin = {
+	rules: {
+		'use-typescript': useTypeScript,
+	},
+};
 const gutenbergStorybookPlugin = {
 	rules: {
 		'no-non-module-stylesheet-imports': require( '../../storybook/eslint/no-non-module-stylesheet-imports.js' ),
@@ -70,6 +76,7 @@ function dedupePlugins( configs ) {
 const SCRIPT_EXT = '@([cm]js|[cm]ts|js|jsx|ts|tsx)';
 const TS_EXT = '@([cm]ts|ts|tsx)';
 const SCRIPT_EXT_NO_JSX = '@([cm]js|[cm]ts|js|ts)';
+const JS_EXT = '@([cm]js|js|jsx)';
 
 const vitestLintFiles = [
 	...vitestTestPatterns,
@@ -109,6 +116,20 @@ const typedFiles = globSync( 'packages/*/package.json', {
 	.filter( ( fileName ) => require( join( rootDir, fileName ) ).types )
 	.map( ( fileName ) => fileName.replace( 'package.json', '**/*.{js,jsx}' ) );
 
+/*
+ * Source and test trees of the packages wired into the TypeScript program,
+ * plus routes and tools, which keep their sources at the workspace root.
+ */
+const typeScriptOnlyFiles = [
+	...globSync( 'packages/*/tsconfig.json', { cwd: rootDir, posix: true } )
+		.sort()
+		.map( ( fileName ) =>
+			fileName.replace( 'tsconfig.json', `@(src|test)/**/*.${ JS_EXT }` )
+		),
+	`routes/**/*.${ JS_EXT }`,
+	`tools/**/*.${ JS_EXT }`,
+];
+
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
 // bundles when importing them via npm.
@@ -146,7 +167,7 @@ const restrictedImports = [
 	{
 		name: '@emotion/css',
 		message:
-			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+			'Please use SCSS Modules for styles and `clsx` to compose class names.',
 	},
 	{
 		name: '@wordpress/edit-post',
@@ -527,6 +548,27 @@ export default dedupePlugins( [
 					} ),
 				},
 			],
+		},
+	},
+
+	// Override: TypeScript-only packages. Existing JavaScript files are
+	// suppressed, so only new ones fail.
+	{
+		files: typeScriptOnlyFiles,
+		ignores: [
+			'**/fixtures/**',
+			// Editors load the ESLint config with their own Node, which
+			// may not strip types.
+			'tools/eslint/**',
+			// Published as plain modules through package.json exports.
+			'tools/react-18/**',
+			'tools/react-19/**',
+		],
+		plugins: {
+			gutenberg: gutenbergPlugin,
+		},
+		rules: {
+			'gutenberg/use-typescript': 'error',
 		},
 	},
 
