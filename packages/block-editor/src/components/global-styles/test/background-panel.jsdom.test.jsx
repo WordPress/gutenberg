@@ -1,12 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import BackgroundPanel, {
+import BaseBackgroundPanel, {
 	hasBackgroundImageValue,
 	hasBackgroundGradientValue,
 	hasBackgroundColorValue,
 	hasLegacyColorGradientValue,
 } from '../background-panel';
+
+// The per-control indicators default to off now; these tests cover them.
+const BackgroundPanel = ( props ) => (
+	<BaseBackgroundPanel showInheritanceLabelIndicators { ...props } />
+);
 
 globalThis.wpVitest.mockMatchMedia();
 

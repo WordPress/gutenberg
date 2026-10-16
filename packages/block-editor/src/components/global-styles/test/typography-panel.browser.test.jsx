@@ -2,7 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import { screen, within } from '@testing-library/react';
 import { render, renderHook } from 'vitest-browser-react';
-import TypographyPanel, { useHasTypographyPanel } from '../typography-panel';
+import BaseTypographyPanel, {
+	useHasTypographyPanel,
+} from '../typography-panel';
+
+// The per-control indicators default to off now; these tests cover them.
+const TypographyPanel = ( props ) => (
+	<BaseTypographyPanel showInheritanceLabelIndicators { ...props } />
+);
 
 // The inheritance treatment sits behind the
 // `gutenberg-global-styles-inheritance-ui` experiment. Turn it on so these
