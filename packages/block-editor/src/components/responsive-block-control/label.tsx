@@ -1,12 +1,13 @@
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
 import { _x, sprintf } from '@wordpress/i18n';
+import type { ResponsiveBlockControlLabelProps } from './types';
 
 export default function ResponsiveBlockControlLabel( {
 	property,
 	viewport,
 	desc,
-} ) {
+}: ResponsiveBlockControlLabelProps ) {
 	const instanceId = useInstanceId( ResponsiveBlockControlLabel );
 	const accessibleLabel =
 		desc ||
