@@ -34,6 +34,7 @@ $palette-header-height: 48px;
 	padding: 0 $grid-unit-20;
 
 	.components-button {
+		min-height: $grid-unit-70;
 		height: $grid-unit-70;
 		width: $grid-unit-70;
 		border: $border-width solid $gray-600;

@@ -21,11 +21,4 @@
 	&[aria-disabled="true"]:hover {
 		color: inherit;
 	}
-
-	&:not(.is-primary) {
-		&.is-busy,
-		&.is-busy[aria-disabled="true"]:hover {
-			color: var(--wpds-color-foreground-interactive-neutral);
-		}
-	}
 }

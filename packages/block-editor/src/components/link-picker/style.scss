@@ -9,6 +9,7 @@
 .link-preview-button.components-button {
 	width: 100%;
 	height: auto;
+	min-height: auto;
 	padding: $grid-unit-15;
 	border-color: $gray-600;
 }

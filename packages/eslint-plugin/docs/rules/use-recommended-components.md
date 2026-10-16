@@ -6,6 +6,7 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 
 ## Migration guides
 
+- `Button` — [`Button` migration guide][button-migration-guide]
 - `CheckboxControl` — [`CheckboxControl` migration guide][checkboxcontrol-migration-guide]
 - `FormToggle` — [`Toggle` family migration guide][togglecontrol-migration-guide]
 - `ToggleControl` — [`Toggle` family migration guide][togglecontrol-migration-guide]
@@ -15,6 +16,7 @@ The rule checks named imports and direct destructuring from `unlock( privateApis
 - `TextareaControl` — [`TextareaControl` migration guide][textareacontrol-migration-guide]
 - `Tip` — [`Tip` migration guide][tip-migration-guide]
 
+[button-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-button--migration-guide
 [checkboxcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-checkboxcontrol--migration-guide
 [inputcontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-inputcontrol--migration-guide
 [radiocontrol-migration-guide]: https://wordpress.github.io/gutenberg/?path=/docs/components-radiocontrol--migration-guide
@@ -42,9 +44,10 @@ Examples of **correct** code for this rule:
 
 ```js
 // Packages not covered by the rule are unaffected.
-import { Button } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 // Default and namespace imports are not checked.
 import UI from '@wordpress/ui';
+import { Button, ButtonLink, IconButton } from '@wordpress/ui';
 import { Tabs } from '@wordpress/ui';
 import { Radio, RadioGroup, RadioGroupControl } from '@wordpress/ui';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
@@ -63,5 +66,5 @@ Examples of **correct** code for this rule with the `{ "allowUseWithCaution": tr
 
 ```js
 /* eslint @wordpress/use-recommended-components: ["error", { "allowUseWithCaution": true }] */
-import { Button, Dialog } from '@wordpress/ui';
+import { Dialog } from '@wordpress/ui';
 ```

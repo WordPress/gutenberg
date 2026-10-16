@@ -32,6 +32,7 @@
 
 	.components-button {
 		position: relative;
+		min-height: $block-toolbar-height;
 		height: $block-toolbar-height;
 		z-index: 1;
 
