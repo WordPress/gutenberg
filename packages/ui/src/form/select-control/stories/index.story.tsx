@@ -119,8 +119,7 @@ const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
  * `size` and `placeholder`. Children can be a render function receiving the
  * selected item. The popup keeps the standard item rendering.
  */
-export const WithCustomTriggerProps: Story = {
-	name: 'With Custom Trigger',
+export const WithCustomTrigger: Story = {
 	args: {
 		...Default.args,
 		items: userOptions,
