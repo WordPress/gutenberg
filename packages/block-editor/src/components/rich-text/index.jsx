@@ -543,6 +543,7 @@ function RichTextWrapper(
 	useMarkPersistent( {
 		html: adjustedValue,
 		value,
+		isSelected: isBlockSelected || isBlockMultiSelected,
 		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
 	} );
 

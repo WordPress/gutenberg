@@ -9,6 +9,7 @@ function props( html, text = html, activeFormats = [] ) {
 	return {
 		html,
 		value: { text, activeFormats },
+		isSelected: true,
 		onMarkPersistent: markPersistent,
 	};
 }
@@ -80,6 +81,44 @@ describe( 'useMarkPersistent', () => {
 
 		expect( markPersistent ).not.toHaveBeenCalled();
 
+		vi.advanceTimersByTime( 1000 );
+
+		expect( markPersistent ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	// A field that is not selected cannot be typed or formatted in. A change
+	// reaching it comes from elsewhere, such as another container editing
+	// the same entity, and must not end the typing run happening there.
+	it( 'does not mark while the field is not selected', () => {
+		const { rerender } = renderHook( useMarkPersistent, {
+			initialProps: { ...props( 'a' ), isSelected: false },
+		} );
+
+		// The record lags one change behind an html change from outside.
+		rerender( { ...props( 'ab', 'a' ), isSelected: false } );
+		rerender( { ...props( 'ab' ), isSelected: false } );
+		rerender( {
+			...props( '<strong>a</strong>b', 'ab' ),
+			isSelected: false,
+		} );
+		vi.runAllTimers();
+
+		expect( markPersistent ).not.toHaveBeenCalled();
+	} );
+
+	it( 'keeps tracking the value while not selected', () => {
+		const { rerender } = renderHook( useMarkPersistent, {
+			initialProps: props( 'a' ),
+		} );
+
+		rerender( { ...props( 'ab' ), isSelected: false } );
+		rerender( props( 'ab' ) );
+		vi.runAllTimers();
+
+		// Nothing changed since the field was selected again.
+		expect( markPersistent ).not.toHaveBeenCalled();
+
+		rerender( props( 'abc' ) );
 		vi.advanceTimersByTime( 1000 );
 
 		expect( markPersistent ).toHaveBeenCalledTimes( 1 );

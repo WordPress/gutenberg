@@ -22,7 +22,12 @@ function getChangeType( previous, next ) {
 	return previous.text === next.text ? 'discrete' : 'typing';
 }
 
-export function useMarkPersistent( { html, value, onMarkPersistent } ) {
+export function useMarkPersistent( {
+	html,
+	value,
+	isSelected,
+	onMarkPersistent,
+} ) {
 	const { text } = value;
 	const hasActiveFormats = !! value.activeFormats?.length;
 	const previousRef = useRef();
@@ -56,6 +61,13 @@ export function useMarkPersistent( { html, value, onMarkPersistent } ) {
 
 		previousRef.current = next;
 
+		// Only a selected field is typed or formatted in. A change reaching
+		// any other field comes from elsewhere, such as another container
+		// editing the same entity, and must not end a typing run there.
+		if ( ! isSelected ) {
+			return;
+		}
+
 		if ( changeType === 'typing' ) {
 			markPersistentDebounced();
 			return;
@@ -67,6 +79,7 @@ export function useMarkPersistent( { html, value, onMarkPersistent } ) {
 		html,
 		text,
 		hasActiveFormats,
+		isSelected,
 		markPersistent,
 		markPersistentDebounced,
 	] );
