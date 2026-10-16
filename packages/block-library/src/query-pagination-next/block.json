@@ -17,7 +17,8 @@
 		"query",
 		"paginationArrow",
 		"showLabel",
-		"enhancedPagination"
+		"enhancedPagination",
+		"useAlphabeticalPagination"
 	],
 	"supports": {
 		"anchor": true,

@@ -15,7 +15,8 @@
 		"previewPostType",
 		"enhancedPagination",
 		"postType",
-		"postId"
+		"postId",
+		"useAlphabeticalPagination"
 	],
 	"supports": {
 		"anchor": true,
