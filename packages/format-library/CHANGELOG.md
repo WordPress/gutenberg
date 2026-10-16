@@ -10,6 +10,11 @@
 
 -   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
+### Bug Fixes
+
+-   Accept scroll-to-text fragments in anchor links ([#84336](https://github.com/WordPress/gutenberg/pull/84336)).
+
+
 ## 5.57.0 (2026-10-07)
 
 ## 5.56.0 (2026-09-23)

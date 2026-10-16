@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Preserve `?` and `/` inside URL fragments when validating and extracting them, including scroll-to-text fragments ([#84336](https://github.com/WordPress/gutenberg/pull/84336)).
+
 ## 4.57.0 (2026-10-07)
 
 ## 4.56.0 (2026-09-23)

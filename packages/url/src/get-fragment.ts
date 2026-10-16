@@ -6,13 +6,13 @@
  * @example
  * ```js
  * const fragment1 = getFragment( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // '#fragment'
- * const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=true' ); // '#another-fragment'
+ * const fragment2 = getFragment( 'https://wordpress.org#another-fragment?query=true' ); // '#another-fragment?query=true'
  * ```
  *
  * @return The fragment part of the URL.
  */
 export function getFragment( url: string ): string | void {
-	const matches = /^\S+?(#[^\s\?]*)/.exec( url );
+	const matches = /^\S+?(#[^\s]*)/.exec( url );
 	if ( matches ) {
 		return matches[ 1 ];
 	}

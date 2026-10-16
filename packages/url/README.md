@@ -155,7 +155,7 @@ const fragment1 = getFragment(
 ); // '#fragment'
 const fragment2 = getFragment(
 	'https://wordpress.org#another-fragment?query=true'
-); // '#another-fragment'
+); // '#another-fragment?query=true'
 ```
 
 _Parameters_
