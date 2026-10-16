@@ -949,7 +949,7 @@ export function setIsListViewOpened( isOpen ) {
  */
 export const toggleDistractionFree =
 	( { createNotice = true } = {} ) =>
-	( { dispatch, registry } ) => {
+	( { dispatch, select, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
 			.get( 'core', 'distractionFree' );
@@ -957,9 +957,35 @@ export const toggleDistractionFree =
 			registry
 				.dispatch( preferencesStore )
 				.set( 'core', 'fixedToolbar', false );
+
+			const previousIsInserterOpened = registry
+				.select( preferencesStore )
+				.get( 'core', 'distractionFreePreviousIsInserterOpened' );
+			const previousIsListViewOpened = registry
+				.select( preferencesStore )
+				.get( 'core', 'distractionFreePreviousIsListViewOpened' );
+			dispatch.setIsInserterOpened( previousIsInserterOpened ?? false );
+			dispatch.setIsListViewOpened( previousIsListViewOpened ?? false );
 		}
 		if ( ! isDistractionFree ) {
+			const isInserterOpened = select.isInserterOpened();
+			const isListViewOpened = select.isListViewOpened();
+
 			registry.batch( () => {
+				registry
+					.dispatch( preferencesStore )
+					.set(
+						'core',
+						'distractionFreePreviousIsInserterOpened',
+						isInserterOpened
+					);
+				registry
+					.dispatch( preferencesStore )
+					.set(
+						'core',
+						'distractionFreePreviousIsListViewOpened',
+						isListViewOpened
+					);
 				registry
 					.dispatch( preferencesStore )
 					.set( 'core', 'fixedToolbar', true );
@@ -989,20 +1015,8 @@ export const toggleDistractionFree =
 								{
 									label: __( 'Undo' ),
 									onClick: () => {
-										registry.batch( () => {
-											registry
-												.dispatch( preferencesStore )
-												.set(
-													'core',
-													'fixedToolbar',
-													isDistractionFree
-												);
-											registry
-												.dispatch( preferencesStore )
-												.toggle(
-													'core',
-													'distractionFree'
-												);
+										dispatch.toggleDistractionFree( {
+											createNotice: false,
 										} );
 									},
 								},
