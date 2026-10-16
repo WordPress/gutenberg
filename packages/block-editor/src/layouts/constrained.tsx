@@ -16,12 +16,24 @@ import {
 	justifyRight,
 } from '@wordpress/icons';
 import { getCSSRules } from '@wordpress/style-engine';
+import type { Style } from '@wordpress/style-engine';
 import { useSettings } from '../components/use-settings';
 import { appendSelectors, getBlockGapCSS, getAlignmentsInfo } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { BlockControls, JustifyContentControl } from '../components';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import type {
+	Layout,
+	LayoutAlignment,
+	LayoutBlockSupport,
+	LayoutControlProps,
+	LayoutInspectorControlsProps,
+	LayoutStyleArgs,
+	LayoutToolbarControlsProps,
+} from './types';
+import type { JustifyContentValue } from '../components/justify-content-control/types';
+import type { BlockGapValue } from '../hooks/types';
 
 const GLOBAL_CONTENT_SIZE = 'var(--wp--style--global--content-size, none)';
 const GLOBAL_WIDE_SIZE = 'var(--wp--style--global--wide-size, none)';
@@ -29,7 +41,7 @@ const GLOBAL_WIDE_SIZE = 'var(--wp--style--global--wide-size, none)';
 export default {
 	name: 'constrained',
 	label: __( 'Constrained' ),
-	hasInspectorControls( layoutBlockSupport = {} ) {
+	hasInspectorControls( layoutBlockSupport: LayoutBlockSupport = {} ) {
 		const {
 			allowJustification = true,
 			allowCustomContentAndWideSize = true,
@@ -43,16 +55,16 @@ export default {
 		layoutBlockSupport = {},
 		resetLayout = {},
 		clientId,
-	} ) {
+	}: LayoutInspectorControlsProps ) {
 		const { wideSize, contentSize, justifyContent = 'center' } = layout;
 		const {
 			allowJustification = true,
 			allowCustomContentAndWideSize = true,
 		} = layoutBlockSupport;
-		const onJustificationChange = ( value ) => {
+		const onJustificationChange = ( value?: string | number ) => {
 			onChange( {
 				...layout,
-				justifyContent: value,
+				justifyContent: value as string | undefined,
 			} );
 		};
 		const justificationOptions = [
@@ -74,9 +86,16 @@ export default {
 		];
 		const [ availableUnits ] = useSettings( 'spacing.units' );
 		const units = useCustomUnits( {
-			availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
+			// The setting lists unit strings.
+			availableUnits: ( availableUnits as string[] | undefined ) || [
+				'%',
+				'px',
+				'em',
+				'rem',
+				'vw',
+			],
 		} );
-		const hasLayoutValue = ( key, defaultValue ) =>
+		const hasLayoutValue = ( key: string, defaultValue?: unknown ) =>
 			( layout?.[ key ] ?? defaultValue ) !==
 			( resetLayout?.[ key ] ?? defaultValue );
 		const resetContentSize = () =>
@@ -125,7 +144,8 @@ export default {
 								}
 								onChange={ ( nextWidth ) => {
 									nextWidth =
-										0 > parseFloat( nextWidth )
+										// An absent width parses as `NaN` and is kept.
+										0 > parseFloat( nextWidth as string )
 											? '0'
 											: nextWidth;
 									onChange( {
@@ -160,7 +180,8 @@ export default {
 								}
 								onChange={ ( nextWidth ) => {
 									nextWidth =
-										0 > parseFloat( nextWidth )
+										// An absent width parses as `NaN` and is kept.
+										0 > parseFloat( nextWidth as string )
 											? '0'
 											: nextWidth;
 									onChange( {
@@ -221,7 +242,7 @@ export default {
 		onChange,
 		layoutBlockSupport,
 		controlsGroup = 'block',
-	} ) {
+	}: LayoutToolbarControlsProps ) {
 		const { allowJustification = true } = layoutBlockSupport;
 
 		if ( ! allowJustification ) {
@@ -247,15 +268,17 @@ export default {
 		blockName,
 		hasBlockGapSupport,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
-	} ) {
+	}: LayoutStyleArgs ): string {
 		const hasViewportOverrides = viewportOverrides !== undefined;
 		const effectiveLayout = hasViewportOverrides
 			? { ...layout, ...viewportOverrides }
 			: layout;
-		const hasViewportOverride = ( key ) =>
+		const hasViewportOverride = ( key: string ) =>
 			Object.hasOwn( viewportOverrides || {}, key );
 		const { contentSize, wideSize, justifyContent } = effectiveLayout;
-		const blockGapStyleValue = style?.spacing?.blockGap;
+		// The `style` attribute is not validated; a string gap reads `top` as undefined.
+		const blockGapStyleValue = style?.spacing?.blockGap as
+			( BlockGapValue & { top?: string } ) | undefined;
 		const hasBlockGapOverride =
 			! hasViewportOverrides ||
 			Object.hasOwn( style?.spacing || {}, 'blockGap' );
@@ -265,7 +288,7 @@ export default {
 
 		// If a block's block.json skips serialization for spacing or
 		// spacing.blockGap, don't apply the user-defined value to the styles.
-		let blockGapValue = '';
+		let blockGapValue: string | null = '';
 		if ( ! shouldSkipSerialization( blockName, 'spacing', 'blockGap' ) ) {
 			// If an object is provided only use the 'top' value for this kind of gap.
 			if ( blockGapStyleValue?.top ) {
@@ -357,7 +380,8 @@ export default {
 		// If there is custom padding, add negative margins for alignfull blocks.
 		if ( hasBlockSpacingOverride && style?.spacing?.padding ) {
 			// The style object might be storing a preset so we need to make sure we get a usable value.
-			const paddingValues = getCSSRules( style );
+			// The `style` attribute is passed through unvalidated.
+			const paddingValues = getCSSRules( style as Style );
 			paddingValues.forEach( ( rule ) => {
 				if ( rule.key === 'paddingRight' ) {
 					// Add unit if 0, to avoid calc(0 * -1) which is invalid.
@@ -394,10 +418,10 @@ export default {
 		}
 		return output;
 	},
-	getOrientation() {
+	getOrientation(): string {
 		return 'vertical';
 	},
-	getAlignments( layout ) {
+	getAlignments( layout: Layout ): LayoutAlignment[] {
 		const alignmentInfo = getAlignmentsInfo( layout );
 		if ( layout.alignments !== undefined ) {
 			if ( ! layout.alignments.includes( 'none' ) ) {
@@ -410,7 +434,7 @@ export default {
 		}
 		const { contentSize, wideSize } = layout;
 
-		const alignments = [
+		const alignments: LayoutAlignment[] = [
 			{ name: 'left' },
 			{ name: 'center' },
 			{ name: 'right' },
@@ -430,24 +454,35 @@ export default {
 	},
 };
 
+// Keeps the placement a literal, as the popover props require.
 const POPOVER_PROPS = {
 	placement: 'bottom-start',
-};
+} as const;
 
-function DefaultLayoutJustifyContentControl( { layout, onChange } ) {
+function DefaultLayoutJustifyContentControl( {
+	layout,
+	onChange,
+}: LayoutControlProps ) {
 	const { justifyContent = 'center' } = layout;
-	const onJustificationChange = ( value ) => {
+	const onJustificationChange = (
+		value: JustifyContentValue | undefined
+	) => {
 		onChange( {
 			...layout,
 			justifyContent: value,
 		} );
 	};
-	const allowedControls = [ 'left', 'center', 'right' ];
+	const allowedControls: JustifyContentValue[] = [
+		'left',
+		'center',
+		'right',
+	];
 
 	return (
 		<JustifyContentControl
 			allowedControls={ allowedControls }
-			value={ justifyContent }
+			// The layout stores one of the allowed justifications.
+			value={ justifyContent as JustifyContentValue }
 			onChange={ onJustificationChange }
 			popoverProps={ POPOVER_PROPS }
 		/>

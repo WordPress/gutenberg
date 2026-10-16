@@ -40,6 +40,7 @@ describe( 'BlockVerticalAlignmentUI', () => {
 				value={ alignment }
 				onChange={ onChange }
 				label="Custom Label"
+				// @ts-expect-error `description` is not a prop, so it is ignored.
 				description="Custom Description"
 			/>
 		);

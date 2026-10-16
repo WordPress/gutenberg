@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
 import { LayoutStyle } from '../layout';
@@ -20,7 +21,7 @@ describe( 'LayoutStyle', () => {
 	it.each( [ null, undefined ] )(
 		'outputs no layout styles when the block gap setting is %s',
 		( blockGapSetting ) => {
-			useSettings.mockReturnValue( [ blockGapSetting ] );
+			( useSettings as Mock ).mockReturnValue( [ blockGapSetting ] );
 
 			const { container } = render( createElement( LayoutStyle, props ) );
 
@@ -29,7 +30,7 @@ describe( 'LayoutStyle', () => {
 	);
 
 	it( 'outputs block gap styles when the theme opts into block gap', () => {
-		useSettings.mockReturnValue( [ true ] );
+		( useSettings as Mock ).mockReturnValue( [ true ] );
 
 		const { container } = render( createElement( LayoutStyle, props ) );
 

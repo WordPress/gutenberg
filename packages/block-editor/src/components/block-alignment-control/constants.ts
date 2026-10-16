@@ -7,8 +7,9 @@ import {
 	stretchFullWidth,
 	stretchWide,
 } from '@wordpress/icons';
+import type { BlockAlignmentOptions } from './types';
 
-export const BLOCK_ALIGNMENTS_CONTROLS = {
+export const BLOCK_ALIGNMENTS_CONTROLS: BlockAlignmentOptions = {
 	none: {
 		icon: alignNone,
 		title: _x( 'None', 'Alignment option' ),

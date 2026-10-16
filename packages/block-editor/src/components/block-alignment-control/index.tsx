@@ -1,10 +1,11 @@
 import BlockAlignmentUI from './ui';
+import type { BlockAlignmentControlProps } from './types';
 
-const BlockAlignmentControl = ( props ) => {
+const BlockAlignmentControl = ( props: BlockAlignmentControlProps ) => {
 	return <BlockAlignmentUI { ...props } isToolbar={ false } />;
 };
 
-const BlockAlignmentToolbar = ( props ) => {
+const BlockAlignmentToolbar = ( props: BlockAlignmentControlProps ) => {
 	return <BlockAlignmentUI { ...props } isToolbar />;
 };
 

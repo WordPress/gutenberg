@@ -1,10 +1,11 @@
 import { createContext, useContext } from '@wordpress/element';
 import { getLayoutType } from '../../layouts';
 import { useSettings } from '../use-settings';
+import type { Layout, LayoutStyleArgs } from '../../layouts/types';
 
-export const defaultLayout = { type: 'default' };
+export const defaultLayout: Layout = { type: 'default' };
 
-const Layout = createContext( defaultLayout );
+const Layout = createContext< Layout >( defaultLayout );
 Layout.displayName = 'BlockLayoutContext';
 
 /**
@@ -19,7 +20,11 @@ export function useLayout() {
 	return useContext( Layout );
 }
 
-export function LayoutStyle( { layout = {}, css, ...props } ) {
+export function LayoutStyle( {
+	layout = {},
+	css,
+	...props
+}: Partial< LayoutStyleArgs > & { css?: string } ) {
 	const layoutType = getLayoutType( layout.type );
 	const [ blockGapSupport ] = useSettings( 'spacing.blockGap' );
 	// Like the server's `isset()` check, an unset or `null` setting means the
@@ -31,11 +36,12 @@ export function LayoutStyle( { layout = {}, css, ...props } ) {
 		if ( css ) {
 			return <style>{ css }</style>;
 		}
+		// As before, unset arguments, such as a missing block name, pass through.
 		const layoutStyle = layoutType.getLayoutStyle?.( {
 			hasBlockGapSupport,
 			layout,
 			...props,
-		} );
+		} as LayoutStyleArgs );
 		if ( layoutStyle ) {
 			return <style>{ layoutStyle }</style>;
 		}

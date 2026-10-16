@@ -1,3 +1,4 @@
+import type { ComponentProps, ComponentType } from 'react';
 import { __, _x } from '@wordpress/i18n';
 import { ToolbarGroup, ToolbarDropdownMenu } from '@wordpress/components';
 import {
@@ -7,6 +8,10 @@ import {
 	justifyStretchVertical,
 	justifySpaceBetweenVertical,
 } from '@wordpress/icons';
+import type {
+	BlockVerticalAlignment,
+	BlockVerticalAlignmentUIProps,
+} from './types';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	top: {
@@ -31,7 +36,11 @@ const BLOCK_ALIGNMENTS_CONTROLS = {
 	},
 };
 
-const DEFAULT_CONTROLS = [ 'top', 'center', 'bottom' ];
+const DEFAULT_CONTROLS: BlockVerticalAlignment[] = [
+	'top',
+	'center',
+	'bottom',
+];
 const DEFAULT_CONTROL = 'top';
 
 function BlockVerticalAlignmentUI( {
@@ -41,16 +50,24 @@ function BlockVerticalAlignmentUI( {
 	isCollapsed = true,
 	isToolbar,
 	label = __( 'Align content vertically' ),
-} ) {
-	function applyOrUnset( align ) {
+}: BlockVerticalAlignmentUIProps ) {
+	function applyOrUnset( align: BlockVerticalAlignment ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = BLOCK_ALIGNMENTS_CONTROLS[ value ];
+	// An unset value looks up no control.
+	const activeAlignment =
+		BLOCK_ALIGNMENTS_CONTROLS[ value as BlockVerticalAlignment ];
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
-	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	// Both take these props; `ToolbarGroup`'s types also require a `title`
+	// for a collapsed group, which was never passed.
+	const UIComponent = (
+		isToolbar ? ToolbarGroup : ToolbarDropdownMenu
+	) as ComponentType<
+		ComponentProps< typeof ToolbarDropdownMenu > & { isCollapsed?: boolean }
+	>;
 	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (

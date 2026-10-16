@@ -1,10 +1,15 @@
 import BlockVerticalAlignmentUI from './ui';
+import type { BlockVerticalAlignmentControlProps } from './types';
 
-const BlockVerticalAlignmentControl = ( props ) => {
+const BlockVerticalAlignmentControl = (
+	props: BlockVerticalAlignmentControlProps
+) => {
 	return <BlockVerticalAlignmentUI { ...props } isToolbar={ false } />;
 };
 
-const BlockVerticalAlignmentToolbar = ( props ) => {
+const BlockVerticalAlignmentToolbar = (
+	props: BlockVerticalAlignmentControlProps
+) => {
 	return <BlockVerticalAlignmentUI { ...props } isToolbar />;
 };
 

@@ -3,12 +3,14 @@ import { useLayout } from '../block-list/layout';
 import { useSettings } from '../use-settings';
 import { store as blockEditorStore } from '../../store';
 import { getLayoutType } from '../../layouts';
+import type { Layout, LayoutAlignment, LayoutType } from '../../layouts/types';
+import type { AlignmentMenu, AlignmentSettings } from './types';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: never[] = [];
 const DEFAULT_CONTROLS = [ 'none', 'left', 'center', 'right', 'wide', 'full' ];
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-function useAlignmentSettings( isNoneOnly ) {
+function useAlignmentSettings( isNoneOnly: boolean ): AlignmentSettings {
 	return useSelect(
 		( select ) => {
 			// If `isNoneOnly` is true, we'll be returning early because there is
@@ -34,7 +36,9 @@ function useAlignmentSettings( isNoneOnly ) {
 	);
 }
 
-export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
+export default function useAvailableAlignments(
+	controls: string[] = DEFAULT_CONTROLS
+): LayoutAlignment[] {
 	// Always add the `none` option if not exists.
 	if ( ! controls.includes( 'none' ) ) {
 		controls = [ 'none', ...controls ];
@@ -55,21 +59,26 @@ export default function useAvailableAlignments( controls = DEFAULT_CONTROLS ) {
  * The store-free part of `useAvailableAlignments`, so the same rules can be
  * evaluated against more than one layout without a subscription for each.
  *
- * @param {string[]} controls                     Alignments the block supports, including `none`.
- * @param {Object}   layout                       Layout to evaluate against.
- * @param {Object}   settings                     Editor settings from `useAlignmentSettings`.
- * @param {boolean}  settings.wideControlsEnabled Whether the theme enables wide alignments.
- * @param {boolean}  settings.themeSupportsLayout Whether the theme supports the layout config.
- * @param {boolean}  settings.isBlockBasedTheme   Whether the theme is block based.
+ * @param controls                     Alignments the block supports, including `none`.
+ * @param layout                       Layout to evaluate against.
+ * @param settings                     Editor settings from `useAlignmentSettings`.
+ * @param settings.wideControlsEnabled Whether the theme enables wide alignments.
+ * @param settings.themeSupportsLayout Whether the theme supports the layout config.
+ * @param settings.isBlockBasedTheme   Whether the theme is block based.
  *
- * @return {Object[]} The alignments the layout offers.
+ * @return The alignments the layout offers.
  */
 function getAvailableAlignments(
-	controls,
-	layout,
-	{ wideControlsEnabled, themeSupportsLayout, isBlockBasedTheme }
-) {
-	const layoutType = getLayoutType( layout?.type );
+	controls: string[],
+	layout: Layout,
+	{
+		wideControlsEnabled,
+		themeSupportsLayout,
+		isBlockBasedTheme,
+	}: AlignmentSettings
+): LayoutAlignment[] {
+	// Every layout type, including the default one, is registered.
+	const layoutType = getLayoutType( layout?.type ) as LayoutType;
 
 	if ( themeSupportsLayout ) {
 		const layoutAlignments = layoutType.getAlignments(
@@ -126,11 +135,13 @@ function getAvailableAlignments(
  * withholding them. Flex and Grid parents never offer alignments to anything,
  * so under those both lists are empty.
  *
- * @param {string[]} controls Alignments the block supports.
+ * @param controls Alignments the block supports.
  *
- * @return {{enabled: Object[], unavailable: string[]}} The split alignments.
+ * @return The split alignments.
  */
-export function useAlignmentMenu( controls = DEFAULT_CONTROLS ) {
+export function useAlignmentMenu(
+	controls: string[] = DEFAULT_CONTROLS
+): AlignmentMenu {
 	// Always add the `none` option if not exists.
 	if ( ! controls.includes( 'none' ) ) {
 		controls = [ 'none', ...controls ];
@@ -158,7 +169,8 @@ export function useAlignmentMenu( controls = DEFAULT_CONTROLS ) {
 
 	const themeNames = getAvailableAlignments(
 		DEFAULT_CONTROLS,
-		{ ...globalLayout, type: 'constrained' },
+		// The `layout` setting is a layout object.
+		{ ...( globalLayout as Layout ), type: 'constrained' },
 		settings
 	).map( ( { name } ) => name );
 	const enabledNames = enabled.map( ( { name } ) => name );

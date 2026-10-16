@@ -2,8 +2,9 @@ import flex from './flex';
 import flow from './flow';
 import constrained from './constrained';
 import grid from './grid';
+import type { LayoutType } from './types';
 
-const layoutTypes = [ flow, flex, constrained, grid ];
+const layoutTypes: LayoutType[] = [ flow, flex, constrained, grid ];
 
 /**
  * Retrieves a layout type by name.
@@ -11,7 +12,7 @@ const layoutTypes = [ flow, flex, constrained, grid ];
  * @param {string} name - The name of the layout type.
  * @return {Object} Layout type.
  */
-export function getLayoutType( name = 'default' ) {
+export function getLayoutType( name = 'default' ): LayoutType | undefined {
 	return layoutTypes.find( ( layoutType ) => layoutType.name === name );
 }
 
@@ -20,6 +21,6 @@ export function getLayoutType( name = 'default' ) {
  *
  * @return {Array} Layout types.
  */
-export function getLayoutTypes() {
+export function getLayoutTypes(): LayoutType[] {
 	return layoutTypes;
 }
