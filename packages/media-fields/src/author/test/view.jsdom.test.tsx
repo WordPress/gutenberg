@@ -1,0 +1,27 @@
+import { describe, expect, it } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import type { NormalizedField } from '@wordpress/dataviews';
+import AuthorView from '../view';
+import type { MediaItem } from '../../types';
+
+const field = {} as NormalizedField< MediaItem >;
+
+describe( 'Media author view', () => {
+	it( 'keeps the author name and initials when the image fails', () => {
+		const item = {
+			_embedded: {
+				author: [
+					{
+						id: 1,
+						name: 'Alex',
+						avatar_urls: { 48: '/missing.png' },
+					},
+				],
+			},
+		} as MediaItem;
+		render( <AuthorView item={ item } field={ field } /> );
+		expect( screen.getByText( 'Alex' ) ).toBeVisible();
+		expect( screen.getByText( 'A' ) ).toBeInTheDocument();
+		expect( screen.queryByRole( 'img' ) ).not.toBeInTheDocument();
+	} );
+} );

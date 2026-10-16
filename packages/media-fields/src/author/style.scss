@@ -1,46 +1,25 @@
-@use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .media-author-field__avatar {
-	flex-shrink: 0;
-	overflow: hidden;
-	width: $grid-unit-30;
-	height: $grid-unit-30;
-	align-items: center;
-	justify-content: left;
-	display: flex;
+	margin-inline-end: var(--wpds-dimension-gap-sm);
 
-	img {
-		width: $grid-unit-20;
-		height: $grid-unit-20;
-		object-fit: cover;
-		opacity: 1;
-		border-radius: 100%;
-	}
+	// The native fallback stays unframed when no initials are available.
+	&:has(> .media-author-field__icon) {
+		display: contents;
+		color: inherit;
 
-	&.is-loading,
-	&.is-loaded {
-		img {
-			@media not (prefers-reduced-motion) {
-				transition: opacity 0.1s linear;
-			}
-		}
-	}
-
-	&.is-loading {
-		img {
-			opacity: 0;
-		}
-	}
-
-	&.is-loaded {
-		img {
-			opacity: 1;
+		// Keep the image hidden until the native fallback unmounts.
+		> img {
+			visibility: hidden;
 		}
 	}
 }
 
 .media-author-field__icon {
+	position: static;
+	justify-content: flex-start;
+	border-radius: 0;
+	overflow: visible;
 	display: flex;
 	flex-shrink: 0;
 	width: $grid-unit-30;

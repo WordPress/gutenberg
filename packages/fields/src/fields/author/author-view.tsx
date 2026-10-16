@@ -1,11 +1,6 @@
-import clsx from 'clsx';
-import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
-import {
-	__experimentalHStack as HStack,
-	Icon as WCIcon,
-} from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- This bundled package already depends on @wordpress/ui.
+import { Avatar, Icon, Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { User } from '@wordpress/core-data';
@@ -45,29 +40,50 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 	const imageUrl =
 		author?.avatar_urls?.[ 48 ] ||
 		item?._embedded?.author?.[ 0 ]?.avatar_urls?.[ 48 ];
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	const initials = text
+		?.trim()
+		.split( /\s+/ )
+		.slice( 0, 2 )
+		.map( ( word ) => Array.from( word )[ 0 ] )
+		.join( '' )
+		.toUpperCase();
 	return (
-		<HStack alignment="left" spacing={ 0 }>
-			{ !! imageUrl && (
-				<div
-					className={ clsx( 'fields-controls__author-avatar', {
-						'is-loaded': isImageLoaded,
-					} ) }
+		<Stack
+			direction="row"
+			align="center"
+			gap={ initials ? 'sm' : undefined }
+		>
+			{ imageUrl || initials ? (
+				<Avatar.Root
+					size="xs"
+					aria-hidden="true"
+					className={
+						! initials
+							? 'fields-controls__author-avatar'
+							: undefined
+					}
 				>
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt={ __( 'Author avatar' ) }
-						src={ imageUrl }
-					/>
-				</div>
-			) }
-			{ ! imageUrl && (
-				<div className="fields-controls__author-icon">
-					<WCIcon icon={ authorIcon } />
+					<Avatar.Fallback
+						className={
+							! initials
+								? 'fields-controls__author-icon'
+								: undefined
+						}
+					>
+						{ initials || <Icon icon={ authorIcon } /> }
+					</Avatar.Fallback>
+					<Avatar.Image src={ imageUrl } alt="" keepMounted />
+				</Avatar.Root>
+			) : (
+				<div
+					className="fields-controls__author-icon"
+					aria-hidden="true"
+				>
+					<Icon icon={ authorIcon } />
 				</div>
 			) }
 			<span className="fields-controls__author-name">{ text }</span>
-		</HStack>
+		</Stack>
 	);
 }
 

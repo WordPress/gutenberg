@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Author field: Use the `@wordpress/ui` Avatar with image-first rendering, initials for named authors, and the original standalone icon when neither is available ([#84540](https://github.com/WordPress/gutenberg/pull/84540)).
+
 ## 0.22.0 (2026-10-07)
 
 ### Bug Fixes
