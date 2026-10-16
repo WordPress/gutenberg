@@ -59,59 +59,8 @@ export interface BasePost extends CommonPost {
 	author?: number;
 }
 
-export interface BasePostWithEditedEntity extends Omit< BasePost, 'content' > {
-	content:
-		| BasePost[ 'content' ]
-		| ( ( record: BasePostWithEditedEntity ) => string );
-}
-
 export interface BasePostWithEmbeddedAuthor extends BasePost {
 	_embedded: EmbeddedAuthor;
-}
-
-interface FeaturedMedia {
-	title: {
-		rendered: string;
-	};
-	source_url: string;
-	media_details: {
-		sizes: Record< string, { width: number; source_url: string } >;
-	};
-}
-
-interface EmbeddedFeaturedMedia {
-	'wp:featuredmedia': FeaturedMedia[];
-}
-
-export interface BasePostWithEmbeddedFeaturedMedia extends BasePost {
-	_embedded: EmbeddedFeaturedMedia;
-}
-
-interface TemplateAuthorFields {
-	author?: number;
-	author_text: string;
-	original_source?: 'theme' | 'plugin' | 'site' | 'user';
-}
-
-export interface Template extends CommonPost, TemplateAuthorFields {
-	type: 'wp_template';
-	is_custom: boolean;
-	source: string;
-	origin: string;
-	plugin?: string;
-	has_theme_file: boolean;
-	id: string;
-	description?: string;
-}
-
-export interface TemplatePart extends CommonPost, TemplateAuthorFields {
-	type: 'wp_template_part';
-	source: string;
-	origin: string;
-	has_theme_file: boolean;
-	id: string;
-	area: string;
-	plugin?: string;
 }
 
 export interface Pattern extends CommonPost {
@@ -121,17 +70,6 @@ export interface Pattern extends CommonPost {
 	meta?: Record< string, any >;
 	wp_pattern_sync_status?: string;
 }
-
-export interface SiteSettings {
-	posts_per_page?: number;
-	default_comment_status?: string | null;
-}
-
-export interface PostsPage {
-	title?: { raw?: string } | string;
-}
-
-export type Post = Template | TemplatePart | Pattern | BasePost;
 
 interface EditorSupport {
 	notes?: boolean;
