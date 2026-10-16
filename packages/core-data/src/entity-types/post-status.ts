@@ -36,6 +36,16 @@ declare module './base-entity-records' {
 			show_in_list: boolean;
 
 			/**
+			 * Whether to show the status in admin status lists.
+			 */
+			show_in_admin_status_list: boolean;
+
+			/**
+			 * A description of what the status is for.
+			 */
+			description: string;
+
+			/**
 			 * An alphanumeric identifier for the status.
 			 */
 			slug: string;
