@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
 .border {
@@ -25,8 +26,8 @@
 .root {
 	box-sizing: border-box;
 	position: relative;
-	border-radius: 2px;
-	padding-top: 0;
+	border-radius: $radius-small;
+	padding-block-start: 0;
 }
 
 .container {
@@ -88,14 +89,6 @@
 	padding: 0;
 	pointer-events: none;
 	position: absolute;
-
-	/* stylelint-disable logical-css/require-logical-properties -- Match the locale-based physical padding, independently of a consumer's direction. */
-	padding-left: 2px;
-	&:where(.is-rtl) {
-		padding-left: 0;
-		padding-right: 2px;
-	}
-	/* stylelint-enable logical-css/require-logical-properties */
 }
 
 .input.input.input {
@@ -160,7 +153,6 @@
 		@media (forced-colors: active) {
 			color: GrayText;
 		}
-
 	}
 
 	&:disabled::placeholder {
@@ -214,13 +206,12 @@
 
 .label.label.label {
 	font-size: 11px;
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 	line-height: 1.4;
 	text-transform: uppercase;
 	box-sizing: border-box;
 	display: block;
-	padding-top: 0;
-	padding-bottom: 0;
+	padding-block: 0;
 	max-width: 100%;
 	z-index: 1;
 }
@@ -231,18 +222,18 @@
 }
 
 @mixin prefix-suffix-padding($property) {
-	#{$property}: 12px;
+	#{$property}: $grid-unit-15;
 
 	&:where(.is-small, .is-compact) {
-		#{$property}: 8px;
+		#{$property}: $grid-unit-10;
 	}
 
 	&:where(.has-reduced-padding) {
 		display: flex;
-		#{$property}: 8px;
+		#{$property}: $grid-unit-10;
 
 		&:where(.is-small, .is-compact) {
-			#{$property}: 4px;
+			#{$property}: $grid-unit-05;
 		}
 	}
 }
