@@ -349,6 +349,8 @@ _Returns_
 
 Returns the slug for the post being edited, preferring a manually edited value if one exists, then the server-generated slug from the post entity, then a JS approximation of the current post title, and finally the post ID.
 
+The server-generated slug is skipped until the post is first saved: for an auto-draft it comes from the `Auto Draft` placeholder title, and autosaves don't refresh it.
+
 _Parameters_
 
 - _state_ `Object`: Editor state.

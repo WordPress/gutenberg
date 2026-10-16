@@ -7,9 +7,14 @@ export const getSlug = ( item: BasePost ): string => {
 		return '';
 	}
 
+	// An auto-draft's generated slug comes from the `Auto Draft` placeholder
+	// title and isn't refreshed by autosaves, so fall back to the title.
+	const generatedSlug =
+		item.status !== 'auto-draft' ? item.generated_slug : undefined;
+
 	return (
 		item.slug ||
-		item.generated_slug ||
+		generatedSlug ||
 		cleanForSlug( getItemTitle( item ) ) ||
 		item.id.toString()
 	);

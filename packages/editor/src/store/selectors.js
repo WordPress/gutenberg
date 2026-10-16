@@ -991,14 +991,22 @@ export function getPermalink( state ) {
  * value if one exists, then the server-generated slug from the post entity,
  * then a JS approximation of the current post title, and finally the post ID.
  *
+ * The server-generated slug is skipped until the post is first saved: for an
+ * auto-draft it comes from the `Auto Draft` placeholder title, and autosaves
+ * don't refresh it.
+ *
  * @param {Object} state Editor state.
  *
  * @return {string} The current slug to be displayed in the editor
  */
 export function getEditedPostSlug( state ) {
+	const generatedSlug =
+		getCurrentPostAttribute( state, 'status' ) !== 'auto-draft'
+			? getEditedPostAttribute( state, 'generated_slug' )
+			: undefined;
 	return (
 		getEditedPostAttribute( state, 'slug' ) ||
-		getEditedPostAttribute( state, 'generated_slug' ) ||
+		generatedSlug ||
 		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
 		getCurrentPostId( state )
 	);

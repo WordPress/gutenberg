@@ -2739,6 +2739,25 @@ describe( 'selectors', () => {
 			);
 		} );
 
+		it( 'should ignore the server-generated slug of an auto-draft', () => {
+			const state = {
+				currentPost: {
+					status: 'auto-draft',
+					title: 'Auto Draft',
+					generated_slug: 'auto-draft',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'edited-title' );
+		} );
+
 		it( 'should return the cleaned title as slug if no saved, edited, or generated slug exists', () => {
 			const state = {
 				currentPost: {
