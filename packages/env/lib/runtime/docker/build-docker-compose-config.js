@@ -116,7 +116,7 @@ const MARIADB_HEALTHCHECK = {
  * @return {Object} A docker-compose config object, ready to serialize into YAML.
  */
 module.exports = function buildDockerComposeConfig( config ) {
-	const testsEnabled = config.testsEnvironment !== false;
+	const testsEnabled = config.testsEnvironment === true;
 
 	// Since we are mounting files from the host operating system
 	// we want to create the host user in some of our containers.

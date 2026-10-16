@@ -97,7 +97,7 @@ class DockerRuntime {
 		const fullConfig = await writeDockerFiles( config );
 		const debug = fullConfig.debug;
 
-		const testsEnabled = config.testsEnvironment !== false;
+		const testsEnabled = config.testsEnvironment === true;
 
 		// Check if the hash of the config has changed. If so, run configuration.
 		const configHash = md5( fullConfig );
@@ -509,7 +509,7 @@ class DockerRuntime {
 	async clean( config, { environment, spinner, debug } ) {
 		ensureDockerInitialized( config, spinner );
 
-		const testsEnabled = config.testsEnvironment !== false;
+		const testsEnabled = config.testsEnvironment === true;
 
 		if ( ! testsEnabled && environment === 'tests' ) {
 			throw new Error(
@@ -592,7 +592,7 @@ class DockerRuntime {
 		validateRunContainer( container );
 
 		if (
-			config.testsEnvironment === false &&
+			! config.testsEnvironment &&
 			container.startsWith( 'tests-' )
 		) {
 			throw new Error(
@@ -623,7 +623,7 @@ class DockerRuntime {
 	async logs( config, { environment, watch, spinner } ) {
 		ensureDockerInitialized( config, spinner );
 
-		const testsEnabled = config.testsEnvironment !== false;
+		const testsEnabled = config.testsEnvironment === true;
 
 		if ( ! testsEnabled && environment === 'tests' ) {
 			throw new Error(
@@ -751,7 +751,7 @@ class DockerRuntime {
 
 		const siteUrl = config.env.development.config.WP_SITEURL;
 
-		const testsEnabled = config.testsEnvironment !== false;
+		const testsEnabled = config.testsEnvironment === true;
 
 		return {
 			status: isRunning ? 'running' : 'stopped',
