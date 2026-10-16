@@ -1,20 +1,22 @@
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
+import type { FontFamilyFace, FormattedFont } from '../../utils/types';
+import type { StyleSettings } from './types';
 
 /**
  * Returns an object of merged font families and the font faces from the selected font family
  * based on the theme.json settings object and the currently selected font family.
  *
- * @param {Object} settings           Theme.json settings.
- * @param {string} selectedFontFamily Decoded font family string.
- * @return {Object} Merged font families and font faces from the selected font family.
+ * @param settings           Theme.json settings.
+ * @param selectedFontFamily Decoded font family string.
+ * @return Merged font families and font faces from the selected font family.
  */
 export function getMergedFontFamiliesAndFontFamilyFaces(
-	settings,
-	selectedFontFamily
+	settings: StyleSettings | undefined,
+	selectedFontFamily: string | undefined
 ) {
 	const fontFamiliesFromSettings = settings?.typography?.fontFamilies;
 
-	const fontFamilies = [ 'default', 'theme', 'custom' ].flatMap(
+	const fontFamilies = ( [ 'default', 'theme', 'custom' ] as const ).flatMap(
 		( key ) => fontFamiliesFromSettings?.[ key ] ?? []
 	);
 
@@ -30,14 +32,14 @@ export function getMergedFontFamiliesAndFontFamilyFaces(
  * Returns the nearest font weight value from the available font weight list based on the new font weight.
  * The nearest font weight is the one with the smallest difference from the new font weight.
  *
- * @param {Array}  availableFontWeights Array of available font weights.
- * @param {string} newFontWeightValue   New font weight value.
- * @return {string} Nearest font weight.
+ * @param availableFontWeights Array of available font weights.
+ * @param newFontWeightValue   New font weight value.
+ * @return Nearest font weight.
  */
 export function findNearestFontWeight(
-	availableFontWeights,
-	newFontWeightValue
-) {
+	availableFontWeights: FormattedFont[] | undefined,
+	newFontWeightValue: string | number | undefined
+): string | undefined {
 	newFontWeightValue =
 		'number' === typeof newFontWeightValue
 			? newFontWeightValue.toString()
@@ -53,10 +55,13 @@ export function findNearestFontWeight(
 	const nearestFontWeight = availableFontWeights?.reduce(
 		( nearest, { value: fw } ) => {
 			const currentDiff = Math.abs(
-				parseInt( fw ) - parseInt( newFontWeightValue )
+				// The weights and the new value are strings here.
+				parseInt( fw as string ) -
+					parseInt( newFontWeightValue as string )
 			);
 			const nearestDiff = Math.abs(
-				parseInt( nearest ) - parseInt( newFontWeightValue )
+				parseInt( nearest as string ) -
+					parseInt( newFontWeightValue as string )
 			);
 			return currentDiff < nearestDiff ? fw : nearest;
 		},
@@ -70,11 +75,14 @@ export function findNearestFontWeight(
  * Returns the nearest font style based on the new font style.
  * Defaults to an empty string if the new font style is not valid or available.
  *
- * @param {Array}  availableFontStyles Array of available font weights.
- * @param {string} newFontStyleValue   New font style value.
- * @return {string} Nearest font style or an empty string.
+ * @param availableFontStyles Array of available font weights.
+ * @param newFontStyleValue   New font style value.
+ * @return Nearest font style or an empty string.
  */
-export function findNearestFontStyle( availableFontStyles, newFontStyleValue ) {
+export function findNearestFontStyle(
+	availableFontStyles: FormattedFont[] | undefined,
+	newFontStyleValue: string | undefined
+): string {
 	if ( typeof newFontStyleValue !== 'string' || ! newFontStyleValue ) {
 		return '';
 	}
@@ -107,16 +115,19 @@ export function findNearestFontStyle( availableFontStyles, newFontStyleValue ) {
 /**
  * Returns the nearest font style and weight based on the available font family faces and the new font style and weight.
  *
- * @param {Array}  fontFamilyFaces Array of available font family faces.
- * @param {string} fontStyle       New font style. Defaults to previous value.
- * @param {string} fontWeight      New font weight. Defaults to previous value.
- * @return {Object} Nearest font style and font weight.
+ * @param fontFamilyFaces Array of available font family faces.
+ * @param fontStyle       New font style. Defaults to previous value.
+ * @param fontWeight      New font weight. Defaults to previous value.
+ * @return Nearest font style and font weight.
  */
 export function findNearestStyleAndWeight(
-	fontFamilyFaces,
-	fontStyle,
-	fontWeight
-) {
+	fontFamilyFaces: FontFamilyFace[] | undefined,
+	fontStyle?: string,
+	fontWeight?: string | number
+): {
+	nearestFontStyle: string | undefined;
+	nearestFontWeight: string | number | undefined;
+} {
 	let nearestFontStyle = fontStyle;
 	let nearestFontWeight = fontWeight;
 
