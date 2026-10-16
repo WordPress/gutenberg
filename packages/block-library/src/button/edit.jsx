@@ -8,7 +8,6 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
-	Button,
 	TextControl,
 	ToolbarButton,
 	Popover,
@@ -35,9 +34,8 @@ import {
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
 import { displayShortcut, isKeyboardEvent, ENTER } from '@wordpress/keycodes';
-import { external, link } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { store as coreStore } from '@wordpress/core-data';
 import {
 	createBlock,
 	cloneBlock,
@@ -56,14 +54,13 @@ import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { useLinkPreview } from '../navigation-link/shared/use-link-preview';
+import ViewLinkButton from '../utils/view-link-button';
 import { getSuggestionsQuery } from '../navigation-link/link-ui';
 import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
-const { HTMLElementControl, LinkPicker, isHashLink, isRelativePath } = unlock(
-	blockEditorPrivateApis
-);
+const { HTMLElementControl, LinkPicker } = unlock( blockEditorPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [
@@ -151,22 +148,7 @@ function ContentControls( { attributes, setAttributes, isLinkEditable } ) {
 	const opensInNewTab = linkTarget === NEW_TAB_TARGET;
 	const nofollow = !! rel?.includes( NOFOLLOW_REL );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const homeUrl = useSelect(
-		( select ) =>
-			select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
-				?.home,
-		[]
-	);
 	const preview = useLinkPreview( { url } );
-
-	// Hash links and relative paths other than site-root paths can't be
-	// opened on their own.
-	const isViewableUrl =
-		!! url &&
-		( ! isHashLink( url ) ||
-			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
-	const viewUrl =
-		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
 	const setLink = ( changes ) =>
 		setAttributes(
@@ -243,19 +225,7 @@ function ContentControls( { attributes, setAttributes, isLinkEditable } ) {
 							}
 						/>
 					</ToolsPanelItem>
-					{ isViewableUrl && (
-						<Button
-							variant="secondary"
-							href={ viewUrl }
-							target="_blank"
-							icon={ external }
-							iconPosition="right"
-							__next40pxDefaultSize
-							className="navigation-link-to__action-button"
-						>
-							{ __( 'View' ) }
-						</Button>
-					) }
+					<ViewLinkButton url={ url } />
 				</>
 			) }
 		</ToolsPanel>
