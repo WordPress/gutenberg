@@ -267,14 +267,144 @@ test.describe( 'Description List', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe(
 			`<!-- wp:description-list -->
 <dl class="wp-block-description-list"><!-- wp:description-term -->
-<dt>API</dt>
+<dt class="wp-block-description-term">API</dt>
 <!-- /wp:description-term -->
 
 <!-- wp:description-detail -->
-<dd>Application programming interface</dd>
+<dd class="wp-block-description-detail">Application programming interface</dd>
 <!-- /wp:description-detail --></dl>
 <!-- /wp:description-list -->`
 		);
+	} );
+
+	test( 'should preserve child formatting when switching between HTML and visual editing', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: '<strong>API</strong>' },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: {
+						content: '<em>Application programming interface</em>',
+					},
+				},
+			],
+		} );
+		const originalContent = await editor.getEditedPostContent();
+		const term = editor.canvas.getByRole( 'document', {
+			name: 'Block: Description Term',
+		} );
+		const detail = editor.canvas.getByRole( 'document', {
+			name: 'Block: Description Detail',
+		} );
+
+		await term.click();
+		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+		await expect( term.getByRole( 'textbox' ) ).toHaveValue(
+			'<dt class="wp-block-description-term"><strong>API</strong></dt>'
+		);
+		await editor.clickBlockOptionsMenuItem( 'Edit visually' );
+		await expect( term.locator( 'strong' ) ).toHaveText( 'API' );
+
+		await detail.click();
+		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
+		await expect( detail.getByRole( 'textbox' ) ).toHaveValue(
+			'<dd class="wp-block-description-detail"><em>Application programming interface</em></dd>'
+		);
+		await editor.clickBlockOptionsMenuItem( 'Edit visually' );
+		await expect( detail.locator( 'em' ) ).toHaveText(
+			'Application programming interface'
+		);
+
+		expect( await editor.getEditedPostContent() ).toBe( originalContent );
+		await editor.saveDraft();
+		await page.reload();
+		await expect(
+			page.getByRole( 'button', { name: 'Attempt Block Recovery' } )
+		).toBeHidden();
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Description Term' } )
+				.locator( 'strong' )
+		).toHaveText( 'API' );
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Description Detail' } )
+				.locator( 'em' )
+		).toHaveText( 'Application programming interface' );
+	} );
+
+	test( 'should apply block support styles to terms and details', async ( {
+		editor,
+	} ) => {
+		const style = {
+			border: {
+				color: '#654321',
+				radius: '4px',
+				style: 'solid',
+				width: '2px',
+			},
+			color: {
+				background: '#abcdef',
+				text: '#123456',
+			},
+			spacing: {
+				margin: { bottom: '12px' },
+				padding: { top: '10px' },
+			},
+			typography: {
+				fontSize: '24px',
+				lineHeight: '1.5',
+			},
+		};
+		await editor.insertBlock( {
+			name: 'core/description-list',
+			innerBlocks: [
+				{
+					name: 'core/description-term',
+					attributes: { content: 'API', style },
+				},
+				{
+					name: 'core/description-detail',
+					attributes: {
+						content: 'Application programming interface',
+						style,
+					},
+				},
+			],
+		} );
+
+		for ( const [ blockName, className ] of [
+			[ 'Description Term', 'wp-block-description-term' ],
+			[ 'Description Detail', 'wp-block-description-detail' ],
+		] ) {
+			const block = editor.canvas.getByRole( 'document', {
+				name: `Block: ${ blockName }`,
+			} );
+			await expect( block ).toHaveClass( new RegExp( className ) );
+			await expect( block ).toHaveCSS( 'color', 'rgb(18, 52, 86)' );
+			await expect( block ).toHaveCSS(
+				'background-color',
+				'rgb(171, 205, 239)'
+			);
+			await expect( block ).toHaveCSS( 'font-size', '24px' );
+			await expect( block ).toHaveCSS( 'line-height', '36px' );
+			await expect( block ).toHaveCSS( 'margin-bottom', '12px' );
+			await expect( block ).toHaveCSS( 'padding-top', '10px' );
+			await expect( block ).toHaveCSS( 'border-top-width', '2px' );
+			await expect( block ).toHaveCSS( 'border-top-style', 'solid' );
+			await expect( block ).toHaveCSS(
+				'border-top-color',
+				'rgb(101, 67, 33)'
+			);
+			await expect( block ).toHaveCSS( 'border-radius', '4px' );
+		}
 	} );
 
 	test( 'should append a term and detail on Enter at the end of the last detail', async ( {

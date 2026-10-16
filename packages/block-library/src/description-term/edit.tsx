@@ -29,6 +29,7 @@ export default function Edit( {
 	onReplace,
 	onRemove,
 	clientId,
+	isSelected,
 }: DescriptionListItemEditProps ) {
 	const { content, placeholder } = attributes;
 	const blockProps = useBlockProps();
@@ -39,7 +40,10 @@ export default function Edit( {
 
 	return (
 		<>
-			<DescriptionListStructureWarning clientId={ clientId } />
+			<DescriptionListStructureWarning
+				clientId={ clientId }
+				isSelected={ isSelected }
+			/>
 			<RichText
 				identifier="content"
 				tagName="dt"

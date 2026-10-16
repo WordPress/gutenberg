@@ -48,11 +48,11 @@ This is a [**static block**](https://developer.wordpress.org/block-editor/gettin
 <!-- wp:description-list -->
 <dl class="wp-block-description-list">
 	<!-- wp:description-term -->
-	<dt>Term</dt>
+	<dt class="wp-block-description-term">Term</dt>
 	<!-- /wp:description-term -->
 
 	<!-- wp:description-detail -->
-	<dd>Description</dd>
+	<dd class="wp-block-description-detail">Description</dd>
 	<!-- /wp:description-detail -->
 </dl>
 <!-- /wp:description-list -->

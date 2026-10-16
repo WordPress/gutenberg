@@ -46,7 +46,6 @@
 				"padding": false
 			}
 		},
-		"__unstablePasteTextInline": true,
 		"__experimentalOnMerge": true,
 		"interactivity": {
 			"clientNavigation": true

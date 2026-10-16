@@ -20,8 +20,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"html": false,
-		"className": false,
+		"html": true,
 		"splitting": true,
 		"__experimentalBorder": {
 			"color": true,
@@ -61,9 +60,5 @@
 		"interactivity": {
 			"clientNavigation": true
 		}
-	},
-	"selectors": {
-		"root": ".wp-block-description-list > dd",
-		"border": ".wp-block-description-list > dd"
 	}
 }

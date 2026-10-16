@@ -27,8 +27,7 @@ _Defined via the [`attributes`](https://developer.wordpress.org/block-editor/ref
 _Defined via the [`supports`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/) property in block.json._
 
 - [`anchor`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#anchor): `true`
-- [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `false`
-- [`className`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#classname): `false`
+- [`html`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#html): `true`
 - [`splitting`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#splitting): `true`
 - [`color`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color):
   - [`gradients`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#color-gradients): `true`
@@ -43,20 +42,13 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 
-## CSS Selectors
-
-_Defined via the [`selectors`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-selectors/) property in block.json._
-
-- **root**: `.wp-block-description-list > dd`
-- **border**: `.wp-block-description-list > dd`
-
 ## Block Markup
 
 This is a [**static block**](https://developer.wordpress.org/block-editor/getting-started/fundamentals/static-dynamic-rendering/). The markup is saved directly in the post content.
 
 ```html
 <!-- wp:description-detail -->
-<dd>Description</dd>
+<dd class="wp-block-description-detail">Description</dd>
 <!-- /wp:description-detail -->
 ```
 

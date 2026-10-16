@@ -7,7 +7,6 @@ import {
 	store as blockEditorStore,
 	// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 } from '@wordpress/block-editor';
-import type { Block } from '@wordpress/blocks';
 
 const DESCRIPTION_LIST = 'core/description-list';
 const DESCRIPTION_TERM = 'core/description-term';
@@ -77,12 +76,22 @@ function getWarningMessage( issue: Exclude< StructureIssue, null > ) {
 
 export default function DescriptionListStructureWarning( {
 	clientId,
+	isSelected,
 }: {
 	clientId: string;
+	isSelected: boolean;
 } ) {
+	if ( ! isSelected ) {
+		return null;
+	}
+
+	return <SelectedBlockStructureWarning clientId={ clientId } />;
+}
+
+function SelectedBlockStructureWarning( { clientId }: { clientId: string } ) {
 	const issue = useSelect(
 		( select ) => {
-			const { getBlockName, getBlockRootClientId, getBlocks } =
+			const { getBlockName, getBlockOrder, getBlockRootClientId } =
 				select( blockEditorStore );
 			const descriptionListClientId =
 				getBlockName( clientId ) === DESCRIPTION_LIST
@@ -97,9 +106,7 @@ export default function DescriptionListStructureWarning( {
 			}
 
 			return getStructureIssue(
-				getBlocks( descriptionListClientId ).map(
-					( block: Block ) => block.name
-				)
+				getBlockOrder( descriptionListClientId ).map( getBlockName )
 			);
 		},
 		[ clientId ]

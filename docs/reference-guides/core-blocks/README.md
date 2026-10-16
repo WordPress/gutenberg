@@ -313,7 +313,7 @@ Add a description to a term.
 -	**Name:** [core/description-detail](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-description-detail/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Parent:** core/description-list
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~, ~~html~~
+-	**Supports:** anchor, color (background, gradients, link, text), html, interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
 -	**Attributes:** content, placeholder
 
 ## Description List
@@ -323,7 +323,7 @@ Create a list of terms and descriptions.
 -	**Name:** [core/description-list](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-description-list/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Allowed Blocks:** core/description-term, core/description-detail
--	**Supports:** __unstablePasteTextInline, anchor, color (background, gradients, link, text), interactivity (clientNavigation), listView, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), listView, spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 
 ## Description Term
 
@@ -332,7 +332,7 @@ Add a term to a description list.
 -	**Name:** [core/description-term](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/core-block-description-term/)
 -	**Category:** [text](https://developer.wordpress.org/block-editor/reference-guides/core-blocks/core-blocks-text/)
 -	**Parent:** core/description-list
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight), ~~className~~, ~~html~~
+-	**Supports:** anchor, color (background, gradients, link, text), html, interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fontSize, lineHeight)
 -	**Attributes:** content, placeholder
 
 ## Details
