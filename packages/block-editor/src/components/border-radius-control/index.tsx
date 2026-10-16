@@ -18,14 +18,23 @@ import {
 	ICONS,
 	MIN_BORDER_RADIUS_VALUE,
 } from './constants';
+import type { Preset } from '../preset-input-control/types';
+import type {
+	BorderRadiusControlProps,
+	BorderRadiusCorner,
+	BorderRadiusCornerValues,
+	BorderRadiusPresets,
+	BorderRadiusUnits,
+	BorderRadiusValues,
+} from './types';
 
-function useBorderRadiusSizes( presets ) {
+function useBorderRadiusSizes( presets?: BorderRadiusPresets ) {
 	const defaultSizes = presets?.default ?? EMPTY_ARRAY;
 	const customSizes = presets?.custom ?? EMPTY_ARRAY;
 	const themeSizes = presets?.theme ?? EMPTY_ARRAY;
 
 	return useMemo( () => {
-		const sizes = [
+		const sizes: Preset[] = [
 			{ name: __( 'None' ), slug: '0', size: 0 },
 			...customSizes,
 			...themeSizes,
@@ -48,12 +57,15 @@ function useBorderRadiusSizes( presets ) {
 /**
  * Gets the value for a specific corner from the values object.
  *
- * @param {Object|string} values Border radius values.
- * @param {string}        corner Corner name ('all', 'topLeft', etc.).
+ * @param values Border radius values.
+ * @param corner Corner name ('all', 'topLeft', etc.).
  *
- * @return {string|undefined} The corner value.
+ * @return The corner value.
  */
-function getCornerValue( values, corner ) {
+function getCornerValue(
+	values: BorderRadiusValues | undefined,
+	corner: BorderRadiusCorner | 'all'
+): string | undefined {
 	if ( corner === 'all' ) {
 		return getAllValue( values );
 	}
@@ -70,12 +82,15 @@ function getCornerValue( values, corner ) {
 /**
  * Gets the selected unit for a specific corner.
  *
- * @param {Object} selectedUnits Units object.
- * @param {string} corner        Corner name.
+ * @param selectedUnits Units object.
+ * @param corner        Corner name.
  *
- * @return {string} The selected unit.
+ * @return The selected unit.
  */
-function getCornerUnit( selectedUnits, corner ) {
+function getCornerUnit(
+	selectedUnits: BorderRadiusUnits,
+	corner: BorderRadiusCorner | 'all'
+): string | undefined {
 	if ( corner === 'all' ) {
 		return selectedUnits.flat;
 	}
@@ -85,14 +100,18 @@ function getCornerUnit( selectedUnits, corner ) {
 /**
  * Creates an onChange handler for a specific corner.
  *
- * @param {string}   corner   Corner name.
- * @param {Object}   values   Current values.
- * @param {Function} onChange Original onChange callback.
+ * @param corner   Corner name.
+ * @param values   Current values.
+ * @param onChange Original onChange callback.
  *
- * @return {Function} Corner-specific onChange handler.
+ * @return Corner-specific onChange handler.
  */
-function createCornerChangeHandler( corner, values, onChange ) {
-	return ( newValue ) => {
+function createCornerChangeHandler(
+	corner: BorderRadiusCorner | 'all',
+	values: BorderRadiusValues | undefined,
+	onChange: BorderRadiusControlProps[ 'onChange' ]
+) {
+	return ( newValue?: string ) => {
 		if ( corner === 'all' ) {
 			onChange( {
 				topLeft: newValue,
@@ -123,18 +142,18 @@ function createCornerChangeHandler( corner, values, onChange ) {
 /**
  * Creates a unit change handler for a specific corner.
  *
- * @param {string}   corner           Corner name.
- * @param {Object}   selectedUnits    Current selected units.
- * @param {Function} setSelectedUnits Unit setter function.
+ * @param corner           Corner name.
+ * @param selectedUnits    Current selected units.
+ * @param setSelectedUnits Unit setter function.
  *
- * @return {Function} Corner-specific unit change handler.
+ * @return Corner-specific unit change handler.
  */
 function createCornerUnitChangeHandler(
-	corner,
-	selectedUnits,
-	setSelectedUnits
+	corner: BorderRadiusCorner | 'all',
+	selectedUnits: BorderRadiusUnits,
+	setSelectedUnits: ( units: BorderRadiusUnits ) => void
 ) {
-	return ( newUnit ) => {
+	return ( newUnit?: string ) => {
 		const newUnits = { ...selectedUnits };
 		if ( corner === 'all' ) {
 			newUnits.flat = newUnit;
@@ -152,14 +171,18 @@ function createCornerUnitChangeHandler(
 /**
  * Control to display border radius options.
  *
- * @param {Object}   props          Component props.
- * @param {Function} props.onChange Callback to handle onChange.
- * @param {Object}   props.values   Border radius values.
- * @param {Object}   props.presets  Border radius presets.
+ * @param props          Component props.
+ * @param props.onChange Callback to handle onChange.
+ * @param props.values   Border radius values.
+ * @param props.presets  Border radius presets.
  *
- * @return {Element}              Custom border radius control.
+ * @return Custom border radius control.
  */
-export default function BorderRadiusControl( { onChange, values, presets } ) {
+export default function BorderRadiusControl( {
+	onChange,
+	values,
+	presets,
+}: BorderRadiusControlProps ) {
 	const [ isLinked, setIsLinked ] = useState(
 		! hasDefinedValues( values ) || ! hasMixedValues( values )
 	);
@@ -167,22 +190,33 @@ export default function BorderRadiusControl( { onChange, values, presets } ) {
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection
 	// behaviour. Filtering CSS unit only values prevents invalid style values.
-	const [ selectedUnits, setSelectedUnits ] = useState( {
+	// A shorthand value has no corners, which read as undefined.
+	const cornerValues = values as BorderRadiusCornerValues | undefined;
+	const [ selectedUnits, setSelectedUnits ] = useState< BorderRadiusUnits >( {
 		flat:
 			typeof values === 'string'
 				? parseQuantityAndUnitFromRawValue( values )[ 1 ]
 				: undefined,
-		topLeft: parseQuantityAndUnitFromRawValue( values?.topLeft )[ 1 ],
-		topRight: parseQuantityAndUnitFromRawValue( values?.topRight )[ 1 ],
-		bottomLeft: parseQuantityAndUnitFromRawValue( values?.bottomLeft )[ 1 ],
+		topLeft: parseQuantityAndUnitFromRawValue( cornerValues?.topLeft )[ 1 ],
+		topRight: parseQuantityAndUnitFromRawValue(
+			cornerValues?.topRight
+		)[ 1 ],
+		bottomLeft: parseQuantityAndUnitFromRawValue(
+			cornerValues?.bottomLeft
+		)[ 1 ],
 		bottomRight: parseQuantityAndUnitFromRawValue(
-			values?.bottomRight
+			cornerValues?.bottomRight
 		)[ 1 ],
 	} );
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
+		// The setting lists unit strings.
+		availableUnits: ( availableUnits as string[] | undefined ) || [
+			'px',
+			'em',
+			'rem',
+		],
 	} );
 
 	const toggleLinked = () => setIsLinked( ! isLinked );
@@ -220,12 +254,14 @@ export default function BorderRadiusControl( { onChange, values, presets } ) {
 				/>
 			) : (
 				<VStack>
-					{ [
-						'topLeft',
-						'topRight',
-						'bottomLeft',
-						'bottomRight',
-					].map( ( corner ) => (
+					{ (
+						[
+							'topLeft',
+							'topRight',
+							'bottomLeft',
+							'bottomRight',
+						] as const
+					 ).map( ( corner ) => (
 						<PresetInputControl
 							key={ corner }
 							ariaLabel={ CORNERS[ corner ] }
