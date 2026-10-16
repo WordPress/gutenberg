@@ -6,8 +6,9 @@ import { _x } from '@wordpress/i18n';
 import { useConvertToGroupButtonProps } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
+import type { Layout } from '../../layouts/types';
 
-const layouts = {
+const layouts: Record< string, Layout > = {
 	group: { type: 'constrained' },
 	row: { type: 'flex', flexWrap: 'nowrap' },
 	stack: { type: 'flex', orientation: 'vertical' },
@@ -26,16 +27,18 @@ function BlockGroupToolbar() {
 
 			return {
 				canRemove: canRemoveBlocks( clientIds ),
+				// A registered block type has a variations array.
 				variations: getBlockVariations(
 					groupingBlockName,
 					'transform'
-				),
+				)!,
 			};
 		},
 		[ clientIds, groupingBlockName ]
 	);
 
-	const onConvertToGroup = ( layout ) => {
+	// The group button passes its click event instead of a layout.
+	const onConvertToGroup = ( layout?: unknown ) => {
 		const newBlocks = groupBlocks( blocksSelection, groupingBlockName );
 
 		if ( typeof layout !== 'string' ) {
@@ -45,7 +48,7 @@ function BlockGroupToolbar() {
 		if ( newBlocks && newBlocks.length > 0 ) {
 			// Because the block is not in the store yet we can't use
 			// updateBlockAttributes so need to manually update attributes.
-			newBlocks[ 0 ].attributes.layout = layouts[ layout ];
+			newBlocks[ 0 ].attributes.layout = layouts[ layout as string ];
 			replaceBlocks( clientIds, newBlocks );
 		}
 	};
