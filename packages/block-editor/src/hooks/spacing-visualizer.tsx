@@ -2,11 +2,22 @@ import { useState, useRef, useEffect, useReducer } from '@wordpress/element';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import BlockPopoverCover from '../components/block-popover/cover';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import type {
+	SpacingVisualizerBaseProps,
+	SpacingVisualizerProps,
+} from './types';
 
-function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
+function SpacingVisualizer( {
+	clientId,
+	value,
+	computeStyle,
+	forceShow,
+}: SpacingVisualizerBaseProps ) {
 	const blockElement = useBlockElement( clientId );
-	const [ style, updateStyle ] = useReducer( () =>
-		computeStyle( blockElement )
+	const [ style, updateStyle ] = useReducer(
+		// Styles are only computed once the block element is rendered.
+		() => computeStyle( blockElement! ),
+		undefined
 	);
 
 	// Force style computation when forceShow becomes true (e.g., when hovering control)
@@ -69,13 +80,18 @@ function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
 	);
 }
 
-function getComputedCSS( element, property ) {
-	return element.ownerDocument.defaultView
-		.getComputedStyle( element )
+function getComputedCSS( element: Element, property: string ) {
+	// A rendered block element has a window.
+	return element.ownerDocument
+		.defaultView!.getComputedStyle( element )
 		.getPropertyValue( property );
 }
 
-export function MarginVisualizer( { clientId, value, forceShow } ) {
+export function MarginVisualizer( {
+	clientId,
+	value,
+	forceShow,
+}: SpacingVisualizerProps ) {
 	return (
 		<SpacingVisualizer
 			clientId={ clientId }
@@ -101,7 +117,11 @@ export function MarginVisualizer( { clientId, value, forceShow } ) {
 	);
 }
 
-export function PaddingVisualizer( { clientId, value, forceShow } ) {
+export function PaddingVisualizer( {
+	clientId,
+	value,
+	forceShow,
+}: SpacingVisualizerProps ) {
 	return (
 		<SpacingVisualizer
 			clientId={ clientId }

@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, CSSProperties } from 'react';
 import type {
 	Block,
 	BlockAttribute,
@@ -285,4 +285,28 @@ export interface LineHeightEditProps {
 		};
 	};
 	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
+
+/**
+ * Props of the margin and padding visualizers.
+ */
+export interface SpacingVisualizerProps {
+	clientId: string;
+	value?: BlockStyle & {
+		spacing?: Record< string, unknown > & {
+			margin?: unknown;
+			padding?: unknown;
+		};
+	};
+	forceShow?: boolean;
+}
+
+/**
+ * Props of the visualizer overlaying a block's margin or padding.
+ */
+export interface SpacingVisualizerBaseProps {
+	clientId: string;
+	value: unknown;
+	computeStyle: ( blockElement: Element ) => CSSProperties;
+	forceShow?: boolean;
 }
