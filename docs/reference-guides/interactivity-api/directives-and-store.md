@@ -385,7 +385,6 @@ The element shows what its reference resolves to, calling it first when it is a 
 
 To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. Known limitation: when that value is `{ "wpServerHtml": true }`, the element keeps the content it had before navigating instead of the new page's server-rendered content.
 
-
 #### Inert content
 
 Inside an interactive region (an element with `data-wp-interactive`, or any of its descendants), the Interactivity API doesn't process the directives or hydrate the interactive islands within the element's content. This covers the server-rendered fallback and the inserted HTML alike. Outside any interactive region, the attribute does nothing and the element is plain markup.
