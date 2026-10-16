@@ -9,8 +9,13 @@ import { __ } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 import PresetInputControl from '../preset-input-control';
 import { CUSTOM_VALUE_SETTINGS } from '../preset-input-control/constants';
+import type {
+	Preset,
+	PresetInputControlProps,
+} from '../preset-input-control/types';
+import type { DimensionControlProps, DimensionSizes } from './types';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: Preset[] = [];
 
 // Dimension-specific custom value settings - override defaults for larger dimension values
 const DIMENSION_CUSTOM_VALUE_SETTINGS = {
@@ -23,16 +28,16 @@ const DIMENSION_CUSTOM_VALUE_SETTINGS = {
 /**
  * Hook to retrieve dimension sizes from theme settings.
  *
- * @param {Object} presets Dimension presets object containing default, theme, and custom sizes.
- * @return {Array} Array of dimension size options.
+ * @param presets Dimension presets object containing default, theme, and custom sizes.
+ * @return Array of dimension size options.
  */
-function useDimensionSizes( presets ) {
+function useDimensionSizes( presets?: DimensionSizes ): Preset[] {
 	const defaultSizes = presets?.default ?? EMPTY_ARRAY;
 	const customSizes = presets?.custom ?? EMPTY_ARRAY;
 	const themeSizes = presets?.theme ?? EMPTY_ARRAY;
 
 	return useMemo( () => {
-		const sizes = [
+		const sizes: Preset[] = [
 			{ name: __( 'None' ), slug: '0', size: 0 },
 			...customSizes,
 			...themeSizes,
@@ -65,15 +70,19 @@ export default function DimensionControl( {
 	placeholder,
 	className,
 	dimensionSizes: dimensionSizesProp,
-} ) {
+}: DimensionControlProps ) {
 	const [ dimensionSizesFromSettings, availableUnits ] = useSettings(
 		'dimensions.dimensionSizes',
 		'spacing.units'
 	);
-	const dimensionSizes = dimensionSizesProp ?? dimensionSizesFromSettings;
+	const dimensionSizes =
+		dimensionSizesProp ??
+		// The setting holds the dimension size presets.
+		( dimensionSizesFromSettings as DimensionSizes | undefined );
 
 	const units = useCustomUnits( {
-		availableUnits: availableUnits || [
+		// The setting lists unit strings.
+		availableUnits: ( availableUnits as string[] | undefined ) || [
 			'%',
 			'px',
 			'em',
@@ -91,7 +100,7 @@ export default function DimensionControl( {
 		return unit || units[ 0 ]?.value || 'px';
 	} );
 
-	const handleUnitChange = ( newUnit ) => {
+	const handleUnitChange = ( newUnit: string ) => {
 		// Attempt to smooth over differences between currentUnit and newUnit.
 		// This should slightly improve the experience of switching between unit types.
 		const [ currentValue, currentUnit ] =
@@ -99,13 +108,15 @@ export default function DimensionControl( {
 
 		if ( [ 'em', 'rem' ].includes( newUnit ) && currentUnit === 'px' ) {
 			// Convert pixel value to an approximate of the new unit, assuming a root size of 16px.
-			onChange( ( currentValue / 16 ).toFixed( 2 ) + newUnit );
+			// A parsed unit comes with its quantity.
+			onChange( ( currentValue! / 16 ).toFixed( 2 ) + newUnit );
 		} else if (
-			[ 'em', 'rem' ].includes( currentUnit ) &&
+			// An unparsed unit matches none of the units.
+			[ 'em', 'rem' ].includes( currentUnit as string ) &&
 			newUnit === 'px'
 		) {
 			// Convert to pixel value assuming a root size of 16px.
-			onChange( Math.round( currentValue * 16 ) + newUnit );
+			onChange( Math.round( currentValue! * 16 ) + newUnit );
 		} else if (
 			[
 				'%',
@@ -134,7 +145,8 @@ export default function DimensionControl( {
 				'lvmax',
 				'dvmax',
 			].includes( newUnit ) &&
-			currentValue > 100
+			// An undefined quantity is not greater than 100.
+			( currentValue as number ) > 100
 		) {
 			// When converting to `%` or viewport-relative units, cap the new value at 100.
 			onChange( 100 + newUnit );
@@ -156,7 +168,10 @@ export default function DimensionControl( {
 				customValueSettings={ DIMENSION_CUSTOM_VALUE_SETTINGS }
 				minimumCustomValue={ 0 }
 				onChange={ onChange }
-				onUnitChange={ handleUnitChange }
+				// The unit select always passes a unit.
+				onUnitChange={
+					handleUnitChange as PresetInputControlProps[ 'onUnitChange' ]
+				}
 				placeholder={ placeholder }
 				presets={ options }
 				presetType="dimension"
