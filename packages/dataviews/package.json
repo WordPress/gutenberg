@@ -50,7 +50,7 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@ariakit/react": "^0.4.41",
-		"@base-ui/react": "^1.8.0",
+		"@base-ui/react": "^1.9.0",
 		"@date-fns/tz": "^1.5.0",
 		"@daypicker/react": "^10.0.1",
 		"@emotion/cache": "^11.14.0",
