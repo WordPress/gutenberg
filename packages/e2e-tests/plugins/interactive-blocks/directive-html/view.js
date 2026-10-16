@@ -1,8 +1,21 @@
 import { store, asDangerousHTML } from '@wordpress/interactivity';
 
+const policy = window.trustedTypes?.createPolicy( 'directive-html', {
+	createHTML: ( html ) => html,
+} );
+
 const { state } = store( 'directive-html', {
 	state: {
 		html: null,
+		// Matches the server-rendered fallback, so it renders before the
+		// rejected value replaces it.
+		rejected: asDangerousHTML(
+			policy?.createHTML( '<p>Rejected fallback</p>' ) ??
+				'<p>Rejected fallback</p>'
+		),
+		empty: null,
+		list: [ 'a', 'b' ],
+		hydration: 'hydrated',
 	},
 	actions: {
 		setHtml() {
@@ -13,8 +26,11 @@ const { state } = store( 'directive-html', {
 		setLoading() {
 			state.html = null;
 		},
-		setPlainString() {
-			state.html = '<strong>Not rendered</strong>';
+		setTrustedHtml() {
+			state.html = asDangerousHTML( policy.createHTML( '<p>Late</p>' ) );
+		},
+		setRejected() {
+			state.rejected = asDangerousHTML( '<b>x</b>' );
 		},
 	},
 } );

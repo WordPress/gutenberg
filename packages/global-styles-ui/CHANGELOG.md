@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Remove the dot that marks blocks with user styles in the block list. The filter to show only those blocks stays ([#84657](https://github.com/WordPress/gutenberg/pull/84657)).
+-   Font Library: Mark installed font variants in font collections ([#84023](https://github.com/WordPress/gutenberg/pull/84023)).
 
 ### Bug Fixes
 
