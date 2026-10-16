@@ -1,9 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { act, render } from '@testing-library/react';
 import { speak } from '@wordpress/a11y';
+// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-import { createElement } from '@wordpress/element';
 import TemplateValidationNotice from '../index';
 
 vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
@@ -14,11 +14,9 @@ describe( 'TemplateValidationNotice', () => {
 		registry.register( blockEditorStore );
 
 		render(
-			createElement(
-				RegistryProvider,
-				{ value: registry },
-				createElement( TemplateValidationNotice )
-			)
+			<RegistryProvider value={ registry }>
+				<TemplateValidationNotice />
+			</RegistryProvider>
 		);
 		expect( speak ).not.toHaveBeenCalled();
 
