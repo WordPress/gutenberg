@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -119,9 +116,8 @@ const { state } = store( 'test/render-html', {
 		},
 		navigate: withSyncEvent( function* ( event ) {
 			event.preventDefault();
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( event.target.href );
 		} ),
 	},

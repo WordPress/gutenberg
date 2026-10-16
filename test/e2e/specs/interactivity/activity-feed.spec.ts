@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 // How the feed cards are identified in the list markup. The same journey

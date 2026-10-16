@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	Fragment,
 	h,
@@ -10,10 +7,6 @@ import {
 	type ContainerNode,
 	type VNode,
 } from 'preact';
-
-/**
- * Internal dependencies
- */
 import { toVdom } from './vdom';
 import { Directives, elementToVnode, isDefaultDirectiveSuffix } from './hooks';
 import { getRegionRootFragment } from './hydration';
@@ -312,7 +305,7 @@ const spliceIntoTree = (
 	const path = getPathTo( treeRoot, container );
 	if ( ! path || path.length === 0 ) {
 		warn(
-			'renderHTML(): the container could not be located in the island tree. Is it inside a router region, a data-wp-each list, a data-wp-ignore subtree, or a template?'
+			'renderHTML(): the container could not be located in the island tree. Is it inside a router region, a data-wp-each list, or a template?'
 		);
 		return;
 	}
@@ -480,8 +473,8 @@ const spliceIntoTree = (
  * must be inside an island (`[data-wp-interactive]`) or carry its own
  * `data-wp-interactive`; otherwise nothing is hydrated and a warning is
  * emitted. Router regions ARE supported — the region signal is written
- * through from the spliced tree. Unsupported (warn + no-op): `data-wp-ignore`
- * subtrees, `data-wp-each-child` content, and `<template>` elements.
+ * through from the spliced tree. Unsupported (warn + no-op):
+ * `data-wp-each-child` content and `<template>` elements.
  *
  * List identity: items are matched by key — a user `data-wp-key` wins, then
  * the element's `id`, and (for `prepend`/`before`/`after` only) an

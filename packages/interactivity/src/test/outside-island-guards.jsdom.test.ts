@@ -1,8 +1,3 @@
-// eslint-disable-next-line no-warning-comments
-/**
- * @jest-environment jsdom
- */
-
 /**
  * RED probes — outside-island hydration + island-root guards.
  *
@@ -26,11 +21,8 @@
  * - Island-root `before`/`after` already warn (guard exists — add tests).
  */
 
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { store } from '../store';
-
-/**
- * Internal dependencies
- */
 import '../directives'; // Registers all the core directives.
 import { renderHTML } from '../render';
 
@@ -117,12 +109,8 @@ describe( 'renderHTML outside any island', () => {
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = true;
 		document.body.innerHTML = '<div data-testid="host"></div>';
-		const warnSpy = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
 		renderHTML( '[data-testid="host"]', '<p data-testid="p">plain</p>' );
-		expect( warnSpy ).toHaveBeenCalled();
-		warnSpy.mockRestore();
+		expect( console ).toHaveWarned();
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = false;
 		expect( document.querySelector( '[data-testid="p"]' ) ).toBeNull();
@@ -237,9 +225,6 @@ describe( 'renderHTML at the island root', () => {
 			</div>
 		`;
 		await flush();
-		const warnSpy = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
 		const islandEl = document.querySelector(
 			'[data-testid="island"]'
 		) as HTMLElement;
@@ -252,8 +237,7 @@ describe( 'renderHTML at the island root', () => {
 		} );
 		await flush();
 
-		expect( warnSpy ).toHaveBeenCalled();
-		warnSpy.mockRestore();
+		expect( console ).toHaveWarned();
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = false;
 
@@ -316,10 +300,6 @@ describe( 'renderHTML at the island root', () => {
 			'[data-testid="island"]'
 		) as HTMLElement;
 
-		const warnSpy = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
-
 		// `before` and `after` share the same island-root guard branch. The
 		// module-level warn dedupe (`logged` in utils.ts) silences a second
 		// IDENTICAL message, so the warn is asserted once and the DOM
@@ -328,14 +308,13 @@ describe( 'renderHTML at the island root', () => {
 		// island, which are not insertions.
 		renderHTML( islandEl, '<p>plain</p>', { mode: 'before' } );
 		await flush();
-		expect( warnSpy ).toHaveBeenCalled();
+		expect( console ).toHaveWarned();
 		expect( islandEl.previousElementSibling ).toBeNull();
 
 		renderHTML( islandEl, '<p>plain</p>', { mode: 'after' } );
 		await flush();
 		expect( islandEl.nextElementSibling ).toBeNull();
 
-		warnSpy.mockRestore();
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = false;
 	} );

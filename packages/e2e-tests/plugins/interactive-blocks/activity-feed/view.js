@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -26,9 +23,8 @@ const { state } = store( 'test/activity-feed', {
 		// region via the interactivity router.
 		navigate: withSyncEvent( function* ( event ) {
 			event.preventDefault();
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+			const { actions } =
+				yield import( '@wordpress/interactivity-router' );
 			yield actions.navigate( event.target.href );
 		} ),
 		// Post-card like button: increments the card's own context, proving

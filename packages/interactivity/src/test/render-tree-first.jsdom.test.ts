@@ -1,8 +1,3 @@
-// eslint-disable-next-line no-warning-comments
-/**
- * @jest-environment jsdom
- */
-
 /**
  * Tree-first renderHTML outcome tests.
  *
@@ -12,12 +7,9 @@
  * iteration: they test failure modes that cannot occur in tree-first.
  */
 
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { store } from '../store';
 import { getContext } from '../scopes';
-
-/**
- * Internal dependencies
- */
 import '../directives'; // Registers all the core directives.
 import { renderHTML } from '../render';
 import { elementToVnode } from '../hooks';
@@ -96,7 +88,7 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'parses HTML, renders it into the container, and hydrates directives', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<button data-testid="btn" data-wp-on--click="actions.inc">0</button>'
 		);
 		await flush();
@@ -112,7 +104,7 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'appends by default', async () => {
 		await setup( '<div data-testid="feed"><p>a</p></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<p>b</p>'
 		);
 		await flush();
@@ -124,7 +116,7 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'prepends when mode is "prepend"', async () => {
 		await setup( '<div data-testid="feed"><p>a</p></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<p>b</p>',
 			{ mode: 'prepend' }
 		);
@@ -137,7 +129,7 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'replaces children when mode is "inner"', async () => {
 		await setup( '<div data-testid="feed"><p>a</p></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<p>b</p>',
 			{ mode: 'inner' }
 		);
@@ -152,7 +144,7 @@ describe( 'renderHTML (tree-first)', () => {
 			'<div data-testid="target"></div><p data-testid="after">after</p>'
 		);
 		renderHTML(
-			document.querySelector( '[data-testid="target"]' ),
+			document.querySelector( '[data-testid="target"]' )!,
 			'<p>before</p>',
 			{ mode: 'before' }
 		);
@@ -171,7 +163,7 @@ describe( 'renderHTML (tree-first)', () => {
 			'<p data-testid="before">before</p><div data-testid="target"></div>'
 		);
 		renderHTML(
-			document.querySelector( '[data-testid="target"]' ),
+			document.querySelector( '[data-testid="target"]' )!,
 			'<p>after</p>',
 			{ mode: 'after' }
 		);
@@ -190,7 +182,7 @@ describe( 'renderHTML (tree-first)', () => {
 			'<div data-testid="wrap"><div data-testid="target">old</div></div>'
 		);
 		renderHTML(
-			document.querySelector( '[data-testid="target"]' ),
+			document.querySelector( '[data-testid="target"]' )!,
 			'<p>new</p>',
 			{ mode: 'replace' }
 		);
@@ -216,7 +208,7 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'inserts and hydrates multiple top-level sibling elements', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<p>a</p><p>b</p>'
 		);
 		await flush();
@@ -228,15 +220,11 @@ describe( 'renderHTML (tree-first)', () => {
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = true;
 		document.body.innerHTML = '<div data-testid="feed"></div>';
-		const warnSpy = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<p>hi</p>'
 		);
-		expect( warnSpy ).toHaveBeenCalled();
-		warnSpy.mockRestore();
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'renders into a container with its own data-wp-interactive (new island)', async () => {
@@ -246,7 +234,7 @@ describe( 'renderHTML (tree-first)', () => {
 		state.count = 0;
 		await hydrateRegions();
 		renderHTML(
-			document.querySelector( '[data-testid="widget"]' ),
+			document.querySelector( '[data-testid="widget"]' )!,
 			'<button data-testid="wbtn" data-wp-on--click="actions.inc">0</button>'
 		);
 		await flush();
@@ -263,7 +251,7 @@ describe( 'renderHTML (tree-first)', () => {
 			'<div data-testid="feed" data-wp-context=\'{ "n": 42 }\'></div>'
 		);
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<span data-testid="ctx" data-wp-text="context.n"></span>'
 		);
 		await flush();
@@ -280,7 +268,7 @@ describe( 'renderHTML (tree-first)', () => {
 				'</div>'
 		);
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<button data-testid="bump" data-wp-on--click="actions.bump">bump</button>'
 		);
 		await flush();
@@ -326,12 +314,12 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'repeated appends do not duplicate nodes or leak listeners', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<button data-testid="a" data-wp-on--click="actions.inc">a</button>'
 		);
 		await flush();
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<button data-testid="b" data-wp-on--click="actions.inc">b</button>'
 		);
 		await flush();
@@ -346,13 +334,13 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'cleans up listeners of removed content on inner replacement', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<span data-testid="listener" data-wp-on-window--resize="actions.inc"></span>'
 		);
 		await flush();
 		// Replace the container's children entirely.
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<p>new content</p>',
 			{ mode: 'inner' }
 		);
@@ -364,32 +352,26 @@ describe( 'renderHTML (tree-first)', () => {
 		expect( state.count ).toBe( 0 );
 	} );
 
-	it( 'keeps data-wp-ignore subtrees inert', async () => {
-		// `data-wp-ignore` is deprecated (removal planned for 7.0), so its
-		// deprecation warning firing here is EXPECTED — asserted below, not
-		// accidental noise. SCRIPT_DEBUG gates the warning.
+	it( 'no longer keeps data-wp-ignore subtrees inert (directive removed upstream)', async () => {
+		// The directive was removed upstream (#84098): an element carrying it
+		// is hydrated like any other element and a warning is expected —
+		// asserted below, not accidental noise. SCRIPT_DEBUG gates it.
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = true;
-		const warnSpy = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<div data-wp-ignore><span data-testid="inner" data-wp-text="state.text">raw</span></div>'
 		);
 		await flush();
+		// The subtree IS hydrated now, so `data-wp-text` replaces the
+		// server-rendered fallback instead of being skipped.
 		expect(
 			document.querySelector( '[data-testid="inner"]' )?.textContent
-		).toBe( 'raw' );
-		// The subtree is inert BECAUSE the directive ran — and the directive
-		// is deprecated, so it must have warned.
-		expect( warnSpy ).toHaveBeenCalledWith(
-			expect.stringContaining(
-				'The data-wp-ignore directive is deprecated'
-			)
+		).toBe( state.text );
+		expect( console ).toHaveWarnedWith(
+			'The data-wp-ignore directive has been removed. The element and its descendants are now hydrated like any other element. Please remove the attribute.'
 		);
-		warnSpy.mockRestore();
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = false;
 	} );
@@ -397,7 +379,7 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'runs data-wp-init on inserted content', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<span data-testid="inited" data-wp-init="actions.set7"></span>'
 		);
 		await flush();
@@ -407,7 +389,7 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'runs data-wp-watch on insertion and re-runs on state change', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<span data-testid="watched" data-wp-watch="actions.watchText"></span>'
 		);
 		await flush();
@@ -420,7 +402,7 @@ describe( 'renderHTML (tree-first)', () => {
 	it( 'renders a data-wp-each list inside inserted content', async () => {
 		await setup( '<div data-testid="feed"></div>' );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<template data-wp-each="state.items"><li data-wp-text="context.item"></li></template>'
 		);
 		await flush();
@@ -437,7 +419,7 @@ describe( 'renderHTML (tree-first)', () => {
 				'</div>'
 		);
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<div data-wp-context=\'{ "n": 100 }\'>' +
 				'<button data-testid="bump" data-wp-on--click="actions.bump">bump</button>' +
 				'<span data-testid="local" data-wp-text="context.n"></span>' +
@@ -468,7 +450,7 @@ describe( 'renderHTML (tree-first)', () => {
 			state: { n: 5 },
 		} );
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			`<div data-wp-interactive="test/tree-first-nested">
 				<span data-testid="nested" data-wp-text="state.n"></span>
 			</div>`
@@ -509,7 +491,7 @@ describe( 'nested islands (targeting a container inside one)', () => {
 		expect( nestedState.initCount ).toBe( 1 );
 
 		renderHTML(
-			document.querySelector( '[data-testid="container"]' ),
+			document.querySelector( '[data-testid="container"]' )!,
 			'<button data-testid="nested-btn" data-wp-on--click="actions.inc">inc</button>'
 		);
 		await flush();
@@ -541,7 +523,7 @@ describe( 'nested islands (targeting a container inside one)', () => {
 		`;
 		await hydrateRegions();
 		renderHTML(
-			document.querySelector( '[data-testid="container"]' ),
+			document.querySelector( '[data-testid="container"]' )!,
 			'<span data-testid="ns" data-wp-text="state.label"></span>'
 		);
 		await flush();
@@ -674,12 +656,8 @@ describe( 'element→vnode map', () => {
 		outer?.appendChild( victim as Node );
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = true;
-		const warnSpy = jest
-			.spyOn( console, 'warn' )
-			.mockImplementation( () => {} );
 		renderHTML( victim as Element, '<p>x</p>' );
-		expect( warnSpy ).toHaveBeenCalled();
-		warnSpy.mockRestore();
+		expect( console ).toHaveWarned();
 		// eslint-disable-next-line @wordpress/wp-global-usage
 		( globalThis as { SCRIPT_DEBUG?: boolean } ).SCRIPT_DEBUG = false;
 
@@ -1313,7 +1291,7 @@ describe( 'auto-keys (id + synthetic): cross-splice, refresh, and dedup behavior
 		// positionally → instance reused, init not re-run) and the sibling
 		// is off-path (carried by reference). Both must keep identity.
 		renderHTML(
-			document.querySelector( '[data-testid="feed"]' ),
+			document.querySelector( '[data-testid="feed"]' )!,
 			'<span>x</span>'
 		);
 		await flush();

@@ -1,8 +1,3 @@
-// eslint-disable-next-line no-warning-comments
-/**
- * @jest-environment jsdom
- */
-
 /**
  * Router-region splice tests — the region signal must mirror the tree.
  *
@@ -26,11 +21,8 @@
  * stay hidden.
  */
 
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { h, type VNode } from 'preact';
-
-/**
- * Internal dependencies
- */
 import '../directives'; // Registers all the core directives.
 import { store } from '../store';
 import { renderHTML } from '../render';
@@ -89,7 +81,7 @@ const navigateRegion = ( id: string, children: VNode[] ) => {
 		'div',
 		{ 'data-testid': 'region' },
 		children
-	);
+	) as VNode;
 };
 
 const islandHtml = ( regionId: string ) => `
@@ -241,7 +233,7 @@ describe( 'renderHTML into a router region (after a navigation)', () => {
 					'data-wp-class--bn-active': 'state.active',
 				},
 				[ h( 'p', null, 'a' ) ]
-			),
+			) as VNode,
 			originalProps: {},
 		} );
 		await flush();

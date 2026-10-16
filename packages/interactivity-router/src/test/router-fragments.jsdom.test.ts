@@ -1,14 +1,9 @@
-// eslint-disable-next-line no-warning-comments
-/**
- * @jest-environment jsdom
- */
-
 /**
  * Router probes (R2–R4) — renderHTML + router navigation interplay.
  *
  * These probe how a navigation interacts with a `renderHTML`-inserted node
  * and with region content generally. All probes share ONE module registry
- * (no `jest.resetModules`): the importmap loader defines a non-configurable
+ * (no per-test module reset): the importmap loader defines a non-configurable
  * `wpInteractivityRouterImport` global at module-eval, so re-importing per
  * test would throw. Contamination is avoided by using a distinct region id
  * per probe (r2–r4), fresh DOM per probe, and resetting the test store's
@@ -21,60 +16,7 @@
  *   (guard).
  */
 
-/*
- * The router imports `@wordpress/interactivity`, whose `index.ts` contains
- * top-level `await import('preact/debug')` — which jest's CJS transform cannot
- * parse. Mock the package with the real internals (relative requires avoid the
- * TLA-carrying index), so the router can be unit-tested at all. This is also
- * why upstream only e2e-tests the router.
- */
-jest.mock( '@wordpress/interactivity', () => {
-	// preact / @preact/signals back the mocked internals but are not direct
-	// deps of this package — test-only requires, so disable the rule.
-	/* eslint-disable import/no-extraneous-dependencies */
-	const {
-		store,
-		getConfig,
-		parseServerData,
-		populateServerData,
-	} = require( '../../../interactivity/src/store' );
-	const {
-		getRegionRootFragment,
-		initialVdomPromise,
-	} = require( '../../../interactivity/src/hydration' );
-	const { toVdom } = require( '../../../interactivity/src/vdom' );
-	const {
-		routerRegions,
-	} = require( '../../../interactivity/src/directives/router-region' );
-	const {
-		navigationSignal,
-		sessionId,
-		warn,
-	} = require( '../../../interactivity/src/utils' );
-	const { h, render } = require( 'preact' );
-	const { batch } = require( '@preact/signals' );
-	/* eslint-enable import/no-extraneous-dependencies */
-
-	return {
-		store,
-		getConfig,
-		privateApis: () => ( {
-			getRegionRootFragment,
-			initialVdomPromise,
-			toVdom,
-			render,
-			parseServerData,
-			populateServerData,
-			batch,
-			routerRegions,
-			h,
-			navigationSignal,
-			sessionId,
-			warn,
-		} ),
-	};
-} );
-
+import { describe, expect, it, vi } from 'vitest';
 import { actions } from '../index';
 import { store } from '../../../interactivity/src/store';
 import {
@@ -82,9 +24,12 @@ import {
 	initialVdomPromise,
 } from '../../../interactivity/src/hydration';
 import { renderHTML } from '../../../interactivity/src/render';
-// The mock bypasses interactivity's index.ts, so directives are not registered
-// by it — register them explicitly.
 import '../../../interactivity/src/directives';
+
+// Fills the jsdom gaps before `@wordpress/interactivity` evaluates.
+await vi.hoisted( async () => {
+	await import( './fixtures/jsdom-setup' );
+} );
 
 const ROUTER_NS = 'router-regions';
 
