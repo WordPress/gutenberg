@@ -1,4 +1,5 @@
 import { createSlotFill } from '@wordpress/components';
+import type { ComponentProps } from 'react';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
@@ -6,7 +7,7 @@ import {
 
 const { Fill, Slot } = createSlotFill( Symbol( 'InspectorControlsLastItem' ) );
 
-const InspectorControlsLastItem = ( props ) => {
+const InspectorControlsLastItem = ( props: ComponentProps< typeof Fill > ) => {
 	const context = useBlockEditContext();
 	if ( ! context[ mayDisplayControlsKey ] ) {
 		return null;
@@ -14,7 +15,7 @@ const InspectorControlsLastItem = ( props ) => {
 	return <Fill { ...props } />;
 };
 InspectorControlsLastItem.Slot = function InspectorControlsLastItemSlot(
-	props
+	props: ComponentProps< typeof Slot >
 ) {
 	return <Slot { ...props } />;
 };

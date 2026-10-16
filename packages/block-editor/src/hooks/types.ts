@@ -16,11 +16,24 @@ export interface BlockStyleState {
 export type BlockStyle = Record< string, unknown >;
 
 /**
- * A Tools Panel reset-all filter, returning the attributes to set.
+ * The block a reset-all filter resets.
  */
-export type ResetAllFilter = ( attributes: {
-	style?: BlockStyle;
-} ) => ( Record< string, unknown > & { style?: BlockStyle } ) | undefined;
+export interface ResetAllContext {
+	attributes: Record< string, unknown >;
+	clientId: string;
+	name: string | null;
+}
+
+/**
+ * A Tools Panel reset-all filter, returning the attributes to set. The block
+ * support tools panel passes the block context; state-scoped filters do not.
+ */
+export type ResetAllFilter = (
+	attributes: {
+		style?: BlockStyle;
+	},
+	context?: ResetAllContext
+) => ( Record< string, unknown > & { style?: BlockStyle } ) | undefined;
 
 /**
  * Props a block support's controls receive: the block's identity and the

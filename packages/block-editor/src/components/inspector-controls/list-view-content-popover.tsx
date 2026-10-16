@@ -8,8 +8,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
+import type { ListViewContentPopoverProps } from './types';
 
 // Create private slot-fill for ListViewContentPanel
 const LIST_VIEW_CONTENT_PANEL_SLOT = Symbol( 'ListViewContentPopover' );
@@ -23,7 +22,7 @@ function useInspectorPopoverPlacement() {
 	return ! isMobile
 		? {
 				popoverProps: {
-					placement: 'left-start',
+					placement: 'left-start' as const,
 					offset: 35,
 					resize: false,
 				},
@@ -38,10 +37,12 @@ function useInspectorPopoverPlacement() {
  * List View block support. The routing is handled automatically by
  * `InspectorControlsFill`.
  *
- * @param {Object}                 props
- * @param {RefObject<HTMLElement>} props.listViewRef Ref to the List View slot for the block inspector.
+ * @param props
+ * @param props.listViewRef Ref to the List View slot for the block inspector.
  */
-export function ListViewContentPopover( { listViewRef } ) {
+export function ListViewContentPopover( {
+	listViewRef,
+}: ListViewContentPopoverProps ) {
 	const { popoverProps } = useInspectorPopoverPlacement();
 	const fills = useSlotFills( LIST_VIEW_CONTENT_PANEL_SLOT );
 	const hasFills = Boolean( fills && fills.length );
@@ -58,7 +59,9 @@ export function ListViewContentPopover( { listViewRef } ) {
 	}, [] );
 
 	// Query DOM for the selected block row element in List View.
-	const [ anchorElement, setAnchorElement ] = useState( null );
+	const [ anchorElement, setAnchorElement ] = useState< Element | null >(
+		null
+	);
 
 	useLayoutEffect( () => {
 		if ( ! selectedClientId || ! listViewRef?.current ) {

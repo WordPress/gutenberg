@@ -16,6 +16,11 @@ import {
 	useBlockStyleState,
 } from '../../hooks/block-style-state';
 import { ListViewContentFill } from './list-view-content-popover';
+import type {
+	InspectorControlsFillProps,
+	RegisterResetAllProps,
+	ToolsPanelInspectorControlProps,
+} from './types';
 
 const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
 
@@ -23,7 +28,7 @@ export default function InspectorControlsFill( {
 	children,
 	group = 'default',
 	resetAllFilter,
-} ) {
+}: InspectorControlsFillProps ) {
 	const context = useBlockEditContext();
 	const isSelectedBlock = context[ mayDisplayControlsKey ];
 	const isPatternEditing = context[ mayDisplayPatternEditingControlsKey ];
@@ -87,7 +92,10 @@ export default function InspectorControlsFill( {
 	);
 }
 
-function RegisterResetAll( { resetAllFilter, children } ) {
+function RegisterResetAll( {
+	resetAllFilter,
+	children,
+}: RegisterResetAllProps ) {
 	const { registerResetAllFilter, deregisterResetAllFilter } =
 		useContext( ToolsPanelContext );
 	const selectedState = useBlockStyleState();
@@ -95,7 +103,7 @@ function RegisterResetAll( { resetAllFilter, children } ) {
 		() => scopeResetAllFilterToState( selectedState, resetAllFilter ),
 		[ resetAllFilter, selectedState ]
 	);
-	useEffect( () => {
+	useEffect( (): void | ( () => void ) => {
 		if (
 			scopedResetAllFilter &&
 			registerResetAllFilter &&
@@ -114,7 +122,11 @@ function RegisterResetAll( { resetAllFilter, children } ) {
 	return children;
 }
 
-function ToolsPanelInspectorControl( { children, resetAllFilter, fillProps } ) {
+function ToolsPanelInspectorControl( {
+	children,
+	resetAllFilter,
+	fillProps,
+}: ToolsPanelInspectorControlProps ) {
 	// `fillProps.forwardedContext` is an array of context provider entries, provided by slot,
 	// that should wrap the fill markup.
 	const { forwardedContext = [] } = fillProps;
