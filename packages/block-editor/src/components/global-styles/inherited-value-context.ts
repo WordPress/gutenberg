@@ -2,6 +2,7 @@ import { useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { store as blockEditorStore } from '../../store';
 import {
 	globalStylesDataKey,
@@ -11,6 +12,7 @@ import { getVariationNameFromClass } from '../../hooks/block-style-variation';
 import { useBlockEditContext } from '../block-edit/context';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
+import type { BlockStyleState } from '../../hooks/types';
 
 const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
 
@@ -19,9 +21,9 @@ const { resolveStyle } = unlock( globalStylesEnginePrivateApis );
  * (`{ styles, _links }`), the shape `resolveStyle` expects. `_links` carries
  * the theme-file map used to resolve pointers such as background images.
  *
- * @return {?Object} Global Styles config, or `null` before the payload settles.
+ * @return Global Styles config, or `null` before the payload settles.
  */
-function useRawGlobalStyles() {
+function useRawGlobalStyles(): GlobalStylesConfig | null {
 	const { rawGlobalStylesData, links } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
@@ -32,7 +34,11 @@ function useRawGlobalStyles() {
 	return useMemo(
 		() =>
 			rawGlobalStylesData
-				? { styles: rawGlobalStylesData, _links: links ?? undefined }
+				? // The settings hold the global styles data and their links.
+					( {
+						styles: rawGlobalStylesData,
+						_links: links ?? undefined,
+					} as GlobalStylesConfig )
 				: null,
 		[ rawGlobalStylesData, links ]
 	);
@@ -47,7 +53,10 @@ function useRawGlobalStyles() {
  * the child's `level` attribute has no default and is absent on pattern-,
  * template- and paste-inserted blocks.
  */
-const CONTEXT_HEADING_LEVEL_BLOCKS = {
+const CONTEXT_HEADING_LEVEL_BLOCKS: Record<
+	string,
+	{ contextKey: string; fallbackLevel: number } | undefined
+> = {
 	'core/accordion-heading': {
 		contextKey: 'core/accordion-heading-level',
 		fallbackLevel: 3,
@@ -57,12 +66,16 @@ const CONTEXT_HEADING_LEVEL_BLOCKS = {
 /**
  * Resolves the heading level that selects a block's `h1`-`h6` element layer.
  *
- * @param {string}  blockName      Block name.
- * @param {?number} levelAttribute The block's own `level` attribute, if it has one.
- * @param {?number} contextLevel   Level supplied by a parent through block context.
- * @return {?number} Resolved heading level, or `undefined` when the block has none.
+ * @param blockName      Block name.
+ * @param levelAttribute The block's own `level` attribute, if it has one.
+ * @param contextLevel   Level supplied by a parent through block context.
+ * @return Resolved heading level, or `undefined` when the block has none.
  */
-function getHeadingLevel( blockName, levelAttribute, contextLevel ) {
+function getHeadingLevel(
+	blockName: string,
+	levelAttribute: number | undefined,
+	contextLevel: number | undefined
+): number | undefined {
 	const contextOwned = CONTEXT_HEADING_LEVEL_BLOCKS[ blockName ];
 	if ( ! contextOwned ) {
 		return levelAttribute;
@@ -80,13 +93,18 @@ function getHeadingLevel( blockName, levelAttribute, contextLevel ) {
  * must not pick it up. Returns a primitive so callers can use it as a
  * `useSelect` dependency.
  *
- * @param {?string} blockName Block name.
- * @return {?number} Level from block context, or `undefined`.
+ * @param blockName Block name.
+ * @return Level from block context, or `undefined`.
  */
-function useContextHeadingLevel( blockName ) {
+function useContextHeadingLevel(
+	blockName: string | null | undefined
+): number | undefined {
 	const blockContext = useContext( BlockContext );
-	const contextKey = CONTEXT_HEADING_LEVEL_BLOCKS[ blockName ]?.contextKey;
-	return contextKey ? blockContext[ contextKey ] : undefined;
+	// A missing block name matches no block.
+	const contextKey =
+		CONTEXT_HEADING_LEVEL_BLOCKS[ blockName as string ]?.contextKey;
+	// The parent block supplies the level as a number.
+	return contextKey ? ( blockContext[ contextKey ] as number ) : undefined;
 }
 
 /**
@@ -113,11 +131,14 @@ function useContextHeadingLevel( blockName ) {
  * `inheritedValue.elements.link` passthrough instead, so folding `link` in would
  * bleed link color into the block's own text.
  *
- * @param {string}  blockName    Block name.
- * @param {?number} headingLevel Resolved heading level, from `getHeadingLevel`.
- * @return {string[]} Ordered element keys, low to high precedence.
+ * @param blockName    Block name.
+ * @param headingLevel Resolved heading level, from `getHeadingLevel`.
+ * @return Ordered element keys, low to high precedence.
  */
-function getElementLayers( blockName, headingLevel ) {
+function getElementLayers(
+	blockName: string,
+	headingLevel: number | undefined
+): string[] {
 	switch ( blockName ) {
 		case 'core/button':
 			return [ 'button' ];
@@ -174,12 +195,18 @@ function getElementLayers( blockName, headingLevel ) {
  * argument: these panels always render inside `BlockEditContextProvider`, so
  * the caller does not have to thread it through.
  *
- * @param {?string} blockName Block name (e.g. `core/heading`).
- * @param {?string} className Space-separated class string from block attributes.
- * @return {{ variationName: ?string, headingLevel: ?number }} Variation slug
+ * @param blockName Block name (e.g. `core/heading`).
+ * @param className Space-separated class string from block attributes.
+ * @return Variation slug
  * (without the `is-style-` prefix) and the block's heading level, if any.
  */
-function useVariationAndElements( blockName, className ) {
+function useVariationAndElements(
+	blockName: string | null | undefined,
+	className: string | null | undefined
+): {
+	variationName: string | null | undefined;
+	headingLevel: number | undefined;
+} {
 	const { clientId } = useBlockEditContext();
 	const contextHeadingLevel = useContextHeadingLevel( blockName );
 	return useSelect(
@@ -189,8 +216,10 @@ function useVariationAndElements( blockName, className ) {
 			}
 			const registeredStyles =
 				select( blocksStore ).getBlockStyles( blockName );
-			const { level } =
-				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			const { level } = ( select( blockEditorStore ).getBlockAttributes(
+				// Global styles panels render inside the edited block.
+				clientId!
+			) || {} ) as { level?: number };
 			// Primitives only: `useSelect` shallow-compares this object, so
 			// returning a fresh array here would re-render on every action.
 			return {
@@ -223,12 +252,16 @@ function useVariationAndElements( blockName, className ) {
  * `blockName` is missing, the hook returns empty value and source objects, so
  * each panel reads no inherited value and renders its local value alone.
  *
- * @param {?string} blockName       Selected block name (e.g. `core/heading`).
- * @param {?string} className       Block `className` used to detect an applied variation.
- * @param {?Object} [selectedState] Selected block style state (`{ viewport, pseudo }`), or null for the default state.
- * @return {{ value: Object, sources: Object }} Merged panel-scoped payload and source map.
+ * @param blockName     Selected block name (e.g. `core/heading`).
+ * @param className     Block `className` used to detect an applied variation.
+ * @param selectedState Selected block style state (`{ viewport, pseudo }`), or null for the default state.
+ * @return Merged panel-scoped payload and source map.
  */
-export function useResolvedStyle( blockName, className, selectedState = null ) {
+export function useResolvedStyle(
+	blockName: string | null | undefined,
+	className?: string | null,
+	selectedState: BlockStyleState | null = null
+) {
 	const { variationName, headingLevel } = useVariationAndElements(
 		blockName,
 		className
