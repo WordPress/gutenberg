@@ -446,10 +446,7 @@ export function serializeBlock(
 	const blockName = block.name;
 	const saveContent = getBlockInnerHTML( block );
 
-	if (
-		blockName === getUnregisteredTypeHandlerName() ||
-		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
-	) {
+	if ( blockName === getUnregisteredTypeHandlerName() ) {
 		return saveContent;
 	}
 
@@ -459,6 +456,14 @@ export function serializeBlock(
 	}
 
 	const saveAttributes = getCommentAttributes( blockType, block.attributes );
+	if (
+		! isInnerBlocks &&
+		blockName === getFreeformContentHandlerName() &&
+		( blockName !== 'core/html' || ! Object.keys( saveAttributes ).length )
+	) {
+		return saveContent;
+	}
+
 	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
