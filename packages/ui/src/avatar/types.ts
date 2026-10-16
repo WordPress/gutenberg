@@ -11,6 +11,11 @@ export type RootProps = Omit<
 	 * an opaque sRGB fill derived from this color and a contrasting foreground.
 	 * Other browsers retain the neutral fallback. Images keep their own colors.
 	 * The ring paints over the avatar's inner edge without changing its layout size.
+	 *
+	 * The colored fallback's fill must resolve independently of its foreground.
+	 * `currentColor`, including through CSS variables or color functions, is
+	 * unsupported for colored fallbacks and can produce insufficient contrast.
+	 * Alpha is discarded, and out-of-gamut channels are clipped to sRGB.
 	 */
 	color?: React.CSSProperties[ 'color' ];
 	/**

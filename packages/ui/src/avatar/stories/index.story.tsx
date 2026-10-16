@@ -111,7 +111,7 @@ export const Interactive: Story = {
 	),
 };
 
-/** Compare neutral, native contrast, WCAG black/white, and contrast-limited tinted fallbacks. */
+/** Compare neutral, black/white, capped tint, and uncapped tint fallbacks. */
 export const FallbackColors: Story = {
 	args: { color: '#008a20', size: 'lg' },
 	render: ( args ) => {
@@ -130,15 +130,28 @@ export const FallbackColors: Story = {
 			[ 'Neutral', 'neutral' ],
 			[ 'Native black/white', 'native' ],
 			[ 'WCAG black/white', 'wcag' ],
-			[ 'Tinted foreground', 'tinted' ],
+			[ 'Tint capped at 20%', 'tinted' ],
+			[ 'Uncapped tint', 'uncapped' ],
 		];
 		return (
 			<div className={ explorationStyles.gallery }>
 				<p>
 					Change the custom color, size, and shape in Controls. Filled
-					fallbacks use opaque sRGB colors. The tinted column falls
+					fallbacks use opaque sRGB colors. Both tinted columns fall
 					back to native black/white, then neutral, as feature support
 					allows.
+				</p>
+				<p>
+					Both tints target 4.55:1 contrast. The capped tint blends at
+					most 20% of the background into black or white. The uncapped
+					tint uses the full blend that retains the target contrast.
+				</p>
+				<p>
+					Colored fallbacks do not support <code>currentColor</code>,
+					including through CSS variables or color functions. Their
+					fill must resolve independently of the foreground.
+					Transparent colors become opaque, and out-of-gamut channels
+					are clipped to sRGB.
 				</p>
 				<table>
 					<thead>
