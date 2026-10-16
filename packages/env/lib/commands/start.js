@@ -10,7 +10,6 @@ const inquirer = require( 'inquirer' );
 /**
  * Promisified dependencies
  */
-const sleep = util.promisify( setTimeout );
 const rimraf = util.promisify( require( 'rimraf' ) );
 const exec = util.promisify( require( 'child_process' ).exec );
 
@@ -22,7 +21,6 @@ const stop = require( './stop' );
 const initConfig = require( '../init-config' );
 const downloadSources = require( '../download-sources' );
 const {
-	checkDatabaseConnection,
 	makeContentDirectoriesWritable,
 	configureWordPress,
 	setupWordPressDirectories,
@@ -144,19 +142,6 @@ module.exports = async function start( { spinner, debug, update } ) {
 				makeContentDirectoriesWritable( 'development', config ),
 				makeContentDirectoriesWritable( 'tests', config ),
 			] );
-		}
-
-		try {
-			await checkDatabaseConnection( config );
-		} catch ( error ) {
-			// Wait 30 seconds for MySQL to accept connections.
-			await retry( () => checkDatabaseConnection( config ), {
-				times: 30,
-				delay: 1000,
-			} );
-
-			// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-			await sleep( 4000 );
 		}
 
 		// Retry WordPress installation in case MySQL *still* wasn't ready.
