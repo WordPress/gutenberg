@@ -1,4 +1,5 @@
 import { store as coreStore } from '@wordpress/core-data';
+import type { BasePost } from '../shared/types';
 
 /**
  * Checks whether a page can be set as the homepage or as the posts page.
@@ -6,12 +7,15 @@ import { store as coreStore } from '@wordpress/core-data';
  * It reads the site settings and the templates through the data registry,
  * so it returns `false` when it's called without one.
  *
- * @param {Object} post             The page.
- * @param {Object} context          The context of the check.
- * @param {Object} context.registry The data registry.
- * @return {boolean} Whether the page can be set as the homepage or as the posts page.
+ * @param post             The page.
+ * @param context          The context of the check.
+ * @param context.registry The data registry.
+ * @return Whether the page can be set as the homepage or as the posts page.
  */
-export function isEligibleForHomepageActions( post, { registry } = {} ) {
+export function isEligibleForHomepageActions(
+	post: BasePost,
+	{ registry }: { registry?: any } = {}
+): boolean {
 	if ( ! registry || post.status !== 'publish' || post.type !== 'page' ) {
 		return false;
 	}

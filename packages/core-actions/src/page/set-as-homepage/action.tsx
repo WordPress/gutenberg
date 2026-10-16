@@ -7,23 +7,34 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Settings } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { getItemTitle } from '../../utils/get-item-title';
-import { isEligibleForHomepageActions } from './utils';
+import type { RenderModalProps } from '@wordpress/dataviews';
+import { getItemTitle } from '../../shared/utils';
+import type {
+	BasePost,
+	CoreDataError,
+	ActionScriptParts,
+} from '../../shared/types';
+import { isEligibleForHomepageActions } from '../utils';
 
-const SetAsHomepageModal = ( { items, closeModal } ) => {
+const SetAsHomepageModal = ( {
+	items,
+	closeModal,
+}: RenderModalProps< BasePost > ) => {
 	const [ item ] = items;
 	const pageTitle = getItemTitle( item );
 	const { showOnFront, currentHomePage, isSaving } = useSelect(
 		( select ) => {
 			const { getEntityRecord, isSavingEntityRecord } =
 				select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
+			const siteSettings = getEntityRecord( 'root', 'site' ) as
+				Partial< Settings > | undefined;
 			const currentHomePageItem = getEntityRecord(
 				'postType',
 				'page',
 				siteSettings?.page_on_front
-			);
+			) as BasePost | undefined;
 			return {
 				showOnFront: siteSettings?.show_on_front,
 				currentHomePage: currentHomePageItem,
@@ -36,7 +47,7 @@ const SetAsHomepageModal = ( { items, closeModal } ) => {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	async function onSetPageAsHomepage( event ) {
+	async function onSetPageAsHomepage( event: React.FormEvent ) {
 		event.preventDefault();
 
 		try {
@@ -49,9 +60,10 @@ const SetAsHomepageModal = ( { items, closeModal } ) => {
 				type: 'snackbar',
 			} );
 		} catch ( error ) {
+			const typedError = error as CoreDataError;
 			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
+				typedError.message && typedError.code !== 'unknown_error'
+					? typedError.message
 					: __( 'An error occurred while setting the homepage.' );
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		} finally {
@@ -113,11 +125,13 @@ const SetAsHomepageModal = ( { items, closeModal } ) => {
 	);
 };
 
-export const setAsHomepage = {
-	id: 'set-as-homepage',
-	label: __( 'Set as homepage…' ),
-	modalHeader: __( 'Set as homepage' ),
+const setAsHomepage: ActionScriptParts< BasePost > = {
 	isEligible: isEligibleForHomepageActions,
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: SetAsHomepageModal,
 };
+
+/**
+ * The JavaScript parts of the set as homepage action for pages; its data is
+ * in `action.php`.
+ */
+export default setAsHomepage;

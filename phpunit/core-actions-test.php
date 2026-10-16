@@ -14,6 +14,11 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	const POST_TYPE_SUPPORTS = '@wordpress/core-actions/post_type_supports';
 
 	/**
+	 * The script module of the actions of pages.
+	 */
+	const PAGE = '@wordpress/core-actions/page';
+
+	/**
 	 * The script module of the actions of patterns.
 	 */
 	const WP_BLOCK = '@wordpress/core-actions/wp_block';
@@ -143,15 +148,23 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 
 	/**
 	 * Pages are viewable and support revisions, titles, and page attributes,
-	 * and the user can create them: they have every action of the
-	 * `post_type_supports` module, in the order the actions are shown.
+	 * and the user can create them and manage the site settings: they have
+	 * every action of the `post_type_supports` module, followed by the
+	 * homepage actions of the `page` module, in the order the actions are
+	 * shown.
 	 */
 	public function test_the_actions_of_pages() {
 		wp_set_current_user( self::$admin_id );
 
 		$ids = array_merge( array( 'view-post', 'view-post-revisions', 'duplicate-post', 'rename-post', 'order-pages' ), self::EVERY_POST_TYPE );
-		$this->assertSame( $ids, $this->get_action_ids( 'page' ) );
-		$this->assertSame( array( self::POST_TYPE_SUPPORTS => $ids ), wp_get_registered_entity_action_modules( 'postType', 'page' ) );
+		$this->assertSame( array_merge( $ids, array( 'set-as-homepage', 'set-as-posts-page' ) ), $this->get_action_ids( 'page' ) );
+		$this->assertSame(
+			array(
+				self::POST_TYPE_SUPPORTS => $ids,
+				self::PAGE               => array( 'set-as-homepage', 'set-as-posts-page' ),
+			),
+			wp_get_registered_entity_action_modules( 'postType', 'page' )
+		);
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( wp_get_registered_entity_actions( 'postType', 'page' ), 'origin' ), 'registeredBy' ) ), 'Every action is registered by core.' );
 	}
 
@@ -246,6 +259,22 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 	}
 
 	/**
+	 * The homepage and the posts page are site settings, so the actions
+	 * setting them are only registered for pages, for the users who can
+	 * manage the site settings.
+	 */
+	public function test_the_homepage_actions_depend_on_the_current_user() {
+		$homepage_actions = array( 'set-as-homepage', 'set-as-posts-page' );
+
+		wp_set_current_user( self::$admin_id );
+		$this->assertSame( $homepage_actions, array_values( array_intersect( $this->get_action_ids( 'page' ), $homepage_actions ) ), 'Administrators can set a page as the homepage or as the posts page.' );
+		$this->assertSame( array(), array_values( array_intersect( $this->get_action_ids( 'post' ), $homepage_actions ) ), 'Posts cannot be the homepage or the posts page.' );
+
+		wp_set_current_user( self::$editor_id );
+		$this->assertSame( array(), array_values( array_intersect( $this->get_action_ids( 'page' ), $homepage_actions ) ), 'Editors cannot manage the site settings.' );
+	}
+
+	/**
 	 * The actions of a custom post type follow what it supports.
 	 */
 	public function test_the_actions_of_a_custom_post_type_follow_its_supports() {
@@ -329,7 +358,7 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		$schema = ( new Gutenberg_REST_Entity_Actions_Controller_7_2() )->get_item_schema();
 
 		$modules = array(
-			'page'             => array( self::POST_TYPE_SUPPORTS ),
+			'page'             => array( self::POST_TYPE_SUPPORTS, self::PAGE ),
 			'wp_block'         => array( self::POST_TYPE_SUPPORTS, self::WP_BLOCK ),
 			'wp_template_part' => array( self::POST_TYPE_SUPPORTS, self::WP_TEMPLATE_PART ),
 		);
@@ -371,9 +400,15 @@ class Tests_Core_Actions extends WP_UnitTestCase {
 		add_action( 'wp_entity_actions_api_init', $callback );
 		wp_set_current_user( self::$admin_id );
 
-		$ids = array( 'view-post', 'view-post-revisions', 'rename-post', 'order-pages', 'restore', 'reset-post', 'delete-post', 'permanently-delete', 'move-to-trash' );
-		$this->assertSame( $ids, $this->get_action_ids( 'page' ) );
-		$this->assertSame( array( self::POST_TYPE_SUPPORTS => $ids ), wp_get_registered_entity_action_modules( 'postType', 'page' ) );
+		$ids = array( 'view-post', 'view-post-revisions', 'rename-post', 'order-pages', 'restore', 'reset-post', 'delete-post', 'permanently-delete' );
+		$this->assertSame( array_merge( $ids, array( 'set-as-homepage', 'set-as-posts-page', 'move-to-trash' ) ), $this->get_action_ids( 'page' ) );
+		$this->assertSame(
+			array(
+				self::POST_TYPE_SUPPORTS => array_merge( $ids, array( 'move-to-trash' ) ),
+				self::PAGE               => array( 'set-as-homepage', 'set-as-posts-page' ),
+			),
+			wp_get_registered_entity_action_modules( 'postType', 'page' )
+		);
 
 		$actions = array_column( wp_get_registered_entity_actions( 'postType', 'page' ), null, 'id' );
 		$this->assertSame( 'Bin…', $actions['move-to-trash']['label'] );

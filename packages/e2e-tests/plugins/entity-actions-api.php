@@ -21,6 +21,8 @@
  *    definition, and with the script module of the core action, which keeps
  *    its JavaScript parts.
  * 3. `remove_action`: the removal of a core action (`duplicate-post`).
+ * 4. `remove_homepage_action`: the removal of the "Set as homepage" action of
+ *    pages (`set-as-homepage`), which keeps the "Set as posts page" one.
  *
  * @package gutenberg-test-entity-actions-api
  */
@@ -104,3 +106,13 @@ function gutenberg_test_entity_actions_api_remove_action() {
 	wp_unregister_entity_actions( 'postType', 'page', array( 'duplicate-post' ) );
 }
 add_action( 'wp_entity_actions_api_init', 'gutenberg_test_entity_actions_api_remove_action' );
+
+/**
+ * Case 4: the removal of the "Set as homepage" action of pages
+ * (`set-as-homepage`). WordPress registers it along with the "Set as posts
+ * page" action (`set-as-posts-page`), which stays.
+ */
+function gutenberg_test_entity_actions_api_remove_homepage_action() {
+	wp_unregister_entity_actions( 'postType', 'page', array( 'set-as-homepage' ) );
+}
+add_action( 'wp_entity_actions_api_init', 'gutenberg_test_entity_actions_api_remove_homepage_action' );

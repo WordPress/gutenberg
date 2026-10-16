@@ -193,6 +193,24 @@ test.describe( 'Entity actions API', () => {
 		).toHaveCount( 0 );
 	} );
 
+	test( 'removes the "Set as homepage" action of pages', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await createPage( requestUtils, { title: 'About Page' } );
+		await admin.visitSiteEditor( { postType: 'page' } );
+		await openRowActions( page, 'About Page' );
+
+		// The "Set as posts page" action, registered along with it, stays.
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as posts page…' } )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Set as homepage…' } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'shows the actions in the editor inspector', async ( {
 		admin,
 		editor,

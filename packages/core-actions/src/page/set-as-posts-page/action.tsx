@@ -7,23 +7,34 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import type { Settings } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
-import { getItemTitle } from '../../utils/get-item-title';
-import { isEligibleForHomepageActions } from './utils';
+import type { RenderModalProps } from '@wordpress/dataviews';
+import { getItemTitle } from '../../shared/utils';
+import type {
+	BasePost,
+	CoreDataError,
+	ActionScriptParts,
+} from '../../shared/types';
+import { isEligibleForHomepageActions } from '../utils';
 
-const SetAsPostsPageModal = ( { items, closeModal } ) => {
+const SetAsPostsPageModal = ( {
+	items,
+	closeModal,
+}: RenderModalProps< BasePost > ) => {
 	const [ item ] = items;
 	const pageTitle = getItemTitle( item );
 	const { currentPostsPage, isPageForPostsSet, isSaving } = useSelect(
 		( select ) => {
 			const { getEntityRecord, isSavingEntityRecord } =
 				select( coreStore );
-			const siteSettings = getEntityRecord( 'root', 'site' );
+			const siteSettings = getEntityRecord( 'root', 'site' ) as
+				Partial< Settings > | undefined;
 			const currentPostsPageItem = getEntityRecord(
 				'postType',
 				'page',
 				siteSettings?.page_for_posts
-			);
+			) as BasePost | undefined;
 			return {
 				currentPostsPage: currentPostsPageItem,
 				isPageForPostsSet: siteSettings?.page_for_posts !== 0,
@@ -36,7 +47,7 @@ const SetAsPostsPageModal = ( { items, closeModal } ) => {
 	const { createSuccessNotice, createErrorNotice } =
 		useDispatch( noticesStore );
 
-	async function onSetPageAsPostsPage( event ) {
+	async function onSetPageAsPostsPage( event: React.FormEvent ) {
 		event.preventDefault();
 
 		try {
@@ -49,9 +60,10 @@ const SetAsPostsPageModal = ( { items, closeModal } ) => {
 				type: 'snackbar',
 			} );
 		} catch ( error ) {
+			const typedError = error as CoreDataError;
 			const errorMessage =
-				error.message && error.code !== 'unknown_error'
-					? error.message
+				typedError.message && typedError.code !== 'unknown_error'
+					? typedError.message
 					: __( 'An error occurred while setting the posts page.' );
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
 		} finally {
@@ -109,11 +121,13 @@ const SetAsPostsPageModal = ( { items, closeModal } ) => {
 	);
 };
 
-export const setAsPostsPage = {
-	id: 'set-as-posts-page',
-	label: __( 'Set as posts page…' ),
-	modalHeader: __( 'Set as posts page' ),
+const setAsPostsPage: ActionScriptParts< BasePost > = {
 	isEligible: isEligibleForHomepageActions,
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: SetAsPostsPageModal,
 };
+
+/**
+ * The JavaScript parts of the set as posts page action for pages; its data is
+ * in `action.php`.
+ */
+export default setAsPostsPage;

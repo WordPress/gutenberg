@@ -4,11 +4,11 @@
  * plugin registers its own.
  *
  * The folders next to this file are the script modules of the actions:
- * `post_type_supports` for the actions of every post type, `wp_block` for
- * the actions of patterns, and `wp_template_part` for the actions of
- * template parts. Each action has a folder named after its id, whose
- * `action.php` returns the serializable part of the action, and whose
- * `action.tsx` holds its JavaScript parts.
+ * `post_type_supports` for the actions of every post type, `page` for the
+ * actions of pages, `wp_block` for the actions of patterns, and
+ * `wp_template_part` for the actions of template parts. Each action has a
+ * folder named after its id, whose `action.php` returns the serializable
+ * part of the action, and whose `action.tsx` holds its JavaScript parts.
  *
  * @package WordPress
  */
@@ -30,6 +30,8 @@
  * - `restore`, `reset-post`, `delete-post`, `move-to-trash`, and
  *   `permanently-delete`, for every post type: each one checks which posts
  *   it applies to.
+ * - `set-as-homepage` and `set-as-posts-page`, for pages, when the user can
+ *   manage the site settings.
  *
  * The actions are registered in that order, which is the order they are
  * shown in, each with the script module of its folder. The registry is built
@@ -43,10 +45,11 @@
  * @since 7.2.0
  */
 function register_core_entity_actions() {
-	$is_gutenberg   = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
-	$is_block_theme = wp_is_block_theme();
-	$design_types   = array( 'wp_block', 'wp_template', 'wp_template_part' );
-	$definitions    = array();
+	$is_gutenberg       = defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN;
+	$is_block_theme     = wp_is_block_theme();
+	$can_manage_options = current_user_can( 'manage_options' );
+	$design_types       = array( 'wp_block', 'wp_template', 'wp_template_part' );
+	$definitions        = array();
 
 	// Each file is required in its own variable scope.
 	$require = static function ( $file ) {
@@ -73,6 +76,8 @@ function register_core_entity_actions() {
 			'post_type_supports/delete-post'           => true,
 			'post_type_supports/move-to-trash'         => true,
 			'post_type_supports/permanently-delete'    => true,
+			'page/set-as-homepage'                     => 'page' === $name && $can_manage_options,
+			'page/set-as-posts-page'                   => 'page' === $name && $can_manage_options,
 		);
 
 		foreach ( array_keys( array_filter( $applies ) ) as $key ) {
