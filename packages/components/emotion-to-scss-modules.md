@@ -80,6 +80,8 @@ Use the smallest selector change that preserves the required winner. Do not put 
 Earlier migration stages used `useCx` to combine component and consumer classes. That hook has been removed, and the context system now composes class names with `clsx`. Consumers that still author Emotion styles must combine source-order-dependent fragments in one `css()` call before passing the resulting class name to a component:
 
 ```js
+import { css } from '@emotion/css';
+
 const className = css( baseStyles, condition && overrideStyles );
 ```
 
@@ -91,7 +93,7 @@ Test mixed Emotion/Module composition in both the root and iframe documents when
 
 Reuse existing tests and stories first. Add or extend a test only for a concrete migration risk that existing coverage does not protect. Choose the smallest check that observes the behavior and would fail if it regressed. A behavior-preserving migration may need no new tests. When automated tests cannot observe the real styling path, document a focused before/after browser check instead of adding a test that cannot detect the regression.
 
-[`StyleProvider`](/packages/components/src/style-provider/index.tsx) registers a document with `@wordpress/style-runtime`. Keep this registration path for CSS Module delivery, including its `useInsertionEffect` timing and cleanup. The provider no longer supplies an Emotion cache. External Emotion consumers must manage their own `CacheProvider` when styles need to target another document.
+[`StyleProvider`](/packages/components/src/style-provider/index.tsx) registers a document with `@wordpress/style-runtime`. Keep this registration path for CSS Module delivery, including its `useInsertionEffect` timing and cleanup. The provider no longer supplies an Emotion cache. Consumers using `@emotion/react` or `@emotion/styled` in another document must provide their own `CacheProvider` with a cache whose `container` is that document's `<head>`. Consumers using `@emotion/css` must create an instance with `@emotion/css/create-instance`, set its `container` to that document's `<head>`, and use the instance's styling functions. See [Emotion's package summary](https://emotion.sh/docs/package-summary) and [custom-instance guidance](https://emotion.sh/docs/@emotion/css#custom-instances).
 
 For SlotFill or portals, use an attached iframe with a real `contentDocument` and `defaultView`. Assert a computed style in the destination document. A class on the element or a style tag in the parent document does not prove delivery. [#80384](https://github.com/WordPress/gutenberg/pull/80384) pairs a registration test with a Storybook example that renders migrated Spacer styles in an iframe.
 
