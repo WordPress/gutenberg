@@ -21,6 +21,10 @@
 
 -   `__unstableGeneratePreviewStateStyles` accepts an element name, such as `link`, as well as a block name ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
 
+### Internal
+
+-   Type the `spacing.spacingSizes` and `border.radiusSizes` settings ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+
 ## 1.24.0 (2026-10-07)
 
 ### New Features
