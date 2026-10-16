@@ -8,14 +8,19 @@ import { store as blocksStore, switchToBlockType } from '@wordpress/blocks';
 import warning from '@wordpress/warning';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type {
+	BlockShortcutProps,
+	BlockShortcutsRegisterProps,
+	DeclaredBlockShortcut,
+} from './types';
 
 /**
  * Returns every keyboard shortcut declared by a registered block type, through
  * either a block variation or a block transform.
  *
- * @return {Array} Declared shortcuts, each paired with the block change it makes.
+ * @return Declared shortcuts, each paired with the block change it makes.
  */
-function useDeclaredBlockShortcuts() {
+function useDeclaredBlockShortcuts(): DeclaredBlockShortcut[] {
 	return useSelect(
 		( select ) =>
 			unlock( select( blocksStore ) ).getBlockKeyboardShortcuts(),
@@ -31,7 +36,7 @@ function useDeclaredBlockShortcuts() {
  * that resolves to the block's current state is still handled, so that the key
  * combination is swallowed rather than typed into the block.
  *
- * @return {Function} Callback receiving a declared shortcut.
+ * @return Callback receiving a declared shortcut.
  */
 function useApplyBlockShortcut() {
 	const {
@@ -47,7 +52,11 @@ function useApplyBlockShortcut() {
 		useDispatch( blockEditorStore );
 
 	return useCallback(
-		( { targetBlockName, blockNames, variationName } ) => {
+		( {
+			targetBlockName,
+			blockNames,
+			variationName,
+		}: DeclaredBlockShortcut ) => {
 			const clientId = getSelectedBlockClientId();
 			if ( ! clientId ) {
 				return false;
@@ -60,7 +69,8 @@ function useApplyBlockShortcut() {
 			}
 
 			const blockName = getBlockName( clientId );
-			if ( ! blockNames.includes( blockName ) ) {
+			// The selected block exists.
+			if ( ! blockNames.includes( blockName! ) ) {
 				return false;
 			}
 
@@ -79,7 +89,8 @@ function useApplyBlockShortcut() {
 				}
 				const activeVariation = getActiveBlockVariation(
 					targetBlockName,
-					getBlockAttributes( clientId )
+					// The selected block exists.
+					getBlockAttributes( clientId )!
 				);
 				if ( activeVariation?.name !== variationName ) {
 					updateBlockAttributes( clientId, variation.attributes );
@@ -138,7 +149,7 @@ function useApplyBlockShortcut() {
 	);
 }
 
-function BlockShortcut( { entry, apply } ) {
+function BlockShortcut( { entry, apply }: BlockShortcutProps ) {
 	useShortcut( entry.name, ( event ) => {
 		// Another handler already acted on this event: either a shortcut
 		// claiming the same key combination, or this same shortcut mounted
@@ -155,7 +166,7 @@ function BlockShortcut( { entry, apply } ) {
 	return null;
 }
 
-function BlockShortcutsRegister( { shortcuts } ) {
+function BlockShortcutsRegister( { shortcuts }: BlockShortcutsRegisterProps ) {
 	const { registerShortcut, unregisterShortcut } = useDispatch(
 		keyboardShortcutsStore
 	);
@@ -164,11 +175,11 @@ function BlockShortcutsRegister( { shortcuts } ) {
 	// removed. Registration deliberately outlives this component: providers can
 	// be nested, and unmounting one of them must not take the shortcuts away
 	// from the others.
-	const registeredRef = useRef( new Map() );
+	const registeredRef = useRef( new Map< string, string >() );
 
 	useEffect( () => {
-		const registered = new Map();
-		const combinations = new Map();
+		const registered = new Map< string, string >();
+		const combinations = new Map< string, string >();
 
 		for ( const shortcut of shortcuts ) {
 			const config = {
@@ -233,7 +244,7 @@ function BlockShortcutsRegister( { shortcuts } ) {
  * Registers and handles the keyboard shortcuts that blocks declare on their
  * variations and transforms, applying them to the selected block.
  *
- * @return {Element} Element.
+ * @return Element.
  */
 export default function BlockKeyboardShortcuts() {
 	const shortcuts = useDeclaredBlockShortcuts();
