@@ -5,7 +5,7 @@ import { useRegistry } from '@wordpress/data';
 import { closeSmall, chevronDown } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Checkbox and Menu, pending WordPress/gutenberg#76135.
-import { Checkbox, Menu, Stack } from '@wordpress/ui';
+import { Checkbox, Field, Menu, Stack } from '@wordpress/ui';
 import DataViewsContext from '../dataviews-context';
 import { ActionModal } from '../dataviews-item-actions';
 import type { Action, ActionModal as ActionModalType } from '../../types';
@@ -250,15 +250,24 @@ function renderBulkActionsContent< Item >(
 			align="center"
 			justify="start"
 		>
-			<BulkSelectionCheckbox
-				checkboxRef={ selectionCheckboxRef }
-				selection={ selection }
-				onChangeSelection={ onChangeSelection }
-				data={ data }
-				actions={ actions }
-				getItemId={ getItemId }
-				disableSelectAll={ isInfiniteScroll }
-			/>
+			<Field.Root
+				render={ <Stack direction="row" gap="sm" align="center" /> }
+			>
+				<BulkSelectionCheckbox
+					checkboxRef={ selectionCheckboxRef }
+					selection={ selection }
+					onChangeSelection={ onChangeSelection }
+					data={ data }
+					actions={ actions }
+					getItemId={ getItemId }
+					disableSelectAll={ isInfiniteScroll }
+				/>
+				{ ! selection.length && ! isInfiniteScroll && (
+					<Field.Label variant="plain">
+						{ __( 'Select all' ) }
+					</Field.Label>
+				) }
+			</Field.Root>
 			{ !! selection.length && (
 				<span className="dataviews-bulk-actions-footer__item-count">
 					{ getFooterMessage(

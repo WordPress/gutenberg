@@ -205,13 +205,15 @@ describe( 'DataViews component', () => {
 			</DataViewWrapper>
 		);
 		const user = userEvent.setup();
-		await user.click(
-			screen.getAllByRole( 'checkbox', { name: 'Select all' } ).at( -1 )!
-		);
+		expect( screen.getByText( 'Select all' ) ).toBeVisible();
+		await user.click( screen.getByText( 'Select all' ) );
+		expect( screen.queryByText( 'Select all' ) ).not.toBeInTheDocument();
 		expect( screen.getByText( '3 items selected' ) ).toBeInTheDocument();
 		expect(
 			screen.getByRole( 'button', { name: 'Delete' } )
 		).toBeInTheDocument();
+		await user.click( screen.getByRole( 'button', { name: 'Cancel' } ) );
+		expect( screen.getByText( 'Select all' ) ).toBeVisible();
 	} );
 
 	it.each( [ LAYOUT_TABLE, LAYOUT_GRID ] as const )(
