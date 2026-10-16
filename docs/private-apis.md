@@ -217,6 +217,8 @@ Private exports:
 - `CreatePatternModal`
 - `CreatePatternModalContents`
 - `DuplicatePatternModal`
+- `CreateTemplatePartModal`
+- `CreateTemplatePartModalContents`
 - `isOverridableBlock`
 - `useDuplicatePatternProps`
 - `RenamePatternModal`
@@ -264,7 +266,6 @@ Private exports:
 ## editor
 
 Private exports:
-- `CreateTemplatePartModal`
 - `BackButton`
 - `Editor`
 - `PluginPostExcerpt`

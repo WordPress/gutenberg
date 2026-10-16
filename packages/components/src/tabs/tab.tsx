@@ -2,10 +2,8 @@ import clsx from 'clsx';
 import { Tab as AriakitTab } from '@ariakit/react';
 import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
-import { chevronRight } from '@wordpress/icons';
 import type { TabProps } from './types';
 import { useTabsContext } from './context';
-import Icon from '../icon';
 import styles from './style.module.scss';
 import type { WordPressComponentProps } from '../context';
 
@@ -36,7 +34,6 @@ export const Tab = forwardRef<
 			className={ clsx( styles.tab, className ) }
 		>
 			<span className={ styles[ 'tab-children' ] }>{ children }</span>
-			<Icon className={ styles[ 'tab-chevron' ] } icon={ chevronRight } />
 		</AriakitTab>
 	);
 } );
