@@ -15075,11 +15075,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/utils/get-item-title.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/utils/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
