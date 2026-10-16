@@ -7,6 +7,7 @@ import type {
 } from '@wordpress/blocks';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockEditorThunkArgs } from '../store/types';
+import type { Bindings } from '../utils/block-bindings';
 
 /**
  * The viewport and pseudo state whose styles a block's controls edit.
@@ -330,4 +331,12 @@ export interface UseBlockColorContrastWarningOptions {
 	checkTextColor?: boolean;
 	checkLinkColor?: boolean;
 	messageOverride?: string;
+}
+
+/**
+ * Props of the block bindings panel.
+ */
+export interface BlockBindingsPanelProps {
+	name: string;
+	metadata?: { bindings?: Bindings };
 }
