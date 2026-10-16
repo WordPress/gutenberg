@@ -731,7 +731,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		);
 
 		if ( 'horizontal' === $layout_orientation ) {
-			$justify_content_options    += array( 'space-between' => 'space-between' );
+			$justify_content_options    += array(
+				'space-between' => 'space-between',
+				'space-around'  => 'space-around',
+				'space-evenly'  => 'space-evenly',
+			);
 			$vertical_alignment_options += array( 'stretch' => 'stretch' );
 		} else {
 			$justify_content_options    += array( 'stretch' => 'stretch' );

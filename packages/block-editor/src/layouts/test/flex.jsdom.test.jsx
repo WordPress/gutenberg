@@ -87,9 +87,84 @@ describe( 'getLayoutStyle', () => {
 } );
 
 describe( 'FlexLayoutInspectorControls', () => {
+	it( 'should describe each justification option', async () => {
+		const user = userEvent.setup();
+		renderInspectorControls();
+
+		await user.click(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		);
+
+		for ( const description of [
+			'Space after the items.',
+			'Space on both sides.',
+			'Space before the items.',
+			'No space at the edges.',
+			'Half space at the edges.',
+			'Equal space at the edges.',
+		] ) {
+			expect( await screen.findByText( description ) ).toBeVisible();
+		}
+	} );
+
+	it( 'should update the justification from the select control', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		renderInspectorControls( { onChange } );
+
+		await user.click(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		);
+		await user.click(
+			await screen.findByRole( 'option', { name: 'Space around' } )
+		);
+
+		expect( onChange ).toHaveBeenCalledWith( {
+			justifyContent: 'space-around',
+		} );
+	} );
+
+	it( 'should not crash when the selected justification becomes unavailable', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		const renderControls = ( layout ) => (
+			<ToolsPanel
+				label="Layout"
+				resetAll={ vi.fn() }
+				panelId={ PANEL_ID }
+			>
+				<FlexLayoutInspectorControls
+					clientId={ PANEL_ID }
+					layout={ layout }
+					onChange={ onChange }
+				/>
+			</ToolsPanel>
+		);
+		const { rerender } = render(
+			renderControls( { orientation: 'vertical' } )
+		);
+
+		await user.click(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		);
+		await user.click(
+			await screen.findByRole( 'option', { name: /Stretch items/ } )
+		);
+		expect( onChange ).toHaveBeenLastCalledWith( {
+			orientation: 'vertical',
+			justifyContent: 'stretch',
+		} );
+
+		rerender( renderControls( { justifyContent: 'stretch' } ) );
+
+		expect(
+			await screen.findByRole( 'combobox', { name: 'Justification' } )
+		).toHaveTextContent( 'Left' );
+	} );
+
 	it( 'should not render the wrap toggle by default', async () => {
 		renderInspectorControls();
-		await screen.findByRole( 'radio', { name: 'Justify items left' } );
+		await screen.findByRole( 'combobox', { name: 'Justification' } );
 
 		expect(
 			screen.queryByRole( 'checkbox', {
