@@ -18,7 +18,7 @@
 		{ "path": "../../packages/element/tsconfig.build.json" },
 		{ "path": "../../packages/global-styles-ui" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
-		{ "path": "../../packages/private-apis" }
+		{ "path": "../../packages/private-apis/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]

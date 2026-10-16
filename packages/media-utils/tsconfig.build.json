@@ -20,7 +20,7 @@
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../media-fields/tsconfig.build.json" },
 		{ "path": "../notices/tsconfig.build.json" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../views/tsconfig.build.json" }
 	]

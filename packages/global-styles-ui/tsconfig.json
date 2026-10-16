@@ -21,7 +21,7 @@
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../kebab-case/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" }
 	],
 	"exclude": [
