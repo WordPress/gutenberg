@@ -21,7 +21,7 @@ export default function FontFamilyControl( {
 		fontFamilies = blockLevelFontFamilies;
 	}
 
-	if ( ! fontFamilies || fontFamilies.length === 0 ) {
+	if ( ! fontFamilies || fontFamilies.length <= 1 ) {
 		return null;
 	}
 
