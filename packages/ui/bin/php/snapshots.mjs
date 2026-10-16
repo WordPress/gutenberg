@@ -1,6 +1,6 @@
 /**
- * Turning rendered HTML into snapshots PHP fills in, and into the reviewable
- * `snapshot.html` files.
+ * The placeholders in rendered HTML, the attributes PHP doesn't need, and the
+ * reviewable `snapshot.html` files.
  */
 export const SLOT_PATTERN = /__wpuislot_([a-z0-9_]+)__/;
 
@@ -17,47 +17,6 @@ export function stripRuntimeAttributes( html, css ) {
 		/ (data-base-ui-[a-z-]+)(="[^"]*")?/g,
 		( match, name ) => ( css.includes( name ) ? match : '' )
 	);
-}
-
-/**
- * Splits rendered HTML into a snapshot: literal HTML, and the parts PHP fills
- * in at render time.
- *
- *   - `[ 'slot', prop, 'text' ]`             A slot prop in text, escaped as HTML.
- *   - `[ 'slot', prop, 'attribute', name ]`  A slot prop in an attribute, escaped for it.
- *
- * @param {string} html Rendered HTML.
- * @return {Array} Snapshot parts.
- */
-export function toSnapshot( html ) {
-	const pattern = new RegExp( SLOT_PATTERN.source, 'g' );
-	const parts = [];
-	let offset = 0;
-
-	for ( const match of html.matchAll( pattern ) ) {
-		if ( match.index > offset ) {
-			parts.push( html.slice( offset, match.index ) );
-		}
-		offset = match.index + match[ 0 ].length;
-
-		const before = html.slice( 0, match.index );
-		const inTag = before.lastIndexOf( '<' ) > before.lastIndexOf( '>' );
-
-		// In an attribute, record which one, so PHP can escape URLs as URLs.
-		const attribute = inTag
-			? before.match( /([^\s=<]+)="[^"]*$/ )?.[ 1 ]
-			: null;
-		parts.push(
-			attribute
-				? [ 'slot', match[ 1 ], 'attribute', attribute ]
-				: [ 'slot', match[ 1 ], 'text' ]
-		);
-	}
-	if ( offset < html.length ) {
-		parts.push( html.slice( offset ) );
-	}
-
-	return parts;
 }
 
 /**
