@@ -1,10 +1,4 @@
-/**
- * Tests for spacing utility functions
- */
-
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { getSpacingSizeValue } from '../utils/spacing';
 
 describe( 'spacing utils', () => {
@@ -134,7 +128,6 @@ describe( 'spacing utils', () => {
 		];
 
 		testCases.forEach( ( { message, preset, settings, expected } ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( message, () => {
 				expect( getSpacingSizeValue( preset, settings || {} ) ).toEqual(
 					expected
