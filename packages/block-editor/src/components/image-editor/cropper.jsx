@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Spinner } from '@wordpress/components';
+import { Spinner as WCSpinner } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
 import { ImageCropper as ImageCropperComponent } from '@wordpress/image-cropper';
 import { useImageEditingContext } from './context';
@@ -38,7 +38,7 @@ export default function ImageCropper( {
 			} }
 		>
 			<ImageCropperComponent src={ editedUrl || url } />
-			{ isInProgress && <Spinner /> }
+			{ isInProgress && <WCSpinner /> }
 		</div>
 	);
 

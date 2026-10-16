@@ -212,7 +212,7 @@ test.describe( 'Post Meta source', () => {
 				await page.getByLabel( 'Attributes options' ).click();
 				await page
 					.getByRole( 'menuitemcheckbox', {
-						name: 'Show content',
+						name: 'content, show',
 					} )
 					.click();
 				await page
@@ -721,7 +721,7 @@ test.describe( 'Post Meta source', () => {
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
-					name: 'Show content',
+					name: 'content, show',
 				} )
 				.click();
 			await page
@@ -750,7 +750,7 @@ test.describe( 'Post Meta source', () => {
 			await page.getByLabel( 'Attributes options' ).click();
 			await page
 				.getByRole( 'menuitemcheckbox', {
-					name: 'Show content',
+					name: 'content, show',
 				} )
 				.click();
 			await page

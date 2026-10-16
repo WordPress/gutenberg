@@ -47,6 +47,9 @@
 		"dequal": "^2.0.3",
 		"react-easy-crop": "^5.4.2"
 	},
+	"devDependencies": {
+		"@wordpress/ui": "file:../ui"
+	},
 	"peerDependencies": {
 		"@types/react": "^18 || ^19",
 		"react": "^18 || ^19",

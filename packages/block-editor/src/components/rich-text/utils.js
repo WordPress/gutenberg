@@ -1,3 +1,5 @@
+import { RichTextData, create } from '@wordpress/rich-text';
+
 export function addActiveFormats( value, activeFormats ) {
 	if ( activeFormats?.length ) {
 		let index = value.formats.length;
@@ -39,3 +41,21 @@ export function getAllowedFormats( { allowedFormats, disableFormats } ) {
 }
 
 getAllowedFormats.EMPTY_ARRAY = [];
+
+/**
+ * The formats, replacements and text of a rich text attribute value, which is
+ * rich text data or an HTML string. Spreading rich text data would lose them:
+ * they are getters.
+ *
+ * @param {unknown} value Attribute value.
+ *
+ * @return {import('@wordpress/rich-text').RichTextValue} Rich text value
+ *                                                       without a selection.
+ */
+export function toRecord( value ) {
+	if ( value instanceof RichTextData ) {
+		const { formats, replacements, text } = value;
+		return { formats, replacements, text };
+	}
+	return create( { html: value ? String( value ) : '' } );
+}
