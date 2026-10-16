@@ -276,4 +276,46 @@
 		}
 
 	}
+
+	@layer compositions {
+		.popup:has(input[role="combobox"]) .item {
+			--_gcd-div-outline: none;
+
+			/* Inset the paint without moving content or shrinking the hit area. */
+			position: relative;
+			isolation: isolate;
+			background-color: transparent;
+
+			&::before {
+				content: "";
+				position: absolute;
+				inset-block: 0;
+				inset-inline: var(--wpds-dimension-padding-xs);
+				z-index: -1;
+				border-radius: inherit;
+				pointer-events: none;
+			}
+
+			&[data-highlighted]:not([aria-disabled="true"])::before {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+
+				@media ( forced-colors: active ) {
+					background-color: Highlight;
+				}
+			}
+
+			&[aria-disabled="true"]::before {
+				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
+			}
+
+			&[data-highlighted][data-keyboard-highlight]::before {
+				outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
+				outline-offset: 0;
+
+				@media ( forced-colors: active ) {
+					outline-color: Highlight;
+				}
+			}
+		}
+	}
 }
