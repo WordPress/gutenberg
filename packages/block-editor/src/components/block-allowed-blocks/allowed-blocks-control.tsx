@@ -5,16 +5,20 @@ import { useSelect } from '@wordpress/data';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import BlockAllowedBlocksModal from './modal';
 import { store as blockEditorStore } from '../../store';
+import type { BlockAllowedBlocksControlProps } from './types';
 
-export default function BlockAllowedBlocksControl( { clientId } ) {
+export default function BlockAllowedBlocksControl( {
+	clientId,
+}: BlockAllowedBlocksControlProps ) {
 	const [ isBlockControlOpened, setIsBlockControlOpened ] = useState( false );
 	const { blockTypes, selectedBlockNames } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
 			return {
 				blockTypes: select( blocksStore ).getBlockTypes(),
-				selectedBlockNames:
-					getBlockAttributes( clientId )?.allowedBlocks,
+				// The attribute holds block names.
+				selectedBlockNames: getBlockAttributes( clientId )
+					?.allowedBlocks as string[] | undefined,
 			};
 		},
 		[ clientId ]
