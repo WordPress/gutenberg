@@ -1,10 +1,11 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Button, ToggleControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
 import URLPopover from '../';
 
-const meta = {
+const meta: Meta< typeof URLPopover > = {
 	id: 'blockeditor-urlpopover',
 	title: 'Editor/Block Editor/URLPopover',
 	component: URLPopover,
@@ -87,7 +88,9 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onClose, ...args } ) {
 		const [ isVisible, setIsVisible ] = useState( true );
 		const [ url, setUrl ] = useState( '' );
@@ -108,7 +111,8 @@ export const Default = {
 					<URLPopover
 						{ ...args }
 						onClose={ ( ...closeArgs ) => {
-							onClose( ...closeArgs );
+							// The `onClose` action is always set.
+							onClose!( ...closeArgs );
 							closePopover();
 						} }
 						renderSettings={ () => (
