@@ -1,6 +1,6 @@
 /**
  * Script module of the `attachment` collection:
- * `@wordpress/core-fields/attachment`.
+ * `@wordpress/entity-fields/attachment`.
  *
  * The data of each field is in its `field.php`, and `index.php` registers the
  * fields for attachments; the client reads them from the `wp/v2/entity-fields`

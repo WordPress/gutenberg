@@ -91,11 +91,27 @@ const REQUIRED_BUILD_EXCLUDES = existsSync( baseConfigPath )
 			.filter( ( pattern ) => /test|stories|story/.test( pattern ) )
 	: [];
 
-const packagesWithTypes = globSync( 'packages/*/tsconfig.json', {
-	cwd: repoRoot,
-} )
-	.sort()
-	.map( ( tsconfigPath ) => basename( dirname( tsconfigPath ) ) );
+/*
+ * The packages: the `packages/*` workspaces and the script module workspaces
+ * outside `packages/`, keyed by folder name, which is also their name in the
+ * `@wordpress` scope.
+ */
+const PACKAGE_DIRS = [ 'packages/*', 'entity-fields' ];
+
+/** @type {Map<string, string>} Package name → absolute package directory. */
+const packageDirs = new Map(
+	globSync(
+		PACKAGE_DIRS.map( ( dir ) => `${ dir }/tsconfig.json` ),
+		{ cwd: repoRoot, posix: true }
+	)
+		.sort()
+		.map( ( tsconfigPath ) => [
+			basename( dirname( tsconfigPath ) ),
+			resolve( repoRoot, dirname( tsconfigPath ) ),
+		] )
+);
+
+const packagesWithTypes = [ ...packageDirs.keys() ];
 
 /**
  * Whether a project extends the shared dev configuration, which packages use
@@ -119,7 +135,7 @@ function isDevProject( tsconfigPath ) {
  * @return {{srcProject: string|undefined, devProject: string|undefined, storiesProject: string|undefined}} Absolute paths.
  */
 function packageProjects( packageName ) {
-	const packageDir = resolve( repoRoot, 'packages', packageName );
+	const packageDir = packageDirs.get( packageName );
 	const buildProject = join( packageDir, 'tsconfig.build.json' );
 	const defaultProject = join( packageDir, 'tsconfig.json' );
 	const storiesConfig = join( packageDir, 'tsconfig.stories.json' );
@@ -164,7 +180,7 @@ function packageProjects( packageName ) {
  * @return {Set<string>} Absolute paths of the referenced projects.
  */
 function srcProjectReferences( srcProject, packageName ) {
-	const packageDir = resolve( repoRoot, 'packages', packageName );
+	const packageDir = packageDirs.get( packageName );
 	const collected = new Set();
 	const pending = [ srcProject ];
 
@@ -193,11 +209,11 @@ function srcProjectReferences( srcProject, packageName ) {
 function hasDevFiles( packageName ) {
 	return (
 		globSync( '**/{test,tests,__tests__,stories}/**/*.{ts,tsx,mts,cts}', {
-			cwd: resolve( repoRoot, 'packages', packageName ),
+			cwd: packageDirs.get( packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0 ||
 		globSync( '**/*.story.{ts,tsx,mts,cts}', {
-			cwd: resolve( repoRoot, 'packages', packageName ),
+			cwd: packageDirs.get( packageName ),
 			ignore: [ 'node_modules/**', 'build/**', 'build-*/**' ],
 		} ).length > 0
 	);
@@ -209,7 +225,10 @@ for ( const packageName of packagesWithTypes ) {
 
 	if ( ! devProject && hasDevFiles( packageName ) ) {
 		reportError(
-			`Missing dev project for the TypeScript test or story files of packages/${ packageName }`
+			`Missing dev project for the TypeScript test or story files of ${ relative(
+				repoRoot,
+				packageDirs.get( packageName )
+			) }`
 		);
 	}
 
@@ -289,7 +308,7 @@ for ( const packageName of packagesWithTypes ) {
 	try {
 		packageJson = JSON.parse(
 			readFileSync(
-				resolve( repoRoot, `packages/${ packageName }/package.json` ),
+				join( packageDirs.get( packageName ), 'package.json' ),
 				'utf8'
 			)
 		);
@@ -330,7 +349,7 @@ for ( const packageName of packagesWithTypes ) {
 				if ( ! references.has( dependencyProject ) ) {
 					reportError(
 						`Missing reference to "${ relative(
-							resolve( repoRoot, 'packages', packageName ),
+							packageDirs.get( packageName ),
 							dependencyProject
 						) }" in ${ relative( repoRoot, dependingProject ) }`
 					);
@@ -341,7 +360,7 @@ for ( const packageName of packagesWithTypes ) {
 				) {
 					reportError(
 						`Missing reference to "${ relative(
-							resolve( repoRoot, 'packages', packageName ),
+							packageDirs.get( packageName ),
 							dependencyProject
 						) }" in ${ relative( repoRoot, storiesProject ) }`
 					);
@@ -457,7 +476,10 @@ for ( const entryName of entriesWithTypes ) {
  * by a declared dependency, or removed dependencies leave stale references.
  */
 const workspaceProjects = globSync(
-	'{packages,routes,widgets}/*/tsconfig*.json',
+	[
+		...PACKAGE_DIRS.map( ( dir ) => `${ dir }/tsconfig*.json` ),
+		'{routes,widgets}/*/tsconfig*.json',
+	],
 	{
 		cwd: repoRoot,
 		posix: true,

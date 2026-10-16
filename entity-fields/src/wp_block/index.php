@@ -12,5 +12,5 @@ return array(
 	'origin' => 'core',
 	'kind'   => 'postType',
 	'name'   => 'wp_block',
-	'module' => '@wordpress/core-fields/wp_block',
+	'module' => '@wordpress/entity-fields/wp_block',
 );

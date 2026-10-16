@@ -6,7 +6,7 @@ module.exports = {
 	],
 	'*.{css,pcss,scss}': [ 'npm run lint:css' ],
 	'package-lock.json': [ 'npm run lint:lockfile' ],
-	'packages/*/package.json': [ 'wp-scripts lint-pkg-json' ],
+	'{packages/*,entity-fields}/package.json': [ 'wp-scripts lint-pkg-json' ],
 	'{docs/toc.json,tools/docs/*.cjs,packages/{*/README.md,components/src/*/**/README.md,block-library/src/*/README.md}}':
 		[ 'npm run docs:gen' ],
 	'packages/**/*.{cjs,cts,js,jsx,mjs,mts,ts,tsx,json}': [

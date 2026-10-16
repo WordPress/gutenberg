@@ -1,4 +1,4 @@
-# Core Fields
+# Entity fields
 
 The fields WordPress core registers on the server for the Entity fields API: their PHP declarations and their JavaScript parts, side by side.
 
@@ -50,7 +50,7 @@ And each folder of fields may have:
 - `template`, for every post type but the design ones.
 - `title`, for the post types supporting `title`.
 
-It reads their definitions with `wp_get_entity_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/core-fields/post_type_supports` module.
+It reads their definitions with `wp_get_entity_field_collection_fields()` and decides in code which post type gets which field, so a field ported later can depend on anything PHP can check: a theme support, a property of the post type, a combination of supports. Every field is registered with the `@wordpress/entity-fields/post_type_supports` module.
 
 It makes no exception for any post type. A post type whose fields differ from the defaults unregisters the ones it does not get, once they are registered. Core does it like a plugin would, in `wp_register_core_field_collections()` in `src/index.php`, after the defaults are registered and before the collection of the post type is:
 
@@ -68,7 +68,7 @@ The array the `index.php` of a collection returns has these keys:
 - `origin` (required): who registers the fields, `'core'` for every collection of this package. It becomes the `origin.registeredBy` of each field.
 - `kind` (required): the entity kind, e.g. `'postType'`.
 - `name` (required): the entity name, e.g. `'wp_template'`.
-- `module` (optional): the id of the script module of the collection, written out (`'@wordpress/core-fields/<collection>'`). Every field of the collection is registered with it, including the fields without JavaScript parts.
+- `module` (optional): the id of the script module of the collection, written out (`'@wordpress/entity-fields/<collection>'`). Every field of the collection is registered with it, including the fields without JavaScript parts.
 
 An invalid configuration is reported with `_doing_it_wrong()` and skipped. For example, `wp_template/index.php`:
 
@@ -77,7 +77,7 @@ return array(
 	'origin' => 'core',
 	'kind'   => 'postType',
 	'name'   => 'wp_template',
-	'module' => '@wordpress/core-fields/wp_template',
+	'module' => '@wordpress/entity-fields/wp_template',
 );
 ```
 
@@ -102,13 +102,13 @@ add_action(
 );
 ```
 
-The source PHP is written as it is in WordPress core. The Gutenberg build copies the PHP files to `build/scripts/core-fields`, which `lib/load.php` loads, and prefixes the functions defined in them with `gutenberg_`; the `index.php` and `field.php` files of the collections come out as they are. The functions of the Entity fields API keep their names: the plugin defines them when WordPress does not. The build only prefixes the calls to a function in the file that defines it, which is why the functions of this package all live in `src/index.php`. A new collection needs its folder, an entry in `src/index.php` and, if it has JavaScript parts, an entry in `wpScriptModuleExports`.
+The source PHP is written as it is in WordPress core. The Gutenberg build copies the PHP files to `build/scripts/entity-fields`, which `lib/load.php` loads, and prefixes the functions defined in them with `gutenberg_`; the `index.php` and `field.php` files of the collections come out as they are. The functions of the Entity fields API keep their names: the plugin defines them when WordPress does not. The build only prefixes the calls to a function in the file that defines it, which is why the functions of this package all live in `src/index.php`. A new collection needs its folder, an entry in `src/index.php` and, if it has JavaScript parts, an entry in `wpScriptModuleExports`.
 
 The client never imports this package directly. The editor will import the script module of a collection on demand, when the `/wp/v2/entity-fields` route lists it for an entity, and merge each entry into the field with the same id among the fields registered with that module; that loading comes in a later change. That is why each collection with JavaScript parts has a module of its own: `post_type_supports` and `wp_template` both have an `author` field.
 
 ## Usage
 
-The package provides the `@wordpress/core-fields/attachment`, `@wordpress/core-fields/page`, `@wordpress/core-fields/post_type_supports`, `@wordpress/core-fields/wp_template`, `@wordpress/core-fields/wp_template_part`, `@wordpress/core-fields/wp_block`, and `@wordpress/core-fields/root_site` script modules. Their default export follows the `FieldsScriptParts` shape defined in [`src/types.ts`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-fields/src/types.ts), the same one a plugin's own field module follows.
+The package provides the `@wordpress/entity-fields/attachment`, `@wordpress/entity-fields/page`, `@wordpress/entity-fields/post_type_supports`, `@wordpress/entity-fields/wp_template`, `@wordpress/entity-fields/wp_template_part`, `@wordpress/entity-fields/wp_block`, and `@wordpress/entity-fields/root_site` script modules. Their default export follows the `FieldsScriptParts` shape defined in [`src/types.ts`](https://github.com/WordPress/gutenberg/tree/HEAD/entity-fields/src/types.ts), the same one a plugin's own field module follows.
 
 ## Contributing to this package
 

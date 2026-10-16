@@ -91,6 +91,8 @@ jobs:
                   name: build-output
                   path: |
                       build
+                      entity-fields/build-module
+                      entity-fields/build-types
                       packages/*/build
                       packages/*/build-module
                       packages/*/build-style

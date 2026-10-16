@@ -127,7 +127,7 @@
 '[Package] Fields':
     - changed-files:
           - any-glob-to-any-file: 'packages/fields/**'
-          - any-glob-to-any-file: 'packages/core-fields/**'
+          - any-glob-to-any-file: 'entity-fields/**'
           - any-glob-to-any-file: 'packages/core-actions/**'
 
 '[Package] Format library':

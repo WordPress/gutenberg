@@ -14,6 +14,7 @@ on:
             - 'phpunit/**'
             - '!phpunit/experimental/**'
             - '!phpunit/blocks/**'
+            - 'entity-fields/**/*.php'
             - 'packages/**/*.php'
             - '!packages/block-library/**'
             - '!packages/block-serialization-default-parser/**'

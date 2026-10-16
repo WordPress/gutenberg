@@ -1,6 +1,6 @@
 /**
  * Script module of the `post_type_supports` collection:
- * `@wordpress/core-fields/post_type_supports`.
+ * `@wordpress/entity-fields/post_type_supports`.
  *
  * The data of each field (id, type, label, filter operators…) is in its
  * `field.php`, and wp_register_core_post_type_supports_fields() in `src/index.php`

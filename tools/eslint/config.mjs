@@ -100,8 +100,15 @@ const developmentFiles = [
 	'packages/theme/terrazzo.config.ts',
 ];
 
+// The package.json files of the packages: the `packages/*` workspaces and the
+// script module workspaces outside `packages/`.
+const packageJsonFiles = [
+	'packages/*/package.json',
+	'entity-fields/package.json',
+];
+
 // All files from packages that have types provided with TypeScript.
-const typedFiles = globSync( 'packages/*/package.json', {
+const typedFiles = globSync( packageJsonFiles, {
 	cwd: rootDir,
 	posix: true,
 } )
@@ -112,7 +119,7 @@ const typedFiles = globSync( 'packages/*/package.json', {
 // All files from bundled packages: packages not registered as WordPress
 // scripts or script modules, which plugins therefore compile into their own
 // bundles when importing them via npm.
-const bundledPackageFiles = globSync( 'packages/*/package.json', {
+const bundledPackageFiles = globSync( packageJsonFiles, {
 	cwd: rootDir,
 	posix: true,
 } )
@@ -534,6 +541,7 @@ export default dedupePlugins( [
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`entity-fields/src/**/*.${ SCRIPT_EXT }`,
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,
 			`storybook/stories/**/*.${ SCRIPT_EXT }`,
@@ -548,6 +556,7 @@ export default dedupePlugins( [
 	{
 		files: [
 			`packages/*/src/**/*.${ SCRIPT_EXT }`,
+			`entity-fields/src/**/*.${ SCRIPT_EXT }`,
 			`routes/**/*.${ SCRIPT_EXT }`,
 			`widgets/**/*.${ SCRIPT_EXT }`,
 		],

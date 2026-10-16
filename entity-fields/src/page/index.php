@@ -15,5 +15,5 @@ return array(
 	'origin' => 'core',
 	'kind'   => 'postType',
 	'name'   => 'page',
-	'module' => '@wordpress/core-fields/page',
+	'module' => '@wordpress/entity-fields/page',
 );

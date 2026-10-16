@@ -85,7 +85,7 @@ function wp_register_core_post_type_supports_fields() {
 		// Keeps the alphabetical order of the folders.
 		$fields = array_values( array_intersect_key( $definitions, array_filter( $applies ) ) );
 		if ( $fields ) {
-			wp_register_entity_fields( 'core', 'postType', $post_type, $fields, '@wordpress/core-fields/post_type_supports' );
+			wp_register_entity_fields( 'core', 'postType', $post_type, $fields, '@wordpress/entity-fields/post_type_supports' );
 		}
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"name": "@wordpress/core-fields",
+	"name": "@wordpress/entity-fields",
 	"version": "0.1.0-prerelease",
 	"private": true,
 	"description": "The fields WordPress core registers on the server for the Entity fields API: their PHP declarations and their JavaScript parts.",
@@ -11,11 +11,11 @@
 		"fields",
 		"core"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/core-fields/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/entity-fields/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/core-fields"
+		"directory": "entity-fields"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -85,23 +85,23 @@
 		"src/**/*.module.css"
 	],
 	"dependencies": {
-		"@wordpress/components": "file:../components",
-		"@wordpress/compose": "file:../compose",
-		"@wordpress/core-data": "file:../core-data",
-		"@wordpress/data": "file:../data",
-		"@wordpress/dataviews": "file:../dataviews",
-		"@wordpress/date": "file:../date",
-		"@wordpress/element": "file:../element",
-		"@wordpress/html-entities": "file:../html-entities",
-		"@wordpress/i18n": "file:../i18n",
-		"@wordpress/icons": "file:../icons",
-		"@wordpress/media-utils": "file:../media-utils",
-		"@wordpress/notices": "file:../notices",
-		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/style-runtime": "file:../style-runtime",
-		"@wordpress/ui": "file:../ui",
-		"@wordpress/url": "file:../url",
-		"@wordpress/wordcount": "file:../wordcount",
+		"@wordpress/components": "file:../packages/components",
+		"@wordpress/compose": "file:../packages/compose",
+		"@wordpress/core-data": "file:../packages/core-data",
+		"@wordpress/data": "file:../packages/data",
+		"@wordpress/dataviews": "file:../packages/dataviews",
+		"@wordpress/date": "file:../packages/date",
+		"@wordpress/element": "file:../packages/element",
+		"@wordpress/html-entities": "file:../packages/html-entities",
+		"@wordpress/i18n": "file:../packages/i18n",
+		"@wordpress/icons": "file:../packages/icons",
+		"@wordpress/media-utils": "file:../packages/media-utils",
+		"@wordpress/notices": "file:../packages/notices",
+		"@wordpress/private-apis": "file:../packages/private-apis",
+		"@wordpress/style-runtime": "file:../packages/style-runtime",
+		"@wordpress/ui": "file:../packages/ui",
+		"@wordpress/url": "file:../packages/url",
+		"@wordpress/wordcount": "file:../packages/wordcount",
 		"clsx": "^2.1.1",
 		"remove-accents": "^0.5.0"
 	},

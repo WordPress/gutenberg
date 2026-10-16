@@ -45,6 +45,7 @@ runs:
               # The eval package is not a workspace: it installs its own large tree from its own lockfile.
               path: |
                   node_modules
+                  entity-fields/node_modules
                   packages/*/node_modules
                   routes/*/node_modules
                   storybook/node_modules

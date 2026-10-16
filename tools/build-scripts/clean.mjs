@@ -45,12 +45,12 @@ if ( values.types ) {
 		process.exit( status ?? 1 );
 	}
 
-	await remove( [ 'packages/*/build-types' ] );
+	await remove( [ '{packages/*,entity-fields}/build-types' ] );
 }
 
 if ( values.packages ) {
 	await remove( [
-		'packages/*/{build,build-module,build-wp,build-style}',
+		'{packages/*,entity-fields}/{build,build-module,build-wp,build-style}',
 		'build',
 	] );
 }

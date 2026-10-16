@@ -34,6 +34,10 @@
 		"scriptGlobal": "wp",
 		"packageNamespace": "wordpress",
 		"handlePrefix": "wp",
+		"packageDirs": [
+			"packages",
+			"entity-fields"
+		],
 		"pages": [
 			{
 				"id": "font-library",
@@ -222,6 +226,7 @@
 		"test:unit:consumers": "npm run --workspace @wordpress/validation-tools test-vitest-consumers --"
 	},
 	"workspaces": [
+		"entity-fields",
 		"packages/*",
 		"routes/*",
 		"storybook",

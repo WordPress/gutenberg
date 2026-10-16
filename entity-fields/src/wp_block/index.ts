@@ -1,6 +1,6 @@
 /**
  * Script module of the `wp_block` collection:
- * `@wordpress/core-fields/wp_block`.
+ * `@wordpress/entity-fields/wp_block`.
  *
  * The data of each field is in its `field.php`; the client merges these
  * JavaScript parts into fields registered with this module.

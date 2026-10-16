@@ -331,7 +331,7 @@ export default function DataFormPostSummary( { onActionPerformed } ) {
 				// the server: `revisions` switches the editor to its revisions
 				// view and `reading_settings` shares its component with the
 				// legacy summary panel, so both read the editor store, which the
-				// script modules of `@wordpress/core-fields` cannot import.
+				// script modules of `@wordpress/entity-fields` cannot import.
 				//
 				// Their ids are already in the form configurations the server
 				// builds (`revisions` in the default post type form and in the

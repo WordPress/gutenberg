@@ -13,5 +13,5 @@ return array(
 	'origin' => 'core',
 	'kind'   => 'root',
 	'name'   => 'site',
-	'module' => '@wordpress/core-fields/root_site',
+	'module' => '@wordpress/entity-fields/root_site',
 );

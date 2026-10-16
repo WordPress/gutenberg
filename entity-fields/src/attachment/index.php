@@ -15,5 +15,5 @@ return array(
 	'origin' => 'core',
 	'kind'   => 'postType',
 	'name'   => 'attachment',
-	'module' => '@wordpress/core-fields/attachment',
+	'module' => '@wordpress/entity-fields/attachment',
 );

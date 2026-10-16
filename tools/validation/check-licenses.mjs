@@ -28,10 +28,16 @@ const packagesDir = path.join( ROOT_DIR, 'packages' );
 const depsMap = new Map();
 const visited = new Set();
 
-// Find all workspace packages with wpScript or wpScriptModuleExports
+// Find all workspace packages with wpScript or wpScriptModuleExports: the
+// `packages/*` workspaces and the script module workspaces outside `packages/`.
+const pkgDirs = [
+	...fs
+		.readdirSync( packagesDir )
+		.map( ( dir ) => path.join( packagesDir, dir ) ),
+	path.join( ROOT_DIR, 'entity-fields' ),
+];
 
-for ( const dir of fs.readdirSync( packagesDir ) ) {
-	const pkgDir = path.join( packagesDir, dir );
+for ( const pkgDir of pkgDirs ) {
 	const pkgJson = readPackageJson( pkgDir );
 
 	if ( pkgJson?.wpScript || pkgJson?.wpScriptModuleExports ) {

@@ -425,7 +425,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 
 		$this->assertContains(
 			array(
-				'id'     => '@wordpress/core-fields/post_type_supports',
+				'id'     => '@wordpress/entity-fields/post_type_supports',
 				'import' => 'dynamic',
 			),
 			$scripts->get_data( 'wp-editor', 'module_dependencies' )
@@ -494,7 +494,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( array( 'author', 'comment_status', 'discussion', 'notesCount', 'post-content-info', 'title' ), self::without_every_post_type_fields( array_column( $fields, 'id' ) ) );
 		$this->assertSame( array( 'core' ), array_unique( array_column( array_column( $fields, 'origin' ), 'registeredBy' ) ), 'The fields carry the origin of their collection.' );
 		$this->assertSame(
-			array( '@wordpress/core-fields/post_type_supports' => array_column( $fields, 'id' ) ),
+			array( '@wordpress/entity-fields/post_type_supports' => array_column( $fields, 'id' ) ),
 			$modules,
 			'Every default field is registered with the module of its folder.'
 		);
@@ -624,8 +624,8 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	 * the fields come out byte-identical.
 	 */
 	public function test_the_build_copies_the_collections_as_they_are() {
-		$source = __DIR__ . '/../packages/core-fields/src';
-		$build  = __DIR__ . '/../build/scripts/core-fields';
+		$source = __DIR__ . '/../entity-fields/src';
+		$build  = __DIR__ . '/../build/scripts/entity-fields';
 		$files  = array_merge( glob( $source . '/*/index.php' ), glob( $source . '/*/*/field.php' ) );
 
 		$this->assertNotEmpty( $files );
@@ -635,12 +635,12 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The build prefixes the functions the core-fields loader defines, and
+	 * The build prefixes the functions the entity-fields loader defines, and
 	 * nothing else: the functions of the Fields API keep their names.
 	 */
-	public function test_the_build_prefixes_the_functions_of_the_core_fields_loader() {
-		$source = file_get_contents( __DIR__ . '/../packages/core-fields/src/index.php' );
-		$built  = file_get_contents( __DIR__ . '/../build/scripts/core-fields/index.php' );
+	public function test_the_build_prefixes_the_functions_of_the_entity_fields_loader() {
+		$source = file_get_contents( __DIR__ . '/../entity-fields/src/index.php' );
+		$built  = file_get_contents( __DIR__ . '/../build/scripts/entity-fields/index.php' );
 
 		$this->assertStringContainsString( 'function gutenberg_register_core_post_type_supports_fields()', $built );
 		$this->assertStringContainsString( 'function gutenberg_register_core_field_collections()', $built );
@@ -741,7 +741,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'Title', $fields['title']['label'], 'The title is the one of the collection.' );
 		$this->assertSame(
 			array( 'author', 'title' ),
-			wp_get_registered_entity_field_modules( 'postType', 'wp_template_part' )['@wordpress/core-fields/wp_template_part']
+			wp_get_registered_entity_field_modules( 'postType', 'wp_template_part' )['@wordpress/entity-fields/wp_template_part']
 		);
 	}
 
@@ -759,7 +759,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( $fields['sync-status']['readOnly'] );
 		$this->assertSame(
 			array( 'excerpt', 'sync-status', 'title' ),
-			wp_get_registered_entity_field_modules( 'postType', 'wp_block' )['@wordpress/core-fields/wp_block']
+			wp_get_registered_entity_field_modules( 'postType', 'wp_block' )['@wordpress/entity-fields/wp_block']
 		);
 	}
 
@@ -927,8 +927,8 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 
 		$this->assertFalse( $fields['title']['enableHiding'], 'The page title is the one of the collection.' );
 		$this->assertSame( 'core', $fields['title']['origin']['registeredBy'] );
-		$this->assertSame( array( 'title' ), $modules['@wordpress/core-fields/page'] );
-		$this->assertNotContains( 'title', $modules['@wordpress/core-fields/post_type_supports'], 'The default title field is not registered.' );
+		$this->assertSame( array( 'title' ), $modules['@wordpress/entity-fields/page'] );
+		$this->assertNotContains( 'title', $modules['@wordpress/entity-fields/post_type_supports'], 'The default title field is not registered.' );
 	}
 
 	/**
@@ -940,8 +940,8 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertTrue( post_type_supports( 'wp_block', 'excerpt' ), 'The post type supports excerpts.' );
 
 		$modules = wp_get_registered_entity_field_modules( 'postType', 'wp_block' );
-		$this->assertContains( 'excerpt', $modules['@wordpress/core-fields/wp_block'], 'The excerpt is the description field of the collection.' );
-		$this->assertNotContains( 'excerpt', $modules['@wordpress/core-fields/post_type_supports'], 'The default excerpt field is not registered.' );
+		$this->assertContains( 'excerpt', $modules['@wordpress/entity-fields/wp_block'], 'The excerpt is the description field of the collection.' );
+		$this->assertNotContains( 'excerpt', $modules['@wordpress/entity-fields/post_type_supports'], 'The default excerpt field is not registered.' );
 	}
 
 	/**
@@ -970,7 +970,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'core', $fields['author']['origin']['registeredBy'] );
 		$this->assertSame(
 			array( 'author', 'default_comment_status', 'description', 'description_readonly', 'posts_page_title', 'posts_per_page', 'title' ),
-			wp_get_registered_entity_field_modules( 'postType', 'wp_template' )['@wordpress/core-fields/wp_template'],
+			wp_get_registered_entity_field_modules( 'postType', 'wp_template' )['@wordpress/entity-fields/wp_template'],
 			'The fields of templates ship their JavaScript parts in the module of the collection.'
 		);
 	}
@@ -1000,7 +1000,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$author = array_column( wp_get_registered_entity_fields( 'postType', 'wp_template' ), null, 'id' )['author'];
 		$this->assertSame( 'my-plugin', $author['origin']['registeredBy'] );
 		$modules = wp_get_registered_entity_field_modules( 'postType', 'wp_template' );
-		$this->assertNotContains( 'author', $modules['@wordpress/core-fields/wp_template'] ?? array(), 'The module of the replaced field no longer applies to it.' );
+		$this->assertNotContains( 'author', $modules['@wordpress/entity-fields/wp_template'] ?? array(), 'The module of the replaced field no longer applies to it.' );
 	}
 
 	/**
@@ -1018,7 +1018,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'datetime', $fields['date']['type'], 'The media fields come from the attachment collection.' );
 		$this->assertSame( 'core', $fields['date']['origin']['registeredBy'] );
 		$this->assertSame(
-			array( '@wordpress/core-fields/attachment' => $ids ),
+			array( '@wordpress/entity-fields/attachment' => $ids ),
 			wp_get_registered_entity_field_modules( 'postType', 'attachment' ),
 			'Every media field is registered with the module of the collection.'
 		);
@@ -1049,7 +1049,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 		$this->assertSame( 'media', $fields['site_logo']['type'] );
 		$this->assertSame( 'core', $fields['title']['origin']['registeredBy'] );
 		$this->assertSame(
-			array( '@wordpress/core-fields/root_site' => $ids ),
+			array( '@wordpress/entity-fields/root_site' => $ids ),
 			wp_get_registered_entity_field_modules( 'root', 'site' ),
 			'Every field of the site is registered with the module of the collection.'
 		);
@@ -1559,7 +1559,7 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 			$fields[0]['origin']
 		);
 		$modules = wp_get_registered_entity_field_modules( 'postType', 'page' );
-		$this->assertContains( 'author', $modules['@wordpress/core-fields/post_type_supports'], 'The field keeps its modules.' );
+		$this->assertContains( 'author', $modules['@wordpress/entity-fields/post_type_supports'], 'The field keeps its modules.' );
 		$this->assertSame( array( 'author' ), $modules['plugin/author'], 'The module applies to the field.' );
 	}
 

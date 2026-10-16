@@ -45,6 +45,7 @@
 	<!-- Check up to 20 files simultaneously. -->
 	<arg name="parallel" value="20"/>
 
+	<file>./entity-fields</file>
 	<file>./gutenberg.php</file>
 	<file>./lib</file>
 	<file>./packages</file>
@@ -89,6 +90,7 @@
 	<rule ref="Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames">
 		<exclude-pattern>/phpunit/*</exclude-pattern>
 		<exclude-pattern>/packages/*</exclude-pattern>
+		<exclude-pattern>/entity-fields/*</exclude-pattern>
 		<properties>
 			<property name="functionsWhiteList" type="array">
 				<element value="/^_?gutenberg.+/"/>

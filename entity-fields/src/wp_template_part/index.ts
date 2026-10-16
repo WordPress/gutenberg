@@ -1,6 +1,6 @@
 /**
  * Script module of the `wp_template_part` collection:
- * `@wordpress/core-fields/wp_template_part`.
+ * `@wordpress/entity-fields/wp_template_part`.
  *
  * The data of each field is in its `field.php`, and `index.php` registers the
  * fields for template parts; the client reads them from the `wp/v2/entity-fields`

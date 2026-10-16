@@ -1,6 +1,7 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"references": [
+		{ "path": "entity-fields/tsconfig.build.json" },
 		{ "path": "packages/a11y/tsconfig.build.json" },
 		{ "path": "packages/abilities/tsconfig.build.json" },
 		{ "path": "packages/admin-ui/tsconfig.build.json" },
@@ -21,7 +22,6 @@
 		{ "path": "packages/core-abilities" },
 		{ "path": "packages/core-actions/tsconfig.build.json" },
 		{ "path": "packages/core-data/tsconfig.build.json" },
-		{ "path": "packages/core-fields/tsconfig.build.json" },
 		{ "path": "packages/data" },
 		{ "path": "packages/data-controls/tsconfig.build.json" },
 		{ "path": "packages/dataviews/tsconfig.build.json" },

@@ -17,5 +17,5 @@ return array(
 	'origin' => 'core',
 	'kind'   => 'postType',
 	'name'   => 'wp_template',
-	'module' => '@wordpress/core-fields/wp_template',
+	'module' => '@wordpress/entity-fields/wp_template',
 );
