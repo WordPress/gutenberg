@@ -34,60 +34,60 @@ function Example() {
 
 ### `inputProps`
 
-- Type: `Object`
-- Required: No
-- Description: Additional props to pass to the input controls.
+-   Type: `Object`
+-   Required: No
+-   Description: Additional props to pass to the input controls.
 
 ### `label`
 
-- Type: `String`
-- Required: Yes
-- Description: Label for the control.
+-   Type: `String`
+-   Required: Yes
+-   Description: Label for the control.
 
 ### `minimumCustomValue`
 
-- Type: `Number`
-- Default: 0
-- Description: Minimum value allowed for custom input.
+-   Type: `Number`
+-   Default: 0
+-   Description: Minimum value allowed for custom input.
 
 ### `onChange`
 
-- Type: `Function`
-- Required: Yes
-- Description: Callback function called when spacing values change. Receives an object containing the updated values.
+-   Type: `Function`
+-   Required: Yes
+-   Description: Callback function called when spacing values change. Receives an object containing the updated values.
 
 ### `onMouseOut`
 
-- Type: `Function`
-- Required: No
-- Description: Callback function called when mouse leaves the control.
+-   Type: `Function`
+-   Required: No
+-   Description: Callback function called when mouse leaves the control.
 
 ### `onMouseOver`
 
-- Type: `Function`
-- Required: No
-- Description: Callback function called when mouse enters the control.
+-   Type: `Function`
+-   Required: No
+-   Description: Callback function called when mouse enters the control.
 
 ### `showSideInLabel`
 
-- Type: `Boolean`
-- Default: true
-- Description: Whether to show the side (top, right, etc.) in the control label.
+-   Type: `Boolean`
+-   Default: true
+-   Description: Whether to show the side (top, right, etc.) in the control label.
 
 ### `sides`
 
-- Type: `Array`
-- Default: ALL_SIDES (top, right, bottom, left)
-- Description: Array of sides that can be controlled.
+-   Type: `Array`
+-   Default: ALL_SIDES (top, right, bottom, left)
+-   Description: Array of sides that can be controlled.
 
 ### `useSelect`
 
-- Type: `Boolean`
-- Required: No
-- Description: Whether to use a select control for predefined values.
+-   Type: `Boolean`
+-   Required: No
+-   Description: Whether to use a select control for predefined values.
 
 ### `values`
 
-- Type: `Object`
-- Required: No
-- Description: Object containing the current spacing values for each side.
+-   Type: `Object`
+-   Required: No
+-   Description: Object containing the current spacing values for each side.
