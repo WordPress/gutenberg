@@ -21,11 +21,10 @@ test.describe( 'WP Editor Meta Boxes', () => {
 			.locator( 'role=textbox[name="Add title"i]' )
 			.type( 'Hello Meta' );
 
-		// Open the meta box pane. The click isn’t in the center because that
-		// would hit the resize handle instead of the located element.
-		await page
-			.getByRole( 'button', { name: 'Meta Boxes' } )
-			.click( { position: { x: 0, y: 0 } } );
+		// The meta box pane is open by default.
+		await expect(
+			page.getByRole( 'button', { name: 'Meta Boxes' } )
+		).toHaveAttribute( 'aria-expanded', 'true' );
 
 		// Switch to Visual mode and wait for TinyMCE to fully initialize.
 		// This ensures getSelection() won't return null when TinyMCE tries
