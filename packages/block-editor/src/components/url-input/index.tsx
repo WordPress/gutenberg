@@ -21,6 +21,7 @@ import type { LinkControlSuggestion } from '../link-control/types';
 import type {
 	LinkSuggestionsRequest,
 	URLInputFieldProps,
+	URLInputInputProps,
 	URLInputProps,
 	URLInputSuggestionsListProps,
 } from './types';
@@ -382,7 +383,7 @@ export default function URLInput( props: URLInputProps ) {
 		hideLabelFromVision,
 	};
 
-	const inputProps = {
+	const inputProps: URLInputInputProps = {
 		id: inputId,
 		value,
 		required,

@@ -82,7 +82,7 @@ export interface URLInputInputProps {
 	role: string;
 	'aria-label': string | undefined;
 	'aria-expanded': boolean;
-	'aria-autocomplete': string;
+	'aria-autocomplete': 'list';
 	'aria-owns': string;
 	'aria-activedescendant': string | undefined;
 	ref: RefObject< HTMLInputElement | null >;
