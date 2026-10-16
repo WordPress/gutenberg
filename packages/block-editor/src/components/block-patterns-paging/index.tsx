@@ -5,20 +5,22 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
+import type { PaginationProps } from './types';
 
 export default function Pagination( {
 	currentPage,
 	numPages,
 	changePage,
 	totalItems,
-} ) {
+}: PaginationProps ) {
 	return (
 		<VStack className="block-editor-patterns__grid-pagination-wrapper">
 			<WCText variant="muted">
 				{ sprintf(
 					// translators: %s: Total number of patterns.
 					_n( '%s item', '%s items', totalItems ),
-					totalItems
+					// `sprintf` formats numbers with `%s`.
+					totalItems as unknown as string
 				) }
 			</WCText>
 			{ numPages > 1 && (
@@ -60,8 +62,9 @@ export default function Pagination( {
 						{ sprintf(
 							// translators: 1: Current page number. 2: Total number of pages.
 							_x( '%1$s of %2$s', 'paging' ),
-							currentPage,
-							numPages
+							// `sprintf` formats numbers with `%s`.
+							currentPage as unknown as string,
+							numPages as unknown as string
 						) }
 					</WCText>
 					<HStack
