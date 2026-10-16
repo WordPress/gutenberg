@@ -76,9 +76,11 @@ jobs:
         multisite: [false, true]
 
     env:
-      # This branch's wp-env can't set a PHP version, so pick the `phpunit` service's image
-      # directly. `wp-env run phpunit` passes this variable through to Docker Compose.
+      # Runs every wp-env container on the matrix PHP version: `LOCAL_PHP` picks the `phpunit`
+      # service's image, and `WP_ENV_PHP_VERSION` the WordPress and WP-CLI images. `wp-env`
+      # passes both through to Docker Compose.
       LOCAL_PHP: ${{ matrix.php }}-fpm
+      WP_ENV_PHP_VERSION: ${{ matrix.php }}
 
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
