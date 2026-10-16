@@ -8,12 +8,19 @@ describe( 'custom className', () => {
 		category: 'text',
 		title: 'block title',
 	} );
+	const blockType = {
+		...getBlockSettings(),
+		name: 'core/test-block',
+		icon: { src: 'block-default' },
+		attributes: {},
+	};
 
 	describe( 'addAttribute()', () => {
+		// Filters return `unknown`; this one returns the block settings.
 		const addAttribute = applyFilters.bind(
 			null,
 			'blocks.registerBlockType'
-		);
+		) as ( ...args: unknown[] ) => Record< string, unknown >;
 
 		it( 'should do nothing if the block settings disable custom className support', () => {
 			const settings = addAttribute( {
@@ -39,7 +46,7 @@ describe( 'custom className', () => {
 			const extraProps = customClassName.addSaveProps(
 				{},
 				{
-					...getBlockSettings(),
+					...blockType,
 					supports: {
 						customClassName: false,
 					},
@@ -54,7 +61,7 @@ describe( 'custom className', () => {
 			const attributes = { className: 'bar' };
 			const extraProps = customClassName.addSaveProps(
 				{ className: 'foo' },
-				getBlockSettings(),
+				blockType,
 				attributes
 			);
 

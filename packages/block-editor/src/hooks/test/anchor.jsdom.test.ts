@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { applyFilters } from '@wordpress/hooks';
+import type { BlockType } from '@wordpress/blocks';
 import anchor from '../anchor';
 
 const noop = () => {};
@@ -10,12 +11,20 @@ describe( 'anchor', () => {
 		category: 'text',
 		title: 'block title',
 	};
+	const blockType = {
+		...blockSettings,
+		save: () => null,
+		name: 'core/test-block',
+		icon: { src: 'block-default' },
+		attributes: {},
+	};
 
 	describe( 'addAttribute()', () => {
+		// Filters return `unknown`; this one returns the block settings.
 		const registerBlockType = applyFilters.bind(
 			null,
 			'blocks.registerBlockType'
-		);
+		) as ( ...args: unknown[] ) => BlockType;
 
 		it( 'should do nothing if the block settings do not define anchor support', () => {
 			const settings = registerBlockType( blockSettings );
@@ -58,11 +67,7 @@ describe( 'anchor', () => {
 	describe( 'addSaveProps', () => {
 		it( 'should do nothing if the block settings do not define anchor support', () => {
 			const attributes = { anchor: 'foo' };
-			const extraProps = anchor.addSaveProps(
-				{},
-				blockSettings,
-				attributes
-			);
+			const extraProps = anchor.addSaveProps( {}, blockType, attributes );
 
 			expect( extraProps ).not.toHaveProperty( 'id' );
 		} );
@@ -72,7 +77,7 @@ describe( 'anchor', () => {
 			const extraProps = anchor.addSaveProps(
 				{},
 				{
-					...blockSettings,
+					...blockType,
 					supports: {
 						anchor: true,
 					},
@@ -88,7 +93,7 @@ describe( 'anchor', () => {
 			const extraProps = anchor.addSaveProps(
 				{},
 				{
-					...blockSettings,
+					...blockType,
 					supports: {
 						anchor: true,
 					},

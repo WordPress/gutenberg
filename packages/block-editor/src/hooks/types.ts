@@ -179,3 +179,38 @@ export interface BlockMetadata {
  * A block whose `metadata` attribute is read.
  */
 export type BlockWithMetadata = Block< { metadata?: BlockMetadata } >;
+
+/**
+ * The attributes the anchor support reads.
+ */
+export interface AnchorAttributes {
+	anchor?: string;
+}
+
+/**
+ * Props of the anchor control.
+ */
+export interface AnchorEditProps {
+	anchor?: string;
+	setAttributes: BlockSupportEditProps[ 'setAttributes' ];
+}
+
+/**
+ * The attributes the custom class name support reads.
+ */
+export interface CustomClassNameAttributes {
+	className?: string;
+}
+
+/**
+ * Props of the custom class name control.
+ */
+export interface CustomClassNameEditProps {
+	className?: string;
+	setAttributes: BlockSupportEditProps[ 'setAttributes' ];
+}
+
+/**
+ * A block whose `className` attribute is read.
+ */
+export type BlockWithClassName = Block< { className?: string } >;

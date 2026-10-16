@@ -51,6 +51,7 @@
 -   Convert the layout helpers and block gap utils to TypeScript ([#84722](https://github.com/WordPress/gutenberg/pull/84722)).
 -   Convert the block attribute filter hooks to TypeScript ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
 -   Convert `InspectorControls` to TypeScript ([#84725](https://github.com/WordPress/gutenberg/pull/84725)).
+-   Convert the anchor and custom class name hooks to TypeScript ([#84726](https://github.com/WordPress/gutenberg/pull/84726)).
 
 ## 18.1.0 (2026-10-07)
 

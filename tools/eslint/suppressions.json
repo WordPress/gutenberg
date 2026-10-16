@@ -2095,12 +2095,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/anchor.jsx": {
+	"packages/block-editor/src/hooks/anchor.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/hooks/auto-inspector-controls.jsx": {
@@ -2139,11 +2136,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/custom-class-name.jsx": {
+	"packages/block-editor/src/hooks/custom-class-name.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2234,11 +2228,6 @@
 		}
 	},
 	"packages/block-editor/src/hooks/test/background.jsdom.test.jsx": {
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/test/custom-class-name.jsdom.test.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
 		}
