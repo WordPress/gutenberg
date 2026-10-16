@@ -7044,11 +7044,6 @@
 			"count": 3
 		}
 	},
-	"packages/fields/src/fields/author/author-view.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/fields/src/lock-unlock.ts": {
 		"no-restricted-imports": {
 			"count": 1
