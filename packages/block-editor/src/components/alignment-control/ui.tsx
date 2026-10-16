@@ -1,8 +1,10 @@
 import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
+import type { ComponentProps, ComponentType } from 'react';
+import type { AlignmentControlOption, AlignmentUIProps } from './types';
 
-const DEFAULT_ALIGNMENT_CONTROLS = [
+const DEFAULT_ALIGNMENT_CONTROLS: AlignmentControlOption[] = [
 	{
 		icon: alignLeft,
 		title: __( 'Align text left' ),
@@ -21,7 +23,7 @@ const DEFAULT_ALIGNMENT_CONTROLS = [
 ];
 
 const POPOVER_PROPS = {
-	placement: 'bottom-start',
+	placement: 'bottom-start' as const,
 };
 
 function AlignmentUI( {
@@ -32,8 +34,8 @@ function AlignmentUI( {
 	description,
 	isCollapsed = true,
 	isToolbar,
-} ) {
-	function applyOrUnset( align ) {
+}: AlignmentUIProps ) {
+	function applyOrUnset( align: string ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
@@ -48,7 +50,10 @@ function AlignmentUI( {
 		return isRTL() ? alignRight : alignLeft;
 	}
 
-	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	// Both take the controls; the extra props match the one rendered.
+	const UIComponent = (
+		isToolbar ? ToolbarGroup : ToolbarDropdownMenu
+	) as ComponentType< ComponentProps< typeof ToolbarDropdownMenu > >;
 	const extraProps = isToolbar
 		? { isCollapsed }
 		: {

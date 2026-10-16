@@ -1,10 +1,11 @@
 import AlignmentUI from './ui';
+import type { AlignmentControlProps } from './types';
 
-const AlignmentControl = ( props ) => {
+const AlignmentControl = ( props: AlignmentControlProps ) => {
 	return <AlignmentUI { ...props } isToolbar={ false } />;
 };
 
-const AlignmentToolbar = ( props ) => {
+const AlignmentToolbar = ( props: AlignmentControlProps ) => {
 	return <AlignmentUI { ...props } isToolbar />;
 };
 
