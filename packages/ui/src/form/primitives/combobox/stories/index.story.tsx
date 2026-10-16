@@ -59,7 +59,8 @@ export default meta;
 type Story = StoryObj< typeof Combobox.Root >;
 
 const inputWrapperStyle = {
-	padding: 'var(--wp-ui-popup-padding)',
+	padding:
+		'var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-xs)',
 };
 
 export const Default: Story = {
