@@ -19,7 +19,8 @@
 		"process-timeout": 0,
 		"allow-plugins": {
 			"dealerdirect/phpcodesniffer-composer-installer": true,
-			"composer/installers": true
+			"composer/installers": true,
+			"phpstan/extension-installer": true
 		},
 		"lock": false
 	},
@@ -30,7 +31,10 @@
 		"sirbrillig/phpcs-variable-analysis": "^2.8",
 		"spatie/phpunit-watcher": "^1.23",
 		"yoast/phpunit-polyfills": "^1.1.0",
-		"gutenberg/gutenberg-coding-standards": "@dev"
+		"gutenberg/gutenberg-coding-standards": "@dev",
+		"phpstan/extension-installer": "^1.4",
+		"phpstan/phpstan": "^1.12",
+		"szepeviktor/phpstan-wordpress": "^1.3"
 	},
 	"repositories": [
 		{
@@ -46,6 +50,7 @@
 		"composer/installers": "^1.0 || ^2.0"
 	},
 	"scripts": {
+		"analyse": "phpstan analyse -v",
 		"format": "phpcbf --standard=phpcs.xml.dist --report-summary --report-source",
 		"lint": "phpcs --standard=phpcs.xml.dist",
 		"test": "phpunit",
