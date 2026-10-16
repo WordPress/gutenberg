@@ -17,7 +17,6 @@
 -   `PageTitleView`: Keep the page-type badge on a single line, so a list row with the `Privacy Policy Page` badge no longer grows and jumps when hovering reveals the primary action. ([#84368](https://github.com/WordPress/gutenberg/pull/84368))
 -   Status and slug fields: When the post's `_links` lack the `wp:action-publish` relation, disable the status field and show only the permalink in the slug control, so a user who can't publish gets what the classic sidebar shows. ([#84371](https://github.com/WordPress/gutenberg/pull/84371))
 -   `SlugEdit`: Keep the external link icon on the same line as the permalink when the slug can't be edited. ([#84371](https://github.com/WordPress/gutenberg/pull/84371))
--   Slug field: Show the slug of the current title instead of the server-generated slug, which could be `auto-draft`. A post without a slug or a title shows `None` and its plain `?p=ID` permalink ([#84893](https://github.com/WordPress/gutenberg/pull/84893)).
 
 ## 0.49.0 (2026-10-07)
 

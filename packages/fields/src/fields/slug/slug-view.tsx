@@ -1,10 +1,20 @@
-import { __ } from '@wordpress/i18n';
+import { useEffect, useRef } from '@wordpress/element';
 import type { BasePost } from '../../types';
 import { getSlug } from './utils';
 
 const SlugView = ( { item }: { item: BasePost } ) => {
-	// A draft without a slug or a title has no slug yet.
-	return getSlug( item ) || __( 'None' );
+	const slug = getSlug( item );
+	const originalSlugRef = useRef( slug );
+
+	useEffect( () => {
+		if ( slug && originalSlugRef.current === undefined ) {
+			originalSlugRef.current = slug;
+		}
+	}, [ slug ] );
+
+	const slugToDisplay = slug || originalSlugRef.current;
+
+	return `${ slugToDisplay }`;
 };
 
 export default SlugView;
