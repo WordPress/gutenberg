@@ -311,4 +311,18 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 			$actual
 		);
 	}
+
+	/**
+	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
+	 */
+	public function test_custom_css_targets_only_the_navigation_wrapper() {
+		$markup = do_blocks( '<!-- wp:navigation {"overlayMenu":"never","style":{"css":"border: 1px solid pink; padding: 10px;"}} --><!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /--><!-- /wp:navigation -->' );
+
+		$processor = new WP_HTML_Tag_Processor( $markup );
+		$this->assertTrue( $processor->next_tag( 'nav' ) );
+		$this->assertSame( 1, preg_match( '/\bwp-custom-css-[a-f0-9]+\b/', $processor->get_attribute( 'class' ), $matches ) );
+
+		$this->assertTrue( $processor->next_tag( 'ul' ) );
+		$this->assertFalse( $processor->has_class( $matches[0] ), 'The Navigation block custom CSS must not also target its inner list.' );
+	}
 }
