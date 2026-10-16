@@ -1,14 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import type { ReactNode } from 'react';
+import type { getBlockType } from '@wordpress/blocks';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { paragraph } from '@wordpress/icons';
+import type { unlock } from '../../../lock-unlock';
+import type BlockIcon from '../../block-icon';
+import type BlockSwitcher from '../../block-switcher';
 import BlockToolbarIcon from '../block-toolbar-icon';
 
 vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 	const actualImplementation = await importOriginal();
 	return {
 		...actualImplementation,
-		getBlockType: ( name ) =>
+		// Block types with only what the toolbar icon reads.
+		getBlockType: ( ( name: string ) =>
 			name
 				? {
 						name,
@@ -18,7 +25,7 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => {
 								: 'Group',
 						icon: `${ name }-icon`,
 					}
-				: undefined,
+				: undefined ) as unknown as typeof getBlockType,
 	};
 } );
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
@@ -26,25 +33,30 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	useSelect: vi.fn(),
 } ) );
 vi.mock( import( '../../../lock-unlock' ), () => ( {
-	unlock: ( value ) => ( {
+	// Returns the selectors themselves, with the private ones mixed in.
+	unlock: ( ( value: object ) => ( {
 		registerPrivateActions: vi.fn(),
 		registerPrivateSelectors: vi.fn(),
 		...value,
-	} ),
+	} ) ) as typeof unlock,
 } ) );
 vi.mock( import( '../../block-title/use-block-display-title' ), () => ( {
 	default: () => 'Block Name',
 } ) );
 vi.mock( import( '../../block-icon' ), () => ( {
-	default: ( { icon } ) => <span data-testid="block-icon">{ icon }</span>,
+	// Renders the icon as text, which the test icons are.
+	default: ( ( { icon }: { icon: ReactNode } ) => (
+		<span data-testid="block-icon">{ icon }</span>
+	) ) as unknown as typeof BlockIcon,
 } ) );
 vi.mock( import( '../../block-switcher' ), () => ( {
-	default: ( { children } ) => (
+	// Takes the props the switcher uses as a plain component.
+	default: ( ( { children }: { children: ReactNode } ) => (
 		<div data-testid="block-switcher">{ children }</div>
-	),
+	) ) as typeof BlockSwitcher,
 } ) );
 vi.mock( import( '../pattern-overrides-dropdown' ), () => ( {
-	default: ( { clientIds } ) => (
+	default: ( { clientIds }: { clientIds: string[] } ) => (
 		<div data-testid="pattern-overrides-dropdown">
 			{ clientIds.length === 1
 				? 'Block Name'
@@ -52,6 +64,11 @@ vi.mock( import( '../pattern-overrides-dropdown' ), () => ( {
 		</div>
 	),
 } ) );
+
+// The mocked hook returns what each test sets up.
+const mockedUseSelect = useSelect as unknown as Mock<
+	( mapSelect: ( select: unknown ) => unknown ) => unknown
+>;
 
 describe( 'BlockToolbarIcon', () => {
 	const defaultProps = {
@@ -67,21 +84,27 @@ describe( 'BlockToolbarIcon', () => {
 		blockName = 'core/group',
 		getActiveBlockVariation = () => null,
 		isSectionBlock = true,
+	}: {
+		attributes?: Record< string, unknown >;
+		blockName?: string;
+		getActiveBlockVariation?: () => unknown;
+		isSectionBlock?: boolean;
 	} = {} ) => {
-		useSelect.mockImplementation( ( mapSelect ) =>
-			mapSelect( () => ( {
-				get: () => false,
-				getBlockName: () => blockName,
-				getBlockAttributes: () => attributes,
-				getBlockParentsByBlockName: () => [],
-				canRemoveBlocks: () => true,
-				getTemplateLock: () => undefined,
-				getBlockEditingMode: () => 'default',
-				canEditBlock: () => true,
-				getBlockStyles: () => [ {} ],
-				getActiveBlockVariation,
-				isSectionBlock: () => isSectionBlock,
-			} ) )
+		mockedUseSelect.mockImplementation(
+			( mapSelect: ( select: unknown ) => unknown ) =>
+				mapSelect( () => ( {
+					get: () => false,
+					getBlockName: () => blockName,
+					getBlockAttributes: () => attributes,
+					getBlockParentsByBlockName: () => [],
+					canRemoveBlocks: () => true,
+					getTemplateLock: () => undefined,
+					getBlockEditingMode: () => 'default',
+					canEditBlock: () => true,
+					getBlockStyles: () => [ {} ],
+					getActiveBlockVariation,
+					isSectionBlock: () => isSectionBlock,
+				} ) )
 		);
 	};
 
@@ -91,7 +114,7 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'when variant is "switcher"', () => {
 		it( 'should render BlockSwitcher with icon', () => {
-			useSelect.mockImplementation( () => ( {
+			mockedUseSelect.mockImplementation( () => ( {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'switcher',
@@ -110,7 +133,7 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'when variant is "pattern-overrides"', () => {
 		it( 'should render PatternOverridesDropdown for single block', () => {
-			useSelect.mockImplementation( () => ( {
+			mockedUseSelect.mockImplementation( () => ( {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'pattern-overrides',
@@ -127,7 +150,7 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 
 		it( 'should render PatternOverridesDropdown for multiple blocks', () => {
-			useSelect.mockImplementation( () => ( {
+			mockedUseSelect.mockImplementation( () => ( {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'pattern-overrides',
@@ -148,7 +171,7 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'when variant is "default"', () => {
 		it( 'should render disabled ToolbarButton for single block', () => {
-			useSelect.mockImplementation( () => ( {
+			mockedUseSelect.mockImplementation( () => ( {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'default',
@@ -168,7 +191,7 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 
 		it( 'should render disabled ToolbarButton for multiple blocks', () => {
-			useSelect.mockImplementation( () => ( {
+			mockedUseSelect.mockImplementation( () => ( {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'default',
@@ -267,7 +290,7 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'label calculation', () => {
 		it( 'should use block title for single block', () => {
-			useSelect.mockImplementation( () => ( {
+			mockedUseSelect.mockImplementation( () => ( {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'default',
@@ -280,7 +303,7 @@ describe( 'BlockToolbarIcon', () => {
 		} );
 
 		it( 'should use "Multiple blocks selected" for multiple blocks', () => {
-			useSelect.mockImplementation( () => ( {
+			mockedUseSelect.mockImplementation( () => ( {
 				icon: paragraph,
 				showIconLabels: false,
 				variant: 'default',
@@ -303,7 +326,7 @@ describe( 'BlockToolbarIcon', () => {
 
 	describe( 'when no block is selected (placeholder)', () => {
 		it( 'should keep a discernible label when no default block type is registered', () => {
-			useSelect.mockImplementation( () => ( {
+			mockedUseSelect.mockImplementation( () => ( {
 				icon: undefined,
 				showIconLabels: false,
 				variant: 'default',
