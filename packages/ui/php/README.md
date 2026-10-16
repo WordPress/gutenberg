@@ -48,7 +48,7 @@ gutenberg_get_ui_component( 'card', $props, array( $intro, $button ) );
 
 Other HTML has to say why it's safe: `Gutenberg_UI_Safe_HTML::sanitized( $html )` runs it through `wp_kses_post()`, and `Gutenberg_UI_Safe_HTML::trusted( $html )` takes it as is, for markup the caller built and escaped itself. Both are easy to find in review.
 
-Content can only be rendered as children, never in an attribute; the build fails otherwise. A component's `compositions` in `component.json` list components to render inside its content. The build renders each with React, and PHPUnit checks that passing one component's output to another in PHP gives the same markup.
+Content can only be rendered as children, never in an attribute; the build fails otherwise. A component's `compositionExamples` in `component.json` list components to render inside its content. The build renders each with React, and PHPUnit checks that passing one component's output to another in PHP gives the same markup.
 
 ## Keeping up with React
 

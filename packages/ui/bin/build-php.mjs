@@ -15,7 +15,8 @@
  *                    its `content` for components that accept it.
  *   - `content`      Optional. Whether the component accepts content, rendered
  *                    where `render` uses `"$content"`.
- *   - `compositions` Optional. Components to render inside the content, for
+ *   - `compositionExamples`
+ *                    Optional. Components to render inside the content, for
  *                    the check that PHP composes them as React nests them.
  *
  * The build renders the React element once for every combination of variants,
@@ -271,7 +272,7 @@ async function buildComponent( component, context ) {
 
 	// Components rendered inside this one's content, as React would nest them,
 	// for the PHPUnit check that composing them in PHP gives the same markup.
-	result.compositions = ( component.compositions ?? [] ).map(
+	result.compositions = ( component.compositionExamples ?? [] ).map(
 		( { name, props = {}, content } ) => {
 			const inner = definitions.get( content.component );
 			if ( ! inner ) {

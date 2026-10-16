@@ -15,7 +15,7 @@
 		[ "Card.Header", {}, [ "Card.Title", {}, "$title" ] ],
 		[ "Card.Content", {}, "$content" ]
 	],
-	"compositions": [
+	"compositionExamples": [
 		{
 			"name": "with a button",
 			"props": { "title": "Settings" },
