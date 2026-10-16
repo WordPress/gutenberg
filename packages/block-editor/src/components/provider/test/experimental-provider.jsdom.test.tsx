@@ -1,10 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { render } from '@testing-library/react';
 import { useRegistry, useSelect } from '@wordpress/data';
+import type { DataRegistry } from '@wordpress/data';
 import { BlockEditorProvider, ExperimentalBlockEditorProvider } from '../';
 import { store as blockEditorStore } from '../../../store';
 
-const HasEditorSetting = ( props ) => {
+const HasEditorSetting = ( props: {
+	setRegistry?: ( registry: DataRegistry ) => void;
+} ) => {
 	const registry = useRegistry();
 	if ( props.setRegistry ) {
 		props.setRegistry( registry );
@@ -27,8 +30,8 @@ const PreviewModeGetter = () => {
 };
 
 describe( 'BlockEditorProvider', () => {
-	let registry;
-	const setRegistry = ( reg ) => {
+	let registry: DataRegistry | undefined;
+	const setRegistry = ( reg: DataRegistry ) => {
 		registry = reg;
 	};
 	beforeEach( () => {
@@ -44,7 +47,7 @@ describe( 'BlockEditorProvider', () => {
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</BlockEditorProvider>
 		);
-		const settings = registry.select( blockEditorStore ).getSettings();
+		const settings = registry!.select( blockEditorStore ).getSettings();
 		// `blockInspectorAnimation` setting is one of the block editor's
 		// default settings, so it has a value. We're testing that its
 		// value was not updated.
@@ -60,7 +63,7 @@ describe( 'BlockEditorProvider', () => {
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</BlockEditorProvider>
 		);
-		const settings = registry.select( blockEditorStore ).getSettings();
+		const settings = registry!.select( blockEditorStore ).getSettings();
 		expect( settings ).toHaveProperty( 'stableSetting' );
 	} );
 	it( 'preserves deprecated getters incoming from the settings reducer', async () => {
@@ -88,8 +91,8 @@ describe( 'BlockEditorProvider', () => {
 } );
 
 describe( 'ExperimentalBlockEditorProvider', () => {
-	let registry;
-	const setRegistry = ( reg ) => {
+	let registry: DataRegistry | undefined;
+	const setRegistry = ( reg: DataRegistry ) => {
 		registry = reg;
 	};
 	beforeEach( () => {
@@ -105,7 +108,7 @@ describe( 'ExperimentalBlockEditorProvider', () => {
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</ExperimentalBlockEditorProvider>
 		);
-		const settings = registry.select( blockEditorStore ).getSettings();
+		const settings = registry!.select( blockEditorStore ).getSettings();
 		expect( settings.blockInspectorAnimation ).toBe( true );
 	} );
 	it( 'should preserve stable settings', async () => {
@@ -118,7 +121,7 @@ describe( 'ExperimentalBlockEditorProvider', () => {
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</ExperimentalBlockEditorProvider>
 		);
-		const settings = registry.select( blockEditorStore ).getSettings();
+		const settings = registry!.select( blockEditorStore ).getSettings();
 		expect( settings ).toHaveProperty( 'stableSetting' );
 	} );
 } );

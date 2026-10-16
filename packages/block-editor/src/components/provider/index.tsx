@@ -9,6 +9,7 @@ import {
 	isHeicCanvasSupported,
 	isHeicFile,
 } from '@wordpress/upload-media';
+import type { DataRegistry } from '@wordpress/data';
 import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
@@ -19,8 +20,15 @@ import BlockKeyboardShortcuts from '../block-keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
 import { mediaUploadOnSuccessKey } from '../../store/private-keys';
 import { SelectionContext } from './selection-context';
-
-/** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
+import type { Settings } from '../../store/types';
+import type {
+	BlockEditorProviderProps,
+	BlockSelectionState,
+	MediaUploadFunction,
+	MediaUploadOptions,
+	RegistryProvidedProps,
+	UseBlockSyncProps,
+} from './types';
 
 const noop = () => {};
 
@@ -33,12 +41,12 @@ let hasLoggedFallback = false;
  * Cached result of whether client-side media processing should be enabled.
  * This is computed once per session for efficiency and stability.
  */
-let isClientSideMediaEnabledCache = null;
+let isClientSideMediaEnabledCache: boolean | null = null;
 
 /**
  * Cached result of whether HEIC-only canvas processing should be enabled.
  */
-let isHeicCanvasEnabledCache = null;
+let isHeicCanvasEnabledCache: boolean | null = null;
 
 /**
  * Refuses a batch of more than one file on behalf of a caller that only takes
@@ -49,13 +57,17 @@ let isHeicCanvasEnabledCache = null;
  * transport that never reaches that function. Without this check every dropped
  * file uploads and the caller keeps whichever one lands last (gutenberg#82041).
  *
- * @param {Array<File>} filesList List of files.
- * @param {boolean}     multiple  Whether the caller accepts more than one file.
- * @param {Function}    onError   Function called when an error happens.
+ * @param filesList List of files.
+ * @param multiple  Whether the caller accepts more than one file.
+ * @param onError   Function called when an error happens.
  *
- * @return {boolean} Whether the batch was refused.
+ * @return Whether the batch was refused.
  */
-function refuseExtraFiles( filesList, multiple, onError ) {
+function refuseExtraFiles(
+	filesList: ArrayLike< File >,
+	multiple: boolean,
+	onError: ( message: string ) => void
+): boolean {
 	if ( ! multiple && filesList.length > 1 ) {
 		onError( __( 'Only one file can be used here.' ) );
 		return true;
@@ -73,9 +85,9 @@ function refuseExtraFiles( filesList, multiple, onError ) {
  *
  * The result is cached for the session to ensure stability during React renders.
  *
- * @return {boolean} Whether client-side media processing should be enabled.
+ * @return Whether client-side media processing should be enabled.
  */
-function shouldEnableClientSideMediaProcessing() {
+function shouldEnableClientSideMediaProcessing(): boolean {
 	// Return cached result if available.
 	if ( isClientSideMediaEnabledCache !== null ) {
 		return isClientSideMediaEnabledCache;
@@ -119,9 +131,9 @@ function shouldEnableClientSideMediaProcessing() {
  * 2. The server has set the __clientSideMediaProcessing flag
  * 3. The browser supports createImageBitmap + OffscreenCanvas (e.g. Safari)
  *
- * @return {boolean} Whether HEIC-only canvas processing should be enabled.
+ * @return Whether HEIC-only canvas processing should be enabled.
  */
-function shouldEnableHeicCanvasProcessing() {
+function shouldEnableHeicCanvasProcessing(): boolean {
 	if ( isHeicCanvasEnabledCache !== null ) {
 		return isHeicCanvasEnabledCache;
 	}
@@ -153,21 +165,21 @@ function shouldEnableHeicCanvasProcessing() {
  * Upload a media file when the file upload button is activated
  * or when adding a file to the editor via drag & drop.
  *
- * @param {WPDataRegistry} registry
- * @param {Object}         settings          Block editor settings.
- * @param {Object}         $3                Parameters object passed to the function.
- * @param {Array}          $3.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
- * @param {Object}         $3.additionalData Additional data to include in the request.
- * @param {Array<File>}    $3.filesList      List of files.
- * @param {Function}       $3.onError        Function called when an error happens.
- * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
- * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
- * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
- * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
+ * @param registry          The data registry.
+ * @param settings          Block editor settings.
+ * @param $3                Parameters object passed to the function.
+ * @param $3.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
+ * @param $3.additionalData Additional data to include in the request.
+ * @param $3.filesList      List of files.
+ * @param $3.onError        Function called when an error happens.
+ * @param $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
+ * @param $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
+ * @param $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ * @param $3.multiple       Whether the caller accepts more than one file.
  */
 function mediaUpload(
-	registry,
-	settings,
+	registry: DataRegistry,
+	settings: Settings,
 	{
 		allowedTypes,
 		additionalData = {},
@@ -177,7 +189,7 @@ function mediaUpload(
 		onSuccess,
 		onBatchSuccess,
 		multiple = true,
-	}
+	}: MediaUploadOptions
 ) {
 	if ( refuseExtraFiles( filesList, multiple, onError ) ) {
 		return;
@@ -187,7 +199,11 @@ function mediaUpload(
 		files: Array.from( filesList ),
 		onChange: onFileChange,
 		onSuccess: ( attachments ) => {
-			settings?.[ mediaUploadOnSuccessKey ]?.( attachments );
+			// The private success callback takes the attachments.
+			(
+				settings?.[ mediaUploadOnSuccessKey ] as
+					( ( attachments: unknown ) => void ) | undefined
+			 )?.( attachments );
 			onSuccess?.( attachments );
 		},
 		onBatchSuccess,
@@ -207,21 +223,21 @@ function mediaUpload(
  * conversion, while passing non-HEIC files to the original mediaUpload
  * function for standard server-side processing.
  *
- * @param {WPDataRegistry} registry
- * @param {Object}         settings          Block editor settings.
- * @param {Object}         $3                Parameters object passed to the function.
- * @param {Array}          $3.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
- * @param {Object}         $3.additionalData Additional data to include in the request.
- * @param {Array<File>}    $3.filesList      List of files.
- * @param {Function}       $3.onError        Function called when an error happens.
- * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
- * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
- * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
- * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
+ * @param registry          The data registry.
+ * @param settings          Block editor settings.
+ * @param $3                Parameters object passed to the function.
+ * @param $3.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
+ * @param $3.additionalData Additional data to include in the request.
+ * @param $3.filesList      List of files.
+ * @param $3.onError        Function called when an error happens.
+ * @param $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
+ * @param $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
+ * @param $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ * @param $3.multiple       Whether the caller accepts more than one file.
  */
 async function heicMediaUpload(
-	registry,
-	settings,
+	registry: DataRegistry,
+	settings: Settings,
 	{
 		allowedTypes,
 		additionalData = {},
@@ -231,7 +247,7 @@ async function heicMediaUpload(
 		onSuccess,
 		onBatchSuccess,
 		multiple = true,
-	}
+	}: MediaUploadOptions
 ) {
 	if ( refuseExtraFiles( filesList, multiple, onError ) ) {
 		return;
@@ -244,8 +260,8 @@ async function heicMediaUpload(
 	 * from the file extension: a HEIC photo saved as .jpg would otherwise be
 	 * handed to the server-side path, which cannot convert it either.
 	 */
-	const heicFiles = [];
-	const otherFiles = [];
+	const heicFiles: File[] = [];
+	const otherFiles: File[] = [];
 	for ( const file of files ) {
 		( ( await isHeicFile( file ) ) ? heicFiles : otherFiles ).push( file );
 	}
@@ -270,7 +286,11 @@ async function heicMediaUpload(
 			files: heicFiles,
 			onChange: onFileChange,
 			onSuccess: ( attachments ) => {
-				settings?.[ mediaUploadOnSuccessKey ]?.( attachments );
+				// The private success callback takes the attachments.
+				(
+					settings?.[ mediaUploadOnSuccessKey ] as
+						( ( attachments: unknown ) => void ) | undefined
+				 )?.( attachments );
 				onSuccess?.( attachments );
 			},
 			onBatchSuccess: coordinatedBatchSuccess,
@@ -285,7 +305,8 @@ async function heicMediaUpload(
 
 	// Pass non-HEIC files to the original server-side upload function.
 	if ( otherFiles.length > 0 && settings?.mediaUpload ) {
-		settings.mediaUpload( {
+		// The setting is the server-side upload function.
+		( settings.mediaUpload as MediaUploadFunction )( {
 			allowedTypes,
 			additionalData,
 			filesList: otherFiles,
@@ -303,15 +324,15 @@ async function heicMediaUpload(
  * hook can read selection state from the context provided by this tree
  * rather than from a parent provider (which may not exist for the root).
  *
- * @param {Object} props Props forwarded to useBlockSync.
+ * @param props Props forwarded to useBlockSync.
  */
-function BlockSyncEffect( props ) {
+function BlockSyncEffect( props: UseBlockSyncProps ) {
 	useBlockSync( props );
 	return null;
 }
 
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
-	( props ) => {
+	( props: RegistryProvidedProps ) => {
 		const {
 			settings: _settings,
 			registry,
@@ -330,8 +351,9 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		// where mediaUpload has already been replaced with the
 		// interceptor.  Detect this so we skip the replacement and
 		// MediaUploadProvider for them — see the longer comment below.
-		const isMediaUploadIntercepted =
-			!! _settings?.mediaUpload?.__isMediaUploadInterceptor;
+		const isMediaUploadIntercepted = !! (
+			_settings?.mediaUpload as MediaUploadFunction | undefined
+		 )?.__isMediaUploadInterceptor;
 
 		const settings = useMemo( () => {
 			if (
@@ -345,7 +367,12 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 				const uploadFn = isClientSideMediaEnabled
 					? mediaUpload
 					: heicMediaUpload;
-				const interceptor = uploadFn.bind( null, registry, _settings );
+				// The bound upload function gets flagged as the interceptor.
+				const interceptor = uploadFn.bind(
+					null,
+					registry,
+					_settings!
+				) as MediaUploadFunction;
 				interceptor.__isMediaUploadInterceptor = true;
 				return {
 					..._settings,
@@ -394,7 +421,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		const selectionContextValue = useMemo(
 			() => ( {
 				getSelection: () => selectionRef.current,
-				onChangeSelection: ( ...args ) =>
+				onChangeSelection: ( ...args: [ BlockSelectionState ] ) =>
 					onChangeSelectionRef.current( ...args ),
 			} ),
 			[]
@@ -453,7 +480,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 	}
 );
 
-export const BlockEditorProvider = ( props ) => {
+export const BlockEditorProvider = ( props: BlockEditorProviderProps ) => {
 	return (
 		<ExperimentalBlockEditorProvider { ...props } stripExperimentalSettings>
 			{ props.children }

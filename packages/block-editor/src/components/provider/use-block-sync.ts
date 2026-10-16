@@ -1,8 +1,16 @@
 import { useContext, useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { SelectionContext } from './selection-context';
+import type { BlockSelection } from '../../store/types';
+import type {
+	BlockSelectionState,
+	ClientIdMapping,
+	OnBlockUpdate,
+	UseBlockSyncProps,
+} from './types';
 
 const noop = () => {};
 
@@ -13,11 +21,14 @@ const noop = () => {};
  * This allows the block editor to use unique internal IDs while preserving
  * stable external IDs for features like real-time collaboration.
  *
- * @param {Object} block   The block to clone.
- * @param {Object} mapping The mapping object with externalToInternal and internalToExternal Maps.
- * @return {Object} The cloned block with a new clientId.
+ * @param block   The block to clone.
+ * @param mapping The mapping object with externalToInternal and internalToExternal Maps.
+ * @return The cloned block with a new clientId.
  */
-function cloneBlockWithMapping( block, mapping ) {
+function cloneBlockWithMapping(
+	block: Block,
+	mapping: ClientIdMapping
+): Block {
 	const clonedBlock = cloneBlock( block );
 
 	// Build bidirectional mapping
@@ -41,11 +52,14 @@ function cloneBlockWithMapping( block, mapping ) {
  * Restores external (original) client IDs on blocks before passing them
  * to onChange/onInput callbacks.
  *
- * @param {Object[]} blocks  The blocks with internal client IDs.
- * @param {Object}   mapping The mapping object with internalToExternal Map.
- * @return {Object[]} Blocks with external client IDs restored.
+ * @param blocks  The blocks with internal client IDs.
+ * @param mapping The mapping object with internalToExternal Map.
+ * @return Blocks with external client IDs restored.
  */
-function restoreExternalIds( blocks, mapping ) {
+function restoreExternalIds(
+	blocks: Block[],
+	mapping: ClientIdMapping
+): Block[] {
 	return blocks.map( ( block ) => {
 		const externalId = mapping.internalToExternal.get( block.clientId );
 		return {
@@ -60,14 +74,17 @@ function restoreExternalIds( blocks, mapping ) {
 /**
  * Restores external client IDs in selection state.
  *
- * @param {Object} selectionState The selection state with internal client IDs.
- * @param {Object} mapping        The mapping object with internalToExternal Map.
- * @return {Object} Selection state with external client IDs.
+ * @param selectionState The selection state with internal client IDs.
+ * @param mapping        The mapping object with internalToExternal Map.
+ * @return Selection state with external client IDs.
  */
-function restoreSelectionIds( selectionState, mapping ) {
+function restoreSelectionIds(
+	selectionState: BlockSelectionState,
+	mapping: ClientIdMapping
+): BlockSelectionState {
 	const { selectionStart, selectionEnd, initialPosition } = selectionState;
 
-	const restoreClientId = ( sel ) => {
+	const restoreClientId = ( sel?: BlockSelection ) => {
 		if ( ! sel?.clientId ) {
 			return sel;
 		}
@@ -84,16 +101,6 @@ function restoreSelectionIds( selectionState, mapping ) {
 		initialPosition,
 	};
 }
-
-/**
- * A function to call when the block value has been updated in the block-editor
- * store.
- *
- * @callback onBlockUpdate
- * @param {Object[]} blocks  The updated blocks.
- * @param {Object}   options The updated block options, such as selectionStart
- *                           and selectionEnd.
- */
 
 /**
  * useBlockSync is a side effect which handles bidirectional sync between the
@@ -116,31 +123,31 @@ function restoreSelectionIds( selectionState, mapping ) {
  *   controllers.
  * - Passes selection state from the block-editor store to the controlling entity.
  *
- * @param {Object}        props          Props for the block sync hook
- * @param {string}        props.clientId The client ID of the inner block controller.
- *                                       If none is passed, then it is assumed to be a
- *                                       root controller rather than an inner block
- *                                       controller.
- * @param {Object[]}      props.value    The control value for the blocks. This value
- *                                       is used to initialize the block-editor store
- *                                       and for resetting the blocks to incoming
- *                                       changes like undo.
- * @param {onBlockUpdate} props.onChange Function to call when a persistent
- *                                       change has been made in the block-editor blocks
- *                                       for the given clientId. For example, after
- *                                       this function is called, an entity is marked
- *                                       dirty because it has changes to save.
- * @param {onBlockUpdate} props.onInput  Function to call when a non-persistent
- *                                       change has been made in the block-editor blocks
- *                                       for the given clientId. When this is called,
- *                                       controlling sources do not become dirty.
+ * @param props          Props for the block sync hook
+ * @param props.clientId The client ID of the inner block controller.
+ *                       If none is passed, then it is assumed to be a
+ *                       root controller rather than an inner block
+ *                       controller.
+ * @param props.value    The control value for the blocks. This value
+ *                       is used to initialize the block-editor store
+ *                       and for resetting the blocks to incoming
+ *                       changes like undo.
+ * @param props.onChange Function to call when a persistent
+ *                       change has been made in the block-editor blocks
+ *                       for the given clientId. For example, after
+ *                       this function is called, an entity is marked
+ *                       dirty because it has changes to save.
+ * @param props.onInput  Function to call when a non-persistent
+ *                       change has been made in the block-editor blocks
+ *                       for the given clientId. When this is called,
+ *                       controlling sources do not become dirty.
  */
 export default function useBlockSync( {
 	clientId = null,
 	value: controlledBlocks,
 	onChange = noop,
 	onInput = noop,
-} ) {
+}: UseBlockSyncProps ) {
 	const registry = useRegistry();
 	const { getSelection, onChangeSelection } = useContext( SelectionContext );
 
@@ -154,19 +161,22 @@ export default function useBlockSync( {
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
 
-	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
+	const pendingChangesRef = useRef< {
+		incoming: Block[] | null;
+		outgoing: Block[][];
+	} >( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
 
 	// Mapping between external (original) and internal (cloned) client IDs.
 	// This allows stable external IDs while using unique internal IDs.
-	const idMappingRef = useRef( {
+	const idMappingRef = useRef< ClientIdMapping >( {
 		externalToInternal: new Map(),
 		internalToExternal: new Map(),
 	} );
 
 	// Tracks which context selection has already been applied, to avoid
 	// duplicate restoration.
-	const appliedSelectionRef = useRef( null );
+	const appliedSelectionRef = useRef< BlockSelectionState | null >( null );
 	// Flag to prevent the subscription from re-reporting a selection
 	// change that was just restored from context (which would loop).
 	const isRestoringSelectionRef = useRef( false );
@@ -199,7 +209,7 @@ export default function useBlockSync( {
 			// Inner block controllers need to convert external→internal
 			// IDs via the clone mapping; the root controller uses
 			// external IDs directly (no mapping needed).
-			const convert = ( sel ) => {
+			const convert = ( sel?: BlockSelection ) => {
 				if ( ! sel?.clientId || ! clientId ) {
 					return sel;
 				}
@@ -215,9 +225,11 @@ export default function useBlockSync( {
 			// selection change back to the entity (which would cause
 			// an infinite update loop).
 			isRestoringSelectionRef.current = true;
+			// The check above found the selection start.
 			resetSelection(
-				convert( selection.selectionStart ),
-				convert( selection.selectionEnd ),
+				convert( selection.selectionStart )!,
+				// The store accepts an unset selection end.
+				convert( selection.selectionEnd ) as BlockSelection,
 				selection.initialPosition
 			);
 			isRestoringSelectionRef.current = false;
@@ -299,8 +311,8 @@ export default function useBlockSync( {
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
 	// waiting for React renders for changes.
-	const onInputRef = useRef( onInput );
-	const onChangeRef = useRef( onChange );
+	const onInputRef = useRef< OnBlockUpdate >( onInput );
+	const onChangeRef = useRef< OnBlockUpdate >( onChange );
 	useEffect( () => {
 		onInputRef.current = onInput;
 		onChangeRef.current = onChange;
@@ -310,7 +322,10 @@ export default function useBlockSync( {
 	// Also restores selection from context after blocks are set.
 	useEffect( () => {
 		const isOutgoing =
-			pendingChangesRef.current.outgoing.includes( controlledBlocks );
+			// An unset value is never pending.
+			pendingChangesRef.current.outgoing.includes(
+				controlledBlocks as Block[]
+			);
 		const storeMatch = getBlocks( clientId ) === controlledBlocks;
 
 		if ( isOutgoing ) {
@@ -451,9 +466,10 @@ export default function useBlockSync( {
 						const updateParent = isPersistent
 							? onChangeRef.current
 							: onInputRef.current;
-						const updateOptions = {
-							selection: selectionForParent,
-						};
+						const updateOptions: Parameters< OnBlockUpdate >[ 1 ] =
+							{
+								selection: selectionForParent,
+							};
 						if ( blockHistoryMode === 'ignore' ) {
 							updateOptions.undoIgnore = true;
 						}

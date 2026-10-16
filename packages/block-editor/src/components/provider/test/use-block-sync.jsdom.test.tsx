@@ -1,6 +1,10 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render } from '@testing-library/react';
+import type { ComponentType } from 'react';
+import type { Block } from '@wordpress/blocks';
+import type { DataRegistry } from '@wordpress/data';
+import type { BlockEditorProviderProps, RegistryProvidedProps } from '../types';
 import useBlockSync from '../use-block-sync';
 import withRegistryProvider from '../with-registry-provider';
 import * as blockEditorActions from '../../../store/actions';
@@ -17,16 +21,34 @@ vi.mock( import( '../../../store/actions' ), async ( importOriginal ) => {
 	};
 } );
 
-const TestWrapper = withRegistryProvider( ( props ) => {
-	if ( props.setRegistry ) {
-		props.setRegistry( props.registry );
+/*
+ * The tests pass partial blocks, and a callback receiving the registry the
+ * provider creates.
+ */
+type TestBlock = Partial< Omit< Block, 'innerBlocks' > > & {
+	innerBlocks?: TestBlock[];
+};
+
+type TestWrapperProps = Omit< BlockEditorProviderProps, 'value' > & {
+	value?: TestBlock[];
+	setRegistry?: ( registry: DataRegistry ) => void;
+};
+
+const TestWrapper = withRegistryProvider(
+	(
+		props: RegistryProvidedProps & Pick< TestWrapperProps, 'setRegistry' >
+	) => {
+		if ( props.setRegistry ) {
+			props.setRegistry( props.registry );
+		}
+		useBlockSync( props );
+		return null;
 	}
-	useBlockSync( props );
-	return null;
-} );
+) as ComponentType< TestWrapperProps >;
 
 describe( 'useBlockSync hook', () => {
 	beforeAll( () => {
+		// @ts-expect-error The test block needs no category.
 		registerBlockType( 'test/test-block', {
 			apiVersion: 3,
 			title: 'Test block',
@@ -41,7 +63,7 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	it( 'resets the block-editor blocks when the controlled value changes', async () => {
-		const fakeBlocks = [];
+		const fakeBlocks: Block[] = [];
 		const resetBlocks = vi.spyOn( blockEditorActions, 'resetBlocks' );
 		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
@@ -93,7 +115,7 @@ describe( 'useBlockSync hook', () => {
 	} );
 
 	it( 'replaces the inner blocks of a block when the controlled value changes if a clientId is passed', async () => {
-		const fakeBlocks = [];
+		const fakeBlocks: Block[] = [];
 		const replaceInnerBlocks = vi.spyOn(
 			blockEditorActions,
 			'replaceInnerBlocks'
@@ -172,8 +194,8 @@ describe( 'useBlockSync hook', () => {
 			},
 		];
 
-		let registry;
-		const setRegistry = ( reg ) => {
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
 			registry = reg;
 		};
 		const { rerender } = render(
@@ -236,8 +258,8 @@ describe( 'useBlockSync hook', () => {
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
-		let registry;
-		const setRegistry = ( reg ) => {
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
 			registry = reg;
 		};
 		render(
@@ -272,8 +294,8 @@ describe( 'useBlockSync hook', () => {
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
-		let registry;
-		const setRegistry = ( reg ) => {
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
 			registry = reg;
 		};
 		render(
@@ -313,8 +335,8 @@ describe( 'useBlockSync hook', () => {
 		const value1 = [
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 1 } },
 		];
-		let registry;
-		const setRegistry = ( reg ) => {
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
 			registry = reg;
 		};
 		render(
@@ -403,8 +425,8 @@ describe( 'useBlockSync hook', () => {
 			},
 		];
 
-		let registry;
-		const setRegistry = ( reg ) => {
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
 			registry = reg;
 		};
 		render(
@@ -445,8 +467,8 @@ describe( 'useBlockSync hook', () => {
 		const onChange1 = vi.fn();
 		const onInput = vi.fn();
 
-		let registry;
-		const setRegistry = ( reg ) => {
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
 			registry = reg;
 		};
 
@@ -514,8 +536,8 @@ describe( 'useBlockSync hook', () => {
 		const onChange1 = vi.fn();
 		const onInput = vi.fn();
 
-		let registry;
-		const setRegistry = ( reg ) => {
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
 			registry = reg;
 		};
 
@@ -587,8 +609,8 @@ describe( 'useBlockSync hook', () => {
 			},
 		];
 
-		let registry;
-		const setRegistry = ( reg ) => {
+		let registry!: DataRegistry;
+		const setRegistry = ( reg: DataRegistry ) => {
 			registry = reg;
 		};
 
