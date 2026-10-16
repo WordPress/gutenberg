@@ -3,6 +3,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { rotateRight, Icon } from '@wordpress/icons';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
+import { GridItemHandle } from './grid-item-handle';
 import { getRotationFromPointer } from './rotation';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 import { setInlineStyle } from './utils';
@@ -45,7 +46,8 @@ function removeKeyListeners( rotation: Rotation ) {
 }
 
 /**
- * A handle below a selected grid item for rotating it on the canvas.
+ * A handle outside the bottom corner of a selected grid item, for rotating it
+ * on the canvas.
  *
  * While dragging, the rotation is previewed with an inline `rotate` style on
  * the block element, which wins over the rotate support's class rules, and
@@ -128,13 +130,14 @@ export function GridItemRotator( {
 			additionalStyles={ overlayStyle }
 		>
 			<div ref={ boxRef } className="block-editor-grid-item-handles__box">
-				<div
+				{ /*
+				 * Keyboard users rotate blocks with the Rotation control in
+				 * the block settings.
+				 */ }
+				<GridItemHandle
 					className="block-editor-grid-item-handles__rotate"
-					title={ __( 'Rotate' ) }
-					// The handle only works with a pointer. Keyboard users
-					// rotate blocks with the Rotation control in the block
-					// settings.
-					aria-hidden="true"
+					label={ __( 'Rotate' ) }
+					angle={ previewAngle ?? angle }
 					onPointerDown={ ( event ) => {
 						if (
 							event.button !== 0 ||
@@ -218,21 +221,19 @@ export function GridItemRotator( {
 						setPreview( null );
 					} }
 				>
-					<Icon icon={ rotateRight } size={ 16 } />
-				</div>
-				{ previewAngle !== null && (
-					<span
-						className="block-editor-grid-item-handles__angle"
-						// Counter the overlay's rotation so the text stays upright.
-						style={ { rotate: `${ -previewAngle }deg` } }
-					>
-						{ sprintf(
-							/* translators: %d: Rotation angle in degrees. */
-							__( '%d°' ),
-							previewAngle
-						) }
-					</span>
-				) }
+					{ /* While rotating, the handle shows the angle instead. */ }
+					{ previewAngle === null ? (
+						<Icon icon={ rotateRight } />
+					) : (
+						<span className="block-editor-grid-item-handles__angle">
+							{ sprintf(
+								/* translators: %d: Rotation angle in degrees. */
+								__( '%d°' ),
+								previewAngle
+							) }
+						</span>
+					) }
+				</GridItemHandle>
 			</div>
 		</BlockPopoverCover>
 	);
