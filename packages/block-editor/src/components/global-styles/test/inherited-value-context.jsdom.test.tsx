@@ -1,7 +1,10 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
+import type { ReactElement, ReactNode } from 'react';
 import { useResolvedStyle } from '../inherited-value-context';
+import type { BlockStyleState } from '../../../hooks/types';
 import { BlockContextProvider } from '../../block-context';
 import { globalStylesDataKey } from '../../../store/private-keys';
 
@@ -17,6 +20,7 @@ afterEach( () => {
 	delete window.__experimentalGlobalStylesInheritanceUI;
 } );
 
+// @ts-expect-error The stub provides only what the hook and its imports need.
 vi.mock( import( '@wordpress/data' ), () => ( {
 	useSelect: vi.fn(),
 	useDispatch: vi.fn( () => ( {} ) ),
@@ -29,20 +33,32 @@ vi.mock( import( '@wordpress/data' ), () => ( {
 	dispatch: vi.fn(),
 	combineReducers: vi.fn( ( reducers ) => reducers ),
 	subscribe: vi.fn(),
-	RegistryProvider: ( { children } ) => children,
-	RegistryConsumer: ( { children } ) => children( {} ),
-	AsyncModeProvider: ( { children } ) => children,
+	RegistryProvider: ( { children }: { children: ReactNode } ) => children,
+	RegistryConsumer: ( {
+		children,
+	}: {
+		children: ( registry: object ) => ReactNode;
+	} ) => children( {} ),
+	AsyncModeProvider: ( { children }: { children: ReactNode } ) => children,
 	useRegistrySelect: vi.fn(),
 	useRegistryDispatch: vi.fn( () => ( {} ) ),
-	withSelect: ( mapStateToProps ) => ( Component ) => ( props ) =>
-		Component( {
-			...props,
-			...( mapStateToProps?.( () => ( {} ) ) || {} ),
-		} ),
-	withDispatch: () => ( Component ) => ( props ) => Component( props ),
-	withRegistry: ( Component ) => Component,
+	withSelect:
+		( mapStateToProps?: ( select: () => object ) => object ) =>
+		( Component: ( props: object ) => unknown ) =>
+		( props: object ) =>
+			Component( {
+				...props,
+				...( mapStateToProps?.( () => ( {} ) ) || {} ),
+			} ),
+	withDispatch:
+		() =>
+		( Component: ( props: object ) => unknown ) =>
+		( props: object ) =>
+			Component( props ),
+	withRegistry: ( Component: unknown ) => Component,
 } ) );
 
+// @ts-expect-error The stub provides only the store descriptor.
 vi.mock( import( '../../../store' ), () => ( {
 	store: { name: 'core/block-editor' },
 } ) );
@@ -52,9 +68,10 @@ vi.mock( import( '../../../store' ), () => ( {
 // transitive import chain fails under this file's `@wordpress/data` mock
 // (missing `createSelector`), so stub the blocks module with just the shape
 // needed.
+// @ts-expect-error The stub provides only what the hook needs.
 vi.mock( import( '@wordpress/blocks' ), () => ( {
 	store: { name: 'core/blocks' },
-	getBlockType: ( blockName ) =>
+	getBlockType: ( blockName: string ) =>
 		( {
 			'core/group': { title: 'Group' },
 			'core/heading': { title: 'Heading' },
@@ -66,19 +83,33 @@ vi.mock( import( '@wordpress/blocks' ), () => ( {
 // `className`; map `is-style-<slug>` to `<slug>` for these tests. The
 // variation-ref resolution itself now lives in `resolveStyle`
 // (`@wordpress/global-styles-engine`) and is covered by its own tests.
+// @ts-expect-error The stub returns `null` for no match, unlike the real helper.
 vi.mock( import( '../../../hooks/block-style-variation' ), () => ( {
-	getVariationNameFromClass: ( className ) => {
+	getVariationNameFromClass: ( className: string ) => {
 		const match = /is-style-([\w-]+)/.exec( className || '' );
 		return match ? match[ 1 ] : null;
 	},
 } ) );
 
+// The mocked hook returns what each test sets up.
+const mockedUseSelect = useSelect as unknown as Mock<
+	( mapSelect: ( select: unknown ) => unknown ) => unknown
+>;
+
 describe( 'useResolvedStyle hook', () => {
 	beforeEach( () => {
-		useSelect.mockReset();
+		mockedUseSelect.mockReset();
 	} );
 
-	function Probe( { blockName, className, selectedState } ) {
+	function Probe( {
+		blockName,
+		className,
+		selectedState,
+	}: {
+		blockName?: string;
+		className?: string;
+		selectedState?: BlockStyleState | null;
+	} ) {
 		const v = useResolvedStyle( blockName, className, selectedState );
 		return <div data-testid="probe">{ JSON.stringify( v ) }</div>;
 	}
@@ -87,10 +118,16 @@ describe( 'useResolvedStyle hook', () => {
 	// payload (block-editor store) and the block's registered styles
 	// (blocks store). Feed both from one stub.
 	function mockStores(
-		rawGlobalStyles,
-		{ blockStyles = [], attributes = {} } = {}
+		rawGlobalStyles: Record< string, unknown > | null,
+		{
+			blockStyles = [],
+			attributes = {},
+		}: {
+			blockStyles?: unknown[];
+			attributes?: Record< string, unknown >;
+		} = {}
 	) {
-		useSelect.mockImplementation( ( mapSelect ) =>
+		mockedUseSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				// `globalStylesDataKey` holds the BARE merged styles tree
 				// in production (see `editor/src/components/provider/
@@ -113,7 +150,7 @@ describe( 'useResolvedStyle hook', () => {
 
 	// Resolves a block's styles as rendered inside an Accordion, which supplies
 	// the heading level to every descendant through block context.
-	function resolveInAccordion( blockName, level = 3 ) {
+	function resolveInAccordion( blockName: string, level: unknown = 3 ) {
 		render(
 			<BlockContextProvider
 				value={ { 'core/accordion-heading-level': level } }
@@ -297,10 +334,16 @@ describe( 'useResolvedStyle hook', () => {
  */
 describe( 'useResolvedStyle – production bare-tree shape', () => {
 	beforeEach( () => {
-		useSelect.mockReset();
+		mockedUseSelect.mockReset();
 	} );
 
-	function Probe( { blockName, className } ) {
+	function Probe( {
+		blockName,
+		className,
+	}: {
+		blockName: string;
+		className?: string;
+	} ) {
 		const { value } = useResolvedStyle( blockName, className );
 		return <div data-testid="probe">{ JSON.stringify( value ) }</div>;
 	}
@@ -358,8 +401,11 @@ describe( 'useResolvedStyle – production bare-tree shape', () => {
 		},
 	};
 
-	function mountWithFixture( ui, rawGlobalStyles = productionShapeFixture ) {
-		useSelect.mockImplementation( ( mapSelect ) =>
+	function mountWithFixture(
+		ui: ReactElement,
+		rawGlobalStyles: Record< string, unknown > = productionShapeFixture
+	) {
+		mockedUseSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getSettings: () => ( {
 					[ globalStylesDataKey ]: rawGlobalStyles,
