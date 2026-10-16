@@ -6,6 +6,7 @@ import { getFontSize, getFontSizeClass } from './utils';
 import { useSettings } from '../use-settings';
 import type {
 	FontSizeSetters,
+	IncompatibleInjectedProps,
 	InjectedFontSizesProps,
 	WithFontSizesProps,
 	WithFontSizesState,
@@ -234,19 +235,13 @@ export default < Name extends string >( ...fontSizeNames: Name[] ) => {
 			Inner: ComponentType< WithFontSizesProps >
 		) => ComponentType< WithFontSizesProps >,
 		'withFontSizes'
-	) as <
-		// Any injected prop the component declares must take the injected type.
-		Props extends Partial<
-			Pick<
-				InjectedFontSizesProps< Name >,
-				keyof Props & keyof InjectedFontSizesProps< Name >
-			>
-		>,
-	>(
-		WrappedComponent:
+	) as < Props >(
+		WrappedComponent: (
 			| FunctionComponent< Props & InjectedFontSizesProps< Name > >
 			// A class component's `props` type must match, so it takes its own props.
 			| ComponentClass< Props >
+		) &
+			IncompatibleInjectedProps< Props, InjectedFontSizesProps< Name > >
 	) => ComponentType<
 		Omit< Props, keyof InjectedFontSizesProps< Name > > &
 			Pick< WithFontSizesProps, 'attributes' | 'setAttributes' >

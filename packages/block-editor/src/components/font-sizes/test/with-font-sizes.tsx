@@ -57,6 +57,32 @@ describe( 'withFontSizes types', () => {
 		expect( [ withLabel, withoutLabel ] ).toHaveLength( 2 );
 	} );
 
+	it( 'accepts injected values that fit the declared props', () => {
+		const Labeled: ComponentType< {
+			setFontSize: ( size: number ) => void;
+			label: string;
+		} > = () => null;
+		const WithFontSize = withFontSizes( 'fontSize' )( Labeled );
+
+		expect(
+			<WithFontSize
+				label="Size"
+				attributes={ {} }
+				setAttributes={ () => {} }
+			/>
+		).toBeDefined();
+	} );
+
+	it( 'rejects injected values that do not fit the declared props', () => {
+		const Narrow: ComponentType< { fontSize: { size: number } } > = () =>
+			null;
+
+		// @ts-expect-error The injected size can be unset or a string.
+		const WithFontSize = withFontSizes( 'fontSize' )( Narrow );
+
+		expect( WithFontSize ).toBeDefined();
+	} );
+
 	it( 'rejects injected props of another type', () => {
 		const Mistyped: ComponentType< { setFontSize: number } > = () => null;
 

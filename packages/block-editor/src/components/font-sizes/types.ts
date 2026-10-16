@@ -93,6 +93,26 @@ export type InjectedFontSizesProps< Name extends string > = {
 };
 
 /**
+ * Rejects a wrapped component that declares an injected prop with a type the
+ * injected value does not fit, naming the props in the error.
+ */
+export type IncompatibleInjectedProps< Props, Injected > = [
+	{
+		[ K in keyof Props & keyof Injected ]: Injected[ K ] extends Props[ K ]
+			? never
+			: K;
+	}[ keyof Props & keyof Injected ],
+] extends [ never ]
+	? unknown
+	: {
+			incompatibleInjectedProps: {
+				[
+					K in keyof Props & keyof Injected
+				]: Injected[ K ] extends Props[ K ] ? never : K;
+			}[ keyof Props & keyof Injected ];
+		};
+
+/**
  * The font size objects `withFontSizes` passes, keyed by attribute name.
  */
 export type WithFontSizesState = Record<
