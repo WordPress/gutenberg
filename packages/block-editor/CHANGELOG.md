@@ -15,6 +15,7 @@
 
 ### Enhancements
 
+-   Use SelectControl for preset input dropdowns.
 -   Migrate date format and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, forwarded trigger props, and control-specific root CSS hooks. Also migrate the date format switch, custom input, link, and layout, and simplify the aspect-ratio control's option rendering ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).
 -   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
