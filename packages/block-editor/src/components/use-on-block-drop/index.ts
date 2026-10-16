@@ -71,7 +71,7 @@ export function parseDropEvent(
  * @return The event handler for a block drop event.
  */
 export function onBlockDrop(
-	targetRootClientId: string | undefined,
+	targetRootClientId: string | null | undefined,
 	targetBlockIndex: number,
 	getBlockIndex: ( clientId: string ) => number,
 	getClientIdsOfDescendants: ( clientIds: string[] ) => string[],
@@ -169,7 +169,7 @@ export function onBlockDrop(
  * @return The event handler for a block-related file drop event.
  */
 export function onFilesDrop(
-	targetRootClientId: string | undefined,
+	targetRootClientId: string | null | undefined,
 	getSettings: () => Settings,
 	updateBlockAttributes: (
 		clientId: string,
@@ -236,7 +236,7 @@ export function onHTMLDrop( insertOrReplaceBlocks: InsertOrReplaceBlocks ) {
  * @return A function to be passed to the onDrop handler.
  */
 export default function useOnBlockDrop(
-	targetRootClientId: string | undefined,
+	targetRootClientId: string | null | undefined,
 	targetBlockIndex: number,
 	options: UseOnBlockDropOptions = {}
 ) {
