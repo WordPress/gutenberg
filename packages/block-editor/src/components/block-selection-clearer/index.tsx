@@ -1,5 +1,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import type { ComponentPropsWithoutRef } from 'react';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -7,7 +8,7 @@ import { store as blockEditorStore } from '../../store';
  * selection. Selection will only be cleared if the element is clicked directly,
  * not if a child element is clicked.
  *
- * @return {React.RefCallback} Ref callback.
+ * @return Ref callback.
  */
 export function useBlockSelectionClearer() {
 	const { getSettings, hasSelectedBlock, hasMultiSelection } =
@@ -15,13 +16,13 @@ export function useBlockSelectionClearer() {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clearBlockSelection: isEnabled } = getSettings();
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( ! isEnabled ) {
 				return;
 			}
 
-			function onMouseDown( event ) {
+			function onMouseDown( event: MouseEvent ) {
 				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
 					return;
 				}
@@ -44,6 +45,8 @@ export function useBlockSelectionClearer() {
 	);
 }
 
-export default function BlockSelectionClearer( props ) {
+export default function BlockSelectionClearer(
+	props: ComponentPropsWithoutRef< 'div' >
+) {
 	return <div ref={ useBlockSelectionClearer() } { ...props } />;
 }
