@@ -1,9 +1,11 @@
 import { Button, Composite } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
+import type { ForwardedRef } from 'react';
+import type { InserterListboxItemProps } from './types';
 
 function InserterListboxItem(
-	{ isFirst, as: Component, children, ...props },
-	ref
+	{ isFirst, as: Component, children, ...props }: InserterListboxItemProps,
+	ref: ForwardedRef< HTMLButtonElement >
 ) {
 	return (
 		<Composite.Item
@@ -15,6 +17,7 @@ function InserterListboxItem(
 			accessibleWhenDisabled
 			// Manage the roving tab index below. Otherwise every item
 			// re-renders to update it once the items have registered.
+			// @ts-expect-error `tabbable` is an Ariakit prop the types omit.
 			tabbable
 			// Without an explicit type, every item re-renders after mount
 			// once Ariakit detects the native button.
@@ -24,7 +27,13 @@ function InserterListboxItem(
 				const propsWithTabIndex = {
 					...htmlProps,
 					tabIndex:
-						isFirst || htmlProps[ 'data-active-item' ] ? 0 : -1,
+						// Ariakit sets the attribute on the active item.
+						isFirst ||
+						( htmlProps as Record< string, unknown > )[
+							'data-active-item'
+						]
+							? 0
+							: -1,
 				};
 				if ( Component ) {
 					return (

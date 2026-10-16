@@ -16,13 +16,17 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import { unlock } from '../../lock-unlock';
+import type {
+	BlockQuickNavigationItemProps,
+	BlockQuickNavigationProps,
+} from './types';
 
 export default function BlockQuickNavigation( {
 	clientIds,
 	onSelect,
 	onSwitchToListView,
 	hasListViewTab,
-} ) {
+}: BlockQuickNavigationProps ) {
 	if ( ! clientIds.length ) {
 		return null;
 	}
@@ -46,7 +50,7 @@ function BlockQuickNavigationItem( {
 	onSelect,
 	onSwitchToListView,
 	hasListViewTab,
-} ) {
+}: BlockQuickNavigationItemProps ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const { isSelected, childBlocks, shouldRenderListView, blockName } =
 		useSelect(
@@ -102,7 +106,8 @@ function BlockQuickNavigationItem( {
 		toggleBlockHighlight( clientId, false )
 	);
 	useEffect(
-		() => () => clearBlockHighlightOnUnmount(),
+		// React ignores the value the cleanup returns.
+		() => ( () => clearBlockHighlightOnUnmount() ) as () => void,
 		[ clearBlockHighlightOnUnmount ]
 	);
 
