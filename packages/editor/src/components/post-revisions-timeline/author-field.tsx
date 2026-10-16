@@ -1,20 +1,18 @@
 import clsx from 'clsx';
+import type { Field } from '@wordpress/dataviews';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { commentAuthorAvatar as authorIcon } from '@wordpress/icons';
-import {
-	__experimentalHStack as HStack,
-	Icon as WCIcon,
-} from '@wordpress/components';
+import { Icon as WCIcon } from '@wordpress/components';
+import { Stack } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { User } from '@wordpress/core-data';
-import type { BasePostWithEmbeddedAuthor } from '../../types';
+import type { BasePostWithEmbeddedAuthor } from '../../dataviews/types';
 
 function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
-	// Fetch the author record from the store when _embedded data is unavailable
-	// (e.g. in the post editor inspector) or when the author has been changed
-	// during editing (item.author differs from _embedded.author).
+	// Revisions don't embed their author, so fetch the user record unless the
+	// item carries an `_embedded` author matching its `author`.
 	const authorId = item?.author;
 	const embeddedAuthorId = item?._embedded?.author?.[ 0 ]?.id;
 	const shouldFetch = Boolean(
@@ -47,12 +45,15 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 		item?._embedded?.author?.[ 0 ]?.avatar_urls?.[ 48 ];
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
 	return (
-		<HStack alignment="left" spacing={ 0 }>
+		<Stack direction="row" align="center">
 			{ !! imageUrl && (
 				<div
-					className={ clsx( 'fields-controls__author-avatar', {
-						'is-loaded': isImageLoaded,
-					} ) }
+					className={ clsx(
+						'editor-post-revisions-timeline__author-avatar',
+						{
+							'is-loaded': isImageLoaded,
+						}
+					) }
 				>
 					<img
 						onLoad={ () => setIsImageLoaded( true ) }
@@ -62,13 +63,26 @@ function AuthorView( { item }: { item: BasePostWithEmbeddedAuthor } ) {
 				</div>
 			) }
 			{ ! imageUrl && (
-				<div className="fields-controls__author-icon">
+				<div className="editor-post-revisions-timeline__author-icon">
 					<WCIcon icon={ authorIcon } />
 				</div>
 			) }
-			<span className="fields-controls__author-name">{ text }</span>
-		</HStack>
+			<span className="editor-post-revisions-timeline__author-name">
+				{ text }
+			</span>
+		</Stack>
 	);
 }
 
-export default AuthorView;
+/**
+ * The author of a revision. The timeline only renders it, so it leaves out
+ * the editing and filtering parts of the author field of the post types.
+ */
+const authorField: Field< BasePostWithEmbeddedAuthor > = {
+	label: __( 'Author' ),
+	id: 'author',
+	type: 'integer',
+	render: AuthorView,
+};
+
+export default authorField;
