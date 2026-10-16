@@ -5,6 +5,9 @@
 $button-spacing-x: $grid-unit-10 + math.div($grid-unit-05, 2); // 10px
 $button-spacing-y: math.div($grid-unit-15, 2); // 6px
 
+.wp-block-search{
+	display: contents !important;
+}
 .wp-block-search__button {
 	margin-left: $button-spacing-x;
 	word-break: normal;
