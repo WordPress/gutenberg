@@ -26,7 +26,7 @@
 
 .media-container {
 	align-items: center;
-	border-radius: 2px;
+	border-radius: variables.$radius-small;
 	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
 	cursor: pointer;
 	display: inline-flex;
@@ -82,8 +82,8 @@
 	}
 }
 
-/* stylelint-disable logical-css/require-logical-properties -- Grid and pointer coordinates are physical image coordinates in both LTR and RTL. */
 .grid {
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Center the grid on physical image coordinates in both LTR and RTL. */
 	left: 50%;
 	overflow: hidden;
 	pointer-events: none;
@@ -111,20 +111,19 @@
 
 .grid-line-x {
 	height: 1px;
-	left: 1px;
-	right: 1px;
+	inset-inline: 1px;
 }
 
 .grid-line-y {
 	width: 1px;
-	top: 1px;
-	bottom: 1px;
+	inset-block: 1px;
 }
 
 .pointer {
 	cursor: grab;
 	height: 40px;
-	margin: -20px 0 0;
+	margin-top: -20px;
+	/* stylelint-disable-next-line logical-css/require-logical-properties -- Offset the pointer from its physical left image coordinate in both LTR and RTL. */
 	margin-left: -20px;
 	position: absolute;
 	user-select: none;
@@ -133,7 +132,7 @@
 	z-index: 10000;
 	background: rgba(255, 255, 255, 0.4);
 	border: 1px solid rgba(255, 255, 255, 0.4);
-	border-radius: 50%;
+	border-radius: variables.$radius-round;
 	backdrop-filter: blur(16px) saturate(180%);
 	box-shadow: rgb(0 0 0 / 10%) 0 0 8px;
 
@@ -147,4 +146,3 @@
 		cursor: grabbing;
 	}
 }
-/* stylelint-enable logical-css/require-logical-properties */
