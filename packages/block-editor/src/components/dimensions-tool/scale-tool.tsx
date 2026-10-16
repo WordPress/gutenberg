@@ -4,11 +4,9 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * @typedef {import('@wordpress/components/build-types/select-control/types').SelectControlProps} SelectControlProps
- */
+import type { DimensionsToolOption, ScaleToolProps } from './types';
 
 /**
  * The descriptions are purposely made generic as object-fit could be used for
@@ -16,10 +14,8 @@ import { __, _x } from '@wordpress/i18n';
  * help text or labels.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/CSS/Replaced_element
- *
- * @type {SelectControlProps[]}
  */
-const DEFAULT_SCALE_OPTIONS = [
+const DEFAULT_SCALE_OPTIONS: DimensionsToolOption[] = [
 	{
 		value: 'fill',
 		label: _x( 'Fill', 'Scale option for dimensions control' ),
@@ -52,28 +48,11 @@ const DEFAULT_SCALE_OPTIONS = [
 ];
 
 /**
- * @callback ScaleToolPropsOnChange
- * @param {string} nextValue New scale value.
- * @return {void}
- */
-
-/**
- * @typedef {Object} ScaleToolProps
- * @property {string}                 [panelId]               ID of the panel that contains the controls.
- * @property {string}                 [value]                 Current scale value.
- * @property {ScaleToolPropsOnChange} [onChange]              Callback to update the scale value.
- * @property {SelectControlProps[]}   [options]               Scale options.
- * @property {string}                 [defaultValue]          Default scale value.
- * @property {boolean}                [showControl=true]      Whether to show the control.
- * @property {boolean}                [isShownByDefault=true] Whether the tool panel is shown by default.
- */
-
-/**
  * A tool to select the CSS object-fit property for the image.
  *
- * @param {ScaleToolProps} props
+ * @param {ScaleToolProps} props The component props.
  *
- * @return {React.ReactElement} The scale tool.
+ * @return The scale tool.
  */
 export default function ScaleTool( {
 	panelId,
@@ -82,14 +61,18 @@ export default function ScaleTool( {
 	options = DEFAULT_SCALE_OPTIONS,
 	defaultValue = DEFAULT_SCALE_OPTIONS[ 0 ].value,
 	isShownByDefault = true,
-} ) {
+}: ScaleToolProps ) {
 	const displayValue = value ?? defaultValue;
 
 	const scaleHelp = useMemo( () => {
-		return options.reduce( ( acc, option ) => {
-			acc[ option.value ] = option.help;
-			return acc;
-		}, {} );
+		return options.reduce(
+			( acc, option ) => {
+				acc[ option.value ] = option.help;
+				return acc;
+				// The reducer fills the empty object.
+			},
+			{} as Record< string, ReactNode >
+		);
 	}, [ options ] );
 
 	return (
@@ -105,7 +88,8 @@ export default function ScaleTool( {
 				isBlock
 				help={ scaleHelp[ displayValue ] }
 				value={ displayValue }
-				onChange={ onChange }
+				// The options' values are strings.
+				onChange={ onChange as ( value?: string | number ) => void }
 			>
 				{ options.map( ( option ) => (
 					<ToggleGroupControlOption

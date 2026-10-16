@@ -3,29 +3,11 @@ import { __, _x } from '@wordpress/i18n';
 import { useSettings } from '../use-settings';
 import { InheritanceToolsPanelItem } from '../global-styles/inheritance';
 import { findAspectRatioOption } from './utils';
-
-/**
- * @typedef {import('@wordpress/components/build-types/select-control/types').SelectControlProps} SelectControlProps
- */
-
-/**
- * @callback AspectRatioToolPropsOnChange
- * @param {string} [value] New aspect ratio value.
- * @return {void} No return.
- */
-
-/**
- * @typedef {Object} AspectRatioToolProps
- * @property {string}                       [panelId]          ID of the panel this tool is associated with.
- * @property {string}                       [value]            Current aspect ratio value.
- * @property {AspectRatioToolPropsOnChange} [onChange]         Callback to update the aspect ratio value.
- * @property {SelectControlProps[]}         [options]          Aspect ratio options.
- * @property {string}                       [defaultValue]     Default aspect ratio value.
- * @property {boolean}                      [isShownByDefault] Whether the tool is shown by default.
- * @property {string}                       [className]        Additional CSS class on the wrapping panel item.
- * @property {boolean}                      [isInherited]      Whether the control is displaying an inherited Global Styles value.
- * @property {boolean}                      [hasLocalOverride] Whether a local value is overriding an inherited Global Styles value.
- */
+import type {
+	AspectRatioPreset,
+	AspectRatioToolProps,
+	DimensionsToolOption,
+} from './types';
 
 export default function AspectRatioTool( {
 	panelId,
@@ -38,24 +20,29 @@ export default function AspectRatioTool( {
 	className,
 	isInherited,
 	hasLocalOverride,
-} ) {
+}: AspectRatioToolProps ) {
 	const [ defaultRatios, themeRatios, showDefaultRatios ] = useSettings(
 		'dimensions.aspectRatios.default',
 		'dimensions.aspectRatios.theme',
 		'dimensions.defaultAspectRatios'
 	);
 
-	const themeOptions = themeRatios?.map( ( { name, ratio } ) => ( {
+	// The settings list the aspect ratio presets.
+	const themeOptions = (
+		themeRatios as AspectRatioPreset[] | undefined
+	 )?.map( ( { name, ratio } ) => ( {
 		label: name,
 		value: ratio,
 	} ) );
 
-	const defaultOptions = defaultRatios?.map( ( { name, ratio } ) => ( {
+	const defaultOptions = (
+		defaultRatios as AspectRatioPreset[] | undefined
+	 )?.map( ( { name, ratio } ) => ( {
 		label: name,
 		value: ratio,
 	} ) );
 
-	const aspectRatioOptions = [
+	const aspectRatioOptions: DimensionsToolOption[] = [
 		{
 			label: _x(
 				'Original',
@@ -63,7 +50,8 @@ export default function AspectRatioTool( {
 			),
 			value: 'auto',
 		},
-		...( showDefaultRatios ? defaultOptions : [] ),
+		// Default ratios are listed when the setting shows them.
+		...( showDefaultRatios ? defaultOptions! : [] ),
 		...( themeOptions ? themeOptions : [] ),
 		{
 			label: _x( 'Custom', 'Aspect ratio option for dimensions control' ),

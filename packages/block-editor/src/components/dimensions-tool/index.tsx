@@ -2,45 +2,14 @@ import { useEffect, useRef } from '@wordpress/element';
 import AspectRatioTool from './aspect-ratio-tool';
 import ScaleTool from './scale-tool';
 import WidthHeightTool from './width-height-tool';
-
-/**
- * @typedef {import('@wordpress/components/build-types/select-control/types').SelectControlProps} SelectControlProps
- */
-
-/**
- * @typedef {import('@wordpress/components/build-types/unit-control/types').WPUnitControlUnit} WPUnitControlUnit
- */
-
-/**
- * @typedef {Object} Dimensions
- * @property {string} [width]       CSS width property.
- * @property {string} [height]      CSS height property.
- * @property {string} [scale]       CSS object-fit property.
- * @property {string} [aspectRatio] CSS aspect-ratio property.
- */
-
-/**
- * @callback DimensionsControlsOnChange
- * @param {Dimensions} nextValue
- * @return {void}
- */
-
-/**
- * @typedef {Object} DimensionsControlsProps
- * @property {string}                     [panelId]            ID of the panel that contains the controls.
- * @property {Dimensions}                 [value]              Current dimensions values.
- * @property {DimensionsControlsOnChange} [onChange]           Callback to update the dimensions values.
- * @property {SelectControlProps[]}       [aspectRatioOptions] Aspect ratio options.
- * @property {SelectControlProps[]}       [scaleOptions]       Scale options.
- * @property {WPUnitControlUnit[]}        [unitsOptions]       Units options.
- */
+import type { Dimensions, DimensionsToolProps } from './types';
 
 /**
  * Component that renders controls to edit the dimensions of an image or container.
  *
- * @param {DimensionsControlsProps} props The component props.
+ * @param {DimensionsToolProps} props The component props.
  *
- * @return {Element} The dimensions controls.
+ * @return The dimensions controls.
  */
 function DimensionsTool( {
 	panelId,
@@ -52,7 +21,7 @@ function DimensionsTool( {
 	defaultScale = 'cover',
 	unitsOptions, // Default options handled by UnitControl.
 	tools = [ 'aspectRatio', 'widthHeight', 'scale' ],
-} ) {
+}: DimensionsToolProps ) {
 	// Coerce undefined and CSS default values to be null.
 	const width =
 		value.width === undefined || value.width === 'auto'
@@ -110,8 +79,8 @@ function DimensionsTool( {
 					options={ aspectRatioOptions }
 					defaultValue={ defaultAspectRatio }
 					value={ aspectRatioValue }
-					onChange={ ( nextAspectRatio ) => {
-						const nextValue = { ...value };
+					onChange={ ( nextAspectRatio?: string | null ) => {
+						const nextValue: Dimensions = { ...value };
 
 						// 'auto' is CSS default, so it gets treated as null.
 						nextAspectRatio =
@@ -147,7 +116,7 @@ function DimensionsTool( {
 					units={ unitsOptions }
 					value={ { width, height } }
 					onChange={ ( { width: nextWidth, height: nextHeight } ) => {
-						const nextValue = { ...value };
+						const nextValue: Dimensions = { ...value };
 
 						// 'auto' is CSS default, so it gets treated as null.
 						nextWidth = nextWidth === 'auto' ? null : nextWidth;
@@ -200,7 +169,7 @@ function DimensionsTool( {
 					defaultValue={ defaultScale }
 					value={ scale }
 					onChange={ ( nextScale ) => {
-						const nextValue = { ...value };
+						const nextValue: Dimensions = { ...value };
 
 						// Update scale.
 						if ( ! nextScale ) {
