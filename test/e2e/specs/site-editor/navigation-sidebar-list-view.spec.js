@@ -335,6 +335,9 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		} );
 
 		await expect(
+			page.getByText( 'This Navigation Menu is empty.' )
+		).toBeVisible();
+		await expect(
 			listView.getByRole( 'button', { name: 'Add page' } )
 		).toBeVisible();
 	} );
@@ -365,6 +368,9 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await expect(
 			listView.getByRole( 'link', { name: 'Test Page 1' } )
 		).toBeVisible();
+		await expect(
+			page.getByText( 'This Navigation Menu is empty.' )
+		).toBeHidden();
 	} );
 } );
 
