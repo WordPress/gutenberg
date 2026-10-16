@@ -9,13 +9,19 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { speak } from '@wordpress/a11y';
 import { useSelect, useDispatch } from '@wordpress/data';
+import type { FocusEvent } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { useBlockDisplayInformation } from '..';
 import isEmptyString from './is-empty-string';
 import { cleanEmptyObject } from '../../hooks/utils';
+import type { Bindings } from '../../utils/block-bindings';
+import type { BlockRenameModalProps } from './types';
 
-export default function BlockRenameModal( { clientId, onClose } ) {
-	const [ editedBlockName, setEditedBlockName ] = useState();
+export default function BlockRenameModal( {
+	clientId,
+	onClose,
+}: BlockRenameModalProps ) {
+	const [ editedBlockName, setEditedBlockName ] = useState< string >();
 
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const { metadata } = useSelect(
@@ -23,7 +29,9 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 			const { getBlockAttributes } = select( blockEditorStore );
 
 			return {
-				metadata: getBlockAttributes( clientId )?.metadata,
+				// The metadata attribute holds the block name and bindings.
+				metadata: getBlockAttributes( clientId )?.metadata as
+					{ name?: string; bindings?: Bindings } | undefined,
 			};
 		},
 		[ clientId ]
@@ -48,7 +56,8 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 
 	const isNameValid = nameHasChanged || nameIsOriginal;
 
-	const autoSelectInputText = ( event ) => event.target.select();
+	const autoSelectInputText = ( event: FocusEvent< HTMLInputElement > ) =>
+		event.target.select();
 
 	const handleSubmit = () => {
 		const newName =
@@ -58,12 +67,14 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 				? sprintf(
 						/* translators: %s: new name/label for the block */
 						__( 'Block name reset to: "%s".' ),
-						editedBlockName
+						// A valid name is changed or the original one.
+						editedBlockName!
 					)
 				: sprintf(
 						/* translators: %s: new name/label for the block */
 						__( 'Block name changed to: "%s".' ),
-						editedBlockName
+						// A valid name is changed or the original one.
+						editedBlockName!
 					);
 
 		// Must be assertive to immediately announce change.
