@@ -5,7 +5,7 @@ import type { DataFormControlProps } from '@wordpress/dataviews';
 import { SelectControl } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { getItemTitle } from '../../actions/utils';
+import { getItemTitle } from '../utils';
 import type { BasePost } from '../../types';
 import { useDefaultTemplateLabel, useTemplateFieldMode } from './hooks';
 import { unlock } from '../../lock-unlock';
