@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/navigation-item-is-active.php';
 require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
 
 /**
@@ -176,7 +177,6 @@ function block_core_navigation_link_maybe_urldecode( $url ) {
 	return $url;
 }
 
-
 /**
  * Renders the `core/navigation-link` block.
  *
@@ -214,14 +214,10 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 	$has_submenu = ! empty( trim( $inner_blocks_html ) );
 
 	$css_classes = trim( implode( ' ', $classes ) );
-	$kind        = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
-	$is_active   = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
-
-	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
-		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
-		if ( $attributes['url'] === $queried_archive_link ) {
-			$is_active = true;
-		}
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		$is_active = gutenberg_block_core_shared_navigation_item_is_active( $attributes );
+	} else {
+		$is_active = block_core_shared_navigation_item_is_active( $attributes );
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
