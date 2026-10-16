@@ -112,15 +112,24 @@ function BlockEditAlignmentToolbarControlsPure( {
 		hasBlockSupport( blockName, 'alignWide', true )
 	);
 
-	const { enabled } = useAlignmentMenu( blockAllowedAlignments );
+	const { enabled, unavailable } = useAlignmentMenu( blockAllowedAlignments );
 	const blockEditingMode = useBlockEditingMode();
 	/*
 	 * Only render when some alignment actually works. Many blocks — Paragraph,
 	 * Heading, List, Group among them — support nothing but wide and full, so
 	 * in a layout offering neither, a control made only of unavailable options
 	 * would sit on the toolbar unable to change anything.
+	 *
+	 * The exception is a block that already carries one of those withheld
+	 * alignments, such as a full-width pattern inserted here. Its saved markup
+	 * keeps the class while the editor renders it unaligned, so the control
+	 * stays to show the alignment is set and to let it be removed.
 	 */
-	if ( ! enabled.length || blockEditingMode !== 'default' ) {
+	const hasUnavailableAlign = !! align && unavailable.includes( align );
+	if (
+		( ! enabled.length && ! hasUnavailableAlign ) ||
+		blockEditingMode !== 'default'
+	) {
 		return null;
 	}
 

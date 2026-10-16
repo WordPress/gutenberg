@@ -256,6 +256,76 @@ describe( 'BlockAlignmentUI with no available alignments', () => {
 
 		expect( container ).toBeEmptyDOMElement();
 	} );
+
+	describe( 'when the value is one of the withheld alignments', () => {
+		// A full-width pattern inserted into a layout offering no full width
+		// keeps `align: "full"`, and its saved markup keeps `alignfull`.
+		async function openMenuWithValue( value ) {
+			const user = userEvent.setup();
+			renderWithTheme(
+				<BlockAlignmentUI
+					value={ value }
+					onChange={ onChange }
+					controls={ controls }
+				/>
+			);
+			await user.click(
+				screen.getByRole( 'button', { name: 'Align block' } )
+			);
+			return user;
+		}
+
+		test( 'keeps the control, showing the value as set but not applied', async () => {
+			await openMenuWithValue( 'full' );
+
+			expect(
+				screen
+					.getAllByRole( 'menuitemradio' )
+					.map( ( item ) => item.textContent )
+			).toEqual( [
+				'None',
+				'Wide widthNot available',
+				'Full widthNot applied here',
+			] );
+			expect(
+				screen.getByRole( 'menuitemradio', { name: /Full width/ } )
+			).toBeChecked();
+		} );
+
+		test( 'describes why the alignment has no effect', async () => {
+			await openMenuWithValue( 'full' );
+
+			expect(
+				screen.getByRole( 'button', { name: 'Align block' } )
+			).toHaveAccessibleDescription(
+				'The surrounding layout stops this alignment from taking effect. Choose None to remove it.'
+			);
+		} );
+
+		test( 'lets None remove it', async () => {
+			const user = await openMenuWithValue( 'full' );
+
+			await user.click(
+				screen.getByRole( 'menuitemradio', { name: 'None' } )
+			);
+
+			expect( onChange ).toHaveBeenCalledTimes( 1 );
+			expect( onChange ).toHaveBeenCalledWith( undefined );
+		} );
+
+		test( 'renders nothing as a toolbar, which has no way to show it', () => {
+			const { container } = renderWithTheme(
+				<BlockAlignmentUI
+					value="full"
+					onChange={ onChange }
+					controls={ controls }
+					isToolbar
+				/>
+			);
+
+			expect( container ).toBeEmptyDOMElement();
+		} );
+	} );
 } );
 
 describe( 'BlockAlignmentUI when the theme withholds alignments', () => {
