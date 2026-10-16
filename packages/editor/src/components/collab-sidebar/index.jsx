@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useRef, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
@@ -13,6 +13,14 @@ import PluginSidebar from '../plugin-sidebar';
 import { ALL_NOTES_SIDEBAR } from './constants';
 import { Notes } from './notes';
 import { NotesDisplayModeMenu } from './notes-display-mode-menu';
+import {
+	DEFAULT_NOTES_FILTERS,
+	NotesFilters,
+	filterNotes,
+	hasActiveNotesFilters,
+	sanitizeNotesFilters,
+	shouldExpandReplies,
+} from './notes-filters';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
 import { NoteAvatarIndicator } from './note-indicator-toolbar';
@@ -80,6 +88,16 @@ function NotesSidebar( { postId, drafts } ) {
 
 	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const areNotesHidden = notesDisplayMode === 'hidden';
+	const [ storedFilters, setFilters ] = useState( DEFAULT_NOTES_FILTERS );
+	const filters = useMemo(
+		() => sanitizeNotesFilters( notes, storedFilters ),
+		[ notes, storedFilters ]
+	);
+	const filteredNotes = useMemo(
+		() => filterNotes( notes, filters, selectedNoteId ),
+		[ notes, filters, selectedNoteId ]
+	);
+
 	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
 	const showAllNotesSidebar =
 		notes.length > 0 || ! isLargeViewport || isAllNotesSidebarOpen;
@@ -197,8 +215,20 @@ function NotesSidebar( { postId, drafts } ) {
 					icon={ commentIcon }
 					closeLabel={ __( 'Close Notes' ) }
 				>
+					{ notes.length > 0 && (
+						<NotesFilters
+							notes={ notes }
+							filters={ filters }
+							onChange={ setFilters }
+						/>
+					) }
 					<NoteDraftsContext.Provider value={ drafts }>
-						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+						<Notes
+							notes={ filteredNotes }
+							sidebarRef={ sidebarRef }
+							isFiltered={ hasActiveNotesFilters( filters ) }
+							expandReplies={ shouldExpandReplies( filters ) }
+						/>
 					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }
