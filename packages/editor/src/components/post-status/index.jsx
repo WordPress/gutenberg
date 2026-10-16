@@ -62,10 +62,11 @@ export const STATUS_OPTIONS = [
 	},
 ];
 
-// A synced pattern that isn't published renders nothing wherever it's used,
-// so patterns only offer the two statuses that keep that predictable.
-const PATTERN_STATUS_OPTIONS = STATUS_OPTIONS.filter( ( { value } ) =>
-	[ 'draft', 'publish' ].includes( value )
+// A synced pattern renders for nobody unless it's published and has no
+// password, so Private ("Only visible to site admins and editors") and
+// password protection would be misleading for patterns.
+const PATTERN_STATUS_OPTIONS = STATUS_OPTIONS.filter(
+	( { value } ) => value !== 'private'
 );
 
 export default function PostStatus() {
