@@ -9,18 +9,17 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalInputControl as WCInputControl,
 } from '@wordpress/components';
-import type { Action } from '@wordpress/dataviews';
-import type { BasePost, CoreDataError } from '../../shared/types';
+import type {
+	BasePost,
+	CoreDataError,
+	ActionScriptParts,
+} from '../../shared/types';
 import { getItemTitle } from '../../shared/utils';
 
-const duplicatePost: Action< BasePost > = {
-	id: 'duplicate-post',
-	label: _x( 'Duplicate…', 'action label' ),
-	modalHeader: _x( 'Duplicate', 'action label' ),
+const duplicatePost: ActionScriptParts< BasePost > = {
 	isEligible( { status } ) {
 		return status !== 'trash';
 	},
-	modalFocusOnMount: 'firstContentElement',
 	RenderModal: ( { items, closeModal, onActionPerformed } ) => {
 		const [ item, setItem ] = useState< BasePost >( {
 			...items[ 0 ],
@@ -160,6 +159,7 @@ const duplicatePost: Action< BasePost > = {
 };
 
 /**
- * Duplicate action for BasePost.
+ * The JavaScript parts of the duplicate action for BasePost; its data is in
+ * `action.php`.
  */
 export default duplicatePost;
