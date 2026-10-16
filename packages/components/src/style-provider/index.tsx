@@ -3,16 +3,30 @@ import createCache from '@emotion/cache';
 import * as uuid from 'uuid';
 import { useLayoutEffect } from '@wordpress/element';
 import { registerDocument } from '@wordpress/style-runtime';
+import { contextConnectWithoutRef, useContextSystem } from '../context';
 import type { StyleProviderProps } from './types';
 
 const uuidCache = new Set();
 // Use a weak map so that when the container is detached it's automatically
-// dereferenced to avoid memory leak.
-const containerCacheMap = new WeakMap();
+// dereferenced to avoid memory leak. Each container keeps one cache per nonce.
+const containerCacheMap = new WeakMap<
+	HTMLElement,
+	Map< string | undefined, ReturnType< typeof createCache > >
+>();
 
-const memoizedCreateCacheWithContainer = ( container: HTMLElement ) => {
-	if ( containerCacheMap.has( container ) ) {
-		return containerCacheMap.get( container );
+const memoizedCreateCacheWithContainer = (
+	container: HTMLElement,
+	nonce?: string
+) => {
+	let nonceCacheMap = containerCacheMap.get( container );
+	if ( ! nonceCacheMap ) {
+		nonceCacheMap = new Map();
+		containerCacheMap.set( container, nonceCacheMap );
+	}
+
+	const existingCache = nonceCacheMap.get( nonce );
+	if ( existingCache ) {
+		return existingCache;
 	}
 
 	// Emotion only accepts alphabetical and hyphenated keys so we just
@@ -23,13 +37,15 @@ const memoizedCreateCacheWithContainer = ( container: HTMLElement ) => {
 	}
 	uuidCache.add( key );
 
-	const cache = createCache( { container, key } );
-	containerCacheMap.set( container, cache );
+	const cache = createCache( { container, key, nonce } );
+	nonceCacheMap.set( nonce, cache );
 	return cache;
 };
 
-export function StyleProvider( props: StyleProviderProps ) {
-	const { children, document } = props;
+function UnconnectedStyleProvider( props: StyleProviderProps ) {
+	const { children, document, nonce } = useContextSystem<
+		StyleProviderProps & { className?: string }
+	>( props, 'StyleProvider' );
 
 	useLayoutEffect( () => {
 		if ( ! document ) {
@@ -43,9 +59,14 @@ export function StyleProvider( props: StyleProviderProps ) {
 		return null;
 	}
 
-	const cache = memoizedCreateCacheWithContainer( document.head );
+	const cache = memoizedCreateCacheWithContainer( document.head, nonce );
 
 	return <CacheProvider value={ cache }>{ children }</CacheProvider>;
 }
+
+export const StyleProvider = contextConnectWithoutRef(
+	UnconnectedStyleProvider,
+	'StyleProvider'
+);
 
 export default StyleProvider;
