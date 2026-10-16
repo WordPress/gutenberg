@@ -380,6 +380,35 @@ describe( 'global styles renderer', () => {
 				':root{--wp--preset--color--white: white;--wp--preset--color--black: black;--wp--preset--color--white-2-black: value;--wp--custom--white-2-black: value;--wp--custom--font-primary: value;--wp--custom--line-height--body: 1.7;--wp--custom--line-height--heading: 1.3;}h1,h2,h3,h4,h5,h6{--wp--preset--font-size--small: 12px;--wp--preset--font-size--medium: 23px;}'
 			);
 		} );
+
+		it( 'should skip presets that are missing a slug', () => {
+			// A font family declaring only `fontFace`, with no `fontFamily`,
+			// `name` or `slug`. See https://github.com/WordPress/gutenberg/issues/80480.
+			const tree = {
+				settings: {
+					typography: {
+						fontFamilies: {
+							theme: [
+								{
+									fontFace: [
+										{
+											fontFamily: 'Poppins',
+											fontStyle: 'normal',
+											fontWeight: '100',
+											src: [
+												'file:./assets/fonts/poppins/poppins-100-normal.woff2',
+											],
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			expect( generateCustomProperties( tree, {} ) ).toEqual( '' );
+		} );
 	} );
 
 	describe( 'transformToStyles', () => {
@@ -569,6 +598,49 @@ describe( 'global styles renderer', () => {
 			expect( transformToStyles( tree, blockSelectors ) ).toEqual(
 				':where(body) {margin: 0;}.is-layout-flow > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-flow > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-flow > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignleft { float: left; margin-inline-start: 0; margin-inline-end: 2em; }.is-layout-constrained > .alignright { float: right; margin-inline-start: 2em; margin-inline-end: 0; }.is-layout-constrained > .aligncenter { margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > :where(:not(.alignleft):not(.alignright):not(.alignfull)) { max-width: var(--wp--style--global--content-size); margin-left: auto !important; margin-right: auto !important; }.is-layout-constrained > .alignwide { max-width: var(--wp--style--global--wide-size); }body .is-layout-flex { display:flex; }.is-layout-flex { flex-wrap: wrap; align-items: center; }.is-layout-flex > :is(*, div) { margin: 0; }body .is-layout-grid { display:grid; }.is-layout-grid > :is(*, div) { margin: 0; }body{background-color: red;margin: 10px;padding: 10px;}a:where(:not(.wp-element-button)){color: blue;}:root :where(a:where(:not(.wp-element-button)):hover){color: orange;}:root :where(a:where(:not(.wp-element-button)):focus){color: orange;}h1{font-size: 42px;}:root :where(.wp-block-group){margin-top: 10px;margin-right: 20px;margin-bottom: 30px;margin-left: 40px;padding-top: 11px;padding-right: 22px;padding-bottom: 33px;padding-left: 44px;}:root :where(h1,h2,h3,h4,h5,h6){color: orange;}:root :where(h1 a:where(:not(.wp-element-button)),h2 a:where(:not(.wp-element-button)),h3 a:where(:not(.wp-element-button)),h4 a:where(:not(.wp-element-button)),h5 a:where(:not(.wp-element-button)),h6 a:where(:not(.wp-element-button))){color: hotpink;}:root :where(h1 a:where(:not(.wp-element-button)):hover,h2 a:where(:not(.wp-element-button)):hover,h3 a:where(:not(.wp-element-button)):hover,h4 a:where(:not(.wp-element-button)):hover,h5 a:where(:not(.wp-element-button)):hover,h6 a:where(:not(.wp-element-button)):hover){color: red;}:root :where(h1 a:where(:not(.wp-element-button)):focus,h2 a:where(:not(.wp-element-button)):focus,h3 a:where(:not(.wp-element-button)):focus,h4 a:where(:not(.wp-element-button)):focus,h5 a:where(:not(.wp-element-button)):focus,h6 a:where(:not(.wp-element-button)):focus){color: red;}:root :where(.wp-block-image img, .wp-block-image .wp-crop-area){border-radius: 9999px;}:root :where(.wp-block-image){color: red;}.wp-site-blocks > .alignleft { float: left; margin-right: 2em; }.wp-site-blocks > .alignright { float: right; margin-left: 2em; }.wp-site-blocks > .aligncenter { justify-content: center; margin-left: auto; margin-right: auto; }.has-white-color{color: var(--wp--preset--color--white) !important;}.has-white-background-color{background-color: var(--wp--preset--color--white) !important;}.has-white-border-color{border-color: var(--wp--preset--color--white) !important;}.has-black-color{color: var(--wp--preset--color--black) !important;}.has-black-background-color{background-color: var(--wp--preset--color--black) !important;}.has-black-border-color{border-color: var(--wp--preset--color--black) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-color{color: var(--wp--preset--color--blue) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-background-color{background-color: var(--wp--preset--color--blue) !important;}:where(h1,h2,h3,h4,h5,h6).has-blue-border-color{border-color: var(--wp--preset--color--blue) !important;}'
 			);
+		} );
+
+		it( 'should skip preset classes for presets that are missing a slug', () => {
+			// A font family declaring only `fontFace`, with no `fontFamily`,
+			// `name` or `slug`. See https://github.com/WordPress/gutenberg/issues/80480.
+			const tree = {
+				settings: {
+					typography: {
+						fontFamilies: {
+							theme: [
+								{
+									fontFace: [
+										{
+											fontFamily: 'Poppins',
+											fontStyle: 'normal',
+											fontWeight: '100',
+											src: [
+												'file:./assets/fonts/poppins/poppins-100-normal.woff2',
+											],
+										},
+									],
+								},
+							],
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				{
+					...minimalStyleOptions,
+					blockStyles: false,
+					presets: true,
+				}
+			);
+
+			expect( result ).toEqual( '' );
 		} );
 
 		it( 'should handle feature selectors', () => {
