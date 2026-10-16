@@ -131,7 +131,7 @@ export type LinkControlCreateSuggestionProp = (
  * Query parameters passed along to the link suggestions fetcher.
  */
 export interface LinkSuggestionsQuery {
-	type?: string;
+	type?: 'attachment' | 'post' | 'term' | 'post-format';
 	subtype?: string;
 	isInitialSuggestions?: boolean;
 	[ param: string ]: unknown;

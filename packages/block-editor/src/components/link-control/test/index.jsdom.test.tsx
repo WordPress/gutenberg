@@ -2058,7 +2058,10 @@ describe( 'Post types', () => {
 			const user = userEvent.setup();
 			const searchTerm = 'Hello world';
 
-			render( <LinkControl suggestionsQuery={ { type: postType } } /> );
+			render(
+				// @ts-expect-error Any query type hides the type, even one core-data does not search.
+				<LinkControl suggestionsQuery={ { type: postType } } />
+			);
 
 			// Search Input UI.
 			const searchInput = screen.getByRole( 'combobox', {
