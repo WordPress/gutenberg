@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import { Component } from '@wordpress/element';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -131,6 +132,32 @@ describe( 'withColors types', () => {
 		const withLabel = (
 			<WithColor
 				label="Color"
+				attributes={ {} }
+				setAttributes={ () => {} }
+			/>
+		);
+		const withoutLabel = (
+			// @ts-expect-error The own props stay required.
+			<WithColor attributes={ {} } setAttributes={ () => {} } />
+		);
+
+		expect( [ withLabel, withoutLabel ] ).toHaveLength( 2 );
+	} );
+
+	it( 'infers the props of a wrapped class component', () => {
+		class Labeled extends Component< {
+			backgroundColor: ColorObject;
+			label: string;
+		} > {
+			render() {
+				return null;
+			}
+		}
+		const WithColor = withColors( 'backgroundColor' )( Labeled );
+
+		const withLabel = (
+			<WithColor
+				label="Size"
 				attributes={ {} }
 				setAttributes={ () => {} }
 			/>

@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentClass, ComponentType, FunctionComponent } from 'react';
 import type { Color } from '@wordpress/global-styles-engine';
 
 /**
@@ -59,7 +59,10 @@ export type WithColorsHOC< Name extends string > = <
 		>
 	>,
 >(
-	WrappedComponent: ComponentType< Props & InjectedColorsProps< Name > >
+	WrappedComponent:
+		| FunctionComponent< Props & InjectedColorsProps< Name > >
+		// A class component's `props` type must match, so it takes its own props.
+		| ComponentClass< Props >
 ) => ComponentType<
 	Omit< Props, keyof InjectedColorsProps< Name > > &
 		Pick< WithColorsProps, 'attributes' | 'setAttributes' >
