@@ -1,9 +1,10 @@
 import { useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { Dropdown, Button, ExternalLink } from '@wordpress/components';
+import { Dropdown, Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURIComponent } from '@wordpress/url';
 import { store as coreStore } from '@wordpress/core-data';
+import { Link } from '@wordpress/ui';
 import PostURLCheck from './check';
 import PostURL from './index';
 import PostPanelRow from '../post-panel-row';
@@ -106,12 +107,12 @@ function FrontPageLink() {
 	}, [] );
 
 	return (
-		<ExternalLink
+		<Link
 			className="editor-post-url__front-page-link"
 			href={ postLink }
-			target="_blank"
+			openInNewTab
 		>
 			{ postLink }
-		</ExternalLink>
+		</Link>
 	);
 }

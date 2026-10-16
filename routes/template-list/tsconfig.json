@@ -19,7 +19,6 @@
 		{ "path": "../../packages/dom" },
 		{ "path": "../../packages/editor/tsconfig.build.json" },
 		{ "path": "../../packages/element/tsconfig.build.json" },
-		{ "path": "../../packages/fields/tsconfig.build.json" },
 		{ "path": "../../packages/html-entities/tsconfig.build.json" },
 		{ "path": "../../packages/i18n/tsconfig.build.json" },
 		{ "path": "../../packages/icons/tsconfig.build.json" },
@@ -27,7 +26,7 @@
 		{ "path": "../../packages/notices/tsconfig.build.json" },
 		{ "path": "../../packages/route" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
-		{ "path": "../../packages/url" },
+		{ "path": "../../packages/url/tsconfig.build.json" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
