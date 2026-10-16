@@ -10,7 +10,12 @@ import {
 	getMostReadableColor,
 } from './utils';
 import { useSettings } from '../use-settings';
-import type { ColorType, WithColorsProps } from './types';
+import type {
+	ColorAttributeName,
+	ColorType,
+	WithColorsHOC,
+	WithColorsProps,
+} from './types';
 
 type ColorPaletteHOC = (
 	Inner: ComponentType< WithColorsProps >
@@ -224,12 +229,13 @@ function createColorHOC(
  * @return {Function} Higher-order component.
  */
 export function createCustomColorsHOC( colorsArray: Color[] ) {
-	return ( ...colorTypes: ColorType[] ) => {
+	return < Types extends ColorType[] >( ...colorTypes: Types ) => {
 		const withColorPalette = withCustomColorPalette( colorsArray );
+		// Types the props each call injects.
 		return createHigherOrderComponent(
 			createColorHOC( colorTypes, withColorPalette ),
 			'withCustomColors'
-		);
+		) as WithColorsHOC< ColorAttributeName< Types[ number ] > >;
 	};
 }
 
@@ -257,10 +263,13 @@ export function createCustomColorsHOC( colorsArray: Color[] ) {
  *
  * @return {Function} Higher-order component.
  */
-export default function withColors( ...colorTypes: ColorType[] ) {
+export default function withColors< Types extends ColorType[] >(
+	...colorTypes: Types
+) {
 	const withColorPalette = withEditorColorPalette();
+	// Types the props each call injects.
 	return createHigherOrderComponent(
 		createColorHOC( colorTypes, withColorPalette ),
 		'withColors'
-	);
+	) as WithColorsHOC< ColorAttributeName< Types[ number ] > >;
 }
