@@ -9,6 +9,7 @@ import { unlock } from '../../lock-unlock';
 import { useBlockElementRef } from '../block-list/use-block-props/use-block-refs';
 import getEditorRegion from '../../utils/get-editor-region';
 import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
+import type { BlockBreadcrumbProps } from './types';
 
 /**
  * Block breadcrumb component, displaying the hierarchy of the current block selection as a breadcrumb.
@@ -18,7 +19,7 @@ import { getBlockDisplayTitle } from '../block-title/use-block-display-title';
  * @param {string} [props.className]     Additional class name for the breadcrumb navigation.
  * @return {React.JSX.Element}           Block Breadcrumb.
  */
-function BlockBreadcrumb( { rootLabelText, className } ) {
+function BlockBreadcrumb( { rootLabelText, className }: BlockBreadcrumbProps ) {
 	const { selectBlock, clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { clientId, parents, currentTitle } = useSelect( ( select ) => {
 		const {
@@ -40,7 +41,7 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 	}, [] );
 	const parentTitles = useSelect(
 		( select ) =>
-			parents.map( ( parentClientId ) =>
+			parents.map( ( parentClientId: string ) =>
 				getBlockDisplayTitle( select, parentClientId, 'breadcrumb' )
 			),
 		[ parents ]
@@ -51,7 +52,7 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 		typeof rootLabelText === 'string' && rootLabelText.trim()
 			? rootLabelText
 			: _x( 'Document', 'noun, breadcrumb' );
-	const blockRef = useRef();
+	const blockRef = useRef< Element | null | undefined >( undefined );
 	useBlockElementRef( clientId, blockRef );
 
 	return (
@@ -70,13 +71,14 @@ function BlockBreadcrumb( { rootLabelText, className } ) {
 								)
 							);
 							clearSelectedBlock();
-							editorRegion?.focus();
+							// The editor region is an HTML element.
+							( editorRegion as HTMLElement | null )?.focus();
 						} }
 					>
 						{ rootLabel }
 					</Breadcrumb.ButtonItem>,
 					parents.map(
-						( parentClientId, index ) =>
+						( parentClientId: string, index: number ) =>
 							parentTitles[ index ] && (
 								<Breadcrumb.ButtonItem
 									key={ parentClientId }
