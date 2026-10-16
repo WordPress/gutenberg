@@ -1014,7 +1014,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			popover.getByRole( 'heading', { name: 'Settings' } )
 		).toBeVisible();
-		const linkInput = popover.getByRole( 'textbox', { name: 'Link' } );
+		const linkInput = popover.getByRole( 'combobox', { name: 'Link' } );
 		await expect( linkInput ).toHaveValue( 'https://wordpress.org/' );
 		await expect(
 			popover.getByRole( 'textbox' ).first()

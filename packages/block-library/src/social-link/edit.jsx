@@ -24,8 +24,7 @@ import {
 } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { external, keyboardReturn, link } from '@wordpress/icons';
-import { Icon, InputControl, InputLayout } from '@wordpress/ui';
+import { external, keyboardReturn } from '@wordpress/icons';
 import { isURL } from '@wordpress/url';
 import { store as blocksStore } from '@wordpress/blocks';
 import { getSocialService } from './social-list';
@@ -233,18 +232,14 @@ const SocialLinkEdit = ( {
 							setAttributes( { url: undefined } );
 						} }
 					>
-						<InputControl
-							type="url"
+						<URLInput
+							className="wp-block-social-link__link-input"
 							label={ __( 'Link' ) }
 							value={ url || '' }
-							onValueChange={ ( value ) =>
+							onChange={ ( value ) =>
 								setAttributes( { url: value } )
 							}
-							prefix={
-								<InputLayout.Slot padding="minimal">
-									<Icon icon={ link } />
-								</InputLayout.Slot>
-							}
+							disableSuggestions
 						/>
 					</ToolsPanelItem>
 					{ !! url && isURL( url ) && (
