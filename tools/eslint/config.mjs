@@ -146,7 +146,7 @@ const restrictedImports = [
 	{
 		name: '@emotion/css',
 		message:
-			'Please use `@emotion/react` and `@emotion/styled` in order to maintain iframe support. As a replacement for the `cx` function, please use the `useCx` hook defined in `@wordpress/components` instead.',
+			'Please use SCSS Modules for styles and `clsx` to compose class names.',
 	},
 	{
 		name: '@wordpress/edit-post',

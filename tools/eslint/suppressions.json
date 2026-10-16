@@ -4530,11 +4530,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/context/test/context-system-provider.jsdom.test.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/custom-gradient-picker/gradient-bar/control-points.tsx": {
 		"react-hooks/refs": {
 			"count": 1
@@ -4616,21 +4611,6 @@
 	"packages/components/src/utils/box-sizing.ts": {
 		"no-restricted-imports": {
 			"count": 1
-		}
-	},
-	"packages/components/src/utils/hooks/emotion.d.ts": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/components/src/utils/hooks/test/use-cx.jsdom.test.tsx": {
-		"no-restricted-imports": {
-			"count": 3
-		}
-	},
-	"packages/components/src/utils/hooks/use-cx.ts": {
-		"no-restricted-imports": {
-			"count": 4
 		}
 	},
 	"packages/components/src/utils/rtl.ts": {
