@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { startGridItemDrag } from '../start-grid-item-drag';
+import {
+	isGridItemHandleDrag,
+	startGridItemDrag,
+} from '../start-grid-item-drag';
 
-function setUp() {
+function setUp( { fromBody = false } = {} ) {
 	const blockElement = document.createElement( 'div' );
 	const handle = document.createElement( 'div' );
 	document.body.append( blockElement, handle );
@@ -12,7 +15,9 @@ function setUp() {
 	};
 	const event = new window.Event( 'dragstart', { bubbles: true } );
 	event.dataTransfer = dataTransfer;
-	Object.defineProperty( event, 'target', { value: handle } );
+	Object.defineProperty( event, 'target', {
+		value: fromBody ? blockElement : handle,
+	} );
 	const startDraggingBlocks = vi.fn();
 	const stopDraggingBlocks = vi.fn();
 	startGridItemDrag( event, {
@@ -45,6 +50,19 @@ describe( 'startGridItemDrag', () => {
 		expect( dataTransfer.setDragImage ).toHaveBeenCalled();
 	} );
 
+	it( 'marks a drag from the handle, but not one from the body', () => {
+		const { dataTransfer } = setUp();
+		expect( dataTransfer.setData ).toHaveBeenCalledWith(
+			'wp-grid-item-handle',
+			'1'
+		);
+		const { dataTransfer: bodyDataTransfer } = setUp( { fromBody: true } );
+		expect( bodyDataTransfer.setData ).not.toHaveBeenCalledWith(
+			'wp-grid-item-handle',
+			expect.anything()
+		);
+	} );
+
 	it( 'dims the block and starts dragging on the first dragover', () => {
 		const { blockElement, startDraggingBlocks } = setUp();
 		expect( blockElement ).toHaveStyle( { opacity: '0.5' } );
@@ -65,5 +83,19 @@ describe( 'startGridItemDrag', () => {
 		expect( blockElement ).not.toHaveStyle( { opacity: '0.5' } );
 		document.dispatchEvent( new window.Event( 'drop' ) );
 		expect( stopDraggingBlocks ).toHaveBeenCalledTimes( 1 );
+	} );
+} );
+
+describe( 'isGridItemHandleDrag', () => {
+	it( 'reads the mark from the drag data types', () => {
+		expect(
+			isGridItemHandleDrag( {
+				dataTransfer: { types: [ 'wp-blocks', 'wp-grid-item-handle' ] },
+			} )
+		).toBe( true );
+		expect(
+			isGridItemHandleDrag( { dataTransfer: { types: [ 'wp-blocks' ] } } )
+		).toBe( false );
+		expect( isGridItemHandleDrag( {} ) ).toBe( false );
 	} );
 } );

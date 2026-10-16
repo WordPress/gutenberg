@@ -1,4 +1,23 @@
 /**
+ * The drag data type that marks a drag started from a grid item's drag handle.
+ * Drag data can only be read on drop, but its types can be read while
+ * dragging. Types are lowercase.
+ */
+const HANDLE_DRAG_TYPE = 'wp-grid-item-handle';
+
+/**
+ * Whether a drag event belongs to a drag started from a grid item's drag
+ * handle, rather than from the block's body or anywhere else.
+ *
+ * @param {DragEvent} event A drag event.
+ *
+ * @return {boolean} Whether the drag started from a drag handle.
+ */
+export function isGridItemHandleDrag( event ) {
+	return !! event.dataTransfer?.types?.includes( HANDLE_DRAG_TYPE );
+}
+
+/**
  * Starts dragging a block of a manual placement grid, from its body or from
  * its drag handle. The grid shows the cells the block will land in, so the
  * block stays in place, dimmed, instead of following the pointer, and the
@@ -32,6 +51,9 @@ export function startGridItemDrag(
 			srcRootClientId: rootClientId,
 		} )
 	);
+	if ( event.target !== blockElement ) {
+		event.dataTransfer.setData( HANDLE_DRAG_TYPE, '1' );
+	}
 
 	// The canvas, and the editor around it when the drag starts on a handle
 	// there.
