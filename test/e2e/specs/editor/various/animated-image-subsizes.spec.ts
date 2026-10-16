@@ -2,6 +2,8 @@ import path from 'path';
 import fs from 'fs/promises';
 import os from 'os';
 import { randomUUID } from 'crypto';
+import { createRequire } from 'module';
+import { pathToFileURL } from 'url';
 import type { Page } from '@playwright/test';
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 import type {
@@ -12,22 +14,50 @@ import type {
 const ASSETS_DIR = path.join( __dirname, '..', '..', '..', 'assets' );
 
 /**
- * Animated formats libvips can decode and encode with every frame. Both
- * fixtures are the same 12-frame 599x441 animation, larger than the `medium`
- * size and croppable to `thumbnail`.
+ * Animated GIF fixture: 12 frames at 599x441, larger than the `medium` size
+ * and croppable to `thumbnail`.
+ */
+const ANIMATED_GIF_FIXTURE = '599x441_e2e_test_image_animated.gif';
+
+/**
+ * Resolves `wasm-vips` through `@wordpress/vips`, which declares it, so the
+ * import works whether or not it is hoisted.
+ */
+const wasmVipsEntry = pathToFileURL(
+	createRequire( require.resolve( '@wordpress/vips/package.json' ) ).resolve(
+		'wasm-vips'
+	)
+).href;
+
+/**
+ * Re-encodes every frame of the GIF fixture as an animated WebP, so the WebP
+ * tests need no fixture of their own.
+ *
+ * @param gif GIF file contents.
+ * @return Animated WebP file contents.
+ */
+async function convertGifToAnimatedWebp( gif: Buffer ): Promise< Buffer > {
+	const { default: Vips } = await import( wasmVipsEntry );
+	const vips = await Vips( {} );
+	const image = vips.Image.newFromBuffer( gif, '[n=-1]' );
+	return Buffer.from( image.writeToBuffer( '.webp', { Q: 60 } ) );
+}
+
+/**
+ * Animated formats libvips can decode and encode with every frame.
  */
 const ANIMATED_FORMATS = [
 	{
 		format: 'GIF',
-		fileName: '599x441_e2e_test_image_animated.gif',
 		mimeType: 'image/gif',
-		extension: /\.gif$/i,
+		extension: '.gif',
+		createFile: async ( gif: Buffer ) => gif,
 	},
 	{
 		format: 'WebP',
-		fileName: '599x441_e2e_test_image_animated.webp',
 		mimeType: 'image/webp',
-		extension: /\.webp$/i,
+		extension: '.webp',
+		createFile: convertGifToAnimatedWebp,
 	},
 ];
 
@@ -85,7 +115,7 @@ async function uploadAndReadSubSizeFrames(
 	}: { page: Page; editor: Editor; requestUtils: RequestUtils },
 	animatedFormat: AnimatedFormat
 ): Promise< SubSizeFrames > {
-	const { fileName, mimeType, extension } = animatedFormat;
+	const { mimeType, extension, createFile } = animatedFormat;
 
 	await editor.insertBlock( { name: 'core/image' } );
 
@@ -98,11 +128,13 @@ async function uploadAndReadSubSizeFrames(
 	const tmpDirectory = await fs.mkdtemp(
 		path.join( os.tmpdir(), 'gutenberg-test-animated-' )
 	);
-	const tmpFileName = path.join(
-		tmpDirectory,
-		randomUUID() + path.extname( fileName )
+	const tmpFileName = path.join( tmpDirectory, randomUUID() + extension );
+	await fs.writeFile(
+		tmpFileName,
+		await createFile(
+			await fs.readFile( path.join( ASSETS_DIR, ANIMATED_GIF_FIXTURE ) )
+		)
 	);
-	await fs.copyFile( path.join( ASSETS_DIR, fileName ), tmpFileName );
 	await imageBlock
 		.getByTestId( 'form-file-upload-input' )
 		.setInputFiles( tmpFileName );
@@ -137,16 +169,13 @@ async function uploadAndReadSubSizeFrames(
 				} );
 				const sizes = media.media_details?.sizes;
 				return [
-					sizes?.medium?.source_url,
-					sizes?.thumbnail?.source_url,
+					sizes?.medium?.source_url?.endsWith( extension ),
+					sizes?.thumbnail?.source_url?.endsWith( extension ),
 				];
 			},
 			{ timeout: 30_000 }
 		)
-		.toEqual( [
-			expect.stringMatching( extension ),
-			expect.stringMatching( extension ),
-		] );
+		.toEqual( [ true, true ] );
 
 	return page.evaluate(
 		async ( { urls, type } ) => {
