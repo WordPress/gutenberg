@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { getScrollContainer } from '@wordpress/dom';
 import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
@@ -137,6 +138,7 @@ function Iframe( {
 	scale = 1,
 	frameSize = 0,
 	readonly,
+	fitContent = false,
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
 	...props
@@ -268,12 +270,53 @@ function Iframe( {
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 
+	// Keeps the iframe at least as tall as its document, so the document never
+	// scrolls on its own and the closest scrollable ancestor scrolls the canvas
+	// together with whatever surrounds it. The minimum height goes on the
+	// container rather than the iframe, so the iframe keeps filling a taller
+	// space through its normal 100% height.
+	const fitContentRef = useRefEffect(
+		( body ) => {
+			if ( ! fitContent ) {
+				return;
+			}
+			const { ownerDocument } = body;
+			const { defaultView } = ownerDocument;
+			const container = defaultView.frameElement.closest(
+				'.block-editor-iframe__container'
+			);
+			const fit = () => {
+				const bottom =
+					body.getBoundingClientRect().bottom + defaultView.scrollY;
+				container.style.minHeight = `${ Math.ceil( bottom ) }px`;
+			};
+			// A document that scrolled on its own before it fit would lose that
+			// offset once it fits. Pass it on so the view stays put.
+			const { scrollTop } = ownerDocument.scrollingElement;
+			fit();
+			if ( scrollTop ) {
+				const scrollContainer = getScrollContainer( container );
+				if ( scrollContainer ) {
+					scrollContainer.scrollTop += scrollTop;
+				}
+			}
+			const observer = new defaultView.ResizeObserver( fit );
+			observer.observe( body );
+			return () => {
+				observer.disconnect();
+				container.style.minHeight = '';
+			};
+		},
+		[ fitContent ]
+	);
+
 	const unguardedBodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
 		contentRef,
 		writingFlowRef,
 		disabledRef,
 		scaleContentRef,
+		fitContentRef,
 	] );
 
 	// Attach the body ref only when the iframe document and window are available.

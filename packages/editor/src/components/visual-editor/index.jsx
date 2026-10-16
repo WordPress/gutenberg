@@ -87,6 +87,10 @@ function checkForPostContentAtRootLevel( blocks ) {
 
 const CANVAS_MIN_WIDTH = 300;
 const CANVAS_TARGET_ASPECT_RATIO = 9 / 16;
+// Room below the last block to click or hover for appending when the canvas
+// is sized to its content. A share of the canvas height (the default) would
+// in turn change that height.
+const FIT_CONTENT_APPENDER_SPACE = '160px';
 
 /**
  * Returns the canvas height, keeping the aspect ratio of the available space
@@ -391,8 +395,13 @@ function VisualEditor( {
 
 	const isNavigationPreview = postType === NAVIGATION_POST_TYPE && isPreview;
 
+	// A canvas sized by the resizable wrapper (device previews, resizable post
+	// types) cannot also take its height from its content.
+	const fitContent = !! iframeProps?.fitContent && ! enableResizing;
+
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
-		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
+		! isPreview && renderingMode === 'post-only' && ! isDesignPostType,
+		fitContent ? FIT_CONTENT_APPENDER_SPACE : undefined
 	);
 
 	const shouldConstrainCanvasHeight =
@@ -496,6 +505,7 @@ function VisualEditor( {
 					// Horizontal padding leaves room for the resize handles
 					// that appear on the left/right of a resizable canvas.
 					'has-horizontal-padding': isFocusedEntity || enableResizing,
+					'is-fit-content': fitContent,
 				}
 			) }
 		>
@@ -515,6 +525,7 @@ function VisualEditor( {
 					height="100%"
 					iframeProps={ {
 						...iframeProps,
+						fitContent,
 						style: iframeProps?.style,
 					} }
 				>
