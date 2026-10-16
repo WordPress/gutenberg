@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `SearchableSelect` and `SearchableSelectControl`: Remove `triggerContent`. Pass custom content as children of a `.Trigger` element through the `trigger` prop instead ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
 -   `SelectControl`: Remove the `triggerContent` prop. Pass custom content as children of a `SelectControl.Trigger` element through the `trigger` prop instead ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Select`, `Autocomplete`, `Combobox`, and the select controls: `actionsRef` no longer keeps closed popups mounted. For externally controlled exit animations, call `eventDetails.preventUnmountOnClose()` in `onOpenChange` when closing, then `actionsRef.current?.unmount()` when the animation ends. Close through `actionsRef.current?.close()` to run that handler. Automatic CSS exit animations need no migration. See [Base UI's migration guide](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   The `actionsRef` types for these components now require `close()`. Add it to manually constructed action objects and ref stubs. See [Base UI #5734](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
@@ -18,6 +19,7 @@
 
 ### Enhancements
 
+-   `SearchableSelect` and `SearchableSelectControl`: Add a `trigger` slot and `.Trigger` subcomponents for customizing trigger props ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Tabs`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and replace vertical chevrons with content-height selection lines without widening minimal tab lists ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
