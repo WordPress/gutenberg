@@ -13,7 +13,6 @@
 ### Internal
 
 -   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
--   `saveEntityRecord`: When an autosave is saved to the post itself, drop `generated_slug` from the persisted record instead of keeping the value generated from the previous title, which made a new post show `auto-draft` as its slug ([#84893](https://github.com/WordPress/gutenberg/pull/84893)).
 
 ## 8.2.0 (2026-10-07)
 
