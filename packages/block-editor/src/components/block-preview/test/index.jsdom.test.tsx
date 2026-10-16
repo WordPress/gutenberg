@@ -5,37 +5,48 @@ import {
 	unregisterBlockType,
 	createBlock,
 } from '@wordpress/blocks';
+import type { Block, BlockConfiguration } from '@wordpress/blocks';
 import { useBlockPreview } from '../';
 import { useBlockProps } from '../../block-list/use-block-props';
 
 describe( 'useBlockPreview', () => {
 	beforeAll( () => {
-		registerBlockType( 'core/test-block', {
-			apiVersion: 3,
-			save: () => (
-				<div { ...useBlockProps.save() }>
-					Test block save view
-					<button>Button</button>
-				</div>
-			),
-			edit: function Edit() {
-				return (
-					<div { ...useBlockProps() }>
-						Test block edit view
+		registerBlockType(
+			'core/test-block',
+			// The test block type declares no attributes.
+			{
+				apiVersion: 3,
+				save: () => (
+					<div { ...useBlockProps.save() }>
+						Test block save view
 						<button>Button</button>
 					</div>
-				);
-			},
-			category: 'text',
-			title: 'test block',
-		} );
+				),
+				edit: function Edit() {
+					return (
+						<div { ...useBlockProps() }>
+							Test block edit view
+							<button>Button</button>
+						</div>
+					);
+				},
+				category: 'text',
+				title: 'test block',
+			} as unknown as BlockConfiguration
+		);
 	} );
 
 	afterAll( () => {
 		unregisterBlockType( 'core/test-block' );
 	} );
 
-	function BlockPreviewComponent( { blocks, className } ) {
+	function BlockPreviewComponent( {
+		blocks,
+		className,
+	}: {
+		blocks: Block[];
+		className: string;
+	} ) {
 		const blockPreviewProps = useBlockPreview( {
 			blocks,
 			props: { className },
@@ -49,7 +60,7 @@ describe( 'useBlockPreview', () => {
 	}
 
 	it( 'will render a block preview with minimal nesting', async () => {
-		const blocks = [];
+		const blocks: Block[] = [];
 		blocks.push( createBlock( 'core/test-block' ) );
 
 		render(
@@ -74,6 +85,7 @@ describe( 'useBlockPreview', () => {
 		expect( blockPreviewComponent ).toHaveClass(
 			'block-editor-block-preview__live-content',
 			'test-container-classname',
+			// @ts-expect-error The types take options only after a single class string.
 			{ exact: true }
 		);
 
