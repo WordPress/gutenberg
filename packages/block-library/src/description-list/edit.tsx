@@ -1,11 +1,12 @@
 // @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import DescriptionListStructureWarning from './structure-warning';
 
 const DEFAULT_BLOCK = {
 	name: 'core/description-term',
 };
 
-export default function Edit() {
+export default function Edit( { clientId }: { clientId: string } ) {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		defaultBlock: DEFAULT_BLOCK,
@@ -13,5 +14,10 @@ export default function Edit() {
 		templateLock: false,
 	} );
 
-	return <dl { ...innerBlocksProps } />;
+	return (
+		<>
+			<DescriptionListStructureWarning clientId={ clientId } />
+			<dl { ...innerBlocksProps } />
+		</>
+	);
 }

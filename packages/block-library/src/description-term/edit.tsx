@@ -4,6 +4,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 import type { BlockEditProps, Block } from '@wordpress/blocks';
 import type { RichTextData } from '@wordpress/rich-text';
 import useGuidedEnterAtEnd from '../description-list/use-guided-enter-at-end';
+import DescriptionListStructureWarning from '../description-list/structure-warning';
 
 type DescriptionListItemAttributes = {
 	content: string | RichTextData;
@@ -37,19 +38,22 @@ export default function Edit( {
 	} );
 
 	return (
-		<RichText
-			identifier="content"
-			tagName="dt"
-			{ ...blockProps }
-			value={ content }
-			onChange={ ( newContent: string ) =>
-				setAttributes( { content: newContent } )
-			}
-			onMerge={ mergeBlocks }
-			onReplace={ onReplace }
-			onRemove={ onRemove }
-			placeholder={ placeholder || __( 'Term' ) }
-			__unstableOnSplitAtEnd={ onSplitAtEnd }
-		/>
+		<>
+			<DescriptionListStructureWarning clientId={ clientId } />
+			<RichText
+				identifier="content"
+				tagName="dt"
+				{ ...blockProps }
+				value={ content }
+				onChange={ ( newContent: string ) =>
+					setAttributes( { content: newContent } )
+				}
+				onMerge={ mergeBlocks }
+				onReplace={ onReplace }
+				onRemove={ onRemove }
+				placeholder={ placeholder || __( 'Term' ) }
+				__unstableOnSplitAtEnd={ onSplitAtEnd }
+			/>
+		</>
 	);
 }
