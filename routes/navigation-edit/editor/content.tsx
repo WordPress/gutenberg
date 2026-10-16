@@ -5,6 +5,7 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
@@ -27,10 +28,17 @@ const PAGES_QUERY = [
 	},
 ];
 
-export default function NavigationMenuContent( {
-	rootClientId,
-}: {
-	rootClientId: string;
+// The link popover opens the way the item settings popover does: beside the
+// row, top edges aligned. Same props as the List View content popover.
+const LINK_POPOVER_PROPS = {
+	placement: 'left-start',
+	offset: 35,
+	resize: false,
+} as const;
+
+function ListViewLinkUI( props: {
+	insertedBlockClientId: string;
+	setInsertedBlockClientId: ( clientId: string | null ) => void;
 } ) {
 	// Read from the global rather than imported: `@wordpress/block-library`
 	// is not a script module and only loads with the lazily loaded editor
@@ -42,7 +50,21 @@ export default function NavigationMenuContent( {
 	const { NavigationLinkUI } = unlock(
 		( window as any ).wp.blockLibrary.privateApis
 	);
+	const isMobile = useViewportMatch( 'medium', '<' );
 
+	return (
+		<NavigationLinkUI
+			{ ...props }
+			popoverProps={ isMobile ? undefined : LINK_POPOVER_PROPS }
+		/>
+	);
+}
+
+export default function NavigationMenuContent( {
+	rootClientId,
+}: {
+	rootClientId: string;
+} ) {
 	const { listViewRootClientId, isLoading } = useSelect(
 		( select ) => {
 			const {
@@ -94,7 +116,7 @@ export default function NavigationMenuContent( {
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
-					additionalBlockContent={ NavigationLinkUI }
+					additionalBlockContent={ ListViewLinkUI }
 					showContentPopover
 					isExpanded
 				/>
