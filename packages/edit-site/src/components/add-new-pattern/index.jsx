@@ -10,7 +10,6 @@ import {
 } from '@wordpress/patterns';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 import {
 	PATTERN_TYPES,
@@ -19,10 +18,8 @@ import {
 } from '../../utils/constants';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { CreatePatternModal, useAddPatternCategory } = unlock(
-	editPatternsPrivateApis
-);
-const { CreateTemplatePartModal } = unlock( editorPrivateApis );
+const { CreatePatternModal, CreateTemplatePartModal, useAddPatternCategory } =
+	unlock( editPatternsPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();

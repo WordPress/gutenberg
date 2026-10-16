@@ -2,13 +2,13 @@ import XCTest
 
 /// Selecting text across blocks with the native gestures: a double tap
 /// selects a word, then dragging a selection handle extends it into the
-/// next block. Only touch gestures in Safari go through the selection
-/// handles, so desktop end-to-end tests cannot cover this.
+/// next block. Only touch gestures go through the selection handles, so
+/// desktop end-to-end tests cannot cover this.
 final class SelectionTests: XCTestCase {
-	let safari = XCUIApplication( bundleIdentifier: "com.apple.mobilesafari" )
+	let app = XCUIApplication()
 
-	var web: XCUIElement { safari.webViews.firstMatch }
-	var editor: Editor { Editor( safari: safari ) }
+	var web: XCUIElement { app.webViews.firstMatch }
+	var editor: Editor { Editor( app: app ) }
 
 	override func setUpWithError() throws {
 		continueAfterFailure = false
@@ -20,11 +20,11 @@ final class SelectionTests: XCTestCase {
 	}
 
 	override func tearDownWithError() throws {
-		safari.terminate()
+		app.terminate()
 	}
 
 	func point( _ x: CGFloat, _ y: CGFloat ) -> XCUICoordinate {
-		safari.coordinate( withNormalizedOffset: .zero ).withOffset( CGVector( dx: x, dy: y ) )
+		app.coordinate( withNormalizedOffset: .zero ).withOffset( CGVector( dx: x, dy: y ) )
 	}
 
 	func testHandleExtendsSelectionIntoPreviousParagraph() throws {
@@ -36,9 +36,8 @@ final class SelectionTests: XCTestCase {
 			name: "content",
 			value: "<!-- wp:paragraph --><p>Alpha <em>bravo</em> charlie</p><!-- /wp:paragraph --><!-- wp:paragraph --><p>Delta echo foxtrot</p><!-- /wp:paragraph -->"
 		) ]
-		XCUIDevice.shared.system.open( url.url! )
-		safari.activate()
-		XCTAssertTrue( safari.wait( for: .runningForeground, timeout: 30 ) )
+		app.launchEnvironment[ "START_URL" ] = url.url!.absoluteString
+		app.launch()
 
 		let second = editor.block( title: "Paragraph", content: "Delta echo foxtrot" )
 		XCTAssertTrue( second.waitForExistence( timeout: 240 ), "The post did not load" )
@@ -55,7 +54,7 @@ final class SelectionTests: XCTestCase {
 
 		// Double tap the first word, "Delta".
 		point( target.minX + 15, target.midY ).doubleTap()
-		let cut = safari.menuItems[ "Cut" ]
+		let cut = app.menuItems[ "Cut" ]
 		XCTAssertTrue( cut.waitForExistence( timeout: 5 ), "The double tap did not select a word" )
 
 		// The start handle's knob sits above the line, at the start of the
