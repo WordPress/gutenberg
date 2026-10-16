@@ -1,6 +1,7 @@
 import type {
 	ComponentProps,
 	ForwardRefExoticComponent,
+	MouseEventHandler,
 	ReactNode,
 	RefAttributes,
 } from 'react';
@@ -48,7 +49,7 @@ export interface URLPopoverLinkViewerURLProps {
  */
 export type URLPopoverLinkViewerProps = ComponentProps< 'div' > & {
 	linkClassName?: string;
-	onEditLinkClick?: () => void;
+	onEditLinkClick?: MouseEventHandler< HTMLButtonElement >;
 	url?: string;
 	urlLabel?: string;
 };
