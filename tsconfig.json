@@ -62,6 +62,7 @@
 		{ "path": "packages/token-list" },
 		{ "path": "packages/ui" },
 		{ "path": "packages/ui/tsconfig.stories.json" },
+		{ "path": "packages/undo-manager" },
 		{ "path": "packages/upload-media" },
 		{ "path": "packages/video-conversion" },
 		{ "path": "packages/views" },
