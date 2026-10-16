@@ -422,9 +422,31 @@ Place component-local styles in a `style.module.scss` file next to the component
 
 Use `--_wp-components-*` for new private custom properties. These are implementation details, not public theming APIs. Keep supported customization in component props and existing public styles.
 
-Components no longer use Emotion. Do not add new Emotion imports.
+Components use SCSS Modules for styling. Do not add Emotion styling imports. The completed migration and its release notes are tracked in [#66806](https://github.com/WordPress/gutenberg/issues/66806).
 
-The [Emotion-to-SCSS migration guide](./emotion-to-scss-modules.md) records compatibility checks, cascade and custom-property pitfalls, verification, and examples from the completed source migrations.
+### Preserve styling contracts
+
+Before changing styles, inspect the component's types, README, stories, and consumers. Keep the existing rendered element, `as` behavior, refs, prop forwarding, public classes, and consumer `className` and `style` handling. A styled wrapper around a shared component may also supply layout or accessibility behavior. Keep that component when replacing its styles.
+
+Use [`PolymorphicElement`](./src/utils/polymorphic-element.tsx) for existing polymorphic components that need intrinsic HTML/SVG prop filtering. Reuse the [`WordPressComponent` types](./src/context/wordpress-component.ts) instead of adding another polymorphic type system. `View` continues to accept its legacy `css` prop as a no-op and consumes it before rendering.
+
+Keep private module classes separate from public classes supplied by callers. Check real consumers of shared labels and wrappers, including visually hidden content and `as="legend"`.
+
+### Dynamic values and the cascade
+
+Keep fixed values and calculations in Sass when JavaScript does not need them. For dynamic custom properties, supply units explicitly where required and distinguish zero from an absent value. Custom properties inherit, so reset instance-specific values when nested components must not inherit them.
+
+Preserve the component's existing precedence for consumer styles, shorthands, longhands, and per-axis values. CSS-wide keywords such as `inherit` and `initial` apply to a custom property itself, so passing them through `var()` does not preserve their meaning for another CSS property. Moving a declaration directly to `style` also changes whether consumer stylesheet rules can override it.
+
+Check the declarations that win in composed components and in each destination document. Sass nesting and repeated classes change specificity; use them only to preserve an established override. Keep selector relationships and scope intact. Use `:global()` for supported public classes, and justify specificity changes with the conflicting declaration. Do not depend on stylesheet import order.
+
+### Styles across documents and verification
+
+`StyleProvider` registers a document with `@wordpress/style-runtime` for CSS Module delivery. Preserve its insertion-effect timing and cleanup. Applications rendering their own Emotion styles in another document must configure their own cache or styling instance. See [styles across documents](/packages/theme/README.md#across-documents-iframes-and-other-portals) for the destination stylesheet and cache requirements.
+
+Start with existing tests and stories. Use Node or jsdom for DOM structure, semantics, props, refs, and state. Use Browser Mode for real styles, specificity, custom-property resolution, layout, focus, and scrolling. Load the styles that the consumer uses. Class assertions and snapshots alone do not prove that CSS loads or wins.
+
+Check the states and consumers affected by the change, including portals, iframes, RTL, consumer overrides, and nested instances when relevant. For cross-document behavior, use an attached iframe with a real document and assert a computed style there. Follow the [testing overview](/docs/contributors/code/testing-overview.md#folder-structure), and add coverage only for a concrete risk that existing tests do not protect.
 
 ### Deprecating styles
 
