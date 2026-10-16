@@ -2,9 +2,6 @@ import { createBlock } from '@wordpress/blocks';
 import { inertValue } from '@wordpress/react-inert-value';
 import FilePreview from './file-preview';
 
-// Media types that preview as themselves. Anything missing here has no visual
-// of its own and falls back to `FilePreview`: audio today, and file types
-// added later. Video stays an element, as it paints its first frame.
 const mediaTypeTag = { image: 'img', video: 'video' };
 
 /** @typedef {import('./hooks').InserterMediaItem} InserterMediaItem */
