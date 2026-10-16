@@ -27,7 +27,7 @@ The example uses separate plain-text strings for the main message and details. C
 
 The text button uses "Copy error" for an error notice and "Copy message" for other intents. When details are available, it copies the main message, a blank line, and the supplementary details, even while they are collapsed. The application supplies the exact text to `useCopyToClipboard`; `Notice` does not inspect its children or choose the clipboard contents.
 
-After a successful copy, a separate "Copied" message provides visible confirmation in the notice's text color. This message is also a `role="status"` region, which announces updates politely. The region stays mounted and empty before success. Confirmation clears after four seconds or when the message or details change. The button keeps its label and accessible name. The static notice has no automatic announcement. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for dynamic messages.
+After a successful copy, a separate `Notice.Description` shows "Copied" in the notice's typography and text color. This message is also a `role="status"` region, which announces updates politely. The region stays mounted and empty before success. Confirmation clears after four seconds or when the message or details change. The button keeps its label and accessible name. The static notice has no automatic announcement. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for dynamic messages.
 
 ## Trying the example
 
