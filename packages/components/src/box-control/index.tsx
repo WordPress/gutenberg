@@ -1,6 +1,6 @@
 import clsx from 'clsx';
-import { useInstanceId, usePrevious } from '@wordpress/compose';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import warning from '@wordpress/warning';
 import { BaseControl } from '../base-control';
@@ -85,28 +85,6 @@ function BoxControl( {
 				linkedByDefault ) ||
 			hasOneSide
 	);
-
-	const prevLinkedByDefault = usePrevious( linkedByDefault );
-	const inputValuesRef = useRef( inputValues );
-
-	useEffect( () => {
-		inputValuesRef.current = inputValues;
-	}, [ inputValues ] );
-
-	useEffect( () => {
-		// Only re-sync when linkedByDefault changes its value.
-		if (
-			prevLinkedByDefault !== undefined &&
-			prevLinkedByDefault !== linkedByDefault
-		) {
-			setIsLinked(
-				( ( ! hasInitialValue ||
-					! isValueMixed( inputValuesRef.current ) ) &&
-					linkedByDefault ) ||
-					hasOneSide
-			);
-		}
-	}, [ linkedByDefault, prevLinkedByDefault, hasInitialValue, hasOneSide ] );
 
 	// Tracking selected units via internal state allows filtering of CSS unit
 	// only values from being saved while maintaining preexisting unit selection

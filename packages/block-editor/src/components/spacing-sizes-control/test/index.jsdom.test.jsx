@@ -206,49 +206,6 @@ describe( 'SpacingSizesControl', () => {
 				screen.getByLabelText( 'Unlink sides' )
 			).toBeInTheDocument();
 		} );
-
-		it( 'transitions to axial view when supported sides change to axial only even if user previously toggled to custom view', async () => {
-			const user = userEvent.setup();
-			const values = {
-				top: '1rem',
-				right: '2rem',
-				bottom: '1rem',
-				left: '2rem',
-			};
-
-			const { rerender } = render(
-				<SpacingSizesControl
-					{ ...defaultProps }
-					sides={ [ 'top', 'right', 'bottom', 'left' ] }
-					values={ values }
-				/>
-			);
-
-			// Starts in axial view, click unlink to switch to custom view.
-			const unlinkButton = screen.getByRole( 'button', {
-				name: 'Unlink sides',
-			} );
-			await user.click( unlinkButton );
-
-			// In custom view, 4 sliders should be rendered.
-			expect( screen.getAllByRole( 'slider' ) ).toHaveLength( 4 );
-
-			// Rerender with sides changed to axial only.
-			rerender(
-				<SpacingSizesControl
-					{ ...defaultProps }
-					sides={ [ 'horizontal', 'vertical' ] }
-					values={ values }
-				/>
-			);
-
-			// Should reset to axial view with 2 sliders (horizontal and vertical).
-			expect( screen.getAllByRole( 'slider' ) ).toHaveLength( 2 );
-			// And the link toggle button should not be rendered.
-			expect(
-				screen.queryByRole( 'button', { name: /link sides/i } )
-			).not.toBeInTheDocument();
-		} );
 	} );
 
 	describe( 'Value Changes - Axial View', () => {

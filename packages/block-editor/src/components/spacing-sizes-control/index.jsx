@@ -3,9 +3,8 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
-import { usePrevious } from '@wordpress/compose';
 import { useSettings } from '../use-settings';
 import useSpacingSizes from './hooks/use-spacing-sizes';
 import AxialInputControls from './input-controls/axial';
@@ -90,11 +89,6 @@ export default function SpacingSizesControl( {
 			: true;
 	const linkedByDefault = linkedByDefaultProp ?? resolvedSetting;
 	const inputValues = values || DEFAULT_VALUES;
-	const inputValuesRef = useRef( inputValues );
-
-	useEffect( () => {
-		inputValuesRef.current = inputValues;
-	}, [ inputValues ] );
 
 	const hasOneSide = sides?.length === 1;
 	const hasOnlyAxialSides =
@@ -106,51 +100,7 @@ export default function SpacingSizesControl( {
 		getInitialView( inputValues, sides, linkedByDefault )
 	);
 
-	const prevLinkedByDefault = usePrevious( linkedByDefault );
-	const prevSides = usePrevious( sides );
-	const hasUserToggledRef = useRef( false );
-
-	useEffect( () => {
-		const isFirstRender =
-			prevLinkedByDefault === undefined && prevSides === undefined;
-		if ( isFirstRender ) {
-			return;
-		}
-
-		const hasLinkedByDefaultChanged =
-			prevLinkedByDefault !== linkedByDefault;
-		const haveSidesChanged = prevSides !== sides;
-
-		// Re-initialize view if sides or linkedByDefault changed.
-		// When supported sides change, constraints of the new configuration must
-		// take precedence over any prior user toggle.
-		if ( haveSidesChanged || hasLinkedByDefaultChanged ) {
-			if ( haveSidesChanged ) {
-				hasUserToggledRef.current = false;
-				setView(
-					getInitialView(
-						inputValuesRef.current,
-						sides,
-						linkedByDefault
-					)
-				);
-			} else if (
-				! hasUserToggledRef.current ||
-				hasLinkedByDefaultChanged
-			) {
-				setView(
-					getInitialView(
-						inputValuesRef.current,
-						sides,
-						linkedByDefault
-					)
-				);
-			}
-		}
-	}, [ linkedByDefault, prevLinkedByDefault, prevSides, sides ] );
-
 	const toggleLinked = () => {
-		hasUserToggledRef.current = true;
 		setView( view === VIEWS.axial ? VIEWS.custom : VIEWS.axial );
 	};
 
