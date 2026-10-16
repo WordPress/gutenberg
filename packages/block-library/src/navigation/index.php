@@ -1639,8 +1639,9 @@ add_action( 'init', 'register_block_core_navigation' );
  * change those classes, so equivalent custom properties and a scoping class
  * are generated for each configured viewport layout.
  *
- * The custom CSS class is copied from the wrapper to its inner lists during
- * rendering. Remove it from those lists so custom CSS only targets the wrapper.
+ * The inner lists are built with `get_block_wrapper_attributes()`, so they also
+ * receive the generated `wp-custom-css-*` class. Remove it from those lists so
+ * custom CSS only targets the wrapper.
  *
  * Currently this is required as a workaround because of how difficult it is for nav
  * child blocks to inherit styles through the complex responsive nav block html. The
