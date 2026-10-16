@@ -371,6 +371,24 @@ export function getFieldsConfig(
 }
 
 /**
+ * The actions registered on the server for an entity, as returned by the
+ * `/wp/v2/entity-actions` route.
+ */
+export interface EntityActionsConfig {
+	kind: string;
+	name: string;
+	/**
+	 * The serializable part of each action, in registration order.
+	 */
+	actions: Array< { id: string } & Record< string, any > >;
+	/**
+	 * The script modules providing the JavaScript parts of the actions, in
+	 * registration order, with the ids of the actions each provides.
+	 */
+	script_modules: Array< { id: string; actions: string[] } >;
+}
+
+/**
  * Returns the actions registered on the server for the given entity, as the
  * `/wp/v2/entity-actions` REST API route returns them: the serializable part of each
  * action, and the script modules providing their JavaScript parts.
@@ -385,7 +403,7 @@ export function getEntityActionsConfig(
 	state: State,
 	kind: string,
 	name: string
-): Record< string, any > | undefined {
+): EntityActionsConfig | undefined {
 	return state.entityActionsConfigs?.[ kind ]?.[ name ];
 }
 
