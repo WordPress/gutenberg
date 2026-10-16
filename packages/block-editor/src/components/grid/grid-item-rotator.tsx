@@ -126,7 +126,12 @@ export function GridItemRotator( {
 	}
 
 	function startRotation( event: PointerEvent< HTMLDivElement > ) {
-		if ( event.button !== 0 || ! boxRef.current || rotationRef.current ) {
+		if (
+			event.button !== 0 ||
+			! blockElement ||
+			! boxRef.current ||
+			rotationRef.current
+		) {
 			return;
 		}
 		event.preventDefault();
