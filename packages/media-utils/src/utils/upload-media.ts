@@ -55,7 +55,7 @@ interface UploadMediaArgs {
  * @param $0.signal             Abort signal.
  * @param $0.multiple           Whether to allow multiple files to be uploaded.
  */
-export function uploadMedia( {
+export async function uploadMedia( {
 	wpAllowedMimeTypes,
 	allowedTypes,
 	additionalData = {},
@@ -125,7 +125,8 @@ export function uploadMedia( {
 		}
 	}
 
-	validFiles.map( async ( file, index ) => {
+	for ( let index = 0; index < validFiles.length; ++index ) {
+		const file = validFiles[ index ];
 		try {
 			const attachment = await uploadToServer(
 				file,
@@ -146,5 +147,5 @@ export function uploadMedia( {
 				} )
 			);
 		}
-	} );
+	}
 }
