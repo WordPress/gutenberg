@@ -60,6 +60,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
+	'__experimentalStyleClassesEnabled',
 	'allImageSizes',
 	'alignWide',
 	'blockStatesEditingEnabled',
