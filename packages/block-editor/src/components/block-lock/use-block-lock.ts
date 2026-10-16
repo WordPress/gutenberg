@@ -1,15 +1,16 @@
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { BlockLockStatus } from './types';
 
 /**
  * Return details about the block lock status.
  *
- * @param {string} clientId The block client Id.
+ * @param clientId The block client Id.
  *
- * @return {Object} Block lock status
+ * @return Block lock status
  */
-export default function useBlockLock( clientId ) {
+export default function useBlockLock( clientId: string ): BlockLockStatus {
 	return useSelect(
 		( select ) => {
 			const {
