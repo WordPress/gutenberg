@@ -12,7 +12,6 @@ interface UseCropOptionsReturn {
 	setAspectRatioValue: ( value: string ) => void;
 	aspectRatioOptions: AspectRatioPreset[];
 	resolvedAspectRatio: number | undefined;
-	resetCropOptions: () => void;
 }
 
 /**
@@ -67,6 +66,5 @@ export function useCropOptions( {
 		setAspectRatioValue: controller.setAspectRatioValue,
 		aspectRatioOptions,
 		resolvedAspectRatio,
-		resetCropOptions: controller.resetCropOptions,
 	};
 }

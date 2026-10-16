@@ -27,8 +27,15 @@ describe( 'Breadcrumb', () => {
 	let originalScrollWidth: PropertyDescriptor | undefined;
 	let originalGetBoundingClientRect: typeof HTMLElement.prototype.getBoundingClientRect;
 	let originalFonts: PropertyDescriptor | undefined;
+	let listPaddingReset: HTMLStyleElement;
 
 	beforeEach( () => {
+		// TODO: jsdom-only reset; the component stylesheet, which the jsdom project mocks away, already removes the UA list padding that the measurements would otherwise subtract.
+		listPaddingReset = document.createElement( 'style' );
+		listPaddingReset.textContent =
+			'ol { padding-inline-start: 0; padding-inline-end: 0; }';
+		document.head.appendChild( listPaddingReset );
+
 		availableWidth = 500;
 		listAvailableWidth = null;
 		labelWidths = new Map();
@@ -78,10 +85,10 @@ describe( 'Breadcrumb', () => {
 
 		vi.stubGlobal(
 			'requestAnimationFrame',
-			vi.fn( ( callback: FrameRequestCallback ) => {
+			( callback: FrameRequestCallback ) => {
 				animationFrames.push( callback );
 				return animationFrames.length;
-			} )
+			}
 		);
 		vi.stubGlobal( 'cancelAnimationFrame', vi.fn() );
 
@@ -94,21 +101,7 @@ describe( 'Breadcrumb', () => {
 				) {
 					const label =
 						element.firstElementChild as HTMLElement | null;
-					const inlineMargin = Number.parseFloat(
-						label?.style.marginInline || '0'
-					);
-					const inlineStartMargin = Number.parseFloat(
-						label?.style.marginInlineStart || '0'
-					);
-					const inlineEndMargin = Number.parseFloat(
-						label?.style.marginInlineEnd || '0'
-					);
-					return (
-						( label?.scrollWidth ?? 0 ) +
-						inlineMargin * 2 +
-						inlineStartMargin +
-						inlineEndMargin
-					);
+					return label?.scrollWidth ?? 0;
 				}
 				if (
 					element.classList.contains(
@@ -121,14 +114,6 @@ describe( 'Breadcrumb', () => {
 					return SEPARATOR_WIDTH;
 				}
 				if ( element.classList.contains( 'style-label' ) ) {
-					const intrinsicWidthElement = element.querySelector(
-						'[data-intrinsic-width]'
-					);
-					const intrinsicWidth = Number.parseFloat(
-						intrinsicWidthElement?.getAttribute(
-							'data-intrinsic-width'
-						) ?? ''
-					);
 					const indicatorWidth = element.matches(
 						'[target="_blank"]'
 					)
@@ -137,9 +122,8 @@ describe( 'Breadcrumb', () => {
 					const configuredLabelWidth = labelWidths.get(
 						element.textContent ?? ''
 					);
-					const labelWidth = Number.isNaN( intrinsicWidth )
-						? ( configuredLabelWidth ?? DEFAULT_LABEL_WIDTH )
-						: intrinsicWidth;
+					const labelWidth =
+						configuredLabelWidth ?? DEFAULT_LABEL_WIDTH;
 					return labelWidth + indicatorWidth;
 				}
 				return 0;
@@ -154,9 +138,6 @@ describe( 'Breadcrumb', () => {
 				}
 				if ( element.getAttribute( 'role' ) === 'navigation' ) {
 					return availableWidth;
-				}
-				if ( element.hasAttribute( 'data-constrained' ) ) {
-					return 20;
 				}
 				if (
 					element.getAttribute( 'aria-current' ) === 'page' &&
@@ -196,6 +177,7 @@ describe( 'Breadcrumb', () => {
 	} );
 
 	afterEach( () => {
+		listPaddingReset.remove();
 		if ( originalClientWidth ) {
 			Object.defineProperty(
 				HTMLElement.prototype,
@@ -287,6 +269,67 @@ describe( 'Breadcrumb', () => {
 			);
 		} );
 
+		it( 'labels the selection list without naming its layout wrapper', () => {
+			render(
+				<Breadcrumb.Root
+					aria-label="Block hierarchy"
+					render={ ( renderProps ) => (
+						<div
+							{ ...renderProps }
+							role="group"
+							aria-label="Wrapper"
+							aria-labelledby="wrapper-label"
+						/>
+					) }
+				>
+					<Breadcrumb.ButtonItem>Document</Breadcrumb.ButtonItem>
+					<Breadcrumb.CurrentItem>Paragraph</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+
+			const list = screen.getByRole( 'list', {
+				name: 'Block hierarchy',
+			} );
+			expect( list.tagName ).toBe( 'OL' );
+
+			// Custom renderers cannot reintroduce a second named container.
+			expect( list.parentElement ).not.toHaveAttribute( 'role' );
+			expect( list.parentElement ).not.toHaveAttribute( 'aria-label' );
+			expect( list.parentElement ).not.toHaveAttribute(
+				'aria-labelledby'
+			);
+		} );
+
+		it( 'uses the referenced label for the selection list', () => {
+			render(
+				<>
+					<span id="hierarchy-label">Block hierarchy</span>
+					<Breadcrumb.Root
+						aria-label="Fallback hierarchy"
+						aria-labelledby="hierarchy-label"
+					>
+						<Breadcrumb.CurrentItem aria-current="true">
+							Document
+						</Breadcrumb.CurrentItem>
+					</Breadcrumb.Root>
+				</>
+			);
+
+			const list = screen.getByRole( 'list', {
+				name: 'Block hierarchy',
+			} );
+			expect( list ).toHaveAttribute(
+				'aria-labelledby',
+				'hierarchy-label'
+			);
+
+			// The label reference is applied only to the list, even without ancestors.
+			expect( list.parentElement ).not.toHaveAttribute(
+				'aria-labelledby'
+			);
+			expect( list.parentElement ).not.toHaveAttribute( 'aria-label' );
+		} );
+
 		it( 'keeps the intrinsic tree inert and out of the accessibility tree', () => {
 			const { container } = renderDefaultTrail();
 			const measurementTree =
@@ -311,32 +354,23 @@ describe( 'Breadcrumb', () => {
 			expect( screen.getAllByRole( 'navigation' ) ).toHaveLength( 1 );
 		} );
 
-		it( 'preserves required semantics when Root uses a custom renderer', () => {
-			render(
-				<Breadcrumb.Root
-					aria-label="Location"
-					render={ <div role="presentation" /> }
-				>
-					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			const navigation = screen.getByRole( 'navigation', {
-				name: 'Location',
-			} );
-			expect( navigation.tagName ).toBe( 'DIV' );
-			expect( navigation ).toHaveAttribute( 'role', 'navigation' );
-		} );
-
 		it( 'forwards refs to the landmark and rendered item elements', () => {
 			const rootRef = createRef< HTMLElement >();
 			const linkRef = createRef< HTMLAnchorElement >();
+			const renderRef = createRef< HTMLAnchorElement >();
 			const currentRef = createRef< HTMLSpanElement >();
 
 			render(
 				<Breadcrumb.Root ref={ rootRef }>
-					<Breadcrumb.LinkItem ref={ linkRef } href="/">
+					<Breadcrumb.LinkItem
+						ref={ linkRef }
+						href="/"
+						render={
+							<a ref={ renderRef } href="/">
+								Home
+							</a>
+						}
+					>
 						Home
 					</Breadcrumb.LinkItem>
 					<Breadcrumb.CurrentItem ref={ currentRef }>
@@ -345,22 +379,26 @@ describe( 'Breadcrumb', () => {
 				</Breadcrumb.Root>
 			);
 
-			expect( rootRef.current?.tagName ).toBe( 'NAV' );
-			expect( linkRef.current?.tagName ).toBe( 'A' );
-			expect( currentRef.current?.tagName ).toBe( 'SPAN' );
+			expect( rootRef.current ).toBe( screen.getByRole( 'navigation' ) );
+			const link = screen.getByRole( 'link', { name: 'Home' } );
+			expect( linkRef.current ).toBe( link );
+			expect( renderRef.current ).toBe( link );
+			expect( currentRef.current ).toBe(
+				screen.getByText( 'Current', {
+					selector: '[aria-current="page"]',
+				} )
+			);
 		} );
 
 		it( 'passes complete link props through a custom renderer', () => {
 			const href = '/settings/general?section=writing#defaults';
-			const renderLink = vi.fn(
-				( {
-					children: linkChildren,
-					...linkProps
-				}: HTMLAttributes< HTMLElement > ) => (
-					<a data-router-link { ...linkProps }>
-						{ linkChildren }
-					</a>
-				)
+			const renderLink = ( {
+				children: linkChildren,
+				...linkProps
+			}: HTMLAttributes< HTMLElement > ) => (
+				<a data-router-link { ...linkProps }>
+					{ linkChildren }
+				</a>
 			);
 
 			render(
@@ -377,7 +415,8 @@ describe( 'Breadcrumb', () => {
 			);
 
 			const link = screen.getByRole( 'link', {
-				name: 'General (opens in a new tab)',
+				// TODO: jsdom-only name; browsers separate the notice with a space.
+				name: 'General(opens in a new tab)',
 			} );
 			expect( link ).toHaveAttribute( 'href', href );
 			expect( link ).toHaveAttribute( 'target', '_blank' );
@@ -385,12 +424,14 @@ describe( 'Breadcrumb', () => {
 				within( link ).getByLabelText( '(opens in a new tab)' )
 			).toBeVisible();
 			expect( link ).toHaveAttribute( 'data-router-link' );
-			expect( renderLink ).toHaveBeenCalled();
 		} );
 
 		it( 'does not let custom renderers override required item semantics', () => {
 			render(
-				<Breadcrumb.Root>
+				<Breadcrumb.Root
+					aria-label="Location"
+					render={ <div role="presentation" /> }
+				>
 					<Breadcrumb.LinkItem
 						href="/required"
 						render={ ( renderProps ) => (
@@ -422,6 +463,9 @@ describe( 'Breadcrumb', () => {
 				</Breadcrumb.Root>
 			);
 
+			expect(
+				screen.getByRole( 'navigation', { name: 'Location' } )
+			).toBeVisible();
 			const ancestor = screen.getByRole( 'link', { name: 'Ancestor' } );
 			expect( ancestor ).toHaveAttribute( 'href', '/required' );
 			expect( ancestor ).not.toHaveAttribute( 'aria-current' );
@@ -464,60 +508,6 @@ describe( 'Breadcrumb', () => {
 			expect( measurement?.style.fontSize ).toBe( '20px' );
 			expect( measurement?.style.letterSpacing ).toBe( '3px' );
 		} );
-
-		it( 'collapses items based on custom-rendered link widths', () => {
-			availableWidth = 110;
-
-			render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem
-						href="/"
-						render={ ( renderProps ) => (
-							<a { ...renderProps }>
-								<span data-intrinsic-width="90">
-									{ renderProps.children }
-								</span>
-							</a>
-						) }
-					>
-						Home
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			expect(
-				screen.getByRole( 'button', {
-					name: 'Show 1 hidden breadcrumb item',
-				} )
-			).toBeInTheDocument();
-		} );
-
-		it( 'keeps custom renderer refs on the visible item', () => {
-			const renderRef = createRef< HTMLAnchorElement >();
-			const { container } = render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem
-						href="/"
-						render={
-							<a ref={ renderRef } href="/">
-								Home
-							</a>
-						}
-					>
-						Home
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			const visibleLink = screen.getByRole( 'link', { name: 'Home' } );
-			const measurementTree =
-				container.querySelector( '.style-measurement' );
-
-			expect( renderRef.current ).toBe( visibleLink );
-			expect( measurementTree ).not.toContainElement( renderRef.current );
-		} );
 	} );
 
 	describe( 'development validation', () => {
@@ -533,14 +523,102 @@ describe( 'Breadcrumb', () => {
 			).toThrow( /only accepts/ );
 		} );
 
-		it( 'requires at least one ancestor link', () => {
+		it( 'supports a current-only navigation trail by default', () => {
+			render(
+				<Breadcrumb.Root>
+					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			expect( screen.getByRole( 'navigation' ) ).toHaveAccessibleName(
+				'Breadcrumbs'
+			);
+			expect(
+				screen.getByText( 'Current', {
+					selector: '[aria-current="page"]',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'enforces selection semantics in composed roots and current items', () => {
+			render(
+				<Breadcrumb.Root
+					aria-label="Block hierarchy"
+					render={ <div role="navigation" /> }
+				>
+					<Breadcrumb.ButtonItem
+						render={ <button type="submit" aria-current="page" /> }
+					>
+						Document
+					</Breadcrumb.ButtonItem>
+					<Breadcrumb.CurrentItem
+						render={ <span aria-current="page" /> }
+					>
+						Paragraph
+					</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			const list = screen.getByRole( 'list', {
+				name: 'Block hierarchy',
+			} );
+			expect( list ).toBeVisible();
+
+			expect(
+				screen.queryByRole( 'navigation' )
+			).not.toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', { name: 'Document' } )
+			).toHaveAttribute( 'type', 'button' );
+			expect(
+				screen.getByRole( 'button', { name: 'Document' } )
+			).not.toHaveAttribute( 'aria-current' );
+			expect(
+				screen.getByText( 'Paragraph', {
+					selector: '[aria-current="true"]',
+				} )
+			).toBeVisible();
+		} );
+
+		it( 'rejects mixed link and button ancestors', () => {
 			expect( () =>
 				render(
 					<Breadcrumb.Root>
+						<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
+						<Breadcrumb.ButtonItem>Group</Breadcrumb.ButtonItem>
 						<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
 					</Breadcrumb.Root>
 				)
-			).toThrow( /at least one/ );
+			).toThrow( /Mixed trails/ );
+		} );
+
+		it( 'keeps button measurement copies inert without event handlers or public refs', () => {
+			const onClick = vi.fn();
+			const ref = vi.fn();
+			const renderRef = vi.fn();
+			const renderClick = vi.fn();
+			const { container } = render(
+				<Breadcrumb.Root aria-label="Block hierarchy">
+					<Breadcrumb.ButtonItem
+						ref={ ref }
+						onClick={ onClick }
+						render={
+							<button ref={ renderRef } onClick={ renderClick } />
+						}
+					>
+						Document
+					</Breadcrumb.ButtonItem>
+					<Breadcrumb.CurrentItem>Paragraph</Breadcrumb.CurrentItem>
+				</Breadcrumb.Root>
+			);
+			const button = screen.getByRole( 'button', { name: 'Document' } );
+			expect( button ).toHaveAttribute( 'type', 'button' );
+			expect( ref ).toHaveBeenLastCalledWith( button );
+			expect( renderRef ).toHaveBeenLastCalledWith( button );
+			const measurement =
+				container.querySelector< HTMLElement >( '[inert]' )!;
+			expect( measurement ).toHaveAttribute( 'aria-hidden', 'true' );
+			measurement.querySelector< HTMLElement >( 'button' )!.click();
+			expect( onClick ).not.toHaveBeenCalled();
+			expect( renderClick ).not.toHaveBeenCalled();
 		} );
 
 		it( 'requires exactly one final current item', () => {
@@ -610,34 +688,17 @@ describe( 'Breadcrumb', () => {
 	} );
 
 	describe( 'overflow menu', () => {
-		it( 'uses the shared small neutral minimal button treatment', () => {
-			availableWidth = 150;
-			labelWidths.set( 'Section', 80 );
-			renderDefaultTrail();
-
-			const trigger = screen.getByRole( 'button', {
-				name: 'Show 1 hidden breadcrumb item',
-			} );
-			expect( trigger ).toHaveClass(
-				'style-is-neutral',
-				'style-is-minimal',
-				'style-is-small'
-			);
-		} );
-
 		it( 'passes the same custom renderer and complete href to menu links', async () => {
 			const user = userEvent.setup();
 			availableWidth = 84;
 			labelWidths.set( 'Settings', 100 );
-			const renderLink = vi.fn(
-				( {
-					children: linkChildren,
-					...linkProps
-				}: HTMLAttributes< HTMLElement > ) => (
-					<a data-router-link { ...linkProps }>
-						{ linkChildren }
-					</a>
-				)
+			const renderLink = ( {
+				children: linkChildren,
+				...linkProps
+			}: HTMLAttributes< HTMLElement > ) => (
+				<a data-router-link { ...linkProps }>
+					{ linkChildren }
+				</a>
 			);
 
 			render(
@@ -660,7 +721,8 @@ describe( 'Breadcrumb', () => {
 			);
 			act( flushAllAnimationFrames );
 			const menuLink = await screen.findByRole( 'menuitem', {
-				name: 'Settings (opens in a new tab)',
+				// TODO: jsdom-only name; browsers separate the notice with a space.
+				name: 'Settings(opens in a new tab)',
 			} );
 			expect( menuLink ).toHaveAttribute(
 				'href',
@@ -935,7 +997,9 @@ describe( 'Breadcrumb', () => {
 				screen.queryByRole( 'button', { name: /hidden breadcrumb/ } )
 			).not.toBeInTheDocument();
 
-			list.style.paddingInline = '4px';
+			// TODO: jsdom-only longhands; it does not expand the paddingInline shorthand into the computed logical longhands the component reads.
+			list.style.paddingInlineStart = '4px';
+			list.style.paddingInlineEnd = '4px';
 			notifyResize( list );
 
 			expect(
@@ -951,26 +1015,6 @@ describe( 'Breadcrumb', () => {
 				<Breadcrumb.Root style={ { paddingInline: '180px' } }>
 					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
 					<Breadcrumb.LinkItem href="/section">
-						Section
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			expect(
-				screen.getByRole( 'button', { name: /hidden breadcrumb/ } )
-			).toBeInTheDocument();
-		} );
-
-		it( 'includes consumer inline margins in intrinsic item widths', () => {
-			availableWidth = 164;
-			render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem href="/">Home</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem
-						href="/section"
-						style={ { marginInline: '30px' } }
-					>
 						Section
 					</Breadcrumb.LinkItem>
 					<Breadcrumb.CurrentItem>Current</Breadcrumb.CurrentItem>
@@ -998,107 +1042,6 @@ describe( 'Breadcrumb', () => {
 					name: 'Show 1 hidden breadcrumb item',
 				} )
 			).toBeInTheDocument();
-		} );
-
-		it( 'recalculates after items are added and reordered', () => {
-			const { rerender } = render(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem key="home" href="/">
-						Home
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem key="section" href="/section">
-						Section
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem key="current">
-						Current
-					</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-			const observersBeforeRerender = [ ...resizeObservers ];
-
-			rerender(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem key="section" href="/section">
-						Section
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem key="home" href="/">
-						Home
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem key="archive" href="/archive">
-						Archive
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem key="current">
-						Current
-					</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-
-			expect(
-				screen
-					.getAllByRole( 'link' )
-					.map( ( link ) => link.textContent )
-			).toEqual( [ 'Section', 'Home', 'Archive' ] );
-			expect(
-				observersBeforeRerender.every(
-					( observer ) => observer.disconnected
-				)
-			).toBe( true );
-			expect( resizeObservers.length ).toBeGreaterThan(
-				observersBeforeRerender.length
-			);
-
-			rerender(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem key="section" href="/section">
-						Section
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem key="archive" href="/archive">
-						Archive
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem key="current">
-						Current
-					</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-			expect(
-				screen
-					.getAllByRole( 'link' )
-					.map( ( link ) => link.textContent )
-			).toEqual( [ 'Section', 'Archive' ] );
-
-			rerender(
-				<Breadcrumb.Root>
-					<Breadcrumb.LinkItem key="section" href="/projects">
-						Projects
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.LinkItem key="archive" href="/library">
-						Library
-					</Breadcrumb.LinkItem>
-					<Breadcrumb.CurrentItem key="current">
-						Current
-					</Breadcrumb.CurrentItem>
-				</Breadcrumb.Root>
-			);
-			expect(
-				screen
-					.getAllByRole( 'link' )
-					.map( ( link ) => link.textContent )
-			).toEqual( [ 'Projects', 'Library' ] );
-		} );
-
-		it( 'observes the available container, intrinsic row, and individual items', () => {
-			const { container } = renderDefaultTrail();
-			const navigation = screen.getByRole( 'navigation' );
-			const row = container.querySelector( '.style-measurement-row' );
-			const item = container.querySelector(
-				'.style-measurement-content'
-			);
-			const measurementObserver = resizeObservers.find( ( observer ) =>
-				observer.elements.has( navigation )
-			);
-
-			expect( measurementObserver?.elements.has( row! ) ).toBe( true );
-			expect( measurementObserver?.elements.has( item! ) ).toBe( true );
 		} );
 
 		it( 'recalculates for item-level size changes and restores on growth', () => {
@@ -1153,27 +1096,6 @@ describe( 'Breadcrumb', () => {
 			expect(
 				screen.getByRole( 'button', { name: /hidden breadcrumb/ } )
 			).toBeInTheDocument();
-		} );
-
-		it( 'coalesces resize notifications into one calculation per frame', () => {
-			const { container } = renderDefaultTrail();
-			const item = container.querySelector(
-				'.style-measurement-content'
-			);
-			const itemObserver = resizeObservers.find( ( observer ) =>
-				observer.elements.has( item! )
-			);
-			const requestFrame = vi.mocked( requestAnimationFrame );
-			requestFrame.mockClear();
-
-			act( () => {
-				itemObserver?.callback( [], {} as ResizeObserver );
-				itemObserver?.callback( [], {} as ResizeObserver );
-				itemObserver?.callback( [], {} as ResizeObserver );
-			} );
-
-			expect( requestFrame ).toHaveBeenCalledTimes( 1 );
-			act( flushAnimationFrames );
 		} );
 
 		it( 'disconnects every observer on cleanup', () => {

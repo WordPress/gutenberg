@@ -6,6 +6,15 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, the full group hierarchy, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
+
+### Internal
+
+-   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
+-   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
+
 ## 2.3.0 (2026-10-07)
 
 ### New Features

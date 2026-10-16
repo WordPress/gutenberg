@@ -268,4 +268,110 @@ class WP_Block_Supports_Colors_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $expected, $actual );
 	}
+
+	/**
+	 * Registers a block with color and background clip support.
+	 *
+	 * @param array|bool  $background_skip Background serialization skip.
+	 * @return WP_Block_Type The registered block type.
+	 */
+	private function register_background_clip_block( $background_skip = false ) {
+		$this->test_block_name = 'test/color-background-clip';
+		register_block_type(
+			$this->test_block_name,
+			array(
+				'api_version' => 3,
+				'attributes'  => array(
+					'backgroundColor' => array(
+						'type' => 'string',
+					),
+					'gradient'        => array(
+						'type' => 'string',
+					),
+					'style'           => array(
+						'type' => 'object',
+					),
+				),
+				'supports'    => array(
+					'color'      => array(
+						'background' => true,
+						'gradients'  => true,
+					),
+					'background' => array(
+						'backgroundClip'                  => true,
+						'__experimentalSkipSerialization' => $background_skip,
+					),
+				),
+			)
+		);
+
+		return WP_Block_Type_Registry::get_instance()->get_registered( $this->test_block_name );
+	}
+
+	/**
+	 * @dataProvider data_background_color_has_background_with_a_clip
+	 *
+	 * @param array       $block_atts      Block attributes.
+	 * @param array|bool  $background_skip Background serialization skip.
+	 * @param string|null $expected_class  Expected class attribute.
+	 */
+	public function test_background_color_has_background_with_a_clip( $block_atts, $background_skip, $expected_class ) {
+		$block_type = $this->register_background_clip_block( $background_skip );
+
+		$actual = gutenberg_apply_colors_support( $block_type, $block_atts );
+
+		$this->assertSame( $expected_class, $actual['class'] ?? null );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array
+	 */
+	public function data_background_color_has_background_with_a_clip() {
+		return array(
+			'preset color clipped to the text'      => array(
+				array(
+					'backgroundColor' => 'base',
+					'style'           => array( 'background' => array( 'backgroundClip' => 'text' ) ),
+				),
+				false,
+				'has-base-background-color',
+			),
+			'custom color clipped to the text'      => array(
+				array(
+					'style' => array(
+						'color'      => array( 'background' => '#ff0000' ),
+						'background' => array( 'backgroundClip' => 'text' ),
+					),
+				),
+				false,
+				null,
+			),
+			'preset color clipped to a box'         => array(
+				array(
+					'backgroundColor' => 'base',
+					'style'           => array( 'background' => array( 'backgroundClip' => 'padding-box' ) ),
+				),
+				false,
+				'has-background has-base-background-color',
+			),
+			'preset color with a skipped text clip' => array(
+				array(
+					'backgroundColor' => 'base',
+					'style'           => array( 'background' => array( 'backgroundClip' => 'text' ) ),
+				),
+				array( 'backgroundClip' ),
+				'has-background has-base-background-color',
+			),
+			'color gradient over a text clip'       => array(
+				array(
+					'gradient' => 'vivid',
+					'style'    => array( 'background' => array( 'backgroundClip' => 'text' ) ),
+				),
+				false,
+				'has-background has-vivid-gradient-background',
+			),
+		);
+	}
 }

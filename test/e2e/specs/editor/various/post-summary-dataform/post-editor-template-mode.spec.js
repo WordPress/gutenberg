@@ -111,9 +111,10 @@ test.describe( 'Post Editor Template mode (DataForm inspector)', () => {
 		await postEditorTemplateMode.disableTemplateWelcomeGuide();
 		await postEditorTemplateMode.openTemplatePopover();
 		// Change to a custom template, save and reload.
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
 		await page
-			.getByRole( 'combobox', { name: 'Template' } )
-			.selectOption( { label: 'Custom' } );
+			.getByRole( 'option', { name: 'Custom', exact: true } )
+			.click();
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.getByRole( 'button', { name: 'Edit Template' } )
@@ -125,9 +126,10 @@ test.describe( 'Post Editor Template mode (DataForm inspector)', () => {
 		).toHaveAccessibleDescription( 'Custom' );
 		// Change to the default template.
 		await postEditorTemplateMode.openTemplatePopover();
+		await page.getByRole( 'combobox', { name: 'Template' } ).click();
 		await page
-			.getByRole( 'combobox', { name: 'Template' } )
-			.selectOption( { label: 'Single Entries' } );
+			.getByRole( 'option', { name: 'Single Entries', exact: true } )
+			.click();
 		await page.keyboard.press( 'Escape' );
 		await expect(
 			page.getByRole( 'button', { name: 'Edit Template' } )

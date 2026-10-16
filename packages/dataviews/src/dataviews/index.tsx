@@ -6,7 +6,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Stack } from '@wordpress/ui';
+import { Stack, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import DataViewsContext from '../components/dataviews-context';
 import { VIEW_LAYOUTS } from '../components/dataviews-layouts';
 import {
@@ -110,6 +110,7 @@ function DataViews< Item >( {
 	empty,
 	onReset,
 }: DataViewsProps< Item > ) {
+	useEnableWpCompatOverlaySlot();
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
