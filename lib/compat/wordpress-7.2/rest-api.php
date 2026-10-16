@@ -333,8 +333,13 @@ function gutenberg_add_page_homepage_action_links( $response, $post, $request ) 
 		return $response;
 	}
 
-	$response->add_link( 'https://api.w.org/action-set-homepage', $links['self'][0]['href'] );
-	$response->add_link( 'https://api.w.org/action-set-posts-page', $links['self'][0]['href'] );
+	// WordPress 7.2 adds the links in `get_available_actions()`, so an
+	// existing link is kept.
+	foreach ( array( 'https://api.w.org/action-set-homepage', 'https://api.w.org/action-set-posts-page' ) as $rel ) {
+		if ( ! isset( $links[ $rel ] ) ) {
+			$response->add_link( $rel, $links['self'][0]['href'] );
+		}
+	}
 
 	return $response;
 }

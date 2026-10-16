@@ -146,6 +146,25 @@ class Gutenberg_REST_Homepage_Action_Links_Test extends WP_Test_REST_TestCase {
 		$this->assert_has_no_links( $this->get_links( '/wp/v2/posts/' . $post_id ) );
 	}
 
+	public function test_links_added_by_core_are_kept() {
+		// Mirrors WordPress 7.2, which adds the links in `get_available_actions()`.
+		add_filter(
+			'rest_prepare_page',
+			static function ( $response ) {
+				$links = $response->get_links();
+				foreach ( self::RELS as $rel ) {
+					if ( ! isset( $links[ $rel ] ) ) {
+						$response->add_link( $rel, $links['self'][0]['href'] );
+					}
+				}
+				return $response;
+			},
+			9
+		);
+
+		$this->assert_has_links( $this->get_links( '/wp/v2/pages/' . self::$page_id ) );
+	}
+
 	public function test_pages_in_a_collection_have_the_links() {
 		$request = new WP_REST_Request( 'GET', '/wp/v2/pages' );
 		$request->set_query_params(
