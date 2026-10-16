@@ -25,6 +25,8 @@ import {
 	getInlineMarkerStart,
 	getNoteMarkerSelector,
 	getNoteAnchorRect,
+	getNoteText,
+	resolveNoteAnchor,
 } from '../utils';
 import { noteFormat } from '../format';
 
@@ -1196,6 +1198,102 @@ describe( 'removeNoteFormat', () => {
 				'5'
 			).toHTMLString()
 		).toBe( 'a b c' );
+	} );
+
+	it( 'removes the marker from a plain string value, returning a string', () => {
+		const value =
+			'the <mark class="wp-note" data-id="7">quick</mark> brown fox';
+		expect( removeNoteFormat( value, 7 ) ).toBe( 'the quick brown fox' );
+	} );
+
+	it( 'returns null for a value that is neither RichTextData nor a string', () => {
+		expect( removeNoteFormat( undefined, 1 ) ).toBeNull();
+		expect( removeNoteFormat( null, 1 ) ).toBeNull();
+		expect( removeNoteFormat( 42, 1 ) ).toBeNull();
+	} );
+} );
+
+describe( 'wrapInlineNote', () => {
+	// `create`/`applyNoteFormat` recognize the marker through the registered
+	// `core/note` format.
+	const FORMAT_NAME = 'core/note';
+
+	const isRegistered = () =>
+		!! select( richTextStore ).getFormatType( FORMAT_NAME );
+
+	beforeAll( () => {
+		if ( ! isRegistered() ) {
+			registerFormatType( FORMAT_NAME, {
+				title: 'Note',
+				tagName: 'mark',
+				className: 'wp-note',
+				attributes: { 'data-id': 'data-id' },
+				edit: () => null,
+			} );
+		}
+	} );
+
+	afterAll( () => {
+		if ( isRegistered() ) {
+			unregisterFormatType( FORMAT_NAME );
+		}
+	} );
+
+	it( 'wraps a plain string value and returns an HTML string, not RichTextData', () => {
+		const wrapped = wrapInlineNote( 'the quick brown fox', 7, 4, 9 );
+		expect( typeof wrapped ).toBe( 'string' );
+		expect( wrapped ).toBe(
+			'the <mark data-id="7" class="wp-note">quick</mark> brown fox'
+		);
+	} );
+
+	it( 'returns null for a value that is neither RichTextData nor a string', () => {
+		expect( wrapInlineNote( undefined, 7, 0, 1 ) ).toBeNull();
+		expect( wrapInlineNote( 42, 7, 0, 1 ) ).toBeNull();
+	} );
+} );
+
+describe( 'resolveNoteAnchor', () => {
+	it( 'decodes a tab-panel-encoded attributeKey to the panel clientId and label attribute', () => {
+		expect(
+			resolveNoteAnchor( 'tab-list-client-id', 'tab-panel:panel-1' )
+		).toEqual( { clientId: 'panel-1', attributeKey: 'label' } );
+	} );
+
+	it( 'passes through an ordinary clientId and attributeKey unchanged', () => {
+		expect( resolveNoteAnchor( 'block-1', 'content' ) ).toEqual( {
+			clientId: 'block-1',
+			attributeKey: 'content',
+		} );
+	} );
+
+	it( 'passes through when attributeKey is undefined (block-level selection)', () => {
+		expect( resolveNoteAnchor( 'block-1', undefined ) ).toEqual( {
+			clientId: 'block-1',
+			attributeKey: undefined,
+		} );
+	} );
+} );
+
+describe( 'getNoteText', () => {
+	it( 'returns the text of a RichTextData value', () => {
+		const value = RichTextData.fromHTMLString(
+			'the <mark class="wp-note" data-id="7">quick</mark> brown fox'
+		);
+		expect( getNoteText( value ) ).toBe( 'the quick brown fox' );
+	} );
+
+	it( 'parses plain text out of a string value carrying markup', () => {
+		expect(
+			getNoteText(
+				'the <mark class="wp-note" data-id="7">quick</mark> brown fox'
+			)
+		).toBe( 'the quick brown fox' );
+	} );
+
+	it( 'returns an empty string for a nullish value', () => {
+		expect( getNoteText( undefined ) ).toBe( '' );
+		expect( getNoteText( null ) ).toBe( '' );
 	} );
 } );
 

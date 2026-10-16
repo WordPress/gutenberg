@@ -27,12 +27,14 @@ import {
 	focusNoteThread,
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
+	getNoteText,
 	addNoteIdToMetadata,
 	getNoteAtCaret,
 	pickNoteForCaret,
 	readInlineSelection,
 	removeInlineNote,
 	removeNoteIdFromMetadata,
+	resolveNoteAnchor,
 	wrapInlineNote,
 } from './utils';
 
@@ -183,6 +185,9 @@ export function useNoteActions() {
 	const { getCurrentPostId } = useSelect( editorStore );
 	const {
 		getBlockAttributes,
+		getBlockName,
+		getBlockRootClientId,
+		getBlocks,
 		getSelectedBlockClientId,
 		getSelectionStart,
 		getSelectionEnd,
@@ -215,13 +220,37 @@ export function useNoteActions() {
 		__unstableMarkLastChangeAsPersistent();
 	};
 
+	/*
+	 * Stopgap for Tab List: its metadata lives on it, but the marker is on a
+	 * child Tab Panel (see `resolveNoteAnchor`). Bakes Tabs' structure into
+	 * generic Notes code; replace once Notes can resolve a cross-block
+	 * anchor. https://github.com/WordPress/gutenberg/issues/84328
+	 */
+	const getInlineAnchorClientId = ( clientId, noteId ) => {
+		if ( findNoteInBlock( getBlockAttributes( clientId ), noteId ) ) {
+			return clientId;
+		}
+		if ( getBlockName( clientId ) !== 'core/tab-list' ) {
+			return clientId;
+		}
+		const tabsClientId = getBlockRootClientId( clientId );
+		const panelsBlock = getBlocks( tabsClientId )?.find(
+			( block ) => block.name === 'core/tab-panels'
+		);
+		const panel = panelsBlock?.innerBlocks.find( ( block ) =>
+			findNoteInBlock( block.attributes, noteId )
+		);
+		return panel?.clientId ?? clientId;
+	};
+
 	const removeNoteMarker = ( clientId, noteId ) => {
+		const anchorClientId = getInlineAnchorClientId( clientId, noteId );
 		const removed = removeInlineNote(
-			getBlockAttributes( clientId ),
+			getBlockAttributes( anchorClientId ),
 			noteId
 		);
 		if ( removed ) {
-			updateNoteAnchor( clientId, {
+			updateNoteAnchor( anchorClientId, {
 				[ removed.attributeKey ]: removed.value,
 			} );
 		}
@@ -242,15 +271,19 @@ export function useNoteActions() {
 			return;
 		}
 		onDiscard( clientId );
+		const anchor = resolveNoteAnchor(
+			selection.clientId,
+			selection.attributeKey
+		);
 		const wrapped = wrapInlineNote(
-			getBlockAttributes( clientId )?.[ selection.attributeKey ],
+			getBlockAttributes( anchor.clientId )?.[ anchor.attributeKey ],
 			'new',
 			selection.start,
 			selection.end
 		);
 		if ( wrapped ) {
-			updateNoteAnchor( clientId, {
-				[ selection.attributeKey ]: wrapped,
+			updateNoteAnchor( anchor.clientId, {
+				[ anchor.attributeKey ]: wrapped,
 			} );
 		}
 	};
@@ -293,9 +326,20 @@ export function useNoteActions() {
 					metadata: cleanEmptyObject( updatedMetadata ),
 				};
 
-				// Inline path: the draft marker becomes the note's marker.
-				const draft = removeInlineNote( attributes, 'new' );
-				if ( draft ) {
+				// Inline path: the draft marker becomes the note's marker. The
+				// draft may live on a different block than the one the note's
+				// metadata is attached to (see `getInlineAnchorClientId`).
+				const draftClientId = getInlineAnchorClientId(
+					clientId,
+					'new'
+				);
+				const draft = removeInlineNote(
+					draftClientId === clientId
+						? attributes
+						: getBlockAttributes( draftClientId ),
+					'new'
+				);
+				if ( draft && draftClientId === clientId ) {
 					newAttributes[ draft.attributeKey ] = wrapInlineNote(
 						draft.value,
 						savedRecord.id,
@@ -305,6 +349,17 @@ export function useNoteActions() {
 				}
 
 				updateNoteAnchor( clientId, newAttributes );
+
+				if ( draft && draftClientId !== clientId ) {
+					updateNoteAnchor( draftClientId, {
+						[ draft.attributeKey ]: wrapInlineNote(
+							draft.value,
+							savedRecord.id,
+							draft.start,
+							draft.end
+						),
+					} );
+				}
 			}
 
 			createNotice(
@@ -432,14 +487,26 @@ export function useNoteActions() {
 						noteId
 					);
 				}
+				if ( Object.keys( newAttributes ).length > 0 ) {
+					updateNoteAnchor( anchor.clientId, newAttributes );
+				}
+
+				// The inline marker may have lived on a different block than
+				// the metadata above (see `getInlineAnchorClientId`).
 				const { inline } = anchor;
-				const value = inline && attributes[ inline.attributeKey ];
+				const inlineClientId = inline?.clientId ?? anchor.clientId;
+				const inlineAttributes =
+					inlineClientId === anchor.clientId
+						? attributes
+						: getBlockAttributes( inlineClientId );
+				const value =
+					inline && inlineAttributes?.[ inline.attributeKey ];
 				// Re-wrap only text that hasn't changed since the delete;
 				// otherwise the note comes back as a block-level note.
 				if (
 					inline &&
-					! findNoteInBlock( attributes, noteId ) &&
-					value?.text?.slice( inline.start, inline.end ) ===
+					! findNoteInBlock( inlineAttributes, noteId ) &&
+					getNoteText( value ).slice( inline.start, inline.end ) ===
 						inline.text
 				) {
 					const wrapped = wrapInlineNote(
@@ -449,11 +516,10 @@ export function useNoteActions() {
 						inline.end
 					);
 					if ( wrapped ) {
-						newAttributes[ inline.attributeKey ] = wrapped;
+						updateNoteAnchor( inlineClientId, {
+							[ inline.attributeKey ]: wrapped,
+						} );
 					}
-				}
-				if ( Object.keys( newAttributes ).length > 0 ) {
-					updateNoteAnchor( anchor.clientId, newAttributes );
 				}
 			}
 
@@ -498,20 +564,35 @@ export function useNoteActions() {
 						removeNoteIdFromMetadata( attributes.metadata, note.id )
 					),
 				};
+				updateNoteAnchor( clientId, newAttributes );
+
 				// Strip the inline marker too (if any) so the deleted note's
-				// highlight doesn't linger in the content.
-				const removed = removeInlineNote( attributes, note.id );
+				// highlight doesn't linger in the content. It may live on a
+				// different block than the metadata above (see
+				// `getInlineAnchorClientId`).
+				const inlineClientId = getInlineAnchorClientId(
+					clientId,
+					note.id
+				);
+				const removed = removeInlineNote(
+					inlineClientId === clientId
+						? attributes
+						: getBlockAttributes( inlineClientId ),
+					note.id
+				);
 				if ( removed ) {
 					const { attributeKey, start, end, value } = removed;
-					newAttributes[ attributeKey ] = value;
+					updateNoteAnchor( inlineClientId, {
+						[ attributeKey ]: value,
+					} );
 					anchor.inline = {
+						clientId: inlineClientId,
 						attributeKey,
 						start,
 						end,
-						text: value.text.slice( start, end ),
+						text: getNoteText( value ).slice( start, end ),
 					};
 				}
-				updateNoteAnchor( clientId, newAttributes );
 			}
 
 			createNotice( 'snackbar', __( 'Note deleted.' ), {
