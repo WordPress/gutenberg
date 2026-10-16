@@ -133,28 +133,84 @@ final class Gutenberg_UI_Components {
 	 * `_doing_it_wrong()` notice, so callers find mistakes without breaking
 	 * the screen.
 	 *
-	 * @param string $name  Component name, e.g. `button`.
-	 * @param array  $props Component props.
-	 * @return string Component HTML, or an empty string if it can't be rendered.
+	 * Content is escaped unless it's known to be safe. See `get_safe_content()`
+	 * for what a component accepts as content.
+	 *
+	 * @param string $name    Component name, e.g. `button`.
+	 * @param array  $props   Component props.
+	 * @param mixed  $content Optional. Content, for components that accept it.
+	 * @return Gutenberg_UI_Safe_HTML Component HTML, empty if it can't be rendered.
 	 */
-	public function render( $name, $props = array() ) {
+	public function render( $name, $props = array(), $content = null ) {
 		$component = $this->get_component_metadata( $name );
 		if ( ! $component ) {
 			$this->doing_it_wrong(
 				/* translators: %s: Component name. */
 				sprintf( __( 'Unknown component "%s".', 'gutenberg' ), $name )
 			);
-			return '';
+			return Gutenberg_UI_Safe_HTML::trusted( '' );
+		}
+
+		if ( null !== $content && empty( $component['content'] ) ) {
+			$this->doing_it_wrong(
+				/* translators: %s: Component name. */
+				sprintf( __( 'The "%s" component doesn\'t accept content.', 'gutenberg' ), $name )
+			);
+			$content = null;
 		}
 
 		$props = $this->validate_props( $name, $component['props'], (array) $props );
 		if ( null === $props ) {
-			return '';
+			return Gutenberg_UI_Safe_HTML::trusted( '' );
 		}
 
 		$this->enqueue_assets();
 
-		return $this->fill_placeholders( $component, $props );
+		// The markup is generated from React and every value in it is escaped
+		// for its context, so the result is safe to insert into another component.
+		return Gutenberg_UI_Safe_HTML::trusted(
+			$this->fill_placeholders( $component, $props, $this->get_safe_content( $content ) )
+		);
+	}
+
+	/**
+	 * Turns content into HTML that is safe to insert.
+	 *
+	 * - A string, or anything else that prints, is escaped. It shows as text.
+	 * - `Gutenberg_UI_Safe_HTML`, such as another component's output, is
+	 *   inserted as HTML.
+	 * - A closure is called and what it prints is inserted as HTML, as in any
+	 *   template: the closure escapes its own values. What it returns follows
+	 *   these same rules, so returning another component works too.
+	 * - An array is a list of any of the above.
+	 *
+	 * @param mixed $content Content.
+	 * @return string Safe HTML.
+	 */
+	private function get_safe_content( $content ) {
+		if ( null === $content ) {
+			return '';
+		}
+		if ( $content instanceof Gutenberg_UI_Safe_HTML ) {
+			return (string) $content;
+		}
+		// Only closures are called, never strings that happen to name a function.
+		if ( $content instanceof Closure ) {
+			ob_start();
+			try {
+				$returned = $content();
+			} finally {
+				$output = (string) ob_get_clean();
+			}
+			return $output . $this->get_safe_content( $returned );
+		}
+		if ( is_array( $content ) ) {
+			return implode( '', array_map( array( $this, 'get_safe_content' ), $content ) );
+		}
+		if ( is_scalar( $content ) || ( is_object( $content ) && method_exists( $content, '__toString' ) ) ) {
+			return self::esc_plain_text( (string) $content );
+		}
+		return '';
 	}
 
 	/**
@@ -262,28 +318,30 @@ final class Gutenberg_UI_Components {
 	 *
 	 * Each placeholder says where it is, such as `__wpuislot_label__text__`
 	 * or `__wpuislot_type__attr_type__`, so it's escaped for that context.
-	 * Everything is replaced in one pass, so filled-in values are never read
-	 * as placeholders themselves.
+	 * Everything is replaced in one pass, so filled-in values, content
+	 * included, are never read as placeholders themselves.
 	 *
-	 * @param array $component Component metadata.
-	 * @param array $props     Validated props.
+	 * @param array  $component Component metadata.
+	 * @param array  $props     Validated props.
+	 * @param string $content   Safe HTML for the content.
 	 * @return string Component HTML.
 	 */
-	private function fill_placeholders( $component, $props ) {
+	private function fill_placeholders( $component, $props, $content ) {
 		return preg_replace_callback(
 			'/__wpuislot_([a-z0-9_]+?)__(?:attr_([a-z0-9-]+)|text)__/',
-			static function ( $placeholder ) use ( $component, $props ) {
+			static function ( $placeholder ) use ( $props, $content ) {
 				$prop      = $placeholder[1];
 				$attribute = $placeholder[2] ?? '';
+
+				// Already made safe by get_safe_content(). The build only allows it in text.
+				if ( 'content' === $prop ) {
+					return $content;
+				}
 
 				$value = (string) $props[ $prop ];
 				if ( '' !== $attribute ) {
 					// React blocks `javascript:` URLs; esc_url() does the same here.
 					return in_array( $attribute, array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : self::esc_plain_text( $value );
-				}
-				if ( isset( $component['props'][ $prop ]['format'] ) && 'html' === $component['props'][ $prop ]['format'] ) {
-					// HTML props are printed as is; callers escape what they pass.
-					return $value;
 				}
 				return self::esc_plain_text( $value );
 			},

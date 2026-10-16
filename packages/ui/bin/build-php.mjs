@@ -11,7 +11,12 @@
  *                    free-form strings are slots filled in at render time.
  *   - `render`       The React element to render for those props, as
  *                    `[ type, props, ...children ]`, where `"$name"` refers to a prop.
- *   - `example`      Props for the preview page and the checks below.
+ *   - `example`      Props for the preview page and the checks below, and
+ *                    its `content` for components that accept it: text, or
+ *                    another component as `{ component, props }`, like a
+ *                    block example's `innerBlocks`.
+ *   - `content`      Optional. Whether the component accepts content, rendered
+ *                    where `render` uses `"$content"`.
  *
  * The build renders the React element once for every combination of variants,
  * with placeholders for the slots. It stores one base render and what each
@@ -47,6 +52,7 @@ import {
 	getCombinations,
 	getExampleCases,
 	getExampleValues,
+	getSlotPlaceholder,
 	getSlotValues,
 	getSnapshotKey,
 	getUnreadPropRemover,
@@ -56,7 +62,10 @@ import {
 	formatSnapshotFile,
 	stripRuntimeAttributes,
 } from './php/snapshots.mjs';
-import { compileVariantChanges } from './php/variant-changes.mjs';
+import {
+	compileVariantChanges,
+	markPlaceholderContext,
+} from './php/variant-changes.mjs';
 import { compileStylesheets, getUsedStylesheets } from './php/stylesheets.mjs';
 
 const PACKAGE_DIR = path.resolve(
@@ -125,20 +134,60 @@ async function catchTranslations() {
  * Builds one component: renders its snapshots and examples, and checks them
  * against React.
  *
- * @param {string} file    Path of its `component.json`, relative to the package.
- * @param {Object} context Shared build state: the built package (`ui`), the
- *                         compiled `stylesheets`, `allCss`, `classReferences`
- *                         and `translations`.
+ * @param {Object} component Its `component.json`, in `php/<name>/`.
+ * @param {Object} context   Shared build state: the built package (`ui`), the
+ *                           compiled `stylesheets`, `allCss`, `classReferences`,
+ *                           `translations` and every component's `definitions`.
  * @return {Promise<Object>} The component's manifest entry, examples and used
  *         stylesheets, and any problems, stale snapshot or markup change to
  *         report.
  */
-async function buildComponent( file, context ) {
-	const { ui, stylesheets, allCss, classReferences, translations } = context;
-	const dir = path.join( PACKAGE_DIR, path.dirname( file ) );
-	const component = JSON.parse(
-		await readFile( path.join( PACKAGE_DIR, file ), 'utf8' )
-	);
+async function buildComponent( component, context ) {
+	const {
+		ui,
+		stylesheets,
+		allCss,
+		classReferences,
+		translations,
+		definitions,
+	} = context;
+	const dir = path.join( PACKAGE_DIR, 'php', component.name );
+
+	// Content isn't a prop. In PHP it's its own argument, escaped unless it's
+	// safe HTML, so it gets its own placeholder, `$content` in `render`.
+	if ( component.props.content ) {
+		throw new Error(
+			`${ component.name }: "content" is reserved for the content argument. Set \`"content": true\` instead of declaring it as a prop.`
+		);
+	}
+	if (
+		component.content &&
+		! JSON.stringify( component.render ).includes( '"$content"' )
+	) {
+		throw new Error(
+			`${ component.name } accepts content, but its \`render\` mapping doesn't use \`"$content"\`.`
+		);
+	}
+	const { content: exampleContentSpec, ...exampleProps } =
+		component.example ?? {};
+	// Content can be another component, rendered inside this one as React
+	// nests them, so the checks cover composition too.
+	let exampleContent = exampleContentSpec;
+	if ( exampleContentSpec?.component ) {
+		const inner = definitions.get( exampleContentSpec.component );
+		if ( ! inner ) {
+			throw new Error(
+				`${ component.name }: its example's content uses an unknown component "${ exampleContentSpec.component }".`
+			);
+		}
+		exampleContent = createNode(
+			inner.render,
+			getExampleValues( inner, exampleContentSpec.props ?? {} ),
+			ui
+		);
+	}
+	const withContent = ( values, content ) =>
+		component.content ? { ...values, content } : values;
 	const render = ( values ) =>
 		stripRuntimeAttributes(
 			renderToStaticMarkup( createNode( component.render, values, ui ) ),
@@ -151,7 +200,10 @@ async function buildComponent( file, context ) {
 
 	// Render every combination of variants, with placeholders for the slots.
 	const variants = getVariants( component );
-	const slotValues = getSlotValues( component );
+	const slotValues = withContent(
+		getSlotValues( component ),
+		getSlotPlaceholder( 'content' )
+	);
 	const renders = new Map();
 	for ( const combination of getCombinations( variants ) ) {
 		const values = { ...slotValues };
@@ -164,6 +216,16 @@ async function buildComponent( file, context ) {
 		if ( html.includes( TRANSLATED_TEXT ) ) {
 			throw new Error(
 				`${ component.name } renders translated text, which PHP components don't support yet.`
+			);
+		}
+		// Content is HTML, so it can only go where HTML goes, never in an attribute.
+		if (
+			markPlaceholderContext( html ).includes(
+				'__wpuislot_content__attr_'
+			)
+		) {
+			throw new Error(
+				`${ component.name } renders its content in an attribute. Content can only be rendered as children.`
 			);
 		}
 		renders.set( getSnapshotKey( variants, combination ), {
@@ -192,11 +254,17 @@ async function buildComponent( file, context ) {
 	// Every combination rendered with real values, for the PHPUnit check that
 	// PHP rebuilds each one exactly.
 	result.combinations = [ ...renders.values() ].map( ( { combination } ) => {
-		const props = { ...component.example, ...combination };
+		const props = { ...exampleProps, ...combination };
 		return {
 			component: component.name,
 			props,
-			html: render( getExampleValues( component, props ) ),
+			content: exampleContentSpec,
+			html: render(
+				withContent(
+					getExampleValues( component, props ),
+					exampleContent
+				)
+			),
 		};
 	} );
 
@@ -204,14 +272,18 @@ async function buildComponent( file, context ) {
 	// markup means React no longer reads the prop, for example after a rename.
 	// An unread prop can still show up as a stray attribute (`tone="neutral"`),
 	// so those don't count.
-	result.examples = getExampleCases( component, variants ).map(
-		( { name, props } ) => ( {
-			component: component.name,
-			name,
-			props,
-			html: render( getExampleValues( component, props ) ),
-		} )
-	);
+	result.examples = getExampleCases(
+		{ ...component, example: exampleProps },
+		variants
+	).map( ( { name, props } ) => ( {
+		component: component.name,
+		name,
+		props,
+		content: exampleContentSpec,
+		html: render(
+			withContent( getExampleValues( component, props ), exampleContent )
+		),
+	} ) );
 	const ignoreUnreadProps = getUnreadPropRemover( component );
 	const [ example, ...variations ] = result.examples;
 	for ( const variation of variations ) {
@@ -246,6 +318,7 @@ async function buildComponent( file, context ) {
 	result.entry = {
 		props: component.props,
 		variants: variants.map( ( { prop } ) => prop ),
+		content: Boolean( component.content ),
 		base,
 		changes,
 		exceptions,
@@ -281,16 +354,23 @@ async function main() {
 			.join( '' ),
 		classReferences,
 		translations: await catchTranslations(),
+		definitions: new Map(),
 	};
+	for ( const file of (
+		await glob( 'php/*/component.json', { cwd: PACKAGE_DIR } )
+	).sort() ) {
+		const definition = JSON.parse(
+			await readFile( path.join( PACKAGE_DIR, file ), 'utf8' )
+		);
+		context.definitions.set( definition.name, definition );
+	}
 
 	await rm( OUT_DIR, { recursive: true, force: true } );
 	await mkdir( path.join( TEST_DIR, 'snapshots' ), { recursive: true } );
 
 	const results = [];
-	for ( const file of (
-		await glob( 'php/*/component.json', { cwd: PACKAGE_DIR } )
-	).sort() ) {
-		results.push( await buildComponent( file, context ) );
+	for ( const definition of context.definitions.values() ) {
+		results.push( await buildComponent( definition, context ) );
 	}
 
 	const problems = results.flatMap( ( result ) => result.problems );
@@ -362,7 +442,9 @@ return ${ json2php.make( { linebreak: '\n', indent: '\t' } )( manifest ) };
 		`Built PHP components: ${ results
 			.map(
 				( { name, entry, combinationCount } ) =>
-					`${ name } (${ combinationCount } combinations: a base, ${
+					`${ name } (${ combinationCount } combination${
+						combinationCount === 1 ? '' : 's'
+					}: a base, ${
 						Object.keys( entry.changes ).length
 					} changes and ${
 						Object.keys( entry.exceptions ).length
