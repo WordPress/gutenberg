@@ -4,7 +4,6 @@ import {
 	BlockList,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { unlock } from '../../lock-unlock';
@@ -12,24 +11,6 @@ import LeafMoreMenu from './leaf-more-menu';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
-
-// The link popover opens the way the item settings popover does: beside the
-// row, top edges aligned. Same props as the List View content popover.
-const LINK_POPOVER_PROPS = {
-	placement: 'left-start',
-	offset: 35,
-	resize: false,
-};
-
-function ListViewLinkUI( props ) {
-	const isMobile = useViewportMatch( 'medium', '<' );
-	return (
-		<NavigationLinkUI
-			{ ...props }
-			popoverProps={ isMobile ? undefined : LINK_POPOVER_PROPS }
-		/>
-	);
-}
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.jsx.
 const MAX_PAGE_COUNT = 100;
@@ -99,7 +80,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
-					additionalBlockContent={ ListViewLinkUI }
+					additionalBlockContent={ NavigationLinkUI }
 					showContentPopover
 					isExpanded
 				/>
