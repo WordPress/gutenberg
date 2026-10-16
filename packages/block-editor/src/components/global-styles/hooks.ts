@@ -161,7 +161,8 @@ export function useSettingsForBlockElement(
 				updatedSettings.spacing = {
 					...updatedSettings.spacing,
 					[ key ]: {
-						...updatedSettings.spacing?.[ key ],
+						// Spreading a `true` setting adds nothing.
+						...( updatedSettings.spacing?.[ key ] as object ),
 						sides,
 					},
 				};
