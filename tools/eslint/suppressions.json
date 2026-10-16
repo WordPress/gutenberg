@@ -8819,18 +8819,8 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/tools-panel/stories/index.story.tsx": {
-		"no-restricted-imports": {
-			"count": 1
-		}
-	},
 	"packages/components/src/tree-grid/cell.tsx": {
 		"react-hooks/refs": {
-			"count": 1
-		}
-	},
-	"packages/components/src/utils/test/polymorphic-element.jsdom.test.tsx": {
-		"no-restricted-imports": {
 			"count": 1
 		}
 	},
