@@ -11,7 +11,9 @@ export function useTypewriter() {
 	return useRefEffect< HTMLElement >( ( node ) => {
 		const { ownerDocument } = node;
 		// A node attached to a document has a window.
-		const defaultView = ownerDocument.defaultView!;
+		const { defaultView } = ownerDocument as Document & {
+			defaultView: Window;
+		};
 
 		let scrollResizeRafId: number | null | undefined;
 		let onKeyDownRafId: number | null | undefined;

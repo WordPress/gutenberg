@@ -126,7 +126,9 @@ export function useTypingObserver() {
 				// cleanup and the handlers working against the same window
 				// we set things up on.
 				// A node attached to a document has a window.
-				const defaultView = node.ownerDocument.defaultView!;
+				const { defaultView } = node.ownerDocument as Document & {
+					defaultView: Window;
+				};
 
 				/**
 				 * Stops typing when focus transitions to a non-text field element.
