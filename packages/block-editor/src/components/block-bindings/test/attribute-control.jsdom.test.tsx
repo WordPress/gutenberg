@@ -4,8 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import BlockBindingsAttributeControl from '../attribute-control';
+import type { ReactNode } from 'react';
+import type { Mock } from 'vitest';
+import type { UserEvent } from '@testing-library/user-event';
 import useBlockBindingsUtils from '../use-block-bindings-utils';
+import BlockBindingsAttributeControl from '../attribute-control';
+import type { Binding } from '../../../utils/block-bindings';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockPointerEvent();
@@ -17,11 +21,18 @@ vi.mock( import( '@wordpress/blocks' ), async ( importOriginal ) => ( {
 } ) );
 vi.mock( import( '@wordpress/components' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	__experimentalToolsPanelItem: ( { children } ) => children,
+	// The stub renders the item's children only.
+	__experimentalToolsPanelItem: ( ( {
+		children,
+	}: {
+		children?: ReactNode;
+	} ) =>
+		children ) as unknown as typeof import( '@wordpress/components' ).__experimentalToolsPanelItem,
 } ) );
 vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useViewportMatch: vi.fn(),
+	// The hook's type carries more than the mock function.
+	useViewportMatch: vi.fn() as unknown as typeof useViewportMatch,
 } ) );
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -43,19 +54,24 @@ const source = {
 	label: 'Post meta',
 };
 
-function renderControl( binding ) {
-	useViewportMatch.mockReturnValue( false );
-	getBlockBindingsSource.mockReturnValue( source );
-	useBlockBindingsUtils.mockReturnValue( { updateBlockBindings } );
-	useSelect.mockImplementation( ( _mapSelect, dependencies ) => {
-		if ( dependencies?.length === 3 ) {
-			return { 'core/post-meta': [ field ] };
-		}
-		if ( dependencies?.length === 4 ) {
-			return {};
-		}
-		return { canUpdateBlockBindings: true };
+function renderControl( binding?: Binding ) {
+	// The modules above are mocked with `vi.fn()`.
+	( useViewportMatch as unknown as Mock ).mockReturnValue( false );
+	( getBlockBindingsSource as Mock ).mockReturnValue( source );
+	( useBlockBindingsUtils as Mock ).mockReturnValue( {
+		updateBlockBindings,
 	} );
+	( useSelect as Mock ).mockImplementation(
+		( _mapSelect: unknown, dependencies?: unknown[] ) => {
+			if ( dependencies?.length === 3 ) {
+				return { 'core/post-meta': [ field ] };
+			}
+			if ( dependencies?.length === 4 ) {
+				return {};
+			}
+			return { canUpdateBlockBindings: true };
+		}
+	);
 
 	return render(
 		<BlockBindingsAttributeControl
@@ -66,7 +82,7 @@ function renderControl( binding ) {
 	);
 }
 
-async function openFieldMenu( user ) {
+async function openFieldMenu( user: UserEvent ) {
 	await user.click( screen.getByRole( 'button', { name: /content/i } ) );
 	const sourceItem = await screen.findByRole( 'menuitem', {
 		name: 'Post meta',
