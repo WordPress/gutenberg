@@ -163,6 +163,7 @@ function shouldEnableHeicCanvasProcessing() {
  * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ * @param {string}         [$3.uploadId]     Durable upload marker for resumable uploads.
  * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
  */
 function mediaUpload(
@@ -176,6 +177,7 @@ function mediaUpload(
 		onFileChange,
 		onSuccess,
 		onBatchSuccess,
+		uploadId,
 		multiple = true,
 	}
 ) {
@@ -197,6 +199,8 @@ function mediaUpload(
 			),
 		additionalData,
 		allowedTypes,
+		uploadId,
+		postId: additionalData?.post,
 	} );
 }
 
@@ -217,6 +221,7 @@ function mediaUpload(
  * @param {Function}       $3.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param {Function}       $3.onSuccess      Function called once a file has completely finished uploading, including thumbnails.
  * @param {Function}       $3.onBatchSuccess Function called once all files in a group have completely finished uploading, including thumbnails.
+ * @param {string}         [$3.uploadId]     Durable upload marker for resumable uploads.
  * @param {boolean}        $3.multiple       Whether the caller accepts more than one file.
  */
 async function heicMediaUpload(
@@ -230,6 +235,7 @@ async function heicMediaUpload(
 		onFileChange,
 		onSuccess,
 		onBatchSuccess,
+		uploadId,
 		multiple = true,
 	}
 ) {
@@ -280,6 +286,8 @@ async function heicMediaUpload(
 				),
 			additionalData,
 			allowedTypes,
+			uploadId,
+			postId: additionalData?.post,
 		} );
 	}
 

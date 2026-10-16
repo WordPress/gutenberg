@@ -21,6 +21,11 @@ import {
 	retryTimers,
 	shouldRetryError,
 } from './utils/retry';
+import {
+	isPersistenceAvailable,
+	persistItem,
+	toPersistedRecord,
+} from './utils/persistence';
 import type {
 	addItem,
 	processItem,
@@ -71,6 +76,8 @@ interface AddItemsArgs {
 	onError?: OnErrorHandler;
 	additionalData?: AdditionalData;
 	allowedTypes?: string[];
+	uploadId?: string;
+	postId?: number;
 }
 
 /**
@@ -84,6 +91,8 @@ interface AddItemsArgs {
  * @param [$0.onError]        Function called when an error happens.
  * @param [$0.additionalData] Additional data to include in the request.
  * @param [$0.allowedTypes]   Array with the types of media that can be uploaded, if unset all types are allowed.
+ * @param [$0.uploadId]       Durable upload marker for resumable uploads.
+ * @param [$0.postId]         Post ID that the uploaded media should be attached to.
  */
 export function addItems( {
 	files,
@@ -93,6 +102,8 @@ export function addItems( {
 	onBatchSuccess,
 	additionalData,
 	allowedTypes,
+	uploadId,
+	postId,
 }: AddItemsArgs ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const batchId = uuidv4();
@@ -123,6 +134,8 @@ export function addItems( {
 				continue;
 			}
 
+			// uploadId is meaningful only for single-file (per-block) re-uploads;
+			// multi-file callers should omit it (otherwise all files share one marker).
 			dispatch.addItem( {
 				file,
 				batchId,
@@ -131,6 +144,8 @@ export function addItems( {
 				onBatchSuccess,
 				onError,
 				additionalData,
+				uploadId,
+				postId,
 			} );
 		}
 	};
@@ -438,6 +453,19 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 			retryCount: currentRetryCount,
 			nextRetryTimestamp: Date.now() + delay,
 		} );
+
+		if (
+			isPersistenceAvailable() &&
+			select.getSettings().durableQueue !== false
+		) {
+			const updated = select.getItem( id );
+			if ( updated ) {
+				const record = toPersistedRecord( updated, Date.now() );
+				if ( record ) {
+					void persistItem( record );
+				}
+			}
+		}
 	};
 }
 
