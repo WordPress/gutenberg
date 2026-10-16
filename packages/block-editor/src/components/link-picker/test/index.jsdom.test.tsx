@@ -6,6 +6,7 @@ import type { useDispatch } from '@wordpress/data';
 import { useSelect } from '@wordpress/data';
 import { useReducedMotion } from '@wordpress/compose';
 import { LinkPicker } from '../';
+import type { LinkSuggestionsQuery } from '../../link-control/types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -390,7 +391,7 @@ describe( 'LinkPicker', () => {
 	describe( 'Suggestions query', () => {
 		it( 'should accept suggestionsQuery prop for filtering', async () => {
 			const user = userEvent.setup();
-			const customQuery = {
+			const customQuery: LinkSuggestionsQuery = {
 				type: 'post',
 				subtype: 'page',
 			};
