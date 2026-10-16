@@ -103,10 +103,33 @@ describe( 'GridItemRotator', () => {
 	it( 'writes nothing when the angle does not change', () => {
 		const { handle, onChange } = renderRotator( { angle: 90 } );
 
-		fireEvent.pointerDown( handle, { button: 0, pointerId: 1 } );
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			pointerId: 1,
+			...QUARTER_TURN,
+		} );
 		fireEvent.pointerMove( handle, { pointerId: 1, ...QUARTER_TURN } );
 		fireEvent.pointerUp( handle, { pointerId: 1 } );
 		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'turns the block by as much as the pointer turns', () => {
+		const { handle, onChange } = renderRotator( { angle: 30 } );
+
+		// The drag starts a quarter turn from below the center, as it does
+		// from a handle in a corner, and the block doesn't jump there.
+		fireEvent.pointerDown( handle, {
+			button: 0,
+			pointerId: 1,
+			...QUARTER_TURN,
+		} );
+		fireEvent.pointerMove( handle, { pointerId: 1, ...QUARTER_TURN } );
+		expect( getInlineRotate() ).toBe( '30deg' );
+		fireEvent.pointerMove( handle, { pointerId: 1, ...HALF_TURN } );
+		expect( getInlineRotate() ).toBe( '120deg' );
+
+		fireEvent.pointerUp( handle, { pointerId: 1 } );
+		expect( onChange ).toHaveBeenCalledWith( 120 );
 	} );
 
 	it( 'cancels on Escape, claiming the key, and writes nothing', () => {

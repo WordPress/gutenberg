@@ -4,7 +4,7 @@ import { rotateRight, Icon } from '@wordpress/icons';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { GridItemHandle } from './grid-item-handle';
-import { getRotationFromPointer } from './rotation';
+import { getPointerAngle, getRotationFromPointer } from './rotation';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 import { setInlineStyle } from './utils';
 
@@ -26,6 +26,8 @@ interface Rotation {
 	pointerId: number;
 	centerX: number;
 	centerY: number;
+	/** The rotation minus the pointer's direction when the drag started. */
+	offset: number;
 	value: number;
 	onKeyDown: ( event: KeyboardEvent ) => void;
 }
@@ -170,12 +172,22 @@ export function GridItemRotator( {
 								handle.ownerDocument,
 							] ),
 						];
+						const centerX = rect.left + rect.width / 2;
+						const centerY = rect.top + rect.height / 2;
 						rotationRef.current = {
 							handle,
 							documents,
 							pointerId: event.pointerId,
-							centerX: rect.left + rect.width / 2,
-							centerY: rect.top + rect.height / 2,
+							centerX,
+							centerY,
+							offset:
+								angle -
+								getPointerAngle( {
+									centerX,
+									centerY,
+									pointerX: event.clientX,
+									pointerY: event.clientY,
+								} ),
 							value: angle,
 							onKeyDown,
 						};
@@ -198,6 +210,7 @@ export function GridItemRotator( {
 							centerY: rotation.centerY,
 							pointerX: event.clientX,
 							pointerY: event.clientY,
+							offset: rotation.offset,
 							snap: ! event.shiftKey,
 						} );
 						setPreview( rotation.value );

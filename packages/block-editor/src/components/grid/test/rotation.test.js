@@ -82,6 +82,17 @@ describe( 'getRotationFromPointer()', () => {
 			getRotationFromPointer( { ...center, ...pointer, snap: false } )
 		).toBe( 44 );
 	} );
+
+	it( 'adds the offset and keeps the result in range', () => {
+		const left = { pointerX: 0, pointerY: 100 };
+		expect(
+			getRotationFromPointer( { ...center, ...left, offset: -60 } )
+		).toBe( 30 );
+		// 90° + 120° is 210°, which is -150°.
+		expect(
+			getRotationFromPointer( { ...center, ...left, offset: 120 } )
+		).toBe( -150 );
+	} );
 } );
 
 describe( 'getRotatedOverlayStyle()', () => {
