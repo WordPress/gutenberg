@@ -287,7 +287,7 @@ describe( 'renderHTML (tree-first)', () => {
 		await setup( '<div data-testid="feed"></div>' );
 		const html =
 			'<button data-testid="counter" data-wp-text="state.count" data-wp-on--click="actions.inc">0</button>';
-		renderHTML( document.querySelector( '[data-testid="feed"]' ), html );
+		renderHTML( document.querySelector( '[data-testid="feed"]' )!, html );
 		await flush();
 		const counter = () =>
 			document.querySelector(
@@ -297,17 +297,15 @@ describe( 'renderHTML (tree-first)', () => {
 		counter().click();
 		counter().click();
 		await flush();
-		// @ts-expect-error jest-dom matcher is added by the test setup.
 		expect( counter() ).toHaveTextContent( '2' );
 
 		// Re-render the same container with the same markup: the button must
 		// NOT be re-initialized (its component instance is matched by
 		// position), so the listener fires exactly once per click.
-		renderHTML( document.querySelector( '[data-testid="feed"]' ), html );
+		renderHTML( document.querySelector( '[data-testid="feed"]' )!, html );
 		await flush();
 		counter().click();
 		await flush();
-		// @ts-expect-error jest-dom matcher is added by the test setup.
 		expect( counter() ).toHaveTextContent( '3' );
 	} );
 
@@ -595,10 +593,10 @@ describe( 'element→vnode map', () => {
 			'<div data-testid="a"><span data-testid="b"></span></div>'
 		);
 		expect(
-			elementToVnode.get( document.querySelector( '[data-testid="a"]' ) )
+			elementToVnode.get( document.querySelector( '[data-testid="a"]' )! )
 		).toBeDefined();
 		expect(
-			elementToVnode.get( document.querySelector( '[data-testid="b"]' ) )
+			elementToVnode.get( document.querySelector( '[data-testid="b"]' )! )
 		).toBeDefined();
 	} );
 
@@ -607,7 +605,7 @@ describe( 'element→vnode map', () => {
 		renderHTML( '[data-testid="feed"]', '<p data-testid="p">x</p>' );
 		await flush();
 		expect(
-			elementToVnode.get( document.querySelector( '[data-testid="p"]' ) )
+			elementToVnode.get( document.querySelector( '[data-testid="p"]' )! )
 		).toBeDefined();
 	} );
 
@@ -620,7 +618,7 @@ describe( 'element→vnode map', () => {
 			'<span data-testid="ctx" data-wp-text="context.n"></span>'
 		);
 		await flush();
-		const ctx = document.querySelector( '[data-testid="ctx"]' );
+		const ctx = document.querySelector( '[data-testid="ctx"]' )!;
 		// The spliced content is wrapped in a Directives chain (data-wp-text
 		// is a directive) — the chain must climb through it to the island
 		// vnode, whose DOM node is the island element.

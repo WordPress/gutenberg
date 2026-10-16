@@ -235,7 +235,7 @@ describe( 'renderHTML into a router region (after a navigation)', () => {
 				[ h( 'p', null, 'a' ) ]
 			) as VNode,
 			originalProps: {},
-		} );
+		} ) as VNode;
 		await flush();
 
 		const regionEl = document.querySelector(
