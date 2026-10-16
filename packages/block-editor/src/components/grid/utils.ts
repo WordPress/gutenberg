@@ -1,8 +1,15 @@
-export function range( start, length ) {
+import type { GridInfo, GridRectOptions, GridTrack } from './types';
+
+export function range( start: number, length: number ) {
 	return Array.from( { length }, ( _, i ) => start + i );
 }
 
 export class GridRect {
+	declare columnStart: number;
+	declare rowStart: number;
+	declare columnEnd: number;
+	declare rowEnd: number;
+
 	constructor( {
 		columnStart,
 		rowStart,
@@ -10,7 +17,7 @@ export class GridRect {
 		rowEnd,
 		columnSpan,
 		rowSpan,
-	} = {} ) {
+	}: GridRectOptions = {} ) {
 		this.columnStart = columnStart ?? 1;
 		this.rowStart = rowStart ?? 1;
 		if ( columnSpan !== undefined ) {
@@ -33,7 +40,7 @@ export class GridRect {
 		return this.rowEnd - this.rowStart + 1;
 	}
 
-	contains( column, row ) {
+	contains( column: number, row: number ) {
 		return (
 			column >= this.columnStart &&
 			column <= this.columnEnd &&
@@ -42,14 +49,14 @@ export class GridRect {
 		);
 	}
 
-	containsRect( rect ) {
+	containsRect( rect: GridRect ) {
 		return (
 			this.contains( rect.columnStart, rect.rowStart ) &&
 			this.contains( rect.columnEnd, rect.rowEnd )
 		);
 	}
 
-	intersectsRect( rect ) {
+	intersectsRect( rect: GridRect ) {
 		return (
 			this.columnStart <= rect.columnEnd &&
 			this.columnEnd >= rect.columnStart &&
@@ -59,9 +66,10 @@ export class GridRect {
 	}
 }
 
-export function getComputedCSS( element, property ) {
-	return element.ownerDocument.defaultView
-		.getComputedStyle( element )
+export function getComputedCSS( element: Element, property: string ) {
+	// The element is rendered in a window.
+	return element.ownerDocument
+		.defaultView!.getComputedStyle( element )
 		.getPropertyValue( property );
 }
 
@@ -71,15 +79,15 @@ export function getComputedCSS( element, property ) {
  *
  * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
  *
- * @param {string} template The grid-template-columns or grid-template-rows CSS property value.
- *                          Only supports fixed sizes in pixels.
- * @param {number} gap      The gap between grid tracks in pixels.
+ * @param template The grid-template-columns or grid-template-rows CSS property value.
+ *                 Only supports fixed sizes in pixels.
+ * @param gap      The gap between grid tracks in pixels.
  *
- * @return {Array<{start: number, end: number}>} An array of objects with the start and end
- *                                               position in pixels of each grid track.
+ * @return An array of objects with the start and end
+ *         position in pixels of each grid track.
  */
-export function getGridTracks( template, gap ) {
-	const tracks = [];
+export function getGridTracks( template: string, gap: number ): GridTrack[] {
+	const tracks: GridTrack[] = [];
 	for ( const size of template.split( ' ' ) ) {
 		const previousTrack = tracks[ tracks.length - 1 ];
 		const start = previousTrack ? previousTrack.end + gap : 0;
@@ -95,16 +103,20 @@ export function getGridTracks( template, gap ) {
  *
  * https://css-tricks.com/snippets/css/complete-guide-grid/#aa-grid-track
  *
- * @param {Array<{start: number, end: number}>} tracks   An array of objects with the start and end
- *                                                       position in pixels of each grid track.
- * @param {number}                              position The position in pixels.
- * @param {string}                              edge     The edge of the track to compare the
- *                                                       position to. Either 'start' or 'end'.
+ * @param tracks   An array of objects with the start and end
+ *                 position in pixels of each grid track.
+ * @param position The position in pixels.
+ * @param edge     The edge of the track to compare the
+ *                 position to. Either 'start' or 'end'.
  *
- * @return {number} The index of the closest track to the position. 0-based, unlike CSS grid which
- *                  is 1-based.
+ * @return The index of the closest track to the position. 0-based, unlike CSS grid which
+ *         is 1-based.
  */
-export function getClosestTrack( tracks, position, edge = 'start' ) {
+export function getClosestTrack(
+	tracks: GridTrack[],
+	position: number,
+	edge: keyof GridTrack = 'start'
+): number {
 	return tracks.reduce(
 		( closest, track, index ) =>
 			Math.abs( track[ edge ] - position ) <
@@ -115,7 +127,7 @@ export function getClosestTrack( tracks, position, edge = 'start' ) {
 	);
 }
 
-export function getGridRect( gridElement, rect ) {
+export function getGridRect( gridElement: Element, rect: DOMRect ) {
 	const columnGap = parseFloat( getComputedCSS( gridElement, 'column-gap' ) );
 	const rowGap = parseFloat( getComputedCSS( gridElement, 'row-gap' ) );
 	const gridColumnTracks = getGridTracks(
@@ -139,9 +151,10 @@ export function getGridRect( gridElement, rect ) {
 	} );
 }
 
-export function getGridItemRect( gridItemElement ) {
+export function getGridItemRect( gridItemElement: HTMLElement ) {
 	return getGridRect(
-		gridItemElement.parentElement,
+		// A grid item is inside its grid.
+		gridItemElement.parentElement!,
 		new window.DOMRect(
 			gridItemElement.offsetLeft,
 			gridItemElement.offsetTop,
@@ -151,7 +164,7 @@ export function getGridItemRect( gridItemElement ) {
 	);
 }
 
-export function getGridInfo( gridElement ) {
+export function getGridInfo( gridElement: Element ): GridInfo {
 	const gridTemplateColumns = getComputedCSS(
 		gridElement,
 		'grid-template-columns'
