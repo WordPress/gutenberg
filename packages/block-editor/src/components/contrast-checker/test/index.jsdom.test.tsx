@@ -16,7 +16,7 @@ describe( 'ContrastChecker', () => {
 	const colorWithTransparency = 'rgba(102,102,102,0.5)'; // #666 with opacity.
 
 	beforeEach( () => {
-		speak.mockReset();
+		vi.mocked( speak ).mockReset();
 	} );
 
 	test( 'should render nothing when no colors are provided', () => {

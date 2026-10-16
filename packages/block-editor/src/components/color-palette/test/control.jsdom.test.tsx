@@ -11,7 +11,7 @@ globalThis.wpVitest.mockMatchMedia();
 
 const noop = () => {};
 
-async function renderAndValidate( ...renderArgs ) {
+async function renderAndValidate( ...renderArgs: Parameters< typeof render > ) {
 	const view = render( ...renderArgs );
 	await waitFor( () => {
 		const activeButton = queryByAttribute(
