@@ -1,5 +1,6 @@
 import { MenuItem, __experimentalText as WCText } from '@wordpress/components';
 import { check } from '@wordpress/icons';
+import type { BlockStylesMenuItemsProps } from './types';
 
 const noop = () => {};
 
@@ -8,7 +9,7 @@ export default function BlockStylesMenuItems( {
 	activeStyle,
 	onSelect = noop,
 	onHoverStyle = noop,
-} ) {
+}: BlockStylesMenuItemsProps ) {
 	if ( ! stylesToRender || stylesToRender.length === 0 ) {
 		return null;
 	}
