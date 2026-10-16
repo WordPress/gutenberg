@@ -890,7 +890,7 @@ function GridVisualizerAppender( {
 								grownRect.columnEnd !== drawnRect.columnEnd ||
 								grownRect.rowEnd !== drawnRect.rowEnd
 							) {
-								// Part of the insertion, as one undo step.
+								// Not an undo step of its own.
 								__unstableMarkNextChangeAsNotPersistent();
 								placeBlock( grownRect );
 							}
