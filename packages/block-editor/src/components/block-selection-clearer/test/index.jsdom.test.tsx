@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useDispatch, useSelect } from '@wordpress/data';
 import BlockSelectionClearer from '../';
@@ -28,11 +29,11 @@ describe( 'BlockSelectionClearer component', () => {
 
 	it( 'should clear the selected block when a selected block exists', () => {
 		const mockClearSelectedBlock = vi.fn();
-		useSelect.mockImplementation( () => ( {
+		( useSelect as Mock ).mockImplementation( () => ( {
 			...defaultUseSelectValues,
 			hasSelectedBlock: vi.fn().mockReturnValue( true ),
 		} ) );
-		useDispatch.mockImplementation( () => ( {
+		( useDispatch as Mock ).mockImplementation( () => ( {
 			clearSelectedBlock: mockClearSelectedBlock,
 		} ) );
 
@@ -49,11 +50,11 @@ describe( 'BlockSelectionClearer component', () => {
 
 	it( 'should clear the selected block when multiple blocks are selected', () => {
 		const mockClearSelectedBlock = vi.fn();
-		useSelect.mockImplementation( () => ( {
+		( useSelect as Mock ).mockImplementation( () => ( {
 			...defaultUseSelectValues,
 			hasMultiSelection: vi.fn().mockReturnValue( true ),
 		} ) );
-		useDispatch.mockImplementation( () => ( {
+		( useDispatch as Mock ).mockImplementation( () => ( {
 			clearSelectedBlock: mockClearSelectedBlock,
 		} ) );
 
@@ -70,8 +71,10 @@ describe( 'BlockSelectionClearer component', () => {
 
 	it( 'should not clear the block selection when no blocks are selected', () => {
 		const mockClearSelectedBlock = vi.fn();
-		useSelect.mockImplementation( () => defaultUseSelectValues );
-		useDispatch.mockImplementation( () => ( {
+		( useSelect as Mock ).mockImplementation(
+			() => defaultUseSelectValues
+		);
+		( useDispatch as Mock ).mockImplementation( () => ( {
 			clearSelectedBlock: mockClearSelectedBlock,
 		} ) );
 
@@ -88,14 +91,14 @@ describe( 'BlockSelectionClearer component', () => {
 
 	it( 'should not clear the block selection when the feature is disabled', () => {
 		const mockClearSelectedBlock = vi.fn();
-		useSelect.mockImplementation( () => ( {
+		( useSelect as Mock ).mockImplementation( () => ( {
 			...defaultUseSelectValues,
 			hasSelectedBlock: vi.fn().mockReturnValue( true ),
 			getSettings: vi.fn().mockReturnValue( {
 				clearBlockSelection: false,
 			} ),
 		} ) );
-		useDispatch.mockImplementation( () => ( {
+		( useDispatch as Mock ).mockImplementation( () => ( {
 			clearSelectedBlock: mockClearSelectedBlock,
 		} ) );
 

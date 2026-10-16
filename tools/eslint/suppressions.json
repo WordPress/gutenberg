@@ -408,14 +408,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-keyboard-shortcuts/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-list-appender/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -769,22 +761,6 @@
 	},
 	"packages/block-editor/src/components/block-rename/use-block-rename.js": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-selection-clearer/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-selection-clearer/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2197,11 +2173,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/keyboard-shortcuts/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/link-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -2443,14 +2414,6 @@
 	},
 	"packages/block-editor/src/components/navigable-toolbar/test/index.browser.test.js": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/observe-typing/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2746,19 +2709,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/selection-scroll-into-view/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/skip-to-selected-block/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/spacing-sizes-control/hooks/use-spacing-sizes.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -2854,14 +2804,6 @@
 	},
 	"packages/block-editor/src/components/tool-selector/index.js": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/typewriter/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
