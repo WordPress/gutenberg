@@ -1265,14 +1265,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/fit-text-size-warning/index.jsx": {
+	"packages/block-editor/src/components/fit-text-size-warning/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2678,73 +2672,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/spacing-sizes-control/hooks/use-spacing-sizes.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/spacing-sizes-control/index.jsx": {
+	"packages/block-editor/src/components/spacing-sizes-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/spacing-sizes-control/input-controls/axial.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/spacing-sizes-control/input-controls/separated.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/spacing-sizes-control/input-controls/single.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/spacing-sizes-control/input-controls/spacing-input-control.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/spacing-sizes-control/linked-button.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/spacing-sizes-control/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/spacing-sizes-control/test/select.browser.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/tabbed-sidebar/index.jsx": {
@@ -3088,14 +3018,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/line-height.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/list-view.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -3105,14 +3027,6 @@
 		}
 	},
 	"packages/block-editor/src/hooks/position.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/spacing-visualizer.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
