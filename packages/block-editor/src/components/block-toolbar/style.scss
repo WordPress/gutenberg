@@ -188,7 +188,7 @@
 .show-icon-labels {
 	// Text labels make the toolbar long, so let it wrap instead of
 	// overflowing the available width (e.g. behind an open sidebar).
-	.block-editor-block-contextual-toolbar {
+	.block-editor-block-contextual-toolbar:not(.editor-header__toolbar *) {
 		background-color: transparent;
 		border: none;
 
