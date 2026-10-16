@@ -1,7 +1,7 @@
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import type { WpTemplate } from '@wordpress/core-data';
-import { getItemTitle } from '../../actions/utils';
+import { getItemTitle } from '../utils';
 import { unlock } from '../../lock-unlock';
 import type { BasePost } from '../../types';
 

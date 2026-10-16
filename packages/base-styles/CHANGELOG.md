@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Internal
+
+-   Rename the `.fields-create-template-part-modal` z-index entry to `.patterns-create-template-part-modal`, since the modal moved to `@wordpress/patterns` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+
 ## 13.3.0 (2026-10-07)
 
 ### Enhancements

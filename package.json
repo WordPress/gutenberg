@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.2.0-rc.1",
+	"version": "24.2.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -95,7 +95,7 @@
 		"cross-env": "^7.0.3",
 		"eslint": "^10.0.0",
 		"husky": "^7.0.0",
-		"lerna": "^10.0.1",
+		"lerna": "^10.1.1",
 		"lint-staged": "^16.4.0",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"stylelint": "^17.14.1",
@@ -103,13 +103,6 @@
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
-		"sockjs": {
-			"uuid": "^11.1.1"
-		},
-		"lerna": {
-			"js-yaml": "4.3.2",
-			"pacote": "21.5.1"
-		},
 		"@y/websocket-server": {
 			"yjs": "npm:@y/y@^14.0.0-rc.7"
 		},

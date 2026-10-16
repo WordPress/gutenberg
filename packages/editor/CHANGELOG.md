@@ -8,18 +8,30 @@
 
 ### Enhancements
 
+-   The post summary of the DataForm-based inspector, the media editor, and the private `usePostFields` hook, through which the site editor screens get their fields, read the fields of the post type from the server, through the Entity fields API. The media editor also lays out the attachment fields with the form of the attachment view configuration ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
+
+### Deprecations
+
+-   `registerEntityField` and `unregisterEntityField`, which only had an effect in the Gutenberg plugin, are deprecated and have no effect anymore: the fields of an entity are registered on the server. Register and unregister them in PHP, with `wp_register_entity_fields()` and `wp_unregister_entity_fields()` on the `wp_entity_fields_api_init` action, and a script module for their JavaScript parts ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 
 ### Bug Fixes
 
 -   `PostTaxonomiesFlatTermSelector`: Pressing Enter adds the typed terms, and comma-separated names are added as separate terms ([#84601](https://github.com/WordPress/gutenberg/pull/84601)).
+-   Notes: Keep the canvas from scrolling to the top when adding a floating note on a scrolled post ([#84639](https://github.com/WordPress/gutenberg/pull/84639)).
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+-   `PostPanelRow`: Wrap long unbroken values (such as an author name or email) inside the row instead of overflowing the Post sidebar ([#84165](https://github.com/WordPress/gutenberg/pull/84165)).
+-   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
+-   Notes: Stop announcing the "Add note" block menu item as opening a dialog ([#84818](https://github.com/WordPress/gutenberg/pull/84818)).
+-   `EditorProvider`: Keep a preview canvas from restoring a block selection written to the entity by another editor, such as the site editor's navigation sidebar ([#84832](https://github.com/WordPress/gutenberg/pull/84832)).
 
 ### Internal
 
 -   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+-   Import the core actions `registerPostTypeSchema()` registers from the `@wordpress/core-actions` script modules instead of `@wordpress/fields` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Take `CreateTemplatePartModal` from the private APIs of `@wordpress/patterns` instead of `@wordpress/fields`, and remove it from the private APIs of the editor ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
 
 ## 15.2.0 (2026-10-07)
 
