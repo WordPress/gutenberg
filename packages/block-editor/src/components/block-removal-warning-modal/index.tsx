@@ -10,8 +10,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { BlockRemovalWarningModalProps } from './types';
 
-export function BlockRemovalWarningModal( { rules } ) {
+export function BlockRemovalWarningModal( {
+	rules,
+}: BlockRemovalWarningModalProps ) {
 	const [ confirmed, setConfirmed ] = useState( false );
 	const { clientIds, selectPrevious, message } = useSelect( ( select ) =>
 		unlock( select( blockEditorStore ) ).getRemovalPromptData()
