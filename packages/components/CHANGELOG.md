@@ -4,10 +4,9 @@
 
 ### Breaking Changes
 
--   `StyleProvider`: Stop creating an Emotion cache for children. Consumers that need Emotion styles in another document must provide their own Emotion `CacheProvider`. CSS Module document registration is unchanged ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
-
--   The component context system no longer merges Emotion-registered classes in `className`. Compose dependent Emotion styles before passing the resulting class name ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
--   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+-   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers that need Emotion styles in another document must provide their own Emotion `CacheProvider`; `StyleProvider` continues to register CSS Module styles. This includes:
+    -   Context-system class-name composition ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
+    -   `StyleProvider` cache removal ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
     -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
     -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724))
     -   `FocalPointPicker` ([#84736](https://github.com/WordPress/gutenberg/pull/84736))
