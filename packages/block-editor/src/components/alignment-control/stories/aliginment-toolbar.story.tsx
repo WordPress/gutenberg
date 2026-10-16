@@ -1,17 +1,14 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-import { AlignmentControl } from '../';
+import { AlignmentToolbar } from '..';
 
 /**
- * The `AlignmentControl` component renders a dropdown menu that displays alignment options for the selected block.
- *
- * This component is mostly used for blocks that display text, such as Heading, Paragraph, Post Author, Post Comments, Verse, Quote, Post Title, etc... And the available alignment options are `left`, `center` or `right` alignment.
- *
- * If you want to use the alignment control in a toolbar, you should use the `AlignmentToolbar` component instead.
+ * The `AlignmentToolbar` component renders a dropdown menu that displays alignment options for the selected block in `Toolbar`.
  */
-const meta = {
-	id: 'blockeditor-alignmentcontrol',
-	title: 'Editor/Block Editor/AlignmentControl',
-	component: AlignmentControl,
+const meta: Meta< typeof AlignmentToolbar > = {
+	id: 'blockeditor-alignmenttoolbar',
+	title: 'Editor/Block Editor/AlignmentToolbar',
+	component: AlignmentToolbar,
 	argTypes: {
 		value: {
 			control: false,
@@ -28,11 +25,13 @@ const meta = {
 };
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState();
+		const [ value, setValue ] = useState< string >();
 		return (
-			<AlignmentControl
+			<AlignmentToolbar
 				{ ...args }
 				onChange={ ( ...changeArgs ) => {
 					onChange( ...changeArgs );
