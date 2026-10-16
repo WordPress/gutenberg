@@ -2,13 +2,13 @@
 
 ## Unreleased
 
-### Enhancements
-
--   Upgrade `wasm-vips` to 0.0.19, which can grow WASM memory up to 2 GiB, and raise the client-side image memory budgets accordingly ([#84980](https://github.com/WordPress/gutenberg/pull/84980)).
-
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Upgrade `wasm-vips` to 0.0.19, which can grow WASM memory up to 2 GiB, and raise the client-side image memory budgets accordingly ([#84980](https://github.com/WordPress/gutenberg/pull/84980)).
 
 ## 4.3.0 (2026-10-07)
 
