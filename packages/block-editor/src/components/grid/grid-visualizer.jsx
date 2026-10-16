@@ -89,6 +89,15 @@ const GridVisualizerGrid = forwardRef(
 			[ gridClientId ]
 		);
 
+		// When a drag ends, Safari moves the hover to where the pointer was
+		// when the drag started, without the pointer moving, so the cell that
+		// was under it looks hovered. Cells only show they're hovered once
+		// the pointer has moved over the grid since the last drag.
+		const [ isHoverPending, setIsHoverPending ] = useState( true );
+		useEffect( () => {
+			setIsHoverPending( true );
+		}, [ isDragging ] );
+
 		// Get the element for the child grid block so we can
 		// compute its position and hide overlapping visualizer cells.
 		const childGridElement = useBlockElement( childGridClientId );
@@ -140,8 +149,15 @@ const GridVisualizerGrid = forwardRef(
 			>
 				<div
 					ref={ ref }
-					className="block-editor-grid-visualizer__grid"
+					className={ clsx( 'block-editor-grid-visualizer__grid', {
+						'is-hover-pending': isHoverPending,
+					} ) }
 					style={ gridInfo.style }
+					onPointerMove={
+						isHoverPending
+							? () => setIsHoverPending( false )
+							: undefined
+					}
 				>
 					{ isManualGrid ? (
 						<ManualGridVisualizer
