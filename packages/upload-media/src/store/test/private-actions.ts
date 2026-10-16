@@ -13,6 +13,7 @@ import {
 	removeItem,
 	uploadItem,
 } from '../private-actions';
+import type { ThunkArgs } from '../private-actions';
 import { OperationType, Type } from '../types';
 import { ErrorCode } from '../../upload-error';
 import {
@@ -26,10 +27,6 @@ import {
 	terminateVideoConversionWorker,
 } from '../utils/video-conversion';
 import { canvasConvertToJpeg, HeicUnsupportedError } from '../../canvas-utils';
-
-// The thunks take the store's full `select` and `dispatch`, while the tests
-// pass only the selectors and actions each thunk uses.
-type ThunkArgs = Parameters< ReturnType< typeof finalizeItem > >[ 0 ];
 
 // Mock @wordpress/blob
 vi.mock( import( '@wordpress/blob' ), () => ( {

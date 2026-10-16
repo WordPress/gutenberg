@@ -117,7 +117,7 @@ type Selectors = {
 	[ key in keyof AllSelectors ]: CurriedState< AllSelectors[ key ] >;
 };
 
-type ThunkArgs = {
+export type ThunkArgs = {
 	select: Selectors;
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
