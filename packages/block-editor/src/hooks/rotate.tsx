@@ -406,7 +406,10 @@ function useBlockProps( {
 	clientId,
 	style,
 }: Pick< RotateEditProps, 'clientId' | 'style' > ) {
-	const [ viewportSettings ] = useSettings( 'viewport' );
+	// Settings are untyped.
+	const [ viewportSettings ] = useSettings( 'viewport' ) as [
+		Record< string, unknown > | undefined,
+	];
 	const className = useInstanceId(
 		ROTATE_BLOCK_PROPS_REFERENCE,
 		'wp-rotate'
