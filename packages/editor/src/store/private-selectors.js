@@ -21,7 +21,6 @@ import {
 	getCurrentPostRevisionsCount,
 } from './selectors';
 import {
-	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
@@ -169,10 +168,6 @@ export const getPostIcon = createRegistrySelector(
 		}
 	}
 );
-
-export function getEntityActions( state, ...args ) {
-	return _getEntityActions( state.dataviews, ...args );
-}
 
 export function isEntityReady( state, ...args ) {
 	return _isEntityReady( state.dataviews, ...args );

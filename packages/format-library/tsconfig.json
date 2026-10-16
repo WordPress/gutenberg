@@ -18,6 +18,6 @@
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }

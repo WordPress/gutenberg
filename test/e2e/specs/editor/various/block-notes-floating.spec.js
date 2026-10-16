@@ -539,6 +539,44 @@ test.describe( 'Block Notes: floating notes', () => {
 		await expectAligned( thread, getParagraph( editor, 'Noted' ) );
 	} );
 
+	test( 'keeps the new note form in view on a scrolled canvas', async ( {
+		editor,
+		page,
+		blockNoteUtils,
+	} ) => {
+		await blockNoteUtils.addBlockWithNote( {
+			type: 'core/paragraph',
+			attributes: { content: 'Noted' },
+			comment: 'Top note',
+		} );
+		await addSpacerParagraphs( editor );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Last block' },
+		} );
+		const last = getParagraph( editor, 'Last block' );
+		await editor.selectBlocks( last );
+		await expect
+			.poll( () => getCanvasScrollTop( editor ) )
+			.toBeGreaterThan( 100 );
+
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+
+		const form = getFloatingNotes( page ).getByRole( 'treeitem', {
+			name: 'New note',
+			exact: true,
+		} );
+		const input = form.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+		await expect( input ).toBeFocused();
+		// Placed first: an unplaced form sits in view at the panel's top.
+		await expectAligned( form, last );
+		await expect( input ).toBeInViewport();
+		await expect( last ).toBeInViewport();
+	} );
+
 	test( 'pushes earlier threads above the canvas to keep the selected one aligned', async ( {
 		editor,
 		page,
