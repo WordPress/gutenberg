@@ -4,7 +4,7 @@ import * as Avatar from '../index';
 import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
-import explorationStyles from './fallback-colors.module.css';
+import styles from './fallback-colors.module.css';
 
 // Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
 // Used under the Unsplash License: https://unsplash.com/license
@@ -111,116 +111,108 @@ export const Interactive: Story = {
 	),
 };
 
-/** Compare neutral, black/white, capped tint, and uncapped tint fallbacks. */
+function FallbackSamples( props: React.ComponentProps< typeof Avatar.Root > ) {
+	return (
+		<Stack gap="lg" align="center">
+			{ ( [ 'circle', 'square' ] as const ).map( ( shape ) => (
+				<Stack key={ shape } gap="sm" align="center">
+					<Avatar.Root
+						{ ...props }
+						shape={ shape }
+						aria-hidden="true"
+					>
+						<Avatar.Initials name="Alex Morgan" />
+					</Avatar.Root>
+					<Avatar.Root
+						{ ...props }
+						shape={ shape }
+						aria-hidden="true"
+					>
+						<Avatar.Fallback />
+					</Avatar.Root>
+				</Stack>
+			) ) }
+		</Stack>
+	);
+}
+
+/** Colored initials and person fallbacks across hues, saturation, and lightness. */
 export const FallbackColors: Story = {
-	args: { color: '#008a20', size: 'lg' },
+	args: { size: 'lg' },
+	parameters: { controls: { include: [ 'size' ] } },
 	render: ( args ) => {
-		const colors = [
-			[ 'Custom color', args.color ?? '#008a20' ],
-			[ 'Bright green', '#00e050' ],
-			[ 'Dark green', '#064e3b' ],
-			[ 'Gray below crossover', '#757575' ],
-			[ 'Gray above crossover', '#767676' ],
-			[ 'Midtone gray', '#777777' ],
-			[ 'Yellow', '#fbbf24' ],
-			[ 'Cyan', '#00cfff' ],
-			[ 'Theme color', 'var(--wpds-color-stroke-surface-brand)' ],
-		];
-		const approaches = [
-			[ 'Neutral', 'neutral' ],
-			[ 'Native black/white', 'native' ],
-			[ 'WCAG black/white', 'wcag' ],
-			[ 'Tint capped at 20%', 'tinted' ],
-			[ 'Uncapped tint', 'uncapped' ],
-		];
+		const hues = [
+			[ 'Red', 0 ],
+			[ 'Orange', 30 ],
+			[ 'Yellow', 60 ],
+			[ 'Lime', 90 ],
+			[ 'Green', 120 ],
+			[ 'Mint', 150 ],
+			[ 'Cyan', 180 ],
+			[ 'Azure', 210 ],
+			[ 'Blue', 240 ],
+			[ 'Violet', 270 ],
+			[ 'Magenta', 300 ],
+			[ 'Rose', 330 ],
+		] as const;
+		const variants = [
+			[ 'Pastel', 70, 85 ],
+			[ 'Muted', 25, 50 ],
+			[ 'Vivid', 90, 50 ],
+			[ 'Deep', 65, 20 ],
+		] as const;
 		return (
-			<div className={ explorationStyles.gallery }>
+			<div
+				className={ styles.gallery }
+				role="region"
+				aria-label="Colored Avatar fallbacks"
+				tabIndex={ 0 }
+			>
 				<p>
-					Change the custom color, size, and shape in Controls. Filled
-					fallbacks use opaque sRGB colors. Both tinted columns fall
-					back to native black/white, then neutral, as feature support
-					allows.
+					Each cell shows circle and square fallbacks, with initials
+					followed by the person icon for each shape. Column
+					percentages are HSL saturation / lightness. Change the size
+					in Controls, or use With Color to try a custom color.
 				</p>
 				<p>
-					Both tints target 4.55:1 contrast for initials and 3.05:1
-					for the person icon, with a small margin above 4.5:1 and
-					3:1. The capped tint blends at most 20% of the background
-					into black or white. The uncapped tint uses the full blend
-					that retains the target contrast.
-				</p>
-				<p>
-					Colored fallbacks do not support <code>currentColor</code>,
-					including through CSS variables or color functions. Their
-					fill must resolve independently of the foreground.
-					Transparent colors become opaque, and out-of-gamut channels
-					are clipped to sRGB.
-				</p>
-				<p>
-					Development warnings are best-effort. They do not resolve
-					CSS variables or detect every unsupported expression. The
-					absence of a warning does not guarantee sufficient contrast.
-					See Unsupported Colors for examples.
+					Foregrounds blend toward the background until they reach
+					4.55:1 contrast for initials or 3.05:1 for the person icon.
+					These targets include a small margin above 4.5:1 and 3:1.
+					Browsers without the required color math retain neutral
+					fallbacks. See Unsupported Colors for input limitations and
+					the limits of best-effort development warnings.
 				</p>
 				<table>
 					<thead>
 						<tr>
-							<th scope="col">Color</th>
-							{ approaches.map( ( [ label ] ) => (
-								<th key={ label } scope="col">
-									{ label }
-								</th>
-							) ) }
+							<th scope="col">Hue</th>
+							{ variants.map(
+								( [ label, saturation, lightness ] ) => (
+									<th key={ label } scope="col">
+										{ label }
+										<br />
+										<code>
+											{ saturation }% / { lightness }%
+										</code>
+									</th>
+								)
+							) }
 						</tr>
 					</thead>
 					<tbody>
-						{ colors.map( ( [ label, color ] ) => (
+						{ hues.map( ( [ label, hue ] ) => (
 							<tr key={ label }>
 								<th scope="row">{ label }</th>
-								{ approaches.map( ( [ approach, variant ] ) => (
-									<td key={ approach }>
-										<Stack gap="lg" align="center">
-											<Avatar.Root
+								{ variants.map(
+									( [ variant, saturation, lightness ] ) => (
+										<td key={ variant }>
+											<FallbackSamples
 												{ ...args }
-												color={ color }
-												aria-hidden="true"
-												style={
-													{
-														'--_wp-ui-avatar-exploration-color':
-															color,
-													} as React.CSSProperties
-												}
-											>
-												<Avatar.Initials
-													name="Alex Morgan"
-													className={
-														explorationStyles[
-															variant
-														]
-													}
-												/>
-											</Avatar.Root>
-											<Avatar.Root
-												{ ...args }
-												color={ color }
-												aria-hidden="true"
-												style={
-													{
-														'--_wp-ui-avatar-exploration-color':
-															color,
-													} as React.CSSProperties
-												}
-											>
-												<Avatar.Fallback
-													className={
-														explorationStyles[
-															variant
-														]
-													}
-												/>
-											</Avatar.Root>
-										</Stack>
-									</td>
-								) ) }
+												color={ `hsl(${ hue } ${ saturation }% ${ lightness }%)` }
+											/>
+										</td>
+									)
+								) }
 							</tr>
 						) ) }
 					</tbody>
@@ -234,6 +226,7 @@ export const FallbackColors: Story = {
 export const UnsupportedColors: Story = {
 	args: { size: 'lg' },
 	parameters: {
+		controls: { include: [ 'size' ] },
 		// This demonstration intentionally reproduces insufficient contrast.
 		// Keep the accessibility findings visible without failing other stories.
 		a11y: { test: 'todo' },
@@ -265,15 +258,16 @@ export const UnsupportedColors: Story = {
 		];
 		return (
 			<div
-				className={ `${ explorationStyles.gallery } ${ explorationStyles.unsupported }` }
+				className={ `${ styles.gallery } ${ styles.unsupported }` }
 				role="region"
 				aria-label="Unsupported Avatar colors"
 				tabIndex={ 0 }
 			>
 				<p>
-					These examples intentionally use unsupported colors. A fill
-					that depends on its foreground can lose contrast. Invalid
-					colors and missing variables can remove the fill.
+					These examples intentionally use unsupported colors in both
+					shapes. A fill that depends on its foreground can lose
+					contrast. Invalid colors and missing variables can remove
+					the fill.
 				</p>
 				<p>
 					In supporting browsers, development builds warn about
@@ -299,22 +293,10 @@ export const UnsupportedColors: Story = {
 									<code>{ color }</code>
 								</th>
 								<td>
-									<Stack gap="lg" align="center">
-										<Avatar.Root
-											{ ...args }
-											color={ color }
-											aria-hidden="true"
-										>
-											<Avatar.Initials name="Alex Morgan" />
-										</Avatar.Root>
-										<Avatar.Root
-											{ ...args }
-											color={ color }
-											aria-hidden="true"
-										>
-											<Avatar.Fallback />
-										</Avatar.Root>
-									</Stack>
+									<FallbackSamples
+										{ ...args }
+										color={ color }
+									/>
 								</td>
 								<td>{ explanation }</td>
 							</tr>
