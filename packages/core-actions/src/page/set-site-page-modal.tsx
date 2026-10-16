@@ -89,6 +89,7 @@ export function SetSitePageModal( {
 
 	async function onSubmit( event: React.FormEvent ) {
 		event.preventDefault();
+		const previousId = siteSettings?.[ setting ];
 
 		try {
 			// Without `throwOnError`, a failed save resolves with `undefined`
@@ -99,15 +100,6 @@ export function SetSitePageModal( {
 				{ [ setting ]: item.id, show_on_front: 'page' },
 				{ throwOnError: true }
 			);
-
-			// The action links of the pages depend on the setting, so the
-			// new page and the previous one are requested again.
-			await refetchPages( registry, [
-				item.id,
-				siteSettings?.[ setting ],
-			] );
-
-			createSuccessNotice( successNotice, { type: 'snackbar' } );
 		} catch ( error ) {
 			const typedError = error as CoreDataError;
 			const errorMessage =
@@ -115,8 +107,20 @@ export function SetSitePageModal( {
 					? typedError.message
 					: errorNotice;
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
-		} finally {
 			closeModal?.();
+			return;
+		}
+
+		createSuccessNotice( successNotice, { type: 'snackbar' } );
+		closeModal?.();
+
+		// The action links of the pages depend on the setting, so the new
+		// page and the previous one are requested again, once the modal is
+		// closed: the setting is saved whether or not the request succeeds.
+		try {
+			await refetchPages( registry, [ item.id, previousId ] );
+		} catch {
+			// The links of the pages stay as they were until the next load.
 		}
 	}
 
