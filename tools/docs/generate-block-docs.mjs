@@ -18,7 +18,7 @@
  * Publishes to: packages/block-library/src/{block}/README.md
  *
  * The same generator can document any other directory of blocks, such as a
- * plugin's, by passing options to generateBlockDocs() or on the command line:
+ * plugin's, from the command line:
  *
  *     node tools/docs/generate-block-docs.mjs \
  *         --blocks-dir=../my-plugin/src/blocks \
@@ -60,7 +60,7 @@ const CORE_BLOCKS_HANDBOOK_URL =
  * @property {Function}    getBlockUrl          Returns a block's doc URL, or null for none.
  * @property {Function}    getCategoryUrl       Returns a category's doc URL, or null for none.
  */
-export const CORE_OPTIONS = {
+const CORE_OPTIONS = {
 	blocksDir: path.resolve( ROOT_DIR, 'packages/block-library/src' ),
 	sourceUrlBase:
 		'https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/',
@@ -181,9 +181,19 @@ function readBlockJson( blockDir ) {
 }
 
 /**
+ * A `save` that returns `null`, which saves no markup: `save: () => null`,
+ * `save: () => { return null; }`, `save: function () { return null; }` or
+ * `save() { return null; }`.
+ */
+const NULL_SAVE_PATTERN =
+	/(?<!\.)\bsave\s*(?::\s*(?:function\s*)?)?\([^)]*\)\s*(?:=>\s*)?(?:null\b|\{\s*return\s+null\s*;?\s*\})/;
+
+/**
  * Check whether a block registers a `save` function in its index script,
- * for blocks that don't have a separate save file. `save: () => null` does
- * not count, since it saves no markup.
+ * for blocks that don't have a separate save file. A `save` that returns
+ * `null` does not count, since it saves no markup.
+ *
+ * This is a heuristic on the source text, not a parse of it.
  *
  * @param {string} dir Absolute block directory.
  * @return {boolean} Whether the index script defines a markup-saving `save`.
@@ -203,7 +213,7 @@ function hasInlineSave( dir ) {
 
 	return (
 		/(?<!\.)\bsave\s*[:(,}]/.test( code ) &&
-		! /\bsave\s*:\s*\(\s*\)\s*=>\s*null\b/.test( code )
+		! NULL_SAVE_PATTERN.test( code )
 	);
 }
 
@@ -691,7 +701,7 @@ function generateBlockApiSection( blockDir ) {
 	const {
 		name,
 		category,
-		description,
+		description = '',
 		keywords,
 		apiVersion,
 		attributes,
@@ -1102,7 +1112,7 @@ function writeDeprecatedNotice( dirs ) {
  *
  * @param {Object} runOptions Options, see CORE_OPTIONS. Defaults to the core block library.
  */
-export function generateBlockDocs( runOptions = CORE_OPTIONS ) {
+function generateBlockDocs( runOptions = CORE_OPTIONS ) {
 	options = {
 		sourceUrlBase: null,
 		fixturesDir: null,
@@ -1172,22 +1182,20 @@ export function generateBlockDocs( runOptions = CORE_OPTIONS ) {
 	);
 }
 
-if ( process.argv[ 1 ] && path.resolve( process.argv[ 1 ] ) === __filename ) {
-	const { values } = parseArgs( {
-		options: {
-			'blocks-dir': { type: 'string' },
-			'source-url': { type: 'string' },
-		},
-	} );
+const { values: args } = parseArgs( {
+	options: {
+		'blocks-dir': { type: 'string' },
+		'source-url': { type: 'string' },
+	},
+} );
 
-	if ( values[ 'blocks-dir' ] ) {
-		generateBlockDocs( {
-			blocksDir: path.resolve( values[ 'blocks-dir' ] ),
-			sourceUrlBase: values[ 'source-url' ] ?? null,
-			// Sibling READMEs, which GitHub and most viewers render.
-			getBlockUrl: ( { dir } ) => `../${ dir }/README.md`,
-		} );
-	} else {
-		generateBlockDocs();
-	}
+if ( args[ 'blocks-dir' ] ) {
+	generateBlockDocs( {
+		blocksDir: path.resolve( args[ 'blocks-dir' ] ),
+		sourceUrlBase: args[ 'source-url' ] ?? null,
+		// Sibling READMEs, which GitHub and most viewers render.
+		getBlockUrl: ( { dir } ) => `../${ dir }/README.md`,
+	} );
+} else {
+	generateBlockDocs();
 }
