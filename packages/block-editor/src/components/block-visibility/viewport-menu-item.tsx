@@ -5,8 +5,11 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
+import type { BlockVisibilityClientIdsProps } from './types';
 
-export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
+export default function BlockVisibilityViewportMenuItem( {
+	clientIds,
+}: BlockVisibilityClientIdsProps ) {
 	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { areBlocksHiddenAnywhere, shortcut } = useSelect(
 		( select ) => {
@@ -37,7 +40,8 @@ export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
 	return (
 		<MenuItem
 			onClick={ () => showViewportModal( clientIds ) }
-			shortcut={ shortcut }
+			// `MenuItem` shows no shortcut for `null`.
+			shortcut={ shortcut as string | undefined }
 		>
 			{ areBlocksHiddenAnywhere ? __( 'Show' ) : __( 'Hide' ) }
 		</MenuItem>

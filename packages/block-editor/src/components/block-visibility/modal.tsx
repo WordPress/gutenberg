@@ -17,6 +17,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { store as noticesStore } from '@wordpress/notices';
+import type { FormEvent } from 'react';
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
@@ -25,6 +26,11 @@ import {
 	getViewportCheckboxState,
 	getHideEverywhereCheckboxState,
 } from './utils';
+import type { TreeBlock } from '../../store/types';
+import type { BlockVisibilityModalProps } from './types';
+import type { ViewportBreakpoints } from './use-block-visibility';
+
+type CheckboxStates = Record< string, boolean | null >;
 
 const DEFAULT_VIEWPORT_CHECKBOX_VALUES = {
 	[ BLOCK_VISIBILITY_VIEWPORTS.mobile.key ]: false,
@@ -32,7 +38,7 @@ const DEFAULT_VIEWPORT_CHECKBOX_VALUES = {
 	[ BLOCK_VISIBILITY_VIEWPORTS.desktop.key ]: false,
 };
 
-const EMPTY_BLOCKS = [];
+const EMPTY_BLOCKS: TreeBlock[] = [];
 
 /**
  * Modal component for configuring block visibility across viewports.
@@ -41,30 +47,37 @@ const EMPTY_BLOCKS = [];
  * or hide them everywhere. When editing multiple blocks, checkboxes only show as
  * checked if ALL selected blocks share the same setting to avoid ambiguity.
  *
- * @param {Object}   props           Component props.
- * @param {Array}    props.clientIds The client IDs of the blocks to hide.
- * @param {Function} props.onClose   Callback function invoked when the modal is closed.
- * @return {React.JSX.Element} The modal component.
+ * @param props           Component props.
+ * @param props.clientIds The client IDs of the blocks to hide.
+ * @param props.onClose   Callback function invoked when the modal is closed.
+ * @return The modal component.
  */
-export default function BlockVisibilityModal( { clientIds, onClose } ) {
+export default function BlockVisibilityModal( {
+	clientIds,
+	onClose,
+}: BlockVisibilityModalProps ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const blocks = useSelect(
 		( select ) =>
-			select( blockEditorStore ).getBlocksByClientId( clientIds ) ??
-			EMPTY_BLOCKS,
+			// The modal is opened for existing blocks.
+			( select( blockEditorStore ).getBlocksByClientId(
+				clientIds
+			) as TreeBlock[] ) ?? EMPTY_BLOCKS,
 		[ clientIds ]
 	);
 	const listViewShortcut = useSelect( ( select ) => {
+		// The editor registers the List View shortcut.
 		return select( keyboardShortcutsStore ).getShortcutRepresentation(
 			'core/editor/toggle-list-view'
-		);
+		) as string;
 	}, [] );
 	const viewportSettings = useSelect(
 		( select ) =>
+			// The `viewport` setting holds the breakpoints.
 			select( blockEditorStore ).getSettings().__experimentalFeatures
-				?.viewport,
+				?.viewport as ViewportBreakpoints | undefined,
 		[]
 	);
 	const viewportEntries = useMemo(
@@ -76,11 +89,12 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 		if ( blocks?.length === 0 ) {
 			return {
 				hideEverywhere: false,
-				viewportChecked: {},
+				// No viewport is checked.
+				viewportChecked: {} as CheckboxStates,
 			};
 		}
 
-		const viewportValues = {};
+		const viewportValues: CheckboxStates = {};
 
 		viewportEntries.forEach( ( [ , { key } ] ) => {
 			viewportValues[ key ] = getViewportCheckboxState( blocks, key );
@@ -100,7 +114,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 	);
 
 	const handleViewportCheckboxChange = useCallback(
-		( viewport, isChecked ) => {
+		( viewport: string, isChecked: boolean ) => {
 			setViewportChecked( {
 				...viewportChecked,
 				[ viewport ]: isChecked,
@@ -168,7 +182,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 	}, [ hideEverywhere, viewportChecked ] );
 
 	const handleSubmit = useCallback(
-		( event ) => {
+		( event: FormEvent ) => {
 			event.preventDefault();
 			const newVisibility = hideEverywhere
 				? false
@@ -183,7 +197,8 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 								}
 								return acc;
 							},
-							{}
+							// The reducer fills the empty object.
+							{} as Record< string, boolean >
 						),
 					};
 			const attributesByClientId = Object.fromEntries(
