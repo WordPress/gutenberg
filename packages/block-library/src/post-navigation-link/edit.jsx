@@ -235,6 +235,8 @@ export default function PostNavigationLinkEdit( {
 						setAttributes( { label: newLabel } )
 					}
 				/>
+				{ /* Mirror the front end, which separates a custom label from the title with a space. */ }
+				{ showTitle && !! label && ' ' }
 				{ showTitle && (
 					<a
 						href="#post-navigation-pseudo-link"
