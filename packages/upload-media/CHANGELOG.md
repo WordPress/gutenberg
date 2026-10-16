@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. With the setting enabled, uncropped sub-sizes of animated images keep their animation instead of flattening to the first frame. It defaults to `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
+-   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. Sub-sizes of animated GIF and WebP images, cropped ones included, keep their animation instead of flattening to the first frame unless the setting is `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 
 ## 0.42.0 (2026-10-07)
 

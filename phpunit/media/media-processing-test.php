@@ -160,7 +160,7 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'image_max_bit_depth', $data );
 		$this->assertSame( 16, $data['image_max_bit_depth'] );
 		$this->assertArrayHasKey( 'generate_animated_image_subsizes', $data );
-		$this->assertFalse( $data['generate_animated_image_subsizes'] );
+		$this->assertTrue( $data['generate_animated_image_subsizes'] );
 	}
 
 	/**
@@ -208,7 +208,7 @@ class Media_Processing_Test extends WP_UnitTestCase {
 	public function test_get_rest_index_honors_generate_animated_image_subsizes_filter() {
 		wp_set_current_user( self::$admin_id );
 
-		add_filter( 'wp_generate_animated_image_subsizes', '__return_true' );
+		add_filter( 'wp_generate_animated_image_subsizes', '__return_false' );
 
 		$server = new WP_REST_Server();
 
@@ -216,7 +216,7 @@ class Media_Processing_Test extends WP_UnitTestCase {
 		$index   = $server->dispatch( $request );
 		$data    = $index->get_data();
 
-		$this->assertTrue( $data['generate_animated_image_subsizes'] );
+		$this->assertFalse( $data['generate_animated_image_subsizes'] );
 	}
 
 	/**

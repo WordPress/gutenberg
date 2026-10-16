@@ -7,4 +7,4 @@
  * @package gutenberg-test-animated-image-subsizes
  */
 
-add_filter( 'wp_generate_animated_image_subsizes', '__return_true' );
+add_filter( 'wp_generate_animated_image_subsizes', '__return_false' );

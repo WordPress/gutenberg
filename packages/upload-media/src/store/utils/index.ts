@@ -59,7 +59,6 @@ interface VipsResizeOptions {
 	maxBitdepth?: number;
 	/**
 	 * Whether animated images should keep their animation when resized.
-	 * Only applies to uncropped resizes.
 	 */
 	preserveAnimation?: boolean;
 }
