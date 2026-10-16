@@ -133,13 +133,6 @@ export interface PostsPage {
 
 export type Post = Template | TemplatePart | Pattern | BasePost;
 
-export type PostWithPermissions = Post & {
-	permissions: {
-		delete: boolean;
-		update: boolean;
-	};
-};
-
 interface EditorSupport {
 	notes?: boolean;
 }
@@ -160,9 +153,6 @@ export interface PostType {
 		'post-formats'?: boolean;
 	};
 }
-
-// Will be unnecessary after typescript 5.0 upgrade.
-export type CoreDataError = { message?: string; code?: string };
 
 export interface MediaEditProps< Item > extends Pick<
 	DataFormControlProps< Item >,
