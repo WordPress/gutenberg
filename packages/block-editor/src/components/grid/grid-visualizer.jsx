@@ -755,6 +755,30 @@ function GridDropIndicator( { dropTarget } ) {
 	);
 }
 
+/**
+ * Calls back with a block's element once it has rendered in the canvas, for up
+ * to a few frames after it was inserted.
+ *
+ * @param {Document}                       ownerDocument The canvas document.
+ * @param {string}                         clientId      The block's client ID.
+ * @param {(element: HTMLElement) => void} callback      Called with the element.
+ */
+function whenBlockRenders( ownerDocument, clientId, callback ) {
+	const { defaultView } = ownerDocument;
+	let framesLeft = 10;
+	function check() {
+		const element = ownerDocument.querySelector(
+			`[data-block="${ clientId }"]`
+		);
+		if ( element ) {
+			callback( element );
+		} else if ( --framesLeft > 0 ) {
+			defaultView.requestAnimationFrame( check );
+		}
+	}
+	defaultView.requestAnimationFrame( check );
+}
+
 function GridVisualizerAppender( {
 	column,
 	row,
@@ -797,39 +821,75 @@ function GridVisualizerAppender( {
 					onClose?.();
 					return;
 				}
-				// Cells can be too small for the block to show its
-				// placeholder, so it gets more of them, even if that covers
-				// other blocks.
-				const rect = getMinimumInsertionRect( {
-					rect: new GridRect( {
-						columnStart: column,
-						rowStart: row,
-						columnSpan,
-						rowSpan,
-					} ),
-					...getGridTrackPositions( gridElement ),
+				const drawnRect = new GridRect( {
+					columnStart: column,
+					rowStart: row,
+					columnSpan,
+					rowSpan,
 				} );
-				updateGridChildLayout(
-					block.clientId,
-					( style, selectedState, gridAttributes ) =>
-						getInsertedChildLayoutStyle(
-							style,
-							rect,
-							selectedState,
-							gridAttributes?.layout
-						),
-					gridClientId
-				);
-				__unstableMarkNextChangeAsNotPersistent();
-				moveBlocksToPosition(
-					[ block.clientId ],
-					gridClientId,
-					gridClientId,
-					getNumberOfBlocksBeforeCell(
-						rect.columnStart,
-						rect.rowStart
-					)
-				);
+				function getGrownRect() {
+					return getMinimumInsertionRect( {
+						rect: drawnRect,
+						...getGridTrackPositions( gridElement ),
+					} );
+				}
+				function placeBlock( rect ) {
+					updateGridChildLayout(
+						block.clientId,
+						( style, selectedState, gridAttributes ) =>
+							getInsertedChildLayoutStyle(
+								style,
+								rect,
+								selectedState,
+								gridAttributes?.layout
+							),
+						gridClientId
+					);
+					__unstableMarkNextChangeAsNotPersistent();
+					moveBlocksToPosition(
+						[ block.clientId ],
+						gridClientId,
+						gridClientId,
+						getNumberOfBlocksBeforeCell(
+							rect.columnStart,
+							rect.rowStart
+						)
+					);
+				}
+				// A single cell can be too small for a block's placeholder,
+				// so a block inserted into one gets more cells, even if that
+				// covers other blocks. A drawn area is the size that was
+				// asked for. It only grows if the block shows a placeholder
+				// once it renders, and the area is too small for it.
+				const isSingleCell = columnSpan === 1 && rowSpan === 1;
+				placeBlock( isSingleCell ? getGrownRect() : drawnRect );
+				if ( ! isSingleCell ) {
+					whenBlockRenders(
+						gridElement.ownerDocument,
+						block.clientId,
+						( blockElement ) => {
+							if (
+								! blockElement.querySelector(
+									'.components-placeholder'
+								)
+							) {
+								return;
+							}
+							const grownRect = getGrownRect();
+							if (
+								grownRect.columnStart !==
+									drawnRect.columnStart ||
+								grownRect.rowStart !== drawnRect.rowStart ||
+								grownRect.columnEnd !== drawnRect.columnEnd ||
+								grownRect.rowEnd !== drawnRect.rowEnd
+							) {
+								// Part of the insertion, as one undo step.
+								__unstableMarkNextChangeAsNotPersistent();
+								placeBlock( grownRect );
+							}
+						}
+					);
+				}
 				onClose?.();
 			} }
 		/>
