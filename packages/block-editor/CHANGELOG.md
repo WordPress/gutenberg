@@ -53,6 +53,7 @@
 -   Convert `InspectorControls` to TypeScript ([#84725](https://github.com/WordPress/gutenberg/pull/84725)).
 -   Convert the anchor and custom class name hooks to TypeScript ([#84726](https://github.com/WordPress/gutenberg/pull/84726)).
 -   Convert the auto-generated inspector controls to TypeScript ([#84727](https://github.com/WordPress/gutenberg/pull/84727)).
+-   Convert the zoom out and content only section hooks to TypeScript ([#84731](https://github.com/WordPress/gutenberg/pull/84731)).
 
 ## 18.1.0 (2026-10-07)
 

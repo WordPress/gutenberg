@@ -6,6 +6,7 @@ import type {
 	ColorProps,
 } from '@wordpress/blocks';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
+import type { BlockEditorThunkArgs } from '../store/types';
 
 /**
  * The viewport and pseudo state whose styles a block's controls edit.
@@ -236,4 +237,17 @@ export interface AutoRegisterControlsProps {
 	name: string;
 	clientId: string;
 	setAttributes: BlockSupportEditProps[ 'setAttributes' ];
+}
+
+/**
+ * The section editing state of a block, and the actions that change it.
+ */
+export interface ContentOnlySectionEdit {
+	isSectionBlock: boolean;
+	isWithinSection: boolean;
+	isWithinEditedSection: boolean;
+	isEditingContentOnlySection: boolean;
+	editedContentOnlySection: string | undefined;
+	editContentOnlySection: BlockEditorThunkArgs[ 'dispatch' ][ 'editContentOnlySection' ];
+	stopEditingContentOnlySection: BlockEditorThunkArgs[ 'dispatch' ][ 'stopEditingContentOnlySection' ];
 }
