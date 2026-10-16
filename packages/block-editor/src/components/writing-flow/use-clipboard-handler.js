@@ -234,6 +234,20 @@ export default function useClipboardHandler() {
 					return;
 				}
 
+				// If a block doesn't support splitting, let rich text paste
+				// inline.
+				if (
+					! hasMultiSelection() &&
+					! hasBlockSupport(
+						getBlockName( selectedBlockClientIds[ 0 ] ),
+						'splitting',
+						false
+					) &&
+					! event.__deprecatedOnSplit
+				) {
+					return;
+				}
+
 				// Pasting over an entirely selected block replaces it, the
 				// equivalent of pasting into an empty block.
 				if (
@@ -250,20 +264,6 @@ export default function useClipboardHandler() {
 						-1
 					);
 					event.preventDefault();
-					return;
-				}
-
-				// If a block doesn't support splitting, let rich text paste
-				// inline.
-				if (
-					! hasMultiSelection() &&
-					! hasBlockSupport(
-						getBlockName( selectedBlockClientIds[ 0 ] ),
-						'splitting',
-						false
-					) &&
-					! event.__deprecatedOnSplit
-				) {
 					return;
 				}
 

@@ -568,7 +568,14 @@ function Layout( {
 						<div { ...navigateRegionsProps }>
 							<Editor
 								settings={ editorSettings }
-								initialEdits={ initialEdits }
+								// The initial edits belong to the post the editor was
+								// opened with, not to entities navigated to from it.
+								initialEdits={
+									currentPostId === initialPostId &&
+									currentPostType === initialPostType
+										? initialEdits
+										: undefined
+								}
 								postType={ currentPostType }
 								postId={ currentPostId }
 								templateId={ templateId }

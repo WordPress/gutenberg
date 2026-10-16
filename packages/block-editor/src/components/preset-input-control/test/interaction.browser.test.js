@@ -41,6 +41,8 @@ describe( 'PresetInputControl browser interactions', () => {
 
 	it( 'can interact with select dropdown options', async () => {
 		const user = userEvent.setup();
+		const onMouseOver = vi.fn();
+		const onMouseOut = vi.fn();
 		const manyPresets = Array.from( { length: 12 }, ( _, index ) => ( {
 			name: `Preset ${ index + 1 }`,
 			slug: `preset-${ index + 1 }`,
@@ -51,13 +53,27 @@ describe( 'PresetInputControl browser interactions', () => {
 			createElement( PresetInputControl, {
 				...defaultProps,
 				presets: manyPresets,
+				onMouseOver,
+				onMouseOut,
 			} )
 		);
 
-		await user.click( screen.getByRole( 'combobox' ) );
+		await user.tab();
+		expect( onMouseOver ).toHaveBeenCalled();
+
+		const trigger = screen.getByRole( 'combobox' );
+		await user.click( trigger );
 
 		await expect
 			.element( page.getByRole( 'combobox', { expanded: true } ) )
 			.toBeVisible();
+
+		await user.click( screen.getByRole( 'option', { name: 'Preset 2' } ) );
+		expect( defaultProps.onChange ).toHaveBeenLastCalledWith(
+			'var:preset|spacing|preset-2'
+		);
+		await expect.element( trigger ).toHaveFocus();
+		await user.tab();
+		expect( onMouseOut ).toHaveBeenCalled();
 	} );
 } );

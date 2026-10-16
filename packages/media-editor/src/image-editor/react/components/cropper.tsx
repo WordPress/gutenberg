@@ -967,23 +967,9 @@ function CropperInner(
 		};
 	}
 
-	// Forward the root element to the consumer's ref.
-	const setContainerRef = useCallback(
-		( element: HTMLDivElement | null ) => {
-			if ( typeof ref === 'function' ) {
-				ref( element );
-			} else if ( ref ) {
-				(
-					ref as React.MutableRefObject< HTMLDivElement | null >
-				 ).current = element;
-			}
-		},
-		[ ref ]
-	);
-
 	return (
 		<div
-			ref={ setContainerRef }
+			ref={ ref }
 			className={ clsx(
 				'wp-media-editor-image-editor',
 				isDragging && 'wp-media-editor-image-editor--dragging',
