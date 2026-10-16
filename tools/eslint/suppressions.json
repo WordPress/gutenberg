@@ -2260,16 +2260,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/use-block-drop-zone/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-block-drop-zone/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/elements/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
