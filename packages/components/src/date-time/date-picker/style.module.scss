@@ -12,7 +12,6 @@
 }
 
 .navigator {
-	column-gap: $grid-unit-10;
 	grid-template-columns: 0.5fr repeat(5, 1fr) 0.5fr;
 	justify-items: center;
 	margin-bottom: $grid-unit-20;
