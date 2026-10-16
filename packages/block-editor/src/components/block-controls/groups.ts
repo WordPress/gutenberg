@@ -1,4 +1,5 @@
 import { createSlotFill } from '@wordpress/components';
+import type { SlotFill } from '../inspector-controls/types';
 
 const BlockControlsDefault = createSlotFill( 'BlockControls' );
 const BlockControlsBlock = createSlotFill( 'BlockControlsBlock' );
@@ -7,7 +8,7 @@ const BlockControlsOther = createSlotFill( 'BlockControlsOther' );
 const BlockControlsParent = createSlotFill( 'BlockControlsParent' );
 const BlockControlsStyleState = createSlotFill( 'BlockControlsStyleState' );
 
-const groups = {
+const groups: Record< string, SlotFill > = {
 	default: BlockControlsDefault,
 	block: BlockControlsBlock,
 	inline: BlockControlsInline,
