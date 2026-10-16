@@ -6,6 +6,7 @@ import PresetInputControl from '../../preset-input-control';
 import { useSettings } from '../../use-settings';
 import { store as blockEditorStore } from '../../../store';
 import { ALL_SIDES, LABELS } from '../utils';
+import type { Side, SpacingInputControlProps } from '../types';
 
 const CUSTOM_VALUE_SETTINGS = {
 	px: { max: 300, steps: 1 },
@@ -51,15 +52,21 @@ export default function SpacingInputControl( {
 	type,
 	value,
 	...restProps
-} ) {
+}: SpacingInputControlProps ) {
 	const disableCustomSpacingSizes = useSelect( ( select ) => {
 		const editorSettings = select( blockEditorStore ).getSettings();
-		return editorSettings?.disableCustomSpacingSizes;
+		// The setting is a boolean flag.
+		return editorSettings?.disableCustomSpacingSizes as boolean | undefined;
 	} );
 
 	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: availableUnits || [ 'px', 'em', 'rem' ],
+		// The setting lists unit names.
+		availableUnits: ( availableUnits as string[] | undefined ) || [
+			'px',
+			'em',
+			'rem',
+		],
 	} );
 
 	// Convert spacing preset format to generic preset format for PresetInputControl
@@ -75,10 +82,11 @@ export default function SpacingInputControl( {
 
 	// Generate aria label
 	const sideLabel =
-		( ALL_SIDES.includes( side ) ||
+		( ALL_SIDES.includes( side as Side ) ||
 			[ 'vertical', 'horizontal' ].includes( side ) ) &&
 		showSideInLabel
-			? LABELS[ side ]
+			? // Only sides and axes have labels.
+				LABELS[ side as keyof typeof LABELS ]
 			: '';
 	const typeLabel = showSideInLabel ? type?.toLowerCase() : type;
 
@@ -94,7 +102,8 @@ export default function SpacingInputControl( {
 
 	return (
 		<PresetInputControl
-			allowNegativeOnDrag={ minimumCustomValue < 0 }
+			// An unset minimum compares as `NaN`, which is not negative.
+			allowNegativeOnDrag={ ( minimumCustomValue as number ) < 0 }
 			ariaLabel={ ariaLabel }
 			className="spacing-sizes-control"
 			customValueSettings={ CUSTOM_VALUE_SETTINGS }

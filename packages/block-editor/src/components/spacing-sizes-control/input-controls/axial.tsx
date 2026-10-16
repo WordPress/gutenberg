@@ -5,6 +5,7 @@ import {
 	getPresetValueFromCustomValue,
 	hasAxisSupport,
 } from '../utils';
+import type { SideValues, SpacingInputControlsProps } from '../types';
 
 const groupedSides = [ 'vertical', 'horizontal' ];
 
@@ -17,17 +18,20 @@ export default function AxialInputControls( {
 	spacingSizes,
 	type,
 	values,
-} ) {
-	const createHandleOnChange = ( side ) => ( next ) => {
+}: SpacingInputControlsProps ) {
+	const createHandleOnChange = ( side: string ) => ( next?: string ) => {
 		if ( ! onChange ) {
 			return;
 		}
 
 		// Encode the existing value into the preset value if the passed in value matches the value of one of the spacingSizes.
 		const nextValues = {
-			...Object.keys( values ).reduce( ( acc, key ) => {
+			...Object.keys( values ).reduce<
+				Record< string, string | undefined >
+			>( ( acc, key ) => {
 				acc[ key ] = getPresetValueFromCustomValue(
-					values[ key ],
+					// The keys come from the side values.
+					values[ key as keyof SideValues ],
 					spacingSizes
 				);
 				return acc;
@@ -60,8 +64,9 @@ export default function AxialInputControls( {
 				return (
 					<SpacingInputControl
 						key={ `spacing-sizes-control-${ side }` }
-						icon={ ICONS[ side ] }
-						label={ LABELS[ side ] }
+						// The grouped sides are axes.
+						icon={ ICONS[ side as keyof typeof ICONS ] }
+						label={ LABELS[ side as keyof typeof LABELS ] }
 						minimumCustomValue={ minimumCustomValue }
 						onChange={ createHandleOnChange( side ) }
 						onMouseOut={ onMouseOut }

@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import type { ComponentType, CSSProperties } from 'react';
 import type {
 	Block,
 	BlockAttribute,
@@ -271,4 +271,42 @@ export interface ContentOnlySectionEdit {
 	editedContentOnlySection: string | undefined;
 	editContentOnlySection: BlockEditorThunkArgs[ 'dispatch' ][ 'editContentOnlySection' ];
 	stopEditingContentOnlySection: BlockEditorThunkArgs[ 'dispatch' ][ 'stopEditingContentOnlySection' ];
+}
+
+/**
+ * Props of the line height block support control.
+ */
+export interface LineHeightEditProps {
+	attributes: {
+		style?: BlockStyle & {
+			typography?: Record< string, unknown > & {
+				lineHeight?: string | number;
+			};
+		};
+	};
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
+
+/**
+ * Props of the margin and padding visualizers.
+ */
+export interface SpacingVisualizerProps {
+	clientId: string;
+	value?: BlockStyle & {
+		spacing?: Record< string, unknown > & {
+			margin?: unknown;
+			padding?: unknown;
+		};
+	};
+	forceShow?: boolean;
+}
+
+/**
+ * Props of the visualizer overlaying a block's margin or padding.
+ */
+export interface SpacingVisualizerBaseProps {
+	clientId: string;
+	value: unknown;
+	computeStyle: ( blockElement: Element ) => CSSProperties;
+	forceShow?: boolean;
 }

@@ -70,6 +70,7 @@
 -   Convert `BorderRadiusControl` and `DimensionControl` to TypeScript ([#84880](https://github.com/WordPress/gutenberg/pull/84880)).
 -   Convert the keyboard shortcut components, `ObserveTyping`, `Typewriter`, `BlockSelectionClearer`, `SkipToSelectedBlock` and `MultiSelectScrollIntoView` to TypeScript ([#84902](https://github.com/WordPress/gutenberg/pull/84902)).
 -   Convert `useOnBlockDrop`, `usePasteStyles`, `useMovingAnimation`, `useFlashEditableBlocks`, `useBlockCommands`, the convert to group buttons, the note icon slots, `useListViewPanelState` and `useResizeCanvas` to TypeScript ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
+-   Convert `SpacingSizesControl`, `FitTextSizeWarning`, the line height hook and the spacing visualizer to TypeScript ([#84907](https://github.com/WordPress/gutenberg/pull/84907)).
 
 ## 18.1.0 (2026-10-07)
 
