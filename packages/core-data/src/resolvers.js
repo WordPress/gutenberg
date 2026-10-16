@@ -1240,3 +1240,19 @@ export const getFieldsConfig =
 		} );
 		dispatch.receiveFieldsConfig( kind, name, config );
 	};
+
+/**
+ * Requests the actions registered on the server for a given entity from the
+ * REST API.
+ *
+ * @param {string} kind Entity kind.
+ * @param {string} name Entity name.
+ */
+export const getEntityActionsConfig =
+	( kind, name ) =>
+	async ( { dispatch } ) => {
+		const config = await apiFetch( {
+			path: addQueryArgs( '/wp/v2/entity-actions', { kind, name } ),
+		} );
+		dispatch.receiveEntityActionsConfig( kind, name, config );
+	};
