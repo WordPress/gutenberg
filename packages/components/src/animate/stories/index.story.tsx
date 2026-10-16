@@ -3,7 +3,7 @@ import { Animate } from '..';
 import Notice from '../../notice';
 
 const meta: Meta< typeof Animate > = {
-	title: 'Components/Deprecated/Animate',
+	title: 'Components/@wordpress-components/Deprecated/Animate',
 	id: 'components-animate',
 	component: Animate,
 	parameters: {
@@ -73,16 +73,6 @@ AppearBottomRight.args = {
 	children: ( { className } ) => (
 		<Notice className={ className } status="success">
 			<p>Appear animation. Origin: bottom right.</p>
-		</Notice>
-	),
-};
-
-export const Loading = Template.bind( {} );
-Loading.args = {
-	type: 'loading',
-	children: ( { className } ) => (
-		<Notice className={ className } status="success">
-			<p>Loading animation.</p>
 		</Notice>
 	),
 };

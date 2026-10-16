@@ -1,31 +1,17 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { KeyboardEventHandler } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalUseDragging as useDragging,
 	useIsomorphicLayoutEffect,
 } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import Controls from './controls';
 import FocalPoint from './focal-point';
 import Grid from './grid';
 import Media from './media';
-import {
-	Container,
-	MediaWrapper,
-	MediaContainer,
-} from './styles/focal-point-picker-style';
+import { View } from '../view';
+import styles from './style.module.scss';
 import { INITIAL_BOUNDS } from './utils';
 import { useUpdateEffect } from '../utils/hooks';
 import type { WordPressComponentProps } from '../context/wordpress-component';
@@ -243,8 +229,11 @@ export function FocalPointPicker( {
 		top: y !== undefined ? y * bounds.height : 0.5 * bounds.height,
 	};
 
-	const classes = clsx( 'components-focal-point-picker-control', className );
-	const Label = hideLabelFromVision ? VisuallyHidden : StyledLabel;
+	const classes = clsx(
+		styles.root,
+		'components-focal-point-picker-control',
+		className
+	);
 
 	useUpdateEffect( () => {
 		setShowGridOverlay( true );
@@ -256,12 +245,34 @@ export function FocalPointPicker( {
 	}, [ x, y ] );
 
 	return (
-		<Container { ...restProps } as="fieldset" className={ classes }>
-			{ !! label && <Label as="legend">{ label }</Label> }
-			<MediaWrapper className="components-focal-point-picker-wrapper">
-				<MediaContainer
-					className="components-focal-point-picker"
+		<View { ...restProps } as="fieldset" className={ classes }>
+			{ !! label &&
+				( hideLabelFromVision ? (
+					<VisuallyHidden as="legend">{ label }</VisuallyHidden>
+				) : (
+					<StyledLabel as="legend">{ label }</StyledLabel>
+				) ) }
+			<div
+				className={ clsx(
+					styles[ 'media-wrapper' ],
+					'components-focal-point-picker-wrapper'
+				) }
+			>
+				<div
+					className={ clsx(
+						styles[ 'media-container' ],
+						'components-focal-point-picker'
+					) }
 					onKeyDown={ arrowKeyStep }
+					onPointerDown={ ( event ) => {
+						if ( event.button !== 0 ) {
+							return;
+						}
+						// Keep the gesture when the pointer crosses into the editor canvas iframe.
+						event.currentTarget.setPointerCapture(
+							event.pointerId
+						);
+					} }
 					onMouseDown={ startDrag }
 					onBlur={ () => {
 						if ( isDragging ) {
@@ -283,8 +294,8 @@ export function FocalPointPicker( {
 						{ ...focalPointPosition }
 						isDragging={ isDragging }
 					/>
-				</MediaContainer>
-			</MediaWrapper>
+				</div>
+			</div>
 			<Controls
 				hasHelpText={ !! help }
 				point={ { x, y } }
@@ -293,7 +304,7 @@ export function FocalPointPicker( {
 				} }
 			/>
 			{ !! help && <StyledHelp>{ help }</StyledHelp> }
-		</Container>
+		</View>
 	);
 }
 

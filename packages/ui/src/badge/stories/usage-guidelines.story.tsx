@@ -6,7 +6,8 @@ import { Stack } from '../../stack';
 import { Text } from '../../text';
 
 const meta: Meta< typeof Badge > = {
-	title: 'Design System/Components/Badge/Usage Guidelines',
+	title: 'Components/@wordpress-ui/Badge/Usage Guidelines',
+	id: 'design-system-components-badge-usage-guidelines',
 	component: Badge,
 	decorators: [
 		( Story ) => (

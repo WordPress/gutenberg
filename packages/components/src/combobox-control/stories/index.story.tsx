@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import ComboboxControl from '..';
 import type { ComboboxControlProps } from '../types';
 
@@ -36,7 +25,7 @@ const countries = [
 
 const meta: Meta< typeof ComboboxControl > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/ComboboxControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/ComboboxControl',
 	id: 'components-comboboxcontrol',
 	component: ComboboxControl,
 	argTypes: {

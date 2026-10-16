@@ -5,7 +5,6 @@ import {
 	useRef,
 	createPortal,
 } from '@wordpress/element';
-
 import SlotFillContext from './context';
 import type { FillComponentProps } from './types';
 import StyleProvider from '../style-provider';

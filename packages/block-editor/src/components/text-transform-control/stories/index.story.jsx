@@ -1,15 +1,9 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TextTransformControl from '../';
 
 const meta = {
-	title: 'BlockEditor/TextTransformControl',
+	id: 'blockeditor-texttransformcontrol',
+	title: 'Editor/Block Editor/TextTransformControl',
 	component: TextTransformControl,
 	parameters: {
 		docs: {

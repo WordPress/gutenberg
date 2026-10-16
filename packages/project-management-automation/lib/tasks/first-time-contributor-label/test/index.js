@@ -1,9 +1,19 @@
-/**
- * Internal dependencies
- */
-import firstTimeContributorLabel from '../';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as core from '@actions/core';
+import firstTimeContributorLabel from '../index.js';
+
+vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	setOutput: vi.fn(),
+} ) );
+
+const setOutput = vi.mocked( core.setOutput );
 
 describe( 'firstTimeContributorLabel', () => {
+	beforeEach( () => {
+		setOutput.mockReset();
+	} );
+
 	const payload = {
 		repository: {
 			owner: {
@@ -34,10 +44,10 @@ describe( 'firstTimeContributorLabel', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn(),
+					listCommits: vi.fn(),
 				},
 				search: {
-					commits: jest.fn(),
+					commits: vi.fn(),
 				},
 			},
 		};
@@ -52,7 +62,7 @@ describe( 'firstTimeContributorLabel', () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
+					listCommits: vi.fn( () =>
 						Promise.resolve( {
 							data: [
 								{
@@ -63,11 +73,10 @@ describe( 'firstTimeContributorLabel', () => {
 					),
 				},
 				search: {
-					commits: jest.fn(),
+					commits: vi.fn(),
 				},
 				issues: {
-					addLabels: jest.fn(),
-					createComment: jest.fn(),
+					addLabels: vi.fn(),
 				},
 			},
 		};
@@ -81,19 +90,17 @@ describe( 'firstTimeContributorLabel', () => {
 		} );
 		expect( octokit.rest.search.commits ).not.toHaveBeenCalled();
 		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does nothing if the search fallback finds a previous commit', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( { data: [] } )
-					),
+					listCommits: vi.fn( () => Promise.resolve( { data: [] } ) ),
 				},
 				search: {
-					commits: jest.fn( () =>
+					commits: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								total_count: 1,
@@ -107,8 +114,7 @@ describe( 'firstTimeContributorLabel', () => {
 					),
 				},
 				issues: {
-					addLabels: jest.fn(),
-					createComment: jest.fn(),
+					addLabels: vi.fn(),
 				},
 			},
 		};
@@ -120,19 +126,17 @@ describe( 'firstTimeContributorLabel', () => {
 			per_page: 1,
 		} );
 		expect( octokit.rest.issues.addLabels ).not.toHaveBeenCalled();
-		expect( octokit.rest.issues.createComment ).not.toHaveBeenCalled();
+		expect( setOutput ).not.toHaveBeenCalled();
 	} );
 
 	it( 'adds the First Time Contributor label if neither finds a commit', async () => {
 		const octokit = {
 			rest: {
 				repos: {
-					listCommits: jest.fn( () =>
-						Promise.resolve( { data: [] } )
-					),
+					listCommits: vi.fn( () => Promise.resolve( { data: [] } ) ),
 				},
 				search: {
-					commits: jest.fn( () =>
+					commits: vi.fn( () =>
 						Promise.resolve( {
 							data: {
 								total_count: 0,
@@ -142,8 +146,7 @@ describe( 'firstTimeContributorLabel', () => {
 					),
 				},
 				issues: {
-					addLabels: jest.fn(),
-					createComment: jest.fn(),
+					addLabels: vi.fn(),
 				},
 			},
 		};
@@ -161,11 +164,9 @@ describe( 'firstTimeContributorLabel', () => {
 			issue_number: 123,
 			labels: [ 'First-time Contributor' ],
 		} );
-		expect( octokit.rest.issues.createComment ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			body: expectedComment,
-		} );
+		expect( setOutput ).toHaveBeenCalledWith(
+			'welcome-prompt',
+			expectedComment
+		);
 	} );
 } );

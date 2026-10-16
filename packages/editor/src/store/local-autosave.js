@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { unlock } from '../lock-unlock';
 
 const { CRDT_AUTOSAVE_SNAPSHOT_KEY } = unlock( coreDataPrivateApis );

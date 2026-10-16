@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { privateApis as globalStylesEnginePrivateApis } from '@wordpress/global-styles-engine';
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import {
 	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
 	BLOCK_VISIBILITY_VIEWPORTS,

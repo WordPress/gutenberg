@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 
@@ -66,7 +59,13 @@ export default function useMultiSelection() {
 				return;
 			}
 
+			// A text selection across blocks needs the wrapper as the editing
+			// host, also when it is set from the store, as after undo. The
+			// fields at either end put the native selection in place.
 			if ( ! isFullSelection ) {
+				if ( node.contains( ownerDocument.activeElement ) ) {
+					setContentEditableWrapper( node, true );
+				}
 				return;
 			}
 

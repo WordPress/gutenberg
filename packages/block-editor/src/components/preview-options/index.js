@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 
 export default function PreviewOptions() {

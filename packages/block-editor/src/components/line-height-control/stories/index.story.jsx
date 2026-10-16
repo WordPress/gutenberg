@@ -1,16 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import LineHeightControl from '../';
 
 export default {
 	component: LineHeightControl,
-	title: 'BlockEditor/LineHeightControl',
+	id: 'blockeditor-lineheightcontrol',
+	title: 'Editor/Block Editor/LineHeightControl',
 };
 
 const Template = ( props ) => {

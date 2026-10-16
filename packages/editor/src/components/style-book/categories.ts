@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 // @wordpress/blocks imports are not typed.
 import { getCategories } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import type {
 	BlockExample,
 	StyleBookCategory,

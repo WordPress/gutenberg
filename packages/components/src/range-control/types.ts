@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type {
 	CSSProperties,
 	FocusEventHandler,
 	MouseEventHandler,
 	RefObject,
 } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 import type { IconType } from '../icon';
 import type { NumberControlProps } from '../number-control/types';
@@ -151,7 +144,7 @@ export type RangeControlProps = Pick<
 		 *
 		 * @default () => void
 		 */
-		onChange?: ( value?: number ) => void;
+		onChange?: ( value: number | undefined ) => void;
 		/**
 		 * Callback for when `RangeControl` input gains focus.
 		 *

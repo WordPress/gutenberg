@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ComponentPropsWithoutRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 
 export const GridItems = forwardRef<

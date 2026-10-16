@@ -1,18 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Button, IconButton, Tooltip } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { Menu } = unlock( componentsPrivateApis );
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { IconButton, Menu, Tooltip } from '@wordpress/ui';
 
 export interface ActionsMenuItem {
 	label: string;
@@ -33,12 +22,8 @@ function ActionsMenuEntry( { item }: { item: ActionsMenuItem } ) {
 	const showDisabledTooltip = item.disabled && item.disabledTooltip;
 
 	const menuItem = (
-		<Menu.Item
-			disabled={ item.disabled }
-			onClick={ item.onClick }
-			render={ <Button variant="minimal" tone="neutral" /> }
-		>
-			{ item.label }
+		<Menu.Item disabled={ item.disabled } onClick={ item.onClick }>
+			<Menu.ItemLabel>{ item.label }</Menu.ItemLabel>
 		</Menu.Item>
 	);
 
@@ -48,17 +33,14 @@ function ActionsMenuEntry( { item }: { item: ActionsMenuItem } ) {
 
 	return (
 		<Tooltip.Root>
-			<Tooltip.Trigger
-				render={
-					<Menu.Item
-						disabled={ item.disabled }
-						onClick={ item.onClick }
-						render={ <Button variant="minimal" tone="neutral" /> }
-					/>
-				}
+			<Menu.Item
+				nativeButton
+				disabled={ item.disabled }
+				onClick={ item.onClick }
+				render={ <Tooltip.Trigger /> }
 			>
-				{ item.label }
-			</Tooltip.Trigger>
+				<Menu.ItemLabel>{ item.label }</Menu.ItemLabel>
+			</Menu.Item>
 			<Tooltip.Popup positioner={ <Tooltip.Positioner side="bottom" /> }>
 				{ item.disabledTooltip }
 			</Tooltip.Popup>
@@ -78,8 +60,8 @@ export function ActionsMenu( { items }: ActionsMenuProps ): React.ReactNode {
 	}
 
 	return (
-		<Menu>
-			<Menu.TriggerButton
+		<Menu.Root>
+			<Menu.Trigger
 				render={
 					<IconButton
 						icon={ moreVertical }
@@ -90,7 +72,7 @@ export function ActionsMenu( { items }: ActionsMenuProps ): React.ReactNode {
 					/>
 				}
 			/>
-			<Menu.Popover>
+			<Menu.Popup>
 				<Tooltip.Provider delay={ 0 }>
 					<Menu.Group>
 						{ items.map( ( item, index ) => (
@@ -98,7 +80,7 @@ export function ActionsMenu( { items }: ActionsMenuProps ): React.ReactNode {
 						) ) }
 					</Menu.Group>
 				</Tooltip.Provider>
-			</Menu.Popover>
-		</Menu>
+			</Menu.Popup>
+		</Menu.Root>
 	);
 }

@@ -45,6 +45,7 @@ $ wp-env start --runtime=playground
 | MySQL database | Yes | No (SQLite) |
 | Multisite | Yes | Yes |
 | Custom PHP version | Yes | Yes |
+| Custom MariaDB version | Yes | No (SQLite) |
 | Plugin/theme mounting | Yes | Yes |
 | `wp-env run` command | Yes | No |
 
@@ -72,9 +73,9 @@ If your project already has a package.json, it's also possible to use `wp-env` a
 $ npm i @wordpress/env --save-dev
 ```
 
-If you have also installed `wp-env` globally, running it will automatically execute the local, project-level package. Alternatively, you can execute `wp-env` via [`npx`](https://www.npmjs.com/package/npx), a utility automatically installed with `npm`.`npx` finds binaries like `wp-env` installed through node modules. As an example: `npx wp-env start --update`.
+If you have also installed `wp-env` globally, running it will automatically execute the local, project-level package. Alternatively, you can execute the `wp-env` installed in your project with [`npm exec`](https://docs.npmjs.com/cli/commands/npm-exec). As an example: `npm exec --no -- wp-env start --update`. The `--no` flag keeps npm from downloading a package when `wp-env` is missing locally.
 
-If you don't wish to use the global installation or `npx`, modify your `package.json` and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
+If you don't wish to use the global installation or `npm exec`, modify your `package.json` and add an extra command to npm `scripts` (https://docs.npmjs.com/misc/scripts):
 
 ```json
 "scripts": {
@@ -250,8 +251,8 @@ When you're running `wp-env` using `npm run`, like when working in the Gutenberg
 
 ```sh
 npm run wp-env start -- --xdebug
-# Alternatively, use npx:
-npx wp-env start --xdebug
+# Alternatively, run the installed binary directly:
+npm exec --no -- wp-env start --xdebug
 ```
 
 If you forget about that, the `--xdebug` parameter will be passed to npm instead of the `wp-env start` command and it will be ignored.
@@ -601,6 +602,7 @@ To enable editor autocomplete and validation, add a `$schema` key:
 |----------------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
 | `"core"`             | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
 | `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
+| `"mariadbVersion"`   | `string\|null` | `null`                                 | The MariaDB version to use: `"lts"`, `"latest"`, or a version such as `"10.11"`. If `null` is specified, `lts` is used.          |
 | `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
 | `"port"`             | `integer`      | `8888`                                 | The port number to use for the installation. |
@@ -718,7 +720,7 @@ This is useful for plugin development when upstream Core changes need to be test
 
 ```json
 {
-	"core": "WordPress/WordPress#trunk",
+	"core": "WordPress/WordPress#master",
 	"plugins": [ "." ]
 }
 ```
@@ -826,6 +828,21 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 	"plugins": [ "." ]
 }
 ```
+
+### Specific MariaDB Version
+
+You can tell `wp-env` which MariaDB version the database should run, for compatibility and testing. Use `"lts"`, `"latest"`, or a version such as `"10.11"` or `"11.4.2"`. This can also be set via the environment variable `WP_ENV_MARIADB_VERSION`, which applies to every environment. The Playground runtime uses SQLite and ignores this option.
+
+```json
+{
+	"mariadbVersion": "10.11",
+	"plugins": [ "." ]
+}
+```
+
+MariaDB cannot start on a database last used by a newer version. When that happens, `wp-env start` stops with an error that names both versions. To switch to a lower version, run `wp-env cleanup` first. It removes the environment's Docker containers, volumes, and local files, not only the databases, so everything is recreated on the next start.
+
+**Note:** MariaDB 5.5 images are not published for ARM processors. Apple silicon devices can still run version 5.5 under emulation by setting `DOCKER_DEFAULT_PLATFORM=linux/amd64` before running `wp-env start`. Be aware that every container in the environment runs under emulation, not only the database, so the whole environment runs more slowly.
 
 ### Multisite support
 

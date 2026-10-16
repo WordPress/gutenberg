@@ -49,14 +49,7 @@ both columns.
 ## Usage
 
 ```jsx
-/**
- * External dependencies
- */
 import styled from '@emotion/styled';
-
-/**
- * WordPress dependencies
- */
 import {
 	BoxControl,
 	__experimentalToolsPanel as ToolsPanel,

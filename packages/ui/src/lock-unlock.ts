@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-imports -- Exists solely for the ThemeProvider compatibility fallback in utils/theme-provider.ts. Remove in WordPress 7.3.
 import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
 
 export const { lock, unlock } =

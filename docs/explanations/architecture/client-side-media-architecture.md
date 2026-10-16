@@ -197,19 +197,15 @@ Document-Isolation-Policy: isolate-and-credentialless
 
 This header provides per-document cross-origin isolation which is required to use the SharedArrayBuffer capability. Client-side media uses this capability to run the processing in a separate worker thread, which improves performance and avoids blocking the main thread during image processing.
 
-The header is set via `gutenberg_start_cross_origin_isolation_output_buffer()` (in `lib/media/load.php`), which uses PHP output buffering on `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` screens. DIP is skipped on admin pages with an `action` parameter other than `edit` to avoid conflicts with page builders that rely on same-origin iframe access.
+The header is sent by `gutenberg_send_document_isolation_policy_header()` (in `lib/media/load.php`) on the `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` screens. DIP is skipped on admin pages with an `action` parameter other than `edit` to avoid conflicts with page builders that rely on same-origin iframe access.
 
 The `gutenberg_use_document_isolation_policy` filter can be used to control whether DIP is applied. Disabling DIP will also disable client-side media processing, since the WASM worker cannot run without SharedArrayBuffer.
 
-### HTML attribute injection
+### No `crossorigin` attribute injection
 
-Cross-origin isolation requires that cross-origin resources include proper CORS attributes. WordPress handles this at two levels:
+`isolate-and-credentialless` loads cross-origin subresources without credentials instead of blocking them, so scripts, styles, images, audio, and video from other origins work without a `crossorigin` attribute. WordPress therefore does not add one. Forcing `crossorigin="anonymous"` would turn each load into a CORS request, which fails for any resource served without `Access-Control-Allow-Origin` headers, such as media offloaded to a CDN or an Image block pointing at a third-party URL.
 
-**Server-side** (PHP output buffer): The `wp_add_crossorigin_attributes()` function uses `WP_HTML_Tag_Processor` to add `crossorigin="anonymous"` to `<audio>`, `<link>`, `<script>`, `<video>`, and `<source>` tags that load cross-origin URLs.
-
-**Client-side** (JavaScript MutationObserver): A MutationObserver in `packages/block-editor/src/hooks/cross-origin-isolation.js` monitors the DOM for dynamically added elements and adds `crossorigin="anonymous"` attributes at runtime.
-
-> **Note:** `<img>` is intentionally excluded from the mutated-element list. Document-Isolation-Policy doesn't require `<img>` resources to be CORS-enabled, and forcing `crossorigin="anonymous"` on cross-origin images would break previews for the common case of an Image block linking to a third-party URL without CORS headers.
+The attribute is only needed when script reads the pixels of a cross-origin image or video frame back out of a canvas, and only when the origin serves CORS headers. Code with that need sets `crossOrigin` on the element it creates, optionally through the `media.crossOrigin` filter, rather than relying on page-wide injection.
 
 ### External images
 

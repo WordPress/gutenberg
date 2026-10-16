@@ -1,0 +1,455 @@
+import { describe, expect, it, vi } from 'vitest';
+import { userEvent } from 'vitest/browser';
+import { screen, waitFor } from '@testing-library/react';
+import { render } from 'vitest-browser-react';
+import { useState } from '@wordpress/element';
+import '../../button/style.scss';
+import '../style.scss';
+import '../../dropdown/style.scss';
+import '../../popover/style.scss';
+import CustomGradientPicker from '../';
+import CustomGradientBar from '../gradient-bar';
+import { KEYBOARD_CONTROL_POINT_VARIATION } from '../gradient-bar/constants';
+
+function ControlledCustomGradientPicker( {
+	initialValue = 'linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)',
+}: {
+	initialValue?: string;
+} ) {
+	const [ value, setValue ] = useState( initialValue );
+	return <CustomGradientPicker value={ value } onChange={ setValue } />;
+}
+
+describe( 'CustomGradientPicker', () => {
+	describe( 'new gradient stop color picker', () => {
+		it( 'preserves visual saturation when setting a new stop color through black', async () => {
+			const { container } = await render(
+				<ControlledCustomGradientPicker />
+			);
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const bar = container.querySelector(
+				'.components-custom-gradient-picker__gradient-bar'
+			) as HTMLElement;
+			const barBounds = bar.getBoundingClientRect();
+			expect( barBounds.width ).toBeGreaterThan( 0 );
+			// Hover mid-bar so the insert-point control appears (away from 0%/100%).
+			await userEvent.hover( bar, {
+				position: { x: barBounds.width / 2, y: barBounds.height / 2 },
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const insertButton = container.querySelector(
+				'.components-custom-gradient-picker__insert-point-dropdown'
+			) as HTMLElement;
+			expect( insertButton ).toBeTruthy();
+			await userEvent.click( insertButton );
+
+			const colorSlider = screen.getByRole( 'slider', { name: 'Color' } );
+			const sliderBounds = colorSlider.getBoundingClientRect();
+			expect( sliderBounds.width ).toBeGreaterThan( 0 );
+			expect( sliderBounds.height ).toBeGreaterThan( 0 );
+
+			// Choose a saturated mid-brightness color — creates the new stop and
+			// exercises parent gradient updates while picking.
+			await userEvent.click( colorSlider, {
+				position: {
+					x: sliderBounds.width * 0.8,
+					y: sliderBounds.height * 0.2,
+				},
+			} );
+
+			// ColorPicker content is portaled; pointer has no accessible role.
+			// eslint-disable-next-line testing-library/no-node-access
+			const pointer = document.querySelector(
+				'.react-colorful__saturation-pointer'
+			) as HTMLElement;
+			expect( pointer ).toBeTruthy();
+			const surface = pointer.offsetParent as HTMLElement;
+			const leftBefore =
+				( pointer.offsetLeft / surface.clientWidth ) * 100;
+			expect( leftBefore ).toBeGreaterThan( 50 );
+
+			// Keyboard to black — must not reset saturation via HSVA↔HSLA echo
+			// while the gradient parent keeps updating (#80110 / #80205).
+			colorSlider.focus();
+			for ( let i = 0; i < 20; i++ ) {
+				await userEvent.keyboard( '{ArrowDown}' );
+			}
+
+			expect(
+				( pointer.offsetTop / surface.clientHeight ) * 100
+			).toBeCloseTo( 100 );
+			expect(
+				( pointer.offsetLeft / surface.clientWidth ) * 100
+			).toBeCloseTo( leftBefore );
+
+			// Close the portaled popover so later tests are not affected by
+			// asynchronous Popover position updates.
+			await userEvent.click( insertButton );
+			await waitFor( () => {
+				expect(
+					screen.queryByRole( 'slider', { name: 'Color' } )
+				).not.toBeInTheDocument();
+			} );
+		} );
+	} );
+
+	describe( 'GradientTypePicker angle persistence', () => {
+		it( 'should restore the previous linear angle when switching from radial back to linear', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value="linear-gradient(125deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+					onChange={ onChange }
+				/>
+			);
+
+			const typeSelect = screen.getByRole( 'combobox', {
+				name: /type/i,
+			} );
+			await user.selectOptions( typeSelect, 'radial-gradient' );
+			await user.selectOptions( typeSelect, 'linear-gradient' );
+
+			// Verify the angle from before the radial switch is restored, not the default
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toContain( '125deg' );
+		} );
+
+		it( 'should use HORIZONTAL_GRADIENT_ORIENTATION when no prior linear angle exists', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			// Start with a radial gradient so there is no previous linear angle in the ref
+			await render(
+				<CustomGradientPicker
+					value="radial-gradient(rgb(0,0,0) 0%, rgb(255,255,255) 100%)"
+					onChange={ onChange }
+				/>
+			);
+
+			const typeSelect = screen.getByRole( 'combobox', {
+				name: /type/i,
+			} );
+			await user.selectOptions( typeSelect, 'linear-gradient' );
+
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toContain( '90deg' );
+		} );
+
+		it( 'should not restore angle when switching to radial', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value="linear-gradient(45deg, rgb(0,0,0) 0%, rgb(255,255,255) 100%)"
+					onChange={ onChange }
+				/>
+			);
+
+			const typeSelect = screen.getByRole( 'combobox', {
+				name: /type/i,
+			} );
+			await user.selectOptions( typeSelect, 'radial-gradient' );
+
+			// Radial gradients have no orientation, so deg should not appear in the output
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).not.toContain( 'deg' );
+		} );
+	} );
+
+	describe( 'with a color interpolation method', () => {
+		// The gradient from the issue. It has more color stops than the default
+		// gradient the picker falls back to, so the assertions below can only
+		// pass when this is the gradient being edited.
+		const INTERPOLATED_GRADIENT =
+			'linear-gradient(in oklch 160deg,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)';
+
+		it( 'shows the color stops and angle of a gradient that has an interpolation method', async () => {
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ vi.fn() }
+				/>
+			);
+
+			expect(
+				screen
+					.getAllByRole( 'button', {
+						name: /Gradient control point/,
+					} )
+					.map( ( point ) => point.getAttribute( 'aria-label' ) )
+			).toEqual( [
+				'Gradient control point at position 0% with color code #009ED4.',
+				'Gradient control point at position 45% with color code #003366.',
+				'Gradient control point at position 65% with color code #452955.',
+				'Gradient control point at position 95% with color code #F08119.',
+				'Gradient control point at position 100% with color code #FFCE00.',
+			] );
+			expect(
+				screen.getByRole( 'spinbutton', { name: 'Angle' } )
+			).toHaveValue( 160 );
+		} );
+
+		it( 'keeps the interpolation method when the angle changes', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			screen.getByRole( 'spinbutton', { name: 'Angle' } ).focus();
+			await user.keyboard( '[ArrowUp]' );
+
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toBe(
+				'linear-gradient(in oklch 161deg,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)'
+			);
+		} );
+
+		it( 'keeps the interpolation method when switching to a radial gradient', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			await user.selectOptions(
+				screen.getByRole( 'combobox', { name: /type/i } ),
+				'radial-gradient'
+			);
+
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toBe(
+				'radial-gradient(in oklch,#009ED4 0%,#003366 45%,#452955 65%,#F08119 95%,#FFCE00 100%)'
+			);
+		} );
+
+		it( 'keeps the interpolation method when a color stop moves', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<CustomGradientPicker
+					value={ INTERPOLATED_GRADIENT }
+					onChange={ onChange }
+				/>
+			);
+
+			const [ firstPoint ] = screen.getAllByRole( 'button', {
+				name: /Gradient control point/,
+			} );
+			firstPoint.focus();
+			await user.keyboard( '[ArrowRight]' );
+
+			// Moving a color stop rewrites every color as `rgb()`.
+			const lastCall =
+				onChange.mock.calls[ onChange.mock.calls.length - 1 ][ 0 ];
+			expect( lastCall ).toBe(
+				`linear-gradient(in oklch 160deg,rgb(0,158,212) ${ KEYBOARD_CONTROL_POINT_VARIATION }%,rgb(0,51,102) 45%,rgb(69,41,85) 65%,rgb(240,129,25) 95%,rgb(255,206,0) 100%)`
+			);
+		} );
+	} );
+} );
+
+describe( 'CustomGradientBar', () => {
+	const POINTS = [
+		{ position: 0, color: 'rgb(0,0,0)' },
+		{ position: 100, color: 'rgb(255,255,255)' },
+	];
+
+	it.each( [ 'top', 'bottom' ] )(
+		'adds a control point from the %s of the gradient bar',
+		async ( edge ) => {
+			const onChange = vi.fn();
+			const { container } = await render(
+				<CustomGradientBar
+					background="linear-gradient(90deg, black, white)"
+					hasGradient
+					value={ POINTS }
+					onChange={ onChange }
+				/>
+			);
+			// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+			const bar = container.querySelector< HTMLElement >(
+				'.components-custom-gradient-picker__gradient-bar'
+			)!;
+			const bounds = bar.getBoundingClientRect();
+			const position = {
+				x: bounds.width / 2,
+				y: edge === 'top' ? 1 : bounds.height - 1,
+			};
+
+			await userEvent.hover( bar, { position } );
+			// eslint-disable-next-line testing-library/no-node-access -- The inserter has no accessible name.
+			const inserter = container.querySelector< HTMLElement >(
+				'.components-custom-gradient-picker__insert-point-dropdown'
+			)!;
+			expect( inserter ).toBeVisible();
+			await userEvent.click( bar, { position } );
+			expect( inserter ).toHaveAttribute( 'aria-expanded', 'true' );
+
+			await userEvent.click(
+				screen.getByRole( 'slider', { name: 'Color' } )
+			);
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.arrayContaining( [
+					...POINTS,
+					{ position: 50, color: expect.any( String ) },
+				] )
+			);
+			await userEvent.keyboard( '{Escape}' );
+		}
+	);
+
+	// The counterpart to the duotone bar's tests: positioning is on unless a
+	// consumer opts out, so arrow keys must still move a control point.
+	it( 'moves a control point with the arrow keys', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+
+		await render(
+			<CustomGradientBar
+				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				hasGradient
+				value={ POINTS }
+				onChange={ onChange }
+			/>
+		);
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+
+		// The description still offers positioning and removal, which the
+		// duotone bar's shorter one drops.
+		expect( firstPoint ).toHaveAccessibleDescription(
+			/change the gradient position.+remove the control point/
+		);
+
+		firstPoint.focus();
+		await user.keyboard( '[ArrowRight]' );
+
+		expect( onChange ).toHaveBeenCalledWith( [
+			{ position: KEYBOARD_CONTROL_POINT_VARIATION, color: 'rgb(0,0,0)' },
+			POINTS[ 1 ],
+		] );
+	} );
+
+	it( 'moves a control point when dragged from above its handle', async () => {
+		const onChange = vi.fn();
+
+		const { container } = await render(
+			<CustomGradientBar
+				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				hasGradient
+				value={ POINTS }
+				onChange={ onChange }
+			/>
+		);
+
+		// eslint-disable-next-line testing-library/no-node-access
+		const markers = container.querySelector(
+			'.components-custom-gradient-picker__markers-container'
+		) as HTMLElement;
+		expect( markers.getBoundingClientRect().width ).toBeGreaterThan( 0 );
+		// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+		const bar = markers.closest< HTMLElement >(
+			'.components-custom-gradient-picker__gradient-bar'
+		)!;
+		const bounds = bar.getBoundingClientRect();
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+
+		const pointBounds = firstPoint.getBoundingClientRect();
+		await userEvent.dragAndDrop( bar, bar, {
+			sourcePosition: {
+				x: pointBounds.x - bounds.x + pointBounds.width / 2,
+				y: 1,
+			},
+			targetPosition: { x: bounds.width / 2, y: bounds.height / 2 },
+		} );
+
+		// The midpoint of the rendered container is 50%.
+		expect( onChange ).toHaveBeenCalledWith( [
+			{ position: 50, color: 'rgb(0,0,0)' },
+			POINTS[ 1 ],
+		] );
+	} );
+
+	it( 'does not move a control point when dragged and positioning is disabled', async () => {
+		const onChange = vi.fn();
+
+		const { container } = await render(
+			<CustomGradientBar
+				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				hasGradient
+				disablePositioning
+				value={ POINTS }
+				onChange={ onChange }
+			/>
+		);
+
+		// eslint-disable-next-line testing-library/no-node-access
+		const markers = container.querySelector(
+			'.components-custom-gradient-picker__markers-container'
+		) as HTMLElement;
+		expect( markers.getBoundingClientRect().width ).toBeGreaterThan( 0 );
+		// eslint-disable-next-line testing-library/no-node-access -- The gradient background has no accessible role.
+		const bar = markers.closest< HTMLElement >(
+			'.components-custom-gradient-picker__gradient-bar'
+		)!;
+		const bounds = bar.getBoundingClientRect();
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+
+		await userEvent.dragAndDrop( firstPoint, bar, {
+			targetPosition: { x: bounds.width / 2, y: bounds.height / 2 },
+		} );
+
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not move a control point when positioning is disabled', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+
+		await render(
+			<CustomGradientBar
+				background="linear-gradient(90deg,rgb(0,0,0) 0%,rgb(255,255,255) 100%)"
+				hasGradient
+				disablePositioning
+				value={ POINTS }
+				onChange={ onChange }
+			/>
+		);
+
+		const [ firstPoint ] = screen.getAllByRole( 'button', {
+			name: /Gradient control point/,
+		} );
+		firstPoint.focus();
+		await user.keyboard( '[ArrowRight]' );
+
+		expect( onChange ).not.toHaveBeenCalled();
+	} );
+} );

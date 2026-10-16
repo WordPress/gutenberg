@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { Editor } from './index';
 
 /**

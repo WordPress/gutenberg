@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from '../fixtures';
 import { SECOND_USER } from '../fixtures/collaboration-utils';
 
@@ -60,7 +57,7 @@ test.describe( 'Collaboration sync body size', () => {
 									? room.updates.length
 									: 0 ),
 							0
-					  )
+						)
 					: null;
 			} catch {}
 			syncRequests.push( {

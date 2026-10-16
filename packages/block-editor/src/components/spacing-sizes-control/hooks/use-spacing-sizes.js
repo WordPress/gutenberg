@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { useSettings } from '../../use-settings';
 import { RANGE_CONTROL_MAX_SIZE } from '../utils';
 
@@ -57,7 +50,7 @@ export default function useSpacingSizes() {
 						size: undefined,
 					},
 					...sizes,
-			  ]
+				]
 			: sizes;
 	}, [ customSizes, themeSizes, defaultSizes ] );
 }

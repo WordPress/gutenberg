@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-
-/**
- * Internal dependencies
- */
 const {
 	fromConfigRoot,
 	getArgsFromCLI,
@@ -35,7 +28,7 @@ const hasLintConfig =
 	hasPackageProp( 'npmPackageJsonLintConfig' );
 
 const defaultConfigArgs = ! hasLintConfig
-	? [ '--configFile', fromConfigRoot( 'npmpackagejsonlint.json' ) ]
+	? [ '--configFile', fromConfigRoot( 'npmpackagejsonlint.js' ) ]
 	: [];
 
 // See: https://github.com/tclindner/npm-package-json-lint/#cli-commands-and-configuration.

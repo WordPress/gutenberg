@@ -1,18 +1,13 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type {
 	FontSizePickerSelectProps,
 	FontSizePickerSelectOption,
 } from './types';
 import { generateFontSizeHint } from './utils';
-import { StyledCustomSelectControl } from './styles';
+import CustomSelectControl from '../custom-select-control';
+import styles from './style.module.scss';
 
 const DEFAULT_OPTION: FontSizePickerSelectOption = {
 	key: 'default',
@@ -59,8 +54,11 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 	}, [ value, valueMode, options ] );
 
 	return (
-		<StyledCustomSelectControl
-			className="components-font-size-picker__select"
+		<CustomSelectControl
+			className={ clsx(
+				'components-font-size-picker__select',
+				styles.select
+			) }
 			label={ __( 'Font size' ) }
 			hideLabelFromVision
 			describedBy={ sprintf(
@@ -83,7 +81,7 @@ const FontSizePickerSelect = ( props: FontSizePickerSelectProps ) => {
 						: fontSizes.find(
 								( fontSize ) =>
 									fontSize.slug === selectedItem.key
-						  );
+							);
 
 				onChange( selectedItem.value, matchingFontSize );
 			} }

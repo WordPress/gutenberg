@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { ConnectionStatus } from '@wordpress/core-data';
 import { useState, useEffect, useRef } from '@wordpress/element';
 

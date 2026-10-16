@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
@@ -87,7 +85,6 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			[ previousPostStatus, postStatus, isViewable ],
 			expectedValue,
 		] ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				previousPost.status = previousPostStatus;
 				post.status = postStatus;
@@ -157,7 +154,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ 'publish', 'publish' ],
 			[
 				'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.',
-				defaultExpectedAction,
+				{ id: 'editor-autosave' },
 			],
 			{ isAutosave: true },
 		],
@@ -169,7 +166,6 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			expectedValue,
 			options = {},
 		] ) => {
-			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				post.status = postStatus;
 				error.code = errorCode;
@@ -204,7 +200,6 @@ describe( 'getNotificationArgumentsForTrashFail()', () => {
 			'Trashing failed',
 		],
 	].forEach( ( [ description, error, message ] ) => {
-		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const expectedValue = [ message, { id: 'editor-trash-fail' } ];
 			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(

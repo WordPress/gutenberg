@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
 import { getStyle } from '@wordpress/global-styles-engine';
 import type { Color } from '@wordpress/global-styles-engine';
-
-/**
- * Internal dependencies
- */
 import { GlobalStylesContext } from './context';
 
 export function ColorPreview() {

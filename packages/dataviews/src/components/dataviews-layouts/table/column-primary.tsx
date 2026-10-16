@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { ComponentProps, ReactElement } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import type { MediaAspectRatio, NormalizedField } from '../../../types';
 import { ItemClickWrapper } from '../utils/item-click-wrapper';
 

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { UnitControlProps } from '../unit-control/types';
 import type { LABELS } from './utils';
 
@@ -82,9 +79,7 @@ export type BoxControlProps = Pick<
 		 * Allowed values are "top", "right", "bottom", "left", "vertical", and "horizontal".
 		 */
 		sides?: readonly (
-			| keyof BoxControlValue
-			| 'horizontal'
-			| 'vertical'
+			keyof BoxControlValue | 'horizontal' | 'vertical'
 		)[];
 		/**
 		 * If this property is true, when the box control is unlinked, vertical and horizontal controls

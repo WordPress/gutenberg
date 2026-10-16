@@ -1,11 +1,16 @@
 import { SelectControl as _SelectControl } from './select-control';
 import { Group } from '../primitives/select/group';
 import { GroupLabel } from '../primitives/select/group-label';
+import { ItemDescription } from '../primitives/select/item-description';
+import { ItemLabel } from '../primitives/select/item-label';
+import { Separator } from '../primitives/select/separator';
 import { Item } from './item';
 
 Group.displayName = 'SelectControl.Group';
 GroupLabel.displayName = 'SelectControl.GroupLabel';
 Item.displayName = 'SelectControl.Item';
+ItemLabel.displayName = 'SelectControl.ItemLabel';
+ItemDescription.displayName = 'SelectControl.ItemDescription';
 
 /**
  * A complete select field with integrated label and description.
@@ -24,4 +29,17 @@ export const SelectControl = Object.assign( _SelectControl, {
 	 * An item rendered inside a `SelectControl` popup.
 	 */
 	Item,
+	/**
+	 * The primary label of a select item.
+	 */
+	ItemLabel,
+	/**
+	 * Supplementary content that describes a select item via
+	 * `aria-describedby`.
+	 */
+	ItemDescription,
+	/**
+	 * Renders a visual separator between items or groups.
+	 */
+	Separator,
 } );

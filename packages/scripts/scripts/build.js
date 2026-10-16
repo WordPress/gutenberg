@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
-
-/**
- * Internal dependencies
- */
 const { getWebpackArgs } = require( '../utils' );
 const EXIT_ERROR_CODE = 1;
 
