@@ -1,12 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
 import BackgroundPanel, {
 	hasBackgroundImageValue,
 	hasBackgroundGradientValue,
 	hasBackgroundColorValue,
 	hasLegacyColorGradientValue,
 } from '../background-panel';
+import type { PanelStyle, StyleSettings } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -24,7 +26,7 @@ afterEach( () => {
 } );
 
 // Scoped to the panel: the notice is also announced into a body live region.
-const clipsToTextNotice = ( container ) =>
+const clipsToTextNotice = ( container: HTMLElement ) =>
 	within( container ).queryByText( /clips the background to the text/ );
 
 describe( 'hasBackgroundImageValue', () => {
@@ -167,7 +169,7 @@ describe( 'BackgroundPanel — duplicate gradient preset slug identity', () => {
 		},
 	};
 
-	async function openGradientDropdown( user ) {
+	async function openGradientDropdown( user: UserEvent ) {
 		await user.click( screen.getByRole( 'button', { name: /Gradient/ } ) );
 		return screen.findAllByRole( 'option' );
 	}
@@ -476,12 +478,12 @@ describe( 'hasLegacyColorGradientValue', () => {
 } );
 
 describe( 'BackgroundPanel background clip', () => {
-	const withClipSetting = ( backgroundClip ) => ( {
+	const withClipSetting = ( backgroundClip?: boolean | string[] ) => ( {
 		...baseSettings,
 		background: { ...baseSettings.background, backgroundClip },
 	} );
 
-	const renderPanel = ( settings ) =>
+	const renderPanel = ( settings: StyleSettings ) =>
 		render(
 			<BackgroundPanel
 				value={ {} }
@@ -534,7 +536,7 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 		},
 	};
 
-	const resetAll = async ( user ) => {
+	const resetAll = async ( user: UserEvent ) => {
 		await user.click(
 			screen.getByRole( 'button', { name: 'Background options' } )
 		);
@@ -657,11 +659,11 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 			...colorSettings,
 			background: { ...colorSettings.background, backgroundClip: true },
 		};
-		let current = {};
-		const onChange = ( next ) => {
+		let current: PanelStyle = {};
+		const onChange = ( next: PanelStyle ) => {
 			current = next;
 		};
-		const panel = ( value ) => (
+		const panel = ( value: PanelStyle ) => (
 			<BackgroundPanel
 				value={ value }
 				settings={ clipSettings }
@@ -671,7 +673,7 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 		);
 		const { container, rerender } = render( panel( current ) );
 
-		const enable = async ( name ) => {
+		const enable = async ( name: RegExp ) => {
 			await user.click(
 				screen.getByRole( 'button', { name: 'Background options' } )
 			);
@@ -685,7 +687,8 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Gradient' } ) );
 		await user.click( screen.getByRole( 'option', { name: /purple/i } ) );
 		await user.keyboard( '{Escape}' );
-		expect( current.background.gradient ).toBeTruthy();
+		// Picking a gradient sets the background.
+		expect( current.background!.gradient ).toBeTruthy();
 
 		// The select needs real layout to open, so apply its value directly.
 		rerender(
@@ -716,7 +719,8 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 
 		await resetAll( user );
 
-		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		// Reset all calls `onChange`.
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
 		expect( result.background.gradient ).toBe( TEXT_GRADIENT );
 		expect( result.background.backgroundClip ).toBe( 'text' );
 		expect( result.background.backgroundImage ).toBeUndefined();
@@ -742,7 +746,8 @@ describe( 'BackgroundPanel text gradient ownership', () => {
 
 		await resetAll( user );
 
-		const result = onChange.mock.calls.at( -1 )[ 0 ];
+		// Reset all calls `onChange`.
+		const result = onChange.mock.calls.at( -1 )![ 0 ];
 		expect( result.background.gradient ).toBeUndefined();
 		expect( result.background.backgroundClip ).toBeUndefined();
 	} );
