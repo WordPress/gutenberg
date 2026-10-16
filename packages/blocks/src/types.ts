@@ -692,10 +692,10 @@ export interface BlockType<
 	/**
 	 * Custom block label callback function.
 	 */
-	__experimentalLabel: (
+	__experimentalLabel?: (
 		attributes: Attributes,
 		options: { context: string }
-	) => string;
+	) => string | void;
 }
 
 /**

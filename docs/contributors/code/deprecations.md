@@ -4,6 +4,7 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 
 ## Unreleased
 
+-   `wp.editor.registerEntityField` and `wp.editor.unregisterEntityField` are deprecated since Gutenberg 24.3 and have no effect: the fields of an entity are registered on the server. Register and unregister fields in PHP instead, with `wp_register_entity_fields()` and `wp_unregister_entity_fields()` on the `wp_entity_fields_api_init` action, and a script module for the parts PHP cannot serialize (`render`, `Edit`, `getElements`…). Both functions remain exported, so existing calls keep working and only log a deprecation warning.
 -   `wp.blocks.isValidBlockContent` has been removed. Please use `wp.blocks.validateBlock` instead.
 
 ## 11.0.0
