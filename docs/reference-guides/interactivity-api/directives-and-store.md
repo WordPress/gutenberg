@@ -385,7 +385,6 @@ The element shows what its reference resolves to, calling it first when it is a 
 
 To keep showing the fallback, return a pending value, not `null`. After [client-side navigation](/docs/reference-guides/interactivity-api/core-concepts/client-side-navigation.md), the element follows its value on the new page. Known limitation: when that value is `{ "wpServerHtml": true }`, the element keeps the content it had before navigating instead of the new page's server-rendered content.
 
-Elements the client creates instead of hydrating, such as the items of a [`data-wp-each`](#wp-each) template or elements added by client-side navigation, also show their fallback while their value is pending or `{ "wpServerHtml": true }`. `<script>` elements in the fallback are left out, so they never run.
 
 #### Inert content
 
@@ -402,7 +401,6 @@ On the same element as `data-wp-text`, `data-wp-each` or `data-wp-router-region`
 -   **Trusted Types.**
     -   The package creates no policy. Pass `asDangerousHTML( policy.createHTML( markup ) )`.
     -   A rejected value empties the element, and a warning is shown in development mode.
-    -   The fallback of a created element is shown without a Trusted Types policy and is never rejected, so it can hold any markup on sites enforcing Trusted Types.
 -   **"Inert" means inert to the Interactivity API only.** The inserted content is still live browser HTML. Content that isn't safe to render as HTML isn't made safe by going through `wp-html`.
 
 ### `wp-on`
