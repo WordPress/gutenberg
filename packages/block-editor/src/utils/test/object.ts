@@ -16,25 +16,45 @@ describe( 'setImmutably', () => {
 		} );
 
 		it( 'should create a new object if `false` is passed', () => {
-			const result = setImmutably( false, 'test', 1 );
+			const result = setImmutably(
+				// @ts-expect-error Testing a falsy value other than null or undefined.
+				false,
+				'test',
+				1
+			);
 
 			expect( result ).toEqual( { test: 1 } );
 		} );
 
 		it( 'should create a new object if `0` is passed', () => {
-			const result = setImmutably( 0, 'test', 1 );
+			const result = setImmutably(
+				// @ts-expect-error Testing a falsy value other than null or undefined.
+				0,
+				'test',
+				1
+			);
 
 			expect( result ).toEqual( { test: 1 } );
 		} );
 
 		it( 'should create a new object if an empty string is passed', () => {
-			const result = setImmutably( '', 'test', 1 );
+			const result = setImmutably(
+				// @ts-expect-error Testing a falsy value other than null or undefined.
+				'',
+				'test',
+				1
+			);
 
 			expect( result ).toEqual( { test: 1 } );
 		} );
 
 		it( 'should create a new object if a NaN is passed', () => {
-			const result = setImmutably( NaN, 'test', 1 );
+			const result = setImmutably(
+				// @ts-expect-error Testing a falsy value other than null or undefined.
+				NaN,
+				'test',
+				1
+			);
 
 			expect( result ).toEqual( { test: 1 } );
 		} );
@@ -148,7 +168,12 @@ describe( 'setImmutably', () => {
 
 		it( 'clones the object at deeper levels', () => {
 			const input = { foo: { bar: { baz: 1 } } };
-			const result = setImmutably( input, [ 'foo', 'bar', 'baz' ], 2 );
+			// The input shape is kept, so read the result through it.
+			const result = setImmutably(
+				input,
+				[ 'foo', 'bar', 'baz' ],
+				2
+			) as typeof input;
 
 			expect( result ).not.toBe( input );
 			expect( result.foo ).not.toBe( input.foo );
@@ -157,7 +182,7 @@ describe( 'setImmutably', () => {
 		} );
 
 		it( 'clones arrays at the first level', () => {
-			const input = [];
+			const input: unknown[] = [];
 			const result = setImmutably( input, 0, 1 );
 
 			expect( result ).not.toBe( input );
@@ -165,7 +190,12 @@ describe( 'setImmutably', () => {
 
 		it( 'clones arrays at deeper levels', () => {
 			const input = [ [ [ [ 'foo', [ 'bar' ] ] ] ] ];
-			const result = setImmutably( input, [ 0, 0, 0, 1, 0 ], 'baz' );
+			// The input shape is kept, so read the result through it.
+			const result = setImmutably(
+				input,
+				[ 0, 0, 0, 1, 0 ],
+				'baz'
+			) as typeof input;
 
 			expect( result ).not.toBe( input );
 			expect( result[ 0 ] ).not.toBe( input[ 0 ] );

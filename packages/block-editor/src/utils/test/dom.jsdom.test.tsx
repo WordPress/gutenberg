@@ -9,7 +9,7 @@ import {
 	WITH_OVERFLOW_ELEMENT_BLOCKS,
 } from '../dom';
 
-function mockVisibleBoundingClientRect( element ) {
+function mockVisibleBoundingClientRect( element: HTMLElement ) {
 	element.getBoundingClientRect = vi.fn().mockReturnValue( {
 		left: 0,
 		top: 0,
@@ -53,7 +53,8 @@ describe( 'dom', () => {
 				ownerDocument: {
 					defaultView: null,
 				},
-			};
+				// A partial element: only the window lookup is read.
+			} as unknown as Element;
 			expect( getElementBounds( element ) ).toEqual(
 				new window.DOMRectReadOnly()
 			);
@@ -77,8 +78,9 @@ describe( 'dom', () => {
 					width: 100,
 					height: 100,
 				} ),
-				getAttribute: ( x ) => x,
-			};
+				getAttribute: ( x: string ) => x,
+				// A partial element: only what the bounds are computed from.
+			} as unknown as Element;
 			expect( getElementBounds( element ) ).toEqual(
 				new window.DOMRectReadOnly( 0, 0, 100, 100 )
 			);

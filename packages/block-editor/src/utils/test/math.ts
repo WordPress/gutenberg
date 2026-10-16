@@ -8,7 +8,8 @@ describe( 'getDistanceFromPointToEdge', () => {
 			top: 0,
 			bottom: 4,
 			left: 2,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		expect( getDistanceFromPointToEdge( point, rect, 'left' ) ).toBe( 2 );
 	} );
 
@@ -18,7 +19,8 @@ describe( 'getDistanceFromPointToEdge', () => {
 			top: 2,
 			left: 0,
 			right: 4,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		expect( getDistanceFromPointToEdge( point, rect, 'top' ) ).toBe( 2 );
 	} );
 
@@ -28,7 +30,8 @@ describe( 'getDistanceFromPointToEdge', () => {
 			top: 1,
 			left: 1,
 			bottom: 4,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		const distance = getDistanceFromPointToEdge( point, rect, 'left' );
 		const fixedDistance = distance.toFixed( 2 );
 		expect( fixedDistance ).toBe( '1.41' );
@@ -40,7 +43,8 @@ describe( 'getDistanceFromPointToEdge', () => {
 			top: 1,
 			left: 1,
 			right: 4,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		const distance = getDistanceFromPointToEdge( point, rect, 'top' );
 		const fixedDistance = distance.toFixed( 2 );
 		expect( fixedDistance ).toBe( '1.41' );
@@ -55,7 +59,8 @@ describe( 'getDistanceToNearestEdge', () => {
 			right: 4,
 			bottom: 4,
 			left: 2,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		expect( getDistanceToNearestEdge( point, rect ) ).toEqual( [
 			2,
 			'top',
@@ -69,7 +74,8 @@ describe( 'getDistanceToNearestEdge', () => {
 			right: 4,
 			bottom: 4,
 			left: 2,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		expect( getDistanceToNearestEdge( point, rect ) ).toEqual( [
 			2,
 			'left',
@@ -83,7 +89,8 @@ describe( 'getDistanceToNearestEdge', () => {
 			right: 4,
 			bottom: 4,
 			left: 2,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		expect( getDistanceToNearestEdge( point, rect ) ).toEqual( [
 			2,
 			'right',
@@ -97,7 +104,8 @@ describe( 'getDistanceToNearestEdge', () => {
 			right: 4,
 			bottom: 4,
 			left: 2,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		expect( getDistanceToNearestEdge( point, rect ) ).toEqual( [
 			2,
 			'bottom',
@@ -112,7 +120,8 @@ describe( 'getDistanceToNearestEdge', () => {
 			right: 4,
 			bottom: 4,
 			left: 2,
-		};
+			// A partial rect: only the edges are read.
+		} as DOMRect;
 		expect(
 			getDistanceToNearestEdge( point, rect, [ 'top', 'bottom' ] )
 		).toEqual( [ 0.5, 'top' ] );

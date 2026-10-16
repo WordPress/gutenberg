@@ -87,7 +87,8 @@ describe( 'replacePatternOverridesDefaultBinding', () => {
 		);
 
 		// Every produced binding key corresponds to a supported attribute…
-		expect( Object.keys( result ) ).toEqual( supportedAttributes );
+		// The bindings passed in are defined, so the result is too.
+		expect( Object.keys( result! ) ).toEqual( supportedAttributes );
 		// …and `innerBlocks` is never among them.
 		expect( result ).not.toHaveProperty( 'innerBlocks' );
 	} );

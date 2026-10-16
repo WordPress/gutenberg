@@ -658,7 +658,7 @@ describe( 'getFontStylesAndWeights', () => {
 	} );
 
 	describe( 'variable font weight ranges', () => {
-		const weightsFor = ( fontWeight ) =>
+		const weightsFor = ( fontWeight: string ) =>
 			getFontStylesAndWeights( [
 				{
 					fontFamily: 'Example Variable',

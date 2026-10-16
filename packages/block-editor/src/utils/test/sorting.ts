@@ -3,7 +3,7 @@ import { orderBy } from '../sorting';
 
 describe( 'orderBy', () => {
 	it( 'should not mutate original input', () => {
-		const input = [];
+		const input: { x?: number }[] = [];
 		expect( orderBy( input, 'x' ) ).not.toBe( input );
 	} );
 
