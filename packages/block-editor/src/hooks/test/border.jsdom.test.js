@@ -1,9 +1,29 @@
-import { describe, expect, it } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+	createBlock,
+	registerBlockStyle,
+	registerBlockType,
+	unregisterBlockStyle,
+	unregisterBlockType,
+} from '@wordpress/blocks';
+import { dispatch } from '@wordpress/data';
+import border, {
 	applyBorderStyleDefaults,
 	getBorderStyleFallbacks,
 	getInheritedBorderStyles,
 } from '../border';
+import { store as blockEditorStore } from '../../store';
+import { globalStylesDataKey } from '../../store/private-keys';
+import { unlock } from '../../lock-unlock';
+
+vi.mock(
+	import( '../../components/use-settings' ),
+	async ( importOriginal ) => ( {
+		...( await importOriginal() ),
+		useSettings: () => [ [], [], [] ],
+	} )
+);
 
 describe( 'getInheritedBorderStyles', () => {
 	const NO_INHERITANCE_RESULT = {
@@ -405,5 +425,84 @@ describe( 'getBorderStyleFallbacks', () => {
 				borderLeftStyle: 'solid',
 			} );
 		} );
+	} );
+} );
+
+describe( 'border useBlockProps', () => {
+	const BLOCK_NAME = 'test/border-defaults';
+	const SOLID_FALLBACKS = {
+		borderTopStyle: 'solid',
+		borderRightStyle: 'solid',
+		borderBottomStyle: 'solid',
+		borderLeftStyle: 'solid',
+	};
+	const widthOnly = { border: { width: '2px' } };
+
+	// `updateSettings` drops symbol keys, so set the private key directly.
+	function setGlobalStyles( styles ) {
+		unlock( dispatch( blockEditorStore ) ).__experimentalUpdateSettings( {
+			[ globalStylesDataKey ]: styles,
+		} );
+	}
+
+	function getStyle( props ) {
+		const { result, unmount } = renderHook( () =>
+			border.useBlockProps( { name: BLOCK_NAME, ...props } )
+		);
+		unmount();
+		return result.current.style;
+	}
+
+	beforeEach( () => {
+		registerBlockType( BLOCK_NAME, {
+			apiVersion: 3,
+			title: 'Test block',
+			category: 'design',
+			save: () => null,
+			// The custom class name hook that adds `className` is not loaded here.
+			attributes: { className: { type: 'string' } },
+			supports: { __experimentalBorder: { color: true, width: true } },
+		} );
+		registerBlockStyle( BLOCK_NAME, { name: 'framed', label: 'Framed' } );
+	} );
+
+	afterEach( () => {
+		setGlobalStyles( undefined );
+		dispatch( blockEditorStore ).resetBlocks( [] );
+		unregisterBlockStyle( BLOCK_NAME, 'framed' );
+		unregisterBlockType( BLOCK_NAME );
+	} );
+
+	it( 'falls back to solid when Global Styles set no border style', () => {
+		setGlobalStyles( {} );
+		expect( getStyle( { style: widthOnly } ) ).toMatchObject(
+			SOLID_FALLBACKS
+		);
+	} );
+
+	it( 'uses the block type border style from Global Styles', () => {
+		setGlobalStyles( {
+			blocks: { [ BLOCK_NAME ]: { border: { style: 'dashed' } } },
+		} );
+		expect( getStyle( { style: widthOnly } ) ).not.toHaveProperty(
+			'borderTopStyle'
+		);
+	} );
+
+	it( 'uses the block style variation border style from Global Styles', () => {
+		const block = createBlock( BLOCK_NAME, {
+			className: 'is-style-framed',
+		} );
+		dispatch( blockEditorStore ).resetBlocks( [ block ] );
+		setGlobalStyles( {
+			blocks: {
+				[ BLOCK_NAME ]: {
+					variations: { framed: { border: { style: 'dotted' } } },
+				},
+			},
+		} );
+		expect(
+			getStyle( { clientId: block.clientId, style: widthOnly } )
+		).not.toHaveProperty( 'borderTopStyle' );
 	} );
 } );
