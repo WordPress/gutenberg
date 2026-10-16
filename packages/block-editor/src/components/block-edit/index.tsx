@@ -15,6 +15,7 @@ import {
 } from './context';
 import { MultipleUsageWarning } from './multiple-usage-warning';
 import { PrivateBlockContext } from '../block-list/private-block-context';
+import type { BlockEditProps } from './types';
 
 /**
  * The `useBlockEditContext` hook provides information about the block this hook is being used in.
@@ -36,7 +37,7 @@ export default function BlockEdit( {
 	// The remaining props are passed through the BlockEdit filters and are thus
 	// public API!
 	...props
-} ) {
+}: BlockEditProps ) {
 	const {
 		name,
 		isSelected,
@@ -66,7 +67,10 @@ export default function BlockEdit( {
 					name,
 					isSelected,
 					clientId,
-					layout: layoutSupport ? layout : null,
+					// The layout attribute is an object when the block supports it.
+					layout: layoutSupport
+						? ( layout as Record< string, unknown > | null )
+						: null,
 					__unstableLayoutClassNames,
 					// We use symbols in favour of an __unstable prefix to avoid
 					// usage outside of the package (this context is exposed).
@@ -105,7 +109,8 @@ export default function BlockEdit( {
 				<MultipleUsageWarning
 					originalBlockClientId={ originalBlockClientId }
 					name={ name }
-					onReplace={ props.onReplace }
+					// As before, assumes the block can be removed.
+					onReplace={ props.onReplace! }
 				/>
 			) }
 		</BlockEditContextProvider>

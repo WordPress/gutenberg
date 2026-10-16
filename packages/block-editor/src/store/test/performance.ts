@@ -1,9 +1,18 @@
 import { beforeAll, describe, expect, it } from 'vitest';
+import type { Block } from '@wordpress/blocks';
 import reducer from '../reducer';
+import type { State } from '../types';
+
+// The reducer only reads these fields of the blocks.
+type BlockFixture = Pick< Block, 'clientId' | 'attributes' | 'innerBlocks' >;
 
 describe( 'performance', () => {
-	const state = reducer( undefined, { type: '@@init' } );
-	const blocks = [];
+	const state = reducer(
+		undefined,
+		// @ts-expect-error Deliberately unknown action type.
+		{ type: '@@init' }
+	);
+	const blocks: BlockFixture[] = [];
 	for ( let i = 0; i < 100000; i++ ) {
 		blocks.push( {
 			clientId: `block-${ i }`,
@@ -12,18 +21,18 @@ describe( 'performance', () => {
 		} );
 	}
 
-	let preparedState;
+	let preparedState: State;
 	beforeAll( () => {
 		preparedState = reducer( state, {
 			type: 'RESET_BLOCKS',
-			blocks,
+			blocks: blocks as Block[],
 		} );
 	}, 60_000 );
 
 	it( 'should reset blocks', () => {
 		const updatedState = reducer( state, {
 			type: 'RESET_BLOCKS',
-			blocks,
+			blocks: blocks as Block[],
 		} );
 		expect( updatedState ).toBeDefined();
 	}, 60_000 );
@@ -55,7 +64,7 @@ describe( 'performance', () => {
 					attributes: { content: '' },
 					innerBlocks: [],
 				},
-			],
+			] as BlockFixture[] as Block[],
 			indexToSelect: 10,
 			initialPosition: 0,
 		} );

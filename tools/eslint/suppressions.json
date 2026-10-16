@@ -371,14 +371,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-controls/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-draggable/draggable-chip.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -412,38 +404,6 @@
 		}
 	},
 	"packages/block-editor/src/components/block-edit-visually-button/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-edit/edit.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-edit/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-edit/multiple-usage-warning.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-edit/test/edit.jsdom.test.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
@@ -583,11 +543,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/private-block-context.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -3771,30 +3726,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/warning/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/warning/stories/index.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/warning/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/writing-flow/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -4346,11 +4277,6 @@
 		}
 	},
 	"packages/block-editor/src/private-apis.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/store/test/performance.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

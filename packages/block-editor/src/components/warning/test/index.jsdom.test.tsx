@@ -30,7 +30,15 @@ describe( 'Warning', () => {
 		const user = userEvent.setup();
 
 		render(
-			<Warning secondaryActions={ [ { title: 'test', onClick: null } ] }>
+			<Warning
+				secondaryActions={ [
+					{
+						title: 'test',
+						// @ts-expect-error The action is only shown, never clicked.
+						onClick: null,
+					},
+				] }
+			>
 				Message
 			</Warning>
 		);

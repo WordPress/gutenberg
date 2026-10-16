@@ -8,7 +8,7 @@ import {
 import Edit from '../edit';
 import { BlockContextProvider } from '../../block-context';
 
-const noop = () => {};
+const noop = () => null;
 
 describe( 'Edit', () => {
 	afterEach( () => {
@@ -27,6 +27,7 @@ describe( 'Edit', () => {
 		const edit = () => <div data-testid="foo-bar" />;
 
 		registerBlockType( 'core/test-block', {
+			attributes: {},
 			apiVersion: 3,
 			save: noop,
 			category: 'text',
@@ -43,6 +44,7 @@ describe( 'Edit', () => {
 		const save = () => <div data-testid="foo-bar" />;
 
 		registerBlockType( 'core/test-block', {
+			attributes: {},
 			apiVersion: 3,
 			save,
 			category: 'text',
@@ -55,7 +57,7 @@ describe( 'Edit', () => {
 	} );
 
 	it( 'should combine the default class name with a custom one', () => {
-		const edit = ( { className } ) => (
+		const edit = ( { className }: { className?: string } ) => (
 			<div data-testid="foo-bar" className={ className } />
 		);
 		const attributes = {
@@ -63,6 +65,7 @@ describe( 'Edit', () => {
 		};
 
 		registerBlockType( 'core/test-block', {
+			attributes: {},
 			edit,
 			save: noop,
 			category: 'text',
@@ -84,8 +87,11 @@ describe( 'Edit', () => {
 	} );
 
 	it( 'should assign context', () => {
-		const edit = ( { context } ) => context.value;
+		// The test context holds a string.
+		const edit = ( { context }: { context: Record< string, unknown > } ) =>
+			context.value as string;
 		registerBlockType( 'core/test-block', {
+			attributes: {},
 			apiVersion: 3,
 			category: 'text',
 			title: 'block title',
@@ -105,8 +111,14 @@ describe( 'Edit', () => {
 
 	describe( 'light wrapper', () => {
 		it( 'should assign context', () => {
-			const edit = ( { context } ) => context.value;
+			// The test context holds a string.
+			const edit = ( {
+				context,
+			}: {
+				context: Record< string, unknown >;
+			} ) => context.value as string;
 			registerBlockType( 'core/test-block', {
+				attributes: {},
 				apiVersion: 3,
 				category: 'text',
 				title: 'block title',

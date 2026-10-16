@@ -2,8 +2,14 @@ import clsx from 'clsx';
 import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
+import type { WarningProps } from './types';
 
-function Warning( { className, actions, children, secondaryActions } ) {
+function Warning( {
+	className,
+	actions,
+	children,
+	secondaryActions,
+}: WarningProps ) {
 	return (
 		<div style={ { display: 'contents', all: 'initial' } }>
 			<div className={ clsx( className, 'block-editor-warning' ) }>
@@ -12,10 +18,12 @@ function Warning( { className, actions, children, secondaryActions } ) {
 						{ children }
 					</p>
 
-					{ ( actions?.length > 0 || secondaryActions ) && (
+					{ /* An absent length compares as `false`. */ }
+					{ ( ( actions?.length as number ) > 0 ||
+						secondaryActions ) && (
 						<div className="block-editor-warning__actions">
-							{ actions?.length > 0 &&
-								actions.map( ( action, i ) => (
+							{ ( actions?.length as number ) > 0 &&
+								actions!.map( ( action, i ) => (
 									<span
 										key={ i }
 										className="block-editor-warning__action"

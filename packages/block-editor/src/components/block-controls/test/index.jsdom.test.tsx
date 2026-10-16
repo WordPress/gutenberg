@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import type { ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import {
 	registerBlockType,
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { SlotFillProvider, ToolbarGroup } from '@wordpress/components';
 import { alignCenter, alignLeft, alignRight } from '@wordpress/icons';
 import BlockControls from '../';
@@ -30,11 +32,14 @@ describe( 'BlockControls', () => {
 	];
 
 	beforeEach( () => {
-		const edit = ( { children } ) => <>{ children }</>;
+		const edit = ( {
+			children,
+		}: BlockEditProps & { children?: ReactNode } ) => <>{ children }</>;
 
 		registerBlockType( 'core/test-block', {
+			attributes: {},
 			apiVersion: 3,
-			save: () => {},
+			save: () => null,
 			category: 'text',
 			title: 'block title',
 			edit,

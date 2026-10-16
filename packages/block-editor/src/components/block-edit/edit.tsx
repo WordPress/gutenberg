@@ -8,6 +8,8 @@ import {
 import { withFilters } from '@wordpress/components';
 import { useRegistry, useSelect } from '@wordpress/data';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
+import type { ComponentType } from 'react';
+import type { BlockBindingsSource } from '@wordpress/blocks';
 import BlockContext from '../block-context';
 import isURLLike from '../link-control/is-url-like';
 import {
@@ -17,8 +19,9 @@ import {
 } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
 import { PrivateBlockContext } from '../block-list/private-block-context';
+import type { BlockEditPublicProps } from './types';
 
-const Edit = ( props ) => {
+const Edit = ( props: BlockEditPublicProps ) => {
 	const { name } = props;
 	const blockType = getBlockType( name );
 
@@ -29,19 +32,26 @@ const Edit = ( props ) => {
 	// `edit` and `save` are functions or components describing the markup
 	// with which a block is displayed. If `blockType` is valid, assign
 	// them preferentially as the render value for the block.
-	const Component = blockType.edit || blockType.save;
+	// Both receive the props passed through the `editor.BlockEdit` filters.
+	const Component = ( blockType.edit ||
+		blockType.save ) as ComponentType< BlockEditPublicProps >;
 
 	return <Component { ...props } />;
 };
 
-const EditWithFilters = withFilters( 'editor.BlockEdit' )( Edit );
+const EditWithFilters = withFilters( 'editor.BlockEdit' )(
+	Edit
+) as unknown as ComponentType< BlockEditPublicProps >; // `withFilters` erases the props of the filtered component.
 
-const EditWithGeneratedProps = ( props ) => {
+const EditWithGeneratedProps = ( props: BlockEditPublicProps ) => {
 	const { name, clientId, attributes, setAttributes } = props;
 	const registry = useRegistry();
 	const blockType = getBlockType( name );
 	const blockContext = useContext( BlockContext );
-	const registeredSources = useSelect(
+	const registeredSources: Record<
+		string,
+		Omit< BlockBindingsSource, 'name' >
+	> = useSelect(
 		( select ) =>
 			unlock( select( blocksStore ) ).getAllBlockBindingsSources(),
 		[]
@@ -52,7 +62,8 @@ const EditWithGeneratedProps = ( props ) => {
 		return {
 			blockBindings: replacePatternOverridesDefaultBinding(
 				attributes?.metadata?.bindings,
-				bindableAttributes
+				// Blocks with pattern overrides have bindable attributes.
+				bindableAttributes as string[]
 			),
 			// Assign context values using the block type's declared context
 			// needs, plus the context requested by the block's bindings
@@ -62,7 +73,9 @@ const EditWithGeneratedProps = ( props ) => {
 				blockType?.usesContext,
 				attributes?.metadata?.bindings
 					? Object.values( attributes.metadata.bindings ).map(
-							( binding ) => registeredSources[ binding?.source ]
+							// An absent source looks up nothing.
+							( binding ) =>
+								registeredSources[ binding?.source as string ]
 						)
 					: undefined
 			),
@@ -84,14 +97,18 @@ const EditWithGeneratedProps = ( props ) => {
 				return attributes;
 			}
 
-			const attributesFromSources = {};
-			const blockBindingsBySource = new Map();
+			const attributesFromSources: Record< string, unknown > = {};
+			const blockBindingsBySource = new Map<
+				Omit< BlockBindingsSource, 'name' >,
+				Record< string, { args?: Record< string, unknown > } >
+			>();
 
 			for ( const [ attributeName, binding ] of Object.entries(
 				blockBindings
 			) ) {
 				const { source: sourceName, args: sourceArgs } = binding;
-				const source = registeredSources[ sourceName ];
+				// An absent source looks up nothing.
+				const source = registeredSources[ sourceName as string ];
 				if (
 					! source ||
 					! bindableAttributes?.includes( attributeName )
@@ -110,7 +127,7 @@ const EditWithGeneratedProps = ( props ) => {
 			if ( blockBindingsBySource.size ) {
 				for ( const [ source, bindings ] of blockBindingsBySource ) {
 					// Get values in batch if the source supports it.
-					let values = {};
+					let values: Record< string, unknown > = {};
 					if ( ! source.getValues ) {
 						Object.keys( bindings ).forEach( ( attr ) => {
 							// Default to the source label when `getValues` doesn't exist.
@@ -129,7 +146,8 @@ const EditWithGeneratedProps = ( props ) => {
 					) ) {
 						if (
 							attributeName === 'url' &&
-							( ! value || ! isURLLike( value ) )
+							// Sources return URLs as strings.
+							( ! value || ! isURLLike( value as string ) )
 						) {
 							// Return null if value is not a valid URL.
 							attributesFromSources[ attributeName ] = null;
@@ -156,15 +174,22 @@ const EditWithGeneratedProps = ( props ) => {
 	);
 
 	const setBoundAttributes = useCallback(
-		( nextAttributes ) => {
+		( nextAttributes: Record< string, unknown > ) => {
 			if ( ! blockBindings ) {
-				setAttributes( nextAttributes );
+				// Edited blocks always receive `setAttributes`.
+				setAttributes!( nextAttributes );
 				return;
 			}
 
 			registry.batch( () => {
 				const keptAttributes = { ...nextAttributes };
-				const blockBindingsBySource = new Map();
+				const blockBindingsBySource = new Map<
+					Omit< BlockBindingsSource, 'name' >,
+					Record<
+						string,
+						{ args?: Record< string, unknown >; newValue: unknown }
+					>
+				>();
 
 				// Loop only over the updated attributes to avoid modifying the bound ones that haven't changed.
 				for ( const [ attributeName, newValue ] of Object.entries(
@@ -178,7 +203,9 @@ const EditWithGeneratedProps = ( props ) => {
 					}
 
 					const binding = blockBindings[ attributeName ];
-					const source = registeredSources[ binding?.source ];
+					// An absent source looks up nothing.
+					const source =
+						registeredSources[ binding?.source as string ];
 					if ( ! source?.setValues ) {
 						continue;
 					}
@@ -197,7 +224,8 @@ const EditWithGeneratedProps = ( props ) => {
 						source,
 						bindings,
 					] of blockBindingsBySource ) {
-						source.setValues( {
+						// Only sources with `setValues` are collected above.
+						source.setValues!( {
 							select: registry.select,
 							dispatch: registry.dispatch,
 							context,
@@ -219,7 +247,7 @@ const EditWithGeneratedProps = ( props ) => {
 					if ( hasPatternOverrides ) {
 						delete keptAttributes.href;
 					}
-					setAttributes( keptAttributes );
+					setAttributes!( keptAttributes );
 				}
 			} );
 		},
@@ -239,7 +267,8 @@ const EditWithGeneratedProps = ( props ) => {
 		return null;
 	}
 
-	if ( blockType.apiVersion > 1 ) {
+	// An absent version compares as `false`.
+	if ( ( blockType.apiVersion as number ) > 1 ) {
 		return (
 			<EditWithFilters
 				{ ...props }
@@ -256,7 +285,8 @@ const EditWithGeneratedProps = ( props ) => {
 		: null;
 	const className = clsx(
 		generatedClassName,
-		attributes?.className,
+		// The class name attribute is a string.
+		attributes?.className as string | undefined,
 		props.className
 	);
 
