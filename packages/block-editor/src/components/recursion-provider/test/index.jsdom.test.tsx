@@ -8,7 +8,11 @@ import {
 
 // Mimics a block's Edit component, such as ReusableBlockEdit, which is capable
 // of calling itself depending on its `uniqueId` attribute.
-function Edit( { attributes: { uniqueId } } ) {
+function Edit( {
+	attributes: { uniqueId },
+}: {
+	attributes: { uniqueId: string };
+} ) {
 	const { name } = useBlockEditContext();
 	const hasRecursion = useHasRecursion( uniqueId );
 
