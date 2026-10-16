@@ -7,7 +7,7 @@ import { store as blockEditorStore } from '../../store';
  * In preview mode, handles Tab and arrow key navigation to move only between
  * block elements, skipping all other focusable content.
  *
- * @return {Function} Ref callback.
+ * @return Ref callback.
  */
 export function usePreviewModeNav() {
 	const isPreviewMode = useSelect(
@@ -15,13 +15,13 @@ export function usePreviewModeNav() {
 		[]
 	);
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( ! isPreviewMode ) {
 				return;
 			}
 
-			function onKeyDown( event ) {
+			function onKeyDown( event: KeyboardEvent ) {
 				const { keyCode, shiftKey, target } = event;
 
 				const isTab = keyCode === TAB;
@@ -38,16 +38,19 @@ export function usePreviewModeNav() {
 				const isReverse = isTab ? shiftKey : isUp || isLeft;
 
 				const blocks = Array.from(
-					node.querySelectorAll( '[data-block]' )
+					node.querySelectorAll< HTMLElement >( '[data-block]' )
 				);
 
 				if ( ! blocks.length ) {
 					return;
 				}
 
-				const currentBlock = target.closest( '[data-block]' );
+				// Key events reach the listener from elements.
+				const currentBlock = ( target as Element ).closest(
+					'[data-block]'
+				);
 				const currentIndex = currentBlock
-					? blocks.indexOf( currentBlock )
+					? blocks.indexOf( currentBlock as HTMLElement )
 					: -1;
 
 				// If focus is not on a block, don't intercept navigation.

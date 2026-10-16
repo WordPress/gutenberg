@@ -16,22 +16,23 @@ export default function useDragSelection() {
 		isDraggingBlocks,
 		isMultiSelecting,
 	} = useSelect( blockEditorStore );
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			const { ownerDocument } = node;
+			// A mounted element's document has a window.
 			const { defaultView } = ownerDocument;
 
-			let anchorElement;
-			let rafId;
+			let anchorElement: HTMLElement;
+			let rafId: number;
 
 			function onMouseUp() {
 				stopMultiSelect();
 				// Equivalent to attaching the listener once.
-				defaultView.removeEventListener( 'mouseup', onMouseUp );
+				defaultView!.removeEventListener( 'mouseup', onMouseUp );
 				// The browser selection won't have updated yet at this point,
 				// so wait until the next animation frame to get the browser
 				// selection.
-				rafId = defaultView.requestAnimationFrame( () => {
+				rafId = defaultView!.requestAnimationFrame( () => {
 					if ( ! hasSelectedBlock() ) {
 						return;
 					}
@@ -43,7 +44,8 @@ export default function useDragSelection() {
 					// now be disabled again.
 					setContentEditableWrapper( node, false );
 
-					const selection = defaultView.getSelection();
+					// A mounted element's window has a selection.
+					const selection = defaultView!.getSelection()!;
 
 					if ( selection.rangeCount ) {
 						const range = selection.getRangeAt( 0 );
@@ -61,20 +63,33 @@ export default function useDragSelection() {
 				} );
 			}
 
-			let lastMouseDownTarget;
+			let lastMouseDownTarget: EventTarget | null;
 
-			function onMouseDown( { target } ) {
+			function onMouseDown( { target }: MouseEvent ) {
 				lastMouseDownTarget = target;
 			}
 
-			function onMouseLeave( { buttons, target, relatedTarget } ) {
-				if ( ! target.contains( lastMouseDownTarget ) ) {
+			function onMouseLeave( {
+				buttons,
+				target,
+				relatedTarget,
+			}: MouseEvent ) {
+				// Mouse events reach the listener from elements.
+				if (
+					! ( target as HTMLElement ).contains(
+						lastMouseDownTarget as Node | null
+					)
+				) {
 					return;
 				}
 
 				// If we're moving into a child element, ignore. We're tracking
 				// the mouse leaving the element to a parent, no a child.
-				if ( target.contains( relatedTarget ) ) {
+				if (
+					( target as HTMLElement ).contains(
+						relatedTarget as Node | null
+					)
+				) {
 					return;
 				}
 
@@ -107,7 +122,9 @@ export default function useDragSelection() {
 				// In preview mode, allow drag selection from blocks since they
 				// are not contenteditable.
 				if (
-					target.getAttribute( 'contenteditable' ) !== 'true' &&
+					( target as HTMLElement ).getAttribute(
+						'contenteditable'
+					) !== 'true' &&
 					! getSettings().isPreviewMode
 				) {
 					return;
@@ -120,14 +137,14 @@ export default function useDragSelection() {
 				// Do not rely on the active element because it may change after
 				// the mouse leaves for the first time. See
 				// https://github.com/WordPress/gutenberg/issues/48747.
-				anchorElement = target;
+				anchorElement = target as HTMLElement;
 
 				startMultiSelect();
 
 				// `onSelectionStart` is called after `mousedown` and
 				// `mouseleave` (from a block). The selection ends when
 				// `mouseup` happens anywhere in the window.
-				defaultView.addEventListener( 'mouseup', onMouseUp );
+				defaultView!.addEventListener( 'mouseup', onMouseUp );
 
 				// Allow cross contentEditable selection by temporarily making
 				// all content editable. We can't rely on using the store and
@@ -141,8 +158,8 @@ export default function useDragSelection() {
 
 			return () => {
 				node.removeEventListener( 'mouseout', onMouseLeave );
-				defaultView.removeEventListener( 'mouseup', onMouseUp );
-				defaultView.cancelAnimationFrame( rafId );
+				defaultView!.removeEventListener( 'mouseup', onMouseUp );
+				defaultView!.cancelAnimationFrame( rafId );
 			};
 		},
 		[

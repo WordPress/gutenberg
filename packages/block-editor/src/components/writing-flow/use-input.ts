@@ -8,9 +8,12 @@ import {
 	getBlockTransforms,
 	findTransform,
 } from '@wordpress/blocks';
+import type { BlockEnterTransform } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { setContentEditableWrapper } from './utils';
 import { getBlockClientId, getSelectionEditableElement } from '../../utils/dom';
+import type { InitialPosition } from '../../store/types';
+import type { WritingFlowKeyEvent } from './types';
 
 /**
  * Handles input for selections across blocks.
@@ -45,8 +48,8 @@ export default function useInput() {
 		selectBlock,
 	} = useDispatch( blockEditorStore );
 
-	return useRefEffect( ( node ) => {
-		function onBeforeInput( event ) {
+	return useRefEffect< HTMLElement >( ( node ) => {
+		function onBeforeInput( event: InputEvent ) {
 			// Enter in an editable is handled here instead of on keydown:
 			// moving focus while the keydown is still being handled leaves
 			// the iOS keyboard's auto-capitalization stale.
@@ -55,7 +58,8 @@ export default function useInput() {
 				! event.defaultPrevented &&
 				! hasMultiSelection()
 			) {
-				onKeyDown( event );
+				// Enter is handled like its key down.
+				onKeyDown( event as unknown as WritingFlowKeyEvent );
 				if ( event.defaultPrevented ) {
 					return;
 				}
@@ -77,14 +81,15 @@ export default function useInput() {
 				return;
 			}
 
-			const selection = node.ownerDocument.defaultView.getSelection();
+			// A mounted element's window has a selection.
+			const selection = node.ownerDocument.defaultView!.getSelection()!;
 
 			if ( ! getSelectionEditableElement( selection, node ) ) {
 				event.preventDefault();
 			}
 		}
 
-		function onKeyDown( event ) {
+		function onKeyDown( event: WritingFlowKeyEvent ) {
 			if ( event.defaultPrevented ) {
 				return;
 			}
@@ -98,8 +103,11 @@ export default function useInput() {
 						event.shiftKey ||
 						// Editables are handled on beforeinput.
 						( event.type === 'keydown' &&
-							event.target.ownerDocument.activeElement
-								.isContentEditable )
+							// Key events reach the listener from elements.
+							(
+								( event.target as Element ).ownerDocument
+									.activeElement as HTMLElement
+							 ).isContentEditable )
 					) {
 						return;
 					}
@@ -117,26 +125,29 @@ export default function useInput() {
 						selectionStart.attributeKey ===
 						selectionEnd.attributeKey
 					) {
-						const selectedAttributeValue =
-							getBlockAttributes( clientId )[
-								selectionStart.attributeKey
-							];
+						// The selection is within an attribute of the selected block.
+						const selectedAttributeValue = getBlockAttributes(
+							clientId
+						)![ selectionStart.attributeKey! ] as string;
 						const transforms = getBlockTransforms( 'from' ).filter(
 							( { type } ) => type === 'enter'
 						);
 						const transformation = findTransform(
 							transforms,
 							( item ) => {
-								return item.regExp.test(
-									selectedAttributeValue
-								);
+								// The filter above keeps enter transforms.
+								return (
+									item as BlockEnterTransform
+								 ).regExp.test( selectedAttributeValue );
 							}
 						);
 
 						if ( transformation ) {
 							replaceBlocks(
 								clientId,
-								transformation.transform( {
+								// Enter transforms transform.
+								( transformation as BlockEnterTransform )
+									.transform!( {
 									content: selectedAttributeValue,
 								} )
 							);
@@ -146,7 +157,8 @@ export default function useInput() {
 					}
 
 					const rootClientId = getBlockRootClientId( clientId );
-					const { activeElement } = event.target.ownerDocument;
+					const activeElement = ( event.target as Element )
+						.ownerDocument.activeElement as HTMLElement;
 
 					// Ensure template is not locked.
 					if (
@@ -156,7 +168,8 @@ export default function useInput() {
 							rootClientId
 						) ||
 							canInsertBlockType( blockName, rootClientId ) ) &&
-						( hasBlockSupport( blockName, 'splitting', false ) ||
+						// The selected block has a name.
+						( hasBlockSupport( blockName!, 'splitting', false ) ||
 							event.__deprecatedOnSplit )
 					) {
 						event.preventDefault();
@@ -202,8 +215,9 @@ export default function useInput() {
 								if ( canInsertBlockType( name, clientId ) ) {
 									event.preventDefault();
 									insertBlock(
+										// Blocks are registered, so there is a default block.
 										createBlock(
-											name,
+											name!,
 											defaultBlock?.attributes
 										),
 										0,
@@ -213,8 +227,8 @@ export default function useInput() {
 								}
 							}
 
-							function getNextClientId( id ) {
-								let nextClientId = null;
+							function getNextClientId( id: string | null ) {
+								let nextClientId: string | null = null;
 
 								while (
 									typeof id === 'string' &&
@@ -227,7 +241,7 @@ export default function useInput() {
 								return nextClientId;
 							}
 
-							let nextClientId =
+							let nextClientId: string | null =
 								getBlockOrder( clientId )[ 0 ] ??
 								getNextClientId( clientId );
 
@@ -245,7 +259,10 @@ export default function useInput() {
 								// internal sentinel: it focuses the block
 								// wrapper instead of a text field within
 								// it. See useFocusFirstElement.
-								selectBlock( nextClientId, true );
+								selectBlock(
+									nextClientId,
+									true as unknown as InitialPosition
+								);
 							}
 						}
 					}
@@ -259,7 +276,8 @@ export default function useInput() {
 				if ( __unstableIsFullySelected() ) {
 					replaceBlocks(
 						getSelectedBlockClientIds(),
-						createBlock( getDefaultBlockName() )
+						// Blocks are registered, so there is a default block.
+						createBlock( getDefaultBlockName()! )
 					);
 				} else {
 					__unstableSplitSelection();
@@ -291,14 +309,14 @@ export default function useInput() {
 					// Safari does not stop default behaviour with either
 					// event.preventDefault() or node.contentEditable = false, so
 					// remove the selection to stop browser manipulation.
-					node.ownerDocument.defaultView
-						.getSelection()
+					node.ownerDocument
+						.defaultView!.getSelection()!
 						.removeAllRanges();
 				}
 			}
 		}
 
-		function onCompositionStart( event ) {
+		function onCompositionStart( event: CompositionEvent ) {
 			if ( ! hasMultiSelection() ) {
 				return;
 			}
@@ -312,7 +330,9 @@ export default function useInput() {
 				// Safari does not stop default behaviour with either
 				// event.preventDefault() or node.contentEditable = false, so
 				// remove the selection to stop browser manipulation.
-				node.ownerDocument.defaultView.getSelection().removeAllRanges();
+				node.ownerDocument
+					.defaultView!.getSelection()!
+					.removeAllRanges();
 			}
 		}
 

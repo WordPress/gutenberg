@@ -15,22 +15,25 @@ export default function useSelectAll() {
 	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
 	const isMatch = useShortcutEventMatch();
 
-	return useRefEffect( ( node ) => {
-		function onKeyDown( event ) {
+	return useRefEffect< HTMLElement >( ( node ) => {
+		function onKeyDown( event: KeyboardEvent ) {
 			if ( ! isMatch( 'core/block-editor/select-all', event ) ) {
 				return;
 			}
 
 			const selectedClientIds = getSelectedBlockClientIds();
 			const { ownerDocument } = node;
-			const selection = ownerDocument.defaultView.getSelection();
+			// A mounted element's window has a selection.
+			const selection = ownerDocument.defaultView!.getSelection()!;
 			// When the wrapper is contentEditable and holds focus (the
 			// selected block supports `editableRoot`), the event targets the
 			// wrapper; resolve the editable element containing the selection.
 			const editable =
 				( event.target === node &&
-					getSelectionEditableElement( selection, node ) ) ||
-				event.target;
+					( getSelectionEditableElement( selection, node ) as
+						HTMLElement | undefined ) ) ||
+				// Key events reach the listener from elements.
+				( event.target as HTMLElement );
 
 			if (
 				selectedClientIds.length < 2 &&
@@ -69,10 +72,11 @@ export default function useSelectAll() {
 				activeClientId &&
 				activeClientId !== firstSelectedClientId &&
 				! isInsideRootBlock(
+					// The selected block and the focused element are rendered.
 					ownerDocument.getElementById(
 						'block-' + firstSelectedClientId
-					),
-					ownerDocument.activeElement
+					)!,
+					ownerDocument.activeElement!
 				)
 			) {
 				selectBlock( activeClientId );
@@ -86,8 +90,8 @@ export default function useSelectAll() {
 			// level. See: https://github.com/WordPress/gutenberg/pull/31859/
 			if ( selectedClientIds.length === blockClientIds.length ) {
 				if ( rootClientId ) {
-					node.ownerDocument.defaultView
-						.getSelection()
+					node.ownerDocument
+						.defaultView!.getSelection()!
 						.removeAllRanges();
 					selectBlock( rootClientId );
 				}

@@ -4,6 +4,13 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect, useMergeRefs, useInstanceId } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
+import type {
+	CSSProperties,
+	KeyboardEvent as ReactKeyboardEvent,
+	ReactElement,
+	RefCallback,
+	RefObject,
+} from 'react';
 import { store as blockEditorStore } from '../../store';
 import { isInSameBlock, isInsideRootBlock } from '../../utils/dom';
 import { unlock } from '../../lock-unlock';
@@ -14,7 +21,7 @@ import { unlock } from '../../lock-unlock';
  * achieve that too, but makes Safari composite the scrollable canvas on a
  * layer sized to the whole document instead of the visible pane.
  */
-const PREVENT_SCROLL_ON_FOCUS = {
+const PREVENT_SCROLL_ON_FOCUS: CSSProperties = {
 	position: 'absolute',
 	inset: 0,
 	pointerEvents: 'none',
@@ -24,10 +31,14 @@ const PREVENT_SCROLL_ON_FOCUS = {
 // Keys that move focus from the canvas stop into the canvas.
 const ENTRY_KEYS = [ 'Enter', ' ', 'F2', 'Escape' ];
 
-export default function useTabNav() {
-	const containerRef = /** @type {typeof useRef<HTMLElement>} */ ( useRef )();
-	const focusCaptureBeforeRef = useRef();
-	const focusCaptureAfterRef = useRef();
+export default function useTabNav(): [
+	ReactElement,
+	RefCallback< HTMLElement >,
+	ReactElement,
+] {
+	const containerRef = useRef< HTMLElement >( undefined );
+	const focusCaptureBeforeRef = useRef< HTMLDivElement >( undefined );
+	const focusCaptureAfterRef = useRef< HTMLDivElement >( undefined );
 	const hintId = useInstanceId(
 		useTabNav,
 		'block-editor-writing-flow__canvas-stop-hint'
@@ -47,7 +58,7 @@ export default function useTabNav() {
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
-	const noCaptureRef = useRef();
+	const noCaptureRef = useRef< boolean | null >( undefined );
 
 	// The canvas is a single stop in the page's tab order, and going in is
 	// an explicit action on it. Focus returns to the place it last left the
@@ -56,20 +67,22 @@ export default function useTabNav() {
 		// Focus the canvas window first. The stop is in the parent document,
 		// and when Firefox focuses an element in another document, it does
 		// not move window focus, so the caret would be restored but key
-		// presses would keep going to the parent page.
-		containerRef.current.ownerDocument.defaultView.focus();
+		// presses would keep going to the parent page. The canvas is mounted
+		// while its stops take focus.
+		containerRef.current!.ownerDocument.defaultView!.focus();
 
 		if ( hasMultiSelection() ) {
-			containerRef.current.focus();
+			containerRef.current!.focus();
 		} else if ( getSelectedBlockClientId() ) {
 			if ( getLastFocus()?.current ) {
 				getLastFocus().current.focus();
 			} else {
 				// Handles when the last focus has not been set yet, or has been cleared by new blocks being added via the inserter.
-				containerRef.current
-					.querySelector(
+				// The selected block is rendered.
+				containerRef
+					.current!.querySelector< HTMLElement >(
 						`[data-block="${ getSelectedBlockClientId() }"]`
-					)
+					)!
 					.focus();
 			}
 		}
@@ -80,33 +93,37 @@ export default function useTabNav() {
 
 			// If we have section within the section root, focus the first one.
 			if ( sectionBlocks.length ) {
-				containerRef.current
-					.querySelector( `[data-block="${ sectionBlocks[ 0 ] }"]` )
+				containerRef
+					.current!.querySelector< HTMLElement >(
+						`[data-block="${ sectionBlocks[ 0 ] }"]`
+					)!
 					.focus();
 			}
 			// If we don't have any section blocks, focus the section root.
 			else if ( sectionRootClientId ) {
-				containerRef.current
-					.querySelector( `[data-block="${ sectionRootClientId }"]` )
+				containerRef
+					.current!.querySelector< HTMLElement >(
+						`[data-block="${ sectionRootClientId }"]`
+					)!
 					.focus();
 			} else {
 				// If we don't have any section root, focus the canvas.
-				containerRef.current.focus();
+				containerRef.current!.focus();
 			}
 		} else {
-			const tabbables = focus.tabbable.find( containerRef.current );
+			const tabbables = focus.tabbable.find( containerRef.current! );
 			if ( tabbables.length ) {
 				tabbables[ 0 ].focus();
 			} else {
 				// Nothing in the canvas is tabbable. Entering still enters:
 				// keys go to the canvas, and a block can be selected with
 				// the arrow keys or a click.
-				containerRef.current.focus();
+				containerRef.current!.focus();
 			}
 		}
 	}
 
-	function onStopKeyDown( event ) {
+	function onStopKeyDown( event: ReactKeyboardEvent< HTMLDivElement > ) {
 		if (
 			event.defaultPrevented ||
 			event.ctrlKey ||
@@ -129,7 +146,8 @@ export default function useTabNav() {
 		// so move focus to the first tabbable element past the canvas.
 		if ( key === 'Tab' && ! event.shiftKey ) {
 			event.preventDefault();
-			focus.tabbable.findNext( focusCaptureAfterRef.current )?.focus();
+			// Both stops render together.
+			focus.tabbable.findNext( focusCaptureAfterRef.current! )?.focus();
 		}
 	}
 
@@ -147,8 +165,9 @@ export default function useTabNav() {
 
 	const before = (
 		<div
-			ref={ focusCaptureBeforeRef }
-			tabIndex="0"
+			ref={ focusCaptureBeforeRef as RefObject< HTMLDivElement | null > }
+			// The attribute takes the string as given.
+			tabIndex={ '0' as unknown as number }
 			role="button"
 			aria-label={ __( 'Editor canvas' ) }
 			aria-describedby={ hintId }
@@ -188,15 +207,16 @@ export default function useTabNav() {
 
 	const after = (
 		<div
-			ref={ focusCaptureAfterRef }
-			tabIndex="0"
+			ref={ focusCaptureAfterRef as RefObject< HTMLDivElement | null > }
+			// The attribute takes the string as given.
+			tabIndex={ '0' as unknown as number }
 			onFocus={ onFocusCapture }
 			style={ PREVENT_SCROLL_ON_FOCUS }
 		/>
 	);
 
-	const ref = useRefEffect( ( node ) => {
-		function onKeyDown( event ) {
+	const ref = useRefEffect< HTMLElement >( ( node ) => {
+		function onKeyDown( event: KeyboardEvent ) {
 			if ( event.defaultPrevented ) {
 				return;
 			}
@@ -250,14 +270,19 @@ export default function useTabNav() {
 
 			const { target, shiftKey: isShift } = event;
 			const direction = isShift ? 'findPrevious' : 'findNext';
-			const nextTabbable = focus.tabbable[ direction ]( target );
+			// Key events reach the listener from elements.
+			const nextTabbable = focus.tabbable[ direction ](
+				target as Element
+			);
 
 			// We want to constrain the tabbing to the block and its child blocks.
 			// If the preceding form element is within a different block,
 			// such as two sibling image blocks in the placeholder state,
 			// we want shift + tab from the first form element to move to the image
 			// block toolbar and not the previous image block's form element.
-			const currentBlock = target.closest( '[data-block]' );
+			const currentBlock = ( target as Element ).closest(
+				'[data-block]'
+			);
 			const isElementPartOfSelectedBlock =
 				currentBlock &&
 				nextTabbable &&
@@ -284,16 +309,18 @@ export default function useTabNav() {
 			// element).
 			noCaptureRef.current = true;
 
-			next.current.focus();
+			// The checks above make sure both stops are rendered.
+			next.current!.focus();
 		}
 
-		function onFocusOut( event ) {
+		function onFocusOut( event: FocusEvent ) {
 			// `focusout` also fires when focus moves between elements within the
 			// canvas, but only the element focus left the canvas from is of
 			// interest. `contains` is false for a null `relatedTarget`, which is
 			// what focus moving to another document reports.
-			if ( ! node.contains( event.relatedTarget ) ) {
-				setLastFocus( { current: event.target } );
+			// Focus events reach the listener from elements.
+			if ( ! node.contains( event.relatedTarget as Node | null ) ) {
+				setLastFocus( { current: event.target as HTMLElement } );
 			}
 
 			const { ownerDocument } = node;
@@ -302,7 +329,7 @@ export default function useTabNav() {
 			// the writing flow wrapper.
 			if (
 				! event.relatedTarget &&
-				event.target.hasAttribute( 'data-block' ) &&
+				( event.target as Element ).hasAttribute( 'data-block' ) &&
 				ownerDocument.activeElement === ownerDocument.body &&
 				getBlockCount() === 0
 			) {

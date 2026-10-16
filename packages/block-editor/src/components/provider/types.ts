@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { ObservableMap } from '@wordpress/compose';
 import type { Block } from '@wordpress/blocks';
 import type { DataRegistry } from '@wordpress/data';
+import type { BlockEventHandlers } from '../writing-flow/types';
 import type {
 	BlockSelection,
 	InitialPosition,
@@ -23,7 +24,7 @@ declare global {
  */
 export interface BlockRefsContextValue {
 	refsMap: ObservableMap< string, Element | null >;
-	eventHandlers: Map< string, unknown >;
+	eventHandlers: Map< string, { current?: BlockEventHandlers } >;
 }
 
 /**

@@ -18,8 +18,8 @@ import { store as blockEditorStore } from '../../store';
  */
 export default function useHomeEnd() {
 	const { hasMultiSelection } = useSelect( blockEditorStore );
-	return useRefEffect( ( node ) => {
-		function onKeyDown( event ) {
+	return useRefEffect< HTMLElement >( ( node ) => {
+		function onKeyDown( event: KeyboardEvent ) {
 			if ( event.defaultPrevented ) {
 				return;
 			}
@@ -38,11 +38,16 @@ export default function useHomeEnd() {
 			// editing host and for a nested editable element like a tab label.
 			// Anything else that takes focus like inputs and textareas keep
 			// default behavior.
-			if ( ! event.target.isContentEditable || hasMultiSelection() ) {
+			if (
+				// Key events reach the listener from elements.
+				! ( event.target as HTMLElement ).isContentEditable ||
+				hasMultiSelection()
+			) {
 				return;
 			}
 
-			const selection = node.ownerDocument.defaultView.getSelection();
+			// A mounted element's window has a selection.
+			const selection = node.ownerDocument.defaultView!.getSelection()!;
 
 			if ( ! getSelectionEditableElement( selection, node ) ) {
 				return;
