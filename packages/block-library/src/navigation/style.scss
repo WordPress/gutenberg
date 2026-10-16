@@ -11,7 +11,11 @@
 // - .wp-block-navigation__submenu-icon targets the chevron icon indicating submenus.
 
 // Size of burger and close icons.
-$navigation-icon-size: 24px;
+// The icons scale with the navigation's font size so a large menu doesn't get a
+// small hamburger, but they never render below the previous fixed size so the
+// toggle stays a large enough target.
+$navigation-icon-min-size: 24px;
+$navigation-icon-size: max(#{$navigation-icon-min-size}, 1.5em);
 
 .wp-block-navigation {
 	position: relative;
