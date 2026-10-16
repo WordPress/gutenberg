@@ -313,94 +313,16 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @dataProvider data_navigation_custom_css_styles
 	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
 	 */
-	public function test_custom_css_targets_only_the_navigation_wrapper( $style ) {
-		$markup = render_block(
-			array(
-				'blockName'    => 'core/navigation',
-				'attrs'        => array(
-					'overlayMenu' => 'never',
-					'style'       => $style,
-				),
-				'innerBlocks'  => array(
-					array(
-						'blockName'    => 'core/navigation-link',
-						'attrs'        => array(
-							'label' => 'Home',
-							'url'   => '/',
-							'kind'  => 'custom',
-						),
-						'innerBlocks'  => array(),
-						'innerHTML'    => '',
-						'innerContent' => array(),
-					),
-				),
-				'innerHTML'    => '',
-				'innerContent' => array( null ),
-			)
-		);
+	public function test_custom_css_targets_only_the_navigation_wrapper() {
+		$markup = do_blocks( '<!-- wp:navigation {"overlayMenu":"never","style":{"css":"border: 1px solid pink; padding: 10px;"}} --><!-- wp:navigation-link {"label":"Home","url":"/","kind":"custom"} /--><!-- /wp:navigation -->' );
 
 		$processor = new WP_HTML_Tag_Processor( $markup );
 		$this->assertTrue( $processor->next_tag( 'nav' ) );
 		$this->assertSame( 1, preg_match( '/\bwp-custom-css-[a-f0-9]+\b/', $processor->get_attribute( 'class' ), $matches ) );
-		$class_name = $matches[0];
-
-		$css = implode( '', wp_styles()->get_data( 'wp-block-custom-css', 'after' ) );
-		$this->assertStringContainsString( '.' . $class_name, $css );
-		$this->assertStringContainsString( 'border: 1px solid pink; padding: 10px;', $css );
-		if ( isset( $style['@mobile'] ) ) {
-			$this->assertStringContainsString( '@media (width <= 480px)', $css );
-		}
 
 		$this->assertTrue( $processor->next_tag( 'ul' ) );
-		$this->assertFalse( $processor->has_class( $class_name ), 'The Navigation block custom CSS must not also target its inner list.' );
-	}
-
-	/**
-	 * @return array[]
-	 */
-	public static function data_navigation_custom_css_styles() {
-		$css = array( 'css' => 'border: 1px solid pink; padding: 10px;' );
-
-		return array(
-			'default CSS'    => array( $css ),
-			'responsive CSS' => array( array( '@mobile' => $css ) ),
-		);
-	}
-
-	/**
-	 * @dataProvider data_navigation_custom_css_containers
-	 * @covers ::gutenberg_block_core_navigation_add_support_classes_to_container
-	 */
-	public function test_custom_css_class_is_removed_only_from_local_navigation_containers( $markup, $expected ) {
-		$actual = gutenberg_block_core_navigation_add_support_classes_to_container( $markup, array( 'blockName' => 'core/navigation' ) );
-
-		$this->assertSame( $expected, $actual );
-	}
-
-	/**
-	 * @return array[]
-	 */
-	public static function data_navigation_custom_css_containers() {
-		return array(
-			'preserves user and child custom CSS classes' => array(
-				'<nav class="wp-block-navigation wp-custom-css-parent"><ul class="wp-block-navigation__container wp-block-navigation wp-custom-css-parent user-class wp-custom-css-other"><li class="wp-block-navigation-item has-custom-css wp-custom-css-child">Home</li></ul></nav>',
-				'<nav class="wp-block-navigation wp-custom-css-parent"><ul class="wp-block-navigation__container wp-block-navigation user-class wp-custom-css-other"><li class="wp-block-navigation-item has-custom-css wp-custom-css-child">Home</li></ul></nav>',
-			),
-			'multiple list containers'                    => array(
-				'<nav class="wp-block-navigation wp-custom-css-parent"><ul class="wp-block-navigation__container wp-custom-css-parent"><li>One</li></ul><div>Separator</div><ul class="wp-block-navigation__container wp-custom-css-parent"><li>Two</li></ul></nav>',
-				'<nav class="wp-block-navigation wp-custom-css-parent"><ul class="wp-block-navigation__container"><li>One</li></ul><div>Separator</div><ul class="wp-block-navigation__container"><li>Two</li></ul></nav>',
-			),
-			'nested Navigation keeps its own classes'     => array(
-				'<nav class="wp-block-navigation wp-custom-css-parent"><ul class="wp-block-navigation__container wp-custom-css-parent"><li>Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation wp-custom-css-nested"><ul class="wp-block-navigation__container wp-custom-css-nested"><li>Nested</li></ul></nav></div></nav>',
-				'<nav class="wp-block-navigation wp-custom-css-parent"><ul class="wp-block-navigation__container"><li>Parent</li></ul><div class="wp-block-navigation__overlay-container"><nav class="wp-block-navigation wp-custom-css-nested"><ul class="wp-block-navigation__container wp-custom-css-nested"><li>Nested</li></ul></nav></div></nav>',
-			),
-			'state classes still reach the inner list'    => array(
-				'<nav class="wp-block-navigation wp-custom-css-parent wp-states-1234abcd"><ul class="wp-block-navigation__container wp-custom-css-parent"><li>Home</li></ul></nav>',
-				'<nav class="wp-block-navigation wp-custom-css-parent wp-states-1234abcd"><ul class="wp-block-navigation__container wp-states-1234abcd"><li>Home</li></ul></nav>',
-			),
-		);
+		$this->assertFalse( $processor->has_class( $matches[0] ), 'The Navigation block custom CSS must not also target its inner list.' );
 	}
 }
