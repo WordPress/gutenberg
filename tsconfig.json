@@ -64,6 +64,7 @@
 		{ "path": "packages/ui/tsconfig.stories.json" },
 		{ "path": "packages/undo-manager" },
 		{ "path": "packages/upload-media" },
+		{ "path": "packages/url" },
 		{ "path": "packages/video-conversion" },
 		{ "path": "packages/views" },
 		{ "path": "packages/vips" },

@@ -23,7 +23,7 @@
 		{ "path": "../patterns" },
 		{ "path": "../private-apis" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" },
+		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	]
 }

@@ -41,7 +41,7 @@
 		{ "path": "../shortcode/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../upload-media/tsconfig.build.json" },
-		{ "path": "../url" },
+		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]

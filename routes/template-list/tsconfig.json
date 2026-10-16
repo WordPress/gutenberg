@@ -27,7 +27,7 @@
 		{ "path": "../../packages/notices/tsconfig.build.json" },
 		{ "path": "../../packages/route" },
 		{ "path": "../../packages/ui/tsconfig.build.json" },
-		{ "path": "../../packages/url" },
+		{ "path": "../../packages/url/tsconfig.build.json" },
 		{ "path": "../../packages/views/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],

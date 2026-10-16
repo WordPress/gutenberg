@@ -29,6 +29,6 @@
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../theme/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" }
+		{ "path": "../url/tsconfig.build.json" }
 	]
 }
