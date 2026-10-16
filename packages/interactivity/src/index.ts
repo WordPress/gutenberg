@@ -10,7 +10,7 @@ import {
 	hydrateRegions,
 	getRegionRootFragment,
 } from './hydration';
-import { parseDirectiveValue, toVdom } from './vdom';
+import { parseDirectiveName, parseDirectiveValue, toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
 import { getScope } from './scopes';
@@ -60,6 +60,8 @@ export const privateApis = (
 			getRegionRootFragment,
 			initialVdomPromise,
 			toVdom,
+			// Parses directive attribute names for internal consumers.
+			parseDirectiveName,
 			// Shares the directive-value interpretation with internal consumers.
 			parseDirectiveValue,
 			directive,
