@@ -32,6 +32,7 @@ describe( 'NavigableToolbar', () => {
 				createElement(
 					Menu.Root,
 					null,
+					// @ts-expect-error `createElement` types its children as nodes, not the render function `ToolbarItem` takes.
 					createElement( ToolbarItem, null, ( props ) =>
 						createElement( Menu.Trigger, props, 'Actions' )
 					),

@@ -7,12 +7,15 @@ import { useSelect } from '@wordpress/data';
 import transformStyles from '../../utils/transform-styles';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { EditorStyle } from '../../utils/transform-styles/types';
+import type { StyleOverride } from '../../store/types';
+import type { EditorStylesProps, EditorStylesStyle } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
-function useDarkThemeBodyClassName( styles, scope ) {
+function useDarkThemeBodyClassName( styles: string[], scope?: string ) {
 	return useCallback(
-		( node ) => {
+		( node: HTMLStyleElement | null ) => {
 			if ( ! node ) {
 				return;
 			}
@@ -41,7 +44,8 @@ function useDarkThemeBodyClassName( styles, scope ) {
 					?.getComputedStyle( canvas, null )
 					.getPropertyValue( 'background-color' );
 			}
-			const colordBackgroundColor = colord( backgroundColor );
+			// `colord` reads a missing color as an invalid one.
+			const colordBackgroundColor = colord( backgroundColor as string );
 			// If background is transparent, it should be treated as light color.
 			if (
 				colordBackgroundColor.luminance() > 0.5 ||
@@ -56,13 +60,17 @@ function useDarkThemeBodyClassName( styles, scope ) {
 	);
 }
 
-function EditorStyles( { styles, scope, transformOptions } ) {
+function EditorStyles( {
+	styles,
+	scope,
+	transformOptions,
+}: EditorStylesProps ) {
 	const overrides = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getStyleOverrides(),
 		[]
 	);
 	const [ transformedStyles, transformedSvgs ] = useMemo( () => {
-		const _styles = Object.values( styles ?? [] );
+		const _styles: EditorStylesStyle[] = Object.values( styles ?? [] );
 
 		/*
 		 * Custom CSS overrides are applied after all other overrides so they
@@ -72,16 +80,19 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 		 */
 		const orderedOverrides = [
 			...overrides.filter(
-				( [ , override ] ) => override?.__unstableType !== 'custom-css'
+				( [ , override ]: [ string, StyleOverride ] ) =>
+					override?.__unstableType !== 'custom-css'
 			),
 			...overrides.filter(
-				( [ , override ] ) => override?.__unstableType === 'custom-css'
+				( [ , override ]: [ string, StyleOverride ] ) =>
+					override?.__unstableType === 'custom-css'
 			),
 		];
 
 		for ( const [ id, override ] of orderedOverrides ) {
 			const index = _styles.findIndex( ( { id: _id } ) => id === _id );
-			const overrideWithId = { ...override, id };
+			// Overrides carry the fields of a style.
+			const overrideWithId = { ...override, id } as EditorStylesStyle;
 			if ( index === -1 ) {
 				_styles.push( overrideWithId );
 			} else {
@@ -91,7 +102,8 @@ function EditorStyles( { styles, scope, transformOptions } ) {
 
 		return [
 			transformStyles(
-				_styles.filter( ( style ) => style?.css ),
+				// The filter keeps the styles with CSS.
+				_styles.filter( ( style ) => style?.css ) as EditorStyle[],
 				scope,
 				transformOptions
 			),

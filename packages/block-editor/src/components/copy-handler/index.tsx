@@ -1,4 +1,5 @@
 import deprecated from '@wordpress/deprecated';
+import type { HTMLAttributes } from 'react';
 import useClipboardHandler from '../writing-flow/use-clipboard-handler';
 
 /**
@@ -18,7 +19,7 @@ export const __unstableUseClipboardHandler = () => {
  * @deprecated
  * @param {Object} props
  */
-export default function CopyHandler( props ) {
+export default function CopyHandler( props: HTMLAttributes< HTMLDivElement > ) {
 	deprecated( 'CopyHandler', {
 		alternative: 'BlockCanvas or WritingFlow',
 		since: '6.4',

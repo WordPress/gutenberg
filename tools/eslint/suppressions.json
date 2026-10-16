@@ -183,22 +183,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-breadcrumb/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-breadcrumb/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-canvas/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1043,14 +1027,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/copy-handler/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/date-format-picker/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -1105,14 +1081,6 @@
 		}
 	},
 	"packages/block-editor/src/components/editable-text/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/editor-styles/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
@@ -1392,23 +1360,12 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/iframe/get-compatibility-styles.js": {
-		"gutenberg/use-typescript": {
+	"packages/block-editor/src/components/iframe/index.tsx": {
+		"@typescript-eslint/no-restricted-imports": {
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/iframe/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/iframe/use-scale-canvas.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-editor/src/components/iframe/use-scale-canvas.ts": {
 		"react-hooks/immutability": {
 			"count": 4
 		},
@@ -2138,19 +2095,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/navigable-toolbar/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/navigable-toolbar/test/index.browser.test.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

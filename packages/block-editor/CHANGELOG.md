@@ -76,6 +76,7 @@
 -   Convert `InserterListbox`, `BlockPatternsPaging`, `__unstableInserterMenuExtension`, `BlockCard`, `BlockVariationTransforms`, `BlockVariationPicker`, `InspectorPopoverHeader`, `MultiSelectionInspector`, `BlockQuickNavigation` and `TabbedSidebar` to TypeScript ([#84913](https://github.com/WordPress/gutenberg/pull/84913)).
 -   Convert `BlockEditorProvider`, `ExperimentalBlockEditorProvider`, `withRegistryProvider`, `useBlockSync`, `BlockRefsProvider`, the selection context and `useMediaUploadSettings` to TypeScript ([#84915](https://github.com/WordPress/gutenberg/pull/84915)).
 -   Convert `WritingFlow` and its hooks to TypeScript ([#84918](https://github.com/WordPress/gutenberg/pull/84918)).
+-   Convert `Iframe`, `EditorStyles`, `NavigableToolbar`, `CopyHandler` and `BlockBreadcrumb` to TypeScript ([#84922](https://github.com/WordPress/gutenberg/pull/84922)).
 
 ## 18.1.0 (2026-10-07)
 
