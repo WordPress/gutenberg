@@ -5,8 +5,13 @@ import {
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from './utils';
+import type { ImageSettingsPanelProps } from './types';
 
-export function useHasImageSettingsPanel( name, value, inheritedValue ) {
+export function useHasImageSettingsPanel(
+	name: string,
+	value: ImageSettingsPanelProps[ 'value' ],
+	inheritedValue: ImageSettingsPanelProps[ 'inheritedValue' ]
+) {
 	// Note: If lightbox `value` exists, that means it was
 	// defined via the Global Styles UI and will NOT
 	// be a boolean value or contain the `allowEditing` property,
@@ -22,13 +27,13 @@ export default function ImageSettingsPanel( {
 	value,
 	inheritedValue,
 	panelId,
-} ) {
+}: ImageSettingsPanelProps ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetLightbox = () => {
 		onChange( undefined );
 	};
 
-	const onChangeLightbox = ( newSetting ) => {
+	const onChangeLightbox = ( newSetting: boolean ) => {
 		onChange( {
 			enabled: newSetting,
 		} );
