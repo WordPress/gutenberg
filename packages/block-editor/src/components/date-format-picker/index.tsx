@@ -9,6 +9,7 @@ import {
 	Stack,
 	SwitchControl,
 } from '@wordpress/ui';
+import type { DateFormatPickerProps, NonDefaultControlsProps } from './types';
 
 // So that we illustrate the different formats in the dropdown properly, show a date that is
 // somewhat recent, has a day greater than 12, and a month with more than three letters.
@@ -26,16 +27,16 @@ if ( exampleDate.getMonth() === 4 ) {
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/date-format-picker/README.md
  *
- * @param {Object}                        props
- * @param {string|null}                   props.format        The selected date format. If `null`, _Default_ is selected.
- * @param {string}                        props.defaultFormat The date format that will be used if the user selects 'Default'.
- * @param {(format: string|null) => void} props.onChange      Called when a selection is made. If `null`, _Default_ is selected.
+ * @param props
+ * @param props.format        The selected date format. If `null`, _Default_ is selected.
+ * @param props.defaultFormat The date format that will be used if the user selects 'Default'.
+ * @param props.onChange      Called when a selection is made. If `null`, _Default_ is selected.
  */
 export default function DateFormatPicker( {
 	format,
 	defaultFormat,
 	onChange,
-} ) {
+}: DateFormatPickerProps ) {
 	return (
 		<Stack
 			render={ <Fieldset.Root /> }
@@ -64,7 +65,7 @@ export default function DateFormatPicker( {
 	);
 }
 
-function NonDefaultControls( { format, onChange } ) {
+function NonDefaultControls( { format, onChange }: NonDefaultControlsProps ) {
 	// Suggest a short format, medium format, long format, and a standardised
 	// (YYYY-MM-DD) format. The short, medium, and long formats are localised as
 	// different languages have different ways of writing these. For example, 'F
