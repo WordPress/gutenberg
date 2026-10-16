@@ -1,8 +1,10 @@
 import { afterAll, beforeAll, describe, expect, test, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import type { BlockConfiguration } from '@wordpress/blocks';
 import { copy } from '@wordpress/icons';
 import { BlockSwitcher } from '../';
 
@@ -13,6 +15,11 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 vi.mock( import( '../../block-title/use-block-display-title' ), () => ( {
 	default: vi.fn().mockReturnValue( 'Block Name' ),
 } ) );
+
+// The mocked hook returns what each test sets up.
+const mockedUseSelect = useSelect as unknown as Mock<
+	( mapSelect: ( select: unknown ) => unknown ) => unknown
+>;
 
 describe( 'BlockSwitcher', () => {
 	const headingBlock1 = {
@@ -65,8 +72,16 @@ describe( 'BlockSwitcher', () => {
 	};
 
 	beforeAll( () => {
-		registerBlockType( 'core/heading', headingBlockType );
-		registerBlockType( 'core/paragraph', paragraphBlockType );
+		registerBlockType(
+			'core/heading',
+			// A partial block type, with what the transforms read.
+			headingBlockType as unknown as BlockConfiguration
+		);
+		registerBlockType(
+			'core/paragraph',
+			// A partial block type, with what the transforms read.
+			paragraphBlockType as unknown as BlockConfiguration
+		);
 	} );
 
 	afterAll( () => {
@@ -75,7 +90,7 @@ describe( 'BlockSwitcher', () => {
 	} );
 
 	test( 'should render switcher with block transforms', async () => {
-		useSelect.mockImplementation( () => ( {
+		mockedUseSelect.mockImplementation( () => ( {
 			possibleBlockTransformations: [
 				{
 					name: 'core/heading',
@@ -137,7 +152,7 @@ describe( 'BlockSwitcher', () => {
 	} );
 
 	test( 'should render message for no available transforms', async () => {
-		useSelect.mockImplementation( () => ( {
+		mockedUseSelect.mockImplementation( () => ( {
 			possibleBlockTransformations: [],
 			blocks: [ headingBlock1 ],
 			patterns: [],
