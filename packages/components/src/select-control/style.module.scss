@@ -48,8 +48,7 @@
 	&:where(:not(.is-multiple)) {
 		height: 40px;
 		min-height: 40px;
-		padding-top: 0;
-		padding-bottom: 0;
+		padding-block: 0;
 
 		&:where(.is-small) {
 			height: 24px;
@@ -65,18 +64,11 @@
 	&:where(.is-multiple) {
 		// Preserve native height for multiple selection.
 		overflow: auto;
-		padding-top: var(--_wp-components-select-control-padding);
-		padding-bottom: var(--_wp-components-select-control-padding);
+		padding-block: var(--_wp-components-select-control-padding);
 	}
 
-	/* stylelint-disable logical-css/require-logical-properties -- Preserve locale-based chevron padding independently of a consumer's direction. */
-	padding-left: var(--_wp-components-select-control-padding);
-	padding-right: calc(var(--_wp-components-select-control-padding) + 18px);
-	&:where(.is-rtl) {
-		padding-left: calc(var(--_wp-components-select-control-padding) + 18px);
-		padding-right: var(--_wp-components-select-control-padding);
-	}
-	/* stylelint-enable logical-css/require-logical-properties */
+	padding-inline-start: var(--_wp-components-select-control-padding);
+	padding-inline-end: calc(var(--_wp-components-select-control-padding) + 18px);
 
 	&:where(.is-minimal) {
 		field-sizing: content;
@@ -92,11 +84,5 @@
 	position: absolute;
 	pointer-events: none;
 
-	/* stylelint-disable logical-css/require-logical-properties -- Match the locale-based chevron position. */
-	right: 0;
-	&:where(.is-rtl) {
-		right: auto;
-		left: 0;
-	}
-	/* stylelint-enable logical-css/require-logical-properties */
+	inset-inline-end: 0;
 }
