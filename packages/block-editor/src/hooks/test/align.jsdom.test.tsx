@@ -9,7 +9,7 @@ import {
 import type { BlockEditProps, BlockType } from '@wordpress/blocks';
 import { getValidAlignments, addAssignedAlign } from '../align';
 
-const noop = () => {};
+const noop = () => null;
 
 describe( 'align', () => {
 	const blockSettings = {
@@ -147,11 +147,10 @@ describe( 'align', () => {
 
 	describe( 'addAssignedAlign', () => {
 		it( 'should do nothing if block does not support align', () => {
-			registerBlockType(
-				'core/foo',
-				// @ts-expect-error The test block defines no attributes.
-				blockSettings
-			);
+			registerBlockType( 'core/foo', {
+				...blockSettings,
+				attributes: {},
+			} );
 
 			const props = addAssignedAlign(
 				{
@@ -169,16 +168,13 @@ describe( 'align', () => {
 		} );
 
 		it( 'should do add align classname if block supports align', () => {
-			registerBlockType(
-				'core/foo',
-				// @ts-expect-error The test block defines no attributes.
-				{
-					...blockSettings,
-					supports: {
-						align: true,
-					},
-				}
-			);
+			registerBlockType( 'core/foo', {
+				...blockSettings,
+				attributes: {},
+				supports: {
+					align: true,
+				},
+			} );
 
 			const props = addAssignedAlign(
 				{
