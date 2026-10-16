@@ -70,11 +70,13 @@ export default function usePatternCategories() {
 			}
 		} );
 
-		// Filter categories so we only have those containing patterns.
+		// Filter categories so we only have default categories containing patterns,
+		// but always keep user-created categories so they can be viewed, renamed, or deleted.
 		[ ...defaultCategories, ...userPatternCategories ].forEach(
 			( category ) => {
+				const isUserCategory = !! category.id;
 				if (
-					categoryMap[ category.name ].count &&
+					( categoryMap[ category.name ].count || isUserCategory ) &&
 					! categoriesWithCounts.find(
 						( cat ) => cat.name === category.name
 					)
