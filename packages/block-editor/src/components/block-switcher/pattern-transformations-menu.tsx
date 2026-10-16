@@ -6,12 +6,17 @@ import { Composite, MenuGroup, MenuItem, Popover } from '@wordpress/components';
 import { VisuallyHidden } from '@wordpress/ui';
 import BlockPreview from '../block-preview';
 import useTransformedPatterns from './use-transformed-patterns';
+import type {
+	BlockPatternProps,
+	PatternTransformationsMenuProps,
+	TransformedPatternsProps,
+} from './types';
 
 function PatternTransformationsMenu( {
 	blocks,
 	patterns: statePatterns,
 	onSelect,
-} ) {
+}: PatternTransformationsMenuProps ) {
 	const [ showTransforms, setShowTransforms ] = useState( false );
 	const patterns = useTransformedPatterns( statePatterns, blocks );
 
@@ -40,7 +45,10 @@ function PatternTransformationsMenu( {
 	);
 }
 
-function PreviewPatternsPopover( { patterns, onSelect } ) {
+function PreviewPatternsPopover( {
+	patterns,
+	onSelect,
+}: TransformedPatternsProps ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	return (
@@ -61,7 +69,7 @@ function PreviewPatternsPopover( { patterns, onSelect } ) {
 	);
 }
 
-function BlockPatternsList( { patterns, onSelect } ) {
+function BlockPatternsList( { patterns, onSelect }: TransformedPatternsProps ) {
 	return (
 		<Composite
 			role="listbox"
@@ -79,7 +87,7 @@ function BlockPatternsList( { patterns, onSelect } ) {
 	);
 }
 
-function BlockPattern( { pattern, onSelect } ) {
+function BlockPattern( { pattern, onSelect }: BlockPatternProps ) {
 	// TODO check pattern/preview width...
 	const baseClassName =
 		'block-editor-block-switcher__preview-patterns-container';
@@ -104,7 +112,10 @@ function BlockPattern( { pattern, onSelect } ) {
 			>
 				<BlockPreview
 					blocks={ pattern.transformedBlocks }
-					viewportWidth={ pattern.viewportWidth || 500 }
+					// Patterns may set the width of their preview.
+					viewportWidth={
+						( pattern.viewportWidth as number | undefined ) || 500
+					}
 				/>
 				<div className={ `${ baseClassName }-list__item-title` }>
 					{ pattern.title }

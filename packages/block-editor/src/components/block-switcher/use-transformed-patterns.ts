@@ -1,17 +1,22 @@
 import { useMemo } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { getMatchingBlockByName, getRetainedBlockAttributes } from './utils';
+import type { BlockPattern } from '../../store/types';
+import type { TransformedBlockPattern } from './types';
 
 /**
  * Mutate the matched block's attributes by getting
  * which block type's attributes to retain and prioritize
  * them in the merging of the attributes.
  *
- * @param {WPBlock} match         The matched block.
- * @param {WPBlock} selectedBlock The selected block.
- * @return {void}
+ * @param match         The matched block.
+ * @param selectedBlock The selected block.
  */
-export const transformMatchingBlock = ( match, selectedBlock ) => {
+export const transformMatchingBlock = (
+	match: Block,
+	selectedBlock: Block
+): void => {
 	// Get the block attributes to retain through the transformation.
 	const retainedBlockAttributes = getRetainedBlockAttributes(
 		selectedBlock.name,
@@ -28,14 +33,14 @@ export const transformMatchingBlock = ( match, selectedBlock ) => {
  * find the matching blocks, transform them and return them.
  * If not all selected blocks are matched, return nothing.
  *
- * @param {WPBlock[]} selectedBlocks The selected blocks.
- * @param {WPBlock[]} patternBlocks  The pattern's blocks.
- * @return {WPBlock[]|void} The transformed pattern's blocks or undefined if not all selected blocks have been matched.
+ * @param selectedBlocks The selected blocks.
+ * @param patternBlocks  The pattern's blocks.
+ * @return The transformed pattern's blocks or undefined if not all selected blocks have been matched.
  */
 export const getPatternTransformedBlocks = (
-	selectedBlocks,
-	patternBlocks
-) => {
+	selectedBlocks: Block[],
+	patternBlocks: Block[]
+): Block[] | void => {
 	// Clone Pattern's blocks to produce new clientIds and be able to mutate the matches.
 	const _patternBlocks = patternBlocks.map( ( block ) =>
 		cloneBlock( block )
@@ -46,7 +51,7 @@ export const getPatternTransformedBlocks = (
 	 * and for example we may have selected two paragraphs and
 	 * the pattern's blocks could have more `paragraphs`.
 	 */
-	const consumedBlocks = new Set();
+	const consumedBlocks = new Set< string >();
 	for ( const selectedBlock of selectedBlocks ) {
 		let isMatch = false;
 		for ( const patternBlock of _patternBlocks ) {
@@ -74,10 +79,6 @@ export const getPatternTransformedBlocks = (
 };
 
 /**
- * @typedef {WPBlockPattern & {transformedBlocks: WPBlock[]}} TransformedBlockPattern
- */
-
-/**
  * Custom hook that accepts patterns from state and the selected
  * blocks and tries to match these with the pattern's blocks.
  * If all selected blocks are matched with a Pattern's block,
@@ -85,26 +86,33 @@ export const getPatternTransformedBlocks = (
  * The transformed pattern's blocks are set to a new pattern
  * property `transformedBlocks`.
  *
- * @param {WPBlockPattern[]} patterns       Patterns from state.
- * @param {WPBlock[]}        selectedBlocks The currently selected blocks.
- * @return {TransformedBlockPattern[]} Returns the eligible matched patterns with all the selected blocks.
+ * @param patterns       Patterns from state.
+ * @param selectedBlocks The currently selected blocks.
+ * @return Returns the eligible matched patterns with all the selected blocks.
  */
-const useTransformedPatterns = ( patterns, selectedBlocks ) => {
+const useTransformedPatterns = (
+	patterns: BlockPattern[],
+	selectedBlocks: Block[]
+): TransformedBlockPattern[] => {
 	return useMemo(
 		() =>
-			patterns.reduce( ( accumulator, _pattern ) => {
-				const transformedBlocks = getPatternTransformedBlocks(
-					selectedBlocks,
-					_pattern.blocks
-				);
-				if ( transformedBlocks ) {
-					accumulator.push( {
-						..._pattern,
-						transformedBlocks,
-					} );
-				}
-				return accumulator;
-			}, [] ),
+			patterns.reduce< TransformedBlockPattern[] >(
+				( accumulator, _pattern ) => {
+					const transformedBlocks = getPatternTransformedBlocks(
+						selectedBlocks,
+						// The patterns from state are parsed into blocks.
+						_pattern.blocks!
+					);
+					if ( transformedBlocks ) {
+						accumulator.push( {
+							..._pattern,
+							transformedBlocks,
+						} );
+					}
+					return accumulator;
+				},
+				[]
+			),
 		[ patterns, selectedBlocks ]
 	);
 };

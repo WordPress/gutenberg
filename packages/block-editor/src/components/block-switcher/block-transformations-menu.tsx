@@ -8,6 +8,13 @@ import { useState, useMemo } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import PreviewBlockPopover from './preview-block-popover';
 import BlockVariationTransformations from './block-variation-transformations';
+import type { InserterItem } from '../../store/types';
+import type {
+	BlockTransformationItemProps,
+	BlockTransformationsMenuProps,
+	GroupedTransforms,
+	RestTransformationItemsProps,
+} from './types';
 
 /**
  * Helper hook to group transformations to display them in a specific order in the UI.
@@ -16,11 +23,13 @@ import BlockVariationTransformations from './block-variation-transformations';
  * Later on we could also group 'layout' transformations(ex. paragraph -> group) and
  * display them in different sections.
  *
- * @param {Object[]} possibleBlockTransformations The available block transformations.
- * @return {Record<string, Object[]>} The grouped block transformations.
+ * @param possibleBlockTransformations The available block transformations.
+ * @return The grouped block transformations.
  */
-function useGroupedTransforms( possibleBlockTransformations ) {
-	const priorityContentTransformationBlocks = {
+function useGroupedTransforms(
+	possibleBlockTransformations: InserterItem[]
+): GroupedTransforms {
+	const priorityContentTransformationBlocks: Record< string, number > = {
 		'core/paragraph': 1,
 		'core/heading': 2,
 		'core/list': 3,
@@ -30,18 +39,19 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 		const priorityTextTransformsNames = Object.keys(
 			priorityContentTransformationBlocks
 		);
-		const groupedPossibleTransforms = possibleBlockTransformations.reduce(
-			( accumulator, item ) => {
-				const { name } = item;
-				if ( priorityTextTransformsNames.includes( name ) ) {
-					accumulator.priorityTextTransformations.push( item );
-				} else {
-					accumulator.restTransformations.push( item );
-				}
-				return accumulator;
-			},
-			{ priorityTextTransformations: [], restTransformations: [] }
-		);
+		const groupedPossibleTransforms =
+			possibleBlockTransformations.reduce< GroupedTransforms >(
+				( accumulator, item ) => {
+					const { name } = item;
+					if ( priorityTextTransformsNames.includes( name ) ) {
+						accumulator.priorityTextTransformations.push( item );
+					} else {
+						accumulator.restTransformations.push( item );
+					}
+					return accumulator;
+				},
+				{ priorityTextTransformations: [], restTransformations: [] }
+			);
 		/**
 		 * If there is only one priority text transformation and it's a Quote,
 		 * is should move to the rest transformations. This is because Quote can
@@ -54,8 +64,9 @@ function useGroupedTransforms( possibleBlockTransformations ) {
 			groupedPossibleTransforms.priorityTextTransformations[ 0 ].name ===
 				'core/quote'
 		) {
+			// The single priority transformation is the Quote.
 			const singleQuote =
-				groupedPossibleTransforms.priorityTextTransformations.pop();
+				groupedPossibleTransforms.priorityTextTransformations.pop()!;
 			groupedPossibleTransforms.restTransformations.push( singleQuote );
 		}
 		return groupedPossibleTransforms;
@@ -80,8 +91,9 @@ const BlockTransformationsMenu = ( {
 	onSelect,
 	onSelectVariation,
 	blocks,
-} ) => {
-	const [ hoveredTransformItem, setHoveredTransformItem ] = useState();
+}: BlockTransformationsMenuProps ) => {
+	const [ hoveredTransformItem, setHoveredTransformItem ] =
+		useState< InserterItem | null >();
 
 	const { priorityTextTransformations, restTransformations } =
 		useGroupedTransforms( possibleBlockTransformations );
@@ -101,11 +113,12 @@ const BlockTransformationsMenu = ( {
 			<MenuGroup label={ __( 'Transform to' ) } className={ className }>
 				{ hoveredTransformItem && (
 					<PreviewBlockPopover
+						// The offered transformations apply to the blocks.
 						blocks={ switchToBlockType(
 							blocks,
 							hoveredTransformItem.name,
 							hoveredTransformItem.variationName
-						) }
+						)! }
 					/>
 				) }
 				{ !! possibleBlockVariationTransformations?.length && (
@@ -140,7 +153,7 @@ function RestTransformationItems( {
 	restTransformations,
 	onSelect,
 	setHoveredTransformItem,
-} ) {
+}: RestTransformationItemsProps ) {
 	return restTransformations.map( ( item ) => (
 		<BlockTransformationItem
 			key={ item.id || item.name }
@@ -155,7 +168,7 @@ function BlockTransformationItem( {
 	item,
 	onSelect,
 	setHoveredTransformItem,
-} ) {
+}: BlockTransformationItemProps ) {
 	const { name, icon, title, isDisabled } = item;
 	return (
 		<MenuItem

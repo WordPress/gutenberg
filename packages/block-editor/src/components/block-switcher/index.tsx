@@ -13,13 +13,21 @@ import {
 	isTemplatePart,
 } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
+import type {
+	BlockSwitcherDropdownMenuContentsProps,
+	BlockSwitcherProps,
+} from './types';
 
-function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
+function BlockSwitcherDropdownMenuContents( {
+	onClose,
+	clientIds,
+}: BlockSwitcherDropdownMenuContentsProps ) {
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 	const {
@@ -42,11 +50,14 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 			} = select( blockEditorStore );
 			const { getBlockStyles } = select( blocksStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-			const _blocks = getBlocksByClientId( clientIds );
+			// The selected blocks exist.
+			const _blocks = getBlocksByClientId( clientIds ) as Block[];
 			const _isSingleBlock = clientIds.length === 1;
 			const _blockName = _isSingleBlock && getBlockName( clientIds[ 0 ] );
 			const _hasBlockStyles =
-				_isSingleBlock && !! getBlockStyles( _blockName )?.length;
+				_isSingleBlock &&
+				// Only read for a single block, which exists.
+				!! getBlockStyles( _blockName as string )?.length;
 			return {
 				blocks: _blocks,
 				possibleBlockTransformations: getBlockTransformItems(
@@ -71,7 +82,7 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 		clientIds,
 		blocks,
 	} );
-	function selectForMultipleBlocks( insertedBlocks ) {
+	function selectForMultipleBlocks( insertedBlocks: Block[] ) {
 		if ( insertedBlocks.length > 1 ) {
 			multiSelect(
 				insertedBlocks[ 0 ].clientId,
@@ -80,20 +91,22 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 		}
 	}
 	// Simple block transformation based on the `Block Transforms` API.
-	function onBlockTransform( name, variationName ) {
-		const newBlocks = switchToBlockType( blocks, name, variationName );
+	function onBlockTransform( name: string, variationName?: string ) {
+		// The offered transformations apply to the blocks.
+		const newBlocks = switchToBlockType( blocks, name, variationName )!;
 		replaceBlocks( clientIds, newBlocks );
 		selectForMultipleBlocks( newBlocks );
 	}
-	function onBlockVariationTransform( name ) {
+	function onBlockVariationTransform( name: string ) {
 		updateBlockAttributes( blocks[ 0 ].clientId, {
-			...blockVariationTransformations.find(
+			// The selected variation is one of the transformations.
+			...blockVariationTransformations!.find(
 				( { name: variationName } ) => variationName === name
-			).attributes,
+			)!.attributes,
 		} );
 	}
 	// Pattern transformation through the `Patterns` API.
-	function onPatternTransform( transformedBlocks ) {
+	function onPatternTransform( transformedBlocks: Block[] ) {
 		replaceBlocks( clientIds, transformedBlocks );
 		selectForMultipleBlocks( transformedBlocks );
 	}
@@ -186,7 +199,12 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 	);
 }
 
-export const BlockSwitcher = ( { children, clientIds, label, text } ) => {
+export const BlockSwitcher = ( {
+	children,
+	clientIds,
+	label,
+	text,
+}: BlockSwitcherProps ) => {
 	const isSingleBlock = clientIds.length === 1;
 
 	const blockSwitcherDescription = isSingleBlock

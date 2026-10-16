@@ -1,4 +1,5 @@
 import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 
 /**
  * Try to find a matching block by a block's name in a provided
@@ -6,17 +7,17 @@ import { getBlockAttributesNamesByRole } from '@wordpress/blocks';
  * of the matched block (it could be an InnerBlock).
  * If no match is found return nothing.
  *
- * @param {WPBlock} block             The block to try to find a match.
- * @param {string}  selectedBlockName The block's name to use for matching condition.
- * @param {Set}     consumedBlocks    A set holding the previously matched/consumed blocks.
+ * @param block             The block to try to find a match.
+ * @param selectedBlockName The block's name to use for matching condition.
+ * @param consumedBlocks    A set holding the previously matched/consumed blocks.
  *
- * @return {WPBlock | undefined} The matched block if found or nothing(`undefined`).
+ * @return The matched block if found or nothing(`undefined`).
  */
 export const getMatchingBlockByName = (
-	block,
-	selectedBlockName,
-	consumedBlocks = new Set()
-) => {
+	block: Block,
+	selectedBlockName: string,
+	consumedBlocks: Set< string > = new Set()
+): Block | void => {
 	const { clientId, name, innerBlocks = [] } = block;
 	// Check if block has been consumed already.
 	if ( consumedBlocks.has( clientId ) ) {
@@ -44,20 +45,26 @@ export const getMatchingBlockByName = (
  * attributes. If no `role:content` attributes exist,
  * return selected block's attributes.
  *
- * @param {string} name       Block type's namespaced name.
- * @param {Object} attributes Selected block's attributes.
- * @return {Object} The block's attributes to retain.
+ * @param name       Block type's namespaced name.
+ * @param attributes Selected block's attributes.
+ * @return The block's attributes to retain.
  */
-export const getRetainedBlockAttributes = ( name, attributes ) => {
+export const getRetainedBlockAttributes = (
+	name: string,
+	attributes: Record< string, unknown >
+): Record< string, unknown > => {
 	const contentAttributes = getBlockAttributesNamesByRole( name, 'content' );
 	if ( ! contentAttributes?.length ) {
 		return attributes;
 	}
 
-	return contentAttributes.reduce( ( _accumulator, attribute ) => {
-		if ( attributes[ attribute ] ) {
-			_accumulator[ attribute ] = attributes[ attribute ];
-		}
-		return _accumulator;
-	}, {} );
+	return contentAttributes.reduce< Record< string, unknown > >(
+		( _accumulator, attribute ) => {
+			if ( attributes[ attribute ] ) {
+				_accumulator[ attribute ] = attributes[ attribute ];
+			}
+			return _accumulator;
+		},
+		{}
+	);
 };

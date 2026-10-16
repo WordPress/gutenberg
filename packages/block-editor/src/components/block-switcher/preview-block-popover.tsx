@@ -1,13 +1,14 @@
 import { Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import BlockPreview from '../block-preview';
+import type { PreviewBlockPopoverProps } from './types';
 
 export default function PreviewBlockPopover( {
 	blocks,
 	placement = 'right-start',
 	offset = 16,
 	anchor,
-} ) {
+}: PreviewBlockPopoverProps ) {
 	const isMobile = useViewportMatch( 'medium', '<' );
 
 	if ( isMobile ) {
