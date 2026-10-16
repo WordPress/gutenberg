@@ -410,37 +410,19 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-manager/category.jsx": {
+	"packages/block-editor/src/components/block-manager/category.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-manager/checklist.jsx": {
+	"packages/block-editor/src/components/block-manager/checklist.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-manager/index.jsx": {
+	"packages/block-editor/src/components/block-manager/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-mover/button.jsx": {
@@ -2019,14 +2001,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/publish-date-time-picker/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/recursion-provider/index.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -2357,14 +2331,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/fit-text.jsx": {
+	"packages/block-editor/src/hooks/fit-text.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
