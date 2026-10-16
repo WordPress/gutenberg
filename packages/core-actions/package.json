@@ -1,6 +1,7 @@
 {
 	"name": "@wordpress/core-actions",
 	"version": "0.1.0-prerelease",
+	"private": true,
 	"description": "The actions WordPress core registers for its entities, shown in DataViews and in the editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

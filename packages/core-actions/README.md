@@ -32,16 +32,6 @@ The actions are registered in that order, which is the order they are shown in, 
 
 The modules use the `wp.*` globals the `wp-editor` script loads, such as `wp.data` and `wp.components`, so they only run on pages that load the editor script. They are dynamic module dependencies of `wp-editor`, which adds them to the import map of every page loading it.
 
-## Installation
-
-Install the module:
-
-```bash
-npm install @wordpress/core-actions --save
-```
-
-_This package assumes that your code will run in an ES2015+ environment. If you're using an environment that has limited or no support for such language features and/or APIs, you should include the polyfill shipped in `@wordpress/babel-preset-default` in your code._
-
 ## Usage
 
 The package provides the `@wordpress/core-actions/post_type_supports`, `@wordpress/core-actions/wp_block`, and `@wordpress/core-actions/wp_template_part` script modules. Their default export maps the id of each action to the properties of the DataViews action that PHP cannot serialize, which complete the action the `/wp/v2/entity-actions` route returns:
