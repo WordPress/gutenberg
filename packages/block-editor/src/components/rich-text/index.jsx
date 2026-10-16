@@ -372,38 +372,10 @@ function RichTextWrapper(
 		]
 	);
 
-	const {
-		value,
-		getValue,
-		onChange,
-		ref: richTextRef,
-		formatTypes,
-		[ getDomPositionKey ]: getDomPosition,
-	} = useRichText( {
-		value: adjustedValue,
-		onChange: adjustedOnChange,
-		selectionStart,
-		selectionEnd,
-		onSelectionChange,
-		placeholder: bindingsPlaceholder || placeholder,
-		__unstableIsSelected: isSelected,
-		__unstableDisableFormats: disableFormats,
-		preserveWhiteSpace,
-		__unstableDependencies: [ tagName ],
-		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting,
-		__unstableFormatTypeHandlerContext: useMemo(
-			() => ( {
-				richTextIdentifier: identifier,
-				blockClientId: clientId,
-			} ),
-			[ identifier, clientId ]
-		),
-	} );
 	// Focus follows the selection while focus is inside the canvas or was
-	// lost to the body. Focus placed elsewhere stays. Runs after
-	// `useRichText` applied the content, so the field is current when its
-	// focus handler applies the selection.
+	// lost to the body. Focus placed elsewhere stays. Runs before
+	// `useRichText` applies a selection from the store, which it only does
+	// while the field or its editing host has focus.
 	useLayoutEffect( () => {
 		const element = anchorRef.current;
 
@@ -435,6 +407,35 @@ function RichTextWrapper(
 			target.focus();
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
+
+	const {
+		value,
+		getValue,
+		onChange,
+		ref: richTextRef,
+		formatTypes,
+		[ getDomPositionKey ]: getDomPosition,
+	} = useRichText( {
+		value: adjustedValue,
+		onChange: adjustedOnChange,
+		selectionStart,
+		selectionEnd,
+		onSelectionChange,
+		placeholder: bindingsPlaceholder || placeholder,
+		__unstableIsSelected: isSelected,
+		__unstableDisableFormats: disableFormats,
+		preserveWhiteSpace,
+		__unstableDependencies: [ tagName ],
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: useMemo(
+			() => ( {
+				richTextIdentifier: identifier,
+				blockClientId: clientId,
+			} ),
+			[ identifier, clientId ]
+		),
+	} );
 
 	// One end of a text selection across blocks is in this field: put that
 	// end of the native selection back after rendering, as a field does for

@@ -30,9 +30,8 @@ export default function useEnter( clientId ) {
 					getBlockRootClientId,
 					getBlockIndex,
 				} = select;
-				const { replaceBlocks, selectStartOfBlock } = unlock(
-					registry.dispatch( blockEditorStore )
-				);
+				const { replaceBlocks, selectionChange } =
+					registry.dispatch( blockEditorStore );
 
 				const { content } = getBlockAttributes( clientId ) ?? {};
 				if ( content?.length ) {
@@ -72,16 +71,14 @@ export default function useEnter( clientId ) {
 							} ),
 						]
 					: [];
-				registry.batch( () => {
-					replaceBlocks(
-						topParentListBlock.clientId,
-						[ head, middle, ...tail ],
-						1
-					);
-					// We manually change the selection here because we are
-					// replacing a different block than the selected one.
-					selectStartOfBlock( middle.clientId );
-				} );
+				replaceBlocks(
+					topParentListBlock.clientId,
+					[ head, middle, ...tail ],
+					1
+				);
+				// We manually change the selection here because we are replacing
+				// a different block than the selected one.
+				selectionChange( middle.clientId );
 			}
 
 			// Enter is handled on beforeinput: moving focus while the

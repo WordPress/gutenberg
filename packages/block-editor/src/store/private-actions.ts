@@ -1,14 +1,8 @@
 import deprecated from '@wordpress/deprecated';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
-import {
-	getBlockType,
-	isUnmodifiedBlock,
-	privateApis as blocksPrivateApis,
-} from '@wordpress/blocks';
-import type { Block, BlockType } from '@wordpress/blocks';
-import { findRichTextAttributeKey } from '../utils/selection';
-import { unlock } from '../lock-unlock';
+import { getBlockType, isUnmodifiedBlock } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import type {
 	BlockEditorThunkArgs,
 	BlockRemovalRule,
@@ -20,10 +14,6 @@ import type {
 	StyleOverride,
 	TreeBlock,
 } from './types';
-
-type BlockTypeWithEditableRoot = BlockType & Record< symbol, unknown >;
-
-const { editableRootKey } = unlock( blocksPrivateApis );
 
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -668,26 +658,3 @@ export function setResponsiveEditing( enabled: boolean ) {
 		enabled,
 	};
 }
-
-/**
- * Selects a block. A block that opts into the editable root gets the start
- * of its text selected, so its field places the caret as it mounts:
- * focusing the field later moves focus off the editing host and back,
- * which resets the iOS keyboard's capitalization.
- *
- * @param clientId Block client ID.
- */
-export const selectStartOfBlock =
-	( clientId: string ) =>
-	( { select, dispatch }: BlockEditorThunkArgs ) => {
-		const blockType = getBlockType( select.getBlockName( clientId )! );
-		const attributeKey =
-			( blockType as BlockTypeWithEditableRoot | undefined )?.[
-				editableRootKey
-			] && findRichTextAttributeKey( blockType as BlockType );
-		if ( attributeKey ) {
-			dispatch.selectionChange( clientId, attributeKey as string, 0, 0 );
-		} else {
-			dispatch.selectionChange( clientId );
-		}
-	};

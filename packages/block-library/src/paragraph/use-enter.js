@@ -15,9 +15,8 @@ const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 export function useOnEnter( props ) {
 	const { batch } = useRegistry();
-	const { moveBlocksToPosition, replaceBlocks, selectStartOfBlock } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { moveBlocksToPosition, replaceBlocks, selectionChange } =
+		useDispatch( blockEditorStore );
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
@@ -116,7 +115,7 @@ export function useOnEnter( props ) {
 				// The selected paragraph is a descendant of the replaced
 				// wrapper, so `replaceBlocks` leaves the selection stale.
 				// Move it to the new default block explicitly.
-				selectStartOfBlock( middle.clientId );
+				selectionChange( middle.clientId );
 			} );
 		}
 
