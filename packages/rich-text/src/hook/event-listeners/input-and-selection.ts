@@ -72,7 +72,7 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		}
 
 		const currentValue = createRecord();
-		const { start, activeFormats: oldActiveFormats = [] } = record.current;
+		const { start } = record.current;
 
 		if ( start === undefined || currentValue.start === undefined ) {
 			handleChange( currentValue );
@@ -84,6 +84,10 @@ const inputAndSelection: EventListenerEffect = ( props ) => ( element ) => {
 		// should not be carried forward.
 		const clearFormats =
 			! isCollapsed( record.current ) && currentValue.start <= start;
+		const oldActiveFormats = getActiveFormats(
+			record.current,
+			EMPTY_ACTIVE_FORMATS
+		);
 
 		// Update the formats between the last and new caret position.
 		const change = updateFormats( {

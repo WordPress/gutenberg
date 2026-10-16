@@ -7,7 +7,12 @@ import type {
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { BlockEditingMode } from '../components/block-editing-mode';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
+import type {
+	FetchLinkSuggestions,
+	FetchRichUrlData,
+} from '../components/link-control/types';
 import type { WPDropOperation } from '../components/use-on-block-drop/types';
+import type { Bindings } from '../utils/block-bindings';
 import type { store } from '.';
 import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
@@ -23,7 +28,7 @@ export interface BlockAttributes {
 	metadata?: Record< string, unknown > & {
 		name?: string;
 		patternName?: string;
-		bindings?: Record< string, unknown >;
+		bindings?: Bindings;
 		blockVisibility?: BlockVisibility;
 	};
 	lock?: { move?: boolean; remove?: boolean; edit?: boolean };
@@ -221,6 +226,7 @@ export interface BlockSelection {
 export interface BlockPattern {
 	name: string;
 	title?: string;
+	description?: string;
 	content: string;
 	categories?: Array< string | number >;
 	blocks?: Block[];
@@ -341,21 +347,44 @@ export type BlockTemplate = NonNullable<
 >;
 
 /**
+ * Theme.json settings, optionally overridden per block type under `blocks`.
+ */
+export type FeatureSettings = Record< string, unknown > & {
+	blocks?: Record< string, Record< string, unknown > >;
+};
+
+/**
+ * A theme.json preset setting, split by the origin that defines it.
+ */
+export interface PresetsByOrigin {
+	custom?: unknown;
+	theme?: unknown;
+	default?: unknown;
+}
+
+/**
  * The editor settings, with the fields the store itself reads.
  */
 export type Settings = Record< string | symbol, unknown > & {
 	allowedBlockTypes?: boolean | string[];
+	alignWide?: boolean;
 	allowedMimeTypes?: Record< string, string > | null;
+	pageForPosts?: number;
+	pageOnFront?: number;
 	canLockBlocks?: boolean;
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
+	supportsLayout?: boolean;
 	template?: BlockTemplate;
 	templateLock?: string | false;
 	__experimentalBlockPatterns?: BlockPattern[];
-	__experimentalFeatures?: { viewport?: unknown };
+	__experimentalFeatures?: FeatureSettings;
+	__experimentalFetchLinkSuggestions?: FetchLinkSuggestions;
+	__experimentalFetchRichUrlData?: FetchRichUrlData;
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
+	__unstableIsBlockBasedTheme?: boolean;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect

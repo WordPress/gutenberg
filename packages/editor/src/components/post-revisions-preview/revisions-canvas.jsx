@@ -59,11 +59,19 @@ const REVISION_DIFF_STYLES = `
 	.is-revision-removed,
 	.revision-diff-removed {
 		text-decoration: line-through;
-		filter: url(#revision-removed-filter);
 	}
 	.is-revision-removed {
 		outline: 3px dashed #d63638;
 		outline-offset: 2px;
+		filter: url(#revision-removed-filter);
+	}
+	.revision-diff-removed {
+		/* Mirror .revision-diff-added so the ins/del pair reads symmetrically.
+		   Leaving the text at currentColor (rather than recolouring it with an
+		   opacity + color-matrix filter) keeps the theme's own AA-compliant body
+		   contrast on any background. */
+		background-color: color-mix(in srgb, currentColor 5%, #d63638 15%);
+		text-decoration-color: #d63638;
 	}
 	.is-revision-modified {
 		outline: 3px dotted #9a7000 !important;

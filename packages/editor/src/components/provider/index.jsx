@@ -429,6 +429,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			return null;
 		}
 
+		// Selections should not be synced when in revision or preview modes.
+		const shouldSyncSelection =
+			! isInRevisionsMode && ! settings.isPreviewMode;
+
 		return (
 			<EntityProvider kind="root" type="site">
 				<PrivateEntityProvider
@@ -444,10 +448,10 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							onChange={ onChange }
 							onInput={ onInput }
 							selection={
-								isInRevisionsMode ? undefined : selection
+								shouldSyncSelection ? selection : undefined
 							}
 							onChangeSelection={
-								isInRevisionsMode ? noop : onChangeSelection
+								shouldSyncSelection ? onChangeSelection : noop
 							}
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
