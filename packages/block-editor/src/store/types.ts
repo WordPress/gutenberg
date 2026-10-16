@@ -375,6 +375,9 @@ export type Settings = Record< string | symbol, unknown > & {
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
+	__experimentalUndo?: () => void;
+	__unstableResolvedAssets?: ResolvedAssets;
+	__internalIsInitialized?: boolean;
 	supportsLayout?: boolean;
 	template?: BlockTemplate;
 	templateLock?: string | false;
@@ -403,6 +406,15 @@ export type Settings = Record< string | symbol, unknown > & {
  */
 export interface LastFocus {
 	current: HTMLElement | SVGElement | null;
+}
+
+/**
+ * The styles and scripts the editor canvas iframe loads, as HTML.
+ */
+export interface ResolvedAssets {
+	// The defaults are empty lists.
+	styles?: string | string[];
+	scripts?: string | string[];
 }
 
 export interface StyleOverride {
