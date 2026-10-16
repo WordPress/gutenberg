@@ -49,10 +49,10 @@
 				}
 
 				@supports (color: color(from green srgb-linear round(up, r) g b / 1)) {
-					.uncapped {
-						/* Keep the component's 4.55:1 calculation and remove only its 20% blend cap. */
-						--_wp-ui-avatar-dark-tint: clamp(0, calc(((var(--_wp-ui-avatar-luminance) + 0.05) / 4.55 - 0.05) / max(0.000001, var(--_wp-ui-avatar-luminance))), 1);
-						--_wp-ui-avatar-light-tint: clamp(0, calc((1.05 - 4.55 * (var(--_wp-ui-avatar-luminance) + 0.05)) / max(0.000001, 1 - var(--_wp-ui-avatar-luminance))), 1);
+					.uncapped,
+					.uncapped > svg {
+						/* Keep each contrast target and remove only the 20% blend cap. */
+						--_wp-ui-avatar-tint-limit: 1;
 					}
 				}
 			}
