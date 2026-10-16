@@ -29,7 +29,6 @@
 
 ### Bug Fixes
 
--   `Combobox`, `SearchableSelect`, and `SearchableSelectControl`: Inset option backgrounds and focus rings to match the popup search field without changing the field, option content, or click areas ([#84087](https://github.com/WordPress/gutenberg/pull/84087)).
 -   `Select`: Keep long popup lists scrollable when item alignment falls back to anchored positioning or the popup opens through touch ([#84682](https://github.com/WordPress/gutenberg/pull/84682)).
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
 -   `Avatar`: Show missing and failed image fallbacks immediately despite a delay, preserve custom fallback rendering, scale fallback SVGs with the avatar, and preserve decorative avatar layout and typography inside wp-admin trees ([#84653](https://github.com/WordPress/gutenberg/pull/84653)).
