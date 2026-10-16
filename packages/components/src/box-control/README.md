@@ -60,6 +60,14 @@ Props for the internal `UnitControl` components.
 
 Heading label for the control.
 
+### `linkedByDefault`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `true`
+
+Whether the box control sides are linked by default when no values are defined or when existing side values match.
+
 ### `onChange`
 
  - Type: `(next: BoxControlValue) => void`

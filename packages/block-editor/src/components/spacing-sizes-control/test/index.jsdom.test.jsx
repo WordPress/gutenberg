@@ -58,6 +58,7 @@ vi.mock( import( '../../use-settings' ), () => ( {
 			'spacing.spacingSizes.theme': [],
 			'spacing.spacingSizes.default': [],
 			'spacing.defaultSpacingSizes': true,
+			'spacing.linkedByDefault': true,
 		};
 		return keys.map( ( key ) => defaults[ key ] );
 	} ),
@@ -1063,6 +1064,22 @@ describe( 'SpacingSizesControl', () => {
 			// Should show custom toggle when custom sizes are enabled
 			expect(
 				screen.getAllByLabelText( 'Set custom value' )[ 0 ]
+			).toBeInTheDocument();
+		} );
+
+		it( 'respects linkedByDefault prop when false', () => {
+			render(
+				<SpacingSizesControl
+					{ ...defaultProps }
+					values={ undefined }
+					linkedByDefault={ false }
+				/>
+			);
+
+			// In custom view, all 4 separated side sliders should be rendered.
+			expect( screen.getAllByRole( 'slider' ) ).toHaveLength( 4 );
+			expect(
+				screen.getByRole( 'button', { name: 'Link sides' } )
 			).toBeInTheDocument();
 		} );
 	} );

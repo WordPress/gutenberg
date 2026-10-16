@@ -69,6 +69,7 @@ function BoxControl( {
 	presetKey,
 	onMouseOver,
 	onMouseOut,
+	linkedByDefault = true,
 }: BoxControlProps ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
@@ -79,7 +80,10 @@ function BoxControl( {
 
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValueMixed( inputValues ) || hasOneSide
+		() =>
+			( ( ! hasInitialValue || ! isValueMixed( inputValues ) ) &&
+				linkedByDefault ) ||
+			hasOneSide
 	);
 
 	// Tracking selected units via internal state allows filtering of CSS unit

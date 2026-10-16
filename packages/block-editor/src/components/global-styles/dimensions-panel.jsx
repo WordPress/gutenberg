@@ -15,6 +15,7 @@ import SpacingSizesControl from '../spacing-sizes-control';
 import DimensionControl from '../dimension-control';
 import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
+import { useSettings } from '../use-settings';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 import {
@@ -380,6 +381,16 @@ export default function DimensionsPanel( {
 		);
 
 	const showSpacingPresetsControl = hasSpacingPresets( settings );
+	const [ linkedByDefaultSetting ] = useSettings( 'spacing.linkedByDefault' );
+	const linkedByDefault =
+		settings?.spacing?.linkedByDefault ?? linkedByDefaultSetting ?? true;
+	const isGlobalBoolean = typeof linkedByDefault === 'boolean';
+	const marginLinked = isGlobalBoolean
+		? linkedByDefault
+		: ( linkedByDefault?.margin ?? true );
+	const paddingLinked = isGlobalBoolean
+		? linkedByDefault
+		: ( linkedByDefault?.padding ?? true );
 	const units = useCustomUnits( {
 		availableUnits: settings?.spacing?.units || [
 			'%',
@@ -878,6 +889,7 @@ export default function DimensionsPanel( {
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialPadding }
+							linkedByDefault={ paddingLinked }
 							inputProps={ {
 								onMouseOver: onMouseOverPadding,
 								onMouseOut: onMouseLeaveControls,
@@ -895,6 +907,7 @@ export default function DimensionsPanel( {
 							sides={ paddingSides }
 							units={ units }
 							allowReset={ false }
+							linkedByDefault={ paddingLinked }
 							onMouseOver={ onMouseOverPadding }
 							onMouseOut={ onMouseLeaveControls }
 						/>
@@ -947,6 +960,7 @@ export default function DimensionsPanel( {
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialMargin }
+							linkedByDefault={ marginLinked }
 						/>
 					) }
 					{ showSpacingPresetsControl && (
@@ -958,6 +972,7 @@ export default function DimensionsPanel( {
 							sides={ marginSides }
 							units={ units }
 							allowReset={ false }
+							linkedByDefault={ marginLinked }
 							onMouseOver={ onMouseOverMargin }
 							onMouseOut={ onMouseLeaveControls }
 						/>

@@ -472,6 +472,7 @@ class WP_Theme_JSON_Gutenberg {
 		'spacing'                       => array(
 			'customSpacingSize'   => null,
 			'defaultSpacingSizes' => null,
+			'linkedByDefault'     => null,
 			'spacingSizes'        => null,
 			'spacingScale'        => null,
 			'blockGap'            => null,
