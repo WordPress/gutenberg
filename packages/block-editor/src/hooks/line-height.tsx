@@ -2,23 +2,24 @@ import { hasBlockSupport } from '@wordpress/blocks';
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
 import { useSettings } from '../components/use-settings';
+import type { LineHeightEditProps } from './types';
 
 export const LINE_HEIGHT_SUPPORT_KEY = 'typography.lineHeight';
 
 /**
  * Inspector control panel containing the line height related configuration
  *
- * @param {Object} props
+ * @param props Component props.
  *
- * @return {Element} Line height edit element.
+ * @return Line height edit element.
  */
-export function LineHeightEdit( props ) {
+export function LineHeightEdit( props: LineHeightEditProps ) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const onChange = ( newLineHeightValue ) => {
+	const onChange = ( newLineHeightValue?: string | number ) => {
 		const newStyle = {
 			...style,
 			typography: {
@@ -41,13 +42,18 @@ export function LineHeightEdit( props ) {
 /**
  * Custom hook that checks if line-height settings have been disabled.
  *
- * @param {string} name The name of the block.
- * @return {boolean} Whether setting is disabled.
+ * @param $0      Block props.
+ * @param $0.name The name of the block.
+ * @return Whether setting is disabled.
  */
-export function useIsLineHeightDisabled( { name: blockName } = {} ) {
+export function useIsLineHeightDisabled( {
+	name: blockName,
+}: { name?: string } = {} ) {
 	const [ isEnabled ] = useSettings( 'typography.lineHeight' );
 
 	return (
-		! isEnabled || ! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY )
+		! isEnabled ||
+		// `hasBlockSupport` returns false for a missing block name.
+		! hasBlockSupport( blockName as string, LINE_HEIGHT_SUPPORT_KEY )
 	);
 }

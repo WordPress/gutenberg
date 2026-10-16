@@ -272,3 +272,17 @@ export interface ContentOnlySectionEdit {
 	editContentOnlySection: BlockEditorThunkArgs[ 'dispatch' ][ 'editContentOnlySection' ];
 	stopEditingContentOnlySection: BlockEditorThunkArgs[ 'dispatch' ][ 'stopEditingContentOnlySection' ];
 }
+
+/**
+ * Props of the line height block support control.
+ */
+export interface LineHeightEditProps {
+	attributes: {
+		style?: BlockStyle & {
+			typography?: Record< string, unknown > & {
+				lineHeight?: string | number;
+			};
+		};
+	};
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
