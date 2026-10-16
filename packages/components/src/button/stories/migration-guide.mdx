@@ -1,0 +1,106 @@
+import { Markdown, Meta } from '@storybook/addon-docs/blocks';
+import * as ButtonStories from './index.story';
+
+<Meta of={ ButtonStories } name="Migration Guide" />
+
+# Button migration guide
+
+Migrate from [`Button`](?path=/docs/components-button--docs) in `@wordpress/components` to [`Button`](?path=/docs/design-system-components-button--docs), [`ButtonLink`](?path=/docs/design-system-components-buttonlink--docs), [`IconButton`](?path=/docs/design-system-components-iconbutton--docs), or [`Link`](?path=/docs/design-system-components-link--docs) in `@wordpress/ui`.
+
+## Basic migration
+
+Update the import. Default `Button` is a solid brand button, so a primary button maps without extra props:
+
+```jsx
+// Before
+import { Button } from '@wordpress/components';
+
+<Button variant="primary">Publish</Button>;
+
+// After
+import { Button } from '@wordpress/ui';
+
+<Button>Publish</Button>;
+```
+
+## Prop mapping
+
+<Markdown>{ `
+| \`@wordpress/components\` | \`@wordpress/ui\` | Notes |
+| --- | --- | --- |
+| \`variant="primary"\` | \`Button\` defaults (\`variant="solid"\`, \`tone="brand"\`) | Omit both props unless you need to be explicit. |
+| \`variant="secondary"\` | \`variant="outline"\` | Keep \`tone="brand"\`, the default. |
+| \`variant="tertiary"\` | \`variant="minimal"\` | Keep \`tone="brand"\`, the default. |
+| no \`variant\` | \`tone="neutral"\` \`variant="minimal"\` | Use [\`IconButton\`](?path=/docs/design-system-components-iconbutton--docs) when the control is icon-only. |
+| \`variant="link"\` | [\`Link\`](?path=/docs/design-system-components-link--docs) | Use [\`ButtonLink\`](?path=/docs/design-system-components-buttonlink--docs) when the link should look like a button. |
+| \`href\` on a button-styled control | [\`ButtonLink\`](?path=/docs/design-system-components-buttonlink--docs) | \`Button\` no longer renders an anchor. |
+| \`isBusy\` | \`loading\` | \`loading\` also disables the button and announces the state. \`isBusy\` does neither. |
+| \`isPressed\` | \`aria-pressed\` | Pressed styling exists only on \`tone="neutral"\` \`variant="minimal"\`. |
+| \`accessibleWhenDisabled\` | \`focusableWhenDisabled\` | Defaults to \`true\`. |
+| \`__next40pxDefaultSize\` | nothing | 40px is the default height. |
+| \`size\` | \`size\` | Names stay \`default\`, \`compact\`, and \`small\`. |
+` }</Markdown>
+
+## Links
+
+`Button` from `@wordpress/ui` always renders a `<button>`. For a control that looks like a button and navigates, use `ButtonLink`. For a text link, use `Link`:
+
+```jsx
+// Before: a button-styled control with an href
+<Button variant="primary" href="/wp-admin/post-new.php">
+	Add post
+</Button>
+
+// After
+<ButtonLink href="/wp-admin/post-new.php">Add post</ButtonLink>
+
+// Before: a link-styled button
+<Button variant="link" href="https://wordpress.org">
+	WordPress
+</Button>
+
+// After
+<Link href="https://wordpress.org">WordPress</Link>
+```
+
+## Loading
+
+`isBusy` hid the label behind a spinner and left the button clickable. `loading` shows the same spinner, disables the button, and announces the loading state. Pass `loadingAnnouncement` when the default announcement isn't specific enough:
+
+```jsx
+// Before
+<Button variant="primary" isBusy>
+	Publishing…
+</Button>
+
+// After
+<Button loading loadingAnnouncement="Publishing">
+	Publish
+</Button>
+```
+
+## Pressed and disabled
+
+Pressed styling is limited to a neutral minimal button. Set `aria-pressed` on that combination:
+
+```jsx
+<Button tone="neutral" variant="minimal" aria-pressed={ isPressed }>
+	Preview
+</Button>
+```
+
+A disabled `Button` stays focusable by default. Pass `focusableWhenDisabled={ false }` only when you need the native `disabled` behavior.
+
+## Size
+
+Drop `__next40pxDefaultSize`. The default size is 40px. `compact` and `small` keep those names.
+
+## Destructive actions
+
+`Button` has no destructive tone. A control that starts a destructive action uses standard styling. Confirm an irreversible action in [`AlertDialog`](?path=/docs/design-system-components-alertdialog--docs) with `intent="irreversible"`, which styles the confirm button. See the [Destructive Actions](?path=/docs/design-system-patterns-destructive-actions--docs) pattern.
+
+`AlertDialog` is still marked use-with-caution. Until it is recommended, keep irreversible confirmations on [`Modal`](?path=/docs/components-modal--docs) from `@wordpress/components` with `isDestructive`.
+
+## Shortcuts
+
+`Button` has no `shortcut` prop. Compose a tooltip, `aria-keyshortcuts`, and a visually hidden description, as in the [keyboard shortcut story](?path=/story/design-system-components-button--with-keyboard-shortcut). [`IconButton`](?path=/docs/design-system-components-iconbutton--docs) accepts a `shortcut` prop that handles that composition.

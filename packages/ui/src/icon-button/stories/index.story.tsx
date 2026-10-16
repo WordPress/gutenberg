@@ -21,6 +21,7 @@ const meta: Meta< typeof IconButton > = {
 	title: 'Components/@wordpress-ui/IconButton',
 	id: 'design-system-components-iconbutton',
 	component: IconButton,
+	tags: [ 'manifest' ],
 	argTypes: {
 		'aria-pressed': {
 			control: { type: 'boolean' },
@@ -28,9 +29,8 @@ const meta: Meta< typeof IconButton > = {
 	},
 	parameters: {
 		componentStatus: {
-			status: 'use-with-caution',
+			status: 'recommended',
 			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of style consistency with `@wordpress/components`, text overflow behavior, and overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
 		},
 	},
 };

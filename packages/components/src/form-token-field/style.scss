@@ -145,6 +145,7 @@
 .components-form-token-field__remove-token.components-button {
 	display: inline-block;
 	height: auto;
+	min-height: auto;
 	background: $gray-300;
 	min-width: unset;
 

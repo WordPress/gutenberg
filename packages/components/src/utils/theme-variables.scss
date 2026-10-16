@@ -17,6 +17,20 @@ $components-color-accent-darker-20: var(--wp-components-color-accent-darker-20, 
 // Used when placing text on the accent color.
 $components-color-accent-inverted: var(--wp-components-color-accent-inverted, var(--wpds-color-foreground-interactive-brand-strong));
 
+// Button variants: rest colors keep `--wp-components-color-accent` first so
+// destructive buttons (which set that variable) keep a red fill and label.
+// Hover and active use the design-system `-active` tokens. `--wp-components-color-accent-darker-10`
+// is defined in WordPress admin, so wrapping through it would keep the old
+// darker-10 / darker-20 hover. Destructive hover is handled in the button
+// stylesheet from the local darker-* overrides.
+$components-color-button-brand-strong: var(--wp-components-color-accent, var(--wpds-color-background-interactive-brand-strong));
+$components-color-button-brand-strong-active: var(--wpds-color-background-interactive-brand-strong-active);
+$components-color-button-brand-strong-foreground-active: var(--wpds-color-foreground-interactive-brand-strong-active);
+$components-color-button-brand: var(--wp-components-color-accent, var(--wpds-color-foreground-interactive-brand));
+$components-color-button-brand-active: var(--wpds-color-foreground-interactive-brand-active);
+$components-color-button-brand-stroke: var(--wp-components-color-accent, var(--wpds-color-stroke-interactive-brand));
+$components-color-button-brand-stroke-active: var(--wpds-color-stroke-interactive-brand-active);
+
 $components-color-background: var(--wp-components-color-background, var(--wpds-color-background-surface-neutral-strong));
 $components-color-foreground: var(--wp-components-color-foreground, var(--wpds-color-foreground-content-neutral));
 
