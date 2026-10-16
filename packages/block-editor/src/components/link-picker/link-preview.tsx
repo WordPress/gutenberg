@@ -7,18 +7,19 @@ import {
 import { Icon, chevronDown } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { Badge } from '@wordpress/ui';
+import type { LinkPreviewProps } from './types';
 
 /**
  * Link preview component that displays the current link information.
  * This is a presentational component meant to be wrapped in a button.
  *
- * @param {Object}        props        - Component props
- * @param {string}        props.title  - Display title for the link
- * @param {string}        props.url    - Display URL for the link
- * @param {string}        props.image  - Optional image URL for the link preview
- * @param {Array<Object>} props.badges - Optional array of badge objects with label and intent
+ * @param props        - Component props
+ * @param props.title  - Display title for the link
+ * @param props.url    - Display URL for the link
+ * @param props.image  - Optional image URL for the link preview
+ * @param props.badges - Optional array of badge objects with label and intent
  */
-export function LinkPreview( { title, url, image, badges } ) {
+export function LinkPreview( { title, url, image, badges }: LinkPreviewProps ) {
 	return (
 		<HStack justify="space-between" alignment="top">
 			<FlexItem className="link-preview-button__content">

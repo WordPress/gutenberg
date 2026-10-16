@@ -1,9 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { useDispatch } from '@wordpress/data';
 import { useSelect } from '@wordpress/data';
 import { useReducedMotion } from '@wordpress/compose';
 import { LinkPicker } from '../';
+import type { LinkSuggestionsQuery } from '../../link-control/types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -12,7 +15,10 @@ const mockFetchSearchSuggestions = vi.fn();
 // Mock useSelect for search suggestions
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
+	// The stub stands in for every store's actions.
+	useDispatch: ( () => ( {
+		saveEntityRecords: vi.fn(),
+	} ) ) as unknown as typeof useDispatch,
 	useSelect: vi.fn(),
 } ) );
 
@@ -48,8 +54,8 @@ function createMockPreview( {
 }
 
 beforeEach( () => {
-	useReducedMotion.mockReturnValue( true );
-	useSelect.mockImplementation( () => ( {
+	( useReducedMotion as Mock ).mockReturnValue( true );
+	( useSelect as Mock ).mockImplementation( () => ( {
 		fetchSearchSuggestions: mockFetchSearchSuggestions,
 	} ) );
 	mockFetchSearchSuggestions.mockImplementation( () =>
@@ -385,7 +391,7 @@ describe( 'LinkPicker', () => {
 	describe( 'Suggestions query', () => {
 		it( 'should accept suggestionsQuery prop for filtering', async () => {
 			const user = userEvent.setup();
-			const customQuery = {
+			const customQuery: LinkSuggestionsQuery = {
 				type: 'post',
 				subtype: 'page',
 			};

@@ -9,27 +9,19 @@ import { useState, useId, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import LinkControl from '../link-control';
 import { LinkPreview } from './link-preview';
-
-/**
- * @typedef {Object} LinkPickerPreview
- * @property {string}        title           - Display title for the link
- * @property {string}        url             - Display URL for the link
- * @property {string}        [image]         - Optional image URL for the link preview
- * @property {Array<Object>} [badges]        - Optional array of badge objects with label and intent
- * @property {string}        badges[].label  - Badge label text
- * @property {string}        badges[].intent - Badge intent/style
- */
+import type { LinkControlValue } from '../link-control/types';
+import type { LinkPickerProps } from './types';
 
 /**
  * LinkPicker component that combines the preview button and search input.
  * Shows a preview button as a trigger, and opens a popover with search input when clicked.
  *
- * @param {Object}            props                  - Component props
- * @param {LinkPickerPreview} props.preview          - Preview data object
- * @param {Function}          props.onSelect         - Callback when a suggestion is selected
- * @param {Object}            props.suggestionsQuery - Query parameters for suggestions
- * @param {string}            props.label            - Label for the control
- * @param {string}            props.help             - Help text for the control
+ * @param props                  - Component props
+ * @param props.preview          - Preview data object
+ * @param props.onSelect         - Callback when a suggestion is selected
+ * @param props.suggestionsQuery - Query parameters for suggestions
+ * @param props.label            - Label for the control
+ * @param props.help             - Help text for the control
  */
 export function LinkPicker( {
 	preview,
@@ -37,19 +29,19 @@ export function LinkPicker( {
 	suggestionsQuery,
 	label,
 	help,
-} ) {
+}: LinkPickerProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const instanceId = useId();
 	const dialogTitleId = `link-picker-title-${ instanceId }`;
 	const dialogDescriptionId = `link-picker-description-${ instanceId }`;
-	const anchorRef = useRef( null );
+	const anchorRef = useRef< HTMLButtonElement >( null );
 
 	// Use the proper BaseControl pattern for associating help text
 	const { baseControlProps, controlProps } = useBaseControlProps( {
 		help,
 	} );
 
-	const handleChange = ( newValue ) => {
+	const handleChange = ( newValue: LinkControlValue ) => {
 		// Close the popover immediately
 		setIsOpen( false );
 
@@ -111,6 +103,7 @@ export function LinkPicker( {
 							</p>
 						</VisuallyHidden>
 						<LinkControl
+							// @ts-expect-error `LinkControl` reads a `null` value as no link.
 							value={ null }
 							onChange={ handleChange }
 							suggestionsQuery={ suggestionsQuery }

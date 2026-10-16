@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { pencil } from '@wordpress/icons';
 import LinkViewerURL from './link-viewer-url';
+import type { URLPopoverLinkViewerProps } from './types';
 
 export default function LinkViewer( {
 	className,
@@ -11,7 +12,7 @@ export default function LinkViewer( {
 	url,
 	urlLabel,
 	...props
-} ) {
+}: URLPopoverLinkViewerProps ) {
 	return (
 		<div
 			className={ clsx(

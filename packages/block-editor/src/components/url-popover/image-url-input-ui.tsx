@@ -25,7 +25,9 @@ import {
 	linkOff,
 } from '@wordpress/icons';
 import { prependHTTPS } from '@wordpress/url';
+import type { FormEvent, ReactNode, RefObject, SyntheticEvent } from 'react';
 import URLPopover from './index';
+import type { ImageLinkDestination, ImageURLInputUIProps } from './types';
 
 const LINK_DESTINATION_NONE = 'none';
 const LINK_DESTINATION_CUSTOM = 'custom';
@@ -47,20 +49,22 @@ const ImageURLInputUI = ( {
 	lightboxEnabled,
 	onSetLightbox,
 	resetLightbox,
-} ) => {
+}: ImageURLInputUIProps ) => {
 	const [ isOpen, setIsOpen ] = useState( false );
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
+	const [ popoverAnchor, setPopoverAnchor ] = useState< Element | null >(
+		null
+	);
 	const openLinkUI = () => {
 		setIsOpen( true );
 	};
 
 	const [ isEditingLink, setIsEditingLink ] = useState( false );
-	const [ urlInput, setUrlInput ] = useState( null );
+	const [ urlInput, setUrlInput ] = useState< string | null >( null );
 
-	const autocompleteRef = useRef( null );
-	const wrapperRef = useRef();
+	const autocompleteRef = useRef< HTMLDivElement >( null );
+	const wrapperRef = useRef< HTMLDivElement >( undefined );
 
 	useEffect( () => {
 		if ( ! wrapperRef.current ) {
@@ -92,7 +96,7 @@ const ImageURLInputUI = ( {
 		setIsOpen( false );
 	};
 
-	const getUpdatedLinkTargetSettings = ( value ) => {
+	const getUpdatedLinkTargetSettings = ( value: boolean ) => {
 		const newLinkTarget = value ? '_blank' : undefined;
 
 		let updatedRel;
@@ -120,15 +124,16 @@ const ImageURLInputUI = ( {
 	};
 
 	const onFocusOutside = () => {
-		return ( event ) => {
+		return ( event: SyntheticEvent ) => {
 			// The autocomplete suggestions list renders in a separate popover (in a portal),
 			// so onFocusOutside fails to detect that a click on a suggestion occurred in the
 			// LinkContainer. Detect clicks on autocomplete suggestions using a ref here, and
 			// return to avoid the popover being closed.
 			const autocompleteElement = autocompleteRef.current;
+			// The focus event targets a DOM node.
 			if (
 				autocompleteElement &&
-				autocompleteElement.contains( event.target )
+				autocompleteElement.contains( event.target as Node )
 			) {
 				return;
 			}
@@ -139,7 +144,7 @@ const ImageURLInputUI = ( {
 	};
 
 	const onSubmitLinkChange = () => {
-		return ( event ) => {
+		return ( event: FormEvent ) => {
 			if ( urlInput ) {
 				// It is possible the entered URL actually matches a named link destination.
 				// This check will ensure our link destination is correct.
@@ -168,7 +173,7 @@ const ImageURLInputUI = ( {
 	};
 
 	const getLinkDestinations = () => {
-		const linkDestinations = [
+		const linkDestinations: ImageLinkDestination[] = [
 			{
 				linkDestination: LINK_DESTINATION_MEDIA,
 				title: __( 'Link to image file' ),
@@ -187,9 +192,9 @@ const ImageURLInputUI = ( {
 		return linkDestinations;
 	};
 
-	const onSetHref = ( value ) => {
+	const onSetHref = ( value?: string ) => {
 		const linkDestinations = getLinkDestinations();
-		let linkDestinationInput;
+		let linkDestinationInput: string;
 		if ( ! value ) {
 			linkDestinationInput = LINK_DESTINATION_NONE;
 		} else {
@@ -205,16 +210,16 @@ const ImageURLInputUI = ( {
 		} );
 	};
 
-	const onSetNewTab = ( value ) => {
+	const onSetNewTab = ( value: boolean ) => {
 		const updatedLinkTarget = getUpdatedLinkTargetSettings( value );
 		onChangeUrl( updatedLinkTarget );
 	};
 
-	const onSetLinkRel = ( value ) => {
+	const onSetLinkRel = ( value: string ) => {
 		onChangeUrl( { rel: value } );
 	};
 
-	const onSetLinkClass = ( value ) => {
+	const onSetLinkClass = ( value: string ) => {
 		onChangeUrl( { linkClass: value } );
 	};
 
@@ -235,6 +240,7 @@ const ImageURLInputUI = ( {
 					),
 					{
 						a: (
+							// @ts-expect-error `createInterpolateElement` fills in the children.
 							<ExternalLink href="https://developer.mozilla.org/docs/Web/HTML/Attributes/rel" />
 						),
 					}
@@ -253,13 +259,11 @@ const ImageURLInputUI = ( {
 		! lightboxEnabled || ( lightboxEnabled && ! showLightboxSetting );
 	const showLinkEditor = ! linkEditorValue && hideLightboxPanel;
 
-	const urlLabel = (
-		getLinkDestinations().find(
-			( destination ) => destination.linkDestination === linkDestination
-		) || {}
-	).title;
+	const urlLabel = getLinkDestinations().find(
+		( destination ) => destination.linkDestination === linkDestination
+	)?.title;
 
-	const PopoverChildren = () => {
+	const PopoverChildren = (): ReactNode => {
 		if (
 			lightboxEnabled &&
 			showLightboxSetting &&
@@ -316,6 +320,7 @@ const ImageURLInputUI = ( {
 				</>
 			);
 		}
+		return undefined;
 	};
 
 	return (
@@ -333,7 +338,8 @@ const ImageURLInputUI = ( {
 			/>
 			{ isOpen && (
 				<URLPopover
-					ref={ wrapperRef }
+					// The popover sets the ref before the effect reads it.
+					ref={ wrapperRef as RefObject< HTMLDivElement > }
 					anchor={ popoverAnchor }
 					onFocusOutside={ onFocusOutside() }
 					onClose={ closeLinkUI }
