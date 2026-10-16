@@ -1,6 +1,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
-import { useState, createInterpolateElement } from '@wordpress/element';
+import { useRef, useState, createInterpolateElement } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -34,7 +34,6 @@ export default function PostURL( { onClose } ) {
 	const {
 		isEditable,
 		postSlug,
-		hasSlug,
 		postLink,
 		permalinkPrefix,
 		permalinkSuffix,
@@ -52,7 +51,6 @@ export default function PostURL( { onClose } ) {
 			postSlug: safeDecodeURIComponent(
 				select( editorStore ).getEditedPostSlug()
 			),
-			hasSlug: !! select( editorStore ).getEditedPostAttribute( 'slug' ),
 			viewPostLabel: postType?.labels?.view_item,
 			postLink: post.link,
 			permalinkPrefix: permalinkParts?.prefix,
@@ -65,6 +63,7 @@ export default function PostURL( { onClose } ) {
 	const { editPost } = useDispatch( editorStore );
 	const { createNotice } = useDispatch( noticesStore );
 	const [ forceEmptyField, setForceEmptyField ] = useState( false );
+	const slugOnFocusRef = useRef();
 	const copyButtonRef = useCopyToClipboard( permalink, () => {
 		createNotice( 'info', __( 'Copied Permalink to clipboard.' ), {
 			isDismissible: true,
@@ -142,11 +141,20 @@ export default function PostURL( { onClose } ) {
 										setForceEmptyField( false );
 									}
 								} }
+								onFocus={ ( event ) => {
+									slugOnFocusRef.current = event.target.value;
+								} }
 								onBlur={ ( event ) => {
-									// Without a slug the field shows the slug derived from
-									// the title. Writing it would pin that value, so the
-									// slug would stop following the title.
-									if ( hasSlug ) {
+									// Only clean and save a value the user changed. An
+									// untouched slug came from the server, and cleaning
+									// it would strip characters `sanitize_title` kept,
+									// such as emoji. Without a slug the field shows the
+									// slug derived from the title, and saving it would
+									// stop the slug from following the title.
+									if (
+										event.target.value !==
+										slugOnFocusRef.current
+									) {
 										editPost( {
 											slug: cleanForSlug(
 												event.target.value
