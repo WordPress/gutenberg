@@ -181,6 +181,7 @@ export function getClosestTabbable(
 
 export default function useArrowNav() {
 	const {
+		getBlockName,
 		getMultiSelectedBlocksStartClientId,
 		getMultiSelectedBlocksEndClientId,
 		getNextBlockClientId,
@@ -319,6 +320,63 @@ export default function useArrowNav() {
 					event.preventDefault();
 				}
 				return;
+			}
+
+			// Extending into a block that does not support splitting (a
+			// spacer, a separator, a verse) covers it whole: a partial
+			// selection has no value within it, since it cannot merge, and
+			// the browser may have no text position to move the selection
+			// focus to anyway, skipping the block (e.g. a spacer after the
+			// line the caret is on). Record the block selection instead of
+			// letting the browser act.
+			if ( shiftKey ) {
+				const selection = defaultView.getSelection();
+				const focusClientId =
+					selection.rangeCount &&
+					selection.focusNode &&
+					getBlockClientId( selection.focusNode );
+
+				// Within the block the browser moves the selection line by
+				// line; only act at the block's edge in the key's direction.
+				// A selection focus at an element boundary has no rectangle
+				// to measure an edge from and is a block edge itself.
+				const focusElement =
+					focusClientId &&
+					( selection.focusNode.nodeType ===
+					selection.focusNode.ELEMENT_NODE
+						? selection.focusNode
+						: selection.focusNode.parentElement );
+				const focusRichText =
+					focusElement &&
+					focusElement.closest( '[data-wp-block-attribute-key]' );
+				const isFocusAtEdge =
+					focusClientId &&
+					( ! focusRichText ||
+						selection.focusNode.nodeType !==
+							selection.focusNode.TEXT_NODE ||
+						isNavEdge( focusRichText, isReverse ) );
+
+				if ( isFocusAtEdge ) {
+					const adjacentClientId = isReverse
+						? getPreviousBlockClientId( focusClientId )
+						: getNextBlockClientId( focusClientId );
+
+					if (
+						adjacentClientId &&
+						! hasBlockSupport(
+							getBlockName( adjacentClientId ),
+							'splitting',
+							false
+						)
+					) {
+						multiSelect(
+							getSelectionStart().clientId ?? focusClientId,
+							adjacentClientId
+						);
+						event.preventDefault();
+						return;
+					}
+				}
 			}
 
 			// Abort if our current target is not a candidate for navigation
