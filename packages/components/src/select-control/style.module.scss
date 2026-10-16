@@ -67,13 +67,19 @@
 		padding-block: var(--_wp-components-select-control-padding);
 	}
 
-	padding-inline-start: var(--_wp-components-select-control-padding);
-	padding-inline-end: calc(var(--_wp-components-select-control-padding) + 18px);
+	/* stylelint-disable logical-css/require-logical-properties -- The native select can override its direction independently of the sibling chevron; reserve space on the same physical side. */
+	padding-left: var(--_wp-components-select-control-padding);
+	padding-right: calc(var(--_wp-components-select-control-padding) + 18px);
+	&:where(.is-rtl) {
+		padding-left: calc(var(--_wp-components-select-control-padding) + 18px);
+		padding-right: var(--_wp-components-select-control-padding);
+	}
 
 	&:where(.is-minimal) {
 		field-sizing: content;
 	}
 }
+/* stylelint-enable logical-css/require-logical-properties */
 
 .down-arrow {
 	margin-inline-end: -4px;
@@ -84,5 +90,11 @@
 	position: absolute;
 	pointer-events: none;
 
-	inset-inline-end: 0;
+	/* stylelint-disable logical-css/require-logical-properties -- Match the locale-based chevron position. */
+	right: 0;
+	&:where(.is-rtl) {
+		right: auto;
+		left: 0;
+	}
 }
+/* stylelint-enable logical-css/require-logical-properties */

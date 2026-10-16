@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
+import { isRTL } from '@wordpress/i18n';
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
 import { PolymorphicElement } from '../utils/polymorphic-element';
@@ -119,6 +120,7 @@ function UnforwardedSelectControl< V extends string >(
 							[ styles[ 'is-compact' ] ]: size === 'compact',
 							[ styles[ 'is-multiple' ] ]: multiple,
 							[ styles[ 'is-minimal' ] ]: variant === 'minimal',
+							[ styles[ 'is-rtl' ] ]: isRTL(),
 						}
 					) }
 					disabled={ disabled }
