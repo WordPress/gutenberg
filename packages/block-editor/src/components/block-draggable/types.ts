@@ -10,7 +10,7 @@ export interface BlockDraggableRenderProps {
 	onDragEnd?: ( event: DragEvent ) => void;
 }
 
-export interface BlockDraggableProps {
+interface BlockDraggableBaseProps {
 	/** Whether to append the cloned element to the owner document body. */
 	appendToOwnerDocument?: boolean;
 	/** Renders the draggable element. */
@@ -19,17 +19,29 @@ export interface BlockDraggableProps {
 	clientIds: string[];
 	/** Class name of the cloned element. */
 	cloneClassname?: string;
-	/** ID of the element to clone when no drag component is shown. */
-	elementId?: string;
 	/** Called when the drag starts. */
 	onDragStart?: () => void;
 	/** Called when the drag ends. */
 	onDragEnd?: () => void;
 	/** Whether the chip indicates a drop target that won't accept the blocks. */
 	fadeWhenDisabled?: boolean;
-	/** Component shown while dragging, or `null` to show none. */
-	dragComponent?: ReactNode;
 }
+
+export type BlockDraggableProps = BlockDraggableBaseProps &
+	(
+		| {
+				/** Component shown while dragging, instead of the chip. */
+				dragComponent?: Exclude< ReactNode, null >;
+				/** ID of the element to clone, unused while a component is shown. */
+				elementId?: string;
+		  }
+		| {
+				/** Clones the element instead of showing a component. */
+				dragComponent: null;
+				/** ID of the element to clone while dragging. */
+				elementId: string;
+		  }
+	);
 
 export interface BlockDraggableChipProps {
 	/** How many blocks are being dragged. */
