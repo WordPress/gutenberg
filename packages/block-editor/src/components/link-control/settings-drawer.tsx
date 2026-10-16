@@ -7,8 +7,13 @@ import { chevronLeftSmall, chevronRightSmall } from '@wordpress/icons';
 import { useReducedMotion, useInstanceId } from '@wordpress/compose';
 import { _x, isRTL } from '@wordpress/i18n';
 import { Fragment } from '@wordpress/element';
+import type { LinkSettingsDrawerProps } from './types';
 
-function LinkSettingsDrawer( { children, settingsOpen, setSettingsOpen } ) {
+function LinkSettingsDrawer( {
+	children,
+	settingsOpen,
+	setSettingsOpen,
+}: LinkSettingsDrawerProps ) {
 	const prefersReducedMotion = useReducedMotion();
 	const MaybeAnimatePresence = prefersReducedMotion
 		? Fragment

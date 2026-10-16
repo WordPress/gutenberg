@@ -5,6 +5,7 @@ import deprecated from '@wordpress/deprecated';
 import LinkControlSearchCreate from './search-create-button';
 import LinkControlSearchItem from './search-item';
 import { CREATE_TYPE, LINK_ENTRY_TYPES } from './constants';
+import type { LinkControlSearchResultsProps } from './types';
 
 function LinkControlSearchResults( {
 	withCreateSuggestion,
@@ -18,7 +19,7 @@ function LinkControlSearchResults( {
 	isInitialSuggestions,
 	createSuggestionButtonText,
 	suggestionsQuery,
-} ) {
+}: LinkControlSearchResultsProps ) {
 	const resultsListClasses = clsx(
 		'block-editor-link-control__search-results',
 		{
@@ -28,7 +29,8 @@ function LinkControlSearchResults( {
 
 	const isSingleDirectEntryResult =
 		suggestions.length === 1 &&
-		LINK_ENTRY_TYPES.includes( suggestions[ 0 ].type );
+		// An absent type is not a link entry type.
+		LINK_ENTRY_TYPES.includes( suggestions[ 0 ].type as string );
 	const shouldShowCreateSuggestion =
 		withCreateSuggestion &&
 		! isSingleDirectEntryResult &&
@@ -41,7 +43,8 @@ function LinkControlSearchResults( {
 		: sprintf(
 				/* translators: %s: search term. */
 				__( 'Search results for "%s"' ),
-				currentInputValue
+				// A search sets the value before its results are shown.
+				currentInputValue as string
 			);
 
 	return (
@@ -97,7 +100,7 @@ function LinkControlSearchResults( {
 								} }
 								isSelected={ index === selectedSuggestion }
 								isURL={ LINK_ENTRY_TYPES.includes(
-									suggestion.type
+									suggestion.type as string
 								) }
 								searchTerm={ currentInputValue }
 								shouldShowType={ shouldShowSuggestionsTypes }
@@ -114,7 +117,9 @@ function LinkControlSearchResults( {
 
 export default LinkControlSearchResults;
 
-export const __experimentalLinkControlSearchResults = ( props ) => {
+export const __experimentalLinkControlSearchResults = (
+	props: LinkControlSearchResultsProps
+) => {
 	deprecated( 'wp.blockEditor.__experimentalLinkControlSearchResults', {
 		since: '6.8',
 	} );

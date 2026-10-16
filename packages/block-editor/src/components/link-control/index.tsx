@@ -1,3 +1,4 @@
+import type { KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
 import {
 	Button,
@@ -29,88 +30,13 @@ import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
 import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
 import normalizeUrl from './normalize-url';
-
-/**
- * Default properties associated with a link control value.
- *
- * @typedef WPLinkControlDefaultValue
- *
- * @property {string}   url           Link URL.
- * @property {string=}  title         Link title.
- * @property {boolean=} opensInNewTab Whether link should open in a new browser
- *                                    tab. This value is only assigned if not
- *                                    providing a custom `settings` prop.
- */
-
-/**
- * Custom settings values associated with a link.
- *
- * @typedef {{[setting:string]:any}} WPLinkControlSettingsValue
- */
-
-/**
- * Custom settings values associated with a link.
- *
- * @typedef WPLinkControlSetting
- *
- * @property {string} id    Identifier to use as property for setting value.
- * @property {string} title Human-readable label to show in user interface.
- */
-
-/**
- * Properties associated with a link control value, composed as a union of the
- * default properties and any custom settings values.
- *
- * @typedef {WPLinkControlDefaultValue&WPLinkControlSettingsValue} WPLinkControlValue
- */
-
-/** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
-
-/**
- * Properties associated with a search suggestion used within the LinkControl.
- *
- * @typedef WPLinkControlSuggestion
- *
- * @property {string} id    Identifier to use to uniquely identify the suggestion.
- * @property {string} type  Identifies the type of the suggestion (eg: `post`,
- *                          `page`, `url`...etc)
- * @property {string} title Human-readable label to show in user interface.
- * @property {string} url   A URL for the suggestion.
- */
-
-/** @typedef {(title:string)=>WPLinkControlSuggestion} WPLinkControlCreateSuggestionProp */
-
-/**
- * @typedef WPLinkControlProps
- *
- * @property {(WPLinkControlSetting[])=}  settings                   An array of settings objects. Each object will used to
- *                                                                   render a `ToggleControl` for that setting.
- * @property {boolean=}                   forceIsEditingLink         If passed as either `true` or `false`, controls the
- *                                                                   internal editing state of the component to respective
- *                                                                   show or not show the URL input field.
- * @property {string=}                    searchInputPlaceholder     Placeholder text for the search input.
- * @property {WPLinkControlValue=}        value                      Current link value.
- * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
- *                                                                   the user selects a new link or updates settings.
- * @property {Function=}                  onInputChange              Callback fired when the search input value changes.
- *                                                                   Use this for observation only (e.g., to track search state).
- * @property {Function=}                  onRemove                   Callback invoked when the link is removed.
- * @property {Function=}                  onCancel                   Callback invoked when editing is cancelled.
- * @property {string=}                    inputValue                 Initial value for the search input (uncontrolled).
- * @property {boolean=}                   noDirectEntry              Whether to allow turning a URL-like search query directly into a link.
- * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
- * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
- * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
- * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
- * @property {Function=}                  transformSuggestions       Changes the search suggestions before they are shown. Called
- *                                                                   with the suggestions and `{ searchTerm, isInitialSuggestions }`,
- *                                                                   and returns the suggestions to show or a Promise of them.
- * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
- * @property {boolean=}                   hasTextControl             Whether to add a text field to the UI to update the value.title.
- * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
- * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
- * @property {boolean=}                   handleEntities             Whether to handle entity links (links with ID). When true and a link has an ID, the input will be disabled and show an unlink button.
- */
+import type {
+	LinkControlProps,
+	LinkControlSuggestion,
+	LinkControlValidity,
+	LinkControlValue,
+	SearchSuffixControlProps,
+} from './types';
 
 const noop = () => {};
 
@@ -153,7 +79,7 @@ const PREFERENCE_KEY = 'linkControlSettingsDrawer';
  * />
  * ```
  *
- * @param {WPLinkControlProps} props Component props.
+ * @param {LinkControlProps} props Component props.
  */
 function LinkControl( {
 	searchInputPlaceholder,
@@ -178,7 +104,7 @@ function LinkControl( {
 	hasTextControl = false,
 	renderControlBottom = null,
 	handleEntities = false,
-} ) {
+}: LinkControlProps ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
 	}
@@ -187,7 +113,9 @@ function LinkControl( {
 	// Sets if the URL value is valid when submitted. The value could be set to
 	// { type: 'invalid', message: 'Please enter a valid URL.' } or { type: 'valid' }.
 	// When it is undefined, the URL value has not been validated.
-	const [ customValidity, setCustomValidity ] = useState( undefined );
+	const [ customValidity, setCustomValidity ] = useState<
+		LinkControlValidity | undefined
+	>( undefined );
 
 	const { advancedSettingsPreference } = useSelect( ( select ) => {
 		const prefsStore = select( preferencesStore );
@@ -208,9 +136,9 @@ function LinkControl( {
 	 * environments which may not have preferences setup.
 	 * Therefore a local state is also  used as a fallback.
 	 *
-	 * @param {boolean} prefVal the open/closed state of the Advanced Settings Drawer.
+	 * @param prefVal the open/closed state of the Advanced Settings Drawer.
 	 */
-	const setSettingsOpenWithPreference = ( prefVal ) => {
+	const setSettingsOpenWithPreference = ( prefVal: boolean ) => {
 		if ( setPreference ) {
 			setPreference( PREFERENCE_SCOPE, PREFERENCE_KEY, prefVal );
 		}
@@ -223,10 +151,10 @@ function LinkControl( {
 	const isSettingsOpen = advancedSettingsPreference || settingsOpen;
 
 	const isMountingRef = useRef( true );
-	const wrapperNode = useRef();
+	const wrapperNode = useRef< HTMLDivElement >( null );
 	const wrapperRef = useMergeRefs( [ wrapperNode, useNativeUndo() ] );
-	const textInputRef = useRef();
-	const searchInputRef = useRef();
+	const textInputRef = useRef< HTMLInputElement >( null );
+	const searchInputRef = useRef< HTMLInputElement >( null );
 	// TODO: Remove entityUrlFallbackRef and previewValue in favor of value prop after taxonomy entity binding
 	// is stable and returns the correct URL instead of null while resolving when creating the entity.
 	//
@@ -235,7 +163,7 @@ function LinkControl( {
 	// The URL can return null, especially for taxonomy entities, while entity binding is being resolved.
 	// To avoid unnecessary rerenders and focus loss, we preserve the URL from the suggestion and use it
 	// as a fallback until the entity binding is available.
-	const entityUrlFallbackRef = useRef();
+	const entityUrlFallbackRef = useRef< string >( undefined );
 
 	const settingsKeys = settings.map( ( { id } ) => id );
 
@@ -248,7 +176,7 @@ function LinkControl( {
 	] = useInternalValue( value );
 
 	// Wrapper for input changes that calls both internal and external handlers
-	const handleInputChange = ( newValue ) => {
+	const handleInputChange = ( newValue: string ) => {
 		setInternalURLInputValue( newValue );
 		onInputChange?.( newValue );
 	};
@@ -261,7 +189,8 @@ function LinkControl( {
 	const helpTextId = isEntity ? `${ baseId }__help` : null;
 
 	const valueHasChanges =
-		value && ! isShallowEqualObjects( internalControlValue, value );
+		// The internal value follows `value`, which is set here.
+		value && ! isShallowEqualObjects( internalControlValue!, value );
 
 	const [ isEditingLink, setIsEditingLink ] = useState(
 		forceIsEditingLink !== undefined
@@ -294,8 +223,9 @@ function LinkControl( {
 		// ...then move focus to the *first* element to avoid focus loss
 		// and to ensure focus is *within* the Link UI.
 		const nextFocusTarget =
-			focus.focusable.find( wrapperNode.current )[ 0 ] ||
-			wrapperNode.current;
+			// The wrapper is mounted once the editing state changes.
+			focus.focusable.find( wrapperNode.current! )[ 0 ] ||
+			wrapperNode.current!;
 
 		nextFocusTarget.focus();
 	}, [ isEditingLink, isCreatingPage ] );
@@ -313,7 +243,7 @@ function LinkControl( {
 	// Warn when inputValue changes after mount. inputValue only sets the
 	// initial value. The component is uncontrolled and changes
 	// from the parent will not update the search input.
-	const prevInputValueRef = useRef();
+	const prevInputValueRef = useRef< string >( undefined );
 	useEffect( () => {
 		if ( prevInputValueRef.current === undefined ) {
 			prevInputValueRef.current = propInputValue;
@@ -344,7 +274,8 @@ function LinkControl( {
 		}
 	}, [ customValidity ] );
 
-	const hasLinkValue = value?.url?.trim()?.length > 0;
+	// An absent length compares as `false`.
+	const hasLinkValue = ( value?.url?.trim()?.length as number ) > 0;
 
 	/**
 	 * Cancels editing state.
@@ -357,16 +288,18 @@ function LinkControl( {
 	 * Validates a URL string using a multi-stage validation process.
 	 * This helper consolidates URL validation logic used throughout the component.
 	 *
-	 * @param {string} urlToValidate - The URL string to validate
-	 * @return {Object} Validation result with isValid boolean and optional errorMessage
+	 * @param urlToValidate - The URL string to validate
+	 * @return Validation result with isValid boolean and optional errorMessage
 	 */
-	const validateUrl = ( urlToValidate ) => {
-		const invalidResult = {
+	const validateUrl = (
+		urlToValidate: string | null | undefined
+	): LinkControlValidity => {
+		const invalidResult: LinkControlValidity = {
 			type: 'invalid',
 			message: __( 'Please enter a valid URL.' ),
 		};
 
-		const validResult = {
+		const validResult: LinkControlValidity = {
 			type: 'valid',
 		};
 
@@ -400,7 +333,7 @@ function LinkControl( {
 		return isURL( urlToCheck ) ? validResult : invalidResult;
 	};
 
-	const handleSelectSuggestion = ( updatedValue ) => {
+	const handleSelectSuggestion = ( updatedValue: LinkControlSuggestion ) => {
 		// Validate URL suggestions (link, mailto, tel, internal) or manually entered URLs.
 		// Entity suggestions (post, page, category, etc.) don't need validation as they come from the database.
 		// However, URL suggestions (created from user input with types like 'link', 'mailto', etc.)
@@ -446,7 +379,7 @@ function LinkControl( {
 				}
 				return acc;
 			},
-			{}
+			{} as LinkControlValue
 		);
 
 		onChange( {
@@ -527,7 +460,7 @@ function LinkControl( {
 		submitUrlValue();
 	};
 
-	const handleSubmitWithEnter = ( event ) => {
+	const handleSubmitWithEnter = ( event: KeyboardEvent ) => {
 		const { keyCode } = event;
 
 		if (
@@ -543,7 +476,7 @@ function LinkControl( {
 		setInternalControlValue( value );
 	};
 
-	const handleCancel = ( event ) => {
+	const handleCancel = ( event: MouseEvent ) => {
 		event.preventDefault();
 		event.stopPropagation();
 
@@ -573,7 +506,8 @@ function LinkControl( {
 		// the original values when spread in handleSubmit. This ensures that
 		// when the user types a custom URL and submits, the entity link is
 		// properly severed (not just when selecting a different entity from suggestions).
-		const { id, kind, type, ...restValue } = internalControlValue;
+		// Unlinking is only offered for an entity value.
+		const { id, kind, type, ...restValue } = internalControlValue!;
 		setInternalControlValue( {
 			...restValue,
 			id: undefined,
@@ -675,7 +609,8 @@ function LinkControl( {
 								ref={ textInputRef }
 								className="block-editor-link-control__field block-editor-link-control__text-content"
 								label={ __( 'Text' ) }
-								value={ internalControlValue?.title }
+								// An absent title leaves the field uncontrolled.
+								value={ internalControlValue?.title as string }
 								onChange={ setInternalTextInputValue }
 								onKeyDown={ handleSubmitWithEnter }
 							/>
@@ -685,7 +620,8 @@ function LinkControl( {
 							currentLink={ value }
 							className="block-editor-link-control__field block-editor-link-control__search-input"
 							placeholder={ searchInputPlaceholder }
-							value={ currentUrlInputValue }
+							// As before, an entity's unresolved `null` URL is passed through.
+							value={ currentUrlInputValue as string }
 							withCreateSuggestion={ withCreateSuggestion }
 							onCreateSuggestion={ createPage }
 							onChange={ handleInputChange }
@@ -741,12 +677,14 @@ function LinkControl( {
 			{ value && ! isEditingLink && ! isCreatingPage && (
 				<LinkPreview
 					key={ previewValue?.url } // force remount when URL changes to avoid race conditions for rich previews
-					value={ previewValue }
+					// Rendered only with a value.
+					value={ previewValue! }
 					onEditClick={ () => setIsEditingLink( true ) }
 					hasRichPreviews={ hasRichPreviews }
 					hasUnlinkControl={ shownUnlinkControl }
 					onRemove={ () => {
-						onRemove();
+						// The unlink control is only shown with `onRemove`.
+						onRemove!();
 						setIsEditingLink( true );
 					} }
 				/>
@@ -804,13 +742,13 @@ function LinkControl( {
  * Suffix control component for LinkControl search input.
  * Handles the display of unlink button for entities and submit button for regular links.
  *
- * @param {Object}   props             - Component props
- * @param {boolean}  props.isEntity    - Whether the link is bound to an entity
- * @param {boolean}  props.showActions - Whether to show action buttons
- * @param {boolean}  props.isDisabled  - Whether the submit button should be disabled
- * @param {Function} props.onUnlink    - Callback when unlink button is clicked
- * @param {Function} props.onSubmit    - Callback when submit button is clicked
- * @param {string}   props.helpTextId  - ID of the help text element for accessibility
+ * @param props             - Component props
+ * @param props.isEntity    - Whether the link is bound to an entity
+ * @param props.showActions - Whether to show action buttons
+ * @param props.isDisabled  - Whether the submit button should be disabled
+ * @param props.onUnlink    - Callback when unlink button is clicked
+ * @param props.onSubmit    - Callback when submit button is clicked
+ * @param props.helpTextId  - ID of the help text element for accessibility
  */
 function SearchSuffixControl( {
 	isEntity,
@@ -819,13 +757,14 @@ function SearchSuffixControl( {
 	onUnlink,
 	onSubmit,
 	helpTextId,
-} ) {
+}: SearchSuffixControlProps ) {
 	if ( isEntity ) {
 		return (
 			<Button
 				icon={ linkOff }
 				onClick={ onUnlink }
-				aria-describedby={ helpTextId }
+				// Set whenever `isEntity` is.
+				aria-describedby={ helpTextId! }
 				showTooltip
 				label={ __( 'Unsync and edit' ) }
 				__next40pxDefaultSize
@@ -854,7 +793,7 @@ function SearchSuffixControl( {
 LinkControl.ViewerFill = ViewerFill;
 LinkControl.DEFAULT_LINK_SETTINGS = DEFAULT_LINK_SETTINGS;
 
-const DeprecatedExperimentalLinkControl = ( props ) => {
+const DeprecatedExperimentalLinkControl = ( props: LinkControlProps ) => {
 	deprecated( 'wp.blockEditor.__experimentalLinkControl', {
 		since: '6.8',
 		alternative: 'wp.blockEditor.LinkControl',

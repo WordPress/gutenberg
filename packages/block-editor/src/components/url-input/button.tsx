@@ -1,3 +1,4 @@
+import type { FormEvent } from 'react';
 import { __ } from '@wordpress/i18n';
 import { useReducer } from '@wordpress/element';
 import {
@@ -6,22 +7,23 @@ import {
 } from '@wordpress/components';
 import { link, keyboardReturn, arrowLeft } from '@wordpress/icons';
 import URLInput from './';
+import type { URLInputButtonProps } from './types';
 
 /**
  * A button that toggles a URL input field for inserting or editing links.
  *
- * @param {Object}   props          Component properties.
- * @param {string}   props.url      The current URL value.
- * @param {Function} props.onChange Callback function to handle URL changes.
- * @return {React.JSX.Element} The URL input button component.
+ * @param props          Component properties.
+ * @param props.url      The current URL value.
+ * @param props.onChange Callback function to handle URL changes.
+ * @return The URL input button component.
  */
-function URLInputButton( { url, onChange } ) {
+function URLInputButton( { url, onChange }: URLInputButtonProps ) {
 	const [ expanded, toggleExpanded ] = useReducer(
 		( isExpanded ) => ! isExpanded,
 		false
 	);
 
-	const submitLink = ( event ) => {
+	const submitLink = ( event: FormEvent ) => {
 		event.preventDefault();
 		toggleExpanded();
 	};

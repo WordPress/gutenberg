@@ -8,7 +8,10 @@ globalThis.wpVitest.mockMatchMedia();
 
 describe( 'URLInputButton', () => {
 	it( 'should render a `Insert link` button and not be pressed when `url` is not provided', () => {
-		render( <URLInputButton /> );
+		render(
+			// @ts-expect-error Rendering alone does not call `onChange`.
+			<URLInputButton />
+		);
 
 		expect(
 			screen.queryByRole( 'button', {
@@ -26,7 +29,10 @@ describe( 'URLInputButton', () => {
 	} );
 
 	it( 'should render an `Edit link` button and be pressed when `url` is provided', () => {
-		render( <URLInputButton url="https://example.com" /> );
+		render(
+			// @ts-expect-error Rendering alone does not call `onChange`.
+			<URLInputButton url="https://example.com" />
+		);
 
 		expect(
 			screen.queryByRole( 'button', {
@@ -44,7 +50,10 @@ describe( 'URLInputButton', () => {
 	} );
 
 	it( 'should not render a form by default', () => {
-		render( <URLInputButton /> );
+		render(
+			// @ts-expect-error Rendering alone does not call `onChange`.
+			<URLInputButton />
+		);
 
 		expect(
 			screen.queryByRole( 'button', { name: 'Submit' } )
@@ -53,7 +62,10 @@ describe( 'URLInputButton', () => {
 
 	it( 'should render a form when `Insert link` button is clicked', async () => {
 		const user = userEvent.setup();
-		render( <URLInputButton /> );
+		render(
+			// @ts-expect-error Rendering alone does not call `onChange`.
+			<URLInputButton />
+		);
 
 		// Click the button to insert a link.
 		await user.click(
@@ -97,7 +109,10 @@ describe( 'URLInputButton', () => {
 	it( 'should close the form when the user clicks the `Close` button', async () => {
 		const user = userEvent.setup();
 
-		render( <URLInputButton /> );
+		render(
+			// @ts-expect-error Rendering alone does not call `onChange`.
+			<URLInputButton />
+		);
 
 		// Click the button to insert a link.
 		await user.click(

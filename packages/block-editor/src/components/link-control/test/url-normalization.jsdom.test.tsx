@@ -1,8 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import type { ReactElement } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { SlotFillProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import type { useDispatch } from '@wordpress/data';
 import { useReducedMotion } from '@wordpress/compose';
 import LinkControl from '../';
 import { fetchFauxEntitySuggestions } from './fixtures';
@@ -13,7 +16,10 @@ const mockFetchSearchSuggestions = vi.fn();
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useDispatch: () => ( { saveEntityRecords: vi.fn() } ),
+	// The stub stands in for every store's actions.
+	useDispatch: ( () => ( {
+		saveEntityRecords: vi.fn(),
+	} ) ) as unknown as typeof useDispatch,
 	useSelect: vi.fn(),
 } ) );
 
@@ -23,8 +29,8 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 } ) );
 
 beforeEach( () => {
-	useReducedMotion.mockReturnValue( true );
-	useSelect.mockImplementation( () => ( {
+	( useReducedMotion as Mock ).mockReturnValue( true );
+	( useSelect as Mock ).mockImplementation( () => ( {
 		fetchSearchSuggestions: mockFetchSearchSuggestions,
 	} ) );
 	mockFetchSearchSuggestions.mockImplementation( fetchFauxEntitySuggestions );
@@ -34,7 +40,7 @@ afterEach( () => {
 	mockFetchSearchSuggestions.mockReset();
 } );
 
-function renderWithProvider( ui ) {
+function renderWithProvider( ui: ReactElement ) {
 	return render( ui, { wrapper: SlotFillProvider } );
 }
 

@@ -1,4 +1,5 @@
 import { expect } from 'vitest';
+import type { Mock } from 'vitest';
 
 /**
  * Temporary test helper while `URLInput` still unlocks the deprecated private
@@ -17,7 +18,7 @@ export const VALIDATED_INPUT_CONTROL_DEPRECATION =
  */
 export function expectValidatedInputControlDeprecationIfCalled() {
 	// eslint-disable-next-line no-console -- Inspect expected console warnings.
-	const deprecationCalls = console.warn.mock.calls.filter(
+	const deprecationCalls = ( console.warn as Mock ).mock.calls.filter(
 		( [ message ] ) => message === VALIDATED_INPUT_CONTROL_DEPRECATION
 	);
 

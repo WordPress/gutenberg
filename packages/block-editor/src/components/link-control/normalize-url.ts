@@ -12,10 +12,13 @@ import { TEL_TYPE, MAILTO_TYPE, INTERNAL_TYPE, URL_TYPE } from './constants';
  * - Relative paths (/, ./, ../) → keep as-is
  * - Hash links (#section) → keep as-is
  *
- * @param {string} url - The URL to normalize
- * @return {Object} An object containing the normalized URL and its type
+ * @param url - The URL to normalize
+ * @return An object containing the normalized URL and its type
  */
-export default function normalizeUrl( url ) {
+export default function normalizeUrl( url: string | null | undefined ): {
+	url: string | undefined;
+	type: string;
+} {
 	const trimmedUrl = url?.trim();
 
 	if ( ! trimmedUrl ) {

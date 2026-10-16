@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import {
 	act,
 	fireEvent,
@@ -14,6 +15,7 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import URLInput from '../';
 import { store as blockEditorStore } from '../../../store';
 import { expectValidatedInputControlDeprecationIfCalled } from './fixtures/validated-input-control-deprecation';
+import type { URLInputProps, URLInputSuggestionsProps } from '../types';
 
 globalThis.wpVitest.mockScrollIntoView();
 globalThis.wpVitest.mockMatchMedia();
@@ -55,10 +57,10 @@ async function flushDebounce() {
  * `URLInput` is a controlled component, so most interactions require an owner
  * that holds on to the value.
  *
- * @param {Object} props Props passed through to `URLInput`, with `value` used
- *                       as the initial value.
+ * @param props Props passed through to `URLInput`, with `value` used
+ *              as the initial value.
  */
-function ControlledURLInput( props ) {
+function ControlledURLInput( props: Partial< URLInputProps > ) {
 	const { onChange, value: initialValue = '', ...restProps } = props;
 	const [ value, setValue ] = useState( initialValue );
 
@@ -75,7 +77,7 @@ function ControlledURLInput( props ) {
 }
 
 describe( 'URLInput', () => {
-	let fetchLinkSuggestions;
+	let fetchLinkSuggestions: Mock;
 
 	beforeEach( () => {
 		fetchLinkSuggestions = vi.fn().mockResolvedValue( SUGGESTIONS );
@@ -85,7 +87,7 @@ describe( 'URLInput', () => {
 		vi.clearAllMocks();
 	} );
 
-	function renderURLInput( props = {} ) {
+	function renderURLInput( props: Partial< URLInputProps > = {} ) {
 		const user = userEvent.setup();
 		const onChange = vi.fn();
 
@@ -97,7 +99,11 @@ describe( 'URLInput', () => {
 			/>
 		);
 
-		return { user, onChange, input: screen.getByRole( 'combobox' ) };
+		return {
+			user,
+			onChange,
+			input: screen.getByRole( 'combobox' ) as HTMLInputElement,
+		};
 	}
 
 	// Mounting with a value requests suggestions for it, so the list is open
@@ -220,7 +226,7 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should fetch suggestions on focus when the previous search returned no results', async () => {
-			let resolveMountRequest;
+			let resolveMountRequest: ( ( value: unknown ) => void ) | undefined;
 			fetchLinkSuggestions
 				.mockImplementationOnce(
 					() =>
@@ -238,7 +244,7 @@ describe( 'URLInput', () => {
 
 			// The request made on mount returns no results. The spinner is only
 			// removed once it has settled.
-			resolveMountRequest( [] );
+			resolveMountRequest!( [] );
 			await waitFor( () =>
 				expect(
 					screen.queryByRole( 'presentation' )
@@ -277,7 +283,7 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should ignore the response of a superseded request', async () => {
-			let resolveStaleRequest;
+			let resolveStaleRequest: ( ( value: unknown ) => void ) | undefined;
 			fetchLinkSuggestions
 				.mockImplementationOnce(
 					() =>
@@ -298,7 +304,7 @@ describe( 'URLInput', () => {
 				expect( fetchLinkSuggestions ).toHaveBeenCalledTimes( 2 )
 			);
 
-			resolveStaleRequest( [
+			resolveStaleRequest!( [
 				{
 					id: 3,
 					title: 'Stale result',
@@ -618,13 +624,15 @@ describe( 'URLInput', () => {
 		} );
 
 		it( 'should render suggestions via `__experimentalRenderSuggestions`', async () => {
-			const renderSuggestions = vi.fn( ( { suggestions } ) => (
-				<ul>
-					{ suggestions.map( ( suggestion ) => (
-						<li key={ suggestion.id }>{ suggestion.title }</li>
-					) ) }
-				</ul>
-			) );
+			const renderSuggestions = vi.fn(
+				( { suggestions }: URLInputSuggestionsProps ) => (
+					<ul>
+						{ suggestions.map( ( suggestion ) => (
+							<li key={ suggestion.id }>{ suggestion.title }</li>
+						) ) }
+					</ul>
+				)
+			);
 
 			renderURLInput( {
 				value: 'hello',

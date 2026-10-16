@@ -1,3 +1,4 @@
+import type { KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
@@ -16,6 +17,14 @@ import { useSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { LinkControlSuggestion } from '../link-control/types';
+import type {
+	LinkSuggestionsRequest,
+	URLInputFieldProps,
+	URLInputInputProps,
+	URLInputProps,
+	URLInputSuggestionsListProps,
+} from './types';
 
 const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
@@ -24,10 +33,12 @@ const noop = () => {};
 /**
  * Whether the argument is a function.
  *
- * @param {*} maybeFunc The argument to check.
- * @return {boolean} True if the argument is a function, false otherwise.
+ * @param maybeFunc The argument to check.
+ * @return True if the argument is a function, false otherwise.
  */
-function isFunction( maybeFunc ) {
+function isFunction< T >(
+	maybeFunc: T
+): maybeFunc is Extract< T, ( ...args: never[] ) => unknown > {
 	return typeof maybeFunc === 'function';
 }
 
@@ -39,7 +50,7 @@ function isFunction( maybeFunc ) {
  *
  * @param {Object} props Component props.
  */
-export default function URLInput( props ) {
+export default function URLInput( props: URLInputProps ) {
 	const {
 		__experimentalFetchLinkSuggestions: fetchLinkSuggestionsProp,
 		__experimentalHandleURLSuggestions: handleURLSuggestions,
@@ -70,19 +81,27 @@ export default function URLInput( props ) {
 	const { getSettings } = useSelect( blockEditorStore );
 	const debouncedSpeak = useDebounce( speak, 500 );
 
-	const [ suggestions, setSuggestions ] = useState( [] );
-	const [ suggestionsValue, setSuggestionsValue ] = useState( null );
-	const [ selectedSuggestion, setSelectedSuggestion ] = useState( null );
+	const [ suggestions, setSuggestions ] = useState< LinkControlSuggestion[] >(
+		[]
+	);
+	const [ suggestionsValue, setSuggestionsValue ] = useState< string | null >(
+		null
+	);
+	const [ selectedSuggestion, setSelectedSuggestion ] = useState<
+		number | null
+	>( null );
 	const [ isSuggestionsListOpen, setIsSuggestionsListOpen ] =
 		useState( false );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ isComposing, setIsComposing ] = useState( false );
 
-	const fallbackInputRef = useRef();
-	const suggestionNodesRef = useRef( [] );
+	const fallbackInputRef = useRef< HTMLInputElement >( null );
+	const suggestionNodesRef = useRef< ( HTMLElement | null )[] >( [] );
 	// A fetch Promise can't be aborted. It's mimicked by holding on to the
 	// pending request so that responses of superseded requests can be ignored.
-	const suggestionsRequestRef = useRef( null );
+	const suggestionsRequestRef = useRef< LinkSuggestionsRequest | null >(
+		null
+	);
 
 	const controlInputRef = inputRef ?? fallbackInputRef;
 
@@ -138,7 +157,7 @@ export default function URLInput( props ) {
 		setSelectedSuggestion( null );
 		setIsLoading( true );
 
-		const request = fetchLinkSuggestions( search, {
+		const request: LinkSuggestionsRequest = fetchLinkSuggestions( search, {
 			isInitialSuggestions,
 		} );
 		suggestionsRequestRef.current = request;
@@ -232,19 +251,20 @@ export default function URLInput( props ) {
 		};
 	}, [] );
 
-	function selectLink( suggestion ) {
-		onChange( suggestion.url, suggestion );
+	function selectLink( suggestion: LinkControlSuggestion ) {
+		// Suggestions always carry a URL.
+		onChange( suggestion.url as string, suggestion );
 		setSelectedSuggestion( null );
 		setIsSuggestionsListOpen( false );
 	}
 
-	function handleSuggestionClick( suggestion ) {
+	function handleSuggestionClick( suggestion: LinkControlSuggestion ) {
 		selectLink( suggestion );
 		// Move focus to the input field when a link suggestion is clicked.
-		controlInputRef.current.focus();
+		controlInputRef.current!.focus();
 	}
 
-	function handleChange( newValue ) {
+	function handleChange( newValue: string ) {
 		// `InputControl` passes an `{ event }` object as its second argument,
 		// which callers would mistake for a selected suggestion.
 		onChange( newValue );
@@ -275,7 +295,7 @@ export default function URLInput( props ) {
 		}
 	}
 
-	function handleKeyDown( event ) {
+	function handleKeyDown( event: KeyboardEvent< HTMLInputElement > ) {
 		onKeyDown?.( event );
 
 		// Unless the list can consume them, the keys must reach the editor for
@@ -289,18 +309,25 @@ export default function URLInput( props ) {
 				// Firefox on Windows leaves the caret in place, trapping focus,
 				// since the editor only navigates away from an edge.
 				// See: https://github.com/WordPress/gutenberg/issues/5693#issuecomment-436684747
+				// The key events come from the input element.
 				const caret =
-					event.keyCode === UP ? 0 : event.target.value.length;
+					event.keyCode === UP
+						? 0
+						: ( event.target as HTMLInputElement ).value.length;
 
 				// UP moves the caret to the start of the text, DOWN to the end.
 				// Once it is already there, with nothing selected, the key is
 				// left to the editor to navigate out of the field.
 				if (
-					event.target.selectionStart !== caret ||
-					event.target.selectionEnd !== caret
+					( event.target as HTMLInputElement ).selectionStart !==
+						caret ||
+					( event.target as HTMLInputElement ).selectionEnd !== caret
 				) {
 					event.preventDefault();
-					event.target.setSelectionRange( caret, caret );
+					( event.target as HTMLInputElement ).setSelectionRange(
+						caret,
+						caret
+					);
 				}
 			} else if ( event.keyCode === ENTER && onSubmit ) {
 				event.preventDefault();
@@ -310,7 +337,8 @@ export default function URLInput( props ) {
 			return;
 		}
 
-		const suggestion = suggestions[ selectedSuggestion ] ?? null;
+		// A `null` index looks up no suggestion.
+		const suggestion = suggestions[ selectedSuggestion as number ] ?? null;
 
 		switch ( event.keyCode ) {
 			case UP:
@@ -355,7 +383,7 @@ export default function URLInput( props ) {
 		hideLabelFromVision,
 	};
 
-	const inputProps = {
+	const inputProps: URLInputInputProps = {
 		id: inputId,
 		value,
 		required,
@@ -419,7 +447,7 @@ function Control( {
 	customValidity,
 	markWhenOptional,
 	renderControl,
-} ) {
+}: URLInputFieldProps ) {
 	// Once a validity has been reported, keep using the validated control, so
 	// that clearing the validity doesn't remount (and blur) the input.
 	const [ isValidated, setIsValidated ] = useState(
@@ -469,19 +497,23 @@ function Suggestions( {
 	suggestions,
 	suggestionsListboxId,
 	suggestionsValue,
-} ) {
+}: URLInputSuggestionsListProps ) {
 	const suggestionsListProps = {
 		id: suggestionsListboxId,
 		ref: autocompleteRef,
 		role: 'listbox',
 	};
 
-	const buildSuggestionItemProps = ( suggestion, index ) => {
+	const buildSuggestionItemProps = (
+		suggestion: LinkControlSuggestion,
+		index: number
+	) => {
 		return {
 			role: 'option',
-			tabIndex: '-1',
+			// React coerces the string like the number.
+			tabIndex: '-1' as unknown as number,
 			id: `${ suggestionOptionIdPrefix }-${ index }`,
-			ref: ( node ) => {
+			ref: ( node: HTMLElement | null ) => {
 				suggestionNodesRef.current[ index ] = node;
 			},
 			'aria-selected': index === selectedSuggestion ? true : undefined,

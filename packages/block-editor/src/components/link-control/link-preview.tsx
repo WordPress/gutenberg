@@ -24,6 +24,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { Badge } from '@wordpress/ui';
 import { ViewerSlot } from './viewer-slot';
 import useRichUrlData from './use-rich-url-data';
+import type { LinkPreviewProps } from './types';
 
 export default function LinkPreview( {
 	value,
@@ -31,7 +32,7 @@ export default function LinkPreview( {
 	hasRichPreviews = false,
 	hasUnlinkControl = false,
 	onRemove,
-} ) {
+}: LinkPreviewProps ) {
 	const showIconLabels = useSelect(
 		( select ) =>
 			select( preferencesStore ).get( 'core', 'showIconLabels' ),
@@ -47,7 +48,9 @@ export default function LinkPreview( {
 	const hasRichData = richData && Object.keys( richData ).length;
 
 	const displayURL =
-		( value && filterURLForDisplay( safeDecodeURI( value.url ), 24 ) ) ||
+		( value &&
+			// An empty URL shows the empty link notice instead.
+			filterURLForDisplay( safeDecodeURI( value.url as string ), 24 ) ) ||
 		'';
 
 	// url can be undefined if the href attribute is unset
@@ -70,7 +73,8 @@ export default function LinkPreview( {
 	}
 
 	const { createNotice } = useDispatch( noticesStore );
-	const ref = useCopyToClipboard( value.url, () => {
+	// The copy button is disabled for an empty URL.
+	const ref = useCopyToClipboard( value.url as string, () => {
 		createNotice( 'info', __( 'Link copied to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
@@ -130,7 +134,7 @@ export default function LinkPreview( {
 							<>
 								<ExternalLink
 									className="block-editor-link-control__preview-title"
-									href={ value.url }
+									href={ value.url! }
 								>
 									<Truncate numberOfLines={ 1 }>
 										{ displayTitle }
@@ -141,13 +145,15 @@ export default function LinkPreview( {
 										{ displayURL }
 									</Truncate>
 								</span>
-								{ value?.badges?.length > 0 && (
+								{ /* An absent length compares as `false`. */ }
+								{ ( value?.badges?.length as number ) > 0 && (
 									<HStack
 										className="block-editor-link-control__preview-badges"
 										alignment="left"
+										// @ts-expect-error `HStack` takes `spacing`, so `gap` is overridden.
 										gap={ 1 }
 									>
-										{ value.badges.map(
+										{ value.badges!.map(
 											( badge, index ) => (
 												<Badge
 													key={ `${ badge.label }|${ badge.intent }|${ index }` }
