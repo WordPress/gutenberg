@@ -7,7 +7,7 @@ import { speak } from '@wordpress/a11y';
  * Component that checks if the fit text computed font size is below a minimum
  * threshold and displays a warning notice.
  *
- * @return {Element|null} Warning notice element or null.
+ * @return Warning notice element or null.
  */
 export default function FitTextSizeWarning() {
 	const message = __(
