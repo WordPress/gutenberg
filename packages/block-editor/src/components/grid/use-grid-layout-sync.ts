@@ -4,17 +4,31 @@ import { usePrevious } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 import { GridRect } from './utils';
 import { setImmutably } from '../../utils/object';
+import type { Layout } from '../../layouts/types';
+import type { GridItemAttributes } from './types';
 
-export function useGridLayoutSync( { clientId: gridClientId } ) {
+export function useGridLayoutSync( {
+	clientId: gridClientId,
+}: {
+	clientId: string;
+} ) {
 	const { gridLayout, blockOrder, selectedBlockLayout } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getBlockOrder } =
 				select( blockEditorStore );
 			const selectedBlock = select( blockEditorStore ).getSelectedBlock();
 			return {
-				gridLayout: getBlockAttributes( gridClientId ).layout ?? {},
+				// The grid block exists, with its layout attribute.
+				gridLayout: ( (
+					getBlockAttributes( gridClientId ) as {
+						layout?: Layout;
+					}
+				 ).layout ?? {} ) as Layout,
 				blockOrder: getBlockOrder( gridClientId ),
-				selectedBlockLayout: selectedBlock?.attributes.style?.layout,
+				// A selected grid item positions itself through its style.
+				selectedBlockLayout: (
+					selectedBlock?.attributes as GridItemAttributes | undefined
+				 )?.style?.layout,
 			};
 		},
 		[ gridClientId ]
@@ -38,10 +52,10 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 	const previousBlockOrder = usePrevious( blockOrder );
 
 	useEffect( () => {
-		const updates = {};
+		const updates: Record< string, Record< string, unknown > > = {};
 
 		if ( gridLayout.isManualPlacement ) {
-			const occupiedRects = [];
+			const occupiedRects: GridRect[] = [];
 
 			// Respect the position of blocks that already have a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
@@ -50,7 +64,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					rowStart,
 					columnSpan = 1,
 					rowSpan = 1,
-				} = getBlockAttributes( clientId ).style?.layout ?? {};
+				} = ( getBlockAttributes( clientId ) as GridItemAttributes )
+					.style?.layout ?? {};
 				if ( ! columnStart || ! rowStart ) {
 					continue;
 				}
@@ -66,7 +81,10 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 
 			// When in manual mode, ensure that every block has a columnStart and rowStart value.
 			for ( const clientId of blockOrder ) {
-				const attributes = getBlockAttributes( clientId );
+				// The grid items exist.
+				const attributes = getBlockAttributes(
+					clientId
+				) as GridItemAttributes;
 				const {
 					columnStart,
 					rowStart,
@@ -78,7 +96,8 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 				}
 				const [ newColumnStart, newRowStart ] = placeBlock(
 					occupiedRects,
-					gridLayout.columnCount,
+					// A manual grid has a column count.
+					gridLayout.columnCount!,
 					columnSpan,
 					rowSpan,
 					previouslySelectedBlockRect?.columnEnd,
@@ -133,12 +152,19 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 					// Check if the block is being moved to another grid.
 					// If so, do nothing and let the new grid parent handle
 					// the attributes.
-					const rootAttributes = getBlockAttributes( rootClientId );
+					const rootAttributes = getBlockAttributes(
+						rootClientId
+					) as {
+						layout?: Layout;
+					} | null;
 					if ( rootAttributes?.layout?.type === 'grid' ) {
 						continue;
 					}
 
-					const attributes = getBlockAttributes( clientId );
+					// A moved block exists.
+					const attributes = getBlockAttributes(
+						clientId
+					) as GridItemAttributes;
 					const {
 						columnStart,
 						rowStart,
@@ -151,11 +177,12 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						const hasEmptyLayoutAttribute =
 							Object.keys( layout ).length === 0;
 
+						// Setting a path in the attributes object keeps an object.
 						updates[ clientId ] = setImmutably(
 							attributes,
 							[ 'style', 'layout' ],
 							hasEmptyLayoutAttribute ? undefined : layout
-						);
+						) as Record< string, unknown >;
 					}
 				}
 			}
@@ -164,7 +191,10 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 			// when switching from manual to auto mode,
 			if ( previousIsManualPlacement === true ) {
 				for ( const clientId of blockOrder ) {
-					const attributes = getBlockAttributes( clientId );
+					// The grid items exist.
+					const attributes = getBlockAttributes(
+						clientId
+					) as GridItemAttributes;
 					const { columnStart, rowStart, ...layout } =
 						attributes.style?.layout ?? {};
 					// Only update attributes if columnStart or rowStart are set.
@@ -172,11 +202,12 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 						const hasEmptyLayoutAttribute =
 							Object.keys( layout ).length === 0;
 
+						// Setting a path in the attributes object keeps an object.
 						updates[ clientId ] = setImmutably(
 							attributes,
 							[ 'style', 'layout' ],
 							hasEmptyLayoutAttribute ? undefined : layout
-						);
+						) as Record< string, unknown >;
 					}
 				}
 			}
@@ -217,21 +248,21 @@ export function useGridLayoutSync( { clientId: gridClientId } ) {
 }
 
 /**
- * @param {GridRect[]} occupiedRects
- * @param {number}     gridColumnCount
- * @param {number}     blockColumnSpan
- * @param {number}     blockRowSpan
- * @param {number?}    startColumn
- * @param {number?}    startRow
+ * @param occupiedRects
+ * @param gridColumnCount
+ * @param blockColumnSpan
+ * @param blockRowSpan
+ * @param startColumn
+ * @param startRow
  */
 function placeBlock(
-	occupiedRects,
-	gridColumnCount,
-	blockColumnSpan,
-	blockRowSpan,
-	startColumn = 1,
-	startRow = 1
-) {
+	occupiedRects: GridRect[],
+	gridColumnCount: number,
+	blockColumnSpan: number,
+	blockRowSpan: number,
+	startColumn: number = 1,
+	startRow: number = 1
+): [ number, number ] {
 	for ( let row = startRow; ; row++ ) {
 		for (
 			let column = row === startRow ? startColumn : 1;

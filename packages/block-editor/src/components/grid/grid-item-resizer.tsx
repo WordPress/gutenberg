@@ -1,16 +1,23 @@
 import { ResizableBox } from '@wordpress/components';
 import { useState, useEffect } from '@wordpress/element';
+import type { CSSProperties, PointerEvent } from 'react';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { getComputedCSS, getGridTracks, getClosestTrack } from './utils';
+import type {
+	GridItemResizerInnerProps,
+	GridItemResizerProps,
+	GridItemResizerSides,
+} from './types';
 
 export function GridItemResizer( {
 	clientId,
 	bounds,
 	onChange,
 	parentLayout,
-} ) {
-	const blockElement = useBlockElement( clientId );
+}: GridItemResizerProps ) {
+	// Block wrappers are HTML elements.
+	const blockElement = useBlockElement( clientId ) as HTMLElement | null;
 	const rootBlockElement = blockElement?.parentElement;
 	const { isManualPlacement } = parentLayout;
 
@@ -40,9 +47,11 @@ function GridItemResizerInner( {
 	rootBlockElement,
 	onChange,
 	isManualGrid,
-} ) {
-	const [ resizeDirection, setResizeDirection ] = useState( null );
-	const [ enableSide, setEnableSide ] = useState( {
+}: GridItemResizerInnerProps ) {
+	const [ resizeDirection, setResizeDirection ] = useState< string | null >(
+		null
+	);
+	const [ enableSide, setEnableSide ] = useState< GridItemResizerSides >( {
 		top: false,
 		bottom: false,
 		left: false,
@@ -78,25 +87,26 @@ function GridItemResizerInner( {
 		return () => observer.disconnect();
 	}, [ blockElement, rootBlockElement, isManualGrid ] );
 
-	const justification = {
+	const justification: Record< string, string > = {
 		right: 'left',
 		left: 'right',
 	};
 
-	const alignment = {
+	const alignment: Record< string, string > = {
 		top: 'flex-end',
 		bottom: 'flex-start',
 	};
 
-	const styles = {
+	// A `null` direction, while not resizing, matches no key.
+	const styles: CSSProperties = {
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
-		...( justification[ resizeDirection ] && {
-			justifyContent: justification[ resizeDirection ],
+		...( justification[ resizeDirection as string ] && {
+			justifyContent: justification[ resizeDirection as string ],
 		} ),
-		...( alignment[ resizeDirection ] && {
-			alignItems: alignment[ resizeDirection ],
+		...( alignment[ resizeDirection as string ] && {
+			alignItems: alignment[ resizeDirection as string ],
 		} ),
 	};
 
@@ -125,14 +135,16 @@ function GridItemResizerInner( {
 				} }
 				bounds={ bounds }
 				boundsByDirection
-				onPointerDown={ ( { target, pointerId } ) => {
+				// @ts-expect-error ResizableBox passes DOM event props to its element without typing them.
+				onPointerDown={ ( { target, pointerId }: PointerEvent ) => {
 					/*
 					 * Captures the pointer to avoid hiccups while dragging over objects
 					 * like iframes and ensures that the event to end the drag is
 					 * captured by the target (resize handle) whether or not it’s under
 					 * the pointer.
 					 */
-					target.setPointerCapture( pointerId );
+					// The resize handle receives the pointer.
+					( target as Element ).setPointerCapture( pointerId );
 				} }
 				onResizeStart={ ( event, direction ) => {
 					/*
