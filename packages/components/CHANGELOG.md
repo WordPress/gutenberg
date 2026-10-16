@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   The component context system no longer merges Emotion-registered classes in `className`. Compose dependent Emotion styles before passing the resulting class name ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
     -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
     -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724))
