@@ -3,6 +3,7 @@ import { useLayoutEffect, useMemo, useRef } from '@wordpress/element';
 import { getScrollContainer } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import type { UseMovingAnimationOptions } from './types';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -10,7 +11,7 @@ import { store as blockEditorStore } from '../../store';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function getAbsolutePosition( element ) {
+function getAbsolutePosition( element: HTMLElement ) {
 	return {
 		top: element.offsetTop,
 		left: element.offsetLeft,
@@ -28,12 +29,15 @@ function getAbsolutePosition( element ) {
  *  - It uses the "resetAnimation" flag to reset the animation
  *    from the beginning in order to animate to the new destination point.
  *
- * @param {Object} $1                          Options
- * @param {*}      $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
- * @param {string} $1.clientId
+ * @param $1                          Options
+ * @param $1.triggerAnimationOnChange Variable used to trigger the animation if it changes.
+ * @param $1.clientId                 The client ID of the block to animate.
  */
-function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
-	const ref = useRef();
+function useMovingAnimation( {
+	triggerAnimationOnChange,
+	clientId,
+}: UseMovingAnimationOptions ) {
+	const ref = useRef< HTMLElement | null | undefined >( undefined );
 	const {
 		isTyping,
 		getGlobalBlockCount,
@@ -59,7 +63,8 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			return;
 		}
 
-		const scrollContainer = getScrollContainer( ref.current );
+		// A block rendered in the canvas has a scroll container.
+		const scrollContainer = getScrollContainer( ref.current )!;
 		const isSelected = isBlockSelected( clientId );
 		const adjustScrolling =
 			isSelected || isFirstMultiSelectedBlock( clientId );
@@ -72,7 +77,8 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			}
 
 			if ( adjustScrolling && prevRect ) {
-				const blockRect = ref.current.getBoundingClientRect();
+				// The effect only runs with a mounted element.
+				const blockRect = ref.current!.getBoundingClientRect();
 				const diff = blockRect.top - prevRect.top;
 
 				if ( diff ) {
@@ -129,18 +135,23 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 				y = Math.round( y );
 				const finishedMoving = x === 0 && y === 0;
 				ref.current.style.transformOrigin = 'center center';
+				// Set to `null` to explicitly remove the transform.
 				ref.current.style.transform = finishedMoving
-					? null // Set to `null` to explicitly remove the transform.
+					? ( null as unknown as string )
 					: `translate3d(${ x }px,${ y }px,0)`;
 				// Only needed while moving. Left behind, it makes the block a
 				// stacking context and clamps overflowing UI inside it, e.g. a
 				// Navigation submenu flyout renders behind its siblings.
-				ref.current.style.zIndex = finishedMoving ? null : zIndex;
+				// `null` removes the property.
+				ref.current.style.zIndex = finishedMoving
+					? ( null as unknown as string )
+					: zIndex;
 				preserveScrollPosition();
 			},
 		} );
 
-		ref.current.style.transform = undefined;
+		// Assigning `undefined` is ignored and keeps the transform.
+		ref.current.style.transform = undefined as unknown as string;
 		const destination = getAbsolutePosition( ref.current );
 
 		const x = Math.round( previous.left - destination.left );
