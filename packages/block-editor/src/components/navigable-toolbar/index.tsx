@@ -12,26 +12,30 @@ import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { ESCAPE } from '@wordpress/keycodes';
+import type { RefObject } from 'react';
 import { store as blockEditorStore } from '../../store';
 import { BlockRefs } from '../provider/block-refs-provider';
 import { unlock } from '../../lock-unlock';
+import type { NavigableToolbarProps, ToolbarFocusOptions } from './types';
 
-function hasOnlyToolbarItem( elements ) {
+function hasOnlyToolbarItem( elements: HTMLElement[] ) {
 	const dataProp = 'toolbarItem';
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
 }
 
-function getAllFocusableToolbarItemsIn( container ) {
+function getAllFocusableToolbarItemsIn( container: Element ) {
 	return Array.from(
-		container.querySelectorAll( '[data-toolbar-item]:not([disabled])' )
+		container.querySelectorAll< HTMLElement >(
+			'[data-toolbar-item]:not([disabled])'
+		)
 	);
 }
 
-function hasFocusWithin( container ) {
+function hasFocusWithin( container: Element ) {
 	return container.contains( container.ownerDocument.activeElement );
 }
 
-function focusFirstTabbableIn( container ) {
+function focusFirstTabbableIn( container: Element ) {
 	const [ firstTabbable ] = focus.tabbable.find( container );
 
 	if ( firstTabbable ) {
@@ -44,7 +48,9 @@ function focusFirstTabbableIn( container ) {
 	}
 }
 
-function useIsAccessibleToolbar( toolbarRef ) {
+function useIsAccessibleToolbar(
+	toolbarRef: RefObject< HTMLElement | undefined >
+) {
 	/*
 	 * By default, we'll assume the starting accessible state of the Toolbar
 	 * is true, as it seems to be the most common case.
@@ -70,7 +76,8 @@ function useIsAccessibleToolbar( toolbarRef ) {
 	const determineIsAccessibleToolbar = useCallback( () => {
 		// Portaled menus add focus guards beside their trigger. These are not controls.
 		const tabbables = focus.tabbable
-			.find( toolbarRef.current )
+			// The toolbar is mounted while it observes its items.
+			.find( toolbarRef.current! )
 			.filter(
 				( element ) =>
 					! element.hasAttribute( 'data-base-ui-focus-guard' )
@@ -97,7 +104,7 @@ function useIsAccessibleToolbar( toolbarRef ) {
 		const observer = new window.MutationObserver(
 			determineIsAccessibleToolbar
 		);
-		observer.observe( toolbarRef.current, {
+		observer.observe( toolbarRef.current!, {
 			childList: true,
 			subtree: true,
 		} );
@@ -115,7 +122,7 @@ function useToolbarFocus( {
 	onIndexChange,
 	shouldUseKeyboardFocusShortcut,
 	focusEditorOnEscape,
-} ) {
+}: ToolbarFocusOptions ) {
 	// Make sure we don't use modified versions of this prop.
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
@@ -126,7 +133,8 @@ function useToolbarFocus( {
 	const { refsMap } = useContext( BlockRefs );
 
 	const focusToolbar = useCallback( () => {
-		focusFirstTabbableIn( toolbarRef.current );
+		// The toolbar is mounted when it takes focus.
+		focusFirstTabbableIn( toolbarRef.current! );
 	}, [ toolbarRef ] );
 
 	const focusToolbarViaShortcut = () => {
@@ -146,7 +154,8 @@ function useToolbarFocus( {
 
 	useEffect( () => {
 		// Store ref so we have access on useEffect cleanup: https://legacy.reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
-		const navigableToolbarRef = toolbarRef.current;
+		// The toolbar is mounted while its effects run.
+		const navigableToolbarRef = toolbarRef.current!;
 		// If initialIndex is passed, we focus on that toolbar item when the
 		// toolbar gets mounted and initial focus is not forced.
 		// We have to wait for the next browser paint because block controls aren't
@@ -194,8 +203,9 @@ function useToolbarFocus( {
 			return;
 		}
 
-		const navigableToolbar = toolbarRef.current;
-		const handleKeyDown = ( event ) => {
+		// The toolbar is mounted while its effects run.
+		const navigableToolbar = toolbarRef.current!;
+		const handleKeyDown = ( event: KeyboardEvent ) => {
 			if ( event.keyCode !== ESCAPE ) {
 				return;
 			}
@@ -208,7 +218,8 @@ function useToolbarFocus( {
 				refsMap.get( getSelectedBlockClientId() );
 			if ( target ) {
 				event.preventDefault();
-				target.focus();
+				// Block elements are HTML elements.
+				( target as HTMLElement ).focus();
 			}
 		};
 		navigableToolbar.addEventListener( 'keydown', handleKeyDown );
@@ -233,8 +244,8 @@ export default function NavigableToolbar( {
 	__experimentalOnIndexChange: onIndexChange,
 	orientation = 'horizontal',
 	...props
-} ) {
-	const toolbarRef = useRef();
+}: NavigableToolbarProps ) {
+	const toolbarRef = useRef< HTMLElement >( undefined );
 	const isAccessibleToolbar = useIsAccessibleToolbar( toolbarRef );
 
 	useToolbarFocus( {
@@ -250,7 +261,8 @@ export default function NavigableToolbar( {
 	if ( isAccessibleToolbar ) {
 		return (
 			<Toolbar
-				label={ props[ 'aria-label' ] }
+				// Callers label the toolbar.
+				label={ props[ 'aria-label' ] as string }
 				ref={ toolbarRef }
 				orientation={ orientation }
 				{ ...props }
