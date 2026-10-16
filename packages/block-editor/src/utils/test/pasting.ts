@@ -1,10 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { shouldDismissPastedFiles } from '../pasting';
 
+// Partial files: only the MIME type is read.
 const mocks = {
-	pngImageFile: { type: 'image/png' },
-	jpgImageFile: { type: 'image/jpg' },
-	documentFile: { type: 'application/zip' },
+	pngImageFile: { type: 'image/png' } as File,
+	jpgImageFile: { type: 'image/jpg' } as File,
+	documentFile: { type: 'application/zip' } as File,
 };
 
 describe( 'shouldDismissPastedFiles', () => {
