@@ -1,5 +1,6 @@
 import { useCallback } from '@wordpress/element';
 import { getBlockType, parse } from '@wordpress/blocks';
+import type { Block, BlockType } from '@wordpress/blocks';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, sprintf } from '@wordpress/i18n';
@@ -23,10 +24,10 @@ import {
  * Since plain text will always get parsed into a freeform block,
  * we check that if the parsed blocks is anything other than that.
  *
- * @param {string} text The copied text.
- * @return {boolean} True if the text looks like serialized blocks, false otherwise.
+ * @param text The copied text.
+ * @return True if the text looks like serialized blocks, false otherwise.
  */
-function hasSerializedBlocks( text ) {
+function hasSerializedBlocks( text: string ): boolean {
 	try {
 		const blocks = parse( text, {
 			__unstableSkipMigrationLogs: true,
@@ -49,9 +50,13 @@ function hasSerializedBlocks( text ) {
  * (Except for some unrelated to style like `anchor` or `settings`.)
  * They generally represent the default block supports.
  */
-const STYLE_ATTRIBUTES = {
+const STYLE_ATTRIBUTES: Record<
+	string,
+	( nameOrType: string | BlockType ) => boolean | undefined
+> = {
 	align: hasAlignSupport,
-	borderColor: ( nameOrType ) => hasBorderSupport( nameOrType, 'color' ),
+	borderColor: ( nameOrType: string | BlockType ) =>
+		hasBorderSupport( nameOrType, 'color' ),
 	backgroundColor: hasBackgroundColorSupport,
 	textAlign: hasTextAlignSupport,
 	textColor: hasTextColorSupport,
@@ -66,13 +71,19 @@ const STYLE_ATTRIBUTES = {
 /**
  * Get the "style attributes" from a given block to a target block.
  *
- * @param {WPBlock} sourceBlock The source block.
- * @param {WPBlock} targetBlock The target block.
- * @return {Object} the filtered attributes object.
+ * @param sourceBlock The source block.
+ * @param targetBlock The target block.
+ * @return the filtered attributes object.
  */
-function getStyleAttributes( sourceBlock, targetBlock ) {
+function getStyleAttributes(
+	sourceBlock: Block,
+	targetBlock: Block
+): Record< string, unknown > {
 	return Object.entries( STYLE_ATTRIBUTES ).reduce(
-		( attributes, [ attributeKey, hasSupport ] ) => {
+		(
+			attributes: Record< string, unknown >,
+			[ attributeKey, hasSupport ]
+		) => {
 			// Only apply the attribute if both blocks support it.
 			if (
 				hasSupport( sourceBlock.name ) &&
@@ -91,14 +102,17 @@ function getStyleAttributes( sourceBlock, targetBlock ) {
 /**
  * Update the target blocks with style attributes recursively.
  *
- * @param {WPBlock[]} targetBlocks          The target blocks to be updated.
- * @param {WPBlock[]} sourceBlocks          The source blocks to get th style attributes from.
- * @param {Function}  updateBlockAttributes The function to update the attributes.
+ * @param targetBlocks          The target blocks to be updated.
+ * @param sourceBlocks          The source blocks to get th style attributes from.
+ * @param updateBlockAttributes The function to update the attributes.
  */
 function recursivelyUpdateBlockAttributes(
-	targetBlocks,
-	sourceBlocks,
-	updateBlockAttributes
+	targetBlocks: Block[],
+	sourceBlocks: Block[],
+	updateBlockAttributes: (
+		clientId: string,
+		attributes: Record< string, unknown >
+	) => void
 ) {
 	for (
 		let index = 0;
@@ -121,7 +135,7 @@ function recursivelyUpdateBlockAttributes(
 /**
  * A hook to return a pasteStyles event function for handling pasting styles to blocks.
  *
- * @return {Function} A function to update the styles to the blocks.
+ * @return A function to update the styles to the blocks.
  */
 export default function usePasteStyles() {
 	const registry = useRegistry();
@@ -130,7 +144,7 @@ export default function usePasteStyles() {
 		useDispatch( noticesStore );
 
 	return useCallback(
-		async ( targetBlocks ) => {
+		async ( targetBlocks: Block[] ) => {
 			let html = '';
 			try {
 				// `http:` sites won't have the clipboard property on navigator.
@@ -199,7 +213,8 @@ export default function usePasteStyles() {
 					sprintf(
 						// Translators: %s: Name of the block being pasted, e.g. "Paragraph".
 						__( 'Pasted styles to %s.' ),
-						title
+						// The block pasted to is registered.
+						title as string
 					),
 					{ type: 'snackbar' }
 				);
