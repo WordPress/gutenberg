@@ -703,6 +703,52 @@ test.describe( 'Navigation block - List view editing', () => {
 			listViewPanel.getByRole( 'button', { name: 'Header Menu' } )
 		).toBeVisible();
 	} );
+
+	test( 'adds a navigation link from the List View appender in a contentOnly locked section', async ( {
+		editor,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content: navMenuBlocksFixture.content,
+		} );
+
+		await editor.setContent(
+			`<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->` +
+				`<div class="wp-block-group">` +
+				`<!-- wp:navigation {"ref":${ menu.id }} /-->` +
+				`</div>` +
+				`<!-- /wp:group -->`
+		);
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Navigation' } )
+			.click();
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'tab', { name: 'List View' } ).click();
+
+		const listView = page
+			.getByRole( 'tabpanel', { name: 'List View' } )
+			.getByRole( 'treegrid', { name: 'Block navigation structure' } );
+
+		await expect(
+			listView.getByRole( 'link', { name: 'Top Level Item 1' } )
+		).toBeVisible();
+		// Items can be added here, as the canvas appender shows, so the List
+		// View offers its appender too.
+		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		await expect( appender ).toBeVisible();
+		await appender.click();
+
+		await linkControl.searchFor( 'Test Page 1' );
+		await ( await linkControl.getNthSearchResult( 0 ) ).click();
+
+		await expect(
+			listView.getByRole( 'link', { name: 'Test Page 1' } )
+		).toBeVisible();
+	} );
 } );
 
 class LinkControl {
