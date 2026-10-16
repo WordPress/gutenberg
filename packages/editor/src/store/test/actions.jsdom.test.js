@@ -703,7 +703,13 @@ describe( 'Post actions', () => {
 			}
 		}
 
-		function setUpEditor( registry ) {
+		/**
+		 * @param {Object} registry              The registry to set up.
+		 * @param {Object} [savedPost=imagePost] The post as stored before the
+		 *                                       save. The editor's content is
+		 *                                       always `imagePost.content`.
+		 */
+		function setUpEditor( registry, savedPost = imagePost ) {
 			// Only the `post` entity is registered by default, and without a
 			// config for attachments the records lookup cannot resolve.
 			registry.dispatch( coreStore ).addEntities( [
@@ -720,8 +726,8 @@ describe( 'Post actions', () => {
 			] );
 			registry
 				.dispatch( coreStore )
-				.receiveEntityRecords( 'postType', 'post', imagePost );
-			registry.dispatch( editorStore ).setupEditor( imagePost, {
+				.receiveEntityRecords( 'postType', 'post', savedPost );
+			registry.dispatch( editorStore ).setupEditor( savedPost, {
 				content: imagePost.content,
 			} );
 			// The block editor store is populated by the editor provider, which
@@ -843,6 +849,41 @@ describe( 'Post actions', () => {
 					request.startsWith( 'PUT /wp/v2/media/99' )
 				)
 			).toBe( false );
+		} );
+
+		/**
+		 * Images already in a published post may have been left unattached on
+		 * purpose.
+		 */
+		it( 'leaves alone images that were already in a published post', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry, { ...imagePost, status: 'publish' } );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		it( 'attaches images added to a published post', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry, {
+				...imagePost,
+				status: 'publish',
+				content: '',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect( attachedTo ).toBe( postId );
 		} );
 
 		it( 'attaches nothing when the editor setting is off', async () => {

@@ -1,3 +1,4 @@
+import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import getMediaIdsInBlocks from './media-ids-in-blocks';
 import invalidateAttachmentResolutions from './invalidate-attachment-resolutions';
@@ -35,14 +36,18 @@ function warnAttachFailed( reason ) {
  * but selecting existing images in the block editor historically hasn't.
  * This feature closes a gap between the block editor and the classic editor.
  *
- * @param {Object}   registry    A `@wordpress/data` registry.
- * @param {Object}   post        The post that was saved.
- * @param {number}   post.id     Its ID.
- * @param {string}   post.type   Its post type.
- * @param {Object[]} post.blocks The post's own blocks — not the ones on screen.
- *                               With "Show template" on, the editor shows the
- *                               template with the post inside it, so what's on
- *                               screen also includes the template's images.
+ * Given the content from before the save, only images added since are
+ * attached, so ones that were already in the post are left alone.
+ *
+ * @param {Object}   registry               A `@wordpress/data` registry.
+ * @param {Object}   post                   The post that was saved.
+ * @param {number}   post.id                Its ID.
+ * @param {string}   post.type              Its post type.
+ * @param {Object[]} post.blocks            The post's own blocks — not the ones on screen.
+ *                                          With "Show template" on, the editor shows the
+ *                                          template with the post inside it, so what's on
+ *                                          screen also includes the template's images.
+ * @param {string}   [post.previousContent] The post's content before the save.
  */
 export default async function attachMediaInPost( registry, post ) {
 	try {
@@ -55,8 +60,20 @@ export default async function attachMediaInPost( registry, post ) {
 	}
 }
 
-async function attach( registry, { id: postId, type: postType, blocks } ) {
-	const mediaIds = getMediaIdsInBlocks( blocks );
+async function attach(
+	registry,
+	{ id: postId, type: postType, blocks, previousContent }
+) {
+	let mediaIds = getMediaIdsInBlocks( blocks );
+
+	// The previous content is only parsed when the post has images to
+	// compare.
+	if ( mediaIds.length && typeof previousContent === 'string' ) {
+		const previousMediaIds = new Set(
+			getMediaIdsInBlocks( parse( previousContent ) )
+		);
+		mediaIds = mediaIds.filter( ( id ) => ! previousMediaIds.has( id ) );
+	}
 
 	if ( ! mediaIds.length ) {
 		return;
