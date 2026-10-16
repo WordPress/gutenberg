@@ -60,17 +60,18 @@ function ListViewLinkUI( props: {
 	const { isMarked } = useContext( MenuInsertedBlockContext );
 	const isFromMenu = isMarked( props.insertedBlockClientId );
 
-	// Select the item added from the menu, so its row shows which item the
-	// popover edits. Only once its block has mounted in the hidden canvas: a
-	// Navigation Link that mounts already selected opens its own link popover
-	// and selects its parent instead.
+	// Select the new item, so its row shows which item the popover edits.
+	// Only once its block has mounted in the hidden canvas: a Navigation Link
+	// that mounts already selected opens its own link popover and selects its
+	// parent instead. Closing the popover without a link removes the item and
+	// leaves nothing selected, with focus back on the control that opened it.
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const blockElement = useBlockElement( props.insertedBlockClientId );
 	useEffect( () => {
-		if ( isFromMenu && blockElement ) {
+		if ( blockElement ) {
 			selectBlock( props.insertedBlockClientId );
 		}
-	}, [ isFromMenu, blockElement, props.insertedBlockClientId, selectBlock ] );
+	}, [ blockElement, props.insertedBlockClientId, selectBlock ] );
 
 	return (
 		<NavigationLinkUI

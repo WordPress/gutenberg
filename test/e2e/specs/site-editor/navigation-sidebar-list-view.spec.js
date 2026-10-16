@@ -85,6 +85,12 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 					page,
 					listView.getByRole( 'row' ).nth( -2 )
 				);
+				// The new item is selected, so the row shows which item
+				// the popover edits.
+				await expectSelectedRow(
+					listView,
+					listView.getByRole( 'row' ).nth( -2 )
+				);
 			}
 
 			// Search for and select the page.
@@ -103,6 +109,11 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect( linkControlSearch ).toBeFocused();
 			await page.keyboard.press( 'Escape' );
 			await expect( linkControlSearch ).toBeHidden();
+			await expect( appender ).toBeFocused();
+			if ( isSiteEditorV2 ) {
+				// The removed item leaves nothing selected behind.
+				await expectSelectedRow( listView, null );
+			}
 		} );
 
 		await test.step( 'can create a new page', async () => {
@@ -409,6 +420,20 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		} );
 	} );
 } );
+
+/**
+ * Asserts which List View row is selected, or that none is.
+ *
+ * @param {import('@playwright/test').Locator}      listView The List View.
+ * @param {import('@playwright/test').Locator|null} row      The selected row, or null for none.
+ */
+async function expectSelectedRow( listView, row ) {
+	if ( row ) {
+		await expect( row ).toHaveClass( /\bis-selected\b/ );
+	} else {
+		await expect( listView.locator( '.is-selected' ) ).toHaveCount( 0 );
+	}
+}
 
 function getLinkPopover( page ) {
 	return page
