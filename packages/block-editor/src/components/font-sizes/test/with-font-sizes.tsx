@@ -29,4 +29,13 @@ describe( 'withFontSizes types', () => {
 
 		expect( [ withLabel, withoutLabel ] ).toHaveLength( 2 );
 	} );
+
+	it( 'rejects injected props of another type', () => {
+		const Mistyped: ComponentType< { setFontSize: number } > = () => null;
+
+		// @ts-expect-error The wrapper passes a function.
+		const WithFontSizeMistyped = withFontSizes( 'fontSize' )( Mistyped );
+
+		expect( WithFontSizeMistyped ).toBeDefined();
+	} );
 } );

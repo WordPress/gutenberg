@@ -234,7 +234,15 @@ export default < Name extends string >( ...fontSizeNames: Name[] ) => {
 			Inner: ComponentType< WithFontSizesProps >
 		) => ComponentType< WithFontSizesProps >,
 		'withFontSizes'
-	) as < Props >(
+	) as <
+		// Any injected prop the component declares must take the injected type.
+		Props extends Partial<
+			Pick<
+				InjectedFontSizesProps< Name >,
+				keyof Props & keyof InjectedFontSizesProps< Name >
+			>
+		>,
+	>(
 		WrappedComponent: ComponentType<
 			Props & InjectedFontSizesProps< Name >
 		>
