@@ -75,20 +75,64 @@ export const WithCustomPlaceholder: Story = {
 	},
 };
 
+const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
+	{
+		value: '1',
+		label: 'User 1 (Admin)',
+	},
+	{
+		value: '2',
+		label: 'User 2 (Editor)',
+	},
+	{
+		value: '3',
+		label: 'User 3 (Author)',
+	},
+];
+
+const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
+	<span
+		style={ {
+			display: 'flex',
+			alignItems: 'center',
+			gap: 8,
+		} }
+	>
+		<img
+			src={ `https://gravatar.com/avatar/?d=initials&name=${
+				user.value ?? 'null'
+			}` }
+			alt=""
+			width="20"
+			style={ {
+				borderRadius: '50%',
+			} }
+		/>
+
+		{ user.label }
+	</span>
+);
+
 /**
  * Pass a `SelectControl.Trigger` element to `trigger` to customize the button's
  * props, including focus and blur handlers. Trigger props override the control's
- * `size` and `placeholder`. Pass children to customize its content.
+ * `size` and `placeholder`. Children can be a render function receiving the
+ * selected item. The popup keeps the standard item rendering.
  */
 export const WithCustomTriggerProps: Story = {
+	name: 'With Custom Trigger',
 	args: {
 		...Default.args,
+		items: userOptions,
+		defaultValue: userOptions[ 0 ],
 		trigger: (
 			<SelectControl.Trigger
 				variant="minimal"
 				onFocus={ action( 'onFocus' ) }
 				onBlur={ action( 'onBlur' ) }
-			/>
+			>
+				{ ( item ) => <User user={ item } /> }
+			</SelectControl.Trigger>
 		),
 	},
 };
@@ -255,63 +299,18 @@ export const WithSeparator: Story = {
 	},
 };
 
-const userOptions: React.ComponentProps< typeof SelectControl >[ 'items' ] = [
-	{
-		value: '1',
-		label: 'User 1 (Admin)',
-	},
-	{
-		value: '2',
-		label: 'User 2 (Editor)',
-	},
-	{
-		value: '3',
-		label: 'User 3 (Author)',
-	},
-];
-
-const User = ( { user }: { user: ( typeof userOptions )[ number ] } ) => (
-	<span
-		style={ {
-			display: 'flex',
-			alignItems: 'center',
-			gap: 8,
-		} }
-	>
-		<img
-			src={ `https://gravatar.com/avatar/?d=initials&name=${
-				user.value ?? 'null'
-			}` }
-			alt=""
-			width="20"
-			style={ {
-				borderRadius: '50%',
-			} }
-		/>
-
-		{ user.label }
-	</span>
-);
-
 /**
- * To customize what is rendered inside the trigger element, pass children
- * to `SelectControl.Trigger`. A render function receives the selected item.
- *
- * The item list can be customized by passing an array of
+ * Customize the item list by passing an array of
  * `SelectControl.Item` as children. Note that the `label` prop of a `SelectControl.Item`
  * is used as the string to match against in the typeahead functionality, while the
  * item content is determined by `children`.
  */
 export const WithCustomTriggerAndItems: Story = {
+	name: 'With Custom Items',
 	args: {
 		items: userOptions,
 		label: 'Label',
 		description: 'This is the description.',
-		trigger: (
-			<SelectControl.Trigger>
-				{ ( item ) => <User user={ item } /> }
-			</SelectControl.Trigger>
-		),
 		children: [
 			userOptions.map( ( item ) => (
 				<SelectControl.Item
