@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import TabbedSidebar from '../';
 
-const meta = {
+const meta: Meta< typeof TabbedSidebar > = {
 	id: 'blockeditor-tabbedsidebar',
 	title: 'Editor/Block Editor/TabbedSidebar',
 	component: TabbedSidebar,
@@ -17,6 +18,7 @@ const meta = {
 	},
 	argTypes: {
 		defaultTabId: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			table: {
 				type: { summary: 'string' },
@@ -26,6 +28,7 @@ const meta = {
 		},
 		onClose: {
 			action: 'onClose',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			table: {
 				type: { summary: 'function' },
@@ -34,6 +37,7 @@ const meta = {
 		},
 		onSelect: {
 			action: 'onSelect',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			table: {
 				type: { summary: 'function' },
@@ -42,6 +46,7 @@ const meta = {
 				"Function called when a tab is selected. Receives the selected tab's ID as an argument.",
 		},
 		selectedTab: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			table: {
 				type: { summary: 'string' },
@@ -49,6 +54,7 @@ const meta = {
 			description: 'The ID of the currently selected tab.',
 		},
 		tabs: {
+			// @ts-expect-error Storybook types omit the `array` control.
 			control: { type: 'array' },
 			table: {
 				type: { summary: 'array' },
@@ -68,15 +74,17 @@ const meta = {
 
 export default meta;
 
+type Story = StoryObj< typeof meta >;
+
 const DEMO_TABS = [
 	{ name: 'tab1', title: 'Settings' },
 	{ name: 'tab2', title: 'Styles' },
 	{ name: 'tab3', title: 'Advanced' },
 ];
 
-export const Default = {
+export const Default: Story = {
 	render: function Template( { onSelect, onClose, ...args } ) {
-		const [ selectedTab, setSelectedTab ] = useState();
+		const [ selectedTab, setSelectedTab ] = useState< string >();
 
 		return (
 			<TabbedSidebar
