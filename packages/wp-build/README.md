@@ -709,7 +709,7 @@ The generated `widgets.php` registers each widget's entries as script modules vi
 {handlePrefix}/widgets/{widget-dir-name}/widget
 ```
 
-Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded.
+Registration is hooked into the `init` action. The `SCRIPT_DEBUG` constant controls whether minified (`.min.js`) or non-minified (`.js`) files are loaded. Builds made with `--no-script-debug` do not include the non-minified files, so they always load the minified ones.
 
 ### Watch Mode
 
