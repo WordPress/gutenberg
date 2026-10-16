@@ -1,18 +1,27 @@
 import { useEffect, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { getBlockSelector } from '@wordpress/global-styles-engine';
 import { speak } from '@wordpress/a11y';
 import { getContrastWarning } from '../components/contrast-checker';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import type {
+	BlockElementColors,
+	UseBlockColorContrastWarningOptions,
+} from './types';
 
-function getComputedValue( node, property ) {
-	return node.ownerDocument.defaultView
-		.getComputedStyle( node )
+function getComputedValue( node: Element, property: string ) {
+	// A rendered block element has a window.
+	return node.ownerDocument
+		.defaultView!.getComputedStyle( node )
 		.getPropertyValue( property );
 }
 
-function getBlockElementColors( blockEl, blockType ) {
+function getBlockElementColors(
+	blockEl: Element | null,
+	blockType: BlockType | null | undefined
+): BlockElementColors {
 	if ( ! blockEl || ! blockType ) {
 		return {};
 	}
@@ -28,9 +37,10 @@ function getBlockElementColors( blockEl, blockType ) {
 	);
 
 	// Find target elements - querySelector handles all the complexity
-	const textElement = blockEl.querySelector( textSelector ) || blockEl;
+	// The `fallback` option always returns a selector.
+	const textElement = blockEl.querySelector( textSelector! ) || blockEl;
 	const backgroundElement =
-		blockEl.querySelector( backgroundSelector ) || blockEl;
+		blockEl.querySelector( backgroundSelector! ) || blockEl;
 	const linkElement = blockEl.querySelector( 'a' );
 
 	// Get computed colors from the appropriate elements
@@ -51,7 +61,8 @@ function getBlockElementColors( blockEl, blockType ) {
 		backgroundColorNode.parentNode.nodeType ===
 			backgroundColorNode.parentNode.ELEMENT_NODE
 	) {
-		backgroundColorNode = backgroundColorNode.parentNode;
+		// The loop only climbs to element parents.
+		backgroundColorNode = backgroundColorNode.parentNode as Element;
 		backgroundColor = getComputedValue(
 			backgroundColorNode,
 			'background-color'
@@ -65,9 +76,14 @@ function getBlockElementColors( blockEl, blockType ) {
 	};
 }
 
-function reducer( prevColors, newColors ) {
+function reducer(
+	prevColors: BlockElementColors,
+	newColors: BlockElementColors
+): BlockElementColors {
 	const hasChanged = Object.keys( newColors ).some(
-		( key ) => prevColors[ key ] !== newColors[ key ]
+		( key ) =>
+			prevColors[ key as keyof BlockElementColors ] !==
+			newColors[ key as keyof BlockElementColors ]
 	);
 
 	// Do not re-render if the colors have not changed.
@@ -81,15 +97,15 @@ function reducer( prevColors, newColors ) {
  * Colors are read from the rendered block element so that inherited values
  * (e.g. from Global Styles or ancestor blocks) are taken into account.
  *
- * @param {Object}  props
- * @param {string}  props.clientId          Block client ID.
- * @param {string}  props.name              Block name.
- * @param {boolean} [props.enabled]         Whether contrast checking is active.
- * @param {boolean} [props.checkTextColor]  Whether to evaluate the text/background pair.
- * @param {boolean} [props.checkLinkColor]  Whether to evaluate the link/background pair.
- * @param {string}  [props.messageOverride] Caller-provided copy used in place of the generic guidance.
+ * @param props                 Hook options.
+ * @param props.clientId        Block client ID.
+ * @param props.name            Block name.
+ * @param props.enabled         Whether contrast checking is active.
+ * @param props.checkTextColor  Whether to evaluate the text/background pair.
+ * @param props.checkLinkColor  Whether to evaluate the link/background pair.
+ * @param props.messageOverride Caller-provided copy used in place of the generic guidance.
  *
- * @return {?string} The warning message, if any.
+ * @return The warning message, if any.
  */
 export default function useBlockColorContrastWarning( {
 	clientId,
@@ -98,7 +114,7 @@ export default function useBlockColorContrastWarning( {
 	checkTextColor = true,
 	checkLinkColor = true,
 	messageOverride,
-} ) {
+}: UseBlockColorContrastWarningOptions ) {
 	const blockEl = useBlockElement( clientId );
 	const [ colors, setColors ] = useReducer( reducer, {} );
 

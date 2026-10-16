@@ -16,13 +16,14 @@ import { unlock } from '../lock-unlock';
 import InspectorControls from '../components/inspector-controls';
 import BlockContext from '../components/block-context';
 import { store as blockEditorStore } from '../store';
+import type { BlockBindingsPanelProps } from './types';
 
 const useToolsPanelDropdownMenuProps = () => {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	return ! isMobile
 		? {
 				popoverProps: {
-					placement: 'left-start',
+					placement: 'left-start' as const,
 					// For non-mobile, inner sidebar width (248px) - button width (24px) - border (1px) + padding (16px) + spacing (20px)
 					offset: 259,
 				},
@@ -30,7 +31,10 @@ const useToolsPanelDropdownMenuProps = () => {
 		: {};
 };
 
-export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
+export const BlockBindingsPanel = ( {
+	name: blockName,
+	metadata,
+}: BlockBindingsPanelProps ) => {
 	const blockContext = useContext( BlockContext );
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -45,10 +49,11 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 			} = unlock( select( blocksStore ) );
 
 			return {
-				bindableAttributes:
-					__experimentalBlockBindingsSupportedAttributes?.[
-						blockName
-					],
+				// The setting maps block names to their bindable attributes.
+				bindableAttributes: (
+					__experimentalBlockBindingsSupportedAttributes as
+						Record< string, string[] > | undefined
+				 )?.[ blockName ],
 				hasCompatibleFields: Object.values(
 					getAllBlockBindingsSources()
 				).some(
@@ -111,7 +116,7 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 export default {
 	edit: BlockBindingsPanel,
 	attributeKeys: [ 'metadata' ],
-	hasSupport( name ) {
+	hasSupport( name: string ) {
 		return ! [
 			'core/post-date',
 			'core/navigation-link',

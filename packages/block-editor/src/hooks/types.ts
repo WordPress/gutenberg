@@ -5,8 +5,10 @@ import type {
 	BlockType,
 	ColorProps,
 } from '@wordpress/blocks';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockEditorThunkArgs } from '../store/types';
+import type { Bindings } from '../utils/block-bindings';
 
 /**
  * The viewport and pseudo state whose styles a block's controls edit.
@@ -309,4 +311,113 @@ export interface SpacingVisualizerBaseProps {
 	value: unknown;
 	computeStyle: ( blockElement: Element ) => CSSProperties;
 	forceShow?: boolean;
+}
+
+/**
+ * The computed colors of a rendered block.
+ */
+export interface BlockElementColors {
+	textColor?: string;
+	backgroundColor?: string;
+	linkColor?: string;
+}
+
+/**
+ * Options of `useBlockColorContrastWarning`.
+ */
+export interface UseBlockColorContrastWarningOptions {
+	clientId: string;
+	name?: string;
+	enabled?: boolean;
+	checkTextColor?: boolean;
+	checkLinkColor?: boolean;
+	messageOverride?: string;
+}
+
+/**
+ * Props of the block bindings panel.
+ */
+export interface BlockBindingsPanelProps {
+	name: string;
+	metadata?: { bindings?: Bindings };
+}
+
+/**
+ * Props of the component applying one style override.
+ */
+export interface OverrideStylesProps {
+	override: StyleOverrideOptions;
+}
+
+/**
+ * Props of `BlockStyleVariationOverridesWithConfig`.
+ */
+export interface BlockStyleVariationOverridesWithConfigProps {
+	/**
+	 * A global styles object, containing settings and styles.
+	 */
+	config?: GlobalStylesConfig;
+}
+
+/**
+ * The position of a block, as stored in its `style.position` attribute.
+ */
+export interface PositionStyle {
+	type?: string;
+	top?: string;
+	right?: string;
+	bottom?: string;
+	left?: string;
+}
+
+/**
+ * A block style that may set a position.
+ */
+export type PositionBlockStyle = BlockStyle & { position?: PositionStyle };
+
+/**
+ * Props of the position block support panel.
+ */
+export interface PositionPanelProps {
+	style?: PositionBlockStyle;
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
+
+/**
+ * The attributes the position block support reads.
+ */
+export interface PositionAttributes {
+	style?: PositionBlockStyle;
+}
+
+/**
+ * Block props carrying the position attributes.
+ */
+export interface PositionValueProps {
+	attributes: PositionAttributes;
+}
+
+/**
+ * Props of `resetPosition`.
+ */
+export interface ResetPositionProps {
+	attributes?: PositionAttributes;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
+
+/**
+ * Options of `getPositionCSS`.
+ */
+export interface PositionCSSOptions {
+	selector: string;
+	style?: PositionBlockStyle;
+}
+
+/**
+ * Options of `getResponsivePositionCSS`.
+ */
+export interface ResponsivePositionCSSOptions extends PositionCSSOptions {
+	viewportSettings?: unknown;
 }
