@@ -14,7 +14,7 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { useMemo, useCallback, useState } from '@wordpress/element';
+import { useMemo, useCallback, useRef, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -22,8 +22,10 @@ import { unlock } from '../../lock-unlock';
 import setNestedValue from '../../utils/set-nested-value';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import ApplyGloballyModal from './apply-globally-modal';
+import StyleSourcesDropdown from './style-sources-dropdown';
 
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+const { cleanEmptyObject, isGlobalStylesInheritanceIndicatorUIEnabled } =
+	unlock( blockEditorPrivateApis );
 
 // Block Gap is a special case and isn't defined within the blocks
 // style properties config. We'll add it here to allow it to be pushed
@@ -437,6 +439,7 @@ function PushChangesToGlobalStylesControl( {
 	name,
 	attributes,
 	setAttributes,
+	buttonRef,
 } ) {
 	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
 
@@ -519,6 +522,7 @@ function PushChangesToGlobalStylesControl( {
 				{ __( 'Styles' ) }
 			</BaseControl.VisualLabel>
 			<Button
+				ref={ buttonRef }
 				__next40pxDefaultSize
 				variant="secondary"
 				accessibleWhenDisabled
@@ -540,6 +544,7 @@ function PushChangesToGlobalStylesControl( {
 }
 
 function PushChangesToGlobalStyles( props ) {
+	const applyGloballyRef = useRef();
 	const blockEditingMode = useBlockEditingMode();
 	const isBlockBasedTheme = useSelect(
 		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
@@ -557,7 +562,16 @@ function PushChangesToGlobalStyles( props ) {
 
 	return (
 		<InspectorAdvancedControls>
-			<PushChangesToGlobalStylesControl { ...props } />
+			<PushChangesToGlobalStylesControl
+				{ ...props }
+				buttonRef={ applyGloballyRef }
+			/>
+			{ isGlobalStylesInheritanceIndicatorUIEnabled() && (
+				<StyleSourcesDropdown
+					{ ...props }
+					fallbackFocusRef={ applyGloballyRef }
+				/>
+			) }
 		</InspectorAdvancedControls>
 	);
 }

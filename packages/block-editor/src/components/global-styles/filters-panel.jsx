@@ -24,7 +24,6 @@ import {
 	getInheritanceProps,
 	InheritanceToolsPanelItem,
 	InheritanceResetButton,
-	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 
 const EMPTY_ARRAY = [];
@@ -171,7 +170,7 @@ export default function FiltersPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
+	showInheritanceLabelIndicators = false,
 } ) {
 	const popoverProps = {
 		...useToolsPanelItemPopoverProps(),

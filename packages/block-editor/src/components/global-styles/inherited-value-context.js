@@ -254,3 +254,27 @@ export function useResolvedStyle( blockName, className, selectedState = null ) {
 		selectedState,
 	] );
 }
+
+/**
+ * Hook: returns the cascade context `useResolvedStyle` resolves a block
+ * against, so a caller can name the layer a `sources` entry points at.
+ *
+ * @param {?string} blockName Selected block name (e.g. `core/heading`).
+ * @param {?string} className Block `className` used to detect an applied variation.
+ * @return {{ variationName: ?string, elements: string[] }} Active variation slug and element layers, low to high precedence.
+ */
+export function useResolvedStyleContext( blockName, className ) {
+	const { variationName, headingLevel } = useVariationAndElements(
+		blockName,
+		className
+	);
+	return useMemo(
+		() => ( {
+			variationName,
+			elements: blockName
+				? getElementLayers( blockName, headingLevel )
+				: [],
+		} ),
+		[ blockName, variationName, headingLevel ]
+	);
+}

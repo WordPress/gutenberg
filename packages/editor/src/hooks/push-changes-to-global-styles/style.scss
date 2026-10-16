@@ -33,3 +33,94 @@
 	color: $gray-900;
 	overflow-wrap: anywhere;
 }
+
+.editor-style-sources__popover .components-popover__content {
+	width: 300px;
+}
+
+// Popover sets an inline `max-height` on its content, so the scroll cap lives here.
+.editor-style-sources {
+	max-height: min(720px, 85vh);
+	overflow-y: auto;
+	padding: $grid-unit-20;
+	font-size: 13px;
+
+	.block-editor-inspector-popover-header {
+		margin-bottom: $grid-unit-20;
+	}
+}
+
+.editor-style-sources__group + .editor-style-sources__group {
+	margin-top: $grid-unit-30;
+	padding-top: $grid-unit-30;
+	border-top: $border-width solid $gray-200;
+}
+
+.editor-style-sources__group-title {
+	margin: 0 0 $grid-unit-20;
+	font-size: 13px;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+	line-height: 1.4;
+
+	&:focus {
+		outline: none;
+	}
+}
+
+.editor-style-sources__rows {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-20;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.editor-style-sources__row {
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-05;
+	margin: 0;
+
+	// Keeps rows with and without a reset button the same height.
+	> :first-child {
+		min-height: $button-size-small;
+	}
+}
+
+.editor-style-sources__label {
+	flex: 1;
+	min-width: 0;
+}
+
+.editor-style-sources__value {
+	flex-shrink: 0;
+	text-align: right;
+}
+
+.editor-style-sources__row .components-button {
+	flex-shrink: 0;
+}
+
+.editor-style-sources__secondary,
+.editor-style-sources__note {
+	margin: 0;
+	font-size: 12px;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
+// Lines the label up with the row labels above it.
+.editor-style-sources__reset-all {
+	margin-top: $grid-unit-30;
+	margin-left: -$grid-unit-15;
+}
+
+// Sits under the "Apply globally" help text, as its last line.
+.editor-style-sources__control {
+	margin-top: -$grid-unit-10;
+	margin-bottom: $grid-unit-30;
+
+	&:has(> .components-dropdown:empty) {
+		display: none;
+	}
+}
