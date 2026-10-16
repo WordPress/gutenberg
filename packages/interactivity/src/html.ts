@@ -135,23 +135,6 @@ export function isDangerousHTML( value: unknown ): value is DangerousHTML {
 }
 
 /**
- * Checks whether a value is `{ wpServerHtml: true }`, the server's
- * representation of a trusted HTML token in the page's data.
- *
- * @param value Value to check.
- *
- * @return Whether the value is the server token representation.
- */
-export function isServerHTMLRepresentation( value: unknown ): boolean {
-	return (
-		typeof value === 'object' &&
-		value !== null &&
-		value.constructor === Object &&
-		( value as { wpServerHtml?: unknown } ).wpServerHtml === true
-	);
-}
-
-/**
  * Retrieves the HTML value a trusted HTML token represents.
  *
  * @param token A token previously returned by `asDangerousHTML()`.

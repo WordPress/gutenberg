@@ -1,15 +1,21 @@
 import { useRef } from 'preact/hooks';
 import type { RefObject } from 'preact';
 import { directive, isDefaultDirectiveSuffix } from '../hooks';
-import { useLayoutEffect, warn } from '../utils';
+import { isPlainObject, useLayoutEffect, warn } from '../utils';
 import { PENDING_GETTER } from '../proxies/state';
 import { warnUniqueIdNotSupported } from './utils/warnings';
-import {
-	emptyHTML,
-	getDangerousHTML,
-	isDangerousHTML,
-	isServerHTMLRepresentation,
-} from '../html';
+import { emptyHTML, isDangerousHTML, getDangerousHTML } from '../html';
+
+/**
+ * Checks whether a value is `{ wpServerHtml: true }`, the server's
+ * representation of a trusted HTML token in the page's data.
+ *
+ * @param value Value to check.
+ *
+ * @return Whether the value is the server token representation.
+ */
+const isServerHTMLRepresentation = ( value: unknown ): boolean =>
+	isPlainObject( value ) && value.wpServerHtml === true;
 
 // data-wp-html — Inner HTML binding for explicitly trusted content.
 directive(
