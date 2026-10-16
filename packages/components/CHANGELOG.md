@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `StyleProvider`: Stop creating an Emotion cache for children. Consumers that need Emotion styles in another document must provide their own Emotion `CacheProvider`. CSS Module document registration is unchanged.
+-   `StyleProvider`: Stop creating an Emotion cache for children. Consumers that need Emotion styles in another document must provide their own Emotion `CacheProvider`. CSS Module document registration is unchanged ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
 
 -   The component context system no longer merges Emotion-registered classes in `className`. Compose dependent Emotion styles before passing the resulting class name ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
