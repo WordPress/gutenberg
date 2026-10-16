@@ -1014,11 +1014,10 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			popover.getByRole( 'heading', { name: 'Settings' } )
 		).toBeVisible();
-		const linkInput = popover.getByRole( 'combobox', { name: 'Link' } );
+		const linkInput = popover.getByRole( 'textbox', {
+			name: 'Social profile link',
+		} );
 		await expect( linkInput ).toHaveValue( 'https://wordpress.org/' );
-		await expect(
-			popover.getByRole( 'textbox' ).first()
-		).toHaveAccessibleName( 'Text' );
 		const textInput = popover.getByRole( 'textbox', { name: 'Text' } );
 		await expect( textInput ).toHaveAttribute( 'placeholder', 'WordPress' );
 		await expect(
