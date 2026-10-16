@@ -1,7 +1,7 @@
-import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Canvas, Controls, Meta } from '@storybook/addon-docs/blocks';
 import * as DisclosureStories from './disclosure.story';
 
-<Meta of={ DisclosureStories } />
+<Meta of={ DisclosureStories } tags={ [ '!docs-only' ] } />
 
 # Notice with disclosed details
 
@@ -9,11 +9,15 @@ Keep a short message visible and let users reveal supplementary details. These e
 
 See [Error messages](?path=/docs/design-system-patterns-error-messages--docs) for guidance on writing actionable errors and deciding when to offer copying.
 
+The controls below configure each example. `intent` is passed to `Notice.Root`; `message` and `details` supply the example content and are not `Notice.Root` props.
+
 ## With Collapsible
 
 This example follows the text-button approach in [Gutenberg PR #82496](https://github.com/WordPress/gutenberg/pull/82496). Both actions stay before the expanded details.
 
 <Canvas of={ DisclosureStories.WithDetails } />
+
+<Controls of={ DisclosureStories.WithDetails } />
 
 `Collapsible.Root` renders `Notice.Root`, so the message, actions, and panel remain direct children of the notice's grid. `Collapsible.Trigger` renders a `Notice.ActionButton`. The panel renders `Notice.Description` as a `div`, preserving the notice's typography and alignment without nesting block content inside a span. The closed panel unmounts so its margin and padding do not reserve space below the actions.
 
@@ -22,6 +26,8 @@ This example follows the text-button approach in [Gutenberg PR #82496](https://g
 This alternative uses a native disclosure and keeps the copy button below the details. The browser supplies the disclosure marker and manages the open state. No additional `Notice` prop is needed.
 
 <Canvas of={ DisclosureStories.WithNativeDetails } />
+
+<Controls of={ DisclosureStories.WithNativeDetails } />
 
 `Notice.Description` renders a `<details>` element, preserving the notice's typography, color, and grid alignment. Its first child is a `<summary>` labeled "Details", followed by the supplementary text. `Notice.Actions` follows the disclosure, so the copy button remains at the bottom of the notice in both states.
 
@@ -37,4 +43,4 @@ After a successful copy, a separate "Copied" message provides visible confirmati
 
 Use Enter or Space on "Show details" or the native "Details" summary to expand the details. The disclosure control keeps focus. Tab to "Copy error", activate it, and paste into a text field to inspect the copied message and details. Copying also works while the details are collapsed. Change the intent to check the "Copy message" label.
 
-Use the story controls to try a longer message, multiline details, and empty details. Resize the canvas to check wrapping before and after copying. The "Copied" confirmation can wrap below the buttons in a narrow container.
+Use the controls below each example to try a longer message, multiline details, and empty details. Resize the canvas to check wrapping before and after copying. The "Copied" confirmation can wrap below the buttons in a narrow container.

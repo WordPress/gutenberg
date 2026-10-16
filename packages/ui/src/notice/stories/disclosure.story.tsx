@@ -6,7 +6,7 @@ import { Text } from '../../text';
 import * as Collapsible from '../../collapsible';
 import * as Notice from '../index';
 
-type StoryArgs = ComponentProps< typeof Notice.Root > & {
+type StoryArgs = Pick< ComponentProps< typeof Notice.Root >, 'intent' > & {
 	message: string;
 	details: string;
 };
@@ -14,12 +14,21 @@ type StoryArgs = ComponentProps< typeof Notice.Root > & {
 const meta: Meta< StoryArgs > = {
 	title: 'Components/@wordpress-ui/Notice/Disclosure',
 	id: 'design-system-components-notice-disclosure',
-	component: Notice.Root,
-	tags: [ '!autodocs' ],
-	parameters: { controls: { include: [ 'intent', 'message', 'details' ] } },
+	tags: [ '!autodocs', 'docs-only' ],
 	argTypes: {
-		message: { control: 'text' },
-		details: { control: 'text' },
+		intent: {
+			control: 'select',
+			options: [ 'neutral', 'info', 'warning', 'success', 'error' ],
+			description: 'Passed to Notice.Root to set the notice intent.',
+		},
+		message: {
+			control: 'text',
+			description: 'Example content rendered inside Notice.Description.',
+		},
+		details: {
+			control: 'text',
+			description: 'Example content revealed by the disclosure.',
+		},
 	},
 };
 export default meta;
