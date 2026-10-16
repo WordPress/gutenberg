@@ -5,7 +5,7 @@ import { store as blockEditorStore } from '../../store';
 /**
  * Returns true if the block toolbar should be shown.
  *
- * @return {boolean} Whether the block toolbar component will be rendered.
+ * @return Whether the block toolbar component will be rendered.
  */
 export function useHasBlockToolbar() {
 	const enabled = useSelect( ( select ) => {
@@ -19,7 +19,8 @@ export function useHasBlockToolbar() {
 
 		const blockType =
 			selectedBlockClientId &&
-			getBlockType( getBlockName( selectedBlockClientId ) );
+			// The selected block has a name.
+			getBlockType( getBlockName( selectedBlockClientId )! );
 
 		return (
 			blockType &&

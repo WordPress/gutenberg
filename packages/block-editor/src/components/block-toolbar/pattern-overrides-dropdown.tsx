@@ -4,17 +4,24 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import type {
+	PatternOverridesDropdownProps,
+	PatternOverridesPopoverContentProps,
+} from './types';
 
 /**
  * Renders the content of the pattern overrides popover.
  * Only mounts when the popover is opened.
  *
- * @param {Object} props            Component props.
- * @param {Array}  props.clientIds  The client IDs of selected blocks.
- * @param {string} props.blockTitle The display title of the block.
- * @return {React.JSX.Element} The popover content.
+ * @param props            Component props.
+ * @param props.clientIds  The client IDs of selected blocks.
+ * @param props.blockTitle The display title of the block.
+ * @return The popover content.
  */
-function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
+function PatternOverridesPopoverContent( {
+	clientIds,
+	blockTitle,
+}: PatternOverridesPopoverContentProps ) {
 	const blockMetaName = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
@@ -44,21 +51,21 @@ function PatternOverridesPopoverContent( { clientIds, blockTitle } ) {
 /**
  * Renders a toolbar button that displays information about pattern overrides in a popover.
  *
- * @param {Object}            props            Component props.
- * @param {React.JSX.Element} props.icon       The icon element to display.
- * @param {Array}             props.clientIds  The client IDs of selected blocks.
- * @param {string}            props.blockTitle The display title of the block.
- * @param {string}            props.label      The label for the button.
- * @return {React.JSX.Element} The pattern overrides button component.
+ * @param props            Component props.
+ * @param props.icon       The icon element to display.
+ * @param props.clientIds  The client IDs of selected blocks.
+ * @param props.blockTitle The display title of the block.
+ * @param props.label      The label for the button.
+ * @return The pattern overrides button component.
  */
 export default function PatternOverridesDropdown( {
 	icon,
 	clientIds,
 	blockTitle,
 	label,
-} ) {
+}: PatternOverridesDropdownProps ) {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const anchorRef = useRef();
+	const anchorRef = useRef< HTMLButtonElement >( null );
 
 	return (
 		<>

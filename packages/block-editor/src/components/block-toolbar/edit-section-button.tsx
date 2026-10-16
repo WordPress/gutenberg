@@ -2,10 +2,12 @@ import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
+import type { ClientIdProps } from './types';
 
-export default function EditSectionButton( { clientId } ) {
+export default function EditSectionButton( { clientId }: ClientIdProps ) {
 	const {
 		isSectionBlock,
 		isEditingContentOnlySection,
@@ -32,8 +34,9 @@ export default function EditSectionButton( { clientId } ) {
 	if (
 		! clientId ||
 		( ! isSectionBlock && ! isEditingContentOnlySection ) ||
-		isReusableBlock( blockType ) ||
-		isTemplatePart( blockType )
+		// Only the block name is read.
+		isReusableBlock( blockType as Block | null ) ||
+		isTemplatePart( blockType as Block | null )
 	) {
 		return null;
 	}

@@ -30,19 +30,20 @@ import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
+import type { BlockToolbarProps, PrivateBlockToolbarProps } from './types';
 
 /**
  * Renders the block toolbar.
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-toolbar/README.md
  *
- * @param {Object}   props                             Components props.
- * @param {boolean}  props.hideDragHandle              Show or hide the Drag Handle for drag and drop functionality.
- * @param {boolean}  props.focusOnMount                Focus the toolbar when mounted.
- * @param {number}   props.__experimentalInitialIndex  The initial index of the toolbar item to focus.
- * @param {Function} props.__experimentalOnIndexChange Callback function to be called when the index of the focused toolbar item changes.
- * @param {string}   props.variant                     Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
- * @param {boolean}  props.showPlaceholder             While no block is selected, show the default block's icon and the mover, disabled.
+ * @param props                             Components props.
+ * @param props.hideDragHandle              Show or hide the Drag Handle for drag and drop functionality.
+ * @param props.focusOnMount                Focus the toolbar when mounted.
+ * @param props.__experimentalInitialIndex  The initial index of the toolbar item to focus.
+ * @param props.__experimentalOnIndexChange Callback function to be called when the index of the focused toolbar item changes.
+ * @param props.variant                     Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
+ * @param props.showPlaceholder             While no block is selected, show the default block's icon and the mover, disabled.
  */
 export function PrivateBlockToolbar( {
 	hideDragHandle,
@@ -51,7 +52,7 @@ export function PrivateBlockToolbar( {
 	__experimentalOnIndexChange,
 	variant = 'unstyled',
 	showPlaceholder = false,
-} ) {
+}: PrivateBlockToolbarProps ) {
 	const {
 		blockClientId,
 		blockClientIds,
@@ -105,22 +106,22 @@ export function PrivateBlockToolbar( {
 		const editingMode = getBlockEditingMode( selectedBlockClientId );
 		const _isDefaultEditingMode = editingMode === 'default';
 		const _blockName = getBlockName( selectedBlockClientId );
-		const isValid = selectedBlockClientIds.every( ( id ) =>
+		const isValid = selectedBlockClientIds.every( ( id: string ) =>
 			isBlockValid( id )
 		);
 		const isVisual = selectedBlockClientIds.every(
-			( id ) => getBlockMode( id ) === 'visual'
+			( id: string ) => getBlockMode( id ) === 'visual'
 		);
 		const _isUsingBindings =
 			selectedBlockClientIds.length > 0 &&
 			selectedBlockClientIds.every(
-				( clientId ) =>
+				( clientId: string ) =>
 					!! getBlockAttributes( clientId )?.metadata?.bindings
 			);
 
 		// If one or more selected blocks are locked, do not show the BlockGroupToolbar.
 		const _hasTemplateLock = selectedBlockClientIds.some(
-			( id ) => getTemplateLock( id ) === 'contentOnly'
+			( id: string ) => getTemplateLock( id ) === 'contentOnly'
 		);
 
 		const _isZoomOut = isZoomOut();
@@ -133,7 +134,7 @@ export function PrivateBlockToolbar( {
 			getSettings()?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
 		const _areSelectedBlocksHiddenOnViewport =
 			selectedBlockClientIds.length > 0 &&
-			selectedBlockClientIds.every( ( id ) =>
+			selectedBlockClientIds.every( ( id: string ) =>
 				isBlockHiddenAtViewport( id, _currentDeviceType )
 			);
 		const _isEditingResponsiveStyleState =
@@ -181,7 +182,7 @@ export function PrivateBlockToolbar( {
 
 	// Handles highlighting the current block outline on hover or focus of the
 	// block type toolbar area.
-	const nodeRef = useRef();
+	const nodeRef = useRef< HTMLDivElement >( null );
 	const showHoveredOrFocusedGestures = useShowHoveredOrFocusedGestures( {
 		ref: nodeRef,
 	} );
@@ -339,7 +340,9 @@ export const showPlaceholderKey = Symbol( 'showPlaceholder' );
  * @param {boolean} props.hideDragHandle Show or hide the Drag Handle for drag and drop functionality.
  * @param {string}  props.variant        Style variant of the toolbar, also passed to the Dropdowns rendered from Block Toolbar Buttons.
  */
-export default function BlockToolbar( props ) {
+export default function BlockToolbar(
+	props: BlockToolbarProps & { [ showPlaceholderKey ]?: boolean }
+) {
 	const { hideDragHandle, variant } = props;
 	return (
 		<PrivateBlockToolbar
