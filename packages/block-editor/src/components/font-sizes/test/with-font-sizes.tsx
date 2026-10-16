@@ -1,0 +1,32 @@
+import type { ComponentType } from 'react';
+import { describe, expect, it } from 'vitest';
+import withFontSizes from '../with-font-sizes';
+import type { FontSizeObject } from '../types';
+
+/*
+ * These checks run at type-check time: each `@ts-expect-error` fails the
+ * type check if the line below it stops being a type error.
+ */
+describe( 'withFontSizes types', () => {
+	it( 'infers the props of the wrapped component', () => {
+		const Labeled: ComponentType< {
+			fontSize: FontSizeObject;
+			label: string;
+		} > = () => null;
+		const WithFontSize = withFontSizes( 'fontSize' )( Labeled );
+
+		const withLabel = (
+			<WithFontSize
+				label="Size"
+				attributes={ {} }
+				setAttributes={ () => {} }
+			/>
+		);
+		const withoutLabel = (
+			// @ts-expect-error The own props stay required.
+			<WithFontSize attributes={ {} } setAttributes={ () => {} } />
+		);
+
+		expect( [ withLabel, withoutLabel ] ).toHaveLength( 2 );
+	} );
+} );

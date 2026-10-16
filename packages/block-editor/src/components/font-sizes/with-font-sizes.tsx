@@ -234,8 +234,10 @@ export default < Name extends string >( ...fontSizeNames: Name[] ) => {
 			Inner: ComponentType< WithFontSizesProps >
 		) => ComponentType< WithFontSizesProps >,
 		'withFontSizes'
-	) as < Props extends InjectedFontSizesProps< Name > >(
-		WrappedComponent: ComponentType< Props >
+	) as < Props >(
+		WrappedComponent: ComponentType<
+			Props & InjectedFontSizesProps< Name >
+		>
 	) => ComponentType<
 		Omit< Props, keyof InjectedFontSizesProps< Name > > &
 			Pick< WithFontSizesProps, 'attributes' | 'setAttributes' >
