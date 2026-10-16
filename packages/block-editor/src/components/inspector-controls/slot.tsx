@@ -1,7 +1,11 @@
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import warning from '@wordpress/warning';
-import type { ForwardedRef } from 'react';
+import type {
+	ForwardedRef,
+	ForwardRefExoticComponent,
+	RefAttributes,
+} from 'react';
 import BlockSupportToolsPanel from './block-support-tools-panel';
 import BlockSupportSlotContainer from './block-support-slot-container';
 import groups from './groups';
@@ -52,4 +56,7 @@ function InspectorControlsSlot(
 	);
 }
 
-export default forwardRef( InspectorControlsSlot );
+// `forwardRef` drops the named props of a type with an index signature.
+export default forwardRef( InspectorControlsSlot ) as ForwardRefExoticComponent<
+	InspectorControlsSlotProps & RefAttributes< unknown >
+>;
