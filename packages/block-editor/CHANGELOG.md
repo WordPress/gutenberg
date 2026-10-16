@@ -82,6 +82,7 @@
 -   Convert `BlockManager`, `PublishDateTimePicker` and the fit text hook to TypeScript ([#84949](https://github.com/WordPress/gutenberg/pull/84949)).
 -   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
 -   Convert the block toolbar, switcher, mover, preview and settings menu to TypeScript ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
+-   Convert the grid item tools, ChildLayoutControl and the layout hooks to TypeScript ([#84985](https://github.com/WordPress/gutenberg/pull/84985)).
 
 ## 18.1.0 (2026-10-07)
 
