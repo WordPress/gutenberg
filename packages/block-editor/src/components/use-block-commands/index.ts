@@ -17,9 +17,12 @@ import {
 	unseen,
 	blockDefault as blockDefaultIcon,
 } from '@wordpress/icons';
+import type { ReactElement } from 'react';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import { unlock } from '../../lock-unlock';
+import type { TransformCommandItem, TransformCommandsSelection } from './types';
 
 const getTransformCommands = () =>
 	function useTransformCommands() {
@@ -30,7 +33,7 @@ const getTransformCommands = () =>
 			canRemove,
 			possibleBlockTransformations,
 			invalidSelection,
-		} = useSelect( ( select ) => {
+		} = useSelect( ( select ): TransformCommandsSelection => {
 			const {
 				getBlockRootClientId,
 				getBlockTransformItems,
@@ -58,12 +61,14 @@ const getTransformCommands = () =>
 				selectedBlockClientIds[ 0 ]
 			);
 			return {
-				blocks: selectedBlocks,
+				blocks: selectedBlocks as Block[],
 				clientIds: selectedBlockClientIds,
+				// Block type icons are normalized to descriptors.
 				possibleBlockTransformations: getBlockTransformItems(
-					selectedBlocks,
+					// The selection has no missing blocks here.
+					selectedBlocks as Block[],
 					rootClientId
-				),
+				) as TransformCommandItem[],
 				canRemove: canRemoveBlocks( selectedBlockClientIds ),
 				invalidSelection: false,
 			};
@@ -77,7 +82,7 @@ const getTransformCommands = () =>
 		}
 		const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
-		function selectForMultipleBlocks( insertedBlocks ) {
+		function selectForMultipleBlocks( insertedBlocks: Block[] ) {
 			if ( insertedBlocks.length > 1 ) {
 				multiSelect(
 					insertedBlocks[ 0 ].clientId,
@@ -87,10 +92,12 @@ const getTransformCommands = () =>
 		}
 
 		// Simple block transformation based on the `Block Transforms` API.
-		function onBlockTransform( name, variationName ) {
-			const newBlocks = switchToBlockType( blocks, name, variationName );
-			replaceBlocks( clientIds, newBlocks );
-			selectForMultipleBlocks( newBlocks );
+		function onBlockTransform( name: string, variationName?: string ) {
+			// Commands are only built for a valid selection.
+			const newBlocks = switchToBlockType( blocks!, name, variationName );
+			// A listed transformation switches the blocks.
+			replaceBlocks( clientIds!, newBlocks! );
+			selectForMultipleBlocks( newBlocks! );
 		}
 
 		/**
@@ -128,10 +135,11 @@ const getTransformCommands = () =>
 						'core/block-editor/transform-to-' +
 						( id || name ).replace( /\//g, '-' ),
 					/* translators: %s: Block or block variation name. */
-					label: sprintf( __( 'Transform to %s' ), title ),
-					icon: blockIcon?.src,
-					category: 'command',
-					callback: ( { close } ) => {
+					label: sprintf( __( 'Transform to %s' ), title! ), // Transform items have a title.
+					// Block icons are elements; see the note above.
+					icon: blockIcon?.src as ReactElement | undefined,
+					category: 'command' as const,
+					callback: ( { close }: { close: () => void } ) => {
 						onBlockTransform( name, variationName );
 						close();
 					},
@@ -162,9 +170,11 @@ const getQuickActionsCommands = () =>
 				clientIds: selectedBlockClientIds,
 				isUngroupable: _isUngroupable(),
 				isGroupable: _isGroupable(),
-				blockVisibilitySetting:
-					getSettings().__experimentalFeatures?.blockVisibility
-						?.allowEditing,
+				blockVisibilitySetting: (
+					getSettings().__experimentalFeatures as
+						| { blockVisibility?: { allowEditing?: boolean } }
+						| undefined
+				 )?.blockVisibility?.allowEditing,
 			};
 		}, [] );
 		const {
@@ -196,7 +206,8 @@ const getQuickActionsCommands = () =>
 
 			const groupingBlockName = getGroupingBlockName();
 
-			const newBlocks = groupBlocks( blocks, groupingBlockName );
+			// A grouping block type is registered.
+			const newBlocks = groupBlocks( blocks, groupingBlockName! );
 
 			if ( ! newBlocks ) {
 				return;
@@ -224,10 +235,11 @@ const getQuickActionsCommands = () =>
 		const { showViewportModal } = unlock( blockEditorDispatch );
 		const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 		const canInsertDefaultBlock = canInsertBlockType(
-			getDefaultBlockName(),
+			// A default block type is registered.
+			getDefaultBlockName()!,
 			rootClientId
 		);
-		const canDuplicate = blocks.every( ( block ) => {
+		const canDuplicate = blocks.every( ( block: Block | null ) => {
 			return (
 				!! block &&
 				hasBlockSupport( block.name, 'multiple', true ) &&
@@ -253,9 +265,10 @@ const getQuickActionsCommands = () =>
 					name: 'add-before',
 					label: __( 'Add before' ),
 					callback: () => {
-						const clientId = Array.isArray( clientIds )
+						const clientId: string = Array.isArray( clientIds )
 							? clientIds[ 0 ]
-							: clientId;
+							: // @ts-expect-error The client IDs are always an array, so this is never read.
+								clientId;
 						insertBeforeBlock( clientId );
 					},
 					icon: add,
@@ -264,9 +277,10 @@ const getQuickActionsCommands = () =>
 					name: 'add-after',
 					label: __( 'Add after' ),
 					callback: () => {
-						const clientId = Array.isArray( clientIds )
+						const clientId: string = Array.isArray( clientIds )
 							? clientIds[ clientIds.length - 1 ]
-							: clientId;
+							: // @ts-expect-error The client IDs are always an array, so this is never read.
+								clientId;
 						insertAfterBlock( clientId );
 					},
 					icon: add,
@@ -302,7 +316,7 @@ const getQuickActionsCommands = () =>
 		}
 
 		const supportsVisibility = blocks.every(
-			( block ) =>
+			( block: Block | null ) =>
 				!! block && hasBlockSupport( block.name, 'visibility', true )
 		);
 		const allBlocksDefaultMode = clientIds.every(
@@ -330,8 +344,8 @@ const getQuickActionsCommands = () =>
 			commands: commands.map( ( command ) => ( {
 				...command,
 				name: 'core/block-editor/action-' + command.name,
-				category: 'command',
-				callback: ( { close } ) => {
+				category: 'command' as const,
+				callback: ( { close }: { close: () => void } ) => {
 					command.callback();
 					close();
 				},

@@ -1168,16 +1168,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/collab/note-icon-slot.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/collab/note-icon-toolbar-slot.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/colors-gradients/control.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
@@ -1195,27 +1185,6 @@
 	},
 	"packages/block-editor/src/components/contrast-checker/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/convert-to-group-buttons/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/convert-to-group-buttons/toolbar.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/convert-to-group-buttons/use-convert-to-group-button-props.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -2846,52 +2815,12 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/use-block-commands/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/use-block-drop-zone/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/use-block-drop-zone/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-flash-editable-blocks/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-list-view-panel-state/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-moving-animation/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-on-block-drop/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-on-block-drop/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-paste-styles/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-resize-canvas/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

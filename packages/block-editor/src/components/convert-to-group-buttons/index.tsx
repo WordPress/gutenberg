@@ -6,6 +6,7 @@ import { store as blockEditorStore } from '../../store';
 import { groupBlocks } from '../../utils/group-blocks';
 import useConvertToGroupButtonProps from './use-convert-to-group-button-props';
 import BlockGroupToolbar from './toolbar';
+import type { ConvertToGroupButtonComponentProps } from './types';
 
 function ConvertToGroupButton( {
 	clientIds,
@@ -15,7 +16,7 @@ function ConvertToGroupButton( {
 	blocksSelection,
 	groupingBlockName,
 	onClose = () => {},
-} ) {
+}: ConvertToGroupButtonComponentProps ) {
 	const { getSelectedBlockClientIds } = useSelect( blockEditorStore );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const onConvertToGroup = () => {
