@@ -2652,6 +2652,30 @@ describe( 'selectors', () => {
 			expect( getPermalinkParts( state ) ).toEqual( parts );
 		} );
 
+		it( 'should use the edited post slug as the post name', () => {
+			const state = {
+				currentPost: {
+					permalink_template: 'http://foo.test/bar/%postname%/',
+					title: 'Sample Post',
+					generated_slug: 'sample-post',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+				initialEdits: {},
+			};
+
+			expect( getPermalinkParts( state ) ).toEqual( {
+				prefix: 'http://foo.test/bar/',
+				postName: 'edited-title',
+				suffix: '/',
+			} );
+		} );
+
 		it( 'should return null if the post has no permalink template', () => {
 			const state = {
 				currentPost: {},
@@ -2719,32 +2743,11 @@ describe( 'selectors', () => {
 			);
 		} );
 
-		it( 'should prefer the server-generated slug over the cleaned title', () => {
+		it( 'should ignore the server-generated slug once the title has been edited', () => {
 			const state = {
 				currentPost: {
 					title: 'Sample Post',
-					generated_slug: 'server-generated-slug',
-				},
-				editor: {
-					present: {
-						edits: {
-							title: 'Edited Title',
-						},
-					},
-				},
-			};
-
-			expect( getEditedPostSlug( state ) ).toBe(
-				'server-generated-slug'
-			);
-		} );
-
-		it( 'should ignore the server-generated slug of an auto-draft', () => {
-			const state = {
-				currentPost: {
-					status: 'auto-draft',
-					title: 'Auto Draft',
-					generated_slug: 'auto-draft',
+					generated_slug: 'sample-post',
 				},
 				editor: {
 					present: {
@@ -2756,6 +2759,46 @@ describe( 'selectors', () => {
 			};
 
 			expect( getEditedPostSlug( state ) ).toBe( 'edited-title' );
+		} );
+
+		it( 'should prefer a saved slug over the edited title', () => {
+			const state = {
+				currentPost: {
+					status: 'publish',
+					slug: 'custom-slug',
+					title: 'Sample Post',
+					generated_slug: 'sample-post',
+				},
+				editor: {
+					present: {
+						edits: {
+							title: 'Edited Title',
+						},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 'custom-slug' );
+		} );
+
+		it( 'should ignore the server-generated slug of an untitled auto-draft', () => {
+			// core-data clears an auto-draft's `Auto Draft` placeholder title,
+			// so the title looks unchanged while the slug still comes from it.
+			const state = {
+				postId: 123,
+				currentPost: {
+					status: 'auto-draft',
+					title: '',
+					generated_slug: 'auto-draft',
+				},
+				editor: {
+					present: {
+						edits: {},
+					},
+				},
+			};
+
+			expect( getEditedPostSlug( state ) ).toBe( 123 );
 		} );
 
 		it( 'should return the cleaned title as slug if no saved, edited, or generated slug exists', () => {

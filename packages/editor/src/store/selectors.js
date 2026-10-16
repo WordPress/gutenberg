@@ -987,27 +987,34 @@ export function getPermalink( state ) {
 }
 
 /**
- * Returns the slug for the post being edited, preferring a manually edited
- * value if one exists, then the server-generated slug from the post entity,
- * then a JS approximation of the current post title, and finally the post ID.
+ * Returns the slug for the post being edited, preferring a manually edited or
+ * saved value if one exists, then the server-generated slug from the post
+ * entity, then a JS approximation of the current post title, and finally the
+ * post ID.
  *
- * The server-generated slug is skipped until the post is first saved: for an
- * auto-draft it comes from the `Auto Draft` placeholder title, and autosaves
- * don't refresh it.
+ * The server generates its slug from the saved title, so it is only used while
+ * the title is unchanged. It is never used for an auto-draft, whose saved title
+ * is the `Auto Draft` placeholder and which autosaves don't refresh.
  *
  * @param {Object} state Editor state.
  *
  * @return {string} The current slug to be displayed in the editor
  */
 export function getEditedPostSlug( state ) {
-	const generatedSlug =
-		getCurrentPostAttribute( state, 'status' ) !== 'auto-draft'
-			? getEditedPostAttribute( state, 'generated_slug' )
-			: undefined;
+	const slug = getEditedPostAttribute( state, 'slug' );
+	if ( slug ) {
+		return slug;
+	}
+
+	const title = getEditedPostAttribute( state, 'title' );
+	const isGeneratedSlugCurrent =
+		getCurrentPostAttribute( state, 'status' ) !== 'auto-draft' &&
+		title === getCurrentPostAttribute( state, 'title' );
+
 	return (
-		getEditedPostAttribute( state, 'slug' ) ||
-		generatedSlug ||
-		cleanForSlug( getEditedPostAttribute( state, 'title' ) ) ||
+		( isGeneratedSlugCurrent &&
+			getEditedPostAttribute( state, 'generated_slug' ) ) ||
+		cleanForSlug( title ) ||
 		getCurrentPostId( state )
 	);
 }
@@ -1030,9 +1037,7 @@ export function getPermalinkParts( state ) {
 		return null;
 	}
 
-	const postName =
-		getEditedPostAttribute( state, 'slug' ) ||
-		getEditedPostAttribute( state, 'generated_slug' );
+	const postName = getEditedPostSlug( state );
 
 	const [ prefix, suffix ] = permalinkTemplate.split(
 		PERMALINK_POSTNAME_REGEX

@@ -699,8 +699,11 @@ export const saveEntityRecord =
 										newRecord.status === 'draft'
 											? newRecord.status
 											: persistedRecord.status;
-								} else {
+								} else if ( key !== 'generated_slug' ) {
 									// These properties are not persisted in autosaves.
+									// `generated_slug` is dropped instead: the server
+									// derives it from the title this autosave just
+									// saved, and the response doesn't include it.
 									acc[ key ] = persistedRecord[ key ];
 								}
 								return acc;

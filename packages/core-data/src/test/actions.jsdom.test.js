@@ -1401,6 +1401,55 @@ describe( 'saveEntityRecord', () => {
 			expect( dispatch.receiveAutosaves ).toHaveBeenCalled();
 		} );
 	} );
+
+	describe( 'autosaves saved to the post itself', () => {
+		it( 'drops the stale generated slug from the persisted record', async () => {
+			const persistedRecord = {
+				id: 10,
+				status: 'auto-draft',
+				title: '',
+				content: '',
+				generated_slug: 'auto-draft',
+				link: 'http://example.com/?p=10',
+			};
+			const select = {
+				getRawEntityRecord: () => persistedRecord,
+			};
+			const resolveSelect = {
+				getEntitiesConfig: vi.fn( () => [
+					{
+						name: 'post',
+						kind: 'postType',
+						baseURL: '/wp/v2/posts',
+					},
+				] ),
+			};
+			// An author's autosave of a draft is saved to the post itself,
+			// so the response has the post's own ID.
+			apiFetch.mockImplementation( () => ( {
+				id: 10,
+				title: 'Hello Slug',
+				content: 'Some content',
+			} ) );
+
+			await saveEntityRecord(
+				'postType',
+				'post',
+				{ id: 10, title: 'Hello Slug', content: 'Some content' },
+				{ isAutosave: true }
+			)( { select, dispatch, resolveSelect } );
+
+			const [ , , receivedRecord ] =
+				dispatch.receiveEntityRecords.mock.calls[ 0 ];
+			expect( receivedRecord ).toEqual( {
+				id: 10,
+				status: 'draft',
+				title: 'Hello Slug',
+				content: 'Some content',
+				link: 'http://example.com/?p=10',
+			} );
+		} );
+	} );
 } );
 
 describe( 'receiveUserPermission', () => {

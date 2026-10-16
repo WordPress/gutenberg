@@ -26,7 +26,7 @@
 -   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
 -   Notes: Stop announcing the "Add note" block menu item as opening a dialog ([#84818](https://github.com/WordPress/gutenberg/pull/84818)).
 -   `EditorProvider`: Keep a preview canvas from restoring a block selection written to the entity by another editor, such as the site editor's navigation sidebar ([#84832](https://github.com/WordPress/gutenberg/pull/84832)).
--   Post slug: Show the slug derived from the title for a new post instead of `auto-draft` until it is first saved.
+-   Post slug: Show the slug derived from the current title instead of `auto-draft`, or the slug of the title before an unsaved edit. `getEditedPostSlug` only uses the server-generated slug while the title is unchanged, and `getPermalinkParts` now uses `getEditedPostSlug` for the post name, so the slug, the permalink preview and the copied permalink agree ([#84893](https://github.com/WordPress/gutenberg/pull/84893)).
 
 ### Internal
 
