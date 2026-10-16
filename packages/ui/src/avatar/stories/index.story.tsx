@@ -4,7 +4,7 @@ import * as Avatar from '../index';
 import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
-import styles from './fallback-colors.module.css';
+import styles from './colors.module.css';
 
 // Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
 // Used under the Unsplash License: https://unsplash.com/license
@@ -48,23 +48,112 @@ type Story = StoryObj< typeof Avatar.Root >;
 
 export const Default: Story = {};
 
-/** Loaded images keep the supplied ring color. Colored fallbacks have no border. */
-export const WithColor: Story = {
-	args: { color: '#008a20' },
-	render: ( args ) => (
-		<Stack gap="lg" align="center">
-			<Avatar.Root { ...args }>
+function ColorSamples( props: React.ComponentProps< typeof Avatar.Root > ) {
+	return (
+		<Stack gap="sm" align="center">
+			<Avatar.Root { ...props } aria-hidden="true">
 				<Avatar.Fallback />
 				<Avatar.Image src={ IMAGE_SRC } alt="" />
 			</Avatar.Root>
-			<Avatar.Root { ...args }>
+			<Avatar.Root { ...props } aria-hidden="true">
 				<Avatar.Initials name="Alex Morgan" />
 			</Avatar.Root>
-			<Avatar.Root { ...args }>
+			<Avatar.Root { ...props } aria-hidden="true">
 				<Avatar.Fallback />
 			</Avatar.Root>
 		</Stack>
-	),
+	);
+}
+
+/** Compare image rings and colored fallbacks across both shapes and all five sizes. */
+export const WithColor: Story = {
+	args: { color: '#008a20' },
+	parameters: { controls: { include: [ 'color' ] } },
+	render: ( args ) => {
+		const colors = [
+			...new Set( [
+				args.color ?? '#008a20',
+				'#d94145',
+				'#fbbf24',
+				'#f3d1ab',
+				'#00cfff',
+				'#3858e9',
+				'#6f42c1',
+				'#757575',
+				'#000000',
+				'#ffffff',
+			] ),
+		];
+		const sizes = [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const;
+		return (
+			<div
+				className={ styles.gallery }
+				role="region"
+				aria-label="Colored Avatar examples"
+				tabIndex={ 0 }
+			>
+				<p>
+					Each size shows an image, initials, and the person icon.
+					Both shapes appear for every color. Change Color in Controls
+					to update the first sample.
+				</p>
+				<p>
+					Initials target at least 4.5:1 contrast and the person icon
+					3:1 against the fill. Colored fallbacks have no border;
+					loaded images keep the supplied color ring. Forced-colors
+					mode retains a visible border. See Unsupported Colors for
+					input limitations and best-effort development warnings.
+				</p>
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">Color</th>
+							<th scope="col">Shape</th>
+							{ sizes.map( ( size ) => (
+								<th key={ size } scope="col">
+									<code>{ size }</code>
+								</th>
+							) ) }
+						</tr>
+					</thead>
+					{ colors.map( ( color, index ) => (
+						<tbody key={ color }>
+							{ ( [ 'circle', 'square' ] as const ).map(
+								( shape, shapeIndex ) => (
+									<tr key={ shape }>
+										{ shapeIndex === 0 && (
+											<th scope="rowgroup" rowSpan={ 2 }>
+												{ index === 0 && (
+													<>
+														Custom
+														<br />
+													</>
+												) }
+												<code>{ color }</code>
+											</th>
+										) }
+										<th scope="row">
+											<code>{ shape }</code>
+										</th>
+										{ sizes.map( ( size ) => (
+											<td key={ size }>
+												<ColorSamples
+													{ ...args }
+													color={ color }
+													shape={ shape }
+													size={ size }
+												/>
+											</td>
+										) ) }
+									</tr>
+								)
+							) }
+						</tbody>
+					) ) }
+				</table>
+			</div>
+		);
+	},
 };
 
 /** Keyboard focus stays outside the avatar, even when the fill matches the focus color. */
@@ -135,94 +224,6 @@ function FallbackSamples( props: React.ComponentProps< typeof Avatar.Root > ) {
 		</Stack>
 	);
 }
-
-/** Colored initials and person fallbacks across hues, saturation, and lightness. */
-export const FallbackColors: Story = {
-	args: { size: 'lg' },
-	parameters: { controls: { include: [ 'size' ] } },
-	render: ( args ) => {
-		const hues = [
-			[ 'Red', 0 ],
-			[ 'Orange', 30 ],
-			[ 'Yellow', 60 ],
-			[ 'Lime', 90 ],
-			[ 'Green', 120 ],
-			[ 'Mint', 150 ],
-			[ 'Cyan', 180 ],
-			[ 'Azure', 210 ],
-			[ 'Blue', 240 ],
-			[ 'Violet', 270 ],
-			[ 'Magenta', 300 ],
-			[ 'Rose', 330 ],
-		] as const;
-		const variants = [
-			[ 'Pastel', 70, 85 ],
-			[ 'Muted', 25, 50 ],
-			[ 'Vivid', 90, 50 ],
-			[ 'Deep', 65, 20 ],
-		] as const;
-		return (
-			<div
-				className={ styles.gallery }
-				role="region"
-				aria-label="Colored Avatar fallbacks"
-				tabIndex={ 0 }
-			>
-				<p>
-					Each cell shows circle and square fallbacks, with initials
-					followed by the person icon for each shape. Column
-					percentages are HSL saturation / lightness. Change the size
-					in Controls, or use With Color to try a custom color.
-				</p>
-				<p>
-					Foregrounds blend toward the background until they reach
-					4.55:1 contrast for initials or 3.05:1 for the person icon.
-					These targets include a small margin above 4.5:1 and 3:1.
-					Colored fallbacks have no border. Forced-colors mode keeps a
-					visible border. Browsers without the required color math
-					retain neutral fallbacks. See Unsupported Colors for input
-					limitations and the limits of best-effort development
-					warnings.
-				</p>
-				<table>
-					<thead>
-						<tr>
-							<th scope="col">Hue</th>
-							{ variants.map(
-								( [ label, saturation, lightness ] ) => (
-									<th key={ label } scope="col">
-										{ label }
-										<br />
-										<code>
-											{ saturation }% / { lightness }%
-										</code>
-									</th>
-								)
-							) }
-						</tr>
-					</thead>
-					<tbody>
-						{ hues.map( ( [ label, hue ] ) => (
-							<tr key={ label }>
-								<th scope="row">{ label }</th>
-								{ variants.map(
-									( [ variant, saturation, lightness ] ) => (
-										<td key={ variant }>
-											<FallbackSamples
-												{ ...args }
-												color={ `hsl(${ hue } ${ saturation }% ${ lightness }%)` }
-											/>
-										</td>
-									)
-								) }
-							</tr>
-						) ) }
-					</tbody>
-				</table>
-			</div>
-		);
-	},
-};
 
 /** Demonstrate unsupported fills and the limits of development warnings. */
 export const UnsupportedColors: Story = {
