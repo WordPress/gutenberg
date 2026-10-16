@@ -7,9 +7,10 @@ import {
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { BaseControl, Button } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf, isRTL } from '@wordpress/i18n';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+import { Stack } from '@wordpress/ui';
 import {
-	__EXPERIMENTAL_STYLE_PROPERTY,
 	getBlockType,
 	hasBlockSupport,
 	store as blocksStore,
@@ -22,16 +23,16 @@ import { unlock } from '../../lock-unlock';
 import setNestedValue from '../../utils/set-nested-value';
 import { useGlobalStyles } from '../../components/global-styles/hooks';
 import ApplyGloballyModal from './apply-globally-modal';
+import StyleSourcesModal from './style-sources-modal';
+import {
+	STYLE_PROPERTY,
+	getChangeRowsFor,
+	getResetAttributes,
+} from './style-sources';
+import { useStyleSources } from './use-style-sources';
 
-const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
-
-// Block Gap is a special case and isn't defined within the blocks
-// style properties config. We'll add it here to allow it to be pushed
-// to global styles as well.
-const STYLE_PROPERTY = {
-	...__EXPERIMENTAL_STYLE_PROPERTY,
-	blockGap: { value: [ 'spacing', 'blockGap' ] },
-};
+const { cleanEmptyObject, isGlobalStylesInheritanceIndicatorUIEnabled } =
+	unlock( blockEditorPrivateApis );
 
 // TODO: Temporary duplication of constant in @wordpress/block-editor. Can be
 // removed by moving PushChangesToGlobalStylesControl to
@@ -433,16 +434,21 @@ export function getStylesUpdate( {
 	return { newBlockAttributes, newUserConfig };
 }
 
-function PushChangesToGlobalStylesControl( {
-	name,
-	attributes,
-	setAttributes,
-} ) {
+/**
+ * The block's changes that can be pushed to Global Styles, and the callback that
+ * pushes the chosen rows. Shared by "Apply globally" and "Where styles come
+ * from" so both take the same path.
+ *
+ * @param {string}   name          Block name.
+ * @param {Object}   attributes    Block attributes.
+ * @param {Function} setAttributes Block attribute setter.
+ *
+ * @return {{ rows: ChangeRow[], pushChanges: Function }} Rows and the push callback.
+ */
+function usePushChangesToGlobalStyles( name, attributes, setAttributes ) {
 	const { user: userConfig, setUser: setUserConfig } = useGlobalStyles();
 
 	const rows = useChangesToPush( name, attributes, userConfig );
-
-	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -504,6 +510,21 @@ function PushChangesToGlobalStylesControl( {
 		]
 	);
 
+	return { rows, pushChanges };
+}
+
+function PushChangesToGlobalStylesControl( {
+	name,
+	attributes,
+	setAttributes,
+} ) {
+	const { rows, pushChanges } = usePushChangesToGlobalStyles(
+		name,
+		attributes,
+		setAttributes
+	);
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+
 	return (
 		<BaseControl
 			className="editor-push-changes-to-global-styles-control"
@@ -539,6 +560,120 @@ function PushChangesToGlobalStylesControl( {
 	);
 }
 
+/**
+ * The one entry point to a block's styles while the inheritance UI is on: a
+ * summary row with the number of changes, opening the review modal. It stands
+ * in for "Apply globally", whose job the modal takes over.
+ *
+ * @param {Object}   props               Component props.
+ * @param {string}   props.name          Block name.
+ * @param {Object}   props.attributes    Block attributes.
+ * @param {Function} props.setAttributes Block attribute setter.
+ */
+function StyleChangesControl( { name, attributes, setAttributes } ) {
+	const [ isModalOpen, setIsModalOpen ] = useState( false );
+	const { rows } = useStyleSources( name, attributes );
+	const changeCount = rows.filter( ( row ) => row.isChanged ).length;
+
+	return (
+		<BaseControl
+			className="editor-style-changes-control"
+			help={ sprintf(
+				// translators: %s: Title of the block e.g. 'Button'.
+				__(
+					'See where this block’s styles come from. Reset changes, or apply them to all %s blocks.'
+				),
+				getBlockType( name ).title
+			) }
+		>
+			<BaseControl.VisualLabel>
+				{ __( 'Styles' ) }
+			</BaseControl.VisualLabel>
+			<div className="editor-style-changes-control__item">
+				<Button
+					__next40pxDefaultSize
+					className="editor-style-changes-control__toggle"
+					aria-haspopup="dialog"
+					onClick={ () => setIsModalOpen( true ) }
+				>
+					<Stack direction="column" gap="xs">
+						<span className="editor-style-changes-control__count">
+							{ changeCount
+								? sprintf(
+										// translators: %d: Number of styles changed on the block.
+										_n(
+											'%d style change',
+											'%d style changes',
+											changeCount
+										),
+										changeCount
+									)
+								: __( 'No style changes' ) }
+						</span>
+						<span className="editor-style-changes-control__actions">
+							{ __( 'Compare, reset or apply' ) }
+						</span>
+					</Stack>
+					<Icon
+						icon={ isRTL() ? chevronLeft : chevronRight }
+						size={ 24 }
+					/>
+				</Button>
+			</div>
+			{ isModalOpen && (
+				<StyleSourcesModalContainer
+					name={ name }
+					rows={ rows }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					onRequestClose={ () => setIsModalOpen( false ) }
+				/>
+			) }
+		</BaseControl>
+	);
+}
+
+// Only mounted while the modal is open, so the push rows aren't worked out for
+// every selected block.
+function StyleSourcesModalContainer( {
+	name,
+	rows,
+	attributes,
+	setAttributes,
+	onRequestClose,
+} ) {
+	const { rows: changeRows, pushChanges } = usePushChangesToGlobalStyles(
+		name,
+		attributes,
+		setAttributes
+	);
+	const onReset = useCallback(
+		( rowsToReset ) =>
+			setAttributes( getResetAttributes( attributes, rowsToReset ) ),
+		[ attributes, setAttributes ]
+	);
+	const canApply = useCallback(
+		( row ) => getChangeRowsFor( [ row ], changeRows ).length > 0,
+		[ changeRows ]
+	);
+	const onApply = useCallback(
+		( rowsToApply ) =>
+			pushChanges( getChangeRowsFor( rowsToApply, changeRows ) ),
+		[ changeRows, pushChanges ]
+	);
+
+	return (
+		<StyleSourcesModal
+			name={ name }
+			rows={ rows }
+			onReset={ onReset }
+			canApply={ canApply }
+			onApply={ onApply }
+			onRequestClose={ onRequestClose }
+		/>
+	);
+}
+
 function PushChangesToGlobalStyles( props ) {
 	const blockEditingMode = useBlockEditingMode();
 	const isBlockBasedTheme = useSelect(
@@ -557,7 +692,11 @@ function PushChangesToGlobalStyles( props ) {
 
 	return (
 		<InspectorAdvancedControls>
-			<PushChangesToGlobalStylesControl { ...props } />
+			{ isGlobalStylesInheritanceIndicatorUIEnabled() ? (
+				<StyleChangesControl { ...props } />
+			) : (
+				<PushChangesToGlobalStylesControl { ...props } />
+			) }
 		</InspectorAdvancedControls>
 	);
 }

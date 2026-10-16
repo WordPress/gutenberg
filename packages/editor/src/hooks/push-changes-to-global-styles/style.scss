@@ -33,3 +33,119 @@
 	color: $gray-900;
 	overflow-wrap: anywhere;
 }
+
+.editor-style-changes-control__item {
+	border: 1px solid $gray-300;
+	border-radius: $radius-small;
+}
+
+// Two lines of text, so taller than the 40px button it starts from.
+.editor-style-changes-control__toggle.components-button {
+	justify-content: space-between;
+	width: 100%;
+	height: auto;
+	padding: $grid-unit-10 $grid-unit-10 $grid-unit-10 $grid-unit-15;
+	text-align: start;
+	color: $gray-900;
+}
+
+.editor-style-changes-control__count {
+	font-weight: var(--wpds-typography-font-weight-emphasis);
+}
+
+.editor-style-changes-control__actions {
+	color: $gray-700;
+	font-weight: var(--wpds-typography-font-weight-default);
+	font-size: $helptext-font-size;
+}
+
+// Lines the inherited table up with the picker table, whose checkbox column
+// comes first. Measured against the rendered picker, to within 2px.
+$picker-checkbox-column-offset: 45px;
+
+// Mirrors the "Apply globally" modal.
+.editor-style-changes-modal {
+	p {
+		margin-top: 0;
+	}
+
+	.components-modal__content {
+		padding-bottom: 0;
+	}
+
+	.dataviews-footer {
+		padding-bottom: $grid-unit-30;
+	}
+
+	.dataviews-layout__container {
+		overflow-x: hidden;
+
+		@media ( max-width: #{ $break-small } ) {
+			overflow-x: auto;
+		}
+	}
+
+	// The same column widths in both tables, so values line up. The inherited
+	// table has no checkbox column, so its first column takes that width too.
+	// The picker table sizes by header cells, the plain table by its colgroup.
+	.dataviews-view-table.dataviews-view-table {
+		table-layout: fixed;
+
+		th {
+			box-sizing: border-box;
+		}
+
+		td {
+			color: $gray-900;
+			font-size: $default-font-size;
+		}
+	}
+
+	.dataviews-view-picker-table.dataviews-view-picker-table {
+		th:nth-child(2),
+		th:nth-child(3) {
+			width: 30%;
+		}
+	}
+
+	.editor-style-changes-modal__inherited .dataviews-view-table.dataviews-view-table {
+		col.dataviews-view-table__col-first-data {
+			width: calc(30% + #{$picker-checkbox-column-offset});
+		}
+
+		col.dataviews-view-table__col-this-block {
+			width: 30%;
+		}
+
+		col.dataviews-view-table__col-global-styles {
+			width: auto;
+		}
+
+		th:first-child,
+		td:first-child {
+			padding-inline-start: $grid-unit-60 + $grid-unit-15;
+		}
+	}
+}
+
+.editor-style-changes-modal__heading {
+	margin: $grid-unit-20 0 $grid-unit-10;
+}
+
+.editor-style-changes-modal__inherited {
+	margin-top: $grid-unit-30;
+}
+
+.editor-style-changes-modal__value {
+	overflow-wrap: anywhere;
+}
+
+// The first line matches a one line cell, so it lines up with the style name.
+.editor-style-changes-modal__stack > :first-child {
+	min-height: var(--wpds-dimension-size-md);
+}
+
+.editor-style-changes-modal__muted {
+	color: $gray-700;
+	font-size: $helptext-font-size;
+}

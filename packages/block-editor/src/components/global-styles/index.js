@@ -29,3 +29,6 @@ export {
 } from './background-panel';
 export { default as StateControl } from './state-control';
 export { default as StateControlBadges } from './state-control-badges';
+export { getStyleLabel } from './style-labels';
+export { useResolvedStyle, getElementLayers } from './inherited-value-context';
+export { isGlobalStylesInheritanceIndicatorUIEnabled } from './inheritance';

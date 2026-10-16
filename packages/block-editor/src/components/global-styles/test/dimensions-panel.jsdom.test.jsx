@@ -139,6 +139,7 @@ const settingsWithSpacingPresets = {
 function renderPanel( props ) {
 	return render(
 		<DimensionsPanel
+			showInheritanceLabelIndicators
 			onChange={ () => {} }
 			panelId="test-panel"
 			{ ...props }
@@ -374,7 +375,11 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				panelId: 'test-panel',
 			};
 			const { rerender } = render(
-				<DimensionsPanel { ...props } allowAxialBlockGap />
+				<DimensionsPanel
+					showInheritanceLabelIndicators
+					{ ...props }
+					allowAxialBlockGap
+				/>
 			);
 
 			expect(
@@ -382,7 +387,11 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			).toHaveLength( 2 );
 
 			rerender(
-				<DimensionsPanel { ...props } allowAxialBlockGap={ false } />
+				<DimensionsPanel
+					showInheritanceLabelIndicators
+					{ ...props }
+					allowAxialBlockGap={ false }
+				/>
 			);
 
 			expect(
@@ -748,6 +757,7 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 				const [ value, setValue ] = useState( {} );
 				return (
 					<DimensionsPanel
+						showInheritanceLabelIndicators
 						value={ value }
 						inheritedValue={ {
 							spacing: { padding: 'var:preset|spacing|20' },
