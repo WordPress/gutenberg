@@ -1,4 +1,5 @@
 import type { Combobox as _Combobox } from '@base-ui/react/combobox';
+import type { KeyboardEvent } from 'react';
 import {
 	createContext,
 	useContext,
@@ -10,7 +11,10 @@ export const KeyboardHighlightContext = createContext< {
 	keyboardHighlight: boolean;
 	inputProps: Pick<
 		_Combobox.Input.Props,
-		'onFocusCapture' | 'onBlurCapture' | 'onPointerDownCapture'
+		| 'onFocusCapture'
+		| 'onBlurCapture'
+		| 'onPointerDownCapture'
+		| 'onKeyDown'
 	>;
 	listProps: Pick<
 		_Combobox.List.Props,
@@ -43,6 +47,21 @@ export function useKeyboardHighlightState< Value >(
 				onFocusCapture: () => setInputFocused( true ),
 				onBlurCapture: () => setInputFocused( false ),
 				onPointerDownCapture: onPointerHighlight,
+				onKeyDown: ( event: KeyboardEvent< HTMLInputElement > ) => {
+					if (
+						event.nativeEvent.isComposing ||
+						event.which === 229
+					) {
+						return;
+					}
+					// Grid navigation can keep the same item without a highlight callback.
+					if (
+						event.key === 'ArrowUp' ||
+						event.key === 'ArrowDown'
+					) {
+						setKeyboardHighlight( true );
+					}
+				},
 			},
 			listProps: {
 				onPointerMoveCapture: onPointerHighlight,
