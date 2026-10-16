@@ -11,7 +11,7 @@ import type {
 	FetchLinkSuggestions,
 	FetchRichUrlData,
 } from '../components/link-control/types';
-import type { WPDropOperation } from '../components/use-on-block-drop/types';
+import type { BlockDropOperation } from '../components/use-on-block-drop/types';
 import type { Bindings } from '../utils/block-bindings';
 import type { store } from '.';
 import type * as privateSelectors from './private-selectors';
@@ -328,9 +328,9 @@ export interface ShowInsertionPointOptions {
 	 */
 	__unstableWithInserter?: boolean;
 	/**
-	 * The operation to perform when applied, either 'insert' or 'replace'.
+	 * The operation to perform when applied.
 	 */
-	operation?: WPDropOperation;
+	operation?: BlockDropOperation;
 	nearestSide?: string;
 }
 
