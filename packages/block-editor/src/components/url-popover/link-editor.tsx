@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { keyboardReturn } from '@wordpress/icons';
 import URLInput from '../url-input';
+import type { URLPopoverLinkEditorProps } from './types';
 
 export default function LinkEditor( {
 	autocompleteRef,
@@ -10,7 +11,7 @@ export default function LinkEditor( {
 	onChangeInputValue,
 	value,
 	...props
-} ) {
+}: URLPopoverLinkEditorProps ) {
 	return (
 		<form
 			className={ clsx(

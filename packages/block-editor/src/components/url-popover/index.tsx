@@ -10,6 +10,7 @@ import deprecated from '@wordpress/deprecated';
 import LinkViewer from './link-viewer';
 import LinkEditor from './link-editor';
 import { unlock } from '../../lock-unlock';
+import type { URLPopoverComponent, URLPopoverProps } from './types';
 
 const { __experimentalPopoverLegacyPositionToPlacement } = unlock(
 	componentsPrivateApis
@@ -17,7 +18,8 @@ const { __experimentalPopoverLegacyPositionToPlacement } = unlock(
 
 const DEFAULT_PLACEMENT = 'bottom';
 
-const URLPopover = forwardRef(
+// The cast declares the link editor and viewer, which are assigned below.
+const URLPopover = forwardRef< HTMLDivElement, URLPopoverProps >(
 	(
 		{
 			additionalControls,
@@ -102,7 +104,7 @@ const URLPopover = forwardRef(
 			</Popover>
 		);
 	}
-);
+) as URLPopoverComponent;
 
 URLPopover.LinkEditor = LinkEditor;
 
