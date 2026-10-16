@@ -91,10 +91,14 @@ export function SetSitePageModal( {
 		event.preventDefault();
 
 		try {
-			await saveEntityRecord( 'root', 'site', {
-				[ setting ]: item.id,
-				show_on_front: 'page',
-			} );
+			// Without `throwOnError`, a failed save resolves with `undefined`
+			// and the success notice would show.
+			await saveEntityRecord(
+				'root',
+				'site',
+				{ [ setting ]: item.id, show_on_front: 'page' },
+				{ throwOnError: true }
+			);
 
 			// The action links of the pages depend on the setting, so the
 			// new page and the previous one are requested again.
