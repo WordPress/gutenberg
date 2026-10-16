@@ -1,0 +1,28 @@
+{
+	"name": "card",
+	"example": {
+		"title": "Site health",
+		"content": "Your site has 2 recommended improvements."
+	},
+	"props": {
+		"title": { "type": "string", "required": true },
+		"class": { "type": "string", "default": "" }
+	},
+	"content": true,
+	"render": [
+		"Card.Root",
+		{ "className": "$class" },
+		[ "Card.Header", {}, [ "Card.Title", {}, "$title" ] ],
+		[ "Card.Content", {}, "$content" ]
+	],
+	"compositions": [
+		{
+			"name": "with a button",
+			"props": { "title": "Settings" },
+			"content": {
+				"component": "button",
+				"props": { "label": "Save changes", "variant": "outline" }
+			}
+		}
+	]
+}

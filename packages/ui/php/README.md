@@ -21,8 +21,34 @@ Each component has a folder here with a `component.json`:
 A PHP component is a subset of the React one: markup and CSS only, with no JavaScript. A prop is only exposed when the markup alone gets its behavior right.
 
 -   Props are plain text, escaped as React escapes them, so entities show as written (`&hellip;` stays `&hellip;`). Decode already-encoded strings, such as `get_the_title()`, first. URLs are escaped with `esc_url()`.
+-   Content, for components that accept it, is a separate argument, escaped unless it's known to be safe. See [Content and composition](#content-and-composition).
 -   Button's `disabled` renders the native `disabled` attribute, so the browser blocks activation without JavaScript. React keeps a disabled button focusable and blocks it with Base UI's JavaScript, which static markup can't carry.
 -   Button's `loading` isn't supported: React announces it with `speak()` from an effect, which needs JavaScript.
+
+## Content and composition
+
+Components return `Gutenberg_UI_Safe_HTML`, which prints like a string. Content passed to another component is escaped unless it's one of those, so unescaped HTML can't get into a component by accident, similar to Rails' `SafeBuffer`:
+
+```php
+// A string is escaped: `<b>` shows as text.
+gutenberg_get_ui_component( 'card', array( 'title' => __( 'Settings' ) ), $user->display_name );
+
+// Another component is inserted as HTML.
+gutenberg_get_ui_component( 'card', $props, gutenberg_get_ui_component( 'button', array( 'label' => __( 'Save' ) ) ) );
+
+// A closure's output is inserted as HTML, as in any template: it escapes its own values.
+// What it returns follows the same rules as content, so returning a component works too.
+gutenberg_get_ui_component( 'card', $props, function () use ( $user ) {
+	echo '<p>' . esc_html( $user->display_name ) . '</p>';
+} );
+
+// A list mixes any of the above.
+gutenberg_get_ui_component( 'card', $props, array( $intro, $button ) );
+```
+
+Other HTML has to say why it's safe: `Gutenberg_UI_Safe_HTML::sanitized( $html )` runs it through `wp_kses_post()`, and `Gutenberg_UI_Safe_HTML::trusted( $html )` takes it as is, for markup the caller built and escaped itself. Both are easy to find in review.
+
+Content can only be rendered as children, never in an attribute; the build fails otherwise. A component's `compositions` in `component.json` list components to render inside its content. The build renders each with React, and PHPUnit checks that passing one component's output to another in PHP gives the same markup.
 
 ## Keeping up with React
 
@@ -39,5 +65,4 @@ Kept out of this first step, as discussed in [#84036](https://github.com/WordPre
 
 -   A props contract and deprecations, so PHP calls keep working when React props change.
 -   Translations, for components with built-in strings such as Notice's "Dismiss".
--   Content and composition, starting with Card.
 -   Interactive components.
