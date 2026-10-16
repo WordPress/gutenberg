@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import UnitControl from '../';
 
-const meta = {
+const meta: Meta< typeof UnitControl > = {
 	id: 'blockeditor-unitcontrol',
 	title: 'Editor/Block Editor/UnitControl',
 	component: UnitControl,
@@ -45,6 +46,7 @@ const meta = {
 			},
 		},
 		value: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'The value of the control.',
 			table: {
@@ -65,7 +67,7 @@ const meta = {
 			description: 'Whether the control is disabled.',
 			table: {
 				type: { summary: 'boolean' },
-				defaultValue: { summary: false },
+				defaultValue: { summary: 'false' },
 			},
 		},
 		disableUnits: {
@@ -73,7 +75,7 @@ const meta = {
 			description: 'If true, the unit select is hidden.',
 			table: {
 				type: { summary: 'boolean' },
-				defaultValue: { summary: false },
+				defaultValue: { summary: 'false' },
 			},
 		},
 		isPressEnterToChange: {
@@ -82,7 +84,7 @@ const meta = {
 				'If true, the ENTER key press is required to trigger onChange. Change is also triggered on blur.',
 			table: {
 				type: { summary: 'boolean' },
-				defaultValue: { summary: false },
+				defaultValue: { summary: 'false' },
 			},
 		},
 		isUnitSelectTabbable: {
@@ -90,7 +92,7 @@ const meta = {
 			description: 'Determines if the unit select is tabbable.',
 			table: {
 				type: { summary: 'boolean' },
-				defaultValue: { summary: true },
+				defaultValue: { summary: 'true' },
 			},
 		},
 	},
@@ -98,15 +100,19 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState();
+		const [ value, setValue ] = useState< string >();
 		return (
 			<UnitControl
 				{ ...args }
 				value={ value }
 				onChange={ ( ...changeArgs ) => {
-					onChange( ...changeArgs );
+					// Storybook passes an action.
+					onChange!( ...changeArgs );
+					// @ts-expect-error The state setter ignores the extra arguments.
 					setValue( ...changeArgs );
 				} }
 			/>
