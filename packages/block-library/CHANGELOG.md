@@ -9,6 +9,7 @@
 ### Enhancements
 
 -   Button: Add content controls (Text, Link to, Open in new tab, View) in the sidebar when the block is inside a Navigation block, and in the List View popover in a content-only section, so a Button in a menu edits like a Navigation Link ([#84854](https://github.com/WordPress/gutenberg/pull/84854)).
+-   Social Icon: Add a validated Social profile link field and a View button to the Settings panel and show it in the content tab, so the link can be edited from the inspector and from the List View popover in a content-only section ([#84860](https://github.com/WordPress/gutenberg/pull/84860)).
 -   Term Count: Reuse filtered terms from Term Template so changes made through the `get_terms` filter appear on the front end without a separate query for each count ([#84119](https://github.com/WordPress/gutenberg/pull/84119)).
 -   Query: List the existing terms in the taxonomy filters, so categories and tags can be browsed and selected instead of recalled and typed. The controls now use `SearchableChipSelectControl` from `@wordpress/ui` ([#82583](https://github.com/WordPress/gutenberg/pull/82583)).
 -   Icon: Speed up loading icons in the icon library ([#84327](https://github.com/WordPress/gutenberg/pull/84327)).

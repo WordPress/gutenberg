@@ -25,9 +25,15 @@ import {
 import { useMergeRefs } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
+import { isURL } from '@wordpress/url';
 import { store as blocksStore } from '@wordpress/blocks';
+// `ValidatedInputControl` is marked "use with caution" while its API settles,
+// as the Math format already accepts; the inline URL error is worth it here.
+// eslint-disable-next-line @wordpress/use-recommended-components
+import { ValidatedInputControl } from '@wordpress/ui';
 import { getSocialService } from './social-list';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import ViewLinkButton from '../utils/view-link-button';
 
 const SocialLinkURLPopover = ( {
 	url,
@@ -195,11 +201,11 @@ const SocialLinkEdit = ( {
 					/>
 				</BlockControls>
 			) }
-			<InspectorControls>
+			<InspectorControls group="content">
 				<ToolsPanel
 					label={ __( 'Settings' ) }
 					resetAll={ () => {
-						setAttributes( { label: undefined } );
+						setAttributes( { url: undefined, label: undefined } );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
 				>
@@ -223,6 +229,24 @@ const SocialLinkEdit = ( {
 							placeholder={ socialLinkName }
 						/>
 					</ToolsPanelItem>
+					<ToolsPanelItem
+						isShownByDefault
+						label={ __( 'Social profile link' ) }
+						hasValue={ () => !! url }
+						onDeselect={ () => {
+							setAttributes( { url: undefined } );
+						} }
+					>
+						<ValidatedInputControl
+							type="url"
+							label={ __( 'Social profile link' ) }
+							value={ url || '' }
+							onValueChange={ ( value ) =>
+								setAttributes( { url: value } )
+							}
+						/>
+					</ToolsPanelItem>
+					{ !! url && isURL( url ) && <ViewLinkButton url={ url } /> }
 				</ToolsPanel>
 			</InspectorControls>
 			<InspectorControls group="advanced">
