@@ -13,12 +13,6 @@
 				border-collapse: collapse;
 			}
 
-			tbody + tbody {
-				border-block-start:
-					var(--wpds-border-width-xs) solid
-					var(--wpds-color-stroke-surface-neutral);
-			}
-
 			th,
 			td {
 				padding: var(--wpds-dimension-padding-lg);
