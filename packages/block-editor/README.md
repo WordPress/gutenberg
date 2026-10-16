@@ -1104,7 +1104,7 @@ _Parameters_
 
 _Returns_
 
-- `?WPBlockBindingsUtils`: Object containing the block bindings utils.
+- `?BlockBindingsUtils`: Object containing the block bindings utils.
 
 _Changelog_
 

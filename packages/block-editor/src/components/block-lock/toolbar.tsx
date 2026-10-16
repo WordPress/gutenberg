@@ -4,12 +4,15 @@ import { useReducer, useRef, useEffect } from '@wordpress/element';
 import { lock, unlock } from '@wordpress/icons';
 import BlockLockModal from './modal';
 import useBlockLock from './use-block-lock';
+import type { BlockLockControlProps } from './types';
 
-export default function BlockLockToolbar( { clientId } ) {
+export default function BlockLockToolbar( {
+	clientId,
+}: BlockLockControlProps ) {
 	const { canLock, isLocked } = useBlockLock( clientId );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
-		( isActive ) => ! isActive,
+		( isActive: boolean ) => ! isActive,
 		false
 	);
 
@@ -30,7 +33,7 @@ export default function BlockLockToolbar( { clientId } ) {
 		return null;
 	}
 
-	let label = isLocked ? __( 'Unlock' ) : __( 'Lock' );
+	let label: string = isLocked ? __( 'Unlock' ) : __( 'Lock' );
 
 	if ( ! canLock && isLocked ) {
 		label = __( 'Locked' );

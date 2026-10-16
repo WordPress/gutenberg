@@ -8,21 +8,36 @@ import useBlockVisibility from './use-block-visibility';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from './constants';
+import type { BlockVisibilityViewport } from './constants';
+import type {
+	BlockVisibility,
+	ViewportBreakpoints,
+} from './use-block-visibility';
+import type { ViewportVisibilityInfoProps } from './types';
 
-const DEFAULT_VISIBILITY_STATE = {
+interface VisibilityState {
+	currentBlockVisibility?: BlockVisibility;
+	hasParentHiddenEverywhere: boolean;
+	selectedDeviceType: BlockVisibilityViewport;
+	viewportSettings?: ViewportBreakpoints;
+}
+
+const DEFAULT_VISIBILITY_STATE: VisibilityState = {
 	currentBlockVisibility: undefined,
 	hasParentHiddenEverywhere: false,
 	selectedDeviceType: BLOCK_VISIBILITY_VIEWPORTS.desktop.key,
 };
 
-export default function ViewportVisibilityInfo( { clientId } ) {
+export default function ViewportVisibilityInfo( {
+	clientId,
+}: ViewportVisibilityInfoProps ) {
 	const {
 		currentBlockVisibility,
 		selectedDeviceType,
 		viewportSettings,
 		hasParentHiddenEverywhere,
 	} = useSelect(
-		( select ) => {
+		( select ): VisibilityState => {
 			if ( ! clientId ) {
 				return DEFAULT_VISIBILITY_STATE;
 			}
@@ -49,7 +64,8 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 
 	// Get the block's DOM element to derive the canvas iframe window,
 	// so viewport detection matches the actual block rendering context.
-	const blockElement = useBlockElement( clientId );
+	// An unset client ID has no element.
+	const blockElement = useBlockElement( clientId as string );
 	const rawCanvasView = blockElement?.ownerDocument?.defaultView;
 	const canvasView = rawCanvasView === null ? undefined : rawCanvasView;
 

@@ -5,10 +5,24 @@ import {
 	BLOCK_VISIBILITY_VIEWPORTS,
 } from './constants';
 import { unlock } from '../../lock-unlock';
+import type { BlockVisibilityViewport } from './constants';
+import type {
+	BlockVisibility,
+	ViewportBreakpoints,
+} from './use-block-visibility';
+import type { BlockWithVisibility } from './types';
 
-const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
+type ViewportVisibility = Exclude< BlockVisibility, boolean >;
 
-export function getBlockVisibilityViewportEntries( viewportSettings ) {
+const { getViewportBreakpoints } = unlock< {
+	getViewportBreakpoints: (
+		viewportSettings?: ViewportBreakpoints
+	) => ViewportBreakpoints;
+} >( globalStylesEnginePrivateApis );
+
+export function getBlockVisibilityViewportEntries(
+	viewportSettings?: ViewportBreakpoints
+) {
 	const breakpoints = getViewportBreakpoints( viewportSettings );
 
 	// Desktop has no breakpoint, so only filter mobile/tablet by configured viewport support.
@@ -24,11 +38,14 @@ export function getBlockVisibilityViewportEntries( viewportSettings ) {
 /**
  * Checks if a block is hidden for a specific viewport.
  *
- * @param {Object} block    The block to check.
- * @param {string} viewport The viewport to check (e.g., 'mobile', 'tablet', 'desktop').
- * @return {boolean} Whether the block is hidden for the viewport.
+ * @param block    The block to check.
+ * @param viewport The viewport to check (e.g., 'mobile', 'tablet', 'desktop').
+ * @return Whether the block is hidden for the viewport.
  */
-function isBlockHiddenForViewport( block, viewport ) {
+function isBlockHiddenForViewport(
+	block: BlockWithVisibility | null | undefined,
+	viewport: string
+): boolean {
 	if ( ! block ) {
 		return false;
 	}
@@ -46,7 +63,8 @@ function isBlockHiddenForViewport( block, viewport ) {
 	}
 
 	// Get viewport configuration from nested structure.
-	const viewportConfig = blockVisibility.viewport;
+	// As before, `null` passes the check above and throws here.
+	const viewportConfig = blockVisibility!.viewport;
 
 	// If no viewport config, block is not hidden for any specific viewport.
 	if ( ! viewportConfig || 'object' !== typeof viewportConfig ) {
@@ -63,18 +81,22 @@ function isBlockHiddenForViewport( block, viewport ) {
 	}
 
 	// Check if the specific viewport is hidden.
-	return viewportConfig[ viewport ] === false;
+	// Checked to be one of the viewports above.
+	return viewportConfig[ viewport as BlockVisibilityViewport ] === false;
 }
 
 /**
  * Gets the checkbox state for a viewport across multiple blocks.
  * Returns `true` if all blocks are hidden, `null` if some are hidden, `false` if none are hidden.
  *
- * @param {Array}  blocks   Array of blocks to check.
- * @param {string} viewport The viewport to check (e.g., 'mobile', 'tablet', 'desktop').
- * @return {boolean|null} `true` if all hidden, `null` if some hidden, `false` if none hidden.
+ * @param blocks   Array of blocks to check.
+ * @param viewport The viewport to check (e.g., 'mobile', 'tablet', 'desktop').
+ * @return `true` if all hidden, `null` if some hidden, `false` if none hidden.
  */
-export function getViewportCheckboxState( blocks, viewport ) {
+export function getViewportCheckboxState(
+	blocks: ( BlockWithVisibility | null | undefined )[] | null | undefined,
+	viewport: string
+): boolean | null {
 	if ( ! blocks?.length ) {
 		return false;
 	}
@@ -97,10 +119,12 @@ export function getViewportCheckboxState( blocks, viewport ) {
  * Gets the checkbox state for "hide everywhere" across multiple blocks.
  * Returns `true` if all blocks are hidden everywhere, `null` if some are hidden everywhere, `false` if none are.
  *
- * @param {Array} blocks Array of blocks to check.
- * @return {boolean|null} `true` if all hidden everywhere, `null` if some hidden everywhere, `false` if none.
+ * @param blocks Array of blocks to check.
+ * @return `true` if all hidden everywhere, `null` if some hidden everywhere, `false` if none.
  */
-export function getHideEverywhereCheckboxState( blocks ) {
+export function getHideEverywhereCheckboxState(
+	blocks: ( BlockWithVisibility | null | undefined )[] | null | undefined
+): boolean | null {
 	if ( ! blocks?.length ) {
 		return false;
 	}
@@ -123,11 +147,14 @@ export function getHideEverywhereCheckboxState( blocks ) {
 /**
  * Get a human-readable label describing which viewports a block is hidden on.
  *
- * @param {boolean|Object} blockVisibility  The block's visibility metadata.
- * @param {Object}         viewportSettings Viewport breakpoint settings.
- * @return {string|null} A descriptive label, or null if the block is not hidden.
+ * @param blockVisibility  The block's visibility metadata.
+ * @param viewportSettings Viewport breakpoint settings.
+ * @return A descriptive label, or null if the block is not hidden.
  */
-export function getBlockVisibilityLabel( blockVisibility, viewportSettings ) {
+export function getBlockVisibilityLabel(
+	blockVisibility: BlockVisibility | null | undefined,
+	viewportSettings?: ViewportBreakpoints
+): string | null {
 	// Not hidden at all
 	if ( ! blockVisibility && blockVisibility !== false ) {
 		return null;
@@ -138,13 +165,17 @@ export function getBlockVisibilityLabel( blockVisibility, viewportSettings ) {
 		return __( 'Block is hidden' );
 	}
 
-	if ( blockVisibility?.viewport ) {
+	// `true` has no viewports, so it reads as unset here.
+	if ( ( blockVisibility as ViewportVisibility )?.viewport ) {
 		// Hidden on specific viewports - list them
 		const hiddenViewports = getBlockVisibilityViewportEntries(
 			viewportSettings
 		)
 			.filter(
-				( [ key ] ) => blockVisibility.viewport?.[ key ] === false
+				( [ key ] ) =>
+					( blockVisibility as ViewportVisibility ).viewport?.[
+						key as BlockVisibilityViewport
+					] === false
 			)
 			.map( ( [ , viewport ] ) => viewport.label );
 

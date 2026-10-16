@@ -7,8 +7,12 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { useSettings } from '../use-settings';
+import type { TreeBlock } from '../../store/types';
+import type { BlockVisibilityClientIdsProps } from './types';
 
-export default function BlockVisibilityViewportToolbar( { clientIds } ) {
+export default function BlockVisibilityViewportToolbar( {
+	clientIds,
+}: BlockVisibilityClientIdsProps ) {
 	const hasBlockVisibilityButtonShownRef = useRef( false );
 	const [ blockVisibility ] = useSettings( 'blockVisibility.allowEditing' );
 	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
@@ -17,12 +21,13 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 				unlock( select( blockEditorStore ) );
 			const _blocks = getBlocksByClientId( clientIds );
 			return {
-				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
-					hasBlockSupport(
-						getBlockName( clientId ),
-						'visibility',
-						true
-					)
+				canToggleBlockVisibility: _blocks.every(
+					( { clientId }: TreeBlock ) =>
+						hasBlockSupport(
+							getBlockName( clientId ),
+							'visibility',
+							true
+						)
 				),
 				areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
 					isBlockHiddenAnywhere( clientId )

@@ -10,16 +10,22 @@ vi.mock( import( '@wordpress/compose' ), async ( importOriginal ) => ( {
 
 describe( 'useBlockVisibility', () => {
 	// Helper function to set up viewport matches
-	const setupViewport = ( { isMobileViewport, isTabletViewport } ) => {
+	const setupViewport = ( {
+		isMobileViewport,
+		isTabletViewport,
+	}: {
+		isMobileViewport?: boolean;
+		isTabletViewport?: boolean;
+	} ) => {
 		if (
 			isMobileViewport !== undefined &&
 			isTabletViewport !== undefined
 		) {
-			useMediaQuery
+			vi.mocked( useMediaQuery )
 				.mockReturnValueOnce( isMobileViewport )
 				.mockReturnValueOnce( isTabletViewport );
 		} else {
-			useMediaQuery.mockReturnValue(
+			vi.mocked( useMediaQuery ).mockReturnValue(
 				isMobileViewport ?? isTabletViewport ?? false
 			);
 		}

@@ -15,11 +15,12 @@ import { getBlockType } from '@wordpress/blocks';
 import useBlockLock from './use-block-lock';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
+import type { BlockLock, BlockLockModalProps } from './types';
 
 // Entity based blocks which allow edit locking
 const ALLOWS_EDIT_LOCKING = [ 'core/navigation' ];
 
-function getTemplateLockValue( lock ) {
+function getTemplateLockValue( lock: BlockLock ) {
 	// Prevents all operations.
 	if ( lock.remove && lock.move ) {
 		return 'all';
@@ -33,15 +34,22 @@ function getTemplateLockValue( lock ) {
 	return false;
 }
 
-export default function BlockLockModal( { clientId, onClose } ) {
-	const [ lock, setLock ] = useState( { move: false, remove: false } );
+export default function BlockLockModal( {
+	clientId,
+	onClose,
+}: BlockLockModalProps ) {
+	const [ lock, setLock ] = useState< BlockLock >( {
+		move: false,
+		remove: false,
+	} );
 	const { isEditLocked, isMoveLocked, isRemoveLocked } =
 		useBlockLock( clientId );
 	const { allowsEditLocking, templateLock, hasTemplateLock } = useSelect(
 		( select ) => {
 			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
-			const blockName = getBlockName( clientId );
+			// The modal is opened for an existing block.
+			const blockName = getBlockName( clientId ) as string;
 			const blockType = getBlockType( blockName );
 
 			return {
@@ -79,7 +87,8 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			title={ sprintf(
 				/* translators: %s: Name of the block. */
 				__( 'Lock %s' ),
-				blockInformation.title
+				// An existing block has display information.
+				blockInformation!.title
 			) }
 			overlayClassName="block-editor-block-lock-modal"
 			onRequestClose={ onClose }

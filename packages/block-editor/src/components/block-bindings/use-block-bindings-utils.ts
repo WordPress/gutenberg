@@ -1,26 +1,20 @@
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit';
+import type { Binding } from '../../utils/block-bindings';
+import type { BlockBindingsUtils } from './types';
+import type { BlockAttributes } from '../../store/types';
 
 /**
  * Checks if the given object is empty.
  *
- * @param {?Object} object The object to check.
+ * @param object The object to check.
  *
- * @return {boolean} Whether the object is empty.
+ * @return Whether the object is empty.
  */
-function isObjectEmpty( object ) {
+function isObjectEmpty( object: object | null | undefined ): boolean {
 	return ! object || Object.keys( object ).length === 0;
 }
-
-/**
- * Contains utils to update the block `bindings` metadata.
- *
- * @typedef {Object} WPBlockBindingsUtils
- *
- * @property {Function} updateBlockBindings    Updates the value of the bindings connected to block attributes.
- * @property {Function} removeAllBlockBindings Removes the bindings property of the `metadata` attribute.
- */
 
 /**
  * Retrieves the existing utils needed to update the block `bindings` metadata.
@@ -34,7 +28,7 @@ function isObjectEmpty( object ) {
  *
  * @param {?string} clientId Optional block client ID. If not set, it will use the current block client ID from the context.
  *
- * @return {?WPBlockBindingsUtils} Object containing the block bindings utils.
+ * @return {?BlockBindingsUtils} Object containing the block bindings utils.
  *
  * @example
  * ```js
@@ -64,7 +58,9 @@ function isObjectEmpty( object ) {
  * removeAllBlockBindings();
  * ```
  */
-export default function useBlockBindingsUtils( clientId ) {
+export default function useBlockBindingsUtils(
+	clientId?: string | null
+): BlockBindingsUtils {
 	const { clientId: contextClientId } = useBlockEditContext();
 	const blockClientId = clientId || contextClientId;
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
@@ -74,9 +70,9 @@ export default function useBlockBindingsUtils( clientId ) {
 	 * Updates the value of the bindings connected to block attributes.
 	 * It removes the binding when the new value is `undefined`.
 	 *
-	 * @param {Object} bindings        Bindings including the attributes to update and the new object.
-	 * @param {string} bindings.source The source name to connect to.
-	 * @param {Object} [bindings.args] Object containing the arguments needed by the source.
+	 * @param bindings        Bindings including the attributes to update and the new object.
+	 * @param bindings.source The source name to connect to.
+	 * @param bindings.args   Object containing the arguments needed by the source.
 	 *
 	 * @example
 	 * ```js
@@ -99,10 +95,15 @@ export default function useBlockBindingsUtils( clientId ) {
 	 * } );
 	 * ```
 	 */
-	const updateBlockBindings = ( bindings ) => {
+	const updateBlockBindings = (
+		bindings: Record< string, Binding | undefined >
+	) => {
 		const { metadata: { bindings: currentBindings, ...metadata } = {} } =
-			getBlockAttributes( blockClientId );
-		const newBindings = { ...currentBindings };
+			// The utils are used within a block or for a given one.
+			getBlockAttributes( blockClientId! ) as BlockAttributes;
+		const newBindings: Record< string, Binding | undefined > = {
+			...currentBindings,
+		};
 
 		Object.entries( bindings ).forEach( ( [ attribute, binding ] ) => {
 			if ( ! binding && newBindings[ attribute ] ) {
@@ -112,7 +113,10 @@ export default function useBlockBindingsUtils( clientId ) {
 			newBindings[ attribute ] = binding;
 		} );
 
-		const newMetadata = {
+		const newMetadata: {
+			bindings?: Record< string, Binding | undefined >;
+			[ key: string ]: unknown;
+		} = {
 			...metadata,
 			bindings: newBindings,
 		};
@@ -121,7 +125,7 @@ export default function useBlockBindingsUtils( clientId ) {
 			delete newMetadata.bindings;
 		}
 
-		updateBlockAttributes( blockClientId, {
+		updateBlockAttributes( blockClientId!, {
 			metadata: isObjectEmpty( newMetadata ) ? undefined : newMetadata,
 		} );
 	};
@@ -139,8 +143,9 @@ export default function useBlockBindingsUtils( clientId ) {
 	 */
 	const removeAllBlockBindings = () => {
 		const { metadata: { bindings, ...metadata } = {} } =
-			getBlockAttributes( blockClientId );
-		updateBlockAttributes( blockClientId, {
+			// The utils are used within a block or for a given one.
+			getBlockAttributes( blockClientId! ) as BlockAttributes;
+		updateBlockAttributes( blockClientId!, {
 			metadata: isObjectEmpty( metadata ) ? undefined : metadata,
 		} );
 	};

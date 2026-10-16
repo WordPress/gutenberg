@@ -63,6 +63,7 @@
 -   Convert the layouts, `LayoutStyle`, the `align` hook, `BlockAlignmentControl`, `BlockVerticalAlignmentControl` and `JustifyContentControl` to TypeScript ([#84847](https://github.com/WordPress/gutenberg/pull/84847)).
 -   Convert the typography controls, the font size utilities and `withFontSizes` to TypeScript ([#84848](https://github.com/WordPress/gutenberg/pull/84848)).
 -   Convert the color utilities, `withColors`, the gradient utilities, `ColorPalette`, `PanelColorSettings`, `BlockColorsStyleSelector` and `ContrastChecker` to TypeScript ([#84875](https://github.com/WordPress/gutenberg/pull/84875)).
+-   Convert the block visibility, block lock and block bindings components to TypeScript ([#84876](https://github.com/WordPress/gutenberg/pull/84876)).
 
 ## 18.1.0 (2026-10-07)
 

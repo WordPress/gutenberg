@@ -229,44 +229,12 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-bindings/attribute-control.jsx": {
+	"packages/block-editor/src/components/block-bindings/attribute-control.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-bindings/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-bindings/source-fields-list.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-bindings/test/attribute-control.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-bindings/test/use-block-bindings-utils.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-bindings/use-block-bindings-utils.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -565,44 +533,14 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-lock/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-lock/menu-item.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-lock/modal.jsx": {
+	"packages/block-editor/src/components/block-lock/modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-lock/toolbar.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-editor/src/components/block-lock/toolbar.tsx": {
 		"react-hooks/refs": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-lock/use-block-lock.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-manager/category.jsx": {
@@ -1212,62 +1150,14 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-visibility/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-visibility/modal.jsx": {
+	"packages/block-editor/src/components/block-visibility/modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-visibility/test/use-block-visibility.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-visibility/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-visibility/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-visibility/viewport-menu-item.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-visibility/viewport-toolbar.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-editor/src/components/block-visibility/viewport-toolbar.tsx": {
 		"react-hooks/refs": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-visibility/viewport-visibility-info.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/border-radius-control/constants.js": {
