@@ -112,6 +112,7 @@
 		"@types/uuid": "8.3.0",
 		"@types/webpack": "4.41.16",
 		"@types/webpack-sources": "0.1.7",
+		"@types/yauzl": "2.9.2",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:packages/babel-plugin-import-jsx-pragma",
 		"@wordpress/babel-plugin-makepot": "file:packages/babel-plugin-makepot",
 		"@wordpress/babel-preset-default": "file:packages/babel-preset-default",
