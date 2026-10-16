@@ -2,25 +2,24 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { Flex, FlexItem } from '@wordpress/components';
 import { dragHandle } from '@wordpress/icons';
 import BlockIcon from '../block-icon';
-
-/** @typedef {import('@wordpress/blocks').BlockTypeIcon} BlockTypeIcon */
+import type { BlockDraggableChipProps } from './types';
 
 /**
  * The chip that follows the cursor while blocks are dragged.
  *
- * @param {Object}        props
- * @param {number}        props.count              How many blocks are being dragged.
- * @param {BlockTypeIcon} [props.icon]             Shown in place of the count.
- * @param {boolean}       [props.isPattern]        Labels the chip as a pattern when there's no icon.
- * @param {boolean}       [props.fadeWhenDisabled] Adds the indicator shown when the drop target won't accept the blocks.
- * @return {React.ReactElement} The chip.
+ * @param props
+ * @param props.count            How many blocks are being dragged.
+ * @param props.icon             Shown in place of the count.
+ * @param props.isPattern        Labels the chip as a pattern when there's no icon.
+ * @param props.fadeWhenDisabled Adds the indicator shown when the drop target won't accept the blocks.
+ * @return The chip.
  */
 export default function BlockDraggableChip( {
 	count,
 	icon,
 	isPattern,
 	fadeWhenDisabled,
-} ) {
+}: BlockDraggableChipProps ) {
 	const patternLabel = isPattern && __( 'Pattern' );
 	return (
 		<div className="block-editor-block-draggable-chip-wrapper">

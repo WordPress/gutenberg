@@ -8,6 +8,7 @@ import useScrollWhenDragging from './use-scroll-when-dragging';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { isDropTargetValid } from '../use-block-drop-zone';
+import type { BlockDraggableProps } from './types';
 
 const BlockDraggable = ( {
 	appendToOwnerDocument,
@@ -19,7 +20,7 @@ const BlockDraggable = ( {
 	onDragEnd,
 	fadeWhenDisabled = false,
 	dragComponent,
-} ) => {
+}: BlockDraggableProps ) => {
 	const {
 		srcRootClientId,
 		isDraggable,
@@ -38,10 +39,11 @@ const BlockDraggable = ( {
 			const { getBlockType: _getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-			const blockName = getBlockName( clientIds[ 0 ] );
+			// The dragged blocks exist.
+			const blockName = getBlockName( clientIds[ 0 ] )!;
 			const variation = getActiveBlockVariation(
 				blockName,
-				getBlockAttributes( clientIds[ 0 ] )
+				getBlockAttributes( clientIds[ 0 ] )!
 			);
 
 			return {
@@ -87,14 +89,21 @@ const BlockDraggable = ( {
 			return;
 		}
 
-		const onDragOver = ( event ) => {
-			if ( ! event.target.closest( '[data-block]' ) ) {
+		// `throttle` takes callbacks with unknown arguments.
+		const onDragOver = ( event: unknown ) => {
+			// Drag events over the editor target elements.
+			if (
+				! ( ( event as Event ).target as Element ).closest(
+					'[data-block]'
+				)
+			) {
 				return;
 			}
 			const draggedBlockNames = getBlockNamesByClientId( clientIds );
-			const targetClientId = event.target
-				.closest( '[data-block]' )
-				.getAttribute( 'data-block' );
+			// The block wrapper carries its client ID.
+			const targetClientId = ( ( event as Event ).target as Element )
+				.closest( '[data-block]' )!
+				.getAttribute( 'data-block' )!;
 
 			const allowedBlocks = getAllowedBlocks( targetClientId );
 			const targetBlockName = getBlockNamesByClientId( [
@@ -112,7 +121,8 @@ const BlockDraggable = ( {
 				const targetRootClientId =
 					getBlockRootClientId( targetClientId );
 				const targetRootBlockName = getBlockNamesByClientId( [
-					targetRootClientId,
+					// The target block is in the editor, so it has a root.
+					targetRootClientId!,
 				] )[ 0 ];
 				const rootAllowedBlocks =
 					getAllowedBlocks( targetRootClientId );
@@ -219,7 +229,8 @@ const BlockDraggable = ( {
 					/>
 				)
 			}
-			elementId={ elementId }
+			// Only read when `dragComponent` disables the default chip.
+			elementId={ elementId! }
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
