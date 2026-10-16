@@ -7,6 +7,7 @@ Consolidated ESLint configuration for the Gutenberg monorepo. This is a **privat
 -   **`config.mjs`** — Main ESLint flat config. The root `eslint.config.mjs` re-exports this so that ESLint, VS Code, and CI all resolve it transparently.
 -   **`import-resolver.cjs`** — Custom import resolver that maps `@wordpress/*` package imports to source files (`src/`) instead of built files (`build-module/`), so linting works without a build step.
 -   **`lint-js.cjs`** — Wrapper around `wp-scripts lint-js` used by `npm run lint:js`. Streams ESLint output through, detects the "stale suppressions" hint, and formats `suppressions.json` after `--prune-suppressions` runs.
+-   **`rules/`**: local rules that only make sense in this repository, such as `use-typescript`, which `config.mjs` scopes to the `src` and `test` trees of every package with a `tsconfig.json`, to routes and to tools, so that new files there must be TypeScript.
 -   **`suppressions.json`** — ESLint suppressions file for pre-existing violations. Updated via `npm run lint:js:prune-suppressions`. CI enforces that this file is pruned and committed.
 
 ## Why a workspace package?

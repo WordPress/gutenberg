@@ -4,8 +4,6 @@ import {
 	BlockList,
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import { unlock } from '../../lock-unlock';
@@ -68,23 +66,8 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		},
 		[ rootClientId ]
 	);
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
-	const offCanvasOnselect = useCallback(
-		( block ) => {
-			if (
-				block.name === 'core/navigation-link' &&
-				! block.attributes.url
-			) {
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlock(
-					block.clientId,
-					createBlock( 'core/navigation-link', block.attributes )
-				);
-			}
-		},
-		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
+	const { openListViewContentPanel } = unlock(
+		useDispatch( blockEditorStore )
 	);
 
 	// The hidden block is needed because it makes block edit side effects trigger.
@@ -94,10 +77,11 @@ export default function NavigationMenuContent( { rootClientId } ) {
 			{ ! isLoading && (
 				<PrivateListView
 					rootClientId={ listViewRootClientId }
-					onSelect={ offCanvasOnselect }
+					onSelect={ openListViewContentPanel }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
 					additionalBlockContent={ NavigationLinkUI }
+					showContentPopover
 					isExpanded
 				/>
 			) }

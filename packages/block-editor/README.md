@@ -790,7 +790,7 @@ Pre-populate the search input with a default value:
 
 _Parameters_
 
-- _props_ `WPLinkControlProps`: Component props.
+- _props_ `LinkControlProps`: Component props.
 
 ### MediaPlaceholder
 
@@ -1126,7 +1126,7 @@ _Parameters_
 
 _Returns_
 
-- `?WPBlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
+- `?BlockDisplayInformation`: Block's display information, or `null` when the block or its type not found.
 
 ### useBlockEditContext
 
