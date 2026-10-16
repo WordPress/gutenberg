@@ -11,6 +11,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
+import type { TextAlignmentControlProps } from './types';
 
 const TEXT_ALIGNMENT_OPTIONS = [
 	{
@@ -40,20 +41,20 @@ const DEFAULT_OPTIONS = [ 'left', 'center', 'right' ];
 /**
  * Control to facilitate text alignment selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.className Class name to add to the control.
- * @param {string}   props.value     Currently selected text alignment.
- * @param {Function} props.onChange  Handles change in text alignment selection.
- * @param {string[]} props.options   Array of text alignment options to display.
+ * @param props           Component props.
+ * @param props.className Class name to add to the control.
+ * @param props.value     Currently selected text alignment.
+ * @param props.onChange  Handles change in text alignment selection.
+ * @param props.options   Array of text alignment options to display.
  *
- * @return {Element} Text alignment control.
+ * @return Text alignment control.
  */
 export default function TextAlignmentControl( {
 	className,
 	value,
 	onChange,
 	options = DEFAULT_OPTIONS,
-} ) {
+}: TextAlignmentControlProps ) {
 	const validOptions = useMemo(
 		() =>
 			TEXT_ALIGNMENT_OPTIONS.filter( ( option ) =>
@@ -76,7 +77,12 @@ export default function TextAlignmentControl( {
 			) }
 			value={ value }
 			onChange={ ( newValue ) => {
-				onChange( newValue === value ? undefined : newValue );
+				// The options' values are strings.
+				onChange(
+					newValue === value
+						? undefined
+						: ( newValue as string | undefined )
+				);
 			} }
 		>
 			{ validOptions.map( ( option ) => {

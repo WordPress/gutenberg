@@ -20,10 +20,10 @@ export const RESET_VALUE = '';
 /**
  * Determines if the lineHeight attribute has been properly defined.
  *
- * @param {any} lineHeight The value to check.
+ * @param lineHeight The value to check.
  *
- * @return {boolean} Whether the lineHeight attribute is valid.
+ * @return Whether the lineHeight attribute is valid.
  */
-export function isLineHeightDefined( lineHeight ) {
+export function isLineHeightDefined( lineHeight: unknown ): boolean {
 	return lineHeight !== undefined && lineHeight !== RESET_VALUE;
 }

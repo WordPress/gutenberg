@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import LetterSpacingControl from '../';
 
-const meta = {
+const meta: Meta< typeof LetterSpacingControl > = {
 	id: 'blockeditor-letterspacingcontrol',
 	title: 'Editor/Block Editor/LetterSpacingControl',
 	component: LetterSpacingControl,
@@ -16,6 +17,7 @@ const meta = {
 	},
 	argTypes: {
 		value: {
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description: 'The current value of the letter spacing setting.',
 			table: {
@@ -24,6 +26,7 @@ const meta = {
 		},
 		onChange: {
 			action: 'onChange',
+			// @ts-expect-error Storybook types omit `null`, which hides the control.
 			control: { type: null },
 			description:
 				'A callback function invoked when the value is changed.',
@@ -45,15 +48,18 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState( '' );
+		const [ value, setValue ] = useState< string | undefined >( '' );
 		return (
 			<LetterSpacingControl
 				{ ...args }
 				value={ value }
 				onChange={ ( newValue ) => {
-					onChange( newValue );
+					// Storybook passes the `onChange` action.
+					onChange!( newValue );
 					setValue( newValue );
 				} }
 			/>

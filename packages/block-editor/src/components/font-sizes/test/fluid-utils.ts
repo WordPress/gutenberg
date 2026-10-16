@@ -64,6 +64,7 @@ describe( 'getComputedFluidTypographyValue()', () => {
 	it( 'should return a fluid font size when given a scale factor', () => {
 		const fluidTypographyValues = getComputedFluidTypographyValue( {
 			fontSize: '30px',
+			// @ts-expect-error A numeric string multiplies like the number.
 			scaleFactor: '2',
 		} );
 		expect( fluidTypographyValues ).toBe(

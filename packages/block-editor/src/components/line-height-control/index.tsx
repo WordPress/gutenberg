@@ -7,6 +7,11 @@ import {
 	SPIN_FACTOR,
 	isLineHeightDefined,
 } from './utils';
+import type {
+	LineHeightControlOnChange,
+	LineHeightControlProps,
+	LineHeightStateReducer,
+} from './types';
 
 const LineHeightControl = ( {
 	/**
@@ -19,10 +24,13 @@ const LineHeightControl = ( {
 	onChange,
 	__unstableInputWidth = '60px',
 	...otherProps
-} ) => {
+}: LineHeightControlProps ) => {
 	const isDefined = isLineHeightDefined( lineHeight );
 
-	const adjustNextValue = ( nextValue, wasTypedOrPasted ) => {
+	const adjustNextValue = (
+		nextValue: string | number | undefined,
+		wasTypedOrPasted: boolean
+	) => {
 		// Set the next value without modification if lineHeight has been defined.
 		if ( isDefined ) {
 			return nextValue;
@@ -58,21 +66,26 @@ const LineHeightControl = ( {
 		}
 	};
 
-	const stateReducer = ( state, action ) => {
+	const stateReducer: LineHeightStateReducer = ( state, action ) => {
 		// Be careful when changing this — cross-browser behavior of the
 		// `inputType` field in `input` events are inconsistent.
 		// For example, Firefox emits an input event with inputType="insertReplacementText"
 		// on spin button clicks, while other browsers do not even emit an input event.
 		const wasTypedOrPasted = [ 'insertText', 'insertFromPaste' ].includes(
-			action.payload.event.nativeEvent?.inputType
+			// Change actions carry the input event.
+			( action.payload.event!.nativeEvent as InputEvent )?.inputType
 		);
 		const value = adjustNextValue( state.value, wasTypedOrPasted );
-		return { ...state, value };
+		// The input takes the numeric spin values as they are.
+		return { ...state, value: value as string | undefined };
 	};
 
 	const value = isDefined ? lineHeight : RESET_VALUE;
 
-	const handleOnChange = ( nextValue, { event } ) => {
+	const handleOnChange: LineHeightControlOnChange = (
+		nextValue,
+		{ event }
+	) => {
 		if ( nextValue === '' ) {
 			onChange();
 			return;
@@ -89,7 +102,8 @@ const LineHeightControl = ( {
 	return (
 		<div className="block-editor-line-height-control">
 			<NumberControl
-				placeholder={ BASE_DEFAULT_VALUE }
+				// The input renders the numeric placeholder as text.
+				placeholder={ BASE_DEFAULT_VALUE as unknown as string }
 				{ ...otherProps }
 				__unstableInputWidth={ __unstableInputWidth }
 				__unstableStateReducer={ stateReducer }

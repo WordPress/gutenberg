@@ -1,18 +1,27 @@
 import { createHigherOrderComponent, compose } from '@wordpress/compose';
 import { Component } from '@wordpress/element';
+import type { ComponentClass, ComponentType, FunctionComponent } from 'react';
+import type { FontSizePreset } from '@wordpress/global-styles-engine';
 import { getFontSize, getFontSizeClass } from './utils';
 import { useSettings } from '../use-settings';
+import type {
+	FontSizeSetters,
+	IncompatibleInjectedProps,
+	InjectedFontSizesProps,
+	WithFontSizesProps,
+	WithFontSizesState,
+} from './types';
 
-const DEFAULT_FONT_SIZES = [];
+const DEFAULT_FONT_SIZES: FontSizePreset[] = [];
 
 /**
  * Capitalizes the first letter in a string.
  *
  * @param {string} str The string whose first letter the function will capitalize.
  *
- * @return {string} Capitalized string.
+ * @return Capitalized string.
  */
-const upperFirst = ( [ firstLetter, ...rest ] ) =>
+const upperFirst = ( [ firstLetter, ...rest ]: string ): string =>
 	firstLetter.toUpperCase() + rest.join( '' );
 
 /**
@@ -25,7 +34,7 @@ const upperFirst = ( [ firstLetter, ...rest ] ) =>
  *
  * @return {Function} Higher-order component.
  */
-export default ( ...fontSizeNames ) => {
+export default < Name extends string >( ...fontSizeNames: Name[] ) => {
 	/*
 	 * Computes an object whose key is the font size attribute name as passed in the array,
 	 * and the value is the custom font size attribute name.
@@ -37,29 +46,42 @@ export default ( ...fontSizeNames ) => {
 				`custom${ upperFirst( fontSizeAttributeName ) }`;
 			return fontSizeAttributeNamesAccumulator;
 		},
-		{}
+		// The reducer fills the empty object.
+		{} as Record< string, string >
 	);
 
+	// The outer cast types the props each call injects.
 	return createHigherOrderComponent(
+		// `compose` loses the types of the components it composes.
 		compose( [
 			createHigherOrderComponent(
-				( WrappedComponent ) =>
-					function WithFontSizesInner( props ) {
+				( WrappedComponent: ComponentType< WithFontSizesProps > ) =>
+					function WithFontSizesInner( props: WithFontSizesProps ) {
 						const [ fontSizes ] = useSettings(
 							'typography.fontSizes'
 						);
 						return (
 							<WrappedComponent
 								{ ...props }
-								fontSizes={ fontSizes || DEFAULT_FONT_SIZES }
+								// The setting lists the font size presets.
+								fontSizes={
+									( fontSizes as
+										FontSizePreset[] | undefined ) ||
+									DEFAULT_FONT_SIZES
+								}
 							/>
 						);
 					},
 				'withFontSizes'
 			),
-			( WrappedComponent ) => {
-				return class WithFontSizes extends Component {
-					constructor( props ) {
+			( WrappedComponent: ComponentType< WithFontSizesProps > ) => {
+				return class WithFontSizes extends Component<
+					WithFontSizesProps,
+					WithFontSizesState
+				> {
+					declare setters: FontSizeSetters;
+
+					constructor( props: WithFontSizesProps ) {
 						super( props );
 
 						this.setters = this.createSetters();
@@ -67,7 +89,7 @@ export default ( ...fontSizeNames ) => {
 						this.state = {};
 					}
 
-					createSetters() {
+					createSetters(): FontSizeSetters {
 						return Object.entries( fontSizeAttributeNames ).reduce(
 							(
 								settersAccumulator,
@@ -86,15 +108,16 @@ export default ( ...fontSizeNames ) => {
 								);
 								return settersAccumulator;
 							},
-							{}
+							// The reducer fills the empty object.
+							{} as FontSizeSetters
 						);
 					}
 
 					createSetFontSize(
-						fontSizeAttributeName,
-						customFontSizeAttributeName
+						fontSizeAttributeName: string,
+						customFontSizeAttributeName: string
 					) {
-						return ( fontSizeValue ) => {
+						return ( fontSizeValue?: number | string ) => {
 							const fontSizeObject = this.props.fontSizes?.find(
 								( { size } ) => size === Number( fontSizeValue )
 							);
@@ -112,12 +135,13 @@ export default ( ...fontSizeNames ) => {
 					}
 
 					static getDerivedStateFromProps(
-						{ attributes, fontSizes },
-						previousState
+						{ attributes, fontSizes }: WithFontSizesProps,
+						previousState: WithFontSizesState
 					) {
 						const didAttributesChange = (
-							customFontSizeAttributeName,
-							fontSizeAttributeName
+							customFontSizeAttributeName: string,
+							// `some` passes the index here, as it always has.
+							fontSizeAttributeName: string | number
 						) => {
 							if ( previousState[ fontSizeAttributeName ] ) {
 								// If new font size is name compare with the previous slug.
@@ -161,14 +185,17 @@ export default ( ...fontSizeNames ) => {
 										customFontSizeAttributeName,
 									]
 								) => {
-									const fontSizeAttributeValue =
-										attributes[ fontSizeAttributeName ];
+									// The font size attribute holds a slug.
+									const fontSizeAttributeValue = attributes[
+										fontSizeAttributeName
+									] as string | undefined;
 									const fontSizeObject = getFontSize(
 										fontSizes,
 										fontSizeAttributeValue,
+										// The custom font size attribute holds a size.
 										attributes[
 											customFontSizeAttributeName
-										]
+										] as number | string | undefined
 									);
 									newStateAccumulator[
 										fontSizeAttributeName
@@ -180,7 +207,8 @@ export default ( ...fontSizeNames ) => {
 									};
 									return newStateAccumulator;
 								},
-								{}
+								// The reducer fills the empty object.
+								{} as WithFontSizesState
 							);
 
 						return {
@@ -203,7 +231,19 @@ export default ( ...fontSizeNames ) => {
 					}
 				};
 			},
-		] ),
+		] ) as (
+			Inner: ComponentType< WithFontSizesProps >
+		) => ComponentType< WithFontSizesProps >,
 		'withFontSizes'
-	);
+	) as < Props >(
+		WrappedComponent: (
+			| FunctionComponent< Props & InjectedFontSizesProps< Name > >
+			// A class component's `props` type must match, so it takes its own props.
+			| ComponentClass< Props >
+		) &
+			IncompatibleInjectedProps< Props, InjectedFontSizesProps< Name > >
+	) => ComponentType<
+		Omit< Props, keyof InjectedFontSizesProps< Name > > &
+			Pick< WithFontSizesProps, 'attributes' | 'setAttributes' >
+	>;
 };

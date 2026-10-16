@@ -11,21 +11,22 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSettings } from '../../components/use-settings';
+import type { TextIndentControlProps } from './types';
 
 /**
  * Control for line text indent.
  *
- * @param {Object}                  props                      Component props.
- * @param {string}                  props.value                Currently selected text indent.
- * @param {Function}                props.onChange             Handles change in text indent selection.
- * @param {string|number|undefined} props.__unstableInputWidth Input width to pass through to inner UnitControl. Should be a valid CSS value.
- * @param {boolean}                 props.withSlider           Whether to show the slider control.
- * @param {boolean}                 props.hasBottomMargin      Whether to add bottom margin below the control.
- * @param {string}                  props.help                 Help text to display below the control.
- * @param {string}                  props.className            Class name to add to the inner UnitControl.
- * @param {string}                  props.placeholder          Placeholder for the inner UnitControl.
+ * @param props                      Component props.
+ * @param props.value                Currently selected text indent.
+ * @param props.onChange             Handles change in text indent selection.
+ * @param props.__unstableInputWidth Input width to pass through to inner UnitControl. Should be a valid CSS value.
+ * @param props.withSlider           Whether to show the slider control.
+ * @param props.hasBottomMargin      Whether to add bottom margin below the control.
+ * @param props.help                 Help text to display below the control.
+ * @param props.className            Class name to add to the inner UnitControl.
+ * @param props.placeholder          Placeholder for the inner UnitControl.
  *
- * @return {Element} Text indent control.
+ * @return Text indent control.
  */
 export default function TextIndentControl( {
 	value,
@@ -37,10 +38,11 @@ export default function TextIndentControl( {
 	className,
 	placeholder,
 	...otherProps
-} ) {
+}: TextIndentControlProps ) {
 	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: availableUnits || [
+		// The setting lists unit strings.
+		availableUnits: ( availableUnits as string[] | undefined ) || [
 			'px',
 			'em',
 			'rem',

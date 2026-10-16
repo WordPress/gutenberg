@@ -10,6 +10,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 } from '@wordpress/components';
+import type { TextTransformControlProps } from './types';
 
 const TEXT_TRANSFORMS = [
 	{
@@ -37,14 +38,18 @@ const TEXT_TRANSFORMS = [
 /**
  * Control to facilitate text transform selections.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.className Class name to add to the control.
- * @param {string}   props.value     Currently selected text transform.
- * @param {Function} props.onChange  Handles change in text transform selection.
+ * @param props           Component props.
+ * @param props.className Class name to add to the control.
+ * @param props.value     Currently selected text transform.
+ * @param props.onChange  Handles change in text transform selection.
  *
- * @return {Element} Text transform control.
+ * @return Text transform control.
  */
-export default function TextTransformControl( { className, value, onChange } ) {
+export default function TextTransformControl( {
+	className,
+	value,
+	onChange,
+}: TextTransformControlProps ) {
 	return (
 		<ToggleGroupControl
 			isDeselectable
@@ -55,7 +60,12 @@ export default function TextTransformControl( { className, value, onChange } ) {
 			) }
 			value={ value }
 			onChange={ ( newValue ) => {
-				onChange( newValue === value ? undefined : newValue );
+				// The options' values are strings.
+				onChange(
+					newValue === value
+						? undefined
+						: ( newValue as string | undefined )
+				);
 			} }
 		>
 			{ TEXT_TRANSFORMS.map( ( option ) => {

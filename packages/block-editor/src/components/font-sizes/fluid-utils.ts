@@ -12,6 +12,12 @@ const DEFAULT_MINIMUM_FONT_SIZE_FACTOR_MIN = 0.25;
 const DEFAULT_MINIMUM_FONT_SIZE_FACTOR_MAX = 0.75;
 const DEFAULT_MINIMUM_FONT_SIZE_LIMIT = '14px';
 
+import type {
+	FluidTypographyArgs,
+	TypographyValueAndUnit,
+	TypographyValueAndUnitOptions,
+} from './types';
+
 /**
  * Computes a fluid font-size value that uses clamp(). A minimum and maximum
  * font size OR a single font size can be specified.
@@ -50,7 +56,7 @@ export function getComputedFluidTypographyValue( {
 	maximumViewportWidth = DEFAULT_MAXIMUM_VIEWPORT_WIDTH,
 	scaleFactor = DEFAULT_SCALE_FACTOR,
 	minimumFontSizeLimit,
-} ) {
+}: FluidTypographyArgs ): string | null {
 	// Validate incoming settings and set defaults.
 	minimumFontSizeLimit = !! getTypographyValueAndUnit( minimumFontSizeLimit )
 		? minimumFontSizeLimit
@@ -131,7 +137,9 @@ export function getComputedFluidTypographyValue( {
 			// Only use calculated min font size if it's > $minimum_font_size_limit value.
 			if (
 				!! minimumFontSizeLimitParsed?.value &&
-				calculatedMinimumFontSize < minimumFontSizeLimitParsed?.value
+				// A finite size rounds to a number.
+				( calculatedMinimumFontSize as number ) <
+					minimumFontSizeLimitParsed?.value
 			) {
 				minimumFontSize = `${ minimumFontSizeLimitParsed.value }${ minimumFontSizeLimitParsed.unit }`;
 			} else {
@@ -196,13 +204,16 @@ export function getComputedFluidTypographyValue( {
 	);
 
 	const viewportWidthOffset =
-		roundToPrecision( minViewportWidthOffsetValue, 3 ) + fontSizeUnit;
+		// A finite width rounds to a number.
+		roundToPrecision( minViewportWidthOffsetValue as number, 3 ) +
+		fontSizeUnit;
 	const linearFactor =
 		100 *
 		( ( maximumFontSizeParsed.value - minimumFontSizeParsed.value ) /
 			linearDenominator );
 	const linearFactorScaled = roundToPrecision(
-		( linearFactor || 1 ) * scaleFactor,
+		// A `null` factor multiplies as `0`, as before.
+		( linearFactor || 1 ) * ( scaleFactor as number ),
 		3
 	);
 	const fluidTargetFontSize = `${ minimumFontSizeRem.value }${ minimumFontSizeRem.unit } + ((1vw - ${ viewportWidthOffset }) * ${ linearFactorScaled })`;
@@ -214,18 +225,22 @@ export function getComputedFluidTypographyValue( {
  * Internal method that checks a string for a unit and value and returns an array consisting of `'value'` and `'unit'`, e.g., [ '42', 'rem' ].
  * A raw font size of `value + unit` is expected. If the value is an integer, it will convert to `value + 'px'`.
  *
- * @param {string|number}    rawValue Raw size value from theme.json.
- * @param {Object|undefined} options  Calculation options.
+ * @param rawValue Raw size value from theme.json.
+ * @param options  Calculation options.
  *
- * @return {{ unit: string, value: number }|null} An object consisting of `'value'` and `'unit'` properties.
+ * @return An object consisting of `'value'` and `'unit'` properties.
  */
-export function getTypographyValueAndUnit( rawValue, options = {} ) {
+export function getTypographyValueAndUnit(
+	rawValue: unknown,
+	options: TypographyValueAndUnitOptions = {}
+): TypographyValueAndUnit | null {
 	if ( typeof rawValue !== 'string' && typeof rawValue !== 'number' ) {
 		return null;
 	}
 
 	// Converts numeric values to pixel values by default.
-	if ( isFinite( rawValue ) ) {
+	// `isFinite` coerces a numeric string.
+	if ( isFinite( rawValue as number ) ) {
 		rawValue = `${ rawValue }px`;
 	}
 
@@ -242,7 +257,8 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
 		`^(\\d*\\.?\\d+)(${ acceptableUnitsGroup }){1,1}$`
 	);
 
-	const matches = rawValue.match( regexUnits );
+	// A number was turned into a string above.
+	const matches = ( rawValue as string ).match( regexUnits );
 
 	// We need a number value and a unit.
 	if ( ! matches || matches.length < 3 ) {
@@ -276,7 +292,8 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
 	}
 
 	return {
-		value: roundToPrecision( returnValue, 3 ),
+		// A parsed number is finite, so it rounds to a number.
+		value: roundToPrecision( returnValue, 3 ) as number,
 		unit,
 	};
 }
@@ -285,14 +302,20 @@ export function getTypographyValueAndUnit( rawValue, options = {} ) {
  * Returns a value rounded to defined precision.
  * Returns `undefined` if the value is not a valid finite number.
  *
- * @param {number} value  Raw value.
- * @param {number} digits The number of digits to appear after the decimal point
+ * @param value  Raw value.
+ * @param digits The number of digits to appear after the decimal point
  *
- * @return {number|undefined} Value rounded to standard precision.
+ * @return Value rounded to standard precision.
  */
-export function roundToPrecision( value, digits = 3 ) {
+export function roundToPrecision(
+	value: number,
+	digits = 3
+): number | undefined {
 	const base = Math.pow( 10, digits );
 	return Number.isFinite( value )
-		? parseFloat( Math.round( value * base ) / base )
+		? // `parseFloat` reads the rounded number as its string form.
+			parseFloat(
+				( Math.round( value * base ) / base ) as unknown as string
+			)
 		: undefined;
 }

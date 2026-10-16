@@ -61,6 +61,7 @@
 -   Convert `LinkControl` and `URLInput` to TypeScript ([#84844](https://github.com/WordPress/gutenberg/pull/84844)).
 -   Convert `Warning`, `BlockEdit` and `PrivateBlockContext`, the `BlockControls` test and the store performance test to TypeScript ([#84846](https://github.com/WordPress/gutenberg/pull/84846)).
 -   Convert the layouts, `LayoutStyle`, the `align` hook, `BlockAlignmentControl`, `BlockVerticalAlignmentControl` and `JustifyContentControl` to TypeScript ([#84847](https://github.com/WordPress/gutenberg/pull/84847)).
+-   Convert the typography controls, the font size utilities and `withFontSizes` to TypeScript ([#84848](https://github.com/WordPress/gutenberg/pull/84848)).
 
 ## 18.1.0 (2026-10-07)
 
