@@ -85,6 +85,14 @@ $footer-height: 90px;
 	text-transform: uppercase;
 }
 
+.font-library__page-selection-trigger {
+	font-size: inherit;
+
+	button {
+		font-weight: inherit;
+	}
+}
+
 .font-library__search {
 	// Fixed width to ensure the control doesn't resize with the reset button.
 	width: 240px;

@@ -80,6 +80,7 @@ export function DataViewsPageSelect( { className }: { className?: string } ) {
 							} }
 						>
 							<Select.Trigger
+								className="dataviews-pagination__page-select-trigger"
 								size="small"
 								variant="minimal"
 								aria-label={ __( 'Current page' ) }

@@ -543,6 +543,7 @@ function FontCollection( { slug }: { slug: string } ) {
 												} }
 											>
 												<Select.Trigger
+													className="font-library__page-selection-trigger"
 													size="small"
 													variant="minimal"
 													aria-label={ __(

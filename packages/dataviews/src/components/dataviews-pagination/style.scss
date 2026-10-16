@@ -3,3 +3,11 @@
 	font-weight: var(--wpds-typography-font-weight-emphasis);
 	text-transform: uppercase;
 }
+
+.dataviews-pagination__page-select-trigger {
+	font-size: inherit;
+
+	button {
+		font-weight: inherit;
+	}
+}
