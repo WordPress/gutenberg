@@ -1,4 +1,6 @@
-let compatibilityStyles = null;
+import type { CompatibilityCSSRule } from './types';
+
+let compatibilityStyles: Node[] | null = null;
 
 /**
  * Returns a list of stylesheets that target the editor canvas. A stylesheet is
@@ -8,14 +10,14 @@ let compatibilityStyles = null;
  * Ideally, this hook should be removed in the future and styles should be added
  * explicitly as editor styles.
  */
-export function getCompatibilityStyles() {
+export function getCompatibilityStyles(): Node[] {
 	if ( compatibilityStyles ) {
 		return compatibilityStyles;
 	}
 
 	// Only memoize the result once on load, since these stylesheets should not
 	// change.
-	compatibilityStyles = Array.from( document.styleSheets ).reduce(
+	compatibilityStyles = Array.from( document.styleSheets ).reduce< Node[] >(
 		( accumulator, styleSheet ) => {
 			try {
 				// May fail for external styles.
@@ -40,17 +42,22 @@ export function getCompatibilityStyles() {
 			// Don't try to add core WP styles. We are responsible for adding
 			// them. This compatibility layer is only meant to add styles added
 			// by plugins or themes.
-			if ( ownerNode.id.startsWith( 'wp-' ) ) {
+			// Style sheets are owned by `link` and `style` elements.
+			if ( ( ownerNode as Element ).id.startsWith( 'wp-' ) ) {
 				return accumulator;
 			}
 
 			// Don't try to add styles without ID. Styles enqueued via the WP dependency system will always have IDs.
-			if ( ! ownerNode.id ) {
+			if ( ! ( ownerNode as Element ).id ) {
 				return accumulator;
 			}
 
-			function matchFromRules( _cssRules ) {
-				return Array.from( _cssRules ).find(
+			function matchFromRules(
+				_cssRules: CSSRuleList
+			): CompatibilityCSSRule | undefined {
+				return Array.from(
+					_cssRules as ArrayLike< CompatibilityCSSRule >
+				).find(
 					( {
 						selectorText,
 						conditionText,
@@ -59,7 +66,8 @@ export function getCompatibilityStyles() {
 						// If the rule is conditional then it will not have selector text.
 						// Recurse into child CSS ruleset to determine selector eligibility.
 						if ( conditionText ) {
-							return matchFromRules( __cssRules );
+							// Condition rules nest rules.
+							return matchFromRules( __cssRules! );
 						}
 
 						return (
@@ -74,13 +82,13 @@ export function getCompatibilityStyles() {
 			}
 
 			if ( matchFromRules( cssRules ) ) {
-				const isInline = ownerNode.tagName === 'STYLE';
+				const isInline = ( ownerNode as Element ).tagName === 'STYLE';
 
 				if ( isInline ) {
 					// If the current target is inline,
 					// it could be a dependency of an existing stylesheet.
 					// Look for that dependency and add it BEFORE the current target.
-					const mainStylesCssId = ownerNode.id.replace(
+					const mainStylesCssId = ( ownerNode as Element ).id.replace(
 						'-inline-css',
 						'-css'
 					);
@@ -97,10 +105,9 @@ export function getCompatibilityStyles() {
 					// If the current target is not inline,
 					// we still look for inline styles that could be relevant for the current target.
 					// If they exist, add them AFTER the current target.
-					const inlineStylesCssId = ownerNode.id.replace(
-						'-css',
-						'-inline-css'
-					);
+					const inlineStylesCssId = (
+						ownerNode as Element
+					 ).id.replace( '-css', '-inline-css' );
 					const inlineStylesElement =
 						document.getElementById( inlineStylesCssId );
 					if ( inlineStylesElement ) {

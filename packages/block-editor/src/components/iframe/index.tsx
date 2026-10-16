@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { version as reactVersion } from 'react';
+import type { CSSProperties, ForwardedRef, Ref, SyntheticEvent } from 'react';
 import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
@@ -9,12 +10,24 @@ import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
+import type { ResolvedAssets } from '../../store/types';
+import type { EventConstructor, IframeProps } from './types';
 
-function bubbleEvent( event, Constructor, frame ) {
-	const init = {};
+function bubbleEvent(
+	event: Event | SyntheticEvent,
+	Constructor: EventConstructor,
+	frame: HTMLIFrameElement
+) {
+	const init: {
+		clientX?: number;
+		clientY?: number;
+		defaultPrevented?: boolean;
+		[ key: string ]: unknown;
+	} = {};
 
 	for ( const key in event ) {
-		init[ key ] = event[ key ];
+		// Copies every enumerable property of the event.
+		init[ key ] = ( event as unknown as Record< string, unknown > )[ key ];
 	}
 
 	// Check if the event is a MouseEvent generated within the iframe.
@@ -24,10 +37,15 @@ function bubbleEvent( event, Constructor, frame ) {
 	// to the iframe. Without this, the Draggable event handler would
 	// result in components "jumping" position as soon as the user
 	// drags over the iframe.
-	if ( event instanceof frame.contentDocument.defaultView.MouseEvent ) {
+	if (
+		// A frame that dispatches events has a document and window.
+		event instanceof
+		( frame.contentDocument!.defaultView! as typeof window ).MouseEvent
+	) {
 		const rect = frame.getBoundingClientRect();
-		init.clientX += rect.left;
-		init.clientY += rect.top;
+		// Mouse events have coordinates.
+		init.clientX! += rect.left;
+		init.clientY! += rect.top;
 	}
 
 	const newEvent = new Constructor( event.type, init );
@@ -49,24 +67,34 @@ function bubbleEvent( event, Constructor, frame ) {
  * should be context dependent, e.g. actions on blocks like Cmd+A should not
  * work globally outside the block editor.
  *
- * @param {Document} iframeDocument Document to attach listeners to.
+ * @param iframeDocument Document to attach listeners to.
  */
-function useBubbleEvents( iframeDocument ) {
+function useBubbleEvents( iframeDocument: Document | undefined ) {
+	// @ts-expect-error Without dependencies the ref callback changes on every render.
 	return useRefEffect( () => {
-		const { defaultView } = iframeDocument;
+		// The body mounts once the document loads.
+		const { defaultView } = iframeDocument!;
 		if ( ! defaultView ) {
 			return;
 		}
 		const { frameElement } = defaultView;
-		const html = iframeDocument.documentElement;
+		const html = iframeDocument!.documentElement;
 		const eventTypes = [ 'dragover', 'mousemove' ];
-		const handlers = {};
+		const handlers: Record< string, ( event: Event ) => void > = {};
 		for ( const name of eventTypes ) {
 			handlers[ name ] = ( event ) => {
 				const prototype = Object.getPrototypeOf( event );
 				const constructorName = prototype.constructor.name;
-				const Constructor = window[ constructorName ];
-				bubbleEvent( event, Constructor, frameElement );
+				// The window has the constructors of the events it dispatches.
+				const Constructor = (
+					window as unknown as Record< string, EventConstructor >
+				 )[ constructorName ];
+				// The iframe window's frame is the iframe.
+				bubbleEvent(
+					event,
+					Constructor,
+					frameElement as HTMLIFrameElement
+				);
 			};
 			html.addEventListener( name, handlers[ name ] );
 		}
@@ -79,14 +107,14 @@ function useBubbleEvents( iframeDocument ) {
 	} );
 }
 
-const iframeSrcCache = new WeakMap();
+const iframeSrcCache = new WeakMap< ResolvedAssets, string >();
 const iframeSrcCleanup = globalThis.FinalizationRegistry
-	? new globalThis.FinalizationRegistry( ( url ) =>
+	? new globalThis.FinalizationRegistry< string >( ( url ) =>
 			URL.revokeObjectURL( url )
 		)
 	: undefined;
 
-function getIframeSrc( resolvedAssets ) {
+function getIframeSrc( resolvedAssets: ResolvedAssets ) {
 	let src = iframeSrcCache.get( resolvedAssets );
 	if ( src ) {
 		return src;
@@ -140,7 +168,7 @@ function Iframe( {
 	forwardedRef: ref,
 	title = __( 'Editor canvas' ),
 	...props
-} ) {
+}: IframeProps ) {
 	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
 		return {
@@ -148,24 +176,26 @@ function Iframe( {
 			isPreviewMode: settings.isPreviewMode,
 		};
 	}, [] );
-	/** @type {[Document, React.Dispatch<Document>]} */
-	const [ iframeDocument, setIframeDocument ] = useState();
-	const [ bodyClasses, setBodyClasses ] = useState( [] );
+	const [ iframeDocument, setIframeDocument ] = useState< Document >();
+	const [ bodyClasses, setBodyClasses ] = useState< string[] >( [] );
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
-	const setRef = useRefEffect( ( node ) => {
-		let iFrameDocument;
+	const setRef = useRefEffect< HTMLIFrameElement >( ( node ) => {
+		let iFrameDocument: Document | undefined;
 		// Prevent the default browser action for files dropped outside of dropzones.
-		function preventFileDropDefault( event ) {
+		function preventFileDropDefault( event: DragEvent ) {
 			event.preventDefault();
 		}
 		// Prevent clicks on link fragments from navigating away. Note that links
 		// inside `contenteditable` are already disabled by the browser, so
 		// this is for links in blocks outside of `contenteditable`.
-		function interceptLinkClicks( event ) {
+		function interceptLinkClicks( event: MouseEvent ) {
+			// Clicks reach the listener from elements.
 			if (
-				event.target.tagName === 'A' &&
-				event.target.getAttribute( 'href' )?.startsWith( '#' )
+				( event.target as Element ).tagName === 'A' &&
+				( event.target as Element )
+					.getAttribute( 'href' )
+					?.startsWith( '#' )
 			) {
 				event.preventDefault();
 				// Manually handle link fragment navigation within the iframe. The iframe's
@@ -177,8 +207,11 @@ function Iframe( {
 				//
 				// Links with fragments are used for example with footnotes. Clicking on these
 				// links will scroll smoothly to the anchors in the editor canvas.
-				iFrameDocument.defaultView.location.hash = event.target
-					.getAttribute( 'href' )
+				// The loaded document has a window, and the link an `href`.
+				iFrameDocument!.defaultView!.location.hash = (
+					event.target as Element
+				 )
+					.getAttribute( 'href' )!
 					.slice( 1 );
 			}
 		}
@@ -198,7 +231,8 @@ function Iframe( {
 		);
 
 		function onLoad() {
-			const { contentDocument } = node;
+			// A loaded iframe has a document.
+			const { contentDocument } = node as { contentDocument: Document };
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
 			setIframeDocument( contentDocument );
@@ -208,7 +242,12 @@ function Iframe( {
 			contentDocument.dir = ownerDocument.dir;
 
 			for ( const compatStyle of getCompatibilityStyles() ) {
-				if ( contentDocument.getElementById( compatStyle.id ) ) {
+				// Compatibility styles are elements with an ID.
+				if (
+					contentDocument.getElementById(
+						( compatStyle as Element ).id
+					)
+				) {
 					continue;
 				}
 
@@ -219,7 +258,7 @@ function Iframe( {
 				if ( ! isPreviewMode ) {
 					// eslint-disable-next-line no-console
 					console.warn(
-						`${ compatStyle.id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
+						`${ ( compatStyle as Element ).id } was added to the iframe incorrectly. Please use block.json or enqueue_block_assets to add styles to the iframe.`,
 						compatStyle
 					);
 				}
@@ -262,15 +301,18 @@ function Iframe( {
 		scaleContainerWidth,
 	} = useScaleCanvas( {
 		scale,
-		frameSize: parseInt( frameSize ),
-		iframeDocument,
+		// `parseInt` reads a number as its string form.
+		frameSize: parseInt( frameSize as string ),
+		// The canvas only animates once the iframe document loads.
+		iframeDocument: iframeDocument as Document,
 	} );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 
 	const unguardedBodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
-		contentRef,
+		// `useMergeRefs` skips unset refs.
+		contentRef as Ref< HTMLElement >,
 		writingFlowRef,
 		disabledRef,
 		scaleContentRef,
@@ -280,7 +322,7 @@ function Iframe( {
 	// When an iframe element is moved in the DOM, like when reordering a list,
 	// its `window` object is destroyed and recreated, and the `defaultView` field is
 	// briefly `null`. We need to guard for such calls of the ref callbacks.
-	const bodyRef = useRefEffect(
+	const bodyRef = useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( node.ownerDocument.defaultView ) {
 				unguardedBodyRef( node );
@@ -291,7 +333,8 @@ function Iframe( {
 		[ unguardedBodyRef ]
 	);
 
-	const src = getIframeSrc( resolvedAssets );
+	// The settings are initialized before the iframe renders.
+	const src = getIframeSrc( resolvedAssets! );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -308,7 +351,11 @@ function Iframe( {
 					height: props.style?.height,
 					border: 0,
 				} }
-				ref={ useMergeRefs( [ ref, setRef ] ) }
+				ref={ useMergeRefs( [
+					// `useMergeRefs` skips unset refs.
+					ref as Ref< HTMLIFrameElement >,
+					setRef,
+				] ) }
 				tabIndex={ tabIndex }
 				src={ src }
 				title={ title }
@@ -324,7 +371,7 @@ function Iframe( {
 					// duplication.
 					if (
 						event.currentTarget.ownerDocument !==
-						event.target.ownerDocument
+						( event.target as Element ).ownerDocument
 					) {
 						// We should only stop propagation of the React event,
 						// the native event should further bubble inside the
@@ -371,10 +418,12 @@ function Iframe( {
 					'block-editor-iframe__scale-container',
 					isZoomedOut && 'is-zoomed-out'
 				) }
-				style={ {
-					'--wp-block-editor-iframe-zoom-out-scale-container-width':
-						isZoomedOut && `${ scaleContainerWidth }px`,
-				} }
+				style={
+					{
+						'--wp-block-editor-iframe-zoom-out-scale-container-width':
+							isZoomedOut && `${ scaleContainerWidth }px`,
+					} as CSSProperties
+				}
 			>
 				{ iframe }
 			</div>
@@ -382,7 +431,10 @@ function Iframe( {
 	);
 }
 
-function IframeIfReady( props, ref ) {
+function IframeIfReady(
+	props: IframeProps,
+	ref: ForwardedRef< HTMLIFrameElement >
+) {
 	const isInitialised = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().__internalIsInitialized,
