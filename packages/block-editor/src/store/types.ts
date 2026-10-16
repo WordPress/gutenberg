@@ -314,6 +314,8 @@ export type HistoryMode = 'merge' | 'ignore';
 
 export type BlockListSettings = Record< string, unknown > & {
 	templateLock?: string | false;
+	template?: BlockTemplate;
+	blockName?: string;
 	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
 	directInsert?: boolean;
 };
@@ -488,7 +490,7 @@ export interface State {
 	blockListSettings: Map< string, BlockListSettings >;
 	insertionPoint: InsertionPoint | null;
 	insertionCue: InsertionCue | null;
-	template: { isValid: boolean };
+	template: { isValid: boolean; isValidationIgnored?: boolean };
 	settings: Settings;
 	preferences: {
 		insertUsage: Record< string, { time?: number; count: number } >;
@@ -721,7 +723,8 @@ export type Action =
 			clientId: string | Record< string, BlockListSettings | undefined >;
 			settings?: BlockListSettings;
 	  }
-	| { type: 'UPDATE_SETTINGS'; settings: Settings; reset?: boolean };
+	| { type: 'UPDATE_SETTINGS'; settings: Settings; reset?: boolean }
+	| { type: 'VALIDATE_TEMPLATE'; isValid: boolean; force?: boolean };
 
 export type RemoveBlocksAction = Extract< Action, { type: 'REMOVE_BLOCKS' } >;
 

@@ -1799,11 +1799,36 @@ export function template(
 	action: Action
 ) {
 	switch ( action.type ) {
-		case 'SET_TEMPLATE_VALIDITY':
-			return {
+		case 'RESET_BLOCKS': {
+			if ( ! state.isValidationIgnored ) {
+				return state;
+			}
+			const nextState = { ...state };
+			delete nextState.isValidationIgnored;
+			return nextState;
+		}
+		case 'VALIDATE_TEMPLATE': {
+			if ( ! action.force && state.isValidationIgnored ) {
+				return state;
+			}
+			const nextState = {
 				...state,
 				isValid: action.isValid,
 			};
+			delete nextState.isValidationIgnored;
+			return nextState;
+		}
+		case 'SET_TEMPLATE_VALIDITY': {
+			const nextState = {
+				...state,
+				isValid: action.isValid,
+			};
+			delete nextState.isValidationIgnored;
+			if ( action.isValid ) {
+				nextState.isValidationIgnored = true;
+			}
+			return nextState;
+		}
 	}
 
 	return state;
