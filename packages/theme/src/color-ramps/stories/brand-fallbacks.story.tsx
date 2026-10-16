@@ -45,6 +45,7 @@ const Verifier: React.FC< VerifierProps > = () => null;
  */
 const meta: Meta< typeof Verifier > = {
 	title: 'Design System/Theme/Theme Provider/Brand Color Fallbacks',
+	id: 'design-system-theme-theme-provider-brand-color-fallbacks',
 	component: Verifier,
 	argTypes: {
 		adminThemeColor: {

@@ -8,6 +8,7 @@ registerCoreBlocks();
 
 export default {
 	title: 'Playground/Block Editor',
+	id: 'playground-block-editor',
 	parameters: {
 		sourceLink: 'storybook/stories/playground',
 	},
