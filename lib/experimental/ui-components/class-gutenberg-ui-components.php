@@ -10,7 +10,8 @@
  * The markup comes from `packages/ui/build-php/manifest.php`, which the build
  * generates by rendering the React components: one snapshot per combination
  * of variant props, with slots for the free-form props. Rendering picks the
- * snapshot and fills in the slots, so there is no markup to maintain here.
+ * snapshot and fills in the slots and translated strings, so there is no markup
+ * to maintain here.
  *
  * @package gutenberg
  */
@@ -145,7 +146,8 @@ final class Gutenberg_UI_Components {
 			return '';
 		}
 
-		$props = $this->validate_props( $name, $component['props'], (array) $props );
+		$props = $this->apply_deprecations( $component['deprecations'], (array) $props );
+		$props = $this->validate_props( $name, $component['props'], $props );
 		if ( null === $props ) {
 			return '';
 		}
@@ -173,7 +175,7 @@ final class Gutenberg_UI_Components {
 	}
 
 	/**
-	 * Fills in a snapshot's slots.
+	 * Fills in a snapshot's slots and translated strings.
 	 *
 	 * @param array $component Component metadata.
 	 * @param array $props     Validated props.
@@ -187,16 +189,24 @@ final class Gutenberg_UI_Components {
 				continue;
 			}
 
-			// A slot: `[ 'slot', prop, 'text' ]` or `[ 'slot', prop, 'attribute', name ]`.
-			$value = (string) $props[ $part[1] ];
-			if ( 'attribute' === $part[2] ) {
-				// React blocks `javascript:` URLs; esc_url() does the same here.
-				$html .= in_array( $part[3], array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : self::esc_plain_text( $value );
-			} elseif ( isset( $component['props'][ $part[1] ]['format'] ) && 'html' === $component['props'][ $part[1] ]['format'] ) {
-				// HTML props are printed as is; callers escape what they pass.
-				$html .= $value;
-			} else {
-				$html .= self::esc_plain_text( $value );
+			switch ( $part[0] ) {
+				case 'slot':
+					$value = (string) $props[ $part[1] ];
+					if ( 'attribute' === $part[2] ) {
+						// React blocks `javascript:` URLs; esc_url() does the same here.
+						$html .= in_array( $part[3], array( 'href', 'src', 'action', 'formaction' ), true ) ? esc_url( $value ) : self::esc_plain_text( $value );
+					} elseif ( isset( $component['props'][ $part[1] ]['format'] ) && 'html' === $component['props'][ $part[1] ]['format'] ) {
+						// HTML props are printed as is; callers escape what they pass.
+						$html .= $value;
+					} else {
+						$html .= self::esc_plain_text( $value );
+					}
+					break;
+
+				case 'text':
+					// A string React translates with `__()`, such as a "Dismiss" label.
+					$html .= self::esc_plain_text( translate( $part[1], $part[2] ) ); // phpcs:ignore WordPress.WP.I18n -- Strings from the React components.
+					break;
 			}
 		}
 
@@ -217,6 +227,46 @@ final class Gutenberg_UI_Components {
 	 */
 	private static function esc_plain_text( $text ) {
 		return htmlspecialchars( (string) $text, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8' );
+	}
+
+	/**
+	 * Keeps deprecated props and values working by mapping them to their
+	 * replacements, with a `_deprecated_argument()` notice.
+	 *
+	 * A deprecation is `{ prop, replacement, since }` for a renamed prop, or
+	 * `{ prop, value, replacement, since }` for a renamed value.
+	 *
+	 * @param array $deprecations The component's deprecations.
+	 * @param array $props        Props passed by the caller.
+	 * @return array Props with the replacements applied.
+	 */
+	private function apply_deprecations( $deprecations, $props ) {
+		foreach ( $deprecations as $deprecation ) {
+			$prop = $deprecation['prop'];
+			if ( ! array_key_exists( $prop, $props ) ) {
+				continue;
+			}
+
+			if ( isset( $deprecation['value'] ) ) {
+				if ( $props[ $prop ] !== $deprecation['value'] ) {
+					continue;
+				}
+				$props[ $prop ] = $deprecation['replacement'];
+				/* translators: 1: Old value. 2: Prop name. 3: New value. */
+				$message = sprintf( __( 'The "%1$s" value of "%2$s" is deprecated. Use "%3$s" instead.', 'gutenberg' ), $deprecation['value'], $prop, $deprecation['replacement'] );
+			} else {
+				if ( ! array_key_exists( $deprecation['replacement'], $props ) ) {
+					$props[ $deprecation['replacement'] ] = $props[ $prop ];
+				}
+				unset( $props[ $prop ] );
+				/* translators: 1: Old prop name. 2: New prop name. */
+				$message = sprintf( __( 'The "%1$s" prop is deprecated. Use "%2$s" instead.', 'gutenberg' ), $prop, $deprecation['replacement'] );
+			}
+
+			_deprecated_argument( __CLASS__ . '::render', esc_html( $deprecation['since'] ), esc_html( $message ) );
+		}
+
+		return $props;
 	}
 
 	/**
