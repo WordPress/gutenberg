@@ -2877,14 +2877,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/block-bindings.jsx": {
+	"packages/block-editor/src/hooks/block-bindings.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2892,14 +2886,6 @@
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/block-style-variation.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
@@ -2916,11 +2902,6 @@
 		}
 	},
 	"packages/block-editor/src/hooks/color.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/contrast-checker.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
@@ -3026,14 +3007,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/position.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/states.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -3102,11 +3075,6 @@
 		}
 	},
 	"packages/block-editor/src/hooks/test/layout.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/test/position.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}
