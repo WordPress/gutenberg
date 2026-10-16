@@ -19,8 +19,15 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
+import type {
+	BackgroundPanelProps,
+	PanelResetAllFilter,
+	PanelStyle,
+	StyleSettings,
+	StyleToolsPanelProps,
+} from './types';
 
-const DEFAULT_CONTROLS = {
+const DEFAULT_CONTROLS: Record< string, boolean > = {
 	backgroundImage: true,
 	backgroundColor: true,
 	gradient: true,
@@ -30,11 +37,15 @@ const DEFAULT_CONTROLS = {
 /**
  * Checks site settings to see if the requested feature's control may be used.
  *
- * @param {Object} settings Site settings.
- * @param {string} feature  Background feature to check.
- * @return {boolean}        Whether site settings has activated background panel.
+ * @param settings Site settings.
+ * @param feature  Background feature to check.
+ * @return Whether site settings has activated background panel.
  */
-export function useHasBackgroundControl( settings, feature ) {
+export function useHasBackgroundControl(
+	settings: StyleSettings | undefined,
+	feature:
+		'backgroundImage' | 'backgroundSize' | 'gradient' | 'backgroundClip'
+) {
 	return settings?.background?.[ feature ];
 }
 
@@ -47,10 +58,10 @@ export function useHasBackgroundControl( settings, feature ) {
  * support (`settings.color.background`), because background color and
  * the legacy `color.gradient` control are rendered here.
  *
- * @param {Object} settings Site settings
- * @return {boolean}        Whether site settings has activated background panel.
+ * @param settings Site settings
+ * @return Whether site settings has activated background panel.
  */
-export function useHasBackgroundPanel( settings ) {
+export function useHasBackgroundPanel( settings: StyleSettings | undefined ) {
 	const hasBackgroundColor = useHasBackgroundColorPanel( settings );
 	const { backgroundImage, gradient, backgroundClip } =
 		settings?.background || {};
@@ -62,10 +73,10 @@ export function useHasBackgroundPanel( settings ) {
  * attributes. Background size values include background size as well
  * as background position.
  *
- * @param {Object} style Style attribute.
- * @return {boolean}     Whether the block has a background size value set.
+ * @param style Style attribute.
+ * @return Whether the block has a background size value set.
  */
-export function hasBackgroundSizeValue( style ) {
+export function hasBackgroundSizeValue( style: PanelStyle | undefined ) {
 	return (
 		style?.background?.backgroundPosition !== undefined ||
 		style?.background?.backgroundSize !== undefined
@@ -75,10 +86,12 @@ export function hasBackgroundSizeValue( style ) {
 /**
  * Returns the `background-clip` values a theme allows.
  *
- * @param {Object} settings Block settings.
- * @return {string[]} Allowed values.
+ * @param settings Block settings.
+ * @return Allowed values.
  */
-export function getAllowedBackgroundClipValues( settings ) {
+export function getAllowedBackgroundClipValues(
+	settings: StyleSettings | undefined
+): string[] {
 	const clipSetting = settings?.background?.backgroundClip;
 	if ( true === clipSetting ) {
 		return VALID_BACKGROUND_CLIP_VALUES;
@@ -94,12 +107,16 @@ export function getAllowedBackgroundClipValues( settings ) {
  * Resolves the `background-clip` values a panel reads, and what they mean for
  * a text gradient. Shared by the Typography and Background panels.
  *
- * @param {Object}  value          Style being edited.
- * @param {Object=} baseValue      Default state style, set only while another state is selected.
- * @param {Object=} inheritedValue Style the block inherits.
- * @return {Object} The clips, and which of them clips to the text.
+ * @param value          Style being edited.
+ * @param baseValue      Default state style, set only while another state is selected.
+ * @param inheritedValue Style the block inherits.
+ * @return The clips, and which of them clips to the text.
  */
-export function getBackgroundClipState( value, baseValue, inheritedValue ) {
+export function getBackgroundClipState(
+	value: PanelStyle | undefined,
+	baseValue?: PanelStyle,
+	inheritedValue?: PanelStyle
+) {
 	const localClip = value?.background?.backgroundClip;
 	const baseClip = baseValue?.background?.backgroundClip;
 	const inheritedClip = inheritedValue?.background?.backgroundClip;
@@ -118,15 +135,18 @@ export function getBackgroundClipState( value, baseValue, inheritedValue ) {
  * Checks if there is a current value in the background image block support
  * attributes.
  *
- * @param {Object} style Style attribute.
- * @return {boolean}     Whether the block has a background image value set.
+ * @param style Style attribute.
+ * @return Whether the block has a background image value set.
  */
-export function hasBackgroundImageValue( style ) {
+export function hasBackgroundImageValue( style: PanelStyle | undefined ) {
+	// The string form has no ID or URL property.
+	const backgroundImage = style?.background?.backgroundImage as
+		{ id?: number; url?: string } | undefined;
 	return (
-		!! style?.background?.backgroundImage?.id ||
+		!! backgroundImage?.id ||
 		// Supports url() string values in theme.json.
 		'string' === typeof style?.background?.backgroundImage ||
-		!! style?.background?.backgroundImage?.url
+		!! backgroundImage?.url
 	);
 }
 
@@ -134,10 +154,10 @@ export function hasBackgroundImageValue( style ) {
  * Checks if there is a current value in the background gradient block support
  * attributes.
  *
- * @param {Object} style Style attribute.
- * @return {boolean}     Whether the block has a background gradient value set.
+ * @param style Style attribute.
+ * @return Whether the block has a background gradient value set.
  */
-export function hasBackgroundGradientValue( style ) {
+export function hasBackgroundGradientValue( style: PanelStyle | undefined ) {
 	return (
 		'string' === typeof style?.background?.gradient &&
 		style?.background?.gradient !== ''
@@ -148,10 +168,10 @@ export function hasBackgroundGradientValue( style ) {
  * Checks if there is a current value for the background color (written to
  * `color.background`).
  *
- * @param {Object} style Style attribute.
- * @return {boolean}     Whether the block has a background color value set.
+ * @param style Style attribute.
+ * @return Whether the block has a background color value set.
  */
-export function hasBackgroundColorValue( style ) {
+export function hasBackgroundColorValue( style: PanelStyle | undefined ) {
 	return !! style?.color?.background;
 }
 
@@ -160,10 +180,10 @@ export function hasBackgroundColorValue( style ) {
  * (used by blocks with color panel gradient support that haven't adopted the
  * `background.gradient` block support).
  *
- * @param {Object} style Style attribute.
- * @return {boolean}     Whether the block has a legacy color gradient value set.
+ * @param style Style attribute.
+ * @return Whether the block has a legacy color gradient value set.
  */
-export function hasLegacyColorGradientValue( style ) {
+export function hasLegacyColorGradientValue( style: PanelStyle | undefined ) {
 	return !! style?.color?.gradient;
 }
 
@@ -174,7 +194,7 @@ export function BackgroundToolsPanel( {
 	panelId,
 	children,
 	headerLabel,
-} ) {
+}: StyleToolsPanelProps ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -183,7 +203,8 @@ export function BackgroundToolsPanel( {
 
 	return (
 		<ToolsPanel
-			label={ headerLabel }
+			// The background panel passes its heading.
+			label={ headerLabel! }
 			resetAll={ resetAll }
 			panelId={ panelId }
 			hasInnerWrapper
@@ -213,7 +234,7 @@ export default function BackgroundImagePanel( {
 	headerLabel = __( 'Background' ),
 	contrastWarning,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
-} ) {
+}: BackgroundPanelProps ) {
 	const {
 		colors,
 		gradients,
@@ -275,7 +296,7 @@ export default function BackgroundImagePanel( {
 				'The gradient clips the background to the text, including any color or image.'
 			);
 
-	const resetAllFilter = useCallback(
+	const resetAllFilter: PanelResetAllFilter = useCallback(
 		( previousValue ) => {
 			const clearsColorBackground = showBackgroundColorControl;
 			const clearsColorGradient =
@@ -350,7 +371,7 @@ export default function BackgroundImagePanel( {
 	// Background color (written to `color.background`).
 	const backgroundColor = decodeValue( inheritedValue?.color?.background );
 	const userBackgroundColor = decodeValue( value?.color?.background );
-	const setBackgroundColor = ( newColor, newSlug ) => {
+	const setBackgroundColor = ( newColor?: string, newSlug?: string ) => {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'background' ],
@@ -360,7 +381,8 @@ export default function BackgroundImagePanel( {
 		// `color.background`. `background.gradient` is independent and
 		// should not be touched.
 		if ( showLegacyColorGradientControl ) {
-			newValue.color.gradient = undefined;
+			// The color was just set.
+			newValue.color!.gradient = undefined;
 		}
 		onChange( newValue );
 	};
@@ -371,7 +393,8 @@ export default function BackgroundImagePanel( {
 			undefined
 		);
 		if ( showLegacyColorGradientControl ) {
-			newValue.color.gradient = undefined;
+			// The color was just set.
+			newValue.color!.gradient = undefined;
 		}
 		onChange( newValue );
 	};
@@ -379,13 +402,17 @@ export default function BackgroundImagePanel( {
 	// Legacy `color.gradient` setters.
 	const legacyColorGradient = decodeValue( inheritedValue?.color?.gradient );
 	const userLegacyColorGradient = decodeValue( value?.color?.gradient );
-	const setLegacyColorGradient = ( newGradient, newSlug ) => {
+	const setLegacyColorGradient = (
+		newGradient?: string,
+		newSlug?: string
+	) => {
 		const newValue = setImmutably(
 			value,
 			[ 'color', 'gradient' ],
 			encodeGradientValue( newGradient, newSlug )
 		);
-		newValue.color.background = undefined;
+		// The color was just set.
+		newValue.color!.background = undefined;
 		onChange( newValue );
 	};
 	const resetLegacyColorGradient = () =>
@@ -411,7 +438,7 @@ export default function BackgroundImagePanel( {
 	// Set gradient value, encoding preset matches as slug references.
 	// Also clear color.gradient to migrate from the legacy location,
 	// matching the block inspector behavior in hooks/background.jsx.
-	const setGradient = ( newGradient, newSlug ) => {
+	const setGradient = ( newGradient?: string, newSlug?: string ) => {
 		let newValue = setImmutably(
 			value,
 			[ 'background', 'gradient' ],
@@ -429,7 +456,11 @@ export default function BackgroundImagePanel( {
 		onChange( newValue );
 	};
 
-	const inheritanceProps = ( isInherited, hasLocalOverride, classNames ) =>
+	const inheritanceProps = (
+		isInherited: boolean,
+		hasLocalOverride: boolean,
+		classNames: string
+	) =>
 		showInheritanceLabelIndicators
 			? getInheritanceProps( isInherited, hasLocalOverride, classNames )
 			: { className: classNames };
@@ -471,6 +502,7 @@ export default function BackgroundImagePanel( {
 						onChange={ onChange }
 						settings={ settings }
 						inheritedValue={ inheritedValue }
+						// @ts-expect-error BackgroundImageControl takes no default controls.
 						defaultControls={ defaultControls }
 						defaultValues={ defaultValues }
 						showInheritanceLabelIndicators={
@@ -631,7 +663,11 @@ export default function BackgroundImagePanel( {
 					panelId={ panelId }
 				>
 					<BackgroundClipControl
-						value={ localClip ?? baseClip ?? inheritedClip }
+						// Clip values are keywords.
+						value={
+							( localClip ?? baseClip ?? inheritedClip ) as
+								string | undefined
+						}
 						onChange={ ( newClip ) =>
 							onChange(
 								setImmutably(
