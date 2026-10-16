@@ -1,4 +1,9 @@
 import { store as blocksStore } from '@wordpress/blocks';
+import type { ComponentProps, ReactElement } from 'react';
+import type {
+	BlockTypeIconDescriptor,
+	BlockVariation,
+} from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
@@ -12,13 +17,17 @@ import { useMemo } from '@wordpress/element';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type {
+	BlockVariationTransformsProps,
+	VariationsControlProps,
+} from './types';
 
 function VariationsButtons( {
 	className,
 	onSelectVariation,
 	selectedValue,
 	variations,
-} ) {
+}: VariationsControlProps ) {
 	return (
 		<fieldset className={ className }>
 			<VisuallyHidden render={ <legend /> }>
@@ -54,7 +63,7 @@ function VariationsDropdown( {
 	onSelectVariation,
 	selectedValue,
 	variations,
-} ) {
+}: VariationsControlProps ) {
 	return (
 		<div className={ className }>
 			<Menu.Root>
@@ -86,11 +95,20 @@ function VariationsDropdown( {
 								<Menu.ItemLabel>
 									{ variation.title }
 								</Menu.ItemLabel>
-								{ variation.description && (
-									<Menu.ItemDescription>
-										{ variation.description }
-									</Menu.ItemDescription>
-								) }
+								{
+									// An empty description renders nothing.
+									( variation.description && (
+										<Menu.ItemDescription>
+											{ variation.description }
+										</Menu.ItemDescription>
+									) ) as
+										| ReactElement<
+												ComponentProps<
+													typeof Menu.ItemDescription
+												>
+										  >
+										| undefined
+								}
 							</Menu.RadioItem>
 						) ) }
 					</Menu.RadioGroup>
@@ -105,14 +123,17 @@ function VariationsToggleGroupControl( {
 	onSelectVariation,
 	selectedValue,
 	variations,
-} ) {
+}: VariationsControlProps ) {
 	return (
 		<div className={ className }>
 			<ToggleGroupControl
 				label={ __( 'Transform to variation' ) }
 				value={ selectedValue }
 				hideLabelFromVision
-				onChange={ onSelectVariation }
+				// The option values are variation names.
+				onChange={
+					onSelectVariation as ( value?: string | number ) => void
+				}
 			>
 				{ variations.map( ( variation ) => (
 					<ToggleGroupControlOptionIcon
@@ -137,7 +158,9 @@ function VariationsToggleGroupControl( {
 	);
 }
 
-function BlockVariationTransforms( { blockClientId } ) {
+function BlockVariationTransforms( {
+	blockClientId,
+}: BlockVariationTransformsProps ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const {
 		activeBlockVariation,
@@ -184,22 +207,28 @@ function BlockVariationTransforms( { blockClientId } ) {
 
 	// Check if each variation has a unique icon.
 	const hasUniqueIcons = useMemo( () => {
-		const variationIcons = new Set();
+		const variationIcons = new Set< unknown >();
 		if ( ! variations ) {
 			return false;
 		}
-		variations.forEach( ( variation ) => {
+		variations.forEach( ( variation: BlockVariation ) => {
 			if ( variation.icon ) {
-				variationIcons.add( variation.icon?.src || variation.icon );
+				variationIcons.add(
+					// A variation icon is a descriptor or the icon itself.
+					( variation.icon as unknown as BlockTypeIconDescriptor )
+						?.src || variation.icon
+				);
 			}
 		} );
 		return variationIcons.size === variations.length;
 	}, [ variations ] );
 
-	const onSelectVariation = ( variationName ) => {
+	const onSelectVariation = ( variationName: string ) => {
 		updateBlockAttributes( blockClientId, {
-			...variations.find( ( { name } ) => name === variationName )
-				.attributes,
+			// The selected variation is one of the listed ones.
+			...( variations as BlockVariation[] ).find(
+				( { name } ) => name === variationName
+			)!.attributes,
 		} );
 	};
 
