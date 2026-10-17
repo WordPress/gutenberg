@@ -44,10 +44,6 @@ export type ListViewExpansionState = Partial< Record< string, boolean > >;
 export type UpdateListViewExpansion = Dispatch< ListViewExpansionAction >;
 
 /**
- * Selects a block from the list view. A `null` focus position keeps focus in
- * the list view.
- */
-/**
  * The event that changes the selection from the list view.
  */
 export type ListViewSelectionEvent = Pick<
@@ -58,6 +54,10 @@ export type ListViewSelectionEvent = Pick<
 	detail?: number;
 };
 
+/**
+ * Selects a block from the list view. A `null` focus position keeps focus in
+ * the list view.
+ */
 export type ListViewSelectBlock = (
 	event: ListViewSelectionEvent | undefined,
 	clientId: string | undefined,
