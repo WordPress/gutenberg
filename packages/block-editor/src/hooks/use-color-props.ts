@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { useMemo } from '@wordpress/element';
+import type { Color, Gradient } from '@wordpress/global-styles-engine';
 import { getInlineStyles } from './style';
 import {
 	getColorClassName,
@@ -10,6 +11,7 @@ import {
 	getGradientValueBySlug,
 } from '../components/gradients';
 import { useSettings } from '../components/use-settings';
+import type { ColorAttributes } from './types';
 
 // The code in this file has largely been lifted from the color block support
 // hook.
@@ -22,11 +24,11 @@ import { useSettings } from '../components/use-settings';
  * Provides the CSS class names and inline styles for a block's color support
  * attributes.
  *
- * @param {Object} attributes Block attributes.
+ * @param attributes Block attributes.
  *
- * @return {Object} Color block support derived CSS classes & styles.
+ * @return Color block support derived CSS classes & styles.
  */
-export function getColorClassesAndStyles( attributes ) {
+export function getColorClassesAndStyles( attributes: ColorAttributes ) {
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
 	// Collect color CSS classes.
@@ -42,7 +44,8 @@ export function getColorClassesAndStyles( attributes ) {
 	// Determine color CSS class name list.
 	const className = clsx( textClass, gradientClass, {
 		// Don't apply the background class if there's a gradient.
-		[ backgroundClass ]: ! hasGradient && !! backgroundClass,
+		// An unset class is skipped, as `!! undefined` is false.
+		[ backgroundClass as string ]: ! hasGradient && !! backgroundClass,
 		'has-text-color': textColor || style?.color?.text,
 		'has-background':
 			backgroundColor ||
@@ -69,11 +72,11 @@ export function getColorClassesAndStyles( attributes ) {
  * Inline styles are forced for named colors to ensure these selections are
  * reflected when themes do not load their color stylesheets in the editor.
  *
- * @param {Object} attributes Block attributes.
+ * @param attributes Block attributes.
  *
- * @return {Object} ClassName & style props from colors block support.
+ * @return ClassName & style props from colors block support.
  */
-export function useColorProps( attributes ) {
+export function useColorProps( attributes: ColorAttributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
 	const [
@@ -90,7 +93,15 @@ export function useColorProps( attributes ) {
 		'color.gradients.custom',
 		'color.gradients.theme',
 		'color.gradients.default'
-	);
+	) as [
+		// The settings list the palettes and gradients of each origin.
+		Color[] | undefined,
+		Color[] | undefined,
+		Color[] | undefined,
+		Gradient[] | undefined,
+		Gradient[] | undefined,
+		Gradient[] | undefined,
+	];
 
 	const colors = useMemo(
 		() => [

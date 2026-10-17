@@ -1,6 +1,7 @@
 import { getInlineStyles } from './style';
 import { getBorderClasses, getMultiOriginColor } from './border';
 import useMultipleOriginColorsAndGradients from '../components/colors-gradients/use-multiple-origin-colors-and-gradients';
+import type { BorderAttributes } from './types';
 
 // This utility is intended to assist where the serialization of the border
 // block support is being skipped for a block but the border related CSS classes
@@ -10,10 +11,10 @@ import useMultipleOriginColorsAndGradients from '../components/colors-gradients/
  * Provides the CSS class names and inline styles for a block's border support
  * attributes.
  *
- * @param {Object} attributes Block attributes.
- * @return {Object} Border block support derived CSS classes & styles.
+ * @param attributes Block attributes.
+ * @return Border block support derived CSS classes & styles.
  */
-export function getBorderClassesAndStyles( attributes ) {
+export function getBorderClassesAndStyles( attributes: BorderAttributes ) {
 	const border = attributes.style?.border || {};
 	const className = getBorderClasses( attributes );
 
@@ -30,11 +31,11 @@ export function getBorderClassesAndStyles( attributes ) {
  * Inline styles are forced for named colors to ensure these selections are
  * reflected when themes do not load their color stylesheets in the editor.
  *
- * @param {Object} attributes Block attributes.
+ * @param attributes Block attributes.
  *
- * @return {Object} ClassName & style props from border block support.
+ * @return ClassName & style props from border block support.
  */
-export function useBorderProps( attributes ) {
+export function useBorderProps( attributes: BorderAttributes ) {
 	const { colors } = useMultipleOriginColorsAndGradients();
 	const borderProps = getBorderClassesAndStyles( attributes );
 	const { borderColor } = attributes;

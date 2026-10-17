@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import type { Block, BlockType } from '@wordpress/blocks';
+import type { Color } from '@wordpress/global-styles-engine';
 import { useMemo } from '@wordpress/element';
 import {
 	getColorClassName,
@@ -13,11 +15,20 @@ import {
 	getBackgroundImageClasses,
 } from './background';
 import { useSettings } from '../components/use-settings';
+import type { PanelStyle } from '../components/global-styles/types';
+import type { BlockWrapperProps, ColorAttributes, ColorSupport } from './types';
+
+type BlockNameOrType = string | BlockType;
+
+// The support flags each color feature; `true` reads as no flags set.
+const getColorSupport = ( blockNameOrType: BlockNameOrType ) =>
+	getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY ) as
+		ColorSupport | null | undefined;
 
 export const COLOR_SUPPORT_KEY = 'color';
 
-const hasColorSupport = ( blockNameOrType ) => {
-	const colorSupport = getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY );
+const hasColorSupport = ( blockNameOrType: BlockNameOrType ) => {
+	const colorSupport = getColorSupport( blockNameOrType );
 	return (
 		colorSupport &&
 		( colorSupport.link === true ||
@@ -27,8 +38,8 @@ const hasColorSupport = ( blockNameOrType ) => {
 	);
 };
 
-const hasLinkColorSupport = ( blockType ) => {
-	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+const hasLinkColorSupport = ( blockType: BlockNameOrType ) => {
+	const colorSupport = getColorSupport( blockType );
 
 	return (
 		colorSupport !== null &&
@@ -37,8 +48,8 @@ const hasLinkColorSupport = ( blockType ) => {
 	);
 };
 
-const hasGradientSupport = ( blockNameOrType ) => {
-	const colorSupport = getBlockSupport( blockNameOrType, COLOR_SUPPORT_KEY );
+const hasGradientSupport = ( blockNameOrType: BlockNameOrType ) => {
+	const colorSupport = getColorSupport( blockNameOrType );
 
 	return (
 		colorSupport !== null &&
@@ -47,14 +58,14 @@ const hasGradientSupport = ( blockNameOrType ) => {
 	);
 };
 
-const hasBackgroundColorSupport = ( blockType ) => {
-	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+const hasBackgroundColorSupport = ( blockType: BlockNameOrType ) => {
+	const colorSupport = getColorSupport( blockType );
 
 	return colorSupport && colorSupport.background !== false;
 };
 
-const hasTextColorSupport = ( blockType ) => {
-	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+const hasTextColorSupport = ( blockType: BlockNameOrType ) => {
+	const colorSupport = getColorSupport( blockType );
 
 	return colorSupport && colorSupport.text !== false;
 };
@@ -63,11 +74,11 @@ const hasTextColorSupport = ( blockType ) => {
  * Filters registered block settings, extending attributes to include
  * `backgroundColor` and `textColor` attribute.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-function addAttributes( settings ) {
+function addAttributes( settings: BlockType ): BlockType {
 	if ( ! hasColorSupport( settings ) ) {
 		return settings;
 	}
@@ -102,13 +113,17 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject colors classnames.
  *
- * @param {Object}        props           Additional props applied to save element.
- * @param {Object|string} blockNameOrType Block type.
- * @param {Object}        attributes      Block attributes.
+ * @param props           Additional props applied to save element.
+ * @param blockNameOrType Block type.
+ * @param attributes      Block attributes.
  *
- * @return {Object} Filtered props applied to save element.
+ * @return Filtered props applied to save element.
  */
-export function addSaveProps( props, blockNameOrType, attributes ) {
+export function addSaveProps(
+	props: BlockWrapperProps,
+	blockNameOrType: BlockNameOrType,
+	attributes: ColorAttributes
+): BlockWrapperProps {
 	if (
 		! hasColorSupport( blockNameOrType ) ||
 		shouldSkipSerialization( blockNameOrType, COLOR_SUPPORT_KEY )
@@ -121,7 +136,7 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 	// I'd have preferred to avoid the "style" attribute usage here
 	const { backgroundColor, textColor, gradient, style } = attributes;
 
-	const shouldSerialize = ( feature ) =>
+	const shouldSerialize = ( feature: string ) =>
 		! shouldSkipSerialization(
 			blockNameOrType,
 			COLOR_SUPPORT_KEY,
@@ -164,7 +179,8 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 
 	const newClassName = clsx( props.className, textClass, gradientClass, {
 		// Don't apply the background class if there's a custom gradient.
-		[ backgroundClass ]:
+		// An unset class is skipped, as `!! undefined` is false.
+		[ backgroundClass as string ]:
 			( ! hasGradient || ! style?.color?.gradient ) && !! backgroundClass,
 		'has-text-color':
 			shouldSerialize( 'text' ) && ( textColor || style?.color?.text ),
@@ -190,8 +206,11 @@ export function addSaveProps( props, blockNameOrType, attributes ) {
 }
 
 // Mirror of the background support's per-feature skip on the front end.
-function getSerializedBackgroundClasses( name, style ) {
-	const shouldSerialize = ( feature ) =>
+function getSerializedBackgroundClasses(
+	name: string,
+	style: PanelStyle | undefined
+) {
+	const shouldSerialize = ( feature: string ) =>
 		! shouldSkipSerialization( name, BACKGROUND_SUPPORT_KEY, feature );
 
 	return getBackgroundImageClasses( {
@@ -215,12 +234,12 @@ function useBlockProps( {
 	textColor,
 	gradient,
 	style,
-} ) {
+}: ColorAttributes & { name: string } ): BlockWrapperProps {
 	const [ userPalette, themePalette, defaultPalette ] = useSettings(
 		'color.palette.custom',
 		'color.palette.theme',
 		'color.palette.default'
-	);
+	) as Array< Color[] | undefined >;
 
 	const colors = useMemo(
 		() => [
@@ -241,7 +260,10 @@ function useBlockProps( {
 	if ( shouldSkipSerialization( name, COLOR_SUPPORT_KEY ) ) {
 		return backgroundClassName ? { className: backgroundClassName } : {};
 	}
-	const extraStyles = {};
+	const extraStyles: {
+		color?: string | null;
+		backgroundColor?: string | null;
+	} = {};
 
 	if (
 		textColor &&
@@ -299,7 +321,12 @@ const MIGRATION_PATHS = {
 	gradient: [ [ 'gradient' ], [ 'style', 'color', 'gradient' ] ],
 };
 
-export function addTransforms( result, source, index, results ) {
+export function addTransforms(
+	result: Block,
+	source: Block[],
+	index: number,
+	results: Block[]
+) {
 	const destinationBlockType = result.name;
 	const activeSupports = {
 		linkColor: hasLinkColorSupport( destinationBlockType ),

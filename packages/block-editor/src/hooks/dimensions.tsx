@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import InspectorControls from '../components/inspector-controls';
 import {
@@ -20,6 +21,14 @@ import {
 	useBlockStyleState,
 } from './block-style-state';
 import { isAxialBlockGapAllowed } from './gap';
+import type { PanelStyle } from '../components/global-styles/types';
+import type { Layout } from '../layouts/types';
+import type {
+	DimensionsAttributes,
+	DimensionsHookPanelProps,
+	ResetAllFilter,
+	StyleInspectorControlProps,
+} from './types';
 
 export const DIMENSIONS_SUPPORT_KEY = 'dimensions';
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -27,7 +36,7 @@ export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ];
 export const AXIAL_SIDES = [ 'vertical', 'horizontal' ];
 
 function useVisualizer() {
-	const [ property, setProperty ] = useState( false );
+	const [ property, setProperty ] = useState< string | false >( false );
 	const { hideBlockInterface, showBlockInterface } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -39,12 +48,15 @@ function useVisualizer() {
 		}
 	}, [ property, showBlockInterface, hideBlockInterface ] );
 
-	return [ property, setProperty ];
+	return [ property, setProperty ] as const;
 }
 
-function DimensionsInspectorControl( { children, resetAllFilter } ) {
+function DimensionsInspectorControl( {
+	children,
+	resetAllFilter,
+}: StyleInspectorControlProps ) {
 	const attributesResetAllFilter = useCallback(
-		( attributes ) => {
+		( attributes: DimensionsAttributes ) => {
 			const existingStyle = attributes.style;
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -58,25 +70,33 @@ function DimensionsInspectorControl( { children, resetAllFilter } ) {
 	return (
 		<InspectorControls
 			group="dimensions"
-			resetAllFilter={ attributesResetAllFilter }
+			// The filter reads the style attribute.
+			resetAllFilter={ attributesResetAllFilter as ResetAllFilter }
 		>
 			{ children }
 		</InspectorControls>
 	);
 }
 
-export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
+export function DimensionsPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+}: DimensionsHookPanelProps ) {
 	const selectedState = useBlockStyleState();
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 	const isEnabled = useHasDimensionsPanel( settings, selectedState );
-	const { style, className, layout } = useSelect(
+	const { style, className, layout }: DimensionsAttributes = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
 				return {};
 			}
-			const attributes =
-				select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			const attributes = ( select( blockEditorStore ).getBlockAttributes(
+				clientId
+				// The block's attributes hold its styles and layout.
+			) || {} ) as DimensionsAttributes;
 			return {
 				style: attributes.style,
 				className: attributes.className,
@@ -94,15 +114,17 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 
 	const [ visualizedProperty, setVisualizedProperty ] = useVisualizer();
 	const value = isStateSelected
-		? getStyleForState( style, selectedState )
+		? // The state styles have the shape of the block styles.
+			( getStyleForState( style, selectedState ) as
+				PanelStyle | undefined )
 		: style;
 	const onChange = isStateSelected
-		? ( newStyle ) => {
+		? ( newStyle: PanelStyle ) => {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
 			}
-		: ( newStyle ) => {
+		: ( newStyle: PanelStyle ) => {
 				setAttributes( {
 					style: cleanEmptyObject( newStyle ),
 				} );
@@ -112,15 +134,19 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
+	// The default controls map control names to whether they show.
 	const defaultDimensionsControls = getBlockSupport( name, [
 		DIMENSIONS_SUPPORT_KEY,
 		'__experimentalDefaultControls',
-	] );
+	] ) as Record< string, boolean > | undefined;
 	const defaultSpacingControls = getBlockSupport( name, [
 		SPACING_SUPPORT_KEY,
 		'__experimentalDefaultControls',
-	] );
-	const { default: defaultLayout } = getBlockSupport( name, 'layout' ) || {};
+	] ) as Record< string, boolean > | undefined;
+	const { default: defaultLayout } =
+		// The layout support may set a default layout.
+		( getBlockSupport( name, 'layout' ) as
+			{ default?: Layout } | undefined ) || {};
 	const defaultControls = {
 		// In the block inspector, minHeight and minWidth should not
 		// be shown by default unless the block explicitly opts in.
@@ -174,13 +200,18 @@ export function DimensionsPanel( { clientId, name, setAttributes, settings } ) {
 /**
  * Determine whether there is block support for dimensions.
  *
- * @param {string} blockName Block name.
- * @param {string} feature   Background image feature to check for.
+ * @param blockName Block name.
+ * @param feature   Background image feature to check for.
  *
- * @return {boolean} Whether there is support.
+ * @return Whether there is support.
  */
-export function hasDimensionsSupport( blockName, feature = 'any' ) {
-	const support = getBlockSupport( blockName, DIMENSIONS_SUPPORT_KEY );
+export function hasDimensionsSupport(
+	blockName: string | BlockType,
+	feature: string = 'any'
+): boolean {
+	// The support is `true` or flags each dimension.
+	const support = getBlockSupport( blockName, DIMENSIONS_SUPPORT_KEY ) as
+		true | Record< string, unknown > | undefined;
 
 	if ( support === true ) {
 		return true;
@@ -199,7 +230,7 @@ export function hasDimensionsSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
-export function isExplicitAspectRatio( aspectRatio ) {
+export function isExplicitAspectRatio( aspectRatio: unknown ) {
 	if ( ! aspectRatio ) {
 		return false;
 	}
@@ -210,12 +241,22 @@ export function isExplicitAspectRatio( aspectRatio ) {
 export default {
 	useBlockProps,
 	attributeKeys: [ 'height', 'minHeight', 'width', 'style' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasDimensionsSupport( name );
 	},
 };
 
-function useBlockProps( { name, height, minHeight, style } ) {
+function useBlockProps( {
+	name,
+	height,
+	minHeight,
+	style,
+}: {
+	name: string;
+	height?: string;
+	minHeight?: string;
+	style?: PanelStyle;
+} ) {
 	if (
 		! hasDimensionsSupport( name, 'aspectRatio' ) ||
 		shouldSkipSerialization( name, DIMENSIONS_SUPPORT_KEY, 'aspectRatio' )
@@ -232,7 +273,11 @@ function useBlockProps( { name, height, minHeight, style } ) {
 
 	// Allow dimensions-based inline style overrides to override any global styles rules that
 	// might be set for the block, and therefore affect the display of the aspect ratio.
-	const inlineStyleOverrides = {};
+	const inlineStyleOverrides: {
+		minHeight?: string;
+		height?: string;
+		aspectRatio?: string;
+	} = {};
 
 	// Apply rules to unset incompatible styles.
 	// Note that an explicit `aspectRatio` will win out if both an aspect ratio and height-related properties are set.

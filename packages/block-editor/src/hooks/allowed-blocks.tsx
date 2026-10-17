@@ -1,10 +1,16 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
+import type { Block, BlockType } from '@wordpress/blocks';
 import { PrivateInspectorControlsAllowedBlocks } from '../components/inspector-controls/groups';
 import BlockAllowedBlocksControl from '../components/block-allowed-blocks/allowed-blocks-control';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import type { BlockSupportEditProps } from './types';
 
-function BlockEditAllowedBlocksControlPure( { clientId } ) {
+type AllowedBlocksBlock = Block< { allowedBlocks?: string[] } >;
+
+function BlockEditAllowedBlocksControlPure( {
+	clientId,
+}: Pick< BlockSupportEditProps, 'clientId' > ) {
 	const blockEditingMode = useBlockEditingMode();
 	const isContentOnly = blockEditingMode === 'contentOnly';
 
@@ -27,7 +33,7 @@ export default {
 	// InspectorControlsFill. Opt out of rendering during pattern editing so a
 	// section doesn't gain a Settings tab holding only Manage allowed blocks.
 	supportsPatternEditing: false,
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, 'allowedBlocks' );
 	},
 };
@@ -35,11 +41,11 @@ export default {
 /**
  * Filters registered block settings, extending attributes with allowedBlocks.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-export function addAttribute( settings ) {
+export function addAttribute( settings: BlockType ): BlockType {
 	// Allow blocks to specify their own attribute definition with default values if needed.
 	if ( settings?.attributes?.allowedBlocks?.type ) {
 		return settings;
@@ -66,13 +72,18 @@ addFilter(
 /**
  * Add transforms to preserve allowedBlocks on block transformations.
  *
- * @param {Object} result  The transformed block.
- * @param {Array}  source  Original blocks transformed.
- * @param {number} index   Index of the transformed block.
- * @param {Array}  results All blocks that resulted from the transformation.
- * @return {Object} Modified transformed block.
+ * @param result  The transformed block.
+ * @param source  Original blocks transformed.
+ * @param index   Index of the transformed block.
+ * @param results All blocks that resulted from the transformation.
+ * @return Modified transformed block.
  */
-export function addTransforms( result, source, index, results ) {
+export function addTransforms(
+	result: AllowedBlocksBlock,
+	source: AllowedBlocksBlock[],
+	index: number,
+	results: AllowedBlocksBlock[]
+): AllowedBlocksBlock {
 	if ( ! hasBlockSupport( result.name, 'allowedBlocks' ) ) {
 		return result;
 	}

@@ -1,9 +1,11 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
 import { kebabCase } from '@wordpress/kebab-case';
 import { shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
+import type { BlockSupportEditProps, BlockWrapperProps } from './types';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
 
@@ -11,10 +13,10 @@ export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
  * Filters registered block settings, extending attributes to include
  * the `fontFamily` attribute.
  *
- * @param {Object} settings Original block settings
- * @return {Object}         Filtered block settings
+ * @param settings Original block settings
+ * @return Filtered block settings
  */
-function addAttributes( settings ) {
+function addAttributes( settings: BlockType ): BlockType {
 	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
 		return settings;
 	}
@@ -34,12 +36,17 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject font family.
  *
- * @param {Object} props      Additional props applied to save element
- * @param {Object} blockType  Block type
- * @param {Object} attributes Block attributes
- * @return {Object}           Filtered props applied to save element
+ * @param props                 Additional props applied to save element
+ * @param blockType             Block type
+ * @param attributes            Block attributes
+ * @param attributes.fontFamily Font family preset slug
+ * @return Filtered props applied to save element
  */
-function addSaveProps( props, blockType, attributes ) {
+function addSaveProps(
+	props: BlockWrapperProps,
+	blockType: BlockType | string,
+	attributes: { fontFamily?: string }
+): BlockWrapperProps {
 	if ( ! hasBlockSupport( blockType, FONT_FAMILY_SUPPORT_KEY ) ) {
 		return props;
 	}
@@ -67,7 +74,13 @@ function addSaveProps( props, blockType, attributes ) {
 	return props;
 }
 
-function useBlockProps( { name, fontFamily } ) {
+function useBlockProps( {
+	name,
+	fontFamily,
+}: {
+	name: string;
+	fontFamily?: string;
+} ) {
 	return addSaveProps( {}, name, { fontFamily } );
 }
 
@@ -75,7 +88,7 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'fontFamily' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
 	},
 };
@@ -85,10 +98,12 @@ export default {
  * disabling the font family support controls for a block via a progressive
  * discovery panel.
  *
- * @param {Object} props               Block props.
- * @param {Object} props.setAttributes Function to set block's attributes.
+ * @param props               Block props.
+ * @param props.setAttributes Function to set block's attributes.
  */
-export function resetFontFamily( { setAttributes } ) {
+export function resetFontFamily( {
+	setAttributes,
+}: Pick< BlockSupportEditProps, 'setAttributes' > ) {
 	setAttributes( { fontFamily: undefined } );
 }
 

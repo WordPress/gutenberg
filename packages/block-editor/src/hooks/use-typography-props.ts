@@ -1,8 +1,13 @@
 import clsx from 'clsx';
 import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
 import { kebabCase } from '@wordpress/kebab-case';
+import type {
+	FontSizePreset,
+	GlobalStylesSettings,
+} from '@wordpress/global-styles-engine';
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
+import type { TypographyAttributes } from './types';
 
 /*
  * This utility is intended to assist where the serialization of the typography
@@ -18,13 +23,18 @@ import { getFontSizeClass } from '../components/font-sizes';
  *
  * @return {Object} Typography block support derived CSS classes & styles.
  */
-export function getTypographyClassesAndStyles( attributes, settings ) {
+export function getTypographyClassesAndStyles(
+	attributes: TypographyAttributes | undefined,
+	settings?: GlobalStylesSettings | boolean
+) {
 	let typographyStyles = attributes?.style?.typography || {};
 	typographyStyles = {
 		...typographyStyles,
 		fontSize: getTypographyFontSizeValue(
-			{ size: attributes?.style?.typography?.fontSize },
-			settings
+			// It reads only the preset size.
+			{ size: attributes?.style?.typography?.fontSize } as FontSizePreset,
+			// It reads the settings optionally, so a boolean reads as none.
+			settings as GlobalStylesSettings
 		),
 	};
 

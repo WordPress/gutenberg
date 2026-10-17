@@ -1,8 +1,10 @@
 import { getInlineStyles } from './style';
+import type { StyleAttributes } from './types';
 import {
 	getBackgroundImageClasses,
 	setBackgroundStyleDefaults,
 } from './background';
+import type { PanelStyle } from '../components/global-styles/types';
 
 // This utility is intended to assist where the serialization of the background
 // block support is being skipped for a block but the background related CSS
@@ -16,9 +18,10 @@ import {
  * @param {Object} attributes Block attributes.
  * @return {Object} Background block support derived CSS classes & styles.
  */
-export function getBackgroundClassesAndStyles( attributes ) {
+export function getBackgroundClassesAndStyles( attributes: StyleAttributes ) {
 	const { style } = attributes;
-	const backgroundStyles = style?.background || {};
+	const backgroundStyles: NonNullable< PanelStyle[ 'background' ] > =
+		style?.background || {};
 
 	// Mirrors gutenberg_render_background_support() in lib/block-supports/background.php.
 	const className =
@@ -48,6 +51,6 @@ export function getBackgroundClassesAndStyles( attributes ) {
  *
  * @return {Object} ClassName & style props from background block support.
  */
-export function useBackgroundProps( attributes ) {
+export function useBackgroundProps( attributes: StyleAttributes ) {
 	return getBackgroundClassesAndStyles( attributes );
 }
