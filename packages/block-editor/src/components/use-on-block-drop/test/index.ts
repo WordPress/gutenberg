@@ -182,7 +182,10 @@ describe( 'onBlockDrop', () => {
 			targetBlockIndex,
 			getBlockIndex,
 			getClientIdsOfDescendants,
-			moveBlocks
+			moveBlocks,
+			noop,
+			noop,
+			'insert'
 		);
 		eventHandler( event as unknown as DragEvent );
 

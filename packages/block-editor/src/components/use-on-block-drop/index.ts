@@ -106,10 +106,14 @@ export function onBlockDrop(
 
 			// If the user is dropping to the same position, including between
 			// the dragged blocks, return early.
+			const lastSamePositionIndex =
+				operation === 'insert'
+					? sourceBlockIndex + sourceClientIds!.length
+					: sourceBlockIndex;
 			if (
 				sourceRootClientId === targetRootClientId &&
 				targetBlockIndex >= sourceBlockIndex &&
-				targetBlockIndex <= sourceBlockIndex + sourceClientIds!.length
+				targetBlockIndex <= lastSamePositionIndex
 			) {
 				return;
 			}
