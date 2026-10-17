@@ -378,6 +378,10 @@ export type Settings = Record< string | symbol, unknown > & {
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
+	/** Whether each block shows the inspector tabs, keyed by name or `default`. */
+	blockInspectorTabs?: Record< string, boolean >;
+	blockInspectorAnimation?: BlockInspectorAnimationSettings;
+	blockStatesEditingEnabled?: boolean;
 	__experimentalUndo?: () => void;
 	__unstableResolvedAssets?: ResolvedAssets;
 	__internalIsInitialized?: boolean;
@@ -406,6 +410,14 @@ export type Settings = Record< string | symbol, unknown > & {
 		select: typeof globalSelect
 	) => UserPatternCategory[];
 };
+
+/**
+ * How the block inspector animates, keyed by the block names it animates.
+ */
+export type BlockInspectorAnimationSettings = {
+	/** The block whose descendants animate. */
+	animationParent?: string;
+} & Partial< Record< string, { enterDirection?: string } | string > >;
 
 /**
  * A reference to the element that had focus when focus left the editor canvas.

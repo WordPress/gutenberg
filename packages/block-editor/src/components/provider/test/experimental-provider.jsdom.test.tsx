@@ -5,6 +5,8 @@ import type { DataRegistry } from '@wordpress/data';
 import { BlockEditorProvider, ExperimentalBlockEditorProvider } from '../';
 import { store as blockEditorStore } from '../../../store';
 
+const blockInspectorAnimation = { animationParent: 'core/test' };
+
 const HasEditorSetting = ( props: {
 	setRegistry?: ( registry: DataRegistry ) => void;
 } ) => {
@@ -41,7 +43,7 @@ describe( 'BlockEditorProvider', () => {
 		render(
 			<BlockEditorProvider
 				settings={ {
-					blockInspectorAnimation: true,
+					blockInspectorAnimation,
 				} }
 			>
 				<HasEditorSetting setRegistry={ setRegistry } />
@@ -51,7 +53,9 @@ describe( 'BlockEditorProvider', () => {
 		// `blockInspectorAnimation` setting is one of the block editor's
 		// default settings, so it has a value. We're testing that its
 		// value was not updated.
-		expect( settings.blockInspectorAnimation ).not.toBe( true );
+		expect( settings.blockInspectorAnimation ).not.toBe(
+			blockInspectorAnimation
+		);
 	} );
 	it( 'should preserve stable settings', async () => {
 		render(
@@ -102,14 +106,16 @@ describe( 'ExperimentalBlockEditorProvider', () => {
 		render(
 			<ExperimentalBlockEditorProvider
 				settings={ {
-					blockInspectorAnimation: true,
+					blockInspectorAnimation,
 				} }
 			>
 				<HasEditorSetting setRegistry={ setRegistry } />
 			</ExperimentalBlockEditorProvider>
 		);
 		const settings = registry!.select( blockEditorStore ).getSettings();
-		expect( settings.blockInspectorAnimation ).toBe( true );
+		expect( settings.blockInspectorAnimation ).toBe(
+			blockInspectorAnimation
+		);
 	} );
 	it( 'should preserve stable settings', async () => {
 		render(
