@@ -1,7 +1,22 @@
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
 
 .text {
+	--_wp-components-text-font-size-body: var(--wpds-typography-font-size-md);
+	--_wp-components-text-font-size-caption: 10px;
+	--_wp-components-text-font-size-footnote: var(--wpds-typography-font-size-xs);
+	--_wp-components-text-font-size-largeTitle: 28px;
+	--_wp-components-text-font-size-subheadline: var(--wpds-typography-font-size-sm);
+	--_wp-components-text-font-size-title: var(--wpds-typography-font-size-xl);
+	--_wp-components-text-font-size-heading-1: calc(2.44 * var(--wpds-typography-font-size-md));
+	--_wp-components-text-font-size-heading-2: calc(1.95 * var(--wpds-typography-font-size-md));
+	--_wp-components-text-font-size-heading-3: calc(1.56 * var(--wpds-typography-font-size-md));
+	--_wp-components-text-font-size-heading-4: calc(1.25 * var(--wpds-typography-font-size-md));
+	--_wp-components-text-font-size-heading-5: var(--wpds-typography-font-size-md);
+	--_wp-components-text-font-size-heading-6: calc(0.8 * var(--wpds-typography-font-size-md));
+	--_wp-components-text-default-weight: var(--wpds-typography-font-weight-default);
+	--_wp-components-text-emphasis-weight: var(--wpds-typography-font-weight-emphasis);
 	// Reset instance values so nested Text does not inherit another instance's props.
 	--wp-components-text-color: initial;
 	--wp-components-text-display: initial;
@@ -16,6 +31,17 @@
 	font-weight: var(--wp-components-text-font-weight);
 	line-height: var(--wp-components-text-line-height, 1.4);
 	margin: 0;
+}
+
+// Keep the legacy control heights; the current control-size tokens use a different scale.
+.control-line-height {
+	--wp-components-text-line-height: calc(36px + #{$grid-unit-10});
+}
+
+@each $size, $scale in (large: 1.2, small: 0.8, xSmall: 0.6) {
+	.control-line-height-#{$size} {
+		--wp-components-text-line-height: calc(36px * #{$scale} + #{$grid-unit-10});
+	}
 }
 
 // Truncate's white-space declaration must win in either stylesheet order.

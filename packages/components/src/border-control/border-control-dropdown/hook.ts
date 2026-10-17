@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { COLORS } from '../../utils';
 import styles from '../style.module.scss';
 import type { DropdownProps } from '../types';
 
@@ -68,7 +67,7 @@ export function useBorderControlDropdown(
 					borderColor:
 						indicatorColor ||
 						( indicatorStyle !== 'none'
-							? COLORS.gray[ 300 ]
+							? 'var(--_wp-components-border-control-preview-color)'
 							: undefined ),
 				}
 			: undefined,

@@ -92,6 +92,7 @@
 }
 
 .input.input.input {
+	--_wp-components-input-control-affix-padding: var(--wpds-dimension-padding-xs);
 	// Keep the original specificity over wp-admin's form styles.
 	--_wp-components-input-control-padding: 12px;
 	background-color: transparent;

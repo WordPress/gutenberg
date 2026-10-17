@@ -1,6 +1,5 @@
 import { isRTL } from '@wordpress/i18n';
 import clsx from 'clsx';
-import { COLORS } from '../utils';
 import { getCSSWideKeyword } from './utils';
 import RangeMark from './mark';
 import { PolymorphicElement } from '../utils/polymorphic-element';
@@ -48,7 +47,7 @@ export default function RangeRail(
 				style={
 					{
 						'--_wp-components-range-control-rail-color':
-							railColor || COLORS.theme.gray[ 300 ],
+							railColor || undefined,
 						...style,
 					} as React.CSSProperties
 				}

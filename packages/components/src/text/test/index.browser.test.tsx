@@ -1,18 +1,8 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { getFontSize } from '../../utils/font-size';
-import { COLORS } from '../../utils';
+import '../../../../theme/prebuilt/css/design-tokens.css';
 import { Text } from '../';
-
-function resolveStyle( property: 'color' | 'fontSize', value: string ) {
-	const element = document.createElement( 'div' );
-	element.style[ property ] = value;
-	document.body.appendChild( element );
-	const resolved = getComputedStyle( element )[ property ];
-	element.remove();
-	return resolved;
-}
 
 // Source SCSS expects theme tokens; the production build adds their fallbacks.
 beforeEach( () => {
@@ -51,7 +41,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			resolveStyle( 'color', COLORS.white )
+			'rgb(255, 255, 255)'
 		);
 	} );
 
@@ -72,7 +62,7 @@ describe( 'Text', () => {
 		);
 		expect(
 			getComputedStyle( screen.getByRole( 'heading' ) ).fontSize
-		).toBe( resolveStyle( 'fontSize', getFontSize( 'title' ) ) );
+		).toBe( '20px' );
 	} );
 
 	test( 'should render custom size', async () => {
@@ -83,7 +73,7 @@ describe( 'Text', () => {
 		);
 		expect(
 			getComputedStyle( screen.getByRole( 'heading' ) ).fontSize
-		).toBe( resolveStyle( 'fontSize', getFontSize( 15 ) ) );
+		).toBe( '15px' );
 	} );
 
 	test( 'should render variant', async () => {
@@ -93,7 +83,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			resolveStyle( 'color', COLORS.theme.gray[ 700 ] )
+			'rgb(112, 112, 112)'
 		);
 	} );
 
@@ -148,7 +138,7 @@ describe( 'Text', () => {
 		);
 
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			resolveStyle( 'color', COLORS.theme.gray[ 700 ] )
+			'rgb(112, 112, 112)'
 		);
 	} );
 
