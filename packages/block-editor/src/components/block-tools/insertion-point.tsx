@@ -27,7 +27,7 @@ import type {
 } from './types';
 
 // The inserter is still JavaScript, so its inferred props are all required.
-const Inserter = UntypedInserter as ComponentType<
+type TypedInserter = ComponentType<
 	Partial< ComponentProps< typeof UntypedInserter > > &
 		RefAttributes< unknown >
 >;
@@ -43,6 +43,8 @@ function InbetweenInsertionPointPopover( {
 	operation = 'insert',
 	nearestSide = 'right',
 }: InbetweenInsertionPointPopoverProps ) {
+	// Read on render, like the JSX it replaces, as the imports are circular.
+	const Inserter = UntypedInserter as TypedInserter;
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	// Block tools provide the ref.
 	const openRef = useContext( InsertionPointOpenRef )!;

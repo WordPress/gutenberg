@@ -7,7 +7,7 @@ import useSelectedBlockToolProps from './use-selected-block-tool-props';
 import type { EmptyBlockInserterProps } from './types';
 
 // The inserter is still JavaScript, so its inferred props are all required.
-const Inserter = UntypedInserter as ComponentType<
+type TypedInserter = ComponentType<
 	Partial< ComponentProps< typeof UntypedInserter > > &
 		RefAttributes< unknown >
 >;
@@ -16,6 +16,8 @@ export default function EmptyBlockInserter( {
 	clientId,
 	__unstableContentRef,
 }: EmptyBlockInserterProps ) {
+	// Read on render, like the JSX it replaces, as the imports are circular.
+	const Inserter = UntypedInserter as TypedInserter;
 	const { isInsertionPointVisible, lastClientId, rootClientId } =
 		useSelectedBlockToolProps( clientId );
 
