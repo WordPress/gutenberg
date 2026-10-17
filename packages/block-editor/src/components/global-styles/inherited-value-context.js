@@ -90,13 +90,10 @@ function useContextHeadingLevel( blockName ) {
 }
 
 /**
- * Maps a block to the root-level Global Styles *element* layers that paint it
- * on the canvas, in addition to (or instead of) the block's own class — e.g. a
- * Button renders `.wp-element-button`, a level-2 Heading renders `<h2>`.
- *
- * Keys are ordered low to high precedence, so a level-specific `h2` wins over
- * the generic `heading`. A level of `0` (e.g. a Site or Post Title rendered as
- * a paragraph) renders no heading tag, so no element layer applies.
+ * The block types that render as a root-level Global Styles *element*, keyed
+ * by element: their whole selves are painted by `styles.elements[ key ]` on
+ * the canvas, in addition to (or instead of) the block's own class. A Button
+ * renders `.wp-element-button`, a level-2 Heading renders `<h2>`.
  *
  * Hand-maintained by necessity: the block-to-element relationship is not
  * inferable from block metadata. `supports.color.link` and friends mark blocks
@@ -105,58 +102,92 @@ function useContextHeadingLevel( blockName ) {
  * as a block property is tracked in
  * https://github.com/WordPress/gutenberg/issues/80438.
  *
- * Only blocks that *are* a link fold the `link` layer (e.g. Read More, Login/out
- * and the pagination links render `<a>` as their whole selves). Blocks that
- * merely *contain* a link — the heading family, Paragraph, Group, and the
- * hybrid blocks with a Link colour control (Post Author Name, Post Date, …) —
- * get no `link` layer: their inner-link control reads the
- * `inheritedValue.elements.link` passthrough instead, so folding `link` in would
- * bleed link color into the block's own text.
+ * Only blocks that *are* a link are listed under `link` (e.g. Read More,
+ * Login/out and the pagination links render `<a>` as their whole selves).
+ * Blocks that merely *contain* a link (the heading family, Paragraph, Group,
+ * and the hybrid blocks with a Link colour control such as Post Author Name
+ * and Post Date) are left out: their inner-link control reads the
+ * `inheritedValue.elements.link` passthrough instead, so folding `link` in
+ * would bleed link color into the block's own text.
+ */
+const ELEMENT_BLOCK_TYPES = {
+	button: [ 'core/button' ],
+	// Each also takes the `h1`-`h6` layer for its level, see `getElementLayers`.
+	heading: [
+		'core/accordion-heading',
+		'core/heading',
+		'core/post-title',
+		'core/site-title',
+		'core/query-title',
+		'core/comments-title',
+		'core/term-name',
+		'core/site-tagline',
+	],
+	// Whole-block link blocks: the entire block renders as an `<a>`, so the
+	// root `styles.elements.link` layer paints it, mirroring how `button`
+	// paints Button. For the blocks whose `color.text` support is disabled
+	// this is inert at the (hidden) text control while their typography
+	// controls now reflect the link element; Read More (`color.text: true`)
+	// surfaces the inherited link color at its Text control.
+	link: [
+		'core/read-more',
+		'core/loginout',
+		'core/post-navigation-link',
+		'core/query-pagination-next',
+		'core/query-pagination-previous',
+		'core/query-pagination-numbers',
+		'core/comments-pagination-next',
+		'core/comments-pagination-previous',
+		'core/comments-pagination-numbers',
+		'core/comment-edit-link',
+		'core/comment-reply-link',
+		'core/post-comments-link',
+	],
+};
+
+const HEADING_LEVEL_ELEMENT = /^h[1-6]$/;
+
+/**
+ * Maps a block to the root-level Global Styles element layers that paint it
+ * on the canvas. See `ELEMENT_BLOCK_TYPES`.
+ *
+ * Keys are ordered low to high precedence, so a level-specific `h2` wins over
+ * the generic `heading`. A level of `0` (e.g. a Site or Post Title rendered as
+ * a paragraph) renders no heading tag, so no element layer applies.
  *
  * @param {string}  blockName    Block name.
  * @param {?number} headingLevel Resolved heading level, from `getHeadingLevel`.
  * @return {string[]} Ordered element keys, low to high precedence.
  */
 function getElementLayers( blockName, headingLevel ) {
-	switch ( blockName ) {
-		case 'core/button':
-			return [ 'button' ];
-		case 'core/accordion-heading':
-		case 'core/heading':
-		case 'core/post-title':
-		case 'core/site-title':
-		case 'core/query-title':
-		case 'core/comments-title':
-		case 'core/term-name':
-		case 'core/site-tagline':
-			if ( headingLevel === 0 ) {
-				return [];
-			}
-			return headingLevel
-				? [ 'heading', `h${ headingLevel }` ]
-				: [ 'heading' ];
-		// Whole-block link blocks: the entire block renders as an `<a>`, so the
-		// root `styles.elements.link` layer paints it, mirroring how `button`
-		// paints Button. For the blocks whose `color.text` support is disabled
-		// this is inert at the (hidden) text control while their typography
-		// controls now reflect the link element; Read More (`color.text: true`)
-		// surfaces the inherited link color at its Text control.
-		case 'core/read-more':
-		case 'core/loginout':
-		case 'core/post-navigation-link':
-		case 'core/query-pagination-next':
-		case 'core/query-pagination-previous':
-		case 'core/query-pagination-numbers':
-		case 'core/comments-pagination-next':
-		case 'core/comments-pagination-previous':
-		case 'core/comments-pagination-numbers':
-		case 'core/comment-edit-link':
-		case 'core/comment-reply-link':
-		case 'core/post-comments-link':
-			return [ 'link' ];
-		default:
-			return [];
+	const element = Object.keys( ELEMENT_BLOCK_TYPES ).find( ( key ) =>
+		ELEMENT_BLOCK_TYPES[ key ].includes( blockName )
+	);
+	if ( ! element ) {
+		return [];
 	}
+	if ( element !== 'heading' ) {
+		return [ element ];
+	}
+	if ( headingLevel === 0 ) {
+		return [];
+	}
+	return headingLevel ? [ 'heading', `h${ headingLevel }` ] : [ 'heading' ];
+}
+
+/**
+ * The inverse of `getElementLayers`: the block types a root-level Global
+ * Styles element paints as their whole selves. `h1`-`h6` give the heading
+ * family, since its blocks can render at any level.
+ *
+ * @param {string} element Element key, e.g. `heading`, `h2` or `button`.
+ * @return {string[]} Block names, or an empty array for an element no block renders as.
+ */
+export function getBlockTypesForElement( element ) {
+	const key = HEADING_LEVEL_ELEMENT.test( element ) ? 'heading' : element;
+	return Object.hasOwn( ELEMENT_BLOCK_TYPES, key )
+		? ELEMENT_BLOCK_TYPES[ key ]
+		: [];
 }
 
 /**

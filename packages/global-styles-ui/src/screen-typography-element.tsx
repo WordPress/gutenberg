@@ -8,6 +8,7 @@ import { useState } from '@wordpress/element';
 import TypographyPanel from './typography-panel';
 import { ScreenHeader } from './screen-header';
 import TypographyPreview from './typography-preview';
+import ElementBlockOverrides from './element-block-overrides';
 
 const elements = {
 	text: {
@@ -123,6 +124,7 @@ function ScreenTypographyElement( { element }: ScreenTypographyElementProps ) {
 				element={ element }
 				headingLevel={ headingLevel }
 			/>
+			<ElementBlockOverrides element={ element } />
 		</>
 	);
 }
