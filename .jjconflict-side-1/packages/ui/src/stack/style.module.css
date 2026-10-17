@@ -1,9 +1,0 @@
-@layer wp-ui {
-	@layer utilities, components, compositions, overrides;
-
-	@layer components {
-		.stack {
-			display: flex;
-		}
-	}
-}

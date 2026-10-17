@@ -1,7 +1,7 @@
 import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
 import 'requestidlecallback';
 import { toVdom } from './vdom';
-import { createRootFragment, splitTask } from './utils';
+import { createRootFragment, splitTask, warn } from './utils';
 
 // Keep the same root fragment for each interactive region node.
 const regionRootFragments = new WeakMap();
@@ -60,12 +60,19 @@ const observedNodes = new Set< Element >();
  * @param node The island element to hydrate.
  */
 const hydrateNode = async ( node: Element ) => {
-	const fragment = getRegionRootFragment( node );
-	const vdom = toVdom( node );
-	initialVdom.set( node, vdom );
-	await splitTask();
-	hydrate( vdom, fragment );
-	await splitTask();
+	try {
+		const fragment = getRegionRootFragment( node );
+		const vdom = toVdom( node );
+		initialVdom.set( node, vdom );
+		await splitTask();
+		hydrate( vdom, fragment );
+	} catch ( e ) {
+		warn(
+			`Failed to hydrate island: ${( e as Error ).message ?? e}`
+		);
+	} finally {
+		await splitTask();
+	}
 };
 
 /**
@@ -126,22 +133,27 @@ export const hydrateRegions = async () => {
 					continue;
 				}
 
-				const node = entry.target;
+				const node = entry.target as Element;
 				intersectionObserverInstance.unobserve( node );
 				observedNodes.delete( node );
-
 				// The node is unobserved on its first intersection, so it is
 				// hydrated once.
+				// `hydrateNode` handles its own errors, so a single
+				// failing island cannot abort the rest of the batch.
 				await hydrateNode( node );
+			}
 
-				if ( observedNodes.size === 0 ) {
-					intersectionObserverInstance.disconnect();
-					// All islands have been hydrated: resolve the promise with
-					// the fully populated initialVdom so the router can start
-					// doing the DOM diffing between the previous and next pages.
-					idleFired = true; // Disarm the idle-time sweep.
-					resolveInitialVdom( initialVdom );
-				}
+			// All observed islands have been hydrated: resolve the promise
+			// with the fully populated initialVdom so the router can start
+			// doing the DOM diffing between the previous and next pages.
+			// Resolving AFTER the batch's hydration attempts (rather than
+			// before the last node's hydrate) guarantees the router never
+			// reads a partially hydrated island list.
+			if ( observedNodes.size === 0 ) {
+				intersectionObserverInstance.disconnect();
+				// Disarm the idle-time sweep.
+				idleFired = true;
+				resolveInitialVdom( initialVdom );
 			}
 		},
 		{

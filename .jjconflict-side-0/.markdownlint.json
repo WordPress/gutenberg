@@ -1,4 +1,0 @@
-{
-	"extends": "packages/scripts/config/.markdownlint.json",
-	"MD033": false
-}
