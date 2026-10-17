@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { __experimentalHasSplitBorders as hasSplitBorders } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -20,12 +21,28 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
+import type { ColorOrigin } from '../components/colors-gradients/types';
+import type { PanelStyle } from '../components/global-styles/types';
+import type {
+	BorderAttributes,
+	BorderHookPanelProps,
+	BlockWrapperProps,
+	MultiOriginColor,
+	ResetAllFilter,
+	StyleInspectorControlProps,
+} from './types';
+
+type BorderBoxValue = Parameters< typeof hasSplitBorders >[ 0 ];
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 export const SHADOW_SUPPORT_KEY = 'shadow';
 
-const getColorByProperty = ( colors, property, value ) => {
-	let matchedColor;
+const getColorByProperty = (
+	colors: ColorOrigin[],
+	property: 'slug' | 'color',
+	value: string
+) => {
+	let matchedColor: ColorOrigin[ 'colors' ][ number ] | undefined;
 
 	colors.some( ( origin ) =>
 		origin.colors.some( ( color ) => {
@@ -41,7 +58,15 @@ const getColorByProperty = ( colors, property, value ) => {
 	return matchedColor;
 };
 
-export const getMultiOriginColor = ( { colors, namedColor, customColor } ) => {
+export const getMultiOriginColor = ( {
+	colors,
+	namedColor,
+	customColor,
+}: {
+	colors: ColorOrigin[];
+	namedColor?: string | null;
+	customColor?: string;
+} ): MultiOriginColor => {
 	// Search each origin (default, theme, or user) for matching color by name.
 	if ( namedColor ) {
 		const colorObject = getColorByProperty( colors, 'slug', namedColor );
@@ -60,39 +85,46 @@ export const getMultiOriginColor = ( { colors, namedColor, customColor } ) => {
 	return colorObject ? colorObject : { color: customColor };
 };
 
-function getColorSlugFromVariable( value ) {
-	const namedColor = /var:preset\|color\|(.+)/.exec( value );
+function getColorSlugFromVariable( value: unknown ) {
+	// `exec` coerces a non-string value to a string.
+	const namedColor = /var:preset\|color\|(.+)/.exec( value as string );
 	if ( namedColor && namedColor[ 1 ] ) {
 		return namedColor[ 1 ];
 	}
 	return null;
 }
 
-function styleToAttributes( style ) {
-	if ( hasSplitBorders( style?.border ) ) {
+function styleToAttributes( style: PanelStyle ): BorderAttributes {
+	// The border styles have the shape of the border box value.
+	if ( hasSplitBorders( style?.border as BorderBoxValue ) ) {
 		return {
 			style,
 			borderColor: undefined,
 		};
 	}
 
-	const borderColorValue = style?.border?.color;
+	// A border color is stored as a string.
+	const borderColorValue = style?.border?.color as string | undefined;
 	const borderColorSlug = borderColorValue?.startsWith( 'var:preset|color|' )
 		? borderColorValue.substring( 'var:preset|color|'.length )
 		: undefined;
-	const updatedStyle = { ...style };
+	const updatedStyle: PanelStyle = { ...style };
 	updatedStyle.border = {
 		...updatedStyle.border,
 		color: borderColorSlug ? undefined : borderColorValue,
 	};
 	return {
-		style: cleanEmptyObject( updatedStyle ),
+		// Cleaning leaves out only the empty values.
+		style: cleanEmptyObject( updatedStyle ) as PanelStyle | undefined,
 		borderColor: borderColorSlug,
 	};
 }
 
-function attributesToStyle( attributes ) {
-	if ( hasSplitBorders( attributes.style?.border ) ) {
+function attributesToStyle(
+	attributes: BorderAttributes
+): PanelStyle | undefined {
+	// The border styles have the shape of the border box value.
+	if ( hasSplitBorders( attributes.style?.border as BorderBoxValue ) ) {
 		return attributes.style;
 	}
 	return {
@@ -106,9 +138,13 @@ function attributesToStyle( attributes ) {
 	};
 }
 
-function BordersInspectorControl( { label, children, resetAllFilter } ) {
+function BordersInspectorControl( {
+	label,
+	children,
+	resetAllFilter,
+}: StyleInspectorControlProps & { label?: string } ) {
 	const attributesResetAllFilter = useCallback(
-		( attributes ) => {
+		( attributes: BorderAttributes ) => {
 			const existingStyle = attributesToStyle( attributes );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -122,7 +158,9 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 	return (
 		<InspectorControls
 			group="border"
-			resetAllFilter={ attributesResetAllFilter }
+			// The filter reads the border attributes.
+			resetAllFilter={ attributesResetAllFilter as ResetAllFilter }
+			// @ts-expect-error InspectorControls ignores the label.
 			label={ label }
 		>
 			{ children }
@@ -130,10 +168,15 @@ function BordersInspectorControl( { label, children, resetAllFilter } ) {
 	);
 }
 
-export function BorderPanel( { clientId, name, setAttributes, settings } ) {
+export function BorderPanel( {
+	clientId,
+	name,
+	setAttributes,
+	settings,
+}: BorderHookPanelProps ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasBorderPanel( settings );
-	const { style, borderColor, className } = useSelect(
+	const { style, borderColor, className }: BorderAttributes = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled
 			if ( ! isEnabled ) {
@@ -143,7 +186,9 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 				style: _style,
 				borderColor: _borderColor,
 				className: _className,
-			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			} = ( select( blockEditorStore ).getBlockAttributes( clientId ) ||
+				// The block's attributes hold its border styles.
+				{} ) as BorderAttributes;
 			return {
 				style: _style,
 				borderColor: _borderColor,
@@ -163,18 +208,20 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState );
+			// The state styles have the shape of the block styles.
+			return getStyleForState( style, selectedState ) as
+				PanelStyle | undefined;
 		}
 		return attributesToStyle( { style, borderColor } );
 	}, [ isStateSelected, selectedState, style, borderColor ] );
 
 	const onChange = isStateSelected
-		? ( newStyle ) => {
+		? ( newStyle: PanelStyle ) => {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
 			}
-		: ( newStyle ) => {
+		: ( newStyle: PanelStyle ) => {
 				setAttributes( styleToAttributes( newStyle ) );
 			};
 
@@ -182,15 +229,16 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 		return null;
 	}
 
+	// The default controls map control names to whether they show.
 	const defaultControls = {
-		...getBlockSupport( name, [
+		...( getBlockSupport( name, [
 			BORDER_SUPPORT_KEY,
 			'__experimentalDefaultControls',
-		] ),
-		...getBlockSupport( name, [
+		] ) as Record< string, boolean > | undefined ),
+		...( getBlockSupport( name, [
 			SHADOW_SUPPORT_KEY,
 			'__experimentalDefaultControls',
-		] ),
+		] ) as Record< string, boolean > | undefined ),
 	};
 
 	return (
@@ -209,13 +257,18 @@ export function BorderPanel( { clientId, name, setAttributes, settings } ) {
 /**
  * Determine whether there is block support for border properties.
  *
- * @param {string} blockName Block name.
- * @param {string} feature   Border feature to check support for.
+ * @param blockName Block name.
+ * @param feature   Border feature to check support for.
  *
- * @return {boolean} Whether there is support.
+ * @return Whether there is support.
  */
-export function hasBorderSupport( blockName, feature = 'any' ) {
-	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY );
+export function hasBorderSupport(
+	blockName: string | BlockType,
+	feature: string = 'any'
+): boolean {
+	// The support is `true` or flags each border feature.
+	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY ) as
+		true | Record< string, unknown > | undefined;
 
 	if ( support === true ) {
 		return true;
@@ -236,11 +289,11 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
 /**
  * Determine whether there is block support for shadow properties.
  *
- * @param {string} blockName Block name.
+ * @param blockName Block name.
  *
- * @return {boolean} Whether there is support.
+ * @return Whether there is support.
  */
-export function hasShadowSupport( blockName ) {
+export function hasShadowSupport( blockName: string | BlockType ) {
 	return hasBlockSupport( blockName, SHADOW_SUPPORT_KEY );
 }
 
@@ -248,12 +301,15 @@ export function hasShadowSupport( blockName ) {
  * Returns a new style object where the specified border attribute has been
  * removed.
  *
- * @param {Object} style     Styles from block attributes.
- * @param {string} attribute The border style attribute to clear.
+ * @param style     Styles from block attributes.
+ * @param attribute The border style attribute to clear.
  *
- * @return {Object} Style object with the specified attribute removed.
+ * @return Style object with the specified attribute removed.
  */
-export function removeBorderAttribute( style, attribute ) {
+export function removeBorderAttribute(
+	style: PanelStyle | undefined,
+	attribute: string
+) {
 	return cleanEmptyObject( {
 		...style,
 		border: {
@@ -267,11 +323,11 @@ export function removeBorderAttribute( style, attribute ) {
  * Filters registered block settings, extending attributes to include
  * `borderColor` if needed.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Updated block settings.
+ * @return Updated block settings.
  */
-function addAttributes( settings ) {
+function addAttributes( settings: BlockType ): BlockType {
 	if ( ! hasBorderSupport( settings, 'color' ) ) {
 		return settings;
 	}
@@ -296,13 +352,17 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject border color.
  *
- * @param {Object}        props           Additional props applied to save element.
- * @param {Object|string} blockNameOrType Block type definition.
- * @param {Object}        attributes      Block's attributes.
+ * @param props           Additional props applied to save element.
+ * @param blockNameOrType Block type definition.
+ * @param attributes      Block's attributes.
  *
- * @return {Object} Filtered props to apply to save element.
+ * @return Filtered props to apply to save element.
  */
-function addSaveProps( props, blockNameOrType, attributes ) {
+function addSaveProps(
+	props: BlockWrapperProps,
+	blockNameOrType: BlockType | string,
+	attributes: BorderAttributes
+): BlockWrapperProps {
 	if (
 		! hasBorderSupport( blockNameOrType, 'color' ) ||
 		shouldSkipSerialization( blockNameOrType, BORDER_SUPPORT_KEY, 'color' )
@@ -324,21 +384,30 @@ function addSaveProps( props, blockNameOrType, attributes ) {
  * Generates a CSS class name consisting of all the applicable border color
  * classes given the current block attributes.
  *
- * @param {Object} attributes Block's attributes.
+ * @param attributes Block's attributes.
  *
- * @return {string} CSS class name.
+ * @return CSS class name.
  */
-export function getBorderClasses( attributes ) {
+export function getBorderClasses( attributes: BorderAttributes ) {
 	const { borderColor, style } = attributes;
 	const borderColorClass = getColorClassName( 'border-color', borderColor );
 
 	return clsx( {
 		'has-border-color': borderColor || style?.border?.color,
-		[ borderColorClass ]: !! borderColorClass,
+		// An unset class is skipped, as `!! undefined` is false.
+		[ borderColorClass as string ]: !! borderColorClass,
 	} );
 }
 
-function useBlockProps( { name, borderColor, style } ) {
+function useBlockProps( {
+	name,
+	borderColor,
+	style,
+}: {
+	name: string;
+	borderColor?: string;
+	style?: PanelStyle;
+} ) {
 	const { colors } = useMultipleOriginColorsAndGradients();
 
 	if (
@@ -388,7 +457,7 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'borderColor', 'style' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBorderSupport( name, 'color' );
 	},
 };
