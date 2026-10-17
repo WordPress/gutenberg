@@ -25,6 +25,10 @@
 -   Search: Show the button's full focus outline when the search field is collapsed ([#84685](https://github.com/WordPress/gutenberg/pull/84685)).
 -   Login/out: Mark the block as content with the `contentRole` support, so it stays listed, movable, and insertable in content-only editing, including a locked navigation menu ([#84849](https://github.com/WordPress/gutenberg/pull/84849)).
 
+### Bug Fixes
+
+-   Spacer: Hide resize handles when custom spacing sizes are disabled, preserving preset dimensions ([#84518](https://github.com/WordPress/gutenberg/pull/84518)).
+
 ## 11.2.0 (2026-10-07)
 
 ### Enhancements
