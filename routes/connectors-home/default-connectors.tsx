@@ -129,6 +129,7 @@ interface ConnectorActionAreaProps {
 	};
 	handleButtonClick: () => void;
 	getButtonLabel: () => string;
+	onDeactivate?: () => Promise< boolean >;
 }
 
 function ConnectorActionArea( {
@@ -141,7 +142,15 @@ function ConnectorActionArea( {
 	actionButtonRef,
 	handleButtonClick,
 	getButtonLabel,
+	onDeactivate,
 }: ConnectorActionAreaProps ) {
+	const handleDeactivate = async () => {
+		// The button unmounts on success; keep focus in the card.
+		if ( await onDeactivate?.() ) {
+			actionButtonRef.current?.focus();
+		}
+	};
+
 	return (
 		<HStack spacing={ 3 } expanded={ false }>
 			{ isConnected && <ConnectedBadge /> }
@@ -151,6 +160,19 @@ function ConnectorActionArea( {
 				) : (
 					<UnavailableActionBadge />
 				) ) }
+			{ onDeactivate && ! isExpanded && (
+				<Button
+					variant="tertiary"
+					size="compact"
+					onClick={ handleDeactivate }
+					disabled={ isBusy }
+					isBusy={ isBusy }
+					accessibleWhenDisabled
+					isDestructive
+				>
+					{ __( 'Deactivate' ) }
+				</Button>
+			) }
 			{ ! showUnavailableBadge && (
 				<Button
 					ref={ actionButtonRef }
@@ -194,6 +216,7 @@ function ApiKeyConnector( {
 		pluginStatus,
 		canInstallPlugins,
 		canActivatePlugins,
+		canDeactivate,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
@@ -203,6 +226,7 @@ function ApiKeyConnector( {
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
+		deactivatePlugin,
 		saveApiKey,
 		removeApiKey,
 	} = useConnectorPlugin( {
@@ -245,6 +269,9 @@ function ApiKeyConnector( {
 					actionButtonRef={ actionButtonRef }
 					handleButtonClick={ handleButtonClick }
 					getButtonLabel={ getButtonLabel }
+					onDeactivate={
+						canDeactivate ? deactivatePlugin : undefined
+					}
 				/>
 			}
 		>
@@ -299,6 +326,7 @@ function ApplicationPasswordConnector( {
 		pluginStatus,
 		canInstallPlugins,
 		canActivatePlugins,
+		canDeactivate,
 		isExpanded,
 		setIsExpanded,
 		isBusy,
@@ -308,6 +336,7 @@ function ApplicationPasswordConnector( {
 		keySource,
 		handleButtonClick,
 		getButtonLabel,
+		deactivatePlugin,
 		saveCredentials,
 		removeCredentials,
 	} = useConnectorPlugin( {
@@ -346,6 +375,9 @@ function ApplicationPasswordConnector( {
 					actionButtonRef={ actionButtonRef }
 					handleButtonClick={ handleButtonClick }
 					getButtonLabel={ getButtonLabel }
+					onDeactivate={
+						canDeactivate ? deactivatePlugin : undefined
+					}
 				/>
 			}
 		>
