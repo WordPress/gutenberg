@@ -6,6 +6,8 @@ import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
 import warning from '@wordpress/warning';
+import type { RefCallback } from 'react';
+import type { Block } from '@wordpress/blocks';
 import useMovingAnimation from '../../use-moving-animation';
 import { store as blockEditorStore } from '../../../store';
 import { PrivateBlockContext } from '../private-block-context';
@@ -24,6 +26,12 @@ import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
 import { useBlockVisibility } from '../../block-visibility/';
+import type {
+	UseBlockPropsOptions,
+	UseBlockPropsProps,
+	UseBlockPropsResult,
+	PrivateBlockContextValue,
+} from '../types';
 
 /**
  * Returns a ref that inserts a ghost block when the user enters it: the
@@ -31,15 +39,18 @@ import { useBlockVisibility } from '../../block-visibility/';
  * about the element changes. Native listeners, so blocks' own handlers
  * are never clashed with.
  *
- * @param {string}  rootClientId The block's root client ID.
- * @param {?Object} ghostBlock   The ghost block object, while not inserted.
+ * @param rootClientId The block's root client ID.
+ * @param ghostBlock   The ghost block object, while not inserted.
  *
- * @return {Function} Ref effect for the block element.
+ * @return Ref effect for the block element.
  */
-function useGhostMaterialize( rootClientId, ghostBlock ) {
+function useGhostMaterialize(
+	rootClientId: string | null | undefined,
+	ghostBlock: Block | undefined
+) {
 	const { insertBlocks } = useDispatch( blockEditorStore );
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( element ) => {
 			if ( ! ghostBlock ) {
 				return;
@@ -54,7 +65,8 @@ function useGhostMaterialize( rootClientId, ghostBlock ) {
 				// Update the selection: the ghost is empty, so the caret
 				// can only be at its start, and the undo level records it.
 				insertBlocks(
-					[ ghostBlock ],
+					// The listeners are only added for a ghost block.
+					[ ghostBlock! ],
 					undefined,
 					rootClientId,
 					true,
@@ -111,7 +123,10 @@ function useGhostMaterialize( rootClientId, ghostBlock ) {
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+export function useBlockProps(
+	props: UseBlockPropsProps = {},
+	{ __unstableIsHtml }: UseBlockPropsOptions = {}
+): UseBlockPropsResult {
 	const {
 		clientId,
 		className,
@@ -146,25 +161,34 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		ariaLabel,
 		ghostBlock,
 		rootClientId,
-	} = useContext( PrivateBlockContext );
+		// A block list block provides the context, with its client ID.
+	} = useContext( PrivateBlockContext ) as PrivateBlockContextValue & {
+		clientId: string;
+	};
 	const ghostRef = useGhostMaterialize( rootClientId, ghostBlock );
 
 	useRegisterBlockEventHandlers( clientId, wrapperProps );
 
-	const defaultViewRef = useRefEffect( ( element ) => {
+	// The ref also stores the window of the block element.
+	const defaultViewRef = useRefEffect( ( element: HTMLElement ) => {
 		if ( element ) {
 			const { ownerDocument } = element;
-			const { defaultView } = ownerDocument;
+			// A rendered element's document has a window.
+			const defaultView = ownerDocument.defaultView!;
 			defaultViewRef.current = defaultView;
 		}
-	}, [] );
+	}, [] ) as RefCallback< HTMLElement > & { current?: Window };
 
-	// translators: %s: Type of block (i.e. Text, Image etc)
-	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
+	const blockLabel = sprintf(
+		// translators: %s: Type of block (i.e. Text, Image etc)
+		__( 'Block: %s' ),
+		// Block types have a title.
+		blockTitle as string
+	);
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const ffDragRef = useFirefoxDraggableCompatibility();
 	const isHoverEnabled = ! isWithinSectionBlock;
-	const mergedRefs = useMergeRefs( [
+	const mergedRefs = useMergeRefs< HTMLElement >( [
 		props.ref,
 		ghostRef,
 		defaultViewRef,
@@ -203,7 +227,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	} );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
-	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
+	// A missing version compares false.
+	if (
+		( blockApiVersion as number ) < 2 &&
+		clientId === blockEditContext.clientId
+	) {
 		warning(
 			`Block type "${ name }" must support API version 2 or higher to work correctly with "useBlockProps" method.`
 		);
@@ -211,9 +239,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	let hasNegativeMargin = false;
 	if (
+		// @ts-expect-error Bug: a numeric margin has no `charAt`, so this throws.
 		wrapperProps?.style?.marginTop?.charAt( 0 ) === '-' ||
+		// @ts-expect-error Bug: a numeric margin has no `charAt`, so this throws.
 		wrapperProps?.style?.marginBottom?.charAt( 0 ) === '-' ||
+		// @ts-expect-error Bug: a numeric margin has no `charAt`, so this throws.
 		wrapperProps?.style?.marginLeft?.charAt( 0 ) === '-' ||
+		// @ts-expect-error Bug: a numeric margin has no `charAt`, so this throws.
 		wrapperProps?.style?.marginRight?.charAt( 0 ) === '-'
 	) {
 		hasNegativeMargin = true;

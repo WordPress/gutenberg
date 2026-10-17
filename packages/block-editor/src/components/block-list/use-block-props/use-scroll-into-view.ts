@@ -1,12 +1,13 @@
 import { useReducedMotion, useRefEffect } from '@wordpress/compose';
 
-export function useScrollIntoView( { isSelected } ) {
+export function useScrollIntoView( { isSelected }: { isSelected?: boolean } ) {
 	const prefersReducedMotion = useReducedMotion();
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( isSelected ) {
 				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
+				// A rendered block's document has a window.
+				const defaultView = ownerDocument.defaultView!;
 				if ( ! defaultView.IntersectionObserver ) {
 					return;
 				}
@@ -29,6 +30,7 @@ export function useScrollIntoView( { isSelected } ) {
 					observer.disconnect();
 				};
 			}
+			return undefined;
 		},
 		[ isSelected ]
 	);
