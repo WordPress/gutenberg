@@ -2,8 +2,13 @@ import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { UpdateListViewExpansion } from './types';
 
-export default function useListViewCollapseItems( { updateExpansion } ) {
+export default function useListViewCollapseItems( {
+	updateExpansion,
+}: {
+	updateExpansion: UpdateListViewExpansion;
+} ) {
 	const { expandedBlock, getBlockParents } = useSelect( ( select ) => {
 		const { getBlockParents: _getBlockParents, getExpandedBlock } = unlock(
 			select( blockEditorStore )

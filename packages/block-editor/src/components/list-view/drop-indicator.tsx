@@ -11,13 +11,17 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 import ListViewExpander from './expander';
+import type { ListViewDropIndicatorPreviewProps } from './types';
 
 export default function ListViewDropIndicatorPreview( {
 	draggedBlockClientId,
 	listViewRef,
 	blockDropTarget,
-} ) {
-	const blockInformation = useBlockDisplayInformation( draggedBlockClientId );
+}: ListViewDropIndicatorPreviewProps ) {
+	// The hook returns `null` without a client ID.
+	const blockInformation = useBlockDisplayInformation(
+		draggedBlockClientId as string
+	);
 	const blockTitle = useBlockDisplayTitle( {
 		clientId: draggedBlockClientId,
 		context: 'list-view',
@@ -25,7 +29,10 @@ export default function ListViewDropIndicatorPreview( {
 
 	const { rootClientId, clientId, dropPosition } = blockDropTarget || {};
 
-	const [ rootBlockElement, blockElement ] = useMemo( () => {
+	const [ rootBlockElement, blockElement ] = useMemo( (): [
+		( HTMLElement | null )?,
+		( HTMLElement | null )?,
+	] => {
 		if ( ! listViewRef.current ) {
 			return [];
 		}
@@ -33,7 +40,7 @@ export default function ListViewDropIndicatorPreview( {
 		// The rootClientId will be defined whenever dropping into inner
 		// block lists, but is undefined when dropping at the root level.
 		const _rootBlockElement = rootClientId
-			? listViewRef.current.querySelector(
+			? listViewRef.current.querySelector< HTMLElement >(
 					`[data-block="${ rootClientId }"]`
 				)
 			: undefined;
@@ -42,7 +49,7 @@ export default function ListViewDropIndicatorPreview( {
 		// usually be inserted adjacent to it. It will be undefined when
 		// dropping a block into an empty block list.
 		const _blockElement = clientId
-			? listViewRef.current.querySelector(
+			? listViewRef.current.querySelector< HTMLElement >(
 					`[data-block="${ clientId }"]`
 				)
 			: undefined;
@@ -58,7 +65,7 @@ export default function ListViewDropIndicatorPreview( {
 	const rtl = isRTL();
 
 	const getDropIndicatorWidth = useCallback(
-		( targetElementRect, indent ) => {
+		( targetElementRect: DOMRect, indent: number ) => {
 			if ( ! targetElement ) {
 				return 0;
 			}
@@ -184,7 +191,8 @@ export default function ListViewDropIndicatorPreview( {
 		}
 
 		const _ariaLevel = parseInt(
-			rootBlockElement.getAttribute( 'aria-level' ),
+			// `parseInt` turns a missing attribute into `NaN`.
+			rootBlockElement.getAttribute( 'aria-level' ) as string,
 			10
 		);
 
@@ -250,7 +258,8 @@ export default function ListViewDropIndicatorPreview( {
 					// scrollbar needs to be accounted for when positioning the
 					// drop indicator.
 					const scrollbarWidth = rtl
-						? scrollContainer.offsetWidth -
+						? // Scroll containers are HTML elements.
+							( scrollContainer as HTMLElement ).offsetWidth -
 							scrollContainer.clientWidth
 						: 0;
 

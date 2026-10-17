@@ -4,10 +4,11 @@ import { __experimentalTreeGridRow as TreeGridRow } from '@wordpress/components'
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
 import useMovingAnimation from '../use-moving-animation';
+import type { ListViewLeafProps } from './types';
 
 const AnimatedTreeGridRow = animated( TreeGridRow );
 
-const ListViewLeaf = forwardRef(
+const ListViewLeaf = forwardRef< HTMLTableRowElement, ListViewLeafProps >(
 	(
 		{
 			isDragged,
@@ -24,6 +25,7 @@ const ListViewLeaf = forwardRef(
 	) => {
 		const animationRef = useMovingAnimation( {
 			clientId: props[ 'data-block' ],
+			// @ts-expect-error The hook ignores `enableAnimation`.
 			enableAnimation: true,
 			triggerAnimationOnChange: path,
 		} );

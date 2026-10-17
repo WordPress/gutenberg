@@ -1,3 +1,5 @@
+import type { HTMLAttributes } from 'react';
+
 /**
  * A component specifically designed to be used as an element referenced
  * by ARIA attributes such as `aria-labelledby` or `aria-describedby`.
@@ -10,11 +12,14 @@
  *
  * @see https://github.com/WordPress/gutenberg/pull/51035
  *
- * @param {Object} props          Props.
- * @param {string} props.children Text to reference. Must be a string, since
- *                                it is used as the key.
+ * @param props          Props.
+ * @param props.children Text to reference. Must be a string, since it is
+ *                       used as the key.
  */
-export default function AriaReferencedText( { children, ...props } ) {
+export default function AriaReferencedText( {
+	children,
+	...props
+}: HTMLAttributes< HTMLDivElement > & { children: string } ) {
 	return (
 		<div hidden { ...props } key={ children }>
 			{ children }
