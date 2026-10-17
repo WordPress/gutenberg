@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   Add Description List, Description Term, and Description Detail blocks ([#81728](https://github.com/WordPress/gutenberg/pull/81728)).
+
 ### Enhancements
 
 -   Term Count: Reuse filtered terms from Term Template so changes made through the `get_terms` filter appear on the front end without a separate query for each count ([#84119](https://github.com/WordPress/gutenberg/pull/84119)).

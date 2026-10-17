@@ -1,0 +1,10 @@
+[
+	{
+		"name": "core/description-term",
+		"isValid": true,
+		"attributes": {
+			"content": "Term"
+		},
+		"innerBlocks": []
+	}
+]

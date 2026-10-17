@@ -1,0 +1,25 @@
+[
+	{
+		"name": "core/description-list",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/description-term",
+				"isValid": true,
+				"attributes": {
+					"content": "Term"
+				},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/description-detail",
+				"isValid": true,
+				"attributes": {
+					"content": "Description"
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]
