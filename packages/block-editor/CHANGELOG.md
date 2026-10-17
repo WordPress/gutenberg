@@ -81,6 +81,7 @@
 -   Convert `useBlockDropZone` to TypeScript ([#84946](https://github.com/WordPress/gutenberg/pull/84946)).
 -   Convert `BlockManager`, `PublishDateTimePicker` and the fit text hook to TypeScript ([#84949](https://github.com/WordPress/gutenberg/pull/84949)).
 -   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+-   Convert the block toolbar, switcher, mover, preview and settings menu to TypeScript ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
 
 ## 18.1.0 (2026-10-07)
 

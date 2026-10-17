@@ -3,7 +3,7 @@ import type { ButtonAsButtonProps } from '../button/types';
 
 export type MenuItemProps = Pick<
 	ButtonAsButtonProps,
-	'isDestructive' | 'isPressed'
+	'accessibleWhenDisabled' | 'isDestructive' | 'isPressed'
 > & {
 	/**
 	 * A CSS `class` to give to the container element.
