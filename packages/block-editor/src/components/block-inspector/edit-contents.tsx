@@ -5,13 +5,14 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 import { store as blockEditorStore } from '../../store';
+import type { InlineEditButtonProps } from './types';
 
 function InlineEditButton( {
 	clientId,
 	editedContentOnlySection,
 	editContentOnlySection,
 	stopEditingContentOnlySection,
-} ) {
+}: InlineEditButtonProps ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleClick = () => {
 		if ( ! editedContentOnlySection ) {
@@ -45,7 +46,7 @@ function InlineEditButton( {
 	);
 }
 
-export default function EditContents( { clientId } ) {
+export default function EditContents( { clientId }: { clientId: string } ) {
 	const {
 		isWithinSection,
 		isWithinEditedSection,

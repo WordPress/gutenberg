@@ -1,7 +1,10 @@
 import { useSelect } from '@wordpress/data';
+import type { BlockType } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 
-export default function useBlockInspectorAnimationSettings( blockType ) {
+export default function useBlockInspectorAnimationSettings(
+	blockType: BlockType | null | undefined
+) {
 	return useSelect(
 		( select ) => {
 			if ( blockType ) {
@@ -18,8 +21,10 @@ export default function useBlockInspectorAnimationSettings( blockType ) {
 					select( blockEditorStore );
 				const _selectedBlockClientId = getSelectedBlockClientId();
 				const animationParentBlockClientId = getBlockParentsByBlockName(
-					_selectedBlockClientId,
-					animationParent,
+					// A block type is only passed for a selected block.
+					_selectedBlockClientId as string,
+					// Without an animation parent, no parent matches.
+					animationParent as string,
 					true
 				)[ 0 ];
 
@@ -32,9 +37,10 @@ export default function useBlockInspectorAnimationSettings( blockType ) {
 					return null;
 				}
 
+				// Block names map to animation settings.
 				return globalBlockInspectorAnimationSettings?.[
 					blockType.name
-				];
+				] as { enterDirection?: string } | undefined;
 			}
 			return null;
 		},
