@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { Dispatch, ForwardedRef, SetStateAction } from 'react';
 import { useState, useEffect, forwardRef, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
@@ -9,13 +10,24 @@ import { store as blockEditorStore } from '../../store';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import ButtonBlockAppender from '../button-block-appender';
 import { unlock } from '../../lock-unlock';
+import type {
+	AutoGridVisualizerProps,
+	DropZoneWithValidationOptions,
+	GridInfo,
+	GridItemAttributes,
+	GridVisualizerCellProps,
+	GridVisualizerCellPosition,
+	GridVisualizerGridProps,
+	GridVisualizerProps,
+	ManualGridVisualizerProps,
+} from './types';
 
 export function GridVisualizer( {
 	clientId,
 	contentRef,
 	parentLayout,
 	childGridClientId,
-} ) {
+}: GridVisualizerProps ) {
 	const isDistractionFree = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().isDistractionFree,
@@ -29,7 +41,12 @@ export function GridVisualizer( {
 
 	const isManualGrid =
 		parentLayout?.isManualPlacement &&
-		window.__experimentalEnableGridInteractivity;
+		// The experiment sets this global.
+		(
+			window as Window & {
+				__experimentalEnableGridInteractivity?: boolean;
+			}
+		 ).__experimentalEnableGridInteractivity;
 	return (
 		<GridVisualizerGrid
 			gridClientId={ clientId }
@@ -42,7 +59,15 @@ export function GridVisualizer( {
 }
 
 const GridVisualizerGrid = forwardRef(
-	( { gridClientId, gridElement, isManualGrid, childGridClientId }, ref ) => {
+	(
+		{
+			gridClientId,
+			gridElement,
+			isManualGrid,
+			childGridClientId,
+		}: GridVisualizerGridProps,
+		ref: ForwardedRef< HTMLDivElement >
+	) => {
 		const [ gridInfo, setGridInfo ] = useState( () =>
 			getGridInfo( gridElement )
 		);
@@ -50,7 +75,8 @@ const GridVisualizerGrid = forwardRef(
 
 		// Get the element for the child grid block so we can
 		// compute its position and hide overlapping visualizer cells.
-		const childGridElement = useBlockElement( childGridClientId );
+		// A missing client ID has no element.
+		const childGridElement = useBlockElement( childGridClientId as string );
 
 		// Compute the child grid block's rect from its position in the grid.
 		// This works for both manual and non-manual grids.
@@ -58,7 +84,8 @@ const GridVisualizerGrid = forwardRef(
 			if ( ! childGridElement ) {
 				return null;
 			}
-			return getGridItemRect( childGridElement );
+			// Block elements are HTML elements.
+			return getGridItemRect( childGridElement as HTMLElement );
 		}, [ childGridElement ] );
 
 		useEffect( () => {
@@ -126,7 +153,10 @@ const GridVisualizerGrid = forwardRef(
 	}
 );
 
-function AutoGridVisualizer( { gridInfo, childGridRect } ) {
+function AutoGridVisualizer( {
+	gridInfo,
+	childGridRect,
+}: AutoGridVisualizerProps ) {
 	return range( 1, gridInfo.numRows ).map( ( row ) =>
 		range( 1, gridInfo.numColumns ).map( ( column ) => {
 			// Don't render visualizer cells for a selected child block
@@ -146,8 +176,14 @@ function AutoGridVisualizer( { gridInfo, childGridRect } ) {
 	);
 }
 
-function ManualGridVisualizer( { gridClientId, gridInfo, childGridRect } ) {
-	const [ highlightedRect, setHighlightedRect ] = useState( null );
+function ManualGridVisualizer( {
+	gridClientId,
+	gridInfo,
+	childGridRect,
+}: ManualGridVisualizerProps ) {
+	const [ highlightedRect, setHighlightedRect ] = useState< GridRect | null >(
+		null
+	);
 
 	const gridItemStyles = useSelect(
 		( select ) => {
@@ -160,14 +196,15 @@ function ManualGridVisualizer( { gridClientId, gridInfo, childGridRect } ) {
 		[ gridClientId ]
 	);
 	const occupiedRects = useMemo( () => {
-		const rects = [];
+		const rects: GridRect[] = [];
 		for ( const style of Object.values( gridItemStyles ) ) {
 			const {
 				columnStart,
 				rowStart,
 				columnSpan = 1,
 				rowSpan = 1,
-			} = style?.layout ?? {};
+				// The style attribute is an object when set.
+			} = ( style as GridItemAttributes[ 'style' ] )?.layout ?? {};
 			if ( ! columnStart || ! rowStart ) {
 				continue;
 			}
@@ -227,7 +264,11 @@ function ManualGridVisualizer( { gridClientId, gridInfo, childGridRect } ) {
 	);
 }
 
-function GridVisualizerCell( { color, children, className } ) {
+function GridVisualizerCell( {
+	color,
+	children,
+	className,
+}: GridVisualizerCellProps ) {
 	return (
 		<div
 			className={ clsx(
@@ -245,11 +286,11 @@ function GridVisualizerCell( { color, children, className } ) {
 }
 
 function useGridVisualizerDropZone(
-	column,
-	row,
-	gridClientId,
-	gridInfo,
-	setHighlightedRect
+	column: number,
+	row: number,
+	gridClientId: string,
+	gridInfo: GridInfo,
+	setHighlightedRect: Dispatch< SetStateAction< GridRect | null > >
 ) {
 	const {
 		getBlockAttributes,
@@ -274,7 +315,10 @@ function useGridVisualizerDropZone(
 			if ( ! canInsertBlockType( blockName, gridClientId ) ) {
 				return false;
 			}
-			const attributes = getBlockAttributes( srcClientId );
+			// The dragged block exists.
+			const attributes = getBlockAttributes(
+				srcClientId
+			) as GridItemAttributes;
 			const rect = new GridRect( {
 				columnStart: column,
 				rowStart: row,
@@ -288,7 +332,10 @@ function useGridVisualizerDropZone(
 			return isInBounds;
 		},
 		onDragEnter( srcClientId ) {
-			const attributes = getBlockAttributes( srcClientId );
+			// The dragged block exists.
+			const attributes = getBlockAttributes(
+				srcClientId
+			) as GridItemAttributes;
 			setHighlightedRect(
 				new GridRect( {
 					columnStart: column,
@@ -311,7 +358,10 @@ function useGridVisualizerDropZone(
 		},
 		onDrop( srcClientId ) {
 			setHighlightedRect( null );
-			const attributes = getBlockAttributes( srcClientId );
+			// The dragged block exists.
+			const attributes = getBlockAttributes(
+				srcClientId
+			) as GridItemAttributes;
 			updateBlockAttributes( srcClientId, {
 				style: {
 					...attributes.style,
@@ -339,7 +389,7 @@ function GridVisualizerDropZone( {
 	gridClientId,
 	gridInfo,
 	setHighlightedRect,
-} ) {
+}: GridVisualizerCellPosition ) {
 	return (
 		<div
 			className="block-editor-grid-visualizer__drop-zone"
@@ -360,7 +410,7 @@ function GridVisualizerAppender( {
 	gridClientId,
 	gridInfo,
 	setHighlightedRect,
-} ) {
+}: GridVisualizerCellPosition ) {
 	const {
 		updateBlockAttributes,
 		moveBlocksToPosition,
@@ -383,6 +433,7 @@ function GridVisualizerAppender( {
 				gridInfo,
 				setHighlightedRect
 			) }
+			// @ts-expect-error The appender ignores `style`.
 			style={ {
 				color: gridInfo.currentColor,
 			} }
@@ -415,7 +466,7 @@ function useDropZoneWithValidation( {
 	onDragEnter,
 	onDragLeave,
 	onDrop,
-} ) {
+}: DropZoneWithValidationOptions ) {
 	const { getDraggedBlockClientIds } = useSelect( blockEditorStore );
 	return useDropZone( {
 		onDragEnter() {
