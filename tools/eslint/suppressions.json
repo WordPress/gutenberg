@@ -14614,11 +14614,6 @@
 			"count": 1
 		}
 	},
-	"packages/upload-media/src/store/test/private-actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/viewport/src/store/test/reducer.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
