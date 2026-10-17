@@ -19,6 +19,7 @@
 
 ### Enhancements
 
+-   `Avatar`: Add CSS-only colored fallbacks with contrast-limited foreground tinting, targeting 4.5:1 for text and 3:1 for the person icon. Colored fallbacks have no border outside forced-colors mode, and browsers without the required features retain neutral fallbacks. Add best-effort development warnings for unsupported colors and use the weak neutral content token for neutral initials ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
@@ -32,6 +33,7 @@
 
 ### Bug Fixes
 
+-   `Avatar`: Use the strong neutral stroke color for the person fallback to provide sufficient non-text contrast ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   Keep the `Link` new-tab indicator with the preceding text when wrapping ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
 -   `Select`: Keep long popup lists scrollable when item alignment falls back to anchored positioning or the popup opens through touch ([#84682](https://github.com/WordPress/gutenberg/pull/84682)).
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).

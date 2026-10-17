@@ -4,6 +4,7 @@ import * as Avatar from '../index';
 import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
+import styles from './colors.module.css';
 
 // Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
 // Used under the Unsplash License: https://unsplash.com/license
@@ -47,26 +48,93 @@ type Story = StoryObj< typeof Avatar.Root >;
 
 export const Default: Story = {};
 
-/** The optional color ring leaves images, initials, and the person fallback unchanged. */
-export const WithColor: Story = {
-	args: { color: '#008a20' },
-	render: ( args ) => (
-		<Stack gap="lg" align="center">
-			<Avatar.Root { ...args }>
+function ColorSamples( props: React.ComponentProps< typeof Avatar.Root > ) {
+	return (
+		<Stack gap="sm" align="center">
+			<Avatar.Root { ...props } aria-hidden="true">
 				<Avatar.Fallback />
 				<Avatar.Image src={ IMAGE_SRC } alt="" />
 			</Avatar.Root>
-			<Avatar.Root { ...args }>
+			<Avatar.Root { ...props } aria-hidden="true">
 				<Avatar.Initials name="Alex Morgan" />
 			</Avatar.Root>
-			<Avatar.Root { ...args }>
+			<Avatar.Root { ...props } aria-hidden="true">
 				<Avatar.Fallback />
 			</Avatar.Root>
 		</Stack>
-	),
+	);
+}
+
+/** Compare image rings and colored fallbacks with shared size and shape controls. */
+export const WithColor: Story = {
+	args: { color: '#008a20', shape: 'circle' },
+	parameters: { controls: { include: [ 'color', 'size', 'shape' ] } },
+	render: ( args ) => {
+		const colors = [
+			...new Set( [
+				args.color ?? '#008a20',
+				'#d94145',
+				'#fbbf24',
+				'#f3d1ab',
+				'#00cfff',
+				'#3858e9',
+				'#6f42c1',
+				'#757575',
+				'#000000',
+				'#ffffff',
+			] ),
+		];
+		return (
+			<div
+				className={ styles.gallery }
+				role="region"
+				aria-label="Colored Avatar examples"
+				tabIndex={ 0 }
+			>
+				<p>
+					Each color shows an image, initials, and the person icon.
+					Use Size and Shape in Controls to update every sample.
+					Change Color to update the first sample.
+				</p>
+				<p>
+					Initials target at least 4.5:1 contrast and the person icon
+					3:1 against the fill. Colored fallbacks have no border;
+					loaded images keep the supplied color ring. Forced-colors
+					mode retains a visible border. See Unsupported Colors for
+					input limitations and best-effort development warnings.
+				</p>
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">Color</th>
+							<th scope="col">Image / initials / person icon</th>
+						</tr>
+					</thead>
+					<tbody>
+						{ colors.map( ( color, index ) => (
+							<tr key={ color }>
+								<th scope="row">
+									{ index === 0 && (
+										<>
+											Custom
+											<br />
+										</>
+									) }
+									<code>{ color }</code>
+								</th>
+								<td>
+									<ColorSamples { ...args } color={ color } />
+								</td>
+							</tr>
+						) ) }
+					</tbody>
+				</table>
+			</div>
+		);
+	},
 };
 
-/** Keyboard focus stays outside the avatar, even when both rings have the same color. */
+/** Keyboard focus stays outside the avatar, even when the fill matches the focus color. */
 export const Interactive: Story = {
 	args: { color: '#008a20' },
 	render: ( args ) => (
@@ -79,7 +147,7 @@ export const Interactive: Story = {
 				},
 				{
 					name: 'Sam Rivera',
-					label: 'Matches focus color',
+					label: 'Fill matches focus color',
 					color: 'var(--wpds-color-stroke-focus)',
 				},
 			].map( ( { name, label, color } ) => (
@@ -108,6 +176,117 @@ export const Interactive: Story = {
 			) ) }
 		</Stack>
 	),
+};
+
+function FallbackSamples( props: React.ComponentProps< typeof Avatar.Root > ) {
+	return (
+		<Stack gap="lg" align="center">
+			{ ( [ 'circle', 'square' ] as const ).map( ( shape ) => (
+				<Stack key={ shape } gap="sm" align="center">
+					<Avatar.Root
+						{ ...props }
+						shape={ shape }
+						aria-hidden="true"
+					>
+						<Avatar.Initials name="Alex Morgan" />
+					</Avatar.Root>
+					<Avatar.Root
+						{ ...props }
+						shape={ shape }
+						aria-hidden="true"
+					>
+						<Avatar.Fallback />
+					</Avatar.Root>
+				</Stack>
+			) ) }
+		</Stack>
+	);
+}
+
+/** Demonstrate unsupported fills and the limits of development warnings. */
+export const UnsupportedColors: Story = {
+	args: { size: 'lg' },
+	parameters: {
+		controls: { include: [ 'size' ] },
+		// This demonstration intentionally reproduces insufficient contrast.
+		// Keep the accessibility findings visible without failing other stories.
+		a11y: { test: 'todo' },
+	},
+	render: ( args ) => {
+		const examples = [
+			[
+				'currentColor',
+				'Keyword scan detects the foreground dependency.',
+			],
+			[
+				'color-mix(in srgb, currentColor 50%, red)',
+				'Keyword scan detects the foreground dependency.',
+			],
+			[
+				'var(--_wp-ui-avatar-unsupported-color)',
+				'The variable resolves to currentColor. Not detected.',
+			],
+			[
+				String.raw`\63 urrentColor`,
+				'Escaped currentColor. Not detected.',
+			],
+			[
+				'var(--_wp-ui-avatar-missing-color)',
+				'The variable is undefined. Not detected.',
+			],
+			[ 'not-a-color', 'CSS.supports() rejects the color.' ],
+			[ 'inherit', 'CSS.supports() rejects the relative-color fill.' ],
+		];
+		return (
+			<div
+				className={ `${ styles.gallery } ${ styles.unsupported }` }
+				role="region"
+				aria-label="Unsupported Avatar colors"
+				tabIndex={ 0 }
+			>
+				<p>
+					These examples intentionally use unsupported colors in both
+					shapes. A fill that depends on its foreground can lose
+					contrast. Invalid colors and missing variables can remove
+					the fill.
+				</p>
+				<p>
+					In supporting browsers, development builds warn about
+					explicit <code>currentColor</code> tokens and values
+					rejected by <code>CSS.supports()</code>. Warnings are
+					best-effort and deduplicated. They do not resolve CSS
+					variables or detect every unsupported expression, including
+					escaped keywords. The absence of a warning does not
+					guarantee sufficient contrast.
+				</p>
+				<table>
+					<thead>
+						<tr>
+							<th scope="col">Color</th>
+							<th scope="col">Fallbacks</th>
+							<th scope="col">Best-effort validation</th>
+						</tr>
+					</thead>
+					<tbody>
+						{ examples.map( ( [ color, explanation ] ) => (
+							<tr key={ color }>
+								<th scope="row">
+									<code>{ color }</code>
+								</th>
+								<td>
+									<FallbackSamples
+										{ ...args }
+										color={ color }
+									/>
+								</td>
+								<td>{ explanation }</td>
+							</tr>
+						) ) }
+					</tbody>
+				</table>
+			</div>
+		);
+	},
 };
 
 /** Square avatars use the theme's corner radius for buttons and controls. */

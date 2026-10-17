@@ -35,7 +35,91 @@ async function renderGallery(
 	);
 }
 
+function luminance( color: string ) {
+	const channels = color
+		.match( /[-+]?(?:\d*\.)?\d+(?:e[-+]?\d+)?/gi )!
+		.map( Number );
+	const linear = color.startsWith( 'color(srgb-linear' )
+		? channels
+		: channels.map( ( channel ) => {
+				const value = color.startsWith( 'color(' )
+					? channel
+					: channel / 255;
+				return value <= 0.04045
+					? value / 12.92
+					: ( ( value + 0.055 ) / 1.055 ) ** 2.4;
+			} );
+	return linear[ 0 ] * 0.2126 + linear[ 1 ] * 0.7152 + linear[ 2 ] * 0.0722;
+}
+
 describe( 'Avatar layout', () => {
+	it( 'keeps tinted initials readable on bright, dark, and midtone backgrounds', async () => {
+		const crossover = ( Math.sqrt( 21 ) - 1 ) / 20;
+		const colors = [
+			'#00e050',
+			'#064e3b',
+			'#6f42c1',
+			'#d94145',
+			'#fbbf24',
+			'#ff35ee',
+			'#879f11',
+			'#0f766e',
+			'#00cfff',
+			'#757575',
+			'#767676',
+			'#777777',
+			'#999999',
+			'#000000',
+			'#ffffff',
+			'#00800080',
+			'color(display-p3 1 0 0)',
+			// The 4.5:1 limits and the point where black and white have equal contrast.
+			...[
+				0.175,
+				crossover - 0.000001,
+				crossover,
+				crossover + 0.000001,
+				1.05 / 4.5 - 0.05,
+			].flatMap( ( background ) => [
+				`color(srgb-linear ${ background } ${ background } ${ background })`,
+				`color(srgb-linear ${ background / 0.2126 } 0 0)`,
+				`color(srgb-linear 0 ${ background / 0.7152 } 0)`,
+				`color(srgb-linear 0.25 ${
+					( background - 0.2126 * 0.25 - 0.0722 ) / 0.7152
+				} 1)`,
+			] ),
+		];
+		await render(
+			<ThemeProvider>
+				{ colors.map( ( color ) => (
+					<Avatar.Root
+						key={ color }
+						color={ color }
+						role="img"
+						aria-label={ color }
+					>
+						<Avatar.Initials name="Alex Morgan" />
+					</Avatar.Root>
+				) ) }
+			</ThemeProvider>
+		);
+		for ( const color of colors ) {
+			const avatar = screen.getByRole( 'img', { name: color } );
+			const styles = getComputedStyle(
+				within( avatar ).getByText( 'AM' )
+			);
+			const background = luminance( styles.backgroundColor );
+			const foreground = luminance( styles.color );
+			expect( foreground ).toBeGreaterThan( 0 );
+			expect( foreground ).toBeLessThan( 1 );
+			expect( styles.backgroundColor ).not.toBe( 'rgba(0, 0, 0, 0)' );
+			expect(
+				( Math.max( background, foreground ) + 0.05 ) /
+					( Math.min( background, foreground ) + 0.05 )
+			).toBeGreaterThanOrEqual( 4.5 );
+		}
+	} );
+
 	it( 'keeps decorative avatars in flow with their typography inside wp-admin trees', async () => {
 		const avatarRef = createRef< HTMLSpanElement >();
 		await render(
