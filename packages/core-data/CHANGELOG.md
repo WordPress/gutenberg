@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+-   Save only modified post metadata keys, preserving unrelated server updates and values while retaining complete editor and autosave views ([#84673](https://github.com/WordPress/gutenberg/pull/84673)).
 -   Keep read-only taxonomy term data out of collaborative edits so stale counts and links do not mark unchanged categories as dirty ([#84838](https://github.com/WordPress/gutenberg/pull/84838)).
 
 ### Internal
