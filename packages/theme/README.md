@@ -273,7 +273,7 @@ When you render React content into a different document (typically an iframe), t
 
     For custom iframes, the consumer is responsible for loading it in the iframe document. Within WordPress, enqueue the `wp-theme` stylesheet for that document. Outside WordPress, import `@wordpress/theme/design-tokens.css` from a stylesheet that the iframe already loads, or inject the CSS string directly.
 
-2.  **Dynamically injected component styles are routed to the iframe document.** Some `@wordpress/components` styles are injected into the document at runtime rather than shipped as static CSS — for example Emotion-based styles, and styles from CSS modules built with `@wordpress/build`. `StyleProvider` tells that machinery which document's `<head>` to inject into. Wrap the iframe subtree in `<StyleProvider document={ iframeDocument }>`.
+2.  **CSS Module styles are registered in the iframe document.** Styles from CSS Modules built with `@wordpress/build` are injected at runtime through `@wordpress/style-runtime`. Wrap the iframe subtree in `<StyleProvider document={ iframeDocument }>` so registered styles reach that document's `<head>` before children measure layout. `StyleProvider` does not provide an Emotion cache. Consumers using `@emotion/react` or `@emotion/styled` must provide their own `CacheProvider` with a cache whose `container` is the iframe document's `<head>`. Consumers using `@emotion/css` must create an instance with `@emotion/css/create-instance`, set its `container` to that document's `<head>`, and use the instance's styling functions. See [Emotion's cache setup guidance](https://emotion.sh/docs/package-summary).
 
 The canonical pattern combines both with a `<ThemeProvider isRoot>` to apply any overrides to the iframe's `:root`:
 
