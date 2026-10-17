@@ -29,6 +29,7 @@ export default function CoverBlockControls( {
 	showEditMediaButton,
 	isEditMediaDisabled,
 	blockEditingMode,
+	isInFixedGridCell,
 } ) {
 	const {
 		contentPosition,
@@ -104,11 +105,13 @@ export default function CoverBlockControls( {
 						}
 						isDisabled={ ! hasInnerBlocks }
 					/>
-					<FullHeightAlignmentControl
-						isActive={ isMinFullHeight }
-						onToggle={ toggleMinFullHeight }
-						isDisabled={ ! hasInnerBlocks }
-					/>
+					{ ! isInFixedGridCell && (
+						<FullHeightAlignmentControl
+							isActive={ isMinFullHeight }
+							onToggle={ toggleMinFullHeight }
+							isDisabled={ ! hasInnerBlocks }
+						/>
+					) }
 					{ showEditMediaButton && (
 						<ToolbarButton
 							ref={ editMediaButtonRef }

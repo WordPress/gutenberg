@@ -1,5 +1,5 @@
 import { ResizableBox } from '@wordpress/components';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import {
@@ -9,12 +9,24 @@ import {
 	getRowEndForResize,
 	getGridItemPixelRect,
 } from './utils';
+import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
+
+const justification = {
+	right: 'left',
+	left: 'right',
+};
+
+const alignment = {
+	top: 'flex-end',
+	bottom: 'flex-start',
+};
 
 export function GridItemResizer( {
 	clientId,
 	bounds,
 	onChange,
 	parentLayout,
+	angle = 0,
 } ) {
 	const blockElement = useBlockElement( clientId );
 	const rootBlockElement = blockElement?.parentElement;
@@ -31,6 +43,7 @@ export function GridItemResizer( {
 			blockElement={ blockElement }
 			rootBlockElement={ rootBlockElement }
 			onChange={ onChange }
+			angle={ angle }
 			isManualGrid={
 				isManualPlacement &&
 				window.__experimentalEnableGridInteractivity
@@ -46,6 +59,7 @@ function GridItemResizerInner( {
 	rootBlockElement,
 	onChange,
 	isManualGrid,
+	angle,
 } ) {
 	const [ resizeDirection, setResizeDirection ] = useState( null );
 	const [ enableSide, setEnableSide ] = useState( {
@@ -86,34 +100,29 @@ function GridItemResizerInner( {
 		return () => observer.disconnect();
 	}, [ blockElement, rootBlockElement, isManualGrid ] );
 
-	const justification = {
-		right: 'left',
-		left: 'right',
-	};
-
-	const alignment = {
-		top: 'flex-end',
-		bottom: 'flex-start',
-	};
-
-	const styles = {
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		...( justification[ resizeDirection ] && {
-			justifyContent: justification[ resizeDirection ],
+	const styles = useMemo(
+		() => ( {
+			display: 'flex',
+			justifyContent: 'center',
+			alignItems: 'center',
+			...( justification[ resizeDirection ] && {
+				justifyContent: justification[ resizeDirection ],
+			} ),
+			...( alignment[ resizeDirection ] && {
+				alignItems: alignment[ resizeDirection ],
+			} ),
 		} ),
-		...( alignment[ resizeDirection ] && {
-			alignItems: alignment[ resizeDirection ],
-		} ),
-	};
+		[ resizeDirection ]
+	);
+	// Keep the handles on the block's edges when it is rotated.
+	const overlayStyles = useRotatedOverlayStyle( blockElement, angle, styles );
 
 	return (
 		<BlockPopoverCover
 			className="block-editor-grid-item-resizer"
 			clientId={ clientId }
 			__unstablePopoverSlot="__unstable-block-tools-after"
-			additionalStyles={ styles }
+			additionalStyles={ overlayStyles }
 		>
 			<ResizableBox
 				className="block-editor-grid-item-resizer__box"

@@ -4,6 +4,7 @@ import {
 	getBoundingGridRect,
 	getGridRectFromPixelRect,
 	getGridTracks,
+	getRotationFromCSS,
 	getRowEndForResize,
 } from '../utils';
 
@@ -145,5 +146,34 @@ describe( 'getRowEndForResize()', () => {
 	it( 'adds a row for every row height dragged past the end', () => {
 		expect( getRowEndForResize( rowTracks, 230, 10 ) ).toBe( 4 );
 		expect( getRowEndForResize( rowTracks, 290, 10 ) ).toBe( 5 );
+	} );
+} );
+
+describe( 'getRotationFromCSS()', () => {
+	it( 'reads degrees', () => {
+		expect( getRotationFromCSS( '45deg' ) ).toBe( 45 );
+		expect( getRotationFromCSS( '-30deg' ) ).toBe( -30 );
+		expect( getRotationFromCSS( '12.5deg' ) ).toBe( 12.5 );
+	} );
+
+	it( 'converts other angle units to degrees', () => {
+		expect( getRotationFromCSS( '0.25turn' ) ).toBeCloseTo( 90 );
+		expect( getRotationFromCSS( '100grad' ) ).toBeCloseTo( 90 );
+		expect( getRotationFromCSS( `${ Math.PI }rad` ) ).toBeCloseTo( 180 );
+	} );
+
+	it( 'is 0 when there is no rotation', () => {
+		expect( getRotationFromCSS( 'none' ) ).toBe( 0 );
+		expect( getRotationFromCSS( '' ) ).toBe( 0 );
+		expect( getRotationFromCSS( undefined ) ).toBe( 0 );
+	} );
+
+	it( 'reads a rotation around the z axis, which is in the page', () => {
+		expect( getRotationFromCSS( 'z 45deg' ) ).toBe( 45 );
+	} );
+
+	it( 'is 0 for a rotation around another axis', () => {
+		expect( getRotationFromCSS( 'x 45deg' ) ).toBe( 0 );
+		expect( getRotationFromCSS( '1 1 0 45deg' ) ).toBe( 0 );
 	} );
 } );

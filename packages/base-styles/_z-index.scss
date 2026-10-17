@@ -74,6 +74,10 @@ $z-layers: (
 	// Above the grid visualizer, like the grid item resizer.
 	".block-editor-grid-row-resizer": 31,
 
+	// Above the grid visualizer, like the grid item resizer, so that the
+	// rotate handle stays usable over empty cells.
+	".block-editor-grid-item-handles": 31,
+
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 

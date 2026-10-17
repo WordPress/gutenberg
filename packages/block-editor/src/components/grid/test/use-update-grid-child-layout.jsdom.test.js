@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { getGridChildUpdates } from '../use-update-grid-child-layout';
+import { getUpdatedRotateStyle } from '../../../hooks/rotate';
 
 const DEFAULT_STATE = { viewport: 'default', pseudo: 'default' };
 const MOBILE_STATE = { viewport: '@mobile', pseudo: 'default' };
@@ -144,6 +145,61 @@ describe( 'getGridChildUpdates()', () => {
 		} );
 		expect( updates.b ).toEqual( {
 			style: expect.objectContaining( { marker: true } ),
+		} );
+	} );
+
+	describe( 'rotation, as the rotate handle changes it', () => {
+		const rotateTo = ( angle ) => ( style, state ) =>
+			getUpdatedRotateStyle( style, angle, state );
+
+		it( 'stores the rotation in the selected state', () => {
+			expect(
+				getUpdates( {
+					change: rotateTo( 30 ),
+					selectedState: DEFAULT_STATE,
+				} ).b.style
+			).toEqual( {
+				layout: { columnStart: 2, rowStart: 1 },
+				rotate: 30,
+			} );
+			expect(
+				getUpdates( {
+					change: rotateTo( -15 ),
+					selectedState: TABLET_STATE,
+				} ).b.style[ '@tablet' ]
+			).toEqual( { rotate: -15 } );
+		} );
+
+		it( 'unstacks a grid stacked on mobile first, keeping the other blocks unrotated', () => {
+			const updates = getGridChildUpdates( {
+				clientId: 'b',
+				style: { rotate: 10 },
+				change: rotateTo( 45 ),
+				selectedState: MOBILE_STATE,
+				gridClientId: 'grid',
+				gridAttributes: manualGrid,
+				children: [
+					{ clientId: 'a', attributes: { style: { rotate: 30 } } },
+					{ clientId: 'b', attributes: { style: { rotate: 10 } } },
+				],
+			} );
+			expect( updates.a.style ).toMatchObject( {
+				rotate: 30,
+				'@mobile': { rotate: 0 },
+			} );
+			expect( updates.b.style ).toMatchObject( { rotate: 10 } );
+			expect( updates.b.style[ '@mobile' ] ).toEqual( {
+				layout: {
+					columnStart: 1,
+					columnSpan: 3,
+					rowStart: 2,
+					rowSpan: 1,
+				},
+				rotate: 45,
+			} );
+			expect( updates.grid.style[ '@mobile' ].layout.stackOnMobile ).toBe(
+				false
+			);
 		} );
 	} );
 
