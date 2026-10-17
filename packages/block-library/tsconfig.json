@@ -23,7 +23,7 @@
 		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../patterns" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../hooks" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
@@ -41,7 +41,7 @@
 		{ "path": "../shortcode/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
 		{ "path": "../upload-media/tsconfig.build.json" },
-		{ "path": "../url" },
+		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	],
 	"include": [ "src/**/*.ts", "src/**/*.tsx" ]
