@@ -103,9 +103,9 @@ export default function InlineNotice( {
 		onDismiss,
 	} = notice;
 	const actions = notice.actions as NoticeAction[];
-	const element = ( notice as Record< symbol, unknown > )[ NOTICE_ELEMENT ] as
-		| ReactNode
-		| undefined;
+	const element = ( notice as Record< symbol, unknown > )[
+		NOTICE_ELEMENT
+	] as ReactNode | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	useAnnouncement( notice );

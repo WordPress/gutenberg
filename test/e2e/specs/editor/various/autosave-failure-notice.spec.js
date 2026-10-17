@@ -296,11 +296,13 @@ test.describe( 'Autosave failure notice', () => {
 
 			const notice = page
 				.getByRole( 'region', { name: 'Editor content' } )
-				.locator( '.components-notice__content' );
-			await expect( notice ).toHaveText(
-				/^Auto-save failed\. We’ll try to save a backup in this browser\. You can also save manually\. Retrying in (10|9) seconds\.$/
+				.locator( '.notices-inline-notices__notice' );
+			await expect( notice ).toContainText(
+				new RegExp(
+					`${ AUTOSAVE_FAILED.replaceAll( '.', '\\.' ) } Retrying in (10|9) seconds\\.`
+				)
 			);
-			await expect( notice ).toHaveText(
+			await expect( notice ).toContainText(
 				`${ AUTOSAVE_FAILED } Retrying in 7 seconds.`
 			);
 		} );
@@ -320,8 +322,8 @@ test.describe( 'Autosave failure notice', () => {
 
 			const notice = page
 				.getByRole( 'region', { name: 'Editor content' } )
-				.locator( '.components-notice__content' );
-			await expect( notice ).toHaveText(
+				.locator( '.notices-inline-notices__notice' );
+			await expect( notice ).toContainText(
 				`${ AUTOSAVE_FAILED } Retrying…`
 			);
 			await expect( notice ).toHaveCount( 0 );
