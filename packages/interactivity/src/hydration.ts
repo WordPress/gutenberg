@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
 import { hydrate, type ContainerNode, type ComponentChild } from 'preact';
 import 'requestidlecallback';
-/**
- * Internal dependencies
- */
 import { toVdom, hydratedIslands } from './vdom';
 import { createRootFragment, splitTask, warn } from './utils';
 
@@ -38,6 +32,14 @@ export const initialVdomPromise = new Promise<
 	resolveInitialVdom = resolve;
 } );
 
+/**
+ * Hydrates the document's top-level interactive islands and initializes the
+ * router's initial vDOM. Islands without an interactive ancestor are selected
+ * before any hydration can change the document. Nested islands run only as part
+ * of their outer island's tree.
+ *
+ * @return A promise that resolves once all eligible islands are hydrated.
+ */
 // The IntersectionObserver used to hydrate islands as they approach the
 // viewport. Module-level so `hydrateAllRemaining` can disconnect it.
 let intersectionObserver: IntersectionObserver | null = null;
@@ -68,9 +70,7 @@ const hydrateNode = async ( node: Element ) => {
 		await splitTask();
 		hydrate( vdom, fragment );
 	} catch ( e ) {
-		warn(
-			`Failed to hydrate island: ${( e as Error ).message ?? e}`
-		);
+		warn( `Failed to hydrate island: ${ ( e as Error ).message ?? e }` );
 	}
 };
 
@@ -112,7 +112,28 @@ export const hydrateAllRemaining = async () => {
  * is eventually hydrated even if the user never scrolls to it.
  */
 export const hydrateRegions = async () => {
-	const nodes = document.querySelectorAll( '[data-wp-interactive]' );
+	const nodes = [
+		...document.querySelectorAll( `[data-wp-interactive]` ),
+	].filter(
+		( node ) => ! node.parentElement?.closest( '[data-wp-interactive]' )
+	);
+
+	// No IntersectionObserver (jsdom unit tests, very old browsers): hydrate
+	// every unhydrated island immediately and resolve, mirroring the original
+	// upstream behavior. Without this, `await hydrateRegions()` would never
+	// complete in those environments — the observer callbacks never fire and
+	// the idle sweep may not run within the caller's wait. The
+	// `hydratedIslands` WeakSet keeps repeated calls idempotent.
+	if ( typeof window.IntersectionObserver !== 'function' ) {
+		for ( const node of nodes ) {
+			if ( ! hydratedIslands.has( node as Element ) ) {
+				await hydrateNode( node as Element );
+			}
+		}
+		resolveInitialVdom( initialVdom );
+		return;
+	}
+
 	// The islands still awaiting hydration via the observer. A `Set` rather
 	// than a counter: `Set.delete` is idempotent, so duplicate intersection
 	// entries for the same node cannot corrupt the "all done" detection (a

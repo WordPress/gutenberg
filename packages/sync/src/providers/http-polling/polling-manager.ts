@@ -1,21 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { applyFilters } from '@wordpress/hooks';
-
-/**
- * External dependencies
- */
 import * as Y from 'yjs';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import type { Awareness } from 'y-protocols/awareness';
 import { removeAwarenessStates } from 'y-protocols/awareness';
 import * as syncProtocol from 'y-protocols/sync';
-
-/**
- * Internal dependencies
- */
 import {
 	DEFAULT_CLIENT_LIMIT_PER_ROOM,
 	ERROR_RETRY_DELAYS_SOLO_MS,
@@ -1123,6 +1112,14 @@ function retryNow(): void {
 		pollingTimeoutId = null;
 		poll();
 	}
+}
+
+/**
+ * Immediately retries the sync connection instead of waiting for the next
+ * automatic retry. See `retryNow`.
+ */
+export function retrySyncConnection(): void {
+	pollingManager.retryNow();
 }
 
 export const pollingManager: PollingManager = {

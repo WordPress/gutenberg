@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 const jsdocConfig = require( './jsdoc' );
 
 module.exports = [

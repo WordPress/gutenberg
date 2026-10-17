@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import type { RequestUtils } from '@wordpress/e2e-test-utils-playwright';
 
 type AddPostWithBlockOptions = {

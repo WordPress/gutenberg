@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -146,10 +143,7 @@ test.describe( 'Post Content focus mode', () => {
 					name: 'Block: Title',
 				} );
 				await expect( postTitle ).toBeVisible();
-				await expect( postTitle ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( postTitle ).not.toHaveAttribute( 'inert' );
 				// Use selectBlocks to avoid toolbar interception issues.
 				await editor.selectBlocks( postTitle );
 				await page.keyboard.type( 'Test Post Title' );

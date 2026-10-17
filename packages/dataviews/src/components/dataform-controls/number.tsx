@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { DataFormControlProps } from '../../types';
 import ValidatedNumber from './utils/validated-number';
 

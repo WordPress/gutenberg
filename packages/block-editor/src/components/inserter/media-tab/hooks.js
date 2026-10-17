@@ -1,18 +1,14 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-/** @typedef {import('../../../store/actions').InserterMediaRequest} InserterMediaRequest */
-/** @typedef {import('../../../store/actions').InserterMediaItem} InserterMediaItem */
-/** @typedef {import('../../../store/actions').InserterMediaResponse} InserterMediaResponse */
+/** @typedef {import('../../../store/types').InserterMediaRequest} InserterMediaRequest */
+/** @typedef {import('../../../store/types').InserterMediaItem} InserterMediaItem */
+/** @typedef {import('../../../store/types').InserterMediaCategory} InserterMediaCategory */
+/** @typedef {import('../../../store/types').InserterMediaResponse} InserterMediaResponse */
+
+const EMPTY_MEDIA_LIST = [];
 
 /**
  * Normalizes the result of a media category's `fetch`, which may be either a
@@ -40,12 +36,16 @@ function normalizeFetchResult( result ) {
  *
  * @param {Object}               category   The media category to fetch results for.
  * @param {InserterMediaRequest} query      The query args to use for the request.
- * @param {any}                  refreshKey Optional value that, when changed, forces
+ * @param {unknown}              refreshKey Optional value that, when changed, forces
  *                                          a refetch (e.g. after attaching/detaching).
  * @return {{ mediaList: InserterMediaItem[], isLoading: boolean, totalItems: number|undefined, totalPages: number|undefined }} The media results and paging totals.
  */
 export function useMediaResults( category, query = {}, refreshKey ) {
 	const [ mediaList, setMediaList ] = useState();
+	// Which source produced the `mediaList`. Lets the return value go empty
+	// during render when a different source is asked for, which is a render
+	// earlier than the effect below can manage. See the note on the return.
+	const [ resolvedSource, setResolvedSource ] = useState();
 	const [ totals, setTotals ] = useState( {} );
 	const [ isLoading, setIsLoading ] = useState( false );
 	// We need to keep track of the last request made because
@@ -69,10 +69,11 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			const request = {};
 			lastRequestRef.current = request;
 			setIsLoading( true );
-			// Only clear the previous results when the category source or query
-			// changes, not on a manual refresh (a `refreshKey` bump after
-			// attach/detach). Keeping them lets the panel dim the existing grid
-			// during the refetch instead of blanking it.
+			// Clear the previous results when the query changes, but not on a
+			// manual refresh (a `refreshKey` bump after attach/detach), where
+			// keeping them lets the panel dim the existing grid rather than
+			// blank it. A source change is handled on the return instead,
+			// where clearing happens a render earlier.
 			if (
 				lastQueryKeyRef.current !== key ||
 				lastFetchRef.current !== category.fetch
@@ -102,6 +103,7 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 			if ( request === lastRequestRef.current ) {
 				// Set together so the grid and the pager never disagree.
 				setMediaList( mediaItems );
+				setResolvedSource( category.name );
 				setTotals( { totalItems, totalPages } );
 				setIsLoading( false );
 			}
@@ -112,41 +114,38 @@ export function useMediaResults( category, query = {}, refreshKey ) {
 		...Object.values( query ),
 		refreshKey,
 	] );
+	// `DataViews` holds on to the last non-empty list it was given while a
+	// fetch is in flight, which is what keeps the current page visible while
+	// the next one loads. A source change isn't the next page though, so the
+	// list has to be empty before the fetch starts: clearing it in the effect
+	// above would be one render too late, by which point `DataViews` has
+	// already taken a copy. Report empty until the requested source resolves.
+	const isSwitchingSource = resolvedSource !== category.name;
 	return {
-		mediaList,
+		mediaList: isSwitchingSource ? EMPTY_MEDIA_LIST : mediaList,
 		isLoading,
-		totalItems: totals.totalItems,
-		totalPages: totals.totalPages,
+		isSwitchingSource,
+		// Held back too, so the pager can't show the previous source's totals.
+		totalItems: isSwitchingSource ? undefined : totals.totalItems,
+		totalPages: isSwitchingSource ? undefined : totals.totalPages,
 	};
 }
 
 /**
- * Delays surfacing a loading state until a request has been in flight for
- * `delay` ms, so brief operations (e.g. a quick attach/detach refetch) don't
- * flash a loading indicator at all. Mirrors the DataViews `useDelayedLoading`
- * hook.
+ * The media categories available, and whether or not the list has been resolved.
+ * `hasResolved` allows a consumer to distinguish between "no categories available"
+ * and "still determining available categories." (i.e. categories are loading)
  *
- * @param {boolean} isLoading Whether a request is currently in flight.
- * @param {number}  delay     Milliseconds to wait before showing the loader.
- * @return {boolean} Whether the loading state should be shown yet.
+ * @param {string} [rootClientId] The client id of the insertion point.
+ * @return {{ categories: InserterMediaCategory[], hasResolved: boolean }} The categories, and whether they have been worked out yet.
  */
-export function useDelayedLoading( isLoading, delay = 400 ) {
-	const [ showLoading, setShowLoading ] = useState( false );
-	useEffect( () => {
-		if ( ! isLoading ) {
-			return undefined;
-		}
-		const timeout = setTimeout( () => setShowLoading( true ), delay );
-		return () => {
-			clearTimeout( timeout );
-			setShowLoading( false );
-		};
-	}, [ isLoading, delay ] );
-	return showLoading;
-}
-
 export function useMediaCategories( rootClientId ) {
-	const [ categories, setCategories ] = useState( [] );
+	const [ categories, setCategories ] = useState(
+		/** @type {InserterMediaCategory[]} */ ( [] )
+	);
+	// Stays true once set: a later run (the insertion point moved, say)
+	// refreshes the list in place rather than emptying the tab again.
+	const [ hasResolved, setHasResolved ] = useState( false );
 
 	const inserterMediaCategories = useSelect(
 		( select ) =>
@@ -179,6 +178,7 @@ export function useMediaCategories( rootClientId ) {
 			// If `inserterMediaCategories` is not defined in
 			// block editor settings, do not show any media categories.
 			if ( ! inserterMediaCategories ) {
+				setHasResolved( true );
 				return;
 			}
 			// Loop through categories to check if they have at least one media item.
@@ -225,6 +225,7 @@ export function useMediaCategories( rootClientId ) {
 			if ( !! _categories.length ) {
 				setCategories( _categories );
 			}
+			setHasResolved( true );
 		} )();
 	}, [
 		canInsertImage,
@@ -232,5 +233,5 @@ export function useMediaCategories( rootClientId ) {
 		canInsertAudio,
 		inserterMediaCategories,
 	] );
-	return categories;
+	return { categories, hasResolved };
 }

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { useState, useMemo, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import { STORE_NAME } from '../../store';
 import NavigationItem from './navigation-item';
 import DrilldownItem from './drilldown-item';
@@ -79,7 +72,6 @@ function Navigation() {
 								<DropdownItem
 									key={ item.id }
 									id={ item.id }
-									className="boot-navigation-item"
 									icon={ item.icon }
 									shouldShowPlaceholder={ hasRealIcons }
 									isExpanded={ parentDropdownId === item.id }

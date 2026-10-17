@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useRef, useEffect } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import type { NavigableContainerProps } from './types';
 
 const noop = () => {};

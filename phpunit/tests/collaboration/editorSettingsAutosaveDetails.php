@@ -17,13 +17,16 @@ class Tests_Collaboration_EditorSettingsAutosaveDetails extends WP_UnitTestCase 
 
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$author_id );
-		delete_option( 'wp_collaboration_enabled' );
 	}
 
 	public function set_up() {
 		parent::set_up();
-		update_option( 'wp_collaboration_enabled', 1 );
 		wp_set_current_user( self::$author_id );
+	}
+
+	public function tear_down() {
+		remove_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
+		parent::tear_down();
 	}
 
 	private const CRDT_SNAPSHOT_META_KEY = Gutenberg_REST_Autosaves_Controller::CRDT_SNAPSHOT_META_KEY;
@@ -108,7 +111,7 @@ class Tests_Collaboration_EditorSettingsAutosaveDetails extends WP_UnitTestCase 
 
 	public function test_does_not_modify_settings_when_collaboration_is_disabled() {
 		list( $post, $autosave ) = $this->create_draft_with_autosave();
-		update_option( 'wp_collaboration_enabled', 0 );
+		add_filter( 'pre_option_gutenberg-experiments', '__return_empty_array', 11 );
 
 		$input    = $this->get_settings_with_autosave( $autosave );
 		$settings = gutenberg_add_autosave_details_to_editor_settings(

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type AttributeMap from './AttributeMap';
 
 interface Op {

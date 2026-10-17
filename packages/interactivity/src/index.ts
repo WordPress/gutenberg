@@ -1,16 +1,8 @@
 if ( globalThis.SCRIPT_DEBUG ) {
 	await import( 'preact/debug' );
 }
-
-/**
- * External dependencies
- */
 import { h, cloneElement, render } from 'preact';
-import { batch, effect } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
+import { batch } from '@preact/signals';
 import './directives'; // Registers all the core directives.
 import { routerRegions } from './directives/router-region';
 import {
@@ -19,12 +11,14 @@ import {
 	hydrateAllRemaining,
 	getRegionRootFragment,
 } from './hydration';
-import { toVdom } from './vdom';
+import { parseDirectiveValue, toVdom } from './vdom';
 import { directive } from './hooks';
 import { getNamespace } from './namespaces';
+import { getScope } from './scopes';
 import { parseServerData, populateServerData } from './store';
 import { proxifyState } from './proxies';
 import {
+	afterNextFrame,
 	deepReadOnly,
 	navigationSignal,
 	onDOMReady,
@@ -40,6 +34,7 @@ export {
 	type TypeYield,
 } from './store';
 export { getContext, getServerContext, getElement } from './scopes';
+export { asDangerousHTML, type DangerousHTML } from './html';
 export {
 	withScope,
 	useWatch,
@@ -50,39 +45,25 @@ export {
 	useMemo,
 	splitTask,
 	withSyncEvent,
+	watch,
 } from './utils';
 
 export { useState, useRef } from 'preact/hooks';
-
-/**
- * Subscribes to changes in any signal accessed inside the callback, re-running
- * the callback whenever those signals change. Returns a cleanup function to
- * stop watching.
- *
- * @example
- * ```js
- * const unwatch = watch( () => {
- *   console.log( state.counter );
- * } );
- *
- * // Later, to stop watching:
- * unwatch();
- * ```
- */
-export const watch = effect;
 
 const requiredConsent =
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.';
 
 export const privateApis = (
 	lock: 'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
-): any => {
+) => {
 	if ( lock === requiredConsent ) {
 		return {
 			getRegionRootFragment,
 			initialVdomPromise,
 			hydrateAllRemaining,
 			toVdom,
+			// Shares the directive-value interpretation with internal consumers.
+			parseDirectiveValue,
 			directive,
 			getNamespace,
 			h,
@@ -97,6 +78,8 @@ export const privateApis = (
 			navigationSignal,
 			sessionId,
 			warn,
+			afterNextFrame,
+			getScope,
 		};
 	}
 

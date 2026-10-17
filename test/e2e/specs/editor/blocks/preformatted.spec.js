@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Preformatted', () => {
@@ -62,5 +59,43 @@ test.describe( 'Preformatted', () => {
 
 		// Expect preformatted block to be deleted.
 		expect( await editor.getEditedPostContent() ).toBe( '' );
+	} );
+
+	test( 'should keep multi-line text pasted into an empty block', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/preformatted' } );
+		pageUtils.setClipboardData( {
+			plainText: 'first part\n\nsecond part',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/preformatted',
+				attributes: { content: 'first part<br><br>second part' },
+			},
+		] );
+	} );
+
+	test( 'should apply active formatting when pasting plain text', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/preformatted' } );
+		await pageUtils.pressKeys( 'primary+b' );
+		await page.keyboard.type( '13' );
+		await page.keyboard.press( 'ArrowLeft' );
+		pageUtils.setClipboardData( { plainText: '2' } );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/preformatted',
+				attributes: { content: '<strong>123</strong>' },
+			},
+		] );
 	} );
 } );

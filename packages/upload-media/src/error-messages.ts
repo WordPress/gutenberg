@@ -4,15 +4,7 @@
  * Provides localized, human-readable messages for all error codes
  * with actionable guidance for users.
  */
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { ErrorCode } from './upload-error';
 import { getHeicConversionAdvice } from './heic-support';
 

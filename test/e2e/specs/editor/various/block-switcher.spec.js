@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Switcher', () => {
@@ -14,7 +11,7 @@ test.describe( 'Block Switcher', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
 		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
@@ -61,7 +58,7 @@ test.describe( 'Block Switcher', () => {
 
 		// Insert a list block.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
 		await pageUtils.pressKeys( 'primary+a', { times: 2 } );
@@ -97,7 +94,7 @@ test.describe( 'Block Switcher', () => {
 	} ) => {
 		// Insert a list block.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await pageUtils.pressKeys( 'alt+F10' );
@@ -125,7 +122,7 @@ test.describe( 'Block Switcher', () => {
 	} ) => {
 		// Insert a list block.
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
 		await pageUtils.pressKeys( 'alt+F10' );
@@ -143,7 +140,7 @@ test.describe( 'Block Switcher', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -169,7 +166,7 @@ test.describe( 'Block Switcher', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '- List content' );
 		await page.keyboard.press( 'ArrowUp' );

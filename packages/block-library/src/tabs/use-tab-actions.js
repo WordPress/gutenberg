@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createBlock } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useDispatch, useRegistry } from '@wordpress/data';
@@ -36,7 +33,7 @@ export default function useTabActions( tabsClientId ) {
 		const tabPanels = tabsClientId
 			? getBlocks( tabsClientId ).find(
 					( block ) => block.name === 'core/tab-panels'
-			  )
+				)
 			: undefined;
 
 		return {

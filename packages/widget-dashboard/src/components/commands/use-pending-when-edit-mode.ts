@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 type UsePendingWhenEditModeProps = {

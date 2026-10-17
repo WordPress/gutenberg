@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import { capitalCase } from 'change-case';
 import type { Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import type { PageUtils } from './';
 import { modifiers as baseModifiers, SHIFT, ALT, CTRL } from './keycodes';
 

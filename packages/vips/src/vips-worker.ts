@@ -1,19 +1,12 @@
-/**
- * External dependencies
- */
 import { wrap, terminate, type Remote } from '@wordpress/worker-threads';
-
-/**
- * Internal dependencies
- */
 import type {
 	ItemId,
 	ImageSizeCrop,
 	ConvertImageOptions,
 	ResizeImageOptions,
-} from './types';
-import type { WorkerAPI } from './worker';
-import { workerCode } from './worker-code';
+} from './types.ts';
+import type { WorkerAPI } from './worker.ts';
+import { workerCode } from './worker-code.ts';
 
 /**
  * The worker instance, lazily created on first use.

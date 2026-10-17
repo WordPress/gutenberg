@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BoxControl from '../';
 
 const meta: Meta< typeof BoxControl > = {
-	title: 'Components/BoxControl',
+	id: 'components-boxcontrol',
+	title: 'Components/@wordpress-components/BoxControl',
 	component: BoxControl,
 	argTypes: {
 		values: { control: false },

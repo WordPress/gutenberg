@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { useMemo, useRef } from '@wordpress/element';
 import { createBlock, parse } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { diffRevisionContent } from '../post-revisions-preview/block-diff';
@@ -32,8 +25,8 @@ export function useRevisionBlocks() {
 		const {
 			isRevisionsMode,
 			isShowingRevisionDiff,
-			getCurrentRevision,
-			getPreviousRevision,
+			getShownVersion,
+			getComparedVersion,
 		} = unlock( select( editorStore ) );
 		const { getCurrentPostType } = select( editorStore );
 
@@ -41,8 +34,8 @@ export function useRevisionBlocks() {
 		return {
 			isInRevisionsMode: inRevisions,
 			showDiff: isShowingRevisionDiff(),
-			revision: inRevisions ? getCurrentRevision() : undefined,
-			previousRevision: inRevisions ? getPreviousRevision() : undefined,
+			revision: inRevisions ? getShownVersion() : undefined,
+			previousRevision: inRevisions ? getComparedVersion() : undefined,
 			postType: getCurrentPostType(),
 		};
 	}, [] );

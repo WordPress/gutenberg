@@ -29,7 +29,10 @@ const DEFAULT_RENDER = (
  * A button that clears the input value.
  */
 export const Clear = forwardRef< HTMLButtonElement, AutocompleteClearProps >(
-	function Clear( { render = DEFAULT_RENDER, ...restProps }, ref ) {
+	function UnforwardedClear(
+		{ render = DEFAULT_RENDER, ...restProps },
+		ref
+	) {
 		return (
 			<_Autocomplete.Clear
 				ref={ ref }

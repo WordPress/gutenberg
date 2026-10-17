@@ -1,18 +1,14 @@
-@layer wp-ui {
-	@layer utilities, components, compositions, overrides;
-
-	@layer components {
-		.visually-hidden {
-			border: 0;
-			clip-path: inset(50%);
-			height: 1px;
-			margin: -1px;
-			overflow: hidden;
-			padding: 0;
-			position: absolute;
-			width: 1px;
-			word-wrap: normal;
-			word-break: normal;
-		}
-	}
+/* Keep these styles unlayered so global element styles do not override them
+ * solely through cascade layer precedence. */
+.visually-hidden {
+	border: 0;
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	overflow-wrap: normal;
+	word-break: normal;
 }

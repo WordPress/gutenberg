@@ -1,12 +1,8 @@
-/**
- * External dependencies
- */
-import { RuleTester } from 'eslint';
-
-/**
- * Internal dependencies
- */
+import { describe, it } from 'vitest';
+import configureRuleTester from '../../test-utils/configure-rule-tester';
 import rule from '../wp-global-usage';
+
+const RuleTester = configureRuleTester( { describe, it } );
 
 const ruleTester = new RuleTester( {
 	languageOptions: {

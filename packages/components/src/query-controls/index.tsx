@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import AuthorSelect from './author-select';
 import CategorySelect from './category-select';
 import FormTokenField from '../form-token-field';

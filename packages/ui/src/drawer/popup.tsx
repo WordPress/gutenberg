@@ -5,7 +5,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import { useDeprioritizedInitialFocus } from '../utils/use-deprioritized-initial-focus';
 import { SCROLL_CONTAINER_ATTR } from '../utils/use-overlay-scroll-state-attributes';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
-import { ThemeProvider } from '../utils/theme-provider';
 import { DrawerValidationProvider, useDrawerModal } from './context';
 import { Portal } from './portal';
 import styles from './style.module.css';
@@ -49,39 +48,30 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DrawerPopup(
 				/>
 			) }
 			<_Drawer.Viewport className={ styles.viewport }>
-				{ /*
-				 * ThemeProvider wraps _Drawer.Popup directly (matching Dialog
-				 * and Popover) so the `display: contents` focus-trap workaround
-				 * selector in the CSS module actually targets this subtree.
-				 */ }
-				<ThemeProvider>
-					<_Drawer.Popup
-						ref={ mergedRef }
-						className={ ( state ) => {
-							const isVertical =
-								state.swipeDirection === 'up' ||
-								state.swipeDirection === 'down';
-							const resolvedSize =
-								size ?? ( isVertical ? 'auto' : 'medium' );
+				<_Drawer.Popup
+					ref={ mergedRef }
+					className={ ( state ) => {
+						const isVertical =
+							state.swipeDirection === 'up' ||
+							state.swipeDirection === 'down';
+						const resolvedSize =
+							size ?? ( isVertical ? 'auto' : 'medium' );
 
-							return clsx(
-								styles.popup,
-								className,
-								styles[ `is-${ resolvedSize }` ]
-							);
-						} }
-						initialFocus={ resolvedInitialFocus }
-						finalFocus={ finalFocus }
-						{ ...props }
-						data-wp-ui-overlay-modal={
-							modal === true ? '' : undefined
-						}
-					>
-						<DrawerValidationProvider>
-							{ children }
-						</DrawerValidationProvider>
-					</_Drawer.Popup>
-				</ThemeProvider>
+						return clsx(
+							styles.popup,
+							className,
+							styles[ `is-${ resolvedSize }` ]
+						);
+					} }
+					initialFocus={ resolvedInitialFocus }
+					finalFocus={ finalFocus }
+					{ ...props }
+					data-wp-ui-overlay-modal={ modal === true ? '' : undefined }
+				>
+					<DrawerValidationProvider>
+						{ children }
+					</DrawerValidationProvider>
+				</_Drawer.Popup>
 			</_Drawer.Viewport>
 		</>
 	);
