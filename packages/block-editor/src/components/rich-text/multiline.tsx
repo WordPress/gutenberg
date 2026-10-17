@@ -9,29 +9,38 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { useRefEffect } from '@wordpress/compose';
+import type { ForwardedRef, RefObject } from 'react';
 import { RichTextWrapper } from './';
 import { store as blockEditorStore } from '../../store';
 import { useBlockEditContext } from '../block-edit';
 import { getMultilineTag } from './utils';
 import { unlock } from '../../lock-unlock';
+import type {
+	RichTextMultilineLineProps,
+	RichTextMultilineLineState,
+	RichTextMultilineProps,
+} from './types';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
-function useEnterRef( props ) {
+function useEnterRef(
+	props: RefObject< RichTextMultilineLineState | undefined >
+) {
 	const registry = useRegistry();
 	const { getSelectionStart, getSelectionEnd } =
 		useSelect( blockEditorStore );
 	const { selectionChange } = useDispatch( blockEditorStore );
 	return useRefEffect( ( element ) => {
-		function onKeyDown( event ) {
+		function onKeyDown( event: KeyboardEvent ) {
 			if ( event.keyCode !== ENTER ) {
 				return;
 			}
 
 			event.preventDefault();
 
+			// Set before any event.
 			const { value, values, onChange, index, identifier, clientId } =
-				props.current;
+				props.current!;
 			const { offset: start } = getSelectionStart();
 			const { offset: end } = getSelectionEnd();
 
@@ -44,7 +53,8 @@ function useEnterRef( props ) {
 			richTextValue.start = start;
 			richTextValue.end = end;
 
-			const array = split( richTextValue ).map( ( v ) =>
+			// Splitting at a selection returns both parts.
+			const array = split( richTextValue )!.map( ( v ) =>
 				toHTMLString( { value: v } )
 			);
 
@@ -53,7 +63,8 @@ function useEnterRef( props ) {
 			registry.batch( () => {
 				onChange( newValues );
 				selectionChange(
-					clientId,
+					// Multiline fields are in blocks.
+					clientId!,
 					`${ identifier }-${ index + 1 }`,
 					0,
 					0
@@ -67,7 +78,7 @@ function useEnterRef( props ) {
 	}, [] );
 }
 
-function Line( lineProps ) {
+function Line( lineProps: RichTextMultilineLineProps ) {
 	const {
 		value,
 		values,
@@ -79,7 +90,7 @@ function Line( lineProps ) {
 	} = lineProps;
 	const { clientId } = useBlockEditContext();
 	const { selectionChange } = useDispatch( blockEditorStore );
-	const latestRef = useRef();
+	const latestRef = useRef< RichTextMultilineLineState >( undefined );
 	useInsertionEffect( () => {
 		latestRef.current = { ...lineProps, clientId };
 	} );
@@ -92,12 +103,13 @@ function Line( lineProps ) {
 			value={ value }
 			onChange={ ( newValue ) => {
 				const newValues = values.slice();
-				newValues[ index ] = newValue;
+				// A string value changes to a string.
+				newValues[ index ] = newValue as string;
 				onChange( newValues );
 			} }
 			isSelected={ undefined }
 			ref={ ref }
-			onMerge={ ( forward ) => {
+			onMerge={ ( forward: boolean ) => {
 				const newValues = values.slice();
 				let offset = 0;
 				if ( forward ) {
@@ -123,7 +135,8 @@ function Line( lineProps ) {
 				}
 				onChange( newValues );
 				selectionChange(
-					clientId,
+					// Multiline fields are in blocks.
+					clientId!,
 					`${ identifier }-${ index - ( forward ? 0 : 1 ) }`,
 					offset,
 					offset
@@ -143,8 +156,8 @@ function RichTextMultiline(
 		onChange,
 		multiline,
 		...props
-	},
-	forwardedRef
+	}: RichTextMultilineProps,
+	forwardedRef: ForwardedRef< HTMLElement >
 ) {
 	deprecated( 'wp.blockEditor.RichText multiline prop', {
 		since: '6.1',
@@ -163,7 +176,7 @@ function RichTextMultiline(
 	values.shift();
 	values.pop();
 
-	function _onChange( newValues ) {
+	function _onChange( newValues: string[] ) {
 		onChange(
 			`<${ multilineTagName }>${ newValues.join(
 				`</${ multilineTagName }><${ multilineTagName }>`

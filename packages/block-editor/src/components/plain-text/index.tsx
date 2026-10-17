@@ -1,6 +1,9 @@
 import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
 import { forwardRef } from '@wordpress/element';
 import EditableText from '../editable-text';
+import type { EditableTextProps } from '../editable-text/types';
+import type { PlainTextProps, PlainTextTextareaProps } from './types';
 
 /**
  * Render an auto-growing textarea allow users to fill any textual content.
@@ -39,21 +42,32 @@ import EditableText from '../editable-text';
  * @param {Object}   [props.ref]    The component forwards the `ref` property to the `textarea` element.
  * @return {Element} Plain text component
  */
-const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
-	if ( __experimentalVersion === 2 ) {
-		return <EditableText ref={ ref } { ...props } />;
+const PlainText = forwardRef< HTMLElement, PlainTextProps >(
+	( { __experimentalVersion, ...props }, ref ) => {
+		if ( __experimentalVersion === 2 ) {
+			// Version 2 takes the editable text props.
+			return (
+				<EditableText
+					ref={ ref }
+					{ ...( props as EditableTextProps ) }
+				/>
+			);
+		}
+
+		// Other versions take the textarea props.
+		const { className, onChange, ...remainingProps } =
+			props as PlainTextTextareaProps;
+
+		return (
+			<textarea
+				// The textarea is the referenced element of these versions.
+				ref={ ref as ForwardedRef< HTMLTextAreaElement > }
+				className={ clsx( 'block-editor-plain-text', className ) }
+				onChange={ ( event ) => onChange( event.target.value ) }
+				{ ...remainingProps }
+			/>
+		);
 	}
-
-	const { className, onChange, ...remainingProps } = props;
-
-	return (
-		<textarea
-			ref={ ref }
-			className={ clsx( 'block-editor-plain-text', className ) }
-			onChange={ ( event ) => onChange( event.target.value ) }
-			{ ...remainingProps }
-		/>
-	);
-} );
+);
 
 export default PlainText;
