@@ -30,7 +30,7 @@ import {
 } from '@wordpress/icons';
 import TableOfContentsList from './list';
 import { createListItemBlocks, linearToNestedHeadingList } from './utils';
-import { useObserveHeadings } from './hooks';
+import { useHeadings } from './hooks';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 /** @typedef {import('./utils').HeadingData} HeadingData */
@@ -117,16 +117,19 @@ function TableOfContentsToolbar( {
 }
 
 export default function TableOfContentsEdit( {
-	attributes: {
-		headings = [],
-		onlyIncludeCurrentPage,
-		maxLevel,
-		ordered = true,
-	},
+	attributes: { onlyIncludeCurrentPage, maxLevel, ordered = true },
 	clientId,
+	context: { postId, postType },
 	setAttributes,
 } ) {
-	useObserveHeadings( clientId );
+	const headings =
+		useHeadings( {
+			clientId,
+			postId,
+			postType,
+			onlyIncludeCurrentPage,
+			maxLevel,
+		} ) ?? [];
 
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
@@ -238,15 +241,29 @@ export default function TableOfContentsEdit( {
 	// Note that the toolbar controls are intentionally omitted since the
 	// "Detach" option is useless to the placeholder state.
 	if ( headings.length === 0 ) {
+		let instructions = __(
+			'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
+		);
+		// Without a post ID, the block is in a template: either one that
+		// renders a single post of a known type (e.g. `single`), or one that
+		// doesn't render a single post at all (e.g. `archive`).
+		if ( ! postId ) {
+			instructions = postType
+				? __(
+						'This table of contents will show headings from the post being viewed.'
+					)
+				: __(
+						'Table of Contents needs a single post or page to list headings.'
+					);
+		}
+
 		return (
 			<>
 				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
-						instructions={ __(
-							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
-						) }
+						instructions={ instructions }
 					/>
 				</div>
 				{ inspectorControls }
