@@ -16,6 +16,7 @@ const MAX_APPENDER_LABEL_LENGTH = 50;
 export function getAppenderLabel(
 	defaultBlock:
 		| { name?: string; attributes?: Record< string, unknown > }
+		| false
 		| null
 		| undefined,
 	defaultBlockType:

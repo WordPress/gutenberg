@@ -1,19 +1,12 @@
-import type { ComponentProps, ComponentType, RefAttributes } from 'react';
 import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { ENTER, SPACE } from '@wordpress/keycodes';
-import UntypedInserter from '../inserter';
+import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import type { DefaultBlockAppenderProps } from './types';
 import type { Layout } from '../../layouts/types';
-
-// The inserter is still JavaScript, so its inferred props are all required.
-type TypedInserter = ComponentType<
-	Partial< ComponentProps< typeof UntypedInserter > > &
-		RefAttributes< unknown >
->;
 
 /**
  * Zero width non-breaking space, used as padding for the paragraph when it is
@@ -24,8 +17,6 @@ export const ZWNBSP = '\ufeff';
 export default function DefaultBlockAppender( {
 	rootClientId,
 }: DefaultBlockAppenderProps ) {
-	// Read on render, like the JSX it replaces, as the imports are circular.
-	const Inserter = UntypedInserter as TypedInserter;
 	const { showPrompt, isLocked, placeholder, isManualGrid } = useSelect(
 		( select ) => {
 			const {
