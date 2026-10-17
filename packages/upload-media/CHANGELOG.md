@@ -10,6 +10,10 @@
 
 -   Add a `generateAnimatedImageSubsizes` store setting, carried in the REST API root index from the new `wp_generate_animated_image_subsizes` filter, and a matching `preserveAnimation` option on `vipsResizeImage`. Sub-sizes of animated GIF and WebP images, cropped ones included, keep their animation instead of flattening to the first frame unless the setting is `false` ([#80385](https://github.com/WordPress/gutenberg/pull/80385)).
 
+### Internal
+
+-   Convert the private actions tests to TypeScript ([#84930](https://github.com/WordPress/gutenberg/pull/84930)).
+
 ## 0.42.0 (2026-10-07)
 
 ## 0.41.0 (2026-09-23)

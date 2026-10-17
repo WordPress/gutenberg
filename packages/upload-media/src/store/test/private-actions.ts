@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock, MockInstance } from 'vitest';
 import { createBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	generateThumbnails,
@@ -12,6 +13,7 @@ import {
 	removeItem,
 	uploadItem,
 } from '../private-actions';
+import type { ThunkArgs } from '../private-actions';
 import { OperationType, Type } from '../types';
 import { ErrorCode } from '../../upload-error';
 import {
@@ -32,22 +34,15 @@ vi.mock( import( '@wordpress/blob' ), () => ( {
 	revokeBlobURL: vi.fn(),
 } ) );
 
-// Mock vips utilities. The real isAnimatedGif() is needed by prepareItem
-// so it is required from the actual module rather than stubbed out.
-vi.mock( import( '../utils' ), async ( importOriginal ) => {
-	const actual = await importOriginal();
-	return {
-		vipsHasTransparency: vi.fn(),
-		vipsGetUltraHdrInfo: vi.fn(),
-		vipsRotateImage: vi.fn(),
-		terminateVipsWorker: vi.fn(),
-		maybeRecycleVipsWorker: vi.fn(),
-		isAnimatedGif: actual.isAnimatedGif,
-		cloneFile: actual.cloneFile,
-		convertBlobToFile: actual.convertBlobToFile,
-		renameFile: actual.renameFile,
-	};
-} );
+// Mock vips utilities. The isAnimatedGif() that prepareItem needs, and the
+// file helpers, come from `src/utils`, which is not mocked.
+vi.mock( import( '../utils' ), () => ( {
+	vipsHasTransparency: vi.fn(),
+	vipsGetUltraHdrInfo: vi.fn(),
+	vipsRotateImage: vi.fn(),
+	terminateVipsWorker: vi.fn(),
+	maybeRecycleVipsWorker: vi.fn(),
+} ) );
 
 // Mock the HEIC conversion so prepareItem's failure branch can be driven.
 // HeicUnsupportedError is kept real: prepareItem tells the two failures apart
@@ -139,7 +134,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should return null when PNG has transparency for PNG to JPEG conversion', async () => {
-			vipsHasTransparency.mockResolvedValue( true );
+			vi.mocked( vipsHasTransparency ).mockResolvedValue( true );
 
 			const file = new File( [ 'test' ], 'test.png', {
 				type: 'image/png',
@@ -157,7 +152,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should return transcode operation when PNG has no transparency for PNG to JPEG conversion', async () => {
-			vipsHasTransparency.mockResolvedValue( false );
+			vi.mocked( vipsHasTransparency ).mockResolvedValue( false );
 
 			const file = new File( [ 'test' ], 'test.png', {
 				type: 'image/png',
@@ -182,7 +177,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'should return null when transparency check fails', async () => {
-			vipsHasTransparency.mockRejectedValue(
+			vi.mocked( vipsHasTransparency ).mockRejectedValue(
 				new Error( 'WASM load failed' )
 			);
 
@@ -226,7 +221,7 @@ describe( 'private actions', () => {
 			const file = new File( [ 'test' ], 'test.png', {
 				type: 'image/png',
 			} );
-			vipsHasTransparency.mockResolvedValue( false );
+			vi.mocked( vipsHasTransparency ).mockResolvedValue( false );
 
 			const result = await getTranscodeImageOperation(
 				file,
@@ -355,7 +350,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
@@ -373,7 +368,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, [] );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
@@ -390,7 +385,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
@@ -407,7 +402,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( mediaFinalize ).not.toHaveBeenCalled();
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
@@ -443,7 +438,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {
@@ -476,7 +471,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation, cancelItem };
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( mediaFinalize ).toHaveBeenCalledWith( 42, mockSubSizes );
 			expect( console ).toHaveWarnedWith(
@@ -501,7 +496,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = finalizeItem( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( finishOperation ).not.toHaveBeenCalled();
 		} );
@@ -522,7 +517,7 @@ describe( 'private actions', () => {
 			} );
 		}
 
-		function flattenOperations( operations ) {
+		function flattenOperations( operations: unknown[] ) {
 			return operations.map( ( op ) =>
 				Array.isArray( op ) ? op[ 0 ] : op
 			);
@@ -536,8 +531,11 @@ describe( 'private actions', () => {
 				additionalData: {},
 			};
 
-			let dispatchedOperations;
-			const dispatch = ( action ) => {
+			let dispatchedOperations: unknown[] | undefined;
+			const dispatch = ( action: {
+				type?: string;
+				operations?: unknown[];
+			} ) => {
 				if ( action?.type === 'ADD_OPERATIONS' ) {
 					dispatchedOperations = action.operations;
 				}
@@ -551,22 +549,25 @@ describe( 'private actions', () => {
 			};
 
 			const thunk = prepareItem( 'gif-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
-			return { operations: dispatchedOperations, dispatch, item };
+			return { operations: dispatchedOperations!, dispatch, item };
 		}
 
+		// jsdom has no WebCodecs, so the tests add and remove its constructors.
+		const globals = global as unknown as Record< string, unknown >;
+
 		beforeEach( () => {
-			global.ImageDecoder = function () {};
-			global.VideoEncoder = function () {};
+			globals.ImageDecoder = function () {};
+			globals.VideoEncoder = function () {};
 			// Default to opaque so the conversion branch is taken; individual
 			// tests override this to exercise the transparency skip.
-			vipsHasTransparency.mockResolvedValue( false );
+			vi.mocked( vipsHasTransparency ).mockResolvedValue( false );
 		} );
 
 		afterEach( () => {
-			delete global.ImageDecoder;
-			delete global.VideoEncoder;
+			delete globals.ImageDecoder;
+			delete globals.VideoEncoder;
 		} );
 
 		it( 'schedules a normal image upload and stashes animatedGifFile', async () => {
@@ -592,7 +593,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'does not stash animatedGifFile when WebCodecs is unavailable', async () => {
-			delete global.ImageDecoder;
+			delete globals.ImageDecoder;
 
 			const { operations, dispatch } = await runPrepareItem();
 
@@ -610,7 +611,7 @@ describe( 'private actions', () => {
 		it( 'does not stash animatedGifFile for a transparent GIF', async () => {
 			// A <video> cannot reproduce GIF transparency, so a transparent
 			// GIF must stay a GIF.
-			vipsHasTransparency.mockResolvedValue( true );
+			vi.mocked( vipsHasTransparency ).mockResolvedValue( true );
 
 			const { dispatch } = await runPrepareItem();
 
@@ -624,7 +625,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'keeps the GIF when the transparency check throws', async () => {
-			vipsHasTransparency.mockRejectedValue(
+			vi.mocked( vipsHasTransparency ).mockRejectedValue(
 				new Error( 'vips unavailable' )
 			);
 
@@ -656,7 +657,10 @@ describe( 'private actions', () => {
 			};
 
 			let dispatchedOperations;
-			const dispatch = ( action ) => {
+			const dispatch = ( action: {
+				type?: string;
+				operations?: unknown[];
+			} ) => {
 				if ( action?.type === 'ADD_OPERATIONS' ) {
 					dispatchedOperations = action.operations;
 				}
@@ -670,7 +674,7 @@ describe( 'private actions', () => {
 			};
 
 			const thunk = prepareItem( 'gif-static-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			// Static GIF falls through to the normal image pipeline (no TranscodeGif).
 			expect(
@@ -695,7 +699,10 @@ describe( 'private actions', () => {
 			};
 
 			let dispatchedOperations;
-			const dispatch = ( action ) => {
+			const dispatch = ( action: {
+				type?: string;
+				operations?: unknown[];
+			} ) => {
 				if ( action?.type === 'ADD_OPERATIONS' ) {
 					dispatchedOperations = action.operations;
 				}
@@ -710,7 +717,7 @@ describe( 'private actions', () => {
 			};
 
 			const thunk = prepareItem( 'gif-optout-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			// gifConvert:false bypasses the detection branch entirely.
 			expect(
@@ -735,13 +742,16 @@ describe( 'private actions', () => {
 				getSettings: () => ( {} ),
 			};
 
-			await prepareItem( 'heic-id' )( { select, dispatch } );
+			await prepareItem( 'heic-id' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			return dispatch;
 		}
 
 		it( 'reports a browser with no HEIC decoder as a decode error', async () => {
-			canvasConvertToJpeg.mockRejectedValue(
+			vi.mocked( canvasConvertToJpeg ).mockRejectedValue(
 				new HeicUnsupportedError( 'No decoder here' )
 			);
 
@@ -760,7 +770,7 @@ describe( 'private actions', () => {
 			// all land here. None of them says the browser cannot read HEIC,
 			// so none should send the user off to install another one.
 			const cause = new Error( 'Corrupt image data' );
-			canvasConvertToJpeg.mockRejectedValue( cause );
+			vi.mocked( canvasConvertToJpeg ).mockRejectedValue( cause );
 
 			const dispatch = await runPrepareItem();
 
@@ -796,11 +806,11 @@ describe( 'private actions', () => {
 			return { select, dispatch };
 		}
 
-		let consoleDebug;
+		let consoleDebug: MockInstance< typeof console.debug >;
 
 		beforeEach( () => {
-			convertGifToVideo.mockReset();
-			createBlobURL.mockClear();
+			vi.mocked( convertGifToVideo ).mockReset();
+			vi.mocked( createBlobURL ).mockClear();
 			consoleDebug = vi
 				.spyOn( console, 'debug' )
 				.mockImplementation( () => {} );
@@ -814,13 +824,13 @@ describe( 'private actions', () => {
 			const videoFile = new File( [ 'mp4' ], 'animation.mp4', {
 				type: 'video/mp4',
 			} );
-			convertGifToVideo.mockResolvedValue( videoFile );
+			vi.mocked( convertGifToVideo ).mockResolvedValue( videoFile );
 			const { select, dispatch } = buildArgs();
 
 			await transcodeGifItem( 'gif-1', { outputFormat: 'mp4' } )( {
 				select,
 				dispatch,
-			} );
+			} as unknown as ThunkArgs );
 
 			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
@@ -841,7 +851,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'sideloads the first-frame poster as a sibling once the video succeeds', async () => {
-			convertGifToVideo.mockResolvedValue(
+			vi.mocked( convertGifToVideo ).mockResolvedValue(
 				new File( [ 'mp4' ], 'animation.mp4', { type: 'video/mp4' } )
 			);
 			const { select, dispatch } = buildArgs();
@@ -849,7 +859,7 @@ describe( 'private actions', () => {
 			await transcodeGifItem( 'gif-1', { outputFormat: 'mp4' } )( {
 				select,
 				dispatch,
-			} );
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.addSideloadItem ).toHaveBeenCalledTimes( 1 );
 			const poster = dispatch.addSideloadItem.mock.calls[ 0 ][ 0 ];
@@ -876,12 +886,15 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'defaults to mp4 when no output format is given', async () => {
-			convertGifToVideo.mockResolvedValue(
+			vi.mocked( convertGifToVideo ).mockResolvedValue(
 				new File( [ 'mp4' ], 'animation.mp4', { type: 'video/mp4' } )
 			);
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await transcodeGifItem( 'gif-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
@@ -892,7 +905,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'passes timeout and maxTotalPixels operation args through', async () => {
-			convertGifToVideo.mockResolvedValue(
+			vi.mocked( convertGifToVideo ).mockResolvedValue(
 				new File( [ 'webm' ], 'animation.webm', {
 					type: 'video/webm',
 				} )
@@ -903,7 +916,7 @@ describe( 'private actions', () => {
 				outputFormat: 'webm',
 				timeout: 5000,
 				maxTotalPixels: 1_000_000,
-			} )( { select, dispatch } );
+			} )( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( convertGifToVideo ).toHaveBeenCalledWith(
 				'gif-1',
@@ -918,12 +931,15 @@ describe( 'private actions', () => {
 			// to "upload the original GIF" here would write a meaningless
 			// animated_video meta entry pointing at the GIF itself. Just
 			// cancel the sideload — silently — and let the GIF stand alone.
-			convertGifToVideo.mockRejectedValue(
+			vi.mocked( convertGifToVideo ).mockRejectedValue(
 				new Error( 'Unsupported: WebCodecs unavailable' )
 			);
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await transcodeGifItem( 'gif-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
@@ -941,14 +957,17 @@ describe( 'private actions', () => {
 			// outcome, but the skip is logged (under SCRIPT_DEBUG, true in
 			// this test env) so developers testing large GIFs understand
 			// why no companion video was produced.
-			convertGifToVideo.mockRejectedValue(
+			vi.mocked( convertGifToVideo ).mockRejectedValue(
 				new Error(
 					'Unsupported: GIF exceeds maximum conversion size (5000x5000 x 100 frames = 2500000000 pixels; limit is 300000000)'
 				)
 			);
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await transcodeGifItem( 'gif-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
@@ -967,12 +986,15 @@ describe( 'private actions', () => {
 			// The conversion was abandoned after the timeout; the GIF
 			// attachment stands alone. No user-facing error, but the
 			// timeout is logged (under SCRIPT_DEBUG) for debuggability.
-			convertGifToVideo.mockRejectedValue(
+			vi.mocked( convertGifToVideo ).mockRejectedValue(
 				new Error( 'GIF to video conversion timed out after 30000ms' )
 			);
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await transcodeGifItem( 'gif-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
@@ -993,10 +1015,13 @@ describe( 'private actions', () => {
 			// user thinks of as an image upload: log the cause, cancel
 			// the sideload silently, leave the GIF attachment untouched.
 			const cause = new Error( 'Encoder produced empty output' );
-			convertGifToVideo.mockRejectedValue( cause );
+			vi.mocked( convertGifToVideo ).mockRejectedValue( cause );
 			const { select, dispatch } = buildArgs();
 
-			await transcodeGifItem( 'gif-1' )( { select, dispatch } );
+			await transcodeGifItem( 'gif-1' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
 			expect( dispatch.cancelItem ).toHaveBeenCalledTimes( 1 );
@@ -1018,7 +1043,10 @@ describe( 'private actions', () => {
 			const { dispatch } = buildArgs();
 			const select = { getItem: vi.fn( () => undefined ) };
 
-			await transcodeGifItem( 'missing' )( { select, dispatch } );
+			await transcodeGifItem( 'missing' )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( convertGifToVideo ).not.toHaveBeenCalled();
 			expect( dispatch.finishOperation ).not.toHaveBeenCalled();
@@ -1027,8 +1055,17 @@ describe( 'private actions', () => {
 	} );
 
 	describe( 'generateThumbnails (animated GIF video sideload)', () => {
-		function runGenerate( { item, settings } ) {
-			const dispatchFn = vi.fn();
+		function runGenerate( {
+			item,
+			settings,
+		}: {
+			item: { id: string };
+			settings: object;
+		} ) {
+			const dispatchFn = vi.fn() as Mock & {
+				finishOperation: Mock;
+				addSideloadItem: Mock;
+			};
 			dispatchFn.finishOperation = vi.fn();
 			dispatchFn.addSideloadItem = vi.fn();
 			const select = {
@@ -1036,9 +1073,10 @@ describe( 'private actions', () => {
 				getSettings: () => settings,
 			};
 			const thunk = generateThumbnails( item.id );
-			return thunk( { select, dispatch: dispatchFn } ).then(
-				() => dispatchFn
-			);
+			return thunk( {
+				select,
+				dispatch: dispatchFn,
+			} as unknown as ThunkArgs ).then( () => dispatchFn );
 		}
 
 		function makeGif( name = 'animated.gif' ) {
@@ -1137,7 +1175,7 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'probes the file and finishes the operation when UltraHDR', async () => {
-			vipsGetUltraHdrInfo.mockResolvedValue( {
+			vi.mocked( vipsGetUltraHdrInfo ).mockResolvedValue( {
 				width: 1024,
 				height: 768,
 				hdrCapacity: 3,
@@ -1148,7 +1186,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = detectUltraHdr( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			// The thunk only probes and tracks the item (tracking is verified
 			// via the generateThumbnails routing tests); the upload itself is
@@ -1158,19 +1196,19 @@ describe( 'private actions', () => {
 		} );
 
 		it( 'finishes cleanly when buffer is not UltraHDR', async () => {
-			vipsGetUltraHdrInfo.mockResolvedValue( null );
+			vi.mocked( vipsGetUltraHdrInfo ).mockResolvedValue( null );
 			const finishOperation = vi.fn();
 			const select = { getItem: () => makeItem() };
 			const dispatch = { finishOperation };
 
 			const thunk = detectUltraHdr( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
 		} );
 
 		it( 'falls through gracefully when probe throws', async () => {
-			vipsGetUltraHdrInfo.mockRejectedValue(
+			vi.mocked( vipsGetUltraHdrInfo ).mockRejectedValue(
 				new Error( 'wasm module unavailable' )
 			);
 			const finishOperation = vi.fn();
@@ -1178,7 +1216,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = detectUltraHdr( 'test-id' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			// Probe failure must not cancel the upload — pass-through finish.
 			expect( finishOperation ).toHaveBeenCalledWith( 'test-id', {} );
@@ -1190,7 +1228,7 @@ describe( 'private actions', () => {
 			const dispatch = { finishOperation };
 
 			const thunk = detectUltraHdr( 'missing' );
-			await thunk( { select, dispatch } );
+			await thunk( { select, dispatch } as unknown as ThunkArgs );
 
 			expect( vipsGetUltraHdrInfo ).not.toHaveBeenCalled();
 			expect( finishOperation ).not.toHaveBeenCalled();
@@ -1223,7 +1261,10 @@ describe( 'private actions', () => {
 			},
 		} );
 
-		const makeHarness = ( item, settings = {} ) => {
+		const makeHarness = (
+			item: ReturnType< typeof makeThumbnailItem >,
+			settings = {}
+		) => {
 			const addSideloadItem = vi.fn();
 			const finishOperation = vi.fn();
 			const dispatch = {
@@ -1243,7 +1284,7 @@ describe( 'private actions', () => {
 
 		// Normalizes an operations list to the bare operation types, whether
 		// an entry is a plain type or a [ type, args ] tuple.
-		const operationTypes = ( sideloadArgs ) =>
+		const operationTypes = ( sideloadArgs: { operations: unknown[] } ) =>
 			sideloadArgs.operations.map( ( op ) =>
 				Array.isArray( op ) ? op[ 0 ] : op
 			);
@@ -1251,21 +1292,23 @@ describe( 'private actions', () => {
 		// Marks an item as UltraHDR by running the real detectUltraHdr thunk,
 		// which is what populates the module-level tracking set that
 		// generateThumbnails reads.
-		const markUltraHdr = async ( item ) => {
-			vipsGetUltraHdrInfo.mockResolvedValue( ULTRAHDR_INFO );
+		const markUltraHdr = async (
+			item: ReturnType< typeof makeThumbnailItem >
+		) => {
+			vi.mocked( vipsGetUltraHdrInfo ).mockResolvedValue( ULTRAHDR_INFO );
 			await detectUltraHdr( item.id )( {
 				select: { getItem: () => item },
 				dispatch: { finishOperation: vi.fn() },
-			} );
+			} as unknown as ThunkArgs );
 		};
 
 		// removeItem owns teardown of the tracking set, so use it to reset
 		// state between tests (and to exercise the cleanup path itself).
-		const clearTracking = async ( id ) => {
+		const clearTracking = async ( id: string ) => {
 			await removeItem( id )( {
 				select: { getItem: () => ( {} ), getAllItems: () => [] },
 				dispatch: vi.fn(),
-			} );
+			} as unknown as ThunkArgs );
 		};
 
 		beforeEach( () => {
@@ -1283,7 +1326,10 @@ describe( 'private actions', () => {
 			await markUltraHdr( item );
 
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
-			await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			// Both the cropped thumbnail and the proportional medium size
 			// were dispatched as sideloads.
@@ -1323,14 +1369,17 @@ describe( 'private actions', () => {
 					item,
 					{ bigImageSizeThreshold: 2560 }
 				);
-				await generateThumbnails( item.id )( { select, dispatch } );
+				await generateThumbnails( item.id )( {
+					select,
+					dispatch,
+				} as unknown as ThunkArgs );
 
 				const scaledCall = addSideloadItem.mock.calls.find(
 					( [ args ] ) => args.additionalData.image_size === 'scaled'
 				);
 				expect( scaledCall ).toBeDefined();
 
-				const types = operationTypes( scaledCall[ 0 ] );
+				const types = operationTypes( scaledCall![ 0 ] );
 				expect( types ).toContain( OperationType.ResizeCrop );
 				expect( types ).not.toContain( OperationType.TranscodeImage );
 			} finally {
@@ -1346,7 +1395,10 @@ describe( 'private actions', () => {
 			} );
 
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
-			await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			const anyTranscode = addSideloadItem.mock.calls.some(
 				( [ args ] ) =>
@@ -1366,7 +1418,10 @@ describe( 'private actions', () => {
 			await clearTracking( item.id );
 
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
-			await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			// With tracking cleared the source is treated as a normal JPEG,
 			// re-enabling transcoding — proving the set was emptied.
@@ -1400,7 +1455,7 @@ describe( 'private actions', () => {
 			...itemOverrides,
 		} );
 
-		const makeHarness = ( item ) => {
+		const makeHarness = ( item: ReturnType< typeof makeItem > ) => {
 			const addSideloadItem = vi.fn();
 			const dispatch = {
 				addSideloadItem,
@@ -1418,14 +1473,14 @@ describe( 'private actions', () => {
 			return { select, dispatch, addSideloadItem };
 		};
 
-		const sideloadedSize = ( addSideloadItem, size ) =>
+		const sideloadedSize = ( addSideloadItem: Mock, size: string ) =>
 			addSideloadItem.mock.calls.find(
 				( [ args ] ) => args.additionalData.image_size === size
 			);
 
 		beforeEach( () => {
 			vi.clearAllMocks();
-			vipsRotateImage.mockResolvedValue(
+			vi.mocked( vipsRotateImage ).mockResolvedValue(
 				new File( [ 'rotated' ], 'photo-rotated.jpg', {
 					type: 'image/jpeg',
 				} )
@@ -1436,7 +1491,10 @@ describe( 'private actions', () => {
 			const item = makeItem( { exif_orientation: 6 } );
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
 
-			await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( vipsRotateImage ).toHaveBeenCalledWith(
 				item.id,
@@ -1453,7 +1511,10 @@ describe( 'private actions', () => {
 			const item = makeItem( { exif_orientation: 1 } );
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
 
-			await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( vipsRotateImage ).not.toHaveBeenCalled();
 			expect(
@@ -1475,7 +1536,10 @@ describe( 'private actions', () => {
 			);
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
 
-			await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( vipsRotateImage ).not.toHaveBeenCalled();
 			expect(
@@ -1493,7 +1557,7 @@ describe( 'private actions', () => {
 			const rotatedFile = new File( [ 'rotated' ], 'photo-rotated.avif', {
 				type: 'image/avif',
 			} );
-			vipsRotateImage.mockResolvedValue( rotatedFile );
+			vi.mocked( vipsRotateImage ).mockResolvedValue( rotatedFile );
 
 			const item = makeItem(
 				{
@@ -1512,7 +1576,10 @@ describe( 'private actions', () => {
 			);
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
 
-			await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( vipsRotateImage ).toHaveBeenCalledWith(
 				item.id,
@@ -1532,12 +1599,14 @@ describe( 'private actions', () => {
 				'thumbnail'
 			);
 			expect( thumbnailCall ).toBeDefined();
-			expect( thumbnailCall[ 0 ].file.name ).toBe( 'photo.avif' );
-			expect( await thumbnailCall[ 0 ].file.text() ).toBe( 'rotated' );
+			expect( thumbnailCall![ 0 ].file.name ).toBe( 'photo.avif' );
+			expect( await thumbnailCall![ 0 ].file.text() ).toBe( 'rotated' );
 		} );
 
 		it( 'continues thumbnail generation when rotation fails', async () => {
-			vipsRotateImage.mockRejectedValue( new Error( 'decode failed' ) );
+			vi.mocked( vipsRotateImage ).mockRejectedValue(
+				new Error( 'decode failed' )
+			);
 
 			const item = makeItem( {
 				exif_orientation: 6,
@@ -1545,7 +1614,10 @@ describe( 'private actions', () => {
 			} );
 			const { select, dispatch, addSideloadItem } = makeHarness( item );
 
-			await generateThumbnails( item.id )( { select, dispatch } );
+			await generateThumbnails( item.id )( {
+				select,
+				dispatch,
+			} as unknown as ThunkArgs );
 
 			expect( console ).toHaveWarnedWith(
 				'Failed to rotate image, continuing with thumbnails'
@@ -1570,7 +1642,10 @@ describe( 'private actions', () => {
 			} );
 			const item = { id: 'item-1', file, additionalData: {} };
 
-			const dispatch = vi.fn();
+			const dispatch = vi.fn() as Mock & {
+				finishOperation: Mock;
+				cancelItem: Mock;
+			};
 			dispatch.finishOperation = vi.fn();
 			dispatch.cancelItem = vi.fn();
 
@@ -1580,7 +1655,7 @@ describe( 'private actions', () => {
 					getSettings: () => ( { mediaUpload } ),
 				},
 				dispatch,
-			} );
+			} as unknown as ThunkArgs );
 
 			expect( mediaUpload ).toHaveBeenCalledWith(
 				expect.objectContaining( {
@@ -1596,14 +1671,14 @@ describe( 'private actions', () => {
 			vi.clearAllMocks();
 		} );
 
-		const runRemove = async ( remaining ) =>
+		const runRemove = async ( remaining: unknown[] ) =>
 			removeItem( 'item-1' )( {
 				select: {
 					getItem: () => ( {} ),
 					getAllItems: () => remaining,
 				},
 				dispatch: vi.fn(),
-			} );
+			} as unknown as ThunkArgs );
 
 		it( 'terminates both background workers once the queue empties', async () => {
 			await runRemove( [] );
