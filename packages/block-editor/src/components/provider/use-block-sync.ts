@@ -236,7 +236,7 @@ export default function useBlockSync( {
 		}
 	};
 
-	const setControlledBlocks = () => {
+	const setControlledBlocks = ( { preserveClientIds = false } = {} ) => {
 		if ( ! controlledBlocks ) {
 			return;
 		}
@@ -253,9 +253,27 @@ export default function useBlockSync( {
 				idMappingRef.current.externalToInternal.clear();
 				idMappingRef.current.internalToExternal.clear();
 
-				const storeBlocks = controlledBlocks.map( ( block ) =>
-					cloneBlockWithMapping( block, idMappingRef.current )
-				);
+				const storeBlocks = preserveClientIds
+					? controlledBlocks
+					: controlledBlocks.map( ( block ) =>
+							cloneBlockWithMapping( block, idMappingRef.current )
+						);
+				if ( preserveClientIds ) {
+					const mapExistingBlocks = ( blocks: Block[] ) => {
+						for ( const block of blocks ) {
+							idMappingRef.current.externalToInternal.set(
+								block.clientId,
+								block.clientId
+							);
+							idMappingRef.current.internalToExternal.set(
+								block.clientId,
+								block.clientId
+							);
+							mapExistingBlocks( block.innerBlocks );
+						}
+					};
+					mapExistingBlocks( controlledBlocks );
+				}
 
 				__unstableMarkNextChangeAsNotPersistent( {
 					history: 'ignore',
@@ -342,6 +360,15 @@ export default function useBlockSync( {
 			) {
 				pendingChangesRef.current.outgoing = [];
 			}
+		} else if (
+			storeMatch &&
+			clientId &&
+			! registry
+				.select( blockEditorStore )
+				.areInnerBlocksControlled( clientId )
+		) {
+			// Adopt the existing blocks without changing their IDs or remounting them.
+			setControlledBlocks( { preserveClientIds: true } );
 		} else if ( ! storeMatch ) {
 			// Reset changing value in all other cases than the sync described
 			// above. Since this can be reached in an update following an out-
@@ -358,7 +385,7 @@ export default function useBlockSync( {
 			// character undo levels.
 			restoreSelection();
 		}
-	}, [ controlledBlocks, clientId ] );
+	}, [ controlledBlocks, clientId, registry ] );
 
 	useEffect( () => {
 		const {

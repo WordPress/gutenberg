@@ -144,17 +144,14 @@ function UncontrolledInnerBlocks( props ) {
 }
 
 /**
- * The controlled inner blocks component wraps the uncontrolled inner blocks
- * component with the blockSync hook. This keeps the innerBlocks of the block in
- * the block-editor store in sync with the blocks of the controlling entity. An
- * example of an inner block controller is a template part block, which provides
- * its own blocks from the template part entity data source.
+ * Synchronizes a controlling entity separately from the block list, so gaining
+ * a controller does not remount the blocks being edited.
  *
  * @param {Object} props The component props.
  */
-function ControlledInnerBlocks( props ) {
+function InnerBlocksSync( props ) {
 	useBlockSync( props );
-	return <UncontrolledInnerBlocks { ...props } />;
+	return null;
 }
 
 const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
@@ -288,10 +285,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		defaultLayout,
 		...options,
 	};
-	const InnerBlocks =
-		innerBlocksProps.value && innerBlocksProps.onChange
-			? ControlledInnerBlocks
-			: UncontrolledInnerBlocks;
+	const isControlled = innerBlocksProps.value && innerBlocksProps.onChange;
 
 	return {
 		...props,
@@ -302,7 +296,18 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			__unstableDisableLayoutClassNames ? '' : layoutClassNames
 		),
 		children: clientId ? (
-			<InnerBlocks { ...innerBlocksProps } clientId={ clientId } />
+			<>
+				<UncontrolledInnerBlocks
+					{ ...innerBlocksProps }
+					clientId={ clientId }
+				/>
+				{ isControlled && (
+					<InnerBlocksSync
+						{ ...innerBlocksProps }
+						clientId={ clientId }
+					/>
+				) }
+			</>
 		) : (
 			<BlockListItems { ...options } />
 		),
