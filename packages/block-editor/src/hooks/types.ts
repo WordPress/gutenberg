@@ -96,7 +96,7 @@ export interface BlockWrapperProps {
 }
 
 interface BlockSupportFeatureBase {
-	hasSupport: ( nameOrType: string | BlockType ) => boolean;
+	hasSupport: ( name: string ) => boolean | null | undefined;
 	attributeKeys?: string[];
 }
 
@@ -125,14 +125,21 @@ export interface BlockListBlockFeatureProps {
 export interface BlockListBlockFeature extends BlockSupportFeatureBase {
 	useBlockProps: (
 		props: BlockListBlockFeatureProps
-	) => BlockWrapperProps | undefined;
+	) => BlockWrapperProps | null | undefined;
 	isMatch?: ( attributes: Record< string, unknown > ) => boolean;
 }
 
 /**
  * A block support that adds props to the saved block markup.
  */
-export interface BlockSaveFeature extends BlockSupportFeatureBase {
+export interface BlockSaveFeature extends Omit<
+	BlockSupportFeatureBase,
+	'hasSupport'
+> {
+	/** The save filter passes the block type. */
+	hasSupport: (
+		nameOrType: string | BlockType
+	) => boolean | null | undefined;
 	addSaveProps: (
 		props: Record< string, unknown >,
 		blockType: BlockType,
