@@ -6,7 +6,7 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-function isColorTransparent( color ) {
+function isColorTransparent( color: string ) {
 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
 }
 
@@ -16,9 +16,17 @@ function isColorTransparent( color ) {
  *   - Inserts a default block on ENTER.
  *   - Disables dragging of block contents.
  *
- * @param {string} clientId Block client ID.
+ * @param options            Options.
+ * @param options.clientId   Block client ID.
+ * @param options.isSelected Whether the block is selected.
  */
-export function useEventHandlers( { clientId, isSelected } ) {
+export function useEventHandlers( {
+	clientId,
+	isSelected,
+}: {
+	clientId: string;
+	isSelected?: boolean;
+} ) {
 	const {
 		getBlockRootClientId,
 		isZoomOut,
@@ -35,7 +43,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		editContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( ! isSelected ) {
 				return;
@@ -48,9 +56,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 * allow for easy deletion and continuous writing flow to add additional
 			 * content.
 			 *
-			 * @param {KeyboardEvent} event Keydown event.
+			 * @param event Keydown event.
 			 */
-			function onKeyDown( event ) {
+			function onKeyDown( event: KeyboardEvent ) {
 				const { keyCode, target } = event;
 
 				if (
@@ -61,7 +69,8 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					return;
 				}
 
-				if ( target !== node || isTextField( target ) ) {
+				// Key events target elements.
+				if ( target !== node || isTextField( target as Element ) ) {
 					return;
 				}
 
@@ -80,10 +89,11 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 * Prevents default dragging behavior within a block. To do: we must
 			 * handle this in the future and clean up the drag target.
 			 *
-			 * @param {DragEvent} event Drag event.
+			 * @param event Drag event.
 			 */
-			function onDragStart( event ) {
-				const { target } = event;
+			function onDragStart( event: DragEvent ) {
+				// Checked to be an element below, before it is used as one.
+				const target = event.target as Element;
 				// The drag may start on an image, which is draggable by
 				// default: it is the block's drag as long as no nested
 				// draggable, such as an inner block, is closer to the source.
@@ -105,12 +115,15 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					srcClientIds: [ clientId ],
 					srcRootClientId: getBlockRootClientId( clientId ),
 				} );
-				event.dataTransfer.effectAllowed = 'move'; // remove "+" cursor
-				event.dataTransfer.clearData();
-				event.dataTransfer.setData( 'wp-blocks', data );
+				// Drag events from the browser carry a data transfer.
+				const dataTransfer = event.dataTransfer!;
+				dataTransfer.effectAllowed = 'move'; // remove "+" cursor
+				dataTransfer.clearData();
+				dataTransfer.setData( 'wp-blocks', data );
 				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
-				const selection = defaultView.getSelection();
+				// A rendered block's document has a window with a selection.
+				const defaultView = ownerDocument.defaultView!;
+				const selection = defaultView.getSelection()!;
 				selection.removeAllRanges();
 
 				// Setting the drag chip as the drag image actually works, but
@@ -126,22 +139,24 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				dragElement.style.position = 'fixed';
 				dragElement.style.visibility = 'hidden';
 				ownerDocument.body.appendChild( dragElement );
-				event.dataTransfer.setDragImage( dragElement, 0, 0 );
+				dataTransfer.setDragImage( dragElement, 0, 0 );
 
 				const rect = node.getBoundingClientRect();
 
 				// Remove the id and leave it on a shallow clone so that drop
 				// target calculations are correct.
 				const id = node.id;
-				const clone = node.cloneNode();
+				// A clone of an element is an element.
+				const clone = node.cloneNode() as HTMLElement;
 				clone.style.display = 'none';
+				// @ts-expect-error Bug: this sets the ID to `"null"`, not removes it.
 				node.id = null;
 				node.after( clone );
 
 				let _scale = 1;
 
 				{
-					let parentElement = node;
+					let parentElement: HTMLElement | null = node;
 					while ( ( parentElement = parentElement.parentElement ) ) {
 						const { scale } =
 							defaultView.getComputedStyle( parentElement );
@@ -154,7 +169,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 
 				const inverted = 1 / _scale;
 
-				const originalNodeProperties = {};
+				const originalNodeProperties: Record< string, string > = {};
 				for ( const property of [
 					'transform',
 					'transformOrigin',
@@ -166,7 +181,8 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					'pointerEvents',
 					'opacity',
 					'backgroundColor',
-				] ) {
+					// The names are style properties.
+				] as const ) {
 					originalNodeProperties[ property ] = node.style[ property ];
 				}
 
@@ -209,7 +225,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					)
 				) {
 					let bgColor = 'transparent';
-					let parentElement = node;
+					let parentElement: HTMLElement | null = node;
 					while ( ( parentElement = parentElement.parentElement ) ) {
 						const { backgroundColor } =
 							defaultView.getComputedStyle( parentElement );
@@ -226,7 +242,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				let lastClientX = originClientX;
 				let lastClientY = originClientY;
 
-				function dragOver( e ) {
+				function dragOver( e: DragEvent ) {
 					// Only trigger `over` if the mouse has moved.
 					if (
 						e.clientX === lastClientX &&
@@ -264,7 +280,10 @@ export function useEventHandlers( { clientId, isSelected } ) {
 					for ( const [ property, value ] of Object.entries(
 						originalNodeProperties
 					) ) {
-						node.style[ property ] = value;
+						// These are the style properties saved above.
+						( node.style as unknown as Record< string, string > )[
+							property
+						] = value;
 					}
 					clone.remove();
 					node.id = id;
@@ -297,9 +316,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			/**
 			 * Handles double-click events on section blocks to edit content only section.
 			 *
-			 * @param {MouseEvent} event Double-click event.
+			 * @param event Double-click event.
 			 */
-			function onDoubleClick( event ) {
+			function onDoubleClick( event: MouseEvent ) {
 				const isSection = isSectionBlock( clientId );
 				const block = getBlock( clientId );
 				const isSyncedPattern = isReusableBlock( block );

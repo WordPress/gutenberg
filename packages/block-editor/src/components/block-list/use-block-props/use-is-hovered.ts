@@ -10,21 +10,23 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
  * Adds `is-hovered` class when the block is hovered and in navigation or
  * outline mode.
  *
- * @param {Object}  options                  Options object.
- * @param {boolean} [options.isEnabled=true] Whether to enable hover detection.
+ * @param options           Options object.
+ * @param options.isEnabled Whether to enable hover detection.
  *
- * @return {Function} Ref callback.
+ * @return Ref callback.
  */
-export function useIsHovered( { isEnabled = true } = {} ) {
-	return useRefEffect(
+export function useIsHovered( {
+	isEnabled = true,
+}: { isEnabled?: boolean } = {} ) {
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( ! isEnabled ) {
 				return;
 			}
 
-			let timeoutId;
+			let timeoutId: ReturnType< typeof setTimeout > | undefined;
 
-			function listener( event ) {
+			function listener( event: MouseEvent ) {
 				if ( event.defaultPrevented ) {
 					return;
 				}
@@ -41,7 +43,8 @@ export function useIsHovered( { isEnabled = true } = {} ) {
 				// editability check can force a style recalculation, so it
 				// runs once the pointer rests, which also keeps the
 				// outline from flashing on blocks it merely passes over.
-				const { target } = event;
+				// Mouse events target elements.
+				const target = event.target as HTMLElement;
 				timeoutId = setTimeout( () => {
 					node.classList.toggle(
 						'is-hovered-draggable',

@@ -6,6 +6,7 @@ import {
 } from '@wordpress/element';
 import { getEventHandlers } from '../../writing-flow/use-editable-root-event-handlers';
 import { BlockRefs } from '../../provider/block-refs-provider';
+import type { BlockEventHandlers } from '../../writing-flow/types';
 
 /**
  * Registers the block's `wrapperProps` event handlers so the writing flow host
@@ -17,13 +18,16 @@ import { BlockRefs } from '../../provider/block-refs-provider';
  * calls the latest render's handlers, and only blocks that have a handler are
  * registered.
  *
- * @param {string} clientId     Block client ID.
- * @param {Object} wrapperProps The block's merged wrapper props.
+ * @param clientId     Block client ID.
+ * @param wrapperProps The block's merged wrapper props.
  */
-export function useRegisterBlockEventHandlers( clientId, wrapperProps ) {
+export function useRegisterBlockEventHandlers(
+	clientId: string,
+	wrapperProps: Record< string, unknown >
+) {
 	const { eventHandlers } = useContext( BlockRefs );
 	const handlers = getEventHandlers( wrapperProps );
-	const handlersRef = useRef();
+	const handlersRef = useRef< BlockEventHandlers | undefined >( undefined );
 	useInsertionEffect( () => {
 		handlersRef.current = handlers;
 	} );
@@ -32,7 +36,10 @@ export function useRegisterBlockEventHandlers( clientId, wrapperProps ) {
 	useEffect( () => {
 		if ( hasHandlers ) {
 			eventHandlers.set( clientId, handlersRef );
-			return () => eventHandlers.delete( clientId );
+			return () => {
+				eventHandlers.delete( clientId );
+			};
 		}
+		return undefined;
 	}, [ eventHandlers, clientId, hasHandlers ] );
 }

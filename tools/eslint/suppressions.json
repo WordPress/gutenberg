@@ -163,113 +163,14 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-list/block-crash-boundary.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/block-crash-warning.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/block-html.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/block-invalid-warning.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/block.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react-hooks/immutability": {
-			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-editor/src/components/block-list/block.tsx": {
 		"react-hooks/immutability": {
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-list/use-block-props/use-firefox-draggable-compatibility.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/use-focus-first-element.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/use-focus-handler.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/use-intersection-observer.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/use-is-hovered.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/use-register-block-event-handlers.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/use-scroll-into-view.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-block-props/use-selected-block-event-handlers.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/use-in-between-inserter.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-list/zoom-out-separator.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
+	"packages/block-editor/src/components/block-list/use-block-props/index.ts": {
+		"react-hooks/immutability": {
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/block-lock/modal.tsx": {

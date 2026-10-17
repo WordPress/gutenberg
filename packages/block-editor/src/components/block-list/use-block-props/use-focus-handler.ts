@@ -12,14 +12,14 @@ const { subscribeDelegatedListener } = unlock( composePrivateApis );
 /**
  * Selects the block if it receives focus.
  *
- * @param {string} clientId Block client ID.
+ * @param clientId Block client ID.
  */
-export function useFocusHandler( clientId ) {
+export function useFocusHandler( clientId: string ) {
 	const { isBlockSelected, isBlockMultiSelected, isMultiSelecting } =
 		useSelect( blockEditorStore );
 	const { selectBlock, selectionChange } = useDispatch( blockEditorStore );
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			/**
 			 * Marks the block as selected when focused and not already
@@ -27,14 +27,16 @@ export function useFocusHandler( clientId ) {
 			 * set focus on its own (via `setFocus`), typically if there is no
 			 * focusable input in the block.
 			 *
-			 * @param {FocusEvent} event Focus event.
+			 * @param event Focus event.
 			 */
-			function onFocus( event ) {
+			function onFocus( event: FocusEvent ) {
+				// Focus events target elements.
+				const target = event.target as HTMLElement;
 				// Check synchronously because a non-selected block might be
 				// getting data through `useSelect` asynchronously.
 				if ( isBlockSelected( clientId ) ) {
 					// Potentially change selection away from rich text.
-					if ( ! event.target.isContentEditable ) {
+					if ( ! target.isContentEditable ) {
 						selectionChange( clientId );
 					}
 					return;
@@ -62,7 +64,7 @@ export function useFocusHandler( clientId ) {
 
 				// If an inner block is focussed, that block is responsible for
 				// setting the selected block.
-				if ( ! isInsideRootBlock( node, event.target ) ) {
+				if ( ! isInsideRootBlock( node, target ) ) {
 					return;
 				}
 
@@ -74,7 +76,7 @@ export function useFocusHandler( clientId ) {
 				// builds the multi-selection from the anchor it recorded at
 				// mousedown, so this dispatch overwriting the store anchor
 				// is harmless.
-				if ( event.target.isContentEditable ) {
+				if ( target.isContentEditable ) {
 					selectBlock( clientId, null );
 					return;
 				}
