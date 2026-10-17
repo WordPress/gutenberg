@@ -13148,9 +13148,6 @@
 		}
 	},
 	"packages/editor/src/components/template-validation-notice/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
