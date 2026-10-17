@@ -2,7 +2,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
+import type { useDispatch, useSelect } from '@wordpress/data';
 import ChildLayoutControl from '../';
+import type { ChildLayoutControlProps } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -14,22 +16,26 @@ vi.mock( import( '../../use-settings' ), () => ( {
 
 vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
-	useSelect: vi.fn( ( mapSelect ) => {
-		if ( typeof mapSelect === 'function' ) {
-			return mapSelect( () => ( {
-				getBlockRootClientId: () => 'root-client-id',
-			} ) );
-		}
+	// The hook's type carries more than the mock function.
+	useSelect: vi.fn(
+		( mapSelect: ( ( select: unknown ) => unknown ) | object ) => {
+			if ( typeof mapSelect === 'function' ) {
+				return mapSelect( () => ( {
+					getBlockRootClientId: () => 'root-client-id',
+				} ) );
+			}
 
-		return {
-			getBlockAttributes: () => ( {} ),
-			getBlockOrder: () => [],
-		};
-	} ),
-	useDispatch: () => ( {
+			return {
+				getBlockAttributes: () => ( {} ),
+				getBlockOrder: () => [],
+			};
+		}
+	) as unknown as typeof useSelect,
+	// Only the actions the control dispatches.
+	useDispatch: ( () => ( {
 		__unstableMarkNextChangeAsNotPersistent: vi.fn(),
 		moveBlocksToPosition: vi.fn(),
-	} ),
+	} ) ) as unknown as typeof useDispatch,
 } ) );
 
 describe( 'ChildLayoutControl', () => {
@@ -46,7 +52,7 @@ describe( 'ChildLayoutControl', () => {
 		vi.clearAllMocks();
 	} );
 
-	function renderControl( props ) {
+	function renderControl( props: Partial< ChildLayoutControlProps > ) {
 		return render(
 			<ToolsPanel
 				label="Dimensions"

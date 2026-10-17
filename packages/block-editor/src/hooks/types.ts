@@ -9,6 +9,8 @@ import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockEditorThunkArgs } from '../store/types';
 import type { Bindings } from '../utils/block-bindings';
+import type { ChildLayout } from '../components/child-layout-control/types';
+import type { Layout, LayoutBlockSupport, LayoutType } from '../layouts/types';
 
 /**
  * The viewport and pseudo state whose styles a block's controls edit.
@@ -475,4 +477,133 @@ export interface FitTextFontSizeProps extends UseFitTextProps {
 	 * Whether the block is selected.
 	 */
 	isSelected?: boolean;
+}
+
+/**
+ * A CSS rule of a block's child layout, optionally in an at-rule group.
+ */
+export interface ChildLayoutRule {
+	selector: string;
+	declarations: Record< string, string | number >;
+	rulesGroup?: string;
+}
+
+/**
+ * Options to build the CSS rules of a block's child layout.
+ */
+export interface ChildLayoutStyleRulesOptions {
+	/** Selector of the block. */
+	selector: string;
+	/** The child layout of the block. */
+	layout?: ChildLayout;
+	/** The child layout of a viewport, applied over `layout`. */
+	viewportOverrides?: ChildLayout;
+	/** The layout of the parent block. */
+	parentLayout?: Layout;
+	/** Whether to add a container query to responsive grids. */
+	includeContainerQuery?: boolean;
+}
+
+/**
+ * Options to build the CSS of a block's child layout for each viewport.
+ */
+export interface ResponsiveChildLayoutStylesOptions {
+	/** The style attribute of the block. */
+	style?: ChildLayoutBlockStyle;
+	/** Selector of the block. */
+	selector: string;
+	/** The layout of the parent block. */
+	parentLayout?: Layout;
+	/** The viewport settings of the editor. */
+	viewportSettings?: Record< string, unknown >;
+}
+
+/**
+ * A style attribute holding a child layout.
+ */
+export type ChildLayoutBlockStyle = BlockStyle & { layout?: ChildLayout };
+
+export interface ChildLayoutControlsPureProps {
+	clientId: string;
+	style?: ChildLayoutBlockStyle;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
+
+export interface GridToolsProps extends ChildLayoutControlsPureProps {
+	allowSizingOnChildren: boolean;
+	isManualPlacement?: boolean;
+	parentLayout: Layout;
+}
+
+/**
+ * The block attributes the layout support reads.
+ */
+export interface LayoutAttributes {
+	layout?: Layout;
+	style?: BlockStyle;
+	className?: string;
+	[ attribute: string ]: unknown;
+}
+
+/**
+ * Options to decide whether the layout panel has controls to display.
+ */
+export interface HasLayoutPanelControlsOptions {
+	/** Active layout type. */
+	layoutType?: LayoutType;
+	/** Constrained layout type. */
+	constrainedType?: LayoutType;
+	/** Layout support settings. */
+	layoutBlockSupport?: LayoutBlockSupport;
+	/** Whether to show the inherit toggle. */
+	showInheritToggle?: boolean;
+	/** Whether to show the layout type switcher. */
+	showLayoutTypeSwitcher?: boolean;
+	/** Whether to show legacy layout controls, as a truthy content size. */
+	displayControlsForLegacyLayouts?: boolean | string | null;
+}
+
+/**
+ * Options to generate the responsive layout CSS of viewport state styles.
+ */
+export interface ResponsiveLayoutStylesOptions {
+	/** Block attributes. */
+	attributes?: LayoutAttributes;
+	/** Block name. */
+	blockName: string;
+	/** CSS selector. */
+	selector: string;
+	/** Active block layout. */
+	layout?: Layout;
+	/** Whether block gap is supported. */
+	hasBlockGapSupport?: boolean;
+	/** Global block gap fallback. */
+	globalBlockGapValue?: BlockGapValue;
+	/** Viewport breakpoint settings. */
+	viewportSettings?: Record< string, unknown >;
+}
+
+export interface LayoutPanelProps extends BlockSupportEditProps {
+	layout?: Layout;
+	style?: BlockStyle;
+}
+
+export interface LayoutTypeSwitcherProps {
+	type: string;
+	onChange: ( type: string ) => void;
+}
+
+/**
+ * The block gap and viewport settings the layout styles of a block use.
+ */
+export interface LayoutStylesSettings {
+	blockGapSupport?: unknown;
+	globalBlockGapValue?: BlockGapValue;
+	viewportSettings?: Record< string, unknown >;
+}
+
+export interface BlockWithLayoutStylesProps extends LayoutStylesSettings {
+	block: ComponentType< BlockListBlockHookProps & Record< string, unknown > >;
+	props: BlockListBlockHookProps & { attributes: LayoutAttributes };
+	layoutClasses: string[];
 }

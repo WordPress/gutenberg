@@ -567,23 +567,9 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/child-layout-control/index.jsx": {
+	"packages/block-editor/src/components/child-layout-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/child-layout-control/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/colors-gradients/control.tsx": {
@@ -853,47 +839,11 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/grid/grid-item-movers.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/grid-item-resizer.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/grid/grid-visualizer.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/use-get-number-of-blocks-before-cell.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/use-grid-layout-sync.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/grid/utils.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -1868,22 +1818,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/layout-child.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/layout.jsx": {
+	"packages/block-editor/src/hooks/layout.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -1954,16 +1890,6 @@
 			"count": 1
 		},
 		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/test/layout-child.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/test/layout.jsdom.test.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
