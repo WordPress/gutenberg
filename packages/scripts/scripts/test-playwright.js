@@ -17,7 +17,6 @@ const {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getAsBooleanFromENV,
-	getTestsBaseUrl,
 } = require( '../utils' );
 
 const wpEnvConfig = getArgFromCLI( '--wp-env-config' );
@@ -101,14 +100,20 @@ function spawnProcess() {
 }
 
 if ( loadConfig && ! process.env.WP_BASE_URL ) {
-	getTestsBaseUrl( loadConfig, resolve( '.' ), wpEnvConfig ).then(
-		( baseUrl ) => {
-			if ( baseUrl ) {
-				process.env.WP_BASE_URL = baseUrl;
-			}
-			spawnProcess();
+	// As with `wp-env start`, this merges in the override file of the config
+	// (such as `.wp-env.test.override.json` for `.wp-env.test.json`) and any
+	// `WP_ENV_*` environment variables. Versions of `@wordpress/env` before
+	// support for `--config` ignore the custom config path.
+	loadConfig( resolve( '.' ), wpEnvConfig ).then( ( envConfig ) => {
+		// A config without the deprecated tests environment has only the
+		// development environment to run the tests against.
+		const port =
+			envConfig?.env?.tests?.port ?? envConfig?.env?.development?.port;
+		if ( port ) {
+			process.env.WP_BASE_URL = `http://localhost:${ port }`;
 		}
-	);
+		spawnProcess();
+	} );
 } else {
 	spawnProcess();
 }
