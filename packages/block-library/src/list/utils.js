@@ -76,7 +76,11 @@ export function migrateToListV2( attributes ) {
 		list.setAttribute( 'type', type );
 	}
 
-	const [ listBlock ] = rawHandler( { HTML: list.outerHTML } );
+	// Preserve shortcode text while normalizing the stored list markup.
+	// HTML parsing restores the brackets after shortcode detection has run.
+	const [ listBlock ] = rawHandler( {
+		HTML: list.outerHTML.replaceAll( '[', '&#91;' ),
+	} );
 
 	return [
 		{ ...otherAttributes, ...listBlock.attributes },
