@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import {
 	ToolbarButton,
 	ToolbarGroup,
@@ -10,14 +11,16 @@ import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import BlockPatternsList from '../block-patterns-list';
+import type { BlockPattern } from '../../store/types';
+import type { PatternMetadata } from './types';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: [] = [];
 const MAX_PATTERNS_TO_SHOW = 6;
-const POPOVER_PROPS = {
+const POPOVER_PROPS: ComponentProps< typeof Dropdown >[ 'popoverProps' ] = {
 	placement: 'bottom-start',
 };
 
-export default function ChangeDesign( { clientId } ) {
+export default function ChangeDesign( { clientId }: { clientId: string } ) {
 	const { categories, currentPatternName, patterns } = useSelect(
 		( select ) => {
 			const {
@@ -26,19 +29,22 @@ export default function ChangeDesign( { clientId } ) {
 				__experimentalGetAllowedPatterns,
 			} = select( blockEditorStore );
 			const attributes = getBlockAttributes( clientId );
-			const _categories = attributes?.metadata?.categories || EMPTY_ARRAY;
+			// The metadata attribute holds the pattern it came from.
+			const metadata = attributes?.metadata as
+				PatternMetadata | undefined;
+			const _categories = metadata?.categories || EMPTY_ARRAY;
 			const rootBlock = getBlockRootClientId( clientId );
 
 			// Calling `__experimentalGetAllowedPatterns` is expensive.
 			// Checking if the block can be changed prevents unnecessary selector calls.
 			// See: https://github.com/WordPress/gutenberg/pull/64736.
-			const _patterns =
+			const _patterns: BlockPattern[] =
 				_categories.length > 0
 					? __experimentalGetAllowedPatterns( rootBlock )
 					: EMPTY_ARRAY;
 			return {
 				categories: _categories,
-				currentPatternName: attributes?.metadata?.patternName,
+				currentPatternName: metadata?.patternName,
 				patterns: _patterns,
 			};
 		},
@@ -58,7 +64,8 @@ export default function ChangeDesign( { clientId } ) {
 				return (
 					// Check if the pattern has only one top level block,
 					// otherwise we may switch to a pattern that doesn't have replacement suggestions.
-					pattern.blocks.length === 1 &&
+					// Allowed patterns are parsed into blocks.
+					pattern.blocks!.length === 1 &&
 					// We exclude the core patterns and pattern directory patterns that are not theme patterns.
 					! isCorePattern &&
 					// Exclude current pattern.
@@ -77,12 +84,13 @@ export default function ChangeDesign( { clientId } ) {
 		return null;
 	}
 
-	const onClickPattern = ( pattern ) => {
+	const onClickPattern = ( pattern: BlockPattern ) => {
 		const newBlocks = ( pattern.blocks ?? [] ).map( ( block ) => {
 			return cloneBlock( block );
 		} );
 		newBlocks[ 0 ].attributes.metadata = {
-			...newBlocks[ 0 ].attributes.metadata,
+			// The metadata attribute is an object when set.
+			...( newBlocks[ 0 ].attributes.metadata as PatternMetadata ),
 			categories,
 		};
 		replaceBlocks( clientId, newBlocks );
@@ -95,6 +103,7 @@ export default function ChangeDesign( { clientId } ) {
 				return (
 					<ToolbarGroup>
 						<ToolbarButton
+							// @ts-expect-error The toggle ignores its argument.
 							onClick={ () => onToggle( ! isOpen ) }
 							aria-expanded={ isOpen }
 						>
