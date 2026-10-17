@@ -10,7 +10,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
 } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	InspectorControls,
 	useSettings,
@@ -227,6 +227,8 @@ export default function CoverInspectorControls( {
 
 	const showFocalPointPicker = isVideoBackground || isImageBackground;
 
+	const prefersReducedMotion = useReducedMotion();
+
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = mediaElement.current
 			? [ mediaElement.current.style, 'objectPosition' ]
@@ -396,8 +398,15 @@ export default function CoverInspectorControls( {
 								}
 							>
 								<FocalPointPicker
+									// `autoPlay` only applies when the
+									// video loads, so remount the picker
+									// to stop a preview that is already
+									// playing when the user turns on
+									// reduced motion.
+									key={ prefersReducedMotion }
 									label={ __( 'Focal point' ) }
 									url={ url }
+									autoPlay={ ! prefersReducedMotion }
 									value={ focalPoint }
 									onDragStart={ imperativeFocalPointPreview }
 									onDrag={ imperativeFocalPointPreview }

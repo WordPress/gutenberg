@@ -1,10 +1,6 @@
 import { __ } from '@wordpress/i18n';
-import {
-	SelectControl as WCSelectControl,
-	Dropdown,
-	Button,
-	Notice,
-} from '@wordpress/components';
+import { Dropdown, Button, Notice } from '@wordpress/components';
+import { SelectControl } from '@wordpress/ui';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
@@ -156,13 +152,13 @@ function PostTemplateDropdownContent( { onClose } ) {
 					{ __( 'The posts page template cannot be changed.' ) }
 				</Notice>
 			) : (
-				<WCSelectControl
+				<SelectControl
 					hideLabelFromVision
 					label={ __( 'Template' ) }
-					value={ selectedOption?.value ?? '' }
-					options={ options }
-					onChange={ ( slug ) =>
-						editPost( { template: slug || '' } )
+					value={ selectedOption ?? null }
+					items={ options }
+					onValueChange={ ( item ) =>
+						editPost( { template: item?.value ?? '' } )
 					}
 				/>
 			) }

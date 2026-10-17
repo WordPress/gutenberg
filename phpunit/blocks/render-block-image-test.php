@@ -49,7 +49,7 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block );
 
 		$rendered_block = gutenberg_render_block_core_image( $attributes, $content, $block );
-		$this->assertEquals( '', $rendered_block );
+		$this->assertSame( '', $rendered_block );
 	}
 
 	/**
@@ -65,7 +65,7 @@ class Tests_Blocks_Render_Image extends WP_UnitTestCase {
 		$block         = new WP_Block( $parsed_block );
 
 		$rendered_block = gutenberg_render_block_core_image( $attributes, $content, $block );
-		$this->assertEquals( '', $rendered_block );
+		$this->assertSame( '', $rendered_block );
 	}
 
 	public function test_should_use_image_id_from_block_bindings_in_classname() {

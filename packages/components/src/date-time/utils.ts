@@ -7,7 +7,7 @@ import { COMMIT, PRESS_DOWN, PRESS_UP } from '../input-control/reducer/actions';
 /**
  * Converts a date input to a UTC-normalized date for consistent date
  * manipulation. Timezoneless strings are interpreted using the timezone
- * offset from @wordpress/date settings. Date objects and timestamps
+ * offset from `@wordpress/date` settings. Date objects and timestamps
  * represent specific UTC instants.
  *
  * @param input Value to turn into a date.
@@ -37,7 +37,7 @@ export function inputToDate( input: Date | string | number ): Date {
 
 /**
  * Returns the start of day (midnight) as a browser-local Date for the calendar
- * day in the configured timezone in @wordpress/date settings. This is necessary
+ * day in the configured timezone in `@wordpress/date` settings. This is necessary
  * because date-fns's startOfDay operates in browser local time, which can cause
  * off-by-one-day bugs when browser and configured timezones differ.
  *

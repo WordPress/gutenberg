@@ -5,7 +5,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -18,10 +18,28 @@
+@@ -18,10 +18,27 @@
               class="components-checkbox-control__input"
               id="checkbox-control"
               type="checkbox"
@@ -26,7 +26,6 @@ Snapshot Diff:
 +           >
 +             <path
 +               d="M7 12H17"
-+               vector-effect="non-scaling-stroke"
 +             />
 +           </svg>
           </span>

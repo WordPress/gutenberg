@@ -15,6 +15,7 @@ import {
 	VIEWPORT_STATE_BY_DEVICE_TYPE,
 } from '../utils/device-type';
 import { unlock } from '../lock-unlock';
+import { BROWSER_BACKUP_NOTICE_ID } from './constants';
 export * from '../dataviews/store/private-actions';
 
 /**
@@ -494,6 +495,32 @@ export function setCanvasWidth( width ) {
 }
 
 /**
+ * Set the calculated canvas height for the footer viewport status.
+ *
+ * @param {number|undefined} height Canvas height in pixels, or undefined when unconstrained.
+ * @return {Object} Action object.
+ */
+export function setCanvasHeight( height ) {
+	return {
+		type: 'SET_CANVAS_HEIGHT',
+		height,
+	};
+}
+
+/**
+ * Set the measured canvas width without changing the requested width.
+ *
+ * @param {number|undefined} width Rendered canvas width in pixels.
+ * @return {Object} Action object.
+ */
+export function setPhysicalCanvasWidth( width ) {
+	return {
+		type: 'SET_PHYSICAL_CANVAS_WIDTH',
+		width,
+	};
+}
+
+/**
  * Set the current revision ID for revisions preview mode.
  * Pass a revision ID to enter revisions mode, or null to exit.
  *
@@ -661,6 +688,52 @@ export function setShowRevisionDiff( showDiff ) {
 		showDiff,
 	};
 }
+
+/**
+ * Opens the revisions view on the backup kept in the browser, compared with
+ * what the editor shows. Nothing is saved.
+ *
+ * @param {Object} backup         The backup.
+ * @param {string} backup.title   The backed up title.
+ * @param {string} backup.content The backed up content.
+ * @param {string} backup.excerpt The backed up excerpt.
+ * @param {number} [backup.time]  When the backup was made, in milliseconds.
+ * @return {Object} Action object.
+ */
+export function viewBrowserBackup( { title, content, excerpt, time } ) {
+	return {
+		type: 'VIEW_BROWSER_BACKUP',
+		backup: {
+			date: time ? new Date( time ).toISOString() : undefined,
+			title: { raw: title },
+			content: { raw: content },
+			excerpt: { raw: excerpt },
+		},
+	};
+}
+
+/**
+ * Replaces the editor's content with the browser backup shown in the
+ * revisions view. Like any edit, it is saved by the next save or autosave.
+ */
+export const restoreBrowserBackup =
+	() =>
+	( { select, dispatch, registry } ) => {
+		const backup = select.getBrowserBackup();
+		if ( ! backup ) {
+			return;
+		}
+
+		dispatch.setCurrentRevisionId( null );
+		dispatch.editPost( {
+			title: backup.title.raw,
+			excerpt: backup.excerpt.raw,
+		} );
+		dispatch.resetEditorBlocks( parse( backup.content.raw ) );
+		registry
+			.dispatch( noticesStore )
+			.removeNotice( BROWSER_BACKUP_NOTICE_ID );
+	};
 
 /**
  * Restore a revision by replacing the current content with the revision's content

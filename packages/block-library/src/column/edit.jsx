@@ -16,6 +16,7 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { sprintf, __ } from '@wordpress/i18n';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
@@ -105,7 +106,10 @@ function ColumnEdit( {
 	};
 
 	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
+	// State, not a ref, so that the element is there on the next render.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
 	const blockProps = useBlockProps( {
+		ref: setDropZoneElement,
 		className: classes,
 		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
 	} );
@@ -124,6 +128,8 @@ function ColumnEdit( {
 	const innerBlocksProps = useInnerBlocksProps(
 		{ ...blockProps, 'aria-label': label },
 		{
+			// Allows dropping before or after the column, not only inside it.
+			dropZoneElement,
 			templateLock,
 			allowedBlocks,
 			renderAppender: hasChildBlocks

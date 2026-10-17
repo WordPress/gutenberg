@@ -36,6 +36,28 @@ describe( 'InlineNotices', () => {
 		expect( container ).toBeEmptyDOMElement();
 	} );
 
+	it( 'should return null when every one of several children renders nothing', () => {
+		// More than one child arrives as an array, which is itself neither
+		// `false` nor empty, so the array is what has to be looked through.
+		const { container } = renderInlineNotices( {
+			children: [ false, null, undefined, '' ],
+		} );
+
+		expect( container ).toBeEmptyDOMElement();
+	} );
+
+	it( 'should render when one of several children renders something', () => {
+		const { container } = renderInlineNotices( {
+			children: [ false, <div key="notice">Extra notice</div> ],
+		} );
+
+		expect(
+			within( getInlineNoticesWrapper( container ) ).getByText(
+				'Extra notice'
+			)
+		).toBeInTheDocument();
+	} );
+
 	it( 'should render the inline notices wrapper with a custom class name', () => {
 		const { container } = renderInlineNotices( {
 			className: 'my-inline-notices',

@@ -8,7 +8,7 @@ import type { TextareaControlProps } from './types';
 export const TextareaControl = forwardRef<
 	HTMLTextAreaElement,
 	TextareaControlProps
->( function TextareaControl(
+>( function UnforwardedTextareaControl(
 	{
 		className,
 		label,

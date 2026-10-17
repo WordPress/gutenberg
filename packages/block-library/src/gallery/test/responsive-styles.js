@@ -28,7 +28,7 @@ describe( 'Gallery responsive styles', () => {
 		} );
 	} );
 
-	it( 'removes a Gallery override without removing viewport layout settings', () => {
+	it( 'preserves a viewport column count matching the base value', () => {
 		expect(
 			getUpdatedGalleryStyle( {
 				style: {
@@ -44,7 +44,30 @@ describe( 'Gallery responsive styles', () => {
 			} )
 		).toEqual( {
 			'@mobile': {
+				columns: 2,
 				imageCrop: false,
+				layout: { columnCount: 2 },
+			},
+		} );
+	} );
+
+	it( 'removes a Gallery override without removing viewport layout settings', () => {
+		expect(
+			getUpdatedGalleryStyle( {
+				style: {
+					'@mobile': {
+						columns: 1,
+						imageCrop: false,
+						layout: { columnCount: 2 },
+					},
+				},
+				viewport: '@mobile',
+				baseSettings: { columns: 2, imageCrop: true },
+				settings: { imageCrop: true },
+			} )
+		).toEqual( {
+			'@mobile': {
+				columns: 1,
 				layout: { columnCount: 2 },
 			},
 		} );

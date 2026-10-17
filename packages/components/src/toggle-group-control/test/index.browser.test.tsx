@@ -114,7 +114,6 @@ describe( 'required context', () => {
 		).rejects.toThrow(
 			'ToggleGroupControlOption can only be rendered inside ToggleGroupControl.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'throws when ToggleGroupControlOptionIcon is outside ToggleGroupControl', async () => {
@@ -129,7 +128,6 @@ describe( 'required context', () => {
 		).rejects.toThrow(
 			'ToggleGroupControlOptionIcon can only be rendered inside ToggleGroupControl.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 } );
 

@@ -8,7 +8,7 @@ import type { CompositeItemProps } from './types';
 export const CompositeItem = forwardRef<
 	HTMLButtonElement,
 	WordPressComponentProps< CompositeItemProps, 'button', false >
->( function CompositeItem( props, ref ) {
+>( function UnforwardedCompositeItem( props, ref ) {
 	const context = useCompositeContext();
 
 	// @ts-expect-error The store prop is undocumented and only used by the

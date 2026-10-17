@@ -32,6 +32,7 @@ _Defined via the [`supports`](https://developer.wordpress.org/block-editor/refer
   - [`lineHeight`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-lineheight): `true`
   - [`textAlign`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#typography-textalign): `true`
   - `textColumns`: `true`
+  - `textIndent`: `true`
 - [`interactivity`](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-supports/#interactivity):
   - `clientNavigation`: `true`
 

@@ -3,7 +3,7 @@ import {
 	Button,
 	DropZone,
 	Icon as WCIcon,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalText as WCText,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
@@ -179,7 +179,7 @@ function MediaPickerButton( {
 			{ children }
 			{ isBlob && (
 				<span className="fields__media-edit-picker-button-spinner">
-					<Spinner />
+					<WCSpinner />
 				</span>
 			) }
 			{ ! isUploading && (
@@ -683,9 +683,7 @@ export function MediaEditControl< Item >( {
 	// reorders (same IDs), we fall back to the cached list to avoid a visual
 	// flash in compact mode. For replacements/uploads (new IDs not in cache),
 	// we let attachments be null as normal.
-	const stableAttachmentsRef = useRef< Attachment< 'view' >[] | null >(
-		null
-	);
+	const stableAttachmentsRef = useRef< Attachment< 'view' >[] >( null );
 	if ( attachments !== null ) {
 		stableAttachmentsRef.current = attachments;
 	}
