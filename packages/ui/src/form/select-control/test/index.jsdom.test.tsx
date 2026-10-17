@@ -30,6 +30,66 @@ describe( 'SelectControl', () => {
 		expect( trigger ).toHaveFocus();
 	} );
 
+	it( 'calls focus and blur handlers passed to the trigger slot', async () => {
+		const user = userEvent.setup();
+		const onFocus = vi.fn();
+		const onBlur = vi.fn();
+
+		render(
+			<>
+				<SelectControl
+					label="Country"
+					items={ mockItems }
+					trigger={
+						<SelectControl.Trigger
+							onFocus={ onFocus }
+							onBlur={ onBlur }
+						/>
+					}
+				/>
+				<button>Next field</button>
+			</>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Country' } );
+
+		await user.tab();
+		expect( trigger ).toHaveFocus();
+		expect( onFocus ).toHaveBeenCalledTimes( 1 );
+		expect( onFocus.mock.calls[ 0 ][ 0 ].target ).toBe( trigger );
+		expect( onBlur ).not.toHaveBeenCalled();
+
+		await user.tab();
+		expect(
+			screen.getByRole( 'button', { name: 'Next field' } )
+		).toHaveFocus();
+		expect( onBlur ).toHaveBeenCalledTimes( 1 );
+		expect( onBlur.mock.calls[ 0 ][ 0 ].target ).toBe( trigger );
+	} );
+
+	it( 'forwards both control and trigger slot refs to the visible trigger', () => {
+		const controlRef = createRef< HTMLButtonElement >();
+		const triggerRef = createRef< HTMLButtonElement >();
+
+		const { unmount } = render(
+			<SelectControl
+				ref={ controlRef }
+				label="Country"
+				items={ mockItems }
+				trigger={ <SelectControl.Trigger ref={ triggerRef } /> }
+			/>
+		);
+
+		const trigger = screen.getByRole( 'combobox', { name: 'Country' } );
+
+		expect( controlRef.current ).toBe( trigger );
+		expect( triggerRef.current ).toBe( trigger );
+
+		unmount();
+		expect( controlRef.current ).toBeNull();
+		expect( triggerRef.current ).toBeNull();
+	} );
+
 	it( 'renders accessible label and description', () => {
 		render(
 			<SelectControl
@@ -131,7 +191,7 @@ describe( 'SelectControl', () => {
 		).toBeVisible();
 	} );
 
-	it( 'passes the current value to custom trigger content', async () => {
+	it( 'passes the current value to custom trigger children', async () => {
 		const user = userEvent.setup();
 
 		render(
@@ -139,7 +199,11 @@ describe( 'SelectControl', () => {
 				label="Country"
 				items={ mockItems }
 				defaultValue={ mockItems[ 1 ] }
-				triggerContent={ ( item ) => `Selected ${ item.label }` }
+				trigger={
+					<SelectControl.Trigger>
+						{ ( item ) => `Selected ${ item.label }` }
+					</SelectControl.Trigger>
+				}
 			/>
 		);
 
