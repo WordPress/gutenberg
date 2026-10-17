@@ -1,8 +1,12 @@
 import { Component } from '@wordpress/element';
+import type { BlockCrashBoundaryProps } from './types';
 
-class BlockCrashBoundary extends Component {
-	constructor() {
-		super( ...arguments );
+class BlockCrashBoundary extends Component<
+	BlockCrashBoundaryProps,
+	{ hasError: boolean }
+> {
+	constructor( props: BlockCrashBoundaryProps ) {
+		super( props );
 
 		this.state = {
 			hasError: false,

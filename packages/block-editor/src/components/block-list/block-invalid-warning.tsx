@@ -2,17 +2,25 @@ import { __, _x } from '@wordpress/i18n';
 import { Button, Modal } from '@wordpress/components';
 import { useState, useCallback, useMemo } from '@wordpress/element';
 import { createBlock, rawHandler } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import Warning from '../warning';
 import BlockCompare from '../block-compare';
 import { store as blockEditorStore } from '../../store';
+import type { InvalidBlock } from '../block-compare/types';
+import type { WarningSecondaryAction } from '../warning/types';
 
-const blockToBlocks = ( block ) =>
+const blockToBlocks = ( block: Block ) =>
 	rawHandler( {
-		HTML: block.originalContent,
+		// Invalid blocks keep their original content.
+		HTML: block.originalContent as string,
 	} );
 
-export default function BlockInvalidWarning( { clientId } ) {
+export default function BlockInvalidWarning( {
+	clientId,
+}: {
+	clientId: string;
+} ) {
 	const { block, canInsertHTMLBlock } = useSelect(
 		( select ) => {
 			const { canInsertBlockType, getBlock, getBlockRootClientId } =
@@ -21,7 +29,9 @@ export default function BlockInvalidWarning( { clientId } ) {
 			const rootClientId = getBlockRootClientId( clientId );
 
 			return {
-				block: getBlock( clientId ),
+				// The warning only renders for an existing invalid block, which
+				// keeps its original content.
+				block: getBlock( clientId ) as InvalidBlock,
 				canInsertHTMLBlock: canInsertBlockType(
 					'core/html',
 					rootClientId
@@ -64,6 +74,7 @@ export default function BlockInvalidWarning( { clientId } ) {
 
 	const secondaryActions = useMemo(
 		() =>
+			// `filter` drops the `false` entries.
 			[
 				{
 					// translators: Button to fix block content
@@ -74,7 +85,7 @@ export default function BlockInvalidWarning( { clientId } ) {
 					title: __( 'Convert to HTML' ),
 					onClick: convert.toHTML,
 				},
-			].filter( Boolean ),
+			].filter( Boolean ) as WarningSecondaryAction[],
 		[ canInsertHTMLBlock, convert ]
 	);
 

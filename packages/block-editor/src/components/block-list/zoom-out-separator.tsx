@@ -14,6 +14,10 @@ export function ZoomOutSeparator( {
 	clientId,
 	rootClientId = '',
 	position = 'top',
+}: {
+	clientId?: string;
+	rootClientId?: string | null;
+	position?: 'top' | 'bottom';
 } ) {
 	const [ isDraggedOver, setIsDraggedOver ] = useState( false );
 	const {
