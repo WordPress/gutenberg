@@ -1,4 +1,5 @@
 import { getInlineStyles } from './style';
+import type { StyleAttributes } from './types';
 
 // This utility is intended to assist where the serialization of the shadow
 // block support is being skipped for a block but the shadow related CSS classes
@@ -8,10 +9,10 @@ import { getInlineStyles } from './style';
  * Provides the CSS class names and inline styles for a block's shadow support
  * attributes.
  *
- * @param {Object} attributes Block attributes.
- * @return {Object} Shadow block support derived CSS classes & styles.
+ * @param attributes Block attributes.
+ * @return Shadow block support derived CSS classes & styles.
  */
-export function getShadowClassesAndStyles( attributes ) {
+export function getShadowClassesAndStyles( attributes: StyleAttributes ) {
 	const shadow = attributes.style?.shadow || '';
 
 	return {
