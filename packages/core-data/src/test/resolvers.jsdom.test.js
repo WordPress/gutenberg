@@ -9,6 +9,7 @@ import {
 	getAutosaves,
 	getCurrentUser,
 	getFieldsConfig,
+	getEntityActionsConfig,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
 vi.mock( import( '@wordpress/api-fetch' ) );
@@ -1137,5 +1138,44 @@ describe( 'getFieldsConfig', () => {
 			getFieldsConfig( 'postType', 'page' )( { dispatch } )
 		).rejects.toBe( error );
 		expect( dispatch.receiveFieldsConfig ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'getEntityActionsConfig', () => {
+	it( 'requests the actions of the entity and receives them', async () => {
+		const config = {
+			kind: 'postType',
+			name: 'page',
+			actions: [ { id: 'rename-post' } ],
+			script_modules: [],
+		};
+		const dispatch = Object.assign( vi.fn(), {
+			receiveEntityActionsConfig: vi.fn(),
+		} );
+		triggerFetch.mockResolvedValue( config );
+
+		await getEntityActionsConfig( 'postType', 'page' )( { dispatch } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/entity-actions?kind=postType&name=page',
+		} );
+		expect( dispatch.receiveEntityActionsConfig ).toHaveBeenCalledWith(
+			'postType',
+			'page',
+			config
+		);
+	} );
+
+	it( 'rejects without receiving anything when the request fails', async () => {
+		const dispatch = Object.assign( vi.fn(), {
+			receiveEntityActionsConfig: vi.fn(),
+		} );
+		const error = { code: 'rest_forbidden', message: 'Forbidden.' };
+		triggerFetch.mockRejectedValue( error );
+
+		await expect(
+			getEntityActionsConfig( 'postType', 'page' )( { dispatch } )
+		).rejects.toBe( error );
+		expect( dispatch.receiveEntityActionsConfig ).not.toHaveBeenCalled();
 	} );
 } );

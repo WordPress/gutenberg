@@ -1548,9 +1548,11 @@ Undocumented declaration.
 
 ### registerEntityAction
 
-Registers a new DataViews action.
+> **Deprecated** since Gutenberg 24.3. Register the action in PHP on the `wp_entity_actions_api_init` action instead, with a script module for its JavaScript parts.
 
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+Has no effect: every action of an entity is registered on the server.
+
+Register the action in PHP on the `wp_entity_actions_api_init` action instead, with a script module for the parts PHP cannot serialize (`callback`, `RenderModal`, `isEligible`…).
 
 _Parameters_
 
@@ -1657,9 +1659,11 @@ Undocumented declaration.
 
 ### unregisterEntityAction
 
-Unregisters a DataViews action.
+> **Deprecated** since Gutenberg 24.3. Unregister the action in PHP on the `wp_entity_actions_api_init` action instead.
 
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+Has no effect: every action of an entity is registered on the server.
+
+Unregister the action in PHP on the `wp_entity_actions_api_init` action instead.
 
 _Parameters_
 
