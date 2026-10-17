@@ -2,7 +2,7 @@ import { colord } from 'colord';
 import { __ } from '@wordpress/i18n';
 import { InputControl } from '../input-control';
 import { Text } from '../text';
-import { COLORS } from '../utils/colors-values';
+import styles from './style.module.scss';
 import type { StateReducer } from '../input-control/reducer/state';
 import type { HexInputProps } from './types';
 import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
@@ -37,7 +37,11 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 		<InputControl
 			prefix={
 				<InputControlPrefixWrapper>
-					<Text color={ COLORS.theme.accent } lineHeight={ 1 }>
+					<Text
+						className={ styles.prefix }
+						color="var(--_wp-components-color-picker-prefix-color)"
+						lineHeight={ 1 }
+					>
 						#
 					</Text>
 				</InputControlPrefixWrapper>

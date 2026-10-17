@@ -9,7 +9,6 @@ import {
 import userEvent from '@testing-library/user-event';
 import { BorderControl } from '../';
 import type { Border, BorderControlProps } from '../types';
-import { COLORS } from '../../utils';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -199,7 +198,8 @@ describe( 'BorderControl', () => {
 					color: '',
 				} );
 				const expectedStyle = document.createElement( 'div' ).style;
-				expectedStyle.borderColor = COLORS.gray[ 300 ];
+				expectedStyle.borderColor =
+					'var(--_wp-components-border-control-preview-color)';
 
 				expect(
 					( indicatorWrapper as HTMLElement ).style.borderStyle
