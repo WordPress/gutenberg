@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import '../../../../../theme/prebuilt/css/design-tokens.css';
 import Label from '../label';
 import { POSITIONS } from '../utils';
 
