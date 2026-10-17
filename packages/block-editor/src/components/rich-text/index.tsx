@@ -17,7 +17,12 @@ import { Popover } from '@wordpress/components';
 import type { DistributiveOmit } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
-import type { ForwardedRef, ReactElement, RefAttributes } from 'react';
+import type {
+	ComponentType,
+	ForwardedRef,
+	ReactElement,
+	RefAttributes,
+} from 'react';
 import type { SelectFunction } from '@wordpress/data';
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
@@ -47,7 +52,9 @@ import type {
 	RichTextBinding,
 	RichTextEventListenerProps,
 	RichTextFieldValue,
+	RichTextInputEventProps,
 	RichTextProps,
+	RichTextShortcutProps,
 } from './types';
 
 // `RichTextShortcut` and `RichTextInputEvent` now live in
@@ -59,9 +66,15 @@ const {
 	getDomPositionKey,
 	KeyboardShortcutContext,
 	InputEventContext,
-	RichTextShortcut,
-	RichTextInputEvent,
+	RichTextShortcut: UntypedRichTextShortcut,
+	RichTextInputEvent: UntypedRichTextInputEvent,
 } = unlock( richTextPrivateApis );
+
+// The private APIs are untyped, so type the components this re-exports.
+const RichTextShortcut =
+	UntypedRichTextShortcut as ComponentType< RichTextShortcutProps >;
+const RichTextInputEvent =
+	UntypedRichTextInputEvent as ComponentType< RichTextInputEventProps >;
 
 const instanceIdKey = Symbol( 'instanceId' );
 

@@ -37,6 +37,16 @@ interface LinkValue {
 	cssClasses?: string;
 }
 
+/**
+ * A page the link UI created.
+ */
+interface CreatedPage {
+	id: number;
+	type: string;
+	title: { rendered: string };
+	link: string;
+}
+
 interface InlineLinkUIProps {
 	isActive: boolean;
 	activeAttributes: LinkFormatAttributes;
@@ -298,7 +308,8 @@ function InlineLinkUI( {
 
 	async function handleCreate( pageTitle: string ) {
 		// The suggestion is offered only with the setting.
-		const page = await createPageEntity!( {
+		// @ts-expect-error Bug: a failed save resolves without a page, which this reads.
+		const page: CreatedPage = await createPageEntity!( {
 			title: pageTitle,
 			status: 'draft',
 		} );

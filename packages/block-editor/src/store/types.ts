@@ -409,12 +409,16 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalCreatePageEntity?: ( page: {
 		title: string;
 		status: string;
-	} ) => Promise< {
-		id: number;
-		type: string;
-		title: { rendered: string };
-		link: string;
-	} >;
+	} ) => Promise<
+		| {
+				id: number;
+				type: string;
+				title: { rendered: string };
+				link: string;
+		  }
+		// A failed save resolves without a page.
+		| undefined
+	>;
 	__experimentalUserCanCreatePages?: boolean;
 	/** Opens an entity, such as a template part, for editing. */
 	onNavigateToEntityRecord?: ( params: {
