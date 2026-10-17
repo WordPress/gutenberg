@@ -1,5 +1,4 @@
 import { getBlockType } from '@wordpress/blocks';
-// @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useContext, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';

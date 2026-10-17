@@ -27,7 +27,7 @@ export interface FluidTypographyArgs {
 	 * Size to derive maximumFontSize and minimumFontSize from, if necessary.
 	 * Optional if minimumFontSize and maximumFontSize are specified.
 	 */
-	fontSize?: string | number;
+	fontSize?: string | number | null;
 	/**
 	 * Maximum font size for any clamp() calculation. Optional.
 	 */

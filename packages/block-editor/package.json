@@ -33,6 +33,7 @@
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
+			"types": "./build-types/index.d.ts",
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
@@ -43,6 +44,7 @@
 	"wpScriptModuleExports": {
 		"./utils/fit-text-frontend": "./build-module/utils/fit-text-frontend.mjs"
 	},
+	"types": "build-types",
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
