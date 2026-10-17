@@ -9,8 +9,7 @@ const AUTOSAVE_FAILED =
 const UPDATING_FAILED_OFFLINE =
 	'Updating failed because you were offline. Please verify your connection and try again.';
 
-const withDetails = ( details ) =>
-	`${ AUTOSAVE_FAILED } <details class="editor-save-error-details"><summary>Show details</summary><span class="editor-save-error-details__message">${ details }</span></details>`;
+const withDetails = ( details ) => ( { content: AUTOSAVE_FAILED, details } );
 
 const isAutosaveRequest = ( request ) =>
 	request.method() === 'POST' &&
@@ -52,7 +51,9 @@ const test = base.extend( {
 					window.wp.data
 						.select( 'core/notices' )
 						.getNotices()
-						.map( ( { content } ) => content )
+						.map( ( { content, details } ) =>
+							details ? { content, details } : content
+						)
 				);
 			},
 		} );
@@ -75,19 +76,26 @@ test.describe( 'Autosave failure notice', () => {
 	} );
 
 	for ( const [ title, failure, notice ] of [
-		// TODO: Show the PHP error the response includes in `data.error`.
-		[ 'PHP fatal error', 'fatal-error', AUTOSAVE_FAILED ],
-		// TODO: Sanitize the message HTML and show it, keeping links.
+		[
+			'PHP fatal error',
+			'fatal-error',
+			// The stack trace's paths and line numbers depend on the
+			// WordPress version, so only its start is checked.
+			withDetails(
+				expect.stringMatching(
+					/^There has been a critical error on this website\.\nLearn more about troubleshooting WordPress\. \(https:\/\/wordpress\.org\/documentation\/article\/faq-troubleshooting\/\)\n\nUncaught Error: Call to undefined function gutenberg_test_autosave_undefined_function\(\) in .+\nStack trace:\n#0 /
+				)
+			),
+		],
 		[
 			'database connection lost',
 			'database-connection-lost',
-			AUTOSAVE_FAILED,
+			withDetails( 'Error establishing a database connection' ),
 		],
-		// TODO: Sanitize the message HTML and show it, keeping links.
 		[
 			'error message containing a link',
 			'link-in-message',
-			AUTOSAVE_FAILED,
+			withDetails( 'Blocked. Learn more (https://example.com).' ),
 		],
 		// TODO: Say the server could not be reached, and retry right away.
 		[

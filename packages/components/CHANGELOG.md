@@ -4,7 +4,12 @@
 
 ### Breaking Changes
 
+-   The component context system no longer merges Emotion-registered classes in `className`. Compose dependent Emotion styles before passing the resulting class name ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
 -   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+    -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
+    -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724))
+    -   `FocalPointPicker` ([#84736](https://github.com/WordPress/gutenberg/pull/84736))
+    -   `InputControl`, `InputControlPrefixWrapper`, and `InputControlSuffixWrapper` ([#84728](https://github.com/WordPress/gutenberg/pull/84728)).
     -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
     -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
     -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
@@ -23,6 +28,8 @@
 -   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
 -   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
+-   `Snackbar`: Keep snackbars that have an action on screen for 10 seconds instead of 6 before they are dismissed automatically ([#84842](https://github.com/WordPress/gutenberg/pull/84842)).
+-   `Tabs`: Show the tab panel's focus ring with the design system's outline instead of a legacy box-shadow ([#84914](https://github.com/WordPress/gutenberg/pull/84914)).
 
 ### Deprecations
 
@@ -30,7 +37,11 @@
 
 ### Bug Fixes
 
+-   `StyleProvider`: Register module styles before children measure layout in iframe documents ([#84736](https://github.com/WordPress/gutenberg/pull/84736)).
 -   `BorderBoxControl`: Unpack multi-value CSS box shorthand strings (such as `"0 0 0 2px"`) into individual side widths when splitting borders ([#84826](https://github.com/WordPress/gutenberg/pull/84826)).
+-   `SelectControl`: Preserve the minimal variant's inline layout in iframe documents ([#84732](https://github.com/WordPress/gutenberg/pull/84732)).
+-   `DatePicker`: Keep month navigation in a grid in iframe documents ([#84724](https://github.com/WordPress/gutenberg/pull/84724)).
+-   `InputControl`: Preserve the label wrapper's maximum width in iframe documents ([#84728](https://github.com/WordPress/gutenberg/pull/84728)).
 -   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
 -   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
@@ -51,6 +62,8 @@
 
 ### Internal
 
+-   Replace remaining Emotion fixtures in polymorphic tests and ToolsPanel stories with SCSS Modules ([#84926](https://github.com/WordPress/gutenberg/pull/84926)).
+-   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
 -   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
 
