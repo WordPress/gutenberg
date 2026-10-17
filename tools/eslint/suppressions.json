@@ -119,11 +119,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-bindings/test/use-block-bindings-utils.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-draggable/draggable-chip.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -164,29 +159,8 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-mover/stories/index.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-patterns-list/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-patterns-list/stories/fixtures.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-patterns-list/stories/index.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -212,14 +186,6 @@
 	},
 	"packages/block-editor/src/components/block-styles/menu-items.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-title/stories/index.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -313,14 +279,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/grid/grid-visualizer.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/height-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
@@ -349,11 +307,6 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/inserter/block-patterns-tab/pattern-category-previews.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 5
@@ -372,19 +325,6 @@
 	"packages/block-editor/src/components/inserter/mobile-tab-navigation.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 6
-		}
-	},
-	"packages/block-editor/src/components/inserter/stories/index.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inserter/stories/utils/fixtures.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/inspector-controls-tabs/index.tsx": {
@@ -483,11 +423,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/elements/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/anchor.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -513,26 +448,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/grid-visualizer.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/hooks/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/hooks/layout.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/index.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
@@ -544,11 +461,6 @@
 	"packages/block-editor/src/layouts/grid.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
-		}
-	},
-	"packages/block-editor/src/private-apis.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/block-library/src/accordion-heading/deprecated.jsx": {
