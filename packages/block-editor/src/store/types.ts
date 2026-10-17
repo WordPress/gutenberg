@@ -1,5 +1,6 @@
 import type {
 	Block,
+	BlockType,
 	BlockTypeIcon,
 	BlockVariation,
 	synchronizeBlocksWithTemplate,
@@ -303,7 +304,7 @@ export interface InserterItem {
 	ancestor?: string[];
 	variations?: InserterVariation[];
 	variationName?: string;
-	example?: unknown;
+	example?: BlockType[ 'example' ];
 	innerBlocks?: InserterVariation[ 'innerBlocks' ];
 	innerContent?: InserterVariation[ 'innerContent' ];
 	isSearchOnly?: boolean;
@@ -320,6 +321,7 @@ export type HistoryMode = 'merge' | 'ignore';
 
 export type BlockListSettings = Record< string, unknown > & {
 	orientation?: 'horizontal' | 'vertical';
+	prioritizedInserterBlocks?: string[];
 	templateLock?: string | false;
 	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
 	/** A function is deprecated. */
@@ -387,6 +389,10 @@ export type Settings = Record< string | symbol, unknown > & {
 	blockInspectorAnimation?: BlockInspectorAnimationSettings;
 	blockStatesEditingEnabled?: boolean;
 	__experimentalUndo?: () => void;
+	/** Opens the inserter sidebar, or closes it with `false`. */
+	__experimentalSetIsInserterOpened?: (
+		value: boolean | Record< string, unknown >
+	) => void;
 	__unstableResolvedAssets?: ResolvedAssets;
 	__internalIsInitialized?: boolean;
 	supportsLayout?: boolean;

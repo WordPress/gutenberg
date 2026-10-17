@@ -93,6 +93,7 @@
 -   Convert the block tools, block canvas and inner blocks to TypeScript ([#85030](https://github.com/WordPress/gutenberg/pull/85030)).
 -   Convert the appenders, inserter list items and pattern lists to TypeScript ([#85031](https://github.com/WordPress/gutenberg/pull/85031)).
 -   Convert the inserter hooks, patterns tab and media tab to TypeScript ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
+-   Convert the inserter components, the block autocompleter, the change design control and the block parent selector to TypeScript ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
 
 ## 18.1.0 (2026-10-07)
 

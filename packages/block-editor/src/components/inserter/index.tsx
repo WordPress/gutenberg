@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ForwardedRef, MouseEvent } from 'react';
 import { speak } from '@wordpress/a11y';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Dropdown, Button } from '@wordpress/components';
@@ -10,11 +11,14 @@ import {
 } from '@wordpress/blocks';
 import { forwardRef } from '@wordpress/element';
 import { plus } from '@wordpress/icons';
+import type { BlockType } from '@wordpress/blocks';
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
 import { getSiblingBlockAttributes } from '../../utils/sibling-block-attributes';
 import { getAppenderLabel } from './get-appender-label';
+import type { BlockListSettings } from '../../store/types';
+import type { InserterProps, InserterToggleRenderProps } from './types';
 
 const UnforwardedInserterToggle = (
 	{
@@ -25,8 +29,8 @@ const UnforwardedInserterToggle = (
 		hasSingleBlockType,
 		appenderLabel,
 		toggleProps = {},
-	},
-	ref
+	}: InserterToggleRenderProps,
+	ref: ForwardedRef< HTMLElement >
 ) => {
 	const {
 		as: Wrapper = Button,
@@ -50,7 +54,7 @@ const UnforwardedInserterToggle = (
 	}
 
 	// Handle both onClick functions from the toggle and the parent component.
-	function handleClick( event ) {
+	function handleClick( event: MouseEvent ) {
 		if ( onToggle ) {
 			onToggle( event );
 		}
@@ -96,8 +100,8 @@ const UnforwardedInserter = (
 		onToggle,
 		renderToggle: renderToggleProp,
 		toggleProps,
-	},
-	ref
+	}: InserterProps,
+	ref: ForwardedRef< HTMLElement >
 ) => {
 	const {
 		hasItems,
@@ -119,7 +123,10 @@ const UnforwardedInserter = (
 			const { getBlockVariations, getBlockType } = select( blocksStore );
 
 			const _targetRootClientId =
-				rootClientId || getBlockRootClientId( clientId ) || undefined;
+				rootClientId ||
+				// A missing client ID has no root.
+				getBlockRootClientId( clientId as string ) ||
+				undefined;
 
 			const allowedBlocks = getAllowedBlocks( _targetRootClientId );
 			const directInsertBlock =
@@ -130,19 +137,25 @@ const UnforwardedInserter = (
 
 			const _hasSingleBlockType =
 				allowedBlocks?.length === 1 &&
-				getBlockVariations( allowedBlocks[ 0 ].name, 'inserter' )
-					?.length === 0;
+				getBlockVariations(
+					// `core/block` is listed by name, so it has no variations to find.
+					( allowedBlocks[ 0 ] as BlockType ).name,
+					'inserter'
+				)?.length === 0;
 			const _allowedBlockType = _hasSingleBlockType
-				? allowedBlocks[ 0 ]
+				? // Only a block type has variations, see above.
+					( allowedBlocks[ 0 ] as BlockType )
 				: null;
 
 			// Single-block-type parents get adjacent-attribute copying
 			// without needing to set `directInsert: true`.
-			let _blockToInsert = directInsertBlock || null;
+			let _blockToInsert: BlockListSettings[ 'defaultBlock' ] | null =
+				directInsertBlock || null;
 			if (
 				! _blockToInsert &&
 				_hasSingleBlockType &&
-				defaultBlock?.name === _allowedBlockType.name
+				// Set with a single block type.
+				defaultBlock?.name === _allowedBlockType!.name
 			) {
 				_blockToInsert = defaultBlock;
 			}
@@ -184,7 +197,8 @@ const UnforwardedInserter = (
 	}
 
 	function insertOnlyAllowedBlock() {
-		const blockName = blockToInsert?.name ?? allowedBlockType.name;
+		// Set whenever there is no block to insert.
+		const blockName = blockToInsert?.name ?? allowedBlockType!.name;
 
 		function getAdjacentBlockAttributes() {
 			// Find the adjacent block of the same type whose attributes
@@ -194,7 +208,8 @@ const UnforwardedInserter = (
 			if ( clientId ) {
 				const currentBlock = getBlock( clientId );
 				const previousBlock = getBlock(
-					getPreviousBlockClientId( clientId )
+					// A missing client ID has no block.
+					getPreviousBlockClientId( clientId ) as string
 				);
 				if ( currentBlock?.name === previousBlock?.name ) {
 					adjacentAttributes = previousBlock?.attributes;
@@ -274,7 +289,13 @@ const UnforwardedInserter = (
 		}
 	}
 
-	function renderToggle( { onToggle: dropdownOnToggle, isOpen } ) {
+	function renderToggle( {
+		onToggle: dropdownOnToggle,
+		isOpen,
+	}: {
+		onToggle: () => void;
+		isOpen?: boolean;
+	} ) {
 		const toggleArgs = {
 			onToggle: dropdownOnToggle,
 			isOpen,
@@ -292,7 +313,7 @@ const UnforwardedInserter = (
 		return <InserterToggle ref={ ref } { ...toggleArgs } />;
 	}
 
-	function renderContent( { onClose } ) {
+	function renderContent( { onClose }: { onClose: () => void } ) {
 		if ( isQuick ) {
 			return (
 				<QuickInserter
@@ -305,6 +326,7 @@ const UnforwardedInserter = (
 							onSelectOrClose &&
 							typeof onSelectOrClose === 'function'
 						) {
+							// @ts-expect-error Bug: an empty selection passes an empty array.
 							onSelectOrClose( firstBlock );
 						}
 						onClose();

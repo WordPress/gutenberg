@@ -1,3 +1,4 @@
+import type { ForwardedRef } from 'react';
 import { __, _x } from '@wordpress/i18n';
 import { useMemo, useEffect, forwardRef } from '@wordpress/element';
 import { useAsyncList } from '@wordpress/compose';
@@ -7,18 +8,22 @@ import useBlockTypesState from './hooks/use-block-types-state';
 import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import InserterNoResults from './no-results';
+import type { InserterItem } from '../../store/types';
+import type {
+	BlockTypesTabPanelProps,
+	BlockTypesTabProps,
+	InserterPanelProps,
+} from './types';
 
-const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
+const getBlockNamespace = ( item: InserterItem ) => item.name.split( '/' )[ 0 ];
 
 const MAX_SUGGESTED_ITEMS = 6;
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation and rerendering the component.
- *
- * @type {Array}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: [] = [];
 
 export function BlockTypesTabPanel( {
 	items,
@@ -28,7 +33,7 @@ export function BlockTypesTabPanel( {
 	onHover,
 	showMostUsedBlocks,
 	className,
-} ) {
+}: BlockTypesTabPanelProps ) {
 	const suggestedItems = useMemo( () => {
 		return orderBy( items, 'frecency', 'desc' ).slice(
 			0,
@@ -42,7 +47,11 @@ export function BlockTypesTabPanel( {
 
 	const itemsPerCollection = useMemo( () => {
 		// Create a new Object to avoid mutating collection.
-		const result = { ...collections };
+		// Each collection is replaced by its items, or deleted, below.
+		const result = { ...collections } as unknown as Record<
+			string,
+			InserterItem[]
+		>;
 		Object.keys( collections ).forEach( ( namespace ) => {
 			result[ namespace ] = items.filter(
 				( item ) => getBlockNamespace( item ) === namespace
@@ -104,7 +113,14 @@ export function BlockTypesTabPanel( {
 					<InserterPanel
 						key={ category.slug }
 						title={ category.title }
-						icon={ category.icon }
+						// Registered categories can carry an icon, which the blocks types omit.
+						icon={
+							(
+								category as {
+									icon?: InserterPanelProps[ 'icon' ];
+								}
+							 ).icon
+						}
 					>
 						<BlockTypesList
 							items={ categoryItems }
@@ -118,6 +134,7 @@ export function BlockTypesTabPanel( {
 
 			{ didRenderAllCategories && uncategorizedItems.length > 0 && (
 				<InserterPanel
+					// @ts-expect-error The panel ignores `className`.
 					className="block-editor-inserter__uncategorized-blocks-panel"
 					title={ __( 'Uncategorized' ) }
 				>
@@ -158,8 +175,8 @@ export function BlockTypesTabPanel( {
 }
 
 export function BlockTypesTab(
-	{ rootClientId, onInsert, onHover, showMostUsedBlocks },
-	ref
+	{ rootClientId, onInsert, onHover, showMostUsedBlocks }: BlockTypesTabProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
@@ -167,8 +184,8 @@ export function BlockTypesTab(
 	);
 
 	const [ itemsForCurrentRoot, itemsRemaining ] = useMemo( () => {
-		const forCurrentRoot = [];
-		const remaining = [];
+		const forCurrentRoot: InserterItem[] = [];
+		const remaining: InserterItem[] = [];
 
 		for ( const item of items ) {
 			// Skip reusable blocks, they moved to the patterns tab.

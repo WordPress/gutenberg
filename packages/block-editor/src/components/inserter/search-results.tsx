@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '@wordpress/ui';
@@ -18,15 +19,14 @@ import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import { orderInserterBlockItems } from '../../utils/order-inserter-block-items';
 import { store as blockEditorStore } from '../../store';
+import type { InserterSearchResultsProps } from './types';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation and rerendering the component.
- *
- * @type {Array}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: string[] = [];
 
 function InserterSearchResults( {
 	filterValue,
@@ -45,7 +45,7 @@ function InserterSearchResults( {
 	prioritizePatterns,
 	selectBlockOnInsert,
 	isQuick,
-} ) {
+}: InserterSearchResultsProps ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
 	const { prioritizedBlocks } = useSelect(
@@ -212,7 +212,8 @@ function InserterSearchResults( {
 					} }
 				>
 					{ ( fills ) => {
-						if ( fills.length ) {
+						// The slot passes its fills as an array.
+						if ( ( fills as ReactNode[] ).length ) {
 							return fills;
 						}
 						if ( ! hasItems ) {
