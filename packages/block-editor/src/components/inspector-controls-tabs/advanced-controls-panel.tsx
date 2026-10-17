@@ -8,8 +8,9 @@ import {
 	InspectorAdvancedControls,
 } from '../inspector-controls';
 import { PrivateInspectorControlsAllowedBlocks } from '../inspector-controls/groups';
+import type { AdvancedControlsProps } from './types';
 
-const AdvancedControls = ( { initialOpen = false } ) => {
+const AdvancedControls = ( { initialOpen = false }: AdvancedControlsProps ) => {
 	const fills = useSlotFills( InspectorAdvancedControls.slotName );
 	const privateFills = useSlotFills(
 		PrivateInspectorControlsAllowedBlocks.name

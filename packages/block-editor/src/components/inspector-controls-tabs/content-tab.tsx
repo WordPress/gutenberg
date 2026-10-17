@@ -1,12 +1,13 @@
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import BlockQuickNavigation from '../block-quick-navigation';
+import type { ContentTabProps } from './types';
 
 const ContentTab = ( {
 	contentClientIds,
 	onSwitchToListView,
 	hasListViewTab,
-} ) => {
+}: ContentTabProps ) => {
 	if ( ! contentClientIds || contentClientIds.length === 0 ) {
 		return null;
 	}

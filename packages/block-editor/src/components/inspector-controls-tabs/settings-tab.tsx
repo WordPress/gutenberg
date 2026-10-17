@@ -2,8 +2,9 @@ import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/component
 import AdvancedControls from './advanced-controls-panel';
 import { default as InspectorControls } from '../inspector-controls';
 import groups from '../inspector-controls/groups';
+import type { SettingsTabProps } from './types';
 
-const SettingsTab = ( { showAdvancedControls = false } ) => {
+const SettingsTab = ( { showAdvancedControls = false }: SettingsTabProps ) => {
 	const defaultFills = useSlotFills( groups.default.name );
 	const bindingsFills = useSlotFills( groups.bindings.name );
 

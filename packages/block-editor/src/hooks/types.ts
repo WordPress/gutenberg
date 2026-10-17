@@ -828,3 +828,52 @@ export interface CustomCSSControlProps {
 export type StyleAttributes = {
 	style?: PanelStyle;
 } & Record< string, unknown >;
+
+/**
+ * A duotone preset from theme.json.
+ */
+export interface DuotonePreset {
+	name: string;
+	slug: string;
+	colors: string[];
+}
+
+/**
+ * A color preset from theme.json.
+ */
+export interface ColorPreset {
+	name: string;
+	slug: string;
+	color: string;
+}
+
+/**
+ * The duotone style: a preset reference, a pair of colors, or a CSS value
+ * such as `unset`.
+ */
+export type DuotoneValue = string | string[];
+
+export interface DuotonePanelProps {
+	style?: PanelStyle;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	name: string;
+	clientId: string;
+}
+
+export interface DuotoneStylesOptions {
+	clientId: string;
+	/** The class name that scopes the filter. */
+	id: string;
+	/** The selectors of the block elements the filter applies to. */
+	selector: string;
+	attribute: DuotoneValue | undefined;
+}
+
+export interface BlockHooksPanelProps {
+	name: string;
+	clientId: string;
+	metadata?: BlockMetadata & {
+		/** Hooked blocks that the user removed from this anchor block. */
+		ignoredHookedBlocks?: string[];
+	};
+}

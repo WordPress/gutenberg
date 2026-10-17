@@ -88,6 +88,7 @@
 -   Convert the style support hooks to TypeScript ([#85024](https://github.com/WordPress/gutenberg/pull/85024)).
 -   Convert the rich text, autocomplete, editable text and plain text components to TypeScript ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
 -   Convert the list view, block navigation dropdown and list view support to TypeScript ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
+-   Convert the block inspector, inspector tabs, duotone and block hooks supports to TypeScript ([#85028](https://github.com/WordPress/gutenberg/pull/85028)).
 
 ## 18.1.0 (2026-10-07)
 
