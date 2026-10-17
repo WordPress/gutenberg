@@ -620,22 +620,8 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/global-styles/border-panel.jsx": {
+	"packages/block-editor/src/components/global-styles/border-panel.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/dimensions-panel.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -644,56 +630,13 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/global-styles/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/global-styles/shadow-panel-components.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 4
 		}
 	},
-	"packages/block-editor/src/components/global-styles/test/border-panel.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/test/dimensions-panel.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/test/typography-panel-core.browser.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/test/typography-panel.browser.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/global-styles/typography-panel.jsx": {
+	"packages/block-editor/src/components/global-styles/typography-panel.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},

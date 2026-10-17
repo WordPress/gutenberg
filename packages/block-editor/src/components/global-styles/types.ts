@@ -10,6 +10,9 @@ import type {
 	UnresolvedValue,
 } from '@wordpress/global-styles-engine';
 import type { ColorGradientOptions } from '../colors-gradients/types';
+import type { Layout, LayoutBlockSupport } from '../../layouts/types';
+import type { BlockStyleState } from '../../hooks/types';
+import type { DimensionSizes } from '../dimension-control/types';
 
 declare global {
 	interface Window {
@@ -51,7 +54,13 @@ export interface StyleSettings {
 		gradient?: boolean;
 		backgroundClip?: boolean | string[];
 	};
-	border?: Record< string, unknown >;
+	border?: Record< string, unknown > & {
+		color?: boolean;
+		radius?: boolean;
+		style?: boolean;
+		width?: boolean;
+		radiusSizes?: Record< string, RadiusSizePreset[] >;
+	};
 	color?: Record< string, unknown > & {
 		palette?: PresetsPerOrigin< Color >;
 		gradients?: PresetsPerOrigin< Gradient > | NoPresets;
@@ -69,9 +78,19 @@ export interface StyleSettings {
 		defaultPalette?: boolean;
 		defaultGradients?: boolean;
 	};
-	dimensions?: Record< string, unknown >;
-	layout?: Record< string, unknown >;
-	parentLayout?: unknown;
+	dimensions?: Record< string, unknown > & {
+		height?: boolean;
+		minHeight?: boolean;
+		minWidth?: boolean;
+		width?: boolean;
+		aspectRatio?: boolean;
+		dimensionSizes?: DimensionSizes;
+	};
+	layout?: Record< string, unknown > & {
+		contentSize?: string;
+		wideSize?: string;
+	};
+	parentLayout?: Layout & LayoutBlockSupport;
 	shadow?:
 		| false
 		| {
@@ -79,7 +98,14 @@ export interface StyleSettings {
 				presets?: PresetsPerOrigin< ShadowPreset >;
 				[ setting: string ]: unknown;
 		  };
-	spacing?: Record< string, unknown >;
+	spacing?: Record< string, unknown > & {
+		padding?: SpacingSidesSetting;
+		margin?: SpacingSidesSetting;
+		blockGap?: SpacingSidesSetting;
+		units?: string[];
+		spacingSizes?: Record< string, SpacingSizePreset[] >;
+		defaultSpacingSizes?: boolean;
+	};
 	typography?: TypographyStyleSettings;
 }
 
@@ -142,15 +168,47 @@ export interface PanelBackgroundStyle extends Omit<
 }
 
 /**
+ * The border of one side, or of all sides at once.
+ */
+export interface PanelBorderSide {
+	color?: StyleValue;
+	style?: StyleValue;
+	width?: StyleValue;
+}
+
+/**
+ * The radius of each corner.
+ */
+export interface PanelBorderRadius {
+	topLeft?: StyleValue;
+	topRight?: StyleValue;
+	bottomLeft?: StyleValue;
+	bottomRight?: StyleValue;
+}
+
+/**
+ * The border styles a style panel edits, flat or split by side.
+ */
+export interface PanelBorderStyle extends PanelBorderSide {
+	radius?: StyleValue | PanelBorderRadius;
+	top?: PanelBorderSide;
+	right?: PanelBorderSide;
+	bottom?: PanelBorderSide;
+	left?: PanelBorderSide;
+	[ key: string ]: unknown;
+}
+
+/**
  * The block or global styles a style panel edits, as stored.
  */
 export interface PanelStyle {
 	color?: Record< string, StyleValue >;
 	typography?: Record< string, StyleValue >;
 	background?: PanelBackgroundStyle;
-	border?: Record< string, StyleValue | Record< string, StyleValue > >;
+	border?: PanelBorderStyle;
 	spacing?: Record< string, StyleValue | Record< string, StyleValue > >;
 	dimensions?: Record< string, StyleValue >;
+	layout?: Record< string, StyleValue >;
 	filter?: Record< string, StyleValue | string[] >;
 	shadow?: StyleValue;
 	elements?: Record< string, PanelStyle >;
@@ -461,6 +519,80 @@ export interface FiltersPanelProps {
 	panelId?: string | null;
 	/** Which controls are shown by default. */
 	defaultControls?: Record< string, boolean | undefined >;
+	/** Whether controls show where their value is inherited from. */
+	showInheritanceLabelIndicators?: boolean;
+}
+
+/**
+ * A border radius preset from theme.json.
+ */
+export interface RadiusSizePreset {
+	name: string;
+	slug: string;
+	size: string;
+}
+
+export interface BorderPanelProps {
+	/** The tools panel the controls render in. */
+	as?: ComponentType< StyleToolsPanelProps >;
+	/** The styles the panel edits. */
+	value?: PanelStyle;
+	/** Called with the changed styles. */
+	onChange: ( value: PanelStyle ) => void;
+	/** The styles inherited from global styles. */
+	inheritedValue?: PanelStyle;
+	/** The settings of the block or element. */
+	settings?: StyleSettings;
+	/** ID of the panel. */
+	panelId?: string | null;
+	/** Which controls are shown by default. */
+	defaultControls?: Record< string, boolean | undefined >;
+	/** Whether controls show where their value is inherited from. */
+	showInheritanceLabelIndicators?: boolean;
+}
+
+/**
+ * Whether a spacing control is shown, and for which sides.
+ */
+export type SpacingSidesSetting = boolean | string[] | { sides?: string[] };
+
+/**
+ * A spacing size preset from theme.json.
+ */
+export interface SpacingSizePreset {
+	name: string;
+	slug: string;
+	size: string;
+}
+
+/**
+ * Spacing values per side, or a single value for every side.
+ */
+export type SpacingSidesValue = Record< string, StyleValue >;
+
+export interface DimensionsPanelProps {
+	/** The tools panel the controls render in. */
+	as?: ComponentType< StyleToolsPanelProps >;
+	/** The styles the panel edits. */
+	value?: PanelStyle;
+	/** Called with the changed styles. */
+	onChange: ( value: PanelStyle ) => void;
+	/** The styles inherited from global styles. */
+	inheritedValue?: PanelStyle;
+	/** The settings of the block or element. */
+	settings: StyleSettings;
+	/** ID of the panel. */
+	panelId?: string | null;
+	/** Which controls are shown by default. */
+	defaultControls?: Record< string, boolean | undefined >;
+	/** Called with the spacing to visualize, or `false` to stop. */
+	onVisualize?: ( property: string | false ) => void;
+	/** Whether to show the content and wide size controls. */
+	includeLayoutControls?: boolean;
+	/** Whether the block gap can differ per axis. */
+	allowAxialBlockGap?: boolean;
+	/** The selected style state. */
+	styleState?: BlockStyleState;
 	/** Whether controls show where their value is inherited from. */
 	showInheritanceLabelIndicators?: boolean;
 }
