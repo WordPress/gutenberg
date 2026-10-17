@@ -11,24 +11,28 @@ process.on( 'unhandledRejection', ( err ) => {
 const { dirname, resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
 const {
-	extractWpEnvConfigArg,
 	fromConfigRoot,
 	hasProjectFile,
 	hasArgInCLI,
+	getArgFromCLI,
 	getArgsFromCLI,
 	getAsBooleanFromENV,
 	getTestsBaseUrl,
 } = require( '../utils' );
 
-const { wpEnvConfig, args: playwrightArgs } =
-	extractWpEnvConfigArg( getArgsFromCLI() );
+const wpEnvConfig = getArgFromCLI( '--wp-env-config' );
 
 if ( wpEnvConfig === null ) {
 	console.error(
-		'Error: The --wp-env-config option requires the path to a wp-env config file.'
+		'Error: The --wp-env-config option requires the path to a wp-env config file, as in --wp-env-config=<path>.'
 	);
 	process.exit( 1 );
 }
+
+// Playwright rejects options it does not know.
+const playwrightArgs = getArgsFromCLI().filter(
+	( arg ) => arg.split( '=' )[ 0 ] !== '--wp-env-config'
+);
 
 /**
  * @typedef {import('../../env/lib/config/load-config').WPConfig} WPConfig
