@@ -28,21 +28,21 @@ directive(
 	( { directives: { 'router-region': routerRegion } } ) => {
 		const entry = routerRegion.find( isDefaultDirectiveSuffix );
 		if ( ! entry ) {
-			return;
+			return undefined;
 		}
 
 		if ( entry.suffix ) {
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warnSuffixNotSupported( 'router-region', entry.suffix );
 			}
-			return;
+			return undefined;
 		}
 
 		if ( entry.uniqueId ) {
 			if ( globalThis.SCRIPT_DEBUG ) {
 				warnUniqueIdNotSupported( 'router-region', entry.uniqueId );
 			}
-			return;
+			return undefined;
 		}
 
 		const regionId =
