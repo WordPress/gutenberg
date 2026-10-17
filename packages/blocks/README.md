@@ -319,7 +319,7 @@ _Parameters_
 
 - _blockTypeOrName_ `string | BlockType`: Block type or name.
 - _attributes_ `Record< string, unknown >`: Block attributes.
-- _innerBlocks_ `Block[]`: Nested blocks.
+- _innerBlocks_ `Block[] | ReactNode`: Nested blocks, or an element to render in their place.
 
 _Returns_
 

@@ -112,14 +112,14 @@ export function getInnerBlocksProps(
  *
  * @param blockTypeOrName Block type or name.
  * @param attributes      Block attributes.
- * @param innerBlocks     Nested blocks.
+ * @param innerBlocks     Nested blocks, or an element to render in their place.
  *
  * @return Save element or raw HTML string.
  */
 export function getSaveElement(
 	blockTypeOrName: string | BlockType,
 	attributes: Record< string, unknown >,
-	innerBlocks: Block[] = []
+	innerBlocks: Block[] | ReactNode = []
 ): unknown {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
