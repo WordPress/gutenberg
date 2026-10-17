@@ -5,6 +5,7 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { useMemo, useEffect } from '@wordpress/element';
@@ -34,11 +35,20 @@ import { useResolvedStyle } from '../components/global-styles/inherited-value-co
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 import { store as blockEditorStore } from '../store';
+import type {
+	BlockListBlockFeatureProps,
+	ColorPreset,
+	DuotonePanelProps,
+	DuotonePreset,
+	DuotoneStylesOptions,
+	DuotoneValue,
+} from './types';
+import type { PanelStyle } from '../components/global-styles/types';
 
 const { getDuotoneFilter, getDuotoneStylesheet, getDuotoneUnsetStylesheet } =
 	unlock( globalStylesEnginePrivateApis );
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: never[] = [];
 
 // Safari does not always update the duotone filter when the duotone colors
 // are changed. This browser check is later used to force a re-render of the block
@@ -52,14 +62,21 @@ const isSafari =
 
 extend( [ namesPlugin ] );
 
-function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
+function useMultiOriginPresets< T >( {
+	presetSetting,
+	defaultSetting,
+}: {
+	presetSetting: string;
+	defaultSetting: string;
+} ): T[] {
+	// The settings hold the flag and the preset lists of each origin.
 	const [ enableDefault, userPresets, themePresets, defaultPresets ] =
 		useSettings(
 			defaultSetting,
 			`${ presetSetting }.custom`,
 			`${ presetSetting }.theme`,
 			`${ presetSetting }.default`
-		);
+		) as [ boolean, T[] | undefined, T[] | undefined, T[] | undefined ];
 	return useMemo(
 		() => [
 			...( userPresets || EMPTY_ARRAY ),
@@ -70,7 +87,10 @@ function useMultiOriginPresets( { presetSetting, defaultSetting } ) {
 	);
 }
 
-export function getColorsFromDuotonePreset( duotone, duotonePalette ) {
+export function getColorsFromDuotonePreset(
+	duotone?: DuotoneValue,
+	duotonePalette?: DuotonePreset[]
+): string[] | undefined {
 	if ( ! duotone ) {
 		return;
 	}
@@ -81,7 +101,10 @@ export function getColorsFromDuotonePreset( duotone, duotonePalette ) {
 	return preset ? preset.colors : undefined;
 }
 
-export function getDuotonePresetFromColors( colors, duotonePalette ) {
+export function getDuotonePresetFromColors(
+	colors?: DuotoneValue,
+	duotonePalette?: DuotonePreset[]
+): string | undefined {
 	if ( ! colors || ! Array.isArray( colors ) ) {
 		return;
 	}
@@ -95,26 +118,33 @@ export function getDuotonePresetFromColors( colors, duotonePalette ) {
 	return preset ? `var:preset|duotone|${ preset.slug }` : undefined;
 }
 
-function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
-	const duotoneStyle = style?.color?.duotone;
+function DuotonePanelPure( {
+	style,
+	setAttributes,
+	name,
+	clientId,
+}: DuotonePanelProps ) {
+	// The duotone style holds a preset reference, colors or a CSS value.
+	const duotoneStyle = style?.color?.duotone as DuotoneValue | undefined;
 	const settings = useBlockSettings( name );
 	const blockEditingMode = useBlockEditingMode();
 
 	const className = useSelect(
 		( select ) =>
 			clientId
-				? select( blockEditorStore ).getBlockAttributes( clientId )
-						?.className
+				? // The class name attribute is a string.
+					( select( blockEditorStore ).getBlockAttributes( clientId )
+						?.className as string | undefined )
 				: undefined,
 		[ clientId ]
 	);
 	const { value: inheritedValue } = useResolvedStyle( name, className );
 
-	const duotonePalette = useMultiOriginPresets( {
+	const duotonePalette = useMultiOriginPresets< DuotonePreset >( {
 		presetSetting: 'color.duotone',
 		defaultSetting: 'color.defaultDuotone',
 	} );
-	const colorPalette = useMultiOriginPresets( {
+	const colorPalette = useMultiOriginPresets< ColorPreset >( {
 		presetSetting: 'color.palette',
 		defaultSetting: 'color.defaultPalette',
 	} );
@@ -152,7 +182,7 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 					value={ {
 						filter: { duotone: duotoneStyle },
 					} }
-					onChange={ ( newDuotone ) => {
+					onChange={ ( newDuotone: PanelStyle ) => {
 						const newStyle = {
 							...style,
 							color: {
@@ -199,6 +229,7 @@ function DuotonePanelPure( { style, setAttributes, name, clientId } ) {
 							style: cleanEmptyObject( newStyle ),
 						} );
 					} }
+					// @ts-expect-error `DuotoneControl` ignores `settings`.
 					settings={ settings }
 				/>
 			</BlockControls>
@@ -211,7 +242,7 @@ export default {
 	edit: DuotonePanelPure,
 	useBlockProps,
 	attributeKeys: [ 'style' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, 'filter.duotone' );
 	},
 };
@@ -220,11 +251,11 @@ export default {
  * Filters registered block settings, extending attributes to include
  * the `duotone` attribute.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-function addDuotoneAttributes( settings ) {
+function addDuotoneAttributes( settings: BlockType ): BlockType {
 	// Previous `color.__experimentalDuotone` support flag is migrated via
 	// block_type_metadata_settings filter in `lib/block-supports/duotone.php`.
 	if ( ! hasBlockSupport( settings, 'filter.duotone' ) ) {
@@ -249,8 +280,8 @@ function useDuotoneStyles( {
 	id: filterId,
 	selector: duotoneSelector,
 	attribute: duotoneAttr,
-} ) {
-	const duotonePalette = useMultiOriginPresets( {
+}: DuotoneStylesOptions ) {
+	const duotonePalette = useMultiOriginPresets< DuotonePreset >( {
 		presetSetting: 'color.duotone',
 		defaultSetting: 'color.defaultDuotone',
 	} );
@@ -267,7 +298,7 @@ function useDuotoneStyles( {
 	const isCSS = typeof duotoneAttr === 'string' && ! isPreset;
 
 	// Match the structure of WP_Duotone_Gutenberg::render_duotone_support() in PHP.
-	let colors = null;
+	let colors: DuotoneValue | null = null;
 	if ( isPreset ) {
 		// Array of colors.
 		colors = duotonePreset;
@@ -316,7 +347,8 @@ function useDuotoneStyles( {
 			: undefined
 	);
 
-	const blockElement = useBlockElement( clientId );
+	// Blocks render HTML elements.
+	const blockElement = useBlockElement( clientId ) as HTMLElement | null;
 
 	useEffect( () => {
 		if ( ! isValidFilter ) {
@@ -349,7 +381,11 @@ function useDuotoneStyles( {
 // Used for generating the instance ID
 const DUOTONE_BLOCK_PROPS_REFERENCE = {};
 
-function useBlockProps( { clientId, name, style } ) {
+function useBlockProps( {
+	clientId,
+	name,
+	style,
+}: BlockListBlockFeatureProps & { style?: PanelStyle } ) {
 	const id = useInstanceId( DUOTONE_BLOCK_PROPS_REFERENCE );
 	const selector = useMemo( () => {
 		const blockType = getBlockType( name );
@@ -388,9 +424,11 @@ function useBlockProps( { clientId, name, style } ) {
 				fallback: true,
 			} );
 		}
+		return undefined;
 	}, [ name ] );
 
-	const attribute = style?.color?.duotone;
+	// The duotone style holds a preset reference, colors or a CSS value.
+	const attribute = style?.color?.duotone as DuotoneValue | undefined;
 
 	const filterClass = `wp-duotone-${ id }`;
 
@@ -399,7 +437,8 @@ function useBlockProps( { clientId, name, style } ) {
 	useDuotoneStyles( {
 		clientId,
 		id: filterClass,
-		selector,
+		// Blocks with duotone support have a selector.
+		selector: selector as string,
 		attribute,
 	} );
 
