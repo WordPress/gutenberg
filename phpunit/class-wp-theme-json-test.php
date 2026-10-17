@@ -1310,6 +1310,415 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		);
 	}
 
+	/**
+	 * Builds a Paragraph stylesheet with a text gradient and the given states.
+	 *
+	 * @param array $state_styles State styles to merge into the block styles.
+	 * @return string Generated stylesheet.
+	 */
+	private function get_text_clip_stylesheet( $state_styles ) {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/paragraph' => array_merge(
+							array(
+								'background' => array(
+									'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+									'backgroundClip' => 'text',
+								),
+							),
+							$state_styles
+						),
+					),
+				),
+			)
+		);
+
+		return $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+	}
+
+	public function test_breakpoint_escaping_a_text_clip_clears_the_inherited_gradient() {
+		$stylesheet = $this->get_text_clip_stylesheet(
+			array(
+				'@mobile' => array(
+					'background' => array( 'backgroundClip' => 'border-box' ),
+				),
+			)
+		);
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(p){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_breakpoint_painting_its_own_background_keeps_it() {
+		$stylesheet = $this->get_text_clip_stylesheet(
+			array(
+				'@mobile' => array(
+					'background' => array(
+						'gradient'       => 'linear-gradient(135deg,#00ff00,#ffff00)',
+						'backgroundClip' => 'border-box',
+					),
+				),
+			)
+		);
+
+		$this->assertStringNotContainsString( 'background-image: unset', $stylesheet );
+	}
+
+	public function test_breakpoint_text_color_under_a_text_clip_gets_its_fill_back() {
+		$stylesheet = $this->get_text_clip_stylesheet(
+			array( '@mobile' => array( 'color' => array( 'text' => '#00ff00' ) ) )
+		);
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(p){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_breakpoint_keeping_the_text_clip_needs_no_escape() {
+		$stylesheet = $this->get_text_clip_stylesheet(
+			array(
+				'@mobile' => array(
+					'background' => array(
+						'gradient'       => 'linear-gradient(135deg,#00ff00,#ffff00)',
+						'backgroundClip' => 'text',
+					),
+				),
+			)
+		);
+
+		$this->assertStringNotContainsString( 'background-image: unset', $stylesheet );
+		$this->assertStringNotContainsString( '-webkit-text-fill-color: currentColor', $stylesheet );
+	}
+
+	public function test_breakpoint_element_styles_read_the_element_clip() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'elements' => array(
+								'link' => array(
+									'background' => array(
+										'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+										'backgroundClip' => 'text',
+									),
+								),
+							),
+							'@mobile'  => array(
+								'elements' => array(
+									'link' => array( 'color' => array( 'text' => '#00ff00' ) ),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		// The state key sits in the middle of this node's path, not at its end.
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-group a:where(:not(.wp-element-button))){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_breakpoint_variation_styles_read_the_variation_clip() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'variations' => array(
+								'flashy' => array(
+									'background' => array(
+										'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+										'backgroundClip' => 'text',
+									),
+									'@mobile'    => array(
+										'background' => array( 'backgroundClip' => 'border-box' ),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/group',
+				'path'       => array( 'styles', 'blocks', 'core/group' ),
+				'selector'   => '.wp-block-group',
+				'css'        => '.wp-block-group',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/group', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-group',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/group', 'flashy' );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.is-style-flashy.wp-block-group){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}',
+			$actual_styles
+		);
+	}
+
+	public function test_breakpoint_variation_styles_read_the_block_clip() {
+		register_block_style(
+			'core/group',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/group' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'flashy' => array(
+									'@mobile' => array(
+										'background' => array( 'backgroundClip' => 'border-box' ),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/group',
+				'path'       => array( 'styles', 'blocks', 'core/group' ),
+				'selector'   => '.wp-block-group',
+				'css'        => '.wp-block-group',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/group', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-group',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/group', 'flashy' );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.is-style-flashy.wp-block-group){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}',
+			$actual_styles
+		);
+	}
+
+	public function test_variation_pseudo_state_reads_the_block_clip() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/button' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'flashy' => array(
+									':hover' => array(
+										'background' => array( 'backgroundClip' => 'border-box' ),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/button',
+				'path'       => array( 'styles', 'blocks', 'core/button' ),
+				'selector'   => '.wp-block-button',
+				'css'        => '.wp-block-button',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-button',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/button', 'flashy' );
+
+		$this->assertStringContainsString(
+			':root :where(.is-style-flashy.wp-block-button:hover){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}',
+			$actual_styles
+		);
+	}
+
+	public function test_variation_breakpoint_pseudo_state_reads_the_block_clip() {
+		register_block_style(
+			'core/button',
+			array(
+				'name'  => 'flashy',
+				'label' => 'Flashy',
+			)
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/button' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'variations' => array(
+								'flashy' => array(
+									'@mobile' => array(
+										':hover' => array(
+											'background' => array( 'backgroundClip' => 'border-box' ),
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$actual_styles = $theme_json->get_styles_for_block(
+			array(
+				'name'       => 'core/button',
+				'path'       => array( 'styles', 'blocks', 'core/button' ),
+				'selector'   => '.wp-block-button',
+				'css'        => '.wp-block-button',
+				'variations' => array(
+					array(
+						'path'     => array( 'styles', 'blocks', 'core/button', 'variations', 'flashy' ),
+						'selector' => '.is-style-flashy.wp-block-button',
+					),
+				),
+			)
+		);
+
+		unregister_block_style( 'core/button', 'flashy' );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.is-style-flashy.wp-block-button:hover){background-clip: border-box;-webkit-text-fill-color: currentColor;background-image: unset;}}',
+			$actual_styles
+		);
+	}
+
+	public function test_pseudo_state_reads_the_clip_its_own_breakpoint_sets() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/button' => array(
+							'background' => array( 'backgroundClip' => 'border-box' ),
+							'@mobile'    => array(
+								'background' => array(
+									'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+									'backgroundClip' => 'text',
+								),
+								':hover'     => array( 'color' => array( 'text' => '#00ff00' ) ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){color: #00ff00;-webkit-text-fill-color: currentColor;}}',
+			$stylesheet
+		);
+	}
+
+	public function test_pseudo_state_inside_a_breakpoint_reads_the_breakpoint_clip() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'viewport' => array( 'mobile' => '480px' ) ),
+				'styles'   => array(
+					'blocks' => array(
+						'core/button' => array(
+							'background' => array(
+								'gradient'       => 'linear-gradient(135deg,#ff0000,#0000ff)',
+								'backgroundClip' => 'text',
+							),
+							'@mobile'    => array(
+								'background' => array( 'backgroundClip' => 'border-box' ),
+								':hover'     => array( 'color' => array( 'text' => '#00ff00' ) ),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
+
+		// The breakpoint already escaped the clip, so no fill is needed.
+		$this->assertStringContainsString(
+			'@media (width <= 480px){:root :where(.wp-block-button .wp-block-button__link:hover){color: #00ff00;}}',
+			$stylesheet
+		);
+	}
+
 	public function test_get_stylesheet_omits_tablet_styles_when_its_breakpoint_is_not_larger_than_mobile() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -1455,30 +1864,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertStringContainsString( '@media (width <= 480px)', $actual_styles );
 		$this->assertStringContainsString( $mobile_gap, $actual_styles );
 		$this->assertLessThan( strpos( $actual_styles, $mobile_gap ), strpos( $actual_styles, $default_gap ) );
-	}
-
-	public function test_get_stylesheet_outputs_legacy_responsive_block_styles() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/group' => array(
-							'mobile' => array(
-								'color' => array(
-									'text' => 'red',
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$this->assertStringContainsString(
-			'@media (width <= 480px){:root :where(.wp-block-group){color: red;}}',
-			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
-		);
 	}
 
 	public function test_get_stylesheet_renders_element_styles_defined_only_in_a_breakpoint() {
@@ -5513,19 +5898,54 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function data_get_stylesheet_ignores_values_of_unexpected_types() {
 		return array(
-			'element custom css as an object'    => array(
+			'element custom css as an object'       => array(
 				array( 'styles' => array( 'elements' => array( 'link' => array( 'css' => array( 'color' => 'red' ) ) ) ) ),
 			),
-			'block custom css as a list'         => array(
+			'block custom css as a list'            => array(
 				array( 'styles' => array( 'blocks' => array( 'core/paragraph' => array( 'css' => array( 'color: red;' ) ) ) ) ),
 			),
-			'ref as an array'                    => array(
+			'ref as an array'                       => array(
 				array( 'styles' => array( 'color' => array( 'text' => array( 'ref' => array( 'styles', 'color' ) ) ) ) ),
 			),
-			'spacing scale as a string'          => array(
+			'palette as a list of strings'          => array(
+				array( 'settings' => array( 'color' => array( 'palette' => array( '#000', '#fff' ) ) ) ),
+			),
+			'palette keyed by origin with a string' => array(
+				array( 'settings' => array( 'color' => array( 'palette' => array( 'custom' => array( '#000' ) ) ) ) ),
+			),
+			'palette mixing a list and an origin'   => array(
+				array(
+					'settings' => array(
+						'color' => array(
+							'palette' => array(
+								0       => '#000',
+								'theme' => '#fff',
+							),
+						),
+					),
+				),
+			),
+			'preset slug as an array'               => array(
+				array(
+					'settings' => array(
+						'typography' => array(
+							'fontSizes' => array(
+								array(
+									'slug' => array( 'small' ),
+									'size' => '1rem',
+								),
+							),
+						),
+					),
+				),
+			),
+			'font families as a list of strings'    => array(
+				array( 'settings' => array( 'typography' => array( 'fontFamilies' => array( 'Inter' ) ) ) ),
+			),
+			'spacing scale as a string'             => array(
 				array( 'settings' => array( 'spacing' => array( 'spacingScale' => '1.5' ) ) ),
 			),
-			'spacing scale unit as an array'     => array(
+			'spacing scale unit as an array'        => array(
 				array(
 					'settings' => array(
 						'spacing' => array(
@@ -5540,13 +5960,69 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-			'shared style variation as a string' => array(
+			'shared style variation as a string'    => array(
 				array( 'styles' => array( 'variations' => array( 'plain' => 'red' ) ) ),
 			),
-			'block types item as an array'       => array(
+			'block types item as an array'          => array(
 				array( 'blockTypes' => array( array( 'core/button' ) ) ),
 			),
 		);
+	}
+
+	public function test_sanitize_removes_preset_items_of_unexpected_types() {
+		$valid_color = array(
+			'slug'  => 'black',
+			'color' => '#000',
+			'name'  => 'Black',
+		);
+		$int_slug    = array(
+			'slug'  => 50,
+			'color' => '#888',
+			'name'  => 'Grey',
+		);
+		$invalid     = array(
+			'#fff',
+			array(
+				'slug'  => array( 'white' ),
+				'color' => '#fff',
+			),
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'  => array( 'palette' => array_merge( $invalid, array( $valid_color, $int_slug ) ) ),
+					'blocks' => array(
+						'core/paragraph' => array(
+							'color' => array( 'palette' => array( 'custom' => array_merge( $invalid, array( $valid_color, $int_slug ) ) ) ),
+						),
+					),
+				),
+			)
+		);
+		$settings   = $theme_json->get_settings();
+
+		$this->assertSame( array( $valid_color, $int_slug ), $settings['color']['palette']['theme'], 'Top-level preset list' );
+		$this->assertSame( array( $valid_color, $int_slug ), $settings['blocks']['core/paragraph']['color']['palette']['custom'], 'Block-level presets keyed by origin' );
+	}
+
+	public function test_remove_insecure_properties_removes_preset_items_of_unexpected_types() {
+		$valid_color = array(
+			'slug'  => 'black',
+			'color' => '#000',
+			'name'  => 'Black',
+		);
+
+		$sanitized = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'color' => array( 'palette' => array( 'custom' => array( '#fff', $valid_color ) ) ) ),
+			),
+			'custom'
+		);
+
+		$this->assertSame( array( $valid_color ), $sanitized['settings']['color']['palette']['custom'] );
 	}
 
 	public function test_merge_does_not_generate_spacing_sizes_from_a_non_array_per_origin_spacing_scale() {
@@ -8666,30 +9142,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'blocks' => array(
 						'core/navigation-link' => array(
 							'-current' => array(
-								'color' => array(
-									'text'       => 'red',
-									'background' => 'blue',
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected   = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}';
-		$this->assertSameCSS( $expected, $stylesheet );
-	}
-
-	public function test_legacy_block_custom_states_are_processed() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/navigation-link' => array(
-							'@current' => array(
 								'color' => array(
 									'text'       => 'red',
 									'background' => 'blue',

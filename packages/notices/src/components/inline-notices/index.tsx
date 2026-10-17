@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react';
 import clsx from 'clsx';
-import { NoticeList } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { Children } from '@wordpress/element';
 import { store as noticesStore } from '../../store';
+import type { Notice } from '../../store/types';
+import InlineNotice from './inline-notice';
 
 type InlineNoticesProps = {
 	children?: ReactNode;
@@ -12,13 +14,35 @@ type InlineNoticesProps = {
 	context?: string;
 };
 
-function hasRenderableChildren( children: ReactNode ): boolean {
+type NoticeListProps = {
+	notices: Notice[];
+	className: string;
+	onRemove?: ( id: string ) => void;
+	children?: ReactNode;
+};
+
+function NoticeList( {
+	notices,
+	className,
+	onRemove,
+	children,
+}: NoticeListProps ) {
 	return (
-		children !== null &&
-		children !== undefined &&
-		children !== false &&
-		children !== ''
+		<div className={ clsx( 'notices-inline-notices__list', className ) }>
+			{ children }
+			{ [ ...notices ].reverse().map( ( notice ) => (
+				<InlineNotice
+					key={ notice.id }
+					notice={ notice }
+					onRemove={ () => onRemove?.( notice.id ) }
+				/>
+			) ) }
+		</div>
 	);
+}
+
+function hasRenderableChildren( children: ReactNode ): boolean {
+	return Children.toArray( children ).some( ( child ) => child !== '' );
 }
 
 export default function InlineNotices( {
