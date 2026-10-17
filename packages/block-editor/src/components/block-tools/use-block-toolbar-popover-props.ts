@@ -11,9 +11,15 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { hasStickyOrFixedPositionValue } from '../../hooks/position';
 import { getElementBounds } from '../../utils/dom';
+import type {
+	BlockToolbarPopoverPositionProps,
+	UseBlockToolbarPopoverPropsOptions,
+} from './types';
+import type { PositionAttributes } from '../../hooks/types';
 
 const COMMON_PROPS = {
-	placement: 'top-start',
+	// Keeps the literal placement the popover expects.
+	placement: 'top-start' as const,
 };
 
 // By default the toolbar sets the `shift` prop. If the user scrolls the page
@@ -39,21 +45,21 @@ const RESTRICTED_HEIGHT_PROPS = {
 /**
  * Get the popover props for the block toolbar, determined by the space at the top of the canvas and the toolbar height.
  *
- * @param {Element} contentElement       The DOM element that represents the editor content or canvas.
- * @param {Element} selectedBlockElement The outer DOM element of the first selected block.
- * @param {Element} scrollContainer      The scrollable container for the contentElement.
- * @param {number}  toolbarHeight        The height of the toolbar in pixels.
- * @param {boolean} isSticky             Whether or not the selected block is sticky or fixed.
+ * @param contentElement       The DOM element that represents the editor content or canvas.
+ * @param selectedBlockElement The outer DOM element of the first selected block.
+ * @param scrollContainer      The scrollable container for the contentElement.
+ * @param toolbarHeight        The height of the toolbar in pixels.
+ * @param isSticky             Whether or not the selected block is sticky or fixed.
  *
- * @return {Object} The popover props used to determine the position of the toolbar.
+ * @return The popover props used to determine the position of the toolbar.
  */
 function getProps(
-	contentElement,
-	selectedBlockElement,
-	scrollContainer,
-	toolbarHeight,
-	isSticky
-) {
+	contentElement: HTMLElement | null | undefined,
+	selectedBlockElement: Element | null | undefined,
+	scrollContainer: Element | undefined,
+	toolbarHeight: number,
+	isSticky: boolean
+): BlockToolbarPopoverPositionProps {
 	if ( ! contentElement || ! selectedBlockElement ) {
 		return DEFAULT_PROPS;
 	}
@@ -94,16 +100,16 @@ function getProps(
 /**
  * Determines the desired popover positioning behavior, returning a set of appropriate props.
  *
- * @param {Object}  elements
- * @param {Element} elements.contentElement The DOM element that represents the editor content or canvas.
- * @param {string}  elements.clientId       The clientId of the first selected block.
+ * @param elements
+ * @param elements.contentElement The DOM element that represents the editor content or canvas.
+ * @param elements.clientId       The clientId of the first selected block.
  *
- * @return {Object} The popover props used to determine the position of the toolbar.
+ * @return The popover props used to determine the position of the toolbar.
  */
 export default function useBlockToolbarPopoverProps( {
 	contentElement,
 	clientId,
-} ) {
+}: UseBlockToolbarPopoverPropsOptions ) {
 	const selectedBlockElement = useBlockElement( clientId );
 	const [ toolbarHeight, setToolbarHeight ] = useState( 0 );
 	const { blockIndex, isSticky } = useSelect(
@@ -113,7 +119,9 @@ export default function useBlockToolbarPopoverProps( {
 			return {
 				blockIndex: getBlockIndex( clientId ),
 				isSticky: hasStickyOrFixedPositionValue(
-					getBlockAttributes( clientId )
+					// The function reads the position style, if any.
+					getBlockAttributes( clientId ) as
+						PositionAttributes | undefined
 				),
 			};
 		},
@@ -135,7 +143,7 @@ export default function useBlockToolbarPopoverProps( {
 		)
 	);
 
-	const popoverRef = useRefEffect( ( popoverNode ) => {
+	const popoverRef = useRefEffect( ( popoverNode: HTMLElement ) => {
 		setToolbarHeight( popoverNode.offsetHeight );
 	}, [] );
 
@@ -175,7 +183,7 @@ export default function useBlockToolbarPopoverProps( {
 		contentView?.addEventListener?.( 'resize', updateProps );
 
 		// Update the toolbar props on block resize.
-		let resizeObserver;
+		let resizeObserver: ResizeObserver | undefined;
 		const blockView = selectedBlockElement?.ownerDocument?.defaultView;
 		if ( blockView?.ResizeObserver ) {
 			resizeObserver = new blockView.ResizeObserver( updateProps );

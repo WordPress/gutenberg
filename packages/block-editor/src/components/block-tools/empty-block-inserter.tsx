@@ -1,13 +1,21 @@
+import type { ComponentProps, ComponentType, RefAttributes } from 'react';
 import clsx from 'clsx';
 import BlockPopoverCover from '../block-popover/cover';
 import useBlockToolbarPopoverProps from './use-block-toolbar-popover-props';
-import Inserter from '../inserter';
+import UntypedInserter from '../inserter';
 import useSelectedBlockToolProps from './use-selected-block-tool-props';
+import type { EmptyBlockInserterProps } from './types';
+
+// The inserter is still JavaScript, so its inferred props are all required.
+const Inserter = UntypedInserter as ComponentType<
+	Partial< ComponentProps< typeof UntypedInserter > > &
+		RefAttributes< unknown >
+>;
 
 export default function EmptyBlockInserter( {
 	clientId,
 	__unstableContentRef,
-} ) {
+}: EmptyBlockInserterProps ) {
 	const { isInsertionPointVisible, lastClientId, rootClientId } =
 		useSelectedBlockToolProps( clientId );
 

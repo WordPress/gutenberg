@@ -59,7 +59,7 @@ function ZoomOutModeInserters() {
 
 	const previousClientId = selectedBlockClientId;
 	const index = blockOrder.findIndex(
-		( clientId ) => selectedBlockClientId === clientId
+		( clientId: string ) => selectedBlockClientId === clientId
 	);
 
 	const insertionIndex = index + 1;
