@@ -53,7 +53,7 @@ describe( 'BlockEditorProvider', () => {
 		// `blockInspectorAnimation` setting is one of the block editor's
 		// default settings, so it has a value. We're testing that its
 		// value was not updated.
-		expect( settings.blockInspectorAnimation ).not.toBe(
+		expect( settings.blockInspectorAnimation ).not.toEqual(
 			blockInspectorAnimation
 		);
 	} );
