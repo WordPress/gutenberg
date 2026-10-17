@@ -57,6 +57,62 @@ function render_block_core_image( $attributes, $content, $block ) {
 		return '';
 	}
 
+	/*
+	* An image edit creates new filenames for the attachment and its sub-sizes.
+	* Existing Image blocks can still contain a URL for one of the backed-up
+	* pre-edit files. Replace that URL at render time when it can be verified
+	* against the attachment's image-edit backup metadata.
+	*/
+	if ( isset( $attributes['id'], $attributes['sizeSlug'] ) && is_string( $attributes['sizeSlug'] ) ) {
+		$attachment_id = (int) $attributes['id'];
+		$size_slug     = $attributes['sizeSlug'];
+		$saved_src     = $processor->get_attribute( 'src' );
+		$current_image = wp_get_attachment_image_src( $attachment_id, $size_slug );
+		$backup_sizes  = get_post_meta( $attachment_id, '_wp_attachment_backup_sizes', true );
+
+		if (
+		$attachment_id > 0 &&
+		'' !== $size_slug &&
+		is_string( $saved_src ) &&
+		is_array( $current_image ) &&
+		isset( $current_image[0] ) &&
+		$saved_src !== $current_image[0] &&
+		is_array( $backup_sizes )
+		) {
+			$attachment_url = wp_get_attachment_url( $attachment_id );
+
+			if ( is_string( $attachment_url ) && '' !== $attachment_url ) {
+				foreach ( $backup_sizes as $backup_key => $backup_size ) {
+					$backup_key    = (string) $backup_key;
+					$backup_prefix = $size_slug . '-';
+
+					if ( 0 !== strpos( $backup_key, $backup_prefix ) ) {
+						continue;
+					}
+
+					$backup_suffix = substr( $backup_key, strlen( $backup_prefix ) );
+
+					if ( 'orig' !== $backup_suffix && 1 !== preg_match( '/^[0-9]+$/', $backup_suffix ) ) {
+						continue;
+					}
+
+					if (
+					! is_array( $backup_size ) ||
+					empty( $backup_size['file'] )
+					) {
+						continue;
+					}
+
+					$backup_url = trailingslashit( dirname( $attachment_url ) ) . $backup_size['file'];
+
+					if ( $saved_src === $backup_url ) {
+						$processor->set_attribute( 'src', $current_image[0] );
+						break;
+					}
+				}
+			}
+		}
+	}
 	$has_id_binding = isset( $attributes['metadata']['bindings']['id'] ) && isset( $attributes['id'] );
 
 	// Ensure the `wp-image-id` classname on the image block supports block bindings.
