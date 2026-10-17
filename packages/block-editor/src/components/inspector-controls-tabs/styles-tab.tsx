@@ -12,6 +12,7 @@ import { BackgroundImagePanel } from '../../hooks/background';
 import { ColorToolsPanel } from '../global-styles/color-panel';
 import { TypographyToolsPanel } from '../global-styles/typography-panel';
 import { BackgroundToolsPanel } from '../global-styles/background-panel';
+import type { SectionStyleControlsProps, StylesTabProps } from './types';
 
 // Section blocks present a curated subset of the normal block style panels.
 // Their block-support fills are gated off by editing mode (see
@@ -25,7 +26,7 @@ export function SectionStyleControls( {
 	blockName,
 	clientId,
 	contentClientIds,
-} ) {
+}: SectionStyleControlsProps ) {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -43,7 +44,7 @@ export function SectionStyleControls( {
 		[ contentClientIds ]
 	);
 
-	const setAttributes = ( newAttributes ) => {
+	const setAttributes = ( newAttributes: Record< string, unknown > ) => {
 		updateBlockAttributes( clientId, newAttributes );
 	};
 
@@ -101,15 +102,19 @@ const StylesTab = ( {
 	hasBlockStyles,
 	isSectionBlock,
 	contentClientIds,
-} ) => {
+}: StylesTabProps ) => {
 	return (
 		<>
-			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
+			{ hasBlockStyles && (
+				// Block styles are only passed for a single block.
+				<BlockStyles clientId={ clientId as string } />
+			) }
 			{ isSectionBlock && blockName !== 'core/template-part' && (
+				// A section block is a single selection, so its props are set.
 				<SectionStyleControls
-					blockName={ blockName }
-					clientId={ clientId }
-					contentClientIds={ contentClientIds }
+					blockName={ blockName as string }
+					clientId={ clientId as string }
+					contentClientIds={ contentClientIds as string[] }
 				/>
 			) }
 			{

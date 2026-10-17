@@ -14,6 +14,7 @@ import { ListViewContentPopover } from '../inspector-controls/list-view-content-
 import InspectorControls from '../inspector-controls';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
+import type { InspectorControlsTabsProps } from './types';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -24,8 +25,8 @@ export default function InspectorControlsTabs( {
 	tabs,
 	isSectionBlock,
 	contentClientIds,
-} ) {
-	const listViewRef = useRef( null );
+}: InspectorControlsTabsProps ) {
+	const listViewRef = useRef< HTMLDivElement >( null );
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
@@ -37,7 +38,7 @@ export default function InspectorControlsTabs( {
 		).getRequestedInspectorTab(),
 	} ) );
 
-	const [ selectedTabId, setSelectedTabId ] = useState(
+	const [ selectedTabId, setSelectedTabId ] = useState< string | undefined >(
 		() => requestedTab?.tabName ?? tabs[ 0 ]?.name
 	);
 	const hasUserSelectionRef = useRef( false );
@@ -122,7 +123,7 @@ export default function InspectorControlsTabs( {
 		}
 	}, [ tabs, selectedTabId ] );
 
-	const handleTabSelect = ( tabId ) => {
+	const handleTabSelect = ( tabId: string ) => {
 		setSelectedTabId( tabId );
 		hasUserSelectionRef.current = true;
 
@@ -143,7 +144,7 @@ export default function InspectorControlsTabs( {
 		( tab ) => tab.name === TAB_LIST_VIEW.name
 	);
 
-	const switchToListView = ( targetClientId ) => {
+	const switchToListView = ( targetClientId: string ) => {
 		if ( hasListViewTab ) {
 			// Open only the target panel
 			setOpenListViewPanel( targetClientId );
