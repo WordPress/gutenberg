@@ -28,6 +28,16 @@ export type ComplementaryAreaFillProps = {
 
 export type ComplementaryAreaProps = {
 	/**
+	 * Shows a dot over the pinned toolbar toggle, flagging that the area has
+	 * something new. Pass `badgeLabel` so assistive technology is told too.
+	 */
+	badge?: boolean;
+	/**
+	 * Accessible label for the pinned toolbar toggle while a badge is shown,
+	 * replacing `title` so the badge is announced.
+	 */
+	badgeLabel?: string;
+	/**
 	 * The content to be displayed within the complementary area.
 	 */
 	children?: ReactNode;

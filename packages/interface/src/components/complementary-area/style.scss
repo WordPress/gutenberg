@@ -77,3 +77,32 @@
 .interface-complementary-area__fill {
 	height: 100%;
 }
+
+// Only rendered with a badge. Hidden on mobile like the pinned items it wraps.
+.interface-complementary-area__pinned-toggle {
+	display: none;
+	position: relative;
+
+	@include break-small() {
+		display: flex;
+	}
+}
+
+.interface-complementary-area__badge {
+	position: absolute;
+	top: 2px;
+	inset-inline-end: 2px;
+	width: $grid-unit-10;
+	height: $grid-unit-10;
+	border-radius: 50%;
+	// Separates the dot from the icon underneath.
+	box-shadow: 0 0 0 2px $white;
+	background: var(--wp-admin-theme-color, #3858e9);
+	pointer-events: none;
+
+	@media (forced-colors: active) {
+		forced-color-adjust: none;
+		background: Highlight;
+		box-shadow: 0 0 0 2px Canvas;
+	}
+}

@@ -18,7 +18,15 @@ import {
 } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 import { store as editorStore } from '../../store';
+import {
+	ALL_NOTES_SIDEBAR,
+	NOTES_LAST_SEEN_LIMIT,
+	NOTES_LAST_SEEN_PREFERENCE,
+	NOTES_LAST_SEEN_SCOPE,
+} from './constants';
 import { unlock } from '../../lock-unlock';
 import { createBoardStore } from './board-store';
 import {
@@ -28,11 +36,14 @@ import {
 	getInlineMarkerStart,
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
+	getLatestNoteActivity,
+	hasUnseenNoteActivity,
 	getNoteAtCaret,
 	pickNoteForCaret,
 	readInlineSelection,
 	removeInlineNote,
 	removeNoteIdFromMetadata,
+	setNotesLastSeen,
 	wrapInlineNote,
 } from './utils';
 
@@ -175,6 +186,91 @@ export function useNoteThreads( postId ) {
 		notes,
 		unresolvedNotes,
 	};
+}
+
+/**
+ * Whether the post has note activity from others the current user has not
+ * seen, which the "All notes" toggle flags with a dot.
+ *
+ * Opening "All notes" or selecting a thread marks the notes as seen, by
+ * storing the newest `date_gmt` shown rather than the current time, which
+ * keeps the comparison immune to clock skew.
+ *
+ * @param {Object}  options        Options.
+ * @param {?number} options.postId Post the notes belong to.
+ * @param {Array}   options.notes  Every note thread loaded for the post.
+ * @return {boolean} Whether there is unseen activity.
+ */
+export function useUnseenNotes( { postId, notes } ) {
+	const { set: setPreference } = useDispatch( preferencesStore );
+
+	const { lastSeenByPost, currentUserId, hasLooked } = useSelect(
+		( select ) => ( {
+			lastSeenByPost: select( preferencesStore ).get(
+				NOTES_LAST_SEEN_SCOPE,
+				NOTES_LAST_SEEN_PREFERENCE
+			),
+			currentUserId: select( coreStore ).getCurrentUser()?.id,
+			// A selected note is a number; 'new' is the add-note form, which
+			// is not reading anyone else's note.
+			hasLooked:
+				select( interfaceStore ).getActiveComplementaryArea(
+					'core'
+				) === ALL_NOTES_SIDEBAR ||
+				typeof unlock( select( editorStore ) ).getSelectedNote() ===
+					'number',
+		} ),
+		[]
+	);
+
+	const lastSeen = postId ? lastSeenByPost?.[ postId ] : undefined;
+	const latestActivity = useMemo(
+		() => getLatestNoteActivity( notes ),
+		[ notes ]
+	);
+	// Only open threads count. This reads the full list rather than
+	// `unresolvedNotes`, which drops threads whose block was deleted.
+	const hasUnseenNotes = useMemo(
+		() =>
+			hasUnseenNoteActivity(
+				( notes ?? [] ).filter(
+					( thread ) => thread.status === 'hold'
+				),
+				lastSeen,
+				currentUserId
+			),
+		[ notes, lastSeen, currentUserId ]
+	);
+
+	useEffect( () => {
+		if (
+			! hasLooked ||
+			! postId ||
+			! latestActivity ||
+			( lastSeen && lastSeen >= latestActivity )
+		) {
+			return;
+		}
+		setPreference(
+			NOTES_LAST_SEEN_SCOPE,
+			NOTES_LAST_SEEN_PREFERENCE,
+			setNotesLastSeen(
+				lastSeenByPost,
+				postId,
+				latestActivity,
+				NOTES_LAST_SEEN_LIMIT
+			)
+		);
+	}, [
+		hasLooked,
+		postId,
+		latestActivity,
+		lastSeen,
+		lastSeenByPost,
+		setPreference,
+	] );
+
+	return hasUnseenNotes;
 }
 
 export function useNoteActions() {
