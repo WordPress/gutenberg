@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { __experimentalGetElementClassName } from '@wordpress/block-editor';
 
 describe( 'element class names', () => {
