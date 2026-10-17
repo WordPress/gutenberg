@@ -1,3 +1,10 @@
+import type {
+	ComponentProps,
+	ComponentType,
+	FocusEvent,
+	MouseEvent,
+	RefAttributes,
+} from 'react';
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -8,13 +15,26 @@ import {
 } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
-import Inserter from '../inserter';
+import UntypedInserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverInbetween from '../block-popover/inbetween';
 import BlockDropZonePopover from '../block-popover/drop-zone';
 import { unlock } from '../../lock-unlock';
+import type {
+	InbetweenInsertionPointPopoverProps,
+	InsertionPointOpenRefValue,
+	InsertionPointProps,
+} from './types';
 
-export const InsertionPointOpenRef = createContext();
+// The inserter is still JavaScript, so its inferred props are all required.
+const Inserter = UntypedInserter as ComponentType<
+	Partial< ComponentProps< typeof UntypedInserter > > &
+		RefAttributes< unknown >
+>;
+
+export const InsertionPointOpenRef = createContext<
+	InsertionPointOpenRefValue | undefined
+>( undefined );
 InsertionPointOpenRef.displayName = 'InsertionPointOpenRefContext';
 
 function InbetweenInsertionPointPopover( {
@@ -22,10 +42,11 @@ function InbetweenInsertionPointPopover( {
 	__unstableContentRef,
 	operation = 'insert',
 	nearestSide = 'right',
-} ) {
+}: InbetweenInsertionPointPopoverProps ) {
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
-	const openRef = useContext( InsertionPointOpenRef );
-	const ref = useRef();
+	// Block tools provide the ref.
+	const openRef = useContext( InsertionPointOpenRef )!;
+	const ref = useRef< HTMLDivElement >( null );
 	const {
 		orientation,
 		previousClientId,
@@ -81,7 +102,7 @@ function InbetweenInsertionPointPopover( {
 
 	const disableMotion = useReducedMotion();
 
-	function onClick( event ) {
+	function onClick( event: MouseEvent ) {
 		if (
 			event.target === ref.current &&
 			nextClientId &&
@@ -91,7 +112,7 @@ function InbetweenInsertionPointPopover( {
 		}
 	}
 
-	function maybeHideInserterPoint( event ) {
+	function maybeHideInserterPoint( event: globalThis.MouseEvent ) {
 		// Only hide the inserter if it's triggered on the wrapper,
 		// and the inserter is not open.
 		if ( event.target === ref.current && ! openRef.current ) {
@@ -99,7 +120,7 @@ function InbetweenInsertionPointPopover( {
 		}
 	}
 
-	function onFocus( event ) {
+	function onFocus( event: FocusEvent ) {
 		// Only handle click on the wrapper specifically, and not an event
 		// bubbled from the inserter itself.
 		if ( event.target !== ref.current ) {
@@ -111,7 +132,7 @@ function InbetweenInsertionPointPopover( {
 	// avoids stale references when `onSelectOrClose` is not called.
 	// See: https://github.com/WordPress/gutenberg/issues/65598#issuecomment-3249229264.
 	const maybeResetOpenRef = useCallback(
-		( node ) => {
+		( node: unknown ) => {
 			if ( ! node && openRef.current ) {
 				openRef.current = false;
 			}
@@ -214,7 +235,7 @@ function InbetweenInsertionPointPopover( {
 							clientId={ nextClientId }
 							rootClientId={ rootClientId }
 							__experimentalIsQuick
-							onToggle={ ( isOpen ) => {
+							onToggle={ ( isOpen: boolean ) => {
 								openRef.current = isOpen;
 							} }
 							onSelectOrClose={ () => {
@@ -228,7 +249,7 @@ function InbetweenInsertionPointPopover( {
 	);
 }
 
-export default function InsertionPoint( props ) {
+export default function InsertionPoint( props: InsertionPointProps ) {
 	const { insertionPoint, isVisible, isBlockListEmpty } = useSelect(
 		( select ) => {
 			const {
