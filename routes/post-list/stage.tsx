@@ -22,8 +22,8 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { useMemo, useCallback } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback, useEffect, useMemo } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
@@ -35,6 +35,7 @@ import {
 	type ViewListEntry,
 	type ViewOverrides,
 } from './view-utils';
+import { ViewTabCount } from './view-tab-count';
 import { QuickEditModal } from './quick-edit-modal';
 // Unlock WordPress private APIs
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
@@ -46,6 +47,15 @@ const { Tabs } = unlock( componentsPrivateApis );
 import './style.scss';
 
 const LAYOUT_LIST = 'list';
+
+// Actions that add posts or move them between statuses, so change the totals
+// the status tabs show.
+const COUNT_CHANGING_ACTIONS = new Set( [
+	'move-to-trash',
+	'permanently-delete',
+	'restore',
+	'duplicate-post',
+] );
 
 function getItemId( item: Post ) {
 	return item.id.toString();
@@ -111,6 +121,7 @@ function PostListView( {
 } ) {
 	const invalidate = useInvalidate();
 	const navigate = useNavigate();
+	const { invalidateResolution } = unlock( useDispatch( coreStore ) );
 	const searchParams = useSearch( { from: '/types/$type/list/$slug' } );
 	const postTypeObject = useSelect(
 		( select ) => select( coreStore ).getPostType( postType ),
@@ -230,10 +241,25 @@ function PostListView( {
 		[ invalidate, searchParams, navigate ]
 	);
 
+	// The tab counts come with the view config, which is cached per post type.
+	// Fetching it again after a change updates the counts only: the user's
+	// view lives in preferences, which this does not touch.
+	const refreshViewCounts = useCallback( () => {
+		invalidateResolution( 'getViewConfig', [ 'postType', postType ] );
+	}, [ invalidateResolution, postType ] );
+
+	// Leaving the list, such as to publish a draft in the editor, can change
+	// the totals without any action here to report it. Marking the counts stale
+	// on the way out makes the route loader fetch them again on the way back.
+	useEffect( () => refreshViewCounts, [ refreshViewCounts ] );
+
 	const postTypeActions: Action< Post >[] = usePostActions( {
 		postType,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: Post[] ) => {
+			if ( COUNT_CHANGING_ACTIONS.has( actionId ) ) {
+				refreshViewCounts();
+			}
 			// Clean up URL when delete actions are performed
 			if (
 				actionId === 'move-to-trash' ||
@@ -359,6 +385,7 @@ function PostListView( {
 									key={ entry.slug }
 								>
 									{ entry.title }
+									<ViewTabCount count={ entry.count } />
 								</Tabs.Tab>
 							) ) }
 						</Tabs.TabList>
@@ -421,6 +448,7 @@ function PostListView( {
 						postType={ postType }
 						postId={ selection }
 						closeModal={ closeQuickEditModal }
+						onSave={ refreshViewCounts }
 						quickEditForm={ quickEditForm }
 					/>
 				) }

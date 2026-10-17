@@ -62,10 +62,11 @@ test.describe( 'Pages View Persistence', () => {
 		);
 		await expect( modifiedIndicator ).toBeVisible();
 
-		// Navigate to Drafts view
+		// Navigate to Drafts view. The v2 tab trails its label with the item
+		// count, as in "Drafts 1".
 		await (
 			isSiteEditorV2
-				? page.getByRole( 'tab', { name: 'Drafts', exact: true } )
+				? page.getByRole( 'tab', { name: /^Drafts(?: [\d,]+)?$/ } )
 				: page.getByRole( 'button', { name: 'Drafts', exact: true } )
 		).click();
 
