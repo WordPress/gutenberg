@@ -3,6 +3,7 @@ import {
 	getListViewDropTarget,
 	NESTING_LEVEL_INDENTATION,
 } from '../use-list-view-drop-zone';
+import type { ListViewDropZoneBlock } from '../types';
 
 describe( 'getListViewDropTarget', () => {
 	const blocksData = [
@@ -98,7 +99,8 @@ describe( 'getListViewDropTarget', () => {
 			rootClientId: '',
 			nestingLevel: 1,
 		},
-	];
+		// The stub elements only provide the rect that the drop target reads.
+	] as unknown as ListViewDropZoneBlock[];
 
 	it( 'should return the correct target when dragging a block over the top half of the first block', () => {
 		[
@@ -327,7 +329,7 @@ describe( 'getListViewDropTarget', () => {
 		// block keeps its row, the rows between it and the target shift up to
 		// fill its slot, and the drop indicator occupies the vacated slot, so a
 		// gap opens between the target block and the block after it.
-		const rect = ( top, bottom ) => ( {
+		const rect = ( top: number, bottom: number ) => ( {
 			top,
 			bottom,
 			left: 10,
@@ -376,7 +378,8 @@ describe( 'getListViewDropTarget', () => {
 				rootClientId: '',
 				nestingLevel: 1,
 			},
-		];
+			// The stub elements only provide the rect that the drop target reads.
+		] as unknown as ListViewDropZoneBlock[];
 
 		it( 'should keep nesting when the cursor is in the gap below the target and over the nesting indentation', () => {
 			[
@@ -427,7 +430,10 @@ describe( 'getListViewDropTarget', () => {
 				{
 					...displacedBlocksData[ 0 ],
 					blockIndex: 1,
-					element: { getBoundingClientRect: () => rect( 100, 150 ) },
+					// The stub element only provides the rect that the drop target reads.
+					element: {
+						getBoundingClientRect: () => rect( 100, 150 ),
+					} as unknown as Element,
 				},
 			];
 

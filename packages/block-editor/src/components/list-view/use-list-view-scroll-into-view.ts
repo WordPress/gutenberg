@@ -1,10 +1,15 @@
 import { getScrollContainer } from '@wordpress/dom';
 import { useLayoutEffect } from '@wordpress/element';
+import type { RefObject } from 'react';
 
 export default function useListViewScrollIntoView( {
 	isSelected,
 	selectedClientIds,
 	rowItemRef,
+}: {
+	isSelected: boolean;
+	selectedClientIds: string[];
+	rowItemRef: RefObject< HTMLElement | null >;
 } ) {
 	const isSingleSelection = selectedClientIds.length === 1;
 

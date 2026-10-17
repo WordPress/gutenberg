@@ -1,8 +1,10 @@
+import type { DragEvent, ForwardedRef, KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import type { BlockTypeIcon } from '@wordpress/blocks';
 import {
 	Icon,
 	lockSmall as lock,
@@ -18,6 +20,7 @@ import ListViewExpander from './expander';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { ListViewBlockSelectButtonProps } from './types';
 
 function ListViewBlockSelectButton(
 	{
@@ -37,8 +40,8 @@ function ListViewBlockSelectButton(
 		ariaDescribedBy,
 		visibilityLabel,
 		isDisabled = false,
-	},
-	ref
+	}: ListViewBlockSelectButtonProps,
+	ref: ForwardedRef< HTMLAnchorElement >
 ) {
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
@@ -61,7 +64,7 @@ function ListViewBlockSelectButton(
 
 			// Pattern-sourced section blocks show the pattern icon.
 			// Everything else resolves its variation or block type icon.
-			let blockIcon = symbol;
+			let blockIcon: BlockTypeIcon | undefined = symbol;
 			if (
 				! attributes?.metadata?.patternName ||
 				! isSectionBlock( clientId )
@@ -92,15 +95,12 @@ function ListViewBlockSelectButton(
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
 	// We need to clear any HTML drag data to prevent `pasteHandler` from firing
 	// inside the `useOnBlockDrop` hook.
-	const onDragStartHandler = ( event ) => {
+	const onDragStartHandler = ( event: DragEvent ) => {
 		event.dataTransfer.clearData();
 		onDragStart?.( event );
 	};
 
-	/**
-	 * @param {KeyboardEvent} event
-	 */
-	function onKeyDown( event ) {
+	function onKeyDown( event: KeyboardEvent ) {
 		if ( event.keyCode === ENTER || event.keyCode === SPACE ) {
 			onClick( event );
 		}

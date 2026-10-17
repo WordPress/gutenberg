@@ -1,12 +1,18 @@
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import type { UpdateListViewExpansion } from './types';
 
 export default function useListViewExpandSelectedItem( {
 	firstSelectedBlockClientId,
 	updateExpansion,
+}: {
+	firstSelectedBlockClientId: string;
+	updateExpansion: UpdateListViewExpansion;
 } ) {
-	const [ selectedTreeId, setSelectedTreeId ] = useState( null );
+	const [ selectedTreeId, setSelectedTreeId ] = useState<
+		string | undefined | null
+	>( null );
 	const { selectedBlockParentClientIds } = useSelect(
 		( select ) => {
 			const { getBlockParents } = select( blockEditorStore );

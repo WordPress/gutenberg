@@ -1,8 +1,19 @@
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { ClientIdsTreeNode } from '../../store/types';
 
-export default function useListViewClientIds( { blocks, rootClientId } ) {
+export default function useListViewClientIds( {
+	blocks,
+	rootClientId,
+}: {
+	blocks?: ClientIdsTreeNode[];
+	rootClientId?: string | null;
+} ): {
+	selectedClientIds: string[];
+	draggedClientIds: string[];
+	clientIdsTree: ClientIdsTreeNode[];
+} {
 	return useSelect(
 		( select ) => {
 			const {
