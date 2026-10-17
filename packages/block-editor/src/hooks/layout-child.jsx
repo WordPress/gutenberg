@@ -369,6 +369,9 @@ function useBlockPropsChildLayoutStyles( { style } ) {
 		window.__experimentalEnableGridInteractivity
 	) {
 		css += `${ selector } img { -webkit-user-drag: none; }`;
+		// A block inserted into cells of a fixed size gets enough of them for
+		// its placeholder, which then fills them rather than leaving a gap.
+		css += `@container style(--wp--style--grid-cells: fixed) { ${ selector } > .components-placeholder { min-height: 100%; } }`;
 	}
 
 	useStyleOverride( { css } );
