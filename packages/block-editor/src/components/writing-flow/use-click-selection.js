@@ -21,6 +21,8 @@ export default function useClickSelection() {
 		isBlockMultiSelected,
 		isAncestorMultiSelected,
 		__unstableIsFullySelected,
+		canMoveBlocks,
+		getSelectedBlockClientIds,
 	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
@@ -125,6 +127,7 @@ export default function useClickSelection() {
 					if (
 						clickedClientId &&
 						__unstableIsFullySelected() &&
+						canMoveBlocks( getSelectedBlockClientIds() ) &&
 						( isBlockMultiSelected( clickedClientId ) ||
 							isAncestorMultiSelected( clickedClientId ) )
 					) {
@@ -192,6 +195,8 @@ export default function useClickSelection() {
 			isBlockMultiSelected,
 			isAncestorMultiSelected,
 			__unstableIsFullySelected,
+			canMoveBlocks,
+			getSelectedBlockClientIds,
 		]
 	);
 }
