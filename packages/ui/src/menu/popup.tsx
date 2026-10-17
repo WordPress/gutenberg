@@ -1,4 +1,5 @@
 import { Menu as _Menu } from '@base-ui/react/menu';
+import { mergeProps } from '@base-ui/react/merge-props';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { renderSlotWithChildren } from '../utils/render-slot-with-children';
@@ -7,6 +8,7 @@ import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { useMenuContext } from './context';
 import type { PopupProps } from './types';
+import { usePopupPointerHighlight } from '../utils/use-popup-pointer-highlight';
 
 /**
  * Renders the floating menu popup.
@@ -16,6 +18,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 	ref
 ) {
 	const { isSubmenu } = useMenuContext();
+	const pointerHighlightProps = usePopupPointerHighlight();
 
 	const popupContent = (
 		<_Menu.Popup
@@ -25,7 +28,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function MenuPopup(
 				isSubmenu ? styles[ 'is-submenu' ] : styles[ 'is-root' ],
 				className
 			) }
-			{ ...props }
+			{ ...mergeProps( pointerHighlightProps, props ) }
 		>
 			<div
 				/*

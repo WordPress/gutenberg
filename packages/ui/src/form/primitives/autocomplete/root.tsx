@@ -2,6 +2,10 @@ import { Autocomplete as _Autocomplete } from '@base-ui/react/autocomplete';
 import type { AutocompleteRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import { AutocompleteGridContext } from './context';
+import {
+	KeyboardHighlightContext,
+	useKeyboardHighlightState,
+} from '../../../utils/item-popup/keyboard-highlight-context';
 
 /**
  * Low-level primitive for an autocomplete input that suggests options as
@@ -15,10 +19,28 @@ import { AutocompleteGridContext } from './context';
 export const Root: typeof _Autocomplete.Root = function Root(
 	props: AutocompleteRootProps
 ) {
+	const {
+		contextValue,
+		onOpenChange,
+		onInputValueChange,
+		onItemHighlighted,
+	} = useKeyboardHighlightState( {
+		onOpenChange: props.onOpenChange,
+		onInputValueChange: props.onValueChange,
+		onItemHighlighted: props.onItemHighlighted,
+	} );
+
 	return (
 		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>
 			<DirectionProvider>
-				<_Autocomplete.Root { ...props } />
+				<KeyboardHighlightContext.Provider value={ contextValue }>
+					<_Autocomplete.Root
+						{ ...props }
+						onOpenChange={ onOpenChange }
+						onValueChange={ onInputValueChange }
+						onItemHighlighted={ onItemHighlighted }
+					/>
+				</KeyboardHighlightContext.Provider>
 			</DirectionProvider>
 		</AutocompleteGridContext.Provider>
 	);
