@@ -195,7 +195,6 @@
 				justify-content: center;
 			}
 		}
-
 		.components-v-stack > .dataviews-view-table__cell-content-wrapper:not(:first-child) {
 			min-height: 0;
 		}
@@ -228,9 +227,30 @@
 		white-space: nowrap;
 	}
 
+	.dataviews-view-table__hierarchy-cell {
+		display: flex;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-md);
+
+		> :last-child {
+			min-width: 0;
+		}
+	}
+
+	.dataviews-view-table__hierarchy-toggle-slot {
+		width: var(--wpds-dimension-size-md);
+		flex-shrink: 0;
+	}
+
+	.dataviews-view-table__hierarchy-toggle.components-button.has-icon {
+		min-width: var(--wpds-dimension-size-md);
+	}
+
 
 	// Density style overrides.
 	&.has-compact-density {
+		--wp-dataviews-table-cell-padding-inline: var(--wpds-dimension-padding-sm);
+
 		thead {
 			th {
 				&:has(.dataviews-view-table-header-button):not(:first-child) {
@@ -263,6 +283,17 @@
 				padding-right: 0;
 			}
 		}
+	}
+
+	thead th:has(> .dataviews-view-table__hierarchy-cell):first-child {
+		padding-inline-start: var(--wpds-dimension-padding-2xl);
+	}
+
+	tbody tr td.dataviews-view-table__hierarchy-content-column {
+		padding-inline-start:
+			calc(var(--wpds-dimension-padding-2xl) +
+			var(--wp-dataviews-table-hierarchy-level, 0) *
+			var(--wpds-dimension-size-md));
 	}
 }
 
