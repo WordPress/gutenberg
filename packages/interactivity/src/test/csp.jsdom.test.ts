@@ -1,8 +1,17 @@
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	vi,
+} from 'vitest';
+
 /**
  * Unit tests for CSP nonce support (csp.ts).
  *
  * csp.ts evaluates `data-nonce` at import time, so each scenario uses
- * `jest.resetModules()` + dynamic `import('../csp')` after setting the
+ * `vi.resetModules()` + dynamic `import('../csp')` after setting the
  * attribute. jsdom does not enforce CSP — we verify the nonce attribute,
  * script injection, caching, and Trusted Types delegation.
  */
@@ -10,17 +19,21 @@
 describe( 'Interactivity API CSP', () => {
 	const originalTrustedTypes = ( window as any ).trustedTypes;
 
+	beforeEach( () => {
+		vi.resetModules();
+	} );
+
 	afterEach( () => {
 		document.documentElement.removeAttribute( 'data-nonce' );
 		( window as any ).trustedTypes = originalTrustedTypes;
-		jest.resetModules();
-		jest.restoreAllMocks();
+		vi.unstubAllGlobals();
+		vi.restoreAllMocks();
 	} );
 
 	describe( 'fallback (no data-nonce)', () => {
 		it( 'isCSPEnabled() is false and getPageNonce() is null', async () => {
 			document.documentElement.removeAttribute( 'data-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const csp = await import( '../csp' );
 			expect( csp.isCSPEnabled() ).toBe( false );
 			expect( csp.getPageNonce() ).toBeNull();
@@ -28,7 +41,7 @@ describe( 'Interactivity API CSP', () => {
 
 		it( 'compileExpression falls back to Function() and is callable', async () => {
 			document.documentElement.removeAttribute( 'data-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const { compileExpression } = await import( '../csp' );
 			const fn = compileExpression(
 				[ 'state', 'context' ],
@@ -40,7 +53,7 @@ describe( 'Interactivity API CSP', () => {
 
 		it( 'prepareScript does not set nonce and sets text directly', async () => {
 			document.documentElement.removeAttribute( 'data-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const { prepareScript } = await import( '../csp' );
 			const script = document.createElement( 'script' );
 			prepareScript( script, 'console.log(1)' );
@@ -50,7 +63,7 @@ describe( 'Interactivity API CSP', () => {
 
 		it( 'createHTML returns raw html when no policy', async () => {
 			document.documentElement.removeAttribute( 'data-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const { createHTML } = await import( '../csp' );
 			expect( createHTML( '<div>hi</div>' ) ).toBe( '<div>hi</div>' );
 		} );
@@ -59,7 +72,7 @@ describe( 'Interactivity API CSP', () => {
 	describe( 'CSP enabled (data-nonce present)', () => {
 		it( 'isCSPEnabled() is true, getPageNonce() returns value, and attribute is removed', async () => {
 			document.documentElement.setAttribute( 'data-nonce', 'abc123' );
-			jest.resetModules();
+			vi.resetModules();
 			const csp = await import( '../csp' );
 			expect( csp.isCSPEnabled() ).toBe( true );
 			expect( csp.getPageNonce() ).toBe( 'abc123' );
@@ -70,7 +83,7 @@ describe( 'Interactivity API CSP', () => {
 
 		it( 'throws on empty data-nonce', async () => {
 			document.documentElement.setAttribute( 'data-nonce', '' );
-			jest.resetModules();
+			vi.resetModules();
 			await expect( import( '../csp' ) ).rejects.toThrow(
 				'nonempty html data-nonce'
 			);
@@ -78,7 +91,7 @@ describe( 'Interactivity API CSP', () => {
 
 		it( 'compileExpression injects nonced script and returns callable', async () => {
 			document.documentElement.setAttribute( 'data-nonce', 'test-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const { compileExpression } = await import( '../csp' );
 			const fn = compileExpression(
 				[ 'state', 'context' ],
@@ -95,7 +108,7 @@ describe( 'Interactivity API CSP', () => {
 
 		it( 'compileExpression caches by source', async () => {
 			document.documentElement.setAttribute( 'data-nonce', 'cache-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const { compileExpression } = await import( '../csp' );
 			const fn1 = compileExpression( [ 'x' ], 'return x+1;' );
 			const fn2 = compileExpression( [ 'x' ], 'return x+1;' );
@@ -106,7 +119,7 @@ describe( 'Interactivity API CSP', () => {
 
 		it( 'prepareScript sets nonce and text', async () => {
 			document.documentElement.setAttribute( 'data-nonce', 'prep-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const { prepareScript } = await import( '../csp' );
 			const script = document.createElement( 'script' );
 			prepareScript( script, 'alert(1)' );
@@ -115,13 +128,13 @@ describe( 'Interactivity API CSP', () => {
 		} );
 
 		it( 'uses Trusted Types policy when available', async () => {
-			const createScript = jest.fn( ( s: string ) => `policy:${ s }` );
-			const createHTML = jest.fn( ( h: string ) => `html:${ h }` );
+			const createScript = vi.fn( ( s: string ) => `policy:${ s }` );
+			const createHTML = vi.fn( ( h: string ) => `html:${ h }` );
 			( window as any ).trustedTypes = {
-				createPolicy: jest.fn( () => ( { createScript, createHTML } ) ),
+				createPolicy: vi.fn( () => ( { createScript, createHTML } ) ),
 			};
 			document.documentElement.setAttribute( 'data-nonce', 'tt-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const { prepareScript, createHTML: cHTML } = await import(
 				'../csp'
 			);
@@ -138,12 +151,12 @@ describe( 'Interactivity API CSP', () => {
 
 		it( 'compileExpression throws when CSP blocks (no x on script)', async () => {
 			document.documentElement.setAttribute( 'data-nonce', 'block-nonce' );
-			jest.resetModules();
+			vi.resetModules();
 			const { compileExpression } = await import( '../csp' );
 			// Simulate CSP blocking: jsdom executes inline scripts on
 			// appendChild, so we mock appendChild to *not* execute — the
 			// script never gets `x` set and compileExpression must throw.
-			jest.spyOn( document.head, 'appendChild' ).mockImplementation(
+			vi.spyOn( document.head, 'appendChild' ).mockImplementation(
 				( node: Node ) => node
 			);
 			expect( () => compileExpression( [ 'x' ], 'return x;' ) ).toThrow(
