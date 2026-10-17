@@ -1,3 +1,5 @@
+import type { Meta } from '@storybook/react-vite';
+// @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.
 import { registerCoreBlocks } from '@wordpress/block-library';
 import BlockLibrary from '../library';
 import { ExperimentalBlockEditorProvider } from '../../provider';
@@ -7,7 +9,7 @@ import Inserter from '../';
 export default {
 	id: 'blockeditor-inserter',
 	title: 'Editor/Block Editor/Inserter',
-};
+} satisfies Meta;
 
 // For the purpose of this story, we need to register the core blocks samples.
 registerCoreBlocks();

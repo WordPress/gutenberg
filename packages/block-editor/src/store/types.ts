@@ -7,7 +7,10 @@ import type {
 } from '@wordpress/blocks';
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { BlockEditingMode } from '../components/block-editing-mode';
-import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
+import type {
+	BlockVisibility,
+	ViewportBreakpoints,
+} from '../components/block-visibility/use-block-visibility';
 import type {
 	FetchLinkSuggestions,
 	FetchRichUrlData,
@@ -18,6 +21,7 @@ import type { store } from '.';
 import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
 import type {
+	deviceTypeKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
@@ -358,6 +362,7 @@ export type BlockTemplate = NonNullable<
 export type FeatureSettings = Record< string, unknown > & {
 	blocks?: Record< string, Record< string, unknown > >;
 	blockVisibility?: { allowEditing?: boolean };
+	viewport?: ViewportBreakpoints;
 };
 
 /**
@@ -405,6 +410,8 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
 	__unstableIsBlockBasedTheme?: boolean;
+	/** The device the editor previews, such as `Desktop`. */
+	[ deviceTypeKey ]?: string;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect

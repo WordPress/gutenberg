@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { renderHook } from '@testing-library/react';
+// @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { dispatch, select } from '@wordpress/data';
 import {
@@ -7,6 +8,7 @@ import {
 	getBlockTypes,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useBlockBindingsUtils } from '../';
 
@@ -16,7 +18,7 @@ describe( 'useBlockBindingsUtils', () => {
 		registerCoreBlocks();
 	} );
 
-	let clientId;
+	let clientId: string;
 	beforeEach( async () => {
 		const block = createBlock( 'core/paragraph', {
 			metadata: {
