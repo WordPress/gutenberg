@@ -279,11 +279,11 @@ export default function RevisionsCanvas() {
 	}, [] );
 
 	const { revision, showDiff } = useSelect( ( select ) => {
-		const { getCurrentRevision, isShowingRevisionDiff } = unlock(
+		const { getShownVersion, isShowingRevisionDiff } = unlock(
 			select( editorStore )
 		);
 		return {
-			revision: getCurrentRevision(),
+			revision: getShownVersion(),
 			showDiff: isShowingRevisionDiff(),
 		};
 	}, [] );

@@ -1,7 +1,16 @@
 import type { Avatar as _Avatar } from '@base-ui/react/avatar';
 import type { ComponentProps } from '../utils/types';
 
-export type RootProps = ComponentProps< typeof _Avatar.Root > & {
+export type RootProps = Omit<
+	ComponentProps< typeof _Avatar.Root >,
+	'color'
+> & {
+	/**
+	 * The color of an optional ring around the avatar. Accepts any CSS color,
+	 * including CSS variables. The image and fallback keep their own colors.
+	 * The ring paints over the avatar's inner edge without changing its layout size.
+	 */
+	color?: React.CSSProperties[ 'color' ];
 	/**
 	 * The size of the avatar: `xs` (16px), `sm` (24px), `md` (32px),
 	 * `lg` (40px), or `xl` (64px) with the default design tokens.

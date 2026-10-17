@@ -1,5 +1,7 @@
+import clsx from 'clsx';
 import { useDrag } from '@use-gesture/react';
 import type {
+	CSSProperties,
 	SyntheticEvent,
 	ChangeEvent,
 	KeyboardEvent,
@@ -11,7 +13,8 @@ import { forwardRef, useRef } from '@wordpress/element';
 import { withIgnoreIMEEvents } from '@wordpress/keycodes';
 import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
-import { Input } from './styles/input-control-styles';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
 
@@ -36,6 +39,9 @@ function InputField(
 		stateReducer = ( state: any ) => state,
 		value: valueProp,
 		type,
+		paddingInlineStart,
+		paddingInlineEnd,
+		style,
 		...props
 	}: WordPressComponentProps< InputFieldProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
@@ -188,20 +194,39 @@ function InputField(
 	const dragProps = isDragEnabled ? dragGestureProps() : {};
 
 	return (
-		<Input
+		<PolymorphicElement
+			as="input"
 			{ ...props }
 			{ ...dragProps }
-			className="components-input-control__input"
+			className={ clsx( 'components-input-control__input', styles.input, {
+				[ styles[ 'is-small' ] ]: size === 'small',
+				[ styles[ 'is-compact' ] ]: size === 'compact',
+				[ styles[ 'is-dragging' ] ]: isDragging,
+				[ styles[ 'has-drag-cursor' ] ]: isDragging && !! dragCursor,
+			} ) }
+			style={
+				{
+					'--_wp-components-input-control-padding-start':
+						typeof paddingInlineStart === 'number'
+							? `${ paddingInlineStart }px`
+							: paddingInlineStart,
+					'--_wp-components-input-control-padding-end':
+						typeof paddingInlineEnd === 'number'
+							? `${ paddingInlineEnd }px`
+							: paddingInlineEnd,
+					'--_wp-components-input-control-drag-cursor': isDragging
+						? dragCursor
+						: undefined,
+					...style,
+				} as CSSProperties
+			}
 			data-empty-value={ value ? undefined : '' }
 			disabled={ disabled }
-			dragCursor={ dragCursor }
-			isDragging={ isDragging }
 			id={ id }
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
 			ref={ ref }
-			inputSize={ size }
 			// Fallback to `''` to avoid "uncontrolled to controlled" warning.
 			// See https://github.com/WordPress/gutenberg/pull/47250 for details.
 			value={ value ?? '' }
