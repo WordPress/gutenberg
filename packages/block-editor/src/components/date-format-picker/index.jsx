@@ -2,13 +2,13 @@ import { _x, __ } from '@wordpress/i18n';
 import { dateI18n, humanTimeDiff } from '@wordpress/date';
 import { useState, createInterpolateElement } from '@wordpress/element';
 import {
-	TextControl,
-	ExternalLink,
-	ToggleControl,
-	__experimentalVStack as VStack,
-	CustomSelectControl,
-} from '@wordpress/components';
-import { VisuallyHidden } from '@wordpress/ui';
+	Fieldset,
+	InputControl,
+	Link,
+	SelectControl,
+	Stack,
+	SwitchControl,
+} from '@wordpress/ui';
 
 // So that we illustrate the different formats in the dropdown properly, show a date that is
 // somewhat recent, has a day greater than 12, and a month with more than three letters.
@@ -26,10 +26,10 @@ if ( exampleDate.getMonth() === 4 ) {
  *
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/date-format-picker/README.md
  *
- * @param {Object}      props
- * @param {string|null} props.format        The selected date format. If `null`, _Default_ is selected.
- * @param {string}      props.defaultFormat The date format that will be used if the user selects 'Default'.
- * @param {Function}    props.onChange      Called when a selection is made. If `null`, _Default_ is selected.
+ * @param {Object}                        props
+ * @param {string|null}                   props.format        The selected date format. If `null`, _Default_ is selected.
+ * @param {string}                        props.defaultFormat The date format that will be used if the user selects 'Default'.
+ * @param {(format: string|null) => void} props.onChange      Called when a selection is made. If `null`, _Default_ is selected.
  */
 export default function DateFormatPicker( {
 	format,
@@ -37,29 +37,30 @@ export default function DateFormatPicker( {
 	onChange,
 } ) {
 	return (
-		<VStack
-			as="fieldset"
-			spacing={ 4 }
+		<Stack
+			render={ <Fieldset.Root /> }
+			direction="column"
+			gap="lg"
 			className="block-editor-date-format-picker"
 		>
-			<VisuallyHidden render={ <legend /> }>
+			<Fieldset.Legend hideFromVision>
 				{ __( 'Date format' ) }
-			</VisuallyHidden>
-			<ToggleControl
+			</Fieldset.Legend>
+			<SwitchControl
 				label={ __( 'Default format' ) }
-				help={ `${ __( 'Example:' ) }  ${ dateI18n(
+				description={ `${ __( 'Example:' ) }  ${ dateI18n(
 					defaultFormat,
 					exampleDate
 				) }` }
 				checked={ ! format }
-				onChange={ ( checked ) =>
+				onCheckedChange={ ( checked ) =>
 					onChange( checked ? null : defaultFormat )
 				}
 			/>
 			{ format && (
 				<NonDefaultControls format={ format } onChange={ onChange } />
 			) }
-		</VStack>
+		</Stack>
 	);
 }
 
@@ -91,64 +92,81 @@ function NonDefaultControls( { format, onChange } ) {
 	];
 
 	const suggestedOptions = [
-		...suggestedFormats.map( ( suggestedFormat, index ) => ( {
-			key: `suggested-${ index }`,
-			name: dateI18n( suggestedFormat, exampleDate ),
-			format: suggestedFormat,
+		...suggestedFormats.map( ( suggestedFormat ) => ( {
+			value: suggestedFormat,
+			label: dateI18n( suggestedFormat, exampleDate ),
 		} ) ),
 		{
-			key: 'human-diff',
-			name: humanTimeDiff( exampleDate ),
-			format: 'human-diff',
+			value: 'human-diff',
+			label: humanTimeDiff( exampleDate ),
 		},
 	];
 
 	const customOption = {
-		key: 'custom',
-		name: __( 'Custom' ),
-		className:
-			'block-editor-date-format-picker__custom-format-select-control__custom-option',
-		hint: __( 'Enter your own date format' ),
+		value: 'custom',
+		label: __( 'Custom' ),
+		description: __( 'Enter your own date format' ),
 	};
 
 	const [ isCustom, setIsCustom ] = useState(
 		() =>
 			!! format &&
-			! suggestedOptions.some( ( option ) => option.format === format )
+			! suggestedOptions.some( ( option ) => option.value === format )
 	);
 
 	return (
-		<VStack>
-			<CustomSelectControl
+		<Stack direction="column" gap="sm">
+			<SelectControl
 				label={ __( 'Choose a format' ) }
-				options={ [ ...suggestedOptions, customOption ] }
+				items={ [ ...suggestedOptions, customOption ] }
 				value={
 					isCustom
 						? customOption
 						: ( suggestedOptions.find(
-								( option ) => option.format === format
+								( option ) => option.value === format
 							) ?? customOption )
 				}
-				onChange={ ( { selectedItem } ) => {
+				onValueChange={ ( selectedItem ) => {
+					if ( ! selectedItem ) {
+						return;
+					}
 					if ( selectedItem === customOption ) {
 						setIsCustom( true );
 					} else {
 						setIsCustom( false );
-						onChange( selectedItem.format );
+						onChange( selectedItem.value );
 					}
 				} }
-			/>
+			>
+				{ suggestedOptions.map( ( option ) => (
+					<SelectControl.Item key={ option.value } value={ option }>
+						<SelectControl.ItemLabel>
+							{ option.label }
+						</SelectControl.ItemLabel>
+					</SelectControl.Item>
+				) ) }
+				<SelectControl.Separator />
+				<SelectControl.Item value={ customOption }>
+					<SelectControl.ItemLabel>
+						{ customOption.label }
+					</SelectControl.ItemLabel>
+					<SelectControl.ItemDescription>
+						{ customOption.description }
+					</SelectControl.ItemDescription>
+				</SelectControl.Item>
+			</SelectControl>
 			{ isCustom && (
-				<TextControl
+				<InputControl
 					label={ __( 'Custom format' ) }
 					hideLabelFromVision
-					help={ createInterpolateElement(
+					details={ createInterpolateElement(
 						__(
 							'Enter a date or time <Link>format string</Link>.'
 						),
 						{
 							Link: (
-								<ExternalLink
+								<Link
+									openInNewTab
 									href={ __(
 										'https://wordpress.org/documentation/article/customize-date-and-time-format/'
 									) }
@@ -157,9 +175,9 @@ function NonDefaultControls( { format, onChange } ) {
 						}
 					) }
 					value={ format }
-					onChange={ ( value ) => onChange( value ) }
+					onValueChange={ ( value ) => onChange( value ) }
 				/>
 			) }
-		</VStack>
+		</Stack>
 	);
 }

@@ -22,7 +22,7 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
  * uploading and doubles as the guard against a second insert starting while
  * one is in flight, so callers always pass one.
  *
- * @param {Function} onInsert Called with the block to insert.
+ * @param {(block: Object) => void} onInsert Called with the block to insert.
  * @return {{
  *   insert: (block: Object, itemId: string) => void,
  *   insertingId: string|undefined,

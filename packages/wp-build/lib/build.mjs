@@ -12,7 +12,6 @@ import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
-import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
 import {
@@ -139,6 +138,8 @@ const baseDefine = {
 			false
 	),
 };
+// Keep esbuild's module condition when enabling development exports.
+const developmentConditions = [ 'development', 'module' ];
 const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
 	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
@@ -614,6 +615,7 @@ async function bundlePackage( packageName, options = {} ) {
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
 				define: getDefine( true ),
+				conditions: developmentConditions,
 				plugins: [
 					...baseBundlePlugins,
 					wordpressExternalsPlugin(
@@ -709,6 +711,7 @@ async function bundlePackage( packageName, options = {} ) {
 						platform: 'browser',
 						minify: false,
 						define: getDefine( true ),
+						conditions: developmentConditions,
 						plugins: [
 							styleRuntimeAliasPlugin(),
 							wordpressExternalsPlugin(
@@ -1328,15 +1331,6 @@ async function transpilePackage( packageName ) {
 	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
 	await generateWorkerPlaceholder( packageDir, packageJson );
 
-	// Check if this is the components package that needs emotion babel plugin.
-	// Ideally we should remove this exception and move away from emotion.
-	const needsEmotionPlugin = packageName === 'components';
-	const emotionPlugin = babel( {
-		filter: /\.[cm]?[jt]sx?$/,
-		config: {
-			plugins: [ styleRuntimeRequire.resolve( '@emotion/babel-plugin' ) ],
-		},
-	} );
 	const externalizeAllExceptCssPlugin = {
 		name: 'externalize-except-css',
 		setup( build ) {
@@ -1404,12 +1398,7 @@ async function transpilePackage( packageName ) {
 		},
 	};
 	const plugins = [
-		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
-		// hook, which is non-composable — the first to return contents wins. If a
-		// file contains --wpds-* tokens, the Emotion transform will be skipped.
-		// Avoid using design tokens in Emotion styles until Emotion is removed.
 		dsTokenFallbacksJs,
-		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
@@ -1721,6 +1710,7 @@ async function buildRoute( routeName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						styleRuntimeAliasPlugin(),
 						wordpressExternalsPlugin(
@@ -1772,6 +1762,7 @@ async function buildRoute( routeName ) {
 				target: getEsbuildTarget(),
 				minify: false,
 				define: getDefine( true ),
+				conditions: developmentConditions,
 				plugins: [
 					...createStyleBundlingPlugins( routeDir ),
 					wordpressExternalsPlugin(
@@ -1882,6 +1873,7 @@ async function buildWidget( widgetName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						...createStyleBundlingPlugins( widgetDir ),
 						wordpressExternalsPlugin(
@@ -1932,6 +1924,7 @@ async function buildWidget( widgetName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						styleRuntimeAliasPlugin(),
 						wordpressExternalsPlugin(
