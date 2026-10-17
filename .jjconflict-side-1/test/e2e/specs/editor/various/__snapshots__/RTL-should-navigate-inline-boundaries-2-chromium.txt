@@ -1,3 +1,0 @@
-<!-- wp:paragraph -->
-<p><strong>١٠</strong>٢</p>
-<!-- /wp:paragraph -->

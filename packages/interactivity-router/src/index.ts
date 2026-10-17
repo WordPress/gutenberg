@@ -9,6 +9,7 @@ import {
 
 const {
 	getRegionRootFragment,
+	hydrateAllRemaining,
 	initialVdomPromise,
 	toVdom,
 	parseDirectiveValue,
@@ -469,6 +470,11 @@ window.addEventListener( 'popstate', async () => {
 			} );
 		}
 
+		// Force-hydrate all islands on the current page so its router regions
+		// are hydrated and can be diffed against the cached page. With lazy
+		// hydration, islands the user never scrolled to may still be pending.
+		await hydrateAllRemaining();
+
 		batch( () => {
 			state.url = window.location.href;
 			renderPage( page );
@@ -516,18 +522,25 @@ window.document
 	.querySelectorAll< HTMLScriptElement >( 'script[type=module][src]' )
 	.forEach( ( { src } ) => markScriptModuleAsResolved( src ) );
 
-// Await hydration completion before setting the initial page to ensure initialVdom is populated.
-( async () => {
-	const initialVdomMap = await initialVdomPromise;
+/*
+ * Cache the initial page using the vDOM produced by hydration, so the router
+ * diffs against the same vDOM that's live on the page. This awaits
+ * `initialVdomPromise`, which resolves once every island is hydrated — either
+ * by the IntersectionObserver or by the idle-time sweep
+ * (`requestIdleCallback` with a `timeout`), so it is guaranteed to resolve
+ * even if the user never scrolls.
+ *
+ * The `vdom` param is required: without it `preparePage()` builds the initial
+ * page's vDOM from the DOM instead of reusing the tree hydration produced.
+ */
+initialVdomPromise.then( ( initialVdom ) => {
 	pages.set(
 		getPagePath( window.location.href ),
-		Promise.resolve(
-			preparePage( getPagePath( window.location.href ), document, {
-				vdom: initialVdomMap,
-			} )
-		)
+		preparePage( getPagePath( window.location.href ), document, {
+			vdom: initialVdom,
+		} )
 	);
-} )();
+} );
 
 // Variable to store the current navigation.
 let navigatingTo = '';
@@ -749,6 +762,13 @@ export const { state, actions } = store< Store >( 'core/router', {
 					! page.initialData?.config?.[ 'core/router' ]
 						?.clientNavigationDisabled
 				) {
+					// Force-hydrate all islands on the current page so its router
+					// regions are hydrated and can be diffed when the new page is
+					// rendered. With lazy hydration, islands the user never scrolled
+					// to may still be pending; the diff would silently no-op on
+					// unhydrated regions.
+					yield hydrateAllRemaining();
+
 					yield importScriptModules( page.scriptModules );
 
 					// The batch keeps `state.url` and `renderPage()` together so

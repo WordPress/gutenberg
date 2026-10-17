@@ -1,7 +1,0 @@
-@use "@wordpress/base-styles/mixins" as *;
-
-.edit-site-save-panel__modal {
-	@include break-small() {
-		width: 600px;
-	}
-}
