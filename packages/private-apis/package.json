@@ -42,6 +42,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"devDependencies": {
+		"@types/react": "^19.3.0",
 		"react": "^19.3.0",
 		"vitest": "^5.0.3"
 	},

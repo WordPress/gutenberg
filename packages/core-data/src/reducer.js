@@ -774,6 +774,28 @@ export function fieldsConfigs( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the actions configs, keyed by kind, then name.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function entityActionsConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_ENTITY_ACTIONS_CONFIG':
+			return {
+				...state,
+				[ action.kind ]: {
+					...state[ action.kind ],
+					[ action.name ]: action.config,
+				},
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -801,4 +823,5 @@ export default combineReducers( {
 	collaborationSupported,
 	viewConfigs,
 	fieldsConfigs,
+	entityActionsConfigs,
 } );
