@@ -1,8 +1,5 @@
-/**
- * Internal dependencies
- */
-import { test, expect } from './fixtures';
 import type { Page } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 const CSP_NONCE = 'test-csp-nonce-123';
 
@@ -31,6 +28,12 @@ type CspRouteOptions = {
  * enforces a given CSP. This is the only mechanism the iAPI JS needs to be
  * exercised in a real browser — no PHP/mu-plugin required. Returns the array
  * of CSP-related console / page errors collected during the page's life.
+ *
+ * @param page              The Playwright page.
+ * @param root0             Route options.
+ * @param root0.csp         CSP header value, or null for none.
+ * @param root0.nonce       Nonce for the html element, or null.
+ * @param root0.scriptNonce Nonce for script tags, or null.
  */
 async function setupCspRoute(
 	page: Page,
@@ -48,7 +51,9 @@ async function setupCspRoute(
 			cspErrors.push( text );
 		}
 	} );
-	page.on( 'pageerror', ( err ) => cspErrors.push( 'pageerror: ' + err.message ) );
+	page.on( 'pageerror', ( err ) =>
+		cspErrors.push( 'pageerror: ' + err.message )
+	);
 
 	await page.route( '**/*', async ( route ) => {
 		const request = route.request();
@@ -95,6 +100,8 @@ async function setupCspRoute(
  * so we must not fail the test on those. The iAPI-specific signal is a
  * violation that mentions `unsafe-eval` (the Function() path) or a blocked
  * inline script that is NOT one of core's known hashes.
+ *
+ * @param errors Raw CSP error strings.
  */
 function iapiCspViolations( errors: string[] ): string[] {
 	const coreHashes = [
@@ -116,6 +123,9 @@ function iapiCspViolations( errors: string[] ): string[] {
  * The shared interaction: initial text is 'no' (count 0), clicking the store
  * action increments state to 1 (text 'yes'), and the inline expression
  * increments state to 2.
+ *
+ * @param page The Playwright page.
+ * @param link URL of the test post.
  */
 async function assertInlineExpressionsWork(
 	page: Page,
@@ -150,7 +160,10 @@ test.describe( 'CSP nonce - inline expressions without unsafe-eval', () => {
 			csp: null,
 			nonce: null,
 		} );
-		await assertInlineExpressionsWork( page, utils.getLink( 'test/csp-nonce' ) );
+		await assertInlineExpressionsWork(
+			page,
+			utils.getLink( 'test/csp-nonce' )
+		);
 		expect( iapiCspViolations( cspErrors ) ).toEqual( [] );
 		await page.unroute( '**/*' );
 	} );
@@ -163,7 +176,10 @@ test.describe( 'CSP nonce - inline expressions without unsafe-eval', () => {
 			csp: `script-src 'self' 'unsafe-eval' 'unsafe-inline'`,
 			nonce: null,
 		} );
-		await assertInlineExpressionsWork( page, utils.getLink( 'test/csp-nonce' ) );
+		await assertInlineExpressionsWork(
+			page,
+			utils.getLink( 'test/csp-nonce' )
+		);
 		expect( iapiCspViolations( cspErrors ) ).toEqual( [] );
 		await page.unroute( '**/*' );
 	} );

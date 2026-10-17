@@ -1,11 +1,4 @@
-import {
-	afterEach,
-	beforeEach,
-	describe,
-	expect,
-	it,
-	vi,
-} from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 /**
  * Unit tests for CSP nonce support (csp.ts).
@@ -76,9 +69,9 @@ describe( 'Interactivity API CSP', () => {
 			const csp = await import( '../csp' );
 			expect( csp.isCSPEnabled() ).toBe( true );
 			expect( csp.getPageNonce() ).toBe( 'abc123' );
-			expect(
-				document.documentElement.hasAttribute( 'data-nonce' )
-			).toBe( false );
+			expect( document.documentElement ).not.toHaveAttribute(
+				'data-nonce'
+			);
 		} );
 
 		it( 'throws on empty data-nonce', async () => {
@@ -101,13 +94,14 @@ describe( 'Interactivity API CSP', () => {
 			expect( fn( { count: 2 }, { n: 3 } ) ).toBe( 5 );
 			// Script is removed after execution, but nonce was used.
 			// Verify no leftover script with that content remains.
-			expect(
-				document.head.querySelector( 'script' )
-			).toBeNull();
+			expect( document.head.querySelector( 'script' ) ).toBeNull();
 		} );
 
 		it( 'compileExpression caches by source', async () => {
-			document.documentElement.setAttribute( 'data-nonce', 'cache-nonce' );
+			document.documentElement.setAttribute(
+				'data-nonce',
+				'cache-nonce'
+			);
 			vi.resetModules();
 			const { compileExpression } = await import( '../csp' );
 			const fn1 = compileExpression( [ 'x' ], 'return x+1;' );
@@ -135,9 +129,8 @@ describe( 'Interactivity API CSP', () => {
 			};
 			document.documentElement.setAttribute( 'data-nonce', 'tt-nonce' );
 			vi.resetModules();
-			const { prepareScript, createHTML: cHTML } = await import(
-				'../csp'
-			);
+			const { prepareScript, createHTML: cHTML } =
+				await import( '../csp' );
 			expect(
 				( window as any ).trustedTypes.createPolicy
 			).toHaveBeenCalledWith( 'wp-interactivity', expect.any( Object ) );
@@ -150,7 +143,10 @@ describe( 'Interactivity API CSP', () => {
 		} );
 
 		it( 'compileExpression throws when CSP blocks (no x on script)', async () => {
-			document.documentElement.setAttribute( 'data-nonce', 'block-nonce' );
+			document.documentElement.setAttribute(
+				'data-nonce',
+				'block-nonce'
+			);
 			vi.resetModules();
 			const { compileExpression } = await import( '../csp' );
 			// Simulate CSP blocking: jsdom executes inline scripts on

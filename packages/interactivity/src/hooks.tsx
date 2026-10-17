@@ -368,14 +368,7 @@ export const getEvaluate: GetEvaluate =
 			let fn = fnCache.get( expression );
 			if ( ! fn ) {
 				fn = compileExpression(
-					[
-						'state',
-						'context',
-						'actions',
-						'callbacks',
-						'el',
-						'evt',
-					],
+					[ 'state', 'context', 'actions', 'callbacks', 'el', 'evt' ],
 					expression
 				);
 				fnCache.set( expression, fn );
