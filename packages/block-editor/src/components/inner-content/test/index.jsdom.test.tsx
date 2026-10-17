@@ -15,14 +15,17 @@ const BLOCK_NAME = 'core/html';
 // intentional.
 /* eslint-disable testing-library/no-node-access, testing-library/no-container, testing-library/render-result-naming-convention */
 
-function renderWithInnerContent( innerContent ) {
+function renderWithInnerContent( innerContent: Array< string | null > ) {
 	const block = createBlock( BLOCK_NAME, {}, [], innerContent );
 	const { container } = render(
 		<BlockEditorProvider value={ [ block ] }>
 			<InnerContent clientId={ block.clientId } />
 		</BlockEditorProvider>
 	);
-	return container.querySelector( '.block-editor-inner-content' );
+	// The provider renders the inner content.
+	return container.querySelector(
+		'.block-editor-inner-content'
+	) as HTMLElement;
 }
 
 describe( 'InnerContent', () => {
@@ -31,6 +34,7 @@ describe( 'InnerContent', () => {
 			apiVersion: 3,
 			title: 'Custom HTML',
 			category: 'text',
+			attributes: {},
 			save: () => null,
 		} );
 	} );

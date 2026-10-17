@@ -3,21 +3,23 @@ import {
 	getBlockType,
 	registerBlockType,
 } from '@wordpress/blocks';
+import type { BlockEditProps } from '@wordpress/blocks';
 import { createContext, useContext, useMemo } from '@wordpress/element';
 import InnerBlocks from '../';
 import BlockList from '../../block-list';
 import { useBlockProps } from '../../block-list/use-block-props';
 import { ExperimentalBlockEditorProvider } from '../../provider';
+import type { InnerBlocksOptions } from '../types';
 
 // `InnerBlocks` only renders within a block, so the story args are passed down
 // to the block type registered below through a context rather than rendered by
 // the story directly.
-const ArgsContext = createContext( {} );
+const ArgsContext = createContext< InnerBlocksOptions >( {} );
 
 const CONTAINER_BLOCK = 'storybook/inner-blocks-container';
 const TEXT_BLOCK = 'storybook/example-text';
 const MEDIA_BLOCK = 'storybook/example-media';
-const CHILD_BLOCKS = [
+const CHILD_BLOCKS: Array< [ string, string, string ] > = [
 	[ TEXT_BLOCK, 'Example Text', 'text' ],
 	[ MEDIA_BLOCK, 'Example Media', 'media' ],
 ];
@@ -42,9 +44,12 @@ function ContainerEdit() {
 	);
 }
 
-function ChildEdit( { name } ) {
+function ChildEdit( {
+	name,
+}: BlockEditProps< Record< string, unknown > > & { name?: string } ) {
 	const blockProps = useBlockProps();
-	const { title } = getBlockType( name );
+	// The edit component of a registered block type gets its name.
+	const { title } = getBlockType( name as string )!;
 
 	return <p { ...blockProps }>{ title }</p>;
 }
@@ -60,6 +65,7 @@ function useContainerBlock() {
 					apiVersion: 3,
 					title,
 					category,
+					attributes: {},
 					edit: ChildEdit,
 					save: () => null,
 				} );
@@ -74,6 +80,7 @@ function useContainerBlock() {
 				// The container is only meant to host the inner blocks area,
 				// so it is kept out of the inserter itself.
 				supports: { inserter: false },
+				attributes: {},
 				edit: ContainerEdit,
 				save: () => null,
 			} );
@@ -227,7 +234,7 @@ const meta = {
 export default meta;
 
 export const Default = {
-	render: function Template( args ) {
+	render: function Template( args: InnerBlocksOptions ) {
 		const blocks = useContainerBlock();
 
 		return (
