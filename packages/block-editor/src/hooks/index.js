@@ -76,6 +76,7 @@ createBlockListBlockFilter( [
 	position,
 	blockStyleVariation,
 	childLayout,
+	layout,
 ] );
 createBlockSaveFilter( [
 	align,
