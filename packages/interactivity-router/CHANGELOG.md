@@ -6,15 +6,19 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Load new script modules during client-side navigation without `eval()` or WebAssembly, so the Content Security Policy doesn't need `'unsafe-eval'` or `'wasm-unsafe-eval'`. ([#84056](https://github.com/WordPress/gutenberg/pull/84056))
+
 ## 2.57.0 (2026-10-07)
 
 ### New Features
 
--   Add `state.navigating` and `state.initiator` to the public `core/router` store, and an optional `initiator` field to `actions.navigate()`'s options, so consumers can react to a navigation's lifecycle and to who started it (by default, the id of the nearest enclosing router region). Both keys read `undefined` before the first navigation and on pages where the router never loads. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+-   Add `state.navigating` and `state.initiator` to the public `core/router` store, and an optional `initiator` field to `actions.navigate()`'s options, so consumers can react to a navigation's lifecycle and source. ([#83874](https://github.com/WordPress/gutenberg/pull/83874))
 
 ### Bug Fixes
 
--   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpretation exposed through `@wordpress/interactivity`'s private API. Previously, navigation keyed those regions under a different id or `undefined` and never updated them. ([#83280](https://github.com/WordPress/gutenberg/pull/83280))
+-   Match, update, and attach `data-wp-router-region` values with a `namespace::` prefix or a JSON scalar under the id registered by the directive runtime, using one shared directive-value interpreter for both server-rendered and client-created regions. ([#83656](https://github.com/WordPress/gutenberg/pull/83656))
 
 ## 2.56.0 (2026-09-23)
 
@@ -169,7 +173,7 @@
     -   Use [`populateServerData()`](https://github.com/WordPress/gutenberg/blob/9671329c386d2b743f14ef314823fbf915366ebd/packages/interactivity/src/store.ts#L269) with state from the server.
     -   Wait for the `load` event of the script element before evaluating it.
     -   Make `renderRegions()` an async function.
-    -   Only prefetch **module** scripts, never prefetch regular scripts. That's because regular scripts (without `async` or `defer` attributes) found in the head are blocking and must be executed in order. When prefetching there is no guarantee that the scripts will execute in the order they are prefetched. Module scripts can be executed in any order.
+    -   Only prefetch **module** scripts, never prefetch regular scripts. That's because regular scripts (without `async` or `defer` attributes) found in the head are blocking and must be executed before the browser has access to the body and so before there are any interactive regions to render.
 
 ## 2.9.0 (2024-10-03)
 
@@ -194,7 +198,7 @@
 ### Breaking Changes
 
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
--   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
+-   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases and support policy](https://nodejs.org/en/about/releases/).
 
 ## 1.8.0 (2024-05-16)
 
