@@ -924,6 +924,82 @@ test.describe( 'Draggable block', () => {
 		] );
 	} );
 
+	test( 'drags a multi-selection from a block nested in a selected block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph -->
+<p>Landing</p>
+<!-- /wp:paragraph -->` );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraphs.nth( 0 ).click();
+		await page.evaluate( () => {
+			const [ first, group ] = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlockOrder();
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.multiSelect( first, group );
+		} );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const {
+						getSelectedBlockClientIds,
+						__unstableIsFullySelected,
+					} = window.wp.data.select( 'core/block-editor' );
+					return (
+						__unstableIsFullySelected() &&
+						getSelectedBlockClientIds().length
+					);
+				} )
+			)
+			.toBe( 2 );
+
+		// The separator is not selected itself, only its group is.
+		const box = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Separator' } )
+			.boundingBox();
+		await page.mouse.move( box.x + box.width / 2, box.y + box.height / 2 );
+		await page.mouse.down();
+		const landingBox = await paragraphs.nth( 1 ).boundingBox();
+		await page.mouse.move(
+			landingBox.x + 40,
+			landingBox.y + landingBox.height - 2,
+			{ steps: 10 }
+		);
+		await expect.poll( () => isDraggingBlocks( page ) ).toBe( true );
+		const indicator = page.locator(
+			'data-testid=block-list-insertion-point-indicator'
+		);
+		await expect( indicator ).toBeVisible();
+		await expect
+			.poll( async () => ( await indicator.boundingBox() ).y )
+			.toBeGreaterThan( landingBox.y );
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'Landing' } },
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{
+				name: 'core/group',
+				innerBlocks: [ { name: 'core/separator' } ],
+			},
+		] );
+	} );
+
 	test( 'does not drag a multi-selection of locked blocks', async ( {
 		editor,
 		page,
