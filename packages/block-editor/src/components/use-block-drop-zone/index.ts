@@ -1,5 +1,6 @@
 import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
+import type { RefCallback } from 'react';
 import {
 	useThrottle,
 	__experimentalUseDropZone as useDropZone,
@@ -10,6 +11,7 @@ import {
 	isUnmodifiedDefaultBlock as getIsUnmodifiedDefaultBlock,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import useOnBlockDrop from '../use-on-block-drop';
 import {
 	getDistanceToNearestEdge,
@@ -18,58 +20,49 @@ import {
 } from '../../utils/math';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { EdgeName, Point } from '../../utils/math';
+import type { BlockWithVisibility } from '../block-visibility/types';
+import type {
+	BlockDropTarget,
+	BlockDropZoneConfig,
+	BlockListOrientation,
+	DropTargetBlockData,
+	DropTargetBlockType,
+	DropTargetPosition,
+	DropTargetPositionOptions,
+	DropTargetSide,
+} from './types';
 
 const THRESHOLD_DISTANCE = 30;
 const MINIMUM_HEIGHT_FOR_THRESHOLD = 120;
 const MINIMUM_WIDTH_FOR_THRESHOLD = 120;
 
-/** @typedef {import('../../utils/math').WPPoint} WPPoint */
-/** @typedef {import('../use-on-block-drop/types').WPDropOperation} WPDropOperation */
-
-/**
- * The orientation of a block list.
- *
- * @typedef {'horizontal'|'vertical'|undefined} WPBlockListOrientation
- */
-
-/**
- * The insert position when dropping a block.
- *
- * @typedef {'before'|'after'} WPInsertPosition
- */
-
-/**
- * @typedef {Object} WPBlockData
- * @property {boolean}       isUnmodifiedDefaultBlock Is the block unmodified default block.
- * @property {() => DOMRect} getBoundingClientRect    Get the bounding client rect of the block.
- * @property {number}        blockIndex               The index of the block.
- */
-
 /**
  * Get the drop target position from a given drop point and the orientation.
  *
- * @param {WPBlockData[]}          blocksData  The block data list.
- * @param {WPPoint}                position    The position of the item being dragged.
- * @param {WPBlockListOrientation} orientation The orientation of the block list.
- * @param {Object}                 options     Additional options.
- * @return {[number, WPDropOperation]} The drop target position.
+ * @param blocksData  The block data list.
+ * @param position    The position of the item being dragged.
+ * @param orientation The orientation of the block list.
+ * @param options     Additional options.
+ * @return The drop target position.
  */
 export function getDropTargetPosition(
-	blocksData,
-	position,
-	orientation = 'vertical',
-	options = {}
-) {
-	const allowedEdges =
+	blocksData: DropTargetBlockData[],
+	position: Point,
+	orientation: BlockListOrientation = 'vertical',
+	options: DropTargetPositionOptions = {}
+): DropTargetPosition {
+	const allowedEdges: [ EdgeName, ...EdgeName[] ] =
 		orientation === 'horizontal'
 			? [ 'left', 'right' ]
 			: [ 'top', 'bottom' ];
 
 	let nearestIndex = 0;
-	let insertPosition = 'before';
+	// `forEach` assigns it, which narrowing does not see.
+	let insertPosition = 'before' as 'before' | 'after';
 	let minDistance = Infinity;
-	let targetBlockIndex = null;
-	let nearestSide = 'right';
+	let targetBlockIndex: number | null = null;
+	let nearestSide: DropTargetSide = 'right';
 
 	const {
 		dropZoneElement,
@@ -179,7 +172,8 @@ export function getDropTargetPosition(
 				 * either within and close to the sides of the target block or on its outer sides.
 				 */
 				targetBlockIndex = blockIndex;
-				nearestSide = sideEdge;
+				// Only the left and right edges are measured.
+				nearestSide = sideEdge as DropTargetSide;
 			}
 
 			if ( distance < minDistance ) {
@@ -230,23 +224,26 @@ export function getDropTargetPosition(
 
 /**
  * Check if the dragged blocks can be dropped on the target.
- * @param {Function} getBlockType
- * @param {Object[]} allowedBlocks
- * @param {string[]} draggedBlockNames
- * @param {string}   targetBlockName
- * @return {boolean} Whether the dragged blocks can be dropped on the target.
+ * @param getBlockType
+ * @param allowedBlocks
+ * @param draggedBlockNames
+ * @param targetBlockName
+ * @return Whether the dragged blocks can be dropped on the target.
  */
 export function isDropTargetValid(
-	getBlockType,
-	allowedBlocks,
-	draggedBlockNames,
-	targetBlockName
-) {
+	getBlockType: ( name: string ) => DropTargetBlockType | null | undefined,
+	allowedBlocks: Array< { name: string } | string > | null | undefined,
+	draggedBlockNames: string[],
+	targetBlockName: string | null
+): boolean {
 	// At root level allowedBlocks is undefined and all blocks are allowed.
 	// Otherwise, check if all dragged blocks are allowed.
 	let areBlocksAllowed = true;
 	if ( allowedBlocks ) {
-		const allowedBlockNames = allowedBlocks?.map( ( { name } ) => name );
+		// A string entry has no `name`, so it never matches.
+		const allowedBlockNames = (
+			allowedBlocks as Array< { name?: string } >
+		 )?.map( ( { name } ) => name );
 
 		areBlocksAllowed = draggedBlockNames.every( ( name ) =>
 			allowedBlockNames?.includes( name )
@@ -275,11 +272,14 @@ export function isDropTargetValid(
 /**
  * Checks if the given element is an insertion point.
  *
- * @param {EventTarget|null} targetToCheck - The element to check.
- * @param {Document}         ownerDocument - The owner document of the element.
- * @return {boolean} True if the element is a insertion point, false otherwise.
+ * @param targetToCheck - The element to check.
+ * @param ownerDocument - The owner document of the element.
+ * @return True if the element is a insertion point, false otherwise.
  */
-function isInsertionPoint( targetToCheck, ownerDocument ) {
+function isInsertionPoint(
+	targetToCheck: EventTarget | null,
+	ownerDocument: Document
+): boolean {
 	const { defaultView } = ownerDocument;
 
 	return !! (
@@ -290,16 +290,14 @@ function isInsertionPoint( targetToCheck, ownerDocument ) {
 }
 
 /**
- * @typedef  {Object} WPBlockDropZoneConfig
- * @property {?HTMLElement} dropZoneElement Optional element to be used as the drop zone.
- * @property {string}       rootClientId    The root client id for the block list.
- */
-
-/**
  * A React hook that can be used to make a block list handle drag and drop.
  *
- * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
- * @return {import('react').RefCallback<HTMLElement>} Ref callback for the drop zone element.
+ * @param dropZoneConfig                 configuration data for the drop zone.
+ * @param dropZoneConfig.dropZoneElement Optional element to be used as the drop zone.
+ * @param dropZoneConfig.rootClientId    The root client id for the block list.
+ * @param dropZoneConfig.parentClientId  The client id of the parent block.
+ * @param dropZoneConfig.isDisabled      Whether the drop zone is disabled.
+ * @return Ref callback for the drop zone element.
  */
 export default function useBlockDropZone( {
 	dropZoneElement,
@@ -310,9 +308,9 @@ export default function useBlockDropZone( {
 	rootClientId: targetRootClientId = '',
 	parentClientId: parentBlockClientId = '',
 	isDisabled = false,
-} = {} ) {
+}: BlockDropZoneConfig = {} ): RefCallback< HTMLElement > {
 	const registry = useRegistry();
-	const [ dropTarget, setDropTarget ] = useState( {
+	const [ dropTarget, setDropTarget ] = useState< BlockDropTarget >( {
 		index: null,
 		operation: 'insert',
 	} );
@@ -345,7 +343,8 @@ export default function useBlockDropZone( {
 		dropTarget.operation === 'before' || dropTarget.operation === 'after'
 			? parentBlockClientId
 			: targetRootClientId,
-		dropTarget.index,
+		// Until a drag over sets it, a `null` index inserts at the end.
+		dropTarget.index as number,
 		{
 			operation: dropTarget.operation,
 			nearestSide: dropTarget.nearestSide,
@@ -353,7 +352,7 @@ export default function useBlockDropZone( {
 	);
 	const throttled = useThrottle(
 		useCallback(
-			( event, ownerDocument ) => {
+			( event: DragEvent, ownerDocument: Document ) => {
 				if ( ! isDragging() ) {
 					// When dragging from the desktop, no drag start event is fired.
 					// So, ensure that the drag state is set when the user drags over a drop zone.
@@ -368,7 +367,7 @@ export default function useBlockDropZone( {
 
 				// Check if the target is within any of the dragged blocks.
 				const isTargetWithinDraggedBlocks = draggedBlockClientIds.some(
-					( clientId ) => targetParents.includes( clientId )
+					( clientId: string ) => targetParents.includes( clientId )
 				);
 
 				if ( isTargetWithinDraggedBlocks ) {
@@ -417,7 +416,7 @@ export default function useBlockDropZone( {
 
 				const blocks = getBlocks( targetRootClientId )
 					// Filter out blocks that are hidden
-					.filter( ( block ) => {
+					.filter( ( block: Block & BlockWithVisibility ) => {
 						return ! (
 							hasBlockSupport( block.name, 'visibility', true ) &&
 							block.attributes?.metadata?.blockVisibility ===
@@ -439,7 +438,7 @@ export default function useBlockDropZone( {
 					return;
 				}
 
-				const blocksData = blocks.map( ( block ) => {
+				const blocksData = blocks.map( ( block: Block ) => {
 					const clientId = block.clientId;
 
 					return {
@@ -513,7 +512,8 @@ export default function useBlockDropZone( {
 						getDraggedBlockClientIds(),
 					] );
 					const groupBlockVariations = getBlockVariations(
-						getGroupingBlockName(),
+						// A grouping block type is registered.
+						getGroupingBlockName()!,
 						'block'
 					);
 					const canInsertRow =
@@ -597,10 +597,14 @@ export default function useBlockDropZone( {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the throttled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-			throttled( event, event.currentTarget.ownerDocument );
+			// The listeners are on the drop zone element.
+			throttled(
+				event,
+				( event.currentTarget as HTMLElement ).ownerDocument
+			);
 		},
 		onDragLeave( event ) {
-			const { ownerDocument } = event.currentTarget;
+			const { ownerDocument } = event.currentTarget as HTMLElement;
 
 			// If the drag event is leaving the drop zone and entering an insertion point,
 			// do not hide the insertion point as it is conceptually within the dropzone.
