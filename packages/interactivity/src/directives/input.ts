@@ -56,9 +56,7 @@ type SignalFile = {
 };
 
 type InputBindingElement =
-	| HTMLInputElement
-	| HTMLSelectElement
-	| HTMLTextAreaElement;
+	HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 
 const dataURIRegex = /^data:(?<mime>[^;]+);base64,(?<contents>.*)$/;
 
@@ -457,8 +455,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 	for ( const eventName of desc.events ) {
 		const propName = `on${ eventName }` as string;
 		const existing = props[ propName ] as
-			| ( ( e: Event ) => void )
-			| undefined;
+			( ( e: Event ) => void ) | undefined;
 
 		props[ propName ] = ( event: Event ) => {
 			if ( existing ) {
@@ -466,9 +463,7 @@ directive( 'input', ( { directives, element, evaluate } ) => {
 			}
 
 			const target = event.target as
-				| HTMLInputElement
-				| HTMLSelectElement
-				| HTMLTextAreaElement;
+				HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
 			const raw = desc.toSignal( target, signalType );
 
 			if ( raw === undefined ) {
