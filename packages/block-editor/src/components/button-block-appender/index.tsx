@@ -1,21 +1,44 @@
+import type {
+	ComponentProps,
+	ComponentType,
+	ForwardedRef,
+	RefAttributes,
+} from 'react';
+import type { Block } from '@wordpress/blocks';
 import clsx from 'clsx';
 import { Button } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-import Inserter from '../inserter';
+import UntypedInserter from '../inserter';
+import type { ButtonBlockAppenderProps } from './types';
+import type { InserterToggleRenderProps } from '../inserter/types';
+
+// The inserter is still JavaScript, so its inferred props are all required.
+type TypedInserter = ComponentType<
+	Partial< ComponentProps< typeof UntypedInserter > > &
+		RefAttributes< unknown >
+>;
 
 function ButtonBlockAppender(
-	{ rootClientId, className, onFocus, tabIndex, onSelect },
-	ref
+	{
+		rootClientId,
+		className,
+		onFocus,
+		tabIndex,
+		onSelect,
+	}: ButtonBlockAppenderProps,
+	ref: ForwardedRef< HTMLButtonElement >
 ) {
+	// Read on render, like the JSX it replaces, as the imports are circular.
+	const Inserter = UntypedInserter as TypedInserter;
 	return (
 		<Inserter
 			position="bottom center"
 			rootClientId={ rootClientId }
 			__experimentalIsQuick
-			onSelectOrClose={ ( ...args ) => {
+			onSelectOrClose={ ( ...args: [ Block? ] ) => {
 				if ( onSelect && typeof onSelect === 'function' ) {
 					onSelect( ...args );
 				}
@@ -27,7 +50,7 @@ function ButtonBlockAppender(
 				blockTitle,
 				hasSingleBlockType,
 				appenderLabel,
-			} ) => {
+			}: InserterToggleRenderProps ) => {
 				const isToggleButton = ! hasSingleBlockType;
 
 				let label;
@@ -80,7 +103,10 @@ function ButtonBlockAppender(
  *
  * @deprecated
  */
-export const ButtonBlockerAppender = forwardRef( ( props, ref ) => {
+export const ButtonBlockerAppender = forwardRef<
+	HTMLButtonElement,
+	ButtonBlockAppenderProps
+>( ( props, ref ) => {
 	deprecated( `wp.blockEditor.ButtonBlockerAppender`, {
 		alternative: 'wp.blockEditor.ButtonBlockAppender',
 		since: '5.9',

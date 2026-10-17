@@ -1,13 +1,7 @@
-import type { ComponentProps, ComponentType } from 'react';
 import clsx from 'clsx';
-import UntypedButtonBlockAppender from '../button-block-appender';
+import BaseButtonBlockAppender from '../button-block-appender';
 import { useBlockEditContext } from '../block-edit/context';
 import type { InnerBlocksButtonBlockAppenderProps } from './types';
-
-// The appender is still JavaScript, so its inferred props are all required.
-const BaseButtonBlockAppender = UntypedButtonBlockAppender as ComponentType<
-	Partial< ComponentProps< typeof UntypedButtonBlockAppender > >
->;
 
 export default function ButtonBlockAppender( {
 	showSeparator,

@@ -44,7 +44,9 @@ describe( 'DefaultBlockAppender', () => {
 	} );
 
 	it( 'should optionally show without prompt', async () => {
-		blockEditorSelectors.getBlockCount.mockImplementation( () => 1 );
+		vi.mocked( blockEditorSelectors.getBlockCount ).mockImplementation(
+			() => 1
+		);
 		const user = userEvent.setup();
 
 		const { container } = render( <DefaultBlockAppender /> );
