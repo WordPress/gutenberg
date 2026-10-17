@@ -64,26 +64,11 @@ function render_block_core_button( $attributes, $content ) {
 	$background = $attributes['style']['background'] ?? null;
 
 	if ( is_array( $background ) ) {
-		$background_styles = array(
-			'backgroundImage'      => $background['backgroundImage'] ?? null,
-			'backgroundSize'       => $background['backgroundSize'] ?? null,
-			'backgroundPosition'   => $background['backgroundPosition'] ?? null,
-			'backgroundRepeat'     => $background['backgroundRepeat'] ?? null,
-			'backgroundAttachment' => $background['backgroundAttachment'] ?? null,
-			'gradient'             => $background['gradient'] ?? null,
-		);
+		// Button has no clip support, so ignore a stale value.
+		unset( $background['backgroundClip'] );
+		$styles = wp_get_background_classes_and_styles( array( 'style' => array( 'background' => $background ) ) );
 
-		// Mirror the background block support defaults.
-		if ( ! empty( $background_styles['backgroundImage'] ) ) {
-			$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
-			if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
-				$background_styles['backgroundPosition'] = '50% 50%';
-			}
-		}
-
-		$styles = wp_style_engine_get_styles( array( 'background' => $background_styles ) );
-
-		if ( ! empty( $styles['css'] ) ) {
+		if ( ! empty( $styles['style'] ) ) {
 			$processor = new WP_HTML_Tag_Processor( $content );
 			while ( $processor->next_tag() ) {
 				if ( $tag !== $processor->get_tag() ) {
@@ -93,13 +78,13 @@ function render_block_core_button( $attributes, $content ) {
 				$existing_style = $processor->get_attribute( 'style' );
 				if ( is_string( $existing_style ) && '' !== $existing_style ) {
 					$separator = str_ends_with( $existing_style, ';' ) ? '' : ';';
-					$processor->set_attribute( 'style', $existing_style . $separator . $styles['css'] );
+					$processor->set_attribute( 'style', $existing_style . $separator . $styles['style'] );
 				} else {
-					$processor->set_attribute( 'style', $styles['css'] );
+					$processor->set_attribute( 'style', $styles['style'] );
 				}
 
-				if ( ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] ) ) {
-					$processor->add_class( 'has-background' );
+				if ( ! empty( $styles['class'] ) ) {
+					$processor->add_class( $styles['class'] );
 				}
 				break;
 			}

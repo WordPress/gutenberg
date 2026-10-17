@@ -199,4 +199,47 @@ class Render_Block_Button_Test extends WP_UnitTestCase {
 		$this->assertSame( 'background-image:var(--wp--preset--gradient--purple-to-yellow);', $processor->get_attribute( 'style' ) );
 		$this->assertTrue( $processor->has_class( 'has-background' ) );
 	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_button
+	 */
+	public function test_background_ignores_clip_and_applies_contain_defaults() {
+		$attributes = array(
+			'style' => array(
+				'background' => array(
+					'backgroundImage'      => array(
+						'url' => 'https://example.com/image.jpg',
+					),
+					'backgroundSize'       => 'contain',
+					'backgroundRepeat'     => 'no-repeat',
+					'backgroundAttachment' => 'fixed',
+					'gradient'             => 'linear-gradient(red, blue)',
+					'backgroundClip'       => 'text',
+				),
+			),
+		);
+
+		$result     = gutenberg_render_block_core_button( $attributes, self::$button_content );
+		$apostrophe = function_exists( 'get_block_bindings_supported_attributes' ) ? '&apos;' : '&#039;';
+
+		$this->assertSame(
+			'<div class="wp-block-button"><a style="background-image:linear-gradient(red, blue), url(' . $apostrophe . 'https://example.com/image.jpg' . $apostrophe . ');background-position:50% 50%;background-repeat:no-repeat;background-size:contain;background-attachment:fixed;" class="wp-block-button__link wp-element-button has-background">Click me</a></div>',
+			$result
+		);
+	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_button
+	 */
+	public function test_malformed_background_returns_content_unchanged() {
+		$attributes = array(
+			'style' => array(
+				'background' => 'linear-gradient(red, blue)',
+			),
+		);
+
+		$result = gutenberg_render_block_core_button( $attributes, self::$button_content );
+
+		$this->assertSame( self::$button_content, $result );
+	}
 }

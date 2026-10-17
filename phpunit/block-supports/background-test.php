@@ -271,6 +271,23 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,hsl(0,100%,50%) 0%,hsl(240,100%,50%) 100%), url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
+			'background gradient is applied without the image when the image skips serialization' => array(
+				'theme_name'          => 'block-theme-child-with-fluid-typography',
+				'block_name'          => 'test/background-image-skipped-gradient-applied',
+				'background_settings' => array(
+					'backgroundImage'                 => true,
+					'gradient'                        => true,
+					'__experimentalSkipSerialization' => array( 'backgroundImage' ),
+				),
+				'background_style'    => array(
+					'backgroundImage' => array(
+						'url' => 'https://example.com/image.jpg',
+					),
+					'gradient'        => 'linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%)',
+				),
+				'expected_wrapper'    => '<div class="has-background" style="background-image:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,0,255) 100%);">Content</div>',
+				'wrapper'             => '<div>Content</div>',
+			),
 			'background image style is not applied if the block does not support background image' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-not-output',
@@ -386,6 +403,171 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'expected_wrapper'    => '<div class="wp-block-test" style="color: red;background-clip:content-box;-webkit-text-fill-color:currentColor;">Content</div>',
 				'wrapper'             => '<div class="wp-block-test" style="color: red">Content</div>',
+			),
+		);
+	}
+
+	/**
+	 * Tests that the background helper returns classes and styles for block attributes.
+	 *
+	 * @covers ::gutenberg_get_background_classes_and_styles
+	 *
+	 * @dataProvider data_get_background_classes_and_styles
+	 *
+	 * @param mixed $block_attributes Block attributes.
+	 * @param array $expected         Expected classes and styles.
+	 */
+	public function test_get_background_classes_and_styles( $block_attributes, $expected ) {
+		$this->assertSame( $expected, gutenberg_get_background_classes_and_styles( $block_attributes ) );
+	}
+
+	/**
+	 * Data provider for the background helper.
+	 *
+	 * @return array[]
+	 */
+	public function data_get_background_classes_and_styles() {
+		return array(
+			'custom image gets default size'        => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'backgroundImage' => array( 'url' => 'https://example.com/image.jpg' ),
+						),
+					),
+				),
+				'expected'         => array(
+					'class' => 'has-background',
+					'style' => "background-image:url('https://example.com/image.jpg');background-size:cover;",
+				),
+			),
+			'contain without position is centered'  => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'backgroundImage'      => array( 'url' => 'https://example.com/image.jpg' ),
+							'backgroundSize'       => 'contain',
+							'backgroundRepeat'     => 'no-repeat',
+							'backgroundAttachment' => 'fixed',
+						),
+					),
+				),
+				'expected'         => array(
+					'class' => 'has-background',
+					'style' => "background-image:url('https://example.com/image.jpg');background-position:50% 50%;background-repeat:no-repeat;background-size:contain;background-attachment:fixed;",
+				),
+			),
+			'preset gradient'                       => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'gradient' => 'var:preset|gradient|vivid-cyan-blue-to-vivid-purple',
+						),
+					),
+				),
+				'expected'         => array(
+					'class' => 'has-background',
+					'style' => 'background-image:var(--wp--preset--gradient--vivid-cyan-blue-to-vivid-purple);',
+				),
+			),
+			'gradient clipped to text has no class' => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'gradient'       => 'linear-gradient(red, blue)',
+							'backgroundClip' => 'text',
+						),
+					),
+				),
+				'expected'         => array(
+					'style' => 'background-image:linear-gradient(red, blue);background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;',
+				),
+			),
+			'clip alone has no class'               => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'backgroundClip' => 'padding-box',
+						),
+					),
+				),
+				'expected'         => array(
+					'style' => 'background-clip:padding-box;-webkit-text-fill-color:currentColor;',
+				),
+			),
+			'image clipped to text has no class'    => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'backgroundImage' => array( 'url' => 'https://example.com/image.jpg' ),
+							'backgroundClip'  => 'text',
+						),
+					),
+				),
+				'expected'         => array(
+					'style' => "background-image:url('https://example.com/image.jpg');background-size:cover;background-clip:text;-webkit-background-clip:text;-webkit-text-fill-color:transparent;",
+				),
+			),
+			'image without url gets default size'   => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'backgroundImage' => array( 'id' => 1 ),
+						),
+					),
+				),
+				'expected'         => array(
+					'class' => 'has-background',
+					'style' => 'background-size:cover;',
+				),
+			),
+			'numeric position is not output'        => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'backgroundImage'    => array( 'url' => 'https://example.com/image.jpg' ),
+							'backgroundPosition' => 50,
+						),
+					),
+				),
+				'expected'         => array(
+					'class' => 'has-background',
+					'style' => "background-image:url('https://example.com/image.jpg');background-size:cover;",
+				),
+			),
+			'zero gradient outputs nothing'         => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(
+							'gradient' => 0,
+						),
+					),
+				),
+				'expected'         => array(),
+			),
+			'empty background'                      => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => array(),
+					),
+				),
+				'expected'         => array(),
+			),
+			'no style attribute'                    => array(
+				'block_attributes' => array(),
+				'expected'         => array(),
+			),
+			'background is not an array'            => array(
+				'block_attributes' => array(
+					'style' => array(
+						'background' => 'linear-gradient(red, blue)',
+					),
+				),
+				'expected'         => array(),
+			),
+			'attributes are not an array'           => array(
+				'block_attributes' => 'style',
+				'expected'         => array(),
 			),
 		);
 	}
