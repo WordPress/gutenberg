@@ -1,5 +1,6 @@
 /* eslint-disable testing-library/render-result-naming-convention */
 
+import type { ReactElement } from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 import {
 	createBlock,
@@ -39,7 +40,10 @@ describe( 'InnerBlocks', () => {
 			save( { attributes } ) {
 				return (
 					<div>
-						{ attributes.fruit }
+						{
+							// The attribute is a string.
+							attributes.fruit as string
+						}
 						<InnerBlocks.Content />
 					</div>
 				);
@@ -47,9 +51,10 @@ describe( 'InnerBlocks', () => {
 		} );
 
 		const saved = renderToString(
+			// The save function returns an element.
 			getSaveElement( 'core/fruit', { fruit: 'Bananas' }, [
 				createBlock( 'core/fruit', { fruit: 'Apples' } ),
-			] )
+			] ) as ReactElement
 		);
 
 		expect( saved ).toMatchSnapshot();
@@ -74,14 +79,17 @@ describe( 'InnerBlocks', () => {
 					type: 'string',
 				},
 			},
-			save( { attributes } ) {
+			save( { attributes }: { attributes: Record< string, unknown > } ) {
 				if ( attributes.throw ) {
 					throw new Error();
 				}
 
 				return (
 					<p>
-						{ attributes.content }
+						{
+							// The attribute is a string.
+							attributes.content as string
+						}
 						<InnerBlocks.Content />
 					</p>
 				);

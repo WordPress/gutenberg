@@ -4,6 +4,7 @@ import { useRegistry } from '@wordpress/data';
 import { getBlockType, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
 import { store as blockEditorStore } from '../../store';
+import type { BlockTemplate } from '../../store/types';
 
 /**
  * This hook makes sure that a block's inner blocks stay in sync with the given
@@ -12,24 +13,24 @@ import { store as blockEditorStore } from '../../store';
  * is meant to be locked (e.g. templateLock = "all" or templateLock = "contentOnly"),
  * then we replace the inner blocks with the correct value after synchronizing it with the template.
  *
- * @param {string}  clientId                       The block client ID.
- * @param {Object}  template                       A template to apply in place of the one
- *                                                 declared in the block type settings.
- * @param {string}  templateLock                   The template lock state for the inner blocks. For
- *                                                 example, if the template lock is set to "all",
- *                                                 then the inner blocks will stay in sync with the
- *                                                 template. If not defined or set to false, then
- *                                                 the inner blocks will not be synchronized with
- *                                                 the given template.
- * @param {boolean} templateInsertUpdatesSelection Whether or not to update the
- *                                                 block-editor selection state when inner blocks
- *                                                 are replaced after template synchronization.
+ * @param clientId                       The block client ID.
+ * @param template                       A template to apply in place of the one
+ *                                       declared in the block type settings.
+ * @param templateLock                   The template lock state for the inner blocks. For
+ *                                       example, if the template lock is set to "all",
+ *                                       then the inner blocks will stay in sync with the
+ *                                       template. If not defined or set to false, then
+ *                                       the inner blocks will not be synchronized with
+ *                                       the given template.
+ * @param templateInsertUpdatesSelection Whether or not to update the
+ *                                       block-editor selection state when inner blocks
+ *                                       are replaced after template synchronization.
  */
 export default function useInnerBlockTemplateSync(
-	clientId,
-	template,
-	templateLock,
-	templateInsertUpdatesSelection
+	clientId: string,
+	template: BlockTemplate | undefined,
+	templateLock: string | false | undefined,
+	templateInsertUpdatesSelection: boolean | undefined
 ) {
 	if ( template !== undefined ) {
 		deprecated(
@@ -56,7 +57,9 @@ export default function useInnerBlockTemplateSync(
 	const registry = useRegistry();
 
 	// Maintain a reference to the previous value so we can do a deep equality check.
-	const existingTemplateRef = useRef( null );
+	const existingTemplateRef = useRef< BlockTemplate | undefined | null >(
+		null
+	);
 
 	useLayoutEffect( () => {
 		let isCancelled = false;
@@ -85,8 +88,11 @@ export default function useInnerBlockTemplateSync(
 			let resolvedTemplate = template;
 			let resolvedUpdatesSelection = templateInsertUpdatesSelection;
 			if ( template === undefined ) {
-				const blockType = getBlockType( getBlockName( clientId ) );
-				resolvedTemplate = blockType?.template;
+				// The block with inner blocks exists.
+				const blockType = getBlockType( getBlockName( clientId )! );
+				// A block type template has the same nested shape.
+				resolvedTemplate = blockType?.template as
+					BlockTemplate | undefined;
 				resolvedUpdatesSelection =
 					blockType?.templateInsertUpdatesSelection;
 			}

@@ -322,7 +322,8 @@ export type BlockListSettings = Record< string, unknown > & {
 	orientation?: 'horizontal' | 'vertical';
 	templateLock?: string | false;
 	defaultBlock?: { name: string; attributes?: Record< string, unknown > };
-	directInsert?: boolean;
+	/** A function is deprecated. */
+	directInsert?: boolean | ( ( ...args: never[] ) => unknown );
 };
 
 export interface ShowInsertionPointOptions {
@@ -354,6 +355,7 @@ export type BlockTemplate = NonNullable<
  */
 export type FeatureSettings = Record< string, unknown > & {
 	blocks?: Record< string, Record< string, unknown > >;
+	blockVisibility?: { allowEditing?: boolean };
 };
 
 /**
