@@ -1,25 +1,27 @@
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
+import type { BlockPattern } from '../../../store/types';
+import type { PatternsPaging, PatternsScrollContainerRef } from '../types';
 
 const PAGE_SIZE = 20;
 
 /**
  * Supplies values needed to page the patterns list client side.
  *
- * @param {Array}  currentCategoryPatterns An array of the current patterns to display.
- * @param {string} currentCategory         The currently selected category.
- * @param {Object} scrollContainerRef      Ref of container to find scroll container for when moving between pages.
- * @param {string} currentFilter           The currently search filter.
+ * @param currentCategoryPatterns An array of the current patterns to display.
+ * @param currentCategory         The currently selected category.
+ * @param scrollContainerRef      Ref of container to find scroll container for when moving between pages.
+ * @param currentFilter           The currently search filter.
  *
- * @return {Object} Returns the relevant paging values. (totalItems, categoryPatternsList, numPages, changePage, currentPage)
+ * @return Returns the relevant paging values. (totalItems, categoryPatternsList, numPages, changePage, currentPage)
  */
 export default function usePatternsPaging(
-	currentCategoryPatterns,
-	currentCategory,
-	scrollContainerRef,
+	currentCategoryPatterns: BlockPattern[],
+	currentCategory: unknown,
+	scrollContainerRef?: PatternsScrollContainerRef,
 	currentFilter = ''
-) {
+): PatternsPaging {
 	const [ currentPage, setCurrentPage ] = useState( 1 );
 	const previousCategory = usePrevious( currentCategory );
 	const previousFilter = usePrevious( currentFilter );
@@ -39,9 +41,10 @@ export default function usePatternsPaging(
 		);
 	}, [ pageIndex, currentCategoryPatterns ] );
 	const numPages = Math.ceil( currentCategoryPatterns.length / PAGE_SIZE );
-	const changePage = ( page ) => {
+	const changePage = ( page: number ) => {
 		const scrollContainer = getScrollContainer(
-			scrollContainerRef?.current
+			// `getScrollContainer` returns nothing for a missing element.
+			scrollContainerRef?.current as Element | null
 		);
 		scrollContainer?.scrollTo( 0, 0 );
 
@@ -51,7 +54,8 @@ export default function usePatternsPaging(
 	useEffect(
 		function scrollToTopOnCategoryChange() {
 			const scrollContainer = getScrollContainer(
-				scrollContainerRef?.current
+				// `getScrollContainer` returns nothing for a missing element.
+				scrollContainerRef?.current as Element | null
 			);
 			scrollContainer?.scrollTo( 0, 0 );
 		},
