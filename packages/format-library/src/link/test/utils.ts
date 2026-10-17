@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { RichTextValue } from '@wordpress/rich-text';
 import { isValidHref, getFormatBoundary } from '../utils';
 
 describe( 'isValidHref', () => {
@@ -7,7 +8,10 @@ describe( 'isValidHref', () => {
 	} );
 
 	it( 'returns false if the href is not specified', () => {
-		expect( isValidHref() ).toBe( false );
+		expect(
+			// @ts-expect-error `isValidHref` expects a string; a missing href is invalid.
+			isValidHref()
+		).toBe( false );
 		expect( isValidHref( '' ) ).toBe( false );
 		expect( isValidHref( ' ' ) ).toBe( false );
 	} );
@@ -95,6 +99,8 @@ describe( 'isValidHref', () => {
 	} );
 } );
 
+// Most records below hold only what `getFormatBoundary` reads and mark the
+// indexes without formats with `null`, so they are cast to `RichTextValue`.
 describe( 'getFormatBoundary', () => {
 	const boldFormat = {
 		type: 'core/bold',
@@ -117,6 +123,7 @@ describe( 'getFormatBoundary', () => {
 		it( 'should return empty bounds if value contains no formats', () => {
 			const record = {
 				formats: [], // No formats here!
+				replacements: [],
 				text: 'Lorem ipsum dolor.',
 				start: 8,
 				end: 8,
@@ -164,7 +171,9 @@ describe( 'getFormatBoundary', () => {
 				};
 
 				expect(
-					getFormatBoundary( record, { type: 'core/link' } )
+					getFormatBoundary( record as RichTextValue, {
+						type: 'core/link',
+					} )
 				).toEqual( {
 					start: undefined,
 					end: undefined,
@@ -209,7 +218,9 @@ describe( 'getFormatBoundary', () => {
 				};
 
 				expect(
-					getFormatBoundary( record, { type: 'core/link' } )
+					getFormatBoundary( record as RichTextValue, {
+						type: 'core/link',
+					} )
 				).toEqual( {
 					start: undefined,
 					end: undefined,
@@ -249,7 +260,9 @@ describe( 'getFormatBoundary', () => {
 				};
 
 				expect(
-					getFormatBoundary( record, { type: 'core/link' } )
+					getFormatBoundary( record as RichTextValue, {
+						type: 'core/link',
+					} )
 				).toEqual( {
 					start: 6,
 					end: 11,
@@ -284,7 +297,9 @@ describe( 'getFormatBoundary', () => {
 			};
 
 			expect(
-				getFormatBoundary( record, { type: 'core/link' } )
+				getFormatBoundary( record as RichTextValue, {
+					type: 'core/link',
+				} )
 			).toEqual( {
 				start: 6,
 				end: 11,
@@ -327,7 +342,9 @@ describe( 'getFormatBoundary', () => {
 				};
 
 				expect(
-					getFormatBoundary( record, { type: 'core/link' } )
+					getFormatBoundary( record as RichTextValue, {
+						type: 'core/link',
+					} )
 				).toEqual( {
 					start: 6,
 					end: 11,
@@ -377,7 +394,9 @@ describe( 'getFormatBoundary', () => {
 			end: 0,
 		};
 
-		expect( getFormatBoundary( record, { type: 'core/link' } ) ).toEqual( {
+		expect(
+			getFormatBoundary( record as RichTextValue, { type: 'core/link' } )
+		).toEqual( {
 			start: 0,
 			end: 6,
 		} );
@@ -412,7 +431,9 @@ describe( 'getFormatBoundary', () => {
 			};
 
 			expect(
-				getFormatBoundary( record, { type: 'core/bold' } )
+				getFormatBoundary( record as RichTextValue, {
+					type: 'core/bold',
+				} )
 			).toEqual( {
 				start: 4,
 				end: 7,
@@ -444,7 +465,7 @@ describe( 'getFormatBoundary', () => {
 
 		expect(
 			getFormatBoundary(
-				record,
+				record as RichTextValue,
 				{ type: 'core/bold' },
 				startIndex,
 				endIndex

@@ -13706,19 +13706,6 @@
 			"count": 2
 		}
 	},
-	"packages/format-library/src/link/test/css-classes-setting.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/format-library/src/link/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-engine/src/lock-unlock.ts": {
 		"no-restricted-imports": {
 			"count": 1
