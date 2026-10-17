@@ -33,11 +33,17 @@ A PHP component is a subset of the React one: markup and CSS only, with no JavaS
 | A prop, value or component is renamed or removed | The build fails. |
 | A new prop or value | Not exposed to PHP until it's added to `component.json`, on purpose. |
 
+## Backward compatibility
+
+PHP callers expect a call that works today to keep working, while `@wordpress/ui` keeps moving. The contract is the component name and its props; markup and class names aren't part of it.
+
+-   `php/<name>/contract.lock.json` records the props as of the last release. The build fails if a prop or value is removed, changes type or becomes required, unless a deprecation keeps old calls working. Update it with `npm run update-php-contracts --workspace @wordpress/ui`.
+-   `deprecations` in `component.json` map an old prop or value to its replacement, with a `_deprecated_argument()` notice: `{ "prop": "text", "replacement": "label", "since": "0.26.0" }`, or with a `value` for a renamed value.
+-   Strings React translates with `__()` are translated by PHP with `translate()`, in the same text domain. `_x()` and `_n()` aren't supported yet, and the build fails if their text reaches the markup.
+
 ## Follow-ups
 
 Kept out of this first step, as discussed in [#84036](https://github.com/WordPress/gutenberg/issues/84036):
 
--   A props contract and deprecations, so PHP calls keep working when React props change.
--   Translations, for components with built-in strings such as Notice's "Dismiss".
 -   Content and composition, starting with Card.
 -   Interactive components.
