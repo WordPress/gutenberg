@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Internal
+
+-   `withDispatch`: Accept action creators with typed arguments in the `mapDispatchToProps` types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+
 ## 10.57.0 (2026-10-07)
 
 ### Bug Fixes
