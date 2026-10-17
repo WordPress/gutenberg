@@ -10,6 +10,10 @@
 
 -   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
+### Bug Fixes
+
+-   Link: Preserve manually added attributes and HTML IDs when editing an existing inline link ([#84841](https://github.com/WordPress/gutenberg/pull/84841)).
+
 ## 5.57.0 (2026-10-07)
 
 ## 5.56.0 (2026-09-23)
