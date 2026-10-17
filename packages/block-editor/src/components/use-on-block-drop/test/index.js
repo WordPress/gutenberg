@@ -148,6 +148,37 @@ describe( 'onBlockDrop', () => {
 		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does nothing if the blocks are dropped between the dragged blocks', () => {
+		const targetRootClientId = '1';
+		const targetBlockIndex = 3;
+		const getBlockIndex = vi.fn( () => 1 );
+		const getClientIdsOfDescendants = () => [];
+		const moveBlocks = vi.fn();
+
+		const event = {
+			dataTransfer: {
+				getData() {
+					return JSON.stringify( {
+						type: 'block',
+						srcRootClientId: targetRootClientId,
+						srcClientIds: [ '2', '3', '4' ],
+					} );
+				},
+			},
+		};
+
+		const eventHandler = onBlockDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			getBlockIndex,
+			getClientIdsOfDescendants,
+			moveBlocks
+		);
+		eventHandler( event );
+
+		expect( moveBlocks ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing if the block is dropped as a child of itself', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;

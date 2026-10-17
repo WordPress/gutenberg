@@ -93,10 +93,12 @@ export function onBlockDrop(
 		if ( dropType === 'block' ) {
 			const sourceBlockIndex = getBlockIndex( sourceClientIds[ 0 ] );
 
-			// If the user is dropping to the same position, return early.
+			// If the user is dropping to the same position, including between
+			// the dragged blocks, return early.
 			if (
 				sourceRootClientId === targetRootClientId &&
-				sourceBlockIndex === targetBlockIndex
+				targetBlockIndex >= sourceBlockIndex &&
+				targetBlockIndex <= sourceBlockIndex + sourceClientIds.length
 			) {
 				return;
 			}
