@@ -13,6 +13,7 @@
 -   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
 -   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
 -   `BlockType`: Add the documented `transforms.ungroup` callback to the type ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
+-   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
 
 ## 16.2.0 (2026-10-07)
 
