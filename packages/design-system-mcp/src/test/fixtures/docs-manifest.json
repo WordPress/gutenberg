@@ -1,0 +1,26 @@
+{
+	"v": 0,
+	"docs": {
+		"design-system-patterns-destructive-actions--docs": {
+			"id": "design-system-patterns-destructive-actions--docs",
+			"name": "Docs",
+			"path": "./stories/design-system/patterns/destructive-actions.mdx",
+			"title": "Design System/Patterns/Destructive Actions",
+			"content": "import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title=\"Design System/Patterns/Destructive Actions\" tags={ [ 'manifest' ] } />\n\n# Destructive Actions\n\nHow to present actions that remove or delete content.\n\n## Decision Tree\n\nGuidance.\n"
+		},
+		"design-system-patterns-error-messages--docs": {
+			"id": "design-system-patterns-error-messages--docs",
+			"name": "Docs",
+			"path": "./stories/design-system/patterns/error-messages.mdx",
+			"title": "Design System/Patterns/Error Messages",
+			"content": "# Error Messages\n\nHow to write an error message.\n"
+		},
+		"design-system-introduction--docs": {
+			"id": "design-system-introduction--docs",
+			"name": "Docs",
+			"path": "./stories/design-system/introduction.mdx",
+			"title": "Design System/Introduction",
+			"content": "# Introduction\n\nNot a pattern.\n"
+		}
+	}
+}
