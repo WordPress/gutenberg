@@ -35,13 +35,15 @@ export function useInBetweenInserter() {
 	const { showInsertionPoint, hideInsertionPoint } =
 		useDispatch( blockEditorStore );
 
-	return useRefEffect(
+	return useRefEffect< HTMLElement >(
 		( node ) => {
 			if ( isInBetweenInserterDisabled ) {
 				return;
 			}
 
-			function onMouseMove( event ) {
+			function onMouseMove( event: MouseEvent ) {
+				// The text node check below returns before any element API is used.
+				const target = event.target as HTMLElement;
 				// openRef is the reference to the insertion point between blocks.
 				// If the reference is not set or the insertion point is already open, return.
 				if ( openRef === undefined || openRef.current ) {
@@ -49,7 +51,7 @@ export function useInBetweenInserter() {
 				}
 
 				// Ignore text nodes sometimes detected in FireFox.
-				if ( event.target.nodeType === event.target.TEXT_NODE ) {
+				if ( target.nodeType === target.TEXT_NODE ) {
 					return;
 				}
 
@@ -58,7 +60,7 @@ export function useInBetweenInserter() {
 				}
 
 				if (
-					! event.target.classList.contains(
+					! target.classList.contains(
 						'block-editor-block-list__layout'
 					)
 				) {
@@ -67,14 +69,11 @@ export function useInBetweenInserter() {
 				}
 
 				let rootClientId;
-				if (
-					! event.target.classList.contains( 'is-root-container' )
-				) {
-					const blockElement = !! event.target.getAttribute(
-						'data-block'
-					)
-						? event.target
-						: event.target.closest( '[data-block]' );
+				if ( ! target.classList.contains( 'is-root-container' ) ) {
+					const blockElement = !! target.getAttribute( 'data-block' )
+						? target
+						: // A nested layout is inside a block.
+							target.closest( '[data-block]' )!;
 					rootClientId = blockElement.getAttribute( 'data-block' );
 				}
 
@@ -100,7 +99,7 @@ export function useInBetweenInserter() {
 				// Use block refs, not the container's DOM children: a block
 				// can render its block props on an inner element.
 				const clientId = getBlockOrder( rootClientId ).find(
-					( childClientId ) => {
+					( childClientId: string ) => {
 						const blockEl = refsMap.get( childClientId );
 
 						if ( ! blockEl ) {
@@ -157,7 +156,8 @@ export function useInBetweenInserter() {
 					return;
 				}
 
-				const element = refsMap.get( clientId );
+				// The block was found through its element above.
+				const element = refsMap.get( clientId )!;
 
 				// Don't show the insertion point when the pointer sits beside
 				// the block rather than before it.
