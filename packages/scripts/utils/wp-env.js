@@ -23,7 +23,7 @@
  *
  * @param {(configDirectoryPath: string, customConfigPath?: string|null) => Promise<WPConfig>} loadConfig          The `loadConfig()` function from `@wordpress/env`.
  * @param {string}                                                                             configDirectoryPath Directory containing the `wp-env` config files.
- * @param {string|null}                                                                        [customConfigPath]  Absolute path to a custom config file, if any.
+ * @param {string|null}                                                                        [customConfigPath]  Path to a custom config file, if any, which `wp-env` resolves relative to the current working directory.
  *
  * @return {Promise<string|null>} Base URL, or null if no port is configured.
  */

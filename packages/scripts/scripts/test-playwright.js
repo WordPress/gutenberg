@@ -8,7 +8,7 @@ process.env.NODE_ENV = 'test';
 process.on( 'unhandledRejection', ( err ) => {
 	throw err;
 } );
-const { dirname, resolve } = require( 'node:path' );
+const { resolve } = require( 'node:path' );
 const { sync: spawn } = require( 'cross-spawn' );
 const {
 	fromConfigRoot,
@@ -101,19 +101,14 @@ function spawnProcess() {
 }
 
 if ( loadConfig && ! process.env.WP_BASE_URL ) {
-	// Like `wp-env --config`, resolve the path relative to the current working
-	// directory. It must be absolute for `loadConfig()`.
-	const customConfigPath = wpEnvConfig ? resolve( wpEnvConfig ) : null;
-	getTestsBaseUrl(
-		loadConfig,
-		customConfigPath ? dirname( customConfigPath ) : resolve( '.' ),
-		customConfigPath
-	).then( ( baseUrl ) => {
-		if ( baseUrl ) {
-			process.env.WP_BASE_URL = baseUrl;
+	getTestsBaseUrl( loadConfig, resolve( '.' ), wpEnvConfig ).then(
+		( baseUrl ) => {
+			if ( baseUrl ) {
+				process.env.WP_BASE_URL = baseUrl;
+			}
+			spawnProcess();
 		}
-		spawnProcess();
-	} );
+	);
 } else {
 	spawnProcess();
 }
