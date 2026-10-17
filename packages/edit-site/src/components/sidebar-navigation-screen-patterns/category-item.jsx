@@ -5,10 +5,13 @@ export default function CategoryItem( {
 	icon,
 	id,
 	isActive,
+	isUserCategory = false,
 	label,
 	type,
 } ) {
-	if ( ! count ) {
+	// User-created categories stay listed even with no patterns, so they can be
+	// opened, renamed, or deleted. Everything else keeps hiding at zero.
+	if ( ! count && ! isUserCategory ) {
 		return;
 	}
 	const queryArgs = [ `postType=${ type }` ];

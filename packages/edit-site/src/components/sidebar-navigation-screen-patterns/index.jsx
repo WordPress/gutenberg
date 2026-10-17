@@ -30,6 +30,7 @@ function CategoriesGroup( {
 	patternViews,
 	templatePartCounts,
 	patternCounts,
+	userCategoryNames,
 	currentCategory,
 	currentType,
 } ) {
@@ -58,6 +59,7 @@ function CategoriesGroup( {
 				<CategoryItem
 					key={ view.slug }
 					count={ patternCounts[ view.slug ] }
+					isUserCategory={ userCategoryNames?.has( view.slug ) }
 					label={ view.title }
 					icon={ file }
 					id={ view.slug }
@@ -115,6 +117,19 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 		return counts;
 	}, [ patternCategories ] );
 
+	// User-created categories are the ones carrying an `id`; theme/core
+	// categories and the built-in "All patterns"/"My patterns" groups have
+	// none. They stay listed even with zero patterns so they remain reachable.
+	const userCategoryNames = useMemo(
+		() =>
+			new Set(
+				patternCategories
+					.filter( ( cat ) => cat.id )
+					.map( ( cat ) => cat.name )
+			),
+		[ patternCategories ]
+	);
+
 	const hasPatterns = patternCounts[ PATTERN_DEFAULT_CATEGORY ] > 0;
 
 	return (
@@ -140,6 +155,7 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 								patternViews={ patternViews }
 								templatePartCounts={ templatePartCounts }
 								patternCounts={ patternCounts }
+								userCategoryNames={ userCategoryNames }
 								currentCategory={ currentCategory }
 								currentType={ postType }
 							/>
