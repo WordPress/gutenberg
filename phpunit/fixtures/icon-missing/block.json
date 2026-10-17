@@ -1,0 +1,9 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "my-plugin/icon-missing",
+	"title": "Icon Missing",
+	"category": "text",
+	"icon": "file:./does-not-exist.svg",
+	"textdomain": "my-plugin"
+}

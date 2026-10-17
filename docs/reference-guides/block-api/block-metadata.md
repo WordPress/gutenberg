@@ -203,7 +203,7 @@ The `allowedBlocks` specifies which block types can be the direct children of th
 
 ### Icon
 
--   Type: `string`
+-   Type: `string` \| `object`
 -   Optional
 -   Localized: No
 -   Property: `icon`
@@ -212,9 +212,29 @@ The `allowedBlocks` specifies which block types can be the direct children of th
 { "icon": "smile" }
 ```
 
-An icon property should be specified to make it easier to identify a block. These can be any of [WordPress' Dashicons](https://developer.wordpress.org/resource/dashicons/) (slug serving also as a fallback in non-js contexts).
+```json
+{ "icon": "file:./assets/icon.svg" }
+```
 
-**Note:** It's also possible to override this property on the client-side with the source of the SVG element. In addition, this property can be defined with JavaScript as an object containing background and foreground colors. These colors will appear with the icon when they are applicable e.g.: in the inserter. Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
+```json
+{
+	"icon": {
+		"src": "file:./assets/icon.svg",
+		"background": "#ff0000",
+		"foreground": "#ffffff"
+	}
+}
+```
+
+An icon property should be specified to make it easier to identify a block. The value can be:
+
+-   A **Dashicon slug** (e.g., `"smile"`) — an icon from the default [Dashicons](https://developer.wordpress.org/resource/dashicons/) set.
+-   A **file path** prefixed with `file:` (e.g., `"file:./assets/icon.svg"`) — an SVG file path relative to the block.json file. The SVG content is resolved at build time (when using `@wordpress/scripts`) or at registration time on the server.
+-   An **object** with `src`, `background`, `foreground`, and `shadowColor` properties. The `src` property accepts the same value types (Dashicon slug or `file:` path).
+
+Custom SVG icons are automatically wrapped in the [wp.primitives.SVG](/packages/primitives/README.md) component to add accessibility attributes (aria-hidden, role, and focusable).
+
+**Note:** It's also possible to override this property on the client-side with the source of an SVG element via JavaScript (e.g., using `registerBlockType`).
 
 ### Description
 
