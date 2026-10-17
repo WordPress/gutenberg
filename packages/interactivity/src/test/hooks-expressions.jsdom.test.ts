@@ -1,8 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-
-/**
- * Internal dependencies
- */
 import { getEvaluate, splitStatements } from '../hooks';
 import { store } from '../store';
 import { resetScope } from '../scopes';
@@ -285,7 +281,8 @@ describe( 'Interactivity API', () => {
 		it( 'should allow direct state mutation without getContext/getState helpers', () => {
 			const result = evaluateExpr( 'state.count += 1; state.count' );
 			expect( result ).toBe( 6 );
-			expect( store( testNamespace ).state.count ).toBe( 6 );
+			const { state } = store( testNamespace );
+			expect( state ).toMatchObject( { count: 6 } );
 		} );
 
 		it( 'should allow direct context mutation without getContext helpers', () => {

@@ -21,8 +21,7 @@
 type ExpressionFn = ( ...args: any[] ) => any;
 
 const nonceAttribute = 'data-nonce';
-const root =
-	typeof document !== 'undefined' ? document.documentElement : null;
+const root = typeof document !== 'undefined' ? document.documentElement : null;
 const pageNonce = root?.getAttribute( nonceAttribute ) ?? null;
 
 const cspEnabled = pageNonce !== null;
@@ -35,13 +34,10 @@ if ( cspEnabled ) {
 		);
 	}
 	root!.removeAttribute( nonceAttribute );
-	policy = ( window as any ).trustedTypes?.createPolicy(
-		'wp-interactivity',
-		{
-			createHTML: ( html: string ) => html,
-			createScript: ( script: string ) => script,
-		}
-	);
+	policy = ( window as any ).trustedTypes?.createPolicy( 'wp-interactivity', {
+		createHTML: ( html: string ) => html,
+		createScript: ( script: string ) => script,
+	} );
 }
 
 export const prepareScript = (
@@ -80,7 +76,9 @@ export const compileExpression = (
 
 	const compiled = ( script as any ).x as ExpressionFn | undefined;
 	if ( ! compiled ) {
-		throw new Error( 'CSP blocked Interactivity API expression compilation.' );
+		throw new Error(
+			'CSP blocked Interactivity API expression compilation.'
+		);
 	}
 	compiledExpressions.set( source, compiled );
 	return compiled;
