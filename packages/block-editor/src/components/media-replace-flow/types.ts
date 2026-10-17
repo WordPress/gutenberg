@@ -21,7 +21,7 @@ export interface MediaReplaceFlowToggleProps {
  */
 interface MediaReplaceFlowBaseProps {
 	/** The URL of the media. */
-	mediaURL: string;
+	mediaURL?: string;
 	/** The Id of the attachment post type for the current media. */
 	mediaId?: number;
 	/** The Ids of the attachments of a gallery. */

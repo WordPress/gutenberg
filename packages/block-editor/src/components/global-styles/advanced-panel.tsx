@@ -5,16 +5,18 @@ import {
 import { Stack } from '@wordpress/ui';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import type { FocusEvent } from 'react';
 import { default as transformStyles } from '../../utils/transform-styles';
+import type { AdvancedPanelProps } from './types';
 
 /**
  * Validates that a CSS string doesn't contain HTML markup.
  * Uses the same validation as the PHP/global styles REST API.
  *
- * @param {string} css The CSS string to validate.
- * @return {boolean} True if the CSS is valid, false otherwise.
+ * @param css The CSS string to validate.
+ * @return True if the CSS is valid, false otherwise.
  */
-export function validateCSS( css ) {
+export function validateCSS( css: string ): boolean {
 	// Check for HTML markup.
 	if ( typeof css === 'string' && /<\/?\w/.test( css ) ) {
 		return false;
@@ -25,10 +27,10 @@ export function validateCSS( css ) {
 /**
  * Returns the error message string if the CSS contains HTML markup, or null if it is clean.
  *
- * @param {string} css The CSS string to check.
- * @return {string|null} An error message, or null if the CSS is valid.
+ * @param css The CSS string to check.
+ * @return An error message, or null if the CSS is valid.
  */
-function getMarkupValidationError( css ) {
+function getMarkupValidationError( css: string ): string | null {
 	return validateCSS( css )
 		? null
 		: __( 'The custom CSS is invalid. Do not use <> markup.' );
@@ -37,10 +39,10 @@ function getMarkupValidationError( css ) {
 /**
  * Full CSS validation: markup check first (fast), then a CSS parser (slower).
  *
- * @param {string} css The CSS string to validate.
- * @return {string|null} An error message, or null if the CSS is valid.
+ * @param css The CSS string to validate.
+ * @return An error message, or null if the CSS is valid.
  */
-function getCSSValidationError( css ) {
+function getCSSValidationError( css: string ): string | null {
 	if ( ! css ) {
 		return null;
 	}
@@ -62,7 +64,7 @@ export default function AdvancedPanel( {
 	onChange,
 	inheritedValue,
 	help,
-} ) {
+}: AdvancedPanelProps ) {
 	// Custom CSS. Prefer the local override in `value` (scoped to the
 	// currently selected style state); when there isn't one, fall back to
 	// `inheritedValue` (e.g. the theme.json + user merged CSS for that same
@@ -71,7 +73,8 @@ export default function AdvancedPanel( {
 	// `undefined`, so the textarea doesn't retain a previous state's
 	// uncontrolled DOM value when switching between style states.
 	const hasOwnCSS = typeof value?.css === 'string' && value.css.trim() !== '';
-	const customCSS = ( hasOwnCSS ? value.css : inheritedValue?.css ) ?? '';
+	// A value has its own CSS here.
+	const customCSS = ( hasOwnCSS ? value!.css : inheritedValue?.css ) ?? '';
 	const [ cssError, setCSSError ] = useState( () =>
 		getCSSValidationError( customCSS )
 	);
@@ -94,7 +97,7 @@ export default function AdvancedPanel( {
 		setCSSError( getCSSValidationError( customCSS ) );
 	}, [ customCSS ] );
 
-	function handleOnChange( newValue ) {
+	function handleOnChange( newValue: string ) {
 		ownValueRef.current = newValue;
 		onChange( {
 			...value,
@@ -103,7 +106,7 @@ export default function AdvancedPanel( {
 
 		setCSSError( getMarkupValidationError( newValue ) );
 	}
-	function handleOnBlur( event ) {
+	function handleOnBlur( event: FocusEvent< HTMLTextAreaElement > ) {
 		const newValue = event?.target?.value;
 		ownValueRef.current = newValue;
 		setCSSError( getCSSValidationError( newValue ) );

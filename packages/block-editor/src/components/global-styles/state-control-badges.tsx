@@ -2,8 +2,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { info } from '@wordpress/icons';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Infotip pattern; Popover is not allowlisted yet (same as widget-header-infotip).
 import { Badge, Icon, Popover, Stack, VisuallyHidden } from '@wordpress/ui';
+import type { StateControlBadgesProps, StyleStateOption } from './types';
 
-function getSummaryDescription( selectedViewport, selectedPseudoState ) {
+function getSummaryDescription(
+	selectedViewport: StyleStateOption | undefined,
+	selectedPseudoState: StyleStateOption | undefined
+) {
 	if ( selectedViewport && selectedPseudoState ) {
 		return sprintf(
 			/* translators: 1: viewport name, e.g. "Tablet". 2: pseudo state name, e.g. "Hover". */
@@ -40,8 +44,8 @@ export default function StateControlBadges( {
 	viewportValue = 'default',
 	pseudoStateValue = 'default',
 	className = 'block-editor-global-styles-state-control__badges',
-} ) {
-	const activeStates = [];
+}: StateControlBadgesProps ) {
+	const activeStates: { key: string; label: string }[] = [];
 	const selectedViewport = viewportStates.find(
 		( state ) => state.value === viewportValue
 	);

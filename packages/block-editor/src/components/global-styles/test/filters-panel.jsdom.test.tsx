@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
 import FiltersPanel from '../filters-panel';
 
 globalThis.wpVitest.mockMatchMedia();
@@ -145,7 +146,8 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 			'.block-editor-global-styles-filters-panel__dropdown-toggle'
 		);
 		expect( toggle ).not.toBeNull();
-		await user.click( toggle );
+		// Checked above.
+		await user.click( toggle! );
 
 		// The popover content is portalled to `document.body`, so it
 		// is queried directly. The `DuotonePicker` is rendered with
@@ -157,7 +159,8 @@ describe( 'FiltersPanel — visual treatment and display-without-commit', () => 
 			'.components-circular-option-picker__option[aria-selected="true"]'
 		);
 		expect( presetButton ).not.toBeNull();
-		await user.click( presetButton );
+		// Checked above.
+		await user.click( presetButton! );
 
 		// The interceptor commits the inherited duotone value rather
 		// than clearing the slot.
@@ -219,7 +222,7 @@ const duplicateSettings = {
 	},
 };
 
-async function openDuotone( user ) {
+async function openDuotone( user: UserEvent ) {
 	await user.click( screen.getByRole( 'button', { name: /duotone/i } ) );
 }
 

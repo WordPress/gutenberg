@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useSelect } from '@wordpress/data';
 import { useResolvedStyle } from '../inherited-value-context';
@@ -17,6 +18,7 @@ vi.mock( import( '@wordpress/data' ), () => ( {
 	combineReducers: vi.fn( ( reducers ) => reducers ),
 } ) );
 
+// @ts-expect-error The stub provides only the store descriptor.
 vi.mock( import( '../../../store' ), () => ( {
 	store: { name: 'core/block-editor' },
 } ) );
@@ -24,23 +26,30 @@ vi.mock( import( '../../../store' ), () => ( {
 // `inherited-value-context.jsx` imports the blocks store for
 // `useVariationAndElements`. Its real import chain needs data-module exports
 // the stub above does not provide, so stub the blocks module too.
+// @ts-expect-error The stub provides only what the hook needs.
 vi.mock( import( '@wordpress/blocks' ), () => ( {
 	store: { name: 'core/blocks' },
-	getBlockType: ( blockName ) =>
+	getBlockType: ( blockName: string ) =>
 		( { 'core/heading': { title: 'Heading' } } )[ blockName ],
 } ) );
 
+// @ts-expect-error The stub returns `null` for no match, unlike the real helper.
 vi.mock( import( '../../../hooks/block-style-variation' ), () => ( {
-	getVariationNameFromClass: ( className ) => {
+	getVariationNameFromClass: ( className: string ) => {
 		const match = /is-style-([\w-]+)/.exec( className || '' );
 		return match ? match[ 1 ] : null;
 	},
 } ) );
 
+// The mocked hook returns what each test sets up.
+const mockedUseSelect = useSelect as unknown as Mock<
+	( mapSelect: ( select: unknown ) => unknown ) => unknown
+>;
+
 describe( 'useResolvedStyle with the indicator experiment off', () => {
 	beforeEach( () => {
-		useSelect.mockReset();
-		useSelect.mockImplementation( ( mapSelect ) =>
+		mockedUseSelect.mockReset();
+		mockedUseSelect.mockImplementation( ( mapSelect ) =>
 			mapSelect( () => ( {
 				getSettings: () => ( {
 					// Root, block and element layers, all three of

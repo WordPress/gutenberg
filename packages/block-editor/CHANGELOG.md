@@ -83,6 +83,7 @@
 -   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
 -   Convert the block toolbar, switcher, mover, preview and settings menu to TypeScript ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
 -   Convert the grid item tools, ChildLayoutControl and the layout hooks to TypeScript ([#84985](https://github.com/WordPress/gutenberg/pull/84985)).
+-   Convert the color, background and filters global styles panels to TypeScript ([#84986](https://github.com/WordPress/gutenberg/pull/84986)).
 
 ## 18.1.0 (2026-10-07)
 
