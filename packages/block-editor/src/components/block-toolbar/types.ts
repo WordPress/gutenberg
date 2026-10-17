@@ -103,3 +103,11 @@ export interface ClientIdProps {
 	/** Client ID of the selected block. */
 	clientId: string;
 }
+
+/**
+ * The metadata attribute of a block inserted from a pattern.
+ */
+export interface PatternMetadata {
+	categories?: Array< string | number >;
+	patternName?: string;
+}
