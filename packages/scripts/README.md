@@ -523,7 +523,7 @@ To do so, you can add a file called `playwright.config.ts` or `playwright.config
 
 #### Test Environment
 
-The tests run against the site at the URL passed with the `--base-url` option, or else at the `WP_BASE_URL` environment variable. When neither is set and [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env) is installed, they run against the `wp-env` environment configured in the current directory: its tests environment if the config enables one, and otherwise its development environment. As with `wp-env start`, the port comes from `.wp-env.json` merged with `.wp-env.override.json` and any `WP_ENV_*` environment variables, so each project can have its own ports. Without either, the tests run against `http://localhost:8889`.
+The tests run against the site at the `WP_BASE_URL` environment variable. When it is not set and [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env) is installed, they run against the `wp-env` environment configured in the current directory: its tests environment if the config enables one, and otherwise its development environment. As with `wp-env start`, the port comes from `.wp-env.json` merged with `.wp-env.override.json` and any `WP_ENV_*` environment variables, so each project can have its own ports. Without either, the tests run against `http://localhost:8889`.
 
 If you start the environment for the tests from a custom config file with `wp-env --config`, pass the same file with `--wp-env-config`. Its path is resolved relative to the current directory, as with `wp-env --config`, and its override file is merged in too, for example `.wp-env.test.override.json` for `.wp-env.test.json`:
 
@@ -534,12 +534,6 @@ If you start the environment for the tests from a custom config file with `wp-en
 		"test:e2e": "wp-scripts test-e2e --wp-env-config .wp-env.test.json"
 	}
 }
-```
-
-To run the tests against another site, such as one served by an environment other than `wp-env`, pass its URL with `--base-url`. It takes precedence over `WP_BASE_URL` and over any `wp-env` config, including one passed with `--wp-env-config`, so it can be appended to a script which already passes that option:
-
-```bash
-npm run test:e2e -- --base-url=http://localhost:8080
 ```
 
 #### Failed Test Artifacts
