@@ -14,6 +14,8 @@
 
 -   `useConstrainedTabbing`: Retain focus when the constrained area has no tabbable elements ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
 -   `useFixedWindowList`: Accept a ref whose element is not set yet ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
+-   `useMergeRefs`: Accept disabled refs and object refs that start `undefined` ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
+-   `useDebounce`: Accept partial options ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
 
 ### Internal
 
