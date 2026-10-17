@@ -6,6 +6,7 @@ import {
 import { applyFilters } from '@wordpress/hooks';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import type { RichTextEventListener } from '../types';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
@@ -13,13 +14,11 @@ const { subscribeOwnedListener } = unlock( richTextPrivateApis );
  * When typing over a selection, the selection will we wrapped by a matching
  * character pair. The second character is optional, it defaults to the first
  * character.
- *
- * @type {string[]} Array of character pairs.
  */
-const wrapSelectionSettings = [ '`', '"', "'", '“”', '‘’' ];
+const wrapSelectionSettings: string[] = [ '`', '"', "'", '“”', '‘’' ];
 
-export default ( props ) => ( element ) => {
-	function onInput( event ) {
+const beforeInputRules: RichTextEventListener = ( props ) => ( element ) => {
+	function onInput( event: InputEvent ) {
 		const { inputType, data } = event;
 		const { value, onChange, registry } = props.current;
 
@@ -32,10 +31,13 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const pair = applyFilters(
-			'blockEditor.wrapSelectionSettings',
-			wrapSelectionSettings
-		).find(
+		// Filters are untyped.
+		const pair = (
+			applyFilters(
+				'blockEditor.wrapSelectionSettings',
+				wrapSelectionSettings
+			) as string[]
+		 ).find(
 			( [ startChar, endChar ] ) => startChar === data || endChar === data
 		);
 
@@ -44,8 +46,9 @@ export default ( props ) => ( element ) => {
 		}
 
 		const [ startChar, endChar = startChar ] = pair;
-		const start = value.start;
-		const end = value.end + startChar.length;
+		// A selection is not collapsed without both ends.
+		const start = value.start!;
+		const end = value.end! + startChar.length;
 
 		let newValue = insert( value, startChar, start, start );
 		newValue = insert( newValue, endChar, end, end );
@@ -59,16 +62,19 @@ export default ( props ) => ( element ) => {
 		onChange( newValue );
 		__unstableMarkAutomaticChange();
 
-		const init = {};
+		const init: InputEventInit = {};
 
 		for ( const key in event ) {
-			init[ key ] = event[ key ];
+			// Copies the event's own properties, which the init dictionary shares.
+			( init as Record< string, unknown > )[ key ] =
+				event[ key as keyof InputEvent ];
 		}
 
 		init.data = endChar;
 
 		const { ownerDocument } = element;
-		const { defaultView } = ownerDocument;
+		// The element is in a document with a window.
+		const defaultView = ownerDocument.defaultView!;
 		const newEvent = new defaultView.InputEvent( 'input', init );
 
 		// Dispatch an `input` event with the new data. This will trigger the
@@ -87,3 +93,5 @@ export default ( props ) => ( element ) => {
 
 	return subscribeOwnedListener( element, 'beforeinput', onInput, true );
 };
+
+export default beforeInputRules;

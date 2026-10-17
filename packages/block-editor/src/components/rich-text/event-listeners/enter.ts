@@ -5,15 +5,16 @@ import {
 } from '@wordpress/rich-text';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { unlock } from '../../../lock-unlock';
+import type { RichTextEventListener } from '../types';
 
 const { subscribeOwnedListener, ownsSelection } = unlock( richTextPrivateApis );
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
-export default ( props ) => ( element ) => {
+const enter: RichTextEventListener = ( props ) => ( element ) => {
 	// Enter is handled on beforeinput: the input type tells a paragraph
 	// break from a line break. The iOS keyboard sends Return with the
 	// shift key down while it shows capitals, so the key event cannot.
-	function onBeforeInput( event ) {
+	function onBeforeInput( event: InputEvent ) {
 		const { inputType } = event;
 		if (
 			inputType !== 'insertParagraph' &&
@@ -41,7 +42,10 @@ export default ( props ) => ( element ) => {
 
 		// Flagged for the writing flow, which handles the event otherwise.
 		if ( inputType === 'insertParagraph' && onReplace && onSplit ) {
-			event.__deprecatedOnSplit = true;
+			// The writing flow reads the flag off the event.
+			(
+				event as InputEvent & { __deprecatedOnSplit?: boolean }
+			 ).__deprecatedOnSplit = true;
 		}
 
 		if ( inputType === 'insertLineBreak' ) {
@@ -70,7 +74,8 @@ export default ( props ) => ( element ) => {
 			) {
 				registry.batch( () => {
 					const _value = { ...value };
-					_value.start = _value.end - 2;
+					// The selection is collapsed at the end.
+					_value.start = _value.end! - 2;
 					onChange( remove( _value ) );
 					onSplitAtDoubleLineEnd();
 				} );
@@ -80,7 +85,7 @@ export default ( props ) => ( element ) => {
 		}
 	}
 
-	function onDefaultBeforeInput( event ) {
+	function onDefaultBeforeInput( event: InputEvent ) {
 		if (
 			event.defaultPrevented ||
 			( event.inputType !== 'insertParagraph' &&
@@ -121,3 +126,5 @@ export default ( props ) => ( element ) => {
 		unsubscribeBeforeInput();
 	};
 };
+
+export default enter;

@@ -11,6 +11,7 @@ import { dragStart } from './drag-and-drop';
 import _delete from './delete';
 import enter from './enter';
 import firefoxCompat from './firefox-compat';
+import type { RichTextEventListenerProps } from '../types';
 
 const allEventListeners = [
 	beforeInputRules,
@@ -26,7 +27,7 @@ const allEventListeners = [
 	firefoxCompat,
 ];
 
-export function useEventListeners( props ) {
+export function useEventListeners( props: RichTextEventListenerProps ) {
 	const propsRef = useRef( props );
 	useInsertionEffect( () => {
 		propsRef.current = props;
@@ -39,7 +40,7 @@ export function useEventListeners( props ) {
 	const dropEffect = useMemo( () => drop( propsRef ), [ propsRef ] );
 
 	return useRefEffect(
-		( element ) => {
+		( element: HTMLElement ) => {
 			const cleanups = [
 				dropEffect,
 				...( props.isSelected ? refEffects : [] ),

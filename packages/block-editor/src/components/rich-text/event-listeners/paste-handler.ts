@@ -8,32 +8,43 @@ import {
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
+import type { RefObject } from 'react';
 import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
 import { unlock } from '../../../lock-unlock';
 import { getDropPasteProps, isTextDrop } from './drag-and-drop';
+import type {
+	RichTextEventListener,
+	RichTextEventListenerProps,
+} from '../types';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 const { ownsSelection } = unlock( richTextPrivateApis );
-
-/** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
 /**
  * Creates the paste listener of a field, which also inserts text dropped on
  * it.
  *
- * @param {Object}      props   Rich text props.
- * @param {HTMLElement} element The field.
+ * @param props   Rich text props.
+ * @param element The field.
  *
- * @return {(event: Event) => void} The listener.
+ * @return The listener.
  */
-export function createPasteListener( props, element ) {
-	return function _onPaste( event ) {
+export function createPasteListener(
+	props: RefObject< RichTextEventListenerProps >,
+	element: HTMLElement
+) {
+	return function _onPaste( event: ClipboardEvent | DragEvent ) {
 		// A drop pastes at the drop point.
 		const pasteProps =
 			event.type === 'drop'
-				? getDropPasteProps( props.current, element, event )
+				? // The drop props are the field props, positioned at the drop.
+					( getDropPasteProps(
+						props.current,
+						element,
+						event as DragEvent
+					) as RichTextEventListenerProps | undefined )
 				: props.current;
 
 		if ( ! pasteProps ) {
@@ -59,7 +70,7 @@ export function createPasteListener( props, element ) {
 		// the event targets the wrapper instead; the element then owns the
 		// paste when it contains the selection.
 		if (
-			! element.contains( event.target ) &&
+			! element.contains( event.target as Node | null ) &&
 			! ownsSelection( element )
 		) {
 			return;
@@ -69,8 +80,13 @@ export function createPasteListener( props, element ) {
 			return;
 		}
 
-		const { clipboardData = event.dataTransfer } = event;
-		const pasteData = getPasteEventData( { clipboardData } );
+		// A drop carries its data in `dataTransfer`.
+		const { clipboardData = ( event as DragEvent ).dataTransfer } =
+			event as ClipboardEvent;
+		// Missing clipboard data throws inside, which returns undefined.
+		const pasteData = getPasteEventData( {
+			clipboardData: clipboardData as DataTransfer,
+		} );
 
 		// Some browsers don't support `clipboardData` and paste plain text on
 		// their own, so the event has to be left alone for them.
@@ -80,7 +96,12 @@ export function createPasteListener( props, element ) {
 
 		event.preventDefault();
 
-		const { plainText, html, files } = pasteData;
+		// The text is only missing with files, which return below.
+		const { plainText, html, files } = pasteData as {
+			plainText: string;
+			html: string;
+			files: File[];
+		};
 
 		// Rich text can only paste text; files are placed by the writing flow.
 		if ( files.length ) {
@@ -98,9 +119,10 @@ export function createPasteListener( props, element ) {
 			return;
 		}
 
-		const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
+		// Pasting without clipboard data returned above.
+		const isInternal = clipboardData!.getData( 'rich-text' ) === 'true';
 
-		function pasteInline( content ) {
+		function pasteInline( content: string ) {
 			const transformed = formatTypes.reduce(
 				( accumulator, { __unstablePasteRule } ) => {
 					// Only allow one transform.
@@ -139,7 +161,7 @@ export function createPasteListener( props, element ) {
 			return;
 		}
 
-		let mode = 'INLINE';
+		let mode: 'INLINE' | 'BLOCKS' = 'INLINE';
 
 		const trimmedPlainText = plainText.trim();
 
@@ -157,7 +179,9 @@ export function createPasteListener( props, element ) {
 			HTML: html,
 			plainText,
 			mode,
-			tagName,
+			// Fields render HTML tags.
+			tagName: tagName as string,
+			// @ts-expect-error The paste handler ignores `preserveWhiteSpace`.
 			preserveWhiteSpace,
 		} );
 
@@ -183,42 +207,46 @@ export function createPasteListener( props, element ) {
 	};
 }
 
-export default ( props ) => ( element ) => {
-	const { defaultView } = element.ownerDocument;
+const pasteHandlerListener: RichTextEventListener =
+	( props ) => ( element ) => {
+		const { defaultView } = element.ownerDocument;
 
-	// Attach the listener to the window so parent elements have the chance to
-	// prevent the default behavior.
-	return subscribeDelegatedListener(
-		defaultView,
-		'paste',
-		createPasteListener( props, element )
-	);
-};
+		// Attach the listener to the window so parent elements have the chance to
+		// prevent the default behavior.
+		return subscribeDelegatedListener(
+			defaultView,
+			'paste',
+			createPasteListener( props, element )
+		);
+	};
+
+export default pasteHandlerListener;
 
 /**
  * Inserts text dropped on the field the way the field would on paste, as one
  * undo level.
  *
- * @param {Object} props Rich text props.
+ * @param props Rich text props.
  */
-export const drop = ( props ) => ( element ) => {
+export const drop: RichTextEventListener = ( props ) => ( element ) => {
 	const { ownerDocument } = element;
 	const onPaste = createPasteListener( props, element );
 
 	// The block drop zones cancel every drag over them, which hides the
 	// browser's drop caret and shows the block insertion point instead. An
 	// empty field keeps the drop zone, which shows the block is replaced.
-	function onDragOver( event ) {
+	function onDragOver( event: DragEvent ) {
 		if (
 			element.isContentEditable &&
 			! isEmpty( props.current.getValue() ) &&
-			isTextDrop( ownerDocument, event.dataTransfer )
+			// Drag events carry a data transfer.
+			isTextDrop( ownerDocument, event.dataTransfer! )
 		) {
 			event.stopPropagation();
 		}
 	}
 
-	function onDrop( event ) {
+	function onDrop( event: DragEvent ) {
 		props.current.registry.batch( () => onPaste( event ) );
 	}
 

@@ -4,6 +4,12 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
+import type {
+	Block,
+	BlockInputTransform,
+	BlockPrefixTransform,
+	NormalizedBlockTransform,
+} from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../../store';
 import { preventEventDiscovery } from '../prevent-event-discovery';
 import {
@@ -11,10 +17,13 @@ import {
 	START_OF_SELECTED_AREA,
 } from '../../../utils/selection';
 import { unlock } from '../../../lock-unlock';
+import type { RichTextEventListener } from '../types';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
-export function findSelection( blocks ) {
+export function findSelection(
+	blocks: Block[]
+): [ string, string, number, number ] | [] {
 	let i = blocks.length;
 
 	while ( i-- ) {
@@ -23,9 +32,10 @@ export function findSelection( blocks ) {
 		);
 
 		if ( attributeKey ) {
-			blocks[ i ].attributes[ attributeKey ] = blocks[ i ].attributes[
-				attributeKey
-			]
+			// The selected attribute holds the marker character.
+			blocks[ i ].attributes[ attributeKey ] = (
+				blocks[ i ].attributes[ attributeKey ] as string
+			 )
 				// To do: refactor this to use rich text's selection instead, so
 				// we no longer have to use on this hack inserting a special
 				// character.
@@ -44,7 +54,7 @@ export function findSelection( blocks ) {
 	return [];
 }
 
-export default ( props ) => ( element ) => {
+const inputRules: RichTextEventListener = ( props ) => ( element ) => {
 	function inputRule() {
 		const { getValue, onReplace, selectionChange, registry } =
 			props.current;
@@ -57,7 +67,8 @@ export default ( props ) => ( element ) => {
 		// asynchronously.
 		const value = getValue();
 		const { start, text } = value;
-		const characterBefore = text.slice( start - 1, start );
+		// Input happens at a caret.
+		const characterBefore = text.slice( start! - 1, start );
 
 		// The character right before the caret must be a plain space.
 		if ( characterBefore !== ' ' ) {
@@ -66,7 +77,10 @@ export default ( props ) => ( element ) => {
 
 		const trimmedTextBefore = text.slice( 0, start ).trim();
 		const prefixTransforms = getBlockTransforms( 'from' ).filter(
-			( { type } ) => type === 'prefix'
+			(
+				transform
+			): transform is NormalizedBlockTransform< BlockPrefixTransform > =>
+				transform.type === 'prefix'
 		);
 		const transformation = findTransform(
 			prefixTransforms,
@@ -82,7 +96,8 @@ export default ( props ) => ( element ) => {
 		const content = toHTMLString( {
 			value: insert( value, START_OF_SELECTED_AREA, 0, start ),
 		} );
-		const block = transformation.transform( content );
+		// Prefix transforms define `transform` and return one block.
+		const block = transformation.transform!( content ) as Block;
 
 		// Batch so the undo history records the pre-transform selection,
 		// instead of the selection change here overwriting it first.
@@ -96,7 +111,7 @@ export default ( props ) => ( element ) => {
 		return true;
 	}
 
-	function onInput( event ) {
+	function onInput( event: InputEvent ) {
 		const { inputType, type } = event;
 		const {
 			getValue,
@@ -120,7 +135,10 @@ export default ( props ) => ( element ) => {
 
 		if ( onReplace ) {
 			const transforms = getBlockTransforms( 'from' ).filter(
-				( transform ) => transform.type === 'input'
+				(
+					transform
+				): transform is NormalizedBlockTransform< BlockInputTransform > =>
+					transform.type === 'input'
 			);
 			const transformation = findTransform( transforms, ( item ) =>
 				item.regExp.test( value.text )
@@ -180,3 +198,5 @@ export default ( props ) => ( element ) => {
 		unsubscribeCompositionEnd();
 	};
 };
+
+export default inputRules;
