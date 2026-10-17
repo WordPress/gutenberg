@@ -1,6 +1,7 @@
 import type {
 	ComponentType,
 	CSSProperties,
+	ElementType,
 	ReactNode,
 	Ref,
 	RefCallback,
@@ -137,7 +138,7 @@ export interface BlockListItemsProps {
 	rootClientId?: string | null;
 	/** A custom appender, or `false` for none. */
 	renderAppender?: ComponentType | false;
-	__experimentalAppenderTagName?: string;
+	__experimentalAppenderTagName?: ElementType;
 	layout?: Layout;
 }
 

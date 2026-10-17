@@ -7,8 +7,11 @@ import {
 	stretchFullWidth,
 } from '@wordpress/icons';
 import { VIEWMODES } from './constants';
+import type { CarouselNavigationProps, SetupToolbarProps } from './types';
 
-const Actions = ( { onBlockPatternSelect } ) => (
+const Actions = ( {
+	onBlockPatternSelect,
+}: Pick< SetupToolbarProps, 'onBlockPatternSelect' > ) => (
 	<div className="block-editor-block-pattern-setup__actions">
 		<Button
 			__next40pxDefaultSize
@@ -25,7 +28,7 @@ const CarouselNavigation = ( {
 	handleNext,
 	activeSlide,
 	totalSlides,
-} ) => (
+}: CarouselNavigationProps ) => (
 	<div className="block-editor-block-pattern-setup__navigation">
 		<Button
 			size="compact"
@@ -54,7 +57,7 @@ const SetupToolbar = ( {
 	activeSlide,
 	totalSlides,
 	onBlockPatternSelect,
-} ) => {
+}: SetupToolbarProps ) => {
 	const isCarouselView = viewMode === VIEWMODES.carousel;
 	const displayControls = (
 		<div className="block-editor-block-pattern-setup__display-controls">

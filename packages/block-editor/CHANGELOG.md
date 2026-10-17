@@ -91,6 +91,7 @@
 -   Convert the block inspector, inspector tabs, duotone and block hooks supports to TypeScript ([#85028](https://github.com/WordPress/gutenberg/pull/85028)).
 -   Convert the block list and `useBlockProps` to TypeScript ([#85029](https://github.com/WordPress/gutenberg/pull/85029)).
 -   Convert the block tools, block canvas and inner blocks to TypeScript ([#85030](https://github.com/WordPress/gutenberg/pull/85030)).
+-   Convert the appenders, inserter list items and pattern lists to TypeScript ([#85031](https://github.com/WordPress/gutenberg/pull/85031)).
 
 ## 18.1.0 (2026-10-07)
 
