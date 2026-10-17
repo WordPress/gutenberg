@@ -542,6 +542,17 @@ export function getSelectedNote( state ) {
 }
 
 /**
+ * Returns when the next server autosave is due.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {?number} Timestamp in milliseconds, or null when none is scheduled.
+ */
+export function getNextAutosaveTime( state ) {
+	return state.nextAutosaveTime;
+}
+
+/**
  * Returns whether the selected note should be focused.
  *
  * @param {Object} state Global application state.
