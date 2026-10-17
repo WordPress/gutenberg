@@ -1,5 +1,17 @@
-import type { MouseEvent, ReactNode, RefObject } from 'react';
-import type { Block, BlockCategory, BlockCollection } from '@wordpress/blocks';
+import type {
+	ComponentProps,
+	ElementType,
+	MouseEvent,
+	ReactNode,
+	RefObject,
+} from 'react';
+import type {
+	Block,
+	BlockCategory,
+	BlockCollection,
+	BlockTypeIconRender,
+} from '@wordpress/blocks';
+import type { Popover } from '@wordpress/components';
 import type {
 	BlockPattern,
 	InserterItem,
@@ -15,9 +27,18 @@ export interface InserterToggleRenderProps {
 	isOpen?: boolean;
 	blockTitle: string;
 	hasSingleBlockType?: boolean;
-	appenderLabel?: string;
-	toggleProps?: Record< string, unknown >;
+	appenderLabel?: string | null;
+	toggleProps?: InserterToggleProps;
 }
+
+/**
+ * Props the inserter passes on to its toggle button.
+ */
+export type InserterToggleProps = Record< string, unknown > & {
+	as?: ElementType;
+	label?: string;
+	onClick?: ( event: MouseEvent ) => void;
+};
 
 /**
  * A pattern category of the inserter.
@@ -58,7 +79,7 @@ export interface InserterConfig {
 	/** If set, insertion will be into this explicit position. */
 	insertionIndex?: number;
 	/** If set, insertion will be after the block with this ID. */
-	clientId?: string;
+	clientId?: string | null;
 	/** Whether the inserter is an appender or not. */
 	isAppender?: boolean;
 	/** Called after insertion. */
@@ -173,4 +194,92 @@ export interface PatternListProps {
 	patternCategories: PatternCategory[];
 	rootClientId?: string | null;
 	onModalClose: () => void;
+}
+
+export interface InserterPanelProps {
+	title?: ReactNode;
+	icon?: BlockTypeIconRender;
+	children?: ReactNode;
+}
+
+export interface BlockTypesTabPanelProps {
+	items: InserterItem[];
+	collections: Record< string, BlockCollection >;
+	categories: BlockCategory[];
+	onSelectItem: OnSelectInserterItem;
+	onHover: ( item: InserterItem | null ) => void;
+	showMostUsedBlocks?: boolean;
+	className?: string;
+}
+
+export interface BlockTypesTabProps {
+	rootClientId?: string | null;
+	onInsert: InsertBlocks;
+	onHover: ( item: InserterItem | null ) => void;
+	showMostUsedBlocks?: boolean;
+}
+
+export interface InserterSearchResultsProps {
+	filterValue: string;
+	onSelect?: InserterConfig[ 'onSelect' ];
+	onHover?: ( item: InserterItem | null ) => void;
+	onHoverPattern?: ( pattern: BlockPattern | null ) => void;
+	rootClientId?: string | null;
+	clientId?: string | null;
+	isAppender?: boolean;
+	__experimentalInsertionIndex?: number;
+	maxBlockPatterns?: number;
+	maxBlockTypes?: number;
+	showBlockDirectory?: boolean;
+	isDraggable?: boolean;
+	shouldFocusBlock?: boolean;
+	prioritizePatterns?: boolean;
+	selectBlockOnInsert?: boolean;
+	isQuick?: boolean;
+}
+
+export interface InserterMenuProps {
+	rootClientId?: string | null;
+	clientId?: string | null;
+	isAppender?: boolean;
+	__experimentalInsertionIndex?: number;
+	onSelect: ( blocks?: Block | Block[] ) => void;
+	showInserterHelpPanel?: boolean;
+	showMostUsedBlocks?: boolean;
+	__experimentalFilterValue?: string;
+	shouldFocusBlock?: boolean;
+	onPatternCategorySelection?: () => void;
+	onClose?: () => void;
+	__experimentalInitialTab?: string;
+	__experimentalInitialCategory?: PatternCategory | null;
+}
+
+export type InserterLibraryProps = Omit< InserterMenuProps, 'onSelect' > & {
+	onSelect?: InserterMenuProps[ 'onSelect' ];
+};
+
+export interface QuickInserterProps {
+	onSelect?: InserterConfig[ 'onSelect' ];
+	rootClientId?: string | null;
+	clientId?: string | null;
+	isAppender?: boolean;
+	selectBlockOnInsert?: boolean;
+	hasSearch?: boolean;
+}
+
+export interface InserterProps {
+	clientId?: string | null;
+	rootClientId?: string | null;
+	disabled?: boolean;
+	isAppender?: boolean;
+	position?: ComponentProps< typeof Popover >[ 'position' ];
+	selectBlockOnInsert?: boolean;
+	shouldDirectInsert?: boolean;
+	showInserterHelpPanel?: boolean;
+	__experimentalIsQuick?: boolean;
+	/** Called with the inserted block, or with nothing on close. */
+	onSelectOrClose?: ( block?: Block ) => void;
+	onToggle?: ( isOpen: boolean ) => void;
+	renderToggle?: ( props: InserterToggleRenderProps ) => ReactNode;
+	toggleProps?: InserterToggleProps;
 }

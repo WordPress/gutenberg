@@ -1,9 +1,4 @@
-import type {
-	ComponentProps,
-	ComponentType,
-	ForwardedRef,
-	RefAttributes,
-} from 'react';
+import type { ForwardedRef } from 'react';
 import type { Block } from '@wordpress/blocks';
 import clsx from 'clsx';
 import { Button } from '@wordpress/components';
@@ -11,15 +6,9 @@ import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-import UntypedInserter from '../inserter';
+import Inserter from '../inserter';
 import type { ButtonBlockAppenderProps } from './types';
 import type { InserterToggleRenderProps } from '../inserter/types';
-
-// The inserter is still JavaScript, so its inferred props are all required.
-type TypedInserter = ComponentType<
-	Partial< ComponentProps< typeof UntypedInserter > > &
-		RefAttributes< unknown >
->;
 
 function ButtonBlockAppender(
 	{
@@ -31,8 +20,6 @@ function ButtonBlockAppender(
 	}: ButtonBlockAppenderProps,
 	ref: ForwardedRef< HTMLButtonElement >
 ) {
-	// Read on render, like the JSX it replaces, as the imports are circular.
-	const Inserter = UntypedInserter as TypedInserter;
 	return (
 		<Inserter
 			position="bottom center"

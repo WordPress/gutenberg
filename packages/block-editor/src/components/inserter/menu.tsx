@@ -1,4 +1,6 @@
 import clsx from 'clsx';
+import type { ForwardedRef } from 'react';
+import type { Block } from '@wordpress/blocks';
 import {
 	forwardRef,
 	useState,
@@ -25,6 +27,8 @@ import { store as blockEditorStore } from '../../store';
 import TabbedSidebar from '../tabbed-sidebar';
 import { useZoomOut } from '../../hooks/use-zoom-out';
 import { unlock } from '../../lock-unlock';
+import type { InserterItem } from '../../store/types';
+import type { InserterMenuProps, PatternCategory } from './types';
 
 const NOOP = () => {};
 function InserterMenu(
@@ -42,8 +46,8 @@ function InserterMenu(
 		onClose,
 		__experimentalInitialTab,
 		__experimentalInitialCategory,
-	},
-	ref
+	}: InserterMenuProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const { isZoomOutMode, hasSectionRootClientId } = useSelect( ( select ) => {
 		const { isZoomOut, getSectionRootClientId } = unlock(
@@ -58,11 +62,15 @@ function InserterMenu(
 
 	const [ filterValue, setFilterValue, delayedFilterValue ] =
 		useDebouncedInput( __experimentalFilterValue );
-	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
-		__experimentalInitialCategory
+	const [ hoveredItem, setHoveredItem ] = useState< InserterItem | null >(
+		null
 	);
-	const [ patternFilter, setPatternFilter ] = useState( 'all' );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState<
+		PatternCategory | null | undefined
+	>( __experimentalInitialCategory );
+	const [ patternFilter, setPatternFilter ] = useState< string | undefined >(
+		'all'
+	);
 	const isLargeViewport = useViewportMatch( 'large' );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const maybeCloseInserter = isMobileViewport ? onClose : NOOP;
@@ -95,10 +103,15 @@ function InserterMenu(
 			shouldFocusBlock,
 		} );
 	const { hideInsertionPoint } = useDispatch( blockEditorStore );
-	const blockTypesTabRef = useRef();
+	const blockTypesTabRef = useRef< HTMLDivElement >( null );
 
 	const onInsert = useCallback(
-		( blocks, meta, shouldForceFocusBlock, _rootClientId ) => {
+		(
+			blocks: Block | Block[],
+			meta?: Record< string, unknown > | null,
+			shouldForceFocusBlock?: boolean,
+			_rootClientId?: string | null
+		) => {
 			// The cue points at a position that no longer exists once the
 			// blocks are inserted, so clear it regardless of what showed it.
 			hideInsertionPoint();
@@ -109,6 +122,7 @@ function InserterMenu(
 				_rootClientId
 			);
 			onSelect( blocks );
+			// @ts-expect-error Bug: this throws on mobile without `onClose`.
 			maybeCloseInserter();
 
 			// Check for focus loss due to filtering blocks by selected block type
@@ -116,10 +130,12 @@ function InserterMenu(
 				if (
 					! shouldFocusBlock &&
 					! blockTypesTabRef.current?.contains(
+						// @ts-expect-error Bug: a callback ref has no `current`.
 						ref.current.ownerDocument.activeElement
 					)
 				) {
 					// There has been a focus loss, so focus the first button in the block types tab
+					// @ts-expect-error Bug: the tab has no button when it shows no results.
 					blockTypesTabRef.current?.querySelector( 'button' ).focus();
 				}
 			} );
@@ -135,17 +151,26 @@ function InserterMenu(
 	);
 
 	const onInsertPattern = useCallback(
-		( blocks, patternName, ...args ) => {
+		(
+			blocks: Block | Block[],
+			// The patterns state passes the pattern name in place of the meta.
+			patternName?: string | Record< string, unknown > | null,
+			...args: [
+				shouldForceFocusBlock?: boolean,
+				rootClientId?: string | null,
+			]
+		) => {
 			hideInsertionPoint();
 			onInsertBlocks( blocks, { patternName }, ...args );
 			onSelect();
+			// @ts-expect-error Bug: this throws on mobile without `onClose`.
 			maybeCloseInserter();
 		},
 		[ hideInsertionPoint, onInsertBlocks, maybeCloseInserter, onSelect ]
 	);
 
 	const onHover = useCallback(
-		( item ) => {
+		( item: InserterItem | null ) => {
 			onToggleInsertionPoint( item );
 			setHoveredItem( item );
 		},
@@ -153,7 +178,7 @@ function InserterMenu(
 	);
 
 	const onClickPatternCategory = useCallback(
-		( patternCategory, filter ) => {
+		( patternCategory: PatternCategory | undefined, filter?: string ) => {
 			setSelectedPatternCategory( patternCategory );
 			setPatternFilter( filter );
 			onPatternCategorySelection?.();
@@ -167,18 +192,22 @@ function InserterMenu(
 		!! selectedPatternCategory;
 
 	const [ isScrolled, setIsScrolled ] = useState( false );
-	const blocksPanelRef = useRef( null );
-	const patternsPanelRef = useRef( null );
-	const mediaPanelRef = useRef( null );
+	const blocksPanelRef = useRef< HTMLDivElement >( null );
+	const patternsPanelRef = useRef< HTMLDivElement >( null );
+	const mediaPanelRef = useRef< HTMLDivElement >( null );
 	useEffect( () => {
-		const handleScroll = ( event ) => {
-			setIsScrolled( event.currentTarget.scrollTop > 0 );
+		const handleScroll = ( event: Event ) => {
+			// The listener is on the panels.
+			setIsScrolled(
+				( event.currentTarget as HTMLElement ).scrollTop > 0
+			);
 		};
 		const panels = [
 			blocksPanelRef.current,
 			patternsPanelRef.current,
 			mediaPanelRef.current,
-		].filter( Boolean );
+			// The filter drops the panels that did not render.
+		].filter( Boolean ) as HTMLDivElement[];
 		panels.forEach( ( panel ) =>
 			panel.addEventListener( 'scroll', handleScroll )
 		);
@@ -288,7 +317,9 @@ function InserterMenu(
 					<PatternCategoryPreviews
 						rootClientId={ destinationRootClientId }
 						onInsert={ onInsertPattern }
-						category={ selectedPatternCategory }
+						// The panel shows only with a category selected.
+						category={ selectedPatternCategory as PatternCategory }
+						// @ts-expect-error The previews ignore `patternFilter`.
 						patternFilter={ patternFilter }
 						showTitlesAsTooltip
 					/>
@@ -313,7 +344,7 @@ function InserterMenu(
 		);
 	}, [ destinationRootClientId, onInsert ] );
 
-	const handleSetSelectedTab = ( value ) => {
+	const handleSetSelectedTab = ( value: string ) => {
 		// If no longer on patterns tab remove the category setting.
 		if ( value !== 'patterns' ) {
 			setSelectedPatternCategory( null );
@@ -322,14 +353,16 @@ function InserterMenu(
 	};
 
 	// Focus first active tab, if any
-	const tabsRef = useRef();
+	const tabsRef = useRef< HTMLDivElement >( null );
 	useLayoutEffect( () => {
 		if ( ! tabsRef.current ) {
 			return;
 		}
 		const frame = window.requestAnimationFrame( () => {
 			tabsRef.current
-				?.querySelector( '[role="tab"][aria-selected="true"]' )
+				?.querySelector< HTMLElement >(
+					'[role="tab"][aria-selected="true"]'
+				)
 				?.focus();
 		} );
 		return () => window.cancelAnimationFrame( frame );
@@ -347,6 +380,7 @@ function InserterMenu(
 				<TabbedSidebar
 					ref={ tabsRef }
 					onSelect={ handleSetSelectedTab }
+					// @ts-expect-error Bug: the close button throws without `onClose`.
 					onClose={ onClose }
 					selectedTab={ selectedTab }
 					closeButtonLabel={ __( 'Close Block Inserter' ) }
@@ -408,7 +442,10 @@ function InserterMenu(
 
 export const PrivateInserterMenu = forwardRef( InserterMenu );
 
-function PublicInserterMenu( props, ref ) {
+function PublicInserterMenu(
+	props: Omit< InserterMenuProps, 'onPatternCategorySelection' >,
+	ref: ForwardedRef< HTMLDivElement >
+) {
 	return (
 		<PrivateInserterMenu
 			{ ...props }

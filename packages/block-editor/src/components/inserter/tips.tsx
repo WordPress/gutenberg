@@ -1,9 +1,10 @@
+import type { ReactNode } from 'react';
 import { __, _x } from '@wordpress/i18n';
 import { createInterpolateElement, useState } from '@wordpress/element';
 import { tip } from '@wordpress/icons';
 import { Notice, VisuallyHidden } from '@wordpress/ui';
 
-function SlashKey( { children } ) {
+function SlashKey( { children }: { children?: ReactNode } ) {
 	return (
 		<>
 			<kbd aria-hidden="true">{ children }</kbd>
