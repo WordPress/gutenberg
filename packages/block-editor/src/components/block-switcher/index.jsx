@@ -12,8 +12,12 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
+import {
+	canConvertToCanvas,
+	useConvertToCanvas,
+} from '../grid/convert-to-canvas';
 import BlockTransformationsMenu from './block-transformations-menu';
 import { useBlockVariationTransforms } from './block-variation-transformations';
 import BlockStylesMenu from './block-styles-menu';
@@ -71,6 +75,8 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 		clientIds,
 		blocks,
 	} );
+	const registry = useRegistry();
+	const convertToCanvas = useConvertToCanvas();
 	function selectForMultipleBlocks( insertedBlocks ) {
 		if ( insertedBlocks.length > 1 ) {
 			multiSelect(
@@ -86,11 +92,28 @@ function BlockSwitcherDropdownMenuContents( { onClose, clientIds } ) {
 		selectForMultipleBlocks( newBlocks );
 	}
 	function onBlockVariationTransform( name ) {
-		updateBlockAttributes( blocks[ 0 ].clientId, {
-			...blockVariationTransformations.find(
-				( { name: variationName } ) => variationName === name
-			).attributes,
-		} );
+		const { attributes } = blockVariationTransformations.find(
+			( { name: variationName } ) => variationName === name
+		);
+		// A container switched to a manual placement grid keeps where its
+		// blocks are, unless they already have places in the grid.
+		const { clientId, innerBlocks } = blocks[ 0 ];
+		const isManualGrid =
+			attributes.layout?.type === 'grid' &&
+			attributes.layout?.isManualPlacement;
+		const hasPlacedBlocks = innerBlocks.some(
+			( { attributes: { style } } ) =>
+				style?.layout?.columnStart || style?.layout?.rowStart
+		);
+		if (
+			isManualGrid &&
+			! hasPlacedBlocks &&
+			canConvertToCanvas( registry.select, clientId ) &&
+			convertToCanvas( clientId, { attributes } )
+		) {
+			return;
+		}
+		updateBlockAttributes( clientId, { ...attributes } );
 	}
 	// Pattern transformation through the `Patterns` API.
 	function onPatternTransform( transformedBlocks ) {
