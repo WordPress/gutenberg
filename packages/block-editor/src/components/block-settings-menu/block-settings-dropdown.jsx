@@ -23,6 +23,12 @@ import { useNotifyCopy } from '../../utils/use-notify-copy';
 const POPOVER_PROPS = {
 	className: 'block-editor-block-settings-menu__popover',
 	placement: 'bottom-start',
+	shift: true,
+	resize: false,
+};
+
+const MENU_PROPS = {
+	style: { maxHeight: 'calc(100dvh - 16px)', overflow: 'auto' },
 };
 
 function CopyMenuItem( {
@@ -233,6 +239,7 @@ export function BlockSettingsDropdown( {
 						label={ __( 'Options' ) }
 						className="block-editor-block-settings-menu"
 						popoverProps={ POPOVER_PROPS }
+						menuProps={ MENU_PROPS }
 						noIcons
 						{ ...props }
 					>

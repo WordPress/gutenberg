@@ -637,6 +637,72 @@ test.describe( 'Widgets screen', () => {
 		await expect( listView ).toBeHidden();
 	} );
 
+	test( 'keeps legacy widget options inside the viewport', async ( {
+		page,
+		requestUtils,
+	} ) => {
+		const { instance } = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/widget-types/meta/encode',
+			data: { instance: {} },
+		} );
+		const widget = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/widgets',
+			data: { id_base: 'meta', sidebar: 'sidebar-1', instance },
+		} );
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/sidebars/sidebar-1',
+			data: { widgets: [ widget.id ] },
+		} );
+		await page.reload();
+		await page
+			.getByRole( 'document', { name: 'Block: Legacy Widget' } )
+			.focus();
+
+		for ( const viewport of [
+			{ width: 320, height: 667 },
+			{ width: 375, height: 667 },
+			{ width: 393, height: 852 },
+			{ width: 1280, height: 800 },
+			{ width: 375, height: 320 },
+		] ) {
+			await page.setViewportSize( viewport );
+			const optionsButton = page
+				.getByRole( 'toolbar', { name: 'Block tools' } )
+				.getByRole( 'button', { name: 'Options', exact: true } );
+			await optionsButton.press( 'Enter' );
+			const optionsMenu = page.getByRole( 'menu', {
+				name: 'Options',
+				exact: true,
+			} );
+			await expect( optionsMenu ).toBeVisible();
+			await expect
+				.poll( async () => ( await optionsMenu.boundingBox() ).x )
+				.toBeGreaterThanOrEqual( 0 );
+			await expect
+				.poll( async () => {
+					const { x, width: menuWidth } =
+						await optionsMenu.boundingBox();
+					return x + menuWidth;
+				} )
+				.toBeLessThanOrEqual( viewport.width );
+			await expect(
+				optionsMenu.getByRole( 'menuitem' ).first()
+			).toBeFocused();
+			await page.keyboard.press( 'ArrowUp' );
+			const deleteItem = optionsMenu.getByRole( 'menuitem', {
+				name: /^Delete\b/,
+			} );
+			await expect( deleteItem ).toBeFocused();
+			await expect( deleteItem ).toBeInViewport( { ratio: 1 } );
+			await page.keyboard.press( 'Escape' );
+			await expect( optionsMenu ).toBeHidden();
+			await expect( optionsButton ).toBeFocused();
+		}
+	} );
+
 	// Check for regressions of https://github.com/WordPress/gutenberg/issues/38002.
 	test( 'allows blocks to be added on mobile viewports', async ( {
 		page,
