@@ -15,6 +15,7 @@ import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import BlockPatternsPaging from '../block-patterns-paging';
 import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
+import type { BlockPattern } from '../../store/types';
 import type {
 	BlockPatternProps,
 	BlockPatternsListPattern,
@@ -45,7 +46,8 @@ function BlockPattern( {
 	isSelected,
 }: BlockPatternProps ) {
 	const [ isDragging, setIsDragging ] = useState( false );
-	const { blocks, viewportWidth } = pattern;
+	// Listed patterns come with their parsed blocks.
+	const { blocks, viewportWidth } = pattern as BlockPatternsListPattern;
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
 	const isUserPattern = pattern.type === INSERTER_PATTERN_TYPES.user;
@@ -212,10 +214,7 @@ function BlockPatternsList(
 		setActiveCompositeId( firstCompositeItemId );
 	}, [ blockPatterns ] );
 
-	const handleClickPattern = (
-		pattern: BlockPatternsListPattern,
-		blocks: Block[]
-	) => {
+	const handleClickPattern = ( pattern: BlockPattern, blocks: Block[] ) => {
 		setActivePattern( pattern.name );
 		onClickPattern( pattern, blocks );
 	};

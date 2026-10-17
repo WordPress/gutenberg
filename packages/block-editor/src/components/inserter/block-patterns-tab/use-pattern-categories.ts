@@ -10,8 +10,12 @@ import {
 	getPopulatedCategories,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import type { PatternCategory } from '../types';
 
-export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
+export function usePatternCategories(
+	rootClientId: string | null | undefined,
+	sourceFilter = 'all'
+): PatternCategory[] {
 	const [ patterns, allCategories ] = usePatternsState(
 		undefined,
 		rootClientId
