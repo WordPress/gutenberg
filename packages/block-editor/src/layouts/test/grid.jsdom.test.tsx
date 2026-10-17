@@ -80,7 +80,7 @@ describe( 'getLayoutStyle', () => {
 		);
 	} );
 	describe( 'with the grid interactivity experiment', () => {
-		let originalExperiment;
+		let originalExperiment: boolean | undefined;
 		beforeEach( () => {
 			originalExperiment = window.__experimentalEnableGridInteractivity;
 			window.__experimentalEnableGridInteractivity = true;
