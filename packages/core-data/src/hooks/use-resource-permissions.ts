@@ -7,6 +7,8 @@ import useQuerySelect from './use-query-select';
 interface GlobalResourcePermissionsResolution {
 	/** Can the current user create new resources of this type? */
 	canCreate: boolean;
+	/** Can the current user read resources of this type? */
+	canRead: boolean;
 }
 interface SpecificResourcePermissionsResolution {
 	/** Can the current user update resources of this type? */
@@ -21,31 +23,32 @@ interface ResolutionDetails {
 	 * Is the data still being resolved?
 	 */
 	isResolving: boolean;
+	/** Is the data resolved by now? */
+	hasResolved: boolean;
 }
 
-/**
- * Is the data resolved by now?
- */
-type HasResolved = boolean;
-
-type ResourcePermissionsResolution< IdType > = [
-	HasResolved,
-	ResolutionDetails &
-		GlobalResourcePermissionsResolution &
-		( IdType extends void ? SpecificResourcePermissionsResolution : {} ),
-];
+type ResourcePermissionsResolution< IdType > = ResolutionDetails &
+	GlobalResourcePermissionsResolution &
+	( IdType extends void ? {} : SpecificResourcePermissionsResolution );
 
 type EntityResource = { kind: string; name: string; id?: string | number };
+
+function useResourcePermissions< IdType >(
+	resource: string,
+	id: IdType
+): ResourcePermissionsResolution< IdType >;
 
 function useResourcePermissions< IdType = void >(
 	resource: string,
 	id?: IdType
 ): ResourcePermissionsResolution< IdType >;
 
-function useResourcePermissions< IdType = void >(
-	resource: EntityResource,
+function useResourcePermissions< Resource extends EntityResource >(
+	resource: Resource,
 	id?: never
-): ResourcePermissionsResolution< IdType >;
+): ResourcePermissionsResolution<
+	'id' extends keyof Resource ? Resource[ 'id' ] : void
+>;
 
 /**
  * Resolves resource permissions.
@@ -114,7 +117,7 @@ function useResourcePermissions< IdType = void >(
  * application, the appropriate permissions and the resolution details will be retrieved from
  * the store state using `canUser()`, or resolved if missing.
  *
- * @return Entity records data.
+ * @return Resource permissions and resolution details.
  * @template IdType
  */
 function useResourcePermissions< IdType = void >(
