@@ -121,6 +121,10 @@ export interface LayoutType {
 	inspectorControls: ComponentType< LayoutInspectorControlsProps >;
 	toolBarControls: ComponentType< LayoutToolbarControlsProps >;
 	getLayoutStyle?: ( args: LayoutStyleArgs ) => string;
+	getMobileStackingStyle?: ( args: {
+		selector: string;
+		layout?: Layout;
+	} ) => string;
 	getOrientation: ( layout: Layout ) => string;
 	getAlignments: (
 		layout: Layout,

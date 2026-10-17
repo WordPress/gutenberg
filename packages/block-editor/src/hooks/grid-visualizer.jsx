@@ -6,6 +6,7 @@ import {
 	GridVisualizer,
 	GridRowResizer,
 	useGridLayoutSync,
+	isGridStackedOnMobile,
 } from '../components/grid';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
@@ -37,7 +38,8 @@ function GridTools( { clientId, layout } ) {
 				getBlockRootClientId,
 				getBlockName,
 				getSettings,
-			} = select( blockEditorStore );
+				getSelectedBlockStyleState,
+			} = unlock( select( blockEditorStore ) );
 
 			// These calls are purposely ordered from least expensive to most expensive.
 			// Hides the visualizer in cases where the user is not or cannot interact with it.
@@ -76,7 +78,13 @@ function GridTools( { clientId, layout } ) {
 					!! layout?.isManualPlacement &&
 					! isDraggingBlocks() &&
 					isBlockSelected( clientId ) &&
-					! isSizedByParentGrid,
+					! isSizedByParentGrid &&
+					// A grid stacked on mobile has no rows to change there.
+					! (
+						getSelectedBlockStyleState( clientId )?.viewport ===
+							'@mobile' &&
+						isGridStackedOnMobile( layout, attributes?.style )
+					),
 				blockVisibility: attributes?.metadata?.blockVisibility,
 				deviceType: currentDeviceType,
 				viewportSettings: settings?.__experimentalFeatures?.viewport,

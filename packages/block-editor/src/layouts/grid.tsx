@@ -13,12 +13,19 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
+import {
+	hasPseudoBlockStyleState,
+	hasViewportBlockStyleState,
+} from '../hooks/block-style-state';
 import { LAYOUT_DEFINITIONS } from './definitions';
+import { store as blockEditorStore } from '../store';
 import type {
+	Layout,
 	LayoutAlignment,
 	LayoutControlProps,
 	LayoutInspectorControlsProps,
@@ -76,6 +83,27 @@ export default {
 		clientId,
 	}: LayoutInspectorControlsProps ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
+		// Stacking only applies on mobile, so it is set for every viewport or
+		// for mobile only. The layout panel edits a viewport's layout in a
+		// viewport state without a pseudo state, so the toggle is hidden in
+		// such states for other viewports.
+		const isOtherViewportLayoutState = useSelect(
+			( select ) => {
+				if ( ! clientId ) {
+					return false;
+				}
+				const selectedState =
+					select( blockEditorStore ).getSelectedBlockStyleState(
+						clientId
+					);
+				return (
+					hasViewportBlockStyleState( selectedState ) &&
+					! hasPseudoBlockStyleState( selectedState ) &&
+					selectedState.viewport !== '@mobile'
+				);
+			},
+			[ clientId ]
+		);
 
 		// Always show both column and minimum width controls in Auto mode.
 		// Manual mode (with isManualPlacement) is only available behind the experiment flag.
@@ -98,6 +126,12 @@ export default {
 		const hasMinimumColumnWidthValue = () =>
 			hasLayoutValue( 'minimumColumnWidth' );
 		const hasFillValue = () => hasLayoutValue( 'autoFit', false );
+		const showStackOnMobileControl =
+			layout?.isManualPlacement &&
+			window.__experimentalEnableGridInteractivity &&
+			! isOtherViewportLayoutState;
+		const hasStackOnMobileValue = () =>
+			hasLayoutValue( 'stackOnMobile', true );
 		const resetGridType = () =>
 			onChange(
 				cleanEmptyObject( {
@@ -127,6 +161,13 @@ export default {
 				cleanEmptyObject( {
 					...layout,
 					autoFit: resetLayout?.autoFit,
+				} )
+			);
+		const resetStackOnMobile = () =>
+			onChange(
+				cleanEmptyObject( {
+					...layout,
+					stackOnMobile: resetLayout?.stackOnMobile,
 				} )
 			);
 
@@ -185,6 +226,35 @@ export default {
 						<GridLayoutFillControl
 							layout={ layout }
 							onChange={ onChange }
+						/>
+					</ToolsPanelItem>
+				) }
+				{ showStackOnMobileControl && (
+					<ToolsPanelItem
+						label={ __( 'Stack on mobile' ) }
+						hasValue={ hasStackOnMobileValue }
+						onDeselect={ resetStackOnMobile }
+						isShownByDefault
+						panelId={ clientId }
+					>
+						<ToggleControl
+							label={ __( 'Stack on mobile' ) }
+							help={ __(
+								'On small screens, show each block full width, one after another.'
+							) }
+							checked={ layout?.stackOnMobile !== false }
+							onChange={ ( value ) =>
+								onChange(
+									cleanEmptyObject( {
+										...layout,
+										// Stacking is on by default, so only
+										// turning it off is stored.
+										stackOnMobile: value
+											? undefined
+											: false,
+									} )
+								)
+							}
 						/>
 					</ToolsPanelItem>
 				) }
@@ -406,6 +476,52 @@ export default {
 			);
 		}
 		return output;
+	},
+	/**
+	 * Gets the CSS that stacks the children of a manual placement grid on
+	 * mobile, as part of the grid interactivity experiment, unless the grid
+	 * has opted out with `stackOnMobile: false`. Each child becomes full
+	 * width, in block order, and keeps its row span, which it publishes as
+	 * `--wp--grid-item--row-span`.
+	 *
+	 * @param options
+	 * @param options.selector The grid's CSS selector.
+	 * @param options.layout   The grid's layout in the mobile state.
+	 *
+	 * @return CSS rules, without the media query.
+	 */
+	getMobileStackingStyle( {
+		selector,
+		layout = {},
+	}: {
+		selector: string;
+		layout?: Layout;
+	} ): string {
+		if (
+			! layout.isManualPlacement ||
+			layout.stackOnMobile === false ||
+			! window.__experimentalEnableGridInteractivity
+		) {
+			return '';
+		}
+		// The selector is repeated so that the rules beat the grid's and each
+		// child's own rules, whatever order the stylesheets end up in.
+		const gridSelector = selector
+			.split( ',' )
+			.map( ( subselector ) => `${ subselector }${ subselector }` )
+			.join( ',' );
+		const childSelector = selector
+			.split( ',' )
+			.map( ( subselector ) => `${ subselector }${ subselector } > *` )
+			.join( ',' );
+		// Stacked blocks are sized by their content again, so the grid stops
+		// taking its height from its width, its rows stop being the same
+		// height, and it tells its children that their cells are no longer
+		// fixed, so blocks that fill fixed cells keep their own size.
+		return (
+			`${ gridSelector } { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }` +
+			`${ childSelector } { grid-column: 1 / -1; grid-row: span var(--wp--grid-item--row-span, 1); }`
+		);
 	},
 	getOrientation(): string {
 		return 'horizontal';
