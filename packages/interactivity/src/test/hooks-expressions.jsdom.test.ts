@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+
 /**
  * Internal dependencies
  */
@@ -340,19 +342,18 @@ describe( 'Interactivity API', () => {
 			);
 		} );
 
-		it( 'should evaluate ! on a function reference (negation ignored)', () => {
+		it( 'should not negate a function reference and warn about derived state', () => {
 			// After ! is stripped and whitespace is trimStart()'d, the path
 			// `actions.increment` matches the legacy path regex, so it goes
-			// through the legacy path. The hasNegationOperator flag is set,
-			// but the negation is ignored for functions — the deprecation
-			// warning fires, then the function is wrapped and returned
-			// without being called. The caller (e.g. the `on` directive) is
-			// responsible for invoking the returned function.
+			// through the legacy path. A function cannot be negated: it is
+			// not invoked, the warning fires, and the result is undefined.
 			const legacyRe = /^[a-zA-Z_$][\w.]*$/;
 			expect( legacyRe.test( 'actions.increment' ) ).toBe( true );
 			const result = evaluateExpr( '!actions.increment' );
-			expect( console ).toHaveWarned();
-			expect( typeof result ).toBe( 'function' );
+			expect( console ).toHaveWarnedWith(
+				'The value of "actions.increment" is a function and cannot be negated. Please use derived state instead.'
+			);
+			expect( result ).toBeUndefined();
 		} );
 
 		it( 'should support complex boolean precedence and grouping', () => {
