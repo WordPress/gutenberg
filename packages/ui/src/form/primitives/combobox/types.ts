@@ -2,6 +2,7 @@ import type { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ReactElement, ReactNode } from 'react';
 import type { ComponentProps } from '../../../utils/types';
 import type { ItemPopupWidthProps } from '../../../utils/css/item-popup';
+import type { LoadingIndicatorProps } from '../../../utils/item-popup/types';
 import type { InputLayoutProps } from '../input-layout/types';
 
 type ComboboxSize = Exclude< InputLayoutProps[ 'size' ], 'small' >;
@@ -177,3 +178,5 @@ export type ComboboxTriggerProps = ComponentProps<
 };
 
 export type ComboboxValueProps = _Combobox.Value.Props;
+
+export type ComboboxLoadingIndicatorProps = LoadingIndicatorProps;

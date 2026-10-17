@@ -18,6 +18,7 @@ const meta: Meta< typeof SearchableSelect > = {
 	id: 'design-system-components-form-primitives-searchableselect',
 	component: SearchableSelect,
 	subcomponents: {
+		'SearchableSelect.LoadingIndicator': SearchableSelect.LoadingIndicator,
 		'SearchableSelect.Group': SearchableSelect.Group,
 		'SearchableSelect.GroupLabel': SearchableSelect.GroupLabel,
 		'SearchableSelect.Separator': SearchableSelect.Separator,
