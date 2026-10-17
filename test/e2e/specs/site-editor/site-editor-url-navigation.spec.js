@@ -7,13 +7,6 @@ const isSiteEditorV2 = !! process.env.GUTENBERG_E2E_SITE_EDITOR_V2;
 test.describe( 'Site editor url navigation', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
-		// Document-Isolation-Policy places the editor in its own agent cluster.
-		// Template creation triggers URL/page navigation to pages without the
-		// DIP header, creating an agent cluster mismatch that breaks
-		// cross-window communication.
-		await requestUtils.activatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 	} );
 
 	test.beforeEach( async ( { requestUtils } ) => {
@@ -26,9 +19,6 @@ test.describe( 'Site editor url navigation', () => {
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
-		await requestUtils.deactivatePlugin(
-			'gutenberg-test-plugin-disable-client-side-media-processing'
-		);
 	} );
 
 	test( 'Redirection after template creation', async ( {
