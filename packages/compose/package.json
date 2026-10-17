@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "8.9.0",
+	"version": "8.10.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,14 +21,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
-		"build-types",
-		"*.md"
+		"build-types"
 	],
 	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
@@ -60,9 +59,10 @@
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/react": "^16.3.3",
 		"@testing-library/user-event": "^14.6.1",
+		"@types/react-dom": "^19.3.0",
 		"mock-match-media": "^0.4.2",
-		"react-dom": "^18.3.1",
-		"vitest": "^5.0.0",
+		"react-dom": "^19.3.0",
+		"vitest": "^5.0.3",
 		"vitest-browser-react": "^2.3.0"
 	},
 	"peerDependencies": {

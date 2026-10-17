@@ -13,14 +13,20 @@ import {
 	useEffect,
 	forwardRef,
 } from '@wordpress/element';
-import { useResourcePermissions } from '@wordpress/core-data';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/ui';
 import { isURL } from '@wordpress/url';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
-import { useEntityBinding, useLinkPreview } from '../shared';
+import {
+	isBlockSuggestion,
+	useBlockSuggestions,
+	useEntityBinding,
+	useLinkPreview,
+} from '../shared';
 
 /**
  * Given the Link block's type attribute, return the query params for that one
@@ -107,10 +113,6 @@ function UnforwardedLinkUI( props, ref ) {
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
 	const addBlockButtonRef = useRef();
-	const permissions = useResourcePermissions( {
-		kind: 'postType',
-		name: postType,
-	} );
 
 	// Use the entity binding hook to get binding status
 	const { isBoundEntityAvailable } = useEntityBinding( {
@@ -187,6 +189,31 @@ function UnforwardedLinkUI( props, ref ) {
 	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
+	const canAddBlock = blockEditingMode !== 'disabled';
+	const canAddPage = useSelect(
+		( select ) => {
+			if ( ! canAddBlock || type !== 'page' ) {
+				return false;
+			}
+
+			return !! select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'page',
+			} );
+		},
+		[ canAddBlock, type ]
+	);
+
+	// Blocks are listed in the search results only when the "Add block"
+	// button would be shown: the link has no URL yet and the block is not
+	// locked.
+	const { transformSuggestions, insertBlockFromSuggestion } =
+		useBlockSuggestions( {
+			clientId,
+			isEnabled: canAddBlock && ! link?.url?.length,
+			onBlockInsert: props.onBlockInsert,
+			onClose: props.onClose,
+		} );
 
 	return (
 		<Popover
@@ -221,7 +248,17 @@ function UnforwardedLinkUI( props, ref ) {
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-						onChange={ props.onChange }
+						transformSuggestions={ transformSuggestions }
+						onChange={ ( updatedValue ) => {
+							if ( isBlockSuggestion( updatedValue ) ) {
+								insertBlockFromSuggestion(
+									updatedValue.blockItemId
+								);
+								return;
+							}
+
+							props.onChange( updatedValue );
+						} }
 						onInputChange={ ( value ) => {
 							// Observe the input value so we can pass the value to the page creator
 							// and restore it on back button click
@@ -248,14 +285,8 @@ function UnforwardedLinkUI( props, ref ) {
 									setAddingPage={ () => {
 										setAddingPage( true );
 									} }
-									canAddPage={
-										blockEditingMode !== 'disabled' &&
-										permissions?.canCreate &&
-										type === 'page'
-									}
-									canAddBlock={
-										blockEditingMode !== 'disabled'
-									}
+									canAddPage={ canAddPage }
+									canAddBlock={ canAddBlock }
 								/>
 							);
 						} }

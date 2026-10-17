@@ -67,9 +67,22 @@
 	}
 }
 
+.dataviews-filters__summary {
+	width: fit-content;
+	max-width: 100%;
+}
+
+// The `Dropdown` wrapper around each chip is a flex item of the row above, and
+// has to shrink for the chip to truncate.
+.dataviews-filters__summary-chip-dropdown {
+	min-width: 0;
+}
+
 .dataviews-filters__summary-chip-container {
 	position: relative;
-	white-space: pre-wrap;
+	// Not `nowrap`: the space that ends the filter name ("Status includes: ")
+	// is a trailing space, which only `pre` preserves.
+	white-space: pre;
 
 	.dataviews-filters__summary-chip {
 		border-radius: var(--wpds-border-radius-lg);
@@ -119,8 +132,13 @@
 				var(--wpds-color-stroke-focus);
 		}
 
-		.dataviews-filters-__summary-filter-text-name {
+		.dataviews-filters__summary-filter-text-name {
 			font-weight: var(--wpds-typography-font-weight-emphasis);
+		}
+
+		.dataviews-filters__summary-filter-text-value {
+			overflow: hidden;
+			text-overflow: ellipsis;
 		}
 	}
 

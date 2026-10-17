@@ -392,12 +392,17 @@ test.describe( 'Buttons', () => {
 			.getByRole( 'option', { name: 'Gradient: Purple to yellow' } )
 			.click();
 
+		// Background support renders on the server, so the gradient is absent from the saved markup.
+		await expect(
+			editor.canvas.locator( '.wp-block-button__link' )
+		).toHaveCSS( 'background-image', /gradient/ );
+
 		// Check the content.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"gradient\":\"purple-to-yellow\"} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-purple-to-yellow-gradient-background has-background wp-element-button\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"background\":{\"gradient\":\"var:preset|gradient|purple-to-yellow\"}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
@@ -437,8 +442,8 @@ test.describe( 'Buttons', () => {
 		const content = await editor.getEditedPostContent();
 		expect( content ).toBe(
 			`<!-- wp:buttons -->
-<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"color\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
-<div class=\"wp-block-button\"><a class=\"wp-block-button__link has-background wp-element-button\" style=\"background:linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\">Content</a></div>
+<div class=\"wp-block-buttons\"><!-- wp:button {\"style\":{\"background\":{\"gradient\":\"linear-gradient(135deg,rgb(255,0,0) 0%,rgb(0,255,0) 100%)\"}}} -->
+<div class=\"wp-block-button\"><a class=\"wp-block-button__link wp-element-button\">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 		);
@@ -774,6 +779,71 @@ test.describe( 'Buttons', () => {
 					},
 				} );
 			} );
+		} );
+	} );
+
+	test.describe( 'List View appender in locked sections', () => {
+		const buttonsInGroup = ( attributes ) =>
+			`<!-- wp:group ${ JSON.stringify( {
+				...attributes,
+				layout: { type: 'constrained' },
+			} ) } --><div class="wp-block-group">` +
+			'<!-- wp:buttons --><div class="wp-block-buttons">' +
+			'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">First</a></div><!-- /wp:button -->' +
+			'</div><!-- /wp:buttons -->' +
+			'</div><!-- /wp:group -->';
+
+		const openListView = async ( { editor, page } ) => {
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Buttons' } )
+				.click();
+			await editor.openDocumentSettingsSidebar();
+			await page.getByRole( 'tab', { name: 'List View' } ).click();
+			return page
+				.getByRole( 'tabpanel', { name: 'List View' } )
+				.getByRole( 'treegrid', {
+					name: 'Block navigation structure',
+				} );
+		};
+
+		test( 'shows the appender in a contentOnly locked section and adds a button', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent(
+				buttonsInGroup( { templateLock: 'contentOnly' } )
+			);
+			const listView = await openListView( { editor, page } );
+
+			await expect(
+				listView.getByRole( 'gridcell', { name: /First/ } )
+			).toBeVisible();
+			// The canvas lets a button be added here, so the List View
+			// offers its appender too.
+			const appender = listView.getByRole( 'button', {
+				name: 'Add Button',
+			} );
+			await expect( appender ).toBeVisible();
+			await appender.click();
+
+			await expect( listView.getByRole( 'row' ) ).toHaveCount( 3 );
+		} );
+
+		test( 'hides the appender in a section locked against inserting', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.setContent(
+				buttonsInGroup( { templateLock: 'all' } )
+			);
+			const listView = await openListView( { editor, page } );
+
+			await expect(
+				listView.getByRole( 'gridcell', { name: /First/ } )
+			).toBeVisible();
+			await expect(
+				listView.getByRole( 'button', { name: 'Add Button' } )
+			).toBeHidden();
 		} );
 	} );
 } );

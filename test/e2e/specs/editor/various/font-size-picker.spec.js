@@ -182,7 +182,9 @@ test.describe( 'Font Size Picker', () => {
 			await page
 				.getByRole( 'button', { name: 'Typography options' } )
 				.click();
-			await page.getByRole( 'menuitem', { name: 'Reset Size' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Size, reset to default' } )
+				.click();
 			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )
@@ -275,7 +277,9 @@ test.describe( 'Font Size Picker', () => {
 			await page
 				.getByRole( 'button', { name: 'Typography options' } )
 				.click();
-			await page.getByRole( 'menuitem', { name: 'Reset Size' } ).click();
+			await page
+				.getByRole( 'menuitem', { name: 'Size, reset to default' } )
+				.click();
 			await page.keyboard.press( 'Escape' ); // Close the menu
 
 			await expect.poll( editor.getEditedPostContent )

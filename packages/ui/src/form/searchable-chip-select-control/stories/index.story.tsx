@@ -229,7 +229,7 @@ export const AsyncItems: Story = {
 	render: function Template( args ) {
 		const [ loading, setLoading ] = useState( false );
 		const [ items, setItems ] = useState< typeof ITEMS >( [] );
-		const timeoutRef = useRef< ReturnType< typeof setTimeout > >();
+		const timeoutRef = useRef< ReturnType< typeof setTimeout > >( null );
 
 		return (
 			<SearchableChipSelectControl
@@ -247,13 +247,14 @@ export const AsyncItems: Story = {
 				}
 				emptyContent={ loading ? null : undefined }
 				onOpenChange={ ( open ) => {
-					if ( ! open ) {
+					if ( timeoutRef.current ) {
 						clearTimeout( timeoutRef.current );
+					}
+					if ( ! open ) {
 						return;
 					}
 					setLoading( true );
 					setItems( [] );
-					clearTimeout( timeoutRef.current );
 					timeoutRef.current = setTimeout( () => {
 						setItems( ITEMS );
 						setLoading( false );

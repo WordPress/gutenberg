@@ -8,6 +8,8 @@ import {
 	canUser,
 	getAutosaves,
 	getCurrentUser,
+	getFieldsConfig,
+	getEntityActionsConfig,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
 vi.mock( import( '@wordpress/api-fetch' ) );
@@ -37,7 +39,7 @@ describe( 'getEntityRecord', () => {
 			receiveEntityRecords: vi.fn(),
 			__unstableAcquireStoreLock: vi.fn(),
 			__unstableReleaseStoreLock: vi.fn(),
-			__unstableNotifySyncUndoManagerChange: vi.fn(),
+			recordSyncUndoLevel: vi.fn(),
 			receiveUserPermissions: vi.fn(),
 			finishResolutions: vi.fn(),
 		} );
@@ -160,7 +162,7 @@ describe( 'getEntityRecord', () => {
 			{
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
-				onUndoStackChange: expect.any( Function ),
+				onUndoLevelOpened: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 			}
 		);
@@ -280,11 +282,9 @@ describe( 'getEntityRecord', () => {
 
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
-		handlers.onUndoStackChange( { hasRedo: false, hasUndo: true } );
+		handlers.onUndoLevelOpened();
 
-		expect(
-			dispatch.__unstableNotifySyncUndoManagerChange
-		).toHaveBeenCalledWith( { hasRedo: false, hasUndo: true } );
+		expect( dispatch.recordSyncUndoLevel ).toHaveBeenCalledTimes( 1 );
 	} );
 
 	it( 'provides transient properties when read/write config is supplied', async () => {
@@ -333,7 +333,7 @@ describe( 'getEntityRecord', () => {
 			{
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
-				onUndoStackChange: expect.any( Function ),
+				onUndoLevelOpened: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 			}
 		);
@@ -1099,5 +1099,83 @@ describe( 'getCurrentUser', () => {
 		expect( dispatch.receiveCurrentUser ).toHaveBeenCalledWith(
 			SUCCESSFUL_RESPONSE
 		);
+	} );
+} );
+
+describe( 'getFieldsConfig', () => {
+	it( 'requests the fields of the entity and receives them', async () => {
+		const config = {
+			kind: 'postType',
+			name: 'page',
+			fields: [ { id: 'author' } ],
+			script_modules: [],
+		};
+		const dispatch = Object.assign( vi.fn(), {
+			receiveFieldsConfig: vi.fn(),
+		} );
+		triggerFetch.mockResolvedValue( config );
+
+		await getFieldsConfig( 'postType', 'page' )( { dispatch } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/entity-fields?kind=postType&name=page',
+		} );
+		expect( dispatch.receiveFieldsConfig ).toHaveBeenCalledWith(
+			'postType',
+			'page',
+			config
+		);
+	} );
+
+	it( 'rejects without receiving anything when the request fails', async () => {
+		const dispatch = Object.assign( vi.fn(), {
+			receiveFieldsConfig: vi.fn(),
+		} );
+		const error = { code: 'rest_forbidden', message: 'Forbidden.' };
+		triggerFetch.mockRejectedValue( error );
+
+		await expect(
+			getFieldsConfig( 'postType', 'page' )( { dispatch } )
+		).rejects.toBe( error );
+		expect( dispatch.receiveFieldsConfig ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'getEntityActionsConfig', () => {
+	it( 'requests the actions of the entity and receives them', async () => {
+		const config = {
+			kind: 'postType',
+			name: 'page',
+			actions: [ { id: 'rename-post' } ],
+			script_modules: [],
+		};
+		const dispatch = Object.assign( vi.fn(), {
+			receiveEntityActionsConfig: vi.fn(),
+		} );
+		triggerFetch.mockResolvedValue( config );
+
+		await getEntityActionsConfig( 'postType', 'page' )( { dispatch } );
+
+		expect( triggerFetch ).toHaveBeenCalledWith( {
+			path: '/wp/v2/entity-actions?kind=postType&name=page',
+		} );
+		expect( dispatch.receiveEntityActionsConfig ).toHaveBeenCalledWith(
+			'postType',
+			'page',
+			config
+		);
+	} );
+
+	it( 'rejects without receiving anything when the request fails', async () => {
+		const dispatch = Object.assign( vi.fn(), {
+			receiveEntityActionsConfig: vi.fn(),
+		} );
+		const error = { code: 'rest_forbidden', message: 'Forbidden.' };
+		triggerFetch.mockRejectedValue( error );
+
+		await expect(
+			getEntityActionsConfig( 'postType', 'page' )( { dispatch } )
+		).rejects.toBe( error );
+		expect( dispatch.receiveEntityActionsConfig ).not.toHaveBeenCalled();
 	} );
 } );

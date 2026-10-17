@@ -198,6 +198,23 @@ async function preloadResolutions( postType, postId ) {
 						unlock( core ).getViewConfig( 'postType', postType, {
 							fields: 'form',
 						} ),
+						// The fields of the post type, which the DataForm post
+						// summary reads with `useFields`. The summary reports a
+						// failure of its own, so this must not cut the rest of
+						// the kickoff short.
+						unlock( core )
+							.getFieldsConfig( 'postType', postType )
+							.catch( () => {} ),
+					]
+				: [] ),
+			// The actions of the post type, which the actions menu of the
+			// document sidebar reads with `useEntityActions`. It reports a failure
+			// of its own, so this must not cut the rest of the kickoff short.
+			...( postType
+				? [
+						unlock( core )
+							.getEntityActionsConfig( 'postType', postType )
+							.catch( () => {} ),
 					]
 				: [] ),
 			// Per-post resolvers. `getPostType` and `getEditedEntityRecord`
