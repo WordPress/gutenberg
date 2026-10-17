@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -12,10 +13,11 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { BlockCanvasProps, ExperimentalBlockCanvasProps } from './types';
 
 export const BlockCanvasCover = createSlotFill( Symbol( 'BlockCanvasCover' ) );
 
-function BlockCanvasCoverWrapper( { children } ) {
+function BlockCanvasCoverWrapper( { children }: { children: ReactNode } ) {
 	return (
 		<div
 			className="block-canvas-cover"
@@ -47,12 +49,12 @@ export function ExperimentalBlockCanvas( {
 	styles,
 	contentRef: contentRefProp,
 	iframeProps,
-} ) {
+}: ExperimentalBlockCanvasProps ) {
 	useBlockCommands();
 	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const resetTypingRef = useMouseMoveTypingReset();
 	const clearerRef = useBlockSelectionClearer();
-	const localRef = useRef();
+	const localRef = useRef< HTMLElement >( null );
 	// Attached to the same node as the writing flow ref: the iframe body,
 	// or the WritingFlow element when the canvas is not iframed.
 	const contentRef = useMergeRefs( [
@@ -81,7 +83,8 @@ export function ExperimentalBlockCanvas( {
 			>
 				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
 					{ ( covers ) =>
-						covers.map( ( cover, index ) => (
+						// A slot passes its fills as an array.
+						( covers as ReactNode[] ).map( ( cover, index ) => (
 							<BlockCanvasCoverWrapper key={ index }>
 								{ cover }
 							</BlockCanvasCoverWrapper>
@@ -126,7 +129,8 @@ export function ExperimentalBlockCanvas( {
 			>
 				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
 					{ ( covers ) =>
-						covers.map( ( cover, index ) => (
+						// A slot passes its fills as an array.
+						( covers as ReactNode[] ).map( ( cover, index ) => (
 							<BlockCanvasCoverWrapper key={ index }>
 								{ cover }
 							</BlockCanvasCoverWrapper>
@@ -169,7 +173,7 @@ export function ExperimentalBlockCanvas( {
  * @param {Element} props.children Content of the canvas, defaults to the BlockList component.
  * @return {Element}               Block Breadcrumb.
  */
-function BlockCanvas( { children, height, styles } ) {
+function BlockCanvas( { children, height, styles }: BlockCanvasProps ) {
 	return (
 		<ExperimentalBlockCanvas height={ height } styles={ styles }>
 			{ children }
