@@ -1002,6 +1002,17 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 			) {
 				return;
 			}
+			if ( ! drag.isMoving ) {
+				// Only one inserter is open at a time. A cell's inserter
+				// stays open when the drag starts on its own toggle, as
+				// the focus doesn't leave it, and the click that would
+				// close it is ignored, so it is closed as drawing starts.
+				for ( const openAppender of container.querySelectorAll(
+					'.block-editor-grid-visualizer__cell .block-editor-grid-visualizer__appender[aria-expanded="true"]'
+				) ) {
+					openAppender.click();
+				}
+			}
 			drag.isMoving = true;
 			setMarquee( {
 				rect: getBoundingGridRect( start, cell ),
