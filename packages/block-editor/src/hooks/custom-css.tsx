@@ -3,6 +3,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	processCSSNesting,
@@ -25,6 +26,13 @@ import { VALID_BLOCK_PSEUDO_STATES } from './states';
 import { useSettings } from '../components/use-settings';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import type { PanelStyle } from '../components/global-styles/types';
+import type {
+	BlockSupportEditProps,
+	BlockWrapperProps,
+	CustomCSSControlProps,
+	CustomCSSStateEntry,
+} from './types';
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -32,9 +40,11 @@ const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 const CUSTOM_CSS_INSTANCE_REFERENCE = {};
 
 // Stable empty object reference for useSelect.
-const EMPTY_STYLE = {};
+const EMPTY_STYLE: PanelStyle = {};
 
-function hasCustomCSSString( node ) {
+function hasCustomCSSString(
+	node: PanelStyle | undefined
+): node is PanelStyle & { css: string } {
 	return typeof node?.css === 'string' && node.css.trim() !== '';
 }
 
@@ -46,18 +56,22 @@ function hasCustomCSSString( node ) {
  * block's custom CSS and to generate its preview CSS, so there is a single
  * traversal of the style tree to keep in sync rather than two.
  *
- * @param {Object} style              Block style attribute.
- * @param {string} blockName          Block name.
- * @param {Object} [viewportSettings] Viewport breakpoint settings. When
- *                                    omitted (e.g. from `addSaveProps`, which
- *                                    runs outside any block context),
- *                                    the default responsive breakpoints and
- *                                    their media queries are used.
- * @return {Object[]} Entries with `css`, `pseudoState` (string|undefined),
- *                     and `mediaQuery` (string|undefined) keys.
+ * @param style            Block style attribute.
+ * @param blockName        Block name.
+ * @param viewportSettings Viewport breakpoint settings. When
+ *                         omitted (e.g. from `addSaveProps`, which
+ *                         runs outside any block context),
+ *                         the default responsive breakpoints and
+ *                         their media queries are used.
+ * @return Entries with `css`, `pseudoState` (string|undefined),
+ *         and `mediaQuery` (string|undefined) keys.
  */
-function getCustomCSSStateEntries( style, blockName, viewportSettings ) {
-	const entries = [];
+function getCustomCSSStateEntries(
+	style: PanelStyle | undefined,
+	blockName: string,
+	viewportSettings?: unknown
+) {
+	const entries: CustomCSSStateEntry[] = [];
 	const pseudoStates = VALID_BLOCK_PSEUDO_STATES[ blockName ] ?? [];
 
 	if ( hasCustomCSSString( style ) ) {
@@ -65,22 +79,29 @@ function getCustomCSSStateEntries( style, blockName, viewportSettings ) {
 	}
 
 	for ( const pseudoState of pseudoStates ) {
-		const pseudoStyle = style?.[ pseudoState ];
+		// The valid pseudo states start with a colon.
+		const pseudoStyle = style?.[ pseudoState as `:${ string }` ];
 		if ( hasCustomCSSString( pseudoStyle ) ) {
 			entries.push( { css: pseudoStyle.css, pseudoState } );
 		}
 	}
 
 	for ( const [ breakpoint, mediaQuery ] of Object.entries(
-		getResponsiveMediaQueries( viewportSettings )
+		getResponsiveMediaQueries( viewportSettings ) as Record<
+			string,
+			string
+		>
 	) ) {
-		const breakpointStyle = style?.[ breakpoint ];
+		// A viewport state holds styles of the block's shape.
+		const breakpointStyle = style?.[ breakpoint ] as PanelStyle | undefined;
 		if ( hasCustomCSSString( breakpointStyle ) ) {
 			entries.push( { css: breakpointStyle.css, mediaQuery } );
 		}
 
 		for ( const pseudoState of pseudoStates ) {
-			const breakpointPseudoStyle = breakpointStyle?.[ pseudoState ];
+			// The valid pseudo states start with a colon.
+			const breakpointPseudoStyle =
+				breakpointStyle?.[ pseudoState as `:${ string }` ];
 			if ( hasCustomCSSString( breakpointPseudoStyle ) ) {
 				entries.push( {
 					css: breakpointPseudoStyle.css,
@@ -99,12 +120,15 @@ function getCustomCSSStateEntries( style, blockName, viewportSettings ) {
  * mirroring the server-side rendering in
  * `gutenberg_render_custom_css_support_styles()`.
  *
- * @param {Object[]} entries      Entries from `getCustomCSSStateEntries()`.
- * @param {string}   baseSelector Selector scoping this block instance.
- * @return {string|undefined} Generated CSS, or undefined if there are no rules.
+ * @param entries      Entries from `getCustomCSSStateEntries()`.
+ * @param baseSelector Selector scoping this block instance.
+ * @return Generated CSS, or undefined if there are no rules.
  */
-export function processCustomCSSStateEntries( entries, baseSelector ) {
-	const rules = [];
+export function processCustomCSSStateEntries(
+	entries: CustomCSSStateEntry[],
+	baseSelector: string
+) {
+	const rules: string[] = [];
 
 	entries.forEach( ( { css, pseudoState, mediaQuery } ) => {
 		if ( ! validateCSS( css ) ) {
@@ -129,18 +153,18 @@ export function processCustomCSSStateEntries( entries, baseSelector ) {
 /**
  * Inspector control for custom CSS.
  *
- * @param {Object}   props               Component props.
- * @param {string}   props.blockName     Block name.
- * @param {Function} props.setAttributes Function to set block attributes.
- * @param {Object}   props.style         Block style attribute.
- * @param {Object}   props.selectedState Currently selected block style state.
+ * @param props               Component props.
+ * @param props.blockName     Block name.
+ * @param props.setAttributes Function to set block attributes.
+ * @param props.style         Block style attribute.
+ * @param props.selectedState Currently selected block style state.
  */
 function CustomCSSControl( {
 	blockName,
 	setAttributes,
 	style,
 	selectedState,
-} ) {
+}: CustomCSSControlProps ) {
 	const blockEditingMode = useBlockEditingMode();
 
 	if ( blockEditingMode !== 'default' ) {
@@ -149,10 +173,12 @@ function CustomCSSControl( {
 	const blockType = getBlockType( blockName );
 	const isStateSelected = ! isDefaultBlockStyleState( selectedState );
 	const stateStyle = isStateSelected
-		? getStyleForState( style, selectedState ) || {}
+		? // The state styles have the shape of the block styles.
+			( getStyleForState( style, selectedState ) as
+				PanelStyle | undefined ) || {}
 		: style;
 
-	function onChange( newStyle ) {
+	function onChange( newStyle: PanelStyle ) {
 		// Normalize whitespace-only CSS to undefined so it gets cleaned up.
 		const css = newStyle?.css?.trim() ? newStyle.css : undefined;
 		const cleanedStyle = cleanEmptyObject( { ...newStyle, css } );
@@ -168,7 +194,8 @@ function CustomCSSControl( {
 		__(
 			'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value, e.g. color: red;.'
 		),
-		blockType?.title
+		// An unknown block prints as `undefined`, as before.
+		blockType?.title as string
 	);
 
 	const panel = (
@@ -192,15 +219,20 @@ function CustomCSSControl( {
 
 const CUSTOM_CSS_WARNING_NOTICE_ID = 'custom-css-edit-warning';
 
-function CustomCSSEdit( { clientId, name, setAttributes } ) {
+function CustomCSSEdit( {
+	clientId,
+	name,
+	setAttributes,
+}: BlockSupportEditProps ) {
 	const { style, canEditCSS, selectedState } = useSelect(
 		( select ) => {
 			const blockEditorSelect = select( blockEditorStore );
 			const { getSelectedBlockStyleState } = unlock( blockEditorSelect );
 			return {
+				// The style attribute holds the block styles.
 				style:
-					blockEditorSelect.getBlockAttributes( clientId )?.style ||
-					EMPTY_STYLE,
+					( blockEditorSelect.getBlockAttributes( clientId )
+						?.style as PanelStyle | undefined ) || EMPTY_STYLE,
 				canEditCSS: blockEditorSelect.getSettings().canEditCSS,
 				selectedState: getSelectedBlockStyleState( clientId ),
 			};
@@ -227,13 +259,21 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
  * Hook to handle custom CSS for a block in the editor.
  * Generates a unique class and applies scoped CSS via style override.
  *
- * @param {Object} props          Block props.
- * @param {Object} props.style    Block style attribute.
- * @param {string} props.clientId Block client ID.
- * @param {string} props.name     Block name.
- * @return {Object} Block props including className for custom CSS scoping.
+ * @param props          Block props.
+ * @param props.style    Block style attribute.
+ * @param props.clientId Block client ID.
+ * @param props.name     Block name.
+ * @return Block props including className for custom CSS scoping.
  */
-function useBlockProps( { style, clientId, name } ) {
+function useBlockProps( {
+	style,
+	clientId,
+	name,
+}: {
+	style?: PanelStyle;
+	clientId: string;
+	name: string;
+} ) {
 	const [ viewportSettings ] = useSettings( 'viewport' );
 
 	const customCSSStateEntries = useMemo(
@@ -311,12 +351,17 @@ function useBlockProps( { style, clientId, name } ) {
 /**
  * Adds a marker class to blocks with custom CSS for server-side rendering.
  *
- * @param {Object} props      Additional props applied to save element.
- * @param {Object} blockType  Block type definition.
- * @param {Object} attributes Block's attributes.
- * @return {Object} Filtered props applied to save element.
+ * @param props            Additional props applied to save element.
+ * @param blockType        Block type definition.
+ * @param attributes       Block's attributes.
+ * @param attributes.style Block style attribute.
+ * @return Filtered props applied to save element.
  */
-function addSaveProps( props, blockType, attributes ) {
+function addSaveProps(
+	props: BlockWrapperProps,
+	blockType: BlockType,
+	attributes: { style?: PanelStyle }
+): BlockWrapperProps {
 	if ( ! hasBlockSupport( blockType, 'customCSS', true ) ) {
 		return props;
 	}
@@ -351,7 +396,7 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'style' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, 'customCSS', true );
 	},
 };
