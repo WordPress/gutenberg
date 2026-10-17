@@ -1,3 +1,4 @@
+import type { ReactElement } from 'react';
 import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
@@ -14,6 +15,8 @@ import {
 } from './utils';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import type { ClientIdsTreeNode } from '../../store/types';
+import type { ListViewBranchProps, ListViewExpansionState } from './types';
 
 /**
  * Given a block, returns the total number of blocks in that subtree. This is used to help determine
@@ -22,18 +25,18 @@ import { unlock } from '../../lock-unlock';
  * When a block is collapsed, we do not count their children as part of that total. In the current drag
  * implementation dragged blocks and their children are not counted.
  *
- * @param {Object}  block               block tree
- * @param {Object}  expansionState      state that notes which branches are collapsed
- * @param {Array}   draggedClientIds    a list of dragged client ids
- * @param {boolean} isExpandedByDefault flag to determine the default fallback expanded state.
- * @return {number} block count
+ * @param block               block tree
+ * @param expansionState      state that notes which branches are collapsed
+ * @param draggedClientIds    a list of dragged client ids
+ * @param isExpandedByDefault flag to determine the default fallback expanded state.
+ * @return block count
  */
 function countBlocks(
-	block,
-	expansionState,
-	draggedClientIds,
-	isExpandedByDefault
-) {
+	block: ClientIdsTreeNode,
+	expansionState: ListViewExpansionState,
+	draggedClientIds: string[] | undefined,
+	isExpandedByDefault: boolean | undefined
+): number {
 	const isDragged = draggedClientIds?.includes( block.clientId );
 	if ( isDragged ) {
 		return 0;
@@ -57,7 +60,7 @@ function countBlocks(
 
 const noop = () => {};
 
-function ListViewBranch( props ) {
+function ListViewBranch( props: ListViewBranchProps ) {
 	const {
 		blocks,
 		selectBlock = noop,
@@ -113,12 +116,12 @@ function ListViewBranch( props ) {
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
 	let nextPosition = listPosition;
 
-	const rows = [];
+	const rows: ReactElement[] = [];
 
 	// A run of blocks outside of the render window becomes one spacer row that
 	// stands in for their height.
 	let placeholderRows = 0;
-	let placeholderKey;
+	let placeholderKey: string | undefined;
 
 	// Adds the pending placeholder row, if there is one. Call before
 	// adding a real row.

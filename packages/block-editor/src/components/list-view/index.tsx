@@ -1,3 +1,4 @@
+import type { CSSProperties, ForwardedRef, KeyboardEvent } from 'react';
 import clsx from 'clsx';
 import {
 	useInstanceId,
@@ -37,8 +38,18 @@ import { BlockSettingsDropdown } from '../block-settings-menu/block-settings-dro
 import { BLOCK_LIST_ITEM_HEIGHT, focusListItem } from './utils';
 import useClipboardHandler from './use-clipboard-handler';
 import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
+import type {
+	ListViewExpansionAction,
+	ListViewExpansionState,
+	ListViewProps,
+	ListViewSelectBlock,
+	PrivateListViewProps,
+} from './types';
 
-const expansion = ( state, action ) => {
+const expansion = (
+	state: ListViewExpansionState,
+	action: ListViewExpansionAction
+): ListViewExpansionState => {
 	const { type, clientIds } = action;
 
 	// Overwrite the state: only the listed blocks stay expanded, every other
@@ -69,27 +80,24 @@ const expansion = ( state, action ) => {
 	};
 };
 
-/** @typedef {React.ComponentType} ComponentType */
-/** @typedef {React.Ref<HTMLElement>} Ref */
-
 /**
  * Show a hierarchical list of blocks.
  *
- * @param {Object}         props                        Components props.
- * @param {string}         props.id                     An HTML element id for the root element of ListView.
- * @param {Array}          props.blocks                 _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
- * @param {?HTMLElement}   props.dropZoneElement        Optional element to be used as the drop zone.
- * @param {?boolean}       props.showBlockMovers        Flag to enable block movers. Defaults to `false`.
- * @param {?boolean}       props.isExpanded             Flag to determine whether nested levels are expanded by default. Defaults to `false`.
- * @param {?boolean}       props.showAppender           Flag to show or hide the block appender. Defaults to `false`.
- * @param {?boolean}       props.focusOnMount           Flag to move focus into the list when it mounts. Defaults to `false`.
- * @param {?ComponentType} props.blockSettingsMenu      Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
- * @param {string}         props.rootClientId           The client id of the root block from which we determine the blocks to show in the list.
- * @param {string}         props.description            Optional accessible description for the tree grid component.
- * @param {?Function}      props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
- * @param {?ComponentType} props.additionalBlockContent Component that renders additional block content UI.
- * @param {?boolean}       props.showContentPopover     Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
- * @param {Ref}            ref                          Forwarded ref
+ * @param props                        Components props.
+ * @param props.id                     An HTML element id for the root element of ListView.
+ * @param props.blocks                 _deprecated_ Custom subset of block client IDs to be used instead of the default hierarchy.
+ * @param props.dropZoneElement        Optional element to be used as the drop zone.
+ * @param props.showBlockMovers        Flag to enable block movers. Defaults to `false`.
+ * @param props.isExpanded             Flag to determine whether nested levels are expanded by default. Defaults to `false`.
+ * @param props.showAppender           Flag to show or hide the block appender. Defaults to `false`.
+ * @param props.focusOnMount           Flag to move focus into the list when it mounts. Defaults to `false`.
+ * @param props.blockSettingsMenu      Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component.
+ * @param props.rootClientId           The client id of the root block from which we determine the blocks to show in the list.
+ * @param props.description            Optional accessible description for the tree grid component.
+ * @param props.onSelect               Optional callback to be invoked when a block is selected. Receives the block object that was selected.
+ * @param props.additionalBlockContent Component that renders additional block content UI.
+ * @param props.showContentPopover     Flag to render the selected block's content controls in a popover anchored to its row. Defaults to `false`.
+ * @param ref                          Forwarded ref
  */
 function ListViewComponent(
 	{
@@ -106,8 +114,8 @@ function ListViewComponent(
 		onSelect,
 		additionalBlockContent: AdditionalBlockContent,
 		showContentPopover = false,
-	},
-	ref
+	}: PrivateListViewProps,
+	ref: ForwardedRef< HTMLElement >
 ) {
 	// This can be removed once we no longer need to support the blocks prop.
 	if ( blocks ) {
@@ -146,24 +154,27 @@ function ListViewComponent(
 
 	const [ expansionState, updateExpansion ] = useReducer( expansion, {} );
 
-	const [ insertedBlockClientId, setInsertedBlockClientId ] =
-		useState( null );
+	const [ insertedBlockClientId, setInsertedBlockClientId ] = useState<
+		string | null
+	>( null );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
 		updateExpansion,
 	} );
-	const selectEditorBlock = useCallback(
-		/**
-		 * @param {MouseEvent | KeyboardEvent | undefined} event
-		 * @param {string}                                 blockClientId
-		 * @param {null | undefined | -1 | 1}              focusPosition
-		 */
+	const selectEditorBlock: ListViewSelectBlock = useCallback(
 		( event, blockClientId, focusPosition ) => {
-			updateBlockSelection( event, blockClientId, null, focusPosition );
+			// Deselecting passes no client ID, which the store ignores.
+			updateBlockSelection(
+				event,
+				blockClientId as string,
+				null,
+				focusPosition
+			);
 			setSelectedTreeId( blockClientId );
 			if ( onSelect ) {
-				onSelect( getBlock( blockClientId ) );
+				// `getBlock` returns `null` without a client ID.
+				onSelect( getBlock( blockClientId as string ) );
 			}
 		},
 		[ setSelectedTreeId, updateBlockSelection, onSelect, getBlock ]
@@ -173,7 +184,7 @@ function ListViewComponent(
 		dropZoneElement,
 		updateExpansion,
 	} );
-	const elementRef = useRef();
+	const elementRef = useRef< HTMLElement >( null );
 
 	// Allow handling of copy, cut, and paste events.
 	const clipBoardRef = useClipboardHandler( {
@@ -181,7 +192,7 @@ function ListViewComponent(
 	} );
 
 	const focusOnMountRef = useRefEffect(
-		( node ) => {
+		( node: HTMLElement ) => {
 			// A list that mounts as a side effect of selecting a block, the
 			// block inspector's for one, would pull focus out of whatever the
 			// user is editing, so taking focus is opt-in.
@@ -190,8 +201,9 @@ function ListViewComponent(
 			}
 
 			const controller = new window.AbortController();
-			const focusRow = ( clientId ) =>
-				focusListItem( clientId, node, controller.signal ).then( () =>
+			const focusRow = ( clientId: string ) =>
+				// A promise is returned for an existing element.
+				focusListItem( clientId, node, controller.signal )!.then( () =>
 					controller.abort()
 				);
 
@@ -216,7 +228,7 @@ function ListViewComponent(
 			// a style and layout pass, and inside that commit it lands on a
 			// document that is still dirty.
 			const timerId = setTimeout( () => {
-				const firstClientId = node.querySelector(
+				const firstClientId = node.querySelector< HTMLElement >(
 					'[role=row][data-block]'
 				)?.dataset.block;
 				if ( firstClientId ) {
@@ -240,24 +252,29 @@ function ListViewComponent(
 		ref,
 	] );
 
-	const expandRow = useCallback( ( row ) => {
+	const expandRow = useCallback( ( row: HTMLElement ) => {
 		const clientId = row?.dataset?.block;
 		if ( clientId ) {
 			updateExpansion( { type: 'expand', clientIds: [ clientId ] } );
 		}
 	}, [] );
-	const collapseRow = useCallback( ( row ) => {
+	const collapseRow = useCallback( ( row: HTMLElement ) => {
 		const clientId = row?.dataset?.block;
 		if ( clientId ) {
 			updateExpansion( { type: 'collapse', clientIds: [ clientId ] } );
 		}
 	}, [] );
 	const focusRow = useCallback(
-		( event, startRow, endRow ) => {
+		(
+			event: KeyboardEvent,
+			startRow: HTMLElement,
+			endRow: HTMLElement
+		) => {
 			if ( event.shiftKey ) {
 				updateBlockSelection(
 					event,
-					startRow?.dataset?.block,
+					// Tree grid rows carry `data-block`.
+					startRow?.dataset?.block as string,
 					endRow?.dataset?.block
 				);
 			}
@@ -274,7 +291,8 @@ function ListViewComponent(
 	// for the drop indicator. See `ListViewBranch` and `getDragDisplacementValues`.
 	const { blockDropTargetIndex, blockDropPosition, firstDraggedBlockIndex } =
 		useMemo( () => {
-			let _blockDropTargetIndex, _firstDraggedBlockIndex;
+			let _blockDropTargetIndex: number | null | undefined;
+			let _firstDraggedBlockIndex: number | undefined;
 
 			if ( blockDropTarget?.clientId ) {
 				const foundBlockIndex =
@@ -398,15 +416,18 @@ function ListViewComponent(
 				onFocusRow={ focusRow }
 				applicationAriaLabel={ __( 'Block navigation structure' ) }
 				aria-describedby={ describedById }
-				style={ {
-					'--wp-admin--list-view-dragged-items-height':
-						draggedClientIds?.length
-							? `${
-									BLOCK_LIST_ITEM_HEIGHT *
-									( draggedClientIds.length - 1 )
-								}px`
-							: null,
-				} }
+				style={
+					// React styles take custom properties.
+					{
+						'--wp-admin--list-view-dragged-items-height':
+							draggedClientIds?.length
+								? `${
+										BLOCK_LIST_ITEM_HEIGHT *
+										( draggedClientIds.length - 1 )
+									}px`
+								: null,
+					} as CSSProperties
+				}
 			>
 				<ListViewContext.Provider value={ contextValue }>
 					<ListViewInsertedBlockContext.Provider
@@ -442,7 +463,7 @@ export const PrivateListView = forwardRef( ListViewComponent );
 
 // This is the public API for the ListView component.
 // We wrap the PrivateListView component to hide some props from the public API.
-export default forwardRef( ( props, ref ) => {
+export default forwardRef< HTMLElement, ListViewProps >( ( props, ref ) => {
 	return (
 		<PrivateListView
 			ref={ ref }

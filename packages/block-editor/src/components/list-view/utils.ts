@@ -1,11 +1,16 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { focus } from '@wordpress/dom';
+import type { DragDisplacementOptions, ListViewDisplacement } from './types';
 
 // Must match the row height in `style.scss`; the windowing math relies on it.
 // See: https://github.com/WordPress/gutenberg/pull/35230 for additional context.
 export const BLOCK_LIST_ITEM_HEIGHT = 32;
 
-export const getBlockPositionDescription = ( position, siblingCount, level ) =>
+export const getBlockPositionDescription = (
+	position: number,
+	siblingCount: number,
+	level: number
+) =>
 	sprintf(
 		/* translators: 1: The numerical position of the block. 2: The total number of blocks. 3. The level of nesting for the block. */
 		__( 'Block %1$d of %2$d, Level %3$d.' ),
@@ -14,7 +19,10 @@ export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 		level
 	);
 
-export const getBlockPropertiesDescription = ( positionLabel, isLocked ) =>
+export const getBlockPropertiesDescription = (
+	positionLabel: string | null | undefined,
+	isLocked: boolean
+) =>
 	[
 		positionLabel
 			? `${ sprintf(
@@ -32,12 +40,15 @@ export const getBlockPropertiesDescription = ( positionLabel, isLocked ) =>
  * Returns true if the client ID occurs within the block selection or multi-selection,
  * or false otherwise.
  *
- * @param {string}          clientId               Block client ID.
- * @param {string|string[]} selectedBlockClientIds Selected block client ID, or an array of multi-selected blocks client IDs.
+ * @param clientId               Block client ID.
+ * @param selectedBlockClientIds Selected block client ID, or an array of multi-selected blocks client IDs.
  *
- * @return {boolean} Whether the block is in multi-selection set.
+ * @return Whether the block is in multi-selection set.
  */
-export const isClientIdSelected = ( clientId, selectedBlockClientIds ) =>
+export const isClientIdSelected = (
+	clientId: string,
+	selectedBlockClientIds: string | string[]
+): boolean =>
 	Array.isArray( selectedBlockClientIds ) && selectedBlockClientIds.length
 		? selectedBlockClientIds.indexOf( clientId ) !== -1
 		: selectedBlockClientIds === clientId;
@@ -49,18 +60,18 @@ export const isClientIdSelected = ( clientId, selectedBlockClientIds ) =>
  * selection is always at the same nesting level, and not split across
  * separate levels.
  *
- * @param {string}   startId      The first id of a selection.
- * @param {string}   endId        The end id of a selection, usually one that has been clicked on.
- * @param {string[]} startParents An array of ancestor ids for the start id, in descending order.
- * @param {string[]} endParents   An array of ancestor ids for the end id, in descending order.
- * @return {Object} An object containing the start and end ids.
+ * @param startId      The first id of a selection.
+ * @param endId        The end id of a selection, usually one that has been clicked on.
+ * @param startParents An array of ancestor ids for the start id, in descending order.
+ * @param endParents   An array of ancestor ids for the end id, in descending order.
+ * @return An object containing the start and end ids.
  */
 export function getCommonDepthClientIds(
-	startId,
-	endId,
-	startParents,
-	endParents
-) {
+	startId: string,
+	endId: string,
+	startParents: string[],
+	endParents: string[]
+): { start: string; end: string } {
 	const startPath = [ ...startParents, startId ];
 	const endPath = [ ...endParents, endId ];
 	const depth = Math.min( startPath.length, endPath.length ) - 1;
@@ -76,29 +87,32 @@ export function getCommonDepthClientIds(
 /**
  * Shift focus to the list view item associated with a particular clientId.
  *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {string}       focusClientId   The client ID of the block to focus.
- * @param {?HTMLElement} treeGridElement The container element to search within.
- * @param {?AbortSignal} signal          Optional signal to stop waiting for the row and leave focus alone.
+ * @param focusClientId   The client ID of the block to focus.
+ * @param treeGridElement The container element to search within.
+ * @param signal          Optional signal to stop waiting for the row and leave focus alone.
  */
-export function focusListItem( focusClientId, treeGridElement, signal ) {
+export function focusListItem(
+	focusClientId: string,
+	treeGridElement: HTMLElement | null | undefined,
+	signal?: AbortSignal
+): Promise< void > | undefined {
 	if ( ! treeGridElement ) {
 		return;
 	}
 
 	const selector = `[role=row][data-block="${ focusClientId }"]`;
 
-	return new Promise( ( resolve ) => {
+	return new Promise< Element | null >( ( resolve ) => {
 		if ( treeGridElement.querySelector( selector ) ) {
 			return resolve( treeGridElement.querySelector( selector ) );
 		}
 
-		let timer = null;
+		let timer: ReturnType< typeof setTimeout > | null = null;
 		// Wait for the element to be added to the DOM.
 		const observer = new window.MutationObserver( () => {
 			if ( treeGridElement.querySelector( selector ) ) {
-				clearTimeout( timer );
+				// `clearTimeout` ignores `null`.
+				clearTimeout( timer as ReturnType< typeof setTimeout > );
 				observer.disconnect();
 				resolve( treeGridElement.querySelector( selector ) );
 			}
@@ -112,7 +126,8 @@ export function focusListItem( focusClientId, treeGridElement, signal ) {
 		signal?.addEventListener(
 			'abort',
 			() => {
-				clearTimeout( timer );
+				// `clearTimeout` ignores `null`.
+				clearTimeout( timer as ReturnType< typeof setTimeout > );
 				observer.disconnect();
 				resolve( null );
 			},
@@ -147,14 +162,14 @@ export function focusListItem( focusClientId, treeGridElement, signal ) {
  * - `up`: the block should be displaced up, creating room beneath the block for the drop indicator.
  * - `down`: the block should be displaced down, creating room above the block for the drop indicator.
  *
- * @param {Object}                props
- * @param {Object}                props.blockIndexes           The indexes of all the blocks in the list view, keyed by clientId.
- * @param {number|null|undefined} props.blockDropTargetIndex   The index of the block that the user is dropping to.
- * @param {?string}               props.blockDropPosition      The position relative to the block that the user is dropping to.
- * @param {string}                props.clientId               The client id for the current block.
- * @param {?number}               props.firstDraggedBlockIndex The index of the first dragged block.
- * @param {?boolean}              props.isDragged              Whether the current block is being dragged. Dragged blocks skip displacement.
- * @return {Object} An object containing the `displacement`, `isAfterDraggedBlocks` and `isNesting` values.
+ * @param props                        Named parameters.
+ * @param props.blockIndexes           The indexes of all the blocks in the list view, keyed by clientId.
+ * @param props.blockDropTargetIndex   The index of the block that the user is dropping to.
+ * @param props.blockDropPosition      The position relative to the block that the user is dropping to.
+ * @param props.clientId               The client id for the current block.
+ * @param props.firstDraggedBlockIndex The index of the first dragged block.
+ * @param props.isDragged              Whether the current block is being dragged. Dragged blocks skip displacement.
+ * @return An object containing the `displacement`, `isAfterDraggedBlocks` and `isNesting` values.
  */
 export function getDragDisplacementValues( {
 	blockIndexes,
@@ -163,15 +178,17 @@ export function getDragDisplacementValues( {
 	clientId,
 	firstDraggedBlockIndex,
 	isDragged,
-} ) {
-	let displacement;
-	let isNesting;
-	let isAfterDraggedBlocks;
+}: DragDisplacementOptions ) {
+	let displacement: ListViewDisplacement | undefined;
+	let isNesting: boolean | undefined;
+	let isAfterDraggedBlocks: boolean | undefined;
 
 	if ( ! isDragged ) {
 		isNesting = false;
 		const thisBlockIndex = blockIndexes[ clientId ];
-		isAfterDraggedBlocks = thisBlockIndex > firstDraggedBlockIndex;
+		// A missing index compares false.
+		isAfterDraggedBlocks =
+			( thisBlockIndex as number ) > ( firstDraggedBlockIndex as number );
 
 		// Determine where to displace the position of the current block, relative
 		// to the blocks being dragged (in their original position) and the drop target

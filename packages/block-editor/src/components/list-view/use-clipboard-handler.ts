@@ -4,10 +4,16 @@ import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
 import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
+import type { TreeBlock } from '../../store/types';
+import type { ListViewSelectBlock } from './types';
 
 // This hook borrows from useClipboardHandler in ../writing-flow/use-clipboard-handler.ts
 // and adds behaviour for the list view, while skipping partial selection.
-export default function useClipboardHandler( { selectBlock } ) {
+export default function useClipboardHandler( {
+	selectBlock,
+}: {
+	selectBlock: ListViewSelectBlock;
+} ) {
 	const registry = useRegistry();
 	const {
 		getBlockOrder,
@@ -23,8 +29,11 @@ export default function useClipboardHandler( { selectBlock } ) {
 		useDispatch( blockEditorStore );
 	const notifyCopy = useNotifyCopy();
 
-	return useRefEffect( ( node ) => {
-		function updateFocusAndSelection( focusClientId, shouldSelectBlock ) {
+	return useRefEffect( ( node: HTMLElement ) => {
+		function updateFocusAndSelection(
+			focusClientId: string,
+			shouldSelectBlock: boolean
+		) {
 			if ( shouldSelectBlock ) {
 				selectBlock( undefined, focusClientId, null, null );
 			}
@@ -35,7 +44,7 @@ export default function useClipboardHandler( { selectBlock } ) {
 		// Determine which blocks to update:
 		// If the current (focused) block is part of the block selection, use the whole selection.
 		// If the focused block is not part of the block selection, only update the focused block.
-		function getBlocksToUpdate( clientId ) {
+		function getBlocksToUpdate( clientId: string ) {
 			const selectedBlockClientIds = getSelectedBlockClientIds();
 			const isUpdatingSelectedBlocks =
 				selectedBlockClientIds.includes( clientId );
@@ -57,24 +66,30 @@ export default function useClipboardHandler( { selectBlock } ) {
 			};
 		}
 
-		function handler( event ) {
+		function handler( event: ClipboardEvent ) {
 			if ( event.defaultPrevented ) {
 				// This was possibly already handled in rich-text/use-paste-handler.js.
 				return;
 			}
 
 			// Only handle events that occur within the list view.
-			if ( ! node.contains( event.target.ownerDocument.activeElement ) ) {
+			// Clipboard events target elements.
+			if (
+				! node.contains(
+					( event.target as Element ).ownerDocument.activeElement
+				)
+			) {
 				return;
 			}
 
 			// Retrieve the block clientId associated with the focused list view row.
 			// This enables applying copy / cut / paste behavior to the focused block,
 			// rather than just the blocks that are currently selected.
-			const listViewRow =
-				event.target.ownerDocument.activeElement?.closest(
-					'[role=row]'
-				);
+			const listViewRow = (
+				event.target as Element
+			 ).ownerDocument.activeElement?.closest< HTMLElement >(
+				'[role=row]'
+			);
 			const clientId = listViewRow?.dataset?.block;
 			if ( ! clientId ) {
 				return;
@@ -99,7 +114,10 @@ export default function useClipboardHandler( { selectBlock } ) {
 				}
 
 				notifyCopy( event.type, selectedBlockClientIds );
-				const blocks = getBlocksByClientId( selectedBlockClientIds );
+				// The blocks to copy exist.
+				const blocks = getBlocksByClientId(
+					selectedBlockClientIds
+				) as TreeBlock[];
 				setClipboardBlocks( event, blocks, registry );
 			}
 
@@ -135,8 +153,10 @@ export default function useClipboardHandler( { selectBlock } ) {
 						canUserUseUnfilteredHTML,
 				} = getSettings();
 				const blocks = getPasteBlocks(
-					event,
-					canUserUseUnfilteredHTML
+					// Paste events carry clipboard data.
+					event as ClipboardEvent & { clipboardData: DataTransfer },
+					// The setting is a boolean.
+					canUserUseUnfilteredHTML as boolean | undefined
 				);
 
 				if ( selectedBlockClientIds.length === 1 ) {

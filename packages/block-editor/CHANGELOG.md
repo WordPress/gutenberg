@@ -87,6 +87,7 @@
 -   Convert the typography, border and dimensions panels to TypeScript ([#84989](https://github.com/WordPress/gutenberg/pull/84989)).
 -   Convert the style support hooks to TypeScript ([#85024](https://github.com/WordPress/gutenberg/pull/85024)).
 -   Convert the rich text, autocomplete, editable text and plain text components to TypeScript ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
+-   Convert the list view, block navigation dropdown and list view support to TypeScript ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
 
 ## 18.1.0 (2026-10-07)
 

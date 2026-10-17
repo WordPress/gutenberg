@@ -1,3 +1,5 @@
+import type { ComponentProps, ComponentType, RefAttributes } from 'react';
+import type { Block } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
@@ -9,9 +11,17 @@ import { useInsertedBlockClientId, useListViewContext } from './context';
 import Inserter from '../inserter';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
+import type { ListViewAppenderProps } from './types';
 
-export const Appender = forwardRef(
+// The inserter is still JavaScript, so its inferred props are all required.
+type TypedInserter = ComponentType<
+	Partial< ComponentProps< typeof Inserter > > & RefAttributes< HTMLElement >
+>;
+
+export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
+		// Read on render, like the JSX it replaces, as the imports are circular.
+		const AppenderInserter = Inserter as TypedInserter;
 		const { setInsertedBlockClientId } = useListViewContext();
 		const insertedBlockClientId = useInsertedBlockClientId();
 
@@ -72,14 +82,15 @@ export const Appender = forwardRef(
 		const description = sprintf(
 			/* translators: 1: The name of the block. 2: The numerical position of the block. 3: The level of nesting for the block. */
 			__( 'Append to %1$s block at position %2$d, Level %3$d' ),
-			blockTitle,
+			// `sprintf` formats any value for `%s`.
+			blockTitle as string,
 			blockCount + 1,
 			nestingLevel
 		);
 
 		return (
 			<div className="list-view-appender">
-				<Inserter
+				<AppenderInserter
 					ref={ ref }
 					rootClientId={ clientId }
 					position="bottom right"
@@ -89,7 +100,7 @@ export const Appender = forwardRef(
 					__experimentalIsQuick
 					{ ...props }
 					toggleProps={ { 'aria-describedby': descriptionId } }
-					onSelectOrClose={ ( maybeInsertedBlock ) => {
+					onSelectOrClose={ ( maybeInsertedBlock?: Block ) => {
 						if ( maybeInsertedBlock?.clientId ) {
 							setInsertedBlockClientId(
 								maybeInsertedBlock.clientId
