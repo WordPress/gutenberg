@@ -377,7 +377,7 @@ Determines whether or not the given block is a reusable block. This is a special
 
 _Parameters_
 
-- _blockOrType_ `Block | BlockType | null | undefined`: Block or Block Type to test.
+- _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
 
 _Returns_
 
@@ -389,7 +389,7 @@ Determines whether or not the given block is a template part. This is a special 
 
 _Parameters_
 
-- _blockOrType_ `Block | BlockType | null | undefined`: Block or Block Type to test.
+- _blockOrType_ `{ name: string; } | null | undefined`: Block or Block Type to test.
 
 _Returns_
 
