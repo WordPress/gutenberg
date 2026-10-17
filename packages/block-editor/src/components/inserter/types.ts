@@ -131,8 +131,10 @@ export interface PatternCategoryPreviewsProps {
 export interface PatternsFilterProps {
 	setPatternSyncFilter: ( value: string ) => void;
 	setPatternSourceFilter: ( value: string ) => void;
+	setPatternAuthorFilter: ( value: string ) => void;
 	patternSyncFilter: string;
 	patternSourceFilter: string;
+	patternAuthorFilter: string;
 	scrollContainerRef: PatternsScrollContainerRef;
 	category: PatternCategory;
 }

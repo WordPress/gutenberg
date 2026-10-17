@@ -5,8 +5,13 @@ import { __ } from '@wordpress/i18n';
 import PatternExplorerSidebar from './pattern-explorer-sidebar';
 import PatternList from './pattern-list';
 import { usePatternCategories } from '../block-patterns-tab/use-pattern-categories';
+import type { PatternsExplorerProps } from '../types';
 
-function PatternsExplorer( { initialCategory, rootClientId, onModalClose } ) {
+function PatternsExplorer( {
+	initialCategory,
+	rootClientId,
+	onModalClose,
+}: PatternsExplorerProps ) {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const [ selectedCategory, setSelectedCategory ] = useState(
 		initialCategory?.name
@@ -46,7 +51,10 @@ function PatternsExplorer( { initialCategory, rootClientId, onModalClose } ) {
 	);
 }
 
-function PatternsExplorerModal( { onModalClose, ...restProps } ) {
+function PatternsExplorerModal( {
+	onModalClose,
+	...restProps
+}: PatternsExplorerProps ) {
 	return (
 		<Modal
 			title={ __( 'Patterns' ) }
