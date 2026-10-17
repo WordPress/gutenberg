@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it } from 'vitest';
+import type { ReactNode } from 'react';
 import {
 	getBlockTypes,
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+import type { BlockConfiguration, BlockEditProps } from '@wordpress/blocks';
 import {
 	getValidTextAlignments,
 	addAssignedTextAlign,
@@ -18,7 +20,9 @@ describe( 'textAlign', () => {
 		save: noop,
 		category: 'text',
 		title: 'block title',
-		edit: ( { children } ) => <>{ children }</>,
+		edit: ( { children }: BlockEditProps & { children?: ReactNode } ) => (
+			<>{ children }</>
+		),
 	};
 
 	afterEach( () => {
@@ -91,7 +95,11 @@ describe( 'textAlign', () => {
 
 	describe( 'addAssignedTextAlign', () => {
 		it( 'should do nothing if block does not support text align', () => {
-			registerBlockType( 'core/foo', blockSettings );
+			// The test block needs no attributes.
+			registerBlockType(
+				'core/foo',
+				blockSettings as unknown as BlockConfiguration
+			);
 
 			const props = addAssignedTextAlign(
 				{
@@ -99,6 +107,7 @@ describe( 'textAlign', () => {
 				},
 				'core/foo',
 				{
+					// @ts-expect-error The case does not need a valid `style`.
 					typography: {
 						textAlign: 'center',
 					},
@@ -111,6 +120,7 @@ describe( 'textAlign', () => {
 		} );
 
 		it( 'should do add text align classname if block supports text align', () => {
+			// The test block needs no attributes.
 			registerBlockType( 'core/foo', {
 				...blockSettings,
 				supports: {
@@ -118,7 +128,7 @@ describe( 'textAlign', () => {
 						textAlign: true,
 					},
 				},
-			} );
+			} as unknown as BlockConfiguration );
 
 			const props = addAssignedTextAlign(
 				{
