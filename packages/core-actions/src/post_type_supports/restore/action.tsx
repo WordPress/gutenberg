@@ -2,16 +2,15 @@ import { backup } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-import type { Action } from '@wordpress/dataviews';
 import { getItemTitle, isTemplateOrTemplatePart } from '../../shared/utils';
-import type { CoreDataError, PostWithPermissions } from '../../shared/types';
+import type {
+	CoreDataError,
+	PostWithPermissions,
+	ActionScriptParts,
+} from '../../shared/types';
 
-const restorePost: Action< PostWithPermissions > = {
-	id: 'restore',
-	label: __( 'Restore' ),
-	isPrimary: true,
+const restorePost: ActionScriptParts< PostWithPermissions > = {
 	icon: backup,
-	supportsBulk: true,
 	isEligible( item ) {
 		return (
 			! isTemplateOrTemplatePart( item ) &&
@@ -125,6 +124,7 @@ const restorePost: Action< PostWithPermissions > = {
 };
 
 /**
- * Restore action for PostWithPermissions.
+ * The JavaScript parts of the restore action for PostWithPermissions; its data
+ * is in `action.php`.
  */
 export default restorePost;
