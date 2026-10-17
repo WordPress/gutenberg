@@ -1,3 +1,0 @@
-<!-- wp:paragraph -->
-<p>2Cut - collapsed selection</p>
-<!-- /wp:paragraph -->

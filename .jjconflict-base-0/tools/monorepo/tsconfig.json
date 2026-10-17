@@ -1,5 +1,0 @@
-{
-	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "./tsconfig/tsconfig.node.base.json",
-	"include": [ "scripts" ]
-}

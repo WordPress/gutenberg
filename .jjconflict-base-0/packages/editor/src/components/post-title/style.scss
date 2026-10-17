@@ -1,8 +1,0 @@
-@use "@wordpress/base-styles/variables" as *;
-
-// Raw Text Variant
-.editor-post-title.is-raw-text {
-	margin-bottom: $grid-unit-30;
-	margin-top: 2px; // space for focus outline to appear.
-	max-width: none;
-}
