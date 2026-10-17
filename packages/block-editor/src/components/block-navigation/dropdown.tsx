@@ -1,3 +1,4 @@
+import type { ForwardedRef } from 'react';
 import deprecated from '@wordpress/deprecated';
 import { Button, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -5,6 +6,10 @@ import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { listView } from '@wordpress/icons';
 import ListView from '../list-view';
+import type {
+	BlockNavigationDropdownProps,
+	BlockNavigationDropdownToggleProps,
+} from './types';
 import { store as blockEditorStore } from '../../store';
 
 function BlockNavigationDropdownToggle( {
@@ -13,7 +18,7 @@ function BlockNavigationDropdownToggle( {
 	isOpen,
 	innerRef,
 	...props
-} ) {
+}: BlockNavigationDropdownToggleProps ) {
 	return (
 		<Button
 			__next40pxDefaultSize
@@ -31,7 +36,10 @@ function BlockNavigationDropdownToggle( {
 	);
 }
 
-function BlockNavigationDropdown( { isDisabled, ...props }, ref ) {
+function BlockNavigationDropdown(
+	{ isDisabled, ...props }: BlockNavigationDropdownProps,
+	ref: ForwardedRef< HTMLButtonElement >
+) {
 	deprecated( 'wp.blockEditor.BlockNavigationDropdown', {
 		since: '6.1',
 		alternative: 'wp.components.Dropdown and wp.blockEditor.ListView',
