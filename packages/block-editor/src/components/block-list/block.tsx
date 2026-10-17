@@ -625,7 +625,7 @@ const applyWithDispatch = withDispatch(
 				}
 			},
 			onReplace(
-				blocks: BlockObject | BlockObject[] | BlockObject[][],
+				blocks: BlockObject | BlockObject[] | [ BlockObject[] ],
 				indexToSelect?: number | null,
 				initialPosition?: InitialPosition
 			) {

@@ -185,7 +185,7 @@ export type BlockSetAttributes = (
  * Replaces the block. Unsynced patterns arrive nested in an array.
  */
 export type BlockListBlockOnReplace = (
-	blocks: Block | Block[] | Block[][],
+	blocks: Block | Block[] | [ Block[] ],
 	indexToSelect?: number | null,
 	initialPosition?: InitialPosition
 ) => void;
