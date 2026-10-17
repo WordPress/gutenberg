@@ -18,7 +18,14 @@ export default function NavigationMenuEditor( { id }: { id: number } ) {
 			return [];
 		}
 
-		return [ createBlock( 'core/navigation', { ref: id } ) ];
+		// Locking the menu to its content gives its items the same editing
+		// experience as content-only List View editing.
+		return [
+			createBlock( 'core/navigation', {
+				ref: id,
+				templateLock: 'contentOnly',
+			} ),
+		];
 	}, [ assetsReady, id ] );
 
 	// The link UI's search needs a suggestions fetcher, which the block
