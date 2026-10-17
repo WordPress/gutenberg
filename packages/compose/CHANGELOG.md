@@ -13,6 +13,7 @@
 ### Bug Fixes
 
 -   `useConstrainedTabbing`: Retain focus when the constrained area has no tabbable elements ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
+-   `useDropZone`: Start a drag on the first `dragover` when the document got no `dragenter`, which Chrome can skip in an iframe, so that `onDragEnd` is still called ([#84500](https://github.com/WordPress/gutenberg/pull/84500)).
 
 ### Internal
 
