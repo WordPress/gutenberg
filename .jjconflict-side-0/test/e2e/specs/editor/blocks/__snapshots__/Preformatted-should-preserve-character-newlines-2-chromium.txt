@@ -1,3 +1,0 @@
-<!-- wp:preformatted -->
-<pre class="wp-block-preformatted">0<br>1<br>2</pre>
-<!-- /wp:preformatted -->

@@ -37,7 +37,13 @@ export const initialVdomPromise = new Promise<
  * before any hydration can change the document. Nested islands run only as part
  * of their outer island's tree.
  *
- * @return A promise that resolves once all eligible islands are hydrated.
+ * Islands are hydrated lazily: an IntersectionObserver hydrates each island as
+ * it approaches the viewport (within one viewport height, from the top or the
+ * bottom), rather than hydrating every island at DOMContentLoaded, so that
+ * off-screen blocks run no hydration JS during page load.
+ *
+ * @return A promise that resolves once every eligible island is under
+ *         observation; each is hydrated as it approaches the viewport.
  */
 export const hydrateRegions = async () => {
 	const nodes = [
@@ -46,13 +52,57 @@ export const hydrateRegions = async () => {
 		( node ) => ! node.parentElement?.closest( '[data-wp-interactive]' )
 	);
 
+	let observedNodeCount = 0;
+
+	const intersectionObserver = new window.IntersectionObserver(
+		async ( entries ) => {
+			for ( const entry of entries ) {
+				if ( ! entry.isIntersecting ) {
+					continue;
+				}
+
+				const node = entry.target;
+				intersectionObserver.unobserve( node );
+				observedNodeCount--;
+				if ( observedNodeCount === 0 ) {
+					intersectionObserver.disconnect();
+				}
+
+				// The node is unobserved on its first intersection, so it is
+				// hydrated once.
+				const fragment = getRegionRootFragment( node );
+				const vdom = toVdom( node );
+				initialVdom.set( node, vdom );
+				await splitTask();
+				hydrate( vdom, fragment );
+				await splitTask();
+			}
+		},
+		{
+			root: null, // To watch for intersection relative to the device's viewport.
+			rootMargin: '100% 0% 100% 0%', // Intersect when within 1 viewport approaching from top or bottom.
+			threshold: 0.0, // As soon as even one pixel is visible.
+		}
+	);
+
+	/*
+	 * This `await` with setTimeout is required to apparently ensure that the
+	 * interactive blocks have their stores fully initialized prior to
+	 * hydrating the blocks. If this is not present, then an error occurs, for
+	 * example:
+	 * > view.js:46 Uncaught (in promise) ReferenceError: Cannot access 'state' before initialization
+	 * This occurs when splitTask() is implemented with scheduler.yield() as
+	 * opposed to setTimeout(), as with the former split tasks are added to the
+	 * front of the task queue whereas with the latter they are added to the
+	 * end of the queue.
+	 */
+	await new Promise( ( resolve ) => {
+		setTimeout( resolve, 0 );
+	} );
+
+	observedNodeCount = nodes.length;
 	for ( const node of nodes ) {
-		await splitTask();
-		const fragment = getRegionRootFragment( node );
-		const vdom = toVdom( node );
-		initialVdom.set( node, vdom );
-		await splitTask();
-		hydrate( vdom, fragment );
+		intersectionObserver.observe( node );
 	}
 
 	// Resolve the promise with the fully populated initialVdom after all regions are hydrated.

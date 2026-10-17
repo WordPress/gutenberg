@@ -1,7 +1,0 @@
-{
-	"$schema": "../../../../schemas/json/theme.json",
-	"version": 3,
-	"settings": {
-		"invalidAdditionalProperty": true
-	}
-}

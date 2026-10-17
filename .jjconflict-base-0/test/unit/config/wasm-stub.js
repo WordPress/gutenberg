@@ -1,1 +1,0 @@
-// Stub file for Vitest.
