@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
 import { MediaCategoryPanel } from '../media-panel';
+import type { MediaCategory } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -16,8 +17,15 @@ const { useMediaResults, defaultResults } = vi.hoisted( () => {
 		],
 		isLoading: false,
 	} );
-	return { useMediaResults: vi.fn( defaults ), defaultResults: defaults };
+	return {
+		useMediaResults:
+			vi.fn< ( ...args: unknown[] ) => Record< string, unknown > >(
+				defaults
+			),
+		defaultResults: defaults,
+	};
 } );
+// @ts-expect-error The stub provides only what the panel needs.
 vi.mock( import( '../hooks' ), () => ( {
 	useMediaResults,
 } ) );
@@ -68,21 +76,27 @@ const baseCategory = {
 	invalidate: vi.fn(),
 };
 
+// A stub category, with what each test adds to the base one.
+type StubCategory = typeof baseCategory & Record< string, unknown >;
+
 // The search term lives above the panel (in `MediaTab`), so the harness
 // owns it here the same way.
-function PanelHarness( { category } ) {
+function PanelHarness( { category }: { category: StubCategory } ) {
 	const [ search, setSearch ] = useState( '' );
 	return (
 		<MediaCategoryPanel
 			onInsert={ vi.fn() }
-			category={ category }
+			// The stub category has only what the panel reads.
+			category={ category as unknown as MediaCategory }
+			// The stub categories hold images.
+			mediaType={ category.mediaType as MediaCategory[ 'mediaType' ] }
 			search={ search }
 			onChangeSearch={ setSearch }
 		/>
 	);
 }
 
-function renderPanel( category ) {
+function renderPanel( category: StubCategory ) {
 	return render( <PanelHarness category={ category } /> );
 }
 
@@ -163,7 +177,8 @@ describe( 'MediaCategoryPanel subscription gating', () => {
 } );
 
 describe( 'MediaCategoryPanel querying', () => {
-	const lastQuery = () => useMediaResults.mock.lastCall[ 1 ];
+	// The panel has rendered, so the hook was called.
+	const lastQuery = () => useMediaResults.mock.lastCall![ 1 ];
 
 	it( 'queries with the search term and page the grid reports', async () => {
 		const user = userEvent.setup();
