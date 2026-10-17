@@ -18,10 +18,20 @@ import {
 	setStyleForState,
 	useBlockStyleState,
 } from './block-style-state';
+import type { PanelStyle } from '../components/global-styles/types';
+import type {
+	ElementsAttributes,
+	ElementsEditProps,
+	ResetAllFilter,
+	StyleInspectorControlProps,
+} from './types';
 
-function ElementsInspectorControl( { children, resetAllFilter } ) {
+function ElementsInspectorControl( {
+	children,
+	resetAllFilter,
+}: StyleInspectorControlProps ) {
 	const attributesResetAllFilter = useCallback(
-		( attributes ) => {
+		( attributes: ElementsAttributes ) => {
 			const updatedStyle = resetAllFilter( attributes.style );
 			return {
 				...attributes,
@@ -34,7 +44,8 @@ function ElementsInspectorControl( { children, resetAllFilter } ) {
 	return (
 		<InspectorControls
 			group="elements"
-			resetAllFilter={ attributesResetAllFilter }
+			// The filter reads the style attribute.
+			resetAllFilter={ attributesResetAllFilter as ResetAllFilter }
 		>
 			{ children }
 		</InspectorControls>
@@ -49,17 +60,19 @@ export function ElementsEdit( {
 	asWrapper,
 	label,
 	defaultControls,
-} ) {
+}: ElementsEditProps ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasColorPanel( settings );
 
-	const { style, className } = useSelect(
+	const { style, className }: ElementsAttributes = useSelect(
 		( select ) => {
 			if ( ! isEnabled ) {
 				return {};
 			}
-			const attributes =
-				select( blockEditorStore ).getBlockAttributes( clientId );
+			// The block's attributes hold its element styles.
+			const attributes = select( blockEditorStore ).getBlockAttributes(
+				clientId
+			) as ElementsAttributes | null;
 			return {
 				style: attributes?.style,
 				className: attributes?.className,
@@ -78,18 +91,20 @@ export function ElementsEdit( {
 
 	const value = useMemo( () => {
 		if ( isStateSelected ) {
-			return getStyleForState( style, selectedState );
+			// The state styles have the shape of the block styles.
+			return getStyleForState( style, selectedState ) as
+				PanelStyle | undefined;
 		}
 		return style;
 	}, [ isStateSelected, selectedState, style ] );
 
 	const onChange = isStateSelected
-		? ( newStyle ) => {
+		? ( newStyle: PanelStyle ) => {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
 			}
-		: ( newStyle ) => {
+		: ( newStyle: PanelStyle ) => {
 				setAttributes( { style: cleanEmptyObject( newStyle ) } );
 			};
 
@@ -120,10 +135,11 @@ export function ElementsEdit( {
 
 	defaultControls = defaultControls
 		? defaultControls
-		: getBlockSupport( name, [
+		: // The default controls map control names to whether they show.
+			( getBlockSupport( name, [
 				COLOR_SUPPORT_KEY,
 				'__experimentalDefaultControls',
-			] );
+			] ) as Record< string, boolean > | undefined );
 
 	const Wrapper = asWrapper || ElementsInspectorControl;
 
