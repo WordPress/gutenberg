@@ -8804,11 +8804,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/style-provider/index.tsx": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
 		"react-hooks/refs": {
 			"count": 11
