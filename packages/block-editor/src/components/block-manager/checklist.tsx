@@ -1,7 +1,12 @@
 import { CheckboxControl as WCCheckboxControl } from '@wordpress/components';
 import BlockIcon from '../block-icon';
+import type { BlockTypesChecklistProps } from './types';
 
-function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
+function BlockTypesChecklist( {
+	blockTypes,
+	value,
+	onItemChange,
+}: BlockTypesChecklistProps ) {
 	return (
 		<ul className="block-editor-block-manager__checklist">
 			{ blockTypes.map( ( blockType ) => (
