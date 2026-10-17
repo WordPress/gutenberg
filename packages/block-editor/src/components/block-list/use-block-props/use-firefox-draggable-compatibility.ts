@@ -1,8 +1,8 @@
 import { useRefEffect } from '@wordpress/compose';
 
-const nodesByDocument = new Map();
+const nodesByDocument = new Map< Document, Set< HTMLElement > >();
 
-function add( doc, node ) {
+function add( doc: Document, node: HTMLElement ) {
 	let set = nodesByDocument.get( doc );
 	if ( ! set ) {
 		set = new Set();
@@ -12,7 +12,7 @@ function add( doc, node ) {
 	set.add( node );
 }
 
-function remove( doc, node ) {
+function remove( doc: Document, node: HTMLElement ) {
 	const set = nodesByDocument.get( doc );
 	if ( set ) {
 		set.delete( node );
@@ -24,7 +24,7 @@ function remove( doc, node ) {
 	}
 }
 
-function restore( node ) {
+function restore( node: HTMLElement ) {
 	const prevDraggable = node.getAttribute( 'data-draggable' );
 	if ( prevDraggable ) {
 		node.removeAttribute( 'data-draggable' );
@@ -36,12 +36,14 @@ function restore( node ) {
 	}
 }
 
-function down( event ) {
-	const { target } = event;
+function down( event: PointerEvent ) {
+	// Pointer events target elements.
+	const target = event.target as HTMLElement;
 	const { ownerDocument, isContentEditable, tagName } = target;
 	const isInputOrTextArea = [ 'INPUT', 'TEXTAREA' ].includes( tagName );
 
-	const nodes = nodesByDocument.get( ownerDocument );
+	// The listener only runs on documents with registered nodes.
+	const nodes = nodesByDocument.get( ownerDocument )!;
 
 	if ( isContentEditable || isInputOrTextArea ) {
 		// Whenever an editable element or an input or textarea is clicked,
@@ -71,10 +73,10 @@ function down( event ) {
  * `draggable` element, selection doesn't get set in the right place. The only
  * solution is to temporarily remove the `draggable` attribute clicking inside
  * these elements.
- * @return {Function} Cleanup function.
+ * @return Cleanup function.
  */
 export function useFirefoxDraggableCompatibility() {
-	return useRefEffect( ( node ) => {
+	return useRefEffect( ( node: HTMLElement ) => {
 		add( node.ownerDocument, node );
 		return () => {
 			remove( node.ownerDocument, node );

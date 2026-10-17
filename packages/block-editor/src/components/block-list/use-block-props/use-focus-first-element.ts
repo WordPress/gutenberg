@@ -10,18 +10,24 @@ import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
-
 /**
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected and an initial position is set.
  *
- * @param {string} clientId Block client ID.
+ * @param options                 Options.
+ * @param options.clientId        Block client ID.
+ * @param options.initialPosition Where to place the caret, `true` to focus the block.
  *
- * @return {RefObject} React ref with the block element.
+ * @return React ref with the block element.
  */
-export function useFocusFirstElement( { clientId, initialPosition } ) {
-	const ref = useRef();
+export function useFocusFirstElement( {
+	clientId,
+	initialPosition,
+}: {
+	clientId: string;
+	initialPosition?: number | boolean | null;
+} ) {
+	const ref = useRef< HTMLElement >( null );
 	const { isBlockSelected, isMultiSelecting, isZoomOut, getSelectionStart } =
 		unlock( useSelect( blockEditorStore ) );
 
@@ -46,7 +52,8 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		const { ownerDocument } = ref.current;
 
 		// Do not focus the block if it already contains the active element.
-		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement ) ) {
+		// A loaded document has an active element, the body at least.
+		if ( isInsideRootBlock( ref.current, ownerDocument.activeElement! ) ) {
 			return;
 		}
 
@@ -90,8 +97,10 @@ export function useFocusFirstElement( { clientId, initialPosition } ) {
 		// target holding focus. Only a caret the rich text synchronized to
 		// the store (offsets present) is deliberate; a leftover one yields
 		// to an explicitly requested edge position (initialPosition -1).
-		const { activeElement } = ownerDocument;
-		const selection = ownerDocument.defaultView.getSelection();
+		// Only HTML elements are focused in the editor.
+		const activeElement = ownerDocument.activeElement as HTMLElement | null;
+		// A rendered block's document has a window with a selection.
+		const selection = ownerDocument.defaultView!.getSelection()!;
 		const { clientId: selectionClientId, offset } = getSelectionStart();
 		const hasCaret =
 			activeElement?.isContentEditable &&
