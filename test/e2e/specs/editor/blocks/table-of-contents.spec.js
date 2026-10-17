@@ -704,8 +704,7 @@ test.describe( 'Table of Contents', () => {
 			await requestUtils.activateTheme( 'emptytheme' );
 		} );
 
-		// Desired behavior: ToC in templates should list headings from the viewed post; trunk does not yet support template placement.
-		test.fixme( 'a table of contents added once to a shared template uses each viewed post heading list', async ( {
+		test( 'a table of contents added once to a shared template uses each viewed post heading list', async ( {
 			page,
 			requestUtils,
 		} ) => {
@@ -803,8 +802,7 @@ test.describe( 'Table of Contents', () => {
 			).toBeInViewport();
 		} );
 
-		// Desired behavior: ToC in template editing should explain that it uses viewed post headings; trunk only shows the generic empty-heading placeholder.
-		test.fixme( 'template editing explains when a live example cannot be shown and the front of site uses the viewed post', async ( {
+		test( 'template editing explains when a live example cannot be shown and the front of site uses the viewed post', async ( {
 			admin,
 			editor,
 			page,
@@ -851,8 +849,7 @@ test.describe( 'Table of Contents', () => {
 			).toBeVisible();
 		} );
 
-		// Desired behavior: ToC in templates should list only the viewed post's own headings.
-		test.fixme( 'only lists headings from the viewed post content boundary', async ( {
+		test( 'only lists headings from the viewed post content boundary', async ( {
 			page,
 			requestUtils,
 		} ) => {
@@ -906,8 +903,7 @@ test.describe( 'Table of Contents', () => {
 			).toHaveCount( 0 );
 		} );
 
-		// Desired behavior: ToC in templates without post content should show a specific editor explanation; trunk only shows the generic empty-heading placeholder.
-		test.fixme( 'templates that do not render post content show an editor placeholder and render nothing to readers', async ( {
+		test( 'templates that do not render post content show an editor placeholder and render nothing to readers', async ( {
 			admin,
 			editor,
 			page,
