@@ -6,6 +6,7 @@ import type {
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
+import type { Color } from '@wordpress/global-styles-engine';
 import type { BlockEditingMode } from '../components/block-editing-mode';
 import type {
 	BlockVisibility,
@@ -402,6 +403,25 @@ export type Settings = Record< string | symbol, unknown > & {
 	blockInspectorTabs?: Record< string, boolean >;
 	blockInspectorAnimation?: BlockInspectorAnimationSettings;
 	blockStatesEditingEnabled?: boolean;
+	/** The color palette. */
+	colors?: Color[];
+	/** Creates a draft page from the link UI. */
+	__experimentalCreatePageEntity?: ( page: {
+		title: string;
+		status: string;
+	} ) => Promise< {
+		id: number;
+		type: string;
+		title: { rendered: string };
+		link: string;
+	} >;
+	__experimentalUserCanCreatePages?: boolean;
+	/** Opens an entity, such as a template part, for editing. */
+	onNavigateToEntityRecord?: ( params: {
+		postId: number | string;
+		postType: string;
+		[ key: string ]: unknown;
+	} ) => void;
 	__experimentalUndo?: () => void;
 	/** Opens the inserter sidebar, or closes it with `false`. */
 	__experimentalSetIsInserterOpened?: (
