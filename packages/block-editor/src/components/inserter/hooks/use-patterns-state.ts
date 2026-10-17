@@ -1,3 +1,4 @@
+import type { Block } from '@wordpress/blocks';
 import { useCallback, useMemo } from '@wordpress/element';
 import { cloneBlock, createBlock } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -11,6 +12,8 @@ import {
 } from '../../../store/private-keys';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
+import type { BlockPattern } from '../../../store/types';
+import type { InsertBlocks, PatternCategory, PatternsState } from '../types';
 
 // Shared so the selector cache survives the inserter closing and reopening.
 const FILTERED_OPTIONS = { [ isFiltered ]: true };
@@ -19,19 +22,19 @@ const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
 /**
  * Retrieves the block patterns inserter state.
  *
- * @param {Function} onInsert         function called when inserter a list of blocks.
- * @param {string=}  rootClientId     Insertion's root client ID.
- * @param {string}   selectedCategory The selected pattern category.
- * @param {boolean}  isQuick          For the quick inserter render only allowed patterns.
+ * @param onInsert         function called when inserter a list of blocks.
+ * @param rootClientId     Insertion's root client ID.
+ * @param selectedCategory The selected pattern category.
+ * @param isQuick          For the quick inserter render only allowed patterns.
  *
- * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
+ * @return Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = (
-	onInsert,
-	rootClientId,
-	selectedCategory,
-	isQuick
-) => {
+	onInsert: InsertBlocks | undefined,
+	rootClientId: string | null | undefined,
+	selectedCategory?: string,
+	isQuick?: boolean
+): PatternsState => {
 	const options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
 
 	// Check if we're editing a navigation-overlay template part.
@@ -70,7 +73,7 @@ const usePatternsState = (
 	// navigation-overlay template part context.
 	// TO DO: create an api for patterns to decide in which context they should be shown.
 	const filteredPatterns = useMemo( () => {
-		return patterns.filter( ( pattern ) => {
+		return patterns.filter( ( pattern: BlockPattern ) => {
 			const hasNavigationCategory =
 				pattern.categories?.includes( 'navigation' );
 			if ( hasNavigationCategory && ! isWithinNavigationOverlayContext ) {
@@ -84,8 +87,8 @@ const usePatternsState = (
 	);
 
 	const allCategories = useMemo( () => {
-		const categories = [ ...patternCategories ];
-		userPatternCategories?.forEach( ( userCategory ) => {
+		const categories: PatternCategory[] = [ ...patternCategories ];
+		userPatternCategories?.forEach( ( userCategory: PatternCategory ) => {
 			if (
 				! categories.find(
 					( existingCategory ) =>
@@ -100,7 +103,7 @@ const usePatternsState = (
 
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback(
-		( pattern, blocks ) => {
+		( pattern: BlockPattern, blocks?: Block[] ) => {
 			const destinationRootClientId = isQuick
 				? rootClientId
 				: getClosestAllowedInsertionPointForPattern(
@@ -115,20 +118,25 @@ const usePatternsState = (
 				pattern.syncStatus !== 'unsynced'
 					? [ createBlock( 'core/block', { ref: pattern.id } ) ]
 					: blocks;
-			onInsert(
+			// The callers that select patterns pass `onInsert`.
+			onInsert!(
 				( patternBlocks ?? [] ).map( ( block ) => {
 					const clonedBlock = cloneBlock( block );
+					// The metadata attribute holds the pattern categories.
+					const metadata = clonedBlock.attributes.metadata as
+						{ categories?: string[] } | undefined;
 					if (
-						clonedBlock.attributes.metadata?.categories?.includes(
-							selectedCategory
+						metadata?.categories?.includes(
+							// A missing category matches none of the categories.
+							selectedCategory as string
 						)
 					) {
-						clonedBlock.attributes.metadata.categories = [
-							selectedCategory,
-						];
+						// Matched above, so the category is set.
+						metadata.categories = [ selectedCategory as string ];
 					}
 					return clonedBlock;
 				} ),
+				// @ts-expect-error Bug: the pattern name is passed as the meta object, which the store ignores.
 				pattern.name,
 				false,
 				destinationRootClientId
@@ -137,7 +145,8 @@ const usePatternsState = (
 				sprintf(
 					/* translators: %s: block pattern title. */
 					__( 'Pattern "%s" inserted.' ),
-					pattern.title
+					// Registered patterns have a title.
+					pattern.title as string
 				),
 				{
 					type: 'snackbar',
