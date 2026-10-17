@@ -51,9 +51,11 @@ describe( 'PostActions', () => {
 			{
 				id: 'delete',
 				label: 'Delete',
-				RenderModal: ( { closeModal }: { closeModal: () => void } ) => (
-					<button onClick={ closeModal }>Cancel</button>
-				),
+				RenderModal: ( {
+					closeModal,
+				}: {
+					closeModal?: () => void;
+				} ) => <button onClick={ closeModal }>Cancel</button>,
 			},
 		] );
 		await renderPostActions();
