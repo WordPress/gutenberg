@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import PlainText from '..';
+import type { PlainTextTextareaProps } from '../types';
 
-const meta: Meta< typeof PlainText > = {
+// The stories render the default textarea.
+const meta: Meta< PlainTextTextareaProps > = {
 	id: 'blockeditor-plaintext',
 	title: 'Editor/Block Editor/PlainText',
 	component: PlainText,
@@ -58,7 +60,7 @@ const meta: Meta< typeof PlainText > = {
 
 export default meta;
 
-export const Default: StoryObj< typeof PlainText > = {
+export const Default: StoryObj< PlainTextTextareaProps > = {
 	render: function Template( { onChange, ...args } ) {
 		const [ value, setValue ] = useState< string >();
 		return (
