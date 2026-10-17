@@ -46,7 +46,7 @@
 	"sideEffects": [
 		"build-style/**",
 		"src/**/*.scss",
-		"src/index.js",
+		"src/index.ts",
 		"src/store/index.ts",
 		"src/hooks/**",
 		"build/index.cjs",
