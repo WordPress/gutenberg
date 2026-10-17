@@ -5,7 +5,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
 import { getFilename } from '@wordpress/url';
+import type { Block } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../../store';
+import type { MediaUploadFunction } from '../../provider/types';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -22,27 +24,28 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
  * uploading and doubles as the guard against a second insert starting while
  * one is in flight, so callers always pass one.
  *
- * @param {(block: Object) => void} onInsert Called with the block to insert.
- * @return {{
- *   insert: (block: Object, itemId: string) => void,
- *   insertingId: string|undefined,
- *   pendingExternalBlock: Object|undefined,
- *   confirmExternalInsert: () => void,
- *   cancelExternalInsert: () => void,
- * }} The insert callback and its state.
+ * @param onInsert Called with the block to insert.
+ * @return The insert callback and its state.
  */
-export function useMediaInsert( onInsert ) {
+export function useMediaInsert( onInsert: ( block: Block ) => void ): {
+	insert: ( block: Block, itemId: string ) => void;
+	insertingId: string | undefined;
+	pendingExternalBlock: Block | undefined;
+	confirmExternalInsert: () => void;
+	cancelExternalInsert: () => void;
+} {
 	// The id of the item whose upload is in flight, so a grid can show a
 	// spinner on that item alone and further inserts are ignored meanwhile.
-	const [ insertingId, setInsertingId ] = useState();
-	const [ pendingExternalBlock, setPendingExternalBlock ] = useState();
+	const [ insertingId, setInsertingId ] = useState< string >();
+	const [ pendingExternalBlock, setPendingExternalBlock ] =
+		useState< Block >();
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
 	const { getSettings, getBlock } = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const insert = useCallback(
-		( previewBlock, itemId ) => {
+		( previewBlock: Block, itemId: string ) => {
 			// Prevent multiple uploads when we're in the process of inserting.
 			if ( insertingId !== undefined ) {
 				return;
@@ -50,7 +53,12 @@ export function useMediaInsert( onInsert ) {
 
 			const settings = getSettings();
 			const clonedBlock = cloneBlock( previewBlock );
-			const { id, url, caption } = clonedBlock.attributes;
+			// Image blocks hold the URL as a string.
+			const { id, url, caption } = clonedBlock.attributes as {
+				id?: number;
+				url?: string;
+				caption?: string;
+			};
 
 			// User has no permission to upload media.
 			if ( ! id && ! settings.mediaUpload ) {
@@ -71,19 +79,23 @@ export function useMediaInsert( onInsert ) {
 			// If this happens, we insert the image block using the external
 			// URL and let the user know about the possible implications.
 			window
+				// @ts-expect-error Bug: audio and video blocks hold `src`, so this fetches `undefined`.
 				.fetch( url )
 				.then( ( response ) => response.blob() )
 				.then( ( blob ) => {
+					// @ts-expect-error Bug: audio and video blocks have no `url`, see above.
 					const fileName = getFilename( url ) || 'image.jpg';
 					const file = new File( [ blob ], fileName, {
 						type: blob.type,
 					} );
 
-					settings.mediaUpload( {
+					// The upload runs when the setting is there, checked above.
+					( settings.mediaUpload as MediaUploadFunction )( {
 						filesList: [ file ],
 						additionalData: { caption },
 						onFileChange( [ img ] ) {
-							if ( isBlobURL( img.url ) ) {
+							// Uploaded attachments have a URL.
+							if ( isBlobURL( img.url as string ) ) {
 								return;
 							}
 
@@ -140,7 +152,8 @@ export function useMediaInsert( onInsert ) {
 	);
 
 	const confirmExternalInsert = useCallback( () => {
-		onInsert( cloneBlock( pendingExternalBlock ) );
+		// Confirmed only while a block is pending.
+		onInsert( cloneBlock( pendingExternalBlock! ) );
 		createSuccessNotice( __( 'Image inserted.' ), {
 			type: 'snackbar',
 			id: 'inserter-notice',
