@@ -259,3 +259,19 @@ export type RichTextEventListenerProps = {
 export type RichTextEventListener = (
 	props: RefObject< RichTextEventListenerProps >
 ) => ( element: HTMLElement ) => () => void;
+
+export interface RichTextShortcutProps {
+	/** The character key of the shortcut. */
+	character: string;
+	/** The modifier of the shortcut, such as `primary`. */
+	type: WPKeycodeModifier;
+	/** Called when the shortcut is used. */
+	onUse: () => void;
+}
+
+export interface RichTextInputEventProps {
+	/** The `InputEvent.inputType` to handle, such as `formatBold`. */
+	inputType: string;
+	/** Called when an input event of `inputType` is fired. */
+	onInput: () => void;
+}
