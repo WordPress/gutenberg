@@ -519,6 +519,13 @@
 	}
 }
 
+// Above the block, where its toolbar would be if the grid didn't show it.
+.block-editor-grid-item-handles__drag {
+	top: -($button-size-compact + $grid-unit-10);
+	left: 50%;
+	margin-left: -$button-size-compact * 0.5;
+}
+
 // Outside the bottom right corner, clear of the resize handles in the middle
 // of each side.
 .block-editor-grid-item-handles__rotate {

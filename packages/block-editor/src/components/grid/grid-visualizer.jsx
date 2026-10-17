@@ -27,9 +27,11 @@ import {
 } from './utils';
 import { getRotatedBoundingRect } from './rotation';
 import {
+	getGrabPoint,
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
+import { isGridItemHandleDrag } from './start-grid-item-drag';
 import { getAlignmentGuides } from './get-alignment-guides';
 import {
 	getUnstackedMobileUpdates,
@@ -538,25 +540,16 @@ function GridVisualizerDropLayer( {
 		const x = ( event.clientX - layerRect.left ) * scale;
 		const y = ( event.clientY - layerRect.top ) * scale;
 
-		// A block dragged by its body keeps the point it was grabbed at
-		// under the pointer, which the first move over the grid finds inside
-		// it. A block dragged by its handle, or from outside the grid, is
-		// centered on the pointer.
+		// The first move over the grid finds where the block was grabbed.
 		if ( grabRef.current?.srcClientId !== srcClientId ) {
-			const isGrabbed =
-				srcPixelRect &&
-				x >= srcPixelRect.left &&
-				x <= srcPixelRect.right &&
-				y >= srcPixelRect.top &&
-				y <= srcPixelRect.bottom;
 			grabRef.current = {
 				srcClientId,
-				grab: isGrabbed
-					? {
-							grabX: x - srcPixelRect.left,
-							grabY: y - srcPixelRect.top,
-						}
-					: {},
+				grab: getGrabPoint( {
+					x,
+					y,
+					pixelRect: srcPixelRect,
+					isHandleDrag: isGridItemHandleDrag( event ),
+				} ),
 			};
 		}
 
