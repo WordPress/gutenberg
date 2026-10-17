@@ -1,7 +1,8 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
 import PlainText from '..';
 
-const meta = {
+const meta: Meta< typeof PlainText > = {
 	id: 'blockeditor-plaintext',
 	title: 'Editor/Block Editor/PlainText',
 	component: PlainText,
@@ -20,6 +21,7 @@ const meta = {
 	argTypes: {
 		value: {
 			control: {
+				// @ts-expect-error Storybook types omit `null`, which hides the control.
 				type: null,
 			},
 			table: {
@@ -32,6 +34,7 @@ const meta = {
 		onChange: {
 			action: 'onChange',
 			control: {
+				// @ts-expect-error Storybook types omit `null`, which hides the control.
 				type: null,
 			},
 			table: {
@@ -55,9 +58,9 @@ const meta = {
 
 export default meta;
 
-export const Default = {
+export const Default: StoryObj< typeof PlainText > = {
 	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState();
+		const [ value, setValue ] = useState< string >();
 		return (
 			<PlainText
 				{ ...args }

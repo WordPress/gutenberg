@@ -1,6 +1,8 @@
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import EditableText from '../editable-text';
+import type { EditableTextProps } from '../editable-text/types';
+import type { PlainTextProps } from './types';
 
 /**
  * Render an auto-growing textarea allow users to fill any textual content.
@@ -39,9 +41,18 @@ import EditableText from '../editable-text';
  * @param {Object}   [props.ref]    The component forwards the `ref` property to the `textarea` element.
  * @return {Element} Plain text component
  */
-const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
+const PlainText = forwardRef<
+	HTMLTextAreaElement & HTMLElement,
+	PlainTextProps
+>( ( { __experimentalVersion, ...props }, ref ) => {
 	if ( __experimentalVersion === 2 ) {
-		return <EditableText ref={ ref } { ...props } />;
+		// The editable text takes the text props of the textarea.
+		return (
+			<EditableText
+				ref={ ref }
+				{ ...( props as unknown as EditableTextProps ) }
+			/>
+		);
 	}
 
 	const { className, onChange, ...remainingProps } = props;
