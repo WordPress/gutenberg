@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
@@ -15,6 +16,7 @@ describe( 'getInlineStyles', () => {
 	} );
 
 	it( 'should ignore unknown styles', () => {
+		// @ts-expect-error The color styles are an object of color values.
 		expect( getInlineStyles( { color: 'red' } ) ).toEqual( {} );
 	} );
 
@@ -731,7 +733,9 @@ describe( 'addSaveProps', () => {
 		},
 	};
 
-	const applySkipSerialization = ( features ) => {
+	const applySkipSerialization = (
+		features: Record< string, boolean | string[] >
+	) => {
 		const updatedSettings = {
 			...blockSettings,
 			supports: {
@@ -741,8 +745,13 @@ describe( 'addSaveProps', () => {
 			},
 		};
 		Object.keys( features ).forEach( ( key ) => {
-			updatedSettings.supports[ key ].__experimentalSkipSerialization =
-				features[ key ];
+			// The features name the supports of the test block.
+			(
+				updatedSettings.supports as Record<
+					string,
+					Record< string, unknown >
+				>
+			 )[ key ].__experimentalSkipSerialization = features[ key ];
 		} );
 		return updatedSettings;
 	};
@@ -764,7 +773,12 @@ describe( 'addSaveProps', () => {
 	};
 
 	it( 'should serialize all styles by default', () => {
-		const extraProps = _style.addSaveProps( {}, blockSettings, attributes );
+		const extraProps = _style.addSaveProps(
+			{},
+			// The test block type needs no name.
+			blockSettings as unknown as BlockType,
+			attributes
+		);
 
 		expect( extraProps.style ).toEqual( {
 			background:
@@ -781,7 +795,12 @@ describe( 'addSaveProps', () => {
 		const settings = applySkipSerialization( {
 			typography: true,
 		} );
-		const extraProps = _style.addSaveProps( {}, settings, attributes );
+		const extraProps = _style.addSaveProps(
+			{},
+			// The test block type needs no name.
+			settings as unknown as BlockType,
+			attributes
+		);
 
 		expect( extraProps.style ).toEqual( {
 			background:
@@ -796,7 +815,12 @@ describe( 'addSaveProps', () => {
 			color: [ 'gradient' ],
 			typography: [ 'textDecoration', 'textTransform' ],
 		} );
-		const extraProps = _style.addSaveProps( {}, settings, attributes );
+		const extraProps = _style.addSaveProps(
+			{},
+			// The test block type needs no name.
+			settings as unknown as BlockType,
+			attributes
+		);
 
 		expect( extraProps.style ).toEqual( {
 			color: '#d92828',

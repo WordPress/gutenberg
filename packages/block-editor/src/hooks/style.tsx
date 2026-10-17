@@ -11,12 +11,15 @@ import {
 	hasBlockSupport,
 	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	getCSSRules,
 	compileCSS,
 	getCSSValueFromRawStyle,
 } from '@wordpress/style-engine';
+import type { Style } from '@wordpress/style-engine';
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
 import { COLOR_SUPPORT_KEY } from './color';
@@ -55,6 +58,22 @@ import { store as blockEditorStore } from '../store';
 import { globalStylesDataKey } from '../store/private-keys';
 import { isPlainObject } from '../utils/object';
 import { unlock } from '../lock-unlock';
+import type {
+	PanelBorderSide,
+	PanelStyle,
+} from '../components/global-styles/types';
+import type {
+	BlockStyle,
+	BlockStyleControlsProps,
+	BlockStyleState,
+	BlockWrapperProps,
+	StateStylesCSSOptions,
+} from './types';
+
+interface StyleGroup {
+	selector?: string;
+	style: BlockStyle;
+}
 
 const { getResponsiveMediaQueries } = unlock( globalStylesEnginePrivateApis );
 
@@ -70,7 +89,7 @@ const styleSupportKeys = [
 	SHADOW_SUPPORT_KEY,
 ];
 
-const hasStyleSupport = ( nameOrType ) =>
+const hasStyleSupport = ( nameOrType: string | BlockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( nameOrType, key ) );
 
 /**
@@ -79,11 +98,11 @@ const hasStyleSupport = ( nameOrType ) =>
  * Vendor-prefixed properties are camelCased without their leading dash, so
  * `-webkit-background-clip` becomes `WebkitBackgroundClip`.
  *
- * @param {string} key CSS property name.
+ * @param key CSS property name.
  *
- * @return {string} React style object key.
+ * @return React style object key.
  */
-function getReactStyleKey( key ) {
+function getReactStyleKey( key: string ): string {
 	// Custom properties start with two dashes. React writes them verbatim.
 	if ( ! key.startsWith( '-' ) || key.startsWith( '--' ) ) {
 		return key;
@@ -91,12 +110,14 @@ function getReactStyleKey( key ) {
 
 	const camelCased = key
 		.slice( 1 )
-		.replace( /-([a-z])/g, ( _, character ) => character.toUpperCase() );
+		.replace( /-([a-z])/g, ( _, character: string ) =>
+			character.toUpperCase()
+		);
 
 	// `-ms-` is the one prefix React keeps lowercase, e.g. `msFlexAlign`.
 	return key.startsWith( '-ms-' )
 		? camelCased
-		: camelCased.replace( /^[a-z]/, ( character ) =>
+		: camelCased.replace( /^[a-z]/, ( character: string ) =>
 				character.toUpperCase()
 			);
 }
@@ -104,15 +125,16 @@ function getReactStyleKey( key ) {
 /**
  * Returns the inline styles to add depending on the style object
  *
- * @param {Object} styles Styles configuration.
+ * @param styles Styles configuration.
  *
- * @return {Object} Flattened CSS variables declaration.
+ * @return Flattened CSS variables declaration.
  */
-export function getInlineStyles( styles = {} ) {
-	const output = {};
+export function getInlineStyles( styles: PanelStyle | undefined = {} ) {
+	const output: Record< string, unknown > = {};
 	// The goal is to move everything to server side generated engine styles
 	// This is temporary as we absorb more and more styles into the engine.
-	getCSSRules( styles ).forEach( ( rule ) => {
+	// The block styles have the shape the style engine reads.
+	getCSSRules( styles as Style ).forEach( ( rule ) => {
 		output[ getReactStyleKey( rule.key ) ] = rule.value;
 	} );
 
@@ -125,10 +147,10 @@ export function getInlineStyles( styles = {} ) {
  * State styles are emitted as stylesheet rules rather than inline styles, so
  * they cannot rely on the block-library inline-style attribute fallback rules.
  *
- * @param {Object} stateStyles State style object.
- * @return {Object|undefined} Style object containing fallback border styles.
+ * @param stateStyles State style object.
+ * @return Style object containing fallback border styles.
  */
-function getStateFallbackBorderStyles( stateStyles ) {
+function getStateFallbackBorderStyles( stateStyles: PanelStyle | undefined ) {
 	const border = stateStyles?.border;
 	if ( ! border ) {
 		return undefined;
@@ -137,7 +159,7 @@ function getStateFallbackBorderStyles( stateStyles ) {
 	const hasBorderStyle = !! border.style;
 	const hasBorderColor = !! border.color;
 	const hasBorderWidth = !! border.width;
-	const fallbackBorder = {};
+	const fallbackBorder: Record< string, unknown > = {};
 
 	if ( ! hasBorderStyle && ( hasBorderColor || hasBorderWidth ) ) {
 		fallbackBorder.style = 'solid';
@@ -145,7 +167,8 @@ function getStateFallbackBorderStyles( stateStyles ) {
 
 	BORDER_SIDES.forEach( ( side ) => {
 		const sideKey = side.toLowerCase();
-		const sideBorder = border[ sideKey ];
+		// The lowercased side names the border of that side.
+		const sideBorder = border[ sideKey ] as PanelBorderSide | undefined;
 		const hasSideStyle = !! sideBorder?.style;
 		const hasSideColor = !! sideBorder?.color;
 		const hasSideWidth = !! sideBorder?.width;
@@ -171,11 +194,14 @@ function getStateFallbackBorderStyles( stateStyles ) {
  * declaration must be explicitly cleared. Without this, the gradient image layer
  * remains visible even though the solid hover color wins `background-color`.
  *
- * @param {Object} stateStyles State style object.
- * @param {string} selector    CSS selector for the generated style.
- * @return {string|undefined} CSS string with background-image reset, or undefined.
+ * @param stateStyles State style object.
+ * @param selector    CSS selector for the generated style.
+ * @return CSS string with background-image reset, or undefined.
  */
-function getStateBackgroundResetCSS( stateStyles, selector ) {
+function getStateBackgroundResetCSS(
+	stateStyles: PanelStyle | undefined,
+	selector: string | undefined
+) {
 	const hasSolidBackground = !! stateStyles?.color?.background;
 
 	if ( ! hasSolidBackground ) {
@@ -200,10 +226,10 @@ function getStateBackgroundResetCSS( stateStyles, selector ) {
 /**
  * Whether a state paints its own background, which escapes must leave alone.
  *
- * @param {Object} stateStyles State style object.
- * @return {boolean} Whether the state paints its own background.
+ * @param stateStyles State style object.
+ * @return Whether the state paints its own background.
  */
-function paintsItsOwnBackground( stateStyles ) {
+function paintsItsOwnBackground( stateStyles: PanelStyle | undefined ) {
 	return (
 		!! stateStyles?.background?.gradient ||
 		!! stateStyles?.background?.backgroundImage ||
@@ -215,12 +241,16 @@ function paintsItsOwnBackground( stateStyles ) {
  * Returns the CSS that stops a text gradient from below painting as a block
  * background once a state switches to a box clip.
  *
- * @param {Object}  stateStyles State style object.
- * @param {Object=} baseStyle   Styles the state layers over.
- * @param {string}  selector    CSS selector for the generated style.
- * @return {string|undefined} CSS string with the background-image reset.
+ * @param stateStyles State style object.
+ * @param baseStyle   Styles the state layers over.
+ * @param selector    CSS selector for the generated style.
+ * @return CSS string with the background-image reset.
  */
-function getStateTextClipEscapeCSS( stateStyles, baseStyle, selector ) {
+function getStateTextClipEscapeCSS(
+	stateStyles: PanelStyle | undefined,
+	baseStyle: PanelStyle | undefined,
+	selector: string | undefined
+) {
 	if ( 'text' !== baseStyle?.background?.backgroundClip ) {
 		return undefined;
 	}
@@ -245,13 +275,17 @@ function getStateTextClipEscapeCSS( stateStyles, baseStyle, selector ) {
  * which otherwise leaves the fill `transparent`. The clip may come from global
  * styles, which the block cannot see, and the fill does nothing without one.
  *
- * @param {Object}  stateStyles State style object.
- * @param {Object=} baseStyle   Styles the state layers over. Without it the
- *                              block cannot sit under a text clip.
- * @param {string}  selector    CSS selector for the generated style.
- * @return {string|undefined} CSS string with the text fill reset.
+ * @param stateStyles State style object.
+ * @param baseStyle   Styles the state layers over. Without it the
+ *                    block cannot sit under a text clip.
+ * @param selector    CSS selector for the generated style.
+ * @return CSS string with the text fill reset.
  */
-function getStateTextFillResetCSS( stateStyles, baseStyle, selector ) {
+function getStateTextFillResetCSS(
+	stateStyles: PanelStyle | undefined,
+	baseStyle: PanelStyle | undefined,
+	selector: string | undefined
+) {
 	if (
 		! baseStyle ||
 		! stateStyles?.color?.text ||
@@ -271,10 +305,12 @@ function getStateTextFillResetCSS( stateStyles, baseStyle, selector ) {
  * Returns fallback dimension styles that keep state styles aligned with the
  * default dimensions block-support output.
  *
- * @param {Object} stateStyles State style object.
- * @return {Object|undefined} Style object containing fallback dimension styles.
+ * @param stateStyles State style object.
+ * @return Style object containing fallback dimension styles.
  */
-function getStateFallbackDimensionStyles( stateStyles ) {
+function getStateFallbackDimensionStyles(
+	stateStyles: PanelStyle | undefined
+): PanelStyle | undefined {
 	const dimensions = stateStyles?.dimensions;
 	if ( ! dimensions ) {
 		return undefined;
@@ -296,6 +332,8 @@ function getStateFallbackDimensionStyles( stateStyles ) {
 			},
 		};
 	}
+
+	return undefined;
 }
 
 /**
@@ -305,11 +343,14 @@ function getStateFallbackDimensionStyles( stateStyles ) {
  * alignment is serialized as a class name. State styles need a declaration
  * instead so viewport and pseudo-state values can override the default class.
  *
- * @param {Object} stateStyles State style object.
- * @param {string} selector    CSS selector for the generated style.
- * @return {string|undefined} CSS string with the text alignment declaration.
+ * @param stateStyles State style object.
+ * @param selector    CSS selector for the generated style.
+ * @return CSS string with the text alignment declaration.
  */
-function getStateTextAlignCSS( stateStyles, selector ) {
+function getStateTextAlignCSS(
+	stateStyles: PanelStyle | undefined,
+	selector: string | undefined
+) {
 	const textAlign = stateStyles?.typography?.textAlign;
 
 	if ( typeof textAlign !== 'string' || ! textAlign ) {
@@ -331,22 +372,30 @@ function getStateTextAlignCSS( stateStyles, selector ) {
  * border styles should not become important because they must not override
  * explicitly authored default border styles.
  *
- * @param {Object}  stateStyles State style object.
- * @param {string}  selector    CSS selector for the generated style.
- * @param {Object=} baseStyle   Styles the state layers over, if any.
- * @return {string} Generated stylesheet.
+ * @param stateStyles State style object.
+ * @param selector    CSS selector for the generated style.
+ * @param baseStyle   Styles the state layers over, if any.
+ * @return Generated stylesheet.
  */
-export function getStateStylesCSS( stateStyles, selector, baseStyle ) {
+export function getStateStylesCSS(
+	stateStyles: PanelStyle | undefined,
+	selector?: string,
+	baseStyle?: PanelStyle
+): string {
 	const fallbackDimensionStyles =
 		getStateFallbackDimensionStyles( stateStyles );
 	const stylesWithDimensionFallbacks = fallbackDimensionStyles
 		? mergeStyleObjects( stateStyles, fallbackDimensionStyles )
 		: stateStyles;
-	const css = compileCSS( stylesWithDimensionFallbacks, { selector } );
+	// The block styles have the shape the style engine reads.
+	const css = compileCSS( stylesWithDimensionFallbacks as Style, {
+		selector,
+	} );
 	const importantCSS = css ? css.replace( /;/g, ' !important;' ) : undefined;
 	const fallbackBorderStyles = getStateFallbackBorderStyles( stateStyles );
 	const fallbackCSS = fallbackBorderStyles
-		? compileCSS( fallbackBorderStyles, { selector } )
+		? // The fallback styles have the shape the style engine reads.
+			compileCSS( fallbackBorderStyles as Style, { selector } )
 		: undefined;
 	const textAlignCSS = getStateTextAlignCSS( stateStyles, selector );
 	const backgroundResetCSS = getStateBackgroundResetCSS(
@@ -376,8 +425,11 @@ export function getStateStylesCSS( stateStyles, selector, baseStyle ) {
 		.join( '\n' );
 }
 
-function mergeStyleObjects( target = {}, source = {} ) {
-	const merged = { ...target };
+function mergeStyleObjects(
+	target: BlockStyle | undefined = {},
+	source: BlockStyle | undefined = {}
+): BlockStyle {
+	const merged: BlockStyle = { ...target };
 
 	Object.entries( source ).forEach( ( [ key, value ] ) => {
 		merged[ key ] =
@@ -389,7 +441,11 @@ function mergeStyleObjects( target = {}, source = {} ) {
 	return merged;
 }
 
-function addStyleGroup( groups, selector, style ) {
+function addStyleGroup(
+	groups: Map< string, StyleGroup >,
+	selector: string | undefined,
+	style: BlockStyle
+) {
 	const key = selector || '';
 	const existing = groups.get( key ) || { selector, style: {} };
 
@@ -399,9 +455,13 @@ function addStyleGroup( groups, selector, style ) {
 	} );
 }
 
-function getStateStyleGroups( stateStyles, name ) {
-	const blockSelectors = getBlockType( name )?.selectors || {};
-	const groups = new Map();
+function getStateStyleGroups(
+	stateStyles: PanelStyle | undefined,
+	name: string
+) {
+	const blockSelectors: NonNullable< BlockType[ 'selectors' ] > =
+		getBlockType( name )?.selectors || {};
+	const groups = new Map< string, StyleGroup >();
 
 	Object.entries( stateStyles || {} ).forEach(
 		( [ feature, featureStyles ] ) => {
@@ -442,7 +502,9 @@ function getStateStyleGroups( stateStyles, name ) {
 				if ( Object.keys( remainingStyles ).length ) {
 					addStyleGroup(
 						groups,
-						featureSelectors.root || blockSelectors.root,
+						featureSelectors.root ||
+							// The block's root selector is a string.
+							( blockSelectors.root as string | undefined ),
 						{
 							[ feature ]: remainingStyles,
 						}
@@ -451,7 +513,8 @@ function getStateStyleGroups( stateStyles, name ) {
 				return;
 			}
 
-			addStyleGroup( groups, blockSelectors.root, {
+			// The block's root selector is a string.
+			addStyleGroup( groups, blockSelectors.root as string | undefined, {
 				[ feature ]: featureStyles,
 			} );
 		}
@@ -463,15 +526,18 @@ function getStateStyleGroups( stateStyles, name ) {
 /**
  * Generates CSS for block instance state styles, honoring feature selectors.
  *
- * @param {Object}  stateStyles          State style object.
- * @param {Object}  options              Generation options.
- * @param {string}  options.name         Block name.
- * @param {string}  options.baseSelector Block-instance scoping selector.
- * @param {string=} options.state        Optional pseudo-state, e.g. ":hover".
- * @param {Object=} options.baseStyle    Styles the state layers over.
- * @return {string|undefined} Generated stylesheet.
+ * @param stateStyles          State style object.
+ * @param options              Generation options.
+ * @param options.name         Block name.
+ * @param options.baseSelector Block-instance scoping selector.
+ * @param options.state        Optional pseudo-state, e.g. ":hover".
+ * @param options.baseStyle    Styles the state layers over.
+ * @return Generated stylesheet.
  */
-export function getBlockStateStylesCSS( stateStyles, options ) {
+export function getBlockStateStylesCSS(
+	stateStyles: PanelStyle | undefined,
+	options: StateStylesCSSOptions
+) {
 	const { name, baseSelector, state = '' } = options;
 	// Mirror of the PHP gate: only a block that supports the clip can sit
 	// under a text clip to escape.
@@ -484,7 +550,8 @@ export function getBlockStateStylesCSS( stateStyles, options ) {
 	const rules = getStateStyleGroups( stateStyles, name )
 		.map( ( { selector: blockSelector, style } ) =>
 			getStateStylesCSS(
-				style,
+				// Grouping keeps the shape of the state styles.
+				style as PanelStyle,
 				buildScopedBlockSelector(
 					baseSelector,
 					blockSelector,
@@ -506,11 +573,14 @@ export function getBlockStateStylesCSS( stateStyles, options ) {
  * `elements` and pseudo-state styles. Only root declarations should be passed
  * to the style engine for the viewport root selector.
  *
- * @param {Object}   stateStyles Style object for a selected state.
- * @param {string[]} nestedKeys  Keys to remove from the root style object.
- * @return {Object|undefined} Root-only style object.
+ * @param stateStyles Style object for a selected state.
+ * @param nestedKeys  Keys to remove from the root style object.
+ * @return Root-only style object.
  */
-function getRootStateStyles( stateStyles, nestedKeys ) {
+function getRootStateStyles(
+	stateStyles: PanelStyle | undefined,
+	nestedKeys: string[]
+) {
 	if ( ! stateStyles ) {
 		return stateStyles;
 	}
@@ -525,21 +595,27 @@ function getRootStateStyles( stateStyles, nestedKeys ) {
 /**
  * Generates CSS rules for supported pseudo-state styles.
  *
- * @param {Object}  style        Block style object containing pseudo-state styles.
- * @param {string}  name         Block name.
- * @param {string}  baseSelector Base selector used to scope generated CSS.
- * @param {Object=} baseStyle    Styles these pseudo states layer over.
- * @return {string[]} Generated CSS rule strings.
+ * @param style        Block style object containing pseudo-state styles.
+ * @param name         Block name.
+ * @param baseSelector Base selector used to scope generated CSS.
+ * @param baseStyle    Styles these pseudo states layer over.
+ * @return Generated CSS rule strings.
  */
-function getPseudoStateCSSRules( style, name, baseSelector, baseStyle ) {
+function getPseudoStateCSSRules(
+	style: PanelStyle | undefined,
+	name: string,
+	baseSelector: string,
+	baseStyle?: PanelStyle
+) {
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ];
 	if ( ! validPseudoStates ) {
 		return [];
 	}
 
-	const cssRules = [];
+	const cssRules: string[] = [];
 	validPseudoStates.forEach( ( pseudoState ) => {
-		const stateStyles = style?.[ pseudoState ];
+		// The valid pseudo states start with a colon.
+		const stateStyles = style?.[ pseudoState as `:${ string }` ];
 		if ( stateStyles ) {
 			const css = getBlockStateStylesCSS( stateStyles, {
 				name,
@@ -562,36 +638,37 @@ function getPseudoStateCSSRules( style, name, baseSelector, baseStyle ) {
  * pseudo-state styles. Generated rules are wrapped in the matching breakpoint
  * media query.
  *
- * @param {Object} style            Block style object containing responsive states.
- * @param {string} name             Block name.
- * @param {string} baseSelector     Base selector used to scope generated CSS.
- * @param {Object} viewportSettings Viewport breakpoint settings.
- * @return {string[]} Generated CSS rule strings.
+ * @param style            Block style object containing responsive states.
+ * @param name             Block name.
+ * @param baseSelector     Base selector used to scope generated CSS.
+ * @param viewportSettings Viewport breakpoint settings.
+ * @return Generated CSS rule strings.
  */
 export function getResponsiveStateCSSRules(
-	style,
-	name,
-	baseSelector,
-	viewportSettings
+	style: PanelStyle | undefined,
+	name: string,
+	baseSelector: string,
+	viewportSettings?: unknown
 ) {
-	const cssRules = [];
+	const cssRules: string[] = [];
 	const validPseudoStates = VALID_BLOCK_PSEUDO_STATES[ name ] ?? [];
 	const nestedStateKeys = [ 'elements', ...validPseudoStates ];
 	const defaultRootStyles = getRootStateStyles( style, nestedStateKeys );
-	const responsiveMediaQueries =
+	const responsiveMediaQueries: Record< string, string > =
 		getResponsiveMediaQueries( viewportSettings );
 
 	Object.entries( responsiveMediaQueries ).forEach(
 		( [ viewport, mediaQuery ] ) => {
+			// The state styles have the shape of the block styles.
 			const viewportStyles = getStyleForState( style, {
 				viewport,
 				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-			} );
+			} ) as PanelStyle | undefined;
 			if ( ! viewportStyles ) {
 				return;
 			}
 
-			const viewportCSSRules = [];
+			const viewportCSSRules: string[] = [];
 			const viewportRootStyles = getRootStateStyles(
 				viewportStyles,
 				nestedStateKeys
@@ -619,7 +696,11 @@ export function getResponsiveStateCSSRules(
 					viewportStyles,
 					name,
 					baseSelector,
-					mergeStyleObjects( defaultRootStyles, viewportRootStyles )
+					// Merging keeps the shape of the block styles.
+					mergeStyleObjects(
+						defaultRootStyles,
+						viewportRootStyles
+					) as PanelStyle
 				)
 			);
 
@@ -641,12 +722,17 @@ export function getResponsiveStateCSSRules(
  * For example, selecting `@mobile + :hover` should preview styles from
  * `:hover`, with `@mobile.:hover` values layered on top when present.
  *
- * @param {Object} style         Block style object.
- * @param {Object} selectedState Selected block style state.
- * @return {Object|undefined} Style value for the canvas preview.
+ * @param style         Block style object.
+ * @param selectedState Selected block style state.
+ * @return Style value for the canvas preview.
  */
-export function getCanvasStateStyleValue( style, selectedState ) {
-	const stateValue = getStyleForState( style, selectedState );
+export function getCanvasStateStyleValue(
+	style: PanelStyle | undefined,
+	selectedState: BlockStyleState | undefined
+): PanelStyle | undefined {
+	// The state styles have the shape of the block styles.
+	const stateValue = getStyleForState( style, selectedState ) as
+		PanelStyle | undefined;
 	if ( ! hasViewportBlockStyleState( selectedState ) ) {
 		return stateValue;
 	}
@@ -655,13 +741,18 @@ export function getCanvasStateStyleValue( style, selectedState ) {
 		...selectedState,
 		viewport: DEFAULT_BLOCK_STYLE_STATE.viewport,
 	};
+	// The state styles have the shape of the block styles.
 	const defaultViewportStateValue = getStyleForState(
 		style,
 		defaultViewportState
-	);
+	) as PanelStyle | undefined;
 
 	if ( defaultViewportStateValue && stateValue ) {
-		return mergeGlobalStyles( defaultViewportStateValue, stateValue );
+		// Merging deeply works the same for block styles.
+		return mergeGlobalStyles(
+			defaultViewportStateValue as GlobalStylesConfig,
+			stateValue as GlobalStylesConfig
+		) as PanelStyle;
 	}
 	return stateValue || defaultViewportStateValue;
 }
@@ -669,11 +760,11 @@ export function getCanvasStateStyleValue( style, selectedState ) {
 /**
  * Filters registered block settings, extending attributes to include `style` attribute.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-function addAttribute( settings ) {
+function addAttribute( settings: BlockType ): BlockType {
 	if (
 		! hasStyleSupport( settings ) &&
 		! hasBlockSupport( settings, 'customCSS', true )
@@ -698,9 +789,8 @@ function addAttribute( settings ) {
  * with values providing the style paths to be omitted from serialization.
  *
  * @constant
- * @type {Record<string, string[]>}
  */
-const skipSerializationPathsEdit = {
+const skipSerializationPathsEdit: Record< string, string[] > = {
 	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
 	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
 		COLOR_SUPPORT_KEY,
@@ -732,9 +822,8 @@ const skipSerializationPathsEdit = {
  * the support is saved.
  *
  * @constant
- * @type {Record<string, string[]>}
  */
-const skipSerializationPathsSave = {
+const skipSerializationPathsSave: Record< string, string[] > = {
 	...skipSerializationPathsEdit,
 	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: [
 		`${ DIMENSIONS_SUPPORT_KEY }.aspectRatio`,
@@ -742,7 +831,7 @@ const skipSerializationPathsSave = {
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: [ BACKGROUND_SUPPORT_KEY ], // Skip serialization of background support in save mode.
 };
 
-const skipSerializationPathsSaveChecks = {
+const skipSerializationPathsSaveChecks: Record< string, boolean > = {
 	[ `${ DIMENSIONS_SUPPORT_KEY }.aspectRatio` ]: true,
 	[ `${ BACKGROUND_SUPPORT_KEY }` ]: true,
 };
@@ -756,9 +845,8 @@ const skipSerializationPathsSaveChecks = {
  * the support flag and the skip serialization array.
  *
  * @constant
- * @type {Record<string, string>}
  */
-const renamedFeatures = { gradients: 'gradient' };
+const renamedFeatures: Record< string, string > = { gradients: 'gradient' };
 
 /**
  * A utility function used to remove one or more paths from a style object.
@@ -845,17 +933,22 @@ const renamedFeatures = { gradients: 'gradient' };
  *
  * @see https://lodash.com/docs/4.17.15#omit
  *
- * @param {Object}       style             Styles object.
- * @param {Array|string} paths             Paths to remove.
- * @param {boolean}      preserveReference True to mutate the `style` object, false otherwise.
- * @return {Object}      Styles object with the specified paths removed.
+ * @param style             Styles object.
+ * @param paths             Paths to remove.
+ * @param preserveReference True to mutate the `style` object, false otherwise.
+ * @return Styles object with the specified paths removed.
  */
-export function omitStyle( style, paths, preserveReference = false ) {
+export function omitStyle< T extends BlockStyle | null | undefined >(
+	style: T,
+	paths: string | Array< string | string[] >,
+	preserveReference: boolean = false
+): T {
 	if ( ! style ) {
 		return style;
 	}
 
-	let newStyle = style;
+	// The early return leaves a style object.
+	let newStyle = style as BlockStyle;
 	if ( ! preserveReference ) {
 		newStyle = JSON.parse( JSON.stringify( style ) );
 	}
@@ -871,38 +964,45 @@ export function omitStyle( style, paths, preserveReference = false ) {
 
 		if ( path.length > 1 ) {
 			const [ firstSubpath, ...restPath ] = path;
-			omitStyle( newStyle[ firstSubpath ], [ restPath ], true );
+			// A missing subpath returns early.
+			omitStyle(
+				newStyle[ firstSubpath ] as BlockStyle,
+				[ restPath ],
+				true
+			);
 		} else if ( path.length === 1 ) {
 			delete newStyle[ path[ 0 ] ];
 		}
 	} );
 
-	return newStyle;
+	// The paths are left out of the same style object.
+	return newStyle as T;
 }
 
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
- * @param {Object}                    props           Additional props applied to save element.
- * @param {Object|string}             blockNameOrType Block type.
- * @param {Object}                    attributes      Block attributes.
- * @param {?Record<string, string[]>} skipPaths       An object of keys and paths to skip serialization.
+ * @param props            Additional props applied to save element.
+ * @param blockNameOrType  Block type.
+ * @param attributes       Block attributes.
+ * @param attributes.style Block style attribute.
+ * @param skipPaths        An object of keys and paths to skip serialization.
  *
- * @return {Object} Filtered props applied to save element.
+ * @return Filtered props applied to save element.
  */
 export function addSaveProps(
-	props,
-	blockNameOrType,
-	attributes,
-	skipPaths = skipSerializationPathsSave
-) {
+	props: BlockWrapperProps,
+	blockNameOrType: BlockType | string,
+	attributes: { style?: PanelStyle },
+	skipPaths: Record< string, string[] > = skipSerializationPathsSave
+): BlockWrapperProps {
 	if ( ! hasStyleSupport( blockNameOrType ) ) {
 		return props;
 	}
 
 	let { style } = attributes;
 	Object.entries( skipPaths ).forEach( ( [ indicator, path ] ) => {
-		const skipSerialization =
+		const skipSerialization: unknown =
 			skipSerializationPathsSaveChecks[ indicator ] ||
 			getBlockSupport( blockNameOrType, indicator );
 
@@ -911,7 +1011,7 @@ export function addSaveProps(
 		}
 
 		if ( Array.isArray( skipSerialization ) ) {
-			skipSerialization.forEach( ( featureName ) => {
+			skipSerialization.forEach( ( featureName: string ) => {
 				const feature = renamedFeatures[ featureName ] || featureName;
 				style = omitStyle( style, [ [ ...path, feature ] ] );
 			} );
@@ -932,7 +1032,7 @@ function BlockStyleControls( {
 	setAttributes,
 	style,
 	__unstableParentLayout,
-} ) {
+}: BlockStyleControlsProps ) {
 	const settings = useBlockSettings( name, __unstableParentLayout );
 	const blockEditingMode = useBlockEditingMode();
 	const { globalBlockStyles, selectedState, showStateOnCanvas } = useSelect(
@@ -944,8 +1044,14 @@ function BlockStyleControls( {
 			} = unlock( blockEditorSelect );
 			const editorSettings = blockEditorSelect.getSettings();
 			return {
-				globalBlockStyles:
-					editorSettings?.[ globalStylesDataKey ]?.blocks?.[ name ],
+				// The global styles data holds the styles of each block type.
+				globalBlockStyles: (
+					editorSettings as {
+						[ globalStylesDataKey ]?: {
+							blocks?: Record< string, PanelStyle >;
+						};
+					}
+				 )?.[ globalStylesDataKey ]?.blocks?.[ name ],
 				selectedState: getSelectedBlockStyleState( clientId ),
 				showStateOnCanvas:
 					isSelectedBlockStyleStateShownOnCanvas( clientId ),
@@ -972,13 +1078,14 @@ function BlockStyleControls( {
 			style,
 			selectedState
 		);
-		let stateValue;
+		let stateValue: PanelStyle;
 
 		if ( globalStateValue && instanceStateValue ) {
+			// Merging deeply works the same for block styles.
 			stateValue = mergeGlobalStyles(
-				globalStateValue,
-				instanceStateValue
-			);
+				globalStateValue as GlobalStylesConfig,
+				instanceStateValue as GlobalStylesConfig
+			) as PanelStyle;
 		} else if ( instanceStateValue ) {
 			stateValue = instanceStateValue;
 		} else if ( globalStateValue ) {
@@ -1068,17 +1175,21 @@ const STYLE_BLOCK_PROPS_REFERENCE = {};
  * pseudo-selectors (e.g. :hover) and related sub-elements (e.g. h1-h6 for headings),
  * into scoped CSS rule strings.
  *
- * @param {Object} blockElementStyles The block's `style.elements` object.
- * @param {string} blockName          The block name, used for skip-serialization checks.
- * @param {string} baseSelector       The base CSS selector to scope rules under.
- * @return {string|undefined} Concatenated CSS rules string, or undefined if none.
+ * @param blockElementStyles The block's `style.elements` object.
+ * @param blockName          The block name, used for skip-serialization checks.
+ * @param baseSelector       The base CSS selector to scope rules under.
+ * @return Concatenated CSS rules string, or undefined if none.
  */
-function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
+function getElementCSSRules(
+	blockElementStyles: Record< string, PanelStyle > | undefined,
+	blockName: string,
+	baseSelector: string
+) {
 	if ( ! blockElementStyles ) {
 		return;
 	}
 
-	const rules = [];
+	const rules: string[] = [];
 
 	elementTypes.forEach( ( { elementType, pseudo, elements } ) => {
 		const skipSerialization = shouldSkipSerialization(
@@ -1100,14 +1211,19 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 				ELEMENTS[ elementType ]
 			);
 
-			rules.push( compileCSS( elementStyles, { selector } ) );
+			// The element styles have the shape the style engine reads.
+			rules.push( compileCSS( elementStyles as Style, { selector } ) );
 
 			// Process any interactive states for the element type.
 			if ( pseudo ) {
 				pseudo.forEach( ( pseudoSelector ) => {
-					if ( elementStyles[ pseudoSelector ] ) {
+					// The pseudo selectors start with a colon.
+					const pseudoStyles =
+						elementStyles[ pseudoSelector as `:${ string }` ];
+					if ( pseudoStyles ) {
 						rules.push(
-							compileCSS( elementStyles[ pseudoSelector ], {
+							// The element styles have the shape the style engine reads.
+							compileCSS( pseudoStyles as Style, {
 								selector: scopeSelector(
 									baseSelector,
 									`${ ELEMENTS[ elementType ] }${ pseudoSelector }`
@@ -1124,7 +1240,8 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 			elements.forEach( ( element ) => {
 				if ( blockElementStyles[ element ] ) {
 					rules.push(
-						compileCSS( blockElementStyles[ element ], {
+						// The element styles have the shape the style engine reads.
+						compileCSS( blockElementStyles[ element ] as Style, {
 							selector: scopeSelector(
 								baseSelector,
 								ELEMENTS[ element ]
@@ -1139,7 +1256,15 @@ function getElementCSSRules( blockElementStyles, blockName, baseSelector ) {
 	return rules.length > 0 ? rules.join( '' ) : undefined;
 }
 
-function useBlockProps( { clientId, name, style } ) {
+function useBlockProps( {
+	clientId,
+	name,
+	style,
+}: {
+	clientId: string;
+	name: string;
+	style?: PanelStyle;
+} ) {
 	const blockElementsContainerIdentifier = useInstanceId(
 		STYLE_BLOCK_PROPS_REFERENCE,
 		'wp-elements'
@@ -1150,7 +1275,7 @@ function useBlockProps( { clientId, name, style } ) {
 	const [ viewportSettings ] = useSettings( 'viewport' );
 
 	const styles = useMemo( () => {
-		const cssRules = [];
+		const cssRules: string[] = [];
 
 		const elementCSS = getElementCSSRules(
 			blockElementStyles,
