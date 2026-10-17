@@ -6,11 +6,13 @@ import {
 	isReusableBlock,
 	isTemplatePart,
 } from '@wordpress/blocks';
+import type { BlockTypeIconDescriptor } from '@wordpress/blocks';
 import { __experimentalTruncate as Truncate } from '@wordpress/components';
 import { ENTER, isAppleOS } from '@wordpress/keycodes';
 import BlockIcon from '../block-icon';
 import { InserterListboxItem } from '../inserter-listbox';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
+import type { InserterListItemProps } from './types';
 
 function InserterListItem( {
 	className,
@@ -20,12 +22,14 @@ function InserterListItem( {
 	onHover,
 	isDraggable,
 	...props
-} ) {
+}: InserterListItemProps ) {
 	const isDraggingRef = useRef( false );
-	const itemIconStyle = item.icon
+	// A plain icon has no colors, so these read `undefined`.
+	const icon = item.icon as BlockTypeIconDescriptor | undefined;
+	const itemIconStyle = icon
 		? {
-				backgroundColor: item.icon.background,
-				color: item.icon.foreground,
+				backgroundColor: icon.background,
+				color: icon.foreground,
 			}
 		: {};
 	const blocks = useMemo(
@@ -33,7 +37,12 @@ function InserterListItem( {
 			createBlock(
 				item.name,
 				item.initialAttributes,
-				createBlocksFromInnerBlocksTemplate( item.innerBlocks ),
+				createBlocksFromInnerBlocksTemplate(
+					// Variations hold inner block templates.
+					item.innerBlocks as Parameters<
+						typeof createBlocksFromInnerBlocksTemplate
+					>[ 0 ]
+				),
 				item.innerContent
 			),
 		],
