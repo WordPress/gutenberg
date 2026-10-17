@@ -16,6 +16,12 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
+import type {
+	ForwardedRef,
+	ForwardRefExoticComponent,
+	RefAttributes,
+} from 'react';
+import type { SelectFunction } from '@wordpress/data';
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
 import {
@@ -39,6 +45,13 @@ import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 import { PrivateBlockContext } from '../block-list/private-block-context';
+import type { BlockSelection, Selection } from '../../store/types';
+import type { UseBlockEditorAutocompletePropsOptions } from '../autocomplete/types';
+import type {
+	RichTextBinding,
+	RichTextEventListenerProps,
+	RichTextProps,
+} from './types';
 
 // `RichTextShortcut` and `RichTextInputEvent` now live in
 // `@wordpress/rich-text` so they share the shortcut and input-event contexts
@@ -84,21 +97,27 @@ function RichTextWrapper(
 		__unstableAllowPrefixTransformations,
 		readOnly,
 		...props
-	},
-	forwardedRef
+	}: RichTextProps,
+	forwardedRef: ForwardedRef< HTMLElement >
 ) {
 	const { supportsSplitting } = useContext( PrivateBlockContext );
 	const instanceId = useInstanceId( RichTextWrapper );
-	const anchorRef = useRef();
-	const [ anchorElement, setAnchorElement ] = useState( null );
+	const anchorRef = useRef< HTMLElement >( null );
+	const [ anchorElement, setAnchorElement ] = useState< HTMLElement | null >(
+		null
+	);
 	const context = useBlockEditContext();
-	const { clientId, isSelected: isBlockSelected, name: blockName } = context;
+	const { isSelected: isBlockSelected, name: blockName } = context;
+	// Outside a block, the store matches the undefined client ID to nothing.
+	const clientId = context.clientId as string;
 	const isBlockMultiSelected = context[ isMultiSelectedKey ];
-	const blockBindings = context[ blockBindingsKey ];
+	// Bindings map attribute keys to their source and arguments.
+	const blockBindings = context[ blockBindingsKey ] as
+		Record< string, RichTextBinding > | null | undefined;
 	const hasDefaultEditingMode = context[ blockEditingModeKey ] === 'default';
 	const blockContext = useContext( BlockContext );
 	const registry = useRegistry();
-	const selector = ( select ) => {
+	const selector = ( select: SelectFunction ) => {
 		// Avoid subscribing to the block editor store if the block is not
 		// selected, alone or with others.
 		if ( ! isBlockSelected && ! isBlockMultiSelected ) {
@@ -109,13 +128,15 @@ function RichTextWrapper(
 			select( blockEditorStore );
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const isInField = ( end ) =>
+		const isInField = ( end: BlockSelection ) =>
 			end.clientId === clientId &&
 			( identifier
 				? end.attributeKey === identifier
-				: end[ instanceIdKey ] === instanceId );
+				: // The field's own selection carries its instance ID.
+					( end as Record< symbol, unknown > )[ instanceIdKey ] ===
+					instanceId );
 
-		let isSelected;
+		let isSelected: boolean | undefined;
 
 		if ( originalIsSelected === undefined ) {
 			isSelected =
@@ -160,25 +181,30 @@ function RichTextWrapper(
 
 	const { disableBoundBlock, bindingsPlaceholder, bindingsLabel } = useSelect(
 		( select ) => {
-			if ( ! blockBindings?.[ identifier ] ) {
+			// A field without an identifier matches no binding.
+			if ( ! blockBindings?.[ identifier as string ] ) {
 				return {};
 			}
 
 			const { __experimentalBlockBindingsSupportedAttributes } =
 				select( blockEditorStore ).getSettings();
 
-			const bindableAttributes =
-				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+			// The setting maps block names to their bindable attributes.
+			const bindableAttributes = (
+				__experimentalBlockBindingsSupportedAttributes as
+					Record< string, string[] > | undefined
+			 )?.[ blockName ];
 
 			if ( ! bindableAttributes ) {
 				return {};
 			}
 
-			const relatedBinding = blockBindings[ identifier ];
+			// Matched a binding above.
+			const relatedBinding = blockBindings[ identifier! ];
 			const blockBindingsSource = getBlockBindingsSource(
 				relatedBinding.source
 			);
-			const blockBindingsContext = {};
+			const blockBindingsContext: Record< string, unknown > = {};
 			if ( blockBindingsSource?.usesContext?.length ) {
 				for ( const key of blockBindingsSource.usesContext ) {
 					blockBindingsContext[ key ] = blockContext[ key ];
@@ -204,12 +230,13 @@ function RichTextWrapper(
 
 			const { getBlockAttributes } = select( blockEditorStore );
 			const blockAttributes = getBlockAttributes( clientId );
-			let clientSideFieldLabel = null;
+			let clientSideFieldLabel: string | null | undefined = null;
 			if ( blockBindingsSource?.getFieldsList ) {
+				// Sources return a list of fields.
 				const fieldsItems = blockBindingsSource.getFieldsList( {
 					select,
 					context: blockBindingsContext,
-				} );
+				} ) as Array< { args?: unknown; label?: string } > | undefined;
 				clientSideFieldLabel = fieldsItems?.find( ( item ) =>
 					fastDeepEqual( item.args, relatedBinding?.args )
 				)?.label;
@@ -223,14 +250,17 @@ function RichTextWrapper(
 				: sprintf(
 						/* translators: %s: connected field label or source label */
 						__( 'Add %s' ),
-						bindingKey
+						// Registered sources have a label.
+						bindingKey as string
 					);
 			const _bindingsLabel = _disableBoundBlock
 				? relatedBinding?.args?.key || blockBindingsSource?.label
 				: sprintf(
 						/* translators: %s: source label or key */
 						__( 'Empty %s; start writing to edit its value' ),
-						relatedBinding?.args?.key || blockBindingsSource?.label
+						// Registered sources have a label.
+						( relatedBinding?.args?.key ||
+							blockBindingsSource?.label ) as string
 					);
 
 			return {
@@ -314,8 +344,9 @@ function RichTextWrapper(
 	] );
 
 	const onSelectionChange = useCallback(
-		( start, end ) => {
-			const selection = {};
+		( start?: number, end?: number ) => {
+			const selection: { start?: BlockSelection; end?: BlockSelection } =
+				{};
 			const unset = start === undefined && end === undefined;
 
 			const baseSelection = {
@@ -333,7 +364,10 @@ function RichTextWrapper(
 				if (
 					end === undefined &&
 					getBlockRootClientId( clientId ) !==
-						getBlockRootClientId( getSelectionEnd().clientId )
+						// An unset end has no root.
+						getBlockRootClientId(
+							getSelectionEnd().clientId as string
+						)
 				) {
 					return;
 				}
@@ -348,7 +382,10 @@ function RichTextWrapper(
 				if (
 					start === undefined &&
 					getBlockRootClientId( clientId ) !==
-						getBlockRootClientId( getSelectionStart().clientId )
+						// An unset start has no root.
+						getBlockRootClientId(
+							getSelectionStart().clientId as string
+						)
 				) {
 					return;
 				}
@@ -359,7 +396,8 @@ function RichTextWrapper(
 				};
 			}
 
-			selectionChange( selection );
+			// The store keeps the end that is not given.
+			selectionChange( selection as Selection );
 		},
 		[
 			clientId,
@@ -419,7 +457,8 @@ function RichTextWrapper(
 		// button) leaves the frame document without focus.
 		const focusedDocument = [
 			ownerDocument,
-			ownerDocument.defaultView.frameElement?.ownerDocument,
+			// The field's document has a window.
+			ownerDocument.defaultView!.frameElement?.ownerDocument,
 		].find( ( doc ) => doc?.hasFocus() );
 
 		if ( ! focusedDocument ) {
@@ -427,7 +466,10 @@ function RichTextWrapper(
 		}
 
 		const { activeElement, body } = focusedDocument;
-		const canvas = element.parentElement?.closest( '[contenteditable]' );
+		const canvas =
+			element.parentElement?.closest< HTMLElement >(
+				'[contenteditable]'
+			);
 		// A field inside an editing host cannot hold focus.
 		const target = canvas?.isContentEditable ? canvas : element;
 
@@ -448,10 +490,14 @@ function RichTextWrapper(
 			return;
 		}
 		const { ownerDocument } = element;
-		if ( ownerDocument.activeElement?.contentEditable !== 'true' ) {
+		if (
+			( ownerDocument.activeElement as HTMLElement | null )
+				?.contentEditable !== 'true'
+		) {
 			return;
 		}
-		const selection = ownerDocument.defaultView.getSelection();
+		// The field's document has a window, which has a selection.
+		const selection = ownerDocument.defaultView!.getSelection()!;
 		if ( ! selection.rangeCount ) {
 			return;
 		}
@@ -464,7 +510,8 @@ function RichTextWrapper(
 				selection.setBaseAndExtent(
 					node,
 					offset,
-					selection.focusNode,
+					// A selection with a range has a focus node.
+					selection.focusNode!,
 					selection.focusOffset
 				);
 			}
@@ -480,7 +527,9 @@ function RichTextWrapper(
 	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		onReplace,
+		// Completers replace the field with blocks, not rich text values.
+		onReplace:
+			onReplace as unknown as UseBlockEditorAutocompletePropsOptions[ 'onReplace' ],
 		completers: autocompleters,
 		record: value,
 		onChange,
@@ -546,8 +595,12 @@ function RichTextWrapper(
 		onMarkPersistent: __unstableMarkLastChangeAsPersistent,
 	} );
 
-	const [ keyboardShortcuts ] = useState( () => new Set() );
-	const [ inputEvents ] = useState( () => new Set() );
+	const [ keyboardShortcuts ] = useState(
+		() => new Set< ( event: KeyboardEvent ) => void >()
+	);
+	const [ inputEvents ] = useState(
+		() => new Set< ( event: InputEvent ) => void >()
+	);
 
 	function onFocus() {
 		anchorRef.current?.focus();
@@ -562,7 +615,7 @@ function RichTextWrapper(
 	// supports `editableRoot`), nested editable elements are no longer
 	// focusable areas on their own, so an explicit tabIndex restores their
 	// focusability.
-	let tabIndex = props.tabIndex;
+	let tabIndex: number | undefined | null = props.tabIndex;
 	if ( isEditingHost ) {
 		tabIndex = props.tabIndex ?? 0;
 	} else if ( ! shouldDisableEditing && props.tabIndex === 0 ) {
@@ -626,7 +679,9 @@ function RichTextWrapper(
 						__unstableAllowPrefixTransformations,
 						formatTypes,
 						onReplace,
-						selectionChange,
+						// The action also takes no arguments.
+						selectionChange:
+							selectionChange as RichTextEventListenerProps[ 'selectionChange' ],
 						isSelected,
 						disableFormats,
 						value,
@@ -666,10 +721,21 @@ export { ForwardedRichTextWrapper as RichTextWrapper };
 
 const RichTextWithDeprecations = withDeprecations( ForwardedRichTextWrapper );
 
+// `forwardRef` types no statics, which are assigned below.
+type RichTextComponent = ForwardRefExoticComponent<
+	Omit< RichTextProps, 'ref' > & RefAttributes< HTMLElement >
+> & {
+	Content: typeof Content;
+	isEmpty: typeof isEmpty;
+};
+
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md
  */
-const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
+const PublicForwardedRichTextContainer = forwardRef<
+	HTMLElement,
+	RichTextProps
+>( ( props, ref ) => {
 	const context = useBlockEditContext();
 	const isPreviewMode = context[ isPreviewModeKey ];
 
@@ -719,7 +785,7 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 	return (
 		<RichTextWithDeprecations ref={ ref } { ...props } readOnly={ false } />
 	);
-} );
+} ) as RichTextComponent;
 
 PublicForwardedRichTextContainer.Content = Content;
 PublicForwardedRichTextContainer.isEmpty = isEmpty;

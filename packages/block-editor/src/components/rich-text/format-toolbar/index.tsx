@@ -2,9 +2,13 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import { ToolbarItem, DropdownMenu, Slot } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
+import type { ComponentProps } from 'react';
 import { orderBy } from '../../../utils/sorting';
+import type { ToolbarControlFill } from '../types';
 
-const POPOVER_PROPS = {
+type DropdownMenuControls = ComponentProps< typeof DropdownMenu >[ 'controls' ];
+
+const POPOVER_PROPS: { placement: 'bottom-start' } = {
 	placement: 'bottom-start',
 };
 
@@ -20,7 +24,9 @@ const FormatToolbar = () => {
 				)
 			) }
 			<Slot name="RichText.ToolbarControls">
-				{ ( fills ) => {
+				{ ( slotFills ) => {
+					// The slot renders the fills of `RichTextToolbarButton`.
+					const fills = slotFills as ToolbarControlFill[];
 					if ( ! fills.length ) {
 						return null;
 					}
@@ -47,10 +53,15 @@ const FormatToolbar = () => {
 											'Displays more block tools'
 										),
 									} }
-									controls={ orderBy(
-										fills.map( ( [ { props } ] ) => props ),
-										'title'
-									) }
+									controls={
+										// The toolbar buttons' props are dropdown options too.
+										orderBy(
+											fills.map(
+												( [ { props } ] ) => props
+											),
+											'title'
+										) as DropdownMenuControls
+									}
 									popoverProps={ POPOVER_PROPS }
 								/>
 							) }
