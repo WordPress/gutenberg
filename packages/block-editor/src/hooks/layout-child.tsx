@@ -558,7 +558,12 @@ function GridTools( {
 		<>
 			<GridVisualizer
 				clientId={ rootClientId }
-				contentRef={ setResizerBounds }
+				// The resizer treats the null an unmount stores as no bounds.
+				contentRef={
+					setResizerBounds as (
+						element: HTMLDivElement | null
+					) => void
+				}
 				parentLayout={ parentLayout }
 				childGridClientId={ childGridClientId }
 			/>

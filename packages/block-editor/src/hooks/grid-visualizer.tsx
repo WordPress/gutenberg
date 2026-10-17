@@ -8,12 +8,20 @@ import { useBlockElement } from '../components/block-list/use-block-props/use-bl
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 import { deviceTypeKey } from '../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
+import type { BlockVisibilityViewport } from '../components/block-visibility/constants';
+import type { Layout } from '../layouts/types';
+import type {
+	BlockEditHookProps,
+	GridLayoutSyncProps,
+	GridVisualizerToolsProps,
+} from './types';
 
-function GridLayoutSync( props ) {
+function GridLayoutSync( props: GridLayoutSyncProps ) {
 	useGridLayoutSync( props );
+	return undefined;
 }
 
-function GridTools( { clientId, layout } ) {
+function GridTools( { clientId, layout }: GridVisualizerToolsProps ) {
 	const { isVisible, blockVisibility, deviceType, viewportSettings } =
 		useSelect(
 			( select ) => {
@@ -29,7 +37,7 @@ function GridTools( { clientId, layout } ) {
 
 				// These calls are purposely ordered from least expensive to most expensive.
 				// Hides the visualizer in cases where the user is not or cannot interact with it.
-				// Also hide if a child block is selected, because layout-child.jsx will render
+				// Also hide if a child block is selected, because layout-child.tsx will render
 				// the visualizer in that case (with proper childGridClientId handling).
 				if (
 					( ! isDraggingBlocks() && ! isBlockSelected( clientId ) ) ||
@@ -42,9 +50,12 @@ function GridTools( { clientId, layout } ) {
 
 				const attributes = getBlockAttributes( clientId );
 				const settings = getSettings();
-				const currentDeviceType =
-					settings?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
+				// Device types are capitalized viewport names.
+				const currentDeviceType = ( settings?.[
+					deviceTypeKey
+				]?.toLowerCase() ||
+					BLOCK_VISIBILITY_VIEWPORTS.desktop
+						.key ) as BlockVisibilityViewport;
 
 				return {
 					isVisible: true,
@@ -102,17 +113,16 @@ function GridTools( { clientId, layout } ) {
 
 const addGridVisualizerToBlockEdit = createHigherOrderComponent(
 	( BlockEdit ) =>
-		function AddGridVisualizerToBlockEdit( props ) {
-			if ( props.attributes.layout?.type !== 'grid' ) {
+		function AddGridVisualizerToBlockEdit( props: BlockEditHookProps ) {
+			// The layout attribute holds the block's layout.
+			const layout = props.attributes.layout as Layout | undefined;
+			if ( layout?.type !== 'grid' ) {
 				return <BlockEdit key="edit" { ...props } />;
 			}
 
 			return (
 				<>
-					<GridTools
-						clientId={ props.clientId }
-						layout={ props.attributes.layout }
-					/>
+					<GridTools clientId={ props.clientId } layout={ layout } />
 					<BlockEdit key="edit" { ...props } />
 				</>
 			);

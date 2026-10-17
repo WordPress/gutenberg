@@ -877,3 +877,11 @@ export interface BlockHooksPanelProps {
 		ignoredHookedBlocks?: string[];
 	};
 }
+
+export interface GridLayoutSyncProps {
+	clientId: string;
+}
+
+export interface GridVisualizerToolsProps extends GridLayoutSyncProps {
+	layout: Layout;
+}
