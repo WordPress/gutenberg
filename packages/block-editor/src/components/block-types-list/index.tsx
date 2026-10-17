@@ -2,9 +2,10 @@ import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import InserterListItem from '../inserter-list-item';
 import { InserterListboxGroup, InserterListboxRow } from '../inserter-listbox';
+import type { BlockTypesListProps } from './types';
 
-function chunk( array, size ) {
-	const chunks = [];
+function chunk< T >( array: T[], size: number ): T[][] {
+	const chunks: T[][] = [];
 	for ( let i = 0, j = array.length; i < j; i += size ) {
 		chunks.push( array.slice( i, i + size ) );
 	}
@@ -18,7 +19,7 @@ function BlockTypesList( {
 	children,
 	label,
 	isDraggable = true,
-} ) {
+}: BlockTypesListProps ) {
 	const className = 'block-editor-block-types-list';
 	const listId = useInstanceId( BlockTypesList, className );
 	return (
