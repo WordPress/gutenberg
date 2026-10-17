@@ -139,13 +139,38 @@ export default function useClickSelection() {
 				}
 			}
 
-			function onClick() {
+			function onClick( event ) {
 				const clientId = clickCollapseClientId;
 				clickCollapseClientId = undefined;
 
-				if ( clientId && hasMultiSelection() ) {
-					selectBlock( clientId );
+				if ( ! clientId || ! hasMultiSelection() ) {
+					return;
 				}
+
+				// The press did not place a caret because it could have
+				// started a drag, so place it at the click on text.
+				const { ownerDocument } = node;
+				const { clientX, clientY } = event;
+				const position = ownerDocument.caretPositionFromPoint
+					? ownerDocument.caretPositionFromPoint( clientX, clientY )
+					: ownerDocument.caretRangeFromPoint?.( clientX, clientY );
+				const textNode =
+					position?.offsetNode ?? position?.startContainer;
+
+				if (
+					textNode?.nodeType === textNode?.TEXT_NODE &&
+					getBlockClientId( textNode ) === clientId
+				) {
+					ownerDocument.defaultView
+						.getSelection()
+						.collapse(
+							textNode,
+							position.offset ?? position.startOffset
+						);
+					return;
+				}
+
+				selectBlock( clientId );
 			}
 
 			node.addEventListener( 'pointerdown', onPointerDown );

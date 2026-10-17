@@ -1000,6 +1000,36 @@ test.describe( 'Draggable block', () => {
 		] );
 	} );
 
+	test( 'places the caret at the click inside a multi-selection', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		const paragraphs = await multiSelectTwoParagraphs( {
+			editor,
+			page,
+			pageUtils,
+		} );
+		// Click between "Sec" and "ond".
+		const point = await paragraphs.nth( 1 ).evaluate( ( node ) => {
+			const range = node.ownerDocument.createRange();
+			range.setStart( node.firstChild, 3 );
+			const rect = range.getBoundingClientRect();
+			return { x: rect.left, y: rect.top + rect.height / 2 };
+		} );
+		const frameBox = await page
+			.locator( '[name="editor-canvas"]' )
+			.boundingBox();
+		await page.mouse.click( frameBox.x + point.x, frameBox.y + point.y );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'SecXond' } },
+			{ name: 'core/paragraph', attributes: { content: 'Landing' } },
+		] );
+	} );
+
 	test( 'does not drag a multi-selection of locked blocks', async ( {
 		editor,
 		page,
