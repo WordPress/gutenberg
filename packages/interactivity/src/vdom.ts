@@ -1,6 +1,9 @@
-import { h, type ComponentChild, type JSX } from 'preact';
+import { h, type ComponentChild, type JSX, type VNode } from 'preact';
 import { warn } from './utils';
 import { type DirectiveEntry } from './hooks';
+
+/** Associates opaque HTML props with detached, script-free fallback snapshots. */
+const htmlFallbacks = new WeakMap< object, DocumentFragment >();
 
 const directivePrefix = `data-wp-`;
 const namespaces: Array< string | null > = [];
@@ -73,6 +76,53 @@ function parseDirectiveName( directiveName: string ): {
 // Namespaces can contain any alphanumeric characters, hyphens, underscores or
 // forward slashes. References don't have any restrictions.
 const nsPathRegExp = /^([\w_\/-]+)::(.+)$/;
+
+/**
+ * Copies a node tree into a fragment, omitting script elements recursively.
+ * Template contents are traversed separately because they are not ordinary
+ * child nodes of their template element.
+ *
+ * @param source The node whose child nodes are copied.
+ * @param target The fragment or cloned node that receives those children.
+ */
+function copyFallbackChildren( source: Node, target: Node ): void {
+	for ( const child of Array.from( source.childNodes ) ) {
+		if (
+			child.nodeType === 1 &&
+			( child as Element ).localName === 'script'
+		) {
+			continue;
+		}
+
+		const clone = child.cloneNode( false );
+		target.appendChild( clone );
+		if (
+			child.nodeType === 1 &&
+			( child as Element ).localName === 'template'
+		) {
+			copyFallbackChildren(
+				( child as HTMLTemplateElement ).content,
+				( clone as HTMLTemplateElement ).content
+			);
+		} else {
+			copyFallbackChildren( child, clone );
+		}
+	}
+}
+
+/**
+ * Reads the script-free fallback snapshot recorded for an element vnode.
+ * Callers must leave the snapshot detached and unmodified; insert a clone.
+ *
+ * @param element The element vnode passed to a directive callback.
+ * @return The detached fallback snapshot, or `undefined` when absent.
+ */
+export function getHtmlFallback(
+	element: VNode< any >
+): DocumentFragment | undefined {
+	const htmlProps = element.props.dangerouslySetInnerHTML;
+	return htmlProps && htmlFallbacks.get( htmlProps );
+}
 
 /**
  * Parses the namespace and value from a directive attribute value.
@@ -282,9 +332,18 @@ export function toVdom( root: Node ): ComponentChild {
 			// vnodes, since the directive writes to the DOM directly rather
 			// than through Preact's own props diffing (see
 			// `directives/html.ts`).
-			props.dangerouslySetInnerHTML = {
+			const htmlProps = {
 				__html: elementNode.innerHTML,
 			};
+			props.dangerouslySetInnerHTML = htmlProps;
+			if ( hasDefaultHtmlDirective ) {
+				// Preserve a script-free snapshot at vnode construction time so a
+				// created host can copy it without parsing an HTML string.
+				const snapshot =
+					elementNode.ownerDocument.createDocumentFragment();
+				copyFallbackChildren( elementNode, snapshot );
+				htmlFallbacks.set( htmlProps, snapshot );
+			}
 		} else if ( localName === 'template' ) {
 			props.content = [
 				...( elementNode as HTMLTemplateElement ).content.childNodes,

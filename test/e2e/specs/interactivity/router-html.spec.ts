@@ -13,6 +13,21 @@ test.describe( 'Router HTML content', () => {
 				attributes: { page: 'one', value: 'T', next },
 			} );
 		}
+		const fallbackDestination = await utils.addPostWithBlock(
+			'test/router-html',
+			{
+				alias: 'fallback destination',
+				attributes: { page: 'two', value: 'pending' },
+			}
+		);
+		await utils.addPostWithBlock( 'test/router-html', {
+			alias: 'fallback source',
+			attributes: {
+				page: 'one',
+				value: 'T',
+				next: fallbackDestination,
+			},
+		} );
 	} );
 
 	test.afterAll( async ( { interactivityUtils: utils } ) => {
@@ -97,4 +112,46 @@ test.describe( 'Router HTML content', () => {
 			await originalKept.dispose();
 		} );
 	}
+
+	test( 'shows a script-free fallback every time navigation creates the element', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		const pageErrors: Error[] = [];
+		page.on( 'pageerror', ( error ) => pageErrors.push( error ) );
+		await page.goto( utils.getLink( 'fallback source' ) );
+		const nextLink = page.getByRole( 'link', {
+			name: 'Next',
+			exact: true,
+		} );
+		await nextLink.click();
+		const fallback = page.getByTestId( 'added-html' );
+		await expect
+			.poll( () => fallback.innerHTML() )
+			.toBe( '<p>B fallback</p>' );
+		expect(
+			await page.evaluate(
+				() =>
+					( window as typeof window & { fallbackRuns?: number } )
+						.fallbackRuns
+			)
+		).toBeUndefined();
+
+		await page.goBack();
+		await expect( page.getByTestId( 'page-content' ) ).toHaveText(
+			'content from one'
+		);
+		await page.getByRole( 'link', { name: 'Next', exact: true } ).click();
+		await expect
+			.poll( () => fallback.innerHTML() )
+			.toBe( '<p>B fallback</p>' );
+		expect(
+			await page.evaluate(
+				() =>
+					( window as typeof window & { fallbackRuns?: number } )
+						.fallbackRuns
+			)
+		).toBeUndefined();
+		expect( pageErrors ).toEqual( [] );
+	} );
 } );
