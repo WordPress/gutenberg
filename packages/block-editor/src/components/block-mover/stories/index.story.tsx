@@ -1,5 +1,7 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useEffect } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
+// @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { useDispatch } from '@wordpress/data';
 import { Toolbar } from '@wordpress/components';
@@ -46,6 +48,7 @@ const meta = {
 	argTypes: {
 		clientIds: {
 			control: {
+				// @ts-expect-error Bug: `none` is not a control type, `false` hides the control.
 				type: 'none',
 			},
 			description: 'The client IDs of the blocks to move.',
@@ -57,10 +60,12 @@ const meta = {
 			description: 'If this property is true, the drag handle is hidden.',
 		},
 	},
-};
+} satisfies Meta< typeof BlockMover >;
 export default meta;
 
-export const Default = {
+type Story = StoryObj< typeof meta >;
+
+export const Default: Story = {
 	args: {
 		clientIds: [ blocks[ 0 ].innerBlocks[ 1 ].clientId ],
 	},
@@ -70,7 +75,7 @@ export const Default = {
  * This story shows the block mover with horizontal orientation.
  * It is necessary to render the blocks to update the block settings in the state.
  */
-export const Horizontal = {
+export const Horizontal: Story = {
 	decorators: [
 		( Story ) => {
 			const { updateBlockListSettings } = useDispatch( blockEditorStore );
@@ -98,7 +103,7 @@ export const Horizontal = {
 /**
  * You can hide the drag handle by `hideDragHandle` attribute.
  */
-export const HideDragHandle = {
+export const HideDragHandle: Story = {
 	args: {
 		...Default.args,
 		hideDragHandle: true,
