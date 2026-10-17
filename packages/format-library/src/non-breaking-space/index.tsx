@@ -1,7 +1,6 @@
 import { __ } from '@wordpress/i18n';
 import { applyFormat, insert, useAnchor } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-// @ts-expect-error Block Editor not fully typed yet.
 import { RichTextShortcut } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import type { FormatEditProps } from '../types';

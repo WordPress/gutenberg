@@ -24,7 +24,6 @@ import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
 	privateApis as blockEditorPrivateApis,
-	// @ts-expect-error: Not typed yet.
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
