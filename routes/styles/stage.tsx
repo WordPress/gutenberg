@@ -22,6 +22,7 @@ import { useEditorSettings } from '@wordpress/lazy-editor';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { ActivatePanel } from './activate-panel';
 import { getPreviewedStylesheet, getPreviewTitle } from './previewed-theme';
+import { shouldOpenStyleBook } from './utils';
 import './style.scss';
 
 const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
@@ -86,15 +87,16 @@ function Stage() {
 		setStylesPath( section );
 		return () => setStylesPath( '/' );
 	}, [ areRevisionsOpened, section, setStylesPath ] );
-	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState(
-		search.preview === 'stylebook'
-	);
+	const isStyleBookOpened = search.preview === 'stylebook';
 
 	const onChangeSection = ( updatedSection: string ) => {
 		navigate( {
 			search: {
 				...search,
 				section: updatedSection,
+				...( shouldOpenStyleBook( section, updatedSection ) && {
+					preview: 'stylebook',
+				} ),
 			},
 		} );
 	};
@@ -113,13 +115,8 @@ function Stage() {
 									icon={ seen }
 									label={ __( 'Style Book' ) }
 									onClick={ () => {
-										const newIsStyleBookOpened =
-											! isStyleBookOpened;
-										setIsStyleBookOpened(
-											newIsStyleBookOpened
-										);
 										navigate( {
-											search: newIsStyleBookOpened
+											search: ! isStyleBookOpened
 												? {
 														...search,
 														preview: 'stylebook',
