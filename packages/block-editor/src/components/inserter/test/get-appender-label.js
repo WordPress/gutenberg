@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it, vi } from 'vitest';
 import { getAppenderLabel } from '../get-appender-label';
 
 describe( 'getAppenderLabel', () => {
@@ -17,7 +15,7 @@ describe( 'getAppenderLabel', () => {
 	it( 'should return null when defaultBlock.attributes is missing', () => {
 		const defaultBlock = { name: 'core/test' };
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn(),
+			__experimentalLabel: vi.fn(),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -55,7 +53,7 @@ describe( 'getAppenderLabel', () => {
 			attributes: { type: 'page', kind: 'post-type' },
 		};
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => 'Add page' ),
+			__experimentalLabel: vi.fn( () => 'Add page' ),
 		};
 
 		getAppenderLabel( defaultBlock, defaultBlockType );
@@ -73,7 +71,7 @@ describe( 'getAppenderLabel', () => {
 		};
 		const fullLabel = 'Add page';
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => fullLabel ),
+			__experimentalLabel: vi.fn( () => fullLabel ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -87,7 +85,7 @@ describe( 'getAppenderLabel', () => {
 			attributes: { foo: 'bar' },
 		};
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => 'This is a test' ),
+			__experimentalLabel: vi.fn( () => 'This is a test' ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -101,7 +99,7 @@ describe( 'getAppenderLabel', () => {
 			attributes: { type: 'page' },
 		};
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => null ),
+			__experimentalLabel: vi.fn( () => null ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -115,7 +113,7 @@ describe( 'getAppenderLabel', () => {
 			attributes: { type: 'page' },
 		};
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => undefined ),
+			__experimentalLabel: vi.fn( () => undefined ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -129,7 +127,7 @@ describe( 'getAppenderLabel', () => {
 			attributes: { type: 'page' },
 		};
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => 123 ),
+			__experimentalLabel: vi.fn( () => 123 ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -143,7 +141,7 @@ describe( 'getAppenderLabel', () => {
 			attributes: { type: 'page' },
 		};
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => ( { label: 'page' } ) ),
+			__experimentalLabel: vi.fn( () => ( { label: 'page' } ) ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -158,7 +156,7 @@ describe( 'getAppenderLabel', () => {
 		};
 		const longLabel = 'a'.repeat( 50 );
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => longLabel ),
+			__experimentalLabel: vi.fn( () => longLabel ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -173,7 +171,7 @@ describe( 'getAppenderLabel', () => {
 		};
 		const label49chars = 'a'.repeat( 49 );
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => label49chars ),
+			__experimentalLabel: vi.fn( () => label49chars ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
@@ -187,7 +185,7 @@ describe( 'getAppenderLabel', () => {
 			attributes: { type: 'page' },
 		};
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => '' ),
+			__experimentalLabel: vi.fn( () => '' ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );

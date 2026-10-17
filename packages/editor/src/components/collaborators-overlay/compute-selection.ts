@@ -3,7 +3,6 @@ import type {
 	CoreDataPrivateApis,
 	ResolvedSelection,
 } from '@wordpress/core-data';
-
 import { unlock } from '../../lock-unlock';
 import {
 	getCursorPosition,
@@ -48,7 +47,7 @@ export interface SelectionVisual {
  * @param resolvedSelection - The resolved selection.
  * @return The target element (RichText editable or block), or null.
  */
-function resolveTargetElement(
+export function resolveTargetElement(
 	editorDocument: Document,
 	resolvedSelection: ResolvedSelection
 ): HTMLElement | null {
@@ -287,7 +286,7 @@ function computeMultiBlockOverlayRects(
 					selectionRects: [
 						blockBoundingRect( docFirstEl, overlayRect ),
 					],
-			  }
+				}
 			: {};
 	}
 
@@ -309,7 +308,7 @@ function computeMultiBlockOverlayRects(
 						MAX,
 						editorDocument,
 						overlayRect
-				  )
+					)
 				: null;
 			rects.push(
 				...( textRects ?? [
@@ -340,7 +339,7 @@ function computeMultiBlockOverlayRects(
 						lastOffset,
 						editorDocument,
 						overlayRect
-				  )
+					)
 				: null;
 			rects.push(
 				...( textRects ?? [

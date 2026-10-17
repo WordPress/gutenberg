@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import {
 	alignCenter,
 	alignLeft,
@@ -24,10 +17,6 @@ import {
 	chevronDown,
 	inlineImage,
 } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	Toolbar,
 	ToolbarButton,
@@ -38,7 +27,8 @@ import {
 import DropdownMenu from '../../dropdown-menu';
 
 const meta: Meta< typeof Toolbar > = {
-	title: 'Components/Toolbar',
+	id: 'components-toolbar',
+	title: 'Components/@wordpress-components/Toolbar',
 	component: Toolbar,
 	subcomponents: {
 		ToolbarButton,

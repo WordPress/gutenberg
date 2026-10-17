@@ -38,7 +38,7 @@
 
 			position: fixed;
 			top: 50%;
-			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
+			/* stylelint-disable-next-line logical-css/require-logical-properties -- Physical centering technique used with transform: translate(-50%, -50%) */
 			left: 50%;
 			z-index: var(--wp-ui-dialog-z-index, initial);
 			transform: translate(-50%, -50%);
@@ -72,6 +72,16 @@
 
 			@media (min-width: 480px) {
 				min-width: var(--wpds-dimension-surface-width-md);
+			}
+
+			&.is-auto {
+				min-width: min(var(--wpds-dimension-surface-width-sm), calc(100vw - 2 * var(--viewport-inset)));
+				width: max-content;
+				max-width: calc(100vw - 2 * var(--viewport-inset));
+
+				@media (min-width: 480px) {
+					min-width: min(var(--wpds-dimension-surface-width-md), calc(100vw - 2 * var(--viewport-inset)));
+				}
 			}
 
 			&.is-small {
@@ -108,7 +118,7 @@
 		 * across modal/non-modal — `box-sizing: border-box` absorbs the
 		 * 1px into the existing box.
 		 */
-		.backdrop ~ * .popup {
+		.backdrop ~ .popup {
 			border-color: transparent;
 		}
 

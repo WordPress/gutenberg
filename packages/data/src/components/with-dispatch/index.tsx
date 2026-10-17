@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createHigherOrderComponent } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { useDispatchWithMap } from '../use-dispatch';
 import type { DataRegistry } from '../../types';
 

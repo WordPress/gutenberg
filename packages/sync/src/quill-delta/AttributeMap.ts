@@ -1,10 +1,6 @@
 // File copied https://github.com/slab/delta/blob/main/src/AttributeMap.ts with changes:
 // - lodash.clonedeep is replaced with JSON parse / stringify
 // - lodash.isequal is replaced with fast-deep-equal.
-
-/**
- * External dependencies
- */
 import { default as isEqual } from 'fast-deep-equal/es6';
 
 function cloneDeep< T >( value: T ): T {

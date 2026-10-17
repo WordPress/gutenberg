@@ -1,14 +1,7 @@
 'use strict';
-/**
- * External dependencies
- */
 const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
-
-/**
- * Internal dependencies
- */
 const pkg = require( '../package.json' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
@@ -18,6 +11,8 @@ const {
 	getRuntime,
 	UnsupportedCommandError,
 	EnvironmentNotInitializedError,
+	DatabaseDowngradeError,
+	MissingImageError,
 } = require( './runtime' );
 
 // Spinner.
@@ -46,7 +41,9 @@ const withSpinner =
 			( error ) => {
 				if (
 					error instanceof UnsupportedCommandError ||
-					error instanceof EnvironmentNotInitializedError
+					error instanceof EnvironmentNotInitializedError ||
+					error instanceof DatabaseDowngradeError ||
+					error instanceof MissingImageError
 				) {
 					// Error is a known user-facing error.
 					spinner.fail( error.message );

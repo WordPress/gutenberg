@@ -1,9 +1,5 @@
 // eslint-disable-next-line @eslint-community/eslint-comments/disable-enable-pair
 /* eslint-disable react-hooks/exhaustive-deps */
-
-/**
- * External dependencies
- */
 import {
 	h as createElement,
 	options,
@@ -14,10 +10,6 @@ import {
 	type Context,
 } from 'preact';
 import { useRef, useCallback, useContext } from 'preact/hooks';
-
-/**
- * Internal dependencies
- */
 import { store, stores, universalUnlock } from './store';
 import { warn, type SyncAwareFunction } from './utils';
 import { getScope, setScope, resetScope, type Scope } from './scopes';
@@ -68,6 +60,7 @@ interface DirectiveArgs {
 		class?: string;
 		style?: string | Record< string, string | number >;
 		content?: ComponentChildren;
+		dangerouslySetInnerHTML?: { __html: string };
 	} >;
 	/**
 	 * The inherited context.
@@ -263,7 +256,15 @@ export const splitStatements = ( expr: string ): string[] | null => {
 // so the same Function object can be reused across all scopes and evaluations.
 const fnCache = new Map< string, Function >();
 
-// Generate the evaluate function.
+/**
+ * Creates an evaluator bound to a directive scope.
+ *
+ * Returned functions restore the caller's scope when the wrapped call throws.
+ *
+ * @param args       Arguments used to bind the evaluator to a scope.
+ * @param args.scope Scope used to resolve directive values.
+ * @return An evaluator for directive entries.
+ */
 export const getEvaluate: GetEvaluate =
 	( { scope } ) =>
 	( entry, evt ) => {
@@ -288,13 +289,12 @@ export const getEvaluate: GetEvaluate =
 				const value = resolve( cleanPath, namespace );
 				// Functions are returned without invoking them.
 				if ( typeof value === 'function' ) {
-					// When used with a negation operator, ignore the negation —
-					// using `!` on a function reference is an antipattern;
-					// use derived state instead.
 					if ( hasNegationOperator ) {
 						warn(
-							'Using a function with a negation operator is deprecated and will stop working in WordPress 7.1. Please use derived state instead.'
+							`The value of "${ cleanPath }" is a function and cannot be negated. Please use derived state instead.`
 						);
+						resetScope();
+						return undefined;
 					}
 					// Reset scope before return and wrap the function so it
 					// will still run within the correct scope.
@@ -303,9 +303,11 @@ export const getEvaluate: GetEvaluate =
 						...functionArgs: any[]
 					) => {
 						setScope( scope );
-						const functionResult = value( ...functionArgs );
-						resetScope();
-						return functionResult;
+						try {
+							return value( ...functionArgs );
+						} finally {
+							resetScope();
+						}
 					};
 					// Preserve the sync property from the original function
 					if ( value.sync ) {
@@ -442,7 +444,7 @@ const Directives = ( {
 					element,
 					originalProps,
 					previousScope: scope,
-			  } )
+				} )
 			: element;
 
 	const props = { ...originalProps, children };

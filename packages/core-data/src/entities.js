@@ -1,26 +1,14 @@
-/**
- * External dependencies
- */
 import { capitalCase, pascalCase } from 'change-case';
-
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
-import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
-	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	taxonomySyncConfig,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -44,9 +32,10 @@ export const rootEntitiesConfig = [
 		baseURL: '/',
 		baseURLParams: {
 			// Please also change the preload path when changing this.
-			// @see lib/compat/wordpress-7.1/preload.php
+			// @see lib/compat/wordpress-7.2/preload.php
 			_fields: [
 				'description',
+				'generate_animated_image_subsizes',
 				'gmt_offset',
 				'home',
 				'image_max_bit_depth',
@@ -146,7 +135,9 @@ export const rootEntitiesConfig = [
 		plural: 'comments',
 		label: __( 'Comment' ),
 		supportsPagination: true,
-		syncConfig: defaultCollectionSyncConfig,
+		...( globalThis.window?.__experimentalEnableRealTimeCollaboration
+			? { syncConfig: defaultCollectionSyncConfig }
+			: {} ),
 	},
 	{
 		name: 'menu',
@@ -219,14 +210,6 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'statuses',
 		key: 'slug',
-		supportsPagination: false,
-	},
-	{
-		label: __( 'Registered Templates' ),
-		name: 'registeredTemplate',
-		kind: 'root',
-		baseURL: '/wp/v2/registered-templates',
-		key: 'id',
 		supportsPagination: false,
 	},
 	{
@@ -318,26 +301,6 @@ export const prePersistPostType = async (
 		}
 	}
 
-	// Add meta for the persisted CRDT document during real post saves so the
-	// saved post and CRDT snapshot are committed in the same request. We don't
-	// want a post save to fail but a CRDT update to succeed or vice versa.
-	// CRDT repair uses /wp-sync/v1/save to avoid post-save side effects.
-	if ( persistedRecord ) {
-		const objectType = `postType/${ name }`;
-		const objectId = persistedRecord.id;
-		const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
-			objectType,
-			objectId
-		);
-
-		if ( serializedDoc ) {
-			newEdits.meta = {
-				...edits.meta,
-				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
-			};
-		}
-	}
-
 	return newEdits;
 };
 
@@ -348,7 +311,7 @@ export const prePersistPostType = async (
  */
 async function loadPostTypeEntities() {
 	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
-	const taxonomiesPromise = window._wpCollaborationEnabled
+	const taxonomiesPromise = window.__experimentalEnableRealTimeCollaboration
 		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
 		: Promise.resolve( {} );
 	const [ postTypes, taxonomies ] = await Promise.all( [
@@ -404,18 +367,21 @@ async function loadPostTypeEntities() {
 			__unstablePrePersist: ( persistedRecord, edits ) =>
 				prePersistPostType( persistedRecord, edits, name, isTemplate ),
 			__unstable_rest_base: postType.rest_base,
-			supportsPagination: true,
+			// The templates controller returns the whole collection and never
+			// paginates.
+			supportsPagination: ! isTemplate,
 			getRevisionsUrl: ( parentId, revisionId ) =>
 				`/${ namespace }/${
 					postType.rest_base
 				}/${ parentId }/revisions${
 					revisionId ? '/' + revisionId : ''
 				}`,
-			revisionKey:
-				isTemplate && ! window?.__experimentalTemplateActivate
-					? 'wp_id'
-					: DEFAULT_ENTITY_KEY,
+			revisionKey: isTemplate ? 'wp_id' : DEFAULT_ENTITY_KEY,
 		};
+
+		if ( ! window.__experimentalEnableRealTimeCollaboration ) {
+			return entity;
+		}
 
 		/**
 		 * @type {import('@wordpress/sync').SyncConfig}
@@ -508,7 +474,9 @@ async function loadTaxonomyEntities() {
 			supportsPagination: true,
 		};
 
-		entity.syncConfig = defaultSyncConfig;
+		if ( window.__experimentalEnableRealTimeCollaboration ) {
+			entity.syncConfig = taxonomySyncConfig;
+		}
 
 		return entity;
 	} );

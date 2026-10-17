@@ -1,15 +1,5 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import type { FontFamily, FontFace } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { kebabCase } = unlock( componentsPrivateApis );
+import { kebabCase } from '@wordpress/kebab-case';
 
 export default function makeFamiliesFromFaces(
 	fontFaces: FontFace[]

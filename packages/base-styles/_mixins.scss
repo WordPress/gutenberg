@@ -146,23 +146,10 @@
 
 // Tabs, Inputs, Square buttons.
 @mixin input-style__neutral() {
-	box-shadow: 0 0 0 transparent;
-	border-radius: variables.$radius-small;
-	border: variables.$border-width solid colors.$gray-600;
-
-	@media not (prefers-reduced-motion) {
-		transition: box-shadow 0.1s linear;
-	}
+	border: wpds.var("--wpds-border-width-xs") solid wpds.var("--wpds-color-stroke-interactive-neutral");
+	border-radius: wpds.var("--wpds-border-radius-sm");
 }
 
-
-@mixin input-style__focus() {
-	border-color: var(--wp-admin-theme-color);
-	// Expand the default border focus style by .5px to be a total of 1.5px.
-	box-shadow: 0 0 0 0.5px var(--wp-admin-theme-color);
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
 
 @mixin button-style__focus() {
 	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
@@ -189,9 +176,7 @@
  */
 
 @mixin outset-ring__focus() {
-	--focus-color: #{ wpds.var("--wpds-color-stroke-focus") };
-
-	outline: wpds.var("--wpds-border-width-focus") solid var(--focus-color);
+	outline: wpds.var("--wpds-border-width-focus") solid var(--focus-color, #{ wpds.var("--wpds-color-stroke-focus") });
 	outline-offset: wpds.var("--wpds-border-width-focus");
 }
 
@@ -310,8 +295,16 @@
 		line-height: normal;
 	}
 
+	&:hover:not(:disabled, [aria-disabled="true"]) {
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-active");
+	}
+
 	&:focus {
-		@include input-style__focus();
+		@include outset-ring__focus();
+
+		// Neutralize wp-admin forms.css focus styles.
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral");
+		box-shadow: none;
 	}
 
 	// Use opacity to work in various editor styles.
@@ -321,11 +314,15 @@
 }
 
 @mixin checkbox-control {
-	border: variables.$border-width solid colors.$gray-900;
+	border: wpds.var("--wpds-border-width-xs") solid wpds.var("--wpds-color-stroke-interactive-neutral");
 	margin-right: variables.$grid-unit-15;
 	transition: none;
 	border-radius: variables.$radius-small;
 	@include input-control;
+
+	&:hover:not(:disabled, [aria-disabled="true"]) {
+		background: wpds.var("--wpds-color-background-interactive-neutral-active");
+	}
 
 	&:focus {
 		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) var(--wp-admin-theme-color);
@@ -362,7 +359,7 @@
 			vertical-align: middle;
 			width: 16px;
 			/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
-			font: normal 30px/1 dashicons;
+			font: 400 30px/1 dashicons;
 			speak: none;
 			-webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
@@ -376,67 +373,91 @@
 
 	&[aria-disabled="true"],
 	&:disabled {
-		background: colors.$gray-100;
-		border-color: colors.$gray-300;
+		background: wpds.var("--wpds-color-background-interactive-neutral-disabled");
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-disabled");
+		color: wpds.var("--wpds-color-foreground-interactive-neutral-disabled");
 		cursor: default;
 
 		// Override style inherited from wp-admin. Required to avoid degraded appearance on different backgrounds.
 		opacity: 1;
+
+		&:checked::before,
+		&[aria-checked="mixed"]::before {
+			color: wpds.var("--wpds-color-foreground-interactive-neutral-disabled");
+		}
 	}
 }
 
 @mixin radio-control {
-	border: variables.$border-width solid colors.$gray-900;
+	border: wpds.var("--wpds-border-width-xs") solid wpds.var("--wpds-color-stroke-interactive-neutral");
+	background: wpds.var("--wpds-color-background-interactive-neutral-weak");
 	margin-right: variables.$grid-unit-15;
 	transition: none;
 	border-radius: variables.$radius-round;
-	width: variables.$radio-input-size-sm;
-	height: variables.$radio-input-size-sm;
-	min-width: variables.$radio-input-size-sm;
-	max-width: variables.$radio-input-size-sm;
+	width: variables.$radio-input-size;
+	height: variables.$radio-input-size;
+	min-width: variables.$radio-input-size;
+	max-width: variables.$radio-input-size;
 	position: relative;
 
 	@media not (prefers-reduced-motion) {
 		transition: box-shadow 0.1s linear;
 	}
 
-	@include break-small() {
-		height: variables.$radio-input-size;
-		width: variables.$radio-input-size;
-		min-width: variables.$radio-input-size;
-		max-width: variables.$radio-input-size;
+	&::after {
+		content: "";
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: variables.$grid-unit-30;
+		aspect-ratio: 1;
+		transform: translate(-50%, -50%);
+	}
+
+	&:hover {
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-active");
 	}
 
 	&:checked::before {
 		box-sizing: inherit;
-		width: math.div(variables.$radio-input-size-sm, 2);
-		height: math.div(variables.$radio-input-size-sm, 2);
+		width: math.div(variables.$radio-input-size, 2);
+		height: math.div(variables.$radio-input-size, 2);
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
 		margin: 0;
-		background-color: colors.$white;
+		background-color: currentColor;
 
 		// This border serves as a background color in Windows High Contrast mode.
-		border: 4px solid colors.$white;
-
-		@include break-small() {
-			width: math.div(variables.$radio-input-size, 2);
-			height: math.div(variables.$radio-input-size, 2);
-		}
+		border: 4px solid currentColor;
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 (variables.$border-width * 2) colors.$white, 0 0 0 (variables.$border-width * 2 + variables.$border-width-focus-fallback) wpds.var("--wpds-color-stroke-focus");
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
 	}
 
 	&:checked {
-		background: var(--wp-admin-theme-color);
-		border: none;
+		background: wpds.var("--wpds-color-background-interactive-brand-strong");
+		border-color: transparent;
+		color: wpds.var("--wpds-color-foreground-interactive-brand-strong");
+	}
+
+	&[aria-disabled="true"],
+	&:disabled {
+		background: wpds.var("--wpds-color-background-interactive-neutral-weak-disabled");
+		border-color: wpds.var("--wpds-color-stroke-interactive-neutral-disabled");
+		color: wpds.var("--wpds-color-foreground-interactive-neutral-disabled");
+		cursor: default;
+		opacity: 1; // Override opacity inherited from wp-admin forms.css.
+
+		@media (forced-colors: active) {
+			color: GrayText;
+			border-color: GrayText;
+		}
 	}
 }
 
@@ -458,7 +479,7 @@
 @mixin link-reset {
 	&:focus {
 		color: var(--wp-admin-theme-color--rgb);
-		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #007cba);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color, #3858e9);
 		border-radius: variables.$radius-small;
 	}
 }
@@ -549,6 +570,10 @@
 }
 
 @mixin wordpress-admin-schemes() {
+	body.admin-color-fresh {
+		@include admin-scheme(#007cba);
+	}
+
 	body.admin-color-light {
 		@include admin-scheme(#007cba);
 	}

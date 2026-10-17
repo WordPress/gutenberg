@@ -4,8 +4,7 @@ export interface ImageSizeCrop {
 	width: number;
 	height: number;
 	crop?:
-		| boolean
-		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+		boolean | [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
 }
 
 /**
@@ -55,6 +54,13 @@ export interface ResizeImageOptions {
 	 * Defaults to 16.
 	 */
 	maxBitdepth?: number;
+	/**
+	 * Whether animated images should keep their animation when resized,
+	 * cropped or not, from the `wp_generate_animated_image_subsizes`
+	 * filter. Defaults to false, which flattens them to the first frame
+	 * like WordPress core.
+	 */
+	preserveAnimation?: boolean;
 }
 
 /**
@@ -67,13 +73,7 @@ export interface ResizeImageOptions {
  * all: Everything is interesting.
  */
 type Interesting =
-	| 'none'
-	| 'centre'
-	| 'entropy'
-	| 'attention'
-	| 'low'
-	| 'high'
-	| 'all';
+	'none' | 'centre' | 'entropy' | 'attention' | 'low' | 'high' | 'all';
 
 /**
  * none: Don't attach metadata.
@@ -88,14 +88,7 @@ type Interesting =
  * Multiple values can be combined with `|`, e.g. `'icc|gainmap'`.
  */
 type ForeignKeepValue =
-	| 'none'
-	| 'exif'
-	| 'xmp'
-	| 'iptc'
-	| 'icc'
-	| 'other'
-	| 'gainmap'
-	| 'all';
+	'none' | 'exif' | 'xmp' | 'iptc' | 'icc' | 'other' | 'gainmap' | 'all';
 type ForeignKeep = ForeignKeepValue | `${ ForeignKeepValue }|${ string }`;
 
 /**
@@ -142,8 +135,8 @@ export interface LoadOptions< T extends string > {
 	n?: T extends 'image/gif'
 		? number
 		: T extends 'image/webp'
-		? number
-		: never;
+			? number
+			: never;
 	/**
 	 * Required access pattern for this file.
 	 */
@@ -191,6 +184,22 @@ export interface SaveOptions< T extends string > {
 	 * flattening them to 8-bit.
 	 */
 	bitdepth?: number;
+	/**
+	 * Maximum inter-frame error for transparency.
+	 *
+	 * Pixels that differ from the previous frame by less than this are
+	 * rendered as transparent, improving compression at slight quality cost.
+	 * Only used by gifsave; do not provide for any other type!
+	 */
+	interframe_maxerror?: number;
+	/**
+	 * Quantise to an 8bpp palette. Only supported by PNG.
+	 * Do not provide for any other type!
+	 *
+	 * Used to keep indexed (palette) sources indexed instead of writing them
+	 * back out as truecolour RGB/RGBA.
+	 */
+	palette?: boolean;
 }
 
 export interface ThumbnailOptions {

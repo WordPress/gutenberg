@@ -1,26 +1,8 @@
-/**
- * External dependencies
- */
 import type { CSSProperties } from 'react';
-
-/**
- * Internal dependencies
- */
 import CONFIG from './config-values';
 
 export type HeadingSize =
-	| 1
-	| 2
-	| 3
-	| 4
-	| 5
-	| 6
-	| '1'
-	| '2'
-	| '3'
-	| '4'
-	| '5'
-	| '6';
+	1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6';
 
 export const BASE_FONT_SIZE = 13;
 

@@ -5,20 +5,20 @@
 	overflow: hidden;
 }
 
-.listArea {
+.list-area {
 	flex: 1;
 	min-width: 0;
 	min-height: 0;
 	overflow: hidden;
 }
 
-.eventIcon {
+.event-icon {
 	height: 100%;
 	background-color: var(--wpds-color-background-track-neutral-weak);
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
-.titleLink {
+.title-link {
 	min-width: 0;
 	overflow: hidden;
 	white-space: nowrap;
@@ -29,11 +29,11 @@
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
-.emptyState {
+.empty-state {
 	margin-block: var(--wpds-dimension-padding-2xl);
 }
 
-.eventNone {
+.event-none {
 	flex-shrink: 0;
 	padding-block: var(--wpds-dimension-padding-md);
 	padding-inline: var(--wpds-dimension-padding-2xl);

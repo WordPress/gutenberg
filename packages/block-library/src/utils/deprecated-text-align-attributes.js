@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useEvent } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';

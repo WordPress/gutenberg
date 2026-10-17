@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 @use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 .components-popover.block-editor-block-switcher__popover .components-popover__content {
 	min-width: 300px;
@@ -25,6 +26,7 @@
 		outline: none;
 		box-shadow: none;
 		overflow: auto;
+		scroll-padding-block: calc(2 * var(--wpds-border-width-focus));
 	}
 
 	.block-editor-block-switcher__preview {
@@ -54,22 +56,16 @@
 		.block-editor-block-switcher__preview-patterns-container-list__item {
 			height: 100%;
 			border-radius: $radius-small;
-			@media not ( prefers-reduced-motion ) {
-				transition: all 0.05s ease-in-out;
-			}
 			position: relative;
 			border: $border-width solid transparent;
 
-			&:hover,
-			&:focus {
-				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-
-				// Windows High Contrast mode will show this outline, but not the box-shadow.
-				outline: 2px solid transparent;
+			&:hover {
+				@include outset-ring__focus();
+				outline-color: $gray-900;
 			}
 
-			&:hover {
-				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
+			&:focus {
+				@include outset-ring__focus();
 			}
 
 			.block-editor-block-switcher__preview-patterns-container-list__item-title {

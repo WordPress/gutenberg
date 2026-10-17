@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, getContext } from '@wordpress/interactivity';
 
 // Whether the hash has been handled for the current page load.
@@ -44,16 +41,13 @@ const { actions } = store(
 				}
 			},
 			openPanelByHash: () => {
-				if ( hashHandled || ! window.location?.hash?.length ) {
+				if ( hashHandled ) {
 					return;
 				}
 
 				const context = getContext();
 				const { id, accordionItems, autoclose } = context;
-				const hash = decodeURIComponent(
-					window.location.hash.slice( 1 )
-				);
-				const targetElement = window.document.getElementById( hash );
+				const targetElement = document.querySelector( ':target' );
 
 				if ( ! targetElement ) {
 					return;

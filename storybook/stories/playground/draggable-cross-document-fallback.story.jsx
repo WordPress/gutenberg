@@ -1,16 +1,9 @@
-/**
- * WordPress dependencies
- */
 import {
 	Draggable,
 	__experimentalStyleProvider as StyleProvider,
 } from '@wordpress/components';
 import { createPortal, useEffect, useRef, useState } from '@wordpress/element';
 import { getWpCompatOverlaySlot } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { WithWpCompatOverlaySlot } from './with-wp-compat-overlay-slot';
 
 export default {

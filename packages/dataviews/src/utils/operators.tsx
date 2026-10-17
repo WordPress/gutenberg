@@ -1,19 +1,8 @@
-/**
- * External dependencies
- */
 import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
-
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 import { getDate } from '@wordpress/date';
 import type { ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type {
 	FilterOperator,
 	NormalizedFilter,
@@ -127,7 +116,10 @@ const isNoneOperatorDefinition = {
 			return ! filterValue.some( ( fv: any ) =>
 				fieldValue.includes( fv )
 			);
-		} else if ( typeof fieldValue === 'string' ) {
+		} else if (
+			typeof fieldValue === 'string' ||
+			typeof fieldValue === 'number'
+		) {
 			return ! filterValue.includes( fieldValue );
 		}
 
@@ -172,7 +164,10 @@ const OPERATORS: {
 				return filterValue.some( ( fv: any ) =>
 					fieldValue.includes( fv )
 				);
-			} else if ( typeof fieldValue === 'string' ) {
+			} else if (
+				typeof fieldValue === 'string' ||
+				typeof fieldValue === 'number'
+			) {
 				return filterValue.includes( fieldValue );
 			}
 
@@ -205,9 +200,14 @@ const OPERATORS: {
 				return true;
 			}
 
-			return filterValue.every( ( value: any ) => {
-				return field.getValue( { item } )?.includes( value );
-			} );
+			const fieldValue = field.getValue( { item } );
+			if ( ! Array.isArray( fieldValue ) ) {
+				return false;
+			}
+
+			return filterValue.every( ( value: any ) =>
+				fieldValue.includes( value )
+			);
 		},
 		selection: 'multi',
 	},

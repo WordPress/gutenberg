@@ -4,5 +4,5 @@ node_modules
 packages/stylelint-config/test
 packages/base-styles/internal/_wpds-token-fallbacks.scss
 packages/theme/prebuilt
-packages/theme/src/stylelint-plugins/test/fixtures
+packages/theme/stylelint-plugins/test/fixtures
 vendor

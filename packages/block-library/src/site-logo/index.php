@@ -139,7 +139,7 @@ add_filter( 'theme_mod_custom_logo', '_override_custom_logo_theme_mod' );
  *
  * @since 5.8.0
  *
- * @param  mixed $value Attachment ID of the custom logo or an empty value.
+ * @param mixed $value Attachment ID of the custom logo or an empty value.
  * @return mixed
  */
 function _sync_custom_logo_to_site_logo( $value ) {

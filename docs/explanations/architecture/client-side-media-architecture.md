@@ -146,6 +146,7 @@ Because encoding happens in the browser, several image-processing filters are no
 | `image_save_progressive` | Read at upload time; the client applies progressive/interlaced encoding accordingly. |
 | `image_strip_meta` | Exported on the REST index; when it returns `false`, the client keeps all metadata on generated images. |
 | `image_max_bit_depth` | Exported on the REST index; the client caps the output bit depth of generated images accordingly. |
+| `wp_generate_animated_image_subsizes` | Exported on the REST index; when it returns `true` (the default), sub-sizes of animated images keep their animation, cropped ones included. `false` flattens them to the first frame. |
 | `intermediate_image_sizes` / `intermediate_image_sizes_advanced` | Consumed when computing registered sizes and `missing_image_sizes`. |
 
 Callbacks on these filters keep working, but they run at settings-computation time instead of once per encode, so they may see different argument values or invocation counts than on the server path.
@@ -197,19 +198,15 @@ Document-Isolation-Policy: isolate-and-credentialless
 
 This header provides per-document cross-origin isolation which is required to use the SharedArrayBuffer capability. Client-side media uses this capability to run the processing in a separate worker thread, which improves performance and avoids blocking the main thread during image processing.
 
-The header is set via `gutenberg_start_cross_origin_isolation_output_buffer()` (in `lib/media/load.php`), which uses PHP output buffering on `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` screens. DIP is skipped on admin pages with an `action` parameter other than `edit` to avoid conflicts with page builders that rely on same-origin iframe access.
+The header is sent by `gutenberg_send_document_isolation_policy_header()` (in `lib/media/load.php`) on the `load-post.php`, `load-post-new.php`, `load-site-editor.php`, and `load-widgets.php` screens. DIP is skipped on admin pages with an `action` parameter other than `edit` to avoid conflicts with page builders that rely on same-origin iframe access.
 
 The `gutenberg_use_document_isolation_policy` filter can be used to control whether DIP is applied. Disabling DIP will also disable client-side media processing, since the WASM worker cannot run without SharedArrayBuffer.
 
-### HTML attribute injection
+### No `crossorigin` attribute injection
 
-Cross-origin isolation requires that cross-origin resources include proper CORS attributes. WordPress handles this at two levels:
+`isolate-and-credentialless` loads cross-origin subresources without credentials instead of blocking them, so scripts, styles, images, audio, and video from other origins work without a `crossorigin` attribute. WordPress therefore does not add one. Forcing `crossorigin="anonymous"` would turn each load into a CORS request, which fails for any resource served without `Access-Control-Allow-Origin` headers, such as media offloaded to a CDN or an Image block pointing at a third-party URL.
 
-**Server-side** (PHP output buffer): The `wp_add_crossorigin_attributes()` function uses `WP_HTML_Tag_Processor` to add `crossorigin="anonymous"` to `<audio>`, `<link>`, `<script>`, `<video>`, and `<source>` tags that load cross-origin URLs.
-
-**Client-side** (JavaScript MutationObserver): A MutationObserver in `packages/block-editor/src/hooks/cross-origin-isolation.js` monitors the DOM for dynamically added elements and adds `crossorigin="anonymous"` attributes at runtime.
-
-> **Note:** `<img>` is intentionally excluded from the mutated-element list. Document-Isolation-Policy doesn't require `<img>` resources to be CORS-enabled, and forcing `crossorigin="anonymous"` on cross-origin images would break previews for the common case of an Image block linking to a third-party URL without CORS headers.
+The attribute is only needed when script reads the pixels of a cross-origin image or video frame back out of a canvas, and only when the origin serves CORS headers. Code with that need sets `crossOrigin` on the element it creates, optionally through the `media.crossOrigin` filter, rather than relying on page-wide injection.
 
 ### External images
 
@@ -261,7 +258,7 @@ The following formats are processed in the WASM/vips pipeline (`CLIENT_SIDE_SUPP
 Notes:
 -   AVIF encoding uses `effort: 2` to balance encoding speed with quality.
 -   High-bit-depth AVIF sources (10- or 12-bit, common for HDR photos) keep their bit depth in generated sub-sizes instead of being silently truncated to 8-bit.
--   Animated GIF and WebP images preserve all frames during processing in the vips pipeline.
+-   Animated GIF and WebP images preserve all frames when the full-size image is compressed or converted to a format that supports animation. Sub-sizes keep the animation too, cropped ones included; the `wp_generate_animated_image_subsizes` filter can turn that off to generate them from the first frame only, matching core's server-side behavior.
 -   Opaque animated GIFs are additionally converted to a companion video (MP4/WebM) outside the vips pipeline — see [Animated GIF to video conversion](#animated-gif-to-video-conversion) below.
 -   PNG-to-JPEG conversion is skipped when the PNG has transparency.
 -   AVIF uploads bypass the server's `wp_prevent_unsupported_mime_type_uploads` check when `generate_sub_sizes=false`, so a host without server-side AVIF support can still accept client-processed AVIF files.
@@ -407,6 +404,7 @@ When client-side processing is enabled, the REST API root index (`GET /`) is aug
 -   `image_size_threshold` — The current `big_image_size_threshold` filter value.
 -   `image_strip_meta` — The current `image_strip_meta` filter value. When `false`, the client keeps all metadata (EXIF, XMP, IPTC) on generated images instead of stripping everything but color profiles (and HDR gain maps).
 -   `image_max_bit_depth` — The current `image_max_bit_depth` filter value. Caps the bit depth of client-generated images; relevant for high-bit-depth AVIF sources.
+-   `generate_animated_image_subsizes` — The current `wp_generate_animated_image_subsizes` filter value. When `true` (the default), sub-sizes of animated images keep their animation instead of flattening to the first frame.
 
 Other server-side filters (`image_editor_output_format`, `image_save_progressive`) are read at upload time on the server rather than exposed via the index. The set of MIME types eligible for client-side processing is fixed at `CLIENT_SIDE_SUPPORTED_MIME_TYPES` (JPEG, PNG, GIF, WebP, AVIF) — there is no public filter for this list.
 

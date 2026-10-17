@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
@@ -59,7 +56,7 @@ function useTemplateBasedTermData() {
 					'postType',
 					'wp_template',
 					templateId
-			  )?.slug
+				)?.slug
 			: null;
 	}, [] );
 

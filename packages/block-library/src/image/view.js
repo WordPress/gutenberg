@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	store,
 	getContext,
@@ -8,11 +5,9 @@ import {
 	getConfig,
 	withSyncEvent,
 	withScope,
+	splitTask,
 } from '@wordpress/interactivity';
-
-/**
- * Internal dependencies
- */
+import { prefersReducedMotion } from '../utils/reduced-motion';
 import { IMAGE_PRELOAD_DELAY } from './constants';
 
 /**
@@ -36,6 +31,144 @@ const touchStartEvent = {
 	startY: 0,
 	startTime: 0,
 };
+
+/**
+ * Elements made inert while the lightbox is open, so only those are restored
+ * when it closes.
+ *
+ * @type {Element[]}
+ */
+let inertElements = [];
+
+/**
+ * Per-gesture state for the in-progress horizontal drag on the lightbox.
+ *
+ * `direction` is null until the gesture exceeds a small disambiguation
+ * threshold, then latches to 'horizontal' or 'vertical' for the rest of it;
+ * vertical gestures bypass the drag-tracking path so native scroll suppression
+ * keeps working unchanged.
+ */
+const touchDrag = {
+	isDragging: false,
+	direction: null,
+	// The elements the gesture moves. The drag offset is written on these
+	// rather than on the overlay, whose `style` attribute is bound to
+	// `state.overlayStyles`: the framework rewrites that attribute whole
+	// whenever the bound value changes, so a resize part way through a gesture
+	// used to wipe the drag out from under the finger. Nothing is bound to the
+	// containers, so what is written here stays written.
+	slideEls: [],
+	// Animations currently running on `slideEls`, so an interrupted gesture can
+	// stop them.
+	animations: [],
+	// Finishes a committed swipe once its slide is over. Held so that a new
+	// gesture can settle a swipe still in flight rather than stranding it.
+	settle: null,
+};
+
+// Duration of the commit slide and of the fade that follows it, in
+// milliseconds. These drive `element.animate()` directly, so they are the only
+// definition: nothing in `style.scss` has to be kept in step with them.
+const SLIDE_DURATION_MS = 220;
+const FADE_DURATION_MS = 300;
+const SLIDE_EASING = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
+
+// Movement (px) needed before a gesture latches to horizontal or vertical.
+const DIRECTION_LATCH_THRESHOLD_PX = 10;
+
+// Horizontal movement must exceed vertical by this ratio to count as a swipe.
+const HORIZONTAL_DOMINANCE_RATIO = 1.5;
+
+// Fraction of a slide a drag must pass to commit to the next image.
+const COMMIT_DISTANCE_RATIO = 0.2;
+
+// A short, fast horizontal flick commits even below the distance threshold.
+const FLICK_DISTANCE_PX = 50;
+const FLICK_MAX_DURATION_MS = 300;
+
+/**
+ * How far a committed swipe travels before the image is swapped.
+ *
+ * The enlarged image is centred in the viewport, so one viewport width is one
+ * slide. Naming it keeps the commit distance and the commit threshold in step,
+ * and marks the single place that would change if the images were ever laid
+ * out as a strip rather than one at a time.
+ *
+ * @return {number} The slide pitch in pixels.
+ */
+function getSlidePitch() {
+	return window.innerWidth;
+}
+
+/**
+ * The transform that places a slide at a given horizontal offset from rest.
+ *
+ * Mirrors the `transform` the stylesheet gives `.lightbox-image-container`, so
+ * an animation can start and end on values the element would hold on its own.
+ *
+ * @param {number} offset Offset from the resting position, in pixels.
+ * @return {string} A CSS transform value.
+ */
+function slideTransform( offset ) {
+	return `translate(calc(-50% + ${ offset }px), -50%)`;
+}
+
+/**
+ * Places the slides at a horizontal offset from rest.
+ *
+ * @param {Element[]} els    The slide elements.
+ * @param {number}    offset Offset in pixels; 0 returns them to rest.
+ */
+function setDragOffset( els, offset ) {
+	els.forEach( ( el ) => {
+		if ( offset ) {
+			el.style.setProperty(
+				'--wp--lightbox-drag-offset',
+				`${ offset }px`
+			);
+		} else {
+			el.style.removeProperty( '--wp--lightbox-drag-offset' );
+		}
+	} );
+}
+
+/**
+ * Stops whatever the gesture is animating.
+ *
+ * Cancelling drops a `fill`, so the slides fall back to the transform the
+ * stylesheet gives them, which reads the offset set by `setDragOffset()`.
+ */
+function stopDragAnimations() {
+	touchDrag.animations.forEach( ( animation ) => animation.cancel() );
+	touchDrag.animations = [];
+}
+
+/**
+ * Clears the per-gesture drag state.
+ *
+ * A committed swipe still animating is left alone: it is started as a gesture
+ * ends and holds its own references. `touchDrag.settle` deals with that side.
+ */
+function resetTouchDrag() {
+	touchDrag.isDragging = false;
+	touchDrag.direction = null;
+	touchDrag.slideEls = [];
+}
+
+/**
+ * Resolves once an image is ready to be painted.
+ *
+ * @param {HTMLImageElement|null} img The image to wait for.
+ * @return {Promise<void>} Resolves when the image is decoded or has failed.
+ */
+async function waitForImage( img ) {
+	await splitTask();
+	try {
+		await img?.decode();
+	} catch {
+		// Fades the image in regardless.
+	}
+}
 
 const focusableSelectors = [
 	'.wp-lightbox-close-button',
@@ -292,32 +425,99 @@ const { state, actions, callbacks } = store(
 				}
 			} ),
 			handleTouchMove: withSyncEvent( ( event ) => {
-				// On mobile devices, prevents triggering the scroll event because
-				// otherwise the page jumps around when it resets the scroll position.
-				// This also means that closing the lightbox requires that a user
-				// perform a simple tap. This may be changed in the future if there is a
-				// better alternative to override or reset the scroll position during
-				// swipe actions.
-				if ( state.overlayEnabled ) {
-					event.preventDefault();
+				if ( ! state.overlayEnabled ) {
+					return;
+				}
+
+				// Prevents triggering the scroll event because otherwise the page
+				// jumps around when it resets the scroll position. This also means
+				// that closing the lightbox requires a simple tap. May change in
+				// the future with a better way to reset scroll during swipes.
+				event.preventDefault();
+
+				const t = event.touches && event.touches[ 0 ];
+				if ( ! t || ! state.hasNavigation ) {
+					return;
+				}
+
+				const deltaX = t.clientX - touchStartEvent.startX;
+				const deltaY = t.clientY - touchStartEvent.startY;
+				const absDeltaX = Math.abs( deltaX );
+				const absDeltaY = Math.abs( deltaY );
+
+				// Latches direction once the user has moved past a small
+				// disambiguation threshold, then sticks with that decision for the
+				// rest of the gesture.
+				if (
+					! touchDrag.direction &&
+					( absDeltaX > DIRECTION_LATCH_THRESHOLD_PX ||
+						absDeltaY > DIRECTION_LATCH_THRESHOLD_PX )
+				) {
+					touchDrag.direction =
+						absDeltaX > absDeltaY ? 'horizontal' : 'vertical';
+					touchDrag.slideEls = Array.from(
+						event.currentTarget.querySelectorAll(
+							'.lightbox-image-container'
+						)
+					);
+				}
+
+				if (
+					touchDrag.direction === 'horizontal' &&
+					touchDrag.slideEls.length
+				) {
+					touchDrag.isDragging = true;
+					setDragOffset( touchDrag.slideEls, deltaX );
 				}
 			} ),
 			handleTouchStart( event ) {
 				isTouching = true;
+				if ( event.touches?.length > 1 ) {
+					return;
+				}
 				const t = event.touches && event.touches[ 0 ];
 				if ( t ) {
 					touchStartEvent.startX = t.clientX;
 					touchStartEvent.startY = t.clientY;
 					touchStartEvent.startTime = Date.now();
 				}
+				// Settles a swipe left over from the previous gesture, so this one
+				// starts from an image at rest rather than part way through a
+				// slide. Dropping it instead would leave the image parked
+				// off-screen and never swap it for the next one.
+				touchDrag.settle?.();
+				stopDragAnimations();
+				resetTouchDrag();
+			},
+			handleTouchCancel() {
+				// The gesture was interrupted — the browser cancelled the drag, or
+				// a system gesture took over — so no `touchend` will arrive to
+				// settle the image. Abandon the drag rather than committing it,
+				// otherwise the offset stays on the slides, which outlive the
+				// lightbox being closed and reopened.
+				stopDragAnimations();
+				setDragOffset( touchDrag.slideEls, 0 );
+				resetTouchDrag();
+				lastTouchTime = Date.now();
+				isTouching = false;
 			},
 			handleTouchEnd: withSyncEvent( ( event ) => {
+				// Ignores fingers lifting while another is still down.
+				if ( event.touches?.length ) {
+					return;
+				}
 				const touchEndEvent =
 					( event.changedTouches && event.changedTouches[ 0 ] ) ||
 					( event.touches && event.touches[ 0 ] );
 				const now = Date.now();
 
-				if ( touchEndEvent && state.overlayEnabled ) {
+				if (
+					touchEndEvent &&
+					state.overlayEnabled &&
+					touchDrag.isDragging
+				) {
+					event.preventDefault();
+
 					const deltaX =
 						touchEndEvent.clientX - touchStartEvent.startX;
 					const deltaY =
@@ -325,26 +525,125 @@ const { state, actions, callbacks } = store(
 					const absDeltaX = Math.abs( deltaX );
 					const absDeltaY = Math.abs( deltaY );
 					const elapsedMs = now - touchStartEvent.startTime;
-					const isHorizontalSwipe =
-						// Swipe distance is greater than 50px
-						absDeltaX > 50 &&
-						// Horizontal movement is much larger than the vertical movement
-						absDeltaX > absDeltaY * 1.5 &&
-						// Fast action of less than 800ms
-						elapsedMs < 800;
+					const slidePitch = getSlidePitch();
+					const isHorizontalDominant =
+						absDeltaX > absDeltaY * HORIZONTAL_DOMINANCE_RATIO;
+					const pastDistanceThreshold =
+						absDeltaX > slidePitch * COMMIT_DISTANCE_RATIO;
+					const isFastFlick =
+						absDeltaX > FLICK_DISTANCE_PX &&
+						elapsedMs < FLICK_MAX_DURATION_MS;
+					const shouldCommit =
+						isHorizontalDominant &&
+						( pastDistanceThreshold || isFastFlick );
+					const showsNextImage = deltaX < 0;
 
-					if ( isHorizontalSwipe ) {
-						event.preventDefault();
-						if ( deltaX < 0 ) {
+					const slideEls = touchDrag.slideEls;
+					const reducedMotion = prefersReducedMotion();
+					// A committed swipe carries the image off the side it was
+					// dragged towards; an uncommitted one falls back to rest.
+					const committedOffset = showsNextImage
+						? -slidePitch
+						: slidePitch;
+					const endOffset = shouldCommit ? committedOffset : 0;
+
+					// Swaps the image and puts the slides back at rest, once the
+					// slide has played out. Runs exactly once, whether it is
+					// reached by the animation finishing or by the next gesture
+					// settling it early.
+					const settle = () => {
+						if ( touchDrag.settle !== settle ) {
+							return;
+						}
+						touchDrag.settle = null;
+						stopDragAnimations();
+						setDragOffset( slideEls, 0 );
+
+						if ( ! shouldCommit ) {
+							return;
+						}
+						if ( showsNextImage ) {
 							actions.showNextImage( event );
 						} else {
 							actions.showPreviousImage( event );
 						}
+						if ( reducedMotion ) {
+							return;
+						}
+						// Keeps the slides hidden until the image that replaced
+						// the one carried off is ready. Fading straight away
+						// plays the fade on an empty box while the image is
+						// still loading, and the image then pops in when it
+						// arrives.
+						// Scripted animations take precedence over the overlay's
+						// own CSS animations without touching its class list, so
+						// this cannot disturb the zoom the lightbox plays when an
+						// image is first opened.
+						const hold = slideEls.map( ( el ) =>
+							el.animate( [ { opacity: 0 }, { opacity: 0 } ], {
+								fill: 'forwards',
+							} )
+						);
+						touchDrag.animations = hold;
+						const enlargedEl = slideEls[ slideEls.length - 1 ];
+						waitForImage( enlargedEl.querySelector( 'img' ) ).then(
+							() => {
+								if ( touchDrag.animations !== hold ) {
+									return;
+								}
+								stopDragAnimations();
+								// Fades only the enlarged image, keeping the
+								// thumbnail behind it hidden until the fade ends.
+								// Fading both lets a thumbnail cropped to another
+								// shape show through as a darker box.
+								touchDrag.animations = slideEls.map( ( el ) =>
+									el.animate(
+										[
+											{ opacity: 0 },
+											{
+												opacity:
+													el === enlargedEl ? 1 : 0,
+											},
+										],
+										{
+											duration: FADE_DURATION_MS,
+											easing: 'ease-out',
+										}
+									)
+								);
+							}
+						);
+					};
+					touchDrag.settle = settle;
+
+					if ( reducedMotion ) {
+						settle();
+					} else {
+						touchDrag.animations = slideEls.map( ( el ) =>
+							el.animate(
+								[
+									{ transform: slideTransform( deltaX ) },
+									{
+										transform: slideTransform( endOffset ),
+									},
+								],
+								{
+									duration: SLIDE_DURATION_MS,
+									easing: SLIDE_EASING,
+									// Holds the end position until `settle()` has
+									// moved the slides there itself.
+									fill: 'forwards',
+								}
+							)
+						);
+						touchDrag.animations[ 0 ].onfinish =
+							withScope( settle );
 					}
 				}
 
 				lastTouchTime = now;
 				isTouching = false;
+				resetTouchDrag();
 			} ),
 			handleScroll() {
 				// Prevents scrolling behaviors that trigger content shift while the
@@ -437,7 +736,7 @@ const { state, actions, callbacks } = store(
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;
 				// Original ratio of the image clicked to open the lightbox.
-				let originalRatio = originalWidth / originalHeight;
+				const originalRatio = originalWidth / originalHeight;
 
 				// If it has object-fit: contain, recalculates the original sizes
 				// and the screen position without the blank spaces.
@@ -455,19 +754,18 @@ const { state, actions, callbacks } = store(
 						originalWidth = widthWithoutSpace;
 					}
 				}
-				originalRatio = originalWidth / originalHeight;
 
 				// Typically, it uses the image's full-sized dimensions. If those
 				// dimensions have not been set (i.e. an external image with only one
 				// size), the image's dimensions in the lightbox are the same
 				// as those of the image in the content.
-				let imgMaxWidth = parseFloat(
+				const imgMaxWidth = parseFloat(
 					state.selectedImage.targetWidth &&
 						state.selectedImage.targetWidth !== 'none'
 						? state.selectedImage.targetWidth
 						: naturalWidth
 				);
-				let imgMaxHeight = parseFloat(
+				const imgMaxHeight = parseFloat(
 					state.selectedImage.targetHeight &&
 						state.selectedImage.targetHeight !== 'none'
 						? state.selectedImage.targetHeight
@@ -475,53 +773,9 @@ const { state, actions, callbacks } = store(
 				);
 
 				// Ratio of the biggest image stored in the database.
-				let imgRatio = imgMaxWidth / imgMaxHeight;
-				let containerMaxWidth = imgMaxWidth;
-				let containerMaxHeight = imgMaxHeight;
+				const fullSizeRatio = imgMaxWidth / imgMaxHeight;
 				let containerWidth = imgMaxWidth;
 				let containerHeight = imgMaxHeight;
-
-				// Checks if the target image has a different ratio than the original
-				// one (thumbnail). Recalculates the width and height.
-				if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
-					if ( naturalRatio > imgRatio ) {
-						// If the width is reached before the height, it keeps the maxWidth
-						// and recalculates the height unless the difference between the
-						// maxHeight and the reducedHeight is higher than the maxWidth,
-						// where it keeps the reducedHeight and recalculate the width.
-						const reducedHeight = imgMaxWidth / naturalRatio;
-						if ( imgMaxHeight - reducedHeight > imgMaxWidth ) {
-							imgMaxHeight = reducedHeight;
-							imgMaxWidth = reducedHeight * naturalRatio;
-						} else {
-							imgMaxHeight = imgMaxWidth / naturalRatio;
-						}
-					} else {
-						// If the height is reached before the width, it keeps the maxHeight
-						// and recalculate the width unlesss the difference between the
-						// maxWidth and the reducedWidth is higher than the maxHeight, where
-						// it keeps the reducedWidth and recalculate the height.
-						const reducedWidth = imgMaxHeight * naturalRatio;
-						if ( imgMaxWidth - reducedWidth > imgMaxHeight ) {
-							imgMaxWidth = reducedWidth;
-							imgMaxHeight = reducedWidth / naturalRatio;
-						} else {
-							imgMaxWidth = imgMaxHeight * naturalRatio;
-						}
-					}
-					containerWidth = imgMaxWidth;
-					containerHeight = imgMaxHeight;
-					imgRatio = imgMaxWidth / imgMaxHeight;
-
-					// Calculates the max size of the container.
-					if ( originalRatio > imgRatio ) {
-						containerMaxWidth = imgMaxWidth;
-						containerMaxHeight = containerMaxWidth / originalRatio;
-					} else {
-						containerMaxHeight = imgMaxHeight;
-						containerMaxWidth = containerMaxHeight * originalRatio;
-					}
-				}
 
 				// If the image has been pixelated on purpose, it keeps that size.
 				if (
@@ -560,21 +814,35 @@ const { state, actions, callbacks } = store(
 				);
 				const targetContainerRatio = targetMaxWidth / targetMaxHeight;
 
-				if ( originalRatio > targetContainerRatio ) {
+				if ( fullSizeRatio > targetContainerRatio ) {
 					// If targetMaxWidth is reached before targetMaxHeight.
 					containerWidth = targetMaxWidth;
-					containerHeight = containerWidth / originalRatio;
+					containerHeight = containerWidth / fullSizeRatio;
 				} else {
 					// If targetMaxHeight is reached before targetMaxWidth.
 					containerHeight = targetMaxHeight;
-					containerWidth = containerHeight * originalRatio;
+					containerWidth = containerHeight * fullSizeRatio;
 				}
 
-				const containerScale = originalWidth / containerWidth;
-				const lightboxImgWidth =
-					imgMaxWidth * ( containerWidth / containerMaxWidth );
-				const lightboxImgHeight =
-					imgMaxHeight * ( containerHeight / containerMaxHeight );
+				const hasCroppedSource =
+					naturalRatio.toFixed( 2 ) !== fullSizeRatio.toFixed( 2 );
+				const sourceRatio = hasCroppedSource
+					? naturalRatio
+					: fullSizeRatio;
+
+				// Include any crop already applied to the thumbnail file.
+				const containerScale = Math.max(
+					originalWidth / containerWidth,
+					originalHeight / containerHeight,
+					originalWidth / ( containerHeight * sourceRatio ),
+					( originalHeight * sourceRatio ) / containerWidth
+				);
+				const thumbnailWidth = originalWidth / containerScale;
+				const thumbnailHeight = originalHeight / containerScale;
+				const cropX = ( containerWidth - thumbnailWidth ) / 2;
+				const cropY = ( containerHeight - thumbnailHeight ) / 2;
+				screenPosX -= cropX * containerScale;
+				screenPosY -= cropY * containerScale;
 
 				// As of this writing, using the calculations above will render the
 				// lightbox with a small, erroneous whitespace on the left side of the
@@ -587,8 +855,15 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
 					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
 					--wp--lightbox-container-height: ${ containerHeight + 1 }px;
-					--wp--lightbox-image-width: ${ lightboxImgWidth }px;
-					--wp--lightbox-image-height: ${ lightboxImgHeight }px;
+					--wp--lightbox-image-width: ${ containerWidth }px;
+					--wp--lightbox-image-height: ${ containerHeight }px;
+					--wp--lightbox-initial-clip: inset(${ cropY }px ${ cropX }px);
+					--wp--lightbox-thumbnail-width: ${
+						hasCroppedSource ? thumbnailWidth : containerWidth
+					}px;
+					--wp--lightbox-thumbnail-height: ${
+						hasCroppedSource ? thumbnailHeight : containerHeight
+					}px;
 					--wp--lightbox-scale: ${ containerScale };
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
@@ -697,16 +972,28 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			setInertElements() {
-				// Makes all children of the document inert exempt .wp-lightbox-overlay.
-				document
-					.querySelectorAll( 'body > :not(.wp-lightbox-overlay)' )
-					.forEach( ( el ) => {
-						if ( state.overlayEnabled ) {
-							el.setAttribute( 'inert', '' );
-						} else {
-							el.removeAttribute( 'inert' );
+				if ( ! state.overlayEnabled ) {
+					inertElements.forEach( ( el ) =>
+						el.removeAttribute( 'inert' )
+					);
+					inertElements = [];
+					return;
+				}
+				// Inerts the overlay's siblings at each level, not its ancestors.
+				const { ref } = getElement();
+				let node = ref;
+				while ( node && node !== document.body && node.parentElement ) {
+					for ( const sibling of node.parentElement.children ) {
+						if (
+							sibling !== node &&
+							! sibling.hasAttribute( 'inert' )
+						) {
+							sibling.setAttribute( 'inert', '' );
+							inertElements.push( sibling );
 						}
-					} );
+					}
+					node = node.parentElement;
+				}
 			},
 			initTriggerButton() {
 				const { imageId } = getContext();

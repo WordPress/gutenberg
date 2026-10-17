@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useEffect, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { Option } from '../types';
 
 const EMPTY_ARRAY: Option[] = [];

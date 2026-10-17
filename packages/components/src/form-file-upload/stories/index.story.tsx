@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { upload as uploadIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/File Upload/FormFileUpload',
+	title: 'Components/@wordpress-components/Selection & Input/File Upload/FormFileUpload',
 	id: 'components-formfileupload',
 	component: FormFileUpload,
 	argTypes: {

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useReducer } from '@wordpress/element';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';

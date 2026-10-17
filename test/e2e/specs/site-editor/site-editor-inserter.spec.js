@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Site Editor Inserter', () => {
@@ -13,9 +10,12 @@ test.describe( 'Site Editor Inserter', () => {
 		] );
 	} );
 
-	test.beforeEach( async ( { admin, editor } ) => {
-		await admin.visitSiteEditor();
-		await editor.canvas.locator( 'body' ).click();
+	test.beforeEach( async ( { admin } ) => {
+		await admin.visitSiteEditor( {
+			postId: 'twentytwentyfour//home',
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
@@ -82,7 +82,7 @@ test.describe( 'Site Editor Inserter', () => {
 			},
 		} );
 
-		test( 'should intialize correct active tab based on zoom level', async ( {
+		test( 'should initialize correct active tab based on zoom level', async ( {
 			InserterUtils,
 			ZoomUtils,
 		} ) => {

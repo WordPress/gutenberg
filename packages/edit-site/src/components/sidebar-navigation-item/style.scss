@@ -8,14 +8,11 @@
 	border: none;
 	min-height: $grid-unit-50;
 
-	&:hover,
 	&:focus,
-	&[aria-current="true"] {
+	&[aria-current="true"],
+	// Bump the specificity above the <Item> component's own `:hover` color.
+	&#{&}:hover {
 		color: var(--wpds-color-foreground-interactive-neutral-weak-active);
-
-		.edit-site-sidebar-navigation-item__drilldown-indicator {
-			fill: var(--wpds-color-foreground-interactive-neutral-weak-active);
-		}
 	}
 
 	&[aria-current="true"] {
@@ -30,10 +27,6 @@
 		--wp-components-color-accent: var(--wpds-color-stroke-focus);
 
 		transform: translateZ(0);
-	}
-
-	.edit-site-sidebar-navigation-item__drilldown-indicator {
-		fill: var(--wpds-color-foreground-interactive-neutral-weak);
 	}
 
 	&.with-suffix {

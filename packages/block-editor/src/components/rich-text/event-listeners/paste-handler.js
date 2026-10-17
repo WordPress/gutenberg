@@ -1,19 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { pasteHandler } from '@wordpress/blocks';
 import {
 	isEmpty,
 	insert,
 	create,
+	getActiveFormats,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
@@ -105,7 +99,7 @@ export default ( props ) => ( element ) => {
 				onChange( transformed );
 			} else {
 				const valueToInsert = create( { html: content } );
-				addActiveFormats( valueToInsert, value.activeFormats );
+				addActiveFormats( valueToInsert, getActiveFormats( value ) );
 				onChange( insert( value, valueToInsert ) );
 			}
 		}
@@ -119,7 +113,9 @@ export default ( props ) => ( element ) => {
 		}
 
 		if ( pastePlainText ) {
-			onChange( insert( value, create( { text: plainText } ) ) );
+			const valueToInsert = create( { text: plainText } );
+			addActiveFormats( valueToInsert, getActiveFormats( value ) );
+			onChange( insert( value, valueToInsert ) );
 			return;
 		}
 

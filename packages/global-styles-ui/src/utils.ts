@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	areGlobalStylesEqual,
 	privateApis as globalStylesEnginePrivateApis,
@@ -10,10 +7,6 @@ import type {
 	GlobalStylesSettings,
 } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { unlock } from './lock-unlock';
 
 const { getViewportBreakpoints } = unlock( globalStylesEnginePrivateApis );
@@ -57,6 +50,12 @@ export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
  */
 export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 	'core/button': [
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
+	],
+	'core/navigation-link': [
 		{ value: ':hover', label: __( 'Hover' ) },
 		{ value: ':focus', label: __( 'Focus' ) },
 		{ value: ':focus-visible', label: __( 'Focus-visible' ) },
