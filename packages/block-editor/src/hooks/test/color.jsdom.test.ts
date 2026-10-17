@@ -1,6 +1,8 @@
 import { renderHook } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import type { BlockConfiguration } from '@wordpress/blocks';
+import type { PanelStyle } from '../../components/global-styles/types';
 import color from '../color';
 
 vi.mock(
@@ -32,7 +34,12 @@ function registerWithSkip( {
 	colorSkip,
 	backgroundSkip,
 	backgroundClip = true,
+}: {
+	colorSkip?: boolean | string[];
+	backgroundSkip?: boolean | string[];
+	backgroundClip?: boolean;
 } = {} ) {
+	// The test block needs no attributes or edit.
 	registerBlockType( BLOCK_NAME, {
 		apiVersion: 3,
 		title: 'Test block',
@@ -51,10 +58,10 @@ function registerWithSkip( {
 				__experimentalSkipSerialization: backgroundSkip,
 			},
 		},
-	} );
+	} as unknown as BlockConfiguration );
 }
 
-function getClassNames( style ) {
+function getClassNames( style: PanelStyle ) {
 	const { result } = renderHook( () =>
 		color.useBlockProps( { name: BLOCK_NAME, style } )
 	);
@@ -233,7 +240,8 @@ describe( 'color addSaveProps', () => {
 	const fontSizeValue = { typography: { fontSize: '20px' } };
 	const linkValue = { elements: { link: { color: { text: '#1d4d3a' } } } };
 
-	function registerWithLink( colorSkip ) {
+	function registerWithLink( colorSkip?: string[] ) {
+		// The test block needs no attributes or edit.
 		registerBlockType( BLOCK_NAME, {
 			apiVersion: 3,
 			title: 'Test block',
@@ -246,7 +254,7 @@ describe( 'color addSaveProps', () => {
 					__experimentalSkipSerialization: colorSkip,
 				},
 			},
-		} );
+		} as unknown as BlockConfiguration );
 	}
 
 	afterEach( () => {
