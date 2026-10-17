@@ -1,3 +1,4 @@
+import deprecated from '@wordpress/deprecated';
 import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
 import type { NoticeOptions, ReducerAction } from './types';
 
@@ -43,6 +44,7 @@ export function createNotice(
 		id = `${ context }${ ++uniqueId }`,
 		actions = [],
 		type = 'default',
+		details,
 		__unstableHTML,
 		icon = null,
 		explicitDismiss = false,
@@ -54,6 +56,13 @@ export function createNotice(
 	// supported, cast to a string.
 	content = String( content );
 
+	if ( __unstableHTML ) {
+		deprecated( 'The `__unstableHTML` option of `createNotice`', {
+			since: '7.2',
+			hint: 'Pass the message as plain text, and any longer account of what happened as `details`.',
+		} );
+	}
+
 	return {
 		type: 'CREATE_NOTICE',
 		context,
@@ -62,6 +71,11 @@ export function createNotice(
 			status,
 			content,
 			spokenMessage: speak ? content : null,
+			// Details with nothing to read would open an empty panel.
+			details:
+				details && String( details ).trim()
+					? String( details )
+					: undefined,
 			__unstableHTML,
 			isDismissible,
 			actions,

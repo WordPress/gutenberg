@@ -24,6 +24,11 @@ collab-sidebar/
 ├── note-indicator-toolbar.jsx       NoteAvatarIndicator - toolbar participants avatars
 ├── floating-container.jsx           FloatingContainer - stack wrapper that applies `top` in floating mode
 │
+├── reactions/                       emoji reactions on a note
+│   ├── use-note-reactions.ts        useNoteReactions( noteId ) - [ reaction_summary, toggleReaction ]
+│   ├── note-reactions.tsx           NoteReactions - reaction pills with reactor-name tooltips + add-reaction Menu
+│   └── reaction-emojis.ts           the reaction emoji and their storage keys
+│
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, usePickNote, useNoteFocus, useFloatingBoard, useEnableFloatingSidebar
 ├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - DOM measurement for the floating layout
