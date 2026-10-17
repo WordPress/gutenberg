@@ -6,6 +6,9 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+// The distance of the dragged blocks from the pointer.
+const PILE_OFFSET = 8;
+
 function isColorTransparent( color ) {
 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
 }
@@ -139,9 +142,10 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			}
 
 			// Adds the multi-selection drag visuals to the pressed block that
-			// the block drag lifts: it is held by its top left corner, the next
-			// selected block peeks out from underneath it, and a count of the
-			// dragged blocks sits on its top right corner.
+			// the block drag lifts: its top left corner hangs just below and
+			// right of the pointer, so the pointer stays over the drop
+			// targets, the next selected block peeks out from underneath it,
+			// and a count of the dragged blocks sits on its top right corner.
 			function startPile( event, clientIds, rect, inverted ) {
 				const { ownerDocument } = node;
 				const index = clientIds.indexOf( clientId );
@@ -163,8 +167,8 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 						( y - from.top - ( from.height * ( 1 - scale ) ) / 2 ) *
 						inverted
 					}px) scale(${ scale }) rotate(${ turn }deg)`;
-				const left = event.clientX - 4;
-				const top = event.clientY - 4;
+				const left = event.clientX + PILE_OFFSET;
+				const top = event.clientY + PILE_OFFSET;
 				const scale = cardScale( rect );
 				const width = rect.width * scale;
 				const height = rect.height * scale;
@@ -224,9 +228,11 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 
 				function positionCountBadge( clientX, clientY ) {
 					countBadge.style.left = `${
-						( clientX - 4 + width ) * inverted - 12
+						( clientX + PILE_OFFSET + width ) * inverted - 12
 					}px`;
-					countBadge.style.top = `${ ( clientY - 4 ) * inverted - 12 }px`;
+					countBadge.style.top = `${
+						( clientY + PILE_OFFSET ) * inverted - 12
+					}px`;
 				}
 				positionCountBadge( event.clientX, event.clientY );
 
