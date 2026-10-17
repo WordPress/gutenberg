@@ -1,4 +1,6 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
+// @ts-expect-error Vite loads the `?raw` stylesheet as a string, which TypeScript cannot resolve.
 import blockLibraryStyles from '@wordpress/block-library/build-style/style.css?raw';
 import BlockPatternsList from '../';
 import { ExperimentalBlockEditorProvider } from '../../provider';
@@ -8,13 +10,14 @@ const blockEditorSettings = {
 	styles: [ { css: blockLibraryStyles } ],
 };
 
-export default {
+const meta = {
 	component: BlockPatternsList,
 	id: 'blockeditor-blockpatternslist',
 	title: 'Editor/Block Editor/BlockPatternsList',
-};
+} satisfies Meta< typeof BlockPatternsList >;
+export default meta;
 
-export const Default = {
+export const Default: StoryObj< typeof meta > = {
 	render: function Template( props ) {
 		return (
 			<ExperimentalBlockEditorProvider settings={ blockEditorSettings }>
@@ -23,6 +26,7 @@ export const Default = {
 		);
 	},
 	args: {
+		// @ts-expect-error The fixtures provide only the blocks the list renders.
 		blockPatterns: patterns,
 		isDraggable: false,
 		label: 'Block patterns story',
@@ -32,6 +36,7 @@ export const Default = {
 	},
 	argTypes: {
 		blockPatterns: { description: 'The patterns to render.' },
+		// @ts-expect-error Bug: the list has no `shownPatterns` prop.
 		shownPatterns: {
 			description:
 				'Usually this component is used with `useAsyncList` for performance reasons and you should provide the returned list from that hook. Alternatively it should have the same value with `blockPatterns`.',
