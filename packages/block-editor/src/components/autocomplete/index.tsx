@@ -7,16 +7,23 @@ import { useMemo } from '@wordpress/element';
 import { getDefaultBlockName, getBlockSupport } from '@wordpress/blocks';
 import { useBlockEditContext } from '../block-edit/context';
 import blockAutocompleter from '../../autocompleters/block';
+import type {
+	BlockEditorAutocompleteProps,
+	Completer,
+	UseBlockEditorAutocompletePropsOptions,
+} from './types';
 
 /**
  * Shared reference to an empty array for cases where it is important to avoid
  * returning a new array reference on every invocation.
- *
- * @type {Array}
  */
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: Completer[] = [];
 
-function useCompleters( { completers = EMPTY_ARRAY } ) {
+function useCompleters( {
+	completers = EMPTY_ARRAY,
+}: {
+	completers?: Completer[];
+} ) {
 	const { name } = useBlockEditContext();
 	return useMemo( () => {
 		let filteredCompleters = [ ...completers ];
@@ -25,7 +32,11 @@ function useCompleters( { completers = EMPTY_ARRAY } ) {
 			name === getDefaultBlockName() ||
 			getBlockSupport( name, '__experimentalSlashInserter', false )
 		) {
-			filteredCompleters = [ ...filteredCompleters, blockAutocompleter ];
+			filteredCompleters = [
+				...filteredCompleters,
+				// The JS completer is typed as a plain object.
+				blockAutocompleter as Completer,
+			];
 		}
 
 		if ( hasFilter( 'editor.Autocomplete.completers' ) ) {
@@ -36,18 +47,21 @@ function useCompleters( { completers = EMPTY_ARRAY } ) {
 				);
 			}
 
+			// Filters are untyped.
 			filteredCompleters = applyFilters(
 				'editor.Autocomplete.completers',
 				filteredCompleters,
 				name
-			);
+			) as Completer[];
 		}
 
 		return filteredCompleters;
 	}, [ completers, name ] );
 }
 
-export function useBlockEditorAutocompleteProps( props ) {
+export function useBlockEditorAutocompleteProps(
+	props: UseBlockEditorAutocompletePropsOptions
+) {
 	return useAutocompleteProps( {
 		...props,
 		completers: useCompleters( props ),
@@ -57,10 +71,8 @@ export function useBlockEditorAutocompleteProps( props ) {
 /**
  * Wrap the default Autocomplete component with one that supports a filter hook
  * for customizing its list of autocompleters.
- *
- * @type {React.FC}
  */
-function BlockEditorAutocomplete( props ) {
+function BlockEditorAutocomplete( props: BlockEditorAutocompleteProps ) {
 	return (
 		<WCAutocomplete { ...props } completers={ useCompleters( props ) } />
 	);
