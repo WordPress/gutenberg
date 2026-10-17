@@ -35,7 +35,7 @@
 		{ "path": "../kebab-case/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
