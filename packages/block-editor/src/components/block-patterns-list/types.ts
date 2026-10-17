@@ -4,25 +4,16 @@ import type { BlockPattern } from '../../store/types';
 import type { PaginationProps } from '../block-patterns-paging/types';
 
 /**
- * A pattern in the list, with its parsed blocks.
+ * A listed pattern, which comes with its parsed blocks.
  */
-export interface BlockPatternsListPattern extends Pick<
-	BlockPattern,
-	'title' | 'description' | 'type' | 'syncStatus' | 'id'
-> {
-	name: string;
+export type BlockPatternsListPattern = BlockPattern & {
 	blocks: Block[];
 	viewportWidth?: number;
-}
+};
 
-export type OnClickPattern = (
-	pattern: BlockPatternsListPattern,
-	blocks: Block[]
-) => void;
+export type OnClickPattern = ( pattern: BlockPattern, blocks: Block[] ) => void;
 
-export type OnHoverPattern = (
-	pattern: BlockPatternsListPattern | null
-) => void;
+export type OnHoverPattern = ( pattern: BlockPattern | null ) => void;
 
 export interface WithToolTipProps {
 	showTooltip?: boolean;
@@ -33,7 +24,7 @@ export interface WithToolTipProps {
 export interface BlockPatternProps {
 	id: string;
 	isDraggable?: boolean;
-	pattern: BlockPatternsListPattern;
+	pattern: BlockPattern;
 	onClick: OnClickPattern;
 	onHover?: OnHoverPattern;
 	showTitlesAsTooltip?: boolean;
@@ -43,7 +34,7 @@ export interface BlockPatternProps {
 
 export interface BlockPatternsListProps {
 	isDraggable?: boolean;
-	blockPatterns: BlockPatternsListPattern[];
+	blockPatterns: BlockPattern[];
 	onHover?: OnHoverPattern;
 	onClickPattern: OnClickPattern;
 	orientation?: 'horizontal' | 'vertical' | 'both';

@@ -235,6 +235,8 @@ export interface BlockPattern {
 	syncStatus?: string;
 	blockTypes?: string[];
 	inserter?: boolean;
+	/** Where the pattern comes from, e.g. `core` or `theme`. */
+	source?: string;
 	[ key: string ]: unknown;
 }
 

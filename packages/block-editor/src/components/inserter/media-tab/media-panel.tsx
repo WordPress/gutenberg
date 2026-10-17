@@ -12,6 +12,7 @@ import MediaLibraryButton from './media-library-button';
 import InsertExternalImageModal from './insert-external-image-modal';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 import InserterNoResults from '../no-results';
+import type { MediaCategoryPanelProps, MediaItem } from './types';
 
 // Four rows at the grid's two columns: roughly one screen, so a page is
 // browsed with little scrolling and the pager does the rest.
@@ -32,7 +33,7 @@ export function MediaCategoryPanel( {
 	onChangeMediaType,
 	sourceMenu,
 	footer,
-} ) {
+}: MediaCategoryPanelProps ) {
 	const [ page, setPage ] = useState( 1 );
 	// Reset paging whenever the source category or the search term changes.
 	// Adjusting state during render (rather than in an effect) keeps the query
@@ -66,8 +67,8 @@ export function MediaCategoryPanel( {
 	if ( typeof totalPages === 'number' && page > numPages ) {
 		setPage( numPages );
 	}
-	const panelRef = useRef();
-	const changePage = useCallback( ( nextPage ) => {
+	const panelRef = useRef< HTMLDivElement >( null );
+	const changePage = useCallback( ( nextPage: number ) => {
 		// Start the new page from the top rather than wherever the previous
 		// one was scrolled to. Same approach as `usePatternsPaging`: the panel
 		// doesn't scroll itself, so find whichever ancestor does.
@@ -85,7 +86,7 @@ export function MediaCategoryPanel( {
 		cancelExternalInsert,
 	} = useMediaInsert( onInsert );
 	const handleClickItem = useCallback(
-		( item ) => {
+		( item: MediaItem ) => {
 			const [ block ] = getBlockAndPreviewFromMedia(
 				item,
 				category.mediaType
@@ -107,7 +108,8 @@ export function MediaCategoryPanel( {
 	return (
 		<div ref={ panelRef } className="block-editor-inserter__media-panel">
 			<MediaGrid
-				mediaList={ mediaList }
+				// The items match `MediaItem`, as its definition explains.
+				mediaList={ mediaList as MediaItem[] }
 				// While loading, `DataViews` goes on showing the items it
 				// already has. After a source change those belong to the
 				// previous source, so tell it nothing is loading and let the

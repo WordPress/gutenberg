@@ -11,8 +11,9 @@ import {
 	FlexBlock,
 } from '@wordpress/components';
 import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
+import type { InserterTabCategory, MobileTabNavigationProps } from './types';
 
-function ScreenHeader( { title } ) {
+function ScreenHeader( { title }: { title: string } ) {
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -38,11 +39,11 @@ function ScreenHeader( { title } ) {
 	);
 }
 
-export default function MobileTabNavigation( {
+export default function MobileTabNavigation< T extends InserterTabCategory >( {
 	categories,
 	children,
 	screenClassName,
-} ) {
+}: MobileTabNavigationProps< T > ) {
 	return (
 		<Navigator
 			initialPath="/"
@@ -55,6 +56,7 @@ export default function MobileTabNavigation( {
 							key={ category.name }
 							path={ `/category/${ category.name }` }
 							as={ Item }
+							// @ts-expect-error `Item` has no `isAction` prop.
 							isAction
 						>
 							<HStack>

@@ -25,6 +25,8 @@ import {
 	starterPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import type { BlockPattern } from '../../../store/types';
+import type { PatternCategoryPreviewsProps } from '../types';
 
 const noop = () => {};
 
@@ -34,7 +36,7 @@ export function PatternCategoryPreviews( {
 	onHover = noop,
 	category,
 	showTitlesAsTooltip,
-} ) {
+}: PatternCategoryPreviewsProps ) {
 	const [ allPatterns, , onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
@@ -47,10 +49,10 @@ export function PatternCategoryPreviews( {
 		rootClientId,
 		patternSourceFilter
 	);
-	const scrollContainerRef = useRef();
+	const scrollContainerRef = useRef< HTMLDivElement >( null );
 	const currentCategoryPatterns = useMemo(
 		() =>
-			allPatterns.filter( ( pattern ) => {
+			allPatterns.filter( ( pattern: BlockPattern ) => {
 				if (
 					isPatternFiltered(
 						pattern,
@@ -113,14 +115,14 @@ export function PatternCategoryPreviews( {
 	useEffect( () => () => onHover( null ), [] );
 
 	const onSetPatternSyncFilter = useCallback(
-		( value ) => {
+		( value: string ) => {
 			setPatternSyncFilter( value );
 			changePage( 1 );
 		},
 		[ setPatternSyncFilter, changePage ]
 	);
 	const onSetPatternSourceFilter = useCallback(
-		( value ) => {
+		( value: string ) => {
 			setPatternSourceFilter( value );
 			changePage( 1 );
 		},
@@ -181,6 +183,7 @@ export function PatternCategoryPreviews( {
 						category={ category.name }
 						isDraggable
 						showTitlesAsTooltip={ showTitlesAsTooltip }
+						// @ts-expect-error The list ignores `patternFilter`.
 						patternFilter={ patternSourceFilter }
 						pagingProps={ pagingProps }
 					/>

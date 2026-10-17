@@ -1,12 +1,13 @@
 import { SearchControl } from '@wordpress/components';
 import { Stack, Tabs } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import type { PatternExplorerSidebarProps } from '../types';
 
 function PatternExplorerSidebar( {
 	patternCategories,
 	searchValue,
 	setSearchValue,
-} ) {
+}: PatternExplorerSidebarProps ) {
 	return (
 		<Stack
 			direction="column"

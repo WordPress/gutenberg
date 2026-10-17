@@ -195,7 +195,10 @@ describe( 'getAppenderLabel', () => {
 
 	describe( 'Navigation Link block integration', () => {
 		// Navigation Link returns the full label (e.g. "Add page") for appender context.
-		const navigationLinkAppenderLabel = ( attributes, { context } ) => {
+		const navigationLinkAppenderLabel = (
+			attributes: Record< string, unknown >,
+			{ context }: { context: string }
+		) => {
 			if ( context === 'appender' ) {
 				const type = attributes?.type || 'link';
 				return `Add ${ type }`;

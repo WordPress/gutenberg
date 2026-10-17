@@ -7,13 +7,29 @@
  * works in other contexts like 'list-view'. The inserter uses the result directly
  * without reformatting.
  *
- * @param {Object} defaultBlock     The default block configuration with name and attributes.
- * @param {Object} defaultBlockType The block type object containing __experimentalLabel.
- * @return {string|null}            The full appender label, or null if not available.
+ * @param defaultBlock     The default block configuration with name and attributes.
+ * @param defaultBlockType The block type object containing __experimentalLabel.
+ * @return The full appender label, or null if not available.
  */
 const MAX_APPENDER_LABEL_LENGTH = 50;
 
-export function getAppenderLabel( defaultBlock, defaultBlockType ) {
+export function getAppenderLabel(
+	defaultBlock:
+		| { name?: string; attributes?: Record< string, unknown > }
+		| null
+		| undefined,
+	defaultBlockType:
+		| {
+				name?: string;
+				/** Checked to return a string, as third-party blocks may not. */
+				__experimentalLabel?: (
+					attributes: Record< string, unknown >,
+					options: { context: string }
+				) => unknown;
+		  }
+		| null
+		| undefined
+): string | null {
 	if (
 		! defaultBlock ||
 		! defaultBlock.attributes ||

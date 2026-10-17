@@ -5,15 +5,16 @@ import {
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { unlock } from '../../../lock-unlock';
+import type { CategoryTabsProps, InserterTabCategory } from '../types';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
-function CategoryTabs( {
+function CategoryTabs< T extends InserterTabCategory >( {
 	categories,
 	selectedCategory,
 	onSelectCategory,
 	children,
-} ) {
+}: CategoryTabsProps< T > ) {
 	// Copied from InterfaceSkeleton.
 	const ANIMATION_DURATION = 0.25;
 	const disableMotion = useReducedMotion();
@@ -26,7 +27,7 @@ function CategoryTabs( {
 	const previousSelectedCategory = usePrevious( selectedCategory );
 
 	const selectedTabId = selectedCategory ? selectedCategory.name : null;
-	const [ activeTabId, setActiveId ] = useState();
+	const [ activeTabId, setActiveId ] = useState< string | undefined >();
 	const firstTabId = categories?.[ 0 ]?.name;
 
 	// If there is no active tab, make the first tab the active tab, so that
@@ -41,7 +42,7 @@ function CategoryTabs( {
 			selectOnMove={ false }
 			selectedTabId={ selectedTabId }
 			orientation="vertical"
-			onSelect={ ( categoryId ) => {
+			onSelect={ ( categoryId: string ) => {
 				// Pass the full category object
 				onSelectCategory(
 					categories.find(
