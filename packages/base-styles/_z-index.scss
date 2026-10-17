@@ -71,6 +71,9 @@ $z-layers: (
 	// otherwise be on top, and the visualizer remounts after a drag.
 	".block-editor-grid-item-resizer": 31,
 
+	// Above the grid visualizer, like the grid item resizer.
+	".block-editor-grid-row-resizer": 31,
+
 	// Show snackbars above everything (similar to popovers)
 	".components-snackbar-list": 100000,
 

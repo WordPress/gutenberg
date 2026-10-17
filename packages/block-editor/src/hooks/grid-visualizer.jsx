@@ -1,7 +1,12 @@
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
+import { getBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { GridVisualizer, useGridLayoutSync } from '../components/grid';
+import {
+	GridVisualizer,
+	GridRowResizer,
+	useGridLayoutSync,
+} from '../components/grid';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
 import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
@@ -14,48 +19,71 @@ function GridLayoutSync( props ) {
 }
 
 function GridTools( { clientId, layout } ) {
-	const { isVisible, blockVisibility, deviceType, viewportSettings } =
-		useSelect(
-			( select ) => {
-				const {
-					isBlockSelected,
-					hasSelectedInnerBlock,
-					isDraggingBlocks,
-					getTemplateLock,
-					getBlockEditingMode,
-					getBlockAttributes,
-					getSettings,
-				} = select( blockEditorStore );
+	const {
+		isVisible,
+		showRowResizer,
+		blockVisibility,
+		deviceType,
+		viewportSettings,
+	} = useSelect(
+		( select ) => {
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				isDraggingBlocks,
+				getTemplateLock,
+				getBlockEditingMode,
+				getBlockAttributes,
+				getBlockRootClientId,
+				getBlockName,
+				getSettings,
+			} = select( blockEditorStore );
 
-				// These calls are purposely ordered from least expensive to most expensive.
-				// Hides the visualizer in cases where the user is not or cannot interact with it.
-				// Also hide if a child block is selected, because layout-child.jsx will render
-				// the visualizer in that case (with proper childGridClientId handling).
-				if (
-					( ! isDraggingBlocks() && ! isBlockSelected( clientId ) ) ||
-					getTemplateLock( clientId ) ||
-					getBlockEditingMode( clientId ) !== 'default' ||
-					hasSelectedInnerBlock( clientId )
-				) {
-					return { isVisible: false };
-				}
+			// These calls are purposely ordered from least expensive to most expensive.
+			// Hides the visualizer in cases where the user is not or cannot interact with it.
+			// Also hide if a child block is selected, because layout-child.jsx will render
+			// the visualizer in that case (with proper childGridClientId handling).
+			if (
+				( ! isDraggingBlocks() && ! isBlockSelected( clientId ) ) ||
+				getTemplateLock( clientId ) ||
+				getBlockEditingMode( clientId ) !== 'default' ||
+				hasSelectedInnerBlock( clientId )
+			) {
+				return { isVisible: false };
+			}
 
-				const attributes = getBlockAttributes( clientId );
-				const settings = getSettings();
-				const currentDeviceType =
-					settings?.[ deviceTypeKey ]?.toLowerCase() ||
-					BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
+			const attributes = getBlockAttributes( clientId );
+			const settings = getSettings();
+			const currentDeviceType =
+				settings?.[ deviceTypeKey ]?.toLowerCase() ||
+				BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
 
-				return {
-					isVisible: true,
-					blockVisibility: attributes?.metadata?.blockVisibility,
-					deviceType: currentDeviceType,
-					viewportSettings:
-						settings?.__experimentalFeatures?.viewport,
-				};
-			},
-			[ clientId ]
-		);
+			// Rows are added and removed from the edges of a selected manual
+			// grid. A grid that is an item of a grid sizing its items already
+			// has the item resizer's handles on those edges, so it changes
+			// rows in the block settings instead.
+			const parentClientId = getBlockRootClientId( clientId );
+			const isSizedByParentGrid =
+				!! parentClientId &&
+				getBlockAttributes( parentClientId )?.layout?.type === 'grid' &&
+				!! getBlockSupport( getBlockName( parentClientId ), 'layout' )
+					?.allowSizingOnChildren;
+
+			return {
+				isVisible: true,
+				showRowResizer:
+					!! window.__experimentalEnableGridInteractivity &&
+					!! layout?.isManualPlacement &&
+					! isDraggingBlocks() &&
+					isBlockSelected( clientId ) &&
+					! isSizedByParentGrid,
+				blockVisibility: attributes?.metadata?.blockVisibility,
+				deviceType: currentDeviceType,
+				viewportSettings: settings?.__experimentalFeatures?.viewport,
+			};
+		},
+		[ clientId, layout ]
+	);
 
 	// Get the block's DOM element to derive the canvas iframe window,
 	// so viewport detection matches the actual block rendering context
@@ -91,10 +119,15 @@ function GridTools( { clientId, layout } ) {
 			{ isVisible &&
 				! isBlockCurrentlyHidden &&
 				! isAnyAncestorHidden && (
-					<GridVisualizer
-						clientId={ clientId }
-						parentLayout={ layout }
-					/>
+					<>
+						<GridVisualizer
+							clientId={ clientId }
+							parentLayout={ layout }
+						/>
+						{ showRowResizer && (
+							<GridRowResizer clientId={ clientId } />
+						) }
+					</>
 				) }
 		</>
 	);
