@@ -1,11 +1,16 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { StrictMode } from '@wordpress/element';
+import type { RichTextFormatList } from '@wordpress/rich-text';
 import { useMarkPersistent } from '../use-mark-persistent';
 
 const markPersistent = vi.fn();
 
-function props( html, text = html, activeFormats = [] ) {
+function props(
+	html: string,
+	text = html,
+	activeFormats: RichTextFormatList = []
+) {
 	return {
 		html,
 		value: { text, activeFormats },

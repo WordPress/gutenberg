@@ -1,6 +1,10 @@
 import { RichTextData, create } from '@wordpress/rich-text';
+import type { RichTextFormatList, RichTextValue } from '@wordpress/rich-text';
 
-export function addActiveFormats( value, activeFormats ) {
+export function addActiveFormats(
+	value: RichTextValue,
+	activeFormats?: RichTextFormatList
+) {
 	if ( activeFormats?.length ) {
 		let index = value.formats.length;
 
@@ -16,11 +20,13 @@ export function addActiveFormats( value, activeFormats ) {
 /**
  * Get the multiline tag based on the multiline prop.
  *
- * @param {?(string|boolean)} multiline The multiline prop.
+ * @param multiline The multiline prop.
  *
- * @return {string | undefined} The multiline tag.
+ * @return The multiline tag.
  */
-export function getMultilineTag( multiline ) {
+export function getMultilineTag(
+	multiline?: string | boolean | null
+): 'p' | 'li' | undefined {
 	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {
 		return;
 	}
@@ -28,11 +34,17 @@ export function getMultilineTag( multiline ) {
 	return multiline === true ? 'p' : multiline;
 }
 
-export function isEmpty( value ) {
+export function isEmpty( value?: { length: number } | null ) {
 	return ! value || value.length === 0;
 }
 
-export function getAllowedFormats( { allowedFormats, disableFormats } ) {
+export function getAllowedFormats( {
+	allowedFormats,
+	disableFormats,
+}: {
+	allowedFormats?: readonly string[];
+	disableFormats?: boolean;
+} ): readonly string[] | undefined {
 	if ( disableFormats ) {
 		return getAllowedFormats.EMPTY_ARRAY;
 	}
@@ -40,19 +52,19 @@ export function getAllowedFormats( { allowedFormats, disableFormats } ) {
 	return allowedFormats;
 }
 
-getAllowedFormats.EMPTY_ARRAY = [];
+// An empty literal would be typed as `never[]`.
+getAllowedFormats.EMPTY_ARRAY = [] as string[];
 
 /**
  * The formats, replacements and text of a rich text attribute value, which is
  * rich text data or an HTML string. Spreading rich text data would lose them:
  * they are getters.
  *
- * @param {unknown} value Attribute value.
+ * @param value Attribute value.
  *
- * @return {import('@wordpress/rich-text').RichTextValue} Rich text value
- *                                                       without a selection.
+ * @return Rich text value without a selection.
  */
-export function toRecord( value ) {
+export function toRecord( value: unknown ): RichTextValue {
 	if ( value instanceof RichTextData ) {
 		const { formats, replacements, text } = value;
 		return { formats, replacements, text };

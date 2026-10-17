@@ -1,9 +1,14 @@
 import { RawHTML } from '@wordpress/element';
 import { children as childrenSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
+import type { RichTextData } from '@wordpress/rich-text';
 import { getMultilineTag, isEmpty } from './utils';
+import type { RichTextContentProps, RichTextFieldValue } from './types';
 
-export function valueToHTMLString( value, multiline ) {
+export function valueToHTMLString(
+	value: RichTextFieldValue | null | undefined,
+	multiline?: string | boolean | null
+): string {
 	if ( isEmpty( value ) ) {
 		const multilineTag = getMultilineTag( multiline );
 		return multilineTag ? `<${ multilineTag }></${ multilineTag }>` : '';
@@ -27,7 +32,8 @@ export function valueToHTMLString( value, multiline ) {
 	// To do: create a toReactComponent method on RichTextData, which we
 	// might in the future also use for the editable tree. See
 	// https://github.com/WordPress/gutenberg/pull/41655.
-	return value.toHTMLString();
+	// Neither empty, an array nor a string, so rich text data.
+	return ( value as RichTextData ).toHTMLString();
 }
 
 export function Content( {
@@ -36,7 +42,9 @@ export function Content( {
 	multiline,
 	format,
 	...props
-} ) {
-	value = <RawHTML>{ valueToHTMLString( value, multiline ) }</RawHTML>;
-	return Tag ? <Tag { ...props }>{ value }</Tag> : value;
+}: RichTextContentProps ) {
+	const content = (
+		<RawHTML>{ valueToHTMLString( value, multiline ) }</RawHTML>
+	);
+	return Tag ? <Tag { ...props }>{ content }</Tag> : content;
 }
