@@ -16,6 +16,7 @@ import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
 import makeFamiliesFromFaces from './utils/make-families-from-faces';
 import { loadFontFaceInBrowser } from './utils';
+import { createCssString } from './utils/create-css-string';
 
 function UploadFonts() {
 	const { installFonts } = useContext( FontLibraryContext );
@@ -101,15 +102,28 @@ function UploadFonts() {
 		const fontFacesLoaded = await Promise.all(
 			files.map( async ( fontFile: File ) => {
 				const fontFaceData = await getFontFaceMetadata( fontFile );
-				await loadFontFaceInBrowser(
-					fontFaceData,
-					fontFaceData.file,
-					'all'
-				);
+				// It's technically possible to use "" as a font's family name, but
+				// that's disallowed here.
+				if ( fontFaceData.fontFamily ) {
+					loadFontFaceInBrowser(
+						{
+							...fontFaceData,
+							fontFamily: createCssString(
+								fontFaceData.fontFamily
+							),
+						},
+						fontFaceData.file,
+						'all'
+					);
+				}
 				return fontFaceData;
 			} )
 		);
-		handleInstall( fontFacesLoaded );
+		handleInstall(
+			fontFacesLoaded.filter(
+				( fontFaceData ) => fontFaceData.fontFamily
+			)
+		);
 	};
 
 	/**
@@ -151,8 +165,10 @@ function UploadFonts() {
 		);
 		const font = onloadEvent.detail.font;
 		const { name } = font.opentype.tables;
-		const fontName = name.get( 16 ) || name.get( 1 );
-		const isItalic = name.get( 2 ).toLowerCase().includes( 'italic' );
+		const fontName = ( name.get( 16 ) || name.get( 1 ) || '' ).trim();
+		const isItalic = ( name.get( 2 ) || '' )
+			.toLowerCase()
+			.includes( 'italic' );
 		const fontWeight =
 			font.opentype.tables[ 'OS/2' ].usWeightClass || 'normal';
 		const isVariable = !! font.opentype.tables.fvar;
