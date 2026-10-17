@@ -1,5 +1,6 @@
 import clsx from 'clsx';
 import { getBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -21,6 +22,17 @@ import {
 	useBlockStyleState,
 } from './block-style-state';
 import { useResolvedStyle } from '../components/global-styles/inherited-value-context';
+import type {
+	PanelBackgroundStyle,
+	PanelResetAllFilter,
+	PanelStyle,
+} from '../components/global-styles/types';
+import type {
+	BackgroundAttributes,
+	BackgroundHookPanelProps,
+	ResetAllFilter,
+	StyleInspectorControlProps,
+} from './types';
 
 export const BACKGROUND_SUPPORT_KEY = 'background';
 
@@ -33,13 +45,18 @@ export const BACKGROUND_BLOCK_DEFAULT_VALUES = {
 /**
  * Determine whether there is block support for background.
  *
- * @param {string} blockName Block name.
- * @param {string} feature   Background image feature to check for.
+ * @param blockName Block name.
+ * @param feature   Background image feature to check for.
  *
- * @return {boolean} Whether there is support.
+ * @return Whether there is support.
  */
-export function hasBackgroundSupport( blockName, feature = 'any' ) {
-	const support = getBlockSupport( blockName, BACKGROUND_SUPPORT_KEY );
+export function hasBackgroundSupport(
+	blockName: string | BlockType,
+	feature: string = 'any'
+): boolean {
+	// The support is `true` or flags each background feature.
+	const support = getBlockSupport( blockName, BACKGROUND_SUPPORT_KEY ) as
+		true | Record< string, unknown > | undefined;
 
 	if ( support === true ) {
 		return true;
@@ -58,12 +75,20 @@ export function hasBackgroundSupport( blockName, feature = 'any' ) {
 	return !! support?.[ feature ];
 }
 
-export function setBackgroundStyleDefaults( backgroundStyle ) {
-	if ( ! backgroundStyle || ! backgroundStyle?.backgroundImage?.url ) {
+export function setBackgroundStyleDefaults(
+	backgroundStyle: PanelBackgroundStyle | undefined
+) {
+	if (
+		! backgroundStyle ||
+		// The string form has no URL property.
+		! ( backgroundStyle?.backgroundImage as { url?: string } | undefined )
+			?.url
+	) {
 		return;
 	}
 
-	let backgroundStylesWithDefaults;
+	let backgroundStylesWithDefaults:
+		{ backgroundSize?: string; backgroundPosition?: string } | undefined;
 
 	// Set block background defaults.
 	if ( ! backgroundStyle?.backgroundSize ) {
@@ -84,7 +109,13 @@ export function setBackgroundStyleDefaults( backgroundStyle ) {
 	return backgroundStylesWithDefaults;
 }
 
-function useBlockProps( { name, style } ) {
+function useBlockProps( {
+	name,
+	style,
+}: {
+	name: string;
+	style?: PanelStyle;
+} ) {
 	if (
 		! hasBackgroundSupport( name ) ||
 		! style?.background?.backgroundImage
@@ -96,7 +127,7 @@ function useBlockProps( { name, style } ) {
 	const skipSerialization = getBlockSupport( name, [
 		BACKGROUND_SUPPORT_KEY,
 		'__experimentalSkipSerialization',
-	] );
+	] ) as unknown;
 	if (
 		skipSerialization === true ||
 		( Array.isArray( skipSerialization ) &&
@@ -121,11 +152,11 @@ function useBlockProps( { name, style } ) {
 /**
  * Generates a CSS class name if an background image is set.
  *
- * @param {Object} style A block's style attribute.
+ * @param style A block's style attribute.
  *
- * @return {string} CSS class name.
+ * @return CSS class name.
  */
-export function getBackgroundImageClasses( style ) {
+export function getBackgroundImageClasses( style: PanelStyle | undefined ) {
 	const hasBackground =
 		hasBackgroundImageValue( style ) || hasBackgroundGradientValue( style );
 
@@ -144,7 +175,10 @@ export function getBackgroundImageClasses( style ) {
 // `color.gradient` path, so "Reset all" clears the legacy value too,
 // regardless of which path stored it. `panelResetAllFilter` keeps what the
 // panel does not own, like a text gradient.
-export function backgroundResetAllFilter( attributes, panelResetAllFilter ) {
+export function backgroundResetAllFilter(
+	attributes: BackgroundAttributes,
+	panelResetAllFilter?: PanelResetAllFilter
+): BackgroundAttributes {
 	const updatedClassName = attributes.className?.includes( 'has-background' )
 		? attributes.className
 				.split( ' ' )
@@ -156,6 +190,7 @@ export function backgroundResetAllFilter( attributes, panelResetAllFilter ) {
 		className: updatedClassName,
 		backgroundColor: undefined,
 		gradient: undefined,
+		// Cleaning leaves out only the empty values.
 		style: cleanEmptyObject( {
 			...attributes.style,
 			background: panelResetAllFilter?.( attributes.style )?.background,
@@ -164,13 +199,16 @@ export function backgroundResetAllFilter( attributes, panelResetAllFilter ) {
 				background: undefined,
 				gradient: undefined,
 			},
-		} ),
+		} ) as PanelStyle | undefined,
 	};
 }
 
-function BackgroundInspectorControl( { children, resetAllFilter } ) {
+function BackgroundInspectorControl( {
+	children,
+	resetAllFilter,
+}: StyleInspectorControlProps ) {
 	const attributesResetAllFilter = useCallback(
-		( attributes ) =>
+		( attributes: BackgroundAttributes ) =>
 			backgroundResetAllFilter( attributes, resetAllFilter ),
 		[ resetAllFilter ]
 	);
@@ -178,7 +216,8 @@ function BackgroundInspectorControl( { children, resetAllFilter } ) {
 	return (
 		<InspectorControls
 			group="background"
-			resetAllFilter={ attributesResetAllFilter }
+			// The filter reads the background attributes.
+			resetAllFilter={ attributesResetAllFilter as ResetAllFilter }
 		>
 			{ children }
 		</InspectorControls>
@@ -194,12 +233,20 @@ export function BackgroundImagePanel( {
 	// blocks direct-render this panel because their support fills are gated
 	// off by editing mode). Defaults to the slot-based wrapper.
 	asWrapper,
-} ) {
+}: BackgroundHookPanelProps ) {
 	const selectedState = useBlockStyleState();
-	const { style, className, backgroundColor, gradient } = useSelect(
+	const {
+		style,
+		className,
+		backgroundColor,
+		gradient,
+	}: BackgroundAttributes = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );
-			const blockAttributes = getBlockAttributes( clientId );
+			// The block's attributes hold its background styles.
+			const blockAttributes = getBlockAttributes(
+				clientId
+			) as BackgroundAttributes | null;
 			return {
 				style: blockAttributes?.style,
 				className: blockAttributes?.className,
@@ -220,7 +267,9 @@ export function BackgroundImagePanel( {
 		hasBackgroundSupport( name, 'gradient' ) &&
 		!! settings?.background?.gradient;
 
-	const colorSupport = getBlockSupport( name, 'color' );
+	// The color support flags each color feature.
+	const colorSupport = getBlockSupport( name, 'color' ) as
+		{ background?: boolean; gradients?: boolean } | undefined;
 	const hasColorBackgroundSupport =
 		colorSupport && colorSupport.background !== false;
 	const hasColorGradientSupport = !! colorSupport?.gradients;
@@ -230,7 +279,7 @@ export function BackgroundImagePanel( {
 	// Fold the backgroundColor / gradient attribute slugs back into the style
 	// object the panel consumes. When background.gradient is supported but not
 	// yet explicitly set, fall back to color.gradient for display.
-	const styleValue = {
+	const styleValue: PanelStyle = {
 		...style,
 		color: {
 			...style?.color,
@@ -252,7 +301,9 @@ export function BackgroundImagePanel( {
 		} ),
 	};
 	const value = isStateSelected
-		? getStyleForState( style, selectedState )
+		? // The state styles have the shape of the block styles.
+			( getStyleForState( style, selectedState ) as
+				PanelStyle | undefined )
 		: styleValue;
 
 	// Skipped for gradients, which can't be reliably evaluated for contrast.
@@ -281,7 +332,7 @@ export function BackgroundImagePanel( {
 		return null;
 	}
 
-	const onChange = ( newStyle ) => {
+	const onChange = ( newStyle: PanelStyle ) => {
 		if ( isStateSelected ) {
 			setAttributes( {
 				style: setStyleForState( style, selectedState, newStyle ),
@@ -311,7 +362,7 @@ export function BackgroundImagePanel( {
 
 		// Drop slug-resolved values so they aren't persisted inline alongside
 		// the attribute slugs.
-		const cleanedStyle = {
+		const cleanedStyle: PanelStyle = {
 			...newStyle,
 			color: {
 				...newStyle?.color,
@@ -334,8 +385,9 @@ export function BackgroundImagePanel( {
 
 		const isMigrating =
 			backgroundGradientSupported && !! style?.color?.gradient;
-		const newAttributes = {
-			style: cleanEmptyObject( cleanedStyle ),
+		const newAttributes: BackgroundAttributes = {
+			// Cleaning leaves out only the empty values.
+			style: cleanEmptyObject( cleanedStyle ) as PanelStyle | undefined,
 			backgroundColor: newBackgroundColorSlug,
 			// The legacy `gradient` attribute is only used when the block does
 			// not support `background.gradient`; otherwise the gradient is
@@ -377,14 +429,15 @@ export function BackgroundImagePanel( {
 		},
 	};
 
+	// The default controls map control names to whether they show.
 	const backgroundDefaultControls = getBlockSupport( name, [
 		BACKGROUND_SUPPORT_KEY,
 		'__experimentalDefaultControls',
-	] );
+	] ) as Record< string, boolean > | undefined;
 	const colorDefaultControls = getBlockSupport( name, [
 		'color',
 		'__experimentalDefaultControls',
-	] );
+	] ) as Record< string, boolean > | undefined;
 	const defaultControls = {
 		...backgroundDefaultControls,
 		backgroundColor: colorDefaultControls?.background,
@@ -407,7 +460,9 @@ export function BackgroundImagePanel( {
 			defaultControls={ defaultControls }
 			value={
 				isStateSelected
-					? getStyleForState( style, selectedState )
+					? // The state styles have the shape of the block styles.
+						( getStyleForState( style, selectedState ) as
+							PanelStyle | undefined )
 					: styleValue
 			}
 			baseValue={ isStateSelected ? styleValue : undefined }
