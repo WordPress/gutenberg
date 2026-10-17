@@ -4,9 +4,9 @@ import { store as blockEditorStore } from '../../store';
 /**
  * Returns props for the selected block tools and empty block inserter.
  *
- * @param {string} clientId Selected block client ID.
+ * @param clientId Selected block client ID.
  */
-export default function useSelectedBlockToolProps( clientId ) {
+export default function useSelectedBlockToolProps( clientId: string ) {
 	const selectedBlockProps = useSelect(
 		( select ) => {
 			const {
@@ -40,7 +40,8 @@ export default function useSelectedBlockToolProps( clientId ) {
 				const insertionPoint = getBlockInsertionPoint();
 				const order = getBlockOrder( insertionPoint.rootClientId );
 				isInsertionPointVisible =
-					order[ insertionPoint.index ] === clientId;
+					// A visible insertion point has an index.
+					order[ insertionPoint.index as number ] === clientId;
 			}
 
 			return {

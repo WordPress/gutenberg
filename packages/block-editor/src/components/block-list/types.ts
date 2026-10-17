@@ -8,6 +8,7 @@ import type {
 } from 'react';
 import type { Block, BlockType, RawBlock } from '@wordpress/blocks';
 import type { InitialPosition } from '../../store/types';
+import type { Layout } from '../../layouts/types';
 import type { BlockEditingMode } from '../block-editing-mode';
 import type {
 	BlockVisibility,
@@ -137,7 +138,7 @@ export interface BlockListItemsProps {
 	/** A custom appender, or `false` for none. */
 	renderAppender?: ComponentType | false;
 	__experimentalAppenderTagName?: string;
-	layout?: Record< string, unknown >;
+	layout?: Layout;
 }
 
 /**

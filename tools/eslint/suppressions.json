@@ -142,14 +142,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-canvas/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/components/block-draggable/draggable-chip.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
@@ -310,73 +302,14 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-tools/block-toolbar-popover.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-editor/src/components/block-tools/block-toolbar-popover.tsx": {
 		"react-hooks/refs": {
 			"count": 4
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-tools/empty-block-inserter.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
+	"packages/block-editor/src/components/block-tools/empty-block-inserter.tsx": {
 		"react-hooks/refs": {
 			"count": 2
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-tools/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-tools/insertion-point.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-tools/use-block-toolbar-popover-props.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-tools/use-selected-block-tool-props.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-tools/use-show-block-tools.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-tools/zoom-out-mode-inserter-button.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/block-tools/zoom-out-mode-inserters.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-types-list/index.jsx": {
@@ -524,77 +457,6 @@
 	},
 	"packages/block-editor/src/components/index.js": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-blocks/button-block-appender.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-blocks/default-block-appender.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-blocks/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-blocks/stories/index.story.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-blocks/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-blocks/use-block-context.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-content/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/inner-content/test/index.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},

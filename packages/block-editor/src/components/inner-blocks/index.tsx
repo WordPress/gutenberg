@@ -1,3 +1,8 @@
+import type {
+	ForwardRefExoticComponent,
+	ReactNode,
+	RefAttributes,
+} from 'react';
 import clsx from 'clsx';
 import { useMergeRefs } from '@wordpress/compose';
 import { forwardRef, useMemo, memo } from '@wordpress/element';
@@ -20,13 +25,30 @@ import { store as blockEditorStore } from '../../store';
 import useBlockDropZone from '../use-block-drop-zone';
 import { normalizeLegacyLayout } from '../../layouts/utils';
 import { unlock } from '../../lock-unlock';
+import type { Layout } from '../../layouts/types';
+import type {
+	InnerBlocksOptions,
+	InnerBlocksProps,
+	UseInnerBlocksPropsProps,
+	UseInnerBlocksPropsResult,
+} from './types';
 
-const EMPTY_OBJECT = {};
+const EMPTY_OBJECT: Layout & {
+	allowSizingOnChildren?: boolean;
+	default?: Layout;
+} = {};
 
-function BlockContext( { children, clientId } ) {
+function BlockContext( {
+	children,
+	clientId,
+}: {
+	children: ReactNode;
+	clientId: string;
+} ) {
 	const context = useBlockContext( clientId );
 	return (
-		<BlockContextProvider value={ context }>
+		// Rendered for blocks that provide context, which have one.
+		<BlockContextProvider value={ context as Record< string, unknown > }>
 			{ children }
 		</BlockContextProvider>
 	);
@@ -40,9 +62,9 @@ const BlockListItemsMemo = memo( BlockListItems );
  * blocks are not controlled by another entity. In other words, it is normally
  * used for inner blocks in the post editor
  *
- * @param {Object} props The component props.
+ * @param props The component props.
  */
-function UncontrolledInnerBlocks( props ) {
+function UncontrolledInnerBlocks( props: InnerBlocksProps ) {
 	const {
 		clientId,
 		allowedBlocks,
@@ -89,10 +111,14 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const defaultLayoutBlockSupport =
-		getBlockSupport( name, 'layout' ) ||
-		getBlockSupport( name, '__experimentalLayout' ) ||
-		EMPTY_OBJECT;
+	// The layout support is a config object.
+	const defaultLayoutBlockSupport = ( getBlockSupport(
+		// A block with inner blocks has a name.
+		name as string,
+		'layout'
+	) ||
+		getBlockSupport( name as string, '__experimentalLayout' ) ||
+		EMPTY_OBJECT ) as typeof EMPTY_OBJECT;
 
 	const { allowSizingOnChildren = false } = defaultLayoutBlockSupport;
 	// Legacy markup expresses a constrained layout as `inherit: true` or bare
@@ -128,6 +154,7 @@ function UncontrolledInnerBlocks( props ) {
 			renderAppender={ renderAppender }
 			__experimentalAppenderTagName={ __experimentalAppenderTagName }
 			layout={ memoedLayout }
+			// @ts-expect-error The block list ignores `wrapperRef`.
 			wrapperRef={ wrapperRef }
 			placeholder={ placeholder }
 		/>
@@ -150,21 +177,30 @@ function UncontrolledInnerBlocks( props ) {
  * example of an inner block controller is a template part block, which provides
  * its own blocks from the template part entity data source.
  *
- * @param {Object} props The component props.
+ * @param props The component props.
  */
-function ControlledInnerBlocks( props ) {
+function ControlledInnerBlocks( props: InnerBlocksProps ) {
 	useBlockSync( props );
 	return <UncontrolledInnerBlocks { ...props } />;
 }
 
-const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
-	const innerBlocksProps = useInnerBlocksProps( { ref }, props );
-	return (
-		<div className="block-editor-inner-blocks">
-			<div { ...innerBlocksProps } />
-		</div>
-	);
-} );
+// The statics are assigned below.
+const ForwardedInnerBlocks = forwardRef< HTMLElement, InnerBlocksOptions >(
+	( props, ref ) => {
+		const innerBlocksProps = useInnerBlocksProps( { ref }, props );
+		return (
+			<div className="block-editor-inner-blocks">
+				<div { ...innerBlocksProps } />
+			</div>
+		);
+	}
+) as ForwardRefExoticComponent<
+	InnerBlocksOptions & RefAttributes< HTMLElement >
+> & {
+	DefaultBlockAppender: typeof DefaultBlockAppender;
+	ButtonBlockAppender: typeof ButtonBlockAppender;
+	Content: () => ReactNode;
+};
 
 /**
  * This hook is used to lightly mark an element as an inner blocks wrapper
@@ -181,7 +217,10 @@ const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
  *                         the ref if one is defined.
  * @param {Object} options Optional. Inner blocks options.
  */
-export function useInnerBlocksProps( props = {}, options = {} ) {
+export function useInnerBlocksProps(
+	props: UseInnerBlocksPropsProps = {},
+	options: InnerBlocksOptions = {}
+): UseInnerBlocksPropsResult {
 	const {
 		__unstableDisableLayoutClassNames,
 		__unstableDisableDropZone,
@@ -196,7 +235,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	// An options layout takes precedence over the context layout, as it does
 	// for the inner blocks settings, so containers whose layout attribute
 	// doesn't apply to their inner blocks (e.g. Post Template) can opt out.
-	const layout = layoutOverride ?? contextLayout;
+	// The context holds the layout of the block.
+	const layout = layoutOverride ?? ( contextLayout as Layout | null );
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -315,7 +355,9 @@ useInnerBlocksProps.save = getInnerBlocksProps;
 ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-ForwardedInnerBlocks.Content = () => useInnerBlocksProps.save().children;
+// The saved props hold the inner blocks elements.
+ForwardedInnerBlocks.Content = () =>
+	useInnerBlocksProps.save().children as ReactNode;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
