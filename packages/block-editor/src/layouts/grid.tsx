@@ -19,6 +19,7 @@ import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/util
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
 import type {
+	Layout,
 	LayoutAlignment,
 	LayoutControlProps,
 	LayoutInspectorControlsProps,
@@ -74,7 +75,7 @@ const units = [
  * @param {Object} layout The grid's layout, with any viewport overrides merged in.
  * @return {boolean} Whether the grid's cells have a fixed size.
  */
-export function hasFixedGridCells( layout ) {
+export function hasFixedGridCells( layout?: Layout ): boolean {
 	return (
 		!! layout?.isManualPlacement &&
 		!! window.__experimentalEnableGridInteractivity &&

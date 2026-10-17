@@ -324,7 +324,7 @@ describe( 'GridLayoutInspectorControls', () => {
 } );
 
 describe( 'hasFixedGridCells', () => {
-	let originalExperiment;
+	let originalExperiment: boolean | undefined;
 	beforeEach( () => {
 		originalExperiment = window.__experimentalEnableGridInteractivity;
 		window.__experimentalEnableGridInteractivity = true;
