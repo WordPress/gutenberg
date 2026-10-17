@@ -3,6 +3,7 @@ import { useEvent } from '@wordpress/compose';
 import type { View } from '../types';
 
 interface UsePageClampParams {
+	enabled?: boolean;
 	view: View;
 	onChangeView: ( view: View ) => void;
 	isLoading: boolean;
@@ -19,12 +20,14 @@ interface UsePageClampParams {
  * (a consumer that hasn't resolved its totals yet reports `null`).
  *
  * @param params              Hook parameters.
+ * @param params.enabled      Whether page clamping is enabled.
  * @param params.view         Current view.
  * @param params.onChangeView Callback to update the view.
  * @param params.isLoading    Whether data is currently loading.
  * @param params.totalPages   Number of available pages, if known.
  */
 export default function usePageClamp( {
+	enabled = true,
 	view,
 	onChangeView,
 	isLoading,
@@ -42,9 +45,15 @@ export default function usePageClamp( {
 	} );
 
 	useEffect( () => {
-		if ( isLoading || lastPage === null || ! page || page <= lastPage ) {
+		if (
+			! enabled ||
+			isLoading ||
+			lastPage === null ||
+			! page ||
+			page <= lastPage
+		) {
 			return;
 		}
 		goToLastPage();
-	}, [ isLoading, lastPage, page, goToLastPage ] );
+	}, [ enabled, isLoading, lastPage, page, goToLastPage ] );
 }

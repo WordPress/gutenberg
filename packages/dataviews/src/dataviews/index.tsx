@@ -29,6 +29,7 @@ import useContainerWidth from '../hooks/use-container-width';
 import useData from '../hooks/use-data';
 import { useInfiniteScroll } from '../hooks/use-infinite-scroll';
 import usePageClamp from '../hooks/use-page-clamp';
+import { LAYOUT_TABLE } from '../constants';
 import type { SupportedLayouts, DataViewsProps, ItemWithId } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 
@@ -51,8 +52,10 @@ function DefaultUI( {
 	search = true,
 	searchLabel = undefined,
 }: DefaultUIProps ) {
-	const { view } = useContext( DataViewsContext );
-	const isInfiniteScroll = view.infiniteScrollEnabled;
+	const { view, isHierarchyPaginationActive } =
+		useContext( DataViewsContext );
+	const isInfiniteScroll =
+		view.infiniteScrollEnabled && ! isHierarchyPaginationActive;
 	return (
 		<>
 			<Stack
@@ -100,6 +103,7 @@ function DataViews< Item >( {
 	getItemHasChildren,
 	expandedItemIds,
 	onChangeExpandedItemIds,
+	hierarchyPagination,
 	isLoading = false,
 	paginationInfo,
 	defaultLayouts: defaultLayoutsProperty = DEFAULT_LAYOUTS,
@@ -115,6 +119,27 @@ function DataViews< Item >( {
 	onReset,
 }: DataViewsProps< Item > ) {
 	useEnableWpCompatOverlaySlot();
+	const isGrouped = !! (
+		view.groupBy &&
+		fields.some( ( field ) => field.id === view.groupBy?.field )
+	);
+	const isHierarchyPaginationActive = !! (
+		hierarchyPagination &&
+		view.type === LAYOUT_TABLE &&
+		view.showLevels &&
+		! isGrouped &&
+		getItemParentId &&
+		getItemHasChildren &&
+		expandedItemIds &&
+		onChangeExpandedItemIds
+	);
+	const runtimeView = useMemo(
+		() =>
+			isHierarchyPaginationActive && view.infiniteScrollEnabled
+				? { ...view, infiniteScrollEnabled: false }
+				: view,
+		[ isHierarchyPaginationActive, view ]
+	);
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
@@ -128,7 +153,7 @@ function DataViews< Item >( {
 		hasInitiallyLoaded,
 		setVisibleEntries,
 	} = useData( {
-		view,
+		view: runtimeView,
 		data: data as any,
 		getItemId: getItemId as any,
 		isLoading,
@@ -157,13 +182,13 @@ function DataViews< Item >( {
 	// When infinite scroll is enabled, don't filter selection by current data
 	// because items may be scrolled out of view but still selected.
 	const _selection = useMemo( () => {
-		if ( view.infiniteScrollEnabled ) {
+		if ( runtimeView.infiniteScrollEnabled ) {
 			return selection;
 		}
 		return selection.filter( ( id ) =>
 			data.some( ( item ) => getItemId( item ) === id )
 		);
-	}, [ selection, data, getItemId, view.infiniteScrollEnabled ] );
+	}, [ selection, data, getItemId, runtimeView.infiniteScrollEnabled ] );
 
 	const filters = useFilters( _fields, view );
 	const hasPrimaryOrLockedFilters = useMemo(
@@ -178,7 +203,7 @@ function DataViews< Item >( {
 	);
 
 	const { intersectionObserver } = useInfiniteScroll( {
-		view,
+		view: runtimeView,
 		onChangeView,
 		isLoading,
 		paginationInfo,
@@ -187,6 +212,7 @@ function DataViews< Item >( {
 	} );
 
 	usePageClamp( {
+		enabled: ! isHierarchyPaginationActive,
 		view,
 		onChangeView,
 		isLoading,
@@ -241,6 +267,8 @@ function DataViews< Item >( {
 				getItemHasChildren,
 				expandedItemIds,
 				onChangeExpandedItemIds,
+				hierarchyPagination,
+				isHierarchyPaginationActive,
 				isItemClickable,
 				onClickItem,
 				renderItemLink,

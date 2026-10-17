@@ -152,6 +152,17 @@ The ids of expanded items in a hierarchical table. DataViews does not store thes
 
 A function called with the next list of expanded item ids when a row or header disclosure control is used.
 
+#### `hierarchyPagination`: `Object`
+
+Controlled per-level loading for an ungrouped hierarchical table. It is enabled together with `getItemParentId`, `getItemHasChildren`, `expandedItemIds`, and `onChangeExpandedItemIds` when `view.showLevels` is true.
+
+-   `getPaginationInfo( parentId )` returns `{ hasMore, remainingItems?, isLoading?, error? }` for a parent's direct children. `null` identifies the root level. `remainingItems` is the total number of unloaded items at that level, not the next batch size; when supplied, the control displays “Show N more” instead of “Load more”. `error` must be a normalized, user-facing string.
+-   `onLoadMore( parentId )` is called when a load-more or retry control is used.
+
+DataViews renders the controls but does not fetch, merge, or deduplicate items. The consumer supplies the accumulated loaded items and owns request cancellation and stale responses. While enabled, this replaces flat pagination, infinite scroll, and the items-per-page control without modifying the persisted `view`.
+
+For flat hierarchy search results, the consumer passes a view with `showLevels: false` and supplies the matching records. An existing `descriptionField` with a custom field renderer can show a non-interactive ancestor path beneath each match. The consumer supplies those paths; DataViews does not fetch missing ancestors. The Hierarchical Levels story demonstrates this without a WordPress REST dependency.
+
 #### `fields`: `Object[]`
 
 The fields describe the visible items for each record in the dataset and how they behave (how to sort them, display them, etc.). See "Fields API" for a description of every property.
@@ -822,6 +833,7 @@ The following `DataViews` properties are **not supported** by `DataViewsPicker`:
 -   `getItemHasChildren`
 -   `expandedItemIds`
 -   `onChangeExpandedItemIds`
+-   `hierarchyPagination`
 -   `header`
 
 ## `DataForm`

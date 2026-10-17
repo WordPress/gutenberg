@@ -71,6 +71,36 @@
 			border-bottom: 0;
 		}
 
+		// Paint each cell's edge above its content, including sticky actions.
+		&:focus-visible {
+			outline: none;
+
+			> td:not(.dataviews-view-table__actions-column--sticky) {
+				position: relative;
+			}
+
+			> td::before {
+				content: "";
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				border: 2px solid var(--wpds-color-stroke-focus);
+				border-inline-width: 0;
+
+				@media (forced-colors: active) {
+					border-color: Highlight;
+				}
+			}
+
+			> td:first-child::before {
+				border-inline-start-width: 2px;
+			}
+
+			> td:last-child::before {
+				border-inline-end-width: 2px;
+			}
+		}
+
 		.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
 			opacity: 0;
 		}
@@ -246,6 +276,19 @@
 		min-width: var(--wpds-dimension-size-md);
 	}
 
+	.dataviews-view-table__hierarchy-pagination-content {
+		// Align the minimal button label with the children's selection controls.
+		padding-inline-start: var(--wpds-dimension-size-md);
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+		min-height: var(--wpds-dimension-size-md);
+
+		[role="alert"] {
+			color: var(--wpds-color-foreground-content-error-weak);
+		}
+	}
 
 	// Density style overrides.
 	&.has-compact-density {

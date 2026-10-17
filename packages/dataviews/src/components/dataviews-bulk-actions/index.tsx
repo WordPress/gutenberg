@@ -415,7 +415,11 @@ export function BulkActionsFooter() {
 		getItemId,
 		paginationInfo,
 		view,
+		isHierarchyPaginationActive,
 	} = useContext( DataViewsContext );
+	const effectivePaginationInfo = isHierarchyPaginationActive
+		? { totalItems: data.length, totalPages: 1 }
+		: paginationInfo;
 	return (
 		<FooterContent
 			selection={ selection }
@@ -423,8 +427,10 @@ export function BulkActionsFooter() {
 			data={ data }
 			actions={ actions }
 			getItemId={ getItemId }
-			isInfiniteScroll={ !! view.infiniteScrollEnabled }
-			paginationInfo={ paginationInfo }
+			isInfiniteScroll={
+				!! view.infiniteScrollEnabled && ! isHierarchyPaginationActive
+			}
+			paginationInfo={ effectivePaginationInfo }
 		/>
 	);
 }

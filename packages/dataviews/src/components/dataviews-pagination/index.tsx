@@ -23,10 +23,13 @@ export function hasPaginationControls(
 }
 
 export function DataViewsPageSelect( { className }: { className?: string } ) {
-	const { view, onChangeView, paginationInfo } =
+	const { view, onChangeView, paginationInfo, isHierarchyPaginationActive } =
 		useContext( DataViewsContext );
 
-	if ( ! hasPaginationControls( view, paginationInfo ) ) {
+	if (
+		isHierarchyPaginationActive ||
+		! hasPaginationControls( view, paginationInfo )
+	) {
 		return null;
 	}
 
@@ -95,10 +98,13 @@ export function DataViewsPageNavigation( {
 }: {
 	className?: string;
 } ) {
-	const { view, onChangeView, paginationInfo } =
+	const { view, onChangeView, paginationInfo, isHierarchyPaginationActive } =
 		useContext( DataViewsContext );
 
-	if ( ! hasPaginationControls( view, paginationInfo ) ) {
+	if (
+		isHierarchyPaginationActive ||
+		! hasPaginationControls( view, paginationInfo )
+	) {
 		return null;
 	}
 
@@ -155,9 +161,13 @@ export function DataViewsPagination( {
 	children?: ReactNode;
 	className?: string;
 } ) {
-	const { view, paginationInfo } = useContext( DataViewsContext );
+	const { view, paginationInfo, isHierarchyPaginationActive } =
+		useContext( DataViewsContext );
 
-	if ( ! hasPaginationControls( view, paginationInfo ) ) {
+	if (
+		isHierarchyPaginationActive ||
+		! hasPaginationControls( view, paginationInfo )
+	) {
 		return null;
 	}
 
