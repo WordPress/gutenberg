@@ -1,0 +1,1 @@
+import{n as r}from"./rolldown-runtime-DiifJuVD.js";function areArraysEqual(r,a,n=Object.is){const{length:t}=r;if(t!==a.length)return!1;for(let e=0;e<t;e+=1)if(!n(r[e],a[e]))return!1;return!0}function init_areArraysEqual(){return(init_areArraysEqual=r(()=>{}))()}export{init_areArraysEqual as n,areArraysEqual as t};

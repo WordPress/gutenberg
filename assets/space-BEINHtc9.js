@@ -1,0 +1,1 @@
+import{n}from"./rolldown-runtime-DiifJuVD.js";function space(n){if(void 0===n)return;if(!n)return"0";const t="number"==typeof n?n:Number(n);return"undefined"!=typeof window&&window.CSS?.supports?.("margin",n.toString())||Number.isNaN(t)?n.toString():`calc(${r} * ${n})`}var r;function init_space(){return(init_space=n(()=>{r="4px"}))()}export{space as n,init_space as t};
