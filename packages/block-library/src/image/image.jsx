@@ -76,6 +76,7 @@ const {
 	ResolutionTool,
 	mediaEditKey,
 	mediaSideloadFromUrlKey,
+	useIsInFixedGridCell,
 } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -422,7 +423,11 @@ export default function Image( {
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
-	const showDimensionsControls = allowResize && hasNonContentControls;
+	// In a grid cell with a fixed size, the image fills the cell, so its own
+	// size settings have no effect.
+	const isInFixedGridCell = useIsInFixedGridCell( clientId );
+	const showDimensionsControls =
+		allowResize && hasNonContentControls && ! isInFixedGridCell;
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
