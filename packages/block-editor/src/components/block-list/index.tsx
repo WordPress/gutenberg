@@ -1,5 +1,4 @@
 import clsx from 'clsx';
-import type { ComponentProps, ComponentType } from 'react';
 import type { DataRegistry } from '@wordpress/data';
 import {
 	AsyncModeProvider,
@@ -16,7 +15,7 @@ import {
 } from '@wordpress/element';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 import BlockListBlock from './block';
-import UntypedBlockListAppender from '../block-list-appender';
+import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
@@ -29,11 +28,6 @@ import {
 import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
 import type { BlockListItemsProps, BlockListProps } from './types';
-
-// The appender is still JavaScript, so its inferred props are all required.
-const BlockListAppender = UntypedBlockListAppender as ComponentType<
-	Partial< ComponentProps< typeof UntypedBlockListAppender > >
->;
 
 export const IntersectionObserver = createContext<
 	globalThis.IntersectionObserver | undefined

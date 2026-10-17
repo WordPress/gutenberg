@@ -4,8 +4,11 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 import { store as blockEditorStore } from '../../store';
+import type { BlockListAppenderProps } from './types';
 
-function DefaultAppender( { rootClientId } ) {
+function DefaultAppender( {
+	rootClientId,
+}: Pick< BlockListAppenderProps, 'rootClientId' > ) {
 	const canInsertDefaultBlock = useSelect( ( select ) =>
 		select( blockEditorStore ).canInsertBlockType(
 			getDefaultBlockName(),
@@ -33,7 +36,7 @@ export default function BlockListAppender( {
 	CustomAppender,
 	className,
 	tagName: TagName = 'div',
-} ) {
+}: BlockListAppenderProps ) {
 	const isDragOver = useSelect(
 		( select ) => {
 			const {
