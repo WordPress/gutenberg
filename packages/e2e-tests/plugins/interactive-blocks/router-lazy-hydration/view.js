@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { store, withSyncEvent } from '@wordpress/interactivity';
 
 const { state } = store( 'router-lazy-hydration', {
@@ -16,9 +13,8 @@ const { state } = store( 'router-lazy-hydration', {
 			// before the router can intercept it (full page reload).
 			navigate: withSyncEvent( function* ( e ) {
 				e.preventDefault();
-				const { actions } = yield import(
-					'@wordpress/interactivity-router'
-				);
+				const { actions } =
+					yield import( '@wordpress/interactivity-router' );
 				yield actions.navigate( e.target.href );
 			} ),
 			back: withSyncEvent( function* ( e ) {

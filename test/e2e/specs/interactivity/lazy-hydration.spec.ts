@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { test, expect } from './fixtures';
 
 test.describe( 'Lazy hydration and the router', () => {
@@ -214,9 +211,7 @@ test.describe( 'Lazy hydration failure resilience', () => {
 		// has flipped, the sweep has already attempted — and, pre-fix,
 		// thrown at — the throwing island. `initialVdomPromise` therefore
 		// never resolved and the initial page was never cached by the router.
-		await expect( page.getByTestId( 'deep-hydrated' ) ).toHaveText(
-			'yes'
-		);
+		await expect( page.getByTestId( 'deep-hydrated' ) ).toHaveText( 'yes' );
 
 		// Forward navigation still works: the router prefetches the
 		// destination page independently of the initial-page cache. The

@@ -92,15 +92,12 @@ export default class InteractivityUtils {
 	 * an island that throws during hydration), as `addPostWithBlock` only
 	 * supports a single block.
 	 *
-	 * @param blocks      The top-level blocks, in document order.
-	 * @param options     Options object.
+	 * @param blocks        The top-level blocks, in document order.
+	 * @param options       Options object.
 	 * @param options.alias The alias used to retrieve the post's link.
 	 * @return The post's link, with the directives SSR disabled.
 	 */
-	async addPostWithBlocks(
-		blocks: Block[],
-		{ alias }: { alias: string }
-	) {
+	async addPostWithBlocks( blocks: Block[], { alias }: { alias: string } ) {
 		const content = blocks.map( generateBlockMarkup ).join( '' );
 
 		const payload = {
