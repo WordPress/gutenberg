@@ -1,11 +1,12 @@
 import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { unlock } from '../../../lock-unlock';
+import type { RichTextEventListener } from '../types';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
-export default ( props ) => ( element ) => {
+const shortcuts: RichTextEventListener = ( props ) => ( element ) => {
 	const { keyboardShortcuts } = props.current;
-	function onKeyDown( event ) {
+	function onKeyDown( event: KeyboardEvent ) {
 		for ( const keyboardShortcut of keyboardShortcuts ) {
 			keyboardShortcut( event );
 		}
@@ -13,3 +14,5 @@ export default ( props ) => ( element ) => {
 
 	return subscribeOwnedListener( element, 'keydown', onKeyDown, true );
 };
+
+export default shortcuts;

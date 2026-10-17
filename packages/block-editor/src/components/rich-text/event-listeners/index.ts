@@ -10,6 +10,7 @@ import pasteHandler from './paste-handler';
 import _delete from './delete';
 import enter from './enter';
 import firefoxCompat from './firefox-compat';
+import type { RichTextEventListenerProps } from '../types';
 
 const allEventListeners = [
 	beforeInputRules,
@@ -24,7 +25,7 @@ const allEventListeners = [
 	firefoxCompat,
 ];
 
-export function useEventListeners( props ) {
+export function useEventListeners( props: RichTextEventListenerProps ) {
 	const propsRef = useRef( props );
 	useInsertionEffect( () => {
 		propsRef.current = props;
@@ -35,7 +36,7 @@ export function useEventListeners( props ) {
 	);
 
 	return useRefEffect(
-		( element ) => {
+		( element: HTMLElement ) => {
 			if ( ! props.isSelected ) {
 				return;
 			}

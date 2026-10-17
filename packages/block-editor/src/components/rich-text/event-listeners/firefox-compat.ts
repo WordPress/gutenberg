@@ -1,6 +1,7 @@
 import { store as blockEditorStore } from '../../../store';
+import type { RichTextEventListener } from '../types';
 
-export default ( props ) => ( element ) => {
+const firefoxCompat: RichTextEventListener = ( props ) => ( element ) => {
 	function onFocus() {
 		const { registry } = props.current;
 		if ( ! registry.select( blockEditorStore ).isMultiSelecting() ) {
@@ -12,7 +13,8 @@ export default ( props ) => ( element ) => {
 		// element sometimes regains focus, while it should not be focusable
 		// and focus should remain on the editable parent element.
 		// To do: try to find the cause of the shifting focus.
-		const parentEditable = element.parentElement.closest(
+		// A field always has a parent.
+		const parentEditable = element.parentElement!.closest< HTMLElement >(
 			'[contenteditable="true"]'
 		);
 
@@ -26,3 +28,5 @@ export default ( props ) => ( element ) => {
 		element.removeEventListener( 'focus', onFocus );
 	};
 };
+
+export default firefoxCompat;
