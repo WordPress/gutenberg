@@ -8,7 +8,7 @@
 
 ### Bug Fixes
 
--   Load sidebar widgets when an empty block-widget instance has no content, preserving its editable paragraph and widget ID ([#61956](https://github.com/WordPress/gutenberg/issues/61956)).
+-   Load sidebar widgets when an empty block-widget instance has no content, preserving its editable paragraph and widget ID ([#85044](https://github.com/WordPress/gutenberg/pull/85044)).
 
 ### Internal
 
