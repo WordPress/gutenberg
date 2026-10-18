@@ -323,7 +323,10 @@ function Iframe( {
 			}
 			const { ownerDocument } = body;
 			// The body lives in the iframe document, which has a window and a frame.
-			const { defaultView } = ownerDocument as { defaultView: Window };
+			// `ResizeObserver` is a global of that window, not a property of `Window`.
+			const { defaultView } = ownerDocument as {
+				defaultView: Window & typeof globalThis;
+			};
 			const container = defaultView.frameElement!.closest(
 				'.block-editor-iframe__container'
 			) as HTMLElement;
