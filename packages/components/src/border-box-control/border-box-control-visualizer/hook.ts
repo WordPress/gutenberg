@@ -9,7 +9,7 @@ const borderBoxStyleWithFallback = ( border?: Border ) => {
 	const {
 		color = 'var(--_wp-components-border-box-visualizer-color)',
 		style = 'solid',
-		width = 'var(--_wp-components-border-box-visualizer-width)',
+		width = 'var(--wpds-border-width-xs)',
 	} = border || {};
 
 	const clampedWidth = `clamp(1px, ${ width }, 10px)`;

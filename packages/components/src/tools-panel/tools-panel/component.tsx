@@ -27,8 +27,8 @@ const UnconnectedToolsPanel = (
 			{ ...toolsPanelProps }
 			columns={ 2 }
 			gap={ 4 }
-			columnGap="var(--_wp-components-tools-panel-gap)"
-			rowGap="var(--_wp-components-tools-panel-gap)"
+			columnGap="var(--wpds-dimension-gap-lg)"
+			rowGap="var(--wpds-dimension-gap-lg)"
 			templateColumns="repeat( 2, minmax(0, 1fr) )"
 			ref={ forwardedRef }
 		>

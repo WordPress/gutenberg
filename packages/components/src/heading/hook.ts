@@ -12,7 +12,7 @@ export function useHeading(
 		level = 2,
 		color,
 		isBlock = true,
-		weight = 'var(--_wp-components-text-emphasis-weight)' as React.CSSProperties[ 'fontWeight' ],
+		weight = 'var(--wpds-typography-font-weight-emphasis)',
 		...otherProps
 	} = useContextSystem( props, 'Heading' );
 

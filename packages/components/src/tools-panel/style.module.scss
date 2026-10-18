@@ -3,7 +3,6 @@
 @use "../utils/theme-variables" as *;
 
 .tools-panel {
-	--_wp-components-tools-panel-gap: var(--wpds-dimension-gap-lg);
 	border-top: $border-width solid $gray-300;
 	margin-top: -$border-width;
 	padding: $grid-unit-20;
@@ -13,8 +12,8 @@
 	> div:not(:first-of-type) {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		column-gap: var(--_wp-components-tools-panel-gap);
-		row-gap: var(--_wp-components-tools-panel-gap);
+		column-gap: var(--wpds-dimension-gap-lg);
+		row-gap: var(--wpds-dimension-gap-lg);
 		grid-column: 1 / -1;
 	}
 }

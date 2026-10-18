@@ -83,14 +83,10 @@ export function UnforwardedInputControl(
 					onKeyDown={ onKeyDown }
 					onValidate={ onValidate }
 					paddingInlineStart={
-						prefix
-							? 'var(--_wp-components-input-control-affix-padding)'
-							: undefined
+						prefix ? 'var(--wpds-dimension-padding-xs)' : undefined
 					}
 					paddingInlineEnd={
-						suffix
-							? 'var(--_wp-components-input-control-affix-padding)'
-							: undefined
+						suffix ? 'var(--wpds-dimension-padding-xs)' : undefined
 					}
 					ref={ ref }
 					size={ size }

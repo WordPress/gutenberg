@@ -28,7 +28,7 @@ export const GroupLabel = forwardRef<
 					upperCase
 					variant="muted"
 					size="11px"
-					weight="var(--_wp-components-text-emphasis-weight)"
+					weight="var(--wpds-typography-font-weight-emphasis)"
 					lineHeight="16px"
 				/>
 			}

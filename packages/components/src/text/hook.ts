@@ -46,7 +46,7 @@ export default function useText(
 		truncate = false,
 		upperCase = false,
 		variant,
-		weight = 'var(--_wp-components-text-default-weight)',
+		weight = 'var(--wpds-typography-font-weight-default)',
 		...otherProps
 	} = useContextSystem( props, 'Text' );
 
