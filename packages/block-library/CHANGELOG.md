@@ -24,6 +24,7 @@
 -   Cover: Decode the oEmbed iframe source before parsing it, so an embedded background video keeps the parameters the provider sent ([#83770](https://github.com/WordPress/gutenberg/pull/83770)).
 -   Search: Show the button's full focus outline when the search field is collapsed ([#84685](https://github.com/WordPress/gutenberg/pull/84685)).
 -   Login/out: Mark the block as content with the `contentRole` support, so it stays listed, movable, and insertable in content-only editing, including a locked navigation menu ([#84849](https://github.com/WordPress/gutenberg/pull/84849)).
+-   Post Template, Latest Posts: Keep the single column of a grid on small screens within the screen width, so a post with content that doesn't wrap, like Fit text, no longer makes the page scroll sideways ([#85018](https://github.com/WordPress/gutenberg/pull/85018)).
 
 ## 11.2.0 (2026-10-07)
 
