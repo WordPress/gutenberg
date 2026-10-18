@@ -25,11 +25,11 @@ const MyBlockToolbar = ( { clientId } ) => (
 
 #### `BlockLockMenuItem`
 
-A menu item that opens the block lock modal. Renders nothing when the block type does not allow locking.
+A menu item that opens the block lock modal for one or more blocks. Renders nothing unless every block type allows locking.
 
 #### `BlockLockModal`
 
-A modal that lets the user choose which lock features to apply to the block.
+A modal that lets the user choose which lock features to apply to one or more blocks. When the blocks have different settings, a feature shows as mixed and keeps each block's current setting unless the user changes it.
 
 #### `BlockLockToolbar`
 
@@ -42,7 +42,14 @@ A toolbar button that opens the block lock modal. Renders nothing until the bloc
 -   **Type:** `String`
 -   **Required:** Yes
 
-The client ID of the block. Accepted by all three components.
+The client ID of the block. Accepted by `BlockLockToolbar` only.
+
+#### `clientIds`
+
+-   **Type:** `Array`
+-   **Required:** Yes
+
+The client IDs of the blocks. Accepted by `BlockLockMenuItem` and `BlockLockModal`.
 
 #### `onClose`
 
@@ -60,6 +67,13 @@ A hook that returns the lock state of a block. It accepts the block's client ID 
 -   `isRemoveLocked` (`Boolean`): Whether removing the block is locked.
 -   `canLock` (`Boolean`): Whether the block type allows locking.
 -   `isLocked` (`Boolean`): Whether any of the block's lock features are applied.
+
+### `useBlocksLock`
+
+A hook that returns the lock state shared by a group of blocks. It accepts an array of client IDs and returns an object with the following properties.
+
+-   `canLock` (`Boolean`): Whether every block type allows locking.
+-   `isLocked` (`Boolean`): Whether every block has at least one lock feature applied.
 
 ## Related components
 

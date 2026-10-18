@@ -111,6 +111,132 @@ test.describe( 'Block Locking', () => {
 <!-- /wp:paragraph -->` );
 	} );
 
+	test( 'can lock multiple blocks', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second paragraph' },
+		} );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraphs.first(), paragraphs.last() );
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+
+		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
+		await modal
+			.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+			.click();
+		await modal
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { lock: { move: true, remove: true } },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { lock: { move: true, remove: true } },
+			},
+		] );
+	} );
+
+	test( 'can unlock multiple blocks', async ( { editor, page } ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First paragraph',
+				lock: { move: true, remove: true },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Second paragraph',
+				lock: { move: true, remove: true },
+			},
+		} );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraphs.first(), paragraphs.last() );
+
+		await editor.clickBlockOptionsMenuItem( 'Unlock' );
+
+		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
+		await modal
+			.getByRole( 'checkbox', { name: 'Lock all', exact: true } )
+			.click();
+		await modal
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { lock: { move: false, remove: false } } },
+				{ attributes: { lock: { move: false, remove: false } } },
+			] );
+	} );
+
+	test( 'keeps mixed settings when locking multiple blocks', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Movement locked',
+				lock: { move: true, remove: false },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Unlocked' },
+		} );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await editor.selectBlocks( paragraphs.first(), paragraphs.last() );
+
+		await editor.clickBlockOptionsMenuItem( 'Lock' );
+
+		const modal = page.getByRole( 'dialog', { name: 'Lock blocks' } );
+		const lockMovement = modal.getByRole( 'checkbox', {
+			name: 'Lock movement',
+			exact: true,
+		} );
+		const lockRemoval = modal.getByRole( 'checkbox', {
+			name: 'Lock removal',
+			exact: true,
+		} );
+		await expect( lockMovement ).toBeChecked( { indeterminate: true } );
+		await expect( lockRemoval ).not.toBeChecked();
+		await expect(
+			modal.getByText( 'Selected blocks have different lock settings.', {
+				exact: false,
+			} )
+		).toBeVisible();
+
+		await lockRemoval.click();
+		await modal
+			.getByRole( 'button', { name: 'Apply', exact: true } )
+			.click();
+
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ attributes: { lock: { move: true, remove: true } } },
+				{ attributes: { lock: { move: false, remove: true } } },
+			] );
+	} );
+
 	test( 'block locking supersedes template locking', async ( {
 		editor,
 		page,
