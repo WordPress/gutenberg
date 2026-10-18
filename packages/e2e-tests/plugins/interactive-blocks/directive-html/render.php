@@ -4,6 +4,13 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
+
+wp_interactivity_state(
+	'directive-html',
+	array(
+		'serverHtml' => array( 'wpServerHtml' => true ),
+	)
+);
 ?>
 
 <div data-wp-interactive="directive-html">
@@ -16,6 +23,8 @@
 		<p data-testid="fallback">Fallback content</p>
 	</div>
 	<div data-wp-html="state.rejected" data-testid="rejected html"><p>Rejected fallback</p></div>
+	<div data-wp-html="state.serverHtml" data-testid="server html"><p>Server-rendered HTML</p></div>
+	<button data-wp-on--click="actions.setServerHtml" data-testid="set server html">Set Server HTML</button>
 	<ul data-testid="created items">
 		<template data-wp-each="state.list"><li><div data-wp-html="state.empty"></div></li></template>
 	</ul>

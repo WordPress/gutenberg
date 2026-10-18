@@ -10,6 +10,10 @@
 
 -   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
+### Internal
+
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#85032](https://github.com/WordPress/gutenberg/pull/85032)).
+
 ## 5.57.0 (2026-10-07)
 
 ## 5.56.0 (2026-09-23)
