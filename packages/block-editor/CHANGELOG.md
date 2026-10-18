@@ -60,6 +60,7 @@
 
 ### Bug Fixes
 
+-   Keep a block's child layout, such as its grid position and span, when it is transformed to another block type ([#85045](https://github.com/WordPress/gutenberg/pull/85045)).
 -   Block Editor: Include migration hint in useSetting deprecation warning ([#85100](https://github.com/WordPress/gutenberg/pull/85100)).
 -   List View: Fix the drag-and-drop nesting gesture over an item without children ([#84856](https://github.com/WordPress/gutenberg/pull/84856)).
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
