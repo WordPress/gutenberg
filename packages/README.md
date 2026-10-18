@@ -273,7 +273,7 @@ Prefer an entry for anything that affects package consumers. Changelog entries a
 
 ### Changelog Entry Format
 
-Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period.
+Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period. Do not leave blank lines between bullets in a subsection, including before nested bullets.
 
 Example:
 

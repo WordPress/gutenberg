@@ -10,7 +10,8 @@
 			"react-css-custom-properties"
 		]
 	},
-	"files": [ "global.d.ts" ],
+	// The `filterSortAndPaginate` tests reuse the story data and fields.
+	"files": [ "global.d.ts", "src/dataviews/stories/fixtures.tsx" ],
 	"include": [
 		"src/**/test/**/*.ts",
 		"src/**/test/**/*.tsx",
@@ -25,12 +26,12 @@
 		{ "path": "../components/tsconfig.build.json" },
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../data" },
-		{ "path": "../date" },
+		{ "path": "../date/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../kebab-case" },
+		{ "path": "../kebab-case/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },

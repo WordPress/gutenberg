@@ -11,6 +11,6 @@
 		{ "path": "../dataviews/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../preferences/tsconfig.build.json" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis/tsconfig.build.json" }
 	]
 }

@@ -71,6 +71,37 @@ jobs:
                   body: ${{ needs.pull-request-automation.outputs.welcome-prompt }}
                   pr-number: ${{ github.event.pull_request.number }}
 
+    playground:
+        name: Link a Playground preview
+        if: ${{ github.event_name == 'pull_request_target' && github.repository == 'WordPress/gutenberg' }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            pull-requests: write
+        timeout-minutes: 5
+        # Shared with every other writer of this comment. See bundle-size.yml.
+        concurrency:
+            group: pr-meta-${{ github.event.pull_request.number }}
+            cancel-in-progress: false
+            queue: max
+
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: trunk
+                  sparse-checkout: tools/pr-meta
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - uses: ./tools/pr-meta
+              with:
+                  repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  section: playground
+                  body: '[![Preview in WordPress Playground](https://img.shields.io/badge/Preview-WordPress%20Playground-3858e9?logo=wordpress)](https://playground.wordpress.net/?gutenberg-pr=${{ github.event.pull_request.number }})'
+                  pr-number: ${{ github.event.pull_request.number }}
+                  # Sections are truncated at write from this commit on.
+                  require-base-contains: d5eff1a2e1201f8644b2732d46fe0320670ef93e
+
     account-link:
         name: Prompt for a WordPress.org profile
         needs: pull-request-automation
