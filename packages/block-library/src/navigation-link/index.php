@@ -81,6 +81,43 @@ function block_core_navigation_link_build_css_colors( $context, $attributes, $is
 }
 
 /**
+ * Build the CSS classes and inline styles for the colors set on a Navigation
+ * Link block itself, as opposed to those inherited from the parent Navigation
+ * block through block context.
+ *
+ * Color serialization is skipped for this block, so these are applied to the
+ * anchor rather than to the block's wrapper. The anchor is the element a
+ * visitor sees and clicks; the list item that wraps it also contains the
+ * submenu, so a background set there would paint behind the dropdown.
+ *
+ * @since 7.2.0
+ *
+ * @param array $attributes Navigation Link block attributes.
+ * @return array {
+ *     Color CSS classes and inline styles.
+ *
+ *     @type string $classnames Space-separated list of CSS classes.
+ *     @type string $css        Inline style declarations.
+ * }
+ */
+function block_core_navigation_link_build_content_css_colors( $attributes ) {
+	$color_block_styles = array();
+
+	$preset_text_color          = array_key_exists( 'textColor', $attributes ) ? "var:preset|color|{$attributes['textColor']}" : null;
+	$custom_text_color          = $attributes['style']['color']['text'] ?? null;
+	$color_block_styles['text'] = $preset_text_color ? $preset_text_color : $custom_text_color;
+
+	$preset_background_color          = array_key_exists( 'backgroundColor', $attributes ) ? "var:preset|color|{$attributes['backgroundColor']}" : null;
+	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
+	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
+
+	return wp_style_engine_get_styles(
+		array( 'color' => $color_block_styles ),
+		array( 'convert_vars_to_classnames' => true )
+	);
+}
+
+/**
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the navigation markup in the front-end.
  *
@@ -230,8 +267,18 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 				( $is_active ? ' current-menu-item' : '' ),
 		)
 	);
-	$html               = '<li ' . $wrapper_attributes . '>' .
-		'<a class="wp-block-navigation-item__content" ';
+	$content_colors     = block_core_navigation_link_build_content_css_colors( $attributes );
+	$content_classes    = 'wp-block-navigation-item__content';
+	if ( ! empty( $content_colors['classnames'] ) ) {
+		$content_classes .= ' ' . $content_colors['classnames'];
+	}
+
+	$html = '<li ' . $wrapper_attributes . '>' .
+		'<a class="' . esc_attr( $content_classes ) . '" ';
+
+	if ( ! empty( $content_colors['css'] ) ) {
+		$html .= ' style="' . esc_attr( $content_colors['css'] ) . '"';
+	}
 
 	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['url'] ) ) {
