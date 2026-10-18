@@ -181,7 +181,7 @@ if ( ! function_exists( '_wp_add_entity_field_modules_to_editor_script' ) ) {
 			$scripts = wp_scripts();
 		}
 
-		// Field registration as well as actions live in packages/editor/src/dataviews/store/private-actions.ts
+		// The fields are loaded in packages/editor/src/dataviews/store/private-resolvers.ts
 		// which means any screen that wants to use this mechanism needs to load the editor script.
 		if ( ! $scripts->query( 'wp-editor', 'enqueued' ) && ! $scripts->query( 'wp-editor', 'done' ) ) {
 			return;

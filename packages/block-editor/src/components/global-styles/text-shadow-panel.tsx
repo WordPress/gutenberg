@@ -153,7 +153,6 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 						items[ 0 ]
 					}
 					items={ items }
-					triggerContent={ ( item ) => item.label }
 					onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
 				/>
 			) : (

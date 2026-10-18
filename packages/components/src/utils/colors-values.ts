@@ -1,15 +1,3 @@
-/* eslint-disable @wordpress/no-ds-tokens -- This file is the package's plain-value
-   mapping to design system tokens. The build plugin injects generated fallbacks.
-
-   IMPORTANT: because this file's source contains `--wpds-` text, the
-   design-system fallback build plugin claims it (it matches any file whose
-   source includes `--wpds-`, comments included) and, in doing so, displaces
-   the Emotion transform for this file. That is harmless ONLY because this file
-   holds plain value constants and no Emotion `css`/styled component selectors.
-   Do not add any here: a co-located component selector would silently fail to
-   compile and break the build, with no lint signal (see #79245). Keep this
-   file selector-free — define styles elsewhere and consume these constants. */
-
 const white = '#fff';
 
 // Matches the grays in @wordpress/base-styles
@@ -81,8 +69,6 @@ const UI = {
 	darkGrayPlaceholder: `color-mix(in srgb, ${ THEME.foreground }, transparent 38%)`,
 	lightGrayPlaceholder: `color-mix(in srgb, ${ THEME.background }, transparent 35%)`,
 };
-
-/* eslint-enable @wordpress/no-ds-tokens */
 
 export const COLORS = Object.freeze( {
 	/**
