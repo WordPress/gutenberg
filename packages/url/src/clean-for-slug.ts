@@ -50,13 +50,47 @@ function stripTags( string: string ): string {
 }
 
 /**
+ * Truncates a string like PHP's `utf8_uri_encode()` with a length: keeps the
+ * characters whose percent-encoded form fits in the length, counting each
+ * ASCII character as one and any other character as three per UTF-8 byte,
+ * without splitting a character.
+ *
+ * @param string The string to process.
+ * @param length The maximum length of the percent-encoded string.
+ *
+ * @return The truncated string.
+ */
+function truncateEncoded( string: string, length: number ): string {
+	let result = '';
+	let encodedLength = 0;
+	for ( const char of string ) {
+		const codePoint = char.codePointAt( 0 ) ?? 0;
+		let charLength = 12;
+		if ( codePoint < 0x80 ) {
+			charLength = 1;
+		} else if ( codePoint < 0x800 ) {
+			charLength = 6;
+		} else if ( codePoint < 0x10000 ) {
+			charLength = 9;
+		}
+		if ( encodedLength + charLength > length ) {
+			break;
+		}
+		result += char;
+		encodedLength += charLength;
+	}
+	return result;
+}
+
+/**
  * Performs some basic cleanup of a string for use as a post slug.
  *
  * This replicates what `sanitize_title()` does in WordPress core when saving
  * a post, without the `sanitize_title` filters and the locale-specific
  * transliterations of `remove_accents()`, so it can only approximate what the
  * slug will be. It works on decoded characters, while WordPress returns the
- * slug percent-encoded, and keeps percent-encoded octets as they are.
+ * slug percent-encoded, and keeps percent-encoded octets as they are. Like
+ * WordPress, it keeps what fits in 200 percent-encoded characters.
  *
  * Converts accented letters to basic Latin letters, and strips HTML tags and
  * entities. Converts spaces, periods, forward slashes, dashes and wide spaces
@@ -74,11 +108,14 @@ export function cleanForSlug( string: string ): string {
 	if ( ! string ) {
 		return '';
 	}
+	const lowercase = stripTags( removeAccents( string ) )
+		// Remove percent signs that aren't part of an octet.
+		.replace( /%(?![0-9a-fA-F]{2})/g, '' )
+		.toLowerCase();
 	return (
-		stripTags( removeAccents( string ) )
-			// Remove percent signs that aren't part of an octet.
-			.replace( /%(?![0-9a-fA-F]{2})/g, '' )
-			.toLowerCase()
+		// Like WordPress, keep what fits in 200 percent-encoded characters,
+		// the length of the slug column.
+		truncateEncoded( lowercase, 200 )
 			// Convert &nbsp, non-breaking hyphens, &ndash, &mdash and their HTML
 			// entities, and forward slashes to hyphens.
 			.replace( /[\u00a0\u2011\u2013\u2014/]/g, '-' )

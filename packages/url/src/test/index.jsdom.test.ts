@@ -1392,6 +1392,21 @@ describe( 'cleanForSlug', () => {
 		expect( cleanForSlug( 'a<!-- note -->b' ) ).toBe( 'ab' );
 	} );
 
+	it( 'Should keep what fits in 200 percent-encoded characters, like WordPress', () => {
+		expect( cleanForSlug( 'a'.repeat( 250 ) ) ).toBe( 'a'.repeat( 200 ) );
+		// Each Devanagari character takes nine percent-encoded characters.
+		expect( cleanForSlug( 'अलग-अलग-प्रकार-के-प्लंबिंग-ट्रैप्स' ) ).toBe(
+			'अलग-अलग-प्रकार-के-प्लंबिं'
+		);
+		// A character that doesn't fit isn't split.
+		expect( cleanForSlug( 'a'.repeat( 198 ) + 'é' ) ).toBe(
+			'a'.repeat( 198 ) + 'e'
+		);
+		expect( cleanForSlug( 'a'.repeat( 198 ) + 'ψ' ) ).toBe(
+			'a'.repeat( 198 )
+		);
+	} );
+
 	it( 'Should keep percent-encoded octets and remove other percent signs', () => {
 		expect( cleanForSlug( '100% sure' ) ).toBe( '100-sure' );
 		expect( cleanForSlug( 'a%20b' ) ).toBe( 'a%20b' );

@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `cleanForSlug`: Match what `sanitize_title()` returns in WordPress core when saving a post. Keep emoji, symbols and other non-ASCII characters, remove accents with the table of core's `remove_accents()`, strip the punctuation and invisible characters core strips, convert wide spaces and dashes to hyphens and `×` to `x`, strip HTML tags and comments like `strip_tags()`, and keep percent-encoded octets. Drop the `remove-accents` dependency ([#84896](https://github.com/WordPress/gutenberg/pull/84896)).
+-   `cleanForSlug`: Match what `sanitize_title()` returns in WordPress core when saving a post. Keep emoji, symbols and other non-ASCII characters, remove accents with the table of core's `remove_accents()`, strip the punctuation and invisible characters core strips, convert wide spaces and dashes to hyphens and `×` to `x`, strip HTML tags and comments like `strip_tags()`, keep percent-encoded octets, and keep what fits in 200 percent-encoded characters. Drop the `remove-accents` dependency ([#84896](https://github.com/WordPress/gutenberg/pull/84896)).
 
 ### Internal
 
