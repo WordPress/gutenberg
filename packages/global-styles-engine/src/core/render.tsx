@@ -30,7 +30,6 @@ import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { getResponsiveMediaQueries } from '../utils/viewport';
 import { getSetting } from '../settings/get-setting';
 import type { GlobalStylesConfig, GlobalStylesStyles } from '../types';
-import { normalizeStyleStateAliases } from '../style-state-back-compat';
 
 // =============================================================================
 // LOCAL TYPE DEFINITIONS
@@ -1863,18 +1862,10 @@ export const transformToStyles = (
 		variationStyles: false,
 		...styleOptions,
 	};
-	const normalizedTree = normalizeStyleStateAliases( tree );
-	const nodesWithStyles = getNodesWithStyles(
-		normalizedTree,
-		blockSelectors
-	);
-	const nodesWithSettings = getNodesWithSettings(
-		normalizedTree,
-		blockSelectors
-	);
-	const useRootPaddingAlign =
-		normalizedTree?.settings?.useRootPaddingAwareAlignments;
-	const { contentSize, wideSize } = normalizedTree?.settings?.layout || {};
+	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
+	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
+	const useRootPaddingAlign = tree?.settings?.useRootPaddingAwareAlignments;
+	const { contentSize, wideSize } = tree?.settings?.layout || {};
 	const hasBodyStyles =
 		options.marginReset || options.rootPadding || options.layoutStyles;
 
@@ -1938,7 +1929,7 @@ export const transformToStyles = (
 				...responsiveNodes.flatMap( getPseudoStyleNodes ),
 			].forEach( ( expandedNode ) => {
 				ruleset += renderStylesNode( expandedNode, {
-					tree: normalizedTree,
+					tree,
 					useRootPaddingAlign,
 					disableLayoutStyles,
 					hasBlockGapSupport,
@@ -1965,8 +1956,7 @@ export const transformToStyles = (
 	if ( options.blockGap && hasBlockGapSupport ) {
 		// Use fallback of `0.5em` just in case, however if there is blockGap support, there should nearly always be a real value.
 		const gapValue =
-			getGapCSSValue( normalizedTree?.styles?.spacing?.blockGap ) ||
-			'0.5em';
+			getGapCSSValue( tree?.styles?.spacing?.blockGap ) || '0.5em';
 		ruleset =
 			ruleset +
 			`:root :where(.wp-site-blocks) > * { margin-block-start: ${ gapValue }; margin-block-end: 0; }`;

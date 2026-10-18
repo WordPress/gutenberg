@@ -157,6 +157,9 @@
 
 .editor-collab-sidebar-panel__note-content {
 	overflow-wrap: break-word;
+	// Room for the floating add-reaction trigger, reserved on every note so
+	// text does not rewrap when one is selected.
+	padding-right: $button-size-small + $grid-unit-10;
 
 	p {
 		margin-top: 0;
@@ -316,6 +319,66 @@
 mark.wp-note {
 	border-radius: 1px;
 	transition: background-color 0.1s ease-in-out;
+}
+
+// Emoji Reactions
+
+// Anchors the floating add-reaction trigger to the note's text.
+.editor-collab-sidebar-panel__note-body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+}
+
+// Without reactions, the trigger floats in the note's top corner, in line
+// with the header actions, instead of adding a row to every note.
+.editor-collab-sidebar-panel__reactions.is-floating {
+	position: absolute;
+	right: 0;
+	// Centered on the first line of text.
+	top: calc((1lh - #{$button-size-small}) / 2);
+}
+
+// Touch devices have no hover to reveal the floating trigger.
+@media (hover: hover) {
+	.editor-collab-sidebar-panel__reactions.is-floating
+	.editor-collab-sidebar-panel__add-reaction-button {
+		// Fade rather than remove, to keep it in the tab order.
+		opacity: 0;
+		transition: opacity 0.1s ease-out;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+
+	// Per note, not per thread: a thread-wide reveal would offer it on every
+	// note at once, and the thread's own `:focus-within` holds while selected.
+	.editor-collab-sidebar-panel__note:hover
+	.editor-collab-sidebar-panel__add-reaction-button,
+	.editor-collab-sidebar-panel__reactions
+	.editor-collab-sidebar-panel__add-reaction-button:focus,
+	.editor-collab-sidebar-panel__reactions
+	.editor-collab-sidebar-panel__add-reaction-button[data-popup-open] {
+		opacity: 1;
+	}
+}
+
+.editor-collab-sidebar-panel__reaction-button {
+	gap: $grid-unit-05;
+	// The Button's four-character minimum pads out a short count.
+	min-width: 0;
+}
+
+// Closing the picker after a pointer open leaves focus on the trigger.
+.editor-collab-sidebar-panel__add-reaction-button:focus:not(:focus-visible):not([data-popup-open]) {
+	outline: none;
+}
+
+.editor-collab-sidebar-panel__reaction-button-emoji,
+.editor-collab-sidebar-panel__reaction-option-emoji {
+	font-size: var(--wpds-typography-font-size-lg);
 }
 
 // Mention chips, both in the note input and the rendered note content. A

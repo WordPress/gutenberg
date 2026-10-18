@@ -7,6 +7,47 @@ import { INSERTER_PATTERN_TYPES } from '../inserter/block-patterns-tab/utils';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
+/** @typedef {import('@wordpress/blocks').Block} Block */
+/** @typedef {import('@wordpress/blocks').BlockTypeIcon} BlockTypeIcon */
+
+/**
+ * The parts of a pattern this component reads. A synced user pattern drags as
+ * a single `core/block` reference rather than as its inner blocks.
+ *
+ * @typedef {Object} DraggablePattern
+ * @property {string}        [type]       One of `INSERTER_PATTERN_TYPES`.
+ * @property {string}        [syncStatus] `'unsynced'` for a user pattern that isn't synced.
+ * @property {number|string} [id]         The pattern's id.
+ */
+
+/**
+ * What the render prop is called with. The handlers are absent when dragging
+ * is disabled, so callers that forward them to something other than a DOM
+ * prop need to check.
+ *
+ * @typedef {Object} DraggableRenderProps
+ * @property {boolean}                draggable     Whether the element should be draggable.
+ * @property {React.DragEventHandler} [onDragStart] Starts the drag.
+ * @property {React.DragEventHandler} [onDragEnd]   Ends the drag.
+ */
+
+/**
+ * Renders the drag source.
+ *
+ * @typedef {(props: DraggableRenderProps) => React.ReactElement} DraggableChildren
+ */
+
+/**
+ * Makes its children a drag source for a set of blocks.
+ *
+ * @param {Object}            props
+ * @param {boolean}           props.isEnabled Whether the children can be dragged.
+ * @param {Block[]}           props.blocks    The blocks to drag.
+ * @param {DraggableChildren} props.children  Renders the drag source.
+ * @param {BlockTypeIcon}     [props.icon]    Icon for the drag chip. Defaults to the block type's icon when dragging a single block that isn't a pattern.
+ * @param {DraggablePattern}  [props.pattern] The pattern the blocks came from, if any.
+ * @return {React.ReactElement} The drag source.
+ */
 export default function InserterDraggableBlocks( {
 	isEnabled,
 	blocks,

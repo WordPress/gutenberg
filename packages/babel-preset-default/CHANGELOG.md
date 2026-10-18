@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   Add list of included polyfills to header comment when generating the bundle ([#84835](https://github.com/WordPress/gutenberg/pull/84835))
+
 ## 9.0.0 (2026-10-07)
 
 ### Breaking Changes
