@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
-
-/**
- * Internal dependencies
- */
 const engine = require( './engine' );
 const defaultMarkdownFormatter = require( './markdown' );
 const isSymbolPrivate = require( './is-symbol-private' );
@@ -15,7 +8,16 @@ const isSymbolIgnore = require( './is-symbol-ignore' );
 /**
  * Helpers functions.
  */
-const extensions = [ '.js', '.ts', '.tsx' ];
+const extensions = [
+	'.js',
+	'.jsx',
+	'.mjs',
+	'.cjs',
+	'.ts',
+	'.tsx',
+	'.mts',
+	'.cts',
+];
 const relativeToAbsolute = ( basePath, relativePath ) => {
 	const target = path.join( path.dirname( basePath ), relativePath );
 	const extension = path.extname( target );
@@ -106,7 +108,7 @@ module.exports = ( sourceFile, options ) => {
 	}
 	sourceFile = path.join( processDir, sourceFile );
 
-	const debugMode = options.debug ? true : false;
+	const debugMode = options.debug;
 
 	const inputBase = path.join(
 		path.dirname( sourceFile ),
@@ -133,7 +135,7 @@ module.exports = ( sourceFile, options ) => {
 		return true;
 	} );
 
-	// Ouput.
+	// Output.
 	if ( result === undefined ) {
 		process.stdout.write(
 			'\nFile was processed, but contained no ES6 module exports:'

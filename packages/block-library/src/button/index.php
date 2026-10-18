@@ -10,9 +10,8 @@
  *
  * @since 6.6.0
  *
- * @param array    $attributes The block attributes.
- * @param string   $content    The block content.
- * @param WP_Block $block      The block object.
+ * @param array  $attributes The block attributes.
+ * @param string $content    The block content.
  *
  * @return string The block content.
  */
@@ -59,6 +58,121 @@ function render_block_core_button( $attributes, $content ) {
 	 */
 	if ( $is_empty ) {
 		return '';
+	}
+
+	// Background skips serialization, so apply it to the link like color.
+	$background = $attributes['style']['background'] ?? null;
+
+	if ( is_array( $background ) ) {
+		$background_styles = array(
+			'backgroundImage'      => $background['backgroundImage'] ?? null,
+			'backgroundSize'       => $background['backgroundSize'] ?? null,
+			'backgroundPosition'   => $background['backgroundPosition'] ?? null,
+			'backgroundRepeat'     => $background['backgroundRepeat'] ?? null,
+			'backgroundAttachment' => $background['backgroundAttachment'] ?? null,
+			'gradient'             => $background['gradient'] ?? null,
+		);
+
+		// Mirror the background block support defaults.
+		if ( ! empty( $background_styles['backgroundImage'] ) ) {
+			$background_styles['backgroundSize'] = $background_styles['backgroundSize'] ?? 'cover';
+			if ( 'contain' === $background_styles['backgroundSize'] && ! $background_styles['backgroundPosition'] ) {
+				$background_styles['backgroundPosition'] = '50% 50%';
+			}
+		}
+
+		$styles = wp_style_engine_get_styles( array( 'background' => $background_styles ) );
+
+		if ( ! empty( $styles['css'] ) ) {
+			$processor = new WP_HTML_Tag_Processor( $content );
+			while ( $processor->next_tag() ) {
+				if ( $tag !== $processor->get_tag() ) {
+					continue;
+				}
+
+				$existing_style = $processor->get_attribute( 'style' );
+				if ( is_string( $existing_style ) && '' !== $existing_style ) {
+					$separator = str_ends_with( $existing_style, ';' ) ? '' : ';';
+					$processor->set_attribute( 'style', $existing_style . $separator . $styles['css'] );
+				} else {
+					$processor->set_attribute( 'style', $styles['css'] );
+				}
+
+				if ( ! empty( $background_styles['backgroundImage'] ) || ! empty( $background_styles['gradient'] ) ) {
+					$processor->add_class( 'has-background' );
+				}
+				break;
+			}
+			$content = $processor->get_updated_html();
+		}
+	}
+
+	$width = $attributes['style']['dimensions']['width'] ?? null;
+
+	if ( is_string( $width ) && '' !== $width ) {
+		// Resolve preset references to their actual values.
+		$resolved_width = $width;
+		$is_preset      = str_starts_with( $width, 'var:preset|dimension|' );
+
+		if ( $is_preset ) {
+			$slug              = substr( $width, strlen( 'var:preset|dimension|' ) );
+			$dimension_presets = wp_get_global_settings(
+				array( 'dimensions', 'dimensionSizes' ),
+				array( 'block_name' => 'core/button' )
+			);
+
+			// Search origins in priority order: custom > theme > default.
+			if ( is_array( $dimension_presets ) ) {
+				foreach ( array( 'custom', 'theme', 'default' ) as $origin ) {
+					if ( empty( $dimension_presets[ $origin ] ) || ! is_array( $dimension_presets[ $origin ] ) ) {
+						continue;
+					}
+					foreach ( $dimension_presets[ $origin ] as $preset ) {
+						if ( isset( $preset['slug'] ) && $preset['slug'] === $slug ) {
+							$resolved_width = $preset['size'] ?? $width;
+							break 2;
+						}
+					}
+				}
+			}
+		}
+
+		$is_percentage = str_ends_with( $resolved_width, '%' );
+
+		$processor = new WP_HTML_Tag_Processor( $content );
+		// Target the outer wrapper div.
+		if ( $processor->next_tag( array( 'class_name' => 'wp-block-button' ) ) ) {
+			$processor->add_class( 'has-custom-width' );
+			$existing_style = $processor->get_attribute( 'style' );
+			$existing_style = is_string( $existing_style ) ? $existing_style : '';
+
+			if ( $is_percentage ) {
+				$numeric_width = (float) $resolved_width;
+				$processor->add_class( 'wp-block-button__width' );
+
+				// Maintain legacy class for the standard percentage widths.
+				$legacy_widths = array(
+					'25%'  => 'wp-block-button__width-25',
+					'50%'  => 'wp-block-button__width-50',
+					'75%'  => 'wp-block-button__width-75',
+					'100%' => 'wp-block-button__width-100',
+				);
+				if ( isset( $legacy_widths[ $resolved_width ] ) ) {
+					$processor->add_class( $legacy_widths[ $resolved_width ] );
+				}
+
+				$width_style = "--wp--block-button--width: $numeric_width;";
+				$processor->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
+			} else {
+				$css_value   = $is_preset
+					? 'var(--wp--preset--dimension--' . _wp_to_kebab_case( $slug ) . ')'
+					: $width;
+				$width_style = "width: $css_value;";
+				$processor->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
+			}
+
+			$content = $processor->get_updated_html();
+		}
 	}
 
 	return $content;

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Sidebar', () => {
@@ -103,6 +100,37 @@ test.describe( 'Sidebar', () => {
 		await expect( activeTab ).toBeFocused();
 	} );
 
+	test( 'should focus the selected tab when tabbing into the sidebar', async ( {
+		editor,
+		page,
+	} ) => {
+		for ( const content of [ '0', '1' ] ) {
+			await editor.insertBlock( { name: 'core/paragraph' } );
+			await page.keyboard.type( content );
+		}
+
+		const activeTab = page
+			.getByRole( 'region', {
+				name: 'Editor settings',
+			} )
+			.getByRole( 'tab', { selected: true } );
+
+		// A selected block puts the sidebar on the "Block" tab.
+		await page.keyboard.press( 'Escape' );
+		await page.keyboard.press( 'Tab' );
+		await expect( activeTab ).toHaveText( 'Block' );
+		await expect( activeTab ).toBeFocused();
+
+		// Moving to the title clears the block selection, which switches the
+		// sidebar back to the "Post" tab.
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.click();
+		await page.keyboard.press( 'Tab' );
+		await expect( activeTab ).toHaveText( 'Post' );
+		await expect( activeTab ).toBeFocused();
+	} );
+
 	test( 'should be possible to programmatically remove Document Settings panels', async ( {
 		page,
 	} ) => {
@@ -111,7 +139,7 @@ test.describe( 'Sidebar', () => {
 			.getByRole( 'heading', { level: 2 } );
 
 		await expect( documentSettingsPanels ).toHaveText( [
-			'No Title',
+			'No title',
 			'Categories',
 			'Tags',
 		] );
@@ -125,13 +153,13 @@ test.describe( 'Sidebar', () => {
 		const postDiscussionPanel = page.getByRole( 'button', {
 			name: 'Change discussion options',
 		} );
-		const postSummarySection = page.getByRole( 'checkbox', {
-			name: 'Sticky',
+		const postAuthorPanel = page.getByRole( 'button', {
+			name: 'admin',
 		} );
 
 		await expect( postExcerptPanel ).toBeVisible();
 		await expect( postFeaturedImagePanel ).toBeVisible();
-		await expect( postSummarySection ).toBeVisible();
+		await expect( postAuthorPanel ).toBeVisible();
 		await expect( postDiscussionPanel ).toHaveCount( 1 );
 
 		await page.evaluate( () => {
@@ -149,7 +177,7 @@ test.describe( 'Sidebar', () => {
 		await expect( documentSettingsPanels ).toHaveCount( 1 );
 		await expect( postExcerptPanel ).toBeHidden();
 		await expect( postFeaturedImagePanel ).toBeHidden();
-		await expect( postSummarySection ).toBeHidden();
+		await expect( postAuthorPanel ).toBeHidden();
 		await expect( postDiscussionPanel ).toHaveCount( 0 );
 	} );
 } );

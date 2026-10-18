@@ -8,14 +8,15 @@
 	"description": "Displays the contents of a comment.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
 	"supports": {
+		"anchor": true,
+		"background": {
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
+			"heading": true,
+			"button": true,
 			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
@@ -25,6 +26,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -35,6 +37,18 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
+		},
 		"spacing": {
 			"padding": [ "horizontal", "vertical" ],
 			"__experimentalDefaultControls": {
@@ -42,5 +56,6 @@
 			}
 		},
 		"html": false
-	}
+	},
+	"style": "wp-block-comment-content"
 }

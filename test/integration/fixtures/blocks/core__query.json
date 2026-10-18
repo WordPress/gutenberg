@@ -16,7 +16,9 @@
 				"sticky": "",
 				"inherit": true,
 				"taxQuery": null,
-				"parents": []
+				"parents": [],
+				"format": [],
+				"excludeCurrent": null
 			},
 			"tagName": "div",
 			"enhancedPagination": false

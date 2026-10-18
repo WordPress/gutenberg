@@ -1,19 +1,9 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { useMemo, useState } from '@wordpress/element';
 import { CircularOptionPickerContext } from './circular-option-picker-context';
-import { Composite, useCompositeStore } from '../composite/v2';
+import { Composite } from '../composite';
 import type {
 	CircularOptionPickerProps,
 	ListboxCircularOptionPickerProps,
@@ -25,6 +15,10 @@ import {
 	ButtonAction,
 	DropdownLinkAction,
 } from './circular-option-picker-actions';
+import {
+	resolveCircularOptionPickerPresentation,
+	warnIfCircularOptionPickerAsButtonsIsSet,
+} from './utils';
 
 /**
  *`CircularOptionPicker` is a component that displays a set of options as circular buttons.
@@ -50,7 +44,6 @@ import {
  * 						style={ { backgroundColor: color, color } }
  * 						isSelected={ index === currentColor }
  * 						onClick={ () => setCurrentColor( index ) }
- * 						aria-label={ name }
  * 					/>
  * 				);
  * 			} ) }
@@ -85,24 +78,31 @@ function ListboxCircularOptionPicker(
 		...additionalProps
 	} = props;
 
-	const compositeStore = useCompositeStore( {
-		focusLoop: loop,
-		rtl: isRTL(),
-	} );
+	const [ activeId, setActiveId ] = useState< string | null | undefined >(
+		undefined
+	);
 
-	const compositeContext = {
-		baseId,
-		compositeStore,
-	};
+	const contextValue = useMemo(
+		() => ( {
+			baseId,
+			activeId,
+			setActiveId,
+			presentation: 'listbox' as const,
+		} ),
+		[ baseId, activeId, setActiveId ]
+	);
 
 	return (
 		<div className={ className }>
-			<CircularOptionPickerContext.Provider value={ compositeContext }>
+			<CircularOptionPickerContext.Provider value={ contextValue }>
 				<Composite
 					{ ...additionalProps }
 					id={ baseId }
-					store={ compositeStore }
+					focusLoop={ loop }
+					rtl={ isRTL() }
 					role="listbox"
+					activeId={ activeId }
+					setActiveId={ setActiveId }
 				>
 					{ options }
 				</Composite>
@@ -116,11 +116,26 @@ function ListboxCircularOptionPicker(
 function ButtonsCircularOptionPicker(
 	props: ButtonsCircularOptionPickerProps
 ) {
-	const { actions, options, children, baseId, ...additionalProps } = props;
+	const {
+		actions,
+		options,
+		children,
+		baseId,
+		presentation,
+		...additionalProps
+	} = props;
+
+	const contextValue = useMemo(
+		() => ( {
+			baseId,
+			presentation,
+		} ),
+		[ baseId, presentation ]
+	);
 
 	return (
-		<div { ...additionalProps } id={ baseId }>
-			<CircularOptionPickerContext.Provider value={ { baseId } }>
+		<div { ...additionalProps } role="group" id={ baseId }>
+			<CircularOptionPickerContext.Provider value={ contextValue }>
 				{ options }
 				{ children }
 				{ actions }
@@ -132,22 +147,28 @@ function ButtonsCircularOptionPicker(
 function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	const {
 		asButtons,
+		presentation,
+		loop,
 		actions: actionsProp,
 		options: optionsProp,
 		children,
 		className,
 		...additionalProps
 	} = props;
+	warnIfCircularOptionPickerAsButtonsIsSet(
+		'CircularOptionPicker',
+		asButtons
+	);
+	const resolvedPresentation = resolveCircularOptionPickerPresentation(
+		presentation,
+		asButtons
+	);
 
 	const baseId = useInstanceId(
 		CircularOptionPicker,
 		'components-circular-option-picker',
 		additionalProps.id
 	);
-
-	const OptionPickerImplementation = asButtons
-		? ButtonsCircularOptionPicker
-		: ListboxCircularOptionPicker;
 
 	const actions = actionsProp ? (
 		<div className="components-circular-option-picker__custom-clear-wrapper">
@@ -161,16 +182,30 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 		</div>
 	);
 
+	const sharedProps = {
+		baseId,
+		className: clsx( 'components-circular-option-picker', className ),
+		actions,
+		options,
+		children,
+	};
+
+	if ( resolvedPresentation === 'listbox' ) {
+		return (
+			<ListboxCircularOptionPicker
+				{ ...additionalProps }
+				{ ...sharedProps }
+				loop={ loop }
+			/>
+		);
+	}
+
 	return (
-		<OptionPickerImplementation
+		<ButtonsCircularOptionPicker
 			{ ...additionalProps }
-			baseId={ baseId }
-			className={ clsx( 'components-circular-option-picker', className ) }
-			actions={ actions }
-			options={ options }
-		>
-			{ children }
-		</OptionPickerImplementation>
+			{ ...sharedProps }
+			presentation={ resolvedPresentation }
+		/>
 	);
 }
 
@@ -178,5 +213,7 @@ CircularOptionPicker.Option = Option;
 CircularOptionPicker.OptionGroup = OptionGroup;
 CircularOptionPicker.ButtonAction = ButtonAction;
 CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
+
+CircularOptionPicker.displayName = 'CircularOptionPicker';
 
 export default CircularOptionPicker;

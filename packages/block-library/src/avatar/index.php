@@ -16,9 +16,10 @@
  * @return string Return the avatar.
  */
 function render_block_core_avatar( $attributes, $content, $block ) {
-	$size               = isset( $attributes['size'] ) ? $attributes['size'] : 96;
+	$size               = $attributes['size'] ?? 96;
 	$wrapper_attributes = get_block_wrapper_attributes();
 	$border_attributes  = get_block_core_avatar_border_attributes( $attributes );
+	$shadow_styles      = wp_style_engine_get_styles( array( 'shadow' => $attributes['style']['shadow'] ?? null ) );
 
 	// Class gets passed through `esc_attr` via `get_avatar`.
 	$image_classes = ! empty( $border_attributes['class'] )
@@ -26,10 +27,11 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		: 'wp-block-avatar__image';
 
 	// Unlike class, `get_avatar` doesn't filter the styles via `esc_attr`.
-	// The style engine does pass the border styles through
+	// The style engine does pass the border and shadow styles through
 	// `safecss_filter_attr` however.
-	$image_styles = ! empty( $border_attributes['style'] )
-		? sprintf( ' style="%s"', esc_attr( $border_attributes['style'] ) )
+	$image_css    = ( $border_attributes['style'] ?? '' ) . ( $shadow_styles['css'] ?? '' );
+	$image_styles = ! empty( $image_css )
+		? sprintf( ' style="%s"', esc_attr( $image_css ) )
 		: '';
 
 	if ( ! isset( $block->context['commentId'] ) ) {
@@ -46,7 +48,7 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 		}
 
 		$author_name = get_the_author_meta( 'display_name', $author_id );
-		// translators: %s is the Author name.
+		// translators: %s: Author name.
 		$alt          = sprintf( __( '%s Avatar' ), $author_name );
 		$avatar_block = get_avatar(
 			$author_id,
@@ -64,16 +66,16 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 				// translators: %s is the Author name.
 				$label = 'aria-label="' . esc_attr( sprintf( __( '(%s author archive, opens in a new tab)' ), $author_name ) ) . '"';
 			}
-			// translators: %1$s: Author archive link. %2$s: Link target. %3$s Aria label. %4$s Avatar image.
+			// translators: 1: Author archive link. 2: Link target. %3$s Aria label. %4$s Avatar image.
 			$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( get_author_posts_url( $author_id ) ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
 		}
-		return sprintf( '<div %1s>%2s</div>', $wrapper_attributes, $avatar_block );
+		return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $avatar_block );
 	}
 	$comment = get_comment( $block->context['commentId'] );
 	if ( ! $comment ) {
 		return '';
 	}
-	/* translators: %s is the Comment Author name */
+	/* translators: %s: Author name. */
 	$alt          = sprintf( __( '%s Avatar' ), $comment->comment_author );
 	$avatar_block = get_avatar(
 		$comment,
@@ -88,13 +90,12 @@ function render_block_core_avatar( $attributes, $content, $block ) {
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] && isset( $comment->comment_author_url ) && '' !== $comment->comment_author_url ) {
 		$label = '';
 		if ( '_blank' === $attributes['linkTarget'] ) {
-			// translators: %s is the Comment Author name.
+			// translators: %s: Comment author name.
 			$label = 'aria-label="' . esc_attr( sprintf( __( '(%s website link, opens in a new tab)' ), $comment->comment_author ) ) . '"';
 		}
-		// translators: %1$s: Comment Author website link. %2$s: Link target. %3$s Aria label. %4$s Avatar image.
 		$avatar_block = sprintf( '<a href="%1$s" target="%2$s" %3$s class="wp-block-avatar__link">%4$s</a>', esc_url( $comment->comment_author_url ), esc_attr( $attributes['linkTarget'] ), $label, $avatar_block );
 	}
-	return sprintf( '<div %1s>%2s</div>', $wrapper_attributes, $avatar_block );
+	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $avatar_block );
 }
 
 /**
@@ -134,9 +135,9 @@ function get_block_core_avatar_border_attributes( $attributes ) {
 	foreach ( $sides as $side ) {
 		$border                 = $attributes['style']['border'][ $side ] ?? null;
 		$border_styles[ $side ] = array(
-			'color' => isset( $border['color'] ) ? $border['color'] : null,
-			'style' => isset( $border['style'] ) ? $border['style'] : null,
-			'width' => isset( $border['width'] ) ? $border['width'] : null,
+			'color' => $border['color'] ?? null,
+			'style' => $border['style'] ?? null,
+			'width' => $border['width'] ?? null,
 		);
 	}
 

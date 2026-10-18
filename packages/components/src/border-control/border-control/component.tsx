@@ -1,13 +1,7 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import BorderControlDropdown from '../border-control-dropdown';
 import UnitControl from '../../unit-control';
+import { CSS_UNITS } from '../../unit-control/utils';
 import RangeControl from '../../range-control';
 import { HStack } from '../../h-stack';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
@@ -16,8 +10,11 @@ import { VisuallyHidden } from '../../visually-hidden';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderControl } from './hook';
-
 import type { BorderControlProps, LabelProps } from '../types';
+import { Spacer } from '../../spacer';
+
+// Percentages are not valid `border-width` values.
+const BORDER_WIDTH_UNITS = CSS_UNITS.filter( ( unit ) => unit.value !== '%' );
 
 const BorderLabel = ( props: LabelProps ) => {
 	const { label, hideLabelFromVision } = props;
@@ -38,7 +35,6 @@ const UnconnectedBorderControl = (
 	forwardedRef: React.ForwardedRef< any >
 ) => {
 	const {
-		__next40pxDefaultSize = false,
 		colors,
 		disableCustomColors,
 		disableUnits,
@@ -56,7 +52,6 @@ const UnconnectedBorderControl = (
 		__unstablePopoverProps,
 		previousStyleSelection,
 		showDropdownHeader,
-		size,
 		sliderClassName,
 		value: border,
 		widthUnit,
@@ -75,22 +70,26 @@ const UnconnectedBorderControl = (
 			<HStack spacing={ 4 } className={ innerWrapperClassName }>
 				<UnitControl
 					prefix={
-						<BorderControlDropdown
-							border={ border }
-							colors={ colors }
-							__unstablePopoverProps={ __unstablePopoverProps }
-							disableCustomColors={ disableCustomColors }
-							enableAlpha={ enableAlpha }
-							enableStyle={ enableStyle }
-							isStyleSettable={ isStyleSettable }
-							onChange={ onBorderChange }
-							previousStyleSelection={ previousStyleSelection }
-							showDropdownHeader={ showDropdownHeader }
-							__experimentalIsRenderedInSidebar={
-								__experimentalIsRenderedInSidebar
-							}
-							size={ size }
-						/>
+						<Spacer marginRight={ 1 } marginBottom={ 0 }>
+							<BorderControlDropdown
+								border={ border }
+								colors={ colors }
+								__unstablePopoverProps={
+									__unstablePopoverProps
+								}
+								disableCustomColors={ disableCustomColors }
+								enableAlpha={ enableAlpha }
+								enableStyle={ enableStyle }
+								isStyleSettable={ isStyleSettable }
+								onChange={ onBorderChange }
+								previousStyleSelection={
+									previousStyleSelection
+								}
+								__experimentalIsRenderedInSidebar={
+									__experimentalIsRenderedInSidebar
+								}
+							/>
+						</Spacer>
 					}
 					label={ __( 'Border width' ) }
 					hideLabelFromVision
@@ -98,13 +97,12 @@ const UnconnectedBorderControl = (
 					onChange={ onWidthChange }
 					value={ border?.width || '' }
 					placeholder={ placeholder }
+					units={ BORDER_WIDTH_UNITS }
 					disableUnits={ disableUnits }
 					__unstableInputWidth={ inputWidth }
-					size={ size }
 				/>
 				{ withSlider && (
 					<RangeControl
-						__nextHasNoMarginBottom
 						label={ __( 'Border width' ) }
 						hideLabelFromVision
 						className={ sliderClassName }
@@ -112,10 +110,9 @@ const UnconnectedBorderControl = (
 						max={ 100 }
 						min={ 0 }
 						onChange={ onSliderChange }
-						step={ [ 'px', '%' ].includes( widthUnit ) ? 1 : 0.1 }
+						step={ widthUnit === 'px' ? 1 : 0.1 }
 						value={ widthValue || undefined }
 						withInputField={ false }
-						__next40pxDefaultSize={ __next40pxDefaultSize }
 					/>
 				) }
 			</HStack>
@@ -134,7 +131,7 @@ const UnconnectedBorderControl = (
  * a "shape" abstraction.
  *
  * ```jsx
- * import { __experimentalBorderControl as BorderControl } from '@wordpress/components';
+ * import { BorderControl } from '@wordpress/components';
  * import { __ } from '@wordpress/i18n';
  *
  * const colors = [

@@ -1,24 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import { isRTL } from '@wordpress/i18n';
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
-import { Select } from './styles/select-control-styles';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import type { WordPressComponentProps } from '../context';
 import type { SelectControlProps } from './types';
 import SelectControlChevronDown from './chevron-down';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function useUniqueId( idProp?: string ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -27,11 +17,31 @@ function useUniqueId( idProp?: string ) {
 	return idProp || id;
 }
 
-function UnforwardedSelectControl(
-	props: WordPressComponentProps< SelectControlProps, 'select', false >,
+function SelectOptions( {
+	options,
+}: {
+	options: NonNullable< SelectControlProps[ 'options' ] >;
+} ) {
+	return options.map( ( { id, label, value, ...optionProps }, index ) => {
+		const key = id || `${ label }-${ value }-${ index }`;
+
+		return (
+			<option key={ key } value={ value } { ...optionProps }>
+				{ label }
+			</option>
+		);
+	} );
+}
+
+function UnforwardedSelectControl< V extends string >(
+	props: WordPressComponentProps< SelectControlProps< V >, 'select', false >,
 	ref: React.ForwardedRef< HTMLSelectElement >
 ) {
 	const {
+		// Prevent passing legacy props to internal components.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
+		__next36pxDefaultSize: _next36pxDefaultSize,
 		className,
 		disabled = false,
 		help,
@@ -47,14 +57,12 @@ function UnforwardedSelectControl(
 		children,
 		prefix,
 		suffix,
-		__next40pxDefaultSize = false,
-		__nextHasNoMarginBottom = false,
+		variant = 'default',
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp( props );
+	} = props;
 	const id = useUniqueId( idProp );
 	const helpId = help ? `${ id }__help` : undefined;
 
-	// Disable reason: A select with an onchange throws a warning.
 	if ( ! options?.length && ! children ) {
 		return null;
 	}
@@ -66,27 +74,25 @@ function UnforwardedSelectControl(
 			const selectedOptions = Array.from( event.target.options ).filter(
 				( { selected } ) => selected
 			);
-			const newValues = selectedOptions.map( ( { value } ) => value );
+			const newValues = selectedOptions.map(
+				( { value } ) => value as V
+			);
 			props.onChange?.( newValues, { event } );
 			return;
 		}
 
-		props.onChange?.( event.target.value, { event } );
+		props.onChange?.( event.target.value as V, { event } );
 	};
 
 	const classes = clsx( 'components-select-control', className );
 
 	return (
-		<BaseControl
-			help={ help }
-			id={ id }
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-		>
+		<BaseControl help={ help } id={ id } className={ classes }>
 			<InputBase
-				className={ classes }
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
+				isBorderless={ variant === 'minimal' }
 				label={ label }
 				size={ size }
 				suffix={
@@ -94,39 +100,38 @@ function UnforwardedSelectControl(
 				}
 				prefix={ prefix }
 				labelPosition={ labelPosition }
-				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__unstableInputWidth={
+					variant === 'minimal' ? 'auto' : undefined
+				}
+				className={ clsx( styles.root, {
+					[ styles[ 'is-disabled' ] ]: disabled,
+					[ styles[ 'is-minimal' ] ]: variant === 'minimal',
+				} ) }
 			>
-				<Select
+				<PolymorphicElement
+					as="select"
 					{ ...restProps }
-					__next40pxDefaultSize={ __next40pxDefaultSize }
 					aria-describedby={ helpId }
-					className="components-select-control__input"
+					className={ clsx(
+						'components-select-control__input',
+						styles.input,
+						{
+							[ styles[ 'is-small' ] ]: size === 'small',
+							[ styles[ 'is-compact' ] ]: size === 'compact',
+							[ styles[ 'is-multiple' ] ]: multiple,
+							[ styles[ 'is-minimal' ] ]: variant === 'minimal',
+							[ styles[ 'is-rtl' ] ]: isRTL(),
+						}
+					) }
 					disabled={ disabled }
 					id={ id }
 					multiple={ multiple }
 					onChange={ handleOnChange }
 					ref={ ref }
-					selectSize={ size }
 					value={ valueProp }
 				>
-					{ children ||
-						options.map( ( option, index ) => {
-							const key =
-								option.id ||
-								`${ option.label }-${ option.value }-${ index }`;
-
-							return (
-								<option
-									key={ key }
-									value={ option.value }
-									disabled={ option.disabled }
-									hidden={ option.hidden }
-								>
-									{ option.label }
-								</option>
-							);
-						} ) }
-				</Select>
+					{ children || <SelectOptions options={ options } /> }
+				</PolymorphicElement>
 			</InputBase>
 		</BaseControl>
 	);
@@ -158,6 +163,17 @@ function UnforwardedSelectControl(
  * };
  * ```
  */
-export const SelectControl = forwardRef( UnforwardedSelectControl );
+export const SelectControl = forwardRef( UnforwardedSelectControl ) as <
+	V extends string,
+>(
+	props: WordPressComponentProps<
+		SelectControlProps< V >,
+		'select',
+		false
+	> & { ref?: React.Ref< HTMLSelectElement > }
+) => React.JSX.Element | null;
+
+// @ts-expect-error TS says: "Property 'displayName' does not exist on type ..."
+SelectControl.displayName = 'SelectControl';
 
 export default SelectControl;

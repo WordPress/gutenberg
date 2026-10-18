@@ -1,24 +1,23 @@
-/**
- * WordPress dependencies
- */
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { store as editorStore } from '@wordpress/editor';
-
-/**
- * Internal dependencies
- */
+import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 import {
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 	TEMPLATE_PART_POST_TYPE,
 } from '../../utils/constants';
+import { unlock } from '../../lock-unlock';
+
+const { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } = unlock(
+	blockLibraryPrivateApis
+);
 
 const useTemplatePartsGroupedByArea = ( items ) => {
 	const allItems = items || [];
 
 	const templatePartAreas = useSelect(
 		( select ) =>
-			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
+			select( coreStore ).getCurrentTheme()
+				?.default_template_part_areas || [],
 		[]
 	);
 
@@ -29,6 +28,7 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 		footer: {},
 		sidebar: {},
 		uncategorized: {},
+		[ NAVIGATION_OVERLAY_TEMPLATE_PART_AREA ]: {},
 	};
 
 	templatePartAreas.forEach(
@@ -43,7 +43,7 @@ const useTemplatePartsGroupedByArea = ( items ) => {
 		const key = accumulator[ item.area ]
 			? item.area
 			: TEMPLATE_PART_AREA_DEFAULT_CATEGORY;
-		accumulator[ key ].templateParts.push( item );
+		accumulator[ key ]?.templateParts?.push( item );
 		return accumulator;
 	}, knownAreas );
 

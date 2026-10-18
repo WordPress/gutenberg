@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { createRegistrySelector } from '@wordpress/data';
+import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { getWidgetIdFromBlock } from '@wordpress/widgets';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
 import {
 	buildWidgetsQuery,
 	buildWidgetAreasQuery,
@@ -29,24 +22,35 @@ const EMPTY_INSERTION_POINT = {
  *
  * @return {Object[]} API List of widgets.
  */
-export const getWidgets = createRegistrySelector( ( select ) => () => {
-	const widgets = select( coreStore ).getEntityRecords(
-		'root',
-		'widget',
-		buildWidgetsQuery()
-	);
+export const getWidgets = createRegistrySelector( ( select ) =>
+	createSelector(
+		() => {
+			const widgets = select( coreStore ).getEntityRecords(
+				'root',
+				'widget',
+				buildWidgetsQuery()
+			);
 
-	return (
-		// Key widgets by their ID.
-		widgets?.reduce(
-			( allWidgets, widget ) => ( {
-				...allWidgets,
-				[ widget.id ]: widget,
-			} ),
-			{}
-		) || {}
-	);
-} );
+			return (
+				// Key widgets by their ID.
+				widgets?.reduce(
+					( allWidgets, widget ) => ( {
+						...allWidgets,
+						[ widget.id ]: widget,
+					} ),
+					{}
+				) ?? {}
+			);
+		},
+		() => [
+			select( coreStore ).getEntityRecords(
+				'root',
+				'widget',
+				buildWidgetsQuery()
+			),
+		]
+	)
+);
 
 /**
  * Returns API widget data for a particular widget ID.
@@ -283,6 +287,10 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
 		// widget area can be inserted into any widget area. Uses the first
 		// widget area for testing whether the block can be inserted.
 		const [ firstWidgetArea ] = widgetAreas;
+		if ( ! firstWidgetArea ) {
+			return false;
+		}
+
 		return select( blockEditorStore ).canInsertBlockType(
 			blockName,
 			firstWidgetArea.clientId
@@ -299,4 +307,35 @@ export const canInsertBlockInWidgetArea = createRegistrySelector(
  */
 export function isListViewOpened( state ) {
 	return state.listViewPanel;
+}
+
+/**
+ * Returns whether widget saving is locked.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @example
+ * ```jsx
+ * import { __ } from '@wordpress/i18n';
+ * import { store as widgetStore } from '@wordpress/edit-widgets';
+ * import { useSelect } from '@wordpress/data';
+ *
+ * const ExampleComponent = () => {
+ * 	const isSavingLocked = useSelect(
+ * 		( select ) => select( widgetStore ).isWidgetSavingLocked(),
+ * 		[]
+ * 	);
+ *
+ * 	return isSavingLocked ? (
+ * 		<p>{ __( 'Widget saving is locked' ) }</p>
+ * 	) : (
+ * 		<p>{ __( 'Widget saving is not locked' ) }</p>
+ * 	);
+ * };
+ * ```
+ *
+ * @return {boolean} Is locked.
+ */
+export function isWidgetSavingLocked( state ) {
+	return Object.keys( state.widgetSavingLock ).length > 0;
 }

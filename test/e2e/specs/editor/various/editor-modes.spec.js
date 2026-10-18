@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Editing modes (visual/HTML)', () => {
@@ -45,7 +42,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Drop cap, show' } )
 			.click();
 
 		await expect(
@@ -74,7 +71,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
 		await page
-			.getByRole( 'menuitemcheckbox', { name: 'Show Drop cap' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Drop cap, show' } )
 			.click();
 		await page.getByRole( 'checkbox', { name: 'Drop cap' } ).check();
 
@@ -115,7 +112,7 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		await expect(
 			page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 		).toBeDisabled();
 
 		// Go back to the visual editor.
@@ -164,15 +161,9 @@ test.describe( 'Editing modes (visual/HTML)', () => {
 		// Open the code editor.
 		await pageUtils.pressKeys( 'secondary+M' );
 
-		const textbox = page.getByRole( 'textbox', {
-			name: 'Type text or HTML',
-		} );
-
-		// Change content by typing.
-		await textbox.fill( '' );
-		await textbox.focus();
-
-		await page.keyboard.type( `<!-- wp:paragraph -->
+		// Change the content.
+		await page.getByRole( 'textbox', { name: 'Type text or HTML' } )
+			.fill( `<!-- wp:paragraph -->
 <p>abc</p>
 <!-- /wp:paragraph -->` );
 

@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { formatListNumbered as icon } from '@wordpress/icons';
 import { registerFormatType } from '@wordpress/rich-text';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
@@ -21,8 +14,7 @@ export const settings = {
 	edit,
 };
 
-registerFormatType( formatName, format );
-
 export const init = () => {
+	registerFormatType( formatName, format );
 	initBlock( { name, metadata, settings } );
 };

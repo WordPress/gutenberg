@@ -18,7 +18,6 @@ const MyLineHeightControl = () => (
 	<LineHeightControl
 		value={ lineHeight }
 		onChange={ onChange }
-		__nextHasNoMarginBottom={ true }
 	/>
 );
 ```
@@ -36,13 +35,6 @@ The value of the line height.
 -   **Type:** `Function`
 
 A callback function that handles the application of the line height value.
-
-#### `__nextHasNoMarginBottom`
-
--   **Type:** `boolean`
--   **Default:** `false`
-
-Start opting into the new margin-free styles that will become the default in a future version, currently scheduled to be WordPress 6.4. (The prop can be safely removed once this happens.)
 
 ## Related components
 

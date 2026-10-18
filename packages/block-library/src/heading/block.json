@@ -8,18 +8,18 @@
 	"keywords": [ "title", "subtitle" ],
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"content": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "h1,h2,h3,h4,h5,h6",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"level": {
 			"type": "number",
 			"default": 2
+		},
+		"levelOptions": {
+			"type": "array"
 		},
 		"placeholder": {
 			"type": "string"
@@ -30,6 +30,22 @@
 		"anchor": true,
 		"className": true,
 		"splitting": true,
+		"background": {
+			"backgroundClip": true,
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true
+		},
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -38,6 +54,11 @@
 				"text": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
+		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -49,6 +70,8 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
+			"textIndent": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
@@ -56,6 +79,8 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalWritingMode": true,
+			"textShadow": true,
+			"fitText": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}

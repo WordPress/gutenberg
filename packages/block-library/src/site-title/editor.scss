@@ -3,6 +3,7 @@
 	border: 1px dashed;
 }
 
-.editor-styles-wrapper :where(.wp-block-site-title a) {
-	color: inherit;
+// Overrides the inline `white-space: pre-wrap` rich text sets on the editable.
+.wp-block-site-title.has-fit-text > * {
+	white-space: inherit !important;
 }

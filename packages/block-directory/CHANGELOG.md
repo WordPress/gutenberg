@@ -2,6 +2,149 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Replace the no-results tip with an info notice and a documentation action link ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+## 5.57.0 (2026-10-07)
+
+## 5.56.0 (2026-09-23)
+
+## 5.55.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `BlockRatings`: Preserve full, half, and empty star colors after the icons became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Wrap the downloadable block item labels in `__()` so they can be translated ([#81237](https://github.com/WordPress/gutenberg/pull/81237)).
+
+## 5.52.0 (2026-07-29)
+
+## 5.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Use the emphasis font-weight token for UI emphasis ([#80093](https://github.com/WordPress/gutenberg/pull/80093)).
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+### Enhancements
+
+-   Use `--wpds-cursor-control` for interactive cursor styling and replace all instances ([#77330](https://github.com/WordPress/gutenberg/pull/77330)).
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+## 5.36.0 (2025-11-26)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
+## 5.29.0 (2025-08-20)
+
+## 5.28.0 (2025-08-07)
+
+## 5.27.0 (2025-07-23)
+
+## 5.26.0 (2025-06-25)
+
+## 5.25.0 (2025-06-04)
+
+## 5.24.0 (2025-05-22)
+
+## 5.23.0 (2025-05-07)
+
+## 5.22.0 (2025-04-11)
+
+## 5.21.0 (2025-03-27)
+
+## 5.20.0 (2025-03-13)
+
+## 5.19.0 (2025-02-28)
+
+## 5.18.0 (2025-02-12)
+
+## 5.17.0 (2025-01-29)
+
+## 5.16.0 (2025-01-15)
+
+## 5.15.0 (2025-01-02)
+
+## 5.14.0 (2024-12-11)
+
+## 5.13.0 (2024-11-27)
+
+## 5.12.0 (2024-11-16)
+
+## 5.11.0 (2024-10-30)
+
+## 5.10.0 (2024-10-16)
+
+## 5.9.0 (2024-10-03)
+
+## 5.8.0 (2024-09-19)
+
+## 5.7.0 (2024-09-05)
+
+## 5.6.0 (2024-08-21)
+
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
 ## 5.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -124,7 +267,7 @@
 
 ## 3.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/url` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -132,7 +275,7 @@
 
 ## 3.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -151,7 +294,7 @@
 
 ## 1.18.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the block directory namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 

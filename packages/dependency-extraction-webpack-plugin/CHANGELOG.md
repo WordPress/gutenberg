@@ -2,6 +2,153 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 6.57.0 (2026-10-07)
+
+### Enhancements
+
+-   Add `@wordpress/sync` as a bundled package, so consumer builds bundle it instead of externalizing it to the removed `wp-sync` script ([#81999](https://github.com/WordPress/gutenberg/pull/81999)).
+
+## 6.56.0 (2026-09-23)
+
+### Enhancements
+
+-   Add `@wordpress/global-styles-engine` and `@wordpress/global-styles-ui` as bundled packages, so consumer builds bundle them instead of externalizing them to the nonexistent `wp-global-styles-engine` and `wp-global-styles-ui` scripts ([#82589](https://github.com/WordPress/gutenberg/pull/82589)).
+-   Pretty-print generated asset files with line breaks and indentation ([#79650](https://github.com/WordPress/gutenberg/pull/79650)).
+
+## 6.55.0 (2026-09-10)
+
+## 6.54.0 (2026-08-26)
+
+## 6.53.0 (2026-08-12)
+
+### Enhancements
+
+-   Add `@wordpress/kebab-case` as a bundled package, so consumer builds bundle it instead of externalizing it to a nonexistent `wp-kebab-case` script ([#81294](https://github.com/WordPress/gutenberg/pull/81294)).
+
+## 6.52.0 (2026-07-29)
+
+### Bug Fixes
+
+-   Include extracted styles (e.g. the `style.css` cache group output) in the version hash of the entry point's asset file, so that style-only changes produce a new version ([#80601](https://github.com/WordPress/gutenberg/pull/80601)).
+
+## 6.51.0 (2026-07-14)
+
+### Bug Fixes
+
+-   Extract dynamically imported external modules that webpack code-splits into their own async chunk in the module build ([#79633](https://github.com/WordPress/gutenberg/pull/79633)).
+
+## 6.50.0 (2026-07-01)
+
+## 6.49.0 (2026-06-24)
+
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
+## 6.47.0 (2026-05-27)
+
+## 6.46.0 (2026-05-14)
+
+## 6.45.0 (2026-04-29)
+
+## 6.44.0 (2026-04-15)
+
+## 6.43.0 (2026-04-01)
+
+## 6.42.0 (2026-03-18)
+
+## 6.41.0 (2026-03-04)
+
+## 6.40.0 (2026-02-18)
+
+## 6.39.0 (2026-01-29)
+
+## 6.38.0 (2026-01-16)
+
+## 6.36.0 (2025-11-26)
+
+## 6.35.0 (2025-11-12)
+
+## 6.34.0 (2025-10-29)
+
+## 6.33.0 (2025-10-17)
+
+## 6.32.0 (2025-10-01)
+
+## 6.31.0 (2025-09-17)
+
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+## 6.27.0 (2025-07-23)
+
+## 6.26.0 (2025-06-25)
+
+## 6.25.0 (2025-06-04)
+
+## 6.24.0 (2025-05-22)
+
+## 6.23.0 (2025-05-07)
+
+## 6.22.0 (2025-04-11)
+
+## 6.21.0 (2025-03-27)
+
+## 6.20.0 (2025-03-13)
+
+## 6.19.0 (2025-02-28)
+
+## 6.18.0 (2025-02-12)
+
+## 6.17.0 (2025-01-29)
+
+## 6.16.0 (2025-01-15)
+
+## 6.15.0 (2025-01-02)
+
+## 6.14.0 (2024-12-11)
+
+## 6.13.0 (2024-11-27)
+
+## 6.12.0 (2024-11-16)
+
+## 6.11.0 (2024-10-30)
+
+## 6.10.0 (2024-10-16)
+
+## 6.9.0 (2024-10-03)
+
+### Enhancements
+
+-   Detection of magic comments is now done before minification ([#65582](https://github.com/WordPress/gutenberg/pull/65582)).
+
+### Bug Fixes
+
+-   Fix a bug where cycles in dependent modules could enter infinite recursion ([#65291](https://github.com/WordPress/gutenberg/pull/65291)).
+
+## 6.8.0 (2024-09-19)
+
+## 6.7.0 (2024-09-05)
+
+## 6.6.0 (2024-08-21)
+
+## 6.5.0 (2024-08-07)
+
+## 6.4.0 (2024-07-24)
+
+## 6.3.0 (2024-07-10)
+
+## 6.2.0 (2024-06-26)
+
+## 6.1.0 (2024-06-15)
+
 ## 6.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -27,7 +174,7 @@
 
 ## 5.2.0 (2024-02-09)
 
-### Bug fixes
+### Bug Fixes
 
 -   Fix import type field in script module asset files ([#58770](https://github.com/WordPress/gutenberg/pull/58770)).
 
@@ -88,7 +235,7 @@
 
 ## 4.10.0 (2023-02-15)
 
-### Bug Fix
+### Bug Fixes
 
 -   The bundled `json2php` dependency has been upgraded from requiring `^0.0.5` to `^0.0.7` ([#47831](https://github.com/WordPress/gutenberg/pull/47831)).
 
@@ -116,7 +263,7 @@
 
 ## 4.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -128,7 +275,7 @@
 
 ## 3.5.0 (2022-05-18)
 
-### Bug Fix
+### Bug Fixes
 
 -   Use OpenSSL provider supported in Node 17+ when calling `crypto.createHash` ([#40503](https://github.com/WordPress/gutenberg/pull/40503)).
 -   Add new line at the end of generated `*.asset.php` files ([#40753](https://github.com/WordPress/gutenberg/pull/40753)).
@@ -146,13 +293,13 @@
 
 ## 2.9.0 (2020-12-17)
 
-### New feature
+### New Features
 
 -   Make the plugin compatible with webpack 5.
 
 ## 2.7.0 (2020-06-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#22498](https://github.com/WordPress/gutenberg/pull/22498))
 

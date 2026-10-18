@@ -1,52 +1,56 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ChangeEvent, FocusEvent, ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { __, isRTL } from '@wordpress/i18n';
 import { useRef, useState, forwardRef } from '@wordpress/element';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { COLORS } from '../utils';
-import { floatClamp, useControlledRangeValue } from './utils';
+import {
+	floatClamp,
+	useControlledRangeValue,
+	getCSSWideKeyword,
+} from './utils';
 import { clamp } from '../utils/math';
 import InputRange from './input-range';
 import RangeRail from './rail';
 import SimpleTooltip from './tooltip';
-import {
-	ActionRightWrapper,
-	AfterIconWrapper,
-	BeforeIconWrapper,
-	InputNumber,
-	Root,
-	Track,
-	ThumbWrapper,
-	Thumb,
-	Wrapper,
-} from './styles/range-control-styles';
-
+import NumberControl from '../number-control';
+import styles from './style.module.scss';
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 import { space } from '../utils/space';
 
 const noop = () => {};
 
+/**
+ * Computes the value that `RangeControl` should reset to when pressing
+ * the reset button.
+ */
+function computeResetValue( {
+	resetFallbackValue,
+	initialPosition,
+}: Pick< RangeControlProps, 'resetFallbackValue' | 'initialPosition' > ) {
+	if ( resetFallbackValue !== undefined ) {
+		return ! Number.isNaN( resetFallbackValue ) ? resetFallbackValue : null;
+	}
+
+	if ( initialPosition !== undefined ) {
+		return ! Number.isNaN( initialPosition ) ? initialPosition : null;
+	}
+
+	return null;
+}
+
 function UnforwardedRangeControl(
 	props: WordPressComponentProps< RangeControlProps, 'input', false >,
 	forwardedRef: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__nextHasNoMarginBottom = false,
+		// Prevent passing legacy props to internal component.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		afterIcon,
 		allowReset = false,
 		beforeIcon,
@@ -70,7 +74,6 @@ function UnforwardedRangeControl(
 		railColor,
 		renderTooltipContent = ( v ) => v,
 		resetFallbackValue,
-		__next40pxDefaultSize = false,
 		shiftStep = 10,
 		showTooltip: showTooltipProp,
 		step = 1,
@@ -101,7 +104,7 @@ function UnforwardedRangeControl(
 	const [ showTooltip, setShowTooltip ] = useState( hasTooltip );
 	const [ isFocused, setIsFocused ] = useState( false );
 
-	const inputRef = useRef< HTMLInputElement >();
+	const inputRef = useRef< HTMLInputElement >( null );
 	const isCurrentlyFocused = inputRef.current?.matches( ':focus' );
 	const isThumbFocused = ! disabled && isFocused;
 
@@ -118,8 +121,13 @@ function UnforwardedRangeControl(
 
 	const classes = clsx( 'components-range-control', className );
 
+	const colorKeyword = getCSSWideKeyword( colorProp );
+	const trackColorKeyword = getCSSWideKeyword( trackColor );
+
 	const wrapperClasses = clsx(
 		'components-range-control__wrapper',
+		styles.wrapper,
+		colorKeyword && styles[ `color-${ colorKeyword }` ],
 		!! marks && 'is-marked'
 	);
 
@@ -166,13 +174,12 @@ function UnforwardedRangeControl(
 	};
 
 	const handleOnReset = () => {
-		let resetValue: number | null = parseFloat( `${ resetFallbackValue }` );
-		let onChangeResetValue: number | undefined = resetValue;
-
-		if ( isNaN( resetValue ) ) {
-			resetValue = null;
-			onChangeResetValue = undefined;
-		}
+		// Reset to `resetFallbackValue` if defined, otherwise set internal value
+		// to `null` — which, if propagated to the `value` prop, will cause
+		// the value to be reset to the `initialPosition` prop if defined.
+		const resetValue = Number.isNaN( resetFallbackValue )
+			? null
+			: ( resetFallbackValue ?? null );
 
 		setValue( resetValue );
 
@@ -189,7 +196,7 @@ function UnforwardedRangeControl(
 		 * preserve the undefined callback argument, except when a
 		 * resetFallbackValue is defined.
 		 */
-		onChange( onChangeResetValue );
+		onChange( resetValue ?? undefined );
 	};
 
 	const handleShowTooltip = () => setShowTooltip( true );
@@ -210,29 +217,34 @@ function UnforwardedRangeControl(
 	const offsetStyle = {
 		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
+
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			className={ classes }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ `${ id }` }
 			help={ help }
 		>
-			<Root
-				className="components-range-control__root"
-				__next40pxDefaultSize={ __next40pxDefaultSize }
+			<div
+				className={ clsx(
+					'components-range-control__root',
+					styles.root,
+					{ [ styles[ 'is-rtl' ] ]: isRTL() }
+				) }
 			>
 				{ beforeIcon && (
-					<BeforeIconWrapper>
+					<span className={ styles[ 'before-icon' ] }>
 						<Icon icon={ beforeIcon } />
-					</BeforeIconWrapper>
+					</span>
 				) }
-				<Wrapper
-					__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
+				<div
 					className={ wrapperClasses }
-					color={ colorProp }
-					marks={ !! marks }
+					style={
+						{
+							'--_wp-components-range-control-color': colorProp,
+						} as React.CSSProperties
+					}
 				>
 					<InputRange
 						{ ...otherProps }
@@ -262,45 +274,67 @@ function UnforwardedRangeControl(
 						step={ step }
 						value={ rangeFillValue }
 					/>
-					<Track
+					<span
 						aria-hidden
-						className="components-range-control__track"
-						disabled={ disabled }
-						style={ { width: fillValueOffset } }
-						trackColor={ trackColor }
+						className={ clsx(
+							'components-range-control__track',
+							styles.track,
+							{ [ styles[ 'is-disabled' ] ]: disabled },
+							! disabled &&
+								trackColorKeyword &&
+								styles[ `background-${ trackColorKeyword }` ]
+						) }
+						{ ...{ disabled } }
+						style={
+							{
+								width: fillValueOffset,
+								'--_wp-components-range-control-track-color':
+									trackColor || 'currentColor',
+							} as React.CSSProperties
+						}
 					/>
-					<ThumbWrapper
-						className="components-range-control__thumb-wrapper"
+					<span
+						className={ clsx(
+							'components-range-control__thumb-wrapper',
+							styles[ 'thumb-wrapper' ],
+							{ [ styles[ 'is-disabled' ] ]: disabled }
+						) }
 						style={ offsetStyle }
-						disabled={ disabled }
+						{ ...{ disabled } }
 					>
-						<Thumb
+						<span
 							aria-hidden
-							isFocused={ isThumbFocused }
-							disabled={ disabled }
+							className={ clsx( styles.thumb, {
+								[ styles[ 'is-disabled' ] ]: disabled,
+								[ styles[ 'is-focused' ] ]: isThumbFocused,
+							} ) }
+							{ ...{ disabled } }
 						/>
-					</ThumbWrapper>
+					</span>
 					{ enableTooltip && (
 						<SimpleTooltip
 							className="components-range-control__tooltip"
 							inputRef={ inputRef }
-							tooltipPosition="bottom"
+							tooltipPlacement="bottom"
 							renderTooltipContent={ renderTooltipContent }
 							show={ isCurrentlyFocused || showTooltip }
 							style={ offsetStyle }
 							value={ value }
 						/>
 					) }
-				</Wrapper>
+				</div>
 				{ afterIcon && (
-					<AfterIconWrapper>
+					<span className={ styles[ 'after-icon' ] }>
 						<Icon icon={ afterIcon } />
-					</AfterIconWrapper>
+					</span>
 				) }
 				{ hasInputField && (
-					<InputNumber
+					<NumberControl
 						aria-label={ label }
-						className="components-range-control__number"
+						className={ clsx(
+							'components-range-control__number',
+							styles[ 'input-number' ]
+						) }
 						disabled={ disabled }
 						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
@@ -309,33 +343,38 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
-						size={
-							__next40pxDefaultSize
-								? '__unstable-large'
-								: 'default'
-						}
-						__unstableInputWidth={
-							__next40pxDefaultSize ? space( 20 ) : space( 16 )
-						}
+						__unstableInputWidth={ space( 20 ) }
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
 					/>
 				) }
 				{ allowReset && (
-					<ActionRightWrapper>
+					<span className={ styles[ 'action-right' ] }>
 						<Button
 							className="components-range-control__reset"
-							disabled={ disabled || value === undefined }
+							// If the RangeControl itself is disabled, the reset button shouldn't be in the tab sequence.
+							accessibleWhenDisabled={ ! disabled }
+							// The reset button should be disabled if RangeControl itself is disabled,
+							// or if the current `value` is equal to the value that would be currently
+							// assigned when clicking the button.
+							disabled={
+								disabled ||
+								value ===
+									computeResetValue( {
+										resetFallbackValue,
+										initialPosition,
+									} )
+							}
 							variant="secondary"
 							size="small"
 							onClick={ handleOnReset }
 						>
 							{ __( 'Reset' ) }
 						</Button>
-					</ActionRightWrapper>
+					</span>
 				) }
-			</Root>
+			</div>
 		</BaseControl>
 	);
 }
@@ -348,20 +387,22 @@ function UnforwardedRangeControl(
  * import { useState } from '@wordpress/element';
  *
  * const MyRangeControl = () => {
- *   const [ isChecked, setChecked ] = useState( true );
+ *   const [ value, setValue ] = useState();
  *   return (
  *     <RangeControl
  *       help="Please select how transparent you would like this."
- *       initialPosition={50}
+ *       initialPosition={ 50 }
  *       label="Opacity"
- *       max={100}
- *       min={0}
- *       onChange={() => {}}
+ *       max={ 100 }
+ *       min={ 0 }
+ *       value={ value }
+ *       onChange={ setValue }
  *     />
  *   );
  * };
  * ```
  */
 export const RangeControl = forwardRef( UnforwardedRangeControl );
+RangeControl.displayName = 'RangeControl';
 
 export default RangeControl;

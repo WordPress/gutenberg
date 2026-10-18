@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 
@@ -19,13 +16,13 @@ interface UseResizeLabelProps {
 	/** The label value. */
 	label?: string;
 	/** Element to be rendered for resize listening events. */
-	resizeListener: JSX.Element;
+	resizeListener: React.JSX.Element;
 }
 
 interface UseResizeLabelArgs {
 	axis?: Axis;
 	fadeTimeout: number;
-	onResize( data: { width: number | null; height: number | null } ): void;
+	onResize: ( data: { width: number | null; height: number | null } ) => void;
 	position: Position;
 	showPx: boolean;
 }
@@ -82,7 +79,7 @@ export function useResizeLabel( {
 	 * This timeout is used with setMoveX and setMoveY to determine of
 	 * both width and height values have changed at (roughly) the same time.
 	 */
-	const moveTimeoutRef = useRef< number >();
+	const moveTimeoutRef = useRef< number >( undefined );
 
 	const debounceUnsetMoveXY = useCallback( () => {
 		const unsetMoveXY = () => {

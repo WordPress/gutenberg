@@ -3,8 +3,7 @@
  * Gutenberg Coding Standards.
  *
  * @package gutenberg/gutenberg-coding-standards
- * @link    https://github.com/WordPress/gutenberg
- * @license https://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/WordPress/gutenberg/tree/trunk/test/php/gutenberg-coding-standards
  */
 
 namespace GutenbergCS\Gutenberg\Sniffs\CodeAnalysis;
@@ -208,7 +207,6 @@ final class GuardedFunctionAndClassNamesSniff implements Sniff {
 	 * Input data needs to be sanitized.
 	 *
 	 * @param array $values The values being sanitized.
-	 *
 	 * @return array
 	 */
 	private static function sanitize( $values ) {

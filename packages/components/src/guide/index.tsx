@@ -1,18 +1,7 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useState, useEffect, Children, useRef } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Modal from '../modal';
 import Button from '../button';
 import PageControl from './page-control';
@@ -55,6 +44,8 @@ function Guide( {
 	className,
 	contentLabel,
 	finishButtonText = __( 'Finish' ),
+	nextButtonText = __( 'Next' ),
+	previousButtonText = __( 'Previous' ),
 	onFinish,
 	pages = [],
 }: GuideProps ) {
@@ -144,8 +135,9 @@ function Guide( {
 							className="components-guide__back-button"
 							variant="tertiary"
 							onClick={ goBack }
+							__next40pxDefaultSize
 						>
-							{ __( 'Previous' ) }
+							{ previousButtonText }
 						</Button>
 					) }
 					{ canGoForward && (
@@ -153,8 +145,9 @@ function Guide( {
 							className="components-guide__forward-button"
 							variant="primary"
 							onClick={ goForward }
+							__next40pxDefaultSize
 						>
-							{ __( 'Next' ) }
+							{ nextButtonText }
 						</Button>
 					) }
 					{ ! canGoForward && (
@@ -162,6 +155,7 @@ function Guide( {
 							className="components-guide__finish-button"
 							variant="primary"
 							onClick={ onFinish }
+							__next40pxDefaultSize
 						>
 							{ finishButtonText }
 						</Button>

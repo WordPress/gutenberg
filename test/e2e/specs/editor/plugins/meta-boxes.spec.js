@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Meta boxes', () => {
@@ -26,7 +23,7 @@ test.describe( 'Meta boxes', () => {
 		await expect( saveDraft ).toBeDisabled();
 
 		// Add title to enable valid non-empty post save.
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Hello Meta' );
 
@@ -38,13 +35,51 @@ test.describe( 'Meta boxes', () => {
 		await expect( saveDraft ).toBeEnabled();
 	} );
 
+	test( 'should leave undo to the browser inside meta box fields', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.canvas
+			.locator( 'role=document[name="Add default block"i]' )
+			.click();
+		await page.keyboard.type( 'canvas text' );
+
+		// Click near the label, away from the resize handle overlaying the
+		// center of the toggle.
+		await page
+			.getByRole( 'button', { name: 'Meta Boxes', exact: true } )
+			.click( { position: { x: 40, y: 10 } } );
+		const field = page.getByRole( 'textbox', {
+			name: 'Test meta box field',
+		} );
+		await field.click();
+		await page.keyboard.type( 'META' );
+		await expect( field ).toHaveValue( 'META' );
+
+		await pageUtils.pressKeys( 'primary+z', { times: 4 } );
+
+		// The browser undoes the typing within the field. The canvas is
+		// untouched, and redo restores the typing.
+		await expect( field ).toHaveValue( '' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'canvas text' },
+			},
+		] );
+
+		await pageUtils.pressKeys( 'primaryShift+z', { times: 4 } );
+		await expect( field ).toHaveValue( 'META' );
+	} );
+
 	test( 'Should render dynamic blocks when the meta box uses the excerpt for front end rendering', async ( {
 		admin,
 		editor,
 		page,
 	} ) => {
 		// Publish a post so there's something for the latest posts dynamic block to render.
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'A published post' );
 		await page.keyboard.press( 'Enter' );
@@ -53,7 +88,7 @@ test.describe( 'Meta boxes', () => {
 
 		// Publish a post with the latest posts dynamic block.
 		await admin.createNewPost();
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Dynamic block test' );
 		await editor.insertBlock( { name: 'core/latest-posts' } );
@@ -70,10 +105,12 @@ test.describe( 'Meta boxes', () => {
 		editor,
 		page,
 	} ) => {
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'A published post' );
-		await page.getByRole( 'button', { name: 'Add default block' } ).click();
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'Excerpt from content.' );
 
 		const postId = await editor.publishPost();
@@ -89,9 +126,11 @@ test.describe( 'Meta boxes', () => {
 		page,
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Add default block' } ).click();
+		await editor.canvas
+			.getByRole( 'document', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'Excerpt from content.' );
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'A published post' );
 

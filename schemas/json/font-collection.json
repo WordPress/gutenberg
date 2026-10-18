@@ -1,7 +1,6 @@
 {
 	"title": "JSON schema for WordPress Font Collections",
-	"$schema": "http://json-schema.org/draft-04/schema#",
-	"type": "object",
+	"$schema": "http://json-schema.org/draft-07/schema#",
 	"definitions": {
 		"fontFace": {
 			"description": "Font face settings, with added preview property.",
@@ -23,28 +22,19 @@
 				},
 				"fontWeight": {
 					"description": "List of available font weights, separated by a space.",
-					"default": "400",
-					"oneOf": [
-						{
-							"type": "string"
-						},
-						{
-							"type": "integer"
-						}
-					]
+					"oneOf": [ { "type": "string" }, { "type": "integer" } ],
+					"default": "400"
 				},
 				"fontDisplay": {
 					"description": "CSS font-display value.",
 					"type": "string",
-					"default": "fallback",
-					"enum": [ "auto", "block", "fallback", "swap", "optional" ]
+					"enum": [ "auto", "block", "fallback", "swap", "optional" ],
+					"default": "fallback"
 				},
 				"src": {
 					"description": "Paths or URLs to the font files.",
 					"oneOf": [
-						{
-							"type": "string"
-						},
+						{ "type": "string" },
 						{
 							"type": "array",
 							"items": {
@@ -95,14 +85,15 @@
 			"additionalProperties": false
 		}
 	},
+	"type": "object",
 	"properties": {
 		"$schema": {
 			"description": "JSON schema URI for font-collection.json.",
 			"type": "string"
 		},
 		"font_families": {
-			"type": "array",
 			"description": "Array of font families ready to be installed.",
+			"type": "array",
 			"items": {
 				"type": "object",
 				"properties": {
@@ -123,18 +114,14 @@
 								"type": "string"
 							},
 							"preview": {
-								"type": "string",
-								"description": "URL to a preview image of the font family."
+								"description": "URL to a preview image of the font family.",
+								"type": "string"
 							},
 							"fontFace": {
 								"description": "Array of font-face definitions.",
 								"type": "array",
 								"items": {
-									"allOf": [
-										{
-											"$ref": "#/definitions/fontFace"
-										}
-									]
+									"$ref": "#/definitions/fontFace"
 								}
 							}
 						},
@@ -142,8 +129,8 @@
 						"additionalProperties": false
 					},
 					"categories": {
-						"type": "array",
 						"description": "Array of category slugs.",
+						"type": "array",
 						"items": {
 							"type": "string"
 						}

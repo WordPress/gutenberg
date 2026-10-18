@@ -1,11 +1,5 @@
-/**
- * External dependencies
- */
+import { describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
-
-/**
- * Internal dependencies
- */
 import {
 	addBlockVariations,
 	addBlockTypes,
@@ -418,6 +412,22 @@ describe( 'categories', () => {
 		} );
 
 		expect( state ).toEqual( [ { slug: 'wings', title: 'Wings' } ] );
+	} );
+
+	it( 'should ensure, that categories are unique by slug', () => {
+		const original = deepFreeze( [
+			{ slug: 'chicken', title: 'Chicken' },
+		] );
+
+		const state = categories( original, {
+			type: 'SET_CATEGORIES',
+			categories: [ { slug: 'chicken', title: 'Another chicken' } ],
+		} );
+
+		expect( state ).toEqual( [
+			{ slug: 'chicken', title: 'Another chicken' },
+		] );
+		expect( state.length ).toBe( 1 );
 	} );
 
 	it( 'should add the category icon', () => {

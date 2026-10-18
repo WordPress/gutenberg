@@ -32,7 +32,7 @@ add_filter( 'font_dir', 'gutenberg_filter_e2e_font_dir' );
 
 /**
  * Deletes all user installed fonts, associated font files, the fonts directory, and user global styles typography
- * setings for the current theme so that we can test uploading/installing fonts in a clean environment.
+ * settings for the current theme so that we can test uploading/installing fonts in a clean environment.
  */
 function gutenberg_delete_installed_fonts() {
 	$font_family_ids = new WP_Query(
@@ -56,7 +56,7 @@ function gutenberg_delete_installed_fonts() {
 	}
 
 	// Delete any installed fonts from global styles.
-	$global_styles_post_id = WP_Theme_JSON_Resolver::get_user_global_styles_post_id();
+	$global_styles_post_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	$request               = new WP_REST_Request( 'POST', '/wp/v2/global-styles/' . $global_styles_post_id );
 	$request->set_body_params( array( 'settings' => array( 'typography' => array( 'fontFamilies' => array() ) ) ) );
 

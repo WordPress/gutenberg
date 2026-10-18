@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
@@ -15,9 +12,7 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
  */
 type FocusNormalizedButton =
-	| HTMLButtonElement
-	| HTMLLinkElement
-	| HTMLInputElement;
+	HTMLButtonElement | HTMLLinkElement | HTMLInputElement;
 
 /**
  * Returns true if the given element is a button element subject to focus
@@ -71,25 +66,20 @@ type UseFocusOutsideReturn = {
 export default function useFocusOutside(
 	onFocusOutside: ( ( event: React.FocusEvent ) => void ) | undefined
 ): UseFocusOutsideReturn {
-	const currentOnFocusOutside = useRef( onFocusOutside );
+	const currentOnFocusOutsideRef = useRef( onFocusOutside );
 	useEffect( () => {
-		currentOnFocusOutside.current = onFocusOutside;
+		currentOnFocusOutsideRef.current = onFocusOutside;
 	}, [ onFocusOutside ] );
 
-	const preventBlurCheck = useRef( false );
+	const preventBlurCheckRef = useRef( false );
 
-	const blurCheckTimeoutId = useRef< number | undefined >();
+	const blurCheckTimeoutIdRef = useRef< number >( undefined );
 
 	/**
 	 * Cancel a blur check timeout.
 	 */
 	const cancelBlurCheck = useCallback( () => {
-		clearTimeout( blurCheckTimeoutId.current );
-	}, [] );
-
-	// Cancel blur checks on unmount.
-	useEffect( () => {
-		return () => cancelBlurCheck();
+		clearTimeout( blurCheckTimeoutIdRef.current );
 	}, [] );
 
 	// Cancel a blur check if the callback or ref is no longer provided.
@@ -116,9 +106,9 @@ export default function useFocusOutside(
 		const isInteractionEnd = [ 'mouseup', 'touchend' ].includes( type );
 
 		if ( isInteractionEnd ) {
-			preventBlurCheck.current = false;
+			preventBlurCheckRef.current = false;
 		} else if ( isFocusNormalizedButton( target ) ) {
-			preventBlurCheck.current = true;
+			preventBlurCheckRef.current = true;
 		}
 	}, [] );
 
@@ -135,7 +125,7 @@ export default function useFocusOutside(
 		event.persist();
 
 		// Skip blur check if clicking button. See `normalizeButtonFocus`.
-		if ( preventBlurCheck.current ) {
+		if ( preventBlurCheckRef.current ) {
 			return;
 		}
 
@@ -156,7 +146,9 @@ export default function useFocusOutside(
 			return;
 		}
 
-		blurCheckTimeoutId.current = setTimeout( () => {
+		// Keep only the latest blur check so a subsequent focus event can cancel it.
+		clearTimeout( blurCheckTimeoutIdRef.current );
+		blurCheckTimeoutIdRef.current = setTimeout( () => {
 			// If document is not focused then focus should remain
 			// inside the wrapped component and therefore we cancel
 			// this blur event thereby leaving focus in place.
@@ -166,8 +158,8 @@ export default function useFocusOutside(
 				return;
 			}
 
-			if ( 'function' === typeof currentOnFocusOutside.current ) {
-				currentOnFocusOutside.current( event );
+			if ( 'function' === typeof currentOnFocusOutsideRef.current ) {
+				currentOnFocusOutsideRef.current( event );
 			}
 		}, 0 );
 	}, [] );

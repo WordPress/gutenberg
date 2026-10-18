@@ -65,14 +65,15 @@ class WP_Block_Parser_Frame {
 	 * @param WP_Block_Parser_Block $block              Full or partial block.
 	 * @param int                   $token_start        Byte offset into document for start of parse token.
 	 * @param int                   $token_length       Byte length of entire parse token string.
-	 * @param int                   $prev_offset        Byte offset into document for after parse token ends.
-	 * @param int                   $leading_html_start Byte offset into document where leading HTML before token starts.
+	 * @param int|null              $prev_offset        Optional. Byte offset into document for after parse token ends. Default null.
+	 * @param int|null              $leading_html_start Optional. Byte offset into document where leading HTML before token starts.
+	 *                                                  Default null.
 	 */
 	public function __construct( $block, $token_start, $token_length, $prev_offset = null, $leading_html_start = null ) {
 		$this->block              = $block;
 		$this->token_start        = $token_start;
 		$this->token_length       = $token_length;
-		$this->prev_offset        = isset( $prev_offset ) ? $prev_offset : $token_start + $token_length;
+		$this->prev_offset        = $prev_offset ?? $token_start + $token_length;
 		$this->leading_html_start = $leading_html_start;
 	}
 }

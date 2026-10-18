@@ -1,32 +1,27 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
 	component: TextControl,
-	title: 'Components/TextControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/TextControl',
+	id: 'components-textcontrol',
 	argTypes: {
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`InputControl`](?path=/docs/design-system-components-form-inputcontrol--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-inputcontrol--migration-guide).',
+		},
 	},
 };
 export default meta;
@@ -52,7 +47,9 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
 	{}
 );
-Default.args = {};
+Default.args = {
+	placeholder: 'Placeholder',
+};
 
 export const WithLabelAndHelpText: StoryFn< typeof TextControl > =
 	DefaultTemplate.bind( {} );

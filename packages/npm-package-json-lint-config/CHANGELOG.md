@@ -2,6 +2,129 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 5.57.0 (2026-10-07)
+
+## 5.56.0 (2026-09-23)
+
+## 5.55.0 (2026-09-10)
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+
+## 5.52.0 (2026-07-29)
+
+## 5.51.0 (2026-07-14)
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+## 5.36.0 (2025-11-26)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
+## 5.29.0 (2025-08-20)
+
+## 5.28.0 (2025-08-07)
+
+## 5.27.0 (2025-07-23)
+
+## 5.26.0 (2025-06-25)
+
+## 5.25.0 (2025-06-04)
+
+## 5.24.0 (2025-05-22)
+
+## 5.23.0 (2025-05-07)
+
+## 5.22.0 (2025-04-11)
+
+## 5.21.0 (2025-03-27)
+
+## 5.20.0 (2025-03-13)
+
+## 5.19.0 (2025-02-28)
+
+## 5.18.0 (2025-02-12)
+
+## 5.17.0 (2025-01-29)
+
+## 5.16.0 (2025-01-15)
+
+## 5.15.0 (2025-01-02)
+
+## 5.14.0 (2024-12-11)
+
+## 5.13.0 (2024-11-27)
+
+## 5.12.0 (2024-11-16)
+
+### Enhancement
+
+-   Include `exports`, `wpScript`, `wpScriptModuleExports` and `sideEffects` in the `prefer-property-order` rule ([#66239](https://github.com/WordPress/gutenberg/pull/66239)).
+
+## 5.11.0 (2024-10-30)
+
+## 5.10.0 (2024-10-16)
+
+## 5.9.0 (2024-10-03)
+
+## 5.8.0 (2024-09-19)
+
+## 5.7.0 (2024-09-05)
+
+## 5.6.0 (2024-08-21)
+
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
 ## 5.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -46,7 +169,7 @@
 
 ## 4.25.0 (2023-08-16)
 
-### Enhancement
+### Enhancements
 
 -   Updated `npm-package-json-lint` peer dependency to require v6.0.0 [#53636](https://github.com/WordPress/gutenberg/pull/53636)
 
@@ -96,13 +219,13 @@
 
 ## 4.2.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with native functionality ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
 ## 4.0.0 (2021-01-21)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -112,13 +235,13 @@
 
 ## 3.0.0 (2020-04-15)
 
-### Breaking Change
+### Breaking Changes
 
 -   Add `types` to the order of preferred properties. ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 
 ## 2.0.0 (2019-06-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Added `type` and `react-native` to the order of preferred properties.
 
@@ -130,13 +253,13 @@
 
 ## 1.1.3 (2018-09-05)
 
-### Bug Fix
+### Bug Fixes
 
 -   Resolves an issue where npm package lint script did not work in Windows environments ([#9321](https://github.com/WordPress/gutenberg/pull/9321)
 
 ## 1.1.0 (2018-07-12)
 
-### New Feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
@@ -146,6 +269,6 @@
 
 ## 1.0.0 (2018-05-18)
 
-### New Feature
+### New Features
 
 -   Initial release `@wordpress/npm-package-json-lint-config` ([#119](https://github.com/WordPress/packages/pull/119))

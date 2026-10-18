@@ -4,7 +4,12 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 
 ## Unreleased
 
+-   `wp.editor.registerEntityField` and `wp.editor.unregisterEntityField` are deprecated since Gutenberg 24.3 and have no effect: the fields of an entity are registered on the server. Register and unregister fields in PHP instead, with `wp_register_entity_fields()` and `wp_unregister_entity_fields()` on the `wp_entity_fields_api_init` action, and a script module for the parts PHP cannot serialize (`render`, `Edit`, `getElements`…). Both functions remain exported, so existing calls keep working and only log a deprecation warning.
 -   `wp.blocks.isValidBlockContent` has been removed. Please use `wp.blocks.validateBlock` instead.
+
+## 24.5
+
+-   `wp.editor.registerEntityAction` and `wp.editor.unregisterEntityAction`, deprecated since 24.3 and available only in the Gutenberg plugin, have no effect: every action of an entity is registered on the server. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for the parts PHP cannot serialize (`callback`, `RenderModal`, `isEligible`…).
 
 ## 11.0.0
 
@@ -183,7 +188,7 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 
 ## 3.8.0
 
--   `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://reactjs.org/docs/context.html.
+-   `wp.components.withContext` has been removed. Please use `wp.element.createContext` instead. See: https://react.dev/reference/react/createContext.
 -   `wp.coreBlocks.registerCoreBlocks` has been removed. Please use `wp.blockLibrary.registerCoreBlocks` instead.
 -   `wp.editor.DocumentTitle` component has been removed.
 -   `getDocumentTitle` selector (`core/editor`) has been removed.

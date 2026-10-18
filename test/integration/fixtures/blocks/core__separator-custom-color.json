@@ -4,6 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"opacity": "alpha-channel",
+			"tagName": "hr",
 			"style": {
 				"color": {
 					"background": "#5da54c"

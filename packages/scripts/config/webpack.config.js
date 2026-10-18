@@ -1,75 +1,45 @@
-/**
- * External dependencies
- */
+const { basename, dirname, relative, resolve, sep } = require( 'path' );
+const { realpathSync } = require( 'fs' );
+const { exec } = require( 'child_process' );
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-const { CleanWebpackPlugin } = require( 'clean-webpack-plugin' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
+const browserslistConfig = require( '@wordpress/browserslist-config' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const { basename, dirname, resolve } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
-const RtlCssPlugin = require( 'rtlcss-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
-
-/**
- * WordPress dependencies
- */
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
-
-/**
- * Internal dependencies
- */
+const PhpFilePathsPlugin = require( '../plugins/php-file-paths-plugin' );
+const RtlCssPlugin = require( '../plugins/rtlcss-webpack-plugin' );
 const {
-	fromConfigRoot,
 	hasBabelConfig,
 	hasArgInCLI,
 	hasCssnanoConfig,
 	hasPostCSSConfig,
-	getWordPressSrcDirectory,
+	getProjectSourcePath,
 	getWebpackEntryPoints,
-	getRenderPropPaths,
 	getAsBooleanFromENV,
 	getBlockJsonModuleFields,
 	getBlockJsonScriptFields,
 	fromProjectRoot,
+	fromScriptsRoot,
 } = require( '../utils' );
 
 const isProduction = process.env.NODE_ENV === 'production';
 const mode = isProduction ? 'production' : 'development';
 let target = 'browserslist';
 if ( ! browserslist.findConfig( '.' ) ) {
-	target += ':' + fromConfigRoot( '.browserslistrc' );
+	// Pass queries, not a config `extends`, which resolves from the consumer's cwd.
+	target += ':' + browserslistConfig.join( ', ' );
 }
 const hasReactFastRefresh = hasArgInCLI( '--hot' ) && ! isProduction;
+const hasBlocksManifest = getAsBooleanFromENV( 'WP_BLOCKS_MANIFEST' );
 const hasExperimentalModulesFlag = getAsBooleanFromENV(
 	'WP_EXPERIMENTAL_MODULES'
 );
-
-/**
- * The plugin recomputes the render paths once on each compilation. It is necessary to avoid repeating processing
- * when filtering every discovered PHP file in the source folder. This is the most performant way to ensure that
- * changes in `block.json` files are picked up in watch mode.
- */
-class RenderPathsPlugin {
-	/**
-	 * Paths with the `render` props included in `block.json` files.
-	 *
-	 * @type {string[]}
-	 */
-	static renderPaths;
-
-	apply( compiler ) {
-		const pluginName = this.constructor.name;
-
-		compiler.hooks.thisCompilation.tap( pluginName, () => {
-			this.constructor.renderPaths = getRenderPropPaths();
-		} );
-	}
-}
 
 const cssLoaders = [
 	{
@@ -111,7 +81,7 @@ const cssLoaders = [
 										],
 									} ),
 								} ),
-						  ]
+							]
 						: postcssPlugins,
 				},
 			} ),
@@ -125,17 +95,36 @@ const baseConfig = {
 	target,
 	output: {
 		filename: '[name].js',
+		chunkFilename: '[name].js?ver=[chunkhash]',
 		path: resolve( process.cwd(), 'build' ),
+		// Clean output directory before emit, except when modules flag is enabled
+		// to prevent the 2 compilations from cleaning each other's output
+		...( ! hasExperimentalModulesFlag && {
+			clean: {
+				// Keep fonts and images directories
+				keep: /^(fonts|images)\//,
+			},
+		} ),
 	},
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
 		},
-		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
+		extensions: [
+			'.jsx',
+			'.mjs',
+			'.cjs',
+			'.ts',
+			'.tsx',
+			'.mts',
+			'.cts',
+			'...',
+		],
 	},
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
 		concatenateModules: isProduction && ! process.env.WP_BUNDLE_ANALYZER,
+		runtimeChunk: hasReactFastRefresh && 'single',
 		splitChunks: {
 			cacheGroups: {
 				style: {
@@ -174,7 +163,7 @@ const baseConfig = {
 	module: {
 		rules: [
 			{
-				test: /\.m?(j|t)sx?$/,
+				test: /\.[cm]?(j|t)sx?$/,
 				exclude: /node_modules/,
 				use: [
 					{
@@ -192,15 +181,11 @@ const baseConfig = {
 								babelrc: false,
 								configFile: false,
 								presets: [
-									require.resolve(
-										'@wordpress/babel-preset-default'
-									),
+									require.resolve( '@wordpress/babel-preset-default' ),
 								],
 								plugins: [
 									hasReactFastRefresh &&
-										require.resolve(
-											'react-refresh/babel'
-										),
+										require.resolve( 'react-refresh/babel' ),
 								].filter( Boolean ),
 							} ),
 						},
@@ -223,6 +208,9 @@ const baseConfig = {
 						loader: require.resolve( 'sass-loader' ),
 						options: {
 							sourceMap: ! isProduction,
+							sassOptions: {
+								charset: false,
+							},
 						},
 					},
 				],
@@ -230,7 +218,10 @@ const baseConfig = {
 			{
 				test: /\.svg$/,
 				issuer: /\.(j|t)sx?$/,
-				use: [ '@svgr/webpack', 'url-loader' ],
+				use: [
+					require.resolve( '@svgr/webpack' ),
+					require.resolve( 'url-loader' ),
+				],
 				type: 'javascript/auto',
 			},
 			{
@@ -273,11 +264,31 @@ if ( ! isProduction ) {
 // Add source-map-loader if devtool is set, whether in dev mode or not.
 if ( baseConfig.devtool ) {
 	baseConfig.module.rules.unshift( {
-		test: /\.(j|t)sx?$/,
+		test: /\.[cm]?(j|t)sx?$/,
 		exclude: [ /node_modules/ ],
 		use: require.resolve( 'source-map-loader' ),
 		enforce: 'pre',
 	} );
+}
+
+/**
+ * Build blocks manifest.
+ */
+class BlocksManifestPlugin {
+	/**
+	 * Apply the plugin.
+	 *
+	 * @param {webpack.Compiler} compiler The compiler instance.
+	 */
+	apply( compiler ) {
+		compiler.hooks.afterEmit.tap( 'BlocksManifest', () => {
+			exec(
+				`node "${ fromScriptsRoot(
+					'build-blocks-manifest'
+				) }" --input="${ compiler.options.output.path }"`
+			);
+		} );
+	}
 }
 
 /** @type {webpack.Configuration} */
@@ -295,14 +306,16 @@ const scriptConfig = {
 				allowedHosts: 'auto',
 				host: 'localhost',
 				port: 8887,
-				proxy: {
-					'/build': {
+				proxy: [
+					{
+						context: [ '/build' ],
+						target: 'http://localhost:8887',
 						pathRewrite: {
 							'^/build': '',
 						},
 					},
-				},
-		  },
+				],
+			},
 
 	plugins: [
 		new webpack.DefinePlugin( {
@@ -311,22 +324,15 @@ const scriptConfig = {
 			SCRIPT_DEBUG: JSON.stringify( ! isProduction ),
 		} ),
 
-		// If we run a modules build, the 2 compilations can "clean" each other's output
-		// Prevent the cleaning from happening
-		! hasExperimentalModulesFlag &&
-			new CleanWebpackPlugin( {
-				cleanAfterEveryBuildPatterns: [ '!fonts/**', '!images/**' ],
-				// Prevent it from deleting webpack assets during builds that have
-				// multiple configurations returned in the webpack config.
-				cleanStaleWebpackAssets: false,
-			} ),
-
-		new RenderPathsPlugin(),
+		new PhpFilePathsPlugin( {
+			context: getProjectSourcePath(),
+			props: [ 'render', 'variations' ],
+		} ),
 		new CopyWebpackPlugin( {
 			patterns: [
 				{
 					from: '**/block.json',
-					context: getWordPressSrcDirectory(),
+					context: getProjectSourcePath(),
 					noErrorOnMissing: true,
 					transform( content, absoluteFrom ) {
 						const convertExtension = ( path ) => {
@@ -358,6 +364,32 @@ const scriptConfig = {
 								}
 							} );
 
+							if ( hasReactFastRefresh ) {
+								// Prepends the file reference to the shared runtime chunk to every script type defined for the block.
+								const runtimePath = relative(
+									dirname( absoluteFrom ),
+									fromProjectRoot(
+										getProjectSourcePath() +
+											sep +
+											'runtime.js'
+									)
+								);
+								const fields =
+									getBlockJsonScriptFields( blockJson );
+								for ( const [ fieldName ] of Object.entries(
+									fields
+								) ) {
+									blockJson[ fieldName ] = [
+										`file:${ runtimePath }`,
+										...( Array.isArray(
+											blockJson[ fieldName ]
+										)
+											? blockJson[ fieldName ]
+											: [ blockJson[ fieldName ] ] ),
+									];
+								}
+							}
+
 							return JSON.stringify( blockJson, null, 2 );
 						}
 
@@ -366,12 +398,12 @@ const scriptConfig = {
 				},
 				{
 					from: '**/*.php',
-					context: getWordPressSrcDirectory(),
+					context: getProjectSourcePath(),
 					noErrorOnMissing: true,
 					filter: ( filepath ) => {
 						return (
 							process.env.WP_COPY_PHP_FILES_TO_DIST ||
-							RenderPathsPlugin.renderPaths.includes(
+							PhpFilePathsPlugin.paths.includes(
 								realpathSync( filepath ).replace( /\\/g, '/' )
 							)
 						);
@@ -382,12 +414,14 @@ const scriptConfig = {
 		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
-		// RtlCssPlugin to generate RTL CSS files.
-		new RtlCssPlugin( {
-			filename: `[name]-rtl.css`,
+		// MiniCSSExtractPlugin to extract the CSS that gets imported into JavaScript.
+		new MiniCSSExtractPlugin( {
+			filename: '[name].css',
 		} ),
+		// RtlCssPlugin to generate RTL CSS files.
+		new RtlCssPlugin(),
+		// Generate blocks manifest after changes.
+		hasBlocksManifest && new BlocksManifestPlugin(),
 		// React Fast Refresh.
 		hasReactFastRefresh && new ReactRefreshWebpackPlugin(),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
@@ -406,7 +440,7 @@ if ( hasExperimentalModulesFlag ) {
 			/** @type {ReadonlyArray<string>} */
 			this.blockJsonFiles = glob( '**/block.json', {
 				absolute: true,
-				cwd: fromProjectRoot( getWordPressSrcDirectory() ),
+				cwd: fromProjectRoot( getProjectSourcePath() ),
 			} );
 		}
 
@@ -463,7 +497,7 @@ if ( hasExperimentalModulesFlag ) {
 			// The WP_BUNDLE_ANALYZER global variable enables a utility that represents
 			// bundle content as a convenient interactive zoomable treemap.
 			process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-			// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
+			// MiniCSSExtractPlugin to extract the CSS that gets imported into JavaScript.
 			new MiniCSSExtractPlugin( { filename: '[name].css' } ),
 			// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 			// generated, and the default externals set.

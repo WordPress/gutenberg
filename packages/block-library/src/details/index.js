@@ -1,25 +1,29 @@
-/**
- * WordPress dependencies
- */
 import { details as icon } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
+import { __, sprintf } from '@wordpress/i18n';
 import initBlock from '../utils/init-block';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
+import transforms from './transforms';
 
 const { name } = metadata;
 export { metadata, name };
 
+const TEMPLATE = [
+	[
+		'core/paragraph',
+		{
+			placeholder: __( 'Type / to add a hidden block' ),
+		},
+	],
+];
+
 export const settings = {
 	icon,
+	template: TEMPLATE,
 	example: {
 		attributes: {
-			summary: 'La Mancha',
+			summary: __( 'La Mancha' ),
 			showContent: true,
 		},
 		innerBlocks: [
@@ -33,8 +37,35 @@ export const settings = {
 			},
 		],
 	},
+	__experimentalLabel( attributes, { context } ) {
+		const { summary } = attributes;
+
+		const customName = attributes?.metadata?.name;
+		const hasSummary = summary?.trim().length > 0;
+
+		// In the list view, use the block's summary as the label.
+		// If the summary is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || hasSummary ) ) {
+			return customName || summary;
+		}
+
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+
+		if ( context === 'accessibility' ) {
+			return ! hasSummary
+				? __( 'Details. Empty.' )
+				: sprintf(
+						/* translators: %s: accessibility text; summary title. */
+						__( 'Details. %s' ),
+						summary
+					);
+		}
+	},
 	save,
 	edit,
+	transforms,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

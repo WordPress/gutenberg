@@ -1,8 +1,7 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file index.js should match snapshot 1`] = `
+exports[`ReadableJsAssetsWebpackPlugin > should produce the expected output > Asset file index.js should match snapshot 1`] = `
 "/******/ (() => { // webpackBootstrap
-var __webpack_exports__ = {};
 function notMinified() {
 	// eslint-disable-next-line no-console
 	console.log( 'hello' );
@@ -13,11 +12,10 @@ notMinified();
 ;"
 `;
 
-exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file index.min.js should match snapshot 1`] = `"console.log("hello");"`;
+exports[`ReadableJsAssetsWebpackPlugin > should produce the expected output > Asset file index.min.js should match snapshot 1`] = `"console.log("hello");"`;
 
-exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file view.js should match snapshot 1`] = `
+exports[`ReadableJsAssetsWebpackPlugin > should produce the expected output > Asset file view.js should match snapshot 1`] = `
 "/******/ (() => { // webpackBootstrap
-var __webpack_exports__ = {};
 function notMinified() {
 	// eslint-disable-next-line no-console
 	console.log( 'hello' );
@@ -28,4 +26,4 @@ notMinified();
 ;"
 `;
 
-exports[`ReadableJsAssetsWebpackPlugin should produce the expected output: Asset file view.min.js should match snapshot 1`] = `"console.log("hello");"`;
+exports[`ReadableJsAssetsWebpackPlugin > should produce the expected output > Asset file view.min.js should match snapshot 1`] = `"console.log("hello");"`;

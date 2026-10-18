@@ -1,10 +1,35 @@
-/**
- * WordPress dependencies
- */
-import { Platform } from '@wordpress/element';
-
 export function defaultColumnsNumber( imageCount ) {
 	return imageCount ? Math.min( 3, imageCount ) : 3;
+}
+
+/**
+ * Whether a value is a plain object (and not an array).
+ *
+ * @param {*} value The value to check.
+ * @return {boolean} Whether the value is a plain object.
+ */
+export function isObject( value ) {
+	return !! value && typeof value === 'object' && ! Array.isArray( value );
+}
+
+/**
+ * Whether the Gallery should use its default Flex layout behavior.
+ *
+ * Gallery blocks created before layout variations existed do not have an
+ * explicit layout attribute. Treat missing and malformed layout data as Flex
+ * so existing galleries keep their current appearance.
+ *
+ * @param {*} layout The Gallery layout attribute.
+ * @return {boolean} Whether the Gallery uses its Flex layout.
+ */
+export function isGalleryFlexLayout( layout ) {
+	const layoutType = isObject( layout ) ? layout.type : undefined;
+
+	return (
+		typeof layoutType !== 'string' ||
+		layoutType === '' ||
+		layoutType === 'flex'
+	);
 }
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
@@ -27,26 +52,3 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 	}
 	return imageProps;
 };
-
-function getGalleryBlockV2Enabled() {
-	// We want to fail early here, at least during beta testing phase, to ensure
-	// there aren't instances where undefined values cause false negatives.
-	if ( ! window.wp || typeof window.wp.galleryBlockV2Enabled !== 'boolean' ) {
-		throw 'window.wp.galleryBlockV2Enabled is not defined';
-	}
-	return window.wp.galleryBlockV2Enabled;
-}
-
-/**
- * The new gallery block format is not compatible with the use_BalanceTags option
- * in WP versions <= 5.8 https://core.trac.wordpress.org/ticket/54130. The
- * window.wp.galleryBlockV2Enabled flag is set in lib/compat.php. This method
- * can be removed when minimum supported WP version >=5.9.
- */
-export function isGalleryV2Enabled() {
-	if ( Platform.isNative ) {
-		return getGalleryBlockV2Enabled();
-	}
-
-	return true;
-}

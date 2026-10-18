@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-
-/**
- * Internal dependencies
- */
 import { postType } from '.';
 import { NAVIGATION_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
@@ -42,7 +35,7 @@ function useDeleteNavigationMenu() {
 					type: 'snackbar',
 				}
 			);
-			history.push( { postType: 'wp_navigation' } );
+			history.navigate( '/navigation' );
 		} catch ( error ) {
 			createErrorNotice(
 				sprintf(
@@ -150,7 +143,7 @@ function useDuplicateNavigationMenu() {
 				{
 					title: sprintf(
 						/* translators: %s: Navigation menu title */
-						__( '%s (Copy)' ),
+						_x( '%s (Copy)', 'navigation menu' ),
 						menuTitle
 					),
 					content: navigationMenu?.content?.raw,
@@ -165,7 +158,7 @@ function useDuplicateNavigationMenu() {
 				createSuccessNotice( __( 'Duplicated Navigation Menu' ), {
 					type: 'snackbar',
 				} );
-				history.push( { postType, postId: savedRecord.id } );
+				history.navigate( `/wp_navigation/${ savedRecord.id }` );
 			}
 		} catch ( error ) {
 			createErrorNotice(

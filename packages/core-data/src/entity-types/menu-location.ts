@@ -1,12 +1,9 @@
-/**
- * Internal dependencies
- */
 import type { Context, OmitNevers } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
+		/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 		export interface MenuLocation< C extends Context > {
 			/**
 			 * The name of the menu location.

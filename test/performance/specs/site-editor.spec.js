@@ -1,13 +1,5 @@
-/* eslint-disable playwright/no-conditional-in-test, playwright/expect-expect */
-
-/**
- * WordPress dependencies
- */
+/* eslint-disable playwright/expect-expect */
 import { test, Metrics } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * Internal dependencies
- */
 import { PerfUtils } from '../fixtures';
 
 // See https://github.com/WordPress/gutenberg/issues/51383#issuecomment-1613460429
@@ -29,6 +21,7 @@ const results = {
 	listViewOpen: [],
 	navigate: [],
 	loadPatterns: [],
+	loadPages: [],
 };
 
 test.describe( 'Site Editor Performance', () => {
@@ -61,11 +54,23 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Loading', () => {
 		let draftId = null;
 
-		test( 'Setup the test page', async ( { admin, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.loadBlocksForLargePost();
+		test( 'Setup the test page', async ( { requestUtils, perfUtils } ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const page = await requestUtils.createPage( {
+				content,
+				status: 'draft',
+			} );
 
-			draftId = await perfUtils.saveDraft();
+			draftId = page.id;
+
+			// Set preferences via REST so that welcomeGuide is reliably
+			// persisted before the timed iterations start.
+			await requestUtils.setPreferences( 'core/edit-site', {
+				welcomeGuide: false,
+				welcomeGuideStyles: false,
+				welcomeGuidePage: false,
+				welcomeGuideTemplate: false,
+			} );
 		} );
 
 		const samples = 10;
@@ -77,19 +82,30 @@ test.describe( 'Site Editor Performance', () => {
 				perfUtils,
 				metrics,
 			} ) => {
+				// Start tracing before navigating so the page load is captured.
+				await metrics.startTracing();
+
 				// Go to the test draft.
-				await admin.visitSiteEditor( {
-					postId: draftId,
-					postType: 'page',
-					canvas: 'edit',
-				} );
+				await admin.page.goto(
+					'wp-admin/site-editor.php?postId=' +
+						draftId +
+						'&postType=page&canvas=edit'
+				);
 
 				// Wait for the first block.
 				const canvas = await perfUtils.getCanvas();
 				await canvas.locator( '.wp-block' ).first().waitFor();
 
-				// Get the durations.
+				// Capture timing metrics before `stopTracing()`, which
+				// blocks for the trace download/parse and would otherwise
+				// inflate `timeSinceResponseEnd` by seconds.
 				const loadingDurations = await metrics.getLoadingDurations();
+
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) &&
+						'site-editor-first-block'
+				);
 
 				// Save the results.
 				if ( i > throwaway ) {
@@ -119,12 +135,15 @@ test.describe( 'Site Editor Performance', () => {
 	test.describe( 'Typing', () => {
 		let draftId = null;
 
-		test( 'Setup the test post', async ( { admin, editor, perfUtils } ) => {
-			await admin.createNewPost( { postType: 'page' } );
-			await perfUtils.loadBlocksForLargePost();
-			await editor.insertBlock( { name: 'core/paragraph' } );
+		test( 'Setup the test post', async ( { requestUtils, perfUtils } ) => {
+			const content = await perfUtils.loadContentForLargePost();
+			const page = await requestUtils.createPage( {
+				content:
+					content + `<!-- wp:paragraph --><!-- /wp:paragraph -->`,
+				status: 'draft',
+			} );
 
-			draftId = await perfUtils.saveDraft();
+			draftId = page.id;
 		} );
 
 		test( 'Run the test', async ( { admin, perfUtils, metrics, page } ) => {
@@ -153,10 +172,6 @@ test.describe( 'Site Editor Performance', () => {
 				await toggleSidebarButton.click();
 			}
 
-			await canvas
-				.getByRole( 'document', { name: /Block:( Post)? Content/ } )
-				.click();
-
 			const paragraph = canvas.getByRole( 'document', {
 				name: /Empty block/i,
 			} );
@@ -180,7 +195,7 @@ test.describe( 'Site Editor Performance', () => {
 			} );
 
 			// Stop tracing.
-			await metrics.stopTracing();
+			await metrics.stopTracing( 'site-editor-type' );
 
 			// Get the durations.
 			const [ keyDownEvents, keyPressEvents, keyUpEvents ] =
@@ -216,30 +231,28 @@ test.describe( 'Site Editor Performance', () => {
 					path: '/wp_template',
 				} );
 
-				// The Templates index page has changed, so we need to know which UI is in use in the branch.
-				// We do so by checking the presence of the dataviews component.
-				// If it's there, switch to the list layout before running the test.
-				// See https://github.com/WordPress/gutenberg/pull/59792
-				const isDataViewsUI = await page
-					.getByRole( 'button', { name: 'View options' } )
-					.isVisible();
-				if ( isDataViewsUI ) {
-					await page
-						.getByRole( 'button', { name: 'View options' } )
-						.click();
-					await page
-						.getByRole( 'menuitem' )
-						.filter( { has: page.getByText( 'Layout' ) } )
-						.click();
-					await page
-						.getByRole( 'menuitemradio' )
-						.filter( { has: page.getByText( 'List' ) } )
-						.click();
-				}
+				// Switch to the list layout before running the test.
+				await page.getByRole( 'button', { name: 'Layout' } ).click();
+				await page
+					.getByRole( 'menuitemradio' )
+					.filter( { has: page.getByText( 'List' ) } )
+					.click();
+
+				// Wait for the grid to be really visible.
+				await page.getByRole( 'grid' ).waitFor();
+
+				// List view shows the editor canvas, wait for it to be ready so
+				// that the loading doesn't contaminate the navigation test.
+				await admin.waitForSiteEditor();
 
 				await metrics.startTracing();
-				await page.getByText( 'Single Posts', { exact: true } ).click();
-				await metrics.stopTracing();
+				await page
+					.getByRole( 'button', { name: 'Single Posts' } )
+					.click();
+				// Stop tracing. Save just one representative sample.
+				await metrics.stopTracing(
+					i === Math.floor( iterations / 2 ) && 'site-editor-navigate'
+				);
 
 				// Get the durations.
 				const [ mouseClickEvents ] = metrics.getClickEventDurations();
@@ -288,12 +301,33 @@ test.describe( 'Site Editor Performance', () => {
 			for ( let i = 1; i <= samples; i++ ) {
 				// We want to start from a fresh state each time, without
 				// queries or patterns already cached.
-				await admin.visitSiteEditor( {
-					postId: 'twentytwentyfour//home',
-					postType: 'wp_template',
-					canvas: 'edit',
-				} );
+				await admin.visitSiteEditor( { canvas: 'edit' } );
 				await editor.openDocumentSettingsSidebar();
+
+				/*
+				 * https://github.com/WordPress/gutenberg/pull/55091 updated the HTML by
+				 * removing the replace template button in sidebar-edit-mode/template-panel/replace-template-button.js
+				 * with a "transform into" list. https://github.com/WordPress/gutenberg/pull/59259 made these tests
+				 * compatible with the new UI, however, the performance tests compare previous versions of the UI.
+				 *
+				 * The following code is a workaround to test the performance of the new UI.
+				 * `actionsButtonElement` is used to check if the old UI is present.
+				 * If there is a Replace template button (old UI), click it, otherwise, click the "transform into" button.
+				 * Once the performance tests are updated to compare compatible versions this code can be removed.
+				 */
+				const isActionsButtonVisible = await page
+					.locator(
+						'.edit-site-template-card__actions button[aria-label="Actions"]'
+					)
+					.isVisible();
+
+				if ( isActionsButtonVisible ) {
+					await page
+						.getByRole( 'button', {
+							name: 'Actions',
+						} )
+						.click();
+				}
 
 				// Wait for the browser to be idle before starting the monitoring.
 				// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
@@ -301,16 +335,22 @@ test.describe( 'Site Editor Performance', () => {
 
 				const startTime = performance.now();
 
-				await page
-					.getByRole( 'button', { name: 'Design' } )
-					.or(
-						// Locator for backward compatibility with the old UI.
-						// The label was updated in https://github.com/WordPress/gutenberg/pull/62161.
-						page.getByRole( 'button', {
-							name: 'Transform into:',
-						} )
-					)
-					.click();
+				if ( isActionsButtonVisible ) {
+					await page
+						.getByRole( 'menuitem', { name: 'Replace template' } )
+						.click();
+				} else {
+					await page
+						.getByRole( 'button', { name: 'Design' } )
+						.or(
+							// Locator for backward compatibility with the old UI.
+							// The label was updated in https://github.com/WordPress/gutenberg/pull/62161.
+							page.getByRole( 'button', {
+								name: 'Transform into:',
+							} )
+						)
+						.click();
+				}
 
 				const patterns = [
 					'Blogging home template',
@@ -321,13 +361,20 @@ test.describe( 'Site Editor Performance', () => {
 
 				await Promise.all(
 					patterns.map( async ( pattern ) => {
+						const option = page.getByRole( 'option', {
+							name: pattern,
+							exact: true,
+						} );
+
+						// The pattern previews are rendered lazily: each
+						// preview's `Editor canvas` iframe is only created once
+						// its list item is scrolled into view. Without this the
+						// off-screen previews never render and the wait below
+						// times out.
+						await option.scrollIntoViewIfNeeded();
+
 						const canvas = await perfUtils.getCanvas(
-							page
-								.getByRole( 'option', {
-									name: pattern,
-									exact: true,
-								} )
-								.getByTitle( 'Editor canvas' )
+							option.getByTitle( 'Editor canvas' )
 						);
 
 						// Wait until the first block is rendered AND all
@@ -352,6 +399,74 @@ test.describe( 'Site Editor Performance', () => {
 			}
 		} );
 	} );
+
+	test.describe( 'Loading Pages', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.activateTheme( 'twentytwentyfour' );
+		} );
+
+		const perPage = 9;
+
+		test( 'Run the test', async ( { page, admin, requestUtils } ) => {
+			await Promise.all(
+				Array.from( { length: perPage }, async ( el, index ) => {
+					const { id } = await requestUtils.createPage( {
+						status: 'publish',
+						title: `Page (${ index })`,
+						content: `
+<!-- wp:heading -->
+<p>Hello</p>
+<!-- /wp:heading -->
+<!-- wp:paragraph -->
+<p>Post content</p>
+<!-- /wp:paragraph -->`,
+					} );
+
+					return id;
+				} )
+			);
+
+			await admin.visitSiteEditor();
+			await page.getByRole( 'button', { name: 'Pages' } ).click();
+
+			// Check if we're dealing with the old URL structure.
+			const path = new URL( page.url() ).searchParams.get( 'path' );
+
+			const samples = 10;
+			for ( let i = 1; i <= samples; i++ ) {
+				// Start from the trash view, then navigate to all pages, so we
+				// test item loading rather than site editor load as a whole.
+				// For some reason `visiSiteEditor` does not work with these
+				// parameters.
+				await admin.visitAdminPage(
+					path
+						? 'site-editor.php?path=%2Fpage&layout=table&activeView=trash'
+						: 'site-editor.php?postType=page&layout=table&activeView=trash'
+				);
+
+				const startTime = performance.now();
+
+				await page.getByRole( 'button', { name: 'All Pages' } ).click();
+
+				// Wait for all pages to be rendered.
+				await Promise.all(
+					Array.from( { length: perPage }, async ( el, index ) => {
+						return await page
+							.getByLabel( `Page (${ index })` )
+							.waitFor( { state: 'attached' } );
+					} )
+				);
+
+				const endTime = performance.now();
+
+				results.loadPages.push( endTime - startTime );
+			}
+		} );
+	} );
 } );
 
-/* eslint-enable playwright/no-conditional-in-test, playwright/expect-expect */
+/* eslint-enable playwright/expect-expect */

@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // Provide special styling for the placeholder.
 // @todo this particular minimal style of placeholder could be componentized further.
 .wp-block-post-featured-image {
@@ -100,9 +103,9 @@
 
 	// When the Post Featured Image block is linked,
 	// it's wrapped with a disabled <a /> tag.
-	// Restore cursor style so it doesn't appear 'clickable'.
+	// Ensure that the link is not clickable.
 	> a {
-		cursor: default;
+		pointer-events: none;
 	}
 
 	// When the Post Featured Image block is linked,

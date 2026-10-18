@@ -42,7 +42,7 @@ function MyApp() {
 
 ```php
 // myplugin.php
-// Example of script registration dependending on the "components" and "element packages.
+// Example of script registration depending on the "components" and "element packages.
 wp_register_script( 'myscript', 'pathtomyscript.js', array ('wp-components', "react" ) );
 ```
 
@@ -78,7 +78,7 @@ These are packages used in development mode to help developers with daily tasks 
 
 ## Editor packages
 
-![Post Editor Modules Architecture](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/explanations/architecture/assets/modules.png)
+![Post Editor Modules Architecture](https://developer.wordpress.org/files/2026/06/modules.png)
 
 ### What's the difference between the different editor packages? What's the purpose of each package?
 

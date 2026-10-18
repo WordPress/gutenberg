@@ -2,6 +2,169 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Remove refs from `KeyboardShortcutContext` and `InputEventContext` context values and pass `Set`s directly. Also affects the `shortcutsListener` and `inputEventsListener` parameters and replaces the `EventListenersProps` type with `EventCallbacksSet` ([#84545](https://github.com/WordPress/gutenberg/pull/84545)).
+
+### Enhancements
+
+-   Type `start` and `end` of `RichTextValue` as optional, since a value has no selection until one is set, and document the return types of the public functions ([#84610](https://github.com/WordPress/gutenberg/pull/84610)).
+
+### Bug Fixes
+
+-   `getTextContent`: Remove every object replacement character from the returned text, not just the first one ([#81526](https://github.com/WordPress/gutenberg/pull/81526)).
+-   Fix `replace` for a caret at `0` and patterns with named groups, `insert` and `split` without a selection, `registerFormatType` with `keywords: undefined`, `RichTextShortcut` and `RichTextInputEvent` outside a rich text field, and a `null` format selector result ([#84610](https://github.com/WordPress/gutenberg/pull/84610)).
+-   `useRichText`: Keep the formats at the caret for text typed after a paste or undo, instead of splitting the format around it ([#84303](https://github.com/WordPress/gutenberg/pull/84303)).
+
+### Internal
+
+-   Refactor to TypeScript ([#84324](https://github.com/WordPress/gutenberg/pull/84324), [#84365](https://github.com/WordPress/gutenberg/pull/84365), [#84378](https://github.com/WordPress/gutenberg/pull/84378)).
+
+## 7.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 7.56.0 (2026-09-23)
+
+### Bug Fixes
+
+-   `useRichText`: Show the boundary of the active format or object when the editing host around the element has focus, not only when the element itself does ([#83385](https://github.com/WordPress/gutenberg/pull/83385)).
+-   `useRichText`: apply every selection change from props, including the second of two consecutive ones, and only while the element or an editing host around it has focus. The hook no longer moves focus to the element; the consumer decides where focus goes ([#82581](https://github.com/WordPress/gutenberg/pull/82581)).
+
+## 7.55.0 (2026-09-10)
+
+### New Features
+
+-   Export the `RichTextFormat` type, describing a single format applied to a range of characters within a `RichTextValue` ([#79486](https://github.com/WordPress/gutenberg/pull/79486)).
+
+### Bug Fixes
+
+-   Restore a rich text element's `contenteditable` attribute when a pointer interaction ends with `pointercancel`, so that swipe scrolling on touch devices no longer leaves text blocks uneditable ([#82598](https://github.com/WordPress/gutenberg/pull/82598)).
+
+## 7.54.0 (2026-08-26)
+
+## 7.53.0 (2026-08-12)
+
+
+## 7.52.0 (2026-07-29)
+
+## 7.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+### Internal
+
+-   Expose `shortcutsListener` and `inputEventsListener` helpers as private APIs, so rich text fields outside `@wordpress/block-editor` can dispatch the keyboard shortcut and input event callbacks format types register. [#78471](https://github.com/WordPress/gutenberg/pull/78471)
+
+## 7.50.0 (2026-07-01)
+
+## 7.49.0 (2026-06-24)
+
+## 7.48.1 (2026-06-16)
+
+## 7.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 7.47.0 (2026-05-27)
+
+## 7.46.0 (2026-05-14)
+
+## 7.45.0 (2026-04-29)
+
+## 7.44.0 (2026-04-15)
+
+## 7.43.0 (2026-04-01)
+
+## 7.42.0 (2026-03-18)
+
+## 7.41.0 (2026-03-04)
+
+## 7.40.0 (2026-02-18)
+
+## 7.39.0 (2026-01-29)
+
+## 7.38.0 (2026-01-16)
+
+## 7.36.0 (2025-11-26)
+
+## 7.35.0 (2025-11-12)
+
+## 7.34.0 (2025-10-29)
+
+## 7.33.0 (2025-10-17)
+
+## 7.32.0 (2025-10-01)
+
+## 7.31.0 (2025-09-17)
+
+## 7.30.0 (2025-09-03)
+
+## 7.29.0 (2025-08-20)
+
+## 7.28.0 (2025-08-07)
+
+## 7.27.0 (2025-07-23)
+
+## 7.26.0 (2025-06-25)
+
+## 7.25.0 (2025-06-04)
+
+## 7.24.0 (2025-05-22)
+
+## 7.23.0 (2025-05-07)
+
+## 7.22.0 (2025-04-11)
+
+## 7.21.0 (2025-03-27)
+
+## 7.20.0 (2025-03-13)
+
+## 7.19.0 (2025-02-28)
+
+## 7.18.0 (2025-02-12)
+
+## 7.17.0 (2025-01-29)
+
+## 7.16.0 (2025-01-15)
+
+## 7.15.0 (2025-01-02)
+
+## 7.14.0 (2024-12-11)
+
+## 7.13.0 (2024-11-27)
+
+## 7.12.0 (2024-11-16)
+
+## 7.11.0 (2024-10-30)
+
+## 7.10.0 (2024-10-16)
+
+## 7.9.0 (2024-10-03)
+
+## 7.8.0 (2024-09-19)
+
+## 7.7.0 (2024-09-05)
+
+## 7.6.0 (2024-08-21)
+
+## 7.5.0 (2024-08-07)
+
+## 7.4.0 (2024-07-24)
+
+## 7.3.0 (2024-07-10)
+
+## 7.2.0 (2024-06-26)
+
+## 7.1.0 (2024-06-15)
+
 ## 7.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -132,7 +295,7 @@
 
 ## 5.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/dom`, `@wordpress/is-shallow-equal` and `classnames` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -140,7 +303,7 @@
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -159,7 +322,7 @@
 
 ## 3.24.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the rich-text namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
@@ -183,7 +346,7 @@
 
 ## 3.1.0 (2019-03-06)
 
-### Enhancement
+### Enhancements
 
 -   Added format boundaries.
 -   Removed parameters from `create` to filter out content.
@@ -213,7 +376,7 @@
 
 ## 2.0.3 (2018-11-09)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix Format Type Assignment During Parsing.
 -   Fix applying formats on multiline values without wrapper tags.

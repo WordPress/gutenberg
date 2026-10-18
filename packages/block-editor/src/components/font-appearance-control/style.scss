@@ -1,8 +1,3 @@
-.components-font-appearance-control {
-	ul {
-		li {
-			color: $gray-900;
-			text-transform: capitalize;
-		}
-	}
+.components-font-appearance-control__option {
+	text-transform: capitalize;
 }

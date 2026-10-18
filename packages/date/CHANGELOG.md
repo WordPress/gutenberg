@@ -2,6 +2,148 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Internal
+
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#84830](https://github.com/WordPress/gutenberg/pull/84830)).
+
+## 5.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   `date`: Drop a backslash that ends the format string instead of emitting the literal text `undefined`, matching PHP's `date()` ([#81528](https://github.com/WordPress/gutenberg/pull/81528)).
+
+## 5.56.0 (2026-09-23)
+
+## 5.55.0 (2026-09-10)
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+
+## 5.52.0 (2026-07-29)
+
+## 5.51.0 (2026-07-14)
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+## 5.47.0 (2026-05-27)
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+### Bug Fixes
+
+-   Fixed incorrect spacing for the time format. It was `g: i` (`14: 30`), and it's now `g:i` (`14:30`). ([#73924](https://github.com/WordPress/gutenberg/pull/73924))
+-   Fixed `timezone` argument handling to properly treat `0` numeric timezone values as a valid UTC offset (UTC+0). Previously, these were treated as if the `timezone` argument was not passed. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
+
+## 5.37.0 (2025-12-23)
+
+## 5.36.0 (2025-11-26)
+
+### Bug Fixes
+
+-   Fixed incorrect TypeScript types for `TimezoneConfig`'s `offset` type (was incorrectly `string`, now `number`)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
+### Enhancements
+
+-   Improved TypeScript definitions ([67573](https://github.com/WordPress/gutenberg/pull/67573))
+
+## 5.29.0 (2025-08-20)
+
+## 5.28.0 (2025-08-07)
+
+## 5.27.0 (2025-07-23)
+
+## 5.26.0 (2025-06-25)
+
+## 5.25.0 (2025-06-04)
+
+## 5.24.0 (2025-05-22)
+
+## 5.23.0 (2025-05-07)
+
+## 5.22.0 (2025-04-11)
+
+## 5.21.0 (2025-03-27)
+
+## 5.20.0 (2025-03-13)
+
+## 5.19.0 (2025-02-28)
+
+## 5.18.0 (2025-02-12)
+
+## 5.17.0 (2025-01-29)
+
+## 5.16.0 (2025-01-15)
+
+## 5.15.0 (2025-01-02)
+
+## 5.14.0 (2024-12-11)
+
+## 5.13.0 (2024-11-27)
+
+## 5.12.0 (2024-11-16)
+
+## 5.11.0 (2024-10-30)
+
+## 5.10.0 (2024-10-16)
+
+## 5.9.0 (2024-10-03)
+
+## 5.8.0 (2024-09-19)
+
+## 5.7.0 (2024-09-05)
+
+## 5.6.0 (2024-08-21)
+
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
 ## 5.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -92,7 +234,7 @@
 
 ## 4.17.0 (2022-09-13)
 
-## Deprecations
+### Deprecations
 
 -   `__experimentalGetSettings` has been renamed to `getSettings`.
 
@@ -137,7 +279,7 @@
 
 ## 3.15.0 (2021-04-06)
 
-### New Feature
+### New Features
 
 -   Bundle type definitions.
 
@@ -162,7 +304,7 @@
 
 ## 2.1.0 (2018-10-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Marked getSettings as experimental
 
@@ -174,6 +316,6 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

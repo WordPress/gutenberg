@@ -1,14 +1,6 @@
-/**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import {
 	forwardRef,
 	useEffect,
@@ -16,11 +8,7 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-
+import { isRTL } from '@wordpress/i18n';
 import Button from '../button';
 import type { TabPanelProps } from './types';
 import type { WordPressComponentProps } from '../context';
@@ -120,9 +108,12 @@ const UnforwardedTabPanel = (
 		orientation,
 		selectOnMove,
 		defaultSelectedId: prependInstanceId( initialTabName ),
+		rtl: isRTL(),
 	} );
 
-	const selectedTabName = extractTabName( tabStore.useState( 'selectedId' ) );
+	const selectedTabName = extractTabName(
+		Ariakit.useStoreState( tabStore, 'selectedId' )
+	);
 
 	const setTabStoreSelectedId = useCallback(
 		( tabName: string ) => {
@@ -216,13 +207,18 @@ const UnforwardedTabPanel = (
 							) }-view` }
 							render={
 								<Button
+									__next40pxDefaultSize
 									icon={ tab.icon }
 									label={ tab.icon && tab.title }
 									showTooltip={ !! tab.icon }
 								/>
 							}
 						>
-							{ ! tab.icon && tab.title }
+							{ ! tab.icon && (
+								<span className="components-tab-panel__tabs-item-label">
+									{ tab.title }
+								</span>
+							) }
 						</Ariakit.Tab>
 					);
 				} ) }
@@ -242,4 +238,5 @@ const UnforwardedTabPanel = (
 };
 
 export const TabPanel = forwardRef( UnforwardedTabPanel );
+TabPanel.displayName = 'TabPanel';
 export default TabPanel;

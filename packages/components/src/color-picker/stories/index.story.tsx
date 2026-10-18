@@ -1,48 +1,29 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { ColorPicker } from '../component';
 
 const meta: Meta< typeof ColorPicker > = {
+	tags: [ 'manifest' ],
 	component: ColorPicker,
-	title: 'Components/ColorPicker',
+	title: 'Components/@wordpress-components/Selection & Input/Color/ColorPicker',
+	id: 'components-colorpicker',
 	argTypes: {
-		as: { control: { type: null } },
-		color: { control: { type: null } },
+		color: { control: false },
+	},
+	args: {
+		onChange: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
 
-const Template: StoryFn< typeof ColorPicker > = ( { onChange, ...props } ) => {
-	const [ color, setColor ] = useState< string | undefined >();
-
-	return (
-		<ColorPicker
-			{ ...props }
-			color={ color }
-			onChange={ ( ...changeArgs ) => {
-				onChange?.( ...changeArgs );
-				setColor( ...changeArgs );
-			} }
-		/>
-	);
-};
-
-export const Default = Template.bind( {} );
+export const Default: StoryObj< typeof ColorPicker > = {};

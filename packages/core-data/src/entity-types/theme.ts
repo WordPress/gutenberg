@@ -1,12 +1,9 @@
-/**
- * Internal dependencies
- */
 import type { Context, PostFormat, RenderedText, OmitNevers } from './helpers';
-
 import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-records';
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
+		/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 		export interface Theme< C extends Context > {
 			/**
 			 * The theme's stylesheet. This uniquely identifies the theme.
@@ -85,6 +82,14 @@ declare module './base-entity-records' {
 			 * Whether posts and comments RSS feed links are added to head.
 			 */
 			'automatic-feed-links': boolean;
+			/**
+			 * Whether a theme uses block-based template parts.
+			 */
+			'block-template-parts': boolean;
+			/**
+			 * Whether a theme uses block-based templates.
+			 */
+			'block-templates': boolean;
 			/**
 			 * Whether border settings are enabled.
 			 */

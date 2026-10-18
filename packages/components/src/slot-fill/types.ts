@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
-import type { Component, MutableRefObject, ReactNode, RefObject } from 'react';
-
-/**
- * WordPress dependencies
- */
+import type { ReactNode, RefObject } from 'react';
 import type { ObservableMap } from '@wordpress/compose';
 
 export type DistributiveOmit< T, K extends keyof any > = T extends any
@@ -84,6 +77,9 @@ export type SlotComponentProps =
 			style?: never;
 	  } );
 
+export type FillChildren =
+	ReactNode | ( ( fillProps: FillProps ) => ReactNode );
+
 export type FillComponentProps = {
 	/**
 	 * The name of the slot to fill into.
@@ -93,7 +89,7 @@ export type FillComponentProps = {
 	/**
 	 * Children elements or render function.
 	 */
-	children?: ReactNode | ( ( fillProps: FillProps ) => ReactNode );
+	children?: FillChildren;
 };
 
 export type SlotFillProviderProps = {
@@ -108,70 +104,26 @@ export type SlotFillProviderProps = {
 	passthrough?: boolean;
 };
 
-export type SlotFillBubblesVirtuallySlotRef = RefObject< HTMLElement >;
-export type SlotFillBubblesVirtuallyFillRef = MutableRefObject< {
-	rerender: () => void;
-} >;
+export type SlotFillInstance = {};
+export type SlotRef = RefObject< HTMLElement | null >;
+export type SlotRecord = { instance: SlotFillInstance } & (
+	| { type: 'children' }
+	| { type: 'portal'; ref: SlotRef; fillProps: FillProps }
+);
+export type FillRecord = { instance: SlotFillInstance; children: FillChildren };
 
-export type SlotFillBubblesVirtuallyContext = {
-	slots: ObservableMap<
-		SlotKey,
-		{
-			ref: SlotFillBubblesVirtuallySlotRef;
-			fillProps: FillProps;
-		}
-	>;
-	fills: ObservableMap< SlotKey, SlotFillBubblesVirtuallyFillRef[] >;
-	registerSlot: (
-		name: SlotKey,
-		ref: SlotFillBubblesVirtuallySlotRef,
-		fillProps: FillProps
-	) => void;
-	unregisterSlot: (
-		name: SlotKey,
-		ref: SlotFillBubblesVirtuallySlotRef
-	) => void;
-	updateSlot: ( name: SlotKey, fillProps: FillProps ) => void;
-	registerFill: (
-		name: SlotKey,
-		ref: SlotFillBubblesVirtuallyFillRef
-	) => void;
-	unregisterFill: (
-		name: SlotKey,
-		ref: SlotFillBubblesVirtuallyFillRef
-	) => void;
+export type SlotFillRegistry = {
+	slots: ObservableMap< SlotKey, SlotRecord >;
+	fills: ObservableMap< SlotKey, FillRecord[] >;
+	registerSlot: ( name: SlotKey, slot: SlotRecord ) => void;
+	unregisterSlot: ( name: SlotKey, instance: SlotFillInstance ) => void;
+	updateSlot: ( name: SlotKey, slot: SlotRecord ) => void;
+	registerFill: ( name: SlotKey, fill: FillRecord ) => void;
+	unregisterFill: ( name: SlotKey, instance: SlotFillInstance ) => void;
+	updateFill: ( name: SlotKey, fill: FillRecord ) => void;
 
 	/**
 	 * This helps the provider know if it's using the default context value or not.
 	 */
 	isDefault?: boolean;
 };
-
-export type BaseSlotFillContext = {
-	registerSlot: (
-		name: SlotKey,
-		slot: Component< BaseSlotComponentProps >
-	) => void;
-	unregisterSlot: (
-		name: SlotKey,
-		slot: Component< BaseSlotComponentProps >
-	) => void;
-	registerFill: ( name: SlotKey, instance: FillComponentProps ) => void;
-	unregisterFill: ( name: SlotKey, instance: FillComponentProps ) => void;
-	getSlot: (
-		name: SlotKey
-	) => Component< BaseSlotComponentProps > | undefined;
-	getFills: (
-		name: SlotKey,
-		slotInstance: Component< BaseSlotComponentProps >
-	) => FillComponentProps[];
-	subscribe: ( listener: () => void ) => () => void;
-};
-
-export type BaseSlotComponentProps = Pick<
-	BaseSlotFillContext,
-	'registerSlot' | 'unregisterSlot' | 'getFills'
-> &
-	Omit< SlotComponentProps, 'bubblesVirtually' > & {
-		children?: ( fills: ReactNode ) => ReactNode;
-	};

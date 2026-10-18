@@ -1,29 +1,24 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { useState, useEffect } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import DateTimePicker from '../date-time';
 import { daysFromNow, isWeekend } from './utils';
 
 const meta: Meta< typeof DateTimePicker > = {
-	title: 'Components/DateTimePicker',
+	title: 'Components/@wordpress-components/Selection & Input/Time & Date/DateTimePicker',
+	id: 'components-datetimepicker',
 	component: DateTimePicker,
 	argTypes: {
 		currentDate: { control: 'date' },
-		onChange: { action: 'onChange', control: { type: null } },
+		onChange: { action: 'onChange', control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Consider using a `TextControl` with `type="date"` or `type="datetime-local"` instead.',
+		},
 	},
 };
 export default meta;
@@ -50,6 +45,9 @@ const Template: StoryFn< typeof DateTimePicker > = ( {
 };
 
 export const Default: StoryFn< typeof DateTimePicker > = Template.bind( {} );
+Default.args = {
+	currentDate: new Date(),
+};
 
 export const WithEvents: StoryFn< typeof DateTimePicker > = Template.bind( {} );
 WithEvents.args = {

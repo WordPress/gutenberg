@@ -29,7 +29,7 @@ The WordPress project, and Gutenberg in particular, iterates quickly. Staying up
 
 ## Additional resources
 
-For more resources on block development and extending the Block Editor, review the additional sections here in the Block Editor Handbook. Further practical examples are also available in the [block-development-examples](https://github.com/wptrainingteam/block-development-examples) GitHub repository.
+For more resources on block development and extending the Block Editor, review the additional sections here in the Block Editor Handbook. Further practical examples are also available in the [block-development-examples](https://github.com/WordPress/block-development-examples) GitHub repository.
 
 If you are looking for more educational content, check out [Learn WordPress](https://learn.wordpress.org/), where you can find [tutorials](https://learn.wordpress.org/tutorials/), [courses](https://learn.wordpress.org/courses/), and [online workshops](https://learn.wordpress.org/online-workshops/). Here is a selection of current offerings:
 

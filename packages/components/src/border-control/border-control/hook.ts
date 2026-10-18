@@ -1,17 +1,9 @@
-/**
- * WordPress dependencies
- */
-import { useCallback, useMemo, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import * as styles from '../styles';
+import clsx from 'clsx';
+import { useCallback, useState } from '@wordpress/element';
 import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
-import { useCx } from '../../utils/hooks/use-cx';
-
+import styles from '../style.module.scss';
 import type { Border, BorderControlProps } from '../types';
 
 // If either width or color are defined, the border is considered valid
@@ -33,16 +25,14 @@ export function useBorderControl(
 		enableAlpha = true,
 		enableStyle = true,
 		shouldSanitizeBorder = true,
-		size = 'default',
 		value: border,
 		width,
 		__experimentalIsRenderedInSidebar = false,
-		__next40pxDefaultSize,
+		// Deprecated props, no longer used.
+		size: _size,
+		__next40pxDefaultSize: _next40pxDefaultSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
-
-	const computedSize =
-		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;
 
 	const [ widthValue, originalWidthUnit ] = parseQuantityAndUnitFromRawValue(
 		border?.width
@@ -120,28 +110,20 @@ export function useBorderControl(
 		[ onWidthChange, widthUnit ]
 	);
 
-	// Generate class names.
-	const cx = useCx();
-	const classes = useMemo( () => {
-		return cx( styles.borderControl, className );
-	}, [ className, cx ] );
+	const classes = clsx( styles[ 'border-control' ], className );
 
 	let wrapperWidth = width;
 	if ( isCompact ) {
 		// Widths below represent the minimum usable width for compact controls.
 		// Taller controls contain greater internal padding, thus greater width.
-		wrapperWidth = size === '__unstable-large' ? '116px' : '90px';
+		wrapperWidth = '116px';
 	}
-	const innerWrapperClassName = useMemo( () => {
-		const widthStyle = !! wrapperWidth && styles.wrapperWidth;
-		const heightStyle = styles.wrapperHeight( computedSize );
+	const innerWrapperClassName = clsx(
+		styles[ 'inner-wrapper' ],
+		!! wrapperWidth && styles[ 'inner-wrapper-has-width' ]
+	);
 
-		return cx( styles.innerWrapper(), widthStyle, heightStyle );
-	}, [ wrapperWidth, cx, computedSize ] );
-
-	const sliderClassName = useMemo( () => {
-		return cx( styles.borderSlider() );
-	}, [ cx ] );
+	const sliderClassName = styles.slider;
 
 	return {
 		...otherProps,
@@ -160,8 +142,6 @@ export function useBorderControl(
 		value: border,
 		widthUnit,
 		widthValue,
-		size: computedSize,
 		__experimentalIsRenderedInSidebar,
-		__next40pxDefaultSize,
 	};
 }

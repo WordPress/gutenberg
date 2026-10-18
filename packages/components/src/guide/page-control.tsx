@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import Button from '../button';
 import { PageControlIcon } from './icons';
 import type { PageControlProps } from './types';
@@ -27,6 +20,7 @@ export default function PageControl( {
 					aria-current={ page === currentPage ? 'step' : undefined }
 				>
 					<Button
+						size="small"
 						key={ page }
 						icon={ <PageControlIcon /> }
 						aria-label={ sprintf(

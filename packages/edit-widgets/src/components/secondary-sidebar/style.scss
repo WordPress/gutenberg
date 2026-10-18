@@ -1,3 +1,7 @@
+@use "sass:math";
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .edit-widgets-editor__list-view-panel {
 	height: 100%;
 	display: flex;
@@ -21,5 +25,5 @@
 	justify-content: space-between;
 	height: $grid-unit-60;
 	padding-left: $grid-unit-20;
-	padding-right: $grid-unit-05;
+	padding-right: $grid-unit-10;
 }

@@ -1,7 +1,6 @@
-/**
- * External dependencies
- */
 const browserslist = require( 'browserslist' );
+const exclusions = require( './polyfill-exclusions' );
+const replacePolyfills = require( './replace-polyfills' );
 
 module.exports = ( api ) => {
 	let wpBuildOpts = {};
@@ -23,10 +22,13 @@ module.exports = ( api ) => {
 	const getPresetEnv = () => {
 		const opts = {
 			bugfixes: true,
-			include: [
-				'proposal-nullish-coalescing-operator',
-				'proposal-logical-assignment-operators',
-			],
+			...( wpBuildOpts.addPolyfillComments
+				? {
+						useBuiltIns: 'usage',
+						exclude: exclusions,
+						corejs: require( 'core-js/package.json' ).version,
+					}
+				: {} ),
 		};
 
 		if ( isTestEnv ) {
@@ -74,6 +76,7 @@ module.exports = ( api ) => {
 			require.resolve( '@babel/preset-typescript' ),
 		],
 		plugins: [
+			require.resolve( '@babel/plugin-syntax-import-attributes' ),
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[
 				require.resolve( '@babel/plugin-transform-react-jsx' ),
@@ -82,6 +85,7 @@ module.exports = ( api ) => {
 				},
 			],
 			maybeGetPluginTransformRuntime(),
+			wpBuildOpts.addPolyfillComments && replacePolyfills,
 		].filter( Boolean ),
 	};
 };

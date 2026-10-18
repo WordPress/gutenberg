@@ -1,29 +1,24 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { upload as uploadIcon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import FormFileUpload from '..';
 
 const meta: Meta< typeof FormFileUpload > = {
-	title: 'Components/FormFileUpload',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Selection & Input/File Upload/FormFileUpload',
+	id: 'components-formfileupload',
 	component: FormFileUpload,
 	argTypes: {
-		icon: { control: { type: null } },
-		onChange: { action: 'onChange', control: { type: null } },
-		onClick: { control: { type: null } },
+		icon: { control: false },
+		onChange: { action: 'onChange', control: false },
+		onClick: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;

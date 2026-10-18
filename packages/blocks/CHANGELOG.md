@@ -2,6 +2,195 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Stop normalizing deprecated responsive style state aliases while parsing blocks; saved style attributes must use canonical state keys ([#84531](https://github.com/WordPress/gutenberg/pull/84531)).
+
+### Bug Fixes
+
+-   `getBlockSupport` and `hasBlockSupport`: Accept the feature as an array of path segments in the types, as the store selectors and runtime already do ([#84708](https://github.com/WordPress/gutenberg/pull/84708)).
+-   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
+-   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
+-   `BlockType`: Add the documented `transforms.ungroup` callback to the type ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
+
+## 16.2.0 (2026-10-07)
+
+### Bug Fixes
+
+-   `pasteHandler`: Give each pasted data-URI image a unique filename, so uploading several images pasted at once (for example from Google Docs) no longer collides server-side and overwrites images with each other ([#79480](https://github.com/WordPress/gutenberg/pull/79480)).
+-   `pasteHandler`: replace non-breaking spaces at the start and end of a run of text with regular spaces, so the ones browsers insert between text and a link become normal spaces and the ones at the end of a line are removed ([#83464](https://github.com/WordPress/gutenberg/pull/83464)).
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 16.1.0 (2026-09-23)
+
+### New Features
+
+-   Add support for the text shadow style property ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+
+## 16.0.0 (2026-09-10)
+
+### Breaking Changes
+
+-   `BlockTransform` is now a discriminated union over its `type`, so that each kind of transform declares its own fields: `shortcode` transforms accept `tag` and `attributes` with `shortcode` matchers, `enter` transforms `regExp`, `prefix` transforms `prefix`, and `raw` transforms `selector` and `schema`. `blocks`, `variationName` and `shortcuts` now belong to `block` transforms only, and `blocks` is required there. This fixes type errors when registering blocks with documented shortcode transforms, but reading a variant field off a `BlockTransform` that has not been narrowed on its `type` no longer compiles — including the result of `findTransform` ([#81811](https://github.com/WordPress/gutenberg/issues/81811)).
+-   Removed the `transforms.supportedMobileTransforms` block type property, along with the `supportedMobileTransforms` and `usingMobileTransformations` properties of a block transform. They were only meaningful to the React Native implementation, removed in [#78747](https://github.com/WordPress/gutenberg/pull/78747), and nothing reads them any more. Note that the filter they drove was not platform-gated: a block type still declaring `supportedMobileTransforms` had its transforms filtered everywhere, and `getBlockTransforms` no longer filters them at all ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+
+### Bug Fixes
+
+-   `getBlockAttributes` no longer breaks when a block has no content to parse, such as a self-closing shortcode: missing content is treated as empty markup instead of reaching the attribute matchers ([#81831](https://github.com/WordPress/gutenberg/pull/81831)).
+
+## 15.27.0 (2026-08-26)
+
+### New Features
+
+-   Block variations and `block` type block transforms accept a `shortcut` property, declaring a keyboard shortcut that applies the variation or transform to the selected block. See the [block variations](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-variations/) and [block transforms](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) documentation ([#81588](https://github.com/WordPress/gutenberg/pull/81588)).
+
+## 15.26.0 (2026-08-12)
+
+### Internal
+
+-   Update `hpq` to 1.4.0 for its bundled TypeScript types ([#81199](https://github.com/WordPress/gutenberg/pull/81199)).
+
+## 15.25.0 (2026-07-29)
+
+### Internal
+
+-   Update `memize` to 2.1.1 ([#80764](https://github.com/WordPress/gutenberg/pull/80764)).
+
+## 15.24.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 15.23.0 (2026-07-01)
+
+## 15.22.0 (2026-06-24)
+
+### Internal
+
+- Replace `showdown` with `marked` for Markdown paste handling. Smaller bundle, modern maintenance, native types.
+
+## 15.21.1 (2026-06-16)
+
+## 15.21.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+### Internal
+
+-   Dependency updates ([#77954](https://github.com/WordPress/gutenberg/pull/77954)).
+
+## 15.20.0 (2026-05-27)
+
+### Bug Fix
+
+- Fix `mergeSchemas` in `getBlockContentSchemaFromTransforms` to preserve array values (e.g. `classes`) instead of converting them to objects with numeric string keys when merging schemas ([#70615](https://github.com/WordPress/gutenberg/pull/70615)).
+- Paste: Move leading and trailing spaces out of inline formatting elements (such as links) so the formatting wraps only its meaningful content. This corrects markup from editors like Google Docs that place the separating space inside the link.
+
+## 15.19.0 (2026-05-14)
+
+## 15.18.0 (2026-04-29)
+
+- Update `registerBlockType` to accept the attributes type as a generic.
+- Update `registerBlockVariation`, `unregisterBlockVariation` type signature to match the dispatch call.
+
+## 15.17.0 (2026-04-15)
+
+## 15.16.0 (2026-04-01)
+
+## 15.15.0 (2026-03-18)
+
+## 15.14.0 (2026-03-04)
+
+## 15.13.0 (2026-02-18)
+
+## 15.12.0 (2026-01-29)
+
+## 15.11.0 (2026-01-16)
+
+## 15.9.0 (2025-11-26)
+
+## 15.8.0 (2025-11-12)
+
+## 15.7.0 (2025-10-29)
+
+## 15.6.0 (2025-10-17)
+
+## 15.5.0 (2025-10-01)
+
+## 15.4.0 (2025-09-17)
+
+## 15.3.0 (2025-09-03)
+
+## 15.2.0 (2025-08-20)
+
+## 15.1.0 (2025-08-07)
+
+## 15.0.0 (2025-07-23)
+
+### Breaking changes
+
+-   `registerBlockType`: Set default `apiVersion` when none is provided during client-side block registration ([#70750](https://github.com/WordPress/gutenberg/pull/70750)).
+
+## 14.15.0 (2025-06-25)
+
+## 14.14.0 (2025-06-04)
+
+## 14.13.0 (2025-05-22)
+
+## 14.12.0 (2025-05-07)
+
+## 14.11.0 (2025-04-11)
+
+## 14.10.0 (2025-03-27)
+
+## 14.9.0 (2025-03-13)
+
+## 14.8.0 (2025-02-28)
+
+## 14.7.0 (2025-02-12)
+
+## 14.6.0 (2025-01-29)
+
+## 14.5.0 (2025-01-15)
+
+## 14.4.0 (2025-01-02)
+
+## 14.3.0 (2024-12-11)
+
+## 14.2.0 (2024-11-27)
+
+## 14.1.0 (2024-11-16)
+
+## 14.0.0 (2024-10-30)
+
+### Breaking changes
+
+- Normalize `blockType.parent` to be an array. While string values were never supported, they appeared to work with some unintended side-effects that have been fixed by [#66250](https://github.com/WordPress/gutenberg/pull/66250). For that reason, we've added some code that automatically migrates strings to arrays — though it still raises a warning.
+
+## 13.10.0 (2024-10-16)
+
+## 13.9.0 (2024-10-03)
+
+## 13.8.0 (2024-09-19)
+
+## 13.7.0 (2024-09-05)
+
+## 13.6.0 (2024-08-21)
+
+## 13.5.0 (2024-08-07)
+
+## 13.4.0 (2024-07-24)
+
+## 13.3.0 (2024-07-10)
+
+## 13.2.0 (2024-06-26)
+
+## 13.1.0 (2024-06-15)
+
 ## 13.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -105,7 +294,7 @@
 
 ## 11.15.0 (2022-08-24)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
@@ -119,7 +308,7 @@
 
 -   `withBlockContentContext` is no longer used by the block editor and therefore got deprecated ([#41395](https://github.com/WordPress/gutenberg/pull/41395)).
 
-### New API
+### New Features
 
 -   The shortcode transformer now accepts a `transform` method to allow advanced controls over the transformed result. For instance, it's now possible to define custom `innerBlocks` for the transformed block. ([#42001](https://github.com/WordPress/gutenberg/pull/42001))
 
@@ -145,17 +334,17 @@
 
 ## 11.1.0 (2021-09-09)
 
-### Backward Compatibility
+### Bug Fixes
 
 -   Register a block even when an invalid value provided for the icon setting ([#34350](https://github.com/WordPress/gutenberg/pull/34350)).
 
-### New API
+### New Features
 
 -   The `isMatch` callback on block transforms now receives the block object (or block objects if `isMulti` is `true`) as its second argument.
 
 ## 11.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -167,7 +356,7 @@
 
 ## 9.1.0 (2021-05-20)
 
-### New API
+### New Features
 
 -   `registerBlockType` method can be used to register a block type using the metadata loaded from `block.json` file ([#32030](https://github.com/WordPress/gutenberg/pull/32030)).
 
@@ -182,37 +371,37 @@
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
 -   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
 
-### New API
+### New Features
 
 -   `registerBlockTypeFromMetadata` method can be used to register a block type using the metadata loaded from `block.json` file ([#30293](https://github.com/WordPress/gutenberg/pull/30293)).
 
 ## 8.0.0 (2021-03-17)
 
-### Breaking Change
+### Breaking Changes
 
 -   Reverted `cloneBlock` back to its original logic that doesn't sanitize block's attributes. [#28379](https://github.com/WordPress/gutenberg/pull/29111)
 
 ## 7.0.0 (2021-02-01)
 
-### Breaking Change
+### Breaking Changes
 
 -   `cloneBlock` now sanitizes the attributes to match the same logic `createBlock` has. [#28379](https://github.com/WordPress/gutenberg/pull/28379)
 
 ## 6.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the blocks namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 6.13.0 (2020-04-01)
 
-### New Feature
+### New Features
 
 -   Blocks can now be registered with an `defaultStylePicker` flag in the `supports` setting, allowing the default style picker to be removed.
 
 ## 6.4.0 (2019-08-05)
 
-### Improvements
+### Enhancements
 
 -   Omitting `attributes` or `keywords` settings will now stub default values (an empty object or empty array, respectively).
 
@@ -222,14 +411,14 @@
 
 ## 6.3.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Added a default implementation for `save` setting in `registerBlockType` which saves no markup in the post content.
 -   Added wildcard block transforms which allows for transforming all/any blocks in another block.
 
 ## 6.1.0 (2019-03-06)
 
-### New Feature
+### New Features
 
 -   Blocks' `transforms` will receive `innerBlocks` as the second argument (or an array of each block's respective `innerBlocks` for a multi-transform).
 
@@ -253,7 +442,7 @@
 
 -   `isValidBlock` has been removed. Please use `isValidBlockContent` instead but keep in mind that the order of params has changed.
 
-### Bug Fix
+### Bug Fixes
 
 -   The block validator is more lenient toward equivalent encoding forms.
 
@@ -261,7 +450,7 @@
 
 ## 5.3.0 (2018-11-09)
 
-### New feature
+### New Features
 
 -   `getBlockAttributes`, `getBlockTransforms`, `getSaveContent`, `getSaveElement` and `isValidBlockContent` methods can now take also block's name as the first param ([#11490](https://github.com/WordPress/gutenberg/pull/11490)). Passing a block's type object continues to work as before.
 -   `registerBlockStyles` and `unregisterBlockStyles` can be triggered at any moment (before or after block registration).
@@ -278,11 +467,11 @@
 
 ## 5.1.0 (2018-10-30)
 
-### New features
+### New Features
 
 -   `isValidBlockContent` function has been added ([#10891](https://github.com/WordPress/gutenberg/pull/10891)).
 
-### Deprecation
+### Deprecations
 
 -   `isValidBlock` function has been deprecated ([#10891](https://github.com/WordPress/gutenberg/pull/10891)). Use `isValidBlockContent` instead.
 
@@ -294,7 +483,7 @@
 -   `setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
 -   `getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
 
-### New Feature
+### New Features
 
 -   Added a `unregisterBlockStyle()` function to remove a block style variation.
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /**
@@ -76,9 +73,7 @@ test.describe( 'Comments', () => {
 		}
 
 		// Visit the post that was just published.
-		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// We check that there is a previous comments page link.
 		await expect(
@@ -88,7 +83,7 @@ test.describe( 'Comments', () => {
 			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeHidden();
 
-		await page.click( 'role=link[name="Older Comments"i]' );
+		await page.getByRole( 'link', { name: 'Older Comments' } ).click();
 
 		// We check that there are a previous and a next link.
 		await expect(
@@ -98,7 +93,7 @@ test.describe( 'Comments', () => {
 			page.locator( 'role=link[name="Newer Comments"i]' )
 		).toBeVisible();
 
-		await page.click( 'role=link[name="Older Comments"i]' );
+		await page.getByRole( 'link', { name: 'Older Comments' } ).click();
 
 		// We check that there is only have a next link
 		await expect(
@@ -130,9 +125,7 @@ test.describe( 'Comments', () => {
 		}
 
 		// Visit the post that was just published.
-		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// We check that there are no comments page link.
 		await expect(
@@ -195,9 +188,7 @@ test.describe( 'Comments', () => {
 		} );
 
 		// Visit the post that was just published.
-		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// Check that the Comment Template block (an inner block) is rendered.
 		await expect(
@@ -226,9 +217,7 @@ test.describe( 'Comments', () => {
 		} );
 
 		// Visit the post that was just published.
-		await page.click(
-			'role=region[name="Editor publish"] >> role=link[name="View Post"i]'
-		);
+		await page.goto( `/?p=${ postId }` );
 
 		// Check that the Comment Template block (an inner block) is NOT rendered.
 		await expect(
@@ -283,7 +272,6 @@ test.describe( 'Post Comments', () => {
 		admin,
 		editor,
 		requestUtils,
-		commentsBlockUtils,
 	} ) => {
 		// Create a post with the old "Post Comments" block.
 		const { id: postId } = await requestUtils.createPost( {
@@ -296,13 +284,7 @@ test.describe( 'Post Comments', () => {
 		} );
 
 		// Go to the post editor.
-		await admin.visitAdminPage(
-			'/post.php',
-			`post=${ postId }&action=edit`
-		);
-
-		// Hide welcome guide.
-		await commentsBlockUtils.hideWelcomeGuide();
+		await admin.editPost( postId );
 
 		// Check that the Post Comments block has been replaced with Comments.
 		await expect(
@@ -371,28 +353,13 @@ class CommentsBlockUtils {
 	 */
 	async setOption( setting, value ) {
 		await this.admin.visitAdminPage( 'options.php', '' );
-		const previousValue = await this.page.inputValue( `#${ setting }` );
+		const previousValue = await this.page
+			.locator( `#${ setting }` )
+			.inputValue();
 
-		await this.page.fill( `#${ setting }`, value );
-		await this.page.click( '#Update' );
+		await this.page.locator( `#${ setting }` ).fill( value );
+		await this.page.locator( '#Update' ).click();
 
 		return previousValue;
-	}
-
-	async hideWelcomeGuide() {
-		await this.page.evaluate( async () => {
-			const isWelcomeGuideActive = window.wp.data
-				.select( 'core/edit-post' )
-				.isFeatureActive( 'welcomeGuide' );
-
-			if ( isWelcomeGuideActive ) {
-				window.wp.data
-					.dispatch( 'core/edit-post' )
-					.toggleFeature( 'welcomeGuide' );
-			}
-		} );
-
-		await this.page.reload();
-		await this.page.waitForSelector( '.edit-post-layout' );
 	}
 }

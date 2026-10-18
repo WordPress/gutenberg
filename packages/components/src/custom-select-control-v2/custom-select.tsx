@@ -1,30 +1,27 @@
-/**
- * WordPress dependencies
- */
-import { createContext, useMemo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { VisuallyHidden } from '..';
-import * as Styled from './styles';
+import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
+import { createContext, useCallback, useMemo } from '@wordpress/element';
+import { __, _n, sprintf } from '@wordpress/i18n';
+import { VisuallyHidden } from '../visually-hidden';
+import styles from './style.module.scss';
 import type {
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
 	CustomSelectButtonProps,
 	CustomSelectButtonSize,
+	CustomSelectInternalProps,
 	_CustomSelectProps,
 } from './types';
-import type { WordPressComponentProps } from '../context';
 import InputBase from '../input-control/input-base';
 import SelectControlChevronDown from '../select-control/chevron-down';
+import BaseControl from '../base-control';
 
 export const CustomSelectContext =
 	createContext< CustomSelectContextType >( undefined );
+CustomSelectContext.displayName = 'CustomSelectContext';
 
 function defaultRenderSelectedValue(
-	value: CustomSelectButtonProps[ 'value' ]
+	value: CustomSelectButtonProps[ 'defaultValue' ]
 ) {
 	const isValueEmpty = Array.isArray( value )
 		? value.length === 0
@@ -37,8 +34,11 @@ function defaultRenderSelectedValue(
 	if ( Array.isArray( value ) ) {
 		return value.length === 1
 			? value[ 0 ]
-			: // translators: %s: number of items selected (it will always be 2 or more items)
-			  sprintf( __( '%s items selected' ), value.length );
+			: sprintf(
+					// translators: %d: number of items selected (it will always be 2 or more items)
+					_n( '%d item selected', '%d items selected', value.length ),
+					value.length
+				);
 	}
 
 	return value;
@@ -48,16 +48,16 @@ const CustomSelectButton = ( {
 	renderSelectedValue,
 	size = 'default',
 	store,
+	className,
 	...restProps
 }: Omit<
-	WordPressComponentProps<
-		CustomSelectButtonProps & CustomSelectButtonSize & CustomSelectStore,
-		'button',
-		false
-	>,
+	React.ComponentProps< typeof Ariakit.Select > &
+		CustomSelectButtonProps &
+		CustomSelectButtonSize &
+		CustomSelectStore,
 	'onChange'
 > ) => {
-	const { value: currentValue } = store.useState();
+	const { value: currentValue } = Ariakit.useStoreState( store );
 
 	const computedRenderSelectedValue = useMemo(
 		() => renderSelectedValue ?? defaultRenderSelectedValue,
@@ -65,22 +65,25 @@ const CustomSelectButton = ( {
 	);
 
 	return (
-		<Styled.Select
+		<Ariakit.Select
 			{ ...restProps }
-			size={ size }
-			hasCustomRenderProp={ !! renderSelectedValue }
+			className={ clsx( styles.select, className, {
+				[ styles[ 'is-compact' ] ]: size === 'compact',
+				[ styles[ 'is-small' ] ]: size === 'small',
+				[ styles[ 'has-custom-render' ] ]: !! renderSelectedValue,
+			} ) }
 			store={ store }
-			// to match legacy behavior where using arrow keys
-			// move selection rather than open the popover
-			showOnKeyDown={ false }
 		>
-			<div>{ computedRenderSelectedValue( currentValue ) }</div>
-		</Styled.Select>
+			{ computedRenderSelectedValue( currentValue ) }
+		</Ariakit.Select>
 	);
 };
 
-function _CustomSelect(
-	props: _CustomSelectProps & CustomSelectStore & CustomSelectButtonSize
+function CustomSelect(
+	props: CustomSelectInternalProps &
+		_CustomSelectProps &
+		CustomSelectStore &
+		CustomSelectButtonSize
 ) {
 	const {
 		children,
@@ -88,36 +91,65 @@ function _CustomSelect(
 		label,
 		size,
 		store,
+		className,
+		isLegacy = false,
 		...restProps
 	} = props;
 
+	const onSelectPopoverKeyDown: React.KeyboardEventHandler< HTMLDivElement > =
+		useCallback(
+			( e ) => {
+				if ( isLegacy ) {
+					e.stopPropagation();
+				}
+			},
+			[ isLegacy ]
+		);
+
+	const contextValue = useMemo( () => ( { store, size } ), [ store, size ] );
+
 	return (
-		<>
-			{ hideLabelFromVision ? ( // TODO: Replace with BaseControl
-				<VisuallyHidden as="label">{ label }</VisuallyHidden>
-			) : (
-				<Styled.SelectLabel store={ store }>
-					{ label }
-				</Styled.SelectLabel>
-			) }
-			<InputBase
-				__next40pxDefaultSize
-				size={ size }
-				suffix={ <SelectControlChevronDown /> }
+		// Where should `restProps` be forwarded to?
+		<div className={ className }>
+			<Ariakit.SelectLabel
+				store={ store }
+				render={
+					hideLabelFromVision ? (
+						// @ts-expect-error `children` are passed via the render prop
+						<VisuallyHidden />
+					) : (
+						// @ts-expect-error `children` are passed via the render prop
+						<BaseControl.VisualLabel as="div" />
+					)
+				}
 			>
+				{ label }
+			</Ariakit.SelectLabel>
+			<InputBase size={ size } suffix={ <SelectControlChevronDown /> }>
 				<CustomSelectButton
 					{ ...restProps }
 					size={ size }
 					store={ store }
+					// Match legacy behavior (move selection rather than open the popover)
+					showOnKeyDown={ ! isLegacy }
 				/>
-				<Styled.SelectPopover gutter={ 12 } store={ store } sameWidth>
-					<CustomSelectContext.Provider value={ { store } }>
+				<Ariakit.SelectPopover
+					className={ styles.popover }
+					gutter={ 12 }
+					store={ store }
+					sameWidth
+					slide={ false }
+					onKeyDown={ onSelectPopoverKeyDown }
+					// Match legacy behavior
+					flip={ ! isLegacy }
+				>
+					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }
 					</CustomSelectContext.Provider>
-				</Styled.SelectPopover>
+				</Ariakit.SelectPopover>
 			</InputBase>
-		</>
+		</div>
 	);
 }
 
-export default _CustomSelect;
+export default CustomSelect;

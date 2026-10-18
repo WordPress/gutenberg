@@ -1,35 +1,38 @@
-/**
- * External dependencies
- */
 import { colord, extend } from 'colord';
 import namesPlugin from 'colord/plugins/names';
 import a11yPlugin from 'colord/plugins/a11y';
-
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { ColorObject, ColorPaletteProps, PaletteObject } from './types';
 
 extend( [ namesPlugin, a11yPlugin ] );
 
+/**
+ * Checks if a color value is a simple CSS color.
+ *
+ * @param value The color value to check.
+ * @return A boolean indicating whether the color value is a simple CSS color.
+ */
+const isSimpleCSSColor = ( value: string ): boolean => {
+	const valueIsCssVariable = /var\(/.test( value ?? '' );
+	const valueIsColorMix = /color-mix\(/.test( value ?? '' );
+	return ! valueIsCssVariable && ! valueIsColorMix;
+};
+
 export const extractColorNameFromCurrentValue = (
 	currentValue?: ColorPaletteProps[ 'value' ],
 	colors: ColorPaletteProps[ 'colors' ] = [],
-	showMultiplePalettes: boolean = false
+	showMultiplePalettes: boolean = false,
+	selectedSlug?: ColorPaletteProps[ 'selectedSlug' ]
 ) => {
 	if ( ! currentValue ) {
 		return '';
 	}
-
-	const currentValueIsCssVariable = /^var\(/.test( currentValue );
-	const normalizedCurrentValue = currentValueIsCssVariable
-		? currentValue
-		: colord( currentValue ).toHex();
+	const currentValueIsSimpleColor = currentValue
+		? isSimpleCSSColor( currentValue )
+		: false;
+	const normalizedCurrentValue = currentValueIsSimpleColor
+		? colord( currentValue ).toHex()
+		: currentValue;
 
 	// Normalize format of `colors` to simplify the following loop
 	type normalizedPaletteObject = { colors: ColorObject[] };
@@ -37,10 +40,21 @@ export const extractColorNameFromCurrentValue = (
 		? ( colors as PaletteObject[] )
 		: [ { colors: colors as ColorObject[] } ];
 	for ( const { colors: paletteColors } of colorPalettes ) {
-		for ( const { name: colorName, color: colorValue } of paletteColors ) {
-			const normalizedColorValue = currentValueIsCssVariable
-				? colorValue
-				: colord( colorValue ).toHex();
+		for ( const {
+			name: colorName,
+			color: colorValue,
+			slug,
+		} of paletteColors ) {
+			if ( selectedSlug ) {
+				if ( slug === selectedSlug ) {
+					return colorName;
+				}
+				continue;
+			}
+
+			const normalizedColorValue = currentValueIsSimpleColor
+				? colord( colorValue ).toHex()
+				: colorValue;
 
 			if ( normalizedCurrentValue === normalizedColorValue ) {
 				return colorName;
@@ -79,9 +93,7 @@ export const normalizeColorValue = (
 	value: string | undefined,
 	element: HTMLElement | null
 ) => {
-	const currentValueIsCssVariable = /^var\(/.test( value ?? '' );
-
-	if ( ! currentValueIsCssVariable || element === null ) {
+	if ( ! value || ! element || isSimpleCSSColor( value ) ) {
 		return value;
 	}
 

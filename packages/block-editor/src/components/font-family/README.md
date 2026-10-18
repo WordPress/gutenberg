@@ -1,5 +1,9 @@
 # FontFamilyControl
 
+<div class="callout callout-alert">
+This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+</div>
+
 FontFamilyControl is a React component that renders a UI that allows users to select a font family.
 The component renders a user interface that allows the user to select from a set of predefined font families as defined by the `typography.fontFamilies` presets.
 Optionally, you can provide a `fontFamilies` prop that overrides the predefined font families.
@@ -10,7 +14,7 @@ Optionally, you can provide a `fontFamilies` prop that overrides the predefined 
 
 ```jsx
 import { useState } from 'react';
-import { FontFamilyControl } from '@wordpress/block-editor';
+import { __experimentalFontFamilyControl as FontFamilyControl } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 // ...

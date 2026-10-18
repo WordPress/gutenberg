@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 
 export type ToolbarProps = {
@@ -22,4 +19,10 @@ export type ToolbarProps = {
 	 * @default undefined
 	 */
 	variant?: 'unstyled' | undefined;
+	/**
+	 * Orientation of the toolbar keyboard interactions.
+	 *
+	 * @default 'horizontal'
+	 */
+	orientation?: 'horizontal' | 'vertical';
 };

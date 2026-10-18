@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
 import type { KeyboardEvent, ForwardedRef, SyntheticEvent } from 'react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import deprecated from '@wordpress/deprecated';
 import { forwardRef, useMemo, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
-import { ValueInput } from './styles/unit-control-styles';
+import NumberControl from '../number-control';
+import styles from './style.module.scss';
 import UnitSelectControl from './unit-select-control';
 import {
 	CSS_UNITS,
@@ -26,7 +16,6 @@ import {
 import { useControlledState } from '../utils/hooks';
 import { escapeRegExp } from '../utils/strings';
 import type { UnitControlProps, UnitControlOnChangeCallback } from './types';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 
 function UnforwardedUnitControl(
 	unitControlProps: WordPressComponentProps<
@@ -56,7 +45,7 @@ function UnforwardedUnitControl(
 		value: valueProp,
 		onFocus: onFocusProp,
 		...props
-	} = useDeprecated36pxDefaultSizeProp( unitControlProps );
+	} = unitControlProps;
 
 	if ( 'unit' in unitControlProps ) {
 		deprecated( 'UnitControl unit prop', {
@@ -113,6 +102,7 @@ function UnforwardedUnitControl(
 		// This class is added for legacy purposes to maintain it on the outer
 		// wrapper. See: https://github.com/WordPress/gutenberg/pull/45139
 		'components-unit-control-wrapper',
+		styles[ 'value-input' ],
 		className
 	);
 
@@ -131,6 +121,12 @@ function UnforwardedUnitControl(
 			return;
 		}
 
+		// After clearing a value whose unit isn't offered, the select shows the
+		// first offered unit, so only fall back to the current unit if offered.
+		const fallbackUnit = units.some( ( option ) => option.value === unit )
+			? unit
+			: undefined;
+
 		/*
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
@@ -139,7 +135,7 @@ function UnforwardedUnitControl(
 			nextQuantityValue,
 			units,
 			parsedQuantity,
-			unit
+			fallbackUnit
 		).join( '' );
 
 		onChangeProp?.( onChangeValue, changeProps );
@@ -167,11 +163,12 @@ function UnforwardedUnitControl(
 	if ( ! disableUnits && isUnitSelectTabbable && units.length ) {
 		handleOnKeyDown = ( event: KeyboardEvent< HTMLInputElement > ) => {
 			props.onKeyDown?.( event );
-			// Unless the meta key was pressed (to avoid interfering with
-			// shortcuts, e.g. pastes), moves focus to the unit select if a key
+			// Unless the meta or ctrl key was pressed (to avoid interfering with
+			// shortcuts, e.g. pastes), move focus to the unit select if a key
 			// matches the first character of a unit.
 			if (
 				! event.metaKey &&
+				! event.ctrlKey &&
 				reFirstCharacterOfUnits.test( event.key )
 			) {
 				refInputSuffix.current?.focus();
@@ -188,10 +185,7 @@ function UnforwardedUnitControl(
 			isUnitSelectTabbable={ isUnitSelectTabbable }
 			onChange={ handleOnUnitChange }
 			size={
-				[ 'small', 'compact' ].includes( size ) ||
-				( size === 'default' && ! props.__next40pxDefaultSize )
-					? 'small'
-					: 'default'
+				[ 'small', 'compact' ].includes( size ) ? 'small' : 'default'
 			}
 			unit={ unit }
 			units={ units }
@@ -212,7 +206,7 @@ function UnforwardedUnitControl(
 	}
 
 	return (
-		<ValueInput
+		<NumberControl
 			{ ...props }
 			autoComplete={ autoComplete }
 			className={ classes }
@@ -250,6 +244,7 @@ function UnforwardedUnitControl(
  * ```
  */
 export const UnitControl = forwardRef( UnforwardedUnitControl );
+UnitControl.displayName = 'UnitControl';
 
 export { parseQuantityAndUnitFromRawValue, useCustomUnits } from './utils';
 export default UnitControl;

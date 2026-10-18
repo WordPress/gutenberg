@@ -1,10 +1,8 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig.json",
-	"extends": "../../tsconfig.base.json",
+	"extends": "@wordpress/monorepo-tools/tsconfig/dev.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"types": [ "requestidlecallback" ]
 	},
-	"include": [ "src/**/*" ]
+	"references": [ { "path": "./tsconfig.build.json" } ]
 }

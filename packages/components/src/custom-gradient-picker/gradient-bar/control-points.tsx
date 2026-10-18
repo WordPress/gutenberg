@@ -1,26 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import { colord } from 'colord';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect, useRef, useState, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import Button from '../../button';
 import { HStack } from '../../h-stack';
 import { ColorPicker } from '../../color-picker';
 import { VisuallyHidden } from '../../visually-hidden';
 import { CustomColorPickerDropdown } from '../../color-palette';
-
 import {
 	addControlPoint,
 	clampPercent,
@@ -48,6 +36,7 @@ function ControlPointButton( {
 	isOpen,
 	position,
 	color,
+	disablePositioning,
 	...additionalProps
 }: WordPressComponentProps< ControlPointButtonProps, 'button', true > ) {
 	const instanceId = useInstanceId( ControlPointButton );
@@ -56,9 +45,9 @@ function ControlPointButton( {
 		<>
 			<Button
 				aria-label={ sprintf(
-					// translators: %1$s: gradient position e.g: 70, %2$s: gradient color code e.g: rgb(52,121,151).
+					// translators: 1: gradient position e.g: 70. 2: gradient color code e.g: rgb(52,121,151).
 					__(
-						'Gradient control point at position %1$s%% with color code %2$s.'
+						'Gradient control point at position %1$d%% with color code %2$s.'
 					),
 					position,
 					color
@@ -66,6 +55,7 @@ function ControlPointButton( {
 				aria-describedby={ descriptionId }
 				aria-haspopup="true"
 				aria-expanded={ isOpen }
+				__next40pxDefaultSize
 				className={ clsx(
 					'components-custom-gradient-picker__control-point-button',
 					{
@@ -75,9 +65,11 @@ function ControlPointButton( {
 				{ ...additionalProps }
 			/>
 			<VisuallyHidden id={ descriptionId }>
-				{ __(
-					'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
-				) }
+				{ disablePositioning
+					? __( 'Press the button to change the color.' )
+					: __(
+							'Use your left or right arrow keys or drag and drop with the mouse to change the gradient position. Press the button to change the color or remove the control point.'
+						) }
 			</VisuallyHidden>
 		</>
 	);
@@ -120,6 +112,7 @@ function GradientColorPickerDropdown( {
 function ControlPoints( {
 	disableRemove,
 	disableAlpha,
+	disablePositioning,
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	value: controlPoints,
@@ -128,11 +121,12 @@ function ControlPoints( {
 	onStopControlPointChange,
 	__experimentalIsRenderedInSidebar,
 }: ControlPointsProps ) {
-	const controlPointMoveState = useRef< ControlPointMoveState >();
+	const controlPointMoveStateRef =
+		useRef< ControlPointMoveState >( undefined );
 
 	const onMouseMove = ( event: MouseEvent ) => {
 		if (
-			controlPointMoveState.current === undefined ||
+			controlPointMoveStateRef.current === undefined ||
 			gradientPickerDomRef.current === null
 		) {
 			return;
@@ -144,14 +138,14 @@ function ControlPoints( {
 		);
 
 		const { initialPosition, index, significantMoveHappened } =
-			controlPointMoveState.current;
+			controlPointMoveStateRef.current;
 
 		if (
 			! significantMoveHappened &&
 			Math.abs( initialPosition - relativePosition ) >=
 				MINIMUM_SIGNIFICANT_MOVE
 		) {
-			controlPointMoveState.current.significantMoveHappened = true;
+			controlPointMoveStateRef.current.significantMoveHappened = true;
 		}
 
 		onChange(
@@ -163,20 +157,20 @@ function ControlPoints( {
 		if (
 			window &&
 			window.removeEventListener &&
-			controlPointMoveState.current &&
-			controlPointMoveState.current.listenersActivated
+			controlPointMoveStateRef.current &&
+			controlPointMoveStateRef.current.listenersActivated
 		) {
 			window.removeEventListener( 'mousemove', onMouseMove );
 			window.removeEventListener( 'mouseup', cleanEventListeners );
 			onStopControlPointChange();
-			controlPointMoveState.current.listenersActivated = false;
+			controlPointMoveStateRef.current.listenersActivated = false;
 		}
 	};
 
 	// Adding `cleanEventListeners` to the dependency array below requires the function itself to be wrapped in a `useCallback`
 	// This memoization would prevent the event listeners from being properly cleaned.
 	// Instead, we'll pass a ref to the function in our `useEffect` so `cleanEventListeners` itself is no longer a dependency.
-	const cleanEventListenersRef = useRef< () => void >();
+	const cleanEventListenersRef = useRef< () => void >( undefined );
 	cleanEventListenersRef.current = cleanEventListeners;
 
 	useEffect( () => {
@@ -202,8 +196,8 @@ function ControlPoints( {
 									key={ index }
 									onClick={ () => {
 										if (
-											controlPointMoveState.current &&
-											controlPointMoveState.current
+											controlPointMoveStateRef.current &&
+											controlPointMoveStateRef.current
 												.significantMoveHappened
 										) {
 											return;
@@ -216,11 +210,14 @@ function ControlPoints( {
 										onToggle();
 									} }
 									onMouseDown={ () => {
+										if ( disablePositioning ) {
+											return;
+										}
 										if (
 											window &&
 											window.addEventListener
 										) {
-											controlPointMoveState.current = {
+											controlPointMoveStateRef.current = {
 												initialPosition,
 												index,
 												significantMoveHappened: false,
@@ -238,6 +235,19 @@ function ControlPoints( {
 										}
 									} }
 									onKeyDown={ ( event ) => {
+										if ( disablePositioning ) {
+											// The point cannot move, but the
+											// arrow keys are still consumed so
+											// they do not bubble away and move
+											// focus to another editor area.
+											if (
+												event.code === 'ArrowLeft' ||
+												event.code === 'ArrowRight'
+											) {
+												event.stopPropagation();
+											}
+											return;
+										}
 										if ( event.code === 'ArrowLeft' ) {
 											// Stop propagation of the key press event to avoid focus moving
 											// to another editor area.
@@ -273,6 +283,7 @@ function ControlPoints( {
 									isOpen={ isOpen }
 									position={ point.position }
 									color={ point.color }
+									disablePositioning={ disablePositioning }
 								/>
 							) }
 							renderContent={ ( { onClose } ) => (
@@ -349,6 +360,7 @@ function InsertPoint( {
 			} }
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
+					__next40pxDefaultSize
 					aria-expanded={ isOpen }
 					aria-haspopup="true"
 					onClick={ () => {
@@ -396,7 +408,7 @@ function InsertPoint( {
 					? {
 							left: `${ insertPosition }%`,
 							transform: 'translateX( -50% )',
-					  }
+						}
 					: undefined
 			}
 		/>

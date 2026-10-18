@@ -10,9 +10,9 @@
  *
  * @access private
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
- * @return string                Filtered block content.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
+ * @return string Filtered block content.
  */
 function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
 	if ( ! $block_content ) {
@@ -46,8 +46,8 @@ function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
  *
  * @access private
  *
- * @param string|null $pre_render   The pre-rendered content. Default null.
- * @param array       $block The block being rendered.
+ * @param string|null $pre_render The pre-rendered content. Default null.
+ * @param array       $block      The block being rendered.
  *
  * @return null
  */
@@ -128,7 +128,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	return null;
 }
 // Remove WordPress core filter to avoid rendering duplicate settings style blocks.
-remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10, 2 );
-remove_filter( 'pre_render_block', '_wp_add_block_level_preset_styles', 10, 2 );
+remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10 );
+remove_filter( 'pre_render_block', '_wp_add_block_level_preset_styles', 10 );
 add_filter( 'render_block', '_gutenberg_add_block_level_presets_class', 10, 2 );
 add_filter( 'pre_render_block', '_gutenberg_add_block_level_preset_styles', 10, 2 );

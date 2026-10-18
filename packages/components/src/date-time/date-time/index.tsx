@@ -1,21 +1,11 @@
-/**
- * External dependencies
- */
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { default as DatePicker } from '../date';
-import { default as TimePicker } from '../time';
+import { default as DatePicker } from '../date-picker';
+import { default as TimePicker } from '../time-picker';
 import type { DateTimePickerProps } from '../types';
-import { Wrapper } from './styles';
+import { VStack } from '../../v-stack';
+import styles from './style.module.scss';
 
 export { DatePicker, TimePicker };
 
@@ -25,6 +15,7 @@ function UnforwardedDateTimePicker(
 	{
 		currentDate,
 		is12Hour,
+		dateOrder,
 		isInvalidDate,
 		onMonthPreviewed = noop,
 		onChange,
@@ -34,12 +25,17 @@ function UnforwardedDateTimePicker(
 	ref: ForwardedRef< any >
 ) {
 	return (
-		<Wrapper ref={ ref } className="components-datetime" spacing={ 4 }>
+		<VStack
+			ref={ ref }
+			className={ clsx( 'components-datetime', styles.wrapper ) }
+			spacing={ 4 }
+		>
 			<>
 				<TimePicker
 					currentTime={ currentDate }
 					onChange={ onChange }
 					is12Hour={ is12Hour }
+					dateOrder={ dateOrder }
 				/>
 				<DatePicker
 					currentDate={ currentDate }
@@ -50,7 +46,7 @@ function UnforwardedDateTimePicker(
 					startOfWeek={ startOfWeek }
 				/>
 			</>
-		</Wrapper>
+		</VStack>
 	);
 }
 
@@ -77,5 +73,6 @@ function UnforwardedDateTimePicker(
  * ```
  */
 export const DateTimePicker = forwardRef( UnforwardedDateTimePicker );
+DateTimePicker.displayName = 'DateTimePicker';
 
 export default DateTimePicker;

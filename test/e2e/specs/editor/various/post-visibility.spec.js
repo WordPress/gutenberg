@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post visibility', () => {
@@ -18,7 +15,7 @@ test.describe( 'Post visibility', () => {
 			await editor.openDocumentSettingsSidebar();
 
 			await page
-				.getByRole( 'button', { name: 'Change post status:' } )
+				.getByRole( 'button', { name: 'Change status:' } )
 				.click();
 			await page.getByRole( 'radio', { name: 'Private' } ).click();
 
@@ -47,19 +44,22 @@ test.describe( 'Post visibility', () => {
 		await editor.openDocumentSettingsSidebar();
 
 		// Set a publish date for the next month.
-		await page.click( 'role=button[name="Change date: Immediately"i]' );
+		await page
+			.getByRole( 'button', { name: 'Change date: Immediately' } )
+			.click();
 
-		await page.click( 'role=button[name="View next month"i]' );
-		await page.click( 'role=application[name="Calendar"] >> text=15' );
+		await page.getByRole( 'button', { name: 'View next month' } ).click();
+		await page
+			.getByRole( 'application', { name: 'Calendar', exact: true } )
+			.getByText( '15' )
+			.click();
 		await page
 			.locator( '.block-editor-publish-date-time-picker' )
 			.getByRole( 'button', {
 				name: 'Close',
 			} )
 			.click();
-		await page
-			.getByRole( 'button', { name: 'Change post status:' } )
-			.click();
+		await page.getByRole( 'button', { name: 'Change status:' } ).click();
 		await page.getByRole( 'radio', { name: 'Private' } ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )

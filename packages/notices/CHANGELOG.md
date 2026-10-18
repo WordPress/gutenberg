@@ -2,6 +2,172 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   `createNotice`: Add a `details` option, for longer plain text that supplements the message. `InlineNotices` shows it behind a "Show details" disclosure, with a button to copy the message and the details together. Web addresses in the details are links that open in a new tab ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Enhancements
+
+-   `InlineNotices`: Render notices with the `@wordpress/ui` `Notice`. The markup changes: the `.components-notice*` classes are gone, each notice has the `notices-inline-notices__notice` class, and each list has the `notices-inline-notices__list` class. Each notice still announces its message when it is created ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Deprecations
+
+-   `createNotice`: Deprecate the `__unstableHTML` option. Pass the message as plain text, and any longer account as `details` ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+### Bug Fixes
+
+-   `InlineNotices`: Render nothing when every child renders nothing ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+
+## 5.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/data`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 5.56.0 (2026-09-23)
+
+## 5.55.0 (2026-09-10)
+
+## 5.54.0 (2026-08-26)
+
+### Internal
+
+-   Split tsconfig into a build project and a default dev project so dev files are type checked without publishing their declarations. ([#81514](https://github.com/WordPress/gutenberg/pull/81514))
+
+## 5.53.0 (2026-08-12)
+
+## 5.52.0 (2026-07-29)
+
+### Internal
+
+-   Update `exports` to use subpath patterns instead of deprecated trailing `/` folder mappings ([#80270](https://github.com/WordPress/gutenberg/pull/80270)).
+
+## 5.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 5.50.0 (2026-07-01)
+
+## 5.49.0 (2026-06-24)
+
+## 5.48.1 (2026-06-16)
+
+## 5.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 5.47.0 (2026-05-27)
+
+### Enhancements
+
+-   `InlineNotices`: Wrap pinned and dismissible lists in a `notices-inline-notices-wrapper` container with spacing between lists. Add optional `className` prop for the wrapper.
+
+### Internal
+
+-   `InlineNotices`: Remove package-level `Notice` style overrides; `Notice` from `@wordpress/components` owns layout and chrome ([#78231](https://github.com/WordPress/gutenberg/pull/78231)).
+
+## 5.46.0 (2026-05-14)
+
+## 5.45.0 (2026-04-29)
+
+## 5.44.0 (2026-04-15)
+
+## 5.43.0 (2026-04-01)
+
+## 5.42.0 (2026-03-18)
+
+## 5.41.0 (2026-03-04)
+
+## 5.40.0 (2026-02-18)
+
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
+### Enhancements
+
+-   Improved TypeScript definitions ([#67565](https://github.com/WordPress/gutenberg/pull/67565)).
+
+## 5.36.0 (2025-11-26)
+
+## 5.35.0 (2025-11-12)
+
+## 5.34.0 (2025-10-29)
+
+## 5.33.0 (2025-10-17)
+
+## 5.32.0 (2025-10-01)
+
+## 5.31.0 (2025-09-17)
+
+## 5.30.0 (2025-09-03)
+
+## 5.29.0 (2025-08-20)
+
+## 5.28.0 (2025-08-07)
+
+## 5.27.0 (2025-07-23)
+
+## 5.26.0 (2025-06-25)
+
+## 5.25.0 (2025-06-04)
+
+## 5.24.0 (2025-05-22)
+
+## 5.23.0 (2025-05-07)
+
+## 5.22.0 (2025-04-11)
+
+## 5.21.0 (2025-03-27)
+
+## 5.20.0 (2025-03-13)
+
+## 5.19.0 (2025-02-28)
+
+## 5.18.0 (2025-02-12)
+
+## 5.17.0 (2025-01-29)
+
+## 5.16.0 (2025-01-15)
+
+## 5.15.0 (2025-01-02)
+
+## 5.14.0 (2024-12-11)
+
+## 5.13.0 (2024-11-27)
+
+## 5.12.0 (2024-11-16)
+
+## 5.11.0 (2024-10-30)
+
+## 5.10.0 (2024-10-16)
+
+## 5.9.0 (2024-10-03)
+
+## 5.8.0 (2024-09-19)
+
+## 5.7.0 (2024-09-05)
+
+## 5.6.0 (2024-08-21)
+
+## 5.5.0 (2024-08-07)
+
+## 5.4.0 (2024-07-24)
+
+## 5.3.0 (2024-07-10)
+
+## 5.2.0 (2024-06-26)
+
+## 5.1.0 (2024-06-15)
+
 ## 5.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -56,7 +222,7 @@
 
 ## 4.3.0 (2023-06-07)
 
-### New Feature
+### New Features
 
 -   Add a new action `removeNotices` which allows bulk removal of notices by their IDs. ([#39940](https://github.com/WordPress/gutenberg/pull/39940))
 -   Add a new action `removeAllNotices` which removes all notices from a given context. ([#44059](https://github.com/WordPress/gutenberg/pull/44059))
@@ -67,7 +233,7 @@
 
 ## 4.0.0 (2023-04-26)
 
-### Breaking Change
+### Breaking Changes
 
 -   Publish Typescript build types to npm. ([#49650](https://github.com/WordPress/gutenberg/pull/49650))
 
@@ -144,13 +310,13 @@
 
 ## 2.12.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the notices namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 2.0.0 (2020-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   A notices message is no longer spoken as a result of notice creation, but rather by its display in the interface by its corresponding [`Notice` component](https://github.com/WordPress/gutenberg/tree/HEAD/packages/components/src/notice).
 
@@ -166,7 +332,7 @@
 
 ## 1.1.0 (2018-11-20)
 
-### New Feature
+### New Features
 
 -   New option `speak` enables control as to whether the notice content is announced to screen readers (defaults to `true`)
 

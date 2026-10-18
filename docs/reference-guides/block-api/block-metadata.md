@@ -1,6 +1,6 @@
 # Metadata in block.json
 
-Starting with the WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin create a notice block.
+Starting with the WordPress 5.8 release, we recommend using the `block.json` metadata file as the canonical way to register block types with both PHP (server-side) and JavaScript (client-side). Here is an example `block.json` file that would define the metadata for a plugin creating a notice block.
 
 **Example:**
 
@@ -100,7 +100,7 @@ This section describes all the properties that can be added to the `block.json` 
 
 The version of the Block API used by the block. The most recent version is `3` and it was introduced in WordPress 6.3.
 
-See [the API versions documentation](/docs/reference-guides/block-api/block-api-versions.md) for more details.
+See [the API versions documentation](/docs/reference-guides/block-api/block-api-versions/README.md) for more details.
 
 ### Name
 
@@ -427,7 +427,7 @@ See the [Example documentation](/docs/reference-guides/block-api/block-registrat
 
 ### Variations
 
--   Type: `object[]`
+-   Type: `object[]|WPDefinedPath` ([learn more](#wpdefinedpath))
 -   Optional
 -   Localized: Yes (`title`, `description`, and `keywords` of each variation only)
 -   Property: `variations`
@@ -454,6 +454,48 @@ Block Variations is the API that allows a block to have similar versions of it, 
 
 _Note: In JavaScript you can provide a function for the `isActive` property, and a React element for the `icon`. In the `block.json` file both only support strings_
 
+Starting with version 6.7, it is possible to specify a PHP file in `block.json` that generates the list of block variations on the server side:
+
+```json
+{ "variations": "file:./variations.php" }
+```
+
+That PHP file is expected to `return` an array that contains the block variations. Strings found in the variations returned from the PHP file will not be localized automatically; instead, use the `__()` function as usual.
+
+For example:
+
+```php
+<?php
+// Generate variations for a Social Icon kind of block.
+
+return array(
+	array(
+		'isDefault'  => true,
+		'name'       => 'wordpress',
+		'title'      => 'WordPress',
+		'icon'       => 'wordpress',
+		'attributes' => array(
+			'service' => 'wordpress',
+		),
+		'isActive'   => array( 'service' )
+	),
+	array(
+		'name'       => 'mail',
+		'title'      => __( 'Mail' ),
+		'keywords'   => array(
+			__( 'email' ),
+			__( 'e-mail' )
+		),
+		'icon'       => 'mail',
+		'attributes' => array(
+			'service' => 'mail',
+		),
+		'isActive'   => array( 'mail' )
+	),
+);
+
+```
+
 See [the variations documentation](/docs/reference-guides/block-api/block-variations.md) for more details.
 
 ### Block Hooks
@@ -473,7 +515,7 @@ See [the variations documentation](/docs/reference-guides/block-api/block-variat
 
 Block Hooks is an API that allows a block to automatically insert itself next to all instances of a given block type, in a relative position also specified by the "hooked" block. That is, a block can opt to be inserted before or after a given block type, or as its first or last child (i.e. to be prepended or appended to the list of its child blocks, respectively). Hooked blocks will appear both on the frontend and in the editor (to allow for customization by the user).
 
-The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Take a look at the [Block Hooks documentation](/docs/reference-guides/block-api/block-registration.md#block-hooks-optional) for more info about available configurations.
+The key is the name of the block (`string`) to hook into, and the value is the position to hook into (`string`). Take a look at the [Block Hooks documentation](/docs/reference-guides/block-api/block-registration.md#blockhooks-optional) for more info about available configurations.
 
 ### Editor script
 
@@ -745,7 +787,7 @@ $metadata = array(
 );
 ```
 
-Implementation follows the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
+Implementation follows the existing [get_plugin_data](https://developer.wordpress.org/reference/functions/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
 
 ### JavaScript
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Allowed Patterns', () => {
@@ -14,14 +11,11 @@ test.describe( 'Allowed Patterns', () => {
 		);
 	} );
 
-	test( 'should show all patterns when all blocks are allowed', async ( {
-		admin,
-		page,
-	} ) => {
+	test( 'should show all patterns by default', async ( { admin, page } ) => {
 		await admin.createNewPost();
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		await page
@@ -29,13 +23,13 @@ test.describe( 'Allowed Patterns', () => {
 				name: 'Block Library',
 			} )
 			.getByRole( 'searchbox', {
-				name: 'Search for blocks and patterns',
+				name: 'Search',
 			} )
 			.fill( 'Test:' );
 
 		await expect(
 			page
-				.getByRole( 'listbox', { name: 'Block patterns' } )
+				.getByRole( 'listbox', { name: 'Patterns' } )
 				.getByRole( 'option' )
 		).toHaveText( [
 			'Test: Single heading',
@@ -57,14 +51,14 @@ test.describe( 'Allowed Patterns', () => {
 			);
 		} );
 
-		test( 'should show only allowed patterns', async ( {
+		test( 'should hide patterns with only hidden blocks', async ( {
 			admin,
 			page,
 		} ) => {
 			await admin.createNewPost();
 			await page
 				.getByRole( 'toolbar', { name: 'Document tools' } )
-				.getByRole( 'button', { name: 'Toggle block inserter' } )
+				.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 				.click();
 
 			await page
@@ -72,13 +66,13 @@ test.describe( 'Allowed Patterns', () => {
 					name: 'Block Library',
 				} )
 				.getByRole( 'searchbox', {
-					name: 'Search for blocks and patterns',
+					name: 'Search',
 				} )
 				.fill( 'Test:' );
 
 			await expect(
 				page
-					.getByRole( 'listbox', { name: 'Block patterns' } )
+					.getByRole( 'listbox', { name: 'Patterns' } )
 					.getByRole( 'option' )
 			).toHaveText( [ 'Test: Single heading' ] );
 		} );

@@ -1,18 +1,6 @@
-/**
- * External dependencies
- */
 import type { ChangeEvent, ForwardedRef } from 'react';
-import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { TextControlProps } from './types';
@@ -22,8 +10,9 @@ function UnforwardedTextControl(
 	ref: ForwardedRef< HTMLInputElement >
 ) {
 	const {
-		__nextHasNoMarginBottom,
-		__next40pxDefaultSize = false,
+		// Prevent passing legacy props to `input`.
+		__nextHasNoMarginBottom: _,
+		__next40pxDefaultSize: __,
 		label,
 		hideLabelFromVision,
 		value,
@@ -40,7 +29,6 @@ function UnforwardedTextControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
@@ -48,9 +36,7 @@ function UnforwardedTextControl(
 			className={ className }
 		>
 			<input
-				className={ clsx( 'components-text-control__input', {
-					'is-next-40px-default-size': __next40pxDefaultSize,
-				} ) }
+				className="components-text-control__input"
 				type={ type }
 				id={ id }
 				value={ value }
@@ -84,5 +70,6 @@ function UnforwardedTextControl(
  * ```
  */
 export const TextControl = forwardRef( UnforwardedTextControl );
+TextControl.displayName = 'TextControl';
 
 export default TextControl;

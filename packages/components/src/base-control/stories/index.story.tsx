@@ -1,25 +1,28 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import BaseControl, { useBaseControlProps } from '..';
 import Button from '../../button';
 
 const meta: Meta< typeof BaseControl > = {
-	title: 'Components/BaseControl',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-components/Selection & Input/Common/BaseControl',
+	id: 'components-basecontrol',
 	component: BaseControl,
+	subcomponents: {
+		'BaseControl.VisualLabel': BaseControl.VisualLabel,
+	},
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 	},
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Use [`Field`](?path=/docs/design-system-components-form-primitives-field--docs) from `@wordpress/ui` instead. For a purely visual label outside `Field.Root`, use `Field.VisualLabel`. For a group legend, use [`Fieldset`](?path=/docs/design-system-components-form-primitives-fieldset--docs) and `Fieldset.Legend`.',
+		},
 	},
 };
 export default meta;
@@ -37,7 +40,6 @@ const BaseControlWithTextarea: StoryFn< typeof BaseControl > = ( props ) => {
 export const Default: StoryFn< typeof BaseControl > =
 	BaseControlWithTextarea.bind( {} );
 Default.args = {
-	__nextHasNoMarginBottom: true,
 	label: 'Label text',
 };
 
@@ -55,14 +57,15 @@ WithHelpText.args = {
  * otherwise use if the `label` prop was passed.
  */
 export const WithVisualLabel: StoryFn< typeof BaseControl > = ( props ) => {
-	// @ts-expect-error - Unclear how to fix, see also https://github.com/WordPress/gutenberg/pull/39468#discussion_r827150516
 	BaseControl.VisualLabel.displayName = 'BaseControl.VisualLabel';
 
 	return (
 		<BaseControl { ...props }>
 			<BaseControl.VisualLabel>Visual label</BaseControl.VisualLabel>
 			<div>
-				<Button variant="secondary">Select an author</Button>
+				<Button __next40pxDefaultSize variant="secondary">
+					Select an author
+				</Button>
 			</div>
 		</BaseControl>
 	);

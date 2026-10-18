@@ -1,19 +1,7 @@
-/**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import ToolbarContext from '../toolbar-context';
 import type { ToolbarProps } from './types';
 import type { WordPressComponentProps } from '../../context';
@@ -41,4 +29,5 @@ function UnforwardedToolbarContainer(
 }
 
 export const ToolbarContainer = forwardRef( UnforwardedToolbarContainer );
+ToolbarContainer.displayName = 'ToolbarContainer';
 export default ToolbarContainer;

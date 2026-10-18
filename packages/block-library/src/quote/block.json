@@ -14,13 +14,13 @@
 			"selector": "blockquote",
 			"multiline": "p",
 			"default": "",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"citation": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "cite",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"textAlign": {
 			"type": "string"
@@ -28,16 +28,32 @@
 	},
 	"supports": {
 		"anchor": true,
+		"align": [ "left", "right", "wide", "full" ],
 		"html": false,
 		"background": {
 			"backgroundImage": true,
 			"backgroundSize": true,
+			"gradient": true,
 			"__experimentalDefaultControls": {
-				"backgroundImage": true
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": true,
+				"radius": true,
+				"style": true,
+				"width": true
 			}
 		},
 		"dimensions": {
 			"minHeight": true,
+			"minWidth": true,
 			"__experimentalDefaultControls": {
 				"minHeight": false
 			}
@@ -53,6 +69,7 @@
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
@@ -61,20 +78,25 @@
 			"gradients": true,
 			"heading": true,
 			"link": true,
+			"button": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
 		},
+		"shadow": true,
 		"layout": {
 			"allowEditing": false
 		},
 		"spacing": {
-			"blockGap": true
+			"blockGap": true,
+			"padding": true,
+			"margin": true
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"allowedBlocks": true
 	},
 	"styles": [
 		{

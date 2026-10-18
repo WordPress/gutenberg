@@ -1,16 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { View } from '../../view';
 import type { WordPressComponentProps } from '../../context';
 import { contextConnect } from '../../context';
 import { useBorderBoxControlVisualizer } from './hook';
-
 import type { VisualizerProps } from '../types';
 
 const BorderBoxControlVisualizer = (

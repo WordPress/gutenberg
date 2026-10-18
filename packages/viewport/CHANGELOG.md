@@ -2,6 +2,140 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 6.57.0 (2026-10-07)
+
+### Bug Fixes
+
+-   Declare `react-dom` and `@types/react-dom` as peer dependencies, forwarding the peers of `@wordpress/element`, so strict package managers such as Yarn PnP can resolve them ([#83765](https://github.com/WordPress/gutenberg/pull/83765)).
+
+## 6.56.0 (2026-09-23)
+
+## 6.55.0 (2026-09-10)
+
+## 6.54.0 (2026-08-26)
+
+## 6.53.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Scope the breakpoint media queries to `screen`, so that printing does not report the viewport as having become narrower ([#81367](https://github.com/WordPress/gutenberg/pull/81367)).
+
+## 6.52.0 (2026-07-29)
+
+## 6.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 6.50.0 (2026-07-01)
+
+## 6.49.0 (2026-06-24)
+
+## 6.48.1 (2026-06-16)
+
+## 6.48.0 (2026-06-10)
+
+### Code Quality
+
+-   Add missing `@types/react` dependency. [#78882](https://github.com/WordPress/gutenberg/pull/78882).
+
+## 6.47.0 (2026-05-27)
+
+## 6.46.0 (2026-05-14)
+
+## 6.45.0 (2026-04-29)
+
+## 6.44.0 (2026-04-15)
+
+## 6.43.0 (2026-04-01)
+
+## 6.42.0 (2026-03-18)
+
+## 6.41.0 (2026-03-04)
+
+## 6.40.0 (2026-02-18)
+
+## 6.39.0 (2026-01-29)
+
+## 6.38.0 (2026-01-16)
+
+## 6.36.0 (2025-11-26)
+
+## 6.35.0 (2025-11-12)
+
+## 6.34.0 (2025-10-29)
+
+## 6.33.0 (2025-10-17)
+
+## 6.32.0 (2025-10-01)
+
+## 6.31.0 (2025-09-17)
+
+## 6.30.0 (2025-09-03)
+
+## 6.29.0 (2025-08-20)
+
+## 6.28.0 (2025-08-07)
+
+## 6.27.0 (2025-07-23)
+
+## 6.26.0 (2025-06-25)
+
+## 6.25.0 (2025-06-04)
+
+## 6.24.0 (2025-05-22)
+
+## 6.23.0 (2025-05-07)
+
+## 6.22.0 (2025-04-11)
+
+## 6.21.0 (2025-03-27)
+
+## 6.20.0 (2025-03-13)
+
+## 6.19.0 (2025-02-28)
+
+## 6.18.0 (2025-02-12)
+
+## 6.17.0 (2025-01-29)
+
+## 6.16.0 (2025-01-15)
+
+## 6.15.0 (2025-01-02)
+
+## 6.14.0 (2024-12-11)
+
+## 6.13.0 (2024-11-27)
+
+## 6.12.0 (2024-11-16)
+
+## 6.11.0 (2024-10-30)
+
+## 6.10.0 (2024-10-16)
+
+## 6.9.0 (2024-10-03)
+
+## 6.8.0 (2024-09-19)
+
+## 6.7.0 (2024-09-05)
+
+## 6.6.0 (2024-08-21)
+
+## 6.5.0 (2024-08-07)
+
+## 6.4.0 (2024-07-24)
+
+## 6.3.0 (2024-07-10)
+
+## 6.2.0 (2024-06-26)
+
+## 6.1.0 (2024-06-15)
+
 ## 6.0.0 (2024-05-31)
 
 ### Breaking Changes
@@ -126,7 +260,7 @@
 
 ## 4.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -145,13 +279,13 @@
 
 ## 2.25.0 (2020-12-17)
 
-### New Feature
+### New Features
 
 -   Added a store definition `store` for the viewport namespace to use with `@wordpress/data` API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
 ## 2.1.0 (2019-01-03)
 
-### Improvements
+### Enhancements
 
 -   The initial viewport state is assigned synchronously, rather than on the next process tick. This should have an impact of fewer callbacks made to data subscribers.
 
@@ -175,6 +309,6 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

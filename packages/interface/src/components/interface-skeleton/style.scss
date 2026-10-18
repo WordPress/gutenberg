@@ -1,3 +1,9 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 // On Mobile devices, swiping the HTML element should not scroll.
 // By making it fixed, we prevent that.
 html.interface-interface-skeleton__html-container {
@@ -30,7 +36,7 @@ html.interface-interface-skeleton__html-container {
 		top: $admin-bar-height;
 
 		.is-fullscreen-mode & {
-			top: 0;
+			top: var(--wp-admin--admin-bar--height, 0);
 		}
 	}
 }
@@ -69,7 +75,7 @@ html.interface-interface-skeleton__html-container {
 	// Footer overlap prevention
 	.has-footer & {
 		@include break-medium() {
-			padding-bottom: $button-size-small + $border-width;
+			padding-bottom: calc(var(--wpds-dimension-size-md) + #{$border-width});
 		}
 	}
 }
@@ -122,7 +128,7 @@ html.interface-interface-skeleton__html-container {
 	overflow: hidden;
 
 	@include break-medium() {
-		box-shadow: -$border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+		box-shadow: -$border-width 0 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	}
 }
@@ -132,7 +138,7 @@ html.interface-interface-skeleton__html-container {
 	right: 0;
 
 	@include break-medium() {
-		box-shadow: $border-width $border-width 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
+		box-shadow: $border-width 0 0 0 rgba($color: #000, $alpha: 0.133); // 0.133 = $gray-200 but with alpha.
 		outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 	}
 }
@@ -162,16 +168,6 @@ html.interface-interface-skeleton__html-container {
 	display: none;
 	@include break-medium() {
 		display: flex;
-	}
-
-	.block-editor-block-breadcrumb {
-		z-index: z-index(".edit-post-layout__footer");
-		display: flex;
-		background: $white;
-		height: $button-size-small;
-		align-items: center;
-		font-size: $default-font-size;
-		padding: 0 ($grid-unit-15 + 6px);
 	}
 }
 
@@ -203,7 +199,7 @@ html.interface-interface-skeleton__html-container {
 				top: $admin-bar-height;
 
 				.is-fullscreen-mode & {
-					top: 0;
+					top: var(--wp-admin--admin-bar--height, 0);
 				}
 			}
 		}

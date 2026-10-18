@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -14,44 +11,39 @@ export function buildTermsTree( flatTerms ) {
 	const flatTermsWithParentAndChildren = flatTerms.map( ( term ) => {
 		return {
 			children: [],
-			parent: null,
+			parent: undefined,
 			...term,
 		};
 	} );
 
 	// All terms should have a `parent` because we're about to index them by it.
 	if (
-		flatTermsWithParentAndChildren.some( ( { parent } ) => parent === null )
+		flatTermsWithParentAndChildren.some(
+			( { parent } ) => parent === undefined
+		)
 	) {
 		return flatTermsWithParentAndChildren;
 	}
 
-	const termsByParent = flatTermsWithParentAndChildren.reduce(
-		( acc, term ) => {
-			const { parent } = term;
-			if ( ! acc[ parent ] ) {
-				acc[ parent ] = [];
-			}
-			acc[ parent ].push( term );
-			return acc;
-		},
-		{}
-	);
+	const termsById = Object.create( null );
+	for ( const term of flatTermsWithParentAndChildren ) {
+		// The tree owns `children`, so drop whatever the input carried.
+		term.children = [];
+		termsById[ term.id ] = term;
+	}
 
-	const fillWithChildren = ( terms ) => {
-		return terms.map( ( term ) => {
-			const children = termsByParent[ term.id ];
-			return {
-				...term,
-				children:
-					children && children.length
-						? fillWithChildren( children )
-						: [],
-			};
-		} );
-	};
+	// Terms whose parent is missing are unreachable, so they are dropped.
+	const tree = [];
+	for ( const term of flatTermsWithParentAndChildren ) {
+		const parent = termsById[ term.parent ];
+		if ( parent ) {
+			parent.children.push( term );
+		} else if ( `${ term.parent }` === '0' ) {
+			tree.push( term );
+		}
+	}
 
-	return fillWithChildren( termsByParent[ '0' ] || [] );
+	return tree;
 }
 
 export const unescapeString = ( arg ) => {

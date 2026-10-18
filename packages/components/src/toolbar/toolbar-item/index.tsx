@@ -1,23 +1,11 @@
-/**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
 import * as Ariakit from '@ariakit/react';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef, useContext } from '@wordpress/element';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import ToolbarContext from '../toolbar-context';
 import type { ToolbarItemProps } from './types';
 
-function ToolbarItem(
+function UnforwardedToolbarItem(
 	{ children, as: Component, ...props }: ToolbarItemProps,
 	ref: ForwardedRef< any >
 ) {
@@ -50,6 +38,7 @@ function ToolbarItem(
 
 	return (
 		<Ariakit.ToolbarItem
+			accessibleWhenDisabled
 			{ ...allProps }
 			store={ accessibleToolbarStore }
 			render={ render }
@@ -57,4 +46,6 @@ function ToolbarItem(
 	);
 }
 
-export default forwardRef( ToolbarItem );
+export const ToolbarItem = forwardRef( UnforwardedToolbarItem );
+ToolbarItem.displayName = 'ToolbarItem';
+export default ToolbarItem;

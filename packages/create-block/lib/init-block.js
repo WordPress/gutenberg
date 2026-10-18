@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
-const { dirname, join } = require( 'path' );
-const makeDir = require( 'make-dir' );
+const { join } = require( 'path' );
 const { writeFile } = require( 'fs' ).promises;
-
-/**
- * Internal dependencies
- */
+const makeDir = require( 'make-dir' );
 const { info } = require( './log' );
 const { writeOutputTemplate } = require( './output' );
 
@@ -35,16 +28,18 @@ async function initBlockJSON( {
 	viewScript,
 	customBlockJSON,
 	example,
+	rootDirectory,
 } ) {
 	info( '' );
 	info( 'Creating a "block.json" file.' );
 
-	const outputFile = plugin
-		? join( process.cwd(), slug, folderName, 'block.json' )
-		: join( process.cwd(), slug, 'block.json' );
-	await makeDir( dirname( outputFile ) );
+	const blockFolderName = plugin
+		? join( rootDirectory, folderName )
+		: rootDirectory;
+	await makeDir( blockFolderName );
+
 	await writeFile(
-		outputFile,
+		join( blockFolderName, 'block.json' ),
 		JSON.stringify(
 			Object.fromEntries(
 				Object.entries( {
@@ -79,13 +74,12 @@ async function initBlockJSON( {
 module.exports = async function ( outputTemplates, view ) {
 	await Promise.all(
 		Object.keys( outputTemplates ).map( async ( outputFile ) => {
-			const pathName = view.plugin
-				? join( view.folderName, outputFile )
-				: join( process.cwd(), view.slug, outputFile );
-
 			await writeOutputTemplate(
 				outputTemplates[ outputFile ],
-				pathName,
+				join(
+					view.plugin ? view.folderName : '',
+					outputFile.replace( /\$slug/g, view.slug )
+				),
 				view
 			);
 		} )

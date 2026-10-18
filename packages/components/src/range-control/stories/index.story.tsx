@@ -1,24 +1,16 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 import { useState } from '@wordpress/element';
 import { starEmpty, starFilled, styles, wordpress } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import RangeControl from '..';
 
 const ICONS = { starEmpty, starFilled, styles, wordpress };
 
 const meta: Meta< typeof RangeControl > = {
+	tags: [ 'manifest' ],
 	component: RangeControl,
-	title: 'Components/RangeControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/RangeControl',
+	id: 'components-rangecontrol',
 	argTypes: {
 		afterIcon: {
 			control: { type: 'select' },
@@ -32,23 +24,33 @@ const meta: Meta< typeof RangeControl > = {
 		},
 		color: { control: { type: 'color' } },
 		help: { control: { type: 'text' } },
-		icon: { control: { type: null } },
 		marks: { control: { type: 'object' } },
-		onBlur: { control: { type: null } },
-		onChange: { control: { type: null } },
-		onFocus: { control: { type: null } },
-		onMouseLeave: { control: { type: null } },
-		onMouseMove: { control: { type: null } },
+		onBlur: { control: false },
+		onChange: { control: false },
+		onFocus: { control: false },
+		onMouseLeave: { control: false },
+		onMouseMove: { control: false },
 		railColor: { control: { type: 'color' } },
 		step: { control: { type: 'number' } },
 		trackColor: { control: { type: 'color' } },
 		type: { control: { type: 'check' }, options: [ 'stepper' ] },
-		value: { control: { type: null } },
+		value: { control: false },
+	},
+	args: {
+		onBlur: fn(),
+		onChange: fn(),
+		onFocus: fn(),
+		onMouseLeave: fn(),
+		onMouseMove: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SliderControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -166,6 +168,12 @@ const marksWithNegatives = [
 export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
+WithIntegerStepAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
+
 WithIntegerStepAndMarks.args = {
 	label: 'Integer Step',
 	marks: marksBase,
@@ -181,6 +189,12 @@ WithIntegerStepAndMarks.args = {
  */
 export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
+
+WithDecimalStepAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 WithDecimalStepAndMarks.args = {
 	marks: [
@@ -201,6 +215,12 @@ WithDecimalStepAndMarks.args = {
 export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
+WithNegativeMinimumAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
+
 WithNegativeMinimumAndMarks.args = {
 	marks: marksWithNegatives,
 	max: 10,
@@ -216,6 +236,12 @@ WithNegativeMinimumAndMarks.args = {
 export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
+WithNegativeRangeAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
+
 WithNegativeRangeAndMarks.args = {
 	marks: marksWithNegatives,
 	max: -1,
@@ -230,6 +256,12 @@ WithNegativeRangeAndMarks.args = {
  */
 export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
+
+WithAnyStepAndMarks.parameters = {
+	// FIXME: Mark labels fail color-contrast; stories without a `label` arg also render an empty heading (color-contrast, empty-heading).
+	// See: https://github.com/WordPress/gutenberg/issues/81596
+	a11y: { test: 'todo' },
+};
 
 WithAnyStepAndMarks.args = {
 	marks: marksBase,

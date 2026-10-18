@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
@@ -8,11 +5,10 @@ import {
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
 import deprecated from '@wordpress/deprecated';
-import { addFilter } from '@wordpress/hooks';
-
-/**
- * Internal dependencies
- */
+import { addAction } from '@wordpress/hooks';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
+import { __ } from '@wordpress/i18n';
 import { getMetaBoxContainer } from '../utils/meta-boxes';
 import { unlock } from '../lock-unlock';
 
@@ -289,9 +285,21 @@ export const requestMetaBoxUpdates =
 			window.tinyMCE.triggerSave();
 		}
 
+		// We gather the base form data.
+		const baseFormData = new window.FormData(
+			document.querySelector( '.metabox-base-form' )
+		);
+
+		const postId = baseFormData.get( 'post_ID' );
+		const postType = baseFormData.get( 'post_type' );
+
 		// Additional data needed for backward compatibility.
 		// If we do not provide this data, the post will be overridden with the default values.
-		const post = registry.select( editorStore ).getCurrentPost();
+		// We cannot rely on getCurrentPost because right now on the editor we may be editing a pattern or a template.
+		// We need to retrieve the post that the base form data is referring to.
+		const post = registry
+			.select( coreStore )
+			.getEditedEntityRecord( 'postType', postType, postId );
 		const additionalData = [
 			post.comment_status
 				? [ 'comment_status', post.comment_status ]
@@ -301,10 +309,7 @@ export const requestMetaBoxUpdates =
 			post.author ? [ 'post_author', post.author ] : false,
 		].filter( Boolean );
 
-		// We gather all the metaboxes locations data and the base form data.
-		const baseFormData = new window.FormData(
-			document.querySelector( '.metabox-base-form' )
-		);
+		// We gather all the metaboxes locations.
 		const activeMetaBoxLocations = select.getActiveMetaBoxLocations();
 		const formDataToMerge = [
 			baseFormData,
@@ -468,21 +473,14 @@ export const initializeMetaBoxes =
 		metaBoxesInitialized = true;
 
 		// Save metaboxes on save completion, except for autosaves.
-		addFilter(
-			'editor.__unstableSavePost',
+		addAction(
+			'editor.savePost',
 			'core/edit-post/save-metaboxes',
-			( previous, options ) =>
-				previous.then( () => {
-					if ( options.isAutosave ) {
-						return;
-					}
-
-					if ( ! select.hasMetaBoxes() ) {
-						return;
-					}
-
-					return dispatch.requestMetaBoxUpdates();
-				} )
+			async ( post, options ) => {
+				if ( ! options.isAutosave && select.hasMetaBoxes() ) {
+					await dispatch.requestMetaBoxUpdates();
+				}
+			}
 		);
 
 		dispatch( {
@@ -505,4 +503,45 @@ export const toggleDistractionFree =
 			alternative: "dispatch( 'core/editor').toggleDistractionFree",
 		} );
 		registry.dispatch( editorStore ).toggleDistractionFree();
+	};
+
+/**
+ * Action that toggles the Fullscreen Mode view option.
+ */
+export const toggleFullscreenMode =
+	() =>
+	( { registry } ) => {
+		const isFullscreen = registry
+			.select( preferencesStore )
+			.get( 'core/edit-post', 'fullscreenMode' );
+
+		registry
+			.dispatch( preferencesStore )
+			.toggle( 'core/edit-post', 'fullscreenMode' );
+
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isFullscreen
+					? __( 'Fullscreen mode deactivated.' )
+					: __( 'Fullscreen mode activated.' ),
+				{
+					id: 'core/edit-post/toggle-fullscreen-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle(
+										'core/edit-post',
+										'fullscreenMode'
+									);
+							},
+						},
+					],
+				}
+			);
 	};

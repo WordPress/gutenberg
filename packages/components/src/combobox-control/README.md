@@ -37,6 +37,7 @@ function MyComboboxControl() {
 			label="Font Size"
 			value={ fontSize }
 			onChange={ setFontSize }
+			isLoading={ isLoading }
 			options={ filteredOptions }
 			onFilterValueChange={ ( inputValue ) =>
 				setFilteredOptions(
@@ -89,9 +90,9 @@ Function called when the control's search input value changes. The argument cont
 
 #### onChange
 
-Function called with the selected value changes.
+Function called when the selected value changes.
 
--   Type: `( value: string | null | undefined ) => void`
+-   Type: `( value: string | null ) => void`
 -   Required: No
 
 #### value
@@ -109,6 +110,20 @@ If the control is clicked, the dropdown will expand regardless of this prop.
 -   Type: `Boolean`
 -   Required: No
 -   Default: `true`
+
+#### placeholder
+
+If passed, the combobox input will show a placeholder string if no values are present.
+
+-   Type: `string`
+-   Required: No
+
+#### isLoading
+
+Show a spinner (and hide the suggestions dropdown) while data about the matching suggestions (ie the `options` prop) is loading
+
+-   Type: `Boolean`
+-   Required: No
 
 #### __experimentalRenderItem
 

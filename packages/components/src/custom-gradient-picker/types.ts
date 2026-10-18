@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type gradientParser from 'gradient-parser';
 
 export type CustomGradientPickerProps = {
@@ -27,6 +24,12 @@ export type CustomGradientPickerProps = {
 	 */
 	onChange: ( currentGradient: string ) => void;
 	/**
+	 * Whether to enable alpha transparency options in the picker.
+	 *
+	 * @default true
+	 */
+	enableAlpha?: boolean;
+	/**
 	 * Whether this is rendered in the sidebar.
 	 *
 	 * @default false
@@ -34,16 +37,22 @@ export type CustomGradientPickerProps = {
 	__experimentalIsRenderedInSidebar?: boolean;
 };
 
+/**
+ * `gradient-parser` can't read the color interpolation method of a gradient
+ * (e.g. `in oklch`), so the picker keeps it next to the parsed AST.
+ */
+type WithColorInterpolation = { colorInterpolation?: string };
+
+export type GradientAST = gradientParser.GradientNode & WithColorInterpolation;
+
 export type GradientAnglePickerProps = {
-	gradientAST:
-		| gradientParser.LinearGradientNode
-		| gradientParser.RepeatingLinearGradientNode;
+	gradientAST: gradientParser.LinearGradientNode & WithColorInterpolation;
 	hasGradient: boolean;
 	onChange: ( gradient: string ) => void;
 };
 
 export type GradientTypePickerProps = {
-	gradientAST: gradientParser.GradientNode;
+	gradientAST: GradientAST;
 	hasGradient: boolean;
 	onChange: ( gradient: string ) => void;
 };
@@ -57,6 +66,14 @@ export type CustomGradientBarProps = {
 	onChange: ( newControlPoints: ControlPoint[] ) => void;
 	disableInserter?: boolean;
 	disableAlpha?: boolean;
+	/**
+	 * Whether control points are fixed in place. Set by consumers whose value
+	 * has no positions to store, such as a duotone, so the control does not
+	 * offer a move it cannot save.
+	 *
+	 * @default false
+	 */
+	disablePositioning?: boolean;
 	__experimentalIsRenderedInSidebar?: boolean;
 };
 
@@ -89,12 +106,14 @@ export type ControlPointButtonProps = {
 	isOpen: boolean;
 	position: ControlPoint[ 'position' ];
 	color: string;
+	disablePositioning?: boolean;
 };
 
 export type ControlPointsProps = {
 	disableRemove: boolean;
 	disableAlpha: boolean;
-	gradientPickerDomRef: React.RefObject< HTMLDivElement >;
+	disablePositioning?: boolean;
+	gradientPickerDomRef: React.RefObject< HTMLDivElement | null >;
 	ignoreMarkerPosition?: number;
 	value: ControlPoint[];
 	onChange: ( controlPoints: ControlPoint[] ) => void;

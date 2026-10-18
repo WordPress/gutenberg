@@ -51,11 +51,10 @@
 		title: 'Test Inner Blocks no locking',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE,
 
 		edit: function InnerBlocksNoLockingEdit() {
-			return el( 'div', useBlockProps(), el( InnerBlocks, {
-				template: TEMPLATE,
-			} ) );
+			return el( 'div', useBlockProps(), el( InnerBlocks ) );
 		},
 
 		save,
@@ -66,12 +65,16 @@
 		title: 'Test InnerBlocks locking all',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE,
 
 		edit: function InnerBlocksBlocksLockingAllEdit() {
-			return el( 'div', useBlockProps(), el( InnerBlocks, {
-				template: TEMPLATE,
-				templateLock: 'all',
-			} ) );
+			return el(
+				'div',
+				useBlockProps(),
+				el( InnerBlocks, {
+					templateLock: 'all',
+				} )
+			);
 		},
 
 		save,
@@ -92,7 +95,9 @@
 
 		edit: function InnerBlocksUpdateLockedTemplateEdit( props ) {
 			const hasUpdatedTemplated = props.attributes.hasUpdatedTemplate;
-			return el( 'div', null,
+			return el(
+				'div',
+				null,
 				el(
 					'button',
 					{
@@ -102,12 +107,16 @@
 					},
 					'Update template'
 				),
-				el( 'div', useBlockProps(), el( InnerBlocks, {
-					template: hasUpdatedTemplated
-						? TEMPLATE_TWO_PARAGRAPHS
-						: TEMPLATE,
-					templateLock: 'all',
-				} ) ),
+				el(
+					'div',
+					useBlockProps(),
+					el( InnerBlocks, {
+						template: hasUpdatedTemplated
+							? TEMPLATE_TWO_PARAGRAPHS
+							: TEMPLATE,
+						templateLock: 'all',
+					} )
+				)
 			);
 		},
 
@@ -119,12 +128,31 @@
 		title: 'Test Inner Blocks Paragraph Placeholder',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
+		templateInsertUpdatesSelection: true,
 
 		edit: function InnerBlocksParagraphPlaceholderEdit() {
-			return el( 'div', useBlockProps(), el( InnerBlocks, {
-				template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
-				templateInsertUpdatesSelection: true,
-			} ) );
+			return el( 'div', useBlockProps(), el( InnerBlocks ) );
+		},
+
+		save,
+	} );
+
+	registerBlockType( 'test/test-inner-blocks-deprecated-props', {
+		apiVersion: 3,
+		title: 'Test Inner Blocks deprecated props',
+		icon: 'cart',
+		category: 'text',
+
+		edit: function InnerBlocksDeprecatedPropsEdit() {
+			return el(
+				'div',
+				useBlockProps(),
+				el( InnerBlocks, {
+					template: TEMPLATE_PARAGRAPH_PLACEHOLDER,
+					templateInsertUpdatesSelection: true,
+				} )
+			);
 		},
 
 		save,
@@ -135,6 +163,7 @@
 		title: 'Test Inner Blocks transformer target',
 		icon: 'cart',
 		category: 'text',
+		template: TEMPLATE,
 
 		transforms: {
 			from: [
@@ -171,36 +200,35 @@
 		},
 
 		edit: function InnerBlocksTransformerTargetEdit() {
-			return el( 'div', useBlockProps(), el( InnerBlocks, {
-				template: TEMPLATE,
-			} ) );
+			return el( 'div', useBlockProps(), el( InnerBlocks ) );
 		},
 
 		save,
 	} );
 
-	registerBlockType(
-		'test/test-inner-blocks-async-template',
-		{
-			apiVersion: 3,
-			title: 'Test Inner Blocks Async Template',
-			icon: 'cart',
-			category: 'text',
+	registerBlockType( 'test/test-inner-blocks-async-template', {
+		apiVersion: 3,
+		title: 'Test Inner Blocks Async Template',
+		icon: 'cart',
+		category: 'text',
 
-			edit: function InnerBlocksAsyncTemplateEdit() {
-				const [ template, setTemplate ] = useState( [] );
+		edit: function InnerBlocksAsyncTemplateEdit() {
+			const [ template, setTemplate ] = useState( [] );
 
-				setInterval( () => {
-					setTemplate( TEMPLATE_TWO_PARAGRAPHS );
-				}, 1000 );
+			setInterval( () => {
+				setTemplate( TEMPLATE_TWO_PARAGRAPHS );
+			}, 1000 );
 
-				return el('div', useBlockProps(), el( InnerBlocks, {
+			return el(
+				'div',
+				useBlockProps(),
+				el( InnerBlocks, {
 					template,
-				} ) );
-			},
+				} )
+			);
+		},
 
-			// Purposely do not save inner blocks so that it's possible to test template resolution.
-			save() {},
-		}
-	);
+		// Purposely do not save inner blocks so that it's possible to test template resolution.
+		save() {},
+	} );
 } )();

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Editor - Multi-entity save flow', () => {
@@ -138,12 +135,12 @@ test.describe( 'Editor - Multi-entity save flow', () => {
 		await expect( saveButton ).toBeEnabled();
 
 		// Verify multi-entity saving not enabled.
-		await expect( openSavePanel ).toBeHidden();
+		await expect( publishPanel ).toBeHidden();
 
 		await siteTitleField.fill( `${ originalSiteTitle }!` );
 
 		// Multi-entity saving should be enabled.
-		await expect( openSavePanel ).toBeVisible();
+		await expect( openSavePanel ).toBeEnabled();
 	} );
 
 	test( 'Site blocks should save individually', async ( {

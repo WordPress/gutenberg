@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Post publish panel', () => {
@@ -19,17 +16,24 @@ test.describe( 'Post publish panel', () => {
 		} );
 
 		// Find and click the Publish panel toggle button.
-		const publishPanelToggleButton = page.locator(
-			'role=region[name="Editor top bar"i] >> role=button[name="Publish"i]'
-		);
+		const publishPanelToggleButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Publish', exact: true } );
 		await publishPanelToggleButton.click();
 
 		// Click the Cancel button.
-		await page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Cancel"i]'
+		const cancelButton = page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Cancel' } );
+		await expect( cancelButton ).toBeEnabled();
+		await cancelButton.click();
+
+		// Wait for the close transition before checking focus return.
+		await expect( publishPanelToggleButton ).toHaveAttribute(
+			'aria-expanded',
+			'false'
 		);
 
-		// Test focus is moved back to the Publish panel toggle button.
 		await expect( publishPanelToggleButton ).toBeFocused();
 	} );
 
@@ -46,19 +50,20 @@ test.describe( 'Post publish panel', () => {
 		await editor.publishPost();
 
 		// Close the publish panel.
-		await page.click(
-			'role=region[name="Editor publish"i] >> role=button[name="Close panel"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Close panel' } )
+			.click();
 
 		// Test focus is moved back to the Publish panel toggle button.
 		await expect(
-			page.locator(
-				'role=region[name="Editor top bar"i] >> role=button[name="Save"i]'
-			)
+			page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Save' } )
 		).toBeFocused();
 	} );
 
-	test( 'should move focus to the publish button in the panel', async ( {
+	test( 'should move focus to the cancel button in the panel', async ( {
 		editor,
 		page,
 	} ) => {
@@ -74,7 +79,7 @@ test.describe( 'Post publish panel', () => {
 			page
 				.getByRole( 'region', { name: 'Editor publish' } )
 				.locator( ':focus' )
-		).toHaveText( 'Publish' );
+		).toHaveText( 'Cancel' );
 	} );
 
 	test( 'should focus on the post list after publishing', async ( {
@@ -90,7 +95,7 @@ test.describe( 'Post publish panel', () => {
 			page
 				.getByRole( 'region', { name: 'Editor publish' } )
 				.locator( ':focus' )
-		).toHaveText( 'Test Post' );
+		).toContainText( 'Test Post' );
 	} );
 
 	test( 'should retain focus within the panel', async ( {
@@ -114,97 +119,26 @@ test.describe( 'Post publish panel', () => {
 		).toBeFocused();
 	} );
 
-	test( 'should show panel and indicator when metadata has been modified', async ( {
-		admin,
+	test( 'should auto-collapse the publish panel after publishing when the user makes an edit', async ( {
 		editor,
 		page,
 	} ) => {
-		await admin.createNewPost( {
-			title: 'Test metadata changes with save panel',
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Test Post' );
+		await editor.publishPost();
+
+		const prePublishChecksToggle = page.getByRole( 'checkbox', {
+			name: 'Always show pre-publish checks.',
 		} );
+		await expect( prePublishChecksToggle ).toBeVisible();
+
+		// Make an edit after publishing.
 		await editor.insertBlock( {
 			name: 'core/paragraph',
-			attributes: {
-				content: 'paragraph default content',
-				metadata: {
-					bindings: {
-						content: {
-							source: 'core/post-meta',
-							args: { key: 'text_custom_field' },
-						},
-					},
-				},
-			},
-		} );
-		const postId = await editor.publishPost();
-		const metadataUtils = new MetadataUtils( page );
-		await metadataUtils.modifyPostMetadata(
-			'post',
-			postId,
-			'text_custom_field',
-			'test value'
-		);
-		const editorTopBar = page.getByRole( 'region', {
-			name: 'Editor top bar',
+			attributes: { content: 'Edit after publish' },
 		} );
 
-		const saveButton = editorTopBar.getByRole( 'button', {
-			name: 'Save',
-			exact: true,
-		} );
-
-		await expect( saveButton ).toBeVisible();
-
-		await saveButton.click();
-
-		const publishPanel = page.getByRole( 'region', {
-			name: 'Editor publish',
-		} );
-
-		await expect( publishPanel ).toBeVisible();
-
-		const postMetaPanel = publishPanel.locator(
-			'.entities-saved-states__post-meta'
-		);
-
-		await expect( postMetaPanel ).toBeVisible();
+		await expect( prePublishChecksToggle ).toBeHidden();
 	} );
 } );
-
-/**
- * Utilities for working with metadata.
- *
- * @param postType
- * @param postId
- * @param metaKey
- * @param metaValue
- */
-class MetadataUtils {
-	constructor( page ) {
-		this.page = page;
-	}
-
-	async modifyPostMetadata( postType, postId, metaKey, metaValue ) {
-		const parameters = {
-			postType,
-			postId,
-			metaKey,
-			metaValue,
-		};
-
-		await this.page.evaluate( ( _parameters ) => {
-			window.wp.data
-				.dispatch( 'core' )
-				.editEntityRecord(
-					'postType',
-					_parameters.postType,
-					_parameters.postId,
-					{
-						meta: {
-							[ _parameters.metaKey ]: _parameters.metaValue,
-						},
-					}
-				);
-		}, parameters );
-	}
-}

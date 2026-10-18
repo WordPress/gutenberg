@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const dashIconRegex = /<span.*?class=".*?dashicons-cart.*?">.*?<\/span>/;
@@ -26,7 +23,7 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with svg icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -46,7 +43,9 @@ test.describe( 'Block Icons', () => {
 		// Can insert the block.
 		await blockOption.click();
 		await expect(
-			page.getByRole( 'document', { name: 'Block: TestSimpleSvgIcon' } )
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: TestSimpleSvgIcon',
+			} )
 		).toBeVisible();
 
 		// Renders correctly the icon on the inspector.
@@ -60,7 +59,7 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with dash icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -84,7 +83,9 @@ test.describe( 'Block Icons', () => {
 		// Can insert the block
 		await blockOption.click();
 		await expect(
-			page.getByRole( 'document', { name: 'Block: TestSimpleDashIcon' } )
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: TestSimpleDashIcon',
+			} )
 		).toBeVisible();
 
 		// Renders correctly the icon on the inspector.
@@ -100,7 +101,7 @@ test.describe( 'Block Icons', () => {
 	test( 'Block with function icon', async ( { editor, page } ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -120,7 +121,9 @@ test.describe( 'Block Icons', () => {
 		// Can insert the block.
 		await blockOption.click();
 		await expect(
-			page.getByRole( 'document', { name: 'Block: TestFunctionIcon' } )
+			editor.canvas.getByRole( 'document', {
+				name: 'Block: TestFunctionIcon',
+			} )
 		).toBeVisible();
 
 		// Renders correctly the icon on the inspector.
@@ -137,7 +140,7 @@ test.describe( 'Block Icons', () => {
 	} ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {
@@ -185,7 +188,7 @@ test.describe( 'Block Icons', () => {
 	} ) => {
 		await page
 			.getByRole( 'toolbar', { name: 'Document tools' } )
-			.getByRole( 'button', { name: 'Toggle block inserter' } )
+			.getByRole( 'button', { name: 'Block Inserter', exact: true } )
 			.click();
 
 		const blockLibrary = page.getByRole( 'region', {

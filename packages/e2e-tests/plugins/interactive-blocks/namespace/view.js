@@ -1,8 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { store } from '@wordpress/interactivity';
-
 
 store( '', {
 	state: {
@@ -63,8 +59,3 @@ store( '"quoted string"', {
 		url: '/quoted-url',
 	},
 } );
-
-
-
-
-

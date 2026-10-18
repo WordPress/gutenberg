@@ -1,12 +1,15 @@
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 
 export type RadioControlProps = Pick<
 	BaseControlProps,
 	'label' | 'help' | 'hideLabelFromVision'
 > & {
+	/**
+	 * Whether the radio group should be disabled.
+	 *
+	 * @default false
+	 */
+	disabled?: boolean;
 	/**
 	 * A function that receives the value of the new option that is being
 	 * selected as input.
@@ -24,6 +27,16 @@ export type RadioControlProps = Pick<
 		 * The internal value compared against select and passed to onChange
 		 */
 		value: string;
+		/**
+		 * Optional help text to be shown in addition the label.
+		 */
+		description?: string;
+		/**
+		 * Whether the option should be disabled.
+		 *
+		 * @default false
+		 */
+		disabled?: boolean;
 	}[];
 	/**
 	 * The value property of the currently selected option.

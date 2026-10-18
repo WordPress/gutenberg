@@ -59,7 +59,7 @@ export interface DebouncedFunc< T extends ( ...args: any[] ) => any > {
 	/**
 	 * Throw away any pending invocation of the debounced function.
 	 */
-	cancel(): void;
+	cancel: () => void;
 
 	/**
 	 * If there is a pending invocation of the debounced function, invoke it immediately and return
@@ -68,7 +68,7 @@ export interface DebouncedFunc< T extends ( ...args: any[] ) => any > {
 	 * Otherwise, return the value from the last invocation, or undefined if the debounced function
 	 * was never invoked.
 	 */
-	flush(): ReturnType< T > | undefined;
+	flush: () => ReturnType< T > | undefined;
 }
 
 /**

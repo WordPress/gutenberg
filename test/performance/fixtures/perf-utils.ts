@@ -1,18 +1,7 @@
-/**
- * WordPress dependencies
- */
-import { expect } from '@wordpress/e2e-test-utils-playwright';
-
-/**
- * External dependencies
- */
 import fs from 'fs';
 import path from 'path';
+import { expect } from '@wordpress/e2e-test-utils-playwright';
 import type { Locator, Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { readFile } from '../utils.js';
 
 type PerfUtilsConstructorProps = {
@@ -98,6 +87,26 @@ export class PerfUtils {
 	}
 
 	/**
+	 * Change the rendering mode of the editor.
+	 *
+	 * Setting the rendering mode to something other than the default is sometimes
+	 * needed when for example we want to update the contents of the editor from a
+	 * HTML file. Calling the resetBlocks method of the core/block-editor store will
+	 * replace the contents of the template if the rendering mode is not post-only.
+	 * So this should always be called before the resetBlocks method is used.
+	 *
+	 * @param newRenderingMode Rendering mode to set
+	 *
+	 * @return Promise<void>
+	 */
+	async setRenderingMode( newRenderingMode: string ) {
+		await this.page.evaluate( ( _newRenderingMode ) => {
+			const { dispatch } = window.wp.data;
+			dispatch( 'core/editor' ).setRenderingMode( _newRenderingMode );
+		}, newRenderingMode );
+	}
+
+	/**
 	 * Loads blocks from the small post with containers fixture into the editor
 	 * canvas.
 	 */
@@ -115,6 +124,15 @@ export class PerfUtils {
 	 */
 	async loadBlocksForLargePost() {
 		return await this.loadBlocksFromHtml(
+			path.join( process.env.ASSETS_PATH!, 'large-post.html' )
+		);
+	}
+
+	/**
+	 * Loads the content of the large post fixture.
+	 */
+	async loadContentForLargePost() {
+		return readFile(
 			path.join( process.env.ASSETS_PATH!, 'large-post.html' )
 		);
 	}
@@ -150,7 +168,7 @@ export class PerfUtils {
 	}
 
 	/**
-	 * Generates and loads a 1000 empty paragraphs into the editor canvas.
+	 * Generates and loads a 1000 paragraphs into the editor canvas.
 	 */
 	async load1000Paragraphs() {
 		await this.page.waitForFunction(
@@ -161,7 +179,7 @@ export class PerfUtils {
 			const { createBlock } = window.wp.blocks;
 			const { dispatch } = window.wp.data;
 			const blocks = Array.from( { length: 1000 } ).map( () =>
-				createBlock( 'core/paragraph' )
+				createBlock( 'core/paragraph', { content: 'paragraph' } )
 			);
 			dispatch( 'core/block-editor' ).resetBlocks( blocks );
 		} );
@@ -169,10 +187,8 @@ export class PerfUtils {
 
 	async expectExpandedState( locator: Locator, state: 'true' | 'false' ) {
 		return await Promise.any( [
-			// eslint-disable-next-line playwright/missing-playwright-await
 			expect( locator ).toHaveAttribute( 'aria-expanded', state ),
 			// Legacy selector.
-			// eslint-disable-next-line playwright/missing-playwright-await
 			expect( locator ).toHaveAttribute( 'aria-pressed', state ),
 		] );
 	}

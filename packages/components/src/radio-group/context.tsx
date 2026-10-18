@@ -1,12 +1,4 @@
-/**
- * External dependencies
- */
-// eslint-disable-next-line no-restricted-imports
 import type * as Ariakit from '@ariakit/react';
-
-/**
- * WordPress dependencies
- */
 import { createContext } from '@wordpress/element';
 
 export const RadioGroupContext = createContext< {
@@ -16,3 +8,4 @@ export const RadioGroupContext = createContext< {
 	store: undefined,
 	disabled: undefined,
 } );
+RadioGroupContext.displayName = 'RadioGroupContext';

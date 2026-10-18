@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { BaseControlProps } from '../base-control/types';
 
 export type ComboboxControlOption = {
@@ -9,6 +6,8 @@ export type ComboboxControlOption = {
 	disabled?: boolean;
 	[ key: string ]: any;
 };
+
+type ComboboxControlValue = string | null;
 
 export type ComboboxControlProps = Pick<
 	BaseControlProps,
@@ -31,12 +30,14 @@ export type ComboboxControlProps = Pick<
 	 *
 	 * @default false
 	 * @deprecated
+	 * @ignore
 	 */
 	__next36pxDefaultSize?: boolean;
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
@@ -66,7 +67,7 @@ export type ComboboxControlProps = Pick<
 	/**
 	 * Function called with the selected value changes.
 	 */
-	onChange?: ( value: ComboboxControlProps[ 'value' ] ) => void;
+	onChange?: ( value: ComboboxControlValue ) => void;
 	/**
 	 * Function called when the control's search input value changes. The argument contains the next input value.
 	 *
@@ -80,5 +81,16 @@ export type ComboboxControlProps = Pick<
 	/**
 	 * The current value of the control.
 	 */
-	value?: string | null;
+	value?: ComboboxControlValue;
+	/**
+	 * If passed, the combobox input will show a placeholder string if no values are present.
+	 */
+	placeholder?: string;
+	/**
+	 * Show a spinner (and hide the suggestions dropdown) while data
+	 * about the matching suggestions (ie the `options` prop) is loading
+	 *
+	 * @default false
+	 */
+	isLoading?: boolean;
 };

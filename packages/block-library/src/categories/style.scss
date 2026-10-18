@@ -15,3 +15,7 @@
 		text-align: center;
 	}
 }
+:where(.wp-block-categories__label:not(.screen-reader-text)) {
+	width: 100%;
+	display: block;
+}

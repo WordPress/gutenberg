@@ -8,7 +8,7 @@ What follows is a set of questions that have come up from the last few years of 
 
 “Gutenberg” is the name of the project to create a new editor experience for WordPress — contributors have been working on it since January 2017 and it’s one of the most significant changes to WordPress in years. It’s built on the idea of using “blocks” to write and design posts and pages. This will serve as the foundation for future improvements to WordPress, including blocks as a way not just to design posts and pages, but also entire sites. The overall goal is to simplify the first-time user experience of WordPress — for those who are writing, editing, publishing, and designing web pages. The editing experience is intended to give users a better visual representation of what their post or page will look like when they hit publish. Originally, this was the kickoff goal:
 
-> The editor will endeavour to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
+> The editor will endeavor to create a new page and post building experience that makes writing rich posts effortless, and has “blocks” to make it easy what today might take shortcodes, custom HTML, or “mystery meat” embed discovery.
 
 Key takeaways include the following points:
 
@@ -125,7 +125,7 @@ This is currently a work in progress and we recommend reviewing the [block based
 
 No, [block variations](/docs/reference-guides/block-api/block-variations.md) are different versions of a single base block, sharing a similar functionality but with slight differences in their implementation or settings (attributes, InnerBlocks, etc.). Block variations are transparent for users, and once there is a registered block variation, it will appear as a new block. For example, the `embed` block registers different block variations to embed content from specific providers.
 
-Meanwhile, [block styles](/docs/reference-guides/filters/block-filters.md#block-style-variations) allow you to provide alternative styles to existing blocks, and they work by adding a `className` to the block’s wrapper. Once a block has registered block styles, a block style selector will appear in its sidebar so that users can choose among the different registered styles.
+Meanwhile, [block styles](/docs/reference-guides/block-api/block-styles.md) allow you to provide alternative styles to existing blocks, and they work by adding a `className` to the block’s wrapper. Once a block has registered block styles, a block style selector will appear in its sidebar so that users can choose among the different registered styles.
 
 ### How do editor styles work?
 

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -10,7 +7,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Warns the user if there are unsaved changes before leaving the editor.
  * Compatible with Post Editor and Site Editor.
  *
- * @return {Component} The component.
+ * @return {React.ReactNode} The component.
  */
 export default function UnsavedChangesWarning() {
 	const { __experimentalGetDirtyEntityRecords } = useSelect( coreStore );

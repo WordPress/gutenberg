@@ -1,12 +1,5 @@
-/**
- * WordPress dependencies
- */
 import { __ } from '@wordpress/i18n';
 import { cover as icon } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import initBlock from '../utils/init-block';
 import deprecated from './deprecated';
 import edit from './edit';
@@ -26,19 +19,23 @@ export const settings = {
 			customOverlayColor: '#065174',
 			dimRatio: 40,
 			url: 'https://s.w.org/images/core/5.3/Windbuchencom.jpg',
+			style: {
+				typography: {
+					fontSize: 48,
+				},
+				color: {
+					text: 'white',
+				},
+			},
 		},
 		innerBlocks: [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: __( '<strong>Snow Patrol</strong>' ),
-					align: 'center',
+					content: `<strong>${ __( 'Snow Patrol' ) }</strong>`,
 					style: {
 						typography: {
-							fontSize: 48,
-						},
-						color: {
-							text: 'white',
+							textAlign: 'center',
 						},
 					},
 				},

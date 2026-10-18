@@ -1,24 +1,32 @@
-/**
- * External dependencies
- */
 import type { ForwardedRef } from 'react';
-
-/**
- * Internal dependencies
- */
-import { Spacer } from '../spacer';
+import clsx from 'clsx';
+import { PolymorphicElement } from '../utils/polymorphic-element';
+import styles from './style.module.scss';
 import type { WordPressComponentProps } from '../context';
 import { contextConnect, useContextSystem } from '../context';
-import type { InputControlPrefixWrapperProps } from './types';
+import type { PrefixSuffixWrapperProps } from './types';
 
 function UnconnectedInputControlPrefixWrapper(
-	props: WordPressComponentProps< InputControlPrefixWrapperProps, 'div' >,
+	props: WordPressComponentProps< PrefixSuffixWrapperProps, 'div' >,
 	forwardedRef: ForwardedRef< any >
 ) {
 	const derivedProps = useContextSystem( props, 'InputControlPrefixWrapper' );
+	const { className, size, variant = 'default' } = derivedProps;
+
+	const classes = clsx( styles[ 'prefix-wrapper' ], className, {
+		[ styles[ 'is-small' ] ]: size === 'small',
+		[ styles[ 'is-compact' ] ]: size === 'compact',
+		[ styles[ 'has-reduced-padding' ] ]: variant !== 'default',
+	} );
 
 	return (
-		<Spacer marginBottom={ 0 } { ...derivedProps } ref={ forwardedRef } />
+		<PolymorphicElement
+			as="div"
+			{ ...derivedProps }
+			{ ...{ isPrefix: true } }
+			className={ classes }
+			ref={ forwardedRef }
+		/>
 	);
 }
 

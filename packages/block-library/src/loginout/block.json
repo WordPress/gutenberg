@@ -17,8 +17,31 @@
 			"default": true
 		}
 	},
+	"example": {
+		"viewportWidth": 350
+	},
 	"supports": {
+		"anchor": true,
 		"className": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true,
+				"gradient": true
+			}
+		},
+		"color": {
+			"background": true,
+			"text": false,
+			"gradients": true,
+			"link": true
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -40,8 +63,17 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
+		"shadow": true,
 		"interactivity": {
 			"clientNavigation": true
-		}
-	}
+		},
+		"contentRole": true
+	},
+	"style": "wp-block-loginout"
 }

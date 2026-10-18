@@ -2,6 +2,160 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 8.57.0 (2026-10-07)
+
+## 8.56.0 (2026-09-23)
+
+### Enhancements
+
+-   Mark the Welcome Guide item of the Options menu with `aria-haspopup="dialog"`, since it opens a modal dialog ([#82395](https://github.com/WordPress/gutenberg/pull/82395)).
+
+## 8.55.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `WelcomeGuide`: Keep the modal close icon white now that it is stroke-based ([#78812](https://github.com/WordPress/gutenberg/pull/78812)).
+-   Meta Boxes: Fix classic (TinyMCE) editors in meta boxes becoming unusable, by moving the meta box markup with `moveBefore` where it is available ([#82243](https://github.com/WordPress/gutenberg/pull/82243)).
+
+### Internal
+
+-   Stop registering the `editorTool` preference default; the Write/Design tool that read it was removed in [#72193](https://github.com/WordPress/gutenberg/pull/72193) ([#82677](https://github.com/WordPress/gutenberg/pull/82677)).
+-   Remove the `showListViewByDefault` handling from `initializeEditor`; the `editor` package now applies the preference itself.
+-   Remove unused dependencies `@wordpress/a11y`, `@wordpress/dom`, `@wordpress/viewport`, etc. ([#82103](https://github.com/WordPress/gutenberg/pull/82103)).
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 8.54.0 (2026-08-26)
+
+### Internal
+
+-   Stop rendering `EditorKeyboardShortcutsRegister`, which the editor provider now renders itself ([#81580](https://github.com/WordPress/gutenberg/pull/81580)).
+
+## 8.53.0 (2026-08-12)
+
+### Enhancements
+
+-   Wrap the post editor layout in `ThemeProvider`, seeded with the active admin color scheme primary color ([#81112](https://github.com/WordPress/gutenberg/pull/81112)).
+
+## 8.52.0 (2026-07-29)
+
+## 8.51.0 (2026-07-14)
+
+### Enhancements
+
+-   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
+
+## 8.50.0 (2026-07-01)
+
+## 8.49.0 (2026-06-24)
+
+## 8.48.1 (2026-06-16)
+
+## 8.48.0 (2026-06-10)
+
+## 8.47.0 (2026-05-27)
+
+## 8.46.0 (2026-05-14)
+
+## 8.45.0 (2026-04-29)
+
+### Enhancements
+
+- Use `--wpds-cursor-control` for interactive cursor styling. [#77360](https://github.com/WordPress/gutenberg/pull/77360)
+
+## 8.44.0 (2026-04-15)
+
+## 8.43.0 (2026-04-01)
+
+## 8.42.0 (2026-03-18)
+
+## 8.41.0 (2026-03-04)
+
+## 8.40.0 (2026-02-18)
+
+## 8.39.0 (2026-01-29)
+
+## 8.38.0 (2026-01-16)
+
+## 8.36.0 (2025-11-26)
+
+### Internal
+
+-   Adjusted `welcome-guide` styles to define the close-button hover state internally after refactoring in the shared `Guide` component.
+
+## 8.35.0 (2025-11-12)
+
+## 8.34.0 (2025-10-29)
+
+## 8.33.0 (2025-10-17)
+
+## 8.32.0 (2025-10-01)
+
+## 8.31.0 (2025-09-17)
+
+## 8.30.0 (2025-09-03)
+
+## 8.29.0 (2025-08-20)
+
+## 8.28.0 (2025-08-07)
+
+## 8.27.0 (2025-07-23)
+
+## 8.26.0 (2025-06-25)
+
+## 8.25.0 (2025-06-04)
+
+## 8.24.0 (2025-05-22)
+
+## 8.23.0 (2025-05-07)
+
+## 8.22.0 (2025-04-11)
+
+## 8.21.0 (2025-03-27)
+
+## 8.20.0 (2025-03-13)
+
+## 8.19.0 (2025-02-28)
+
+## 8.18.0 (2025-02-12)
+
+## 8.17.0 (2025-01-29)
+
+## 8.16.0 (2025-01-15)
+
+## 8.15.0 (2025-01-02)
+
+## 8.14.0 (2024-12-11)
+
+## 8.13.0 (2024-11-27)
+
+## 8.12.0 (2024-11-16)
+
+## 8.11.0 (2024-10-30)
+
+## 8.10.0 (2024-10-16)
+
+## 8.9.0 (2024-10-03)
+
+## 8.8.0 (2024-09-19)
+
+## 8.7.0 (2024-09-05)
+
+## 8.6.0 (2024-08-21)
+
+## 8.5.0 (2024-08-07)
+
+## 8.4.0 (2024-07-24)
+
+## 8.3.0 (2024-07-10)
+
+## 8.2.0 (2024-06-26)
+
+## 8.1.0 (2024-06-15)
+
 ### Bug Fixes
 
 -   Add ´@wordpress/html-entities´ package to the list of dependencies in package.json. ([#62313](https://github.com/WordPress/gutenberg/pull/62313))
@@ -99,7 +253,7 @@
 
 ## 6.19.0 (2022-11-16)
 
-### Enhancement
+### Enhancements
 
 -   ` BlockTypesChecklist`: Move BlockIcon component out of CheckboxControl label ([#45535](https://github.com/WordPress/gutenberg/pull/45535))
 
@@ -141,11 +295,11 @@
 
 ## 6.0.0 (2022-02-10)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `GUTENBERG_PHASE` environment variable has been renamed to `IS_GUTENBERG_PLUGIN` and is now a boolean ([#38202](https://github.com/WordPress/gutenberg/pull/38202)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/api-fetch`, `@wordpress/primitives` and `uuid` dependencies ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -153,7 +307,7 @@
 
 ## 5.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -188,23 +342,23 @@
 
 ## 3.6.0 (2019-08-05)
 
-### Refactor
+### Internal
 
 -   Create EditorInitializer component and implement for various things to initialize as the editor is loaded. This replaces the `__unstableInitialize` refactor done in #14740. ([#15444](https://github.com/WordPress/gutenberg/pull/15444))
 
 ## 3.4.0 (2019-05-21)
 
-### New Feature
+### New Features
 
 -   Implement the `addToGallery` option in the `MediaUpload` hook. The option allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
 
-### Refactor
+### Internal
 
 -   convert `INIT` effect to controls & actions [#14740](https://github.com/WordPress/gutenberg/pull/14740)
 
 ## 3.2.0 (2019-03-06)
 
-### Polish
+### Internal
 
 -   Expose the `className` property to style the `PluginSidebar` component.
 
@@ -233,7 +387,7 @@
 
 ## 3.1.0 (2018-11-20)
 
-### New Feature
+### New Features
 
 -   The new `AdminNotices` component will transparently upgrade any `.notice` elements on the page to the equivalent `@wordpress/notices` module notice state.
 
@@ -243,7 +397,7 @@
 
 ## 3.0.0 (2018-11-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   `isEditorSidebarPanelOpened` selector (`core/edit-post`) has been removed. Please use `isEditorPanelEnabled` instead.
 -   `toggleGeneralSidebarEditorPanel` action (`core/edit-post`) has been removed. Please use `toggleEditorPanelOpened` instead.
@@ -274,7 +428,7 @@
 -   `getMetaBoxes` selector (`core/edit-post`) has been removed. Use `getActiveMetaBoxLocations` selector (`core/edit-post`) instead.
 -   `getMetaBox` selector (`core/edit-post`) has been removed. Use `isMetaBoxLocationActive` selector (`core/edit-post`) instead.
 
-### Polish
+### Internal
 
 -   Add the editor styles support's wrapper className.
 
