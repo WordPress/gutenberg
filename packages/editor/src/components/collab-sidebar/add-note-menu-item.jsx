@@ -12,12 +12,16 @@ import { unlock } from '../../lock-unlock';
 const { NoteIconSlotFill } = unlock( blockEditorPrivateApis );
 
 function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
-	const { blockName, isValid, shortcut } = useSelect(
+	const { blockName, isValid, isInTemplatePart, shortcut } = useSelect(
 		( select ) => {
-			const { getBlockName, isBlockValid } = select( blockEditorStore );
+			const { getBlockName, isBlockValid, getBlockParentsByBlockName } =
+				select( blockEditorStore );
 			return {
 				blockName: getBlockName( clientId ),
 				isValid: isBlockValid( clientId ),
+				isInTemplatePart:
+					getBlockParentsByBlockName( clientId, 'core/template-part' )
+						.length > 0,
 				shortcut: select(
 					keyboardShortcutsStore
 				).getShortcutRepresentation( 'core/editor/new-note' ),
@@ -30,7 +34,8 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 		return null;
 	}
 
-	const isDisabled = isDistractionFree || blockName === 'core/freeform';
+	const isDisabled =
+		isDistractionFree || blockName === 'core/freeform' || isInTemplatePart;
 
 	let infoText;
 
@@ -38,6 +43,10 @@ function NoteMenuItem( { clientId, onClick, isDistractionFree } ) {
 		infoText = __( 'Notes are disabled in distraction free mode.' );
 	} else if ( blockName === 'core/freeform' ) {
 		infoText = __( 'Convert to blocks to add notes.' );
+	} else if ( isInTemplatePart ) {
+		// The block saves to the template part, but its notes would attach to
+		// the template, so they'd be lost from the part.
+		infoText = __( 'Edit the template part to add notes.' );
 	}
 
 	return (

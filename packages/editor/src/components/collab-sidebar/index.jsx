@@ -33,15 +33,20 @@ function NotesSidebar( { postId, drafts } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
 
-	const { clientId, isClassicBlock } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, getBlockName } =
-			select( blockEditorStore );
+	const { clientId, canAddNote } = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getBlockName,
+			getBlockParentsByBlockName,
+		} = select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 		return {
 			clientId: _clientId,
-			isClassicBlock: _clientId
-				? getBlockName( _clientId ) === 'core/freeform'
-				: false,
+			canAddNote:
+				!! _clientId &&
+				getBlockName( _clientId ) !== 'core/freeform' &&
+				! getBlockParentsByBlockName( _clientId, 'core/template-part' )
+					.length,
 		};
 	}, [] );
 	const { notesDisplayMode, selectedNoteId, isAllNotesSidebarOpen } =
@@ -133,7 +138,7 @@ function NotesSidebar( { postId, drafts } ) {
 			addNewNoteForBlock( clientId );
 		},
 		{
-			isDisabled: isClassicBlock || ! clientId,
+			isDisabled: ! canAddNote,
 		}
 	);
 

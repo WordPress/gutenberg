@@ -235,6 +235,59 @@ test.describe( 'Notes in the site editor', () => {
 		).toBeVisible();
 	} );
 
+	test( 'does not offer notes on blocks inside a template part of a template', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// The block's note ID would save to the template part, while the note
+		// itself would attach to the template, so the part would lose it.
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'notes-nested-part',
+			title: 'Notes Nested Part',
+			content:
+				'<!-- wp:paragraph --><p>Part content</p><!-- /wp:paragraph -->',
+		} );
+		const template = await requestUtils.createTemplate( 'wp_template', {
+			slug: 'notes-template-with-part',
+			title: 'Notes Template With Part',
+			content: `<!-- wp:template-part {"slug":"notes-nested-part","theme":"emptytheme"} /-->${ TEMPLATE_CONTENT }`,
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: template.id,
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		// Selecting the template part lifts its overlay off its inner blocks.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Notes Nested Part' } )
+			.click();
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Part content' } )
+			.click();
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Add note' } )
+		).toBeDisabled();
+		await page.keyboard.press( 'Escape' );
+
+		// Blocks of the template itself still take notes.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.filter( { hasText: 'Template content' } )
+			.click();
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await expect(
+			page.getByRole( 'menuitem', { name: 'Add note' } )
+		).toBeEnabled();
+	} );
+
 	test( 'does not offer notes on a pristine theme template', async ( {
 		admin,
 		editor,
