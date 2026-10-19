@@ -1,14 +1,6 @@
 const { expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /*
- * Specs in this folder cover the post summary rendered by the
- * `gutenberg-dataform-inspector` experiment. A spec that supersedes classic
- * summary coverage names the classic spec file(s) it mirrors in a header
- * comment; those are the tests to delete when the experiment graduates.
- */
-const EXPERIMENTS = [ 'gutenberg-dataform-inspector' ];
-
-/*
  * The DataForm summary is rendered by the same `editor` package component in
  * every editor, so specs parametrize over the contexts, which differ only in
  * how an entity is opened and saved.
@@ -74,4 +66,4 @@ async function openPostSummary( { editor, page, tab } ) {
 	return summary;
 }
 
-module.exports = { EXPERIMENTS, EDITOR_CONTEXTS, openPostSummary };
+module.exports = { EDITOR_CONTEXTS, openPostSummary };

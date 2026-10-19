@@ -3,21 +3,9 @@ const {
 	expect,
 	Editor,
 } = require( '@wordpress/e2e-test-utils-playwright' );
-const { EXPERIMENTS, EDITOR_CONTEXTS, openPostSummary } = require( './utils' );
+const { EDITOR_CONTEXTS, openPostSummary } = require( './utils' );
 
-/*
- * Net-new coverage for the fields of the DataForm summary: there is no
- * classic spec this file supersedes.
- */
 test.describe( 'Post Summary', () => {
-	test.beforeEach( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( EXPERIMENTS );
-	} );
-
-	test.afterEach( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
-	} );
-
 	test.describe( 'wp_block summary', () => {
 		const INITIAL_DESCRIPTION = 'Pattern description for DataForm.';
 		const UPDATED_DESCRIPTION =

@@ -189,11 +189,11 @@ async function preloadResolutions( postType, postId ) {
 				kind: 'postType',
 				name: 'wp_template',
 			} ),
-			// The DataForm-based inspector requests the entity form config
-			// when the document sidebar mounts. The args must match the
-			// `useViewConfig` call in `@wordpress/views` exactly for the
-			// resolution (and its preload entry) to be shared.
-			...( postType && window?.__experimentalDataFormInspector
+			// The inspector requests the entity form config when the document
+			// sidebar mounts. The args must match the `useViewConfig` call in
+			// `@wordpress/views` exactly for the resolution (and its preload
+			// entry) to be shared.
+			...( postType
 				? [
 						unlock( core ).getViewConfig( 'postType', postType, {
 							fields: 'form',
@@ -272,11 +272,14 @@ async function preloadResolutions( postType, postId ) {
 				}
 				tasks.push( core.getDefaultTemplateId( { slug } ) );
 
+				// The author of the post, which the post summary reads with
+				// the same query, see `AuthorView` in `@wordpress/core-fields`.
 				if ( post.author ) {
 					tasks.push(
-						core.getUser( post.author, {
+						core.getEntityRecords( 'root', 'user', {
+							include: [ post.author ],
+							who: 'authors',
 							context: 'view',
-							_fields: 'id,name',
 						} )
 					);
 				}

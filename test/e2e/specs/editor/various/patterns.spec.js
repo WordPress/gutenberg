@@ -1404,10 +1404,9 @@ test.describe( 'Synced pattern - entity navigation', () => {
 		await page.evaluate( () => {
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
 		} );
-		await editor.openDocumentSettingsSidebar();
 		await page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Template options' } )
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
 			.click();
 		await page
 			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
