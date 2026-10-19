@@ -39,6 +39,7 @@
 
 ### Bug Fixes
 
+-   `Tabs`, `TabPanel`: Expand vertical tab interaction backgrounds and focus rings across the row ([#84821](https://github.com/WordPress/gutenberg/pull/84821)).
 -   `StyleProvider`: Register module styles before children measure layout in iframe documents ([#84736](https://github.com/WordPress/gutenberg/pull/84736)).
 -   `BorderBoxControl`: Unpack multi-value CSS box shorthand strings (such as `"0 0 0 2px"`) into individual side widths when splitting borders ([#84826](https://github.com/WordPress/gutenberg/pull/84826)).
 -   `SelectControl`: Preserve the minimal variant's inline layout in iframe documents ([#84732](https://github.com/WordPress/gutenberg/pull/84732)).
