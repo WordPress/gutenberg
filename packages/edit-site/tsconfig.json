@@ -30,11 +30,11 @@
 		{ "path": "../patterns" },
 		{ "path": "../plugins" },
 		{ "path": "../preferences/tsconfig.build.json" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../router" },
 		{ "path": "../theme/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../url" },
+		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../views/tsconfig.build.json" }
 	],
 	"include": []
