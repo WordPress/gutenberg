@@ -81,7 +81,7 @@ export interface EntitiesSavedStatesExtensibleProps
 	/**
 	 * Label for the save button.
 	 */
-	saveLabel?: string;
+	saveLabel?: ReactNode;
 	/**
 	 * Optional custom success notice content.
 	 */

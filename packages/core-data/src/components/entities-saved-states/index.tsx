@@ -81,7 +81,7 @@ export function EntitiesSavedStatesExtensible( {
 	variant = 'default',
 	successNoticeContent,
 }: EntitiesSavedStatesExtensibleProps ) {
-	const saveButtonRef = useRef< HTMLButtonElement >( null );
+	const saveButtonRef = useRef< HTMLButtonElement | undefined >( undefined );
 	const { saveDirtyEntities } = unlock(
 		// The store is selected by name, which carries no store types.
 		useDispatch( STORE_NAME as unknown as typeof coreStore )
