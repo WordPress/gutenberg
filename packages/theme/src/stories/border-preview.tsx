@@ -54,6 +54,7 @@ export function BorderTokenPreview() {
 					return (
 						<section key={ kind }>
 							<GroupTitle name={ kind } />
+							<p>{ group.$description }</p>
 							<dl style={ listStyle }>
 								{ group.tokens.map( ( name ) => (
 									<div

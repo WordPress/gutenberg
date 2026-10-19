@@ -21,7 +21,6 @@ const contentStyle: CSSProperties = {
 };
 
 type DimensionKind = {
-	intro: string;
 	example: ( name: string ) => ReactNode;
 };
 
@@ -29,7 +28,6 @@ type DimensionGroupKey = keyof typeof groups.dimension.groups;
 
 const dimensionConfig: Record< DimensionGroupKey, DimensionKind > = {
 	padding: {
-		intro: 'Space between the edge of a container and its content. The shaded area is the padding.',
 		example: ( name ) => (
 			<span
 				style={ {
@@ -50,7 +48,6 @@ const dimensionConfig: Record< DimensionGroupKey, DimensionKind > = {
 		),
 	},
 	gap: {
-		intro: 'Space between sibling elements in a flex or grid layout.',
 		example: ( name ) => (
 			<span
 				style={ {
@@ -74,7 +71,6 @@ const dimensionConfig: Record< DimensionGroupKey, DimensionKind > = {
 		),
 	},
 	size: {
-		intro: 'Width and height of controls, icons, and markers.',
 		example: ( name ) => (
 			<span
 				style={ {
@@ -88,7 +84,6 @@ const dimensionConfig: Record< DimensionGroupKey, DimensionKind > = {
 		),
 	},
 	'surface-width': {
-		intro: 'Widths for surfaces such as popovers, dialogs, and panels.',
 		example: ( name ) => (
 			<span
 				style={ {
@@ -114,11 +109,11 @@ export function DimensionTokenPreview() {
 				Object.keys( groups.dimension.groups ) as DimensionGroupKey[]
 			 ).map( ( key ) => {
 				const group = groups.dimension.groups[ key ];
-				const { intro, example } = dimensionConfig[ key ];
+				const { example } = dimensionConfig[ key ];
 				return (
 					<section key={ key }>
 						<GroupTitle name={ key } />
-						<p>{ intro }</p>
+						<p>{ group.$description }</p>
 						<dl style={ { ...listStyle, marginBlockStart: 8 } }>
 							{ group.tokens.map( ( name ) => (
 								<div
