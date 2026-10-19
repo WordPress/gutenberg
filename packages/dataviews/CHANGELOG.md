@@ -18,6 +18,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for DataViews tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Remove unused Emotion dependencies ([#85021](https://github.com/WordPress/gutenberg/pull/85021)).
 -   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
