@@ -1,8 +1,16 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-import { isEntirelySelected, isTextField } from '@wordpress/dom';
+import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
+import {
+	create,
+	insert,
+	remove,
+	slice,
+	toHTMLString,
+	RichTextData,
+} from '@wordpress/rich-text';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -35,6 +43,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
+		getBlockAttributes,
+		getSelectionStart,
+		getSelectionEnd,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		removeBlock,
@@ -42,7 +53,11 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		startDraggingBlocks,
 		stopDraggingBlocks,
 		editContentOnlySection,
+		updateBlockAttributes,
+		selectBlock,
+		selectionChange,
 	} = unlock( useDispatch( blockEditorStore ) );
+	const registry = useRegistry();
 
 	return useRefEffect(
 		( node ) => {
@@ -87,12 +102,11 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 
 			/**
 			 * Lets the browser start a drag of the block from any press
-			 * inside a fully selected multi-selection, or on the fully
-			 * selected text of the block. Editable content places a caret
-			 * on press instead of dragging the draggable block, and a text
-			 * selection only drags from a press that begins at rest on the
-			 * selected glyphs, so the editing host and the pressed field are
-			 * taken out of editing for the length of the press.
+			 * inside a fully selected multi-selection. The canvas is an
+			 * editing host while blocks are multi-selected, and inside an
+			 * editing host the browser places a caret on press instead of
+			 * dragging the draggable block, so the host and the pressed
+			 * field are taken out of editing for the length of the press.
 			 *
 			 * @param {MouseEvent} event Mouse down event.
 			 */
@@ -102,33 +116,18 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					event.shiftKey ||
 					event.metaKey ||
 					event.ctrlKey ||
-					event.altKey
-				) {
-					return;
-				}
-
-				const { ownerDocument } = node;
-				const selection = ownerDocument.defaultView.getSelection();
-				const isWholeMultiSelection =
-					isMultiSelected &&
-					hasMultiSelection() &&
-					__unstableIsFullySelected();
-				const isFullySelectedText =
-					isSelected &&
-					! hasMultiSelection() &&
-					node.isContentEditable &&
-					! selection.isCollapsed &&
-					isEntirelySelected( node );
-
-				if (
-					( ! isWholeMultiSelection && ! isFullySelectedText ) ||
+					event.altKey ||
+					! isMultiSelected ||
+					! hasMultiSelection() ||
+					! __unstableIsFullySelected() ||
 					! canMoveBlocks( getSelectedBlockClientIds() )
 				) {
 					return;
 				}
 
-				// Multi-selected blocks and text fields are not draggable by
-				// themselves; the pressed one is, for the length of the press.
+				const { ownerDocument } = node;
+				// Multi-selected blocks are not draggable by themselves;
+				// the pressed one is, for the length of the press.
 				const hadDraggable = node.getAttribute( 'draggable' );
 				node.setAttribute( 'draggable', 'true' );
 				const editables = [
@@ -140,17 +139,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					element.contentEditable = 'false';
 				}
 
-				// A field that stops being editable loses focus unless it is
-				// focusable in its own right, and a block is only a direct
-				// drag target while it is focused.
-				const hadTabIndex = node.hasAttribute( 'tabindex' );
-				if ( isFullySelectedText ) {
-					if ( ! hadTabIndex ) {
-						node.setAttribute( 'tabindex', '-1' );
-					}
-					node.focus();
-				}
-
 				function restore() {
 					if ( hadDraggable === null ) {
 						node.removeAttribute( 'draggable' );
@@ -160,60 +148,11 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					for ( const element of editables ) {
 						element.contentEditable = 'true';
 					}
-					if ( isFullySelectedText && ! hadTabIndex ) {
-						node.removeAttribute( 'tabindex' );
-					}
-					ownerDocument.removeEventListener( 'mouseup', onPressEnd );
+					ownerDocument.removeEventListener( 'mouseup', restore );
 					ownerDocument.removeEventListener( 'dragend', restore );
-					node.removeEventListener( 'dragstart', onPressDragStart );
 				}
 
-				function onPressDragStart() {
-					// The drag of a fully selected field is under way: the
-					// field can be editable again while it is dragged. The
-					// editing host of a multi-selection stays out of editing
-					// until the drag ends, or the browser would show a text
-					// drop caret in it.
-					if ( isFullySelectedText ) {
-						restore();
-					}
-				}
-
-				function onPressEnd( e ) {
-					restore();
-					if ( ! isFullySelectedText ) {
-						return;
-					}
-					// The field was not editable during the press, so the
-					// browser did not place a caret for the click. Place it
-					// where the press landed, so clicking into the selected
-					// text keeps putting the caret at the click position.
-					node.focus();
-					const position = ownerDocument.caretPositionFromPoint?.(
-						e.clientX,
-						e.clientY
-					);
-
-					if ( position ) {
-						selection.setPosition(
-							position.offsetNode,
-							position.offset
-						);
-					} else {
-						const range = ownerDocument.caretRangeFromPoint?.(
-							e.clientX,
-							e.clientY
-						);
-
-						if ( range ) {
-							selection.removeAllRanges();
-							selection.addRange( range );
-						}
-					}
-				}
-
-				node.addEventListener( 'dragstart', onPressDragStart );
-				ownerDocument.addEventListener( 'mouseup', onPressEnd );
+				ownerDocument.addEventListener( 'mouseup', restore );
 				ownerDocument.addEventListener( 'dragend', restore );
 			}
 
@@ -331,6 +270,178 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			}
 
 			/**
+			 * Starts a drag of the text selected within one rich text field.
+			 * The drop moves the text through the rich text values, not the
+			 * browser's own drop editing.
+			 *
+			 * @param {DragEvent} event Drag start event.
+			 * @return {boolean} Whether a text drag started.
+			 */
+			function startTextDrag( event ) {
+				const source = getSelectionStart();
+				const sourceEnd = getSelectionEnd();
+				if (
+					source.attributeKey === undefined ||
+					source.clientId !== sourceEnd.clientId ||
+					source.attributeKey !== sourceEnd.attributeKey ||
+					source.offset === sourceEnd.offset
+				) {
+					return false;
+				}
+
+				const sourceAttribute = getBlockAttributes( source.clientId )[
+					source.attributeKey
+				];
+				const sourceValue = create( {
+					html: sourceAttribute.toString(),
+				} );
+				const from = Math.min( source.offset, sourceEnd.offset );
+				const to = Math.max( source.offset, sourceEnd.offset );
+				const dragged = slice( sourceValue, from, to );
+
+				event.dataTransfer.effectAllowed = 'move';
+				event.dataTransfer.clearData();
+				event.dataTransfer.setData( 'text/plain', dragged.text );
+				event.dataTransfer.setData(
+					'text/html',
+					toHTMLString( { value: dragged } )
+				);
+
+				const { ownerDocument } = node;
+				const { defaultView } = ownerDocument;
+
+				function getDropTarget( { clientX, clientY } ) {
+					const position = ownerDocument.caretPositionFromPoint?.(
+						clientX,
+						clientY
+					);
+					const range = ownerDocument.createRange();
+					if ( position ) {
+						range.setStart( position.offsetNode, position.offset );
+					} else {
+						const caretRange = ownerDocument.caretRangeFromPoint?.(
+							clientX,
+							clientY
+						);
+						if ( ! caretRange ) {
+							return;
+						}
+						range.setStart(
+							caretRange.startContainer,
+							caretRange.startOffset
+						);
+					}
+					const { startContainer } = range;
+					const field = (
+						startContainer.nodeType === startContainer.ELEMENT_NODE
+							? startContainer
+							: startContainer.parentElement
+					)?.closest( '[data-wp-block-attribute-key]' );
+					const block = field?.closest( '[data-block]' );
+					if ( ! block ) {
+						return;
+					}
+					return {
+						clientId: block.dataset.block,
+						attributeKey: field.dataset.wpBlockAttributeKey,
+						offset: create( {
+							element: field,
+							range,
+							__unstableIsEditableTree: true,
+						} ).start,
+					};
+				}
+
+				// The block drop zones would take the drop over. Editable
+				// fields accept the drop and show the drop caret natively;
+				// the drop itself is replaced by the move.
+				function stop( e ) {
+					e.stopPropagation();
+				}
+
+				function onDrop( e ) {
+					e.stopPropagation();
+					e.preventDefault();
+					end();
+					const target = getDropTarget( e );
+					if ( ! target ) {
+						return;
+					}
+					const isSameField =
+						target.clientId === source.clientId &&
+						target.attributeKey === source.attributeKey;
+					if (
+						isSameField &&
+						target.offset >= from &&
+						target.offset <= to
+					) {
+						return;
+					}
+
+					const toAttribute = ( value, current ) =>
+						typeof current === 'string'
+							? toHTMLString( { value } )
+							: new RichTextData( value );
+					const removed = remove( sourceValue, from, to );
+					let at = target.offset;
+					let targetValue = removed;
+					let targetAttribute = sourceAttribute;
+					if ( isSameField ) {
+						if ( at > to ) {
+							at -= to - from;
+						}
+					} else {
+						targetAttribute = getBlockAttributes( target.clientId )[
+							target.attributeKey
+						];
+						targetValue = create( {
+							html: targetAttribute.toString(),
+						} );
+					}
+					const inserted = insert( targetValue, dragged, at, at );
+
+					registry.batch( () => {
+						if ( ! isSameField ) {
+							updateBlockAttributes( source.clientId, {
+								[ source.attributeKey ]: toAttribute(
+									removed,
+									sourceAttribute
+								),
+							} );
+						}
+						updateBlockAttributes( target.clientId, {
+							[ target.attributeKey ]: toAttribute(
+								inserted,
+								targetAttribute
+							),
+						} );
+						// Keeps the block's focus handling from moving the
+						// caret to an edge.
+						selectBlock( target.clientId, null );
+						selectionChange(
+							target.clientId,
+							target.attributeKey,
+							at,
+							at + dragged.text.length
+						);
+					} );
+				}
+
+				function end() {
+					defaultView.removeEventListener( 'dragenter', stop, true );
+					defaultView.removeEventListener( 'dragover', stop, true );
+					defaultView.removeEventListener( 'drop', onDrop, true );
+					defaultView.removeEventListener( 'dragend', end, true );
+				}
+
+				defaultView.addEventListener( 'dragenter', stop, true );
+				defaultView.addEventListener( 'dragover', stop, true );
+				defaultView.addEventListener( 'drop', onDrop, true );
+				defaultView.addEventListener( 'dragend', end, true );
+				return true;
+			}
+
+			/**
 			 * Prevents default dragging behavior within a block, except when
 			 * the block is part of a multi selection (then the drag moves
 			 * all selected blocks).
@@ -341,9 +452,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			 */
 			function onDragStart( event ) {
 				const { target } = event;
-				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
-				const { activeElement } = ownerDocument;
+				const { activeElement } = node.ownerDocument;
 				// The drag may start on an image, which is draggable by
 				// default: it is the block's drag as long as no nested
 				// draggable, such as an inner block, is closer to the source.
@@ -366,15 +475,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					canMoveBlocks( getSelectedBlockClientIds() );
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
-					// A drag of a text selection within the field stays
-					// native: the browser moves the dragged text to the drop
-					// point. Any other drag within the block is prevented.
-					const textSelection = defaultView.getSelection();
-					if ( ! (
-						node.isContentEditable &&
-						! textSelection.isCollapsed &&
-						node.contains( textSelection.anchorNode )
-					) ) {
+					if ( ! startTextDrag( event ) ) {
 						event.preventDefault();
 					}
 					return;
@@ -390,21 +491,10 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				event.dataTransfer.effectAllowed = 'move'; // remove "+" cursor
 				event.dataTransfer.clearData();
 				event.dataTransfer.setData( 'wp-blocks', data );
+				const { ownerDocument } = node;
+				const { defaultView } = ownerDocument;
 				const selection = defaultView.getSelection();
-				// A block dragged by its fully selected text keeps the
-				// selection, so the highlight rides along with the block
-				// and survives the drop. Other drags clear the selection.
-				const editableElement =
-					isDirectBlockDrag &&
-					! selection.isCollapsed &&
-					node.contains( selection.anchorNode ) &&
-					isEntirelySelected( node )
-						? node
-						: null;
-
-				if ( ! editableElement ) {
-					selection.removeAllRanges();
-				}
+				selection.removeAllRanges();
 
 				// Setting the drag chip as the drag image actually works, but
 				// the behaviour is slightly different in every browser. In
@@ -568,16 +658,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					node.id = id;
 					pile?.end();
 					dragElement.remove();
-					// Moving the block in the document tears the selection
-					// out of it; select the field in full again, so the
-					// block reads as still selected after the drop.
-					if ( editableElement ) {
-						editableElement.focus();
-						const range = ownerDocument.createRange();
-						range.selectNodeContents( editableElement );
-						selection.removeAllRanges();
-						selection.addRange( range );
-					}
 					stopDraggingBlocks();
 					document.body.classList.remove(
 						'is-dragging-components-draggable'
@@ -667,6 +747,13 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			isSectionBlock,
 			editedContentOnlySection,
 			editContentOnlySection,
+			getBlockAttributes,
+			getSelectionStart,
+			getSelectionEnd,
+			updateBlockAttributes,
+			selectBlock,
+			selectionChange,
+			registry,
 		]
 	);
 }
