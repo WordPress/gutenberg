@@ -108,7 +108,7 @@ test.describe( 'Page List', () => {
 						name: 'Set featured image',
 					} );
 					await expect( placeholder ).toBeHidden();
-					const img = page.locator( '.fields__media-edit-thumbnail' );
+					const img = page.locator( '.media-edit__thumbnail' );
 					await expect( img ).toBeVisible();
 				},
 			},
@@ -415,9 +415,7 @@ test.describe( 'Page List', () => {
 			await expect( updatedStatus ).toBeVisible();
 
 			// Verify featured image placeholder is gone (image was set)
-			const imagePlaceholder = row.locator(
-				'.fields__media-edit-placeholder'
-			);
+			const imagePlaceholder = row.locator( '.media-edit__placeholder' );
 			await expect( imagePlaceholder ).toBeHidden();
 
 			// Reset the page to its original state
@@ -444,7 +442,7 @@ test.describe( 'Page List', () => {
 		// 	expect( await selectedItems.all() ).toHaveLength( 2 );
 
 		// 	const imagePlaceholders = selectedItems.locator(
-		// 		'.fields__media-edit-placeholder',
+		// 		'.media-edit__placeholder',
 		// 		{ strict: false }
 		// 	);
 

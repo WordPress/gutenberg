@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Bug Fixes
+
+-   Type the key combination `modifier` as optional, as shortcuts can be registered without one ([#84902](https://github.com/WordPress/gutenberg/pull/84902)).
+
 ## 5.57.0 (2026-10-07)
 
 ### Bug Fixes
