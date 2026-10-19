@@ -25,7 +25,7 @@ export default function getNestedValue(
 	const normalizedPath = Array.isArray( path ) ? path : path.split( '.' );
 	let value: unknown = object;
 	normalizedPath.forEach( ( fieldName ) => {
-		// A primitive has no such property, so this reads `undefined`.
+		// Reads through whatever value the path reaches, as `?.` allows.
 		value = ( value as Record< string | number, unknown > )?.[ fieldName ];
 	} );
 	return value !== undefined ? value : defaultValue;

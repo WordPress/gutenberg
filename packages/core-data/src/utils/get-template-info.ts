@@ -25,6 +25,7 @@ export const getTemplateInfo = (
 
 	const { title: defaultTitle, description: defaultDescription } =
 		Object.values( templateTypes ).find( ( type ) => type.slug === slug ) ??
+		// An unknown slug has no default title or description.
 		( EMPTY_OBJECT as Partial< TemplateType > );
 
 	const templateTitle = typeof title === 'string' ? title : title?.rendered;

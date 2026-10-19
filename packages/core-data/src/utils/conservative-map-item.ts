@@ -13,11 +13,11 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 export default function conservativeMapItem<
 	I extends Record< string, unknown >,
 	N extends Record< string, unknown >,
->( item: I | undefined, nextItem: N ): I & N {
+>( item: I | undefined, nextItem: N ): Omit< I, keyof N > & N {
 	// Return next item in its entirety if there is no original item.
 	if ( ! item ) {
 		// With no original item, the next item is the whole result.
-		return nextItem as I & N;
+		return nextItem as Omit< I, keyof N > & N;
 	}
 
 	let hasChanges = false;
@@ -33,7 +33,7 @@ export default function conservativeMapItem<
 
 	if ( ! hasChanges ) {
 		// Unchanged, so the original item has every value of the next one.
-		return item as I & N;
+		return item as Omit< I, keyof N > & N;
 	}
 
 	// Only at this point, backfill properties from the original item which
@@ -46,5 +46,5 @@ export default function conservativeMapItem<
 	}
 
 	// Holds every key of both items, with the values of the next item.
-	return result as I & N;
+	return result as Omit< I, keyof N > & N;
 }

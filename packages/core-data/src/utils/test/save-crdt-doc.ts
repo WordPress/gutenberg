@@ -11,6 +11,7 @@ vi.mock( import( '../../sync' ), () => ( {
 } ) );
 
 function createDeferred() {
+	// The promise executor below assigns both synchronously.
 	let resolve!: ( value: unknown ) => void;
 	let reject!: ( reason: unknown ) => void;
 	const promise = new Promise( ( _resolve, _reject ) => {
