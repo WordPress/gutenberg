@@ -16,8 +16,8 @@ const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
 // without editing them from the sidebar, which is not available yet. The other
 // allowed blocks stay reachable from the "Add block" pane. The extensible site
 // editor keeps every block on purpose. This wrapper, and the
-// `suggestedBlockNames` prop it sets, can go when this sidebar does.
-const SUGGESTED_BLOCK_NAMES = [
+// `allowedBlockNames` prop it sets, can go when this sidebar does.
+const ALLOWED_BLOCK_NAMES = [
 	'core/home-link',
 	'core/search',
 	'core/loginout',
@@ -29,7 +29,7 @@ function SidebarNavigationLinkUI( props ) {
 	return (
 		<NavigationLinkUI
 			{ ...props }
-			suggestedBlockNames={ SUGGESTED_BLOCK_NAMES }
+			allowedBlockNames={ ALLOWED_BLOCK_NAMES }
 		/>
 	);
 }

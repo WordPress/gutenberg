@@ -148,7 +148,9 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		} );
 	} );
 
-	test( 'lists only the blocks the sidebar supports in the link search results', async ( {
+	// The extensible site editor lists every allowed block on purpose, so
+	// this sidebar-only rule has no v2 equivalent.
+	test( 'lists only the blocks the sidebar supports in the link search results @site-editor-v1-only', async ( {
 		admin,
 		page,
 		requestUtils,
