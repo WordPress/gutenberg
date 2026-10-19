@@ -25,6 +25,7 @@
 
 ### Bug Fixes
 
+-   Block mover: Match the shorter Move up and Move down height with `min-height`, so the toolbar button minimum does not stack Move down below the bar. List view movers do the same ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 -   List View: Fix the drag-and-drop nesting gesture over an item without children ([#84856](https://github.com/WordPress/gutenberg/pull/84856)).
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
 -   List View: Show the appender when the container is contentOnly ([#84713](https://github.com/WordPress/gutenberg/pull/84713)).
