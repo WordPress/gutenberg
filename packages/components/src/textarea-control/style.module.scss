@@ -28,7 +28,7 @@
 	}
 
 	// Use opacity to work in various editor styles.
-	// Keep the supported vendor placeholder selectors.
+	// Keep the legacy vendor placeholder selectors.
 	&::-webkit-input-placeholder {
 		color: $components-color-dark-gray-placeholder;
 	}

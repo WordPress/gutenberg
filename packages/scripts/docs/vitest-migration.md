@@ -205,7 +205,7 @@ export default defineConfig( {
 } );
 ```
 
-Vitest discovers `vitest.config.*` before `vite.config.*`. `--config` takes precedence over both. To reuse Vite plugins with a separate test config, use [`mergeConfig`](https://vitest.dev/config/). Babel and Jest transforms do not carry over. Rename JSX-bearing `.js` files to `.jsx`, and configure the React Vite plugin when testing React source.
+Vitest discovers `vitest.config.*` before `vite.config.*`. `--config` takes precedence over both. To reuse Vite plugins with a separate test config, use [`mergeConfig`](https://vitest.dev/config/). Babel and Jest transforms do not carry over. Rename JSX-bearing `.js` files to `.jsx`, and configure the React Vite plugin when testing React or Emotion source.
 
 ## Opt into jsdom
 
