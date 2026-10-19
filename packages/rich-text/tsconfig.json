@@ -14,6 +14,6 @@
 		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
-		{ "path": "../private-apis" }
+		{ "path": "../private-apis/tsconfig.build.json" }
 	]
 }

@@ -135,7 +135,7 @@ describe( 'Text', () => {
 		);
 	} );
 
-	test( 'should render variant color regardless of Emotion insertion order', async () => {
+	test( 'should prefer the variant color over the color prop', async () => {
 		await render(
 			<>
 				<Text role="note" variant="muted">
