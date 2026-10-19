@@ -52,14 +52,14 @@ function isBlockEntirelySelected( ownerDocument: Document, clientId: string ) {
  * is not part of the serialized block, like bound attributes or dynamic
  * content, would be lost when copying the block instead of the text.
  *
- * @param {Document} ownerDocument The block's document.
- * @param {Object}   block         The block to copy.
+ * @param ownerDocument The block's document.
+ * @param block         The block to copy.
  *
- * @return {boolean} Whether copying the block preserves the selected text.
+ * @return Whether copying the block preserves the selected text.
  */
-function isTextPreservedOnBlockCopy( ownerDocument, block ) {
-	const selectedText = ownerDocument.defaultView
-		.getSelection()
+function isTextPreservedOnBlockCopy( ownerDocument: Document, block: Block ) {
+	const selectedText = ownerDocument
+		.defaultView!.getSelection()!
 		.toString()
 		.trim();
 
@@ -125,8 +125,10 @@ export default function useClipboardHandler() {
 					selectedBlockClientIds[ 0 ]
 				) &&
 				isTextPreservedOnBlockCopy(
-					event.target.ownerDocument,
-					getBlocksByClientId( selectedBlockClientIds )[ 0 ]
+					( event.target as Element ).ownerDocument,
+					(
+						getBlocksByClientId( selectedBlockClientIds ) as Block[]
+					 )[ 0 ]
 				);
 
 			// Let native copy/paste behaviour take over in input fields.
