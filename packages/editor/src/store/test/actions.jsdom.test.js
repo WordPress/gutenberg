@@ -583,8 +583,7 @@ describe( 'Post actions', () => {
 			} );
 		} );
 
-		// Something other than WordPress answered, so the status explains the
-		// failure instead of the client's own "not a valid JSON response".
+		// The status explains the failure, not "not a valid JSON response".
 		it.each( [
 			[
 				429,

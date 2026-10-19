@@ -87,10 +87,7 @@ function getFailureDetails( message ) {
 }
 
 /**
- * Explains an `invalid_json` failure, where something other than WordPress
- * answered, such as a proxy's error page or the login page. Its own message
- * only says the response wasn't JSON, so the HTTP status is what tells the
- * cases apart.
+ * Explains an `invalid_json` save failure from the response's HTTP status.
  *
  * @param {Object}  error              The `invalid_json` error.
  * @param {number}  [error.status]     HTTP status of the response.
