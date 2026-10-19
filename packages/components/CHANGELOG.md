@@ -73,6 +73,7 @@
 
 ### Documentation
 
+-   Retire completed Emotion migration guidance and keep permanent styling advice in the contribution guide ([#85023](https://github.com/WordPress/gutenberg/pull/85023)).
 -   Update styling guidance and the `ToolsPanel` example after the Emotion migration ([#85020](https://github.com/WordPress/gutenberg/pull/85020)).
 
 ## 42.0.0 (2026-10-07)
