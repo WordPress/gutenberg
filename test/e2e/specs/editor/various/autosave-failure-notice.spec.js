@@ -5,6 +5,9 @@ const {
 
 const AUTOSAVE_FAILED = 'Auto-save failed. You can also save manually.';
 
+const AUTOSAVE_FAILED_NO_RESPONSE =
+	'Auto-save failed because there was no response from the server. You can also save manually.';
+
 const UPDATING_FAILED_OFFLINE =
 	'Updating failed because you were offline. Please verify your connection and try again.';
 
@@ -96,11 +99,11 @@ test.describe( 'Autosave failure notice', () => {
 			'link-in-message',
 			withDetails( 'Blocked. Learn more (https://example.com).' ),
 		],
-		// TODO: Say the server could not be reached, and retry right away.
+		// TODO: Retry right away.
 		[
 			'connection dropped before a response',
 			'dropped-connection',
-			AUTOSAVE_FAILED,
+			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
 		// TODO: Show the status code.
 		[ 'error without a message', 'no-message', AUTOSAVE_FAILED ],
@@ -143,11 +146,10 @@ test.describe( 'Autosave failure notice', () => {
 			'redirect-to-login',
 			withDetails( 'The response is not a valid JSON response.' ),
 		],
-		// TODO: Say the server could not be reached.
 		[
 			'redirected to another site',
 			'redirect-to-other-site',
-			AUTOSAVE_FAILED,
+			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
 		[
 			'maintenance mode',
@@ -298,11 +300,11 @@ test.describe( 'Autosave failure notice', () => {
 				.locator( '.notices-inline-notices__notice' );
 			await expect( notice ).toContainText(
 				new RegExp(
-					`${ AUTOSAVE_FAILED.replaceAll( '.', '\\.' ) } Retrying in (10|9) seconds\\.`
+					`${ AUTOSAVE_FAILED_NO_RESPONSE.replaceAll( '.', '\\.' ) } Retrying in (10|9) seconds\\.`
 				)
 			);
 			await expect( notice ).toContainText(
-				`${ AUTOSAVE_FAILED } Retrying in 7 seconds.`
+				`${ AUTOSAVE_FAILED_NO_RESPONSE } Retrying in 7 seconds.`
 			);
 		} );
 
@@ -323,7 +325,7 @@ test.describe( 'Autosave failure notice', () => {
 				.getByRole( 'region', { name: 'Editor content' } )
 				.locator( '.notices-inline-notices__notice' );
 			await expect( notice ).toContainText(
-				`${ AUTOSAVE_FAILED } Retrying…`
+				`${ AUTOSAVE_FAILED_NO_RESPONSE } Retrying…`
 			);
 			await expect( notice ).toHaveCount( 0 );
 		} );
@@ -355,7 +357,7 @@ test.describe( 'Autosave failure notice', () => {
 					}
 				}
 				expect( await autosaveFailure.getNotices() ).toEqual( [
-					AUTOSAVE_FAILED,
+					AUTOSAVE_FAILED_NO_RESPONSE,
 				] );
 			} );
 		}
@@ -366,7 +368,7 @@ test.describe( 'Autosave failure notice', () => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
+				AUTOSAVE_FAILED_NO_RESPONSE,
 			] );
 
 			await autosaveFailure.stopFailing();
@@ -381,7 +383,7 @@ test.describe( 'Autosave failure notice', () => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
+				AUTOSAVE_FAILED_NO_RESPONSE,
 			] );
 
 			await autosaveFailure.stopFailing();
@@ -400,7 +402,7 @@ test.describe( 'Autosave failure notice', () => {
 			await autosaveFailure.fail( 'dropped-connection' );
 			await autosaveFailure.autosave();
 			expect( await autosaveFailure.getNotices() ).toEqual( [
-				AUTOSAVE_FAILED,
+				AUTOSAVE_FAILED_NO_RESPONSE,
 			] );
 
 			await context.setOffline( true );
