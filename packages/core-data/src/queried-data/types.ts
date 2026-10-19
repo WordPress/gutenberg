@@ -97,6 +97,7 @@ export interface ReceiveItemsAction {
 	meta?: QueriedMeta | null;
 	query?: Query | null;
 	key?: string;
+	invalidateCache?: boolean;
 }
 
 /**

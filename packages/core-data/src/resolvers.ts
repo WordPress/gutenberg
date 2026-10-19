@@ -2,9 +2,11 @@ import { camelCase } from 'change-case';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
+import type { Block } from '@wordpress/blocks';
 import { STORE_NAME } from './name';
 import { additionalEntityConfigLoaders, DEFAULT_ENTITY_KEY } from './entities';
 import { getEntitySyncManager } from './entity-sync';
+import type { EntitySyncRecord } from './entity-sync';
 import {
 	forwardResolver,
 	getNormalizedCommaSeparable,
@@ -18,21 +20,26 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { setCachedBlocks } from './parsed-blocks-cache';
+import type { QueriedMeta, Query } from './queried-data/types';
+import type { PermissionResource } from './utils/types';
+import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
+import type { Action, CoreDataThunkArgs, RestRecord } from './private-types';
+import type { EntityConfig, TransientEditConfig } from './types';
 
 /**
  * Requests authors from the REST API.
  *
- * @param {Object|undefined} query Optional object of query parameters to
- *                                 include with request.
+ * @param query Optional object of query parameters to
+ *              include with request.
  */
 export const getAuthors =
-	( query ) =>
-	async ( { dispatch } ) => {
+	( query?: Query ) =>
+	async ( { dispatch }: CoreDataThunkArgs ) => {
 		const path = addQueryArgs(
 			'/wp/v2/users/?who=authors&per_page=100',
 			query
 		);
-		const users = await apiFetch( { path } );
+		const users = await apiFetch< Array< RestRecord > >( { path } );
 		dispatch.receiveUserQuery( path, users );
 	};
 
@@ -41,25 +48,33 @@ export const getAuthors =
  */
 export const getCurrentUser =
 	() =>
-	async ( { dispatch } ) => {
-		const currentUser = await apiFetch( { path: '/wp/v2/users/me' } );
+	async ( { dispatch }: CoreDataThunkArgs ) => {
+		const currentUser = await apiFetch< RestRecord >( {
+			path: '/wp/v2/users/me',
+		} );
 		dispatch.receiveCurrentUser( currentUser );
 	};
 
 /**
  * Requests an entity's record from the REST API.
  *
- * @param {string}           kind  Entity kind.
- * @param {string}           name  Entity name.
- * @param {number|string}    key   Record's key
- * @param {Object|undefined} query Optional object of query parameters to
- *                                 include with request. If requesting specific
- *                                 fields, fields must always include the ID.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param key   Record's key
+ * @param query Optional object of query parameters to
+ *              include with request. If requesting specific
+ *              fields, fields must always include the ID.
  */
 export const getEntityRecord =
-	( kind, name, key = '', query ) =>
-	async ( { select, dispatch, registry, resolveSelect } ) => {
-		const configs = await resolveSelect.getEntitiesConfig( kind );
+	( kind: string, name: string, key: string | number = '', query?: Query ) =>
+	async ( {
+		select,
+		dispatch,
+		registry,
+		resolveSelect,
+	}: CoreDataThunkArgs ) => {
+		const configs: Array< EntityConfig > =
+			await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -112,12 +127,12 @@ export const getEntityRecord =
 				...query,
 			} );
 			const response = await apiFetch( { path, parse: false } );
-			const record = await response.json();
+			const record: RestRecord = await response.json();
 			const permissions = getUserPermissionsFromAllowHeader(
 				response.headers?.get( 'allow' )
 			);
 
-			const receiveUserPermissionArgs = {};
+			const receiveUserPermissionArgs: Record< string, boolean > = {};
 			for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 				receiveUserPermissionArgs[
 					getUserPermissionCacheKey( action, {
@@ -165,7 +180,10 @@ export const getEntityRecord =
 					)
 					.forEach( ( [ propName, transientConfig ] ) => {
 						recordWithTransients[ propName ] =
-							transientConfig.read( recordWithTransients );
+							// The filter above keeps the configs that read the record.
+							( transientConfig as TransientEditConfig ).read(
+								recordWithTransients
+							);
 					} );
 
 				// Share the parsed blocks with `useEntityBlockEditor` so the
@@ -174,14 +192,18 @@ export const getEntityRecord =
 				// entry computed before they register is discarded, not served.
 				if (
 					recordWithTransients.blocks &&
-					typeof recordWithTransients.content?.raw === 'string'
+					// Post content is fetched in the edit context, with its `raw` value.
+					typeof ( recordWithTransients.content as { raw?: unknown } )
+						?.raw === 'string'
 				) {
 					setCachedBlocks(
 						kind,
 						name,
 						key,
-						recordWithTransients.content.raw,
-						recordWithTransients.blocks
+						// Checked above to be a string.
+						( recordWithTransients.content as { raw: string } ).raw,
+						// The blocks transient edit parses the content into blocks.
+						recordWithTransients.blocks as Array< Block >
 					);
 				}
 
@@ -212,11 +234,12 @@ export const getEntityRecord =
 					},
 					// Get the current entity record (with edits)
 					getEditedRecord: async () =>
-						await resolveSelect.getEditedEntityRecord(
+						// The synced record is received below, so it has an edited record.
+						( await resolveSelect.getEditedEntityRecord(
 							kind,
 							name,
 							key
-						),
+						) ) as EntitySyncRecord,
 					// Refetch the current entity record from the database.
 					refetchRecord: async () => {
 						dispatch.receiveEntityRecords(
@@ -244,7 +267,11 @@ export const getEntityRecord =
 
 // Whenever a template is saved, the active templates might be updated, so
 // invalidate the site settings when a template is updated or deleted.
-getEntityRecord.shouldInvalidate = ( action, kind, name ) => {
+getEntityRecord.shouldInvalidate = (
+	action: Action,
+	kind: string,
+	name: string
+) => {
 	return (
 		kind === 'root' &&
 		name === 'site' &&
@@ -273,15 +300,16 @@ export const getEditedEntityRecord = forwardResolver( 'getEntityRecord' );
 /**
  * Requests the entity's records from the REST API.
  *
- * @param {string}  kind  Entity kind.
- * @param {string}  name  Entity name.
- * @param {?Object} query Query Object. If requesting specific fields, fields
- *                        must always include the ID.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param query Query Object. If requesting specific fields, fields
+ *              must always include the ID.
  */
 export const getEntityRecords =
-	( kind, name, query = {} ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
-		const configs = await resolveSelect.getEntitiesConfig( kind );
+	( kind: string, name: string, query: Query = {} ) =>
+	async ( { dispatch, registry, resolveSelect }: CoreDataThunkArgs ) => {
+		const configs: Array< EntityConfig > =
+			await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -302,7 +330,10 @@ export const getEntityRecords =
 		const rawQuery = { ...query };
 		const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 
-		function getResolutionsArgs( records, recordsQuery ) {
+		function getResolutionsArgs(
+			records: Array< RestRecord >,
+			recordsQuery: Query
+		) {
 			const normalizedQuery = normalizeQueryForResolution( recordsQuery );
 			return records
 				.filter( ( record ) => record?.[ key ] )
@@ -338,25 +369,30 @@ export const getEntityRecords =
 				...query,
 			} );
 
-			let records = [],
-				meta;
+			let records: Array< RestRecord > = [],
+				meta: QueriedMeta | undefined;
 			if ( entityConfig.supportsPagination && query.per_page !== -1 ) {
 				const response = await apiFetch( { path, parse: false } );
 				records = Object.values( await response.json() );
 				meta = getPaginationMeta( response.headers );
 			} else if (
 				query.per_page === -1 &&
-				query[ RECEIVE_INTERMEDIATE_RESULTS ] === true
+				// The private option is a symbol key of the query.
+				( query as Record< symbol, unknown > )[
+					RECEIVE_INTERMEDIATE_RESULTS
+				] === true
 			) {
 				let page = 1;
-				let totalPages;
+				let totalPages: number;
 
 				do {
-					const response = await apiFetch( {
+					const response = await apiFetch< unknown, false >( {
 						path: addQueryArgs( path, { page, per_page: 100 } ),
 						parse: false,
 					} );
-					const pageRecords = Object.values( await response.json() );
+					const pageRecords: Array< RestRecord > = Object.values(
+						await response.json()
+					);
 
 					const pageMeta = getPaginationMeta( response.headers );
 					// An endpoint that doesn't paginate answers the first
@@ -389,7 +425,9 @@ export const getEntityRecords =
 					page++;
 				} while ( page <= totalPages );
 			} else {
-				records = Object.values( await apiFetch( { path } ) );
+				records = Object.values(
+					await apiFetch< Record< string, RestRecord > >( { path } )
+				);
 				meta = {
 					totalItems: records.length,
 					totalPages: 1,
@@ -423,11 +461,14 @@ export const getEntityRecords =
 			// that way we consider the query "fulfilled".
 			if ( query._fields ) {
 				records = records.map( ( record ) => {
-					query._fields.split( ',' ).forEach( ( field ) => {
-						if ( ! record.hasOwnProperty( field ) ) {
-							record[ field ] = undefined;
-						}
-					} );
+					// Normalized to a string above.
+					( query._fields as string )
+						.split( ',' )
+						.forEach( ( field ) => {
+							if ( ! record.hasOwnProperty( field ) ) {
+								record[ field ] = undefined;
+							}
+						} );
 
 					return record;
 				} );
@@ -451,14 +492,18 @@ export const getEntityRecords =
 							!! record?._links?.self?.[ 0 ]?.targetHints?.allow
 					)
 					.map( ( record ) => ( {
-						id: record[ key ],
+						// Records are keyed by their ID.
+						id: record[ key ] as string | number,
 						permissions: getUserPermissionsFromAllowHeader(
-							record._links.self[ 0 ].targetHints.allow
+							// Filtered above to records with an allow hint.
+							record._links!.self![ 0 ].targetHints!.allow
 						),
 					} ) );
 
-				const canUserResolutionsArgs = [];
-				const receiveUserPermissionArgs = {};
+				const canUserResolutionsArgs: Array<
+					[ { kind: string; name: string; id: string | number } ]
+				> = [];
+				const receiveUserPermissionArgs: Record< string, boolean > = {};
 				for ( const targetHint of targetHints ) {
 					// `canUser` is keyed by the resource, so one entry covers
 					// all four actions.
@@ -499,7 +544,11 @@ export const getEntityRecords =
 		}
 	};
 
-getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
+getEntityRecords.shouldInvalidate = (
+	action: Action,
+	kind: string,
+	name: string
+) => {
 	return (
 		( action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS' ) &&
 		action.invalidateCache &&
@@ -523,14 +572,15 @@ export const getEntityRecordsTotalPages = forwardResolver( 'getEntityRecords' );
  */
 export const getCurrentTheme =
 	() =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		const activeThemes = await resolveSelect.getEntityRecords(
 			'root',
 			'theme',
 			{ status: 'active' }
 		);
 
-		dispatch.receiveCurrentTheme( activeThemes[ 0 ] );
+		// Resolved, so the records are set.
+		dispatch.receiveCurrentTheme( activeThemes![ 0 ] );
 	};
 
 /**
@@ -541,11 +591,11 @@ export const getThemeSupports = forwardResolver( 'getCurrentTheme' );
 /**
  * Requests a preview from the Embed API.
  *
- * @param {string} url URL to get the preview for.
+ * @param url URL to get the preview for.
  */
 export const getEmbedPreview =
-	( url ) =>
-	async ( { dispatch } ) => {
+	( url: string ) =>
+	async ( { dispatch }: CoreDataThunkArgs ) => {
 		try {
 			const embedProxyResponse = await apiFetch( {
 				path: addQueryArgs( '/oembed/1.0/proxy', { url } ),
@@ -561,14 +611,14 @@ export const getEmbedPreview =
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string|Object} resource Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
- *                                 or REST base as a string - `media`.
- * @param {?string}       id       ID of the rest resource to check.
+ * @param resource Entity resource to check. Accepts entity object `{ kind: 'postType', name: 'attachment', id: 1 }`
+ *                 or REST base as a string - `media`.
+ * @param id       ID of the rest resource to check.
  */
 export const canUser =
-	( resource, id ) =>
-	async ( { dispatch, resolveSelect } ) => {
-		let resourcePath = null;
+	( resource: string | PermissionResource, id?: string | number ) =>
+	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
+		let resourcePath: string | null = null;
 		if ( typeof resource === 'object' ) {
 			if ( ! resource.kind || ! resource.name ) {
 				throw new Error( 'The entity resource object is not valid.' );
@@ -611,7 +661,7 @@ export const canUser =
 		const permissions = getUserPermissionsFromAllowHeader(
 			response.headers?.get( 'allow' )
 		);
-		const receiveUserPermissionArgs = {};
+		const receiveUserPermissionArgs: Record< string, boolean > = {};
 		for ( const action of ALLOWED_RESOURCE_ACTIONS ) {
 			receiveUserPermissionArgs[
 				getUserPermissionCacheKey( action, resource, id )
@@ -625,47 +675,52 @@ export const canUser =
  * is left out of the key and all four `canUser` calls for a resource share a
  * single resolver run.
  *
- * @param {string}        action   Action the selector was called with.
- * @param {string|Object} resource Entity resource to check.
- * @param {?string}       id       ID of the rest resource to check.
+ * @param action   Action the selector was called with.
+ * @param resource Entity resource to check.
+ * @param id       ID of the rest resource to check.
  *
- * @return {Array} The cache key arguments.
+ * @return The cache key arguments.
  */
-canUser.getResolutionArgs = ( action, resource, id ) => [ resource, id ];
+canUser.getResolutionArgs = (
+	action: string,
+	resource: string | PermissionResource,
+	id?: string | number
+) => [ resource, id ];
 
 /**
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
- * @param {string}        kind     Entity kind.
- * @param {string}        name     Entity name.
- * @param {number|string} recordId Record's id.
+ * @param kind     Entity kind.
+ * @param name     Entity name.
+ * @param recordId Record's id.
  */
 export const canUserEditEntityRecord =
-	( kind, name, recordId ) =>
-	async ( { resolveSelect } ) => {
+	( kind: string, name: string, recordId: number | string ) =>
+	async ( { resolveSelect }: CoreDataThunkArgs ) => {
 		await resolveSelect.canUser( 'update', { kind, name, id: recordId } );
 	};
 
 /**
  * Request autosave data from the REST API.
  *
- * @param {string} postType The type of the parent post.
- * @param {number} postId   The id of the parent post.
+ * @param postType The type of the parent post.
+ * @param postId   The id of the parent post.
  */
 export const getAutosaves =
-	( postType, postId ) =>
-	async ( { dispatch, resolveSelect } ) => {
+	( postType: string, postId: number ) =>
+	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		const {
 			rest_base: restBase,
 			rest_namespace: restNamespace = 'wp/v2',
 			supports,
-		} = await resolveSelect.getPostType( postType );
+			// Autosaves are requested for posts of an existing post type.
+		} = ( await resolveSelect.getPostType( postType ) )!;
 		if ( ! supports?.autosave ) {
 			return;
 		}
 
-		const autosaves = await apiFetch( {
+		const autosaves = await apiFetch< Array< unknown > >( {
 			path: `/${ restNamespace }/${ restBase }/${ postId }/autosaves?context=edit`,
 		} );
 
@@ -680,26 +735,27 @@ export const getAutosaves =
  * This resolver exists to ensure the underlying autosaves are fetched via
  * `getAutosaves` when a call to the `getAutosave` selector is made.
  *
- * @param {string} postType The type of the parent post.
- * @param {number} postId   The id of the parent post.
+ * @param postType The type of the parent post.
+ * @param postId   The id of the parent post.
  */
 export const getAutosave =
-	( postType, postId ) =>
-	async ( { resolveSelect } ) => {
+	( postType: string, postId: number ) =>
+	async ( { resolveSelect }: CoreDataThunkArgs ) => {
 		await resolveSelect.getAutosaves( postType, postId );
 	};
 
 export const __experimentalGetCurrentGlobalStylesId =
 	() =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		const activeThemes = await resolveSelect.getEntityRecords(
 			'root',
 			'theme',
 			{ status: 'active' }
 		);
-		const globalStylesURL =
-			activeThemes?.[ 0 ]?._links?.[ 'wp:user-global-styles' ]?.[ 0 ]
-				?.href;
+		const globalStylesURL = // Themes are fetched with their links.
+			( activeThemes?.[ 0 ] as RestRecord | undefined )?._links?.[
+				'wp:user-global-styles'
+			]?.[ 0 ]?.href;
 		if ( ! globalStylesURL ) {
 			return;
 		}
@@ -716,10 +772,10 @@ export const __experimentalGetCurrentGlobalStylesId =
 
 export const __experimentalGetCurrentThemeBaseGlobalStyles =
 	() =>
-	async ( { resolveSelect, dispatch } ) => {
+	async ( { resolveSelect, dispatch }: CoreDataThunkArgs ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 		// Please adjust the preloaded requests if this changes!
-		const themeGlobalStyles = await apiFetch( {
+		const themeGlobalStyles = await apiFetch< object >( {
 			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeBaseGlobalStyles(
@@ -730,10 +786,10 @@ export const __experimentalGetCurrentThemeBaseGlobalStyles =
 
 export const __experimentalGetCurrentThemeGlobalStylesVariations =
 	() =>
-	async ( { resolveSelect, dispatch } ) => {
+	async ( { resolveSelect, dispatch }: CoreDataThunkArgs ) => {
 		const currentTheme = await resolveSelect.getCurrentTheme();
 		// Please adjust the preloaded requests if this changes!
-		const variations = await apiFetch( {
+		const variations = await apiFetch< Array< unknown > >( {
 			path: `/wp/v2/global-styles/themes/${ currentTheme.stylesheet }/variations?context=view`,
 		} );
 		dispatch.__experimentalReceiveThemeGlobalStyleVariations(
@@ -747,7 +803,7 @@ export const __experimentalGetCurrentThemeGlobalStylesVariations =
  */
 export const getCurrentThemeGlobalStylesRevisions =
 	() =>
-	async ( { resolveSelect, dispatch } ) => {
+	async ( { resolveSelect, dispatch }: CoreDataThunkArgs ) => {
 		const globalStylesId =
 			await resolveSelect.__experimentalGetCurrentGlobalStylesId();
 		const record = globalStylesId
@@ -757,10 +813,15 @@ export const getCurrentThemeGlobalStylesRevisions =
 					globalStylesId
 				)
 			: undefined;
-		const revisionsURL = record?._links?.[ 'version-history' ]?.[ 0 ]?.href;
+		const revisionsURL = // Global styles are fetched with their links.
+			( record as RestRecord | undefined )?._links?.[
+				'version-history'
+			]?.[ 0 ]?.href;
 
 		if ( revisionsURL ) {
-			const resetRevisions = await apiFetch( {
+			const resetRevisions = await apiFetch<
+				Array< Record< string, unknown > >
+			>( {
 				url: revisionsURL,
 			} );
 			const revisions = resetRevisions?.map( ( revision ) =>
@@ -772,13 +833,14 @@ export const getCurrentThemeGlobalStylesRevisions =
 				)
 			);
 			dispatch.receiveThemeGlobalStyleRevisions(
-				globalStylesId,
+				// Set, as the record it names has revisions.
+				globalStylesId!,
 				revisions
 			);
 		}
 	};
 
-getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
+getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action: Action ) => {
 	return (
 		action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
 		action.kind === 'root' &&
@@ -789,14 +851,14 @@ getCurrentThemeGlobalStylesRevisions.shouldInvalidate = ( action ) => {
 
 export const getBlockPatterns =
 	() =>
-	async ( { dispatch } ) => {
+	async ( { dispatch }: CoreDataThunkArgs ) => {
 		const patterns = await fetchBlockPatterns();
 		dispatch( { type: 'RECEIVE_BLOCK_PATTERNS', patterns } );
 	};
 
 export const getBlockPatternCategories =
 	() =>
-	async ( { dispatch } ) => {
+	async ( { dispatch }: CoreDataThunkArgs ) => {
 		const categories = await apiFetch( {
 			path: '/wp/v2/block-patterns/categories',
 		} );
@@ -805,7 +867,7 @@ export const getBlockPatternCategories =
 
 export const getUserPatternCategories =
 	() =>
-	async ( { dispatch, resolveSelect } ) => {
+	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		const patternCategories = await resolveSelect.getEntityRecords(
 			'taxonomy',
 			'wp_pattern_category',
@@ -817,7 +879,13 @@ export const getUserPatternCategories =
 		);
 
 		const mappedPatternCategories =
-			patternCategories?.map( ( userCategory ) => ( {
+			// Requested with these fields.
+			(
+				patternCategories as Array< {
+					name: string;
+					slug: string;
+				} > | null
+			 )?.map( ( userCategory ) => ( {
 				...userCategory,
 				label: decodeEntities( userCategory.name ),
 				name: userCategory.slug,
@@ -831,8 +899,11 @@ export const getUserPatternCategories =
 
 export const getNavigationFallbackId =
 	() =>
-	async ( { dispatch, select, registry } ) => {
-		const fallback = await apiFetch( {
+	async ( { dispatch, select, registry }: CoreDataThunkArgs ) => {
+		const fallback = await apiFetch< {
+			id?: number;
+			_embedded?: { self?: RestRecord };
+		} >( {
 			path: addQueryArgs( '/wp-block-editor/v1/navigation-fallback', {
 				_embed: true,
 			} ),
@@ -874,9 +945,11 @@ export const getNavigationFallbackId =
 	};
 
 export const getDefaultTemplateId =
-	( query ) =>
-	async ( { dispatch, registry, resolveSelect } ) => {
-		const template = await apiFetch( {
+	( query: Query ) =>
+	async ( { dispatch, registry, resolveSelect }: CoreDataThunkArgs ) => {
+		const template = await apiFetch<
+			RestRecord & { id?: string; type: string }
+		>( {
 			path: addQueryArgs( '/wp/v2/templates/lookup', query ),
 		} );
 		// Wait for the entities config to be loaded, otherwise receiving
@@ -907,17 +980,23 @@ export const getDefaultTemplateId =
 /**
  * Requests an entity's revisions from the REST API.
  *
- * @param {string}           kind      Entity kind.
- * @param {string}           name      Entity name.
- * @param {number|string}    recordKey The key of the entity record whose revisions you want to fetch.
- * @param {Object|undefined} query     Optional object of query parameters to
- *                                     include with request. If requesting specific
- *                                     fields, fields must always include the ID.
+ * @param kind      Entity kind.
+ * @param name      Entity name.
+ * @param recordKey The key of the entity record whose revisions you want to fetch.
+ * @param query     Optional object of query parameters to
+ *                  include with request. If requesting specific
+ *                  fields, fields must always include the ID.
  */
 export const getRevisions =
-	( kind, name, recordKey, query = {} ) =>
-	async ( { dispatch, resolveSelect } ) => {
-		const configs = await resolveSelect.getEntitiesConfig( kind );
+	(
+		kind: string,
+		name: string,
+		recordKey: number | string,
+		query: Query = {}
+	) =>
+	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
+		const configs: Array< EntityConfig > =
+			await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -951,12 +1030,13 @@ export const getRevisions =
 			}
 
 			const path = addQueryArgs(
-				entityConfig.getRevisionsUrl( recordKey ),
+				// Entities with revisions have a revisions URL.
+				entityConfig.getRevisionsUrl!( recordKey ),
 				query
 			);
 
-			let records, response;
-			const meta = {};
+			let records: Array< RestRecord >, response;
+			const meta: QueriedMeta = {};
 			const isPaginated =
 				entityConfig.supportsPagination && query.per_page !== -1;
 			try {
@@ -968,12 +1048,19 @@ export const getRevisions =
 
 			if ( response ) {
 				if ( isPaginated ) {
-					records = Object.values( await response.json() );
+					// Fetched unparsed when paginated.
+					records = Object.values(
+						await ( response as Response ).json()
+					);
 					meta.totalItems = getPaginationMeta(
-						response.headers
+						// Fetched unparsed when paginated.
+						( response as Response ).headers
 					).totalItems;
 				} else {
-					records = Object.values( response );
+					// Fetched parsed, as the revisions themselves.
+					records = Object.values(
+						response as Record< string, RestRecord >
+					);
 				}
 
 				// If we request fields but the result doesn't contain the fields,
@@ -981,11 +1068,14 @@ export const getRevisions =
 				// that way we consider the query "fulfilled".
 				if ( query._fields ) {
 					records = records.map( ( record ) => {
-						query._fields.split( ',' ).forEach( ( field ) => {
-							if ( ! record.hasOwnProperty( field ) ) {
-								record[ field ] = undefined;
-							}
-						} );
+						// Normalized to a string above.
+						( query._fields as string )
+							.split( ',' )
+							.forEach( ( field ) => {
+								if ( ! record.hasOwnProperty( field ) ) {
+									record[ field ] = undefined;
+								}
+							} );
 
 						return record;
 					} );
@@ -1023,7 +1113,12 @@ export const getRevisions =
 	};
 
 // Invalidate cache when a new revision is created.
-getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
+getRevisions.shouldInvalidate = (
+	action: Action,
+	kind: string,
+	name: string,
+	recordKey: number | string
+) =>
 	action.type === 'SAVE_ENTITY_RECORD_FINISH' &&
 	name === action.name &&
 	kind === action.kind &&
@@ -1033,18 +1128,25 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
 /**
  * Requests a specific Entity revision from the REST API.
  *
- * @param {string}           kind        Entity kind.
- * @param {string}           name        Entity name.
- * @param {number|string}    recordKey   The key of the entity record whose revisions you want to fetch.
- * @param {number|string}    revisionKey The revision's key.
- * @param {Object|undefined} query       Optional object of query parameters to
- *                                       include with request. If requesting specific
- *                                       fields, fields must always include the ID.
+ * @param kind        Entity kind.
+ * @param name        Entity name.
+ * @param recordKey   The key of the entity record whose revisions you want to fetch.
+ * @param revisionKey The revision's key.
+ * @param query       Optional object of query parameters to
+ *                    include with request. If requesting specific
+ *                    fields, fields must always include the ID.
  */
 export const getRevision =
-	( kind, name, recordKey, revisionKey, query ) =>
-	async ( { select, dispatch, resolveSelect } ) => {
-		const configs = await resolveSelect.getEntitiesConfig( kind );
+	(
+		kind: string,
+		name: string,
+		recordKey: number | string,
+		revisionKey: number | string,
+		query?: Query
+	) =>
+	async ( { select, dispatch, resolveSelect }: CoreDataThunkArgs ) => {
+		const configs: Array< EntityConfig > =
+			await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
@@ -1091,19 +1193,21 @@ export const getRevision =
 			}
 
 			const path = addQueryArgs(
-				entityConfig.getRevisionsUrl( recordKey, revisionKey ),
+				// Entities with revisions have a revisions URL.
+				entityConfig.getRevisionsUrl!( recordKey, revisionKey ),
 				query
 			);
 
 			let record;
 			try {
-				record = await apiFetch( { path } );
+				record = await apiFetch< RestRecord >( { path } );
 			} catch {
 				// Do nothing if our request comes back with an API error.
 				return;
 			}
 
 			if ( record ) {
+				// @ts-expect-error The JavaScript action's inferred type requires its optional arguments.
 				await dispatch.receiveRevisions(
 					kind,
 					name,
@@ -1120,18 +1224,24 @@ export const getRevision =
 /**
  * Requests a specific post type options from the REST API.
  *
- * @param {string} postType Post type slug.
+ * @param postType Post type slug.
  */
 export const getRegisteredPostMeta =
-	( postType ) =>
-	async ( { dispatch, resolveSelect } ) => {
+	( postType: string ) =>
+	async ( { dispatch, resolveSelect }: CoreDataThunkArgs ) => {
 		let options;
 		try {
 			const {
 				rest_namespace: restNamespace = 'wp/v2',
 				rest_base: restBase,
 			} = ( await resolveSelect.getPostType( postType ) ) || {};
-			options = await apiFetch( {
+			options = await apiFetch< {
+				schema?: {
+					properties?: {
+						meta?: { properties?: Record< string, unknown > };
+					};
+				};
+			} >( {
 				path: `${ restNamespace }/${ restBase }/?context=edit`,
 				method: 'OPTIONS',
 			} );
@@ -1151,11 +1261,11 @@ export const getRegisteredPostMeta =
 /**
  * Requests entity configs for the given kind from the REST API.
  *
- * @param {string} kind Entity kind.
+ * @param kind Entity kind.
  */
 export const getEntitiesConfig =
-	( kind ) =>
-	async ( { dispatch } ) => {
+	( kind: string ) =>
+	async ( { dispatch }: CoreDataThunkArgs ) => {
 		const loader = additionalEntityConfigLoaders.find(
 			( l ) => l.kind === kind
 		);
@@ -1181,8 +1291,8 @@ export const getEntitiesConfig =
  */
 export const getEditorSettings =
 	() =>
-	async ( { dispatch } ) => {
-		const settings = await apiFetch( {
+	async ( { dispatch }: CoreDataThunkArgs ) => {
+		const settings = await apiFetch< Record< string, unknown > >( {
 			path: '/wp-block-editor/v1/settings',
 		} );
 		dispatch.receiveEditorSettings( settings );
@@ -1193,8 +1303,8 @@ export const getEditorSettings =
  */
 export const getEditorAssets =
 	() =>
-	async ( { dispatch } ) => {
-		const assets = await apiFetch( {
+	async ( { dispatch }: CoreDataThunkArgs ) => {
+		const assets = await apiFetch< Record< string, unknown > >( {
 			path: '/wp-block-editor/v1/assets',
 		} );
 		dispatch.receiveEditorAssets( assets );
@@ -1203,23 +1313,27 @@ export const getEditorAssets =
 /**
  * Requests view config for a given entity type from the REST API.
  *
- * @param {string}    kind           Entity kind.
- * @param {string}    name           Entity name.
- * @param {?Object}   options        Optional options.
- * @param {?string[]} options.fields Optional subset of top-level config
- *                                   properties to request, mapped to the REST
- *                                   API `_fields` parameter. When omitted, the
- *                                   full config is requested.
+ * @param kind           Entity kind.
+ * @param name           Entity name.
+ * @param options        Optional options.
+ * @param options.fields Optional subset of top-level config
+ *                       properties to request, mapped to the REST
+ *                       API `_fields` parameter. When omitted, the
+ *                       full config is requested.
  */
 export const getViewConfig =
-	( kind, name, options = {} ) =>
-	async ( { dispatch } ) => {
-		const query = { kind, name };
+	(
+		kind: string,
+		name: string,
+		options: { fields?: Array< string > } = {}
+	) =>
+	async ( { dispatch }: CoreDataThunkArgs ) => {
+		const query: Query = { kind, name };
 		const fields = getNormalizedCommaSeparable( options.fields );
 		if ( fields?.length ) {
 			query._fields = fields.join( ',' );
 		}
-		const config = await apiFetch( {
+		const config = await apiFetch< Record< string, unknown > >( {
 			path: addQueryArgs( '/wp/v2/view-config', query ),
 		} );
 		dispatch.receiveViewConfig( kind, name, config );
@@ -1229,13 +1343,13 @@ export const getViewConfig =
  * Requests the fields registered on the server for a given entity from the
  * REST API.
  *
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
+ * @param kind Entity kind.
+ * @param name Entity name.
  */
 export const getFieldsConfig =
-	( kind, name ) =>
-	async ( { dispatch } ) => {
-		const config = await apiFetch( {
+	( kind: string, name: string ) =>
+	async ( { dispatch }: CoreDataThunkArgs ) => {
+		const config = await apiFetch< FieldsConfig >( {
 			path: addQueryArgs( '/wp/v2/entity-fields', { kind, name } ),
 		} );
 		dispatch.receiveFieldsConfig( kind, name, config );
@@ -1245,13 +1359,13 @@ export const getFieldsConfig =
  * Requests the actions registered on the server for a given entity from the
  * REST API.
  *
- * @param {string} kind Entity kind.
- * @param {string} name Entity name.
+ * @param kind Entity kind.
+ * @param name Entity name.
  */
 export const getEntityActionsConfig =
-	( kind, name ) =>
-	async ( { dispatch } ) => {
-		const config = await apiFetch( {
+	( kind: string, name: string ) =>
+	async ( { dispatch }: CoreDataThunkArgs ) => {
+		const config = await apiFetch< EntityActionsConfig >( {
 			path: addQueryArgs( '/wp/v2/entity-actions', { kind, name } ),
 		} );
 		dispatch.receiveEntityActionsConfig( kind, name, config );

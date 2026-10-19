@@ -2,6 +2,7 @@
  * Types internal to the package, which the package root does not re-export.
  */
 import type { Block } from '@wordpress/blocks';
+import type { ThunkArgs } from '@wordpress/data';
 import type { ConnectionStatus } from '@wordpress/sync';
 import type { HistoryRecord } from '@wordpress/undo-manager';
 import type * as ET from './entity-types';
@@ -235,4 +236,31 @@ export interface EntitiesState {
 export interface UsersState {
 	byId: Record< ItemId, ET.User< 'view' > >;
 	queries: Record< string, Array< ItemId > >;
+}
+
+/**
+ * The argument of the core data thunks, with the private selectors and
+ * actions.
+ */
+export type CoreDataThunkArgs = ThunkArgs<
+	typeof import( '.' ).store,
+	typeof import( './private-selectors' ),
+	typeof import( './private-actions' )
+>;
+
+/**
+ * A record received from the REST API.
+ */
+export type RestRecord = Record< string, unknown > & {
+	_links?: RestLinks;
+};
+
+/**
+ * The links of a REST API record that core data reads.
+ */
+export interface RestLinks {
+	self?: Array< { href?: string; targetHints?: { allow?: string } } >;
+	'version-history'?: Array< { href?: string } >;
+	'wp:user-global-styles'?: Array< { href?: string } >;
+	[ relation: string ]: unknown;
 }

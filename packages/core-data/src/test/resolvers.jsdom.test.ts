@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
+import type { Mock } from 'vitest';
 import { getEntitySyncManager } from '../entity-sync';
 import {
 	getEntityRecord,
@@ -12,6 +13,33 @@ import {
 	getEntityActionsConfig,
 } from '../resolvers';
 import { RECEIVE_INTERMEDIATE_RESULTS } from '../utils';
+import type { EntitySyncManager } from '../entity-sync';
+import type { CoreDataThunkArgs } from '../private-types';
+import type { EntityConfig } from '../types';
+
+// A mocked `dispatch`, with the action creators the tests check.
+type DispatchMock< Action extends string > = Mock & Record< Action, Mock >;
+
+// The tests stub REST responses and errors in place of typed requests.
+const apiFetchMock = triggerFetch as unknown as Mock;
+
+/**
+ * Types the mocks a resolver runs with, which provide only what it uses.
+ *
+ * @param args The mocked thunk arguments.
+ */
+function thunkArgs( args: Record< string, unknown > ): CoreDataThunkArgs {
+	return args as unknown as CoreDataThunkArgs;
+}
+
+/**
+ * Types a mocked sync manager, which provides only what the resolvers use.
+ *
+ * @param manager The mocked sync manager.
+ */
+function asSyncManager( manager: Record< string, Mock > ): EntitySyncManager {
+	return manager as unknown as EntitySyncManager;
+}
 vi.mock( import( '@wordpress/api-fetch' ) );
 vi.mock( import( '../entity-sync' ), () => ( {
 	getEntitySyncManager: vi.fn(),
@@ -28,11 +56,18 @@ describe( 'getEntityRecord', () => {
 			baseURLParams: { context: 'edit' },
 		},
 	];
-	const registry = { batch: ( callback ) => callback() };
+	const registry = { batch: ( callback: () => void ) => callback() };
 	const resolveSelect = { getEntitiesConfig: vi.fn( () => ENTITIES ) };
 
-	let dispatch;
-	let syncManager;
+	let dispatch: DispatchMock<
+		| 'receiveEntityRecords'
+		| '__unstableAcquireStoreLock'
+		| '__unstableReleaseStoreLock'
+		| 'recordSyncUndoLevel'
+		| 'receiveUserPermissions'
+		| 'finishResolutions'
+	>;
+	let syncManager: Record< string, Mock >;
 
 	beforeEach( async () => {
 		dispatch = Object.assign( vi.fn(), {
@@ -43,24 +78,26 @@ describe( 'getEntityRecord', () => {
 			receiveUserPermissions: vi.fn(),
 			finishResolutions: vi.fn(),
 		} );
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 
 		syncManager = {
 			load: vi.fn(),
 			loadCollection: vi.fn(),
 		};
-		getEntitySyncManager.mockImplementation( () => syncManager );
+		vi.mocked( getEntitySyncManager ).mockImplementation( () =>
+			asSyncManager( syncManager )
+		);
 	} );
 
 	it( 'yields with requested post type', async () => {
 		// Provide response
-		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
+		apiFetchMock.mockImplementation( () => POST_TYPE_RESPONSE );
 
 		await getEntityRecord(
 			'root',
 			'postType',
 			'post'
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -89,14 +126,14 @@ describe( 'getEntityRecord', () => {
 		const query = { context: 'view', _envelope: '1' };
 
 		// Provide response
-		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
+		apiFetchMock.mockImplementation( () => POST_TYPE_RESPONSE );
 
 		await getEntityRecord(
 			'root',
 			'postType',
 			'post',
 			query
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		// Trigger apiFetch, test that the query is present in the url.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -140,17 +177,19 @@ describe( 'getEntityRecord', () => {
 			getEditedEntityRecord: vi.fn(),
 		};
 
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
+		apiFetchMock.mockImplementation( () => POST_RESPONSE );
 
 		await getEntityRecord(
 			'postType',
 			'post',
 			1
-		)( {
-			dispatch,
-			registry,
-			resolveSelect: resolveSelectWithSync,
-		} );
+		)(
+			thunkArgs( {
+				dispatch,
+				registry,
+				resolveSelect: resolveSelectWithSync,
+			} )
+		);
 
 		// Verify load was called with correct arguments.
 		expect( syncManager.load ).toHaveBeenCalledTimes( 1 );
@@ -185,17 +224,19 @@ describe( 'getEntityRecord', () => {
 		};
 		syncManager.shouldSync = vi.fn( () => false );
 
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
+		apiFetchMock.mockImplementation( () => POST_RESPONSE );
 
 		await getEntityRecord(
 			'postType',
 			'post',
 			1
-		)( {
-			dispatch,
-			registry,
-			resolveSelect: resolveSelectWithSync,
-		} );
+		)(
+			thunkArgs( {
+				dispatch,
+				registry,
+				resolveSelect: resolveSelectWithSync,
+			} )
+		);
 
 		expect( syncManager.shouldSync ).toHaveBeenCalledWith(
 			'postType',
@@ -226,18 +267,20 @@ describe( 'getEntityRecord', () => {
 			isCollaborationSupported: vi.fn( () => false ),
 		};
 
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
+		apiFetchMock.mockImplementation( () => POST_RESPONSE );
 
 		await getEntityRecord(
 			'postType',
 			'post',
 			1
-		)( {
-			select,
-			dispatch,
-			registry,
-			resolveSelect: resolveSelectWithSync,
-		} );
+		)(
+			thunkArgs( {
+				select,
+				dispatch,
+				registry,
+				resolveSelect: resolveSelectWithSync,
+			} )
+		);
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
 		expect( select.isCollaborationSupported ).toHaveBeenCalledTimes( 1 );
@@ -268,17 +311,19 @@ describe( 'getEntityRecord', () => {
 			getEditedEntityRecord: vi.fn(),
 		};
 
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
+		apiFetchMock.mockImplementation( () => POST_RESPONSE );
 
 		await getEntityRecord(
 			'postType',
 			'post',
 			1
-		)( {
-			dispatch,
-			registry,
-			resolveSelect: resolveSelectWithSync,
-		} );
+		)(
+			thunkArgs( {
+				dispatch,
+				registry,
+				resolveSelect: resolveSelectWithSync,
+			} )
+		);
 
 		const handlers = syncManager.load.mock.calls[ 0 ][ 4 ];
 
@@ -311,17 +356,19 @@ describe( 'getEntityRecord', () => {
 			getEditedEntityRecord: vi.fn(),
 		};
 
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
+		apiFetchMock.mockImplementation( () => POST_RESPONSE );
 
 		await getEntityRecord(
 			'postType',
 			'post',
 			1
-		)( {
-			dispatch,
-			registry,
-			resolveSelect: resolveSelectWithSync,
-		} );
+		)(
+			thunkArgs( {
+				dispatch,
+				registry,
+				resolveSelect: resolveSelectWithSync,
+			} )
+		);
 
 		// Verify load was called with correct arguments.
 		expect( syncManager.load ).toHaveBeenCalledTimes( 1 );
@@ -357,14 +404,16 @@ describe( 'getEntityRecord', () => {
 			getEntitiesConfig: vi.fn( () => ENTITIES_WITH_SYNC ),
 		};
 
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
+		apiFetchMock.mockImplementation( () => POST_RESPONSE );
 
 		// Call with a query parameter
-		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )( {
-			dispatch,
-			registry,
-			resolveSelect: resolveSelectWithSync,
-		} );
+		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )(
+			thunkArgs( {
+				dispatch,
+				registry,
+				resolveSelect: resolveSelectWithSync,
+			} )
+		);
 
 		expect( syncManager.load ).not.toHaveBeenCalled();
 	} );
@@ -400,11 +449,11 @@ describe( 'getEntityRecords', () => {
 			supportsPagination: true,
 		},
 	];
-	const registry = { batch: ( callback ) => callback() };
+	const registry = { batch: ( callback: () => void ) => callback() };
 	const resolveSelect = { getEntitiesConfig: vi.fn( () => ENTITIES ) };
 
 	beforeEach( async () => {
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	it( 'dispatches the requested post type', async () => {
@@ -415,12 +464,12 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// Provide response
-		triggerFetch.mockImplementation( () => POST_TYPES );
+		apiFetchMock.mockImplementation( () => POST_TYPES );
 
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -447,12 +496,12 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// Provide response
-		triggerFetch.mockImplementation( () => POST_TYPES );
+		apiFetchMock.mockImplementation( () => POST_TYPES );
 
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -481,12 +530,12 @@ describe( 'getEntityRecords', () => {
 		} );
 
 		// Provide response
-		triggerFetch.mockImplementation( () => POST_TYPES );
+		apiFetchMock.mockImplementation( () => POST_TYPES );
 
 		await getEntityRecords(
 			'root',
 			'postType'
-		)( { dispatch, registry, resolveSelect } );
+		)( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		// Fetch request should have been issued.
 		expect( triggerFetch ).toHaveBeenCalledWith( {
@@ -527,15 +576,17 @@ describe( 'getEntityRecords', () => {
 			},
 		];
 
-		triggerFetch.mockImplementation( () => postsWithLinks );
+		apiFetchMock.mockImplementation( () => postsWithLinks );
 
 		await getEntityRecords( 'postType', 'post', {
 			_fields: Object.keys( postsWithLinks[ 0 ] ).join( ',' ),
-		} )( {
-			dispatch,
-			registry,
-			resolveSelect,
-		} );
+		} )(
+			thunkArgs( {
+				dispatch,
+				registry,
+				resolveSelect,
+			} )
+		);
 
 		// Permissions should have been cached. `canUser` is keyed by the
 		// resource, so one entry covers all four actions.
@@ -568,15 +619,17 @@ describe( 'getEntityRecords', () => {
 			},
 		];
 
-		triggerFetch.mockImplementation( () => postsWithoutLinks );
+		apiFetchMock.mockImplementation( () => postsWithoutLinks );
 
 		await getEntityRecords( 'postType', 'post', {
 			_fields: Object.keys( postsWithoutLinks[ 0 ] ).join( ',' ),
-		} )( {
-			dispatch,
-			registry,
-			resolveSelect,
-		} );
+		} )(
+			thunkArgs( {
+				dispatch,
+				registry,
+				resolveSelect,
+			} )
+		);
 
 		// Permissions should NOT have been cached
 		expect( dispatch.receiveUserPermissions ).not.toHaveBeenCalled();
@@ -605,7 +658,7 @@ describe( 'getEntityRecords', () => {
 		];
 
 		let callCount = 0;
-		triggerFetch.mockImplementation( () => {
+		apiFetchMock.mockImplementation( () => {
 			const data = mockPages[ callCount % mockPages.length ];
 			callCount++;
 			return Promise.resolve( {
@@ -620,7 +673,7 @@ describe( 'getEntityRecords', () => {
 		await getEntityRecords( 'postType', 'attachment', {
 			per_page: -1,
 			[ RECEIVE_INTERMEDIATE_RESULTS ]: true,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		// 3 calls for intermediate results (one per page), plus 1 final call with complete records
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledTimes( 4 );
@@ -664,8 +717,13 @@ describe( 'getEntityRecords', () => {
 } );
 
 describe( 'taxonomy pagination', () => {
-	const registry = { batch: ( callback ) => callback() };
-	let dispatch, loadedTaxonomyEntities;
+	const registry = { batch: ( callback: () => void ) => callback() };
+	let dispatch: DispatchMock<
+			| 'receiveEntityRecords'
+			| '__unstableAcquireStoreLock'
+			| '__unstableReleaseStoreLock'
+		>,
+		loadedTaxonomyEntities: Array< EntityConfig >;
 
 	beforeEach( async () => {
 		dispatch = Object.assign( vi.fn(), {
@@ -673,7 +731,7 @@ describe( 'taxonomy pagination', () => {
 			__unstableAcquireStoreLock: vi.fn().mockResolvedValue( 'lock' ),
 			__unstableReleaseStoreLock: vi.fn(),
 		} );
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 
 		const mockTaxonomyConfig = {
 			category: {
@@ -682,13 +740,14 @@ describe( 'taxonomy pagination', () => {
 			},
 		};
 
-		triggerFetch.mockResolvedValueOnce( mockTaxonomyConfig );
+		apiFetchMock.mockResolvedValueOnce( mockTaxonomyConfig );
 
 		const { additionalEntityConfigLoaders } = await import( '../entities' );
 		const taxonomyLoader = additionalEntityConfigLoaders.find(
 			( loader ) => loader.kind === 'taxonomy'
 		);
-		loadedTaxonomyEntities = await taxonomyLoader.loadEntities();
+		// The taxonomy loader is registered.
+		loadedTaxonomyEntities = await taxonomyLoader!.loadEntities();
 	} );
 
 	it( 'should make paginated API calls with parse: false', async () => {
@@ -698,7 +757,7 @@ describe( 'taxonomy pagination', () => {
 				.mockResolvedValue( loadedTaxonomyEntities ),
 		};
 
-		triggerFetch.mockResolvedValueOnce( [
+		apiFetchMock.mockResolvedValueOnce( [
 			{ id: 1, name: 'Category 1' },
 			{ id: 2, name: 'Category 2' },
 		] );
@@ -706,7 +765,7 @@ describe( 'taxonomy pagination', () => {
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,
 			page: 1,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenLastCalledWith( {
 			path: '/wp/v2/categories?context=edit&per_page=2&page=1',
@@ -740,12 +799,12 @@ describe( 'taxonomy pagination', () => {
 			},
 		};
 
-		triggerFetch.mockResolvedValueOnce( mockResponse );
+		apiFetchMock.mockResolvedValueOnce( mockResponse );
 
 		await getEntityRecords( 'taxonomy', 'category', {
 			per_page: 2,
 			page: 1,
-		} )( { dispatch, registry, resolveSelect } );
+		} )( thunkArgs( { dispatch, registry, resolveSelect } ) );
 
 		expect( dispatch.receiveEntityRecords ).toHaveBeenCalledWith(
 			'taxonomy',
@@ -774,9 +833,9 @@ describe( 'getEmbedPreview', () => {
 		} );
 
 		// Provide response
-		triggerFetch.mockResolvedValue( SUCCESSFUL_EMBED_RESPONSE );
+		apiFetchMock.mockResolvedValue( SUCCESSFUL_EMBED_RESPONSE );
 
-		await getEmbedPreview( EMBEDDABLE_URL )( { dispatch } );
+		await getEmbedPreview( EMBEDDABLE_URL )( thunkArgs( { dispatch } ) );
 
 		expect( dispatch.receiveEmbedPreview ).toHaveBeenCalledWith(
 			EMBEDDABLE_URL,
@@ -790,9 +849,9 @@ describe( 'getEmbedPreview', () => {
 		} );
 
 		// Provide response
-		triggerFetch.mockRejectedValue( { status: 404 } );
+		apiFetchMock.mockRejectedValue( { status: 404 } );
 
-		await getEmbedPreview( UNEMBEDDABLE_URL )( { dispatch } );
+		await getEmbedPreview( UNEMBEDDABLE_URL )( thunkArgs( { dispatch } ) );
 
 		expect( dispatch.receiveEmbedPreview ).toHaveBeenCalledWith(
 			UNEMBEDDABLE_URL,
@@ -818,12 +877,12 @@ describe( 'canUser', () => {
 	];
 	const resolveSelect = { getEntitiesConfig: vi.fn( () => ENTITIES ) };
 
-	let dispatch;
+	let dispatch: DispatchMock< 'receiveUserPermissions' >;
 	beforeEach( async () => {
 		dispatch = Object.assign( vi.fn(), {
 			receiveUserPermissions: vi.fn(),
 		} );
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	it( 'drops the action from the resolution args', () => {
@@ -834,15 +893,17 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'does nothing when there is an API error', async () => {
-		triggerFetch.mockImplementation( () =>
+		apiFetchMock.mockImplementation( () =>
 			Promise.reject( { status: 404 } )
 		);
 
-		await canUser( 'media' )( { dispatch, resolveSelect } );
-		await canUser( { kind: 'postType', name: 'attachment' } )( {
-			dispatch,
-			resolveSelect,
-		} );
+		await canUser( 'media' )( thunkArgs( { dispatch, resolveSelect } ) );
+		await canUser( { kind: 'postType', name: 'attachment' } )(
+			thunkArgs( {
+				dispatch,
+				resolveSelect,
+			} )
+		);
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -854,11 +915,11 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives false when the allow header is missing', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map(),
 		} ) );
 
-		await canUser( 'media' )( { dispatch, resolveSelect } );
+		await canUser( 'media' )( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( dispatch.receiveUserPermissions ).toHaveBeenCalledWith( {
 			'create/media': false,
@@ -870,19 +931,24 @@ describe( 'canUser', () => {
 
 	it( 'throws an error when an entity resource object is malformed', async () => {
 		await expect(
-			canUser( { name: 'wp_block' } )( {
-				dispatch,
-				resolveSelect,
-			} )
+			canUser(
+				// @ts-expect-error Tests the error for a resource without a kind.
+				{ name: 'wp_block' }
+			)(
+				thunkArgs( {
+					dispatch,
+					resolveSelect,
+				} )
+			)
 		).rejects.toThrow( 'The entity resource object is not valid.' );
 	} );
 
 	it( 'receives false when the user is not allowed to perform an action', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser( 'media' )( { dispatch, resolveSelect } );
+		await canUser( 'media' )( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -899,14 +965,16 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives false when the user is not allowed to perform an action on entities', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
-		await canUser( { kind: 'postType', name: 'attachment' } )( {
-			dispatch,
-			resolveSelect,
-		} );
+		await canUser( { kind: 'postType', name: 'attachment' } )(
+			thunkArgs( {
+				dispatch,
+				resolveSelect,
+			} )
+		);
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -920,11 +988,11 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives true when the user is allowed to perform an action', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'media' )( { dispatch, resolveSelect } );
+		await canUser( 'media' )( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -938,14 +1006,16 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives true when the user is allowed to perform an action on entities', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( { kind: 'postType', name: 'attachment' } )( {
-			dispatch,
-			resolveSelect,
-		} );
+		await canUser( { kind: 'postType', name: 'attachment' } )(
+			thunkArgs( {
+				dispatch,
+				resolveSelect,
+			} )
+		);
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/media',
@@ -959,11 +1029,14 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives true when the user is allowed to perform an action on a specific resource', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
-		await canUser( 'blocks', 123 )( { dispatch, resolveSelect } );
+		await canUser(
+			'blocks',
+			123
+		)( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
@@ -977,7 +1050,7 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives true when the user is allowed to perform an action on a specific entity', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 		} ) );
 
@@ -985,7 +1058,7 @@ describe( 'canUser', () => {
 			kind: 'postType',
 			name: 'wp_block',
 			id: 123,
-		} )( { dispatch, resolveSelect } );
+		} )( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/blocks/123',
@@ -999,11 +1072,11 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'receives every action permission from a single request', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'POST, GET' ] ] ),
 		} ) );
 
-		await canUser( 'blocks' )( { dispatch, resolveSelect } );
+		await canUser( 'blocks' )( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledTimes( 1 );
 
@@ -1026,7 +1099,7 @@ describe( 'getAutosaves', () => {
 	];
 
 	beforeEach( async () => {
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
 	it( 'yields with fetched autosaves', async () => {
@@ -1038,14 +1111,17 @@ describe( 'getAutosaves', () => {
 			supports: { autosave: true },
 		};
 
-		triggerFetch.mockImplementation( () => SUCCESSFUL_RESPONSE );
+		apiFetchMock.mockImplementation( () => SUCCESSFUL_RESPONSE );
 		const dispatch = Object.assign( vi.fn(), {
 			receiveAutosaves: vi.fn(),
 		} );
 		const resolveSelect = Object.assign( vi.fn(), {
 			getPostType: vi.fn( () => postEntityConfig ),
 		} );
-		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
+		await getAutosaves(
+			postType,
+			postId
+		)( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
@@ -1065,14 +1141,17 @@ describe( 'getAutosaves', () => {
 			supports: { autosave: true },
 		};
 
-		triggerFetch.mockImplementation( () => [] );
+		apiFetchMock.mockImplementation( () => [] );
 		const dispatch = Object.assign( vi.fn(), {
 			receiveAutosaves: vi.fn(),
 		} );
 		const resolveSelect = Object.assign( vi.fn(), {
 			getPostType: vi.fn( () => postEntityConfig ),
 		} );
-		await getAutosaves( postType, postId )( { dispatch, resolveSelect } );
+		await getAutosaves(
+			postType,
+			postId
+		)( thunkArgs( { dispatch, resolveSelect } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: `/wp/v2/${ restBase }/${ postId }/autosaves?context=edit`,
@@ -1092,9 +1171,9 @@ describe( 'getCurrentUser', () => {
 		} );
 
 		// Provide response
-		triggerFetch.mockResolvedValue( SUCCESSFUL_RESPONSE );
+		apiFetchMock.mockResolvedValue( SUCCESSFUL_RESPONSE );
 
-		await getCurrentUser()( { dispatch } );
+		await getCurrentUser()( thunkArgs( { dispatch } ) );
 
 		expect( dispatch.receiveCurrentUser ).toHaveBeenCalledWith(
 			SUCCESSFUL_RESPONSE
@@ -1113,9 +1192,12 @@ describe( 'getFieldsConfig', () => {
 		const dispatch = Object.assign( vi.fn(), {
 			receiveFieldsConfig: vi.fn(),
 		} );
-		triggerFetch.mockResolvedValue( config );
+		apiFetchMock.mockResolvedValue( config );
 
-		await getFieldsConfig( 'postType', 'page' )( { dispatch } );
+		await getFieldsConfig(
+			'postType',
+			'page'
+		)( thunkArgs( { dispatch } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/entity-fields?kind=postType&name=page',
@@ -1132,10 +1214,10 @@ describe( 'getFieldsConfig', () => {
 			receiveFieldsConfig: vi.fn(),
 		} );
 		const error = { code: 'rest_forbidden', message: 'Forbidden.' };
-		triggerFetch.mockRejectedValue( error );
+		apiFetchMock.mockRejectedValue( error );
 
 		await expect(
-			getFieldsConfig( 'postType', 'page' )( { dispatch } )
+			getFieldsConfig( 'postType', 'page' )( thunkArgs( { dispatch } ) )
 		).rejects.toBe( error );
 		expect( dispatch.receiveFieldsConfig ).not.toHaveBeenCalled();
 	} );
@@ -1152,9 +1234,12 @@ describe( 'getEntityActionsConfig', () => {
 		const dispatch = Object.assign( vi.fn(), {
 			receiveEntityActionsConfig: vi.fn(),
 		} );
-		triggerFetch.mockResolvedValue( config );
+		apiFetchMock.mockResolvedValue( config );
 
-		await getEntityActionsConfig( 'postType', 'page' )( { dispatch } );
+		await getEntityActionsConfig(
+			'postType',
+			'page'
+		)( thunkArgs( { dispatch } ) );
 
 		expect( triggerFetch ).toHaveBeenCalledWith( {
 			path: '/wp/v2/entity-actions?kind=postType&name=page',
@@ -1171,10 +1256,13 @@ describe( 'getEntityActionsConfig', () => {
 			receiveEntityActionsConfig: vi.fn(),
 		} );
 		const error = { code: 'rest_forbidden', message: 'Forbidden.' };
-		triggerFetch.mockRejectedValue( error );
+		apiFetchMock.mockRejectedValue( error );
 
 		await expect(
-			getEntityActionsConfig( 'postType', 'page' )( { dispatch } )
+			getEntityActionsConfig(
+				'postType',
+				'page'
+			)( thunkArgs( { dispatch } ) )
 		).rejects.toBe( error );
 		expect( dispatch.receiveEntityActionsConfig ).not.toHaveBeenCalled();
 	} );
