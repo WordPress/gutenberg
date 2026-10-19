@@ -3,7 +3,10 @@ import { __ } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { GlobalStylesSettings } from '@wordpress/global-styles-engine';
 import { ScreenHeader } from './screen-header';
+import { ScreenBody } from './screen-body';
 import DimensionsPanel from './dimensions-panel';
+import SpacingsCount from './spacing/spacings-count';
+import { hasAvailableSpacingSizes } from './spacing/utils';
 import { useSetting } from './hooks';
 import { unlock } from './lock-unlock';
 
@@ -15,11 +18,19 @@ function ScreenLayout() {
 	const [ rawSettings ] = useSetting< GlobalStylesSettings >( '' );
 	const settings = useSettingsForBlockElement( rawSettings );
 	const hasDimensionsPanel = useHasDimensionsPanel( settings );
+	const hasSpacingSizes = hasAvailableSpacingSizes( settings );
 
 	return (
 		<>
 			<ScreenHeader title={ __( 'Layout' ) } />
-			{ hasDimensionsPanel && <DimensionsPanel /> }
+			<>
+				{ hasDimensionsPanel && <DimensionsPanel /> }
+				{ hasSpacingSizes && (
+					<ScreenBody>
+						<SpacingsCount />
+					</ScreenBody>
+				) }
+			</>
 		</>
 	);
 }
