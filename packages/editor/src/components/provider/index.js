@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo, differenceBy, isEqual, noop } from 'lodash';
+import { map, pick, defaultTo } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -15,7 +15,6 @@ import { BlockEditorProvider, transformStyles } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
-import { unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -40,8 +39,6 @@ const fetchLinkSuggestions = async ( search ) => {
 		title: decodeEntities( post.title ) || __( '(no title)' ),
 	} ) );
 };
-
-const UNINSTALL_ERROR_NOTICE_ID = 'block-uninstall-error';
 
 class EditorProvider extends Component {
 	constructor( props ) {
@@ -193,7 +190,6 @@ export default compose( [
 			__experimentalGetReusableBlocks,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
-		const { getBlocks } = select( 'core/block-editor' );
 
 		return {
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
