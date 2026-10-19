@@ -112,7 +112,7 @@
 		"source-map": "^0.6.1",
 		"storybook": "^10.6.1",
 		"stylelint": "^17.14.1",
-		"vite": "^8.3.2",
+		"vite": "^8.3.4",
 		"vitest": "^5.0.3",
 		"vitest-browser-react": "^2.3.0"
 	},
@@ -161,6 +161,6 @@
 		"build:figma": "node bin/build-figma-tokens/index.ts",
 		"build": "npm run build:default-ramps && npm run build:tokens && npm run build:figma",
 		"lint:package-contents": "wp-validate-package-contents . --disallow-path src",
-		"postbuild": "prettier --write tokens/color.json tokens/modes prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
+		"postbuild": "prettier --write tokens/color.json tokens/wpds.resolver.json prebuilt src/prebuilt src/color-ramps/lib/default-ramps.ts docs ../base-styles/internal/_wpds-token-fallbacks.scss"
 	}
 }

@@ -43,13 +43,13 @@ function isEmptyMeta( str ) {
  */
 export default function RevisionFieldsDiffPanel() {
 	const { revision, previousRevision } = useSelect( ( select ) => {
-		const { getCurrentRevision, getPreviousRevision } = unlock(
+		const { getShownVersion, getComparedVersion } = unlock(
 			select( editorStore )
 		);
 
 		return {
-			revision: getCurrentRevision(),
-			previousRevision: getPreviousRevision(),
+			revision: getShownVersion(),
+			previousRevision: getComparedVersion(),
 		};
 	}, [] );
 

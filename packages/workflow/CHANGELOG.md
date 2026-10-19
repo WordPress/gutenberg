@@ -10,6 +10,11 @@
 
 -   Widen React peer dependency ranges to `^18 || ^19` to support both React 18 and React 19 environments ([#80024](https://github.com/WordPress/gutenberg/pull/80024)).
 
+### Bug Fixes
+
+-   Show a fallback message when an ability throws a value without a string message, instead of failing silently or showing `[object Object]` ([#84361](https://github.com/WordPress/gutenberg/pull/84361)).
+-   Reset the palette when it closes with the shortcut, and drop results from runs that finish after it closes ([#84361](https://github.com/WordPress/gutenberg/pull/84361)).
+
 ### Internal
 
 -   Import `withIgnoreIMEEvents` from `@wordpress/keycodes` instead of unlocking it from `@wordpress/components`. Adds a `@wordpress/keycodes` dependency ([#81343](https://github.com/WordPress/gutenberg/pull/81343)).

@@ -5,6 +5,21 @@
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   Remove the `deletePost`, `duplicatePattern`, `duplicatePost`, `duplicateTemplatePart`, `exportPattern`, `permanentlyDeletePost`, `renamePost`, `reorderPage`, `resetPost`, `restorePost`, `trashPost`, `viewPost` and `viewPostRevisions` actions, which moved to the `@wordpress/core-actions` script modules ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Remove `CreateTemplatePartModal`, which moved to the private APIs of `@wordpress/patterns` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Remove the `authorField`, `commentStatusField`, `dateField`, `descriptionField`, `discussionField`, `excerptField`, `featuredImageField`, `formatField`, `lastEditedDateField`, `notesField`, `pageTitleField`, `parentField`, `passwordField`, `patternDescriptionField`, `patternSyncStatusField`, `patternTitleField`, `pingStatusField`, `postContentInfoField`, `postsPageTitleField`, `postsPerPageField`, `readOnlyDescriptionField`, `scheduledDateField`, `siteDiscussionField`, `slugField`, `statusField`, `stickyField`, `templateAuthorField`, `templateField`, `templatePartAuthorField`, `templateTitleField` and `titleField` fields, which moved to the `@wordpress/core-fields` script modules ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
+-   Remove `orderField`, which nothing used ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
+-   Remove the `BasePost`, `BasePostWithEmbeddedAuthor`, `Pattern` and `PostType` types, which only described the records of the removed fields ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
+
+### Enhancements
+
+-   Template field: Migrate template selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+
+### Bug Fixes
+
+-   `PageTitleView`: Keep the page-type badge on a single line, so a list row with the `Privacy Policy Page` badge no longer grows and jumps when hovering reveals the primary action. ([#84368](https://github.com/WordPress/gutenberg/pull/84368))
+-   Status and slug fields: When the post's `_links` lack the `wp:action-publish` relation, disable the status field and show only the permalink in the slug control, so a user who can't publish gets what the classic sidebar shows. ([#84371](https://github.com/WordPress/gutenberg/pull/84371))
+-   `SlugEdit`: Keep the external link icon on the same line as the permalink when the slug can't be edited. ([#84371](https://github.com/WordPress/gutenberg/pull/84371))
 
 ## 0.49.0 (2026-10-07)
 

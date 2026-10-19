@@ -1,7 +1,11 @@
 import clsx from 'clsx';
 import { useRefEffect } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
-import { Disabled, Placeholder, Spinner } from '@wordpress/components';
+import {
+	Disabled,
+	Placeholder,
+	Spinner as WCSpinner,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 
@@ -102,7 +106,7 @@ export default function Preview( { idBase, instance, isVisible } ) {
 			*/ }
 			{ isVisible && ! isLoaded && (
 				<Placeholder>
-					<Spinner />
+					<WCSpinner />
 				</Placeholder>
 			) }
 			<div

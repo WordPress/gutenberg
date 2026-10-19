@@ -22,8 +22,10 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/connectors',
 	'@wordpress/workflows',
 	'@wordpress/components',
+	'@wordpress/core-actions',
 	'@wordpress/core-commands',
 	'@wordpress/core-data',
+	'@wordpress/core-fields',
 	'@wordpress/customize-widgets',
 	'@wordpress/data',
 	'@wordpress/edit-post',
@@ -78,7 +80,7 @@ const requiredConsent =
 	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.';
 
 /**
- * Called by a @wordpress package wishing to opt-in to accessing or exposing
+ * Called by a `@wordpress` package wishing to opt-in to accessing or exposing
  * private private APIs.
  *
  * @param consent    The consent string.

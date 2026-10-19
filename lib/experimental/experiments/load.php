@@ -147,8 +147,15 @@ function gutenberg_initialize_experiments_settings() {
 			'label'        => __( 'Gutenberg Experiments', 'gutenberg' ),
 			'show_in_rest' => array(
 				'schema' => array(
-					'type'       => 'object',
-					'properties' => $properties,
+					'type'                 => 'object',
+					'properties'           => $properties,
+					/*
+					 * A site that enabled an experiment which was since removed still
+					 * carries that ID in the saved option.
+					 */
+					'additionalProperties' => array(
+						'type' => 'boolean',
+					),
 				),
 			),
 			'default'      => array(),

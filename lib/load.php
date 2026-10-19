@@ -96,12 +96,18 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-templates-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/view-config-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/note-reactions.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
-	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-fields-registry.php';
-	require __DIR__ . '/compat/wordpress-7.2/fields-api.php';
-	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-fields-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-wp-entity-fields-registry.php';
+	require __DIR__ . '/compat/wordpress-7.2/entity-fields-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/preload.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-entity-fields-controller-7-2.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-wp-entity-actions-registry.php';
+	require __DIR__ . '/compat/wordpress-7.2/entity-actions-api.php';
+	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-entity-actions-controller-7-2.php';
 
 	// Real-time collaboration.
 	require __DIR__ . '/experimental/collaboration/class-gutenberg-rest-autosaves-controller.php';
@@ -115,6 +121,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/class-wp-rest-icon-collections-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-icons-registry-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-icons-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-entity-fields-registry-gutenberg.php';
+	require_once __DIR__ . '/class-wp-entity-actions-registry-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
@@ -130,7 +138,6 @@ require_once __DIR__ . '/experimental/rest-api-overrides.php';
 require __DIR__ . '/compat/plugin/edit-site-routes-backwards-compat.php';
 require __DIR__ . '/compat/plugin/fonts.php';
 require __DIR__ . '/compat/plugin/connectors.php';
-require __DIR__ . '/compat/plugin/style-state-aliases.php';
 
 
 // WordPress 7.1 compat.
@@ -138,11 +145,11 @@ require __DIR__ . '/compat/wordpress-7.1/admin-bar.php';
 require __DIR__ . '/compat/wordpress-7.1/blocks.php';
 require __DIR__ . '/compat/wordpress-7.1/kses.php';
 require __DIR__ . '/compat/wordpress-7.1/media.php';
-require __DIR__ . '/compat/wordpress-7.1/preload.php';
 require __DIR__ . '/compat/wordpress-7.1/icons.php';
 
 // WordPress 7.2 compat.
 require __DIR__ . '/compat/wordpress-7.2/kses.php';
+require __DIR__ . '/compat/wordpress-7.2/media.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -163,6 +170,13 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ) {
 	require __DIR__ . '/experimental/dataform-inspector-preload.php';
+}
+
+if (
+	gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ||
+	gutenberg_is_experiment_enabled( 'gutenberg-media-editor' )
+) {
+	require __DIR__ . '/experimental/route-entity-fields-preload.php';
 }
 if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 	require __DIR__ . '/experimental/media-editor/load.php';
@@ -201,6 +215,23 @@ if ( is_dir( __DIR__ . '/../build/scripts/style-engine' ) ) {
 	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-processor-gutenberg.php';
 	require_once __DIR__ . '/../build/scripts/style-engine/class-wp-style-engine-gutenberg.php';
 	require_once __DIR__ . '/../build/scripts/style-engine/style-engine-gutenberg.php';
+}
+if ( is_dir( __DIR__ . '/../build/scripts/core-fields' ) ) {
+	/*
+	 * Remove the WordPress core callback registering the same fields, or every
+	 * field is registered twice and the second registration is refused.
+	 */
+	$core_field_collections_priority = has_action( 'wp_entity_fields_api_init', 'wp_register_core_field_collections' );
+	if ( false !== $core_field_collections_priority ) {
+		remove_action( 'wp_entity_fields_api_init', 'wp_register_core_field_collections', $core_field_collections_priority );
+	}
+	require_once __DIR__ . '/../build/scripts/core-fields/index.php';
+}
+if ( is_dir( __DIR__ . '/../build/scripts/core-actions' ) ) {
+	require_once __DIR__ . '/../build/scripts/core-actions/index.php';
+	// The plugin registers its copy of the core actions instead of the one
+	// WordPress ships, which would otherwise register them first.
+	remove_action( 'wp_entity_actions_api_init', 'register_core_entity_actions', 0 );
 }
 
 // Block supports overrides.
