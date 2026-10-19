@@ -1,8 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { store as coreDataStore } from '../../index';
 import useEntityRecords, {
 	useEntityRecordsWithPermissions,
@@ -10,16 +12,22 @@ import useEntityRecords, {
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
+// The tests stub REST responses in place of typed requests.
+const apiFetchMock = triggerFetch as unknown as Mock;
+
 describe( 'useEntityRecords', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
 	} );
 
-	function renderHookWithRegistry( hook, options = {} ) {
-		const Wrapper = ( { children } ) =>
+	function renderHookWithRegistry< Result, Props >(
+		hook: ( props: Props ) => Result,
+		options: { initialProps?: Props } = {}
+	) {
+		const Wrapper = ( { children }: { children?: ReactNode } ) =>
 			createElement( RegistryProvider, { value: registry }, children );
 		return renderHook( hook, { wrapper: Wrapper, ...options } );
 	}
@@ -32,7 +40,7 @@ describe( 'useEntityRecords', () => {
 
 	it( 'resolves the entity records when missing from the state', async () => {
 		// Provide response
-		triggerFetch.mockImplementation( () => TEST_RECORDS );
+		apiFetchMock.mockImplementation( () => TEST_RECORDS );
 
 		const { result } = renderHookWithRegistry( () =>
 			useEntityRecords( 'root', 'widget', { status: 'draft' } )
@@ -68,7 +76,7 @@ describe( 'useEntityRecords', () => {
 } );
 
 describe( 'useEntityRecordsWithPermissions', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createRegistry();
@@ -85,8 +93,11 @@ describe( 'useEntityRecordsWithPermissions', () => {
 		] );
 	} );
 
-	function renderHookWithRegistry( hook, options = {} ) {
-		const Wrapper = ( { children } ) =>
+	function renderHookWithRegistry< Result, Props >(
+		hook: ( props: Props ) => Result,
+		options: { initialProps?: Props } = {}
+	) {
+		const Wrapper = ( { children }: { children?: ReactNode } ) =>
 			createElement( RegistryProvider, { value: registry }, children );
 		return renderHook( hook, { wrapper: Wrapper, ...options } );
 	}
@@ -100,7 +111,7 @@ describe( 'useEntityRecordsWithPermissions', () => {
 
 	it( 'injects _links when _fields is provided', async () => {
 		// Mock the API response
-		triggerFetch.mockImplementation( () => TEST_RECORDS );
+		apiFetchMock.mockImplementation( () => TEST_RECORDS );
 
 		renderHookWithRegistry( () =>
 			useEntityRecordsWithPermissions( 'postType', 'post', {
@@ -120,7 +131,7 @@ describe( 'useEntityRecordsWithPermissions', () => {
 
 	it( 'does not modify query when _fields is not provided', async () => {
 		// Mock the API response
-		triggerFetch.mockImplementation( () => TEST_RECORDS );
+		apiFetchMock.mockImplementation( () => TEST_RECORDS );
 
 		renderHookWithRegistry( () =>
 			useEntityRecordsWithPermissions( 'postType', 'post', {} )
@@ -136,7 +147,7 @@ describe( 'useEntityRecordsWithPermissions', () => {
 
 	it( 'avoids duplicate _links when already present in _fields', async () => {
 		// Mock the API response
-		triggerFetch.mockImplementation( () => TEST_RECORDS );
+		apiFetchMock.mockImplementation( () => TEST_RECORDS );
 
 		const fieldsWithLinks = fieldsFromMock + ',_links';
 		renderHookWithRegistry( () =>

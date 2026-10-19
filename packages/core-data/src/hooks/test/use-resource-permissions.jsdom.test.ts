@@ -1,28 +1,36 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { renderHook, waitFor } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { store as coreDataStore } from '../../index';
 import useResourcePermissions from '../use-resource-permissions';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
+// The tests stub REST responses in place of typed requests.
+const apiFetchMock = triggerFetch as unknown as Mock;
+
 describe( 'useResourcePermissions', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
 
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Headers( {
 				allow: 'POST',
 			} ),
 		} ) );
 	} );
 
-	function renderHookWithRegistry( hook, options = {} ) {
-		const Wrapper = ( { children } ) =>
+	function renderHookWithRegistry< Result, Props >(
+		hook: ( props: Props ) => Result,
+		options: { initialProps?: Props } = {}
+	) {
+		const Wrapper = ( { children }: { children?: ReactNode } ) =>
 			createElement( RegistryProvider, { value: registry }, children );
 		return renderHook( hook, { wrapper: Wrapper, ...options } );
 	}
@@ -104,7 +112,7 @@ describe( 'useResourcePermissions', () => {
 	} );
 
 	it( 'normalizes id-less entity resources before resolving permissions', async () => {
-		triggerFetch.mockImplementation( ( options ) => {
+		apiFetchMock.mockImplementation( ( options ) => {
 			if ( options.path === '/wp/v2/types?context=view' ) {
 				return {
 					wp_navigation: {
@@ -147,7 +155,7 @@ describe( 'useResourcePermissions', () => {
 		);
 
 		expect(
-			triggerFetch.mock.calls.filter(
+			apiFetchMock.mock.calls.filter(
 				( [ options ] ) => options.path === '/wp/v2/navigation'
 			)
 		).toHaveLength( 1 );
@@ -191,6 +199,7 @@ describe( 'useResourcePermissions', () => {
 					kind: 'root',
 					name: 'user',
 				},
+				// @ts-expect-error Tests the warning for an ID passed beside an entity resource.
 				1
 			)
 		);

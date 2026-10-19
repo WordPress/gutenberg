@@ -1,24 +1,32 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { createElement } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { store as coreDataStore } from '../../index';
 import useEntityRecord from '../use-entity-record';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
+// The tests stub REST responses in place of typed requests.
+const apiFetchMock = triggerFetch as unknown as Mock;
+
 describe( 'useEntityRecord', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 	} );
 
-	function renderHookWithRegistry( hook, options = {} ) {
-		const Wrapper = ( { children } ) =>
+	function renderHookWithRegistry< Result, Props >(
+		hook: ( props: Props ) => Result,
+		options: { initialProps?: Props } = {}
+	) {
+		const Wrapper = ( { children }: { children?: ReactNode } ) =>
 			createElement( RegistryProvider, { value: registry }, children );
 		return renderHook( hook, { wrapper: Wrapper, ...options } );
 	}
@@ -28,7 +36,7 @@ describe( 'useEntityRecord', () => {
 
 	it( 'resolves the entity record when missing from the state', async () => {
 		// Provide response
-		triggerFetch.mockImplementation( () => TEST_RECORD_RESPONSE );
+		apiFetchMock.mockImplementation( () => TEST_RECORD_RESPONSE );
 
 		const { result } = renderHookWithRegistry( () =>
 			useEntityRecord( 'root', 'widget', 1 )
@@ -71,7 +79,7 @@ describe( 'useEntityRecord', () => {
 
 	it( 'applies edits to the entity record', async () => {
 		// Provide response
-		triggerFetch.mockImplementation( () => TEST_RECORD_RESPONSE );
+		apiFetchMock.mockImplementation( () => TEST_RECORD_RESPONSE );
 
 		const { result } = renderHookWithRegistry( () =>
 			useEntityRecord( 'root', 'widget', 1 )
@@ -109,7 +117,7 @@ describe( 'useEntityRecord', () => {
 	} );
 
 	it( 'does not resolve entity record when disabled via options', async () => {
-		triggerFetch.mockImplementation( () => TEST_RECORD_RESPONSE );
+		apiFetchMock.mockImplementation( () => TEST_RECORD_RESPONSE );
 
 		const { result, rerender } = renderHookWithRegistry(
 			( { enabled } ) =>
@@ -128,7 +136,7 @@ describe( 'useEntityRecord', () => {
 			} )
 		);
 		// Clear the fetch call history.
-		triggerFetch.mockReset();
+		apiFetchMock.mockReset();
 
 		rerender( { enabled: false } );
 

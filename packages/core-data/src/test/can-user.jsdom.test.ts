@@ -1,22 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import triggerFetch from '@wordpress/api-fetch';
 import { createRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '../index';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
+// The tests stub REST responses in place of typed requests.
+const apiFetchMock = triggerFetch as unknown as Mock;
+
 const ALLOW_ALL = {
 	headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),
 };
 
 describe( 'canUser', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistry >;
 
 	beforeEach( () => {
 		registry = createRegistry();
 		registry.register( coreDataStore );
-		triggerFetch.mockReset();
-		triggerFetch.mockImplementation( () => ALLOW_ALL );
+		apiFetchMock.mockReset();
+		apiFetchMock.mockImplementation( () => ALLOW_ALL );
 	} );
 
 	it( 'makes a single OPTIONS request for all four actions on a resource', async () => {
@@ -37,7 +41,7 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'resolves each action with its own permission', async () => {
-		triggerFetch.mockImplementation( () => ( {
+		apiFetchMock.mockImplementation( () => ( {
 			headers: new Map( [ [ 'allow', 'GET' ] ] ),
 		} ) );
 
@@ -53,8 +57,9 @@ describe( 'canUser', () => {
 
 	it( 'waits for a resolution that is already in flight', async () => {
 		// Hold the response open so both calls are resolving at the same time.
-		let respond;
-		triggerFetch.mockImplementation(
+		// The promise executor below assigns it synchronously.
+		let respond!: () => void;
+		apiFetchMock.mockImplementation(
 			() =>
 				new Promise( ( resolve ) => {
 					respond = () => resolve( ALLOW_ALL );

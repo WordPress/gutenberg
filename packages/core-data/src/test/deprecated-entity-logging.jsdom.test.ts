@@ -9,17 +9,17 @@ vi.mock( import( '@wordpress/api-fetch' ) );
 /**
  * Returns the expected arguments for the deprecated function call.
  *
- * @param {string}  name                - The name of the function.
- * @param {Array}   args                - The arguments for the function.
- * @param {boolean} isShorthandSelector - Whether the function is a shorthand selector.
- * @param {string}  alternativeFunction - The name of the alternative function.
- * @return {Array} The expected arguments for the deprecated function call.
+ * @param name                - The name of the function.
+ * @param args                - The arguments for the function.
+ * @param isShorthandSelector - Whether the function is a shorthand selector.
+ * @param alternativeFunction - The name of the alternative function.
+ * @return The expected arguments for the deprecated function call.
  */
 function getExpectedDeprecationArgs(
-	name,
-	args,
-	isShorthandSelector,
-	alternativeFunction
+	name: string,
+	args: Array< unknown >,
+	isShorthandSelector?: boolean,
+	alternativeFunction?: string
 ) {
 	const expectedMessage = isShorthandSelector
 		? `'${ name }'`
@@ -250,7 +250,7 @@ describe( 'Deprecated entity logging', () => {
 				// logEntityDeprecation() uses setTimeout() to avoid spurious
 				// logging, so fake timers keep each test deterministic.
 				vi.useFakeTimers();
-				deprecated.mockReset();
+				vi.mocked( deprecated ).mockReset();
 			} );
 
 			afterEach( async () => {
@@ -264,10 +264,22 @@ describe( 'Deprecated entity logging', () => {
 
 				if ( type === 'selector' ) {
 					// Dispatch the action.
-					registry.select( coreDataStore )[ name ]( ...args );
+					// The test calls each listed selector by its name.
+					(
+						registry.select( coreDataStore ) as unknown as Record<
+							string,
+							( ...selectorArgs: Array< unknown > ) => unknown
+						>
+					 )[ name ]( ...args );
 				} else {
 					// Dispatch the action.
-					registry.dispatch( coreDataStore )[ name ]( ...args );
+					// The test calls each listed action by its name.
+					(
+						registry.dispatch( coreDataStore ) as unknown as Record<
+							string,
+							( ...actionArgs: Array< unknown > ) => unknown
+						>
+					 )[ name ]( ...args );
 				}
 
 				const [ expectedMessage, expectedOptions ] =
