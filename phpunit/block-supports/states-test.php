@@ -150,7 +150,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::gutenberg_get_state_text_clip_escape
 	 */
-	public function test_adds_background_image_reset_when_a_state_escapes_a_text_clip() {
+	public function test_text_clip_escape_unsets_the_background_image_when_a_state_escapes_a_text_clip() {
 		$actual = gutenberg_get_state_text_clip_escape(
 			array( 'background' => array( 'backgroundClip' => 'border-box' ) ),
 			'text'
@@ -163,54 +163,137 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 * Tests that a background the state paints itself is kept.
 	 *
 	 * @covers ::gutenberg_get_state_text_clip_escape
+	 * @covers ::gutenberg_get_state_text_fill_reset
+	 * @covers ::gutenberg_state_paints_own_background
+	 *
+	 * @dataProvider data_state_styles_that_paint_their_own_background
+	 *
+	 * @param array $state_style State style object.
 	 */
-	public function test_no_background_image_reset_when_the_state_paints_its_own_background() {
-		$state_style = array(
-			'background' => array(
-				'backgroundClip' => 'padding-box',
-				'gradient'       => 'linear-gradient(135deg, #ff0000, #0000ff)',
+	public function test_text_clip_helpers_add_nothing_when_the_state_paints_its_own_background( $state_style ) {
+		$this->assertSame( array(), gutenberg_get_state_text_clip_escape( $state_style, 'text' ), 'Expected no text clip escape.' );
+		$this->assertSame( array(), gutenberg_get_state_text_fill_reset( $state_style ), 'Expected no text fill reset.' );
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_state_styles_that_paint_their_own_background() {
+		$color = array( 'text' => '#ff0000' );
+
+		return array(
+			'background gradient' => array(
+				array(
+					'color'      => $color,
+					'background' => array(
+						'backgroundClip' => 'padding-box',
+						'gradient'       => 'linear-gradient(135deg, #ff0000, #0000ff)',
+					),
+				),
+			),
+			'background image'    => array(
+				array(
+					'color'      => $color,
+					'background' => array(
+						'backgroundClip'  => 'padding-box',
+						'backgroundImage' => array( 'url' => 'image.png' ),
+					),
+				),
+			),
+			'color gradient'      => array(
+				array(
+					'color'      => array_merge( $color, array( 'gradient' => 'linear-gradient(135deg, #ff0000, #0000ff)' ) ),
+					'background' => array( 'backgroundClip' => 'padding-box' ),
+				),
+			),
+			'gradient, no clip'   => array(
+				array(
+					'color'      => $color,
+					'background' => array( 'gradient' => 'linear-gradient(135deg, #ff0000, #0000ff)' ),
+				),
 			),
 		);
-
-		$this->assertSame( array(), gutenberg_get_state_text_clip_escape( $state_style, 'text' ) );
 	}
 
 	/**
 	 * Tests that a box clip is left alone when nothing below it clips to text.
 	 *
 	 * @covers ::gutenberg_get_state_text_clip_escape
+	 *
+	 * @dataProvider data_base_clips_that_are_not_text
+	 *
+	 * @param string $base_clip Background clip the state layers over.
 	 */
-	public function test_no_background_image_reset_without_an_inherited_text_clip() {
+	public function test_text_clip_escape_adds_nothing_without_a_base_text_clip( $base_clip ) {
 		$actual = gutenberg_get_state_text_clip_escape(
 			array( 'background' => array( 'backgroundClip' => 'padding-box' ) ),
-			''
+			$base_clip
 		);
 
 		$this->assertSame( array(), $actual );
 	}
 
 	/**
-	 * Tests that a box clip over a box clip needs no escape.
+	 * Data provider.
 	 *
-	 * @covers ::gutenberg_get_state_text_clip_escape
+	 * @return array[]
 	 */
-	public function test_no_background_image_reset_over_a_box_clip() {
-		$actual = gutenberg_get_state_text_clip_escape(
-			array( 'background' => array( 'backgroundClip' => 'padding-box' ) ),
-			'border-box'
+	public function data_base_clips_that_are_not_text() {
+		return array(
+			'no base clip' => array( '' ),
+			'border-box'   => array( 'border-box' ),
 		);
-
-		$this->assertSame( array(), $actual );
 	}
 
 	/**
-	 * Tests that a state keeping the text clip needs no escape.
+	 * Tests that an empty state clip of any type counts as no clip.
+	 *
+	 * @covers ::gutenberg_get_state_text_clip_escape
+	 * @covers ::gutenberg_get_state_text_fill_reset
+	 *
+	 * @dataProvider data_empty_state_clips
+	 *
+	 * @param mixed $state_clip Background clip set by the state.
+	 */
+	public function test_text_clip_helpers_treat_an_empty_state_clip_as_no_clip( $state_clip ) {
+		$state_style = array(
+			'color'      => array( 'text' => '#ff0000' ),
+			'background' => array( 'backgroundClip' => $state_clip ),
+		);
+
+		$this->assertSame( array(), gutenberg_get_state_text_clip_escape( $state_style, 'text' ), 'Expected no text clip escape.' );
+		$this->assertSame(
+			array( '-webkit-text-fill-color' => 'currentColor' ),
+			gutenberg_get_state_text_fill_reset( $state_style ),
+			'Expected the text fill reset.'
+		);
+	}
+
+	/**
+	 * Data provider.
+	 *
+	 * @return array[]
+	 */
+	public function data_empty_state_clips() {
+		return array(
+			'false'        => array( false ),
+			'zero'         => array( 0 ),
+			'zero string'  => array( '0' ),
+			'empty string' => array( '' ),
+			'empty array'  => array( array() ),
+		);
+	}
+
+	/**
+	 * Tests that an invalid state clip over a base text clip does not unset the gradient.
 	 *
 	 * @covers ::gutenberg_get_state_text_clip_escape
 	 */
-	public function test_no_background_image_reset_when_the_state_keeps_the_text_clip() {
+	public function test_text_clip_escape_ignores_an_invalid_state_clip() {
 		$actual = gutenberg_get_state_text_clip_escape(
-			array( 'background' => array( 'backgroundClip' => 'text' ) ),
+			array( 'background' => array( 'backgroundClip' => 'borderbox' ) ),
 			'text'
 		);
 
@@ -218,44 +301,48 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that a state without its own clip needs no escape.
-	 *
-	 * @covers ::gutenberg_get_state_text_clip_escape
-	 */
-	public function test_no_background_image_reset_when_the_state_sets_no_clip() {
-		$actual = gutenberg_get_state_text_clip_escape(
-			array( 'color' => array( 'text' => '#ff0000' ) ),
-			'text'
-		);
-
-		$this->assertSame( array(), $actual );
-	}
-
-	/**
-	 * Tests that a text color is painted again, whether or not a text clip is known.
+	 * Tests that a text color with an invalid state clip gets its fill back.
 	 *
 	 * @covers ::gutenberg_get_state_text_fill_reset
 	 */
-	public function test_adds_text_fill_reset_for_a_text_color() {
+	public function test_text_fill_reset_ignores_an_invalid_state_clip() {
 		$actual = gutenberg_get_state_text_fill_reset(
-			array( 'color' => array( 'text' => '#ff0000' ) )
+			array(
+				'color'      => array( 'text' => '#ff0000' ),
+				'background' => array( 'backgroundClip' => 'borderbox' ),
+			)
 		);
 
 		$this->assertSame( array( '-webkit-text-fill-color' => 'currentColor' ), $actual );
 	}
 
 	/**
-	 * Tests that the fill is left alone when the state paints its own gradient.
+	 * Tests that a state without its own clip, or keeping the text clip, needs no escape.
+	 *
+	 * @covers ::gutenberg_get_state_text_clip_escape
+	 */
+	public function test_text_clip_escape_adds_nothing_when_the_state_keeps_the_text_clip() {
+		$this->assertSame(
+			array(),
+			gutenberg_get_state_text_clip_escape( array( 'background' => array( 'backgroundClip' => 'text' ) ), 'text' ),
+			'Expected no escape for a state that also clips to text.'
+		);
+		$this->assertSame(
+			array(),
+			gutenberg_get_state_text_clip_escape( array( 'color' => array( 'text' => '#ff0000' ) ), 'text' ),
+			'Expected no escape for a state without a clip.'
+		);
+	}
+
+	/**
+	 * Tests that a text color set without a clip gets its fill back.
 	 *
 	 * @covers ::gutenberg_get_state_text_fill_reset
 	 */
-	public function test_no_text_fill_reset_when_the_state_paints_its_own_gradient() {
-		$state_style = array(
-			'color'      => array( 'text' => '#ff0000' ),
-			'background' => array( 'gradient' => 'linear-gradient(135deg, #ff0000, #0000ff)' ),
-		);
+	public function test_text_fill_reset_refills_a_text_color() {
+		$actual = gutenberg_get_state_text_fill_reset( array( 'color' => array( 'text' => '#ff0000' ) ) );
 
-		$this->assertSame( array(), gutenberg_get_state_text_fill_reset( $state_style ) );
+		$this->assertSame( array( '-webkit-text-fill-color' => 'currentColor' ), $actual );
 	}
 
 	/**
@@ -263,7 +350,7 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	 *
 	 * @covers ::gutenberg_get_state_text_fill_reset
 	 */
-	public function test_no_text_fill_reset_when_the_state_sets_its_own_clip() {
+	public function test_text_fill_reset_adds_nothing_when_the_state_sets_its_own_clip() {
 		$state_style = array(
 			'color'      => array( 'text' => '#ff0000' ),
 			'background' => array( 'backgroundClip' => 'text' ),
@@ -273,46 +360,55 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests that the fill needs a text color.
+	 * Tests that the fill is left alone when the state sets no text color.
 	 *
 	 * @covers ::gutenberg_get_state_text_fill_reset
 	 */
-	public function test_no_text_fill_reset_without_a_text_color() {
-		$actual = gutenberg_get_state_text_fill_reset(
-			array( 'color' => array( 'background' => '#ff0000' ) )
-		);
-
-		$this->assertSame( array(), $actual );
+	public function test_text_fill_reset_adds_nothing_without_a_text_color() {
+		$this->assertSame( array(), gutenberg_get_state_text_fill_reset( array( 'color' => array( 'background' => '#ff0000' ) ) ) );
 	}
 
 	/**
-	 * Tests that an invalid state clip does not escape a text clip.
+	 * Tests that a block state escapes its base text clip.
 	 *
-	 * @covers ::gutenberg_get_state_text_clip_escape
+	 * @covers ::gutenberg_add_block_state_style_rule
 	 */
-	public function test_no_background_image_reset_for_an_invalid_state_clip() {
-		$actual = gutenberg_get_state_text_clip_escape(
-			array( 'background' => array( 'backgroundClip' => 'not-a-clip' ) ),
-			'text'
+	public function test_block_state_rule_escapes_a_base_text_clip() {
+		$css_rules = array();
+
+		gutenberg_add_block_state_style_rule(
+			$css_rules,
+			':hover',
+			'.wp-block-test',
+			array( 'background' => array( 'backgroundClip' => 'border-box' ) ),
+			null,
+			array( 'background' => array( 'backgroundClip' => 'text' ) )
 		);
 
-		$this->assertSame( array(), $actual );
+		$this->assertSame( 'unset', $css_rules[0]['declarations']['background-image'] ?? null );
 	}
 
 	/**
-	 * Tests that an invalid state clip counts as no clip, so a text color is painted again.
+	 * Tests that a block state text color gets its fill back over a base box clip,
+	 * since a text clip from global styles cannot be seen from the block.
 	 *
-	 * @covers ::gutenberg_get_state_text_fill_reset
+	 * @covers ::gutenberg_add_block_state_style_rule
 	 */
-	public function test_adds_text_fill_reset_for_an_invalid_state_clip() {
-		$actual = gutenberg_get_state_text_fill_reset(
-			array(
-				'color'      => array( 'text' => '#ff0000' ),
-				'background' => array( 'backgroundClip' => 'not-a-clip' ),
-			)
+	public function test_block_state_rule_refills_a_text_color_over_a_base_box_clip() {
+		$css_rules = array();
+
+		gutenberg_add_block_state_style_rule(
+			$css_rules,
+			':hover',
+			'.wp-block-test',
+			array( 'color' => array( 'text' => '#ff0000' ) ),
+			null,
+			array( 'background' => array( 'backgroundClip' => 'border-box' ) )
 		);
 
-		$this->assertSame( array( '-webkit-text-fill-color' => 'currentColor' ), $actual );
+		$declarations = $css_rules[0]['declarations'];
+		$this->assertSame( 'currentColor', $declarations['-webkit-text-fill-color'] ?? null, 'Expected the text fill reset.' );
+		$this->assertArrayNotHasKey( 'background-image', $declarations, 'Expected no text clip escape.' );
 	}
 
 	/**
@@ -1269,6 +1365,42 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'/^<p class="wp-block-paragraph (wp-states-[a-f0-9]{8})">Hello<\/p>$/',
 			$actual
 		);
+		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString(
+			'@media (width <= 480px){.' . $matches[0] . '{color:#ff0000 !important;-webkit-text-fill-color:currentColor !important;}}',
+			$actual_stylesheet
+		);
+	}
+
+	/**
+	 * Tests that a responsive text color fills the letters again for a block
+	 * that supports the background clip, so a text gradient from global styles
+	 * cannot hide it.
+	 *
+	 */
+	public function test_responsive_text_color_fills_text_for_a_block_that_supports_the_clip() {
+		$this->ensure_block_registered(
+			'test/responsive-text-clip-state',
+			array(),
+			array( 'background' => array( 'backgroundClip' => true ) )
+		);
+
+		$block = array(
+			'blockName' => 'test/responsive-text-clip-state',
+			'attrs'     => array(
+				'style' => array(
+					'@mobile' => array(
+						'color' => array(
+							'text' => '#ff0000',
+						),
+					),
+				),
+			),
+		);
+
+		$actual = gutenberg_render_block_states_support( '<div class="wp-block-test">Hello</div>', $block );
 		preg_match( '/wp-states-[a-f0-9]{8}/', $actual, $matches );
 		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
 

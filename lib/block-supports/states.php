@@ -162,7 +162,7 @@ function gutenberg_merge_state_style_objects( $target, $source ) {
 }
 
 /**
- * Checks whether a state paints its own background, which a clip escape must keep.
+ * Checks whether a state paints its own background.
  *
  * @access private
  *
@@ -176,42 +176,42 @@ function gutenberg_state_paints_own_background( array $state_style ): bool {
 }
 
 /**
- * Unclips a base text clip when the state sets a different clip.
+ * Returns the declarations that unclip a text clip when a state sets a different clip.
  *
  * Mirror of `getStateTextClipEscapeCSS` in packages/block-editor/src/hooks/style.jsx.
  *
  * @param array<string, mixed> $state_style State style object.
- * @param string               $base_clip   Background clip the state layers over.
- * @return array<string, string> CSS declarations for the escape.
+ * @param string               $base_clip   Background clip of the styles the state layers over.
+ * @return array<string, string> CSS declarations, empty when no escape is needed.
  */
 function gutenberg_get_state_text_clip_escape( array $state_style, string $base_clip ): array {
 	$state_clip = $state_style['background']['backgroundClip'] ?? '';
 	if ( ! in_array( $state_clip, WP_Style_Engine_Gutenberg::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
 		$state_clip = '';
 	}
-	if ( '' === $state_clip || 'text' === $state_clip || 'text' !== $base_clip || gutenberg_state_paints_own_background( $state_style ) ) {
+	if ( empty( $state_clip ) || 'text' === $state_clip || 'text' !== $base_clip || gutenberg_state_paints_own_background( $state_style ) ) {
 		return array();
 	}
 	return array( 'background-image' => 'unset' );
 }
 
 /**
- * Refills the letters when the state sets a text color but no clip.
+ * Returns the declarations that refill the letters when a state sets a text color but no clip.
  *
- * The block cannot see a text clip set in global styles, so the instance adds
- * the fill whatever its own base clip is. The fill does nothing without a clip.
+ * The fill is added even without a known text clip, since a block instance
+ * cannot see a clip set in global styles. It does nothing when no clip applies.
  *
  * Mirror of `getStateTextFillResetCSS` in packages/block-editor/src/hooks/style.jsx.
  *
  * @param array<string, mixed> $state_style State style object.
- * @return array<string, string> CSS declarations for the fill reset.
+ * @return array<string, string> CSS declarations, empty when no reset is needed.
  */
 function gutenberg_get_state_text_fill_reset( array $state_style ): array {
 	$state_clip = $state_style['background']['backgroundClip'] ?? '';
 	if ( ! in_array( $state_clip, WP_Style_Engine_Gutenberg::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
 		$state_clip = '';
 	}
-	if ( '' !== $state_clip || empty( $state_style['color']['text'] ) || gutenberg_state_paints_own_background( $state_style ) ) {
+	if ( ! empty( $state_clip ) || empty( $state_style['color']['text'] ) || gutenberg_state_paints_own_background( $state_style ) ) {
 		return array();
 	}
 	return array( '-webkit-text-fill-color' => 'currentColor' );

@@ -4014,7 +4014,7 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 7.2.0
 	 *
-	 * @param array[]              $declarations Declarations generated for the state, each with `name` and `value` keys.
+	 * @param array[]              $declarations Declarations generated for the state.
 	 * @param array<string, mixed> $state_style  State style object.
 	 * @param array[]              $base_styles  Style objects the state layers over, nearest first.
 	 * @return array[] Declarations with the escapes applied where needed.
@@ -4036,6 +4036,7 @@ class WP_Theme_JSON_Gutenberg {
 			gutenberg_get_state_text_clip_escape( $state_style, $base_clip ),
 			gutenberg_get_state_text_fill_reset( $state_style )
 		);
+
 		foreach ( $escapes as $name => $value ) {
 			$declarations[] = array(
 				'name'  => $name,
