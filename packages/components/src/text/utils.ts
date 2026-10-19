@@ -43,14 +43,11 @@ export function createHighlighterText( {
 		searchWords,
 		textToHighlight: children,
 	} );
-	const highlightStyle = {};
 
 	return chunks.map( ( chunk, index ) =>
 		createElement( chunk.highlight ? 'mark' : 'span', {
-			children: children.substr( chunk.start, chunk.end - chunk.start ),
-			className: chunk.highlight ? ' ' : '',
+			children: children.slice( chunk.start, chunk.end ),
 			key: index,
-			style: chunk.highlight ? highlightStyle : undefined,
 		} )
 	);
 }
