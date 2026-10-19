@@ -114,3 +114,93 @@ export function startGridItemDrag(
 		startTarget.addEventListener( 'dragover', startGridDrag );
 	}
 }
+
+/**
+ * The drop layers of the grids on screen, told where a touch drag from a drag
+ * handle goes, since touch screens don't start the browser's drag and drop
+ * from a handle.
+ *
+ * @type {Set<(event: {type: 'move'|'drop'|'cancel', clientX: number, clientY: number}) => void>}
+ */
+const pointerDragListeners = new Set();
+
+/**
+ * Listens to touch drags started from grid item drag handles.
+ *
+ * @param {(event: {type: 'move'|'drop'|'cancel', clientX: number, clientY: number}) => void} listener Called as the drag moves, when it is dropped, and when it is cancelled.
+ *
+ * @return {() => void} Stops listening.
+ */
+export function subscribeToGridItemPointerDrag( listener ) {
+	pointerDragListeners.add( listener );
+	return () => pointerDragListeners.delete( listener );
+}
+
+/**
+ * Starts dragging a block of a manual placement grid from its drag handle with
+ * a touch. It follows the touch with pointer events and tells the grids' drop
+ * layers, which work out the landing cells as they do for a drag with a mouse.
+ * The block stays in place, dimmed.
+ *
+ * @param {PointerEvent}                  event                       The `pointerdown` event on the handle.
+ * @param {Object}                        options
+ * @param {string}                        options.clientId            Client ID of the dragged block.
+ * @param {HTMLElement}                   options.blockElement        The block's element in the canvas.
+ * @param {HTMLElement}                   options.handle              The drag handle.
+ * @param {(clientIds: string[]) => void} options.startDraggingBlocks Marks blocks as being dragged.
+ * @param {() => void}                    options.stopDraggingBlocks  Marks the drag as over.
+ */
+export function startGridItemPointerDrag(
+	event,
+	{ clientId, blockElement, handle, startDraggingBlocks, stopDraggingBlocks }
+) {
+	const { pointerId } = event;
+	// Keeps the drag going while the touch is over the canvas iframe, and
+	// stops the press from selecting text. The toolbar the handle is in is
+	// hidden while dragging, so the drag is followed from the handle's
+	// document, which still gets the events if the capture is lost.
+	handle.setPointerCapture( pointerId );
+	event.preventDefault();
+	const { ownerDocument } = handle;
+
+	const originalOpacity = blockElement.style.opacity;
+	let isStarted = false;
+
+	function notify( type, { clientX, clientY } ) {
+		for ( const listener of pointerDragListeners ) {
+			listener( { type, clientX, clientY } );
+		}
+	}
+
+	function onPointerMove( moveEvent ) {
+		if ( moveEvent.pointerId !== pointerId ) {
+			return;
+		}
+		// A tap on the handle doesn't start a drag.
+		if ( ! isStarted ) {
+			isStarted = true;
+			blockElement.style.opacity = '0.5';
+			startDraggingBlocks( [ clientId ] );
+		}
+		notify( 'move', moveEvent );
+	}
+
+	function end( endEvent ) {
+		if ( endEvent.pointerId !== pointerId ) {
+			return;
+		}
+		ownerDocument.removeEventListener( 'pointermove', onPointerMove );
+		ownerDocument.removeEventListener( 'pointerup', end );
+		ownerDocument.removeEventListener( 'pointercancel', end );
+		if ( ! isStarted ) {
+			return;
+		}
+		notify( endEvent.type === 'pointerup' ? 'drop' : 'cancel', endEvent );
+		blockElement.style.opacity = originalOpacity;
+		stopDraggingBlocks();
+	}
+
+	ownerDocument.addEventListener( 'pointermove', onPointerMove );
+	ownerDocument.addEventListener( 'pointerup', end );
+	ownerDocument.addEventListener( 'pointercancel', end );
+}

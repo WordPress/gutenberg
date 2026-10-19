@@ -169,10 +169,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 	require __DIR__ . '/experimental/theme-preview/load.php';
 }
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-dataform-inspector' ) ) {
-	require __DIR__ . '/experimental/dataform-inspector-preload.php';
-}
-
 if (
 	gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ||
 	gutenberg_is_experiment_enabled( 'gutenberg-media-editor' )

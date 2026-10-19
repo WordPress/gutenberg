@@ -13,15 +13,6 @@ module.exports = {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
-		'declaration-property-value-allowed-list': [
-			{
-				'flex-direction': '/^(?!(row|column)-reverse).*$/',
-			},
-			{
-				message: ( property, value ) =>
-					`Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`,
-			},
-		],
 		'declaration-property-value-disallowed-list': [
 			{
 				'/.*/': [
@@ -30,9 +21,17 @@ module.exports = {
 					'/\\$font-weight-medium/',
 				],
 				cursor: [ 'pointer' ],
+				'flex-direction': [ '/^(row|column)-reverse/' ],
 			},
 			{
 				message: ( property, value ) => {
+					switch ( property ) {
+						case 'flex-direction':
+							return `Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`;
+						case 'cursor':
+							return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
+					}
+					// The remaining patterns apply to every property, so tell them apart by value.
 					if (
 						value.includes( '$font-weight-regular' ) ||
 						value.includes( '$font-weight-medium' )
@@ -43,9 +42,6 @@ module.exports = {
 							? '$font-weight-regular'
 							: '$font-weight-medium';
 						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
-					}
-					if ( property === 'cursor' ) {
-						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
 					}
 					return `Avoid using "${ value }" in "${ property }". --wp-components-color-* variables are not ready to be used outside of the components package.`;
 				},
