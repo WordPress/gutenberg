@@ -14624,11 +14624,6 @@
 			"count": 1
 		}
 	},
-	"packages/warning/src/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/warning/test/babel-plugin.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
