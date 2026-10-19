@@ -419,6 +419,62 @@ describe( 'DuotonePicker', () => {
 		} );
 	} );
 
+	describe( 'clear button', () => {
+		it( 'should call onChange with undefined when clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ onChange }
+					disableCustomDuotone
+				/>
+			);
+
+			await user.click( screen.getByRole( 'button', { name: 'Clear' } ) );
+
+			expect( onChange ).toHaveBeenCalledWith( undefined );
+		} );
+
+		it( 'should be disabled when there is no value', async () => {
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					onChange={ vi.fn() }
+					disableCustomDuotone
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'button', { name: 'Clear' } )
+			).toHaveAttribute( 'aria-disabled', 'true' );
+		} );
+
+		it( 'should not render when the `clearable` prop is false', async () => {
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUPLICATE_DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ vi.fn() }
+					clearable={ false }
+					disableCustomDuotone
+				/>
+			);
+
+			expect(
+				screen.queryByRole( 'button', { name: 'Clear' } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'custom duotone controls', () => {
 		const getControlPoints = () =>
 			screen.queryAllByRole( 'button', {
