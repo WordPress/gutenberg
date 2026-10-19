@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 import { getScrollContainer } from '@wordpress/dom';
-import type { BlockPattern } from '../../../store/types';
+import type { ParsedBlockPattern } from '../../../store/types';
 import type { PatternsPaging, PatternsScrollContainerRef } from '../types';
 
 const PAGE_SIZE = 20;
@@ -17,7 +17,7 @@ const PAGE_SIZE = 20;
  * @return Returns the relevant paging values. (totalItems, categoryPatternsList, numPages, changePage, currentPage)
  */
 export default function usePatternsPaging(
-	currentCategoryPatterns: BlockPattern[],
+	currentCategoryPatterns: Array< ParsedBlockPattern >,
 	currentCategory: unknown,
 	scrollContainerRef?: PatternsScrollContainerRef,
 	currentFilter = ''

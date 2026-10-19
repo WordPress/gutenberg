@@ -242,6 +242,11 @@ export interface BlockPattern {
 }
 
 /**
+ * A pattern with its parsed blocks, as the allowed patterns come.
+ */
+export type ParsedBlockPattern = BlockPattern & { blocks: Array< Block > };
+
+/**
  * A user pattern as returned by the REST API.
  */
 export interface UserPattern {

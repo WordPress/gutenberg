@@ -1,6 +1,10 @@
 import type { MouseEvent, ReactNode, RefObject } from 'react';
 import type { Block, BlockCategory, BlockCollection } from '@wordpress/blocks';
-import type { BlockPattern, InserterItem } from '../../store/types';
+import type {
+	BlockPattern,
+	InserterItem,
+	ParsedBlockPattern,
+} from '../../store/types';
 
 /**
  * Props the inserter passes to its toggle, or to `renderToggle`.
@@ -76,14 +80,14 @@ export type OnClickPattern = (
 ) => void;
 
 export type PatternsState = [
-	BlockPattern[],
+	Array< ParsedBlockPattern >,
 	PatternCategory[],
 	OnClickPattern,
 ];
 
 export interface PatternsPaging {
 	totalItems: number;
-	categoryPatterns: BlockPattern[];
+	categoryPatterns: Array< ParsedBlockPattern >;
 	numPages: number;
 	changePage: ( page: number ) => void;
 	currentPage: number;
