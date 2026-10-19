@@ -325,7 +325,7 @@ describe( 'Post actions', () => {
 			expect( notice ).toMatchObject( {
 				status: 'error',
 				content:
-					'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
+					'Updating failed. Keep this page open and try updating again.',
 				details: 'Details from server.',
 			} );
 			expect( notice.actions ).toEqual( [] );
@@ -333,7 +333,7 @@ describe( 'Post actions', () => {
 			// The message is a plain string again, so the notice announces
 			// itself and nothing has to be spoken by hand.
 			expect( notice.spokenMessage ).toBe(
-				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.'
+				'Updating failed. Keep this page open and try updating again.'
 			);
 		} );
 
@@ -539,7 +539,7 @@ describe( 'Post actions', () => {
 			[
 				'fetch_error',
 				'Could not get a valid response from the server.',
-				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
+				'Updating failed. Keep this page open and try updating again.',
 			],
 		].forEach( ( [ code, message, expectedNotice ] ) => {
 			it( `omits the details disclosure for ${ code } failures`, async () => {
