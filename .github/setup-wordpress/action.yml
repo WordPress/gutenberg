@@ -1,0 +1,51 @@
+name: 'Set up WordPress'
+description: 'Starts the Docker environment defined in `docker-compose.yml`, installs WordPress, and activates the Gutenberg plugin.'
+
+# This branch predates `wp-env`. Its PHP and end-to-end tests run against the Docker environment
+# defined in `docker-compose.yml`, driven by the scripts in `bin/`.
+
+inputs:
+  wordpress-version:
+    description: 'The WordPress version to test against, passed to the scripts in `bin/` as `WP_VERSION`.'
+    required: false
+    default: '5.2'
+
+runs:
+  using: 'composite'
+  steps:
+  # `WP_VERSION` is also read by `bin/reset-e2e-tests.sh`, which `npm run test-e2e` runs
+  # before the end-to-end tests, so it is set for the rest of the job.
+  - name: Configure environment variables
+    shell: bash
+    env:
+      WORDPRESS_VERSION: ${{ inputs.wordpress-version }}
+    run: echo "WP_VERSION=${WORDPRESS_VERSION}" >> "$GITHUB_ENV"
+
+  # The scripts in `bin/` call the standalone Docker Compose v1 binary, `docker-compose`, which
+  # GitHub's runner images no longer include. Docker Compose v2 supports the commands and
+  # options these scripts use, so a small wrapper is enough.
+  - name: Provide a docker-compose command
+    shell: bash
+    run: |
+      mkdir -p "${RUNNER_TEMP}/bin"
+      printf '#!/bin/sh\nexec docker compose "$@"\n' > "${RUNNER_TEMP}/bin/docker-compose"
+      chmod +x "${RUNNER_TEMP}/bin/docker-compose"
+      echo "${RUNNER_TEMP}/bin" >> "$GITHUB_PATH"
+
+  - name: Docker debug information
+    shell: bash
+    run: |
+      docker -v
+      docker-compose version
+
+  # `bin/setup-local-env.sh` is not used because it also runs `bin/install-node-nvm.sh`, which
+  # requires nvm and upgrades npm to its latest version. `bin/install-docker.sh` is the part of
+  # it that starts the containers, installs WordPress, and installs the PHPUnit test suite and
+  # the Composer dependencies.
+  - name: Install WordPress
+    shell: bash
+    run: ./bin/install-docker.sh
+
+  - name: Log running Docker containers
+    shell: bash
+    run: docker ps -a
