@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 /**
@@ -145,7 +142,7 @@ export function findNearestStyleAndWeight(
 					( option ) =>
 						option.style.fontWeight ===
 						findNearestFontWeight( fontWeights, fontWeight )
-			  )?.style?.fontStyle;
+				)?.style?.fontStyle;
 	}
 
 	if ( ! hasFontWeight ) {
@@ -159,7 +156,7 @@ export function findNearestStyleAndWeight(
 					( option ) =>
 						option.style.fontStyle ===
 						( nearestFontStyle || fontStyle )
-			  )?.style?.fontWeight;
+				)?.style?.fontWeight;
 	}
 
 	return { nearestFontStyle, nearestFontWeight };

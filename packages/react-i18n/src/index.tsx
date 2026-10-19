@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type {
 	ComponentType,
 	FunctionComponent,
 	PropsWithChildren,
 } from 'react';
 import type { Subtract } from 'utility-types';
-
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,
@@ -73,7 +66,7 @@ type I18nProviderProps = PropsWithChildren< { i18n: I18n } >;
  * @param props i18n provider props.
  * @return Children wrapped in the I18nProvider.
  */
-export function I18nProvider( props: I18nProviderProps ): JSX.Element {
+export function I18nProvider( props: I18nProviderProps ) {
 	const { children, i18n = defaultI18n } = props;
 	const [ update, forceUpdate ] = useReducer( () => [], [] );
 

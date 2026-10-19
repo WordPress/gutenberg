@@ -8,9 +8,6 @@
 	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"displayAsRange": {
 			"type": "boolean",
 			"default": true
@@ -26,6 +23,11 @@
 	},
 	"supports": {
 		"anchor": true,
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"gradient": true
+		},
 		"color": {
 			"gradients": true,
 			"__experimentalDefaultControls": {
@@ -33,7 +35,12 @@
 				"text": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
+		},
 		"html": false,
+		"shadow": true,
 		"spacing": {
 			"margin": true,
 			"padding": true,
@@ -45,6 +52,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,

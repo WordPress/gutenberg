@@ -1,7 +1,4 @@
-/**
- * Internal dependencies
- */
-import type { BlockType } from '../types';
+import type { BlockType } from '@wordpress/blocks';
 import { scopeSelector } from '../utils/common';
 import { getValueFromObjectPath } from '../utils/object';
 
@@ -83,7 +80,7 @@ export function getBlockSelector(
 					supports,
 					`${ path }.__experimentalSelector`,
 					null
-			  ) as string | undefined )
+				) as string | undefined )
 			: undefined;
 
 		// If nothing to work with, provide fallback selector if available.

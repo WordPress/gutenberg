@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { Children, createElement } from './react';
 
 /**
@@ -31,10 +28,7 @@ export type RawHTMLProps = {
  *
  * @return Dangerously-rendering component.
  */
-export default function RawHTML( {
-	children,
-	...props
-}: RawHTMLProps ): JSX.Element {
+export default function RawHTML( { children, ...props }: RawHTMLProps ) {
 	let rawHtml = '';
 
 	// Cast children as an array, and concatenate each element if it is a string.

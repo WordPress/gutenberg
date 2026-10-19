@@ -3,8 +3,16 @@ import { Fragment } from '@wordpress/element';
 import { Badge } from '../index';
 
 const meta: Meta< typeof Badge > = {
-	title: 'Design System/Components/Badge',
+	tags: [ 'manifest' ],
+	title: 'Components/@wordpress-ui/Badge',
+	id: 'design-system-components-badge',
 	component: Badge,
+	parameters: {
+		componentStatus: {
+			status: 'recommended',
+			whereUsed: 'global',
+		},
+	},
 };
 export default meta;
 
@@ -80,7 +88,7 @@ export const AllIntents: Story = {
 				display: 'grid',
 				gridTemplateColumns: 'max-content min-content',
 				gap: '1rem',
-				color: 'var(--wpds-color-fg-content-neutral)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
 			} }
 		>
 			{ (

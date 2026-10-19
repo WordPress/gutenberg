@@ -1,26 +1,13 @@
-/**
- * WordPress dependencies
- */
-import { useState, Fragment } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
+import type { ReactElement } from 'react';
+import type { StoryFn } from '@storybook/react-vite';
 import Icon from '../';
 import check from '../../library/check';
 import * as icons from '../../';
-import keywords from './keywords';
-
-/**
- * External dependencies
- */
-import type { ReactElement } from 'react';
-
-const { Icon: _Icon, ...availableIcons } = icons;
 
 const meta = {
 	component: Icon,
-	title: 'Icons/Icon',
+	id: 'icons-icon',
+	title: 'Design System/Icons/Icon',
 	parameters: {
 		controls: { hideNoControlsWarning: true },
 	},
@@ -48,62 +35,60 @@ export const Default = (): ReactElement => {
 	);
 };
 
-const LibraryExample = (): ReactElement => {
-	const [ filter, setFilter ] = useState< string >( '' );
-	const filteredIcons = filter.length
-		? Object.fromEntries(
-				Object.entries( availableIcons ).filter( ( [ name ] ) => {
-					const normalizedName = name.toLowerCase();
-					const normalizedFilter = filter.toLowerCase();
-
-					return (
-						normalizedName.includes( normalizedFilter ) ||
-						// @ts-expect-error - Not worth the effort to cast `name`
-						keywords[ name ]?.some( ( keyword: string ) =>
-							keyword.toLowerCase().includes( normalizedFilter )
-						)
-					);
-				} )
-		  )
-		: availableIcons;
+/**
+ *
+ */
+export const CurrentColor: StoryFn< typeof Icon > = ( args ) => {
 	return (
-		<div style={ { padding: 20 } }>
-			<label htmlFor="filter-icons" style={ { paddingRight: 10 } }>
-				Filter Icons
-			</label>
-			<input
-				// eslint-disable-next-line no-restricted-syntax
-				id="filter-icons"
-				type="search"
-				value={ filter }
-				placeholder="Icon name"
-				onChange={ ( event ) => setFilter( event.target.value ) }
-			/>
-			<div style={ { marginTop: 20 } }>
-				<div
-					style={ {
-						display: 'inline-grid',
-						alignItems: 'center',
-						gap: 4,
-						gridTemplateColumns: 'auto 24px 36px 48px',
-					} }
-				>
-					{ Object.entries( filteredIcons ).map(
-						( [ name, icon ] ) => {
-							return (
-								<Fragment key={ name }>
-									<strong>{ name }</strong>
-									<Icon icon={ icon } />
-									<Icon icon={ icon } size={ 36 } />
-									<Icon icon={ icon } size={ 48 } />
-								</Fragment>
-							);
-						}
-					) }
-				</div>
-			</div>
+		<div
+			style={ {
+				display: 'flex',
+				alignItems: 'center',
+				padding: '4px',
+				gap: '4px',
+				color: 'blue',
+				border: '1px solid blue',
+			} }
+		>
+			<Icon { ...args } />
+			This div has a blue <code>color</code>, and the icon will be
+			rendered in the same color.
 		</div>
 	);
 };
+CurrentColor.args = {
+	icon: icons.wordpress,
+};
 
-export const Library = (): ReactElement => <LibraryExample />;
+export const StrokeScaling = (): ReactElement => (
+	<table>
+		<caption>Stroke-based icons at different sizes</caption>
+		<thead>
+			<tr>
+				<th scope="col">Icon</th>
+				{ [ 16, 20, 24, 36, 48 ].map( ( size ) => (
+					<th key={ size } scope="col">
+						{ size }px
+					</th>
+				) ) }
+			</tr>
+		</thead>
+		<tbody>
+			{ [
+				{ label: 'Check', icon: icons.check },
+				{ label: 'Paragraph', icon: icons.paragraph },
+				{ label: 'Image', icon: icons.image },
+				{ label: 'Settings', icon: icons.cog },
+			].map( ( { label, icon } ) => (
+				<tr key={ label }>
+					<th scope="row">{ label }</th>
+					{ [ 16, 20, 24, 36, 48 ].map( ( size ) => (
+						<td key={ size }>
+							<Icon icon={ icon } size={ size } />
+						</td>
+					) ) }
+				</tr>
+			) ) }
+		</tbody>
+	</table>
+);

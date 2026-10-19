@@ -1,13 +1,6 @@
-/**
- * WordPress dependencies
- */
 import { observableMap } from '@wordpress/compose';
 import { createContext } from '@wordpress/element';
 import warning from '@wordpress/warning';
-
-/**
- * Internal dependencies
- */
 import type { SlotFillRegistry } from './types';
 
 const initialValue: SlotFillRegistry = {

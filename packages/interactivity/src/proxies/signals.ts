@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	computed,
 	signal,
@@ -8,10 +5,6 @@ import {
 	type Signal,
 	type ReadonlySignal,
 } from '@preact/signals';
-
-/**
- * Internal dependencies
- */
 import { getNamespaceFromProxy } from './registry';
 import { getScope } from '../scopes';
 import { setNamespace, resetNamespace } from '../namespaces';

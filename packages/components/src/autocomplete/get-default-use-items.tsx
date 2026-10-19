@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import removeAccents from 'remove-accents';
-
-/**
- * WordPress dependencies
- */
 import { debounce } from '@wordpress/compose';
 import { useLayoutEffect, useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { escapeRegExp } from '../utils/strings';
 import type { CancelablePromise, KeyedOption, WPCompleter } from './types';
 
@@ -84,12 +73,12 @@ export default function getDefaultUseItems( autocompleter: WPCompleter ) {
 								keywords: autocompleter.getOptionKeywords
 									? autocompleter.getOptionKeywords(
 											optionData
-									  )
+										)
 									: [],
 								isDisabled: autocompleter.isOptionDisabled
 									? autocompleter.isOptionDisabled(
 											optionData
-									  )
+										)
 									: false,
 							} )
 						);

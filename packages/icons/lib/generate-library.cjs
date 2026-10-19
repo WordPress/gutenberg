@@ -1,25 +1,105 @@
-/**
- * External dependencies
+/*
+ * SCRIPT OVERVIEW
+ * ===============
+ *
+ * - Find *.svg files in ./library
+ * - For each, generate a sibling .tsx file
+ * - Build an index of these at ./library/index.ts
+ *
+ * Note that the generated files are ignored by Git.
  */
 const path = require( 'path' );
 const { readdir, readFile, writeFile } = require( 'fs' ).promises;
 const { execFile } = require( 'child_process' );
 const { promisify } = require( 'util' );
-
-/**
- * Internal dependencies
- */
+const { camelCase } = require( 'change-case' );
 const { validateCollection } = require( './validate-collection.cjs' );
 
 const execFileAsync = promisify( execFile );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 
-// - Find *.svg files in ./library
-// - For each, generate a sibling .tsx file
-// - Build an index of these at ./library/index.ts
-//
-// Note that the generated files are ignored by Git.
+/**
+ * List of SVG attributes whose names need to be converted from kebab-case
+ * to camelCase when transforming SVG into JSX elements.
+ *
+ * List from: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute.
+ */
+const SVG_ATTRIBUTE_WITH_DASHES = [
+	'accent-height',
+	'alignment-baseline',
+	'arabic-form',
+	'baseline-shift',
+	'cap-height',
+	'clip-path',
+	'clip-rule',
+	'color-interpolation',
+	'color-interpolation-filters',
+	'color-profile',
+	'color-rendering',
+	'dominant-baseline',
+	'enable-background',
+	'fill-opacity',
+	'fill-rule',
+	'flood-color',
+	'flood-opacity',
+	'font-family',
+	'font-size',
+	'font-size-adjust',
+	'font-stretch',
+	'font-style',
+	'font-variant',
+	'font-weight',
+	'glyph-name',
+	'glyph-orientation-horizontal',
+	'glyph-orientation-vertical',
+	'horiz-adv-x',
+	'horiz-origin-x',
+	'image-rendering',
+	'letter-spacing',
+	'lighting-color',
+	'marker-end',
+	'marker-mid',
+	'marker-start',
+	'overline-position',
+	'overline-thickness',
+	'paint-order',
+	'panose-1',
+	'pointer-events',
+	'rendering-intent',
+	'shape-rendering',
+	'stop-color',
+	'stop-opacity',
+	'strikethrough-position',
+	'strikethrough-thickness',
+	'stroke-dasharray',
+	'stroke-dashoffset',
+	'stroke-linecap',
+	'stroke-linejoin',
+	'stroke-miterlimit',
+	'stroke-opacity',
+	'stroke-width',
+	'text-anchor',
+	'text-decoration',
+	'text-rendering',
+	'underline-position',
+	'underline-thickness',
+	'unicode-bidi',
+	'unicode-range',
+	'units-per-em',
+	'v-alphabetic',
+	'v-hanging',
+	'v-ideographic',
+	'v-mathematical',
+	'vector-effect',
+	'vert-adv-y',
+	'vert-origin-x',
+	'vert-origin-y',
+	'word-spacing',
+	'writing-mode',
+	'xmlns-xlink',
+	'x-height',
+];
 
 // The SOURCE OF TRUTH for this package's library of icons consists of the SVG
 // files found under `src/library`. We must thus first generate the TSX files
@@ -126,10 +206,12 @@ async function generateIndex() {
 		.map( ( file ) => {
 			const importPath = path.basename( file, '.tsx' );
 
-			// Camel case, but retaining 'RTL' acronym in uppercase
+			// Camel case, but retaining acronyms in uppercase
 			const identifier = importPath
 				.replace( /-([0-9A-Za-z])/g, ( _, c ) => c.toUpperCase() )
-				.replace( /Rtl\b/, 'RTL' );
+				.replace( /Ltr\b/, 'LTR' )
+				.replace( /Rtl\b/, 'RTL' )
+				.replace( /Ne\b/, 'NE' );
 
 			return `export { default as ${ identifier } } from './${ importPath }';`;
 		} )
@@ -150,6 +232,45 @@ function svgToTsx( svgContent ) {
 	let jsxContent = svgContent.trim();
 
 	jsxContent = jsxContent.replace( /\sclass=/g, ' className=' );
+
+	// Convert SVG attribute names to JSX-friendly camelCase.
+	const kebabCaseToCamelCaseMap = SVG_ATTRIBUTE_WITH_DASHES.reduce(
+		( map, kebabCase ) => {
+			map[ kebabCase ] = camelCase( kebabCase );
+			return map;
+		},
+		{}
+	);
+
+	// Replace SVG attribute names with camel-case equivalents.
+	jsxContent = jsxContent.replace(
+		/\s([a-zA-Z][\w-]*)=/g,
+		( match, attrName ) => {
+			const camel = kebabCaseToCamelCaseMap[ attrName ];
+			if ( camel ) {
+				return ` ${ camel }=`;
+			}
+			return match;
+		}
+	);
+
+	// Convert the source convention `style="fill: none"` into JSX style object
+	// syntax. Reject other inline styles so this targeted conversion cannot
+	// silently generate an incomplete JSX style object.
+	const openingTagWithStyleRe =
+		/(<[A-Za-z][\w:-]*\b(?:[^>"']|"[^"]*"|'[^']*')*?)\sstyle=(["'])(.*?)\2/gs;
+	jsxContent = jsxContent.replace(
+		openingTagWithStyleRe,
+		( _, openingTag, _quote, cssString ) => {
+			if ( ! /^fill\s*:\s*none\s*;?$/.test( cssString.trim() ) ) {
+				throw new Error(
+					`Unsupported inline SVG style: "${ cssString }". Only "fill: none" is supported.`
+				);
+			}
+
+			return `${ openingTag } style={ { fill: "none" } }`;
+		}
+	);
 
 	// Tags that ought to be converted to WordPress primitives when converting
 	// SVGs to React elements
@@ -195,10 +316,7 @@ function svgToTsx( svgContent ) {
 		.map( ( line ) => '\t' + line )
 		.join( '\n' );
 
-	return `/**
- * WordPress dependencies
- */
-import { ${ Array.from( usedPrimitives )
+	return `import { ${ Array.from( usedPrimitives )
 		.sort()
 		.join( ', ' ) } } from '@wordpress/primitives';
 
@@ -214,4 +332,5 @@ if ( module === require.main ) {
 
 module.exports = {
 	generateTsxFiles,
+	svgToTsx,
 };

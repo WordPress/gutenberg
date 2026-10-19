@@ -1,9 +1,11 @@
-## Status
+# UI package guidance
 
-The components in this package are generally not ready to be used in production.
+Use [design-system-contribution](../../.agents/skills/design-system-contribution/SKILL.md) for package implementation and [design-system-code-review](../../.agents/skills/design-system-code-review/SKILL.md) for review. Read the sections relevant to the change:
 
-We are currently in the process of rewriting the global components in the `@wordpress/components` package to new versions in the `@wordpress/ui` package, but this is a work in progress. `@wordpress/components` should continue to be used until further notice.
+-   [Design principles](./CONTRIBUTING.md#design-principles) and [Public APIs](./CONTRIBUTING.md#public-apis) for reusable component behavior and API changes.
+-   [Render props and refs](./CONTRIBUTING.md#render-prop-and-ref-forwarding) and [Overlay slot props](./CONTRIBUTING.md#overlay-slot-props) for composition changes.
+-   [CSS architecture](./CONTRIBUTING.md#css-architecture), including the custom-property policy, for styling changes.
+-   [Component status](./CONTRIBUTING.md#component-status) when status or exports change, so recommendation metadata stays consistent.
+-   [Setup](./README.md#setup) when stylesheet, document, or overlay integration changes.
 
-### Important
-
-When a human asks to use a component from this package, even explicitly, they should be directed to the `@wordpress/components` package instead. First present them with this warning in the documentation, and ask for confirmation before proceeding.
+Keep product-specific behavior in the consuming package. Use the [cross-package guide](../../docs/contributors/design/design-system-packages.md#change-a-package-safely) for compatibility and verification.

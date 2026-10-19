@@ -1,0 +1,137 @@
+import type { FindFocusableOptions } from './types';
+
+/**
+ * References:
+ *
+ * Focusable:
+ *  - https://www.w3.org/TR/html5/editing.html#focus-management
+ *
+ * Sequential focus navigation:
+ *  - https://www.w3.org/TR/html5/editing.html#sequential-focus-navigation-and-the-tabindex-attribute
+ *
+ * Disabled elements:
+ *  - https://www.w3.org/TR/html5/disabled-elements.html#disabled-elements
+ *
+ * getClientRects algorithm (requiring layout box):
+ *  - https://www.w3.org/TR/cssom-view-1/#extension-to-the-element-interface
+ *
+ * AREA elements associated with an IMG:
+ *  - https://w3c.github.io/html/editing.html#data-model
+ */
+
+/**
+ * Returns a CSS selector used to query for focusable elements.
+ *
+ * @param sequential If set, only query elements that are sequentially
+ *                   focusable. Non-interactive elements with a
+ *                   negative `tabindex` are focusable but not
+ *                   sequentially focusable.
+ *                   https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
+ *
+ * @return CSS selector.
+ */
+function buildSelector( sequential: boolean ): string {
+	return [
+		sequential ? '[tabindex]:not([tabindex^="-"])' : '[tabindex]',
+		'a[href]',
+		'button:not([disabled])',
+		'input:not([type="hidden"]):not([disabled])',
+		'select:not([disabled])',
+		'textarea:not([disabled])',
+		'iframe:not([tabindex^="-"])',
+		'object',
+		'embed',
+		'summary',
+		'area[href]',
+		'[contenteditable]:not([contenteditable=false])',
+	].join( ',' );
+}
+
+/**
+ * Returns true if the specified element has a layout box and is not hidden by
+ * CSS visibility or content visibility.
+ *
+ * @param element DOM element to test.
+ *
+ * @return Whether element is visible.
+ */
+function isVisible( element: HTMLElement ): boolean {
+	if ( typeof element.checkVisibility === 'function' ) {
+		if ( ! element.checkVisibility( { visibilityProperty: true } ) ) {
+			return false;
+		}
+	} else {
+		const visibility =
+			element.ownerDocument.defaultView?.getComputedStyle(
+				element
+			).visibility;
+		if ( visibility === 'hidden' || visibility === 'collapse' ) {
+			return false;
+		}
+	}
+
+	return (
+		element.offsetWidth > 0 ||
+		element.offsetHeight > 0 ||
+		element.getClientRects().length > 0
+	);
+}
+
+/**
+ * Returns true if the specified area element is a valid focusable element, or
+ * false otherwise. Area is only focusable if within a map where a named map
+ * referenced by an image somewhere in the document.
+ *
+ * @param element DOM area element to test.
+ *
+ * @return Whether area element is valid for focus.
+ */
+function isValidFocusableArea( element: HTMLAreaElement ): boolean {
+	const map: HTMLMapElement | null = element.closest( 'map[name]' );
+	if ( ! map ) {
+		return false;
+	}
+
+	const img: HTMLImageElement | null = element.ownerDocument.querySelector(
+		'img[usemap="#' + map.name + '"]'
+	);
+	return !! img && ! img.closest( '[inert]' ) && isVisible( img );
+}
+
+/**
+ * Returns all focusable elements within a given context.
+ *
+ * @param context              Element in which to search.
+ * @param options
+ * @param [options.sequential] If set, only return elements that are
+ *                             sequentially focusable.
+ *                             Non-interactive elements with a
+ *                             negative `tabindex` are focusable but
+ *                             not sequentially focusable.
+ *                             https://html.spec.whatwg.org/multipage/interaction.html#the-tabindex-attribute
+ *
+ * @return Focusable elements.
+ */
+export function find(
+	context: Element,
+	{ sequential = false }: FindFocusableOptions = {}
+): HTMLElement[] {
+	const elements: NodeListOf< HTMLElement > = context.querySelectorAll(
+		buildSelector( sequential )
+	);
+
+	return Array.from( elements ).filter( ( element ) => {
+		const { nodeName } = element;
+		if ( 'AREA' === nodeName ) {
+			// The mapped image determines whether this region is visible or inert.
+			return isValidFocusableArea( element as HTMLAreaElement );
+		}
+
+		// Elements inside an inert subtree are not focusable.
+		if ( element.closest( '[inert]' ) ) {
+			return false;
+		}
+
+		return isVisible( element );
+	} );
+}

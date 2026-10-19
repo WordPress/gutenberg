@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { VisuallyHidden } from '../visually-hidden';
 import type { BaseControlProps, BaseControlVisualLabelProps } from './types';
 import {
@@ -27,7 +16,7 @@ import { contextConnectWithoutRef, useContextSystem } from '../context';
 export { useBaseControlProps } from './hooks';
 
 const UnconnectedBaseControl = (
-	props: WordPressComponentProps< BaseControlProps, null >
+	props: WordPressComponentProps< BaseControlProps, null, false >
 ) => {
 	const {
 		id,

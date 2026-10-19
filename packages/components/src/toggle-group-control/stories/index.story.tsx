@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { formatLowercase, formatUppercase } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import {
 	ToggleGroupControl,
 	ToggleGroupControlOption,
@@ -26,19 +15,19 @@ import type {
 const meta: Meta< typeof ToggleGroupControl > = {
 	component: ToggleGroupControl,
 	subcomponents: { ToggleGroupControlOption, ToggleGroupControlOptionIcon },
-	title: 'Components/Selection & Input/Common/ToggleGroupControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/ToggleGroupControl',
 	id: 'components-togglegroupcontrol',
 	argTypes: {
 		help: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
 		value: { control: false },
 	},
-	tags: [ 'status-experimental' ],
+	tags: [ 'status-experimental', 'manifest' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'recommended',
 			whereUsed: 'global',
 			notes: 'Will be superseded by `ToggleGroupControl` in `@wordpress/ui`, but continue using for now.',
 		},
@@ -50,12 +39,12 @@ const Template: StoryFn< typeof ToggleGroupControl > = ( {
 	onChange,
 	...props
 } ) => {
-	const [ value, setValue ] =
-		useState< ToggleGroupControlProps[ 'value' ] >();
+	const [ value, setValue ] = useState< ToggleGroupControlProps[ 'value' ] >(
+		props.value
+	);
 
 	return (
 		<ToggleGroupControl
-			__next40pxDefaultSize
 			{ ...props }
 			onChange={ ( ...changeArgs ) => {
 				setValue( ...changeArgs );
@@ -90,6 +79,7 @@ Default.args = {
 		{ value: 'right', label: 'Right' },
 		{ value: 'justify', label: 'Justify' },
 	].map( mapPropsToOptionComponent ),
+	help: 'Help text to describe the control.',
 	isBlock: true,
 	label: 'Label',
 };
@@ -145,4 +135,16 @@ export const Deselectable: StoryFn< typeof ToggleGroupControl > = Template.bind(
 Deselectable.args = {
 	...WithIcons.args,
 	isDeselectable: true,
+};
+
+/**
+ * When the `disabled` prop is true, the control is unselectable.
+ */
+export const Disabled: StoryFn< typeof ToggleGroupControl > = Template.bind(
+	{}
+);
+Disabled.args = {
+	...Default.args,
+	disabled: true,
+	value: 'left',
 };

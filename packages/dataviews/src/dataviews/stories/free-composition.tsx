@@ -1,29 +1,21 @@
-/**
- * WordPress dependencies
- */
 import {
 	useState,
 	useMemo,
 	createInterpolateElement,
 } from '@wordpress/element';
 import {
-	Card,
-	CardBody,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	Button,
 } from '@wordpress/components';
 import { __, _n } from '@wordpress/i18n';
-import { Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
+import { Card, Stack } from '@wordpress/ui';
 import DataViews from '../index';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 import type { View } from '../../types';
 import { actions, data, fields, type SpaceObject } from './fixtures';
 import { LAYOUT_TABLE } from '../../constants';
+import styles from './style.module.css';
 
 /**
  * Custom composition example
@@ -33,10 +25,10 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 
 	return (
 		<>
-			<Heading className="free-composition-heading" level={ 2 }>
+			<Heading className={ styles.heading } level={ 2 }>
 				{ __( 'Solar System numbers' ) }
 			</Heading>
-			<div className="free-composition-header">
+			<div className={ styles.header }>
 				<Stack direction="column" gap="lg">
 					<Stack direction="row" justify="start" gap="sm">
 						<DataViews.Search label={ __( 'Search content' ) } />
@@ -52,10 +44,10 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 						</Stack>
 					</Stack>
 					<DataViews.FiltersToggled />
-					<Card variant="secondary">
-						<CardBody>
+					<Card.Root>
+						<Card.Content>
 							<Stack direction="column" gap="sm">
-								<Text size={ 18 } as="p">
+								<WCText size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
 											'<PlanetsNumber /> planet',
@@ -70,9 +62,9 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 											),
 										}
 									) }
-								</Text>
+								</WCText>
 
-								<Text size={ 18 } as="p">
+								<WCText size={ 18 } as="p">
 									{ createInterpolateElement(
 										_n(
 											'<SatellitesNumber /> moon',
@@ -85,12 +77,12 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 											),
 										}
 									) }
-								</Text>
+								</WCText>
 							</Stack>
-						</CardBody>
-					</Card>
-					<Card style={ { width: '100%' } }>
-						<CardBody>
+						</Card.Content>
+					</Card.Root>
+					<Card.Root style={ { width: '100%' } }>
+						<Card.Content>
 							<Stack
 								direction="row"
 								justify="space-between"
@@ -100,11 +92,11 @@ function PlanetOverview( { planets }: { planets: SpaceObject[] } ) {
 								<DataViews.BulkActionToolbar />
 								<DataViews.Pagination />
 							</Stack>
-						</CardBody>
-					</Card>
-					<DataViews.Layout className="free-composition-dataviews-layout" />
+						</Card.Content>
+					</Card.Root>
 				</Stack>
 			</div>
+			<DataViews.Layout className={ styles.layout } />
 		</>
 	);
 }
@@ -132,13 +124,8 @@ export const FreeCompositionComponent = () => {
 		type: LAYOUT_TABLE,
 		search: '',
 		page: 1,
-		perPage: 10,
+		perPage: 20,
 		layout: {
-			styles: {
-				satellites: {
-					align: 'end' as const,
-				},
-			},
 			enableMoving: false,
 		},
 		filters: [],
@@ -157,38 +144,38 @@ export const FreeCompositionComponent = () => {
 	);
 
 	return (
-		<div className="free-composition">
-			<DataViews
-				getItemId={ ( item ) => item.id.toString() }
-				paginationInfo={ paginationInfo }
-				data={ processedData }
-				view={ view }
-				fields={ fields }
-				actions={ actions }
-				onChangeView={ setView }
-				defaultLayouts={ {
-					table: {},
-					grid: {},
-				} }
-				empty={
-					<Stack
-						direction="column"
-						gap="sm"
-						justify="space-around"
-						align="center"
-						className="free-composition-dataviews-empty"
-					>
-						<Text size={ 18 } as="p">
-							No planets
-						</Text>
-						<Text variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</Text>
-						<Button variant="secondary">Create new planet</Button>
-					</Stack>
-				}
-			>
-				<PlanetOverview planets={ planets } />
-			</DataViews>
-		</div>
+		<DataViews
+			getItemId={ ( item ) => item.id.toString() }
+			paginationInfo={ paginationInfo }
+			data={ processedData }
+			view={ view }
+			fields={ fields }
+			actions={ actions }
+			onChangeView={ setView }
+			defaultLayouts={ {
+				table: true,
+				grid: true,
+			} }
+			empty={
+				<Stack
+					direction="column"
+					gap="sm"
+					justify="space-around"
+					align="center"
+					className={ styles.empty }
+				>
+					<WCText size={ 18 } as="p">
+						No planets
+					</WCText>
+					<WCText variant="muted">{ `Try a different search because “${ view.search }” returned no results.` }</WCText>
+					<Button variant="secondary" __next40pxDefaultSize>
+						Create new planet
+					</Button>
+				</Stack>
+			}
+		>
+			<PlanetOverview planets={ planets } />
+		</DataViews>
 	);
 };
 

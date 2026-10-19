@@ -17,7 +17,6 @@ Notices display at the top of the screen, below any toolbars anchored to the top
 Notices are color-coded to indicate the type of message being communicated:
 
 - **Informational** notices are **blue** by default.
-- If there is a parent `Theme` component with an `accent` color prop, informational notices will take on that color instead.
 - **Success** notices are **green.**
 - **Warning** notices are **yellow.**
 - **Error** notices are **red.**
@@ -101,7 +100,7 @@ Used to provide a custom spoken message in place of the `children` default.
 
 #### `status`: `'warning' | 'success' | 'error' | 'info'`
 
-Determines the color of the notice: `warning` (yellow), `success` (green), `error` (red), or `'info'`. By default `'info'` will be blue, but if there is a parent Theme component with an accent color prop, the notice will take on that color instead.
+Determines the color of the notice: `warning` (yellow), `success` (green), `error` (red), or `'info'`. By default `'info'` will be blue.
 
 - Required: No
 - Default: `info`

@@ -29,8 +29,6 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	 *
 	 * @param string $block_name Name for the test block.
 	 * @param array  $supports   Array defining block support configuration.
-	 *
-	 * @return WP_Block_Type The block type for the newly registered test block.
 	 */
 	private function register_custom_css_block_with_support( $block_name, $supports = array() ) {
 		$this->test_block_name = $block_name;
@@ -75,6 +73,31 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added.' );
 		$this->assertMatchesRegularExpression( '/wp-custom-css-/', $result['attrs']['className'], 'className should contain wp-custom-css- prefix.' );
+	}
+
+	/**
+	 * Tests that custom CSS which produces no rules does not add a class name.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_support_does_not_add_class_name_when_processing_produces_no_css() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-empty-output',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-empty-output',
+			'attrs'     => array(
+				'style' => array(
+					'css' => '&',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayNotHasKey( 'className', $result['attrs'] );
 	}
 
 	/**
@@ -340,6 +363,44 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS class surrounded by ASCII whitespace (other than space) is extracted.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_render_custom_css_class_name_extracts_class_between_whitespace() {
+		$block_content = '<div class="wp-block-paragraph">Test content</div>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => "\twp-custom-css-123abc\t",
+			),
+		);
+
+		$result = gutenberg_render_custom_css_class_name( $block_content, $block );
+
+		$this->assertStringContainsString( 'wp-custom-css-123abc', $result, 'Custom CSS class should be extracted from between whitespace.' );
+	}
+
+	/**
+	 * Tests that a class merely prefixed with wp-custom-css- (e.g. via a hyphen) is not treated as the custom CSS class.
+	 *
+	 * @covers ::gutenberg_render_custom_css_class_name
+	 */
+	public function test_render_custom_css_class_name_returns_unchanged_for_prefixed_class() {
+		$block_content = '<div class="wp-block-paragraph">Test content</div>';
+		$block         = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'className' => 'my-wp-custom-css-456def',
+			),
+		);
+
+		$result = gutenberg_render_custom_css_class_name( $block_content, $block );
+
+		$this->assertSame( $block_content, $result, 'Block content should remain unchanged when wp-custom-css- only appears as a substring of another class.' );
+	}
+
+	/**
 	 * Tests that custom CSS support is enabled by default.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
@@ -415,6 +476,73 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS is correctly scoped for style states.
+	 *
+	 * @covers ::gutenberg_process_custom_css_state_entries
+	 */
+	public function test_custom_css_processes_style_state_entries() {
+		$entries = array(
+			array(
+				'css'         => 'color: red;',
+				'pseudo'      => null,
+				'media_query' => null,
+			),
+			array(
+				'css'         => 'color: blue;',
+				'pseudo'      => ':hover',
+				'media_query' => null,
+			),
+			array(
+				'css'         => 'color: green;',
+				'pseudo'      => null,
+				'media_query' => '@media (width <= 480px)',
+			),
+			array(
+				'css'         => 'color: purple;',
+				'pseudo'      => ':focus',
+				'media_query' => '@media (width <= 480px)',
+			),
+		);
+
+		$result = gutenberg_process_custom_css_state_entries( $entries, '.test-block' );
+
+		$this->assertSame(
+			':root :where(.test-block){color: red;}' .
+			':root :where(.test-block:hover){color: blue;}' .
+			'@media (width <= 480px){:root :where(.test-block){color: green;}}' .
+			'@media (width <= 480px){:root :where(.test-block:focus){color: purple;}}',
+			$result
+		);
+	}
+
+	/**
+	 * Tests that valid CSS state entries are processed when another state contains HTML.
+	 *
+	 * @covers ::gutenberg_process_custom_css_state_entries
+	 */
+	public function test_custom_css_processes_valid_state_entries_when_another_state_contains_html() {
+		$valid_entry = array(
+			'css'         => 'color: red;',
+			'pseudo'      => null,
+			'media_query' => null,
+		);
+
+		$entries = array(
+			$valid_entry,
+			array(
+				'css'         => '<script>alert(1)</script>',
+				'pseudo'      => ':hover',
+				'media_query' => null,
+			),
+		);
+
+		$result = gutenberg_process_custom_css_state_entries( $entries, '.test-block' );
+
+		$this->assertStringContainsString( 'color: red', $result );
+		$this->assertStringNotContainsString( '<script>', $result );
+	}
+
+	/**
 	 * Tests that valid CSS without HTML markup is accepted.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
@@ -437,5 +565,104 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
 
 		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added for valid CSS.' );
+	}
+
+	/**
+	 * Tests that style.css is stripped from a single block.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_removes_css_from_block() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'] ?? array(), 'style.css should be stripped from block attributes.' );
+	}
+
+	/**
+	 * Tests that style.css is stripped from nested inner blocks.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_removes_css_from_inner_blocks() {
+		$content = '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph --></div><!-- /wp:group -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$inner_block = $blocks[0]['innerBlocks'][0];
+		$this->assertArrayNotHasKey( 'css', $inner_block['attrs']['style'] ?? array(), 'style.css should be stripped from inner block attributes.' );
+	}
+
+	/**
+	 * Tests that content without blocks is returned unchanged.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_returns_non_block_content_unchanged() {
+		$content = '<p>This is plain HTML content with no blocks.</p>';
+
+		$result = gutenberg_strip_custom_css_from_blocks( $content );
+
+		$this->assertSame( $content, $result, 'Non-block content should be returned unchanged.' );
+	}
+
+	/**
+	 * Tests that content without style.css attributes is returned unchanged.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_returns_unchanged_when_no_css_attributes() {
+		$content = '<!-- wp:paragraph {"style":{"color":{"text":"#ff0000"}}} --><p class="has-text-color" style="color:#ff0000">Hello</p><!-- /wp:paragraph -->';
+
+		$result = gutenberg_strip_custom_css_from_blocks( $content );
+
+		$this->assertSame( $content, $result, 'Content without style.css attributes should be returned unchanged.' );
+	}
+
+	/**
+	 * Tests that other style properties are preserved when css is stripped.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_preserves_other_style_properties() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;","color":{"text":"#ff0000"}}} --><p>Hello</p><!-- /wp:paragraph -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'], 'style.css should be stripped.' );
+		$this->assertSame( '#ff0000', $blocks[0]['attrs']['style']['color']['text'], 'Other style properties should be preserved.' );
+	}
+
+	/**
+	 * Tests that empty style object is cleaned up after stripping css.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_cleans_up_empty_style_object() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
+
+		$result = wp_unslash( gutenberg_strip_custom_css_from_blocks( $content ) );
+		$blocks = parse_blocks( $result );
+
+		$this->assertArrayNotHasKey( 'style', $blocks[0]['attrs'], 'Empty style object should be cleaned up after stripping css.' );
+	}
+
+	/**
+	 * Tests that slashed content is handled correctly.
+	 *
+	 * @covers ::gutenberg_strip_custom_css_from_blocks
+	 */
+	public function test_strip_custom_css_handles_slashed_content() {
+		$content = '<!-- wp:paragraph {"style":{"css":"color: red;"}} --><p>Hello</p><!-- /wp:paragraph -->';
+		$slashed = wp_slash( $content );
+
+		$result = gutenberg_strip_custom_css_from_blocks( $slashed );
+		$blocks = parse_blocks( wp_unslash( $result ) );
+
+		$this->assertArrayNotHasKey( 'css', $blocks[0]['attrs']['style'] ?? array(), 'style.css should be stripped even from slashed content.' );
 	}
 }

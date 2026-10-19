@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { createContext, useState, useEffect } from '@wordpress/element';
 import {
 	useSelect,
@@ -25,10 +22,6 @@ import type {
 	FontFamily,
 	WpFontFamily,
 } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { fetchInstallFontFamily } from './api';
 import {
 	setUIValuesNeeded,
@@ -62,7 +55,8 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 	const globalStyles = useEntityRecord< GlobalStylesConfig >(
 		'root',
 		'globalStyles',
-		globalStylesId
+		globalStylesId ?? 0,
+		{ enabled: globalStylesId !== undefined }
 	);
 
 	const [ isInstalling, setIsInstalling ] = useState( false );
@@ -73,6 +67,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			'wp_font_family',
 			{
 				_embed: true,
+				per_page: -1,
 			}
 		);
 
@@ -192,7 +187,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 										`${ face.fontStyle ?? '' }${
 											face.fontWeight ?? ''
 										}`
-							  )
+								)
 							: [ 'normal400' ]; // If the font doesn't have fontFace, we assume it is a system font and we add the defaults: normal 400
 
 					acc[ font.slug ] = availableFontFaces;
@@ -271,7 +266,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 									( face: CollectionFontFace ) =>
 										face.font_face_settings
 								) || [],
-					  }
+						}
 					: null;
 
 				// Otherwise create it.
@@ -295,7 +290,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 										fontFaceToInstall,
 										fontFamilyToInstall.fontFace
 									)
-						  )
+							)
 						: [];
 
 				// Filter out Font Faces that have already been installed (so that they are not re-installed)
@@ -482,7 +477,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 						fontFace: fontFace.map(
 							( { id: _faceDbId, ...face } ) => face
 						),
-				  }
+					}
 				: {} ),
 		} ) );
 	};

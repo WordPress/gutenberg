@@ -1,16 +1,9 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * Internal dependencies
- */
 import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
 	component: ProgressBar,
-	title: 'Components/Feedback/ProgressBar',
+	title: 'Components/@wordpress-components/Feedback/ProgressBar',
 	id: 'components-progressbar',
 	argTypes: {
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
@@ -21,8 +14,9 @@ const meta: Meta< typeof ProgressBar > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'stable',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Use [`Progress`](?path=/docs/design-system-components-progress--docs) from `@wordpress/ui` instead.',
 		},
 	},
 };

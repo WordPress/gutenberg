@@ -1,0 +1,10 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.save-button {
+	width: 100%;
+}
+
+
+.shortcut:not(:first-child) {
+	margin-inline-start: $grid-unit-10;
+}

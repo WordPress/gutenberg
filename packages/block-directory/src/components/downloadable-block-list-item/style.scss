@@ -32,7 +32,7 @@
 
 
 	&:not([aria-disabled="true"]) {
-		cursor: pointer;
+		cursor: var(--wpds-cursor-control);
 	}
 
 	&:hover {
@@ -84,13 +84,13 @@
 
 .block-directory-downloadable-block-list-item__title {
 	display: block;
-	font-weight: 600;
+	font-weight: var(--wpds-typography-font-weight-emphasis);
 }
 
 .block-directory-downloadable-block-list-item__author {
 	display: block;
 	margin-top: $grid-unit-05;
-	font-weight: normal;
+	font-weight: 400;
 }
 
 .block-directory-downloadable-block-list-item__desc {

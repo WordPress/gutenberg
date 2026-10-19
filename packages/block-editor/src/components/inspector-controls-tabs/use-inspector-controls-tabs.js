@@ -1,13 +1,8 @@
-/**
- * WordPress dependencies
- */
 import { __experimentalUseSlotFills as useSlotFills } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import InspectorControlsGroups from '../inspector-controls/groups';
+import InspectorControlsGroups, {
+	PrivateInspectorControlsAllowedBlocks,
+} from '../inspector-controls/groups';
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
@@ -41,6 +36,7 @@ export default function useInspectorControlsTabs(
 		color: colorGroup,
 		content: contentGroup,
 		default: defaultGroup,
+		layout: layoutGroup,
 		dimensions: dimensionsGroup,
 		list: listGroup,
 		position: positionGroup,
@@ -62,6 +58,8 @@ export default function useInspectorControlsTabs(
 	const styleFills = [
 		...( useSlotFills( borderGroup.name ) || [] ),
 		...( useSlotFills( colorGroup.name ) || [] ),
+		...( useSlotFills( layoutGroup.name ) || [] ),
+		...( useSlotFills( positionGroup.name ) || [] ),
 		...( useSlotFills( dimensionsGroup.name ) || [] ),
 		...( useSlotFills( stylesGroup.name ) || [] ),
 		...( useSlotFills( typographyGroup.name ) || [] ),
@@ -70,28 +68,25 @@ export default function useInspectorControlsTabs(
 	const hasStyleFills = styleFills.length;
 
 	// Settings Tab: If we don't have multiple tabs to display
-	// (i.e. both list view and styles), check only the default and position
+	// (i.e. both list view and styles), check only the default
 	// InspectorControls slots. If we have multiple tabs, we'll need to check
 	// the advanced controls slot as well to ensure they are rendered.
+	//
+	// The allowed-blocks control renders inside the advanced panel via its own
+	// private slot, so its fills are counted here too — otherwise a block whose
+	// only advanced tool is Allowed blocks would lose its Settings tab.
 	const advancedFills = [
 		...( useSlotFills( InspectorAdvancedControls.slotName ) || [] ),
 		...( useSlotFills( bindingsGroup.name ) || [] ),
+		...( useSlotFills( PrivateInspectorControlsAllowedBlocks.name ) || [] ),
 	];
 
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.name ) || [] ),
-		...( useSlotFills( positionGroup.name ) || [] ),
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
 
-	// When the block fields experiment is active, only rely on `hasContentFills`
-	// to determine whether the content tab to be shown. The tab purely uses slot
-	// fills in this situation.
-	const shouldShowBlockFields =
-		window?.__experimentalContentOnlyInspectorFields;
-	const hasContentTab =
-		hasContentFills ||
-		( ! shouldShowBlockFields && contentClientIds?.length );
+	const hasContentTab = hasContentFills || contentClientIds?.length;
 
 	if ( hasContentTab ) {
 		tabs.push( TAB_CONTENT );
@@ -111,13 +106,17 @@ export default function useInspectorControlsTabs(
 		tabs.push( TAB_SETTINGS );
 	}
 
-	if ( hasBlockStyles || hasStyleFills ) {
+	const { tabSettings, isPreviewMode } = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return {
+			tabSettings: settings.blockInspectorTabs,
+			isPreviewMode: settings.isPreviewMode,
+		};
+	}, [] );
+
+	if ( ! isPreviewMode && ( hasBlockStyles || hasStyleFills ) ) {
 		tabs.push( TAB_STYLES );
 	}
-
-	const tabSettings = useSelect( ( select ) => {
-		return select( blockEditorStore ).getSettings().blockInspectorTabs;
-	}, [] );
 
 	const showTabs = getShowTabs( blockName, tabSettings );
 	return showTabs ? tabs : EMPTY_ARRAY;

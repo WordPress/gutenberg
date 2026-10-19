@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { createReduxStore, register } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
 import reducer from './reducer';
 import * as selectors from './selectors';
 import * as privateSelectors from './private-selectors';
@@ -140,3 +133,4 @@ export * from './awareness/types';
 export * from './fetch';
 export * from './hooks';
 export * from './private-apis';
+export * from './types';

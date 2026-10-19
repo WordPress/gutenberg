@@ -1,23 +1,16 @@
-/**
- * WordPress dependencies
- */
+import { Progress } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalText as Text,
+	__experimentalText as WCText,
 	__experimentalVStack as VStack,
 	Button,
 	DropZone,
 	Notice,
 	FormFileUpload,
 	FlexItem,
-	ProgressBar,
 } from '@wordpress/components';
 import { useContext, useState } from '@wordpress/element';
 import type { FontFace } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
 import { ALLOWED_FILE_EXTENSIONS } from './utils/constants';
 import { FontLibraryContext } from './context';
 import { Font } from './lib/lib-font.browser';
@@ -131,7 +124,7 @@ function UploadFonts() {
 			const buffer = await readFileAsArrayBuffer( file );
 			await font.fromDataBuffer( buffer, 'font' );
 			return true;
-		} catch ( error ) {
+		} catch {
 			return false;
 		}
 	}
@@ -231,7 +224,14 @@ function UploadFonts() {
 				{ isUploading && (
 					<FlexItem>
 						<div className="font-library__upload-area">
-							<ProgressBar />
+							<Progress.Root
+								value={ null }
+								aria-label={ __( 'Uploading fonts' ) }
+							>
+								<Progress.Track>
+									<Progress.Indicator />
+								</Progress.Track>
+							</Progress.Root>
 						</div>
 					</FlexItem>
 				) }
@@ -253,11 +253,11 @@ function UploadFonts() {
 						) }
 					/>
 				) }
-				<Text className="font-library__upload-area__text">
+				<WCText className="font-library__upload-area__text">
 					{ __(
 						'Uploaded fonts appear in your library and can be used in your theme. Supported formats: .ttf, .otf, .woff, and .woff2.'
 					) }
-				</Text>
+				</WCText>
 			</VStack>
 		</div>
 	);
