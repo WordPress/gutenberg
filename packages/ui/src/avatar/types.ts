@@ -6,8 +6,8 @@ export type RootProps = Omit<
 	'color'
 > & {
 	/**
-	 * Colors the image's inner ring or the fallback background without changing
-	 * the avatar's size. Fallbacks use an opaque color with a contrasting foreground.
+	 * Colors the image's inner ring or opaque fallback background, automatically
+	 * choosing a contrasting foreground tint for fallbacks.
 	 *
 	 * Accepts CSS colors and variables that resolve to a color. Do not use
 	 * `currentColor`, including through variables, or CSS-wide keywords such as
