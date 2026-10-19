@@ -12,6 +12,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for Theme tests ([#0](https://github.com/WordPress/gutenberg/pull/0)).
 -   Consolidate border mode overrides in the resolver and inherit default values from the base tokens ([#84108](https://github.com/WordPress/gutenberg/pull/84108)).
 -   Update the Vite development dependency to 8.3.4 ([#84544](https://github.com/WordPress/gutenberg/pull/84544)).
 

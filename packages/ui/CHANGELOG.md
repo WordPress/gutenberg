@@ -46,6 +46,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for UI tests ([#0](https://github.com/WordPress/gutenberg/pull/0)).
 -   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 
 ### Documentation
