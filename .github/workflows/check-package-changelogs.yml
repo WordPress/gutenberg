@@ -69,7 +69,7 @@ jobs:
     # none or only a few.
     changed-packages:
         name: Find packages that need a CHANGELOG entry
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
         outputs:
@@ -173,7 +173,7 @@ jobs:
         needs: changed-packages
         # A matrix with no values fails the run, so skip the job instead.
         if: ${{ needs.changed-packages.outputs.packages != '[]' }}
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
         strategy:
