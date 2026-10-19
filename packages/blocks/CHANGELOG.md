@@ -13,9 +13,6 @@
 -   Add the `backgroundClip`, `backgroundPosition`, `backgroundRepeat` and `gradient` background supports to the block supports type ([#84709](https://github.com/WordPress/gutenberg/pull/84709)).
 -   `__experimentalLabel`: Type the block label callback as optional and allowed to return nothing, as `getBlockLabel` already handles ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
 -   `BlockType`: Add the documented `transforms.ungroup` callback to the type ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
-
-### Bug Fixes
-
 -   `applyBuiltInValidationFixes` removes an `anchor` or `ariaLabel` the block's markup no longer carries, where before it could only assign one. Deleting an `id` or `aria-label` by hand no longer leaves the block unable to validate ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 -   Raw HTML conversion keeps an element's `id` as the block's `anchor`, and its `class` on every raw transform rather than only those declaring a `transform` function. Converting a Classic block that contains `<h2 id="section-one">` no longer drops the anchor ([#82836](https://github.com/WordPress/gutenberg/pull/82836)).
 
