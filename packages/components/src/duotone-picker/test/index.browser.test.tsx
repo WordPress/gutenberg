@@ -356,4 +356,48 @@ describe( 'DuotonePicker', () => {
 			expect( options[ 1 ] ).toHaveAttribute( 'aria-selected', 'true' );
 		} );
 	} );
+
+	describe( 'unset option', () => {
+		const DUOTONES = [ { name: 'A', slug: 'a', colors: COLORS_A } ];
+
+		it( 'should call onChange with "unset" when the unset option is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value={ COLORS_A }
+					onChange={ onChange }
+					disableCustomDuotone
+				/>
+			);
+
+			await user.click( screen.getByRole( 'option', { name: 'Unset' } ) );
+
+			expect( onChange ).toHaveBeenCalledWith( 'unset' );
+		} );
+
+		it( 'should call onChange with undefined when the selected unset option is clicked', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+
+			await render(
+				<DuotonePicker
+					aria-label="Duotone"
+					duotonePalette={ DUOTONES }
+					colorPalette={ COLOR_PALETTE }
+					value="unset"
+					onChange={ onChange }
+					disableCustomDuotone
+				/>
+			);
+
+			await user.click( screen.getByRole( 'option', { name: 'Unset' } ) );
+
+			expect( onChange ).toHaveBeenCalledWith( undefined );
+		} );
+	} );
 } );
