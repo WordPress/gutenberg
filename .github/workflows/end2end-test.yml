@@ -23,6 +23,7 @@ jobs:
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 60
         permissions:
             contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
@@ -81,6 +82,7 @@ jobs:
         if: ${{ !cancelled() }}
         needs: [e2e-playwright]
         runs-on: 'ubuntu-24.04'
+        timeout-minutes: 5
         permissions: {}
         outputs:
             has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
