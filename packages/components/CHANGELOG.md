@@ -66,6 +66,7 @@
 
 ### Internal
 
+-   Remove unused internal BoxControl and UnitControl helpers and gradient constants ([#85091](https://github.com/WordPress/gutenberg/pull/85091)).
 -   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Replace remaining Emotion fixtures in polymorphic tests and ToolsPanel stories with SCSS Modules ([#84926](https://github.com/WordPress/gutenberg/pull/84926)).
 -   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
