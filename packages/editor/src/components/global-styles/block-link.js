@@ -40,7 +40,7 @@ export function GlobalStylesBlockLink( { path, onPathChange } ) {
 		if (
 			! path ||
 			( path !== '/blocks' && ! path.startsWith( '/blocks/' ) ) ||
-			path.startsWith( '/blocks/elements' )
+			path.startsWith( '/blocks/elements/' )
 		) {
 			return;
 		}
