@@ -93,7 +93,7 @@
 		{ "path": "packages/viewport" },
 		{ "path": "packages/views/tsconfig.build.json" },
 		{ "path": "packages/vips/tsconfig.build.json" },
-		{ "path": "packages/warning" },
+		{ "path": "packages/warning/tsconfig.build.json" },
 		{ "path": "packages/widget-dashboard/tsconfig.build.json" },
 		{ "path": "packages/widget-primitives/tsconfig.build.json" },
 		{ "path": "packages/wordcount/tsconfig.build.json" },
