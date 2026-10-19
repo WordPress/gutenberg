@@ -29,6 +29,8 @@ export interface LayoutOptions {
 	gap?: number;
 	/** Nudge applied so a card's first line sits level with its anchor. */
 	alignOffset?: number;
+	/** Highest a card may sit; cards are pushed down, selected one included, to stay below it. */
+	minTop?: number;
 }
 
 export const DEFAULT_GAP = 12;
@@ -43,6 +45,7 @@ export const DEFAULT_ALIGN_OFFSET = -4;
  * @param options.selectedId
  * @param options.gap
  * @param options.alignOffset
+ * @param options.minTop
  * @return Document-space top for each note ID.
  */
 export function calculateThreadTops( {
@@ -51,6 +54,7 @@ export function calculateThreadTops( {
 	selectedId = null,
 	gap = DEFAULT_GAP,
 	alignOffset = DEFAULT_ALIGN_OFFSET,
+	minTop = -Infinity,
 }: LayoutOptions ): Record< string, number > {
 	const tops: Record< string, number > = {};
 
@@ -98,6 +102,18 @@ export function calculateThreadTops( {
 
 		tops[ id ] = placed;
 		nextTop = placed;
+	}
+
+	// Cards pushed up past the floor would be unreachable, so lay them all
+	// out top-down from the floor instead, giving up the selected card's
+	// exact alignment.
+	if ( tops[ ordered[ 0 ].id ] < minTop ) {
+		let floor = minTop;
+
+		for ( const { id, top } of ordered ) {
+			tops[ id ] = Math.max( top + alignOffset, floor );
+			floor = tops[ id ] + ( heights[ id ] ?? 0 ) + gap;
+		}
 	}
 
 	return tops;

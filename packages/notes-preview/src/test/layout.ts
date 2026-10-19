@@ -93,6 +93,38 @@ describe( 'calculateThreadTops', () => {
 
 		expect( tops[ '2' ] ).toBe( tops[ '1' ] + DEFAULT_GAP );
 	} );
+
+	it( 'never pushes a card above the floor', () => {
+		const tops = calculateThreadTops( {
+			anchors: [
+				{ id: '1', top: 100 },
+				{ id: '2', top: 120 },
+				{ id: '3', top: 140 },
+			],
+			heights,
+			selectedId: '3',
+			minTop: 80,
+		} );
+
+		expect( tops[ '1' ] ).toBe( 100 + DEFAULT_ALIGN_OFFSET );
+		expect( tops[ '2' ] ).toBe( tops[ '1' ] + 100 + DEFAULT_GAP );
+		expect( tops[ '3' ] ).toBe( tops[ '2' ] + 100 + DEFAULT_GAP );
+	} );
+
+	it( 'leaves the layout alone when it already clears the floor', () => {
+		const options = {
+			anchors: [
+				{ id: '1', top: 400 },
+				{ id: '2', top: 420 },
+			],
+			heights,
+			selectedId: '2',
+		};
+
+		expect( calculateThreadTops( { ...options, minTop: 0 } ) ).toEqual(
+			calculateThreadTops( options )
+		);
+	} );
 } );
 
 describe( 'parseNoteIds', () => {
