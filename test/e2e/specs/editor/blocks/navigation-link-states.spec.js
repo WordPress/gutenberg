@@ -100,23 +100,27 @@ test.describe( 'Navigation Link states', () => {
 			.getByRole( 'radio', { name: 'Large', exact: true } )
 			.click();
 
-		await editor.publishPost();
+		const postId = await editor.publishPost();
 
 		await page.goto( pageUrl );
 
-		const navigation = page.getByRole( 'navigation' );
-		const currentItem = navigation
+		const styledItem = page
+			.getByRole( 'navigation' )
 			.getByRole( 'listitem' )
 			.filter( { hasText: 'Current Link' } );
-		const otherItem = navigation
-			.getByRole( 'listitem' )
-			.filter( { hasText: 'Other Link' } );
 
-		await expect( currentItem ).toHaveClass( /current-menu-item/ );
+		await expect( styledItem ).toHaveClass( /current-menu-item/ );
 		// The block's own state styles are scoped to a `wp-states-*` class.
-		await expect( currentItem ).toHaveClass( /wp-states-/ );
+		await expect( styledItem ).toHaveClass( /wp-states-/ );
 		// The default "Large" font size preset is 36px.
-		await expect( currentItem ).toHaveCSS( 'font-size', '36px' );
-		await expect( otherItem ).not.toHaveCSS( 'font-size', '36px' );
+		await expect( styledItem ).toHaveCSS( 'font-size', '36px' );
+
+		// The post shows the same menu, but the link isn't the current menu
+		// item there, so its Current state styles don't apply.
+		await page.goto( `/?p=${ postId }` );
+
+		await expect( styledItem ).not.toHaveClass( /current-menu-item/ );
+		await expect( styledItem ).toHaveClass( /wp-states-/ );
+		await expect( styledItem ).not.toHaveCSS( 'font-size', '36px' );
 	} );
 } );
