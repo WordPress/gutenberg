@@ -21,7 +21,8 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
-import { CreateTemplatePartModal } from '@wordpress/fields';
+// @ts-expect-error `@wordpress/patterns` is not typed yet.
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import {
 	getAreaFromViewOverrides,
@@ -34,6 +35,7 @@ import { previewField } from './fields/preview';
 const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { Tabs } = unlock( componentsPrivateApis );
+const { CreateTemplatePartModal } = unlock( patternsPrivateApis );
 /**
  * Style dependencies
  */
@@ -369,7 +371,7 @@ function TemplatePartListView( {
 				<CreateTemplatePartModal
 					closeModal={ () => setShowTemplatePartModal( false ) }
 					blocks={ [] }
-					onCreate={ ( templatePart ) => {
+					onCreate={ ( templatePart: WpTemplatePart ) => {
 						setShowTemplatePartModal( false );
 						navigate( {
 							to: `/types/wp_template_part/edit/${ encodeURIComponent(

@@ -70,7 +70,7 @@
 		"@testing-library/dom": "^10.4.2",
 		"@testing-library/jest-dom": "^7.0.1",
 		"@testing-library/react": "^16.3.3",
-		"@testing-library/user-event": "^14.6.1",
+		"@testing-library/user-event": "^14.6.8",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/preferences": "file:../preferences",
 		"vitest": "^5.0.3"

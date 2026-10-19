@@ -3,6 +3,12 @@ import attachMediaInPost from '..';
 
 vi.mock( import( '@wordpress/core-data' ), () => ( { store: {} } ) );
 
+const { mockParse } = vi.hoisted( () => ( {
+	mockParse: vi.fn(),
+} ) );
+
+vi.mock( import( '@wordpress/blocks' ), () => ( { parse: mockParse } ) );
+
 const { mockInvalidate } = vi.hoisted( () => ( {
 	mockInvalidate: vi.fn(),
 } ) );
@@ -44,9 +50,15 @@ function createRegistry( { media = [], postType = { viewable: true } } = {} ) {
 /**
  * The post being saved, with whatever blocks the case needs.
  *
- * @param {Object[]} blocks The post's own blocks.
+ * @param {Object[]} blocks            The post's own blocks.
+ * @param {string}   [previousContent] The post's content before the save.
  */
-const post = ( blocks ) => ( { id: 7, type: 'post', blocks } );
+const post = ( blocks, previousContent ) => ( {
+	id: 7,
+	type: 'post',
+	blocks,
+	previousContent,
+} );
 
 describe( 'attachMediaInPost', () => {
 	it( 'attaches media that belongs to no post', async () => {
@@ -244,6 +256,90 @@ describe( 'attachMediaInPost', () => {
 		await attachMediaInPost( registry, post( atLimit ) );
 
 		expect( getEntityRecords ).toHaveBeenCalled();
+	} );
+
+	it( 'only looks up images added since the previous save', async () => {
+		mockParse.mockReturnValueOnce( [ imageBlock( 12 ) ] );
+		const { registry, getEntityRecords } = createRegistry();
+
+		await attachMediaInPost(
+			registry,
+			post(
+				[ imageBlock( 12 ), imageBlock( 13 ) ],
+				'<!-- wp:image {"id":12} /-->'
+			)
+		);
+
+		expect( mockParse ).toHaveBeenCalledWith(
+			'<!-- wp:image {"id":12} /-->',
+			{ __unstableSkipMigrationLogs: true }
+		);
+		expect( getEntityRecords ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			expect.objectContaining( { include: [ 13 ] } )
+		);
+	} );
+
+	it( 'makes no request when every image was there before the save', async () => {
+		mockParse.mockReturnValueOnce( [ imageBlock( 12 ) ] );
+		const { registry, getEntityRecords } = createRegistry();
+
+		await attachMediaInPost(
+			registry,
+			post( [ imageBlock( 12 ) ], '<!-- wp:image {"id":12} /-->' )
+		);
+
+		expect( getEntityRecords ).not.toHaveBeenCalled();
+	} );
+
+	it( 'counts only new images towards the limit', async () => {
+		const previous = Array.from( { length: 100 }, ( _, index ) =>
+			imageBlock( index + 1 )
+		);
+		mockParse.mockReturnValueOnce( previous );
+		const { registry, saveEntityRecord } = createRegistry( {
+			media: [ { id: 101, post: null } ],
+		} );
+
+		await attachMediaInPost(
+			registry,
+			post( [ ...previous, imageBlock( 101 ) ], 'previous content' )
+		);
+
+		expect( saveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'attachment',
+			{ id: 101, post: 7 }
+		);
+	} );
+
+	it( 'does not parse the previous content when the post has no media', async () => {
+		mockParse.mockClear();
+		const { registry } = createRegistry();
+
+		await attachMediaInPost(
+			registry,
+			post( [], '<!-- wp:image {"id":12} /-->' )
+		);
+
+		expect( mockParse ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not parse the previous content for a post type with no front end', async () => {
+		mockParse.mockClear();
+		const { registry } = createRegistry( {
+			postType: { viewable: false },
+		} );
+
+		await attachMediaInPost( registry, {
+			id: 7,
+			type: 'wp_template',
+			blocks: [ imageBlock( 12 ) ],
+			previousContent: '<!-- wp:image {"id":12} /-->',
+		} );
+
+		expect( mockParse ).not.toHaveBeenCalled();
 	} );
 
 	it( 'does not look up the post type when the post has no media', async () => {
