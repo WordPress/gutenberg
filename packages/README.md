@@ -267,19 +267,13 @@ See [Testing published packages across WordPress versions](/docs/contributors/co
 
 ## Maintaining Changelogs
 
-Each package keeps a `CHANGELOG.md` to tell consumers what changes when they upgrade and to inform the release process. Put new entries under `## Unreleased` at the top of the file, or create the heading if it is missing.
-
-Add an entry for changes that affect package consumers, such as API or type changes, bug fixes, deprecations, compatibility requirements, or updates to consumer documentation. Entries are optional for trivial changes and work with no consumer impact, such as tests, repository-only tooling, or behavior-preserving refactors. The **Internal** heading is available when an internal change needs a release note; it does not require an entry for every code change.
+Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries are optional for trivial changes or work with no consumer impact, such as tests and behavior-preserving refactors. Put new entries under `## Unreleased` at the top of the file, creating the heading if needed.
 
 ### Writing concise entries
 
-Write for someone upgrading the package. State what changed for them and any action they need to take.
-
--   Prefer one short sentence per entry. Name the affected API or component and describe the change consumers can observe.
--   Treat preserved behavior as the baseline for refactors and migrations. Omit lists of unchanged props, callbacks, values, styling, or accessibility behavior.
--   Omit implementation steps, file lists, test results, and internal library replacements unless they affect how consumers use the package.
--   Combine related details about the same consumer impact. Use separate entries or subsections only for distinct changes consumers need to know about.
--   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations and examples.
+-   Prefer one short sentence naming the affected API or component and what changed for consumers.
+-   Omit preserved behavior and internal implementation details. Avoid repeating the same change across subsections.
+-   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations.
 
 For example, summarize a migration's effect on custom styling:
 
