@@ -181,7 +181,6 @@
 - name: BaseControl
   props:
       - __nextHasNoMarginBottom
-      - as
       - children
       - className
       - help
@@ -1731,7 +1730,7 @@
       - ref
       - required
       - size
-      - triggerContent
+      - trigger
       - value
   subcomponents:
       - name: SelectControl.Group
@@ -1772,6 +1771,16 @@
         props:
             - className
             - render
+            - style
+      - name: SelectControl.Trigger
+        props:
+            - children
+            - className
+            - disabled
+            - nativeButton
+            - placeholder
+            - render
+            - size
             - style
 - name: Shortcut
   props:
