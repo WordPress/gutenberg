@@ -4,7 +4,7 @@
  * Cards are placed in document space rather than viewport space, so they scroll
  * with the content they annotate and no scroll listener is needed. Only a
  * change in layout - a resize, a font loading, an image settling - can move an
- * anchor, and a ResizeObserver covers those.
+ * anchor or resize a card, and a ResizeObserver covers those.
  */
 
 import {
@@ -73,6 +73,9 @@ export function createBoard(
 	/** Anchor element for every note that has one, keyed by note ID. */
 	const anchors = new Map< string, HTMLElement >();
 
+	/** The block each indicator was built for. */
+	const indicatorBlocks = new Map< HTMLElement, HTMLElement >();
+
 	// Only threads on the aligned board take part in layout. Resolved threads
 	// live in their own list and would otherwise push open threads off their
 	// anchors.
@@ -94,6 +97,7 @@ export function createBoard(
 		}
 
 		indicatorLayer.replaceChildren();
+		indicatorBlocks.clear();
 
 		for ( const block of document.querySelectorAll< HTMLElement >(
 			NOTE_BLOCK_SELECTOR
@@ -144,6 +148,7 @@ export function createBoard(
 			);
 
 			indicatorLayer.append( button );
+			indicatorBlocks.set( button, block );
 		}
 	}
 
@@ -200,18 +205,14 @@ export function createBoard(
 		const scrollX = window.scrollX;
 		const scrollY = window.scrollY;
 
-		for ( const button of indicatorLayer.querySelectorAll< HTMLElement >(
-			'.wp-notes-preview__indicator'
-		) ) {
-			const anchor = anchors.get( button.dataset.noteId as string );
-
-			if ( ! anchor ) {
+		// A note spanning several blocks has an indicator on each, so place
+		// each one against the block it was built for, not the note's anchor.
+		for ( const [ button, block ] of indicatorBlocks ) {
+			if ( ! block.isConnected ) {
 				button.hidden = true;
 				continue;
 			}
 
-			const block =
-				anchor.closest< HTMLElement >( NOTE_BLOCK_SELECTOR ) ?? anchor;
 			const rect = block.getBoundingClientRect();
 
 			button.hidden = false;
@@ -261,12 +262,6 @@ export function createBoard(
 			heights[ id ] = card.offsetHeight;
 		}
 
-		const tops = calculateThreadTops( {
-			anchors: anchorTops(),
-			heights,
-			selectedId,
-		} );
-
 		/*
 		 * Card tops are document-space, but the board sits below the rail's
 		 * header inside a fixed panel. Subtracting the scroller's viewport top
@@ -274,6 +269,14 @@ export function createBoard(
 		 * The board's own scroll translation supplies the rest.
 		 */
 		const origin = boardEl.parentElement?.getBoundingClientRect().top ?? 0;
+
+		// A card above the origin could never be scrolled into view.
+		const tops = calculateThreadTops( {
+			anchors: anchorTops(),
+			heights,
+			selectedId,
+			minTop: origin,
+		} );
 
 		for ( const [ id, top ] of Object.entries( tops ) ) {
 			cards.get( id )?.style.setProperty( 'top', `${ top - origin }px` );
@@ -341,19 +344,28 @@ export function createBoard(
 			return;
 		}
 
-		const block = anchors
+		// Every block of a note that spans several, falling back to the block
+		// around an inline marker whose own block lost its `metadata.noteId`.
+		const blocks = Array.from(
+			document.querySelectorAll< HTMLElement >( NOTE_BLOCK_SELECTOR )
+		).filter( ( block ) =>
+			parseNoteIds( block.dataset.wpNoteId ?? null ).includes( id )
+		);
+		const fallback = anchors
 			.get( id )
 			?.closest< HTMLElement >( NOTE_BLOCK_SELECTOR );
 
-		if ( ! block ) {
-			return;
+		if ( ! blocks.length && fallback ) {
+			blocks.push( fallback );
 		}
 
-		block.classList.add( 'is-note-selected' );
-		block.style.setProperty(
-			'--wp-notes-preview-author-color',
-			cards.get( id )?.dataset.authorColor ?? ''
-		);
+		for ( const block of blocks ) {
+			block.classList.add( 'is-note-selected' );
+			block.style.setProperty(
+				'--wp-notes-preview-author-color',
+				cards.get( id )?.dataset.authorColor ?? ''
+			);
+		}
 	}
 
 	function setSelected( id: string | null ): void {
@@ -406,8 +418,13 @@ export function createBoard(
 		}
 	}
 
+	// The cards sit in a fixed panel, so their own size changes - a reply
+	// error, a resized textarea, an image settling - never reach the body.
 	const observer = new window.ResizeObserver( schedule );
 	observer.observe( document.body );
+	for ( const card of cards.values() ) {
+		observer.observe( card );
+	}
 
 	const passive = { passive: true } as const;
 	window.addEventListener( 'resize', schedule, passive );
