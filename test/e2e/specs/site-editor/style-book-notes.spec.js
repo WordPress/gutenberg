@@ -214,6 +214,102 @@ test.describe( 'Style Book notes', () => {
 		).toBeVisible();
 	} );
 
+	test( 'keeps a selected Style Book note away from the page notes', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// A page supports notes, so its own notes sidebar shares the note
+		// selection with the Style Book.
+		const { id: pageId } = await requestUtils.createPage( {
+			title: 'Page without notes',
+			status: 'publish',
+		} );
+		await admin.visitSiteEditor( {
+			postId: pageId,
+			postType: 'page',
+			canvas: 'edit',
+		} );
+		// Styles is only on offer while the page shows its template.
+		await expect(
+			editor.canvas.getByRole( 'textbox', { name: 'Add title' } )
+		).toBeVisible();
+		await page.evaluate( () => {
+			window.wp.data
+				.dispatch( 'core/editor' )
+				.setRenderingMode( 'template-locked' );
+		} );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+		await page.getByRole( 'button', { name: 'Style Book' } ).click();
+		await page.getByRole( 'tab', { name: 'Text' } ).click();
+
+		await styleBookFrame( page )
+			.getByRole( 'button', { name: 'Add note on Headings' } )
+			.click();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await sidebar
+			.getByRole( 'textbox', { name: 'New note on Headings' } )
+			.fill( 'Selected after saving.' );
+		await sidebar.getByRole( 'button', { name: 'Add note' } ).click();
+		// Saving selects the new note, which expands its thread.
+		await expect(
+			sidebar.getByRole( 'treeitem', {
+				name: /Note on Headings/,
+				expanded: true,
+			} )
+		).toBeVisible();
+
+		await sidebar
+			.getByRole( 'button', { name: 'Close Style Book notes' } )
+			.click();
+
+		// The page's floating notes sidebar must not take the place of Styles
+		// on the way back.
+		await expect(
+			page.locator( 'role=region[name="Style Book"i]' )
+		).toBeVisible();
+		await expect(
+			page.getByRole( 'button', { name: 'Style Book', pressed: true } )
+		).toBeVisible();
+
+		/*
+		 * A Style Book note left selected would open the page's floating notes
+		 * sidebar, empty, the moment nothing else is open. Watch the store for
+		 * a while rather than checking once, since that happens after a render.
+		 */
+		const openedFloatingNotes = page.evaluate(
+			() =>
+				new Promise( ( resolve ) => {
+					const { select, subscribe } = window.wp.data;
+					const unsubscribe = subscribe( () => {
+						if (
+							select(
+								'core/interface'
+							).getActiveComplementaryArea( 'core' ) ===
+							'edit-post/collab-sidebar'
+						) {
+							unsubscribe();
+							resolve( true );
+						}
+					} );
+					setTimeout( () => {
+						unsubscribe();
+						resolve( false );
+					}, 2000 );
+				} )
+		);
+		await page.getByRole( 'button', { name: 'Close Styles' } ).click();
+		expect( await openedFloatingNotes ).toBe( false );
+
+		await requestUtils.deleteAllPages();
+	} );
+
 	test( 'stores the note on global styles with the example as its anchor', async ( {
 		admin,
 		page,

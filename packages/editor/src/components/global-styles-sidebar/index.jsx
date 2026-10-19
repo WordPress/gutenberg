@@ -15,7 +15,10 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import PluginSidebar from '../plugin-sidebar';
 import WelcomeGuideStyles from './welcome-guide';
-import { STYLE_BOOK_NOTES_SIDEBAR } from '../collab-sidebar/constants';
+import {
+	FLOATING_NOTES_SIDEBAR,
+	STYLE_BOOK_NOTES_SIDEBAR,
+} from '../collab-sidebar/constants';
 
 export const GLOBAL_STYLES_SIDEBAR = 'edit-site/global-styles';
 
@@ -139,8 +142,14 @@ export default function GlobalStylesSidebar() {
 			return;
 		}
 
+		/*
+		 * The post's floating notes sidebar reopens itself synchronously when
+		 * the area empties while a note is selected, so it can already be
+		 * standing in for "nothing open" by the time this runs.
+		 */
 		if (
-			! activeComplementaryArea &&
+			( ! activeComplementaryArea ||
+				activeComplementaryArea === FLOATING_NOTES_SIDEBAR ) &&
 			previousActiveArea === STYLE_BOOK_NOTES_SIDEBAR &&
 			showStylebook &&
 			isVisualEditorMode

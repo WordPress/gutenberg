@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
 import { comment as commentIcon } from '@wordpress/icons';
 import PluginSidebar from '../../plugin-sidebar';
 import { STYLE_BOOK_NOTES_SIDEBAR } from '../../collab-sidebar/constants';
@@ -46,6 +47,27 @@ function StyleBookNotesSidebar( {
 	);
 
 	const { groups } = useStyleBookNoteThreads( { labels } );
+
+	/*
+	 * The note selection is shared with the post's own notes sidebar, which
+	 * opens itself whenever a note is selected and nothing else is open. While
+	 * this sidebar is open every selection is a Style Book note, so it is
+	 * cleared on the way out; left behind, it would open that sidebar, empty,
+	 * as soon as Styles closes too.
+	 */
+	const { selectNote } = unlock( useDispatch( editorStore ) );
+	const isOpen = useSelect(
+		( select ) =>
+			select( interfaceStore ).getActiveComplementaryArea( 'core' ) ===
+			STYLE_BOOK_NOTES_SIDEBAR,
+		[]
+	);
+	useEffect( () => {
+		if ( ! isOpen ) {
+			return undefined;
+		}
+		return () => selectNote( undefined );
+	}, [ isOpen, selectNote ] );
 
 	return (
 		<NotesSidebar
