@@ -13721,11 +13721,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/color-preview.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/dimensions-panel.tsx": {
 		"no-restricted-imports": {
 			"count": 1
