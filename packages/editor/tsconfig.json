@@ -52,7 +52,7 @@
 		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../views/tsconfig.build.json" },
-		{ "path": "../warning" },
+		{ "path": "../warning/tsconfig.build.json" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	]
 }
