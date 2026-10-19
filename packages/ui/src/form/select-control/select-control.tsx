@@ -1,7 +1,11 @@
+import { useRender } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
 import { Field, Select } from '../primitives';
 import { Item } from './item';
+import { Trigger } from './trigger';
 import type { SelectControlProps } from './types';
+
+const DEFAULT_TRIGGER = <Trigger />;
 
 /**
  * A complete select field with integrated label and description.
@@ -21,24 +25,24 @@ export const SelectControl = forwardRef<
 		placeholder,
 		popupWidth = 'content',
 		size = 'default',
-		triggerContent,
+		trigger,
 		...restProps
 	},
 	ref
 ) {
+	const triggerElement = useRender( {
+		render: trigger ?? DEFAULT_TRIGGER,
+		ref,
+		props: { placeholder, size },
+	} );
+
 	return (
 		<Field.Root className={ className }>
 			<Field.Label hideFromVision={ hideLabelFromVision }>
 				{ label }
 			</Field.Label>
 			<Select.Root items={ items } { ...restProps }>
-				<Select.Trigger
-					ref={ ref }
-					placeholder={ placeholder }
-					size={ size }
-				>
-					{ triggerContent }
-				</Select.Trigger>
+				{ triggerElement }
 				<Select.Popup width={ popupWidth }>
 					{ children !== undefined
 						? children
