@@ -5,7 +5,7 @@ import '../store';
 import ifViewportMatches from '../if-viewport-matches';
 
 vi.mock( import( '../../../compose/src/hooks/use-viewport-match' ), () => ( {
-	default: vi.fn(),
+	default: vi.fn< typeof useViewportMatch >(),
 } ) );
 
 const mockedUseViewportMatch = vi.mocked( useViewportMatch );

@@ -5,12 +5,21 @@ import '../store';
 import withViewportMatch from '../with-viewport-match';
 
 vi.mock( import( '../../../compose/src/hooks/use-viewport-match' ), () => ( {
-	default: vi.fn(),
+	default: vi.fn< typeof useViewportMatch >(),
 } ) );
 
 const mockedUseViewportMatch = vi.mocked( useViewportMatch );
 
-const Component = ( { isWide, isSmall, isLarge, isLessThanSmall } ) => {
+type ViewportMatchProps = Partial<
+	Record< 'isWide' | 'isSmall' | 'isLarge' | 'isLessThanSmall', boolean >
+>;
+
+const Component = ( {
+	isWide,
+	isSmall,
+	isLarge,
+	isLessThanSmall,
+}: ViewportMatchProps ) => {
 	return (
 		<div>
 			<span>{ isWide && 'Is wide' }</span>
