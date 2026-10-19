@@ -4,6 +4,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { createRegistry } from '@wordpress/data';
+import { addFilter, removeFilter } from '@wordpress/hooks';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import warning from '@wordpress/warning';
@@ -28,6 +29,10 @@ const postTypeConfig = {
 	transientEdits: { blocks: true, selection: true },
 	mergedEdits: { meta: true },
 	rawAttributes: [ 'title', 'excerpt', 'content' ],
+	getRevisionsUrl: ( parentId, revisionId ) =>
+		`/wp/v2/posts/${ parentId }/revisions${
+			revisionId ? '/' + revisionId : ''
+		}`,
 };
 
 const postTypeEntity = {
@@ -703,7 +708,13 @@ describe( 'Post actions', () => {
 			}
 		}
 
-		function setUpEditor( registry ) {
+		/**
+		 * Opens the editor with `imagePost.content` over the given stored post.
+		 *
+		 * @param {Object} registry    The registry to set up.
+		 * @param {Object} [savedPost] The post as stored before the save.
+		 */
+		function setUpEditor( registry, savedPost = imagePost ) {
 			// Only the `post` entity is registered by default, and without a
 			// config for attachments the records lookup cannot resolve.
 			registry.dispatch( coreStore ).addEntities( [
@@ -720,8 +731,8 @@ describe( 'Post actions', () => {
 			] );
 			registry
 				.dispatch( coreStore )
-				.receiveEntityRecords( 'postType', 'post', imagePost );
-			registry.dispatch( editorStore ).setupEditor( imagePost, {
+				.receiveEntityRecords( 'postType', 'post', savedPost );
+			registry.dispatch( editorStore ).setupEditor( savedPost, {
 				content: imagePost.content,
 			} );
 			// The block editor store is populated by the editor provider, which
@@ -843,6 +854,41 @@ describe( 'Post actions', () => {
 					request.startsWith( 'PUT /wp/v2/media/99' )
 				)
 			).toBe( false );
+		} );
+
+		/**
+		 * Images already in a published post may have been left unattached on
+		 * purpose.
+		 */
+		it( 'leaves alone images that were already in a published post', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry, { ...imagePost, status: 'publish' } );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		it( 'attaches images added to a published post', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry, {
+				...imagePost,
+				status: 'publish',
+				content: '',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect( attachedTo ).toBe( postId );
 		} );
 
 		it( 'attaches nothing when the editor setting is off', async () => {
@@ -1095,6 +1141,316 @@ describe( 'Post actions', () => {
 			} );
 			expect( dispatch ).toHaveBeenCalledWith( {
 				type: 'REQUEST_POST_DELETE_FINISH',
+			} );
+		} );
+	} );
+
+	describe( 'restoreRevision()', () => {
+		const revisionId = 12;
+
+		// Remove the filters added by tests, including when a test fails.
+		afterEach( () => {
+			removeFilter( 'editor.preSavePost', 'test/stop-save' );
+			removeFilter( 'editor.preSavePost', 'test/hold-save' );
+		} );
+
+		const revision = {
+			id: revisionId,
+			date: '2026-10-13T10:00:00',
+			modified: '2026-10-13T10:00:00',
+			author: 1,
+			title: { raw: 'Autosaved title' },
+			excerpt: { raw: '' },
+			content: { raw: 'autosaved content' },
+		};
+
+		/**
+		 * Sets up a registry with the given post open in the editor, and
+		 * records the data sent with each save.
+		 *
+		 * @param {Object}                   post             The post to edit.
+		 * @param {Object}                   [options]        Options.
+		 * @param {Object}                   [options.edits]  Unsaved edits to apply to the post.
+		 * @param {(data: Object) => Object} [options.onSave] Handles a save request. Returns the response.
+		 * @return {Object} The registry and the data sent with each save.
+		 */
+		function setUpRestore( post, { edits, onSave } = {} ) {
+			const savedData = [];
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path, data } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					savedData.push( data );
+					if ( onSave ) {
+						return onSave( data );
+					}
+					return { ...post, ...data };
+				} else if (
+					method === 'GET' &&
+					path.startsWith(
+						`/wp/v2/posts/${ postId }/revisions/${ revisionId }`
+					)
+				) {
+					return revision;
+				} else if (
+					method === 'GET' &&
+					path.startsWith( '/wp/v2/types/post' )
+				) {
+					return {
+						json: () => Promise.resolve( {} ),
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+			registry.dispatch( editorStore ).setupEditor( post, edits );
+
+			return { registry, savedData };
+		}
+
+		it( 'saves the current content of a draft before restoring a revision', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 2 );
+			expect( savedData[ 0 ] ).toMatchObject( {
+				content: 'unsaved content',
+			} );
+			expect( savedData[ 1 ] ).toMatchObject( {
+				title: 'Autosaved title',
+				content: 'autosaved content',
+			} );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'autosaved content' );
+		} );
+
+		it( 'does not save first for a published post', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'publish',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 1 );
+			expect( savedData[ 0 ] ).toMatchObject( {
+				content: 'autosaved content',
+			} );
+		} );
+
+		it( 'does not restore the revision when saving the current content fails', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+				onSave: () => {
+					throw {
+						code: 'test_save_failure',
+						message: 'Details from server.',
+					};
+				},
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 1 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'unsaved content' );
+			// Revisions mode only shows snackbars.
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.find(
+						( notice ) =>
+							notice.id === 'editor-revision-restore-failed'
+					)
+			).toMatchObject( { type: 'snackbar', explicitDismiss: true } );
+		} );
+
+		it( 'does not restore the revision when a filter stops the save of the current content', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+			addFilter( 'editor.preSavePost', 'test/stop-save', () => {
+				throw new Error( 'Stopped by a filter.' );
+			} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 0 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'unsaved content' );
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.map( ( notice ) => notice.id )
+			).toContain( 'editor-revision-restore-failed' );
+		} );
+
+		it( 'keeps the restored content in the editor when saving the restored revision fails', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+				onSave: ( data ) => {
+					// Let the save of the current content succeed, and fail
+					// the save of the restored revision.
+					if ( savedData.length === 1 ) {
+						return { ...post, ...data };
+					}
+					throw {
+						code: 'test_save_failure',
+						message: 'Details from server.',
+					};
+				},
+			} );
+			registry
+				.dispatch( noticesStore )
+				.createWarningNotice( 'There is an autosave.', {
+					id: 'autosave-exists',
+				} );
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect( savedData ).toHaveLength( 2 );
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'autosaved content' );
+			expect( registry.select( editorStore ).isEditedPostDirty() ).toBe(
+				true
+			);
+
+			const allNotices = registry.select( noticesStore ).getNotices();
+			const noticeIds = allNotices.map( ( notice ) => notice.id );
+			// The editor has left revisions mode by now, so the notice is
+			// shown inline where it stays in view.
+			expect(
+				allNotices.find(
+					( notice ) => notice.id === 'editor-revision-restore-failed'
+				)
+			).toMatchObject( { type: 'default' } );
+			expect( noticeIds ).toContain( 'autosave-exists' );
+			expect( noticeIds ).not.toContain( 'editor-revision-restored' );
+		} );
+
+		it( 'does not restore the revision while the post is saving', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'Saved title',
+				content: 'saved content',
+				excerpt: '',
+				status: 'draft',
+			};
+			const { registry, savedData } = setUpRestore( post, {
+				edits: { content: 'unsaved content' },
+			} );
+
+			// Hold the save open before its request is sent.
+			let finishSave;
+			addFilter(
+				'editor.preSavePost',
+				'test/hold-save',
+				( edits ) =>
+					new Promise( ( resolve ) => {
+						finishSave = () => resolve( edits );
+					} )
+			);
+
+			const savePromise = registry.dispatch( editorStore ).savePost();
+			expect( registry.select( editorStore ).isSavingPost() ).toBe(
+				true
+			);
+
+			await unlock( registry.dispatch( editorStore ) ).restoreRevision(
+				revisionId
+			);
+
+			expect(
+				registry.select( editorStore ).getEditedPostContent()
+			).toBe( 'unsaved content' );
+			// Revisions mode only shows snackbars.
+			expect(
+				registry
+					.select( noticesStore )
+					.getNotices()
+					.find(
+						( notice ) =>
+							notice.id === 'editor-revision-restore-failed'
+					)
+			).toMatchObject( { type: 'snackbar', explicitDismiss: true } );
+
+			finishSave();
+			await savePromise;
+			expect( savedData ).toHaveLength( 1 );
+			expect( savedData[ 0 ] ).toMatchObject( {
+				content: 'unsaved content',
 			} );
 		} );
 	} );
