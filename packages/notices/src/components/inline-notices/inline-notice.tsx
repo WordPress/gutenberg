@@ -123,7 +123,12 @@ export default function InlineNotice( {
 			) : (
 				<Notice.Description>
 					{ content }
-					{ slot && <Slot name={ slot } /> }
+					{ slot && (
+						<>
+							{ ' ' }
+							<Slot name={ slot } />
+						</>
+					) }
 				</Notice.Description>
 			) }
 			{ hasActions && (

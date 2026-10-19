@@ -65,5 +65,5 @@ export default function AutosaveRetry( {
 	if ( ! text ) {
 		return null;
 	}
-	return <Fill name={ AUTOSAVE_RETRY_SLOT }> { text }</Fill>;
+	return <Fill name={ AUTOSAVE_RETRY_SLOT }>{ text }</Fill>;
 }

@@ -63,7 +63,9 @@ export function createNotice(
 		} );
 	}
 
-	const slot = ( options as Record< symbol, unknown > )[ NOTICE_SLOT ];
+	const slot = ( options as Record< symbol, symbol | undefined > )[
+		NOTICE_SLOT
+	];
 
 	return {
 		type: 'CREATE_NOTICE',
@@ -85,7 +87,7 @@ export function createNotice(
 			icon,
 			explicitDismiss,
 			onDismiss,
-			...( slot === undefined ? {} : { [ NOTICE_SLOT ]: slot } ),
+			...( slot && { [ NOTICE_SLOT ]: slot } ),
 		},
 	};
 }
