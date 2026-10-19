@@ -1,22 +1,8 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
+import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
+import { kebabCase } from '@wordpress/kebab-case';
 import { getInlineStyles } from './style';
 import { getFontSizeClass } from '../components/font-sizes';
-import { getTypographyFontSizeValue } from '../components/global-styles/typography-utils';
-import { unlock } from '../lock-unlock';
-
-const { kebabCase } = unlock( componentsPrivateApis );
 
 /*
  * This utility is intended to assist where the serialization of the typography

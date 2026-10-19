@@ -10,7 +10,7 @@ export type DropZoneProps = {
 	 *
 	 * @default "upload"
 	 */
-	icon?: JSX.Element;
+	icon?: React.JSX.Element;
 	/**
 	 * A string to be shown within the drop zone area.
 	 *

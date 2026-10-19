@@ -1,0 +1,524 @@
+import { describe, expect, it } from 'vitest';
+import { act, renderHook } from '@testing-library/react';
+import { useMediaEditorState } from '../use-media-editor-state';
+
+const IMAGE = {
+	src: 'test.jpg',
+	naturalWidth: 1200,
+	naturalHeight: 600,
+};
+
+// Loading the image through the session, as the canvas does, so the
+// baseline and history start from the loaded image.
+function setupHook( visualSize = { width: 600, height: 400 } ) {
+	const view = renderHook( () => useMediaEditorState() );
+	act( () => {
+		view.result.current.setSourceImage( IMAGE );
+		view.result.current.cropper.setVisualSize( visualSize );
+	} );
+	return view;
+}
+
+describe( 'useMediaEditorState', () => {
+	describe( 'initial state', () => {
+		it( 'starts with default cropOptions', () => {
+			const { result } = renderHook( () => useMediaEditorState() );
+
+			expect( result.current.cropOptions.aspectRatioValue ).toBe( '0' );
+		} );
+
+		it( 'starts with isDirty=false and no undo / redo', () => {
+			const { result } = setupHook();
+
+			expect( result.current.isDirty ).toBe( false );
+			expect( result.current.cropper.isDirty ).toBe( false );
+			expect( result.current.hasUndo ).toBe( false );
+			expect( result.current.hasRedo ).toBe( false );
+		} );
+	} );
+
+	describe( 'session edits versus image output edits', () => {
+		it( 'counts an aspect-ratio preset change as a session edit only', () => {
+			// No visual size is reported, so picking a ratio changes the
+			// preset without reshaping the crop.
+			const { result } = renderHook( () => useMediaEditorState() );
+			act( () => result.current.setSourceImage( IMAGE ) );
+
+			act( () => result.current.setAspectRatioValue( '1' ) );
+
+			expect( result.current.isDirty ).toBe( true );
+			expect( result.current.cropper.isDirty ).toBe( false );
+			expect( result.current.hasOutputEdits ).toBe( false );
+		} );
+
+		it( 'counts a geometry change as an image output edit', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.cropper.setRotation( 45 ) );
+
+			expect( result.current.isDirty ).toBe( true );
+			expect( result.current.cropper.isDirty ).toBe( true );
+			expect( result.current.hasOutputEdits ).toBe( true );
+		} );
+	} );
+
+	describe( 'history — undo / redo across slices', () => {
+		it( 'records the pre-state of each action and undoes it', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.cropper.setRotation( 45 ) );
+
+			expect( result.current.cropper.state.rotation ).toBe( 45 );
+			expect( result.current.hasUndo ).toBe( true );
+
+			act( () => result.current.undo() );
+
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+			expect( result.current.hasUndo ).toBe( false );
+			expect( result.current.hasRedo ).toBe( true );
+		} );
+
+		it( 'redo re-applies an undone action', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.cropper.setRotation( 45 ) );
+			act( () => result.current.undo() );
+			act( () => result.current.redo() );
+
+			expect( result.current.cropper.state.rotation ).toBe( 45 );
+		} );
+
+		it( 'redo stack clears on a new action after undo', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.cropper.setRotation( 45 ) );
+			act( () => result.current.undo() );
+			act( () => result.current.cropper.setRotation( 90 ) );
+
+			expect( result.current.hasRedo ).toBe( false );
+		} );
+
+		it( 'no-op actions do not record history entries', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.setAspectRatioValue( '0' ) );
+
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'a single undo restores both cropOptions and cropRect after aspect-ratio change', () => {
+			const { result } = setupHook();
+			const initialCropRect = result.current.cropper.state.cropRect;
+			const initialPreset = result.current.cropOptions.aspectRatioValue;
+
+			act( () => result.current.setAspectRatioValue( '1' ) ); // Square
+
+			// Both slices changed atomically: preset key and cropRect.
+			expect( result.current.cropOptions.aspectRatioValue ).toBe( '1' );
+			expect( result.current.cropper.state.cropRect ).not.toEqual(
+				initialCropRect
+			);
+			expect( result.current.cropper.isDirty ).toBe( true );
+			// Only ONE undo entry — atomic transaction.
+			expect( result.current.hasUndo ).toBe( true );
+
+			act( () => result.current.undo() );
+
+			expect( result.current.cropOptions.aspectRatioValue ).toBe(
+				initialPreset
+			);
+			expect( result.current.cropper.state.cropRect ).toEqual(
+				initialCropRect
+			);
+		} );
+	} );
+
+	describe( 'gestures — coalesce many changes into one undo entry', () => {
+		it( 'coalesces all changes between beginGesture and endGesture', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.beginGesture() );
+			act( () => result.current.cropper.setRotation( 10 ) );
+			act( () => result.current.cropper.setRotation( 20 ) );
+			act( () => result.current.cropper.setRotation( 30 ) );
+			act( () => result.current.endGesture() );
+
+			expect( result.current.cropper.state.rotation ).toBe( 30 );
+			expect( result.current.hasUndo ).toBe( true );
+
+			// One undo restores all the way to the pre-gesture state.
+			act( () => result.current.undo() );
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+		} );
+
+		it( 'an empty gesture (no changes) records no history', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.beginGesture() );
+			act( () => result.current.endGesture() );
+
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'undo during an open gesture flushes the gesture first', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.beginGesture() );
+			act( () => result.current.cropper.setRotation( 45 ) );
+			// Undo without endGesture should still flush the in-flight change.
+			act( () => result.current.undo() );
+
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+			expect( result.current.hasRedo ).toBe( true );
+		} );
+
+		it( 'keeps the original gesture snapshot if beginGesture is called repeatedly', () => {
+			const { result } = setupHook();
+
+			act( () => {
+				result.current.beginGesture();
+				result.current.cropper.setRotation( 10 );
+				result.current.beginGesture();
+				result.current.cropper.setRotation( 20 );
+				result.current.endGesture();
+			} );
+
+			expect( result.current.cropper.state.rotation ).toBe( 20 );
+
+			act( () => result.current.undo() );
+
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+		} );
+
+		it( 'does not record a gesture that returns to its starting state', () => {
+			const { result } = setupHook();
+
+			act( () => {
+				result.current.beginGesture();
+				result.current.cropper.setRotation( 10 );
+				result.current.cropper.setRotation( 0 );
+				result.current.endGesture();
+			} );
+
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+	} );
+
+	describe( 'SET_ASPECT_RATIO_VALUE atomicity', () => {
+		it( 'reshapes cropRect when a fixed ratio is selected with visualSize > 0', () => {
+			const { result } = setupHook( { width: 600, height: 400 } );
+
+			act( () => result.current.setAspectRatioValue( '1' ) ); // Square
+
+			// At visualSize 600x400, the inscribed square has w/h such that
+			// pixel ratio = 1. normalizedRatio = 1 * 400 / 600 = 0.666...
+			// So normalized w = 0.666..., h = 1.
+			expect( result.current.cropper.state.cropRect.width ).toBeCloseTo(
+				2 / 3,
+				5
+			);
+			expect( result.current.cropper.state.cropRect.height ).toBeCloseTo(
+				1,
+				5
+			);
+		} );
+
+		it( 'Free leaves the cropRect alone', () => {
+			const { result } = setupHook();
+			const original = result.current.cropper.state.cropRect;
+
+			// User-picked custom crop first.
+			act( () =>
+				result.current.cropper.setCropRect( {
+					x: 0.1,
+					y: 0.1,
+					width: 0.5,
+					height: 0.5,
+				} )
+			);
+			const beforeFree = result.current.cropper.state.cropRect;
+
+			// Switch to Free — cropRect should NOT snap back to anything.
+			act( () => result.current.setAspectRatioValue( '0' ) );
+
+			expect( result.current.cropper.state.cropRect ).toEqual(
+				beforeFree
+			);
+			expect( original ).not.toEqual( beforeFree );
+		} );
+
+		it( 'resolves Original from the loaded image', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.setAspectRatioValue( '-1' ) ); // Original
+
+			// Image is 1200x600 = ratio 2. inscribedRect at visualSize 600x400:
+			// normalizedRatio = 2 * 400 / 600 = 1.333... > 1, so h = 1/1.333 = 0.75.
+			expect( result.current.cropper.state.cropRect.width ).toBeCloseTo(
+				1,
+				5
+			);
+			expect( result.current.cropper.state.cropRect.height ).toBeCloseTo(
+				0.75,
+				5
+			);
+		} );
+	} );
+
+	describe( 'reset', () => {
+		it( 'puts geometry, crop options and edits back to their starting state', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.setAspectRatioValue( '1' ) );
+			act( () => result.current.cropper.setRotation( 45 ) );
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
+
+			act( () => result.current.reset() );
+
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+			expect( result.current.cropper.state.image ).toEqual( IMAGE );
+			expect( result.current.cropOptions ).toEqual( {
+				aspectRatioValue: '0',
+			} );
+			expect( result.current.edits ).toEqual( {} );
+			expect( result.current.isDirty ).toBe( false );
+		} );
+
+		it( 'is undone in one step', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.setAspectRatioValue( '1' ) );
+			act( () => result.current.cropper.setRotation( 45 ) );
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
+			act( () => result.current.reset() );
+
+			act( () => result.current.undo() );
+
+			expect( result.current.cropper.state.rotation ).toBe( 45 );
+			expect( result.current.cropOptions ).toEqual( {
+				aspectRatioValue: '1',
+			} );
+			expect( result.current.edits ).toEqual( {
+				'test/vignette': { amount: 0.5 },
+			} );
+		} );
+
+		it( 'records no history on a clean session', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.reset() );
+
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+	} );
+
+	describe( 'viewport reshape is silent', () => {
+		it( 'adjustCropRectForViewport does NOT record an undo entry', () => {
+			const { result } = setupHook();
+
+			act( () =>
+				result.current.cropper.adjustCropRectForViewport( {
+					x: 0,
+					y: 0,
+					width: 0.5,
+					height: 0.5,
+				} )
+			);
+
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+	} );
+
+	describe( 'edits', () => {
+		it( 'undoes and redoes an edit and a crop change in the order they were made', () => {
+			const { result } = setupHook();
+
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
+			act( () => result.current.cropper.setRotation( 45 ) );
+
+			act( () => result.current.undo() );
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+			expect( result.current.edits ).toEqual( {
+				'test/vignette': { amount: 0.5 },
+			} );
+
+			act( () => result.current.undo() );
+			expect( result.current.edits ).toEqual( {} );
+
+			act( () => result.current.redo() );
+			expect( result.current.edits ).toEqual( {
+				'test/vignette': { amount: 0.5 },
+			} );
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+
+			act( () => result.current.redo() );
+			expect( result.current.cropper.state.rotation ).toBe( 45 );
+		} );
+
+		it( 'groups the edits made during a gesture into one undo entry', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.beginGesture() );
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.1 } )
+			);
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.2 } )
+			);
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.3 } )
+			);
+			act( () => result.current.endGesture() );
+
+			expect( result.current.edits ).toEqual( {
+				'test/vignette': { amount: 0.3 },
+			} );
+
+			act( () => result.current.undo() );
+
+			expect( result.current.edits ).toEqual( {} );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'records no history when the new value is equal in content', () => {
+			const { result } = setupHook();
+
+			act( () =>
+				result.current.setEdit( 'test/tint', { rgb: [ 255, 0, 0 ] } )
+			);
+			act( () =>
+				result.current.setEdit( 'test/tint', { rgb: [ 255, 0, 0 ] } )
+			);
+			act( () => result.current.undo() );
+
+			expect( result.current.edits ).toEqual( {} );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'is clean again once the edit is removed', () => {
+			const { result } = setupHook();
+
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
+			expect( result.current.isDirty ).toBe( true );
+
+			act( () => result.current.setEdit( 'test/vignette', undefined ) );
+
+			expect( result.current.edits ).toEqual( {} );
+			expect( result.current.isDirty ).toBe( false );
+		} );
+
+		it( 'makes the session dirty without counting as an image output edit', () => {
+			const { result } = setupHook();
+
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
+
+			expect( result.current.isDirty ).toBe( true );
+			expect( result.current.cropper.isDirty ).toBe( false );
+			expect( result.current.hasOutputEdits ).toBe( false );
+		} );
+
+		it( 'clears the edits when a different image is loaded', () => {
+			const { result } = setupHook();
+
+			act( () =>
+				result.current.setEdit( 'test/vignette', { amount: 0.5 } )
+			);
+			act( () =>
+				result.current.setSourceImage( {
+					src: 'other.jpg',
+					naturalWidth: 800,
+					naturalHeight: 800,
+				} )
+			);
+
+			expect( result.current.edits ).toEqual( {} );
+			expect( result.current.isDirty ).toBe( false );
+		} );
+	} );
+
+	describe( 'setSourceImage', () => {
+		it( 'clears history and resets isDirty', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.cropper.setRotation( 45 ) );
+			expect( result.current.hasUndo ).toBe( true );
+			expect( result.current.isDirty ).toBe( true );
+
+			act( () =>
+				result.current.setSourceImage( {
+					src: 'other.jpg',
+					naturalWidth: 800,
+					naturalHeight: 800,
+				} )
+			);
+
+			expect( result.current.hasUndo ).toBe( false );
+			expect( result.current.hasRedo ).toBe( false );
+			expect( result.current.isDirty ).toBe( false );
+		} );
+
+		it( 'resets geometry and crop options for a new image', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.cropper.setRotation( 45 ) );
+			act( () => result.current.setAspectRatioValue( '1' ) );
+			expect( result.current.cropper.state.rotation ).toBe( 45 );
+			expect( result.current.cropOptions.aspectRatioValue ).toBe( '1' );
+
+			act( () =>
+				result.current.setSourceImage( {
+					src: 'other.jpg',
+					naturalWidth: 800,
+					naturalHeight: 800,
+				} )
+			);
+
+			// Edits made against one image must not survive onto another.
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+			expect( result.current.cropOptions.aspectRatioValue ).toBe( '0' );
+		} );
+
+		it( 'starts a fresh session when the cropper reports a different image', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.cropper.setRotation( 45 ) );
+			act( () =>
+				result.current.cropper.setImage( {
+					src: 'other.jpg',
+					naturalWidth: 800,
+					naturalHeight: 800,
+				} )
+			);
+
+			expect( result.current.cropper.state.image?.src ).toBe(
+				'other.jpg'
+			);
+			expect( result.current.cropper.state.rotation ).toBe( 0 );
+			expect( result.current.hasUndo ).toBe( false );
+		} );
+
+		it( 'does not clear history when the same image is reported again', () => {
+			const { result } = setupHook();
+
+			act( () => result.current.cropper.setRotation( 45 ) );
+			expect( result.current.hasUndo ).toBe( true );
+			expect( result.current.cropper.isDirty ).toBe( true );
+
+			act( () => result.current.setSourceImage( IMAGE ) );
+
+			expect( result.current.hasUndo ).toBe( true );
+			expect( result.current.cropper.isDirty ).toBe( true );
+		} );
+	} );
+} );

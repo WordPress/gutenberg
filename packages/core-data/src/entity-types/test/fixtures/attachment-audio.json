@@ -1,0 +1,138 @@
+{
+	"id": 125,
+	"date": "2025-11-12T23:02:13",
+	"date_gmt": "2025-11-12T23:02:13",
+	"guid": {
+		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/sample.mp3",
+		"raw": "http://localhost:8888/wp-content/uploads/2025/11/sample.mp3"
+	},
+	"modified": "2025-11-12T23:03:26",
+	"modified_gmt": "2025-11-12T23:03:26",
+	"slug": "sample-audio",
+	"status": "inherit",
+	"type": "attachment",
+	"link": "http://localhost:8888/sample-audio/",
+	"title": {
+		"raw": "Sample Audio",
+		"rendered": "Sample Audio"
+	},
+	"author": 1,
+	"featured_media": 126,
+	"comment_status": "open",
+	"ping_status": "closed",
+	"template": "",
+	"meta": [],
+	"permalink_template": "http://localhost:8888/?attachment_id=125",
+	"generated_slug": "sample-audio",
+	"class_list": [
+		"post-125",
+		"attachment",
+		"type-attachment",
+		"status-inherit",
+		"has-post-thumbnail",
+		"hentry"
+	],
+	"description": {
+		"raw": "Sample audio file",
+		"rendered": "<!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->\n<audio class=\"wp-audio-shortcode\" id=\"audio-125-1\" preload=\"none\" style=\"width: 100%;\" controls=\"controls\"><source type=\"audio/mpeg\" src=\"http://localhost:8888/wp-content/uploads/2025/11/sample.mp3?_=1\" /><a href=\"http://localhost:8888/wp-content/uploads/2025/11/sample.mp3\">http://localhost:8888/wp-content/uploads/2025/11/sample.mp3</a></audio>\n<p>Sample audio file</p>\n"
+	},
+	"caption": {
+		"raw": "",
+		"rendered": "<p>Sample audio file</p>\n"
+	},
+	"alt_text": "",
+	"media_type": "file",
+	"mime_type": "audio/mpeg",
+	"media_details": {
+		"dataformat": "mp3",
+		"channels": 2,
+		"sample_rate": 44100,
+		"bitrate": 320000,
+		"channelmode": "joint stereo",
+		"bitrate_mode": "cbr",
+		"codec": "LAME",
+		"encoder": "LAME3.99r",
+		"lossless": false,
+		"encoder_options": "--preset insane",
+		"compression_ratio": 0.22675736961451248,
+		"fileformat": "mp3",
+		"filesize": 7373059,
+		"mime_type": "audio/mpeg",
+		"length": 182,
+		"length_formatted": "3:02",
+		"title": "Sample Audio",
+		"artist": "",
+		"track_number": "",
+		"album": "",
+		"recording_time": "2025-11-12T23:02:13",
+		"genre": "",
+		"date": "2025-11-12 23:02:13",
+		"comment": "",
+		"band": "",
+		"year": "",
+		"image": {
+			"mime": "image/jpeg",
+			"width": 700,
+			"height": 700
+		},
+		"sizes": {}
+	},
+	"post": null,
+	"source_url": "http://localhost:8888/wp-content/uploads/2025/11/sample.mp3",
+	"missing_image_sizes": [],
+	"_links": {
+		"self": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/125",
+				"targetHints": {
+					"allow": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
+				}
+			}
+		],
+		"collection": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media"
+			}
+		],
+		"about": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/types/attachment"
+			}
+		],
+		"author": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/users/1"
+			}
+		],
+		"replies": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/comments?post=125"
+			}
+		],
+		"wp:featuredmedia": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/media/126"
+			}
+		],
+		"wp:action-unfiltered-html": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/125"
+			}
+		],
+		"wp:action-assign-author": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/125"
+			}
+		],
+		"curies": [
+			{
+				"name": "wp",
+				"href": "https://api.w.org/{rel}",
+				"templated": true
+			}
+		]
+	}
+}

@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { FormToggleProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -27,6 +16,7 @@ function UnforwardedFormToggle(
 		id,
 		disabled,
 		onChange = noop,
+		onClick,
 		...additionalProps
 	} = props;
 	const wrapperClasses = clsx( 'components-form-toggle', className, {
@@ -43,6 +33,12 @@ function UnforwardedFormToggle(
 				checked={ checked }
 				onChange={ onChange }
 				disabled={ disabled }
+				onClick={ ( event ) => {
+					// Compat code for Safari to ensure that the toggle is focused when clicked.
+					event.currentTarget.focus();
+
+					onClick?.( event );
+				} }
 				{ ...additionalProps }
 				ref={ ref }
 			/>
@@ -72,5 +68,6 @@ function UnforwardedFormToggle(
  * ```
  */
 export const FormToggle = forwardRef( UnforwardedFormToggle );
+FormToggle.displayName = 'FormToggle';
 
 export default FormToggle;

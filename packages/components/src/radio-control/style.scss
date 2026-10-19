@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .components-radio-control {
 	border: 0;
 	margin: 0;
@@ -29,19 +33,27 @@
 	margin: 0;
 	padding: 0;
 	appearance: none;
-	cursor: pointer;
+
+	&:not(:disabled) {
+		cursor: var(--wpds-cursor-control);
+	}
 
 	&:focus {
 		@include button-style-outset__focus(var(--wp-admin-theme-color));
 	}
 
 	&:checked {
-		background: $components-color-accent;
-		border-color: $components-color-accent;
-
 		&::before {
 			content: "";
 			border-radius: $radius-round;
+		}
+	}
+
+	&:disabled {
+		opacity: 1; // Override style from wp-admin forms.css.
+
+		&:checked::before {
+			opacity: 1; // Override style from wp-admin forms.css.
 		}
 	}
 }
@@ -49,13 +61,13 @@
 .components-radio-control__label {
 	grid-column: 2;
 	grid-row: 1;
+	color: var(--wpds-color-foreground-content-neutral);
 
-	cursor: pointer;
-	line-height: $radio-input-size-sm;
-
-	@include break-small() {
-		line-height: $radio-input-size;
+	.components-radio-control__input:not(:disabled) + & {
+		cursor: var(--wpds-cursor-control);
 	}
+
+	line-height: $radio-input-size;
 }
 
 .components-radio-control__option-description {
