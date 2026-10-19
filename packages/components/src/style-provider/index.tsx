@@ -1,9 +1,12 @@
 import { useInsertionEffect } from '@wordpress/element';
 import { registerDocument } from '@wordpress/style-runtime';
+import { contextConnectWithoutRef, useContextSystem } from '../context';
 import type { StyleProviderProps } from './types';
 
-export function StyleProvider( props: StyleProviderProps ) {
-	const { children, document } = props;
+function UnconnectedStyleProvider( props: StyleProviderProps ) {
+	const { children, document, nonce } = useContextSystem<
+		StyleProviderProps & { className?: string }
+	>( props, 'StyleProvider' );
 
 	// Inject module styles before children measure layout, including in iframes.
 	useInsertionEffect( () => {
@@ -11,8 +14,8 @@ export function StyleProvider( props: StyleProviderProps ) {
 			return;
 		}
 
-		return registerDocument( document );
-	}, [ document ] );
+		return registerDocument( document, { nonce } );
+	}, [ document, nonce ] );
 
 	if ( ! document ) {
 		return null;
@@ -20,5 +23,10 @@ export function StyleProvider( props: StyleProviderProps ) {
 
 	return <>{ children }</>;
 }
+
+export const StyleProvider = contextConnectWithoutRef(
+	UnconnectedStyleProvider,
+	'StyleProvider'
+);
 
 export default StyleProvider;

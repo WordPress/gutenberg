@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, onTestFinished, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useEffect, useState } from '@wordpress/element';
@@ -6,6 +6,8 @@ import {
 	getWpCompatOverlaySlot,
 	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
+import { registerStyle } from '@wordpress/style-runtime';
+import { ContextSystemProvider } from '../../context';
 import Modal from '../';
 globalThis.wpVitest.mockCSSSupports();
 globalThis.wpVitest.mockMatchMedia();
@@ -13,6 +15,33 @@ globalThis.wpVitest.mockMatchMedia();
 const noop = () => {};
 
 describe( 'Modal', () => {
+	it( 'adds the `nonce` set through the context system to injected styles', () => {
+		onTestFinished( () => {
+			delete ( globalThis as { __wpStyleRuntime?: unknown } )
+				.__wpStyleRuntime;
+			document.head.innerHTML = '';
+		} );
+
+		render(
+			<ContextSystemProvider
+				value={ { StyleProvider: { nonce: 'modal-nonce' } } }
+			>
+				<Modal title="Nonce" onRequestClose={ noop }>
+					<p>Modal content</p>
+				</Modal>
+			</ContextSystemProvider>
+		);
+
+		registerStyle( 'modal-nonce-test-style', '.modal-nonce-test{}' );
+
+		expect(
+			// eslint-disable-next-line testing-library/no-node-access
+			document.head.querySelector(
+				'style[data-wp-hash="modal-nonce-test-style"]'
+			)
+		).toHaveAttribute( 'nonce', 'modal-nonce' );
+	} );
+
 	it( 'applies the aria-describedby attribute when provided', () => {
 		render(
 			<Modal

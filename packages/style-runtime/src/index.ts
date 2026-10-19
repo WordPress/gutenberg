@@ -5,7 +5,19 @@ type GlobalScopeWithStyleRuntime = typeof globalThis & {
 		documents: Map< Document, number >;
 		styles: Map< string, string >;
 		injectedStyles: WeakMap< Document, Set< string > >;
+		// Added after the first release, so a runtime created by an older
+		// copy of this package doesn't have it until a nonce is set.
+		nonces?: WeakMap< Document, string >;
 	};
+};
+
+export type RegisterDocumentOptions = {
+	/**
+	 * Nonce to add to the style tags injected into the document, for
+	 * documents with a Content Security Policy that only allows styles with
+	 * a matching nonce.
+	 */
+	nonce?: string;
 };
 
 const STYLE_HASH_ATTRIBUTE = 'data-wp-hash';
@@ -98,11 +110,88 @@ function injectStyle( targetDocument: Document, hash: string, css: string ) {
 		return;
 	}
 
+	targetDocument.head.appendChild(
+		createStyleElement(
+			targetDocument,
+			hash,
+			css,
+			runtime.nonces?.get( targetDocument )
+		)
+	);
+	injectedStyles.add( hash );
+}
+
+/**
+ * Sets the nonce for the style tags injected into a document.
+ *
+ * Style tags that were injected before the nonce was known, for example into
+ * the root document when a CSS module was imported, are replaced with copies
+ * that carry the nonce. Changing the nonce attribute of an existing style tag
+ * is not enough, because the browser only checks it when the tag is inserted.
+ *
+ * @param targetDocument Document the nonce applies to.
+ * @param nonce          Nonce to add to the style tags.
+ */
+function setDocumentNonce( targetDocument: Document, nonce: string ) {
+	const runtime = getRuntime();
+
+	if ( ! runtime.nonces ) {
+		runtime.nonces = new WeakMap();
+	}
+
+	if ( runtime.nonces.get( targetDocument ) === nonce ) {
+		return;
+	}
+
+	runtime.nonces.set( targetDocument, nonce );
+
+	if ( ! targetDocument.head ) {
+		return;
+	}
+
+	for ( const style of targetDocument.head.querySelectorAll< HTMLElement >(
+		`style[${ STYLE_HASH_ATTRIBUTE }]`
+	) ) {
+		const hash = style.getAttribute( STYLE_HASH_ATTRIBUTE );
+		const css = hash === null ? undefined : runtime.styles.get( hash );
+
+		// Browsers can hide the nonce attribute from scripts, so read the
+		// `nonce` property first.
+		const styleNonce = style.nonce || style.getAttribute( 'nonce' );
+
+		if ( hash === null || css === undefined || styleNonce === nonce ) {
+			continue;
+		}
+
+		style.replaceWith(
+			createStyleElement( targetDocument, hash, css, nonce )
+		);
+	}
+}
+
+/**
+ * Creates a style tag for a registered style.
+ *
+ * @param targetDocument Document that will own the style tag.
+ * @param hash           Stable hash for the transformed CSS.
+ * @param css            CSS text of the style tag.
+ * @param nonce          Optional nonce to add to the style tag.
+ *
+ * @return The style tag.
+ */
+function createStyleElement(
+	targetDocument: Document,
+	hash: string,
+	css: string,
+	nonce?: string
+) {
 	const style = targetDocument.createElement( 'style' );
 	style.setAttribute( STYLE_HASH_ATTRIBUTE, hash );
+	if ( nonce ) {
+		style.setAttribute( 'nonce', nonce );
+	}
 	style.appendChild( targetDocument.createTextNode( css ) );
-	targetDocument.head.appendChild( style );
-	injectedStyles.add( hash );
+	return style;
 }
 
 /**
@@ -113,11 +202,26 @@ function injectStyle( targetDocument: Document, hash: string, css: string ) {
  * same document without one cleanup removing it while another registration is
  * still active.
  *
+ * When a `nonce` is given, it is added to every style tag injected into the
+ * document from then on, and style tags that were injected without it are
+ * replaced. A registration without a `nonce` keeps the nonce that another
+ * registration set for the same document.
+ *
  * @param targetDocument Document to receive registered styles.
+ * @param options        Registration options.
+ * @param options.nonce  Nonce to add to the style tags injected into the
+ *                       document.
  * @return Cleanup function that unregisters this document registration.
  */
-export function registerDocument( targetDocument: Document ) {
+export function registerDocument(
+	targetDocument: Document,
+	{ nonce }: RegisterDocumentOptions = {}
+) {
 	const runtime = getRuntime();
+
+	if ( nonce ) {
+		setDocumentNonce( targetDocument, nonce );
+	}
 
 	runtime.documents.set(
 		targetDocument,

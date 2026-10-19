@@ -73,6 +73,14 @@ const cleanup = registerDocument( document );
 cleanup();
 ```
 
+For documents with a Content Security Policy that only allows styles with a matching nonce, pass the nonce with the `nonce` option. It is added to every style tag injected into the document from then on, and style tags that were injected into the document before the nonce was set are replaced with ones that carry it. A registration without a `nonce` keeps the nonce that another registration set for the same document.
+
+```js
+import { registerDocument } from '@wordpress/style-runtime';
+
+const cleanup = registerDocument( document, { nonce: 'abc123' } );
+```
+
 ## Contributing to this package
 
 This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.

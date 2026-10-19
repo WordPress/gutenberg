@@ -82,6 +82,77 @@ describe( 'style runtime', () => {
 		).toHaveLength( 2 );
 	} );
 
+	describe( 'nonce', () => {
+		it( 'does not add a nonce by default', () => {
+			const iframeDocument = document.implementation.createHTMLDocument();
+			registerDocument( iframeDocument );
+			registerStyle( 'test-style', '.test-class{color:red;}' );
+
+			expect( iframeDocument.head.innerHTML ).toBe(
+				'<style data-wp-hash="test-style">.test-class{color:red;}</style>'
+			);
+		} );
+
+		it( 'adds the nonce to styles replayed into the document', () => {
+			registerStyle( 'test-style', '.test-class{color:red;}' );
+
+			const iframeDocument = document.implementation.createHTMLDocument();
+			registerDocument( iframeDocument, { nonce: 'test-nonce' } );
+
+			expect( iframeDocument.head.innerHTML ).toBe(
+				'<style data-wp-hash="test-style" nonce="test-nonce">.test-class{color:red;}</style>'
+			);
+		} );
+
+		it( 'adds the nonce to styles registered later', () => {
+			const iframeDocument = document.implementation.createHTMLDocument();
+			registerDocument( iframeDocument, { nonce: 'test-nonce' } );
+			registerStyle( 'test-style', '.test-class{color:red;}' );
+
+			expect( iframeDocument.head.innerHTML ).toBe(
+				'<style data-wp-hash="test-style" nonce="test-nonce">.test-class{color:red;}</style>'
+			);
+		} );
+
+		it( 'replaces styles that were injected before the nonce was set', () => {
+			// The root document is registered as soon as the first style is,
+			// before any provider can pass a nonce.
+			registerStyle( 'test-style', '.test-class{color:red;}' );
+			const injectedStyle = document.head.querySelector( 'style' );
+
+			registerDocument( document, { nonce: 'test-nonce' } );
+
+			expect( document.head.innerHTML ).toBe(
+				'<style data-wp-hash="test-style" nonce="test-nonce">.test-class{color:red;}</style>'
+			);
+			expect( document.head.querySelector( 'style' ) ).not.toBe(
+				injectedStyle
+			);
+		} );
+
+		it( 'leaves style tags it did not register alone', () => {
+			const otherStyle = document.createElement( 'style' );
+			otherStyle.setAttribute( 'data-wp-hash', 'other-style' );
+			document.head.appendChild( otherStyle );
+
+			registerDocument( document, { nonce: 'test-nonce' } );
+
+			expect( document.head.querySelector( 'style' ) ).toBe( otherStyle );
+			expect( otherStyle ).not.toHaveAttribute( 'nonce' );
+		} );
+
+		it( 'keeps the nonce when the document is registered again without one', () => {
+			const iframeDocument = document.implementation.createHTMLDocument();
+			registerDocument( iframeDocument, { nonce: 'test-nonce' } );
+			registerDocument( iframeDocument );
+			registerStyle( 'test-style', '.test-class{color:red;}' );
+
+			expect( iframeDocument.head.innerHTML ).toBe(
+				'<style data-wp-hash="test-style" nonce="test-nonce">.test-class{color:red;}</style>'
+			);
+		} );
+	} );
+
 	it( 'stops injecting into documents after cleanup', () => {
 		const iframeDocument = document.implementation.createHTMLDocument();
 		const cleanup = registerDocument( iframeDocument );

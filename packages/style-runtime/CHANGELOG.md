@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### New Features
+
+-   `registerDocument`: Add a `nonce` option that is added to the style tags injected into the document, for documents with a strict Content Security Policy. Style tags injected before the nonce was set are replaced with ones that carry it ([#84843](https://github.com/WordPress/gutenberg/pull/84843)).
+
 ## 0.13.0 (2026-10-07)
 
 ## 0.12.0 (2026-09-23)
