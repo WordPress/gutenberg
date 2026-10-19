@@ -140,7 +140,7 @@ export type Action =
 	| {
 			type: 'RECEIVE_REGISTERED_POST_META';
 			postType: string;
-			registeredPostMeta: Record< string, unknown >;
+			registeredPostMeta: Record< string, unknown > | undefined;
 	  }
 	| {
 			type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS';

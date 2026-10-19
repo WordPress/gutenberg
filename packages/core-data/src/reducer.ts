@@ -734,7 +734,7 @@ export function defaultTemplates(
  * @return Updated state.
  */
 export function registeredPostMeta(
-	state: Record< string, Record< string, unknown > > = {},
+	state: Record< string, Record< string, unknown > | undefined > = {},
 	action: Action
 ) {
 	switch ( action.type ) {
