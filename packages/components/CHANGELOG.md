@@ -26,7 +26,7 @@
 
 ### Enhancements
 
--   Use semantic WPDS tokens and local defaults, and remove obsolete JavaScript style configuration ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
+-   `BorderBoxControl`, `BorderControl`, `Heading`, `InputControl`, `Menu`, `RangeControl`, `Text`, `ToolsPanel`: Use semantic WPDS tokens for typography, spacing, border previews, and range rails ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
 -   `ColorPicker`: Use `Select` from `@wordpress/ui` for the color format selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   `ExternalLink`: Use a small border radius for consistent focus rings ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
@@ -67,6 +67,7 @@
 
 ### Internal
 
+-   Remove obsolete JavaScript style configuration and unused style helpers ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
 -   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
 -   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Remove unused internal BoxControl and UnitControl helpers and gradient constants ([#85091](https://github.com/WordPress/gutenberg/pull/85091)).

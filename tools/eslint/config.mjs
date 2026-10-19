@@ -903,14 +903,14 @@ export default dedupePlugins( [
 					selector:
 						':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
 					message:
-						'--wp-admin-theme-* variables do not support component theming. Move static theme colors to SCSS and use the aliases in packages/components/src/utils/theme-variables.scss.',
+						'--wp-admin-theme-* variables do not support component theming. Use semantic WPDS design tokens directly. Keep required admin color-scheme fallbacks in SCSS.',
 				},
 				{
 					selector:
 						// Allow overriding definitions, but not access with var()
 						':matches(Literal[value=/var\\(\\s*--wp-components-color-/],TemplateElement[value.cooked=/var\\(\\s*--wp-components-color-/])',
 					message:
-						'To ensure proper fallbacks, --wp-components-color-* variables should not be used directly. Move static theme colors to SCSS and use the aliases in packages/components/src/utils/theme-variables.scss.',
+						'--wp-components-color-* variables are internal. Use semantic WPDS design tokens directly.',
 				},
 			],
 		},
