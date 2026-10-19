@@ -59,7 +59,7 @@ export function useBorderControlDropdown(
 		// Applied inline so CSS-wide values (e.g. `inherit`) and the `||` color
 		// fallback pass straight through to `border-style`/`border-color`. Style
 		// `none` previews as `solid`; a style without a color falls back to
-		// gray-300.
+		// the neutral surface stroke token.
 		indicatorWrapperStyle: indicatorStyle
 			? {
 					borderStyle:
@@ -67,7 +67,7 @@ export function useBorderControlDropdown(
 					borderColor:
 						indicatorColor ||
 						( indicatorStyle !== 'none'
-							? 'var(--_wp-components-border-control-preview-color)'
+							? 'var(--wpds-color-stroke-surface-neutral)'
 							: undefined ),
 				}
 			: undefined,

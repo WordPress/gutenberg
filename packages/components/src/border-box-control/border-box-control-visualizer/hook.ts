@@ -7,7 +7,7 @@ import type { VisualizerProps } from '../types';
 
 const borderBoxStyleWithFallback = ( border?: Border ) => {
 	const {
-		color = 'var(--_wp-components-border-box-visualizer-color)',
+		color = 'var(--wpds-color-stroke-surface-neutral)',
 		style = 'solid',
 		width = 'var(--wpds-border-width-xs)',
 	} = border || {};

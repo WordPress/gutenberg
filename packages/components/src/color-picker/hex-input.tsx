@@ -36,12 +36,8 @@ export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	return (
 		<InputControl
 			prefix={
-				<InputControlPrefixWrapper>
-					<Text
-						className={ styles.prefix }
-						color="var(--_wp-components-color-picker-prefix-color)"
-						lineHeight={ 1 }
-					>
+				<InputControlPrefixWrapper className={ styles.prefix }>
+					<Text color="inherit" lineHeight={ 1 }>
 						#
 					</Text>
 				</InputControlPrefixWrapper>

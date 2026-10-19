@@ -1,8 +1,8 @@
 import { describe, expect, test } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
+import '@wordpress/theme/design-tokens.css';
 import { Heading } from '../';
-import '../../../../theme/prebuilt/css/design-tokens.css';
 
 describe( 'props', () => {
 	test( 'should render correctly', async () => {

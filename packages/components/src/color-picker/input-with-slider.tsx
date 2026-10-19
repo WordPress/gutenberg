@@ -37,12 +37,8 @@ export const InputWithSlider = ( {
 				value={ value }
 				onChange={ onNumberControlChange }
 				prefix={
-					<InputControlPrefixWrapper>
-						<Text
-							className={ styles.prefix }
-							color="var(--_wp-components-color-picker-prefix-color)"
-							lineHeight={ 1 }
-						>
+					<InputControlPrefixWrapper className={ styles.prefix }>
+						<Text color="inherit" lineHeight={ 1 }>
 							{ abbreviation }
 						</Text>
 					</InputControlPrefixWrapper>

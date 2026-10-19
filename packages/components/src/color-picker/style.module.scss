@@ -2,7 +2,7 @@
 @use "../utils/theme-variables" as *;
 
 .prefix {
-	--_wp-components-color-picker-prefix-color: #{$components-color-accent};
+	color: $components-color-accent;
 }
 
 .number-control {

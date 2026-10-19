@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import '../../../../theme/prebuilt/css/design-tokens.css';
+import '@wordpress/theme/design-tokens.css';
 import { Text } from '../';
 
 // Source SCSS expects theme tokens; the production build adds their fallbacks.

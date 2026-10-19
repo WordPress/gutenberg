@@ -13,8 +13,9 @@ export function getFontSize(
 		case 'title':
 			return 'var(--wpds-typography-font-size-xl)';
 		case 'caption':
+			return '10px';
 		case 'largeTitle':
-			return `var(--_wp-components-text-font-size-${ size })`;
+			return '28px';
 	}
 
 	if ( typeof size !== 'number' ) {
@@ -29,11 +30,21 @@ export function getFontSize(
 }
 
 export function getHeadingFontSize( size: number | string = 3 ): string {
-	if ( String( size ) === '5' ) {
-		return 'var(--wpds-typography-font-size-md)';
+	// Preserve the legacy heading scale where no matching WPDS token exists.
+	switch ( String( size ) ) {
+		case '1':
+			return '31.72px';
+		case '2':
+			return '25.35px';
+		case '3':
+			return '20.28px';
+		case '4':
+			return '16.25px';
+		case '5':
+			return 'var(--wpds-typography-font-size-md)';
+		case '6':
+			return '10.4px';
+		default:
+			return getFontSize( size );
 	}
-
-	return /^[1-6]$/.test( String( size ) )
-		? `var(--_wp-components-text-font-size-heading-${ size })`
-		: getFontSize( size );
 }

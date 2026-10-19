@@ -20,6 +20,8 @@ import styles from './style.module.scss';
 import type { RangeControlProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
+const NUMBER_CONTROL_WIDTH = 80;
+
 const noop = () => {};
 
 /**
@@ -53,7 +55,7 @@ function UnforwardedRangeControl(
 		allowReset = false,
 		beforeIcon,
 		className,
-		color: colorProp = 'var(--_wp-components-range-control-default-color)',
+		color: colorProp,
 		currentInput,
 		disabled = false,
 		help,
@@ -125,6 +127,7 @@ function UnforwardedRangeControl(
 	const wrapperClasses = clsx(
 		'components-range-control__wrapper',
 		styles.wrapper,
+		colorProp === undefined && styles[ 'default-color' ],
 		colorKeyword && styles[ `color-${ colorKeyword }` ],
 		!! marks && 'is-marked'
 	);
@@ -341,7 +344,7 @@ function UnforwardedRangeControl(
 						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
-						__unstableInputWidth="var(--_wp-components-range-control-input-width)"
+						__unstableInputWidth={ `${ NUMBER_CONTROL_WIDTH }px` }
 						step={ step }
 						// @ts-expect-error TODO: Investigate if the `null` value is necessary
 						value={ inputSliderValue }
