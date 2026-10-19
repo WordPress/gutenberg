@@ -4,6 +4,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as editorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 interface ReactionSummaryEntry {
 	count: number;
@@ -102,7 +103,7 @@ export function useNoteReactions(
 		[ noteId ]
 	);
 	const { getEntityRecord } = useSelect( coreStore );
-	const { getCurrentPostId } = useSelect( editorStore );
+	const { getNotesPostId } = unlock( useSelect( editorStore ) );
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord, receiveEntityRecords } =
 		useDispatch( coreStore );
@@ -137,7 +138,7 @@ export function useNoteReactions(
 					'root',
 					'comment',
 					{
-						post: getCurrentPostId(),
+						post: getNotesPostId(),
 						type: 'reaction',
 						parent: noteId,
 						content: hexKey,
