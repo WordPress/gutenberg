@@ -1,13 +1,12 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
-const { EXPERIMENTS } = require( './utils' );
 
 /*
  * Plugins extend the media picker through the `editor.MediaUpload` filter and
- * recognize the featured image by the prop the classic panel passes. The
- * DataForm summary's featured image field must reach them the same way, and
- * open the same featured-image media frame.
+ * recognize the featured image by the `featuredImageFlow` prop. The summary's
+ * featured image field must reach them with it, and open the featured-image
+ * media frame.
  */
-test.describe( 'Featured image media upload filter (DataForm inspector)', () => {
+test.describe( 'Featured image media upload filter', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.resetPreferences();
 		await requestUtils.activatePlugin(
@@ -16,31 +15,16 @@ test.describe( 'Featured image media upload filter (DataForm inspector)', () => 
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
-		await requestUtils.setGutenbergExperiments( [] );
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-media-upload-filter'
 		);
 	} );
 
-	test( 'reaches the featured image field as it does the classic panel', async ( {
+	test( 'reaches the featured image field', async ( {
 		admin,
 		editor,
 		page,
-		requestUtils,
 	} ) => {
-		await requestUtils.setGutenbergExperiments( [] );
-		await admin.createNewPost();
-		await editor.openDocumentSettingsSidebar();
-		const classicMarker = page.locator(
-			'.editor-post-featured-image .e2e-media-upload-filter'
-		);
-		await expect( classicMarker ).toHaveAttribute(
-			'data-featured-image-flow',
-			'true'
-		);
-		await expectFeaturedImageFrame( page );
-
-		await requestUtils.setGutenbergExperiments( EXPERIMENTS );
 		await admin.createNewPost();
 		await editor.openDocumentSettingsSidebar();
 		const marker = page.locator( '.media-edit .e2e-media-upload-filter' );
