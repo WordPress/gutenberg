@@ -67,6 +67,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 			'wp_font_family',
 			{
 				_embed: true,
+				per_page: -1,
 			}
 		);
 

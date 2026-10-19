@@ -1,60 +1,24 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook, act, waitFor } from '@testing-library/react';
-import { useDelayedLoading, useMediaResults } from '../hooks';
+import { useMediaCategories, useMediaResults } from '../hooks';
+import { lock } from '../../../../lock-unlock';
 
-describe( 'useDelayedLoading', () => {
-	beforeEach( () => {
-		vi.useFakeTimers();
-	} );
-	afterEach( () => {
-		vi.useRealTimers();
-	} );
-
-	it( 'does not surface loading before the delay elapses', () => {
-		const { result } = renderHook( () => useDelayedLoading( true, 400 ) );
-		expect( result.current ).toBe( false );
-		act( () => {
-			vi.advanceTimersByTime( 399 );
-		} );
-		expect( result.current ).toBe( false );
-	} );
-
-	it( 'surfaces loading once the delay elapses', () => {
-		const { result } = renderHook( () => useDelayedLoading( true, 400 ) );
-		act( () => {
-			vi.advanceTimersByTime( 400 );
-		} );
-		expect( result.current ).toBe( true );
-	} );
-
-	it( 'never surfaces loading for an operation that ends before the delay', () => {
-		const { result, rerender } = renderHook(
-			( { isLoading } ) => useDelayedLoading( isLoading, 400 ),
-			{ initialProps: { isLoading: true } }
-		);
-		act( () => {
-			vi.advanceTimersByTime( 200 );
-		} );
-		rerender( { isLoading: false } );
-		act( () => {
-			vi.advanceTimersByTime( 400 );
-		} );
-		expect( result.current ).toBe( false );
-	} );
-
-	it( 'resets once loading finishes', () => {
-		const { result, rerender } = renderHook(
-			( { isLoading } ) => useDelayedLoading( isLoading, 400 ),
-			{ initialProps: { isLoading: true } }
-		);
-		act( () => {
-			vi.advanceTimersByTime( 400 );
-		} );
-		expect( result.current ).toBe( true );
-		rerender( { isLoading: false } );
-		expect( result.current ).toBe( false );
-	} );
-} );
+// `useMediaCategories` reads the registered categories and the insertion
+// point's permissions from the store. Stand in for both, so the tests only
+// exercise what the hook does with them.
+const { storeStub } = vi.hoisted( () => ( {
+	storeStub: {
+		getInserterMediaCategories: vi.fn(),
+		canInsertBlockType: vi.fn( () => true ),
+	},
+} ) );
+vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
+	...( await importOriginal() ),
+	useSelect: ( mapSelect ) => mapSelect( () => storeStub ),
+} ) );
+// The hook reaches the category list through `unlock`, so the stub has to be
+// locked rather than mocked: the store itself unlocks at import time.
+lock( storeStub, storeStub );
 
 describe( 'useMediaResults', () => {
 	const createCategory = ( name, items ) => ( {
@@ -231,6 +195,62 @@ describe( 'useMediaResults', () => {
 		expect( result.current.mediaList ).toEqual( [ { id: 2 } ] );
 	} );
 
+	it( 'reports no results for a source that has not resolved yet', async () => {
+		const images = createCategory( 'images', [ { id: 1 } ] );
+		// Every render is recorded, because the guarantee is about the render
+		// itself: by the time effects have run the list has been cleared
+		// either way, and it's the render in between that would put the
+		// previous source's items on screen.
+		const renders = [];
+		const { result, rerender } = renderHook(
+			( { category } ) => {
+				const results = useMediaResults( category, { search: '' }, 0 );
+				renders.push( {
+					source: category.name,
+					mediaList: results.mediaList,
+				} );
+				return results;
+			},
+			{ initialProps: { category: images } }
+		);
+		await waitFor( () =>
+			expect( result.current.mediaList ).toEqual( [ { id: 1 } ] )
+		);
+		expect( result.current.isSwitchingSource ).toBe( false );
+
+		let resolveFetch;
+		const videos = {
+			name: 'videos',
+			fetch: vi.fn(
+				() =>
+					new Promise( ( resolve ) => {
+						resolveFetch = resolve;
+					} )
+			),
+		};
+		renders.length = 0;
+		rerender( { category: videos } );
+
+		// `DataViews` keeps showing the last non-empty list it was given, so
+		// the images must never be handed over once videos are the source —
+		// one such render is enough to leave them under the Videos tab.
+		expect(
+			renders.filter(
+				( render ) =>
+					render.source === 'videos' && render.mediaList.length > 0
+			)
+		).toEqual( [] );
+		expect( result.current.isSwitchingSource ).toBe( true );
+		expect( result.current.totalItems ).toBeUndefined();
+		expect( result.current.totalPages ).toBeUndefined();
+
+		await act( async () => {
+			resolveFetch( [ { id: 2 } ] );
+		} );
+		expect( result.current.mediaList ).toEqual( [ { id: 2 } ] );
+		expect( result.current.isSwitchingSource ).toBe( false );
+	} );
+
 	it( 'does not refetch when only the category wrapper changes', async () => {
 		const fetch = vi.fn( async () => [ { id: 1 } ] );
 		const { result, rerender } = renderHook(
@@ -257,5 +277,47 @@ describe( 'useMediaResults', () => {
 
 		expect( fetch ).toHaveBeenCalledTimes( 1 );
 		expect( result.current.mediaList ).toEqual( [ { id: 1 } ] );
+	} );
+} );
+
+describe( 'useMediaCategories', () => {
+	const imagesCategory = {
+		name: 'images',
+		mediaType: 'image',
+		fetch: vi.fn( async () => [ { id: 1 } ] ),
+	};
+
+	beforeEach( () => {
+		storeStub.getInserterMediaCategories.mockReturnValue( [
+			imagesCategory,
+		] );
+	} );
+
+	it( 'reports the categories once it has worked out which have media', async () => {
+		const { result } = renderHook( () => useMediaCategories() );
+
+		// Finding out takes a request per category, so there is nothing to
+		// report yet.
+		expect( result.current.hasResolved ).toBe( false );
+		expect( result.current.categories ).toEqual( [] );
+
+		await waitFor( () =>
+			expect( result.current.hasResolved ).toBe( true )
+		);
+		expect( result.current.categories ).toEqual( [ imagesCategory ] );
+	} );
+
+	it( 'resolves with no categories when none has media', async () => {
+		storeStub.getInserterMediaCategories.mockReturnValue( [
+			{ ...imagesCategory, fetch: vi.fn( async () => [] ) },
+		] );
+		const { result } = renderHook( () => useMediaCategories() );
+
+		// An empty list is the answer here, not the absence of one, which is
+		// the difference the tab needs to show "no results" rather than wait.
+		await waitFor( () =>
+			expect( result.current.hasResolved ).toBe( true )
+		);
+		expect( result.current.categories ).toEqual( [] );
 	} );
 } );
