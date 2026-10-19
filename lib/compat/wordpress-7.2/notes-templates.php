@@ -25,10 +25,17 @@
 /**
  * Declares Notes support for the template post types.
  *
+ * Merges into any arguments the `editor` feature already has, since
+ * add_post_type_support() replaces them.
+ *
  * @since 7.2.0
  */
 function gutenberg_notes_add_template_post_type_support() {
-	add_post_type_support( 'wp_template', 'editor', array( 'notes' => true ) );
-	add_post_type_support( 'wp_template_part', 'editor', array( 'notes' => true ) );
+	foreach ( array( 'wp_template', 'wp_template_part' ) as $post_type ) {
+		$supports = get_all_post_type_supports( $post_type );
+		$args     = isset( $supports['editor'][0] ) && is_array( $supports['editor'][0] ) ? $supports['editor'][0] : array();
+
+		add_post_type_support( $post_type, 'editor', array_merge( $args, array( 'notes' => true ) ) );
+	}
 }
 add_action( 'init', 'gutenberg_notes_add_template_post_type_support', 11 );

@@ -115,6 +115,31 @@ class Tests_Notes_Templates extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Arguments already set on the editor feature must survive the notes opt-in.
+	 *
+	 * @dataProvider data_template_post_types
+	 *
+	 * @param string $post_type Template post type.
+	 */
+	public function test_existing_editor_arguments_are_kept( $post_type ) {
+		add_post_type_support( $post_type, 'editor', array( 'custom' => 'value' ) );
+
+		gutenberg_notes_add_template_post_type_support();
+
+		$supports = get_all_post_type_supports( $post_type );
+
+		$this->assertSame(
+			array(
+				array(
+					'custom' => 'value',
+					'notes'  => true,
+				),
+			),
+			$supports['editor']
+		);
+	}
+
+	/**
 	 * A user who can edit templates can create notes on them.
 	 *
 	 * @dataProvider data_template_post_types
