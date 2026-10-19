@@ -16,7 +16,6 @@ import {
 import type { ColumnSteps } from '@wordpress/grid';
 import { chartBar, download, shield, trendingUp } from '@wordpress/icons';
 import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
 } from '@wordpress/ui';
 import {

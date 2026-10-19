@@ -4,7 +4,6 @@ import { __ } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { store as viewportStore } from '@wordpress/viewport';
 import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
 	Stack,
 } from '@wordpress/ui';

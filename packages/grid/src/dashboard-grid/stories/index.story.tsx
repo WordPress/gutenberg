@@ -3,7 +3,6 @@ import { useId, useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
 import {
 	Icon,
-	// eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 	IconButton,
 	Stack,
 } from '@wordpress/ui';
