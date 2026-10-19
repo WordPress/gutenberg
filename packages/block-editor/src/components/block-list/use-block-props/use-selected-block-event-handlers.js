@@ -1,5 +1,5 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-import { isTextField } from '@wordpress/dom';
+import { caretRangeFromPoint, isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -54,7 +54,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		stopDraggingBlocks,
 		editContentOnlySection,
 		updateBlockAttributes,
-		selectBlock,
 		selectionChange,
 	} = unlock( useDispatch( blockEditorStore ) );
 	const registry = useRegistry();
@@ -311,25 +310,13 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				const { defaultView } = ownerDocument;
 
 				function getDropTarget( { clientX, clientY } ) {
-					const position = ownerDocument.caretPositionFromPoint?.(
+					const range = caretRangeFromPoint(
+						ownerDocument,
 						clientX,
 						clientY
 					);
-					const range = ownerDocument.createRange();
-					if ( position ) {
-						range.setStart( position.offsetNode, position.offset );
-					} else {
-						const caretRange = ownerDocument.caretRangeFromPoint?.(
-							clientX,
-							clientY
-						);
-						if ( ! caretRange ) {
-							return;
-						}
-						range.setStart(
-							caretRange.startContainer,
-							caretRange.startOffset
-						);
+					if ( ! range ) {
+						return;
 					}
 					const { startContainer } = range;
 					const field = (
@@ -342,6 +329,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 						return;
 					}
 					return {
+						element: field,
 						clientId: block.dataset.block,
 						attributeKey: field.dataset.wpBlockAttributeKey,
 						offset: create( {
@@ -352,15 +340,16 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					};
 				}
 
-				// The block drop zones would take the drop over. Editable
-				// fields accept the drop and show the drop caret natively;
-				// the drop itself is replaced by the move.
+				// The block drop zones cancel every drag over them, which
+				// hides the browser's drop caret and shows the block
+				// insertion point instead.
 				function stop( e ) {
 					e.stopPropagation();
 				}
 
+				// Canceling the drop replaces the browser's insertion and
+				// tells the block drop zones the drop is handled.
 				function onDrop( e ) {
-					e.stopPropagation();
 					e.preventDefault();
 					end();
 					const target = getDropTarget( e );
@@ -400,6 +389,14 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					}
 					const inserted = insert( targetValue, dragged, at, at );
 
+					// Rich text only applies the new selection to a focused
+					// field. A field inside an editing host cannot hold focus.
+					const host =
+						target.element.parentElement.closest(
+							'[contenteditable]'
+						);
+					( host?.isContentEditable ? host : target.element ).focus();
+
 					registry.batch( () => {
 						if ( ! isSameField ) {
 							updateBlockAttributes( source.clientId, {
@@ -415,9 +412,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 								targetAttribute
 							),
 						} );
-						// Keeps the block's focus handling from moving the
-						// caret to an edge.
-						selectBlock( target.clientId, null );
 						selectionChange(
 							target.clientId,
 							target.attributeKey,
@@ -751,7 +745,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			getSelectionStart,
 			getSelectionEnd,
 			updateBlockAttributes,
-			selectBlock,
 			selectionChange,
 			registry,
 		]
