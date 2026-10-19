@@ -12,6 +12,10 @@
 
 -   Export `VALID_BACKGROUND_CLIP_VALUES`, the values `background-clip` accepts, so consumers stop keeping their own copy ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 
+### Bug Fixes
+
+-   Add the `background.backgroundAttachment`, `outline`, `shadow` and `typography.textIndent` styles the engine already generates to the `Style` type ([#85097](https://github.com/WordPress/gutenberg/pull/85097)).
+
 ## 2.57.0 (2026-10-07)
 
 ### New Features
