@@ -526,22 +526,6 @@ export function selectedNote( state = {}, action ) {
 	return state;
 }
 
-/**
- * Reducer returning when the next server autosave is due, as a timestamp in
- * milliseconds, or null when none is scheduled.
- *
- * @param {?number} state  Current state.
- * @param {Object}  action Dispatched action.
- * @return {?number} Updated state.
- */
-export function nextAutosaveTime( state = null, action ) {
-	switch ( action.type ) {
-		case 'SET_NEXT_AUTOSAVE_TIME':
-			return action.time;
-	}
-	return state;
-}
-
 export default combineReducers( {
 	postId,
 	postType,
@@ -570,6 +554,5 @@ export default combineReducers( {
 	revisionPage,
 	showRevisionDiff,
 	selectedNote,
-	nextAutosaveTime,
 	dataviews: dataviewsReducer,
 } );

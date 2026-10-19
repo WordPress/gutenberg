@@ -1,8 +1,7 @@
-import { createElement, useEffect, useRef } from '@wordpress/element';
+import { createElement, useEffect, useRef, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
 import AutosaveRetry from '../autosave-retry';
 
 /**
@@ -72,15 +71,14 @@ function IntervalAutosaveMonitor( { interval, autosave } ) {
 
 /**
  * Autosaves to the server once `interval` seconds have passed while an
- * autosave is needed. The time of the next autosave is stored in the editor
- * store, so the countdown in the notice matches the request that follows.
+ * autosave is needed, and counts down to it in the autosave failure notice.
  *
  * @param {Object} props          The component props.
  * @param {number} props.interval Time in seconds between autosaves.
  */
 function ScheduledAutosaveMonitor( { interval } ) {
 	const { autosave } = useDispatch( editorStore );
-	const { setNextAutosaveTime } = unlock( useDispatch( editorStore ) );
+	const [ nextAutosaveTime, setNextAutosaveTime ] = useState( null );
 	const { getReferenceByDistinctEdits } = useSelect( coreStore );
 
 	// Reference of the edits last sent in an autosave.
@@ -123,10 +121,9 @@ function ScheduledAutosaveMonitor( { interval } ) {
 		interval,
 		autosave,
 		getReferenceByDistinctEdits,
-		setNextAutosaveTime,
 	] );
 
-	return createElement( AutosaveRetry );
+	return createElement( AutosaveRetry, { nextAutosaveTime } );
 }
 
 /**

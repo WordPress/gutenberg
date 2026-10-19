@@ -839,16 +839,3 @@ export function selectNote( noteId, options = { focus: false } ) {
 		options,
 	};
 }
-
-/**
- * Sets when the next server autosave is due.
- *
- * @param {?number} time Timestamp in milliseconds, or null to cancel.
- * @return {Object} Action object.
- */
-export function setNextAutosaveTime( time ) {
-	return {
-		type: 'SET_NEXT_AUTOSAVE_TIME',
-		time,
-	};
-}

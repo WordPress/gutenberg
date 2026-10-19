@@ -13,45 +13,41 @@ const { createNoticeContentFill } = unlock( noticesPrivateApis );
 const NOTICE_ID = 'editor-autosave';
 const AutosaveFailureContent = createNoticeContentFill( NOTICE_ID );
 
-function useRetryText() {
-	const { isAutosaving, nextAutosaveTime } = useSelect( ( select ) => {
-		const hasNotice = select( noticesStore )
-			.getNotices()
-			.some( ( notice ) => notice.id === NOTICE_ID );
-		if ( ! hasNotice ) {
-			return { isAutosaving: false, nextAutosaveTime: null };
-		}
-		const { isAutosavingPost, getNextAutosaveTime } = unlock(
-			select( editorStore )
-		);
-		return {
-			isAutosaving: isAutosavingPost() as boolean,
-			nextAutosaveTime: getNextAutosaveTime() as number | null,
-		};
-	}, [] );
+function useRetryText( nextAutosaveTime: number | null ) {
+	const { hasNotice, isAutosaving } = useSelect(
+		( select ) => ( {
+			hasNotice: select( noticesStore )
+				.getNotices()
+				.some( ( notice ) => notice.id === NOTICE_ID ),
+			isAutosaving: select( editorStore ).isAutosavingPost() as boolean,
+		} ),
+		[]
+	);
+	const countdownTime = hasNotice ? nextAutosaveTime : null;
 	const [ now, setNow ] = useState( Date.now );
 
 	useEffect( () => {
-		if ( nextAutosaveTime === null ) {
+		if ( countdownTime === null ) {
 			return;
 		}
 		setNow( Date.now() );
 		const interval = setInterval( () => setNow( Date.now() ), 1000 );
 		return () => clearInterval( interval );
-	}, [ nextAutosaveTime ] );
+	}, [ countdownTime ] );
+
+	if ( ! hasNotice ) {
+		return null;
+	}
 
 	if ( isAutosaving ) {
 		return __( 'Retrying…' );
 	}
 
-	if ( nextAutosaveTime === null ) {
+	if ( countdownTime === null ) {
 		return null;
 	}
 
-	const seconds = Math.max(
-		0,
-		Math.ceil( ( nextAutosaveTime - now ) / 1000 )
-	);
+	const seconds = Math.max( 0, Math.ceil( ( countdownTime - now ) / 1000 ) );
 	return sprintf(
 		/* translators: %d: Number of seconds until the next autosave. */
 		_n( 'Retrying in %d second.', 'Retrying in %d seconds.', seconds ),
@@ -61,9 +57,16 @@ function useRetryText() {
 
 /**
  * Adds a countdown to the next autosave to the autosave failure notice.
+ *
+ * @param props                  Component props.
+ * @param props.nextAutosaveTime When the next autosave is due, or null.
  */
-export default function AutosaveRetry() {
-	const text = useRetryText();
+export default function AutosaveRetry( {
+	nextAutosaveTime,
+}: {
+	nextAutosaveTime: number | null;
+} ) {
+	const text = useRetryText( nextAutosaveTime );
 	if ( ! text ) {
 		return null;
 	}
