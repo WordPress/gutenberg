@@ -243,7 +243,7 @@ export interface UsersState {
  * actions.
  */
 export type CoreDataThunkArgs = ThunkArgs<
-	typeof import( '.' ).store,
+	typeof import( './index' ).store,
 	typeof import( './private-selectors' ),
 	typeof import( './private-actions' )
 >;

@@ -145,7 +145,8 @@ export function useNoteReactions(
 					},
 					{ throwOnError: true }
 				);
-				change = { added: saved.id };
+				// Saved with `throwOnError`, so the reaction is set, with its numeric ID.
+				change = { added: saved!.id as number };
 			}
 
 			const note = getNote();

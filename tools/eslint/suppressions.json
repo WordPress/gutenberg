@@ -6664,11 +6664,6 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/components/entities-saved-states/entity-record-item.jsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
@@ -6749,17 +6744,7 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/private-actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/test/actions.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

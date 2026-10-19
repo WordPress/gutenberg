@@ -20,6 +20,7 @@ import {
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 import { setCachedBlocks } from './parsed-blocks-cache';
+import type * as ET from './entity-types';
 import type { QueriedMeta, Query } from './queried-data/types';
 import type { PermissionResource } from './utils/types';
 import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
@@ -39,7 +40,7 @@ export const getAuthors =
 			'/wp/v2/users/?who=authors&per_page=100',
 			query
 		);
-		const users = await apiFetch< Array< RestRecord > >( { path } );
+		const users = await apiFetch< Array< ET.User< 'edit' > > >( { path } );
 		dispatch.receiveUserQuery( path, users );
 	};
 
@@ -49,7 +50,7 @@ export const getAuthors =
 export const getCurrentUser =
 	() =>
 	async ( { dispatch }: CoreDataThunkArgs ) => {
-		const currentUser = await apiFetch< RestRecord >( {
+		const currentUser = await apiFetch< ET.User< 'view' > >( {
 			path: '/wp/v2/users/me',
 		} );
 		dispatch.receiveCurrentUser( currentUser );
@@ -582,7 +583,8 @@ export const getCurrentTheme =
 		);
 
 		// Resolved, so the records are set.
-		dispatch.receiveCurrentTheme( activeThemes![ 0 ] );
+		// Theme records are themes.
+		dispatch.receiveCurrentTheme( activeThemes![ 0 ] as ET.Theme );
 	};
 
 /**
@@ -1210,7 +1212,6 @@ export const getRevision =
 			}
 
 			if ( record ) {
-				// @ts-expect-error The JavaScript action's inferred type requires its optional arguments.
 				await dispatch.receiveRevisions(
 					kind,
 					name,

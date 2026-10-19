@@ -82,12 +82,13 @@ const duplicatePost: ActionScriptParts< BasePost > = {
 			} );
 			setIsCreatingPage( true );
 			try {
-				const newItem = await saveEntityRecord(
+				// Saved with `throwOnError`, so the duplicate is set: a post of the same type.
+				const newItem = ( await saveEntityRecord(
 					'postType',
 					item.type,
 					newItemObject,
 					{ throwOnError: true }
-				);
+				) ) as unknown as BasePost;
 
 				createSuccessNotice(
 					sprintf(
