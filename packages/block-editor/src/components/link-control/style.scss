@@ -219,11 +219,6 @@ $block-editor-link-control-number-of-actions: 1;
 		align-items: baseline;
 		line-height: var(--wpds-typography-line-height-sm);
 
-		// The Link contents wrapper, lets the truncated title shrink beside the icon.
-		& > span:first-child {
-			min-width: 0;
-		}
-
 		mark {
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 			color: inherit;
