@@ -124,6 +124,8 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 
 		// Put the render filters back the way the rest of the suite expects.
 		remove_filter( 'render_block', 'gutenberg_notes_preview_add_block_anchor', 20 );
+		remove_filter( 'render_block', 'gutenberg_notes_preview_strip_other_posts' );
+		unset( $_GET['preview_id'], $_GET['preview_nonce'] );
 
 		if ( ! has_filter( 'render_block', 'wp_strip_inline_note_markers' ) ) {
 			add_filter( 'render_block', 'wp_strip_inline_note_markers' );
@@ -580,6 +582,30 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 		$this->assertEmpty( $GLOBALS['wp_query']->posts );
 
 		wp_delete_post( $post_id, true );
+	}
+
+	public function test_reviewer_preview_drops_a_foreign_preview_nonce() {
+		$this->grant( self::$post_id, array( 'read_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$_GET['preview_id']    = self::$post_id;
+		$_GET['preview_nonce'] = 'not-for-this-user';
+
+		gutenberg_notes_preview_drop_foreign_preview_nonce();
+
+		$this->assertArrayNotHasKey( 'preview_id', $_GET );
+		$this->assertArrayNotHasKey( 'preview_nonce', $_GET );
+	}
+
+	public function test_preview_nonce_is_kept_for_users_without_a_grant() {
+		wp_set_current_user( self::$outsider_id );
+
+		$_GET['preview_id']    = self::$post_id;
+		$_GET['preview_nonce'] = 'not-for-this-user';
+
+		gutenberg_notes_preview_drop_foreign_preview_nonce();
+
+		$this->assertArrayHasKey( 'preview_nonce', $_GET );
 	}
 
 	public function test_non_preview_request_is_untouched() {

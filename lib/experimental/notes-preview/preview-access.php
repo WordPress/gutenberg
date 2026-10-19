@@ -9,9 +9,10 @@
  *
  * A reviewer holding `read_post_notes` on the post is let through that gate.
  * The capability is the whole grant - there is no token or nonce involved.
- * The `preview_id` / `preview_nonce` parameters on a preview URL only select
- * autosave content and are bound to the session that generated them, so a
- * reviewer sees the last saved revision of the draft, which is the artifact
+ * The `preview_id` / `preview_nonce` parameters on a preview URL select
+ * autosave content and are bound to the session that generated them. Core
+ * dies on a nonce that does not verify, so for a reviewer they are dropped and
+ * the reviewer sees the last saved version of the draft, which is the artifact
  * they are being asked to review.
  *
  * Logged-out visitors are turned away by core before this file gets a say
@@ -79,6 +80,36 @@ function gutenberg_notes_preview_post_type_supports_notes( $post_type ) {
 
 	return false;
 }
+
+/**
+ * Drops a preview nonce that a reviewer cannot verify.
+ *
+ * A preview link copied from the editor carries the author's autosave nonce,
+ * and _show_post_preview() calls wp_die() when it does not verify. Dropping
+ * the parameters only loses the autosave; whether the reviewer may see the
+ * post is still decided by the `posts_results` filter below.
+ *
+ * Runs before _show_post_preview() on `init`.
+ */
+function gutenberg_notes_preview_drop_foreign_preview_nonce() {
+	if ( ! isset( $_GET['preview_id'], $_GET['preview_nonce'] ) || ! is_user_logged_in() ) {
+		return;
+	}
+
+	$post_id = (int) $_GET['preview_id'];
+
+	if ( false !== wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['preview_nonce'] ) ), 'post_preview_' . $post_id ) ) {
+		return;
+	}
+
+	if ( current_user_can( 'edit_post', $post_id ) || ! current_user_can( 'read_post_notes', $post_id ) ) {
+		return;
+	}
+
+	unset( $_GET['preview_id'], $_GET['preview_nonce'] );
+}
+
+add_action( 'init', 'gutenberg_notes_preview_drop_foreign_preview_nonce', 9 );
 
 /**
  * Remembers the real status of a post whose status is temporarily swapped.
