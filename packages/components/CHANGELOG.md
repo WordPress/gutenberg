@@ -4,9 +4,10 @@
 
 ### Breaking Changes
 
--   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers using `@emotion/react` or `@emotion/styled` that relied on StyleProvider's cross-document cache must provide their own cache and `CacheProvider`; `StyleProvider` continues to register CSS Module styles. This includes:
+-   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers using `@emotion/react` or `@emotion/styled` that relied on StyleProvider's cross-document cache must provide their own cache targeting that document's `<head>` and wrap the subtree in `CacheProvider`; `StyleProvider` continues to register CSS Module styles. Components no longer supply Framer Motion's optional Emotion DOM prop validator; without a validator, `__unstableMotion` forwards non-animation props to the rendered element. This includes:
     -   Context-system class-name composition ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
     -   `StyleProvider` cache removal ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
+    -   Removal of the remaining Emotion dependencies and obsolete snapshot helpers ([#85022](https://github.com/WordPress/gutenberg/pull/85022)).
     -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
     -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724))
     -   `FocalPointPicker` ([#84736](https://github.com/WordPress/gutenberg/pull/84736))
@@ -67,6 +68,10 @@
 -   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
 -   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
+
+### Documentation
+
+-   Update styling guidance and the `ToolsPanel` example after the Emotion migration ([#85020](https://github.com/WordPress/gutenberg/pull/85020)).
 
 ## 42.0.0 (2026-10-07)
 
