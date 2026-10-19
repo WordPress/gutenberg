@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import warning from '@wordpress/warning';
+import type { Block } from '@wordpress/blocks';
 import { updateFootnotesFromMeta } from '../';
 
 // The real implementation logs once per distinct message, which would make
@@ -7,10 +8,10 @@ import { updateFootnotesFromMeta } from '../';
 vi.mock( import( '@wordpress/warning' ) );
 
 describe( 'updateFootnotesFromMeta', () => {
-	const blocks = [];
+	const blocks: Array< Block > = [];
 
 	beforeEach( () => {
-		warning.mockClear();
+		vi.mocked( warning ).mockClear();
 	} );
 
 	it( 'returns the blocks untouched when there is no meta', () => {

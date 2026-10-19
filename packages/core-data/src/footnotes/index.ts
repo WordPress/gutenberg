@@ -1,10 +1,15 @@
 import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 import warning from '@wordpress/warning';
+import type { Block } from '@wordpress/blocks';
 import getFootnotesOrder from './get-footnotes-order';
+import type { Footnote } from './types';
 
-let oldFootnotes = {};
+let oldFootnotes: Record< string, Footnote > = {};
 
-export function updateFootnotesFromMeta( blocks, meta ) {
+export function updateFootnotesFromMeta(
+	blocks: Array< Block >,
+	meta: Record< string, unknown > | undefined
+): { blocks: Array< Block >; meta?: Record< string, unknown > } {
 	const output = { blocks };
 	if ( ! meta ) {
 		return output;
@@ -22,15 +27,16 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 	// something other than an array. Parsing it unguarded throws inside a store
 	// subscriber, where no error boundary catches it and the edit is dropped
 	// before it reaches editEntityRecord, so the post silently stops saving.
-	let parsed;
+	let parsed: unknown;
 	try {
-		parsed = JSON.parse( meta.footnotes || '[]' );
+		// The footnotes meta is a JSON string.
+		parsed = JSON.parse( ( meta.footnotes as string ) || '[]' );
 	} catch {
 		// Left undefined, which the check below reports along with a value of
 		// the wrong shape.
 	}
 
-	let footnotes = [];
+	let footnotes: Array< Footnote > = [];
 	if ( Array.isArray( parsed ) ) {
 		footnotes = parsed;
 	} else {
@@ -52,7 +58,9 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 			}
 	);
 
-	function updateAttributes( attributes ) {
+	function updateAttributes(
+		attributes: Record< string, unknown >
+	): Record< string, unknown > {
 		// Only attempt to update attributes, if attributes is an object.
 		if (
 			! attributes ||
@@ -68,7 +76,10 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 			const value = attributes[ key ];
 
 			if ( Array.isArray( value ) ) {
-				attributes[ key ] = value.map( updateAttributes );
+				// Nested attributes are checked as the attributes are.
+				attributes[ key ] = (
+					value as Array< Record< string, unknown > >
+				 ).map( updateAttributes );
 				continue;
 			}
 
@@ -89,7 +100,8 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 
 			richTextValue.replacements.forEach( ( replacement ) => {
 				if ( replacement.type === 'core/footnote' ) {
-					const id = replacement.attributes[ 'data-fn' ];
+					// A footnote format names its footnote.
+					const id = replacement.attributes![ 'data-fn' ];
 					const index = newOrder.indexOf( id );
 					// The innerHTML contains the count wrapped in a link.
 					const countValue = create( {
@@ -122,7 +134,9 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 		return attributes;
 	}
 
-	function updateBlocksAttributes( __blocks ) {
+	function updateBlocksAttributes(
+		__blocks: Array< Block >
+	): Array< Block > {
 		return __blocks.map( ( block ) => {
 			return {
 				...block,
@@ -138,7 +152,7 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 
 	oldFootnotes = {
 		...oldFootnotes,
-		...footnotes.reduce( ( acc, fn ) => {
+		...footnotes.reduce< Record< string, Footnote > >( ( acc, fn ) => {
 			if ( ! newOrder.includes( fn.id ) ) {
 				acc[ fn.id ] = fn;
 			}

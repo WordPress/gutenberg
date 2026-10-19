@@ -5,15 +5,18 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
+// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { RichText } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
+import type { Block } from '@wordpress/blocks';
 import { store as coreDataStore } from '../index';
 import { registerEntitySyncManager } from '../entity-sync';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
 import { getRootMap } from '../utils/crdt-utils';
+import type { EntityBlockEditorHandler } from '../hooks/types';
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
@@ -66,16 +69,18 @@ function createRegistryWithStores() {
 	return registry;
 }
 
-function readFirstBlockContentFromDoc( doc ) {
+function readFirstBlockContentFromDoc( doc: Y.Doc ): string {
 	const ymap = getRootMap( doc, CRDT_RECORD_MAP_KEY );
-	const yblocks = ymap.get( 'blocks' );
-	const attrs = yblocks.get( 0 ).get( 'attributes' );
-	return attrs.get( 'content' ).toString();
+	// The record map holds the blocks as maps, with their attributes as maps.
+	const yblocks = ymap.get( 'blocks' ) as Y.Array< Y.Map< Y.Map< Y.Text > > >;
+	// The test's paragraph has attributes, with content.
+	const attrs = yblocks.get( 0 ).get( 'attributes' )!;
+	return attrs.get( 'content' )!.toString();
 }
 
 describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
-	let crdtDoc;
-	let unregisterSyncManager;
+	let crdtDoc: Y.Doc;
+	let unregisterSyncManager: () => void;
 
 	beforeEach( () => {
 		crdtDoc = new Y.Doc();
@@ -133,13 +138,15 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 
 	it( 'preserves formatted paragraph content when onInput forwards blocks plus selection', async () => {
 		const registry = createRegistryWithStores();
-		let blocks;
-		let onInput;
+		// Both are set by the component's first render, which the test awaits.
+		let blocks!: Array< Block >;
+		let onInput!: EntityBlockEditorHandler;
 
 		const TestComponent = () => {
+			// Given an ID, the hook returns the blocks of the record.
 			[ blocks, onInput ] = useEntityBlockEditor( 'postType', 'post', {
 				id: 1,
-			} );
+			} ) as [ Array< Block >, EntityBlockEditorHandler, unknown ];
 
 			return <div />;
 		};

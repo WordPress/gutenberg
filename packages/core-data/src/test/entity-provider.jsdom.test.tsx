@@ -6,12 +6,24 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
+// @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { unregisterFormatType } from '@wordpress/rich-text';
+import type { ReactNode } from 'react';
+import type { Block } from '@wordpress/blocks';
 import { store as coreDataStore } from '../index';
 import useEntityBlockEditor from '../hooks/use-entity-block-editor';
+import type { EntityBlockEditorHandler } from '../hooks/types';
+
+// Given an ID, the hook returns the blocks of the record.
+type EntityBlockEditorWithBlocks = [
+	Array< Block >,
+	EntityBlockEditorHandler,
+	EntityBlockEditorHandler,
+];
 
 vi.mock( import( '@wordpress/api-fetch' ) );
 
@@ -70,19 +82,24 @@ function createRegistryWithStores() {
 }
 
 describe( 'useEntityBlockEditor', () => {
-	let registry;
+	let registry: ReturnType< typeof createRegistryWithStores >;
 
 	beforeEach( () => {
 		registry = createRegistryWithStores();
 
-		const edit = ( { children } ) => <>{ children }</>;
+		const edit = ( {
+			children,
+		}: {
+			attributes: unknown;
+			children?: ReactNode;
+		} ) => <>{ children }</>;
 
 		registerBlockType( 'core/test-block', {
 			apiVersion: 3,
 			supports: {
 				className: false,
 			},
-			save: ( { attributes } ) => {
+			save: ( { attributes }: { attributes: { content: string } } ) => {
 				const { content } = attributes;
 				return (
 					<p { ...useBlockProps.save() }>
@@ -109,7 +126,11 @@ describe( 'useEntityBlockEditor', () => {
 			supports: {
 				className: false,
 			},
-			save: ( { attributes } ) => {
+			save: ( {
+				attributes,
+			}: {
+				attributes: { items: Array< string | null > };
+			} ) => {
 				const { items } = attributes;
 				return (
 					<div>
@@ -144,11 +165,12 @@ describe( 'useEntityBlockEditor', () => {
 	} );
 
 	it( 'does not mutate block attributes that include an array of strings or null values', async () => {
-		let blocks, onChange;
+		// Set by the component's first render.
+		let blocks!: Array< Block >, onChange!: EntityBlockEditorHandler;
 		const TestComponent = () => {
 			[ blocks, , onChange ] = useEntityBlockEditor( 'postType', 'post', {
 				id: 1,
-			} );
+			} ) as EntityBlockEditorWithBlocks;
 
 			return <div />;
 		};
@@ -218,12 +240,13 @@ describe( 'useEntityBlockEditor', () => {
 				},
 			] );
 
-		let blocks, onChange;
+		// Set by the component's first render.
+		let blocks!: Array< Block >, onChange!: EntityBlockEditorHandler;
 
 		const TestComponent = () => {
 			[ blocks, , onChange ] = useEntityBlockEditor( 'postType', 'post', {
 				id: 1,
-			} );
+			} ) as EntityBlockEditorWithBlocks;
 
 			return <div />;
 		};
@@ -270,11 +293,12 @@ describe( 'useEntityBlockEditor', () => {
 	} );
 
 	it( 'preserves block clientIds across unmount and remount when content is unchanged', () => {
-		let blocks;
+		// Set by the component's first render.
+		let blocks!: Array< Block >;
 		const TestComponent = () => {
 			[ blocks ] = useEntityBlockEditor( 'postType', 'post', {
 				id: 1,
-			} );
+			} ) as EntityBlockEditorWithBlocks;
 			return <div />;
 		};
 
@@ -302,11 +326,12 @@ describe( 'useEntityBlockEditor', () => {
 	} );
 
 	it( 'returns new blocks when content changes', () => {
-		let blocks;
+		// Set by the component's first render.
+		let blocks!: Array< Block >;
 		const TestComponent = () => {
 			[ blocks ] = useEntityBlockEditor( 'postType', 'post', {
 				id: 1,
-			} );
+			} ) as EntityBlockEditorWithBlocks;
 			return <div />;
 		};
 

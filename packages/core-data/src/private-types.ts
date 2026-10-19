@@ -258,3 +258,67 @@ export type CoreDataThunkArgs = ThunkArgs<
 	typeof import( './private-selectors' ),
 	typeof import( './private-actions' )
 >;
+
+/**
+ * A modifier to apply to a media item.
+ */
+export interface MediaEditModifier {
+	/**
+	 * The type of modifier.
+	 */
+	type?: string;
+	/**
+	 * The arguments of the modifier.
+	 */
+	args?: Record< string, unknown >;
+}
+
+/**
+ * Edits to apply to a duplicated media item.
+ */
+export interface MediaEdits {
+	/**
+	 * The URL of the media item.
+	 */
+	src?: string;
+	/**
+	 * The modifiers to apply to the media item.
+	 */
+	modifiers?: Array< MediaEditModifier >;
+}
+
+/**
+ * A dirty record to save, or an edited property of the site entity.
+ */
+export interface SavableRecord {
+	kind: string;
+	name: string;
+	key?: string | number;
+	property?: string;
+}
+
+/**
+ * Options of `saveDirtyEntities`.
+ */
+export interface SaveDirtyEntitiesOptions {
+	/**
+	 * Callback when saving happens.
+	 */
+	onSave?: () => unknown;
+	/**
+	 * Array of dirty entities.
+	 */
+	dirtyEntityRecords?: Array< SavableRecord >;
+	/**
+	 * Array of entities to skip saving.
+	 */
+	entitiesToSkip?: Array< SavableRecord >;
+	/**
+	 * Callback when the actions is called. It should be consolidated with `onSave`.
+	 */
+	close?: ( entities: Array< SavableRecord > ) => void;
+	/**
+	 * Optional custom success notice content. Defaults to 'Site updated.'.
+	 */
+	successNoticeContent?: string;
+}
