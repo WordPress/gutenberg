@@ -4,10 +4,9 @@ import { __ } from '@wordpress/i18n';
  * Reads the response body as JSON, normalizing a parse failure into an
  * `invalid_json` error.
  *
- * The error keeps the response's `status` and whether it was `redirected`,
- * since they are often the only account of what answered instead of
- * WordPress: an error page from a proxy, or the login page. They are top-level
- * rather than in `data`, where a REST error keeps the status WordPress set.
+ * The error includes the response's `status` and `redirected`, so a failed
+ * save can say more than "not a valid JSON response". They're top-level, not
+ * in `data`, which holds the status WordPress sets on REST errors.
  *
  * Only the success path passes `allowEmptyBody`: `parseAndThrowError` throws
  * whatever this returns, and callers read `code` off it.
