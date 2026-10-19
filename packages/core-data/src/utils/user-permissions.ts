@@ -1,3 +1,5 @@
+import type { PermissionResource } from './types';
+
 export const ALLOWED_RESOURCE_ACTIONS = [
 	'create',
 	'read',
@@ -5,8 +7,10 @@ export const ALLOWED_RESOURCE_ACTIONS = [
 	'delete',
 ];
 
-export function getUserPermissionsFromAllowHeader( allowedMethods ) {
-	const permissions = {};
+export function getUserPermissionsFromAllowHeader(
+	allowedMethods: string | null | undefined
+): Record< string, boolean > {
+	const permissions: Record< string, boolean > = {};
 	const methods = {
 		create: 'POST',
 		read: 'GET',
@@ -23,7 +27,11 @@ export function getUserPermissionsFromAllowHeader( allowedMethods ) {
 	return permissions;
 }
 
-export function getUserPermissionCacheKey( action, resource, id ) {
+export function getUserPermissionCacheKey(
+	action: string,
+	resource: string | PermissionResource,
+	id?: string | number
+): string {
 	const key = (
 		typeof resource === 'object'
 			? [ action, resource.kind, resource.name, resource.id ]

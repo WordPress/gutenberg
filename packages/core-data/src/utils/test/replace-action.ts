@@ -1,11 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import replaceAction from '../replace-action';
 
+type Action = { before: string };
+type ReplacedAction = { after: string };
+
 describe( 'replaceAction', () => {
-	function createEnhancedReducer( replacer ) {
+	function createEnhancedReducer(
+		replacer: ( action: Action ) => ReplacedAction
+	) {
 		const enhanceReducer = replaceAction( replacer );
 		return enhanceReducer(
-			( state, action ) => 'Called by ' + action.after
+			( state: string | undefined, action: ReplacedAction ) =>
+				'Called by ' + action.after
 		);
 	}
 

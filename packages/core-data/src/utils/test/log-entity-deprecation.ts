@@ -100,13 +100,23 @@ describe( 'logEntityDeprecation', () => {
 	} );
 
 	it( 'should handle null parameters', () => {
-		logEntityDeprecation( null, null, null );
+		logEntityDeprecation(
+			// @ts-expect-error Tests the guard against missing arguments.
+			null,
+			null,
+			null
+		);
 
 		expect( deprecated ).not.toHaveBeenCalled();
 	} );
 
 	it( 'should handle undefined parameters', () => {
-		logEntityDeprecation( undefined, undefined, undefined );
+		logEntityDeprecation(
+			// @ts-expect-error Tests the guard against missing arguments.
+			undefined,
+			undefined,
+			undefined
+		);
 
 		expect( deprecated ).not.toHaveBeenCalled();
 	} );

@@ -5,19 +5,23 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  * result of the next item, preferring value references from the original item
  * if equal. If all values match, the original item is returned.
  *
- * @param {Object} item     Original item.
- * @param {Object} nextItem Next item.
+ * @param item     Original item.
+ * @param nextItem Next item.
  *
- * @return {Object} Minimally modified merged item.
+ * @return Minimally modified merged item.
  */
-export default function conservativeMapItem( item, nextItem ) {
+export default function conservativeMapItem<
+	I extends Record< string, unknown >,
+	N extends Record< string, unknown >,
+>( item: I | undefined, nextItem: N ): I & N {
 	// Return next item in its entirety if there is no original item.
 	if ( ! item ) {
-		return nextItem;
+		// With no original item, the next item is the whole result.
+		return nextItem as I & N;
 	}
 
 	let hasChanges = false;
-	const result = {};
+	const result: Record< string, unknown > = {};
 	for ( const key in nextItem ) {
 		if ( fastDeepEqual( item[ key ], nextItem[ key ] ) ) {
 			result[ key ] = item[ key ];
@@ -28,7 +32,8 @@ export default function conservativeMapItem( item, nextItem ) {
 	}
 
 	if ( ! hasChanges ) {
-		return item;
+		// Unchanged, so the original item has every value of the next one.
+		return item as I & N;
 	}
 
 	// Only at this point, backfill properties from the original item which
@@ -40,5 +45,6 @@ export default function conservativeMapItem( item, nextItem ) {
 		}
 	}
 
-	return result;
+	// Holds every key of both items, with the values of the next item.
+	return result as I & N;
 }

@@ -20,26 +20,35 @@
  * @param {Array|string} path   Path of the property to set.
  * @param {*}            value  Value to set.
  */
-export default function setNestedValue( object, path, value ) {
+export default function setNestedValue< T >(
+	object: T,
+	path: ( string | number )[] | string,
+	value: unknown
+): T {
 	if ( ! object || typeof object !== 'object' ) {
 		return object;
 	}
 
 	const normalizedPath = Array.isArray( path ) ? path : path.split( '.' );
 
-	normalizedPath.reduce( ( acc, key, idx ) => {
-		if ( acc[ key ] === undefined ) {
-			if ( Number.isInteger( normalizedPath[ idx + 1 ] ) ) {
-				acc[ key ] = [];
-			} else {
-				acc[ key ] = {};
+	normalizedPath.reduce< Record< string | number, unknown > >(
+		( acc, key, idx ) => {
+			if ( acc[ key ] === undefined ) {
+				if ( Number.isInteger( normalizedPath[ idx + 1 ] ) ) {
+					acc[ key ] = [];
+				} else {
+					acc[ key ] = {};
+				}
 			}
-		}
-		if ( idx === normalizedPath.length - 1 ) {
-			acc[ key ] = value;
-		}
-		return acc[ key ];
-	}, object );
+			if ( idx === normalizedPath.length - 1 ) {
+				acc[ key ] = value;
+			}
+			// The path runs through objects and arrays, as the caller describes it.
+			return acc[ key ] as Record< string | number, unknown >;
+		},
+		// Checked above to be an object.
+		object as Record< string | number, unknown >
+	);
 
 	return object;
 }

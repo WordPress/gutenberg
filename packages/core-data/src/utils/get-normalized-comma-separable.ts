@@ -3,15 +3,16 @@
  * string or an array, returns a value normalized to an array of strings, or
  * null if the value cannot be interpreted as either.
  *
- * @param {string|string[]|*} value
+ * @param value
  *
- * @return {?(string[])} Normalized field value.
+ * @return Normalized field value.
  */
-function getNormalizedCommaSeparable( value ) {
+function getNormalizedCommaSeparable( value: unknown ): string[] | null {
 	if ( typeof value === 'string' ) {
 		return value.split( ',' );
 	} else if ( Array.isArray( value ) ) {
-		return value;
+		// Callers pass arrays of strings.
+		return value as string[];
 	}
 
 	return null;

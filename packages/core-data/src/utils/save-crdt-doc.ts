@@ -1,10 +1,15 @@
 import apiFetch from '@wordpress/api-fetch';
+import type { ObjectID, ObjectType } from '@wordpress/sync';
 import { getSyncManager } from '../sync';
 
 const SYNC_SAVE_API_PATH = '/wp-sync/v1/save';
-const saveCRDTDocQueues = new Map();
+const saveCRDTDocQueues = new Map< string, Promise< void > >();
 
-async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
+async function serializeAndSaveCRDTDoc(
+	objectType: ObjectType,
+	objectId: ObjectID,
+	room: string
+): Promise< void > {
 	const serializedDoc = await getSyncManager()?.createPersistedCRDTDoc(
 		objectType,
 		objectId
@@ -27,10 +32,13 @@ async function serializeAndSaveCRDTDoc( objectType, objectId, room ) {
 /**
  * Persist the current CRDT document through the sync /save endpoint.
  *
- * @param {import('@wordpress/sync').ObjectType} objectType Object type.
- * @param {import('@wordpress/sync').ObjectID}   objectId   Object ID.
+ * @param objectType Object type.
+ * @param objectId   Object ID.
  */
-export async function saveCRDTDoc( objectType, objectId ) {
+export async function saveCRDTDoc(
+	objectType: ObjectType,
+	objectId: ObjectID
+): Promise< void > {
 	const room = `${ objectType }:${ objectId }`;
 
 	// Saves are chained per-room, which forms a queue.

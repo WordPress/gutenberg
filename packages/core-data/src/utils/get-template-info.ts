@@ -1,17 +1,22 @@
 import { layout } from '@wordpress/icons';
 import { getTemplatePartIcon } from './get-template-part-icon';
+import type { TemplateInfo, TemplateInfoParams, TemplateType } from './types';
+
 const EMPTY_OBJECT = {};
 
 /**
  * Helper function to retrieve the corresponding template info for a given template.
- * @param {Object} params
- * @param {Array}  params.templateTypes
- * @param {Array}  [params.templateAreas]
- * @param {Object} params.template
+ * @param params
+ * @param params.templateTypes
+ * @param params.templateAreas
+ * @param params.template
  */
-export const getTemplateInfo = ( params ) => {
+export const getTemplateInfo = (
+	params: TemplateInfoParams | undefined
+): TemplateInfo => {
 	if ( ! params ) {
-		return EMPTY_OBJECT;
+		// Every field of the info is optional.
+		return EMPTY_OBJECT as TemplateInfo;
 	}
 
 	const { templateTypes, templateAreas, template } = params;
@@ -20,7 +25,7 @@ export const getTemplateInfo = ( params ) => {
 
 	const { title: defaultTitle, description: defaultDescription } =
 		Object.values( templateTypes ).find( ( type ) => type.slug === slug ) ??
-		EMPTY_OBJECT;
+		( EMPTY_OBJECT as Partial< TemplateType > );
 
 	const templateTitle = typeof title === 'string' ? title : title?.rendered;
 	const templateDescription =

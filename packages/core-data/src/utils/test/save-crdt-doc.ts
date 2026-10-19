@@ -1,5 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
+import type { SyncManager } from '@wordpress/sync';
 import { getSyncManager } from '../../sync';
 import { saveCRDTDoc } from '../save-crdt-doc';
 
@@ -9,8 +11,8 @@ vi.mock( import( '../../sync' ), () => ( {
 } ) );
 
 function createDeferred() {
-	let resolve;
-	let reject;
+	let resolve!: ( value: unknown ) => void;
+	let reject!: ( reason: unknown ) => void;
 	const promise = new Promise( ( _resolve, _reject ) => {
 		resolve = _resolve;
 		reject = _reject;
@@ -24,22 +26,25 @@ async function flushPromises() {
 }
 
 describe( 'saveCRDTDoc', () => {
-	let syncManager;
+	let syncManager: { createPersistedCRDTDoc: Mock };
 
 	beforeEach( () => {
-		apiFetch.mockReset();
+		vi.mocked( apiFetch ).mockReset();
 		syncManager = {
 			createPersistedCRDTDoc: vi.fn(),
 		};
-		getSyncManager.mockReturnValue( syncManager );
+		vi.mocked( getSyncManager ).mockReturnValue(
+			// The stub provides only what `saveCRDTDoc` needs.
+			syncManager as unknown as SyncManager
+		);
 	} );
 
 	it( 'saves the serialized CRDT document through the sync endpoint', async () => {
 		const fetch = createDeferred();
 		syncManager.createPersistedCRDTDoc.mockResolvedValue( 'doc' );
-		apiFetch.mockImplementation( () => fetch.promise );
+		vi.mocked( apiFetch ).mockImplementation( () => fetch.promise );
 
-		const save = saveCRDTDoc( 'postType/post', 1 );
+		const save = saveCRDTDoc( 'postType/post', '1' );
 
 		await flushPromises();
 
@@ -59,7 +64,7 @@ describe( 'saveCRDTDoc', () => {
 	it( 'does not call the sync endpoint when there is no serialized CRDT document', async () => {
 		syncManager.createPersistedCRDTDoc.mockResolvedValue( null );
 
-		await saveCRDTDoc( 'postType/post', 1 );
+		await saveCRDTDoc( 'postType/post', '1' );
 
 		expect( apiFetch ).not.toHaveBeenCalled();
 	} );
@@ -69,12 +74,12 @@ describe( 'saveCRDTDoc', () => {
 		syncManager.createPersistedCRDTDoc
 			.mockResolvedValueOnce( 'doc-1' )
 			.mockResolvedValueOnce( 'doc-2' );
-		apiFetch
+		vi.mocked( apiFetch )
 			.mockImplementationOnce( () => firstFetch.promise )
 			.mockResolvedValueOnce( {} );
 
-		const firstSave = saveCRDTDoc( 'postType/post', 1 );
-		const secondSave = saveCRDTDoc( 'postType/post', 1 );
+		const firstSave = saveCRDTDoc( 'postType/post', '1' );
+		const secondSave = saveCRDTDoc( 'postType/post', '1' );
 
 		await flushPromises();
 
@@ -110,14 +115,15 @@ describe( 'saveCRDTDoc', () => {
 	it( 'does not serialize save requests for different rooms', async () => {
 		const firstFetch = createDeferred();
 		syncManager.createPersistedCRDTDoc.mockImplementation(
-			( objectType, objectId ) => Promise.resolve( `doc-${ objectId }` )
+			( objectType: string, objectId: string ) =>
+				Promise.resolve( `doc-${ objectId }` )
 		);
-		apiFetch
+		vi.mocked( apiFetch )
 			.mockImplementationOnce( () => firstFetch.promise )
 			.mockResolvedValueOnce( {} );
 
-		const firstSave = saveCRDTDoc( 'postType/post', 1 );
-		const secondSave = saveCRDTDoc( 'postType/post', 2 );
+		const firstSave = saveCRDTDoc( 'postType/post', '1' );
+		const secondSave = saveCRDTDoc( 'postType/post', '2' );
 
 		await flushPromises();
 
@@ -150,12 +156,12 @@ describe( 'saveCRDTDoc', () => {
 		syncManager.createPersistedCRDTDoc
 			.mockResolvedValueOnce( 'doc-1' )
 			.mockResolvedValueOnce( 'doc-2' );
-		apiFetch
+		vi.mocked( apiFetch )
 			.mockImplementationOnce( () => firstFetch.promise )
 			.mockResolvedValueOnce( {} );
 
-		const firstSave = saveCRDTDoc( 'postType/post', 1 );
-		const secondSave = saveCRDTDoc( 'postType/post', 1 );
+		const firstSave = saveCRDTDoc( 'postType/post', '1' );
+		const secondSave = saveCRDTDoc( 'postType/post', '1' );
 
 		await flushPromises();
 

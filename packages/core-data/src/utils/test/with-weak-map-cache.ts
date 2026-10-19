@@ -4,6 +4,7 @@ import withWeakMapCache from '../with-weak-map-cache';
 describe( 'withWeakMapCache', () => {
 	it( 'calls and returns from the original function', () => {
 		const cachedFn = withWeakMapCache( () => 'Called' );
+		// @ts-expect-error Tests a call without a key, which is not cached.
 		const result = cachedFn();
 
 		expect( result ).toBe( 'Called' );

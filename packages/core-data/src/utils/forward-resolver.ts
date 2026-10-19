@@ -1,3 +1,5 @@
+import type { ForwardedResolverArgs } from './types';
+
 /**
  * Higher-order function which forward the resolution to another resolver with the same arguments.
  *
@@ -6,9 +8,9 @@
  * @return {Function} Enhanced resolver.
  */
 const forwardResolver =
-	( resolverName ) =>
-	( ...args ) =>
-	async ( { resolveSelect } ) => {
+	( resolverName: string ) =>
+	( ...args: unknown[] ) =>
+	async ( { resolveSelect }: ForwardedResolverArgs ): Promise< void > => {
 		await resolveSelect[ resolverName ]( ...args );
 	};
 

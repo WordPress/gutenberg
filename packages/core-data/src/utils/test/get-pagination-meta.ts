@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import getPaginationMeta from '../get-pagination-meta';
 
-const createHeaders = ( values ) => ( {
-	get: ( header ) => values[ header ] ?? null,
-} );
+const createHeaders = ( values: Record< string, string > ) =>
+	// The stub provides only what `getPaginationMeta` needs.
+	( {
+		get: ( header: string ) => values[ header ] ?? null,
+	} ) as unknown as Headers;
 
 describe( 'getPaginationMeta', () => {
 	it( 'returns the totals reported by the headers', () => {

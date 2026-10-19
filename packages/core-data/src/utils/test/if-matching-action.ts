@@ -3,9 +3,11 @@ import deepFreeze from 'deep-freeze';
 import ifMatchingAction from '../if-matching-action';
 
 describe( 'ifMatchingAction', () => {
-	function createEnhancedReducer( predicate ) {
+	function createEnhancedReducer(
+		predicate: ( action: unknown ) => boolean
+	) {
 		const enhanceReducer = ifMatchingAction( predicate );
-		return enhanceReducer( () => 'Called' );
+		return enhanceReducer( (): unknown => 'Called' );
 	}
 
 	it( 'should call reducer if predicate returns true', () => {

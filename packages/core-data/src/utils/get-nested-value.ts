@@ -5,12 +5,16 @@
  * - an array of properties, for example `[ 'x', 'y' ]`.
  * You can also specify a default value in case the result is nullish.
  *
- * @param {Object}       object       Input object.
- * @param {string|Array} path         Path to the object property.
- * @param {*}            defaultValue Default value if the value at the specified path is undefined.
- * @return {*} Value of the object property at the specified path.
+ * @param object       Input object.
+ * @param path         Path to the object property.
+ * @param defaultValue Default value if the value at the specified path is undefined.
+ * @return Value of the object property at the specified path.
  */
-export default function getNestedValue( object, path, defaultValue ) {
+export default function getNestedValue(
+	object: unknown,
+	path: string | ( string | number )[],
+	defaultValue?: unknown
+): unknown {
 	if (
 		! object ||
 		typeof object !== 'object' ||
@@ -19,9 +23,10 @@ export default function getNestedValue( object, path, defaultValue ) {
 		return object;
 	}
 	const normalizedPath = Array.isArray( path ) ? path : path.split( '.' );
-	let value = object;
+	let value: unknown = object;
 	normalizedPath.forEach( ( fieldName ) => {
-		value = value?.[ fieldName ];
+		// A primitive has no such property, so this reads `undefined`.
+		value = ( value as Record< string | number, unknown > )?.[ fieldName ];
 	} );
 	return value !== undefined ? value : defaultValue;
 }
