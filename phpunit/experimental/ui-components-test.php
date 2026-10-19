@@ -49,7 +49,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 * @param array|null $example Example props with the React render.
 	 */
 	public function test_renders_the_same_markup_as_react( $example ) {
-		$html = gutenberg_get_ui_component( $example['component'], $example['props'] );
+		$html = (string) gutenberg_ui_components_render_example( $example );
 
 		$this->assertSame(
 			self::normalize_html( $example['html'] ),
@@ -89,7 +89,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 * @param array|null $combination Props with the React render.
 	 */
 	public function test_rebuilds_every_combination_like_react( $combination ) {
-		$html = gutenberg_get_ui_component( $combination['component'], $combination['props'] );
+		$html = (string) gutenberg_ui_components_render_example( $combination );
 
 		$this->assertSame(
 			self::normalize_html( $combination['html'] ),
@@ -146,14 +146,14 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 */
 	public function test_accepts_the_values_wordpress_treats_as_booleans( $value ) {
 		$this->assertSame(
-			gutenberg_get_ui_component(
+			(string) gutenberg_get_ui_component(
 				'button',
 				array(
 					'label'    => 'Save',
 					'disabled' => true,
 				)
 			),
-			gutenberg_get_ui_component(
+			(string) gutenberg_get_ui_component(
 				'button',
 				array(
 					'label'    => 'Save',
@@ -172,7 +172,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	public function test_escapes_text_and_attribute_slots() {
-		$html = gutenberg_get_ui_component(
+		$html = (string) gutenberg_get_ui_component(
 			'button',
 			array(
 				'label' => '<script>alert(1)</script>',
@@ -190,7 +190,7 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 */
 	public function test_keeps_entities_in_text_and_attribute_slots_literal() {
 		$processor = new WP_HTML_Tag_Processor(
-			gutenberg_get_ui_component(
+			(string) gutenberg_get_ui_component(
 				'button',
 				array(
 					'label' => 'Tom &amp; Jerry &hellip; &#8217; &lt;b&gt;',
@@ -207,17 +207,201 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * String content is plain text too, so it escapes entities the same way
+	 * as props.
+	 */
+	public function test_keeps_entities_in_string_content_literal() {
+		$processor = new WP_HTML_Tag_Processor(
+			(string) gutenberg_get_ui_component( 'card', array( 'title' => 'Settings' ), 'Tom &amp; Jerry &hellip;' )
+		);
+
+		$text = '';
+		while ( $processor->next_token() ) {
+			if ( '#text' === $processor->get_token_type() ) {
+				$text .= $processor->get_modifiable_text();
+			}
+		}
+		$this->assertStringContainsString( 'Tom &amp; Jerry &hellip;', $text );
+	}
+
+	/**
+	 * An example's content can be another component, like a block example's
+	 * `innerBlocks`.
+	 */
+	public function test_renders_an_example_with_a_component_as_content() {
+		$html = (string) gutenberg_ui_components_render_example(
+			array(
+				'component' => 'card',
+				'props'     => array( 'title' => 'Settings' ),
+				'content'   => array(
+					'component' => 'button',
+					'props'     => array( 'label' => 'Save' ),
+				),
+			)
+		);
+
+		$this->assertSame(
+			(string) gutenberg_get_ui_component( 'card', array( 'title' => 'Settings' ), gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ) ),
+			$html
+		);
+		$this->assertSame( 1, substr_count( $html, '<button' ) );
+	}
+
+	public function test_returns_safe_html_that_prints_like_a_string() {
+		$button = gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) );
+
+		$this->assertInstanceOf( Gutenberg_UI_Safe_HTML::class, $button );
+		$this->expectOutputString( (string) $button );
+		echo $button; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Testing that it prints.
+	}
+
+	public function test_escapes_string_content() {
+		$html = (string) gutenberg_get_ui_component( 'card', array( 'title' => 'Settings' ), '<script>alert(1)</script><b>bold</b>' );
+
+		$this->assertStringNotContainsString( '<script>', $html );
+		$this->assertStringNotContainsString( '<b>', $html );
+		$this->assertStringContainsString( '&lt;script&gt;alert(1)&lt;/script&gt;&lt;b&gt;bold&lt;/b&gt;', $html );
+	}
+
+	public function test_inserts_a_component_as_html() {
+		$html = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			gutenberg_get_ui_component( 'button', array( 'label' => '<script>alert(1)</script>' ) )
+		);
+
+		$this->assertSame( 1, substr_count( $html, '<button' ), 'The button is markup, not text.' );
+		$this->assertStringNotContainsString( '<script>', $html, 'The button still escapes its own props.' );
+	}
+
+	public function test_inserts_what_a_closure_prints() {
+		$name = '<script>alert(1)</script>';
+		$html = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			static function () use ( $name ) {
+				echo '<p>' . esc_html( $name ) . '</p>';
+				echo gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Component output.
+			}
+		);
+
+		$this->assertStringContainsString( '<p>&lt;script&gt;alert(1)&lt;/script&gt;</p>', $html );
+		$this->assertSame( 1, substr_count( $html, '<button' ) );
+	}
+
+	public function test_uses_what_a_closure_returns_with_the_same_rules() {
+		$with_component = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			static function () {
+				return gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) );
+			}
+		);
+		$with_string    = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			static function () {
+				return '<script>alert(1)</script>';
+			}
+		);
+
+		$this->assertSame( 1, substr_count( $with_component, '<button' ) );
+		$this->assertStringNotContainsString( '<script>', $with_string );
+	}
+
+	public function test_mixes_a_list_of_content() {
+		$html = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			array(
+				'<b>Text</b>',
+				gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ),
+			)
+		);
+
+		$this->assertStringContainsString( '&lt;b&gt;Text&lt;/b&gt;', $html );
+		$this->assertSame( 1, substr_count( $html, '<button' ) );
+	}
+
+	public function test_sanitized_content_drops_scripts_and_event_handlers() {
+		$html = (string) gutenberg_get_ui_component(
+			'card',
+			array( 'title' => 'Settings' ),
+			Gutenberg_UI_Safe_HTML::sanitized( '<a href="https://example.org" onclick="alert(1)">Docs</a><script>alert(1)</script>' )
+		);
+
+		$this->assertStringContainsString( '<a href="https://example.org">Docs</a>', $html );
+		$this->assertStringNotContainsString( 'onclick', $html );
+		$this->assertStringNotContainsString( '<script>', $html );
+	}
+
+	public function test_content_is_never_read_as_a_placeholder() {
+		$html = (string) gutenberg_get_ui_component( 'card', array( 'title' => 'Settings' ), '__wpuislot_title__text__' );
+
+		$this->assertStringContainsString( '__wpuislot_title__text__', $html );
+	}
+
+	/**
+	 * @expectedIncorrectUsage Gutenberg_UI_Components::render
+	 */
+	public function test_ignores_content_for_a_component_that_does_not_accept_it() {
+		$called = false;
+		$html   = (string) gutenberg_get_ui_component(
+			'button',
+			array( 'label' => 'Save' ),
+			static function () use ( &$called ) {
+				$called = true;
+			}
+		);
+
+		$this->assertFalse( $called, 'Ignored content must not run.' );
+		$this->assertSame( (string) gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ), $html );
+	}
+
+	public function test_a_closure_that_throws_leaves_no_output_buffer_open() {
+		$level = ob_get_level();
+
+		try {
+			gutenberg_get_ui_component(
+				'card',
+				array( 'title' => 'Settings' ),
+				static function () {
+					echo 'Partial';
+					throw new RuntimeException( 'Failed' );
+				}
+			);
+		} catch ( RuntimeException $e ) {
+			$this->assertSame( 'Failed', $e->getMessage() );
+		}
+
+		$this->assertSame( $level, ob_get_level() );
+	}
+
+	public function test_escapes_objects_that_print() {
+		$content = new class() {
+			public function __toString() {
+				return '<script>alert(1)</script>';
+			}
+		};
+
+		$html = (string) gutenberg_get_ui_component( 'card', array( 'title' => 'Settings' ), $content );
+
+		$this->assertStringContainsString( '&lt;script&gt;', $html );
+		$this->assertStringNotContainsString( '<script>', $html );
+	}
+
+	/**
 	 * @expectedIncorrectUsage Gutenberg_UI_Components::render
 	 */
 	public function test_unknown_component_renders_nothing() {
-		$this->assertSame( '', gutenberg_get_ui_component( 'not-a-component' ) );
+		$this->assertSame( '', (string) gutenberg_get_ui_component( 'not-a-component' ) );
 	}
 
 	/**
 	 * @expectedIncorrectUsage Gutenberg_UI_Components::render
 	 */
 	public function test_missing_required_prop_renders_nothing() {
-		$this->assertSame( '', gutenberg_get_ui_component( 'button' ) );
+		$this->assertSame( '', (string) gutenberg_get_ui_component( 'button' ) );
 	}
 
 	/**
@@ -225,8 +409,8 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 */
 	public function test_invalid_prop_value_falls_back_to_default() {
 		$this->assertSame(
-			gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ),
-			gutenberg_get_ui_component(
+			(string) gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ),
+			(string) gutenberg_get_ui_component(
 				'button',
 				array(
 					'label' => 'Save',
@@ -241,8 +425,8 @@ class Gutenberg_UI_Components_Test extends WP_UnitTestCase {
 	 */
 	public function test_unknown_prop_is_ignored() {
 		$this->assertSame(
-			gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ),
-			gutenberg_get_ui_component(
+			(string) gutenberg_get_ui_component( 'button', array( 'label' => 'Save' ) ),
+			(string) gutenberg_get_ui_component(
 				'button',
 				array(
 					'label'   => 'Save',

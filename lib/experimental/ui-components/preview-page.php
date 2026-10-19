@@ -26,6 +26,24 @@ function gutenberg_ui_components_get_examples() {
 }
 
 /**
+ * Renders an example with PHP.
+ *
+ * An example's content is text, or another component as
+ * `{ component, props }`, like a block example's `innerBlocks`.
+ *
+ * @param array $example Example, as the build writes it.
+ * @return Gutenberg_UI_Safe_HTML Component HTML.
+ */
+function gutenberg_ui_components_render_example( $example ) {
+	$content = $example['content'] ?? null;
+	if ( is_array( $content ) && isset( $content['component'] ) ) {
+		$content = gutenberg_get_ui_component( $content['component'], $content['props'] ?? array() );
+	}
+
+	return gutenberg_get_ui_component( $example['component'], $example['props'], $content );
+}
+
+/**
  * Registers the preview page.
  */
 function gutenberg_ui_components_add_preview_page() {
@@ -87,7 +105,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_ui_components_enqueue_preview_as
 /**
  * Prints component HTML. Components escape their own output.
  *
- * @param string $html Component HTML.
+ * @param Gutenberg_UI_Safe_HTML|string $html Component HTML.
  */
 function gutenberg_ui_components_print( $html ) {
 	echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -114,7 +132,7 @@ function gutenberg_ui_components_render_preview_page() {
 		$mode = gutenberg_ui_components_get_sample_mode();
 		if ( $mode ) :
 			foreach ( gutenberg_ui_components_get_examples() as $example ) :
-				$html = 'php' === $mode ? gutenberg_get_ui_component( $example['component'], $example['props'] ) : $example['html'];
+				$html = 'php' === $mode ? gutenberg_ui_components_render_example( $example ) : $example['html'];
 				?>
 				<div class="gutenberg-ui-preview-sample" data-example="<?php echo esc_attr( $example['component'] . ': ' . $example['name'] ); ?>" style="width: 280px; margin-bottom: 16px;">
 					<?php gutenberg_ui_components_print( $html ); ?>
@@ -154,6 +172,30 @@ function gutenberg_ui_components_render_preview_page() {
 			</p>
 		</form>
 
+		<h2><?php esc_html_e( 'Composition', 'gutenberg' ); ?></h2>
+		<div style="max-width: 480px;">
+			<?php
+			gutenberg_ui_components_print(
+				gutenberg_get_ui_component(
+					'card',
+					array( 'title' => __( 'Site health', 'gutenberg' ) ),
+					static function () {
+						echo '<p>' . esc_html__( 'Your site has 2 recommended improvements.', 'gutenberg' ) . '</p>';
+						gutenberg_ui_components_print(
+							gutenberg_get_ui_component(
+								'button',
+								array(
+									'label'   => __( 'View details', 'gutenberg' ),
+									'variant' => 'outline',
+								)
+							)
+						);
+					}
+				)
+			);
+			?>
+		</div>
+
 		<h2><?php esc_html_e( 'Examples', 'gutenberg' ); ?></h2>
 		<table class="widefat striped" style="max-width: 960px;">
 			<thead>
@@ -167,7 +209,7 @@ function gutenberg_ui_components_render_preview_page() {
 				<?php foreach ( gutenberg_ui_components_get_examples() as $example ) : ?>
 					<tr>
 						<td><code><?php echo esc_html( $example['component'] . ': ' . $example['name'] ); ?></code></td>
-						<td><?php gutenberg_ui_components_print( gutenberg_get_ui_component( $example['component'], $example['props'] ) ); ?></td>
+						<td><?php gutenberg_ui_components_print( gutenberg_ui_components_render_example( $example ) ); ?></td>
 						<td><?php gutenberg_ui_components_print( $example['html'] ); ?></td>
 					</tr>
 				<?php endforeach; ?>
