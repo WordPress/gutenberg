@@ -111,6 +111,10 @@ function block_core_navigation_link_build_content_css_colors( $attributes ) {
 	$custom_background_color          = $attributes['style']['color']['background'] ?? null;
 	$color_block_styles['background'] = $preset_background_color ? $preset_background_color : $custom_background_color;
 
+	if ( ! $color_block_styles['text'] && ! $color_block_styles['background'] ) {
+		return array();
+	}
+
 	return wp_style_engine_get_styles(
 		array( 'color' => $color_block_styles ),
 		array( 'convert_vars_to_classnames' => true )
