@@ -614,6 +614,11 @@ describe( 'Post actions', () => {
 				'Error code 429. Your site is receiving too many requests. Wait a moment, then try again.',
 			],
 			[
+				500,
+				false,
+				'Error code 500. Your site ran into an error while saving. Try again. If it keeps happening, contact your host.',
+			],
+			[
 				200,
 				true,
 				'Your site sent the request to another page, usually the login page. Log in again in a new tab, then try again.',

@@ -145,7 +145,7 @@ test.describe( 'Autosave failure notice', () => {
 			'server error page',
 			'server-error-page',
 			withDetails(
-				'Your site ran into an error while saving. Try again. If it keeps happening, contact your host. (Error 500)'
+				'Error code 500. Your site ran into an error while saving. Try again. If it keeps happening, contact your host.'
 			),
 		],
 		[
