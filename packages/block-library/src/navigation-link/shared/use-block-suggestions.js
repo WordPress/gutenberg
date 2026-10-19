@@ -115,8 +115,9 @@ export function addBlockSuggestions( suggestions, blockItems, searchTerm ) {
  *                                                when left out, and none when
  *                                                empty. Only the site editor's
  *                                                navigation sidebar sets this,
- *                                                to list the Home Link block
- *                                                alone. It is internal, not a
+ *                                                to list only the blocks it
+ *                                                can add without editing
+ *                                                them. It is internal, not a
  *                                                public API, and can be removed
  *                                                with that sidebar.
  * @param {Function=} options.onBlockInsert       Called with the inserted block by a

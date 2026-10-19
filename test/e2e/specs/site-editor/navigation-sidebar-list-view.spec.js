@@ -148,7 +148,7 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		} );
 	} );
 
-	test( 'lists the Home Link block, and no other block, in the link search results', async ( {
+	test( 'lists only the blocks the sidebar supports in the link search results', async ( {
 		admin,
 		page,
 		requestUtils,
@@ -182,9 +182,28 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			searchResults.getByRole( 'option', { name: /Home Link/ } )
 		).toBeVisible();
 
+		await searchInput.fill( 'Search' );
+		await expect(
+			searchResults.getByRole( 'option', { name: /Search/ } )
+		).toBeVisible();
+
+		await searchInput.fill( 'Login' );
+		await expect(
+			searchResults.getByRole( 'option', { name: /Login\/out/ } )
+		).toBeVisible();
+
+		await searchInput.fill( 'Site' );
+		await expect(
+			searchResults.getByRole( 'option', { name: /Site Logo/ } )
+		).toBeVisible();
+		await expect(
+			searchResults.getByRole( 'option', { name: /Site Title/ } )
+		).toBeVisible();
+
 		// Social Icons is allowed in the navigation, so it is listed on the
-		// canvas, but the sidebar lists only the Home Link block: editing
-		// other blocks from the sidebar is not available yet.
+		// canvas, but the sidebar lists only the blocks it can add without
+		// editing them: editing other blocks from the sidebar is not
+		// available yet.
 		await searchInput.fill( 'Social' );
 		await expect(
 			searchResults.getByRole( 'option', { name: /Social Page/ } )

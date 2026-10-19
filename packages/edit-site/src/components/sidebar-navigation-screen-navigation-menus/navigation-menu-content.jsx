@@ -12,11 +12,18 @@ import LeafMoreMenu from './leaf-more-menu';
 const { PrivateListView } = unlock( blockEditorPrivateApis );
 const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
 
-// The sidebar's link search lists the Home Link block, and no other block.
-// The other allowed blocks stay reachable from the "Add block" pane. The
-// extensible site editor keeps every block on purpose. This wrapper, and the
+// The sidebar's link search lists only these blocks, which work as menu items
+// without editing them from the sidebar, which is not available yet. The other
+// allowed blocks stay reachable from the "Add block" pane. The extensible site
+// editor keeps every block on purpose. This wrapper, and the
 // `suggestedBlockNames` prop it sets, can go when this sidebar does.
-const SUGGESTED_BLOCK_NAMES = [ 'core/home-link' ];
+const SUGGESTED_BLOCK_NAMES = [
+	'core/home-link',
+	'core/search',
+	'core/loginout',
+	'core/site-logo',
+	'core/site-title',
+];
 
 function SidebarNavigationLinkUI( props ) {
 	return (
