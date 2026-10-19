@@ -20,7 +20,7 @@
 -   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
 -   Save failures: Pass the server's message as the notice's `details`, as plain text with links kept as `text (URL)`, rather than building escaped HTML behind `__unstableHTML`. For a PHP fatal error, the PHP error and its stack trace from `data.error` follow the message. The notice shows it behind "Show details" and offers to copy it with the message ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
--   Save failures: When something other than WordPress answers, such as a proxy's error page or the login page, the notice's `details` explain the failure from the HTTP status instead of saying the response is not valid JSON.
+-   Save failures: When something other than WordPress answers, such as a proxy's error page or the login page, the notice's `details` explain the failure from the HTTP status instead of saying the response is not valid JSON ([#85050](https://github.com/WordPress/gutenberg/pull/85050)).
 
 ### Deprecations
 
