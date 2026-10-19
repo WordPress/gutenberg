@@ -6664,44 +6664,14 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/components/entities-saved-states/entity-record-item.jsx": {
+	"packages/core-data/src/components/entities-saved-states/entity-record-item.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
-	"packages/core-data/src/components/entities-saved-states/entity-type-list.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/hooks/use-is-dirty.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/index.jsx": {
+	"packages/core-data/src/components/entities-saved-states/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/core-data/src/components/entities-saved-states/test/use-is-dirty.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
 		}
 	},
 	"packages/core-data/src/footnotes/get-footnotes-order.js": {

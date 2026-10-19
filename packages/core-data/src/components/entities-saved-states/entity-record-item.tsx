@@ -7,8 +7,15 @@ import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { STORE_NAME } from '../../name';
 import { getTemplateInfo } from '../../utils/get-template-info';
+import type { store as coreStore } from '../../';
+import type { EntityRecordItemProps } from './types';
+import type { TemplateInfoParams } from '../../utils/types';
 
-export default function EntityRecordItem( { record, checked, onChange } ) {
+export default function EntityRecordItem( {
+	record,
+	checked,
+	onChange,
+}: EntityRecordItemProps ) {
 	const { name, kind, title, key } = record;
 
 	// Handle templates that might use default descriptive titles.
@@ -20,18 +27,22 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 				};
 			}
 
-			const template = select( STORE_NAME ).getEditedEntityRecord(
-				kind,
-				name,
-				key
-			);
+			const template = // The store is selected by name, which carries no store types.
+				select(
+					STORE_NAME as unknown as typeof coreStore
+				).getEditedEntityRecord( kind, name, key );
 
 			const { default_template_types: templateTypes = [] } =
-				select( STORE_NAME ).getCurrentTheme() ?? {};
+				// The store is selected by name, which carries no store types.
+				select(
+					STORE_NAME as unknown as typeof coreStore
+				).getCurrentTheme() ?? {};
 
 			return {
 				entityRecordTitle: getTemplateInfo( {
-					template,
+					// A missing record is `false`, whose fields read as `undefined`.
+					template:
+						template as unknown as TemplateInfoParams[ 'template' ],
 					templateTypes,
 				} ).title,
 			};
@@ -44,7 +55,9 @@ export default function EntityRecordItem( { record, checked, onChange } ) {
 			<PanelRow>
 				<WCCheckboxControl
 					label={
-						decodeEntities( entityRecordTitle ) || __( 'Untitled' )
+						// `decodeEntities` returns a missing title as is.
+						decodeEntities( entityRecordTitle as string ) ||
+						__( 'Untitled' )
 					}
 					checked={ checked }
 					onChange={ onChange }

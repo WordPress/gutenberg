@@ -15,22 +15,28 @@ import EntityTypeList from './entity-type-list';
 import { useIsDirty } from './hooks/use-is-dirty';
 import { unlock } from '../../lock-unlock';
 import { STORE_NAME } from '../../name';
+import type { store as coreStore } from '../../';
+import type {
+	EntitiesSavedStatesExtensibleProps,
+	EntitiesSavedStatesProps,
+	EntitySavedStatesRecord,
+} from './types';
 
 /**
  * Renders the component for managing saved states of entities.
  *
- * @param {Object}   props              The component props.
- * @param {Function} props.close        The function to close the dialog.
- * @param {boolean=} props.renderDialog Whether to render the component with modal dialog behavior.
- * @param {string}   props.variant      Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
+ * @param props              The component props.
+ * @param props.close        The function to close the dialog.
+ * @param props.renderDialog Whether to render the component with modal dialog behavior.
+ * @param props.variant      Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
  *
- * @return {React.ReactNode} The rendered component.
+ * @return The rendered component.
  */
 export default function EntitiesSavedStates( {
 	close,
 	renderDialog,
 	variant,
-} ) {
+}: EntitiesSavedStatesProps ) {
 	const isDirtyProps = useIsDirty();
 	return (
 		<EntitiesSavedStatesExtensible
@@ -45,21 +51,21 @@ export default function EntitiesSavedStates( {
 /**
  * Renders a panel for saving entities with dirty records.
  *
- * @param {Object}   props                       The component props.
- * @param {string}   props.additionalPrompt      Additional prompt to display.
- * @param {Function} props.close                 Function to close the panel.
- * @param {Function} props.onSave                Function to call when saving entities.
- * @param {boolean}  props.saveEnabled           Flag indicating if save is enabled.
- * @param {string}   props.saveLabel             Label for the save button.
- * @param {boolean}  props.renderDialog          Whether to render the component with modal dialog behavior.
- * @param {Array}    props.dirtyEntityRecords    Array of dirty entity records.
- * @param {boolean}  props.isDirty               Flag indicating if there are dirty entities.
- * @param {Function} props.setUnselectedEntities Function to set unselected entities.
- * @param {Array}    props.unselectedEntities    Array of unselected entities.
- * @param {string}   props.variant               Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
- * @param {string}   props.successNoticeContent  Optional custom success notice content.
+ * @param props                       The component props.
+ * @param props.additionalPrompt      Additional prompt to display.
+ * @param props.close                 Function to close the panel.
+ * @param props.onSave                Function to call when saving entities.
+ * @param props.saveEnabled           Flag indicating if save is enabled.
+ * @param props.saveLabel             Label for the save button.
+ * @param props.renderDialog          Whether to render the component with modal dialog behavior.
+ * @param props.dirtyEntityRecords    Array of dirty entity records.
+ * @param props.isDirty               Flag indicating if there are dirty entities.
+ * @param props.setUnselectedEntities Function to set unselected entities.
+ * @param props.unselectedEntities    Array of unselected entities.
+ * @param props.variant               Changes the layout of the component. When an `inline` value is provided, the action buttons are rendered at the end of the component instead of at the start.
+ * @param props.successNoticeContent  Optional custom success notice content.
  *
- * @return {React.ReactNode} The rendered component.
+ * @return The rendered component.
  */
 export function EntitiesSavedStatesExtensible( {
 	additionalPrompt = undefined,
@@ -74,11 +80,16 @@ export function EntitiesSavedStatesExtensible( {
 	unselectedEntities,
 	variant = 'default',
 	successNoticeContent,
-} ) {
-	const saveButtonRef = useRef();
-	const { saveDirtyEntities } = unlock( useDispatch( STORE_NAME ) );
+}: EntitiesSavedStatesExtensibleProps ) {
+	const saveButtonRef = useRef< HTMLButtonElement >( null );
+	const { saveDirtyEntities } = unlock(
+		// The store is selected by name, which carries no store types.
+		useDispatch( STORE_NAME as unknown as typeof coreStore )
+	);
 	// To group entities by type.
-	const partitionedSavables = dirtyEntityRecords.reduce( ( acc, record ) => {
+	const partitionedSavables = dirtyEntityRecords.reduce<
+		Record< string, Array< EntitySavedStatesRecord > >
+	>( ( acc, record ) => {
 		const { name } = record;
 		if ( ! acc[ name ] ) {
 			acc[ name ] = [];
