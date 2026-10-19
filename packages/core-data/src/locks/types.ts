@@ -1,7 +1,7 @@
 /**
  * The path a lock covers, below its store.
  */
-export type LockPath = readonly ( string | number )[];
+export type LockPath = ReadonlyArray< string | number >;
 
 /**
  * A granted lock.
