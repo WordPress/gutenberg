@@ -6571,11 +6571,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/popover/test/utils/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/components/src/range-control/index.tsx": {
 		"react-hooks/immutability": {
 			"count": 3
