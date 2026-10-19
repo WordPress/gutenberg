@@ -25,12 +25,6 @@ const meta: Meta< typeof Avatar.Root > = {
 			notes: 'API and design may change.',
 		},
 	},
-	args: {
-		size: 'md',
-		shape: 'circle',
-		role: 'img',
-		'aria-label': 'Alex Morgan',
-	},
 	argTypes: {
 		color: { control: 'color' },
 	},
@@ -45,11 +39,16 @@ export default meta;
 
 type Story = StoryObj< typeof Avatar.Root >;
 
-export const Default: Story = {};
+export const Default: Story = {
+	args: {
+		'aria-label': 'Alex Morgan',
+		role: 'img',
+	},
+};
 
 /** Apply the same color to image rings, initials, and person fallbacks. */
 export const WithColor: Story = {
-	args: { color: '#008a20' },
+	args: { ...Default.args, color: '#008a20' },
 	render: ( args ) => (
 		<Stack gap="md" align="center">
 			<Avatar.Root { ...args }>
@@ -68,7 +67,6 @@ export const WithColor: Story = {
 
 /** Wrap a decorative avatar in a button to make it interactive. */
 export const Interactive: Story = {
-	args: { color: '#008a20' },
 	render: ( args ) => (
 		<Button
 			variant="unstyled"
@@ -90,6 +88,7 @@ export const Interactive: Story = {
 
 /** Omit fallback content to display the person icon. */
 export const IconFallback: Story = {
+	args: Default.args,
 	render: ( args ) => (
 		<Avatar.Root { ...args }>
 			<Avatar.Fallback />
@@ -105,7 +104,7 @@ export const Initials: StoryObj<
 			'name' | 'locale'
 		>
 > = {
-	args: { name: 'Alex Morgan' },
+	args: { ...Default.args, name: 'Alex Morgan' },
 	argTypes: {
 		name: { control: 'text' },
 		locale: { control: 'text' },
@@ -119,7 +118,6 @@ export const Initials: StoryObj<
 
 /** Hide the avatar from assistive technology when the name is shown beside it. */
 export const WithVisibleName: Story = {
-	args: { size: 'sm' },
 	render: ( args ) => (
 		<Stack gap="sm" align="center">
 			<Avatar.Root { ...args } aria-hidden="true">
