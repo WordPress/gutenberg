@@ -20,7 +20,7 @@ import {
 	doActionAsync,
 } from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
@@ -84,6 +84,55 @@ function getFailureDetails( message ) {
 	}
 
 	return body.textContent.replace( /\n{3,}/g, '\n\n' ).trim();
+}
+
+/**
+ * Explains an `invalid_json` save failure from the response's HTTP status.
+ *
+ * @param {Object}  error              The `invalid_json` error.
+ * @param {number}  [error.status]     HTTP status of the response.
+ * @param {boolean} [error.redirected] Whether the request was redirected.
+ *
+ * @return {string} The explanation.
+ */
+function getInvalidResponseDetails( { status, redirected } ) {
+	if ( status >= 200 && status < 300 ) {
+		return redirected
+			? __(
+					'Your site sent the request to another page, usually the login page. Log in again in a new tab, then try again.'
+				)
+			: __(
+					'Your site’s response was cut off or had unexpected text in it.'
+				);
+	}
+
+	let explanation;
+	if ( status === 429 ) {
+		explanation = __(
+			'Your site is receiving too many requests. Wait a moment, then try again.'
+		);
+	} else if ( status === 500 ) {
+		explanation = __(
+			'Your site ran into an error while saving. Try again.'
+		);
+	} else if ( status >= 502 && status <= 504 ) {
+		explanation = __(
+			'Your site didn’t respond in time. Wait a moment, then try again.'
+		);
+	} else {
+		explanation = __(
+			'Your site sent back a response the editor couldn’t read.'
+		);
+	}
+
+	return typeof status === 'number'
+		? sprintf(
+				/* translators: 1: Explanation of a failed save. 2: HTTP status code. */
+				__( '%1$s (Error %2$d)' ),
+				explanation,
+				status
+			)
+		: explanation;
 }
 
 /**
@@ -404,11 +453,17 @@ export const savePost =
 				// A PHP fatal error's message, with its stack trace, comes in
 				// `data.error`, apart from the generic message WordPress shows.
 				const phpError = error.data?.error?.message;
-				const details = [
+				let failureDetails = '';
+				if ( error.code === 'invalid_json' ) {
+					failureDetails = getInvalidResponseDetails( error );
+				} else if (
 					error.message &&
 					! CLIENT_GENERATED_ERROR_CODES.includes( error.code )
-						? getFailureDetails( error.message )
-						: '',
+				) {
+					failureDetails = getFailureDetails( error.message );
+				}
+				const details = [
+					failureDetails,
 					typeof phpError === 'string' ? phpError.trim() : '',
 				]
 					.filter( Boolean )
