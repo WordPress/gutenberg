@@ -151,7 +151,7 @@ function buildScssFile( styleFile ) {
 	fs.writeFileSync( outputFile, result.css );
 
 	const resultRTL = deasync( postCSSRTLSync )( result );
-	fs.writeFileSync( outputFileRTL, resultRTL );
+	fs.writeFileSync( outputFileRTL, resultRTL.css );
 }
 
 /**
