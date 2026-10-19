@@ -4,6 +4,8 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { useMemo } from '@wordpress/element';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
+const EMPTY_ARRAY = [];
+
 /**
  * Flattens a block tree in document order, the same order the server walks
  * the post content in.
@@ -125,7 +127,7 @@ function getLatestHeadings(
  * @param {boolean} options.onlyIncludeCurrentPage Whether to only include headings from the current page.
  * @param {number}  options.maxLevel               Maximum heading level to include.
  *
- * @return {Object[]|undefined} Heading data, or undefined when there is no post.
+ * @return {Object[]} Heading data.
  */
 export function useHeadings( {
 	clientId,
@@ -151,7 +153,7 @@ export function useHeadings( {
 
 	return useMemo( () => {
 		if ( ! postId || ! blocks ) {
-			return undefined;
+			return EMPTY_ARRAY;
 		}
 
 		return getLatestHeadings( blocks, clientId, permalink, {

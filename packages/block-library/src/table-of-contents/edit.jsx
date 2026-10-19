@@ -122,14 +122,13 @@ export default function TableOfContentsEdit( {
 	context: { postId, postType },
 	setAttributes,
 } ) {
-	const headings =
-		useHeadings( {
-			clientId,
-			postId,
-			postType,
-			onlyIncludeCurrentPage,
-			maxLevel,
-		} ) ?? [];
+	const headings = useHeadings( {
+		clientId,
+		postId,
+		postType,
+		onlyIncludeCurrentPage,
+		maxLevel,
+	} );
 
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
