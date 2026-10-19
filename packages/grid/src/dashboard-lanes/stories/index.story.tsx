@@ -19,12 +19,12 @@ const meta: Meta< typeof DashboardLanes > = {
 		children: { control: false },
 		columns: {
 			control: { type: 'number', min: 1, max: 12, step: 1 },
-			description: 'Total lanes in fixed mode.',
+			description: 'Lane count, or the cap when `minColumnWidth` is set.',
 		},
 		minColumnWidth: {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
-				'Enables responsive mode. Per-lane lower bound in pixels.',
+				'Per-lane floor in pixels. Lowers the count on narrow containers, down to one.',
 		},
 		flowTolerance: {
 			control: { type: 'number', min: 0, max: 64, step: 1 },
@@ -183,45 +183,13 @@ export const Default: Story = {
 };
 
 /**
- * Responsive lane count: derived from container width using
- * `minColumnWidth` as the per-lane lower bound. Resize the preview
- * frame to see the lane count adapt.
+ * `columns` and `minColumnWidth` compose. `columns` alone fixes the lane
+ * count. `minColumnWidth` alone fits as many lanes of at least that width
+ * as the container allows. Together, `columns` caps what the floor fits:
+ * up to four lanes here, none narrower than 200px, down to one. Open the
+ * story full screen and resize the browser to walk the counts.
  */
-export const Responsive: Story = {
-	parameters: {
-		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
-		// See: https://github.com/WordPress/gutenberg/issues/81596
-		a11y: { test: 'todo' },
-	},
-	args: {
-		minColumnWidth: 200,
-		layout: [
-			{ key: 'a' },
-			{ key: 'b' },
-			{ key: 'c' },
-			{ key: 'd' },
-			{ key: 'e' },
-			{ key: 'f' },
-		],
-		children: [
-			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
-			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
-			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
-			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
-			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
-			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
-		],
-	},
-};
-
-/**
- * Layered configuration: `columns` caps the lane count and
- * `minColumnWidth` enforces a per-tile width floor. The surface
- * renders up to `columns` lanes on wide containers and reduces the
- * count on narrow ones whenever fitting all of them would push
- * tiles below `minColumnWidth`.
- */
-export const Layered: Story = {
+export const Columns: Story = {
 	parameters: {
 		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
 		// See: https://github.com/WordPress/gutenberg/issues/81596

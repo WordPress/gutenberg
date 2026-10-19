@@ -25,12 +25,13 @@ const meta: Meta< typeof DashboardGrid > = {
 		children: { control: false },
 		columns: {
 			control: { type: 'number', min: 1, max: 24, step: 1 },
-			description: 'Total columns in fixed mode.',
+			description:
+				'Column count, or the cap when `minColumnWidth` is set.',
 		},
 		minColumnWidth: {
 			control: { type: 'number', min: 80, max: 600, step: 8 },
 			description:
-				'Enables responsive mode. Per-column lower bound in pixels.',
+				'Per-column floor in pixels. Lowers the count on narrow containers, down to one.',
 		},
 		rowHeight: {
 			control: { type: 'number', min: 24, max: 400, step: 4 },
@@ -282,84 +283,46 @@ export const Default: Story = {
 };
 
 /**
- * Responsive grid: the column count is derived from the container
- * width using `minColumnWidth` as the lower bound per column. A
- * `ResizeObserver` recomputes the count on container resize.
+ * `columns` and `minColumnWidth` compose. `columns` alone fixes the count.
+ * `minColumnWidth` alone fits as many columns of at least that width as
+ * the container allows. Together, `columns` caps what the floor fits:
+ * up to four columns here, none narrower than 240px, down to one. The
+ * layout mixes fixed, `fill`, `full` and two-row tiles so the repacking
+ * is visible at every count: a `fill` takes the free run of the row it
+ * lands in, and the tall tile's shadow shortens the runs below it. Open
+ * the story full screen and resize the browser to walk the counts.
  */
-export const Responsive: Story = {
+export const Columns: Story = {
 	args: {
-		layout: [
-			{ key: 'a', width: 1, order: 1 },
-			{ key: 'b', width: 2, order: 2 },
-			{ key: 'c', width: 2, order: 3 },
-			{ key: 'd', width: 1, order: 4 },
-			{ key: 'e', width: 2, order: 5 },
-			{ key: 'f', width: 2, order: 6 },
-		],
-		rowHeight: 96,
-		minColumnWidth: 192,
-		children: [
-			<Tile key="a" tone="brand">
-				width: 1
-			</Tile>,
-			<Tile key="b" tone="info">
-				width: 2
-			</Tile>,
-			<Tile key="c" tone="success">
-				width: 2
-			</Tile>,
-			<Tile key="d" tone="warning">
-				width: 1
-			</Tile>,
-			<Tile key="e" tone="error">
-				width: 2
-			</Tile>,
-			<Tile key="f" tone="neutral">
-				width: 2
-			</Tile>,
-		],
-	},
-};
-
-/**
- * Layered configuration: `columns` caps the count and
- * `minColumnWidth` enforces a per-tile width floor. The grid renders
- * up to `columns` columns on wide containers and reduces the count
- * on narrow ones whenever fitting all of them would push tiles
- * below `minColumnWidth`. Resize the preview to see the cap apply
- * on wide widths and the floor reduce the count on narrow widths.
- */
-export const Layered: Story = {
-	args: {
-		layout: [
-			{ key: 'a', width: 1, order: 1 },
-			{ key: 'b', width: 2, order: 2 },
-			{ key: 'c', width: 2, order: 3 },
-			{ key: 'd', width: 1, order: 4 },
-			{ key: 'e', width: 2, order: 5 },
-			{ key: 'f', width: 2, order: 6 },
-		],
-		rowHeight: 96,
-		columns: 6,
+		columns: 4,
 		minColumnWidth: 240,
+		rowHeight: 96,
+		layout: [
+			{ key: 'a', width: 1 },
+			{ key: 'b', width: 'fill' },
+			{ key: 'c', width: 1, height: 2 },
+			{ key: 'd', width: 1 },
+			{ key: 'e', width: 'fill' },
+			{ key: 'f', width: 'full' },
+		],
 		children: [
 			<Tile key="a" tone="brand">
-				width: 1
+				1
 			</Tile>,
 			<Tile key="b" tone="info">
-				width: 2
+				fill
 			</Tile>,
 			<Tile key="c" tone="success">
-				width: 2
+				1 · 2 rows
 			</Tile>,
 			<Tile key="d" tone="warning">
-				width: 1
+				1
 			</Tile>,
 			<Tile key="e" tone="error">
-				width: 2
+				fill
 			</Tile>,
 			<Tile key="f" tone="neutral">
-				width: 2
+				full
 			</Tile>,
 		],
 	},
