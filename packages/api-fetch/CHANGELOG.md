@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `invalid_json` error also keeps whether the response was redirected, as `data.redirected` next to `data.status`, so a caller can tell when the login page answered instead of WordPress.
+
 ## 8.1.0 (2026-11-04)
 
 ### Internal
