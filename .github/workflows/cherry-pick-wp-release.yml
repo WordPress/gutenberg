@@ -22,7 +22,7 @@ permissions: {}
 
 jobs:
     cherry-pick:
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: write
             issues: write

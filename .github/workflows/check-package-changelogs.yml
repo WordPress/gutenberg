@@ -200,7 +200,7 @@ jobs:
     # validate that the contents follow the expected format.
     structure:
         name: Validate CHANGELOG structure
-        runs-on: 'ubuntu-24.04'
+        runs-on: 'ubuntu-slim'
         permissions:
             contents: read
         steps:
