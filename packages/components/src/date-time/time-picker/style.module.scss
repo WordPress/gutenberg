@@ -26,7 +26,7 @@
 .minutes-input.minutes-input.minutes-input,
 .day-input.day-input.day-input,
 .year-input.year-input.year-input {
-	// Keep the original specificity over InputControl's Emotion styles.
+	// Preserve the established specificity for InputControl overrides.
 	:global(.components-input-control__input) {
 		/* stylelint-disable logical-css/require-logical-properties -- Time fields remain physically LTR, including in RTL locales. */
 		padding-left: $grid-unit-10;

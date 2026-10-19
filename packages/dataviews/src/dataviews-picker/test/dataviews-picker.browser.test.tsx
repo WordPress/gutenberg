@@ -745,7 +745,7 @@ describe( 'DataViews Picker', () => {
 			const pageSelect = screen.getByRole( 'combobox', {
 				name: 'Current page',
 			} );
-			expect( pageSelect ).toHaveValue( '1' );
+			expect( pageSelect ).toHaveTextContent( '1' );
 			expect(
 				screen.getByRole( 'button', { name: 'Confirm' } )
 			).toBeInTheDocument();
@@ -758,8 +758,11 @@ describe( 'DataViews Picker', () => {
 
 			// The page select paginates on its own.
 			const user = userEvent.setup();
-			await user.selectOptions( pageSelect, '2' );
-			expect( pageSelect ).toHaveValue( '2' );
+			await user.click( pageSelect );
+			await user.click(
+				await screen.findByRole( 'option', { name: '2' } )
+			);
+			expect( pageSelect ).toHaveTextContent( '2' );
 			expect(
 				within( screen.getByRole( 'listbox' ) ).getAllByRole( 'option' )
 			).toHaveLength( 1 );

@@ -100,4 +100,91 @@ test.describe( 'Sidebar Permalink', () => {
 		} );
 		expect( post.slug ).toBe( 'hello-slug' );
 	} );
+
+	test( 'should not clean a slug the user did not change when the slug field loses focus', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		// The server keeps the emoji in the slug, but `cleanForSlug()` strips it.
+		const { id: postId, slug } = await requestUtils.createPost( {
+			title: 'Hello ❤️',
+			status: 'publish',
+		} );
+		expect( slug ).toBe( 'hello-%e2%9d%a4%ef%b8%8f' );
+
+		await admin.editPost( postId );
+		await editor.openDocumentSettingsSidebar();
+		await page.getByRole( 'button', { name: /^Change link/ } ).click();
+		await page.getByRole( 'textbox', { name: 'Slug' } ).click();
+		await page.keyboard.press( 'Tab' );
+
+		const editedSlug = await page.evaluate( () =>
+			window.wp.data
+				.select( 'core/editor' )
+				.getEditedPostAttribute( 'slug' )
+		);
+		expect( editedSlug ).toBe( slug );
+	} );
+
+	test( 'should clean a slug the user changed when the slug field loses focus', async ( {
+		admin,
+		page,
+		editor,
+	} ) => {
+		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello Slug' );
+
+		await page.getByRole( 'button', { name: /^Change link/ } ).click();
+		await page.getByRole( 'textbox', { name: 'Slug' } ).fill( 'Foo Bar' );
+		await page.keyboard.press( 'Tab' );
+
+		await expect(
+			page.getByRole( 'textbox', { name: 'Slug' } )
+		).toHaveValue( 'foo-bar' );
+	} );
+
+	test( 'should derive the slug from the title after an autosave', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
+		await editor.canvas
+			.getByRole( 'textbox', { name: 'Add title' } )
+			.fill( 'Hello Slug' );
+
+		// An autosave of a new post saves the title to the post itself.
+		await page.evaluate( () =>
+			window.wp.data.dispatch( 'core/editor' ).autosave()
+		);
+
+		await expect(
+			page.getByRole( 'button', { name: 'Change link: hello-slug' } )
+		).toBeVisible();
+	} );
+
+	test( 'should not show a slug for a post without a title', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await admin.createNewPost();
+		await editor.openDocumentSettingsSidebar();
+
+		await page.getByRole( 'button', { name: 'Change link: None' } ).click();
+
+		// Without a slug, the post only has its plain permalink.
+		await expect(
+			page.getByRole( 'textbox', { name: 'Slug' } )
+		).toHaveValue( '' );
+		await expect(
+			page.getByRole( 'link', { name: /\?p=\d+/ } )
+		).toBeVisible();
+	} );
 } );
