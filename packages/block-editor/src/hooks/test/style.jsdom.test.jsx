@@ -3,6 +3,7 @@ import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 import _style, {
 	getCanvasStateStyleValue,
 	getBlockStateStylesCSS,
+	getCustomStateCSSRules,
 	getInlineStyles,
 	getResponsiveStateCSSRules,
 	getStateStylesCSS,
@@ -663,6 +664,108 @@ describe( 'getResponsiveStateCSSRules', () => {
 	} );
 } );
 
+describe( 'custom state styles', () => {
+	const CURRENT =
+		'.wp-elements-1:is(.wp-block-navigation .current-menu-item)';
+
+	beforeEach( () => {
+		registerBlockType( 'core/navigation-link', {
+			apiVersion: 3,
+			title: 'Custom Link',
+			category: 'design',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+			selectors: {
+				color: {
+					background:
+						'.wp-block-navigation-link > .wp-block-navigation-item__content',
+				},
+				states: {
+					'-current': '.wp-block-navigation .current-menu-item',
+				},
+			},
+		} );
+	} );
+
+	afterEach( () => {
+		unregisterBlockType( 'core/navigation-link' );
+	} );
+
+	it( 'scopes custom state styles to the selector the block declares', () => {
+		expect(
+			getCustomStateCSSRules(
+				{
+					'-current': {
+						color: { text: 'red' },
+						':hover': { color: { text: 'blue' } },
+					},
+				},
+				'core/navigation-link',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			`${ CURRENT } { color: red !important; }`,
+			`${ CURRENT }:hover { color: blue !important; }`,
+		] );
+	} );
+
+	it( 'keeps the custom state on the block wrapper for feature selectors', () => {
+		expect(
+			getCustomStateCSSRules(
+				{
+					'-current': {
+						color: { background: 'black' },
+					},
+				},
+				'core/navigation-link',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			`${ CURRENT } > .wp-block-navigation-item__content { background-color: black !important; }\n${ CURRENT } > .wp-block-navigation-item__content { background-image: unset !important; }`,
+		] );
+	} );
+
+	it( 'skips custom states the block declares no selector for', () => {
+		unregisterBlockType( 'core/navigation-link' );
+		registerBlockType( 'core/navigation-link', {
+			apiVersion: 3,
+			title: 'Custom Link',
+			category: 'design',
+			attributes: {},
+			edit: () => null,
+			save: () => null,
+		} );
+
+		expect(
+			getCustomStateCSSRules(
+				{ '-current': { color: { text: 'red' } } },
+				'core/navigation-link',
+				'.wp-elements-1'
+			)
+		).toEqual( [] );
+	} );
+
+	it( 'generates media-query scoped custom state styles for viewport states', () => {
+		expect(
+			getResponsiveStateCSSRules(
+				{
+					'@mobile': {
+						'-current': {
+							color: { text: 'red' },
+							':hover': { color: { text: 'blue' } },
+						},
+					},
+				},
+				'core/navigation-link',
+				'.wp-elements-1'
+			)
+		).toEqual( [
+			`@media (width <= 480px){${ CURRENT } { color: red !important; }${ CURRENT }:hover { color: blue !important; }}`,
+		] );
+	} );
+} );
+
 describe( 'getCanvasStateStyleValue', () => {
 	it( 'returns the selected pseudo state value without a viewport state', () => {
 		expect(
@@ -710,6 +813,84 @@ describe( 'getCanvasStateStyleValue', () => {
 				{ viewport: '@mobile', pseudo: ':hover' }
 			)
 		).toEqual( {
+			color: { background: 'blue', text: 'yellow' },
+		} );
+	} );
+
+	it( 'returns the selected custom state value', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					'-current': {
+						color: { text: 'red' },
+					},
+				},
+				{ viewport: 'default', custom: '-current', pseudo: 'default' }
+			)
+		).toEqual( {
+			color: { text: 'red' },
+		} );
+	} );
+
+	it( 'merges custom pseudo styles over the custom state styles', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					'-current': {
+						color: { background: 'blue', text: 'red' },
+						':hover': {
+							color: { text: 'yellow' },
+						},
+					},
+				},
+				{ viewport: 'default', custom: '-current', pseudo: ':hover' }
+			)
+		).toMatchObject( {
+			color: { background: 'blue', text: 'yellow' },
+		} );
+	} );
+
+	it( 'layers pseudo, custom and custom pseudo styles in front end specificity order', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					':hover': {
+						color: { background: 'green', text: 'green' },
+						typography: { textDecoration: 'underline' },
+					},
+					'-current': {
+						color: { text: 'red' },
+						':hover': {
+							typography: { fontWeight: '700' },
+						},
+					},
+				},
+				{ viewport: 'default', custom: '-current', pseudo: ':hover' }
+			)
+		).toMatchObject( {
+			color: { background: 'green', text: 'red' },
+			typography: { textDecoration: 'underline', fontWeight: '700' },
+		} );
+	} );
+
+	it( 'layers responsive custom pseudo styles over the custom state styles', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					'-current': {
+						color: { background: 'blue', text: 'red' },
+					},
+					'@mobile': {
+						'-current': {
+							':hover': {
+								color: { text: 'yellow' },
+							},
+						},
+					},
+				},
+				{ viewport: '@mobile', custom: '-current', pseudo: ':hover' }
+			)
+		).toMatchObject( {
 			color: { background: 'blue', text: 'yellow' },
 		} );
 	} );

@@ -318,6 +318,103 @@ describe( 'resolveStyle – merged output', () => {
 		} );
 	} );
 
+	describe( 'state-aware inheritance (customState)', () => {
+		const CURRENT_STATE = {
+			viewport: 'default',
+			customState: '-current',
+			pseudoState: 'default',
+		};
+		const CURRENT_HOVER_STATE = { ...CURRENT_STATE, pseudoState: ':hover' };
+
+		const gs = {
+			styles: {
+				blocks: {
+					'core/navigation-link': {
+						color: { text: 'linkBase' },
+						typography: { fontSize: '13px' },
+						':hover': { color: { text: 'linkHover' } },
+						'-current': {
+							color: { text: 'linkCurrent' },
+							':hover': { color: { text: 'linkCurrentHover' } },
+						},
+					},
+				},
+			},
+		};
+
+		test( 'custom state layers the block `-current` slice over base', () => {
+			const { value: out } = resolveStyle( gs, {
+				blockName: 'core/navigation-link',
+				...CURRENT_STATE,
+			} );
+			expect( out.color.text ).toBe( 'linkCurrent' );
+			// fontSize has no `-current` override → cascades from the base.
+			expect( out.typography.fontSize ).toBe( '13px' );
+		} );
+
+		test( 'custom pseudo state layers the `-current.:hover` slice over base', () => {
+			const { value: out } = resolveStyle( gs, {
+				blockName: 'core/navigation-link',
+				...CURRENT_HOVER_STATE,
+			} );
+			expect( out.color.text ).toBe( 'linkCurrentHover' );
+		} );
+
+		test( 'custom pseudo state inherits from the pseudo and custom states', () => {
+			const layeredGs = {
+				styles: {
+					blocks: {
+						'core/navigation-link': {
+							color: { text: 'linkBase' },
+							':hover': {
+								color: { background: 'hoverBackground' },
+								typography: {
+									fontSize: '14px',
+									textDecoration: 'underline',
+								},
+							},
+							'-current': {
+								color: { text: 'linkCurrent' },
+								typography: { fontSize: '16px' },
+								':hover': {
+									typography: { fontWeight: '700' },
+								},
+							},
+						},
+					},
+				},
+			};
+			const { value: out } = resolveStyle( layeredGs, {
+				blockName: 'core/navigation-link',
+				...CURRENT_HOVER_STATE,
+			} );
+			// `:hover` sits below `-current`, which sits below `-current.:hover`.
+			expect( out.color ).toEqual( {
+				text: 'linkCurrent',
+				background: 'hoverBackground',
+			} );
+			expect( out.typography ).toEqual( {
+				fontSize: '16px',
+				textDecoration: 'underline',
+				fontWeight: '700',
+			} );
+		} );
+
+		test( 'memoized variant keys custom states separately', () => {
+			const { value: hover } = resolveStyle( gs, {
+				blockName: 'core/navigation-link',
+				viewport: 'default',
+				pseudoState: ':hover',
+			} );
+			const { value: currentHover } = resolveStyle( gs, {
+				blockName: 'core/navigation-link',
+				...CURRENT_HOVER_STATE,
+			} );
+			expect( hover.color.text ).toBe( 'linkHover' );
+			expect( currentHover.color.text ).toBe( 'linkCurrentHover' );
+		} );
+	} );
+
 	describe( 'element-based blocks fold root element styles', () => {
 		const HOVER_STATE = { viewport: 'default', pseudoState: ':hover' };
 

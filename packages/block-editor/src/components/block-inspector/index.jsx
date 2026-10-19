@@ -39,6 +39,7 @@ import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info
 import { unlock } from '../../lock-unlock';
 import {
 	BlockStyleStateProvider,
+	hasCustomBlockStyleState,
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
@@ -100,6 +101,7 @@ function StyleStateInspectorSlots( {
 } ) {
 	const isViewportStyleState =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
+		! hasCustomBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
 	const showSectionStyleControls =
 		isSectionBlock && blockName !== 'core/template-part';
@@ -430,6 +432,7 @@ const BlockInspectorSingleBlock = ( {
 	const isEditingStyleState =
 		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
 			isResponsiveEditing ) ||
+		hasCustomBlockStyleState( selectedBlockStyleState ) ||
 		hasPseudoBlockStyleState( selectedBlockStyleState );
 	// When a style state is active, the badges replace the block description.
 	const showStateBadges =
@@ -489,8 +492,12 @@ const BlockInspectorSingleBlock = ( {
 									isSelected={ showStateOnCanvas }
 									icon={ showStateOnCanvas ? check : null }
 									// Previewing is only meaningful while a
-									// non-default pseudo state is selected.
+									// non-default custom or pseudo state is
+									// selected.
 									disabled={
+										! hasCustomBlockStyleState(
+											selectedBlockStyleState
+										) &&
 										! hasPseudoBlockStyleState(
 											selectedBlockStyleState
 										)

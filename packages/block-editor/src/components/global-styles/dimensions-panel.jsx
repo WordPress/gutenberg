@@ -19,6 +19,7 @@ import { cleanEmptyObject } from '../../hooks/utils';
 import { setImmutably } from '../../utils/object';
 import {
 	DEFAULT_BLOCK_STYLE_STATE,
+	hasCustomBlockStyleState,
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
 } from '../../hooks/block-style-state';
@@ -112,13 +113,17 @@ function hasWidth( settings ) {
 
 function hasAspectRatio( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
 	return (
+		! hasCustomBlockStyleState( styleState ) &&
 		! hasPseudoBlockStyleState( styleState ) &&
 		settings?.dimensions?.aspectRatio
 	);
 }
 
 function hasChildLayout( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
-	if ( hasPseudoBlockStyleState( styleState ) ) {
+	if (
+		hasCustomBlockStyleState( styleState ) ||
+		hasPseudoBlockStyleState( styleState )
+	) {
 		return false;
 	}
 

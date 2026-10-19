@@ -15,6 +15,7 @@ import type { Bindings } from '../utils/block-bindings';
  */
 export interface BlockStyleState {
 	viewport?: string;
+	custom?: string;
 	pseudo?: string;
 }
 

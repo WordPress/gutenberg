@@ -269,6 +269,29 @@ describe( 'useResolvedStyle hook', () => {
 			parsed.sources[ 'elements.h2.typography.fontSize' ].layer
 		).toBe( 'root' );
 	} );
+
+	test( 'resolves the selected custom state slice', () => {
+		mockStores( {
+			blocks: {
+				'core/paragraph': {
+					color: { text: '#000000' },
+					'-current': { color: { text: '#ff0000' } },
+				},
+			},
+		} );
+		render(
+			<Probe
+				blockName="core/paragraph"
+				selectedState={ {
+					viewport: 'default',
+					custom: '-current',
+					pseudo: 'default',
+				} }
+			/>
+		);
+		const parsed = JSON.parse( screen.getByTestId( 'probe' ).textContent );
+		expect( parsed.value.color.text ).toBe( '#ff0000' );
+	} );
 } );
 
 /**

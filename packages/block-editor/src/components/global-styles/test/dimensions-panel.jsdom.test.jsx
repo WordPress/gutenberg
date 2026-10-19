@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
-import DimensionsPanel from '../dimensions-panel';
+import DimensionsPanel, { useHasDimensionsPanel } from '../dimensions-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -838,4 +838,39 @@ describe( 'DimensionsPanel — per-control placeholder pattern', () => {
 			expectLocalOverride();
 		} );
 	} );
+} );
+
+describe( 'useHasDimensionsPanel', () => {
+	const DEFAULT_STATE = {
+		viewport: 'default',
+		custom: 'default',
+		pseudo: 'default',
+	};
+
+	it.each( [
+		[ 'custom', { ...DEFAULT_STATE, custom: '-current' } ],
+		[ 'pseudo', { ...DEFAULT_STATE, pseudo: ':hover' } ],
+	] )(
+		'leaves out child layout and aspect ratio controls for a %s state',
+		( _, styleState ) => {
+			const childLayoutSettings = {
+				layout: {},
+				parentLayout: { type: 'flex', allowSizingOnChildren: true },
+			};
+			const aspectRatioSettings = { dimensions: { aspectRatio: true } };
+
+			expect(
+				useHasDimensionsPanel( childLayoutSettings, DEFAULT_STATE )
+			).toBe( true );
+			expect(
+				useHasDimensionsPanel( childLayoutSettings, styleState )
+			).toBe( false );
+			expect(
+				useHasDimensionsPanel( aspectRatioSettings, DEFAULT_STATE )
+			).toBeTruthy();
+			expect(
+				useHasDimensionsPanel( aspectRatioSettings, styleState )
+			).toBeFalsy();
+		}
+	);
 } );

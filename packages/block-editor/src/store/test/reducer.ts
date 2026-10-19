@@ -6076,6 +6076,7 @@ describe( 'state', () => {
 				showStateOnCanvas: true,
 				value: {
 					viewport: '@mobile',
+					custom: 'default',
 					pseudo: 'default',
 				},
 			} );
@@ -6092,6 +6093,47 @@ describe( 'state', () => {
 				clientId: 'client-1',
 				showStateOnCanvas: true,
 				value: {
+					custom: 'default',
+					pseudo: ':hover',
+				},
+			} );
+		} );
+
+		it( 'stores a selected custom state for a block', () => {
+			const state = selectedBlockStyleState( undefined, {
+				type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+				clientId: 'client-1',
+				value: { custom: '-current' },
+			} );
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: true,
+				value: {
+					custom: '-current',
+					pseudo: 'default',
+				},
+			} );
+		} );
+
+		it( 'keeps the selected custom state when the pseudo state changes', () => {
+			const state = selectedBlockStyleState(
+				partial< SelectedBlockStyleState >( {
+					clientId: 'client-1',
+					value: { custom: '-current', pseudo: 'default' },
+				} ),
+				{
+					type: 'SET_SELECTED_BLOCK_STYLE_STATE',
+					clientId: 'client-1',
+					value: { pseudo: ':hover' },
+				}
+			);
+
+			expect( state ).toEqual( {
+				clientId: 'client-1',
+				showStateOnCanvas: true,
+				value: {
+					custom: '-current',
 					pseudo: ':hover',
 				},
 			} );
@@ -6115,6 +6157,7 @@ describe( 'state', () => {
 				showStateOnCanvas: true,
 				value: {
 					viewport: '@mobile',
+					custom: 'default',
 					pseudo: ':hover',
 				},
 			} );
@@ -6137,6 +6180,7 @@ describe( 'state', () => {
 				clientId: 'client-2',
 				showStateOnCanvas: true,
 				value: {
+					custom: 'default',
 					pseudo: ':focus',
 				},
 			} );
@@ -6160,6 +6204,7 @@ describe( 'state', () => {
 				showStateOnCanvas: true,
 				value: {
 					viewport: 'default',
+					custom: 'default',
 					pseudo: 'default',
 				},
 			} );
@@ -6424,7 +6469,11 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: false,
-				value: { viewport: '@mobile', pseudo: ':hover' },
+				value: {
+					viewport: '@mobile',
+					custom: 'default',
+					pseudo: ':hover',
+				},
 			} );
 		} );
 
@@ -6445,7 +6494,11 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				clientId: 'client-1',
 				showStateOnCanvas: false,
-				value: { viewport: '@mobile', pseudo: ':hover' },
+				value: {
+					viewport: '@mobile',
+					custom: 'default',
+					pseudo: ':hover',
+				},
 			} );
 		} );
 	} );
