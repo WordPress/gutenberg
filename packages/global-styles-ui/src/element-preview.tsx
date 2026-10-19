@@ -110,7 +110,9 @@ export default function ElementPreview( {
 			// The class is half of the element's selector, so a button only
 			// picks up the element's styles when it carries it. It's a link, as
 			// Button blocks are on the site, so the link-only states such as
-			// `:any-link` apply to it the same way.
+			// `:any-link` apply to it the same way. Form buttons, such as the
+			// Search block's, are `<button>`s, which those states never match,
+			// so for them the preview of a link-only state doesn't hold.
 			sample = (
 				<a className="wp-element-button" href="#anchor">
 					{ __( 'Call to action' ) }
