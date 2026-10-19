@@ -310,6 +310,56 @@ test.describe( 'Style Book notes', () => {
 		await requestUtils.deleteAllPages();
 	} );
 
+	test( 'moves the highlight along with the selection after a delete', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const globalStylesId = await getGlobalStylesId( requestUtils );
+		for ( const anchor of [ 'core/heading', 'core/paragraph' ] ) {
+			await requestUtils.rest( {
+				method: 'POST',
+				path: '/wp/v2/comments',
+				data: {
+					post: globalStylesId,
+					type: 'note',
+					status: 'hold',
+					content: `Note on ${ anchor }.`,
+					meta: { _wp_note_anchor: anchor },
+				},
+			} );
+		}
+
+		await openStyleBook( { admin, page } );
+		await styleBookFrame( page )
+			.getByRole( 'button', { name: '1 note on Headings' } )
+			.click();
+		const sidebar = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		const headingsThread = sidebar.getByRole( 'treeitem', {
+			name: /Note on Headings/,
+		} );
+		await headingsThread.click();
+		await headingsThread.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Delete' } ).click();
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete' } )
+			.click();
+
+		// The selection moves to the next thread, so the canvas follows it.
+		await expect(
+			sidebar.getByRole( 'treeitem', {
+				name: /Note on Paragraph/,
+				expanded: true,
+			} )
+		).toBeVisible();
+		await expect(
+			styleBookFrame( page ).locator( '#example-core\\/paragraph' )
+		).toHaveClass( /is-note-anchor-highlighted/ );
+	} );
+
 	test( 'stores the note on global styles with the example as its anchor', async ( {
 		admin,
 		page,

@@ -9,7 +9,7 @@ import { NoteCard } from '../../collab-sidebar/note-card';
 import { NoteForm } from '../../collab-sidebar/note-form';
 import { useNoteActions } from '../../collab-sidebar/hooks';
 import { focusNoteThread } from '../../collab-sidebar/utils';
-import { NOTE_ANCHOR_META, UNKNOWN_ANCHOR } from './anchors';
+import { NOTE_ANCHOR_META, UNKNOWN_ANCHOR, getThreadAnchor } from './anchors';
 import type { StyleBookNoteGroup, StyleBookNoteThread } from './anchors';
 import { useStyleBookNotesContext } from './context';
 import { store as editorStore } from '../../../store';
@@ -115,6 +115,7 @@ export function StyleBookNotesPanel( {
 
 		if ( adjacent ) {
 			selectNote( adjacent.id );
+			setActiveAnchor( getThreadAnchor( adjacent ) || null );
 			focusNoteThread( adjacent.id, sidebarRef.current );
 		} else {
 			selectNote( undefined );
