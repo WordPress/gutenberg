@@ -333,10 +333,10 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Should load the icon content from a readable SVG file referenced by `file_path`.
+	 * Should load and sanitize the icon content from a readable SVG file referenced by `file_path`.
 	 */
 	public function test_get_content_reads_from_valid_file_path() {
-		$path = $this->create_temp_icon_file( '<svg><path d="M0 0"/></svg>' );
+		$path = $this->create_temp_icon_file( '<svg><script>alert( 1 )</script><path d="M0 0"/></svg>' );
 
 		$this->register(
 			'test-collection/from-file',
@@ -348,6 +348,7 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 
 		$icon = $this->registry->get_registered_icon( 'test-collection/from-file' );
 		$this->assertStringContainsString( '<path', $icon['content'] );
+		$this->assertStringNotContainsString( '<script', $icon['content'] );
 	}
 
 	/**
@@ -539,6 +540,16 @@ class WP_Test_Icons_Registry_Gutenberg extends WP_UnitTestCase {
 	public function test_sanitize_icon_content_preserves_library_icons( string $file_path ) {
 		$content = file_get_contents( $file_path );
 		$this->assertEqualHTML( $content, $this->sanitize_icon_content( $content ) );
+	}
+
+	/**
+	 * Should serve a core icon unsanitized (sanitizing would lowercase `viewBox`, which would fail this test).
+	 *
+	 * @covers WP_Icons_Registry_Gutenberg::get_content
+	 */
+	public function test_get_content_does_not_sanitize_core_icon() {
+		$icon = $this->original_registry->get_registered_icon( 'core/pencil' );
+		$this->assertSame( file_get_contents( gutenberg_dir_path() . 'packages/icons/src/library/pencil.svg' ), $icon['content'] );
 	}
 
 	/**
