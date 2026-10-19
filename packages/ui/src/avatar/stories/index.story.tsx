@@ -19,7 +19,6 @@ const meta: Meta< typeof Avatar.Root > = {
 		'Avatar.Initials': Avatar.Initials,
 	},
 	parameters: {
-		controls: { include: [ 'color', 'size', 'shape' ] },
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
@@ -107,9 +106,6 @@ export const Initials: StoryObj<
 		>
 > = {
 	args: { name: 'Alex Morgan' },
-	parameters: {
-		controls: { include: [ 'name', 'locale', 'color', 'size', 'shape' ] },
-	},
 	argTypes: {
 		name: { control: 'text' },
 		locale: { control: 'text' },
