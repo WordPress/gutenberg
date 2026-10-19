@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Skip installing Xdebug unless it is enabled with `--xdebug`, since the latest Xdebug release requires PHP 8 and fails to install on older PHP versions ([#84776](https://github.com/WordPress/gutenberg/pull/84776)).
+
 ## 3.0.0 (2020-12-17)
 
 ### Breaking Changes
