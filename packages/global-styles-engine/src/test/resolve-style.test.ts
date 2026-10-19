@@ -360,6 +360,46 @@ describe( 'resolveStyle – merged output', () => {
 			expect( out.color.text ).toBe( 'linkCurrentHover' );
 		} );
 
+		test( 'custom pseudo state inherits from the pseudo and custom states', () => {
+			const layeredGs = {
+				styles: {
+					blocks: {
+						'core/navigation-link': {
+							color: { text: 'linkBase' },
+							':hover': {
+								color: { background: 'hoverBackground' },
+								typography: {
+									fontSize: '14px',
+									textDecoration: 'underline',
+								},
+							},
+							'-current': {
+								color: { text: 'linkCurrent' },
+								typography: { fontSize: '16px' },
+								':hover': {
+									typography: { fontWeight: '700' },
+								},
+							},
+						},
+					},
+				},
+			};
+			const { value: out } = resolveStyle( layeredGs, {
+				blockName: 'core/navigation-link',
+				...CURRENT_HOVER_STATE,
+			} );
+			// `:hover` sits below `-current`, which sits below `-current.:hover`.
+			expect( out.color ).toEqual( {
+				text: 'linkCurrent',
+				background: 'hoverBackground',
+			} );
+			expect( out.typography ).toEqual( {
+				fontSize: '16px',
+				textDecoration: 'underline',
+				fontWeight: '700',
+			} );
+		} );
+
 		test( 'memoized variant keys custom states separately', () => {
 			const { value: hover } = resolveStyle( gs, {
 				blockName: 'core/navigation-link',

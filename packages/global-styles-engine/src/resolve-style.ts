@@ -77,6 +77,35 @@ function getStyleForState( style: StyleTree, selectedState: SelectedState ) {
 	return getValueFromObjectPath( style, path );
 }
 
+/**
+ * Returns the states whose slices layer over the base styles, ordered low to
+ * high precedence. A custom pseudo state follows the front end's specificity,
+ * so `-current + :hover` layers `:hover`, then `-current`, then
+ * `-current.:hover`, matching the canvas preview in the block editor.
+ *
+ * @param selectedState Selected block style state.
+ * @return States to layer, ordered low to high precedence.
+ */
+function getLayeredStates( selectedState: SelectedState ): SelectedState[] {
+	if ( isDefaultBlockStyleState( selectedState ) ) {
+		return [];
+	}
+	const { customState, pseudoState } = selectedState;
+	if (
+		customState &&
+		customState !== DEFAULT_STATE_VALUE &&
+		pseudoState &&
+		pseudoState !== DEFAULT_STATE_VALUE
+	) {
+		return [
+			{ ...selectedState, customState: null },
+			{ ...selectedState, pseudoState: null },
+			selectedState,
+		];
+	}
+	return [ selectedState ];
+}
+
 // Keys on a `styles.*` layer that describe tree structure rather than the
 // block's own leaf contributions; excluded from the per-layer pick pass.
 const TREE_STRUCTURAL_KEYS = new Set( [ 'blocks', 'variations', 'css' ] );
@@ -486,27 +515,24 @@ function computeResolvedStyle(
 	// state-scoped slice on top of the base contributions, mirroring the CSS
 	// cascade: a block's `:hover`/responsive styles inherit from its base
 	// styles. State slices are appended after all base layers, preserving the
-	// same low-to-high scope ordering, so state values win over base.
-	if ( ! isDefaultBlockStyleState( selectedState ) ) {
+	// same low-to-high scope ordering, so state values win over base. A custom
+	// pseudo state layers each of its states in turn (see `getLayeredStates`).
+	for ( const state of getLayeredStates( selectedState ) ) {
 		contributions.push(
 			createContribution(
-				pickLayerRootContribution(
-					getStateSlice( root, selectedState )
-				),
+				pickLayerRootContribution( getStateSlice( root, state ) ),
 				createSourceDescriptor( 'root' )
 			),
 			...elementLayers.map( ( layer ) =>
 				createContribution(
-					pickLayerRootContribution(
-						getStateSlice( layer, selectedState )
-					),
+					pickLayerRootContribution( getStateSlice( layer, state ) ),
 					createSourceDescriptor( 'element' )
 				)
 			),
 			block
 				? createContribution(
 						pickLayerRootContribution(
-							getStateSlice( block, selectedState )
+							getStateSlice( block, state )
 						),
 						createSourceDescriptor( 'block' )
 					)
@@ -514,7 +540,7 @@ function computeResolvedStyle(
 			variation
 				? createContribution(
 						pickLayerRootContribution(
-							getStateSlice( variation, selectedState )
+							getStateSlice( variation, state )
 						),
 						createSourceDescriptor( 'blockVariation' )
 					)
