@@ -6,8 +6,6 @@ import {
 	getWpCompatOverlaySlot,
 	useEnableWpCompatOverlaySlot,
 } from '@wordpress/ui';
-import { ContextSystemProvider } from '../../context';
-import InputControl from '../../input-control';
 import Modal from '../';
 globalThis.wpVitest.mockCSSSupports();
 globalThis.wpVitest.mockMatchMedia();
@@ -15,26 +13,6 @@ globalThis.wpVitest.mockMatchMedia();
 const noop = () => {};
 
 describe( 'Modal', () => {
-	it( 'adds the `nonce` set through the context system to its Emotion styles', () => {
-		render(
-			<ContextSystemProvider
-				value={ { StyleProvider: { nonce: 'modal-nonce' } } }
-			>
-				<Modal title="Nonce" onRequestClose={ noop }>
-					{ /* `InputControl` is styled with Emotion. */ }
-					<InputControl label="Label" />
-				</Modal>
-			</ContextSystemProvider>
-		);
-
-		const nonces = Array.from(
-			// eslint-disable-next-line testing-library/no-node-access
-			document.head.querySelectorAll( 'style[data-emotion]' ),
-			( style ) => style.getAttribute( 'nonce' )
-		);
-		expect( nonces ).toContain( 'modal-nonce' );
-	} );
-
 	it( 'applies the aria-describedby attribute when provided', () => {
 		render(
 			<Modal

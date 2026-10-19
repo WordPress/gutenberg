@@ -53,7 +53,6 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/private-apis": "file:../private-apis",
-		"@wordpress/url": "file:../url",
 		"@wordpress/video-conversion": "file:../video-conversion",
 		"@wordpress/vips": "file:../vips",
 		"uuid": "^14.0.0"
