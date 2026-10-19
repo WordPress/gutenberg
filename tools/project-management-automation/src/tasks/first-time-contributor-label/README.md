@@ -1,6 +1,6 @@
 # First Time Contributor Label
 
-Adds the "First Time Contributor" label to pull requests merged on behalf of contributors that have not previously made a contribution.
+Adds the "First Time Contributor" label to pull requests opened by contributors that have not previously made a contribution.
 
 ## Rationale
 

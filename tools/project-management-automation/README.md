@@ -2,7 +2,7 @@
 
 This is a [GitHub Action](https://help.github.com/en/categories/automating-your-workflow-with-github-actions) which contains various automation to assist with managing the Gutenberg GitHub repository:
 
-- [First Time Contributor Label](https://github.com/WordPress/gutenberg/tree/HEAD/tools/project-management-automation/src/tasks/first-time-contributor-label): Adds the "First Time Contributor" label to pull requests merged on behalf of contributors that have not previously made a contribution.
+- [First Time Contributor Label](https://github.com/WordPress/gutenberg/tree/HEAD/tools/project-management-automation/src/tasks/first-time-contributor-label): Adds the "First Time Contributor" label to pull requests opened by contributors that have not previously made a contribution.
 - [First Time Contributor Account Link](https://github.com/WordPress/gutenberg/tree/HEAD/tools/project-management-automation/src/tasks/first-time-contributor-account-link): Prompts the user to link their GitHub account to their WordPress.org profile if necessary for release notes credit.
 - [Add Milestone](https://github.com/WordPress/gutenberg/tree/HEAD/tools/project-management-automation/src/tasks/add-milestone): Assigns the plugin release milestone to a pull request once it is merged.
 - [Assign Fixed Issues](https://github.com/WordPress/gutenberg/tree/HEAD/tools/project-management-automation/src/tasks/assign-fixed-issues): Adds assignee for issues which are marked to be "Fixed" by a pull request, and adds the "In Progress" label.
