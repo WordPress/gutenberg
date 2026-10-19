@@ -145,7 +145,7 @@ export default function PresetInputControl( {
 
 	const options = selectListOptions.map( ( size, index ) => ( {
 		value: String( index ),
-		label: size.name,
+		label: size.name ?? '',
 	} ) );
 
 	const resolvedPresetValue = isValuePreset( value, presetType )
@@ -280,7 +280,7 @@ export default function PresetInputControl( {
 					hideLabelFromVision
 					items={ options }
 					onValueChange={ ( selection ) => {
-						if ( ! selection ) {
+						if ( ! selection || selection.value === null ) {
 							return;
 						}
 						if (
