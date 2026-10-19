@@ -2,19 +2,17 @@ import removeAccents from 'remove-accents';
 
 /**
  * Object map tracking anchors.
- *
- * @type {Record<string, string | null>}
  */
-const anchors = {};
+const anchors: Record< string, string | null > = {};
 
 /**
  * Returns the text without markup.
  *
- * @param {string} text The text.
+ * @param text The text.
  *
- * @return {string} The text without markup.
+ * @return The text without markup.
  */
-const getTextWithoutMarkup = ( text ) => {
+const getTextWithoutMarkup = ( text: string ): string => {
 	const dummyElement = document.createElement( 'div' );
 	dummyElement.innerHTML = text;
 	return dummyElement.innerText;
@@ -23,11 +21,11 @@ const getTextWithoutMarkup = ( text ) => {
 /**
  * Get the slug from the content.
  *
- * @param {string} content The block content.
+ * @param content The block content.
  *
- * @return {string} Returns the slug.
+ * @return Returns the slug.
  */
-const getSlug = ( content ) => {
+const getSlug = ( content: string ): string => {
 	// Get the slug.
 	return (
 		removeAccents(
@@ -50,12 +48,15 @@ const getSlug = ( content ) => {
 /**
  * Generate the anchor for a heading.
  *
- * @param {string} clientId The block ID.
- * @param {string} content  The block content.
+ * @param clientId The block ID.
+ * @param content  The block content.
  *
- * @return {string|null} Return the heading anchor.
+ * @return Return the heading anchor.
  */
-export const generateAnchor = ( clientId, content ) => {
+export const generateAnchor = (
+	clientId: string,
+	content: string
+): string | null => {
 	const slug = getSlug( content );
 	// If slug is empty, then return null.
 	// Returning null instead of an empty string allows us to check again when the content changes.
@@ -80,9 +81,9 @@ export const generateAnchor = ( clientId, content ) => {
 /**
  * Set the anchor for a heading.
  *
- * @param {string}      clientId The block ID.
- * @param {string|null} anchor   The block anchor.
+ * @param clientId The block ID.
+ * @param anchor   The block anchor.
  */
-export const setAnchor = ( clientId, anchor ) => {
+export const setAnchor = ( clientId: string, anchor: string | null ): void => {
 	anchors[ clientId ] = anchor;
 };

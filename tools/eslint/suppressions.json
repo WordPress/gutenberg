@@ -4236,11 +4236,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/heading/autogenerate-anchors.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/heading/deprecated.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
