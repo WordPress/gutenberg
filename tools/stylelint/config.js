@@ -13,15 +13,6 @@ module.exports = {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
 		'comment-empty-line-before': null,
-		'declaration-property-value-allowed-list': [
-			{
-				'flex-direction': '/^(?!(row|column)-reverse).*$/',
-			},
-			{
-				message: ( property, value ) =>
-					`Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`,
-			},
-		],
 		'declaration-property-value-disallowed-list': [
 			{
 				'/.*/': [
@@ -30,9 +21,13 @@ module.exports = {
 					'/\\$font-weight-medium/',
 				],
 				cursor: [ 'pointer' ],
+				'flex-direction': [ '/-reverse$/' ],
 			},
 			{
 				message: ( property, value ) => {
+					if ( property === 'flex-direction' ) {
+						return `Avoid "${ value }" value for the "${ property }" property. For accessibility reasons, visual, reading, and DOM order must match. Only use the reverse values when they do not affect reading order, meaning, and interaction.`;
+					}
 					if (
 						value.includes( '$font-weight-regular' ) ||
 						value.includes( '$font-weight-medium' )
