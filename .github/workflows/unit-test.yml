@@ -27,18 +27,11 @@ jobs:
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
-        strategy:
-            fail-fast: false
-            matrix:
-                node: ['14']
-
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
-              with:
-                  node-version: ${{ matrix.node }}
 
             - name: Npm build
               # It's not necessary to run the full build, since Jest can interpret
