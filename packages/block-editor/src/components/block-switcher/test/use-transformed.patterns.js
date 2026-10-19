@@ -1,11 +1,5 @@
-/**
- * WordPress dependencies
- */
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { unregisterBlockType, registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
 import {
 	transformMatchingBlock,
 	getPatternTransformedBlocks,

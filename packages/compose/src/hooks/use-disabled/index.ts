@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { debounce } from '../../utils/debounce';
 import useRefEffect from '../use-ref-effect';
 
@@ -53,7 +50,7 @@ export default function useDisabled( {
 					if ( ! ( child instanceof defaultView.HTMLElement ) ) {
 						return;
 					}
-					if ( ! child.getAttribute( 'inert' ) ) {
+					if ( ! child.hasAttribute( 'inert' ) ) {
 						child.setAttribute( 'inert', 'true' );
 						updates.push( () => {
 							child.removeAttribute( 'inert' );

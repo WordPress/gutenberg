@@ -1,14 +1,7 @@
-/**
- * WordPress dependencies
- */
 import {
 	__experimentalHStack as HStack,
 	__unstableMotion as motion,
 } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
 import PresetColors from './preset-colors';
 import PreviewWrapper from './preview-wrapper';
 

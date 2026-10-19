@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { ButtonAsButtonProps } from '../button/types';
 import type { WordPressComponentProps } from '../context';
 
@@ -60,8 +57,7 @@ export type PanelBodyProps = {
 	 * this prop, it will receive an object with the `opened` prop as an argument.
 	 */
 	children?:
-		| React.ReactNode
-		| ( ( props: { opened: boolean } ) => React.ReactNode );
+		React.ReactNode | ( ( props: { opened: boolean } ) => React.ReactNode );
 
 	/**
 	 * The CSS class to apply to the wrapper element.

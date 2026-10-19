@@ -1,14 +1,6 @@
 // CSS Baseline 2024 stepped-value functions not yet recognized by Stylelint.
 const CSS_BASELINE_2024_FUNCTIONS = [ 'round', 'rem', 'mod' ];
 
-const SELECTOR_CLASS_PATTERN = [
-	'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
-	{
-		message:
-			'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
-	},
-];
-
 /** @type {import('stylelint').Config} */
 module.exports = {
 	extends: '@wordpress/stylelint-config/scss-stylistic',
@@ -16,6 +8,7 @@ module.exports = {
 		'stylelint-plugin-logical-css',
 		'@wordpress/theme/stylelint-plugins/no-token-fallback-values',
 	],
+	reportNeedlessDisables: true,
 	rules: {
 		'at-rule-empty-line-before': null,
 		'at-rule-no-unknown': null,
@@ -31,11 +24,26 @@ module.exports = {
 		],
 		'declaration-property-value-disallowed-list': [
 			{
-				'/.*/': [ '/--wp-components-color-/' ],
+				'/.*/': [
+					'/--wp-components-color-/',
+					'/\\$font-weight-regular/',
+					'/\\$font-weight-medium/',
+				],
 				cursor: [ 'pointer' ],
 			},
 			{
 				message: ( property, value ) => {
+					if (
+						value.includes( '$font-weight-regular' ) ||
+						value.includes( '$font-weight-medium' )
+					) {
+						const variable = value.includes(
+							'$font-weight-regular'
+						)
+							? '$font-weight-regular'
+							: '$font-weight-medium';
+						return `\`${ variable }\` has been removed. Use \`var(--wpds-typography-font-weight-default)\` or \`var(--wpds-typography-font-weight-emphasis)\` based on the intended emphasis.`;
+					}
 					if ( property === 'cursor' ) {
 						return 'Use the `var( --wpds-cursor-control )` token for interactive non-link controls. If this is for a link, you can disable this rule.';
 					}
@@ -43,7 +51,7 @@ module.exports = {
 				},
 			},
 		],
-		'font-weight-notation': null,
+		'font-weight-notation': 'numeric',
 		'@stylistic/max-line-length': null,
 		'no-descending-specificity': null,
 		'property-disallowed-list': [
@@ -54,7 +62,13 @@ module.exports = {
 			},
 		],
 		'rule-empty-line-before': null,
-		'selector-class-pattern': null,
+		'selector-class-pattern': [
+			'^[a-z][a-z0-9]*(?:(?:__|--|-)[a-z0-9]+)*$',
+			{
+				message:
+					'Selector should use lowercase class segments separated with hyphens, double hyphens, or double underscores (selector-class-pattern)',
+			},
+		],
 		'value-keyword-case': null,
 		'scss/operator-no-unspaced': null,
 		'scss/selector-no-redundant-nesting-selector': null,
@@ -91,7 +105,8 @@ module.exports = {
 					'border-radius': 3,
 					inset: 3,
 				},
-				'plugin/use-logical-properties-and-values': [
+				'logical-css/require-logical-keywords': [ true ],
+				'logical-css/require-logical-properties': [
 					true,
 					{
 						ignore: [
@@ -155,13 +170,42 @@ module.exports = {
 			},
 		},
 		{
-			files: [
-				'packages/components/src/**/*.module.{css,scss}',
-				'packages/theme/src/**/*.module.{css,scss}',
-				'packages/ui/src/**/*.module.{css,scss}',
-			],
+			files: [ '**/*.css' ],
 			rules: {
-				'selector-class-pattern': SELECTOR_CLASS_PATTERN,
+				// Re-add no-duplicate-selectors rule for CSS because it is disabled by stylelint-config-recommended-scss v17
+				'no-duplicate-selectors': true,
+			},
+		},
+		{
+			/*
+			 * The admin design tokens experiment ships inside a cascade layer, and
+			 * layer priority REVERSES for `!important`: a layered `!important`
+			 * beats a third-party plugin's *unlayered* `!important`, even when the
+			 * plugin's stylesheet loads later. Allowing one would silently break
+			 * overrides the ecosystem has relied on for years. Normal declarations
+			 * are safe, since unlayered plugin CSS still wins.
+			 *
+			 * DELETE WHEN: `lib/experimental/wpds-admin/` is removed.
+			 */
+			files: [ 'lib/experimental/wpds-admin/**/*.css' ],
+			rules: {
+				'declaration-no-important': true,
+			},
+		},
+		{
+			/*
+			 * The single exception. `99-overrides.css` exists only to cancel
+			 * `!important` declarations in WordPress's admin CSS, which survive
+			 * being demoted into a lower layer because importance is compared
+			 * before layer order. Every rule in that file must cancel a specific
+			 * WordPress `!important` and record what would let it be deleted. Do
+			 * not widen this exception to any other file.
+			 *
+			 * DELETE WHEN: `lib/experimental/wpds-admin/` is removed.
+			 */
+			files: [ 'lib/experimental/wpds-admin/css/99-overrides.css' ],
+			rules: {
+				'declaration-no-important': null,
 			},
 		},
 	],

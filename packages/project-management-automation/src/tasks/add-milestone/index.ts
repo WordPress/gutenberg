@@ -1,25 +1,16 @@
-/**
- * External dependencies
- */
 import type { getOctokit } from '@actions/github';
-import type { PushEvent } from '@octokit/webhooks-types';
-
-/**
- * Internal dependencies
- */
-import debug from '../../debug';
-import getAssociatedPullRequest from '../../get-associated-pull-request';
+import type { components } from '@octokit/openapi-webhooks-types';
+import debug from '../../debug.js';
+import getAssociatedPullRequest from '../../get-associated-pull-request.js';
 
 /**
  * Type definitions
  */
 type GitHub = ReturnType< typeof getOctokit >;
+type WebhookPayloadPush = components[ 'schemas' ][ 'webhook-push' ];
 type Milestone = Awaited<
 	ReturnType< GitHub[ 'rest' ][ 'issues' ][ 'listMilestones' ] >
 >[ 'data' ][ 0 ];
-/** @typedef {import('@octokit/request-error').RequestError} RequestError */
-/** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
 
 /**
  * Number of expected days elapsed between releases.
@@ -93,7 +84,7 @@ async function getMilestoneByTitle(
  * @param octokit Initialized Octokit REST client.
  */
 async function addMilestone(
-	payload: PushEvent,
+	payload: WebhookPayloadPush,
 	octokit: GitHub
 ): Promise< void > {
 	if ( payload.ref !== 'refs/heads/trunk' ) {
@@ -107,9 +98,15 @@ async function addMilestone(
 		return;
 	}
 
-	debug( 'add-milestone: Fetching current milestone' );
-	const owner = payload.repository.owner.login;
+	const owner = payload.repository.owner?.login;
+	if ( ! owner ) {
+		debug(
+			'add-milestone: Push payload is missing a repository owner. Aborting'
+		);
+		return;
+	}
 	const repo = payload.repository.name;
+	debug( 'add-milestone: Fetching current milestone' );
 
 	const {
 		data: { milestone: pullMilestone },
@@ -131,7 +128,7 @@ async function addMilestone(
 	const {
 		// The types for the `getContent` response are incorrect.
 		// see https://github.com/octokit/rest.js/issues/32
-		// @ts-ignore
+		// @ts-expect-error The `getContent` response is a union that may be a directory listing.
 		data: { content, encoding },
 	} = await octokit.rest.repos.getContent( {
 		owner,
@@ -200,12 +197,7 @@ async function addMilestone(
 
 	const title = `Gutenberg ${ major }.${ minor }`;
 
-	const milestone = await getMilestoneByTitle(
-		octokit,
-		payload.repository.owner.login,
-		payload.repository.name,
-		title
-	);
+	const milestone = await getMilestoneByTitle( octokit, owner, repo, title );
 
 	if ( ! milestone ) {
 		throw new Error( 'Could not rediscover milestone by title: ' + title );

@@ -1,15 +1,8 @@
-/**
- * WordPress dependencies
- */
-import { privateApis as composePrivateApis } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
-const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
 /**
  * When the browser is about to auto correct, add an undo level so the user can
@@ -29,5 +22,5 @@ export default ( props ) => ( element ) => {
 			.__unstableMarkLastChangeAsPersistent();
 	}
 
-	return subscribeDelegatedListener( element, 'beforeinput', onInput );
+	return subscribeOwnedListener( element, 'beforeinput', onInput );
 };

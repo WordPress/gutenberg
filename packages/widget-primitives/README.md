@@ -36,24 +36,78 @@ endpoint, exposed while the `gutenberg-dashboard-widgets` experiment is
 enabled. The dashboard reads it through a `@wordpress/core-data` entity and
 passes the records to the hook.
 
-With no records, or an empty list, `useWidgetTypes()` returns an empty list.
+An empty list of records resolves to an empty `widgetTypes` with
+`isResolvingWidgetTypes` set to `false`. Passing `null` (or `undefined`) keeps
+the hook in its loading state: `widgetTypes` is empty and
+`isResolvingWidgetTypes` stays `true`.
 
 ## Public API
 
--   `<WidgetRender>`: canonical entry point for any host that mounts a widget.
-    Resolves the widget's render module via a host-provided `resolveWidgetModule`
-    and mounts the resulting component with the standard `attributes` plus
-    `setAttributes` render contract. Error handling and chrome are host
-    concerns; because the component is mounted lazily, the host must also
-    wrap it in a `Suspense` boundary.
--   `useWidgetTypes( records )` → `[ widgetTypes, isResolvingWidgetTypes ]`:
-    takes host-supplied records (`WidgetModuleRecord[]`, or `null` while
-    loading) and imports each record's metadata module;
-    `isResolvingWidgetTypes` stays `true` until they resolve.
--   Contract types: `WidgetType`, `WidgetName`, `WidgetIcon`,
-    `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`.
-    `WidgetIcon` is a rendered SVG element; hosts pass it to their icon
-    primitive as is.
+### `<WidgetRender>`
+
+It's the entry point for any host that mounts a widget. It resolves the render module via a host-provided `resolveWidgetModule` and mounts the component using the `attributes` / `setAttributes` contract.
+
+Error handling and chrome stay with the host, which wraps the lazy render in a `Suspense` boundary.
+
+### `useWidgetTypes( records )`
+
+It takes host-supplied records (`WidgetModuleRecord[]`, or `null` while loading) and imports each one's metadata module. It returns `[ widgetTypes, isResolvingWidgetTypes ]`; the flag stays `true` until they resolve.
+
+### `useWidgetActions( actions )`
+
+It declares the actions a mounted widget wants its host to place. The list is that call's whole set: an action that does not apply is left out. Several components of one widget can each call it; `WidgetRender` joins their lists before the host sees them.
+
+A runtime action carrying a declared action's `id` takes its place, keeping the declared `icon` and `relevance` it leaves out.
+
+The list is compared by value, so it can be written inline, and a callback always runs its latest version. The hook returns `false` when the host has no `actions` capability, and the widget keeps rendering its own affordance.
+
+### `HostLink`
+
+It's how a consumer mounts a link target, and the only piece of the seam most consumers touch: the host's `Link` when `match` recognizes the target, a plain anchor otherwise. A target that opens a new document never routes, which it reads off the anchor props: a `download` other than `false`, or the `_blank` target a UI link resolves `openInNewTab` into.
+
+It takes `href` plus anchor props and composes through the `render` prop of a UI link, which merges its own anchor props in.
+
+### `WidgetHostProvider` / `useWidgetHost`
+
+It's the seam itself: the embedding application provides what only it knows as a `WidgetHost` bag of optional capabilities. The provider merges its value over the inherited one; an absent capability degrades to the host-agnostic behavior.
+
+The first capability is `links` (`WidgetHostLinks`): `match` resolves a href to an in-app route (a string, path and query as the router takes them, or `null` for anything the application does not own), and `Link` is the router's primitive, which must render a real anchor and forward `ref` to it.
+
+Applications mount the provider. `useWidgetHost` reads the bag directly, for a capability no component covers yet or an answer a consumer needs before it renders.
+
+`HostLink` reaches the anchor through that ref: a link that drops it is skipped by keyboard navigation and loses its tooltip. The Widget Host Storybook page carries the one test that pins it.
+
+The second capability is `actions` (`WidgetHostActions`): `declare` takes the runtime actions of one instance. A host that places actions binds it where it mounts the widget's render.
+
+### Contract types
+
+`WidgetType`, `WidgetName`, `WidgetIcon`, `WidgetRenderProps`, `ResolveWidgetModule`, `WidgetModuleRecord`, and `WidgetAttributeRecord`. `WidgetIcon` is a rendered SVG element that hosts pass to their icon primitive as-is; in `widget.json` a widget declares a registered icon name instead, resolved before it reaches hosts. `WidgetAttributeRecord` is an attribute as `widget.json` declares it: the JSON-expressible subset of a DataViews `Field`.
+
+### `WidgetAttributeField< Item >`
+
+It's an authoring helper for a `widget.ts` entry: a DataViews `Field` whose `id` is narrowed to the widget's attribute keys.
+Its optional `relevance` hint (`'high' | 'medium' | 'low'`) marks attributes a host may promote to a prominent surface.
+`useWidgetTypes` merges such an entry by `id` over the one `widget.json` declares, so the module only carries what JSON cannot express; `isValid` merges rule by rule, so a module `custom` validator survives the JSON rules.
+
+### `WidgetAction`
+
+It's a declarative verb a widget type exposes: an envelope (`id`, `label`, optional `icon` and `relevance`) plus exactly one fulfillment, named by the key carrying it.
+Today the only key is `href`, a link target, with optional `download` / `openInNewTab`.
+`data:` and `javascript:` hrefs are rejected at registration. Prefer a file next to the widget, an absolute URL, or `downloadBlob` for generated content.
+
+The widget names the intent and how it is fulfilled; the host mounts the primitive and owns placement.
+
+`WidgetCallbackAction` is the runtime-only form: the same envelope with a `callback` function as fulfillment. `WidgetRuntimeAction` is either form, and `WidgetActionEnvelope` the identity both share.
+
+### Field types
+
+`registerFieldType( definition )` names a reusable field type — `{ name: 'location', baseType: 'text', Edit, ... }`, typed by `FieldTypeDefinition`. Those attributes reference via `type`.
+
+`useWidgetTypes` resolves those references into the plain per-field `Field` props DataViews understands, inheriting the rest from `baseType`.
+
+### Icons
+
+`registerIconResolver( resolver )` registers how a registered icon name (`"icon": "core/calendar"` in `widget.json`) becomes a renderable element. The application registers it once; `useWidgetTypes` resolves references while assembling each `WidgetType`, so hosts only receive renderable icons. An unresolvable reference degrades to no icon.
 
 ## Architecture
 
@@ -63,15 +117,8 @@ hosts), see the
 
 ## Contributing to this package
 
-This is an individual package that's part of the Gutenberg project.
-The project is organized as a monorepo. It's made up of multiple
-self-contained software packages, each with a specific purpose. The
-packages in this monorepo are published to [npm](https://www.npmjs.com/)
-and used by [WordPress](https://make.wordpress.org/core/) as well as
-other software projects.
+This is an individual package that's part of the Gutenberg project. The project is organized as a monorepo. It's made up of multiple self-contained software packages, each with a specific purpose. The packages in this monorepo are published to [npm](https://www.npmjs.com/) and used by [WordPress](https://make.wordpress.org/core/) as well as other software projects.
 
-To find out more about contributing to this package or Gutenberg as a
-whole, please read the project's main
-[contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
+To find out more about contributing to this package or Gutenberg as a whole, please read the project's main [contributor guide](https://github.com/WordPress/gutenberg/tree/HEAD/CONTRIBUTING.md).
 
 <br /><br /><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

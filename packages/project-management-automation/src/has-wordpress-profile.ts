@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { request } from 'https';
+import { request } from 'node:https';
 
 /**
  * Endpoint hostname for WordPress.org profile lookup by GitHub username.

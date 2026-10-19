@@ -1,7 +1,10 @@
+import type { components } from '@octokit/openapi-webhooks-types';
+
 /**
- * External dependencies
+ * Type definitions
  */
-import type { Commit } from '@octokit/webhooks-types';
+export type WebhookPayloadPushCommit =
+	components[ 'schemas' ][ 'webhook-push' ][ 'commits' ][ number ];
 
 /**
  * Given a commit object, returns a promise resolving with the pull request
@@ -11,7 +14,9 @@ import type { Commit } from '@octokit/webhooks-types';
  * @param commit Commit object.
  * @return Pull request number, or null if it cannot be determined.
  */
-function getAssociatedPullRequest( commit: Commit ): number | null {
+function getAssociatedPullRequest(
+	commit: WebhookPayloadPushCommit
+): number | null {
 	const match = commit.message.match( /\(#(\d+)\)$/m );
 	return match ? Number( match[ 1 ] ) : null;
 }

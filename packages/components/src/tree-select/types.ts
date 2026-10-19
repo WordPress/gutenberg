@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { SelectControlSingleSelectionProps } from '../select-control/types';
 
 export type Truthy< T > = T extends false | '' | 0 | null | undefined
@@ -15,18 +12,10 @@ export interface Tree {
 
 // `TreeSelect` inherits props from `SelectControl`, but only
 // in single selection mode (ie. when the `multiple` prop is not defined).
-export interface TreeSelectProps
-	extends Omit<
-		SelectControlSingleSelectionProps,
-		'value' | 'multiple' | 'onChange' | '__next40pxDefaultSize'
-	> {
-	/**
-	 * Start opting into the larger default height that will become the default size in a future version.
-	 *
-	 * @deprecated Default behavior since WordPress 7.1. Prop can be safely removed.
-	 * @ignore
-	 */
-	__next40pxDefaultSize?: boolean;
+export interface TreeSelectProps extends Omit<
+	SelectControlSingleSelectionProps,
+	'value' | 'multiple' | 'onChange'
+> {
 	/**
 	 * If this property is added, an option will be added with this label to represent empty selection.
 	 */

@@ -1,15 +1,13 @@
-/**
- * Internal dependencies
- */
-import getAssociatedPullRequest from '../get-associated-pull-request';
+import { describe, expect, it } from 'vitest';
+import getAssociatedPullRequest from '../get-associated-pull-request.js';
 
-/** @typedef {import('@octokit/webhooks-types').Commit} Commit */
+/** @typedef {import('../get-associated-pull-request.js').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
 
 /**
  * An example commit which can be associated with a pull request, e.g. a pull
  * request merge commit.
  *
- * @type {Commit}
+ * @type {WebhookPayloadPushCommit}
  */
 const VALID_COMMIT = {
 	message:
@@ -20,7 +18,7 @@ const VALID_COMMIT = {
  * An example commit which cannot be associated with a pull request, e.g. when
  * someone commits directly to trunk.
  *
- * @type {Commit}
+ * @type {WebhookPayloadPushCommit}
  */
 const INVALID_COMMIT = {
 	message: 'Add basic placeholder content to post title, content, and date.',

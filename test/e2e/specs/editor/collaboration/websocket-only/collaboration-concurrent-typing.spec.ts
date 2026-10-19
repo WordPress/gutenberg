@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Locator, Page } from '@playwright/test';
-
-/**
- * Internal dependencies
- */
 import { test, expect } from '../fixtures';
-
-const MIN_REQUIRED_WS_DELAY_MS = 30;
-const CONFIGURED_WS_DELAY_MS =
-	Number.parseInt( process.env.RTC_WS_DELAY || '0', 10 ) || 0;
 
 const USER_A_TEXT =
 	'123456789012345678901234567890123456789012345678901234567890';
@@ -38,11 +27,6 @@ async function getParagraphContents( page: Page ): Promise< string[] > {
 }
 
 test.describe( 'Collaboration - WebSocket Concurrent Typing', () => {
-	test.skip(
-		CONFIGURED_WS_DELAY_MS < MIN_REQUIRED_WS_DELAY_MS,
-		`Run with RTC_WS_DELAY=${ MIN_REQUIRED_WS_DELAY_MS } to enable the slow WebSocket reproduction.`
-	);
-
 	test( 'does not lose characters when two users rapidly type in different paragraphs', async ( {
 		collaborationUtils,
 		requestUtils,

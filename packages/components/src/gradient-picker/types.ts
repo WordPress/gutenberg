@@ -1,7 +1,5 @@
-/**
- * Internal dependencies
- */
 import type { HeadingSize } from '../heading/types';
+import type { CircularOptionPickerProps } from '../circular-option-picker/types';
 
 export type GradientObject = {
 	gradient: string;
@@ -17,10 +15,16 @@ type GradientPickerBaseProps = {
 	 */
 	className?: string;
 	/**
-	 * The function called when a new gradient has been defined. It is passed to
-	 * the `currentGradient` as an argument.
+	 * The function called when a new gradient has been defined. It is passed
+	 * the `currentGradient` as an argument. When a predefined gradient is
+	 * selected, the second argument is its index (or, for multiple-origin
+	 * gradients, the origin index) and the third argument is its slug.
 	 */
-	onChange: ( currentGradient: string | undefined ) => void;
+	onChange: (
+		currentGradient: string | undefined,
+		index?: number,
+		slug?: string
+	) => void;
 	/**
 	 * The current value of the gradient. Pass a css gradient string (See default value for example).
 	 * Optionally pass in a `null` value to specify no gradient is currently selected.
@@ -28,6 +32,19 @@ type GradientPickerBaseProps = {
 	 * @default 'linear-gradient(135deg,rgba(6,147,227,1) 0%,rgb(155,81,224) 100%)'
 	 */
 	value?: GradientObject[ 'gradient' ] | null;
+	/**
+	 * The slug of the currently selected predefined gradient.
+	 *
+	 * When set to a non-empty string, selection is determined by slug rather
+	 * than by gradient value, which correctly handles palettes where two
+	 * entries share the same gradient. Entries whose slug does not match will
+	 * not appear selected in this mode, even if their gradient value matches
+	 * `value`.
+	 *
+	 * An empty string is treated the same as `undefined`: selection falls
+	 * back to matching by gradient value.
+	 */
+	selectedSlug?: string;
 	/**
 	 * Whether the palette should have a clearing button or not.
 	 *
@@ -43,15 +60,33 @@ type GradientPickerBaseProps = {
 	 */
 	headingLevel?: HeadingSize;
 	/**
-	 * Whether the control should present as a set of buttons,
-	 * each with its own tab stop.
+	 * How predefined gradient swatches behave and are exposed to assistive
+	 * technology.
 	 *
+	 * - `listbox` uses one tab stop and arrow-key navigation, and exposes
+	 *   selection with `aria-selected`.
+	 * - `toggle-buttons` gives each swatch a tab stop and exposes selection with
+	 *   `aria-pressed`.
+	 * - `command-buttons` gives each swatch a tab stop and exposes no selection
+	 *   state. `value` and `selectedSlug` do not mark predefined swatches as
+	 *   selected, and activating a swatch always calls `onChange` with that
+	 *   swatch. `value` still controls the custom gradient picker.
+	 *
+	 * @default 'listbox'
+	 */
+	presentation?: CircularOptionPickerProps[ 'presentation' ];
+	/**
+	 * Whether the control should present as toggle buttons.
+	 *
+	 * @deprecated Use `presentation="toggle-buttons"` instead. An explicit
+	 * `presentation` takes precedence.
 	 * @default false
+	 * @ignore
 	 */
 	asButtons?: boolean;
 	/**
 	 * Prevents keyboard interaction from wrapping around.
-	 * Only used when `asButtons` is not true.
+	 * Only used with the `listbox` presentation.
 	 *
 	 * @default true
 	 */
@@ -121,7 +156,8 @@ export type PickerProps< TOriginType extends GradientObject | OriginObject > =
 		clearGradient: () => void;
 		onChange: (
 			currentGradient: string | undefined,
-			index: number
+			index: number,
+			slug?: string
 		) => void;
 		actions?: React.ReactNode;
 		gradients: TOriginType[];

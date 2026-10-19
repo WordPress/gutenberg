@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import { useRefEffect } from '@wordpress/compose';
 
 const nodesByDocument = new Map();

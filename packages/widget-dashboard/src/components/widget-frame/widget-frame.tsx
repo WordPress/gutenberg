@@ -1,23 +1,14 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
-import { Spinner } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 import { Component, Suspense } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-// eslint-disable-next-line @wordpress/use-recommended-components
-import { Card, Icon, Notice, Stack, VisuallyHidden } from '@wordpress/ui';
+import { inertValue } from '@wordpress/react-inert-value';
+import { Card, Notice, Spinner, Stack, VisuallyHidden } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';
-
-/**
- * Internal dependencies
- */
+import { WidgetHeader } from '../widget-header';
 import { WidgetRender } from '../widget-render';
+import { WidgetFrameFooter } from './widget-frame-footer';
 import styles from './widget-frame.module.css';
 import type { DashboardWidget } from '../../types';
 
@@ -37,6 +28,10 @@ class WidgetErrorBoundary extends Component<
 
 	static getDerivedStateFromError(): ErrorBoundaryState {
 		return { hasError: true };
+	}
+
+	componentDidCatch() {
+		speak( __( 'This widget encountered an error.' ), 'polite' );
 	}
 
 	render() {
@@ -62,41 +57,26 @@ export function LoadingOverlay() {
 	);
 }
 
-interface HeaderProps {
-	titleId: string;
-	widgetType: WidgetType;
-}
-
-function Header( { titleId, widgetType }: HeaderProps ) {
-	if ( ! widgetType.title ) {
-		return null;
-	}
-
-	return (
-		<Card.Header>
-			<Stack direction="row" align="center" gap="sm">
-				{ widgetType.icon && (
-					<span className={ styles.headerIcon } aria-hidden="true">
-						<Icon icon={ widgetType.icon } />
-					</span>
-				) }
-				<Card.Title id={ titleId } render={ <h2 /> }>
-					{ widgetType.title }
-				</Card.Title>
-			</Stack>
-		</Card.Header>
-	);
-}
-
 export interface WidgetFrameProps {
 	widget: DashboardWidget< unknown >;
 	widgetType: WidgetType;
 	titleId: string;
+
+	/**
+	 * Inert the body and identity while customizing.
+	 */
+	editMode?: boolean;
+
+	/**
+	 * Toolbar shown beside the identity in the in-card header.
+	 */
+	headerToolbar?: ReactNode;
 }
 
 /**
- * Shared framing: `presentation` into header + content, with the error/loading
- * boundaries. Hosts supply the `Card.Root` and their own concerns.
+ * Shared framing: `presentation` into header, content, and the actions footer,
+ * with the error/loading boundaries. Hosts supply the `Card.Root` and their
+ * own concerns.
  *
  * @param {WidgetFrameProps} props Component props.
  */
@@ -104,6 +84,8 @@ export function WidgetFrame( {
 	widget,
 	widgetType,
 	titleId,
+	editMode = false,
+	headerToolbar,
 }: WidgetFrameProps ) {
 	// full-bleed hides the header; full-bleed and content-bleed bleed the body.
 	const { presentation } = widgetType;
@@ -122,14 +104,22 @@ export function WidgetFrame( {
 	return (
 		<>
 			{ ! isHeaderHidden && (
-				<Header titleId={ titleId } widgetType={ widgetType } />
+				<WidgetHeader
+					showIdentity
+					widgetType={ widgetType }
+					titleId={ titleId }
+					editMode={ editMode }
+				>
+					{ headerToolbar }
+				</WidgetHeader>
 			) }
 
 			<Card.Content
 				className={ clsx(
 					styles.content,
-					isBodyBleeding && styles.bleedContent
+					isBodyBleeding && styles[ 'bleed-content' ]
 				) }
+				inert={ inertValue( editMode ) }
 			>
 				{ isHeaderHidden && widgetType.title && (
 					<VisuallyHidden render={ <h2 id={ titleId } /> }>
@@ -138,6 +128,12 @@ export function WidgetFrame( {
 				) }
 				{ body }
 			</Card.Content>
+
+			<WidgetFrameFooter
+				widget={ widget }
+				widgetType={ widgetType }
+				editMode={ editMode }
+			/>
 		</>
 	);
 }

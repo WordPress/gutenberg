@@ -1,20 +1,13 @@
-/**
- * External dependencies
- */
 import type { getOctokit } from '@actions/github';
-import type { PullRequestEvent } from '@octokit/webhooks-types';
-
-/**
- * Internal dependencies
- */
-import debug from '../../debug';
+import type { components } from '@octokit/openapi-webhooks-types';
+import debug from '../../debug.js';
 
 /**
  * Type definitions
  */
 type GitHub = ReturnType< typeof getOctokit >;
-/** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['pull_request']} WebhookPayloadPullRequest */
+type WebhookPayloadPullRequest =
+	components[ 'schemas' ][ 'webhook-pull-request-opened' ];
 
 /**
  * Assigns any issues 'fixed' by a newly opened PR to the author of that PR.
@@ -23,7 +16,7 @@ type GitHub = ReturnType< typeof getOctokit >;
  * @param octokit Initialized Octokit REST client.
  */
 async function assignFixedIssues(
-	payload: PullRequestEvent,
+	payload: WebhookPayloadPullRequest,
 	octokit: GitHub
 ): Promise< void > {
 	const regex =

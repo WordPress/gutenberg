@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import {
 	getListViewDropTarget,
 	NESTING_LEVEL_INDENTATION,
@@ -320,6 +318,155 @@ describe( 'getListViewDropTarget', () => {
 				clientId: 'block-1',
 				dropPosition: 'bottom',
 				rootClientId: '',
+			} );
+		} );
+	} );
+
+	describe( 'while the drop indicator displaces the rows', () => {
+		// Models the list view while a block is dragged downward: the dragged
+		// block keeps its row, the rows between it and the target shift up to
+		// fill its slot, and the drop indicator occupies the vacated slot, so a
+		// gap opens between the target block and the block after it.
+		const rect = ( top, bottom ) => ( {
+			top,
+			bottom,
+			left: 10,
+			right: 300,
+			x: 10,
+			y: top,
+			width: 290,
+			height: bottom - top,
+		} );
+		const displacedBlocksData = [
+			{
+				blockIndex: 0,
+				canInsertDraggedBlocksAsChild: true,
+				canInsertDraggedBlocksAsSibling: true,
+				clientId: 'dragged',
+				element: { getBoundingClientRect: () => rect( 50, 100 ) },
+				innerBlockCount: 0,
+				isDraggedBlock: true,
+				isExpanded: false,
+				rootClientId: '',
+				nestingLevel: 1,
+			},
+			{
+				blockIndex: 1,
+				canInsertDraggedBlocksAsChild: true,
+				canInsertDraggedBlocksAsSibling: true,
+				clientId: 'target',
+				// Shifted up into the dragged block's slot.
+				element: { getBoundingClientRect: () => rect( 50, 100 ) },
+				innerBlockCount: 0,
+				isDraggedBlock: false,
+				isExpanded: false,
+				rootClientId: '',
+				nestingLevel: 1,
+			},
+			{
+				blockIndex: 2,
+				canInsertDraggedBlocksAsChild: true,
+				canInsertDraggedBlocksAsSibling: true,
+				clientId: 'after',
+				// The drop indicator sits in the 100-150 gap above this block.
+				element: { getBoundingClientRect: () => rect( 150, 200 ) },
+				innerBlockCount: 0,
+				isDraggedBlock: false,
+				isExpanded: false,
+				rootClientId: '',
+				nestingLevel: 1,
+			},
+		];
+
+		it( 'should keep nesting when the cursor is in the gap below the target and over the nesting indentation', () => {
+			[
+				{ position: { x: 250, y: 125 }, rtl: false },
+				{ position: { x: 50, y: 125 }, rtl: true },
+			].forEach( ( { position, rtl } ) => {
+				const target = getListViewDropTarget(
+					displacedBlocksData,
+					position,
+					rtl
+				);
+
+				expect( target ).toEqual( {
+					blockIndex: 0,
+					clientId: 'target',
+					dropPosition: 'inside',
+					rootClientId: 'target',
+				} );
+			} );
+		} );
+
+		it( 'should drop below the target when the cursor is in the gap but not over the nesting indentation', () => {
+			[
+				{ position: { x: 30, y: 125 }, rtl: false },
+				{ position: { x: 270, y: 125 }, rtl: true },
+			].forEach( ( { position, rtl } ) => {
+				const target = getListViewDropTarget(
+					displacedBlocksData,
+					position,
+					rtl
+				);
+
+				expect( target ).toEqual( {
+					blockIndex: 2,
+					clientId: 'target',
+					dropPosition: 'bottom',
+					rootClientId: '',
+				} );
+			} );
+		} );
+
+		it( "should keep nesting into the block above the dragged last block when the cursor is over the dragged block's slot", () => {
+			// The dragged block is the last row; it keeps its slot while the
+			// rows above do not move, so the gap below the target is the
+			// dragged block's own row.
+			const draggedLastBlocksData = [
+				{ ...displacedBlocksData[ 1 ], blockIndex: 0 },
+				{
+					...displacedBlocksData[ 0 ],
+					blockIndex: 1,
+					element: { getBoundingClientRect: () => rect( 100, 150 ) },
+				},
+			];
+
+			[
+				{ position: { x: 250, y: 125 }, rtl: false },
+				{ position: { x: 50, y: 125 }, rtl: true },
+			].forEach( ( { position, rtl } ) => {
+				const target = getListViewDropTarget(
+					draggedLastBlocksData,
+					position,
+					rtl
+				);
+
+				expect( target ).toEqual( {
+					blockIndex: 0,
+					clientId: 'target',
+					dropPosition: 'inside',
+					rootClientId: 'target',
+				} );
+			} );
+		} );
+
+		it( 'should not nest into the last block when the cursor is below it', () => {
+			[
+				{ position: { x: 250, y: 230 }, rtl: false },
+				{ position: { x: 50, y: 230 }, rtl: true },
+			].forEach( ( { position, rtl } ) => {
+				const target = getListViewDropTarget(
+					displacedBlocksData,
+					position,
+					rtl
+				);
+
+				expect( target ).toEqual( {
+					blockIndex: 3,
+					clientId: 'after',
+					dropPosition: 'bottom',
+					rootClientId: '',
+				} );
 			} );
 		} );
 	} );

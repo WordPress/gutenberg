@@ -1,21 +1,10 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryFn } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import SearchControl from '..';
 
 const meta: Meta< typeof SearchControl > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Selection & Input/Common/SearchControl',
+	title: 'Components/@wordpress-components/Selection & Input/Common/SearchControl',
 	id: 'components-searchcontrol',
 	component: SearchControl,
 	argTypes: {

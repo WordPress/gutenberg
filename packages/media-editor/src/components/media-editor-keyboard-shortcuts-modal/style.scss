@@ -35,7 +35,7 @@
 
 	.media-editor-keyboard-shortcuts-modal__shortcut-term {
 		background: none;
-		font-weight: 600;
+		font-weight: var(--wpds-typography-font-weight-emphasis);
 		margin: 0 0 0 1rem;
 		padding: 0;
 		text-align: right;

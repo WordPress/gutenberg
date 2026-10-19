@@ -26,7 +26,7 @@ import styles from './style.module.css';
  * ```
  */
 export const VisuallyHidden = forwardRef< HTMLDivElement, VisuallyHiddenProps >(
-	function VisuallyHidden( { render, ...restProps }, ref ) {
+	function UnforwardedVisuallyHidden( { render, ...restProps }, ref ) {
 		const element = useRender( {
 			render,
 			ref,

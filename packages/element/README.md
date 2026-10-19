@@ -16,8 +16,8 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 At the risk of igniting debate surrounding any single "best" front-end framework, the choice to use any tool should be motivated specifically to serve the requirements of the system. In modeling the concept of a [block](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md), we observe the following technical requirements:
 
--   An understanding of a block in terms of its underlying values (in the [random image example](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md#example), a category)
--   A means to describe the UI of a block given these values
+- An understanding of a block in terms of its underlying values (in the [random image example](https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md#example), a category)
+- A means to describe the UI of a block given these values
 
 At its most basic, React provides a simple input / output mechanism. **Given a set of inputs ("props"), a developer describes the output to be shown on the page.** This is most elegantly observed in its [function components](https://reactjs.org/docs/components-and-props.html#functional-and-class-components). React serves the role of reconciling the desired output with the current state of the page.
 
@@ -37,12 +37,12 @@ Creates a copy of an element with extended props.
 
 _Parameters_
 
--   _element_ `Element`: Element
--   _props_ `?Object`: Props to apply to cloned element
+- _element_ `Element`: Element
+- _props_ `?Object`: Props to apply to cloned element
 
 _Returns_
 
--   `Element`: Cloned element.
+- `Element`: Cloned element.
 
 ### Component
 
@@ -54,11 +54,11 @@ Concatenate two or more React children objects.
 
 _Parameters_
 
--   _childrenArguments_ `ReactNode[][]`: - Array of children arguments (array of arrays/strings/objects) to concatenate.
+- _childrenArguments_ `ReactNode[][]`: - Array of children arguments (array of arrays/strings/objects) to concatenate.
 
 _Returns_
 
--   `ReactNode[]`: The concatenated value.
+- `ReactNode[]`: The concatenated value.
 
 ### createContext
 
@@ -66,11 +66,11 @@ Creates a context object containing two components: a provider and consumer.
 
 _Parameters_
 
--   _defaultValue_ `Object`: A default data stored in the context.
+- _defaultValue_ `Object`: A default data stored in the context.
 
 _Returns_
 
--   `Object`: Context object.
+- `Object`: Context object.
 
 ### createElement
 
@@ -78,13 +78,13 @@ Returns a new element of given type. Type can be either a string tag name or ano
 
 _Parameters_
 
--   _type_ `?(string|Function)`: Tag name or element creator
--   _props_ `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
--   _children_ `...Element`: Descendant elements
+- _type_ `?(string|Function)`: Tag name or element creator
+- _props_ `Object`: Element properties, either attribute set to apply to DOM node or values to pass through to element creator
+- _children_ `...Element`: Descendant elements
 
 _Returns_
 
--   `Element`: Element.
+- `Element`: Element.
 
 ### createInterpolateElement
 
@@ -109,12 +109,12 @@ You would have something like this as the conversionMap value:
 
 _Parameters_
 
--   _interpolatedString_ `Input`: The interpolation string to be parsed.
--   _conversionMap_ `ConversionMap< InterpolationString< Input > >`: The map used to convert the string to a react element.
+- _interpolatedString_ `Input`: The interpolation string to be parsed.
+- _conversionMap_ `ConversionMap< InterpolationString< Input > >`: The map used to convert the string to a react element.
 
 _Returns_
 
--   `ReactElement`: A wp element.
+- `ReactElement`: A wp element.
 
 ### createPortal
 
@@ -122,7 +122,7 @@ Creates a portal into which a component can be rendered.
 
 _Related_
 
--   <https://react.dev/reference/react-dom/createPortal>
+- <https://react.dev/reference/react-dom/createPortal>
 
 ### createRef
 
@@ -130,7 +130,7 @@ Returns an object tracking a reference to a rendered element via its `current` p
 
 _Returns_
 
--   `Object`: Ref object.
+- `Object`: Ref object.
 
 ### createRoot
 
@@ -138,7 +138,7 @@ Creates a new React root for the target DOM node.
 
 _Related_
 
--   <https://react.dev/reference/react-dom/client/createRoot>
+- <https://react.dev/reference/react-dom/client/createRoot>
 
 _Changelog_
 
@@ -150,7 +150,7 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `React.ComponentType`: Component's instance.
+- _component_ `React.ComponentType`: Component's instance.
 
 ### flushSync
 
@@ -158,7 +158,7 @@ Forces React to flush any updates inside the provided callback synchronously.
 
 _Related_
 
--   <https://react.dev/reference/react-dom/flushSync>
+- <https://react.dev/reference/react-dom/flushSync>
 
 ### forwardRef
 
@@ -166,11 +166,11 @@ Component enhancer used to enable passing a ref to its wrapped component. Pass a
 
 _Parameters_
 
--   _forwarder_ `Function`: Function passed `props` and `ref`, expected to return an element.
+- _forwarder_ `Function`: Function passed `props` and `ref`, expected to return an element.
 
 _Returns_
 
--   `Component`: Enhanced component.
+- `Component`: Enhanced component.
 
 ### Fragment
 
@@ -184,7 +184,7 @@ Hydrates a given element into the target DOM node.
 
 _Related_
 
--   <https://react.dev/reference/react-dom/hydrate>
+- <https://react.dev/reference/react-dom/hydrate>
 
 ### hydrateRoot
 
@@ -192,7 +192,7 @@ Creates a new React root for the target DOM node and hydrates it with a pre-gene
 
 _Related_
 
--   <https://react.dev/reference/react-dom/client/hydrateRoot>
+- <https://react.dev/reference/react-dom/client/hydrateRoot>
 
 _Changelog_
 
@@ -204,11 +204,11 @@ Checks if the provided WP element is empty.
 
 _Parameters_
 
--   _element_ `unknown`: WP element to check.
+- _element_ `unknown`: WP element to check.
 
 _Returns_
 
--   `boolean`: True when an element is considered empty.
+- `boolean`: True when an element is considered empty.
 
 ### isValidElement
 
@@ -216,23 +216,23 @@ Checks if an object is a valid React Element.
 
 _Parameters_
 
--   _objectToCheck_ `Object`: The object to be checked.
+- _objectToCheck_ `Object`: The object to be checked.
 
 _Returns_
 
--   `boolean`: true if objectToTest is a valid React Element and false otherwise.
+- `boolean`: true if objectToTest is a valid React Element and false otherwise.
 
 ### lazy
 
 _Related_
 
--   <https://react.dev/reference/react/lazy>
+- <https://react.dev/reference/react/lazy>
 
 ### memo
 
 _Related_
 
--   <https://react.dev/reference/react/memo>
+- <https://react.dev/reference/react/memo>
 
 ### Platform
 
@@ -257,7 +257,7 @@ const placeholderLabel = Platform.select( {
 
 _Related_
 
--   <https://react.dev/reference/react/PureComponent>
+- <https://react.dev/reference/react/PureComponent>
 
 ### RawHTML
 
@@ -281,11 +281,11 @@ const Component = () => (
 
 _Parameters_
 
--   _props_ `RawHTMLProps`: Children should be a string of HTML or an array of strings. Other props will be passed through to the div wrapper.
+- _props_ `RawHTMLProps`: Children should be a string of HTML or an array of strings. Other props will be passed through to the div wrapper.
 
 _Returns_
 
--   Dangerously-rendering component.
+- Dangerously-rendering component.
 
 ### render
 
@@ -295,7 +295,7 @@ Renders a given element into the target DOM node.
 
 _Related_
 
--   <https://react.dev/reference/react-dom/render>
+- <https://react.dev/reference/react-dom/render>
 
 ### renderToString
 
@@ -303,15 +303,15 @@ Serializes a React element to string.
 
 _Parameters_
 
--   _element_ `React.ReactNode`:
--   _context_ `any`:
--   _legacyContext_ `Record< string, any >`:
+- _element_ `React.ReactNode`:
+- _context_ `any`:
+- _legacyContext_ `Record< string, any >`:
 
 ### startTransition
 
 _Related_
 
--   <https://react.dev/reference/react/startTransition>
+- <https://react.dev/reference/react/startTransition>
 
 ### StrictMode
 
@@ -321,7 +321,7 @@ Component that activates additional checks and warnings for its descendants.
 
 _Related_
 
--   <https://react.dev/reference/react/Suspense>
+- <https://react.dev/reference/react/Suspense>
 
 ### switchChildrenNodeName
 
@@ -329,12 +329,12 @@ Switches the nodeName of all the elements in the children object.
 
 _Parameters_
 
--   _children_ `ReactNode`: Children object.
--   _nodeName_ `string`: Node name.
+- _children_ `ReactNode`: Children object.
+- _nodeName_ `string`: Node name.
 
 _Returns_
 
--   `ReactNode`: The updated children object.
+- `ReactNode`: The updated children object.
 
 ### unmountComponentAtNode
 
@@ -344,97 +344,97 @@ Removes any mounted element from the target DOM node.
 
 _Related_
 
--   <https://react.dev/reference/react-dom/unmountComponentAtNode>
+- <https://react.dev/reference/react-dom/unmountComponentAtNode>
 
 ### useCallback
 
 _Related_
 
--   <https://react.dev/reference/react/useCallback>
+- <https://react.dev/reference/react/useCallback>
 
 ### useContext
 
 _Related_
 
--   <https://react.dev/reference/react/useContext>
+- <https://react.dev/reference/react/useContext>
 
 ### useDebugValue
 
 _Related_
 
--   <https://react.dev/reference/react/useDebugValue>
+- <https://react.dev/reference/react/useDebugValue>
 
 ### useDeferredValue
 
 _Related_
 
--   <https://react.dev/reference/react/useDeferredValue>
+- <https://react.dev/reference/react/useDeferredValue>
 
 ### useEffect
 
 _Related_
 
--   <https://react.dev/reference/react/useEffect>
+- <https://react.dev/reference/react/useEffect>
 
 ### useId
 
 _Related_
 
--   <https://react.dev/reference/react/useId>
+- <https://react.dev/reference/react/useId>
 
 ### useImperativeHandle
 
 _Related_
 
--   <https://react.dev/reference/react/useImperativeHandle>
+- <https://react.dev/reference/react/useImperativeHandle>
 
 ### useInsertionEffect
 
 _Related_
 
--   <https://react.dev/reference/react/useInsertionEffect>
+- <https://react.dev/reference/react/useInsertionEffect>
 
 ### useLayoutEffect
 
 _Related_
 
--   <https://react.dev/reference/react/useLayoutEffect>
+- <https://react.dev/reference/react/useLayoutEffect>
 
 ### useMemo
 
 _Related_
 
--   <https://react.dev/reference/react/useMemo>
+- <https://react.dev/reference/react/useMemo>
 
 ### useReducer
 
 _Related_
 
--   <https://react.dev/reference/react/useReducer>
+- <https://react.dev/reference/react/useReducer>
 
 ### useRef
 
 _Related_
 
--   <https://react.dev/reference/react/useRef>
+- <https://react.dev/reference/react/useRef>
 
 ### useState
 
 _Related_
 
--   <https://react.dev/reference/react/useState>
+- <https://react.dev/reference/react/useState>
 
 ### useSyncExternalStore
 
 _Related_
 
--   <https://react.dev/reference/react/useSyncExternalStore>
+- <https://react.dev/reference/react/useSyncExternalStore>
 
 ### useTransition
 
 _Related_
 
--   <https://react.dev/reference/react/useTransition>
+- <https://react.dev/reference/react/useTransition>
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

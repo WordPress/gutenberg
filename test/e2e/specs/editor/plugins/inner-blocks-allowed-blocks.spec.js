@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
@@ -117,7 +114,7 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/Allowed Blocks Dynamic' );
 		await expect(
@@ -170,8 +167,8 @@ test.describe( 'Allowed Blocks Setting on InnerBlocks', () => {
 
 		// It should display a different allowed block list.
 		await expect( blockListBox.getByRole( 'option' ) ).toHaveText( [
-			'Gallery',
 			'List',
+			'Gallery',
 			'Video',
 		] );
 	} );

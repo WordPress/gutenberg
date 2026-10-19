@@ -4,11 +4,36 @@ import type {
 	SelectRootProps,
 	SelectTriggerProps,
 } from '../primitives/select/types';
+import type { ItemPopupWidth } from '../../utils/css/item-popup';
 
 export type SelectItem = {
 	label: string;
 	value: string | null;
 	disabled?: boolean;
+	/**
+	 * Supplementary text shown under the label in the standard item layout.
+	 * Rendered as `SelectControl.ItemDescription`. Compose
+	 * `SelectControl.Item` children instead when you need multiple
+	 * descriptions or custom markup.
+	 */
+	description?: string;
+};
+
+export type SelectControlTriggerProps = Omit<
+	SelectTriggerProps,
+	'size' | 'children' | 'variant'
+> & {
+	/**
+	 * The size of the trigger.
+	 *
+	 * @default 'default'
+	 */
+	size?: Exclude< SelectTriggerProps[ 'size' ], 'small' >;
+	/**
+	 * Custom trigger content, or a function that receives the selected item.
+	 * When omitted, the selected item's label or placeholder is shown.
+	 */
+	children?: ( ( item: SelectItem ) => React.ReactNode ) | React.ReactNode;
 };
 
 export type SelectControlProps = Omit<
@@ -25,22 +50,39 @@ export type SelectControlProps = Omit<
 		 */
 		items?: SelectItem[];
 		/**
-		 * Text to show when no value is selected. This is overridden by `triggerContent`
-		 * if specified, or by a null item's label in `items`.
+		 * Controls how the popup width is constrained relative to its anchor.
+		 *
+		 * For all presets, the popup is never narrower than its anchor.
+		 *
+		 * - `'anchor'`: Fixed width matching the anchor width.
+		 * - `'content'`: Width grows with item labels between the anchor and available
+		 *   viewport bounds.
+		 * - `'sm'`: Fixed width at the small surface width token (`--wpds-dimension-surface-width-sm`).
+		 * - `'md'`: Fixed width at the medium surface width token (`--wpds-dimension-surface-width-md`).
+		 * - `'lg'`: Fixed width at the large surface width token (`--wpds-dimension-surface-width-lg`).
+		 * - `'available'`: Fixed width at the available viewport width (`--available-width`).
+		 *
+		 * @default 'content'
+		 */
+		popupWidth?: ItemPopupWidth;
+		/**
+		 * Text to show when no value is selected. This is overridden by custom trigger
+		 * children if specified, or by a null item's label in `items`.
 		 *
 		 * @default __( 'Select' )
 		 */
 		placeholder?: SelectTriggerProps[ 'placeholder' ];
 		/**
-		 * The custom trigger content to use instead of the default.
+		 * Optional trigger element, typically `<SelectControl.Trigger />` with
+		 * custom props such as `onFocus` or `onBlur`, or custom children.
+		 * When omitted, the default trigger is used. Props on this element
+		 * override `size` and `placeholder`.
 		 *
 		 * ```jsx
-		 * triggerContent={ ( item ) => item.label }
+		 * trigger={ <SelectControl.Trigger>{ ( item ) => item.label }</SelectControl.Trigger> }
 		 * ```
 		 */
-		triggerContent?:
-			| ( ( item: SelectItem ) => React.ReactNode )
-			| React.ReactNode;
+		trigger?: React.ReactElement< SelectControlTriggerProps >;
 		/**
 		 * The size of the control.
 		 *

@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { lock } from './lock-unlock';
 import OverridesPanel from './components/overrides-panel';
 import {
@@ -11,6 +8,10 @@ import {
 	default as DuplicatePatternModal,
 	useDuplicatePatternProps,
 } from './components/duplicate-pattern-modal';
+import {
+	default as CreateTemplatePartModal,
+	CreateTemplatePartModalContents,
+} from './components/create-template-part-modal';
 import { isOverridableBlock } from './api';
 import RenamePatternModal from './components/rename-pattern-modal';
 import PatternsMenuItems from './components';
@@ -32,6 +33,8 @@ lock( privateApis, {
 	CreatePatternModal,
 	CreatePatternModalContents,
 	DuplicatePatternModal,
+	CreateTemplatePartModal,
+	CreateTemplatePartModalContents,
 	isOverridableBlock,
 	useDuplicatePatternProps,
 	RenamePatternModal,

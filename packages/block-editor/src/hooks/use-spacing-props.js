@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { getInlineStyles } from './style';
 
 // This utility is intended to assist where the serialization of the spacing

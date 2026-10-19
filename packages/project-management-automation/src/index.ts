@@ -1,17 +1,10 @@
-/**
- * External dependencies
- */
 import { setFailed, getInput } from '@actions/core';
 import { getOctokit, context } from '@actions/github';
-
-/**
- * Internal dependencies
- */
-import assignFixedIssues from './tasks/assign-fixed-issues';
-import firstTimeContributorAccountLink from './tasks/first-time-contributor-account-link';
-import firstTimeContributorLabel from './tasks/first-time-contributor-label';
-import addMilestone from './tasks/add-milestone';
-import debug from './debug';
+import assignFixedIssues from './tasks/assign-fixed-issues/index.js';
+import firstTimeContributorAccountLink from './tasks/first-time-contributor-account-link/index.js';
+import firstTimeContributorLabel from './tasks/first-time-contributor-label/index.js';
+import addMilestone from './tasks/add-milestone/index.js';
+import debug from './debug.js';
 
 /**
  * Type definitions

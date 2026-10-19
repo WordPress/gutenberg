@@ -1,8 +1,6 @@
-/**
- * Internal dependencies
- */
 import type {
 	DragPreviewRenderProps,
+	GridItemWidthLimits,
 	GridOverlayRenderProps,
 	ResizeHandleRenderProps,
 } from '../shared/types';
@@ -39,6 +37,22 @@ export type DashboardLanesLayoutItem = {
 	lane?: number;
 
 	/**
+	 * Whether the item can be dragged while the surface is in edit mode.
+	 * When `false`, the item is pinned: it also holds its index while the
+	 * other items reorder around it.
+	 *
+	 * @default true
+	 */
+	draggable?: boolean;
+
+	/**
+	 * Whether the item can be resized while the surface is in edit mode.
+	 *
+	 * @default true
+	 */
+	resizable?: boolean;
+
+	/**
 	 * Display order. Lower values render first. When omitted, the
 	 * item falls back to its index in the `layout` array.
 	 */
@@ -55,11 +69,10 @@ export type DashboardLanesLayoutItem = {
  * - Both together: `columns` caps the count, `minColumnWidth` enforces
  *   a per-tile width floor that can reduce the count below the cap.
  */
-export interface DashboardLanesProps
-	extends Omit<
-		React.ComponentPropsWithoutRef< 'div' >,
-		'children' | 'className' | 'style'
-	> {
+export interface DashboardLanesProps extends Omit<
+	React.ComponentPropsWithoutRef< 'div' >,
+	'children' | 'className' | 'style'
+> {
 	/**
 	 * Array of layout items.
 	 */
@@ -173,4 +186,10 @@ export interface DashboardLanesProps
 	 * down to 1.
 	 */
 	minColumnWidth?: number;
+
+	/**
+	 * Per-item width limits in pixels, keyed by layout item key. Lane
+	 * heights are content-driven, so there is no height axis.
+	 */
+	itemLimits?: Record< string, GridItemWidthLimits >;
 }
