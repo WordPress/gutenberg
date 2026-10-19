@@ -1,6 +1,18 @@
-import { register } from 'node:module';
+import { registerHooks } from 'node:module';
 
-register( './hide-theme.mjs', import.meta.url );
+// Make `@wordpress/theme` unresolvable, for both `import` and `require()`, as
+// if the optional peer dependency were not installed.
+registerHooks( {
+	resolve( specifier, context, nextResolve ) {
+		if ( specifier.startsWith( '@wordpress/theme/' ) ) {
+			throw Object.assign(
+				new Error( `Cannot find module '${ specifier }'` ),
+				{ code: 'MODULE_NOT_FOUND' }
+			);
+		}
+		return nextResolve( specifier, context );
+	},
+} );
 
 const { default: postcss } = await import( 'postcss' );
 const { transform: lightningcssTransform } = await import( 'lightningcss' );

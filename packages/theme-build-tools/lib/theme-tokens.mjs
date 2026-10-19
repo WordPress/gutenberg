@@ -7,6 +7,8 @@
  * token names, so the fallback plugins do nothing with them either.
  */
 
+import { createRequire } from 'node:module';
+
 /**
  * @typedef {Object} DesignTokensModule
  * @property {Record<string, { fallback: string }>} [tokens] Token metadata, keyed by CSS custom property name.
@@ -14,27 +16,34 @@
  */
 
 /**
- * Import `@wordpress/theme/design-tokens.js`, or return `undefined` when
+ * Load `@wordpress/theme/design-tokens.js`, or return `undefined` when
  * `@wordpress/theme` is not installed.
  *
- * @return {Promise<DesignTokensModule | undefined>} The module, or `undefined`.
+ * This loads the module synchronously, without a top-level `await`, so that
+ * CommonJS consumers can still `require()` the plugins.
+ *
+ * @return {DesignTokensModule | undefined} The module, or `undefined`.
  */
-async function importDesignTokens() {
+function loadDesignTokens() {
 	try {
-		return await import( '@wordpress/theme/design-tokens.js' );
+		return createRequire( import.meta.url )(
+			'@wordpress/theme/design-tokens.js'
+		);
 	} catch ( error ) {
-		const code = /** @type {{ code?: string }} */ ( error )?.code;
-		if (
-			code === 'ERR_MODULE_NOT_FOUND' ||
-			code === 'ERR_PACKAGE_PATH_NOT_EXPORTED'
-		) {
+		const { code, message } =
+			/** @type {{ code?: string, message?: string }} */ ( error );
+		const isThemeMissing =
+			( code === 'MODULE_NOT_FOUND' ||
+				code === 'ERR_MODULE_NOT_FOUND' ) &&
+			message?.includes( '@wordpress/theme' );
+		if ( isThemeMissing || code === 'ERR_PACKAGE_PATH_NOT_EXPORTED' ) {
 			return undefined;
 		}
 		throw error;
 	}
 }
 
-const designTokens = await importDesignTokens();
+const designTokens = loadDesignTokens();
 
 /**
  * Map of design token names to their generated fallback values, or
