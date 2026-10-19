@@ -186,7 +186,10 @@ function gutenberg_state_paints_own_background( array $state_style ): bool {
  */
 function gutenberg_get_state_text_clip_escape( array $state_style, string $base_clip ): array {
 	$state_clip = $state_style['background']['backgroundClip'] ?? '';
-	if ( empty( $state_clip ) || 'text' === $state_clip || 'text' !== $base_clip || gutenberg_state_paints_own_background( $state_style ) ) {
+	if ( ! in_array( $state_clip, WP_Style_Engine_Gutenberg::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
+		$state_clip = '';
+	}
+	if ( '' === $state_clip || 'text' === $state_clip || 'text' !== $base_clip || gutenberg_state_paints_own_background( $state_style ) ) {
 		return array();
 	}
 	return array( 'background-image' => 'unset' );
@@ -204,7 +207,11 @@ function gutenberg_get_state_text_clip_escape( array $state_style, string $base_
  * @return array<string, string> CSS declarations for the fill reset.
  */
 function gutenberg_get_state_text_fill_reset( array $state_style ): array {
-	if ( ! empty( $state_style['background']['backgroundClip'] ) || empty( $state_style['color']['text'] ) || gutenberg_state_paints_own_background( $state_style ) ) {
+	$state_clip = $state_style['background']['backgroundClip'] ?? '';
+	if ( ! in_array( $state_clip, WP_Style_Engine_Gutenberg::VALID_BACKGROUND_CLIP_VALUES, true ) ) {
+		$state_clip = '';
+	}
+	if ( '' !== $state_clip || empty( $state_style['color']['text'] ) || gutenberg_state_paints_own_background( $state_style ) ) {
 		return array();
 	}
 	return array( '-webkit-text-fill-color' => 'currentColor' );

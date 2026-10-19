@@ -286,6 +286,36 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that an invalid state clip does not escape a text clip.
+	 *
+	 * @covers ::gutenberg_get_state_text_clip_escape
+	 */
+	public function test_no_background_image_reset_for_an_invalid_state_clip() {
+		$actual = gutenberg_get_state_text_clip_escape(
+			array( 'background' => array( 'backgroundClip' => 'not-a-clip' ) ),
+			'text'
+		);
+
+		$this->assertSame( array(), $actual );
+	}
+
+	/**
+	 * Tests that an invalid state clip counts as no clip, so a text color is painted again.
+	 *
+	 * @covers ::gutenberg_get_state_text_fill_reset
+	 */
+	public function test_adds_text_fill_reset_for_an_invalid_state_clip() {
+		$actual = gutenberg_get_state_text_fill_reset(
+			array(
+				'color'      => array( 'text' => '#ff0000' ),
+				'background' => array( 'backgroundClip' => 'not-a-clip' ),
+			)
+		);
+
+		$this->assertSame( array( '-webkit-text-fill-color' => 'currentColor' ), $actual );
+	}
+
+	/**
 	 * Tests that a block instance over its own box clip still paints a state's
 	 * text color, since a text clip from global styles may sit below it.
 	 *
