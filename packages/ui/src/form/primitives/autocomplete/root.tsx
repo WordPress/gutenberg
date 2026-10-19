@@ -19,16 +19,7 @@ import {
 export const Root: typeof _Autocomplete.Root = function Root(
 	props: AutocompleteRootProps
 ) {
-	const {
-		contextValue,
-		onOpenChange,
-		onInputValueChange,
-		onItemHighlighted,
-	} = useKeyboardHighlightState( {
-		onOpenChange: props.onOpenChange,
-		onInputValueChange: props.onValueChange,
-		onItemHighlighted: props.onItemHighlighted,
-	} );
+	const { contextValue, onOpenChange } = useKeyboardHighlightState( props );
 
 	return (
 		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>
@@ -36,9 +27,10 @@ export const Root: typeof _Autocomplete.Root = function Root(
 				<KeyboardHighlightContext.Provider value={ contextValue }>
 					<_Autocomplete.Root
 						{ ...props }
+						highlightItemOnHover={
+							props.highlightItemOnHover ?? false
+						}
 						onOpenChange={ onOpenChange }
-						onValueChange={ onInputValueChange }
-						onItemHighlighted={ onItemHighlighted }
 					/>
 				</KeyboardHighlightContext.Provider>
 			</DirectionProvider>

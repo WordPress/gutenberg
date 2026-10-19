@@ -1,5 +1,4 @@
 import { Select as _Select } from '@base-ui/react/select';
-import { mergeProps } from '@base-ui/react/merge-props';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import { Portal } from './portal';
@@ -9,14 +8,12 @@ import itemPopupStyles from '../../../utils/css/item-popup.module.css';
 import { getItemPopupWidthClassName } from '../../../utils/css/item-popup';
 import type { SelectPopupProps } from './types';
 import styles from './style.module.css';
-import { usePopupPointerHighlight } from '../../../utils/use-popup-pointer-highlight';
 
 export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 	function UnforwardedPopup(
 		{ className, portal, positioner, width, children, ...restProps },
 		ref
 	) {
-		const pointerHighlightProps = usePopupPointerHighlight();
 		const popupContent = (
 			<_Select.Popup
 				ref={ ref }
@@ -25,7 +22,7 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 					getItemPopupWidthClassName( width ),
 					className
 				) }
-				{ ...mergeProps( pointerHighlightProps, restProps ) }
+				{ ...restProps }
 			>
 				<_Select.List
 					className={ clsx(

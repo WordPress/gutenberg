@@ -17,13 +17,17 @@ export function Root<
 	Multiple extends boolean | undefined = false,
 	Item = Value,
 >( props: ComboboxRootProps< Value, Multiple, Item > ) {
-	const { contextValue, ...highlightProps } =
+	const { contextValue, onOpenChange } =
 		useKeyboardHighlightState< Value >( props );
 
 	return (
 		<DirectionProvider>
 			<KeyboardHighlightContext.Provider value={ contextValue }>
-				<_Combobox.Root { ...props } { ...highlightProps } />
+				<_Combobox.Root
+					{ ...props }
+					highlightItemOnHover={ props.highlightItemOnHover ?? false }
+					onOpenChange={ onOpenChange }
+				/>
 			</KeyboardHighlightContext.Provider>
 		</DirectionProvider>
 	);

@@ -175,15 +175,14 @@
 				grid-template-columns: subgrid;
 			}
 
-			&[data-popup-open]:not([data-disabled]) {
+			&[data-popup-open]:not([data-disabled]),
+			&[data-highlighted]:not([aria-disabled="true"]) {
 				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
 
 				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
 				color: var(--wpds-color-foreground-interactive-neutral-active);
 
 				@media ( forced-colors: active ) {
-					--_gcd-div-outline: var(--wpds-border-width-xs) solid GrayText;
-					--_gcd-a-outline: var(--wpds-border-width-xs) solid GrayText;
 					--_gcd-a-color: HighlightText;
 
 					forced-color-adjust: none;
@@ -192,19 +191,37 @@
 				}
 			}
 
-			&[data-highlighted]:not([aria-disabled="true"]) {
-				--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
-
-				background-color: var(--wpds-color-background-interactive-neutral-weak-active);
-				color: var(--wpds-color-foreground-interactive-neutral-active);
-				outline: none;
-
+			&[data-popup-open]:not([data-disabled]) {
 				@media ( forced-colors: active ) {
-					--_gcd-a-color: HighlightText;
+					--_gcd-div-outline: var(--wpds-border-width-xs) solid GrayText;
+					--_gcd-a-outline: var(--wpds-border-width-xs) solid GrayText;
+				}
+			}
 
-					forced-color-adjust: none;
-					background-color: Highlight;
-					color: HighlightText;
+			&[data-highlighted]:not([aria-disabled="true"]) {
+				outline: none;
+			}
+
+			@media ( hover: hover ) {
+				&:hover:not([aria-disabled="true"]) {
+					--_gcd-a-color: var(--wpds-color-foreground-interactive-neutral-active);
+
+					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+					color: var(--wpds-color-foreground-interactive-neutral-active);
+
+					:is(.item-description, .item-suffix, .item-shortcut, .item-trailing, .item-selection-indicator) {
+						--_gcd-heading-color: currentColor;
+
+						color: inherit;
+					}
+
+					@media ( forced-colors: active ) {
+						--_gcd-a-color: HighlightText;
+
+						forced-color-adjust: none;
+						background-color: Highlight;
+						color: HighlightText;
+					}
 				}
 			}
 
@@ -222,7 +239,7 @@
 			}
 		}
 
-		.popup:not([data-pointer-highlight]) .item[data-highlighted]:focus-visible {
+		.popup .item[data-highlighted]:focus-visible {
 			/* Keep the ring visible above adjacent rows and wp-admin's resets. */
 			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
 			--_gcd-a-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));

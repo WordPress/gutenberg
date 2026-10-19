@@ -94,6 +94,23 @@ export const Default: Story = {
 	},
 };
 
+/**
+ * Pointer use and typing do not show option rings. Navigate the options with
+ * arrow keys to show a ring, then hover another option to compare the targets.
+ */
+export const KeyboardFocus: Story = {
+	args: {
+		...Default.args,
+		defaultValue: ITEMS[ 1 ],
+		autoHighlight: true,
+		highlightItemOnHover: false,
+	},
+	argTypes: {
+		highlightItemOnHover: { control: 'boolean' },
+		autoHighlight: { control: 'boolean' },
+	},
+};
+
 export const Compact: Story = {
 	args: {
 		defaultValue: ITEMS[ 0 ],

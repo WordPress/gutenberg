@@ -77,7 +77,13 @@ function Root( props: RootProps ) {
 		<DirectionProvider>
 			<MenuContext.Provider value={ { isSubmenu: false } }>
 				<MenuGroupContext.Provider value={ null }>
-					<_Menu.Root { ...props } { ...iframeDismissalProps } />
+					<_Menu.Root
+						{ ...props }
+						highlightItemOnHover={
+							props.highlightItemOnHover ?? false
+						}
+						{ ...iframeDismissalProps }
+					/>
 				</MenuGroupContext.Provider>
 			</MenuContext.Provider>
 		</DirectionProvider>

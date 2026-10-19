@@ -11,42 +11,27 @@ export const KeyboardHighlightContext = createContext< {
 	keyboardHighlight: boolean;
 	inputProps: Pick<
 		_Combobox.Input.Props,
-		| 'onFocusCapture'
-		| 'onBlurCapture'
-		| 'onPointerDownCapture'
-		| 'onKeyDown'
-	>;
-	listProps: Pick<
-		_Combobox.List.Props,
-		'onPointerMoveCapture' | 'onPointerDownCapture'
+		'onFocusCapture' | 'onBlurCapture' | 'onKeyDown'
 	>;
 } >( {
 	keyboardHighlight: false,
 	inputProps: {},
-	listProps: {},
 } );
 
 export const useKeyboardHighlight = () =>
 	useContext( KeyboardHighlightContext );
 
-type HighlightCallbacks< Value > = Pick<
-	_Combobox.Root.Props< Value >,
-	'onOpenChange' | 'onInputValueChange' | 'onItemHighlighted'
->;
-
 export function useKeyboardHighlightState< Value >(
-	props: HighlightCallbacks< Value >
+	props: Pick< _Combobox.Root.Props< Value >, 'onOpenChange' | 'grid' >
 ) {
 	const [ keyboardHighlight, setKeyboardHighlight ] = useState( false );
 	const [ inputFocused, setInputFocused ] = useState( false );
-	const keyboardHighlightContext = useMemo( () => {
-		const onPointerHighlight = () => setKeyboardHighlight( false );
-		return {
+	const contextValue = useMemo(
+		() => ( {
 			keyboardHighlight: keyboardHighlight && inputFocused,
 			inputProps: {
 				onFocusCapture: () => setInputFocused( true ),
 				onBlurCapture: () => setInputFocused( false ),
-				onPointerDownCapture: onPointerHighlight,
 				onKeyDown: ( event: KeyboardEvent< HTMLInputElement > ) => {
 					if (
 						event.nativeEvent.isComposing ||
@@ -54,60 +39,38 @@ export function useKeyboardHighlightState< Value >(
 					) {
 						return;
 					}
-					// Grid navigation can keep the same item without a highlight callback.
+					// Typing alone does not enable option rings. Navigation can
+					// keep the same item active, so observe the key directly.
 					if (
-						event.key === 'ArrowUp' ||
-						event.key === 'ArrowDown'
+						[ 'ArrowUp', 'ArrowDown', 'Enter' ].includes(
+							event.key
+						) ||
+						( props.grid &&
+							[ 'ArrowLeft', 'ArrowRight' ].includes(
+								event.key
+							) )
 					) {
 						setKeyboardHighlight( true );
 					}
 				},
 			},
-			listProps: {
-				onPointerMoveCapture: onPointerHighlight,
-				onPointerDownCapture: onPointerHighlight,
-			},
-		};
-	}, [ keyboardHighlight, inputFocused ] );
-	const handleOpenChange: NonNullable<
-		HighlightCallbacks< Value >[ 'onOpenChange' ]
+		} ),
+		[ keyboardHighlight, inputFocused, props.grid ]
+	);
+	const onOpenChange: NonNullable<
+		_Combobox.Root.Props< Value >[ 'onOpenChange' ]
 	> = ( open, eventDetails ) => {
 		props.onOpenChange?.( open, eventDetails );
-		if ( open && ! eventDetails.isCanceled ) {
+		if ( ! eventDetails.isCanceled ) {
 			setKeyboardHighlight(
-				isKeyboardOpenEvent( eventDetails.event ) ||
-					eventDetails.reason === 'input-change'
+				open &&
+					eventDetails.reason !== 'input-change' &&
+					isKeyboardOpenEvent( eventDetails.event )
 			);
 		}
 	};
-	const handleInputValueChange: NonNullable<
-		HighlightCallbacks< Value >[ 'onInputValueChange' ]
-	> = ( value, eventDetails ) => {
-		props.onInputValueChange?.( value, eventDetails );
-		if (
-			! eventDetails.isCanceled &&
-			eventDetails.reason === 'input-change'
-		) {
-			setKeyboardHighlight( true );
-		}
-	};
-	const handleItemHighlighted: NonNullable<
-		HighlightCallbacks< Value >[ 'onItemHighlighted' ]
-	> = ( value, eventDetails ) => {
-		setKeyboardHighlight( ( wasKeyboardHighlight ) =>
-			eventDetails.reason === 'none'
-				? wasKeyboardHighlight
-				: eventDetails.reason === 'keyboard'
-		);
-		props.onItemHighlighted?.( value, eventDetails );
-	};
 
-	return {
-		contextValue: keyboardHighlightContext,
-		onOpenChange: handleOpenChange,
-		onInputValueChange: handleInputValueChange,
-		onItemHighlighted: handleItemHighlighted,
-	};
+	return { contextValue, onOpenChange };
 }
 
 function isKeyboardOpenEvent( event: Event ) {

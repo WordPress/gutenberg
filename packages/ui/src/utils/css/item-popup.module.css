@@ -199,6 +199,25 @@
 				}
 			}
 
+			@media ( hover: hover ) {
+				&:hover:not([aria-disabled="true"]) {
+					background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+					color: var(--wpds-color-foreground-interactive-neutral-active);
+
+					.item-description {
+						--_gcd-heading-color: currentColor;
+
+						color: inherit;
+					}
+
+					@media ( forced-colors: active ) {
+						forced-color-adjust: none;
+						background-color: Highlight;
+						color: HighlightText;
+					}
+				}
+			}
+
 			&[aria-disabled="true"] {
 				background-color: var(--wpds-color-background-interactive-neutral-weak-disabled);
 				color: var(--wpds-color-foreground-interactive-neutral-disabled);
@@ -209,7 +228,7 @@
 			}
 		}
 
-		.popup:not([data-pointer-highlight]) .item[data-highlighted]:focus-visible,
+		.popup .item[data-highlighted]:focus-visible,
 		.item[data-highlighted][data-keyboard-highlight] {
 			/* Keep the ring visible above adjacent rows and wp-admin's resets. */
 			--_gcd-div-outline: var(--wpds-border-width-focus) solid var(--focus-color, var(--wpds-color-stroke-focus));
