@@ -46,7 +46,7 @@ describe( 'theme.json schema', () => {
 						':focus': {
 							color: { text: 'blue' },
 						},
-						':invalid': {
+						':user-invalid': {
 							spacing: { padding: { top: '1rem' } },
 						},
 						'::placeholder': {

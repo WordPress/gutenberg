@@ -2275,10 +2275,10 @@
 				":required": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
-				":valid": {
+				":user-valid": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
-				":invalid": {
+				":user-invalid": {
 					"$ref": "#/definitions/stylesPropertiesComplete"
 				},
 				"::placeholder": {
@@ -2291,8 +2291,8 @@
 				":focus",
 				":focus-visible",
 				":required",
-				":valid",
-				":invalid",
+				":user-valid",
+				":user-invalid",
 				"::placeholder"
 			]
 		},

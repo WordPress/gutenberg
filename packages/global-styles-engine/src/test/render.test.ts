@@ -837,14 +837,14 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
-		it( 'renders text input invalid spacing styles with capped specificity', () => {
+		it( 'renders text input user-invalid spacing styles with capped specificity', () => {
 			const css = transformTextInputStyles( {
-				':invalid': { spacing: { padding: { top: '1rem' } } },
+				':user-invalid': { spacing: { padding: { top: '1rem' } } },
 			} );
 
 			expect( css ).toEqual(
 				`:root :where(${ textInputSelectorWith(
-					':invalid'
+					':user-invalid'
 				) }){padding-top: 1rem;}`
 			);
 		} );
@@ -864,16 +864,16 @@ describe( 'global styles renderer', () => {
 		it( 'outputs focus after validation states so focus color wins when both states match', () => {
 			const css = transformTextInputStyles( {
 				':focus': { color: { text: 'blue' } },
-				':valid': { color: { text: 'green' } },
-				':invalid': { color: { text: 'red' } },
+				':user-valid': { color: { text: 'green' } },
+				':user-invalid': { color: { text: 'red' } },
 			} );
 
 			expect( css ).toEqual(
 				`:root :where(${ textInputSelectorWith(
-					':valid'
+					':user-valid'
 				) }){color: green;}` +
 					`:root :where(${ textInputSelectorWith(
-						':invalid'
+						':user-invalid'
 					) }){color: red;}` +
 					`:root :where(${ textInputSelectorWith(
 						':focus'

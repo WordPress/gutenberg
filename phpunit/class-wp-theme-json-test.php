@@ -2328,14 +2328,14 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
-	public function test_get_stylesheet_renders_text_input_invalid_spacing_styles() {
+	public function test_get_stylesheet_renders_text_input_user_invalid_spacing_styles() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'styles'  => array(
 					'elements' => array(
 						'textInput' => array(
-							':invalid' => array(
+							':user-invalid' => array(
 								'spacing' => array(
 									'padding' => array(
 										'top' => '1rem',
@@ -2348,7 +2348,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$expected = ':root :where(textarea:invalid, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):invalid){padding-top: 1rem;}';
+		$expected = ':root :where(textarea:user-invalid, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):user-invalid){padding-top: 1rem;}';
 
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
@@ -4793,7 +4793,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 									'text' => 'blue',
 								),
 							),
-							':invalid'      => array(
+							':user-invalid' => array(
 								'spacing' => array(
 									'padding' => array(
 										'top' => '1rem',
@@ -4822,7 +4822,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 								'text' => 'blue',
 							),
 						),
-						':invalid'      => array(
+						':user-invalid' => array(
 							'spacing' => array(
 								'padding' => array(
 									'top' => '1rem',
