@@ -21,6 +21,7 @@ import { activateTheme } from './themes';
 import { deleteAllBlocks } from './blocks';
 import { createComment, deleteAllComments } from './comments';
 import { createPost, deleteAllPosts } from './posts';
+import { deleteAllPages } from './pages';
 import { resetPreferences } from './preferences';
 import { getSiteSettings, updateSiteSettings } from './site-settings';
 import { deleteAllWidgets, addWidgetBlock } from './widgets';
@@ -139,6 +140,7 @@ class RequestUtils {
 	deleteAllUsers = deleteAllUsers.bind( this );
 	getSiteSettings = getSiteSettings.bind( this );
 	updateSiteSettings = updateSiteSettings.bind( this );
+	deleteAllPages = deleteAllPages.bind( this );
 }
 
 export type { StorageState };
