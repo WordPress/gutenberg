@@ -476,7 +476,7 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
-- _refs_ `Ref< T >[]`: The refs to be merged.
+- _refs_ `MergeableRef< T >[]`: The refs to be merged. Pass `false` to disable a ref.
 
 _Returns_
 
