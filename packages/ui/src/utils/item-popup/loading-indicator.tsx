@@ -27,7 +27,10 @@ export const LoadingIndicator = forwardRef<
 			children: (
 				<>
 					<span className={ itemPopupStyles[ 'item-icon' ] }>
-						<Spinner aria-hidden="true" />
+						<Spinner
+							aria-hidden="true"
+							className={ itemPopupStyles[ 'loading-spinner' ] }
+						/>
 					</span>
 					<Text className={ itemPopupStyles[ 'item-label' ] }>
 						{ children }
