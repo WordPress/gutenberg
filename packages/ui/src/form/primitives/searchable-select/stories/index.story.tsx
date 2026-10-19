@@ -99,23 +99,14 @@ const CustomFruitItem = ( { label }: { label: string } ) => (
 );
 
 /**
- * To customize what is rendered inside the trigger element, pass a
- * render function as the children of `SearchableSelect.Trigger` through `trigger`.
- *
- * The item list can be customized by passing a render function as `children`,
- * returning a `Item` subcomponent for each item.
+ * Customize the item list by passing a render function as `children`,
+ * returning an `Item` subcomponent for each item. The trigger keeps the
+ * standard item label.
  */
-export const WithCustomTriggerAndItems: Story = {
+export const WithCustomItems: Story = {
 	args: {
 		...Default.args,
 		defaultValue: ITEMS[ 0 ],
-		trigger: (
-			<SearchableSelect.Trigger>
-				{ ( item ) =>
-					item ? <CustomFruitItem label={ item.label } /> : null
-				}
-			</SearchableSelect.Trigger>
-		),
 		children: ( item: ( typeof ITEMS )[ 0 ] ) => (
 			<SearchableSelect.Item key={ item.value } value={ item }>
 				<SearchableSelect.ItemLabel>

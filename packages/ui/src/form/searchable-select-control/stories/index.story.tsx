@@ -210,11 +210,11 @@ export const Creatable: Story = {
 	},
 };
 
-export const WithCustomTriggerAndItems: Story = {
-	...SearchableSelectStories.WithCustomTriggerAndItems,
+export const WithCustomItems: Story = {
+	...SearchableSelectStories.WithCustomItems,
 	args: {
 		...Default.args,
-		...SearchableSelectStories.WithCustomTriggerAndItems.args,
+		...SearchableSelectStories.WithCustomItems.args,
 	},
 };
 
