@@ -24,6 +24,7 @@
 -   Cover: Decode the oEmbed iframe source before parsing it, so an embedded background video keeps the parameters the provider sent ([#83770](https://github.com/WordPress/gutenberg/pull/83770)).
 -   Search: Show the button's full focus outline when the search field is collapsed ([#84685](https://github.com/WordPress/gutenberg/pull/84685)).
 -   Login/out: Mark the block as content with the `contentRole` support, so it stays listed, movable, and insertable in content-only editing, including a locked navigation menu ([#84849](https://github.com/WordPress/gutenberg/pull/84849)).
+-   Table of Contents: Keep the block's link updates out of the undo history, so redo still works after an undo that changes the links, such as undoing a slug edit ([#85048](https://github.com/WordPress/gutenberg/pull/85048)).
 
 ## 11.2.0 (2026-10-07)
 
