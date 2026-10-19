@@ -156,7 +156,8 @@ async function addMilestone(
 	}
 
 	// Using UTC for the calculation ensures it's not affected by daylight savings.
-	// If the milestone has no due date, use current date as fallback, reflects previous behavior before TypeScript conversion.
+	// If the last milestone has no due date, the next one is due a release
+	// cycle from today.
 	const dueDate = new Date( lastMilestone.due_on || new Date() );
 	dueDate.setUTCDate( dueDate.getUTCDate() + DAYS_PER_RELEASE );
 
