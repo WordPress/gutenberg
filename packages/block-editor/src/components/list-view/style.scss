@@ -353,10 +353,12 @@
 		align-items: center;
 	}
 
-	// Keep the tap target large.
-	.block-editor-block-mover-button {
+	// Keep the tap target large. The button's own min-height would
+	// otherwise ignore the shorter height.
+	.components-button.block-editor-block-mover-button {
 		position: relative;
 		width: $button-size;
+		min-height: $button-size-small;
 		height: $button-size-small;
 
 		// Position the icon.
