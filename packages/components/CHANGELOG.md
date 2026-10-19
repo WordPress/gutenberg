@@ -69,6 +69,7 @@
 -   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
 -   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Replace remaining Emotion fixtures in polymorphic tests and ToolsPanel stories with SCSS Modules ([#84926](https://github.com/WordPress/gutenberg/pull/84926)).
+-   Generate connected component class names locally and remove unused case-conversion dependencies ([#85098](https://github.com/WordPress/gutenberg/pull/85098)).
 -   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
 -   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
