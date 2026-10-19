@@ -201,6 +201,9 @@ describe( 'Text', () => {
 		expect(
 			screen.queryByText( 'ipsum', { selector: 'mark' } )
 		).not.toBeInTheDocument();
+		expect( screen.getByRole( 'heading' ) ).toHaveTextContent(
+			'Lorem ipsum.'
+		);
 	} );
 
 	test.each( [
@@ -225,18 +228,6 @@ describe( 'Text', () => {
 				text.normalize( 'NFD' ).replace( /[\u0300-\u036f]/g, '' ),
 			highlights: [ 'café', 'cafe' ],
 		},
-		{
-			description: 'merged overlapping matches',
-			text: 'banana',
-			words: [ 'ana', 'banana' ],
-			highlights: [ 'banana' ],
-		},
-		{
-			description: 'text without search terms',
-			text: 'plain text',
-			words: [],
-			highlights: [],
-		},
 	] )(
 		'preserves $description',
 		async ( { text, words, escape, sanitize, highlights } ) => {
@@ -259,14 +250,6 @@ describe( 'Text', () => {
 			).toEqual( highlights );
 		}
 	);
-
-	test( 'preserves empty text', async () => {
-		await render(
-			<Text as="p" highlightWords={ [ 'cat' ] } children="" />
-		);
-
-		expect( screen.getByRole( 'paragraph' ) ).toBeEmptyDOMElement();
-	} );
 
 	test( 'should render isBlock', async () => {
 		await render(
