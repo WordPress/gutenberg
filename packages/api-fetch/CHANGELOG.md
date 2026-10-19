@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   The `invalid_json` error keeps the response's HTTP `status` and whether it was `redirected`, so a caller can say what answered instead of WordPress, such as a proxy error page or the login page.
+
 ## 7.57.0 (2026-10-07)
 
 ## 7.56.0 (2026-09-23)

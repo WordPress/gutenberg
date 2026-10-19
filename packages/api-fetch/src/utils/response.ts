@@ -4,6 +4,11 @@ import { __ } from '@wordpress/i18n';
  * Reads the response body as JSON, normalizing a parse failure into an
  * `invalid_json` error.
  *
+ * The error keeps the response's `status` and whether it was `redirected`,
+ * since they are often the only account of what answered instead of
+ * WordPress: an error page from a proxy, or the login page. They are top-level
+ * rather than in `data`, where a REST error keeps the status WordPress set.
+ *
  * Only the success path passes `allowEmptyBody`: `parseAndThrowError` throws
  * whatever this returns, and callers read `code` off it.
  *
@@ -32,6 +37,13 @@ async function parseJsonAndNormalizeError(
 		throw {
 			code: 'invalid_json',
 			message: __( 'The response is not a valid JSON response.' ),
+			// Response-likes from a custom fetch handler may lack either.
+			...( typeof response.status === 'number' && {
+				status: response.status,
+			} ),
+			...( typeof response.redirected === 'boolean' && {
+				redirected: response.redirected,
+			} ),
 		};
 	}
 }
