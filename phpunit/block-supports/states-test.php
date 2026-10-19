@@ -148,28 +148,21 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 	/**
 	 * Tests that a state escaping a text clip stops the inherited gradient painting.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 * @covers ::gutenberg_get_state_text_clip_escape
 	 */
 	public function test_adds_background_image_reset_when_a_state_escapes_a_text_clip() {
-		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
-			array( 'background-clip' => 'border-box' ),
+		$actual = gutenberg_get_state_text_clip_escape(
 			array( 'background' => array( 'backgroundClip' => 'border-box' ) ),
-			array( 'background' => array( 'backgroundClip' => 'text' ) )
+			'text'
 		);
 
-		$this->assertSame(
-			array(
-				'background-clip'  => 'border-box',
-				'background-image' => 'unset',
-			),
-			$actual
-		);
+		$this->assertSame( array( 'background-image' => 'unset' ), $actual );
 	}
 
 	/**
 	 * Tests that a background the state paints itself is kept.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 * @covers ::gutenberg_get_state_text_clip_escape
 	 */
 	public function test_no_background_image_reset_when_the_state_paints_its_own_background() {
 		$state_style = array(
@@ -179,77 +172,82 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
-			array( 'background-clip' => 'padding-box' ),
-			$state_style,
-			array( 'background' => array( 'backgroundClip' => 'text' ) )
-		);
-
-		$this->assertSame( array( 'background-clip' => 'padding-box' ), $actual );
+		$this->assertSame( array(), gutenberg_get_state_text_clip_escape( $state_style, 'text' ) );
 	}
 
 	/**
-	 * Tests that a box clip is left alone when nothing above it clips to text.
+	 * Tests that a box clip is left alone when nothing below it clips to text.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 * @covers ::gutenberg_get_state_text_clip_escape
 	 */
 	public function test_no_background_image_reset_without_an_inherited_text_clip() {
-		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
-			array( 'background-clip' => 'padding-box' ),
+		$actual = gutenberg_get_state_text_clip_escape(
 			array( 'background' => array( 'backgroundClip' => 'padding-box' ) ),
-			array( 'background' => array( 'backgroundImage' => array( 'url' => 'image.png' ) ) )
+			''
 		);
 
-		$this->assertSame( array( 'background-clip' => 'padding-box' ), $actual );
+		$this->assertSame( array(), $actual );
 	}
 
 	/**
-	 * Tests that a text color set under a text clip is painted.
+	 * Tests that a box clip over a box clip needs no escape.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 * @covers ::gutenberg_get_state_text_clip_escape
 	 */
-	public function test_adds_text_fill_reset_for_a_text_color_under_a_text_clip() {
-		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
-			array( 'color' => '#ff0000' ),
-			array( 'color' => array( 'text' => '#ff0000' ) ),
-			array( 'background' => array( 'backgroundClip' => 'text' ) )
+	public function test_no_background_image_reset_over_a_box_clip() {
+		$actual = gutenberg_get_state_text_clip_escape(
+			array( 'background' => array( 'backgroundClip' => 'padding-box' ) ),
+			'border-box'
 		);
 
-		$this->assertSame(
-			array(
-				'color'                   => '#ff0000',
-				'-webkit-text-fill-color' => 'currentColor',
-			),
-			$actual
-		);
+		$this->assertSame( array(), $actual );
 	}
 
 	/**
-	 * Tests that a text color is painted under a text clip from global styles,
-	 * which the block's own styles do not show.
+	 * Tests that a state keeping the text clip needs no escape.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 * @covers ::gutenberg_get_state_text_clip_escape
 	 */
-	public function test_adds_text_fill_reset_for_a_text_color_without_a_known_text_clip() {
-		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
-			array( 'color' => '#ff0000' ),
-			array( 'color' => array( 'text' => '#ff0000' ) ),
-			array()
+	public function test_no_background_image_reset_when_the_state_keeps_the_text_clip() {
+		$actual = gutenberg_get_state_text_clip_escape(
+			array( 'background' => array( 'backgroundClip' => 'text' ) ),
+			'text'
 		);
 
-		$this->assertSame(
-			array(
-				'color'                   => '#ff0000',
-				'-webkit-text-fill-color' => 'currentColor',
-			),
-			$actual
+		$this->assertSame( array(), $actual );
+	}
+
+	/**
+	 * Tests that a state without its own clip needs no escape.
+	 *
+	 * @covers ::gutenberg_get_state_text_clip_escape
+	 */
+	public function test_no_background_image_reset_when_the_state_sets_no_clip() {
+		$actual = gutenberg_get_state_text_clip_escape(
+			array( 'color' => array( 'text' => '#ff0000' ) ),
+			'text'
 		);
+
+		$this->assertSame( array(), $actual );
+	}
+
+	/**
+	 * Tests that a text color is painted again, whether or not a text clip is known.
+	 *
+	 * @covers ::gutenberg_get_state_text_fill_reset
+	 */
+	public function test_adds_text_fill_reset_for_a_text_color() {
+		$actual = gutenberg_get_state_text_fill_reset(
+			array( 'color' => array( 'text' => '#ff0000' ) )
+		);
+
+		$this->assertSame( array( '-webkit-text-fill-color' => 'currentColor' ), $actual );
 	}
 
 	/**
 	 * Tests that the fill is left alone when the state paints its own gradient.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 * @covers ::gutenberg_get_state_text_fill_reset
 	 */
 	public function test_no_text_fill_reset_when_the_state_paints_its_own_gradient() {
 		$state_style = array(
@@ -257,19 +255,13 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'background' => array( 'gradient' => 'linear-gradient(135deg, #ff0000, #0000ff)' ),
 		);
 
-		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
-			array( 'color' => '#ff0000' ),
-			$state_style,
-			array( 'background' => array( 'backgroundClip' => 'text' ) )
-		);
-
-		$this->assertSame( array( 'color' => '#ff0000' ), $actual );
+		$this->assertSame( array(), gutenberg_get_state_text_fill_reset( $state_style ) );
 	}
 
 	/**
 	 * Tests that the fill is left to the style engine when the state sets its own clip.
 	 *
-	 * @covers ::gutenberg_get_state_declarations_with_text_clip_escapes
+	 * @covers ::gutenberg_get_state_text_fill_reset
 	 */
 	public function test_no_text_fill_reset_when_the_state_sets_its_own_clip() {
 		$state_style = array(
@@ -277,13 +269,53 @@ class WP_Block_Supports_States_Test extends WP_UnitTestCase {
 			'background' => array( 'backgroundClip' => 'text' ),
 		);
 
-		$actual = gutenberg_get_state_declarations_with_text_clip_escapes(
-			array( 'color' => '#ff0000' ),
-			$state_style,
-			array( 'background' => array( 'backgroundClip' => 'text' ) )
+		$this->assertSame( array(), gutenberg_get_state_text_fill_reset( $state_style ) );
+	}
+
+	/**
+	 * Tests that the fill needs a text color.
+	 *
+	 * @covers ::gutenberg_get_state_text_fill_reset
+	 */
+	public function test_no_text_fill_reset_without_a_text_color() {
+		$actual = gutenberg_get_state_text_fill_reset(
+			array( 'color' => array( 'background' => '#ff0000' ) )
 		);
 
-		$this->assertSame( array( 'color' => '#ff0000' ), $actual );
+		$this->assertSame( array(), $actual );
+	}
+
+	/**
+	 * Tests that a block instance over its own box clip still paints a state's
+	 * text color, since a text clip from global styles may sit below it.
+	 *
+	 * @covers ::gutenberg_render_block_states_support
+	 */
+	public function test_instance_adds_text_fill_reset_over_a_box_clip() {
+		$this->ensure_block_registered(
+			'core/paragraph',
+			array(),
+			array( 'background' => array( 'backgroundClip' => true ) )
+		);
+
+		$block = array(
+			'blockName' => 'core/paragraph',
+			'attrs'     => array(
+				'style' => array(
+					'background' => array( 'backgroundClip' => 'border-box' ),
+					'@mobile'    => array(
+						'color' => array( 'text' => '#00ff00' ),
+					),
+				),
+			),
+		);
+
+		gutenberg_render_block_states_support( '<p>Text</p>', $block );
+
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		$this->assertStringContainsString( 'color:#00ff00 !important;-webkit-text-fill-color:currentColor !important;', $actual_stylesheet );
+		$this->assertStringNotContainsString( 'background-image', $actual_stylesheet );
 	}
 
 	/**
