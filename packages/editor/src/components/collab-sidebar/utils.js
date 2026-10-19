@@ -1,5 +1,10 @@
 import { _x } from '@wordpress/i18n';
-import { create, getActiveFormat, RichTextData } from '@wordpress/rich-text';
+import {
+	create,
+	getActiveFormat,
+	RichTextData,
+	toHTMLString,
+} from '@wordpress/rich-text';
 import { NOTE_FORMAT_NAME } from './constants';
 
 /**
@@ -399,19 +404,58 @@ export function readInlineSelection( getSelectionStart, getSelectionEnd ) {
 	};
 }
 
+/*
+ * Stopgap: Tab List edits its label via a RichText bound to the Tab Panel
+ * block that actually stores it, so its `identifier` encodes the panel's
+ * clientId instead of an attribute name. Duplicated as a string literal in
+ * `@wordpress/block-library`'s `tab-list/edit.jsx` (sibling packages).
+ * https://github.com/WordPress/gutenberg/issues/84328
+ */
+export const TAB_PANEL_ANCHOR_PREFIX = 'tab-panel:';
+
 /**
- * Wrap a rich-text range with a core/note marker. Returns a new
- * RichTextData ready to write back into block attributes, or null when the
- * incoming value isn't a rich-text instance (legacy/string attributes).
+ * Resolves a selection's `clientId`/`attributeKey` to the block and attribute
+ * that actually hold the text, decoding the Tab List encoding above. Passes
+ * through unchanged for every other block.
+ *
+ * @param {string}  clientId     Selected block's clientId, as block-editor selection reports it.
+ * @param {?string} attributeKey Selected attribute, as block-editor selection reports it.
+ * @return {{clientId: string, attributeKey: ?string}} The block and attribute that actually hold the text.
+ */
+export function resolveNoteAnchor( clientId, attributeKey ) {
+	if ( attributeKey?.startsWith( TAB_PANEL_ANCHOR_PREFIX ) ) {
+		return {
+			clientId: attributeKey.slice( TAB_PANEL_ANCHOR_PREFIX.length ),
+			attributeKey: 'label',
+		};
+	}
+	return { clientId, attributeKey };
+}
+
+/**
+ * Plain text of a RichTextData or marked-up string value.
+ *
+ * @param {unknown} value Attribute value.
+ * @return {string} Plain text.
+ */
+export function getNoteText( value ) {
+	return value instanceof RichTextData
+		? value.text
+		: create( { html: value ?? '' } ).text;
+}
+
+/**
+ * Wrap a rich-text range with a core/note marker. Returns the same type it
+ * was given (RichTextData or string), or null if it's neither.
  *
  * @param {unknown} value Existing block attribute value.
  * @param {number}  id    New note id to embed as `data-id`.
  * @param {number}  start Range start offset.
  * @param {number}  end   Range end offset.
- * @return {?RichTextData} Wrapped value or null when the attribute isn't rich text.
+ * @return {?(RichTextData|string)} Wrapped value or null when the attribute isn't rich text.
  */
 export function wrapInlineNote( value, id, start, end ) {
-	if ( ! ( value instanceof RichTextData ) ) {
+	if ( ! ( value instanceof RichTextData ) && typeof value !== 'string' ) {
 		return null;
 	}
 	const record = applyNoteFormat(
@@ -420,7 +464,9 @@ export function wrapInlineNote( value, id, start, end ) {
 		start,
 		end
 	);
-	return new RichTextData( record );
+	return value instanceof RichTextData
+		? new RichTextData( record )
+		: toHTMLString( { value: record } );
 }
 
 /**
@@ -432,13 +478,13 @@ export function wrapInlineNote( value, id, start, end ) {
  * would wipe co-located notes; this filters by `data-id` to drop only the target
  * marker.
  *
- * @param {unknown}       value  Block attribute value (RichTextData or other).
+ * @param {unknown}       value  Block attribute value (RichTextData, string, or other).
  * @param {number|string} noteId Note id whose marker should be removed.
- * @return {?RichTextData} A new value with the marker removed, or null when the
- *                         attribute isn't rich text or carries no such marker.
+ * @return {?(RichTextData|string)} Same type as `value` with the marker removed,
+ *                                  or null when there's no such marker.
  */
 export function removeNoteFormat( value, noteId ) {
-	if ( ! ( value instanceof RichTextData ) ) {
+	if ( ! ( value instanceof RichTextData ) && typeof value !== 'string' ) {
 		return null;
 	}
 	const target = String( noteId );
@@ -464,7 +510,13 @@ export function removeNoteFormat( value, noteId ) {
 			delete formats[ index ];
 		}
 	} );
-	return changed ? new RichTextData( { ...record, formats } ) : null;
+	if ( ! changed ) {
+		return null;
+	}
+	const newRecord = { ...record, formats };
+	return value instanceof RichTextData
+		? new RichTextData( newRecord )
+		: toHTMLString( { value: newRecord } );
 }
 
 /**
