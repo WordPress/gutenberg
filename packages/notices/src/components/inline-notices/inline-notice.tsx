@@ -1,4 +1,3 @@
-import type { ReactNode } from 'react';
 import { speak } from '@wordpress/a11y';
 import { RawHTML, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -6,7 +5,7 @@ import { Collapsible, Notice, VisuallyHidden } from '@wordpress/ui';
 import clsx from 'clsx';
 import CopyButton from './copy-button';
 import DetailsText from './details-text';
-import { NOTICE_ELEMENT } from '../../store/constants';
+import { NoticeContentSlot } from '../notice-content';
 import type {
 	Notice as NoticeType,
 	NoticeAction as NoticeActionType,
@@ -103,9 +102,6 @@ export default function InlineNotice( {
 		onDismiss,
 	} = notice;
 	const actions = notice.actions as NoticeAction[];
-	const element = ( notice as Record< symbol, unknown > )[
-		NOTICE_ELEMENT
-	] as ReactNode | undefined;
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	useAnnouncement( notice );
@@ -122,7 +118,10 @@ export default function InlineNotice( {
 					<RawHTML>{ content }</RawHTML>
 				</Notice.Description>
 			) : (
-				<Notice.Description>{ element ?? content }</Notice.Description>
+				<Notice.Description>
+					{ content }
+					<NoticeContentSlot noticeId={ notice.id } />
+				</Notice.Description>
 			) }
 			{ hasActions && (
 				<Notice.Actions>

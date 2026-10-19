@@ -8,11 +8,7 @@ import {
 	synchronizeBlocksWithTemplate,
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
-import {
-	store as noticesStore,
-	privateApis as noticesPrivateApis,
-} from '@wordpress/notices';
-import { createElement } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -35,7 +31,6 @@ import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
-import AutosaveFailureNotice from '../components/autosave-failure-notice';
 
 const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 
@@ -376,10 +371,20 @@ export const savePost =
 			previousRecord.status !== 'trash' &&
 			select.getEditorSettings().autoAttachMediaEnabled
 		) {
+			// Once a post is out of draft, only images added since its last
+			// save are attached, so ones left unattached on purpose stay that
+			// way. Drafts can't be compared like this: an autosave of a draft
+			// updates the post itself (see `WP_REST_Autosaves_Controller`), so
+			// images added since the last manual save may already be in it.
+			const isDraft = [ 'draft', 'auto-draft' ].includes(
+				previousRecord.status
+			);
+
 			attachMediaInPost( registry, {
 				id: previousRecord.id,
 				type: previousRecord.type,
 				blocks: savedBlocks,
+				previousContent: isDraft ? undefined : previousRecord.content,
 			} );
 		}
 
@@ -410,17 +415,6 @@ export const savePost =
 					.join( '\n\n' );
 				if ( details ) {
 					args[ 1 ] = { ...args[ 1 ], details };
-				}
-
-				if ( options.isAutosave ) {
-					const { NOTICE_ELEMENT } = unlock( noticesPrivateApis );
-					args[ 1 ] = {
-						...args[ 1 ],
-						[ NOTICE_ELEMENT ]: createElement(
-							AutosaveFailureNotice,
-							{ message: args[ 0 ] }
-						),
-					};
 				}
 
 				registry.dispatch( noticesStore ).createErrorNotice( ...args );

@@ -3,6 +3,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import AutosaveRetry from '../autosave-retry';
 
 /**
  * Calls `callback` every `intervalInSeconds`. The latest `callback` is always
@@ -125,7 +126,7 @@ function ScheduledAutosaveMonitor( { interval } ) {
 		setNextAutosaveTime,
 	] );
 
-	return null;
+	return createElement( AutosaveRetry );
 }
 
 /**

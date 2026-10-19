@@ -1,5 +1,5 @@
 import deprecated from '@wordpress/deprecated';
-import { DEFAULT_CONTEXT, DEFAULT_STATUS, NOTICE_ELEMENT } from './constants';
+import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
 import type { NoticeOptions, ReducerAction } from './types';
 
 let uniqueId = 0;
@@ -63,32 +63,27 @@ export function createNotice(
 		} );
 	}
 
-	const notice = {
-		id,
-		status,
-		content,
-		spokenMessage: speak ? content : null,
-		// Details with nothing to read would open an empty panel.
-		details:
-			details && String( details ).trim() ? String( details ) : undefined,
-		__unstableHTML,
-		isDismissible,
-		actions,
-		type,
-		icon,
-		explicitDismiss,
-		onDismiss,
-	};
-
-	const element = ( options as Record< symbol, unknown > )[ NOTICE_ELEMENT ];
-	if ( element !== undefined ) {
-		( notice as Record< symbol, unknown > )[ NOTICE_ELEMENT ] = element;
-	}
-
 	return {
 		type: 'CREATE_NOTICE',
 		context,
-		notice,
+		notice: {
+			id,
+			status,
+			content,
+			spokenMessage: speak ? content : null,
+			// Details with nothing to read would open an empty panel.
+			details:
+				details && String( details ).trim()
+					? String( details )
+					: undefined,
+			__unstableHTML,
+			isDismissible,
+			actions,
+			type,
+			icon,
+			explicitDismiss,
+			onDismiss,
+		},
 	};
 }
 
