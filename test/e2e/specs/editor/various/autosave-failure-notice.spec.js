@@ -282,6 +282,53 @@ test.describe( 'Autosave failure notice', () => {
 	} );
 
 	test.describe( 'after a failure', () => {
+		test( 'notice counts down to the next autosave', async ( {
+			autosaveFailure,
+			page,
+		} ) => {
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/editor' )
+					.updateEditorSettings( { autosaveInterval: 10 } )
+			);
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
+
+			const notice = page
+				.getByRole( 'region', { name: 'Editor content' } )
+				.locator( '.notices-inline-notices__notice' );
+			await expect( notice ).toContainText(
+				new RegExp(
+					`${ AUTOSAVE_FAILED.replaceAll( '.', '\\.' ) } Retrying in (10|9) seconds\\.`
+				)
+			);
+			await expect( notice ).toContainText(
+				`${ AUTOSAVE_FAILED } Retrying in 7 seconds.`
+			);
+		} );
+
+		test( 'notice shows the retry while it is in flight', async ( {
+			autosaveFailure,
+			page,
+		} ) => {
+			await page.evaluate( () =>
+				window.wp.data
+					.dispatch( 'core/editor' )
+					.updateEditorSettings( { autosaveInterval: 1 } )
+			);
+			await autosaveFailure.fail( 'dropped-connection' );
+			await autosaveFailure.autosave();
+			await autosaveFailure.fail( 'slow' );
+
+			const notice = page
+				.getByRole( 'region', { name: 'Editor content' } )
+				.locator( '.notices-inline-notices__notice' );
+			await expect( notice ).toContainText(
+				`${ AUTOSAVE_FAILED } Retrying…`
+			);
+			await expect( notice ).toHaveCount( 0 );
+		} );
+
 		for ( const newEdits of [ false, true ] ) {
 			test( `autosave is retried at every interval ${
 				newEdits ? 'with' : 'without'
