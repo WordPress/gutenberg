@@ -37,6 +37,7 @@ import {
 	getNoteIdsFromMetadata,
 	addNoteIdToMetadata,
 	getLatestNoteActivity,
+	getUnseenNoteIds,
 	hasUnseenNoteActivity,
 	getNoteAtCaret,
 	pickNoteForCaret,
@@ -53,6 +54,11 @@ const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
  * Unsent note drafts, keyed by block client ID for new notes and note ID for replies.
  */
 export const NoteDraftsContext = createContext();
+
+/**
+ * Ids of the note threads flagged as new for this editor session.
+ */
+export const UnseenNotesContext = createContext( new Set() );
 
 export function useNoteThreads( postId ) {
 	const queryArgs = {
@@ -196,10 +202,13 @@ export function useNoteThreads( postId ) {
  * storing the newest `date_gmt` shown rather than the current time, which
  * keeps the comparison immune to clock skew.
  *
+ * The threads that were unseen stay flagged for the session after that
+ * timestamp advances, until the user selects them.
+ *
  * @param {Object}  options        Options.
  * @param {?number} options.postId Post the notes belong to.
  * @param {Array}   options.notes  Every note thread loaded for the post.
- * @return {boolean} Whether there is unseen activity.
+ * @return {{hasUnseenNotes: boolean, unseenNoteIds: Set<number>}} Whether there is unseen activity, and the threads to flag as new.
  */
 export function useUnseenNotes( { postId, notes } ) {
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -242,6 +251,35 @@ export function useUnseenNotes( { postId, notes } ) {
 		[ notes, lastSeen, currentUserId ]
 	);
 
+	const selectedNoteId = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
+	const [ unseenNoteIds, setUnseenNoteIds ] = useState( () => new Set() );
+	// Collects the unseen threads before `lastSeen` advances past them.
+	useEffect( () => {
+		const ids = getUnseenNoteIds(
+			( notes ?? [] ).filter( ( thread ) => thread.status === 'hold' ),
+			lastSeen,
+			currentUserId
+		);
+		setUnseenNoteIds( ( current ) =>
+			ids.every( ( id ) => current.has( id ) )
+				? current
+				: new Set( [ ...current, ...ids ] )
+		);
+	}, [ notes, lastSeen, currentUserId ] );
+	useEffect( () => {
+		setUnseenNoteIds( ( current ) => {
+			if ( ! current.has( selectedNoteId ) ) {
+				return current;
+			}
+			const next = new Set( current );
+			next.delete( selectedNoteId );
+			return next;
+		} );
+	}, [ selectedNoteId ] );
+
 	useEffect( () => {
 		if (
 			! hasLooked ||
@@ -270,7 +308,7 @@ export function useUnseenNotes( { postId, notes } ) {
 		setPreference,
 	] );
 
-	return hasUnseenNotes;
+	return { hasUnseenNotes, unseenNoteIds };
 }
 
 export function useNoteActions() {

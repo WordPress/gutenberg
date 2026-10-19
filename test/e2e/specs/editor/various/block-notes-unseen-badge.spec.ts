@@ -153,6 +153,43 @@ test.describe( 'Notes: unseen badge', () => {
 		await expect( badge ).toBeHidden();
 	} );
 
+	test( 'flags each unseen thread until it is selected', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const postId = await createPostWithNotes( requestUtils, [
+			{ content: 'A note to self' },
+			{ author: collaboratorId, content: 'First question' },
+			{ author: collaboratorId, content: 'Second question' },
+		] );
+		await admin.editPost( postId );
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'All notes' } )
+			.click();
+
+		const sidebar = page.getByRole( 'region', { name: 'Editor settings' } );
+		const ownThread = sidebar.getByRole( 'treeitem', {
+			name: /A note to self/,
+		} );
+		const firstThread = sidebar.getByRole( 'treeitem', {
+			name: /First question/,
+		} );
+		const secondThread = sidebar.getByRole( 'treeitem', {
+			name: /Second question/,
+		} );
+
+		// Opening the sidebar advances "last seen", but the flags stay.
+		await expect( firstThread ).toHaveAccessibleName( /, new activity$/ );
+		await expect( secondThread ).toHaveAccessibleName( /, new activity$/ );
+		await expect( ownThread ).not.toHaveAccessibleName( /new activity/ );
+
+		await firstThread.click();
+		await expect( firstThread ).not.toHaveAccessibleName( /new activity/ );
+		await expect( secondThread ).toHaveAccessibleName( /, new activity$/ );
+	} );
+
 	test( 'starting a note of your own does not clear the badge', async ( {
 		admin,
 		page,

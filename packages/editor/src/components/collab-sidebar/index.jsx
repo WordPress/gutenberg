@@ -19,6 +19,7 @@ import { NoteAvatarIndicator } from './note-indicator-toolbar';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import {
 	NoteDraftsContext,
+	UnseenNotesContext,
 	useNoteActions,
 	useNoteSelection,
 	useNoteThreads,
@@ -65,7 +66,10 @@ function NotesSidebar( { postId, drafts } ) {
 		}, [] );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { notes, unresolvedNotes } = useNoteThreads( postId );
-	const hasUnseenNotes = useUnseenNotes( { postId, notes } );
+	const { hasUnseenNotes, unseenNoteIds } = useUnseenNotes( {
+		postId,
+		notes,
+	} );
 	const { onStart, onDiscard } = useNoteActions();
 	// Here rather than in `Notes`, which unmounts with its surface: a draft
 	// must be restored on block selection even while no note is shown.
@@ -202,7 +206,9 @@ function NotesSidebar( { postId, drafts } ) {
 					closeLabel={ __( 'Close Notes' ) }
 				>
 					<NoteDraftsContext.Provider value={ drafts }>
-						<Notes notes={ notes } sidebarRef={ sidebarRef } />
+						<UnseenNotesContext.Provider value={ unseenNoteIds }>
+							<Notes notes={ notes } sidebarRef={ sidebarRef } />
+						</UnseenNotesContext.Provider>
 					</NoteDraftsContext.Provider>
 				</PluginSidebar>
 			) }
@@ -216,11 +222,15 @@ function NotesSidebar( { postId, drafts } ) {
 						} ) }
 					>
 						<NoteDraftsContext.Provider value={ drafts }>
-							<Notes
-								notes={ unresolvedNotes }
-								sidebarRef={ sidebarRef }
-								isFloating
-							/>
+							<UnseenNotesContext.Provider
+								value={ unseenNoteIds }
+							>
+								<Notes
+									notes={ unresolvedNotes }
+									sidebarRef={ sidebarRef }
+									isFloating
+								/>
+							</UnseenNotesContext.Provider>
 						</NoteDraftsContext.Provider>
 					</div>
 				</CanvasMargin.Fill>
