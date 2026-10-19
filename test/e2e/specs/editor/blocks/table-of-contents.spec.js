@@ -834,7 +834,7 @@ test.describe( 'Table of Contents', () => {
 			await expect(
 				getTableOfContentsEditorBlock( editor )
 			).toContainText(
-				'This table of contents will show headings from the post being viewed.'
+				'Headings from the post being viewed appear here'
 			);
 
 			await openPostOnFrontend( page, post.id );
@@ -920,11 +920,10 @@ test.describe( 'Table of Contents', () => {
 				postType: 'wp_template',
 				canvas: 'edit',
 			} );
-			// TODO: Make this placeholder explain how users can fix the template, not only why no ToC can render.
 			await expect(
 				getTableOfContentsEditorBlock( editor )
 			).toContainText(
-				'Table of Contents needs a single post or page to list headings.'
+				'Headings from the post being viewed appear here'
 			);
 
 			await page.goto( '/?m=202001' );

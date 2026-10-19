@@ -122,13 +122,26 @@ export default function TableOfContentsEdit( {
 	context: { postId, postType },
 	setAttributes,
 } ) {
-	const headings = useHeadings( {
+	const postHeadings = useHeadings( {
 		clientId,
 		postId,
 		postType,
 		onlyIncludeCurrentPage,
 		maxLevel,
 	} );
+	// Without a post in context, e.g. in a template or a block preview, show
+	// sample entries standing in for the headings of the post being viewed.
+	const headings = postId
+		? postHeadings
+		: [
+				{
+					content: __(
+						'Headings from the post being viewed appear here'
+					),
+					level: 2,
+				},
+				{ content: __( 'Subheading' ), level: 3 },
+			];
 
 	const blockProps = useBlockProps();
 	const instanceId = useInstanceId(
@@ -240,29 +253,15 @@ export default function TableOfContentsEdit( {
 	// Note that the toolbar controls are intentionally omitted since the
 	// "Detach" option is useless to the placeholder state.
 	if ( headings.length === 0 ) {
-		let instructions = __(
-			'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
-		);
-		// Without a post ID, the block is in a template: either one that
-		// renders a single post of a known type (e.g. `single`), or one that
-		// doesn't render a single post at all (e.g. `archive`).
-		if ( ! postId ) {
-			instructions = postType
-				? __(
-						'This table of contents will show headings from the post being viewed.'
-					)
-				: __(
-						'Table of Contents needs a single post or page to list headings.'
-					);
-		}
-
 		return (
 			<>
 				<div { ...blockProps }>
 					<Placeholder
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
-						instructions={ instructions }
+						instructions={ __(
+							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
+						) }
 					/>
 				</div>
 				{ inspectorControls }
@@ -284,7 +283,7 @@ export default function TableOfContentsEdit( {
 					/>
 				</ListTag>
 			</nav>
-			{ toolbarControls }
+			{ !! postId && toolbarControls }
 			{ inspectorControls }
 		</>
 	);
