@@ -10,7 +10,7 @@
 		{ "path": "packages/autop/tsconfig.build.json" },
 		{ "path": "packages/blob/tsconfig.build.json" },
 		{ "path": "packages/block-editor/tsconfig.build.json" },
-		{ "path": "packages/block-library/tsconfig.build.json" },
+		{ "path": "packages/block-library" },
 		{ "path": "packages/block-serialization-default-parser" },
 		{ "path": "packages/blocks" },
 		{ "path": "packages/boot" },
