@@ -1,4 +1,3 @@
-export { default as caretRangeFromPoint } from './caret-range-from-point';
 export { default as computeCaretRect } from './compute-caret-rect';
 export { default as documentHasTextSelection } from './document-has-text-selection';
 export { default as documentHasUncollapsedSelection } from './document-has-uncollapsed-selection';

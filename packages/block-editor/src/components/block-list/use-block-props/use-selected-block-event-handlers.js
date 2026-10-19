@@ -1,5 +1,5 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
-import { caretRangeFromPoint, isTextField } from '@wordpress/dom';
+import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
@@ -277,9 +277,12 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			 * @return {boolean} Whether a text drag started.
 			 */
 			function startTextDrag( event ) {
+				const { ownerDocument } = node;
 				const source = getSelectionStart();
 				const sourceEnd = getSelectionEnd();
 				if (
+					// Safari before 26.2 cannot locate the drop position.
+					! ownerDocument.caretPositionFromPoint ||
 					source.attributeKey === undefined ||
 					source.clientId !== sourceEnd.clientId ||
 					source.attributeKey !== sourceEnd.attributeKey ||
@@ -306,18 +309,18 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					toHTMLString( { value: dragged } )
 				);
 
-				const { ownerDocument } = node;
 				const { defaultView } = ownerDocument;
 
 				function getDropTarget( { clientX, clientY } ) {
-					const range = caretRangeFromPoint(
-						ownerDocument,
+					const position = ownerDocument.caretPositionFromPoint(
 						clientX,
 						clientY
 					);
-					if ( ! range ) {
+					if ( ! position ) {
 						return;
 					}
+					const range = ownerDocument.createRange();
+					range.setStart( position.offsetNode, position.offset );
 					const { startContainer } = range;
 					const field = (
 						startContainer.nodeType === startContainer.ELEMENT_NODE

@@ -8,7 +8,6 @@
 
 ### Enhancements
 
--   Export `caretRangeFromPoint`, which returns a collapsed range at a viewport point ([#81603](https://github.com/WordPress/gutenberg/pull/81603)).
 -   Refine the public types: `getScrollContainer` types `direction` as a union, `isEmpty` takes any `Node`, `isFormElement` accepts a missing element, `getPhrasingContentSchema` returns `ContentSchema`, `allowEmpty` is optional in a `Schema` item, and `Schema` and `SchemaItem` are exported ([#84317](https://github.com/WordPress/gutenberg/pull/84317)).
 
 ### Bug Fixes
