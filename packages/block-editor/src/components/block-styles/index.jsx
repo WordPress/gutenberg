@@ -7,7 +7,6 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Button } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import PreviewBlockPopover from '../block-switcher/preview-block-popover';

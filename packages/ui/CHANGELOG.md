@@ -19,6 +19,7 @@
 
 ### Enhancements
 
+-   `Button`, `ButtonLink`, `IconButton`: Mark as recommended for use in a WordPress environment ([#85073](https://github.com/WordPress/gutenberg/pull/85073)).
 -   `Avatar`: Use `color` for fallback backgrounds with contrasting text and icons ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).

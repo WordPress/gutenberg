@@ -19,7 +19,7 @@
 			border-color: $gray-400;
 			width: 100%;
 			display: block;
-			height: $grid-unit-50;
+			min-height: $grid-unit-50;
 			padding-right: $grid-unit-40;
 
 			&:hover {
@@ -31,7 +31,6 @@
 
 .block-library-utils__media-control__inspector-media-replace-title {
 	word-break: break-all;
-	// The Button component is white-space: nowrap, and that won't work with line-clamp.
 	white-space: normal;
 
 	// Without this, the ellipsis can sometimes be partially hidden by the Button padding.

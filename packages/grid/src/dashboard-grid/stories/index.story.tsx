@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, useMemo } from '@wordpress/element';
 import { close, justifyStretch, stretchFullWidth } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components -- @wordpress/grid consumes @wordpress/ui in story examples only.
 import { Icon, IconButton, Stack } from '@wordpress/ui';
 import { DashboardGrid } from '..';
 import type { DashboardGridLayoutItem } from '../types';

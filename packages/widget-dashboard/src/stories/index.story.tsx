@@ -14,7 +14,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { chartBar, download, shield, trendingUp } from '@wordpress/icons';
-// eslint-disable-next-line @wordpress/use-recommended-components
 import { Button } from '@wordpress/ui';
 import {
 	WidgetHostProvider,
