@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { computeLanePlacements } from '../lane-placement';
 import type { LanePlacementItem } from '../lane-placement';
 

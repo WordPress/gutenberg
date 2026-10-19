@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { SVG, Circle } from '@wordpress/primitives';
-
-/**
- * Internal dependencies
- */
 import styles from './circle-progress.module.css';
 
 export type HealthTone = 'success' | 'warning' | 'error';

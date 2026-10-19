@@ -1,9 +1,8 @@
-/**
- * Internal dependencies
- */
 import { HStack } from '../h-stack';
 import { Text } from '../text';
-import { RangeControl, NumberControlWrapper } from './styles';
+import RangeControl from '../range-control';
+import NumberControl from '../number-control';
+import styles from './style.module.scss';
 import { COLORS } from '../utils/colors-values';
 import type { InputWithSliderProps } from './types';
 import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
@@ -30,8 +29,8 @@ export const InputWithSlider = ( {
 
 	return (
 		<HStack spacing={ 4 }>
-			<NumberControlWrapper
-				__next40pxDefaultSize
+			<NumberControl
+				className={ styles[ 'number-control' ] }
 				min={ min }
 				max={ max }
 				label={ label }
@@ -48,13 +47,13 @@ export const InputWithSlider = ( {
 				spinControls="none"
 			/>
 			<RangeControl
-				__next40pxDefaultSize
+				className={ styles.range }
 				label={ label }
 				hideLabelFromVision
 				min={ min }
 				max={ max }
 				value={ value }
-				// @ts-expect-error
+				// @ts-expect-error `RangeControl` may call `onChange` with `undefined`, but this expects a `number`.
 				// See: https://github.com/WordPress/gutenberg/pull/40535#issuecomment-1172418185
 				onChange={ onChange }
 				withInputField={ false }

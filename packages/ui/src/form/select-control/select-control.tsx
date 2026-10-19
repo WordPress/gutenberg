@@ -1,8 +1,11 @@
+import { useRender } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
 import { Field, Select } from '../primitives';
-import { SelectControlSizeContext } from './context';
 import { Item } from './item';
+import { Trigger } from './trigger';
 import type { SelectControlProps } from './types';
+
+const DEFAULT_TRIGGER = <Trigger />;
 
 /**
  * A complete select field with integrated label and description.
@@ -10,7 +13,7 @@ import type { SelectControlProps } from './types';
 export const SelectControl = forwardRef<
 	HTMLButtonElement,
 	SelectControlProps
->( function SelectControl(
+>( function UnforwardedSelectControl(
 	{
 		className,
 		children,
@@ -20,40 +23,46 @@ export const SelectControl = forwardRef<
 		details,
 		hideLabelFromVision,
 		placeholder,
+		popupWidth = 'content',
 		size = 'default',
-		triggerContent,
+		trigger,
 		...restProps
 	},
 	ref
 ) {
+	const triggerElement = useRender( {
+		render: trigger ?? DEFAULT_TRIGGER,
+		ref,
+		props: { placeholder, size },
+	} );
+
 	return (
 		<Field.Root className={ className }>
 			<Field.Label hideFromVision={ hideLabelFromVision }>
 				{ label }
 			</Field.Label>
 			<Select.Root items={ items } { ...restProps }>
-				<Select.Trigger
-					ref={ ref }
-					placeholder={ placeholder }
-					size={ size }
-				>
-					{ triggerContent }
-				</Select.Trigger>
-				<Select.Popup>
-					<SelectControlSizeContext.Provider value={ size }>
-						{ children !== undefined
-							? children
-							: items?.map( ( item ) => (
-									<Item
-										key={ item.value ?? 'null' }
-										value={ item }
-										label={ item.label }
-										disabled={ item.disabled }
-									>
+				{ triggerElement }
+				<Select.Popup width={ popupWidth }>
+					{ children !== undefined
+						? children
+						: items?.map( ( item ) => (
+								<Item
+									key={ item.value ?? 'null' }
+									value={ item }
+									label={ item.label }
+									disabled={ item.disabled }
+								>
+									<Select.ItemLabel>
 										{ item.label }
-									</Item>
-							  ) ) }
-					</SelectControlSizeContext.Provider>
+									</Select.ItemLabel>
+									{ item.description ? (
+										<Select.ItemDescription>
+											{ item.description }
+										</Select.ItemDescription>
+									) : null }
+								</Item>
+							) ) }
 				</Select.Popup>
 			</Select.Root>
 			{ description && (

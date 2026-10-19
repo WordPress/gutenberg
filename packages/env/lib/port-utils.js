@@ -1,7 +1,4 @@
 'use strict';
-/**
- * External dependencies
- */
 const net = require( 'net' );
 
 const DEFAULT_MIN_PORT = 49152;

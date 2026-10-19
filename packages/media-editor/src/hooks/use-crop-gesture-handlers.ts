@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useMediaEditor } from '../state';
 
 /**

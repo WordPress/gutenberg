@@ -12,14 +12,10 @@ import * as Popover from '../../popover';
 import { VisuallyHidden } from '../../visually-hidden';
 
 const meta: Meta = {
-	title: 'Design System/Components/Tooltip/Usage Guidelines',
+	title: 'Components/@wordpress-ui/Tooltip/Usage Guidelines',
+	id: 'design-system-components-tooltip-usage-guidelines',
 	parameters: {
 		controls: { disable: true },
-		componentStatus: {
-			status: 'use-with-caution',
-			whereUsed: 'global',
-			notes: 'Not yet recommended for use alongside components from `@wordpress/components`, pending review of overlays compatibility. See [WordPress/gutenberg#76135](https://github.com/WordPress/gutenberg/issues/76135).',
-		},
 	},
 	tags: [ '!dev' ],
 };

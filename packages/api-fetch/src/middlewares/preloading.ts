@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { addQueryArgs, getQueryArgs, normalizePath } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
 import type { APIFetchMiddleware } from '../types';
 
 export const ENABLE_MULTI_USE = Symbol( 'preloadingEnableMultiUse' );
@@ -145,7 +138,7 @@ function prepareResponse(
 						status: 200,
 						statusText: 'OK',
 						headers: responseData.headers,
-				  } )
+					} )
 		);
 	}
 }

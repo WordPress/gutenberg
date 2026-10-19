@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactElement } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { WordPressComponentProps } from '../context';
 import { hasConnectNamespace, useContextSystem } from '../context';
 import { FlexItem, useFlex } from '../flex';

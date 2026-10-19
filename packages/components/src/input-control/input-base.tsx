@@ -1,20 +1,11 @@
-/**
- * External dependencies
- */
-import type { ForwardedRef } from 'react';
-
-/**
- * WordPress dependencies
- */
+import type { CSSProperties, ForwardedRef } from 'react';
+import clsx from 'clsx';
 import { useInstanceId } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import Backdrop from './backdrop';
 import Label from './label';
-import { Container, Root, Prefix, Suffix } from './styles/input-control-styles';
+import styles from './style.module.scss';
+import { Flex } from '../flex';
 import type { InputBaseProps, LabelPosition } from './types';
 import type { WordPressComponentProps } from '../context';
 import {
@@ -22,7 +13,6 @@ import {
 	contextConnect,
 	useContextSystem,
 } from '../context';
-import { useDeprecated36pxDefaultSizeProp } from '../utils/use-deprecated-props';
 import type { FlexDirection } from '../flex/types';
 
 function useUniqueId( idProp?: string ) {
@@ -64,7 +54,6 @@ function InputBase(
 	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const {
-		__next40pxDefaultSize,
 		__unstableInputWidth,
 		children,
 		className,
@@ -78,25 +67,53 @@ function InputBase(
 		size = 'default',
 		suffix,
 		...restProps
-	} = useDeprecated36pxDefaultSizeProp(
-		useContextSystem( props, 'InputBase' )
-	);
+	} = useContextSystem( props, 'InputBase' );
 
 	const id = useUniqueId( idProp );
-	const hideLabel = hideLabelFromVision || ! label;
 
 	const prefixSuffixContextValue = useMemo( () => {
 		return {
-			InputControlPrefixWrapper: { __next40pxDefaultSize, size },
-			InputControlSuffixWrapper: { __next40pxDefaultSize, size },
+			InputControlPrefixWrapper: { size },
+			InputControlSuffixWrapper: { size },
 		};
-	}, [ __next40pxDefaultSize, size ] );
+	}, [ size ] );
+
+	const normalizedWidth =
+		typeof __unstableInputWidth === 'string'
+			? __unstableInputWidth.trim().toLowerCase()
+			: undefined;
+	const widthKeyword =
+		normalizedWidth &&
+		[ 'inherit', 'initial', 'revert', 'revert-layer', 'unset' ].includes(
+			normalizedWidth
+		)
+			? normalizedWidth
+			: undefined;
+	const hasWidth = !! __unstableInputWidth;
+	const hasCustomWidth =
+		hasWidth && labelPosition !== 'side' && labelPosition !== 'edge';
+	// The previous flex shorthand ignored numeric widths and CSS-wide keywords.
+	const hasEdgeWidth =
+		labelPosition === 'edge' &&
+		typeof __unstableInputWidth === 'string' &&
+		hasWidth &&
+		! widthKeyword;
+	const cssWidth =
+		typeof __unstableInputWidth === 'number'
+			? `${ __unstableInputWidth }px`
+			: __unstableInputWidth;
+	const containerStyle = {
+		'--_wp-components-input-control-width':
+			( hasCustomWidth && ! widthKeyword ) || hasEdgeWidth
+				? cssWidth
+				: undefined,
+	} as CSSProperties;
 
 	return (
-		<Root
+		<Flex
 			{ ...restProps }
 			{ ...getUIFlexProps( labelPosition ) }
-			className={ className }
+			className={ clsx( styles.root, className ) }
 			gap={ 2 }
 			ref={ ref }
 		>
@@ -108,29 +125,50 @@ function InputBase(
 			>
 				{ label }
 			</Label>
-			<Container
-				__unstableInputWidth={ __unstableInputWidth }
-				className="components-input-control__container"
-				disabled={ disabled }
-				hideLabel={ hideLabel }
-				labelPosition={ labelPosition }
+			<div
+				{ ...{ disabled } }
+				className={ clsx(
+					'components-input-control__container',
+					styles.container,
+					{
+						[ styles[ 'is-disabled' ] ]: disabled,
+						[ styles[ 'full-width' ] ]: ! hasWidth,
+						[ styles[ 'custom-width' ] ]:
+							hasCustomWidth && ! widthKeyword,
+						[ styles[ 'edge-width' ] ]: hasEdgeWidth,
+					},
+					hasCustomWidth &&
+						widthKeyword &&
+						styles[ `width-${ widthKeyword }` ]
+				) }
+				style={ containerStyle }
 			>
 				<ContextSystemProvider value={ prefixSuffixContextValue }>
 					{ prefix && (
-						<Prefix className="components-input-control__prefix">
+						<span
+							className={ clsx(
+								'components-input-control__prefix',
+								styles.prefix
+							) }
+						>
 							{ prefix }
-						</Prefix>
+						</span>
 					) }
 					{ children }
 					{ suffix && (
-						<Suffix className="components-input-control__suffix">
+						<span
+							className={ clsx(
+								'components-input-control__suffix',
+								styles.suffix
+							) }
+						>
 							{ suffix }
-						</Suffix>
+						</span>
 					) }
 				</ContextSystemProvider>
 				<Backdrop disabled={ disabled } isBorderless={ isBorderless } />
-			</Container>
-		</Root>
+			</div>
+		</Flex>
 	);
 }
 

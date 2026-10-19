@@ -1,18 +1,11 @@
-/**
- * WordPress dependencies
- */
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useCallback, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * Internal dependencies
- */
 import type { Media } from '../media-editor-provider';
-import type { MediaEditorController } from '../../state';
+import type { MediaEditorSession } from '../../state';
 import {
 	buildModifiers,
 	type Modifier,
@@ -44,11 +37,23 @@ export interface MediaEditorSaveResult {
 }
 
 interface UseSaveMediaEditorArgs {
-	cropper: MediaEditorController;
+	session: MediaEditorSession;
 	id: number;
 	isImage: boolean;
 	media?: Media | null;
 	onSaved?: ( result: MediaEditorSaveResult ) => void;
+	/**
+	 * When another attachment has replaced the edited one (today, the original
+	 * via "Restore original image"), the save targets the replacement:
+	 * - with no fresh crop, the block is repointed at the replacement and any
+	 *   changed details are saved there (no `/edit`);
+	 * - with a fresh crop, `/edit` runs against the replacement's id and url.
+	 */
+	replacementSource?: {
+		id: number;
+		url?: string;
+		media: Media;
+	};
 }
 
 interface UseSaveMediaEditorReturn {
@@ -56,13 +61,14 @@ interface UseSaveMediaEditorReturn {
 	save: () => Promise< void >;
 }
 
-function getCropModifiers( cropper: MediaEditorController ): Modifier[] {
-	if ( ! cropper.isCropperDirty || ! cropper.state.image ) {
+function getCropModifiers( session: MediaEditorSession ): Modifier[] {
+	const { state } = session.cropper;
+	if ( ! session.hasOutputEdits || ! state.image ) {
 		return [];
 	}
-	return buildModifiers( cropper.state, {
-		width: cropper.state.image.naturalWidth,
-		height: cropper.state.image.naturalHeight,
+	return buildModifiers( state, {
+		width: state.image.naturalWidth,
+		height: state.image.naturalHeight,
 	} );
 }
 
@@ -87,11 +93,12 @@ function getMetadataEdits(
 }
 
 export function useSaveMediaEditor( {
-	cropper,
+	session,
 	id,
 	isImage,
 	media,
 	onSaved,
+	replacementSource,
 }: UseSaveMediaEditorArgs ): UseSaveMediaEditorReturn {
 	const registry = useRegistry();
 	const {
@@ -107,13 +114,22 @@ export function useSaveMediaEditor( {
 		setIsSaving( true );
 		try {
 			let saved: Media | null | undefined;
-			const modifiers = getCropModifiers( cropper );
+			const modifiers = getCropModifiers( session );
+
+			// A replacement retargets the save; without one the current
+			// attachment is both source and target as before.
+			const targetId = replacementSource?.id ?? id;
+			const targetUrl = replacementSource?.url ?? media?.source_url;
+			const targetMedia = replacementSource?.media ?? media;
+
+			// Both a fresh crop and a bare replacement swap the block's image,
+			// so both offer an Undo back to the current attachment.
 			const previous =
-				modifiers.length > 0 && media
+				( modifiers.length > 0 || replacementSource ) && media
 					? {
 							id,
 							url: media.source_url,
-					  }
+						}
 					: undefined;
 
 			if ( modifiers.length > 0 ) {
@@ -122,15 +138,18 @@ export function useSaveMediaEditor( {
 					.getEntityRecordNonTransientEdits(
 						'postType',
 						'attachment',
-						id
+						targetId
 					) as PendingMetadataEdits;
-				const metadataEdits = getMetadataEdits( pendingEdits, media );
+				const metadataEdits = getMetadataEdits(
+					pendingEdits,
+					targetMedia
+				);
 
 				saved = ( await apiFetch( {
-					path: `/wp/v2/media/${ id }/edit`,
+					path: `/wp/v2/media/${ targetId }/edit`,
 					method: 'POST',
 					data: {
-						src: media?.source_url,
+						src: targetUrl,
 						modifiers,
 						...metadataEdits,
 					},
@@ -145,23 +164,37 @@ export function useSaveMediaEditor( {
 						true
 					);
 				}
+			} else if (
+				replacementSource &&
+				! registry
+					.select( coreStore )
+					.hasEditsForEntityRecord(
+						'postType',
+						'attachment',
+						targetId
+					)
+			) {
+				// A bare replacement only repoints the block. The replacement
+				// already exists and has no changes to persist.
+				saved = replacementSource.media;
 			} else {
 				saved = ( await saveEditedEntityRecord(
 					'postType',
 					'attachment',
-					id
+					targetId,
+					{ throwOnError: true }
 				) ) as Media | undefined;
 			}
 
-			const next = ( saved ?? media ) as Media | null;
+			const next = ( saved ?? targetMedia ) as Media | null;
 
-			if ( next && next.id !== id ) {
-				clearEntityRecordEdits( 'postType', 'attachment', id );
+			if ( next && next.id !== targetId ) {
+				clearEntityRecordEdits( 'postType', 'attachment', targetId );
 			}
 
 			if ( next && next.id ) {
 				if ( next.id === id ) {
-					cropper.reset();
+					session.cropper.reset();
 				}
 				onSaved?.( {
 					id: next.id,
@@ -174,20 +207,20 @@ export function useSaveMediaEditor( {
 			const message =
 				error instanceof Error
 					? error.message
-					: ( error as { message?: string } )?.message ??
-					  __( 'An unknown error occurred.' );
+					: ( ( error as { message?: string } )?.message ??
+						__( 'An unknown error occurred.' ) );
 			createErrorNotice(
 				isImage
 					? sprintf(
 							/* translators: %s: Error message. */
 							__( 'Could not save image. %s' ),
 							message
-					  )
+						)
 					: sprintf(
 							/* translators: %s: Error message. */
 							__( 'Could not save media. %s' ),
 							message
-					  ),
+						),
 				{
 					type: 'snackbar',
 					context: MEDIA_EDITOR_NOTICES_CONTEXT,
@@ -199,7 +232,6 @@ export function useSaveMediaEditor( {
 	}, [
 		clearEntityRecordEdits,
 		createErrorNotice,
-		cropper,
 		id,
 		isImage,
 		media,
@@ -207,7 +239,9 @@ export function useSaveMediaEditor( {
 		receiveEntityRecords,
 		registry,
 		removeAllNotices,
+		replacementSource,
 		saveEditedEntityRecord,
+		session,
 	] );
 
 	return { isSaving, save };

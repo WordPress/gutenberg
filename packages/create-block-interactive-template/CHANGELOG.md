@@ -1,5 +1,28 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
+## Unreleased
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+## 2.57.0 (2026-10-07)
+
+## 2.56.0 (2026-09-23)
+
+## 2.55.0 (2026-09-10)
+
+## 2.54.0 (2026-08-26)
+
+## 2.53.0 (2026-08-12)
+
+
+## 2.52.0 (2026-07-29)
+
+## 2.51.0 (2026-07-14)
+
+## 2.50.0 (2026-07-01)
+
 ## 2.8.0 (2024-09-19)
 
 ### Enhancements

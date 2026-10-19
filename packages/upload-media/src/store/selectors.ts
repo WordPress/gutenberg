@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import type { QueueItem, Settings, State } from './types';
 
 /**

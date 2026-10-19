@@ -1,0 +1,26 @@
+.z-stack {
+	display: inline-grid;
+	grid-auto-flow: column;
+	position: relative;
+
+	> .child {
+		position: relative;
+		justify-self: start;
+	}
+}
+
+// When the ZStack is layered, all items overlap in the same grid cell.
+// Kept at the top level so that the selector retains the same specificity
+// as `.z-stack > .child` above, matching the original Emotion styles.
+.layered > .child {
+	grid-row-start: 1;
+	grid-column-start: 1;
+}
+
+.child {
+	z-index: var(--z-stack-z-index, auto);
+
+	&:not(:first-of-type) {
+		margin-inline-start: var(--z-stack-offset, 0);
+	}
+}

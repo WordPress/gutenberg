@@ -15,14 +15,9 @@ It is responsible for managing the state of the menu and its items, and for
 rendering the `Menu.TriggerButton` (or the `Menu.SubmenuTriggerItem`)
 component, and the `Menu.Popover` component.
 
+This component is deprecated. When building for the Gutenberg repo, use `Menu` from `@wordpress/ui` instead. Otherwise, continue using `DropdownMenu` for now.
+
 ## Props
-
-### `as`
-
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | "base" | "bdi" | "bdo" | "big" | "blockquote" | "body" | "br" | "button" | "canvas" | ... 517 more ...`
- - Required: No
-
-The HTML element or React component to render the component as.
 
 ### `children`
 
@@ -306,7 +301,7 @@ that don't support the native `disabled` attribute.
 The checked state of the radio menu item when it is initially rendered.
 Use when not wanting to control its checked state.
 
-Note: this prop will be overriden by the `checked` prop, if it is defined.
+Note: this prop will be overridden by the `checked` prop, if it is defined.
 
 ##### `hideOnClick`
 
@@ -404,7 +399,7 @@ that don't support the native `disabled` attribute.
 The checked state of the checkbox menu item when it is initially rendered.
 Use when not wanting to control its checked state.
 
-Note: this prop will be overriden by the `checked` prop, if it is defined.
+Note: this prop will be overridden by the `checked` prop, if it is defined.
 
 ##### `hideOnClick`
 
@@ -466,7 +461,7 @@ Renders a menu item's label text. It should be wrapped with `Menu.Item`,
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.
@@ -480,7 +475,7 @@ Renders a menu item's help text. It should be wrapped with `Menu.Item`,
 
 ##### `as`
 
- - Type: `"symbol" | "object" | "a" | "abbr" | "address" | "area" | "article" | "aside" | "audio" | "b" | ...`
+ - Type: `keyof IntrinsicElements | JSXElementConstructor<any>`
  - Required: No
 
 The HTML element or React component to render the component as.

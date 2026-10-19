@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-
-/**
- * WordPress dependencies
- */
 import { autop } from '@wordpress/autop';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -21,10 +14,6 @@ import { escapeHTML } from '@wordpress/escape-html';
 import { __ } from '@wordpress/i18n';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { Button, Stack } from '@wordpress/ui';
-
-/**
- * Internal dependencies
- */
 import { DraftsList, SavedPost } from './components';
 import { QuickDraftContentField } from './fields';
 import { useWidgetSize } from './hooks';
@@ -110,7 +99,7 @@ export default function QuickDraft() {
 			const anyDrafts = getEntityRecords( 'postType', 'post', {
 				status: 'draft',
 				per_page: 1,
-			} ) as Array< { id: number } > | undefined;
+			} );
 			return { hasDrafts: ( anyDrafts?.length ?? 0 ) > 0 };
 		},
 		[ showDraftsList ]
@@ -190,7 +179,10 @@ export default function QuickDraft() {
 				justify="space-between"
 				className={ styles.fill }
 			>
-				<Stack direction="column" className={ styles.formContainer }>
+				<Stack
+					direction="column"
+					className={ styles[ 'form-container' ] }
+				>
 					<DataForm< QuickDraftData >
 						data={ data }
 						fields={ fields }
@@ -229,13 +221,13 @@ export default function QuickDraft() {
 	if ( ! showDraftsList && isListOpenInCompact ) {
 		return (
 			<Stack ref={ ref } direction="column" className={ styles.body }>
-				<Stack direction="column" className={ styles.listPane }>
+				<Stack direction="column" className={ styles[ 'list-pane' ] }>
 					<DraftsList />
 				</Stack>
 				<Stack
 					direction="row"
 					justify="flex-start"
-					className={ styles.backRow }
+					className={ styles[ 'back-row' ] }
 				>
 					<Button
 						variant="minimal"
@@ -255,7 +247,10 @@ export default function QuickDraft() {
 	if ( ! showDraftsList ) {
 		return (
 			<Stack ref={ ref } direction="column" className={ styles.body }>
-				<Stack direction="column" className={ styles.primaryPane }>
+				<Stack
+					direction="column"
+					className={ styles[ 'primary-pane' ] }
+				>
 					{ primary }
 				</Stack>
 			</Stack>
@@ -267,16 +262,13 @@ export default function QuickDraft() {
 		<Stack
 			ref={ ref }
 			direction={ listBeside ? 'row' : 'column' }
-			className={ clsx(
-				styles.body,
-				listBeside ? styles.row : styles.column
-			) }
+			className={ clsx( styles.body, listBeside && styles.row ) }
 		>
-			<Stack direction="column" className={ styles.primaryPane }>
+			<Stack direction="column" className={ styles[ 'primary-pane' ] }>
 				{ primary }
 			</Stack>
 
-			<Stack direction="column" className={ styles.listPane }>
+			<Stack direction="column" className={ styles[ 'list-pane' ] }>
 				<DraftsList />
 			</Stack>
 		</Stack>
