@@ -21,7 +21,7 @@ module.exports = {
 					'/\\$font-weight-medium/',
 				],
 				cursor: [ 'pointer' ],
-				'flex-direction': [ '/-reverse$/' ],
+				'flex-direction': [ '/^(row|column)-reverse/' ],
 			},
 			{
 				message: ( property, value ) => {
