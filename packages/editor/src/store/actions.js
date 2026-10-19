@@ -119,9 +119,7 @@ function getInvalidResponseDetails( status, redirected ) {
 		);
 	}
 	if ( status === 500 ) {
-		return __(
-			'Your site ran into an error while saving. Try again. If it keeps happening, contact your host.'
-		);
+		return __( 'Your site ran into an error while saving. Try again.' );
 	}
 	if ( status >= 502 && status <= 504 ) {
 		return __(
