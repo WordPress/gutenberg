@@ -371,10 +371,20 @@ export const savePost =
 			previousRecord.status !== 'trash' &&
 			select.getEditorSettings().autoAttachMediaEnabled
 		) {
+			// Once a post is out of draft, only images added since its last
+			// save are attached, so ones left unattached on purpose stay that
+			// way. Drafts can't be compared like this: an autosave of a draft
+			// updates the post itself (see `WP_REST_Autosaves_Controller`), so
+			// images added since the last manual save may already be in it.
+			const isDraft = [ 'draft', 'auto-draft' ].includes(
+				previousRecord.status
+			);
+
 			attachMediaInPost( registry, {
 				id: previousRecord.id,
 				type: previousRecord.type,
 				blocks: savedBlocks,
+				previousContent: isDraft ? undefined : previousRecord.content,
 			} );
 		}
 

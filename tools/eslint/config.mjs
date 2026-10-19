@@ -989,7 +989,7 @@ export default dedupePlugins( [
 	},
 
 	// Override: Components src — allow ariakit/framer-motion imports and
-	// prevent new Emotion usage while existing styles are migrated.
+	// prevent Emotion imports from returning after the migration.
 	{
 		files: [ 'packages/components/src/**' ],
 		rules: {
@@ -1002,7 +1002,13 @@ export default dedupePlugins( [
 								name
 							) && ! name.startsWith( '@emotion/' )
 					),
-					patterns: [ '@emotion/**' ],
+					patterns: [
+						{
+							group: [ '@emotion/**' ],
+							message:
+								'Please use SCSS Modules for styles and `clsx` to compose class names.',
+						},
+					],
 				},
 			],
 		},
