@@ -206,7 +206,8 @@
 			// Groups can wrap onto several rows, so each one carries its own
 			// border instead of the toolbar having a single outer border.
 			.components-toolbar-group,
-			.components-toolbar {
+			.components-toolbar,
+			.block-editor-block-parent-selector:not(:has(.components-toolbar-group)) {
 				border: $border-width solid $gray-900;
 				margin: 0 (-$border-width) (-$border-width) 0;
 				padding: 0;
@@ -215,6 +216,11 @@
 				.components-toolbar-group {
 					border: none;
 					margin: 0;
+
+					// Except if there are adjacent groups which need a border between them.
+					+ .components-toolbar-group {
+						border-left: 1px solid $gray-900;
+					}
 				}
 			}
 
@@ -222,9 +228,11 @@
 			.block-editor-block-parent-selector__button {
 				border: none;
 				margin: 0;
-			}
-			.block-editor-block-parent-selector:not(:has(.components-toolbar-group)) {
-				margin-top: 1px;
+
+				// Overrides an override: https://github.com/WordPress/gutenberg/blob/fix/text-labels-toolbar/packages/block-editor/src/components/block-tools/style.scss#L176
+				.components-toolbar-group:last-child {
+					border-right: 1px solid $gray-900;
+				}
 			}
 		}
 	}
