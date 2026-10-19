@@ -1,5 +1,6 @@
 import { select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
+import type { Block, BlockType } from '@wordpress/blocks';
 
 /**
  * Shared cache of blocks parsed from an entity's `content` string. Populated
@@ -20,9 +21,16 @@ import { store as blocksStore } from '@wordpress/blocks';
  * drops the old, taking every entry parsed against it with it. Nothing is
  * invalidated by hand and nothing stale is retained.
  */
-const caches = new WeakMap();
+const caches = new WeakMap<
+	ReadonlyArray< BlockType >,
+	Map< string, { content: string; blocks: Array< Block > } >
+>();
 
-function getCacheKey( kind, name, id ) {
+function getCacheKey(
+	kind: string,
+	name: string,
+	id: string | number
+): string {
 	return `${ kind }:${ name }:${ id }`;
 }
 
@@ -33,9 +41,9 @@ function getCacheKey( kind, name, id ) {
  * partitioned by that registry's list rather than one from the registry
  * hosting the entities.
  *
- * @return {Array} Registered block types.
+ * @return Registered block types.
  */
-function getBlockTypes() {
+function getBlockTypes(): ReadonlyArray< BlockType > {
 	return select( blocksStore ).getBlockTypes();
 }
 
@@ -43,15 +51,20 @@ function getBlockTypes() {
  * Returns the blocks cached for an entity, if they were parsed from the
  * given content with the block types registered right now.
  *
- * @param {string}        kind    Entity kind.
- * @param {string}        name    Entity name.
- * @param {string|number} id      Record ID.
- * @param {string}        content The record's current `content` string.
+ * @param kind    Entity kind.
+ * @param name    Entity name.
+ * @param id      Record ID.
+ * @param content The record's current `content` string.
  *
- * @return {Array|undefined} The cached blocks, or undefined without a valid
- *                           entry.
+ * @return The cached blocks, or undefined without a valid
+ *         entry.
  */
-export function getCachedBlocks( kind, name, id, content ) {
+export function getCachedBlocks(
+	kind: string,
+	name: string,
+	id: string | number,
+	content: string
+): Array< Block > | void {
 	const cached = caches
 		.get( getBlockTypes() )
 		?.get( getCacheKey( kind, name, id ) );
@@ -65,14 +78,20 @@ export function getCachedBlocks( kind, name, id, content ) {
  * Caches the blocks parsed for an entity, under the block types they were
  * parsed with.
  *
- * @param {string}        kind    Entity kind.
- * @param {string}        name    Entity name.
- * @param {string|number} id      Record ID.
- * @param {string}        content The `content` string the blocks were parsed
- *                                from.
- * @param {Array}         blocks  The parsed blocks.
+ * @param kind    Entity kind.
+ * @param name    Entity name.
+ * @param id      Record ID.
+ * @param content The `content` string the blocks were parsed
+ *                from.
+ * @param blocks  The parsed blocks.
  */
-export function setCachedBlocks( kind, name, id, content, blocks ) {
+export function setCachedBlocks(
+	kind: string,
+	name: string,
+	id: string | number,
+	content: string,
+	blocks: Array< Block >
+): void {
 	const blockTypes = getBlockTypes();
 	let cache = caches.get( blockTypes );
 

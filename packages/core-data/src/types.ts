@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
 import type {
 	SelectionType,
@@ -199,4 +200,53 @@ export interface ResolvedSelection {
 	//   core/table cell.
 	// Set to `null` for WholeBlock selections.
 	attributeKey: string | null;
+}
+
+/**
+ * The IDs of the provided entities, by kind and name, and their revisions
+ * under `revision`.
+ */
+export type EntityContextValue = Record<
+	string,
+	Record< string, unknown > | undefined
+> & {
+	revision?: Record< string, Record< string, unknown > | undefined >;
+};
+
+/**
+ * The props of `EntityProvider`.
+ */
+export interface EntityProviderProps {
+	/**
+	 * The entity kind.
+	 */
+	kind: string;
+	/**
+	 * The entity name.
+	 */
+	type: string;
+	/**
+	 * The entity ID.
+	 */
+	id: number | string | undefined;
+	/**
+	 * Optional revision ID. When set, `useEntityProp` reads from the revision
+	 * record instead of the current entity. Applies only to this entity, not
+	 * to others rendered within it.
+	 */
+	revisionId?: number;
+	/**
+	 * The children to wrap.
+	 */
+	children?: ReactNode;
+}
+
+/**
+ * The props of `PrivateEntityProvider`.
+ */
+export interface PrivateEntityProviderProps extends EntityProviderProps {
+	/**
+	 * Optional record to read from.
+	 */
+	revision?: Record< string, unknown >;
 }

@@ -1,6 +1,7 @@
 import { useCallback, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { STORE_NAME } from '../name';
+import type { store as coreStore } from '../';
 import { EntityContext } from '../entity-context';
 import useEntityId from './use-entity-id';
 
@@ -18,19 +19,24 @@ const REVISION_QUERY = {
  * specified property of the nearest provided
  * entity of the specified type.
  *
- * @param {string}        kind  The entity kind.
- * @param {string}        name  The entity name.
- * @param {string}        prop  The property name.
- * @param {number|string} [_id] An entity ID to use instead of the context-provided one.
+ * @param kind The entity kind.
+ * @param name The entity name.
+ * @param prop The property name.
+ * @param _id  An entity ID to use instead of the context-provided one.
  *
- * @return {[*, Function, *]} An array where the first item is the
- *                            property value, the second is the
- *                            setter and the third is the full value
- * 							  object from REST API containing more
- * 							  information like `raw`, `rendered` and
- * 							  `protected` props.
+ * @return An array where the first item is the
+ *         property value, the second is the
+ *         setter and the third is the full value
+ *         object from REST API containing more
+ *         information like `raw`, `rendered` and
+ *         `protected` props.
  */
-export default function useEntityProp( kind, name, prop, _id ) {
+export default function useEntityProp< Value = unknown >(
+	kind: string,
+	name: string,
+	prop: string,
+	_id?: number | string
+): [ Value, ( newValue: Value ) => void, unknown ] {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const context = useContext( EntityContext );
@@ -41,8 +47,14 @@ export default function useEntityProp( kind, name, prop, _id ) {
 			? context?.revision?.[ kind ]?.[ name ]
 			: undefined;
 	const revisionRecord =
-		typeof providedRevision === 'object' ? providedRevision : undefined;
-	const revisionId = revisionRecord ? undefined : providedRevision;
+		// A provided revision record is an object, a revision ID is not.
+		typeof providedRevision === 'object'
+			? ( providedRevision as Record< string, unknown > | null )
+			: undefined;
+	// Otherwise the provided revision is its ID.
+	const revisionId = revisionRecord
+		? undefined
+		: ( providedRevision as number | undefined );
 	const isRevision = !! ( revisionRecord || revisionId );
 
 	const { value, fullValue } = useSelect(
@@ -50,14 +62,22 @@ export default function useEntityProp( kind, name, prop, _id ) {
 			if ( revisionRecord ? prop in revisionRecord : revisionId ) {
 				const revision =
 					revisionRecord ??
-					select( STORE_NAME ).getRevision(
+					// The store is selected by name, which carries no store types.
+					select(
+						STORE_NAME as unknown as typeof coreStore
+					).getRevision(
 						kind,
 						name,
-						id,
-						revisionId,
+						// A revision is provided for a record, so its ID is set.
+						id as string | number,
+						// Set, as the condition above checks.
+						revisionId as number,
 						REVISION_QUERY
 					);
-				const propValue = revision?.[ prop ];
+				// Fields are read by their name.
+				const propValue = (
+					revision as Record< string, unknown > | undefined
+				 )?.[ prop ];
 				if ( propValue === undefined ) {
 					return {};
 				}
@@ -74,21 +94,31 @@ export default function useEntityProp( kind, name, prop, _id ) {
 			}
 
 			const { getEntityRecord, getEditedEntityRecord } =
-				select( STORE_NAME );
+				// The store is selected by name, which carries no store types.
+				select( STORE_NAME as unknown as typeof coreStore );
 			const record = getEntityRecord( kind, name, id ); // Trigger resolver.
 			const editedRecord = getEditedEntityRecord( kind, name, id );
 			return record && editedRecord
 				? {
-						value: editedRecord[ prop ],
-						fullValue: record[ prop ],
+						// Fields are read by their name.
+						value: ( editedRecord as Record< string, unknown > )[
+							prop
+						],
+						// Fields are read by their name.
+						fullValue: ( record as Record< string, unknown > )[
+							prop
+						],
 					}
 				: {};
 		},
 		[ kind, name, id, prop, revisionId, revisionRecord ]
 	);
-	const { editEntityRecord } = useDispatch( STORE_NAME );
+	// The store is selected by name, which carries no store types.
+	const { editEntityRecord } = useDispatch(
+		STORE_NAME as unknown as typeof coreStore
+	);
 	const setValue = useCallback(
-		( newValue ) => {
+		( newValue: Value ) => {
 			if ( isRevision ) {
 				return;
 			}
@@ -99,5 +129,6 @@ export default function useEntityProp( kind, name, prop, _id ) {
 		[ editEntityRecord, kind, name, id, prop, isRevision ]
 	);
 
-	return [ value, setValue, fullValue ];
+	// The caller names the type of the property.
+	return [ value as Value, setValue, fullValue ];
 }

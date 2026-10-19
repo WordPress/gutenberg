@@ -1048,12 +1048,12 @@ _Parameters_
 
 - _kind_ `string`: The entity kind.
 - _name_ `string`: The entity name.
-- _options_ `Object`:
-- _options.id_ `[string]`: An entity ID to use instead of the context-provided one.
+- _options_ `{ id?: string | number; }`:
+- _options.id_ `string | number`: An entity ID to use instead of the context-provided one.
 
 _Returns_
 
-- `[unknown[], Function, Function]`: The block array and setters.
+- `[ Array< Block > | undefined, EntityBlockEditorHandler, EntityBlockEditorHandler ]`: The block array and setters.
 
 ### useEntityId
 
@@ -1073,11 +1073,11 @@ _Parameters_
 - _kind_ `string`: The entity kind.
 - _name_ `string`: The entity name.
 - _prop_ `string`: The property name.
-- _\_id_ `[number|string]`: An entity ID to use instead of the context-provided one.
+- _\_id_ `number | string`: An entity ID to use instead of the context-provided one.
 
 _Returns_
 
-- `[*, Function, *]`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
+- `[ Value, ( newValue: Value ) => void, unknown ]`: An array where the first item is the property value, the second is the setter and the third is the full value object from REST API containing more information like `raw`, `rendered` and `protected` props.
 
 ### useEntityRecord
 

@@ -8,7 +8,11 @@ import { EntityContext } from '../entity-context';
  * @param {string} kind The entity kind.
  * @param {string} name The entity name.
  */
-export default function useEntityId( kind, name ) {
+export default function useEntityId(
+	kind: string,
+	name: string
+): string | number | undefined {
 	const context = useContext( EntityContext );
-	return context?.[ kind ]?.[ name ];
+	// Entity providers set the ID of each kind and name.
+	return context?.[ kind ]?.[ name ] as string | number | undefined;
 }

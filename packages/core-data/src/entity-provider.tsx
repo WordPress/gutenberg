@@ -1,24 +1,25 @@
 import { useContext, useMemo } from '@wordpress/element';
 import { EntityContext } from './entity-context';
+import type { EntityProviderProps, PrivateEntityProviderProps } from './types';
 
 /**
  * Context provider component for providing
  * an entity for a specific entity.
  *
- * @param {Object} props              The component's props.
- * @param {string} props.kind         The entity kind.
- * @param {string} props.type         The entity name.
- * @param {number} props.id           The entity ID.
- * @param {number} [props.revisionId] Optional revision ID. When set,
- *                                    `useEntityProp` reads from the
- *                                    revision record instead of the
- *                                    current entity. Applies only to this
- *                                    entity, not to others rendered within
- *                                    it.
- * @param {*}      props.children     The children to wrap.
+ * @param props            The component's props.
+ * @param props.kind       The entity kind.
+ * @param props.type       The entity name.
+ * @param props.id         The entity ID.
+ * @param props.revisionId Optional revision ID. When set,
+ *                         `useEntityProp` reads from the
+ *                         revision record instead of the
+ *                         current entity. Applies only to this
+ *                         entity, not to others rendered within
+ *                         it.
+ * @param props.children   The children to wrap.
  *
- * @return {Object} The provided children, wrapped with
- *                   the entity's context provider.
+ * @return The provided children, wrapped with
+ *         the entity's context provider.
  */
 export default function EntityProvider( {
 	kind,
@@ -26,7 +27,7 @@ export default function EntityProvider( {
 	id,
 	revisionId,
 	children,
-} ) {
+}: EntityProviderProps ) {
 	return (
 		<PrivateEntityProvider
 			kind={ kind }
@@ -44,16 +45,16 @@ export default function EntityProvider( {
  * the current entity, for content that isn't stored as a revision. Fields the
  * record doesn't have are read from the current entity.
  *
- * @param {Object} props              The component's props.
- * @param {string} props.kind         The entity kind.
- * @param {string} props.type         The entity name.
- * @param {number} props.id           The entity ID.
- * @param {number} [props.revisionId] Optional revision ID.
- * @param {Object} [props.revision]   Optional record to read from.
- * @param {*}      props.children     The children to wrap.
+ * @param props            The component's props.
+ * @param props.kind       The entity kind.
+ * @param props.type       The entity name.
+ * @param props.id         The entity ID.
+ * @param props.revisionId Optional revision ID.
+ * @param props.revision   Optional record to read from.
+ * @param props.children   The children to wrap.
  *
- * @return {Object} The provided children, wrapped with
- *                   the entity's context provider.
+ * @return The provided children, wrapped with
+ *         the entity's context provider.
  */
 export function PrivateEntityProvider( {
 	kind,
@@ -62,7 +63,7 @@ export function PrivateEntityProvider( {
 	revisionId,
 	revision,
 	children,
-} ) {
+}: PrivateEntityProviderProps ) {
 	const parent = useContext( EntityContext );
 	const providedRevision = revision ?? revisionId;
 	const childContext = useMemo(

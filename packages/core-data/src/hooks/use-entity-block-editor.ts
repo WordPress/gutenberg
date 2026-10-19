@@ -1,12 +1,19 @@
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { STORE_NAME } from '../name';
+import type { store as coreStore } from '../';
 import useEntityId from './use-entity-id';
 import { updateFootnotesFromMeta } from '../footnotes';
 import { getCachedBlocks, setCachedBlocks } from '../parsed-blocks-cache';
+import type {
+	EntityBlockEditorChangeOptions,
+	EntityBlockEditorHandler,
+	EntityBlockEditorRecord,
+} from './types';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: Array< Block > = [];
 
 /**
  * Hook that returns block content getters and setters for
@@ -19,14 +26,22 @@ const EMPTY_ARRAY = [];
  * `BlockEditorProvider` and are intended to be used with it,
  * or similar components or hooks.
  *
- * @param {string} kind         The entity kind.
- * @param {string} name         The entity name.
- * @param {Object} options
- * @param {string} [options.id] An entity ID to use instead of the context-provided one.
+ * @param kind       The entity kind.
+ * @param name       The entity name.
+ * @param options
+ * @param options.id An entity ID to use instead of the context-provided one.
  *
- * @return {[unknown[], Function, Function]} The block array and setters.
+ * @return The block array and setters.
  */
-export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
+export default function useEntityBlockEditor(
+	kind: string,
+	name: string,
+	{ id: _id }: { id?: string | number } = {}
+): [
+	Array< Block > | undefined,
+	EntityBlockEditorHandler,
+	EntityBlockEditorHandler,
+] {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const { content, editedBlocks, meta } = useSelect(
@@ -34,8 +49,16 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( ! id ) {
 				return {};
 			}
-			const { getEditedEntityRecord } = select( STORE_NAME );
-			const editedRecord = getEditedEntityRecord( kind, name, id );
+			// The store is selected by name, which carries no store types.
+			const { getEditedEntityRecord } = select(
+				STORE_NAME as unknown as typeof coreStore
+			);
+			// A missing record is `false`, whose fields read as `undefined`.
+			const editedRecord = getEditedEntityRecord(
+				kind,
+				name,
+				id
+			) as EntityBlockEditorRecord;
 			return {
 				editedBlocks: editedRecord.blocks,
 				content: editedRecord.content,
@@ -45,7 +68,8 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		[ kind, name, id ]
 	);
 	const { __unstableCreateUndoLevel, editEntityRecord } =
-		useDispatch( STORE_NAME );
+		// The store is selected by name, which carries no store types.
+		useDispatch( STORE_NAME as unknown as typeof coreStore );
 
 	const blocks = useMemo( () => {
 		if ( ! id ) {
@@ -75,10 +99,18 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	}, [ kind, name, id, editedBlocks, content ] );
 
 	const onChange = useCallback(
-		( newBlocks, options ) => {
+		(
+			newBlocks: Array< Block >,
+			options: EntityBlockEditorChangeOptions
+		): Promise< unknown > | void => {
 			const noChange = blocks === newBlocks;
 			if ( noChange ) {
-				return __unstableCreateUndoLevel( kind, name, id );
+				return __unstableCreateUndoLevel(
+					// @ts-expect-error Bug: the action takes no arguments, so the entity is ignored.
+					kind,
+					name,
+					id
+				);
 			}
 			const { selection, ...rest } = options;
 
@@ -87,8 +119,11 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			// a new undo level.
 			const edits = {
 				selection,
-				content: ( { blocks: blocksForSerialization = [] } ) =>
-					__unstableSerializeAndClean( blocksForSerialization ),
+				content: ( {
+					blocks: blocksForSerialization = [],
+				}: {
+					blocks?: Array< Block >;
+				} ) => __unstableSerializeAndClean( blocksForSerialization ),
 				...updateFootnotesFromMeta( newBlocks, meta ),
 			};
 
@@ -109,7 +144,10 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	);
 
 	const onInput = useCallback(
-		( newBlocks, options ) => {
+		(
+			newBlocks: Array< Block >,
+			options: EntityBlockEditorChangeOptions
+		) => {
 			const { selection, ...rest } = options;
 			const edits = {
 				selection,
