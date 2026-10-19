@@ -8,6 +8,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for Widget Dashboard tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Type the dashboard commands with `CommandConfig` from `@wordpress/commands` ([#84315](https://github.com/WordPress/gutenberg/pull/84315)).
 -   Reference the `@wordpress/commands` build project in the TypeScript configs ([#84377](https://github.com/WordPress/gutenberg/pull/84377)).
 

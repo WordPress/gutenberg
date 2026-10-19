@@ -736,8 +736,81 @@ export const restoreBrowserBackup =
 	};
 
 /**
+ * Creates the notice shown when a revision is not restored because the post
+ * is saving.
+ *
+ * @param {Object} registry The data registry.
+ */
+function createRestoreWhileSavingNotice( registry ) {
+	registry.dispatch( noticesStore ).createErrorNotice(
+		__(
+			'The revision could not be restored while the post is saving. Wait for the save to finish, then try again.'
+		),
+		// Revisions mode does not show inline notices, so use a snackbar.
+		{
+			type: 'snackbar',
+			explicitDismiss: true,
+			id: 'editor-revision-restore-failed',
+		}
+	);
+}
+
+/**
+ * Statuses where saving the post does not change what visitors can see.
+ */
+const UNPUBLISHED_POST_STATUSES = [ 'auto-draft', 'draft', 'pending' ];
+
+/**
+ * Returns whether the given post fields differ from the edits a restore would
+ * apply.
+ *
+ * @param {Object} fields         The post's title, content, excerpt, and meta.
+ * @param {string} fields.title   The post title.
+ * @param {string} fields.content The post content.
+ * @param {string} fields.excerpt The post excerpt.
+ * @param {Object} fields.meta    The post meta.
+ * @param {Object} edits          The edits the restore would apply.
+ * @return {boolean} Whether restoring would replace different content.
+ */
+function hasContentToReplace( fields, edits ) {
+	const hasDifferentFields = [ 'title', 'content', 'excerpt' ].some(
+		( attribute ) =>
+			edits[ attribute ] !== undefined &&
+			fields[ attribute ] !== edits[ attribute ]
+	);
+	if ( hasDifferentFields || edits.meta === undefined ) {
+		return hasDifferentFields;
+	}
+
+	// Meta includes footnotes, which are not part of the post content. A
+	// difference in key order is treated as a change, which only means an
+	// extra save.
+	return Object.keys( edits.meta ).some(
+		( key ) =>
+			JSON.stringify( fields.meta?.[ key ] ) !==
+			JSON.stringify( edits.meta[ key ] )
+	);
+}
+
+/**
+ * Returns whether the last save of the current post failed. A save that was
+ * stopped before the request, such as by an `editor.preSavePost` filter, does
+ * not record a save error, so a post that is still dirty is treated as failed.
+ *
+ * @param {Object} select The editor store selectors.
+ * @return {boolean} Whether the save failed.
+ */
+function didSaveFail( select ) {
+	return select.didPostSaveRequestFail() || select.isEditedPostDirty();
+}
+
+/**
  * Restore a revision by replacing the current content with the revision's content
  * and auto-saving.
+ *
+ * For unpublished posts, the current content is saved first so that it is kept
+ * as a revision. Otherwise content that only exists in the editor or in an
+ * autosave could be lost when the restored revision is saved.
  *
  * @param {number} revisionId The revision ID to restore.
  */
@@ -794,6 +867,78 @@ export const restoreRevision =
 			edits.meta = revision.meta;
 		}
 
+		// A save that is already in progress would make the save below a
+		// no-op, so the current content could not be kept.
+		if ( select.isSavingPost() ) {
+			createRestoreWhileSavingNotice( registry );
+			return;
+		}
+
+		// Save the current content first so that it is stored as a revision
+		// and the restore can be undone. Only do this when neither the saved
+		// nor the edited status is public, so that unsaved edits are not
+		// published. A post that can't be saved has no title, content, or
+		// excerpt to keep.
+		const shouldSaveCurrentContent =
+			select.isEditedPostSaveable() &&
+			UNPUBLISHED_POST_STATUSES.includes(
+				select.getCurrentPostAttribute( 'status' )
+			) &&
+			UNPUBLISHED_POST_STATUSES.includes(
+				select.getEditedPostAttribute( 'status' )
+			) &&
+			hasContentToReplace(
+				{
+					title: select.getEditedPostAttribute( 'title' ),
+					content: select.getEditedPostContent(),
+					excerpt: select.getEditedPostAttribute( 'excerpt' ),
+					meta: select.getEditedPostAttribute( 'meta' ),
+				},
+				edits
+			);
+
+		if ( shouldSaveCurrentContent ) {
+			await dispatch.savePost();
+			if ( didSaveFail( select ) ) {
+				registry.dispatch( noticesStore ).createErrorNotice(
+					__(
+						'The revision was not restored because the current version of the post could not be saved first. Your content has not been changed.'
+					),
+					// Revisions mode does not show inline notices, so use
+					// a snackbar.
+					{
+						type: 'snackbar',
+						explicitDismiss: true,
+						id: 'editor-revision-restore-failed',
+					}
+				);
+				return;
+			}
+		}
+
+		// Keep the saved fields that the restore replaces, so it can be undone.
+		const previousFields = {
+			title: select.getCurrentPostAttribute( 'title' ),
+			content: select.getCurrentPostAttribute( 'content' ),
+			excerpt: select.getCurrentPostAttribute( 'excerpt' ),
+		};
+		if ( edits.meta !== undefined ) {
+			const savedMeta = select.getCurrentPostAttribute( 'meta' ) ?? {};
+			previousFields.meta = Object.fromEntries(
+				Object.keys( edits.meta ).map( ( key ) => [
+					key,
+					savedMeta[ key ],
+				] )
+			);
+		}
+
+		// Check again, as an autosave may have started during the save above.
+		// Nothing has been changed yet, so it is safe to stop here.
+		if ( select.isSavingPost() ) {
+			createRestoreWhileSavingNotice( registry );
+			return;
+		}
+
 		// Apply edits and save.
 		dispatch.editPost( edits );
 
@@ -802,7 +947,18 @@ export const restoreRevision =
 
 		// Save the post to persist the restored revision.
 		await dispatch.savePost();
-		if ( select.didPostSaveRequestFail() ) {
+		if ( didSaveFail( select ) ) {
+			// The restored content is only in the editor. If the post was
+			// saved above, it is now newer than the autosave, and the autosave
+			// can be deleted the next time the editor loads.
+			registry
+				.dispatch( noticesStore )
+				.createErrorNotice(
+					__(
+						'The revision was restored in the editor but could not be saved. Save the post before leaving this page to keep the restored content.'
+					),
+					{ id: 'editor-revision-restore-failed' }
+				);
 			return;
 		}
 
@@ -810,7 +966,44 @@ export const restoreRevision =
 		// autosave notice is stale.
 		registry.dispatch( noticesStore ).removeNotice( 'autosave-exists' );
 
-		// Show success notice.
+		const undoRestore = async () => {
+			// The editor may have moved on to a different post.
+			if (
+				select.getCurrentPostId() !== postId ||
+				select.getCurrentPostType() !== postType
+			) {
+				return;
+			}
+
+			if ( select.isSavingPost() ) {
+				registry
+					.dispatch( noticesStore )
+					.createErrorNotice(
+						__(
+							'The restore could not be undone while the post is saving. Wait for the save to finish, then try again.'
+						),
+						{ id: 'editor-revision-restore-failed' }
+					);
+				return;
+			}
+
+			dispatch.editPost( { blocks: undefined, ...previousFields } );
+			await dispatch.savePost();
+			if ( didSaveFail( select ) ) {
+				return;
+			}
+
+			registry
+				.dispatch( noticesStore )
+				.createSuccessNotice( __( 'Restore undone.' ), {
+					type: 'snackbar',
+					id: 'editor-revision-restore-undone',
+				} );
+		};
+
+		// Show success notice, with an Undo action when there is something
+		// to undo.
+		const canUndo = hasContentToReplace( previousFields, edits );
 		registry.dispatch( noticesStore ).createSuccessNotice(
 			sprintf(
 				/* translators: %s: Date and time of the revision. */
@@ -820,6 +1013,14 @@ export const restoreRevision =
 			{
 				type: 'snackbar',
 				id: 'editor-revision-restored',
+				...( canUndo && {
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: undoRestore,
+						},
+					],
+				} ),
 			}
 		);
 	};

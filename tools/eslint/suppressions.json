@@ -8804,11 +8804,6 @@
 			"count": 1
 		}
 	},
-	"packages/components/src/style-provider/index.tsx": {
-		"no-restricted-imports": {
-			"count": 2
-		}
-	},
 	"packages/components/src/toggle-group-control/toggle-group-control/utils.ts": {
 		"react-hooks/refs": {
 			"count": 11
@@ -11212,14 +11207,6 @@
 	},
 	"packages/editor/src/components/collab-sidebar/note-highlight-styles.js": {
 		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/editor/src/components/collab-sidebar/note-indicator-toolbar.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -13706,19 +13693,6 @@
 			"count": 2
 		}
 	},
-	"packages/format-library/src/link/test/css-classes-setting.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/format-library/src/link/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-engine/src/lock-unlock.ts": {
 		"no-restricted-imports": {
 			"count": 1
@@ -13743,11 +13717,6 @@
 		}
 	},
 	"packages/global-styles-ui/src/color-palette-panel.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/global-styles-ui/src/color-preview.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		}
@@ -13917,15 +13886,17 @@
 	"packages/global-styles-ui/src/screen-colors.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/screen-css.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/screen-element.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -13950,17 +13921,12 @@
 	},
 	"packages/global-styles-ui/src/screen-root.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 8
+			"count": 6
 		}
 	},
 	"packages/global-styles-ui/src/screen-style-variations.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/global-styles-ui/src/screen-typography-element.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
@@ -14027,11 +13993,6 @@
 	"packages/global-styles-ui/src/typography-elements.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"packages/global-styles-ui/src/typography-panel.tsx": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/utils.ts": {
@@ -14614,11 +14575,6 @@
 			"count": 1
 		}
 	},
-	"packages/upload-media/src/store/test/private-actions.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/viewport/src/store/test/reducer.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -14652,11 +14608,6 @@
 	},
 	"packages/views/src/use-view-config.ts": {
 		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/warning/src/test/index.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},

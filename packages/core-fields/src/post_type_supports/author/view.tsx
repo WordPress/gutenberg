@@ -48,6 +48,10 @@ export default function AuthorView( { item }: { item: PostWithAuthor } ) {
 		author?.avatar_urls?.[ 48 ] ||
 		item?._embedded?.author?.[ 0 ]?.avatar_urls?.[ 48 ];
 	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
+	// Some items have no author, like the patterns of themes.
+	if ( ! authorId ) {
+		return null;
+	}
 	return (
 		<Stack direction="row" align="center">
 			{ !! imageUrl && (
