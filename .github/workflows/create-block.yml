@@ -26,7 +26,8 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                os: ['macos-15', 'ubuntu-24.04', 'windows-2025']
+                # macOS and Windows runners are more costly than Ubuntu, so they should not run within forks.
+                os: ${{ github.repository == 'WordPress/gutenberg' && fromJSON( '["macos-15", "ubuntu-24.04", "windows-2025"]' ) || fromJSON( '["ubuntu-24.04"]' ) }}
 
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
