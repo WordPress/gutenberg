@@ -21,6 +21,7 @@ describe( 'getGridChildUpdates()', () => {
 			isManualPlacement: true,
 			columnCount: 3,
 			rowCount: 2,
+			stackOnMobile: true,
 		},
 	};
 	const children = [

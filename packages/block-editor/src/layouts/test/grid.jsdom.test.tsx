@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 import grid from '../grid';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
@@ -337,11 +337,36 @@ describe( 'GridLayoutInspectorControls', () => {
 			window.__experimentalEnableGridInteractivity = originalExperiment;
 		} );
 
-		it( 'turns stacking on mobile off for manual placement grids', async () => {
+		it( 'turns stacking on mobile on for manual placement grids', async () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
 			renderInspectorControls( {
 				layout: { type: 'grid', isManualPlacement: true },
+				onChange,
+			} );
+
+			const toggle = screen.getByRole( 'checkbox', {
+				name: 'Stack on mobile',
+			} );
+			expect( toggle ).not.toBeChecked();
+
+			await user.click( toggle );
+			expect( onChange ).toHaveBeenCalledWith( {
+				type: 'grid',
+				isManualPlacement: true,
+				stackOnMobile: true,
+			} );
+		} );
+
+		it( 'stores nothing when stacking on mobile is turned back off', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderInspectorControls( {
+				layout: {
+					type: 'grid',
+					isManualPlacement: true,
+					stackOnMobile: true,
+				},
 				onChange,
 			} );
 
@@ -354,29 +379,56 @@ describe( 'GridLayoutInspectorControls', () => {
 			expect( onChange ).toHaveBeenCalledWith( {
 				type: 'grid',
 				isManualPlacement: true,
-				stackOnMobile: false,
 			} );
 		} );
 
-		it( 'stores nothing when stacking on mobile is turned back on', async () => {
+		it( 'shows and removes the stacking set by the mobile layout', async () => {
 			const user = userEvent.setup();
 			const onChange = vi.fn();
-			renderInspectorControls( {
-				layout: {
-					type: 'grid',
-					isManualPlacement: true,
-					stackOnMobile: false,
-				},
-				onChange,
-			} );
-
-			await user.click(
-				screen.getByRole( 'checkbox', { name: 'Stack on mobile' } )
-			);
-			expect( onChange ).toHaveBeenCalledWith( {
+			const layout = {
 				type: 'grid',
 				isManualPlacement: true,
+				stackOnMobile: true,
+			};
+			act( () => {
+				dispatch( blockEditorStore ).resetBlocks( [
+					{
+						clientId: PANEL_ID,
+						name: 'core/group',
+						isValid: true,
+						attributes: {
+							layout,
+							style: {
+								'@mobile': {
+									layout: {
+										stackOnMobile: false,
+										columnCount: 3,
+									},
+								},
+							},
+						},
+						innerBlocks: [],
+					},
+				] );
 			} );
+			renderInspectorControls( { layout, onChange } );
+
+			const toggle = screen.getByRole( 'checkbox', {
+				name: 'Stack on mobile',
+			} );
+			// The grid was unstacked on mobile, by editing it there.
+			expect( toggle ).not.toBeChecked();
+
+			await user.click( toggle );
+			expect( onChange ).not.toHaveBeenCalled();
+			const attributes = unlock(
+				select( blockEditorStore )
+			).getBlockAttributes( PANEL_ID );
+			expect( attributes.layout ).toEqual( layout );
+			expect( attributes.style ).toEqual( {
+				'@mobile': { layout: { columnCount: 3 } },
+			} );
+			expect( toggle ).toBeChecked();
 		} );
 
 		it( 'offers stacking on mobile in the mobile state but not in the tablet state', async () => {
@@ -457,7 +509,11 @@ describe( 'getMobileStackingStyle', () => {
 		expect(
 			grid.getMobileStackingStyle( {
 				selector: '.my-container',
-				layout: { isManualPlacement: true, columnCount: 3 },
+				layout: {
+					isManualPlacement: true,
+					columnCount: 3,
+					stackOnMobile: true,
+				},
 			} )
 		).toBe(
 			'.my-container.my-container { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
@@ -469,12 +525,18 @@ describe( 'getMobileStackingStyle', () => {
 		expect(
 			grid.getMobileStackingStyle( {
 				selector: '.a,.b',
-				layout: { isManualPlacement: true },
+				layout: { isManualPlacement: true, stackOnMobile: true },
 			} )
 		).toContain( '.a.a > *,.b.b > * {' );
 	} );
 
-	it( 'does not stack grids that opt out, or auto placement grids', () => {
+	it( 'does not stack grids that have not opted in, or auto placement grids', () => {
+		expect(
+			grid.getMobileStackingStyle( {
+				selector: '.my-container',
+				layout: { isManualPlacement: true },
+			} )
+		).toBe( '' );
 		expect(
 			grid.getMobileStackingStyle( {
 				selector: '.my-container',
@@ -494,7 +556,7 @@ describe( 'getMobileStackingStyle', () => {
 		expect(
 			grid.getMobileStackingStyle( {
 				selector: '.my-container',
-				layout: { isManualPlacement: true },
+				layout: { isManualPlacement: true, stackOnMobile: true },
 			} )
 		).toBe( '' );
 	} );

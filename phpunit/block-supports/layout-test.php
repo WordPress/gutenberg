@@ -1777,7 +1777,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 	/**
 	 * Check that manual placement grids stack their children on mobile when the grid
-	 * interactivity experiment is on, unless they opt out.
+	 * interactivity experiment is on and they opt in.
 	 *
 	 * @dataProvider data_layout_support_flag_stacks_manual_grids_on_mobile
 	 *
@@ -1831,31 +1831,46 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 	 */
 	public function data_layout_support_flag_stacks_manual_grids_on_mobile() {
 		return array(
-			'manual placement grid stacks by default'     => array(
+			'manual placement grid does not stack by default' => array(
 				'experiment_enabled' => true,
 				'layout'             => array(
 					'type'              => 'grid',
 					'isManualPlacement' => true,
 					'columnCount'       => 3,
 				),
-				'should_stack'       => true,
+				'should_stack'       => false,
 			),
-			'manual placement grid can opt out'           => array(
+			'manual placement grid can opt in'            => array(
 				'experiment_enabled' => true,
 				'layout'             => array(
 					'type'              => 'grid',
 					'isManualPlacement' => true,
 					'columnCount'       => 4,
-					'stackOnMobile'     => false,
+					'stackOnMobile'     => true,
 				),
-				'should_stack'       => false,
+				'should_stack'       => true,
+			),
+			'manual placement grid can opt in on mobile'  => array(
+				'experiment_enabled' => true,
+				'layout'             => array(
+					'type'              => 'grid',
+					'isManualPlacement' => true,
+					'columnCount'       => 6,
+				),
+				'should_stack'       => true,
+				'style'              => array(
+					'@mobile' => array(
+						'layout' => array( 'stackOnMobile' => true ),
+					),
+				),
 			),
 			'manual placement grid can opt out on mobile' => array(
 				'experiment_enabled' => true,
 				'layout'             => array(
 					'type'              => 'grid',
 					'isManualPlacement' => true,
-					'columnCount'       => 6,
+					'columnCount'       => 9,
+					'stackOnMobile'     => true,
 				),
 				'should_stack'       => false,
 				'style'              => array(
@@ -1870,6 +1885,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					'type'              => 'grid',
 					'isManualPlacement' => true,
 					'columnCount'       => 8,
+					'stackOnMobile'     => true,
 				),
 				'should_stack'       => false,
 				'style'              => array(
@@ -1892,6 +1908,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 					'type'              => 'grid',
 					'isManualPlacement' => true,
 					'columnCount'       => 7,
+					'stackOnMobile'     => true,
 				),
 				'should_stack'       => false,
 			),

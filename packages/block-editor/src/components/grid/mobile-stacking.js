@@ -5,7 +5,7 @@ const MOBILE_VIEWPORT = '@mobile';
 /**
  * Returns whether a grid stacks its children on mobile. Grids that use manual
  * placement on mobile stack, as part of the grid interactivity experiment,
- * unless `stackOnMobile` is false. Both can be set for the default state or in
+ * when `stackOnMobile` is true. Both can be set for the default state or in
  * the grid's mobile layout.
  *
  * @param {Object|undefined} layout The grid's layout attribute.
@@ -19,8 +19,7 @@ export function isGridStackedOnMobile( layout, style ) {
 	}
 	const mobileLayout = { ...layout, ...style?.[ MOBILE_VIEWPORT ]?.layout };
 	return (
-		!! mobileLayout.isManualPlacement &&
-		mobileLayout.stackOnMobile !== false
+		!! mobileLayout.isManualPlacement && mobileLayout.stackOnMobile === true
 	);
 }
 

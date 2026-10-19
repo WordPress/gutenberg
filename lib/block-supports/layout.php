@@ -1449,7 +1449,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		/*
 		 * Manual placement grids stack their children on mobile, as part of the grid
-		 * interactivity experiment, unless they opt out with `stackOnMobile: false`: each
+		 * interactivity experiment, when they opt in with `stackOnMobile: true`: each
 		 * child becomes full width, in block order, and keeps the row span it publishes as
 		 * `--wp--grid-item--row-span`. The selector is repeated so that the rules beat the
 		 * grid's and each child's own rules, whatever order the stylesheets end up in.
@@ -1464,7 +1464,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 			$mobile_media_query &&
 			'grid' === ( $used_layout['type'] ?? null ) &&
 			! empty( $mobile_layout['isManualPlacement'] ) &&
-			false !== ( $mobile_layout['stackOnMobile'] ?? true ) &&
+			true === ( $mobile_layout['stackOnMobile'] ?? false ) &&
 			gutenberg_is_experiment_enabled( 'gutenberg-grid-interactivity' )
 		) {
 			// Stacked blocks are sized by their content again, so their cells are no longer fixed.

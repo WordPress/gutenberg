@@ -234,6 +234,7 @@ describe( 'layout', () => {
 				type: 'grid',
 				isManualPlacement: true,
 				columnCount: 3,
+				stackOnMobile: true,
 			};
 			const stackingCSS =
 				'.wp-container-test.wp-container-test { aspect-ratio: auto; grid-template-rows: none; grid-auto-rows: auto; --wp--style--grid-cells: auto; }' +
@@ -278,6 +279,19 @@ describe( 'layout', () => {
 				).toBe(
 					`@media (width <= 480px){.wp-container-test { grid-template-columns: repeat(2, minmax(0, 1fr)); }${ stackingCSS }}`
 				);
+			} );
+
+			it( 'does not stack a manual placement grid by default', () => {
+				const { stackOnMobile, ...unstackedLayout } = manualGridLayout;
+				expect(
+					getResponsiveLayoutStyles( {
+						attributes: {},
+						blockName: 'core/group',
+						selector: '.wp-container-test',
+						layout: unstackedLayout,
+						hasBlockGapSupport: true,
+					} )
+				).toBe( '' );
 			} );
 
 			it( 'does not stack a manual placement grid when stacking is turned off', () => {

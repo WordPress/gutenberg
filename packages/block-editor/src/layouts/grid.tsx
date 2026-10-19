@@ -13,11 +13,12 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue, getGapBoxControlValueFromStyle } from '../hooks/gap';
 import { getSpacingPresetCssVar } from '../components/spacing-sizes-control/utils';
 import { cleanEmptyObject, shouldSkipSerialization } from '../hooks/utils';
+import { setImmutably } from '../utils/object';
 import {
 	hasPseudoBlockStyleState,
 	hasViewportBlockStyleState,
@@ -31,6 +32,13 @@ import type {
 	LayoutInspectorControlsProps,
 	LayoutStyleArgs,
 } from './types';
+
+/**
+ * The part of a grid's style attribute that the stacking toggle reads.
+ */
+type GridStyle = {
+	'@mobile'?: { layout?: { stackOnMobile?: boolean } };
+};
 
 const RANGE_CONTROL_MAX_VALUES: Record< string, number > = {
 	px: 600,
@@ -86,24 +94,48 @@ export default {
 		// Stacking only applies on mobile, so it is set for every viewport or
 		// for mobile only. The layout panel edits a viewport's layout in a
 		// viewport state without a pseudo state, so the toggle is hidden in
-		// such states for other viewports.
-		const isOtherViewportLayoutState = useSelect(
+		// such states for other viewports. Outside the viewport states, the
+		// toggle shows whether the grid stacks on mobile, which its mobile
+		// layout can override.
+		const {
+			isOtherViewportLayoutState,
+			isMobileLayoutState,
+			mobileStackOverride,
+			style,
+		} = useSelect(
 			( select ) => {
 				if ( ! clientId ) {
-					return false;
+					return {
+						isOtherViewportLayoutState: false,
+						isMobileLayoutState: false,
+					};
 				}
-				const selectedState =
-					select( blockEditorStore ).getSelectedBlockStyleState(
-						clientId
-					);
-				return (
-					hasViewportBlockStyleState( selectedState ) &&
-					! hasPseudoBlockStyleState( selectedState ) &&
-					selectedState.viewport !== '@mobile'
-				);
+				const { getSelectedBlockStyleState, getBlockAttributes } =
+					select( blockEditorStore );
+				const selectedState = getSelectedBlockStyleState( clientId );
+				const isViewportState =
+					hasViewportBlockStyleState( selectedState );
+				const isViewportLayoutState =
+					isViewportState &&
+					! hasPseudoBlockStyleState( selectedState );
+				const blockStyle: GridStyle | undefined =
+					getBlockAttributes( clientId )?.style;
+				return {
+					isOtherViewportLayoutState:
+						isViewportLayoutState &&
+						selectedState.viewport !== '@mobile',
+					isMobileLayoutState:
+						isViewportLayoutState &&
+						selectedState.viewport === '@mobile',
+					mobileStackOverride: isViewportState
+						? undefined
+						: blockStyle?.[ '@mobile' ]?.layout?.stackOnMobile,
+					style: blockStyle,
+				};
 			},
 			[ clientId ]
 		);
+		const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 		// Always show both column and minimum width controls in Auto mode.
 		// Manual mode (with isManualPlacement) is only available behind the experiment flag.
@@ -131,7 +163,34 @@ export default {
 			window.__experimentalEnableGridInteractivity &&
 			! isOtherViewportLayoutState;
 		const hasStackOnMobileValue = () =>
-			hasLayoutValue( 'stackOnMobile', true );
+			hasLayoutValue( 'stackOnMobile', false );
+		const isStackedOnMobile =
+			( mobileStackOverride ?? layout?.stackOnMobile ) === true;
+		const onChangeStackOnMobile = ( value: boolean ) => {
+			const nextLayout = cleanEmptyObject( {
+				...layout,
+				// Stacking is off by default, so outside the viewport states
+				// only turning it on is stored. In the mobile state, turning
+				// it off is stored too, as it overrides the default state.
+				stackOnMobile: isMobileLayoutState ? value : value || undefined,
+			} );
+			if ( mobileStackOverride === undefined || ! clientId ) {
+				onChange( nextLayout );
+				return;
+			}
+			// The mobile layout's own setting would keep overriding the
+			// toggle, so it is removed in the same change.
+			updateBlockAttributes( clientId, {
+				layout: nextLayout,
+				style: cleanEmptyObject(
+					setImmutably(
+						style,
+						[ '@mobile', 'layout', 'stackOnMobile' ],
+						undefined
+					)
+				),
+			} );
+		};
 		const resetGridType = () =>
 			onChange(
 				cleanEmptyObject( {
@@ -242,19 +301,8 @@ export default {
 							help={ __(
 								'On small screens, show each block full width, one after another.'
 							) }
-							checked={ layout?.stackOnMobile !== false }
-							onChange={ ( value ) =>
-								onChange(
-									cleanEmptyObject( {
-										...layout,
-										// Stacking is on by default, so only
-										// turning it off is stored.
-										stackOnMobile: value
-											? undefined
-											: false,
-									} )
-								)
-							}
+							checked={ isStackedOnMobile }
+							onChange={ onChangeStackOnMobile }
 						/>
 					</ToolsPanelItem>
 				) }
@@ -479,8 +527,8 @@ export default {
 	},
 	/**
 	 * Gets the CSS that stacks the children of a manual placement grid on
-	 * mobile, as part of the grid interactivity experiment, unless the grid
-	 * has opted out with `stackOnMobile: false`. Each child becomes full
+	 * mobile, as part of the grid interactivity experiment, when the grid
+	 * has opted in with `stackOnMobile: true`. Each child becomes full
 	 * width, in block order, and keeps its row span, which it publishes as
 	 * `--wp--grid-item--row-span`.
 	 *
@@ -499,7 +547,7 @@ export default {
 	} ): string {
 		if (
 			! layout.isManualPlacement ||
-			layout.stackOnMobile === false ||
+			layout.stackOnMobile !== true ||
 			! window.__experimentalEnableGridInteractivity
 		) {
 			return '';
