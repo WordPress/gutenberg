@@ -5,29 +5,12 @@ import firstTimeContributorAccountLink from './tasks/first-time-contributor-acco
 import firstTimeContributorLabel from './tasks/first-time-contributor-label/index.js';
 import addMilestone from './tasks/add-milestone/index.js';
 import debug from './debug.js';
-
-/**
- * Type definitions
- */
-type GitHub = ReturnType< typeof getOctokit >;
-
-/**
- * Automation task function.
- *
- * @typedef {( payload: any, octokit: ReturnType<typeof getOctokit> ) => void} WPAutomationTask
- */
-type WPAutomationTask = ( payload: any, octokit: GitHub ) => Promise< void >;
+import type { WPAutomation } from './types.js';
 
 /**
  * Full list of automations, matched by given properties against the incoming
  * payload object.
  */
-interface WPAutomation {
-	event: string;
-	action?: string;
-	task: WPAutomationTask;
-}
-
 const automations: WPAutomation[] = [
 	{
 		event: 'pull_request_target',

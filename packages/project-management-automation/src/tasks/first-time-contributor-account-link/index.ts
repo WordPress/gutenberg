@@ -1,15 +1,8 @@
 import { setOutput } from '@actions/core';
-import type { getOctokit } from '@actions/github';
-import type { components } from '@octokit/openapi-webhooks-types';
 import debug from '../../debug.js';
 import getAssociatedPullRequest from '../../get-associated-pull-request.js';
 import hasWordPressProfile from '../../has-wordpress-profile.js';
-
-/**
- * Type definitions
- */
-type GitHub = ReturnType< typeof getOctokit >;
-type WebhookPayloadPush = components[ 'schemas' ][ 'webhook-push' ];
+import type { GitHub, WebhookPayloadPush } from '../../types.js';
 
 /**
  * Returns the message text to be used for the comment prompting contributor to

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import getAssociatedPullRequest from '../get-associated-pull-request.js';
-import type { WebhookPayloadPushCommit } from '../get-associated-pull-request.js';
+import type { WebhookPayloadPushCommit } from '../types.js';
 
 /**
  * An example commit which can be associated with a pull request, e.g. a pull

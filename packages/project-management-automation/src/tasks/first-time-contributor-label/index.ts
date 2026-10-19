@@ -1,14 +1,6 @@
 import { setOutput } from '@actions/core';
-import type { getOctokit } from '@actions/github';
-import type { components } from '@octokit/openapi-webhooks-types';
 import debug from '../../debug.js';
-
-/**
- * Type definitions
- */
-type GitHub = ReturnType< typeof getOctokit >;
-type WebhookPayloadPullRequest =
-	components[ 'schemas' ][ 'webhook-pull-request-opened' ];
+import type { GitHub, WebhookPayloadPullRequest } from '../../types.js';
 
 /**
  * Assigns the first-time contributor label to PRs.

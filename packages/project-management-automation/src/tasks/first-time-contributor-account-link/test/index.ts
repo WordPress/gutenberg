@@ -2,9 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
 import hasWordPressProfile from '../../../has-wordpress-profile.js';
 import firstTimeContributorAccountLinkTask from '../index.js';
-
-type Payload = Parameters< typeof firstTimeContributorAccountLinkTask >[ 0 ];
-type GitHub = Parameters< typeof firstTimeContributorAccountLinkTask >[ 1 ];
+import type { GitHub, WebhookPayloadPush } from '../../../types.js';
 
 /**
  * Runs the task with partial fixtures, which provide only what it reads.
@@ -17,7 +15,7 @@ const firstTimeContributorAccountLink = (
 	octokit: unknown
 ) =>
 	firstTimeContributorAccountLinkTask(
-		payload as Payload,
+		payload as WebhookPayloadPush,
 		octokit as GitHub
 	);
 

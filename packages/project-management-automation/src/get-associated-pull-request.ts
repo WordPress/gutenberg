@@ -1,10 +1,4 @@
-import type { components } from '@octokit/openapi-webhooks-types';
-
-/**
- * Type definitions
- */
-export type WebhookPayloadPushCommit =
-	components[ 'schemas' ][ 'webhook-push' ][ 'commits' ][ number ];
+import type { WebhookPayloadPushCommit } from './types.js';
 
 /**
  * Given a commit object, returns a promise resolving with the pull request

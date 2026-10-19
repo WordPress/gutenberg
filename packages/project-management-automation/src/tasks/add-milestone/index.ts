@@ -1,16 +1,6 @@
-import type { getOctokit } from '@actions/github';
-import type { components } from '@octokit/openapi-webhooks-types';
 import debug from '../../debug.js';
 import getAssociatedPullRequest from '../../get-associated-pull-request.js';
-
-/**
- * Type definitions
- */
-type GitHub = ReturnType< typeof getOctokit >;
-type WebhookPayloadPush = components[ 'schemas' ][ 'webhook-push' ];
-type Milestone = Awaited<
-	ReturnType< GitHub[ 'rest' ][ 'issues' ][ 'listMilestones' ] >
->[ 'data' ][ 0 ];
+import type { GitHub, Milestone, WebhookPayloadPush } from '../../types.js';
 
 /**
  * Number of expected days elapsed between releases.

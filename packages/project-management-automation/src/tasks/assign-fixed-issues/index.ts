@@ -1,13 +1,5 @@
-import type { getOctokit } from '@actions/github';
-import type { components } from '@octokit/openapi-webhooks-types';
 import debug from '../../debug.js';
-
-/**
- * Type definitions
- */
-type GitHub = ReturnType< typeof getOctokit >;
-type WebhookPayloadPullRequest =
-	components[ 'schemas' ][ 'webhook-pull-request-opened' ];
+import type { GitHub, WebhookPayloadPullRequest } from '../../types.js';
 
 /**
  * Assigns any issues 'fixed' by a newly opened PR to the author of that PR.

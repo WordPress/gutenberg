@@ -1,9 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
 import firstTimeContributorLabelTask from '../index.js';
-
-type Payload = Parameters< typeof firstTimeContributorLabelTask >[ 0 ];
-type GitHub = Parameters< typeof firstTimeContributorLabelTask >[ 1 ];
+import type { GitHub, WebhookPayloadPullRequest } from '../../../types.js';
 
 /**
  * Runs the task with partial fixtures, which provide only what it reads.
@@ -12,7 +10,10 @@ type GitHub = Parameters< typeof firstTimeContributorLabelTask >[ 1 ];
  * @param octokit Partial Octokit REST client.
  */
 const firstTimeContributorLabel = ( payload: unknown, octokit: unknown ) =>
-	firstTimeContributorLabelTask( payload as Payload, octokit as GitHub );
+	firstTimeContributorLabelTask(
+		payload as WebhookPayloadPullRequest,
+		octokit as GitHub
+	);
 
 vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
