@@ -16,9 +16,7 @@ const config = defineConfig( {
 		...baseConfig.webServer,
 		command: 'npm run wp-env-test -- start',
 	},
-	reporter: process.env.CI
-		? [ [ 'github' ] ]
-		: 'list',
+	reporter: process.env.CI ? [ [ 'github' ] ] : 'list',
 	workers: 1,
 	globalSetup: fileURLToPath(
 		new URL( './config/global-setup.ts', 'file:' + __filename ).href
