@@ -424,6 +424,8 @@ export type Settings = Record< string | symbol, unknown > & {
 	onNavigateToEntityRecord?: ( params: {
 		postId: number | string;
 		postType: string;
+		/** The canvas viewport to open the entity in, such as `mobile`. */
+		viewport?: string;
 		[ key: string ]: unknown;
 	} ) => void;
 	__experimentalUndo?: () => void;
