@@ -126,8 +126,8 @@ function injectStyle( targetDocument: Document, hash: string, css: string ) {
  *
  * Style tags that were injected before the nonce was known, for example into
  * the root document when a CSS module was imported, are replaced with copies
- * that carry the nonce. Changing the nonce attribute of an existing style tag
- * is not enough, because the browser only checks it when the tag is inserted.
+ * that carry the nonce. Changing only the nonce attribute of an existing style
+ * tag does not retry a stylesheet that the Content Security Policy blocked.
  *
  * @param targetDocument Document the nonce applies to.
  * @param nonce          Nonce to add to the style tags.
