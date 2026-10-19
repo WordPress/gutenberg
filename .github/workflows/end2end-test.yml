@@ -1,0 +1,69 @@
+name: End-to-End Tests
+
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    admin:
+        name: Admin - ${{ matrix.part }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                part: [1, 2, 3, 4]
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install npm dependencies
+              run: npm ci
+
+            - name: Build
+              env:
+                  FORCE_REDUCED_MOTION: true
+              run: npm run build
+
+            - name: Install WordPress
+              uses: ./.github/setup-wordpress
+
+            - name: List the tests
+              run: ./node_modules/.bin/wp-scripts test-e2e --config=packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
+
+            # The list of test files is split into 4 evenly sized groups, and each job runs one of them.
+            - name: Running the tests
+              env:
+                  PART: ${{ matrix.part }}
+              run: |
+                  mapfile -t tests < <( awk -v part="$PART" 'NR % 4 == part - 1' < ~/.jest-e2e-tests )
+                  ./node_modules/.bin/wp-scripts test-e2e --config=packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath "${tests[@]}"
