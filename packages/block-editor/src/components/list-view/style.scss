@@ -613,9 +613,11 @@ svg {
 	padding: 0;
 
 	// TODO: Consider passing size="small" to the Inserter toggle instead.
-	// Special dimensions for this button.
+	// Special dimensions for this button. The default button min-height is
+	// taller than this control, so match it here to keep the appender square.
 	&.has-icon.is-next-40px-default-size {
 		min-width: $button-size-small;
+		min-height: $button-size-small;
 	}
 
 	&:hover,
