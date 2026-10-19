@@ -582,6 +582,91 @@ describe( 'Post actions', () => {
 				expect( notice.__unstableHTML ).toBeUndefined();
 			} );
 		} );
+
+		// Something other than WordPress answered, so the status explains the
+		// failure instead of the client's own "not a valid JSON response".
+		it.each( [
+			[
+				429,
+				false,
+				'Your site is receiving too many requests. Wait a moment, then try again. (Error 429)',
+			],
+			[
+				502,
+				false,
+				'Your site didn’t respond in time. Wait a moment, then try again. (Error 502)',
+			],
+			[
+				200,
+				true,
+				'Your site sent the request to another page, usually the login page. Log in again in a new tab, then try again.',
+			],
+			[
+				200,
+				false,
+				'Your site’s response was cut off or had unexpected text in it.',
+			],
+			[
+				403,
+				false,
+				'Your site sent back a response the editor couldn’t read. (Error 403)',
+			],
+			[
+				undefined,
+				undefined,
+				'Your site sent back a response the editor couldn’t read.',
+			],
+		] )(
+			'explains an invalid JSON response with status %s',
+			async ( status, redirected, expectedDetails ) => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'bar',
+					content: 'bar',
+					excerpt: 'crackers',
+					status: 'publish',
+				};
+
+				apiFetch.setFetchHandler( async ( options ) => {
+					const method = getMethod( options );
+					const { path } = options;
+
+					if (
+						method === 'PUT' &&
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						throw {
+							code: 'invalid_json',
+							message:
+								'The response is not a valid JSON response.',
+							status,
+							redirected,
+						};
+					}
+
+					throw {
+						code: 'unknown_path',
+						message: `Unknown path: ${ method } ${ path }`,
+					};
+				} );
+
+				const registry = createRegistryWithStores();
+
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', 'post', post );
+
+				registry.dispatch( editorStore ).setupEditor( post, {
+					content: 'new bar',
+				} );
+
+				await registry.dispatch( editorStore ).savePost();
+
+				const [ notice ] = registry.select( noticesStore ).getNotices();
+				expect( notice.details ).toBe( expectedDetails );
+			}
+		);
 	} );
 
 	describe( 'savePost() attaching media', () => {

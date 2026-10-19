@@ -120,29 +120,34 @@ test.describe( 'Autosave failure notice', () => {
 			'database-write',
 			withDetails( 'Could not update post in the database.' ),
 		],
-		// TODO: Show the status code (502) instead.
 		[
 			'HTML error page',
 			'bad-gateway',
-			withDetails( 'The response is not a valid JSON response.' ),
+			withDetails(
+				'Your site didn’t respond in time. Wait a moment, then try again. (Error 502)'
+			),
 		],
-		// TODO: Show the status code (429) instead.
 		[
 			'too many requests',
 			'too-many-requests',
-			withDetails( 'The response is not a valid JSON response.' ),
+			withDetails(
+				'Your site is receiving too many requests. Wait a moment, then try again. (Error 429)'
+			),
 		],
 		// TODO: Show the PHP error the response includes in `data.error`.
 		[
 			'PHP fatal error printed before the JSON',
 			'fatal-error-displayed',
-			withDetails( 'The response is not a valid JSON response.' ),
+			withDetails(
+				'Your site’s response was cut off or had unexpected text in it.'
+			),
 		],
-		// TODO: Say the session may have expired.
 		[
 			'redirected to the login page',
 			'redirect-to-login',
-			withDetails( 'The response is not a valid JSON response.' ),
+			withDetails(
+				'Your site sent the request to another page, usually the login page. Log in again in a new tab, then try again.'
+			),
 		],
 		// TODO: Say the server could not be reached.
 		[
@@ -222,7 +227,9 @@ test.describe( 'Autosave failure notice', () => {
 		const title = await autosaveFailure.autosave();
 		// TODO: Don't report a failure; the autosave was stored.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'The response is not a valid JSON response.' ),
+			withDetails(
+				'Your site’s response was cut off or had unexpected text in it.'
+			),
 		] );
 
 		const postId = await page.evaluate( () =>
