@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `manifest.json`: Add 18 popular admin menu icons to the `core-admin` collection ([#85072](https://github.com/WordPress/gutenberg/pull/85072)).
+
 ## 18.0.0 (2026-10-07)
 
 ### Breaking Changes
