@@ -904,6 +904,17 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 		let drag = null;
 		let shouldIgnoreClick = false;
 		let ignoreClickTimeout;
+		// A touch opens a cell's inserter in two taps: the first one shows
+		// the cell, and a second tap on the same cell opens its inserter.
+		let isTouchPress = false;
+		let tappedCell = null;
+
+		function clearTappedCell() {
+			if ( tappedCell ) {
+				delete tappedCell.dataset.isTapped;
+				tappedCell = null;
+			}
+		}
 
 		function getCell( event ) {
 			const { columnTracks, rowTracks } =
@@ -923,8 +934,12 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 
 		function onPointerDown( event ) {
 			shouldIgnoreClick = false;
+			isTouchPress = event.pointerType === 'touch';
+			if ( tappedCell && ! tappedCell.contains( event.target ) ) {
+				clearTappedCell();
+			}
 			// Drawing is for a mouse or a pen. A touch on a cell scrolls the
-			// page, or opens the inserter for that cell when it is a tap.
+			// page, or shows the cell when it is a tap (see `onClick`).
 			if (
 				event.pointerType === 'touch' ||
 				event.button !== 0 ||
@@ -1025,6 +1040,8 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 		}
 
 		function onKeyDown( event ) {
+			// A key that opens the inserter isn't a tap.
+			isTouchPress = false;
 			if ( drag && ! drag.isCancelled && event.key === 'Escape' ) {
 				event.preventDefault();
 				event.stopPropagation();
@@ -1045,7 +1062,31 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 				shouldIgnoreClick = false;
 				event.preventDefault();
 				event.stopPropagation();
+				return;
 			}
+			const appender = event.target.closest?.(
+				'.block-editor-grid-visualizer__cell .block-editor-grid-visualizer__appender'
+			);
+			// A tap on an open inserter's toggle closes it.
+			if (
+				! isTouchPress ||
+				! appender ||
+				appender.getAttribute( 'aria-expanded' ) === 'true'
+			) {
+				return;
+			}
+			const cell = appender.closest(
+				'.block-editor-grid-visualizer__cell'
+			);
+			if ( cell === tappedCell ) {
+				clearTappedCell();
+				return;
+			}
+			clearTappedCell();
+			tappedCell = cell;
+			tappedCell.dataset.isTapped = 'true';
+			event.preventDefault();
+			event.stopPropagation();
 		}
 
 		container.addEventListener( 'pointerdown', onPointerDown );
@@ -1074,6 +1115,7 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 				keyDocument.removeEventListener( 'keydown', onKeyDown, true );
 			}
 			ownerWindow.clearTimeout( ignoreClickTimeout );
+			clearTappedCell();
 		};
 	}, [ gridElement ] );
 

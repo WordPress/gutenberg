@@ -35,6 +35,6 @@
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../ui/tsconfig.build.json" },
-		{ "path": "../warning" }
+		{ "path": "../warning/tsconfig.build.json" }
 	]
 }

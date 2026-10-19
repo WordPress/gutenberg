@@ -13736,11 +13736,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/color-preview.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/dimensions-panel.tsx": {
 		"no-restricted-imports": {
 			"count": 1
@@ -14636,11 +14631,6 @@
 	},
 	"packages/views/src/use-view-config.ts": {
 		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/warning/src/test/index.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
