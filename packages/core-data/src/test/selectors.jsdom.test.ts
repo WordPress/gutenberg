@@ -26,8 +26,9 @@ import type { EntitySyncManager } from '../entity-sync';
 import type { State } from '../selectors';
 
 /**
- * Types a state fixture. The fixtures key queried data by the `default`
- * context and hold whole entity configs, which `State` does not describe.
+ * Types a state fixture that holds only the fields the selector under test
+ * reads. Queried data fixtures key items by the `default` context and hold
+ * whole entity configs, which `State` does not describe.
  *
  * @param value The state fixture.
  */
