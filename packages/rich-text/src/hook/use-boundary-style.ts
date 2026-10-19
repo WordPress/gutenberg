@@ -14,7 +14,8 @@ export function useBoundaryStyle( {
 } ) {
 	const ref = useRef< HTMLElement >( undefined );
 	const { activeFormats = [], replacements, start } = record.current;
-	const activeReplacement = replacements[ start ];
+	const activeReplacement =
+		start === undefined ? undefined : replacements[ start ];
 	useEffect( () => {
 		// There's no need to recalculate the boundary styles if no formats are
 		// active, because no boundary styles will be visible.

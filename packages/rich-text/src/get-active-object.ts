@@ -14,7 +14,11 @@ export function getActiveObject( {
 	replacements,
 	text,
 }: RichTextValue ) {
-	if ( start + 1 !== end || text[ start ] !== OBJECT_REPLACEMENT_CHARACTER ) {
+	if (
+		start === undefined ||
+		start + 1 !== end ||
+		text[ start ] !== OBJECT_REPLACEMENT_CHARACTER
+	) {
 		return;
 	}
 

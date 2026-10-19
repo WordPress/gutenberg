@@ -11,6 +11,10 @@
 -   Language format: Migrate text direction selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 -   Highlight format: Save palette background colors as a `has-{slug}-background-color` class instead of an inline style, so they follow style variations. Custom colors and existing highlights are unchanged ([#49332](https://github.com/WordPress/gutenberg/issues/49332)).
 
+### Internal
+
+-   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#85032](https://github.com/WordPress/gutenberg/pull/85032)).
+
 ## 5.57.0 (2026-10-07)
 
 ## 5.56.0 (2026-09-23)

@@ -23,8 +23,13 @@ export const Appender = forwardRef(
 
 				const settings = getBlockListSettings( clientId );
 				const directInsertValue = settings?.directInsert || false;
+				const templateLock = getTemplateLock( clientId );
+				// `contentOnly` doesn't block insertion outright; `canInsertBlockType`
+				// decides per container, and the Inserter renders nothing when no
+				// block is insertable. Should be kept in sync with `canInsertBlockType`.
 				const hideInserterValue =
-					!! getTemplateLock( clientId ) || isZoomOut();
+					( !! templateLock && templateLock !== 'contentOnly' ) ||
+					isZoomOut();
 
 				return {
 					directInsert: directInsertValue,

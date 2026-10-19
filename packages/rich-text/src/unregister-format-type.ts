@@ -1,5 +1,6 @@
 import { select, dispatch } from '@wordpress/data';
 import { store as richTextStore } from './store';
+import type { FormatType } from './types';
 
 /**
  * Unregisters a format.
@@ -10,7 +11,7 @@ import { store as richTextStore } from './store';
  *                                        been successfully unregistered;
  *                                        otherwise `undefined`.
  */
-export function unregisterFormatType( name: string ) {
+export function unregisterFormatType( name: string ): FormatType | undefined {
 	const oldFormat = select( richTextStore ).getFormatType( name );
 
 	if ( ! oldFormat ) {

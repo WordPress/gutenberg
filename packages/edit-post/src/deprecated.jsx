@@ -27,7 +27,7 @@ const deprecateSlot = ( name ) => {
 
 /* eslint-disable jsdoc/require-param */
 /**
- * @see PluginBlockSettingsMenuItem in @wordpress/editor package.
+ * @see PluginBlockSettingsMenuItem in `@wordpress/editor` package.
  */
 export function PluginBlockSettingsMenuItem( props ) {
 	if ( isSiteEditor ) {
@@ -38,7 +38,7 @@ export function PluginBlockSettingsMenuItem( props ) {
 }
 
 /**
- * @see PluginDocumentSettingPanel in @wordpress/editor package.
+ * @see PluginDocumentSettingPanel in `@wordpress/editor` package.
  */
 export function PluginDocumentSettingPanel( props ) {
 	if ( isSiteEditor ) {
@@ -49,7 +49,7 @@ export function PluginDocumentSettingPanel( props ) {
 }
 
 /**
- * @see PluginMoreMenuItem in @wordpress/editor package.
+ * @see PluginMoreMenuItem in `@wordpress/editor` package.
  */
 export function PluginMoreMenuItem( props ) {
 	if ( isSiteEditor ) {
@@ -60,7 +60,7 @@ export function PluginMoreMenuItem( props ) {
 }
 
 /**
- * @see PluginPrePublishPanel in @wordpress/editor package.
+ * @see PluginPrePublishPanel in `@wordpress/editor` package.
  */
 export function PluginPrePublishPanel( props ) {
 	if ( isSiteEditor ) {
@@ -71,7 +71,7 @@ export function PluginPrePublishPanel( props ) {
 }
 
 /**
- * @see PluginPostPublishPanel in @wordpress/editor package.
+ * @see PluginPostPublishPanel in `@wordpress/editor` package.
  */
 export function PluginPostPublishPanel( props ) {
 	if ( isSiteEditor ) {
@@ -82,7 +82,7 @@ export function PluginPostPublishPanel( props ) {
 }
 
 /**
- * @see PluginPostStatusInfo in @wordpress/editor package.
+ * @see PluginPostStatusInfo in `@wordpress/editor` package.
  */
 export function PluginPostStatusInfo( props ) {
 	if ( isSiteEditor ) {
@@ -93,7 +93,7 @@ export function PluginPostStatusInfo( props ) {
 }
 
 /**
- * @see PluginSidebar in @wordpress/editor package.
+ * @see PluginSidebar in `@wordpress/editor` package.
  */
 export function PluginSidebar( props ) {
 	if ( isSiteEditor ) {
@@ -104,7 +104,7 @@ export function PluginSidebar( props ) {
 }
 
 /**
- * @see PluginSidebarMoreMenuItem in @wordpress/editor package.
+ * @see PluginSidebarMoreMenuItem in `@wordpress/editor` package.
  */
 export function PluginSidebarMoreMenuItem( props ) {
 	if ( isSiteEditor ) {
@@ -115,7 +115,7 @@ export function PluginSidebarMoreMenuItem( props ) {
 }
 
 /**
- * @see PluginPostExcerpt in @wordpress/editor package.
+ * @see PluginPostExcerpt in `@wordpress/editor` package.
  */
 export function __experimentalPluginPostExcerpt() {
 	if ( isSiteEditor ) {
