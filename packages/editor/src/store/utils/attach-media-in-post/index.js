@@ -66,24 +66,7 @@ async function attach(
 ) {
 	let mediaIds = getMediaIdsInBlocks( blocks );
 
-	// The previous content is only parsed when the post has images to
-	// compare.
-	if ( mediaIds.length && typeof previousContent === 'string' ) {
-		const previousMediaIds = new Set(
-			getMediaIdsInBlocks( parse( previousContent ) )
-		);
-		mediaIds = mediaIds.filter( ( id ) => ! previousMediaIds.has( id ) );
-	}
-
 	if ( ! mediaIds.length ) {
-		return;
-	}
-
-	if ( mediaIds.length > MAX_MEDIA_TO_ATTACH ) {
-		// eslint-disable-next-line no-console
-		console.warn(
-			`Not attaching media: the post has more than ${ MAX_MEDIA_TO_ATTACH } images.`
-		);
 		return;
 	}
 
@@ -94,6 +77,30 @@ async function attach(
 		.getPostType( postType );
 
 	if ( ! postTypeObject?.viewable ) {
+		return;
+	}
+
+	// Parsed only once we know the post can have media attached.
+	if ( typeof previousContent === 'string' ) {
+		const previousMediaIds = new Set(
+			getMediaIdsInBlocks(
+				parse( previousContent, {
+					__unstableSkipMigrationLogs: true,
+				} )
+			)
+		);
+		mediaIds = mediaIds.filter( ( id ) => ! previousMediaIds.has( id ) );
+
+		if ( ! mediaIds.length ) {
+			return;
+		}
+	}
+
+	if ( mediaIds.length > MAX_MEDIA_TO_ATTACH ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Not attaching media: the post has more than ${ MAX_MEDIA_TO_ATTACH } images.`
+		);
 		return;
 	}
 

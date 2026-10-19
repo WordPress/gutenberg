@@ -271,7 +271,8 @@ describe( 'attachMediaInPost', () => {
 		);
 
 		expect( mockParse ).toHaveBeenCalledWith(
-			'<!-- wp:image {"id":12} /-->'
+			'<!-- wp:image {"id":12} /-->',
+			{ __unstableSkipMigrationLogs: true }
 		);
 		expect( getEntityRecords ).toHaveBeenCalledWith(
 			'postType',
@@ -321,6 +322,22 @@ describe( 'attachMediaInPost', () => {
 			registry,
 			post( [], '<!-- wp:image {"id":12} /-->' )
 		);
+
+		expect( mockParse ).not.toHaveBeenCalled();
+	} );
+
+	it( 'does not parse the previous content for a post type with no front end', async () => {
+		mockParse.mockClear();
+		const { registry } = createRegistry( {
+			postType: { viewable: false },
+		} );
+
+		await attachMediaInPost( registry, {
+			id: 7,
+			type: 'wp_template',
+			blocks: [ imageBlock( 12 ) ],
+			previousContent: '<!-- wp:image {"id":12} /-->',
+		} );
 
 		expect( mockParse ).not.toHaveBeenCalled();
 	} );
