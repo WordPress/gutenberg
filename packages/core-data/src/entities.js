@@ -6,9 +6,9 @@ import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import {
 	applyPostChangesToCRDTDoc,
 	defaultCollectionSyncConfig,
-	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	taxonomySyncConfig,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -32,9 +32,10 @@ export const rootEntitiesConfig = [
 		baseURL: '/',
 		baseURLParams: {
 			// Please also change the preload path when changing this.
-			// @see lib/compat/wordpress-7.1/preload.php
+			// @see lib/compat/wordpress-7.2/preload.php
 			_fields: [
 				'description',
+				'generate_animated_image_subsizes',
 				'gmt_offset',
 				'home',
 				'image_max_bit_depth',
@@ -474,7 +475,7 @@ async function loadTaxonomyEntities() {
 		};
 
 		if ( window.__experimentalEnableRealTimeCollaboration ) {
-			entity.syncConfig = defaultSyncConfig;
+			entity.syncConfig = taxonomySyncConfig;
 		}
 
 		return entity;

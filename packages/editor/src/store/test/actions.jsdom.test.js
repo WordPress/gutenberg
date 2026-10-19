@@ -1,5 +1,4 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
@@ -273,7 +272,7 @@ describe( 'Post actions', () => {
 			] );
 		} );
 
-		it( 'adds a details action for save failures with a plain-text error message', async () => {
+		it( 'passes a plain-text server message as the notice details', async () => {
 			const post = {
 				id: postId,
 				type: 'post',
@@ -316,29 +315,212 @@ describe( 'Post actions', () => {
 			await registry.dispatch( editorStore ).savePost();
 
 			const [ notice ] = registry.select( noticesStore ).getNotices();
+			// The server's account of the failure rides along on the notice,
+			// rather than being built into its message as escaped HTML.
 			expect( notice ).toMatchObject( {
 				status: 'error',
-				__unstableHTML: true,
+				content:
+					'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
+				details: 'Details from server.',
 			} );
-			expect( notice.content ).toContain(
+			expect( notice.actions ).toEqual( [] );
+			expect( notice.__unstableHTML ).toBeUndefined();
+			// The message is a plain string again, so the notice announces
+			// itself and nothing has to be spoken by hand.
+			expect( notice.spokenMessage ).toBe(
 				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.'
 			);
-			expect( notice.content ).toContain(
-				'<details class="editor-save-error-details">'
-			);
-			expect( notice.content ).toContain(
-				'<summary>Show details</summary>'
-			);
-			expect( notice.content ).toContain( 'Details from server.' );
-			expect( notice.actions ).toEqual( [] );
-			expect( notice.spokenMessage ).toBeNull();
-			expect( notice.content ).toContain(
-				'<span class="editor-save-error-details__message">Details from server.</span>'
-			);
-			expect( speak ).toHaveBeenCalledWith(
-				'Updating failed. We’ll try to save a backup in this browser. Please try updating again.',
-				'assertive'
-			);
+		} );
+
+		it.each( [
+			[
+				// Two paragraphs, so two sentences, rather than run together.
+				'separates paragraphs with line breaks',
+				'<p>The <strong>title</strong> was rejected.</p><p>Try again.</p>',
+				'The title was rejected.\nTry again.',
+			],
+			[
+				'keeps the target of a link',
+				'<p>There has been a critical error on this website.</p><p><a href="https://wordpress.org/documentation/article/faq-troubleshooting/">Learn more about troubleshooting WordPress.</a></p>',
+				'There has been a critical error on this website.\nLearn more about troubleshooting WordPress. (https://wordpress.org/documentation/article/faq-troubleshooting/)',
+			],
+			[
+				'keeps a link target only once when it is also the text',
+				'See <a href="https://example.com/help">https://example.com/help</a>',
+				'See https://example.com/help',
+			],
+			[
+				'leaves out a link target that is not a web address',
+				'<a href="javascript:alert(1)">Fix it</a> now.',
+				'Fix it now.',
+			],
+			[
+				'leaves out scripts and styles',
+				'<style>p { color: red; }</style><p>Rejected.</p><script>alert( 1 );</script>',
+				'Rejected.',
+			],
+		] )(
+			'converts markup in a server message to plain text: %s',
+			async ( _description, message, expectedDetails ) => {
+				const post = {
+					id: postId,
+					type: 'post',
+					title: 'bar',
+					content: 'bar',
+					excerpt: 'crackers',
+					status: 'publish',
+				};
+
+				apiFetch.setFetchHandler( async ( options ) => {
+					const method = getMethod( options );
+					const { path } = options;
+
+					if (
+						method === 'PUT' &&
+						path.startsWith( `/wp/v2/posts/${ postId }` )
+					) {
+						throw { code: 'test_save_failure', message };
+					}
+
+					throw {
+						code: 'unknown_path',
+						message: `Unknown path: ${ method } ${ path }`,
+					};
+				} );
+
+				const registry = createRegistryWithStores();
+
+				registry
+					.dispatch( coreStore )
+					.receiveEntityRecords( 'postType', 'post', post );
+
+				registry.dispatch( editorStore ).setupEditor( post, {
+					content: 'new bar',
+				} );
+
+				await registry.dispatch( editorStore ).savePost();
+
+				const [ notice ] = registry.select( noticesStore ).getNotices();
+				expect( notice.details ).toBe( expectedDetails );
+				expect( notice.__unstableHTML ).toBeUndefined();
+			}
+		);
+
+		it.each( [
+			[
+				'adds the PHP error a fatal error reports to the details',
+				{
+					code: 'internal_server_error',
+					message:
+						'<p>There has been a critical error on this website.</p>',
+					data: {
+						status: 500,
+						error: {
+							type: 1,
+							message:
+								'Uncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
+						},
+					},
+				},
+				'There has been a critical error on this website.\n\nUncaught Error: Call to undefined function f() in /var/www/html/a.php:2\nStack trace:\n#0 {main}\n  thrown',
+			],
+			[
+				'ignores a PHP error message that is not a string',
+				{
+					code: 'internal_server_error',
+					message: 'Server error.',
+					data: { status: 500, error: { message: [ 'unexpected' ] } },
+				},
+				'Server error.',
+			],
+		] )( '%s', async ( _description, serverError, expectedDetails ) => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'publish',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					throw serverError;
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice.details ).toBe( expectedDetails );
+		} );
+
+		it( 'keeps a server message that only looks like markup', async () => {
+			const post = {
+				id: postId,
+				type: 'post',
+				title: 'bar',
+				content: 'bar',
+				excerpt: 'crackers',
+				status: 'publish',
+			};
+
+			apiFetch.setFetchHandler( async ( options ) => {
+				const method = getMethod( options );
+				const { path } = options;
+
+				if (
+					method === 'PUT' &&
+					path.startsWith( `/wp/v2/posts/${ postId }` )
+				) {
+					throw {
+						code: 'test_save_failure',
+						message: 'Unexpected token < at line 3',
+					};
+				}
+
+				throw {
+					code: 'unknown_path',
+					message: `Unknown path: ${ method } ${ path }`,
+				};
+			} );
+
+			const registry = createRegistryWithStores();
+
+			registry
+				.dispatch( coreStore )
+				.receiveEntityRecords( 'postType', 'post', post );
+
+			registry.dispatch( editorStore ).setupEditor( post, {
+				content: 'new bar',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+
+			// Parsing this as HTML would take everything after the `<`.
+			const [ notice ] = registry.select( noticesStore ).getNotices();
+			expect( notice.details ).toBe( 'Unexpected token < at line 3' );
 		} );
 
 		// These errors are generated by the client rather than returned by the
@@ -396,8 +578,7 @@ describe( 'Post actions', () => {
 
 				const [ notice ] = registry.select( noticesStore ).getNotices();
 				expect( notice.content ).toBe( expectedNotice );
-				expect( notice.content ).not.toContain( '<details' );
-				expect( notice.content ).not.toContain( 'Show details' );
+				expect( notice.details ).toBeUndefined();
 				expect( notice.__unstableHTML ).toBeUndefined();
 			} );
 		} );
@@ -522,7 +703,13 @@ describe( 'Post actions', () => {
 			}
 		}
 
-		function setUpEditor( registry ) {
+		/**
+		 * Opens the editor with `imagePost.content` over the given stored post.
+		 *
+		 * @param {Object} registry    The registry to set up.
+		 * @param {Object} [savedPost] The post as stored before the save.
+		 */
+		function setUpEditor( registry, savedPost = imagePost ) {
 			// Only the `post` entity is registered by default, and without a
 			// config for attachments the records lookup cannot resolve.
 			registry.dispatch( coreStore ).addEntities( [
@@ -539,8 +726,8 @@ describe( 'Post actions', () => {
 			] );
 			registry
 				.dispatch( coreStore )
-				.receiveEntityRecords( 'postType', 'post', imagePost );
-			registry.dispatch( editorStore ).setupEditor( imagePost, {
+				.receiveEntityRecords( 'postType', 'post', savedPost );
+			registry.dispatch( editorStore ).setupEditor( savedPost, {
 				content: imagePost.content,
 			} );
 			// The block editor store is populated by the editor provider, which
@@ -662,6 +849,41 @@ describe( 'Post actions', () => {
 					request.startsWith( 'PUT /wp/v2/media/99' )
 				)
 			).toBe( false );
+		} );
+
+		/**
+		 * Images already in a published post may have been left unattached on
+		 * purpose.
+		 */
+		it( 'leaves alone images that were already in a published post', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry, { ...imagePost, status: 'publish' } );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( false );
+		} );
+
+		it( 'attaches images added to a published post', async () => {
+			const requests = [];
+			setFetchHandler( requests );
+
+			const registry = createRegistryWithStores();
+			setUpEditor( registry, {
+				...imagePost,
+				status: 'publish',
+				content: '',
+			} );
+
+			await registry.dispatch( editorStore ).savePost();
+			await flush();
+
+			expect( hasAttached( requests ) ).toBe( true );
+			expect( attachedTo ).toBe( postId );
 		} );
 
 		it( 'attaches nothing when the editor setting is off', async () => {

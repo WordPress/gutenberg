@@ -228,3 +228,53 @@ describe( 'color useBlockProps has-background', () => {
 		).toEqual( [ 'has-background' ] );
 	} );
 } );
+
+describe( 'color addSaveProps', () => {
+	const fontSizeValue = { typography: { fontSize: '20px' } };
+	const linkValue = { elements: { link: { color: { text: '#1d4d3a' } } } };
+
+	function registerWithLink( colorSkip ) {
+		registerBlockType( BLOCK_NAME, {
+			apiVersion: 3,
+			title: 'Test block',
+			category: 'design',
+			save: () => null,
+			supports: {
+				color: {
+					gradients: true,
+					link: true,
+					__experimentalSkipSerialization: colorSkip,
+				},
+			},
+		} );
+	}
+
+	afterEach( () => {
+		unregisterBlockType( BLOCK_NAME );
+	} );
+
+	it( 'adds no className key when only the link color serializes and none is set', () => {
+		registerWithLink( [ 'text', 'background', 'gradients' ] );
+		expect(
+			color.addSaveProps( {}, BLOCK_NAME, { style: fontSizeValue } )
+		).toStrictEqual( {} );
+	} );
+
+	it( 'adds has-link-color when only the link color serializes', () => {
+		registerWithLink( [ 'text', 'background', 'gradients' ] );
+		expect(
+			color.addSaveProps( {}, BLOCK_NAME, {
+				style: { ...fontSizeValue, ...linkValue },
+			} )
+		).toEqual( { className: 'has-link-color' } );
+	} );
+
+	it( 'still adds the className key when other colors serialize', () => {
+		registerWithLink();
+		expect(
+			Object.keys(
+				color.addSaveProps( {}, BLOCK_NAME, { style: fontSizeValue } )
+			)
+		).toEqual( [ 'className' ] );
+	} );
+} );

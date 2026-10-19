@@ -2,7 +2,7 @@
  * Test-only WebSocket sync provider for Gutenberg RTC e2e tests.
  *
  * Speaks the y-websocket binary protocol against test/e2e/bin/rtc-test-ws-sync-server.mjs
- * (which is built on @y/websocket-server) so the test harness exercises the same
+ * (which is built on `@y/websocket-server`) so the test harness exercises the same
  * wire format as production deployments. Exposes a small debug surface on
  * window.__gutenbergTestWebSocketSync.rooms that the Playwright fixtures poll.
  */
