@@ -474,6 +474,14 @@ test.describe( 'Style Book notes', () => {
 			sidebar.getByText( 'Resolved', { exact: true } )
 		).toBeVisible();
 
+		// A resolved note no longer needs attention, so the example offers to
+		// take a new one instead of counting it.
+		await expect(
+			styleBookFrame( page ).getByRole( 'button', {
+				name: 'Add note on Headings',
+			} )
+		).toBeVisible();
+
 		await thread.click();
 		await sidebar
 			.getByRole( 'textbox', { name: /Reply to note/ } )

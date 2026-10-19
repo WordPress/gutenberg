@@ -88,7 +88,9 @@ export function useStyleBookNoteThreads( {
 
 		return {
 			groups: groupThreadsByAnchor( ordered, labels ),
-			counts: countThreadsByAnchor( ordered ),
+			// Resolved notes need no attention, matching the post editor's
+			// block indicators, which count unresolved notes only.
+			counts: countThreadsByAnchor( unresolved ),
 			threads: ordered,
 		};
 	}, [ records, labels ] );
