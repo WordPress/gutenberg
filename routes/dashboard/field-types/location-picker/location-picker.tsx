@@ -1,8 +1,6 @@
 import { useEffect, useId, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { mapMarker } from '@wordpress/icons';
-// The dashboard is still experimental.
-/* eslint-disable @wordpress/use-recommended-components */
 import {
 	Autocomplete,
 	Button,
@@ -12,7 +10,6 @@ import {
 	InputLayout,
 	Stack,
 } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
 import styles from './location-picker.module.css';
 
 type LocationOption = {

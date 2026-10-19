@@ -11,10 +11,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { globe, starFilled } from '@wordpress/icons';
-// `IconButton` is not on the recommended list yet.
-/* eslint-disable @wordpress/use-recommended-components */
 import { Button, Card, Icon, IconButton, Link, Stack } from '@wordpress/ui';
-/* eslint-enable @wordpress/use-recommended-components */
 import { WidgetRender } from '..';
 import { registerFieldType, resolveFields } from '../../../field-types';
 import { registerIconResolver, resolveIcon } from '../../../icon-resolver';

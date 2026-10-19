@@ -34,7 +34,6 @@ $button-brand-stroke-active: $components-color-button-brand-stroke-active;
 		@include mixins.outset-ring__focus();
 	}
 
-	position: relative;
 	display: inline-flex;
 	text-decoration: none;
 	font-family: inherit;
@@ -339,9 +338,12 @@ $button-brand-stroke-active: $components-color-button-brand-stroke-active;
 	}
 
 	// The label stays in place to preserve the button's size, but is hidden
-	// behind a centered spinner.
+	// behind a centered spinner. Only a busy button is a positioning parent:
+	// a positioned button would trap a descendant hit area that is meant to
+	// stretch to an ancestor, such as a dataform field row.
 	&.is-busy,
 	&.is-busy:is(:hover, :active, :focus) {
+		position: relative;
 		color: transparent;
 
 		@media (forced-colors: active) {
