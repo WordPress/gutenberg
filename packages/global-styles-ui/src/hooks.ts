@@ -234,17 +234,6 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 	}, [ properties, userVariation, variationsFromTheme ] );
 }
 
-const propertiesToFilter = [ 'color' ];
-
-/**
- * Hook to get color variations using the full Gutenberg implementation.
- */
-export function useColorVariations(): StyleVariation[] {
-	return useCurrentMergeThemeStyleVariationsWithUserConfig(
-		propertiesToFilter
-	);
-}
-
 /**
  * Resolves `ref` pointers and theme-relative (`file:./…`) URLs in a style
  * object's `background` sub-tree, for display. The Global Styles screens
