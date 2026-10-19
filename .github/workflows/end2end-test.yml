@@ -51,8 +51,8 @@ jobs:
                           - '!test/{integration,performance,php,storybook-playwright,unit}/**'
                           - '!{packages,tools}/**/{test,tests}/**'
                           # Development tooling and its configuration.
-                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,project-management-automation,stylelint-config}/**'
-                          - '!tools/{docs,eslint,stylelint,validation}/**'
+                          - '!packages/{create-block,docgen,eslint-plugin,jest-*,npm-package-json-lint-config,prettier-config,stylelint-config}/**'
+                          - '!tools/{docs,eslint,project-management-automation,stylelint,validation}/**'
                           - '!{eslint,lint-staged,prettier,syncpack}.config*'
                           - '!{phpcs,phpunit}*'
                           # Repository metadata.
