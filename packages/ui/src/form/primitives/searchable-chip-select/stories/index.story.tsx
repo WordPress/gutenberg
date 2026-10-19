@@ -73,27 +73,47 @@ export const AsyncItemsWithCreatable: Story = {
 	render: function Template( args ) {
 		const [ open, setOpen ] = useState( false );
 		const [ loading, setLoading ] = useState( true );
+		const [ inputValue, setInputValue ] = useState( '' );
+		const [ matches, setMatches ] = useState< typeof ITEMS >( [] );
 		const creatableItem = {
 			value: 'create',
-			label: 'Create a new fruit',
+			label: `Create new fruit: ${ inputValue.trim() }`,
 			creatable: true,
 		};
+		const resolvedItems =
+			matches.length > 0 || ! inputValue.trim()
+				? matches
+				: [ creatableItem ];
 
 		useEffect( () => {
 			if ( ! open ) {
 				return;
 			}
-			const timeout = setTimeout( () => setLoading( false ), 2000 );
+			const timeout = setTimeout( () => {
+				setMatches(
+					ITEMS.filter( ( item ) =>
+						item.label
+							.toLowerCase()
+							.includes( inputValue.trim().toLowerCase() )
+					)
+				);
+				setLoading( false );
+			}, 2000 );
 			return () => clearTimeout( timeout );
-		}, [ open ] );
+		}, [ open, inputValue ] );
 
 		return (
 			<SearchableChipSelect
 				{ ...args }
 				open={ open }
-				items={
-					loading ? [ creatableItem ] : [ ...ITEMS, creatableItem ]
-				}
+				inputValue={ inputValue }
+				filter={ null }
+				items={ loading ? [] : resolvedItems }
+				onInputValueChange={ ( nextInputValue, eventDetails ) => {
+					setInputValue( nextInputValue );
+					setLoading( true );
+					args.onInputValueChange?.( nextInputValue, eventDetails );
+				} }
 				statusContent={
 					loading ? <SearchableChipSelect.LoadingIndicator /> : null
 				}
