@@ -704,10 +704,10 @@ describe( 'Post actions', () => {
 		}
 
 		/**
-		 * @param {Object} registry              The registry to set up.
-		 * @param {Object} [savedPost=imagePost] The post as stored before the
-		 *                                       save. The editor's content is
-		 *                                       always `imagePost.content`.
+		 * Opens the editor with `imagePost.content` over the given stored post.
+		 *
+		 * @param {Object} registry    The registry to set up.
+		 * @param {Object} [savedPost] The post as stored before the save.
 		 */
 		function setUpEditor( registry, savedPost = imagePost ) {
 			// Only the `post` entity is registered by default, and without a
