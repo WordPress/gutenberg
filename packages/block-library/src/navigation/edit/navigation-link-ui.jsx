@@ -14,6 +14,7 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 export function NavigationLinkUI( {
 	insertedBlockClientId,
 	setInsertedBlockClientId,
+	suggestedBlockNames,
 } ) {
 	const { updateBlockAttributes, removeBlock } =
 		useDispatch( blockEditorStore );
@@ -96,6 +97,7 @@ export function NavigationLinkUI( {
 		<LinkUI
 			clientId={ insertedBlockClientId }
 			link={ insertedBlockAttributes }
+			suggestedBlockNames={ suggestedBlockNames }
 			onBlockInsert={ handleSetInsertedBlock }
 			onClose={ () => {
 				// Use cleanup function

@@ -148,6 +148,52 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		} );
 	} );
 
+	test( 'lists the Home Link block, and no other block, in the link search results', async ( {
+		admin,
+		page,
+		requestUtils,
+		linkControl,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+		await requestUtils.createPage( {
+			title: 'Social Page',
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		await listView.getByRole( 'button', { name: 'Add page' } ).click();
+
+		const searchInput = linkControl.getLinkControlSearch();
+		await expect( searchInput ).toBeFocused();
+		const searchResults = page.getByRole( 'listbox', {
+			name: 'Search results',
+		} );
+
+		await page.keyboard.type( 'Home', { delay: 50 } );
+		await expect(
+			searchResults.getByRole( 'option', { name: /Home Link/ } )
+		).toBeVisible();
+
+		// Social Icons is allowed in the navigation, so it is listed on the
+		// canvas, but the sidebar lists only the Home Link block: editing
+		// other blocks from the sidebar is not available yet.
+		await searchInput.fill( 'Social' );
+		await expect(
+			searchResults.getByRole( 'option', { name: /Social Page/ } )
+		).toBeVisible();
+		await expect(
+			searchResults.getByRole( 'option', { name: /Social Icons/ } )
+		).toHaveCount( 0 );
+	} );
+
 	test( 'does not select blocks in the canvas preview when editing from the sidebar', async ( {
 		admin,
 		page,
