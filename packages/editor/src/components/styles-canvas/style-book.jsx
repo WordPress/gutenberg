@@ -17,13 +17,15 @@ import { useGlobalStyles } from '../global-styles/hooks';
  * a user or WordPress version that cannot store them - and the Style Book then
  * renders exactly as it did before notes existed.
  *
+ * @param {Object}  [options]
+ * @param {boolean} [options.enabled] Whether to fetch notes at all.
  * @return {Object|undefined} `noteActions` and the anchor to highlight.
  */
-function useStyleBookNoteActions() {
+function useStyleBookNoteActions( { enabled = true } = {} ) {
 	const { setPendingAnchor, activeAnchor, setActiveAnchor } =
 		useStyleBookNotesContext();
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { isEnabled } = useStyleBookNotesEnabled();
+	const { isEnabled } = useStyleBookNotesEnabled( { enabled } );
 
 	/*
 	 * The badges need anchors and counts, not titles, so this deliberately
@@ -165,7 +167,9 @@ function StylesCanvasRevisionStyleBook( { path, onPathChange, forwardedRef } ) {
 function StylesCanvasStyleBook( { path, onPathChange }, ref ) {
 	// Revisions preview an older set of styles, so notes - which belong to the
 	// current one - are left off there, matching the notes sidebar.
-	const { noteActions, highlightedAnchor } = useStyleBookNoteActions();
+	const { noteActions, highlightedAnchor } = useStyleBookNoteActions( {
+		enabled: ! path?.startsWith( '/revisions' ),
+	} );
 
 	if ( path?.startsWith( '/revisions' ) ) {
 		return (
