@@ -22,12 +22,49 @@ import { EntityContext } from './entity-context';
  */
 export default function EntityProvider( {
 	kind,
-	type: name,
+	type,
 	id,
 	revisionId,
 	children,
 } ) {
+	return (
+		<PrivateEntityProvider
+			kind={ kind }
+			type={ type }
+			id={ id }
+			revisionId={ revisionId }
+		>
+			{ children }
+		</PrivateEntityProvider>
+	);
+}
+
+/**
+ * Like `EntityProvider`, but also accepts a record to read from instead of
+ * the current entity, for content that isn't stored as a revision. Fields the
+ * record doesn't have are read from the current entity.
+ *
+ * @param {Object} props              The component's props.
+ * @param {string} props.kind         The entity kind.
+ * @param {string} props.type         The entity name.
+ * @param {number} props.id           The entity ID.
+ * @param {number} [props.revisionId] Optional revision ID.
+ * @param {Object} [props.revision]   Optional record to read from.
+ * @param {*}      props.children     The children to wrap.
+ *
+ * @return {Object} The provided children, wrapped with
+ *                   the entity's context provider.
+ */
+export function PrivateEntityProvider( {
+	kind,
+	type: name,
+	id,
+	revisionId,
+	revision,
+	children,
+} ) {
 	const parent = useContext( EntityContext );
+	const providedRevision = revision ?? revisionId;
 	const childContext = useMemo(
 		() => ( {
 			...parent,
@@ -37,18 +74,18 @@ export default function EntityProvider( {
 					[ name ]: id,
 				},
 			} ),
-			...( revisionId !== undefined &&
+			...( providedRevision !== undefined &&
 				kind && {
 					revision: {
 						...parent?.revision,
 						[ kind ]: {
 							...parent?.revision?.[ kind ],
-							[ name ]: revisionId,
+							[ name ]: providedRevision,
 						},
 					},
 				} ),
 		} ),
-		[ parent, kind, name, id, revisionId ]
+		[ parent, kind, name, id, providedRevision ]
 	);
 	return (
 		<EntityContext.Provider value={ childContext }>
