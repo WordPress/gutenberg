@@ -218,17 +218,8 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from base repository'
               run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
-            # This intentionally doesn't use `.github/setup-node`, because we
-            # don't currently need to `npm ci` install any dependencies.
-            - name: Use desired version of Node.js
-              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-              with:
-                  node-version-file: '.nvmrc'
-                  package-manager-cache: false
-            - name: Set up npm
-              uses: ./.github/setup-npm
-              with:
-                  cache: false
+            # The validator imports only Node.js built-in modules, so it runs on
+            # the runner image's Node.js without `actions/setup-node`.
             - name: Validate touched CHANGELOG files
               env:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -243,4 +234,4 @@ jobs:
 
                   echo "Validating:"
                   echo "$changelogs"
-                  echo "$changelogs" | xargs npm run lint:changelogs -- --pr="${PR_NUMBER}"
+                  echo "$changelogs" | xargs node tools/validation/validate-changelogs.ts --pr="${PR_NUMBER}"
