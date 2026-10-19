@@ -271,18 +271,6 @@ async function preloadResolutions( postType, postId ) {
 					slug += '-' + post.slug;
 				}
 				tasks.push( core.getDefaultTemplateId( { slug } ) );
-
-				// The author of the post, which the post summary reads with
-				// the same query, see `AuthorView` in `@wordpress/core-fields`.
-				if ( post.author ) {
-					tasks.push(
-						core.getEntityRecords( 'root', 'user', {
-							include: [ post.author ],
-							who: 'authors',
-							context: 'view',
-						} )
-					);
-				}
 			}
 		}
 

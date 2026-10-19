@@ -133,10 +133,8 @@ function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 
 		$author_id = (int) get_post_field( 'post_author', $context->post->ID );
 		if ( post_type_supports( $context->post->post_type, 'author' ) && $author_id > 0 ) {
-			// The post summary of the inspector queries the author through
-			// the users collection, see `AuthorView` in `@wordpress/core-fields`,
-			// instead of the single user path core preloads for the classic
-			// author panel, which nothing requests anymore.
+			// Core preloads the single user path of the classic author panel,
+			// which nothing requests anymore.
 			$classic_author_path = sprintf( '/wp/v2/users/%d?context=view&_fields=id,name', $author_id );
 			$paths               = array_values(
 				array_filter(
@@ -145,15 +143,6 @@ function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 						return $path !== $classic_author_path;
 					}
 				)
-			);
-
-			$paths[] = add_query_arg(
-				array(
-					'context' => 'view',
-					'include' => array( $author_id ),
-					'who'     => 'authors',
-				),
-				'/wp/v2/users'
 			);
 		}
 	}
