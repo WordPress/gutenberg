@@ -25,9 +25,6 @@ const meta: Meta< typeof Avatar.Root > = {
 			notes: 'API and design may change.',
 		},
 	},
-	argTypes: {
-		color: { control: 'color' },
-	},
 };
 export default meta;
 
@@ -97,23 +94,12 @@ export const IconFallback: Story = {
 	),
 };
 
-/** Derive initials from a display name, or use the person icon for a blank name. */
-export const Initials: StoryObj<
-	React.ComponentProps< typeof Avatar.Root > &
-		Pick<
-			React.ComponentProps< typeof Avatar.Initials >,
-			'name' | 'locale'
-		>
-> = {
+/** Derive initials from a display name. */
+export const Initials: Story = {
 	...Default,
-	args: { ...Default.args, name: 'Alex Morgan' },
-	argTypes: {
-		name: { control: 'text' },
-		locale: { control: 'text' },
-	},
-	render: ( { name, locale, ...args } ) => (
-		<Avatar.Root { ...args } aria-label={ name || 'Unknown person' }>
-			<Avatar.Initials name={ name } locale={ locale } />
+	render: ( args ) => (
+		<Avatar.Root { ...args }>
+			<Avatar.Initials name="Alex Morgan" />
 		</Avatar.Root>
 	),
 };
