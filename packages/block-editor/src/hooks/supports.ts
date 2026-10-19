@@ -3,7 +3,6 @@ import type { BlockType } from '@wordpress/blocks';
 import type { BorderSupport, ColorSupport } from './types';
 
 const ALIGN_SUPPORT_KEY = 'align';
-const ALIGN_WIDE_SUPPORT_KEY = 'alignWide';
 const BORDER_SUPPORT_KEY = '__experimentalBorder';
 const COLOR_SUPPORT_KEY = 'color';
 const CUSTOM_CLASS_NAME_SUPPORT_KEY = 'customClassName';
@@ -83,35 +82,6 @@ export const hasAlignSupport = ( nameOrType: string | BlockType ): boolean =>
 	hasBlockSupport( nameOrType, ALIGN_SUPPORT_KEY );
 
 /**
- * Returns the block support value for align, if defined.
- *
- * @param nameOrType Block name or type object.
- * @return The block support value.
- */
-export const getAlignSupport = ( nameOrType: string | BlockType ): unknown =>
-	getBlockSupport( nameOrType, ALIGN_SUPPORT_KEY );
-
-/**
- * Returns true if the block defines support for align wide.
- *
- * @param nameOrType Block name or type object.
- * @return Whether the block supports the feature.
- */
-export const hasAlignWideSupport = (
-	nameOrType: string | BlockType
-): boolean => hasBlockSupport( nameOrType, ALIGN_WIDE_SUPPORT_KEY );
-
-/**
- * Returns the block support value for align wide, if defined.
- *
- * @param nameOrType Block name or type object.
- * @return The block support value.
- */
-export const getAlignWideSupport = (
-	nameOrType: string | BlockType
-): unknown => getBlockSupport( nameOrType, ALIGN_WIDE_SUPPORT_KEY );
-
-/**
  * Determine whether there is block support for border properties.
  *
  * @param nameOrType Block name or type object.
@@ -142,19 +112,6 @@ export function hasBorderSupport(
 
 	return !! support?.[ feature ];
 }
-
-/**
- * Get block support for border properties.
- *
- * @param nameOrType Block name or type object.
- * @param feature    Border feature to get.
- *
- * @return The block support.
- */
-export const getBorderSupport = (
-	nameOrType: string | BlockType,
-	feature: string
-): unknown => getBlockSupport( nameOrType, [ BORDER_SUPPORT_KEY, feature ] );
 
 /**
  * Returns true if the block defines support for color.
@@ -244,16 +201,6 @@ export const hasTextAlignSupport = (
 ): boolean => hasBlockSupport( nameOrType, TEXT_ALIGN_SUPPORT_KEY );
 
 /**
- * Returns the block support value for text-align, if defined.
- *
- * @param nameOrType Block name or type object.
- * @return The block support value.
- */
-export const getTextAlignSupport = (
-	nameOrType: string | BlockType
-): unknown => getBlockSupport( nameOrType, TEXT_ALIGN_SUPPORT_KEY );
-
-/**
  * Returns true if the block defines support for background color.
  *
  * @param nameOrType Block name or type object.
@@ -270,19 +217,6 @@ export const hasTextColorSupport = (
 };
 
 /**
- * Get block support for color properties.
- *
- * @param nameOrType Block name or type object.
- * @param feature    Color feature to get.
- *
- * @return The block support.
- */
-export const getColorSupport = (
-	nameOrType: string | BlockType,
-	feature: string
-): unknown => getBlockSupport( nameOrType, [ COLOR_SUPPORT_KEY, feature ] );
-
-/**
  * Returns true if the block defines support for custom class name.
  *
  * @param nameOrType Block name or type object.
@@ -292,17 +226,6 @@ export const hasCustomClassNameSupport = (
 	nameOrType: string | BlockType
 ): boolean =>
 	hasBlockSupport( nameOrType, CUSTOM_CLASS_NAME_SUPPORT_KEY, true );
-
-/**
- * Returns the block support value for custom class name, if defined.
- *
- * @param nameOrType Block name or type object.
- * @return The block support value.
- */
-export const getCustomClassNameSupport = (
-	nameOrType: string | BlockType
-): unknown =>
-	getBlockSupport( nameOrType, CUSTOM_CLASS_NAME_SUPPORT_KEY, true );
 
 /**
  * Returns true if the block defines support for font family.
@@ -315,16 +238,6 @@ export const hasFontFamilySupport = (
 ): boolean => hasBlockSupport( nameOrType, FONT_FAMILY_SUPPORT_KEY );
 
 /**
- * Returns the block support value for font family, if defined.
- *
- * @param nameOrType Block name or type object.
- * @return The block support value.
- */
-export const getFontFamilySupport = (
-	nameOrType: string | BlockType
-): unknown => getBlockSupport( nameOrType, FONT_FAMILY_SUPPORT_KEY );
-
-/**
  * Returns true if the block defines support for font size.
  *
  * @param nameOrType Block name or type object.
@@ -334,15 +247,6 @@ export const hasFontSizeSupport = ( nameOrType: string | BlockType ): boolean =>
 	hasBlockSupport( nameOrType, FONT_SIZE_SUPPORT_KEY );
 
 /**
- * Returns the block support value for font size, if defined.
- *
- * @param nameOrType Block name or type object.
- * @return The block support value.
- */
-export const getFontSizeSupport = ( nameOrType: string | BlockType ): unknown =>
-	getBlockSupport( nameOrType, FONT_SIZE_SUPPORT_KEY );
-
-/**
  * Returns true if the block defines support for layout.
  *
  * @param nameOrType Block name or type object.
@@ -350,15 +254,6 @@ export const getFontSizeSupport = ( nameOrType: string | BlockType ): unknown =>
  */
 export const hasLayoutSupport = ( nameOrType: string | BlockType ): boolean =>
 	hasBlockSupport( nameOrType, LAYOUT_SUPPORT_KEY );
-
-/**
- * Returns the block support value for layout, if defined.
- *
- * @param nameOrType Block name or type object.
- * @return The block support value.
- */
-export const getLayoutSupport = ( nameOrType: string | BlockType ): unknown =>
-	getBlockSupport( nameOrType, LAYOUT_SUPPORT_KEY );
 
 /**
  * Returns true if the block defines support for style.
