@@ -5,7 +5,7 @@ import firstTimeContributorAccountLinkTask from '../index.js';
 import type { GitHub, WebhookPayloadPush } from '../../../types.js';
 
 /**
- * Runs the task with partial fixtures, which provide only what it reads.
+ * Calls the task with partial fixtures.
  *
  * @param payload Partial event payload.
  * @param octokit Partial Octokit REST client.

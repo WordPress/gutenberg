@@ -5,7 +5,12 @@ import firstTimeContributorAccountLink from './tasks/first-time-contributor-acco
 import firstTimeContributorLabel from './tasks/first-time-contributor-label/index.js';
 import addMilestone from './tasks/add-milestone/index.js';
 import debug from './debug.js';
-import type { WPAutomation } from './types.js';
+import type {
+	GitHub,
+	WebhookPayloadPullRequest,
+	WebhookPayloadPush,
+	WPAutomation,
+} from './types.js';
 
 /**
  * Full list of automations, matched by given properties against the incoming
@@ -32,6 +37,30 @@ const automations: WPAutomation[] = [
 	},
 ];
 
+/**
+ * Runs an automation's task with the payload of its event.
+ *
+ * @param automation Automation to run.
+ * @param octokit    Initialized Octokit REST client.
+ */
+function runAutomation(
+	automation: WPAutomation,
+	octokit: GitHub
+): Promise< void > {
+	switch ( automation.event ) {
+		case 'push':
+			return automation.task(
+				context.payload as WebhookPayloadPush,
+				octokit
+			);
+		case 'pull_request_target':
+			return automation.task(
+				context.payload as WebhookPayloadPullRequest,
+				octokit
+			);
+	}
+}
+
 ( async function main() {
 	const token = getInput( 'github_token' );
 	if ( ! token ) {
@@ -45,14 +74,15 @@ const automations: WPAutomation[] = [
 		`main: Received event = '${ context.eventName }', action = '${ context.payload.action }'`
 	);
 
-	for ( const { event, action, task } of automations ) {
+	for ( const automation of automations ) {
+		const { event, action, task } = automation;
 		if (
 			event === context.eventName &&
 			( action === undefined || action === context.payload.action )
 		) {
 			try {
 				debug( `main: Starting task ${ task.name }` );
-				await task( context.payload, octokit );
+				await runAutomation( automation, octokit );
 			} catch ( error ) {
 				setFailed(
 					`main: Task ${ task.name } failed with error: ${ error }`

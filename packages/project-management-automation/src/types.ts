@@ -33,26 +33,49 @@ export type Milestone = Awaited<
 /**
  * Automation task function.
  */
-export type WPAutomationTask = (
-	payload: any,
+export type WPAutomationTask< Payload > = (
+	payload: Payload,
 	octokit: GitHub
 ) => Promise< void >;
+
+/**
+ * Automation run on a push.
+ */
+export interface WPPushAutomation {
+	/**
+	 * Webhook event name to match.
+	 */
+	event: 'push';
+	/**
+	 * Push events have no action.
+	 */
+	action?: never;
+	/**
+	 * Task to run.
+	 */
+	task: WPAutomationTask< WebhookPayloadPush >;
+}
+
+/**
+ * Automation run when a pull request is opened.
+ */
+export interface WPPullRequestAutomation {
+	/**
+	 * Webhook event name to match.
+	 */
+	event: 'pull_request_target';
+	/**
+	 * Action to match.
+	 */
+	action: 'opened';
+	/**
+	 * Task to run.
+	 */
+	task: WPAutomationTask< WebhookPayloadPullRequest >;
+}
 
 /**
  * Automation, matched by given properties against the incoming payload
  * object.
  */
-export interface WPAutomation {
-	/**
-	 * Webhook event name to match.
-	 */
-	event: string;
-	/**
-	 * Action to match, if applicable.
-	 */
-	action?: string;
-	/**
-	 * Task to run.
-	 */
-	task: WPAutomationTask;
-}
+export type WPAutomation = WPPushAutomation | WPPullRequestAutomation;
