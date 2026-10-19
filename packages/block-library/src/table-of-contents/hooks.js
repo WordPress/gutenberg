@@ -141,8 +141,10 @@ function observeCallback( select, dispatch, clientId ) {
 	const headings = getLatestHeadings( select, clientId );
 	if ( ! fastDeepEqual( headings, attributes.headings ) ) {
 		// Executing the update in a microtask ensures that the non-persistent marker doesn't affect an attribute triggering the change.
+		// The headings are derived from the post, so keep the update out of
+		// the undo history: after an undo, it would clear the redo history.
 		window.queueMicrotask( () => {
-			__unstableMarkNextChangeAsNotPersistent();
+			__unstableMarkNextChangeAsNotPersistent( { history: 'ignore' } );
 			updateBlockAttributes( clientId, { headings } );
 		} );
 	}
