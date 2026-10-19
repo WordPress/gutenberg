@@ -22,6 +22,27 @@ import {
 	hasRedo,
 } from '../selectors';
 import { getEntitySyncManager } from '../entity-sync';
+import type { EntitySyncManager } from '../entity-sync';
+import type { State } from '../selectors';
+
+/**
+ * Types a state fixture. The fixtures key queried data by the `default`
+ * context and hold whole entity configs, which `State` does not describe.
+ *
+ * @param value The state fixture.
+ */
+function partialState( value: object ): State {
+	return value as State;
+}
+
+/**
+ * Freezes a state fixture to catch mutations, typed as `partialState` is.
+ *
+ * @param value The state fixture.
+ */
+function frozenState( value: object ): State {
+	return deepFreeze( value ) as State;
+}
 
 vi.mock( import( '../entity-sync' ), () => ( {
 	getEntitySyncManager: vi.fn(),
@@ -29,7 +50,7 @@ vi.mock( import( '../entity-sync' ), () => ( {
 
 describe( 'hasUndo/hasRedo', () => {
 	afterEach( () => {
-		getEntitySyncManager.mockReset();
+		vi.mocked( getEntitySyncManager ).mockReset();
 	} );
 
 	it( 'reads undo availability from the undo manager, also when an entity sync manager is registered', () => {
@@ -37,16 +58,19 @@ describe( 'hasUndo/hasRedo', () => {
 			hasUndo: vi.fn( () => true ),
 			hasRedo: vi.fn( () => false ),
 		};
-		getEntitySyncManager.mockReturnValue( {
-			undoHistory: {
-				undo: vi.fn(),
-				redo: vi.fn(),
-				stopCapturing: vi.fn(),
-				clearRedo: vi.fn(),
-			},
-		} );
+		vi.mocked( getEntitySyncManager ).mockReturnValue(
+			// The stub provides only what the selectors use.
+			{
+				undoHistory: {
+					undo: vi.fn(),
+					redo: vi.fn(),
+					stopCapturing: vi.fn(),
+					clearRedo: vi.fn(),
+				},
+			} as unknown as EntitySyncManager
+		);
 
-		const state = { undoManager };
+		const state = partialState( { undoManager } );
 
 		expect( hasUndo( state ) ).toBe( true );
 		expect( hasRedo( state ) ).toBe( false );
@@ -58,7 +82,8 @@ describe( 'hasUndo/hasRedo', () => {
 describe( 'getEntityRecord', () => {
 	describe( 'normalizing Post ID passed as recordKey', () => {
 		it( 'normalizes any Post ID recordKey argument to a Number via `normalizeArgs` method', async () => {
-			const normalized = getEntityRecord.normalizeArgs( [
+			// `getEntityRecord` defines how it normalizes its arguments.
+			const normalized = getEntityRecord.normalizeArgs!( [
 				'postType',
 				'some_post',
 				'123',
@@ -67,7 +92,8 @@ describe( 'getEntityRecord', () => {
 		} );
 
 		it( 'does not normalize recordKey argument unless it is a Post ID', async () => {
-			const normalized = getEntityRecord.normalizeArgs( [
+			// `getEntityRecord` defines how it normalizes its arguments.
+			const normalized = getEntityRecord.normalizeArgs!( [
 				'postType',
 				'some_post',
 				'i-am-a-slug-with-a-number-123',
@@ -81,7 +107,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should return undefined for unknown entity kind, name', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -100,7 +126,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should return undefined for unknown record’s key', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -121,7 +147,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should return a record by key', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -152,7 +178,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should return undefined if no item received, filtered item requested', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -176,7 +202,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should return filtered item if incomplete item received, filtered item requested', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -207,7 +233,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should return undefined if incomplete item received, complete item requested', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -238,7 +264,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should return filtered item if complete item received, filtered item requested', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -273,7 +299,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should work well for nested fields properties', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -310,7 +336,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should return the same filtered item for equivalent queries', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -351,7 +377,7 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should not reuse a cached item across different field sets', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -382,8 +408,8 @@ describe( 'getEntityRecord', () => {
 	} );
 
 	it( 'should not return a stale filtered item when the record changes', () => {
-		const stateWithContent = ( content ) =>
-			deepFreeze( {
+		const stateWithContent = ( content: string ) =>
+			frozenState( {
 				entities: {
 					records: {
 						postType: {
@@ -426,7 +452,7 @@ describe( 'getEntityRecord', () => {
 
 describe( 'hasEntityRecord', () => {
 	it( 'returns false if entity record has not been received', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -445,7 +471,7 @@ describe( 'hasEntityRecord', () => {
 	} );
 
 	it( 'returns true when full record exists and no fields query', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -472,7 +498,7 @@ describe( 'hasEntityRecord', () => {
 	} );
 
 	it( 'returns true when requested fields exist on the item', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -514,7 +540,7 @@ describe( 'hasEntityRecord', () => {
 	} );
 
 	it( 'returns false when a requested fields are missing', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -553,7 +579,7 @@ describe( 'hasEntityRecord', () => {
 
 describe( 'hasEntityRecords', () => {
 	it( 'returns false if entity records have not been received', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -573,7 +599,7 @@ describe( 'hasEntityRecords', () => {
 	} );
 
 	it( 'returns false if the entity configuration is not known', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {},
 			},
@@ -583,7 +609,7 @@ describe( 'hasEntityRecords', () => {
 	} );
 
 	it( 'returns true if entity records have been received', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -645,7 +671,7 @@ describe( 'getRawEntityRecord', () => {
 	};
 
 	it( 'should preserve the structure of `raw` field by default', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				config: [
 					{
@@ -666,7 +692,7 @@ describe( 'getRawEntityRecord', () => {
 		} );
 	} );
 	it( 'should flatten the structure of `raw` field for entities configured with rawAttributes', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				config: [
 					{
@@ -687,7 +713,7 @@ describe( 'getRawEntityRecord', () => {
 		} );
 	} );
 	it( 'should allow `null` as raw value', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				config: [
 					{
@@ -732,7 +758,7 @@ describe( 'getRawEntityRecord', () => {
 
 describe( 'getEntityRecords', () => {
 	it( 'should return null by default', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -751,7 +777,7 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'should return null for an unknown entity configuration', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {},
 			},
@@ -761,7 +787,7 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'should return all the records', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					root: {
@@ -797,7 +823,7 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'should return filtered items', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -838,7 +864,7 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'should return the same instance with the same arguments', () => {
-		let state = deepFreeze( {
+		let state = frozenState( {
 			entities: {
 				records: {},
 			},
@@ -876,7 +902,7 @@ describe( 'getEntityRecords', () => {
 
 describe( '__experimentalGetDirtyEntityRecords', () => {
 	it( 'returns a map of objects with each raw edited entity record and its corresponding edits', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				config: [
 					{
@@ -925,7 +951,7 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 	} );
 
 	it( 'excludes entity records that no longer exist', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				config: [
 					{
@@ -982,7 +1008,7 @@ describe( '__experimentalGetDirtyEntityRecords', () => {
 
 describe( '__experimentalGetEntitiesBeingSaved', () => {
 	it( "should return a map of objects with each raw entity record that's being saved", () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				config: [
 					{
@@ -1030,7 +1056,7 @@ describe( '__experimentalGetEntitiesBeingSaved', () => {
 
 describe( 'getEntityRecordNonTransientEdits', () => {
 	it( 'should return an empty object when the entity does not have a loaded config.', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: { config: [], records: {} },
 		} );
 		expect(
@@ -1046,14 +1072,14 @@ describe( 'getEntityRecordNonTransientEdits', () => {
 
 describe( 'getEmbedPreview()', () => {
 	it( 'returns preview stored for url', () => {
-		let state = deepFreeze( {
+		let state = frozenState( {
 			embedPreviews: {},
 		} );
 		expect( getEmbedPreview( state, 'http://example.com/' ) ).toBe(
 			undefined
 		);
 
-		state = deepFreeze( {
+		state = frozenState( {
 			embedPreviews: {
 				'http://example.com/': { records: 42 },
 			},
@@ -1066,7 +1092,7 @@ describe( 'getEmbedPreview()', () => {
 
 describe( 'isPreviewEmbedFallback()', () => {
 	it( 'returns true if the preview html is just a single link', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			embedPreviews: {
 				'http://example.com/': {
 					html: '<a href="http://example.com/">http://example.com/</a>',
@@ -1081,7 +1107,7 @@ describe( 'isPreviewEmbedFallback()', () => {
 
 describe( 'canUser', () => {
 	it( 'returns undefined by default', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			userPermissions: {},
 		} );
 		expect( canUser( state, 'create', 'media' ) ).toBe( undefined );
@@ -1091,19 +1117,29 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'returns null when entity kind or name is missing', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			userPermissions: {},
 		} );
-		expect( canUser( state, 'create', { name: 'attachment' } ) ).toBe(
-			false
-		);
-		expect( canUser( state, 'create', { kind: 'postType' } ) ).toBe(
-			false
-		);
+		expect(
+			canUser(
+				state,
+				'create',
+				// @ts-expect-error Tests the guard against a resource without a kind.
+				{ name: 'attachment' }
+			)
+		).toBe( false );
+		expect(
+			canUser(
+				state,
+				'create',
+				// @ts-expect-error Tests the guard against a resource without a name.
+				{ kind: 'postType' }
+			)
+		).toBe( false );
 	} );
 
 	it( 'returns whether an action can be performed', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			userPermissions: {
 				'create/media': false,
 				'create/postType/attachment': false,
@@ -1116,7 +1152,7 @@ describe( 'canUser', () => {
 	} );
 
 	it( 'returns whether an action can be performed for a given resource', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			userPermissions: {
 				'create/media/123': false,
 				'create/postType/attachment/123': false,
@@ -1145,12 +1181,12 @@ describe( 'getAutosave', () => {
 		const postType = 'post';
 		const postId = 2;
 		const author = 2;
-		const state = {
+		const state = partialState( {
 			autosaves: {
 				1: [ testAutosave ],
 				2: [ testAutosave ],
 			},
-		};
+		} );
 
 		const result = getAutosave( state, postType, postId, author );
 
@@ -1160,12 +1196,13 @@ describe( 'getAutosave', () => {
 	it( 'returns undefined if an authorId is not provided (or undefined)', () => {
 		const postType = 'post';
 		const postId = 1;
-		const state = {
+		const state = partialState( {
 			autosaves: {
 				1: [ testAutosave ],
 			},
-		};
+		} );
 
+		// @ts-expect-error Tests the guard against a missing author ID.
 		const result = getAutosave( state, postType, postId );
 
 		expect( result ).toBeUndefined();
@@ -1175,12 +1212,12 @@ describe( 'getAutosave', () => {
 		const postType = 'post';
 		const postId = 1;
 		const author = 2;
-		const state = {
+		const state = partialState( {
 			autosaves: {
 				[ postId ]: [ testAutosave ],
 				2: [ testAutosave ],
 			},
-		};
+		} );
 
 		const result = getAutosave( state, postType, postId, author );
 
@@ -1197,12 +1234,12 @@ describe( 'getAutosave', () => {
 			excerpt: { raw: '' },
 			content: { raw: '' },
 		};
-		const state = {
+		const state = partialState( {
 			autosaves: {
 				[ postId ]: [ testAutosave, expectedAutosave ],
 				2: [ testAutosave ],
 			},
-		};
+		} );
 
 		const result = getAutosave( state, postType, postId, author );
 
@@ -1217,11 +1254,11 @@ describe( 'getAutosaves', () => {
 		const autosaves = [
 			{ title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } },
 		];
-		const state = {
+		const state = partialState( {
 			autosaves: {
 				1: autosaves,
 			},
-		};
+		} );
 
 		const result = getAutosaves( state, postType, postId );
 
@@ -1234,11 +1271,11 @@ describe( 'getAutosaves', () => {
 		const autosaves = [
 			{ title: { raw: '' }, excerpt: { raw: '' }, content: { raw: '' } },
 		];
-		const state = {
+		const state = partialState( {
 			autosaves: {
 				1: autosaves,
 			},
-		};
+		} );
 
 		const result = getAutosaves( state, postType, postId );
 
@@ -1248,7 +1285,7 @@ describe( 'getAutosaves', () => {
 
 describe( 'getCurrentUser', () => {
 	it( 'returns undefined if no user exists in state', () => {
-		const state = {};
+		const state = partialState( {} );
 
 		expect( getCurrentUser( state ) ).toBeUndefined();
 	} );
@@ -1258,9 +1295,9 @@ describe( 'getCurrentUser', () => {
 			id: 1,
 		};
 
-		const state = {
+		const state = partialState( {
 			currentUser,
-		};
+		} );
 
 		expect( getCurrentUser( state ) ).toEqual( currentUser );
 	} );
@@ -1268,7 +1305,7 @@ describe( 'getCurrentUser', () => {
 
 describe( 'getRevisions', () => {
 	it( 'should return revisions', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -1316,7 +1353,7 @@ describe( 'getRevisions', () => {
 
 describe( 'getRevision', () => {
 	it( 'should return a specific revision', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -1360,7 +1397,7 @@ describe( 'getRevision', () => {
 	} );
 
 	it( 'should return the same filtered revision for equivalent queries', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -1402,7 +1439,7 @@ describe( 'getRevision', () => {
 
 describe( 'hasRevision', () => {
 	it( 'returns false if revision has not been received', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -1423,7 +1460,7 @@ describe( 'hasRevision', () => {
 	} );
 
 	it( 'returns false if parent record does not exist', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {},
 			},
@@ -1432,7 +1469,7 @@ describe( 'hasRevision', () => {
 	} );
 
 	it( 'returns true when full revision exists and no fields query', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -1465,7 +1502,7 @@ describe( 'hasRevision', () => {
 	} );
 
 	it( 'returns true when requested fields exist on the revision', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {
@@ -1508,7 +1545,7 @@ describe( 'hasRevision', () => {
 	} );
 
 	it( 'returns false when requested fields are missing', () => {
-		const state = deepFreeze( {
+		const state = frozenState( {
 			entities: {
 				records: {
 					postType: {

@@ -6755,11 +6755,6 @@
 			"count": 1
 		}
 	},
-	"packages/core-data/src/test/selectors.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/core-data/src/test/sync.jsdom.test.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
