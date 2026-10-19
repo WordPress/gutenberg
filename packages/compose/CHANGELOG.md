@@ -24,7 +24,7 @@
 
 ### Bug Fixes
 
--   `useMergeRefs`: Accept `false` in the ref types to support conditionally disabled refs ([#85090](https://github.com/WordPress/gutenberg/pull/85090)).
+-   `useMergeRefs`, `useStateWithHistory`: Accept `false` in `useMergeRefs`, preserve the initial value type in `useStateWithHistory`, and allow omitting `isStaged` in `setValue` ([#85090](https://github.com/WordPress/gutenberg/pull/85090)).
 -   `useConstrainedTabbing`: Retain focus when the constrained area has no tabbable elements ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
 
 ### Internal
