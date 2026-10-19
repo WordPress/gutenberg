@@ -6,25 +6,12 @@ export type RootProps = Omit<
 	'color'
 > & {
 	/**
-	 * The color of an optional ring around the avatar. Accepts any CSS color,
-	 * including CSS variables. Without an image, supporting browsers also use
-	 * an opaque sRGB fill derived from this color and a contrasting foreground.
-	 * Colored fallbacks have no border. Forced-colors mode retains a visible border.
-	 * Other browsers retain the neutral fallback. Images keep their own colors
-	 * and the supplied ring color.
-	 * The ring paints over the avatar's inner edge without changing its layout size.
-	 * Foreground tinting targets at least 4.5:1 contrast for text and 3:1 for
-	 * the default person icon when the fill resolves independently.
+	 * Colors the image's inner ring or the fallback background without changing
+	 * the avatar's size. Fallbacks use an opaque color with a contrasting foreground.
 	 *
-	 * The colored fallback's fill must resolve independently of its foreground.
-	 * `currentColor`, including through CSS variables or color functions, is
-	 * unsupported for colored fallbacks and can produce insufficient contrast.
-	 * CSS-wide keywords such as `inherit` cannot be used as fallback fills.
-	 * Alpha is discarded, and out-of-gamut channels are clipped to sRGB.
-	 *
-	 * Development warnings are best-effort. They do not resolve CSS variables
-	 * or detect every unsupported expression, including escaped keywords.
-	 * The absence of a warning does not guarantee sufficient contrast.
+	 * Accepts CSS colors and variables that resolve to a color. Do not use
+	 * `currentColor`, including through variables, or CSS-wide keywords such as
+	 * `inherit`. Browsers without support for colored fallbacks use neutral colors.
 	 */
 	color?: React.CSSProperties[ 'color' ];
 	/**
