@@ -48,7 +48,7 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@ariakit/react": "^0.4.41",
+		"@ariakit/react": "^0.4.42",
 		"@date-fns/utc": "^2.1.1",
 		"@floating-ui/react-dom": "^2.1.9",
 		"@types/highlight-words-core": "^1.2.1",
