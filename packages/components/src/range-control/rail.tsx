@@ -46,8 +46,7 @@ export default function RangeRail(
 				) }
 				style={
 					{
-						'--_wp-components-range-control-rail-color':
-							railColor || undefined,
+						'--_wp-components-range-control-rail-color': railColor,
 						...style,
 					} as React.CSSProperties
 				}
