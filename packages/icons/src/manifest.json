@@ -1024,8 +1024,7 @@
 	{
 		"slug": "megaphone",
 		"label": "Megaphone",
-		"filePath": "library/megaphone.svg",
-		"collections": [ "core", "core-admin" ]
+		"filePath": "library/megaphone.svg"
 	},
 	{
 		"slug": "menu",

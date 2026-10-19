@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `manifest.json`: Add 19 popular admin menu icons to the `core-admin` collection, and ship `megaphone` to the `core` collection ([#85072](https://github.com/WordPress/gutenberg/pull/85072)).
+-   `manifest.json`: Add 18 popular admin menu icons to the `core-admin` collection ([#85072](https://github.com/WordPress/gutenberg/pull/85072)).
 
 ## 18.0.0 (2026-10-07)
 

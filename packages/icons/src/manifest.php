@@ -292,11 +292,6 @@ return array(
 		'filePath'    => 'library/media.svg',
 		'collections' => array( 'core-admin' ),
 	),
-	'megaphone'           => array(
-		'label'       => _x( 'Megaphone', 'icon label', 'gutenberg' ),
-		'filePath'    => 'library/megaphone.svg',
-		'collections' => array( 'core', 'core-admin' ),
-	),
 	'menu'                => array(
 		'label'       => _x( 'Menu', 'icon label', 'gutenberg' ),
 		'filePath'    => 'library/menu.svg',
