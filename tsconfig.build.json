@@ -90,7 +90,7 @@
 		{ "path": "packages/upload-media/tsconfig.build.json" },
 		{ "path": "packages/url/tsconfig.build.json" },
 		{ "path": "packages/video-conversion/tsconfig.build.json" },
-		{ "path": "packages/viewport" },
+		{ "path": "packages/viewport/tsconfig.build.json" },
 		{ "path": "packages/views/tsconfig.build.json" },
 		{ "path": "packages/vips/tsconfig.build.json" },
 		{ "path": "packages/warning" },
