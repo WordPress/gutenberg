@@ -36,21 +36,27 @@ export default function useEntityProp( kind, name, prop, _id ) {
 	const context = useContext( EntityContext );
 	// A revision applies only to the record it was provided for. The ID can be
 	// given as a string or a number, so compare the two loosely.
-	const revisionId =
+	const providedRevision =
 		String( id ) === String( providerId )
 			? context?.revision?.[ kind ]?.[ name ]
 			: undefined;
+	const revisionRecord =
+		typeof providedRevision === 'object' ? providedRevision : undefined;
+	const revisionId = revisionRecord ? undefined : providedRevision;
+	const isRevision = !! ( revisionRecord || revisionId );
 
 	const { value, fullValue } = useSelect(
 		( select ) => {
-			if ( revisionId ) {
-				const revision = select( STORE_NAME ).getRevision(
-					kind,
-					name,
-					id,
-					revisionId,
-					REVISION_QUERY
-				);
+			if ( revisionRecord ? prop in revisionRecord : revisionId ) {
+				const revision =
+					revisionRecord ??
+					select( STORE_NAME ).getRevision(
+						kind,
+						name,
+						id,
+						revisionId,
+						REVISION_QUERY
+					);
 				const propValue = revision?.[ prop ];
 				if ( propValue === undefined ) {
 					return {};
@@ -78,19 +84,19 @@ export default function useEntityProp( kind, name, prop, _id ) {
 					}
 				: {};
 		},
-		[ kind, name, id, prop, revisionId ]
+		[ kind, name, id, prop, revisionId, revisionRecord ]
 	);
 	const { editEntityRecord } = useDispatch( STORE_NAME );
 	const setValue = useCallback(
 		( newValue ) => {
-			if ( revisionId ) {
+			if ( isRevision ) {
 				return;
 			}
 			editEntityRecord( kind, name, id, {
 				[ prop ]: newValue,
 			} );
 		},
-		[ editEntityRecord, kind, name, id, prop, revisionId ]
+		[ editEntityRecord, kind, name, id, prop, isRevision ]
 	);
 
 	return [ value, setValue, fullValue ];
