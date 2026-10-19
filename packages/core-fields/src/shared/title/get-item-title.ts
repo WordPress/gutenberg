@@ -6,6 +6,10 @@ import { __ } from '@wordpress/i18n';
  */
 export interface ItemWithTitle {
 	title?: string | { rendered?: string; raw?: string };
+	/**
+	 * The user editing the post, when it isn't the current user.
+	 */
+	locked_by?: { id: number; name: string } | null;
 }
 
 /**
