@@ -6,6 +6,7 @@
 
 -   Notes: Add one note to several selected blocks, or to text selected across them ([#86051](https://github.com/WordPress/gutenberg/pull/86051)).
 -   Style revisions: Compare the selected revision with the current version side by side, as a visual preview or as a code diff of the styles and settings, with a header naming each ([#85288](https://github.com/WordPress/gutenberg/pull/85288)).
+-   Save failures: When something other than WordPress answers, such as a proxy's error page or the login page, the notice's `details` explain the failure from the HTTP status, instead of showing only the error code or no details at all.
 
 ### Bug Fixes
 
