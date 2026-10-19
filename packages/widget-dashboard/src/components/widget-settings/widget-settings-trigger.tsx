@@ -2,7 +2,6 @@ import { __ } from '@wordpress/i18n';
 import { drawerRight } from '@wordpress/icons';
 // Dashboard is still experimental.
 import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	IconButton,
 } from '@wordpress/ui';
 import type { WidgetType } from '@wordpress/widget-primitives';

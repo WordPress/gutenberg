@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useCallback, useState } from '@wordpress/element';
 import {
 	Badge,
-	// eslint-disable-next-line @wordpress/use-recommended-components -- admin-ui is a bundled package that depends on @wordpress/ui
 	Button,
 	Text,
 } from '@wordpress/ui';

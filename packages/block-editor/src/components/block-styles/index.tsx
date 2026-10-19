@@ -8,7 +8,6 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
 	Tooltip,
 } from '@wordpress/ui';

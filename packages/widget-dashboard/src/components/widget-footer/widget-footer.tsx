@@ -1,13 +1,6 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { inertValue } from '@wordpress/react-inert-value';
-import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
-	ButtonLink,
-	Icon,
-	Link,
-	Stack,
-	Tooltip,
-} from '@wordpress/ui';
+import { ButtonLink, Icon, Link, Stack, Tooltip } from '@wordpress/ui';
 import { HostLink } from '@wordpress/widget-primitives';
 import type {
 	WidgetAction,

@@ -8,7 +8,6 @@ import {
 } from '@wordpress/element';
 import { lock } from '@wordpress/icons';
 import {
-	// eslint-disable-next-line @wordpress/use-recommended-components
 	Button,
 } from '@wordpress/ui';
 import type {
