@@ -14,7 +14,7 @@ export type RemoveHook = (
 	/**
 	 * The unique namespace identifying the callback in the form `vendor/plugin/function`.
 	 */
-	namespace: string
+	namespace?: string
 ) => number | undefined;
 
 /**
