@@ -11,7 +11,9 @@ import useResourcePermissions from '../use-resource-permissions';
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 // The tests stub REST responses in place of typed requests.
-const apiFetchMock = triggerFetch as unknown as Mock;
+const apiFetchMock = triggerFetch as unknown as Mock<
+	( options: { path: string; method?: string; parse?: boolean } ) => unknown
+>;
 
 describe( 'useResourcePermissions', () => {
 	let registry: ReturnType< typeof createRegistry >;

@@ -7,7 +7,9 @@ import { store as coreDataStore } from '../index';
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 // The tests stub REST responses in place of typed requests.
-const apiFetchMock = triggerFetch as unknown as Mock;
+const apiFetchMock = triggerFetch as unknown as Mock<
+	( options: { path: string; parse?: boolean } ) => unknown
+>;
 
 const ALLOW_ALL = {
 	headers: new Map( [ [ 'allow', 'POST, GET, PUT, DELETE' ] ] ),

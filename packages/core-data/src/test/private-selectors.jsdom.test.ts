@@ -7,7 +7,7 @@ import {
 } from '../private-selectors';
 import type { State } from '../selectors';
 
-type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
+type DeepPartial< T > = T extends ( ...args: Array< never > ) => unknown
 	? T
 	: T extends object
 		? { [ K in keyof T ]?: DeepPartial< T[ K ] > }

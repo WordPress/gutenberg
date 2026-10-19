@@ -13,7 +13,9 @@ import useEntityRecords, {
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 // The tests stub REST responses in place of typed requests.
-const apiFetchMock = triggerFetch as unknown as Mock;
+const apiFetchMock = triggerFetch as unknown as Mock<
+	( options: { path: string; parse?: boolean } ) => unknown
+>;
 
 describe( 'useEntityRecords', () => {
 	let registry: ReturnType< typeof createRegistry >;

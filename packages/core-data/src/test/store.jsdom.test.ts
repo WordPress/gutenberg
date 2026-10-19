@@ -8,7 +8,9 @@ import type * as ET from '../entity-types';
 vi.mock( import( '@wordpress/api-fetch' ) );
 
 // The tests stub REST responses in place of typed requests.
-const apiFetchMock = triggerFetch as unknown as Mock;
+const apiFetchMock = triggerFetch as unknown as Mock<
+	( options: { path: string; parse?: boolean } ) => unknown
+>;
 
 function createTestRegistry() {
 	const registry = createRegistry();
@@ -50,7 +52,7 @@ function createTestRegistry() {
 	return registry;
 }
 
-function createTestPost( id = 1, fields = [] ) {
+function createTestPost( id = 1, fields: Array< string > = [] ) {
 	const post = {
 		id,
 		author: 1,
@@ -73,9 +75,14 @@ function createTestPost( id = 1, fields = [] ) {
 	};
 
 	if ( fields.length > 0 ) {
+		// The tests read the subset of fields as the post they come from.
 		return Object.fromEntries(
-			fields.map( ( field ) => [ field, post[ field ] ] )
-		);
+			fields.map( ( field ) => [
+				field,
+				// The tests ask for fields the post has.
+				post[ field as keyof typeof post ],
+			] )
+		) as typeof post;
 	}
 
 	return post;
