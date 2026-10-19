@@ -11,6 +11,37 @@ import {
 	fieldsConfigs,
 	entityActionsConfigs,
 } from '../reducer';
+import type * as ET from '../entity-types';
+import type { EntityActionsConfig, FieldsConfig } from '../private-selectors';
+import type { Action, EntitiesState, EntityConfig } from '../types';
+
+type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
+	? T
+	: T extends object
+		? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
+		: T;
+
+/**
+ * Types a fixture that holds only the fields the code under test reads.
+ *
+ * @param value The partial fixture.
+ */
+function partial< T >( value: DeepPartial< T > ): T {
+	return value as T;
+}
+
+/**
+ * Freezes a partial fixture to catch mutations, keeping it writable to the
+ * type checker as the code under test expects.
+ *
+ * @param value The partial fixture.
+ */
+function frozen< T >( value: DeepPartial< T > ): T {
+	return deepFreeze( value ) as T;
+}
+
+// An action no reducer handles, to read the initial state.
+const UNHANDLED_ACTION = partial< Action >( {} );
 
 describe( 'entities', () => {
 	// See also unit tests at `queried-data/test/reducer.js`, which are more
@@ -18,7 +49,7 @@ describe( 'entities', () => {
 	// `queriedData` property on a kind/name nested object pair.
 
 	it( 'returns the default state for all defined entities', () => {
-		const state = entities( undefined, {} );
+		const state = entities( undefined, UNHANDLED_ACTION );
 
 		expect( state.records.root.postType.queriedData ).toEqual( {
 			items: {},
@@ -28,7 +59,7 @@ describe( 'entities', () => {
 	} );
 
 	it( 'returns with received post types by slug', () => {
-		const originalState = deepFreeze( {} );
+		const originalState = frozen< EntitiesState >( {} );
 		const state = entities( originalState, {
 			type: 'RECEIVE_ITEMS',
 			items: [
@@ -57,7 +88,7 @@ describe( 'entities', () => {
 	} );
 
 	it( 'appends the received post types by slug', () => {
-		const originalState = deepFreeze( {
+		const originalState = frozen< EntitiesState >( {
 			records: {
 				root: {
 					postType: {
@@ -103,10 +134,12 @@ describe( 'entities', () => {
 	} );
 
 	it( 'returns with updated entities config', () => {
-		const originalState = deepFreeze( {} );
+		const originalState = frozen< EntitiesState >( {} );
 		const state = entities( originalState, {
 			type: 'ADD_ENTITIES',
-			entities: [ { kind: 'postType', name: 'posts' } ],
+			entities: [
+				partial< EntityConfig >( { kind: 'postType', name: 'posts' } ),
+			],
 		} );
 
 		expect(
@@ -120,11 +153,12 @@ describe( 'entities', () => {
 		const stateWithConfig = entities( undefined, {
 			type: 'ADD_ENTITIES',
 			entities: [
-				{
+				partial< EntityConfig >( {
 					kind: 'root',
 					name: 'postType',
+					// @ts-expect-error The config has no `supports`: revisions are always tracked.
 					supports: { revisions: true },
-				},
+				} ),
 			],
 		} );
 		it( 'appends revisions state', () => {
@@ -135,7 +169,7 @@ describe( 'entities', () => {
 		} );
 
 		it( 'returns with received revisions', () => {
-			const initialState = deepFreeze( {
+			const initialState = frozen< EntitiesState >( {
 				config: stateWithConfig.config,
 				records: {},
 			} );
@@ -164,7 +198,7 @@ describe( 'entities', () => {
 		} );
 
 		it( 'returns with appended received revisions at the parent level', () => {
-			const initialState = deepFreeze( {
+			const initialState = frozen< EntitiesState >( {
 				config: stateWithConfig.config,
 				records: {
 					root: {
@@ -226,7 +260,7 @@ describe( 'entities', () => {
 		} );
 
 		it( 'returns with appended received revision items', () => {
-			const initialState = deepFreeze( {
+			const initialState = frozen< EntitiesState >( {
 				config: stateWithConfig.config,
 				records: {
 					root: {
@@ -277,7 +311,7 @@ describe( 'entities', () => {
 		} );
 
 		it( 'returns with removed revision items', () => {
-			const initialState = deepFreeze( {
+			const initialState = frozen< EntitiesState >( {
 				config: stateWithConfig.config,
 				records: {
 					root: {
@@ -327,12 +361,15 @@ describe( 'entities', () => {
 					},
 				},
 			} );
-			const state = entities( initialState, {
-				type: 'REMOVE_ITEMS',
-				itemIds: [ 4, 6 ],
-				kind: 'root',
-				name: 'postType',
-			} );
+			const state = entities(
+				initialState,
+				partial< Action >( {
+					type: 'REMOVE_ITEMS',
+					itemIds: [ 4, 6 ],
+					kind: 'root',
+					name: 'postType',
+				} )
+			);
 			expect( state.records.root.postType.revisions ).toEqual( {
 				2: {
 					items: {
@@ -354,7 +391,7 @@ describe( 'entities', () => {
 
 describe( 'embedPreviews()', () => {
 	it( 'returns an empty object by default', () => {
-		const state = embedPreviews( undefined, {} );
+		const state = embedPreviews( undefined, UNHANDLED_ACTION );
 
 		expect( state ).toEqual( {} );
 	} );
@@ -375,7 +412,7 @@ describe( 'embedPreviews()', () => {
 
 describe( 'userPermissions()', () => {
 	it( 'defaults to an empty object', () => {
-		const state = userPermissions( undefined, {} );
+		const state = userPermissions( undefined, UNHANDLED_ACTION );
 		expect( state ).toEqual( {} );
 	} );
 
@@ -398,7 +435,7 @@ describe( 'userPermissions()', () => {
 
 describe( 'autosaves', () => {
 	it( 'returns an empty object by default', () => {
-		const state = autosaves( undefined, {} );
+		const state = autosaves( undefined, UNHANDLED_ACTION );
 
 		expect( state ).toEqual( {} );
 	} );
@@ -497,12 +534,12 @@ describe( 'autosaves', () => {
 
 describe( 'currentUser', () => {
 	it( 'returns an empty object by default', () => {
-		const state = currentUser( undefined, {} );
+		const state = currentUser( undefined, UNHANDLED_ACTION );
 		expect( state ).toEqual( {} );
 	} );
 
 	it( 'returns the current user', () => {
-		const currentUserData = { id: 1 };
+		const currentUserData = partial< ET.User< 'view' > >( { id: 1 } );
 
 		const state = currentUser(
 			{},
@@ -516,15 +553,12 @@ describe( 'currentUser', () => {
 	} );
 
 	it( 'overwrites any existing current user state', () => {
-		const currentUserData = { id: 2 };
+		const currentUserData = partial< ET.User< 'view' > >( { id: 2 } );
 
-		const state = currentUser(
-			{ id: 1 },
-			{
-				type: 'RECEIVE_CURRENT_USER',
-				currentUser: currentUserData,
-			}
-		);
+		const state = currentUser( partial< ET.User< 'view' > >( { id: 1 } ), {
+			type: 'RECEIVE_CURRENT_USER',
+			currentUser: currentUserData,
+		} );
 
 		expect( state ).toEqual( currentUserData );
 	} );
@@ -532,7 +566,9 @@ describe( 'currentUser', () => {
 
 describe( 'undoManager', () => {
 	it( 'returns the same reference for unrelated actions', () => {
-		const originalState = undoManager( undefined, {} );
+		// @ts-expect-error The reducer takes no action.
+		const originalState = undoManager( undefined, UNHANDLED_ACTION );
+		// @ts-expect-error The reducer takes no action.
 		const state = undoManager( originalState, {
 			type: 'UNRELATED',
 		} );
@@ -543,12 +579,16 @@ describe( 'undoManager', () => {
 
 describe( 'undoManagerReference', () => {
 	it( 'changes when the entity sync manager records an undo level', () => {
-		const originalState = undoManagerReference( undefined, {} );
+		const originalState = undoManagerReference(
+			undefined,
+			UNHANDLED_ACTION
+		);
 
 		expect(
-			undoManagerReference( originalState, {
-				type: 'EDIT_ENTITY_RECORD',
-			} )
+			undoManagerReference(
+				originalState,
+				partial< Action >( { type: 'EDIT_ENTITY_RECORD' } )
+			)
 		).toBe( originalState );
 		expect(
 			undoManagerReference( originalState, {
@@ -560,13 +600,23 @@ describe( 'undoManagerReference', () => {
 
 describe( 'fieldsConfigs', () => {
 	it( 'returns an empty object by default', () => {
-		expect( fieldsConfigs( undefined, {} ) ).toEqual( {} );
+		expect( fieldsConfigs( undefined, UNHANDLED_ACTION ) ).toEqual( {} );
 	} );
 
 	it( 'keys the received configs by kind, then name', () => {
-		const pageConfig = { kind: 'postType', name: 'page', fields: [] };
-		const postConfig = { kind: 'postType', name: 'post', fields: [] };
-		const state = deepFreeze( {
+		const pageConfig = partial< FieldsConfig >( {
+			kind: 'postType',
+			name: 'page',
+			fields: [],
+		} );
+		const postConfig = partial< FieldsConfig >( {
+			kind: 'postType',
+			name: 'post',
+			fields: [],
+		} );
+		const state = frozen<
+			Record< string, Record< string, FieldsConfig > >
+		>( {
 			postType: { page: pageConfig },
 		} );
 
@@ -588,13 +638,17 @@ describe( 'fieldsConfigs', () => {
 				type: 'RECEIVE_FIELDS_CONFIG',
 				kind: 'a/b',
 				name: 'c',
-				config: { fields: [ { id: 'first' } ] },
+				config: partial< FieldsConfig >( {
+					fields: [ { id: 'first' } ],
+				} ),
 			} ),
 			{
 				type: 'RECEIVE_FIELDS_CONFIG',
 				kind: 'a',
 				name: 'b/c',
-				config: { fields: [ { id: 'second' } ] },
+				config: partial< FieldsConfig >( {
+					fields: [ { id: 'second' } ],
+				} ),
 			}
 		);
 
@@ -605,13 +659,25 @@ describe( 'fieldsConfigs', () => {
 
 describe( 'entityActionsConfigs', () => {
 	it( 'returns an empty object by default', () => {
-		expect( entityActionsConfigs( undefined, {} ) ).toEqual( {} );
+		expect( entityActionsConfigs( undefined, UNHANDLED_ACTION ) ).toEqual(
+			{}
+		);
 	} );
 
 	it( 'keys the received configs by kind, then name', () => {
-		const pageConfig = { kind: 'postType', name: 'page', actions: [] };
-		const postConfig = { kind: 'postType', name: 'post', actions: [] };
-		const state = deepFreeze( {
+		const pageConfig = partial< EntityActionsConfig >( {
+			kind: 'postType',
+			name: 'page',
+			actions: [],
+		} );
+		const postConfig = partial< EntityActionsConfig >( {
+			kind: 'postType',
+			name: 'post',
+			actions: [],
+		} );
+		const state = frozen<
+			Record< string, Record< string, EntityActionsConfig > >
+		>( {
 			postType: { page: pageConfig },
 		} );
 
@@ -633,13 +699,17 @@ describe( 'entityActionsConfigs', () => {
 				type: 'RECEIVE_ENTITY_ACTIONS_CONFIG',
 				kind: 'a/b',
 				name: 'c',
-				config: { actions: [ { id: 'first' } ] },
+				config: partial< EntityActionsConfig >( {
+					actions: [ { id: 'first' } ],
+				} ),
 			} ),
 			{
 				type: 'RECEIVE_ENTITY_ACTIONS_CONFIG',
 				kind: 'a',
 				name: 'b/c',
-				config: { actions: [ { id: 'second' } ] },
+				config: partial< EntityActionsConfig >( {
+					actions: [ { id: 'second' } ],
+				} ),
 			}
 		);
 

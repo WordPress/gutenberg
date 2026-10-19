@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
+import type { CRDTDoc } from '@wordpress/sync';
 import {
 	getMethodName,
 	rootEntitiesConfig,
@@ -7,6 +8,24 @@ import {
 	additionalEntityConfigLoaders,
 } from '../entities';
 import { applyPostChangesToCRDTDoc } from '../utils/crdt';
+import type { EntityConfig } from '../types';
+
+/**
+ * Finds an item the test expects, such as a loader or an entity.
+ *
+ * @param items     The items to search.
+ * @param predicate Whether an item is the one the test expects.
+ */
+function findExpected< T >(
+	items: ReadonlyArray< T >,
+	predicate: ( item: T ) => boolean
+): T {
+	// The tests look up only items that exist.
+	return items.find( predicate )!;
+}
+
+// The mocked CRDT functions never read the document.
+const CRDT_DOC = {} as CRDTDoc;
 vi.mock( import( '@wordpress/api-fetch' ) );
 vi.mock( import( '../utils/crdt' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -34,7 +53,11 @@ describe( 'getMethodName', () => {
 
 	it( 'should include the kind in the method name', () => {
 		const id = rootEntitiesConfig.length;
-		rootEntitiesConfig[ id ] = { name: 'book', kind: 'postType' };
+		// The method name reads only the name and kind.
+		rootEntitiesConfig[ id ] = {
+			name: 'book',
+			kind: 'postType',
+		} as EntityConfig;
 		const methodName = getMethodName( 'postType', 'book' );
 		delete rootEntitiesConfig[ id ];
 
@@ -44,7 +67,8 @@ describe( 'getMethodName', () => {
 
 describe( 'rootEntitiesConfig', () => {
 	it( 'does not define sync configuration when collaboration is disabled', () => {
-		const commentEntity = rootEntitiesConfig.find(
+		const commentEntity = findExpected(
+			rootEntitiesConfig,
 			( entity ) => entity.name === 'comment'
 		);
 
@@ -53,7 +77,7 @@ describe( 'rootEntitiesConfig', () => {
 } );
 
 describe( 'prePersistPostType', () => {
-	let originalCollaborationEnabled;
+	let originalCollaborationEnabled: boolean | undefined;
 
 	beforeEach( () => {
 		originalCollaborationEnabled =
@@ -66,7 +90,7 @@ describe( 'prePersistPostType', () => {
 	} );
 
 	it( 'set the status to draft and empty the title when saving auto-draft posts', async () => {
-		let record = {
+		let record: Record< string, unknown > = {
 			status: 'auto-draft',
 		};
 		const edits = {};
@@ -117,12 +141,12 @@ describe( 'prePersistPostType', () => {
 } );
 
 describe( 'loadPostTypeEntities', () => {
-	let originalCollaborationEnabled;
-	let originalCollaborationDisabledPostTypes;
+	let originalCollaborationEnabled: boolean | undefined;
+	let originalCollaborationDisabledPostTypes: unknown;
 
 	beforeEach( () => {
-		apiFetch.mockReset();
-		applyPostChangesToCRDTDoc.mockReset();
+		vi.mocked( apiFetch ).mockReset();
+		vi.mocked( applyPostChangesToCRDTDoc ).mockReset();
 		originalCollaborationEnabled =
 			window.__experimentalEnableRealTimeCollaboration;
 		originalCollaborationDisabledPostTypes =
@@ -160,17 +184,19 @@ describe( 'loadPostTypeEntities', () => {
 			},
 		};
 
-		apiFetch
+		vi.mocked( apiFetch )
 			.mockResolvedValueOnce( mockPostTypes )
 			.mockResolvedValueOnce( mockTaxonomies );
 
-		const postTypeLoader = additionalEntityConfigLoaders.find(
+		const postTypeLoader = findExpected(
+			additionalEntityConfigLoaders,
 			( loader ) => loader.kind === 'postType'
 		);
 		const entities = await postTypeLoader.loadEntities();
-		const bookEntity = entities.find( ( e ) => e.name === 'book' );
+		const bookEntity = findExpected( entities, ( e ) => e.name === 'book' );
 
-		bookEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
+		// Collaboration is enabled, so the entity has a sync config.
+		bookEntity.syncConfig!.applyChangesToCRDTDoc( CRDT_DOC, {} );
 
 		expect( applyPostChangesToCRDTDoc ).toHaveBeenCalledWith(
 			{},
@@ -178,7 +204,8 @@ describe( 'loadPostTypeEntities', () => {
 			expect.any( Set )
 		);
 
-		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
+		const syncedProperties = vi.mocked( applyPostChangesToCRDTDoc ).mock
+			.calls[ 0 ][ 2 ];
 		expect( syncedProperties ).toContain( 'genres' );
 		expect( syncedProperties ).toContain( 'audiences' );
 	} );
@@ -195,9 +222,10 @@ describe( 'loadPostTypeEntities', () => {
 			},
 		};
 
-		apiFetch.mockResolvedValueOnce( mockPostTypes );
+		vi.mocked( apiFetch ).mockResolvedValueOnce( mockPostTypes );
 
-		const postTypeLoader = additionalEntityConfigLoaders.find(
+		const postTypeLoader = findExpected(
+			additionalEntityConfigLoaders,
 			( loader ) => loader.kind === 'postType'
 		);
 		await postTypeLoader.loadEntities();
@@ -217,13 +245,14 @@ describe( 'loadPostTypeEntities', () => {
 			},
 		};
 
-		apiFetch.mockResolvedValueOnce( mockPostTypes );
+		vi.mocked( apiFetch ).mockResolvedValueOnce( mockPostTypes );
 
-		const postTypeLoader = additionalEntityConfigLoaders.find(
+		const postTypeLoader = findExpected(
+			additionalEntityConfigLoaders,
 			( loader ) => loader.kind === 'postType'
 		);
 		const entities = await postTypeLoader.loadEntities();
-		const postEntity = entities.find( ( e ) => e.name === 'post' );
+		const postEntity = findExpected( entities, ( e ) => e.name === 'post' );
 
 		expect( postEntity.syncConfig ).toBeUndefined();
 	} );
@@ -240,15 +269,20 @@ describe( 'loadPostTypeEntities', () => {
 			},
 		};
 
-		apiFetch.mockResolvedValueOnce( mockPostTypes );
+		vi.mocked( apiFetch ).mockResolvedValueOnce( mockPostTypes );
 
-		const postTypeLoader = additionalEntityConfigLoaders.find(
+		const postTypeLoader = findExpected(
+			additionalEntityConfigLoaders,
 			( loader ) => loader.kind === 'postType'
 		);
 		const entities = await postTypeLoader.loadEntities();
-		const bookEntity = entities.find( ( e ) => e.name === 'book' );
+		const bookEntity = findExpected( entities, ( e ) => e.name === 'book' );
 
-		expect( bookEntity.syncConfig.shouldSync() ).toBe( false );
+		// Collaboration is enabled, so the post type syncs and has a sync check.
+		expect(
+			// @ts-expect-error The post type check ignores the object it is given.
+			bookEntity.syncConfig!.shouldSync!()
+		).toBe( false );
 	} );
 
 	it( 'should skip taxonomy rest_base when taxonomy is not found in fetched taxonomies', async () => {
@@ -271,19 +305,22 @@ describe( 'loadPostTypeEntities', () => {
 			// 'missing_taxonomy' is intentionally absent.
 		};
 
-		apiFetch
+		vi.mocked( apiFetch )
 			.mockResolvedValueOnce( mockPostTypes )
 			.mockResolvedValueOnce( mockTaxonomies );
 
-		const postTypeLoader = additionalEntityConfigLoaders.find(
+		const postTypeLoader = findExpected(
+			additionalEntityConfigLoaders,
 			( loader ) => loader.kind === 'postType'
 		);
 		const entities = await postTypeLoader.loadEntities();
-		const bookEntity = entities.find( ( e ) => e.name === 'book' );
+		const bookEntity = findExpected( entities, ( e ) => e.name === 'book' );
 
-		bookEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
+		// Collaboration is enabled, so the entity has a sync config.
+		bookEntity.syncConfig!.applyChangesToCRDTDoc( CRDT_DOC, {} );
 
-		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
+		const syncedProperties = vi.mocked( applyPostChangesToCRDTDoc ).mock
+			.calls[ 0 ][ 2 ];
 		expect( syncedProperties ).toContain( 'genres' );
 		// missing_taxonomy has no rest_base entry, so nothing should be added for it.
 		expect( syncedProperties.size ).toBe( 16 ); // 15 base + 1 taxonomy (genres)
@@ -301,19 +338,22 @@ describe( 'loadPostTypeEntities', () => {
 			},
 		};
 
-		apiFetch
+		vi.mocked( apiFetch )
 			.mockResolvedValueOnce( mockPostTypes )
 			.mockResolvedValueOnce( {} );
 
-		const postTypeLoader = additionalEntityConfigLoaders.find(
+		const postTypeLoader = findExpected(
+			additionalEntityConfigLoaders,
 			( loader ) => loader.kind === 'postType'
 		);
 		const entities = await postTypeLoader.loadEntities();
-		const pageEntity = entities.find( ( e ) => e.name === 'page' );
+		const pageEntity = findExpected( entities, ( e ) => e.name === 'page' );
 
-		pageEntity.syncConfig.applyChangesToCRDTDoc( {}, {} );
+		// Collaboration is enabled, so the entity has a sync config.
+		pageEntity.syncConfig!.applyChangesToCRDTDoc( CRDT_DOC, {} );
 
-		const syncedProperties = applyPostChangesToCRDTDoc.mock.calls[ 0 ][ 2 ];
+		const syncedProperties = vi.mocked( applyPostChangesToCRDTDoc ).mock
+			.calls[ 0 ][ 2 ];
 		const expectedBase = [
 			'author',
 			'blocks',
@@ -339,10 +379,10 @@ describe( 'loadPostTypeEntities', () => {
 } );
 
 describe( 'loadTaxonomyEntities', () => {
-	let originalCollaborationEnabled;
+	let originalCollaborationEnabled: boolean | undefined;
 
 	beforeEach( () => {
-		apiFetch.mockReset();
+		vi.mocked( apiFetch ).mockReset();
 		originalCollaborationEnabled =
 			window.__experimentalEnableRealTimeCollaboration;
 	} );
@@ -361,9 +401,10 @@ describe( 'loadTaxonomyEntities', () => {
 			},
 		};
 
-		apiFetch.mockResolvedValueOnce( mockTaxonomies );
+		vi.mocked( apiFetch ).mockResolvedValueOnce( mockTaxonomies );
 
-		const taxonomyLoader = additionalEntityConfigLoaders.find(
+		const taxonomyLoader = findExpected(
+			additionalEntityConfigLoaders,
 			( loader ) => loader.kind === 'taxonomy'
 		);
 		const entities = await taxonomyLoader.loadEntities();
@@ -374,14 +415,15 @@ describe( 'loadTaxonomyEntities', () => {
 
 	it( 'does not define sync configuration when collaboration is disabled', async () => {
 		window.__experimentalEnableRealTimeCollaboration = false;
-		apiFetch.mockResolvedValueOnce( {
+		vi.mocked( apiFetch ).mockResolvedValueOnce( {
 			category: {
 				name: 'Categories',
 				rest_base: 'categories',
 			},
 		} );
 
-		const taxonomyLoader = additionalEntityConfigLoaders.find(
+		const taxonomyLoader = findExpected(
+			additionalEntityConfigLoaders,
 			( loader ) => loader.kind === 'taxonomy'
 		);
 		const entities = await taxonomyLoader.loadEntities();

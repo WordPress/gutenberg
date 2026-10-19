@@ -2,22 +2,38 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
 import { createUndoManager } from '@wordpress/undo-manager';
+import type {
+	ConnectionStatus,
+	ConnectionStatusDisconnected,
+} from '@wordpress/sync';
 import { clearUnchangedEdits, ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { rootEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
 import { ConnectionErrorCode } from './sync';
-
-/** @typedef {import('./types').AnyFunction} AnyFunction */
+import type * as ET from './entity-types';
+import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
+import type { ItemId } from './queried-data/types';
+import type {
+	Action,
+	EntitiesState,
+	EntityConfig,
+	EntityRecordsState,
+	KeyedEntityAction,
+	UsersState,
+} from './types';
 
 /**
  * Reducer managing authors state. Keyed by id.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function users( state = { byId: {}, queries: {} }, action ) {
+export function users(
+	state: UsersState = { byId: {}, queries: {} },
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_USER_QUERY':
 			return {
@@ -45,12 +61,15 @@ export function users( state = { byId: {}, queries: {} }, action ) {
 /**
  * Reducer managing current user state.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function currentUser( state = {}, action ) {
+export function currentUser(
+	state: ET.User< 'view' > | Record< string, never > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_CURRENT_USER':
 			return action.currentUser;
@@ -62,12 +81,15 @@ export function currentUser( state = {}, action ) {
 /**
  * Reducer managing the current theme.
  *
- * @param {string|undefined} state  Current state.
- * @param {Object}           action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {string|undefined} Updated state.
+ * @return Updated state.
  */
-export function currentTheme( state = undefined, action ) {
+export function currentTheme(
+	state: string | undefined = undefined,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_CURRENT_THEME':
 			return action.currentTheme.stylesheet;
@@ -79,12 +101,15 @@ export function currentTheme( state = undefined, action ) {
 /**
  * Reducer managing the current global styles id.
  *
- * @param {number|undefined} state  Current state.
- * @param {Object}           action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {number|undefined} Updated state.
+ * @return Updated state.
  */
-export function currentGlobalStylesId( state = undefined, action ) {
+export function currentGlobalStylesId(
+	state: number | undefined = undefined,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_CURRENT_GLOBAL_STYLES_ID':
 			return action.id;
@@ -96,12 +121,15 @@ export function currentGlobalStylesId( state = undefined, action ) {
 /**
  * Reducer managing the theme base global styles.
  *
- * @param {Record<string, object>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Record<string, object>} Updated state.
+ * @return Updated state.
  */
-export function themeBaseGlobalStyles( state = {}, action ) {
+export function themeBaseGlobalStyles(
+	state: Record< string, object > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_THEME_GLOBAL_STYLES':
 			return {
@@ -116,12 +144,15 @@ export function themeBaseGlobalStyles( state = {}, action ) {
 /**
  * Reducer managing the theme global styles variations.
  *
- * @param {Record<string, object>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Record<string, object>} Updated state.
+ * @return Updated state.
  */
-export function themeGlobalStyleVariations( state = {}, action ) {
+export function themeGlobalStyleVariations(
+	state: Record< string, unknown > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_THEME_GLOBAL_STYLE_VARIATIONS':
 			return {
@@ -133,36 +164,49 @@ export function themeGlobalStyleVariations( state = {}, action ) {
 	return state;
 }
 
-const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
-	if ( action.type === 'UNDO' || action.type === 'REDO' ) {
-		const { record } = action;
+const withMultiEntityRecordEdits =
+	(
+		reducer: (
+			state: EntityRecordsState | undefined,
+			action: Action
+		) => EntityRecordsState
+	) =>
+	( state: EntityRecordsState | undefined, action: Action ) => {
+		if ( action.type === 'UNDO' || action.type === 'REDO' ) {
+			const { record } = action;
 
-		let newState = state;
-		record.forEach( ( { id: { kind, name, recordId }, changes } ) => {
-			const persistedRecord =
-				state?.queriedData?.items?.default?.[ recordId ];
-			const edits = Object.fromEntries(
-				Object.entries( changes ).map( ( [ key, value ] ) => [
-					key,
-					action.type === 'UNDO' ? value.from : value.to,
-				] )
-			);
+			let newState = state;
+			record.forEach( ( { id, changes } ) => {
+				// Entity undo levels are identified by their entity and record.
+				const { kind, name, recordId } = id as {
+					kind: string;
+					name: string;
+					recordId: ItemId;
+				};
+				const persistedRecord =
+					state?.queriedData?.items?.default?.[ recordId ];
+				const edits = Object.fromEntries(
+					Object.entries( changes ).map( ( [ key, value ] ) => [
+						key,
+						action.type === 'UNDO' ? value.from : value.to,
+					] )
+				);
 
-			newState = reducer( newState, {
-				type: 'EDIT_ENTITY_RECORD',
-				kind,
-				name,
-				recordId,
-				// Clear edits matching the persisted record so the entity is
-				// no longer dirty after undoing back to its saved state.
-				edits: clearUnchangedEdits( edits, persistedRecord ),
+				newState = reducer( newState, {
+					type: 'EDIT_ENTITY_RECORD',
+					kind,
+					name,
+					recordId,
+					// Clear edits matching the persisted record so the entity is
+					// no longer dirty after undoing back to its saved state.
+					edits: clearUnchangedEdits( edits, persistedRecord ),
+				} );
 			} );
-		} );
-		return newState;
-	}
+			return newState;
+		}
 
-	return reducer( state, action );
-};
+		return reducer( state, action );
+	};
 
 /**
  * Higher Order Reducer for a given entity config. It supports:
@@ -171,18 +215,19 @@ const withMultiEntityRecordEdits = ( reducer ) => ( state, action ) => {
  *  - Editing
  *  - Saving
  *
- * @param {Object} entityConfig Entity config.
+ * @param entityConfig Entity config.
  *
- * @return {AnyFunction} Reducer.
+ * @return Reducer.
  */
-function entity( entityConfig ) {
+function entity( entityConfig: EntityConfig ) {
+	// `compose` returns an untyped function, cast to the reducer it builds.
 	return compose( [
 		withMultiEntityRecordEdits,
 
 		// Limit to matching action type so we don't attempt to replace action on
 		// an unhandled action.
 		ifMatchingAction(
-			( action ) =>
+			( action: { kind?: string; name?: string } ) =>
 				action.name &&
 				action.kind &&
 				action.name === entityConfig.name &&
@@ -190,7 +235,7 @@ function entity( entityConfig ) {
 		),
 
 		// Inject the entity config into the action.
-		replaceAction( ( action ) => {
+		replaceAction( ( action: Action ): KeyedEntityAction => {
 			return {
 				key: entityConfig.key || DEFAULT_ENTITY_KEY,
 				...action,
@@ -199,7 +244,10 @@ function entity( entityConfig ) {
 	] )(
 		combineReducers( {
 			queriedData: queriedDataReducer,
-			edits: ( state = {}, action ) => {
+			edits: (
+				state: EntityRecordsState[ 'edits' ] = {},
+				action: KeyedEntityAction
+			) => {
 				switch ( action.type ) {
 					case 'RECEIVE_ITEMS':
 						const context = action?.query?.context ?? 'default';
@@ -213,38 +261,42 @@ function entity( entityConfig ) {
 							: [ action.items ];
 
 						for ( const record of itemsList ) {
-							const recordId = record?.[ action.key ];
+							// Records are keyed by their ID.
+							const recordId = record?.[ action.key ] as ItemId;
 							const edits = nextState[ recordId ];
 							if ( ! edits ) {
 								continue;
 							}
 
-							const nextEdits = Object.keys( edits ).reduce(
-								( acc, key ) => {
-									// If the edited value is still different to the persisted value,
-									// keep the edited value in edits.
-									if (
-										// Edits are the "raw" attribute values, but records may have
-										// objects with more properties, so we use `get` here for the
-										// comparison.
+							const nextEdits = Object.keys( edits ).reduce<
+								Record< string, unknown >
+							>( ( acc, key ) => {
+								// If the edited value is still different to the persisted value,
+								// keep the edited value in edits.
+								if (
+									// Edits are the "raw" attribute values, but records may have
+									// objects with more properties, so we use `get` here for the
+									// comparison.
+									! fastDeepEqual(
+										edits[ key ],
+										// A raw attribute holds its value under `raw`.
+										(
+											record[ key ] as
+												{ raw?: unknown } | undefined
+										 )?.raw ?? record[ key ]
+									) &&
+									// Sometimes the server alters the sent value which means
+									// we need to also remove the edits before the api request.
+									( ! action.persistedEdits ||
 										! fastDeepEqual(
 											edits[ key ],
-											record[ key ]?.raw ?? record[ key ]
-										) &&
-										// Sometimes the server alters the sent value which means
-										// we need to also remove the edits before the api request.
-										( ! action.persistedEdits ||
-											! fastDeepEqual(
-												edits[ key ],
-												action.persistedEdits[ key ]
-											) )
-									) {
-										acc[ key ] = edits[ key ];
-									}
-									return acc;
-								},
-								{}
-							);
+											action.persistedEdits[ key ]
+										) )
+								) {
+									acc[ key ] = edits[ key ];
+								}
+								return acc;
+							}, {} );
 
 							if ( Object.keys( nextEdits ).length ) {
 								nextState[ recordId ] = nextEdits;
@@ -276,7 +328,10 @@ function entity( entityConfig ) {
 				return state;
 			},
 
-			saving: ( state = {}, action ) => {
+			saving: (
+				state: EntityRecordsState[ 'saving' ] = {},
+				action: KeyedEntityAction
+			) => {
 				switch ( action.type ) {
 					case 'SAVE_ENTITY_RECORD_START':
 					case 'SAVE_ENTITY_RECORD_FINISH':
@@ -294,7 +349,10 @@ function entity( entityConfig ) {
 				return state;
 			},
 
-			deleting: ( state = {}, action ) => {
+			deleting: (
+				state: EntityRecordsState[ 'deleting' ] = {},
+				action: KeyedEntityAction
+			) => {
 				switch ( action.type ) {
 					case 'DELETE_ENTITY_RECORD_START':
 					case 'DELETE_ENTITY_RECORD_FINISH':
@@ -312,10 +370,14 @@ function entity( entityConfig ) {
 				return state;
 			},
 
-			revisions: ( state = {}, action ) => {
+			revisions: (
+				state: EntityRecordsState[ 'revisions' ] = {},
+				action: KeyedEntityAction
+			) => {
 				// Use the same queriedDataReducer shape for revisions.
 				if ( action.type === 'RECEIVE_ITEM_REVISIONS' ) {
-					const recordKey = action.recordKey;
+					// Revisions are received for a record.
+					const recordKey = action.recordKey as ItemId;
 					delete action.recordKey;
 					const newState = queriedDataReducer( state[ recordKey ], {
 						...action,
@@ -344,18 +406,24 @@ function entity( entityConfig ) {
 				return state;
 			},
 		} )
-	);
+	) as (
+		state: EntityRecordsState | undefined,
+		action: Action
+	) => EntityRecordsState;
 }
 
 /**
  * Reducer keeping track of the registered entities.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function entitiesConfig( state = rootEntitiesConfig, action ) {
+export function entitiesConfig(
+	state: Array< EntityConfig > = rootEntitiesConfig,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'ADD_ENTITIES':
 			return [ ...state, ...action.entities ];
@@ -367,12 +435,15 @@ export function entitiesConfig( state = rootEntitiesConfig, action ) {
 /**
  * Reducer keeping track of the registered entities config and data.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export const entities = ( state = {}, action ) => {
+export const entities = (
+	state: EntitiesState = {},
+	action: Action
+): Required< EntitiesState > => {
 	const newConfig = entitiesConfig( state.config, action );
 
 	// Generates a reducer for the entities nested by `kind` and `name`.
@@ -400,7 +471,9 @@ export const entities = ( state = {}, action ) => {
 	// ```
 	let entitiesDataReducer = state.reducer;
 	if ( ! entitiesDataReducer || newConfig !== state.config ) {
-		const entitiesByKind = newConfig.reduce( ( acc, record ) => {
+		const entitiesByKind = newConfig.reduce<
+			Record< string, Array< EntityConfig > >
+		>( ( acc, record ) => {
 			const { kind } = record;
 			if ( ! acc[ kind ] ) {
 				acc[ kind ] = [];
@@ -436,7 +509,8 @@ export const entities = ( state = {}, action ) => {
 		newConfig === state.config &&
 		entitiesDataReducer === state.reducer
 	) {
-		return state;
+		// Unchanged, so it already holds the reducer, records and config.
+		return state as Required< EntitiesState >;
 	}
 
 	return {
@@ -446,9 +520,6 @@ export const entities = ( state = {}, action ) => {
 	};
 };
 
-/**
- * @type {UndoManager}
- */
 export function undoManager( state = createUndoManager() ) {
 	return state;
 }
@@ -457,7 +528,10 @@ export function undoManager( state = createUndoManager() ) {
 // state on their own. Entity edits, undo, and redo are store actions already.
 // A level the entity sync manager adds to it arrives outside of one, so this
 // reference changes then, and selectors reading the undo manager run again.
-export function undoManagerReference( state = {}, action ) {
+export function undoManagerReference(
+	state: Record< string, never > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECORD_SYNC_UNDO_LEVEL':
 			return {};
@@ -465,7 +539,10 @@ export function undoManagerReference( state = {}, action ) {
 	return state;
 }
 
-export function editsReference( state = {}, action ) {
+export function editsReference(
+	state: Record< string, never > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'EDIT_ENTITY_RECORD':
 		case 'UNDO':
@@ -478,12 +555,15 @@ export function editsReference( state = {}, action ) {
 /**
  * Reducer managing embed preview data.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function embedPreviews( state = {}, action ) {
+export function embedPreviews(
+	state: Record< string, unknown > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_EMBED_PREVIEW':
 			const { url, preview } = action;
@@ -499,12 +579,15 @@ export function embedPreviews( state = {}, action ) {
  * State which tracks whether the user can perform an action on a REST
  * resource.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function userPermissions( state = {}, action ) {
+export function userPermissions(
+	state: Record< string, boolean > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_USER_PERMISSION':
 			return {
@@ -524,12 +607,15 @@ export function userPermissions( state = {}, action ) {
 /**
  * Reducer returning autosaves keyed by their parent's post id.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function autosaves( state = {}, action ) {
+export function autosaves(
+	state: Record< ItemId, Array< unknown > > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_AUTOSAVES':
 			const { postId, autosaves: autosavesData } = action;
@@ -543,7 +629,7 @@ export function autosaves( state = {}, action ) {
 	return state;
 }
 
-export function blockPatterns( state = [], action ) {
+export function blockPatterns( state: Array< unknown > = [], action: Action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_BLOCK_PATTERNS':
 			return action.patterns;
@@ -552,7 +638,10 @@ export function blockPatterns( state = [], action ) {
 	return state;
 }
 
-export function blockPatternCategories( state = [], action ) {
+export function blockPatternCategories(
+	state: Array< unknown > = [],
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_BLOCK_PATTERN_CATEGORIES':
 			return action.categories;
@@ -561,7 +650,10 @@ export function blockPatternCategories( state = [], action ) {
 	return state;
 }
 
-export function userPatternCategories( state = [], action ) {
+export function userPatternCategories(
+	state: Array< unknown > = [],
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_USER_PATTERN_CATEGORIES':
 			return action.patternCategories;
@@ -569,7 +661,10 @@ export function userPatternCategories( state = [], action ) {
 	return state;
 }
 
-export function navigationFallbackId( state = null, action ) {
+export function navigationFallbackId(
+	state: ItemId | null = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_NAVIGATION_FALLBACK_ID':
 			return action.fallbackId;
@@ -581,12 +676,15 @@ export function navigationFallbackId( state = null, action ) {
 /**
  * Reducer managing the theme global styles revisions.
  *
- * @param {Record<number, Array<object>>} state  Current state.
- * @param {Object}                        action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Record<number, Array<object>>} Updated state.
+ * @return Updated state.
  */
-export function themeGlobalStyleRevisions( state = {}, action ) {
+export function themeGlobalStyleRevisions(
+	state: Record< number, Array< object > > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS':
 			return {
@@ -601,12 +699,15 @@ export function themeGlobalStyleRevisions( state = {}, action ) {
 /**
  * Reducer managing the template lookup per query.
  *
- * @param {Record<string, string>} state  Current state.
- * @param {Object}                 action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Record<string, string>} Updated state.
+ * @return Updated state.
  */
-export function defaultTemplates( state = {}, action ) {
+export function defaultTemplates(
+	state: Record< string, string > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_DEFAULT_TEMPLATE':
 			return {
@@ -621,12 +722,15 @@ export function defaultTemplates( state = {}, action ) {
 /**
  * Reducer returning an object of registered post meta.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function registeredPostMeta( state = {}, action ) {
+export function registeredPostMeta(
+	state: Record< string, Record< string, unknown > > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_REGISTERED_POST_META':
 			return {
@@ -640,12 +744,15 @@ export function registeredPostMeta( state = {}, action ) {
 /**
  * Reducer managing editor settings.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Action object.
+ * @param state  Current state.
+ * @param action Action object.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function editorSettings( state = null, action ) {
+export function editorSettings(
+	state: Record< string, unknown > | null = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_EDITOR_SETTINGS':
 			return action.settings;
@@ -656,12 +763,15 @@ export function editorSettings( state = null, action ) {
 /**
  * Reducer managing editor assets.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Action object.
+ * @param state  Current state.
+ * @param action Action object.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function editorAssets( state = null, action ) {
+export function editorAssets(
+	state: Record< string, unknown > | null = null,
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_EDITOR_ASSETS':
 			return action.assets;
@@ -673,12 +783,15 @@ export function editorAssets( state = null, action ) {
  * Reducer managing sync connection states for entities.
  * Keyed by "kind/name:id" (e.g., "postType/post:123").
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function syncConnectionStatuses( state = {}, action ) {
+export function syncConnectionStatuses(
+	state: Record< string, ConnectionStatus > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'SET_SYNC_CONNECTION_STATUS': {
 			const key = `${ action.kind }/${ action.name }:${ action.key }`;
@@ -703,12 +816,12 @@ export function syncConnectionStatuses( state = {}, action ) {
  * unless explicitly disabled due to unsupported conditions
  * such as metaboxes.
  *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return Updated state.
  */
-export function collaborationSupported( state = true, action ) {
+export function collaborationSupported( state = true, action: Action ) {
 	switch ( action.type ) {
 		case 'SET_COLLABORATION_SUPPORTED':
 			return action.supported;
@@ -716,7 +829,8 @@ export function collaborationSupported( state = true, action ) {
 		case 'SET_SYNC_CONNECTION_STATUS':
 			if (
 				ConnectionErrorCode.DOCUMENT_SIZE_LIMIT_EXCEEDED ===
-				action.status?.error?.code
+				// Only a disconnected status has an error.
+				( action.status as ConnectionStatusDisconnected )?.error?.code
 			) {
 				return false;
 			}
@@ -729,12 +843,15 @@ export function collaborationSupported( state = true, action ) {
 /**
  * Reducer managing view configs, keyed by `kind/name`.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function viewConfigs( state = {}, action ) {
+export function viewConfigs(
+	state: Record< string, Record< string, unknown > > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_VIEW_CONFIG': {
 			const key = `${ action.kind }/${ action.name }`;
@@ -755,12 +872,15 @@ export function viewConfigs( state = {}, action ) {
 /**
  * Reducer managing the fields configs, keyed by kind, then name.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function fieldsConfigs( state = {}, action ) {
+export function fieldsConfigs(
+	state: Record< string, Record< string, FieldsConfig > > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_FIELDS_CONFIG':
 			return {
@@ -777,12 +897,15 @@ export function fieldsConfigs( state = {}, action ) {
 /**
  * Reducer managing the actions configs, keyed by kind, then name.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param state  Current state.
+ * @param action Dispatched action.
  *
- * @return {Object} Updated state.
+ * @return Updated state.
  */
-export function entityActionsConfigs( state = {}, action ) {
+export function entityActionsConfigs(
+	state: Record< string, Record< string, EntityActionsConfig > > = {},
+	action: Action
+) {
 	switch ( action.type ) {
 		case 'RECEIVE_ENTITY_ACTIONS_CONFIG':
 			return {

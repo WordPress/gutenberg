@@ -1,6 +1,7 @@
 import { capitalCase, pascalCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import {
@@ -10,20 +11,34 @@ import {
 	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	taxonomySyncConfig,
 } from './utils/crdt';
+import type { Post } from './entity-types/post';
+import type {
+	EntityConfig,
+	EntityConfigLoader,
+	RestTypeDescription,
+	TransientEditConfig,
+} from './types';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
 
-const blocksTransientEdits = {
+const blocksTransientEdits: Record< string, TransientEditConfig > = {
 	blocks: {
-		read: ( record ) => parse( record.content?.raw ?? '' ),
+		read: ( record ) =>
+			// Post content is fetched in the edit context, with its `raw` value.
+			parse(
+				( record.content as { raw?: string } | undefined )?.raw ?? ''
+			),
 		write: ( record ) => ( {
-			content: __unstableSerializeAndClean( record.blocks ),
+			// The blocks are the record's parsed content.
+			content: __unstableSerializeAndClean(
+				record.blocks as Array< Block >
+			),
 		} ),
 	},
 };
 
-export const rootEntitiesConfig = [
+export const rootEntitiesConfig: Array< EntityConfig > = [
 	{
 		label: __( 'Base' ),
 		kind: 'root',
@@ -256,7 +271,7 @@ export const deprecatedEntities = {
 	},
 };
 
-export const additionalEntityConfigLoaders = [
+export const additionalEntityConfigLoaders: Array< EntityConfigLoader > = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
 	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
 	{
@@ -270,19 +285,19 @@ export const additionalEntityConfigLoaders = [
 /**
  * Apply extra edits before persisting a post type.
  *
- * @param {Object}  persistedRecord Already persisted Post
- * @param {Object}  edits           Edits.
- * @param {string}  name            Post type name.
- * @param {boolean} isTemplate      Whether the post type is a template.
- * @return {Promise< Object >} Updated edits.
+ * @param persistedRecord Already persisted Post
+ * @param edits           Edits.
+ * @param name            Post type name.
+ * @param isTemplate      Whether the post type is a template.
+ * @return Updated edits.
  */
 export const prePersistPostType = async (
-	persistedRecord,
-	edits,
-	name,
-	isTemplate
-) => {
-	const newEdits = {};
+	persistedRecord: Record< string, unknown > | undefined,
+	edits: Record< string, unknown >,
+	name: string,
+	isTemplate: boolean
+): Promise< Record< string, unknown > > => {
+	const newEdits: Record< string, unknown > = {};
 
 	if ( ! isTemplate && persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
@@ -307,13 +322,19 @@ export const prePersistPostType = async (
 /**
  * Returns the list of post type entities.
  *
- * @return {Promise} Entities promise
+ * @return Entities promise
  */
-async function loadPostTypeEntities() {
-	const postTypesPromise = apiFetch( { path: '/wp/v2/types?context=view' } );
+async function loadPostTypeEntities(): Promise< Array< EntityConfig > > {
+	const postTypesPromise = apiFetch< Record< string, RestTypeDescription > >(
+		{
+			path: '/wp/v2/types?context=view',
+		}
+	);
 	const taxonomiesPromise = window.__experimentalEnableRealTimeCollaboration
-		? apiFetch( { path: '/wp/v2/taxonomies?context=view' } )
-		: Promise.resolve( {} );
+		? apiFetch< Record< string, RestTypeDescription > >( {
+				path: '/wp/v2/taxonomies?context=view',
+			} )
+		: Promise.resolve< Record< string, RestTypeDescription > >( {} );
 	const [ postTypes, taxonomies ] = await Promise.all( [
 		postTypesPromise,
 		taxonomiesPromise,
@@ -346,7 +367,7 @@ async function loadPostTypeEntities() {
 				?.filter( Boolean ) ?? [] ),
 		] );
 
-		const entity = {
+		const entity: EntityConfig = {
 			kind: 'postType',
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
 			baseURLParams: { context: 'edit' },
@@ -359,8 +380,10 @@ async function loadPostTypeEntities() {
 			mergedEdits: { meta: true },
 			rawAttributes: POST_RAW_ATTRIBUTES,
 			getTitle: ( record ) =>
-				record?.title?.rendered ||
-				record?.title ||
+				// A fetched title is an object, an edited one a string.
+				( record?.title as { rendered?: string } | undefined )
+					?.rendered ||
+				( record?.title as string | undefined ) ||
 				( isTemplate
 					? capitalCase( record.slug ?? '' )
 					: String( record.id ) ),
@@ -383,9 +406,6 @@ async function loadPostTypeEntities() {
 			return entity;
 		}
 
-		/**
-		 * @type {import('@wordpress/sync').SyncConfig}
-		 */
 		entity.syncConfig = {
 			// Save a CRDT document with this entity
 			supportsPersistence: true,
@@ -394,9 +414,8 @@ async function loadPostTypeEntities() {
 			 * Apply changes from the local editor to the local CRDT document so
 			 * that those changes can be synced to other peers (via the provider).
 			 *
-			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
-			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-			 * @return {void}
+			 * @param crdtDoc
+			 * @param changes
 			 */
 			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
 				applyPostChangesToCRDTDoc( crdtDoc, changes, syncedProperties ),
@@ -404,13 +423,14 @@ async function loadPostTypeEntities() {
 			/**
 			 * Create the awareness instance for the entity's CRDT document.
 			 *
-			 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
-			 * @param {import('@wordpress/sync').ObjectID} objectId
-			 * @return {import('@wordpress/sync').Awareness} Awareness instance
+			 * @param ydoc
+			 * @param objectId
+			 * @return Awareness instance
 			 */
 			createAwareness: ( ydoc, objectId ) => {
 				const kind = 'postType';
-				const id = parseInt( objectId, 10 );
+				// Awareness is created for a saved post, which has an ID.
+				const id = parseInt( objectId as string, 10 );
 				return new PostEditorAwareness( ydoc, kind, name, id );
 			},
 
@@ -418,14 +438,15 @@ async function loadPostTypeEntities() {
 			 * Extract changes from a CRDT document that can be used to update the
 			 * local editor state.
 			 *
-			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
-			 * @param {import('@wordpress/sync').ObjectData} editedRecord
-			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 * @param crdtDoc
+			 * @param editedRecord
+			 * @return Changes to record
 			 */
 			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
 				getPostChangesFromCRDTDoc(
 					crdtDoc,
-					editedRecord,
+					// The records of post type entities are posts.
+					editedRecord as Post,
 					syncedProperties
 				),
 
@@ -433,13 +454,15 @@ async function loadPostTypeEntities() {
 			 * Extract changes from a CRDT document that can be used to update the
 			 * local editor state.
 			 *
-			 * @param {import('@wordpress/sync').ObjectData} record
-			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 * @param record
+			 * @return Changes to record
 			 */
 			getPersistedCRDTDoc: ( record ) => {
 				return (
-					record?.meta?.[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] ||
-					null
+					// Post meta holds the persisted document as a string.
+					( record?.meta as Record< string, string > | undefined )?.[
+						POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE
+					] || null
 				);
 			},
 			shouldSync: () =>
@@ -456,15 +479,17 @@ async function loadPostTypeEntities() {
 /**
  * Returns the list of the taxonomies entities.
  *
- * @return {Promise} Entities promise
+ * @return Entities promise
  */
-async function loadTaxonomyEntities() {
-	const taxonomies = await apiFetch( {
-		path: '/wp/v2/taxonomies?context=view',
-	} );
+async function loadTaxonomyEntities(): Promise< Array< EntityConfig > > {
+	const taxonomies = await apiFetch< Record< string, RestTypeDescription > >(
+		{
+			path: '/wp/v2/taxonomies?context=view',
+		}
+	);
 	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
-		const entity = {
+		const entity: EntityConfig = {
 			kind: 'taxonomy',
 			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
@@ -485,10 +510,10 @@ async function loadTaxonomyEntities() {
 /**
  * Returns the Site entity.
  *
- * @return {Promise} Entity promise
+ * @return Entity promise
  */
-async function loadSiteEntity() {
-	const entity = {
+async function loadSiteEntity(): Promise< Array< EntityConfig > > {
+	const entity: EntityConfig = {
 		label: __( 'Site' ),
 		name: 'site',
 		kind: 'root',
@@ -498,12 +523,14 @@ async function loadSiteEntity() {
 		meta: {},
 	};
 
-	const site = await apiFetch( {
+	const site = await apiFetch< {
+		schema?: { properties?: Record< string, { title?: string } > };
+	} >( {
 		path: entity.baseURL,
 		method: 'OPTIONS',
 	} );
 
-	const labels = {};
+	const labels: Record< string, string > = {};
 	Object.entries( site?.schema?.properties ?? {} ).forEach(
 		( [ key, value ] ) => {
 			// Ignore properties `title` and `type` keys.
@@ -528,13 +555,17 @@ async function loadSiteEntity() {
  * // namePlural is setRootThemes
  * ```
  *
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name or plural name.
- * @param {string} prefix Function prefix.
+ * @param kind   Entity kind.
+ * @param name   Entity name or plural name.
+ * @param prefix Function prefix.
  *
- * @return {string} Method name
+ * @return Method name
  */
-export const getMethodName = ( kind, name, prefix = 'get' ) => {
+export const getMethodName = (
+	kind: string,
+	name: string,
+	prefix = 'get'
+): string => {
 	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
 	const suffix = pascalCase( name );
 	return `${ prefix }${ kindPrefix }${ suffix }`;
