@@ -1,21 +1,34 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+import type { Page } from '@playwright/test';
+import type { Editor } from '@wordpress/e2e-test-utils-playwright';
+import { test, expect } from '@wordpress/e2e-test-utils-playwright';
+
+// Floating notes or the "All notes" sidebar.
+const NOTES_SURFACE = /^(Notes|Editor settings)$/;
 
 const TEMPLATE_CONTENT =
 	'<!-- wp:paragraph --><p>Template content</p><!-- /wp:paragraph -->';
 
 // Adds a note to the currently selected block and waits for its thread.
-async function addNoteToSelectedBlock( { page, editor, content } ) {
+async function addNoteToSelectedBlock( {
+	page,
+	editor,
+	content,
+}: {
+	page: Page;
+	editor: Editor;
+	content: string;
+} ) {
 	await editor.clickBlockOptionsMenuItem( 'Add note' );
 	await page
 		.getByRole( 'textbox', { name: 'New note', exact: true } )
 		.pressSequentially( content );
 	await page
-		.getByRole( 'region', { name: 'Editor settings' } )
+		.getByRole( 'region', { name: NOTES_SURFACE } )
 		.getByRole( 'button', { name: 'Add note', exact: true } )
 		.click();
 	await expect(
 		page
-			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'region', { name: NOTES_SURFACE } )
 			.getByRole( 'treeitem', { name: `Note: ${ content }` } )
 	).toBeVisible();
 }
@@ -83,7 +96,7 @@ test.describe( 'Notes in the site editor', () => {
 
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: NOTES_SURFACE } )
 				.getByRole( 'treeitem', {
 					name: 'Note: A note on a template block',
 				} )
@@ -119,7 +132,7 @@ test.describe( 'Notes in the site editor', () => {
 		} );
 
 		const settings = page.getByRole( 'region', {
-			name: 'Editor settings',
+			name: NOTES_SURFACE,
 		} );
 
 		const replyForm = page.getByRole( 'textbox', { name: 'Reply to' } );
@@ -138,6 +151,48 @@ test.describe( 'Notes in the site editor', () => {
 				name: 'Note: Needs a second opinion',
 			} )
 		).toBeHidden();
+	} );
+
+	test( 'reacts to a note on a template', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const template = await requestUtils.createTemplate( 'wp_template', {
+			slug: 'notes-template-reactions',
+			title: 'Notes Template Reactions',
+			content: TEMPLATE_CONTENT,
+		} );
+
+		await admin.visitSiteEditor( {
+			postId: template.id,
+			postType: 'wp_template',
+			canvas: 'edit',
+		} );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.click();
+
+		await addNoteToSelectedBlock( {
+			page,
+			editor,
+			content: 'React to this',
+		} );
+
+		// Reactions attach to the template's post, like the note itself.
+		await page.getByRole( 'button', { name: 'Add reaction' } ).click();
+		await page
+			.getByRole( 'menu', { name: 'Add reaction' } )
+			.getByRole( 'menuitemcheckbox', { name: 'Heart', exact: true } )
+			.click();
+
+		const reactionButton = page.getByRole( 'button', { name: /Heart/ } );
+		await expect( reactionButton ).toContainText( '1' );
+
+		await reactionButton.hover();
+		await expect( page.getByText( /reacted with heart/ ) ).toBeVisible();
 	} );
 
 	test( 'adds a note to a block in a saved template part', async ( {
@@ -173,7 +228,7 @@ test.describe( 'Notes in the site editor', () => {
 
 		await expect(
 			page
-				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'region', { name: NOTES_SURFACE } )
 				.getByRole( 'treeitem', {
 					name: 'Note: A note on a template part',
 				} )
