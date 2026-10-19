@@ -964,9 +964,13 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		 * Pre-fetch reaction summaries for the notes the parent query actually
 		 * returns, so pagination, ordering, and `rest_comment_query` filters
 		 * all apply. The filter removes itself after the first query.
+		 *
+		 * WordPress 7.2 pre-fetches in core's get_items(), so skip it there
+		 * to avoid running the summary queries twice.
 		 */
 		$prefetch = null;
 		if (
+			! method_exists( 'WP_REST_Comments_Controller', 'prefetch_reaction_summaries' ) &&
 			'note' === $request['type'] &&
 			rest_is_field_included( 'reaction_summary', $fields )
 		) {

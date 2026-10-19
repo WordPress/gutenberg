@@ -6,6 +6,10 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `cleanForSlug`: Match what `sanitize_title()` returns in WordPress core when saving a post. Keep emoji, symbols and other non-ASCII characters, remove accents with the table of core's `remove_accents()`, strip the punctuation and invisible characters core strips, convert wide spaces and dashes to hyphens and `×` to `x`, strip HTML tags and comments like `strip_tags()`, keep percent-encoded octets, and keep what fits in 200 percent-encoded characters. Drop the `remove-accents` dependency ([#84896](https://github.com/WordPress/gutenberg/pull/84896)).
+
 ### Internal
 
 -   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#84916](https://github.com/WordPress/gutenberg/pull/84916)).
