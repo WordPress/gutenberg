@@ -40,25 +40,22 @@ let board: BoardHandle | null = null;
 /**
  * Turns a rejected REST response into something worth showing a person.
  *
- * A REST error arrives as a plain object rather than an Error, and a network
- * failure arrives as neither, so neither `instanceof Error` nor string
- * interpolation can be trusted here.
+ * Only a REST error, a plain `{ code, message }` object, carries copy meant
+ * for people. A network failure or an unparseable response rejects with an
+ * Error whose message is browser text, so it gets the fallback.
  *
  * @param error    Whatever the request rejected with.
  * @param fallback Copy to use when the error carries no message.
  * @return A message to display.
  */
 function toMessage( error: unknown, fallback: string ): string {
-	if ( typeof error === 'string' && error ) {
-		return error;
-	}
+	const { code, message } = ( error ?? {} ) as {
+		code?: unknown;
+		message?: unknown;
+	};
 
-	if (
-		error &&
-		typeof error === 'object' &&
-		typeof ( error as { message?: unknown } ).message === 'string'
-	) {
-		return ( error as { message: string } ).message;
+	if ( typeof code === 'string' && typeof message === 'string' && message ) {
+		return message;
 	}
 
 	return fallback;
