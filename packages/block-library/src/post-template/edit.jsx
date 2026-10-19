@@ -10,7 +10,7 @@ import {
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Spinner, ToolbarGroup } from '@wordpress/components';
+import { Spinner as WCSpinner, ToolbarGroup } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { list, grid } from '@wordpress/icons';
 
@@ -288,7 +288,7 @@ export default function PostTemplateEdit( {
 	if ( ! posts ) {
 		return (
 			<p { ...blockProps }>
-				<Spinner />
+				<WCSpinner />
 			</p>
 		);
 	}

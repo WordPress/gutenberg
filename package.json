@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "24.2.0-rc.1",
+	"version": "24.2.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -95,7 +95,7 @@
 		"cross-env": "^7.0.3",
 		"eslint": "^10.0.0",
 		"husky": "^7.0.0",
-		"lerna": "^10.0.1",
+		"lerna": "^10.1.1",
 		"lint-staged": "^16.4.0",
 		"prettier": "npm:wp-prettier@^3.9.6",
 		"stylelint": "^17.14.1",
@@ -103,14 +103,6 @@
 		"wait-on": "^8.0.1"
 	},
 	"overrides": {
-		"jsdom": "26.1.0",
-		"sockjs": {
-			"uuid": "^11.1.1"
-		},
-		"lerna": {
-			"js-yaml": "4.3.2",
-			"pacote": "21.5.1"
-		},
 		"@y/websocket-server": {
 			"yjs": "npm:@y/y@^14.0.0-rc.7"
 		},
@@ -190,12 +182,12 @@
 		"storybook:manifest-snapshot": "npm run --workspace @wordpress/storybook manifest-snapshot",
 		"test": "npm run lint && npm run test:unit",
 		"test:create-block": "npm run --workspace @wordpress/validation-tools test-create-block --",
-		"test:e2e": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts",
-		"test:e2e:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts --ui",
+		"test:e2e": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts --wp-env-config=../../.wp-env.test.json",
+		"test:e2e:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.config.ts --wp-env-config=../../.wp-env.test.json --ui",
 		"test:e2e:playwright": "npm run test:e2e",
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
-		"test:e2e:rtc-websocket": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts",
-		"test:e2e:rtc-websocket:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --ui",
+		"test:e2e:rtc-websocket": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --wp-env-config=../../.wp-env.test.json",
+		"test:e2e:rtc-websocket:debug": "npm exec --no --workspace @wordpress/e2e-tests-playwright -- wp-scripts test-e2e --config playwright.rtc-websocket.config.ts --wp-env-config=../../.wp-env.test.json --ui",
 		"test:e2e:storybook": "npm exec --no --workspace @wordpress/storybook-playwright -- playwright test --config playwright.config.ts",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:performance": "npm exec --no --workspace @wordpress/performance-tests -- wp-scripts test-e2e --config playwright.config.ts",
