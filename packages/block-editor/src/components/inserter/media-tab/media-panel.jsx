@@ -13,9 +13,18 @@ import InsertExternalImageModal from './insert-external-image-modal';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 import InserterNoResults from '../no-results';
 
-// Items per page by window height. The sidebar fits two columns of 167px rows
-// with 381px of chrome around them, so an entry is `381 + rows * 167`, rounded
-// up. Measured on the library tabs, which carry the most chrome.
+// Items per page by window height. The grid is two columns, so pages step by
+// rows of two, and each threshold is `chrome + rows * row height`:
+//
+// - Row height, 167px: a tile plus the gap under it. Measure a
+//   `.dataviews-view-grid__row` and add the grid's `row-gap`.
+// - Chrome, 381px: everything else stacked around the grid, from the editor
+//   header down to the footer button. Measure `window.innerHeight` minus the
+//   grid's height, on the library tabs: they carry the most chrome, so other
+//   sources under-fill rather than overshoot into a scrollbar.
+//
+// Either number drifting leaves a page over- or under-filled by a row. The
+// largest entry is the tallest window worth planning for, not an API limit.
 const MIN_ITEMS_PER_PAGE = 8;
 const ITEMS_PER_PAGE_BY_WINDOW_HEIGHT = [
 	[ 2060, 20 ],
