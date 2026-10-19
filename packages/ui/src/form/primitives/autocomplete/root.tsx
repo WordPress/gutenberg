@@ -3,9 +3,9 @@ import type { AutocompleteRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
 import { AutocompleteGridContext } from './context';
 import {
-	KeyboardHighlightContext,
-	useKeyboardHighlightState,
-} from '../../../utils/item-popup/keyboard-highlight-context';
+	InputFocusContext,
+	useInputFocusState,
+} from '../../../utils/item-popup/input-focus-context';
 
 /**
  * Low-level primitive for an autocomplete input that suggests options as
@@ -19,20 +19,19 @@ import {
 export const Root: typeof _Autocomplete.Root = function Root(
 	props: AutocompleteRootProps
 ) {
-	const { contextValue, onOpenChange } = useKeyboardHighlightState( props );
+	const contextValue = useInputFocusState();
 
 	return (
 		<AutocompleteGridContext.Provider value={ Boolean( props.grid ) }>
 			<DirectionProvider>
-				<KeyboardHighlightContext.Provider value={ contextValue }>
+				<InputFocusContext.Provider value={ contextValue }>
 					<_Autocomplete.Root
 						{ ...props }
 						highlightItemOnHover={
 							props.highlightItemOnHover ?? false
 						}
-						onOpenChange={ onOpenChange }
 					/>
-				</KeyboardHighlightContext.Provider>
+				</InputFocusContext.Provider>
 			</DirectionProvider>
 		</AutocompleteGridContext.Provider>
 	);

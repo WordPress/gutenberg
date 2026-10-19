@@ -7,7 +7,7 @@ import { Input as InputPrimitive } from '../input';
 import { InputLayout } from '../input-layout';
 import type { ComboboxInputProps } from './types';
 import styles from './style.module.css';
-import { useKeyboardHighlight } from '../../../utils/item-popup/keyboard-highlight-context';
+import { useInputFocus } from '../../../utils/item-popup/input-focus-context';
 
 const DEFAULT_RENDER = ( props: ComboboxInputProps ) => (
 	<InputPrimitive
@@ -25,7 +25,7 @@ export const Input = forwardRef< HTMLInputElement, ComboboxInputProps >(
 		{ render = DEFAULT_RENDER, ...restProps },
 		ref
 	) {
-		const { inputProps } = useKeyboardHighlight();
+		const { inputProps } = useInputFocus();
 		return (
 			<_Combobox.Input
 				ref={ ref }

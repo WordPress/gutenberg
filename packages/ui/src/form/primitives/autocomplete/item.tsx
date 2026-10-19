@@ -11,7 +11,7 @@ import {
 } from './item-description';
 import { ItemLabel } from './item-label';
 import type { AutocompleteItemProps } from './types';
-import { useKeyboardHighlight } from '../../../utils/item-popup/keyboard-highlight-context';
+import { useInputFocus } from '../../../utils/item-popup/input-focus-context';
 
 const ITEM_CONTENT_COMPONENTS = {
 	Label: ItemLabel,
@@ -33,7 +33,7 @@ export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
 		},
 		ref
 	) {
-		const { keyboardHighlight } = useKeyboardHighlight();
+		const { inputFocused } = useInputFocus();
 		const { contentChildren, itemAriaProps } = useItemContent(
 			children,
 			ITEM_CONTENT_COMPONENTS,
@@ -45,7 +45,7 @@ export const Item = forwardRef< HTMLDivElement, AutocompleteItemProps >(
 		);
 		return (
 			<_Autocomplete.Item
-				data-keyboard-highlight={ keyboardHighlight ? '' : undefined }
+				data-input-focused={ inputFocused ? '' : undefined }
 				className={ clsx(
 					defenseStyles.div,
 					resetStyles[ 'box-sizing' ],

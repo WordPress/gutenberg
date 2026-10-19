@@ -95,10 +95,11 @@ export const Default: Story = {
 };
 
 /**
- * Pointer use and typing do not show option rings. Navigate the options with
- * arrow keys to show a ring, then hover another option to compare the targets.
+ * Highlighted options show rings while the input has focus. Open the selected
+ * option with the pointer, or type to automatically highlight another option.
  */
 export const KeyboardFocus: Story = {
+	name: 'Active option rings',
 	args: {
 		...Default.args,
 		defaultValue: ITEMS[ 1 ],
@@ -109,6 +110,16 @@ export const KeyboardFocus: Story = {
 		highlightItemOnHover: { control: 'boolean' },
 		autoHighlight: { control: 'boolean' },
 	},
+	render: ( args ) => (
+		<>
+			<p>
+				Open with the pointer to see a ring on Apricot. Type{ ' ' }
+				<code>ap</code> to see the ring move to Apple. Hovering another
+				option leaves the ring on the active option.
+			</p>
+			<Combobox.Root { ...args } />
+		</>
+	),
 };
 
 export const Compact: Story = {
