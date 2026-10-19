@@ -1,16 +1,17 @@
 import { setOutput } from '@actions/core';
-import debug from '../../debug.js';
-
-/** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/openapi-webhooks-types').components['schemas']['webhook-pull-request-opened']} WebhookPayloadPullRequest */
+import debug from '../../debug.ts';
+import type { GitHub, WebhookPayloadPullRequest } from '../../types.ts';
 
 /**
  * Assigns the first-time contributor label to PRs.
  *
- * @param {WebhookPayloadPullRequest} payload Pull request event payload.
- * @param {GitHub}                    octokit Initialized Octokit REST client.
+ * @param payload Pull request event payload.
+ * @param octokit Initialized Octokit REST client.
  */
-async function firstTimeContributorLabel( payload, octokit ) {
+async function firstTimeContributorLabel(
+	payload: WebhookPayloadPullRequest,
+	octokit: GitHub
+): Promise< void > {
 	const userType = payload.pull_request.user.type;
 
 	if ( userType === 'Bot' ) {

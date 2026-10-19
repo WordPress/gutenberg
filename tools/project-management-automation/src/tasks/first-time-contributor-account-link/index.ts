@@ -1,21 +1,17 @@
 import { setOutput } from '@actions/core';
-import debug from '../../debug.js';
-import getAssociatedPullRequest from '../../get-associated-pull-request.js';
-import hasWordPressProfile from '../../has-wordpress-profile.js';
-
-/** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/openapi-webhooks-types').components['schemas']['webhook-push']} WebhookPayloadPush */
-/** @typedef {import('../../get-associated-pull-request.js').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+import debug from '../../debug.ts';
+import getAssociatedPullRequest from '../../get-associated-pull-request.ts';
+import hasWordPressProfile from '../../has-wordpress-profile.ts';
+import type { GitHub, WebhookPayloadPush } from '../../types.ts';
 
 /**
  * Returns the message text to be used for the comment prompting contributor to
  * link their GitHub account from their WordPress.org profile for props credit.
  *
- * @param {string} author GitHub username of author.
- *
- * @return {string} Message text.
+ * @param author GitHub username of author.
+ * @return Message text.
  */
-function getPromptMessageText( author ) {
+function getPromptMessageText( author: string ): string {
 	return (
 		'Congratulations on your first merged pull request, @' +
 		author +
@@ -34,10 +30,13 @@ function getPromptMessageText( author ) {
  * Prompts the user to link their GitHub account to their WordPress.org profile
  * if necessary for props credit.
  *
- * @param {WebhookPayloadPush} payload Push event payload.
- * @param {GitHub}             octokit Initialized Octokit REST client.
+ * @param payload Push event payload.
+ * @param octokit Initialized Octokit REST client.
  */
-async function firstTimeContributorAccountLink( payload, octokit ) {
+async function firstTimeContributorAccountLink(
+	payload: WebhookPayloadPush,
+	octokit: GitHub
+): Promise< void > {
 	if ( payload.ref !== 'refs/heads/trunk' ) {
 		debug(
 			'first-time-contributor-account-link: Commit is not to `trunk`. Aborting'
@@ -45,9 +44,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		return;
 	}
 
-	const commit = /** @type {WebhookPayloadPushCommit} */ (
-		payload.commits[ 0 ]
-	);
+	const commit = payload.commits[ 0 ];
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(

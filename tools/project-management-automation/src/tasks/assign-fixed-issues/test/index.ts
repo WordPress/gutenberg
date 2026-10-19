@@ -1,5 +1,18 @@
 import { describe, expect, it, vi } from 'vitest';
-import assignFixedIssues from '../index.js';
+import assignFixedIssuesTask from '../index.ts';
+import type { GitHub, WebhookPayloadPullRequest } from '../../../types.ts';
+
+/**
+ * Calls the task with partial fixtures.
+ *
+ * @param payload Partial event payload.
+ * @param octokit Partial Octokit REST client.
+ */
+const assignFixedIssues = ( payload: unknown, octokit: unknown ) =>
+	assignFixedIssuesTask(
+		payload as WebhookPayloadPullRequest,
+		octokit as GitHub
+	);
 
 describe( 'assignFixedIssues', () => {
 	it( 'does nothing if there are no fixed issues', async () => {

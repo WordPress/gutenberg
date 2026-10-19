@@ -1,6 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
-import firstTimeContributorLabel from '../index.js';
+import firstTimeContributorLabelTask from '../index.ts';
+import type { GitHub, WebhookPayloadPullRequest } from '../../../types.ts';
+
+/**
+ * Calls the task with partial fixtures.
+ *
+ * @param payload Partial event payload.
+ * @param octokit Partial Octokit REST client.
+ */
+const firstTimeContributorLabel = ( payload: unknown, octokit: unknown ) =>
+	firstTimeContributorLabelTask(
+		payload as WebhookPayloadPullRequest,
+		octokit as GitHub
+	);
 
 vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),

@@ -21,4 +21,4 @@ outputs:
             request number, so a consumer needs this one.
 runs:
     using: node24
-    main: lib/index.js
+    main: src/index.ts

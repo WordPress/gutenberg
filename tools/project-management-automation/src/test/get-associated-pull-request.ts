@@ -1,28 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import getAssociatedPullRequest from '../get-associated-pull-request.js';
-
-/** @typedef {import('../get-associated-pull-request.js').WebhookPayloadPushCommit} WebhookPayloadPushCommit */
+import getAssociatedPullRequest from '../get-associated-pull-request.ts';
+import type { WebhookPayloadPushCommit } from '../types.ts';
 
 /**
  * An example commit which can be associated with a pull request, e.g. a pull
  * request merge commit.
- *
- * @type {WebhookPayloadPushCommit}
  */
 const VALID_COMMIT = {
 	message:
 		'Components: SlotFill: Guard property access to possibly-undefined slot (#21205)',
-};
+} as WebhookPayloadPushCommit;
 
 /**
  * An example commit which cannot be associated with a pull request, e.g. when
  * someone commits directly to trunk.
- *
- * @type {WebhookPayloadPushCommit}
  */
 const INVALID_COMMIT = {
 	message: 'Add basic placeholder content to post title, content, and date.',
-};
+} as WebhookPayloadPushCommit;
 
 describe( 'getAssociatedPullRequest', () => {
 	it( 'should return the pull request number associated with a commit', () => {

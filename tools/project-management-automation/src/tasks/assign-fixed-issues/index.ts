@@ -1,15 +1,16 @@
-import debug from '../../debug.js';
-
-/** @typedef {ReturnType<typeof import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/openapi-webhooks-types').components['schemas']['webhook-pull-request-opened']} WebhookPayloadPullRequest */
+import debug from '../../debug.ts';
+import type { GitHub, WebhookPayloadPullRequest } from '../../types.ts';
 
 /**
  * Assigns any issues 'fixed' by a newly opened PR to the author of that PR.
  *
- * @param {WebhookPayloadPullRequest} payload Pull request event payload.
- * @param {GitHub}                    octokit Initialized Octokit REST client.
+ * @param payload Pull request event payload.
+ * @param octokit Initialized Octokit REST client.
  */
-async function assignFixedIssues( payload, octokit ) {
+async function assignFixedIssues(
+	payload: WebhookPayloadPullRequest,
+	octokit: GitHub
+): Promise< void > {
 	const regex =
 		/(?:close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved):? +(?:\#?|https?:\/\/github\.com\/WordPress\/gutenberg\/issues\/)(\d+)/gi;
 

@@ -1,5 +1,15 @@
 import { describe, expect, it, vi } from 'vitest';
-import addMilestone from '../index.js';
+import addMilestoneTask from '../index.ts';
+import type { GitHub, WebhookPayloadPush } from '../../../types.ts';
+
+/**
+ * Calls the task with partial fixtures.
+ *
+ * @param payload Partial event payload.
+ * @param octokit Partial Octokit REST client.
+ */
+const addMilestone = ( payload: unknown, octokit: unknown ) =>
+	addMilestoneTask( payload as WebhookPayloadPush, octokit as GitHub );
 
 describe( 'addMilestone', () => {
 	it( 'does nothing if base is not trunk', async () => {
@@ -287,6 +297,88 @@ describe( 'addMilestone', () => {
 			repo: 'gutenberg',
 			title: 'Gutenberg 7.0',
 			due_on: '2019-11-18T00:00:00.000Z',
+		} );
+		expect( octokit.rest.issues.update ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			issue_number: 123,
+			milestone: 12,
+		} );
+	} );
+
+	it( 'dates the new milestone from today when the current one has no due date', async () => {
+		vi.useFakeTimers( { toFake: [ 'Date' ] } );
+		vi.setSystemTime( new Date( '2026-10-19T00:00:00.000Z' ) );
+
+		const payload = {
+			ref: 'refs/heads/trunk',
+			commits: [ { message: '(#123)' } ],
+			repository: {
+				owner: {
+					login: 'WordPress',
+				},
+				name: 'gutenberg',
+			},
+		};
+		const octokit = {
+			paginate: {
+				iterator: vi.fn().mockReturnValue( [
+					Promise.resolve( {
+						data: [
+							{
+								title: 'Gutenberg 6.3',
+								number: 11,
+								due_on: null,
+							},
+							{
+								title: 'Gutenberg 6.4',
+								number: 12,
+								due_on: null,
+							},
+						],
+					} ),
+				] ),
+			},
+			rest: {
+				issues: {
+					get: vi.fn( () =>
+						Promise.resolve( {
+							data: {
+								milestone: null,
+							},
+						} )
+					),
+					createMilestone: vi.fn(),
+					update: vi.fn(),
+				},
+				repos: {
+					getContent: vi.fn( () =>
+						Promise.resolve( {
+							data: {
+								content: Buffer.from(
+									JSON.stringify( {
+										version: '6.3.0',
+									} )
+								).toString( 'base64' ),
+								encoding: 'base64',
+							},
+						} )
+					),
+				},
+			},
+		};
+
+		try {
+			await addMilestone( payload, octokit );
+		} finally {
+			vi.useRealTimers();
+		}
+
+		expect( octokit.rest.issues.createMilestone ).toHaveBeenCalledWith( {
+			owner: 'WordPress',
+			repo: 'gutenberg',
+			title: 'Gutenberg 6.4',
+			due_on: '2026-11-02T00:00:00.000Z',
 		} );
 		expect( octokit.rest.issues.update ).toHaveBeenCalledWith( {
 			owner: 'WordPress',

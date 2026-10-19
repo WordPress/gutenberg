@@ -1,14 +1,30 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
-import hasWordPressProfile from '../../../has-wordpress-profile.js';
-import firstTimeContributorAccountLink from '../index.js';
+import hasWordPressProfile from '../../../has-wordpress-profile.ts';
+import firstTimeContributorAccountLinkTask from '../index.ts';
+import type { GitHub, WebhookPayloadPush } from '../../../types.ts';
+
+/**
+ * Calls the task with partial fixtures.
+ *
+ * @param payload Partial event payload.
+ * @param octokit Partial Octokit REST client.
+ */
+const firstTimeContributorAccountLink = (
+	payload: unknown,
+	octokit: unknown
+) =>
+	firstTimeContributorAccountLinkTask(
+		payload as WebhookPayloadPush,
+		octokit as GitHub
+	);
 
 vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
 	setOutput: vi.fn(),
 } ) );
 
-vi.mock( import( '../../../has-wordpress-profile.js' ), () => ( {
+vi.mock( import( '../../../has-wordpress-profile.ts' ), () => ( {
 	default: vi.fn(),
 } ) );
 
