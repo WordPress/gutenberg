@@ -153,7 +153,7 @@ class WP_Test_REST_Autosaves_Controller extends WP_Test_REST_Post_Type_Controlle
 
 	public function test_registered_query_params() {
 		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/posts/' . self::$post_id . '/autosaves' );
-		$response = $this->server->dispatch( $request );
+		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$keys     = array_keys( $data['endpoints'][0]['args'] );
 		sort( $keys );
