@@ -260,11 +260,6 @@
 	:where(.root.is-rtl) & {
 		margin-right: $grid-unit-20 !important; /* stylelint-disable-line logical-css/require-logical-properties -- Match the locale-based isRTL() position calculations. */
 	}
-
-	@at-root input[type="number"]#{&} {
-		height: 30px;
-		min-height: 30px;
-	}
 }
 .action-right {
 	display: block;

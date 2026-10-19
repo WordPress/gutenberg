@@ -66,7 +66,7 @@
 
 ### Internal
 
--   `Grid`: Simplify redundant CSS-wide keyword selectors while preserving layout and consumer style overrides ([#85086](https://github.com/WordPress/gutenberg/pull/85086)).
+-   `RangeControl`, `Tabs`, `BorderBoxControl`: Remove unused styles and simplify SCSS nesting while preserving specificity and rendered styles ([#85086](https://github.com/WordPress/gutenberg/pull/85086)).
 -   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Replace remaining Emotion fixtures in polymorphic tests and ToolsPanel stories with SCSS Modules ([#84926](https://github.com/WordPress/gutenberg/pull/84926)).
 -   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
