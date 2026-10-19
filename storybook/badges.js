@@ -27,17 +27,21 @@ const statusDescriptions = {
 };
 
 const statusBadges = Object.fromEntries(
-	Object.entries( statuses ).map( ( [ key, { label, icon, tag } ] ) => [
-		tag,
-		{
-			icon,
-			title: `${ icon } ${ label }`,
-			tooltip: {
-				title: `Component status: ${ label }`,
-				desc: statusDescriptions[ key ],
+	Object.entries( statuses ).map( ( [ key, { label, icon, tag } ] ) => {
+		const showIcon = key !== 'recommended';
+
+		return [
+			tag,
+			{
+				...( showIcon && { icon } ),
+				title: showIcon ? `${ icon } ${ label }` : label,
+				tooltip: {
+					title: `Component status: ${ label }`,
+					desc: statusDescriptions[ key ],
+				},
 			},
-		},
-	] )
+		];
+	} )
 );
 
 /**
@@ -57,15 +61,6 @@ const badges = {
 					href: 'https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/',
 				},
 			],
-		},
-	},
-	'status-wip': {
-		icon: '🚧',
-		title: '🚧 WIP',
-		styles: { backgroundColor: '#FFF0BD' },
-		tooltip: {
-			title: 'Component is a work in progress',
-			desc: 'This component is not ready for use in production, including the Gutenberg codebase. DO NOT export outside of @wordpress/components.',
 		},
 	},
 	'status-experimental': {

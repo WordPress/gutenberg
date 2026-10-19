@@ -7,7 +7,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import GroupPlaceHolder, { useShouldShowPlaceHolder } from './placeholder';
 import { unlock } from '../lock-unlock';
@@ -70,9 +70,9 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 	const layoutSupportEnabled =
 		themeSupportsLayout || type === 'flex' || type === 'grid';
 
-	// Hooks.
-	const ref = useRef();
-	const blockProps = useBlockProps( { ref } );
+	// State, not a ref, so that the element is there on the next render.
+	const [ dropZoneElement, setDropZoneElement ] = useState( null );
+	const blockProps = useBlockProps( { ref: setDropZoneElement } );
 
 	const [ showPlaceholder, setShowPlaceholder ] = useShouldShowPlaceHolder( {
 		attributes,
@@ -99,7 +99,7 @@ function GroupEdit( { attributes, name, setAttributes, clientId } ) {
 			? blockProps
 			: { className: 'wp-block-group__inner-container' },
 		{
-			dropZoneElement: ref.current,
+			dropZoneElement,
 			templateLock,
 			allowedBlocks,
 			renderAppender,

@@ -1,8 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { logged } from '@wordpress/deprecated';
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
 import createReduxStore from '../redux-store';
 import coreDataStore from '../store';
+
+const REGISTER_GENERIC_STORE_DEPRECATION =
+	'wp.data.registerGenericStore is deprecated since version 5.9. Please use wp.data.register( storeDescriptor ) instead.';
 
 describe( 'createRegistry', () => {
 	let registry;
@@ -14,7 +18,7 @@ describe( 'createRegistry', () => {
 		return unsubscribe;
 	}
 	function subscribeUntil( predicates ) {
-		predicates = Array.from( predicates );
+		predicates = Array.isArray( predicates ) ? predicates : [ predicates ];
 
 		return new Promise( ( resolve ) => {
 			subscribeWithUnsubscribe( () => {
@@ -27,6 +31,7 @@ describe( 'createRegistry', () => {
 
 	beforeEach( () => {
 		vi.useFakeTimers();
+		logged[ REGISTER_GENERIC_STORE_DEPRECATION ] = true;
 		registry = createRegistry();
 	} );
 
@@ -35,6 +40,7 @@ describe( 'createRegistry', () => {
 		while ( ( unsubscribe = unsubscribes.shift() ) ) {
 			unsubscribe();
 		}
+		delete logged[ REGISTER_GENERIC_STORE_DEPRECATION ];
 		vi.useRealTimers();
 	} );
 
@@ -50,6 +56,7 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should throw if not all required config elements are present', () => {
+			delete logged[ REGISTER_GENERIC_STORE_DEPRECATION ];
 			expect( () =>
 				registry.registerGenericStore( 'grocer', {} )
 			).toThrow();
@@ -65,7 +72,9 @@ describe( 'createRegistry', () => {
 					subscribe,
 				} )
 			).toThrow();
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveWarnedWith(
+				REGISTER_GENERIC_STORE_DEPRECATION
+			);
 		} );
 
 		describe( 'getSelectors', () => {
@@ -354,7 +363,7 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getPage( 4, {} );
 		} );
 
-		it( 'should resolve action to dispatch', () => {
+		it( 'should resolve action to dispatch', async () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
@@ -378,10 +387,11 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getValue();
 			vi.runAllTimers();
 
-			return promise;
+			await promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should resolve promise action to dispatch', () => {
+		it( 'should resolve promise action to dispatch', async () => {
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' ? 'OK' : state;
@@ -405,10 +415,14 @@ describe( 'createRegistry', () => {
 			registry.select( 'demo' ).getValue();
 			vi.runAllTimers();
 
-			return promise;
+			await promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 
-		it( 'should not dispatch resolved promise action on subsequent selector calls', () => {
+		it( 'should not dispatch resolved promise action on subsequent selector calls', async () => {
+			const resolver = vi.fn( () =>
+				Promise.resolve( { type: 'SET_OK' } )
+			);
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
 					return action.type === 'SET_OK' && state === 'NOTOK'
@@ -419,7 +433,7 @@ describe( 'createRegistry', () => {
 					getValue: ( state ) => state,
 				},
 				resolvers: {
-					getValue: () => Promise.resolve( { type: 'SET_OK' } ),
+					getValue: resolver,
 				},
 			} );
 
@@ -429,25 +443,28 @@ describe( 'createRegistry', () => {
 
 			registry.select( 'demo' ).getValue();
 			vi.runAllTimers();
+			await promise;
 			registry.select( 'demo' ).getValue();
 			vi.runAllTimers();
 
-			return promise;
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
+			expect( resolver ).toHaveBeenCalledTimes( 1 );
 		} );
 
 		it( "should invalidate the resolver's resolution cache", async () => {
+			const fulfill = vi.fn( () =>
+				Promise.resolve( { type: 'SET_OK' } )
+			);
 			registry.registerStore( 'demo', {
 				reducer: ( state = 'NOTOK', action ) => {
-					return action.type === 'SET_OK' && state === 'NOTOK'
-						? 'OK'
-						: 'NOTOK';
+					return action.type === 'SET_OK' ? 'OK' : state;
 				},
 				selectors: {
 					getValue: ( state ) => state,
 				},
 				resolvers: {
 					getValue: {
-						fulfill: () => Promise.resolve( { type: 'SET_OK' } ),
+						fulfill,
 						shouldInvalidate: ( action ) =>
 							action.type === 'INVALIDATE',
 					},
@@ -457,22 +474,21 @@ describe( 'createRegistry', () => {
 				},
 			} );
 
-			let promise = subscribeUntil(
-				() => registry.select( 'demo' ).getValue() === 'OK'
-			);
-			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK.
+			const firstResolution = registry.resolveSelect( 'demo' ).getValue();
 			vi.runAllTimers();
-			await promise;
+			await firstResolution;
+			expect( fulfill ).toHaveBeenCalledTimes( 1 );
 
 			// Invalidate the cache
 			registry.dispatch( 'demo' ).invalidate();
 
-			promise = subscribeUntil(
-				() => registry.select( 'demo' ).getValue() === 'NOTOK'
-			);
-			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK.
+			const secondResolution = registry
+				.resolveSelect( 'demo' )
+				.getValue();
 			vi.runAllTimers();
-			await promise;
+			await secondResolution;
+			expect( fulfill ).toHaveBeenCalledTimes( 2 );
+			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
 		} );
 	} );
 
@@ -666,6 +682,46 @@ describe( 'createRegistry', () => {
 			const listener = vi.fn();
 			subscribeWithUnsubscribe( listener );
 
+			store.dispatch( { type: 'dummy' } );
+
+			expect( listener ).not.toHaveBeenCalled();
+		} );
+
+		it( 'calls a listener subscribed to a store that gets registered later', () => {
+			const listener = vi.fn();
+			subscribeWithUnsubscribe( listener, 'lateStore' );
+
+			const store = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+
+			expect( listener ).not.toHaveBeenCalled();
+
+			store.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'does not call a listener waiting for a store when another store updates', () => {
+			const otherStore = registry.registerStore( 'otherStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			const listener = vi.fn();
+			subscribeWithUnsubscribe( listener, 'lateStore' );
+
+			otherStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).not.toHaveBeenCalled();
+		} );
+
+		it( 'does not call a listener that unsubscribed before the store was registered', () => {
+			const listener = vi.fn();
+			const unsubscribe = registry.subscribe( listener, 'lateStore' );
+			unsubscribe();
+
+			const store = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
 			store.dispatch( { type: 'dummy' } );
 
 			expect( listener ).not.toHaveBeenCalled();
@@ -885,6 +941,25 @@ describe( 'createRegistry', () => {
 
 			expect( mySelector2 ).toHaveBeenCalled();
 			expect( myAction2 ).toHaveBeenCalled();
+		} );
+
+		it( 'should hand a subscription to an unregistered store over to the parent', () => {
+			const subRegistry = createRegistry( {}, registry );
+
+			const listener = vi.fn();
+			const unsubscribe = subRegistry.subscribe( listener, 'lateStore' );
+
+			const parentStore = registry.registerStore( 'lateStore', {
+				reducer: ( state = 0 ) => state + 1,
+			} );
+			parentStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
+
+			unsubscribe();
+			parentStore.dispatch( { type: 'dummy' } );
+
+			expect( listener ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 } );

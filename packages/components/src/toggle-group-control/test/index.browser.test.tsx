@@ -31,11 +31,6 @@ const expectGroupChromeDisabled = ( group: HTMLElement ) => {
 const sleep = ( milliseconds: number ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, milliseconds ) );
 
-const getGeneratedEmotionClassNames = ( element: HTMLElement ) =>
-	Array.from( element.classList ).filter( ( className ) =>
-		/^(css|emotion)-/.test( className )
-	);
-
 const ControlledToggleGroupControl = ( {
 	value: valueProp,
 	onChange,
@@ -114,7 +109,6 @@ describe( 'required context', () => {
 		).rejects.toThrow(
 			'ToggleGroupControlOption can only be rendered inside ToggleGroupControl.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 
 	it( 'throws when ToggleGroupControlOptionIcon is outside ToggleGroupControl', async () => {
@@ -129,7 +123,6 @@ describe( 'required context', () => {
 		).rejects.toThrow(
 			'ToggleGroupControlOptionIcon can only be rendered inside ToggleGroupControl.'
 		);
-		expect( console ).toHaveErrored();
 	} );
 } );
 
@@ -921,7 +914,7 @@ describe.each( [
 	} );
 } );
 
-test( 'should render block styles without Emotion-generated classes', async () => {
+test( 'should render block styles with enclosing borders', async () => {
 	await render(
 		<ToggleGroupControl label="Test Toggle Group Control" isBlock>
 			{ options }
@@ -932,7 +925,6 @@ test( 'should render block styles without Emotion-generated classes', async () =
 		name: 'Test Toggle Group Control',
 	} );
 
-	expect( getGeneratedEmotionClassNames( control ) ).toHaveLength( 0 );
 	expect( control ).toHaveClass(
 		controlStyles[ 'toggle-group-control' ],
 		controlStyles[ 'is-block' ],

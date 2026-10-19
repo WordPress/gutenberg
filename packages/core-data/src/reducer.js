@@ -453,18 +453,14 @@ export function undoManager( state = createUndoManager() ) {
 	return state;
 }
 
-// Stores a snapshot of the sync undo manager's undo/redo availability so
-// core-data selectors can react to undo stack changes.
-export function syncUndoManagerState(
-	state = { hasRedo: false, hasUndo: false },
-	action
-) {
+// The undo manager above is a mutable object, so changes to it do not change
+// state on their own. Entity edits, undo, and redo are store actions already.
+// A level the entity sync manager adds to it arrives outside of one, so this
+// reference changes then, and selectors reading the undo manager run again.
+export function undoManagerReference( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SYNC_UNDO_MANAGER_CHANGE':
-			return {
-				hasRedo: action.hasRedo,
-				hasUndo: action.hasUndo,
-			};
+		case 'RECORD_SYNC_UNDO_LEVEL':
+			return {};
 	}
 	return state;
 }
@@ -756,6 +752,50 @@ export function viewConfigs( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing the fields configs, keyed by kind, then name.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function fieldsConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_FIELDS_CONFIG':
+			return {
+				...state,
+				[ action.kind ]: {
+					...state[ action.kind ],
+					[ action.name ]: action.config,
+				},
+			};
+	}
+	return state;
+}
+
+/**
+ * Reducer managing the actions configs, keyed by kind, then name.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function entityActionsConfigs( state = {}, action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_ENTITY_ACTIONS_CONFIG':
+			return {
+				...state,
+				[ action.kind ]: {
+					...state[ action.kind ],
+					[ action.name ]: action.config,
+				},
+			};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -766,7 +806,7 @@ export default combineReducers( {
 	themeGlobalStyleRevisions,
 	entities,
 	editsReference,
-	syncUndoManagerState,
+	undoManagerReference,
 	undoManager,
 	embedPreviews,
 	userPermissions,
@@ -782,4 +822,6 @@ export default combineReducers( {
 	syncConnectionStatuses,
 	collaborationSupported,
 	viewConfigs,
+	fieldsConfigs,
+	entityActionsConfigs,
 } );

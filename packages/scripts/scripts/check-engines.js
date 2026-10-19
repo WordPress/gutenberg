@@ -1,27 +1,28 @@
+const path = require( 'path' );
 const { sync: spawn } = require( 'cross-spawn' );
 const { sync: resolveBin } = require( 'resolve-bin' );
 const { getArgsFromCLI, hasArgInCLI, getPackageProp } = require( '../utils' );
+const { getPackagePath } = require( '../utils/package' );
 
-const getConfig = () => {
-	const hasConfig =
-		hasArgInCLI( '--package' ) ||
-		hasArgInCLI( '--node' ) ||
-		hasArgInCLI( '--npm' ) ||
-		hasArgInCLI( '--yarn' );
+const hasConfig =
+	hasArgInCLI( '--package' ) ||
+	hasArgInCLI( '--node' ) ||
+	hasArgInCLI( '--npm' ) ||
+	hasArgInCLI( '--yarn' );
 
-	if ( hasConfig ) {
-		return [];
-	}
-	const { node, npm } =
-		getPackageProp( 'engines' ) || require( '../package.json' ).engines;
-
-	return [ '--node', node, '--npm', npm ];
-};
+// `--package` reads `engines` from the `package.json` in the working directory.
+const getEnginesDirectory = () =>
+	path.dirname(
+		getPackageProp( 'engines' )
+			? getPackagePath()
+			: require.resolve( '../package.json' )
+	);
 
 const result = spawn(
 	resolveBin( 'check-node-version' ),
-	[ ...getConfig(), ...getArgsFromCLI() ],
+	[ ...( hasConfig ? [] : [ '--package' ] ), ...getArgsFromCLI() ],
 	{
+		cwd: hasConfig ? undefined : getEnginesDirectory(),
 		stdio: 'inherit',
 	}
 );

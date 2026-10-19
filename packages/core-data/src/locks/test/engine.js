@@ -13,11 +13,15 @@ describe( 'Locks engine', () => {
 		const l2 = locks.acquire( 'store', [ 'root' ], true );
 
 		// On each grant, verify that the other lock is not granted at the same time.
+		// The plugin stops tracking these promises at `l1Granted = false`,
+		// before the awaited Promise.all.
+		// eslint-disable-next-line vitest/valid-expect-in-promise
 		const check1 = l1.then( () => {
 			l1Granted = true;
 			expect( l2Granted ).toBe( false );
 		} );
 
+		// eslint-disable-next-line vitest/valid-expect-in-promise
 		const check2 = l2.then( () => {
 			l2Granted = true;
 			expect( l1Granted ).toBe( false );
@@ -47,11 +51,15 @@ describe( 'Locks engine', () => {
 		const l2 = locks.acquire( 'store', [ 'root' ], true );
 
 		// On each grant, verify that the other lock is not granted at the same time.
+		// The plugin stops tracking these promises at `l1Granted = false`,
+		// before the awaited Promise.all.
+		// eslint-disable-next-line vitest/valid-expect-in-promise
 		const check1 = l1.then( () => {
 			l1Granted = true;
 			expect( l2Granted ).toBe( false );
 		} );
 
+		// eslint-disable-next-line vitest/valid-expect-in-promise
 		const check2 = l2.then( () => {
 			l2Granted = true;
 			expect( l1Granted ).toBe( false );
@@ -81,11 +89,15 @@ describe( 'Locks engine', () => {
 		const l2 = locks.acquire( 'store', [ 'root', 'child' ], true );
 
 		// On each grant, verify that the other lock is not granted at the same time.
+		// The plugin stops tracking these promises at `l1Granted = false`,
+		// before the awaited Promise.all.
+		// eslint-disable-next-line vitest/valid-expect-in-promise
 		const check1 = l1.then( () => {
 			l1Granted = true;
 			expect( l2Granted ).toBe( false );
 		} );
 
+		// eslint-disable-next-line vitest/valid-expect-in-promise
 		const check2 = l2.then( () => {
 			l2Granted = true;
 			expect( l1Granted ).toBe( false );

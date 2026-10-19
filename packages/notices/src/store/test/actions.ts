@@ -110,6 +110,7 @@ describe( 'actions', () => {
 					onDismiss: undefined,
 				},
 			} );
+			expect( console ).toHaveWarned();
 		} );
 	} );
 

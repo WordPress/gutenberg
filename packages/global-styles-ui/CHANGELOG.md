@@ -2,13 +2,42 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Font Library: Use `Select` from `@wordpress/ui` for the pagination page selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
+-   Remove the dot that marks blocks with user styles in the block list. The filter to show only those blocks stays ([#84657](https://github.com/WordPress/gutenberg/pull/84657)).
+-   Font Library: Mark installed font variants in font collections ([#84023](https://github.com/WordPress/gutenberg/pull/84023)).
+
+### Bug Fixes
+
+-   Font Library: Load all installed font families, not only the first 10 ([#84684](https://github.com/WordPress/gutenberg/pull/84684)).
+
+## 1.24.0 (2026-10-07)
+
+### Enhancements
+
+-   Blocks screen: add the hover, focus, focus-visible and active state controls for the Navigation Link block, which already supports those states in `theme.json` and in the block inspector ([#83451](https://github.com/WordPress/gutenberg/pull/83451)).
+
+### Internal
+
+-   Font Library: Replace `ProgressBar` with `Progress` from `@wordpress/ui`. ([#84021](https://github.com/WordPress/gutenberg/pull/84021))
+-   Font Library: Use the public `Menu` from `@wordpress/ui` for font collection actions ([#82965](https://github.com/WordPress/gutenberg/pull/82965)).
+
+## 1.23.0 (2026-09-23)
+
 ### Enhancements
 
 -   Add a text shadow presets screen under Typography ([#79584](https://github.com/WordPress/gutenberg/pull/79584)).
+-   Screen Revisions: Use the DataViews `pickerActivity` layout to render the revisions timeline, with Apply / Reset rendered as a picker footer action so the timeline options hold no interactive content ([#80856](https://github.com/WordPress/gutenberg/pull/80856)).
 
 ### Bug Fixes
 
 -   Preset groups: separate adjacent header action buttons so their focus rings and hit areas do not overlap. ([#81921](https://github.com/WordPress/gutenberg/pull/81921))
+-   Blocks screen: rank search results so a block whose title matches the search is listed before blocks that only match by keyword, category or description. ([#83435](https://github.com/WordPress/gutenberg/pull/83435))
 
 ### Internal
 

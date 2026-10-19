@@ -167,11 +167,11 @@ _Example:_
 
 This is how you execute the script with presented setup:
 
-- `npm run check-engines` - checks installed version of `node` and `npm`.
+- `npm run check-engines` - checks installed versions of the tools listed in the `engines` field of your project's `package.json`, falling back to the `node` version required by this package.
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. The default requirements are set to the same Node.js and npm versions as listed in the [installation](#installation) section for this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. When your project has no `engines` field, it checks the Node.js version required by this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 
@@ -472,7 +472,7 @@ The default environment is Node. Vitest APIs must be imported explicitly. Vitest
 
 Vitest discovers `vitest.config.*`, then `vite.config.*`, in the current working directory. A Vitest config takes precedence over a Vite config; it does not merge the two automatically. Use `--config path/to/config.mjs` to select another file. ESM and TypeScript configs use Vite's config loader. Jest config files and the `jest` field in `package.json` do not configure this command.
 
-`@wordpress/scripts` supplies no Vitest preset, shared setup, DOM environment, React transform, aliases, console assertions, or CSS mocks. See the [consumer migration guide](./docs/vitest-migration.md) for tested Node, jsdom, and Browser Mode examples, dependencies, and support ranges.
+`@wordpress/scripts` supplies no Vitest preset, shared setup, DOM environment, React transform, aliases, console assertions, or CSS mocks. See the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md) for tested Node, jsdom, and Browser Mode examples, dependencies, and support ranges.
 
 ### `test-unit-jest`
 
@@ -486,7 +486,7 @@ Use `wp-scripts test-unit-jest` in your npm test command. Jest discovers your pr
 
 Existing suites can keep using the published WordPress Jest packages. Maintenance covers this adapter and the documented legacy setup. New testing features target Vitest.
 
-The default `wp-scripts lint-js` config also switches to Vitest. The [Jest upgrade checklist](./docs/vitest-migration.md#keep-an-existing-jest-suite) covers test commands, dependencies, Jest configuration, and a complete ESLint configuration. You can keep your Jest tests without installing Vitest or Vite.
+The default `wp-scripts lint-js` config also switches to Vitest. The [Jest upgrade checklist](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md#keep-an-existing-jest-suite) covers test commands, dependencies, Jest configuration, and a complete ESLint configuration. You can keep your Jest tests without installing Vitest or Vite.
 
 ### `test-e2e`
 
@@ -521,6 +521,21 @@ By default, Playwright looks for JavaScript or TypeScript files with `.test` or 
 This script automatically detects the best config to start Playwright, but sometimes you may need to specify custom options.
 To do so, you can add a file called `playwright.config.ts` or `playwright.config.js` in the top-level directory of your package (at the same level as your `package.json`).
 
+#### Test Environment
+
+The tests run against the site at the `WP_BASE_URL` environment variable. When it is not set and [`@wordpress/env`](https://www.npmjs.com/package/@wordpress/env) is installed, they run against the `wp-env` environment configured in the current directory: its tests environment if the config enables one, and otherwise its development environment. As with `wp-env start`, the port comes from `.wp-env.json` merged with `.wp-env.override.json` and any `WP_ENV_*` environment variables, so each project can have its own ports. Without either, the tests run against `http://localhost:8889`.
+
+If you start the environment for the tests from a custom config file with `wp-env --config`, pass the same file with `--wp-env-config=<path>`. Its path is resolved relative to the current directory, as with `wp-env --config`, and its override file is merged in too, for example `.wp-env.test.override.json` for `.wp-env.test.json`:
+
+```json
+{
+	"scripts": {
+		"env:test": "wp-env --config .wp-env.test.json",
+		"test:e2e": "wp-scripts test-e2e --wp-env-config=.wp-env.test.json"
+	}
+}
+```
+
 #### Failed Test Artifacts
 
 When tests fail, snapshots will be taken of the page and stored in the `artifacts/` directory at the root of your project. These snapshots may help debug failed tests during development or when running tests in a CI environment.
@@ -545,7 +560,7 @@ For Vitest tests, pass `--inspect-brk --no-file-parallelism` after `test-unit-js
 
 Tests can be debugged by any [inspector client](https://nodejs.org/en/docs/guides/debugging-getting-started/#inspector-clients) that supports the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/).
 
-For unit tests, keep the inspector flags after `test-unit-js` so they reach the Vitest worker. See the [consumer migration guide](./docs/vitest-migration.md) for the complete command setup.
+For unit tests, keep the inspector flags after `test-unit-js` so they reach the Vitest worker. See the [consumer migration guide](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/docs/vitest-migration.md) for the complete command setup.
 
 Google Chrome and Visual Studio Code are used as examples below.
 

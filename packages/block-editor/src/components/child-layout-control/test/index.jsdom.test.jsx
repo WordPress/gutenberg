@@ -120,7 +120,7 @@ describe( 'ChildLayoutControl', () => {
 		} );
 	} );
 
-	it( 'shows legacy fixed flex sizing as max', () => {
+	it( 'shows legacy fixed flex sizing as max', async () => {
 		renderControl( {
 			parentLayout: {
 				type: 'flex',
@@ -132,7 +132,9 @@ describe( 'ChildLayoutControl', () => {
 			},
 		} );
 
-		expect( screen.getByRole( 'radio', { name: 'Max' } ) ).toBeChecked();
+		expect(
+			await screen.findByRole( 'radio', { name: 'Max' } )
+		).toBeChecked();
 	} );
 
 	it( 'sets fixedNoShrink when selecting fixed flex sizing', async () => {

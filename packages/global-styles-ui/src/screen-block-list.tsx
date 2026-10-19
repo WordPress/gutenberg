@@ -8,7 +8,7 @@ import {
 	__experimentalText as WCText,
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
-import { Menu, VisuallyHidden } from '@wordpress/ui';
+import { Menu } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import {
 	useState,
@@ -19,6 +19,7 @@ import {
 	useDeferredValue,
 	memo,
 } from '@wordpress/element';
+import type { BlockType } from '@wordpress/blocks';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import {
 	BlockIcon,
@@ -42,6 +43,7 @@ const {
 	useSettingsForBlockElement,
 	useHasColorPanel,
 	useHasBackgroundPanel,
+	searchItems,
 } = unlock( blockEditorPrivateApis );
 
 /**
@@ -139,10 +141,9 @@ export function useBlockHasGlobalStyles( blockName: string ) {
 
 interface BlockMenuItemProps {
 	block: any;
-	isCustomized: boolean;
 }
 
-function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
+function BlockMenuItem( { block }: BlockMenuItemProps ) {
 	const hasBlockMenuItem = useBlockHasGlobalStyles( block.name );
 	if ( ! hasBlockMenuItem ) {
 		return null;
@@ -158,17 +159,6 @@ function BlockMenuItem( { block, isCustomized }: BlockMenuItemProps ) {
 					icon={ block.icon }
 				/>
 				<FlexItem>{ block.title }</FlexItem>
-				{ isCustomized && (
-					<>
-						<VisuallyHidden>
-							{ __( 'Has custom styles' ) }
-						</VisuallyHidden>
-						<span
-							aria-hidden="true"
-							className="global-styles-ui-block-types-item__indicator"
-						/>
-					</>
-				) }
 			</HStack>
 		</NavigationButtonAsItem>
 	);
@@ -206,7 +196,6 @@ interface BlockListProps {
 function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 	const sortedBlockTypes = useSortedBlockTypes();
 	const debouncedSpeak = useDebounce( speak, 500 );
-	const { isMatchingSearchTerm } = useSelect( blocksStore );
 	const { user } = useContext( GlobalStylesContext );
 
 	// Computed once for the whole list rather than per row, so the list does
@@ -225,11 +214,13 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 		return names;
 	}, [ user ] );
 
-	const searchedBlockTypes = ! filterValue
-		? sortedBlockTypes
-		: sortedBlockTypes.filter( ( blockType ) =>
-				isMatchingSearchTerm( blockType, filterValue )
-			);
+	// Ranks title matches above keyword, category and description matches, the
+	// same way the inserter does. Without a search value the list keeps its
+	// registration order.
+	const searchedBlockTypes: BlockType[] = searchItems(
+		sortedBlockTypes,
+		filterValue
+	);
 
 	const filteredBlockTypes =
 		styleFilter === 'customized'
@@ -283,7 +274,6 @@ function BlockList( { filterValue, styleFilter }: BlockListProps ) {
 				filteredBlockTypes.map( ( block ) => (
 					<BlockMenuItem
 						block={ block }
-						isCustomized={ customizedBlockNames.has( block.name ) }
 						key={ 'menu-itemblock-' + block.name }
 					/>
 				) )
@@ -304,7 +294,7 @@ function ScreenBlockList() {
 			<ScreenHeader
 				title={ __( 'Blocks' ) }
 				description={ __(
-					'Customize the appearance of specific blocks and for the whole site.'
+					"Customize how a block looks everywhere it's used."
 				) }
 			/>
 			<HStack

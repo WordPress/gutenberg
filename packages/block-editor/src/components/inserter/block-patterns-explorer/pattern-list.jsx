@@ -6,13 +6,13 @@ import { speak } from '@wordpress/a11y';
 import BlockPatternsList from '../../block-patterns-list';
 import useInsertionPoint from '../hooks/use-insertion-point';
 import usePatternsState from '../hooks/use-patterns-state';
-import { searchItems } from '../search-items';
+import { searchItems } from '../../../utils/search-ranking';
 import BlockPatternsPaging from '../../block-patterns-paging';
 import usePatternsPaging from '../hooks/use-patterns-paging';
 import {
 	INSERTER_PATTERN_TYPES,
 	allPatternsCategory,
-	myPatternsCategory,
+	sitePatternsCategory,
 	starterPatternsCategory,
 } from '../block-patterns-tab/utils';
 
@@ -49,7 +49,7 @@ function PatternList( {
 				return true;
 			}
 			if (
-				selectedCategory === myPatternsCategory.name &&
+				selectedCategory === sitePatternsCategory.name &&
 				pattern.type === INSERTER_PATTERN_TYPES.user
 			) {
 				return true;

@@ -24,10 +24,15 @@
 		},
 		"color": {
 			"gradients": true,
+			"link": true,
 			"__experimentalDefaultControls": {
 				"background": true,
 				"text": true
 			}
+		},
+		"dimensions": {
+			"minHeight": true,
+			"minWidth": true
 		},
 		"shadow": true,
 		"spacing": {
