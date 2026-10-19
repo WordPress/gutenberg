@@ -1418,19 +1418,10 @@ export const getNodesWithStyles = (
 				) {
 					nodes.push( {
 						styles: value,
-						selector: blockSelectors[ blockName ]?.selector
-							.split( ',' )
-							.map( ( sel: string ) => {
-								const elementSelectors =
-									ELEMENTS[
-										elementName as ElementName
-									].split( ',' );
-								return elementSelectors.map(
-									( elementSelector: string ) =>
-										sel + ' ' + elementSelector
-								);
-							} )
-							.join( ',' ),
+						selector: scopeSelector(
+							blockSelectors[ blockName ].selector,
+							ELEMENTS[ elementName as ElementName ]
+						),
 						elementName,
 					} );
 				}
