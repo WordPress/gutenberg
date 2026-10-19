@@ -31,6 +31,10 @@ const meta: Meta< typeof RangeControl > = {
 		onMouseLeave: { control: false },
 		onMouseMove: { control: false },
 		railColor: { control: { type: 'color' } },
+		size: {
+			control: { type: 'select' },
+			options: [ 'default', 'compact' ],
+		},
 		step: { control: { type: 'number' } },
 		trackColor: { control: { type: 'color' } },
 		type: { control: { type: 'check' }, options: [ 'stepper' ] },
