@@ -259,7 +259,10 @@ export type RestRecord = Record< string, unknown > & {
  * The links of a REST API record that core data reads.
  */
 export interface RestLinks {
-	self?: Array< { href?: string; targetHints?: { allow?: string } } >;
+	self?: Array< {
+		href?: string;
+		targetHints?: { allow?: ReadonlyArray< string > };
+	} >;
 	'version-history'?: Array< { href?: string } >;
 	'wp:user-global-styles'?: Array< { href?: string } >;
 	[ relation: string ]: unknown;
