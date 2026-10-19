@@ -380,10 +380,7 @@ test.describe( 'Table of Contents', () => {
 
 			const tableOfContents = getTableOfContentsEditorBlock( editor );
 			await expect( tableOfContents ).toContainText(
-				'Start adding Heading blocks to create a table of contents.'
-			);
-			await expect( tableOfContents ).toContainText(
-				'Headings with HTML anchors will be linked here.'
+				'Start adding Heading blocks to create a table of contents automatically.'
 			);
 
 			const postId = await editor.publishPost();

@@ -260,7 +260,7 @@ export default function TableOfContentsEdit( {
 						icon={ <BlockIcon icon={ icon } /> }
 						label={ __( 'Table of Contents' ) }
 						instructions={ __(
-							'Start adding Heading blocks to create a table of contents. Headings with HTML anchors will be linked here.'
+							'Start adding Heading blocks to create a table of contents automatically.'
 						) }
 					/>
 				</div>
