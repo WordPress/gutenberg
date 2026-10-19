@@ -5,6 +5,7 @@ import {
 	isTextField,
 	removeInvalidHTML,
 	isEmpty,
+	getOffsetParent,
 } from '../dom';
 import { getPhrasingContentSchema } from '../phrasing-content';
 
@@ -168,6 +169,26 @@ describe( 'DOM', () => {
 			expect( isTextField( document.createElement( 'div' ) ) ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'getOffsetParent', () => {
+		it( 'should return the closest element when it is positioned', () => {
+			parent.style.position = 'relative';
+			const text = document.createTextNode( 'text' );
+			parent.appendChild( text );
+
+			expect( getOffsetParent( text ) ).toBe( parent );
+		} );
+
+		it( 'should return null when no ancestor is an element', () => {
+			expect( getOffsetParent( document.documentElement ) ).toBe( null );
+
+			const fragment = document.createDocumentFragment();
+			const text = document.createTextNode( 'text' );
+			fragment.appendChild( text );
+
+			expect( getOffsetParent( text ) ).toBe( null );
 		} );
 	} );
 } );

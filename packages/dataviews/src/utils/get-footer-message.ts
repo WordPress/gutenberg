@@ -17,25 +17,25 @@ export default function getFooterMessage(
 ): string {
 	if ( selectionCount > 0 ) {
 		return sprintf(
-			/* translators: %d: number of items. */
-			_n( '%d Item selected', '%d Items selected', selectionCount ),
-			selectionCount
+			/* translators: %s: formatted number of items. */
+			_n( '%s Item selected', '%s Items selected', selectionCount ),
+			selectionCount.toLocaleString()
 		);
 	}
 
 	// No selection - show item count
 	if ( onlyTotalCount || totalItems <= itemsCount ) {
 		return sprintf(
-			/* translators: %d: number of items. */
-			_n( '%d Item', '%d Items', totalItems ),
-			totalItems
+			/* translators: %s: formatted number of items. */
+			_n( '%s Item', '%s Items', totalItems ),
+			totalItems.toLocaleString()
 		);
 	}
 
 	return sprintf(
-		/* translators: %1$d: number of items. %2$d: total number of items. */
-		_n( '%1$d of %2$d Item', '%1$d of %2$d Items', totalItems ),
-		itemsCount,
-		totalItems
+		/* translators: %1$s: formatted number of items. %2$s: formatted total number of items. */
+		_n( '%1$s of %2$s Item', '%1$s of %2$s Items', totalItems ),
+		itemsCount.toLocaleString(),
+		totalItems.toLocaleString()
 	);
 }

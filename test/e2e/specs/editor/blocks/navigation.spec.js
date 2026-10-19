@@ -1009,6 +1009,181 @@ test.describe( 'Navigation block', () => {
 		} );
 	} );
 
+	// Blocks the Navigation allows are listed alongside the link results, so
+	// a Home Link can be found by typing "Home".
+	// See https://github.com/WordPress/gutenberg/issues/76803.
+	test.describe( 'Block search results', () => {
+		test.beforeAll( async ( { requestUtils } ) => {
+			// Each shares its first word with a block, so the block is listed
+			// in the same results as a page.
+			await requestUtils.createPage( {
+				title: 'Home Office',
+				status: 'publish',
+			} );
+			await requestUtils.createPage( {
+				title: 'Paragraph Guide',
+				status: 'publish',
+			} );
+		} );
+
+		test.beforeEach(
+			async ( { admin, editor, requestUtils, navigation } ) => {
+				await admin.createNewPost();
+
+				await requestUtils.createNavigationMenu( {
+					title: 'Block search',
+					content: '',
+				} );
+
+				await editor.insertBlock( { name: 'core/navigation' } );
+
+				await navigation.getNavBlockInserter().click();
+			}
+		);
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllMenus();
+			await requestUtils.deleteAllPages();
+		} );
+
+		test( 'can insert a block from the search results', async ( {
+			page,
+			navigation,
+		} ) => {
+			const searchResults = page.getByRole( 'listbox', {
+				name: /Search results/,
+			} );
+
+			await test.step( 'List the block with the page results', async () => {
+				await expect( navigation.getLinkControlSearch() ).toBeFocused();
+				await page.keyboard.type( 'Home' );
+
+				await expect(
+					searchResults.getByRole( 'option', { name: /Home Office/ } )
+				).toBeVisible();
+				const blockResult = searchResults.getByRole( 'option' ).first();
+				await expect( blockResult ).toHaveText( /Home Link.*Block/ );
+				// The block's own icon, as the inserter shows it.
+				await expect(
+					blockResult.locator(
+						'.block-editor-link-control__search-item-icon svg'
+					)
+				).toBeVisible();
+			} );
+
+			await test.step( 'Replace the new link with the block', async () => {
+				await searchResults
+					.getByRole( 'option', { name: /Home Link/ } )
+					.click();
+
+				await expect( navigation.getLinkPopover() ).toBeHidden();
+				await expect(
+					navigation
+						.getNavBlock()
+						.getByRole( 'document', { name: 'Block: Home Link' } )
+				).toBeVisible();
+				await expect(
+					navigation
+						.getNavBlock()
+						.getByRole( 'document', { name: 'Block: Page Link' } )
+				).toHaveCount( 0 );
+			} );
+		} );
+
+		test( 'can insert a block from the search results with the keyboard', async ( {
+			page,
+			navigation,
+		} ) => {
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Home' );
+
+			const blockResult = page
+				.getByRole( 'listbox', { name: /Search results/ } )
+				.getByRole( 'option', { name: /Home Link/ } );
+			await expect( blockResult ).toBeVisible();
+
+			await page.keyboard.press( 'ArrowDown' );
+			await expect( blockResult ).toHaveAttribute(
+				'aria-selected',
+				'true'
+			);
+			await page.keyboard.press( 'Enter' );
+
+			await expect( navigation.getLinkPopover() ).toBeHidden();
+			await expect(
+				navigation
+					.getNavBlock()
+					.getByRole( 'document', { name: 'Block: Home Link' } )
+			).toBeVisible();
+		} );
+
+		test( 'does not list blocks the Navigation does not allow', async ( {
+			page,
+			navigation,
+		} ) => {
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Paragraph' );
+
+			const searchResults = page.getByRole( 'listbox', {
+				name: /Search results/,
+			} );
+
+			// Wait for the page result, so the results have arrived before
+			// counting them.
+			await expect(
+				searchResults.getByRole( 'option', { name: /Paragraph Guide/ } )
+			).toBeVisible();
+			await expect( searchResults.getByRole( 'option' ) ).toHaveCount(
+				1
+			);
+		} );
+
+		// A submenu with no URL of its own still holds its items, so a block
+		// chosen from its search results goes beside it, as with "Add block",
+		// rather than replacing it.
+		test( 'keeps a submenu and its items when a block is chosen from its search results', async ( {
+			admin,
+			editor,
+			page,
+			pageUtils,
+			requestUtils,
+			navigation,
+		} ) => {
+			await admin.createNewPost();
+			const { id: menuId } = await requestUtils.createNavigationMenu( {
+				title: 'Block search in a submenu',
+				content:
+					'<!-- wp:navigation-submenu {"label":"Parent"} --><!-- wp:navigation-link {"label":"Child","url":"https://example.com"} /--><!-- /wp:navigation-submenu -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menuId },
+			} );
+
+			const submenu = navigation
+				.getNavBlock()
+				.getByRole( 'document', { name: 'Block: Submenu' } );
+			await submenu.getByText( 'Parent' ).click();
+			await pageUtils.pressKeys( 'primary+k' );
+
+			await expect( navigation.getLinkControlSearch() ).toBeFocused();
+			await page.keyboard.type( 'Home' );
+			await page
+				.getByRole( 'listbox', { name: /Search results/ } )
+				.getByRole( 'option', { name: /Home Link/ } )
+				.click();
+
+			await expect( navigation.getLinkPopover() ).toBeHidden();
+			await expect(
+				navigation
+					.getNavBlock()
+					.getByRole( 'document', { name: 'Block: Home Link' } )
+			).toHaveCount( 1 );
+			await expect( submenu ).toHaveCount( 1 );
+			await expect( submenu.getByText( 'Child' ) ).toBeVisible();
+		} );
+	} );
+
 	test( 'Adding new links to a navigation block with existing inner blocks triggers creation of a single Navigation Menu', async ( {
 		admin,
 		page,
@@ -1895,6 +2070,76 @@ test.describe( 'Navigation block', () => {
 				);
 				await expect( linkInput ).toBeFocused();
 			} );
+		} );
+	} );
+
+	test( 'can change open in new tab from the Link UI popover', async ( {
+		admin,
+		editor,
+		navigation,
+		pageUtils,
+		requestUtils,
+	} ) => {
+		await admin.createNewPost();
+
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Test Menu',
+			content:
+				'<!-- wp:navigation-link {"label":"wordpress.org","type":"custom","url":"https://wordpress.org","kind":"custom"} /-->',
+		} );
+
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: menu.id,
+			},
+		} );
+
+		const navLinkBlock = navigation
+			.getNavBlock()
+			.getByRole( 'document', { name: 'Block: Custom Link' } );
+		await expect( navLinkBlock ).toBeVisible();
+
+		await editor.openDocumentSettingsSidebar();
+		await editor.selectBlocks( navLinkBlock );
+
+		const sidebarCheckbox = navigation
+			.getContentControls()
+			.getByRole( 'checkbox', { name: 'Open in new tab' } );
+		await expect( sidebarCheckbox ).not.toBeChecked();
+
+		const linkPopover = navigation.getLinkPopover();
+		const popoverCheckbox = linkPopover.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+
+		await test.step( 'Check open in new tab and apply', async () => {
+			await pageUtils.pressKeys( 'primary+k' );
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+			await linkPopover
+				.getByRole( 'button', { name: 'Advanced' } )
+				.click();
+
+			await popoverCheckbox.check();
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect( sidebarCheckbox ).toBeChecked();
+		} );
+
+		await test.step( 'Uncheck open in new tab and apply', async () => {
+			// The Advanced settings stay expanded, as the editor persists
+			// their open state.
+			await linkPopover
+				.getByRole( 'button', { name: 'Edit link' } )
+				.click();
+			await expect( popoverCheckbox ).toBeChecked();
+
+			await popoverCheckbox.uncheck();
+			await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+			await expect( sidebarCheckbox ).not.toBeChecked();
 		} );
 	} );
 
