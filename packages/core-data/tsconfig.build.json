@@ -25,6 +25,6 @@
 		{ "path": "../sync/tsconfig.build.json" },
 		{ "path": "../undo-manager/tsconfig.build.json" },
 		{ "path": "../url/tsconfig.build.json" },
-		{ "path": "../warning" }
+		{ "path": "../warning/tsconfig.build.json" }
 	]
 }

@@ -124,7 +124,7 @@
 		"slug": "audio",
 		"label": "Audio",
 		"filePath": "library/audio.svg",
-		"collections": [ "core" ],
+		"collections": [ "core", "core-admin" ],
 		"keywords": [ "music", "note" ]
 	},
 	{
@@ -141,7 +141,7 @@
 		"slug": "bell",
 		"label": "Bell",
 		"filePath": "library/bell.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "bell-unread",
@@ -206,7 +206,7 @@
 		"slug": "calendar",
 		"label": "Calendar",
 		"filePath": "library/calendar.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "cancel-circle-filled",
@@ -235,7 +235,7 @@
 		"slug": "cart",
 		"label": "Cart",
 		"filePath": "library/cart.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "category",
@@ -260,7 +260,7 @@
 		"slug": "chart-bar",
 		"label": "Chart Bar",
 		"filePath": "library/chart-bar.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "check",
@@ -545,7 +545,7 @@
 		"slug": "envelope",
 		"label": "Envelope",
 		"filePath": "library/envelope.svg",
-		"collections": [ "core" ],
+		"collections": [ "core", "core-admin" ],
 		"keywords": [ "email", "letter", "post" ]
 	},
 	{
@@ -697,7 +697,7 @@
 		"slug": "gallery",
 		"label": "Gallery",
 		"filePath": "library/gallery.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "gift",
@@ -770,7 +770,7 @@
 		"slug": "help",
 		"label": "Help",
 		"filePath": "library/help.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "help-filled",
@@ -797,7 +797,7 @@
 		"slug": "image",
 		"label": "Image",
 		"filePath": "library/image.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "inbox",
@@ -1003,7 +1003,7 @@
 		"slug": "map-marker",
 		"label": "Map Marker",
 		"filePath": "library/map-marker.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "math",
@@ -1127,7 +1127,7 @@
 		"slug": "payment",
 		"label": "Payment",
 		"filePath": "library/payment.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "pencil",
@@ -1332,7 +1332,7 @@
 		"slug": "quote",
 		"label": "Quote",
 		"filePath": "library/quote.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "reaction",
@@ -1343,7 +1343,7 @@
 		"slug": "receipt",
 		"label": "Receipt",
 		"filePath": "library/receipt.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "redo",
@@ -1414,7 +1414,7 @@
 		"slug": "rss",
 		"label": "RSS",
 		"filePath": "library/rss.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "scheduled",
@@ -1460,13 +1460,13 @@
 		"slug": "share",
 		"label": "Share",
 		"filePath": "library/share.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "shield",
 		"label": "Shield",
 		"filePath": "library/shield.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "shipping",
@@ -1583,7 +1583,7 @@
 		"slug": "store",
 		"label": "Store",
 		"filePath": "library/store.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "stretch-full-width",
@@ -1694,7 +1694,7 @@
 		"slug": "tag",
 		"label": "Tag",
 		"filePath": "library/tag.svg",
-		"collections": [ "core" ]
+		"collections": [ "core", "core-admin" ]
 	},
 	{
 		"slug": "term-count",

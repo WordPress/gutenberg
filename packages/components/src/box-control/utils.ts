@@ -58,23 +58,6 @@ export const DEFAULT_VALUES = {
 export const ALL_SIDES = [ 'top', 'right', 'bottom', 'left' ] as const;
 
 /**
- * Gets an items with the most occurrence within an array
- * https://stackoverflow.com/a/20762713
- *
- * @param arr Array of items to check.
- * @return The item with the most occurrences.
- */
-function mode< T >( arr: T[] ) {
-	return arr
-		.sort(
-			( a, b ) =>
-				arr.filter( ( v ) => v === a ).length -
-				arr.filter( ( v ) => v === b ).length
-		)
-		.pop();
-}
-
-/**
  * Gets the merged input value and unit from values data.
  *
  * @param values         Box values.
@@ -115,22 +98,6 @@ export function isValueMixed(
 		( side: keyof BoxControlValue ) =>
 			values[ side ] !== values[ sides[ 0 ] ]
 	);
-}
-
-/**
- * Determine the most common unit selection to use as a fallback option.
- *
- * @param selectedUnits Current unit selections for individual sides.
- * @return  Most common unit selection.
- */
-export function getAllUnitFallback( selectedUnits?: BoxControlValue ) {
-	if ( ! selectedUnits || typeof selectedUnits !== 'object' ) {
-		return undefined;
-	}
-
-	const filteredUnits = Object.values( selectedUnits ).filter( Boolean );
-
-	return mode( filteredUnits );
 }
 
 /**
