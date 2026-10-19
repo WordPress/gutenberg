@@ -27,6 +27,7 @@ export default function BlockParentSelector() {
 				getParentSectionBlock,
 				getEnabledBlockParents,
 				getBlockName,
+				getBlockListSettings,
 				getNextBlockClientId,
 				hasInserterItems,
 			} = unlock( select( blockEditorStore ) );
@@ -49,12 +50,20 @@ export default function BlockParentSelector() {
 				getBlockName( _parentClientId )
 			);
 			// A wrapper that merges with the text flow (list, quote) grows
-			// by typing: Enter continues it, and users know that. Any
-			// other parent gets a plus button to add a child; the Inserter
-			// hides itself when nothing is insertable.
+			// by typing: Enter continues it, and users know that.
 			const isTextFlowWrapper =
 				parentBlockType?.merge ||
 				hasBlockSupport( parentBlockType, '__experimentalOnMerge' );
+			// Enter adds a sibling when a child splits, so the plus is only
+			// for parents with an allowed list where no block splits.
+			const allowedBlocks =
+				getBlockListSettings( _parentClientId )?.allowedBlocks ??
+				parentBlockType?.allowedBlocks;
+			const allowsOnlyUnsplittable =
+				Array.isArray( allowedBlocks ) &&
+				allowedBlocks.every(
+					( name ) => ! hasBlockSupport( name, 'splitting' )
+				);
 			return {
 				parentClientId: _parentClientId,
 				nextSiblingClientId: getNextBlockClientId(
@@ -69,6 +78,7 @@ export default function BlockParentSelector() {
 					_parentClientId === immediateParentClientId &&
 					! parentSection &&
 					! isTextFlowWrapper &&
+					allowsOnlyUnsplittable &&
 					hasInserterItems( _parentClientId ),
 			};
 		},
