@@ -46,6 +46,7 @@ const gridLayout = {
 	isManualPlacement: true,
 	columnCount: 3,
 	rowCount: 2,
+	stackOnMobile: true,
 };
 
 describe( 'ChildLayoutControl in a grid stacked on mobile', () => {

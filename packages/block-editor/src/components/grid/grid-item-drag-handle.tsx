@@ -4,7 +4,10 @@ import { dragHandle, Icon } from '@wordpress/icons';
 import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import { GridItemHandle } from './grid-item-handle';
-import { startGridItemDrag } from './start-grid-item-drag';
+import {
+	startGridItemDrag,
+	startGridItemPointerDrag,
+} from './start-grid-item-drag';
 
 interface GridItemDragHandleProps {
 	/** Client ID of the grid item. */
@@ -40,6 +43,20 @@ export function GridItemDragHandle( {
 			className="block-editor-grid-item-handles__drag"
 			label={ __( 'Drag' ) }
 			draggable
+			onPointerDown={ ( event ) => {
+				// Touch screens don't start the browser's drag and drop from
+				// the handle, so a touch drag follows the touch instead.
+				if ( event.pointerType !== 'touch' ) {
+					return;
+				}
+				startGridItemPointerDrag( event.nativeEvent, {
+					clientId,
+					blockElement,
+					handle: event.currentTarget,
+					startDraggingBlocks,
+					stopDraggingBlocks,
+				} );
+			} }
 			onDragStart={ ( event ) => {
 				startGridItemDrag( event.nativeEvent, {
 					clientId,

@@ -31,7 +31,10 @@ import {
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
-import { isGridItemHandleDrag } from './start-grid-item-drag';
+import {
+	isGridItemHandleDrag,
+	subscribeToGridItemPointerDrag,
+} from './start-grid-item-drag';
 import { getAlignmentGuides } from './get-alignment-guides';
 import {
 	getUnstackedMobileUpdates,
@@ -482,7 +485,10 @@ function GridVisualizerDropLayer( {
 		return getBlockToPlaceInGrid( blockEditorSelectors, gridClientId );
 	}
 
-	function updateDropTarget( event ) {
+	function updateDropTarget(
+		event,
+		isHandleDrag = isGridItemHandleDrag( event )
+	) {
 		const srcClientId = getDraggedBlock();
 		const layer = layerRef.current;
 		if ( ! srcClientId || ! layer ) {
@@ -548,7 +554,7 @@ function GridVisualizerDropLayer( {
 					x,
 					y,
 					pixelRect: srcPixelRect,
-					isHandleDrag: isGridItemHandleDrag( event ),
+					isHandleDrag,
 				} ),
 			};
 		}
@@ -658,42 +664,71 @@ function GridVisualizerDropLayer( {
 		setDropTarget( target );
 	}
 
+	function dropOnTarget() {
+		const target = lastTargetRef.current;
+		clearDropTarget();
+		const srcClientId = getDraggedBlock();
+		if ( ! target || target.srcClientId !== srcClientId ) {
+			return;
+		}
+		const { landing, span } = target;
+		const { columnStart, rowStart } = landing;
+		// A block bigger than the grid is shrunk to fit, as shown by the
+		// landing cells.
+		const layout = {
+			columnStart,
+			rowStart,
+			...( landing.columnSpan < span.columnSpan && {
+				columnSpan: landing.columnSpan,
+			} ),
+			...( landing.rowSpan < span.rowSpan && {
+				rowSpan: landing.rowSpan,
+			} ),
+		};
+		// The grid is given to the updater because a block dropped in
+		// from elsewhere isn't in it yet.
+		updateGridChildLayout( srcClientId, layout, gridClientId );
+		__unstableMarkNextChangeAsNotPersistent();
+		moveBlocksToPosition(
+			[ srcClientId ],
+			getBlockRootClientId( srcClientId ),
+			gridClientId,
+			getNumberOfBlocksBeforeCell( columnStart, rowStart )
+		);
+	}
+
 	const dropZoneRef = useDropZone( {
-		onDragOver: updateDropTarget,
+		onDragOver: ( event ) => updateDropTarget( event ),
 		onDragLeave: clearDropTarget,
 		onDragEnd: clearDropTarget,
-		onDrop() {
-			const target = lastTargetRef.current;
-			clearDropTarget();
-			const srcClientId = getDraggedBlock();
-			if ( ! target || target.srcClientId !== srcClientId ) {
-				return;
+		onDrop: dropOnTarget,
+	} );
+
+	// A touch drag from a drag handle doesn't use the browser's drag and
+	// drop, so it is followed here. The layer of the innermost grid under the
+	// touch takes it, as a drop zone would.
+	useEffect( () => {
+		return subscribeToGridItemPointerDrag(
+			( { type, clientX, clientY } ) => {
+				const layer = layerRef.current;
+				const isOverLayer =
+					!! layer &&
+					layer.ownerDocument
+						.elementsFromPoint( clientX, clientY )
+						.find( ( element ) =>
+							element.classList.contains(
+								'block-editor-grid-visualizer__drop-layer'
+							)
+						) === layer;
+				if ( type === 'move' && isOverLayer ) {
+					updateDropTarget( { clientX, clientY }, true );
+				} else if ( type === 'drop' && isOverLayer ) {
+					dropOnTarget();
+				} else {
+					clearDropTarget();
+				}
 			}
-			const { landing, span } = target;
-			const { columnStart, rowStart } = landing;
-			// A block bigger than the grid is shrunk to fit, as shown by the
-			// landing cells.
-			const layout = {
-				columnStart,
-				rowStart,
-				...( landing.columnSpan < span.columnSpan && {
-					columnSpan: landing.columnSpan,
-				} ),
-				...( landing.rowSpan < span.rowSpan && {
-					rowSpan: landing.rowSpan,
-				} ),
-			};
-			// The grid is given to the updater because a block dropped in
-			// from elsewhere isn't in it yet.
-			updateGridChildLayout( srcClientId, layout, gridClientId );
-			__unstableMarkNextChangeAsNotPersistent();
-			moveBlocksToPosition(
-				[ srcClientId ],
-				getBlockRootClientId( srcClientId ),
-				gridClientId,
-				getNumberOfBlocksBeforeCell( columnStart, rowStart )
-			);
-		},
+		);
 	} );
 
 	return (
@@ -927,6 +962,17 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 		let drag = null;
 		let shouldIgnoreClick = false;
 		let ignoreClickTimeout;
+		// A touch opens a cell's inserter in two taps: the first one shows
+		// the cell, and a second tap on the same cell opens its inserter.
+		let isTouchPress = false;
+		let tappedCell = null;
+
+		function clearTappedCell() {
+			if ( tappedCell ) {
+				delete tappedCell.dataset.isTapped;
+				tappedCell = null;
+			}
+		}
 
 		function getCell( event ) {
 			const { columnTracks, rowTracks } =
@@ -946,8 +992,12 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 
 		function onPointerDown( event ) {
 			shouldIgnoreClick = false;
+			isTouchPress = event.pointerType === 'touch';
+			if ( tappedCell && ! tappedCell.contains( event.target ) ) {
+				clearTappedCell();
+			}
 			// Drawing is for a mouse or a pen. A touch on a cell scrolls the
-			// page, or opens the inserter for that cell when it is a tap.
+			// page, or shows the cell when it is a tap (see `onClick`).
 			if (
 				event.pointerType === 'touch' ||
 				event.button !== 0 ||
@@ -1048,6 +1098,8 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 		}
 
 		function onKeyDown( event ) {
+			// A key that opens the inserter isn't a tap.
+			isTouchPress = false;
 			if ( drag && ! drag.isCancelled && event.key === 'Escape' ) {
 				event.preventDefault();
 				event.stopPropagation();
@@ -1068,7 +1120,31 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 				shouldIgnoreClick = false;
 				event.preventDefault();
 				event.stopPropagation();
+				return;
 			}
+			const appender = event.target.closest?.(
+				'.block-editor-grid-visualizer__cell .block-editor-grid-visualizer__appender'
+			);
+			// A tap on an open inserter's toggle closes it.
+			if (
+				! isTouchPress ||
+				! appender ||
+				appender.getAttribute( 'aria-expanded' ) === 'true'
+			) {
+				return;
+			}
+			const cell = appender.closest(
+				'.block-editor-grid-visualizer__cell'
+			);
+			if ( cell === tappedCell ) {
+				clearTappedCell();
+				return;
+			}
+			clearTappedCell();
+			tappedCell = cell;
+			tappedCell.dataset.isTapped = 'true';
+			event.preventDefault();
+			event.stopPropagation();
 		}
 
 		container.addEventListener( 'pointerdown', onPointerDown );
@@ -1097,6 +1173,7 @@ function GridVisualizerMarquee( { gridClientId, gridElement, gridInfo } ) {
 				keyDocument.removeEventListener( 'keydown', onKeyDown, true );
 			}
 			ownerWindow.clearTimeout( ignoreClickTimeout );
+			clearTappedCell();
 		};
 	}, [ gridElement ] );
 

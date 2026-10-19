@@ -16,9 +16,9 @@ describe( 'isGridStackedOnMobile()', () => {
 		window.__experimentalEnableGridInteractivity = originalExperiment;
 	} );
 
-	it( 'stacks manual placement grids by default', () => {
+	it( 'does not stack manual placement grids by default', () => {
 		expect( isGridStackedOnMobile( { isManualPlacement: true } ) ).toBe(
-			true
+			false
 		);
 	} );
 
@@ -30,12 +30,18 @@ describe( 'isGridStackedOnMobile()', () => {
 		expect(
 			isGridStackedOnMobile( {
 				isManualPlacement: true,
-				stackOnMobile: false,
+				stackOnMobile: true,
 			} )
-		).toBe( false );
+		).toBe( true );
 		expect(
 			isGridStackedOnMobile(
 				{ isManualPlacement: true },
+				{ '@mobile': { layout: { stackOnMobile: true } } }
+			)
+		).toBe( true );
+		expect(
+			isGridStackedOnMobile(
+				{ isManualPlacement: true, stackOnMobile: true },
 				{ '@mobile': { layout: { stackOnMobile: false } } }
 			)
 		).toBe( false );
@@ -44,13 +50,13 @@ describe( 'isGridStackedOnMobile()', () => {
 	it( 'uses the placement of the mobile layout', () => {
 		expect(
 			isGridStackedOnMobile(
-				{ isManualPlacement: true },
+				{ isManualPlacement: true, stackOnMobile: true },
 				{ '@mobile': { layout: { isManualPlacement: null } } }
 			)
 		).toBe( false );
 		expect(
 			isGridStackedOnMobile(
-				{ columnCount: 3 },
+				{ columnCount: 3, stackOnMobile: true },
 				{ '@mobile': { layout: { isManualPlacement: true } } }
 			)
 		).toBe( true );
@@ -58,9 +64,12 @@ describe( 'isGridStackedOnMobile()', () => {
 
 	it( 'does not stack without the grid interactivity experiment', () => {
 		window.__experimentalEnableGridInteractivity = false;
-		expect( isGridStackedOnMobile( { isManualPlacement: true } ) ).toBe(
-			false
-		);
+		expect(
+			isGridStackedOnMobile( {
+				isManualPlacement: true,
+				stackOnMobile: true,
+			} )
+		).toBe( false );
 	} );
 } );
 
