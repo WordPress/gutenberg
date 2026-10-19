@@ -1,4 +1,5 @@
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import { useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 import {
@@ -7,6 +8,7 @@ import {
 } from '@wordpress/block-editor';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { SaveShortcutContext } from './save-shortcut-context';
 
 const { usesNativeUndo } = unlock( blockEditorPrivateApis );
 
@@ -18,6 +20,7 @@ const { usesNativeUndo } = unlock( blockEditorPrivateApis );
  * and toggling the sidebar.
  */
 export default function EditorKeyboardShortcuts() {
+	const saveShortcutHandlerRef = useContext( SaveShortcutContext );
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } =
 			select( editorStore ).getEditorSettings();
@@ -82,6 +85,10 @@ export default function EditorKeyboardShortcuts() {
 		 * Do not save the post if post saving is locked.
 		 */
 		if ( isPostSavingLocked() || isSavingNonPostEntityChanges() ) {
+			return;
+		}
+
+		if ( saveShortcutHandlerRef?.current?.() ) {
 			return;
 		}
 
