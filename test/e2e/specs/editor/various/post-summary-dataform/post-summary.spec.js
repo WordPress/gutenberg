@@ -589,8 +589,14 @@ test.describe( 'Post Summary', () => {
 			await admin.createNewPost( { postType: 'page' } );
 			const summary = await openPostSummary( { editor, page } );
 
+			// The field row also renders the current value next to the edit
+			// button. Scope to it: the Slug row of an untitled page shows
+			// `None` too.
+			const parentRow = summary
+				.getByRole( 'button', { name: 'Edit Parent' } )
+				.locator( '..' );
 			await expect(
-				summary.getByText( 'None', { exact: true } )
+				parentRow.getByText( 'None', { exact: true } )
 			).toBeVisible();
 
 			await summary
