@@ -1,0 +1,113 @@
+name: Unit Tests
+
+on:
+    pull_request:
+    push:
+        branches:
+            - trunk
+            - 'release/[0-9]+.[0-9]'
+            - 'wp/[0-9]+.[0-9]'
+            - wp/latest
+            - wp/next
+    # Allow manually triggering the workflow.
+    workflow_dispatch:
+
+# Cancels all previous workflow runs for pull requests that have not completed.
+concurrency:
+    # The concurrency group contains the workflow name and the branch name for pull requests
+    # or the commit hash for any other events.
+    group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
+    cancel-in-progress: true
+
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
+jobs:
+    unit-js:
+        name: JavaScript
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install npm dependencies
+              run: npm ci
+
+            # It's not necessary to run the full build, since Jest can interpret
+            # source files with `babel-jest`. Some packages have their own custom
+            # build tasks, however. These must be run.
+            - name: Run build scripts
+              run: ./node_modules/.bin/lerna run build
+
+            - name: Running the tests
+              run: npm run test-unit:ci -- --cacheDirectory="$HOME/.jest-cache"
+
+    unit-php:
+        name: PHP
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
+
+            - name: Use desired version of Node.js
+              uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+              with:
+                  node-version-file: '.nvmrc'
+                  cache: npm
+
+            - name: Install npm dependencies
+              run: npm ci
+
+            # The plugin reads the built files when it loads, so it must be built
+            # before the tests can run.
+            - name: Build
+              run: npm run build
+
+            - name: Install WordPress
+              uses: ./.github/setup-wordpress
+
+            # The remaining steps are the commands `bin/run-wp-unit-tests.sh` runs.
+            - name: Regenerate the PHP parser
+              run: node bin/create-php-parser.js
+
+            - name: Check that the PHP parser is up to date
+              run: |
+                  if ! git diff --quiet --exit-code lib/parser.php; then
+                    echo 'ERROR: The PEG parser has been updated, but the generated PHP version'
+                    echo '       (lib/parser.php) has not. Run bin/create-php-parser.js and'
+                    echo '       commit the resulting changes to resolve this.'
+                    exit 1
+                  fi
+
+            - name: Lint PHP
+              run: npm run lint-php
+
+            - name: Running the tests (single site)
+              run: npm run test-unit-php
+
+            - name: Running the tests (multisite)
+              run: npm run test-unit-php-multisite
+
+            - name: Check the PHP parser syntax
+              run: php lib/parser.php
