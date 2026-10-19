@@ -35,7 +35,7 @@ function chunk< T >(
  *         (if not ).
  */
 export default async function defaultProcessor(
-	requests: Array< BatchRequest >
+	requests: ReadonlyArray< BatchRequest >
 ): Promise< Array< BatchResult > > {
 	if ( maxItems === null ) {
 		const preflightResponse = await apiFetch< BatchPreflightResponse >( {

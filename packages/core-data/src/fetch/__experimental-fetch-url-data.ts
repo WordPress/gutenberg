@@ -39,7 +39,7 @@ const CACHE = new Map< string, RemoteUrlData >();
  */
 const fetchUrlData = async (
 	url: string,
-	options: APIFetchOptions< true > = {}
+	options: APIFetchOptions< true > | null = {}
 ): Promise< RemoteUrlData > => {
 	const endpoint = '/wp-block-editor/v1/url-details';
 

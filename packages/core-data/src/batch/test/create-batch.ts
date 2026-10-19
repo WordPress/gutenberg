@@ -14,7 +14,7 @@ describe( 'createBatch', () => {
 				output: input,
 			} ) );
 		const batch = createBatch( processor );
-		let promise1Value, promise2Value;
+		let promise1Value: unknown, promise2Value: unknown;
 		batch.add( 1 ).then( ( value ) => ( promise1Value = value ) );
 		batch.add( 2 ).then( ( value ) => ( promise2Value = value ) );
 		expect( await batch.run() ).toBe( true );
@@ -26,7 +26,7 @@ describe( 'createBatch', () => {
 		const processor = async ( inputs: Array< number > ) =>
 			inputs.map( ( input ) => input );
 		const batch = createBatch( processor );
-		let promise1Value, promise2Value;
+		let promise1Value: unknown, promise2Value: unknown;
 		batch.add( 1 ).then( ( value ) => ( promise1Value = value ) );
 		batch.add( 2 ).then( ( value ) => ( promise2Value = value ) );
 		expect( await batch.run() ).toBe( true );
@@ -40,7 +40,7 @@ describe( 'createBatch', () => {
 				output: input,
 			} ) );
 		const batch = createBatch( processor );
-		let promise1Value, promise2Value;
+		let promise1Value: unknown, promise2Value: unknown;
 		batch.add( async ( add ) => {
 			await Promise.resolve(); // Simulates a delay.
 			return add( 1 ).then( ( value ) => ( promise1Value = value ) );
@@ -76,7 +76,7 @@ describe( 'createBatch', () => {
 			} ) )
 		);
 		const batch = createBatch( processor );
-		let promise1Value;
+		let promise1Value: unknown;
 		batch.add( 1 ).then( ( value ) => ( promise1Value = value ) );
 		expect( await batch.run() ).toBe( true );
 		expect( promise1Value ).toBe( 1 );
@@ -96,7 +96,7 @@ describe( 'createBatch', () => {
 				error: input,
 			} ) );
 		const batch = createBatch( processor );
-		let promise1Error, promise2Error;
+		let promise1Error: unknown, promise2Error: unknown;
 		batch.add( 1 ).catch( ( error ) => ( promise1Error = error ) );
 		batch.add( 2 ).catch( ( error ) => ( promise2Error = error ) );
 		expect( await batch.run() ).toBe( false );
@@ -109,7 +109,7 @@ describe( 'createBatch', () => {
 			throw 'Jikes!';
 		};
 		const batch = createBatch< number >( processor );
-		let promise1Error, promise2Error;
+		let promise1Error: unknown, promise2Error: unknown;
 		batch.add( 1 ).catch( ( error ) => ( promise1Error = error ) );
 		batch.add( 2 ).catch( ( error ) => ( promise2Error = error ) );
 		await expect( batch.run() ).rejects.toBe( 'Jikes!' );
@@ -120,7 +120,7 @@ describe( 'createBatch', () => {
 	test( 'running rejects promises and throws when processor returns wrong length', async () => {
 		const processor = async () => [ 1 ];
 		const batch = createBatch< number >( processor );
-		let promise1Error, promise2Error;
+		let promise1Error: unknown, promise2Error: unknown;
 		batch.add( 1 ).catch( ( error ) => ( promise1Error = error ) );
 		batch.add( 2 ).catch( ( error ) => ( promise2Error = error ) );
 		await expect( batch.run() ).rejects.toBeInstanceOf( Error );
