@@ -1,16 +1,23 @@
 import apiFetch from '@wordpress/api-fetch';
+import type {
+	BatchPreflightResponse,
+	BatchRequest,
+	BatchResponse,
+	BatchResult,
+} from './types';
 
 /**
  * Maximum number of requests to place in a single batch request. Obtained by
  * sending a preflight OPTIONS request to /batch/v1/.
- *
- * @type {number?}
  */
-let maxItems = null;
+let maxItems: number | null = null;
 
-function chunk( arr, chunkSize ) {
+function chunk< T >(
+	arr: ReadonlyArray< T >,
+	chunkSize: number
+): Array< Array< T > > {
 	const tmp = [ ...arr ];
-	const cache = [];
+	const cache: Array< Array< T > > = [];
 	while ( tmp.length ) {
 		cache.push( tmp.splice( 0, chunkSize ) );
 	}
@@ -21,25 +28,27 @@ function chunk( arr, chunkSize ) {
 /**
  * Default batch processor. Sends its input requests to /batch/v1.
  *
- * @param {Array} requests List of API requests to perform at once.
+ * @param requests List of API requests to perform at once.
  *
- * @return {Promise} Promise that resolves to a list of objects containing
- *                   either `output` (if that request was successful) or `error`
- *                   (if not ).
+ * @return Promise that resolves to a list of objects containing
+ *         either `output` (if that request was successful) or `error`
+ *         (if not ).
  */
-export default async function defaultProcessor( requests ) {
+export default async function defaultProcessor(
+	requests: Array< BatchRequest >
+): Promise< Array< BatchResult > > {
 	if ( maxItems === null ) {
-		const preflightResponse = await apiFetch( {
+		const preflightResponse = await apiFetch< BatchPreflightResponse >( {
 			path: '/batch/v1',
 			method: 'OPTIONS',
 		} );
 		maxItems = preflightResponse.endpoints[ 0 ].args.requests.maxItems;
 	}
 
-	const results = [];
+	const results: Array< BatchResult > = [];
 
 	for ( const batchRequests of chunk( requests, maxItems ) ) {
-		const batchResponse = await apiFetch( {
+		const batchResponse = await apiFetch< BatchResponse >( {
 			path: '/batch/v1',
 			method: 'POST',
 			data: {
@@ -53,7 +62,7 @@ export default async function defaultProcessor( requests ) {
 			},
 		} );
 
-		let batchResults;
+		let batchResults: Array< BatchResult >;
 
 		if ( batchResponse.failed ) {
 			batchResults = batchResponse.responses.map( ( response ) => ( {
@@ -61,7 +70,7 @@ export default async function defaultProcessor( requests ) {
 			} ) );
 		} else {
 			batchResults = batchResponse.responses.map( ( response ) => {
-				const result = {};
+				const result: BatchResult = {};
 				if ( response.status >= 200 && response.status < 300 ) {
 					result.output = response.body;
 				} else {

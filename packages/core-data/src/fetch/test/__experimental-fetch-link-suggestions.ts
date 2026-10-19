@@ -5,8 +5,9 @@ import {
 	tokenize,
 } from '../__experimental-fetch-link-suggestions';
 
+// @ts-expect-error The mock provides only the default export the tests need.
 vi.mock( import( '@wordpress/api-fetch' ), () => ( {
-	default: vi.fn( ( { path } ) => {
+	default: vi.fn( ( { path }: { path: string } ) => {
 		switch ( path ) {
 			case '/wp/v2/search?search=&per_page=20&type=post':
 			case '/wp/v2/search?search=Contact&per_page=20&type=post&subtype=page':
@@ -299,7 +300,7 @@ describe( 'fetchLinkSuggestions', () => {
 		// 5 titles hold both words typed, 5 hold one of them, and 30 hold
 		// neither because WordPress matched their body. All are offered, in
 		// that order.
-		const startsWith = ( titles, prefix ) =>
+		const startsWith = ( titles: Array< string >, prefix: string ) =>
 			titles.every( ( title ) => title.startsWith( prefix ) );
 
 		return fetchLinkSuggestions( 'few notes', {} ).then(

@@ -1,4 +1,10 @@
 import defaultProcessor from './default-processor';
+import type {
+	BatchProcessor,
+	BatchRequest,
+	BatchResult,
+	BatchThunk,
+} from './types';
 
 /**
  * Creates a batch, which can be used to combine multiple API requests into one
@@ -26,18 +32,24 @@ import defaultProcessor from './default-processor';
  * }
  * ```
  *
- * @param {Function} [processor] Processor function. Can be used to replace the
- *                               default functionality which is to send an API
- *                               request to /v1/batch. Is given an array of
- *                               inputs and must return a promise that
- *                               resolves to an array of objects containing
- *                               either `output` or `error`.
+ * @param processor Processor function. Can be used to replace the
+ *                  default functionality which is to send an API
+ *                  request to /v1/batch. Is given an array of
+ *                  inputs and must return a promise that
+ *                  resolves to an array of objects containing
+ *                  either `output` or `error`.
  */
-export default function createBatch( processor = defaultProcessor ) {
+export default function createBatch< Input = BatchRequest >(
+	// The default processor sends the default inputs, API requests.
+	processor = defaultProcessor as unknown as BatchProcessor< Input >
+) {
 	let lastId = 0;
-	/** @type {Array<{ input: any; resolve: ( value: any ) => void; reject: ( error: any ) => void }>} */
-	let queue = [];
-	const pending = new ObservableSet();
+	let queue: Array< {
+		input: Input;
+		resolve: ( value: unknown ) => void;
+		reject: ( error: unknown ) => void;
+	} > = [];
+	const pending = new ObservableSet< number >();
 
 	return {
 		/**
@@ -59,18 +71,18 @@ export default function createBatch( processor = defaultProcessor ) {
 		 * - The thunk returns a promise and that promise resolves, or;
 		 * - The thunk returns a non-promise.
 		 *
-		 * @param {any|Function} inputOrThunk Input to add or thunk to execute.
+		 * @param inputOrThunk Input to add or thunk to execute.
 		 *
-		 * @return {Promise|any} If given an input, returns a promise that
-		 *                       is resolved or rejected when the batch is
-		 *                       processed. If given a thunk, returns the return
-		 *                       value of that thunk.
+		 * @return If given an input, returns a promise that
+		 *         is resolved or rejected when the batch is
+		 *         processed. If given a thunk, returns the return
+		 *         value of that thunk.
 		 */
-		add( inputOrThunk ) {
+		add( inputOrThunk: Input | BatchThunk< Input > ): Promise< unknown > {
 			const id = ++lastId;
 			pending.add( id );
 
-			const add = ( input ) =>
+			const add = ( input: Input ) =>
 				new Promise( ( resolve, reject ) => {
 					queue.push( {
 						input,
@@ -81,22 +93,26 @@ export default function createBatch( processor = defaultProcessor ) {
 				} );
 
 			if ( typeof inputOrThunk === 'function' ) {
-				return Promise.resolve( inputOrThunk( add ) ).finally( () => {
+				// A function input is a thunk.
+				return Promise.resolve(
+					( inputOrThunk as BatchThunk< Input > )( add )
+				).finally( () => {
 					pending.delete( id );
 				} );
 			}
 
-			return add( inputOrThunk );
+			// Not a function, so not a thunk.
+			return add( inputOrThunk as Input );
 		},
 
 		/**
 		 * Runs the batch. This calls `batchProcessor` and resolves or rejects
 		 * all promises returned by `add()`.
 		 *
-		 * @return {Promise<boolean>} A promise that resolves to a boolean that is true
-		 *                   if the processor returned no errors.
+		 * @return A promise that resolves to a boolean that is true
+		 *         if the processor returned no errors.
 		 */
-		async run() {
+		async run(): Promise< boolean > {
 			if ( pending.size ) {
 				await new Promise( ( resolve ) => {
 					const unsubscribe = pending.subscribe( () => {
@@ -108,12 +124,13 @@ export default function createBatch( processor = defaultProcessor ) {
 				} );
 			}
 
-			let results;
+			let results: Array< BatchResult | undefined >;
 
 			try {
-				results = await processor(
+				// A raw output reads as a result with no `output` or `error`.
+				results = ( await processor(
 					queue.map( ( { input } ) => input )
-				);
+				) ) as Array< BatchResult | undefined >;
 
 				if ( results.length !== queue.length ) {
 					throw new Error(
@@ -148,29 +165,32 @@ export default function createBatch( processor = defaultProcessor ) {
 	};
 }
 
-class ObservableSet {
-	constructor( ...args ) {
+class ObservableSet< T > {
+	set: Set< T >;
+	subscribers: Set< () => void >;
+
+	constructor( ...args: [ values?: Iterable< T > | null ] ) {
 		this.set = new Set( ...args );
 		this.subscribers = new Set();
 	}
 
-	get size() {
+	get size(): number {
 		return this.set.size;
 	}
 
-	add( value ) {
+	add( value: T ): this {
 		this.set.add( value );
 		this.subscribers.forEach( ( subscriber ) => subscriber() );
 		return this;
 	}
 
-	delete( value ) {
+	delete( value: T ): boolean {
 		const isSuccess = this.set.delete( value );
 		this.subscribers.forEach( ( subscriber ) => subscriber() );
 		return isSuccess;
 	}
 
-	subscribe( subscriber ) {
+	subscribe( subscriber: () => void ): () => void {
 		this.subscribers.add( subscriber );
 		return () => {
 			this.subscribers.delete( subscriber );

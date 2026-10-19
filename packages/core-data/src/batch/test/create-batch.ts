@@ -3,13 +3,13 @@ import createBatch from '../create-batch';
 
 describe( 'createBatch', () => {
 	test( 'running an empty batch', async () => {
-		const processor = async ( inputs ) => inputs;
+		const processor = async ( inputs: Array< number > ) => inputs;
 		const batch = createBatch( processor );
 		expect( await batch.run() ).toBe( true );
 	} );
 
 	test( 'running resolves promises when processor returns output', async () => {
-		const processor = async ( inputs ) =>
+		const processor = async ( inputs: Array< number > ) =>
 			inputs.map( ( input ) => ( {
 				output: input,
 			} ) );
@@ -23,7 +23,8 @@ describe( 'createBatch', () => {
 	} );
 
 	test( 'running resolves promises when processor returns non-objects', async () => {
-		const processor = async ( inputs ) => inputs.map( ( input ) => input );
+		const processor = async ( inputs: Array< number > ) =>
+			inputs.map( ( input ) => input );
 		const batch = createBatch( processor );
 		let promise1Value, promise2Value;
 		batch.add( 1 ).then( ( value ) => ( promise1Value = value ) );
@@ -34,7 +35,7 @@ describe( 'createBatch', () => {
 	} );
 
 	test( 'running waits for all thunks to finish', async () => {
-		const processor = async ( inputs ) =>
+		const processor = async ( inputs: Array< number > ) =>
 			inputs.map( ( input ) => ( {
 				output: input,
 			} ) );
@@ -54,7 +55,7 @@ describe( 'createBatch', () => {
 	} );
 
 	test( "running doesn't time out when a thunk doesn't call add()", async () => {
-		const processor = async ( inputs ) =>
+		const processor = async ( inputs: Array< number > ) =>
 			inputs.map( ( input ) => ( {
 				output: input,
 			} ) );
@@ -69,7 +70,7 @@ describe( 'createBatch', () => {
 	} );
 
 	test( 'running resets the batch when finished', async () => {
-		const processor = vi.fn( async ( inputs ) =>
+		const processor = vi.fn( async ( inputs: Array< number > ) =>
 			inputs.map( ( input ) => ( {
 				output: input,
 			} ) )
@@ -90,7 +91,7 @@ describe( 'createBatch', () => {
 	} );
 
 	test( 'running rejects promises when processor returns errors', async () => {
-		const processor = async ( inputs ) =>
+		const processor = async ( inputs: Array< number > ) =>
 			inputs.map( ( input ) => ( {
 				error: input,
 			} ) );
@@ -107,7 +108,7 @@ describe( 'createBatch', () => {
 		const processor = async () => {
 			throw 'Jikes!';
 		};
-		const batch = createBatch( processor );
+		const batch = createBatch< number >( processor );
 		let promise1Error, promise2Error;
 		batch.add( 1 ).catch( ( error ) => ( promise1Error = error ) );
 		batch.add( 2 ).catch( ( error ) => ( promise2Error = error ) );
@@ -118,7 +119,7 @@ describe( 'createBatch', () => {
 
 	test( 'running rejects promises and throws when processor returns wrong length', async () => {
 		const processor = async () => [ 1 ];
-		const batch = createBatch( processor );
+		const batch = createBatch< number >( processor );
 		let promise1Error, promise2Error;
 		batch.add( 1 ).catch( ( error ) => ( promise1Error = error ) );
 		batch.add( 2 ).catch( ( error ) => ( promise2Error = error ) );

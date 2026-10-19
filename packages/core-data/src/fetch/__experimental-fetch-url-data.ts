@@ -6,27 +6,23 @@ import {
 	getProtocol,
 	isValidProtocol,
 } from '@wordpress/url';
+import type { APIFetchOptions } from '@wordpress/api-fetch';
+import type { RemoteUrlData } from './types';
 
 /**
  * A simple in-memory cache for requests.
  * This avoids repeat HTTP requests which may be beneficial
  * for those wishing to preserve low-bandwidth.
  */
-const CACHE = new Map();
-
-/**
- * @typedef WPRemoteUrlData
- *
- * @property {string} title contents of the remote URL's `<title>` tag.
- */
+const CACHE = new Map< string, RemoteUrlData >();
 
 /**
  * Fetches data about a remote URL.
  * eg: <title> tag, favicon...etc.
  *
  * @async
- * @param {string}  url     the URL to request details from.
- * @param {?Object} options any options to pass to the underlying fetch.
+ * @param url     the URL to request details from.
+ * @param options any options to pass to the underlying fetch.
  * @example
  * ```js
  * import { __experimentalFetchUrlData as fetchUrlData } from '@wordpress/core-data';
@@ -39,9 +35,12 @@ const CACHE = new Map();
  * url
  * ) => fetchUrlData( url );
  * ```
- * @return {Promise< WPRemoteUrlData[] >} Remote URL data.
+ * @return Remote URL data.
  */
-const fetchUrlData = async ( url, options = {} ) => {
+const fetchUrlData = async (
+	url: string,
+	options: APIFetchOptions< true > = {}
+): Promise< RemoteUrlData > => {
 	const endpoint = '/wp-block-editor/v1/url-details';
 
 	const args = {
@@ -68,10 +67,11 @@ const fetchUrlData = async ( url, options = {} ) => {
 	}
 
 	if ( CACHE.has( url ) ) {
-		return CACHE.get( url );
+		// Checked above.
+		return CACHE.get( url )!;
 	}
 
-	return apiFetch( {
+	return apiFetch< RemoteUrlData >( {
 		path: addQueryArgs( endpoint, args ),
 		...options,
 	} ).then( ( res ) => {
