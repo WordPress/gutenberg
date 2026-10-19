@@ -4,7 +4,7 @@ Sync entity data between peers for real-time collaboration using [CRDT](https://
 
 This package provides the syncing layer for real-time collaboration in the WordPress editor. It is built on [Yjs](https://docs.yjs.dev/), a CRDT implementation that enables multiple users to edit shared data concurrently without conflicts.
 
-See [CODE.md](./CODE.md) for architecture details.
+See [CODE.md](https://github.com/WordPress/gutenberg/tree/HEAD/packages/sync/CODE.md) for architecture details.
 
 ## Installation
 

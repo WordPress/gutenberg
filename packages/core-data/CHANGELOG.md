@@ -2,8 +2,24 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   Keep read-only taxonomy term data out of collaborative edits so stale counts and links do not mark unchanged categories as dirty ([#84838](https://github.com/WordPress/gutenberg/pull/84838)).
+
+### Internal
+
+-   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Add the private `getEntityActionsConfig( kind, name )` selector, which fetches the actions registered on the server for an entity from the `/wp/v2/entity-actions` route ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
+
+## 8.2.0 (2026-10-07)
+
 ### Enhancements
 
+-   Add the root-level `edit_root` field to the `Attachment` entity type — the edit root attachment's id, or `0` when the attachment was not created by editing another one; embeddable via the `wp:edit-root` link, exposed in the `edit` context ([#81803](https://github.com/WordPress/gutenberg/pull/81803)).
 -   `Icon`: add the `keywords` field exposed by the icons REST endpoint ([#82367](https://github.com/WordPress/gutenberg/pull/82367)).
 -   `__experimentalFetchLinkSuggestions`: add a `preferTypes` option to rank matches from one or more search types above the usual order ([#83408](https://github.com/WordPress/gutenberg/pull/83408)).
 

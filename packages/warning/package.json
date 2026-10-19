@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/warning",
-	"version": "3.56.0",
+	"version": "3.57.0",
 	"description": "Warning utility for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,14 +19,13 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"src",
 		"build",
 		"build-module",
 		"build-types",
-		"*.md",
 		"babel-plugin.cjs"
 	],
 	"main": "build/index.cjs",

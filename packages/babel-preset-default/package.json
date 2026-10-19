@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/babel-preset-default",
-	"version": "8.56.0",
+	"version": "9.0.0",
 	"description": "Default Babel preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,7 +21,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=18.12.0"
+		"node": ">=22.13.0"
 	},
 	"files": [
 		"build",
@@ -47,7 +47,7 @@
 		"@wordpress/warning": "file:../warning",
 		"browserslist": "^4.28.7",
 		"core-js": "^3.31.0",
-		"react": "^18.3.1"
+		"react": "^19.3.0"
 	},
 	"devDependencies": {
 		"core-js-builder": "^3.39.0",

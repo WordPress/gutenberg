@@ -1,7 +1,10 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks';
 import * as ProgressStories from './index.story';
 
-<Meta id="design-system-components-progress-usage-guidelines" title="Components/@wordpress-ui/Progress/Usage Guidelines" />
+<Meta
+	id="design-system-components-progress-usage-guidelines"
+	title="Components/@wordpress-ui/Progress/Usage Guidelines"
+/>
 
 # Progress usage guidelines
 
@@ -9,7 +12,7 @@ import * as ProgressStories from './index.story';
 
 Use `Progress` to show how much of a task has completed, such as uploading files, exporting data, or installing an update. Keep the indicator close to the task it describes.
 
-Use a meter for a measurement within a known range, such as storage usage or battery charge. A meter describes a quantity rather than task completion. See the [WAI-ARIA meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/). A link to the WordPress UI Meter component will be added when it is available.
+Use [Meter](?path=/docs/design-system-components-meter-usage-guidelines--docs) for a measurement within a known range, such as storage usage or battery charge. A meter describes a quantity rather than task completion. See the [WAI-ARIA meter pattern](https://www.w3.org/WAI/ARIA/apg/patterns/meter/).
 
 ## Label the task
 
@@ -26,6 +29,31 @@ Pass a numeric `value` when the amount of completed work is known. The default r
 Pass `value={ null }` when the amount of completed work is unknown. Indeterminate progress shows activity without suggesting a completion percentage.
 
 <Canvas of={ ProgressStories.Indeterminate } />
+
+## Set the width for the layout
+
+`Progress.Root` has a default width of 160px, and `Progress.Track` fills that width. Override the width on Root with `className` or `style` when the layout needs a different size. For example, use `style={ { width: '100%' } }` to fill the container.
+
+Prefer the default width. A wider bar can suit some layouts, but avoid making it so narrow that progress is hard to read. Use a spinner when you need a more compact loading indicator.
+
+## Migrate from ProgressBar
+
+Replace `ProgressBar` from `@wordpress/components` with `Progress.Root`, `Progress.Track`, and `Progress.Indicator` from `@wordpress/ui`. Root requires a `value`. For indeterminate progress, pass `value={ null }` explicitly; ProgressBar allowed its value to be omitted.
+
+Give each task an accessible name with `Progress.Label`, `aria-label`, or `aria-labelledby`. Progress does not supply the generic loading label that ProgressBar used. Both components have a default width of 160px:
+
+```jsx
+import { Progress } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
+
+<Progress.Root value={ null } aria-label={ __( 'Uploading files' ) }>
+	<Progress.Track>
+		<Progress.Indicator />
+	</Progress.Track>
+</Progress.Root>;
+```
+
+Pass numeric values to Root for determinate progress. If an existing value can be `undefined`, convert it to `null` with `value={ value ?? null }`. Move any track styling to `Progress.Track`; `className` on Root styles the container. A ref on Root points to that container, a `div` by default, rather than ProgressBar's native `progress` element.
 
 ## Format values for the task
 

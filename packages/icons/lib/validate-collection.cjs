@@ -22,10 +22,10 @@ function isStrokeBasedSvg( svgContent ) {
  * - Each SVG uses currentColor so icons inherit text color.
  * - Each SVG uses viewBox="0 0 24 24".
  * - Each stroke-based SVG contains at least one stroked graphical element.
- * - Each stroked graphical element uses a non-scaling stroke.
+ * - Each SVG omits vector-effect so strokes scale with the icon.
  */
-async function validateCollection() {
-	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
+async function validateCollection( iconLibraryDir = ICON_LIBRARY_DIR ) {
+	const manifestPath = path.join( iconLibraryDir, '..', 'manifest.json' );
 
 	try {
 		await stat( manifestPath );
@@ -114,13 +114,13 @@ async function validateCollection() {
 		 * Verify that the corresponding SVG file is found.
 		 */
 		if (
-			! ( await stat(
-				path.join( ICON_LIBRARY_DIR, '..', expected )
-			).catch( () => false ) )
+			! ( await stat( path.join( iconLibraryDir, '..', expected ) ).catch(
+				() => false
+			) )
 		) {
 			problems.push(
 				`- Icon file ${ path.join(
-					ICON_LIBRARY_DIR,
+					iconLibraryDir,
 					'..',
 					expected
 				) } not found`
@@ -132,7 +132,7 @@ async function validateCollection() {
 	 * Conversely, check that all the SVG files under library/ are listed in
 	 * the manifest.
 	 */
-	const svgFiles = ( await readdir( ICON_LIBRARY_DIR ) )
+	const svgFiles = ( await readdir( iconLibraryDir ) )
 		.filter( ( file ) => file.match( /^[a-z0-9--]+\.svg$/ ) )
 		.map( ( file ) => path.join( 'library', file ) )
 
@@ -140,7 +140,7 @@ async function validateCollection() {
 		.map( ( file ) => file.replaceAll( path.sep, '/' ) );
 
 	for ( const file of svgFiles ) {
-		const svgPath = path.join( ICON_LIBRARY_DIR, path.basename( file ) );
+		const svgPath = path.join( iconLibraryDir, path.basename( file ) );
 
 		if ( ! manifestPaths.includes( file ) ) {
 			problems.push( `- Missing entry for icon ${ svgPath }` );
@@ -163,6 +163,12 @@ async function validateCollection() {
 			);
 		}
 
+		if ( /\svector-effect\s*=/.test( svgContent ) ) {
+			problems.push(
+				`- Icon ${ svgPath } must omit vector-effect so its stroke width scales with its size`
+			);
+		}
+
 		if ( isStrokeBasedSvg( svgContent ) ) {
 			const graphicalElements = svgContent.match(
 				/<(?:circle|ellipse|line|path|polygon|polyline|rect)\b[^>]*>/g
@@ -174,19 +180,6 @@ async function validateCollection() {
 			if ( ! strokedElements?.length ) {
 				problems.push(
 					`- Stroke-based icon ${ svgPath } must contain a graphical element that does not set stroke="none"`
-				);
-			}
-
-			if (
-				strokedElements?.some(
-					( element ) =>
-						! element.includes(
-							'vector-effect="non-scaling-stroke"'
-						)
-				)
-			) {
-				problems.push(
-					`- Stroked elements in ${ svgPath } must set vector-effect="non-scaling-stroke"`
 				);
 			}
 		}
