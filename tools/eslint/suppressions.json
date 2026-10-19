@@ -11294,19 +11294,6 @@
 			"count": 1
 		}
 	},
-	"packages/plugins/src/api/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/plugins/src/components/test/plugin-area.jsdom.test.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/preferences/src/components/preference-base-option/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
