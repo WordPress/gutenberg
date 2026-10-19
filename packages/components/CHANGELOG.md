@@ -67,6 +67,7 @@
 
 ### Internal
 
+-   `RangeControl`, `Tabs`, `BorderBoxControl`: Remove unused styles and simplify SCSS nesting while preserving specificity and rendered styles ([#85086](https://github.com/WordPress/gutenberg/pull/85086)).
 -   Remove obsolete JavaScript style configuration and unused style helpers ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
 -   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
 -   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
