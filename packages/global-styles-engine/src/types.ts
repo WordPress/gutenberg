@@ -192,7 +192,7 @@ export interface SpacingSettings {
 	padding?: string | Record< string, string >;
 	margin?: string | Record< string, string >;
 	blockGap?: string;
-	spacingSizes?: Record< string, SizePreset[] >;
+	spacingSizes?: SizePreset[] | Record< string, SizePreset[] >;
 }
 
 /**
@@ -203,7 +203,7 @@ export interface BorderSettings {
 	radius?: boolean;
 	style?: boolean;
 	width?: boolean;
-	radiusSizes?: Record< string, SizePreset[] >;
+	radiusSizes?: SizePreset[] | Record< string, SizePreset[] >;
 }
 
 // =============================================================================

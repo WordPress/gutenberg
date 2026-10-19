@@ -31,8 +31,7 @@ export default function BlockView( {
 				<Button
 					__next40pxDefaultSize
 					variant="secondary"
-					// React renders the string attribute as is.
-					tabIndex={ '0' as unknown as number }
+					tabIndex={ 0 }
 					onClick={ action }
 				>
 					{ actionText }
