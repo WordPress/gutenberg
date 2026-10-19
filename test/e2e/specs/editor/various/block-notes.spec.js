@@ -98,7 +98,8 @@ test.describe( 'Block Notes', () => {
 			.getByRole( 'toolbar', { name: 'Block tools' } )
 			.getByRole( 'button', { name: 'Add note (1 note)', exact: true } );
 
-		await expect( addNoteButton ).toHaveText( '1' );
+		await expect( addNoteButton ).toBeVisible();
+		await expect( addNoteButton ).toHaveText( '' );
 	} );
 
 	test( 'can add a note to a block', async ( { editor, page } ) => {

@@ -8,7 +8,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as preferencesStore } from '@wordpress/preferences';
 import { comment as commentIcon } from '@wordpress/icons';
 import { unlock } from '../../lock-unlock';
 
@@ -25,7 +24,7 @@ function NoteToolbarButton( {
 	count,
 	onClick,
 }: NoteToolbarButtonProps ) {
-	const { canAddNote, shortcut, showIconLabels } = useSelect(
+	const { canAddNote, shortcut } = useSelect(
 		( select ) => {
 			const { getBlockName, isBlockValid } = select( blockEditorStore );
 			const blockName = getBlockName( clientId );
@@ -37,10 +36,6 @@ function NoteToolbarButton( {
 				shortcut: select(
 					keyboardShortcutsStore
 				).getShortcutRepresentation( 'core/editor/new-note' ),
-				showIconLabels: select( preferencesStore ).get(
-					'core',
-					'showIconLabels'
-				),
 			};
 		},
 		[ clientId ]
@@ -66,9 +61,6 @@ function NoteToolbarButton( {
 						)
 					: __( 'Add note' )
 			}
-			// With text labels on, a button with text keeps its icon and never
-			// shows its label.
-			text={ count && ! showIconLabels ? String( count ) : undefined }
 			shortcut={ shortcut ?? undefined }
 			onClick={ onClick }
 		/>
