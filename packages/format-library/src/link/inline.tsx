@@ -159,7 +159,7 @@ function InlineLinkUI( {
 
 		// Scenario: we have any active text selection or an active format.
 		let newValue: RichTextValue;
-		if ( isCollapsed( value ) && ! isActive ) {
+		if ( isCollapsed( value ) && value.start !== undefined && ! isActive ) {
 			// Scenario: we don't have any actively selected text or formats.
 			const inserted = insert( value, newText );
 

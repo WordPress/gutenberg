@@ -1,30 +1,49 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { useState } from '@wordpress/element';
 import { MediaCategoryPanel } from '../media-panel';
 
 globalThis.wpVitest.mockMatchMedia();
 
 // Keep the panel's data + async surface out of the test: return a small,
-// non-empty result set so the grid (and the detach affordance) render.
-vi.mock( import( '../hooks' ), () => ( {
-	useMediaResults: () => ( {
+// non-empty result set so the grid renders. The mock is a spy so tests can
+// assert on the query the panel sends.
+const { useMediaResults, defaultResults } = vi.hoisted( () => {
+	const defaults = () => ( {
 		mediaList: [
 			{ id: 1, title: 'Example', url: 'https://example.com/1' },
 		],
 		isLoading: false,
-	} ),
-	useDelayedLoading: () => false,
+	} );
+	return { useMediaResults: vi.fn( defaults ), defaultResults: defaults };
+} );
+vi.mock( import( '../hooks' ), () => ( {
+	useMediaResults,
 } ) );
 
-// Replace `MediaList` with a marker that only reports whether it was wired for
-// detach, so the gate can be asserted without the full preview/dropdown tree.
-vi.mock( import( '../media-list' ), () => ( {
+// Replace the grid with a marker that reports the actions it was given and
+// lets tests drive its search and paging callbacks.
+vi.mock( import( '../media-grid' ), () => ( {
 	__esModule: true,
-	default: ( { onDetach } ) => (
+	default: ( {
+		actions,
+		onChangeSearch,
+		onChangePage,
+		page,
+		footer,
+		isLoading,
+	} ) => (
 		<div
-			data-testid="media-list"
-			data-has-detach={ String( !! onDetach ) }
-		/>
+			data-testid="media-grid"
+			data-actions={ actions.map( ( action ) => action.id ).join( ',' ) }
+			data-page={ page }
+			data-loading={ String( isLoading ) }
+		>
+			<button onClick={ () => onChangeSearch( 'sunset' ) }>search</button>
+			<button onClick={ () => onChangePage( 2 ) }>next page</button>
+			{ footer }
+		</div>
 	),
 } ) );
 
@@ -49,27 +68,41 @@ const baseCategory = {
 	invalidate: vi.fn(),
 };
 
-function renderPanel( category ) {
-	return render(
+// The search term lives above the panel (in `MediaTab`), so the harness
+// owns it here the same way.
+function PanelHarness( { category } ) {
+	const [ search, setSearch ] = useState( '' );
+	return (
 		<MediaCategoryPanel
-			rootClientId=""
 			onInsert={ vi.fn() }
 			category={ category }
+			search={ search }
+			onChangeSearch={ setSearch }
 		/>
 	);
 }
 
+function renderPanel( category ) {
+	return render( <PanelHarness category={ category } /> );
+}
+
+const getGridActions = () =>
+	screen.getByTestId( 'media-grid' ).getAttribute( 'data-actions' );
+
+beforeEach( () => {
+	// Reset rather than clear, so a test's own results don't leak into the next.
+	useMediaResults.mockReset();
+	useMediaResults.mockImplementation( defaultResults );
+} );
+
 describe( 'MediaCategoryPanel attach/detach gating', () => {
-	it( 'exposes attach/detach for the built-in Attachments source', () => {
+	it( 'exposes attach and a detach action for the built-in Attachments source', () => {
 		renderPanel( baseCategory );
 
+		expect( getGridActions() ).toBe( 'detach' );
 		expect(
 			screen.getByRole( 'button', { name: 'Attach images' } )
 		).toBeInTheDocument();
-		expect( screen.getByTestId( 'media-list' ) ).toHaveAttribute(
-			'data-has-detach',
-			'true'
-		);
 	} );
 
 	it( 'ignores attach/detach when the source is an external resource', () => {
@@ -79,13 +112,20 @@ describe( 'MediaCategoryPanel attach/detach gating', () => {
 		// even if it sets `attach`/`detach`.
 		renderPanel( { ...baseCategory, isExternalResource: true } );
 
+		expect( getGridActions() ).toBe( '' );
 		expect(
 			screen.queryByRole( 'button', { name: 'Attach images' } )
 		).not.toBeInTheDocument();
-		expect( screen.getByTestId( 'media-list' ) ).toHaveAttribute(
-			'data-has-detach',
-			'false'
-		);
+	} );
+
+	it( 'offers a report action for a source with a report URL', () => {
+		renderPanel( {
+			...baseCategory,
+			isExternalResource: true,
+			getReportUrl: () => 'https://example.com/report',
+		} );
+
+		expect( getGridActions() ).toBe( 'report' );
 	} );
 } );
 
@@ -119,5 +159,61 @@ describe( 'MediaCategoryPanel subscription gating', () => {
 		renderPanel( { ...baseCategory, subscribe, isExternalResource: true } );
 
 		expect( subscribe ).not.toHaveBeenCalled();
+	} );
+} );
+
+describe( 'MediaCategoryPanel querying', () => {
+	const lastQuery = () => useMediaResults.mock.lastCall[ 1 ];
+
+	it( 'queries with the search term and page the grid reports', async () => {
+		const user = userEvent.setup();
+		renderPanel( baseCategory );
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { page: 1, search: '' } )
+		);
+
+		await user.click( screen.getByRole( 'button', { name: 'next page' } ) );
+		expect( lastQuery() ).toEqual( expect.objectContaining( { page: 2 } ) );
+		expect( screen.getByTestId( 'media-grid' ) ).toHaveAttribute(
+			'data-page',
+			'2'
+		);
+
+		// A new search restarts from the first page.
+		await user.click( screen.getByRole( 'button', { name: 'search' } ) );
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { page: 1, search: 'sunset' } )
+		);
+	} );
+
+	it( 'reports the grid as idle while switching source, even mid-fetch', () => {
+		// A fetch is already in flight (paging, say) when another source is
+		// asked for, so `isLoading` never falls back to false on its own.
+		useMediaResults.mockReturnValue( {
+			mediaList: [],
+			isLoading: true,
+			isSwitchingSource: true,
+		} );
+		renderPanel( baseCategory );
+
+		expect( screen.getByTestId( 'media-grid' ) ).toHaveAttribute(
+			'data-loading',
+			'false'
+		);
+	} );
+
+	it( 'reports the grid as loading while refetching the current source', () => {
+		useMediaResults.mockReturnValue( {
+			mediaList: [ { id: 1, url: 'https://example.com/1' } ],
+			isLoading: true,
+			isSwitchingSource: false,
+		} );
+		renderPanel( baseCategory );
+
+		expect( screen.getByTestId( 'media-grid' ) ).toHaveAttribute(
+			'data-loading',
+			'true'
+		);
 	} );
 } );

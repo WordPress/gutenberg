@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Format footer item and selection counts with locale-specific separators ([#84622](https://github.com/WordPress/gutenberg/pull/84622)).
 -   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 
 ### Bug Fixes
@@ -17,8 +18,11 @@
 
 ### Internal
 
+-   Remove unused Emotion dependencies ([#85021](https://github.com/WordPress/gutenberg/pull/85021)).
+-   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
 -   Use the `RefObject` React type instead of `MutableRefObject` which is deprecated in React 19 types ([#84550](https://github.com/WordPress/gutenberg/pull/84550)).
+-   Convert the `filterSortAndPaginate` tests to TypeScript ([#84836](https://github.com/WordPress/gutenberg/pull/84836)).
 
 ## 20.0.0 (2026-10-07)
 

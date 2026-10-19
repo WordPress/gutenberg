@@ -2,7 +2,7 @@
 
 An Emotion migration should preserve the component's public API, rendered elements, interactions, and resulting styles. Use the existing SCSS Modules and `@wordpress/style-runtime` pipeline. A component migration does not require a new CSS extraction pipeline.
 
-This temporary guide collects the [migration guidelines in #66806](https://github.com/WordPress/gutenberg/issues/66806) and lessons from its merged PRs. The [reference migrations](#reference-migrations) identify useful examples and their limitations. Read the current implementation before copying an older diff. Some merged PRs include explicitly agreed visual or behavior changes that are not part of a mechanical migration.
+The component source migration is complete. This guide records the [migration guidelines in #66806](https://github.com/WordPress/gutenberg/issues/66806) and lessons from its merged PRs. The [reference migrations](#reference-migrations) identify useful examples and their limitations. Read the current implementation before copying an older diff. Some merged PRs include explicitly agreed visual or behavior changes that are not part of a mechanical migration.
 
 ## Establish the component and consumer contract
 
@@ -69,24 +69,23 @@ Compare matched declarations on the component and its consumers:
 
 -   Keep low-specificity defaults overridable. The Divider migration added attribute-selector specificity and broke `CardDivider` and complementary-area border overrides. [#79534](https://github.com/WordPress/gutenberg/pull/79534) wrapped orientation attributes in `:where()` to remove that extra specificity.
 -   Preserve deliberate Emotion `&&` or `&&&` increases. Sass can express these as `.wrapper.wrapper` or `.label.label.label`; raw `&&&` is not valid Dart Sass. ConfirmDialog's doubled selector keeps its overlay above the parent Popover.
--   Protect every declaration that must beat a still-Emotion-based primitive. ColorPalette initially protected `font-size` and margin but missed `line-height`; Heading's later rule won in the root document. ToolsPanel had a similar heading conflict.
+-   Preserve declarations that had to override primitives during the staged migration. ColorPalette initially protected `font-size` and margin but missed `line-height`; Heading's later Emotion rule won in the root document. ToolsPanel had a similar heading conflict. Check current consumers before reducing the resulting specificity.
 -   Keep selector relationships and scope. Nesting `.layered > .child` under `.z-stack` adds specificity. Replacing Emotion component interpolation requires checking which real elements the new selector matches.
 -   Mark existing external classes with `:global(...)` inside a CSS Module, for example `:global(.components-panel__row) &`. Do not accidentally hash a legacy class, broaden its matching elements, or add a public class solely to replace an internal selector.
 
 Use the smallest selector change that preserves the required winner. Do not put every rule in `:where()`, increase every selector, or add `!important` to hide an unexplained conflict. Record why a deliberate specificity adjustment is needed.
 
-### Audit remaining Emotion consumers
+### Preserve external Emotion composition
 
-Removing an Emotion wrapper can expose source-order dependencies in callers that still use `useCx`. Where fragments overlap on a property, shorthand/longhand pair, or nested selector, compose them in one `css()` call before passing them to `cx()`:
+Earlier migration stages used `useCx` to combine component and consumer classes. That hook has been removed, and the context system now composes class names with `clsx`. Consumers that still author Emotion styles must combine source-order-dependent fragments in one `css()` call before passing the resulting class name to a component:
 
 ```js
-const classes = cx(
-	css( baseStyles, condition && overrideStyles ),
-	className
-);
+import { css } from '@emotion/css';
+
+const className = css( baseStyles, condition && overrideStyles );
 ```
 
-This is an interim compatibility fix for existing Emotion consumers, not a pattern for newly migrated styles. Do not mechanically combine unrelated fragments. Audit callers outside the migrated directory: [#79443](https://github.com/WordPress/gutenberg/pull/79443) updated several consumers but missed the BorderBoxControl gutter regression fixed in [#79967](https://github.com/WordPress/gutenberg/pull/79967).
+This is compatibility guidance for external Emotion consumers. New component styles use SCSS Modules. Do not mechanically combine unrelated fragments. Audit downstream callers when changing composition: [#79443](https://github.com/WordPress/gutenberg/pull/79443) updated several consumers but missed the BorderBoxControl gutter regression fixed in [#79967](https://github.com/WordPress/gutenberg/pull/79967).
 
 Test mixed Emotion/Module composition in both the root and iframe documents when used there. [Scrollable's review](https://github.com/WordPress/gutenberg/pull/80694#discussion_r3845389532) found that `CardBody isScrollable` kept `height: 100%` in an iframe but resolved to `auto` in the root document because insertion order differed.
 
@@ -94,7 +93,7 @@ Test mixed Emotion/Module composition in both the root and iframe documents when
 
 Reuse existing tests and stories first. Add or extend a test only for a concrete migration risk that existing coverage does not protect. Choose the smallest check that observes the behavior and would fail if it regressed. A behavior-preserving migration may need no new tests. When automated tests cannot observe the real styling path, document a focused before/after browser check instead of adding a test that cannot detect the regression.
 
-[`StyleProvider`](/packages/components/src/style-provider/index.tsx) both supplies an Emotion cache and registers a document with `@wordpress/style-runtime`. Keep the relevant provider and registration path while either responsibility is needed. Removing a component's Emotion import does not make this infrastructure redundant.
+[`StyleProvider`](/packages/components/src/style-provider/index.tsx) registers a document with `@wordpress/style-runtime`. Keep this registration path for CSS Module delivery, including its `useInsertionEffect` timing and cleanup. The provider no longer supplies an Emotion cache. Consumers using `@emotion/react` or `@emotion/styled` in another document must provide their own `CacheProvider` with a cache whose `container` is that document's `<head>`. Consumers using `@emotion/css` must create an instance with `@emotion/css/create-instance`, set its `container` to that document's `<head>`, and use the instance's styling functions. See [Emotion's package summary](https://emotion.sh/docs/package-summary) and [custom-instance guidance](https://emotion.sh/docs/@emotion/css#custom-instances).
 
 For SlotFill or portals, use an attached iframe with a real `contentDocument` and `defaultView`. Assert a computed style in the destination document. A class on the element or a style tag in the parent document does not prove delivery. [#80384](https://github.com/WordPress/gutenberg/pull/80384) pairs a registration test with a Storybook example that renders migrated Spacer styles in an iframe.
 
@@ -112,7 +111,7 @@ Keep new tests focused on the migrated component's integration. A wrapper test c
 
 ## Complete the migration
 
-Remove obsolete Emotion imports, files, lint/type suppressions, and utilities that become unused because of this migration. Search all consumers before deleting shared constants. Preserve useful comments explaining layout calculations or compatibility workarounds. Leave unrelated cleanup and global Emotion dependencies, Babel wiring, serializers, `useCx`, and the `rtl` utility until their remaining users are gone.
+Remove obsolete Emotion imports, files, lint/type suppressions, and utilities that become unused because of this migration. Search all consumers before deleting shared constants. Preserve useful comments explaining layout calculations or compatibility workarounds. The compiler transforms, `useCx`, and Emotion `rtl` utility have been removed. Audit direct and transitive dependencies across workspaces before removing remaining package declarations or lockfile entries. Leave unrelated cleanup outside the migration.
 
 Follow [worktree setup](/docs/contributors/code/getting-started-with-code-contribution.md#set-up-each-worktree) and read the [testing overview](/docs/contributors/code/testing-overview.md) before adding tests. All unit tests use Vitest. Follow the [filename-based environment conventions](/docs/contributors/code/testing-overview.md#folder-structure). From the repository root, use the appropriate focused command below, then run lint and the repository gates:
 
