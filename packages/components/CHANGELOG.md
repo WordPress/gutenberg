@@ -63,7 +63,7 @@
 
 ### Internal
 
--   Update `@testing-library/user-event` to 14.6.8 for component tests ([#0](https://github.com/WordPress/gutenberg/pull/0)).
+-   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Replace remaining Emotion fixtures in polymorphic tests and ToolsPanel stories with SCSS Modules ([#84926](https://github.com/WordPress/gutenberg/pull/84926)).
 -   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
