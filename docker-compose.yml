@@ -19,6 +19,7 @@ services:
 
   cli:
     image: wordpress:cli-php7.2
+    entrypoint: wp
     user: xfs
     volumes:
       - wordpress:/var/www/html
@@ -69,6 +70,7 @@ services:
 
   cli_e2e_tests:
     image: wordpress:cli-php7.2
+    entrypoint: wp
     volumes:
       - wordpress_e2e_tests:/var/www/html
       - .:/var/www/html/wp-content/plugins/gutenberg
