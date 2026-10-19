@@ -1,6 +1,5 @@
 import { speak } from '@wordpress/a11y';
 import apiFetch from '@wordpress/api-fetch';
-import { escapeHTML } from '@wordpress/escape-html';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 import warning from '@wordpress/warning';
@@ -39,6 +38,53 @@ const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 // the server. Their messages restate what the notice already says, so there are
 // no details worth disclosing.
 const CLIENT_GENERATED_ERROR_CODES = [ 'offline_error', 'fetch_error' ];
+
+// Block-level elements whose end is a line break once markup is removed, so two
+// sentences in separate paragraphs don't run together.
+const LINE_BREAK_ELEMENTS = 'p, div, li, h1, h2, h3, h4, h5, h6, tr';
+
+/**
+ * Converts a server message to plain text for a notice's details. Markup is
+ * removed rather than the message being dropped, since it may be the only
+ * account of the failure. A link keeps its target as `text (URL)`, because the
+ * target is often the most useful part, as with the troubleshooting link of a
+ * critical error.
+ *
+ * @param {string} message Message from the server.
+ *
+ * @return {string} The message as plain text.
+ */
+function getFailureDetails( message ) {
+	// Only parse when there is a tag: parsing a message that merely contains a
+	// `<`, as a parse error does, would take everything after it.
+	if ( ! /<\/?[a-z][^>]*>/i.test( message ) ) {
+		return message;
+	}
+
+	// An inert document, so nothing in the message runs or loads.
+	const { body } = document.implementation.createHTMLDocument( '' );
+	body.innerHTML = message;
+
+	// Their text is code, not part of the message.
+	for ( const element of body.querySelectorAll( 'script, style' ) ) {
+		element.remove();
+	}
+	for ( const link of body.querySelectorAll( 'a[href]' ) ) {
+		const href = link.getAttribute( 'href' ).trim();
+		const text = link.textContent.trim();
+		if ( /^https?:\/\//i.test( href ) && text !== href ) {
+			link.append( text ? ` (${ href })` : href );
+		}
+	}
+	for ( const element of body.querySelectorAll( LINE_BREAK_ELEMENTS ) ) {
+		element.append( '\n' );
+	}
+	for ( const element of body.querySelectorAll( 'br' ) ) {
+		element.replaceWith( '\n' );
+	}
+
+	return body.textContent.replace( /\n{3,}/g, '\n\n' ).trim();
+}
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -284,6 +330,32 @@ export const savePost =
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
 
+		const isManualSaveFailureShown = registry
+			.select( noticesStore )
+			.getNotices()
+			.some(
+				( notice ) =>
+					notice.id === 'editor-save' && notice.status === 'error'
+			);
+
+		// An earlier autosave failure is resolved by a successful autosave, and
+		// replaced by the outcome of a manual save.
+		if ( ! error || ! options.isAutosave ) {
+			registry.dispatch( noticesStore ).removeNotice( 'editor-autosave' );
+		}
+
+		// An autosave of a draft saves the post itself, so it can leave nothing
+		// to save manually.
+		// TODO: Should a manual save stay possible, so it creates a revision?
+		if (
+			! error &&
+			options.isAutosave &&
+			isManualSaveFailureShown &&
+			! select.isEditedPostDirty()
+		) {
+			registry.dispatch( noticesStore ).removeNotice( 'editor-save' );
+		}
+
 		// Attach any images in the post that aren't attached to a post yet. Not
 		// awaited: it shouldn't hold up the editor showing "Saved", and it
 		// handles its own errors.
@@ -299,10 +371,20 @@ export const savePost =
 			previousRecord.status !== 'trash' &&
 			select.getEditorSettings().autoAttachMediaEnabled
 		) {
+			// Once a post is out of draft, only images added since its last
+			// save are attached, so ones left unattached on purpose stay that
+			// way. Drafts can't be compared like this: an autosave of a draft
+			// updates the post itself (see `WP_REST_Autosaves_Controller`), so
+			// images added since the last manual save may already be in it.
+			const isDraft = [ 'draft', 'auto-draft' ].includes(
+				previousRecord.status
+			);
+
 			attachMediaInPost( registry, {
 				id: previousRecord.id,
 				type: previousRecord.type,
 				blocks: savedBlocks,
+				previousContent: isDraft ? undefined : previousRecord.content,
 			} );
 		}
 
@@ -313,29 +395,26 @@ export const savePost =
 				error,
 				options,
 			} );
-			if ( args.length ) {
-				const [ noticeMessage ] = args;
-				if (
+			// A failed manual save is the notice to act on, so a failed autosave
+			// doesn't add a second one next to it.
+			if (
+				args.length &&
+				! ( options.isAutosave && isManualSaveFailureShown )
+			) {
+				// A PHP fatal error's message, with its stack trace, comes in
+				// `data.error`, apart from the generic message WordPress shows.
+				const phpError = error.data?.error?.message;
+				const details = [
 					error.message &&
-					! CLIENT_GENERATED_ERROR_CODES.includes( error.code ) &&
-					! /<\/?[^>]*>/.test( error.message )
-				) {
-					args[ 0 ] = `${ escapeHTML(
-						noticeMessage
-					) } <details class="editor-save-error-details"><summary>${ escapeHTML(
-						__( 'Show details' )
-					) }</summary><span class="editor-save-error-details__message">${ escapeHTML(
-						error.message
-					) }</span></details>`;
-					args[ 1 ] = {
-						...args[ 1 ],
-						__unstableHTML: true,
-						speak: false,
-					};
-					// The notices store doesn't support a separate spoken message
-					// when rendering raw HTML content, so announce the plain text
-					// manually to avoid reading the markup aloud.
-					speak( noticeMessage, 'assertive' );
+					! CLIENT_GENERATED_ERROR_CODES.includes( error.code )
+						? getFailureDetails( error.message )
+						: '',
+					typeof phpError === 'string' ? phpError.trim() : '',
+				]
+					.filter( Boolean )
+					.join( '\n\n' );
+				if ( details ) {
+					args[ 1 ] = { ...args[ 1 ], details };
 				}
 
 				registry.dispatch( noticesStore ).createErrorNotice( ...args );

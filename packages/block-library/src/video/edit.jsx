@@ -1,7 +1,7 @@
 import clsx from 'clsx';
 import { isBlobURL } from '@wordpress/blob';
 import {
-	Spinner,
+	Spinner as WCSpinner,
 	Placeholder,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
@@ -326,7 +326,7 @@ function VideoEdit( {
 				>
 					<Tracks tracks={ tracks } />
 				</video>
-				{ !! temporaryURL && <Spinner /> }
+				{ !! temporaryURL && <WCSpinner /> }
 				<Caption
 					attributes={ attributes }
 					setAttributes={ setAttributes }

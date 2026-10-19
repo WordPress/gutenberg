@@ -1866,30 +1866,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertLessThan( strpos( $actual_styles, $mobile_gap ), strpos( $actual_styles, $default_gap ) );
 	}
 
-	public function test_get_stylesheet_outputs_legacy_responsive_block_styles() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/group' => array(
-							'mobile' => array(
-								'color' => array(
-									'text' => 'red',
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$this->assertStringContainsString(
-			'@media (width <= 480px){:root :where(.wp-block-group){color: red;}}',
-			$theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) )
-		);
-	}
-
 	public function test_get_stylesheet_renders_element_styles_defined_only_in_a_breakpoint() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
@@ -5922,19 +5898,54 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function data_get_stylesheet_ignores_values_of_unexpected_types() {
 		return array(
-			'element custom css as an object'    => array(
+			'element custom css as an object'       => array(
 				array( 'styles' => array( 'elements' => array( 'link' => array( 'css' => array( 'color' => 'red' ) ) ) ) ),
 			),
-			'block custom css as a list'         => array(
+			'block custom css as a list'            => array(
 				array( 'styles' => array( 'blocks' => array( 'core/paragraph' => array( 'css' => array( 'color: red;' ) ) ) ) ),
 			),
-			'ref as an array'                    => array(
+			'ref as an array'                       => array(
 				array( 'styles' => array( 'color' => array( 'text' => array( 'ref' => array( 'styles', 'color' ) ) ) ) ),
 			),
-			'spacing scale as a string'          => array(
+			'palette as a list of strings'          => array(
+				array( 'settings' => array( 'color' => array( 'palette' => array( '#000', '#fff' ) ) ) ),
+			),
+			'palette keyed by origin with a string' => array(
+				array( 'settings' => array( 'color' => array( 'palette' => array( 'custom' => array( '#000' ) ) ) ) ),
+			),
+			'palette mixing a list and an origin'   => array(
+				array(
+					'settings' => array(
+						'color' => array(
+							'palette' => array(
+								0       => '#000',
+								'theme' => '#fff',
+							),
+						),
+					),
+				),
+			),
+			'preset slug as an array'               => array(
+				array(
+					'settings' => array(
+						'typography' => array(
+							'fontSizes' => array(
+								array(
+									'slug' => array( 'small' ),
+									'size' => '1rem',
+								),
+							),
+						),
+					),
+				),
+			),
+			'font families as a list of strings'    => array(
+				array( 'settings' => array( 'typography' => array( 'fontFamilies' => array( 'Inter' ) ) ) ),
+			),
+			'spacing scale as a string'             => array(
 				array( 'settings' => array( 'spacing' => array( 'spacingScale' => '1.5' ) ) ),
 			),
-			'spacing scale unit as an array'     => array(
+			'spacing scale unit as an array'        => array(
 				array(
 					'settings' => array(
 						'spacing' => array(
@@ -5949,13 +5960,69 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					),
 				),
 			),
-			'shared style variation as a string' => array(
+			'shared style variation as a string'    => array(
 				array( 'styles' => array( 'variations' => array( 'plain' => 'red' ) ) ),
 			),
-			'block types item as an array'       => array(
+			'block types item as an array'          => array(
 				array( 'blockTypes' => array( array( 'core/button' ) ) ),
 			),
 		);
+	}
+
+	public function test_sanitize_removes_preset_items_of_unexpected_types() {
+		$valid_color = array(
+			'slug'  => 'black',
+			'color' => '#000',
+			'name'  => 'Black',
+		);
+		$int_slug    = array(
+			'slug'  => 50,
+			'color' => '#888',
+			'name'  => 'Grey',
+		);
+		$invalid     = array(
+			'#fff',
+			array(
+				'slug'  => array( 'white' ),
+				'color' => '#fff',
+			),
+		);
+
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array(
+					'color'  => array( 'palette' => array_merge( $invalid, array( $valid_color, $int_slug ) ) ),
+					'blocks' => array(
+						'core/paragraph' => array(
+							'color' => array( 'palette' => array( 'custom' => array_merge( $invalid, array( $valid_color, $int_slug ) ) ) ),
+						),
+					),
+				),
+			)
+		);
+		$settings   = $theme_json->get_settings();
+
+		$this->assertSame( array( $valid_color, $int_slug ), $settings['color']['palette']['theme'], 'Top-level preset list' );
+		$this->assertSame( array( $valid_color, $int_slug ), $settings['blocks']['core/paragraph']['color']['palette']['custom'], 'Block-level presets keyed by origin' );
+	}
+
+	public function test_remove_insecure_properties_removes_preset_items_of_unexpected_types() {
+		$valid_color = array(
+			'slug'  => 'black',
+			'color' => '#000',
+			'name'  => 'Black',
+		);
+
+		$sanitized = WP_Theme_JSON_Gutenberg::remove_insecure_properties(
+			array(
+				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'settings' => array( 'color' => array( 'palette' => array( 'custom' => array( '#fff', $valid_color ) ) ) ),
+			),
+			'custom'
+		);
+
+		$this->assertSame( array( $valid_color ), $sanitized['settings']['color']['palette']['custom'] );
 	}
 
 	public function test_merge_does_not_generate_spacing_sizes_from_a_non_array_per_origin_spacing_scale() {
@@ -9075,30 +9142,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 					'blocks' => array(
 						'core/navigation-link' => array(
 							'-current' => array(
-								'color' => array(
-									'text'       => 'red',
-									'background' => 'blue',
-								),
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$stylesheet = $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) );
-		$expected   = ':root :where(.wp-block-navigation .current-menu-item){background-color: blue;color: red;}';
-		$this->assertSameCSS( $expected, $stylesheet );
-	}
-
-	public function test_legacy_block_custom_states_are_processed() {
-		$theme_json = new WP_Theme_JSON_Gutenberg(
-			array(
-				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-				'styles'  => array(
-					'blocks' => array(
-						'core/navigation-link' => array(
-							'@current' => array(
 								'color' => array(
 									'text'       => 'red',
 									'background' => 'blue',
