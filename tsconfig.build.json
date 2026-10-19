@@ -63,7 +63,7 @@
 		{ "path": "packages/media-utils/tsconfig.build.json" },
 		{ "path": "packages/notices/tsconfig.build.json" },
 		{ "path": "packages/patterns" },
-		{ "path": "packages/plugins" },
+		{ "path": "packages/plugins/tsconfig.build.json" },
 		{ "path": "packages/preferences/tsconfig.build.json" },
 		{ "path": "packages/preferences-persistence" },
 		{ "path": "packages/prettier-config" },
