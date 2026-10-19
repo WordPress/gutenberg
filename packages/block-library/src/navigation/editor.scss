@@ -117,6 +117,11 @@
 		background: $gray-900;
 		padding: 0;
 		width: $button-size-small;
+		height: $button-size-small;
+		// The button's own min-height is taller than this control. Match it
+		// here, or the appender stays taller than it is wide.
+		min-width: $button-size-small;
+		min-height: $button-size-small;
 		margin-right: 0;
 		margin-left: auto;
 	}
@@ -218,6 +223,10 @@ $color-control-label-height: 20px;
 	color: $white;
 	height: $button-size-small;
 	width: $button-size-small;
+	// The button's own min-height is taller than this control. Match it
+	// here, or the appender stays taller than it is wide.
+	min-height: $button-size-small;
+	min-width: $button-size-small;
 
 	// This needs specificity to override an inherited padding.
 	// That source padding in turn has high specificity to protect
