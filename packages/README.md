@@ -113,7 +113,7 @@ When creating a new package, you need to provide at least the following. Package
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 1. `CHANGELOG.md` file containing at least:
 
-    ```
+    ```md
     <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
     ## Unreleased
@@ -267,9 +267,25 @@ See [Testing published packages across WordPress versions](/docs/contributors/co
 
 ## Maintaining Changelogs
 
-Each package keeps a `CHANGELOG.md` so the release process can see what changed since the last publish. Put new entries under `## Unreleased` at the top of the file, or create the heading if it is missing.
+Each package keeps a `CHANGELOG.md` to tell consumers what changes when they upgrade and to inform the release process. Put new entries under `## Unreleased` at the top of the file, or create the heading if it is missing.
 
-Prefer an entry for anything that affects package consumers. Changelog entries are optional for trivial or for changes that don't impact the user or consumer. Internal changes can be added under an **Internal** heading.
+Add an entry for changes that affect package consumers, such as API or type changes, bug fixes, deprecations, compatibility requirements, or updates to consumer documentation. Entries are optional for trivial changes and work with no consumer impact, such as tests, repository-only tooling, or behavior-preserving refactors. The **Internal** heading is available when an internal change needs a release note; it does not require an entry for every code change.
+
+### Writing concise entries
+
+Write for someone upgrading the package. State what changed for them and any action they need to take.
+
+-   Prefer one short sentence per entry. Name the affected API or component and describe the change consumers can observe.
+-   Treat preserved behavior as the baseline for refactors and migrations. Omit lists of unchanged props, callbacks, values, styling, or accessibility behavior.
+-   Omit implementation steps, file lists, test results, and internal library replacements unless they affect how consumers use the package.
+-   Combine related details about the same consumer impact. Use separate entries or subsections only for distinct changes consumers need to know about.
+-   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations and examples.
+
+For example, summarize a migration's effect on custom styling:
+
+```md
+-   `FontFamilyControl`: Change markup and CSS hooks; custom CSS overrides need updating, and `options[].style` now applies only to the option label ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
+```
 
 ### Changelog Entry Format
 
