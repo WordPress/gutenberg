@@ -635,10 +635,10 @@ export const saveEntityRecord =
 			return;
 		}
 		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
-		// A record's key holds its ID.
+		// A record's key holds its ID, which a new record has none of.
 		const recordId = ( record as Record< string, unknown > )[
 			entityIdKey as string
-		] as string | number;
+		] as string | number | undefined;
 		const isNewRecord = !! entityIdKey && ! recordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
@@ -700,6 +700,7 @@ export const saveEntityRecord =
 					: await syncManager?.beforeSave?.(
 							kind,
 							name,
+							// @ts-expect-error Bug: a keyless entity passes an `undefined` ID, which the sync manager's type excludes.
 							recordId,
 							// Fields are read by their name.
 							record as Record< string, unknown >,

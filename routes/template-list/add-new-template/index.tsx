@@ -204,7 +204,7 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 			// Navigate to the created template editor.
 			navigate( {
 				to: `/types/wp_template/edit/${ encodeURIComponent(
-					// Saved with `throwOnError`, so the record is set.
+					// A registered post type saved with `throwOnError` returns the record.
 					String( newTemplate!.id )
 				) }`,
 			} );
@@ -217,7 +217,7 @@ function NewTemplateModal( { onClose }: NewTemplateModalProps ) {
 					// translators: %s: Title of the created post or template, e.g: "Hello world".
 					__( '"%s" successfully created.' ),
 					decodeEntities(
-						// Saved with `throwOnError`, so the record is set, with a rendered title.
+						// A registered post type saved with `throwOnError` returns the record.
 						(
 							newTemplate!.title as
 								{ rendered?: string } | undefined

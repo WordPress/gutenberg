@@ -145,7 +145,7 @@ export function useNoteReactions(
 					},
 					{ throwOnError: true }
 				);
-				// Saved with `throwOnError`, so the reaction is set, with its numeric ID.
+				// Comments are registered, so saving with `throwOnError` returns the reaction.
 				change = { added: saved!.id as number };
 			}
 
