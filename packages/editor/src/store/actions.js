@@ -8,7 +8,10 @@ import {
 	synchronizeBlocksWithTemplate,
 	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
-import { store as noticesStore } from '@wordpress/notices';
+import {
+	store as noticesStore,
+	privateApis as noticesPrivateApis,
+} from '@wordpress/notices';
 import {
 	store as coreStore,
 	privateApis as coreDataPrivateApis,
@@ -31,6 +34,7 @@ import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
+import { AUTOSAVE_RETRY_SLOT } from './constants';
 
 const { getEntitySnapshot } = unlock( coreDataPrivateApis );
 
@@ -405,6 +409,13 @@ export const savePost =
 					.join( '\n\n' );
 				if ( details ) {
 					args[ 1 ] = { ...args[ 1 ], details };
+				}
+				if ( options.isAutosave ) {
+					const { NOTICE_SLOT } = unlock( noticesPrivateApis );
+					args[ 1 ] = {
+						...args[ 1 ],
+						[ NOTICE_SLOT ]: AUTOSAVE_RETRY_SLOT,
+					};
 				}
 
 				registry.dispatch( noticesStore ).createErrorNotice( ...args );

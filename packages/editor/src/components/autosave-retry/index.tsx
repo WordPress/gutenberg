@@ -1,17 +1,12 @@
 import { useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	store as noticesStore,
-	privateApis as noticesPrivateApis,
-} from '@wordpress/notices';
+import { Fill } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
 import { store as editorStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { createNoticeContentFill } = unlock( noticesPrivateApis );
+import { AUTOSAVE_RETRY_SLOT } from '../../store/constants';
 
 const NOTICE_ID = 'editor-autosave';
-const AutosaveFailureContent = createNoticeContentFill( NOTICE_ID );
 
 function useRetryText( nextAutosaveTime: number | null ) {
 	const { hasNotice, isAutosaving } = useSelect(
@@ -70,5 +65,5 @@ export default function AutosaveRetry( {
 	if ( ! text ) {
 		return null;
 	}
-	return <AutosaveFailureContent> { text }</AutosaveFailureContent>;
+	return <Fill name={ AUTOSAVE_RETRY_SLOT }> { text }</Fill>;
 }

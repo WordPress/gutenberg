@@ -1,10 +1,10 @@
 import { lock } from './lock-unlock';
-import { createNoticeContentFill } from './components/notice-content';
+import { NOTICE_SLOT } from './store/constants';
 
 /**
  * @private
  */
 export const privateApis = {};
 lock( privateApis, {
-	createNoticeContentFill,
+	NOTICE_SLOT,
 } );

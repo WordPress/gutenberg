@@ -1,5 +1,5 @@
 import deprecated from '@wordpress/deprecated';
-import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
+import { DEFAULT_CONTEXT, DEFAULT_STATUS, NOTICE_SLOT } from './constants';
 import type { NoticeOptions, ReducerAction } from './types';
 
 let uniqueId = 0;
@@ -63,6 +63,8 @@ export function createNotice(
 		} );
 	}
 
+	const slot = ( options as Record< symbol, unknown > )[ NOTICE_SLOT ];
+
 	return {
 		type: 'CREATE_NOTICE',
 		context,
@@ -83,6 +85,7 @@ export function createNotice(
 			icon,
 			explicitDismiss,
 			onDismiss,
+			...( slot === undefined ? {} : { [ NOTICE_SLOT ]: slot } ),
 		},
 	};
 }
