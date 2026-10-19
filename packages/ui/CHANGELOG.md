@@ -32,6 +32,7 @@
 
 ### Bug Fixes
 
+-   `Tabs`: Expand vertical tab interaction backgrounds and focus rings across the row ([#84821](https://github.com/WordPress/gutenberg/pull/84821)).
 -   Keep the `Link` new-tab indicator with the preceding text when wrapping ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
 -   `Select`: Keep long popup lists scrollable when item alignment falls back to anchored positioning or the popup opens through touch ([#84682](https://github.com/WordPress/gutenberg/pull/84682)).
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
@@ -46,6 +47,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for UI tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 
 ### Documentation
