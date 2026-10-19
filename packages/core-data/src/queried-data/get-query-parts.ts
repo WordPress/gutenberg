@@ -1,34 +1,18 @@
 import { addQueryArgs } from '@wordpress/url';
 import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
-
-/**
- * An object of properties describing a specific query.
- *
- * @typedef {Object} WPQueriedDataQueryParts
- *
- * @property {number}      page      The query page (1-based index, default 1).
- * @property {number}      perPage   Items per page for query (default 10).
- * @property {?number}     offset    Absolute item offset (default null).
- * @property {string}      stableKey An encoded stable string of all non-pagination, non-fields query parameters.
- * @property {?(string[])} fields    Target subset of fields to derive from item objects (default null).
- * @property {?(number[])} include   Specific item IDs to include (default null).
- * @property {string}      context   Scope under which the request is made; determines returned fields in response.
- */
+import type { Query, QueryParts } from './types';
 
 /**
  * Given a query object, returns an object of parts, including pagination
  * details (`page` and `perPage`, or default values). All other properties are
  * encoded into a stable (idempotent) `stableKey` value.
  *
- * @param {Object} query Optional query object.
+ * @param query Optional query object.
  *
- * @return {WPQueriedDataQueryParts} Query parts.
+ * @return Query parts.
  */
-export function getQueryParts( query ) {
-	/**
-	 * @type {WPQueriedDataQueryParts}
-	 */
-	const parts = {
+export function getQueryParts( query: Query ): QueryParts {
+	const parts: QueryParts = {
 		stableKey: '',
 		page: 1,
 		perPage: 10,
@@ -63,7 +47,8 @@ export function getQueryParts( query ) {
 			}
 
 			case 'context':
-				parts.context = value;
+				// The REST API context is a string.
+				parts.context = value as string;
 				break;
 
 			default:

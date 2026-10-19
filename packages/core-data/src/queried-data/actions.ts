@@ -1,3 +1,12 @@
+import type {
+	ItemId,
+	QueriedItem,
+	QueriedMeta,
+	Query,
+	ReceiveItemsAction,
+	RemoveItemsAction,
+} from './types';
+
 /**
  * Returns an action object used in signalling that items have been received.
  *
@@ -7,7 +16,11 @@
  *
  * @return {Object} Action object.
  */
-export function receiveItems( items, edits, meta ) {
+export function receiveItems(
+	items: QueriedItem | Array< QueriedItem >,
+	edits?: Record< string, unknown >,
+	meta?: QueriedMeta
+): ReceiveItemsAction {
 	return {
 		type: 'RECEIVE_ITEMS',
 		items,
@@ -26,7 +39,12 @@ export function receiveItems( items, edits, meta ) {
  * @param {boolean}             invalidateCache Controls whether we want to invalidate the cache.
  * @return {Object} Action object.
  */
-export function removeItems( kind, name, records, invalidateCache = false ) {
+export function removeItems(
+	kind: string,
+	name: string,
+	records: ItemId | Array< ItemId >,
+	invalidateCache = false
+): RemoveItemsAction {
 	return {
 		type: 'REMOVE_ITEMS',
 		itemIds: Array.isArray( records ) ? records : [ records ],
@@ -47,7 +65,12 @@ export function removeItems( kind, name, records, invalidateCache = false ) {
  *
  * @return {Object} Action object.
  */
-export function receiveQueriedItems( items, query = {}, edits, meta ) {
+export function receiveQueriedItems(
+	items: QueriedItem | Array< QueriedItem >,
+	query: Query = {},
+	edits?: Record< string, unknown >,
+	meta?: QueriedMeta
+): ReceiveItemsAction & { query: Query } {
 	return {
 		...receiveItems( items, edits, meta ),
 		query,

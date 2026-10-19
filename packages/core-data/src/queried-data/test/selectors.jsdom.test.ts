@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getQueriedItems } from '../selectors';
+import type { QueriedDataState } from '../types';
 import { getMergedItemIds } from '../reducer';
 
 describe( 'getQueriedItems', () => {
@@ -42,7 +43,7 @@ describe( 'getQueriedItems', () => {
 	} );
 
 	it( 'should cache on query by state', () => {
-		const state = {
+		const state: QueriedDataState< { id: number } > = {
 			items: {
 				default: {
 					1: { id: 1 },
@@ -55,6 +56,7 @@ describe( 'getQueriedItems', () => {
 					2: true,
 				},
 			},
+			// @ts-expect-error The malformed queries match no query, which caching does not need.
 			queries: { itemIds: [ 1, 2 ] },
 		};
 
