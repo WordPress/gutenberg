@@ -728,9 +728,10 @@ export function getResponsiveStateCSSRules(
  * For example, selecting `@mobile + :hover` should preview styles from
  * `:hover`, with `@mobile.:hover` values layered on top when present.
  *
- * A custom pseudo state also inherits from its custom state, because the
- * canvas does not carry the custom state's class. For example, selecting
- * `-current + :hover` previews `-current` with `-current.:hover` on top.
+ * A custom pseudo state also inherits from its pseudo state and its custom
+ * state, because the canvas does not carry the custom state's class. The
+ * layers follow the front end's specificity: selecting `-current + :hover`
+ * previews `:hover`, then `-current`, then `-current.:hover` on top.
  *
  * @param {Object} style         Block style object.
  * @param {Object} selectedState Selected block style state.
@@ -744,6 +745,7 @@ export function getCanvasStateStyleValue( style, selectedState ) {
 		hasPseudoBlockStyleState( selectedState )
 	) {
 		states = [
+			{ ...selectedState, custom: DEFAULT_BLOCK_STYLE_STATE.custom },
 			{ ...selectedState, pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo },
 			...states,
 		];

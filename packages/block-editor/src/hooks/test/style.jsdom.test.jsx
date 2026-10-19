@@ -850,6 +850,29 @@ describe( 'getCanvasStateStyleValue', () => {
 		} );
 	} );
 
+	it( 'layers pseudo, custom and custom pseudo styles in front end specificity order', () => {
+		expect(
+			getCanvasStateStyleValue(
+				{
+					':hover': {
+						color: { background: 'green', text: 'green' },
+						typography: { textDecoration: 'underline' },
+					},
+					'-current': {
+						color: { text: 'red' },
+						':hover': {
+							typography: { fontWeight: '700' },
+						},
+					},
+				},
+				{ viewport: 'default', custom: '-current', pseudo: ':hover' }
+			)
+		).toMatchObject( {
+			color: { background: 'green', text: 'red' },
+			typography: { textDecoration: 'underline', fontWeight: '700' },
+		} );
+	} );
+
 	it( 'layers responsive custom pseudo styles over the custom state styles', () => {
 		expect(
 			getCanvasStateStyleValue(
