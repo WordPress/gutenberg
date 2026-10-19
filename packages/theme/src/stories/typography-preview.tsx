@@ -1,5 +1,13 @@
 import type { CSSProperties } from 'react';
 import { GroupTitle } from './group-title';
+import {
+	descriptionStyle,
+	itemStyle as sharedItemStyle,
+	listStyle,
+	previewStyle,
+	textStyle,
+	tokenNameStyle,
+} from './token-preview-styles';
 import { groups, tokens } from '../../prebuilt/js/design-tokens.mjs';
 
 type TypographyTokenGroup = {
@@ -51,51 +59,13 @@ const typographyConfig: Record< TypographyGroupKey, TypographyTokenGroup > = {
 	},
 };
 
-const previewStyle: CSSProperties = {
-	display: 'flex',
-	flexDirection: 'column',
-	gap: 'var(--wpds-dimension-gap-3xl)',
-	color: 'var(--wpds-color-foreground-content-neutral)',
-};
-
-const listStyle: CSSProperties = {
-	display: 'flex',
-	flexDirection: 'column',
-	gap: 'var(--wpds-dimension-gap-md)',
-	margin: 0,
-	padding: 0,
-};
-
+// Stack the token name and description above the sample.
 const itemStyle: CSSProperties = {
+	...sharedItemStyle,
 	display: 'flex',
 	flexDirection: 'column',
+	alignItems: 'stretch',
 	gap: 'var(--wpds-dimension-gap-md)',
-	padding: 'var(--wpds-dimension-padding-lg)',
-	backgroundColor: 'var(--wpds-color-background-surface-neutral-weak)',
-	border: 'var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral-weak)',
-	borderRadius: 'var(--wpds-border-radius-sm)',
-};
-
-const tokenNameStyle: CSSProperties = {
-	fontFamily: 'var(--wpds-typography-font-family-mono)',
-	fontSize: 'var(--wpds-typography-font-size-sm)',
-	fontStyle: 'normal',
-	fontWeight: 'var(--wpds-typography-font-weight-default)',
-	lineHeight: 'var(--wpds-typography-line-height-sm)',
-	overflowWrap: 'anywhere',
-};
-
-const tokenNameContainerStyle: CSSProperties = {
-	display: 'flex',
-	flexDirection: 'column',
-	gap: 'var(--wpds-dimension-gap-xs)',
-	margin: 0,
-};
-
-const descriptionStyle: CSSProperties = {
-	fontSize: 'var(--wpds-typography-font-size-sm)',
-	lineHeight: 'var(--wpds-typography-line-height-sm)',
-	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 };
 
 const sampleStyle: CSSProperties = {
@@ -132,7 +102,7 @@ function TypographyTokenSection( {
 
 					return (
 						<div key={ tokenName } style={ itemStyle }>
-							<dt style={ tokenNameContainerStyle }>
+							<dt style={ textStyle }>
 								<code style={ tokenNameStyle }>
 									{ tokenName }
 								</code>

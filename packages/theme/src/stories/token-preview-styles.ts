@@ -32,15 +32,19 @@ export const itemStyle: CSSProperties = {
 
 export const tokenNameStyle: CSSProperties = {
 	fontFamily: 'var(--wpds-typography-font-family-mono)',
-	fontSize: 'var(--wpds-typography-font-size-sm)',
-	lineHeight: 'var(--wpds-typography-line-height-sm)',
+	fontSize: 'var(--wpds-typography-font-size-md)',
+	fontStyle: 'normal',
+	fontWeight: 'var(--wpds-typography-font-weight-default)',
+	lineHeight: 'var(--wpds-typography-line-height-md)',
 	overflowWrap: 'anywhere',
 };
 
 export const descriptionStyle: CSSProperties = {
 	margin: 0,
-	fontSize: 'var(--wpds-typography-font-size-sm)',
-	lineHeight: 'var(--wpds-typography-line-height-sm)',
+	fontSize: 'var(--wpds-typography-font-size-md)',
+	fontStyle: 'normal',
+	fontWeight: 'var(--wpds-typography-font-weight-default)',
+	lineHeight: 'var(--wpds-typography-line-height-md)',
 	color: 'var(--wpds-color-foreground-content-neutral-weak)',
 };
 

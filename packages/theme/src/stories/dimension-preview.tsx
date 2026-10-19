@@ -90,7 +90,6 @@ const dimensionConfig: Record< DimensionGroupKey, DimensionKind > = {
 					...boxStyle,
 					display: 'block',
 					width: `var(${ name })`,
-					maxWidth: '100%',
 					height: 'var(--wpds-dimension-size-md)',
 				} }
 			/>
@@ -137,7 +136,10 @@ export function DimensionTokenPreview() {
 									<dd
 										style={ {
 											margin: 0,
-											overflow: 'hidden',
+											// Let wide examples (surface widths) scroll instead of
+											// shrinking, so their widths stay comparable.
+											minWidth: 0,
+											overflowX: 'auto',
 										} }
 										aria-hidden="true"
 									>
