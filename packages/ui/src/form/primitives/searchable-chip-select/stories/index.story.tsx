@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useEffect, useState } from '@wordpress/element';
 import { SearchableChipSelect } from '../';
 import {
 	GROUPED_ITEMS,
@@ -52,6 +52,61 @@ export const Default: Story = {
 		defaultValue: [ ITEMS[ 0 ], ITEMS[ 1 ] ],
 		items: ITEMS,
 		'aria-label': 'Fruit',
+	},
+};
+
+// TODO: Remove this temporary story before merge.
+export const AsyncItemsPermanentLoading: Story = {
+	args: {
+		'aria-label': 'Fruit',
+		items: [],
+		statusContent: <SearchableChipSelect.LoadingIndicator />,
+		emptyContent: null,
+	},
+};
+
+// TODO: Remove this temporary story before merge.
+export const AsyncItemsWithCreatable: Story = {
+	args: {
+		'aria-label': 'Fruit',
+	},
+	render: function Template( args ) {
+		const [ open, setOpen ] = useState( false );
+		const [ loading, setLoading ] = useState( true );
+		const creatableItem = {
+			value: 'create',
+			label: 'Create a new fruit',
+			creatable: true,
+		};
+
+		useEffect( () => {
+			if ( ! open ) {
+				return;
+			}
+			const timeout = setTimeout( () => setLoading( false ), 2000 );
+			return () => clearTimeout( timeout );
+		}, [ open ] );
+
+		return (
+			<SearchableChipSelect
+				{ ...args }
+				open={ open }
+				items={
+					loading ? [ creatableItem ] : [ ...ITEMS, creatableItem ]
+				}
+				statusContent={
+					loading ? <SearchableChipSelect.LoadingIndicator /> : null
+				}
+				emptyContent={ loading ? null : undefined }
+				onOpenChange={ ( nextOpen, eventDetails ) => {
+					setOpen( nextOpen );
+					if ( nextOpen ) {
+						setLoading( true );
+					}
+					args.onOpenChange?.( nextOpen, eventDetails );
+				} }
+			/>
+		);
 	},
 };
 
