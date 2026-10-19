@@ -297,7 +297,15 @@ describe( 'Preview', () => {
 		await editorPage.bringToFront();
 		await editorPage.waitForSelector( '.editor-post-switch-to-draft' );
 		await editorPage.click( '.editor-post-switch-to-draft' );
-		await page.keyboard.press( 'Enter' );
+		const confirmButton = await editorPage.waitForXPath(
+			'//*[@role="dialog"]//button[text()="OK"]'
+		);
+		await confirmButton.click();
+
+		// Wait for the status change.
+		await editorPage.waitForSelector(
+			'.editor-post-publish-panel__toggle'
+		);
 
 		// Change the title.
 		await editorPage.type( '[aria-label="Add title"]', 'Draft ' );
