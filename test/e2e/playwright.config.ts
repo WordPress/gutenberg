@@ -12,7 +12,7 @@ const STORAGE_STATE_PATH =
 
 const config = defineConfig( {
 	reporter: process.env.CI
-		? [ [ 'github' ], [ './config/flaky-tests-reporter.ts' ] ]
+		? [ [ 'github' ] ]
 		: 'list',
 	forbidOnly: !! process.env.CI,
 	workers: 1,
