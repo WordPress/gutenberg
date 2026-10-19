@@ -1125,6 +1125,7 @@ test.describe( 'Draggable text (@firefox, @webkit)', () => {
 	test( 'moves selected text into another paragraph', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.setContent( `<!-- wp:paragraph -->
 <p>First second third</p>
@@ -1161,11 +1162,22 @@ test.describe( 'Draggable text (@firefox, @webkit)', () => {
 					.evaluate( () => window.getSelection().toString() )
 			)
 			.toBe( 'second ' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First second third' },
+			},
+			{ name: 'core/paragraph', attributes: { content: 'Fourth fifth' } },
+		] );
 	} );
 
 	test( 'moves selected text within a paragraph', async ( {
 		editor,
 		page,
+		pageUtils,
 	} ) => {
 		await editor.setContent( `<!-- wp:paragraph -->
 <p>First second third</p>
@@ -1182,6 +1194,64 @@ test.describe( 'Draggable text (@firefox, @webkit)', () => {
 			{
 				name: 'core/paragraph',
 				attributes: { content: 'second First third' },
+			},
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First second third' },
+			},
+		] );
+	} );
+
+	test( 'inserts text dropped from outside the editor', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First-third</p>
+<!-- /wp:paragraph -->` );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const target = await pointAt( page, paragraph, 6 );
+		const frameBox = await page
+			.locator( '[name="editor-canvas"]' )
+			.boundingBox();
+
+		// Playwright cannot drag from outside the page, so the drop is
+		// dispatched with the data another application would give it.
+		await paragraph.evaluate(
+			( node, [ clientX, clientY ] ) => {
+				const { defaultView } = node.ownerDocument;
+				const dataTransfer = new defaultView.DataTransfer();
+				dataTransfer.setData( 'text/plain', 'second-' );
+				dataTransfer.setData(
+					'text/html',
+					'<span style="color: red;"><b>second</b>-</span>'
+				);
+				node.dispatchEvent(
+					new defaultView.DragEvent( 'drop', {
+						bubbles: true,
+						cancelable: true,
+						clientX,
+						clientY,
+						dataTransfer,
+					} )
+				);
+			},
+			[ target.x - frameBox.x, target.y - frameBox.y ]
+		);
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First-<strong>second</strong>-third',
+				},
 			},
 		] );
 	} );

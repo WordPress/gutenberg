@@ -18,21 +18,129 @@ const { ownsSelection } = unlock( richTextPrivateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
+/**
+ * Inserts pasted or dropped content into a rich text value, the way the field
+ * would on paste.
+ *
+ * @param {Object}  props           Rich text props, with the value to insert
+ *                                  into.
+ * @param {Object}  data            Content to insert.
+ * @param {string}  data.html       HTML content.
+ * @param {string}  data.plainText  Plain text content.
+ * @param {boolean} data.isInternal Whether a rich text field put the content
+ *                                  there.
+ * @return {boolean} Whether the content was inserted.
+ */
+export function pasteContent( props, { html, plainText, isInternal } ) {
+	const {
+		disableFormats,
+		onChange,
+		value,
+		formatTypes,
+		tagName,
+		onReplace,
+		__unstableEmbedURLOnPaste,
+		preserveWhiteSpace,
+		pastePlainText,
+		registry,
+	} = props;
+
+	// Allows us to ask for this information when we get a report.
+	// `pasteHandler` also logs this, but we're not using `pasteHandler` in
+	// every case.
+	window.console.log( 'Received HTML (RichText):\n\n', html );
+	window.console.log( 'Received plain text (RichText):\n\n', plainText );
+
+	if ( disableFormats ) {
+		onChange( insert( value, plainText ) );
+		return true;
+	}
+
+	function pasteInline( content ) {
+		const transformed = formatTypes.reduce(
+			( accumulator, { __unstablePasteRule } ) => {
+				// Only allow one transform.
+				if ( __unstablePasteRule && accumulator === value ) {
+					accumulator = __unstablePasteRule( value, {
+						html,
+						plainText,
+					} );
+				}
+
+				return accumulator;
+			},
+			value
+		);
+		if ( transformed !== value ) {
+			onChange( transformed );
+		} else {
+			const valueToInsert = create( { html: content } );
+			addActiveFormats( valueToInsert, getActiveFormats( value ) );
+			onChange( insert( value, valueToInsert ) );
+		}
+	}
+
+	// If the data comes from a rich text instance, we can directly use it
+	// without filtering the data. The filters are only meant for externally
+	// pasted content and remove inline styles.
+	if ( isInternal ) {
+		pasteInline( html );
+		return true;
+	}
+
+	if ( pastePlainText ) {
+		const valueToInsert = create( { text: plainText } );
+		addActiveFormats( valueToInsert, getActiveFormats( value ) );
+		onChange( insert( value, valueToInsert ) );
+		return true;
+	}
+
+	let mode = 'INLINE';
+
+	const trimmedPlainText = plainText.trim();
+
+	if (
+		__unstableEmbedURLOnPaste &&
+		isEmpty( value ) &&
+		isURL( trimmedPlainText ) &&
+		// For the link pasting feature, allow only http(s) protocols.
+		/^https?:/.test( trimmedPlainText )
+	) {
+		mode = 'BLOCKS';
+	}
+
+	const content = pasteHandler( {
+		HTML: html,
+		plainText,
+		mode,
+		tagName,
+		preserveWhiteSpace,
+	} );
+
+	if ( typeof content === 'string' ) {
+		pasteInline( content );
+		return true;
+	}
+
+	if ( ! content.length || ! onReplace || ! isEmpty( value ) ) {
+		return false;
+	}
+
+	// Record an intermediate paragraph-with-URL state so a single undo
+	// after the URL → block transformation restores the pasted link.
+	if ( mode === 'BLOCKS' ) {
+		pasteInline( html );
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
+	}
+
+	onReplace( content, content.length - 1, -1 );
+	return true;
+}
+
 export default ( props ) => ( element ) => {
 	function _onPaste( event ) {
-		const {
-			disableFormats,
-			onChange,
-			value,
-			formatTypes,
-			tagName,
-			onReplace,
-			__unstableEmbedURLOnPaste,
-			preserveWhiteSpace,
-			pastePlainText,
-			registry,
-		} = props.current;
-
 		// The event listener is attached to the window, so we need to check if
 		// the target is the element or inside the element. When the editable
 		// wrapper holds focus (the selected block supports `editableRoot`),
@@ -66,100 +174,11 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		// Allows us to ask for this information when we get a report.
-		// `pasteHandler` also logs this, but we're not using `pasteHandler` in
-		// every case.
-		window.console.log( 'Received HTML (RichText):\n\n', html );
-		window.console.log( 'Received plain text (RichText):\n\n', plainText );
-
-		if ( disableFormats ) {
-			onChange( insert( value, plainText ) );
-			return;
-		}
-
-		const isInternal =
-			event.clipboardData.getData( 'rich-text' ) === 'true';
-
-		function pasteInline( content ) {
-			const transformed = formatTypes.reduce(
-				( accumulator, { __unstablePasteRule } ) => {
-					// Only allow one transform.
-					if ( __unstablePasteRule && accumulator === value ) {
-						accumulator = __unstablePasteRule( value, {
-							html,
-							plainText,
-						} );
-					}
-
-					return accumulator;
-				},
-				value
-			);
-			if ( transformed !== value ) {
-				onChange( transformed );
-			} else {
-				const valueToInsert = create( { html: content } );
-				addActiveFormats( valueToInsert, getActiveFormats( value ) );
-				onChange( insert( value, valueToInsert ) );
-			}
-		}
-
-		// If the data comes from a rich text instance, we can directly use it
-		// without filtering the data. The filters are only meant for externally
-		// pasted content and remove inline styles.
-		if ( isInternal ) {
-			pasteInline( html );
-			return;
-		}
-
-		if ( pastePlainText ) {
-			const valueToInsert = create( { text: plainText } );
-			addActiveFormats( valueToInsert, getActiveFormats( value ) );
-			onChange( insert( value, valueToInsert ) );
-			return;
-		}
-
-		let mode = 'INLINE';
-
-		const trimmedPlainText = plainText.trim();
-
-		if (
-			__unstableEmbedURLOnPaste &&
-			isEmpty( value ) &&
-			isURL( trimmedPlainText ) &&
-			// For the link pasting feature, allow only http(s) protocols.
-			/^https?:/.test( trimmedPlainText )
-		) {
-			mode = 'BLOCKS';
-		}
-
-		const content = pasteHandler( {
-			HTML: html,
+		pasteContent( props.current, {
+			html,
 			plainText,
-			mode,
-			tagName,
-			preserveWhiteSpace,
+			isInternal: event.clipboardData.getData( 'rich-text' ) === 'true',
 		} );
-
-		if ( typeof content === 'string' ) {
-			pasteInline( content );
-			return;
-		}
-
-		if ( ! content.length || ! onReplace || ! isEmpty( value ) ) {
-			return;
-		}
-
-		// Record an intermediate paragraph-with-URL state so a single undo
-		// after the URL → block transformation restores the pasted link.
-		if ( mode === 'BLOCKS' ) {
-			pasteInline( html );
-			registry
-				.dispatch( blockEditorStore )
-				.__unstableMarkLastChangeAsPersistent();
-		}
-
-		onReplace( content, content.length - 1, -1 );
 	}
 
 	const { defaultView } = element.ownerDocument;

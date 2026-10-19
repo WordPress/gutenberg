@@ -1,16 +1,8 @@
 import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-import {
-	create,
-	insert,
-	remove,
-	slice,
-	toHTMLString,
-	RichTextData,
-} from '@wordpress/rich-text';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
@@ -43,7 +35,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
-		getBlockAttributes,
 		getSelectionStart,
 		getSelectionEnd,
 	} = unlock( useSelect( blockEditorStore ) );
@@ -53,10 +44,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		startDraggingBlocks,
 		stopDraggingBlocks,
 		editContentOnlySection,
-		updateBlockAttributes,
-		selectionChange,
 	} = unlock( useDispatch( blockEditorStore ) );
-	const registry = useRegistry();
 
 	return useRefEffect(
 		( node ) => {
@@ -269,176 +257,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			}
 
 			/**
-			 * Starts a drag of the text selected within one rich text field.
-			 * The drop moves the text through the rich text values, not the
-			 * browser's own drop editing.
-			 *
-			 * @param {DragEvent} event Drag start event.
-			 * @return {boolean} Whether a text drag started.
-			 */
-			function startTextDrag( event ) {
-				const { ownerDocument } = node;
-				const source = getSelectionStart();
-				const sourceEnd = getSelectionEnd();
-				if (
-					// Safari before 26.2 cannot locate the drop position.
-					! ownerDocument.caretPositionFromPoint ||
-					source.attributeKey === undefined ||
-					source.clientId !== sourceEnd.clientId ||
-					source.attributeKey !== sourceEnd.attributeKey ||
-					source.offset === sourceEnd.offset
-				) {
-					return false;
-				}
-
-				const sourceAttribute = getBlockAttributes( source.clientId )[
-					source.attributeKey
-				];
-				const sourceValue = create( {
-					html: sourceAttribute.toString(),
-				} );
-				const from = Math.min( source.offset, sourceEnd.offset );
-				const to = Math.max( source.offset, sourceEnd.offset );
-				const dragged = slice( sourceValue, from, to );
-
-				event.dataTransfer.effectAllowed = 'move';
-				event.dataTransfer.clearData();
-				event.dataTransfer.setData( 'text/plain', dragged.text );
-				event.dataTransfer.setData(
-					'text/html',
-					toHTMLString( { value: dragged } )
-				);
-
-				const { defaultView } = ownerDocument;
-
-				function getDropTarget( { clientX, clientY } ) {
-					const position = ownerDocument.caretPositionFromPoint(
-						clientX,
-						clientY
-					);
-					if ( ! position ) {
-						return;
-					}
-					const range = ownerDocument.createRange();
-					range.setStart( position.offsetNode, position.offset );
-					const { startContainer } = range;
-					const field = (
-						startContainer.nodeType === startContainer.ELEMENT_NODE
-							? startContainer
-							: startContainer.parentElement
-					)?.closest( '[data-wp-block-attribute-key]' );
-					const block = field?.closest( '[data-block]' );
-					if ( ! block ) {
-						return;
-					}
-					return {
-						element: field,
-						clientId: block.dataset.block,
-						attributeKey: field.dataset.wpBlockAttributeKey,
-						offset: create( {
-							element: field,
-							range,
-							__unstableIsEditableTree: true,
-						} ).start,
-					};
-				}
-
-				// The block drop zones cancel every drag over them, which
-				// hides the browser's drop caret and shows the block
-				// insertion point instead.
-				function stop( e ) {
-					e.stopPropagation();
-				}
-
-				// Canceling the drop replaces the browser's insertion and
-				// tells the block drop zones the drop is handled.
-				function onDrop( e ) {
-					e.preventDefault();
-					end();
-					const target = getDropTarget( e );
-					if ( ! target ) {
-						return;
-					}
-					const isSameField =
-						target.clientId === source.clientId &&
-						target.attributeKey === source.attributeKey;
-					if (
-						isSameField &&
-						target.offset >= from &&
-						target.offset <= to
-					) {
-						return;
-					}
-
-					const toAttribute = ( value, current ) =>
-						typeof current === 'string'
-							? toHTMLString( { value } )
-							: new RichTextData( value );
-					const removed = remove( sourceValue, from, to );
-					let at = target.offset;
-					let targetValue = removed;
-					let targetAttribute = sourceAttribute;
-					if ( isSameField ) {
-						if ( at > to ) {
-							at -= to - from;
-						}
-					} else {
-						targetAttribute = getBlockAttributes( target.clientId )[
-							target.attributeKey
-						];
-						targetValue = create( {
-							html: targetAttribute.toString(),
-						} );
-					}
-					const inserted = insert( targetValue, dragged, at, at );
-
-					// Rich text only applies the new selection to a focused
-					// field. A field inside an editing host cannot hold focus.
-					const host =
-						target.element.parentElement.closest(
-							'[contenteditable]'
-						);
-					( host?.isContentEditable ? host : target.element ).focus();
-
-					registry.batch( () => {
-						if ( ! isSameField ) {
-							updateBlockAttributes( source.clientId, {
-								[ source.attributeKey ]: toAttribute(
-									removed,
-									sourceAttribute
-								),
-							} );
-						}
-						updateBlockAttributes( target.clientId, {
-							[ target.attributeKey ]: toAttribute(
-								inserted,
-								targetAttribute
-							),
-						} );
-						selectionChange(
-							target.clientId,
-							target.attributeKey,
-							at,
-							at + dragged.text.length
-						);
-					} );
-				}
-
-				function end() {
-					defaultView.removeEventListener( 'dragenter', stop, true );
-					defaultView.removeEventListener( 'dragover', stop, true );
-					defaultView.removeEventListener( 'drop', onDrop, true );
-					defaultView.removeEventListener( 'dragend', end, true );
-				}
-
-				defaultView.addEventListener( 'dragenter', stop, true );
-				defaultView.addEventListener( 'dragover', stop, true );
-				defaultView.addEventListener( 'drop', onDrop, true );
-				defaultView.addEventListener( 'dragend', end, true );
-				return true;
-			}
-
-			/**
 			 * Prevents default dragging behavior within a block, except when
 			 * the block is part of a multi selection (then the drag moves
 			 * all selected blocks).
@@ -472,7 +290,16 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					canMoveBlocks( getSelectedBlockClientIds() );
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
-					if ( ! startTextDrag( event ) ) {
+					const selectionStart = getSelectionStart();
+					const selectionEnd = getSelectionEnd();
+					// Rich text moves text selected within one of its fields.
+					const isTextDrag =
+						selectionStart.attributeKey !== undefined &&
+						selectionStart.clientId === selectionEnd.clientId &&
+						selectionStart.attributeKey ===
+							selectionEnd.attributeKey &&
+						selectionStart.offset !== selectionEnd.offset;
+					if ( ! isTextDrag ) {
 						event.preventDefault();
 					}
 					return;
@@ -732,6 +559,8 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			getBlockRootClientId,
 			getSelectedBlockClientIds,
 			getBlock,
+			getSelectionStart,
+			getSelectionEnd,
 			isReusableBlock,
 			isTemplatePart,
 			removeBlock,
@@ -744,12 +573,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			isSectionBlock,
 			editedContentOnlySection,
 			editContentOnlySection,
-			getBlockAttributes,
-			getSelectionStart,
-			getSelectionEnd,
-			updateBlockAttributes,
-			selectionChange,
-			registry,
 		]
 	);
 }
