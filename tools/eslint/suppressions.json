@@ -1806,7 +1806,7 @@
 	},
 	"packages/block-editor/src/components/link-control/link-preview.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/link-control/settings.tsx": {
