@@ -124,6 +124,8 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 
 		// Put the render filters back the way the rest of the suite expects.
 		remove_filter( 'render_block', 'gutenberg_notes_preview_add_block_anchor', 20 );
+		remove_filter( 'render_block', 'gutenberg_notes_preview_strip_other_posts' );
+		unset( $_GET['preview_id'], $_GET['preview_nonce'] );
 
 		if ( ! has_filter( 'render_block', 'wp_strip_inline_note_markers' ) ) {
 			add_filter( 'render_block', 'wp_strip_inline_note_markers' );
@@ -308,6 +310,37 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
 	}
 
+	public function test_reviewer_cannot_list_trashed_notes() {
+		$this->grant( self::$post_id, array( 'read_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		$request->set_param( 'post', self::$post_id );
+		$request->set_param( 'type', 'note' );
+		$request->set_param( 'status', 'trash' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+	}
+
+	public function test_reviewer_cannot_read_a_trashed_note() {
+		$note_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => self::$post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 'trash',
+			)
+		);
+
+		$this->grant( self::$post_id, array( 'read_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$response = rest_get_server()->dispatch( new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id ) );
+
+		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+	}
+
 	public function test_reviewer_can_read_single_note() {
 		$this->grant( self::$post_id, array( 'read_post_notes' ) );
 		wp_set_current_user( self::$reviewer_id );
@@ -420,6 +453,54 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
 	}
 
+	/**
+	 * @dataProvider data_reviewer_cannot_reply_outside_an_open_thread
+	 *
+	 * @param string $parent_type Which parent the reply targets.
+	 */
+	public function test_reviewer_cannot_reply_outside_an_open_thread( $parent_type ) {
+		if ( 'resolved' === $parent_type ) {
+			$parent_id = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => self::$post_id,
+					'comment_type'     => 'note',
+					'comment_approved' => 1,
+				)
+			);
+		} else {
+			$parent_id = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => self::$post_id,
+					'comment_type'     => 'note',
+					'comment_approved' => 'trash' === $parent_type ? 'trash' : 0,
+					'comment_parent'   => 'reply' === $parent_type ? self::$note_id : 0,
+				)
+			);
+		}
+
+		$this->grant( self::$post_id, array( 'read_post_notes', 'create_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'post', self::$post_id );
+		$request->set_param( 'type', 'note' );
+		$request->set_param( 'parent', $parent_id );
+		$request->set_param( 'status', 'hold' );
+		$request->set_param( 'content', 'Out of place.' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+	}
+
+	public function data_reviewer_cannot_reply_outside_an_open_thread() {
+		return array(
+			'resolved thread' => array( 'resolved' ),
+			'trashed thread'  => array( 'trash' ),
+			'nested reply'    => array( 'reply' ),
+		);
+	}
+
 	public function test_reviewer_cannot_delete_a_note() {
 		$this->grant( self::$post_id, array( 'read_post_notes', 'create_post_notes' ) );
 		wp_set_current_user( self::$reviewer_id );
@@ -503,6 +584,30 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 		wp_delete_post( $post_id, true );
 	}
 
+	public function test_reviewer_preview_drops_a_foreign_preview_nonce() {
+		$this->grant( self::$post_id, array( 'read_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$_GET['preview_id']    = self::$post_id;
+		$_GET['preview_nonce'] = 'not-for-this-user';
+
+		gutenberg_notes_preview_drop_foreign_preview_nonce();
+
+		$this->assertArrayNotHasKey( 'preview_id', $_GET );
+		$this->assertArrayNotHasKey( 'preview_nonce', $_GET );
+	}
+
+	public function test_preview_nonce_is_kept_for_users_without_a_grant() {
+		wp_set_current_user( self::$outsider_id );
+
+		$_GET['preview_id']    = self::$post_id;
+		$_GET['preview_nonce'] = 'not-for-this-user';
+
+		gutenberg_notes_preview_drop_foreign_preview_nonce();
+
+		$this->assertArrayHasKey( 'preview_nonce', $_GET );
+	}
+
 	public function test_non_preview_request_is_untouched() {
 		$this->grant( self::$post_id, array( 'read_post_notes' ) );
 		wp_set_current_user( self::$reviewer_id );
@@ -560,6 +665,35 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 		// Inline markers carry information the reviewer is entitled to read.
 		$this->assertFalse( has_filter( 'render_block', 'wp_strip_inline_note_markers' ) );
 		$this->assertFalse( has_filter( 'render_block', 'gutenberg_strip_inline_note_markers' ) );
+	}
+
+	public function test_other_posts_on_the_preview_keep_their_markers_stripped() {
+		$this->grant( self::$post_id, array( 'read_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$this->go_to( $this->preview_url( self::$post_id ) );
+		gutenberg_notes_preview_maybe_enable_anchors();
+
+		$html  = '<p>Some <mark class="wp-note" data-id="5">noted</mark> text.</p>';
+		$block = array( 'attrs' => array( 'metadata' => array( 'noteId' => 5 ) ) );
+
+		$render = static function () use ( $html, $block ) {
+			return gutenberg_notes_preview_add_block_anchor(
+				gutenberg_notes_preview_strip_other_posts( $html ),
+				$block
+			);
+		};
+
+		$GLOBALS['post'] = get_post( self::$post_id );
+		$reviewed        = $render();
+		$this->assertStringContainsString( 'wp-note', $reviewed );
+		$this->assertStringContainsString( 'data-wp-note-id="5"', $reviewed );
+
+		// A Query Loop item sets up its own post as the global post.
+		$GLOBALS['post'] = get_post( self::$other_post_id );
+		$other           = $render();
+		$this->assertStringNotContainsString( 'wp-note', $other );
+		$this->assertStringNotContainsString( 'data-wp-note-id', $other );
 	}
 
 	public function test_anchor_filters_are_not_armed_without_the_capability() {
