@@ -27,6 +27,7 @@ import {
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { getBrowserslistQueries } from './browserslist.mjs';
 import { getSourceFileGlob, isTestSourceFile } from './source-files.mjs';
+import { svgInlinePlugin } from './svg-inline-plugin.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
@@ -592,6 +593,7 @@ async function bundlePackage( packageName, options = {} ) {
 		const baseBundlePlugins = [
 			momentTimezoneAliasPlugin(),
 			styleRuntimeAliasPlugin(),
+			svgInlinePlugin(),
 		];
 
 		builds.push(
@@ -685,6 +687,7 @@ async function bundlePackage( packageName, options = {} ) {
 					define: getDefine( false ),
 					plugins: [
 						styleRuntimeAliasPlugin(),
+						svgInlinePlugin(),
 						wordpressExternalsPlugin(
 							`${ baseFileName }.min`,
 							'esm',
@@ -714,6 +717,7 @@ async function bundlePackage( packageName, options = {} ) {
 						conditions: developmentConditions,
 						plugins: [
 							styleRuntimeAliasPlugin(),
+							svgInlinePlugin(),
 							wordpressExternalsPlugin(
 								`${ baseFileName }.min`,
 								'esm',
@@ -1400,6 +1404,7 @@ async function transpilePackage( packageName ) {
 	const plugins = [
 		dsTokenFallbacksJs,
 		wasmInlinePlugin,
+		svgInlinePlugin(),
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
 		...createStyleBundlingPlugins( packageDir ),
@@ -1694,6 +1699,7 @@ async function buildRoute( routeName ) {
 					define: getDefine( false ),
 					plugins: [
 						styleRuntimeAliasPlugin(),
+						svgInlinePlugin(),
 						wordpressExternalsPlugin(
 							'route.min',
 							'esm',
@@ -1713,6 +1719,7 @@ async function buildRoute( routeName ) {
 					conditions: developmentConditions,
 					plugins: [
 						styleRuntimeAliasPlugin(),
+						svgInlinePlugin(),
 						wordpressExternalsPlugin(
 							'route.min',
 							'esm',
@@ -1746,6 +1753,7 @@ async function buildRoute( routeName ) {
 				define: getDefine( false ),
 				plugins: [
 					...createStyleBundlingPlugins( routeDir ),
+					svgInlinePlugin(),
 					wordpressExternalsPlugin(
 						'content.min',
 						'esm',
@@ -1765,6 +1773,7 @@ async function buildRoute( routeName ) {
 				conditions: developmentConditions,
 				plugins: [
 					...createStyleBundlingPlugins( routeDir ),
+					svgInlinePlugin(),
 					wordpressExternalsPlugin(
 						'content.min',
 						'esm',
@@ -1857,6 +1866,7 @@ async function buildWidget( widgetName ) {
 					define: getDefine( false ),
 					plugins: [
 						...createStyleBundlingPlugins( widgetDir ),
+						svgInlinePlugin(),
 						wordpressExternalsPlugin(
 							'render.min',
 							'esm',
@@ -1876,6 +1886,7 @@ async function buildWidget( widgetName ) {
 					conditions: developmentConditions,
 					plugins: [
 						...createStyleBundlingPlugins( widgetDir ),
+						svgInlinePlugin(),
 						wordpressExternalsPlugin(
 							'render.min',
 							'esm',
@@ -1908,6 +1919,7 @@ async function buildWidget( widgetName ) {
 					define: getDefine( false ),
 					plugins: [
 						styleRuntimeAliasPlugin(),
+						svgInlinePlugin(),
 						wordpressExternalsPlugin(
 							'widget.min',
 							'esm',
@@ -1927,6 +1939,7 @@ async function buildWidget( widgetName ) {
 					conditions: developmentConditions,
 					plugins: [
 						styleRuntimeAliasPlugin(),
+						svgInlinePlugin(),
 						wordpressExternalsPlugin(
 							'widget.min',
 							'esm',
