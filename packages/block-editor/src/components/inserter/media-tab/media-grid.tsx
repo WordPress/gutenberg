@@ -1,0 +1,331 @@
+import type { ReactNode } from 'react';
+import { useCallback, useMemo } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { DataViews } from '@wordpress/dataviews';
+import type { Action, Field, View } from '@wordpress/dataviews';
+import { Spinner as WCSpinner } from '@wordpress/components';
+import { Stack, Tabs } from '@wordpress/ui';
+import InserterDraggableBlocks from '../../inserter-draggable-blocks';
+import MediaSearch from './media-search';
+import { getBlockAndPreviewFromMedia, getItemId } from './utils';
+import type { MediaItem, MediaType } from './types';
+
+type MediaGridProps = {
+	// Results.
+	/**
+	 * The items for the current page. Empty until the requested source
+	 * resolves, so the previous source's items never show under a new tab.
+	 */
+	mediaList: MediaItem[];
+	isLoading: boolean;
+	totalItems?: number;
+	totalPages?: number;
+
+	// Search row.
+	search: string;
+	onChangeSearch: ( search: string ) => void;
+	searchLabel: string;
+	/**
+	 * Rendered beside the search input (the source menu).
+	 */
+	sourceMenu?: ReactNode;
+
+	// Media-type tabs.
+	/**
+	 * Fewer than two renders no tab bar, since there is nothing to switch
+	 * between.
+	 */
+	mediaTypes?: { value: MediaType; label: string }[];
+	mediaType: MediaType;
+	onChangeMediaType?: ( mediaType: MediaType ) => void;
+
+	// Grid.
+	/**
+	 * Called with the item the reader chose to insert.
+	 */
+	onClickItem: ( item: MediaItem ) => void;
+	/**
+	 * The item whose insert is in flight, shown with a spinner.
+	 */
+	insertingId?: string;
+	/**
+	 * Per-item actions, shown in each card's menu.
+	 */
+	actions: Action< MediaItem >[];
+	/**
+	 * Rendered when there are no items to show.
+	 */
+	empty: ReactNode;
+
+	// Footer.
+	page: number;
+	/**
+	 * Items per page, as requested from the source by the panel.
+	 */
+	perPage: number;
+	onChangePage: ( page: number ) => void;
+	/**
+	 * Rendered beneath the pager (e.g. the attach button).
+	 */
+	footer?: ReactNode;
+};
+
+// A 120px minimum gives two columns at the inserter's width (the grid derives
+// its column count from the container width and this size).
+const GRID_LAYOUT = {
+	previewSize: 120,
+	density: 'compact',
+	mediaFit: 'contain',
+} as const;
+const DEFAULT_LAYOUTS = { grid: { layout: GRID_LAYOUT } };
+
+const getTitle = ( item: MediaItem ) =>
+	typeof item.title === 'string'
+		? item.title
+		: item.title?.rendered || __( 'no title' );
+
+function MediaGridPreview( {
+	item,
+	mediaType,
+	isInserting,
+}: {
+	item: MediaItem;
+	mediaType: MediaType;
+	isInserting: boolean;
+} ) {
+	const [ block, preview ] = useMemo(
+		() => getBlockAndPreviewFromMedia( item, mediaType ),
+		[ item, mediaType ]
+	);
+	// The card's media area is the click-to-insert target (a DataViews click
+	// wrapper); the preview inside it is what gets dragged onto the canvas. A
+	// native drag doesn't emit a click, so the two don't collide.
+	return (
+		<InserterDraggableBlocks isEnabled blocks={ [ block ] }>
+			{ ( { draggable, onDragStart, onDragEnd } ) => (
+				<div
+					className="block-editor-inserter__media-grid__preview"
+					draggable={ draggable }
+					onDragStart={ onDragStart }
+					onDragEnd={ onDragEnd }
+				>
+					{ preview }
+					{ isInserting && (
+						<div className="block-editor-inserter__media-grid__spinner">
+							<WCSpinner />
+						</div>
+					) }
+				</div>
+			) }
+		</InserterDraggableBlocks>
+	);
+}
+
+/**
+ * Which items of the whole set this page holds, so "Page 3 of 42" is never
+ * the only wayfinding.
+ *
+ * Derived from the page rather than from the items in hand, which are cleared
+ * while the next page loads. The last page is clamped to the total.
+ */
+function getItemRange( {
+	page,
+	perPage,
+	totalItems,
+}: {
+	page: number;
+	perPage: number;
+	totalItems: number;
+} ) {
+	if ( ! totalItems ) {
+		return undefined;
+	}
+	const start = ( page - 1 ) * perPage + 1;
+	return sprintf(
+		/* translators: 1: The first item shown on the page. 2: The last item shown on the page. 3: The total number of items. */
+		__( '%1$d–%2$d of %3$d' ),
+		start,
+		Math.min( page * perPage, totalItems ),
+		totalItems
+	);
+}
+
+/**
+ * The redesigned media panel body: a DataViews grid with search above and a
+ * pager below, composed from the DataViews sub-components so the view config,
+ * layout switcher and bulk toolbar are left out.
+ */
+export default function MediaGrid( {
+	mediaList,
+	isLoading,
+	totalItems,
+	totalPages,
+	search,
+	onChangeSearch,
+	searchLabel,
+	sourceMenu,
+	mediaTypes,
+	mediaType,
+	onChangeMediaType,
+	onClickItem,
+	insertingId,
+	actions,
+	empty,
+	page,
+	perPage,
+	onChangePage,
+	footer,
+}: MediaGridProps ) {
+	const fields: Field< MediaItem >[] = useMemo(
+		() => [
+			{
+				id: 'preview',
+				label: __( 'Preview' ),
+				type: 'media',
+				render: ( { item } ) => (
+					<MediaGridPreview
+						item={ item }
+						mediaType={ mediaType }
+						isInserting={ getItemId( item ) === insertingId }
+					/>
+				),
+			},
+			{
+				// Hidden from the card but used as its accessible name.
+				id: 'title',
+				label: __( 'Title' ),
+				type: 'text',
+				getValue: ( { item } ) => getTitle( item ),
+				enableSorting: false,
+				enableGlobalSearch: false,
+			},
+		],
+		[ mediaType, insertingId ]
+	);
+
+	const view: View = useMemo(
+		() => ( {
+			type: 'grid',
+			page,
+			perPage,
+			search,
+			fields: [],
+			titleField: 'title',
+			mediaField: 'preview',
+			showTitle: false,
+			showMedia: true,
+			layout: GRID_LAYOUT,
+		} ),
+		[ page, perPage, search ]
+	);
+
+	// The panel owns the page, so changes are forwarded to it rather than
+	// stored here. Search comes in through `MediaSearch`, not the view, so
+	// paging is the only thing `DataViews` changes.
+	const onChangeView = useCallback(
+		( nextView: View ) => {
+			const nextPage = nextView.page ?? 1;
+			if ( nextPage !== page ) {
+				onChangePage( nextPage );
+			}
+		},
+		[ page, onChangePage ]
+	);
+
+	const paginationInfo = useMemo(
+		() => ( {
+			totalItems: totalItems ?? 0,
+			totalPages: totalPages ?? 1,
+		} ),
+		[ totalItems, totalPages ]
+	);
+	const showPagination = paginationInfo.totalPages > 1;
+	const hasTabs = !! mediaTypes && mediaTypes.length > 1;
+	const hasFooter = showPagination || !! footer;
+	const itemRange = getItemRange( {
+		page,
+		perPage,
+		totalItems: paginationInfo.totalItems,
+	} );
+
+	return (
+		<DataViews
+			data={ mediaList }
+			fields={ fields }
+			view={ view }
+			onChangeView={ onChangeView }
+			actions={ actions }
+			isLoading={ isLoading }
+			paginationInfo={ paginationInfo }
+			defaultLayouts={ DEFAULT_LAYOUTS }
+			getItemId={ getItemId }
+			onClickItem={ onClickItem }
+			empty={ empty }
+		>
+			<Stack
+				direction="row"
+				align="center"
+				gap="sm"
+				className="block-editor-inserter__media-grid__search"
+			>
+				<MediaSearch
+					label={ searchLabel }
+					defaultValue={ search }
+					onChange={ onChangeSearch }
+				/>
+				{ sourceMenu }
+			</Stack>
+			{ hasTabs ? (
+				<Tabs.Root
+					value={ mediaType }
+					onValueChange={ onChangeMediaType }
+					className="block-editor-inserter__media-grid__tabs"
+				>
+					<div className="block-editor-inserter__media-grid__tablist">
+						<Tabs.List variant="minimal">
+							{ mediaTypes.map( ( type ) => (
+								<Tabs.Tab
+									key={ type.value }
+									value={ type.value }
+								>
+									{ type.label }
+								</Tabs.Tab>
+							) ) }
+						</Tabs.List>
+					</div>
+					{ /* One panel per tab, as `Tabs` requires the counts to match.
+					   Only the selected one mounts, so a single grid renders. */ }
+					{ mediaTypes.map( ( type ) => (
+						<Tabs.Panel key={ type.value } value={ type.value }>
+							<DataViews.Layout className="block-editor-inserter__media-grid" />
+						</Tabs.Panel>
+					) ) }
+				</Tabs.Root>
+			) : (
+				<DataViews.Layout className="block-editor-inserter__media-grid" />
+			) }
+			{ hasFooter && (
+				<Stack
+					direction="column"
+					gap="lg"
+					className="block-editor-inserter__media-grid__footer"
+				>
+					{ showPagination && (
+						<Stack
+							direction="row"
+							justify="space-between"
+							align="center"
+							gap="sm"
+						>
+							<span className="block-editor-inserter__media-grid__range">
+								{ itemRange }
+							</span>
+							<DataViews.Pagination />
+						</Stack>
+					) }
+					{ footer }
+				</Stack>
+			) }
+		</DataViews>
+	);
+}
