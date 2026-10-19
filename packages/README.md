@@ -275,12 +275,6 @@ Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries a
 -   Omit preserved behavior and internal implementation details. Avoid repeating the same change across subsections.
 -   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations.
 
-For example, summarize a migration's effect on custom styling:
-
-```md
--   `FontFamilyControl`: Change markup and CSS hooks; custom CSS overrides need updating, and `options[].style` now applies only to the option label ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
-```
-
 ### Changelog Entry Format
 
 Under the "Unreleased" heading, add entries as list items under an appropriate `###` subheading (see ["Changelog Subsections"](#changelog-subsections)). Each top-level bullet should end with a link to the pull request and a period. Do not leave blank lines between bullets in a subsection, including before nested bullets.
