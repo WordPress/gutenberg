@@ -1,8 +1,8 @@
+import clsx from 'clsx';
+import { FlexItem } from '../flex';
+import { Text } from '../text';
+import styles from './style.module.scss';
 import { VisuallyHidden } from '../visually-hidden';
-import {
-	Label as BaseLabel,
-	LabelWrapper,
-} from './styles/input-control-styles';
 import type { WordPressComponentProps } from '../context';
 import type { InputControlLabelProps } from './types';
 
@@ -10,6 +10,9 @@ export default function Label( {
 	children,
 	hideLabelFromVision,
 	htmlFor,
+	className,
+	labelPosition: _labelPosition,
+	size: _size,
 	...props
 }: WordPressComponentProps< InputControlLabelProps, 'label', false > ) {
 	if ( ! children ) {
@@ -25,10 +28,15 @@ export default function Label( {
 	}
 
 	return (
-		<LabelWrapper>
-			<BaseLabel htmlFor={ htmlFor } { ...props }>
+		<FlexItem className={ styles[ 'label-wrapper' ] }>
+			<Text
+				{ ...props }
+				as="label"
+				htmlFor={ htmlFor }
+				className={ clsx( styles.label, className ) }
+			>
 				{ children }
-			</BaseLabel>
-		</LabelWrapper>
+			</Text>
+		</FlexItem>
 	);
 }
