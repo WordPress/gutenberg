@@ -15,6 +15,10 @@ import type { GlobalStylesStyles } from '@wordpress/global-styles-engine';
 interface ElementPreviewProps {
 	element: string;
 	/**
+	 * The selected state, such as `:hover`, if any.
+	 */
+	state?: string;
+	/**
 	 * The styles of the selected state, such as `:hover`, if any. The preview
 	 * is inert and can't trigger the state, so it shows these styles on top of
 	 * the sample's own.
@@ -59,6 +63,9 @@ const PREVIEW_CSS = `
 	}
 `;
 
+// The states only a link can match.
+const LINK_ONLY_STATES = [ ':link', ':any-link', ':visited' ];
+
 /**
  * Renders a sample of an element using the site's own styles.
  *
@@ -69,10 +76,12 @@ const PREVIEW_CSS = `
  *
  * @param props
  * @param props.element     The element being previewed.
+ * @param props.state       The selected state, if any.
  * @param props.stateStyles The styles of the selected state, if any.
  */
 export default function ElementPreview( {
 	element,
+	state,
 	stateStyles,
 }: ElementPreviewProps ) {
 	const styles = useSelect(
@@ -108,16 +117,20 @@ export default function ElementPreview( {
 	switch ( element ) {
 		case 'button':
 			// The class is half of the element's selector, so a button only
-			// picks up the element's styles when it carries it. It's a link, as
-			// Button blocks are on the site, so the link-only states such as
-			// `:any-link` apply to it the same way. Form buttons, such as the
-			// Search block's, are `<button>`s, which those states never match,
-			// so for them the preview of a link-only state doesn't hold.
-			sample = (
-				<a className="wp-element-button" href="#anchor">
-					{ __( 'Call to action' ) }
-				</a>
-			);
+			// picks up the element's styles when it carries it. Button blocks
+			// are links and form buttons, such as the Search block's, are
+			// `<button>`s. Only links match the link-only states, such as
+			// `:visited`, so show a link for those and a form button otherwise.
+			sample =
+				state && LINK_ONLY_STATES.includes( state ) ? (
+					<a className="wp-element-button" href="#anchor">
+						{ __( 'Call to action' ) }
+					</a>
+				) : (
+					<button className="wp-element-button" type="button">
+						{ __( 'Call to action' ) }
+					</button>
+				);
 			break;
 		case 'textInput':
 			sample = (

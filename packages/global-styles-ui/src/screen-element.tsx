@@ -264,6 +264,7 @@ function ScreenElement( {
 			/>
 			<ElementPreview
 				element={ element }
+				state={ state }
 				stateStyles={ state ? inheritedStyle : undefined }
 			/>
 			<ElementStylePanels

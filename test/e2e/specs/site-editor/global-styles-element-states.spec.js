@@ -17,14 +17,21 @@ const ELEMENTS = [
 		name: 'Link',
 		listItem: 'Link',
 		property: 'color',
-		frontEndLink: 'Text link',
+		sample: 'a',
+		getFrontEndTarget: () => ( { role: 'link', name: 'Text link' } ),
 		getStyles: ( color ) => ( { color: { text: color } } ),
 	},
 	{
 		name: 'Button',
 		listItem: 'Button (element)',
 		property: 'background-color',
-		frontEndLink: 'Button link',
+		sample: '.wp-element-button',
+		// The preview shows a link, like a Button block, for the states only
+		// links match, and a form button, like the Search block's, otherwise.
+		getFrontEndTarget: ( linkOnly ) =>
+			linkOnly
+				? { role: 'link', name: 'Button link' }
+				: { role: 'button', name: 'Search' },
 		getStyles: ( color ) => ( {
 			color: { background: color, text: '#ffffff' },
 		} ),
@@ -63,16 +70,23 @@ const INTERACTIONS = {
 	},
 };
 
-// The front end interaction each state in the States menu stands for.
+// The front end interaction each state in the States menu stands for, and
+// whether only links match the state.
 // Visited is left out: browsers hide `:visited` styles from scripts.
 const PREVIEW_STATES = [
-	[ 'Default', 'rest' ],
-	[ 'Link', 'rest' ],
-	[ 'Hover', 'hover' ],
-	[ 'Focus', 'click' ],
-	[ 'Focus-visible', 'tab' ],
-	[ 'Active', 'press' ],
+	{ state: 'Default', interaction: 'rest' },
+	{ state: 'Link', interaction: 'rest', linkOnly: true },
+	{ state: 'Hover', interaction: 'hover' },
+	{ state: 'Focus', interaction: 'click' },
+	{ state: 'Focus-visible', interaction: 'tab' },
+	{ state: 'Active', interaction: 'press' },
 ];
+
+// Names what a preview state is compared with on the front end.
+function getFrontEndKey( element, { interaction, linkOnly } ) {
+	const { role, name } = element.getFrontEndTarget( linkOnly );
+	return `${ role } "${ name }" ${ interaction }`;
+}
 
 test.describe( 'Global Styles - Element state previews', () => {
 	let postId;
@@ -101,7 +115,8 @@ test.describe( 'Global Styles - Element state previews', () => {
 			status: 'publish',
 			content:
 				'<!-- wp:paragraph --><p><a href="https://example.com/">Text link</a></p><!-- /wp:paragraph -->' +
-				'<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://example.com/">Button link</a></div><!-- /wp:button --></div><!-- /wp:buttons -->',
+				'<!-- wp:buttons --><div class="wp-block-buttons"><!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://example.com/">Button link</a></div><!-- /wp:button --></div><!-- /wp:buttons -->' +
+				'<!-- wp:search {"label":"Search","buttonText":"Search"} /-->',
 		} ) );
 	} );
 
@@ -116,16 +131,19 @@ test.describe( 'Global Styles - Element state previews', () => {
 			admin,
 			page,
 		} ) => {
-			const target = page.getByRole( 'link', {
-				name: element.frontEndLink,
-			} );
-
 			const frontEnd = {};
-			for ( const [ interaction, interact ] of Object.entries(
-				INTERACTIONS
-			) ) {
+			for ( const previewState of PREVIEW_STATES ) {
+				const key = getFrontEndKey( element, previewState );
+				if ( key in frontEnd ) {
+					continue;
+				}
+				const { role, name } = element.getFrontEndTarget(
+					previewState.linkOnly
+				);
+				const target = page.getByRole( role, { name, exact: true } );
 				await page.goto( `/?p=${ postId }` );
-				// Keep clicks from following the link, so its focus can be read.
+				// Keep clicks from following a link or submitting the search,
+				// so the target's focus can be read.
 				await page.evaluate( () =>
 					document.addEventListener(
 						'click',
@@ -133,21 +151,21 @@ test.describe( 'Global Styles - Element state previews', () => {
 						true
 					)
 				);
-				await interact( page, target );
-				frontEnd[ interaction ] = await target.evaluate(
-					( link, property ) =>
+				await INTERACTIONS[ previewState.interaction ]( page, target );
+				frontEnd[ key ] = await target.evaluate(
+					( node, property ) =>
 						window
-							.getComputedStyle( link )
+							.getComputedStyle( node )
 							.getPropertyValue( property ),
 					element.property
 				);
 				await page.mouse.up();
 			}
 
-			// Each interaction shows a different state, so the comparison
-			// below means something.
+			// Each target and interaction shows a different state, so the
+			// comparison below means something.
 			expect( new Set( Object.values( frontEnd ) ).size ).toBe(
-				Object.keys( INTERACTIONS ).length
+				Object.keys( frontEnd ).length
 			);
 
 			await admin.visitSiteEditor( {
@@ -171,9 +189,11 @@ test.describe( 'Global Styles - Element state previews', () => {
 			const sample = page
 				.locator( '.global-styles-ui-element-preview iframe' )
 				.contentFrame()
-				.locator( 'a' );
+				.locator( element.sample );
 
-			for ( const [ state, interaction ] of PREVIEW_STATES ) {
+			for ( const previewState of PREVIEW_STATES ) {
+				const { state } = previewState;
+
 				await test.step( state, async () => {
 					await page
 						.getByRole( 'region', { name: 'Editor settings' } )
@@ -188,7 +208,10 @@ test.describe( 'Global Styles - Element state previews', () => {
 							sample,
 							`${ state } preview should match the front end`
 						)
-						.toHaveCSS( element.property, frontEnd[ interaction ] );
+						.toHaveCSS(
+							element.property,
+							frontEnd[ getFrontEndKey( element, previewState ) ]
+						);
 				} );
 			}
 		} );
