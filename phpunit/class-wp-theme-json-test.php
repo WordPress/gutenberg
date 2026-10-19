@@ -2429,6 +2429,69 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that text input focus styles are output after validation styles, so focus wins when both match.
+	 */
+	public function test_get_stylesheet_outputs_text_input_focus_after_validation_states() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'textInput' => array(
+							':focus'        => array(
+								'color' => array(
+									'text' => 'blue',
+								),
+							),
+							':user-valid'   => array(
+								'color' => array(
+									'text' => 'green',
+								),
+							),
+							':user-invalid' => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(textarea:user-valid, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):user-valid){color: green;}:root :where(textarea:user-invalid, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):user-invalid){color: red;}:root :where(textarea:focus, input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]):focus){color: blue;}';
+
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	public function test_get_stylesheet_renders_block_text_input_placeholder_styles() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/search' => array(
+							'elements' => array(
+								'textInput' => array(
+									'::placeholder' => array(
+										'color' => array(
+											'text' => 'green',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(.wp-block-search textarea, .wp-block-search input:where([type=email],[type=number],[type=password],[type=search],[type=text],[type=tel],[type=url]))::placeholder{color: green;}';
+
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	/**
 	 * Tests that element pseudo selectors are output before block element pseudo selectors, and that whitelisted
 	 * block element pseudo selectors are output correctly.
 	 */
