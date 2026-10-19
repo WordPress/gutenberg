@@ -131,8 +131,8 @@ function ScheduledAutosaveMonitor( { interval } ) {
 /**
  * Monitors the changes made to the edited post and triggers autosave if necessary.
  *
- * The post is autosaved every `interval` seconds while there is something new to save,
- * and retried every `interval` seconds after a failure.
+ * The post is autosaved every `interval` seconds while there is something new to save.
+ * A failed autosave to the server is retried every `interval` seconds.
  *
  * @param {Object}   props            The component props.
  * @param {number}   [props.interval] Time in seconds between checks. Defaults to the editor's

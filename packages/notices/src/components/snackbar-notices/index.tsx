@@ -2,7 +2,6 @@ import clsx from 'clsx';
 import { SnackbarList } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as noticesStore } from '../../store';
-import { withNoticeElements } from '../../store/notice-element';
 
 // Last three notices. Slices from the tail end of the list.
 const MAX_VISIBLE_NOTICES = -3;
@@ -20,9 +19,8 @@ export default function SnackbarNotices( {
 		( select ) => select( noticesStore ).getNotices( context ),
 		[ context ]
 	);
-	const renderedNotices = withNoticeElements( notices );
 	const { removeNotice } = useDispatch( noticesStore );
-	const snackbarNotices = renderedNotices
+	const snackbarNotices = notices
 		.filter( ( { type } ) => type === 'snackbar' )
 		.slice( MAX_VISIBLE_NOTICES );
 
