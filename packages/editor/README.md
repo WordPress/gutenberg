@@ -1548,9 +1548,11 @@ Undocumented declaration.
 
 ### registerEntityAction
 
-Registers a new DataViews action.
+> **Deprecated** since Gutenberg 24.3. Register the action in PHP on the `wp_entity_actions_api_init` action instead, with a script module for its JavaScript parts.
 
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+Has no effect: every action of an entity is registered on the server.
+
+Register the action in PHP on the `wp_entity_actions_api_init` action instead, with a script module for the parts PHP cannot serialize (`callback`, `RenderModal`, `isEligible`…).
 
 _Parameters_
 
@@ -1560,9 +1562,11 @@ _Parameters_
 
 ### registerEntityField
 
-Registers a new DataViews field.
+> **Deprecated** since Gutenberg 24.3. Register the field in PHP with `wp_register_entity_fields()` instead.
 
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+Has no effect: the fields of an entity are registered on the server.
+
+Register the field in PHP, with `wp_register_entity_fields()` on the `wp_entity_fields_api_init` action, and with a script module for the parts PHP cannot serialize (`render`, `Edit`, `getElements`…).
 
 _Parameters_
 
@@ -1655,9 +1659,11 @@ Undocumented declaration.
 
 ### unregisterEntityAction
 
-Unregisters a DataViews action.
+> **Deprecated** since Gutenberg 24.3. Unregister the action in PHP on the `wp_entity_actions_api_init` action instead.
 
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+Has no effect: every action of an entity is registered on the server.
+
+Unregister the action in PHP on the `wp_entity_actions_api_init` action instead.
 
 _Parameters_
 
@@ -1667,9 +1673,11 @@ _Parameters_
 
 ### unregisterEntityField
 
-Unregisters a DataViews field.
+> **Deprecated** since Gutenberg 24.3. Unregister the field in PHP with `wp_unregister_entity_fields()` instead.
 
-This is an experimental API and is subject to change. it's only available in the Gutenberg plugin for now.
+Has no effect: the fields of an entity are registered on the server.
+
+Unregister the field in PHP, with `wp_unregister_entity_fields()` on the `wp_entity_fields_api_init` action.
 
 _Parameters_
 

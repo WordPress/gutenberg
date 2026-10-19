@@ -118,13 +118,13 @@ export default function ConnectedRevisionsCodeDiff() {
 		const editorSelectors = select( editorStore );
 		const coreSelectors = select( coreStore );
 		const {
-			getCurrentRevision,
-			getPreviousRevision,
+			getShownVersion,
+			getComparedVersion,
 			getRevisionPage,
 			getRevisionsPerPage,
 			isShowingRevisionDiff,
 		} = unlock( editorSelectors );
-		const _previousRevision = getPreviousRevision();
+		const _previousRevision = getComparedVersion();
 		const _showDiff = isShowingRevisionDiff();
 		const revisionPage = getRevisionPage();
 		const totalPages =
@@ -156,7 +156,7 @@ export default function ConnectedRevisionsCodeDiff() {
 		}
 
 		return {
-			revision: getCurrentRevision(),
+			revision: getShownVersion(),
 			previousRevision: _previousRevision,
 			...getCodeDiffDisplayState( {
 				previousRevision: _previousRevision,

@@ -29,6 +29,18 @@
 			vertical-align: middle;
 		}
 
+		.has-color::after {
+			content: "";
+			position: absolute;
+			/* Paint inside the root's border box, leaving outer focus rings separate. */
+			inset: calc(-1 * var(--wpds-border-width-xs));
+			border-radius: inherit;
+			border:
+				var(--wpds-border-width-focus) solid
+				var(--_wp-ui-avatar-color);
+			pointer-events: none;
+		}
+
 		.is-square {
 			border-radius: var(--wpds-border-radius-sm);
 		}

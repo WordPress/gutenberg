@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { forwardRef } from '@wordpress/element';
 import * as Avatar from '../index';
+import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
 
@@ -30,6 +31,9 @@ const meta: Meta< typeof Avatar.Root > = {
 		role: 'img',
 		'aria-label': 'Alex Morgan',
 	},
+	argTypes: {
+		color: { control: 'color' },
+	},
 	render: ( args ) => (
 		<Avatar.Root { ...args }>
 			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
@@ -42,6 +46,69 @@ export default meta;
 type Story = StoryObj< typeof Avatar.Root >;
 
 export const Default: Story = {};
+
+/** The optional color ring leaves images, initials, and the person fallback unchanged. */
+export const WithColor: Story = {
+	args: { color: '#008a20' },
+	render: ( args ) => (
+		<Stack gap="lg" align="center">
+			<Avatar.Root { ...args }>
+				<Avatar.Fallback />
+				<Avatar.Image src={ IMAGE_SRC } alt="" />
+			</Avatar.Root>
+			<Avatar.Root { ...args }>
+				<Avatar.Initials name="Alex Morgan" />
+			</Avatar.Root>
+			<Avatar.Root { ...args }>
+				<Avatar.Fallback />
+			</Avatar.Root>
+		</Stack>
+	),
+};
+
+/** Keyboard focus stays outside the avatar, even when both rings have the same color. */
+export const Interactive: Story = {
+	args: { color: '#008a20' },
+	render: ( args ) => (
+		<Stack gap="lg" align="center">
+			{ [
+				{
+					name: 'Alex Morgan',
+					label: 'Custom color',
+					color: args.color,
+				},
+				{
+					name: 'Sam Rivera',
+					label: 'Matches focus color',
+					color: 'var(--wpds-color-stroke-focus)',
+				},
+			].map( ( { name, label, color } ) => (
+				<Stack key={ name } direction="column" gap="sm" align="center">
+					<Button
+						variant="unstyled"
+						aria-label={ `Open ${ name }'s profile` }
+						style={ {
+							display: 'inline-flex',
+							borderRadius:
+								args.shape === 'square'
+									? 'var(--wpds-border-radius-sm)'
+									: '50%',
+						} }
+					>
+						<Avatar.Root
+							{ ...args }
+							color={ color }
+							aria-hidden="true"
+						>
+							<Avatar.Initials name={ name } />
+						</Avatar.Root>
+					</Button>
+					<Text>{ label }</Text>
+				</Stack>
+			) ) }
+		</Stack>
+	),
+};
 
 /** Square avatars use the theme's corner radius for buttons and controls. */
 export const Square: Story = {
