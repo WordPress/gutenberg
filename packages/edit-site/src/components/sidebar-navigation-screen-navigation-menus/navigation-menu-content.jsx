@@ -22,7 +22,6 @@ const ALLOWED_BLOCK_NAMES = [
 	'core/home-link',
 	'core/search',
 	'core/loginout',
-	'core/site-logo',
 	'core/site-title',
 ];
 
