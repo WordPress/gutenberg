@@ -204,7 +204,7 @@ export function PatternCategoryPreviews( {
 						category={ category.name }
 						isDraggable
 						showTitlesAsTooltip={ showTitlesAsTooltip }
-						// @ts-expect-error The list ignores `patternFilter`.
+						// @ts-expect-error TODO: The list ignores `patternFilter`, so remove it.
 						patternFilter={ patternSourceFilter }
 						pagingProps={ pagingProps }
 					/>

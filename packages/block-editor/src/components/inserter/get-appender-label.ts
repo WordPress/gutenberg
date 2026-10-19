@@ -21,7 +21,7 @@ export function getAppenderLabel(
 	defaultBlockType:
 		| {
 				name?: string;
-				/** Checked to return a string, as third-party blocks may not. */
+				/** Checked at runtime to return a string, as third-party blocks may not. */
 				__experimentalLabel?: (
 					attributes: Record< string, unknown >,
 					options: { context: string }

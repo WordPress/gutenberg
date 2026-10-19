@@ -56,7 +56,7 @@ export default function MobileTabNavigation< T extends InserterTabCategory >( {
 							key={ category.name }
 							path={ `/category/${ category.name }` }
 							as={ Item }
-							// @ts-expect-error `Item` has no `isAction` prop.
+							// @ts-expect-error TODO: `Item` has no `isAction` prop, so remove it.
 							isAction
 						>
 							<HStack>

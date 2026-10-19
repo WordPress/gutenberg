@@ -53,7 +53,7 @@ export function useMediaInsert( onInsert: ( block: Block ) => void ): {
 
 			const settings = getSettings();
 			const clonedBlock = cloneBlock( previewBlock );
-			// Image blocks hold the URL as a string.
+			// Block attributes are untyped, so declare the media ones read here.
 			const { id, url, caption } = clonedBlock.attributes as {
 				id?: number;
 				url?: string;
