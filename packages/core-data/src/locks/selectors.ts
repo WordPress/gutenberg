@@ -4,12 +4,18 @@ import {
 	hasConflictingLock,
 	getNode,
 } from './utils';
+import type { LockPath, LockRequest, LocksState } from './types';
 
-export function getPendingLockRequests( state ) {
+export function getPendingLockRequests( state: LocksState ): LockRequest[] {
 	return state.requests;
 }
 
-export function isLockAvailable( state, store, path, { exclusive } ) {
+export function isLockAvailable(
+	state: LocksState,
+	store: string,
+	path: LockPath,
+	{ exclusive }: { exclusive: boolean }
+): boolean {
 	const storePath = [ store, ...path ];
 	const locks = state.tree;
 

@@ -1,4 +1,9 @@
-export function deepCopyLocksTreePath( tree, path ) {
+import type { Lock, LockNode, LockPath } from './types';
+
+export function deepCopyLocksTreePath(
+	tree: LockNode,
+	path: LockPath
+): LockNode {
 	const newTree = { ...tree };
 	let currentNode = newTree;
 	for ( const branchName of path ) {
@@ -7,7 +12,9 @@ export function deepCopyLocksTreePath( tree, path ) {
 			[ branchName ]: {
 				locks: [],
 				children: {},
-				...currentNode.children[ branchName ],
+				// The branch does not exist until a lock is first taken on it.
+				...( currentNode.children[ branchName ] as
+					LockNode | undefined ),
 			},
 		};
 		currentNode = currentNode.children[ branchName ];
@@ -15,7 +22,7 @@ export function deepCopyLocksTreePath( tree, path ) {
 	return newTree;
 }
 
-export function getNode( tree, path ) {
+export function getNode( tree: LockNode, path: LockPath ): LockNode | null {
 	let currentNode = tree;
 	for ( const branchName of path ) {
 		const nextNode = currentNode.children[ branchName ];
@@ -27,7 +34,10 @@ export function getNode( tree, path ) {
 	return currentNode;
 }
 
-export function* iteratePath( tree, path ) {
+export function* iteratePath(
+	tree: LockNode,
+	path: LockPath
+): Generator< LockNode > {
 	let currentNode = tree;
 	yield currentNode;
 	for ( const branchName of path ) {
@@ -40,16 +50,20 @@ export function* iteratePath( tree, path ) {
 	}
 }
 
-export function* iterateDescendants( node ) {
+export function* iterateDescendants( node: LockNode ): Generator< LockNode > {
 	const stack = Object.values( node.children );
 	while ( stack.length ) {
-		const childNode = stack.pop();
+		// The loop runs while the stack has nodes.
+		const childNode = stack.pop()!;
 		yield childNode;
 		stack.push( ...Object.values( childNode.children ) );
 	}
 }
 
-export function hasConflictingLock( { exclusive }, locks ) {
+export function hasConflictingLock(
+	{ exclusive }: { exclusive: boolean },
+	locks: Lock[]
+): boolean {
 	if ( exclusive && locks.length ) {
 		return true;
 	}

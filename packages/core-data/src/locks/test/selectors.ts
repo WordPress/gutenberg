@@ -2,10 +2,33 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import deepFreeze from 'deep-freeze';
 import { getPendingLockRequests, isLockAvailable } from '../selectors';
 import { deepCopyLocksTreePath, getNode } from '../utils';
+import type { Lock, LockNode, LockPath, LocksState } from '../types';
+
+type DeepPartial< T > = { [ K in keyof T ]?: DeepPartial< T[ K ] > };
+
+/**
+ * Types a fixture that holds only the fields the code under test reads.
+ *
+ * @param value The partial fixture.
+ */
+function partial< T >( value: DeepPartial< T > ): T {
+	return value as T;
+}
+
+/**
+ * Freezes a partial fixture to catch mutations, keeping it writable to the
+ * type checker as the code under test expects.
+ *
+ * @param value The partial fixture.
+ */
+function frozen< T >( value: DeepPartial< T > ): T {
+	return deepFreeze( value ) as T;
+}
 
 describe( 'getPendingLockRequests', () => {
 	it( 'returns pending lock requests', () => {
-		const state = deepFreeze( {
+		const state = frozen< LocksState >( {
+			// @ts-expect-error The selector returns the requests, whatever they hold.
 			requests: [ 1, 2, 3 ],
 		} );
 
@@ -16,7 +39,7 @@ describe( 'getPendingLockRequests', () => {
 describe( 'isLockAvailable', () => {
 	describe( 'smoke tests', () => {
 		it( 'returns true if lock is available', () => {
-			const state = deepFreeze( {
+			const state = frozen< LocksState >( {
 				tree: {
 					children: {},
 					locks: [],
@@ -30,7 +53,7 @@ describe( 'isLockAvailable', () => {
 			).toBe( true );
 		} );
 		it( 'returns false if lock is not available', () => {
-			const state = deepFreeze( {
+			const state = frozen< LocksState >( {
 				tree: {
 					children: {},
 					locks: [ { exclusive: false } ],
@@ -46,7 +69,7 @@ describe( 'isLockAvailable', () => {
 	} );
 
 	describe( 'Advanced cases - exclusive lock', () => {
-		let state;
+		let state: LocksState;
 		beforeEach( () => {
 			state = buildState( [
 				[ 'core', 'entities', 'root', 'template_part', '3' ],
@@ -57,7 +80,7 @@ describe( 'isLockAvailable', () => {
 		it( `returns true if no parent or descendant has any locks`, () => {
 			expect(
 				isLockAvailable(
-					deepFreeze( state ),
+					frozen< LocksState >( state ),
 					'core',
 					[ 'entities', 'root' ],
 					{ exclusive: true }
@@ -71,7 +94,7 @@ describe( 'isLockAvailable', () => {
 			} );
 			expect(
 				isLockAvailable(
-					deepFreeze( state ),
+					frozen< LocksState >( state ),
 					'core',
 					[ 'entities', 'root' ],
 					{ exclusive: true }
@@ -85,7 +108,7 @@ describe( 'isLockAvailable', () => {
 			} );
 			expect(
 				isLockAvailable(
-					deepFreeze( state ),
+					frozen< LocksState >( state ),
 					'core',
 					[ 'entities', 'root' ],
 					{ exclusive: true }
@@ -138,7 +161,7 @@ describe( 'isLockAvailable', () => {
 			};
 			expect(
 				isLockAvailable(
-					deepFreeze( subState ),
+					frozen< LocksState >( subState ),
 					'core',
 					[ 'postType', 'wp_template_part', 17 ],
 					{ exclusive: true }
@@ -198,7 +221,7 @@ describe( 'isLockAvailable', () => {
 			};
 			expect(
 				isLockAvailable(
-					deepFreeze( subState ),
+					frozen< LocksState >( subState ),
 					'core',
 					[ 'entities', 'records', 'postType', 'book', 67 ],
 					{ exclusive: false }
@@ -210,7 +233,7 @@ describe( 'isLockAvailable', () => {
 			it( `returns true if the path is not accessible and no parent holds a lock`, () => {
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'fake', 'path' ],
 						{ exclusive: true }
@@ -224,7 +247,7 @@ describe( 'isLockAvailable', () => {
 				} );
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'fake', 'path' ],
 						{ exclusive: true }
@@ -238,7 +261,7 @@ describe( 'isLockAvailable', () => {
 				} );
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: true }
@@ -252,7 +275,7 @@ describe( 'isLockAvailable', () => {
 				} );
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: true }
@@ -266,7 +289,7 @@ describe( 'isLockAvailable', () => {
 				} );
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: true }
@@ -285,7 +308,7 @@ describe( 'isLockAvailable', () => {
 				);
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: true }
@@ -304,7 +327,7 @@ describe( 'isLockAvailable', () => {
 				);
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: true }
@@ -315,7 +338,7 @@ describe( 'isLockAvailable', () => {
 	} );
 
 	describe( 'Advanced cases - shared lock', () => {
-		let state;
+		let state: LocksState;
 		beforeEach( () => {
 			state = buildState( [
 				[ 'core', 'entities', 'root', 'template_part', '3' ],
@@ -324,7 +347,7 @@ describe( 'isLockAvailable', () => {
 		it( `returns true if no parent or descendant has any locks`, () => {
 			expect(
 				isLockAvailable(
-					deepFreeze( state ),
+					frozen< LocksState >( state ),
 					'core',
 					[ 'entities', 'root' ],
 					{ exclusive: true }
@@ -340,7 +363,7 @@ describe( 'isLockAvailable', () => {
 				} );
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'fake', 'path' ],
 						{ exclusive: false }
@@ -354,7 +377,7 @@ describe( 'isLockAvailable', () => {
 				} );
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: false }
@@ -368,7 +391,7 @@ describe( 'isLockAvailable', () => {
 				} );
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: false }
@@ -382,7 +405,7 @@ describe( 'isLockAvailable', () => {
 				} );
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: false }
@@ -401,7 +424,7 @@ describe( 'isLockAvailable', () => {
 				);
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: false }
@@ -420,7 +443,7 @@ describe( 'isLockAvailable', () => {
 				);
 				expect(
 					isLockAvailable(
-						deepFreeze( state ),
+						frozen< LocksState >( state ),
 						'core',
 						[ 'entities', 'root' ],
 						{ exclusive: false }
@@ -431,14 +454,22 @@ describe( 'isLockAvailable', () => {
 	} );
 } );
 
-function appendLock( state, store, path, lock ) {
-	getNode( state.tree, [ store, ...path ] ).locks.push( lock );
+function appendLock(
+	state: LocksState,
+	store: string,
+	path: LockPath,
+	lock: DeepPartial< Lock >
+) {
+	// The tests lock nodes that `buildState` created.
+	getNode( state.tree, [ store, ...path ] )!.locks.push(
+		partial< Lock >( lock )
+	);
 }
 
-function buildState( paths ) {
+function buildState( paths: LockPath[] ): LocksState {
 	return {
 		requests: [],
-		tree: paths.reduce(
+		tree: paths.reduce< LockNode >(
 			( tree, path ) => deepCopyLocksTreePath( tree, path ),
 			{
 				locks: [],
