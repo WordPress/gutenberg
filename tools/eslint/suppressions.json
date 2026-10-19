@@ -1335,6 +1335,11 @@
 			"count": 1
 		}
 	},
+	"packages/block-editor/src/components/grid/start-grid-item-drag.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
 	"packages/block-editor/src/components/grid/use-get-number-of-blocks-before-cell.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

@@ -5,7 +5,10 @@ import { store as blockEditorStore } from '../../store';
 import { useBlockElement } from '../block-list/use-block-props/use-block-refs';
 import BlockPopoverCover from '../block-popover/cover';
 import { GridItemHandle } from './grid-item-handle';
-import { startGridItemDrag } from './start-grid-item-drag';
+import {
+	startGridItemDrag,
+	startGridItemPointerDrag,
+} from './start-grid-item-drag';
 import { useRotatedOverlayStyle } from './use-rotated-overlay-style';
 
 interface GridItemDragHandleProps {
@@ -56,6 +59,21 @@ export function GridItemDragHandle( {
 					label={ __( 'Drag' ) }
 					angle={ angle }
 					draggable
+					onPointerDown={ ( event ) => {
+						// Touch screens don't start the browser's drag and
+						// drop from the handle, so a touch drag follows the
+						// touch instead.
+						if ( event.pointerType !== 'touch' ) {
+							return;
+						}
+						startGridItemPointerDrag( event.nativeEvent, {
+							clientId,
+							blockElement,
+							handle: event.currentTarget,
+							startDraggingBlocks,
+							stopDraggingBlocks,
+						} );
+					} }
 					onDragStart={ ( event ) => {
 						startGridItemDrag( event.nativeEvent, {
 							clientId,

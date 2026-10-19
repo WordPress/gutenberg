@@ -509,6 +509,9 @@
 	color: var(--wpds-color-foreground-interactive-neutral);
 	cursor: grab;
 	touch-action: none;
+	// A press on a handle drags or turns the block, and never selects text.
+	user-select: none;
+	-webkit-touch-callout: none;
 
 	&:hover {
 		color: var(--wp-admin-theme-color);

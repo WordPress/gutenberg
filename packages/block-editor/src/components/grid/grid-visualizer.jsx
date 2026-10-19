@@ -31,7 +31,10 @@ import {
 	getGridDropTarget,
 	getPixelRectFromGridRect,
 } from './get-grid-drop-target';
-import { isGridItemHandleDrag } from './start-grid-item-drag';
+import {
+	isGridItemHandleDrag,
+	subscribeToGridItemPointerDrag,
+} from './start-grid-item-drag';
 import { getAlignmentGuides } from './get-alignment-guides';
 import {
 	getUnstackedMobileUpdates,
@@ -482,7 +485,10 @@ function GridVisualizerDropLayer( {
 		return getBlockToPlaceInGrid( blockEditorSelectors, gridClientId );
 	}
 
-	function updateDropTarget( event ) {
+	function updateDropTarget(
+		event,
+		isHandleDrag = isGridItemHandleDrag( event )
+	) {
 		const srcClientId = getDraggedBlock();
 		const layer = layerRef.current;
 		if ( ! srcClientId || ! layer ) {
@@ -548,7 +554,7 @@ function GridVisualizerDropLayer( {
 					x,
 					y,
 					pixelRect: srcPixelRect,
-					isHandleDrag: isGridItemHandleDrag( event ),
+					isHandleDrag,
 				} ),
 			};
 		}
@@ -658,42 +664,71 @@ function GridVisualizerDropLayer( {
 		setDropTarget( target );
 	}
 
+	function dropOnTarget() {
+		const target = lastTargetRef.current;
+		clearDropTarget();
+		const srcClientId = getDraggedBlock();
+		if ( ! target || target.srcClientId !== srcClientId ) {
+			return;
+		}
+		const { landing, span } = target;
+		const { columnStart, rowStart } = landing;
+		// A block bigger than the grid is shrunk to fit, as shown by the
+		// landing cells.
+		const layout = {
+			columnStart,
+			rowStart,
+			...( landing.columnSpan < span.columnSpan && {
+				columnSpan: landing.columnSpan,
+			} ),
+			...( landing.rowSpan < span.rowSpan && {
+				rowSpan: landing.rowSpan,
+			} ),
+		};
+		// The grid is given to the updater because a block dropped in
+		// from elsewhere isn't in it yet.
+		updateGridChildLayout( srcClientId, layout, gridClientId );
+		__unstableMarkNextChangeAsNotPersistent();
+		moveBlocksToPosition(
+			[ srcClientId ],
+			getBlockRootClientId( srcClientId ),
+			gridClientId,
+			getNumberOfBlocksBeforeCell( columnStart, rowStart )
+		);
+	}
+
 	const dropZoneRef = useDropZone( {
-		onDragOver: updateDropTarget,
+		onDragOver: ( event ) => updateDropTarget( event ),
 		onDragLeave: clearDropTarget,
 		onDragEnd: clearDropTarget,
-		onDrop() {
-			const target = lastTargetRef.current;
-			clearDropTarget();
-			const srcClientId = getDraggedBlock();
-			if ( ! target || target.srcClientId !== srcClientId ) {
-				return;
+		onDrop: dropOnTarget,
+	} );
+
+	// A touch drag from a drag handle doesn't use the browser's drag and
+	// drop, so it is followed here. The layer of the innermost grid under the
+	// touch takes it, as a drop zone would.
+	useEffect( () => {
+		return subscribeToGridItemPointerDrag(
+			( { type, clientX, clientY } ) => {
+				const layer = layerRef.current;
+				const isOverLayer =
+					!! layer &&
+					layer.ownerDocument
+						.elementsFromPoint( clientX, clientY )
+						.find( ( element ) =>
+							element.classList.contains(
+								'block-editor-grid-visualizer__drop-layer'
+							)
+						) === layer;
+				if ( type === 'move' && isOverLayer ) {
+					updateDropTarget( { clientX, clientY }, true );
+				} else if ( type === 'drop' && isOverLayer ) {
+					dropOnTarget();
+				} else {
+					clearDropTarget();
+				}
 			}
-			const { landing, span } = target;
-			const { columnStart, rowStart } = landing;
-			// A block bigger than the grid is shrunk to fit, as shown by the
-			// landing cells.
-			const layout = {
-				columnStart,
-				rowStart,
-				...( landing.columnSpan < span.columnSpan && {
-					columnSpan: landing.columnSpan,
-				} ),
-				...( landing.rowSpan < span.rowSpan && {
-					rowSpan: landing.rowSpan,
-				} ),
-			};
-			// The grid is given to the updater because a block dropped in
-			// from elsewhere isn't in it yet.
-			updateGridChildLayout( srcClientId, layout, gridClientId );
-			__unstableMarkNextChangeAsNotPersistent();
-			moveBlocksToPosition(
-				[ srcClientId ],
-				getBlockRootClientId( srcClientId ),
-				gridClientId,
-				getNumberOfBlocksBeforeCell( columnStart, rowStart )
-			);
-		},
+		);
 	} );
 
 	return (
