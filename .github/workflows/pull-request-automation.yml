@@ -35,10 +35,7 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - name: Build project management automation package
-              run: npm run build --workspace @wordpress/project-management-automation
-
-            - uses: ./packages/project-management-automation
+            - uses: ./tools/project-management-automation
               id: automation
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}

@@ -26,6 +26,7 @@
 
 ### Enhancements
 
+-   `ColorPicker`: Use `Select` from `@wordpress/ui` for the color format selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   `ExternalLink`: Use a small border radius for consistent focus rings ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
 -   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
@@ -39,6 +40,7 @@
 
 ### Bug Fixes
 
+-   `Tabs`, `TabPanel`: Expand vertical tab interaction backgrounds and focus rings across the row ([#84821](https://github.com/WordPress/gutenberg/pull/84821)).
 -   `StyleProvider`: Register module styles before children measure layout in iframe documents ([#84736](https://github.com/WordPress/gutenberg/pull/84736)).
 -   `BorderBoxControl`: Unpack multi-value CSS box shorthand strings (such as `"0 0 0 2px"`) into individual side widths when splitting borders ([#84826](https://github.com/WordPress/gutenberg/pull/84826)).
 -   `SelectControl`: Preserve the minimal variant's inline layout in iframe documents ([#84732](https://github.com/WordPress/gutenberg/pull/84732)).
@@ -64,6 +66,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Replace remaining Emotion fixtures in polymorphic tests and ToolsPanel stories with SCSS Modules ([#84926](https://github.com/WordPress/gutenberg/pull/84926)).
 -   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
@@ -71,6 +74,7 @@
 
 ### Documentation
 
+-   Retire completed Emotion migration guidance and keep permanent styling advice in the contribution guide ([#85023](https://github.com/WordPress/gutenberg/pull/85023)).
 -   Update styling guidance and the `ToolsPanel` example after the Emotion migration ([#85020](https://github.com/WordPress/gutenberg/pull/85020)).
 
 ## 42.0.0 (2026-10-07)

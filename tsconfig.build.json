@@ -70,7 +70,6 @@
 		{ "path": "packages/primitives" },
 		{ "path": "packages/priority-queue/tsconfig.build.json" },
 		{ "path": "packages/private-apis/tsconfig.build.json" },
-		{ "path": "packages/project-management-automation/tsconfig.build.json" },
 		{ "path": "packages/react-i18n" },
 		{ "path": "packages/react-inert-value/tsconfig.build.json" },
 		{ "path": "packages/redux-routine" },

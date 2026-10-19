@@ -19,6 +19,7 @@
 
 ### Enhancements
 
+-   `Avatar`: Use `color` for fallback backgrounds with contrasting text and icons ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Link`: Use a small border radius for consistent focus rings in the default variant ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
@@ -32,6 +33,8 @@
 
 ### Bug Fixes
 
+-   `Avatar`: Use the strong neutral stroke color for the person fallback to provide sufficient non-text contrast ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
+-   `Tabs`: Expand vertical tab interaction backgrounds and focus rings across the row ([#84821](https://github.com/WordPress/gutenberg/pull/84821)).
 -   Keep the `Link` new-tab indicator with the preceding text when wrapping ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
 -   `Select`: Keep long popup lists scrollable when item alignment falls back to anchored positioning or the popup opens through touch ([#84682](https://github.com/WordPress/gutenberg/pull/84682)).
 -   `Combobox.Input`, `SearchableSelect`, and `SearchableSelectControl`: Orient the search icon toward the top left in LTR and the top right in RTL ([#84690](https://github.com/WordPress/gutenberg/pull/84690)).
@@ -46,6 +49,7 @@
 
 ### Internal
 
+-   Update `@testing-library/user-event` to 14.6.8 for UI tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 
 ### Documentation
