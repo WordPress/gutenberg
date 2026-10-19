@@ -14,7 +14,7 @@ Each component has a folder here with a `component.json`:
 -   `render`: the React element to render, as `[ type, props, ...children ]`, where `"$name"` is a prop.
 -   `example`: the props for the preview page and the checks.
 
-`bin/build-php.mjs` runs after the package build. It renders the React element for every combination of variants and writes the result to `build-php/manifest.php`, which is generated and never committed. PHP picks the markup for the props it gets, then escapes and fills in the free-form ones. The stylesheet is compiled by `@wordpress/build` from the same CSS modules React uses, so class names match.
+`bin/build-php.mjs` runs after the package build. It renders the React element for every combination of variants and writes the result to `build-php/manifest.php`, which is generated and never committed. To keep it small, it stores one base render plus what each variant value changes, and checks that this rebuilds every combination exactly; a combination it can't rebuild, such as a variant that swaps an element, is stored in full. For Button, that's a base and 7 changes instead of 48 snapshots. PHP applies the changes with `WP_HTML_Tag_Processor`, then escapes and fills in the free-form props. The stylesheet is compiled by `@wordpress/build` from the same CSS modules React uses, so class names match.
 
 ## What PHP components support
 
