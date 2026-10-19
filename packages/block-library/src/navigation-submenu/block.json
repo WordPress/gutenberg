@@ -91,7 +91,10 @@
 		}
 	},
 	"selectors": {
-		"shadow": ".wp-block-navigation-submenu > .wp-block-navigation__submenu-container"
+		"shadow": ".wp-block-navigation-submenu > .wp-block-navigation__submenu-container",
+		"states": {
+			"-current": ".wp-block-navigation .wp-block-navigation-submenu .current-menu-item"
+		}
 	},
 	"editorStyle": "wp-block-navigation-submenu-editor",
 	"style": "wp-block-navigation-submenu"
