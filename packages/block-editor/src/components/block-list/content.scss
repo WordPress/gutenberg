@@ -44,9 +44,6 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 
 	// Block multi selection
 	.block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
-		// The whole selection can be dragged from any of its blocks.
-		cursor: grab;
-
 		// Hide the native selection indicator, for the selection, and children.
 		&::selection,
 		& ::selection {
@@ -451,10 +448,13 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	}
 }
 
-// While dragging a multi selection, every block in it shows the
-// grabbing cursor.
-.is-dragging .block-editor-block-list__block.is-multi-selected:not(.is-partially-selected) {
-	cursor: grabbing;
+// The whole selection can be dragged from any of its blocks.
+.block-editor-block-list__block.is-movable-multi-selected:not(.is-partially-selected) {
+	cursor: grab;
+
+	.is-dragging & {
+		cursor: grabbing;
+	}
 }
 
 // The number of dragged blocks, next to the pointer while dragging a

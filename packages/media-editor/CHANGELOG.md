@@ -8,6 +8,8 @@
 
 ### Enhancements
 
+-   `MediaEditorProvider` accepts a `settings.form` to lay out the fields with, which `MediaForm` uses when it gets no `form` prop. `MediaEditor` and the private `MediaEditorModal` pass a `form` prop through to it ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Lay out the default form of `MediaForm` in a fixed order of the core attachment fields, so it no longer depends on the order the fields are passed in. Other fields are no longer part of the default form: pass a `form` to show them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 -   Migrate crop and story selectors to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
 
 ### Internal

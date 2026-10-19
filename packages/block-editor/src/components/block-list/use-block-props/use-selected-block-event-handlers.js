@@ -6,6 +6,9 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+// The distance of the dragged blocks from the pointer.
+const PILE_OFFSET = 8;
+
 function isColorTransparent( color ) {
 	return ! color || color === 'transparent' || color === 'rgba(0, 0, 0, 0)';
 }
@@ -25,6 +28,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 	const {
 		getBlockRootClientId,
 		getSelectedBlockClientIds,
+		canMoveBlocks,
 		isZoomOut,
 		hasMultiSelection,
 		__unstableIsFullySelected,
@@ -33,7 +37,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		getBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
-		multiSelect,
 		removeBlock,
 		resetZoomLevel,
 		startDraggingBlocks,
@@ -117,7 +120,10 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					! selection.isCollapsed &&
 					isEntirelySelected( node );
 
-				if ( ! isWholeMultiSelection && ! isFullySelectedText ) {
+				if (
+					( ! isWholeMultiSelection && ! isFullySelectedText ) ||
+					! canMoveBlocks( getSelectedBlockClientIds() )
+				) {
 					return;
 				}
 
@@ -126,12 +132,9 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				const hadDraggable = node.getAttribute( 'draggable' );
 				node.setAttribute( 'draggable', 'true' );
 				const editables = [
-					node.parentElement?.closest( '[contenteditable="true"]' ),
-					event.target.closest?.( '[contenteditable="true"]' ),
-				].filter(
-					( element, index, all ) =>
-						element && all.indexOf( element ) === index
-				);
+					node.parentElement.closest( '[contenteditable="true"]' ),
+					event.target.closest( '[contenteditable="true"]' ),
+				].filter( Boolean );
 
 				for ( const element of editables ) {
 					element.contentEditable = 'false';
@@ -214,326 +217,117 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				ownerDocument.addEventListener( 'dragend', restore );
 			}
 
-			/**
-			 * Starts the visuals of a multi-selection drag: the pressed
-			 * block hangs below and right of the pointer, the next block
-			 * of the selection slides out from underneath it, slightly
-			 * turned, and a count of all dragged blocks sits on its top
-			 * right corner. The rest of the selection hides in place.
-			 *
-			 * @param {DragEvent}   event       Drag event.
-			 * @param {string[]}    clientIds   The dragged block client IDs.
-			 * @param {HTMLElement} dragElement The fake drag image element.
-			 */
-			function startPileDrag( event, clientIds, dragElement ) {
+			// Adds the multi-selection drag visuals to the pressed block that
+			// the block drag lifts: its top left corner hangs just below and
+			// right of the pointer, so the pointer stays over the drop
+			// targets, the next selected block peeks out from underneath it,
+			// and a count of the dragged blocks sits on its top right corner.
+			function startPile( event, clientIds, rect, inverted ) {
 				const { ownerDocument } = node;
-				const { defaultView } = ownerDocument;
-
-				const blockNodes = clientIds
-					.map( ( selectedClientId ) =>
-						ownerDocument.querySelector(
-							`[data-block="${ selectedClientId }"]`
-						)
-					)
-					.filter( Boolean );
-
-				// The pressed block is the drag visual. The block after it
-				// (or before it, for the last block) slides out from
-				// underneath, so the visual reads as a stack. The rest of
-				// the selection hides in place.
-				const anchorPlace = blockNodes.indexOf( node );
-				const backNode =
-					blockNodes[ anchorPlace + 1 ] ??
-					blockNodes[ anchorPlace - 1 ];
-				const pileNodes = backNode ? [ node, backNode ] : [ node ];
-				const restNodes = blockNodes.filter(
-					( blockNode ) => ! pileNodes.includes( blockNode )
+				const index = clientIds.indexOf( clientId );
+				const backNode = ownerDocument.querySelector(
+					`[data-block="${
+						clientIds[ index + 1 ] ?? clientIds[ index - 1 ]
+					}"]`
 				);
-
-				let _scale = 1;
-
-				{
-					let parentElement = node;
-					while ( ( parentElement = parentElement.parentElement ) ) {
-						const { scale } =
-							defaultView.getComputedStyle( parentElement );
-						if ( scale && scale !== 'none' ) {
-							_scale = parseFloat( scale );
-							break;
-						}
-					}
-				}
-
-				const inverted = 1 / _scale;
-				// Every block scales towards the same diagonal, and only
-				// ever down. Wide blocks come out long and thin, tall ones
-				// narrow.
-				const cardScale = ( rect ) =>
-					Math.min( 1, 420 / Math.hypot( rect.width, rect.height ) );
-				const anchorRect = node.getBoundingClientRect();
-				const dragScale = cardScale( anchorRect );
-				const grabX = event.clientX;
-				const grabY = event.clientY;
-				// The pointer holds the block by its top left corner,
-				// wherever the press landed in the block: the corner sits
-				// just inside the grabbing hand.
-				const grabOffset = 4;
-				const anchorVisual = {
-					left: grabX - grabOffset,
-					top: grabY - grabOffset,
-					width: anchorRect.width * dragScale,
-					height: anchorRect.height * dragScale,
-				};
-
-				// Scaling happens around the center; compensate the shift
-				// so the box still lands on its slot.
-				function translationTo( rect, scale, left, top ) {
-					return {
-						x:
-							left -
-							rect.left -
-							( rect.width * ( 1 - scale ) ) / 2,
-						y: top - rect.top - ( rect.height * ( 1 - scale ) ) / 2,
-					};
-				}
-
-				const cards = pileNodes.map( ( blockNode, index ) => {
-					const rect = blockNode.getBoundingClientRect();
-					const scale = cardScale( rect );
-
-					if ( index === 0 ) {
-						const to = translationTo(
-							rect,
-							scale,
-							anchorVisual.left,
-							anchorVisual.top
-						);
-						return { scale, turn: 0, from: { x: 0, y: 0 }, to };
-					}
-
-					const width = rect.width * scale;
-					const height = rect.height * scale;
-					// It starts centered under the pressed block and slides
-					// out a little to the left, its bottom edge peeking out
-					// below, slightly turned.
-					const from = translationTo(
-						rect,
-						scale,
-						anchorVisual.left + ( anchorVisual.width - width ) / 2,
-						anchorVisual.top + ( anchorVisual.height - height ) / 2
-					);
-					const to = translationTo(
-						rect,
-						scale,
-						anchorVisual.left - 12,
-						anchorVisual.top + anchorVisual.height + 24 - height
-					);
-					return { scale, turn: 1.5, from, to };
-				} );
-				const toTransform = ( { x, y }, scale, turn ) =>
-					`translate(${ x * inverted }px, ${
-						y * inverted
+				// Scales a block down to a fixed diagonal.
+				const cardScale = ( { width, height } ) =>
+					Math.min( 1, 420 / Math.hypot( width, height ) );
+				// Moves a block's top left corner to x, y, compensating for
+				// scaling around the center.
+				const toTransform = ( from, x, y, scale, turn = 0 ) =>
+					`translate(${
+						( x - from.left - ( from.width * ( 1 - scale ) ) / 2 ) *
+						inverted
+					}px, ${
+						( y - from.top - ( from.height * ( 1 - scale ) ) / 2 ) *
+						inverted
 					}px) scale(${ scale }) rotate(${ turn }deg)`;
-				const restoreCallbacks = [];
+				const left = event.clientX + PILE_OFFSET;
+				const top = event.clientY + PILE_OFFSET;
+				const scale = cardScale( rect );
+				const width = rect.width * scale;
+				const height = rect.height * scale;
 
-				pileNodes.forEach( ( blockNode, index ) => {
-					const savedProperties = {};
+				// Hides the rest of the selection and keeps the slot styling
+				// off the cards.
+				ownerDocument.documentElement.dataset.dragPile = 'true';
+				node.dataset.dragPile = 'true';
+				node.style.transformOrigin = '50% 50%';
+				node.style.transform = toTransform( rect, left, top, scale );
+				node.style.opacity = '';
 
-					for ( const property of [
-						'transform',
-						'transformOrigin',
-						'transition',
-						'zIndex',
-						'position',
-						'top',
-						'left',
-						'pointerEvents',
-						'backgroundColor',
-						'boxShadow',
-					] ) {
-						savedProperties[ property ] =
-							blockNode.style[ property ];
-					}
+				let restoreBackNode;
+				if ( backNode ) {
+					const backRect = backNode.getBoundingClientRect();
+					const backScale = cardScale( backRect );
+					const backStyle = backNode.getAttribute( 'style' );
+					const backId = backNode.id;
+					const backClone = backNode.cloneNode();
+					backClone.style.display = 'none';
+					backNode.id = null;
+					backNode.after( backClone );
+					backNode.dataset.dragPile = 'true';
+					restoreBackNode = () => {
+						backNode.setAttribute( 'style', backStyle ?? '' );
+						delete backNode.dataset.dragPile;
+						backNode.id = backId;
+						backClone.remove();
+					};
 
-					// Remove the id and leave it on a hidden shallow clone
-					// so that drop target calculations are correct.
-					const blockId = blockNode.id;
-					const placeholder = blockNode.cloneNode();
-					placeholder.style.display = 'none';
-					blockNode.id = null;
-					blockNode.after( placeholder );
-					// The attribute keeps the slot styling for dragged
-					// blocks from hiding the selection overlay on the
-					// stack.
-					blockNode.dataset.dragPile = 'true';
-
-					restoreCallbacks.push( () => {
-						for ( const [ property, value ] of Object.entries(
-							savedProperties
-						) ) {
-							blockNode.style[ property ] = value;
-						}
-						delete blockNode.dataset.dragPile;
-						blockNode.id = blockId;
-						placeholder.remove();
-					} );
-
-					const { style } = blockNode;
-					const { scale, from } = cards[ index ];
-					style.position = 'relative';
-					style.zIndex = `${ 1000 - index }`;
-					style.transformOrigin = '50% 50%';
-					style.boxShadow = '4px 4px 8px rgba(0, 0, 0, 0.15)';
-					style.transform = toTransform( from, index ? scale : 1, 0 );
-
-					// If the block has no background color, use the
-					// nearest ancestor's, so it does not show the content
-					// it moves over through the gaps between lines.
+					const { style } = backNode;
 					if (
 						isColorTransparent(
-							defaultView.getComputedStyle( blockNode )
-								.backgroundColor
+							ownerDocument.defaultView.getComputedStyle(
+								backNode
+							).backgroundColor
 						)
 					) {
-						let bgColor = 'transparent';
-						let parentElement = blockNode;
-
-						while (
-							( parentElement = parentElement.parentElement )
-						) {
-							const { backgroundColor } =
-								defaultView.getComputedStyle( parentElement );
-							if ( ! isColorTransparent( backgroundColor ) ) {
-								bgColor = backgroundColor;
-								break;
-							}
-						}
-
-						style.backgroundColor = bgColor;
+						style.backgroundColor = node.style.backgroundColor;
 					}
-				} );
-
-				// Flush the starting styles, then set the targets, so the
-				// pressed block animates from its place to the pointer and
-				// the block behind it slides out from underneath.
-				void pileNodes[ 0 ].offsetHeight;
-				pileNodes.forEach( ( blockNode, index ) => {
-					const { scale, turn, to } = cards[ index ];
-					blockNode.style.transition = 'transform 0.2s ease-out';
-					blockNode.style.transform = toTransform( to, scale, turn );
-				} );
-
-				// The other selected blocks hide in place; their spots
-				// keep their size until the drag ends.
-				for ( const blockNode of restNodes ) {
-					const savedVisibility = blockNode.style.visibility;
-					blockNode.style.visibility = 'hidden';
-					restoreCallbacks.push( () => {
-						blockNode.style.visibility = savedVisibility;
-					} );
+					// Slides out to the left with its bottom edge peeking out
+					// below the pressed block.
+					style.transition = 'transform 0.2s ease-out';
+					style.transform = toTransform(
+						backRect,
+						left - 12,
+						top + height + 24 - backRect.height * backScale,
+						backScale,
+						1.5
+					);
 				}
 
-				const originScrollTop = defaultView.scrollY;
-				const originScrollLeft = defaultView.scrollX;
-				const originClientX = grabX;
-				const originClientY = grabY;
-				let lastClientX = originClientX;
-				let lastClientY = originClientY;
-
-				// A count near the pointer: most of the selection may be
-				// hidden, so the stack alone does not tell how many
-				// blocks are dragged.
 				const countBadge = ownerDocument.createElement( 'div' );
 				countBadge.className = 'block-editor-block-list__drag-count';
 				countBadge.textContent = String( clientIds.length );
 				ownerDocument.body.appendChild( countBadge );
 
-				function positionCountBadge() {
-					// On the stack's top right corner, clear of the
-					// pointer at its top left.
+				function positionCountBadge( clientX, clientY ) {
 					countBadge.style.left = `${
-						( lastClientX - grabOffset + anchorVisual.width ) *
-							inverted -
-						12
+						( clientX + PILE_OFFSET + width ) * inverted - 12
 					}px`;
 					countBadge.style.top = `${
-						( lastClientY - grabOffset ) * inverted - 12
+						( clientY + PILE_OFFSET ) * inverted - 12
 					}px`;
 				}
-				positionCountBadge();
+				positionCountBadge( event.clientX, event.clientY );
 
-				function over() {
-					const topDelta =
-						( lastClientY -
-							originClientY +
-							defaultView.scrollY -
-							originScrollTop ) *
-						inverted;
-					const leftDelta =
-						( lastClientX -
-							originClientX +
-							defaultView.scrollX -
-							originScrollLeft ) *
-						inverted;
-
-					for ( const blockNode of pileNodes ) {
-						blockNode.style.top = `${ topDelta }px`;
-						blockNode.style.left = `${ leftDelta }px`;
-					}
-
-					positionCountBadge();
-				}
-				over();
-
-				function dragOver( e ) {
-					// The pile rides under the pointer, so it must not catch
-					// the drag events meant for the drop zones beneath it.
-					// Applied once the drag is under way: the browser cancels
-					// a drag whose source stops receiving pointer events
-					// while the drag starts.
-					for ( const blockNode of pileNodes ) {
-						blockNode.style.pointerEvents = 'none';
-					}
-					// Only move if the pointer has moved.
-					if (
-						e.clientX === lastClientX &&
-						e.clientY === lastClientY
-					) {
-						return;
-					}
-					lastClientX = e.clientX;
-					lastClientY = e.clientY;
-					over();
-				}
-
-				function end() {
-					ownerDocument.removeEventListener( 'dragover', dragOver );
-					ownerDocument.removeEventListener( 'dragend', end );
-					ownerDocument.removeEventListener( 'drop', end );
-					ownerDocument.removeEventListener( 'scroll', over );
-					restoreCallbacks.forEach( ( restore ) => restore() );
-					countBadge.remove();
-					dragElement.remove();
-					stopDraggingBlocks();
-					document.body.classList.remove(
-						'is-dragging-components-draggable'
-					);
-					ownerDocument.documentElement.classList.remove(
-						'is-dragging'
-					);
-				}
-
-				ownerDocument.addEventListener( 'dragover', dragOver );
-				ownerDocument.addEventListener( 'dragend', end );
-				ownerDocument.addEventListener( 'drop', end );
-				ownerDocument.addEventListener( 'scroll', over );
-
-				startDraggingBlocks( clientIds );
-				// Important because it hides the block toolbar.
-				document.body.classList.add(
-					'is-dragging-components-draggable'
-				);
-				ownerDocument.documentElement.classList.add( 'is-dragging' );
+				return {
+					move( clientX, clientY ) {
+						if ( backNode ) {
+							backNode.style.pointerEvents = 'none';
+							backNode.style.top = node.style.top;
+							backNode.style.left = node.style.left;
+						}
+						positionCountBadge( clientX, clientY );
+					},
+					end() {
+						delete ownerDocument.documentElement.dataset.dragPile;
+						delete node.dataset.dragPile;
+						restoreBackNode?.();
+						countBadge.remove();
+					},
+				};
 			}
 
 			/**
@@ -568,7 +362,8 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				const isMultiSelectionDrag =
 					isMultiSelected &&
 					hasMultiSelection() &&
-					__unstableIsFullySelected();
+					__unstableIsFullySelected() &&
+					canMoveBlocks( getSelectedBlockClientIds() );
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
 					// A drag of a text selection within the field stays
@@ -625,11 +420,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 				dragElement.style.visibility = 'hidden';
 				ownerDocument.body.appendChild( dragElement );
 				event.dataTransfer.setDragImage( dragElement, 0, 0 );
-
-				if ( isMultiSelectionDrag ) {
-					startPileDrag( event, clientIds, dragElement );
-					return;
-				}
 
 				const rect = node.getBoundingClientRect();
 
@@ -725,6 +515,10 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					node.style.backgroundColor = bgColor;
 				}
 
+				const pile = isMultiSelectionDrag
+					? startPile( event, clientIds, rect, inverted )
+					: undefined;
+
 				let hasStarted = false;
 				let lastClientX = originClientX;
 				let lastClientY = originClientY;
@@ -757,6 +551,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					const leftDelta = pointerXDelta + scrollLeftDelta;
 					node.style.top = `${ topDelta * inverted }px`;
 					node.style.left = `${ leftDelta * inverted }px`;
+					pile?.move( lastClientX, lastClientY );
 				}
 
 				function end() {
@@ -771,6 +566,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					}
 					clone.remove();
 					node.id = id;
+					pile?.end();
 					dragElement.remove();
 					// Moving the block in the document tears the selection
 					// out of it; select the field in full again, so the
@@ -865,7 +661,7 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			isZoomOut,
 			resetZoomLevel,
 			hasMultiSelection,
-			multiSelect,
+			canMoveBlocks,
 			startDraggingBlocks,
 			stopDraggingBlocks,
 			isSectionBlock,

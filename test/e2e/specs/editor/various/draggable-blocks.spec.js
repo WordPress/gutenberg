@@ -601,8 +601,12 @@ test.describe( 'Draggable block', () => {
 			.poll( () => spacerBlock.evaluate( ( n ) => n.style.position ) )
 			.toBe( 'relative' );
 		await expect
-			.poll( () => separatorBlock.evaluate( ( n ) => n.style.position ) )
-			.toBe( 'relative' );
+			.poll( () =>
+				separatorBlock.evaluate( ( n ) =>
+					n.hasAttribute( 'data-drag-pile' )
+				)
+			)
+			.toBe( true );
 		await expect(
 			editor.canvas.locator( '.block-editor-block-list__drag-count' )
 		).toHaveText( '2' );
@@ -626,8 +630,12 @@ test.describe( 'Draggable block', () => {
 			.poll( () => spacerBlock.evaluate( ( n ) => n.style.position ) )
 			.toBe( '' );
 		await expect
-			.poll( () => separatorBlock.evaluate( ( n ) => n.style.position ) )
-			.toBe( '' );
+			.poll( () =>
+				separatorBlock.evaluate( ( n ) =>
+					n.hasAttribute( 'data-drag-pile' )
+				)
+			)
+			.toBe( false );
 		await expect(
 			editor.canvas.locator( '.block-editor-block-list__drag-count' )
 		).toHaveCount( 0 );
@@ -913,6 +921,159 @@ test.describe( 'Draggable block', () => {
 			{ name: 'core/paragraph', attributes: { content: 'Landing' } },
 			{ name: 'core/paragraph', attributes: { content: 'First' } },
 			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
+	test( 'drags a multi-selection from a block nested in a selected block', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:group -->
+<div class="wp-block-group"><!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph -->
+<p>Landing</p>
+<!-- /wp:paragraph -->` );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraphs.nth( 0 ).click();
+		await page.evaluate( () => {
+			const [ first, group ] = window.wp.data
+				.select( 'core/block-editor' )
+				.getBlockOrder();
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.multiSelect( first, group );
+		} );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const {
+						getSelectedBlockClientIds,
+						__unstableIsFullySelected,
+					} = window.wp.data.select( 'core/block-editor' );
+					return (
+						__unstableIsFullySelected() &&
+						getSelectedBlockClientIds().length
+					);
+				} )
+			)
+			.toBe( 2 );
+
+		// The separator is not selected itself, only its group is.
+		const box = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Separator' } )
+			.boundingBox();
+		await page.mouse.move( box.x + box.width / 2, box.y + box.height / 2 );
+		await page.mouse.down();
+		const landingBox = await paragraphs.nth( 1 ).boundingBox();
+		await page.mouse.move(
+			landingBox.x + 40,
+			landingBox.y + landingBox.height - 2,
+			{ steps: 10 }
+		);
+		await expect.poll( () => isDraggingBlocks( page ) ).toBe( true );
+		const indicator = page.locator(
+			'data-testid=block-list-insertion-point-indicator'
+		);
+		await expect( indicator ).toBeVisible();
+		await expect
+			.poll( async () => ( await indicator.boundingBox() ).y )
+			.toBeGreaterThan( landingBox.y );
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'Landing' } },
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{
+				name: 'core/group',
+				innerBlocks: [ { name: 'core/separator' } ],
+			},
+		] );
+	} );
+
+	test( 'places the caret at the click inside a multi-selection', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		const paragraphs = await multiSelectTwoParagraphs( {
+			editor,
+			page,
+			pageUtils,
+		} );
+		// Click between "Sec" and "ond".
+		const point = await paragraphs.nth( 1 ).evaluate( ( node ) => {
+			const range = node.ownerDocument.createRange();
+			range.setStart( node.firstChild, 3 );
+			const rect = range.getBoundingClientRect();
+			return { x: rect.left, y: rect.top + rect.height / 2 };
+		} );
+		const frameBox = await page
+			.locator( '[name="editor-canvas"]' )
+			.boundingBox();
+		await page.mouse.click( frameBox.x + point.x, frameBox.y + point.y );
+		await page.keyboard.type( 'X' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'SecXond' } },
+			{ name: 'core/paragraph', attributes: { content: 'Landing' } },
+		] );
+	} );
+
+	test( 'does not drag a multi-selection of locked blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		const paragraphs = await multiSelectTwoParagraphs( {
+			editor,
+			page,
+			pageUtils,
+		} );
+		await page.evaluate( () => {
+			const { getSelectedBlockClientIds } =
+				window.wp.data.select( 'core/block-editor' );
+			window.wp.data
+				.dispatch( 'core/block-editor' )
+				.updateBlockAttributes( getSelectedBlockClientIds(), {
+					lock: { move: true },
+				} );
+		} );
+		await expect(
+			paragraphs
+				.nth( 0 )
+				.evaluate(
+					( n ) =>
+						n.ownerDocument.defaultView.getComputedStyle( n ).cursor
+				)
+		).resolves.not.toBe( 'grab' );
+
+		const box = await paragraphs.nth( 0 ).boundingBox();
+		await page.mouse.move( box.x + box.width - 20, box.y + box.height / 2 );
+		await page.mouse.down();
+		const landingBox = await paragraphs.nth( 2 ).boundingBox();
+		await page.mouse.move(
+			landingBox.x + 40,
+			landingBox.y + landingBox.height - 2,
+			{ steps: 10 }
+		);
+		expect( await isDraggingBlocks( page ) ).toBe( false );
+		await page.mouse.up();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+			{ name: 'core/paragraph', attributes: { content: 'Landing' } },
 		] );
 	} );
 
