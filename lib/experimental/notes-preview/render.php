@@ -57,17 +57,69 @@ function gutenberg_notes_preview_maybe_enable_anchors() {
 
 	/*
 	 * Inline note markers carry the same information the reviewer is entitled
-	 * to read in the panel, so keep them rather than unwrapping them. Both the
-	 * core filter and the plugin's copy are removed.
+	 * to read in the panel, so keep them on the previewed post. The strip
+	 * filters are swapped for one that still strips every other post rendered
+	 * on the page, such as a Query Loop item.
 	 */
-	remove_filter( 'render_block', 'wp_strip_inline_note_markers' );
-	remove_filter( 'render_block', 'gutenberg_strip_inline_note_markers' );
+	foreach ( array( 'wp_strip_inline_note_markers', 'gutenberg_strip_inline_note_markers' ) as $strip ) {
+		if ( remove_filter( 'render_block', $strip ) ) {
+			gutenberg_notes_preview_strip_callback( $strip );
+		}
+	}
+
+	add_filter( 'render_block', 'gutenberg_notes_preview_strip_other_posts' );
 
 	// Priority 20, after any stripping that other code may still do.
 	add_filter( 'render_block', 'gutenberg_notes_preview_add_block_anchor', 20, 2 );
 }
 
 add_action( 'template_redirect', 'gutenberg_notes_preview_maybe_enable_anchors' );
+
+/**
+ * Whether the block being rendered belongs to the previewed post.
+ *
+ * Blocks of other posts on the page, such as Query Loop items, run with that
+ * post set up as the global post.
+ *
+ * @return bool True when rendering the queried post.
+ */
+function gutenberg_notes_preview_is_rendering_reviewed_post() {
+	return (int) get_the_ID() === (int) get_queried_object_id();
+}
+
+/**
+ * Remembers which strip filters were swapped out for this request.
+ *
+ * @param string|null $callback Callback to remember, or null to read them.
+ * @return string[] The remembered callbacks.
+ */
+function gutenberg_notes_preview_strip_callback( $callback = null ) {
+	static $callbacks = array();
+
+	if ( null !== $callback ) {
+		$callbacks[] = $callback;
+	}
+
+	return $callbacks;
+}
+
+/**
+ * Strips inline note markers from blocks of any post other than the previewed one.
+ *
+ * @param string $block_content Rendered block HTML.
+ * @return string Block HTML.
+ */
+function gutenberg_notes_preview_strip_other_posts( $block_content ) {
+	if ( gutenberg_notes_preview_is_rendering_reviewed_post() ) {
+		return $block_content;
+	}
+
+	foreach ( gutenberg_notes_preview_strip_callback() as $strip ) {
+		$block_content = call_user_func( $strip, $block_content );
+	}
+
+	return $block_content;
+}
 
 /**
  * Normalises a block's `metadata.noteId` into a list of note IDs.
@@ -107,6 +159,10 @@ function gutenberg_notes_preview_note_ids( $note_id ) {
  */
 function gutenberg_notes_preview_add_block_anchor( $block_content, $block ) {
 	if ( ! isset( $block['attrs']['metadata']['noteId'] ) || '' === $block_content ) {
+		return $block_content;
+	}
+
+	if ( ! gutenberg_notes_preview_is_rendering_reviewed_post() ) {
 		return $block_content;
 	}
 

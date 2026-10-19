@@ -667,6 +667,35 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 		$this->assertFalse( has_filter( 'render_block', 'gutenberg_strip_inline_note_markers' ) );
 	}
 
+	public function test_other_posts_on_the_preview_keep_their_markers_stripped() {
+		$this->grant( self::$post_id, array( 'read_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$this->go_to( $this->preview_url( self::$post_id ) );
+		gutenberg_notes_preview_maybe_enable_anchors();
+
+		$html  = '<p>Some <mark class="wp-note" data-id="5">noted</mark> text.</p>';
+		$block = array( 'attrs' => array( 'metadata' => array( 'noteId' => 5 ) ) );
+
+		$render = static function () use ( $html, $block ) {
+			return gutenberg_notes_preview_add_block_anchor(
+				gutenberg_notes_preview_strip_other_posts( $html ),
+				$block
+			);
+		};
+
+		$GLOBALS['post'] = get_post( self::$post_id );
+		$reviewed        = $render();
+		$this->assertStringContainsString( 'wp-note', $reviewed );
+		$this->assertStringContainsString( 'data-wp-note-id="5"', $reviewed );
+
+		// A Query Loop item sets up its own post as the global post.
+		$GLOBALS['post'] = get_post( self::$other_post_id );
+		$other           = $render();
+		$this->assertStringNotContainsString( 'wp-note', $other );
+		$this->assertStringNotContainsString( 'data-wp-note-id', $other );
+	}
+
 	public function test_anchor_filters_are_not_armed_without_the_capability() {
 		wp_set_current_user( self::$outsider_id );
 
