@@ -36,4 +36,13 @@ export interface FontFamilyControlProps extends Partial<
 	 */
 	fontFamilies?: FontFamilyOption[];
 	className?: string;
+	/**
+	 * Custom options, in place of the font family presets.
+	 */
+	options?: CustomSelectControlProps[ 'options' ];
+	disabled?: boolean;
+	/**
+	 * @deprecated The prop is no longer needed and can be safely removed.
+	 */
+	__nextHasNoMarginBottom?: boolean;
 }

@@ -1,9 +1,18 @@
 import clsx from 'clsx';
 import { Field, Select, VisuallyHidden } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
+import type { CSSProperties } from 'react';
 import type { FontFamilyPreset } from '@wordpress/global-styles-engine';
 import { useSettings } from '../use-settings';
 import type { FontFamilyControlProps } from './types';
+
+type FontFamilySelectOption = {
+	value: string | null;
+	label: string;
+	style?: CSSProperties;
+	className?: string;
+	description?: string;
+};
 
 export default function FontFamilyControl( {
 	/**
@@ -38,7 +47,7 @@ export default function FontFamilyControl( {
 		return null;
 	}
 
-	const options = customOptions
+	const options: FontFamilySelectOption[] = customOptions
 		? customOptions.map( ( option ) => ( {
 				value: option.key || null,
 				label: option.name,
@@ -63,7 +72,7 @@ export default function FontFamilyControl( {
 		options[ 0 ] ??
 		null;
 	const selectedHint = showSelectedHint && selectedValue?.description;
-	const description = [ describedBy, selectedHint ]
+	const description = [ selectedHint, describedBy ]
 		.filter( Boolean )
 		.join( ' ' );
 
@@ -108,7 +117,7 @@ export default function FontFamilyControl( {
 							<Select.ItemLabel style={ option.style }>
 								{ option.label }
 							</Select.ItemLabel>
-							{ option.description && (
+							{ !! option.description && (
 								<Select.ItemDescription>
 									{ option.description }
 								</Select.ItemDescription>

@@ -80,7 +80,7 @@ it( 'keeps the selected font hint visible and exposes it as an accessible descri
 	const trigger = screen.getByRole( 'combobox', { name: 'Font' } );
 	expect( trigger ).toHaveTextContent( 'Serif A font for body text' );
 	expect( trigger ).toHaveAccessibleDescription(
-		'Choose the font family A font for body text'
+		'A font for body text Choose the font family'
 	);
 	expect( screen.getByText( 'A font for body text' ) ).toHaveAttribute(
 		'aria-hidden',
