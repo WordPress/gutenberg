@@ -1,5 +1,17 @@
 import { describe, expect, it, vi } from 'vitest';
-import addMilestone from '../index.js';
+import addMilestoneTask from '../index.js';
+
+type Payload = Parameters< typeof addMilestoneTask >[ 0 ];
+type GitHub = Parameters< typeof addMilestoneTask >[ 1 ];
+
+/**
+ * Runs the task with partial fixtures, which provide only what it reads.
+ *
+ * @param payload Partial event payload.
+ * @param octokit Partial Octokit REST client.
+ */
+const addMilestone = ( payload: unknown, octokit: unknown ) =>
+	addMilestoneTask( payload as Payload, octokit as GitHub );
 
 describe( 'addMilestone', () => {
 	it( 'does nothing if base is not trunk', async () => {

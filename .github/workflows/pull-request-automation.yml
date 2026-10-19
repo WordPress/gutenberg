@@ -36,7 +36,7 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Build project management automation package
-              run: npm run typecheck -- packages/project-management-automation/tsconfig.json
+              run: npm run typecheck -- packages/project-management-automation/tsconfig.build.json
 
             - uses: ./packages/project-management-automation
               id: automation

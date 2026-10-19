@@ -1,6 +1,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
-import firstTimeContributorLabel from '../index.js';
+import firstTimeContributorLabelTask from '../index.js';
+
+type Payload = Parameters< typeof firstTimeContributorLabelTask >[ 0 ];
+type GitHub = Parameters< typeof firstTimeContributorLabelTask >[ 1 ];
+
+/**
+ * Runs the task with partial fixtures, which provide only what it reads.
+ *
+ * @param payload Partial event payload.
+ * @param octokit Partial Octokit REST client.
+ */
+const firstTimeContributorLabel = ( payload: unknown, octokit: unknown ) =>
+	firstTimeContributorLabelTask( payload as Payload, octokit as GitHub );
 
 vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),

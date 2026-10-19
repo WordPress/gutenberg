@@ -1,7 +1,25 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import * as core from '@actions/core';
 import hasWordPressProfile from '../../../has-wordpress-profile.js';
-import firstTimeContributorAccountLink from '../index.js';
+import firstTimeContributorAccountLinkTask from '../index.js';
+
+type Payload = Parameters< typeof firstTimeContributorAccountLinkTask >[ 0 ];
+type GitHub = Parameters< typeof firstTimeContributorAccountLinkTask >[ 1 ];
+
+/**
+ * Runs the task with partial fixtures, which provide only what it reads.
+ *
+ * @param payload Partial event payload.
+ * @param octokit Partial Octokit REST client.
+ */
+const firstTimeContributorAccountLink = (
+	payload: unknown,
+	octokit: unknown
+) =>
+	firstTimeContributorAccountLinkTask(
+		payload as Payload,
+		octokit as GitHub
+	);
 
 vi.mock( import( '@actions/core' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
