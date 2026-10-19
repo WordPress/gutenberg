@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `FontFamilyControl`: Internal markup and CSS classes have changed; custom CSS overrides may need updates. Popup items render outside the control root, and custom `options[].style` applies only to the option label. See the pull request's dev note for migration details ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
 -   Date format and preset selectors now use `@wordpress/ui`. They no longer render `.components-custom-select-control` or its item and hint classes, the `has-hint` modifier, the legacy `.components-input-base`, `.components-input-control__container`, `.components-input-control__backdrop`, `.components-input-control__suffix`, and `.components-input-control-suffix-wrapper` classes, `.components-base-control__label`, or `.block-editor-date-format-picker__custom-format-select-control__custom-option`. Control-specific root classes are retained. Update overrides that target the removed classes to use control-specific hooks or Design System theme tokens. Popup items are now portaled outside the control root, so root-descendant selectors no longer reach them ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   `ImageSizeControl`: The event in the `onChangeImage` callback's `{ event }` argument now comes from popup selection rather than a native select change. Read the selected value from the `slug` argument rather than `event.target.value` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -15,6 +16,7 @@
 
 ### Enhancements
 
+-   Migrate `FontFamilyControl` to `@wordpress/ui` ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
 -   Migrate date format and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, forwarded trigger props, and control-specific root CSS hooks. Also migrate the date format switch, custom input, link, and layout, and simplify the aspect-ratio control's option rendering ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).
 -   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
@@ -25,6 +27,7 @@
 
 ### Bug Fixes
 
+-   List View: Fix the drag-and-drop nesting gesture over an item without children ([#84856](https://github.com/WordPress/gutenberg/pull/84856)).
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
 -   List View: Show the appender when the container is contentOnly ([#84713](https://github.com/WordPress/gutenberg/pull/84713)).
 -   NavigableToolbar: Ignore menu focus guards so menus from `@wordpress/ui` open on the first click ([#84547](https://github.com/WordPress/gutenberg/pull/84547)).
@@ -37,6 +40,7 @@
 
 ### Internal
 
+-   Remove unused internal border-radius, block-support, state-selector, and object helpers ([#85092](https://github.com/WordPress/gutenberg/pull/85092)).
 -   Convert the remaining `utils` modules and the `state-utils` and `useCachedTruthy` hook helpers to TypeScript ([#84629](https://github.com/WordPress/gutenberg/pull/84629)).
 -   Convert the `private-keys`, `constants` and `array` store modules to TypeScript ([#84616](https://github.com/WordPress/gutenberg/pull/84616)).
 -   Convert the store reducer to TypeScript and add the store `State` and `Action` types ([#84624](https://github.com/WordPress/gutenberg/pull/84624)).
@@ -50,6 +54,33 @@
 -   Convert the block support helpers to TypeScript ([#84721](https://github.com/WordPress/gutenberg/pull/84721)).
 -   Convert the layout helpers and block gap utils to TypeScript ([#84722](https://github.com/WordPress/gutenberg/pull/84722)).
 -   Convert the block attribute filter hooks to TypeScript ([#84723](https://github.com/WordPress/gutenberg/pull/84723)).
+-   Convert `InspectorControls` to TypeScript ([#84725](https://github.com/WordPress/gutenberg/pull/84725)).
+-   Convert the anchor and custom class name hooks to TypeScript ([#84726](https://github.com/WordPress/gutenberg/pull/84726)).
+-   Convert the auto-generated inspector controls to TypeScript ([#84727](https://github.com/WordPress/gutenberg/pull/84727)).
+-   Convert the zoom out and content only section hooks to TypeScript ([#84731](https://github.com/WordPress/gutenberg/pull/84731)).
+-   Convert `BlockControls` to TypeScript ([#84733](https://github.com/WordPress/gutenberg/pull/84733)).
+-   Convert the flow layout to TypeScript ([#84734](https://github.com/WordPress/gutenberg/pull/84734)).
+-   Convert BlockPopover, the color and gradient controls, BlockTitle, useBlockDisplayInformation and MediaUpload to TypeScript ([#84813](https://github.com/WordPress/gutenberg/pull/84813)).
+-   Convert `LinkControl` and `URLInput` to TypeScript ([#84844](https://github.com/WordPress/gutenberg/pull/84844)).
+-   Convert `Warning`, `BlockEdit` and `PrivateBlockContext`, the `BlockControls` test and the store performance test to TypeScript ([#84846](https://github.com/WordPress/gutenberg/pull/84846)).
+-   Convert the layouts, `LayoutStyle`, the `align` hook, `BlockAlignmentControl`, `BlockVerticalAlignmentControl` and `JustifyContentControl` to TypeScript ([#84847](https://github.com/WordPress/gutenberg/pull/84847)).
+-   Convert the typography controls, the font size utilities and `withFontSizes` to TypeScript ([#84848](https://github.com/WordPress/gutenberg/pull/84848)).
+-   Convert the color utilities, `withColors`, the gradient utilities, `ColorPalette`, `PanelColorSettings`, `BlockColorsStyleSelector` and `ContrastChecker` to TypeScript ([#84875](https://github.com/WordPress/gutenberg/pull/84875)).
+-   Convert the block visibility, block lock and block bindings components to TypeScript ([#84876](https://github.com/WordPress/gutenberg/pull/84876)).
+-   Convert `DimensionsTool`, `ResolutionTool` and `ImageSizeControl` to TypeScript ([#84877](https://github.com/WordPress/gutenberg/pull/84877)).
+-   Convert `PresetInputControl` to TypeScript ([#84878](https://github.com/WordPress/gutenberg/pull/84878)).
+-   Convert `URLPopover` and `LinkPicker` to TypeScript ([#84879](https://github.com/WordPress/gutenberg/pull/84879)).
+-   Convert `BorderRadiusControl` and `DimensionControl` to TypeScript ([#84880](https://github.com/WordPress/gutenberg/pull/84880)).
+-   Convert the keyboard shortcut components, `ObserveTyping`, `Typewriter`, `BlockSelectionClearer`, `SkipToSelectedBlock` and `MultiSelectScrollIntoView` to TypeScript ([#84902](https://github.com/WordPress/gutenberg/pull/84902)).
+-   Convert `useOnBlockDrop`, `usePasteStyles`, `useMovingAnimation`, `useFlashEditableBlocks`, `useBlockCommands`, the convert to group buttons, the note icon slots, `useListViewPanelState` and `useResizeCanvas` to TypeScript ([#84906](https://github.com/WordPress/gutenberg/pull/84906)).
+-   Convert `SpacingSizesControl`, `FitTextSizeWarning`, the line height hook and the spacing visualizer to TypeScript ([#84907](https://github.com/WordPress/gutenberg/pull/84907)).
+-   Convert the block color contrast warning hook, the block bindings panel, the block style variation hook and the position hook to TypeScript ([#84908](https://github.com/WordPress/gutenberg/pull/84908)).
+-   Convert `AlignmentControl`, `BlockAlignmentMatrixControl`, `HeadingLevelDropdown`, `HTMLElementControl`, `BlockFullHeightAlignmentControl`, `BlockEditVisuallyButton`, `ToolSelector`, `PreviewOptions`, `useBlockOverlayActive`, `UnitControl`, `ResizableBoxPopover` and `HeightControl` to TypeScript ([#84912](https://github.com/WordPress/gutenberg/pull/84912)).
+-   Convert `InserterListbox`, `BlockPatternsPaging`, `__unstableInserterMenuExtension`, `BlockCard`, `BlockVariationTransforms`, `BlockVariationPicker`, `InspectorPopoverHeader`, `MultiSelectionInspector`, `BlockQuickNavigation` and `TabbedSidebar` to TypeScript ([#84913](https://github.com/WordPress/gutenberg/pull/84913)).
+-   Convert `BlockEditorProvider`, `ExperimentalBlockEditorProvider`, `withRegistryProvider`, `useBlockSync`, `BlockRefsProvider`, the selection context and `useMediaUploadSettings` to TypeScript ([#84915](https://github.com/WordPress/gutenberg/pull/84915)).
+-   Convert `WritingFlow` and its hooks to TypeScript ([#84918](https://github.com/WordPress/gutenberg/pull/84918)).
+-   Convert `Iframe`, `EditorStyles`, `NavigableToolbar`, `CopyHandler` and `BlockBreadcrumb` to TypeScript ([#84922](https://github.com/WordPress/gutenberg/pull/84922)).
+-   Convert `MediaPlaceholder` and `ImageEditor` to TypeScript ([#84923](https://github.com/WordPress/gutenberg/pull/84923)).
 
 ## 18.1.0 (2026-10-07)
 

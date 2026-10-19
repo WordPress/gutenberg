@@ -53,17 +53,6 @@ function gutenberg_initialize_experiments_settings() {
 			),
 		),
 		array(
-			'slug'  => 'data-views',
-			'label' => _x( 'Data Views', 'experiments group name', 'gutenberg' ),
-			'items' => array(
-				array(
-					'id'          => 'gutenberg-dataform-inspector',
-					'label'       => __( 'Editor Inspector: Use DataForm', 'gutenberg' ),
-					'description' => __( 'Replaces the bespoke editor inspector panels with a unified DataForm-based implementation for Pages and Posts, matching the QuickEdit experience.', 'gutenberg' ),
-				),
-			),
-		),
-		array(
 			'slug'  => 'interactivity',
 			'label' => _x( 'Interactivity', 'experiments group name', 'gutenberg' ),
 			'items' => array(

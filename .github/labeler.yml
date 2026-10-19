@@ -128,6 +128,7 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/fields/**'
           - any-glob-to-any-file: 'packages/core-fields/**'
+          - any-glob-to-any-file: 'packages/core-actions/**'
 
 '[Package] Format library':
     - changed-files:
@@ -212,10 +213,6 @@
 '[Package] Private APIs':
     - changed-files:
           - any-glob-to-any-file: 'packages/private-apis/**'
-
-'[Package] Project management automation':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/project-management-automation/**'
 
 '[Package] React i18n':
     - changed-files:

@@ -654,6 +654,10 @@ export interface BlockType<
 		 * Transforms from this block type to another block type.
 		 */
 		to?: BlockTransform[];
+		/**
+		 * Returns the blocks that replace this block when it is ungrouped.
+		 */
+		ungroup?: ( attributes: Attributes, innerBlocks: Block[] ) => Block[];
 	};
 	/**
 	 * Array of the names of context values to inherit from

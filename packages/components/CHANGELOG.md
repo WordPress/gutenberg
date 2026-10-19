@@ -4,7 +4,14 @@
 
 ### Breaking Changes
 
--   Components that compose Emotion style fragments with `cx()` should pass source-order-dependent fragments in a single `css()` call. Passing separate fragments can change override order after the following components stopped rendering styles through Emotion:
+-   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers using `@emotion/react` or `@emotion/styled` that relied on StyleProvider's cross-document cache must provide their own cache targeting that document's `<head>` and wrap the subtree in `CacheProvider`; `StyleProvider` continues to register CSS Module styles. Components no longer supply Framer Motion's optional Emotion DOM prop validator; without a validator, `__unstableMotion` forwards non-animation props to the rendered element. This includes:
+    -   Context-system class-name composition ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
+    -   `StyleProvider` cache removal ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
+    -   Removal of the remaining Emotion dependencies and obsolete snapshot helpers ([#85022](https://github.com/WordPress/gutenberg/pull/85022)).
+    -   `SelectControl` ([#84732](https://github.com/WordPress/gutenberg/pull/84732))
+    -   `DatePicker` ([#84724](https://github.com/WordPress/gutenberg/pull/84724))
+    -   `FocalPointPicker` ([#84736](https://github.com/WordPress/gutenberg/pull/84736))
+    -   `InputControl`, `InputControlPrefixWrapper`, and `InputControlSuffixWrapper` ([#84728](https://github.com/WordPress/gutenberg/pull/84728)).
     -   `Menu` ([#84706](https://github.com/WordPress/gutenberg/pull/84706))
     -   `Navigator` ([#84565](https://github.com/WordPress/gutenberg/pull/84565))
     -   `UnitControl` ([#84561](https://github.com/WordPress/gutenberg/pull/84561))
@@ -19,10 +26,14 @@
 
 ### Enhancements
 
+-   `BorderBoxControl`, `BorderControl`, `Heading`, `InputControl`, `Menu`, `RangeControl`, `Text`, `ToolsPanel`: Use semantic WPDS tokens for typography, spacing, border previews, and range rails ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
+-   `ColorPicker`: Use `Select` from `@wordpress/ui` for the color format selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   `ExternalLink`: Use a small border radius for consistent focus rings ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
 -   `TabPanel`: Add interaction backgrounds to unselected tabs, preserve keyboard focus rings, and size neutral vertical selection lines to the content ([#84572](https://github.com/WordPress/gutenberg/pull/84572)).
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
+-   `Snackbar`: Keep snackbars that have an action on screen for 10 seconds instead of 6 before they are dismissed automatically ([#84842](https://github.com/WordPress/gutenberg/pull/84842)).
+-   `Tabs`: Show the tab panel's focus ring with the design system's outline instead of a legacy box-shadow ([#84914](https://github.com/WordPress/gutenberg/pull/84914)).
 
 ### Deprecations
 
@@ -30,7 +41,12 @@
 
 ### Bug Fixes
 
+-   `Tabs`, `TabPanel`: Expand vertical tab interaction backgrounds and focus rings across the row ([#84821](https://github.com/WordPress/gutenberg/pull/84821)).
+-   `StyleProvider`: Register module styles before children measure layout in iframe documents ([#84736](https://github.com/WordPress/gutenberg/pull/84736)).
 -   `BorderBoxControl`: Unpack multi-value CSS box shorthand strings (such as `"0 0 0 2px"`) into individual side widths when splitting borders ([#84826](https://github.com/WordPress/gutenberg/pull/84826)).
+-   `SelectControl`: Preserve the minimal variant's inline layout in iframe documents ([#84732](https://github.com/WordPress/gutenberg/pull/84732)).
+-   `DatePicker`: Keep month navigation in a grid in iframe documents ([#84724](https://github.com/WordPress/gutenberg/pull/84724)).
+-   `InputControl`: Preserve the label wrapper's maximum width in iframe documents ([#84728](https://github.com/WordPress/gutenberg/pull/84728)).
 -   `PaletteEdit`: Name picker dialogs and add screen-reader-only dismissal controls while preserving live edits ([#84333](https://github.com/WordPress/gutenberg/pull/84333)).
 -   `Grid`: Fix the `bottomLeft` alignment, which resolved to the top right corner instead of the bottom left one ([#82641](https://github.com/WordPress/gutenberg/pull/82641)).
 -   Keep JavaScript color fallbacks in sync with the generated design tokens. ([#84569](https://github.com/WordPress/gutenberg/pull/84569))
@@ -51,8 +67,21 @@
 
 ### Internal
 
+-   Remove obsolete JavaScript style configuration and unused style helpers ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
+-   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
+-   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
+-   Remove unused internal BoxControl and UnitControl helpers and gradient constants ([#85091](https://github.com/WordPress/gutenberg/pull/85091)).
+-   Replace remaining Emotion fixtures in polymorphic tests and ToolsPanel stories with SCSS Modules ([#84926](https://github.com/WordPress/gutenberg/pull/84926)).
+-   Generate connected component class names locally and remove unused case-conversion dependencies ([#85098](https://github.com/WordPress/gutenberg/pull/85098)).
+-   Remove unused Emotion-based `boxSizingReset` and `rtl` utilities ([#84929](https://github.com/WordPress/gutenberg/pull/84929)).
+-   Simplify the internal Text highlighter ([#85101](https://github.com/WordPress/gutenberg/pull/85101)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
 -   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
+
+### Documentation
+
+-   Retire completed Emotion migration guidance and keep permanent styling advice in the contribution guide ([#85023](https://github.com/WordPress/gutenberg/pull/85023)).
+-   Update styling guidance and the `ToolsPanel` example after the Emotion migration ([#85020](https://github.com/WordPress/gutenberg/pull/85020)).
 
 ## 42.0.0 (2026-10-07)
 

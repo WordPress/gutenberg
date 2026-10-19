@@ -2,7 +2,7 @@ import { Button } from '@wordpress/components';
 import { copySmall } from '@wordpress/icons';
 import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { InputControl, InputLayout, Link, Stack } from '@wordpress/ui';
 import { safeDecodeURIComponent } from '@wordpress/url';
@@ -17,8 +17,7 @@ const PERMALINK_POSTNAME_REGEX = /%(?:postname|pagename)%/;
 /*
  * The slug control, laid out with `Stack` and built with `InputControl`, `InputLayout`, and `Link` from
  * `@wordpress/ui`, as `use-recommended-components` asks, and styled with a
- * CSS module. It keeps the first slug in state rather than in a ref read
- * during render.
+ * CSS module.
  */
 const SlugEdit = ( {
 	field,
@@ -43,13 +42,12 @@ const SlugEdit = ( {
 	const isEditable =
 		PERMALINK_POSTNAME_REGEX.test( permalinkTemplate ) &&
 		hasActionLink( data, 'wp:action-publish' );
-	// The slug the post had first, shown and restored while the slug is
-	// emptied.
-	const [ originalSlug ] = useState( slug );
-	const slugToDisplay = slug || originalSlug;
-	const permalink = isEditable
-		? `${ permalinkPrefix }${ slugToDisplay }${ permalinkSuffix }`
-		: safeDecodeURIComponent( data.link || '' );
+	// A post without a slug or a title has no pretty permalink yet, so use its
+	// plain one (`?p=ID`).
+	const permalink =
+		isEditable && slug
+			? `${ permalinkPrefix }${ slug }${ permalinkSuffix }`
+			: safeDecodeURIComponent( data.link || '' );
 
 	const onChangeControl = useCallback(
 		( newValue?: string ) =>
@@ -109,11 +107,6 @@ const SlugEdit = ( {
 						onValueChange={ ( newValue ) => {
 							onChangeControl( newValue );
 						} }
-						onBlur={ () => {
-							if ( slug === '' ) {
-								onChangeControl( originalSlug );
-							}
-						} }
 						aria-describedby={ postUrlSlugDescriptionId }
 					/>
 					<div className={ styles.help }>
@@ -123,11 +116,17 @@ const SlugEdit = ( {
 							href={ permalink }
 							openInNewTab
 						>
-							<span>{ permalinkPrefix }</span>
-							<span className={ styles[ 'help-slug' ] }>
-								{ slugToDisplay }
-							</span>
-							<span>{ permalinkSuffix }</span>
+							{ slug ? (
+								<>
+									<span>{ permalinkPrefix }</span>
+									<span className={ styles[ 'help-slug' ] }>
+										{ slug }
+									</span>
+									<span>{ permalinkSuffix }</span>
+								</>
+							) : (
+								permalink
+							) }
 						</Link>
 					</div>
 				</Stack>
