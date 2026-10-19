@@ -151,9 +151,13 @@ function filterElementBlockSupports(
 
 		const isElement = ! name && !! element && element in ELEMENTS;
 
-		// Block gap is emitted for blocks and for the root, but not for an
-		// element's own selector, so the control would have no effect there.
-		if ( support === 'blockGap' && isElement ) {
+		// Block gap and the layout widths are emitted for blocks and for the
+		// root, but not for an element's own selector, so their controls would
+		// have no effect there.
+		if (
+			[ 'blockGap', 'contentSize', 'wideSize' ].includes( support ) &&
+			isElement
+		) {
 			return false;
 		}
 
