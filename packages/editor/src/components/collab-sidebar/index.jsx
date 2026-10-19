@@ -15,7 +15,7 @@ import { Notes } from './notes';
 import { NotesDisplayModeMenu } from './notes-display-mode-menu';
 import { store as editorStore } from '../../store';
 import { AddNoteMenuItem } from './add-note-menu-item';
-import { NoteAvatarIndicator } from './note-indicator-toolbar';
+import { AddNoteToolbarButton } from './add-note-toolbar-button';
 import { NoteHighlightStyles } from './note-highlight-styles';
 import {
 	NoteDraftsContext,
@@ -24,7 +24,6 @@ import {
 	useNoteThreads,
 	usePickNote,
 } from './hooks';
-import { getNoteIdsFromMetadata, pickPrimaryNote } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { CanvasMargin } from '../visual-editor/canvas-margin';
 import { unlock } from '../../lock-unlock';
@@ -34,15 +33,12 @@ function NotesSidebar( { postId, drafts } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { ref: canvasMarginRef } = useSlot( CanvasMargin.name );
 
-	const { clientId, noteId, isClassicBlock } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+	const { clientId, isClassicBlock } = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockName } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 		return {
 			clientId: _clientId,
-			noteId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
 			isClassicBlock: _clientId
 				? getBlockName( _clientId ) === 'core/freeform'
 				: false,
@@ -78,7 +74,6 @@ function NotesSidebar( { postId, drafts } ) {
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const pickNote = usePickNote( { drafts, onDiscard } );
 
-	const blockNoteIds = getNoteIdsFromMetadata( { noteId } );
 	const areNotesHidden = notesDisplayMode === 'hidden';
 	// Fallback to "All notes" sidebar on smaller viewports or a narrow canvas.
 	const showAllNotesSidebar =
@@ -123,19 +118,6 @@ function NotesSidebar( { postId, drafts } ) {
 		pickNote( targetNoteId, targetClientId, { focus: true } );
 	}
 
-	function openNoteForBlock( targetClientId ) {
-		// A block can carry multiple threads; surface the most relevant.
-		const blockThreads = notes.filter(
-			( thread ) => thread.blockClientId === targetClientId
-		);
-		const target = pickPrimaryNote( blockThreads );
-		return focusNote( {
-			targetClientId,
-			noteId: target?.id ?? 'new',
-			isApproved: target?.status === 'approved',
-		} );
-	}
-
 	function addNewNoteForBlock( targetClientId ) {
 		return focusNote( {
 			targetClientId,
@@ -155,30 +137,27 @@ function NotesSidebar( { postId, drafts } ) {
 		}
 	);
 
-	// Surface one thread for the avatar indicator.
-	const currentThreads =
-		blockNoteIds.length > 0
-			? notes.filter( ( thread ) => blockNoteIds.includes( thread.id ) )
-			: [];
-	const currentThread = pickPrimaryNote( currentThreads );
-
 	return (
 		<>
 			<NoteHighlightStyles
 				threads={ unresolvedNotes }
 				selectedId={ selectedNoteId }
 			/>
-			{ !! currentThread && (
-				<NoteAvatarIndicator
-					note={ currentThread }
-					onClick={ () => openNoteForBlock( clientId ) }
-				/>
-			) }
 			<AddNoteMenuItem
 				onClick={ ( menuClientId ) =>
 					addNewNoteForBlock( menuClientId )
 				}
 			/>
+			{ notes.length > 0 && (
+				<AddNoteToolbarButton
+					count={
+						notes.filter(
+							( thread ) => thread.blockClientId === clientId
+						).length
+					}
+					onClick={ addNewNoteForBlock }
+				/>
+			) }
 			<NotesDisplayModeMenu
 				hasFloatingNotes={ hasFloatingNotes }
 				hasAllNotes={ showAllNotesSidebar }

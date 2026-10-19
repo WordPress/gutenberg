@@ -5,6 +5,7 @@ import type { select as globalSelect } from '@wordpress/data';
 import {
 	selectBlockPatternsKey,
 	userPatternCategoriesSelectKey,
+	currentUserIdSelectKey,
 } from './private-keys';
 import { unlock } from '../lock-unlock';
 import { STORE_NAME } from './constants';
@@ -30,9 +31,19 @@ export const isFiltered = Symbol( 'isFiltered' );
 const parsedPatternCache = new WeakMap< BlockPattern, ParsedPattern >();
 const grammarMapCache = new WeakMap< BlockPattern, GrammarBlock[] >();
 
+/**
+ * Maps a `wp_block` record to the pattern shape the inserter uses.
+ *
+ * @param userPattern                         The `wp_block` record.
+ * @param __experimentalUserPatternCategories The user pattern categories.
+ * @param currentUserId                       The ID of the current user, if known.
+ *
+ * @return The pattern.
+ */
 export function mapUserPattern(
 	userPattern: UserPattern,
-	__experimentalUserPatternCategories: UserPatternCategory[] = []
+	__experimentalUserPatternCategories: UserPatternCategory[] = [],
+	currentUserId?: number
 ): BlockPattern {
 	return {
 		name: `core/block/${ userPattern.id }`,
@@ -47,6 +58,8 @@ export function mapUserPattern(
 		} ),
 		content: userPattern.content?.raw,
 		syncStatus: userPattern.wp_pattern_sync_status,
+		isCurrentUserPattern:
+			!! currentUserId && userPattern.author === currentUserId,
 	};
 }
 
@@ -150,6 +163,7 @@ export const getAllPatternsDependants =
 				state.settings.__experimentalUserPatternCategories,
 			state.settings.__experimentalReusableBlocks,
 			state.settings[ selectBlockPatternsKey ]?.( select ),
+			state.settings[ currentUserIdSelectKey ]?.( select ),
 			// @ts-expect-error The store has no `blockPatterns`, so this is always undefined.
 			state.blockPatterns,
 			unlock( select( STORE_NAME ) ).getReusableBlocks(),

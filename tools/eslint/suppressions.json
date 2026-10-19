@@ -11210,14 +11210,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/note-indicator-toolbar.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/collab-sidebar/note-thread.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
