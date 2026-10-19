@@ -2,7 +2,7 @@
 /**
  * External dependencies
  */
-const dockerCompose = require( 'docker-compose' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 
 /**
  * Internal dependencies
