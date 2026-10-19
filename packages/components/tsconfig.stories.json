@@ -15,7 +15,7 @@
 			"style-imports"
 		]
 	},
-	"files": [ "storybook.d.ts", "src/popover/test/utils/index.tsx" ],
+	"files": [ "storybook.d.ts" ],
 	// Same JS-only exclusion the package used before the split.
 	"exclude": [
 		"**/benchmark",
