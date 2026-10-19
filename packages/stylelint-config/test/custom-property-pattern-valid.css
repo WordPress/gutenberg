@@ -1,0 +1,4 @@
+.example {
+	--my-token: 1rem;
+	color: var(--my-token);
+}

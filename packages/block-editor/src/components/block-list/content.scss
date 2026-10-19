@@ -80,13 +80,16 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 		}
 	}
 
-	// Block highlight, and navigation mode, and focus.
+	// Block highlight, and navigation mode, and focus, and hover where the
+	// grab cursor shows what a drag would take.
 	// This piece of code has gone back and forth between using a pseudo element
 	// vs. styling the block directly. Ultimately we likely need a pseudo element
 	// (unless styles like focus and selection overlay can be rendered as separate elements),
 	// since things like border-radius need to be able to be set on the block itself.
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-highlighted ~ .is-multi-selected,
+	.block-editor-block-list__block.is-hovered-draggable[draggable="true"]:not(.is-multi-selected),
+	.block-editor-block-list__block.is-hovered-draggable[data-draggable="true"]:not(.is-multi-selected),
 	.block-editor-block-list__block:not([contenteditable="true"]):focus {
 		outline: none;
 
@@ -366,7 +369,8 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	box-sizing: border-box;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
-	overflow: hidden;
+	field-sizing: content;
+	overflow: auto;
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
 	line-height: 1.5;
@@ -399,7 +403,7 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	font-size: $default-font-size;
 	font-family: $default-font;
 	color: $black;
-	font-weight: normal;
+	font-weight: 400;
 
 	.is-zoomed-out & {
 		// Maintains an absolute font-size by counter-scaling based on the zoom level.
@@ -435,4 +439,34 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 			pointer-events: none;
 		}
 	}
+}
+
+// The whole selection can be dragged from any of its blocks.
+.block-editor-block-list__block.is-movable-multi-selected:not(.is-partially-selected) {
+	cursor: grab;
+
+	.is-dragging & {
+		cursor: grabbing;
+	}
+}
+
+// The number of dragged blocks, next to the pointer while dragging a
+// multi selection.
+.block-editor-block-list__drag-count {
+	position: fixed;
+	z-index: 1001;
+	pointer-events: none;
+	box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-width: $grid-unit-30;
+	height: $grid-unit-30;
+	padding: 0 $grid-unit-05;
+	border-radius: $grid-unit-30 * 0.5;
+	background: var(--wp-admin-theme-color);
+	color: $white;
+	font-family: $default-font;
+	font-size: 12px;
+	font-weight: 500;
 }

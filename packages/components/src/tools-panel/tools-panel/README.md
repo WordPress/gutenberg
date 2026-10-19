@@ -1,9 +1,7 @@
 # ToolsPanel
 
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early
-implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early
+implementation subject to drastic and breaking changes.</p>
 <br />
 These panels provide progressive discovery options for their children. For
 example the controls provided via block supports.
@@ -51,29 +49,15 @@ both columns.
 ## Usage
 
 ```jsx
-/**
- * External dependencies
- */
-import styled from '@emotion/styled';
-
-/**
- * WordPress dependencies
- */
 import {
 	BoxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-const PanelDescription = styled.div`
-	grid-column: span 2;
-`;
-
-const SingleColumnItem = styled( ToolsPanelItem )`
-	grid-column: span 1;
-`;
+import styles from './style.module.scss';
 
 export function DimensionPanel() {
 	const [ height, setHeight ] = useState();
@@ -90,11 +74,12 @@ export function DimensionPanel() {
 
 	return (
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
-			<PanelDescription>
+			<div className={ styles[ 'panel-description' ] }>
 				Select dimensions or spacing related settings from the menu for
 				additional controls.
-			</PanelDescription>
-			<SingleColumnItem
+			</div>
+			<ToolsPanelItem
+				className={ styles[ 'single-column-item' ] }
 				hasValue={ () => !! height }
 				label={ __( 'Height' ) }
 				onDeselect={ () => setHeight( undefined ) }
@@ -106,8 +91,9 @@ export function DimensionPanel() {
 					onChange={ setHeight }
 					value={ height }
 				/>
-			</SingleColumnItem>
-			<SingleColumnItem
+			</ToolsPanelItem>
+			<ToolsPanelItem
+				className={ styles[ 'single-column-item' ] }
 				hasValue={ () => !! width }
 				label={ __( 'Width' ) }
 				onDeselect={ () => setWidth( undefined ) }
@@ -119,7 +105,7 @@ export function DimensionPanel() {
 					onChange={ setWidth }
 					value={ width }
 				/>
-			</SingleColumnItem>
+			</ToolsPanelItem>
 			<ToolsPanelItem
 				hasValue={ () => !! padding }
 				label={ __( 'Padding' ) }
@@ -146,6 +132,18 @@ export function DimensionPanel() {
 			</ToolsPanelItem>
 		</ToolsPanel>
 	);
+}
+```
+
+Add these styles to `style.module.scss`. The repeated selector keeps the single-column override above ToolsPanelItem's default full-width rule, regardless of stylesheet order.
+
+```scss
+.panel-description {
+	grid-column: span 2;
+}
+
+.single-column-item.single-column-item {
+	grid-column: span 1;
 }
 ```
 

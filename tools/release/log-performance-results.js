@@ -1,8 +1,4 @@
 #!/usr/bin/env node
-
-/**
- * External dependencies
- */
 const fs = require( 'fs' );
 const path = require( 'path' );
 const [ token, branch, hash, baseHash, timestamp ] = process.argv.slice( 2 );

@@ -17,7 +17,7 @@ This set of guidelines should apply especially to newly introduced components. I
 -   [Unit tests](#unit-tests)
 -   [Storybook](#storybook)
 -   [Documentation](#documentation)
--   [README example](#README-example)
+-   [README example](#readme-example)
 -   [Folder structure](#folder-structure)
 -   [Component versioning](#component-versioning)
 
@@ -346,7 +346,7 @@ function HookExample() {
 
 ## TypeScript
 
-We strongly encourage using TypeScript for all new components.
+All new components should be written in TypeScript.
 
 Extend existing components’ props if possible, especially when a component internally forwards its props to another component in the package:
 
@@ -420,7 +420,11 @@ All new components should be styled using SCSS Modules.
 
 Place component-local styles in a `style.module.scss` file next to the component, import the module from JavaScript or TypeScript, and compose class names with `clsx`. Preserve existing public `components-*` class names where consumers may rely on them. For dynamic values, prefer inline CSS custom properties consumed by the SCSS module. For variants and state, prefer conditional module classes composed with `clsx` object syntax, e.g. `{ [ styles.className ]: condition }`.
 
-Legacy components may still use Emotion while they are being migrated, but new Emotion usage should not be added.
+Use `--_wp-components-*` for new private custom properties. These are implementation details, not public theming APIs. Keep supported customization in component props and existing public styles.
+
+Components no longer use Emotion. Do not add new Emotion imports.
+
+For styling compatibility and verification, follow [Change a package safely](/docs/contributors/design/design-system-packages.md#change-a-package-safely) and the [cross-document setup guidance](/packages/theme/README.md#across-documents-iframes-and-other-portals).
 
 ### Deprecating styles
 
@@ -590,7 +594,11 @@ A component's story should be showcasing its different states — for example, t
 ```jsx
 import Button from '../';
 
-export default { title: 'Components/Button', component: Button };
+export default {
+	id: 'components-button',
+	title: 'Components/@wordpress-components/Actions/Button',
+	component: Button,
+};
 
 const Template = ( args ) => <Button { ...args } />;
 
@@ -611,7 +619,7 @@ Primary.args = {
 
 A great tool to use when writing stories is the [Storybook Controls addon](https://storybook.js.org/addons/@storybook/addon-controls). Ideally props should be exposed by using this addon, which provides a graphical UI to interact dynamically with the component without needing to write code. Historically, we used [Knobs](https://storybook.js.org/addons/@storybook/addon-knobs), but it was deprecated and later removed in [#47152](https://github.com/WordPress/gutenberg/pull/47152).
 
-The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) (code [here](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/stories/index.story.tsx)).
+The default value of each control should coincide with the default value of the props (i.e. it should be `undefined` if a prop is not required). A story should, therefore, also explicitly show how values from the Context System are applied to (sub)components. A good example of how this may look like is the [`Card` story](https://wordpress.github.io/gutenberg/?path=/story/components-card--default) ([source code](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/src/card/stories/index.story.tsx)).
 
 Storybook can be started on a local machine by running `npm run storybook:dev`. Alternatively, the components' catalogue (up to date with the latest code on `trunk`) can be found at [wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/).
 
@@ -627,14 +635,10 @@ Each component that is exported from the `@wordpress/components` package should 
 # `ComponentName`
 
 <!-- If component is experimental, add the following section: -->
-<div class="callout callout-alert">
-This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
-</div>
+<p class="callout callout-alert">This feature is still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.</p>
 
 <!-- If component is deprecated, add the following section: -->
-<div class="callout callout-alert">
-This component is deprecated. Please use `{other component}` from the `{other package}` package instead.
-</div>
+<p class="callout callout-alert">This component is deprecated. Please use `{other component}` from the `{other package}` package instead.</p>
 
 Description of the component.
 
@@ -684,9 +688,9 @@ As a result of the above guidelines, all new components (except for shared utili
 ```text
 component-name/
 ├── stories
-│   └── index.js
+│   └── index.ts
 ├── test
-│   └── index.js
+│   └── index.ts
 ├── component.tsx
 ├── context.ts
 ├── hook.ts
@@ -713,9 +717,9 @@ component-family-name/
 │   ├── README.md
 │   └── style.module.scss
 ├── stories
-│   └── index.js
+│   └── index.ts
 ├── test
-│   └── index.js
+│   └── index.ts
 ├── context.ts
 ├── index.ts
 ├── types.ts
@@ -757,19 +761,18 @@ If possible, the legacy version of the component should be rewritten so that it 
 function LegacyComponent( props ) {
 	const newProps = useTranslateLegacyPropsToNewProps( props );
 
-	return ( <NewComponentImplementation { ...newProps } /> );
+	return <NewComponentImplementation { ...newProps } />;
 }
 
 // new-component/index.tsx
 function NewComponent( props ) {
-	return ( <NewComponentImplementation { ...props } /> );
+	return <NewComponentImplementation { ...props } />;
 }
 
 // new-component/implementation.tsx
 function NewComponentImplementation( props ) {
 	// implementation
 }
-
 ```
 
 In case that is not possible (eg. too difficult to reconciliate new and legacy implementations, or impossible to preserve backward compatibility), then the legacy implementation can stay as-is.

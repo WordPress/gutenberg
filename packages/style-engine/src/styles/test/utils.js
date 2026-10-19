@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { camelCaseJoin, getCSSValueFromRawStyle, upperFirst } from '../utils';
 
 describe( 'utils', () => {

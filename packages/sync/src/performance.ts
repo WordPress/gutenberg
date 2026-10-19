@@ -33,19 +33,3 @@ export function passThru< T extends ( ...args: any[] ) => any >( fn: T ): T {
 	return ( ( ...args: Parameters< T > ): ReturnType< T > =>
 		fn( ...args ) ) as T;
 }
-
-/**
- * Wraps a function so that every invocation is delayed until the next tick of
- * the event loop.
- *
- * @param fn - The function to be scheduled.
- */
-export function yieldToEventLoop< Params extends Array< unknown > >(
-	fn: ( ...args: Params ) => void
-): typeof fn {
-	return function ( this: unknown, ...args: Params ): void {
-		setTimeout( () => {
-			fn.apply( this, args );
-		}, 0 );
-	};
-}

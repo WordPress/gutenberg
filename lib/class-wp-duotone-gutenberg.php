@@ -135,8 +135,8 @@ class WP_Duotone_Gutenberg {
 	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L23
 	 *
 	 * @param float $number The number to clamp.
-	 * @param float $min   The minimum value.
-	 * @param float $max   The maximum value.
+	 * @param float $min    The minimum value.
+	 * @param float $max    The maximum value.
 	 * @return float The clamped value.
 	 */
 	private static function colord_clamp( $number, $min = 0, $max = 1 ) {
@@ -878,9 +878,9 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 *
-	 * @param  string   $block_content Rendered block content.
-	 * @param  array    $block         Block object.
-	 * @param  WP_Block $wp_block      The block instance.
+	 * @param string   $block_content Rendered block content.
+	 * @param array    $block         Block object.
+	 * @param WP_Block $wp_block      The block instance.
 	 * @return string Filtered block content.
 	 */
 	public static function render_duotone_support( $block_content, $block, $wp_block ) {
@@ -912,9 +912,12 @@ class WP_Duotone_Gutenberg {
 			// 3. A CSS string - e.g. 'unset' to remove globally applied duotone.
 
 			$duotone_attr = $block['attrs']['style']['color']['duotone'];
-			$is_preset    = is_string( $duotone_attr ) && self::is_preset( $duotone_attr );
-			$is_css       = is_string( $duotone_attr ) && ! $is_preset;
-			$is_custom    = is_array( $duotone_attr );
+			if ( ! is_string( $duotone_attr ) && ! is_array( $duotone_attr ) ) {
+				return $block_content;
+			}
+
+			$is_preset = is_string( $duotone_attr ) && self::is_preset( $duotone_attr );
+			$is_css    = is_string( $duotone_attr ) && ! $is_preset;
 
 			if ( $is_preset ) {
 				$slug         = self::get_slug_from_attribute( $duotone_attr ); // e.g. 'blue-orange'.
@@ -931,7 +934,7 @@ class WP_Duotone_Gutenberg {
 
 				// Just block CSS.
 				self::enqueue_block_css( $filter_id, $duotone_selector, $filter_value );
-			} elseif ( $is_custom ) {
+			} else {
 				$slug         = wp_unique_id( sanitize_key( implode( '-', $duotone_attr ) . '-' ) ); // e.g. '000000-ffffff-2'.
 				$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-000000-ffffff-2'.
 				$filter_value = self::get_filter_url( $filter_id ); // e.g. 'url(#wp-duotone-filter-000000-ffffff-2)'.
@@ -943,7 +946,7 @@ class WP_Duotone_Gutenberg {
 				// SVG filter and block CSS.
 				self::enqueue_custom_filter( $filter_id, $duotone_selector, $filter_value, $filter_data );
 			}
-		} elseif ( $has_global_styles_duotone ) {
+		} else {
 			$slug         = $global_styles_block_names[ $block['blockName'] ]; // e.g. 'blue-orange'.
 			$filter_id    = self::get_filter_id( $slug ); // e.g. 'wp-duotone-filter-blue-orange'.
 			$filter_value = self::get_css_var( $slug ); // e.g. 'var(--wp--preset--duotone--blue-orange)'.
@@ -967,8 +970,8 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.5.0
 	 *
-	 * @param  string $block_content Rendered block content.
-	 * @return string                Filtered block content.
+	 * @param string $block_content Rendered block content.
+	 * @return string Filtered block content.
 	 */
 	public static function restore_image_outer_container( $block_content ) {
 		if ( wp_theme_has_theme_json() ) {
@@ -1119,8 +1122,8 @@ class WP_Duotone_Gutenberg {
 	 * @since 6.3.0
 	 * @deprecated 6.3.0
 	 *
-	 * @param  array $preset Duotone preset value as seen in theme.json.
-	 * @return string        Duotone filter CSS id.
+	 * @param array $preset Duotone preset value as seen in theme.json.
+	 * @return string Duotone filter CSS id.
 	 */
 	public static function get_filter_id_from_preset( $preset ) {
 		_deprecated_function( __FUNCTION__, '6.3.0' );

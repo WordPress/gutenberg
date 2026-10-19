@@ -18,7 +18,7 @@ class Tests_Blocks_Render_Table_Of_Contents_Test extends WP_UnitTestCase {
 	/**
 	 * @covers ::gutenberg_block_core_table_of_contents_render
 	 */
-	public function test_render_uses_current_post_headings_instead_of_saved_headings() {
+	public function test_render_preserves_saved_markup_for_unedited_legacy_content() {
 		$post_id = self::factory()->post->create(
 			array(
 				'post_status'  => 'publish',
@@ -45,9 +45,9 @@ class Tests_Blocks_Render_Table_Of_Contents_Test extends WP_UnitTestCase {
 
 		$nav = $this->get_table_of_contents_html( $this->render_post_content( $post_id ) );
 
-		$this->assertStringContainsString( 'Current section', $nav );
-		$this->assertStringContainsString( '#current-section', $nav );
-		$this->assertStringNotContainsString( 'Stale section', $nav );
+		$this->assertStringContainsString( 'Stale section', $nav );
+		$this->assertStringContainsString( '#stale-section', $nav );
+		$this->assertStringNotContainsString( 'Current section', $nav );
 	}
 
 	/**

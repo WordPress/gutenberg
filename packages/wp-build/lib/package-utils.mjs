@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { readFileSync, existsSync } from 'fs';
 import { createRequire } from 'module';
 import path from 'path';

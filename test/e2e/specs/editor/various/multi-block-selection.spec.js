@@ -1,6 +1,7 @@
-/**
- * WordPress dependencies
- */
+import { randomUUID } from 'crypto';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 /** @typedef {import('@playwright/test').Page} Page */
@@ -47,6 +48,51 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		);
 	} );
 
+	test( 'should disclose the blocks nested in selected blocks', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/group',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'inner one' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'inner two' },
+				},
+			],
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'outer' },
+		} );
+
+		await editor.canvas.getByText( 'outer' ).click();
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 4 ] );
+
+		await expect( page.locator( '[aria-live="assertive"]' ) ).toHaveText(
+			'2 blocks selected, 4 including nested blocks.'
+		);
+
+		await editor.openDocumentSettingsSidebar();
+		await expect(
+			page.locator( '.block-editor-multi-selection-inspector__card' )
+		).toContainText( '2 Blocks' );
+		await expect(
+			page.locator( '.block-editor-multi-selection-inspector__card' )
+		).toContainText( '4 including nested blocks' );
+	} );
+
 	// See #14448: an incorrect buffer may trigger multi-selection too soon.
 	test( 'should only trigger multi-selection when at the end (-webkit)', async ( {
 		page,
@@ -85,7 +131,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Shift+Enter' );
@@ -112,7 +158,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '12' );
@@ -135,7 +181,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Shift+ArrowUp' );
@@ -215,7 +261,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 3 ] );
 	} );
 
-	test( 'should deselect with Escape', async ( {
+	test( 'should keep the selection when stepping out with Escape', async ( {
 		page,
 		editor,
 		pageUtils,
@@ -234,11 +280,23 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2, 3 ] );
 
+		// Escape steps out of the canvas onto its stop without removing the
+		// selection.
 		await page.keyboard.press( 'Escape' );
+
+		await expect(
+			page.getByRole( 'button', { name: 'Editor canvas' } )
+		).toBeFocused();
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2, 3 ] );
+
+		// Enter returns to the selection.
+		await page.keyboard.press( 'Enter' );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
-			.toEqual( [ 1 ] );
+			.toEqual( [ 1, 2, 3 ] );
 	} );
 
 	test( 'should keep the editing host semantics across a cross-block selection', async ( {
@@ -247,7 +305,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -305,7 +363,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -603,7 +661,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -670,7 +728,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		editor,
 	} ) => {
 		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
+			.locator( 'role=document[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '123' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -787,7 +845,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		multiBlockSelectionUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', {
+			.getByRole( 'document', {
 				name: 'Add default block',
 			} )
 			.click();
@@ -879,7 +937,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1' );
 
@@ -934,7 +992,54 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should select the whole paragraph on triple click from the block edge', async ( {
+	test( 'should place the caret at the click inside a multi block selection', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'One two three' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'Second' },
+		} );
+
+		const box = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.boundingBox();
+		// Click past the text so the caret lands at the end.
+		await page.mouse.click( box.x + box.width - 4, box.y + box.height / 2 );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const { getSelectionStart, getSelectionEnd } =
+						window.wp.data.select( 'core/block-editor' );
+					return [ getSelectionStart(), getSelectionEnd() ].map(
+						( { offset } ) => offset
+					);
+				} )
+			)
+			.toEqual( [ 11, 6 ] );
+
+		// Selecting the first block must not keep the start offset without
+		// an end, which would set the caret at the start of the block.
+		await page.mouse.click( box.x + box.width - 4, box.y + box.height / 2 );
+		await page.keyboard.type( 'a' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'One two threea' },
+			},
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
+	} );
+
+	test( 'should select the whole paragraph on triple click', async ( {
 		page,
 		editor,
 		multiBlockSelectionUtils,
@@ -947,24 +1052,14 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Second' },
 		} );
-
-		// Deselect the block so the rich text element is not focused and the
-		// selection observer, not the rich text, dispatches the selection.
 		await page.evaluate( () =>
 			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock()
 		);
 
-		const paragraph = editor.canvas
+		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
-			.first();
-		const box = await paragraph.boundingBox();
-
-		// Triple click just left of the paragraph text (on the canvas
-		// padding), so the paragraph selection is made without focusing the
-		// rich text element.
-		await page.mouse.click( box.x - 5, box.y + box.height / 2, {
-			clickCount: 3,
-		} );
+			.first()
+			.click( { clickCount: 3 } );
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedBlocks )
@@ -993,6 +1088,13 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				startOffset: 0,
 				endOffset: 'One two three'.length,
 			} );
+
+		// Typing replaces the selection.
+		await page.keyboard.type( 'x' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'x' } },
+			{ name: 'core/paragraph', attributes: { content: 'Second' } },
+		] );
 	} );
 
 	test( 'should gradually multi-select', async ( {
@@ -1053,10 +1155,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Backspace' );
 
-		// Expect both columns to be deleted.
-		await expect
-			.poll( editor.getBlocks )
-			.toMatchObject( [ { name: 'core/columns', innerBlocks: [] } ] );
+		// Expect the columns block to be deleted along with its emptied
+		// columns.
+		await expect.poll( editor.getBlocks ).toEqual( [] );
 	} );
 
 	test( 'should multi-select from within the list block', async ( {
@@ -1281,7 +1382,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );
@@ -1310,7 +1411,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		pageUtils,
 	} ) => {
 		await editor.canvas
-			.getByRole( 'button', { name: 'Add default block' } )
+			.getByRole( 'document', { name: 'Add default block' } )
 			.click();
 		await page.keyboard.type( '1[' );
 		await page.keyboard.press( 'Enter' );
@@ -1454,6 +1555,123 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should preserve other style attributes on selected blocks when updating a specific style property', async ( {
+		page,
+		editor,
+		pageUtils,
+		multiBlockSelectionUtils,
+	} ) => {
+		// Insert 3 paragraph blocks with different custom background colors
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First',
+				style: { color: { background: '#ff0000' } },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Second',
+				style: { color: { background: '#00ff00' } },
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Third',
+				style: { color: { background: '#0000ff' } },
+			},
+		} );
+
+		// Select all 3 blocks
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 2, 3 ] );
+
+		// Open block settings sidebar
+		await editor.openDocumentSettingsSidebar();
+
+		const settings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+		await settings
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Typography' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+
+		// Wait for the color picker to appear and click white
+		await page.getByRole( 'option', { name: 'White' } ).click();
+
+		// Check that the blocks have the white text color but kept their
+		// original backgrounds and content.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First',
+					textColor: 'white',
+					style: { color: { background: '#ff0000' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second',
+					textColor: 'white',
+					style: { color: { background: '#00ff00' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Third',
+					textColor: 'white',
+					style: { color: { background: '#0000ff' } },
+				},
+			},
+		] );
+
+		// Clicking the active color again clears the text color on all
+		// selected blocks, while the distinct backgrounds remain.
+		await page.getByRole( 'option', { name: 'White' } ).click();
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First',
+					style: { color: { background: '#ff0000' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second',
+					style: { color: { background: '#00ff00' } },
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Third',
+					style: { color: { background: '#0000ff' } },
+				},
+			},
+		] );
+
+		const blocksAfterClear = await editor.getBlocks();
+		expect(
+			blocksAfterClear.map( ( block ) => block.attributes.textColor )
+		).toEqual( [ undefined, undefined, undefined ] );
+	} );
+
 	test.describe( 'shift+click multi-selection', () => {
 		test( 'should multi-select block with text selection and a block without text selection', async ( {
 			page,
@@ -1483,6 +1701,237 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				] );
 		} );
 
+		test( 'should partially select text from block to block in either direction', async ( {
+			editor,
+			page,
+		} ) => {
+			// One block without `editableRoot` support (verse) and one
+			// with it (paragraph). Starting from the verse, the blocks
+			// are separate editing hosts at click time, which is the
+			// case under test; starting from the paragraph covers a
+			// block that already keeps the wrapper as the editing host.
+			await editor.insertBlock( {
+				name: 'core/verse',
+				attributes: {
+					// Several lines, so the block is taller than the
+					// floating toolbar of the block below, which hovers
+					// over the bottom of this one.
+					content: 'verse one<br>verse two<br>verse three',
+				},
+			} );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'paragraph text' },
+			} );
+
+			const getSelection = () =>
+				page.evaluate( () => {
+					const sel = window.wp.data.select( 'core/block-editor' );
+					const start = sel.getSelectionStart();
+					const end = sel.getSelectionEnd();
+					return {
+						blocks: sel.getSelectedBlockClientIds().length,
+						startKey: start.attributeKey,
+						endKey: end.attributeKey,
+						isFullySelected: sel.__unstableIsFullySelected(),
+					};
+				} );
+			const getNativeSelection = () =>
+				page.frame( { name: 'editor-canvas' } ).evaluate( () => {
+					const selection = document.getSelection();
+					const blockType = ( domNode ) =>
+						domNode &&
+						( domNode.nodeType === domNode.TEXT_NODE
+							? domNode.parentElement
+							: domNode
+						)
+							.closest( '[data-type]' )
+							?.getAttribute( 'data-type' );
+					return {
+						anchorBlock: blockType( selection.anchorNode ),
+						focusBlock: blockType( selection.focusNode ),
+						// The clicked positions vary with rendering, but
+						// any selection between the middle of the verse
+						// and the middle of the paragraph contains the
+						// last verse line whole.
+						includesCrossedText: selection
+							.toString()
+							.includes( 'verse three' ),
+					};
+				} );
+
+			// Down: from the verse into the paragraph. The selection
+			// must extend to the clicked position, like it does within a
+			// single block, resulting in a partial selection of both
+			// blocks.
+			await editor.canvas.locator( '[data-type="core/verse"]' ).click();
+			await editor.canvas
+				.locator( '[data-type="core/paragraph"]' )
+				.click( { modifiers: [ 'Shift' ] } );
+			await expect.poll( getSelection ).toEqual( {
+				blocks: 2,
+				startKey: 'content',
+				endKey: 'content',
+				isFullySelected: false,
+			} );
+			// The native selection reaches from the click to the click.
+			await expect.poll( getNativeSelection ).toEqual( {
+				anchorBlock: 'core/verse',
+				focusBlock: 'core/paragraph',
+				includesCrossedText: true,
+			} );
+
+			// Deselect: click in the paragraph again.
+			await editor.canvas
+				.locator( '[data-type="core/paragraph"]' )
+				.click();
+			await expect
+				.poll( () => getSelection().then( ( s ) => s.blocks ) )
+				.toBe( 1 );
+
+			// Up: from the paragraph into the verse.
+			await editor.canvas
+				.locator( '[data-type="core/verse"]' )
+				.click( { modifiers: [ 'Shift' ] } );
+			await expect.poll( getSelection ).toEqual( {
+				blocks: 2,
+				startKey: 'content',
+				endKey: 'content',
+				isFullySelected: false,
+			} );
+			await expect.poll( getNativeSelection ).toEqual( {
+				anchorBlock: 'core/paragraph',
+				focusBlock: 'core/verse',
+				includesCrossedText: true,
+			} );
+		} );
+
+		test( 'should partially select text from list item to list item', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/list',
+				innerBlocks: [
+					{
+						name: 'core/list-item',
+						attributes: { content: 'first item text' },
+					},
+					{
+						name: 'core/list-item',
+						attributes: { content: 'second item text' },
+					},
+				],
+			} );
+			await page.keyboard.press( 'Escape' );
+
+			// Click within the text, not the (full row width) center.
+			await editor.canvas
+				.getByText( 'first item text', { exact: true } )
+				.click( { position: { x: 40, y: 8 } } );
+			await editor.canvas
+				.getByText( 'second item text', { exact: true } )
+				.click( {
+					modifiers: [ 'Shift' ],
+					position: { x: 60, y: 8 },
+				} );
+
+			await expect
+				.poll( () =>
+					page.evaluate( () => {
+						const sel =
+							window.wp.data.select( 'core/block-editor' );
+						return {
+							blocks: sel.getSelectedBlockClientIds().length,
+							startKey: sel.getSelectionStart().attributeKey,
+							endKey: sel.getSelectionEnd().attributeKey,
+							isFullySelected: sel.__unstableIsFullySelected(),
+						};
+					} )
+				)
+				.toEqual( {
+					blocks: 2,
+					startKey: 'content',
+					endKey: 'content',
+					isFullySelected: false,
+				} );
+
+			// The native selection reaches from within the first item to
+			// within the second: it must contain the end of the first
+			// item's text and the start of the second's.
+			await expect
+				.poll( () =>
+					page
+						.frame( { name: 'editor-canvas' } )
+						.evaluate( () =>
+							document
+								.getSelection()
+								.toString()
+								.replace( /\s+/g, ' ' )
+						)
+				)
+				.toMatch( /text s/ );
+		} );
+
+		test( 'should preserve text selection on shift+click within the same paragraph', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'sample paragraph text' },
+			} );
+			await page.keyboard.press( 'Escape' );
+
+			const paragraph = editor.canvas.getByText(
+				'sample paragraph text',
+				{ exact: true }
+			);
+
+			// Click to place caret at the beginning.
+			await paragraph.click( { position: { x: 10, y: 8 } } );
+
+			// Shift+click towards the end of the same paragraph.
+			await paragraph.click( {
+				modifiers: [ 'Shift' ],
+				position: { x: 80, y: 8 },
+			} );
+
+			// Extending selection within the same block keeps text selection active.
+			await expect
+				.poll( () =>
+					page.evaluate( () => {
+						const sel =
+							window.wp.data.select( 'core/block-editor' );
+						return {
+							blocks: sel.getSelectedBlockClientIds().length,
+							startKey: sel.getSelectionStart()?.attributeKey,
+							endKey: sel.getSelectionEnd()?.attributeKey,
+							isFullySelected: sel.__unstableIsFullySelected(),
+						};
+					} )
+				)
+				.toEqual( {
+					blocks: 1,
+					startKey: 'content',
+					endKey: 'content',
+					isFullySelected: false,
+				} );
+
+			await expect
+				.poll( () =>
+					page
+						.frame( { name: 'editor-canvas' } )
+						.evaluate( () =>
+							document
+								.getSelection()
+								.toString()
+								.replace( /\s+/g, ' ' )
+						)
+				)
+				.not.toBe( '' );
+		} );
+
 		test( 'should multi-select blocks without text selection', async ( {
 			editor,
 			multiBlockSelectionUtils,
@@ -1503,6 +1952,156 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 					{ name: 'core/spacer' },
 					{ name: 'core/spacer' },
 				] );
+		} );
+
+		test( 'should grow and shrink a full selection with shift+arrow', async ( {
+			editor,
+			page,
+			multiBlockSelectionUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'a paragraph' },
+			} );
+
+			const spacerBlocks = editor.canvas.getByRole( 'document', {
+				name: 'Block: Spacer',
+			} );
+
+			await spacerBlocks.nth( 0 ).click();
+			await spacerBlocks.nth( 1 ).click( { modifiers: [ 'Shift' ] } );
+
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+				] );
+
+			// A fully selected multi-selection grows by one block at the
+			// focus end.
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'a paragraph' },
+					},
+				] );
+
+			// And shrinks the same way.
+			await page.keyboard.press( 'Shift+ArrowUp' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{ name: 'core/spacer' },
+				] );
+		} );
+
+		test( 'should extend the selection from a block without a text selection', async ( {
+			page,
+			editor,
+			multiBlockSelectionUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/spacer' } );
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'a paragraph' },
+			} );
+
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Spacer' } )
+				.click();
+
+			await page.keyboard.press( 'Shift+ArrowDown' );
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toMatchObject( [
+					{ name: 'core/spacer' },
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'a paragraph' },
+					},
+				] );
+		} );
+
+		test( 'should not scroll the canvas when the selection spans a scrolled page', async ( {
+			editor,
+			page,
+			multiBlockSelectionUtils,
+		} ) => {
+			await editor.insertBlock( { name: 'core/spacer' } );
+			for ( let i = 0; i < 30; i++ ) {
+				await editor.insertBlock( {
+					name: 'core/paragraph',
+					attributes: { content: `${ i }` },
+				} );
+			}
+
+			const frame = page.frame( { name: 'editor-canvas' } );
+
+			// Select the spacer at the top of the document.
+			await frame.evaluate( () => {
+				document.documentElement.scrollTop = 0;
+			} );
+			await editor.canvas
+				.getByRole( 'document', { name: 'Block: Spacer' } )
+				.click();
+
+			// Scroll to the bottom of the document, and resolve after the
+			// scroll event settles so the watcher below only sees
+			// scrolling caused by the selection.
+			const before = await frame.evaluate(
+				() =>
+					new Promise( ( resolve ) => {
+						document.addEventListener(
+							'scroll',
+							() =>
+								window.requestAnimationFrame( () =>
+									resolve(
+										document.documentElement.scrollTop
+									)
+								),
+							{ once: true }
+						);
+						document.documentElement.scrollTop =
+							document.documentElement.scrollHeight;
+					} )
+			);
+			expect( before ).toBeGreaterThan( 0 );
+
+			// Record every scroll movement for a second. The page may
+			// scroll up and back down again, so the position cannot be
+			// asserted after the fact.
+			const scrollWatcher = frame.evaluate(
+				() =>
+					new Promise( ( resolve ) => {
+						const positions = [];
+						document.addEventListener( 'scroll', () => {
+							positions.push(
+								document.documentElement.scrollTop
+							);
+						} );
+						setTimeout( () => resolve( positions ), 1000 );
+					} )
+			);
+
+			// Extend the selection to a paragraph at the bottom. The
+			// page must not scroll back to the top of the document.
+			await editor.canvas
+				.getByText( '28', { exact: true } )
+				.click( { modifiers: [ 'Shift' ] } );
+
+			await expect
+				.poll( multiBlockSelectionUtils.getSelectedBlocks )
+				.toHaveLength( 30 );
+			expect( await scrollWatcher ).toEqual( [] );
 		} );
 	} );
 
@@ -1556,6 +2155,407 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 				{ name: 'core/paragraph' },
 				{ name: 'core/paragraph' },
 			] );
+	} );
+
+	test( 'should format text across blocks', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+
+		// The same text on both lines, so the caret lands between the
+		// same letters one line up.
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		const getSelection = () =>
+			page.evaluate( () => {
+				const {
+					getSelectedBlockClientIds,
+					getSelectionStart,
+					getSelectionEnd,
+				} = window.wp.data.select( 'core/block-editor' );
+				return {
+					blocks: getSelectedBlockClientIds().length,
+					anchorOffset: getSelectionStart().offset,
+					focusOffset: getSelectionEnd().offset,
+				};
+			} );
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 1,
+			focusOffset: 1,
+		} );
+		// Browsers differ in how they separate the blocks.
+		const getSelectedText = () =>
+			editor.canvas
+				.locator( ':root' )
+				.evaluate( () =>
+					window.getSelection().toString().replace( /\s/g, '' )
+				);
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a<strong>b</strong>' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>a</strong>b' },
+			},
+		] );
+
+		// The selection is kept, and the toolbar shows the format as
+		// active and removes it again.
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 1,
+			focusOffset: 1,
+		} );
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+		const bold = page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Bold' } );
+		await expect( bold ).toHaveAttribute( 'aria-pressed', 'true' );
+		await bold.click();
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+
+		// Undo brings back the format and the selection.
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a<strong>b</strong>' },
+			},
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>a</strong>b' },
+			},
+		] );
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 1,
+			focusOffset: 1,
+		} );
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+		await pageUtils.pressKeys( 'primary+shift+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+
+		// A link is one anchor per block, as it is one per line within a
+		// block.
+		await pageUtils.pressKeys( 'primary+k' );
+		await expect(
+			page.getByRole( 'combobox', { name: 'Search or type URL' } )
+		).toBeFocused();
+		await page.keyboard.type( 'https://example.com' );
+		await page.keyboard.press( 'Enter' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'a<a href="https://example.com">b</a>',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<a href="https://example.com">a</a>b',
+				},
+			},
+		] );
+
+		// Leave the link preview, which keeps focus, and the selection is
+		// still the one to delete.
+		await page.keyboard.press( 'Escape' );
+		await expect.poll( getSelectedText ).toBe( 'ba' );
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			] );
+	} );
+
+	test( 'should keep a selection ending after a non-breaking space', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'ab' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'a&nbsp;bcd' },
+		} );
+		// The inserted block starts with the caret at its start. The space
+		// is rendered in its own element, which the selection must not
+		// confuse with the text around it.
+		await pageUtils.pressKeys( 'ArrowRight', { times: 3 } );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		const getSelection = () =>
+			page.evaluate( () => {
+				const {
+					getSelectedBlockClientIds,
+					getSelectionStart,
+					getSelectionEnd,
+				} = window.wp.data.select( 'core/block-editor' );
+				return {
+					blocks: getSelectedBlockClientIds().length,
+					anchorOffset: getSelectionStart().offset,
+					focusOffset: getSelectionEnd().offset,
+				};
+			} );
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 3,
+			focusOffset: 2,
+		} );
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: '<strong>a\u00a0b</strong>cd' },
+			},
+		] );
+		await expect.poll( getSelection ).toEqual( {
+			blocks: 2,
+			anchorOffset: 3,
+			focusOffset: 2,
+		} );
+		await expect
+			.poll( () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () =>
+						window.getSelection().toString().replace( /\s/g, '' )
+					)
+			)
+			.toBe( 'ab' );
+		await page.keyboard.press( 'Backspace' );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: 'abcd' } },
+			] );
+	} );
+
+	test( 'should replace the selection across blocks with an inline image', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'ab' );
+		await page.keyboard.press( 'ArrowLeft' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlockClientIds().length
+				)
+			)
+			.toBe( 2 );
+
+		await page.getByRole( 'button', { name: 'More' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Inline image' } ).click();
+		const fileName = randomUUID();
+		const tmpFileName = path.join( os.tmpdir(), fileName + '.png' );
+		fs.copyFileSync(
+			'./assets/10x10_e2e_test_image_z9T8jK.png',
+			tmpFileName
+		);
+		await page
+			.locator( '.media-modal .moxie-shim input[type=file]' )
+			.setInputFiles( tmpFileName );
+		await page
+			.getByRole( 'button', { name: 'Select', exact: true } )
+			.click();
+
+		// The image replaces the selected text, as it does within a block,
+		// and the blocks become one with the caret after it.
+		const image = `<img class="wp-image-\\d+" style="width:\\s*10px;?" src="[^"]+\\/${ fileName }\\.png" alt=""\\/?>`;
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: expect.stringMatching(
+						new RegExp( `^a${ image }b$` )
+					),
+				},
+			},
+		] );
+		await page.keyboard.type( 'c' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: expect.stringMatching(
+						new RegExp( `^a${ image }cb$` )
+					),
+				},
+			},
+		] );
+
+		// Undo takes the typed letter back, then the image and the merge
+		// together.
+		await pageUtils.pressKeys( 'primary+z' );
+		await pageUtils.pressKeys( 'primary+z' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+			{ name: 'core/paragraph', attributes: { content: 'ab' } },
+		] );
+	} );
+
+	test( 'should offer the formats every selected block allows', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await page.evaluate( () => {
+			const { registerBlockType } = window.wp.blocks;
+			const { useBlockProps, RichText } = window.wp.blockEditor;
+			const el = window.wp.element.createElement;
+			registerBlockType( 'test/italic-only', {
+				apiVersion: 3,
+				title: 'Italic only',
+				category: 'text',
+				attributes: {
+					content: {
+						type: 'rich-text',
+						source: 'rich-text',
+						selector: 'p',
+					},
+				},
+				edit: function Edit( { attributes, setAttributes } ) {
+					return el( RichText, {
+						...useBlockProps(),
+						tagName: 'p',
+						identifier: 'content',
+						allowedFormats: [ 'core/italic' ],
+						value: attributes.content,
+						onChange( content ) {
+							setAttributes( { content } );
+						},
+					} );
+				},
+				save( { attributes } ) {
+					return el( RichText.Content, {
+						tagName: 'p',
+						value: attributes.content,
+					} );
+				},
+			} );
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'ab' },
+		} );
+		await editor.insertBlock( {
+			name: 'test/italic-only',
+			attributes: { content: 'ab' },
+		} );
+		// The inserted block starts with the caret at its start.
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowUp' );
+		await expect
+			.poll( () =>
+				page.evaluate( () => {
+					const {
+						getSelectedBlockClientIds,
+						getSelectionStart,
+						getSelectionEnd,
+					} = window.wp.data.select( 'core/block-editor' );
+					return {
+						blocks: getSelectedBlockClientIds().length,
+						anchorOffset: getSelectionStart().offset,
+						focusOffset: getSelectionEnd().offset,
+					};
+				} )
+			)
+			.toEqual( { blocks: 2, anchorOffset: 1, focusOffset: 1 } );
+
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Italic' } )
+		).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeHidden();
+
+		await pageUtils.pressKeys( 'primary+b' );
+		await pageUtils.pressKeys( 'primary+i' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'a<em>b</em>' },
+			},
+			{
+				name: 'test/italic-only',
+				attributes: { content: '<em>a</em>b' },
+			},
+		] );
+	} );
+
+	test( 'should not offer formatting when a selected block is more than its text', async ( {
+		editor,
+		page,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'ab' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/quote',
+			innerBlocks: [
+				{ name: 'core/paragraph', attributes: { content: 'cd' } },
+			],
+		} );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first()
+			.click();
+		await page.keyboard.press( 'Shift+ArrowDown' );
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph' },
+				{ name: 'core/quote' },
+			] );
+		const toolbar = page.getByRole( 'toolbar', { name: 'Block tools' } );
+		await expect( toolbar ).toBeVisible();
+		await expect(
+			toolbar.getByRole( 'button', { name: 'Bold' } )
+		).toBeHidden();
 	} );
 } );
 

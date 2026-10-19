@@ -2,6 +2,38 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   Replace the no-results tip with an info notice and a documentation action link ([#84197](https://github.com/WordPress/gutenberg/pull/84197)).
+
+## 5.57.0 (2026-10-07)
+
+## 5.56.0 (2026-09-23)
+
+## 5.55.0 (2026-09-10)
+
+### Bug Fixes
+
+-   `BlockRatings`: Preserve full, half, and empty star colors after the icons became stroke-based. ([#78808](https://github.com/WordPress/gutenberg/pull/78808))
+
+### Internal
+
+-   Use the `.jsx` extension for JavaScript source files that contain JSX ([#80990](https://github.com/WordPress/gutenberg/pull/80990)).
+
+## 5.54.0 (2026-08-26)
+
+## 5.53.0 (2026-08-12)
+
+### Bug Fixes
+
+-   Wrap the downloadable block item labels in `__()` so they can be translated ([#81237](https://github.com/WordPress/gutenberg/pull/81237)).
+
+## 5.52.0 (2026-07-29)
+
 ## 5.51.0 (2026-07-14)
 
 ### Enhancements

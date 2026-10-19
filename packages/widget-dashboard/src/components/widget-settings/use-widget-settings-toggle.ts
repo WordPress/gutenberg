@@ -1,11 +1,4 @@
-/**
- * WordPress dependencies
- */
 import { useCallback } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { useDashboardInternalContext } from '../../context/dashboard-context';
 import { useDashboardUIContext } from '../../context/ui-context';
 import type { DashboardWidget } from '../../types';

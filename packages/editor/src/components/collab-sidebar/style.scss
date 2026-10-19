@@ -1,18 +1,75 @@
+@use "@wordpress/base-styles/animations" as *;
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-.interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
-	box-shadow: none;
+// Threads collapse to avatar pills, showing the author on hover or focus.
+// Selecting the block only highlights its thread; focusing it expands it.
+@mixin minimized-threads {
+	.editor-collab-sidebar-panel__thread.is-floating:not(.is-selected.has-focus) {
+		left: auto;
+		padding: $grid-unit-10;
 
-	.interface-complementary-area-header {
-		display: none;
+		.editor-collab-sidebar-panel__deleted-block-notice,
+		.editor-collab-sidebar-panel__more-reply-separator,
+		.editor-collab-sidebar-panel__note ~ .editor-collab-sidebar-panel__note,
+		.editor-collab-sidebar-panel__note > :not(:first-child),
+		.editor-collab-sidebar-panel__note-actions {
+			display: none;
+		}
+
+		.editor-collab-sidebar-panel__user-info {
+			white-space: nowrap;
+		}
+
+		&:not(:hover, :focus-within) .editor-collab-sidebar-panel__user-info {
+			display: none;
+		}
 	}
 }
 
-.editor-collab-sidebar {
+// Pointer events pass through to the canvas, except on threads.
+.editor-collab-sidebar-overlay {
 	height: 100%;
-	overflow: hidden;
+	// Fades in while "All notes" closes, so notes don't show twice.
+	@include animation__fade-in(var(--wpds-motion-duration-lg), 0s, var(--wpds-motion-easing-balanced));
+
+	&.is-minimized {
+		@include minimized-threads;
+	}
+
+	// The canvas margin's compact tier. Keep in sync with `canvas-margin.js`.
+	@container (width < 880px) {
+		@include minimized-threads;
+	}
+
+	.editor-collab-sidebar-panel {
+		// A real scroller, mirrored with the canvas by `useFloatingBoard`.
+		// No anchoring, so a thread that grows doesn't move the panel.
+		overflow-y: auto;
+		overflow-anchor: none;
+		scrollbar-width: none;
+
+		// Gives the panel the canvas's scroll range, whatever their heights.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			width: 1px;
+			height: calc(100% + var(--canvas-scroll-range, 0px));
+		}
+	}
+
+	// The margin spans the canvas scrollbar; shift the panel off it.
+	.editor-resizable-editor.has-canvas-margin & .editor-collab-sidebar-panel {
+		margin-inline-start: calc(-1 * var(--canvas-scrollbar-width, 0px));
+		margin-inline-end: var(--canvas-scrollbar-width, 0px);
+	}
+
+	.editor-collab-sidebar-panel__thread,
+	.editor-collab-sidebar-panel__add-note {
+		pointer-events: auto;
+	}
 }
 
 .editor-collab-sidebar-panel {
@@ -48,15 +105,25 @@
 		right: $grid-unit-20;
 		position: absolute;
 		margin-top: $grid-unit-20;
-		// Inherits `--canvas-scroll` from the panel (set by `useFloatingBoard`)
-		// so each thread tracks the canvas scroll.
-		transform: translateY(var(--canvas-scroll, 0));
-		will-change: transform;
-		// Keep the reply input reachable when a thread is taller than the viewport
-		// (e.g. many replies on short content where the canvas can't scroll).
+		// Inherits `--canvas-offset` from the panel (set by `useFloatingBoard`)
+		// so each thread tracks the canvas frame. The panel's scroll tracks the
+		// canvas scroll.
+		transform: translateY(var(--canvas-offset, 0px));
+		// Keep the reply input reachable when a thread is taller than the
+		// viewport (e.g. many replies).
 		max-height: calc(100dvh - var(--wp-admin--admin-bar--height, 0px) - #{$header-height + $grid-unit-80});
 		overflow-y: auto;
+
+		// Ease reflows, e.g. on selection change. The first positioning starts
+		// from `top: auto`, which doesn't animate.
+		@media (prefers-reduced-motion: no-preference) {
+			transition: top var(--wpds-motion-duration-md) var(--wpds-motion-easing-balanced);
+		}
 	}
+}
+
+.editor-collab-sidebar-panel__user-info {
+	flex: 1;
 }
 
 .editor-collab-sidebar-panel__user-name {
@@ -65,7 +132,7 @@
 	line-height: 16px;
 	text-align: left;
 	color: $gray-700;
-	text-transform: capitalize;
+	overflow-wrap: anywhere;
 }
 
 .editor-collab-sidebar-panel__user-time {
@@ -89,6 +156,15 @@
 }
 
 .editor-collab-sidebar-panel__note-content {
+	overflow-wrap: break-word;
+	// Room for the floating add-reaction trigger, reserved on every note so
+	// text does not rewrap when one is selected.
+	padding-right: $button-size-small + $grid-unit-10;
+
+	p {
+		margin-top: 0;
+	}
+
 	p:last-child {
 		margin-bottom: 0;
 	}
@@ -158,7 +234,7 @@
 	max-height: calc(20px * 20 + 18px); // 20 rows + vertical padding.
 	overflow-y: auto;
 	white-space: pre-wrap;
-	word-wrap: break-word;
+	overflow-wrap: break-word;
 
 	// Inline formats inherit the surrounding text styles but keep
 	// their semantic emphasis (RichText renders <strong>, <em>, etc.).
@@ -170,7 +246,7 @@
 		border-radius: 2px;
 	}
 
-	a:not(.wp-note-mention) {
+	a {
 		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 	}
@@ -202,40 +278,6 @@
 	bottom: $grid-unit-10;
 }
 
-.editor-note-indicator__avatar {
-	width: $icon-size;
-	border-radius: $radius-round;
-	margin-left: -12px;
-	border-width: var(--wp-admin-border-width-focus);
-	border-style: solid;
-	padding: var(--wp-admin-border-width-focus);
-	background: $white;
-	box-sizing: border-box;
-
-	&:first-child {
-		margin-left: 0;
-	}
-}
-
-.editor-note-indicator__overflow {
-	font-weight: var(--wpds-typography-font-weight-emphasis);
-}
-
-.show-icon-labels {
-	.editor-note-indicator {
-		width: auto;
-		// Hide the user avatars container when labels are set to display...
-		div {
-			display: none;
-		}
-		// ... and display labels.
-		&::after {
-			content: attr(aria-label);
-			font-size: $helptext-font-size;
-		}
-	}
-}
-
 // Inline-note highlight applied to the `core/note` marker (`mark.wp-note`).
 // Each marker is tinted by `<NoteHighlightStyles>` using the note author's
 // color from `AVATAR_BORDER_COLORS`; this base rule only provides shared
@@ -245,9 +287,69 @@ mark.wp-note {
 	transition: background-color 0.1s ease-in-out;
 }
 
+// Emoji Reactions
+
+// Anchors the floating add-reaction trigger to the note's text.
+.editor-collab-sidebar-panel__note-body {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: $grid-unit-10;
+}
+
+// Without reactions, the trigger floats in the note's top corner, in line
+// with the header actions, instead of adding a row to every note.
+.editor-collab-sidebar-panel__reactions.is-floating {
+	position: absolute;
+	right: 0;
+	// Centered on the first line of text.
+	top: calc((1lh - #{$button-size-small}) / 2);
+}
+
+// Touch devices have no hover to reveal the floating trigger.
+@media (hover: hover) {
+	.editor-collab-sidebar-panel__reactions.is-floating
+	.editor-collab-sidebar-panel__add-reaction-button {
+		// Fade rather than remove, to keep it in the tab order.
+		opacity: 0;
+		transition: opacity 0.1s ease-out;
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+
+	// Per note, not per thread: a thread-wide reveal would offer it on every
+	// note at once, and the thread's own `:focus-within` holds while selected.
+	.editor-collab-sidebar-panel__note:hover
+	.editor-collab-sidebar-panel__add-reaction-button,
+	.editor-collab-sidebar-panel__reactions
+	.editor-collab-sidebar-panel__add-reaction-button:focus,
+	.editor-collab-sidebar-panel__reactions
+	.editor-collab-sidebar-panel__add-reaction-button[data-popup-open] {
+		opacity: 1;
+	}
+}
+
+.editor-collab-sidebar-panel__reaction-button {
+	gap: $grid-unit-05;
+	// The Button's four-character minimum pads out a short count.
+	min-width: 0;
+}
+
+// Closing the picker after a pointer open leaves focus on the trigger.
+.editor-collab-sidebar-panel__add-reaction-button:focus:not(:focus-visible):not([data-popup-open]) {
+	outline: none;
+}
+
+.editor-collab-sidebar-panel__reaction-button-emoji,
+.editor-collab-sidebar-panel__reaction-option-emoji {
+	font-size: var(--wpds-typography-font-size-lg);
+}
+
 // Mention chips, both in the note input and the rendered note content. A
-// mention is a link to the mentioned user's author page, styled as a chip
-// rather than an underlined link.
+// mention is a non-interactive `span` carrying the mentioned user's ID in a
+// `user-N` class, styled as a chip.
 .wp-note-mention {
 	display: inline;
 	padding: 0 var(--wpds-dimension-padding-xs);
@@ -255,33 +357,10 @@ mark.wp-note {
 	background: var(--wpds-color-background-surface-brand);
 	color: var(--wpds-color-foreground-interactive-brand);
 	font-weight: var(--wpds-typography-font-weight-emphasis);
-	white-space: nowrap;
-	text-decoration: none;
 
-	// Focus ring matching `ExternalLink`/`Link`; 0-width at rest avoids a stray forced-colors outline.
-	outline: 0 solid transparent;
-	outline-offset: 1px;
-
-	// Also clears the wp-admin common.css `a:focus` shadow/color/radius, which outrank the base rule.
-	&:focus {
-		outline:
-			var(--wpds-border-width-focus) solid
-			var(--wpds-color-stroke-focus);
-		box-shadow: none;
-		border-radius: var(--wpds-border-radius-sm);
-		color: var(--wpds-color-foreground-interactive-brand);
-	}
-
-	// Interactive states, since the chip look drops the link underline. After `:focus` so hover wins when both apply.
-	&:hover,
-	&:active {
-		background: var(--wpds-color-background-interactive-brand-weak-active);
-		color: var(--wpds-color-foreground-interactive-brand-active);
-	}
-
-	// Restore the underline when forced-colors drops the background tint.
+	// Keep the chip boundary visible when forced-colors drops the background tint.
 	@media (forced-colors: active) {
-		text-decoration: underline;
+		border: 1px solid;
 	}
 }
 

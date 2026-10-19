@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import type { Page } from '@playwright/test';
 
 /**

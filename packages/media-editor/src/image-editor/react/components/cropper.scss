@@ -6,6 +6,11 @@
 // reach isn't clipped by the root.
 $handle-touch-target-size: 44px;
 
+// Geometry, not text direction: the camera and `stencil-math.ts` address
+// this canvas in physical pixels, and JS sets the image's `left` inline.
+// Mirrored, `nw` would resize the right edge and the image would pin to the
+// stage edge. ResizableBox ignores its own handle offsets for the same reason.
+/*!rtl:begin:ignore*/
 .wp-media-editor-image-editor {
 	position: relative;
 	overflow: hidden;
@@ -144,8 +149,8 @@ $handle-touch-target-size: 44px;
 	// on the canvas ensures the outline appears only when the canvas
 	// itself is focused, not when focus is on a child handle.
 	&__canvas--focus-visible:focus &__stencil-rect {
-		border-color: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
-		box-shadow: 0 0 0 1px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+		border-color: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
+		box-shadow: 0 0 0 1px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
 	}
 
 	&__handle {
@@ -164,7 +169,7 @@ $handle-touch-target-size: 44px;
 		// Solid white fill with an accent-blue border so the handles read
 		// clearly against the light grey wash.
 		background: $white;
-		border: 1px solid var(--wp-admin-theme-color, #007cba);
+		border: 1px solid var(--wp-admin-theme-color, #3858e9);
 		border-radius: 50%;
 		box-sizing: border-box;
 		pointer-events: auto;
@@ -180,9 +185,9 @@ $handle-touch-target-size: 44px;
 		// keyboard session — e.g., clicking a handle to start a drag —
 		// don't leave the active ring stuck on the handle.
 		.wp-media-editor-image-editor__canvas--focus-visible &:focus {
-			background: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+			background: var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
 			border-color: transparent;
-			box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #007cba));
+			box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--wp-image-editor-focus-color, var(--wp-admin-theme-color, #3858e9));
 		}
 
 		// Extend touch target to the minimum accessible hit area.
@@ -251,3 +256,4 @@ $handle-touch-target-size: 44px;
 	}
 
 }
+/*!rtl:end:ignore*/
