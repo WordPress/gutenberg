@@ -28,12 +28,6 @@ const meta: Meta< typeof Avatar.Root > = {
 	argTypes: {
 		color: { control: 'color' },
 	},
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image src={ IMAGE_SRC } alt="" />
-		</Avatar.Root>
-	),
 };
 export default meta;
 
@@ -44,10 +38,17 @@ export const Default: Story = {
 		'aria-label': 'Alex Morgan',
 		role: 'img',
 	},
+	render: ( args ) => (
+		<Avatar.Root { ...args }>
+			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
+			<Avatar.Image src={ IMAGE_SRC } alt="" />
+		</Avatar.Root>
+	),
 };
 
 /** Apply the same color to image rings, initials, and person fallbacks. */
 export const WithColor: Story = {
+	...Default,
 	args: { ...Default.args, color: '#008a20' },
 	render: ( args ) => (
 		<Stack gap="md" align="center">
@@ -88,7 +89,7 @@ export const Interactive: Story = {
 
 /** Omit fallback content to display the person icon. */
 export const IconFallback: Story = {
-	args: Default.args,
+	...Default,
 	render: ( args ) => (
 		<Avatar.Root { ...args }>
 			<Avatar.Fallback />
@@ -104,6 +105,7 @@ export const Initials: StoryObj<
 			'name' | 'locale'
 		>
 > = {
+	...Default,
 	args: { ...Default.args, name: 'Alex Morgan' },
 	argTypes: {
 		name: { control: 'text' },
