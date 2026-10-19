@@ -443,7 +443,7 @@ This configuration:
 
 ## SVG imports
 
-SVG files can be imported from JavaScript. The file is inlined using esbuild's `dataurl` loader and the import resolves to a `data:` URI:
+SVG files can be imported from JavaScript. The file is inlined into the JavaScript and the import resolves to a `data:` URI:
 
 ```js
 import logo from './logo.svg';
