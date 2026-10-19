@@ -90,6 +90,15 @@ export function RadioControl(
 				</BaseControl.VisualLabel>
 			) }
 
+			{ !! help && (
+				<StyledHelp
+					id={ generateHelpId( id ) }
+					className="components-base-control__help"
+				>
+					{ help }
+				</StyledHelp>
+			) }
+
 			<VStack
 				spacing={ 3 }
 				className={ clsx( 'components-radio-control__group-wrapper', {
@@ -140,14 +149,6 @@ export function RadioControl(
 					</div>
 				) ) }
 			</VStack>
-			{ !! help && (
-				<StyledHelp
-					id={ generateHelpId( id ) }
-					className="components-base-control__help"
-				>
-					{ help }
-				</StyledHelp>
-			) }
 		</fieldset>
 	);
 }

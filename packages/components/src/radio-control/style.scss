@@ -11,8 +11,12 @@
 	font-size: $default-font-size;
 }
 
+.components-radio-control > .components-base-control__help {
+	margin-block-start: 0;
+}
+
 .components-radio-control__group-wrapper.has-help {
-	margin-block-end: $grid-unit-15;
+	margin-block-start: $grid-unit-15;
 }
 
 .components-radio-control__option {

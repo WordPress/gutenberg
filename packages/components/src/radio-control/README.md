@@ -78,7 +78,7 @@ The component accepts the following props:
 
 #### `help`: `string | Element`
 
-If this property is added, a help text will be generated using help property as the content.
+The help text appears beneath the fieldset label, before the radio options.
 
 -   Required: No
 
