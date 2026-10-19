@@ -591,6 +591,11 @@ describe( 'Post actions', () => {
 				'Your site is receiving too many requests. Wait a moment, then try again. (Error 429)',
 			],
 			[
+				500,
+				false,
+				'Your site ran into an error while saving. Try again. If it keeps happening, contact your host. (Error 500)',
+			],
+			[
 				502,
 				false,
 				'Your site didn’t respond in time. Wait a moment, then try again. (Error 502)',
