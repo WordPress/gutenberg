@@ -19,6 +19,9 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		getItemId,
 		getItemLevel,
 		getItemParentId,
+		getItemHasChildren,
+		expandedItemIds,
+		onChangeExpandedItemIds,
 		hasInitiallyLoaded,
 		isLoading,
 		view,
@@ -69,6 +72,9 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				getItemParentId={ getItemParentId }
+				getItemHasChildren={ getItemHasChildren }
+				expandedItemIds={ expandedItemIds }
+				onChangeExpandedItemIds={ onChangeExpandedItemIds }
 				isLoading={ isLoading }
 				onChangeView={ onChangeView }
 				onChangeSelection={ onChangeSelection }
