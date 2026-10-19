@@ -734,7 +734,7 @@ export const getEntityRecords = ( <
 	return getQueriedItems( queriedState, query, {
 		supportsPagination: !! getEntityConfig( state, kind, name )
 			?.supportsPagination,
-	} ) as EntityRecord[] | null;
+	} ) as Array< EntityRecord > | null;
 } ) as GetEntityRecords;
 
 /**

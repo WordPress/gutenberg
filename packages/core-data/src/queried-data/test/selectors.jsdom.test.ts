@@ -56,8 +56,7 @@ describe( 'getQueriedItems', () => {
 					2: true,
 				},
 			},
-			// @ts-expect-error The malformed queries match no query, which caching does not need.
-			queries: { itemIds: [ 1, 2 ] },
+			queries: { default: { '': { itemIds: [ 1, 2 ] } } },
 		};
 
 		const resultA = getQueriedItems( state, {} );

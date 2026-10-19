@@ -60,7 +60,7 @@ export interface QueriedMeta {
  */
 export interface QueryState {
 	itemIds: ReadonlyArray< ItemId | undefined >;
-	meta?: QueriedMeta;
+	meta?: QueriedMeta | null;
 }
 
 /**
@@ -93,9 +93,9 @@ export interface QueriedItemsOptions {
 export interface ReceiveItemsAction {
 	type: 'RECEIVE_ITEMS';
 	items: QueriedItem | Array< QueriedItem >;
-	persistedEdits?: Record< string, unknown >;
-	meta?: QueriedMeta;
-	query?: Query;
+	persistedEdits?: Record< string, unknown > | null;
+	meta?: QueriedMeta | null;
+	query?: Query | null;
 	key?: string;
 }
 

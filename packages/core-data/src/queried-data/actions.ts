@@ -18,8 +18,8 @@ import type {
  */
 export function receiveItems(
 	items: QueriedItem | Array< QueriedItem >,
-	edits?: Record< string, unknown >,
-	meta?: QueriedMeta
+	edits?: Record< string, unknown > | null,
+	meta?: QueriedMeta | null
 ): ReceiveItemsAction {
 	return {
 		type: 'RECEIVE_ITEMS',
@@ -67,10 +67,10 @@ export function removeItems(
  */
 export function receiveQueriedItems(
 	items: QueriedItem | Array< QueriedItem >,
-	query: Query = {},
-	edits?: Record< string, unknown >,
-	meta?: QueriedMeta
-): ReceiveItemsAction & { query: Query } {
+	query: Query | null = {},
+	edits?: Record< string, unknown > | null,
+	meta?: QueriedMeta | null
+): ReceiveItemsAction & { query: Query | null } {
 	return {
 		...receiveItems( items, edits, meta ),
 		query,
