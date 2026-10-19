@@ -593,7 +593,7 @@ describe( 'Post actions', () => {
 			[
 				500,
 				false,
-				'Your site ran into an error while saving. Try again. If it keeps happening, contact your host. (Error 500)',
+				'Your site ran into an error while saving. Try again. (Error 500)',
 			],
 			[
 				502,

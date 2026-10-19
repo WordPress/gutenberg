@@ -113,7 +113,7 @@ function getInvalidResponseDetails( { status, redirected } ) {
 		);
 	} else if ( status === 500 ) {
 		explanation = __(
-			'Your site ran into an error while saving. Try again. If it keeps happening, contact your host.'
+			'Your site ran into an error while saving. Try again.'
 		);
 	} else if ( status >= 502 && status <= 504 ) {
 		explanation = __(
