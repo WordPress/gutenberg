@@ -30,9 +30,16 @@ const getTextWithoutMarkup = ( text ) => {
 const getSlug = ( content ) => {
 	// Get the slug.
 	return (
-		removeAccents( getTextWithoutMarkup( content ) )
-			// Convert anything that's not a letter or number to a hyphen.
-			.replace( /[^\p{L}\p{N}]+/gu, '-' )
+		removeAccents(
+			// Compose letters typed as a base letter and an accent, so that
+			// removeAccents() converts them like precomposed letters.
+			getTextWithoutMarkup( content ).normalize( 'NFC' )
+		)
+			// Remove emoji variation selectors and enclosing marks, such as in "❤️" or "1️⃣".
+			.replace( /[\p{Variation_Selector}\p{Me}]/gu, '' )
+			// Convert anything that's not a letter, mark or number to a hyphen.
+			// Marks are needed by scripts like Devanagari, Tamil and Bengali.
+			.replace( /[^\p{L}\p{M}\p{N}]+/gu, '-' )
 			// Convert to lowercase
 			.toLowerCase()
 			// Remove any remaining leading or trailing hyphens.
