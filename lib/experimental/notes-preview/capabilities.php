@@ -75,7 +75,7 @@ function gutenberg_map_note_meta_caps( $caps, $cap, $user_id, $args ) {
 				esc_html__( 'When checking for the %s capability, you must always check it against a specific post.', 'gutenberg' ),
 				'<code>' . esc_html( $cap ) . '</code>'
 			),
-			'22.4.0'
+			'24.3.0'
 		);
 
 		return array( 'do_not_allow' );
