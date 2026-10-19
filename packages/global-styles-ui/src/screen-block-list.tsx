@@ -29,22 +29,7 @@ import {
 } from '@wordpress/block-editor';
 import { useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-import {
-	button,
-	caption,
-	chevronUpDown,
-	formInput,
-	funnel,
-	heading,
-	headingLevel1,
-	headingLevel2,
-	headingLevel3,
-	headingLevel4,
-	headingLevel5,
-	headingLevel6,
-	link,
-	quote,
-} from '@wordpress/icons';
+import { funnel } from '@wordpress/icons';
 import { useBlockVariations } from './variations/variations-panel';
 import { ScreenHeader } from './screen-header';
 import { NavigationButtonAsItem } from './navigation-button';
@@ -64,48 +49,26 @@ const {
 	searchItems,
 } = unlock( blockEditorPrivateApis );
 
-interface ElementItem {
-	/** The element's key under `styles.elements`. */
-	name: ElementName;
-	icon: any;
-}
-
 /*
  * Elements are listed alongside blocks, grouped under subheadings, so that
  * anything styleable is one list away rather than behind its own drilldown.
  * Their labels are the titles of their screens, singular to match how blocks
  * are listed.
  */
-const ELEMENT_GROUPS: { title: string; elements: ElementItem[] }[] = [
+const ELEMENT_GROUPS: { title: string; elements: ElementName[] }[] = [
 	{
 		title: __( 'Elements' ),
-		elements: [
-			{ name: 'link', icon: link },
-			{ name: 'caption', icon: caption },
-			{ name: 'cite', icon: quote },
-		],
+		elements: [ 'link', 'caption', 'cite' ],
 	},
 	{
 		title: __( 'Headings' ),
-		elements: [
-			// `heading` styles every level at once; each level can then
-			// override it. Themes set most of their heading styles here.
-			{ name: 'heading', icon: heading },
-			{ name: 'h1', icon: headingLevel1 },
-			{ name: 'h2', icon: headingLevel2 },
-			{ name: 'h3', icon: headingLevel3 },
-			{ name: 'h4', icon: headingLevel4 },
-			{ name: 'h5', icon: headingLevel5 },
-			{ name: 'h6', icon: headingLevel6 },
-		],
+		// `heading` styles every level at once; each level can then override
+		// it. Themes set most of their heading styles here.
+		elements: [ 'heading', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ],
 	},
 	{
 		title: __( 'Form controls' ),
-		elements: [
-			{ name: 'textInput', icon: formInput },
-			{ name: 'select', icon: chevronUpDown },
-			{ name: 'button', icon: button },
-		],
+		elements: [ 'textInput', 'select', 'button' ],
 	},
 ];
 
@@ -227,16 +190,10 @@ function BlockMenuItem( { block }: BlockMenuItemProps ) {
 	);
 }
 
-function ElementMenuItem( { element }: { element: ElementItem } ) {
+function ElementMenuItem( { element }: { element: ElementName } ) {
 	return (
-		<NavigationButtonAsItem path={ '/blocks/elements/' + element.name }>
-			<HStack justify="flex-start" spacing={ 2 }>
-				<BlockIcon
-					className="global-styles-ui-block-types-item__icon"
-					icon={ element.icon }
-				/>
-				<FlexItem>{ ELEMENTS[ element.name ].title }</FlexItem>
-			</HStack>
+		<NavigationButtonAsItem path={ '/blocks/elements/' + element }>
+			{ ELEMENTS[ element ].title }
 		</NavigationButtonAsItem>
 	);
 }
@@ -299,16 +256,12 @@ function getFilteredElementGroups(
 				// The element's name and group title match too, so "h1" finds
 				// Heading 1 and "form" lists the form controls.
 				( ! search ||
-					[
-						ELEMENTS[ element.name ].title,
-						element.name,
-						group.title,
-					]
+					[ ELEMENTS[ element ].title, element, group.title ]
 						.join( ' ' )
 						.toLowerCase()
 						.includes( search ) ) &&
 				( styleFilter !== 'customized' ||
-					customizedElementNames.has( element.name ) )
+					customizedElementNames.has( element ) )
 		),
 	} ) ).filter( ( group ) => group.elements.length > 0 );
 }
@@ -422,7 +375,7 @@ function BlockAndElementList( { filterValue, styleFilter }: ListProps ) {
 					<ItemGroup>
 						{ group.elements.map( ( element ) => (
 							<ElementMenuItem
-								key={ element.name }
+								key={ element }
 								element={ element }
 							/>
 						) ) }

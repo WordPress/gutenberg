@@ -10,10 +10,6 @@
 
 -   `manifest.json`: Add 18 popular admin menu icons to the `core-admin` collection ([#85072](https://github.com/WordPress/gutenberg/pull/85072)).
 
-### New Features
-
--   Add the `formInput` icon, used by the Global Styles form control screens ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
-
 ## 18.0.0 (2026-10-07)
 
 ### Breaking Changes
@@ -145,7 +141,7 @@
 
 ### Breaking Changes
 
-- Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
+-   Rename Tabs-related icons: `tabs-menu` to `tab-list`, `tabs-menu-item` to `tab`, and `tab` to `tab-panel`. ([#77418](https://github.com/WordPress/gutenberg/pull/77418))
 
 ## 12.2.0 (2026-04-15)
 
