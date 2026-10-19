@@ -19,6 +19,7 @@ jobs:
     check:
         name: All
         runs-on: ubuntu-latest
+        timeout-minutes: 30
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
 
         steps:
