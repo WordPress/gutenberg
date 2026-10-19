@@ -18,8 +18,10 @@
  *
  * Three rules keep the extra path tight:
  *
- * - It never grants anything in `edit` context. Edit context exposes raw
- *   content and moderation fields, and stays on `edit_post`.
+ * - It never grants an `edit` context read. Edit context exposes raw content
+ *   and moderation fields, and stays on `edit_post`. A reviewer's own new reply
+ *   still comes back in edit context, as core returns every create.
+ * - It never reaches trashed or spammed notes.
  * - It never applies to logged-out visitors. Notes are private editorial
  *   discussion and every branch below requires a user.
  * - It never covers editing, deleting, resolving or reopening. Those keep
@@ -48,7 +50,7 @@ class Gutenberg_REST_Comments_Controller_Notes extends WP_REST_Comments_Controll
 			return false;
 		}
 
-		if ( ! $this->post_type_supports_notes( $post->post_type ) ) {
+		if ( ! gutenberg_notes_preview_post_type_supports_notes( $post->post_type ) ) {
 			return false;
 		}
 
@@ -107,31 +109,6 @@ class Gutenberg_REST_Comments_Controller_Notes extends WP_REST_Comments_Controll
 	}
 
 	/**
-	 * Checks whether a post type opts in to notes.
-	 *
-	 * Mirrors WP_REST_Comments_Controller::check_post_type_supports_notes(),
-	 * which is private and so cannot be reached from a subclass.
-	 *
-	 * @param string $post_type Post type name.
-	 * @return bool True if the post type supports notes, false otherwise.
-	 */
-	protected function post_type_supports_notes( $post_type ) {
-		$supports = get_all_post_type_supports( $post_type );
-
-		if ( ! isset( $supports['editor'] ) || ! is_array( $supports['editor'] ) ) {
-			return false;
-		}
-
-		foreach ( $supports['editor'] as $item ) {
-			if ( ! empty( $item['notes'] ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
 	 * Checks if the post can be read.
 	 *
 	 * Adds the reviewer path: a note reader may reach the parent post of the
@@ -171,6 +148,11 @@ class Gutenberg_REST_Comments_Controller_Notes extends WP_REST_Comments_Controll
 		}
 
 		if ( 'note' !== $comment->comment_type || empty( $comment->comment_post_ID ) ) {
+			return false;
+		}
+
+		// Open and resolved notes only; trash and spam stay with editors.
+		if ( ! in_array( (string) $comment->comment_approved, array( '0', '1' ), true ) ) {
 			return false;
 		}
 
@@ -220,6 +202,12 @@ class Gutenberg_REST_Comments_Controller_Notes extends WP_REST_Comments_Controll
 			if ( ! empty( $request[ $param ] ) ) {
 				return false;
 			}
+		}
+
+		// Open and resolved threads only, never trash or spam. Newer cores
+		// accept a list of statuses.
+		if ( array_diff( (array) $request['status'], array( 'all', 'approve', 'hold' ) ) ) {
+			return false;
 		}
 
 		// The per-post capability is the whole grant, so a post is required.
@@ -320,11 +308,14 @@ class Gutenberg_REST_Comments_Controller_Notes extends WP_REST_Comments_Controll
 			return false;
 		}
 
-		// The parent must be a note already on this post.
+		// The parent must be an open thread on this post, not a reply, a
+		// resolution record, or a resolved or trashed thread.
 		$parent = get_comment( $parent_id );
 
 		return $parent
 			&& 'note' === $parent->comment_type
-			&& (int) $parent->comment_post_ID === $post->ID;
+			&& (int) $parent->comment_post_ID === $post->ID
+			&& 0 === (int) $parent->comment_parent
+			&& '0' === (string) $parent->comment_approved;
 	}
 }

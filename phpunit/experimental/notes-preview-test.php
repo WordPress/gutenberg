@@ -308,6 +308,37 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
 	}
 
+	public function test_reviewer_cannot_list_trashed_notes() {
+		$this->grant( self::$post_id, array( 'read_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$request = new WP_REST_Request( 'GET', '/wp/v2/comments' );
+		$request->set_param( 'post', self::$post_id );
+		$request->set_param( 'type', 'note' );
+		$request->set_param( 'status', 'trash' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+	}
+
+	public function test_reviewer_cannot_read_a_trashed_note() {
+		$note_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID'  => self::$post_id,
+				'comment_type'     => 'note',
+				'comment_approved' => 'trash',
+			)
+		);
+
+		$this->grant( self::$post_id, array( 'read_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$response = rest_get_server()->dispatch( new WP_REST_Request( 'GET', '/wp/v2/comments/' . $note_id ) );
+
+		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+	}
+
 	public function test_reviewer_can_read_single_note() {
 		$this->grant( self::$post_id, array( 'read_post_notes' ) );
 		wp_set_current_user( self::$reviewer_id );
@@ -418,6 +449,54 @@ class Gutenberg_Notes_Preview_Test extends WP_Test_REST_TestCase {
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+	}
+
+	/**
+	 * @dataProvider data_reviewer_cannot_reply_outside_an_open_thread
+	 *
+	 * @param string $parent_type Which parent the reply targets.
+	 */
+	public function test_reviewer_cannot_reply_outside_an_open_thread( $parent_type ) {
+		if ( 'resolved' === $parent_type ) {
+			$parent_id = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => self::$post_id,
+					'comment_type'     => 'note',
+					'comment_approved' => 1,
+				)
+			);
+		} else {
+			$parent_id = self::factory()->comment->create(
+				array(
+					'comment_post_ID'  => self::$post_id,
+					'comment_type'     => 'note',
+					'comment_approved' => 'trash' === $parent_type ? 'trash' : 0,
+					'comment_parent'   => 'reply' === $parent_type ? self::$note_id : 0,
+				)
+			);
+		}
+
+		$this->grant( self::$post_id, array( 'read_post_notes', 'create_post_notes' ) );
+		wp_set_current_user( self::$reviewer_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->set_param( 'post', self::$post_id );
+		$request->set_param( 'type', 'note' );
+		$request->set_param( 'parent', $parent_id );
+		$request->set_param( 'status', 'hold' );
+		$request->set_param( 'content', 'Out of place.' );
+
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertGreaterThanOrEqual( 400, $response->get_status() );
+	}
+
+	public function data_reviewer_cannot_reply_outside_an_open_thread() {
+		return array(
+			'resolved thread' => array( 'resolved' ),
+			'trashed thread'  => array( 'trash' ),
+			'nested reply'    => array( 'reply' ),
+		);
 	}
 
 	public function test_reviewer_cannot_delete_a_note() {
