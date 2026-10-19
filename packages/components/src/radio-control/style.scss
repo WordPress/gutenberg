@@ -11,6 +11,12 @@
 	font-size: $default-font-size;
 }
 
+.components-radio-control__legend {
+	margin-block-end: $grid-unit-10;
+	padding: 0;
+	color: var(--wpds-color-foreground-content-neutral);
+}
+
 .components-radio-control__help {
 	color: var(--wpds-color-foreground-content-neutral-weak);
 }
