@@ -142,6 +142,14 @@ export type DataViewsProps< Item > = {
 	getItemLevel?: ( item: Item ) => number;
 
 	/**
+	 * Returns the unique identifier of an item's parent. When provided, the
+	 * view's `showLevels` option is enabled, and items aren't grouped, loaded
+	 * table items are ordered by their parent relationships and their
+	 * hierarchical depth is calculated.
+	 */
+	getItemParentId?: ( item: Item ) => string | number | null | undefined;
+
+	/**
 	 * Custom component tree rendered instead of the default layout
 	 * composition, using the internal `DataViews.*` sub-components.
 	 */
@@ -788,6 +796,13 @@ export interface ViewBaseProps< Item > {
 	getItemLevel?: ( item: Item ) => number;
 
 	/**
+	 * Returns the unique identifier of an item's parent. Used by the table
+	 * layout when the view's `showLevels` option is enabled and items aren't
+	 * grouped.
+	 */
+	getItemParentId?: ( item: Item ) => string | number | null | undefined;
+
+	/**
 	 * Whether the data is loading, in which case a loading state is shown.
 	 */
 	isLoading?: boolean;
@@ -851,7 +866,7 @@ export interface ViewBaseProps< Item > {
  * The props passed to every picker layout component. Same as
  * `ViewBaseProps`, minus the props pickers don't support: the item-click
  * ones (`onClickItem`, `renderItemLink`, `isItemClickable`) and the
- * hierarchy one (`getItemLevel`).
+ * hierarchy ones (`getItemLevel`, `getItemParentId`).
  */
 export type ViewPickerBaseProps< Item > = Omit<
 	ViewBaseProps< Item >,
@@ -862,6 +877,7 @@ export type ViewPickerBaseProps< Item > = Omit<
 	| 'onClickItem'
 	| 'renderItemLink'
 	| 'getItemLevel'
+	| 'getItemParentId'
 > & {
 	/**
 	 * The current view configuration.
