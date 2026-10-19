@@ -26,7 +26,7 @@
 
 ### Enhancements
 
--   RadioControl: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
+-   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `ColorPicker`: Use `Select` from `@wordpress/ui` for the color format selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   `ExternalLink`: Use a small border radius for consistent focus rings ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).

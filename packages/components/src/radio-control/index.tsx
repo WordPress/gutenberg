@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 import { useInstanceId } from '@wordpress/compose';
+import { Text } from '@wordpress/ui';
 import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
@@ -90,21 +91,22 @@ export function RadioControl(
 				</BaseControl.VisualLabel>
 			) }
 
-			{ !! help && (
-				<StyledHelp
-					id={ generateHelpId( id ) }
-					className="components-base-control__help"
-				>
-					{ help }
-				</StyledHelp>
-			) }
-
 			<VStack
 				spacing={ 3 }
 				className={ clsx( 'components-radio-control__group-wrapper', {
 					'has-help': !! help,
 				} ) }
 			>
+				{ !! help && (
+					<Text
+						id={ generateHelpId( id ) }
+						render={ <p /> }
+						variant="body-sm"
+						className="components-base-control__help components-radio-control__help"
+					>
+						{ help }
+					</Text>
+				) }
 				{ options.map( ( option, index ) => (
 					<div
 						key={ generateOptionId( id, index ) }
