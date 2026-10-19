@@ -146,34 +146,6 @@
 		"webpack": "4.41.0",
 		"worker-farm": "1.7.0"
 	},
-	"npmPackageJsonLintConfig": {
-		"extends": "@wordpress/npm-package-json-lint-config",
-		"rules": {
-			"description-format": [
-				"error",
-				{
-					"requireCapitalFirstLetter": true,
-					"requireEndingPeriod": true
-				}
-			],
-			"require-publishConfig": "error",
-			"require-repository-directory": "error",
-			"valid-values-author": [
-				"error",
-				[
-					"The WordPress Contributors"
-				]
-			],
-			"valid-values-publishConfig": [
-				"error",
-				[
-					{
-						"access": "public"
-					}
-				]
-			]
-		}
-	},
 	"scripts": {
 		"prebuild": "npm run check-engines",
 		"clean:packages": "rimraf ./packages/*/build ./packages/*/build-module ./packages/*/build-style ./packages/*/node_modules",
