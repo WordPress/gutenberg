@@ -15103,6 +15103,71 @@
 			"count": 1
 		}
 	},
+	"tools/project-management-automation/lib/debug.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/get-associated-pull-request.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/has-wordpress-profile.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/tasks/add-milestone/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/tasks/add-milestone/test/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/tasks/assign-fixed-issues/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/tasks/assign-fixed-issues/test/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/tasks/first-time-contributor-account-link/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/tasks/first-time-contributor-account-link/test/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/tasks/first-time-contributor-label/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/tasks/first-time-contributor-label/test/index.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
+	"tools/project-management-automation/lib/test/get-associated-pull-request.js": {
+		"gutenberg/use-typescript": {
+			"count": 1
+		}
+	},
 	"tools/release/cherry-pick.mjs": {
 		"gutenberg/use-typescript": {
 			"count": 1

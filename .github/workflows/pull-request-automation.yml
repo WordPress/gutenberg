@@ -35,7 +35,7 @@ jobs:
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
-            - uses: ./packages/project-management-automation
+            - uses: ./tools/project-management-automation
               id: automation
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
