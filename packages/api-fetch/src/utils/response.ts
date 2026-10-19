@@ -5,8 +5,7 @@ import { __ } from '@wordpress/i18n';
  * `invalid_json` error.
  *
  * The error includes the response's `status` and `redirected`, so a failed
- * save can say more than "not a valid JSON response". They're top-level, not
- * in `data`, which holds the status WordPress sets on REST errors.
+ * save can say more than "not a valid JSON response".
  *
  * Only the success path passes `allowEmptyBody`: `parseAndThrowError` throws
  * whatever this returns, and callers read `code` off it.
