@@ -9,14 +9,14 @@ import type {
 	GitHub,
 	WebhookPayloadPullRequest,
 	WebhookPayloadPush,
-	WPAutomation,
+	Automation,
 } from './types.js';
 
 /**
  * Full list of automations, matched by given properties against the incoming
  * payload object.
  */
-const automations: WPAutomation[] = [
+const automations: Automation[] = [
 	{
 		event: 'pull_request_target',
 		action: 'opened',
@@ -44,7 +44,7 @@ const automations: WPAutomation[] = [
  * @param octokit    Initialized Octokit REST client.
  */
 function runAutomation(
-	automation: WPAutomation,
+	automation: Automation,
 	octokit: GitHub
 ): Promise< void > {
 	switch ( automation.event ) {
