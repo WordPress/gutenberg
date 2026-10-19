@@ -1,10 +1,20 @@
 import { createStore, applyMiddleware } from 'redux';
-import { describe, expect, it } from 'vitest';
+import type { Action, Middleware } from 'redux';
+import { describe, expect, expectTypeOf, it } from 'vitest';
 import createMiddleware from '../';
 
 describe( 'createMiddleware', () => {
-	function createStoreWithMiddleware( middleware ) {
-		const reducer = ( state = null, action ) => action.nextState || state;
+	type TestState = number | Action | null;
+	type TestAction = Action & {
+		nextState?: TestState;
+		value?: number;
+	};
+
+	function createStoreWithMiddleware(
+		middleware: ReturnType< typeof createMiddleware >
+	) {
+		const reducer = ( state: TestState = null, action: TestAction ) =>
+			action.nextState || state;
 		return createStore( reducer, applyMiddleware( middleware ) );
 	}
 
@@ -31,7 +41,7 @@ describe( 'createMiddleware', () => {
 
 	it( 'should continue only once control condition resolves', async () => {
 		const middleware = createMiddleware( {
-			WAIT: () => new Promise( ( resolve ) => resolve() ),
+			WAIT: () => new Promise< void >( ( resolve ) => resolve() ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
 		function* createAction() {
@@ -44,7 +54,7 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'should throw if promise rejects', async () => {
-		let caughtError;
+		let caughtError: unknown;
 		const middleware = createMiddleware( {
 			WAIT_FAIL: () =>
 				new Promise( ( resolve, reject ) => reject( 'Message' ) ),
@@ -63,7 +73,7 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'should throw if promise throws', async () => {
-		let caughtError;
+		let caughtError: unknown;
 		const middleware = createMiddleware( {
 			WAIT_FAIL: () =>
 				new Promise( () => {
@@ -84,7 +94,7 @@ describe( 'createMiddleware', () => {
 	} );
 
 	it( 'should handle a null returned from a caught promise error', async () => {
-		let caughtError;
+		let caughtError: unknown;
 		const middleware = createMiddleware( {
 			WAIT_FAIL: () =>
 				new Promise( () => {
@@ -92,7 +102,11 @@ describe( 'createMiddleware', () => {
 				} ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
-		function* createAction() {
+		function* createAction(): Generator<
+			TestAction,
+			null | void,
+			unknown
+		> {
 			try {
 				yield { type: 'WAIT_FAIL' };
 			} catch ( error ) {
@@ -109,7 +123,7 @@ describe( 'createMiddleware', () => {
 			RETURN_TWO: () => 2,
 		} );
 		const store = createStoreWithMiddleware( middleware );
-		function* createAction() {
+		function* createAction(): Generator< TestAction, void, number > {
 			const nextState = yield { type: 'RETURN_TWO' };
 			yield { type: 'CHANGE', nextState };
 		}
@@ -127,7 +141,7 @@ describe( 'createMiddleware', () => {
 				} ),
 		} );
 		const store = createStoreWithMiddleware( middleware );
-		function* createAction() {
+		function* createAction(): Generator< TestAction, TestAction, number > {
 			const nextState = yield { type: 'WAIT', value: 2 };
 			return { type: 'CHANGE', nextState };
 		}
@@ -146,7 +160,11 @@ describe( 'createMiddleware', () => {
 				UPDATE: () => post,
 			} );
 			const store = createStoreWithMiddleware( middleware );
-			function* getPostAction() {
+			function* getPostAction(): Generator<
+				TestAction,
+				TestAction,
+				Action
+			> {
 				const nextState = yield { type: 'UPDATE' };
 				return { type: 'CHANGE', nextState };
 			}
@@ -156,4 +174,60 @@ describe( 'createMiddleware', () => {
 			expect( store.getState() ).toEqual( post );
 		}
 	);
+
+	it( 'accepts synchronous and asynchronous control results', async () => {
+		const middleware = createMiddleware( {
+			BOOLEAN: () => true,
+			NUMBER: () => 2,
+			OBJECT: () => ( { type: 'post' } ),
+			VOID: () => {},
+			PROMISE: () => Promise.resolve( 2 ),
+			RESOLVED: () => Promise.resolve(),
+		} );
+
+		expectTypeOf( middleware ).toExtend< Middleware >();
+		const store = createStore(
+			( state = 0 ) => state,
+			applyMiddleware( middleware )
+		);
+		function* routine(): Generator< Action, unknown[], unknown > {
+			return [
+				yield { type: 'BOOLEAN' },
+				yield { type: 'NUMBER' },
+				yield { type: 'OBJECT' },
+				yield { type: 'VOID' },
+				yield { type: 'PROMISE' },
+				yield { type: 'RESOLVED' },
+			];
+		}
+
+		await expect( store.dispatch( routine() ) ).resolves.toEqual( [
+			true,
+			2,
+			{ type: 'post' },
+			undefined,
+			2,
+			undefined,
+		] );
+	} );
+
+	it( 'returns a promise when dispatching a generator while preserving ordinary action dispatch', async () => {
+		const store = createStore(
+			( state = 0 ) => state,
+			applyMiddleware( createMiddleware() )
+		);
+		const action = { type: 'UNCHANGED' };
+		const dispatchedAction = store.dispatch( action );
+
+		expectTypeOf( dispatchedAction ).toEqualTypeOf< typeof action >();
+		expect( dispatchedAction ).toBe( action );
+
+		function* routine() {
+			return 7;
+		}
+		const result = store.dispatch( routine() );
+
+		expectTypeOf( result ).toEqualTypeOf< Promise< unknown > >();
+		await expect( result ).resolves.toBe( 7 );
+	} );
 } );
