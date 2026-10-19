@@ -201,7 +201,55 @@ describe( 'Text', () => {
 		expect(
 			screen.queryByText( 'ipsum', { selector: 'mark' } )
 		).not.toBeInTheDocument();
+		expect( screen.getByRole( 'heading' ) ).toHaveTextContent(
+			'Lorem ipsum.'
+		);
 	} );
+
+	test.each( [
+		{
+			description: 'regular-expression matches',
+			text: 'cat c.t',
+			words: [ 'c.t' ],
+			highlights: [ 'cat', 'c.t' ],
+		},
+		{
+			description: 'literal matches when escaping is enabled',
+			text: 'cat c.t',
+			words: [ 'c.t' ],
+			escape: true,
+			highlights: [ 'c.t' ],
+		},
+		{
+			description: 'original text when matching sanitized words',
+			text: 'café cafe',
+			words: [ 'cafe' ],
+			sanitize: ( text: string ) =>
+				text.normalize( 'NFD' ).replace( /[\u0300-\u036f]/g, '' ),
+			highlights: [ 'café', 'cafe' ],
+		},
+	] )(
+		'preserves $description',
+		async ( { text, words, escape, sanitize, highlights } ) => {
+			await render(
+				<Text
+					as="p"
+					highlightWords={ words }
+					highlightEscape={ escape }
+					highlightSanitize={ sanitize }
+				>
+					{ text }
+				</Text>
+			);
+
+			expect( screen.getByRole( 'paragraph' ) ).toHaveTextContent( text );
+			expect(
+				screen
+					.queryAllByText( /.+/, { selector: 'mark' } )
+					.map( ( mark ) => mark.textContent )
+			).toEqual( highlights );
+		}
+	);
 
 	test( 'should render isBlock', async () => {
 		await render(
