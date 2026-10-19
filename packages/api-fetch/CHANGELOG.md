@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   The `invalid_json` error also keeps whether the response was redirected, as `data.redirected` next to `data.status`, so a caller can tell when the login page answered instead of WordPress ([#85050](https://github.com/WordPress/gutenberg/pull/85050)).
+-   Include whether the response was redirected as `data.redirected` in `invalid_json` errors ([#85050](https://github.com/WordPress/gutenberg/pull/85050)).
 
 ## 8.1.0 (2026-11-04)
 
