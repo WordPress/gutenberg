@@ -26,7 +26,6 @@ export const Default: StoryObj< typeof meta > = {
 		);
 	},
 	args: {
-		// @ts-expect-error The fixtures provide only the blocks the list renders.
 		blockPatterns: patterns,
 		isDraggable: false,
 		label: 'Block patterns story',
