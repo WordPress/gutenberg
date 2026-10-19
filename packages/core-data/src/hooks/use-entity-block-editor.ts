@@ -9,8 +9,9 @@ import { updateFootnotesFromMeta } from '../footnotes';
 import { getCachedBlocks, setCachedBlocks } from '../parsed-blocks-cache';
 import type {
 	EntityBlockEditorChangeOptions,
-	EntityBlockEditorHandler,
+	EntityBlockEditorOptions,
 	EntityBlockEditorRecord,
+	EntityBlockEditorResult,
 } from './types';
 
 const EMPTY_ARRAY: Array< Block > = [];
@@ -36,12 +37,8 @@ const EMPTY_ARRAY: Array< Block > = [];
 export default function useEntityBlockEditor(
 	kind: string,
 	name: string,
-	{ id: _id }: { id?: string | number } = {}
-): [
-	Array< Block > | undefined,
-	EntityBlockEditorHandler,
-	EntityBlockEditorHandler,
-] {
+	{ id: _id }: EntityBlockEditorOptions = {}
+): EntityBlockEditorResult {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const { content, editedBlocks, meta } = useSelect(

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { Block } from '@wordpress/blocks';
 import type { ConnectionStatusDisconnected, Y } from '@wordpress/sync';
 import type {
 	SelectionType,
@@ -228,7 +229,7 @@ export interface EntityProviderProps {
 	/**
 	 * The entity ID.
 	 */
-	id: number | string | undefined;
+	id?: number | string;
 	/**
 	 * Optional revision ID. When set, `useEntityProp` reads from the revision
 	 * record instead of the current entity. Applies only to this entity, not
@@ -249,4 +250,12 @@ export interface PrivateEntityProviderProps extends EntityProviderProps {
 	 * Optional record to read from.
 	 */
 	revision?: Record< string, unknown >;
+}
+
+/**
+ * Blocks cached for an entity, with the `content` string they were parsed from.
+ */
+export interface ParsedBlocksCacheEntry {
+	content: string;
+	blocks: Array< Block >;
 }

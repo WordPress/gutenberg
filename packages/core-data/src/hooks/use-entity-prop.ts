@@ -4,6 +4,7 @@ import { STORE_NAME } from '../name';
 import type { store as coreStore } from '../';
 import { EntityContext } from '../entity-context';
 import useEntityId from './use-entity-id';
+import type { EntityPropResult } from './types';
 
 // The same fields the editor loads revisions with, so that they are read from
 // the store rather than fetched again. `content` is the exception: the whole
@@ -36,7 +37,7 @@ export default function useEntityProp< Value = unknown >(
 	name: string,
 	prop: string,
 	_id?: number | string
-): [ Value, ( newValue: Value ) => void, unknown ] {
+): EntityPropResult< Value > {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
 	const context = useContext( EntityContext );
@@ -68,7 +69,7 @@ export default function useEntityProp< Value = unknown >(
 					).getRevision(
 						kind,
 						name,
-						// A revision is provided for a record, so its ID is set.
+						// Without an entity ID, this reads the record under `undefined`.
 						id as string | number,
 						// Set, as the condition above checks.
 						revisionId as number,
@@ -130,5 +131,5 @@ export default function useEntityProp< Value = unknown >(
 	);
 
 	// The caller names the type of the property.
-	return [ value as Value, setValue, fullValue ];
+	return [ value as Value | undefined, setValue, fullValue ];
 }

@@ -1,6 +1,7 @@
 import { select } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import type { Block, BlockType } from '@wordpress/blocks';
+import type { ParsedBlocksCacheEntry } from './types';
 
 /**
  * Shared cache of blocks parsed from an entity's `content` string. Populated
@@ -23,7 +24,7 @@ import type { Block, BlockType } from '@wordpress/blocks';
  */
 const caches = new WeakMap<
 	ReadonlyArray< BlockType >,
-	Map< string, { content: string; blocks: Array< Block > } >
+	Map< string, ParsedBlocksCacheEntry >
 >();
 
 function getCacheKey(

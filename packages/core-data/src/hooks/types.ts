@@ -25,3 +25,32 @@ export type EntityBlockEditorHandler = (
 	newBlocks: Array< Block >,
 	options: EntityBlockEditorChangeOptions
 ) => void;
+
+/**
+ * Options of `useEntityBlockEditor`.
+ */
+export interface EntityBlockEditorOptions {
+	/**
+	 * An entity ID to use instead of the context-provided one.
+	 */
+	id?: string | number;
+}
+
+/**
+ * The blocks of `useEntityBlockEditor`, and its input and change handlers.
+ */
+export type EntityBlockEditorResult = [
+	Array< Block > | undefined,
+	EntityBlockEditorHandler,
+	EntityBlockEditorHandler,
+];
+
+/**
+ * The value of `useEntityProp`, its setter and the full value from the REST
+ * API.
+ */
+export type EntityPropResult< Value > = [
+	Value | undefined,
+	( newValue: Value ) => void,
+	unknown,
+];
