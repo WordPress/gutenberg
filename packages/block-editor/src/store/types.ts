@@ -238,6 +238,8 @@ export interface BlockPattern {
 	inserter?: boolean;
 	/** Where the pattern comes from, e.g. `core` or `theme`. */
 	source?: string;
+	/** Whether the current user authored this user pattern. */
+	isCurrentUserPattern?: boolean;
 	[ key: string ]: unknown;
 }
 
