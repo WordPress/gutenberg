@@ -560,9 +560,9 @@ export default function CompositeGrid< Item >( {
 										role="row"
 										aria-rowindex={ i + 1 }
 										aria-label={ sprintf(
-											/* translators: %d: The row number in the grid */
-											__( 'Row %d' ),
-											i + 1
+											/* translators: %s: The formatted row number in the grid */
+											__( 'Row %s' ),
+											( i + 1 ).toLocaleString()
 										) }
 										className="dataviews-view-grid__row"
 										style={ {

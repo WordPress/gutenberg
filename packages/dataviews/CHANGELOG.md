@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   Format page, page-size, grid row, and validation counts with locale-specific separators ([#84634](https://github.com/WordPress/gutenberg/pull/84634)).
 -   Format footer item and selection counts with locale-specific separators ([#84622](https://github.com/WordPress/gutenberg/pull/84622)).
 -   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 

@@ -37,16 +37,16 @@ export function DataViewsPageSelect( { className }: { className?: string } ) {
 			const page = i + 1;
 			return {
 				value: page.toString(),
-				label: page.toString(),
+				label: page.toLocaleString(),
 				'aria-label':
 					currentPage === page
 						? sprintf(
-								// translators: 1: current page number. 2: total number of pages.
-								__( 'Page %1$d of %2$d' ),
-								currentPage,
-								totalPages
+								// translators: 1: formatted current page number. 2: formatted total number of pages.
+								__( 'Page %1$s of %2$s' ),
+								currentPage.toLocaleString(),
+								totalPages.toLocaleString()
 							)
-						: page.toString(),
+						: page.toLocaleString(),
 			};
 		}
 	);
@@ -61,10 +61,10 @@ export function DataViewsPageSelect( { className }: { className?: string } ) {
 		>
 			{ createInterpolateElement(
 				sprintf(
-					// translators: 1: Current page number, 2: Total number of pages.
-					_x( '<div>Page</div>%1$s<div>of %2$d</div>', 'paging' ),
+					// translators: 1: Current page selector, 2: Formatted total number of pages.
+					_x( '<div>Page</div>%1$s<div>of %2$s</div>', 'paging' ),
 					'<CurrentPage />',
-					totalPages
+					totalPages.toLocaleString()
 				),
 				{
 					div: <div aria-hidden />,
