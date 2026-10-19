@@ -3,7 +3,7 @@ import { render } from 'vitest-browser-react';
 import warning from '@wordpress/warning';
 import * as Avatar from '../index';
 
-vi.mock( '@wordpress/warning', () => ( { default: vi.fn() } ) );
+vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 it.each( [ 'currentColor', 'color-mix(in srgb, currentColor 50%, red)' ] )(
 	'warns when color=%s depends on the foreground',
