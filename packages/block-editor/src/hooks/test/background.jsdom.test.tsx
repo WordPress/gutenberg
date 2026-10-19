@@ -2,7 +2,6 @@ import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import type { BlockConfiguration } from '@wordpress/blocks';
 import {
 	setBackgroundStyleDefaults,
 	backgroundResetAllFilter,
@@ -204,10 +203,11 @@ describe( 'background', () => {
 		};
 
 		beforeAll( () => {
-			// The test block needs no category, attributes, edit or save.
 			registerBlockType( BLOCK_NAME, {
 				apiVersion: 3,
 				title: 'Test background gradient',
+				category: 'text',
+				attributes: {},
 				supports: {
 					background: {
 						gradient: true,
@@ -218,7 +218,7 @@ describe( 'background', () => {
 						__experimentalDefaultControls: { background: true },
 					},
 				},
-			} as unknown as BlockConfiguration );
+			} );
 		} );
 
 		afterAll( () => {

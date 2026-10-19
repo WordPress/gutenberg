@@ -4,7 +4,6 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-import type { BlockConfiguration } from '@wordpress/blocks';
 import dimensions from '../dimensions';
 import { getDimensionsClassesAndStyles } from '../use-dimensions-props';
 
@@ -142,17 +141,17 @@ describe( 'useBlockProps', () => {
 	} );
 
 	const registerDimensionsBlock = () =>
-		// The test block needs no attributes, edit or save.
 		registerBlockType( blockName, {
 			apiVersion: 3,
 			title: 'Dimensions with aspect ratio',
 			category: 'text',
+			attributes: {},
 			supports: {
 				dimensions: {
 					aspectRatio: true,
 				},
 			},
-		} as unknown as BlockConfiguration );
+		} );
 
 	it( 'unsets height styles when aspect ratio is explicit', () => {
 		registerDimensionsBlock();
