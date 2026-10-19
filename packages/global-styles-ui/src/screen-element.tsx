@@ -113,42 +113,33 @@ interface ScreenElementProps {
 }
 
 /**
- * Renders every style panel for an element. The element's styles and settings
- * are resolved once here and shared by all the panels.
+ * Renders every style panel for an element. The element's settings are
+ * resolved once here and shared by all the panels, as are the styles that the
+ * screen resolves for them.
  *
  * @param props
- * @param props.element The element being styled.
- * @param props.label   Its display name, used in the custom CSS help text.
- * @param props.state   The selected state, such as `:hover`, if any.
+ * @param props.element        The element being styled.
+ * @param props.label          Its display name, used in the custom CSS help text.
+ * @param props.style          The element's user styles in the selected state.
+ * @param props.inheritedStyle The element's merged styles in the selected state.
+ * @param props.setStyle       Saves the element's user styles in the selected state.
  */
 function ElementStylePanels( {
 	element,
 	label,
-	state,
+	style,
+	inheritedStyle,
+	setStyle,
 }: {
 	element: string;
 	label: string;
-	state?: string;
+	style?: GlobalStylesStyles;
+	inheritedStyle?: GlobalStylesStyles;
+	setStyle: ( newStyle?: GlobalStylesStyles ) => void;
 } ) {
-	// "Text" is the site's base text, stored at the root of the styles rather
-	// than under `elements`. The root has its own screens for background,
-	// spacing and borders, so only typography is offered here.
+	// The root has its own screens for background, spacing and borders, so
+	// only typography is offered for "Text".
 	const isRoot = element === 'text';
-	const prefix = isRoot ? '' : `elements.${ element }`;
-	const [ style ] = useStyle< GlobalStylesStyles >(
-		prefix,
-		'',
-		'user',
-		false,
-		state
-	);
-	const [ inheritedStyle, setStyle ] = useStyle< GlobalStylesStyles >(
-		prefix,
-		'',
-		'merged',
-		false,
-		state
-	);
 	const [ rawSettings ] = useSetting< GlobalStylesSettings >( '' );
 	const settings = useSettingsForBlockElement(
 		rawSettings,
@@ -237,6 +228,26 @@ function ScreenElement( {
 		() => ( showStateControls ? getValidPseudoStates( element ) : [] ),
 		[ element, showStateControls ]
 	);
+	const state =
+		selectedPseudoState === 'default' ? undefined : selectedPseudoState;
+	// "Text" is the site's base text, stored at the root of the styles rather
+	// than under `elements`. Its styles are resolved once here and shared by
+	// the preview and the style panels.
+	const prefix = element === 'text' ? '' : `elements.${ element }`;
+	const [ style ] = useStyle< GlobalStylesStyles >(
+		prefix,
+		'',
+		'user',
+		false,
+		state
+	);
+	const [ inheritedStyle, setStyle ] = useStyle< GlobalStylesStyles >(
+		prefix,
+		'',
+		'merged',
+		false,
+		state
+	);
 
 	if ( ! Object.hasOwn( ELEMENTS, element ) ) {
 		return null;
@@ -251,15 +262,17 @@ function ScreenElement( {
 				selectedPseudoState={ selectedPseudoState }
 				onChangePseudoState={ setSelectedPseudoState }
 			/>
-			<ElementPreview element={ element } />
+			<ElementPreview
+				element={ element }
+				state={ state }
+				stateStyles={ state ? inheritedStyle : undefined }
+			/>
 			<ElementStylePanels
 				element={ element }
 				label={ ELEMENTS[ element ].title }
-				state={
-					selectedPseudoState === 'default'
-						? undefined
-						: selectedPseudoState
-				}
+				style={ style }
+				inheritedStyle={ inheritedStyle }
+				setStyle={ setStyle }
 			/>
 		</>
 	);
