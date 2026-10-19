@@ -16,6 +16,10 @@
 
 -   Font Library: Load all installed font families, not only the first 10 ([#84684](https://github.com/WordPress/gutenberg/pull/84684)).
 
+### Internal
+
+-   Remove unused color preview, variation hook wrapper, and back-navigation wrapper ([#85093](https://github.com/WordPress/gutenberg/pull/85093)).
+
 ## 1.24.0 (2026-10-07)
 
 ### Enhancements
