@@ -28,4 +28,10 @@ export type InputProps = Omit<
 		 * The size of the field.
 		 */
 		size?: Exclude< InputLayoutProps[ 'size' ], 'small' >;
+		/**
+		 * Whether to render the value in a monospace font.
+		 *
+		 * @default false
+		 */
+		monospace?: boolean;
 	};

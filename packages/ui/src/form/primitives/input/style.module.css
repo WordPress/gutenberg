@@ -41,6 +41,10 @@
 				}
 			}
 
+			&.monospace {
+				font-family: var(--wpds-typography-font-family-mono);
+			}
+
 			&[type="email"],
 			&[type="url"] {
 				direction: ltr; /* maintain LTR in RTL languages */

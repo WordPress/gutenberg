@@ -14,7 +14,15 @@ import { InputLayout } from '../input-layout';
  */
 export const Input = forwardRef< HTMLElement, InputProps >(
 	function UnforwardedInput(
-		{ className, size = 'default', prefix, suffix, style, ...restProps },
+		{
+			className,
+			size = 'default',
+			monospace,
+			prefix,
+			suffix,
+			style,
+			...restProps
+		},
 		ref
 	) {
 		return (
@@ -32,7 +40,11 @@ export const Input = forwardRef< HTMLElement, InputProps >(
 			>
 				<_Input
 					ref={ ref }
-					className={ clsx( defenseStyles.input, styles.input ) }
+					className={ clsx(
+						defenseStyles.input,
+						styles.input,
+						monospace && styles.monospace
+					) }
 					{ ...restProps }
 				/>
 			</InputLayout>
