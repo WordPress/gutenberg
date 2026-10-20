@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `single` from the values of the `context` of an action, which no screen supported ([#85186](https://github.com/WordPress/gutenberg/pull/85186)).
+
 ## 21.0.0 (2026-10-20)
 
 ### Breaking Changes
