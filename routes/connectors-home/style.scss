@@ -55,35 +55,21 @@ $sticky-header-clearance: 120px;
 	}
 
 	.ai-plugin-callout {
-		position: relative;
-		overflow: hidden;
-		border-radius: var(--wpds-border-radius-lg);
-		padding: var(--wpds-dimension-padding-2xl);
-		padding-inline-end: 150px;
-		background-color: #e7d4e4;
-		background-image:
-			radial-gradient(ellipse 70% 120% at 18% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
-			radial-gradient(ellipse 55% 110% at 92% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
-			radial-gradient(ellipse 40% 85% at 58% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
-
-		[dir="rtl"] & {
+		&__surface {
+			position: relative;
+			padding: var(--wpds-dimension-padding-2xl);
+			padding-inline-end: 150px;
+			background-color: #e7d4e4;
 			background-image:
-				radial-gradient(ellipse 70% 120% at 82% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
-				radial-gradient(ellipse 55% 110% at 8% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
-				radial-gradient(ellipse 40% 85% at 42% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
-		}
+				radial-gradient(ellipse 70% 120% at 18% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
+				radial-gradient(ellipse 55% 110% at 92% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
+				radial-gradient(ellipse 40% 85% at 58% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
 
-		&__content {
-			display: flex;
-			flex-direction: column;
-			gap: var(--wpds-dimension-gap-md);
-			padding-top: 2px;
-			align-items: flex-start;
-
-			p {
-				margin: 0;
-				font-size: var(--wpds-typography-font-size-md);
-				line-height: var(--wpds-typography-line-height-sm);
+			[dir="rtl"] & {
+				background-image:
+					radial-gradient(ellipse 70% 120% at 82% 115%, rgba(202, 158, 198, 0.75) 0%, rgba(202, 158, 198, 0) 60%),
+					radial-gradient(ellipse 55% 110% at 8% -15%, rgba(208, 175, 217, 0.7) 0%, rgba(208, 175, 217, 0) 65%),
+					radial-gradient(ellipse 40% 85% at 42% -10%, rgba(170, 130, 184, 0.45) 0%, rgba(170, 130, 184, 0) 70%);
 			}
 		}
 
@@ -102,8 +88,10 @@ $sticky-header-clearance: 120px;
 
 	@media (max-width: 680px) {
 		.ai-plugin-callout {
-			padding: var(--wpds-dimension-padding-md);
-			padding-inline-end: 100px;
+			&__surface {
+				padding: var(--wpds-dimension-padding-md);
+				padding-inline-end: 100px;
+			}
 
 			&__decoration {
 				width: 75px;
@@ -117,7 +105,7 @@ $sticky-header-clearance: 120px;
 	@media (max-width: 480px) {
 		padding: var(--wpds-dimension-padding-sm);
 
-		.ai-plugin-callout {
+		.ai-plugin-callout__surface {
 			padding-inline-end: 130px;
 		}
 
