@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import type { ComponentProps } from 'react';
 import { useEffect, useState } from '@wordpress/element';
 import { useCopyToClipboard } from '@wordpress/compose';
 import * as Notice from '../index';
+import { Stack } from '../../stack';
+import { Text } from '../../text';
 
-type StoryArgs = Pick< ComponentProps< typeof Notice.Root >, 'intent' > & {
+type StoryArgs = {
 	message: string;
 	details: string;
 };
@@ -14,11 +15,6 @@ const meta: Meta< StoryArgs > = {
 	id: 'design-system-components-notice-disclosure',
 	tags: [ '!autodocs', 'docs-only' ],
 	argTypes: {
-		intent: {
-			control: 'select',
-			options: [ 'neutral', 'info', 'warning', 'success', 'error' ],
-			description: 'Passed to Notice.Root to set the notice intent.',
-		},
 		message: {
 			control: 'text',
 			description: 'Example content rendered inside Notice.Description.',
@@ -35,7 +31,7 @@ type Story = StoryObj< StoryArgs >;
 
 const CONFIRMATION_TIMEOUT = 4000;
 
-function CopyButton( { text, label }: { text: string; label: string } ) {
+function CopyButton( { text }: { text: string } ) {
 	const [ hasCopied, setHasCopied ] = useState( false );
 	const copyRef = useCopyToClipboard< HTMLButtonElement >( text, () => {
 		setHasCopied( true );
@@ -60,9 +56,9 @@ function CopyButton( { text, label }: { text: string; label: string } ) {
 	return (
 		<>
 			<Notice.ActionButton ref={ copyRef } variant="outline">
-				{ label }
+				Copy error
 			</Notice.ActionButton>
-			<Notice.Description role="status" style={ { alignSelf: 'center' } }>
+			<Notice.Description role="status">
 				{ hasCopied ? 'Copied' : '' }
 			</Notice.Description>
 		</>
@@ -71,48 +67,42 @@ function CopyButton( { text, label }: { text: string; label: string } ) {
 
 export const WithDetails: Story = {
 	args: {
-		intent: 'error',
 		message: 'Updating failed. Please try updating again.',
 		details:
 			'The title was rejected by a server-side rule.\nRemove "Break save" from the title, then try again.',
 	},
-	render: function NoticeWithDetails( { intent, message, details } ) {
+	render: function NoticeWithDetails( { message, details } ) {
 		const hasDetails = details.trim().length > 0;
 
 		return (
-			<Notice.Root intent={ intent }>
-				<Notice.Description>{ message }</Notice.Description>
-				{ hasDetails && (
-					<Notice.Description
-						render={ <details /> }
-						style={ {
-							marginBlockStart: 'var(--wpds-dimension-gap-sm)',
-							overflowWrap: 'anywhere',
-						} }
-					>
-						<summary style={ { cursor: 'pointer' } }>
-							Details
-						</summary>
-						<div
-							style={ {
-								marginBlockStart:
-									'var(--wpds-dimension-gap-sm)',
-								whiteSpace: 'pre-wrap',
-							} }
-						>
-							{ details }
-						</div>
-					</Notice.Description>
-				) }
-				<Notice.Actions>
+			<Notice.Root intent="error">
+				<Notice.Description
+					render={ <Stack direction="column" gap="sm" /> }
+					style={ { overflowWrap: 'anywhere' } }
+				>
+					<div>{ message }</div>
+					{ hasDetails && (
+						<details>
+							<summary>Details</summary>
+							<Text
+								render={ <pre /> }
+								style={ {
+									marginBlockStart:
+										'var(--wpds-dimension-gap-sm)',
+									whiteSpace: 'pre-wrap',
+								} }
+							>
+								{ details }
+							</Text>
+						</details>
+					) }
+				</Notice.Description>
+				<Notice.Actions render={ <Stack align="center" /> }>
 					<CopyButton
 						text={
 							hasDetails
 								? `${ message }\n\n${ details }`
 								: message
-						}
-						label={
-							intent === 'error' ? 'Copy error' : 'Copy message'
 						}
 					/>
 				</Notice.Actions>
