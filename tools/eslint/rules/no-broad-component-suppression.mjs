@@ -1,11 +1,3 @@
-import privateApis from '../../../packages/eslint-plugin/utils/private-apis.js';
-
-const {
-	createPrivateApisState,
-	trackPrivateApisSpecifier,
-	getUnlockDestructuring,
-} = privateApis;
-
 const RECOMMENDATION_RULE = '@wordpress/use-recommended-components';
 
 /** @type {import('eslint').Rule.RuleModule} */
@@ -19,39 +11,17 @@ export default {
 		schema: [],
 		messages: {
 			narrowSuppression:
-				'Place eslint-disable-next-line {{ rule }} immediately above one import specifier or unlocked private API property on its own line.',
+				'Place eslint-disable-next-line {{ rule }} immediately above one import specifier on its own line.',
 		},
 	},
 	create( context ) {
 		const { sourceCode } = context;
-		const privateApisState = createPrivateApisState();
-		/** @type {Array<import('estree').ImportSpecifier | import('estree').Property>} */
-		const components = [];
+		/** @type {import('estree').ImportSpecifier[]} */
+		const specifiers = [];
 
 		return {
-			ImportDeclaration( node ) {
-				for ( const specifier of node.specifiers ) {
-					if ( specifier.type !== 'ImportSpecifier' ) {
-						continue;
-					}
-					components.push( specifier );
-					trackPrivateApisSpecifier(
-						privateApisState,
-						specifier,
-						node.source.value,
-						true
-					);
-				}
-			},
-			VariableDeclarator( node ) {
-				const unlocked = getUnlockDestructuring(
-					node,
-					sourceCode,
-					privateApisState
-				);
-				if ( unlocked ) {
-					components.push( ...unlocked.properties );
-				}
+			ImportSpecifier( node ) {
+				specifiers.push( node );
 			},
 			'Program:exit'() {
 				for ( const comment of sourceCode.getAllComments() ) {
@@ -67,17 +37,17 @@ export default {
 					}
 
 					const targetLine = comment.loc.end.line + 1;
-					const component = components.find(
+					const specifier = specifiers.find(
 						( node ) =>
 							node.loc.start.line === targetLine &&
 							node.loc.end.line === targetLine
 					);
 					if (
 						directive[ 1 ] === 'eslint-disable-next-line' &&
-						component
+						specifier
 					) {
-						const before = sourceCode.getTokenBefore( component );
-						let after = sourceCode.getTokenAfter( component );
+						const before = sourceCode.getTokenBefore( specifier );
+						let after = sourceCode.getTokenAfter( specifier );
 						if ( after?.value === ',' ) {
 							after = sourceCode.getTokenAfter( after );
 						}

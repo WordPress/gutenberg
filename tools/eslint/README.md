@@ -10,8 +10,6 @@ Consolidated ESLint configuration for the Gutenberg monorepo. This is a **privat
 -   **`rules/`**: local rules that only make sense in this repository, such as `use-typescript`, which `config.mjs` scopes to the `src` and `test` trees of every package with a `tsconfig.json`, to routes and to tools, so that new files there must be TypeScript.
 -   **`suppressions.json`** — ESLint suppressions file for pre-existing violations. Updated via `npm run lint:js:prune-suppressions`. CI enforces that this file is pruned and committed.
 
-The local `gutenberg/no-broad-component-suppression` rule requires inline exceptions for `@wordpress/use-recommended-components` to use `eslint-disable-next-line` above one import specifier or unlocked private API property on its own line.
-
 ## Why a workspace package?
 
 Moving all ESLint plugins and config into a single package keeps the root `package.json` clean and makes future ESLint upgrades easier — all plugin dependencies live in one place rather than being scattered across root `devDependencies`.
