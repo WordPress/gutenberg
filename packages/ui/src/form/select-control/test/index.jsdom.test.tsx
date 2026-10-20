@@ -336,7 +336,7 @@ describe( 'SelectControl', () => {
 
 			expect( mockedWarning ).toHaveBeenCalledWith(
 				expect.stringContaining(
-					'SelectControl: items with an empty string `value`'
+					'SelectControl: empty string item values'
 				)
 			);
 		} );
@@ -354,23 +354,6 @@ describe( 'SelectControl', () => {
 			);
 
 			expect( mockedWarning ).not.toHaveBeenCalled();
-		} );
-
-		it( 'warns when a custom serializer leaves an empty value without a name', () => {
-			render(
-				<SelectControl
-					label="Country"
-					items={ [
-						{ value: '', label: 'Default' },
-						{ value: 'option1', label: 'Option 1' },
-					] }
-					itemToStringValue={ ( item ) =>
-						item.value || ( null as unknown as string )
-					}
-				/>
-			);
-
-			expect( mockedWarning ).toHaveBeenCalled();
 		} );
 
 		it( 'does not warn for null and non-empty values', () => {

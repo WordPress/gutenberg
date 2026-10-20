@@ -119,10 +119,13 @@ export type SelectItemProps = Omit<
 	/**
 	 * A unique value that identifies this select item.
 	 *
-	 * An item with an empty string value counts as no selection, so the
-	 * trigger shows the placeholder when it is selected. Use `null` for an
-	 * option that means no value, or a non-empty value for an option that is
-	 * a choice of its own (like "Default").
+	 * Empty string values are treated as empty selections by default.
+	 * Use `null` for an option that lets users clear the selection.
+	 *
+	 * To preserve an empty string as an application value, provide
+	 * `itemToStringValue` on `Select.Root` that returns a unique,
+	 * non-empty string. This changes the submitted form value, but not
+	 * the value passed to `onValueChange`.
 	 */
 	value?: unknown;
 	/**

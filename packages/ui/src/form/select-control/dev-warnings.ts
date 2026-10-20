@@ -5,14 +5,9 @@ export function warnSelectControlProps(
 	items: SelectItem[] | undefined,
 	itemToStringValue: SelectControlProps[ 'itemToStringValue' ]
 ): void {
-	// A custom serializer that gives the item a non-empty value avoids the
-	// placeholder, like it does for the select.
-	const isEmpty = ( item: SelectItem ) =>
-		item.value === '' &&
-		( ! itemToStringValue || ( itemToStringValue( item ) ?? '' ) === '' );
-	if ( items?.some( isEmpty ) ) {
+	if ( ! itemToStringValue && items?.some( ( item ) => item.value === '' ) ) {
 		warning(
-			'SelectControl: items with an empty string `value` show the placeholder when selected. Use `null` for an option that means no value (like "None"), or a non-empty value for an option that is a choice of its own (like "Default").'
+			'SelectControl: empty string item values are treated as empty selections by default. Use a non-empty item value or return a non-empty string from `itemToStringValue`. Use `null` for an option that clears the selection.'
 		);
 	}
 }
