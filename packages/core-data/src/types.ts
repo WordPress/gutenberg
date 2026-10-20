@@ -235,7 +235,7 @@ export interface EntityProviderProps {
 	 * record instead of the current entity. Applies only to this entity, not
 	 * to others rendered within it.
 	 */
-	revisionId?: number;
+	revisionId?: number | string;
 	/**
 	 * The children to wrap.
 	 */
