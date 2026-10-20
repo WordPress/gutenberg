@@ -421,3 +421,58 @@ export interface PositionCSSOptions {
 export interface ResponsivePositionCSSOptions extends PositionCSSOptions {
 	viewportSettings?: unknown;
 }
+
+/**
+ * The attributes the fit text support reads.
+ */
+export type FitTextAttributes = {
+	fitText?: boolean;
+	fontSize?: string;
+	style?: BlockStyle & { typography?: BlockStyle };
+};
+
+/**
+ * Props of the hook sizing a block's text to fit its container.
+ */
+export interface UseFitTextProps {
+	/**
+	 * Fit text attribute.
+	 */
+	fitText?: boolean;
+	/**
+	 * Block name.
+	 */
+	name: string;
+	/**
+	 * Block client ID.
+	 */
+	clientId: string;
+}
+
+/**
+ * Props of `FitTextControl`.
+ */
+export interface FitTextControlProps extends FitTextAttributes {
+	/**
+	 * Block client ID.
+	 */
+	clientId: string;
+	/**
+	 * Function to set block attributes.
+	 */
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	/**
+	 * Block name.
+	 */
+	name: string;
+}
+
+/**
+ * Props of the component warning about a small fit text font size.
+ */
+export interface FitTextFontSizeProps extends UseFitTextProps {
+	/**
+	 * Whether the block is selected.
+	 */
+	isSelected?: boolean;
+}

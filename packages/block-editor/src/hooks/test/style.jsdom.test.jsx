@@ -489,6 +489,31 @@ describe( 'getStateStylesCSS under a text clip', () => {
 		).toBe( '.wp-block-test { color: #ff0000 !important; }' );
 	} );
 
+	it( 'ignores an invalid state clip over a text clip', () => {
+		const css = getStateStylesCSS(
+			{ background: { backgroundClip: 'borderbox' } },
+			'.wp-block-test',
+			textClipBase
+		);
+
+		expect( css ).not.toContain( 'background-image: unset' );
+	} );
+
+	it( 'paints a text color under an invalid state clip', () => {
+		const css = getStateStylesCSS(
+			{
+				color: { text: '#ff0000' },
+				background: { backgroundClip: 'borderbox' },
+			},
+			'.wp-block-test',
+			textClipBase
+		);
+
+		expect( css ).toContain(
+			'-webkit-text-fill-color: currentColor !important'
+		);
+	} );
+
 	it( 'leaves a box clip alone without a text clip to escape', () => {
 		expect(
 			getStateStylesCSS(

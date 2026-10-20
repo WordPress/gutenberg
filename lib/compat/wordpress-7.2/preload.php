@@ -35,8 +35,8 @@ function _gutenberg_get_post_type_fields_preload_paths( $post_types ) {
 }
 
 /**
- * Returns the post types whose fields the screen of the site editor being
- * loaded lists, from its `p` query arg.
+ * Returns the post types whose items the screen of the site editor being
+ * loaded lists or edits, from its `p` query arg.
  *
  * The screens are the routes in
  * packages/edit-site/src/components/site-editor-routes: the lists and the
@@ -67,22 +67,55 @@ function _gutenberg_get_site_editor_screen_post_types() {
 }
 
 /**
- * Preloads the fields of the post types the site editor lists.
+ * Preloads the fields of the post types the editors list.
  *
- * The site editor reads them from the `wp/v2/entity-fields` route before it
- * can list the post fields, see `useFields` in
- * packages/editor/src/dataviews/fields-loader/index.ts: those of the edited
- * post, if any, and of the post types of the screen it opens on.
- *
- * The post editor only reads them in the post summary of the DataForm-based
- * inspector, which is an experiment that preloads them on its own, see
- * lib/experimental/dataform-inspector-preload.php.
+ * The editors read them from the `wp/v2/entity-fields` route, see `useFields`
+ * in packages/editor/src/dataviews/fields-loader/index.ts. The post editor
+ * reads those of the edited post in the post summary of its inspector. The
+ * site editor reads those of the edited post, if any, and of the post types of
+ * the screen it opens on.
  *
  * @param array                   $paths   REST API paths to preload.
  * @param WP_Block_Editor_Context $context Block editor context.
  * @return array Filtered preload paths.
  */
 function _gutenberg_preload_entity_fields( $paths, $context ) {
+	$post_types = array();
+	if ( 'core/edit-post' === $context->name && isset( $context->post ) ) {
+		$post_types[] = $context->post->post_type;
+	} elseif ( 'core/edit-site' === $context->name ) {
+		if ( isset( $context->post ) ) {
+			$post_types[] = $context->post->post_type;
+		}
+		$post_types = array_merge( $post_types, _gutenberg_get_site_editor_screen_post_types() );
+	}
+
+	return array_merge(
+		$paths,
+		_gutenberg_get_post_type_fields_preload_paths( $post_types )
+	);
+}
+add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
+
+/**
+ * Preloads the actions of the post types the site editor lists.
+ *
+ * The site editor reads them from the `wp/v2/entity-actions` route as it
+ * loads, see `useEntityActions()` in
+ * packages/editor/src/dataviews/entity-actions-loader.ts: those of the edited
+ * post, if any, and of the post types of the screen it opens on, whose lists
+ * show the actions of their items. A path must match the request of the
+ * `getEntityActionsConfig` core data resolver, see
+ * packages/core-data/src/resolvers.js.
+ *
+ * The post editor is left to `_wp_preload_entity_actions()`, and the paths it
+ * already preloads are skipped.
+ *
+ * @param array                   $paths   REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Block editor context.
+ * @return array Filtered preload paths.
+ */
+function _gutenberg_preload_site_editor_entity_actions( $paths, $context ) {
 	if ( 'core/edit-site' !== $context->name ) {
 		return $paths;
 	}
@@ -93,12 +126,25 @@ function _gutenberg_preload_entity_fields( $paths, $context ) {
 	}
 	$post_types = array_merge( $post_types, _gutenberg_get_site_editor_screen_post_types() );
 
-	return array_merge(
-		$paths,
-		_gutenberg_get_post_type_fields_preload_paths( $post_types )
-	);
+	foreach ( array_unique( $post_types ) as $post_type ) {
+		if ( ! post_type_exists( $post_type ) ) {
+			continue;
+		}
+		$path = add_query_arg(
+			array(
+				'kind' => 'postType',
+				'name' => $post_type,
+			),
+			'/wp/v2/entity-actions'
+		);
+		if ( ! in_array( $path, $paths, true ) ) {
+			$paths[] = $path;
+		}
+	}
+
+	return $paths;
 }
-add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_entity_fields', 10, 2 );
+add_filter( 'block_editor_rest_api_preload_paths', '_gutenberg_preload_site_editor_entity_actions', 10, 2 );
 
 /**
  * Filters the block editor preload paths.
@@ -129,12 +175,23 @@ function gutenberg_block_editor_preload_paths_7_2( $paths, $context ) {
 		$paths[] = '/wp/v2/templates/lookup?slug=front-page';
 		$paths[] = '/wp/v2/taxonomies?context=edit';
 		$paths[] = array( rest_get_route_for_post_type_items( $context->post->post_type ), 'OPTIONS' );
+		// The post summary of the inspector requests the form config of the
+		// post type through `useViewConfig` with `fields: [ 'form' ]`, so the
+		// path must match the resulting `_fields=form` request.
+		$paths[] = '/wp/v2/view-config?kind=postType&name=' . $context->post->post_type . '&_fields=form';
 
 		$author_id = (int) get_post_field( 'post_author', $context->post->ID );
 		if ( post_type_supports( $context->post->post_type, 'author' ) && $author_id > 0 ) {
-			$paths[] = sprintf(
-				'/wp/v2/users/%d?context=view&_fields=id,name',
-				$author_id
+			// Core preloads the single user path of the classic author panel,
+			// which nothing requests anymore.
+			$classic_author_path = sprintf( '/wp/v2/users/%d?context=view&_fields=id,name', $author_id );
+			$paths               = array_values(
+				array_filter(
+					$paths,
+					static function ( $path ) use ( $classic_author_path ) {
+						return $path !== $classic_author_path;
+					}
+				)
 			);
 		}
 	}

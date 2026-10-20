@@ -13,7 +13,7 @@
 return array(
 	'id'            => 'post-content-info',
 	'type'          => 'text',
-	'label'         => __( 'Post content information', 'gutenberg' ),
+	'label'         => __( 'Post content information' ),
 	'readOnly'      => true,
 	'enableSorting' => false,
 	'enableHiding'  => false,

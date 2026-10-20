@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.43.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -12,6 +14,7 @@
 
 ### Internal
 
+-   Remove unused internal filename helpers and the orphaned URL dependency ([#85094](https://github.com/WordPress/gutenberg/pull/85094)).
 -   Convert the private actions tests to TypeScript ([#84930](https://github.com/WordPress/gutenberg/pull/84930)).
 
 ## 0.42.0 (2026-10-07)

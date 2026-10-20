@@ -5,6 +5,7 @@ import {
 	// @ts-expect-error - No type declarations available for @wordpress/block-editor
 } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
@@ -43,7 +44,7 @@ export default function NavigationMenuContent( {
 		( window as any ).wp.blockLibrary.privateApis
 	);
 
-	const { listViewRootClientId, isLoading } = useSelect(
+	const { listViewRootClientId, isLoading, hasChildren } = useSelect(
 		( select ) => {
 			const {
 				areInnerBlocksControlled,
@@ -71,6 +72,7 @@ export default function NavigationMenuContent( {
 				listViewRootClientId: pageListHasBlocks
 					? blockClientIds[ 0 ]
 					: rootClientId,
+				hasChildren: blockClientIds.length > 0,
 				// This is a small hack to wait for the navigation block
 				// to actually load its inner blocks.
 				isLoading:
@@ -88,6 +90,11 @@ export default function NavigationMenuContent( {
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
+			{ ! isLoading && ! hasChildren && (
+				<p className="navigation-edit-editor__empty-message">
+					{ __( 'This Navigation Menu is empty.' ) }
+				</p>
+			) }
 			{ ! isLoading && (
 				<PrivateListView
 					rootClientId={ listViewRootClientId }
