@@ -265,4 +265,38 @@ class Tests_REST_View_Config_Controller_7_2 extends WP_Test_REST_TestCase {
 		$this->assertArrayNotHasKey( 'count', $view_list['all'] );
 		$this->assertSame( 2, $view_list['drafts']['count'] );
 	}
+
+	/**
+	 * The user can switch a view to any layout on offer, which the server cannot
+	 * see, so a filter in the defaults of a layout other than the default one
+	 * also leaves the "All" view without a count.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_omits_count_when_another_layout_has_filters() {
+		$filter_table_layout = static function ( $data ) {
+			return $data->merge(
+				array(
+					'default_layouts' => array(
+						'table' => array(
+							'filters' => array(
+								array(
+									'field'    => 'author',
+									'operator' => 'isAny',
+									'value'    => array( 1 ),
+								),
+							),
+						),
+					),
+				),
+				1
+			);
+		};
+		add_filter( 'get_entity_view_config_posttype_page', $filter_table_layout );
+		$view_list = $this->get_page_view_list();
+		remove_filter( 'get_entity_view_config_posttype_page', $filter_table_layout );
+
+		$this->assertArrayNotHasKey( 'count', $view_list['all'] );
+		$this->assertSame( 2, $view_list['drafts']['count'], 'Views with filters of their own keep their count in every layout.' );
+	}
 }
