@@ -8,7 +8,12 @@ describe( 'DuotoneSwatch', () => {
 			<DuotoneSwatch values={ [ '#8c00b7', '#fcff41' ] } />
 		);
 
-		expect( container ).toMatchSnapshot();
+		// The swatch has no role or text, so check the rendered element directly.
+		// eslint-disable-next-line testing-library/no-node-access
+		expect( container.firstElementChild ).toHaveStyle( {
+			background:
+				'linear-gradient(135deg, #8c00b7 0%, #8c00b7 50%, #fcff41 50%, #fcff41 100%)',
+		} );
 	} );
 
 	it( 'should render the swatch icon when there are no values', () => {

@@ -1,14 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`DuotoneSwatch > should render a color indicator filled with the duotone gradient 1`] = `
-<div>
-  <span
-    class="component-color-indicator"
-    style="background: linear-gradient(135deg, rgb(140, 0, 183) 0%, rgb(140, 0, 183) 50%, rgb(252, 255, 65) 50%, rgb(252, 255, 65) 100%);"
-  />
-</div>
-`;
-
 exports[`DuotoneSwatch > should render the swatch icon when there are no values 1`] = `
 <div>
   <svg
