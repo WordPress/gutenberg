@@ -9,7 +9,6 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { getBlockType } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
 import { store as editorStore } from '../../store';
