@@ -58,6 +58,45 @@ function resolveGhostParent(
 }
 
 /**
+ * The pending-move ghost index for the current block tree.
+ *
+ * @param blockEditor Block-editor selectors, or undefined without the store.
+ * @return Anchor → ghost index, or null when there are no pending moves.
+ */
+function computeMoveGhostIndex( blockEditor: any ) {
+	if ( ! blockEditor?.getClientIdsWithDescendants ) {
+		return null;
+	}
+	const moved = [];
+	for ( const clientId of blockEditor.getClientIdsWithDescendants() ) {
+		const marker =
+			blockEditor.getBlockAttributes( clientId )?.metadata?.suggestion;
+		if ( marker?.type === 'pending-move' ) {
+			moved.push( {
+				clientId,
+				name: blockEditor.getBlockName( clientId ),
+				authorId: marker.authorId ?? null,
+				fromAnchorClientId: marker.fromAnchorClientId ?? null,
+				fromParentClientId: resolveGhostParent(
+					blockEditor,
+					clientId,
+					marker.fromParentClientId ?? ''
+				),
+				fromIndex: marker.fromIndex ?? 0,
+			} );
+		}
+	}
+	if ( moved.length === 0 ) {
+		return null;
+	}
+	return buildMoveGhostIndex( moved, {
+		blockExists: ( id: string ) => !! blockEditor.getBlockName( id ),
+		getSiblings: ( parentId: string ) =>
+			blockEditor.getBlockOrder( parentId ),
+	} );
+}
+
+/**
  * Build the pending-move ghost index for the whole document. Internal to the
  * provider — per-block consumers must go through `useMoveGhosts` so the
  * document scan runs once, not once per block.
@@ -73,108 +112,36 @@ function useMoveGhostIndex() {
 	//
 	// `useSelect` must return a referentially stable value when state is
 	// unchanged (otherwise `@wordpress/data` warns about wasted re-renders),
-	// so it returns a primitive signature string that fully determines ghost
-	// placement (clientId, old index/anchor/parent, whether the anchor still
-	// exists, and the old parent's current first non-self sibling). The index
-	// itself is rebuilt only when that signature changes.
+	// so it returns a primitive signature of the built index: every ghost's
+	// placement and what it renders. The index itself is rebuilt only when
+	// that signature changes.
 	const moveSignature = useSelect( ( select ) => {
-		const blockEditor: any = select( BLOCK_EDITOR_STORE_NAME );
-		const ids = blockEditor?.getClientIdsWithDescendants?.() ?? [];
-		// Collect the pending-move set first so anchor/sibling resolution in
-		// the fingerprint matches `buildMoveGhostIndex`: a block that is itself
-		// pending-moved can't anchor a ghost (it would drag the ghost to its
-		// destination), so it must be treated as unusable here too — otherwise
-		// the memo could miss a recompute when an anchor's moved-state is the
-		// only thing that changed.
-		const movedIds = new Set();
-		for ( const clientId of ids ) {
-			if (
-				blockEditor.getBlockAttributes( clientId )?.metadata?.suggestion
-					?.type === 'pending-move'
-			) {
-				movedIds.add( clientId );
-			}
+		const index = computeMoveGhostIndex(
+			select( BLOCK_EDITOR_STORE_NAME )
+		);
+		if ( ! index ) {
+			return '';
 		}
 		let signature = '';
-		for ( const clientId of ids ) {
-			const marker =
-				blockEditor.getBlockAttributes( clientId )?.metadata
-					?.suggestion;
-			if ( marker?.type !== 'pending-move' ) {
-				continue;
+		for ( const [ placement, map ] of Object.entries( index ) ) {
+			for ( const [ key, ghosts ] of map ) {
+				for ( const ghost of ghosts ) {
+					signature += `${ placement }:${ key }:${ ghost.clientId }:${ ghost.name }:${ ghost.authorId }|`;
+				}
 			}
-			const fromParent = resolveGhostParent(
-				blockEditor,
-				clientId,
-				marker.fromParentClientId ?? ''
-			);
-			const fromAnchor = marker.fromAnchorClientId ?? '';
-			const anchorUsable =
-				fromAnchor &&
-				blockEditor.getBlockName( fromAnchor ) &&
-				! movedIds.has( fromAnchor )
-					? 1
-					: 0;
-			const firstSibling =
-				blockEditor
-					.getBlockOrder( fromParent )
-					.find(
-						( id: string ) =>
-							id !== clientId && ! movedIds.has( id )
-					) ?? '';
-			// Whether the old parent can host an inside-parent fallback ghost
-			// (block existed, not root, not itself moved) — keeps the memo in
-			// sync when only the parent's existence/moved-state changes.
-			const parentUsable =
-				fromParent &&
-				blockEditor.getBlockName( fromParent ) &&
-				! movedIds.has( fromParent )
-					? 1
-					: 0;
-			signature += `${ clientId }:${
-				marker.fromIndex ?? 0
-			}:${ fromAnchor }:${ fromParent }:${ anchorUsable }:${ firstSibling }:${ parentUsable }|`;
 		}
 		return signature;
 	}, [] );
 
-	return useMemo( () => {
-		if ( ! moveSignature ) {
-			return EMPTY_GHOSTS;
-		}
-		const blockEditor: any = registry.select( BLOCK_EDITOR_STORE_NAME );
-		if ( ! blockEditor?.getClientIdsWithDescendants ) {
-			return EMPTY_GHOSTS;
-		}
-		const moved = [];
-		for ( const clientId of blockEditor.getClientIdsWithDescendants() ) {
-			const marker =
-				blockEditor.getBlockAttributes( clientId )?.metadata
-					?.suggestion;
-			if ( marker?.type === 'pending-move' ) {
-				moved.push( {
-					clientId,
-					name: blockEditor.getBlockName( clientId ),
-					authorId: marker.authorId ?? null,
-					fromAnchorClientId: marker.fromAnchorClientId ?? null,
-					fromParentClientId: resolveGhostParent(
-						blockEditor,
-						clientId,
-						marker.fromParentClientId ?? ''
-					),
-					fromIndex: marker.fromIndex ?? 0,
-				} );
-			}
-		}
-		if ( moved.length === 0 ) {
-			return EMPTY_GHOSTS;
-		}
-		return buildMoveGhostIndex( moved, {
-			blockExists: ( id: string ) => !! blockEditor.getBlockName( id ),
-			getSiblings: ( parentId: string ) =>
-				blockEditor.getBlockOrder( parentId ),
-		} );
-	}, [ moveSignature, registry ] );
+	return useMemo(
+		() =>
+			( moveSignature &&
+				computeMoveGhostIndex(
+					registry.select( BLOCK_EDITOR_STORE_NAME )
+				) ) ||
+			EMPTY_GHOSTS,
+		[ moveSignature, registry ]
+	);
 }
 
 /**

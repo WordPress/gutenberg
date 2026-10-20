@@ -26,11 +26,15 @@ export type MoveGhostIndex = Map< string, MovedBlockDescriptor[] >;
  * - `after`        : Map<anchorClientId, MovedBlockDescriptor[]> — render the
  *                    ghost immediately after the (still-present) previous-
  *                    sibling anchor.
- * - `before`       : Map<firstSiblingClientId, MovedBlockDescriptor[]> — used
- *                    when the block was the old parent's first child (null
- *                    anchor) or the recorded anchor no longer exists; render
- *                    the ghost before the old parent's current first
- *                    (non-moved) child.
+ * - `before`       : Map<siblingClientId, MovedBlockDescriptor[]> — used
+ *                    when no surviving sibling precedes the old position;
+ *                    render the ghost before the first one that follows it.
+ *
+ * When the recorded anchor is unusable (gone, pending-moved, or a client id
+ * from before a reload, since parsing regenerates them), the old index places
+ * the ghost instead: it counts the surviving siblings ahead of the old
+ * position, after discounting other blocks that moved out of the slots
+ * before it.
  * - `insideParent` : Map<oldParentClientId, MovedBlockDescriptor[]> — used
  *                    when no sibling survives in the old parent (the moved
  *                    block was an only child, or every sibling also moved
@@ -91,12 +95,25 @@ export function buildMoveGhostIndex(
 			continue;
 		}
 		const parentId = descriptor.fromParentClientId ?? '';
-		const siblings = getSiblings( parentId ) ?? [];
-		const firstSibling = siblings.find(
-			( id: string ) => id !== descriptor.clientId && ! movedIds.has( id )
+		const survivors = ( getSiblings( parentId ) ?? [] ).filter(
+			( id: string ) => ! movedIds.has( id )
 		);
-		if ( firstSibling ) {
-			push( before, firstSibling, descriptor );
+		if ( survivors.length > 0 ) {
+			const movedOutAhead = moved.filter(
+				( other ) =>
+					other !== descriptor &&
+					( other.fromParentClientId ?? '' ) === parentId &&
+					other.fromIndex < descriptor.fromIndex
+			).length;
+			const survivorsAhead = Math.min(
+				descriptor.fromIndex - movedOutAhead,
+				survivors.length
+			);
+			if ( survivorsAhead > 0 ) {
+				push( after, survivors[ survivorsAhead - 1 ], descriptor );
+			} else {
+				push( before, survivors[ 0 ], descriptor );
+			}
 			continue;
 		}
 		// No surviving sibling to anchor on (only child, or all siblings also
