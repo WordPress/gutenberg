@@ -6,7 +6,12 @@ import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useInsertedBlockClientId, useListViewTreeState } from './context';
+import {
+	useHoveredClientId,
+	useInsertedBlockClientId,
+	useListViewContext,
+	useListViewTreeState,
+} from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
@@ -57,6 +62,21 @@ function countBlocks(
 
 const noop = () => {};
 
+/**
+ * Whether the block is one of the blocks, or nested inside one of them.
+ *
+ * @param {Array}  blocks   Block tree.
+ * @param {string} clientId Block client ID.
+ * @return {boolean} Whether the block is within the blocks.
+ */
+function hasBlock( blocks, clientId ) {
+	return blocks.some(
+		( block ) =>
+			block.clientId === clientId ||
+			hasBlock( block.innerBlocks ?? [], clientId )
+	);
+}
+
 function ListViewBranch( props ) {
 	const {
 		blocks,
@@ -101,14 +121,26 @@ function ListViewBranch( props ) {
 		draggedClientIds,
 	} = useListViewTreeState();
 	const insertedBlockClientId = useInsertedBlockClientId();
+	const hoveredClientId = useHoveredClientId();
+	const { setHoveredClientId } = useListViewContext();
 
 	if ( ! canParentExpand ) {
 		return null;
 	}
 
-	// Only show the appender at the first level.
-	const showAppender = showAppenderProp && level === 1;
 	const filteredBlocks = blocks.filter( Boolean );
+	// The first level always shows the appender. A nested level adds its
+	// appender row while the pointer or focus is on its parent, on any block
+	// inside the parent, or on the appender itself, so the appender opens at
+	// the end of the list the user is working in.
+	const showAppender =
+		showAppenderProp &&
+		( level === 1 ||
+			hoveredClientId === parentId ||
+			hasBlock( filteredBlocks, hoveredClientId ) );
+	// The appender row stands in for its parent, so hovering or focusing it
+	// keeps it shown.
+	const hoverAppender = () => setHoveredClientId( parentId );
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
@@ -255,6 +287,7 @@ function ListViewBranch( props ) {
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
 						isSyncedBranch={ syncedBranch }
+						showAppender={ showAppenderProp }
 					/>
 				) }
 			</AsyncModeProvider>
@@ -268,10 +301,13 @@ function ListViewBranch( props ) {
 			{ rows }
 			{ showAppender && (
 				<TreeGridRow
+					className="block-editor-list-view-appender-row"
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }
 					isExpanded
+					onMouseEnter={ hoverAppender }
+					onFocus={ hoverAppender }
 				>
 					<TreeGridCell>
 						{ ( treeGridCellProps ) => (

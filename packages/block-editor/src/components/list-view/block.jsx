@@ -167,6 +167,7 @@ function ListViewBlock( {
 		BlockSettingsMenu,
 		listViewInstanceId,
 		updateExpansion,
+		setHoveredClientId,
 		setInsertedBlockClientId,
 		treeGridElementRef,
 		rootClientId,
@@ -421,8 +422,14 @@ function ListViewBlock( {
 
 	const onMouseEnter = useCallback( () => {
 		setIsHovered( true );
+		setHoveredClientId( clientId );
 		debouncedToggleBlockHighlight( clientId, true );
-	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
+	}, [
+		clientId,
+		setIsHovered,
+		setHoveredClientId,
+		debouncedToggleBlockHighlight,
+	] );
 	const onMouseLeave = useCallback( () => {
 		setIsHovered( false );
 		debouncedToggleBlockHighlight( clientId, false );

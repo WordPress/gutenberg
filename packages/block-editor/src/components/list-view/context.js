@@ -28,3 +28,14 @@ ListViewInsertedBlockContext.displayName = 'ListViewInsertedBlockContext';
 
 export const useInsertedBlockClientId = () =>
 	useContext( ListViewInsertedBlockContext );
+
+/**
+ * The client ID of the block whose row the pointer is over or focus is on,
+ * or `null` when neither is inside the List View. An appender row counts as
+ * its parent block.
+ */
+export const ListViewHoveredBlockContext = createContext( null );
+ListViewHoveredBlockContext.displayName = 'ListViewHoveredBlockContext';
+
+export const useHoveredClientId = () =>
+	useContext( ListViewHoveredBlockContext );
