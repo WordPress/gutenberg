@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { getNewIndexFromPresets, getValidPseudoStates } from '../utils';
+import {
+	getNewIndexFromPresets,
+	getValidPseudoStates,
+	withUserCustomColorPresets,
+} from '../utils';
 
 const validPresets = {
 	single: [ { slug: 'preset-1' } ],
@@ -63,5 +67,103 @@ describe( 'getValidPseudoStates', () => {
 				( state ) => state.value
 			)
 		).toEqual( [ ':hover', ':focus', ':focus-visible', ':active' ] );
+	} );
+} );
+
+describe( 'withUserCustomColorPresets', () => {
+	const customColors = [
+		{ slug: 'my-blue', color: '#0000ff', name: 'MyBlue' },
+	];
+	const customGradients = [
+		{
+			slug: 'my-gradient',
+			gradient: 'linear-gradient(#fff, #000)',
+			name: 'MyGradient',
+		},
+	];
+	const customDuotones = [
+		{ slug: 'my-duotone', colors: [ '#000', '#fff' ], name: 'MyDuotone' },
+	];
+	const themeColors = [ { slug: 'base', color: '#ffffff', name: 'Base' } ];
+
+	it( 'returns the variation unchanged when the user has no custom presets', () => {
+		const variation = {
+			settings: { color: { palette: { theme: themeColors } } },
+		};
+		expect( withUserCustomColorPresets( variation, {} ) ).toBe( variation );
+		expect( withUserCustomColorPresets( variation, undefined ) ).toBe(
+			variation
+		);
+	} );
+
+	it( 'keeps the user custom colors, gradients and duotones', () => {
+		const variation = {
+			title: 'Ember',
+			settings: { color: { palette: { theme: themeColors } } },
+			styles: { color: { background: 'red' } },
+		};
+		const user = {
+			settings: {
+				color: {
+					palette: { custom: customColors },
+					gradients: { custom: customGradients },
+					duotone: { custom: customDuotones },
+				},
+			},
+		};
+
+		expect( withUserCustomColorPresets( variation, user ) ).toEqual( {
+			title: 'Ember',
+			settings: {
+				color: {
+					palette: { theme: themeColors, custom: customColors },
+					gradients: { custom: customGradients },
+					duotone: { custom: customDuotones },
+				},
+			},
+			styles: { color: { background: 'red' } },
+		} );
+	} );
+
+	it( 'adds the user custom colors to a variation without settings', () => {
+		const user = {
+			settings: { color: { palette: { custom: customColors } } },
+		};
+
+		expect(
+			withUserCustomColorPresets( { title: 'Default' }, user )
+		).toEqual( {
+			title: 'Default',
+			settings: { color: { palette: { custom: customColors } } },
+		} );
+	} );
+
+	it( 'keeps the custom colors the variation defines itself', () => {
+		const variationColors = [
+			{ slug: 'variation', color: '#ff0000', name: 'Variation' },
+		];
+		const variation = {
+			settings: { color: { palette: { custom: variationColors } } },
+		};
+		const user = {
+			settings: { color: { palette: { custom: customColors } } },
+		};
+
+		expect( withUserCustomColorPresets( variation, user ) ).toBe(
+			variation
+		);
+	} );
+
+	it( 'does not change a variation whose palette is a plain array', () => {
+		const variation = {
+			settings: { color: { palette: themeColors } },
+		};
+		const user = {
+			settings: { color: { palette: { custom: customColors } } },
+		};
+
+		expect( withUserCustomColorPresets( variation, user ) ).toBe(
+			variation
+		);
 	} );
 } );

@@ -19,6 +19,7 @@
 ### Bug Fixes
 
 -   Font Library: Load all installed font families, not only the first 10 ([#84684](https://github.com/WordPress/gutenberg/pull/84684)).
+-   Keep custom colors, gradients and duotones when applying a style variation or color palette ([#56054](https://github.com/WordPress/gutenberg/issues/56054)).
 
 ### Internal
 

@@ -15,7 +15,11 @@ import type {
 	StyleVariation,
 } from '@wordpress/global-styles-engine';
 import { GlobalStylesContext } from './context';
-import { removePropertiesFromObject, isVariationWithProperties } from './utils';
+import {
+	removePropertiesFromObject,
+	isVariationWithProperties,
+	withUserCustomColorPresets,
+} from './utils';
 
 /**
  * Hook to get and set style values with memoization.
@@ -229,7 +233,11 @@ export function useCurrentMergeThemeStyleVariationsWithUserConfig(
 		];
 
 		return variationsByProperties?.length
-			? variationsByProperties.filter( hasThemeVariation )
+			? variationsByProperties
+					.filter( hasThemeVariation )
+					.map( ( variation ) =>
+						withUserCustomColorPresets( variation, userVariation )
+					)
 			: [];
 	}, [ properties, userVariation, variationsFromTheme ] );
 }

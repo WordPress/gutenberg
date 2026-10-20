@@ -198,6 +198,56 @@ export function isVariationWithProperties(
 	return areGlobalStylesEqual( variationWithProperties, variation );
 }
 
+const CUSTOM_COLOR_PRESETS = [ 'palette', 'gradients', 'duotone' ] as const;
+
+/**
+ * Copies the user's custom color presets (colors, gradients and duotones)
+ * into a variation, so they are not lost when the variation is applied.
+ * Presets the variation defines itself are left as they are.
+ *
+ * @param variation The variation to apply.
+ * @param user      The current user config.
+ * @return The variation with the user's custom color presets.
+ */
+export function withUserCustomColorPresets< T extends GlobalStylesConfig >(
+	variation: T,
+	user?: GlobalStylesConfig
+): T {
+	const userColor = user?.settings?.color;
+	if ( ! userColor ) {
+		return variation;
+	}
+
+	let color = variation.settings?.color;
+	for ( const preset of CUSTOM_COLOR_PRESETS ) {
+		const userPresets = userColor[ preset ];
+		const variationPresets = color?.[ preset ];
+		const custom = Array.isArray( userPresets )
+			? undefined
+			: userPresets?.custom;
+		if (
+			! custom ||
+			Array.isArray( variationPresets ) ||
+			variationPresets?.custom
+		) {
+			continue;
+		}
+		color = {
+			...color,
+			[ preset ]: { ...variationPresets, custom },
+		};
+	}
+
+	if ( color === variation.settings?.color ) {
+		return variation;
+	}
+
+	return {
+		...variation,
+		settings: { ...variation.settings, color },
+	};
+}
+
 function getFontFamilyFromSetting( fontFamilies: any[], setting: string ): any {
 	if ( ! Array.isArray( fontFamilies ) || ! setting ) {
 		return null;
