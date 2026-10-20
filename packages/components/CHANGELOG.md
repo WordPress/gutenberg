@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
+
 ### Enhancements
 
+-   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
@@ -15,7 +20,6 @@
 
 ### Breaking Changes
 
--   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers using `@emotion/react` or `@emotion/styled` that relied on StyleProvider's cross-document cache must provide their own cache targeting that document's `<head>` and wrap the subtree in `CacheProvider`; `StyleProvider` continues to register CSS Module styles. Components no longer supply Framer Motion's optional Emotion DOM prop validator; without a validator, `__unstableMotion` forwards non-animation props to the rendered element. This includes:
     -   Context-system class-name composition ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
     -   `StyleProvider` cache removal ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
@@ -38,7 +42,6 @@
 
 ### Enhancements
 
--   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   `BorderBoxControl`, `BorderControl`, `Heading`, `InputControl`, `Menu`, `RangeControl`, `Text`, `ToolsPanel`: Use semantic WPDS tokens for typography, spacing, border previews, and range rails ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
 -   `ColorPicker`: Use `Select` from `@wordpress/ui` for the color format selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   `ExternalLink`: Use a small border radius for consistent focus rings ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
