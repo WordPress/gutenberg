@@ -225,7 +225,11 @@ export function PrivateBlockToolbar( {
 			// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
 			key={ toolbarKey }
 		>
-			<div ref={ toolbarWrapperRef } className={ innerClasses }>
+			<div
+				ref={ toolbarWrapperRef }
+				className={ innerClasses }
+				tabIndex={ -1 }
+			>
 				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
 					<BlockParentSelector />
 				) }
