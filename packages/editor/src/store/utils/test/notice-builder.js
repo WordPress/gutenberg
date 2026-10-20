@@ -168,20 +168,6 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			],
 			{ isAutosave: true },
 		],
-		[
-			'when the autosave was redirected to the login page',
-			'invalid_json',
-			[ 'publish', 'publish' ],
-			[
-				'Auto-save failed because you may have been logged out.',
-				{ id: 'editor-autosave' },
-			],
-			{ isAutosave: true },
-			{
-				status: 200,
-				url: 'http://example.com/wp-login.php?redirect_to=x',
-			},
-		],
 	].forEach(
 		( [
 			description,
@@ -189,12 +175,10 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ postStatus, editsStatus ],
 			expectedValue,
 			options = {},
-			data,
 		] ) => {
 			it( description, () => {
 				post.status = postStatus;
 				error.code = errorCode;
-				error.data = data;
 				edits.status = editsStatus;
 				expect(
 					getNotificationArgumentsForSaveFail( {

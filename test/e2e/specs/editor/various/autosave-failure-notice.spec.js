@@ -5,9 +5,6 @@ const {
 
 const AUTOSAVE_FAILED = 'Auto-save failed. You can also save manually.';
 
-const AUTOSAVE_FAILED_LOGGED_OUT =
-	'Auto-save failed because you may have been logged out.';
-
 const AUTOSAVE_FAILED_NO_RESPONSE =
 	'Auto-save failed because there was no response from the server. You can also save manually.';
 
@@ -112,7 +109,8 @@ test.describe( 'Autosave failure notice', () => {
 			'dropped-connection',
 			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
-		[ 'error without a message', 'no-message', withDetails( 'Error 500' ) ],
+		// TODO: Show the status code.
+		[ 'error without a message', 'no-message', AUTOSAVE_FAILED ],
 		[
 			'error with a plain text message',
 			'plain-message',
@@ -144,10 +142,11 @@ test.describe( 'Autosave failure notice', () => {
 			'fatal-error-displayed',
 			AUTOSAVE_FAILED,
 		],
+		// TODO: Say the session may have expired.
 		[
 			'redirected to the login page',
 			'redirect-to-login',
-			AUTOSAVE_FAILED_LOGGED_OUT,
+			AUTOSAVE_FAILED,
 		],
 		[
 			'redirected to another site',

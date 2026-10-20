@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Add the response's status to the `data` of a thrown error when the error body doesn't include one, including `invalid_json` errors, which also include the address a redirected request ended at as `data.url` ([#85157](https://github.com/WordPress/gutenberg/pull/85157)).
+-   Include the response's status as `data.status` in `invalid_json` errors ([#85157](https://github.com/WordPress/gutenberg/pull/85157)).
 
 ## 7.57.0 (2026-10-07)
 

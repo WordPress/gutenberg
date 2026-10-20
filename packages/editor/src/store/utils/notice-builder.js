@@ -9,29 +9,9 @@ const AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE = __(
 	'Auto-save failed because there was no response from the server. You can also save manually.'
 );
 
-const AUTO_SAVE_LOGGED_OUT_FAILURE_NOTICE = __(
-	'Auto-save failed because you may have been logged out.'
-);
-
 const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
 	'Auto-save failed because you were offline. You can also save manually once you’re back online.'
 );
-
-/**
- * Returns whether an address is the login page, where a request lands once the
- * session has ended.
- *
- * @param {string} [url] Address a request was redirected to.
- *
- * @return {boolean} Whether the address is the login page.
- */
-function isLoginPage( url ) {
-	try {
-		return new URL( url ).pathname.endsWith( '/wp-login.php' );
-	} catch {
-		return false;
-	}
-}
 
 /**
  * Builds the arguments for a success notification dispatch.
@@ -174,13 +154,10 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			: messages.default;
 
 	if ( options?.isAutosave ) {
-		if ( error.code === 'fetch_error' ) {
-			noticeMessage = AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE;
-		} else if ( isLoginPage( error.data?.url ) ) {
-			noticeMessage = AUTO_SAVE_LOGGED_OUT_FAILURE_NOTICE;
-		} else {
-			noticeMessage = AUTO_SAVE_FAILURE_NOTICE;
-		}
+		noticeMessage =
+			error.code === 'fetch_error'
+				? AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE
+				: AUTO_SAVE_FAILURE_NOTICE;
 	}
 
 	return [ noticeMessage, { id } ];
