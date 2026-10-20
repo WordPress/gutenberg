@@ -4,10 +4,9 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import DialogWrapper from './dialog-wrapper';
 import { unlock } from '../../lock-unlock';
 
-const { PrivateQuickInserter: QuickInserter } = unlock(
+const { PrivateQuickInserter: QuickInserter, LinkUIPane } = unlock(
 	blockEditorPrivateApis
 );
 
@@ -36,8 +35,7 @@ function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
 	}
 
 	return (
-		<DialogWrapper
-			className="link-ui-block-inserter"
+		<LinkUIPane
 			title={ __( 'Add block' ) }
 			description={ __( 'Choose a block to add to your Navigation.' ) }
 			onBack={ onBack }
@@ -51,7 +49,7 @@ function LinkUIBlockInserter( { clientId, onBack, onBlockInsert } ) {
 				onSelect={ onBlockInsert ? onBlockInsert : undefined }
 				hasSearch={ false }
 			/>
-		</DialogWrapper>
+		</LinkUIPane>
 	);
 }
 

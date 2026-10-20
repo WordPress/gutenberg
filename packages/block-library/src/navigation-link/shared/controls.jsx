@@ -16,12 +16,12 @@ import { useSelect } from '@wordpress/data';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
-import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
+import { useLinkPreview } from '../../utils/link-picker';
 import { useIsInvalidLink } from './use-is-invalid-link';
 import ViewLinkButton from '../../utils/view-link-button';
 import { unlock } from '../../lock-unlock';
 
-const { LinkPicker } = unlock( blockEditorPrivateApis );
+const { LinkPicker, getSuggestionsQuery } = unlock( blockEditorPrivateApis );
 
 /**
  * Get a human-readable entity type name.

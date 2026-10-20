@@ -53,13 +53,15 @@ import { NEW_TAB_TARGET, NOFOLLOW_REL } from './constants';
 import { getUpdatedLinkAttributes } from './get-updated-link-attributes';
 import removeAnchorTag from '../utils/remove-anchor-tag';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { getSuggestionsQuery, useLinkPreview } from '../utils/link-picker';
+import { useLinkPreview } from '../utils/link-picker';
 import ViewLinkButton from '../utils/view-link-button';
 import { unlock } from '../lock-unlock';
 import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 import { getWidthClasses, isPercentageWidth } from './utils';
 
-const { HTMLElementControl, LinkPicker } = unlock( blockEditorPrivateApis );
+const { HTMLElementControl, LinkPicker, getSuggestionsQuery } = unlock(
+	blockEditorPrivateApis
+);
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 
 const LINK_SETTINGS = [

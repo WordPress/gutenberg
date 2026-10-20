@@ -1,37 +1,35 @@
-import { __unstableStripHTML as stripHTML, focus } from '@wordpress/dom';
-import {
-	Popover,
-	Button,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { __ } from '@wordpress/i18n';
-import { LinkControl, useBlockEditingMode } from '@wordpress/block-editor';
 import {
-	useMemo,
-	useState,
-	useRef,
-	useEffect,
-	forwardRef,
-} from '@wordpress/element';
+	privateApis as blockEditorPrivateApis,
+	useBlockEditingMode,
+} from '@wordpress/block-editor';
+import { forwardRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
-import { plus } from '@wordpress/icons';
-import { useInstanceId } from '@wordpress/compose';
-import { VisuallyHidden } from '@wordpress/ui';
-import { isURL } from '@wordpress/url';
-import { LinkUIPageCreator } from './page-creator';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { decodeEntities } from '@wordpress/html-entities';
 import LinkUIBlockInserter from './block-inserter';
 import {
 	isBlockSuggestion,
 	useBlockSuggestions,
 	useEntityBinding,
 } from '../shared';
-import { getSuggestionsQuery, useLinkPreview } from '../../utils/link-picker';
+import { useLinkPreview } from '../../utils/link-picker';
+import { unlock } from '../../lock-unlock';
 
+const { LinkUI: BaseLinkUI } = unlock( blockEditorPrivateApis );
+
+/**
+ * The block editor's Link UI set up for a Navigation item: a preview of the
+ * linked entity, page creation through core data, and an "Add block" tool.
+ *
+ * @param {Object} props The props of the Navigation Link UI.
+ * @param {Object} ref   Forwarded to the popover.
+ */
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
-
 	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
+	const { clientId } = props;
 
 	const { image, badges } = useLinkPreview( {
 		url,
@@ -41,103 +39,11 @@ function UnforwardedLinkUI( props, ref ) {
 		isEntityAvailable,
 	} );
 
-	const { clientId } = props;
-	const postType = type || 'page';
-
-	const [ addingBlock, setAddingBlock ] = useState( false );
-	const [ addingPage, setAddingPage ] = useState( false );
-	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
-	// Stable initial value for LinkControl's uncontrolled inputValue prop.
-	// We track the search with the searchInputValueRef, then update the
-	// initialSearchValue state with the observed searchInputValueRef
-	// when mounting the LinkControl. If LinkControl becomes a fully
-	// controlled component, then we can remove this extra complexity.
-	const [ initialSearchValue, setInitialSearchValue ] = useState( '' );
-	// Tracks the live search input between renders without causing re-renders.
-	const searchInputValueRef = useRef( '' );
-	// Call this instead of setting searchInputValueRef.current and
-	// setInitialSearchValue separately, to keep both in sync.
-	const updateSearchValue = ( value ) => {
-		searchInputValueRef.current = value;
-		setInitialSearchValue( value );
-	};
-	const linkControlWrapperRef = useRef();
-	const addPageButtonRef = useRef();
-	const addBlockButtonRef = useRef();
-
 	// Use the entity binding hook to get binding status
 	const { isBoundEntityAvailable } = useEntityBinding( {
 		clientId,
 		attributes: props.link,
 	} );
-
-	// Memoize link value to avoid overriding the LinkControl's internal state.
-	// This is a temporary fix. See https://github.com/WordPress/gutenberg/issues/50976#issuecomment-1568226407.
-	const link = useMemo(
-		() => ( {
-			url,
-			opensInNewTab,
-			title: label && stripHTML( label ),
-			entityTitle: entityRecord?.title?.rendered || entityRecord?.name,
-			kind,
-			type,
-			id,
-			image,
-			badges,
-		} ),
-		[
-			label,
-			opensInNewTab,
-			url,
-			kind,
-			type,
-			id,
-			image,
-			badges,
-			entityRecord,
-		]
-	);
-
-	const handlePageCreated = ( pageLink ) => {
-		// Set the new page as the current link
-		props.onChange( pageLink );
-		// Return to main Link UI and focus the first focusable element
-		setAddingPage( false );
-		setShouldFocusPane( true );
-		// Clear search input value
-		updateSearchValue( '' );
-	};
-
-	const dialogTitleId = useInstanceId(
-		LinkUI,
-		'link-ui-link-control__title'
-	);
-	const dialogDescriptionId = useInstanceId(
-		LinkUI,
-		'link-ui-link-control__description'
-	);
-
-	// Focus management when transitioning between panes
-	useEffect( () => {
-		if ( shouldFocusPane && linkControlWrapperRef.current ) {
-			// If we have a specific element to focus, focus it
-			if ( shouldFocusPane?.current ) {
-				// Focus the specific element passed
-				shouldFocusPane.current.focus();
-			} else {
-				// Focus the first tabbable element (keyboard-accessible, excluding tabindex="-1")
-				const tabbableElements = focus.tabbable.find(
-					linkControlWrapperRef.current
-				);
-				const nextFocusTarget =
-					tabbableElements[ 0 ] || linkControlWrapperRef.current;
-				nextFocusTarget.focus();
-			}
-
-			// Reset the state
-			setShouldFocusPane( false );
-		}
-	}, [ shouldFocusPane ] );
 
 	const blockEditingMode = useBlockEditingMode();
 	const canAddBlock = blockEditingMode !== 'disabled';
@@ -154,6 +60,27 @@ function UnforwardedLinkUI( props, ref ) {
 		},
 		[ canAddBlock, type ]
 	);
+	const { saveEntityRecord } = useDispatch( coreStore );
+
+	const createPage = async ( { title, publish } ) => {
+		const savedRecord = await saveEntityRecord(
+			'postType',
+			'page',
+			{
+				title,
+				status: publish ? 'publish' : 'draft',
+			},
+			{ throwOnError: true }
+		);
+
+		return {
+			id: savedRecord.id,
+			type: 'page',
+			title: decodeEntities( savedRecord.title.rendered ),
+			url: savedRecord.link,
+			kind: 'post-type',
+		};
+	};
 
 	// Blocks are listed in the search results only when the "Add block"
 	// button would be shown: the link has no URL yet and the block is not
@@ -161,172 +88,63 @@ function UnforwardedLinkUI( props, ref ) {
 	const { transformSuggestions, insertBlockFromSuggestion } =
 		useBlockSuggestions( {
 			clientId,
-			isEnabled: canAddBlock && ! link?.url?.length,
+			isEnabled: canAddBlock && ! url?.length,
 			onBlockInsert: props.onBlockInsert,
 			onClose: props.onClose,
 		} );
 
+	const tools = canAddBlock
+		? [
+				{
+					id: 'block-inserter',
+					label: __( 'Add block' ),
+					render: ( { onBack } ) => (
+						<LinkUIBlockInserter
+							clientId={ clientId }
+							onBack={ onBack }
+							onBlockInsert={ props.onBlockInsert }
+						/>
+					),
+				},
+			]
+		: [];
+
 	return (
-		<Popover
+		<BaseLinkUI
 			ref={ ref }
-			placement="bottom"
-			onClose={ props.onClose }
+			link={ {
+				url,
+				opensInNewTab,
+				title: label && stripHTML( label ),
+				entityTitle:
+					entityRecord?.title?.rendered || entityRecord?.name,
+				kind,
+				type,
+				id,
+				image,
+				badges,
+			} }
+			handleEntities={ isBoundEntityAvailable }
+			description={ __(
+				'Search for and add a link to your Navigation.'
+			) }
 			anchor={ props.anchor }
-			shift
-		>
-			{ ! addingBlock && ! addingPage && (
-				<div
-					ref={ linkControlWrapperRef }
-					role="dialog"
-					aria-labelledby={ dialogTitleId }
-					aria-describedby={ dialogDescriptionId }
-				>
-					<VisuallyHidden>
-						<h2 id={ dialogTitleId }>{ __( 'Add link' ) }</h2>
+			onClose={ props.onClose }
+			onCancel={ props.onCancel }
+			onRemove={ props.onRemove }
+			onCreatePage={ canAddPage ? createPage : undefined }
+			tools={ tools }
+			transformSuggestions={ transformSuggestions }
+			onChange={ ( updatedValue ) => {
+				if ( isBlockSuggestion( updatedValue ) ) {
+					insertBlockFromSuggestion( updatedValue.blockItemId );
+					return;
+				}
 
-						<p id={ dialogDescriptionId }>
-							{ __(
-								'Search for and add a link to your Navigation.'
-							) }
-						</p>
-					</VisuallyHidden>
-					<LinkControl
-						hasTextControl
-						hasRichPreviews
-						value={ link }
-						showInitialSuggestions
-						withCreateSuggestion={ false }
-						noDirectEntry={ !! type }
-						noURLSuggestion={ !! type }
-						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
-						transformSuggestions={ transformSuggestions }
-						onChange={ ( updatedValue ) => {
-							if ( isBlockSuggestion( updatedValue ) ) {
-								insertBlockFromSuggestion(
-									updatedValue.blockItemId
-								);
-								return;
-							}
-
-							props.onChange( updatedValue );
-						} }
-						onInputChange={ ( value ) => {
-							// Observe the input value so we can pass the value to the page creator
-							// and restore it on back button click
-							searchInputValueRef.current = value;
-						} }
-						inputValue={ initialSearchValue }
-						onRemove={ props.onRemove }
-						onCancel={ props.onCancel }
-						handleEntities={ isBoundEntityAvailable }
-						forceIsEditingLink={ link?.url ? false : undefined }
-						renderControlBottom={ () => {
-							// Don't show the tools when there is submitted link (preview state).
-							if ( link?.url?.length ) {
-								return null;
-							}
-
-							return (
-								<LinkUITools
-									addPageButtonRef={ addPageButtonRef }
-									addBlockButtonRef={ addBlockButtonRef }
-									setAddingBlock={ () => {
-										setAddingBlock( true );
-									} }
-									setAddingPage={ () => {
-										setAddingPage( true );
-									} }
-									canAddPage={ canAddPage }
-									canAddBlock={ canAddBlock }
-								/>
-							);
-						} }
-					/>
-				</div>
-			) }
-
-			{ addingBlock && (
-				<LinkUIBlockInserter
-					clientId={ props.clientId }
-					onBack={ () => {
-						setAddingBlock( false );
-						setShouldFocusPane( addBlockButtonRef );
-						updateSearchValue( searchInputValueRef.current );
-					} }
-					onBlockInsert={ props?.onBlockInsert }
-				/>
-			) }
-
-			{ addingPage && (
-				<LinkUIPageCreator
-					postType={ postType }
-					onBack={ () => {
-						setAddingPage( false );
-						setShouldFocusPane( addPageButtonRef );
-						updateSearchValue( searchInputValueRef.current );
-					} }
-					onPageCreated={ handlePageCreated }
-					initialTitle={
-						searchInputValueRef.current &&
-						! isURL( searchInputValueRef.current )
-							? searchInputValueRef.current
-							: ''
-					}
-				/>
-			) }
-		</Popover>
+				props.onChange( updatedValue );
+			} }
+		/>
 	);
 }
 
 export const LinkUI = forwardRef( UnforwardedLinkUI );
-
-const LinkUITools = ( {
-	addPageButtonRef,
-	addBlockButtonRef,
-	setAddingBlock,
-	setAddingPage,
-	canAddPage,
-	canAddBlock,
-} ) => {
-	const blockInserterAriaRole = 'listbox';
-
-	// Don't render anything if neither button should be shown
-	if ( ! canAddPage && ! canAddBlock ) {
-		return null;
-	}
-
-	return (
-		<VStack spacing={ 0 } className="link-ui-tools">
-			{ canAddPage && (
-				<Button
-					__next40pxDefaultSize
-					ref={ addPageButtonRef }
-					icon={ plus }
-					onClick={ ( e ) => {
-						e.preventDefault();
-						setAddingPage( true );
-					} }
-					aria-haspopup={ blockInserterAriaRole }
-				>
-					{ __( 'Create page' ) }
-				</Button>
-			) }
-			{ canAddBlock && (
-				<Button
-					__next40pxDefaultSize
-					ref={ addBlockButtonRef }
-					icon={ plus }
-					onClick={ ( e ) => {
-						e.preventDefault();
-						setAddingBlock( true );
-					} }
-					aria-haspopup={ blockInserterAriaRole }
-				>
-					{ __( 'Add block' ) }
-				</Button>
-			) }
-		</VStack>
-	);
-};
-
-export default LinkUITools;
