@@ -145,9 +145,12 @@ describe( 'useDashboardLayout', () => {
 	} );
 
 	it( 'restores the registered default via resetLayout', async () => {
-		mockedApiFetch.mockResolvedValueOnce( [
-			placed( 'default', { width: 3, height: 3 } ),
-		] );
+		// The default record is authored on 300px rows and lands in the
+		// current geometry, stamped with it.
+		mockedApiFetch.mockResolvedValueOnce( {
+			geometry: LEGACY,
+			widgets: [ placed( 'default', { width: 3, height: 3 } ) ],
+		} );
 
 		const { result } = render();
 
@@ -165,8 +168,6 @@ describe( 'useDashboardLayout', () => {
 			path: `/wp/v2/dashboards/${ DASHBOARD_NAME }/default-layout`,
 		} );
 
-		// The default is authored on 300px rows and lands in the current
-		// geometry, stamped with it.
 		const expected = [ placed( 'default', { width: 3, height: 15 } ) ];
 		expect( select( preferencesStore ).get( SCOPE, KEY ) ).toEqual( {
 			geometry: GEOMETRY,
@@ -174,5 +175,23 @@ describe( 'useDashboardLayout', () => {
 		} );
 		const [ layout ] = result.current;
 		expect( layout ).toEqual( expected );
+	} );
+
+	it( 'reads a default served without a geometry as legacy', async () => {
+		mockedApiFetch.mockResolvedValueOnce( [
+			placed( 'default', { width: 3, height: 3 } ),
+		] );
+
+		const { result } = render();
+
+		await act( async () => {
+			const [ , , resetLayout ] = result.current;
+			await resetLayout();
+		} );
+
+		const [ layout ] = result.current;
+		expect( layout ).toEqual( [
+			placed( 'default', { width: 3, height: 15 } ),
+		] );
 	} );
 } );
