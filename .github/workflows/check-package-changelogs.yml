@@ -218,8 +218,9 @@ jobs:
                   persist-credentials: false
             - name: 'Fetch relevant history from base repository'
               run: git fetch "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" "$GITHUB_BASE_REF"
-            # The validator imports only Node.js built-in modules, so it runs on
-            # the runner image's Node.js without `actions/setup-node`.
+            # The validator needs no installed dependencies, and the runner
+            # image's Node.js and npm satisfy `devEngines`, so this skips
+            # `actions/setup-node` and `.github/setup-npm`.
             - name: Validate touched CHANGELOG files
               env:
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
@@ -234,4 +235,4 @@ jobs:
 
                   echo "Validating:"
                   echo "$changelogs"
-                  echo "$changelogs" | xargs node tools/validation/validate-changelogs.ts --pr="${PR_NUMBER}"
+                  echo "$changelogs" | xargs npm run lint:changelogs -- --pr="${PR_NUMBER}"
