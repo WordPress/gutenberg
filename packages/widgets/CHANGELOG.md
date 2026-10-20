@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Legacy widget: Show "Select widget" in the widget type select instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+
 ## 5.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -11,10 +15,6 @@
 ### Enhancements
 
 -   Legacy widget: Migrate widget type selection to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
-
-### Bug Fixes
-
--   Legacy widget: Show "Select widget" in the widget type select instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 4.57.0 (2026-10-07)
 
