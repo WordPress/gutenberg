@@ -795,8 +795,8 @@ export const getBlockPatterns =
 	};
 
 /**
- * Requests the patterns a theme registers, loading the theme through a theme
- * preview the same way activating it would.
+ * Requests the patterns an installed theme would add if it were activated,
+ * loading the theme through a theme preview.
  *
  * @param {string} stylesheet Theme stylesheet.
  */
@@ -805,9 +805,14 @@ export const getThemeBlockPatterns =
 	async ( { dispatch } ) => {
 		let patterns = [];
 		try {
-			patterns = await fetchBlockPatterns( {
-				wp_theme_preview: stylesheet,
-			} );
+			patterns = await fetchBlockPatterns(
+				addQueryArgs(
+					'/wp/v2/block-patterns/installed-theme-patterns',
+					{
+						wp_theme_preview: stylesheet,
+					}
+				)
+			);
 		} catch {
 			// A theme that fails to load in a preview has no patterns to offer.
 		}

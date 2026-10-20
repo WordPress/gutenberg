@@ -2,9 +2,10 @@ import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import { filterOutDuplicatesByName } from './utils';
+import { filterOutDuplicatesByName, isInOtherCategories } from './utils';
 import {
 	EXCLUDED_PATTERN_SOURCES,
+	PATTERN_OTHER_CATEGORIES,
 	PATTERN_TYPES,
 	PATTERN_SYNC_TYPES,
 	TEMPLATE_PART_POST_TYPE,
@@ -77,6 +78,64 @@ const selectTemplateParts = createSelector(
 	]
 );
 
+const selectPatternCategories = createSelector(
+	( select ) => {
+		const settings = unlock( select( editSiteStore ) ).getSettings();
+		return [
+			...( settings.__experimentalAdditionalBlockPatternCategories ??
+				settings.__experimentalBlockPatternCategories ??
+				[] ),
+			...( select( coreStore ).getBlockPatternCategories() ?? [] ),
+		];
+	},
+	( select ) => [
+		unlock( select( editSiteStore ) ).getSettings(),
+		select( coreStore ).getBlockPatternCategories(),
+	]
+);
+
+const selectInstalledThemeStylesheets = createSelector(
+	( select ) =>
+		unlock( select( editSiteStore ) )
+			.getSettings()
+			.installedThemePatternSources?.map(
+				( { stylesheet } ) => stylesheet
+			) ?? EMPTY_PATTERN_LIST,
+	( select ) => [
+		unlock( select( editSiteStore ) ).getSettings()
+			.installedThemePatternSources,
+	]
+);
+
+/**
+ * Returns the patterns that installed themes, other than the active one,
+ * would add if they were activated. Each pattern has the stylesheet of its
+ * theme in `theme`. Asking starts loading them.
+ *
+ * @param {Object} select The select function from the data registry.
+ * @return {{patterns: Array, isResolving: boolean}} The patterns.
+ */
+export const selectInstalledThemePatterns = createSelector(
+	( select ) => {
+		const stylesheets = selectInstalledThemeStylesheets( select );
+		if ( ! stylesheets.length ) {
+			return { patterns: EMPTY_PATTERN_LIST, isResolving: false };
+		}
+		const patterns = unlock(
+			select( coreStore )
+		).getInstalledThemePatterns( stylesheets );
+		return {
+			patterns: patterns ?? EMPTY_PATTERN_LIST,
+			isResolving: ! patterns,
+		};
+	},
+	( select ) => [
+		unlock( select( coreStore ) ).getInstalledThemePatterns(
+			selectInstalledThemeStylesheets( select )
+		),
+	]
+);
+
 const selectThemePatterns = createSelector(
 	( select ) => {
 		const { getSettings } = unlock( select( editSiteStore ) );
@@ -87,10 +146,15 @@ const selectThemePatterns = createSelector(
 			settings.__experimentalBlockPatterns;
 
 		const restBlockPatterns = select( coreStore ).getBlockPatterns();
+		const {
+			patterns: installedThemePatterns,
+			isResolving: isResolvingInstalledThemePatterns,
+		} = selectInstalledThemePatterns( select );
 
 		const patterns = [
 			...( blockPatterns || [] ),
 			...( restBlockPatterns || [] ),
+			...installedThemePatterns,
 		]
 			.filter(
 				( pattern ) =>
@@ -109,12 +173,14 @@ const selectThemePatterns = createSelector(
 		return {
 			patterns,
 			isResolving: isResolvingSelector( 'getBlockPatterns' ),
+			isResolvingInstalledThemePatterns,
 		};
 	},
 	( select ) => [
 		select( coreStore ).getBlockPatterns(),
 		select( coreStore ).isResolving( 'getBlockPatterns' ),
 		unlock( select( editSiteStore ) ).getSettings(),
+		selectInstalledThemePatterns( select ),
 	]
 );
 
@@ -123,6 +189,7 @@ const selectPatterns = createSelector(
 		const {
 			patterns: themePatterns,
 			isResolving: isResolvingThemePatterns,
+			isResolvingInstalledThemePatterns,
 		} = selectThemePatterns( select );
 		const {
 			patterns: userPatterns,
@@ -146,7 +213,14 @@ const selectPatterns = createSelector(
 			} );
 		}
 
-		if ( categoryId ) {
+		if ( categoryId === PATTERN_OTHER_CATEGORIES ) {
+			const categories = selectPatternCategories( select );
+			patterns = searchItems( patterns, search, {
+				categoryId,
+				hasCategory: ( item ) =>
+					isInOtherCategories( item, categories ),
+			} );
+		} else if ( categoryId ) {
 			patterns = searchItems( patterns, search, {
 				categoryId,
 				hasCategory: ( item, currentCategory ) => {
@@ -182,12 +256,18 @@ const selectPatterns = createSelector(
 		}
 		return {
 			patterns,
-			isResolving: isResolvingThemePatterns || isResolvingUserPatterns,
+			// Patterns from other installed themes take longer to load, so
+			// the list doesn't wait for them unless it would be empty.
+			isResolving:
+				isResolvingThemePatterns ||
+				isResolvingUserPatterns ||
+				( isResolvingInstalledThemePatterns && ! patterns.length ),
 		};
 	},
 	( select ) => [
 		selectThemePatterns( select ),
 		selectUserPatterns( select ),
+		selectPatternCategories( select ),
 	]
 );
 

@@ -4,6 +4,7 @@ import { VisuallyHidden } from '@wordpress/ui';
 import { useDebounce, useAsyncList } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 import { useSelect } from '@wordpress/data';
+import { Spinner } from '@wordpress/components';
 import BlockTypesList from '../block-types-list';
 import BlockPatternsList from '../block-patterns-list';
 import __unstableInserterMenuExtension from '../inserter-menu-extension';
@@ -18,6 +19,7 @@ import InserterListbox from '../inserter-listbox';
 import { orderBy } from '../../utils/sorting';
 import { orderInserterBlockItems } from '../../utils/order-inserter-block-items';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const INITIAL_INSERTER_RESULTS = 9;
 /**
@@ -81,6 +83,16 @@ function InserterSearchResults( {
 		destinationRootClientId,
 		undefined,
 		isQuick
+	);
+	// The quick inserter leaves out patterns from other installed themes.
+	const isLoadingPatterns = useSelect(
+		( select ) =>
+			! isQuick &&
+			maxBlockPatterns !== 0 &&
+			unlock(
+				select( blockEditorStore )
+			).isLoadingInstalledThemePatterns(),
+		[ isQuick, maxBlockPatterns ]
 	);
 
 	const filteredBlockPatterns = useMemo( () => {
@@ -173,24 +185,30 @@ function InserterSearchResults( {
 		</InserterPanel>
 	);
 
-	const patternsUI = !! filteredBlockPatterns.length && (
+	const patternsUI = ( !! filteredBlockPatterns.length ||
+		isLoadingPatterns ) && (
 		<InserterPanel
 			title={ <VisuallyHidden>{ __( 'Patterns' ) }</VisuallyHidden> }
 		>
-			<div className="block-editor-inserter__quick-inserter-patterns">
-				<BlockPatternsList
-					blockPatterns={ filteredBlockPatterns }
-					onClickPattern={ onClickPattern }
-					onHover={ onHoverPattern }
-					isDraggable={ isDraggable }
-				/>
-			</div>
+			{ !! filteredBlockPatterns.length && (
+				<div className="block-editor-inserter__quick-inserter-patterns">
+					<BlockPatternsList
+						blockPatterns={ filteredBlockPatterns }
+						onClickPattern={ onClickPattern }
+						onHover={ onHoverPattern }
+						isDraggable={ isDraggable }
+					/>
+				</div>
+			) }
+			{ isLoadingPatterns && <Spinner /> }
 		</InserterPanel>
 	);
 
 	return (
 		<InserterListbox>
-			{ ! showBlockDirectory && ! hasItems && <InserterNoResults /> }
+			{ ! showBlockDirectory && ! hasItems && ! isLoadingPatterns && (
+				<InserterNoResults />
+			) }
 
 			{ prioritizePatterns ? patternsUI : blocksUI }
 
@@ -215,7 +233,7 @@ function InserterSearchResults( {
 						if ( fills.length ) {
 							return fills;
 						}
-						if ( ! hasItems ) {
+						if ( ! hasItems && ! isLoadingPatterns ) {
 							return <InserterNoResults />;
 						}
 						return null;

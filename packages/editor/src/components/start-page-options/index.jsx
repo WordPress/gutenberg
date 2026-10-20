@@ -29,11 +29,10 @@ import { unlock } from '../../lock-unlock';
 
 const {
 	getPopulatedCategories,
+	isInOtherCategories,
+	otherCategoriesCategory,
 	searchItems,
-	installedThemePatternsCategory,
 	withInstalledThemePatterns,
-	selectInstalledThemePatternsKey,
-	INSERTER_PATTERN_TYPES,
 } = unlock( blockEditorPrivateApis );
 
 const ALL_PATTERNS_CATEGORY = {
@@ -105,23 +104,24 @@ export function useStartPatterns( includeInstalledThemes = false ) {
 	}, [ postType, patterns ] );
 }
 
+/**
+ * Returns the categories to filter the start patterns by, along with every
+ * registered category.
+ *
+ * @param {Array} startPatterns The start patterns.
+ * @return {{categories: Array, allCategories: Array}} The categories.
+ */
 function useStartPatternCategories( startPatterns ) {
-	const { registeredCategories, userCategories, hasInstalledThemePatterns } =
-		useSelect( ( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			return {
-				// The block editor settings already merge the categories from the
-				// REST API with the ones added through `block_editor_settings_all`.
-				registeredCategories:
-					settings.__experimentalBlockPatternCategories,
-				userCategories: select( coreStore ).getUserPatternCategories(),
-				// Patterns from other installed themes load once their tab is
-				// open, so the tab is offered whenever the editor can provide
-				// them.
-				hasInstalledThemePatterns:
-					!! settings[ selectInstalledThemePatternsKey ],
-			};
-		}, [] );
+	const { registeredCategories, userCategories } = useSelect( ( select ) => {
+		return {
+			// The block editor settings already merge the categories from the
+			// REST API with the ones added through `block_editor_settings_all`.
+			registeredCategories:
+				select( blockEditorStore ).getSettings()
+					.__experimentalBlockPatternCategories,
+			userCategories: select( coreStore ).getUserPatternCategories(),
+		};
+	}, [] );
 
 	return useMemo( () => {
 		const allCategories = [ ...( registeredCategories ?? [] ) ];
@@ -136,35 +136,20 @@ function useStartPatternCategories( startPatterns ) {
 		} );
 
 		const categories = getPopulatedCategories(
-			startPatterns.filter(
-				( pattern ) =>
-					pattern.type !== INSERTER_PATTERN_TYPES.installedTheme
-			),
+			startPatterns,
 			allCategories
 		);
 
-		// Filtering is not useful when no start pattern belongs to a
-		// registered category.
-		const hasRegisteredCategories = ! categories.every(
-			( { name } ) => name === 'uncategorized'
-		);
-		if ( ! hasRegisteredCategories && ! hasInstalledThemePatterns ) {
-			return [];
+		// Filtering is not useful when every start pattern is uncategorized.
+		if ( categories.every( ( { name } ) => name === 'uncategorized' ) ) {
+			return { categories: [], allCategories };
 		}
 
-		return [
-			ALL_PATTERNS_CATEGORY,
-			...( hasRegisteredCategories ? categories : [] ),
-			...( hasInstalledThemePatterns
-				? [ installedThemePatternsCategory ]
-				: [] ),
-		];
-	}, [
-		startPatterns,
-		registeredCategories,
-		userCategories,
-		hasInstalledThemePatterns,
-	] );
+		return {
+			categories: [ ALL_PATTERNS_CATEGORY, ...categories ],
+			allCategories,
+		};
+	}, [ startPatterns, registeredCategories, userCategories ] );
 }
 
 function PatternSelection( { blockPatterns, onChoosePattern } ) {
@@ -193,26 +178,33 @@ function PatternSelection( { blockPatterns, onChoosePattern } ) {
 }
 
 function StartPageOptionsModal( { onClose } ) {
+	// Patterns from other installed themes are offered once the modal opens,
+	// but they don't open it on their own.
+	const hasStartPattern = useStartPatterns().length > 0;
+	if ( ! hasStartPattern ) {
+		return null;
+	}
+	return <StartPageOptionsModalContent onClose={ onClose } />;
+}
+
+function StartPageOptionsModalContent( { onClose } ) {
 	const [ showStartPatterns, setShowStartPatterns ] = useState( true );
 	const [ selectedCategory, setSelectedCategory ] = useState(
 		ALL_PATTERNS_CATEGORY.name
 	);
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const isInstalledThemesCategory =
-		selectedCategory === installedThemePatternsCategory.name;
-	const startPatterns = useStartPatterns( isInstalledThemesCategory );
+	const startPatterns = useStartPatterns( true );
 	const isLoadingInstalledThemePatterns = useSelect(
 		( select ) =>
-			isInstalledThemesCategory &&
 			unlock(
 				select( blockEditorStore )
 			).isLoadingInstalledThemePatterns(),
-		[ isInstalledThemesCategory ]
+		[]
 	);
-	const patternCategories = useStartPatternCategories( startPatterns );
+	const { categories: patternCategories, allCategories } =
+		useStartPatternCategories( startPatterns );
 	const hasCategories = patternCategories.length > 0;
-	const hasStartPattern = startPatterns.length > 0;
 
 	// The selected category can stop existing while the modal stays mounted,
 	// for instance when the edited post changes. A controlled `Tabs` value
@@ -226,31 +218,35 @@ function StartPageOptionsModal( { onClose } ) {
 
 	const filteredStartPatterns = useMemo( () => {
 		let patterns = startPatterns;
-		if ( activeCategory === installedThemePatternsCategory.name ) {
+		if ( activeCategory === otherCategoriesCategory.name ) {
+			patterns = patterns.filter( ( pattern ) =>
+				isInOtherCategories( pattern, allCategories )
+			);
+		} else if ( activeCategory === 'uncategorized' ) {
 			patterns = patterns.filter(
 				( pattern ) =>
-					pattern.type === INSERTER_PATTERN_TYPES.installedTheme
+					! pattern.categories?.some( ( patternCategory ) =>
+						patternCategories.some(
+							( { name } ) => name === patternCategory
+						)
+					) && ! isInOtherCategories( pattern, allCategories )
 			);
 		} else if ( activeCategory !== ALL_PATTERNS_CATEGORY.name ) {
 			patterns = patterns.filter( ( pattern ) =>
-				activeCategory === 'uncategorized'
-					? ! pattern.categories?.some( ( patternCategory ) =>
-							patternCategories.some(
-								( { name } ) => name === patternCategory
-							)
-						)
-					: pattern.categories?.includes( activeCategory )
+				pattern.categories?.includes( activeCategory )
 			);
 		}
 		if ( searchValue ) {
 			patterns = searchItems( patterns, searchValue );
 		}
 		return patterns;
-	}, [ startPatterns, activeCategory, patternCategories, searchValue ] );
-
-	if ( ! hasStartPattern ) {
-		return null;
-	}
+	}, [
+		startPatterns,
+		activeCategory,
+		patternCategories,
+		allCategories,
+		searchValue,
+	] );
 
 	function handleClose() {
 		onClose();

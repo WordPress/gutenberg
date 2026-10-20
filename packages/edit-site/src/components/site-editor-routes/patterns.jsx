@@ -16,7 +16,7 @@ export const patternsRoute = {
 		},
 		content: <PagePatterns />,
 		mobileSidebar( { siteData, query } ) {
-			if ( query.categoryId || query.installedTheme ) {
+			if ( query.categoryId ) {
 				return undefined;
 			}
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
@@ -27,9 +27,7 @@ export const patternsRoute = {
 			return <SidebarNavigationScreenPatterns backPath={ backPath } />;
 		},
 		mobileContent( { query } ) {
-			return query.categoryId || query.installedTheme ? (
-				<PagePatterns />
-			) : undefined;
+			return query.categoryId ? <PagePatterns /> : undefined;
 		},
 	},
 };

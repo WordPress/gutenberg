@@ -3,9 +3,11 @@ import { __ } from '@wordpress/i18n';
 import useDefaultPatternCategories from './use-default-pattern-categories';
 import useThemePatterns from './use-theme-patterns';
 import usePatterns from '../page-patterns/use-patterns';
+import { isInOtherCategories } from '../page-patterns/utils';
 import {
 	PATTERN_TYPES,
 	PATTERN_DEFAULT_CATEGORY,
+	PATTERN_OTHER_CATEGORIES,
 	PATTERN_USER_CATEGORY,
 	TEMPLATE_PART_AREA_DEFAULT_CATEGORY,
 } from '../../utils/constants';
@@ -37,7 +39,12 @@ export default function usePatternCategories() {
 		} );
 
 		// Update the category counts to reflect theme registered patterns.
+		let otherCategoriesCount = 0;
 		themePatterns.forEach( ( pattern ) => {
+			if ( isInOtherCategories( pattern, defaultCategories ) ) {
+				otherCategoriesCount += 1;
+				return;
+			}
 			pattern.categories?.forEach( ( category ) => {
 				if ( categoryMap[ category ] ) {
 					categoryMap[ category ].count += 1;
@@ -86,6 +93,17 @@ export default function usePatternCategories() {
 		const sortedCategories = categoriesWithCounts.sort( ( a, b ) =>
 			a.label.localeCompare( b.label )
 		);
+
+		if ( otherCategoriesCount ) {
+			sortedCategories.push( {
+				name: PATTERN_OTHER_CATEGORIES,
+				label: __( 'Other categories' ),
+				description: __(
+					'Patterns from other installed themes that use categories only those themes add.'
+				),
+				count: otherCategoriesCount,
+			} );
+		}
 
 		sortedCategories.unshift( {
 			name: PATTERN_USER_CATEGORY,

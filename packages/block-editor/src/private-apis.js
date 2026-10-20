@@ -12,7 +12,9 @@ import {
 } from './utils/search-ranking';
 import {
 	getPopulatedCategories,
-	installedThemePatternsCategory,
+	isInOtherCategories,
+	isUncategorized,
+	otherCategoriesCategory,
 	INSERTER_PATTERN_TYPES,
 } from './components/inserter/block-patterns-tab/utils';
 import { withInstalledThemePatterns } from './store/utils';
@@ -127,7 +129,9 @@ lock( privateApis, {
 	selectBlockPatternsKey,
 	selectInstalledThemePatternsKey,
 	withInstalledThemePatterns,
-	installedThemePatternsCategory,
+	isInOtherCategories,
+	isUncategorized,
+	otherCategoriesCategory,
 	INSERTER_PATTERN_TYPES,
 	requiresWrapperOnCopy,
 	PrivateInserterLibrary,

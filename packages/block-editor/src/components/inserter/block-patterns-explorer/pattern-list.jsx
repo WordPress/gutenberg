@@ -14,6 +14,8 @@ import {
 	allPatternsCategory,
 	myPatternsCategory,
 	starterPatternsCategory,
+	otherCategoriesCategory,
+	isInOtherCategories,
 } from '../block-patterns-tab/utils';
 
 function PatternList( {
@@ -29,7 +31,7 @@ function PatternList( {
 		rootClientId,
 		shouldFocusBlock: true,
 	} );
-	const [ patterns, , onClickPattern ] = usePatternsState(
+	const [ patterns, allCategories, onClickPattern ] = usePatternsState(
 		onInsertBlocks,
 		destinationRootClientId,
 		selectedCategory
@@ -60,13 +62,20 @@ function PatternList( {
 			) {
 				return true;
 			}
+			if ( selectedCategory === otherCategoriesCategory.name ) {
+				return isInOtherCategories( pattern, allCategories );
+			}
 			if ( selectedCategory === 'uncategorized' ) {
 				const hasKnownCategory =
 					pattern.categories?.some( ( category ) =>
 						registeredPatternCategories.includes( category )
 					) ?? false;
 
-				return ! pattern.categories?.length || ! hasKnownCategory;
+				return (
+					! pattern.categories?.length ||
+					( ! hasKnownCategory &&
+						! isInOtherCategories( pattern, allCategories ) )
+				);
 			}
 
 			return pattern.categories?.includes( selectedCategory );
@@ -82,6 +91,7 @@ function PatternList( {
 		patterns,
 		selectedCategory,
 		registeredPatternCategories,
+		allCategories,
 	] );
 
 	// Announce search results on change.

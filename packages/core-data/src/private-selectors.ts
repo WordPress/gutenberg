@@ -64,47 +64,32 @@ export function getThemeBlockPatterns(
 }
 
 /**
- * Returns the patterns that installed themes, other than the active theme and
- * its parent, would add if they were activated. Each pattern is marked with
- * the stylesheet of the theme it comes from.
+ * Returns the patterns that installed themes would add if they were activated.
+ * Patterns the editor already offers are left out, and each pattern is marked
+ * with the stylesheet of the theme it comes from.
+ *
+ * @param state       Data state.
+ * @param stylesheets Stylesheets of the installed themes, other than the active
+ *                    theme and its parent.
  *
  * @return The patterns, or undefined while they load.
  */
 export const getInstalledThemePatterns = createRegistrySelector(
 	( select: any ) =>
 		createSelector(
-			( state: State ) => {
-				const {
-					getEntityRecords,
-					getCurrentTheme,
-					getBlockPatterns,
-					hasFinishedResolution,
-				} = select( STORE_NAME );
-				const themes = getEntityRecords( 'root', 'theme' );
-				const currentTheme = getCurrentTheme();
-				if (
-					! themes ||
-					! currentTheme ||
-					! hasFinishedResolution( 'getBlockPatterns' )
-				) {
-					return undefined;
-				}
-
-				const otherThemes = themes.filter(
-					( { stylesheet }: { stylesheet: string } ) =>
-						stylesheet !== currentTheme.stylesheet &&
-						stylesheet !== currentTheme.template
-				);
+			( state: State, stylesheets: string[] ) => {
+				const { getBlockPatterns, hasFinishedResolution } =
+					select( STORE_NAME );
 				// Request every theme up front so they load in parallel.
-				otherThemes.forEach(
-					( { stylesheet }: { stylesheet: string } ) =>
-						unlock( select( STORE_NAME ) ).getThemeBlockPatterns(
-							stylesheet
-						)
+				stylesheets.forEach( ( stylesheet ) =>
+					unlock( select( STORE_NAME ) ).getThemeBlockPatterns(
+						stylesheet
+					)
 				);
 				if (
-					otherThemes.some(
-						( { stylesheet }: { stylesheet: string } ) =>
+					! hasFinishedResolution( 'getBlockPatterns' ) ||
+					stylesheets.some(
+						( stylesheet ) =>
 							! state.themeBlockPatterns[ stylesheet ]
 					)
 				) {
@@ -118,22 +103,19 @@ export const getInstalledThemePatterns = createRegistrySelector(
 						( { name }: { name: string } ) => name
 					)
 				);
-				return otherThemes.flatMap(
-					( { stylesheet }: { stylesheet: string } ) =>
-						state.themeBlockPatterns[ stylesheet ]
-							.filter(
-								( { name }: any ) =>
-									! activePatternNames.has( name )
-							)
-							.map( ( pattern: any ) => ( {
-								...pattern,
-								theme: stylesheet,
-							} ) )
+				return stylesheets.flatMap( ( stylesheet ) =>
+					state.themeBlockPatterns[ stylesheet ]
+						.filter(
+							( { name }: any ) =>
+								! activePatternNames.has( name )
+						)
+						.map( ( pattern: any ) => ( {
+							...pattern,
+							theme: stylesheet,
+						} ) )
 				);
 			},
 			( state: State ) => [
-				select( STORE_NAME ).getEntityRecords( 'root', 'theme' ),
-				select( STORE_NAME ).getCurrentTheme(),
 				select( STORE_NAME ).getBlockPatterns(),
 				select( STORE_NAME ).hasFinishedResolution(
 					'getBlockPatterns'

@@ -27,7 +27,8 @@ import {
 	allPatternsCategory,
 	myPatternsCategory,
 	starterPatternsCategory,
-	installedThemePatternsCategory,
+	otherCategoriesCategory,
+	isInOtherCategories,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
 
@@ -40,18 +41,17 @@ export function PatternCategoryPreviews( {
 	category,
 	showTitlesAsTooltip,
 } ) {
-	const [ allPatterns, , onClickPattern ] = usePatternsState(
+	const [ allPatterns, allCategories, onClickPattern ] = usePatternsState(
 		onInsert,
 		rootClientId,
 		category?.name
 	);
 	const isLoading = useSelect(
 		( select ) =>
-			category.name === installedThemePatternsCategory.name &&
 			unlock(
 				select( blockEditorStore )
 			).isLoadingInstalledThemePatterns(),
-		[ category.name ]
+		[]
 	);
 	const [ patternSyncFilter, setPatternSyncFilter ] = useState( 'all' );
 	const [ patternSourceFilter, setPatternSourceFilter ] = useState( 'all' );
@@ -74,17 +74,6 @@ export function PatternCategoryPreviews( {
 					return false;
 				}
 
-				// Patterns from other installed themes only show in their own
-				// category.
-				const isInstalledThemePattern =
-					pattern.type === INSERTER_PATTERN_TYPES.installedTheme;
-				if ( category.name === installedThemePatternsCategory.name ) {
-					return isInstalledThemePattern;
-				}
-				if ( isInstalledThemePattern ) {
-					return false;
-				}
-
 				if ( category.name === allPatternsCategory.name ) {
 					return true;
 				}
@@ -103,15 +92,24 @@ export function PatternCategoryPreviews( {
 					return true;
 				}
 
+				if ( category.name === otherCategoriesCategory.name ) {
+					return isInOtherCategories( pattern, allCategories );
+				}
+
 				if ( category.name === 'uncategorized' ) {
 					// The uncategorized category should show all the patterns without any category...
 					if ( ! pattern.categories ) {
 						return true;
 					}
 
-					// ...or with no available category.
-					return ! pattern.categories.some( ( catName ) =>
-						availableCategories.some( ( c ) => c.name === catName )
+					// ...or with no available category, unless they're in
+					// "Other categories".
+					return (
+						! pattern.categories.some( ( catName ) =>
+							availableCategories.some(
+								( c ) => c.name === catName
+							)
+						) && ! isInOtherCategories( pattern, allCategories )
 					);
 				}
 
@@ -119,6 +117,7 @@ export function PatternCategoryPreviews( {
 			} ),
 		[
 			allPatterns,
+			allCategories,
 			availableCategories,
 			category.name,
 			patternSourceFilter,

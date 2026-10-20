@@ -9,17 +9,15 @@ import {
 	isNavigationOverlayContextKey,
 	userPatternCategoriesSelectKey,
 } from '../../../store/private-keys';
-import {
-	INSERTER_PATTERN_TYPES,
-	installedThemePatternsCategory,
-} from '../block-patterns-tab/utils';
+import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered, withInstalledThemePatterns } from '../../../store/utils';
 
 // Shared so the selector cache survives the inserter closing and reopening.
 const FILTERED_OPTIONS = { [ isFiltered ]: true };
-const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
-// Patterns from other installed themes only load when their category is open.
-const INSTALLED_THEME_OPTIONS = {
+// Patterns from other installed themes start loading once the inserter shows
+// patterns. The quick inserter leaves them out, so opening it doesn't load
+// every installed theme.
+const UNFILTERED_OPTIONS = {
 	[ isFiltered ]: false,
 	[ withInstalledThemePatterns ]: true,
 };
@@ -40,10 +38,7 @@ const usePatternsState = (
 	selectedCategory,
 	isQuick
 ) => {
-	let options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
-	if ( selectedCategory === installedThemePatternsCategory.name ) {
-		options = INSTALLED_THEME_OPTIONS;
-	}
+	const options = isQuick ? FILTERED_OPTIONS : UNFILTERED_OPTIONS;
 
 	// Check if we're editing a navigation-overlay template part.
 	// This information is passed through block editor settings to avoid

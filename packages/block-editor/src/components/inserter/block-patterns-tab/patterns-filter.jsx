@@ -9,11 +9,14 @@ import {
 import { __, _x } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
 import { useMemo, createInterpolateElement } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import {
 	myPatternsCategory,
 	INSERTER_SYNC_TYPES,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
+import { store as blockEditorStore } from '../../../store';
+import { selectInstalledThemePatternsKey } from '../../../store/private-keys';
 
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
 	sourceFilter !== 'all' && sourceFilter !== 'user';
@@ -40,6 +43,15 @@ const PATTERN_SOURCE_MENU_OPTIONS = [
 	},
 ];
 
+const PATTERN_SOURCE_MENU_OPTIONS_WITH_INSTALLED_THEMES = [
+	...PATTERN_SOURCE_MENU_OPTIONS.slice( 0, 3 ),
+	{
+		value: INSERTER_PATTERN_TYPES.installedTheme,
+		label: __( 'Other themes' ),
+	},
+	...PATTERN_SOURCE_MENU_OPTIONS.slice( 3 ),
+];
+
 export function PatternsFilter( {
 	setPatternSyncFilter,
 	setPatternSourceFilter,
@@ -56,6 +68,14 @@ export function PatternsFilter( {
 		category.name === myPatternsCategory.name
 			? INSERTER_PATTERN_TYPES.user
 			: patternSourceFilter;
+
+	const hasInstalledThemePatterns = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getSettings()[
+				selectInstalledThemePatternsKey
+			],
+		[]
+	);
 
 	// We need to disable the sync filter option if the source filter is not 'all' or 'user'
 	// otherwise applying them will just result in no patterns being shown.
@@ -126,7 +146,11 @@ export function PatternsFilter( {
 						{ ! shouldHideSourcesFilter && (
 							<MenuGroup label={ __( 'Source' ) }>
 								<MenuItemsChoice
-									choices={ PATTERN_SOURCE_MENU_OPTIONS }
+									choices={
+										hasInstalledThemePatterns
+											? PATTERN_SOURCE_MENU_OPTIONS_WITH_INSTALLED_THEMES
+											: PATTERN_SOURCE_MENU_OPTIONS
+									}
 									onSelect={ ( value ) => {
 										handleSetSourceFilterChange( value );
 										scrollContainerRef.current?.scrollTo(
@@ -153,9 +177,13 @@ export function PatternsFilter( {
 						</MenuGroup>
 						<div className="block-editor-inserter__patterns-filter-help">
 							{ createInterpolateElement(
-								__(
-									'Patterns are available from the <Link>WordPress.org Pattern Directory</Link>, bundled in the active theme, or created by users on this site. Only patterns created on this site can be synced.'
-								),
+								hasInstalledThemePatterns
+									? __(
+											'Patterns are available from the <Link>WordPress.org Pattern Directory</Link>, bundled in the active theme or other installed themes, or created by users on this site. Only patterns created on this site can be synced.'
+										)
+									: __(
+											'Patterns are available from the <Link>WordPress.org Pattern Directory</Link>, bundled in the active theme, or created by users on this site. Only patterns created on this site can be synced.'
+										),
 								{
 									Link: (
 										<ExternalLink

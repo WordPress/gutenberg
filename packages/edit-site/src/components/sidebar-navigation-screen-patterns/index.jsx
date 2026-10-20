@@ -9,7 +9,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
 import { useViewConfig } from '@wordpress/views';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
-import SidebarNavigationItem from '../sidebar-navigation-item';
 import CategoryItem from './category-item';
 import {
 	PATTERN_DEFAULT_CATEGORY,
@@ -19,7 +18,6 @@ import {
 } from '../../utils/constants';
 import usePatternCategories from './use-pattern-categories';
 import useTemplatePartAreas from './use-template-part-areas';
-import useInstalledThemePatterns from './use-installed-theme-patterns';
 import { unlock } from '../../lock-unlock';
 
 const VIEW_CONFIG_FIELDS = [ 'view_list' ];
@@ -32,10 +30,8 @@ function CategoriesGroup( {
 	patternViews,
 	templatePartCounts,
 	patternCounts,
-	installedThemes,
 	currentCategory,
 	currentType,
-	currentInstalledTheme,
 } ) {
 	return (
 		<ItemGroup className="edit-site-sidebar-navigation-screen-patterns__group">
@@ -72,40 +68,19 @@ function CategoriesGroup( {
 					}
 				/>
 			) ) }
-			{ !! installedThemes.length && (
-				<div className="edit-site-sidebar-navigation-screen-patterns__divider" />
-			) }
-			{ installedThemes.map( ( theme ) => (
-				<SidebarNavigationItem
-					key={ theme.stylesheet }
-					icon={ file }
-					suffix={ <span>{ theme.patterns.length }</span> }
-					aria-current={
-						currentInstalledTheme === theme.stylesheet
-							? 'true'
-							: undefined
-					}
-					to={ `/pattern?installedTheme=${ theme.stylesheet }` }
-				>
-					{ theme.name }
-				</SidebarNavigationItem>
-			) ) }
 		</ItemGroup>
 	);
 }
 
 export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
-		query: { postType = 'wp_block', categoryId, installedTheme },
+		query: { postType = 'wp_block', categoryId },
 	} = useLocation();
-	let currentCategory;
-	if ( ! installedTheme ) {
-		currentCategory =
-			categoryId ||
-			( postType === PATTERN_TYPES.user
-				? PATTERN_DEFAULT_CATEGORY
-				: TEMPLATE_PART_ALL_AREAS_CATEGORY );
-	}
+	const currentCategory =
+		categoryId ||
+		( postType === PATTERN_TYPES.user
+			? PATTERN_DEFAULT_CATEGORY
+			: TEMPLATE_PART_ALL_AREAS_CATEGORY );
 
 	const { view_list: templatePartViews } = useViewConfig( {
 		kind: 'postType',
@@ -141,7 +116,6 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	}, [ patternCategories ] );
 
 	const hasPatterns = patternCounts[ PATTERN_DEFAULT_CATEGORY ] > 0;
-	const { themes: installedThemes } = useInstalledThemePatterns();
 
 	return (
 		<SidebarNavigationScreen
@@ -166,10 +140,8 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 								patternViews={ patternViews }
 								templatePartCounts={ templatePartCounts }
 								patternCounts={ patternCounts }
-								installedThemes={ installedThemes }
 								currentCategory={ currentCategory }
 								currentType={ postType }
-								currentInstalledTheme={ installedTheme }
 							/>
 						</>
 					) }

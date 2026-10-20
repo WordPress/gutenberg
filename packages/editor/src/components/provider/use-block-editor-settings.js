@@ -117,10 +117,6 @@ const {
 	openMediaEditorModalKey,
 } = unlock( privateApis );
 
-function selectInstalledThemePatterns( select ) {
-	return unlock( select( coreStore ) ).getInstalledThemePatterns();
-}
-
 /**
  * React hook used to compute the block editor settings to use for the post editor.
  *
@@ -145,7 +141,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		isDistractionFree,
 		keepCaretInsideBlock,
 		hasUploadPermissions,
-		canReadThemes,
 		hiddenBlockTypes,
 		canUseUnfilteredHTML,
 		userCanCreatePages,
@@ -242,12 +237,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					kind: 'postType',
 					name: 'page',
 				} ),
-				// Patterns from other installed themes need to list and
-				// preview them.
-				canReadThemes: canUser( 'read', {
-					kind: 'root',
-					name: 'theme',
-				} ),
 				pageOnFront: siteSettings?.page_on_front,
 				pageForPosts: siteSettings?.page_for_posts,
 				// The post type's singular name, but only for real, front-end
@@ -311,6 +300,23 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
+
+	// The installed themes, other than the active theme and its parent, whose
+	// patterns the editor offers. The server leaves them out for users who
+	// can't preview themes.
+	const { installedThemePatternSources } = settings;
+	const selectInstalledThemePatterns = useMemo( () => {
+		if ( ! installedThemePatternSources?.length ) {
+			return undefined;
+		}
+		const stylesheets = installedThemePatternSources.map(
+			( { stylesheet } ) => stylesheet
+		);
+		return ( select ) =>
+			unlock( select( coreStore ) ).getInstalledThemePatterns(
+				stylesheets
+			);
+	}, [ installedThemePatternSources ] );
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );
@@ -420,9 +426,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? patterns
 					: undefined;
 			},
-			[ selectInstalledThemePatternsKey ]: canReadThemes
-				? selectInstalledThemePatterns
-				: undefined,
+			[ selectInstalledThemePatternsKey ]: selectInstalledThemePatterns,
 			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,
@@ -485,7 +489,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		keepCaretInsideBlock,
 		settings,
 		hasUploadPermissions,
-		canReadThemes,
+		selectInstalledThemePatterns,
 		blockPatterns,
 		blockPatternCategories,
 		inserterMediaCategories,

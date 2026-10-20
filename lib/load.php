@@ -118,6 +118,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
+	require_once __DIR__ . '/experimental/class-gutenberg-rest-installed-theme-patterns-controller.php';
 
 	require_once __DIR__ . '/experimental/class-gutenberg-hierarchical-sort.php';
 }
@@ -150,6 +151,7 @@ require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
 require __DIR__ . '/experimental/installed-theme-files.php';
+require __DIR__ . '/experimental/installed-theme-patterns.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/collaboration/meta-box-rtc-compat.php';

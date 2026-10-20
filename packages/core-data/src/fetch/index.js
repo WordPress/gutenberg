@@ -1,14 +1,13 @@
 import { camelCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
-import { addQueryArgs } from '@wordpress/url';
 
 export { default as __experimentalFetchLinkSuggestions } from './__experimental-fetch-link-suggestions';
 export { default as __experimentalFetchUrlData } from './__experimental-fetch-url-data';
 
-export async function fetchBlockPatterns( query = {} ) {
-	const restPatterns = await apiFetch( {
-		path: addQueryArgs( '/wp/v2/block-patterns/patterns', query ),
-	} );
+export async function fetchBlockPatterns(
+	path = '/wp/v2/block-patterns/patterns'
+) {
+	const restPatterns = await apiFetch( { path } );
 	if ( ! restPatterns ) {
 		return [];
 	}

@@ -9,6 +9,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
+import { store as editSiteStore } from '../../store';
 import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
@@ -21,7 +22,6 @@ import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
 import { previewField } from './fields';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
-import InstalledThemePatterns from './installed-theme-patterns';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
@@ -29,6 +29,42 @@ const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
 const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts' ];
+
+/**
+ * Returns a field to filter patterns by the installed theme, other than the
+ * active one, they come from. There's no field when the site editor doesn't
+ * offer patterns from other themes.
+ *
+ * @return {Object|undefined} The field.
+ */
+function useInstalledThemeField() {
+	const installedThemePatternSources = useSelect(
+		( select ) =>
+			unlock( select( editSiteStore ) ).getSettings()
+				.installedThemePatternSources,
+		[]
+	);
+	return useMemo( () => {
+		if ( ! installedThemePatternSources?.length ) {
+			return undefined;
+		}
+		return {
+			id: 'theme',
+			type: 'text',
+			label: __( 'Theme' ),
+			readOnly: true,
+			enableSorting: false,
+			getValue: ( { item } ) => item.theme,
+			elements: installedThemePatternSources.map(
+				( { stylesheet, name } ) => ( {
+					value: stylesheet,
+					label: name,
+				} )
+			),
+			filterBy: { operators: [ 'isAny' ] },
+		};
+	}, [ installedThemePatternSources ] );
+}
 
 function usePagePatternsHeader( type, categoryId ) {
 	const { patternCategories } = usePatternCategories();
@@ -58,15 +94,7 @@ function usePagePatternsHeader( type, categoryId ) {
 	return { title, description };
 }
 
-export default function PagePatterns() {
-	const { query } = useLocation();
-	if ( query.installedTheme ) {
-		return <InstalledThemePatterns stylesheet={ query.installedTheme } />;
-	}
-	return <DataviewsPatterns />;
-}
-
-function DataviewsPatterns() {
+export default function DataviewsPatterns() {
 	const { path, query } = useLocation();
 	const { postType = 'wp_block', categoryId: categoryIdFromURL } = query;
 	const history = useHistory();
@@ -106,20 +134,31 @@ function DataviewsPatterns() {
 	} );
 
 	const postTypeFields = usePostFields( { postType } );
+	const installedThemeField = useInstalledThemeField();
 	const fields = useMemo( () => {
-		return [ previewField, ...( postTypeFields || [] ) ];
-	}, [ postTypeFields ] );
+		return [
+			previewField,
+			...( postTypeFields || [] ),
+			...( installedThemeField && postType === PATTERN_TYPES.user
+				? [ installedThemeField ]
+				: [] ),
+		];
+	}, [ postTypeFields, installedThemeField, postType ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		// Search is managed server-side as well as filters for patterns.
-		// However, the author filter in template parts is done client-side.
+		// However, the author filter in template parts and the theme filter
+		// in patterns are done client-side.
 		const viewWithoutFilters = { ...view };
 		delete viewWithoutFilters.search;
 		if ( postType !== TEMPLATE_PART_POST_TYPE ) {
-			viewWithoutFilters.filters = [];
+			viewWithoutFilters.filters =
+				view.filters?.filter(
+					( { field } ) => installedThemeField && field === 'theme'
+				) ?? [];
 		}
 		return filterSortAndPaginate( patterns, viewWithoutFilters, fields );
-	}, [ patterns, view, fields, postType ] );
+	}, [ patterns, view, fields, postType, installedThemeField ] );
 
 	const dataWithPermissions = useAugmentPatternsWithPermissions( data );
 
