@@ -515,9 +515,9 @@ test.describe( 'Block Notes', () => {
 			.click();
 		await expect( anotherBlock ).not.toHaveClass( /is-selected/ );
 
-		await expect(
-			sidebar.locator( '[aria-current="true"]' )
-		).toHaveCount( 0 );
+		await expect( sidebar.locator( '[aria-current="true"]' ) ).toHaveCount(
+			0
+		);
 	} );
 
 	test( 'selecting a block or note marks it as an active', async ( {
