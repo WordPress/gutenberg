@@ -157,7 +157,10 @@
 // When the pane is pinned the editors should allow shrinking so the meta box
 // pane remains visible and reachable. Apply common sizing to both editors, then
 // specialise overflow handling per editor so scroll behavior is correct.
-.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main.is-pinned) {
+.has-metaboxes
+	.interface-interface-skeleton__content:has(
+		.edit-post-meta-boxes-main.is-pinned
+	) {
 	// Shared sizing for both editors.
 	.editor-visual-editor,
 	.editor-text-editor {
@@ -179,10 +182,14 @@
 }
 
 // Inline meta boxes follow the visual editor in this scroller, so nothing else
-// bounds its height. Fill the content area as when pinned: a canvas sized to
-// its content (see the `fitContent` prop of the editor iframe) grows past it,
-// and a width-constrained canvas (device preview) is sized from it.
-.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main.is-inline) .editor-visual-editor {
+// bounds its height. Fill the content area as when pinned: the canvas spacer
+// (see the `fitContent` prop of the editor iframe) grows past it, and a
+// width-constrained canvas (device preview) is sized from it.
+.has-metaboxes
+	.interface-interface-skeleton__content:has(
+		.edit-post-meta-boxes-main.is-inline
+	)
+	.editor-visual-editor {
 	min-height: 100%;
 }
 

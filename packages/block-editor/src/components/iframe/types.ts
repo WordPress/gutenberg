@@ -108,8 +108,9 @@ export type IframeProps = IframeHTMLAttributes< HTMLIFrameElement > & {
 	 */
 	readonly?: boolean;
 	/**
-	 * Size the iframe to its document so the closest scrollable ancestor
-	 * scrolls the canvas instead of the document scrolling on its own.
+	 * Keep the iframe's viewport at the parent window's height and let the
+	 * closest scrollable ancestor scroll the document. `vh` then matches the
+	 * front end, because the viewport never grows with the content.
 	 */
 	fitContent?: boolean;
 	forwardedRef?: ForwardedRef< HTMLIFrameElement >;

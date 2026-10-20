@@ -311,11 +311,14 @@ function Iframe( {
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 
-	// Keeps the iframe at least as tall as its document, so the document never
-	// scrolls on its own and the closest scrollable ancestor scrolls the canvas
-	// together with whatever surrounds it. The minimum height goes on the
-	// container rather than the iframe, so the iframe keeps filling a taller
-	// space through its normal 100% height.
+	// `vh` is the iframe's layout viewport. Growing the iframe to its content
+	// makes `vh` grow with it, so a Cover block set to 100vh expands the iframe
+	// forever. The viewport stays the parent window's height, which is what
+	// `vh` means on the front end. The container is a spacer as tall as the
+	// document measured at that viewport, and the iframe sticks to the top of
+	// the ancestor that scrolls. Scrolling that ancestor moves the document
+	// inside the iframe, so whatever follows the spacer (the meta boxes) comes
+	// into view with the content.
 	const fitContentRef = useRefEffect< HTMLElement >(
 		( body ) => {
 			if ( ! fitContent ) {
@@ -327,29 +330,144 @@ function Iframe( {
 			const { defaultView } = ownerDocument as {
 				defaultView: Window & typeof globalThis;
 			};
-			const container = defaultView.frameElement!.closest(
+			const iframe = defaultView.frameElement as HTMLIFrameElement;
+			const container = iframe.closest(
 				'.block-editor-iframe__container'
 			) as HTMLElement;
-			const fit = () => {
-				const bottom =
-					body.getBoundingClientRect().bottom + defaultView.scrollY;
-				container.style.minHeight = `${ Math.ceil( bottom ) }px`;
-			};
-			// A document that scrolled on its own before it fit would lose that
-			// offset once it fits. Pass it on so the view stays put.
-			const { scrollTop } = ownerDocument.scrollingElement!;
-			fit();
-			if ( scrollTop ) {
-				const scrollContainer = getScrollContainer( container );
-				if ( scrollContainer ) {
-					scrollContainer.scrollTop += scrollTop;
+			const scrollContainer = getScrollContainer( container );
+			const scrollingElement = ownerDocument.scrollingElement!;
+			// One scrollbar: the ancestor's. The document still reports
+			// scrollHeight, and assigning scrollTop still moves it.
+			const { overflow } = scrollingElement.style;
+			scrollingElement.style.overflow = 'hidden';
+
+			// Where the spacer starts inside the ancestor, so the ancestor's
+			// scroll position maps onto the document.
+			const spacerOffset = () => {
+				if ( ! scrollContainer ) {
+					return 0;
 				}
+				return (
+					container.getBoundingClientRect().top -
+					scrollContainer.getBoundingClientRect().top +
+					scrollContainer.scrollTop
+				);
+			};
+
+			let measuredViewport = 0;
+			let measuredContent = 0;
+			const measure = () => {
+				const viewport = defaultView.parent.innerHeight;
+				// Set the viewport before reading, so `vh` resolves against it.
+				container.style.setProperty(
+					'--wp-block-editor-iframe-viewport-height',
+					`${ viewport }px`
+				);
+				const contentHeight = Math.max(
+					viewport,
+					Math.ceil( scrollingElement.scrollHeight )
+				);
+				if (
+					viewport === measuredViewport &&
+					contentHeight === measuredContent
+				) {
+					return;
+				}
+				measuredViewport = viewport;
+				measuredContent = contentHeight;
+				container.style.setProperty(
+					'--wp-block-editor-iframe-content-height',
+					`${ contentHeight }px`
+				);
+			};
+
+			// Phase 1: the iframe is stuck to the top, so the document scrolls
+			// by the same amount as the ancestor. Phase 2: the iframe has
+			// reached the bottom of the spacer and slides up; the document
+			// stays at its end.
+			let syncing = false;
+			const syncScroll = () => {
+				if ( ! scrollContainer ) {
+					return;
+				}
+				const maxScroll = Math.max(
+					0,
+					scrollingElement.scrollHeight -
+						defaultView.parent.innerHeight
+				);
+				const into = scrollContainer.scrollTop - spacerOffset();
+				syncing = true;
+				scrollingElement.scrollTop = Math.min(
+					Math.max( 0, into ),
+					maxScroll
+				);
+				syncing = false;
+			};
+
+			// A document that scrolled on its own before it fit would lose
+			// that offset once it fits. Pass it on so the view stays put.
+			const carried = scrollingElement.scrollTop;
+			measure();
+			if ( carried && scrollContainer ) {
+				scrollContainer.scrollTop = spacerOffset() + carried;
 			}
-			const observer = new defaultView.ResizeObserver( fit );
+			syncScroll();
+
+			const onContentChange = () => {
+				measure();
+				syncScroll();
+			};
+			const onCanvasScroll = () => {
+				if ( syncing || ! scrollContainer ) {
+					return;
+				}
+				scrollContainer.scrollTop =
+					spacerOffset() + scrollingElement.scrollTop;
+				syncScroll();
+			};
+			// Wheel events inside the iframe do not scroll the ancestor.
+			const onWheel = ( event: WheelEvent ) => {
+				if ( ! scrollContainer ) {
+					return;
+				}
+				let delta = event.deltaY;
+				// deltaMode 1 is lines, 2 is pages.
+				if ( event.deltaMode === 1 ) {
+					delta *= 16;
+				} else if ( event.deltaMode === 2 ) {
+					delta *= scrollContainer.clientHeight;
+				}
+				scrollContainer.scrollTop += delta;
+				event.preventDefault();
+			};
+
+			const observer = new defaultView.ResizeObserver( onContentChange );
 			observer.observe( body );
+			defaultView.parent.addEventListener( 'resize', onContentChange );
+			scrollContainer?.addEventListener( 'scroll', syncScroll );
+			scrollingElement.addEventListener( 'scroll', onCanvasScroll );
+			ownerDocument.addEventListener( 'wheel', onWheel, {
+				passive: false,
+			} );
 			return () => {
 				observer.disconnect();
-				container.style.minHeight = '';
+				defaultView.parent.removeEventListener(
+					'resize',
+					onContentChange
+				);
+				scrollContainer?.removeEventListener( 'scroll', syncScroll );
+				scrollingElement.removeEventListener(
+					'scroll',
+					onCanvasScroll
+				);
+				ownerDocument.removeEventListener( 'wheel', onWheel );
+				scrollingElement.style.overflow = overflow;
+				container.style.removeProperty(
+					'--wp-block-editor-iframe-viewport-height'
+				);
+				container.style.removeProperty(
+					'--wp-block-editor-iframe-content-height'
+				);
 			};
 		},
 		[ fitContent ]
@@ -459,7 +577,13 @@ function Iframe( {
 	);
 
 	return (
-		<div className="block-editor-iframe__container" ref={ containerRef }>
+		<div
+			className={ clsx(
+				'block-editor-iframe__container',
+				fitContent && 'is-fit-content'
+			) }
+			ref={ containerRef }
+		>
 			<div
 				className={ clsx(
 					'block-editor-iframe__scale-container',

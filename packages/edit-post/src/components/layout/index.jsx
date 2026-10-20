@@ -553,8 +553,8 @@ function Layout( {
 	const { isPinned: areMetaBoxesPinned, hasAnyVisible: hasMainMetaBoxes } =
 		useMetaBoxesMainState();
 	// Inline meta boxes follow the canvas in the content area, which then has
-	// to scroll both. The canvas is sized to its content so it does not scroll
-	// on its own as well.
+	// to scroll both. The canvas keeps the parent window as its viewport, so
+	// `vh` does not grow with the content, and this scroller moves the document.
 	const iframeProps = useMemo(
 		() => ( {
 			fitContent:

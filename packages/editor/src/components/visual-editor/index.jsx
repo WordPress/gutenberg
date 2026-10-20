@@ -87,10 +87,6 @@ function checkForPostContentAtRootLevel( blocks ) {
 
 const CANVAS_MIN_WIDTH = 300;
 const CANVAS_TARGET_ASPECT_RATIO = 9 / 16;
-// Room below the last block to click or hover for appending when the canvas
-// is sized to its content. A share of the canvas height (the default) would
-// in turn change that height.
-const FIT_CONTENT_APPENDER_SPACE = '160px';
 
 /**
  * Returns the canvas height, keeping the aspect ratio of the available space
@@ -400,8 +396,7 @@ function VisualEditor( {
 	const fitContent = !! iframeProps?.fitContent && ! enableResizing;
 
 	const [ paddingAppenderRef, paddingStyle ] = usePaddingAppender(
-		! isPreview && renderingMode === 'post-only' && ! isDesignPostType,
-		fitContent ? FIT_CONTENT_APPENDER_SPACE : undefined
+		! isPreview && renderingMode === 'post-only' && ! isDesignPostType
 	);
 
 	const shouldConstrainCanvasHeight =
