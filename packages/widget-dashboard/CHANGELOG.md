@@ -9,7 +9,7 @@
 
 ### New Features
 
--   `rescaleLayout( layout, from, to )` and `layoutGeometry( gridSettings )`, with the `LayoutGeometry` type: re-express a stored layout in a new geometry, keeping the pixels of each height and the proportion of each width, so a host can change its column count or row height without breaking saved layouts ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `rescaleLayout( layout, from, to )` and `layoutGeometry( gridSettings )`, with the `LayoutGeometry` type: re-express a stored layout in a new geometry, keeping the pixels of each height and the proportion of each width, so a host can change its column count or row height without breaking saved layouts ([#85230](https://github.com/WordPress/gutenberg/pull/85230)).
 
 ### Enhancements
 
