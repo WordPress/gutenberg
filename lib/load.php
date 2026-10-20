@@ -97,7 +97,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// time (`gutenberg_strip_pending_structural_suggestions`), mirroring the
 	// inline marker strip.
 	require __DIR__ . '/compat/wordpress-7.1/block-suggestions.php';
-	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-controller-7-1.php';
 
 	// WordPress 7.2 compat.
 	require __DIR__ . '/compat/wordpress-7.2/block-bindings.php';
@@ -106,6 +105,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-view-config-controller-7-2.php';
 	require __DIR__ . '/compat/wordpress-7.2/note-reactions.php';
 	require __DIR__ . '/compat/wordpress-7.2/class-gutenberg-rest-comment-controller-7-2.php';
+	// Extends the 7.2 comment controller, so it loads after it.
+	require __DIR__ . '/compat/wordpress-7.1/class-gutenberg-rest-comment-controller-7-1.php';
 	require __DIR__ . '/compat/wordpress-7.2/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.2/edit-root-attachment.php';
 	require __DIR__ . '/compat/wordpress-7.2/notes.php';
