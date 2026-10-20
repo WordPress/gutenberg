@@ -6,7 +6,6 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 // @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.

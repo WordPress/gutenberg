@@ -5,11 +5,11 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { RichText } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
 import type { Block } from '@wordpress/blocks';
+import type { RichTextData } from '@wordpress/rich-text';
 import { store as coreDataStore } from '../index';
 import { registerEntitySyncManager } from '../entity-sync';
 import { CRDT_RECORD_MAP_KEY } from '../sync';
@@ -85,7 +85,7 @@ describe( 'useEntityBlockEditor RTC rich-text offset-space bug', () => {
 	beforeEach( () => {
 		crdtDoc = new Y.Doc();
 
-		registerBlockType( 'core/paragraph', {
+		registerBlockType< { content: RichTextData } >( 'core/paragraph', {
 			apiVersion: 3,
 			title: 'Paragraph',
 			category: 'text',

@@ -1,6 +1,5 @@
 import apiFetch from '@wordpress/api-fetch';
 import { store as noticesStore } from '@wordpress/notices';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';

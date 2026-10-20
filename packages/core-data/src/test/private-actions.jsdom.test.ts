@@ -1,6 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createRegistry } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';

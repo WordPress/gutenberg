@@ -1,4 +1,3 @@
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import type { Block } from '@wordpress/blocks';
 import type { RichTextValue } from '@wordpress/rich-text';
