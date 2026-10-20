@@ -6,7 +6,17 @@
 export async function transformBlockTo( name ) {
 	await page.mouse.move( 200, 300, { steps: 10 } );
 	await page.mouse.move( 250, 350, { steps: 10 } );
-	await page.click( '.block-editor-block-switcher__toggle' );
+	const switcherToggle = await page.waitForSelector(
+		'.block-editor-block-switcher__toggle'
+	);
+	await page.evaluate( ( element ) => element.scrollIntoView(), switcherToggle );
+	await page.waitForSelector( '.block-editor-block-switcher__toggle', {
+		visible: true,
+	} );
+	await switcherToggle.click();
+	await page.waitForSelector( '.block-editor-block-switcher__container', {
+		visible: true,
+	} );
 	// Close the "Block Styles" section if it is open.
 	// Having the section open may make the transform buttons hidden on the testing resolution.
 	const closeBlockStylesButton = await page.$x(
@@ -15,9 +25,12 @@ export async function transformBlockTo( name ) {
 	if ( closeBlockStylesButton.length > 0 ) {
 		await closeBlockStylesButton[ 0 ].click();
 	}
-	const insertButton = ( await page.$x(
-		`//button//span[contains(text(), '${ name }')]`
-	) )[ 0 ];
+
+	// Find the block button option within the switcher popover.
+	const xpath = `//*[contains(@class, "block-editor-block-switcher__popover")]//button//span[contains(text(), '${ name }')]`;
+	const insertButton = await page.waitForXPath( xpath, { visible: true } );
+	// Clicks may fail if the button is out of view. Assure it is before click.
+	await page.evaluate( ( element ) => element.scrollIntoView(), insertButton );
 	await insertButton.click();
 	const BLOCK_SELECTOR = '.block-editor-block-list__block';
 	const BLOCK_NAME_SELECTOR = `[aria-label="Block: ${ name }"]`;
