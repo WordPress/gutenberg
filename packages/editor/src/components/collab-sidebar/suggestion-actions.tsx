@@ -8,7 +8,6 @@ import { Stack, Text } from '@wordpress/ui';
 import { useSelect } from '@wordpress/data';
 import { getBlockType } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { check, closeSmall } from '@wordpress/icons';
 import {
