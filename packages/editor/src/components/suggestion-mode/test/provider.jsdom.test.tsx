@@ -5,7 +5,6 @@ import {
 	createReduxStore,
 	RegistryProvider,
 } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import {
@@ -944,8 +943,10 @@ describe( 'decision failures leave the block tree untouched', () => {
 		// be applied or rejected again once the server is reachable.
 		expect( blockEditor.getBlock( target.clientId ) ).not.toBeNull();
 		expect(
-			blockEditor.getBlockAttributes( target.clientId )?.metadata
-				?.suggestion?.type
+			(
+				blockEditor.getBlockAttributes( target.clientId )?.metadata
+					?.suggestion as { type?: string } | undefined
+			 )?.type
 		).toBe( 'pending-remove' );
 		expect(
 			registry
@@ -994,8 +995,10 @@ describe( 'decision failures leave the block tree untouched', () => {
 		// with the marker still on it.
 		expect( blockEditor.getBlockIndex( moved.clientId ) ).toBe( 1 );
 		expect(
-			blockEditor.getBlockAttributes( moved.clientId )?.metadata
-				?.suggestion?.type
+			(
+				blockEditor.getBlockAttributes( moved.clientId )?.metadata
+					?.suggestion as { type?: string } | undefined
+			 )?.type
 		).toBe( 'pending-move' );
 	} );
 } );
