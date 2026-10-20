@@ -17,6 +17,7 @@ if ( ! class_exists( 'Gutenberg_Interactivity_API_Full_Page_Navigation' ) ) {
 
 		public static function instance() {
 			self::$instance ??= new Gutenberg_Interactivity_API_Full_Page_Navigation();
+
 			return self::$instance;
 		}
 
