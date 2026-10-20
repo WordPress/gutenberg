@@ -4,16 +4,25 @@
 
 ### Breaking Changes
 
+-   Remove `single` from the values of the `context` of an action, which no screen supported ([#85186](https://github.com/WordPress/gutenberg/pull/85186)).
+
+## 21.0.0 (2026-10-20)
+
+### Breaking Changes
+
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   `DataViews.BulkActionToolbar` now renders nothing; built-in table and grid layouts include bulk actions automatically ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 
 ### Enhancements
 
 -   DataViews: Use `Select` from `@wordpress/ui` for the pagination page selector and filter operator selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   Format footer item and selection counts with locale-specific separators ([#84622](https://github.com/WordPress/gutenberg/pull/84622)).
 -   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
+-   Show bulk actions in table and grid headers, with a labeled action menu on mobile ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 
 ### Bug Fixes
 
+-   Restore focus to the grid selection checkbox after cancelling bulk selection ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
 -   Enable overlay compatibility for `DataViews` and `DataViewsPicker` in directly bundled applications so `@wordpress/ui` popups stack above `@wordpress/components` overlays ([#84305](https://github.com/WordPress/gutenberg/pull/84305)).
 -   DataForm: Center the `prefix` and `suffix` of the `text` control's `Edit` config vertically and give them the standard input padding, so consumers pass only the content. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 
