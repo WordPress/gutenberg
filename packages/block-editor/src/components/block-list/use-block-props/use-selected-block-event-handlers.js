@@ -288,7 +288,10 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					canMoveBlocks( getSelectedBlockClientIds() );
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
-					event.preventDefault();
+					// Rich text carries a drag of the text selected in a field.
+					if ( ! event.dataTransfer.types.includes( 'rich-text' ) ) {
+						event.preventDefault();
+					}
 					return;
 				}
 				const clientIds = isMultiSelectionDrag
