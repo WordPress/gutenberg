@@ -10,24 +10,16 @@
 	height: 100%;
 }
 
-// The viewport stays a fixed height (`vh` resolves against it) and this
-// element is the spacer the ancestor scrolls through. The iframe sticks to
-// the top of that ancestor while the spacer is on screen.
-.block-editor-iframe__container.is-fit-content {
-	height: var(--wp-block-editor-iframe-content-height, auto);
-
-	.block-editor-iframe__scale-container {
-		height: var(--wp-block-editor-iframe-content-height, auto);
-	}
-
-	iframe {
-		position: sticky;
-		top: 0;
-		height: var(--wp-block-editor-iframe-viewport-height, 100%);
-		// Device previews animate height. Animating it here moves the viewport
-		// while scroll position is being applied.
-		transition: none;
-	}
+// The container is a spacer as tall as the document (set by the `fitContent`
+// effect). The iframe is one window tall, so `vh` inside it means the same
+// as on the front end, and it sticks in place while the spacer scrolls by.
+.block-editor-iframe__container.is-fit-content iframe {
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	// Device previews animate the iframe height. Here the height must follow
+	// the window at once.
+	transition: none;
 }
 
 .block-editor-iframe__scale-container {

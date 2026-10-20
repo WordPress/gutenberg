@@ -311,14 +311,14 @@ function Iframe( {
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
 
-	// `vh` is the iframe's layout viewport. Growing the iframe to its content
-	// makes `vh` grow with it, so a Cover block set to 100vh expands the iframe
-	// forever. The viewport stays the parent window's height, which is what
-	// `vh` means on the front end. The container is a spacer as tall as the
-	// document measured at that viewport, and the iframe sticks to the top of
-	// the ancestor that scrolls. Scrolling that ancestor moves the document
-	// inside the iframe, so whatever follows the spacer (the meta boxes) comes
-	// into view with the content.
+	// `vh` is the iframe's layout viewport, so an iframe that grows to its
+	// content makes a 100vh Cover block grow the iframe forever. Instead the
+	// iframe stays one window tall (`height: 100vh`, see style.scss) and is
+	// sticky inside the container, which is a spacer as tall as the document.
+	// As the ancestor scrolls through the spacer, the iframe stays put and the
+	// document inside it scrolls by the same amount. Once the spacer ends the
+	// iframe scrolls away with it, and whatever follows (the meta boxes) comes
+	// into view.
 	const fitContentRef = useRefEffect< HTMLElement >(
 		( body ) => {
 			if ( ! fitContent ) {
@@ -326,148 +326,80 @@ function Iframe( {
 			}
 			const { ownerDocument } = body;
 			// The body lives in the iframe document, which has a window and a frame.
-			// `ResizeObserver` is a global of that window, not a property of `Window`.
-			const { defaultView } = ownerDocument as {
-				defaultView: Window & typeof globalThis;
-			};
-			const iframe = defaultView.frameElement as HTMLIFrameElement;
+			const defaultView = ownerDocument.defaultView!;
+			const iframe = defaultView.frameElement!;
 			const container = iframe.closest(
 				'.block-editor-iframe__container'
 			) as HTMLElement;
-			const scrollContainer = getScrollContainer( container );
 			const scrollingElement = ownerDocument.scrollingElement!;
-			// One scrollbar: the ancestor's. The document still reports
-			// scrollHeight, and assigning scrollTop still moves it.
+			// The ancestor's scrollbar is the only one. The document still
+			// scrolls when `scrollTop` is set.
 			const { overflow } = scrollingElement.style;
 			scrollingElement.style.overflow = 'hidden';
 
-			// Where the spacer starts inside the ancestor, so the ancestor's
-			// scroll position maps onto the document.
-			const spacerOffset = () => {
-				if ( ! scrollContainer ) {
-					return 0;
-				}
-				return (
-					container.getBoundingClientRect().top -
-					scrollContainer.getBoundingClientRect().top +
-					scrollContainer.scrollTop
-				);
+			// How far the ancestor has scrolled into the spacer: the distance
+			// the sticky iframe has moved from the top of the spacer.
+			const scrolledIntoSpacer = () =>
+				iframe.getBoundingClientRect().top -
+				container.getBoundingClientRect().top;
+
+			const resize = () => {
+				container.style.height = `${ scrollingElement.scrollHeight }px`;
 			};
 
-			let measuredViewport = 0;
-			let measuredContent = 0;
-			const measure = () => {
-				const viewport = defaultView.parent.innerHeight;
-				// Set the viewport before reading, so `vh` resolves against it.
-				container.style.setProperty(
-					'--wp-block-editor-iframe-viewport-height',
-					`${ viewport }px`
-				);
-				const contentHeight = Math.max(
-					viewport,
-					Math.ceil( scrollingElement.scrollHeight )
-				);
-				if (
-					viewport === measuredViewport &&
-					contentHeight === measuredContent
-				) {
+			// The ancestor scrolled, so the document scrolls by the same amount.
+			let synced = 0;
+			const followAncestor = () => {
+				scrollingElement.scrollTop = scrolledIntoSpacer();
+				synced = scrollingElement.scrollTop;
+			};
+
+			// The document scrolled on its own (a block scrolled into view, or
+			// it scrolled before it was fit), so the ancestor scrolls until the
+			// spacer is scrolled into by that amount instead.
+			const followDocument = () => {
+				const { scrollTop } = scrollingElement;
+				if ( scrollTop === synced ) {
 					return;
 				}
-				measuredViewport = viewport;
-				measuredContent = contentHeight;
-				container.style.setProperty(
-					'--wp-block-editor-iframe-content-height',
-					`${ contentHeight }px`
-				);
+				const scroller = getScrollContainer( container );
+				if ( scroller ) {
+					scroller.scrollBy(
+						0,
+						container.getBoundingClientRect().top -
+							scroller.getBoundingClientRect().top +
+							scrollTop
+					);
+				}
 			};
 
-			// Phase 1: the iframe is stuck to the top, so the document scrolls
-			// by the same amount as the ancestor. Phase 2: the iframe has
-			// reached the bottom of the spacer and slides up; the document
-			// stays at its end.
-			let syncing = false;
-			const syncScroll = () => {
-				if ( ! scrollContainer ) {
-					return;
-				}
-				const maxScroll = Math.max(
-					0,
-					scrollingElement.scrollHeight -
-						defaultView.parent.innerHeight
-				);
-				const into = scrollContainer.scrollTop - spacerOffset();
-				syncing = true;
-				scrollingElement.scrollTop = Math.min(
-					Math.max( 0, into ),
-					maxScroll
-				);
-				syncing = false;
-			};
+			resize();
+			followDocument();
+			followAncestor();
 
-			// A document that scrolled on its own before it fit would lose
-			// that offset once it fits. Pass it on so the view stays put.
-			const carried = scrollingElement.scrollTop;
-			measure();
-			if ( carried && scrollContainer ) {
-				scrollContainer.scrollTop = spacerOffset() + carried;
-			}
-			syncScroll();
-
-			const onContentChange = () => {
-				measure();
-				syncScroll();
-			};
-			const onCanvasScroll = () => {
-				if ( syncing || ! scrollContainer ) {
-					return;
-				}
-				scrollContainer.scrollTop =
-					spacerOffset() + scrollingElement.scrollTop;
-				syncScroll();
-			};
-			// Wheel events inside the iframe do not scroll the ancestor.
-			const onWheel = ( event: WheelEvent ) => {
-				if ( ! scrollContainer ) {
-					return;
-				}
-				let delta = event.deltaY;
-				// deltaMode 1 is lines, 2 is pages.
-				if ( event.deltaMode === 1 ) {
-					delta *= 16;
-				} else if ( event.deltaMode === 2 ) {
-					delta *= scrollContainer.clientHeight;
-				}
-				scrollContainer.scrollTop += delta;
-				event.preventDefault();
-			};
-
-			const observer = new defaultView.ResizeObserver( onContentChange );
-			observer.observe( body );
-			defaultView.parent.addEventListener( 'resize', onContentChange );
-			scrollContainer?.addEventListener( 'scroll', syncScroll );
-			scrollingElement.addEventListener( 'scroll', onCanvasScroll );
-			ownerDocument.addEventListener( 'wheel', onWheel, {
-				passive: false,
+			const observer = new defaultView.ResizeObserver( () => {
+				resize();
+				followAncestor();
 			} );
+			observer.observe( body );
+			// Capture catches whichever ancestor scrolls.
+			iframe.ownerDocument.addEventListener(
+				'scroll',
+				followAncestor,
+				true
+			);
+			// The document's own scroll events target the document.
+			ownerDocument.addEventListener( 'scroll', followDocument );
 			return () => {
 				observer.disconnect();
-				defaultView.parent.removeEventListener(
-					'resize',
-					onContentChange
-				);
-				scrollContainer?.removeEventListener( 'scroll', syncScroll );
-				scrollingElement.removeEventListener(
+				iframe.ownerDocument.removeEventListener(
 					'scroll',
-					onCanvasScroll
+					followAncestor,
+					true
 				);
-				ownerDocument.removeEventListener( 'wheel', onWheel );
+				ownerDocument.removeEventListener( 'scroll', followDocument );
 				scrollingElement.style.overflow = overflow;
-				container.style.removeProperty(
-					'--wp-block-editor-iframe-viewport-height'
-				);
-				container.style.removeProperty(
-					'--wp-block-editor-iframe-content-height'
-				);
+				container.style.height = '';
 			};
 		},
 		[ fitContent ]

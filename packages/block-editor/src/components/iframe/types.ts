@@ -108,9 +108,9 @@ export type IframeProps = IframeHTMLAttributes< HTMLIFrameElement > & {
 	 */
 	readonly?: boolean;
 	/**
-	 * Keep the iframe's viewport at the parent window's height and let the
-	 * closest scrollable ancestor scroll the document. `vh` then matches the
-	 * front end, because the viewport never grows with the content.
+	 * Let the closest scrollable ancestor scroll the document, through a
+	 * spacer as tall as the document. The iframe itself stays one window
+	 * tall, so `vh` means the same as on the front end.
 	 */
 	fitContent?: boolean;
 	forwardedRef?: ForwardedRef< HTMLIFrameElement >;
