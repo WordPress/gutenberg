@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
-import { Spinner } from '../../../spinner';
-import { Stack } from '../../../stack';
 import { VisuallyHidden } from '../../../visually-hidden';
 import { SearchableChipSelectControl } from '../';
 import {
@@ -25,6 +23,8 @@ const meta: Meta< typeof SearchableChipSelectControl > = {
 	id: 'design-system-components-form-searchablechipselectcontrol',
 	component: SearchableChipSelectControl,
 	subcomponents: {
+		'SearchableChipSelectControl.LoadingIndicator':
+			SearchableChipSelectControl.LoadingIndicator,
 		'SearchableChipSelectControl.Group': SearchableChipSelectControl.Group,
 		'SearchableChipSelectControl.GroupLabel':
 			SearchableChipSelectControl.GroupLabel,
@@ -237,10 +237,7 @@ export const AsyncItems: Story = {
 				items={ items }
 				statusContent={
 					loading ? (
-						<Stack direction="row" gap="sm" align="center">
-							<Spinner />
-							Loading…
-						</Stack>
+						<SearchableChipSelectControl.LoadingIndicator />
 					) : (
 						<HiddenResultCount />
 					)
