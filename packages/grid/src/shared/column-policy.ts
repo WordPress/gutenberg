@@ -1,9 +1,11 @@
 /**
  * Column count per container width. Each key is the inline size in pixels
  * from which its count applies: `{ 0: 1, 600: 2, 960: 4 }` is one column
- * from 0px, two from 600px, four from 960px.
+ * from 0px, two from 600px, four from 960px. An `'auto'` step lifts the
+ * cap from its width up: the count is what `minColumnWidth` fits, or the
+ * default count when no floor is set.
  */
-export type ColumnSteps = Record< number, number >;
+export type ColumnSteps = Record< number, number | 'auto' >;
 
 /**
  * Column policy shared by the surfaces: a count at every width, or a count
@@ -19,7 +21,7 @@ export interface ColumnPolicy {
  *
  * @param columns        A count, or a count per container width.
  * @param containerWidth Measured inline size of the surface in pixels.
- * @return The count, or `undefined` when none was set.
+ * @return The count, or `undefined` when none was set or the step is `'auto'`.
  */
 export function resolveColumnCap(
 	columns: number | ColumnSteps | undefined,
@@ -36,7 +38,8 @@ export function resolveColumnCap(
 		return undefined;
 	}
 	const reached = widths.find( ( width ) => containerWidth >= width );
-	return columns[ reached ?? widths[ widths.length - 1 ] ];
+	const step = columns[ reached ?? widths[ widths.length - 1 ] ];
+	return typeof step === 'number' ? step : undefined;
 }
 
 /**

@@ -372,6 +372,22 @@ export const ColumnSteps: Story = {
 };
 
 /**
+ * A step can be `'auto'`: from that width up there is no cap and the
+ * floor alone decides the count. Here the steps fix one and two columns
+ * below 960px, and 240px columns fill the container above it.
+ */
+export const ColumnStepsWithFloor: Story = {
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		...ColumnSteps.args,
+		columns: { 0: 1, 600: 2, 960: 'auto' },
+		minColumnWidth: 240,
+	},
+};
+
+/**
  * A `width: 'fill'` item expands to cover the remaining columns in
  * its row. Mix it with fixed-width items on either side to build
  * sidebar-like layouts that adapt to the column count.

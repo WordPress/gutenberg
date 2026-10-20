@@ -148,7 +148,7 @@ interface DashboardGridLayoutItem {
 | -------------------- | ------------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `layout`             | `DashboardGridLayoutItem[]`                | —        | Required. Positions and sizes keyed by child `key`.                                                                                                     |
 | `children`           | `ReactNode`                                | —        | Required. Each child needs a `key` matching a layout entry.                                                                                             |
-| `columns`            | `number \| ColumnSteps`                    | `6`      | Column count, or a count per container width (`{ 0: 1, 600: 2, 960: 4 }`). Caps the count when `minColumnWidth` is set. See [Columns](#columns).      |
+| `columns`            | `number \| ColumnSteps`                    | `6`      | Column count, or a count per container width (`{ 0: 1, 600: 2, 960: 4 }`; a step can be `'auto'`). Caps the count when `minColumnWidth` is set. See [Columns](#columns). |
 | `minColumnWidth`     | `number`                                   | —        | Per-column floor in pixels: the count drops on narrow containers so no column is narrower, down to one. Alone, as many columns as fit.                 |
 | `rowHeight`          | `number \| 'auto'`                         | `'auto'` | Row height in pixels, or `'auto'` to let content size rows.                                                                                             |
 | `itemLimits`         | `Record< string, GridItemLimits >`         | —        | Per-item minimum and maximum tile sizes in pixels, keyed by layout item key. See [Size limits](#size-limits).                                           |
@@ -208,6 +208,19 @@ lowered whenever a column would end up narrower than the floor.
 
 ```jsx
 <DashboardGrid layout={ layout } columns={ 4 } minColumnWidth={ 240 }>
+	{ children }
+</DashboardGrid>
+```
+
+A step can be `'auto'`: from that width up there is no cap, and the
+floor alone decides the count. Below it the steps still fix the count.
+
+```jsx
+<DashboardGrid
+	layout={ layout }
+	columns={ { 0: 1, 600: 2, 960: 'auto' } }
+	minColumnWidth={ 240 }
+>
 	{ children }
 </DashboardGrid>
 ```
@@ -322,7 +335,7 @@ items flow around them; out-of-range values (negative, or beyond
 | -------------------- | ------------------------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `layout`             | `DashboardLanesLayoutItem[]`               | —       | Required. Span and order keyed by child `key`.                                                                                                                                                          |
 | `children`           | `ReactNode`                                | —       | Required. Each child needs a `key` matching a layout entry.                                                                                                                                             |
-| `columns`            | `number \| ColumnSteps`                    | `6`     | Lane count, or a count per container width (`{ 0: 1, 600: 2, 960: 4 }`). Caps the count when `minColumnWidth` is set. See [Columns](#columns).                                                        |
+| `columns`            | `number \| ColumnSteps`                    | `6`     | Lane count, or a count per container width (`{ 0: 1, 600: 2, 960: 4 }`; a step can be `'auto'`). Caps the count when `minColumnWidth` is set. See [Columns](#columns).                               |
 | `minColumnWidth`     | `number`                                   | —       | Per-lane floor in pixels: the count drops on narrow containers so no lane is narrower, down to one. Alone, as many lanes as fit.                                                                       |
 | `flowTolerance`      | `number`                                   | `16`    | Pixel tolerance for source-order tiebreaking when two candidate lanes have similar baselines. Larger values keep tiles closer to reading order at the cost of bigger empty regions.                     |
 | `rowUnit`            | `number`                                   | `4`     | Snap unit for the polyfill's `grid-row-start` math. Smaller values produce sharper placement at the cost of a larger implicit row count. Ignored on browsers with native `display: grid-lanes` support. |

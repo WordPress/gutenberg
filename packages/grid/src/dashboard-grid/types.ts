@@ -298,7 +298,8 @@ export interface DashboardGridProps extends Omit<
 
 	/**
 	 * Column count, used as a cap. A number applies at every width; a
-	 * `ColumnSteps` map applies a count from each container width up.
+	 * `ColumnSteps` map applies a count from each container width up, and
+	 * an `'auto'` step lifts the cap from its width up.
 	 * Defaults to six when neither `columns` nor `minColumnWidth` is set;
 	 * with `minColumnWidth` set it can resolve lower on narrow containers.
 	 */

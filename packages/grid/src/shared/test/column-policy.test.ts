@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { resolveColumnCap, resolveColumnCount } from '../column-policy';
+import type { ColumnSteps } from '../column-policy';
 
 const STEPS = { 0: 1, 600: 2, 960: 4 };
+const AUTO_STEPS: ColumnSteps = { 0: 1, 600: 2, 960: 'auto' };
 const GAP = 24;
 
 describe( 'resolveColumnCap', () => {
@@ -21,6 +23,11 @@ describe( 'resolveColumnCap', () => {
 
 	it( 'uses the narrowest step below its own threshold', () => {
 		expect( resolveColumnCap( { 600: 2, 960: 4 }, 100 ) ).toBe( 2 );
+	} );
+
+	it( 'lifts the cap on an auto step', () => {
+		expect( resolveColumnCap( AUTO_STEPS, 800 ) ).toBe( 2 );
+		expect( resolveColumnCap( AUTO_STEPS, 960 ) ).toBeUndefined();
 	} );
 
 	it( 'treats a map with no numeric keys as unset', () => {
@@ -91,6 +98,32 @@ describe( 'resolveColumnCount', () => {
 				6
 			)
 		).toBe( 4 );
+	} );
+
+	it( 'lets the floor decide on an auto step', () => {
+		// Five 240px columns and four gaps need 1296px.
+		expect(
+			resolveColumnCount(
+				{ columns: AUTO_STEPS, minColumnWidth: 240 },
+				1300,
+				GAP,
+				6
+			)
+		).toBe( 5 );
+		expect(
+			resolveColumnCount(
+				{ columns: AUTO_STEPS, minColumnWidth: 240 },
+				800,
+				GAP,
+				6
+			)
+		).toBe( 2 );
+	} );
+
+	it( 'renders the default on an auto step with no floor', () => {
+		expect(
+			resolveColumnCount( { columns: { 0: 'auto' } }, 1000, GAP, 6 )
+		).toBe( 6 );
 	} );
 
 	it( 'never renders fewer than one column', () => {

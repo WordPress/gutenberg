@@ -253,6 +253,23 @@ export const ColumnSteps: Story = {
 };
 
 /**
+ * A step can be `'auto'`: from that width up there is no cap and the
+ * floor alone decides the count. Here the steps fix one and two lanes
+ * below 960px, and 200px lanes fill the container above it.
+ */
+export const ColumnStepsWithFloor: Story = {
+	parameters: ColumnSteps.parameters,
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		...ColumnSteps.args,
+		columns: { 0: 1, 600: 2, 960: 'auto' },
+		minColumnWidth: 200,
+	},
+};
+
+/**
  * Items with `width: 2` span two lanes. The skyline picks a span
  * position that minimizes the resulting baseline across spanned
  * lanes.
