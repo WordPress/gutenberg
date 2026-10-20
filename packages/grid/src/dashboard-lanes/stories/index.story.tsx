@@ -234,20 +234,40 @@ export const ColumnSteps: Story = {
 	args: {
 		columns: { 0: 1, 600: 2, 960: 4 },
 		layout: [
-			{ key: 'a' },
-			{ key: 'b' },
-			{ key: 'c' },
-			{ key: 'd' },
-			{ key: 'e' },
-			{ key: 'f' },
+			{ key: 'fixed-1', width: 1 },
+			{ key: 'fixed-2', width: 2 },
+			{ key: 'fill-1', width: 2 },
+			{ key: 'fixed-3', width: 1 },
+			{ key: 'fixed-4', width: 1 },
+			{ key: 'fixed-5', width: 2 },
+			{ key: 'fill-2', width: 3 },
+			{ key: 'full-1', width: 1 },
 		],
 		children: [
-			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
-			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
-			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
-			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
-			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
-			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
+			<Tile key="fixed-1" tone="brand" height={ 120 } index={ 1 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-2" tone="info" height={ 200 } index={ 2 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fill-1" tone="success" height={ 80 } index={ 3 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fixed-3" tone="warning" height={ 160 } index={ 4 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-4" tone="error" height={ 100 } index={ 5 }>
+				width: <strong>1</strong>
+			</Tile>,
+			<Tile key="fixed-5" tone="neutral" height={ 240 } index={ 6 }>
+				width: <strong>2</strong>
+			</Tile>,
+			<Tile key="fill-2" tone="neutral" height={ 240 } index={ 7 }>
+				width: <strong>3</strong>
+			</Tile>,
+			<Tile key="full-1" tone="neutral" height={ 240 } index={ 8 }>
+				width: <strong>1</strong>
+			</Tile>,
 		],
 	},
 };

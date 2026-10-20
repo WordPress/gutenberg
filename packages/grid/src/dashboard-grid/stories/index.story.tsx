@@ -341,31 +341,39 @@ export const ColumnSteps: Story = {
 		columns: { 0: 1, 600: 2, 960: 4 },
 		rowHeight: 96,
 		layout: [
-			{ key: 'a', width: 1 },
-			{ key: 'b', width: 'fill' },
-			{ key: 'c', width: 1, height: 2 },
-			{ key: 'd', width: 1 },
-			{ key: 'e', width: 'fill' },
-			{ key: 'f', width: 'full' },
+			{ key: 'fixed-1', width: 1, height: 1 },
+			{ key: 'fixed-2', width: 2, height: 2 },
+			{ key: 'fill-1', width: 'fill' },
+			{ key: 'fixed-3', width: 1, height: 1 },
+			{ key: 'fixed-4', width: 1, height: 2 },
+			{ key: 'fixed-5', width: 2, height: 1 },
+			{ key: 'fill-2', width: 'fill' },
+			{ key: 'full-1', width: 'full' },
 		],
 		children: [
-			<Tile key="a" tone="brand">
-				1
+			<Tile key="fixed-1" tone="brand">
+				width: <strong>1</strong> · height: <strong>1</strong>
 			</Tile>,
-			<Tile key="b" tone="info">
-				fill
+			<Tile key="fixed-2" tone="info">
+				width: <strong>2</strong> · height: <strong>2</strong>
 			</Tile>,
-			<Tile key="c" tone="success">
-				1 · 2 rows
+			<Tile key="fill-1" tone="info">
+				width: <strong>fill</strong>
 			</Tile>,
-			<Tile key="d" tone="warning">
-				1
+			<Tile key="fixed-3" tone="success">
+				width: <strong>1</strong> · height: <strong>1</strong>
 			</Tile>,
-			<Tile key="e" tone="error">
-				fill
+			<Tile key="fixed-4" tone="warning">
+				width: <strong>1</strong> · height: <strong>2</strong>
 			</Tile>,
-			<Tile key="f" tone="neutral">
-				full
+			<Tile key="fixed-5" tone="error">
+				width: <strong>2</strong> · height: <strong>1</strong>
+			</Tile>,
+			<Tile key="fill-2" tone="error">
+				width: <strong>fill</strong>
+			</Tile>,
+			<Tile key="full-1" tone="neutral">
+				width: <strong>full</strong>
 			</Tile>,
 		],
 	},
