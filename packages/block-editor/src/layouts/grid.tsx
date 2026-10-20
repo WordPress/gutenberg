@@ -25,6 +25,7 @@ import {
 } from '../hooks/block-style-state';
 import { LAYOUT_DEFINITIONS } from './definitions';
 import { store as blockEditorStore } from '../store';
+import { useChangeGridColumnCount } from '../components/grid/use-change-grid-column-count';
 import type {
 	Layout,
 	LayoutAlignment,
@@ -158,6 +159,7 @@ export default {
 			[ clientId ]
 		);
 		const { updateBlockAttributes } = useDispatch( blockEditorStore );
+		const changeGridColumnCount = useChangeGridColumnCount( clientId );
 
 		// Always show both column and minimum width controls in Auto mode.
 		// Manual mode (with isManualPlacement) is only available behind the experiment flag.
@@ -279,6 +281,13 @@ export default {
 						<GridLayoutColumnsAndRowsControl
 							layout={ layout }
 							onChange={ onChange }
+							onChangeColumnCount={ ( newColumnCount ) =>
+								changeGridColumnCount(
+									layout,
+									newColumnCount,
+									onChange
+								)
+							}
 							allowSizingOnChildren={ allowSizingOnChildren }
 						/>
 					</ToolsPanelItem>
@@ -698,8 +707,16 @@ function GridLayoutMinimumWidthControl( {
 function GridLayoutColumnsAndRowsControl( {
 	layout,
 	onChange,
+	onChangeColumnCount,
 	allowSizingOnChildren,
-}: LayoutControlProps & { allowSizingOnChildren?: boolean } ) {
+}: LayoutControlProps & {
+	allowSizingOnChildren?: boolean;
+	/**
+	 * Changes the column count, and returns whether it did. Manual grids with
+	 * cells of a fixed size keep their blocks in place.
+	 */
+	onChangeColumnCount?: ( columnCount: number | undefined ) => boolean;
+} ) {
 	// Allow unsetting the column count in Auto mode.
 	const defaultColumnCount = undefined;
 	const {
@@ -729,6 +746,9 @@ function GridLayoutColumnsAndRowsControl( {
 										? defaultNewColumnCount
 										: // Only an absent value is not a string.
 											parseInt( value as string, 10 );
+								if ( onChangeColumnCount?.( newColumnCount ) ) {
+									return;
+								}
 								onChange( {
 									...layout,
 									columnCount: newColumnCount,

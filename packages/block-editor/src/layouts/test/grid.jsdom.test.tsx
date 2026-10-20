@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import { dispatch, select } from '@wordpress/data';
@@ -9,6 +9,16 @@ import { unlock } from '../../lock-unlock';
 
 globalThis.wpVitest.mockMatchMedia();
 globalThis.wpVitest.mockResizeObserver();
+
+// The grid's element in the canvas, measured when its column count changes.
+const mockGridElement = { current: null as HTMLElement | null };
+vi.mock(
+	import( '../../components/block-list/use-block-props/use-block-refs' ),
+	async ( importOriginal ) => ( {
+		...( await importOriginal() ),
+		useBlockElement: () => mockGridElement.current,
+	} )
+);
 
 const GridLayoutInspectorControls = grid.inspectorControls;
 const PANEL_ID = 'test-panel';
@@ -469,6 +479,121 @@ describe( 'GridLayoutInspectorControls', () => {
 					setStyleStateViewport( 'default' );
 				} );
 			}
+		} );
+
+		describe( 'changing the column count of a manual grid', () => {
+			const layout = {
+				type: 'grid',
+				isManualPlacement: true,
+				columnCount: 4,
+				rowCount: 4,
+			};
+
+			beforeEach( () => {
+				// A 430px wide grid with 10px gaps and fixed cells.
+				const element = document.createElement( 'div' );
+				element.style.setProperty( '--wp--style--grid-cells', 'fixed' );
+				element.style.columnGap = '10px';
+				element.style.rowGap = '10px';
+				Object.defineProperty( element, 'clientWidth', {
+					value: 430,
+				} );
+				document.body.appendChild( element );
+				mockGridElement.current = element;
+				act( () => {
+					dispatch( blockEditorStore ).resetBlocks( [
+						{
+							clientId: PANEL_ID,
+							name: 'core/group',
+							isValid: true,
+							attributes: { layout },
+							innerBlocks: [
+								{
+									clientId: 'child',
+									name: 'core/paragraph',
+									isValid: true,
+									attributes: {
+										style: {
+											layout: {
+												columnStart: 1,
+												columnSpan: 2,
+												rowStart: 1,
+												rowSpan: 1,
+											},
+										},
+									},
+									innerBlocks: [],
+								},
+							],
+						},
+					] );
+				} );
+			} );
+			afterEach( () => {
+				mockGridElement.current?.remove();
+				mockGridElement.current = null;
+			} );
+
+			it( 'keeps blocks in place and adds rows', async () => {
+				const onChange = vi.fn();
+				renderInspectorControls( { layout, onChange } );
+
+				fireEvent.change(
+					await screen.findByRole( 'spinbutton', {
+						name: 'Columns',
+					} ),
+					{ target: { value: '5' } }
+				);
+
+				expect( onChange ).toHaveBeenCalledWith( {
+					...layout,
+					columnCount: 5,
+					rowCount: 5,
+				} );
+				const childLayout = unlock(
+					select( blockEditorStore )
+				).getBlockAttributes( 'child' ).style.layout;
+				// The block was two 100px columns wide, 210px, which is now
+				// inside three 78px columns, 254px.
+				expect( childLayout ).toEqual( {
+					columnStart: 1,
+					columnSpan: 3,
+					rowStart: 1,
+					rowSpan: 2,
+					box: { left: 0, top: 0, width: 0.8268, height: 0.6024 },
+				} );
+			} );
+
+			it( 'only changes the count where the cells are not fixed', async () => {
+				mockGridElement.current?.style.setProperty(
+					'--wp--style--grid-cells',
+					'auto'
+				);
+				const onChange = vi.fn();
+				renderInspectorControls( { layout, onChange } );
+
+				fireEvent.change(
+					await screen.findByRole( 'spinbutton', {
+						name: 'Columns',
+					} ),
+					{ target: { value: '5' } }
+				);
+
+				expect( onChange ).toHaveBeenCalledWith( {
+					...layout,
+					columnCount: 5,
+				} );
+				expect(
+					unlock( select( blockEditorStore ) ).getBlockAttributes(
+						'child'
+					).style.layout
+				).toEqual( {
+					columnStart: 1,
+					columnSpan: 2,
+					rowStart: 1,
+					rowSpan: 1,
+				} );
+			} );
 		} );
 
 		it( 'does not offer stacking on mobile for auto placement grids', async () => {
