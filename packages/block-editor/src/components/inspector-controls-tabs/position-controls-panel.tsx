@@ -11,6 +11,9 @@ import { store as blockEditorStore } from '../../store';
 import { useToolsPanelDropdownMenuProps } from '../global-styles/utils';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { unlock } from '../../lock-unlock';
+import type { TreeBlock } from '../../store/types';
+import type { BlockStyleState } from '../../hooks/types';
+import type { PositionStyleAttribute } from './types';
 
 const DEFAULT_STATE_VALUE = 'default';
 
@@ -19,10 +22,12 @@ const DEFAULT_STATE_VALUE = 'default';
  * controls, or `null` for the default (desktop) state. Position doesn't
  * support pseudo states, so those are treated as the default state.
  *
- * @param {Object} selectedState Value returned by `getSelectedBlockStyleState`.
- * @return {string|null} Viewport key, or `null` for the default state.
+ * @param selectedState Value returned by `getSelectedBlockStyleState`.
+ * @return Viewport key, or `null` for the default state.
  */
-const getPositionStateViewport = ( selectedState ) =>
+const getPositionStateViewport = (
+	selectedState: BlockStyleState | undefined
+): string | null =>
 	selectedState?.viewport &&
 	selectedState.viewport !== DEFAULT_STATE_VALUE &&
 	( ! selectedState.pseudo || selectedState.pseudo === DEFAULT_STATE_VALUE )
@@ -33,16 +38,19 @@ const getPositionStateViewport = ( selectedState ) =>
  * Checks whether a style object has a position value in the default state or
  * any viewport state.
  *
- * @param {Object} style Block style attributes.
- * @return {boolean} Whether a position value is set.
+ * @param style Block style attributes.
+ * @return Whether a position value is set.
  */
-const hasAnyPositionValue = ( style ) => {
+const hasAnyPositionValue = ( style?: PositionStyleAttribute ): boolean => {
 	if ( style?.position?.type ) {
 		return true;
 	}
 	return Object.entries( style ?? {} ).some(
 		( [ key, stateStyle ] ) =>
-			key.startsWith( '@' ) && !! stateStyle?.position?.type
+			key.startsWith( '@' ) &&
+			// Viewport states hold style objects.
+			!! ( stateStyle as PositionStyleAttribute | undefined )?.position
+				?.type
 	);
 };
 
@@ -53,16 +61,21 @@ const PositionControlsPanel = () => {
 				select( blockEditorStore );
 
 			const selectedBlockClientIds = getSelectedBlockClientIds();
+			// The selected blocks exist.
 			const _selectedBlocks = getBlocksByClientId(
 				selectedBlockClientIds
-			);
+			) as TreeBlock[];
 
 			return {
 				selectedClientIds: selectedBlockClientIds,
 				selectedBlocks: _selectedBlocks,
 				hasPositionAttribute: _selectedBlocks?.some(
 					( { attributes } ) =>
-						hasAnyPositionValue( attributes?.style )
+						// The style attribute is an object.
+						hasAnyPositionValue(
+							attributes?.style as
+								PositionStyleAttribute | undefined
+						)
 				),
 			};
 		}, [] );
@@ -84,14 +97,20 @@ const PositionControlsPanel = () => {
 				const viewport = getPositionStateViewport(
 					getSelectedBlockStyleState( clientId )
 				);
-				const style = { ...attributes?.style };
+				const style: PositionStyleAttribute = {
+					// The style attribute is an object.
+					...( attributes?.style as
+						PositionStyleAttribute | undefined ),
+				};
 
 				if ( viewport ) {
 					/*
 					 * Explicitly clear the position for this viewport.
 					 */
 					style[ viewport ] = {
-						...style[ viewport ],
+						// Viewport states hold style objects.
+						...( style[ viewport ] as
+							PositionStyleAttribute | undefined ),
 						position: {
 							type: '',
 							top: undefined,

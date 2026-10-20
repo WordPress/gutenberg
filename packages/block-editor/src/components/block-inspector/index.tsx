@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useRef } from '@wordpress/element';
+import type { ReactNode } from 'react';
 import { check } from '@wordpress/icons';
 import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
@@ -43,12 +44,20 @@ import {
 	hasViewportBlockStyleState,
 	isDefaultBlockStyleState,
 } from '../../hooks/block-style-state';
+import type {
+	AnimatedContainerProps,
+	BlockInspectorSingleBlockProps,
+	BlockInspectorSingleBlockWrapperProps,
+	StyleInspectorSlotsProps,
+	StyleStateInspectorSlotsProps,
+} from './types';
+import type { BlockStyleState } from '../../hooks/types';
 
 function StyleInspectorSlots( {
 	showAdvancedControls = true,
 	showPositionControls = true,
 	showBindingsControls = true,
-} ) {
+}: StyleInspectorSlotsProps ) {
 	return (
 		<>
 			<InspectorControls.Slot />
@@ -97,7 +106,7 @@ function StyleStateInspectorSlots( {
 	contentClientIds,
 	isSectionBlock,
 	selectedBlockStyleState,
-} ) {
+}: StyleStateInspectorSlotsProps ) {
 	const isViewportStyleState =
 		hasViewportBlockStyleState( selectedBlockStyleState ) &&
 		! hasPseudoBlockStyleState( selectedBlockStyleState );
@@ -208,7 +217,7 @@ function BlockInspector() {
 			_renderedBlockName && getBlockType( _renderedBlockName );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const _isSectionBlockInSelection = selectedBlockClientIds.some(
-			( id ) => _isSectionBlock( id )
+			( id: string ) => _isSectionBlock( id )
 		);
 		const blockStyles =
 			_renderedBlockName && getBlockStyles( _renderedBlockName );
@@ -254,18 +263,18 @@ function BlockInspector() {
 
 			// Exclude items from the content tab that are already present in the
 			// List View tab.
-			const listViewDescendants = new Set();
-			descendants.forEach( ( clientId ) => {
+			const listViewDescendants = new Set< string >();
+			descendants.forEach( ( clientId: string ) => {
 				if ( shouldRenderBlockListView( clientId ) ) {
 					const listViewChildren =
 						getClientIdsOfDescendants( clientId );
-					listViewChildren.forEach( ( childId ) =>
+					listViewChildren.forEach( ( childId: string ) =>
 						listViewDescendants.add( childId )
 					);
 				}
 			} );
 
-			return descendants.filter( ( current ) => {
+			return descendants.filter( ( current: string ) => {
 				return (
 					! listViewDescendants.has( current ) &&
 					getBlockEditingMode( current ) === 'contentOnly'
@@ -343,7 +352,7 @@ function BlockInspector() {
 	return (
 		<BlockInspectorSingleBlockWrapper
 			animate={ blockInspectorAnimationSettings }
-			wrapper={ ( children ) => (
+			wrapper={ ( children: ReactNode ) => (
 				<AnimatedContainer
 					blockInspectorAnimationSettings={
 						blockInspectorAnimationSettings
@@ -367,13 +376,18 @@ function BlockInspector() {
 				showStateOnCanvas={ showStateOnCanvas }
 				isResponsiveEditing={ isResponsiveEditing }
 				blockStatesEditingEnabled={ blockStatesEditingEnabled }
+				// @ts-expect-error The single block view ignores `isBlockStyleStateSelected`.
 				isBlockStyleStateSelected={ isBlockStyleStateSelected }
 			/>
 		</BlockInspectorSingleBlockWrapper>
 	);
 }
 
-const BlockInspectorSingleBlockWrapper = ( { animate, wrapper, children } ) => {
+const BlockInspectorSingleBlockWrapper = ( {
+	animate,
+	wrapper,
+	children,
+}: BlockInspectorSingleBlockWrapperProps ) => {
 	return animate ? wrapper( children ) : children;
 };
 
@@ -381,7 +395,7 @@ const AnimatedContainer = ( {
 	blockInspectorAnimationSettings,
 	renderedBlockClientId,
 	children,
-} ) => {
+}: AnimatedContainerProps ) => {
 	const animationOrigin =
 		blockInspectorAnimationSettings &&
 		blockInspectorAnimationSettings.enterDirection === 'leftToRight'
@@ -424,8 +438,8 @@ const BlockInspectorSingleBlock = ( {
 	showStateOnCanvas,
 	isResponsiveEditing,
 	blockStatesEditingEnabled = true,
-} ) => {
-	const listViewRef = useRef( null );
+}: BlockInspectorSingleBlockProps ) => {
+	const listViewRef = useRef< HTMLDivElement >( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const isEditingStyleState =
 		( hasViewportBlockStyleState( selectedBlockStyleState ) &&
@@ -437,21 +451,23 @@ const BlockInspectorSingleBlock = ( {
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
+	// The hook returns `null` without a client ID.
 	const parentBlockInformation = useBlockDisplayInformation(
-		editedContentOnlySection
+		editedContentOnlySection as string
 	);
+	// The rendered block has a block type, so it has display information.
 	const blockInformation = useBlockDisplayInformation(
 		renderedBlockClientId
-	);
+	)!;
 	const isBlockSynced = blockInformation.isSynced;
 	const {
 		setSelectedBlockStyleState,
 		setSelectedBlockStyleStateCanvasPreview,
 	} = unlock( useDispatch( blockEditorStore ) );
-	const onBlockStyleStateChange = ( value ) => {
+	const onBlockStyleStateChange = ( value: BlockStyleState ) => {
 		setSelectedBlockStyleState( renderedBlockClientId, value );
 	};
-	const onShowStateOnCanvasChange = ( value ) => {
+	const onShowStateOnCanvasChange = ( value: boolean ) => {
 		setSelectedBlockStyleStateCanvasPreview( renderedBlockClientId, value );
 	};
 
@@ -460,8 +476,10 @@ const BlockInspectorSingleBlock = ( {
 			{ hasParentChildBlockCards && (
 				<BlockCard
 					{ ...parentBlockInformation }
+					// `BlockCard` passes the class name to `clsx`.
 					className={
-						parentBlockInformation?.isSynced && 'is-synced'
+						( parentBlockInformation?.isSynced &&
+							'is-synced' ) as string
 					}
 					parentClientId={ editedContentOnlySection }
 				/>
@@ -472,8 +490,10 @@ const BlockInspectorSingleBlock = ( {
 					showStateBadges ? undefined : blockInformation.description
 				}
 				allowParentNavigation
-				className={ isBlockSynced && 'is-synced' }
-				isChild={ hasParentChildBlockCards }
+				// `BlockCard` passes the class name to `clsx`.
+				className={ ( isBlockSynced && 'is-synced' ) as string }
+				// `BlockCard` only checks whether this is truthy.
+				isChild={ hasParentChildBlockCards as boolean }
 				clientId={ renderedBlockClientId }
 				controls={
 					blockEditingMode === 'default' &&
@@ -538,6 +558,7 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<BlockInspectorPreTabsSlot />
 			{ isEditingStyleState && (
+				// @ts-expect-error Bug: without `blockName`, template parts get the section controls.
 				<StyleStateInspectorSlots
 					clientId={ renderedBlockClientId }
 					contentClientIds={ contentClientIds }

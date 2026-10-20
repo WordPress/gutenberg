@@ -6,13 +6,18 @@ import InspectorControlsGroups, {
 import { InspectorAdvancedControls } from '../inspector-controls';
 import { TAB_LIST_VIEW, TAB_SETTINGS, TAB_STYLES, TAB_CONTENT } from './utils';
 import { store as blockEditorStore } from '../../store';
+import type { InspectorTab } from './types';
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: InspectorTab[] = [];
 
-function getShowTabs( blockName, tabSettings = {} ) {
+function getShowTabs(
+	blockName: string | undefined,
+	tabSettings: Partial< Record< string, boolean > > = {}
+) {
 	// Block specific setting takes precedence over generic default.
-	if ( tabSettings[ blockName ] !== undefined ) {
-		return tabSettings[ blockName ];
+	// A missing block name has no setting.
+	if ( tabSettings[ blockName as string ] !== undefined ) {
+		return tabSettings[ blockName as string ];
 	}
 
 	// Use generic default if set over the Gutenberg experiment option.
@@ -24,12 +29,12 @@ function getShowTabs( blockName, tabSettings = {} ) {
 }
 
 export default function useInspectorControlsTabs(
-	blockName,
-	contentClientIds,
-	isSectionBlock,
-	hasBlockStyles
-) {
-	const tabs = [];
+	blockName: string | undefined,
+	contentClientIds: string[] | undefined,
+	isSectionBlock: boolean | undefined,
+	hasBlockStyles: boolean | undefined
+): InspectorTab[] {
+	const tabs: InspectorTab[] = [];
 	const {
 		bindings: bindingsGroup,
 		border: borderGroup,

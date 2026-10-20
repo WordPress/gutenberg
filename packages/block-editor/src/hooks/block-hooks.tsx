@@ -2,17 +2,19 @@ import { __ } from '@wordpress/i18n';
 import { Fragment, useMemo } from '@wordpress/element';
 import { PanelBody, ToggleControl } from '@wordpress/components';
 import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import type { Block, BlockType } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { InspectorControls } from '../components';
 import { store as blockEditorStore } from '../store';
+import type { BlockHooksPanelProps } from './types';
 
-const EMPTY_OBJECT = {};
+const EMPTY_OBJECT: Record< string, string > = {};
 
 function BlockHooksControlPure( {
 	name,
 	clientId,
 	metadata: { ignoredHookedBlocks = [] } = {},
-} ) {
+}: BlockHooksPanelProps ) {
 	const blockTypes = useSelect(
 		( select ) => select( blocksStore ).getBlockTypes(),
 		[]
@@ -39,7 +41,7 @@ function BlockHooksControlPure( {
 
 			const rootClientId = getBlockRootClientId( clientId );
 			const _hookedBlockClientIds = hookedBlocksForCurrentBlock.reduce(
-				( clientIds, block ) => {
+				( clientIds: Record< string, string >, block ) => {
 					// If the block doesn't exist anywhere in the block tree,
 					// we know that we have to set the toggle to disabled.
 					if ( getGlobalBlockCount( block.name ) === 0 ) {
@@ -116,7 +118,7 @@ function BlockHooksControlPure( {
 
 	// Group by block namespace (i.e. prefix before the slash).
 	const groupedHookedBlocks = hookedBlocksForCurrentBlock.reduce(
-		( groups, block ) => {
+		( groups: Record< string, BlockType[] >, block ) => {
 			const [ namespace ] = block.name.split( '/' );
 			if ( ! groups[ namespace ] ) {
 				groups[ namespace ] = [];
@@ -127,7 +129,10 @@ function BlockHooksControlPure( {
 		{}
 	);
 
-	const insertBlockIntoDesignatedLocation = ( block, relativePosition ) => {
+	const insertBlockIntoDesignatedLocation = (
+		block: Block,
+		relativePosition: string | undefined
+	) => {
 		const blockIndex = getBlockIndex( clientId );
 		const innerBlocksLength = getBlockCount( clientId );
 		const rootClientId = getBlockRootClientId( clientId );
@@ -197,6 +202,7 @@ function BlockHooksControlPure( {
 											if ( ! checked ) {
 												// Create and insert block.
 												const relativePosition =
+													// @ts-expect-error Bug: a block hooked by a filter has no `blockHooks`.
 													block.blockHooks[ name ];
 												insertBlockIntoDesignatedLocation(
 													createBlock( block.name ),
