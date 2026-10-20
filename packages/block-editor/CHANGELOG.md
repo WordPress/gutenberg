@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Keep a controlled block's inner blocks reference stable when the root blocks are reset and its preserved sub-tree is unchanged, so nested controllers such as a Navigation block inside a template part no longer report an edit they did not make. That spurious edit could shadow menu content refetched from the server, leaving the block stale until a reload ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 19.0.0 (2026-10-20)
