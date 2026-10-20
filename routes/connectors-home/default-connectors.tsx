@@ -87,19 +87,7 @@ function getConnectorLogo(
 }
 
 const ConnectedBadge = () => (
-	<span
-		style={ {
-			color: '#345b37',
-			backgroundColor: '#eff8f0',
-			padding: '4px 12px',
-			borderRadius: '2px',
-			fontSize: '13px',
-			fontWeight: 'var(--wpds-typography-font-weight-emphasis)',
-			whiteSpace: 'nowrap',
-		} }
-	>
-		{ __( 'Connected' ) }
-	</span>
+	<Badge intent="stable">{ __( 'Connected' ) }</Badge>
 );
 
 const PluginDirectoryLink = ( { slug }: { slug: string } ) => (
