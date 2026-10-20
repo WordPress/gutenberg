@@ -43,10 +43,13 @@ if ( ! class_exists( 'WP_Entity_Actions_Registry' ) ) {
 		 * The values DataViews supports for the properties of an action that
 		 * take one of a set of values, see packages/dataviews/src/types/dataviews.ts.
 		 *
+		 * The DataViews types also list `single` for `context`, but no screen
+		 * shows the actions of that context, so it is not supported here.
+		 *
 		 * @var array<string, string[]>
 		 */
 		const SUPPORTED_VALUES = array(
-			'context'   => array( 'list', 'single' ),
+			'context'   => array( 'list' ),
 			'modalSize' => array( 'small', 'medium', 'large', 'fill' ),
 		);
 
@@ -214,8 +217,8 @@ if ( ! class_exists( 'WP_Entity_Actions_Registry' ) ) {
 		 * _doing_it_wrong().
 		 *
 		 * A value DataViews does not support is otherwise silent: an action
-		 * whose `context` is not `list` or `single` shows on no screen. Such a
-		 * value is kept, like the field types the fields registry reports.
+		 * whose `context` is not `list` shows on no screen. Such a value is
+		 * kept, like the field types the fields registry reports.
 		 * `callback`, `RenderModal`, and `isEligible` are functions and
 		 * components, which only a script module can provide: a value set on
 		 * the server would be called on the client and fail, so it is removed.
