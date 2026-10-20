@@ -6,6 +6,19 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 
+### Enhancements
+
+-   `data-wp-html` keeps the element's server-rendered content when its value is `{ "wpServerHtml": true }`, the stand-in for an `asDangerousHTML()` value in the page's data, whether it comes from `state`, `context` or a `data-wp-each` item ([#84889](https://github.com/WordPress/gutenberg/pull/84889)).
+-   Speed up hydration by only parsing object-like directive values as JSON and reading attributes with `getAttributeNames()` ([#81699](https://github.com/WordPress/gutenberg/pull/81699)).
+
+### Bug Fixes
+
+-   Reject malformed Interactivity directive names whose text after `data-wp-` begins with a hyphen, including offset-zero `--` forms that would create an empty prefix, aligning client-side validation with WordPress Core ([#81023](https://github.com/WordPress/gutenberg/pull/81023)).
+-   `data-wp-html` now follows its value on every update and after navigation: tokens render, pending values keep the content, anything else empties the element. Throwing getters and functions no longer break rendering. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   `data-wp-html` is ignored, with a warning, when combined with `data-wp-text`, `data-wp-each` or `data-wp-router-region` on the same element. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Interactive islands inside server-rendered `data-wp-each-child` items are no longer hydrated twice. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+-   Functions called from directive values restore the caller's scope when they throw. ([#84652](https://github.com/WordPress/gutenberg/pull/84652)).
+
 ### Internal
 
 -   Publish only runtime files, dropping `tsconfig.json`, `tsconfig.build.json`, `tsconfig.build.tsbuildinfo` and the test files from the package ([#84164](https://github.com/WordPress/gutenberg/pull/84164)).

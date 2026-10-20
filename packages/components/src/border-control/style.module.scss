@@ -20,7 +20,7 @@
 		flex: 1 1 40%;
 	}
 
-	/* Raised specificity to beat UnitSelect's runtime-injected Emotion min-height. */
+	/* Preserve the established specificity for UnitSelect's min-height override. */
 	&#{&}
 	:global(.components-unit-control__select):global(.components-unit-control__select) {
 		min-height: 0;
@@ -37,7 +37,7 @@
 .dropdown {
 	background: #fff;
 
-	/* Raised specificity to stay ahead of the Emotion Button base styles. */
+	/* Preserve the established specificity for Button overrides. */
 	&#{&} > button {
 		aspect-ratio: 1;
 		padding: 0;

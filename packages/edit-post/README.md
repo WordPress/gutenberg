@@ -43,49 +43,49 @@ _Parameters_
 
 _Related_
 
-- PluginBlockSettingsMenuItem in @wordpress/editor package.
+- PluginBlockSettingsMenuItem in `@wordpress/editor` package.
 
 ### PluginDocumentSettingPanel
 
 _Related_
 
-- PluginDocumentSettingPanel in @wordpress/editor package.
+- PluginDocumentSettingPanel in `@wordpress/editor` package.
 
 ### PluginMoreMenuItem
 
 _Related_
 
-- PluginMoreMenuItem in @wordpress/editor package.
+- PluginMoreMenuItem in `@wordpress/editor` package.
 
 ### PluginPostPublishPanel
 
 _Related_
 
-- PluginPostPublishPanel in @wordpress/editor package.
+- PluginPostPublishPanel in `@wordpress/editor` package.
 
 ### PluginPostStatusInfo
 
 _Related_
 
-- PluginPostStatusInfo in @wordpress/editor package.
+- PluginPostStatusInfo in `@wordpress/editor` package.
 
 ### PluginPrePublishPanel
 
 _Related_
 
-- PluginPrePublishPanel in @wordpress/editor package.
+- PluginPrePublishPanel in `@wordpress/editor` package.
 
 ### PluginSidebar
 
 _Related_
 
-- PluginSidebar in @wordpress/editor package.
+- PluginSidebar in `@wordpress/editor` package.
 
 ### PluginSidebarMoreMenuItem
 
 _Related_
 
-- PluginSidebarMoreMenuItem in @wordpress/editor package.
+- PluginSidebarMoreMenuItem in `@wordpress/editor` package.
 
 ### reinitializeEditor
 

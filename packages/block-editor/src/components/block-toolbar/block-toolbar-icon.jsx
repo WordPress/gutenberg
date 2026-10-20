@@ -1,7 +1,7 @@
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { copy, symbol } from '@wordpress/icons';
+import { blockDefault, copy, symbol } from '@wordpress/icons';
 import {
 	getBlockType,
 	getDefaultBlockName,
@@ -90,9 +90,9 @@ function getBlockIconVariant( { select, clientIds } ) {
 }
 
 function getBlockIcon( { select, clientIds } ) {
-	// Without blocks the icon stands in for the default block.
+	// Without blocks the icon stands in for the default block, falling back to the generic block icon when no default block type is registered.
 	if ( ! clientIds.length ) {
-		return getBlockType( getDefaultBlockName() )?.icon;
+		return getBlockType( getDefaultBlockName() )?.icon ?? blockDefault;
 	}
 
 	const { getBlockName, getBlockAttributes, getBlock, isSectionBlock } =
@@ -155,7 +155,7 @@ export default function BlockToolbarIcon( { clientIds, isSynced } ) {
 	const showBlockTitle = isSingleBlock && isSynced && ! showIconLabels;
 	let label = isSingleBlock ? blockTitle : __( 'Multiple blocks selected' );
 	if ( ! clientIds.length ) {
-		label = getBlockType( getDefaultBlockName() )?.title;
+		label = getBlockType( getDefaultBlockName() )?.title ?? __( 'Block' );
 	}
 	// Used to hide the block icon when the showIconLabels preference is enabled, or to display the template title when it's a template.
 	const text = showBlockTitle && blockTitle ? blockTitle : undefined;
