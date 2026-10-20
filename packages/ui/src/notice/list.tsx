@@ -4,17 +4,12 @@ import {
 	forwardRef,
 	useCallback,
 	useEffect,
-	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
 import { Stack } from '../stack';
 import { VisuallyHidden } from '../visually-hidden';
-import {
-	NoticeListContext,
-	NoticeTextContext,
-	type Announcement,
-} from './context';
+import { NoticeListContext, type Announcement } from './context';
 import type { ListProps } from './types';
 
 /**
@@ -41,25 +36,22 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 				return;
 			}
 			isUpdatePending.current = true;
-			// Read after the commit so title and description registrations, refs,
+			// Read after the commit so title and description elements, refs,
 			// and any consumer focus effects have finished.
 			queueMicrotask( () => {
 				isUpdatePending.current = false;
 				updateRef.current();
 			} );
 		}, [] );
-		const context = useMemo(
-			() => ( {
-				register( notice: string, read: () => Announcement ) {
-					notices.current.set( notice, read );
+		const register = useCallback(
+			( notice: string, read: () => Announcement ) => {
+				notices.current.set( notice, read );
+				update();
+				return () => {
+					notices.current.delete( notice );
 					update();
-					return () => {
-						notices.current.delete( notice );
-						update();
-					};
-				},
-				update,
-			} ),
+				};
+			},
 			[ update ]
 		);
 
@@ -136,63 +128,62 @@ export const List = forwardRef< HTMLDivElement, ListProps >(
 		}, [ element, update ] );
 
 		return (
-			<NoticeListContext.Provider value={ context }>
-				<NoticeTextContext.Provider value={ null }>
-					<Stack
-						ref={ mergedRef }
-						direction="column"
-						gap="sm"
-						{ ...mergeProps< 'div' >(
-							{
-								onFocusCapture() {
-									setHasFocus( true );
-									setAnnouncements( new Map() );
-								},
-								onBlurCapture( event ) {
-									if (
-										! event.currentTarget.contains(
-											event.relatedTarget
-										)
-									) {
-										setHasFocus( false );
-									}
-								},
+			<NoticeListContext.Provider value={ register }>
+				<Stack
+					ref={ mergedRef }
+					direction="column"
+					gap="sm"
+					{ ...mergeProps< 'div' >(
+						{
+							onFocusCapture() {
+								setHasFocus( true );
+								setAnnouncements( new Map() );
 							},
-							props
+							onBlurCapture( event ) {
+								if (
+									! event.currentTarget.contains(
+										event.relatedTarget
+									)
+								) {
+									setHasFocus( false );
+								}
+							},
+						},
+						props
+					) }
+					data-wp-ui-notice-list=""
+				>
+					<>{ children }</>
+					{ ! hasFocus &&
+						( [ 'polite', 'assertive' ] as const ).map(
+							( politeness ) => (
+								<VisuallyHidden
+									key={ politeness }
+									role={
+										politeness === 'polite'
+											? 'status'
+											: 'alert'
+									}
+									aria-atomic={ false }
+									aria-relevant="additions text"
+								>
+									{ Array.from(
+										announcements,
+										( [ notice, announcement ] ) =>
+											announcement.politeness ===
+											politeness ? (
+												<div
+													key={ notice }
+													aria-atomic="true"
+												>
+													{ announcement.message }
+												</div>
+											) : null
+									) }
+								</VisuallyHidden>
+							)
 						) }
-					>
-						<>{ children }</>
-						{ ! hasFocus &&
-							( [ 'polite', 'assertive' ] as const ).map(
-								( politeness ) => (
-									<VisuallyHidden
-										key={ politeness }
-										role={
-											politeness === 'polite'
-												? 'status'
-												: 'alert'
-										}
-										aria-atomic={ false }
-										aria-relevant="additions text"
-									>
-										{ Array.from(
-											announcements,
-											( [ notice, announcement ] ) =>
-												announcement.politeness ===
-												politeness ? (
-													<div
-														key={ notice }
-														aria-atomic="true"
-													>
-														{ announcement.message }
-													</div>
-												) : null
-										) }
-									</VisuallyHidden>
-								)
-							) }
-					</Stack>
-				</NoticeTextContext.Provider>
+				</Stack>
 			</NoticeListContext.Provider>
 		);
 	}

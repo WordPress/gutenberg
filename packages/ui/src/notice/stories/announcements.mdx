@@ -1,6 +1,6 @@
 import { Canvas, Meta } from '@storybook/addon-docs/blocks';
 import * as AnnouncementStories from './announcements.story';
-import * as ListStories from './list.story';
+import * as NoticeStories from './index.story';
 
 <Meta of={ AnnouncementStories } />
 
@@ -18,9 +18,9 @@ Leave static notices without an announcement. Users can read the message and rea
 
 Keep `Notice.List` mounted, including when it is empty, and render keyed `Notice.Root` children inside it. The list stacks its children with a small gap. It announces added notices and changes to their messages. Notices present when the list mounts stay silent.
 
-<Canvas of={ ListStories.DynamicNotices } />
+<Canvas of={ NoticeStories.DynamicNotices } />
 
-The default announcement contains the plaintext content of `Notice.Title` and `Notice.Description`, with a period between the title and description when the title has no ending punctuation. Actions, dismiss buttons, and descriptions inside `Notice.Actions` are excluded. For complex content, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
+The default announcement contains the plaintext content of `Notice.Title` and `Notice.Description` elements rendered inside the notice, with a period between the title and description when the title has no ending punctuation. Actions, dismiss buttons, and descriptions inside `Notice.Actions` are excluded. For complex content or content rendered outside the notice, use `spokenMessage` on `Notice.Root` to provide a complete, punctuated announcement that excludes technical details.
 
 Announcements are `polite` by default, including error notices. Set `politeness="assertive"` on a notice only when its message needs immediate attention. Set `politeness="off"` or `spokenMessage=""` to skip announcements for a notice. These props only affect notices inside `Notice.List`.
 

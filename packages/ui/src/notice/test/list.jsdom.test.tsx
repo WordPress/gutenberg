@@ -42,7 +42,7 @@ describe( 'Notice.List', () => {
 		expect( screen.getByRole( 'alert' ) ).toBeEmptyDOMElement();
 	} );
 
-	it( 'announces added and changed title and description text without action labels', async () => {
+	it( 'announces added notices and descendant message updates without action content', async () => {
 		function Description() {
 			const [ isUpdated, setIsUpdated ] = useState( false );
 			return (
@@ -58,6 +58,7 @@ describe( 'Notice.List', () => {
 						>
 							Publish
 						</Notice.ActionButton>
+						<Notice.Description>Action feedback</Notice.Description>
 					</Notice.Actions>
 				</>
 			);
