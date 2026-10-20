@@ -206,10 +206,12 @@ export const drop = ( props ) => ( element ) => {
 	const onPaste = createPasteListener( props, element );
 
 	// The block drop zones cancel every drag over them, which hides the
-	// browser's drop caret and shows the block insertion point instead.
+	// browser's drop caret and shows the block insertion point instead. An
+	// empty field keeps the drop zone, which shows the block is replaced.
 	function onDragOver( event ) {
 		if (
 			element.isContentEditable &&
+			! isEmpty( props.current.getValue() ) &&
 			isTextDrop( ownerDocument, event.dataTransfer )
 		) {
 			event.stopPropagation();

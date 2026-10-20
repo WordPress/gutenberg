@@ -224,9 +224,6 @@ export function getDropPasteProps(
 		if ( isSameField && offset > drag.end ) {
 			offset -= drag.end - drag.start;
 		}
-		// An insertion into the field of the removal would otherwise not
-		// create an undo level.
-		__unstableMarkLastChangeAsPersistent();
 	}
 
 	return {
