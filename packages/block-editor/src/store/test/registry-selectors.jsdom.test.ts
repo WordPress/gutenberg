@@ -130,27 +130,25 @@ describe( 'selectors', () => {
 				select( store ).__experimentalGetAllowedPatterns( 'block2' )
 			).toHaveLength( 0 );
 		} );
-		it( 'should return empty array if only patterns hidden from UI exist', () => {
-			expect(
-				select( store ).__experimentalGetAllowedPatterns(
-					// @ts-expect-error The test passes a state where the root client ID goes.
-					{
-						blocks: { byClientId: new Map() },
-						blockListSettings: new Map(),
-						settings: {
-							__experimentalBlockPatterns: [
-								{
-									name: 'pattern-c',
-									title: 'pattern hidden from UI',
-									inserter: false,
-									content:
-										'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
-								},
-							],
-						},
-					}
-				)
-			).toHaveLength( 0 );
+		it( 'should return empty array if only patterns hidden from UI exist', async () => {
+			const patterns =
+				select( store ).getSettings().__experimentalBlockPatterns!;
+
+			try {
+				await dispatch( store ).updateSettings( {
+					__experimentalBlockPatterns: patterns.filter(
+						( { inserter } ) => inserter === false
+					),
+				} );
+
+				expect(
+					select( store ).__experimentalGetAllowedPatterns( null )
+				).toHaveLength( 0 );
+			} finally {
+				await dispatch( store ).updateSettings( {
+					__experimentalBlockPatterns: patterns,
+				} );
+			}
 		} );
 	} );
 
