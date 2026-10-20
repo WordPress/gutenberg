@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Keep `wp-config.php` when a zip `core` source is downloaded again, as a git `core` source already does. A restart that reconfigures WordPress, such as `--xdebug` or a changed `.wp-env.json`, replaced the whole directory, so the site lost its configuration: multisite environments came back without their `MULTISITE` constants, and plugins that read a configured constant while loading failed before wp-env could set it again.
+
 ## 12.0.0 (2026-10-20)
 
 ### Breaking Changes

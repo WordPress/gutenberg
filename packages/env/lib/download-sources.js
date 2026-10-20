@@ -99,8 +99,12 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
  * @param {Function} options.onProgress A function called with download progress. Will be invoked with one argument: a number that ranges from 0 to 1 which indicates current download progress for this source.
  * @param {Object}   options.spinner    A CLI spinner which indicates progress.
  * @param {boolean}  options.debug      True if debug mode is enabled.
+ * @param {string[]} [options.preserve] Files in a previous download, relative to `source.path`, to keep in the new one.
  */
-async function downloadZipSource( source, { onProgress, spinner, debug } ) {
+async function downloadZipSource(
+	source,
+	{ onProgress, spinner, debug, preserve = [] }
+) {
 	const log = debug
 		? ( message ) => {
 				spinner.info( `NodeGit: ${ message }` );
@@ -126,6 +130,25 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 		tempDir,
 		/* overwrite */ true,
 		/* keepOriginalPermission */ false
+	);
+
+	// Read before the previous download is removed, to write back into the new one.
+	const preserved = await Promise.all(
+		preserve.map( async ( file ) => {
+			try {
+				return [
+					file,
+					await fs.promises.readFile(
+						path.join( source.path, file )
+					),
+				];
+			} catch ( error ) {
+				if ( error.code === 'ENOENT' ) {
+					return null;
+				}
+				throw error;
+			}
+		} )
 	);
 
 	const files = (
@@ -159,6 +182,17 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 	}
 	await fs.promises.rename( pluginContainer, source.path );
 	await rimraf( tempDir );
+
+	await Promise.all(
+		preserved
+			.filter( Boolean )
+			.map( ( [ file, contents ] ) =>
+				fs.promises.writeFile(
+					path.join( source.path, file ),
+					contents
+				)
+			)
+	);
 
 	onProgress( 1 );
 }
