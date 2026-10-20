@@ -169,7 +169,9 @@ jobs:
     # Presence: Each package with relevant changes needs a changelog note
     # citing this pull request.
     presence:
-        name: Check CHANGELOG presence (${{ matrix.package }})
+        # GitHub appends the package to each matrix job's name. A skipped job
+        # shows the name as written, so it must not use the `matrix` context.
+        name: Check CHANGELOG presence
         needs: changed-packages
         # A matrix with no values fails the run, so skip the job instead.
         if: ${{ needs.changed-packages.outputs.packages != '[]' }}
