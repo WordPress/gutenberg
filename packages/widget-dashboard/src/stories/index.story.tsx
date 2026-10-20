@@ -25,6 +25,7 @@ import type {
 	ResolveWidgetModule,
 	WidgetAction,
 	WidgetAttributeField,
+	WidgetFootprint,
 	WidgetHost,
 	WidgetRenderProps,
 	WidgetType,
@@ -1264,6 +1265,115 @@ The \`gridSettings\` prop carries the host's layout decisions, and the column po
 \`model\` picks the surface, and the per-model field follows it: \`rowHeight\` belongs to \`grid\`, \`flowTolerance\` to \`masonry\`. Only the active one is passed in \`gridSettings\`, and only its control is shown.
 
 Tile spans are stored per widget and do not scale with the count. Raise \`columns\` and every track narrows, so the same spans cover less of the surface. Enter Customize and resize a tile to see it take the new count.
+`,
+			},
+		},
+	},
+};
+
+// One tile per form, each stored at one column by one row, so the board
+// shows the floor each type lifts its tile to.
+const FOOTPRINT_FORMS: WidgetFootprint[] = [
+	'glance',
+	'strip',
+	'card',
+	'panel',
+];
+
+const FOOTPRINT_FLOORS: Record< WidgetFootprint, string > = {
+	glance: 'no floor',
+	strip: 'at least 440px wide',
+	card: 'at least 200 by 200px',
+	panel: 'at least 440 by 360px',
+};
+
+function FootprintBody( { form }: { form: WidgetFootprint } ) {
+	return <p>Stored at one by one. Floor: { FOOTPRINT_FLOORS[ form ] }.</p>;
+}
+
+const footprintWidgetTypes: WidgetType[] = [
+	{
+		apiVersion: 1,
+		name: 'demo/footprint-glance',
+		title: 'Glance',
+		renderModule: 'demo/footprint-glance/render',
+		footprint: 'glance',
+	},
+	{
+		apiVersion: 1,
+		name: 'demo/footprint-strip',
+		title: 'Strip',
+		renderModule: 'demo/footprint-strip/render',
+		footprint: 'strip',
+	},
+	{
+		apiVersion: 1,
+		name: 'demo/footprint-card',
+		title: 'Card',
+		renderModule: 'demo/footprint-card/render',
+		footprint: 'card',
+	},
+	{
+		apiVersion: 1,
+		name: 'demo/footprint-panel',
+		title: 'Panel',
+		renderModule: 'demo/footprint-panel/render',
+		footprint: 'panel',
+	},
+];
+
+const resolveFootprintModule: ResolveWidgetModule = async ( moduleId ) => {
+	const form =
+		FOOTPRINT_FORMS.find(
+			( candidate ) => moduleId === `demo/footprint-${ candidate }/render`
+		) ?? 'glance';
+	return { default: () => <FootprintBody form={ form } /> };
+};
+
+const FOOTPRINT_LAYOUT: DashboardWidget[] = footprintWidgetTypes.map(
+	( type, index ) => ( {
+		uuid: `footprint-${ index }`,
+		type: type.name,
+		placement: { width: 1, height: 1, order: index + 1 },
+	} )
+);
+
+function FootprintsStory() {
+	const [ layout, setLayout ] =
+		useState< DashboardWidget[] >( FOOTPRINT_LAYOUT );
+	const [ editMode, setEditMode ] = useState( false );
+
+	return (
+		<WidgetDashboard
+			widgetTypes={ footprintWidgetTypes }
+			layout={ layout }
+			onLayoutChange={ setLayout }
+			editMode={ editMode }
+			onEditChange={ setEditMode }
+			resolveWidgetModule={ resolveFootprintModule }
+			gridSettings={ { model: 'grid', columns: 4, rowHeight: 200 } }
+		>
+			<Page
+				title="Dashboard"
+				subTitle="Four columns of 200px rows: every tile is stored at one by one and renders at its floor."
+				actions={ <WidgetDashboard.Actions /> }
+				showSidebarToggle={ false }
+				hasPadding
+			>
+				<WidgetDashboard.Widgets />
+			</Page>
+		</WidgetDashboard>
+	);
+}
+
+export const Footprints: StoryObj = {
+	render: () => <FootprintsStory />,
+	parameters: {
+		controls: { include: [] },
+		docs: {
+			description: {
+				story: `
+Each widget type declares a \`footprint\`, and this host appraises it in pixels: \`strip\` at least 440px wide, \`card\` 200 by 200px, \`panel\` 440 by 360px, \`glance\` none. The surface quantizes the floor to whole tracks of the current geometry, so a tile stored at one by one renders at its floor, and in Customize a resize never commits below it. Narrow the canvas to watch the floors take more of the columns.
 `,
 			},
 		},
