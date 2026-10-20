@@ -123,8 +123,11 @@ function useGhostMaterialize(
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps(
-	props: UseBlockPropsProps = {},
+export function useBlockProps<
+	P extends UseBlockPropsProps = UseBlockPropsProps,
+>(
+	// Generic, so inline props of any element are not excess properties.
+	props: P | Record< string, never > = {},
 	{ __unstableIsHtml }: UseBlockPropsOptions = {}
 ): UseBlockPropsResult {
 	const {

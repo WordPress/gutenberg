@@ -89,9 +89,10 @@ export type BlockListWrapperProps = Record< string, unknown > & {
 };
 
 /**
- * Props passed to `useBlockProps`, merged into the returned props.
+ * Props passed to `useBlockProps`, merged into the returned props. Any props
+ * object is accepted, including typed element attributes.
  */
-export type UseBlockPropsProps = Record< string, unknown > & {
+export type UseBlockPropsProps = object & {
 	/** A falsy ref is ignored, and an object ref may start out `undefined`. */
 	ref?:
 		| Ref< HTMLElement >
