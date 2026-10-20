@@ -6,7 +6,7 @@ import {
 	TextControl,
 	RadioControl,
 } from '@wordpress/components';
-import { Tooltip } from '@wordpress/ui';
+import { Text } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useMemo } from '@wordpress/element';
@@ -116,52 +116,6 @@ export default function PostStatus() {
 		return null;
 	}
 
-	/*
-	 * A status change is an editorial decision, not a proposal: nothing in the
-	 * suggestion layer can hold it as pending or hand it to a reviewer. Rather
-	 * than let the control move the post through the workflow behind the
-	 * reviewer's back, show the current status and say where to change it.
-	 * `editPost` refuses the same field for the paths that don't go through
-	 * this control. See issue #73411 (F-15).
-	 */
-	if ( isSuggesting ) {
-		const suggestingHint = __(
-			'The post status cannot be suggested. Switch to Editing to change it.'
-		);
-		return (
-			<PostPanelRow label={ __( 'Status' ) }>
-				<Tooltip.Root>
-					<Tooltip.Trigger
-						render={
-							<Button
-								className="editor-post-status__toggle"
-								variant="tertiary"
-								size="compact"
-								icon={ postStatusesInfo[ status ]?.icon }
-								disabled
-								accessibleWhenDisabled
-								/*
-								 * `description` rather than `label`, which
-								 * doubles as the button's `aria-label` and
-								 * would replace the status with the reason as
-								 * its accessible name - leaving a screen
-								 * reader user told why the control is disabled
-								 * but never told what the status is. The
-								 * tooltip carries the reason to everyone else,
-								 * since tooltip popups are visual-only.
-								 */
-								description={ suggestingHint }
-							>
-								{ postStatusesInfo[ status ]?.label }
-							</Button>
-						}
-					/>
-					<Tooltip.Popup>{ suggestingHint }</Tooltip.Popup>
-				</Tooltip.Root>
-			</PostPanelRow>
-		);
-	}
-
 	const updatePost = ( {
 		status: newStatus = status,
 		password: newPassword = password,
@@ -222,87 +176,112 @@ export default function PostStatus() {
 							{ postStatusesInfo[ status ]?.label }
 						</Button>
 					) }
-					renderContent={ ( { onClose } ) => (
-						<>
-							<InspectorPopoverHeader
-								title={ __( 'Status & visibility' ) }
-								onClose={ onClose }
-							/>
-							<form
-								onSubmit={ ( event ) => {
-									event.preventDefault();
-									onClose();
-								} }
-							>
-								<VStack spacing={ 4 }>
-									<RadioControl
-										className="editor-change-status__options"
-										hideLabelFromVision
-										label={ __( 'Status' ) }
-										options={ STATUS_OPTIONS }
-										onChange={ handleStatus }
-										selected={
-											status === 'auto-draft'
-												? 'draft'
-												: status
-										}
-									/>
-									{ status === 'future' && (
-										<div className="editor-change-status__publish-date-wrapper">
-											<PrivatePostSchedule
-												showPopoverHeaderActions={
-													false
-												}
-												isCompact
-											/>
-										</div>
+					/*
+					 * A status change is an editorial decision the suggestion
+					 * layer can't hold as pending, so while suggesting the
+					 * popover says where to change it instead of offering the
+					 * controls. See issue #73411 (F-15).
+					 */
+					renderContent={ ( { onClose } ) =>
+						isSuggesting ? (
+							<>
+								<InspectorPopoverHeader
+									title={ __( 'Status & visibility' ) }
+									onClose={ onClose }
+								/>
+								<Text render={ <p /> }>
+									{ __(
+										'The post status cannot be suggested. Switch to Editing to change it.'
 									) }
-									{ status !== 'private' && (
-										<VStack
-											as="fieldset"
-											spacing={ 4 }
-											className="editor-change-status__password-fieldset"
-										>
-											<WCCheckboxControl
-												label={ __(
-													'Password protected'
+								</Text>
+							</>
+						) : (
+							<>
+								<InspectorPopoverHeader
+									title={ __( 'Status & visibility' ) }
+									onClose={ onClose }
+								/>
+								<form
+									onSubmit={ ( event ) => {
+										event.preventDefault();
+										onClose();
+									} }
+								>
+									<VStack spacing={ 4 }>
+										<RadioControl
+											className="editor-change-status__options"
+											hideLabelFromVision
+											label={ __( 'Status' ) }
+											options={ STATUS_OPTIONS }
+											onChange={ handleStatus }
+											selected={
+												status === 'auto-draft'
+													? 'draft'
+													: status
+											}
+										/>
+										{ status === 'future' && (
+											<div className="editor-change-status__publish-date-wrapper">
+												<PrivatePostSchedule
+													showPopoverHeaderActions={
+														false
+													}
+													isCompact
+												/>
+											</div>
+										) }
+										{ status !== 'private' && (
+											<VStack
+												as="fieldset"
+												spacing={ 4 }
+												className="editor-change-status__password-fieldset"
+											>
+												<WCCheckboxControl
+													label={ __(
+														'Password protected'
+													) }
+													help={ __(
+														'Only visible to those who know the password.'
+													) }
+													checked={ showPassword }
+													onChange={
+														handleTogglePassword
+													}
+												/>
+												{ showPassword && (
+													<div className="editor-change-status__password-input">
+														<TextControl
+															label={ __(
+																'Password'
+															) }
+															onChange={ (
+																value
+															) =>
+																updatePost( {
+																	password:
+																		value,
+																} )
+															}
+															value={ password }
+															placeholder={ __(
+																'Use a secure password'
+															) }
+															type="text"
+															id={
+																passwordInputId
+															}
+															maxLength={ 255 }
+														/>
+													</div>
 												) }
-												help={ __(
-													'Only visible to those who know the password.'
-												) }
-												checked={ showPassword }
-												onChange={
-													handleTogglePassword
-												}
-											/>
-											{ showPassword && (
-												<div className="editor-change-status__password-input">
-													<TextControl
-														label={ __(
-															'Password'
-														) }
-														onChange={ ( value ) =>
-															updatePost( {
-																password: value,
-															} )
-														}
-														value={ password }
-														placeholder={ __(
-															'Use a secure password'
-														) }
-														type="text"
-														id={ passwordInputId }
-														maxLength={ 255 }
-													/>
-												</div>
-											) }
-										</VStack>
-									) }
-									<PostSticky />
-								</VStack>
-							</form>
-						</>
-					) }
+											</VStack>
+										) }
+										<PostSticky />
+									</VStack>
+								</form>
+							</>
+						)
+					}
 				/>
 			) : (
 				<div className="editor-post-status is-read-only">

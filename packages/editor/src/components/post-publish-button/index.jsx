@@ -1,7 +1,11 @@
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	Dropdown,
+	__experimentalDropdownContentWrapper as DropdownContentWrapper,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { Tooltip } from '@wordpress/ui';
+import { Text } from '@wordpress/ui';
 import PublishButtonLabel from './label';
 import { store as editorStore } from '../../store';
 import { EDITOR_INTENT_SUGGEST } from '../../store/constants';
@@ -95,18 +99,6 @@ export function PostPublishButton( {
 	const createOnClick =
 		( callback ) =>
 		( ...args ) => {
-			/*
-			 * Both controls are disabled while the status change is withheld,
-			 * but they carry `aria-disabled` rather than `disabled`, so the
-			 * click still arrives here - ahead of the callbacks that check for
-			 * it. Stop at the seam: otherwise a dirty non-post entity sends a
-			 * control reporting `aria-disabled="true"` on to open the "Are you
-			 * ready to save?" dialog. See issue #73411 (F-15).
-			 */
-			if ( isPublishWithheld ) {
-				return noop;
-			}
-
 			// If a post with non-post entities is published, but the user
 			// elects to not save changes to the non-post entities, those
 			// entities will still be dirty when the Publish button is clicked.
@@ -140,15 +132,7 @@ export function PostPublishButton( {
 			return callback( ...args );
 		};
 
-	/*
-	 * `editPost` drops a withheld status, but the button doesn't stop at the
-	 * status edit: it calls `savePost()` right after, which would write the
-	 * post to the server while the pre-publish flow waits on a state change
-	 * that never comes. Disable the control rather than let it run half of
-	 * itself.
-	 */
 	const isButtonDisabled =
-		isPublishWithheld ||
 		isPostSavingLocked ||
 		// Disable while a non-post entity (e.g. a newly created term) is mid-save.
 		isSavingNonPostEntityChanges ||
@@ -158,7 +142,6 @@ export function PostPublishButton( {
 			! hasNonPostEntityChanges );
 
 	const isToggleDisabled =
-		isPublishWithheld ||
 		isPostSavingLocked ||
 		isSavingNonPostEntityChanges ||
 		( ( isPublished ||
@@ -203,37 +186,53 @@ export function PostPublishButton( {
 		'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 	};
 	const componentProps = isToggle ? toggleProps : buttonProps;
-	const withheldHint = __( 'Switch to Editing to change the post status.' );
-	const button = (
+
+	/*
+	 * `editPost` would drop the status, but `savePost()` would still write the
+	 * post to the server while the pre-publish flow waits on a status change
+	 * that never comes. Keep the button enabled so the reason is reachable on
+	 * click, by touch and assistive technology alike, and say where to change
+	 * the status instead of running either half.
+	 */
+	if ( isPublishWithheld ) {
+		return (
+			<Dropdown
+				popoverProps={ { placement: 'bottom-end' } }
+				renderToggle={ ( {
+					isOpen: isHintOpen,
+					onToggle: onToggleHint,
+				} ) => (
+					<Button
+						className={ `${ componentProps.className } editor-post-publish-button__button` }
+						variant="primary"
+						size="compact"
+						onClick={ onToggleHint }
+						aria-expanded={ isHintOpen }
+					>
+						<PublishButtonLabel />
+					</Button>
+				) }
+				renderContent={ () => (
+					<DropdownContentWrapper paddingSize="medium">
+						<Text render={ <p /> }>
+							{ __(
+								'Switch to Editing to change the post status.'
+							) }
+						</Text>
+					</DropdownContentWrapper>
+				) }
+			/>
+		);
+	}
+
+	return (
 		<Button
 			{ ...componentProps }
 			className={ `${ componentProps.className } editor-post-publish-button__button` }
 			size="compact"
-			/*
-			 * `description` rather than `label`, which doubles as the button's
-			 * `aria-label` and would replace the visible "Publish" / "Update"
-			 * text as its accessible name.
-			 */
-			description={ isPublishWithheld ? withheldHint : undefined }
 		>
 			<PublishButtonLabel />
 		</Button>
-	);
-
-	if ( ! isPublishWithheld ) {
-		return button;
-	}
-
-	/*
-	 * `description` carries the reason to assistive technology; the tooltip
-	 * carries it to everyone else. Tooltip popups are visual-only by design,
-	 * so neither channel covers for the other.
-	 */
-	return (
-		<Tooltip.Root>
-			<Tooltip.Trigger render={ button } />
-			<Tooltip.Popup>{ withheldHint }</Tooltip.Popup>
-		</Tooltip.Root>
 	);
 }
 
