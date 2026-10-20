@@ -8,12 +8,21 @@
 
 ### Enhancements
 
+-   List elements alongside blocks in one Blocks & Elements screen, grouped under Elements, Headings and Form controls, instead of splitting them between Typography and Colors ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Offer every element the background, dimensions, border, shadow and custom CSS controls that `theme.json` already accepts, instead of typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Preview an element as a sample of the markup it applies to, rendered with the site's own styles, so the preview reflects every panel rather than typography and color alone ([#81645](https://github.com/WordPress/gutenberg/pull/81645)).
+-   Show the selected state, such as hover, in the link and button element previews. For the states only links match, such as visited, the button sample is a link, like a Button block on the site ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
+-   Font Library: Use `Select` from `@wordpress/ui` for the pagination page selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   Remove the dot that marks blocks with user styles in the block list. The filter to show only those blocks stays ([#84657](https://github.com/WordPress/gutenberg/pull/84657)).
 -   Font Library: Mark installed font variants in font collections ([#84023](https://github.com/WordPress/gutenberg/pull/84023)).
 
 ### Bug Fixes
 
 -   Font Library: Load all installed font families, not only the first 10 ([#84684](https://github.com/WordPress/gutenberg/pull/84684)).
+
+### Internal
+
+-   Remove unused color preview, variation hook wrapper, and back-navigation wrapper ([#85093](https://github.com/WordPress/gutenberg/pull/85093)).
 
 ## 1.24.0 (2026-10-07)
 

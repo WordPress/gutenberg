@@ -1,34 +1,21 @@
 import type { CSSProperties } from 'react';
-import CONFIG from './config-values';
-
-export type HeadingSize =
-	1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6';
-
-export const BASE_FONT_SIZE = 13;
-
-export const PRESET_FONT_SIZES = {
-	body: BASE_FONT_SIZE,
-	caption: 10,
-	footnote: 11,
-	largeTitle: 28,
-	subheadline: 12,
-	title: 20,
-};
-
-export const HEADING_FONT_SIZES = [ 1, 2, 3, 4, 5, 6 ].flatMap( ( n ) => [
-	n as HeadingSize,
-	n.toString() as HeadingSize,
-] );
 
 export function getFontSize(
-	size:
-		| CSSProperties[ 'fontSize' ]
-		| keyof typeof PRESET_FONT_SIZES = BASE_FONT_SIZE
+	size: CSSProperties[ 'fontSize' ] = 'body'
 ): string {
-	if ( size in PRESET_FONT_SIZES ) {
-		return getFontSize(
-			PRESET_FONT_SIZES[ size as keyof typeof PRESET_FONT_SIZES ]
-		);
+	switch ( size ) {
+		case 'body':
+			return 'var(--wpds-typography-font-size-md)';
+		case 'footnote':
+			return 'var(--wpds-typography-font-size-xs)';
+		case 'subheadline':
+			return 'var(--wpds-typography-font-size-sm)';
+		case 'title':
+			return 'var(--wpds-typography-font-size-xl)';
+		case 'caption':
+			return '10px';
+		case 'largeTitle':
+			return '28px';
 	}
 
 	if ( typeof size !== 'number' ) {
@@ -39,15 +26,25 @@ export function getFontSize(
 		size = parsed;
 	}
 
-	const ratio = `(${ size } / ${ BASE_FONT_SIZE })`;
-	return `calc(${ ratio } * ${ CONFIG.fontSize })`;
+	return `${ size }px`;
 }
 
 export function getHeadingFontSize( size: number | string = 3 ): string {
-	if ( ! HEADING_FONT_SIZES.includes( size as HeadingSize ) ) {
-		return getFontSize( size );
+	// Preserve the legacy heading scale where no matching WPDS token exists.
+	switch ( String( size ) ) {
+		case '1':
+			return '31.72px';
+		case '2':
+			return '25.35px';
+		case '3':
+			return '20.28px';
+		case '4':
+			return '16.25px';
+		case '5':
+			return 'var(--wpds-typography-font-size-md)';
+		case '6':
+			return '10.4px';
+		default:
+			return getFontSize( size );
 	}
-
-	const headingSize = `fontSizeH${ size }` as `fontSizeH${ HeadingSize }`;
-	return CONFIG[ headingSize ];
 }

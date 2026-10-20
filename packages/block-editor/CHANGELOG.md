@@ -4,6 +4,7 @@
 
 ### Breaking Changes
 
+-   `FontFamilyControl`: Internal markup and CSS classes have changed; custom CSS overrides may need updates. Popup items render outside the control root, and custom `options[].style` applies only to the option label. See the pull request's dev note for migration details ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
 -   Date format and preset selectors now use `@wordpress/ui`. They no longer render `.components-custom-select-control` or its item and hint classes, the `has-hint` modifier, the legacy `.components-input-base`, `.components-input-control__container`, `.components-input-control__backdrop`, `.components-input-control__suffix`, and `.components-input-control-suffix-wrapper` classes, `.components-base-control__label`, or `.block-editor-date-format-picker__custom-format-select-control__custom-option`. Control-specific root classes are retained. Update overrides that target the removed classes to use control-specific hooks or Design System theme tokens. Popup items are now portaled outside the control root, so root-descendant selectors no longer reach them ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   `ImageSizeControl`: The event in the `onChangeImage` callback's `{ event }` argument now comes from popup selection rather than a native select change. Read the selected value from the `slug` argument rather than `event.target.value` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -15,6 +16,7 @@
 
 ### Enhancements
 
+-   Migrate `FontFamilyControl` to `@wordpress/ui` ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
 -   Migrate date format and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, forwarded trigger props, and control-specific root CSS hooks. Also migrate the date format switch, custom input, link, and layout, and simplify the aspect-ratio control's option rendering ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).
 -   Migrate HTML element, image size, resolution, aspect ratio, and text-shadow preset controls to `@wordpress/ui` `SelectControl` ([#84546](https://github.com/WordPress/gutenberg/pull/84546)).
@@ -38,6 +40,7 @@
 
 ### Internal
 
+-   Remove unused internal border-radius, block-support, state-selector, and object helpers ([#85092](https://github.com/WordPress/gutenberg/pull/85092)).
 -   Convert the remaining `utils` modules and the `state-utils` and `useCachedTruthy` hook helpers to TypeScript ([#84629](https://github.com/WordPress/gutenberg/pull/84629)).
 -   Convert the `private-keys`, `constants` and `array` store modules to TypeScript ([#84616](https://github.com/WordPress/gutenberg/pull/84616)).
 -   Convert the store reducer to TypeScript and add the store `State` and `Action` types ([#84624](https://github.com/WordPress/gutenberg/pull/84624)).
@@ -78,6 +81,8 @@
 -   Convert `WritingFlow` and its hooks to TypeScript ([#84918](https://github.com/WordPress/gutenberg/pull/84918)).
 -   Convert `Iframe`, `EditorStyles`, `NavigableToolbar`, `CopyHandler` and `BlockBreadcrumb` to TypeScript ([#84922](https://github.com/WordPress/gutenberg/pull/84922)).
 -   Convert `MediaPlaceholder` and `ImageEditor` to TypeScript ([#84923](https://github.com/WordPress/gutenberg/pull/84923)).
+-   Convert `useBlockDropZone` to TypeScript ([#84946](https://github.com/WordPress/gutenberg/pull/84946)).
+-   Convert `BlockManager`, `PublishDateTimePicker` and the fit text hook to TypeScript ([#84949](https://github.com/WordPress/gutenberg/pull/84949)).
 
 ## 18.1.0 (2026-10-07)
 

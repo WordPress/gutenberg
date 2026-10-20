@@ -8,6 +8,7 @@
 
 ### Enhancements
 
+-   DataViews: Use `Select` from `@wordpress/ui` for the pagination page selector and filter operator selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   Format footer item and selection counts with locale-specific separators ([#84622](https://github.com/WordPress/gutenberg/pull/84622)).
 -   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 
@@ -18,6 +19,8 @@
 
 ### Internal
 
+-   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
+-   Update `@testing-library/user-event` to 14.6.8 for DataViews tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Remove unused Emotion dependencies ([#85021](https://github.com/WordPress/gutenberg/pull/85021)).
 -   Update Base UI to 1.9.0 ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
