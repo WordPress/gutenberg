@@ -85,7 +85,7 @@ test.describe( 'Autosave failure notice', () => {
 			// WordPress version, so only its start is checked.
 			withDetails(
 				expect.stringMatching(
-					/^There has been a critical error on this website\.\nLearn more about troubleshooting WordPress\. \(https:\/\/wordpress\.org\/documentation\/article\/faq-troubleshooting\/\)\n\nUncaught Error: Call to undefined function gutenberg_test_autosave_undefined_function\(\) in .+\nStack trace:\n#0 /
+					/^Error code 500: There has been a critical error on this website\.\nLearn more about troubleshooting WordPress\. \(https:\/\/wordpress\.org\/documentation\/article\/faq-troubleshooting\/\)\n\nUncaught Error: Call to undefined function gutenberg_test_autosave_undefined_function\(\) in .+\nStack trace:\n#0 /
 				)
 			),
 		],
@@ -93,14 +93,14 @@ test.describe( 'Autosave failure notice', () => {
 			'database connection lost',
 			'database-connection-lost',
 			withDetails(
-				'Error establishing a database connection\n\nError 500'
+				'Error code 500: Error establishing a database connection'
 			),
 		],
 		[
 			'error message containing a link',
 			'link-in-message',
 			withDetails(
-				'Blocked. Learn more (https://example.com).\n\nError 403'
+				'Error code 403: Blocked. Learn more (https://example.com).'
 			),
 		],
 		// TODO: Retry right away.
@@ -114,13 +114,15 @@ test.describe( 'Autosave failure notice', () => {
 		[
 			'error with a plain text message',
 			'plain-message',
-			withDetails( 'Something went wrong on the server.\n\nError 500' ),
+			withDetails(
+				'Error code 500: Something went wrong on the server.'
+			),
 		],
 		[
 			'permission denied',
 			'permission',
 			withDetails(
-				'Sorry, you are not allowed to edit this post.\n\nError 403'
+				'Error code 403: Sorry, you are not allowed to edit this post.'
 			),
 		],
 		// The error's `data` is the database error, so there is no status in it.
@@ -129,11 +131,11 @@ test.describe( 'Autosave failure notice', () => {
 			'database-write',
 			withDetails( 'Could not update post in the database.' ),
 		],
-		[ 'HTML error page', 'bad-gateway', withDetails( 'Error 502' ) ],
+		[ 'HTML error page', 'bad-gateway', withDetails( 'Error code 502' ) ],
 		[
 			'too many requests',
 			'too-many-requests',
-			withDetails( 'Error 429' ),
+			withDetails( 'Error code 429' ),
 		],
 		// The error is printed before the headers, so the status stays 200.
 		// TODO: Show the PHP error the response includes in `data.error`.
@@ -157,7 +159,7 @@ test.describe( 'Autosave failure notice', () => {
 			'maintenance mode',
 			'maintenance',
 			withDetails(
-				'Briefly unavailable for scheduled maintenance. Check back in a minute.\n\nError 503'
+				'Error code 503: Briefly unavailable for scheduled maintenance. Check back in a minute.'
 			),
 		],
 		// TODO: Report the failure; the autosave fails without a notice.
@@ -212,7 +214,7 @@ test.describe( 'Autosave failure notice', () => {
 		await autosaveFailure.autosave();
 		// TODO: Say the session expired and offer to log in again.
 		expect( await autosaveFailure.getNotices() ).toEqual( [
-			withDetails( 'Cookie check failed\n\nError 403' ),
+			withDetails( 'Error code 403: Cookie check failed' ),
 		] );
 	} );
 

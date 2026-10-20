@@ -413,19 +413,29 @@ export const savePost =
 				// `data.error`, apart from the generic message WordPress shows.
 				const phpError = error.data?.error?.message;
 				const status = error.data?.status;
-				const details = [
+				const message =
 					error.message &&
 					! CLIENT_GENERATED_ERROR_CODES.includes( error.code )
 						? getFailureDetails( error.message )
-						: '',
-					typeof phpError === 'string' ? phpError.trim() : '',
-					Number.isInteger( status ) && status >= 400
+						: '';
+				let summary = message;
+				if ( Number.isInteger( status ) && status >= 400 ) {
+					summary = message
 						? sprintf(
-								/* translators: %d: HTTP status code, such as 500. */
-								__( 'Error %d' ),
-								status
+								/* translators: 1: HTTP status code, such as 500. 2: Error message. */
+								__( 'Error code %1$d: %2$s' ),
+								status,
+								message
 							)
-						: '',
+						: sprintf(
+								/* translators: %d: HTTP status code, such as 500. */
+								__( 'Error code %d' ),
+								status
+							);
+				}
+				const details = [
+					summary,
+					typeof phpError === 'string' ? phpError.trim() : '',
 				]
 					.filter( Boolean )
 					.join( '\n\n' );
