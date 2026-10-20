@@ -875,7 +875,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toEqual( [ 1, 2 ] );
 	} );
 
-	test( 'should select by dragging from outside the blocks', async ( {
+	test( 'should select the blocks the selection box touches when dragging from outside the blocks', async ( {
 		page,
 		editor,
 		multiBlockSelectionUtils,
@@ -915,7 +915,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2, 3 ] );
 
-		// Dragging back shrinks the selection.
+		// Shrinking the box shrinks the selection.
 		await paragraph2.hover( { position: { x: 1, y: 1 } } );
 		await page.mouse.up();
 
@@ -923,14 +923,14 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
 
-		// The selection runs from the start of the first paragraph to the
-		// start of the second one, as when dragging from text.
+		// Act on the selection, as with any other multi-selection.
 		await page.keyboard.press( 'Backspace' );
 
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{ name: 'core/paragraph', attributes: { content: '2' } },
-			{ name: 'core/paragraph', attributes: { content: '3' } },
-		] );
+		await expect
+			.poll( editor.getBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph', attributes: { content: '3' } },
+			] );
 	} );
 
 	test( 'should clear selection when clicking next to blocks', async ( {
