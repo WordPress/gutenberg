@@ -705,8 +705,8 @@ class Tests_Entity_Fields_API extends WP_UnitTestCase {
 	 */
 	public function test_the_core_collections_are_registered_at_priority_zero() {
 		$this->assertSame( 0, has_action( 'wp_entity_fields_api_init', 'gutenberg_register_core_field_collections' ) );
-		$this->assertFalse( function_exists( 'wp_register_core_field_collections' ), 'The Gutenberg build prefixes the function.' );
-		$this->assertFalse( function_exists( 'wp_register_core_post_type_supports_fields' ), 'The Gutenberg build prefixes the function.' );
+		// Core trunk ships the unprefixed functions too, so only check the prefixed one.
+		$this->assertTrue( function_exists( 'gutenberg_register_core_post_type_supports_fields' ), 'The Gutenberg build prefixes the function.' );
 	}
 
 	/**
