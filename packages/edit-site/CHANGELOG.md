@@ -12,6 +12,11 @@
 
 -   The pages, templates, and patterns lists and the Quick Edit form read their fields from the server, through the Entity fields API. Fields registered with `registerEntityField` from `@wordpress/editor` no longer show: register them on the server ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 
+### Bug Fixes
+
+-   Keep Quick edit popovers accessible after opening View options ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+-   Label the quick edit action as Bulk edit when multiple pages are selected ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+
 ## 7.6.0 (2026-10-07)
 
 ## 7.5.0 (2026-09-23)
