@@ -56,7 +56,9 @@ export const getBlockPropertiesDescription = (
  * appended to the row's accessible description, or undefined when the block
  * carries no pending suggestion.
  */
-export const getBlockSuggestionTreatment = ( suggestion ) => {
+export const getBlockSuggestionTreatment = (
+	suggestion?: { type?: unknown; [ key: string ]: unknown } | null
+) => {
 	switch ( suggestion?.type ) {
 		case 'pending-insert':
 			return {

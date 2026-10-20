@@ -1,6 +1,5 @@
 import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { pasteHandler } from '@wordpress/blocks';
@@ -342,7 +341,7 @@ export default function SuggestionAdditionKeyboard() {
 		) => {
 			const record = await createSuggestion( {
 				clientId,
-				blockName: getBlockName( clientId ),
+				blockName: getBlockName( clientId ) ?? '',
 				operations: [
 					{
 						type: INLINE_OP_TYPE,
@@ -495,7 +494,7 @@ export default function SuggestionAdditionKeyboard() {
 				 * write it once. A type-over is a single user gesture, so it
 				 * must occupy a single undo level.
 				 */
-				let value = attributes[ attributeKey ];
+				let value = attributes?.[ attributeKey ];
 				if ( isTypeOver ) {
 					const deleted = wrapSuggestionMarker( value, {
 						kind: 'del',
@@ -567,7 +566,7 @@ export default function SuggestionAdditionKeyboard() {
 			try {
 				await updateSuggestion( {
 					commentId: id,
-					blockName: getBlockName( clientId ),
+					blockName: getBlockName( clientId ) ?? '',
 					operations: [
 						{
 							type: INLINE_OP_TYPE,
@@ -931,7 +930,8 @@ export default function SuggestionAdditionKeyboard() {
 			 * point — but only once the caret resolved to a valid anchor;
 			 * otherwise let the editor's paste pipeline have it.
 			 */
-			const { clientId } = getSelectionStart();
+			// No block name without a selected block, so no embed either.
+			const clientId = getSelectionStart().clientId ?? '';
 			const embedBlocks = readEmbedPasteBlocks(
 				getBlockName( clientId ),
 				getBlockAttributes( clientId ),

@@ -13,7 +13,6 @@
 import { useSelect } from '@wordpress/data';
 import { RichTextData } from '@wordpress/rich-text';
 import type { RichTextValue } from '@wordpress/rich-text';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockTreeVersion } from './block-tree-version';
 import {

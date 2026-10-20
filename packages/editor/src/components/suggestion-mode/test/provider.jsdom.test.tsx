@@ -36,6 +36,16 @@ import { useSuggestionsProvider } from '../provider';
 import { getSuggestionsResolvedThisSession } from '../decision-state';
 import { SuggestionSessionProvider } from '../suggestion-session';
 
+// Attribute values are `unknown` in the store types; the tests read them
+// as the blocks define them.
+const attributesOf = ( registry: any, clientId: string ): any =>
+	registry.select( blockEditorStore ).getBlockAttributes( clientId );
+
+// Block metadata is `unknown` in the store types; read its marker.
+function blockMarkerOf( attributes: any ): Record< string, any > | undefined {
+	return attributes?.metadata?.suggestion;
+}
+
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
 vi.hoisted( () => {
@@ -873,7 +883,7 @@ describe( 'attribute proposals on the block marker', () => {
 	}
 
 	const attrs = ( registry: any, clientId: string ) =>
-		registry.select( blockEditorStore ).getBlockAttributes( clientId );
+		attributesOf( registry, clientId );
 
 	function levelPayload() {
 		return {
@@ -1158,9 +1168,7 @@ describe( 'rejectSuggestion (inline marker)', () => {
 			} );
 		} );
 
-		const content = registry
-			.select( blockEditorStore )
-			.getBlockAttributes( block.clientId )?.content;
+		const content = attributesOf( registry, block.clientId )?.content;
 		expect( content.toHTMLString() ).toBe( 'Hello ' );
 	} );
 
@@ -1170,10 +1178,10 @@ describe( 'rejectSuggestion (inline marker)', () => {
 		// while the comment stayed unresolved ('hold') — the suggestion
 		// silently vanished for every viewer but still counted as pending.
 		const { registry, block, getProvider } = setup( { failSave: true } );
-		const before = registry
-			.select( blockEditorStore )
-			.getBlockAttributes( block.clientId )
-			?.content.toHTMLString();
+		const before = attributesOf(
+			registry,
+			block.clientId
+		)?.content.toHTMLString();
 
 		await act( async () => {
 			await getProvider().rejectSuggestion( {
@@ -1183,9 +1191,7 @@ describe( 'rejectSuggestion (inline marker)', () => {
 			} );
 		} );
 
-		const content = registry
-			.select( blockEditorStore )
-			.getBlockAttributes( block.clientId )?.content;
+		const content = attributesOf( registry, block.clientId )?.content;
 		// The marker (and its proposed text) is restored.
 		expect( content.toHTMLString() ).toBe( before );
 		expect( content.toHTMLString() ).toContain( 'data-suggestion-id="9"' );
@@ -1755,8 +1761,8 @@ describe( 'grouped structural decisions (block replacement)', () => {
 		const blockEditor = registry.select( blockEditorStore );
 		// Neither half moved: the insertion keeps its pending treatment...
 		expect(
-			blockEditor.getBlockAttributes( inserted.clientId )?.metadata
-				?.suggestion?.type
+			blockMarkerOf( blockEditor.getBlockAttributes( inserted.clientId ) )
+				?.type
 		).toBe( 'pending-insert' );
 		// ...and the removal was never attempted, so the block is still
 		// there for the user to decide on again.
@@ -1887,10 +1893,7 @@ describe( 'review decisions and undo history', () => {
 
 		// The proposed text is committed...
 		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( block.clientId )
-				?.content.toHTMLString()
+			attributesOf( registry, block.clientId )?.content.toHTMLString()
 		).toBe( 'Hello world' );
 		/*
 		 * ...as a PERSISTENT change. Hiding the decision from undo also hides
@@ -1919,10 +1922,7 @@ describe( 'review decisions and undo history', () => {
 		} );
 
 		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( block.clientId )
-				?.content.toHTMLString()
+			attributesOf( registry, block.clientId )?.content.toHTMLString()
 		).toBe( 'Hello ' );
 		expect(
 			registry
@@ -2028,11 +2028,10 @@ describe( 'withdrawn suggestions and failed applies', () => {
 			} );
 		} );
 
-		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( block.clientId )?.metadata
-		).toEqual( { name: 'Intro', noteId: [ 3 ] } );
+		expect( attributesOf( registry, block.clientId )?.metadata ).toEqual( {
+			name: 'Intro',
+			noteId: [ 3 ],
+		} );
 	} );
 
 	it( 'drops empty metadata when the withdrawn note was its only content', async () => {
@@ -2050,9 +2049,7 @@ describe( 'withdrawn suggestions and failed applies', () => {
 		} );
 
 		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( block.clientId )?.metadata
+			attributesOf( registry, block.clientId )?.metadata
 		).toBeUndefined();
 	} );
 
@@ -2094,11 +2091,9 @@ describe( 'withdrawn suggestions and failed applies', () => {
 
 		// The block rolls back and the proposal is still pending, so the
 		// marker must survive for a retry.
-		const attributes = registry
-			.select( blockEditorStore )
-			.getBlockAttributes( block.clientId );
+		const attributes = attributesOf( registry, block.clientId );
 		expect( attributes?.align ).toBeUndefined();
-		expect( attributes?.metadata?.suggestion?.after ).toEqual( {
+		expect( blockMarkerOf( attributes )?.after ).toEqual( {
 			align: 'center',
 		} );
 	} );
@@ -2150,9 +2145,10 @@ describe( 'decisions record a provisional status first', () => {
 						( kind: any, name: any, record: any ) => async () => {
 							saves.push( {
 								record,
-								attributes: registry
-									.select( blockEditorStore )
-									.getBlockAttributes( block.clientId ),
+								attributes: attributesOf(
+									registry,
+									block.clientId
+								),
 							} );
 							if ( failSave ) {
 								throw new Error( 'save failed' );
@@ -2186,10 +2182,7 @@ describe( 'decisions record a provisional status first', () => {
 			registry,
 			saves,
 			getProvider: () => providerHandle,
-			attributes: () =>
-				registry
-					.select( blockEditorStore )
-					.getBlockAttributes( block.clientId ),
+			attributes: () => attributesOf( registry, block.clientId ),
 		};
 	}
 

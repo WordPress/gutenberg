@@ -666,7 +666,7 @@ export function pickPrimaryNote( threads ) {
  *
  * @param {Object|undefined} metadata Existing block metadata
  * @param {number}           noteId   Note ID to remove
- * @return {Object} Updated metadata object
+ * @return {Record<string, any>} Updated metadata object
  */
 export function removeNoteIdFromMetadata( metadata, noteId ) {
 	const ids = new Set( getNoteIdsFromMetadata( metadata ) );

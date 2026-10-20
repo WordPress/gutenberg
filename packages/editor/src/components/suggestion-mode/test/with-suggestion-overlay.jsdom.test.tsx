@@ -42,6 +42,11 @@ import {
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+// Attribute values are `unknown` in the store types; the tests read them
+// as the blocks define them.
+const attributesOf = ( registry: any, clientId: string ): any =>
+	registry.select( blockEditorStore ).getBlockAttributes( clientId );
+
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
 vi.hoisted( () => {
@@ -182,8 +187,7 @@ function Connected( {
 }
 
 const markerOf = ( registry: any, clientId: string ) =>
-	registry.select( blockEditorStore ).getBlockAttributes( clientId )?.metadata
-		?.suggestion;
+	attributesOf( registry, clientId )?.metadata?.suggestion;
 
 describe( 'withSuggestionOverlay', () => {
 	it( 'passes through unchanged in Edit intent', () => {
@@ -227,11 +231,7 @@ describe( 'withSuggestionOverlay', () => {
 			authorId: null,
 			after: { level: 3 },
 		} );
-		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( block.clientId ).level
-		).toBe( 2 );
+		expect( attributesOf( registry, block.clientId ).level ).toBe( 2 );
 		// The block renders the proposal.
 		expect( screen.getByTestId( 'level' ) ).toHaveTextContent( '3' );
 	} );

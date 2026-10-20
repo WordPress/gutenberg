@@ -25,6 +25,11 @@ import { isRecentRedo } from '../decision-state';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
 
+// Block metadata is `unknown` in the store types; read its marker.
+function blockMarkerOf( attributes: any ): Record< string, any > | undefined {
+	return attributes?.metadata?.suggestion;
+}
+
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
 vi.hoisted( () => {
@@ -393,10 +398,11 @@ describe( 'SuggestionUndoGuard', () => {
 		// The real undo ran (and armed an adoption); the move stays pending.
 		expect( overlay.current.consumeUndoRedoAdoption() ).toBe( true );
 		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( block.clientId )?.metadata?.suggestion
-				?.type
+			blockMarkerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( block.clientId )
+			)?.type
 		).toBe( 'pending-move' );
 	} );
 } );
