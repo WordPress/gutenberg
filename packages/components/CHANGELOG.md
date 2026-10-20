@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `RadioControl`: Replace the `components-base-control__help` class on group help text with `components-radio-control__help`. Update CSS selectors targeting this help text to use the new class ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
+-   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
 -   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers using `@emotion/react` or `@emotion/styled` that relied on StyleProvider's cross-document cache must provide their own cache targeting that document's `<head>` and wrap the subtree in `CacheProvider`; `StyleProvider` continues to register CSS Module styles. Components no longer supply Framer Motion's optional Emotion DOM prop validator; without a validator, `__unstableMotion` forwards non-animation props to the rendered element. This includes:
     -   Context-system class-name composition ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
     -   `StyleProvider` cache removal ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
