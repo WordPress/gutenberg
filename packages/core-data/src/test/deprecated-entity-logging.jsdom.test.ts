@@ -48,9 +48,9 @@ function getExpectedDeprecationArgs(
  * It means the tests in this file are integration rather than unit tests, so they're kept
  * separate from the selector.js/reducer.js tests.
  *
- * @return {Object} Registry with core-data store registered.
+ * @return Registry with core-data store registered.
  */
-function createTestRegistry() {
+function createTestRegistry(): ReturnType< typeof createRegistry > {
 	const registry = createRegistry();
 
 	// Register the core-data store
