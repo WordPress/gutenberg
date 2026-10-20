@@ -326,7 +326,8 @@ export function useEventHandlers( {
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
 					// Rich text carries a drag of the text selected in a field.
-					if ( ! event.dataTransfer.types.includes( 'rich-text' ) ) {
+					// Drag events from the browser carry a data transfer.
+					if ( ! event.dataTransfer!.types.includes( 'rich-text' ) ) {
 						event.preventDefault();
 					}
 					return;
