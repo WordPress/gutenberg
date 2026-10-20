@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Media & Text: Restore the content area's default padding in classic themes whose CSS reset sets `padding: 0` on `div`, which overrode it on the front end since the padding's specificity was lowered. Theme overrides keep working ([#PR_NUMBER](https://github.com/WordPress/gutenberg/pull/PR_NUMBER)).
+
 ## 12.0.0 (2026-10-20)
 
 ### Breaking Changes
