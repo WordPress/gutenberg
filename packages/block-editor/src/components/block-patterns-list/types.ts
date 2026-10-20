@@ -15,14 +15,16 @@ export interface BlockPatternsListPattern extends Pick<
 	viewportWidth?: number;
 }
 
-export type OnClickPattern = (
-	pattern: BlockPatternsListPattern,
-	blocks: Block[]
-) => void;
+/**
+ * The callbacks receive the pattern objects the list was given.
+ */
+export type OnClickPattern<
+	P extends BlockPatternsListPattern = BlockPatternsListPattern,
+> = ( pattern: P, blocks: Block[] ) => void;
 
-export type OnHoverPattern = (
-	pattern: BlockPatternsListPattern | null
-) => void;
+export type OnHoverPattern<
+	P extends BlockPatternsListPattern = BlockPatternsListPattern,
+> = ( pattern: P | null ) => void;
 
 export interface WithToolTipProps {
 	showTooltip?: boolean;
@@ -30,22 +32,26 @@ export interface WithToolTipProps {
 	children: ReactElement< Record< string, unknown > >;
 }
 
-export interface BlockPatternProps {
+export interface BlockPatternProps<
+	P extends BlockPatternsListPattern = BlockPatternsListPattern,
+> {
 	id: string;
 	isDraggable?: boolean;
-	pattern: BlockPatternsListPattern;
-	onClick: OnClickPattern;
-	onHover?: OnHoverPattern;
+	pattern: P;
+	onClick: OnClickPattern< P >;
+	onHover?: OnHoverPattern< P >;
 	showTitlesAsTooltip?: boolean;
 	category?: string;
 	isSelected?: boolean;
 }
 
-export interface BlockPatternsListProps {
+export interface BlockPatternsListProps<
+	P extends BlockPatternsListPattern = BlockPatternsListPattern,
+> {
 	isDraggable?: boolean;
-	blockPatterns: BlockPatternsListPattern[];
-	onHover?: OnHoverPattern;
-	onClickPattern: OnClickPattern;
+	blockPatterns: Array< P >;
+	onHover?: OnHoverPattern< P >;
+	onClickPattern: OnClickPattern< P >;
 	orientation?: 'horizontal' | 'vertical' | 'both';
 	category?: string;
 	label?: string;
