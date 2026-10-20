@@ -15,7 +15,7 @@ import type * as ET from '../entity-types';
 import type { EntityActionsConfig, FieldsConfig } from '../private-selectors';
 import type { Action, EntitiesState, EntityConfig } from '../types';
 
-type DeepPartial< T > = T extends ( ...args: never[] ) => unknown
+type DeepPartial< T > = T extends ( ...args: Array< never > ) => unknown
 	? T
 	: T extends object
 		? { [ K in keyof T ]?: DeepPartial< T[ K ] > }
