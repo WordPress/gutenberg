@@ -131,7 +131,7 @@ describe( 'PostPublishButton', () => {
 			);
 		} );
 
-		it( 'should be true while suggesting', () => {
+		it( 'should be false while suggesting', () => {
 			mockHasPublishAction( true );
 			mockSelector( 'isEditedPostPublishable', true );
 			mockSelector( 'isEditedPostSaveable', true );
@@ -139,13 +139,14 @@ describe( 'PostPublishButton', () => {
 
 			render( <PostPublishButton /> );
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			// The click opens the reason, so the control stays operable.
+			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
 				'aria-disabled',
 				'true'
 			);
 		} );
 
-		it( 'should be true for the toggle while suggesting', () => {
+		it( 'should be false for the toggle while suggesting', () => {
 			mockHasPublishAction( true );
 			mockSelector( 'isEditedPostPublishable', true );
 			mockSelector( 'isEditedPostSaveable', true );
@@ -153,7 +154,8 @@ describe( 'PostPublishButton', () => {
 
 			render( <PostPublishButton isToggle /> );
 
-			expect( screen.getByRole( 'button' ) ).toHaveAttribute(
+			// The click opens the reason, so the control stays operable.
+			expect( screen.getByRole( 'button' ) ).not.toHaveAttribute(
 				'aria-disabled',
 				'true'
 			);
@@ -197,12 +199,8 @@ describe( 'PostPublishButton', () => {
 
 			await user.click( screen.getByRole( 'button' ) );
 
-			/*
-			 * The button is `aria-disabled`, not `disabled`, so the click still
-			 * reaches its handler. A dirty non-post entity used to send it past
-			 * the disabled check and straight into the "Are you ready to save?"
-			 * dialog.
-			 */
+			// A dirty non-post entity would otherwise send the click straight
+			// into the "Are you ready to save?" dialog.
 			expect( setEntitiesSavedStatesCallback ).not.toHaveBeenCalled();
 			expect( dispatch( editorStore ).savePost ).not.toHaveBeenCalled();
 		} );
@@ -220,7 +218,8 @@ describe( 'PostPublishButton', () => {
 			).toBeVisible();
 		} );
 
-		it( 'should say why it is disabled', () => {
+		it( 'should say where to change the status when clicked', async () => {
+			const user = userEvent.setup();
 			mockHasPublishAction( true );
 			mockSelector( 'isEditedPostPublishable', true );
 			mockSelector( 'isEditedPostSaveable', true );
@@ -228,13 +227,19 @@ describe( 'PostPublishButton', () => {
 
 			render( <PostPublishButton /> );
 
-			// Tooltip popups are visual-only, so the reason has to reach
-			// assistive technology through the button's description.
+			// The reason opens on click rather than in a tooltip, so it is
+			// reachable by touch and assistive technology alike.
+			const button = screen.getByRole( 'button', { name: 'Publish' } );
+			expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
+
+			await user.click( button );
+
+			expect( button ).toHaveAttribute( 'aria-expanded', 'true' );
 			expect(
-				screen.getByRole( 'button', { name: 'Publish' } )
-			).toHaveAccessibleDescription(
-				'Switch to Editing to change the post status.'
-			);
+				screen.getByText(
+					'Switch to Editing to change the post status.'
+				)
+			).toBeVisible();
 		} );
 
 		it( 'should stay enabled when the click would only save', () => {
