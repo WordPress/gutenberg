@@ -8,7 +8,6 @@
  */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { speak } from '@wordpress/a11y';
@@ -787,7 +786,9 @@ export function useSuggestionDecisions() {
 			const liveIds = selectClientIdsWithDescendants?.() ?? [];
 			for ( const id of liveIds ) {
 				const metadata = selectBlockAttributes( id )?.metadata;
-				if ( metadata?.suggestion?.groupId !== groupId ) {
+				const marker = metadata?.suggestion as
+					{ groupId?: string } | undefined;
+				if ( marker?.groupId !== groupId ) {
 					continue;
 				}
 				for ( const noteId of getNoteIdsFromMetadata( metadata ) ) {

@@ -3,7 +3,6 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
-	// @ts-expect-error No exported types
 } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import { removeNoteIdFromMetadata } from '../collab-sidebar/utils';

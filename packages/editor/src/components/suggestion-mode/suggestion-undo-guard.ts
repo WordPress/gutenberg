@@ -55,7 +55,6 @@
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { nextCaptureSeq, useSuggestionSession } from './suggestion-session';
 import type { StructuralCapture } from './suggestion-session';

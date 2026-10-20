@@ -2,7 +2,6 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-// @ts-expect-error No exported types
 import { useStyleOverride } from '@wordpress/block-editor';
 import {
 	SUGGESTION_TYPE_ADDITION,
