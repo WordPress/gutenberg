@@ -35,6 +35,7 @@
 		"esbuild": "^0.27.2",
 		"glob": "^13.0.6",
 		"jsonc-parser": "^3.3.1",
+		"knip": "^6.42.0",
 		"simple-git": "^4.0.2",
 		"vitest": "^5.0.3"
 	},
@@ -49,6 +50,7 @@
 		"check-local-changes": "node ./check-local-changes.cjs",
 		"check-peer-dependencies": "node ./check-peer-dependencies.ts",
 		"check-root-dependencies": "node ./check-root-dependencies.mjs",
+		"knip": "knip --directory ../..",
 		"test-create-block": "node ./test-create-block.mjs",
 		"validate-package-lock": "node ./validate-package-lock.cjs",
 		"validate-tsconfig": "node ./validate-tsconfig.mjs",

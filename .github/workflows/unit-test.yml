@@ -57,7 +57,7 @@ jobs:
                           - '!{backport-changelog,docs,storybook}/**'
                           # Development tooling and its configuration.
                           - '!tools/{docs,eslint,stylelint}/**'
-                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          - '!{eslint,knip,lint-staged,prettier,syncpack}.config*'
                           # Repository metadata.
                           - '!{changelog,readme}.txt'
                           - '!.{editorconfig,gitignore,prettierrc*,stylelintrc*}'

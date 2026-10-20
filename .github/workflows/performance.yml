@@ -62,7 +62,7 @@ jobs:
                           # The mu-plugins and plugins below it load at run time, so they still count.
                           - '!packages/e2e-tests/{*,!(mu-plugins|plugins)/**}'
                           - '!tools/{docs,eslint,monorepo,project-management-automation,stylelint,validation}/**'
-                          - '!{eslint,lint-staged,prettier,syncpack}.config*'
+                          - '!{eslint,knip,lint-staged,prettier,syncpack}.config*'
                           - '!{phpcs,phpunit}*'
                           # Repository metadata.
                           - '!{changelog,readme}.txt'

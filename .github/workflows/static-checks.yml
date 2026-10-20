@@ -87,6 +87,9 @@ jobs:
             - name: Lint dependency versions across workspaces
               run: npm run lint:deps
 
+            - name: Lint unused files, dependencies, and exports
+              run: npm run lint:unused
+
             - name: Check peer dependencies of published packages
               run: npm run lint:peer-deps
 
