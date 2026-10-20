@@ -53,10 +53,11 @@ function withRenderableIcons(
 type WidgetAttributes = NonNullable< WidgetType[ 'attributes' ] >;
 
 /*
- * Record entries lead, each completed by the module entry sharing its `id`
- * (the record wins a shared key); module-only entries follow. `isValid`
- * merges rule by rule, so the record's serializable rules keep the
- * module's `custom` validator.
+ * Module entries keep their position, each completed by the record entry
+ * sharing its `id` (the record wins a shared key); new record-only
+ * entries are appended after the module's list. `isValid` merges rule by
+ * rule, so the record's serializable rules keep the module's `custom`
+ * validator.
  */
 function mergeAttributes(
 	recordAttributes: WidgetAttributeRecord[] | null | undefined,
@@ -69,30 +70,37 @@ function mergeAttributes(
 		return recordAttributes as WidgetAttributes;
 	}
 
-	const moduleById = new Map(
-		moduleAttributes.map(
+	const recordById = new Map(
+		recordAttributes.map(
 			( attribute ) => [ attribute.id, attribute ] as const
 		)
 	);
-	const recordIds = new Set(
-		recordAttributes.map( ( attribute ) => attribute.id )
+	const moduleIds = new Set(
+		moduleAttributes.map( ( attribute ) => attribute.id )
 	);
 
 	return [
-		...recordAttributes.map( ( attribute ) => {
-			const moduleAttribute = moduleById.get( attribute.id );
-			if ( ! moduleAttribute?.isValid || ! attribute.isValid ) {
-				return { ...moduleAttribute, ...attribute };
+		...moduleAttributes.map( ( moduleAttribute ) => {
+			const recordAttribute = recordById.get( moduleAttribute.id );
+			if ( ! recordAttribute ) {
+				return moduleAttribute;
+			}
+
+			if ( ! moduleAttribute.isValid || ! recordAttribute.isValid ) {
+				return { ...moduleAttribute, ...recordAttribute };
 			}
 
 			return {
 				...moduleAttribute,
-				...attribute,
-				isValid: { ...moduleAttribute.isValid, ...attribute.isValid },
+				...recordAttribute,
+				isValid: {
+					...moduleAttribute.isValid,
+					...recordAttribute.isValid,
+				},
 			};
 		} ),
-		...moduleAttributes.filter(
-			( attribute ) => ! recordIds.has( attribute.id )
+		...recordAttributes.filter(
+			( attribute ) => ! moduleIds.has( attribute.id )
 		),
 	] as WidgetAttributes;
 }
