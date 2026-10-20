@@ -1,0 +1,52 @@
+@layer wp-ui {
+	@layer utilities, components, compositions, overrides;
+
+	@layer components {
+		.root {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			flex-shrink: 0;
+			width: var(--wpds-dimension-size-2xs);
+			height: var(--wpds-dimension-size-2xs);
+			border:
+				var(--wpds-border-width-xs) solid
+				var(--wpds-color-stroke-interactive-neutral);
+			background-color: var(--wpds-color-background-interactive-neutral-weak);
+		}
+
+		.checkbox {
+			border-radius: min(var(--wpds-border-radius-sm), 2px);
+		}
+
+		.radio {
+			border-radius: 50%;
+		}
+
+		.icon {
+			flex-shrink: 0;
+		}
+
+		.checked {
+			border-color: transparent;
+			background-color: var(--wpds-color-background-interactive-brand-strong);
+			color: var(--wpds-color-foreground-interactive-brand-strong);
+
+			@media (forced-colors: active) {
+				border-color: Highlight;
+				color: Highlight;
+			}
+		}
+
+		.disc {
+			width: calc(var(--wpds-dimension-size-2xs) / 2);
+			height: calc(var(--wpds-dimension-size-2xs) / 2);
+			border-radius: 50%;
+			background-color: currentColor;
+
+			@media (forced-colors: active) {
+				border: 4px solid currentColor;
+			}
+		}
+	}
+}

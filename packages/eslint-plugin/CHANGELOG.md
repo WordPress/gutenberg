@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `use-recommended-components`: Recommend `SelectionIndicator` from `@wordpress/ui`.
+
 ## 28.0.0 (2026-10-20)
 
 ### Breaking Changes

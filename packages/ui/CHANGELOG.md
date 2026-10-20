@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add a presentational `SelectionIndicator` for checkbox and radio selection marks.
+
 ## 0.25.0 (2026-10-20)
 
 ### Breaking Changes

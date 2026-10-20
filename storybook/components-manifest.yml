@@ -1793,6 +1793,13 @@
             - render
             - size
             - style
+- name: SelectionIndicator
+  props:
+      - checked
+      - className
+      - render
+      - style
+      - type
 - name: Shortcut
   props:
       - className

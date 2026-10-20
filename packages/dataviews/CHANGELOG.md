@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Simplify filter selection indicators and remove their hover colors.
+
 ## 21.0.0 (2026-10-20)
 
 ### Breaking Changes

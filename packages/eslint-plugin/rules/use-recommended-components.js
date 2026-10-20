@@ -48,6 +48,7 @@ const ALLOWLIST = {
 			'SearchableChipSelectControl',
 			'Select',
 			'SelectControl',
+			'SelectionIndicator',
 			'Skeleton',
 			'Spinner',
 			'Stack',
