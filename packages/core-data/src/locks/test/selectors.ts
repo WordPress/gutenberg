@@ -466,7 +466,7 @@ function appendLock(
 	);
 }
 
-function buildState( paths: LockPath[] ): LocksState {
+function buildState( paths: Array< LockPath > ): LocksState {
 	return {
 		requests: [],
 		tree: paths.reduce< LockNode >(

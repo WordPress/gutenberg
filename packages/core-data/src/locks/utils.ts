@@ -62,7 +62,7 @@ export function* iterateDescendants( node: LockNode ): Generator< LockNode > {
 
 export function hasConflictingLock(
 	{ exclusive }: { exclusive: boolean },
-	locks: Lock[]
+	locks: Array< Lock >
 ): boolean {
 	if ( exclusive && locks.length ) {
 		return true;

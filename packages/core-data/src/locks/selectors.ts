@@ -6,7 +6,9 @@ import {
 } from './utils';
 import type { LockPath, LockRequest, LocksState } from './types';
 
-export function getPendingLockRequests( state: LocksState ): LockRequest[] {
+export function getPendingLockRequests(
+	state: LocksState
+): Array< LockRequest > {
 	return state.requests;
 }
 

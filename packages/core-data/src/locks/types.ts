@@ -23,7 +23,7 @@ export interface LockRequest extends Lock {
  * A node of the locks tree, holding the locks on its path.
  */
 export interface LockNode {
-	locks: Lock[];
+	locks: Array< Lock >;
 	children: Record< string, LockNode >;
 }
 
@@ -31,7 +31,7 @@ export interface LockNode {
  * The locks state.
  */
 export interface LocksState {
-	requests: LockRequest[];
+	requests: Array< LockRequest >;
 	tree: LockNode;
 }
 
