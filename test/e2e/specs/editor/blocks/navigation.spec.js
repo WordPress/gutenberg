@@ -598,6 +598,52 @@ test.describe( 'Navigation block', () => {
 			await expect( navigation.getNavBlockInserter() ).toBeFocused();
 		} );
 
+		test( 'keeps the label formatting when editing the sidebar Text field', async ( {
+			page,
+			editor,
+			requestUtils,
+		} ) => {
+			const createdMenu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					'<!-- wp:navigation-link {"label":"\\u003cstrong\\u003eShop\\u003c/strong\\u003e now","url":"https://example.com"} /-->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: createdMenu?.id },
+			} );
+
+			const linkLabel = editor.canvas.getByRole( 'textbox', {
+				name: 'Navigation link text',
+			} );
+			await linkLabel.click();
+			await editor.openDocumentSettingsSidebar();
+
+			const textInput = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Text' } );
+			await expect( textInput ).toHaveValue( 'Shop now' );
+
+			// Editing the plain text leaves the untouched bold text bold.
+			await textInput.fill( 'Shop later' );
+			await expect( linkLabel ).toHaveText( 'Shop later' );
+			await expect( linkLabel.locator( 'strong' ) ).toHaveText( 'Shop' );
+			const clientId = await editor.canvas
+				.locator( '[data-type="core/navigation-link"]' )
+				.getAttribute( 'data-block' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						( id ) =>
+							window.wp.data
+								.select( 'core/block-editor' )
+								.getBlockAttributes( id ).label,
+						clientId
+					)
+				)
+				.toBe( '<strong>Shop</strong> later' );
+		} );
+
 		test( 'should preserve focus in sidebar text input when typing (@firefox)', async ( {
 			page,
 			editor,
