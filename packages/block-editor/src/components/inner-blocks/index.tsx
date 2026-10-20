@@ -217,8 +217,11 @@ const ForwardedInnerBlocks = forwardRef< HTMLElement, InnerBlocksOptions >(
  *                         the ref if one is defined.
  * @param {Object} options Optional. Inner blocks options.
  */
-export function useInnerBlocksProps(
-	props: UseInnerBlocksPropsProps = {},
+export function useInnerBlocksProps<
+	P extends UseInnerBlocksPropsProps = UseInnerBlocksPropsProps,
+>(
+	// Generic, so inline props of any element are not excess properties.
+	props: P | Record< string, never > = {},
 	options: InnerBlocksOptions = {}
 ): UseInnerBlocksPropsResult {
 	const {
