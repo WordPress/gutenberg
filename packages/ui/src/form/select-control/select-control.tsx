@@ -32,7 +32,7 @@ export const SelectControl = forwardRef<
 	ref
 ) {
 	if ( process.env.NODE_ENV !== 'production' ) {
-		warnSelectControlProps( items );
+		warnSelectControlProps( items, restProps.itemToStringValue );
 	}
 
 	const triggerElement = useRender( {

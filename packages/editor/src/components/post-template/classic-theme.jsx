@@ -14,7 +14,7 @@ import PostPanelRow from '../post-panel-row';
 
 // The default template is stored as an empty string, but the select treats an
 // empty value as no selection and shows its placeholder.
-const DEFAULT_TEMPLATE_VALUE = '__default';
+const DEFAULT_TEMPLATE_VALUE = '//default';
 
 function PostTemplateToggle( { isOpen, onClick } ) {
 	const templateTitle = useSelect( ( select ) => {
@@ -126,10 +126,9 @@ function PostTemplateDropdownContent( { onClose } ) {
 		[ availableTemplates, fetchedTemplates ]
 	);
 
-	const selectedOption = options.find(
-		( option ) =>
-			option.value === ( selectedTemplateSlug || DEFAULT_TEMPLATE_VALUE )
-	);
+	const selectedOption =
+		options.find( ( option ) => option.value === selectedTemplateSlug ) ??
+		options.find( ( option ) => option.value === DEFAULT_TEMPLATE_VALUE );
 
 	const { editPost } = useDispatch( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );

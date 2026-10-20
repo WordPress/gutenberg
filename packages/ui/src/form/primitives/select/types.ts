@@ -118,6 +118,11 @@ export type SelectItemProps = Omit<
 > & {
 	/**
 	 * A unique value that identifies this select item.
+	 *
+	 * An item with an empty string value counts as no selection, so the
+	 * trigger shows the placeholder when it is selected. Use `null` for an
+	 * option that means no value, or a non-empty value for an option that is
+	 * a choice of its own (like "Default").
 	 */
 	value?: unknown;
 	/**
