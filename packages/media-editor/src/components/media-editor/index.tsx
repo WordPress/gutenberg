@@ -4,7 +4,7 @@ import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
-	Spinner,
+	Spinner as WCSpinner,
 	__experimentalConfirmDialog as ConfirmDialog,
 } from '@wordpress/components';
 import { Stack, Tabs, VisuallyHidden } from '@wordpress/ui';
@@ -37,7 +37,7 @@ import {
 	isKeyboardEvent,
 } from '@wordpress/keycodes';
 import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
-import type { Field } from '@wordpress/dataviews';
+import type { Field, Form } from '@wordpress/dataviews';
 import type {
 	KeyboardEvent as ReactKeyboardEvent,
 	ReactElement,
@@ -116,6 +116,7 @@ export interface MediaEditorFrameProps {
 
 export interface MediaEditorProps {
 	fields?: Field< Media >[];
+	form?: Form;
 	id: number;
 	aspectRatioPresets?: AspectRatioPreset[];
 	onClose?: () => void;
@@ -493,6 +494,7 @@ function SaveActions( { size = 'default' }: SaveActionsProps ) {
 
 function MediaEditorContent( {
 	fields = [],
+	form,
 	id,
 	aspectRatioPresets,
 	onClose,
@@ -877,12 +879,13 @@ function MediaEditorContent( {
 							isDisabled: true,
 						} ) )
 					: fields,
+				form,
 			} }
 		>
 			<div className="media-editor">
 				{ ! media ? (
 					<div className="media-editor__loading">
-						<Spinner />
+						<WCSpinner />
 					</div>
 				) : (
 					<div
