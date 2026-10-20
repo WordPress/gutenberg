@@ -143,6 +143,17 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		public $attributes = null;
 
 		/**
+		 * Structured example: `attributes` maps attribute names to the JSON
+		 * values hosts preview the widget with, and apply to a new instance
+		 * created without attributes of its own. Not translated.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var array|null
+		 */
+		public $example = null;
+
+		/**
 		 * Alternative terms used to match the widget type when searching,
 		 * e.g. "calendar" for an events widget. Translated at registration
 		 * time using the widget's text domain.
