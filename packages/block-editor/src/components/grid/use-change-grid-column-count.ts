@@ -61,21 +61,33 @@ export function useChangeGridColumnCount( clientId?: string ) {
 				return false;
 			}
 
-			const width =
-				gridElement.clientWidth -
-				( parseFloat( getComputedCSS( gridElement, 'padding-left' ) ) ||
-					0 ) -
-				( parseFloat(
-					getComputedCSS( gridElement, 'padding-right' )
-				) || 0 );
-			const columnGap =
-				parseFloat( getComputedCSS( gridElement, 'column-gap' ) ) || 0;
-			const rowGap =
-				parseFloat( getComputedCSS( gridElement, 'row-gap' ) ) || 0;
+			const getPixels = ( property: string ) =>
+				parseFloat( getComputedCSS( gridElement, property ) ) || 0;
+			const horizontalPadding =
+				getPixels( 'padding-left' ) + getPixels( 'padding-right' );
+			const width = gridElement.clientWidth - horizontalPadding;
 			if ( width <= 0 ) {
 				return false;
 			}
-
+			const columnGap = getPixels( 'column-gap' );
+			const rowGap = getPixels( 'row-gap' );
+			// The grid's aspect ratio sizes its border box when it has
+			// `box-sizing: border-box`, as Group blocks do, so its padding and
+			// borders are part of the size it takes from its width.
+			const isBorderBox =
+				getComputedCSS( gridElement, 'box-sizing' ) === 'border-box';
+			const aspectWidth = isBorderBox
+				? width +
+					horizontalPadding +
+					getPixels( 'border-left-width' ) +
+					getPixels( 'border-right-width' )
+				: width;
+			const heightOffset = isBorderBox
+				? getPixels( 'padding-top' ) +
+					getPixels( 'padding-bottom' ) +
+					getPixels( 'border-top-width' ) +
+					getPixels( 'border-bottom-width' )
+				: 0;
 			const {
 				getBlockAttributes,
 				getBlockOrder,
@@ -144,6 +156,8 @@ export function useChangeGridColumnCount( clientId?: string ) {
 				}
 				const result = getColumnCountChangeUpdates( {
 					width,
+					aspectWidth,
+					heightOffset,
 					columnGap,
 					rowGap,
 					columnCount,

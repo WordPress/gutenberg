@@ -20,6 +20,8 @@ import {
 	isGridStackedOnMobile,
 } from '../grid/mobile-stacking';
 import { useUpdateGridChildLayout } from '../grid/use-update-grid-child-layout';
+import { getGridItemBox } from '../../hooks/layout-child';
+import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
 
 // These are the serialized `selfStretch` values. `max` used to be called
 // "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
@@ -290,6 +292,25 @@ function GridControls( {
 		},
 		[ rootClientId ]
 	);
+	// In a viewport state, the control shows that viewport's own layout. A
+	// block placed freely keeps the box of the place it has there, which can
+	// be its default place.
+	const defaultPlaceBox = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSelectedBlockStyleState } =
+				select( blockEditorStore );
+			if (
+				! hasViewportBlockStyleState( getSelectedBlockStyleState() )
+			) {
+				return undefined;
+			}
+			return getGridItemBox(
+				getBlockAttributes( panelId )?.style?.layout,
+				childLayout
+			);
+		},
+		[ panelId, childLayout ]
+	);
 	const isStackedOnMobile = !! stackItems;
 	const stackedLayouts = useMemo(
 		() =>
@@ -301,8 +322,13 @@ function GridControls( {
 	// A block placed freely in a manual grid has a box inside its cells.
 	// Moving it by whole cells keeps its box, so it keeps its shape, while
 	// typing a span snaps it to the cells, so its box goes.
-	const { columnStart, rowStart, columnSpan, rowSpan, box } =
-		stackedLayouts?.child ?? childLayout;
+	const {
+		columnStart,
+		rowStart,
+		columnSpan,
+		rowSpan,
+		box = defaultPlaceBox,
+	} = stackedLayouts?.child ?? childLayout;
 	const { columnCount, rowCount } = {
 		...parentLayout,
 		...stackedLayouts?.grid,

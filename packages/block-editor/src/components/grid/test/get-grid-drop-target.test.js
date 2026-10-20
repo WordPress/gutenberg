@@ -318,4 +318,22 @@ describe( 'getFreeGridDropTarget', () => {
 		} );
 		expect( pixelRect.top ).toBeCloseTo( 40 );
 	} );
+
+	it( 'keeps a rotated block inside the grid without its rotation too', () => {
+		// A 300×100 block rotated 90° at the left edge would need to start
+		// before the grid for its outline to touch the edge.
+		const { pixelRect, placement } = getFreeGridDropTarget( {
+			columnTracks: freeColumnTracks,
+			rowTracks: freeRowTracks,
+			width: 300,
+			height: 100,
+			grabX: 150,
+			grabY: 50,
+			angle: 90,
+			x: 0,
+			y: 200,
+		} );
+		expect( pixelRect.left ).toBeGreaterThanOrEqual( 0 );
+		expect( placement.box?.left ?? 0 ).toBeGreaterThanOrEqual( 0 );
+	} );
 } );

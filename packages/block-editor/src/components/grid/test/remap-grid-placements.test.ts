@@ -128,6 +128,38 @@ describe( 'getColumnCountChangeUpdates', () => {
 		} );
 	} );
 
+	it( 'keeps blocks in place in a grid with padding', () => {
+		// A border-box grid with 40px of padding all round takes its height
+		// from its 510px border box: 4 × 2 cells leave 175px of content,
+		// so its rows are 82.5px.
+		const padded = {
+			...options,
+			rowCount: 2,
+			aspectWidth: 510,
+			heightOffset: 80,
+		};
+		const result = getColumnCountChangeUpdates( {
+			...padded,
+			newColumnCount: 5,
+			placements: {
+				a: { columnStart: 1, columnSpan: 1, rowStart: 2, rowSpan: 1 },
+			},
+		} );
+		expect( result.rowCount ).toBe( 3 );
+		// Three rows in 510 × 3 / 5 - 80 = 226px.
+		const rect = getPixelRectFromGridPlacement(
+			result.placements.a,
+			getEqualTracks( { count: 5, size: width, gap } ),
+			getEqualTracks( { count: 3, size: 226, gap } )
+		);
+		expectSamePixels( rect, {
+			left: 0,
+			top: 92.5,
+			right: 100,
+			bottom: 175,
+		} );
+	} );
+
 	it( 'skips blocks without a start', () => {
 		const result = getColumnCountChangeUpdates( {
 			...options,

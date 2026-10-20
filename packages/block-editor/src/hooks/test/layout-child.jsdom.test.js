@@ -309,8 +309,10 @@ describe( 'layout child', () => {
 						'justify-self': 'start',
 						'align-self': 'start',
 						'box-sizing': 'border-box',
-						'margin-left': 'var(--wp--grid-item--box-left)',
-						'margin-top': 'var(--wp--grid-item--box-top)',
+						'margin-left':
+							'var(--wp--grid-item--box-left) !important',
+						'margin-top':
+							'var(--wp--grid-item--box-top) !important',
 						width: 'var(--wp--grid-item--box-width)',
 						height: 'var(--wp--grid-item--box-height)',
 					},
@@ -384,6 +386,19 @@ describe( 'layout child', () => {
 			).toEqual( [] );
 		} );
 
+		it( 'ignores a box the front end would ignore', () => {
+			expect(
+				getGridItemBox( { box: { ...box, width: 2 } } )
+			).toBeUndefined();
+			expect(
+				getGridItemBox( { box: { ...box, left: -0.01 } } )
+			).toBeUndefined();
+			expect(
+				getGridItemBox( { box: { ...box, height: '0.5' } } )
+			).toBeUndefined();
+			expect( getGridItemBox( { box } ) ).toEqual( box );
+		} );
+
 		it( 'emits nothing extra without a box anywhere', () => {
 			expect( hasGridItemBoxInAnyState( { layout: placement } ) ).toBe(
 				false
@@ -438,7 +453,7 @@ describe( 'layout child', () => {
 				'@container style(--wp--style--grid-cells: fixed)'
 			);
 			expect( css ).toContain(
-				'margin-left: var(--wp--grid-item--box-left)'
+				'margin-left: var(--wp--grid-item--box-left) !important'
 			);
 		} );
 	} );

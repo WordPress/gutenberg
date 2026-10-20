@@ -3,8 +3,10 @@ import { getRotatedBoundingRect } from './rotation';
 
 /**
  * How close, in pixels, an edge must be to a grid line to count as on it.
+ * The canvas measures blocks in whole pixels, so an edge on a line can be
+ * measured up to a pixel away from it.
  */
-export const EDGE_EPSILON = 0.5;
+export const EDGE_EPSILON = 1;
 
 /** A grid track, in pixels from the start of the first track. */
 export interface GridTrack {
@@ -126,9 +128,17 @@ export function getGridPlacementFromPixelRect(
 		right: columnTracks[ columnEnd ].end,
 		bottom: rowTracks[ rowEnd ].end,
 	};
+	// An edge measured just outside its cells is on their edge, so the box
+	// never starts before its cells or reaches past them.
+	const rect: PixelRect = {
+		left: Math.max( pixelRect.left, area.left ),
+		top: Math.max( pixelRect.top, area.top ),
+		right: Math.min( pixelRect.right, area.right ),
+		bottom: Math.min( pixelRect.bottom, area.bottom ),
+	};
 	const edges: PixelRectEdge[] = [ 'left', 'top', 'right', 'bottom' ];
 	const fillsArea = edges.every(
-		( edge ) => Math.abs( pixelRect[ edge ] - area[ edge ] ) <= EDGE_EPSILON
+		( edge ) => Math.abs( rect[ edge ] - area[ edge ] ) <= EDGE_EPSILON
 	);
 	if ( fillsArea ) {
 		return placement;
@@ -139,10 +149,10 @@ export function getGridPlacementFromPixelRect(
 	return {
 		...placement,
 		box: {
-			left: round( ( pixelRect.left - area.left ) / areaWidth ),
-			top: round( ( pixelRect.top - area.top ) / areaWidth ),
-			width: round( ( pixelRect.right - pixelRect.left ) / areaWidth ),
-			height: round( ( pixelRect.bottom - pixelRect.top ) / areaHeight ),
+			left: round( ( rect.left - area.left ) / areaWidth ),
+			top: round( ( rect.top - area.top ) / areaWidth ),
+			width: round( ( rect.right - rect.left ) / areaWidth ),
+			height: round( ( rect.bottom - rect.top ) / areaHeight ),
 		},
 	};
 }

@@ -115,6 +115,9 @@ export function getFreeGridDropTarget( {
 			angle
 		);
 	}
+	// The block's place is stored without its rotation, so that has to be
+	// inside the grid too, even if its rotated outline then reaches out.
+	pixelRect = clampPixelRect( pixelRect, bounds );
 	return {
 		placement: getGridPlacementFromPixelRect(
 			pixelRect,

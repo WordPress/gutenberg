@@ -10,26 +10,54 @@ import {
 } from './free-placement';
 
 /**
- * Gets the row tracks of a grid whose cells have a fixed size. The grid
- * takes its height from its width with `aspect-ratio: columns / rows`, and
- * its rows share that height, with gaps between them.
+ * Gets the height of the content of a grid whose cells have a fixed size.
+ * The grid takes its height from its width with `aspect-ratio: columns /
+ * rows`, which applies to its border box when it has `box-sizing:
+ * border-box`, so its padding and borders are part of that size.
  *
- * @param width       The grid's width in pixels.
- * @param columnCount Number of columns.
- * @param rowCount    Number of rows.
- * @param rowGap      Row gap in pixels.
+ * @param aspectWidth  The width the aspect ratio applies to, in pixels.
+ * @param heightOffset What the aspect ratio's height includes besides the content, in pixels.
+ * @param columnCount  Number of columns.
+ * @param rowCount     Number of rows.
+ *
+ * @return The content height in pixels.
+ */
+function getFixedContentHeight(
+	aspectWidth: number,
+	heightOffset: number,
+	columnCount: number,
+	rowCount: number
+): number {
+	return ( aspectWidth * rowCount ) / columnCount - heightOffset;
+}
+
+/**
+ * Gets the row tracks of a grid whose cells have a fixed size: its rows
+ * share its content height, with gaps between them.
+ *
+ * @param aspectWidth  The width the aspect ratio applies to, in pixels.
+ * @param heightOffset What the aspect ratio's height includes besides the content, in pixels.
+ * @param columnCount  Number of columns.
+ * @param rowCount     Number of rows.
+ * @param rowGap       Row gap in pixels.
  *
  * @return The row tracks.
  */
 function getFixedRowTracks(
-	width: number,
+	aspectWidth: number,
+	heightOffset: number,
 	columnCount: number,
 	rowCount: number,
 	rowGap: number
 ): GridTrack[] {
 	return getEqualTracks( {
 		count: rowCount,
-		size: ( width * rowCount ) / columnCount,
+		size: getFixedContentHeight(
+			aspectWidth,
+			heightOffset,
+			columnCount,
+			rowCount
+		),
 		gap: rowGap,
 	} );
 }
@@ -51,6 +79,8 @@ function getFixedRowTracks(
  * @param options.rowCount       The current number of rows.
  * @param options.newColumnCount The new number of columns.
  * @param options.placements     The blocks' places, keyed by client ID.
+ * @param options.aspectWidth    The width the grid's aspect ratio applies to, which includes its padding and borders when it has `box-sizing: border-box`.
+ * @param options.heightOffset   What the aspect ratio's height includes besides the content, such as vertical padding and borders.
  *
  * @return The new number of rows, and the blocks' new places.
  */
@@ -62,8 +92,14 @@ export function getColumnCountChangeUpdates( {
 	rowCount,
 	newColumnCount,
 	placements,
+	aspectWidth = width,
+	heightOffset = 0,
 }: {
 	width: number;
+	/** The width the grid's aspect ratio applies to. Defaults to `width`. */
+	aspectWidth?: number;
+	/** What the aspect ratio's height includes besides the content, such as vertical padding. */
+	heightOffset?: number;
 	columnGap: number;
 	rowGap: number;
 	columnCount: number;
@@ -88,7 +124,13 @@ export function getColumnCountChangeUpdates( {
 				placement.rowStart + ( placement.rowSpan ?? 1 ) - 1
 		)
 	);
-	const rowTracks = getFixedRowTracks( width, columnCount, rowCount, rowGap );
+	const rowTracks = getFixedRowTracks(
+		aspectWidth,
+		heightOffset,
+		columnCount,
+		rowCount,
+		rowGap
+	);
 	const lastRowTrack = rowTracks[ rowTracks.length - 1 ];
 	const allRowTracks = extendTracks(
 		rowTracks,
@@ -120,7 +162,15 @@ export function getColumnCountChangeUpdates( {
 		1,
 		Math.ceil( ( rowCount * newColumnCount ) / columnCount - 1e-6 )
 	);
-	while ( ( width * newRowCount ) / newColumnCount < bottom - EDGE_EPSILON ) {
+	while (
+		getFixedContentHeight(
+			aspectWidth,
+			heightOffset,
+			newColumnCount,
+			newRowCount
+		) <
+		bottom - EDGE_EPSILON
+	) {
 		newRowCount++;
 	}
 
@@ -130,7 +180,8 @@ export function getColumnCountChangeUpdates( {
 		gap: columnGap,
 	} );
 	const newRowTracks = getFixedRowTracks(
-		width,
+		aspectWidth,
+		heightOffset,
 		newColumnCount,
 		newRowCount,
 		rowGap

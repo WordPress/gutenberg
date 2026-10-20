@@ -2029,8 +2029,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'justify-self' => 'start',
 						'align-self'   => 'start',
 						'box-sizing'   => 'border-box',
-						'margin-left'  => 'var(--wp--grid-item--box-left)',
-						'margin-top'   => 'var(--wp--grid-item--box-top)',
+						'margin-left'  => 'var(--wp--grid-item--box-left) !important',
+						'margin-top'   => 'var(--wp--grid-item--box-top) !important',
 						'width'        => 'var(--wp--grid-item--box-width)',
 						'height'       => 'var(--wp--grid-item--box-height)',
 					),
@@ -2082,6 +2082,8 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 
 		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array( 'left' => 'x' ) ) ), 'A box with values that are not numbers should be ignored.' );
 		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'width' => 2 ) ) ) ), 'A box wider than its cells should be ignored.' );
+		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'height' => '0.5' ) ) ) ), 'A box with numeric strings should be ignored, as in the editor.' );
+		$this->assertNull( gutenberg_get_grid_item_box( array( 'box' => array_merge( $box, array( 'left' => -0.01 ) ) ) ), 'A box that starts before its cells should be ignored.' );
 	}
 
 	/**

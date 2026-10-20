@@ -325,7 +325,7 @@ function gutenberg_sanitize_block_gap_value( $gap_value ) {
  *
  * Box values are fractions of the cells' area: `left` and `top` of its width, as CSS resolves
  * margin percentages, `width` of its width and `height` of its height. Values that aren't
- * numbers in range mean there is no box.
+ * numbers in range mean there is no box, as in the editor's `getGridItemBox()`.
  *
  * @param array      $child_layout       The base child layout.
  * @param array|null $viewport_overrides Optional. The child layout of a viewport.
@@ -347,7 +347,7 @@ function gutenberg_get_grid_item_box( $child_layout, $viewport_overrides = null 
 	$sanitized_box = array();
 	foreach ( array( 'left', 'top', 'width', 'height' ) as $key ) {
 		$value = $box[ $key ] ?? null;
-		if ( ! is_numeric( $value ) ) {
+		if ( ! is_int( $value ) && ! is_float( $value ) ) {
 			return null;
 		}
 		$sanitized_box[ $key ] = (float) $value;
@@ -518,6 +518,7 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 		);
 	}
 
+	// The box's margins are `!important` because a block's own margin is an inline style.
 	if ( $has_grid_item_box && null === $viewport_overrides ) {
 		$child_layout_styles[] = array(
 			'rules_group'  => '@container style(--wp--style--grid-cells: fixed)',
@@ -526,8 +527,8 @@ function gutenberg_get_child_layout_style_rules( $selector, $child_layout, $pare
 				'justify-self' => 'start',
 				'align-self'   => 'start',
 				'box-sizing'   => 'border-box',
-				'margin-left'  => 'var(--wp--grid-item--box-left)',
-				'margin-top'   => 'var(--wp--grid-item--box-top)',
+				'margin-left'  => 'var(--wp--grid-item--box-left) !important',
+				'margin-top'   => 'var(--wp--grid-item--box-top) !important',
 				'width'        => 'var(--wp--grid-item--box-width)',
 				'height'       => 'var(--wp--grid-item--box-height)',
 			),

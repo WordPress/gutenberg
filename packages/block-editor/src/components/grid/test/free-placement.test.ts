@@ -72,6 +72,33 @@ describe( 'getGridPlacementFromPixelRect', () => {
 	} );
 } );
 
+describe( 'getGridPlacementFromPixelRect with measured pixels', () => {
+	// Three columns in a 1000px grid with 24px gaps start at 0, 341.33 and
+	// 682.67, which the canvas measures in whole pixels.
+	const thirds = getEqualTracks( { count: 3, size: 1000, gap: 24 } );
+	const rows = getEqualTracks( { count: 3, size: 1000, gap: 24 } );
+
+	it( 'never gives a box that starts before its cells', () => {
+		const { box } = getGridPlacementFromPixelRect(
+			{ left: 341, top: 0, right: 658, bottom: 200 },
+			thirds,
+			rows
+		);
+		expect( box?.left ).toBe( 0 );
+		expect( box?.width ).toBeLessThanOrEqual( 1 );
+	} );
+
+	it( 'does not add a cell for an edge rounded just past a line', () => {
+		expect(
+			getGridPlacementFromPixelRect(
+				{ left: 341, top: 0, right: 659, bottom: 318 },
+				thirds,
+				rows
+			)
+		).toEqual( { columnStart: 2, columnSpan: 1, rowStart: 1, rowSpan: 1 } );
+	} );
+} );
+
 describe( 'getPixelRectFromGridPlacement', () => {
 	it( 'inverts getGridPlacementFromPixelRect', () => {
 		const rect = { left: 50, top: 20, right: 260, bottom: 90 };

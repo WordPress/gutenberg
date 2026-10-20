@@ -4,6 +4,12 @@ import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
 import ChildLayoutControl from '../';
 
+// What the mocked block editor store returns, which tests can change.
+const mockStore = vi.hoisted( () => ( {
+	attributes: {},
+	selectedState: undefined,
+} ) );
+
 globalThis.wpVitest.mockMatchMedia();
 
 globalThis.wpVitest.mockResizeObserver();
@@ -18,10 +24,11 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 		if ( typeof mapSelect === 'function' ) {
 			return mapSelect( () => ( {
 				getBlockRootClientId: () => 'root-client-id',
-				getBlockAttributes: () => ( {} ),
+				getBlockAttributes: ( clientId ) =>
+					mockStore.attributes[ clientId ] ?? {},
 				getBlockOrder: () => [],
 				getBlocksByClientId: () => [],
-				getSelectedBlockStyleState: () => undefined,
+				getSelectedBlockStyleState: () => mockStore.selectedState,
 			} ) );
 		}
 
@@ -147,6 +154,39 @@ describe( 'ChildLayoutControl', () => {
 		} );
 		afterEach( () => {
 			window.__experimentalEnableGridInteractivity = originalExperiment;
+			mockStore.attributes = {};
+			mockStore.selectedState = undefined;
+		} );
+
+		it( 'changing a start on mobile keeps the box of the default place', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			// The block has a free place in the default state only, and the
+			// control shows its mobile layout, which is empty.
+			mockStore.attributes = {
+				'client-id': { style: { layout: value } },
+			};
+			mockStore.selectedState = {
+				viewport: '@mobile',
+				pseudo: 'default',
+			};
+			renderControl( { value: {}, onChange, parentLayout } );
+
+			// The mobile layout has no place yet, so the control is shown
+			// from the panel's menu.
+			await user.click(
+				screen.getByRole( 'button', { name: 'Dimensions options' } )
+			);
+			await user.click(
+				screen.getByRole( 'menuitemcheckbox', {
+					name: /Grid placement/,
+				} )
+			);
+			const input = screen.getByRole( 'spinbutton', { name: 'Column' } );
+			await user.clear( input );
+			await user.type( input, '3' );
+
+			expect( onChange.mock.calls.at( -1 )[ 0 ].box ).toEqual( box );
 		} );
 
 		it( 'changing a span clears the box', async () => {

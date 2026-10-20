@@ -96,7 +96,28 @@ export function getGridItemBox( layout = {}, viewportOverrides ) {
 		GRID_PLACEMENT_KEYS.some( ( key ) =>
 			Object.hasOwn( viewportOverrides, key )
 		);
-	return ( ownsPlacement ? viewportOverrides : layout )?.box ?? undefined;
+	const box = ( ownsPlacement ? viewportOverrides : layout )?.box;
+	// The same check as the front end, so that the editor never shows a box
+	// the front end ignores.
+	if (
+		! box ||
+		[ 'left', 'top', 'width', 'height' ].some(
+			( key ) =>
+				typeof box[ key ] !== 'number' ||
+				! Number.isFinite( box[ key ] )
+		) ||
+		box.left < 0 ||
+		box.left > 100 ||
+		box.top < 0 ||
+		box.top > 100 ||
+		box.width <= 0 ||
+		box.width > 1 ||
+		box.height <= 0 ||
+		box.height > 1
+	) {
+		return undefined;
+	}
+	return box;
 }
 
 /**
@@ -269,6 +290,8 @@ export function getChildLayoutStyleRules( {
 		rules.push( { selector, declarations } );
 	}
 
+	// The box's margins are `!important` because a block's own margin is an
+	// inline style, which would otherwise move it away from its box.
 	if ( hasGridItemBox && ! hasViewportOverrides ) {
 		rules.push( {
 			rulesGroup: '@container style(--wp--style--grid-cells: fixed)',
@@ -277,8 +300,8 @@ export function getChildLayoutStyleRules( {
 				'justify-self': 'start',
 				'align-self': 'start',
 				'box-sizing': 'border-box',
-				'margin-left': 'var(--wp--grid-item--box-left)',
-				'margin-top': 'var(--wp--grid-item--box-top)',
+				'margin-left': 'var(--wp--grid-item--box-left) !important',
+				'margin-top': 'var(--wp--grid-item--box-top) !important',
 				width: 'var(--wp--grid-item--box-width)',
 				height: 'var(--wp--grid-item--box-height)',
 			},
