@@ -439,18 +439,23 @@ describe( 'border useBlockProps', () => {
 	const widthOnly = { border: { width: '2px' } };
 
 	// `updateSettings` drops symbol keys, so set the private key directly.
-	function setGlobalStyles( styles ) {
+	function setGlobalStyles( styles: Record< string, unknown > | undefined ) {
 		unlock( dispatch( blockEditorStore ) ).__experimentalUpdateSettings( {
 			[ globalStylesDataKey ]: styles,
 		} );
 	}
 
-	function getStyle( props ) {
+	type BorderBlockProps = Parameters< typeof border.useBlockProps >[ 0 ];
+
+	function getStyle( props: Partial< BorderBlockProps > ) {
 		const { result, unmount } = renderHook( () =>
-			border.useBlockProps( { name: BLOCK_NAME, ...props } )
+			border.useBlockProps( {
+				name: BLOCK_NAME,
+				...props,
+			} as BorderBlockProps )
 		);
 		unmount();
-		return result.current.style;
+		return ( result.current as { style?: Record< string, string > } ).style;
 	}
 
 	beforeEach( () => {
