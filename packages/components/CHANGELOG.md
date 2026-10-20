@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
+
 ### Internal
 
 -   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
