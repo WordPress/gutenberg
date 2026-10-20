@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Publish the package's TypeScript declarations, so consumers get its types ([#85036](https://github.com/WordPress/gutenberg/pull/85036)).
+
 ### Bug Fixes
 
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).

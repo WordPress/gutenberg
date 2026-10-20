@@ -6,7 +6,9 @@ import type {
 	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
+import type { Color } from '@wordpress/global-styles-engine';
 import type { BlockEditingMode } from '../components/block-editing-mode';
+import type { EditorStylesStyle } from '../components/editor-styles/types';
 import type {
 	BlockVisibility,
 	ViewportBreakpoints,
@@ -402,6 +404,31 @@ export type Settings = Record< string | symbol, unknown > & {
 	blockInspectorTabs?: Record< string, boolean >;
 	blockInspectorAnimation?: BlockInspectorAnimationSettings;
 	blockStatesEditingEnabled?: boolean;
+	/** The color palette. */
+	colors?: Color[];
+	/** Creates a draft page from the link UI. */
+	__experimentalCreatePageEntity?: ( page: {
+		title: string;
+		status: string;
+	} ) => Promise<
+		| {
+				id: number;
+				type: string;
+				title: { rendered: string };
+				link: string;
+		  }
+		// A failed save resolves without a page.
+		| undefined
+	>;
+	__experimentalUserCanCreatePages?: boolean;
+	/** Opens an entity, such as a template part, for editing. */
+	onNavigateToEntityRecord?: ( params: {
+		postId: number | string;
+		postType: string;
+		/** The canvas viewport to open the entity in, such as `mobile`. */
+		viewport?: string;
+		[ key: string ]: unknown;
+	} ) => void;
 	__experimentalUndo?: () => void;
 	/** Opens the inserter sidebar, or closes it with `false`. */
 	__experimentalSetIsInserterOpened?: (
@@ -419,6 +446,8 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
 	__unstableIsBlockBasedTheme?: boolean;
+	/** The styles of the editor canvas, flagged when generated from global styles. */
+	styles?: Array< EditorStylesStyle & { isGlobalStyles?: boolean } >;
 	[ currentUserIdSelectKey ]?: (
 		select: typeof globalSelect
 	) => number | undefined;

@@ -8,7 +8,6 @@ import {
 	getBlockTypes,
 	unregisterBlockType,
 } from '@wordpress/blocks';
-// @ts-expect-error `@wordpress/block-editor` does not expose type declarations for its entry point.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useBlockBindingsUtils } from '../';
 
@@ -65,8 +64,9 @@ describe( 'useBlockBindingsUtils', () => {
 				},
 			} );
 		} );
+		// The block was reset into the store above.
 		const { metadata } =
-			await select( blockEditorStore ).getBlockAttributes( clientId );
+			await select( blockEditorStore ).getBlockAttributes( clientId )!;
 		expect( metadata ).toMatchObject( {
 			// Other metadata properties shouldn't change.
 			name: 'Block name',
@@ -105,8 +105,9 @@ describe( 'useBlockBindingsUtils', () => {
 				},
 			} );
 		} );
+		// The block was reset into the store above.
 		const { metadata } =
-			await select( blockEditorStore ).getBlockAttributes( clientId );
+			await select( blockEditorStore ).getBlockAttributes( clientId )!;
 		expect( metadata ).toMatchObject( {
 			// Other metadata properties shouldn't change.
 			name: 'Block name',
@@ -134,8 +135,9 @@ describe( 'useBlockBindingsUtils', () => {
 				prop2: undefined,
 			} );
 		} );
+		// The block was reset into the store above.
 		const { metadata } =
-			await select( blockEditorStore ).getBlockAttributes( clientId );
+			await select( blockEditorStore ).getBlockAttributes( clientId )!;
 		expect( metadata ).toMatchObject( {
 			// Other metadata properties shouldn't change.
 			name: 'Block name',
@@ -156,8 +158,9 @@ describe( 'useBlockBindingsUtils', () => {
 				useBlockBindingsUtils( clientId );
 			removeAllBlockBindings();
 		} );
+		// The block was reset into the store above.
 		const { metadata } =
-			await select( blockEditorStore ).getBlockAttributes( clientId );
+			await select( blockEditorStore ).getBlockAttributes( clientId )!;
 		expect( metadata ).toMatchObject( {
 			// Other metadata properties shouldn't change.
 			name: 'Block name',
