@@ -1,13 +1,14 @@
 import { Fill, ToolbarButton } from '@wordpress/components';
 import { displayShortcut } from '@wordpress/keycodes';
+import type { RichTextToolbarButtonProps } from './types';
 
 export function RichTextToolbarButton( {
 	name,
 	shortcutType,
 	shortcutCharacter,
 	...props
-} ) {
-	let shortcut;
+}: RichTextToolbarButtonProps ) {
+	let shortcut: string | undefined;
 	let fillName = 'RichText.ToolbarControls';
 
 	if ( name ) {

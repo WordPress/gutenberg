@@ -1,6 +1,7 @@
 import { getActiveFormat, getActiveObject } from '@wordpress/rich-text';
 import { useContext, useMemo } from '@wordpress/element';
 import BlockContext from '../block-context';
+import type { FormatEditComponentProps, FormatEditItemProps } from './types';
 
 const DEFAULT_BLOCK_CONTEXT = {};
 
@@ -13,7 +14,7 @@ function Edit( {
 	forwardedRef,
 	settings,
 	isVisible,
-} ) {
+}: FormatEditItemProps ) {
 	const {
 		name,
 		edit: EditFunction,
@@ -65,7 +66,10 @@ function Edit( {
 	);
 }
 
-export default function FormatEdit( { formatTypes, ...props } ) {
+export default function FormatEdit( {
+	formatTypes,
+	...props
+}: FormatEditComponentProps ) {
 	return formatTypes.map( ( settings ) => (
 		<Edit settings={ settings } { ...props } key={ settings.name } />
 	) );

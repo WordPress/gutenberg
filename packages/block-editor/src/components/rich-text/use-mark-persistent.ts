@@ -1,17 +1,21 @@
 import { useLayoutEffect, useRef } from '@wordpress/element';
 import { useDebounce, useEvent } from '@wordpress/compose';
+import type { MarkPersistentSnapshot, UseMarkPersistentOptions } from './types';
 
 const TYPING_TIMEOUT = 1000;
 
 /**
  * Classifies the change between two snapshots of the value.
  *
- * @param {Object} previous Previous snapshot.
- * @param {Object} next     Next snapshot.
+ * @param previous Previous snapshot.
+ * @param next     Next snapshot.
  *
- * @return {'none'|'typing'|'discrete'} The change type.
+ * @return The change type.
  */
-function getChangeType( previous, next ) {
+function getChangeType(
+	previous: MarkPersistentSnapshot,
+	next: MarkPersistentSnapshot
+): 'none' | 'typing' | 'discrete' {
 	if (
 		previous.html === next.html &&
 		previous.hasActiveFormats === next.hasActiveFormats
@@ -22,10 +26,14 @@ function getChangeType( previous, next ) {
 	return previous.text === next.text ? 'discrete' : 'typing';
 }
 
-export function useMarkPersistent( { html, value, onMarkPersistent } ) {
+export function useMarkPersistent( {
+	html,
+	value,
+	onMarkPersistent,
+}: UseMarkPersistentOptions ) {
 	const { text } = value;
 	const hasActiveFormats = !! value.activeFormats?.length;
-	const previousRef = useRef();
+	const previousRef = useRef< MarkPersistentSnapshot >( undefined );
 	// Stable, so a new callback doesn't reset the debounce.
 	const markPersistent = useEvent( onMarkPersistent );
 	// Don't create an undo level for every character. Create one after a

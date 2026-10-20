@@ -5,11 +5,12 @@ import {
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
 import { unlock } from '../../../lock-unlock';
+import type { RichTextEventListener } from '../types';
 
 const { subscribeOwnedListener } = unlock( richTextPrivateApis );
 
-export default ( props ) => ( element ) => {
-	function onKeyDown( event ) {
+const deleteListener: RichTextEventListener = ( props ) => ( element ) => {
+	function onKeyDown( event: KeyboardEvent ) {
 		const { keyCode } = event;
 
 		if ( event.defaultPrevented ) {
@@ -52,3 +53,5 @@ export default ( props ) => ( element ) => {
 
 	return subscribeOwnedListener( element, 'keydown', onKeyDown );
 };
+
+export default deleteListener;

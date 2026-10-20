@@ -3,8 +3,13 @@ import { Popover, ToolbarGroup } from '@wordpress/components';
 import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 import NavigableToolbar from '../navigable-toolbar';
+import type { FormatToolbarContainerProps } from './types';
 
-function InlineToolbar( { popoverAnchor } ) {
+function InlineToolbar( {
+	popoverAnchor,
+}: {
+	popoverAnchor?: HTMLElement | null;
+} ) {
 	return (
 		<Popover
 			placement="top"
@@ -26,7 +31,10 @@ function InlineToolbar( { popoverAnchor } ) {
 	);
 }
 
-const FormatToolbarContainer = ( { inline, editableContentElement } ) => {
+const FormatToolbarContainer = ( {
+	inline,
+	editableContentElement,
+}: FormatToolbarContainerProps ) => {
 	if ( inline ) {
 		return <InlineToolbar popoverAnchor={ editableContentElement } />;
 	}

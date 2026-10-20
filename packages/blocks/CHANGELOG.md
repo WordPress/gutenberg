@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add the `input` block transform type, and let `getSaveElement` take an element in place of inner blocks in the types, as the runtime already does ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
+
 ## 17.0.0 (2026-10-20)
 
 ### Breaking Changes
