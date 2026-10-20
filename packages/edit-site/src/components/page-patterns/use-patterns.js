@@ -1,8 +1,7 @@
-import { parse } from '@wordpress/blocks';
 import { useSelect, createSelector } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
-import { filterOutDuplicatesByName } from './utils';
+import { filterOutDuplicatesByName, withLazyBlocks } from './utils';
 import {
 	EXCLUDED_PATTERN_SOURCES,
 	PATTERN_TYPES,
@@ -88,24 +87,22 @@ const selectThemePatterns = createSelector(
 
 		const restBlockPatterns = select( coreStore ).getBlockPatterns();
 
-		const patterns = [
-			...( blockPatterns || [] ),
-			...( restBlockPatterns || [] ),
-		]
-			.filter(
+		const patterns = filterOutDuplicatesByName(
+			[
+				...( blockPatterns || [] ),
+				...( restBlockPatterns || [] ),
+			].filter(
 				( pattern ) =>
 					! EXCLUDED_PATTERN_SOURCES.includes( pattern.source )
 			)
-			.filter( filterOutDuplicatesByName )
+		)
 			.filter( ( pattern ) => pattern.inserter !== false )
-			.map( ( pattern ) => ( {
-				...pattern,
-				keywords: pattern.keywords || [],
-				type: PATTERN_TYPES.theme,
-				blocks: parse( pattern.content, {
-					__unstableSkipMigrationLogs: true,
-				} ),
-			} ) );
+			.map( ( pattern ) =>
+				withLazyBlocks( pattern, {
+					keywords: pattern.keywords || [],
+					type: PATTERN_TYPES.theme,
+				} )
+			);
 		return {
 			patterns,
 			isResolving: isResolvingSelector( 'getBlockPatterns' ),
