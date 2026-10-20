@@ -61,7 +61,8 @@ function isTextDrop( ownerDocument: Document, dataTransfer: DataTransfer ) {
 }
 
 /**
- * Returns the field a text drop lands in, and the offset in it.
+ * Returns the field a text drop lands in, the offset in it, and the range
+ * there.
  *
  * @param event Drop event.
  */
@@ -96,7 +97,7 @@ export function getTextDropPoint( event: DragEvent ) {
 		range,
 		__unstableIsEditableTree: true,
 	} ).start as number;
-	return { element, offset };
+	return { element, offset, range };
 }
 
 /**

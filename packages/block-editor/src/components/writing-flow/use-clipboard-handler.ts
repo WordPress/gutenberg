@@ -46,156 +46,6 @@ function isBlockEntirelySelected( ownerDocument: Document, clientId: string ) {
 	);
 }
 
-interface PastedBlocks {
-	blocks: Block[];
-	replace: boolean;
-}
-
-/**
- * Returns the blocks pasted content is inserted as at the selection, and
- * whether they replace the selected blocks or split the selection. Returns
- * nothing when rich text inserts the content inline.
- *
- * @param registry                   Data registry.
- * @param data                       Pasted content.
- * @param data.html                  HTML content.
- * @param data.plainText             Plain text content.
- * @param data.files                 Files.
- * @param data.isEntireBlockSelected Whether the text of the single
- *                                   selected block is entirely selected.
- * @param data.__deprecatedOnSplit   Whether rich text has a legacy split
- *                                   handler.
- *
- * @return The blocks to insert.
- */
-function getPastedBlocks(
-	registry: ReturnType< typeof useRegistry >,
-	{
-		html,
-		plainText,
-		files,
-		isEntireBlockSelected,
-		__deprecatedOnSplit,
-	}: {
-		html?: string;
-		plainText?: string;
-		files: File[];
-		isEntireBlockSelected: boolean;
-		__deprecatedOnSplit?: unknown;
-	}
-): PastedBlocks | undefined {
-	const {
-		getSettings,
-		getSelectedBlockClientIds,
-		hasMultiSelection,
-		getBlockName,
-		getBlockRootClientId,
-		canInsertBlockType,
-		__unstableIsFullySelected,
-	} = registry.select( blockEditorStore );
-	const { __experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML } =
-		getSettings();
-	const isFullySelected = __unstableIsFullySelected();
-	let blocks: Block[] | string = [];
-
-	if ( files.length ) {
-		const fromTransforms = getBlockTransforms( 'from' );
-		blocks = files
-			.reduce< ( Block | Block[] )[] >( ( accumulator, file ) => {
-				const transformation = findTransform(
-					fromTransforms,
-					( transform ) =>
-						transform.type === 'files' &&
-						// Files transforms define a matcher.
-						transform.isMatch!( [ file ] )
-				);
-				if ( transformation ) {
-					accumulator.push(
-						// The predicate only matches files transforms, which transform.
-						( transformation as BlockFilesTransform ).transform!( [
-							file,
-						] )
-					);
-				}
-				return accumulator;
-			}, [] )
-			.flat();
-	} else {
-		blocks = pasteHandler( {
-			HTML: html,
-			plainText,
-			mode: isFullySelected ? 'BLOCKS' : 'AUTO',
-			// @ts-expect-error `pasteHandler` ignores this option.
-			canUserUseUnfilteredHTML,
-		} );
-	}
-
-	// Inline paste: let rich text handle it.
-	if ( typeof blocks === 'string' ) {
-		return;
-	}
-
-	if ( isFullySelected ) {
-		return { blocks, replace: true };
-	}
-
-	const selectedBlockClientIds = getSelectedBlockClientIds();
-
-	// If a block doesn't support splitting, let rich text paste inline.
-	if (
-		! hasMultiSelection() &&
-		! hasBlockSupport(
-			// The selected block has a name.
-			getBlockName( selectedBlockClientIds[ 0 ] )!,
-			'splitting',
-			false
-		) &&
-		! __deprecatedOnSplit
-	) {
-		return;
-	}
-
-	// Pasting over an entirely selected block replaces it, the equivalent of
-	// pasting into an empty block.
-	if ( isEntireBlockSelected ) {
-		return { blocks, replace: true };
-	}
-
-	const [ firstSelectedClientId ] = selectedBlockClientIds;
-	const rootClientId = getBlockRootClientId( firstSelectedClientId );
-
-	const newBlocks: Block[] = [];
-
-	for ( const block of blocks ) {
-		if ( canInsertBlockType( block.name, rootClientId ) ) {
-			newBlocks.push( block );
-		} else {
-			// If a block cannot be inserted in a root block, try converting it
-			// to that root block type and insert the inner blocks.
-			// Example: paragraphs cannot be inserted into a list, so convert
-			// the paragraphs to a list for list items.
-			const rootBlockName = getBlockName( rootClientId );
-			const switchedBlocks =
-				block.name !== rootBlockName
-					? // A block that cannot be inserted has a root block.
-						switchToBlockType( block, rootBlockName! )
-					: [ block ];
-
-			if ( ! switchedBlocks ) {
-				return;
-			}
-
-			for ( const switchedBlock of switchedBlocks ) {
-				for ( const innerBlock of switchedBlock.innerBlocks ) {
-					newBlocks.push( innerBlock );
-				}
-			}
-		}
-	}
-
-	return { blocks: newBlocks, replace: false };
-}
-
 export default function useClipboardHandler() {
 	const registry = useRegistry();
 	const {
@@ -203,10 +53,13 @@ export default function useClipboardHandler() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
+		getBlockName,
 		__unstableIsFullySelected,
 		__unstableIsSelectionCollapsed,
 		__unstableIsSelectionMergeable,
 		__unstableGetSelectedBlocksWithPartialSelection,
+		canInsertBlockType,
+		getBlockRootClientId,
 	} = useSelect( blockEditorStore );
 	const {
 		flashBlock,
@@ -220,9 +73,42 @@ export default function useClipboardHandler() {
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect< HTMLElement >( ( node ) => {
+		// Text dropped is inserted the way it would be pasted at the drop
+		// point.
+		function moveSelectionToDropPoint( event: DragEvent ) {
+			const point = getTextDropPoint( event );
+			if ( ! point || ! node.contains( point.element ) ) {
+				return false;
+			}
+			const { element, offset, range } = point;
+			const host =
+				element.parentElement?.closest< HTMLElement >(
+					'[contenteditable]'
+				);
+			( host?.isContentEditable ? host : element ).focus();
+			const selection =
+				element.ownerDocument.defaultView!.getSelection()!;
+			selection.removeAllRanges();
+			selection.addRange( range );
+			selectionChange(
+				getBlockClientId( element )!,
+				element.dataset.wpBlockAttributeKey,
+				offset,
+				offset
+			);
+			return true;
+		}
+
 		function handler( event: WritingFlowClipboardEvent ) {
 			if ( event.defaultPrevented ) {
 				// This was likely already handled in rich-text/use-paste-handler.js.
+				return;
+			}
+
+			if (
+				event.type === 'drop' &&
+				! moveSelectionToDropPoint( event as DragEvent )
+			) {
 				return;
 			}
 
@@ -308,8 +194,13 @@ export default function useClipboardHandler() {
 						blocks = [ head, ...inBetweenBlocks, tail ];
 					}
 
-					// The selected blocks exist.
-					setClipboardBlocks( event, blocks as Block[], registry );
+					// The selected blocks exist, and copy and cut events are
+					// clipboard events.
+					setClipboardBlocks(
+						event as ClipboardEvent,
+						blocks as Block[],
+						registry
+					);
 				}
 			}
 
@@ -327,89 +218,155 @@ export default function useClipboardHandler() {
 					);
 					__unstableDeleteSelection();
 				}
-			} else if ( event.type === 'paste' ) {
-				const { mediaUpload } = getSettings();
+			} else if ( event.type === 'paste' || event.type === 'drop' ) {
+				const {
+					__experimentalCanUserUseUnfilteredHTML:
+						canUserUseUnfilteredHTML,
+					mediaUpload,
+				} = getSettings();
+				// Paste and drop events carry readable data.
+				const clipboardData = (
+					'dataTransfer' in event
+						? event.dataTransfer
+						: event.clipboardData
+				)!;
 				const isInternal =
-					// Paste events carry clipboard data.
-					event.clipboardData!.getData( 'rich-text' ) === 'true';
+					clipboardData.getData( 'rich-text' ) === 'true';
 				if ( isInternal ) {
 					return;
 				}
-				// Paste events carry readable clipboard data.
-				const { plainText, html, files } = getPasteEventData(
-					event as { clipboardData: DataTransfer }
-				)!;
+				const { plainText, html, files } = getPasteEventData( {
+					clipboardData,
+				} )!;
+				const isFullySelected = __unstableIsFullySelected();
+				let blocks: Block[] | string = [];
 
-				if ( files.length && ! mediaUpload ) {
+				if ( files.length ) {
+					if ( ! mediaUpload ) {
+						event.preventDefault();
+						return;
+					}
+
+					const fromTransforms = getBlockTransforms( 'from' );
+					blocks = files
+						.reduce< ( Block | Block[] )[] >(
+							( accumulator, file ) => {
+								const transformation = findTransform(
+									fromTransforms,
+									( transform ) =>
+										transform.type === 'files' &&
+										// Files transforms define a matcher.
+										transform.isMatch!( [ file ] )
+								);
+								if ( transformation ) {
+									accumulator.push(
+										// The predicate only matches files transforms, which transform.
+										(
+											transformation as BlockFilesTransform
+										 ).transform!( [ file ] )
+									);
+								}
+								return accumulator;
+							},
+							[]
+						)
+						.flat();
+				} else {
+					blocks = pasteHandler( {
+						HTML: html,
+						plainText,
+						mode: isFullySelected ? 'BLOCKS' : 'AUTO',
+						// @ts-expect-error `pasteHandler` ignores this option.
+						canUserUseUnfilteredHTML,
+					} );
+				}
+
+				// Inline paste: let rich text handle it.
+				if ( typeof blocks === 'string' ) {
+					return;
+				}
+
+				if ( isFullySelected ) {
+					replaceBlocks(
+						selectedBlockClientIds,
+						blocks,
+						blocks.length - 1,
+						-1
+					);
 					event.preventDefault();
 					return;
 				}
 
-				const pasted = getPastedBlocks( registry, {
-					html,
-					plainText,
-					files,
-					isEntireBlockSelected:
-						! hasMultiSelection() &&
-						isBlockEntirelySelected(
-							( event.target as Element ).ownerDocument,
-							selectedBlockClientIds[ 0 ]
-						),
-					__deprecatedOnSplit: event.__deprecatedOnSplit,
-				} );
-				if ( pasted ) {
-					insertPastedBlocks( pasted );
-					event.preventDefault();
+				// If a block doesn't support splitting, let rich text paste
+				// inline.
+				if (
+					! hasMultiSelection() &&
+					! hasBlockSupport(
+						// The selected block has a name.
+						getBlockName( selectedBlockClientIds[ 0 ] )!,
+						'splitting',
+						false
+					) &&
+					! event.__deprecatedOnSplit
+				) {
+					return;
 				}
-			}
-		}
 
-		function insertPastedBlocks( { blocks, replace }: PastedBlocks ) {
-			if ( replace ) {
-				replaceBlocks(
-					getSelectedBlockClientIds(),
-					blocks,
-					blocks.length - 1,
-					-1
+				// Pasting over an entirely selected block replaces it, the
+				// equivalent of pasting into an empty block.
+				if (
+					! hasMultiSelection() &&
+					isBlockEntirelySelected(
+						( event.target as Element ).ownerDocument,
+						selectedBlockClientIds[ 0 ]
+					)
+				) {
+					replaceBlocks(
+						selectedBlockClientIds,
+						blocks,
+						blocks.length - 1,
+						-1
+					);
+					event.preventDefault();
+					return;
+				}
+
+				const [ firstSelectedClientId ] = selectedBlockClientIds;
+				const rootClientId = getBlockRootClientId(
+					firstSelectedClientId
 				);
-			} else {
-				__unstableSplitSelection( blocks );
-			}
-		}
 
-		// Text dropped from outside the editor is inserted the way it would
-		// be pasted at the drop point. Rich text inserts the content inline
-		// when it is not blocks.
-		function onDrop( event: DragEvent ) {
-			if ( event.defaultPrevented ) {
-				return;
-			}
-			const point = getTextDropPoint( event );
-			if ( ! point || ! node.contains( point.element ) ) {
-				return;
-			}
-			const dataTransfer = event.dataTransfer!;
-			if ( dataTransfer.getData( 'rich-text' ) === 'true' ) {
-				return;
-			}
-			const data = getPasteEventData( { clipboardData: dataTransfer } );
-			if ( ! data ) {
-				return;
-			}
-			selectionChange(
-				getBlockClientId( point.element )!,
-				point.element.dataset.wpBlockAttributeKey,
-				point.offset,
-				point.offset
-			);
-			const pasted = getPastedBlocks( registry, {
-				html: data.html,
-				plainText: data.plainText,
-				files: [],
-				isEntireBlockSelected: false,
-			} );
-			if ( pasted ) {
-				insertPastedBlocks( pasted );
+				const newBlocks: Block[] = [];
+
+				for ( const block of blocks ) {
+					if ( canInsertBlockType( block.name, rootClientId ) ) {
+						newBlocks.push( block );
+					} else {
+						// If a block cannot be inserted in a root block, try
+						// converting it to that root block type and insert the
+						// inner blocks.
+						// Example: paragraphs cannot be inserted into a list,
+						// so convert the paragraphs to a list for list items.
+						const rootBlockName = getBlockName( rootClientId );
+						const switchedBlocks =
+							block.name !== rootBlockName
+								? // A block that cannot be inserted has a root block.
+									switchToBlockType( block, rootBlockName! )
+								: [ block ];
+
+						if ( ! switchedBlocks ) {
+							return;
+						}
+
+						for ( const switchedBlock of switchedBlocks ) {
+							for ( const innerBlock of switchedBlock.innerBlocks ) {
+								newBlocks.push( innerBlock );
+							}
+						}
+					}
+				}
+
+				__unstableSplitSelection( newBlocks );
 				event.preventDefault();
 			}
 		}
@@ -417,15 +374,13 @@ export default function useClipboardHandler() {
 		node.ownerDocument.addEventListener( 'copy', handler );
 		node.ownerDocument.addEventListener( 'cut', handler );
 		node.ownerDocument.addEventListener( 'paste', handler );
-		// Capture, so blocks are inserted before the field inserts the drop
-		// inline, as on paste, and before the block drop zone handles it.
-		node.ownerDocument.addEventListener( 'drop', onDrop, true );
+		node.ownerDocument.addEventListener( 'drop', handler, true );
 
 		return () => {
 			node.ownerDocument.removeEventListener( 'copy', handler );
 			node.ownerDocument.removeEventListener( 'cut', handler );
 			node.ownerDocument.removeEventListener( 'paste', handler );
-			node.ownerDocument.removeEventListener( 'drop', onDrop, true );
+			node.ownerDocument.removeEventListener( 'drop', handler, true );
 		};
 	}, [] );
 }
