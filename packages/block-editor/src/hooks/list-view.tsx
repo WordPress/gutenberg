@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
 import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
@@ -15,22 +16,28 @@ export const LIST_VIEW_SUPPORT_KEY = 'listView';
 /**
  * Check if the block has list view support.
  *
- * @param {string|Object} nameOrType Block name or block type object.
- * @return {boolean} Whether the block has list view support.
+ * @param nameOrType Block name or block type object.
+ * @return Whether the block has list view support.
  */
-export function hasListViewSupport( nameOrType ) {
+export function hasListViewSupport( nameOrType: string | BlockType ): boolean {
 	return hasBlockSupport( nameOrType, LIST_VIEW_SUPPORT_KEY );
 }
 
 /**
  * Inspector controls panel for list view.
  *
- * @param {Object} props          Component props.
- * @param {string} props.clientId Block client ID.
- * @param {string} props.name     Block name.
- * @return {Element|null} List view inspector controls or null.
+ * @param props          Component props.
+ * @param props.clientId Block client ID.
+ * @param props.name     Block name.
+ * @return List view inspector controls or null.
  */
-export function ListViewPanel( { clientId, name } ) {
+export function ListViewPanel( {
+	clientId,
+	name,
+}: {
+	clientId: string;
+	name: string;
+} ) {
 	const { isSelectionWithinCurrentSection } =
 		useContext( PrivateBlockContext );
 
@@ -55,7 +62,7 @@ export function ListViewPanel( { clientId, name } ) {
 			// Search parents to see if there's one that also has support, and if so skip rendering.
 			// This matches closely the logic in the `BlockCard` component.
 			const parents = getBlockParents( clientId, false );
-			const _isNestedListView = parents.find( ( parentId ) =>
+			const _isNestedListView = parents.find( ( parentId: string ) =>
 				shouldRenderBlockListView( parentId )
 			);
 

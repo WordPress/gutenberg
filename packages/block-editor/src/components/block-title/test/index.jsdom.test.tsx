@@ -45,10 +45,7 @@ describe( 'BlockTitle', () => {
 	it( 'renders nothing if name is falsey', () => {
 		( useSelect as Mock ).mockImplementation( () => null );
 
-		const { container } = render(
-			// @ts-expect-error The missing `clientId` is deliberate.
-			<BlockTitle />
-		);
+		const { container } = render( <BlockTitle /> );
 
 		expect( container ).toBeEmptyDOMElement();
 	} );

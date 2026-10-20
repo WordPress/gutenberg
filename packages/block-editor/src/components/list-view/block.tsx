@@ -1,3 +1,4 @@
+import type { KeyboardEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { hasBlockSupport, store as blocksStore } from '@wordpress/blocks';
 import {
@@ -40,6 +41,8 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { getBlockVisibilityLabel } from '../block-visibility';
+import type { ListViewBlockProps, TreeGridItemRenderProps } from './types';
+import type { TreeBlock } from '../../store/types';
 
 function ListViewBlock( {
 	clientId,
@@ -59,12 +62,12 @@ function ListViewBlock( {
 	isExpanded,
 	selectedClientIds,
 	isSyncedBranch,
-} ) {
-	const cellRef = useRef( null );
-	const rowRef = useRef( null );
-	const settingsRef = useRef( null );
+}: ListViewBlockProps ) {
+	const cellRef = useRef< HTMLTableCellElement >( null );
+	const rowRef = useRef< HTMLTableRowElement >( null );
+	const settingsRef = useRef< HTMLTableCellElement >( null );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
+	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState< DOMRect >();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
 
 	const isFirstSelectedBlock =
@@ -198,17 +201,15 @@ function ListViewBlock( {
 		};
 	}
 
-	/**
-	 * @param {KeyboardEvent} event
-	 */
-	async function onKeyDown( event ) {
+	async function onKeyDown( event: KeyboardEvent< HTMLTableRowElement > ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
 
 		// Do not handle events if it comes from modals;
 		// retain the default behavior for these keys.
-		if ( event.target.closest( '[role=dialog]' ) ) {
+		// Key events target elements.
+		if ( ( event.target as Element ).closest( '[role=dialog]' ) ) {
 			return;
 		}
 
@@ -269,7 +270,8 @@ function ListViewBlock( {
 			event.preventDefault();
 
 			const { blocksToUpdate } = getBlocksToUpdate();
-			const blocks = getBlocksByClientId( blocksToUpdate );
+			// The blocks to update exist.
+			const blocks = getBlocksByClientId( blocksToUpdate ) as TreeBlock[];
 
 			pasteStyles( blocks );
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
@@ -370,9 +372,16 @@ function ListViewBlock( {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			if ( blocksToUpdate.length > 1 && isGroupable( blocksToUpdate ) ) {
 				event.preventDefault();
-				const blocks = getBlocksByClientId( blocksToUpdate );
+				// The blocks to update exist.
+				const blocks = getBlocksByClientId(
+					blocksToUpdate
+				) as TreeBlock[];
 				const groupingBlockName = getGroupingBlockName();
-				const newBlocks = groupBlocks( blocks, groupingBlockName );
+				const newBlocks = groupBlocks(
+					blocks,
+					// `isGroupable` requires a grouping block.
+					groupingBlockName!
+				);
 				replaceBlocks( blocksToUpdate, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();
@@ -387,7 +396,8 @@ function ListViewBlock( {
 			}
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
-			const blocks = getBlocksByClientId( blocksToUpdate );
+			// The blocks to update exist.
+			const blocks = getBlocksByClientId( blocksToUpdate ) as TreeBlock[];
 			const supportsBlockVisibility = blocks.every( ( _block ) =>
 				hasBlockSupport( _block.name, 'visibility', true )
 			);
@@ -429,7 +439,7 @@ function ListViewBlock( {
 	}, [ clientId, setIsHovered, debouncedToggleBlockHighlight ] );
 
 	const selectEditorBlock = useCallback(
-		( event ) => {
+		( event: MouseEvent | KeyboardEvent ) => {
 			// For keyboard activation (Enter/Space on a link), transfer focus
 			// to the canvas at the default initial position (start of the first
 			// field). For mouse clicks, keep focus in the list view so that
@@ -443,7 +453,7 @@ function ListViewBlock( {
 	);
 
 	const updateFocusAndSelection = useCallback(
-		( focusClientId, shouldSelectBlock ) => {
+		( focusClientId: string, shouldSelectBlock: boolean ) => {
 			if ( shouldSelectBlock ) {
 				selectBlock( undefined, focusClientId, null, null );
 			}
@@ -454,7 +464,7 @@ function ListViewBlock( {
 	);
 
 	const toggleExpanded = useCallback(
-		( event ) => {
+		( event: MouseEvent ) => {
 			// Prevent shift+click from opening link in a new window when toggling.
 			event.preventDefault();
 			event.stopPropagation();
@@ -471,7 +481,7 @@ function ListViewBlock( {
 
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback(
-		( event ) => {
+		( event: MouseEvent ) => {
 			const { ownerDocument } = settingsRef?.current || {};
 			if ( ! ownerDocument || ! ownerDocument.hasFocus() ) {
 				return;
@@ -490,7 +500,7 @@ function ListViewBlock( {
 	);
 
 	const onMouseDown = useCallback(
-		( event ) => {
+		( event: MouseEvent ) => {
 			// Prevent right-click from focusing the block,
 			// because focus will be handled when opening the block settings dropdown.
 			if ( allowRightClickOverrides && event.button === 2 ) {
@@ -586,6 +596,7 @@ function ListViewBlock( {
 		'is-dragging': isDragged,
 		'has-single-cell': ! showBlockActions,
 		'is-synced': isSynced,
+		// @ts-expect-error Bug: `canMoveBlock` is the selector, so it is always truthy.
 		'is-draggable': canMoveBlock && ! isDisabled,
 		'is-displacement-normal': displacement === 'normal',
 		'is-displacement-up': displacement === 'up',
@@ -603,7 +614,7 @@ function ListViewBlock( {
 		? selectedClientIds
 		: [ clientId ];
 
-	const getListViewBlockTabIndex = ( rovingTabIndex ) => {
+	const getListViewBlockTabIndex = ( rovingTabIndex?: number ) => {
 		if ( isDisabled ) {
 			return -1;
 		}
@@ -631,6 +642,7 @@ function ListViewBlock( {
 			path={ path }
 			id={ `list-view-${ listViewInstanceId }-block-${ clientId }` }
 			data-block={ clientId }
+			// @ts-expect-error Bug: `canEditBlock` is the selector, so it is always truthy.
 			data-expanded={ canEditBlock ? isExpanded : undefined }
 			ref={ rowRef }
 		>
@@ -655,6 +667,7 @@ function ListViewBlock( {
 							ref={ ref }
 							tabIndex={ getListViewBlockTabIndex( tabIndex ) }
 							onFocus={ onFocus }
+							// @ts-expect-error Bug: `canEditBlock` is the selector, so it is always truthy.
 							isExpanded={ canEditBlock ? isExpanded : undefined }
 							isSelected={ isSelected }
 							selectedClientIds={ selectedClientIds }
@@ -681,7 +694,11 @@ function ListViewBlock( {
 						withoutGridItem
 					>
 						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
+							{ ( {
+								ref,
+								tabIndex,
+								onFocus,
+							}: TreeGridItemRenderProps ) => (
 								<BlockMoverUpButton
 									orientation="vertical"
 									clientIds={ [ clientId ] }
@@ -692,7 +709,11 @@ function ListViewBlock( {
 							) }
 						</TreeGridItem>
 						<TreeGridItem>
-							{ ( { ref, tabIndex, onFocus } ) => (
+							{ ( {
+								ref,
+								tabIndex,
+								onFocus,
+							}: TreeGridItemRenderProps ) => (
 								<BlockMoverDownButton
 									orientation="vertical"
 									clientIds={ [ clientId ] }

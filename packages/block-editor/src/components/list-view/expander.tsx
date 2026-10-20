@@ -1,7 +1,8 @@
 import { chevronRightSmall, chevronLeftSmall, Icon } from '@wordpress/icons';
 import { isRTL } from '@wordpress/i18n';
+import type { ListViewExpanderProps } from './types';
 
-export default function ListViewExpander( { onClick } ) {
+export default function ListViewExpander( { onClick }: ListViewExpanderProps ) {
 	return (
 		// Keyboard events are handled by TreeGrid see: components/src/tree-grid/index.js
 		//

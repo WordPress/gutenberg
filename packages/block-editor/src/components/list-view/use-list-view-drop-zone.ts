@@ -1,3 +1,4 @@
+import type { RefCallback } from 'react';
 import { useSelect } from '@wordpress/data';
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import {
@@ -12,46 +13,12 @@ import {
 } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
-
-/** @typedef {import('../../utils/math').WPPoint} WPPoint */
-
-/**
- * The type of a drag event.
- *
- * @typedef {'default'|'file'|'html'} WPDragEventType
- */
-
-/**
- * An object representing data for blocks in the DOM used by drag and drop.
- *
- * @typedef {Object} WPListViewDropZoneBlock
- * @property {string}  clientId                        The client id for the block.
- * @property {string}  rootClientId                    The root client id for the block.
- * @property {number}  blockIndex                      The block's index.
- * @property {Element} element                         The DOM element representing the block.
- * @property {number}  innerBlockCount                 The number of inner blocks the block has.
- * @property {boolean} isDraggedBlock                  Whether the block is currently being dragged.
- * @property {boolean} isExpanded                      Whether the block is expanded in the UI.
- * @property {boolean} canInsertDraggedBlocksAsSibling Whether the dragged block can be a sibling of this block.
- * @property {boolean} canInsertDraggedBlocksAsChild   Whether the dragged block can be a child of this block.
- */
-
-/**
- * An array representing data for blocks in the DOM used by drag and drop.
- *
- * @typedef {WPListViewDropZoneBlock[]} WPListViewDropZoneBlocks
- */
-
-/**
- * An object containing details of a drop target.
- *
- * @typedef {Object} WPListViewDropZoneTarget
- * @property {string}                  blockIndex   The insertion index.
- * @property {string}                  rootClientId The root client id for the block.
- * @property {string|undefined}        clientId     The client id for the block.
- * @property {'top'|'bottom'|'inside'} dropPosition The position relative to the block that the user is dropping to.
- *                                                  'inside' refers to nesting as an inner block.
- */
+import type { EdgeName, Point } from '../../utils/math';
+import type {
+	ListViewDropZoneBlock,
+	ListViewDropZoneTarget,
+	UseListViewDropZoneOptions,
+} from './types';
 
 // When the indentation level, the corresponding left margin in `style.scss`
 // must be updated as well to ensure the drop zone is aligned with the indentation.
@@ -63,13 +30,18 @@ export const NESTING_LEVEL_INDENTATION = 24;
  *
  * Determined based on nesting level indentation of the current block.
  *
- * @param {WPPoint} point        The point representing the cursor position when dragging.
- * @param {DOMRect} rect         The rectangle.
- * @param {number}  nestingLevel The nesting level of the block.
- * @param {boolean} rtl          Whether the editor is in RTL mode.
- * @return {boolean} Whether the gesture is an upward gesture.
+ * @param point        The point representing the cursor position when dragging.
+ * @param rect         The rectangle.
+ * @param nestingLevel The nesting level of the block.
+ * @param rtl          Whether the editor is in RTL mode.
+ * @return Whether the gesture is an upward gesture.
  */
-function isUpGesture( point, rect, nestingLevel = 1, rtl = false ) {
+function isUpGesture(
+	point: Point,
+	rect: DOMRect,
+	nestingLevel = 1,
+	rtl = false
+): boolean {
 	// If the block is nested, and the user is dragging to the bottom
 	// left of the block (or bottom right in RTL languages), then it is an upward gesture.
 	const blockIndentPosition = rtl
@@ -90,18 +62,18 @@ function isUpGesture( point, rect, nestingLevel = 1, rtl = false ) {
  * of parent blocks, where the first item is the block the user
  * is hovering over, and the last item is the root block.
  *
- * @param {WPPoint} point        The point representing the cursor position when dragging.
- * @param {DOMRect} rect         The rectangle.
- * @param {number}  nestingLevel The nesting level of the block.
- * @param {boolean} rtl          Whether the editor is in RTL mode.
- * @return {number} The desired relative parent level.
+ * @param point        The point representing the cursor position when dragging.
+ * @param rect         The rectangle.
+ * @param nestingLevel The nesting level of the block.
+ * @param rtl          Whether the editor is in RTL mode.
+ * @return The desired relative parent level.
  */
 function getDesiredRelativeParentLevel(
-	point,
-	rect,
+	point: Point,
+	rect: DOMRect,
 	nestingLevel = 1,
 	rtl = false
-) {
+): number {
 	// In RTL languages, the block indent position is from the right edge of the block.
 	// In LTR languages, the block indent position is from the left edge of the block.
 	const blockIndentPosition = rtl
@@ -122,19 +94,24 @@ function getDesiredRelativeParentLevel(
 /**
  * Returns an array of the parent blocks of the block the user is dropping to.
  *
- * @param {WPListViewDropZoneBlock}  candidateBlockData The block the user is dropping to.
- * @param {WPListViewDropZoneBlocks} blocksData         Data about the blocks in list view.
- * @return {WPListViewDropZoneBlocks} An array of block parents, including the block the user is dropping to.
+ * @param candidateBlockData The block the user is dropping to.
+ * @param blocksData         Data about the blocks in list view.
+ * @return An array of block parents, including the block the user is dropping to.
  */
-function getCandidateBlockParents( candidateBlockData, blocksData ) {
-	const candidateBlockParents = [];
-	let currentBlockData = candidateBlockData;
+function getCandidateBlockParents(
+	candidateBlockData: ListViewDropZoneBlock,
+	blocksData: ListViewDropZoneBlock[]
+): ListViewDropZoneBlock[] {
+	const candidateBlockParents: ListViewDropZoneBlock[] = [];
+	let currentBlockData: ListViewDropZoneBlock | undefined =
+		candidateBlockData;
 
 	while ( currentBlockData ) {
 		candidateBlockParents.push( { ...currentBlockData } );
 		currentBlockData = blocksData.find(
 			( blockData ) =>
-				blockData.clientId === currentBlockData.rootClientId
+				// The loop condition checks the current block.
+				blockData.clientId === currentBlockData!.rootClientId
 		);
 	}
 
@@ -146,11 +123,14 @@ function getCandidateBlockParents( candidateBlockData, blocksData ) {
  * block. This is used to determine the block that the user is dropping to,
  * while ignoring the dragged block.
  *
- * @param {WPListViewDropZoneBlocks} blocksData Data about the blocks in list view.
- * @param {number}                   index      The index to begin searching from.
- * @return {WPListViewDropZoneBlock | undefined} The next non-dragged block.
+ * @param blocksData Data about the blocks in list view.
+ * @param index      The index to begin searching from.
+ * @return The next non-dragged block.
  */
-function getNextNonDraggedBlock( blocksData, index ) {
+function getNextNonDraggedBlock(
+	blocksData: ListViewDropZoneBlock[],
+	index: number
+): ListViewDropZoneBlock | undefined {
 	const nextBlockData = blocksData[ index + 1 ];
 	if ( nextBlockData && nextBlockData.isDraggedBlock ) {
 		return getNextNonDraggedBlock( blocksData, index + 1 );
@@ -167,12 +147,17 @@ function getNextNonDraggedBlock( blocksData, index ) {
  * the indentation of the next level of nesting. The vertical position of the
  * cursor must also be within the block.
  *
- * @param {WPPoint} point        The point representing the cursor position when dragging.
- * @param {DOMRect} rect         The rectangle.
- * @param {number}  nestingLevel The nesting level of the block.
- * @param {boolean} rtl          Whether the editor is in RTL mode.
+ * @param point        The point representing the cursor position when dragging.
+ * @param rect         The rectangle.
+ * @param nestingLevel The nesting level of the block.
+ * @param rtl          Whether the editor is in RTL mode.
  */
-function isNestingGesture( point, rect, nestingLevel = 1, rtl = false ) {
+function isNestingGesture(
+	point: Point,
+	rect: Pick< DOMRect, 'top' | 'left' | 'right' | 'bottom' >,
+	nestingLevel = 1,
+	rtl = false
+) {
 	const blockIndentPosition = rtl
 		? rect.right - nestingLevel * NESTING_LEVEL_INDENTATION
 		: rect.left + nestingLevel * NESTING_LEVEL_INDENTATION;
@@ -186,23 +171,28 @@ function isNestingGesture( point, rect, nestingLevel = 1, rtl = false ) {
 
 // Block navigation is always a vertical list, so only allow dropping
 // to the above or below a block.
-const ALLOWED_DROP_EDGES = [ 'top', 'bottom' ];
+const ALLOWED_DROP_EDGES: [ EdgeName, ...EdgeName[] ] = [ 'top', 'bottom' ];
 
 /**
  * Given blocks data and the cursor position, compute the drop target.
  *
- * @param {WPListViewDropZoneBlocks} blocksData Data about the blocks in list view.
- * @param {WPPoint}                  position   The point representing the cursor position when dragging.
- * @param {boolean}                  rtl        Whether the editor is in RTL mode.
+ * @param blocksData Data about the blocks in list view.
+ * @param position   The point representing the cursor position when dragging.
+ * @param rtl        Whether the editor is in RTL mode.
  *
- * @return {WPListViewDropZoneTarget | undefined} An object containing data about the drop target.
+ * @return An object containing data about the drop target.
  */
-export function getListViewDropTarget( blocksData, position, rtl = false ) {
-	let candidateEdge;
-	let candidateBlockData;
-	let candidateDistance;
-	let candidateRect;
-	let candidateBlockIndex;
+export function getListViewDropTarget(
+	blocksData: ListViewDropZoneBlock[],
+	position: Point,
+	rtl = false
+): ListViewDropZoneTarget | undefined {
+	// The edge, rect and index are set together with `candidateBlockData`.
+	let candidateEdge!: 'top' | 'bottom';
+	let candidateBlockData: ListViewDropZoneBlock | undefined;
+	let candidateDistance: number | undefined;
+	let candidateRect!: DOMRect;
+	let candidateBlockIndex!: number;
 
 	for ( let i = 0; i < blocksData.length; i++ ) {
 		const blockData = blocksData[ i ];
@@ -244,7 +234,8 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 				candidateBlockIndex = index - 1;
 			} else {
 				candidateBlockData = blockData;
-				candidateEdge = edge;
+				// Only the top and bottom edges are allowed.
+				candidateEdge = edge as 'top' | 'bottom';
 				candidateRect = rect;
 				candidateBlockIndex = index;
 			}
@@ -354,7 +345,8 @@ export function getListViewDropTarget( blocksData, position, rtl = false ) {
 
 			if ( candidateBlockParents[ targetParentIndex ] ) {
 				// Default to the block index of the candidate block.
-				let newBlockIndex = candidateBlockData.blockIndex;
+				let newBlockIndex: number | undefined =
+					candidateBlockData.blockIndex;
 
 				// If the next block is at the same level, use that as the default
 				// block index. This ensures that the block is dropped in the correct
@@ -418,16 +410,19 @@ const EXPAND_THROTTLE_OPTIONS = {
 /**
  * A react hook for implementing a drop zone in list view.
  *
- * @param {Object}       props                   Named parameters.
- * @param {?HTMLElement} [props.dropZoneElement] Optional element to be used as the drop zone.
- * @param {Function}     [props.updateExpansion] Dispatch to update the expansion state of a list of block clientIds.
+ * @param props                 Named parameters.
+ * @param props.dropZoneElement Optional element to be used as the drop zone.
+ * @param props.updateExpansion Dispatch to update the expansion state of a list of block clientIds.
  *
- * @return {WPListViewDropZoneTarget} The drop target.
+ * @return The drop target.
  */
 export default function useListViewDropZone( {
 	dropZoneElement,
 	updateExpansion,
-} ) {
+}: UseListViewDropZoneOptions ): {
+	ref: RefCallback< HTMLElement >;
+	target: ListViewDropZoneTarget | null | undefined;
+} {
 	const {
 		getBlockRootClientId,
 		getBlockIndex,
@@ -435,18 +430,22 @@ export default function useListViewDropZone( {
 		getDraggedBlockClientIds,
 		canInsertBlocks,
 	} = useSelect( blockEditorStore );
-	const [ target, setTarget ] = useState();
+	const [ target, setTarget ] = useState< ListViewDropZoneTarget | null >();
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};
 
-	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+	// Drops only run with a target.
+	const onBlockDrop = useOnBlockDrop(
+		targetRootClientId,
+		targetBlockIndex as number
+	);
 
 	const rtl = isRTL();
 
 	const previousRootClientId = usePrevious( targetRootClientId );
 
 	const maybeExpandBlock = useCallback(
-		( _target ) => {
+		( _target?: ListViewDropZoneTarget | null ) => {
 			// If the user is attempting to drop a block inside a collapsed block,
 			// that is, using a nesting gesture flagged by 'inside' dropPosition,
 			// expand the block within the list view.
@@ -487,23 +486,27 @@ export default function useListViewDropZone( {
 	const draggedBlockClientIds = getDraggedBlockClientIds();
 	const throttled = useThrottle(
 		useCallback(
-			( event, currentTarget ) => {
+			( event: DragEvent, currentTarget: HTMLElement ) => {
 				const position = { x: event.clientX, y: event.clientY };
 				const isBlockDrag = !! draggedBlockClientIds?.length;
 
 				const blockElements = Array.from(
-					currentTarget.querySelectorAll( '[data-block]' )
+					currentTarget.querySelectorAll< HTMLElement >(
+						'[data-block]'
+					)
 				);
 
 				const blocksData = blockElements.map( ( blockElement ) => {
-					const clientId = blockElement.dataset.block;
+					// The selector only matches rows with the attribute.
+					const clientId = blockElement.dataset.block!;
 					const isExpanded = blockElement.dataset.expanded === 'true';
 					const isDraggedBlock =
 						blockElement.classList.contains( 'is-dragging' );
 
 					// Get nesting level from `aria-level` attribute because Firefox does not support `element.ariaLevel`.
 					const nestingLevel = parseInt(
-						blockElement.getAttribute( 'aria-level' ),
+						// `parseInt` turns a missing attribute into `NaN`.
+						blockElement.getAttribute( 'aria-level' ) as string,
 						10
 					);
 					const rootClientId = getBlockRootClientId( clientId );
@@ -574,7 +577,8 @@ export default function useListViewDropZone( {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the throttled function.
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
-			throttled( event, event.currentTarget );
+			// The listener is on the drop zone element.
+			throttled( event, event.currentTarget as HTMLElement );
 		},
 		onDragEnd() {
 			throttled.cancel();

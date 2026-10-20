@@ -1,12 +1,13 @@
 import { useMemo } from '@wordpress/element';
+import type { ClientIdsTreeNode } from '../../store/types';
 
-export default function useListViewBlockIndexes( blocks ) {
+export default function useListViewBlockIndexes( blocks: ClientIdsTreeNode[] ) {
 	const blockIndexes = useMemo( () => {
-		const indexes = {};
+		const indexes: Partial< Record< string, number > > = {};
 
 		let currentGlobalIndex = 0;
 
-		const traverseBlocks = ( blockList ) => {
+		const traverseBlocks = ( blockList: ClientIdsTreeNode[] ) => {
 			blockList.forEach( ( block ) => {
 				indexes[ block.clientId ] = currentGlobalIndex;
 				currentGlobalIndex++;

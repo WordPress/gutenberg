@@ -6,6 +6,7 @@ import { UP, DOWN, HOME, END, ESCAPE } from '@wordpress/keycodes';
 import { store as blocksStore } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { getCommonDepthClientIds } from './utils';
+import type { ListViewSelectionEvent } from './types';
 
 export default function useBlockSelection() {
 	const { clearSelectedBlock, multiSelect, selectBlock } =
@@ -22,7 +23,12 @@ export default function useBlockSelection() {
 	const { getBlockType } = useSelect( blocksStore );
 
 	const updateBlockSelection = useCallback(
-		async ( event, clientId, destinationClientId, focusPosition ) => {
+		async (
+			event: ListViewSelectionEvent | undefined,
+			clientId: string,
+			destinationClientId?: string | null,
+			focusPosition?: 0 | -1 | null
+		) => {
 			if ( ! event?.shiftKey && event?.keyCode !== ESCAPE ) {
 				selectBlock( clientId, focusPosition );
 				return;
@@ -73,7 +79,8 @@ export default function useBlockSelection() {
 
 			// Update selection, if not only clearing the selection.
 			if ( ! isOnlyDeselection ) {
-				let startTarget = getBlockSelectionStart();
+				// A selection exists, or the key press below starts one.
+				let startTarget = getBlockSelectionStart() as string;
 				let endTarget = clientId;
 
 				// Handle keyboard behavior for selecting multiple blocks.
@@ -125,7 +132,8 @@ export default function useBlockSelection() {
 			let label;
 			if ( selectionDiff.length === 1 ) {
 				const title = getBlockType(
-					getBlockName( selectionDiff[ 0 ] )
+					// A removed block has no name, so no block type either.
+					getBlockName( selectionDiff[ 0 ] ) as string
 				)?.title;
 				if ( title ) {
 					label = sprintf(
@@ -138,6 +146,7 @@ export default function useBlockSelection() {
 				label = sprintf(
 					/* translators: %s: number of deselected blocks */
 					__( '%s blocks deselected.' ),
+					// @ts-expect-error `%s` formats the number too.
 					selectionDiff.length
 				);
 			}

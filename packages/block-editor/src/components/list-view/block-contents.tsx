@@ -2,16 +2,17 @@ import { forwardRef } from '@wordpress/element';
 import ListViewBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
 import { useInsertedBlockClientId, useListViewContext } from './context';
+import type { ListViewBlockContentsProps } from './types';
 
 /**
  * Renders the additional block content for the row of the block that was just
  * inserted. Reading the inserted block from its own context keeps an insert
  * from re-rendering the contents of every other row.
  *
- * @param {Object} props          Component props.
- * @param {string} props.clientId The client ID of the block for this row.
+ * @param props          Component props.
+ * @param props.clientId The client ID of the block for this row.
  */
-function InsertedBlockContent( { clientId } ) {
+function InsertedBlockContent( { clientId }: { clientId: string } ) {
 	const { AdditionalBlockContent, setInsertedBlockClientId } =
 		useListViewContext();
 	const insertedBlockClientId = useInsertedBlockClientId();
@@ -28,7 +29,10 @@ function InsertedBlockContent( { clientId } ) {
 	);
 }
 
-const ListViewBlockContents = forwardRef(
+const ListViewBlockContents = forwardRef<
+	HTMLAnchorElement,
+	ListViewBlockContentsProps
+>(
 	(
 		{
 			onClick,

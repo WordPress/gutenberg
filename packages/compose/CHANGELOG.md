@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useFixedWindowList`: Accept a ref whose element is not set yet ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
+
 ## 9.0.0 (2026-10-20)
 
 ### Breaking Changes
