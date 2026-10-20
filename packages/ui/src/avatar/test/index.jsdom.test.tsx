@@ -1,52 +1,24 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { createRef } from '@wordpress/element';
-import type { Avatar as _Avatar } from '@base-ui/react/avatar';
-import * as Avatar from '../index';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import warning from '@wordpress/warning';
+import { Avatar } from '../index';
+
+vi.mock( import( '@wordpress/warning' ), () => ( { default: vi.fn() } ) );
 
 afterEach( () => vi.useRealTimers() );
 
 describe( 'Avatar fallback', () => {
 	it.each( [ undefined, '' ] )(
-		'shows the fallback immediately with src=%s despite a delay',
+		'shows the fallback immediately with src=%s despite the internal delay',
 		( src ) => {
-			render(
-				<Avatar.Root>
-					<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-					<Avatar.Image src={ src } alt="" />
-				</Avatar.Root>
-			);
+			render( <Avatar name="Alex Morgan" src={ src } /> );
 			expect( screen.getByText( 'AM' ) ).toBeInTheDocument();
 		}
 	);
 
-	it( 'shows the fallback immediately when there is no image part', () => {
-		const ref = createRef< HTMLSpanElement >();
-		render(
-			<Avatar.Root>
-				<Avatar.Fallback
-					delay={ 300 }
-					ref={ ref }
-					render={ <span title="Custom fallback" /> }
-					className="custom-fallback"
-				>
-					AM
-				</Avatar.Fallback>
-			</Avatar.Root>
-		);
-		expect( screen.getByText( 'AM' ) ).toBeInTheDocument();
-		expect( ref.current ).toBe( screen.getByTitle( 'Custom fallback' ) );
-		expect( ref.current ).toHaveClass( 'custom-fallback' );
-	} );
-
-	it( 'retains the requested delay while an image is loading', () => {
+	it( 'retains the internal delay while an image is loading', () => {
 		vi.useFakeTimers();
-		render(
-			<Avatar.Root>
-				<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-				<Avatar.Image src="/portrait.png" alt="" keepMounted />
-			</Avatar.Root>
-		);
+		render( <Avatar name="Alex Morgan" src="/portrait.png" /> );
 		expect( screen.queryByText( 'AM' ) ).not.toBeInTheDocument();
 		act( () => vi.advanceTimersByTime( 299 ) );
 		expect( screen.queryByText( 'AM' ) ).not.toBeInTheDocument();
@@ -55,56 +27,10 @@ describe( 'Avatar fallback', () => {
 	} );
 
 	it( 'shows the fallback when an image fails before the delay ends', () => {
-		render(
-			<Avatar.Root>
-				<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-				<Avatar.Image src="/portrait.png" alt="" keepMounted />
-			</Avatar.Root>
-		);
+		render( <Avatar name="Alex Morgan" src="/portrait.png" /> );
 		fireEvent.error( screen.getByAltText( '' ) );
 		expect( screen.getByText( 'AM' ) ).toBeInTheDocument();
 	} );
-} );
-
-describe( 'Avatar custom rendering', () => {
-	it.each( [ 'Fallback', 'Initials' ] as const )(
-		'passes image loading state to custom %s rendering',
-		( part ) => {
-			// The public render type only advertises props; verify runtime state with an optional parameter.
-			const customRender = (
-				elementProps: React.ComponentPropsWithRef< 'span' >,
-				state?: _Avatar.Fallback.State
-			) => (
-				<span { ...elementProps } title={ state?.imageLoadingStatus } />
-			);
-			const fallback =
-				part === 'Fallback' ? (
-					<Avatar.Fallback render={ customRender }>
-						AM
-					</Avatar.Fallback>
-				) : (
-					<Avatar.Initials
-						name="Alex Morgan"
-						render={ customRender }
-					/>
-				);
-			const { rerender } = render(
-				<Avatar.Root>{ fallback }</Avatar.Root>
-			);
-			expect( screen.getByTitle( 'idle' ) ).toHaveTextContent( 'AM' );
-
-			rerender(
-				<Avatar.Root>
-					{ fallback }
-					<Avatar.Image src="/portrait.png" alt="" keepMounted />
-				</Avatar.Root>
-			);
-			expect( screen.getByTitle( 'loading' ) ).toHaveTextContent( 'AM' );
-
-			fireEvent.error( screen.getByAltText( '' ) );
-			expect( screen.getByTitle( 'error' ) ).toHaveTextContent( 'AM' );
-		}
-	);
 } );
 
 describe( 'Avatar initials', () => {
@@ -118,28 +44,22 @@ describe( 'Avatar initials', () => {
 	] )(
 		'shows complete first and last initials for %s',
 		( name, initials ) => {
-			render(
-				<Avatar.Root>
-					<Avatar.Initials name={ name } />
-				</Avatar.Root>
-			);
+			render( <Avatar name={ name } /> );
 			expect( screen.getByText( initials ) ).toBeInTheDocument();
 		}
 	);
 
 	it.each( [ undefined, '', '   ' ] )(
-		'shows the person fallback for a blank name %s',
+		'leaves the fallback empty and warns for a blank name %s',
 		( name ) => {
-			render(
-				<Avatar.Root role="img" aria-label="Unknown person">
-					<Avatar.Initials name={ name } />
-				</Avatar.Root>
-			);
+			// Missing names can still reach the component from JavaScript consumers.
+			render( <Avatar name={ name! } aria-label="Unknown person" /> );
 			expect(
-				within(
-					screen.getByRole( 'img', { name: 'Unknown person' } )
-				).getByRole( 'presentation', { hidden: true } )
-			).toBeInTheDocument();
+				screen.getByRole( 'img', { name: 'Unknown person' } )
+			).toHaveTextContent( '' );
+			expect( warning ).toHaveBeenCalledWith(
+				'Avatar: `name` has no displayable characters. Provide a name with visible characters for the initials and accessible label.'
+			);
 		}
 	);
 } );
