@@ -2,6 +2,7 @@ import clsx from 'clsx';
 import type { ChangeEvent } from 'react';
 import { useInstanceId } from '@wordpress/compose';
 import { Stack, Text, VisuallyHidden } from '@wordpress/ui';
+import BaseControl from '../base-control';
 import type { WordPressComponentProps } from '../context';
 import type { RadioControlProps } from './types';
 import { StyledHelp } from '../base-control/styles/base-control-styles';
@@ -83,13 +84,9 @@ export function RadioControl(
 			{ hideLabelFromVision ? (
 				<VisuallyHidden render={ <legend /> }>{ label }</VisuallyHidden>
 			) : (
-				<Text
-					render={ <legend /> }
-					variant="heading-sm"
-					className="components-radio-control__legend"
-				>
+				<BaseControl.VisualLabel as="legend">
 					{ label }
-				</Text>
+				</BaseControl.VisualLabel>
 			) }
 
 			<Stack
