@@ -1,27 +1,9 @@
-import { createContext, useCallback, useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import {
 	getNodeDocument,
 	isInsideCurrentPopup,
 	useIframePressListeners,
 } from './iframe-dismissal-utils';
-
-export const IframeOutsidePressContext = createContext<
-	( ( popup: HTMLDivElement | null ) => void ) | null
->( null );
-
-function getCommonDocument( first: Document, second: Document ) {
-	const ancestors = new Set< Document >();
-	let current: Document | undefined = first;
-	while ( current ) {
-		ancestors.add( current );
-		current = current.defaultView?.frameElement?.ownerDocument;
-	}
-	current = second;
-	while ( current && ! ancestors.has( current ) ) {
-		current = current.defaultView?.frameElement?.ownerDocument;
-	}
-	return current ?? first;
-}
 
 type OpenChangeHandler< EventDetails > = (
 	open: boolean,
@@ -35,7 +17,9 @@ function dispatchOutsidePress( event: Event, ownerDocument: Document ) {
 		frameElement = frameElement.ownerDocument.defaultView?.frameElement;
 	}
 
-	const target = frameElement ?? ownerDocument.body;
+	if ( ! frameElement ) {
+		return;
+	}
 
 	const EventConstructor =
 		event.type === 'mousedown'
@@ -46,7 +30,7 @@ function dispatchOutsidePress( event: Event, ownerDocument: Document ) {
 	}
 
 	const pointerEvent = event as PointerEvent;
-	target.dispatchEvent(
+	frameElement.dispatchEvent(
 		new EventConstructor( event.type, {
 			bubbles: true,
 			button: pointerEvent.button,
@@ -66,7 +50,7 @@ type IframeOutsidePressForwardingOptions< TEventDetails > = {
 
 /**
  * Forwards outside same-origin iframe presses for non-modal form popups.
- * Forwards events into the popup document for Base UI dismissal.
+ * Dispatches pointer and mouse presses on the containing iframe for Base UI dismissal.
  * Requires a trigger captured from an opening onOpenChange notification.
  *
  * @param options Popup state and open-change handler.
@@ -89,35 +73,21 @@ export function useIframeOutsidePressForwarding<
 		defaultOpen ?? false
 	);
 	const [ trigger, setTrigger ] = useState< Element | null >( null );
-	const [ popup, setPopup ] = useState< HTMLDivElement | null >( null );
 	const open = openProp ?? uncontrolledOpen;
 	const handleIframePress = useCallback(
 		( event: Event ) => {
-			const eventTarget = event.target as Node | null;
-			if (
-				trigger &&
-				popup &&
-				getNodeDocument( eventTarget ) !== popup.ownerDocument &&
-				! trigger.contains( eventTarget ) &&
-				! isInsideCurrentPopup( event, trigger )
-			) {
-				dispatchOutsidePress( event, popup.ownerDocument );
+			if ( trigger && ! isInsideCurrentPopup( event, trigger ) ) {
+				dispatchOutsidePress( event, trigger.ownerDocument );
 			}
 		},
-		[ popup, trigger ]
+		[ trigger ]
 	);
 	useIframePressListeners( {
 		enabled: open && modal === false && ! disabled && trigger !== null,
 		onClick: handleIframePress,
 		onMouseDown: handleIframePress,
 		onPointerDown: handleIframePress,
-		ownerDocument:
-			trigger && popup
-				? getCommonDocument(
-						trigger.ownerDocument,
-						popup.ownerDocument
-					)
-				: null,
+		ownerDocument: trigger?.ownerDocument ?? null,
 	} );
 
 	const handleOpenChange: OpenChangeHandler< TEventDetails > = (
@@ -145,5 +115,5 @@ export function useIframeOutsidePressForwarding<
 		);
 	};
 
-	return { onOpenChange: handleOpenChange, popupRef: setPopup };
+	return { onOpenChange: handleOpenChange };
 }

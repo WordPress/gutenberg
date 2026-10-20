@@ -4,10 +4,7 @@ import { page, userEvent } from 'vitest/browser';
 import { render } from 'vitest-browser-react';
 import { createPortal } from '@wordpress/element';
 import * as Combobox from '../index';
-import {
-	addCanvasButton,
-	addIframeButton,
-} from '../../../test/fixtures/iframe';
+import { addCanvasButton } from '../../../test/fixtures/iframe';
 
 describe( 'Combobox interactions', () => {
 	it( 'read-only Combobox allows browsing without changing the value', async () => {
@@ -162,113 +159,4 @@ describe( 'Combobox interactions', () => {
 		await expect.element( option ).not.toBeInTheDocument();
 		expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
 	} );
-
-	it.each( [ { sibling: false }, { sibling: true } ] )(
-		'closes a non-modal Combobox portaled to another document and delivers the iframe click (sibling: $sibling)',
-		async ( { sibling } ) => {
-			const onCanvasClick = vi.fn();
-			const onPopupClick = vi.fn();
-			const onOpenChange = vi.fn();
-			await render(
-				<>
-					<iframe title="Component frame" width="400" height="250" />
-					{ sibling && (
-						<iframe
-							title="Popup document"
-							width="400"
-							height="250"
-						/>
-					) }
-				</>
-			);
-			const componentDocument =
-				screen.getByTitle< HTMLIFrameElement >(
-					'Component frame'
-				).contentDocument;
-			const popupDocument = sibling
-				? screen.getByTitle< HTMLIFrameElement >( 'Popup document' )
-						.contentDocument
-				: document;
-			if ( ! componentDocument || ! popupDocument ) {
-				throw new Error( 'Expected same-origin iframe documents.' );
-			}
-			await render(
-				createPortal(
-					<>
-						<Combobox.Root
-							items={ [ 'First' ] }
-							modal={ false }
-							onOpenChange={ onOpenChange }
-						>
-							<Combobox.Input aria-label="Search" />
-							<Combobox.Popup
-								portal={
-									<Combobox.Portal
-										container={ popupDocument.body }
-									/>
-								}
-							>
-								<Combobox.List>
-									<Combobox.Item value="First">
-										<Combobox.ItemLabel>
-											First
-										</Combobox.ItemLabel>
-									</Combobox.Item>
-									<iframe
-										title="Popup frame"
-										width="150"
-										height="50"
-									/>
-								</Combobox.List>
-							</Combobox.Popup>
-						</Combobox.Root>
-						<iframe
-							title="Editor canvas"
-							style={ { position: 'fixed', left: 200, top: 100 } }
-						/>
-					</>,
-					componentDocument.body
-				)
-			);
-			addIframeButton(
-				within(
-					componentDocument.body
-				).getByTitle< HTMLIFrameElement >( 'Editor canvas' ),
-				onCanvasClick
-			);
-			const componentFrame = page.frameLocator(
-				page.getByTitle( 'Component frame' )
-			);
-			await componentFrame
-				.getByRole( 'combobox', { name: 'Search' } )
-				.fill( 'F' );
-			const popupFrame = sibling
-				? page.frameLocator( page.getByTitle( 'Popup document' ) )
-				: page;
-			const option = popupFrame.getByRole( 'option', { name: 'First' } );
-			await expect.element( option ).toBeVisible();
-			const popupIframe = within(
-				popupDocument.body
-			).getByTitle< HTMLIFrameElement >( 'Popup frame' );
-			addIframeButton( popupIframe, onPopupClick );
-			await page
-				.frameLocator( popupFrame.getByTitle( 'Popup frame' ) )
-				.getByRole( 'button', { name: 'Edit block' } )
-				.click();
-			expect( onPopupClick ).toHaveBeenCalledTimes( 1 );
-			await expect.element( option ).toBeVisible();
-
-			await page
-				.frameLocator( componentFrame.getByTitle( 'Editor canvas' ) )
-				.getByRole( 'button', { name: 'Edit block' } )
-				.click();
-
-			await expect.element( option ).not.toBeInTheDocument();
-			expect( onCanvasClick ).toHaveBeenCalledTimes( 1 );
-			expect( onOpenChange ).toHaveBeenLastCalledWith(
-				false,
-				expect.objectContaining( { reason: 'outside-press' } )
-			);
-		}
-	);
 } );

@@ -1,8 +1,6 @@
 import { Select as _Select } from '@base-ui/react/select';
 import clsx from 'clsx';
-import { forwardRef, useContext } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
-import { IframeOutsidePressContext } from '../../../utils/use-iframe-outside-press-forwarding';
+import { forwardRef } from '@wordpress/element';
 import { Portal } from './portal';
 import { Positioner } from './positioner';
 import { renderSlotWithChildren } from '../../../utils/render-slot-with-children';
@@ -16,11 +14,9 @@ export const Popup = forwardRef< HTMLDivElement, SelectPopupProps >(
 		{ className, portal, positioner, width, children, ...restProps },
 		ref
 	) {
-		const popupRef = useContext( IframeOutsidePressContext );
-		const mergedRef = useMergeRefs( [ ref, popupRef ] );
 		const popupContent = (
 			<_Select.Popup
-				ref={ mergedRef }
+				ref={ ref }
 				className={ clsx(
 					itemPopupStyles.popup,
 					getItemPopupWidthClassName( width ),

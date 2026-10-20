@@ -1,10 +1,7 @@
 import { Combobox as _Combobox } from '@base-ui/react/combobox';
 import type { ComboboxRootProps } from './types';
 import { DirectionProvider } from '../../../utils/direction-provider';
-import {
-	IframeOutsidePressContext,
-	useIframeOutsidePressForwarding,
-} from '../../../utils/use-iframe-outside-press-forwarding';
+import { useIframeOutsidePressForwarding } from '../../../utils/use-iframe-outside-press-forwarding';
 
 /**
  * Low-level primitive for a combobox that has an associated selection state.
@@ -17,7 +14,7 @@ export function Root<
 	Multiple extends boolean | undefined = false,
 	Item = Value,
 >( props: ComboboxRootProps< Value, Multiple, Item > ) {
-	const { popupRef, ...iframeOutsidePressForwardingProps } =
+	const iframeOutsidePressForwardingProps =
 		useIframeOutsidePressForwarding< _Combobox.Root.OpenChangeEventDetails >(
 			{
 				defaultOpen: props.defaultOpen,
@@ -31,12 +28,10 @@ export function Root<
 
 	return (
 		<DirectionProvider>
-			<IframeOutsidePressContext.Provider value={ popupRef }>
-				<_Combobox.Root
-					{ ...props }
-					{ ...iframeOutsidePressForwardingProps }
-				/>
-			</IframeOutsidePressContext.Provider>
+			<_Combobox.Root
+				{ ...props }
+				{ ...iframeOutsidePressForwardingProps }
+			/>
 		</DirectionProvider>
 	);
 }
