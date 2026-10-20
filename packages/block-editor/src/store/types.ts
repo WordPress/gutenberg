@@ -8,6 +8,7 @@ import type {
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { Color } from '@wordpress/global-styles-engine';
 import type { BlockEditingMode } from '../components/block-editing-mode';
+import type { EditorStylesStyle } from '../components/editor-styles/types';
 import type {
 	BlockVisibility,
 	ViewportBreakpoints,
@@ -445,6 +446,8 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
 	__unstableIsBlockBasedTheme?: boolean;
+	/** The styles of the editor canvas. */
+	styles?: Array< EditorStylesStyle >;
 	[ currentUserIdSelectKey ]?: (
 		select: typeof globalSelect
 	) => number | undefined;
