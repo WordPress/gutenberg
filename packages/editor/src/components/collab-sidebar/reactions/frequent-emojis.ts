@@ -1,7 +1,7 @@
 import { useCallback } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { REACTION_EMOJIS, emojiToHexKey } from './reaction-emojis';
+import { REACTION_EMOJIS } from './reaction-emojis';
 
 /**
  * A recorded frequently-used emoji: its normalized hex key and how many
@@ -26,8 +26,8 @@ export const MAX_FREQUENT_EMOJIS = 30;
  * Seeds the frequently-used section before any picks. Never persisted:
  * appended at display time, and they fall away as usage fills the list.
  */
-export const DEFAULT_FREQUENT_EMOJI_KEYS = REACTION_EMOJIS.map( ( entry ) =>
-	emojiToHexKey( entry.emoji )
+export const DEFAULT_FREQUENT_EMOJI_KEYS = REACTION_EMOJIS.map(
+	( entry ) => entry.hexKey
 );
 
 /**

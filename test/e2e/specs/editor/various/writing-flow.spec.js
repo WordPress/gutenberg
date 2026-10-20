@@ -1140,7 +1140,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		).toHaveClass( /is-selected/ );
 	} );
 
-	test( 'should prevent browser default formatting on multi selection', async ( {
+	test( 'should format a multi selection with the shortcut, not the browser default', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -1160,11 +1160,11 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		await expect.poll( editor.getEditedPostContent )
 			.toBe( `<!-- wp:paragraph -->
-<p>first</p>
+<p>fir<strong>st</strong></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p>second</p>
+<p><strong>seco</strong>nd</p>
 <!-- /wp:paragraph -->` );
 	} );
 

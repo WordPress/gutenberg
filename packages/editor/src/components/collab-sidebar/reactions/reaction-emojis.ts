@@ -1,26 +1,79 @@
 import { _x } from '@wordpress/i18n';
 
 /**
- * A single curated reaction emoji.
+ * A reaction emoji.
  */
-export interface CuratedEmoji {
+export interface ReactionEmoji {
 	emoji: string;
+	// The storage key, as `emojiToHexKey()` builds it (e.g. `2764` for ❤️).
+	hexKey: string;
 	label: string;
+	sentenceLabel: string;
 }
 
 /**
- * Curated emoji set for reactions, seeding "Frequently used" and naming
- * these emoji with their own translated labels. Lowercase, like the
- * Emojibase names around them, since they also appear mid-sentence
- * ("Adam reacted with heart").
+ * The curated reaction emoji, seeding the picker's "Frequently used"
+ * section. `label` names the emoji on its own (picker items, the reaction
+ * count label). `sentenceLabel` is only used in
+ * the "reacted with" sentences, so translators can give it whatever form
+ * that phrase needs.
  */
-export const REACTION_EMOJIS: CuratedEmoji[] = [
-	{ emoji: '❤️', label: _x( 'heart', 'emoji reaction' ) },
-	{ emoji: '🎉', label: _x( 'celebration', 'emoji reaction' ) },
-	{ emoji: '😄', label: _x( 'smile', 'emoji reaction' ) },
-	{ emoji: '👀', label: _x( 'eyes', 'emoji reaction' ) },
-	{ emoji: '🚀', label: _x( 'rocket', 'emoji reaction' ) },
+export const REACTION_EMOJIS: ReactionEmoji[] = [
+	{
+		emoji: '❤️',
+		hexKey: '2764',
+		label: _x( 'Heart', 'emoji reaction' ),
+		sentenceLabel: _x( 'heart', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '🎉',
+		hexKey: '1f389',
+		label: _x( 'Celebration', 'emoji reaction' ),
+		sentenceLabel: _x(
+			'celebration',
+			'emoji reaction, after "reacted with"'
+		),
+	},
+	{
+		emoji: '😄',
+		hexKey: '1f604',
+		label: _x( 'Smile', 'emoji reaction' ),
+		sentenceLabel: _x( 'smile', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '👀',
+		hexKey: '1f440',
+		label: _x( 'Eyes', 'emoji reaction' ),
+		sentenceLabel: _x( 'eyes', 'emoji reaction, after "reacted with"' ),
+	},
+	{
+		emoji: '🚀',
+		hexKey: '1f680',
+		label: _x( 'Rocket', 'emoji reaction' ),
+		sentenceLabel: _x( 'rocket', 'emoji reaction, after "reacted with"' ),
+	},
 ];
+
+/**
+ * The curated reaction emoji stored under a hex key.
+ *
+ * @param hexKey The storage key, e.g. `2764`.
+ * @return The reaction emoji, or undefined for any other emoji.
+ */
+export function getReactionEmoji( hexKey: string ): ReactionEmoji | undefined {
+	return REACTION_EMOJIS.find( ( entry ) => entry.hexKey === hexKey );
+}
+
+/**
+ * The translated label of a curated reaction, so the picker names it the
+ * same way the reaction pills do.
+ *
+ * @param hexKey Normalized hex key, e.g. `2764`.
+ * @return The curated label, or undefined for any other emoji.
+ */
+export function getCuratedLabel( hexKey: string ): string | undefined {
+	return getReactionEmoji( hexKey )?.label;
+}
 
 /**
  * Reactions storage format: every reaction, curated or not, is stored as
@@ -110,17 +163,4 @@ export function hexKeyToEmoji( hexKey: string ): string {
 	} catch {
 		return hexKey;
 	}
-}
-
-/**
- * The translated label of a curated reaction, so the full picker and the
- * pills name it the same way the quick reactions do.
- *
- * @param hexKey Normalized hex key, e.g. `2764`.
- * @return The curated label, or undefined for any other emoji.
- */
-export function getCuratedLabel( hexKey: string ): string | undefined {
-	return REACTION_EMOJIS.find(
-		( entry ) => emojiToHexKey( entry.emoji ) === hexKey
-	)?.label;
 }

@@ -197,7 +197,7 @@ class BlockNoteUtils {
 			.click();
 		await this.waitForFullPicker();
 
-		// Curated reactions carry their own exact labels (e.g. "heart")
+		// Curated reactions carry their own exact labels (e.g. "Heart")
 		// and are seeded into the "Frequently used" section, so an
 		// exact-name gridcell lookup finds them
 		// without matching Emojibase labels that merely contain the name

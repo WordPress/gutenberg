@@ -25,7 +25,7 @@
 		{ "path": "../../packages/icons/tsconfig.build.json" },
 		{ "path": "../../packages/lazy-editor" },
 		{ "path": "../../packages/route" },
-		{ "path": "../../packages/url" }
+		{ "path": "../../packages/url/tsconfig.build.json" }
 	],
 	"include": [ "**/*.ts", "**/*.tsx" ],
 	"exclude": [ "build", "node_modules" ]

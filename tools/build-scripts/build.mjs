@@ -80,7 +80,7 @@ async function build() {
 
 	try {
 		/*
-		 * Verify node_modules is in sync with package-lock.json.
+		 * Step 0: Verify node_modules is in sync with package-lock.json.
 		 *
 		 * GUTENBERG_CHECK_INSTALLED_DEPS controls when this runs:
 		 *   - `BEFORE_BUILD` (default): pre-build gate.
