@@ -1,11 +1,12 @@
 import { Breadcrumbs, Page } from '@wordpress/admin-ui';
 import { store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as viewportStore } from '@wordpress/viewport';
 import {
+	layoutGeometry,
 	WidgetDashboard,
 	type DashboardWidget,
 } from '@wordpress/widget-dashboard';
@@ -20,11 +21,15 @@ import { DashboardWidgetHostProvider } from './widget-host';
 registerDashboardFieldTypes();
 
 function Dashboard() {
-	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
-		'gutenberg_dashboard'
-	);
-
 	const gridSettings = useDashboardGridSettings();
+	const geometry = useMemo(
+		() => layoutGeometry( gridSettings ),
+		[ gridSettings ]
+	);
+	const [ layout, setLayout, resetLayout ] = useDashboardLayout(
+		'gutenberg_dashboard',
+		geometry
+	);
 
 	const widgetsModules = useSelect(
 		( select ) =>
