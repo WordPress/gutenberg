@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Allow clicking block toolbar buttons that overlap the right edge of the Customizer sidebar ([#84567](https://github.com/WordPress/gutenberg/pull/84567)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -11,7 +15,6 @@
 ### Bug Fixes
 
 -   Keep the block selected when choosing an option in a `@wordpress/ui` overlay, such as the Legacy Widget type select ([#84628](https://github.com/WordPress/gutenberg/pull/84628)).
--   Allow clicking block toolbar buttons that overlap the right edge of the Customizer sidebar ([#84567](https://github.com/WordPress/gutenberg/pull/84567)).
 
 ## 5.57.0 (2026-10-07)
 
