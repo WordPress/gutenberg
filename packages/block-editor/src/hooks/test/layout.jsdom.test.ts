@@ -28,7 +28,7 @@ describe( 'layout', () => {
 		it.each( [ null, undefined ] )(
 			'outputs no layout styles when the block gap setting is %s',
 			( blockGapSetting ) => {
-				useSettings.mockReturnValue( [ blockGapSetting ] );
+				vi.mocked( useSettings ).mockReturnValue( [ blockGapSetting ] );
 
 				const { result } = renderHook( () =>
 					useLayoutStyles( attributes, 'test/block', '.my-container' )
@@ -39,7 +39,7 @@ describe( 'layout', () => {
 		);
 
 		it( 'outputs block gap styles when the theme opts into block gap', () => {
-			useSettings.mockReturnValue( [ true ] );
+			vi.mocked( useSettings ).mockReturnValue( [ true ] );
 
 			const { result } = renderHook( () =>
 				useLayoutStyles( attributes, 'test/block', '.my-container' )

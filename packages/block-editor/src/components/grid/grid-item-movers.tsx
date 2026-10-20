@@ -13,6 +13,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BlockControls from '../block-controls';
 import { useGetNumberOfBlocksBeforeCell } from './use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
+import type { GridItemMoverProps, GridItemMoversProps } from './types';
 
 export function GridItemMovers( {
 	layout,
@@ -20,7 +21,7 @@ export function GridItemMovers( {
 	onChange,
 	gridClientId,
 	blockClientId,
-} ) {
+}: GridItemMoversProps ) {
 	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
@@ -35,7 +36,8 @@ export function GridItemMovers( {
 
 	const getNumberOfBlocksBeforeCell = useGetNumberOfBlocksBeforeCell(
 		gridClientId,
-		columnCount
+		// Items move only within a grid with a column count.
+		columnCount!
 	);
 
 	return (
@@ -145,7 +147,7 @@ function GridItemMover( {
 	isDisabled,
 	onClick,
 	description,
-} ) {
+}: GridItemMoverProps ) {
 	const instanceId = useInstanceId( GridItemMover );
 	const descriptionId = `block-editor-grid-item-mover-button__description-${ instanceId }`;
 	return (
@@ -158,8 +160,10 @@ function GridItemMover( {
 				icon={ icon }
 				label={ label }
 				aria-describedby={ descriptionId }
-				onClick={ isDisabled ? null : onClick }
-				disabled={ isDisabled }
+				// The button ignores a `null` click handler.
+				onClick={ ( isDisabled ? null : onClick ) as typeof onClick }
+				// A zero or missing count enables the button.
+				disabled={ isDisabled as boolean }
 				accessibleWhenDisabled
 			/>
 			<VisuallyHidden id={ descriptionId }>

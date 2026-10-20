@@ -15,6 +15,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useGetNumberOfBlocksBeforeCell } from '../grid/use-get-number-of-blocks-before-cell';
 import { store as blockEditorStore } from '../../store';
 import { useSettings } from '../use-settings';
+import type {
+	ChildLayoutControlProps,
+	ChildLayoutControlsProps,
+	ParentLayout,
+} from './types';
 
 // These are the serialized `selfStretch` values. `max` used to be called
 // "Fixed" in the UI, but was renamed and replaced by `fixedNoShrink`.
@@ -30,18 +35,22 @@ const FLEX_SIZE_VALUES = [
 	FLEX_CHILD_LAYOUT_VALUES.fixed,
 ];
 
-function isFlexSizeValue( value ) {
-	return FLEX_SIZE_VALUES.includes( value );
+function isFlexSizeValue( value: string | undefined ) {
+	// `includes` finds no match for `undefined`.
+	return FLEX_SIZE_VALUES.includes( value as string );
 }
 
-function maxSizeLabel( parentLayout ) {
+function maxSizeLabel( parentLayout: ParentLayout | undefined ) {
 	const { orientation = 'horizontal' } = parentLayout ?? {};
 	return orientation === 'horizontal'
 		? _x( 'Max', 'Block with maximum width in flex layout' )
 		: _x( 'Max', 'Block with maximum height in flex layout' );
 }
 
-function helpText( flexControlValue, parentLayout ) {
+function helpText(
+	flexControlValue: string,
+	parentLayout: ParentLayout | undefined
+) {
 	const { orientation = 'horizontal' } = parentLayout ?? {};
 
 	if ( flexControlValue === FLEX_CHILD_LAYOUT_VALUES.grow ) {
@@ -69,15 +78,15 @@ function helpText( flexControlValue, parentLayout ) {
 /**
  * Form to edit the child layout value.
  *
- * @param {Object}   props                      Props.
- * @param {Object}   props.value                The child layout value.
- * @param {Function} props.onChange             Function to update the child layout value.
- * @param {Object}   props.parentLayout         The parent layout value.
+ * @param props                      Props.
+ * @param props.value                The child layout value.
+ * @param props.onChange             Function to update the child layout value.
+ * @param props.parentLayout         The parent layout value.
  *
- * @param {boolean}  props.isShownByDefault     Whether the control is shown by default.
- * @param {string}   props.panelId              The panel ID.
- * @param {boolean}  props.showGridSpanDefaults Whether unset grid span controls should show default values.
- * @return {Element} child layout edit element.
+ * @param props.isShownByDefault     Whether the control is shown by default.
+ * @param props.panelId              The panel ID.
+ * @param props.showGridSpanDefaults Whether unset grid span controls should show default values.
+ * @return child layout edit element.
  */
 export default function ChildLayoutControl( {
 	value: childLayout = {},
@@ -86,7 +95,7 @@ export default function ChildLayoutControl( {
 	isShownByDefault,
 	panelId,
 	showGridSpanDefaults = true,
-} ) {
+}: ChildLayoutControlProps ) {
 	const {
 		type: parentType,
 		default: { type: defaultParentType = 'default' } = {},
@@ -125,7 +134,7 @@ function FlexControls( {
 	parentLayout,
 	isShownByDefault,
 	panelId,
-} ) {
+}: ChildLayoutControlsProps ) {
 	const { selfStretch, flexSize } = childLayout;
 	const { orientation = 'horizontal' } = parentLayout ?? {};
 	const flexControlValue = selfStretch || FLEX_CHILD_LAYOUT_VALUES.fit;
@@ -135,7 +144,8 @@ function FlexControls( {
 		orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: availableUnits || [
+		// The setting lists unit names.
+		availableUnits: ( availableUnits as string[] | undefined ) || [
 			'%',
 			'px',
 			'em',
@@ -175,11 +185,12 @@ function FlexControls( {
 				value={ flexControlValue }
 				help={ helpText( flexControlValue, parentLayout ) }
 				onChange={ ( value ) => {
-					const newFlexSize = isFlexSizeValue( value )
+					// The options have string values.
+					const newFlexSize = isFlexSizeValue( value as string )
 						? flexSize
 						: null;
 					onChange( {
-						selfStretch: value,
+						selfStretch: value as string,
 						flexSize: newFlexSize,
 					} );
 				} }
@@ -224,7 +235,8 @@ function FlexControls( {
 							flexSize: value,
 						} );
 					} }
-					value={ flexSize }
+					// The control shows no value for `null`.
+					value={ flexSize as string | undefined }
 					min={ 0 }
 					label={ flexResetLabel }
 					hideLabelFromVision
@@ -234,7 +246,9 @@ function FlexControls( {
 	);
 }
 
-export function childLayoutOrientation( parentLayout ) {
+export function childLayoutOrientation(
+	parentLayout: ParentLayout | undefined
+) {
 	const { orientation = 'horizontal' } = parentLayout ?? {};
 	return orientation === 'horizontal' ? __( 'Width' ) : __( 'Height' );
 }
@@ -246,7 +260,7 @@ function GridControls( {
 	isShownByDefault,
 	panelId,
 	showGridSpanDefaults,
-} ) {
+}: ChildLayoutControlsProps ) {
 	const { columnStart, rowStart, columnSpan, rowSpan } = childLayout;
 	const { columnCount, rowCount } = parentLayout ?? {};
 	const rootClientId = useSelect( ( select ) =>
@@ -304,7 +318,10 @@ function GridControls( {
 						onChange={ ( value ) => {
 							// Don't allow unsetting.
 							const newColumnSpan =
-								value === '' ? 1 : parseInt( value, 10 );
+								// The number input passes a string.
+								value === ''
+									? 1
+									: parseInt( value as string, 10 );
 							const constrainedValue = maxColumnSpan
 								? Math.min( newColumnSpan, maxColumnSpan )
 								: newColumnSpan;
@@ -316,7 +333,8 @@ function GridControls( {
 								columnSpan: constrainedValue,
 							} );
 						} }
-						value={ columnSpanValue }
+						// The input renders the number as is.
+						value={ columnSpanValue as unknown as string }
 						min={ 1 }
 						max={ maxColumnSpan }
 					/>
@@ -327,7 +345,10 @@ function GridControls( {
 						type="number"
 						onChange={ ( value ) => {
 							const newRowSpan =
-								value === '' ? 1 : parseInt( value, 10 );
+								// The number input passes a string.
+								value === ''
+									? 1
+									: parseInt( value as string, 10 );
 							const constrainedValue = maxRowSpan
 								? Math.min( newRowSpan, maxRowSpan )
 								: newRowSpan;
@@ -339,7 +360,8 @@ function GridControls( {
 								rowSpan: constrainedValue,
 							} );
 						} }
-						value={ rowSpanValue }
+						// The input renders the number as is.
+						value={ rowSpanValue as unknown as string }
 						min={ 1 }
 						max={ maxRowSpan }
 					/>
@@ -365,7 +387,10 @@ function GridControls( {
 							onChange={ ( value ) => {
 								// Don't allow unsetting.
 								const newColumnStart =
-									value === '' ? 1 : parseInt( value, 10 );
+									// The number input passes a string.
+									value === ''
+										? 1
+										: parseInt( value as string, 10 );
 								onChange( {
 									columnStart: newColumnStart,
 									rowStart,
@@ -379,11 +404,13 @@ function GridControls( {
 									rootClientId,
 									getNumberOfBlocksBeforeCell(
 										newColumnStart,
-										rowStart
+										// Placing a block in a manual grid sets both.
+										rowStart!
 									)
 								);
 							} }
-							value={ columnStart ?? 1 }
+							// The input renders the number as is.
+							value={ ( columnStart ?? 1 ) as unknown as string }
 							min={ 1 }
 							max={
 								columnCount
@@ -399,7 +426,10 @@ function GridControls( {
 							onChange={ ( value ) => {
 								// Don't allow unsetting.
 								const newRowStart =
-									value === '' ? 1 : parseInt( value, 10 );
+									// The number input passes a string.
+									value === ''
+										? 1
+										: parseInt( value as string, 10 );
 								onChange( {
 									columnStart,
 									rowStart: newRowStart,
@@ -412,12 +442,14 @@ function GridControls( {
 									rootClientId,
 									rootClientId,
 									getNumberOfBlocksBeforeCell(
-										columnStart,
+										// Placing a block in a manual grid sets both.
+										columnStart!,
 										newRowStart
 									)
 								);
 							} }
-							value={ rowStart ?? 1 }
+							// The input renders the number as is.
+							value={ ( rowStart ?? 1 ) as unknown as string }
 							min={ 1 }
 							max={
 								rowCount
