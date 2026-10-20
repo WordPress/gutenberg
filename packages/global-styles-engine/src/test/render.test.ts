@@ -881,6 +881,44 @@ describe( 'global styles renderer', () => {
 			);
 		} );
 
+		it( 'should handle select element pseudo selectors', () => {
+			const tree = {
+				styles: {
+					elements: {
+						select: {
+							color: {
+								text: 'red',
+							},
+							':hover': {
+								color: {
+									text: 'blue',
+								},
+							},
+							':visited': {
+								color: {
+									text: 'green',
+								},
+							},
+						},
+					},
+				},
+			} as unknown as GlobalStylesConfig;
+
+			const result = transformToStyles(
+				Object.freeze( tree ),
+				{},
+				false,
+				false,
+				true,
+				true,
+				minimalStyleOptions
+			);
+
+			expect( result ).toEqual(
+				'select{color: red;}:root :where(select:hover){color: blue;}'
+			);
+		} );
+
 		it( 'outputs default pseudo styles after responsive base styles', () => {
 			const tree = {
 				styles: {
