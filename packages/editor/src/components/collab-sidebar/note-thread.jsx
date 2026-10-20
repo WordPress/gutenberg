@@ -301,12 +301,13 @@ export function NoteThread( {
 				{ __( 'Add new reply' ) }
 			</Button>
 			{ isUnseen && (
-				<span
+				// Not a span: core styles `[role="treeitem"] span[aria-hidden]` as a dashicon.
+				<div
 					className="editor-collab-sidebar-panel__unseen-badge"
 					aria-hidden="true"
 				>
 					{ __( 'New' ) }
-				</span>
+				</div>
 			) }
 			{ ! note.blockClientId && (
 				<p className="editor-collab-sidebar-panel__deleted-block-notice">
