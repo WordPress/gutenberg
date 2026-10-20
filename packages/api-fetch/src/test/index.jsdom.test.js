@@ -131,6 +131,27 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'bad_request',
 			message: 'Bad Request',
+			data: { status: 400 },
+		} );
+	} );
+
+	it( 'should keep the data of an error response', async () => {
+		globalThis.fetch.mockResolvedValue( {
+			ok: false,
+			status: 500,
+			async json() {
+				return {
+					code: 'db_update_error',
+					message: 'Could not update post in the database.',
+					data: 'Table does not exist',
+				};
+			},
+		} );
+
+		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
+			code: 'db_update_error',
+			message: 'Could not update post in the database.',
+			data: 'Table does not exist',
 		} );
 	} );
 
@@ -146,6 +167,7 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
+			data: { status: 200 },
 		} );
 	} );
 
@@ -161,6 +183,7 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
+			data: { status: 200 },
 		} );
 	} );
 
@@ -234,6 +257,7 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
+			data: { status: 200 },
 		} );
 	} );
 
@@ -245,6 +269,7 @@ describe( 'apiFetch', () => {
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
 			message: 'The response is not a valid JSON response.',
+			data: { status: 500 },
 		} );
 	} );
 
@@ -357,6 +382,7 @@ describe( 'apiFetch', () => {
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'rest_cookie_invalid_nonce',
+			data: { status: 403 },
 		} );
 	} );
 

@@ -13,9 +13,37 @@ import InsertExternalImageModal from './insert-external-image-modal';
 import { getBlockAndPreviewFromMedia, getItemId } from './utils';
 import InserterNoResults from '../no-results';
 
-// Four rows at the grid's two columns: roughly one screen, so a page is
-// browsed with little scrolling and the pager does the rest.
-const MEDIA_ITEMS_PER_PAGE = 8;
+// Items per page by window height. The grid is two columns, so pages step by
+// rows of two, and each threshold is `chrome + rows * row height`:
+//
+// - Row height, 167px: a tile plus the gap under it. Measure a
+//   `.dataviews-view-grid__row` and add the grid's `row-gap`.
+// - Chrome, 381px: everything else stacked around the grid, from the editor
+//   header down to the footer button. Measure `window.innerHeight` minus the
+//   grid's height, on the library tabs: they carry the most chrome, so other
+//   sources under-fill rather than overshoot into a scrollbar.
+//
+// Either number drifting leaves a page over- or under-filled by a row. The
+// largest entry is the tallest window worth planning for, not an API limit.
+const MIN_ITEMS_PER_PAGE = 8;
+const ITEMS_PER_PAGE_BY_WINDOW_HEIGHT = [
+	[ 2060, 20 ],
+	[ 1890, 18 ],
+	[ 1720, 16 ],
+	[ 1550, 14 ],
+	[ 1390, 12 ],
+	[ 1220, 10 ],
+];
+
+function getItemsPerPage() {
+	if ( typeof window === 'undefined' ) {
+		return MIN_ITEMS_PER_PAGE;
+	}
+	const band = ITEMS_PER_PAGE_BY_WINDOW_HEIGHT.find(
+		( [ height ] ) => window.innerHeight >= height
+	);
+	return band?.[ 1 ] ?? MIN_ITEMS_PER_PAGE;
+}
 
 // The attach flow is image-only, so the picker is constrained to images.
 const ATTACH_ALLOWED_TYPES = [ 'image' ];
@@ -33,7 +61,9 @@ export function MediaCategoryPanel( {
 	sourceMenu,
 	footer,
 } ) {
+	const panelRef = useRef();
 	const [ page, setPage ] = useState( 1 );
+	const [ perPage, setPerPage ] = useState( getItemsPerPage );
 	// Reset paging whenever the source category or the search term changes.
 	// Adjusting state during render (rather than in an effect) keeps the query
 	// on page 1 for the very next fetch, avoiding a wasted request for the
@@ -46,13 +76,22 @@ export function MediaCategoryPanel( {
 	) {
 		setPage( 1 );
 	}
+	// Only taken again on a source change, so a resize doesn't move the items
+	// under the reader. `previousCategory` is still the old name on the
+	// re-render this triggers, so the value comparison is what ends it.
+	if ( previousCategory !== category.name ) {
+		const nextPerPage = getItemsPerPage();
+		if ( nextPerPage !== perPage ) {
+			setPerPage( nextPerPage );
+		}
+	}
 	const query = useMemo(
 		() => ( {
-			per_page: MEDIA_ITEMS_PER_PAGE,
+			per_page: perPage,
 			page,
 			search,
 		} ),
-		[ page, search ]
+		[ perPage, page, search ]
 	);
 	const { actions, attach, handleAttach, refreshKey } = useAttachmentActions(
 		{ category, query }
@@ -66,7 +105,6 @@ export function MediaCategoryPanel( {
 	if ( typeof totalPages === 'number' && page > numPages ) {
 		setPage( numPages );
 	}
-	const panelRef = useRef();
 	const changePage = useCallback( ( nextPage ) => {
 		// Start the new page from the top rather than wherever the previous
 		// one was scrolled to. Same approach as `usePatternsPaging`: the panel
@@ -116,7 +154,7 @@ export function MediaCategoryPanel( {
 				totalItems={ totalItems }
 				totalPages={ totalPages }
 				page={ page }
-				perPage={ MEDIA_ITEMS_PER_PAGE }
+				perPage={ perPage }
 				onChangePage={ changePage }
 				search={ search }
 				onChangeSearch={ onChangeSearch }

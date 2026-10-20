@@ -410,37 +410,19 @@
 			"count": 2
 		}
 	},
-	"packages/block-editor/src/components/block-manager/category.jsx": {
+	"packages/block-editor/src/components/block-manager/category.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-manager/checklist.jsx": {
+	"packages/block-editor/src/components/block-manager/checklist.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/block-manager/index.jsx": {
+	"packages/block-editor/src/components/block-manager/index.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
 		}
 	},
 	"packages/block-editor/src/components/block-mover/button.jsx": {
@@ -1806,7 +1788,7 @@
 	},
 	"packages/block-editor/src/components/link-control/link-preview.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 3
+			"count": 2
 		}
 	},
 	"packages/block-editor/src/components/link-control/settings.tsx": {
@@ -2016,14 +1998,6 @@
 	},
 	"packages/block-editor/src/components/preset-input-control/index.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/publish-date-time-picker/index.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -2260,16 +2234,6 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/components/use-block-drop-zone/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/block-editor/src/components/use-block-drop-zone/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-editor/src/elements/index.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -2367,14 +2331,8 @@
 			"count": 1
 		}
 	},
-	"packages/block-editor/src/hooks/fit-text.jsx": {
+	"packages/block-editor/src/hooks/fit-text.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
 			"count": 1
 		}
 	},
@@ -11210,14 +11168,6 @@
 			"count": 1
 		}
 	},
-	"packages/editor/src/components/collab-sidebar/note-indicator-toolbar.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/editor/src/components/collab-sidebar/note-thread.jsx": {
 		"gutenberg/use-typescript": {
 			"count": 1
@@ -13729,11 +13679,6 @@
 			"count": 1
 		}
 	},
-	"packages/global-styles-ui/src/color-preview.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"packages/global-styles-ui/src/dimensions-panel.tsx": {
 		"no-restricted-imports": {
 			"count": 1
@@ -13899,15 +13844,17 @@
 	"packages/global-styles-ui/src/screen-colors.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
-		},
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/screen-css.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 1
 		},
+		"no-restricted-imports": {
+			"count": 1
+		}
+	},
+	"packages/global-styles-ui/src/screen-element.tsx": {
 		"no-restricted-imports": {
 			"count": 1
 		}
@@ -13932,17 +13879,12 @@
 	},
 	"packages/global-styles-ui/src/screen-root.tsx": {
 		"@wordpress/use-recommended-components": {
-			"count": 8
+			"count": 6
 		}
 	},
 	"packages/global-styles-ui/src/screen-style-variations.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 2
-		}
-	},
-	"packages/global-styles-ui/src/screen-typography-element.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/shadows-edit-panel.tsx": {
@@ -14009,11 +13951,6 @@
 	"packages/global-styles-ui/src/typography-elements.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
-		}
-	},
-	"packages/global-styles-ui/src/typography-panel.tsx": {
-		"no-restricted-imports": {
-			"count": 1
 		}
 	},
 	"packages/global-styles-ui/src/utils.ts": {
@@ -14629,11 +14566,6 @@
 	},
 	"packages/views/src/use-view-config.ts": {
 		"no-restricted-imports": {
-			"count": 1
-		}
-	},
-	"packages/warning/src/test/index.js": {
-		"gutenberg/use-typescript": {
 			"count": 1
 		}
 	},
