@@ -5,6 +5,7 @@ import {
 	registerBlockType,
 	unregisterBlockType,
 	validateBlock,
+	VALIDATION_LEVEL,
 } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
 import '../../packages/editor/src/hooks';
@@ -28,7 +29,7 @@ describe( 'validateBlock', () => {
 			title: 'Fruit block',
 		} );
 
-		const [ valid ] = validateBlock( {
+		const [ valid, , { validationLevel } ] = validateBlock( {
 			name: 'myplugin/fruit',
 			attributes: {
 				fruit: 'Bananas',
@@ -38,6 +39,8 @@ describe( 'validateBlock', () => {
 		} );
 
 		expect( valid ).toBe( true );
+		// An exact match: the generated class names are the stored ones.
+		expect( validationLevel ).toBe( VALIDATION_LEVEL.VALID_BLOCK );
 	} );
 
 	it( 'should include additional classes in block attributes', () => {
@@ -56,7 +59,7 @@ describe( 'validateBlock', () => {
 			title: 'Fruit block',
 		} );
 
-		const [ valid ] = validateBlock( {
+		const [ valid, , { validationLevel } ] = validateBlock( {
 			name: 'myplugin/fruit',
 			attributes: { fruit: 'Bananas', className: 'fresh' },
 			originalContent:
@@ -64,6 +67,8 @@ describe( 'validateBlock', () => {
 		} );
 
 		expect( valid ).toBe( true );
+		// An exact match: the generated class names are the stored ones.
+		expect( validationLevel ).toBe( VALIDATION_LEVEL.VALID_BLOCK );
 	} );
 
 	it( 'should not add a className if falsy', () => {
@@ -79,12 +84,14 @@ describe( 'validateBlock', () => {
 			},
 		} );
 
-		const [ valid ] = validateBlock( {
+		const [ valid, , { validationLevel } ] = validateBlock( {
 			name: 'myplugin/fruit',
 			attributes: { fruit: 'Bananas' },
 			originalContent: '<div>Bananas</div>',
 		} );
 
 		expect( valid ).toBe( true );
+		// An exact match: the generated class names are the stored ones.
+		expect( validationLevel ).toBe( VALIDATION_LEVEL.VALID_BLOCK );
 	} );
 } );

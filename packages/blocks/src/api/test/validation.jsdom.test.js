@@ -770,9 +770,9 @@ describe( 'validation', () => {
 		it( 'returns true when attributes are added or values change', () => {
 			expect(
 				areAttributesPreserved(
-					[ [ 'href', 'https://a.example' ] ],
+					[ [ 'data-id', '1' ] ],
 					[
-						[ 'href', 'https://b.example' ],
+						[ 'data-id', '2' ],
 						[ 'target', '_blank' ],
 					]
 				)
@@ -780,6 +780,28 @@ describe( 'validation', () => {
 			expect( areAttributesPreserved( [], [ [ 'class', 'x' ] ] ) ).toBe(
 				true
 			);
+		} );
+
+		it( 'returns false when the value of a content-bearing attribute changes', () => {
+			expect(
+				areAttributesPreserved(
+					[ [ 'href', 'https://a.example' ] ],
+					[ [ 'href', 'https://b.example' ] ]
+				)
+			).toBe( false );
+			expect(
+				areAttributesPreserved(
+					[ [ 'SRC', 'a.jpg' ] ],
+					[ [ 'src', 'b.jpg' ] ]
+				)
+			).toBe( false );
+			expect(
+				areAttributesPreserved(
+					[ [ 'style', 'background-image:url("a.jpg")' ] ],
+					[ [ 'style', "background-image:url('b.jpg')" ] ]
+				)
+			).toBe( false );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'ignores the case of attribute names', () => {
@@ -845,7 +867,7 @@ describe( 'validation', () => {
 			expect(
 				isEquivalentHTMLStructure(
 					'<div class="wp-block-button"><a class="wp-block-button__link" href="https://a.example">Go</a></div>',
-					'<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://b.example">Go</a></div>'
+					'<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" href="https://a.example" target="_blank">Go</a></div>'
 				)
 			).toBe( true );
 		} );
@@ -916,13 +938,42 @@ describe( 'validation', () => {
 			expect( console ).toHaveWarned();
 		} );
 
-		it( 'returns true when attribute values change but nothing is dropped', () => {
+		it( 'returns true when presentational attribute values change but nothing is dropped', () => {
 			expect(
 				isEquivalentHTMLStructure(
-					'<a style="border-radius:2px" href="https://a.example">Go</a>',
-					'<a style="border-radius:4px" href="https://b.example" target="_blank">Go</a>'
+					'<a style="border-radius:2px" data-id="1" href="https://a.example">Go</a>',
+					'<a style="border-radius:4px" data-id="2" href="https://a.example" target="_blank">Go</a>'
 				)
 			).toBe( true );
+		} );
+
+		it( 'returns false when a media source, link target or alternative text would change', () => {
+			expect(
+				isEquivalentHTMLStructure(
+					'<figure class="wp-block-image"><img src="https://new.example/a.jpg" alt="A sunset"/></figure>',
+					'<figure class="wp-block-image"><img src="https://old.example/a.jpg" alt="A sunset"/></figure>'
+				)
+			).toBe( false );
+			expect(
+				isEquivalentHTMLStructure(
+					'<img src="a.jpg" alt="A sunset"/>',
+					'<img src="a.jpg" alt="A sunrise"/>'
+				)
+			).toBe( false );
+			expect(
+				isEquivalentHTMLStructure(
+					'<a href="https://a.example">Go</a>',
+					'<a href="https://b.example">Go</a>'
+				)
+			).toBe( false );
+			// Images referenced from CSS, e.g. a cover block with parallax.
+			expect(
+				isEquivalentHTMLStructure(
+					'<div class="wp-block-cover" style="background-image:url(https://new.example/bg.jpg)"></div>',
+					'<div class="wp-block-cover has-parallax" style="background-image:url(https://old.example/bg.jpg)"></div>'
+				)
+			).toBe( false );
+			expect( console ).toHaveWarned();
 		} );
 
 		it( 'returns false when the generated markup has extra elements', () => {
@@ -955,10 +1006,12 @@ describe( 'validation', () => {
 			).toEqual( [ 'Hello', 'big', 'world' ] );
 		} );
 
-		it( 'ignores comments and decodes entities', () => {
-			expect(
-				getContentTokens( '<!-- not text --><p>Fish &amp; Chips</p>' )
-			).toEqual( [ 'Fish', '&', 'Chips' ] );
+		it( 'decodes entities', () => {
+			expect( getContentTokens( '<p>Fish &amp; Chips</p>' ) ).toEqual( [
+				'Fish',
+				'&',
+				'Chips',
+			] );
 		} );
 
 		it( 'includes media sources, link targets and alternative text', () => {
@@ -972,6 +1025,17 @@ describe( 'validation', () => {
 				'alt=A cat',
 				'href=https://a.example/?x=1&y=2',
 			] );
+		} );
+
+		it( 'includes comment text and URLs referenced from styles', () => {
+			expect(
+				getContentTokens( '<!--more Read on!--><!--noteaser-->' )
+			).toEqual( [ 'more', 'Read', 'on!', 'noteaser' ] );
+			expect(
+				getContentTokens(
+					'<div class="wp-block-cover has-parallax" style="background-image:url(\'bg.jpg\');min-height:300px"></div>'
+				)
+			).toEqual( [ 'url=bg.jpg' ] );
 		} );
 
 		it( 'returns an empty array when there is no content', () => {
@@ -1933,6 +1997,73 @@ describe( 'validation', () => {
 				VALIDATION_LEVEL.INVALID_BLOCK
 			);
 			expect( issues.length ).toBeGreaterThan( 0 );
+		} );
+
+		it( 'should read allowsReconstruction from block.json metadata', () => {
+			registerBlockType(
+				{
+					name: 'core/strict-block',
+					title: 'Strict block',
+					category: 'text',
+					apiVersion: 3,
+					allowsReconstruction: false,
+					attributes: {
+						content: { type: 'string' },
+					},
+				},
+				{
+					save: ( { attributes } ) =>
+						createElement(
+							'p',
+							{ className: 'x' },
+							attributes.content
+						),
+				}
+			);
+
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/strict-block',
+				attributes: { content: 'Text' },
+				originalContent: '<p>Text</p>',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
+		} );
+
+		it( 'should invalidate when a media source differs from the attributes', () => {
+			registerBlockType( 'core/cover', {
+				...defaultBlockSettings,
+				attributes: {
+					url: { type: 'string' },
+				},
+				save: ( { attributes } ) =>
+					createElement(
+						'div',
+						{ className: 'wp-block-cover' },
+						createElement( 'img', {
+							className: 'wp-block-cover__image-background',
+							src: attributes.url,
+							alt: '',
+						} )
+					),
+			} );
+
+			// The structure matches, but the stored image is not the one the
+			// attributes describe: regenerating would replace it.
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/cover',
+				attributes: { url: 'https://old.example/bg.jpg' },
+				originalContent:
+					'<div class="wp-block-cover"><img class="wp-block-cover__image-background" src="https://new.example/bg.jpg" alt=""/></div>',
+			} );
+
+			expect( isValid ).toBe( false );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
 		} );
 	} );
 

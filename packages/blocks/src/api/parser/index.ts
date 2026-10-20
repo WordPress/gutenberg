@@ -266,7 +266,10 @@ export function parseRawBlock(
 	// new object is created so that `validatedBlock` keeps its outcome.
 	if (
 		! updatedBlock.isValid &&
-		updatedBlock.validationLevel !== VALIDATION_LEVEL.INVALID_BLOCK
+		( updatedBlock.validationLevel ===
+			VALIDATION_LEVEL.RECONSTRUCTED_BLOCK ||
+			updatedBlock.validationLevel ===
+				VALIDATION_LEVEL.REGENERATED_BLOCK )
 	) {
 		updatedBlock = { ...updatedBlock, isValid: true };
 	}

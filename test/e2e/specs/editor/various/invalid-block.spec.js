@@ -5,7 +5,7 @@ test.describe( 'Invalid blocks', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should regenerate malformed HTML at validation Level 3', async ( {
+	test( 'should show an invalid block message with clickable options', async ( {
 		editor,
 		page,
 	} ) => {
@@ -18,23 +18,57 @@ test.describe( 'Invalid blocks', () => {
 		// Change to HTML mode and close the options.
 		await editor.clickBlockOptionsMenuItem( 'Edit as HTML' );
 
-		// Focus on the textarea and enter malformed HTML (missing closing tag).
+		// Focus on the textarea and enter an invalid paragraph. Markup typed
+		// by the user is only accepted when it matches exactly; it is not
+		// regenerated behind their back.
 		await editor.canvas
 			.getByRole( 'document', { name: 'Block: Paragraph' } )
 			.getByRole( 'textbox' )
 			.fill( '<p>invalid paragraph' );
 
-		// Takes the focus away from the block.
+		// Takes the focus away from the block so the invalid warning is triggered.
 		await editor.saveDraft();
 
-		// The malformed HTML can be regenerated from the block's attributes
-		// without losing content, so instead of the invalid block warning the
-		// block is kept and its markup fixed on save.
-		await expect(
-			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
-		).toBeVisible();
+		// Click on the 'three-dots' menu toggle.
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.getByRole( 'button', { name: 'More options' } )
+			.click();
 
-		// Check that the block was regenerated properly.
+		await page
+			.getByRole( 'menu', { name: 'More options' } )
+			.getByRole( 'menuitem', { name: 'Resolve' } )
+			.click();
+
+		// Check we get the resolve modal with the appropriate contents.
+		await expect(
+			page
+				.getByRole( 'dialog', { name: 'Resolve Block' } )
+				.locator( '.block-editor-block-compare__html' )
+		).toHaveText( [ '<p>invalid paragraph', '<p>invalid paragraph</p>' ] );
+	} );
+
+	test( 'should regenerate stored malformed HTML which preserves content', async ( {
+		editor,
+	} ) => {
+		// The malformed paragraph can be regenerated from the block's
+		// attributes without losing content (validation Level 3), so the
+		// stored content is loaded as a regular block rather than an invalid
+		// one, and its markup is fixed on save.
+		await editor.setContent( `
+			<!-- wp:paragraph -->
+			<p>invalid paragraph
+			<!-- /wp:paragraph -->
+		` );
+
+		const block = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await expect( block ).toBeVisible();
+		await expect(
+			block.getByRole( 'button', { name: 'Attempt recovery' } )
+		).toBeHidden();
+
 		const content = await editor.getEditedPostContent();
 		expect( content ).toContain( '<p>invalid paragraph</p>' );
 	} );

@@ -46,10 +46,11 @@ export const VALIDATION_LEVEL = {
 	/**
 	 * The stored content has the same elements, text and attributes as the
 	 * `save` output, except that the `save` output adds attributes or uses
-	 * different attribute values (e.g. class names generated from attributes
-	 * are missing). Regenerating the block from its attributes only adds to
-	 * the markup; it never drops an element, text, attribute, class name or
-	 * style property.
+	 * different presentational attribute values (e.g. class names generated
+	 * from attributes are missing). Regenerating the block from its
+	 * attributes only adds to the markup; it never drops an element, text,
+	 * attribute, class name or style property, nor changes a media source,
+	 * link target or alternative text.
 	 */
 	RECONSTRUCTED_BLOCK: 2,
 
@@ -57,7 +58,7 @@ export const VALIDATION_LEVEL = {
 	 * The stored content differs structurally from the `save` output (e.g.
 	 * wrong tags, malformed markup, or attributes that the block does not
 	 * model), but regenerating the block from its attributes preserves all of
-	 * its visible text.
+	 * its content: text, media sources and link targets.
 	 */
 	REGENERATED_BLOCK: 3,
 
@@ -674,11 +675,49 @@ export function isClosedByToken(
 }
 
 /**
+ * Attributes whose values are content in their own right, as opposed to
+ * presentation which a block regenerates from its attributes: media sources,
+ * link targets, embedded data and alternative text.
+ */
+const CONTENT_ATTRIBUTES = [
+	'src',
+	'srcset',
+	'poster',
+	'href',
+	'alt',
+	'data',
+	'srcdoc',
+	'value',
+];
+
+/**
+ * Matches the URLs referenced by a CSS declaration list, e.g. background
+ * images: `url(a.png)`, `url("a.png")` or `url('a.png')`.
+ */
+const REGEXP_STYLE_URL = /url\(\s*(['"]?)(.*?)\1\s*\)/gi;
+
+/**
+ * Returns the URLs referenced by the given CSS declaration list.
+ *
+ * @param style Value of a `style` attribute.
+ *
+ * @return Referenced URLs.
+ */
+export function getStyleURLs( style: string ): string[] {
+	return Array.from(
+		style.matchAll( REGEXP_STYLE_URL ),
+		( [ , , url ] ) => url
+	).filter( Boolean );
+}
+
+/**
  * Returns true if every meaningful attribute of the actual (stored) tag is
  * still present on the expected (generated) tag, or false if regenerating the
- * markup would drop one. Attribute values may differ and the generated tag may
- * carry additional attributes; for `class` and `style`, every class name and
- * style property of the stored tag must be kept.
+ * markup would drop or alter content. The generated tag may carry additional
+ * attributes and presentational attribute values may differ, with these
+ * constraints: every class name and style property (and every URL referenced
+ * from `style`) of the stored tag must be kept, and content-bearing
+ * attributes (`src`, `href`, `alt`, …) must keep their value.
  *
  * @param actual   Actual (stored) attribute tuples.
  * @param expected Expected (generated) attribute tuples.
@@ -712,9 +751,27 @@ export function areAttributesPreserved(
 			);
 		} else if ( nameLower === 'style' ) {
 			const expectedProperties = getStyleProperties( expectedValue );
-			dropped = Object.keys( getStyleProperties( actualValue ) ).filter(
-				( property ) => ! Object.hasOwn( expectedProperties, property )
+			const expectedURLs = getStyleURLs( expectedValue );
+			dropped = [
+				...Object.keys( getStyleProperties( actualValue ) ).filter(
+					( property ) =>
+						! Object.hasOwn( expectedProperties, property )
+				),
+				...getStyleURLs( actualValue ).filter(
+					( url ) => ! expectedURLs.includes( url )
+				),
+			];
+		} else if (
+			CONTENT_ATTRIBUTES.includes( nameLower ) &&
+			actualValue !== expectedValue
+		) {
+			logger.warning(
+				'Attribute `%s` value would change from `%s` to `%s`.',
+				name,
+				actualValue,
+				expectedValue
 			);
+			return false;
 		}
 
 		if ( dropped.length ) {
@@ -733,8 +790,8 @@ export function areAttributesPreserved(
 /**
  * Token-type-specific equality handlers which consider the structure of the
  * markup (tag names and text content) and whether the attributes of the
- * actual markup are preserved, but not whether attributes are added or their
- * values changed.
+ * actual markup are preserved, but not whether presentational attributes are
+ * added or their values changed.
  *
  * @see isEqualTokensOfType
  */
@@ -887,14 +944,15 @@ export function isEquivalentHTML(
 /**
  * Returns true if the given HTML strings have an equivalent structure: the
  * same sequence of elements with the same text content, where `expected` may
- * add attributes to an element or change attribute values (e.g. missing class
- * names), but never drops an attribute, class name or style property that
- * `actual` has.
+ * add attributes to an element or change presentational attribute values
+ * (e.g. missing class names), but never drops an attribute, class name or
+ * style property that `actual` has, nor changes the value of a content-bearing
+ * attribute such as `src`, `href` or `alt`.
  *
  * Unlike `isEquivalentHTML`, which stops at the first mismatch of any kind, a
  * positive result here guarantees that no element, text, attribute, class
- * name or style property of `actual` is absent from `expected`; attribute
- * values may still differ.
+ * name, style property or content-bearing attribute value of `actual` is
+ * absent from `expected`; presentational attribute values may still differ.
  *
  * @param actual   Actual HTML string.
  * @param expected Expected HTML string.
@@ -921,17 +979,11 @@ export function isEquivalentHTMLStructure(
 }
 
 /**
- * Attributes whose values are content in their own right, as opposed to
- * presentation which a block regenerates from its attributes: media sources,
- * link targets and alternative text.
- */
-const CONTENT_ATTRIBUTES = [ 'src', 'srcset', 'poster', 'href', 'alt' ];
-
-/**
  * Returns the content tokens of the given HTML, in document order: the words
- * of its text content, followed by the values of content-bearing attributes
- * (`src`, `srcset`, `poster`, `href`, `alt`), each prefixed with the attribute
- * name. Comments and other attributes are not considered.
+ * of its text and comment nodes, followed by the values of content-bearing
+ * attributes (`src`, `href`, `alt`, …, see `CONTENT_ATTRIBUTES`) and the URLs
+ * referenced from `style` attributes, each prefixed with the attribute name.
+ * Other attributes are not considered.
  *
  * The markup is parsed with an inert HTML document rather than tokenized, so
  * that malformed markup is interpreted the way a browser renders it (e.g. a
@@ -948,24 +1000,33 @@ export function getContentTokens( html: string ): string[] {
 
 	// Collect the words of each text node separately, since adjacent text
 	// nodes (e.g. of sibling elements) are not separated by whitespace.
+	// Comments carry content too, e.g. the custom text of a "more" block.
 	const tokens: string[] = [];
-	const walker = doc.createTreeWalker( doc.body, NodeFilter.SHOW_TEXT );
+	const walker = doc.createTreeWalker(
+		doc.body,
+		NodeFilter.SHOW_TEXT | NodeFilter.SHOW_COMMENT // eslint-disable-line no-bitwise
+	);
 	while ( walker.nextNode() ) {
-		const words = ( walker.currentNode as Text ).data
+		const words = ( walker.currentNode as CharacterData ).data
 			.split( /\s+/ )
 			.filter( Boolean );
 		tokens.push( ...words );
 	}
 
-	const selector = CONTENT_ATTRIBUTES.map( ( name ) => `[${ name }]` ).join(
-		','
-	);
+	const selector = [ ...CONTENT_ATTRIBUTES, 'style' ]
+		.map( ( name ) => `[${ name }]` )
+		.join( ',' );
 	for ( const element of doc.body.querySelectorAll( selector ) ) {
 		for ( const name of CONTENT_ATTRIBUTES ) {
 			const value = element.getAttribute( name )?.trim();
 			if ( value ) {
 				tokens.push( `${ name }=${ value }` );
 			}
+		}
+		for ( const url of getStyleURLs(
+			element.getAttribute( 'style' ) ?? ''
+		) ) {
+			tokens.push( `url=${ url }` );
 		}
 	}
 
@@ -1139,20 +1200,22 @@ export function validateBlock(
 
 	// Block types can opt out of any automatic reconstruction, in which case
 	// only an exact match (or a deprecation, handled by the parser) is
-	// acceptable. The comparisons below use a separate logger so that only
-	// the issues found by the strict comparison above are reported.
+	// acceptable. The comparisons below share the logger, so that the issues
+	// explain why a block was regenerated rather than reconstructed, or why
+	// it could not be regenerated at all.
 	const allowsReconstruction = blockType.allowsReconstruction !== false;
 
-	// Level 2 (ReconstructedBlock): the stored content has the same elements
-	// and text as the `save` output, which only adds attributes or changes
-	// their values, such as class names generated from attributes being
-	// absent. Regenerating the block only adds to its markup.
+	// Level 2 (ReconstructedBlock): the stored content has the same elements,
+	// text and content-bearing attributes as the `save` output, which only
+	// adds attributes or changes presentational values, such as class names
+	// generated from attributes being absent. Regenerating the block only
+	// adds to its markup.
 	if (
 		allowsReconstruction &&
 		isEquivalentHTMLStructure(
 			originalContent,
 			generatedBlockContent,
-			createQueuedLogger()
+			logger
 		)
 	) {
 		return result( true, VALIDATION_LEVEL.RECONSTRUCTED_BLOCK );
@@ -1165,11 +1228,7 @@ export function validateBlock(
 	// markup without dropping what the user wrote.
 	if (
 		allowsReconstruction &&
-		isContentPreserved(
-			originalContent,
-			generatedBlockContent,
-			createQueuedLogger()
-		)
+		isContentPreserved( originalContent, generatedBlockContent, logger )
 	) {
 		return result( true, VALIDATION_LEVEL.REGENERATED_BLOCK );
 	}
