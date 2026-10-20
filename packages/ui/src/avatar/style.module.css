@@ -1,48 +1,96 @@
+/* Invalid computed colors inherit the root's theme-aware neutral defaults. */
+@property --_wp-ui-avatar-background {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: transparent;
+}
+
+@property --_wp-ui-avatar-foreground {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: #000;
+}
+
+@property --_wp-ui-avatar-ring {
+	syntax: "<color>";
+	inherits: true;
+	initial-value: transparent;
+}
+
 @layer wp-ui {
 	@layer utilities, components, compositions, overrides;
 
 	@layer components {
 		.root {
 			--_wp-ui-avatar-size: var(--wpds-dimension-size-md);
+			/* Reserve both tracks at their high-DPI width, regardless of display density. */
+			--_wp-ui-avatar-track-space: 6px;
+			--_wp-ui-avatar-radius: 50%;
+			--_wp-ui-avatar-background: var(--wpds-color-background-surface-neutral-weak);
+			--_wp-ui-avatar-foreground: var(--wpds-color-foreground-content-neutral-weak);
+			--_wp-ui-avatar-ring: var(--wpds-color-stroke-surface-neutral);
+			--_wp-ui-avatar-font-size: var(--wpds-typography-font-size-sm);
+			--_wp-ui-avatar-font-scale: 1;
+			--_wp-ui-avatar-content-size: calc(var(--_wp-ui-avatar-size) + var(--_wp-ui-avatar-track-space) - 4 * var(--wpds-border-width-focus));
+			/* Leave room for two wide glyphs, including color emoji. */
+			--_wp-ui-avatar-fitted-font-size: min(var(--_wp-ui-avatar-font-size), calc(var(--_wp-ui-avatar-content-size) / 2.5));
 
 			--_gcd-span-position: relative;
 			--_gcd-span-display: inline-flex;
 			--_gcd-span-font-family: var(--wpds-typography-font-family-body);
-			--_gcd-span-font-size: var(--_wp-ui-avatar-font-size);
-			--_wp-ui-avatar-font-size: var(--wpds-typography-font-size-sm);
+			--_gcd-span-font-size: calc(var(--_wp-ui-avatar-fitted-font-size) * var(--_wp-ui-avatar-font-scale));
 
 			position: relative;
 			display: inline-flex;
-			align-items: center;
-			justify-content: center;
 			flex-shrink: 0;
-			inline-size: var(--_wp-ui-avatar-size);
-			block-size: var(--_wp-ui-avatar-size);
-			border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
-			border-radius: 50%;
-			background-color: var(--wpds-color-background-surface-neutral-weak);
-			color: var(--wpds-color-foreground-content-neutral-weak);
+			inline-size: calc(var(--_wp-ui-avatar-size) + var(--_wp-ui-avatar-track-space));
+			block-size: calc(var(--_wp-ui-avatar-size) + var(--_wp-ui-avatar-track-space));
+			border-radius: var(--_wp-ui-avatar-radius);
 			font-family: var(--wpds-typography-font-family-body);
-			font-size: var(--_wp-ui-avatar-font-size);
+			font-size: calc(var(--_wp-ui-avatar-fitted-font-size) * var(--_wp-ui-avatar-font-scale));
 			font-weight: var(--wpds-typography-font-weight-emphasis);
 			line-height: 1;
 			vertical-align: middle;
 		}
 
-		.has-color::after {
+		.content {
+			--_gcd-span-position: absolute;
+			--_gcd-span-display: block;
+
+			position: absolute;
+			inset: calc(2 * var(--wpds-border-width-focus));
+			border-radius: 50%;
+			background-color: var(--wpds-color-background-surface-neutral-weak);
+			color: var(--_wp-ui-avatar-foreground);
+		}
+
+		.is-active > .content::after {
 			content: "";
 			position: absolute;
-			/* Paint inside the root's border box, leaving outer focus rings separate. */
-			inset: calc(-1 * var(--wpds-border-width-xs));
-			border-radius: inherit;
-			border:
-				var(--wpds-border-width-focus) solid
-				var(--_wp-ui-avatar-color);
+			/* The halo is empty space, so it never paints in forced-colors mode. */
+			inset: calc(-2 * var(--wpds-border-width-focus));
+			box-sizing: border-box;
+			border-radius: var(--_wp-ui-avatar-radius);
+			/* Unlike border widths, shadow spreads preserve fractional track widths. */
+			box-shadow: inset 0 0 0 var(--wpds-border-width-focus) var(--_wp-ui-avatar-ring);
 			pointer-events: none;
+
+			@media (forced-colors: active) {
+				border: var(--wpds-border-width-focus) solid CanvasText;
+				box-shadow: none;
+			}
 		}
 
 		.is-square {
-			border-radius: var(--wpds-border-radius-sm);
+			--_wp-ui-avatar-radius: calc(var(--wpds-border-radius-sm) + 2 * var(--wpds-border-width-focus));
+
+			> .content {
+				border-radius: var(--wpds-border-radius-sm);
+			}
+		}
+
+		.has-single-initial {
+			--_wp-ui-avatar-font-scale: 1.25;
 		}
 
 		.is-xs {
@@ -87,7 +135,6 @@
 				}
 			}
 
-			/* Hide non-displayable images, keeping a box for native lazy loading. */
 			&[data-loading],
 			&[data-error],
 			&[data-ending-style] {
@@ -102,48 +149,21 @@
 			display: flex;
 			align-items: center;
 			justify-content: center;
+			background-color: var(--_wp-ui-avatar-background);
 			overflow: hidden;
 			white-space: nowrap;
-
-			> svg {
-				inline-size: 100%;
-				block-size: 100%;
-				flex-shrink: 0;
-			}
-
-			> .person-icon {
-				/* Keep the head visible and crop the torso at the bottom of the frame. */
-				color: var(--wpds-color-stroke-surface-neutral-strong);
-				inline-size: 110%;
-				block-size: 110%;
-				translate: 0 15%;
-			}
 		}
 
 		@media not (forced-colors: active) {
-			@supports (color: rgb(from green r g b / 1)) and (color: color(from green srgb-linear round(up, r) g b / 1)) {
-				.has-color:has(> .fallback) {
-					border: none;
-				}
-
-				.has-color:has(> .fallback)::after {
-					content: none;
-				}
-
-				.has-color > .fallback {
-					/* Opaque sRGB keeps contrast independent of the surrounding surface. */
-					--_wp-ui-avatar-background: rgb(from var(--_wp-ui-avatar-color) clamp(0, r, 255) clamp(0, g, 255) clamp(0, b, 255) / 1);
+			@supports (color: rgb(from green r g b / 1)) and
+				(color: color(from green srgb-linear round(up, r) g b / 1)) {
+				.has-color > .content {
+					/* Share the existing opaque sRGB fill with the activity ring. */
+					--_wp-ui-avatar-custom-background: rgb(from var(--_wp-ui-avatar-color) clamp(0, r, 255) clamp(0, g, 255) clamp(0, b, 255) / 1);
+					--_wp-ui-avatar-background: var(--_wp-ui-avatar-custom-background);
+					--_wp-ui-avatar-ring: var(--_wp-ui-avatar-custom-background);
 					--_wp-ui-avatar-contrast-target: 4.55;
 
-					background-color: var(--_wp-ui-avatar-background);
-				}
-
-				.has-color > .fallback > .person-icon {
-					--_wp-ui-avatar-contrast-target: 3.05;
-				}
-
-				.has-color > .fallback,
-				.has-color > .fallback > .person-icon {
 					--_wp-ui-avatar-luminance: calc(0.2126 * r + 0.7152 * g + 0.0722 * b);
 					/* The black/white crossover from the WCAG contrast formula is (sqrt(21) - 1) / 20. */
 					--_wp-ui-avatar-light-foreground: round(up, clamp(0, calc(0.1791287847 - var(--_wp-ui-avatar-luminance)), 1));
@@ -155,7 +175,7 @@
 					--_wp-ui-avatar-light-tint: clamp(0, calc((1.05 - var(--_wp-ui-avatar-contrast-target) * (var(--_wp-ui-avatar-luminance) + 0.05)) / max(0.000001, 1 - var(--_wp-ui-avatar-luminance))), 1);
 					--_wp-ui-avatar-tint: calc(var(--_wp-ui-avatar-light-foreground) * var(--_wp-ui-avatar-light-tint) + (1 - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-dark-tint));
 
-					color: color(from var(--_wp-ui-avatar-background) srgb-linear calc(var(--_wp-ui-avatar-light-foreground) + (r - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) calc(var(--_wp-ui-avatar-light-foreground) + (g - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) calc(var(--_wp-ui-avatar-light-foreground) + (b - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) / 1);
+					--_wp-ui-avatar-foreground: color(from var(--_wp-ui-avatar-custom-background) srgb-linear calc(var(--_wp-ui-avatar-light-foreground) + (r - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) calc(var(--_wp-ui-avatar-light-foreground) + (g - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) calc(var(--_wp-ui-avatar-light-foreground) + (b - var(--_wp-ui-avatar-light-foreground)) * var(--_wp-ui-avatar-tint)) / 1);
 				}
 			}
 		}

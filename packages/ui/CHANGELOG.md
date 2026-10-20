@@ -2,8 +2,13 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   `Avatar`: Replace the compound API with a single component requiring `name`. Use `src` and optional `imageProps` for images; initials are the only fallback. Sizes now describe the intended high-DPI image size with a fixed additional footprint for the activity ring and transparent halo.
+
 ### Enhancements
 
+-   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, share opaque colors between the ring and fallback, fit initials to small sizes, and enlarge single initials.
 -   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 0.25.0 (2026-10-20)
