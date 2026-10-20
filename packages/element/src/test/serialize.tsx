@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { PropsWithChildren } from 'react';
 import {
 	Component,
 	createContext,
@@ -35,7 +36,8 @@ describe( 'serialize()', () => {
 	} );
 
 	it( 'should render with context (legacy)', () => {
-		class Provider extends Component {
+		class Provider extends Component< PropsWithChildren > {
+			declare static childContextTypes: { greeting: typeof noop };
 			getChildContext() {
 				return {
 					greeting: 'Hello!',
@@ -55,11 +57,15 @@ describe( 'serialize()', () => {
 		// explicitly defines `contextTypes`. This requirement is ignored in
 		// our implementation.
 
-		function FunctionComponent( props, context ) {
+		function FunctionComponent(
+			props: Record< string, never >,
+			context: { greeting: string }
+		) {
 			return 'FunctionComponent: ' + context.greeting;
 		}
 
 		class ClassComponent extends Component {
+			declare context: { greeting: string };
 			render() {
 				return 'ClassComponent: ' + this.context.greeting;
 			}
@@ -67,6 +73,7 @@ describe( 'serialize()', () => {
 
 		const result = serialize(
 			<Provider>
+				{ /* @ts-expect-error This fixture uses legacy context, removed from React 19 component types. */ }
 				<FunctionComponent />
 				<ClassComponent />
 			</Provider>
@@ -88,7 +95,7 @@ describe( 'serialize()', () => {
 	} );
 
 	it( 'should render with memo', () => {
-		const MemoizedComponent = memo( ( { value } ) => {
+		const MemoizedComponent = memo( ( { value }: { value: string } ) => {
 			return <div>{ value }</div>;
 		} );
 
@@ -117,7 +124,12 @@ describe( 'serialize()', () => {
 		} );
 
 		it( 'should not render an undefined attribute value', () => {
-			const result = serialize( <video src={ null } /> );
+			const result = serialize(
+				<video
+					// @ts-expect-error A null source tests omission of null attributes.
+					src={ null }
+				/>
+			);
 
 			expect( result ).toBe( '<video></video>' );
 		} );
@@ -139,7 +151,11 @@ describe( 'serialize()', () => {
 		it( 'should render elements with false boolean attributes', () => {
 			[ false, null, undefined ].forEach( ( controls ) => {
 				const result = serialize(
-					<video src="/" controls={ controls } />
+					<video
+						src="/"
+						// @ts-expect-error A null value tests omission of false-like boolean attributes.
+						controls={ controls }
+					/>
 				);
 
 				expect( result ).toBe( '<video src="/"></video>' );
@@ -149,7 +165,11 @@ describe( 'serialize()', () => {
 		it( 'should render elements with true boolean attributes', () => {
 			[ true, 'true', 'false', '' ].forEach( ( controls ) => {
 				const result = serialize(
-					<video src="/" controls={ controls } />
+					<video
+						src="/"
+						// @ts-expect-error String values test legacy boolean attribute serialization.
+						controls={ controls }
+					/>
 				);
 
 				expect( result ).toBe( '<video src="/" controls></video>' );
@@ -157,7 +177,13 @@ describe( 'serialize()', () => {
 		} );
 
 		it( 'should not render non-boolean-attribute with boolean value', () => {
-			const result = serialize( <video src controls /> );
+			const result = serialize(
+				<video
+					// @ts-expect-error A boolean source tests omission of an invalid attribute value.
+					src
+					controls
+				/>
+			);
 
 			expect( result ).toBe( '<video controls></video>' );
 		} );
@@ -206,6 +232,7 @@ describe( 'renderElement()', () => {
 					x="0"
 					y="0"
 					strokeWidth="5"
+					// @ts-expect-error Deliberately wrong casing tests SVG attribute normalization.
 					// eslint-disable-next-line react/no-unknown-property
 					STROKELinejoin="miter"
 				></rect>
@@ -220,6 +247,7 @@ describe( 'renderElement()', () => {
 	it( 'Case sensitive attributes should have the right casing - even with wrong casing', () => {
 		const result = renderElement(
 			<svg
+				// @ts-expect-error Deliberately wrong casing tests SVG attribute normalization.
 				// eslint-disable-next-line react/no-unknown-property
 				ViEWBOx="0 0 1 1"
 				// eslint-disable-next-line react/no-unknown-property
@@ -236,6 +264,7 @@ describe( 'renderElement()', () => {
 		const result = renderElement(
 			<svg
 				viewBox="0 0 1 1"
+				// @ts-expect-error Deliberately wrong casing tests SVG attribute normalization.
 				// eslint-disable-next-line react/no-unknown-property
 				XLINKROLE="some-role"
 				xlinkShow="hello"
@@ -288,7 +317,10 @@ describe( 'renderElement()', () => {
 	} );
 
 	it( 'renders empty string for indeterminite types', () => {
-		const result = renderElement( {} );
+		const result = renderElement(
+			// @ts-expect-error An object without an element type tests unsupported input.
+			{}
+		);
 
 		expect( result ).toBe( '' );
 	} );
@@ -396,13 +428,19 @@ describe( 'renderElement()', () => {
 	} );
 
 	it( 'renders RawHTML with empty children as empty string', () => {
-		const result = renderElement( <RawHTML /> );
+		const result = renderElement(
+			// @ts-expect-error Missing children test empty raw HTML.
+			<RawHTML />
+		);
 
 		expect( result ).toBe( '' );
 	} );
 
 	it( 'renders RawHTML with wrapper and empty children', () => {
-		const result = renderElement( <RawHTML className="foo" /> );
+		const result = renderElement(
+			// @ts-expect-error Missing children test a raw HTML wrapper without content.
+			<RawHTML className="foo" />
+		);
 
 		expect( result ).toBe( '<div class="foo"></div>' );
 	} );
@@ -439,7 +477,10 @@ describe( 'renderNativeComponent()', () => {
 
 		it( 'should not render invalid dangerouslySetInnerHTML', () => {
 			const result = renderNativeComponent( 'div', {
-				dangerouslySetInnerHTML: { __html: undefined },
+				dangerouslySetInnerHTML: {
+					// @ts-expect-error Undefined HTML tests an invalid dangerouslySetInnerHTML value.
+					__html: undefined,
+				},
 			} );
 
 			expect( result ).toBe( '<div></div>' );
@@ -493,8 +534,11 @@ describe( 'renderNativeComponent()', () => {
 describe( 'renderComponent()', () => {
 	it( 'calls constructor', () => {
 		class Example extends Component {
-			constructor() {
-				super( ...arguments );
+			declare constructed: string;
+			constructor(
+				...args: [ props: Record< string, never >, context?: unknown ]
+			) {
+				super( ...args );
 
 				this.constructed = 'constructed';
 			}
@@ -510,9 +554,14 @@ describe( 'renderComponent()', () => {
 	} );
 
 	it( 'does not call componentDidMount', () => {
-		class Example extends Component {
-			constructor() {
-				super( ...arguments );
+		class Example extends Component<
+			Record< string, never >,
+			{ didMounted?: string }
+		> {
+			constructor(
+				...args: [ props: Record< string, never >, context?: unknown ]
+			) {
+				super( ...args );
 
 				this.state = {};
 			}

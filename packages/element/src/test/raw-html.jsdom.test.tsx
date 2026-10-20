@@ -38,7 +38,10 @@ describe( 'RawHTML', () => {
 	} );
 
 	it( 'renders an empty container if there are no children', () => {
-		const { container } = render( <RawHTML></RawHTML> );
+		const { container } = render(
+			// @ts-expect-error Missing children test the empty container.
+			<RawHTML></RawHTML>
+		);
 
 		const expected = '<div></div>';
 		expect( container.innerHTML ).toBe( expected );
@@ -48,7 +51,7 @@ describe( 'RawHTML', () => {
 		const html = '<p>So scary!</p>';
 		const { container } = render(
 			<RawHTML>
-				{ html }
+				{ html /* @ts-expect-error Test non-string children. */ }
 				<p>Ignore this!</p>
 			</RawHTML>
 		);
