@@ -1,20 +1,13 @@
-/**
- * WordPress dependencies
- */
 import { useMemo, useRef, useInsertionEffect } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import beforeInputRules from './before-input-rules';
 import inputRules from './input-rules';
 import insertReplacementText from './insert-replacement-text';
 import removeBrowserShortcuts from './remove-browser-shortcuts';
 import shortcuts from './shortcuts';
 import inputEvents from './input-events';
-import undoAutomaticChange from './undo-automatic-change';
-import pasteHandler from './paste-handler';
+import pasteHandler, { drop } from './paste-handler';
+import { dragStart } from './drag-and-drop';
 import _delete from './delete';
 import enter from './enter';
 import firefoxCompat from './firefox-compat';
@@ -26,8 +19,8 @@ const allEventListeners = [
 	removeBrowserShortcuts,
 	shortcuts,
 	inputEvents,
-	undoAutomaticChange,
 	pasteHandler,
+	dragStart,
 	_delete,
 	enter,
 	firefoxCompat,
@@ -42,17 +35,19 @@ export function useEventListeners( props ) {
 		() => allEventListeners.map( ( refEffect ) => refEffect( propsRef ) ),
 		[ propsRef ]
 	);
+	// A drop can land on any field, selected or not.
+	const dropEffect = useMemo( () => drop( propsRef ), [ propsRef ] );
 
 	return useRefEffect(
 		( element ) => {
-			if ( ! props.isSelected ) {
-				return;
-			}
-			const cleanups = refEffects.map( ( effect ) => effect( element ) );
+			const cleanups = [
+				dropEffect,
+				...( props.isSelected ? refEffects : [] ),
+			].map( ( effect ) => effect( element ) );
 			return () => {
 				cleanups.forEach( ( cleanup ) => cleanup() );
 			};
 		},
-		[ refEffects, props.isSelected ]
+		[ refEffects, dropEffect, props.isSelected ]
 	);
 }

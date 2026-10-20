@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { Middleware, AnyAction } from 'redux';
-
-/**
- * Internal dependencies
- */
 import isGenerator from './is-generator';
 import createRuntime from './runtime';
 

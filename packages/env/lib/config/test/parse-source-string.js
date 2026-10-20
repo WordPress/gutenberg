@@ -1,20 +1,15 @@
-'use strict';
-/* eslint-disable jest/no-conditional-expect */
-/**
- * External dependencies
- */
-const path = require( 'path' );
-const { homedir } = require( 'os' );
-
-/**
- * Internal dependencies
- */
+import { createRequire } from 'node:module';
+import path from 'node:path';
+import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+const require = createRequire( import.meta.url );
+const os = require( 'node:os' );
+let homedir = vi.spyOn( os, 'homedir' ).mockImplementation( () => undefined );
 const { ValidationError } = require( '../validate-config' );
 const { parseSourceString } = require( '../parse-source-string' );
 
-jest.mock( 'os', () => ( {
-	homedir: jest.fn(),
-} ) );
+afterAll( () => {
+	vi.restoreAllMocks();
+} );
 
 describe( 'parseSourceString', () => {
 	const options = {
@@ -22,7 +17,8 @@ describe( 'parseSourceString', () => {
 	};
 
 	beforeEach( () => {
-		homedir.mockReturnValue( '/home/test' );
+		homedir = vi.spyOn( os, 'homedir' );
+		homedir.mockReset().mockReturnValue( '/home/test' );
 	} );
 
 	it( 'should do nothing when given an empty source', () => {
@@ -30,16 +26,11 @@ describe( 'parseSourceString', () => {
 	} );
 
 	it( 'should throw when source not parseable', () => {
-		expect.assertions( 1 );
-		try {
-			parseSourceString( 'test://test', options );
-		} catch ( error ) {
-			expect( error ).toEqual(
-				new ValidationError(
-					'Invalid or unrecognized source: "test://test".'
-				)
-			);
-		}
+		expect( () => parseSourceString( 'test://test', options ) ).toThrow(
+			new ValidationError(
+				'Invalid or unrecognized source: "test://test".'
+			)
+		);
 	} );
 
 	describe( 'local sources', () => {
@@ -85,12 +76,12 @@ describe( 'parseSourceString', () => {
 
 		it( 'should parse other sources', () => {
 			expect(
-				parseSourceString( 'http://test.com/testing.zip', options )
+				parseSourceString( 'http://example.com/testing.zip', options )
 			).toEqual( {
 				basename: 'testing',
 				path: '/test/cache/testing',
 				type: 'zip',
-				url: 'http://test.com/testing.zip',
+				url: 'http://example.com/testing.zip',
 			} );
 		} );
 	} );
@@ -151,4 +142,3 @@ describe( 'parseSourceString', () => {
 		} );
 	} );
 } );
-/* eslint-enable jest/no-conditional-expect */

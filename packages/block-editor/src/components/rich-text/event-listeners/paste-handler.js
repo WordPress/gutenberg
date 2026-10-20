@@ -1,20 +1,45 @@
-/**
- * WordPress dependencies
- */
 import { pasteHandler } from '@wordpress/blocks';
-import { isEmpty, insert, create } from '@wordpress/rich-text';
+import {
+	isEmpty,
+	insert,
+	create,
+	getActiveFormats,
+	privateApis as richTextPrivateApis,
+} from '@wordpress/rich-text';
 import { isURL } from '@wordpress/url';
-
-/**
- * Internal dependencies
- */
+import { privateApis as composePrivateApis } from '@wordpress/compose';
+import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
+import { unlock } from '../../../lock-unlock';
+import { getDropPasteProps, isTextDrop } from './drag-and-drop';
+
+const { subscribeDelegatedListener } = unlock( composePrivateApis );
+const { ownsSelection } = unlock( richTextPrivateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
-export default ( props ) => ( element ) => {
-	function _onPaste( event ) {
+/**
+ * Creates the paste listener of a field, which also inserts text dropped on
+ * it.
+ *
+ * @param {Object}      props   Rich text props.
+ * @param {HTMLElement} element The field.
+ *
+ * @return {(event: Event) => void} The listener.
+ */
+export function createPasteListener( props, element ) {
+	return function _onPaste( event ) {
+		// A drop pastes at the drop point.
+		const pasteProps =
+			event.type === 'drop'
+				? getDropPasteProps( props.current, element, event )
+				: props.current;
+
+		if ( ! pasteProps ) {
+			return;
+		}
+
 		const {
 			disableFormats,
 			onChange,
@@ -25,11 +50,18 @@ export default ( props ) => ( element ) => {
 			__unstableEmbedURLOnPaste,
 			preserveWhiteSpace,
 			pastePlainText,
-		} = props.current;
+			registry,
+		} = pasteProps;
 
 		// The event listener is attached to the window, so we need to check if
-		// the target is the element or inside the element.
-		if ( ! element.contains( event.target ) ) {
+		// the target is the element or inside the element. When the editable
+		// wrapper holds focus (the selected block supports `editableRoot`),
+		// the event targets the wrapper instead; the element then owns the
+		// paste when it contains the selection.
+		if (
+			! element.contains( event.target ) &&
+			! ownsSelection( element )
+		) {
 			return;
 		}
 
@@ -37,21 +69,36 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const { plainText, html } = getPasteEventData( event );
+		const { clipboardData = event.dataTransfer } = event;
+		const pasteData = getPasteEventData( { clipboardData } );
+
+		// Some browsers don't support `clipboardData` and paste plain text on
+		// their own, so the event has to be left alone for them.
+		if ( ! pasteData ) {
+			return;
+		}
 
 		event.preventDefault();
 
+		const { plainText, html, files } = pasteData;
+
+		// Rich text can only paste text; files are placed by the writing flow.
+		if ( files.length ) {
+			return;
+		}
+
 		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
+		// `pasteHandler` also logs this, but we're not using `pasteHandler` in
+		// every case.
+		window.console.log( 'Received HTML (RichText):\n\n', html );
+		window.console.log( 'Received plain text (RichText):\n\n', plainText );
 
 		if ( disableFormats ) {
 			onChange( insert( value, plainText ) );
 			return;
 		}
 
-		const isInternal =
-			event.clipboardData.getData( 'rich-text' ) === 'true';
+		const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 		function pasteInline( content ) {
 			const transformed = formatTypes.reduce(
@@ -72,7 +119,7 @@ export default ( props ) => ( element ) => {
 				onChange( transformed );
 			} else {
 				const valueToInsert = create( { html: content } );
-				addActiveFormats( valueToInsert, value.activeFormats );
+				addActiveFormats( valueToInsert, getActiveFormats( value ) );
 				onChange( insert( value, valueToInsert ) );
 			}
 		}
@@ -86,7 +133,9 @@ export default ( props ) => ( element ) => {
 		}
 
 		if ( pastePlainText ) {
-			onChange( insert( value, create( { text: plainText } ) ) );
+			const valueToInsert = create( { text: plainText } );
+			addActiveFormats( valueToInsert, getActiveFormats( value ) );
+			onChange( insert( value, valueToInsert ) );
 			return;
 		}
 
@@ -114,19 +163,71 @@ export default ( props ) => ( element ) => {
 
 		if ( typeof content === 'string' ) {
 			pasteInline( content );
-		} else if ( content.length > 0 ) {
-			if ( onReplace && isEmpty( value ) ) {
-				onReplace( content, content.length - 1, -1 );
-			}
+			return;
 		}
-	}
 
+		if ( ! content.length || ! onReplace || ! isEmpty( value ) ) {
+			return;
+		}
+
+		// Record an intermediate paragraph-with-URL state so a single undo
+		// after the URL → block transformation restores the pasted link.
+		if ( mode === 'BLOCKS' ) {
+			pasteInline( html );
+			registry
+				.dispatch( blockEditorStore )
+				.__unstableMarkLastChangeAsPersistent();
+		}
+
+		onReplace( content, content.length - 1, -1 );
+	};
+}
+
+export default ( props ) => ( element ) => {
 	const { defaultView } = element.ownerDocument;
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	defaultView.addEventListener( 'paste', _onPaste );
+	return subscribeDelegatedListener(
+		defaultView,
+		'paste',
+		createPasteListener( props, element )
+	);
+};
+
+/**
+ * Inserts text dropped on the field the way the field would on paste, as one
+ * undo level.
+ *
+ * @param {Object} props Rich text props.
+ */
+export const drop = ( props ) => ( element ) => {
+	const { ownerDocument } = element;
+	const onPaste = createPasteListener( props, element );
+
+	// The block drop zones cancel every drag over them, which hides the
+	// browser's drop caret and shows the block insertion point instead. An
+	// empty field keeps the drop zone, which shows the block is replaced.
+	function onDragOver( event ) {
+		if (
+			element.isContentEditable &&
+			! isEmpty( props.current.getValue() ) &&
+			isTextDrop( ownerDocument, event.dataTransfer )
+		) {
+			event.stopPropagation();
+		}
+	}
+
+	function onDrop( event ) {
+		props.current.registry.batch( () => onPaste( event ) );
+	}
+
+	element.addEventListener( 'dragenter', onDragOver );
+	element.addEventListener( 'dragover', onDragOver );
+	element.addEventListener( 'drop', onDrop );
 	return () => {
-		defaultView.removeEventListener( 'paste', _onPaste );
+		element.removeEventListener( 'dragenter', onDragOver );
+		element.removeEventListener( 'dragover', onDragOver );
+		element.removeEventListener( 'drop', onDrop );
 	};
 };

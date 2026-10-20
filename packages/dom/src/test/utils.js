@@ -1,6 +1,4 @@
-/**
- * Internal dependencies
- */
+import { describe, expect, it } from 'vitest';
 import { assertIsDefined } from '../utils/assert-is-defined';
 
 describe( 'assertIsDefined', () => {

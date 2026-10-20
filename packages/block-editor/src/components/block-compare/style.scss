@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+
 /**
  * Invalid block comparison
  */
@@ -36,6 +40,9 @@
 		border-bottom: 1px solid #ddd;
 		padding-bottom: 15px;
 		line-height: 1.7;
+		// Keep the markup's spaces and blank lines. Once the browser collapses
+		// them, a difference made of nothing else cannot be seen.
+		white-space: pre-wrap;
 
 		span {
 			background-color: #e6ffed;
@@ -49,6 +56,12 @@
 
 		span.block-editor-block-compare__removed {
 			background-color: $alert-red;
+		}
+
+		// The newline marker sits inside a changed part and takes its highlight.
+		span.block-editor-block-compare__newline {
+			background: none;
+			padding: 0;
 		}
 	}
 

@@ -1,7 +1,3 @@
-/**
- * WordPress dependencies
- */
-
 import { __, _x } from '@wordpress/i18n';
 
 export const INSERTER_PATTERN_TYPES = {
@@ -15,14 +11,18 @@ export const INSERTER_SYNC_TYPES = {
 	unsynced: 'unsynced',
 };
 
+export const INSERTER_AUTHOR_TYPES = {
+	currentUser: 'currentUser',
+};
+
 export const allPatternsCategory = {
 	name: 'allPatterns',
 	label: _x( 'All', 'patterns' ),
 };
 
-export const myPatternsCategory = {
-	name: 'myPatterns',
-	label: __( 'My patterns' ),
+export const sitePatternsCategory = {
+	name: 'sitePatterns',
+	label: __( 'Site patterns' ),
 };
 
 export const starterPatternsCategory = {
@@ -30,7 +30,56 @@ export const starterPatternsCategory = {
 	label: __( 'Starter content' ),
 };
 
-export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
+function hasRegisteredCategory( pattern, allCategories ) {
+	if ( ! pattern.categories || ! pattern.categories.length ) {
+		return false;
+	}
+
+	return pattern.categories.some( ( cat ) =>
+		allCategories.some( ( category ) => category.name === cat )
+	);
+}
+
+/**
+ * Returns the categories that contain at least one of the given patterns,
+ * sorted by label. An "Uncategorized" category is appended when some pattern
+ * belongs to no registered category.
+ *
+ * @param {Array} patterns      The patterns to derive the categories from.
+ * @param {Array} allCategories The registered pattern categories.
+ *
+ * @return {Array} The populated categories.
+ */
+export function getPopulatedCategories( patterns, allCategories ) {
+	const categories = allCategories
+		.filter( ( category ) =>
+			patterns.some( ( pattern ) =>
+				pattern.categories?.includes( category.name )
+			)
+		)
+		.sort( ( a, b ) => a.label.localeCompare( b.label ) );
+
+	if (
+		patterns.some(
+			( pattern ) => ! hasRegisteredCategory( pattern, allCategories )
+		) &&
+		! categories.find( ( category ) => category.name === 'uncategorized' )
+	) {
+		categories.push( {
+			name: 'uncategorized',
+			label: __( 'Uncategorized' ),
+		} );
+	}
+
+	return categories;
+}
+
+export function isPatternFiltered(
+	pattern,
+	sourceFilter,
+	syncFilter,
+	authorFilter
+) {
 	const isUserPattern = pattern.name.startsWith( 'core/block' );
 	const isDirectoryPattern =
 		pattern.source === 'core' ||
@@ -58,6 +107,14 @@ export function isPatternFiltered( pattern, sourceFilter, syncFilter ) {
 	if (
 		sourceFilter === INSERTER_PATTERN_TYPES.user &&
 		pattern.type !== INSERTER_PATTERN_TYPES.user
+	) {
+		return true;
+	}
+
+	// If the current user's patterns are selected, filter out everyone else's.
+	if (
+		authorFilter === INSERTER_AUTHOR_TYPES.currentUser &&
+		! pattern.isCurrentUserPattern
 	) {
 		return true;
 	}

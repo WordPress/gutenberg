@@ -31,7 +31,7 @@ $wrapper_attributes = get_block_wrapper_attributes();
 				<a
 					data-testid="link <?php echo $label; ?>"
 					data-wp-on--click="actions.navigate"
-					data-wp-on-async--mouseenter="actions.prefetch"
+					data-wp-on--mouseenter="actions.prefetch"
 					href="<?php echo $link; ?>"
 				>
 					<?php echo $label; ?>

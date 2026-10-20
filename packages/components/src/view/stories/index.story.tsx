@@ -1,16 +1,10 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryFn } from '@storybook/react';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { View } from '..';
 
 const meta: Meta< typeof View > = {
 	component: View,
-	title: 'Components/View',
+	id: 'components-view',
+	title: 'Components/@wordpress-components/View',
 	argTypes: {
 		as: { control: false },
 		children: { control: { type: 'text' } },
@@ -19,6 +13,11 @@ const meta: Meta< typeof View > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Planned for deprecation.',
+		},
 	},
 };
 export default meta;

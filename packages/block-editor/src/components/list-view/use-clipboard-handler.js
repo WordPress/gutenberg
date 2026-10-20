@@ -1,18 +1,11 @@
-/**
- * WordPress dependencies
- */
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { useNotifyCopy } from '../../utils/use-notify-copy';
 import { focusListItem } from './utils';
 import { getPasteBlocks, setClipboardBlocks } from '../writing-flow/utils';
 
-// This hook borrows from useClipboardHandler in ../writing-flow/use-clipboard-handler.js
+// This hook borrows from useClipboardHandler in ../writing-flow/use-clipboard-handler.ts
 // and adds behaviour for the list view, while skipping partial selection.
 export default function useClipboardHandler( { selectBlock } ) {
 	const registry = useRegistry();

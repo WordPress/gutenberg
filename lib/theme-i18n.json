@@ -12,6 +12,11 @@
 				{
 					"name": "Font family name"
 				}
+			],
+			"textShadowPresets": [
+				{
+					"name": "Text shadow name"
+				}
 			]
 		},
 		"color": {
@@ -43,6 +48,11 @@
 				{
 					"name": "Aspect ratio name"
 				}
+			],
+			"dimensionSizes": [
+				{
+					"name": "Dimension size name"
+				}
 			]
 		},
 		"shadow": {
@@ -71,6 +81,11 @@
 						{
 							"name": "Font family name"
 						}
+					],
+					"textShadowPresets": [
+						{
+							"name": "Text shadow name"
+						}
 					]
 				},
 				"color": {
@@ -94,6 +109,11 @@
 					"aspectRatios": [
 						{
 							"name": "Aspect ratio name"
+						}
+					],
+					"dimensionSizes": [
+						{
+							"name": "Dimension size name"
 						}
 					]
 				},

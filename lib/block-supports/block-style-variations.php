@@ -155,12 +155,22 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
 	);
 
 	$config = array(
-		'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
-		'styles'  => array(
+		'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+		'settings' => array(
+			'spacing' => array(
+				'blockGap' => true,
+			),
+		),
+		'styles'   => array(
 			'elements' => $elements_data,
 			'blocks'   => $blocks_data,
 		),
 	);
+
+	// Ensure variation state styles know about any custom viewport breakpoints.
+	if ( isset( $theme_json['settings']['viewport'] ) ) {
+		$config['settings']['viewport'] = $theme_json['settings']['viewport'];
+	}
 
 	// Turn off filter that excludes block nodes. They are needed here for the variation's inner block types.
 	if ( ! is_admin() ) {
@@ -215,13 +225,18 @@ function gutenberg_render_block_style_variation_support_styles( $parsed_block ) 
  *
  * @see gutenberg_render_block_style_variation_support_styles
  *
- * @param  string $block_content Rendered block content.
- * @param  array  $block         Block object.
+ * @param string $block_content Rendered block content.
+ * @param array  $block         Block object.
  *
- * @return string                Filtered block content.
+ * @return string Filtered block content.
  */
 function gutenberg_render_block_style_variation_class_name( $block_content, $block ) {
 	if ( ! $block_content || empty( $block['attrs']['className'] ) ) {
+		return $block_content;
+	}
+
+	$block_class_name = $block['attrs']['className'];
+	if ( ! is_string( $block_class_name ) ) {
 		return $block_content;
 	}
 
@@ -229,7 +244,7 @@ function gutenberg_render_block_style_variation_class_name( $block_content, $blo
 	 * Matches a class prefixed by `is-style`, followed by the
 	 * variation slug, then `--`, and finally an instance number.
 	 */
-	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block['attrs']['className'], $matches );
+	preg_match( '/\bis-style-(\S+?--\d+)\b/', $block_class_name, $matches );
 
 	if ( empty( $matches ) ) {
 		return $block_content;

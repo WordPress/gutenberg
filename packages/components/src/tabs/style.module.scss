@@ -1,0 +1,220 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "../utils/theme-variables" as *;
+
+.tab-list {
+	display: flex;
+	align-items: stretch;
+	overflow-x: auto;
+
+	&[aria-orientation="vertical"] {
+		flex-direction: column;
+	}
+
+	&:where([aria-orientation="horizontal"]) {
+		width: fit-content;
+	}
+
+	--direction-factor: 1;
+	--direction-start: left;
+	--direction-end: right;
+	--selected-start: var(--selected-left, 0);
+	&:dir(rtl) {
+		--direction-factor: -1;
+		--direction-start: right;
+		--direction-end: left;
+		--selected-start: var(--selected-right, 0);
+	}
+
+	@media not (prefers-reduced-motion) {
+		&[data-indicator-animated]::before {
+			transition-property: transform;
+			transition-duration: 0.2s;
+			transition-timing-function: ease-out;
+		}
+	}
+	position: relative;
+	&::before {
+		content: "";
+		position: absolute;
+		pointer-events: none;
+		transform-origin: var(--direction-start) top;
+		color: var(--wpds-color-foreground-interactive-neutral);
+
+		// Windows high contrast mode.
+		outline: 2px solid transparent;
+		outline-offset: -1px;
+	}
+
+	/* Using a large value to avoid antialiasing rounding issues
+			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
+	--antialiasing-factor: 100;
+	&[aria-orientation="horizontal"] {
+		--fade-width: 64px;
+		--fade-gradient-base: transparent 0%, #000 var(--fade-width);
+		--fade-gradient-composed: var(--fade-gradient-base), #000 60%, transparent 50%;
+		&:global(.is-overflowing-first) {
+			mask-image: linear-gradient(to var(--direction-end), var(--fade-gradient-base));
+		}
+		&:global(.is-overflowing-last) {
+			mask-image: linear-gradient(to var(--direction-start), var(--fade-gradient-base));
+		}
+		&:global(.is-overflowing-first):global(.is-overflowing-last) {
+			mask-image:
+				linear-gradient(to right, var(--fade-gradient-composed)),
+				linear-gradient(to left, var(--fade-gradient-composed));
+		}
+
+		&::before {
+			bottom: 0;
+			height: 0;
+			width: calc(var(--antialiasing-factor) * 1px);
+			transform:
+				translateX(calc(var(--selected-start) * var(--direction-factor) * 1px))
+				scaleX(calc(var(--selected-width, 0) / var(--antialiasing-factor)));
+			border-bottom: var(--wp-admin-border-width-focus) solid currentColor;
+		}
+	}
+	&:has(
+		[aria-selected="true"]:not([aria-disabled="true"])[data-focus-visible]
+	)::before {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+	}
+
+	&[aria-orientation="vertical"] {
+		@media not (prefers-reduced-motion) {
+			&[data-indicator-animated]::before {
+				transition-property: transform, height;
+			}
+		}
+
+		&::before {
+			top: var(--wpds-dimension-padding-md);
+			inset-inline-start: 0;
+			z-index: 1;
+			width: var(--wp-admin-border-width-focus);
+			height: max(0px, calc(var(--selected-height, 0) * 1px - 2 * var(--wpds-dimension-padding-md)));
+			transform: translateY(calc(var(--selected-top, 0) * 1px));
+			background-color: currentColor;
+		}
+	}
+}
+
+.tab {
+	/* Resets */
+	border-radius: 0;
+	background: transparent;
+	border: none;
+	box-shadow: none;
+
+	flex: 1 0 auto;
+	white-space: nowrap;
+	display: flex;
+	align-items: center;
+	/* stylelint-disable-next-line declaration-property-value-disallowed-list -- Preserve the existing pointer cursor during the migration. */
+	cursor: pointer;
+	line-height: 1.2; // Characters in some languages (e.g. Japanese) may have a native higher line-height.
+	font-family: $font-family-body;
+	font-weight: 400;
+	font-size: $font-size-medium;
+	color: var(--wpds-color-foreground-interactive-neutral);
+
+	&:is([aria-selected="true"], [aria-disabled="true"]) {
+		cursor: default;
+	}
+
+	&[aria-disabled="true"] {
+		color: var(--wpds-color-foreground-interactive-neutral-disabled);
+	}
+
+	&:not([aria-disabled="true"]):is(
+		:not([aria-selected="true"]):hover,
+		:not([aria-selected="true"]):active,
+		[data-focus-visible]
+	) {
+		color: var(--wpds-color-foreground-interactive-neutral-active);
+
+		&::after {
+			background-color: var(--wpds-color-background-interactive-neutral-weak-active);
+			opacity: 1;
+		}
+	}
+
+	&:focus:not(:disabled) {
+		box-shadow: none;
+		outline: none;
+	}
+
+	// Interaction background and focus indicator.
+	position: relative;
+	isolation: isolate;
+	&::after {
+		position: absolute;
+		z-index: -1;
+		pointer-events: none;
+
+		// Draw the indicator.
+		// Outline works for Windows high contrast mode as well.
+		outline: var(--wp-admin-border-width-focus) solid transparent;
+		border-radius: $radius-small;
+
+		// Animation
+		opacity: 0;
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
+	}
+
+	&[data-focus-visible]::after {
+		outline-color: $components-color-accent;
+		opacity: 1;
+	}
+
+	[aria-orientation="horizontal"] & {
+		padding-inline: 16px;
+		height: 48px;
+		scroll-margin: 24px;
+
+		&::after {
+			content: "";
+			inset: var(--wpds-dimension-padding-md);
+		}
+	}
+
+	[aria-orientation="vertical"] & {
+		padding: var(--wpds-dimension-padding-md);
+		min-height: var(--wpds-dimension-size-lg);
+
+		&::after {
+			content: "";
+			inset: 0;
+			outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+		}
+	}
+}
+
+.tab-children {
+	flex-grow: 1;
+
+	display: flex;
+	align-items: center;
+
+	[aria-orientation="horizontal"] & {
+		justify-content: center;
+	}
+	[aria-orientation="vertical"] & {
+		justify-content: start;
+	}
+}
+
+.tab-panel {
+	&:focus {
+		outline: none;
+	}
+
+	&[data-focus-visible] {
+		@include outset-ring__focus();
+		outline-offset: 0;
+	}
+}

@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.use( {
@@ -18,7 +15,11 @@ test.describe( 'Site editor navigation', () => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
-	test( 'Can use keyboard to navigate the site editor', async ( {
+	// The extensible site editor has its own navigation shell (sidebar links
+	// without the drilldown frames, Saved button, or focusable view-mode
+	// iframe this test drives), so this scenario only applies to the classic
+	// site editor.
+	test( 'Can use keyboard to navigate the site editor @site-editor-v1-only', async ( {
 		admin,
 		editorNavigationUtils,
 		page,
@@ -51,6 +52,7 @@ test.describe( 'Site editor navigation', () => {
 		} );
 		const editorCanvasButton = editorCanvasRegion.getByRole( 'button', {
 			name: 'Edit',
+			exact: true,
 		} );
 
 		await expect( editorCanvasButton ).toBeVisible();
@@ -131,7 +133,7 @@ class EditorNavigationUtils {
 		this.pageUtils = pageUtils;
 	}
 
-	async tabToLabel( label, times = 10 ) {
+	async tabToLabel( label, times = 20 ) {
 		for ( let i = 0; i < times; i++ ) {
 			await this.pageUtils.pressKeys( 'Tab' );
 			const activeLabel = await this.page.evaluate( () => {

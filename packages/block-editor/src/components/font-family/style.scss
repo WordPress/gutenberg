@@ -1,5 +1,4 @@
-.block-editor-font-family-control {
-	&:not(.is-next-has-no-margin-bottom) {
-		margin-bottom: $grid-unit-10;
-	}
+.block-editor-font-family-control__hint {
+	margin-inline-start: var(--wpds-dimension-gap-sm);
+	color: var(--wpds-color-foreground-interactive-neutral-weak);
 }

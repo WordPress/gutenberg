@@ -1,16 +1,10 @@
-/**
- * WordPress dependencies
- */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useMemo, useCallback } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { blockMeta, post, archive } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
+import { safeDecodeURI } from '@wordpress/url';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 
 const EMPTY_OBJECT = {};
@@ -28,6 +22,20 @@ const getValueFromObjectPath = ( object, path ) => {
 	} );
 	return value;
 };
+
+/**
+ * Helper that adds a prefix to a post slug. The slug needs to be URL-decoded first,
+ * so that we have raw Unicode characters there. The server will truncate the slug to
+ * 200 characters, respecing Unicode char boundary. On the other hand, the server
+ * doesn't detect urlencoded octet boundary and can possibly construct slugs that
+ * are not valid urlencoded strings.
+ * @param {string} prefix The prefix to add to the slug.
+ * @param {string} slug   The slug to add the prefix to.
+ * @return {string} The slug with the prefix.
+ */
+function prefixSlug( prefix, slug ) {
+	return `${ prefix }-${ safeDecodeURI( slug ) }`;
+}
 
 /**
  * Helper util to map records to add a `name` prop from a
@@ -259,7 +267,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 							_x( '%1$s (%2$s)', 'post type menu label' ),
 							labels.template_name,
 							slug
-					  )
+						)
 					: sprintf(
 							// translators: 1: Name of the post type e.g: "Post". 2: Slug of the post type e.g: "book".
 							_x(
@@ -268,13 +276,13 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 							),
 							labels.singular_name,
 							slug
-					  );
+						);
 			}
 			const menuItem = defaultTemplateType
 				? {
 						...defaultTemplateType,
 						templatePrefix: templatePrefixes[ slug ],
-				  }
+					}
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -292,7 +300,7 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 								? icon.slice( 10 )
 								: post,
 						templatePrefix: templatePrefixes[ slug ],
-				  };
+					};
 			const hasEntities = postTypesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
 			if ( hasEntities ) {
@@ -312,7 +320,10 @@ export const usePostTypeMenuItems = ( onClickMenuItem ) => {
 								};
 							},
 							getSpecificTemplate: ( suggestion ) => {
-								const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
+								const templateSlug = prefixSlug(
+									templatePrefixes[ slug ],
+									suggestion.slug
+								);
 								return {
 									title: templateSlug,
 									slug: templateSlug,
@@ -426,19 +437,19 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 							_x( '%1$s (%2$s)', 'taxonomy template menu label' ),
 							labels.template_name,
 							slug
-					  )
+						)
 					: sprintf(
 							// translators: 1: Name of the taxonomy e.g: "Category". 2: Slug of the taxonomy e.g: "product_cat".
 							_x( '%1$s (%2$s)', 'taxonomy menu label' ),
 							labels.singular_name,
 							slug
-					  );
+						);
 			}
 			const menuItem = defaultTemplateType
 				? {
 						...defaultTemplateType,
 						templatePrefix: templatePrefixes[ slug ],
-				  }
+					}
 				: {
 						slug: generalTemplateSlug,
 						title: menuItemTitle,
@@ -449,7 +460,7 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 						),
 						icon: blockMeta,
 						templatePrefix: templatePrefixes[ slug ],
-				  };
+					};
 			const hasEntities = taxonomiesInfo?.[ slug ]?.hasEntities;
 			// We have a different template creation flow only if they have entities.
 			if ( hasEntities ) {
@@ -468,7 +479,10 @@ export const useTaxonomiesMenuItems = ( onClickMenuItem ) => {
 								};
 							},
 							getSpecificTemplate: ( suggestion ) => {
-								const templateSlug = `${ templatePrefixes[ slug ] }-${ suggestion.slug }`;
+								const templateSlug = prefixSlug(
+									templatePrefixes[ slug ],
+									suggestion.slug
+								);
 								return {
 									title: templateSlug,
 									slug: templateSlug,
@@ -553,7 +567,10 @@ export function useAuthorMenuItem( onClickMenuItem ) {
 						};
 					},
 					getSpecificTemplate: ( suggestion ) => {
-						const templateSlug = `author-${ suggestion.slug }`;
+						const templateSlug = prefixSlug(
+							'author',
+							suggestion.slug
+						);
 						return {
 							title: templateSlug,
 							slug: templateSlug,
@@ -695,15 +712,19 @@ const useEntitiesInfo = (
 						recordsToExcludePerEntity?.[ slug ]?.map(
 							( { id } ) => id
 						) || [];
-					accumulator[ slug ] = !! select(
-						coreStore
-					).getEntityRecords( entityName, slug, {
-						per_page: 1,
-						_fields: 'id',
-						context: 'view',
-						exclude: existingEntitiesIds,
-						...additionalQueryParameters[ slug ],
-					} )?.length;
+					const records = select( coreStore ).getEntityRecords(
+						entityName,
+						slug,
+						{
+							per_page: 1,
+							_fields: 'id',
+							context: 'view',
+							exclude: existingEntitiesIds,
+							...additionalQueryParameters[ slug ],
+						}
+					);
+					accumulator[ slug ] =
+						records === null || records.length > 0;
 					return accumulator;
 				},
 				{}
