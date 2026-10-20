@@ -1202,6 +1202,7 @@
       - separatorType
       - shiftStep
       - showTooltip
+      - size
       - step
       - trackColor
       - type
