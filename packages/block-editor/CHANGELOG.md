@@ -11,6 +11,7 @@
 
 ### New Features
 
+-   `RichTextToolbarButton`: Add a `group` prop. `group="insert"` marks a button that inserts something inline (an image, a footnote) rather than formatting text; with the experimental block toolbar redesign these buttons move to the block options menu ([#85187](https://github.com/WordPress/gutenberg/pull/85187)).
 -   Typography: Add a Gradient control that fills the text with a gradient, shown when `settings.background.backgroundClip` allows the `text` value, or when the block declares the support and a theme has not set it ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 -   Background: Add a Clip control for choosing the box a background is painted into, shown when `settings.background.backgroundClip` allows a value other than `text` ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 
