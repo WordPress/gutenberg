@@ -11,6 +11,8 @@
 
 ### Breaking Changes
 
+-   `Avatar`: Replace the compound API with a single component requiring `name`. Use `src` and optional `imageProps` for images; initials are the only fallback. Sizes now describe the intended high-DPI image size with a fixed additional footprint for the activity ring and transparent halo.
+
 -   `Calendar` and `RangeCalendar`: Fill their container width with no internal maximum. Constrain the container width to keep a compact calendar ([#86086](https://github.com/WordPress/gutenberg/pull/86086)).
 -   `Menu`, `Popover`: Remove the same-origin iframe outside-press workaround. Parent documents that need canvas presses to dismiss popups should forward those events from the iframe document onto the `<iframe>` element, as the block editor canvas does ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
 
@@ -23,6 +25,8 @@
 -   Add `LoadingIndicator` to `Combobox`, `Autocomplete`, `SearchableSelect`, `SearchableChipSelect`, and their controls, with a fixed spinner, customizable loading message, and popup item layout ([#84633](https://github.com/WordPress/gutenberg/pull/84633)).
 
 ### Enhancements
+
+-   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, share opaque colors between the ring and fallback, fit initials to small sizes, and enlarge single initials.
 
 -   `ControlWithError`, `ValidatedInputControl`, `ValidatedTextareaControl`: Don't show the missing-value message when focus leaves an empty required control. Tabbing or clicking through a form no longer reports fields the user hasn't filled in, and coming back to type no longer reports an incomplete value on every keystroke ([#86600](https://github.com/WordPress/gutenberg/pull/86600)).
 -   `Autocomplete`: Throw an error in development when `Autocomplete.Input` is rendered inside `Autocomplete.Popup`. For a searchable picker that opens from a button, render an inline `Autocomplete` inside a standalone `Popover` component instead ([#86674](https://github.com/WordPress/gutenberg/pull/86674)).
