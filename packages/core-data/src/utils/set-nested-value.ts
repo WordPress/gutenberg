@@ -22,7 +22,7 @@
  */
 export default function setNestedValue< T >(
 	object: T,
-	path: ( string | number )[] | string,
+	path: Array< string | number > | string,
 	value: unknown
 ): T {
 	if ( ! object || typeof object !== 'object' ) {

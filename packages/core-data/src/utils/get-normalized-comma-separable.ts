@@ -7,12 +7,12 @@
  *
  * @return Normalized field value.
  */
-function getNormalizedCommaSeparable( value: unknown ): string[] | null {
+function getNormalizedCommaSeparable( value: unknown ): Array< string > | null {
 	if ( typeof value === 'string' ) {
 		return value.split( ',' );
 	} else if ( Array.isArray( value ) ) {
 		// Callers pass arrays of strings.
-		return value as string[];
+		return value as Array< string >;
 	}
 
 	return null;

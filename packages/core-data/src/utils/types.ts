@@ -11,7 +11,7 @@ export type Reducer< S, A > = ( state: S | undefined, action: A ) => S;
 export interface ForwardedResolverArgs {
 	resolveSelect: Record<
 		string,
-		( ...args: unknown[] ) => Promise< unknown >
+		( ...args: Array< unknown > ) => Promise< unknown >
 	>;
 }
 
@@ -46,8 +46,8 @@ export interface TemplateArea {
  * The template parameters of `getTemplateInfo`.
  */
 export interface TemplateInfoParams {
-	templateTypes: TemplateType[];
-	templateAreas?: TemplateArea[];
+	templateTypes: Array< TemplateType >;
+	templateAreas?: Array< TemplateArea >;
 	template: {
 		slug?: string;
 		area?: string;

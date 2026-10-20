@@ -12,7 +12,7 @@
  */
 export default function getNestedValue(
 	object: unknown,
-	path: string | ( string | number )[],
+	path: string | Array< string | number >,
 	defaultValue?: unknown
 ): unknown {
 	if (
