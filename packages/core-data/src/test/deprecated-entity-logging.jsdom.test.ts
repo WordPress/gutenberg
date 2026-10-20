@@ -20,7 +20,7 @@ function getExpectedDeprecationArgs(
 	args: Array< unknown >,
 	isShorthandSelector?: boolean,
 	alternativeFunction?: string
-) {
+): [ string, { alternative: string; since: string } ] {
 	const expectedMessage = isShorthandSelector
 		? `'${ name }'`
 		: `The 'root', 'media' entity (used via '${ name }')`;
