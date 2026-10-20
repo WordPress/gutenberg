@@ -5,8 +5,9 @@
  * Block notes (and the base note REST controller) graduated to WordPress 6.9
  * core. Suggestions - a note that carries a `_wp_suggestion` payload describing
  * a proposed edit - are a Gutenberg 7.1 feature layered on top, so only the
- * suggestion-specific behavior lives here as a thin subclass of the core
- * comments controller.
+ * suggestion-specific behavior lives here as a thin subclass of the comments
+ * controller. It extends the 7.2 controller rather than core's, so registering
+ * it keeps note reactions working.
  *
  * Permissions are core's: `update_item` requires `edit_comment`, which
  * `map_meta_cap()` resolves to `edit_post` on the note's parent post, so a post
@@ -25,11 +26,11 @@
  * @since   7.1.0
  */
 
-if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg_REST_Comment_Controller_7_1' ) ) {
+if ( class_exists( 'Gutenberg_REST_Comment_Controller_7_2' ) && ! class_exists( 'Gutenberg_REST_Comment_Controller_7_1' ) ) {
 	/**
 	 * Core class to manage suggestion edits on note comments via the REST API.
 	 */
-	class Gutenberg_REST_Comment_Controller_7_1 extends WP_REST_Comments_Controller {
+	class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Controller_7_2 {
 
 		/**
 		 * Validates an incoming request's `_wp_suggestion` meta before any
@@ -140,6 +141,10 @@ if ( class_exists( 'WP_REST_Comments_Controller' ) && ! class_exists( 'Gutenberg
 		}
 	}
 }
+
+// The first handler registered for a route wins, and this controller already
+// includes the 7.2 one, so it takes over that registration.
+remove_action( 'rest_api_init', 'gutenberg_register_comment_controller_7_2' );
 
 add_action(
 	'rest_api_init',
