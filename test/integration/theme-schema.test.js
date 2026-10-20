@@ -91,6 +91,43 @@ describe( 'theme.json schema', () => {
 		expect( result ).toBe( true );
 	} );
 
+	test( 'accepts supported select pseudo-selectors', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					select: {
+						':hover': {
+							color: { background: 'blue' },
+						},
+						':focus-visible': {
+							outline: { style: 'solid' },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( true );
+	} );
+
+	test( 'rejects unsupported select pseudo-selectors', () => {
+		const theme = {
+			version: 3,
+			styles: {
+				elements: {
+					select: {
+						':visited': {
+							color: { text: 'green' },
+						},
+					},
+				},
+			},
+		};
+
+		expect( ajv.validate( themeSchema, theme ) ).toBe( false );
+	} );
+
 	test.each( invalidFiles )( 'invalidates schema for `%s`', ( filepath ) => {
 		// We want to validate the theme.json file using the local schema.
 		const { $schema, ...metadata } = JSON.parse(
