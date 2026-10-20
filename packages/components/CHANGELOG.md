@@ -94,6 +94,7 @@
 
 ### Internal
 
+-   Convert the remaining Popover test helper to TypeScript ([#85150](https://github.com/WordPress/gutenberg/pull/85150)).
 -   `RangeControl`, `Tabs`, `BorderBoxControl`: Remove unused styles and simplify SCSS nesting while preserving specificity and rendered styles ([#85086](https://github.com/WordPress/gutenberg/pull/85086)).
 -   Remove obsolete JavaScript style configuration and unused style helpers ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
 -   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
