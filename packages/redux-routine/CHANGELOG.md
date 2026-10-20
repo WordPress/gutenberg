@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Correct control result and generator dispatch types to match existing middleware behavior ([#85121](https://github.com/WordPress/gutenberg/pull/85121)).
+
+### Internal
+
+-   Convert the tests to TypeScript ([#85121](https://github.com/WordPress/gutenberg/pull/85121)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
