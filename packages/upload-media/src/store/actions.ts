@@ -240,6 +240,17 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 		dispatch.removeItem( id );
 		dispatch.revokeBlobUrls( id );
 
+		// An uploaded original is incomplete until finalization succeeds.
+		// Clean it up on cancellation, including manual and silent cancels.
+		// Child sideloads belong to the parent attachment and must not delete it.
+		const { mediaDelete } = select.getSettings();
+		if ( ! parentId && item.attachment?.id && mediaDelete ) {
+			mediaDelete( item.attachment.id ).catch( () => {
+				// Best-effort cleanup: a failed delete must not prevent
+				// cancellation or replace the original upload error.
+			} );
+		}
+
 		// A concurrency slot just freed up. Kick any items that were
 		// waiting in the queue, mirroring finishOperation's behavior.
 		if (
@@ -315,19 +326,6 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 						dispatch.processItem( parentId );
 					}
 				} else {
-					// Total failure: no child succeeded. The parent file
-					// already uploaded — delete the orphaned attachment
-					// from the server so it doesn't appear in the media
-					// library.
-					const parentAttachmentId = parentItem.attachment?.id;
-					const { mediaDelete } = select.getSettings();
-					if ( parentAttachmentId && mediaDelete ) {
-						mediaDelete( parentAttachmentId ).catch( () => {
-							// Best-effort cleanup; surface nothing to the
-							// user if the delete itself fails.
-						} );
-					}
-
 					// Cancel the parent too so the block resets rather
 					// than showing a partial upload. Propagate the
 					// underlying error's code and message — vips
