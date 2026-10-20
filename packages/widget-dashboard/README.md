@@ -256,9 +256,11 @@ The exported kit for handling them:
 
 - `WidgetGridSettings` — discriminated union of the per-model settings shapes.
 - `DEFAULT_GRID` — canonical default settings, applied when `gridSettings` is omitted.
-- `normalizeGridSettings( settings, defaultRowHeight )` — coerces legacy freeform row heights to the nearest preset. Run it over stored payloads before passing them in.
-- `ROW_HEIGHT_PRESETS` / `DEFAULT_ROW_HEIGHT` — the row-height presets (`small`, `medium`, `large`) that `rowHeight` values normalize to.
-- `WIDGET_DASHBOARD_COLUMN_COUNT` — column count used on wide containers when the host sets no `gridSettings.columns`. A default, not a ceiling: a finite `columns` is floored, with a floor of `1`, and rendered as asked. The effective count steps down from container width: the count at `960px` and above, `min( 2, count )` below that, one column below `600px`.
+- `normalizeGridSettings( settings, defaultRowHeight )` — fills an absent or invalid `rowHeight` with the default. Run it over stored payloads before passing them in.
+- `ROW_HEIGHT_PRESETS` / `DEFAULT_ROW_HEIGHT` — suggested row heights (`small`, `medium`, `large`) for hosts that offer a choice. Any positive `rowHeight` is honored; a tile's stored `height` counts rows of that size.
+- `WIDGET_DASHBOARD_COLUMN_STEPS` / `WIDGET_DASHBOARD_COLUMN_COUNT` — the policy used when the host sets neither `gridSettings.columns` nor `gridSettings.minColumnWidth` (`{ 0: 1, 600: 2, 960: 4 }`), and its wide-container count. A default, not a ceiling.
+
+The column policy is the host's, and it travels to the `@wordpress/grid` surface untouched. `gridSettings.columns` is a count at every width, or a count per container width: `{ 0: 1, 600: 2, 960: 4 }` renders one column from 0px, two from 600px, four from 960px, and a step can be `'auto'` to lift the cap from that width up. `gridSettings.minColumnWidth` is a per-column floor in pixels: the surface fits as many columns as the container allows at that width, capped by `columns` when set, down to one. Counts are floored at one with no ceiling. The package applies no steps of its own: a host that wants the count to change with the container width states the steps in `columns`.
 
 ```tsx
 <WidgetDashboard
