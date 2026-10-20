@@ -7,6 +7,8 @@ const [ disallowedValues, disallowedValueMessages ] =
 export default {
 	extends: '@wordpress/stylelint-tools/config',
 	rules: {
+		// Allow this package's own private properties while keeping other private prefixes restricted.
+		'custom-property-pattern': '^(?:_wp-components-.+|(?!_(?:gcd|wp)-).+)',
 		'declaration-property-value-disallowed-list': [
 			{
 				...disallowedValues,

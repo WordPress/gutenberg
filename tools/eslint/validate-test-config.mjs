@@ -86,7 +86,7 @@ for ( const file of [ nodeTest, jsdomTest, browserTest, sharedHelper ] ) {
 for ( const file of [
 	nodeTest,
 	'packages/blocks/src/store/test/selectors.jsdom.test.jsx',
-	'packages/block-editor/src/components/link-control/test/keyboard-selection.browser.test.js',
+	'packages/block-editor/src/components/border-radius-control/test/select.browser.test.js',
 	sharedHelper,
 	'test/unit/config/global-mocks.vitest.js',
 	'test/unit/scripts/validate-vitest-conventions.mjs',

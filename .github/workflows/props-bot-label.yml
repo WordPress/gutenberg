@@ -2,8 +2,8 @@ name: Props Bot Label
 
 on:
     # Removing the label is what lets it be added again to ask for another
-    # refresh, so it lives apart from the gather: that one cancels superseded
-    # runs, and a cancellation here would strand the label.
+    # refresh, so it lives apart from the gather: that one queues behind earlier
+    # runs, and the label should not wait on them to be consumed.
     pull_request_target:
         types:
             - labeled

@@ -127,6 +127,8 @@
 '[Package] Fields':
     - changed-files:
           - any-glob-to-any-file: 'packages/fields/**'
+          - any-glob-to-any-file: 'packages/core-fields/**'
+          - any-glob-to-any-file: 'packages/core-actions/**'
 
 '[Package] Format library':
     - changed-files:
@@ -180,10 +182,6 @@
     - changed-files:
           - any-glob-to-any-file: 'packages/keycodes/**'
 
-'[Package] Lazy import':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/lazy-import/**'
-
 '[Package] Media Utils':
     - changed-files:
           - any-glob-to-any-file: 'packages/media-utils/**'
@@ -215,10 +213,6 @@
 '[Package] Private APIs':
     - changed-files:
           - any-glob-to-any-file: 'packages/private-apis/**'
-
-'[Package] Project management automation':
-    - changed-files:
-          - any-glob-to-any-file: 'packages/project-management-automation/**'
 
 '[Package] React i18n':
     - changed-files:

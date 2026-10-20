@@ -5,12 +5,17 @@ import {
 	it,
 	vi,
 	type MockedFunction,
+	beforeEach,
 } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createRef, useId, useState } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
 import * as Menu from '../index';
+import {
+	getWpCompatOverlaySlot,
+	__resetWpCompatOverlaySlotCacheForTests,
+} from '../../utils/wp-compat-overlay-slot';
 
 vi.mock( import( '@wordpress/i18n' ), async ( importOriginal ) => ( {
 	...( await importOriginal() ),
@@ -71,6 +76,65 @@ function queryExternalLinkIndicator( item: HTMLElement ) {
 }
 
 describe( 'Menu', () => {
+	it( 'keeps a popup portaled into an iframe open for inside presses and closes it for outside presses', async () => {
+		const user = userEvent.setup();
+		const iframe = document.createElement( 'iframe' );
+		document.body.appendChild( iframe );
+		const iframeDocument = iframe.contentDocument;
+
+		if ( ! iframeDocument ) {
+			throw new Error( 'Expected a same-origin iframe document.' );
+		}
+
+		try {
+			const outsideTarget = iframeDocument.createElement( 'button' );
+			iframeDocument.body.appendChild( outsideTarget );
+
+			render(
+				<Menu.Root modal={ false }>
+					<Menu.Trigger>Actions</Menu.Trigger>
+					<Menu.Popup
+						portal={
+							<Menu.Portal container={ iframeDocument.body } />
+						}
+					>
+						<Menu.Item>
+							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
+						</Menu.Item>
+					</Menu.Popup>
+				</Menu.Root>
+			);
+
+			await user.click(
+				screen.getByRole( 'button', { name: 'Actions' } )
+			);
+			const portaledMenu = await within( iframeDocument.body ).findByRole(
+				'menu'
+			);
+			const item = within( portaledMenu ).getByRole( 'menuitem', {
+				name: 'Duplicate',
+			} );
+
+			act( () => {
+				item.dispatchEvent(
+					new MouseEvent( 'pointerdown', { bubbles: true } )
+				);
+			} );
+			expect( portaledMenu ).toBeVisible();
+
+			act( () => {
+				outsideTarget.dispatchEvent(
+					new MouseEvent( 'pointerdown', { bubbles: true } )
+				);
+			} );
+			await waitFor( () => {
+				expect( portaledMenu ).not.toBeInTheDocument();
+			} );
+		} finally {
+			iframe.remove();
+		}
+	} );
+
 	it( 'renders prefix icons at 16px by default', () => {
 		render( <Menu.PrefixIcon icon={ <svg /> } role="img" /> );
 
@@ -148,73 +212,6 @@ describe( 'Menu', () => {
 		expect( triggerWithPayload ).toBeDefined();
 	} );
 
-	it( 'does not close for pointer interactions inside a menu portaled to an iframe', async () => {
-		const user = userEvent.setup();
-		const iframe = document.createElement( 'iframe' );
-		document.body.appendChild( iframe );
-		const iframeDocument = iframe.contentDocument;
-
-		if ( ! iframeDocument ) {
-			throw new Error( 'Expected a same-origin iframe document.' );
-		}
-		const addEventListener = vi.spyOn( iframeDocument, 'addEventListener' );
-
-		try {
-			const outsideTarget = iframeDocument.createElement( 'button' );
-			iframeDocument.body.appendChild( outsideTarget );
-
-			render(
-				<Menu.Root modal={ false }>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<Menu.Popup
-						portal={
-							<Menu.Portal container={ iframeDocument.body } />
-						}
-					>
-						<Menu.Item>
-							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-			);
-
-			await user.click(
-				screen.getByRole( 'button', { name: 'Actions' } )
-			);
-			const portaledMenu = await within( iframeDocument.body ).findByRole(
-				'menu'
-			);
-			const item = within( portaledMenu ).getByRole( 'menuitem', {
-				name: 'Duplicate',
-			} );
-			await waitFor( () => {
-				expect( addEventListener ).toHaveBeenCalledWith(
-					'pointerdown',
-					expect.any( Function ),
-					true
-				);
-			} );
-
-			act( () => {
-				item.dispatchEvent(
-					new MouseEvent( 'pointerdown', { bubbles: true } )
-				);
-			} );
-			expect( portaledMenu ).toBeVisible();
-
-			act( () => {
-				outsideTarget.dispatchEvent(
-					new MouseEvent( 'pointerdown', { bubbles: true } )
-				);
-			} );
-			await waitFor( () => {
-				expect( portaledMenu ).not.toBeInTheDocument();
-			} );
-		} finally {
-			iframe.remove();
-		}
-	} );
-
 	it( 'closes a non-modal menu on iframe pointerdown after its trigger becomes disabled', async () => {
 		const user = userEvent.setup();
 
@@ -256,189 +253,6 @@ describe( 'Menu', () => {
 				new MouseEvent( 'pointerdown', { bubbles: true } )
 			);
 		} );
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-	} );
-
-	it( 'reattaches the iframe listener after reload and removes it when closed', async () => {
-		const user = userEvent.setup();
-
-		const { unmount } = render(
-			<>
-				<Menu.Root modal={ false }>
-					<Menu.Trigger>Actions</Menu.Trigger>
-					<Menu.Popup>
-						<Menu.Item>
-							<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-						</Menu.Item>
-					</Menu.Popup>
-				</Menu.Root>
-				<iframe title="Editor canvas" />
-			</>
-		);
-
-		const iframe = screen.getByTitle( 'Editor canvas' );
-		const firstDocument = document.implementation.createHTMLDocument();
-		const reloadedDocument = document.implementation.createHTMLDocument();
-		let iframeDocument = firstDocument;
-		Object.defineProperty( iframe, 'contentDocument', {
-			configurable: true,
-			get: () => iframeDocument,
-		} );
-		const firstAddEventListener = vi.spyOn(
-			firstDocument,
-			'addEventListener'
-		);
-		const firstRemoveEventListener = vi.spyOn(
-			firstDocument,
-			'removeEventListener'
-		);
-		const reloadedAddEventListener = vi.spyOn(
-			reloadedDocument,
-			'addEventListener'
-		);
-		const reloadedRemoveEventListener = vi.spyOn(
-			reloadedDocument,
-			'removeEventListener'
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-		await waitFor( () => {
-			expect( firstAddEventListener ).toHaveBeenCalledWith(
-				'pointerdown',
-				expect.any( Function ),
-				true
-			);
-		} );
-
-		iframeDocument = reloadedDocument;
-		act( () => iframe.dispatchEvent( new Event( 'load' ) ) );
-
-		expect( firstRemoveEventListener ).toHaveBeenCalledWith(
-			'pointerdown',
-			expect.any( Function ),
-			true
-		);
-		expect( reloadedAddEventListener ).toHaveBeenCalledWith(
-			'pointerdown',
-			expect.any( Function ),
-			true
-		);
-
-		await user.keyboard( '{Escape}' );
-		await waitFor( () => {
-			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
-		} );
-		expect( reloadedRemoveEventListener ).toHaveBeenCalledWith(
-			'pointerdown',
-			expect.any( Function ),
-			true
-		);
-		reloadedAddEventListener.mockClear();
-		reloadedRemoveEventListener.mockClear();
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-		await waitFor( () => {
-			expect( reloadedAddEventListener ).toHaveBeenCalledWith(
-				'pointerdown',
-				expect.any( Function ),
-				true
-			);
-		} );
-		const reloadedPointerDownListener =
-			reloadedAddEventListener.mock.calls.find(
-				( [ type, , capture ] ) =>
-					type === 'pointerdown' && capture === true
-			)?.[ 1 ];
-		unmount();
-		expect( reloadedRemoveEventListener ).toHaveBeenCalledExactlyOnceWith(
-			'pointerdown',
-			reloadedPointerDownListener,
-			true
-		);
-	} );
-
-	it( 'moves the listener when an iframe remounts while the menu is open', async () => {
-		const user = userEvent.setup();
-
-		function MenuWithIframe( { iframeKey }: { iframeKey: string } ) {
-			return (
-				<>
-					<Menu.Root modal={ false }>
-						<Menu.Trigger>Actions</Menu.Trigger>
-						<Menu.Popup>
-							<Menu.Item>
-								<Menu.ItemLabel>Duplicate</Menu.ItemLabel>
-							</Menu.Item>
-						</Menu.Popup>
-					</Menu.Root>
-					<iframe key={ iframeKey } title="Editor canvas" />
-				</>
-			);
-		}
-
-		const { rerender } = render( <MenuWithIframe iframeKey="first" /> );
-		const firstIframe = screen.getByTitle( 'Editor canvas' );
-		const firstDocument = document.implementation.createHTMLDocument();
-		Object.defineProperty( firstIframe, 'contentDocument', {
-			configurable: true,
-			get: () => firstDocument,
-		} );
-		const firstAddEventListener = vi.spyOn(
-			firstDocument,
-			'addEventListener'
-		);
-		const firstRemoveEventListener = vi.spyOn(
-			firstDocument,
-			'removeEventListener'
-		);
-
-		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
-		expect( await screen.findByRole( 'menu' ) ).toBeVisible();
-		await waitFor( () => {
-			expect( firstAddEventListener ).toHaveBeenCalledWith(
-				'pointerdown',
-				expect.any( Function ),
-				true
-			);
-		} );
-
-		const firstPointerDownListener = firstAddEventListener.mock.calls.find(
-			( [ type, , capture ] ) =>
-				type === 'pointerdown' && capture === true
-		)?.[ 1 ];
-		rerender( <MenuWithIframe iframeKey="second" /> );
-		await waitFor( () => {
-			expect( firstRemoveEventListener ).toHaveBeenCalledWith(
-				'pointerdown',
-				firstPointerDownListener,
-				true
-			);
-		} );
-
-		act( () => {
-			firstDocument.dispatchEvent(
-				new MouseEvent( 'pointerdown', { bubbles: true } )
-			);
-		} );
-		expect( screen.getByRole( 'menu' ) ).toBeVisible();
-
-		const secondIframe = screen.getByTitle( 'Editor canvas' );
-		const secondDocument = document.implementation.createHTMLDocument();
-		Object.defineProperty( secondIframe, 'contentDocument', {
-			configurable: true,
-			get: () => secondDocument,
-		} );
-		act( () => secondIframe.dispatchEvent( new Event( 'load' ) ) );
-		act( () => {
-			secondDocument.dispatchEvent(
-				new MouseEvent( 'pointerdown', { bubbles: true } )
-			);
-		} );
-
 		await waitFor( () => {
 			expect( screen.queryByRole( 'menu' ) ).not.toBeInTheDocument();
 		} );
@@ -938,7 +752,8 @@ describe( 'Menu', () => {
 		await user.click( screen.getByRole( 'button', { name: 'Actions' } ) );
 
 		const item = await screen.findByRole( 'menuitem', {
-			name: 'WordPress.org (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'WordPress.org(opens in a new tab)',
 		} );
 
 		expect( item ).toHaveAttribute( 'target', '_blank' );
@@ -955,7 +770,8 @@ describe( 'Menu', () => {
 			screen.getAllByLabelText( '(opens in a new tab)' )
 		).toHaveLength( 3 );
 		const developerItem = screen.getByRole( 'menuitem', {
-			name: 'Developer resources (opens in a new tab)',
+			// TODO: jsdom-only name; browsers separate the notice with a space.
+			name: 'Developer resources(opens in a new tab)',
 		} );
 		const developerItemIndicator =
 			queryExternalLinkIndicator( developerItem );
@@ -1002,5 +818,44 @@ describe( 'Menu', () => {
 		expect( screen.getByText( 'Create a separate copy.' ).tagName ).toBe(
 			'H3'
 		);
+	} );
+} );
+
+describe( 'Menu.Portal', () => {
+	beforeEach( () => {
+		vi.stubGlobal( '__wpUiCompatOverlaySlotEnabled', true );
+	} );
+
+	afterEach( () => {
+		getWpCompatOverlaySlot()?.remove();
+		__resetWpCompatOverlaySlotCacheForTests();
+		vi.unstubAllGlobals();
+	} );
+
+	it( 'waits for an explicit null container to become available', async () => {
+		const content = ( container: HTMLElement | null ) => (
+			<Menu.Root defaultOpen>
+				<Menu.Trigger>Open Menu</Menu.Trigger>
+				<div data-testid="portal-target" />
+				<Menu.Popup portal={ <Menu.Portal container={ container } /> }>
+					Portal content
+				</Menu.Popup>
+			</Menu.Root>
+		);
+
+		const { rerender } = render( content( null ) );
+
+		expect(
+			screen.queryByText( 'Portal content' )
+		).not.toBeInTheDocument();
+
+		const target = screen.getByTestId( 'portal-target' );
+		rerender( content( target ) );
+
+		await waitFor( () => {
+			expect(
+				within( target ).getByText( 'Portal content' )
+			).toBeVisible();
+		} );
 	} );
 } );

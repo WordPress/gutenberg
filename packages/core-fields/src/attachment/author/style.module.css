@@ -1,0 +1,49 @@
+.avatar {
+	flex-shrink: 0;
+	overflow: hidden;
+	inline-size: 24px;
+	block-size: 24px;
+	align-items: center;
+	justify-content: start;
+	display: flex;
+}
+
+.avatar img {
+	inline-size: 16px;
+	block-size: 16px;
+	object-fit: cover;
+	opacity: 1;
+	border-radius: 100%;
+}
+
+@media not (prefers-reduced-motion) {
+	.is-loading img,
+	.is-loaded img {
+		transition: opacity 0.1s linear;
+	}
+}
+
+.is-loading img {
+	opacity: 0;
+}
+
+.is-loaded img {
+	opacity: 1;
+}
+
+.icon {
+	display: flex;
+	flex-shrink: 0;
+	inline-size: 24px;
+	block-size: 24px;
+}
+
+.icon svg {
+	margin-inline-start: -4px;
+	fill: currentColor;
+}
+
+.name {
+	text-overflow: ellipsis;
+	overflow: hidden;
+}

@@ -27,11 +27,20 @@ function getCollapsedLayout(
 	} = metrics;
 	const linkCount = linkItemWidths.length;
 
-	if ( linkCount === 0 || availableWidth <= 0 ) {
+	if ( availableWidth <= 0 ) {
 		return {
 			collapsedIndices: [],
 			shouldMoveFocusToOverflow: false,
 			shouldTruncateCurrent: false,
+		};
+	}
+
+	if ( linkCount === 0 ) {
+		return {
+			collapsedIndices: [],
+			shouldMoveFocusToOverflow: false,
+			shouldTruncateCurrent:
+				currentItemWidth > availableWidth + FIT_TOLERANCE,
 		};
 	}
 

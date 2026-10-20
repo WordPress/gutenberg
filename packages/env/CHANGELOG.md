@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Bug Fixes
+
+-   Download the PHPUnit test library for a WordPress alpha, beta or RC version from its `X.Y` branch of `WordPress/wordpress-develop` when that branch exists, instead of always from trunk. A maintenance branch between point releases, such as `7.1.4-alpha`, no longer gets trunk's tests, which can depend on code only trunk has. A release falls back to its `X.Y` branch when its tag does not exist yet. Cached test libraries now also update to the fetched version instead of staying on the first one downloaded ([#84758](https://github.com/WordPress/gutenberg/pull/84758)).
+
 ## 11.17.0 (2026-10-07)
 
 ### New Features
@@ -19,6 +27,7 @@
 ### Internal
 
 -   Update `@wp-playground/cli` to 3.1.56, which replaces the `fs-ext` optional dependency, compiled with `node-gyp` at install time, with `fs-ext-extra-prebuilt`, which ships prebuilt binaries and works without running install scripts ([#84012](https://github.com/WordPress/gutenberg/pull/84012)).
+-   Update `simple-git` to v4, which has better TypeScript support ([#84137](https://github.com/WordPress/gutenberg/pull/84137)).
 
 ## 11.16.0 (2026-09-23)
 

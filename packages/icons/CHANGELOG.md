@@ -2,10 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### Enhancements
+
+-   `tag`, `termCount`, `termName` and `postTerms`: mirror the tag so it leans the same way as the other angled icons, such as `brush`, `pin` and `plugins`. The number in `termCount` stays readable ([#84675](https://github.com/WordPress/gutenberg/pull/84675)).
+-   `manifest.json`: Add 18 popular admin menu icons to the `core-admin` collection ([#85072](https://github.com/WordPress/gutenberg/pull/85072)).
+
 ## 18.0.0 (2026-10-07)
 
 ### Breaking Changes
 
+-   Stroke-based icons now scale their stroke width with their size. A 1.5-unit stroke renders at 1px for a 16px icon, 1.25px for a 20px icon, and 1.5px for a 24px icon ([#84081](https://github.com/WordPress/gutenberg/pull/84081)).
 -   Upgrade React to v19 ([#83941](https://github.com/WordPress/gutenberg/pull/83941)).
 
 ### New Features
