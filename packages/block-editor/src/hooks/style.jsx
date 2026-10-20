@@ -16,6 +16,7 @@ import {
 	getCSSRules,
 	compileCSS,
 	getCSSValueFromRawStyle,
+	VALID_BACKGROUND_CLIP_VALUES,
 } from '@wordpress/style-engine';
 import { BACKGROUND_SUPPORT_KEY, BackgroundImagePanel } from './background';
 import { BORDER_SUPPORT_KEY, BorderPanel, SHADOW_SUPPORT_KEY } from './border';
@@ -212,6 +213,20 @@ function paintsItsOwnBackground( stateStyles ) {
 }
 
 /**
+ * Returns a state's clip, or `undefined` when it is not a valid clip value.
+ * Mirrors the PHP helpers, which ignore invalid clips.
+ *
+ * @param {Object} stateStyles State style object.
+ * @return {string|undefined} The state's valid clip value.
+ */
+function getValidStateClip( stateStyles ) {
+	const stateClip = stateStyles?.background?.backgroundClip;
+	return VALID_BACKGROUND_CLIP_VALUES.includes( stateClip )
+		? stateClip
+		: undefined;
+}
+
+/**
  * Returns the CSS that stops a text gradient from below painting as a block
  * background once a state switches to a box clip.
  *
@@ -225,7 +240,7 @@ function getStateTextClipEscapeCSS( stateStyles, baseStyle, selector ) {
 		return undefined;
 	}
 
-	const stateClip = stateStyles?.background?.backgroundClip;
+	const stateClip = getValidStateClip( stateStyles );
 	if ( ! stateClip || 'text' === stateClip ) {
 		return undefined;
 	}
@@ -255,7 +270,7 @@ function getStateTextFillResetCSS( stateStyles, baseStyle, selector ) {
 	if (
 		! baseStyle ||
 		! stateStyles?.color?.text ||
-		stateStyles?.background?.backgroundClip ||
+		getValidStateClip( stateStyles ) ||
 		paintsItsOwnBackground( stateStyles )
 	) {
 		return undefined;
