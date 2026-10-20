@@ -48,15 +48,6 @@ import './style.scss';
 
 const LAYOUT_LIST = 'list';
 
-// Actions that add posts or move them between statuses, so change the totals
-// the status tabs show.
-const COUNT_CHANGING_ACTIONS = new Set( [
-	'move-to-trash',
-	'permanently-delete',
-	'restore',
-	'duplicate-post',
-] );
-
 function getItemId( item: Post ) {
 	return item.id.toString();
 }
@@ -257,9 +248,9 @@ function PostListView( {
 		postType,
 		context: 'list',
 		onActionPerformed: ( actionId: string, items: Post[] ) => {
-			if ( COUNT_CHANGING_ACTIONS.has( actionId ) ) {
-				refreshViewCounts();
-			}
+			// Any action may change the totals, including a plugin's, so
+			// refresh after each one rather than tracking which do.
+			refreshViewCounts();
 			// Clean up URL when delete actions are performed
 			if (
 				actionId === 'move-to-trash' ||
