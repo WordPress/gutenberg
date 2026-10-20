@@ -293,6 +293,10 @@ This engine is one host implementation of `@wordpress/widget-primitives`. It map
 
 When a widget type declares `help`, the tile chrome surfaces its `content` and optional `links` in a infotip beside the title.
 
+### Footprint
+
+When a widget type declares `footprint`, the tile gets a floor in pixels that this host appraises per form: `strip` at least 440 wide, `card` at least 200 by 200, `panel` at least 440 by 360, `glance` none. The surface quantizes the floor to whole tracks of the current geometry and saturates it at the column count, so a resize never commits a span below it and a stored span renders bounded. The floor is derived per render and never stored: changing the row height or the column count changes the quantized floor, not the declaration.
+
 ### Attribute editing
 
 A widget declares importance per attribute through `relevance` (`'high' | 'medium' | 'low'`, absent means `'low'`). The declaration states importance, not placement; this host maps it to two surfaces:
