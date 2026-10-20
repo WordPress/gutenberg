@@ -415,6 +415,10 @@ export function FlatTermSelector( { slug } ) {
 
 		event.preventDefault();
 		onInputValueChange( '' );
+		if ( isSuggesting ) {
+			newTermNames.forEach( proposeTerm );
+			return;
+		}
 		createTerms( newTermNames );
 	}
 
@@ -424,7 +428,7 @@ export function FlatTermSelector( { slug } ) {
 		);
 		if ( isCreatingTerm ) {
 			if ( isSuggesting ) {
-				proposeTerm( newTermName );
+				newTermNames.forEach( proposeTerm );
 				return;
 			}
 			// Picking the create item leaves the assigned terms untouched, and
