@@ -6475,32 +6475,7 @@
 			"count": 1
 		}
 	},
-	"packages/block-library/src/navigation-link/link-ui/dialog-wrapper.jsx": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
 	"packages/block-library/src/navigation-link/link-ui/index.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		},
-		"gutenberg/use-typescript": {
-			"count": 1
-		},
-		"react-hooks/refs": {
-			"count": 4
-		},
-		"react/jsx-filename-extension": {
-			"count": 1
-		}
-	},
-	"packages/block-library/src/navigation-link/link-ui/page-creator.jsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 5
-		},
 		"gutenberg/use-typescript": {
 			"count": 1
 		},

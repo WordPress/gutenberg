@@ -120,7 +120,9 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			await expect( titleField ).toHaveValue( 'Brand New Page' );
 
 			// The Back button should be focused after entering the creation form.
-			const backButton = page.locator( '.link-ui-page-creator__back' );
+			const backButton = page
+				.getByRole( 'dialog', { name: 'Create page' } )
+				.getByRole( 'button', { name: 'Back' } );
 			await expect( backButton ).toBeFocused();
 
 			// Tab to the title field.

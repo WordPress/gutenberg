@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getSuggestionsQuery } from '../link-picker';
+import { getSuggestionsQuery } from '../get-suggestions-query';
 
 const PER_PAGE = 20;
 
