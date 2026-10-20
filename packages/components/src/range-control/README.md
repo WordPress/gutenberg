@@ -328,7 +328,7 @@ Forcing the Tooltip UI to show or hide. This is overridden to `false` when `step
 
 ### `size`: `'default' | 'compact'`
 
-Adjusts the size of the control. The `default` size is 40px tall and the `compact` size is 32px tall.
+Adjusts the size of the control.
 
 -   Required: No
 -   Default: `'default'`
