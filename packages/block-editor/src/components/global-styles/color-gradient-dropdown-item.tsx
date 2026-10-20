@@ -9,6 +9,7 @@ import { useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { reset as resetIcon, caution as cautionIcon } from '@wordpress/icons';
 import { Stack, Tabs } from '@wordpress/ui';
+import type { ReactNode } from 'react';
 import ColorGradientControl from '../colors-gradients/control';
 import {
 	getInheritanceProps,
@@ -17,25 +18,32 @@ import {
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
 import { useToolsPanelItemPopoverProps } from './utils';
-
-/**
- * @typedef {Object} DropdownContentProps
- * @property {Array}  tabs                         Tab configurations to render.
- * @property {Object} colorGradientControlSettings Settings passed to ColorGradientControl.
- * @property {string} [contrastWarning]            Contrast warning message for the color value.
- */
+import type { ColorGradientOptions } from '../colors-gradients/types';
+import type {
+	ColorGradientDropdownItemProps,
+	ColorGradientTabConfig,
+} from './types';
 
 /**
  * Renders the dropdown content containing the color/gradient picker tabs.
  *
- * @param {DropdownContentProps} props
+ * @param props
+ * @param props.tabs                         Tab configurations to render.
+ * @param props.colorGradientControlSettings Settings passed to ColorGradientControl.
+ * @param props.contrastWarning              Contrast warning message for the color value.
  */
 function DropdownContent( {
 	tabs,
 	colorGradientControlSettings,
 	contrastWarning,
+}: {
+	tabs: ColorGradientTabConfig[];
+	colorGradientControlSettings: ColorGradientOptions;
+	contrastWarning?: ReactNode;
 } ) {
-	const { key: firstTabKey, ...firstTab } = tabs[ 0 ] ?? {};
+	// The dropdown renders at least one tab.
+	const { key: firstTabKey, ...firstTab } =
+		tabs[ 0 ] ?? ( {} as ColorGradientTabConfig );
 	const defaultTabId = (
 		tabs.find( ( tab ) => tab.userValue !== undefined ) ??
 		tabs.find(
@@ -91,7 +99,13 @@ function DropdownContent( {
 	);
 }
 
-const LabeledColorIndicators = ( { indicators, label } ) => (
+const LabeledColorIndicators = ( {
+	indicators,
+	label,
+}: {
+	indicators: ( string | undefined )[];
+	label: string;
+} ) => (
 	<Stack
 		className="block-editor-panel-color-gradient-settings__labeled-indicators"
 		direction="row"
@@ -120,6 +134,9 @@ function ColorGradientTab( {
 	isPlaceholder,
 	colorGradientControlSettings,
 	contrastWarning,
+}: Omit< ColorGradientTabConfig, 'key' | 'label' > & {
+	colorGradientControlSettings: ColorGradientOptions;
+	contrastWarning?: ReactNode;
 } ) {
 	// Display value: prefer the user's local value when set; otherwise fall
 	// back to the inherited value so the at-rest preselection is visible
@@ -136,7 +153,7 @@ function ColorGradientTab( {
 	// re-route the `undefined` payload to a commit of the inherited value
 	// instead of the default "clear local" behaviour. Once a local value is
 	// set, the same click correctly clears local back to at rest.
-	const onChange = ( newValue, newSlug ) => {
+	const onChange = ( newValue?: string, newSlug?: string ) => {
 		if ( isPlaceholder && newValue === undefined ) {
 			setValue( inheritedValue, inheritedSlug );
 			return;
@@ -196,9 +213,10 @@ export default function ColorGradientDropdownItem( {
 	isPlaceholder = false,
 	hasInheritedValue = false,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
-} ) {
+}: ColorGradientDropdownItemProps ) {
 	const popoverProps = useToolsPanelItemPopoverProps();
-	const colorGradientDropdownButtonRef = useRef( undefined );
+	const colorGradientDropdownButtonRef =
+		useRef< HTMLButtonElement >( undefined );
 	const itemClassName = clsx( 'block-editor-color-gradient-item', className );
 	// A local override exists when the user has set a value that shadows an
 	// inherited one — only then do we offer the reset-to-inherited / push

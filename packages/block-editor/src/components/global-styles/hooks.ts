@@ -3,6 +3,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 import { _x } from '@wordpress/i18n';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import type { UnresolvedValue } from '@wordpress/global-styles-engine';
 import { unlock } from '../../lock-unlock';
 import type { StyleSettings } from './types';
 
@@ -341,13 +342,16 @@ export function useColorGradientSettings(
 		() => colors.flatMap( ( { colors: originColors } ) => originColors ),
 		[ colors ]
 	);
-	const decodeValue = ( rawValue: string ) =>
+	const decodeValue = ( rawValue: UnresolvedValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
 	// When a slug is provided it is used directly: two presets can share the
 	// same gradient string, and matching by string alone would collapse them
 	// onto whichever entry appears first. Without a slug, fall back to
 	// matching the gradient string against the presets.
-	const encodeGradientValue = ( gradientValue: string, slug?: string ) => {
+	const encodeGradientValue = (
+		gradientValue: string | undefined,
+		slug?: string
+	) => {
 		if ( slug ) {
 			return 'var:preset|gradient|' + slug;
 		}

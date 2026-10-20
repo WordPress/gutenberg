@@ -15,6 +15,16 @@ import {
 	encodeColorValueWithPalette,
 } from '../../utils/color-values';
 import { isGlobalStylesInheritanceIndicatorUIEnabled } from './inheritance';
+import type {
+	ColorGradientDropdownItemProps,
+	ColorGradientTabConfig,
+	ColorPanelProps,
+	PanelResetAllFilter,
+	PanelStyle,
+	StyleSettings,
+	StyleToolsPanelProps,
+	StyleValue,
+} from './types';
 
 // Despite the "ColorPanel" name, this gates only the element-level color
 // controls (link, heading, button, caption, h1–h6) — surfaced as the
@@ -22,7 +32,7 @@ import { isGlobalStylesInheritanceIndicatorUIEnabled } from './inheritance';
 // Global Styles. Top-level text and background color moved to the
 // Typography and Background panels, so this returns false for blocks
 // whose only color support is text and/or background.
-export function useHasColorPanel( settings ) {
+export function useHasColorPanel( settings: StyleSettings | undefined ) {
 	const hasLinkPanel = useHasLinkPanel( settings );
 	const hasHeadingPanel = useHasHeadingPanel( settings );
 	const hasButtonPanel = useHasButtonPanel( settings );
@@ -31,7 +41,7 @@ export function useHasColorPanel( settings ) {
 	return hasLinkPanel || hasHeadingPanel || hasButtonPanel || hasCaptionPanel;
 }
 
-export function useHasTextPanel( settings ) {
+export function useHasTextPanel( settings: StyleSettings | undefined ) {
 	const colors = useColorsPerOrigin( settings );
 	return (
 		settings?.color?.text &&
@@ -39,7 +49,7 @@ export function useHasTextPanel( settings ) {
 	);
 }
 
-export function useHasLinkPanel( settings ) {
+export function useHasLinkPanel( settings: StyleSettings | undefined ) {
 	const colors = useColorsPerOrigin( settings );
 	return (
 		settings?.color?.link &&
@@ -47,7 +57,7 @@ export function useHasLinkPanel( settings ) {
 	);
 }
 
-export function useHasCaptionPanel( settings ) {
+export function useHasCaptionPanel( settings: StyleSettings | undefined ) {
 	const colors = useColorsPerOrigin( settings );
 	return (
 		settings?.color?.caption &&
@@ -55,7 +65,7 @@ export function useHasCaptionPanel( settings ) {
 	);
 }
 
-export function useHasHeadingPanel( settings ) {
+export function useHasHeadingPanel( settings: StyleSettings | undefined ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	return (
@@ -67,7 +77,7 @@ export function useHasHeadingPanel( settings ) {
 	);
 }
 
-export function useHasButtonPanel( settings ) {
+export function useHasButtonPanel( settings: StyleSettings | undefined ) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	return (
@@ -79,7 +89,9 @@ export function useHasButtonPanel( settings ) {
 	);
 }
 
-export function useHasBackgroundColorPanel( settings ) {
+export function useHasBackgroundColorPanel(
+	settings: StyleSettings | undefined
+) {
 	const colors = useColorsPerOrigin( settings );
 	const gradients = useGradientsPerOrigin( settings );
 	return (
@@ -98,7 +110,7 @@ export function ColorToolsPanel( {
 	panelId,
 	children,
 	label,
-} ) {
+}: StyleToolsPanelProps ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -124,7 +136,7 @@ export function ColorToolsPanel( {
 	);
 }
 
-const DEFAULT_CONTROLS = {
+const DEFAULT_CONTROLS: Record< string, boolean > = {
 	link: true,
 	heading: true,
 	button: true,
@@ -144,7 +156,7 @@ export default function ColorPanel( {
 	contrastWarning,
 	additionalElements,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
-} ) {
+}: ColorPanelProps ) {
 	const {
 		colors,
 		gradients,
@@ -160,7 +172,7 @@ export default function ColorPanel( {
 	// When an inherited preset isn't in the panel's palette, `decodeValue`
 	// returns the raw `var:preset|…` token rather than a paintable colour.
 	// Fall back to its CSS custom property so the swatch still renders.
-	const decodeInheritedColor = ( rawValue ) =>
+	const decodeInheritedColor = ( rawValue: StyleValue ) =>
 		getCSSValueFromRawStyle( decodeValue( rawValue ) );
 
 	// Links
@@ -169,7 +181,7 @@ export default function ColorPanel( {
 		inheritedValue?.elements?.link?.color?.text
 	);
 	const userLinkColor = decodeValue( value?.elements?.link?.color?.text );
-	const setLinkColor = ( newColor, newSlug ) => {
+	const setLinkColor = ( newColor?: string, newSlug?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -184,7 +196,7 @@ export default function ColorPanel( {
 	const userHoverLinkColor = decodeValue(
 		value?.elements?.link?.[ ':hover' ]?.color?.text
 	);
-	const setHoverLinkColor = ( newColor, newSlug ) => {
+	const setHoverLinkColor = ( newColor?: string, newSlug?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -275,7 +287,7 @@ export default function ColorPanel( {
 		]
 	);
 
-	const resetAllFilter = useCallback(
+	const resetAllFilter: PanelResetAllFilter = useCallback(
 		( previousValue ) => {
 			return {
 				...previousValue,
@@ -288,15 +300,20 @@ export default function ColorPanel( {
 							color: undefined,
 						},
 					},
-					...elements.reduce( ( acc, element ) => {
-						return {
-							...acc,
-							[ element.name ]: {
-								...previousValue?.elements?.[ element.name ],
-								color: undefined,
-							},
-						};
-					}, {} ),
+					...elements.reduce< Record< string, PanelStyle > >(
+						( acc, element ) => {
+							return {
+								...acc,
+								[ element.name ]: {
+									...previousValue?.elements?.[
+										element.name
+									],
+									color: undefined,
+								},
+							};
+						},
+						{}
+					),
 				},
 			};
 		},
@@ -360,7 +377,13 @@ export default function ColorPanel( {
 				},
 			],
 		},
-	].filter( Boolean );
+		// Hidden items are dropped.
+	].filter( Boolean ) as ( Omit<
+		ColorGradientDropdownItemProps,
+		'colorGradientControlSettings'
+	> & {
+		key: string;
+	} )[];
 
 	elements.forEach( ( { name, label: elementLabel, showPanel } ) => {
 		if ( ! showPanel ) {
@@ -397,12 +420,16 @@ export default function ColorPanel( {
 				[ 'elements', name, 'color', 'background' ],
 				undefined
 			);
-			newValue.elements[ name ].color.gradient = undefined;
-			newValue.elements[ name ].color.text = undefined;
+			// The element color was just set.
+			newValue.elements![ name ].color!.gradient = undefined;
+			newValue.elements![ name ].color!.text = undefined;
 			onChange( newValue );
 		};
 
-		const setElementTextColor = ( newTextColor, newSlug ) => {
+		const setElementTextColor = (
+			newTextColor?: string,
+			newSlug?: string
+		) => {
 			onChange(
 				setImmutably(
 					value,
@@ -415,7 +442,10 @@ export default function ColorPanel( {
 				)
 			);
 		};
-		const setElementBackgroundColor = ( newBackgroundColor, newSlug ) => {
+		const setElementBackgroundColor = (
+			newBackgroundColor?: string,
+			newSlug?: string
+		) => {
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'background' ],
@@ -425,16 +455,21 @@ export default function ColorPanel( {
 					newSlug
 				)
 			);
-			newValue.elements[ name ].color.gradient = undefined;
+			// The element color was just set.
+			newValue.elements![ name ].color!.gradient = undefined;
 			onChange( newValue );
 		};
-		const setElementGradient = ( newGradient, newSlug ) => {
+		const setElementGradient = (
+			newGradient?: string,
+			newSlug?: string
+		) => {
 			const newValue = setImmutably(
 				value,
 				[ 'elements', name, 'color', 'gradient' ],
 				encodeGradientValue( newGradient, newSlug )
 			);
-			newValue.elements[ name ].color.background = undefined;
+			// The element color was just set.
+			newValue.elements![ name ].color!.background = undefined;
 			onChange( newValue );
 		};
 		// Background color is not supported for `caption`
@@ -534,7 +569,8 @@ export default function ColorPanel( {
 						isGradient: true,
 						isPlaceholder: isElementGradientPlaceholder,
 					},
-			].filter( Boolean ),
+				// Hidden tabs are dropped.
+			].filter( Boolean ) as ColorGradientTabConfig[],
 		} );
 	} );
 
