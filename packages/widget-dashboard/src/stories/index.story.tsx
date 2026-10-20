@@ -29,6 +29,7 @@ import type {
 	WidgetRenderProps,
 	WidgetType,
 } from '@wordpress/widget-primitives';
+import { layoutGeometry, rescaleLayout } from '../utils/rescale-layout';
 import { ROW_HEIGHT_PRESETS } from '../utils/row-height-presets';
 import type { RowHeightPreset } from '../utils/row-height-presets';
 import { WidgetDashboard } from '../widget-dashboard';
@@ -1264,6 +1265,196 @@ The \`gridSettings\` prop carries the host's layout decisions, and the column po
 \`model\` picks the surface, and the per-model field follows it: \`rowHeight\` belongs to \`grid\`, \`flowTolerance\` to \`masonry\`. Only the active one is passed in \`gridSettings\`, and only its control is shown.
 
 Tile spans are stored per widget and do not scale with the count. Raise \`columns\` and every track narrows, so the same spans cover less of the surface. Enter Customize and resize a tile to see it take the new count.
+`,
+			},
+		},
+	},
+};
+
+// The wp-admin seed layout, with the demo types standing in for the core
+// widgets: the placements are what this story is about.
+const SEED_LAYOUT: DashboardWidget[] = [
+	{
+		uuid: 'seed-welcome',
+		type: 'demo/traffic-snapshot',
+		placement: { width: 'full', height: 3 },
+		attributes: { metric: 'views', period: 'week', label: 'Welcome' },
+	},
+	{
+		uuid: 'seed-activity',
+		type: 'demo/goal-progress',
+		placement: { width: 3, height: 3 },
+		attributes: { metric: 'revenue', target: '5000' },
+	},
+	{
+		uuid: 'seed-quick-draft',
+		type: 'demo/traffic-snapshot',
+		placement: { width: 4, height: 3 },
+		attributes: {
+			metric: 'visitors',
+			period: 'month',
+			label: 'Quick Draft',
+		},
+	},
+	{
+		uuid: 'seed-site-health',
+		type: 'demo/goal-progress',
+		placement: { width: 2, height: 2 },
+		attributes: { metric: 'orders', target: '1000' },
+	},
+	{
+		uuid: 'seed-site-preview',
+		type: 'demo/traffic-snapshot',
+		placement: { width: 2, height: 3 },
+		attributes: { metric: 'orders', period: 'day', label: 'Site Preview' },
+	},
+];
+
+// The geometry the seed was authored against.
+const SEED_GRID: WidgetGridSettings = {
+	model: 'grid',
+	columns: 4,
+	rowHeight: 300,
+};
+
+type GeometryChangeStoryProps = {
+	rescale: boolean;
+	columns: number;
+	rowHeight: number;
+};
+
+function describeGeometry( gridSettings: WidgetGridSettings ): string {
+	const { columns, rowHeight } = layoutGeometry( gridSettings );
+	return `${ columns } columns, ${ rowHeight }px rows`;
+}
+
+function GeometryBoard( {
+	title,
+	gridSettings,
+	layout,
+}: {
+	title: string;
+	gridSettings: WidgetGridSettings;
+	layout: DashboardWidget[];
+} ) {
+	return (
+		<section
+			style={ {
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-md)',
+				fontFamily: 'var(--wpds-typography-font-family-body)',
+				color: 'var(--wpds-color-foreground-content-neutral)',
+			} }
+		>
+			<h2
+				style={ {
+					margin: 0,
+					fontSize: 'var(--wpds-typography-font-size-lg)',
+				} }
+			>
+				{ title }
+				<span
+					style={ {
+						marginInlineStart: 'var(--wpds-dimension-gap-sm)',
+						fontSize: 'var(--wpds-typography-font-size-sm)',
+						fontWeight: 'normal',
+						color: 'var(--wpds-color-foreground-content-neutral-weak)',
+					} }
+				>
+					{ describeGeometry( gridSettings ) }
+				</span>
+			</h2>
+			<WidgetDashboard
+				widgetTypes={ [
+					trafficSnapshotWidgetType,
+					goalProgressWidgetType,
+				] }
+				layout={ layout }
+				onLayoutChange={ () => {} }
+				resolveWidgetModule={ resolveDemoModule }
+				gridSettings={ gridSettings }
+			>
+				<WidgetDashboard.Widgets />
+			</WidgetDashboard>
+		</section>
+	);
+}
+
+function GeometryChangeStory( {
+	rescale,
+	columns,
+	rowHeight,
+}: GeometryChangeStoryProps ) {
+	const nextGrid = useMemo< WidgetGridSettings >(
+		() => ( { model: 'grid', columns, rowHeight } ),
+		[ columns, rowHeight ]
+	);
+	const rendered = useMemo(
+		() =>
+			rescale
+				? rescaleLayout(
+						SEED_LAYOUT,
+						layoutGeometry( SEED_GRID ),
+						layoutGeometry( nextGrid )
+					)
+				: SEED_LAYOUT,
+		[ rescale, nextGrid ]
+	);
+
+	return (
+		<div
+			style={ {
+				display: 'grid',
+				gap: 'var(--wpds-dimension-gap-2xl)',
+				padding: 'var(--wpds-dimension-padding-lg)',
+			} }
+		>
+			<GeometryBoard
+				title="Authored"
+				gridSettings={ SEED_GRID }
+				layout={ SEED_LAYOUT }
+			/>
+			<GeometryBoard
+				title="Rendered now"
+				gridSettings={ nextGrid }
+				layout={ rendered }
+			/>
+		</div>
+	);
+}
+
+export const GeometryChange: StoryObj< GeometryChangeStoryProps > = {
+	render: ( args ) => <GeometryChangeStory { ...args } />,
+	args: {
+		rescale: true,
+		columns: 4,
+		rowHeight: 40,
+	},
+	argTypes: {
+		rescale: {
+			control: 'boolean',
+			description:
+				'Run the stored layout through `rescaleLayout` before rendering it in the new geometry. Off shows what the same spans mean there.',
+		},
+		columns: {
+			control: { type: 'range', min: 1, max: 12, step: 1 },
+			description: 'Column count of the new geometry.',
+		},
+		rowHeight: {
+			control: { type: 'range', min: 24, max: 400, step: 8 },
+			description: 'Row height of the new geometry, in pixels.',
+		},
+	},
+	parameters: {
+		controls: {
+			include: [ 'rescale', 'columns', 'rowHeight' ],
+		},
+		docs: {
+			description: {
+				story: `
+Spans are relative to the geometry a layout was saved under: a \`height\` of 3 is 948px on 300px rows and 168px on 40px rows. The same stored layout renders twice here, read-only: above in the geometry it was authored against, below in a new one. With \`rescale\` on, the layout goes through \`rescaleLayout( layout, from, to )\` first, which keeps the pixels of each height and the proportion of each width; turn it off to see the same spans land in the new geometry untranslated.
+
+A host that changes its geometry stamps the geometry next to each saved layout (\`layoutGeometry( gridSettings )\`) and rescales on read when the stamp differs. A layout saved before the stamp existed counts as the geometry the host had at the time.
 `,
 			},
 		},

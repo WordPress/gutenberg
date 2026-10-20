@@ -13,6 +13,8 @@ export {
 } from './types';
 export { DEFAULT_GRID } from './utils/default-grid';
 export { normalizeGridSettings } from './utils/normalize-grid-settings';
+export { layoutGeometry, rescaleLayout } from './utils/rescale-layout';
+export type { LayoutGeometry } from './utils/rescale-layout';
 export {
 	ROW_HEIGHT_PRESETS,
 	DEFAULT_ROW_HEIGHT,
