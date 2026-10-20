@@ -234,9 +234,10 @@ describe( 'MediaCategoryPanel querying', () => {
 } );
 
 describe( 'MediaCategoryPanel page sizing', () => {
-	const lastQuery = () => useMediaResults.mock.lastCall[ 1 ];
+	// The panel has rendered, so the hook was called.
+	const lastQuery = () => useMediaResults.mock.lastCall![ 1 ];
 
-	const setViewportHeight = ( height ) => {
+	const setViewportHeight = ( height: number ) => {
 		Object.defineProperty( window, 'innerHeight', {
 			value: height,
 			configurable: true,
