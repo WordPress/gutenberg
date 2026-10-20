@@ -204,6 +204,10 @@
 	overflow: auto;
 }
 
+.dataviews-filters__selection-indicator {
+	pointer-events: none;
+}
+
 .dataviews-filters__search-widget-listitem {
 	display: flex;
 	align-items: center;

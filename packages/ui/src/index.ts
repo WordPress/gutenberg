@@ -20,7 +20,6 @@ export * as Meter from './meter';
 export * as Notice from './notice';
 export * as Popover from './popover';
 export * as Progress from './progress';
-export * from './selection-indicator';
 export * from './skeleton';
 export * from './spinner';
 export * from './stack';

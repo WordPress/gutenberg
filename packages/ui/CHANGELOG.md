@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### New Features
-
--   Add a presentational `SelectionIndicator` for checkbox and radio selection marks ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
-
 ## 0.25.0 (2026-10-20)
 
 ### Breaking Changes
