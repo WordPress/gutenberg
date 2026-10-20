@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the tests to TypeScript ([#85145](https://github.com/WordPress/gutenberg/pull/85145)).
+
 ## 8.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -11,10 +15,6 @@
 ### Enhancements
 
 -   Include the response's status as `data.status` in `invalid_json` errors, and in error responses that have no `data` ([#85157](https://github.com/WordPress/gutenberg/pull/85157)).
-
-### Internal
-
--   Convert the tests to TypeScript ([#85145](https://github.com/WordPress/gutenberg/pull/85145)).
 
 ## 7.57.0 (2026-10-07)
 
