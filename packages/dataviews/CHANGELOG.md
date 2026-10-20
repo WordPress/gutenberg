@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Render table bulk actions outside the table while preserving their placement over the column headers.
+
 ## 21.0.0 (2026-10-20)
 
 ### Breaking Changes

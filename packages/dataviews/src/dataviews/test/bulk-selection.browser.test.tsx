@@ -32,7 +32,7 @@ const actions: Action< Post >[] = [
 	{ id: 'edit', label: 'Edit', supportsBulk: true, callback: () => {} },
 ];
 
-function SelectableTable() {
+function SelectableTable( { isLoading = false } = {} ) {
 	const [ view, setView ] = useState< View >( {
 		type: 'table',
 		titleField: 'title',
@@ -53,6 +53,7 @@ function SelectableTable() {
 			view={ view }
 			onChangeView={ setView }
 			actions={ actions }
+			isLoading={ isLoading }
 			paginationInfo={ paginationInfo }
 			defaultLayouts={ { table: true } }
 		/>
@@ -124,6 +125,117 @@ it( 'keeps column names and sorting accessible during selection, skips covered c
 		.element( page.getByRole( 'columnheader', { name: /Author/ } ) )
 		.not.toHaveAttribute( 'aria-sort' );
 } );
+
+it( 'prevents table bulk actions from receiving focus while loading', async () => {
+	const { rerender } = await render( <SelectableTable /> );
+	const user = userEvent.setup();
+	await user.click(
+		page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+	);
+	const cancel = page
+		.getByRole( 'button', { name: 'Cancel', exact: true } )
+		.element();
+	await rerender( <SelectableTable isLoading /> );
+	cancel.focus();
+	expect( cancel ).not.toHaveFocus();
+	await rerender( <SelectableTable /> );
+	cancel.focus();
+	expect( cancel ).toHaveFocus();
+} );
+
+it.each( [ 'balanced', 'compact', 'comfortable' ] as const )(
+	'keeps the %s table toolbar aligned during scrolling and resizing',
+	async ( density ) => {
+		const data = Array.from( { length: 20 }, ( _, index ) => ( {
+			...posts[ 0 ],
+			id: String( index ),
+			title: `Post ${ index }`,
+		} ) );
+		await render(
+			<div style={ { height: 300 } }>
+				<DataViews
+					data={ data }
+					fields={ fields }
+					view={ {
+						type: 'table',
+						titleField: 'title',
+						fields: [ 'author' ],
+						layout: {
+							density,
+							styles: { author: { minWidth: '1400px' } },
+						},
+					} }
+					onChangeView={ () => {} }
+					actions={ actions }
+					paginationInfo={ {
+						totalItems: data.length,
+						totalPages: 1,
+					} }
+					defaultLayouts={ { table: true } }
+				/>
+			</div>
+		);
+		const table = page.getByRole( 'table' ).element();
+		const header = table.querySelector( 'thead' )!;
+		const scroller = table.parentElement!;
+		const firstRowTop = table
+			.querySelector( 'tbody' )!
+			.getBoundingClientRect().top;
+		const user = userEvent.setup();
+		await user.click(
+			page.getByRole( 'checkbox', { name: 'Select all', exact: true } )
+		);
+		const toolbar = document.querySelector< HTMLDivElement >(
+			'.dataviews-bulk-actions'
+		)!;
+		expect( table ).not.toContainElement( toolbar );
+		expect(
+			table.querySelector( 'tbody' )!.getBoundingClientRect().top
+		).toBe( firstRowTop );
+
+		for ( const width of [ 1280, 390 ] ) {
+			await page.viewport( width, 900 );
+			scroller.scrollTop = scroller.scrollHeight;
+			scroller.scrollLeft = scroller.scrollWidth;
+			expect( scroller.scrollTop ).toBeGreaterThan( 0 );
+			expect( scroller.scrollLeft ).toBeGreaterThan( 0 );
+			await expect
+				.poll( () => toolbar.getBoundingClientRect().height )
+				.toBe( header.getBoundingClientRect().height );
+			await expect
+				.poll( () => toolbar.getBoundingClientRect().top )
+				.toBe( scroller.getBoundingClientRect().top );
+			expect( toolbar.getBoundingClientRect().left ).toBe(
+				scroller.getBoundingClientRect().left
+			);
+			expect( toolbar.getBoundingClientRect().width ).toBe(
+				scroller.clientWidth
+			);
+			await expect
+				.element(
+					page.getByRole( 'button', { name: 'Cancel', exact: true } )
+				)
+				.toBeInViewport();
+		}
+
+		// Custom headers can change height after mount, independently of density.
+		header.style.height = '96px';
+		await expect
+			.poll( () => toolbar.getBoundingClientRect().height )
+			.toBe( 96 );
+		await user.click(
+			page.getByRole( 'button', { name: 'Cancel', exact: true } )
+		);
+		await expect
+			.element(
+				page.getByRole( 'checkbox', {
+					name: 'Select all',
+					exact: true,
+				} )
+			)
+			.toHaveFocus();
+	}
+);
 
 it( 'keeps a grid item checkbox below the sticky toolbar after arrow navigation and Tab', async () => {
 	const data = Array.from( { length: 8 }, ( _, index ) => ( {
