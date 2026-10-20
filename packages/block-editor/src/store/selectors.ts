@@ -2499,36 +2499,36 @@ const buildBlockVariationItem =
 		};
 	};
 
-const buildReusableBlockInserterItem =
+const buildUserPatternInserterItem =
 	( state: State ) =>
-	( reusableBlock: UserPattern ): InserterItem => {
-		const icon = ! reusableBlock.wp_pattern_sync_status
+	( userPattern: UserPattern ): InserterItem => {
+		const icon = ! userPattern.wp_pattern_sync_status
 			? {
 					src: symbol,
 					foreground: 'var(--wp-block-synced-color)',
 				}
 			: symbol;
-		const userPattern = mapUserPattern( reusableBlock );
+		const mappedPattern = mapUserPattern( userPattern );
 		const { time, count = 0 } =
-			getInsertUsage( state, userPattern.name ) || {};
+			getInsertUsage( state, mappedPattern.name ) || {};
 		const frecency = calculateFrecency( time, count );
 
 		return {
-			id: userPattern.name,
+			id: mappedPattern.name,
 			name: 'core/block',
-			initialAttributes: { ref: reusableBlock.id },
-			title: userPattern.title,
+			initialAttributes: { ref: userPattern.id },
+			title: mappedPattern.title,
 			icon,
 			category: 'reusable',
 			keywords: [ 'reusable' ],
 			isDisabled: false,
 			utility: 1, // Deprecated.
 			frecency,
-			content: userPattern.content,
+			content: mappedPattern.content,
 			get blocks() {
-				return getParsedPattern( userPattern ).blocks;
+				return getParsedPattern( mappedPattern ).blocks;
 			},
-			syncStatus: userPattern.syncStatus,
+			syncStatus: mappedPattern.syncStatus,
 		};
 	};
 
@@ -2603,18 +2603,18 @@ const getBlockTypeInserterItems = createSelector(
 );
 
 /**
- * Returns an inserter item for every reusable block.
+ * Returns an inserter item for every user pattern.
  *
- * @param state          Editor state.
- * @param reusableBlocks Reusable blocks, from `getReusableBlocks`.
+ * @param state        Editor state.
+ * @param userPatterns User patterns, from `getUserPatterns`.
  *
- * @return Reusable block inserter items.
+ * @return User pattern inserter items.
  */
-const getReusableBlockInserterItems = createSelector(
-	( state: State, reusableBlocks: UserPattern[] ) =>
-		reusableBlocks.map( buildReusableBlockInserterItem( state ) ),
-	( state: State, reusableBlocks: UserPattern[] ) => [
-		reusableBlocks,
+const getUserPatternInserterItems = createSelector(
+	( state: State, userPatterns: UserPattern[] ) =>
+		userPatterns.map( buildUserPatternInserterItem( state ) ),
+	( state: State, userPatterns: UserPattern[] ) => [
+		userPatterns,
 		state.preferences.insertUsage,
 	]
 );
@@ -2692,9 +2692,9 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				'core/block',
 				rootClientId
 			)
-				? getReusableBlockInserterItems(
+				? getUserPatternInserterItems(
 						state,
-						unlock( select( STORE_NAME ) ).getReusableBlocks()
+						unlock( select( STORE_NAME ) ).getUserPatterns()
 					)
 				: [];
 
@@ -2760,7 +2760,7 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 		},
 		( state: State, rootClientId?: string | null ) => [
 			getBlockTypeInserterItems( state ),
-			unlock( select( STORE_NAME ) ).getReusableBlocks(),
+			unlock( select( STORE_NAME ) ).getUserPatterns(),
 			state.blocks.order,
 			state.preferences.insertUsage,
 			...getInsertBlockTypeDependants( select )( state, rootClientId ),
@@ -3325,7 +3325,7 @@ export const __experimentalGetReusableBlockTitle = createRegistrySelector(
 				);
 
 				const reusableBlock = unlock( select( STORE_NAME ) )
-					.getReusableBlocks()
+					.getUserPatterns()
 					.find( ( block: UserPattern ) => block.id === ref );
 				if ( ! reusableBlock ) {
 					return null;
@@ -3333,7 +3333,7 @@ export const __experimentalGetReusableBlockTitle = createRegistrySelector(
 
 				return reusableBlock.title?.raw;
 			},
-			() => [ unlock( select( STORE_NAME ) ).getReusableBlocks() ]
+			() => [ unlock( select( STORE_NAME ) ).getUserPatterns() ]
 		)
 );
 

@@ -40,7 +40,7 @@ const EMPTY_OBJECT = {};
  * @param {(store: Object) => Object} select Registry select.
  * @return {?Object[]} Pattern records, or null while loading.
  */
-function __experimentalReusableBlocksSelect( select ) {
+function userPatternsSelect( select ) {
 	const { RECEIVE_INTERMEDIATE_RESULTS } = unlock( coreDataPrivateApis );
 	const { getEntityRecords } = select( coreStore );
 	return getEntityRecords( 'postType', 'wp_block', {
@@ -117,7 +117,7 @@ const {
 	globalStylesDataKey,
 	globalStylesLinksDataKey,
 	selectBlockPatternsKey,
-	reusableBlocksSelectKey,
+	userPatternsSelectKey,
 	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
@@ -428,7 +428,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 					? patterns
 					: undefined;
 			},
-			[ reusableBlocksSelectKey ]: __experimentalReusableBlocksSelect,
+			[ userPatternsSelectKey ]: userPatternsSelect,
 			[ currentUserIdSelectKey ]: currentUserIdSelect,
 			[ userPatternCategoriesSelectKey ]:
 				__experimentalUserPatternCategoriesSelect,

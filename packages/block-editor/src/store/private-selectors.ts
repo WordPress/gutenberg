@@ -31,7 +31,7 @@ import { STORE_NAME } from './constants';
 import { unlock } from '../lock-unlock';
 import {
 	selectBlockPatternsKey,
-	reusableBlocksSelectKey,
+	userPatternsSelectKey,
 	currentUserIdSelectKey,
 	userPatternCategoriesSelectKey,
 	sectionRootClientIdKey,
@@ -625,7 +625,7 @@ export const hasAllowedPatterns = createRegistrySelector( ( select ) =>
 export const getPatternBySlug = createRegistrySelector( ( select ) =>
 	createSelector(
 		( state: State, patternName: string ) => {
-			// Only fetch reusable blocks if we know we need them. To do: maybe
+			// Only fetch user patterns if we know we need them. To do: maybe
 			// use the entity record API to retrieve the block by slug.
 			if ( patternName?.startsWith( 'core/block/' ) ) {
 				const _id = parseInt(
@@ -633,7 +633,7 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 					10
 				);
 				const block = unlock( select( STORE_NAME ) )
-					.getReusableBlocks()
+					.getUserPatterns()
 					.find( ( { id }: UserPattern ) => id === _id );
 
 				if ( ! block ) {
@@ -659,7 +659,7 @@ export const getPatternBySlug = createRegistrySelector( ( select ) =>
 		( state: State, patternName: string ) =>
 			patternName?.startsWith( 'core/block/' )
 				? [
-						unlock( select( STORE_NAME ) ).getReusableBlocks(),
+						unlock( select( STORE_NAME ) ).getUserPatterns(),
 						state.settings.__experimentalReusableBlocks,
 						state.settings[ currentUserIdSelectKey ]?.( select ),
 					]
@@ -674,7 +674,7 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 	createSelector( ( state: State ): BlockPattern[] => {
 		return [
 			...unlock( select( STORE_NAME ) )
-				.getReusableBlocks()
+				.getUserPatterns()
 				.map( ( userPattern: UserPattern ) =>
 					mapUserPattern(
 						userPattern,
@@ -696,12 +696,12 @@ export const getAllPatterns = createRegistrySelector( ( select ) =>
 
 const EMPTY_ARRAY: never[] = [];
 
-export const getReusableBlocks = createRegistrySelector(
+export const getUserPatterns = createRegistrySelector(
 	( select ) => ( state: State ) => {
-		const reusableBlocksSelect = state.settings[ reusableBlocksSelectKey ];
+		const userPatternsSelect = state.settings[ userPatternsSelectKey ];
 		return (
-			( reusableBlocksSelect
-				? reusableBlocksSelect( select )
+			( userPatternsSelect
+				? userPatternsSelect( select )
 				: state.settings.__experimentalReusableBlocks ) ?? EMPTY_ARRAY
 		);
 	}

@@ -19,10 +19,10 @@ import type * as privateActions from './private-actions';
 import type {
 	currentUserIdSelectKey,
 	isIsolatedEditorKey,
-	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
 	selectBlockPatternsKey,
 	userPatternCategoriesSelectKey,
+	userPatternsSelectKey,
 } from './private-keys';
 
 export interface BlockAttributes {
@@ -394,9 +394,6 @@ export type Settings = Record< string | symbol, unknown > & {
 		select: typeof globalSelect
 	) => number | undefined;
 	[ isIsolatedEditorKey ]?: boolean;
-	[ reusableBlocksSelectKey ]?: (
-		select: typeof globalSelect
-	) => UserPattern[] | null;
 	[ sectionRootClientIdKey ]?: string;
 	[ selectBlockPatternsKey ]?: (
 		select: typeof globalSelect
@@ -404,6 +401,9 @@ export type Settings = Record< string | symbol, unknown > & {
 	[ userPatternCategoriesSelectKey ]?: (
 		select: typeof globalSelect
 	) => UserPatternCategory[];
+	[ userPatternsSelectKey ]?: (
+		select: typeof globalSelect
+	) => UserPattern[] | null;
 };
 
 /**
