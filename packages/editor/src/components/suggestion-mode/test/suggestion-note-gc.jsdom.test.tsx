@@ -11,7 +11,6 @@ import { render, act } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { store as noticesStore } from '@wordpress/notices';

@@ -51,7 +51,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	describeAnchor,

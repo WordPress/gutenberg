@@ -3,7 +3,6 @@ import { useSelect } from '@wordpress/data';
 import {
 	useStyleOverride,
 	privateApis as blockEditorPrivateApis,
-	// @ts-expect-error No exported types
 } from '@wordpress/block-editor';
 import { getSuggestionMarkerSelector } from '../inline-suggestions';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';

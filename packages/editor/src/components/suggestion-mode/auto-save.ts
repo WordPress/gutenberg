@@ -38,7 +38,6 @@
  */
 import { useRegistry, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 import { getSuggestionStatus, isPendingStatus } from './suggestion-status';

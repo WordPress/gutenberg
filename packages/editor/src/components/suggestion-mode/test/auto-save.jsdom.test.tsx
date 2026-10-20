@@ -13,7 +13,6 @@ import { createRegistry, RegistryProvider } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { createBlock, registerBlockType } from '@wordpress/blocks';
 import SuggestionAutoSave, {
@@ -27,6 +26,11 @@ import {
 import { postOperationsFromTitle } from '../operations';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+
+// Attribute values are `unknown` in the store types; the tests read them
+// as the blocks define them.
+const attributesOf = ( registry: any, clientId: string ): any =>
+	registry.select( blockEditorStore ).getBlockAttributes( clientId );
 
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
@@ -140,8 +144,7 @@ function seedComment( registry: any, comment: any ) {
 }
 
 const markerOf = ( registry: any, clientId: string ) =>
-	registry.select( blockEditorStore ).getBlockAttributes( clientId )?.metadata
-		?.suggestion;
+	attributesOf( registry, clientId )?.metadata?.suggestion;
 
 // Write a proposal the way the HOC does: the whole marker, keeping what is
 // already on it (commentId, authorId).
@@ -152,9 +155,7 @@ function propose(
 	marker: Record< string, any > = {}
 ) {
 	act( () => {
-		const attributes = registry
-			.select( blockEditorStore )
-			.getBlockAttributes( clientId );
+		const attributes = attributesOf( registry, clientId );
 		registry.dispatch( blockEditorStore ).updateBlockAttributes( clientId, {
 			metadata: {
 				...attributes.metadata,
@@ -224,11 +225,7 @@ describe( 'SuggestionAutoSave', () => {
 			commentId: 42,
 		} );
 		// The live block is untouched.
-		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( block.clientId ).level
-		).toBe( 2 );
+		expect( attributesOf( registry, block.clientId ).level ).toBe( 2 );
 	} );
 
 	it( 'updates the same comment on subsequent edits', async () => {

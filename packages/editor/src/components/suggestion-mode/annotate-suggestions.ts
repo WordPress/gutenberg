@@ -15,7 +15,6 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import {
 	findSuggestionRange,
