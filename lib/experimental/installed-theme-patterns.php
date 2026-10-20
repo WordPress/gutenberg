@@ -7,7 +7,7 @@
  */
 
 /**
- * Registers the route that lists the patterns of an installed theme.
+ * Registers the route that lists the patterns of the other installed themes.
  */
 function gutenberg_register_installed_theme_patterns_route() {
 	$controller = new Gutenberg_REST_Installed_Theme_Patterns_Controller();
@@ -16,19 +16,33 @@ function gutenberg_register_installed_theme_patterns_route() {
 add_action( 'rest_api_init', 'gutenberg_register_installed_theme_patterns_route' );
 
 /**
- * Lists the installed themes, other than the active theme and its parent,
- * whose patterns the editor offers. Loading a theme's patterns previews the
- * theme, so they're only offered to users who can switch themes.
+ * Returns whether the current user gets patterns from installed themes other
+ * than the active one. Patterns from other themes are offered to users who can
+ * switch themes.
  *
- * @return array[] The stylesheet and name of each theme.
+ * This runs on every editor load, so it doesn't look at the installed themes.
+ * Which themes offer patterns is only worked out when patterns are shown.
+ *
+ * @return bool Whether the current user gets patterns from other themes.
+ */
+function gutenberg_can_use_installed_theme_patterns() {
+	return current_user_can( 'switch_themes' );
+}
+
+/**
+ * Lists the installed themes, other than the active theme and its parent,
+ * whose patterns the editor offers. On a multisite, only the themes the site
+ * is allowed to use are listed.
+ *
+ * @return WP_Theme[] The themes.
  */
 function gutenberg_get_installed_theme_pattern_sources() {
-	if ( ! current_user_can( 'switch_themes' ) ) {
+	if ( ! gutenberg_can_use_installed_theme_patterns() ) {
 		return array();
 	}
 
 	$themes = array();
-	foreach ( wp_get_themes() as $theme ) {
+	foreach ( wp_get_themes( array( 'allowed' => true ) ) as $theme ) {
 		if ( in_array( $theme->get_stylesheet(), array( get_stylesheet(), get_template() ), true ) ) {
 			continue;
 		}
@@ -48,23 +62,19 @@ function gutenberg_get_installed_theme_pattern_sources() {
 			continue;
 		}
 
-		$themes[] = array(
-			'stylesheet' => $theme->get_stylesheet(),
-			'name'       => $theme->display( 'Name', false ),
-		);
+		$themes[] = $theme;
 	}
 	return $themes;
 }
 
 /**
- * Adds the installed themes whose patterns the editor offers to the editor
- * settings.
+ * Tells the editor whether to offer patterns from other installed themes.
  *
  * @param array $settings The editor settings.
- * @return array The editor settings with the installed themes.
+ * @return array The editor settings.
  */
 function gutenberg_add_installed_theme_patterns_to_editor_settings( $settings ) {
-	$settings['installedThemePatternSources'] = gutenberg_get_installed_theme_pattern_sources();
+	$settings['hasInstalledThemePatterns'] = gutenberg_can_use_installed_theme_patterns();
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_add_installed_theme_patterns_to_editor_settings' );
@@ -72,13 +82,13 @@ add_filter( 'block_editor_settings_all', 'gutenberg_add_installed_theme_patterns
 /**
  * Adds "Other categories" to the pattern views in the site editor. It holds
  * the patterns of other installed themes whose categories are only registered
- * while their theme is active.
+ * while their theme is active. The site editor hides it when it's empty.
  *
  * @param Gutenberg_View_Config_Data $data The view configuration container for patterns.
  * @return Gutenberg_View_Config_Data The updated view configuration container.
  */
 function gutenberg_add_other_categories_to_pattern_views( $data ) {
-	if ( ! gutenberg_get_installed_theme_pattern_sources() ) {
+	if ( ! gutenberg_can_use_installed_theme_patterns() ) {
 		return $data;
 	}
 

@@ -320,22 +320,19 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ settingsBlockPatternCategories, restBlockPatternCategories ]
 	);
 
-	// The installed themes, other than the active theme and its parent, whose
-	// patterns the editor offers. The server leaves them out for users who
-	// can't preview themes.
-	const { installedThemePatternSources } = settings;
-	const selectInstalledThemePatterns = useMemo( () => {
-		if ( ! installedThemePatternSources?.length ) {
-			return undefined;
-		}
-		const stylesheets = installedThemePatternSources.map(
-			( { stylesheet } ) => stylesheet
-		);
-		return ( select ) =>
-			unlock( select( coreStore ) ).getInstalledThemePatterns(
-				stylesheets
-			);
-	}, [ installedThemePatternSources ] );
+	// Patterns from installed themes other than the active one. The server
+	// only offers them to users who can switch themes.
+	const { hasInstalledThemePatterns } = settings;
+	const selectInstalledThemePatterns = useMemo(
+		() =>
+			hasInstalledThemePatterns
+				? ( select ) =>
+						unlock(
+							select( coreStore )
+						).getInstalledThemePatterns()
+				: undefined,
+		[ hasInstalledThemePatterns ]
+	);
 
 	const { undo, setIsInserterOpened } = useDispatch( editorStore );
 	const { editMediaEntity } = unlock( useDispatch( coreStore ) );

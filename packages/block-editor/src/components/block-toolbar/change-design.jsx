@@ -62,9 +62,6 @@ export default function ChangeDesign( { clientId } ) {
 					( pattern.source?.startsWith( 'pattern-directory' ) &&
 						pattern.source !== 'pattern-directory/theme' );
 				return (
-					// Check if the pattern has only one top level block,
-					// otherwise we may switch to a pattern that doesn't have replacement suggestions.
-					pattern.blocks.length === 1 &&
 					// We exclude the core patterns and pattern directory patterns that are not theme patterns.
 					! isCorePattern &&
 					// Exclude current pattern.
@@ -73,7 +70,11 @@ export default function ChangeDesign( { clientId } ) {
 						return categories.includes( category );
 					} ) &&
 					// Check if the pattern is not a synced pattern.
-					( pattern.syncStatus === 'unsynced' || ! pattern.id )
+					( pattern.syncStatus === 'unsynced' || ! pattern.id ) &&
+					// Check if the pattern has only one top level block,
+					// otherwise we may switch to a pattern that doesn't have replacement suggestions.
+					// This parses the pattern, so it's checked last.
+					pattern.blocks.length === 1
 				);
 			} )
 			.slice( 0, MAX_PATTERNS_TO_SHOW );

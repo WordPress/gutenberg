@@ -196,17 +196,16 @@ export function receiveViewConfig( kind, name, config ) {
 }
 
 /**
- * Returns an action object used to receive the patterns registered by a theme.
+ * Returns an action object used to receive the patterns of installed themes
+ * other than the active one.
  *
- * @param {string} stylesheet Theme stylesheet.
- * @param {Array}  patterns   Patterns registered while the theme is active.
+ * @param {Array} patterns The patterns.
  *
  * @return {Object} Action object.
  */
-export function receiveThemeBlockPatterns( stylesheet, patterns ) {
+export function receiveInstalledThemePatterns( patterns ) {
 	return {
-		type: 'RECEIVE_THEME_BLOCK_PATTERNS',
-		stylesheet,
+		type: 'RECEIVE_INSTALLED_THEME_PATTERNS',
 		patterns,
 	};
 }

@@ -795,28 +795,21 @@ export const getBlockPatterns =
 	};
 
 /**
- * Requests the patterns an installed theme would add if it were activated,
- * loading the theme through a theme preview.
- *
- * @param {string} stylesheet Theme stylesheet.
+ * Requests the patterns that installed themes, other than the active one,
+ * would add if they were activated.
  */
-export const getThemeBlockPatterns =
-	( stylesheet ) =>
+export const getInstalledThemePatterns =
+	() =>
 	async ( { dispatch } ) => {
 		let patterns = [];
 		try {
 			patterns = await fetchBlockPatterns(
-				addQueryArgs(
-					'/wp/v2/block-patterns/installed-theme-patterns',
-					{
-						wp_theme_preview: stylesheet,
-					}
-				)
+				'/wp/v2/block-patterns/installed-theme-patterns'
 			);
 		} catch {
-			// A theme that fails to load in a preview has no patterns to offer.
+			// Without them, the editor still offers every other pattern.
 		}
-		dispatch.receiveThemeBlockPatterns( stylesheet, patterns );
+		dispatch.receiveInstalledThemePatterns( patterns );
 	};
 
 export const getBlockPatternCategories =

@@ -76,7 +76,12 @@ class Gutenberg_Installed_Theme_Patterns_Test extends WP_UnitTestCase {
 	 * @return string[] The stylesheets.
 	 */
 	private function get_offered_stylesheets() {
-		return wp_list_pluck( gutenberg_get_installed_theme_pattern_sources(), 'stylesheet' );
+		return array_map(
+			static function ( $theme ) {
+				return $theme->get_stylesheet();
+			},
+			gutenberg_get_installed_theme_pattern_sources()
+		);
 	}
 
 	/**
@@ -132,13 +137,24 @@ class Gutenberg_Installed_Theme_Patterns_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_add_installed_theme_patterns_to_editor_settings
+	 */
+	public function test_tells_the_editor_to_offer_patterns_from_other_themes_to_users_who_can_switch_themes() {
+		wp_set_current_user( self::$admin_id );
+		$this->assertTrue( gutenberg_add_installed_theme_patterns_to_editor_settings( array() )['hasInstalledThemePatterns'], 'Users who can switch themes should get patterns from other themes.' );
+
+		wp_set_current_user( self::$editor_id );
+		$this->assertFalse( gutenberg_add_installed_theme_patterns_to_editor_settings( array() )['hasInstalledThemePatterns'], 'Users who cannot switch themes should not get patterns from other themes.' );
+	}
+
+	/**
 	 * @covers ::gutenberg_add_other_categories_to_pattern_views
 	 */
-	public function test_adds_other_categories_to_the_pattern_views_only_when_some_theme_is_offered() {
+	public function test_adds_other_categories_to_the_pattern_views_for_users_who_can_switch_themes() {
 		wp_set_current_user( self::$admin_id );
-		$this->assertContains( 'other-categories', $this->get_pattern_view_slugs(), 'Other categories should be listed when other themes offer patterns.' );
+		$this->assertContains( 'other-categories', $this->get_pattern_view_slugs(), 'Other categories should be listed for users who can switch themes.' );
 
-		add_filter( 'should_load_installed_theme_block_patterns', '__return_false' );
-		$this->assertNotContains( 'other-categories', $this->get_pattern_view_slugs(), 'Other categories should not be listed when no theme offers patterns.' );
+		wp_set_current_user( self::$editor_id );
+		$this->assertNotContains( 'other-categories', $this->get_pattern_view_slugs(), 'Other categories should not be listed for users who cannot switch themes.' );
 	}
 }

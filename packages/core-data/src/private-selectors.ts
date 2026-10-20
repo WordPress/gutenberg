@@ -49,81 +49,19 @@ export const getBlockPatternsForPostType = createRegistrySelector(
 );
 
 /**
- * Returns the patterns a theme registers, as if it were the active theme.
+ * Returns the patterns that installed themes, other than the active one, would
+ * add if they were activated. Patterns the editor already offers are left out,
+ * and each pattern has the stylesheet of its theme in `theme`.
  *
- * @param state      Data state.
- * @param stylesheet Theme stylesheet.
- *
- * @return The theme's patterns, or undefined if they haven't loaded yet.
- */
-export function getThemeBlockPatterns(
-	state: State,
-	stylesheet: string
-): Array< any > | undefined {
-	return state.themeBlockPatterns[ stylesheet ];
-}
-
-/**
- * Returns the patterns that installed themes would add if they were activated.
- * Patterns the editor already offers are left out, and each pattern is marked
- * with the stylesheet of the theme it comes from.
- *
- * @param state       Data state.
- * @param stylesheets Stylesheets of the installed themes, other than the active
- *                    theme and its parent.
+ * @param state Data state.
  *
  * @return The patterns, or undefined while they load.
  */
-export const getInstalledThemePatterns = createRegistrySelector(
-	( select: any ) =>
-		createSelector(
-			( state: State, stylesheets: string[] ) => {
-				const { getBlockPatterns, hasFinishedResolution } =
-					select( STORE_NAME );
-				// Request every theme up front so they load in parallel.
-				stylesheets.forEach( ( stylesheet ) =>
-					unlock( select( STORE_NAME ) ).getThemeBlockPatterns(
-						stylesheet
-					)
-				);
-				if (
-					! hasFinishedResolution( 'getBlockPatterns' ) ||
-					stylesheets.some(
-						( stylesheet ) =>
-							! state.themeBlockPatterns[ stylesheet ]
-					)
-				) {
-					return undefined;
-				}
-
-				// Core, plugin and active theme patterns are already available,
-				// so only keep what each theme would add on top of them.
-				const activePatternNames = new Set(
-					getBlockPatterns().map(
-						( { name }: { name: string } ) => name
-					)
-				);
-				return stylesheets.flatMap( ( stylesheet ) =>
-					state.themeBlockPatterns[ stylesheet ]
-						.filter(
-							( { name }: any ) =>
-								! activePatternNames.has( name )
-						)
-						.map( ( pattern: any ) => ( {
-							...pattern,
-							theme: stylesheet,
-						} ) )
-				);
-			},
-			( state: State ) => [
-				select( STORE_NAME ).getBlockPatterns(),
-				select( STORE_NAME ).hasFinishedResolution(
-					'getBlockPatterns'
-				),
-				state.themeBlockPatterns,
-			]
-		)
-);
+export function getInstalledThemePatterns(
+	state: State
+): Array< any > | undefined {
+	return state.installedThemePatterns ?? undefined;
+}
 
 /**
  * Returns the entity records permissions for the given entity record ids.

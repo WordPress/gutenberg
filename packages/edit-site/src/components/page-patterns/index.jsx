@@ -9,7 +9,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView, useViewConfig } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { store as editSiteStore } from '../../store';
 import {
 	PATTERN_TYPES,
 	TEMPLATE_PART_POST_TYPE,
@@ -17,7 +16,10 @@ import {
 } from '../../utils/constants';
 import usePatternSettings from './use-pattern-settings';
 import { unlock } from '../../lock-unlock';
-import usePatterns, { useAugmentPatternsWithPermissions } from './use-patterns';
+import usePatterns, {
+	selectInstalledThemePatterns,
+	useAugmentPatternsWithPermissions,
+} from './use-patterns';
 import PatternsActions from './actions';
 import { useEditPostAction } from '../dataviews-actions';
 import { previewField } from './fields';
@@ -32,20 +34,24 @@ const VIEW_CONFIG_FIELDS = [ 'default_view', 'default_layouts' ];
 
 /**
  * Returns a field to filter patterns by the installed theme, other than the
- * active one, they come from. There's no field when the site editor doesn't
- * offer patterns from other themes.
+ * active one, they come from. There's no field until patterns from other
+ * themes have loaded.
  *
  * @return {Object|undefined} The field.
  */
 function useInstalledThemeField() {
-	const installedThemePatternSources = useSelect(
-		( select ) =>
-			unlock( select( editSiteStore ) ).getSettings()
-				.installedThemePatternSources,
+	const installedThemePatterns = useSelect(
+		( select ) => selectInstalledThemePatterns( select ).patterns,
 		[]
 	);
 	return useMemo( () => {
-		if ( ! installedThemePatternSources?.length ) {
+		const themes = new Map(
+			installedThemePatterns.map( ( { theme, themeName } ) => [
+				theme,
+				themeName,
+			] )
+		);
+		if ( ! themes.size ) {
 			return undefined;
 		}
 		return {
@@ -55,15 +61,13 @@ function useInstalledThemeField() {
 			readOnly: true,
 			enableSorting: false,
 			getValue: ( { item } ) => item.theme,
-			elements: installedThemePatternSources.map(
-				( { stylesheet, name } ) => ( {
-					value: stylesheet,
-					label: name,
-				} )
-			),
+			elements: Array.from( themes, ( [ value, label ] ) => ( {
+				value,
+				label,
+			} ) ).sort( ( a, b ) => a.label.localeCompare( b.label ) ),
 			filterBy: { operators: [ 'isAny' ] },
 		};
-	}, [ installedThemePatternSources ] );
+	}, [ installedThemePatterns ] );
 }
 
 function usePagePatternsHeader( type, categoryId ) {

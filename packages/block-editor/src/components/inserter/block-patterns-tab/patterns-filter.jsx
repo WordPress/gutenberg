@@ -17,7 +17,7 @@ import {
 	INSERTER_AUTHOR_TYPES,
 } from './utils';
 import { store as blockEditorStore } from '../../../store';
-import { selectInstalledThemePatternsKey } from '../../../store/private-keys';
+import { unlock } from '../../../lock-unlock';
 
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
 	sourceFilter !== 'all' && sourceFilter !== 'user';
@@ -83,13 +83,16 @@ export function PatternsFilter( {
 			? INSERTER_PATTERN_TYPES.user
 			: patternSourceFilter;
 
-	const hasInstalledThemePatterns = useSelect(
-		( select ) =>
-			!! select( blockEditorStore ).getSettings()[
-				selectInstalledThemePatternsKey
-			],
-		[]
-	);
+	// "Other themes" is offered while their patterns load, and once they have
+	// loaded if there are any.
+	const hasInstalledThemePatterns = useSelect( ( select ) => {
+		const { getInstalledThemePatterns, isLoadingInstalledThemePatterns } =
+			unlock( select( blockEditorStore ) );
+		return (
+			isLoadingInstalledThemePatterns() ||
+			getInstalledThemePatterns().length > 0
+		);
+	}, [] );
 
 	// We need to disable the sync filter option if the source filter is not 'all' or 'user'
 	// otherwise applying them will just result in no patterns being shown.

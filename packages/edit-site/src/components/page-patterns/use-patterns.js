@@ -94,19 +94,6 @@ const selectPatternCategories = createSelector(
 	]
 );
 
-const selectInstalledThemeStylesheets = createSelector(
-	( select ) =>
-		unlock( select( editSiteStore ) )
-			.getSettings()
-			.installedThemePatternSources?.map(
-				( { stylesheet } ) => stylesheet
-			) ?? EMPTY_PATTERN_LIST,
-	( select ) => [
-		unlock( select( editSiteStore ) ).getSettings()
-			.installedThemePatternSources,
-	]
-);
-
 /**
  * Returns the patterns that installed themes, other than the active one,
  * would add if they were activated. Each pattern has the stylesheet of its
@@ -117,22 +104,24 @@ const selectInstalledThemeStylesheets = createSelector(
  */
 export const selectInstalledThemePatterns = createSelector(
 	( select ) => {
-		const stylesheets = selectInstalledThemeStylesheets( select );
-		if ( ! stylesheets.length ) {
+		if (
+			! unlock( select( editSiteStore ) ).getSettings()
+				.hasInstalledThemePatterns
+		) {
 			return { patterns: EMPTY_PATTERN_LIST, isResolving: false };
 		}
 		const patterns = unlock(
 			select( coreStore )
-		).getInstalledThemePatterns( stylesheets );
+		).getInstalledThemePatterns();
 		return {
 			patterns: patterns ?? EMPTY_PATTERN_LIST,
 			isResolving: ! patterns,
 		};
 	},
 	( select ) => [
-		unlock( select( coreStore ) ).getInstalledThemePatterns(
-			selectInstalledThemeStylesheets( select )
-		),
+		unlock( select( editSiteStore ) ).getSettings()
+			.hasInstalledThemePatterns,
+		unlock( select( coreStore ) ).getInstalledThemePatterns(),
 	]
 );
 

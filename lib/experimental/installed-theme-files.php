@@ -67,6 +67,23 @@ function gutenberg_copy_theme_file_to_media_library( $file_path, $source ) {
 }
 
 /**
+ * Returns the URL of each folder that holds themes.
+ *
+ * @param array[] $theme_folders The installed themes' folders, as returned by search_theme_directories().
+ * @return string[] Theme root URLs, by theme root path.
+ */
+function gutenberg_get_theme_root_urls( $theme_folders ) {
+	$urls = array();
+	foreach ( (array) $theme_folders as $stylesheet => $theme_folder ) {
+		$theme_root = $theme_folder['theme_root'];
+		if ( ! isset( $urls[ $theme_root ] ) ) {
+			$urls[ $theme_root ] = get_theme_root_uri( $stylesheet, $theme_root );
+		}
+	}
+	return $urls;
+}
+
+/**
  * Before content is saved, copies the files it loads from installed themes
  * other than the active one into the Media Library, and points the content to
  * the copies. Files that can't be copied keep their theme URL.
@@ -84,23 +101,57 @@ function gutenberg_copy_installed_theme_files( $data ) {
 	}
 
 	$content = wp_unslash( $data['post_content'] );
-	foreach ( wp_get_themes() as $theme ) {
-		if ( in_array( $theme->get_stylesheet(), array( get_stylesheet(), get_template() ), true ) ) {
+
+	// This runs on every save and most content loads no theme files, so look
+	// for the name of a folder that holds themes before looking for themes.
+	$might_load_theme_files = false;
+	foreach ( (array) $GLOBALS['wp_theme_directories'] as $theme_root ) {
+		if ( str_contains( $content, '/' . wp_basename( $theme_root ) . '/' ) ) {
+			$might_load_theme_files = true;
+			break;
+		}
+	}
+	if ( ! $might_load_theme_files ) {
+		return $data;
+	}
+
+	$theme_folders = search_theme_directories();
+	$active_themes = array( get_stylesheet(), get_template() );
+	foreach ( gutenberg_get_theme_root_urls( $theme_folders ) as $theme_root_url ) {
+		$theme_root_url = trailingslashit( $theme_root_url );
+		if ( ! str_contains( $content, $theme_root_url ) ) {
 			continue;
 		}
-		$theme_uri = $theme->get_stylesheet_directory_uri() . '/';
-		if ( ! str_contains( $content, $theme_uri ) ) {
-			continue;
-		}
-		$theme_directory = realpath( $theme->get_stylesheet_directory() ) . DIRECTORY_SEPARATOR;
 
 		// A file URL ends where the markup or CSS around it does.
 		$content = preg_replace_callback(
-			'#' . preg_quote( $theme_uri, '#' ) . '[^\s"\'()<>\\\\?\#]+#',
-			static function ( $matches ) use ( $theme, $theme_uri, $theme_directory ) {
-				$url           = $matches[0];
-				$relative_path = rawurldecode( substr( $url, strlen( $theme_uri ) ) );
-				$file_path     = realpath( $theme_directory . $relative_path );
+			'#' . preg_quote( $theme_root_url, '#' ) . '[^\s"\'()<>\\\\?\#]+#',
+			static function ( $matches ) use ( $theme_root_url, $theme_folders, $active_themes ) {
+				$url  = $matches[0];
+				$path = rawurldecode( substr( $url, strlen( $theme_root_url ) ) );
+
+				// A theme can be in a subfolder of the theme folder, like `pub/theme`.
+				$parts      = explode( '/', $path );
+				$stylesheet = null;
+				for ( $length = 1; $length <= 2 && $length < count( $parts ); $length++ ) {
+					$folder = implode( '/', array_slice( $parts, 0, $length ) );
+					if ( isset( $theme_folders[ $folder ] ) ) {
+						$stylesheet = $folder;
+						break;
+					}
+				}
+				if ( ! $stylesheet || in_array( $stylesheet, $active_themes, true ) ) {
+					return $url;
+				}
+
+				$theme = wp_get_theme( $stylesheet );
+				if ( ! $theme->exists() || $theme->errors() ) {
+					return $url;
+				}
+
+				$theme_directory = realpath( $theme->get_stylesheet_directory() ) . DIRECTORY_SEPARATOR;
+				$relative_path   = substr( $path, strlen( $stylesheet ) + 1 );
+				$file_path       = realpath( $theme_directory . $relative_path );
 
 				// Only copy files inside the theme folder that WordPress accepts as uploads.
 				if (
@@ -113,7 +164,7 @@ function gutenberg_copy_installed_theme_files( $data ) {
 
 				$attachment_id = gutenberg_copy_theme_file_to_media_library(
 					$file_path,
-					$theme->get_stylesheet() . '/' . $relative_path
+					$stylesheet . '/' . $relative_path
 				);
 				return is_wp_error( $attachment_id ) ? $url : wp_get_attachment_url( $attachment_id );
 			},
