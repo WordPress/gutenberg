@@ -757,10 +757,7 @@ describe( 'Post actions', () => {
 						throw { code: 'test_save_failure', message };
 					}
 
-					throw {
-						code: 'unknown_path',
-						message: `Unknown path: ${ method } ${ path }`,
-					};
+					return unknownPath( method, path );
 				} );
 
 				const registry = createRegistryWithStores();
@@ -847,10 +844,7 @@ describe( 'Post actions', () => {
 					throw serverError;
 				}
 
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
-				};
+				return unknownPath( method, path );
 			} );
 
 			const registry = createRegistryWithStores();
@@ -893,10 +887,7 @@ describe( 'Post actions', () => {
 					};
 				}
 
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
-				};
+				return unknownPath( method, path );
 			} );
 
 			const registry = createRegistryWithStores();
@@ -1583,10 +1574,7 @@ describe( 'Post actions', () => {
 					};
 				}
 
-				throw {
-					code: 'unknown_path',
-					message: `Unknown path: ${ method } ${ path }`,
-				};
+				return unknownPath( method, path );
 			} );
 
 			const registry = createRegistryWithStores();
