@@ -50,13 +50,28 @@ jobs:
             - name: Running the tests
               run: npm run test-unit:ci -- --cacheDirectory="$HOME/.jest-cache"
 
+    # Runs the PHPUnit tests on the highest and lowest PHP versions of each major version the branch's
+    # WordPress version supports that can still be tested, using the `wordpressdevelop/phpunit` image
+    # with the PHPUnit version for each.
     unit-php:
-        name: PHP
+        name: PHP ${{ matrix.php }}
         runs-on: 'ubuntu-24.04'
         permissions:
             contents: read
         timeout-minutes: 20
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
+        strategy:
+            fail-fast: false
+            matrix:
+                include:
+                    - php: '7.3'
+                      phpunit-image: 'wordpressdevelop/phpunit:7-php-7.3-fpm'
+                    - php: '7.0'
+                      phpunit-image: 'wordpressdevelop/phpunit:6-php-7.0-fpm'
+                    - php: '5.6'
+                      phpunit-image: 'wordpressdevelop/phpunit:4-php-5.6-fpm'
+                    - php: '5.3'
+                      phpunit-image: 'wordpressdevelop/phpunit:5.3-fpm'
 
         steps:
             - name: Checkout repository
@@ -82,11 +97,14 @@ jobs:
             - name: Install WordPress
               uses: ./.github/setup-wordpress
 
-            # The remaining steps are the commands `bin/run-wp-unit-tests.sh` runs.
+            # The remaining steps are the commands `bin/run-wp-unit-tests.sh` runs. The
+            # checks that do not depend on the PHP version only run once, on PHP 7.3.
             - name: Regenerate the PHP parser
+              if: ${{ matrix.php == '7.3' }}
               run: node bin/create-php-parser.js
 
             - name: Check that the PHP parser is up to date
+              if: ${{ matrix.php == '7.3' }}
               run: |
                   if ! git diff --quiet --exit-code lib/parser.php; then
                     echo 'ERROR: The PEG parser has been updated, but the generated PHP version'
@@ -96,13 +114,20 @@ jobs:
                   fi
 
             - name: Lint PHP
+              if: ${{ matrix.php == '7.3' }}
               run: npm run lint-php
 
             - name: Running the tests (single site)
               run: npm run test-unit-php
+              env:
+                  PHPUNIT_IMAGE: ${{ matrix.phpunit-image }}
 
             - name: Running the tests (multisite)
               run: npm run test-unit-php-multisite
+              env:
+                  PHPUNIT_IMAGE: ${{ matrix.phpunit-image }}
 
             - name: Check the PHP parser syntax
-              run: php lib/parser.php
+              run: docker-compose run --rm wordpress_phpunit php lib/parser.php
+              env:
+                  PHPUNIT_IMAGE: ${{ matrix.phpunit-image }}

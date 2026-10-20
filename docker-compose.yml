@@ -34,7 +34,12 @@ services:
       MYSQL_DATABASE: wordpress_test
 
   wordpress_phpunit:
-    image: chriszarate/wordpress-phpunit
+    # `PHPUNIT_IMAGE` selects another image to run the tests on a different PHP version.
+    image: ${PHPUNIT_IMAGE:-chriszarate/wordpress-phpunit}
+    # The `wordpressdevelop/phpunit` images have an entrypoint that expects a wordpress-develop
+    # checkout and a working directory of `/var/www`.
+    entrypoint: []
+    working_dir: /app
     environment:
       PHPUNIT_DB_HOST: mysql
     volumes:
