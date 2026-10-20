@@ -417,7 +417,8 @@ export default function useClipboardHandler() {
 		node.ownerDocument.addEventListener( 'copy', handler );
 		node.ownerDocument.addEventListener( 'cut', handler );
 		node.ownerDocument.addEventListener( 'paste', handler );
-		// Before the fields and the block drop zones.
+		// Capture, so blocks are inserted before the field inserts the drop
+		// inline, as on paste, and before the block drop zone handles it.
 		node.ownerDocument.addEventListener( 'drop', onDrop, true );
 
 		return () => {
