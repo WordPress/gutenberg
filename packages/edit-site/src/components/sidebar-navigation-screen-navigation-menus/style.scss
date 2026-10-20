@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 .edit-site-sidebar-navigation-screen__description {
 	margin: 0 0 $grid-unit-40 0;
@@ -47,6 +48,25 @@
 		&:focus {
 			background: var(--wpds-color-background-interactive-brand-strong-active);
 			color: var(--wpds-color-foreground-interactive-brand-strong-active);
+		}
+	}
+
+	// In a list with items, the appender stays out of the way until the list
+	// is hovered or holds focus. It keeps its row in the tree grid, so keyboard
+	// users reach it as before and reveal it by focusing it. An empty list has
+	// nothing to hover, so its appender stays shown.
+	.block-editor-list-view-tree:has(.block-editor-list-view-leaf) {
+		.list-view-appender .block-editor-inserter__toggle {
+			opacity: 0;
+			transition: opacity 0.1s ease-out;
+			@include reduce-motion("transition");
+		}
+
+		&:hover,
+		&:focus-within {
+			.list-view-appender .block-editor-inserter__toggle {
+				opacity: 1;
+			}
 		}
 	}
 }
