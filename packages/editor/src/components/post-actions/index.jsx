@@ -34,7 +34,11 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 			permissions,
 		};
 	}, [ item, permissions ] );
-	const allActions = usePostActions( { postType, onActionPerformed } );
+	const allActions = usePostActions( {
+		postType,
+		onActionPerformed,
+		context: 'single',
+	} );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {

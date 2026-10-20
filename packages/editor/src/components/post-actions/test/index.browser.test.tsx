@@ -30,6 +30,15 @@ async function renderPostActions() {
 }
 
 describe( 'PostActions', () => {
+	it( 'requests the actions of the single context', async () => {
+		mockedUsePostActions.mockReturnValue( [] );
+		await renderPostActions();
+
+		expect( mockedUsePostActions ).toHaveBeenCalledWith(
+			expect.objectContaining( { postType: 'post', context: 'single' } )
+		);
+	} );
+
 	it( 'keeps the unavailable actions trigger focusable and closed', async () => {
 		const user = userEvent.setup();
 		mockedUsePostActions.mockReturnValue( [] );

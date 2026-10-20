@@ -31,12 +31,10 @@ export function usePostActions( { postType, onActionPerformed, context } ) {
 			b.id === 'move-to-trash' ? -1 : 0
 		);
 
-		// Filter actions based on provided context. If not provided
-		// all actions are returned. We'll have a single entry for getting the actions
-		// and the consumer should provide the context to filter the actions, if needed.
-		// Actions should also provide the `context` they support, if it's specific, to
-		// compare with the provided context to get all the actions.
-		// Right now the only supported context is `list`.
+		// Filter actions based on the provided context: `list` for the
+		// DataViews lists, `single` for the editor. An action without a
+		// `context` shows in both. If no context is provided, only the
+		// actions without a `context` are returned.
 		actions = actions.filter( ( action ) => {
 			if ( ! action.context ) {
 				return true;
