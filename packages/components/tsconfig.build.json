@@ -13,7 +13,7 @@
 		{ "path": "../compose/tsconfig.build.json" },
 		{ "path": "../date/tsconfig.build.json" },
 		{ "path": "../deprecated/tsconfig.build.json" },
-		{ "path": "../dom" },
+		{ "path": "../dom/tsconfig.build.json" },
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../hooks/tsconfig.build.json" },
