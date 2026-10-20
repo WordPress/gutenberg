@@ -6,7 +6,7 @@
 	},
 	"references": [
 		{
-			"path": "../private-apis"
+			"path": "../private-apis/tsconfig.build.json"
 		}
 	],
 	"include": [ "src/**/*" ]

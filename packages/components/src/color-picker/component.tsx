@@ -13,8 +13,8 @@ import {
 } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
+import { Select, useEnableWpCompatOverlaySlot } from '@wordpress/ui';
 import { useContextSystem, contextConnect } from '../context';
-import SelectControl from '../select-control';
 import { HStack } from '../h-stack';
 import { Flex } from '../flex';
 import { PolymorphicElement } from '../utils/polymorphic-element';
@@ -52,6 +52,8 @@ const UnconnectedColorPicker = (
 	props: ColorPickerProps,
 	forwardedRef: ForwardedRef< any >
 ) => {
+	useEnableWpCompatOverlaySlot();
+
 	const {
 		enableAlpha = false,
 		color: colorProp,
@@ -209,18 +211,34 @@ const UnconnectedColorPicker = (
 			/>
 			<div className={ styles.auxiliary }>
 				<HStack className={ styles.header } justify="space-between">
-					<SelectControl
-						className={ styles.select }
-						size="compact"
-						options={ options }
+					<Select.Root
+						items={ options }
 						value={ colorType }
-						onChange={ ( nextColorType ) =>
-							setColorType( nextColorType as ColorType )
-						}
-						label={ __( 'Color format' ) }
-						hideLabelFromVision
-						variant="minimal"
-					/>
+						onValueChange={ ( nextColorType ) => {
+							if ( nextColorType !== null ) {
+								setColorType( nextColorType );
+							}
+						} }
+					>
+						<Select.Trigger
+							size="compact"
+							variant="minimal"
+							aria-label={ __( 'Color format' ) }
+							className={ styles.select }
+						/>
+						<Select.Popup width="content">
+							{ options.map( ( option ) => (
+								<Select.Item
+									key={ option.value }
+									value={ option.value }
+								>
+									<Select.ItemLabel>
+										{ option.label }
+									</Select.ItemLabel>
+								</Select.Item>
+							) ) }
+						</Select.Popup>
+					</Select.Root>
 					<ColorCopyButton
 						color={ safeColordColor }
 						colorType={ copyFormat || colorType }
