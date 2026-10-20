@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
+-   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
+
+### Internal
+
+-   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
+
+## 43.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
@@ -28,6 +39,7 @@
 ### Enhancements
 
 -   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
+-   `BorderBoxControl`, `BorderControl`, `Heading`, `InputControl`, `Menu`, `RangeControl`, `Text`, `ToolsPanel`: Use semantic WPDS tokens for typography, spacing, border previews, and range rails ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
 -   `ColorPicker`: Use `Select` from `@wordpress/ui` for the color format selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   `ExternalLink`: Use a small border radius for consistent focus rings ([#84697](https://github.com/WordPress/gutenberg/pull/84697)).
 -   `Menu`: Use WPDS motion tokens for popup transition durations and slide easing ([#84706](https://github.com/WordPress/gutenberg/pull/84706)).
@@ -35,6 +47,7 @@
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
 -   `Snackbar`: Keep snackbars that have an action on screen for 10 seconds instead of 6 before they are dismissed automatically ([#84842](https://github.com/WordPress/gutenberg/pull/84842)).
 -   `Tabs`: Show the tab panel's focus ring with the design system's outline instead of a legacy box-shadow ([#84914](https://github.com/WordPress/gutenberg/pull/84914)).
+-   `RangeControl`: Add a `size` prop with `default` and `compact` options ([#69844](https://github.com/WordPress/gutenberg/pull/69844)).
 
 ### Deprecations
 
@@ -68,6 +81,8 @@
 
 ### Internal
 
+-   `RangeControl`, `Tabs`, `BorderBoxControl`: Remove unused styles and simplify SCSS nesting while preserving specificity and rendered styles ([#85086](https://github.com/WordPress/gutenberg/pull/85086)).
+-   Remove obsolete JavaScript style configuration and unused style helpers ([#85038](https://github.com/WordPress/gutenberg/pull/85038)).
 -   Update Ariakit to 0.4.42 ([#85066](https://github.com/WordPress/gutenberg/pull/85066)).
 -   Update `@testing-library/user-event` to 14.6.8 for component tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
 -   Remove unused internal BoxControl and UnitControl helpers and gradient constants ([#85091](https://github.com/WordPress/gutenberg/pull/85091)).

@@ -12,14 +12,34 @@ import { store as blockEditorStore } from '../../../store';
 import { addActiveFormats } from '../utils';
 import { getPasteEventData } from '../../../utils/pasting';
 import { unlock } from '../../../lock-unlock';
+import { getDropPasteProps, isTextDrop } from './drag-and-drop';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 const { ownsSelection } = unlock( richTextPrivateApis );
 
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
-export default ( props ) => ( element ) => {
-	function _onPaste( event ) {
+/**
+ * Creates the paste listener of a field, which also inserts text dropped on
+ * it.
+ *
+ * @param {Object}      props   Rich text props.
+ * @param {HTMLElement} element The field.
+ *
+ * @return {(event: Event) => void} The listener.
+ */
+export function createPasteListener( props, element ) {
+	return function _onPaste( event ) {
+		// A drop pastes at the drop point.
+		const pasteProps =
+			event.type === 'drop'
+				? getDropPasteProps( props.current, element, event )
+				: props.current;
+
+		if ( ! pasteProps ) {
+			return;
+		}
+
 		const {
 			disableFormats,
 			onChange,
@@ -31,7 +51,7 @@ export default ( props ) => ( element ) => {
 			preserveWhiteSpace,
 			pastePlainText,
 			registry,
-		} = props.current;
+		} = pasteProps;
 
 		// The event listener is attached to the window, so we need to check if
 		// the target is the element or inside the element. When the editable
@@ -49,7 +69,8 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const pasteData = getPasteEventData( event );
+		const { clipboardData = event.dataTransfer } = event;
+		const pasteData = getPasteEventData( { clipboardData } );
 
 		// Some browsers don't support `clipboardData` and paste plain text on
 		// their own, so the event has to be left alone for them.
@@ -77,8 +98,7 @@ export default ( props ) => ( element ) => {
 			return;
 		}
 
-		const isInternal =
-			event.clipboardData.getData( 'rich-text' ) === 'true';
+		const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 		function pasteInline( content ) {
 			const transformed = formatTypes.reduce(
@@ -160,11 +180,54 @@ export default ( props ) => ( element ) => {
 		}
 
 		onReplace( content, content.length - 1, -1 );
-	}
+	};
+}
 
+export default ( props ) => ( element ) => {
 	const { defaultView } = element.ownerDocument;
 
 	// Attach the listener to the window so parent elements have the chance to
 	// prevent the default behavior.
-	return subscribeDelegatedListener( defaultView, 'paste', _onPaste );
+	return subscribeDelegatedListener(
+		defaultView,
+		'paste',
+		createPasteListener( props, element )
+	);
+};
+
+/**
+ * Inserts text dropped on the field the way the field would on paste, as one
+ * undo level.
+ *
+ * @param {Object} props Rich text props.
+ */
+export const drop = ( props ) => ( element ) => {
+	const { ownerDocument } = element;
+	const onPaste = createPasteListener( props, element );
+
+	// The block drop zones cancel every drag over them, which hides the
+	// browser's drop caret and shows the block insertion point instead. An
+	// empty field keeps the drop zone, which shows the block is replaced.
+	function onDragOver( event ) {
+		if (
+			element.isContentEditable &&
+			! isEmpty( props.current.getValue() ) &&
+			isTextDrop( ownerDocument, event.dataTransfer )
+		) {
+			event.stopPropagation();
+		}
+	}
+
+	function onDrop( event ) {
+		props.current.registry.batch( () => onPaste( event ) );
+	}
+
+	element.addEventListener( 'dragenter', onDragOver );
+	element.addEventListener( 'dragover', onDragOver );
+	element.addEventListener( 'drop', onDrop );
+	return () => {
+		element.removeEventListener( 'dragenter', onDragOver );
+		element.removeEventListener( 'dragover', onDragOver );
+		element.removeEventListener( 'drop', onDrop );
+	};
 };

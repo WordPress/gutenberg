@@ -2,8 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+
+## 0.25.0 (2026-10-20)
+
 ### Breaking Changes
 
+-   `SearchableSelect` and `SearchableSelectControl`: Remove `triggerContent`. Pass custom content as children of a `.Trigger` element through the `trigger` prop instead ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
 -   `Link`: Styled links with a new-tab indicator now wrap their content in a span. Update flex/grid compositions and direct-child selectors that rely on the content being a direct child of the anchor, and review anchor-level underline overrides ([#84806](https://github.com/WordPress/gutenberg/pull/84806)).
 -   `SelectControl`: Remove the `triggerContent` prop. Pass custom content as children of a `SelectControl.Trigger` element through the `trigger` prop instead ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
 -   `Select`, `Autocomplete`, `Combobox`, and the select controls: `actionsRef` no longer keeps closed popups mounted. For externally controlled exit animations, call `eventDetails.preventUnmountOnClose()` in `onOpenChange` when closing, then `actionsRef.current?.unmount()` when the animation ends. Close through `actionsRef.current?.close()` to run that handler. Automatic CSS exit animations need no migration. See [Base UI's migration guide](https://github.com/mui/base-ui/pull/5734) ([#84542](https://github.com/WordPress/gutenberg/pull/84542)).
@@ -19,6 +26,7 @@
 
 ### Enhancements
 
+-   `SearchableSelect` and `SearchableSelectControl`: Add a `trigger` slot and `.Trigger` subcomponents for customizing trigger props ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
 -   `Avatar`: Use `color` for fallback backgrounds with contrasting text and icons ([#84824](https://github.com/WordPress/gutenberg/pull/84824)).
 -   `Avatar`: Add an optional `color` prop for an internal ring, preserving the avatar's layout size and neutral fallbacks while leaving room for an external focus ring ([#84822](https://github.com/WordPress/gutenberg/pull/84822)).
 -   `SelectControl`: Add a `trigger` slot and `SelectControl.Trigger` subcomponent for customizing trigger props ([#84828](https://github.com/WordPress/gutenberg/pull/84828)).
