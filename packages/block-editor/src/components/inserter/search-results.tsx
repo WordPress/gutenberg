@@ -77,6 +77,7 @@ function InserterSearchResults( {
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks, isQuick );
 	const [ patterns, , onClickPattern ] = usePatternsState(
+		// @ts-expect-error Bug: the pattern name is passed unwrapped, as the meta object, which the store ignores.
 		onInsertBlocks,
 		destinationRootClientId,
 		undefined,
