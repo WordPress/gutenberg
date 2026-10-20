@@ -668,6 +668,9 @@ test.describe( 'Suggest mode: overlay-retirement safety net (Phase 0)', () => {
 		);
 		await expect( addMarker ).toHaveAttribute( 'data-suggestion-id', /\d/ );
 		const id = await addMarker.getAttribute( 'data-suggestion-id' );
+		// Let the new note open in the sidebar before selecting: on a slow
+		// runner it can land between the key presses and reset the selection.
+		await expect( page.getByText( /^Add: “ NEW”$/ ) ).toBeVisible();
 
 		/*
 		 * Select part of the pending addition and type over it. The author
