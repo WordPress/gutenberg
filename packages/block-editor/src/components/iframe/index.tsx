@@ -331,7 +331,9 @@ function Iframe( {
 			const container = iframe.closest(
 				'.block-editor-iframe__container'
 			) as HTMLElement;
-			const scrollingElement = ownerDocument.scrollingElement!;
+			// Standards mode, so the document element is the scrolling element,
+			// and it has a style. `scrollingElement` is only typed as `Element`.
+			const scrollingElement = ownerDocument.documentElement;
 			// The ancestor's scrollbar is the only one. The document still
 			// scrolls when `scrollTop` is set.
 			const { overflow } = scrollingElement.style;
