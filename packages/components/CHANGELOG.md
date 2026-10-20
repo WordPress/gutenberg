@@ -4,6 +4,30 @@
 
 ### Breaking Changes
 
+-   `RadioControl`: Remove the `components-base-control__help` class from group help text ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
+
+### Enhancements
+
+-   `RadioControl`: Display help text beneath the fieldset label, before the radio options ([#85126](https://github.com/WordPress/gutenberg/pull/85126)).
+-   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
+-   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
+
+### Bug Fixes
+
+-   `MenuItemsChoice`: Make the `onHover` prop optional, as it defaults to a no-op ([#85033](https://github.com/WordPress/gutenberg/pull/85033)).
+
+### Internal
+
+-   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
+-   `ColorIndicator`: Make `colorValue` optional, and `MenuItem`: Accept `isPressed` in the props types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+-   `MenuItem`: Accept `accessibleWhenDisabled` in the props types ([#84981](https://github.com/WordPress/gutenberg/pull/84981)).
+-   `Autocomplete`: Let completers type the payload they replace the field with ([#85025](https://github.com/WordPress/gutenberg/pull/85025)).
+-   `Autocomplete`: Make the `keywords` of the options from `useItems` optional, as the default filter already does ([#85034](https://github.com/WordPress/gutenberg/pull/85034)).
+
+## 43.0.0 (2026-10-20)
+
+### Breaking Changes
+
 -   Components no longer use Emotion for styling, class-name composition, or cross-document style injection. Consumers that compose source-order-dependent Emotion fragments must combine them in a single `css()` call before passing the resulting `className`. Consumers using `@emotion/react` or `@emotion/styled` that relied on StyleProvider's cross-document cache must provide their own cache targeting that document's `<head>` and wrap the subtree in `CacheProvider`; `StyleProvider` continues to register CSS Module styles. Components no longer supply Framer Motion's optional Emotion DOM prop validator; without a validator, `__unstableMotion` forwards non-animation props to the rendered element. This includes:
     -   Context-system class-name composition ([#84925](https://github.com/WordPress/gutenberg/pull/84925)).
     -   `StyleProvider` cache removal ([#85019](https://github.com/WordPress/gutenberg/pull/85019)).
@@ -34,6 +58,7 @@
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
 -   `Snackbar`: Keep snackbars that have an action on screen for 10 seconds instead of 6 before they are dismissed automatically ([#84842](https://github.com/WordPress/gutenberg/pull/84842)).
 -   `Tabs`: Show the tab panel's focus ring with the design system's outline instead of a legacy box-shadow ([#84914](https://github.com/WordPress/gutenberg/pull/84914)).
+-   `RangeControl`: Add a `size` prop with `default` and `compact` options ([#69844](https://github.com/WordPress/gutenberg/pull/69844)).
 
 ### Deprecations
 

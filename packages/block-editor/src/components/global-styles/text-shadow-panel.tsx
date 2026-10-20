@@ -30,6 +30,10 @@ const EMPTY_ARRAY: TextShadowPreset[] = [];
 // rather than a long list of options.
 const PRESETS_SELECT_THRESHOLD = 7;
 
+// The default is stored as an empty string, but the select treats an empty
+// value as no selection and shows its placeholder.
+const DEFAULT_VALUE = '__default';
+
 /**
  * Extracts the preset slug from a raw text shadow value.
  *
@@ -119,7 +123,10 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 			label: preset.name,
 		} ) ),
 	];
-	const items = [ { value: '', label: __( 'Default' ) }, ...choices ];
+	const items = [
+		{ value: DEFAULT_VALUE, label: __( 'Default' ) },
+		...choices,
+	];
 
 	const activeSlug = getTextShadowPresetSlug( textShadow );
 	const activeValue = activeSlug
@@ -149,11 +156,19 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 					hideLabelFromVision
 					label={ __( 'Text shadow preset' ) }
 					value={
-						items.find( ( item ) => item.value === activeValue ) ??
-						items[ 0 ]
+						items.find(
+							( item ) =>
+								item.value === ( activeValue || DEFAULT_VALUE )
+						) ?? items[ 0 ]
 					}
 					items={ items }
-					onValueChange={ ( item ) => onChange( item?.value ?? '' ) }
+					onValueChange={ ( item ) =>
+						onChange(
+							! item?.value || item.value === DEFAULT_VALUE
+								? ''
+								: item.value
+						)
+					}
 				/>
 			) : (
 				<Composite
