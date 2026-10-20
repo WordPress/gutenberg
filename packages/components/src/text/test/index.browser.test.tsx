@@ -1,32 +1,8 @@
-import { afterEach, beforeEach, describe, expect, test } from 'vitest';
+import { describe, expect, test } from 'vitest';
 import { screen } from '@testing-library/react';
 import { render } from 'vitest-browser-react';
-import { getFontSize } from '../../utils/font-size';
-import { COLORS } from '../../utils';
+import '@wordpress/theme/design-tokens.css';
 import { Text } from '../';
-
-function resolveStyle( property: 'color' | 'fontSize', value: string ) {
-	const element = document.createElement( 'div' );
-	element.style[ property ] = value;
-	document.body.appendChild( element );
-	const resolved = getComputedStyle( element )[ property ];
-	element.remove();
-	return resolved;
-}
-
-// Source SCSS expects theme tokens; the production build adds their fallbacks.
-beforeEach( () => {
-	document.documentElement.style.setProperty(
-		'--wp-components-color-gray-700',
-		'#707070'
-	);
-} );
-
-afterEach( () => {
-	document.documentElement.style.removeProperty(
-		'--wp-components-color-gray-700'
-	);
-} );
 
 describe( 'Text', () => {
 	test( 'should render correctly', async () => {
@@ -51,7 +27,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			resolveStyle( 'color', COLORS.white )
+			'rgb(255, 255, 255)'
 		);
 	} );
 
@@ -72,7 +48,7 @@ describe( 'Text', () => {
 		);
 		expect(
 			getComputedStyle( screen.getByRole( 'heading' ) ).fontSize
-		).toBe( resolveStyle( 'fontSize', getFontSize( 'title' ) ) );
+		).toBe( '20px' );
 	} );
 
 	test( 'should render custom size', async () => {
@@ -83,7 +59,7 @@ describe( 'Text', () => {
 		);
 		expect(
 			getComputedStyle( screen.getByRole( 'heading' ) ).fontSize
-		).toBe( resolveStyle( 'fontSize', getFontSize( 15 ) ) );
+		).toBe( '15px' );
 	} );
 
 	test( 'should render variant', async () => {
@@ -93,7 +69,7 @@ describe( 'Text', () => {
 			</Text>
 		);
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			resolveStyle( 'color', COLORS.theme.gray[ 700 ] )
+			'rgb(112, 112, 112)'
 		);
 	} );
 
@@ -148,7 +124,7 @@ describe( 'Text', () => {
 		);
 
 		expect( getComputedStyle( screen.getByRole( 'heading' ) ).color ).toBe(
-			resolveStyle( 'color', COLORS.theme.gray[ 700 ] )
+			'rgb(112, 112, 112)'
 		);
 	} );
 
@@ -262,16 +238,35 @@ describe( 'Text', () => {
 		).toBe( 'block' );
 	} );
 
-	test( 'should render lineHeight', async () => {
-		await render(
-			<Text role="heading" lineHeight={ 1.5 }>
-				Lorem ipsum.
-			</Text>
-		);
-		expect(
-			getComputedStyle( screen.getByRole( 'heading' ) ).lineHeight
-		).toBe( '19.5px' );
-	} );
+	test.each( [
+		{ lineHeight: 1.5, expected: '19.5px' },
+		{ adjustLineHeightForInnerControls: 'medium', expected: '44px' },
+		{ adjustLineHeightForInnerControls: 'large', expected: '51.2px' },
+		{ adjustLineHeightForInnerControls: 'small', expected: '36.8px' },
+		{ adjustLineHeightForInnerControls: 'xSmall', expected: '29.6px' },
+		{
+			adjustLineHeightForInnerControls: 'large',
+			lineHeight: 1.5,
+			expected: '19.5px',
+		},
+		{
+			adjustLineHeightForInnerControls: 'large',
+			lineHeight: '32px',
+			expected: '32px',
+		},
+	] as const )(
+		'should render lineHeight as $expected for %j',
+		async ( { expected, ...props } ) => {
+			await render(
+				<Text role="heading" { ...props }>
+					Lorem ipsum.
+				</Text>
+			);
+			expect(
+				getComputedStyle( screen.getByRole( 'heading' ) ).lineHeight
+			).toBe( expected );
+		}
+	);
 
 	test( 'should render upperCase', async () => {
 		await render(

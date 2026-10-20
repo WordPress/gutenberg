@@ -15,6 +15,7 @@
 
 ### Enhancements
 
+-   The document sidebar shows the post summary built with DataForm, the same fields as Quick Edit, for every post type, and the template actions panel below it ([#85081](https://github.com/WordPress/gutenberg/pull/85081)).
 -   `usePostActions` no longer adds the "Set as homepage" and "Set as posts page" actions to pages: they moved to `@wordpress/core-actions`, which registers them on the server for the users who can manage the site settings when the theme has no `front-page` template, so a plugin can remove them with `wp_unregister_entity_actions()`. The pages they apply to come from the `wp:action-set-homepage` and `wp:action-set-posts-page` REST links ([#84932](https://github.com/WordPress/gutenberg/pull/84932)).
 -   The post summary of the DataForm-based inspector, the media editor, and the private `usePostFields` hook, through which the site editor screens get their fields, read the fields of the post type from the server, through the Entity fields API. The media editor also lays out the attachment fields with the form of the attachment view configuration ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 -   Notes: Mark noted content in the author's color at rest. Inline notes get a tint and an underline that thickens when the note is selected, and block-level notes tint the whole block with an outline around it. Selecting a note outlines its block instead of dimming the rest of the canvas, and hiding notes hides the marks ([#80578](https://github.com/WordPress/gutenberg/pull/80578)).

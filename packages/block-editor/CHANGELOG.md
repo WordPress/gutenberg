@@ -27,6 +27,7 @@
 
 ### Bug Fixes
 
+-   Block Editor: Include migration hint in useSetting deprecation warning ([#85100](https://github.com/WordPress/gutenberg/pull/85100)).
 -   List View: Fix the drag-and-drop nesting gesture over an item without children ([#84856](https://github.com/WordPress/gutenberg/pull/84856)).
 -   Writing Flow: Preserve rich text selection on Shift+click within the same block ([#84579](https://github.com/WordPress/gutenberg/pull/84579)).
 -   List View: Show the appender when the container is contentOnly ([#84713](https://github.com/WordPress/gutenberg/pull/84713)).
@@ -81,6 +82,8 @@
 -   Convert `WritingFlow` and its hooks to TypeScript ([#84918](https://github.com/WordPress/gutenberg/pull/84918)).
 -   Convert `Iframe`, `EditorStyles`, `NavigableToolbar`, `CopyHandler` and `BlockBreadcrumb` to TypeScript ([#84922](https://github.com/WordPress/gutenberg/pull/84922)).
 -   Convert `MediaPlaceholder` and `ImageEditor` to TypeScript ([#84923](https://github.com/WordPress/gutenberg/pull/84923)).
+-   Convert `useBlockDropZone` to TypeScript ([#84946](https://github.com/WordPress/gutenberg/pull/84946)).
+-   Convert `BlockManager`, `PublishDateTimePicker` and the fit text hook to TypeScript ([#84949](https://github.com/WordPress/gutenberg/pull/84949)).
 
 ## 18.1.0 (2026-10-07)
 

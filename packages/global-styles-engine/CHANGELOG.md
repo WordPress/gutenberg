@@ -11,6 +11,10 @@
 
 -   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
 
+### Enhancements
+
+-   `__unstableGeneratePreviewStateStyles` accepts an element name, such as `link`, as well as a block name ([#83787](https://github.com/WordPress/gutenberg/pull/83787)).
+
 ## 1.24.0 (2026-10-07)
 
 ### New Features

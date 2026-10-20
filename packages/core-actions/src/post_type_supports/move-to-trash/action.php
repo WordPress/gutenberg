@@ -8,7 +8,7 @@
  */
 
 return array(
-	'label'             => _x( 'Trash…', 'verb', 'gutenberg' ),
+	'label'             => _x( 'Trash…', 'verb' ),
 	'isPrimary'         => true,
 	'supportsBulk'      => true,
 	'hideModalHeader'   => true,

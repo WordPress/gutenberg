@@ -7,7 +7,6 @@
  * @covers ::_gutenberg_get_post_type_fields_preload_paths
  * @covers ::_gutenberg_get_site_editor_screen_post_types
  * @covers ::_gutenberg_preload_entity_fields
- * @covers ::gutenberg_dataform_inspector_preload_paths
  */
 class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 
@@ -17,11 +16,11 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 	}
 
 	/**
-	 * The post editor leaves the fields to the DataForm inspector experiment,
-	 * the only part of it that reads them, whatever its `p` query arg.
+	 * The post editor preloads the fields of the edited post type, which the
+	 * post summary of its inspector reads, whatever its `p` query arg.
 	 */
-	public function test_the_post_editor_does_not_preload_the_fields() {
-		$_GET['p'] = '/page';
+	public function test_the_post_editor_preloads_the_fields_of_the_post_type() {
+		$_GET['p'] = '/wp_template';
 		$post      = self::factory()->post->create_and_get( array( 'post_type' => 'page' ) );
 		$context   = new WP_Block_Editor_Context(
 			array(
@@ -30,31 +29,9 @@ class Tests_Preload_Entity_Fields extends WP_UnitTestCase {
 			)
 		);
 
-		$this->assertSame( array(), _gutenberg_preload_entity_fields( array(), $context ) );
-	}
+		$paths = _gutenberg_preload_entity_fields( array(), $context );
 
-	/**
-	 * The DataForm inspector experiment preloads the fields of the edited post
-	 * type, which its post summary reads, with the path the `getFieldsConfig`
-	 * core data resolver requests.
-	 */
-	public function test_the_dataform_inspector_preloads_the_fields_of_the_post_type() {
-		// The experiment loads its preloading only when it is enabled.
-		if ( ! function_exists( 'gutenberg_dataform_inspector_preload_paths' ) ) {
-			require_once dirname( __DIR__ ) . '/lib/experimental/dataform-inspector-preload.php';
-			remove_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_dataform_inspector_preload_paths' );
-		}
-		$post    = self::factory()->post->create_and_get( array( 'post_type' => 'page' ) );
-		$context = new WP_Block_Editor_Context(
-			array(
-				'name' => 'core/edit-post',
-				'post' => $post,
-			)
-		);
-
-		$paths = gutenberg_dataform_inspector_preload_paths( array(), $context );
-
-		$this->assertContains( '/wp/v2/entity-fields?kind=postType&name=page', $paths );
+		$this->assertSame( array( '/wp/v2/entity-fields?kind=postType&name=page' ), $paths );
 	}
 
 	/**
