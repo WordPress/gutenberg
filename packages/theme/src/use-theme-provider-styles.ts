@@ -197,6 +197,10 @@ function generateThemeProviderColors(
 	styles: CSSProperties;
 	warnings: ThemeProviderColorWarning[];
 } {
+	// Building a ramp registers the color space of the seeds, which reading
+	// the colors of any ramp, prebuilt ones included, depends on.
+	ColorSpace.register( sRGB );
+
 	const seeds = {
 		...DEFAULT_SEED_COLORS,
 		background,
