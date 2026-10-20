@@ -1255,4 +1255,57 @@ test.describe( 'Draggable text (@firefox, @webkit)', () => {
 			},
 		] );
 	} );
+
+	test( 'splits the paragraph for paragraphs dropped from outside the editor', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First-third</p>
+<!-- /wp:paragraph -->` );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const target = await pointAt( page, paragraph, 6 );
+		const frameBox = await page
+			.locator( '[name="editor-canvas"]' )
+			.boundingBox();
+
+		await paragraph.evaluate(
+			( node, [ clientX, clientY ] ) => {
+				const { defaultView } = node.ownerDocument;
+				const dataTransfer = new defaultView.DataTransfer();
+				dataTransfer.setData( 'text/plain', 'Second\n\nThird' );
+				dataTransfer.setData(
+					'text/html',
+					'<p>Second</p><p>Third</p>'
+				);
+				node.dispatchEvent(
+					new defaultView.DragEvent( 'drop', {
+						bubbles: true,
+						cancelable: true,
+						clientX,
+						clientY,
+						dataTransfer,
+					} )
+				);
+			},
+			[ target.x - frameBox.x, target.y - frameBox.y ]
+		);
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First-Second' } },
+			{ name: 'core/paragraph', attributes: { content: 'Thirdthird' } },
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First-third' },
+			},
+		] );
+	} );
 } );

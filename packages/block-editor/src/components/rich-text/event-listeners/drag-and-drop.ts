@@ -50,6 +50,55 @@ function stopPropagation( event: Event ) {
 	event.stopPropagation();
 }
 
+function isTextDrop( ownerDocument: Document, dataTransfer: DataTransfer ) {
+	const types = Array.from( dataTransfer.types );
+	return (
+		!! ownerDocument.caretPositionFromPoint &&
+		! types.includes( 'wp-blocks' ) &&
+		! types.includes( 'Files' ) &&
+		( types.includes( 'text/plain' ) || types.includes( 'text/html' ) )
+	);
+}
+
+/**
+ * Returns the field a text drop lands in, and the offset in it.
+ *
+ * @param event Drop event.
+ */
+export function getTextDropPoint( event: DragEvent ) {
+	const { ownerDocument } = event.target as Node;
+	if (
+		! ownerDocument ||
+		! isTextDrop( ownerDocument, event.dataTransfer! )
+	) {
+		return;
+	}
+	const position = ownerDocument.caretPositionFromPoint(
+		event.clientX,
+		event.clientY
+	);
+	if ( ! position ) {
+		return;
+	}
+	const { offsetNode } = position;
+	const element = (
+		offsetNode.nodeType === offsetNode.ELEMENT_NODE
+			? ( offsetNode as Element )
+			: offsetNode.parentElement
+	)?.closest< HTMLElement >( '[data-wp-block-attribute-key]' );
+	if ( ! element?.isContentEditable ) {
+		return;
+	}
+	const range = ownerDocument.createRange();
+	range.setStart( offsetNode, position.offset );
+	const offset = create( {
+		element,
+		range,
+		__unstableIsEditableTree: true,
+	} ).start as number;
+	return { element, offset };
+}
+
 /**
  * Starts a drag of the text selected in the field.
  *
@@ -68,12 +117,13 @@ export const dragStart = ( props: Props ) => ( element: HTMLElement ) => {
 	function onDragStart( event: DragEvent ) {
 		const { getValue, onChange } = props.current;
 		const value = getValue();
-		if (
-			event.defaultPrevented ||
-			isCollapsed( value ) ||
-			( ! element.contains( event.target as Node ) &&
-				! ownsSelection( element ) )
-		) {
+		const target = event.target as Node;
+		// The drag starts on the selected text, or on the editing host
+		// around the field when the host owns the selection.
+		const isSource =
+			element.contains( target ) ||
+			( target.contains( element ) && ownsSelection( element ) );
+		if ( event.defaultPrevented || isCollapsed( value ) || ! isSource ) {
 			return;
 		}
 
@@ -111,10 +161,13 @@ export const dragStart = ( props: Props ) => ( element: HTMLElement ) => {
 		defaultView.addEventListener( 'dragover', stopPropagation, true );
 	}
 
+	// Before the block's own drag start handler, which cancels the drags it
+	// does not carry.
 	const unsubscribeDragStart = subscribeDelegatedListener(
 		defaultView,
 		'dragstart',
-		onDragStart as EventListener
+		onDragStart as EventListener,
+		true
 	);
 	const unsubscribeDragEnd = subscribeDelegatedListener(
 		defaultView,
@@ -136,44 +189,26 @@ export const dragStart = ( props: Props ) => ( element: HTMLElement ) => {
 export const drop = ( props: Props ) => ( element: HTMLElement ) => {
 	const { ownerDocument } = element;
 
-	function isTextDrop( { dataTransfer }: DragEvent ) {
-		const types = Array.from( dataTransfer!.types );
-		return (
-			element.isContentEditable &&
-			!! ownerDocument.caretPositionFromPoint &&
-			! types.includes( 'wp-blocks' ) &&
-			! types.includes( 'Files' ) &&
-			( types.includes( 'text/plain' ) || types.includes( 'text/html' ) )
-		);
-	}
-
 	// The block drop zones cancel every drag over them, which hides the
 	// browser's drop caret and shows the block insertion point instead.
 	function onDragOver( event: DragEvent ) {
-		if ( isTextDrop( event ) ) {
+		if (
+			element.isContentEditable &&
+			isTextDrop( ownerDocument, event.dataTransfer! )
+		) {
 			event.stopPropagation();
 		}
 	}
 
 	function onDrop( event: DragEvent ) {
-		if ( event.defaultPrevented || ! isTextDrop( event ) ) {
+		if ( event.defaultPrevented ) {
 			return;
 		}
-
-		const position = ownerDocument.caretPositionFromPoint(
-			event.clientX,
-			event.clientY
-		);
-		if ( ! position || ! element.contains( position.offsetNode ) ) {
+		const point = getTextDropPoint( event );
+		if ( point?.element !== element ) {
 			return;
 		}
-		const range = ownerDocument.createRange();
-		range.setStart( position.offsetNode, position.offset );
-		let offset = create( {
-			element,
-			range,
-			__unstableIsEditableTree: true,
-		} ).start as number;
+		let { offset } = point;
 
 		const drag = textDrags.get( ownerDocument );
 		const isSameField = drag?.element === element;

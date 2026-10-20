@@ -35,8 +35,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 		isSectionBlock,
 		editedContentOnlySection,
 		getBlock,
-		getSelectionStart,
-		getSelectionEnd,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		removeBlock,
@@ -290,16 +288,8 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 					canMoveBlocks( getSelectedBlockClientIds() );
 
 				if ( ! isDirectBlockDrag && ! isMultiSelectionDrag ) {
-					const selectionStart = getSelectionStart();
-					const selectionEnd = getSelectionEnd();
-					// Rich text moves text selected within one of its fields.
-					const isTextDrag =
-						selectionStart.attributeKey !== undefined &&
-						selectionStart.clientId === selectionEnd.clientId &&
-						selectionStart.attributeKey ===
-							selectionEnd.attributeKey &&
-						selectionStart.offset !== selectionEnd.offset;
-					if ( ! isTextDrag ) {
+					// Rich text carries a drag of the text selected in a field.
+					if ( ! event.dataTransfer.types.includes( 'rich-text' ) ) {
 						event.preventDefault();
 					}
 					return;
@@ -559,8 +549,6 @@ export function useEventHandlers( { clientId, isSelected, isMultiSelected } ) {
 			getBlockRootClientId,
 			getSelectedBlockClientIds,
 			getBlock,
-			getSelectionStart,
-			getSelectionEnd,
 			isReusableBlock,
 			isTemplatePart,
 			removeBlock,
