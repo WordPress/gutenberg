@@ -13,7 +13,7 @@
 
 ### Enhancements
 
--   `ThemeProvider` uses the prebuilt ramps of the default seed colors instead of building them, so a provider seeded with the default colors (such as the default admin color scheme) builds no ramp at all.
+-   `ThemeProvider` uses the prebuilt ramps of the default seed colors instead of building them, so a provider seeded with the default colors (such as the default admin color scheme) builds no ramp at all ([#85182](https://github.com/WordPress/gutenberg/pull/85182)).
 
 ### Internal
 
