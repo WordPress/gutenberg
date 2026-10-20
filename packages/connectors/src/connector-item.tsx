@@ -280,7 +280,7 @@ export function DefaultConnectorSettings( {
 				className="connector-settings__input"
 				label={ __( 'API Key' ) }
 				value={ apiKey }
-				onValueChange={ ( value ) => {
+				onValueChange={ ( value: string ) => {
 					if ( ! readOnly ) {
 						setSaveError( null );
 						setApiKey( value );
@@ -392,7 +392,7 @@ export function ApplicationPasswordConnectorSettings( {
 				className="connector-settings__input"
 				label={ __( 'Username' ) }
 				value={ username }
-				onValueChange={ ( value ) => {
+				onValueChange={ ( value: string ) => {
 					if ( ! readOnly ) {
 						setSaveError( null );
 						setUsername( value );
@@ -406,7 +406,7 @@ export function ApplicationPasswordConnectorSettings( {
 				className="connector-settings__input"
 				label={ __( 'Application password' ) }
 				value={ readOnly ? '••••••••••••••••' : applicationPassword }
-				onValueChange={ ( value ) => {
+				onValueChange={ ( value: string ) => {
 					if ( ! readOnly ) {
 						setSaveError( null );
 						setApplicationPassword( value );
