@@ -7,8 +7,9 @@ import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import BlockCard from '../block-card';
 import BlockPreview from '../block-preview';
+import type { InserterItem } from '../../store/types';
 
-function InserterPreviewPanel( { item } ) {
+function InserterPreviewPanel( { item }: { item: InserterItem } ) {
 	const { name, title, icon, description, initialAttributes, example } = item;
 	const isReusable = isReusableBlock( item );
 	const blocks = useMemo( () => {

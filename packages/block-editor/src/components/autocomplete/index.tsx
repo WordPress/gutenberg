@@ -34,7 +34,7 @@ function useCompleters( {
 		) {
 			filteredCompleters = [
 				...filteredCompleters,
-				// The JS completer is typed as a plain object.
+				// It lists its items through `useItems`, so it has no `options`.
 				blockAutocompleter as Completer,
 			];
 		}

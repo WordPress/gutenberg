@@ -12,6 +12,8 @@ import BlockIcon from '../components/block-icon';
 import { store as blockEditorStore } from '../store';
 import { orderBy } from '../utils/sorting';
 import { orderInserterBlockItems } from '../utils/order-inserter-block-items';
+import type { InserterItem } from '../store/types';
+import type { BlockCompleter } from './types';
 
 const noop = () => {};
 const SHOWN_BLOCK_TYPES = 9;
@@ -19,15 +21,15 @@ const SHOWN_BLOCK_TYPES = 9;
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
  *
- * @return {Object} A blocks completer.
+ * @return A blocks completer.
  */
-function createBlockCompleter() {
+function createBlockCompleter(): BlockCompleter {
 	return {
 		name: 'blocks',
 		className: 'block-editor-autocompleters__block',
 		triggerPrefix: '/',
 
-		useItems( filterValue ) {
+		useItems( filterValue: string ) {
 			const { rootClientId, selectedBlockId, prioritizedBlocks } =
 				useSelect( ( select ) => {
 					const {
@@ -37,10 +39,12 @@ function createBlockCompleter() {
 						getBlockRootClientId,
 					} = select( blockEditorStore );
 					const { getActiveBlockVariation } = select( blocksStore );
-					const selectedBlockClientId = getSelectedBlockClientId();
+					// The completer runs in the selected block.
+					const selectedBlockClientId =
+						getSelectedBlockClientId() as string;
 					const { name: blockName, attributes } = getBlock(
 						selectedBlockClientId
-					);
+					)!;
 					const activeBlockVariation = getActiveBlockVariation(
 						blockName,
 						attributes
@@ -114,10 +118,10 @@ function createBlockCompleter() {
 
 			return [ options ];
 		},
-		allowContext( before, after ) {
+		allowContext( before: string, after: string ) {
 			return ! ( /\S/.test( before ) || /\S/.test( after ) );
 		},
-		getOptionCompletion( inserterItem ) {
+		getOptionCompletion( inserterItem: InserterItem ) {
 			const {
 				name,
 				initialAttributes,
@@ -138,7 +142,10 @@ function createBlockCompleter() {
 								name,
 								initialAttributes,
 								createBlocksFromInnerBlocksTemplate(
-									innerBlocks
+									// Variations hold inner block templates.
+									innerBlocks as Parameters<
+										typeof createBlocksFromInnerBlocksTemplate
+									>[ 0 ]
 								),
 								innerContent
 							),

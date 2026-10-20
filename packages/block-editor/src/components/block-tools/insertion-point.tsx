@@ -1,10 +1,4 @@
-import type {
-	ComponentProps,
-	ComponentType,
-	FocusEvent,
-	MouseEvent,
-	RefAttributes,
-} from 'react';
+import type { FocusEvent, MouseEvent } from 'react';
 import clsx from 'clsx';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -15,7 +9,7 @@ import {
 } from '@wordpress/element';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { useReducedMotion } from '@wordpress/compose';
-import UntypedInserter from '../inserter';
+import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import BlockPopoverInbetween from '../block-popover/inbetween';
 import BlockDropZonePopover from '../block-popover/drop-zone';
@@ -25,12 +19,6 @@ import type {
 	InsertionPointOpenRefValue,
 	InsertionPointProps,
 } from './types';
-
-// The inserter is still JavaScript, so its inferred props are all required.
-type TypedInserter = ComponentType<
-	Partial< ComponentProps< typeof UntypedInserter > > &
-		RefAttributes< unknown >
->;
 
 export const InsertionPointOpenRef = createContext<
 	InsertionPointOpenRefValue | undefined
@@ -43,8 +31,6 @@ function InbetweenInsertionPointPopover( {
 	operation = 'insert',
 	nearestSide = 'right',
 }: InbetweenInsertionPointPopoverProps ) {
-	// Read on render, like the JSX it replaces, as the imports are circular.
-	const Inserter = UntypedInserter as TypedInserter;
 	const { selectBlock, hideInsertionPoint } = useDispatch( blockEditorStore );
 	// Block tools provide the ref.
 	const openRef = useContext( InsertionPointOpenRef )!;

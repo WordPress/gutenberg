@@ -22,7 +22,7 @@ export type KeyedOption = {
 	key: string;
 	value: any;
 	label: OptionLabel;
-	keywords: Array< string >;
+	keywords?: Array< string >;
 	isDisabled: boolean;
 };
 

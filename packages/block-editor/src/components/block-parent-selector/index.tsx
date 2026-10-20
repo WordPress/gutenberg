@@ -3,6 +3,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useRef } from '@wordpress/element';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 import useBlockDisplayInformation from '../use-block-display-information';
 import BlockIcon from '../block-icon';
@@ -15,7 +16,7 @@ import { unlock } from '../../lock-unlock';
  * Block parent selector component, displaying the hierarchy of the
  * current block selection as a single icon to "go up" a level.
  *
- * @return {Component} Parent block selector.
+ * @return Parent block selector.
  */
 export default function BlockParentSelector() {
 	const { selectBlock } = useDispatch( blockEditorStore );
@@ -53,7 +54,11 @@ export default function BlockParentSelector() {
 			// by typing: Enter continues it, and users know that.
 			const isTextFlowWrapper =
 				parentBlockType?.merge ||
-				hasBlockSupport( parentBlockType, '__experimentalOnMerge' );
+				// A missing block type has no support.
+				hasBlockSupport(
+					parentBlockType as BlockType,
+					'__experimentalOnMerge'
+				);
 			// Enter adds a sibling when a child splits, so the plus is only
 			// for parents with an allowed list where no block splits.
 			const allowedBlocks =
@@ -88,7 +93,7 @@ export default function BlockParentSelector() {
 
 	// Allows highlighting the parent block outline when focusing or hovering
 	// the parent block selector within the child.
-	const nodeRef = useRef();
+	const nodeRef = useRef< HTMLDivElement >( null );
 	const showHoveredOrFocusedGestures = useShowHoveredOrFocusedGestures( {
 		ref: nodeRef,
 		highlightParent: true,
@@ -101,7 +106,8 @@ export default function BlockParentSelector() {
 			label={ sprintf(
 				/* translators: %s: Name of the block's parent. */
 				__( 'Select parent block: %s' ),
-				blockInformation?.title
+				// The selector shows only for a parent, which has a title.
+				blockInformation?.title as string
 			) }
 			showTooltip
 			icon={ <BlockIcon icon={ blockInformation?.icon } /> }

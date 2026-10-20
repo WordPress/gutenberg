@@ -1,4 +1,3 @@
-import type { ComponentProps, ComponentType, RefAttributes } from 'react';
 import type { Block } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
@@ -13,15 +12,8 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import type { ListViewAppenderProps } from './types';
 
-// The inserter is still JavaScript, so its inferred props are all required.
-type TypedInserter = ComponentType<
-	Partial< ComponentProps< typeof Inserter > > & RefAttributes< HTMLElement >
->;
-
 export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 	( { nestingLevel, blockCount, clientId, ...props }, ref ) => {
-		// Read on render, like the JSX it replaces, as the imports are circular.
-		const AppenderInserter = Inserter as TypedInserter;
 		const { setInsertedBlockClientId } = useListViewContext();
 		const insertedBlockClientId = useInsertedBlockClientId();
 
@@ -90,7 +82,7 @@ export const Appender = forwardRef< HTMLElement, ListViewAppenderProps >(
 
 		return (
 			<div className="list-view-appender">
-				<AppenderInserter
+				<Inserter
 					ref={ ref }
 					rootClientId={ clientId }
 					position="bottom right"

@@ -7,6 +7,7 @@ import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import useBlockTypesState from './hooks/use-block-types-state';
 import { store as blockEditorStore } from '../../store';
+import type { QuickInserterProps } from './types';
 
 const SEARCH_THRESHOLD = 6;
 const SHOWN_BLOCK_TYPES = 6;
@@ -19,7 +20,7 @@ export default function QuickInserter( {
 	isAppender,
 	selectBlockOnInsert,
 	hasSearch = true,
-} ) {
+}: QuickInserterProps ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
@@ -39,7 +40,8 @@ export default function QuickInserter( {
 			const { getSettings, getBlockIndex, getBlockCount } =
 				select( blockEditorStore );
 			const settings = getSettings();
-			const index = getBlockIndex( clientId );
+			// A missing client ID has no index.
+			const index = getBlockIndex( clientId as string );
 			const blockCount = getBlockCount();
 
 			return {
@@ -61,7 +63,8 @@ export default function QuickInserter( {
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected.
 	const onBrowseAll = () => {
-		setInserterIsOpened( {
+		// The button renders only with the setting.
+		setInserterIsOpened!( {
 			filterValue,
 			onSelect,
 			rootClientId,

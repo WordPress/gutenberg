@@ -1,7 +1,9 @@
+import type { ForwardedRef } from 'react';
 import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { PrivateInserterMenu } from './menu';
 import { store as blockEditorStore } from '../../store';
+import type { InserterLibraryProps } from './types';
 
 const noop = () => {};
 
@@ -20,14 +22,17 @@ function InserterLibrary(
 		onSelect = noop,
 		shouldFocusBlock = false,
 		onClose,
-	},
-	ref
+	}: InserterLibraryProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const { destinationRootClientId } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId } = select( blockEditorStore );
 			const _rootClientId =
-				rootClientId || getBlockRootClientId( clientId ) || undefined;
+				rootClientId ||
+				// A missing client ID has no root.
+				getBlockRootClientId( clientId as string ) ||
+				undefined;
 			return {
 				destinationRootClientId: _rootClientId,
 			};
@@ -57,7 +62,10 @@ function InserterLibrary(
 
 export const PrivateInserterLibrary = forwardRef( InserterLibrary );
 
-function PublicInserterLibrary( props, ref ) {
+function PublicInserterLibrary(
+	props: Omit< InserterLibraryProps, 'onPatternCategorySelection' >,
+	ref: ForwardedRef< HTMLDivElement >
+) {
 	return (
 		<PrivateInserterLibrary
 			{ ...props }
