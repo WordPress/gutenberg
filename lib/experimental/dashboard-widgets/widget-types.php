@@ -395,6 +395,21 @@ function gutenberg_sanitize_widget_icon( $icon ) {
 }
 
 /**
+ * Constrains a widget footprint to one of the allowed forms. Anything else
+ * drops silently, so an unknown form degrades to no floor rather than warn.
+ *
+ * @param string|null $footprint Footprint from the build manifest.
+ * @return string|null The footprint, or null when the value is not allowed.
+ */
+function gutenberg_sanitize_widget_footprint( $footprint ) {
+	if ( ! is_string( $footprint ) || ! in_array( $footprint, WP_Widget_Type::FOOTPRINT_VALUES, true ) ) {
+		return null;
+	}
+
+	return $footprint;
+}
+
+/**
  * Hydrates the widget type registry from the build manifest.
  *
  * Iterates the widgets discovered by the build pipeline (via
@@ -423,6 +438,7 @@ function gutenberg_register_widget_types() {
 				'render_module' => $widget['render_module'] ?? null,
 				'widget_module' => $widget['widget_module'] ?? null,
 				'presentation'  => $widget['presentation'] ?? null,
+				'footprint'     => gutenberg_sanitize_widget_footprint( $widget['footprint'] ?? null ),
 				'category'      => $widget['category'] ?? null,
 				'title'         => $widget['title'] ?? null,
 				'description'   => $widget['description'] ?? null,

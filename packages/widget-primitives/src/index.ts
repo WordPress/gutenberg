@@ -36,6 +36,7 @@ export type {
 	WidgetIcon,
 	WidgetIconReference,
 	WidgetRelevance,
+	WidgetFootprint,
 	WidgetType,
 	WidgetAction,
 	WidgetActionEnvelope,

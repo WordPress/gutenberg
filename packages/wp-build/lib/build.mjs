@@ -2001,7 +2001,7 @@ async function buildAllWidgets() {
  * Discover all widgets and collect their registry-facing data.
  * Widgets without a valid widget.json are skipped.
  *
- * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, attributes: import('./widget-utils.mjs').WidgetAttributeMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
+ * @return {Array<{ name: string, dirName: string, title: string | null, description: string | null, help: import('./widget-utils.mjs').WidgetHelpMetadata | null, icon: string | null, actions: import('./widget-utils.mjs').WidgetActionMetadata[] | null, attributes: import('./widget-utils.mjs').WidgetAttributeMetadata[] | null, hasRender: boolean, hasWidget: boolean, presentation: string | null, footprint: string | null, category: string | null, keywords: string[] | null, textdomain: string | null }>} Array of widget objects.
  */
 function collectWidgets() {
 	return getAllWidgets( ROOT_DIR ).flatMap( ( widgetName ) => {
@@ -2029,6 +2029,7 @@ function collectWidgets() {
 				hasRender: widgetFiles.hasRender,
 				hasWidget: widgetFiles.hasWidget,
 				presentation: metadata.presentation ?? null,
+				footprint: metadata.footprint ?? null,
 				category: metadata.category ?? null,
 				keywords: metadata.keywords ?? null,
 				textdomain: metadata.textdomain ?? null,
@@ -2257,6 +2258,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 			const hasRenderStr = widget.hasRender ? 'true' : 'false';
 			const hasWidgetStr = widget.hasWidget ? 'true' : 'false';
 			const presentationStr = toPhpStringLiteral( widget.presentation );
+			const footprintStr = toPhpStringLiteral( widget.footprint );
 			const categoryStr = toPhpStringLiteral( widget.category );
 			const titleStr = toPhpStringLiteral( widget.title );
 			const descriptionStr = toPhpStringLiteral( widget.description );
@@ -2278,6 +2280,7 @@ async function generateWidgetRegistry( widgets, replacements ) {
 		'has_render'   => ${ hasRenderStr },
 		'has_widget'   => ${ hasWidgetStr },
 		'presentation' => ${ presentationStr },
+		'footprint'    => ${ footprintStr },
 		'category'     => ${ categoryStr },
 		'keywords'     => ${ keywordsStr },
 		'textdomain'   => ${ textdomainStr },

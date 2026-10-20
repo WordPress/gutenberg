@@ -14,5 +14,6 @@
 	],
 	"category": "dashboard",
 	"presentation": "content-bleed",
+	"footprint": "card",
 	"textdomain": "default"
 }

@@ -60,6 +60,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 				'render_module' => 'wp/widgets/widget-a/render',
 				'widget_module' => 'wp/widgets/widget-a/widget',
 				'category'      => 'dashboard',
+				'footprint'     => 'panel',
 				'title'         => 'Widget A',
 				'description'   => 'The first test widget.',
 				'help'          => array(
@@ -156,6 +157,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( 'wp/widgets/widget-a/render', $data['render_module'] );
 		$this->assertSame( 'wp/widgets/widget-a/widget', $data['widget_module'] );
 		$this->assertSame( 'dashboard', $data['category'] );
+		$this->assertSame( 'panel', $data['footprint'] );
 		$this->assertSame( 'Widget A', $data['title'] );
 		$this->assertSame( 'The first test widget.', $data['description'] );
 		$this->assertSame(
@@ -248,6 +250,7 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertArrayHasKey( 'actions', $properties );
 		$this->assertArrayHasKey( 'attributes', $properties );
 		$this->assertArrayHasKey( 'keywords', $properties );
+		$this->assertArrayHasKey( 'footprint', $properties );
 		$this->assertSame( 'string', $properties['name']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['render_module']['type'] );
 		$this->assertSame( array( 'string', 'null' ), $properties['widget_module']['type'] );
@@ -259,6 +262,11 @@ class WP_REST_Widget_Modules_Controller_Test extends WP_UnitTestCase {
 		$this->assertSame( array( 'array', 'null' ), $properties['actions']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['attributes']['type'] );
 		$this->assertSame( array( 'array', 'null' ), $properties['keywords']['type'] );
+		$this->assertSame( array( 'string', 'null' ), $properties['footprint']['type'] );
+		$this->assertSame(
+			array( 'glance', 'strip', 'card', 'panel', null ),
+			$properties['footprint']['enum']
+		);
 
 		$action_properties = $properties['actions']['items']['properties'];
 		$this->assertArrayHasKey( 'icon', $action_properties );

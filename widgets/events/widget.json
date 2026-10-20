@@ -5,6 +5,7 @@
 	"icon": "core/calendar",
 	"category": "dashboard",
 	"presentation": "content-bleed",
+	"footprint": "card",
 	"actions": [
 		{
 			"id": "meetups",

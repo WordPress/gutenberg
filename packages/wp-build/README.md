@@ -642,6 +642,7 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 - **`attributes`** (optional): Attribute schema, one entry per attribute with the JSON-expressible subset of a DataViews `Field` (`id`, `type`, `label`, `elements`, `isValid` without `custom`, ...) plus an optional `relevance` (`high`, `medium`, `low`). `type` may name a registered field type. `label`, `header`, `description`, `placeholder`, and option labels and descriptions are translated server-side using `textdomain`.
 - **`category`** (optional): Grouping category for filtering
 - **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
+- **`footprint`** (optional): The smallest form the widget's content can take (`glance`, `strip`, `card`, `panel`); hosts translate it into a minimum tile size
 - **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, `keywords`, and attribute labels
 
 ### `widget.ts` — runtime values
