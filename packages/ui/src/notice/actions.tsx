@@ -2,7 +2,6 @@ import { forwardRef } from '@wordpress/element';
 import { useRender, mergeProps } from '@base-ui/react';
 import type { ActionsProps } from './types';
 import styles from './style.module.css';
-import { NoticeTextContext } from './context';
 
 /**
  * A container for Notice.ActionButton and Notice.ActionLink.
@@ -21,10 +20,6 @@ export const Actions = forwardRef< HTMLDivElement, ActionsProps >(
 			),
 		} );
 
-		return (
-			<NoticeTextContext.Provider value={ null }>
-				{ element }
-			</NoticeTextContext.Provider>
-		);
+		return element;
 	}
 );
