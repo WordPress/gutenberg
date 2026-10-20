@@ -30,7 +30,7 @@ export function setClipboardBlocks(
 	blocks: Block[],
 	registry: DataRegistry
 ) {
-	let _blocks: Block | Block[] = blocks;
+	let _blocks: Block[] = blocks;
 
 	const [ firstBlock ] = blocks;
 
@@ -74,7 +74,7 @@ export function setClipboardBlocks(
 	 * that cannot be intercepted at the far end.
 	 */
 	const serialized = serialize(
-		applyFilters( 'blockEditor.copiedBlocks', _blocks )
+		applyFilters( 'blockEditor.copiedBlocks', _blocks ) as Block[]
 	);
 
 	// Copy and cut events carry clipboard data.
