@@ -27,7 +27,7 @@ interface MediaReplaceFlowBaseProps {
 	/** The Ids of the attachments of a gallery. */
 	mediaIds?: number[];
 	/** A list of media types allowed to replace the current media. */
-	allowedTypes: string[];
+	allowedTypes?: string[];
 	/** Comma delimited list of MIME types accepted for upload. */
 	accept?: string;
 	/**
@@ -62,8 +62,8 @@ interface MediaReplaceFlowBaseProps {
 	 * prop as an argument.
 	 */
 	children?: ReactNode | ( ( props: { onClose: () => void } ) => ReactNode );
-	/** Whether to allow selecting multiple media. */
-	multiple?: boolean;
+	/** Whether to allow selecting multiple media. `add` works like `true`. */
+	multiple?: boolean | 'add';
 	/** Whether the gallery modal opens in the media library. */
 	addToGallery?: boolean;
 	/** Variant of the popover. */

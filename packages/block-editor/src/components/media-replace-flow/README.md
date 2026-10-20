@@ -29,7 +29,7 @@ The Id of the attachment post type for the current media.
 A list of media types allowed to replace the current media.
 
 -   Type: `Array`
--   Required: Yes
+-   Required: No
 
 ### accept
 
