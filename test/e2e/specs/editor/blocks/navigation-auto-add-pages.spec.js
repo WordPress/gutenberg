@@ -114,6 +114,76 @@ test.describe( 'Navigation block: Auto add pages', () => {
 		).toContainText( 'Auto added page', { timeout: 10000 } );
 	} );
 
+	test( 'a child page is nested under the link to its parent', async ( {
+		admin,
+		editor,
+		requestUtils,
+	} ) => {
+		const parent = await requestUtils.createPage( {
+			title: 'Parent page',
+			status: 'publish',
+		} );
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Main menu',
+			content: `<!-- wp:navigation-link {"label":"Parent page","type":"page","kind":"post-type","id":${ parent.id },"url":"${ parent.link }"} /-->`,
+			meta: { [ META_KEY ]: true },
+		} );
+		const child = await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/pages',
+			data: {
+				title: 'Child page',
+				status: 'draft',
+				parent: parent.id,
+			},
+		} );
+
+		await admin.editPost( child.id );
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: { ref: menu.id },
+		} );
+
+		const navigationBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await expect(
+			navigationBlock.getByRole( 'document', {
+				name: 'Block: Page Link',
+			} )
+		).toContainText( 'Parent page' );
+
+		await editor.publishPost();
+
+		// The server turned the parent link into a submenu holding the child;
+		// the block must pick it up without a reload.
+		const submenu = navigationBlock.getByRole( 'document', {
+			name: 'Block: Submenu',
+		} );
+		await expect( submenu ).toContainText( 'Parent page', {
+			timeout: 10000,
+		} );
+
+		// The submenu only shows its items while it is being edited, so check
+		// the block tree for the child instead.
+		const menuBlocks = await editor.getBlocks( {
+			clientId: await navigationBlock.getAttribute( 'data-block' ),
+		} );
+		expect( menuBlocks ).toMatchObject( [
+			{
+				name: 'core/navigation-submenu',
+				attributes: { label: 'Parent page', id: parent.id },
+				innerBlocks: [
+					{
+						name: 'core/navigation-link',
+						attributes: { label: 'Child page', id: child.id },
+						innerBlocks: [],
+					},
+				],
+			},
+		] );
+	} );
+
 	test( 'turning the setting off is saved with the post', async ( {
 		admin,
 		editor,

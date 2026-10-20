@@ -195,19 +195,11 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 		$this->assertSame( $content, get_post( $menu_id )->post_content );
 	}
 
-	public function test_child_pages_other_post_types_and_republished_pages_are_ignored() {
+	public function test_other_post_types_and_republished_pages_are_ignored() {
 		$menu_id = $this->create_menu( '', true );
 
 		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
 		$this->assertCount( 1, $this->get_menu_blocks( $menu_id ), 'The top-level parent is added.' );
-
-		$this->publish_new_page(
-			array(
-				'post_title'  => 'Child',
-				'post_parent' => $parent_id,
-			)
-		);
-		$this->assertCount( 1, $this->get_menu_blocks( $menu_id ), 'A child page is not added.' );
 
 		$post_id = self::factory()->post->create( array( 'post_status' => 'draft' ) );
 		wp_publish_post( $post_id );
@@ -264,6 +256,127 @@ class Gutenberg_Navigation_Auto_Add_Pages_Test extends WP_Test_REST_TestCase {
 		$this->assertCount( 1, $blocks );
 		$this->assert_page_link_block( $blocks[0], $page_id );
 		kses_remove_filters();
+	}
+
+	/*
+	 * Child pages.
+	 */
+
+	public function test_a_child_page_turns_its_parent_link_into_a_submenu() {
+		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
+		$content   = sprintf(
+			'<!-- wp:navigation-link {"label":"Home","url":"https://example.com","kind":"custom"} /--><!-- wp:navigation-link {"label":"Parent","type":"page","kind":"post-type","id":%d,"url":"%s","opensInNewTab":true,"rel":"nofollow"} /-->',
+			$parent_id,
+			get_permalink( $parent_id )
+		);
+		$menu_id   = $this->create_menu( $content, true );
+
+		$child_id = $this->publish_new_page(
+			array(
+				'post_title'  => 'Child',
+				'post_parent' => $parent_id,
+			)
+		);
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 2, $blocks, 'The child is not added at the top level.' );
+		$this->assertSame( 'Home', $blocks[0]['attrs']['label'] );
+
+		$parent = $blocks[1];
+		$this->assertSame( 'core/navigation-submenu', $parent['blockName'], 'The parent link becomes a submenu.' );
+		$this->assertSame( $parent_id, $parent['attrs']['id'] );
+		$this->assertSame( 'Parent', $parent['attrs']['label'] );
+		$this->assertSame( 'page', $parent['attrs']['type'] );
+		$this->assertSame( 'post-type', $parent['attrs']['kind'] );
+		$this->assertTrue( $parent['attrs']['opensInNewTab'], 'The parent link keeps its attributes.' );
+		$this->assertSame( 'nofollow', $parent['attrs']['rel'], 'The parent link keeps its attributes.' );
+
+		$this->assertCount( 1, $parent['innerBlocks'] );
+		$this->assert_page_link_block( $parent['innerBlocks'][0], $child_id );
+	}
+
+	public function test_a_child_page_is_appended_to_an_existing_parent_submenu() {
+		$parent_id = $this->publish_new_page( array( 'post_title' => 'Parent' ) );
+		$content   = sprintf(
+			'<!-- wp:navigation-submenu {"label":"Parent","type":"page","kind":"post-type","id":%d,"url":"%s"} --><!-- wp:navigation-link {"label":"Existing","url":"https://example.com/existing","kind":"custom"} /--><!-- /wp:navigation-submenu -->',
+			$parent_id,
+			get_permalink( $parent_id )
+		);
+		$menu_id   = $this->create_menu( $content, true );
+
+		$child_id = $this->publish_new_page(
+			array(
+				'post_title'  => 'Child',
+				'post_parent' => $parent_id,
+			)
+		);
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 1, $blocks );
+		$this->assertSame( 'core/navigation-submenu', $blocks[0]['blockName'] );
+		$this->assertCount( 2, $blocks[0]['innerBlocks'] );
+		$this->assertSame( 'Existing', $blocks[0]['innerBlocks'][0]['attrs']['label'], 'Existing items are left in place.' );
+		$this->assert_page_link_block( $blocks[0]['innerBlocks'][1], $child_id );
+	}
+
+	public function test_a_grandchild_page_nests_under_its_parent_inside_a_submenu() {
+		$grandparent_id = $this->publish_new_page( array( 'post_title' => 'Grandparent' ) );
+		$parent_id      = $this->publish_new_page(
+			array(
+				'post_title'  => 'Parent',
+				'post_parent' => $grandparent_id,
+			)
+		);
+		$content        = sprintf(
+			'<!-- wp:navigation-submenu {"label":"Grandparent","type":"page","kind":"post-type","id":%d,"url":"%s"} --><!-- wp:navigation-link {"label":"Parent","type":"page","kind":"post-type","id":%d,"url":"%s"} /--><!-- /wp:navigation-submenu -->',
+			$grandparent_id,
+			get_permalink( $grandparent_id ),
+			$parent_id,
+			get_permalink( $parent_id )
+		);
+		$menu_id        = $this->create_menu( $content, true );
+
+		$child_id = $this->publish_new_page(
+			array(
+				'post_title'  => 'Child',
+				'post_parent' => $parent_id,
+			)
+		);
+
+		$blocks = $this->get_menu_blocks( $menu_id );
+		$this->assertCount( 1, $blocks );
+		$this->assertCount( 1, $blocks[0]['innerBlocks'] );
+
+		$parent = $blocks[0]['innerBlocks'][0];
+		$this->assertSame( 'core/navigation-submenu', $parent['blockName'] );
+		$this->assertSame( $parent_id, $parent['attrs']['id'] );
+		$this->assertCount( 1, $parent['innerBlocks'] );
+		$this->assert_page_link_block( $parent['innerBlocks'][0], $child_id );
+	}
+
+	public function test_a_child_page_whose_parent_is_not_in_the_menu_is_skipped() {
+		$parent_id = self::factory()->post->create(
+			array(
+				'post_type'   => 'page',
+				'post_status' => 'publish',
+				'post_title'  => 'Parent',
+			)
+		);
+		// A custom link to the parent's URL does not count: only a link to the page itself does.
+		$content = sprintf(
+			'<!-- wp:navigation-link {"label":"Parent","url":"%s","kind":"custom"} /-->',
+			get_permalink( $parent_id )
+		);
+		$menu_id = $this->create_menu( $content, true );
+
+		$this->publish_new_page(
+			array(
+				'post_title'  => 'Child',
+				'post_parent' => $parent_id,
+			)
+		);
+
+		$this->assertSame( $content, get_post( $menu_id )->post_content );
 	}
 
 	/*

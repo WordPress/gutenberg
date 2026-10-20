@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   Navigation: Add an "Auto add pages" menu setting. While it is on, publishing a top-level page appends a link to the menu, as classic menus do. The default menu a site creates for itself now starts as one link per published page with the setting on, instead of a Page List block ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
+-   Navigation: Add an "Auto add pages" menu setting. While it is on, publishing a page adds a link to the menu, as classic menus do: a top-level page is appended, and a child page is nested under the link to its parent, which becomes a submenu. The default menu a site creates for itself now starts as one link per published page with the setting on, instead of a Page List block ([#84508](https://github.com/WordPress/gutenberg/pull/84508)).
 
 ### Bug Fixes
 

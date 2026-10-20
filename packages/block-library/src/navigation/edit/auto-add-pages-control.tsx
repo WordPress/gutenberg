@@ -70,7 +70,7 @@ export default function AutoAddPagesControl( {
 				<SwitchControl
 					label={ __( 'Auto add pages' ) }
 					description={ __(
-						'Add a link to each new top-level page when it is published.'
+						'Add a link to each new page when it is published. A child page is added under the link to its parent.'
 					) }
 					checked={ isEnabled }
 					onCheckedChange={ setEnabled }

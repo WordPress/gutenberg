@@ -5,9 +5,11 @@
  * Replaces the Page List block as the default content of a Navigation Menu.
  * The fallback menu a site creates for itself starts as individual link
  * blocks, one per published page, with the setting switched on. While it is
- * on, publishing a new top-level page appends a link for it to the menu, the
- * way classic menus do with their "Automatically add new top-level pages"
- * option. Existing items are never reordered, renamed or removed.
+ * on, publishing a new page adds a link for it to the menu, the way classic
+ * menus do with their "Automatically add new top-level pages" option. A
+ * top-level page is appended to the menu; a child page is nested under its
+ * parent's link when the menu has one, which turns that link into a submenu.
+ * Existing items are never reordered, renamed or removed.
  *
  * @package gutenberg
  */
@@ -30,7 +32,7 @@ function gutenberg_register_navigation_auto_add_pages_meta() {
 		'wp_navigation_auto_add_pages',
 		array(
 			'type'              => 'boolean',
-			'description'       => __( 'Whether newly published top-level pages are added to the menu.', 'gutenberg' ),
+			'description'       => __( 'Whether newly published pages are added to the menu.', 'gutenberg' ),
 			'single'            => true,
 			'default'           => false,
 			'sanitize_callback' => 'rest_sanitize_boolean',
@@ -77,6 +79,25 @@ function gutenberg_navigation_build_page_link_block( $page, $inner_blocks = arra
 }
 
 /**
+ * Checks whether a block is a Navigation Link or Submenu pointing at a page.
+ *
+ * @param array $block   Parsed block.
+ * @param int   $page_id Page ID.
+ * @return bool Whether the block links to the page.
+ */
+function gutenberg_navigation_block_links_to_page( $block, $page_id ) {
+	if ( ! in_array( $block['blockName'], array( 'core/navigation-link', 'core/navigation-submenu' ), true ) ) {
+		return false;
+	}
+	if ( ! isset( $block['attrs']['id'] ) || (int) $block['attrs']['id'] !== (int) $page_id ) {
+		return false;
+	}
+	$kind = isset( $block['attrs']['kind'] ) ? $block['attrs']['kind'] : '';
+	$type = isset( $block['attrs']['type'] ) ? $block['attrs']['type'] : '';
+	return 'post-type' === $kind || 'page' === $type;
+}
+
+/**
  * Checks whether any block in a tree links to the given page.
  *
  * @param array[] $blocks  Parsed blocks.
@@ -85,13 +106,8 @@ function gutenberg_navigation_build_page_link_block( $page, $inner_blocks = arra
  */
 function gutenberg_navigation_blocks_link_to_page( $blocks, $page_id ) {
 	foreach ( $blocks as $block ) {
-		$is_link = in_array( $block['blockName'], array( 'core/navigation-link', 'core/navigation-submenu' ), true );
-		if ( $is_link && isset( $block['attrs']['id'] ) && (int) $block['attrs']['id'] === (int) $page_id ) {
-			$kind = isset( $block['attrs']['kind'] ) ? $block['attrs']['kind'] : '';
-			$type = isset( $block['attrs']['type'] ) ? $block['attrs']['type'] : '';
-			if ( 'post-type' === $kind || 'page' === $type ) {
-				return true;
-			}
+		if ( gutenberg_navigation_block_links_to_page( $block, $page_id ) ) {
+			return true;
 		}
 		if ( ! empty( $block['innerBlocks'] ) && gutenberg_navigation_blocks_link_to_page( $block['innerBlocks'], $page_id ) ) {
 			return true;
@@ -102,12 +118,42 @@ function gutenberg_navigation_blocks_link_to_page( $blocks, $page_id ) {
 }
 
 /**
- * Appends a link to a newly published top-level page to every Navigation Menu
- * that has "Auto add pages" switched on.
+ * Nests a block under the first block in a tree that links to the given page.
  *
- * Mirrors `_wp_auto_add_pages_to_menu()` for classic menus: only the
- * transition into `publish` counts, child pages are skipped, and a page the
- * menu already links to is not added again.
+ * A Navigation Link for the page becomes a Navigation Submenu with the same
+ * attributes, so the link keeps working as before and gains a submenu.
+ *
+ * @param array[] $blocks    Parsed blocks, modified in place.
+ * @param int     $parent_id Page ID the parent block links to.
+ * @param array   $new_block Parsed block to nest under the parent.
+ * @return bool Whether a parent block was found.
+ */
+function gutenberg_navigation_nest_block_under_page( &$blocks, $parent_id, $new_block ) {
+	foreach ( $blocks as &$block ) {
+		if ( gutenberg_navigation_block_links_to_page( $block, $parent_id ) ) {
+			$block['blockName']     = 'core/navigation-submenu';
+			$block['innerBlocks'][] = $new_block;
+			$block['innerHTML']     = '';
+			$block['innerContent']  = array_fill( 0, count( $block['innerBlocks'] ), null );
+			return true;
+		}
+		if ( ! empty( $block['innerBlocks'] ) && gutenberg_navigation_nest_block_under_page( $block['innerBlocks'], $parent_id, $new_block ) ) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Adds a link to a newly published page to every Navigation Menu that has
+ * "Auto add pages" switched on.
+ *
+ * A top-level page is appended to the menu. A child page is nested under the
+ * link to its parent, which becomes a submenu; a menu with no link to the
+ * parent is left alone. Like `_wp_auto_add_pages_to_menu()` for classic
+ * menus, only the transition into `publish` counts, and a page the menu
+ * already links to is not added again.
  *
  * @param string  $new_status New post status.
  * @param string  $old_status Old post status.
@@ -115,9 +161,6 @@ function gutenberg_navigation_blocks_link_to_page( $blocks, $page_id ) {
  */
 function gutenberg_navigation_auto_add_page_on_publish( $new_status, $old_status, $post ) {
 	if ( 'publish' !== $new_status || 'publish' === $old_status || 'page' !== $post->post_type ) {
-		return;
-	}
-	if ( ! empty( $post->post_parent ) ) {
 		return;
 	}
 
@@ -138,7 +181,13 @@ function gutenberg_navigation_auto_add_page_on_publish( $new_status, $old_status
 		if ( gutenberg_navigation_blocks_link_to_page( $blocks, $post->ID ) ) {
 			continue;
 		}
-		$blocks[] = gutenberg_navigation_build_page_link_block( $post );
+
+		$link = gutenberg_navigation_build_page_link_block( $post );
+		if ( empty( $post->post_parent ) ) {
+			$blocks[] = $link;
+		} elseif ( ! gutenberg_navigation_nest_block_under_page( $blocks, $post->post_parent, $link ) ) {
+			continue;
+		}
 
 		wp_update_post(
 			array(
