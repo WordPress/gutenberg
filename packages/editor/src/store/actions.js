@@ -30,7 +30,7 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import { EDITOR_INTENT_SUGGEST } from './constants';
+import { AUTOSAVE_RETRY_SLOT, EDITOR_INTENT_SUGGEST } from './constants';
 import {
 	classifySuggestedPostEdits,
 	getPostFieldProposalId,
@@ -45,7 +45,6 @@ import attachMediaInPost from './utils/attach-media-in-post';
 import { unlock } from '../lock-unlock';
 import { setCanvasWidth } from './private-actions';
 import { getCanvasWidthByDeviceType } from '../utils/device-type';
-import { AUTOSAVE_RETRY_SLOT } from './constants';
 
 // Edits the read-only `view` intent lets through; see `editPost`.
 const VIEW_UNGUARDED_POST_FIELDS = [ 'blocks', 'content', 'selection' ];
