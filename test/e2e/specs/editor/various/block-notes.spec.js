@@ -398,16 +398,15 @@ test.describe( 'Block Notes', () => {
 
 		await search.fill( '' );
 		await sidebar.getByRole( 'button', { name: 'Filter' } ).click();
-		// The filter options open in a popover outside the sidebar.
-		const status = page.getByRole( 'combobox', { name: 'Status' } );
-		await status.selectOption( 'Resolved' );
+		await page.getByRole( 'menuitemradio', { name: 'Resolved' } ).click();
 		await expect( headingThread ).toBeVisible();
 		await expect( imageThread ).toBeHidden();
+
+		// The menu stays open, so Status and Author can both be set.
 		await expect(
 			sidebar.getByRole( 'button', { name: 'Filter (1 applied)' } )
 		).toBeVisible();
-
-		await status.selectOption( 'Open' );
+		await page.getByRole( 'menuitemradio', { name: 'Open' } ).click();
 		await expect( imageThread ).toBeVisible();
 		await expect( headingThread ).toBeHidden();
 	} );

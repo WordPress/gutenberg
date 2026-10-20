@@ -1,8 +1,8 @@
 import {
-	Button,
-	Dropdown,
+	DropdownMenu,
+	MenuGroup,
+	MenuItemsChoice,
 	SearchControl,
-	SelectControl as WCSelectControl,
 } from '@wordpress/components';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { __, _n, _x, sprintf } from '@wordpress/i18n';
@@ -55,7 +55,7 @@ export function shouldExpandReplies( filters: NotesFilterValues ) {
 }
 
 /**
- * Counts the filters set in the filter dropdown. Search is left out since its
+ * Counts the filters set in the filter menu. Search is left out since its
  * field is always shown.
  *
  * @param filters Filter values.
@@ -139,6 +139,9 @@ export function filterNotes< T extends Note >(
 	} );
 }
 
+// `MenuItemsChoice` types require `onHover`, though nothing here uses it.
+const noop = () => {};
+
 type NotesFiltersProps = {
 	notes: Note[];
 	filters: NotesFilterValues;
@@ -174,81 +177,84 @@ export function NotesFilters( {
 				value={ filters.search }
 				onChange={ ( search ) => onChange( { ...filters, search } ) }
 			/>
-			<Dropdown
-				className="editor-collab-sidebar-filters__toggle"
-				popoverProps={ { placement: 'bottom-end' } }
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<>
-						<Button
-							__next40pxDefaultSize
-							icon={ funnel }
-							label={
-								panelFilterCount
-									? sprintf(
-											/* translators: %d: Number of filters applied. */
-											_n(
-												'Filter (%d applied)',
-												'Filter (%d applied)',
-												panelFilterCount
-											),
-											panelFilterCount
-										)
-									: _x( 'Filter', 'verb' )
-							}
-							aria-expanded={ isOpen }
-							isPressed={ isOpen }
-							onClick={ onToggle }
-						/>
-						{ panelFilterCount > 0 && (
-							<span
-								className="editor-collab-sidebar-filters__count"
-								aria-hidden="true"
-							>
-								{ panelFilterCount }
-							</span>
-						) }
-					</>
-				) }
-				renderContent={ () => (
-					<Stack
-						className="editor-collab-sidebar-filters__options"
-						direction="column"
-						gap="md"
-					>
-						<WCSelectControl
-							label={ __( 'Status' ) }
-							value={ filters.status }
-							options={ [
-								{ label: __( 'All' ), value: 'all' },
-								{ label: __( 'Open' ), value: 'hold' },
-								{ label: __( 'Resolved' ), value: 'approved' },
-							] }
-							onChange={ ( status ) =>
-								onChange( { ...filters, status } )
-							}
-						/>
-						{ ( authors.size > 1 || filters.author !== 'all' ) && (
-							<WCSelectControl
-								label={ __( 'Author' ) }
-								value={ filters.author }
-								options={ [
-									{ label: __( 'All' ), value: 'all' },
-									...Array.from(
-										authors,
-										( [ value, label ] ) => ( {
-											label,
-											value,
-										} )
+			<div className="editor-collab-sidebar-filters__toggle">
+				<DropdownMenu
+					icon={ funnel }
+					label={
+						panelFilterCount
+							? sprintf(
+									/* translators: %d: Number of filters applied. */
+									_n(
+										'Filter (%d applied)',
+										'Filter (%d applied)',
+										panelFilterCount
 									),
-								] }
-								onChange={ ( author ) =>
-									onChange( { ...filters, author } )
-								}
-							/>
-						) }
-					</Stack>
+									panelFilterCount
+								)
+							: _x( 'Filter', 'verb' )
+					}
+					toggleProps={ { __next40pxDefaultSize: true } }
+					popoverProps={ { placement: 'bottom-end' } }
+				>
+					{ () => (
+						<>
+							<MenuGroup label={ __( 'Status' ) }>
+								<MenuItemsChoice
+									choices={ [
+										{ label: __( 'All' ), value: 'all' },
+										{ label: __( 'Open' ), value: 'hold' },
+										{
+											label: __( 'Resolved' ),
+											value: 'approved',
+										},
+									] }
+									value={ filters.status }
+									onHover={ noop }
+									onSelect={ ( status ) =>
+										onChange( {
+											...filters,
+											status: status as NoteStatusFilter,
+										} )
+									}
+								/>
+							</MenuGroup>
+							{ ( authors.size > 1 ||
+								filters.author !== 'all' ) && (
+								<MenuGroup label={ __( 'Author' ) }>
+									<MenuItemsChoice
+										choices={ [
+											{
+												label: __( 'All' ),
+												value: 'all',
+											},
+											...Array.from(
+												authors,
+												( [ value, label ] ) => ( {
+													label,
+													value,
+												} )
+											),
+										] }
+										value={ filters.author }
+										onHover={ noop }
+										onSelect={ ( author ) =>
+											onChange( { ...filters, author } )
+										}
+									/>
+								</MenuGroup>
+							) }
+						</>
+					) }
+				</DropdownMenu>
+				{ panelFilterCount > 0 && (
+					<span
+						className="editor-collab-sidebar-filters__count"
+						aria-hidden="true"
+					>
+						{ panelFilterCount }
+					</span>
 				) }
-			/>
+			</div>
 		</Stack>
 	);
 }

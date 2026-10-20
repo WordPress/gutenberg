@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { DEFAULT_NOTES_FILTERS, NotesFilters } from '../notes-filters';
@@ -15,7 +15,7 @@ const note = ( id: number, author: number ) => ( {
 } );
 
 describe( 'NotesFilters', () => {
-	it( 'shows the filters in a dropdown when the toggle is pressed', async () => {
+	it( 'shows the filters in a menu when the toggle is pressed', async () => {
 		const user = userEvent.setup();
 		render(
 			<NotesFilters
@@ -25,21 +25,17 @@ describe( 'NotesFilters', () => {
 			/>
 		);
 		expect(
-			screen.queryByRole( 'combobox', { name: 'Status' } )
+			screen.queryByRole( 'group', { name: 'Status' } )
 		).not.toBeInTheDocument();
 
 		const toggle = screen.getByRole( 'button', { name: 'Filter' } );
 		await user.click( toggle );
 		expect( toggle ).toHaveAttribute( 'aria-expanded', 'true' );
-		expect(
-			screen.getByRole( 'combobox', { name: 'Status' } )
-		).toBeVisible();
-		expect(
-			screen.getByRole( 'combobox', { name: 'Author' } )
-		).toBeVisible();
+		expect( screen.getByRole( 'group', { name: 'Status' } ) ).toBeVisible();
+		expect( screen.getByRole( 'group', { name: 'Author' } ) ).toBeVisible();
 	} );
 
-	it( 'counts the filters already applied', async () => {
+	it( 'counts the filters already applied and checks them', async () => {
 		const user = userEvent.setup();
 		render(
 			<NotesFilters
@@ -54,11 +50,31 @@ describe( 'NotesFilters', () => {
 		expect( toggle ).toHaveAttribute( 'aria-expanded', 'false' );
 		await user.click( toggle );
 		expect(
-			screen.getByRole( 'combobox', { name: 'Status' } )
-		).toHaveValue( 'approved' );
+			screen.getByRole( 'menuitemradio', { name: 'Resolved' } )
+		).toBeChecked();
 	} );
 
-	it( 'hides the Author control when only one author has notes', async () => {
+	it( 'calls onChange with the chosen status', async () => {
+		const user = userEvent.setup();
+		const onChange = vi.fn();
+		render(
+			<NotesFilters
+				notes={ [ note( 1, 1 ) ] }
+				filters={ DEFAULT_NOTES_FILTERS }
+				onChange={ onChange }
+			/>
+		);
+		await user.click( screen.getByRole( 'button', { name: 'Filter' } ) );
+		await user.click(
+			screen.getByRole( 'menuitemradio', { name: 'Open' } )
+		);
+		expect( onChange ).toHaveBeenCalledWith( {
+			...DEFAULT_NOTES_FILTERS,
+			status: 'hold',
+		} );
+	} );
+
+	it( 'hides the Author group when only one author has notes', async () => {
 		const user = userEvent.setup();
 		render(
 			<NotesFilters
@@ -68,15 +84,13 @@ describe( 'NotesFilters', () => {
 			/>
 		);
 		await user.click( screen.getByRole( 'button', { name: 'Filter' } ) );
+		expect( screen.getByRole( 'group', { name: 'Status' } ) ).toBeVisible();
 		expect(
-			screen.getByRole( 'combobox', { name: 'Status' } )
-		).toBeVisible();
-		expect(
-			screen.queryByRole( 'combobox', { name: 'Author' } )
+			screen.queryByRole( 'group', { name: 'Author' } )
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'keeps the Author control while an author filter is active', async () => {
+	it( 'keeps the Author group while an author filter is active', async () => {
 		const user = userEvent.setup();
 		// The other author's threads were deleted, leaving one author.
 		render(
@@ -90,7 +104,10 @@ describe( 'NotesFilters', () => {
 			screen.getByRole( 'button', { name: 'Filter (1 applied)' } )
 		);
 		expect(
-			screen.getByRole( 'combobox', { name: 'Author' } )
-		).toHaveValue( '1' );
+			within( screen.getByRole( 'group', { name: 'Author' } ) ).getByRole(
+				'menuitemradio',
+				{ name: 'Author 1' }
+			)
+		).toBeChecked();
 	} );
 } );
