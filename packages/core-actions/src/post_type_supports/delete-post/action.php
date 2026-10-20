@@ -9,7 +9,7 @@
  */
 
 return array(
-	'label'             => __( 'Delete…', 'gutenberg' ),
+	'label'             => __( 'Delete…' ),
 	'isPrimary'         => true,
 	'supportsBulk'      => true,
 	'hideModalHeader'   => true,

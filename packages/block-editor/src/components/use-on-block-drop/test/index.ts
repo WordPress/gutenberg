@@ -157,6 +157,41 @@ describe( 'onBlockDrop', () => {
 		expect( moveBlocks ).not.toHaveBeenCalled();
 	} );
 
+	it( 'does nothing if the blocks are dropped between the dragged blocks', () => {
+		const targetRootClientId = '1';
+		const targetBlockIndex = 3;
+		const getBlockIndex = vi.fn( () => 1 );
+		const getClientIdsOfDescendants = () => [] as string[];
+		const moveBlocks = vi.fn();
+
+		const event = {
+			dataTransfer: {
+				getData() {
+					return JSON.stringify( {
+						type: 'block',
+						srcRootClientId: targetRootClientId,
+						srcClientIds: [ '2', '3', '4' ],
+					} );
+				},
+			},
+		};
+
+		// @ts-expect-error The remaining arguments are not read by these drops.
+		const eventHandler = onBlockDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			getBlockIndex,
+			getClientIdsOfDescendants,
+			moveBlocks,
+			noop,
+			noop,
+			'insert'
+		);
+		eventHandler( event as unknown as DragEvent );
+
+		expect( moveBlocks ).not.toHaveBeenCalled();
+	} );
+
 	it( 'does nothing if the block is dropped as a child of itself', () => {
 		const targetRootClientId = '1';
 		const targetBlockIndex = 0;

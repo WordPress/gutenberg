@@ -10,6 +10,7 @@
 
 -   Allow `@wordpress/core-fields` to use private APIs: the fields it registers on the server read private selectors of `@wordpress/core-data` (`getTemplateId`, `getHomePage`, and `getPostsPageId`) and private components of `@wordpress/media-utils` (`MediaEdit` and `MediaEditControl`) ([#84696](https://github.com/WordPress/gutenberg/pull/84696)).
 -   Add `@wordpress/core-actions` to the list of core modules allowed to use private APIs ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Add `@wordpress/notices` to the list of core modules allowed to use private APIs ([#84656](https://github.com/WordPress/gutenberg/pull/84656)).
 -   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#84901](https://github.com/WordPress/gutenberg/pull/84901)).
 
 ## 2.0.0 (2026-10-07)

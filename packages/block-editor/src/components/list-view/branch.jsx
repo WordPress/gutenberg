@@ -6,7 +6,7 @@ import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useListViewTreeState } from './context';
+import { useInsertedBlockClientId, useListViewTreeState } from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
@@ -100,6 +100,7 @@ function ListViewBranch( props ) {
 		expansionState,
 		draggedClientIds,
 	} = useListViewTreeState();
+	const insertedBlockClientId = useInsertedBlockClientId();
 
 	if ( ! canParentExpand ) {
 		return null;
@@ -167,8 +168,11 @@ function ListViewBranch( props ) {
 			: undefined;
 
 		// Make updates to the selected or dragged blocks synchronous,
-		// but asynchronous for any other block.
+		// but asynchronous for any other block. The block just inserted from
+		// the appender is being edited through its popover, so its row stays
+		// synchronous too, even though nothing is selected.
 		const isSelected = isClientIdSelected( clientId, selectedClientIds );
+		const isSync = isSelected || clientId === insertedBlockClientId;
 		const isSelectedBranch =
 			isBranchSelected || ( isSelected && hasNestedBlocks );
 
@@ -215,7 +219,7 @@ function ListViewBranch( props ) {
 			} );
 
 		rows.push(
-			<AsyncModeProvider key={ clientId } value={ ! isSelected }>
+			<AsyncModeProvider key={ clientId } value={ ! isSync }>
 				{ showBlock && (
 					<ListViewBlock
 						clientId={ clientId }
