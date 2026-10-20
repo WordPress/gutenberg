@@ -17,28 +17,45 @@ import { canonicalizeLayout } from '../utils/canonicalize-layout';
 import { DEFAULT_GRID } from '../utils/default-grid';
 import { enforceLayoutPolicy } from '../utils/enforce-layout-policy';
 import { normalizeGridSettings } from '../utils/normalize-grid-settings';
-import { resolveDashboardColumnCap } from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
+import {
+	resolveDashboardColumns,
+	resolveDashboardMinColumnWidth,
+} from '../utils/resolve-dashboard-column-count/resolve-dashboard-column-count';
 import { DEFAULT_ROW_HEIGHT } from '../utils/row-height-presets';
 import { createPendingActionsMap } from '../utils/pending-actions-map';
 import type { PendingActionsMap } from '../utils/pending-actions-map';
 import { createRuntimeActionsMap } from '../utils/runtime-actions-map';
 import type { RuntimeActionsMap } from '../utils/runtime-actions-map';
 import { useDashboardPolicy } from '../components/dashboard-policy';
+import { WIDGET_DASHBOARD_COLUMN_STEPS } from '../types';
 import type {
 	CanPerformDashboardOperation,
 	WidgetGridSettings,
 	DashboardWidget,
 } from '../types';
 
-type GridSettingsWithColumns = WidgetGridSettings & { columns: number };
-
+/*
+ * Validates the host's column policy and hands it to the surface untouched:
+ * the `@wordpress/grid` surface measures its own width and resolves the
+ * count. The default steps only apply when the host set neither a policy
+ * nor a floor.
+ */
 function resolveGridSettings(
 	settings: WidgetGridSettings
-): GridSettingsWithColumns {
+): WidgetGridSettings {
 	const normalized = normalizeGridSettings( settings, DEFAULT_ROW_HEIGHT );
+	const columns = resolveDashboardColumns( normalized.columns );
+	const minColumnWidth = resolveDashboardMinColumnWidth(
+		normalized.minColumnWidth
+	);
+
 	return {
 		...normalized,
-		columns: resolveDashboardColumnCap( normalized.columns ),
+		columns:
+			columns === undefined && minColumnWidth === undefined
+				? WIDGET_DASHBOARD_COLUMN_STEPS
+				: columns,
+		minColumnWidth,
 	};
 }
 
@@ -65,7 +82,7 @@ interface InternalDashboardContextValue {
 	layout: DashboardWidget[];
 	onLayoutChange: ( layout: DashboardWidget[] ) => void;
 	onLayoutReset?: () => void;
-	gridSettings: GridSettingsWithColumns;
+	gridSettings: WidgetGridSettings;
 
 	/**
 	 * Publishes the staged layout when it differs from the committed
