@@ -9,6 +9,7 @@ import { getEntitySyncManager } from './entity-sync';
 import { createSyncUndoLevelRecord } from './utils/sync-undo-levels';
 import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
 import type {
+	ActionOf,
 	CoreDataThunkArgs,
 	MediaEdits,
 	SaveDirtyEntitiesOptions,
@@ -31,7 +32,7 @@ import type {
 export function receiveRegisteredPostMeta(
 	postType: string,
 	registeredPostMeta: Record< string, unknown > | undefined
-) {
+): ActionOf< 'RECEIVE_REGISTERED_POST_META' > {
 	return {
 		type: 'RECEIVE_REGISTERED_POST_META',
 		postType,
@@ -147,7 +148,9 @@ export const editMediaEntity =
  *
  * @return Action object.
  */
-export function receiveEditorSettings( settings: Record< string, unknown > ) {
+export function receiveEditorSettings(
+	settings: Record< string, unknown >
+): ActionOf< 'RECEIVE_EDITOR_SETTINGS' > {
 	return {
 		type: 'RECEIVE_EDITOR_SETTINGS',
 		settings,
@@ -161,7 +164,9 @@ export function receiveEditorSettings( settings: Record< string, unknown > ) {
  *
  * @return Action object.
  */
-export function receiveEditorAssets( assets: Record< string, unknown > ) {
+export function receiveEditorAssets(
+	assets: Record< string, unknown >
+): ActionOf< 'RECEIVE_EDITOR_ASSETS' > {
 	return {
 		type: 'RECEIVE_EDITOR_ASSETS',
 		assets,
@@ -198,7 +203,7 @@ export function receiveViewConfig(
 	kind: string,
 	name: string,
 	config: Record< string, unknown >
-) {
+): ActionOf< 'RECEIVE_VIEW_CONFIG' > {
 	return {
 		type: 'RECEIVE_VIEW_CONFIG',
 		kind,
@@ -220,7 +225,7 @@ export function receiveFieldsConfig(
 	kind: string,
 	name: string,
 	config: FieldsConfig
-) {
+): ActionOf< 'RECEIVE_FIELDS_CONFIG' > {
 	return {
 		type: 'RECEIVE_FIELDS_CONFIG',
 		kind,
@@ -242,7 +247,7 @@ export function receiveEntityActionsConfig(
 	kind: string,
 	name: string,
 	config: EntityActionsConfig
-) {
+): ActionOf< 'RECEIVE_ENTITY_ACTIONS_CONFIG' > {
 	return {
 		type: 'RECEIVE_ENTITY_ACTIONS_CONFIG',
 		kind,
@@ -289,7 +294,7 @@ export function setSyncConnectionStatus(
 	name: string,
 	key: number | string | null,
 	status: ConnectionStatus | null
-) {
+): ActionOf< 'CLEAR_SYNC_CONNECTION_STATUS' | 'SET_SYNC_CONNECTION_STATUS' > {
 	if ( ! status ) {
 		return {
 			type: 'CLEAR_SYNC_CONNECTION_STATUS',
