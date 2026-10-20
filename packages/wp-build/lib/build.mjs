@@ -1338,10 +1338,14 @@ async function transpilePackage( packageName ) {
 	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
 	await generateWorkerPlaceholder( packageDir, packageJson );
 
-	const externalizeAllExceptCssPlugin = {
-		name: 'externalize-except-css',
+	/*
+	 * Keeps imports external so each source file is transpiled on its own,
+	 * except for styles and SVGs, which are processed and inlined.
+	 */
+	const externalizeAllExceptPlugin = {
+		name: 'externalize-all-except',
 		setup( build ) {
-			// Externalize all non-CSS imports
+			// Externalize all imports except styles and SVGs
 			build.onResolve( { filter: /.*/ }, async ( args ) => {
 				// Skip recursive calls.
 				if ( args.pluginData?.__fromExternalize ) {
@@ -1415,7 +1419,7 @@ async function transpilePackage( packageName ) {
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
 		...createStyleBundlingPlugins( packageDir ),
-		externalizeAllExceptCssPlugin,
+		externalizeAllExceptPlugin,
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
