@@ -43,7 +43,6 @@ import BlockContext from '../block-context';
 import { unlock } from '../../lock-unlock';
 import { PrivateBlockContext } from '../block-list/private-block-context';
 import type { BlockSelection, Selection } from '../../store/types';
-import type { UseBlockEditorAutocompletePropsOptions } from '../autocomplete/types';
 import type {
 	RichTextBinding,
 	RichTextEventListenerProps,
@@ -525,12 +524,8 @@ function RichTextWrapper(
 	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		/*
-		 * Completers replace the field with blocks, not rich text values.
-		 * TODO: Make the replacement payload generic in `@wordpress/components`.
-		 */
-		onReplace:
-			onReplace as unknown as UseBlockEditorAutocompletePropsOptions[ 'onReplace' ],
+		// @ts-expect-error TODO: a replacing completer throws in a field without `onReplace`.
+		onReplace,
 		completers: autocompleters,
 		record: value,
 		onChange,
