@@ -10,7 +10,7 @@ import {
 import { getPhrasingContentSchema } from '../phrasing-content';
 
 describe( 'DOM', () => {
-	let parent;
+	let parent: HTMLDivElement;
 
 	beforeEach( () => {
 		parent = document.createElement( 'div' );
@@ -110,9 +110,8 @@ describe( 'DOM', () => {
 		/**
 		 * A sampling of input types expected not to be text eligible.
 		 *
-		 * @type {string[]}
 		 */
-		const NON_TEXT_INPUT_TYPES = [
+		const NON_TEXT_INPUT_TYPES: string[] = [
 			'button',
 			'checkbox',
 			'hidden',
@@ -129,9 +128,13 @@ describe( 'DOM', () => {
 		/**
 		 * A sampling of input types expected to be text eligible.
 		 *
-		 * @type {string[]}
 		 */
-		const TEXT_INPUT_TYPES = [ 'text', 'password', 'search', 'url' ];
+		const TEXT_INPUT_TYPES: string[] = [
+			'text',
+			'password',
+			'search',
+			'url',
+		];
 
 		it( 'should return false for non-text input elements', () => {
 			NON_TEXT_INPUT_TYPES.forEach( ( type ) => {
@@ -325,7 +328,7 @@ describe( 'removeInvalidHTML', () => {
 } );
 
 describe( 'isEmpty', () => {
-	function isEmptyHTML( HTML ) {
+	function isEmptyHTML( HTML: string ) {
 		const doc = document.implementation.createHTMLDocument( '' );
 
 		doc.body.innerHTML = HTML;

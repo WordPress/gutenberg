@@ -1,19 +1,22 @@
 import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
+import type { ApiFetch, APIFetchMiddleware } from '..';
 
 /**
  * Mock response value for a successful fetch.
  *
- * @return {Response} Mock return value.
+ * @return Mock return value.
  */
 const DEFAULT_FETCH_MOCK_RETURN = {
 	ok: true,
 	status: 200,
 	json: () => Promise.resolve( {} ),
-};
+} as Response;
 
 describe( 'apiFetch', () => {
-	let apiFetch;
+	let apiFetch: ApiFetch;
 	const originalFetch = globalThis.fetch;
+	let fetchMock: Mock< typeof globalThis.fetch >;
 
 	beforeEach( async () => {
 		// Reset the `apiFetch` module before each test to clear
@@ -21,7 +24,8 @@ describe( 'apiFetch', () => {
 		vi.resetModules();
 		apiFetch = ( await import( '../' ) ).default;
 
-		globalThis.fetch = vi.fn();
+		fetchMock = vi.fn< typeof globalThis.fetch >();
+		globalThis.fetch = fetchMock;
 	} );
 
 	afterAll( () => {
@@ -29,13 +33,13 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should call the API properly', async () => {
-		globalThis.fetch.mockResolvedValue( {
+		fetchMock.mockResolvedValue( {
 			ok: true,
 			status: 200,
 			async json() {
 				return { message: 'ok' };
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toEqual( {
 			message: 'ok',
@@ -43,7 +47,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should fetch with non-JSON body', async () => {
-		globalThis.fetch.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
+		fetchMock.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
 
 		const body = 'FormData';
 
@@ -53,21 +57,18 @@ describe( 'apiFetch', () => {
 			body,
 		} );
 
-		expect( globalThis.fetch ).toHaveBeenCalledWith(
-			'/wp/v2/media?_locale=user',
-			{
-				credentials: 'include',
-				headers: {
-					Accept: 'application/json, */*;q=0.1',
-				},
-				method: 'POST',
-				body,
-			}
-		);
+		expect( fetchMock ).toHaveBeenCalledWith( '/wp/v2/media?_locale=user', {
+			credentials: 'include',
+			headers: {
+				Accept: 'application/json, */*;q=0.1',
+			},
+			method: 'POST',
+			body,
+		} );
 	} );
 
 	it( 'should fetch with a JSON body', async () => {
-		globalThis.fetch.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
+		fetchMock.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
 
 		await apiFetch( {
 			path: '/wp/v2/posts',
@@ -78,22 +79,19 @@ describe( 'apiFetch', () => {
 			data: {},
 		} );
 
-		expect( globalThis.fetch ).toHaveBeenCalledWith(
-			'/wp/v2/posts?_locale=user',
-			{
-				body: '{}',
-				credentials: 'include',
-				headers: {
-					Accept: 'application/json, */*;q=0.1',
-					'Content-Type': 'application/json',
-				},
-				method: 'POST',
-			}
-		);
+		expect( fetchMock ).toHaveBeenCalledWith( '/wp/v2/posts?_locale=user', {
+			body: '{}',
+			credentials: 'include',
+			headers: {
+				Accept: 'application/json, */*;q=0.1',
+				'Content-Type': 'application/json',
+			},
+			method: 'POST',
+		} );
 	} );
 
 	it( 'should respect developer-provided options', async () => {
-		globalThis.fetch.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
+		fetchMock.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
 
 		await apiFetch( {
 			path: '/wp/v2/posts',
@@ -102,22 +100,19 @@ describe( 'apiFetch', () => {
 			credentials: 'omit',
 		} );
 
-		expect( globalThis.fetch ).toHaveBeenCalledWith(
-			'/wp/v2/posts?_locale=user',
-			{
-				body: '{}',
-				credentials: 'omit',
-				headers: {
-					Accept: 'application/json, */*;q=0.1',
-					'Content-Type': 'application/json',
-				},
-				method: 'POST',
-			}
-		);
+		expect( fetchMock ).toHaveBeenCalledWith( '/wp/v2/posts?_locale=user', {
+			body: '{}',
+			credentials: 'omit',
+			headers: {
+				Accept: 'application/json, */*;q=0.1',
+				'Content-Type': 'application/json',
+			},
+			method: 'POST',
+		} );
 	} );
 
 	it( 'should return the error message properly', async () => {
-		globalThis.fetch.mockResolvedValue( {
+		fetchMock.mockResolvedValue( {
 			ok: false,
 			status: 400,
 			async json() {
@@ -126,7 +121,7 @@ describe( 'apiFetch', () => {
 					message: 'Bad Request',
 				};
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'bad_request',
@@ -136,7 +131,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should keep the data of an error response', async () => {
-		globalThis.fetch.mockResolvedValue( {
+		fetchMock.mockResolvedValue( {
 			ok: false,
 			status: 500,
 			async json() {
@@ -146,7 +141,7 @@ describe( 'apiFetch', () => {
 					data: 'Table does not exist',
 				};
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'db_update_error',
@@ -156,13 +151,13 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return invalid JSON error if no json response', async () => {
-		globalThis.fetch.mockResolvedValue( {
+		fetchMock.mockResolvedValue( {
 			ok: true,
 			status: 200,
 			async json() {
 				return JSON.parse( '' );
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
@@ -172,13 +167,13 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return invalid JSON error if response is not valid', async () => {
-		globalThis.fetch.mockResolvedValue( {
+		fetchMock.mockResolvedValue( {
 			ok: true,
 			status: 200,
 			async json() {
 				return JSON.parse( '' );
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
@@ -188,9 +183,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return offline error when fetch errors', async () => {
-		globalThis.fetch.mockRejectedValue(
-			new TypeError( 'Failed to fetch' )
-		);
+		fetchMock.mockRejectedValue( new TypeError( 'Failed to fetch' ) );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'fetch_error',
@@ -199,9 +192,10 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should throw AbortError when fetch aborts', async () => {
-		globalThis.fetch.mockImplementation(
-			( path, { signal } ) =>
+		fetchMock.mockImplementation(
+			( path, options ) =>
 				new Promise( ( _, reject ) => {
+					const { signal } = options!;
 					if ( ! signal ) {
 						reject( new Error( 'Expected signal as argument' ) );
 						return;
@@ -211,7 +205,7 @@ describe( 'apiFetch', () => {
 					signal.addEventListener(
 						'abort',
 						( e ) => {
-							reject( e.target.reason );
+							reject( ( e.target as AbortSignal ).reason );
 						},
 						{ once: true }
 					);
@@ -233,24 +227,22 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return null if response has no content status code', async () => {
-		globalThis.fetch.mockResolvedValue( {
+		fetchMock.mockResolvedValue( {
 			ok: true,
 			status: 204,
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toBe( null );
 	} );
 
 	it( 'should return null for a 200 response with an empty body', async () => {
-		globalThis.fetch.mockResolvedValue(
-			new Response( '', { status: 200 } )
-		);
+		fetchMock.mockResolvedValue( new Response( '', { status: 200 } ) );
 
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toBe( null );
 	} );
 
 	it( 'should return invalid JSON error for a 200 response with a non-empty invalid body', async () => {
-		globalThis.fetch.mockResolvedValue(
+		fetchMock.mockResolvedValue(
 			new Response( 'not json', { status: 200 } )
 		);
 
@@ -262,9 +254,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should return invalid JSON error for an error response with an empty body', async () => {
-		globalThis.fetch.mockResolvedValue(
-			new Response( '', { status: 500 } )
-		);
+		fetchMock.mockResolvedValue( new Response( '', { status: 500 } ) );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
@@ -277,9 +267,9 @@ describe( 'apiFetch', () => {
 		const mockResponse = {
 			ok: true,
 			status: 200,
-		};
+		} as Response;
 
-		globalThis.fetch.mockResolvedValue( mockResponse );
+		fetchMock.mockResolvedValue( mockResponse );
 
 		await expect(
 			apiFetch( { path: '/random', parse: false } )
@@ -290,9 +280,9 @@ describe( 'apiFetch', () => {
 		const mockResponse = {
 			ok: false,
 			status: 400,
-		};
+		} as Response;
 
-		globalThis.fetch.mockResolvedValue( mockResponse );
+		fetchMock.mockResolvedValue( mockResponse );
 
 		await expect(
 			apiFetch( { path: '/random', parse: false } )
@@ -305,36 +295,39 @@ describe( 'apiFetch', () => {
 		apiFetch.use( apiFetch.nonceMiddleware );
 		apiFetch.nonceEndpoint = '/rest-nonce';
 
-		globalThis.fetch.mockImplementation( async ( path, options ) => {
-			if ( path.startsWith( '/random' ) ) {
-				if ( options?.headers[ 'X-WP-Nonce' ] === 'new-nonce' ) {
+		fetchMock.mockImplementation( async ( path, options ) => {
+			if ( ( path as string ).startsWith( '/random' ) ) {
+				if (
+					new Headers( options?.headers ).get( 'X-WP-Nonce' ) ===
+					'new-nonce'
+				) {
 					return {
 						ok: true,
 						status: 200,
 						json: async () => ( { code: 'success' } ),
-					};
+					} as Response;
 				}
 
 				return {
 					ok: false,
 					status: 403,
 					json: async () => ( { code: 'rest_cookie_invalid_nonce' } ),
-				};
+				} as Response;
 			}
 
-			if ( path.startsWith( '/rest-nonce' ) ) {
+			if ( ( path as string ).startsWith( '/rest-nonce' ) ) {
 				return {
 					ok: true,
 					status: 200,
 					text: async () => 'new-nonce',
-				};
+				} as Response;
 			}
 
 			return {
 				ok: false,
 				status: 404,
 				json: async () => ( { code: 'rest_no_route' } ),
-			};
+			} as Response;
 		} );
 
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toEqual( {
@@ -348,36 +341,39 @@ describe( 'apiFetch', () => {
 		apiFetch.use( apiFetch.nonceMiddleware );
 		apiFetch.nonceEndpoint = '/rest-nonce';
 
-		globalThis.fetch.mockImplementation( async ( path, options ) => {
-			if ( path.startsWith( '/random' ) ) {
-				if ( options?.headers[ 'X-WP-Nonce' ] === 'new-nonce' ) {
+		fetchMock.mockImplementation( async ( path, options ) => {
+			if ( ( path as string ).startsWith( '/random' ) ) {
+				if (
+					new Headers( options?.headers ).get( 'X-WP-Nonce' ) ===
+					'new-nonce'
+				) {
 					return {
 						ok: true,
 						status: 200,
 						json: async () => ( { code: 'success' } ),
-					};
+					} as Response;
 				}
 
 				return {
 					ok: false,
 					status: 403,
 					json: async () => ( { code: 'rest_cookie_invalid_nonce' } ),
-				};
+				} as Response;
 			}
 
-			if ( path.startsWith( '/rest-nonce' ) ) {
+			if ( ( path as string ).startsWith( '/rest-nonce' ) ) {
 				return {
 					ok: false,
 					status: 400,
 					text: async () => '0',
-				};
+				} as Response;
 			}
 
 			return {
 				ok: false,
 				status: 404,
 				json: async () => ( { code: 'rest_no_route' } ),
-			};
+			} as Response;
 		} );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
@@ -393,7 +389,7 @@ describe( 'apiFetch', () => {
 
 		await apiFetch( { path: '/random' } );
 
-		expect( globalThis.fetch ).not.toHaveBeenCalled();
+		expect( fetchMock ).not.toHaveBeenCalled();
 
 		expect( customFetchHandler ).toHaveBeenCalledWith( {
 			path: '/random?_locale=user',
@@ -439,7 +435,8 @@ describe( 'apiFetch', () => {
 		} );
 
 		it( 'should report whether the middleware was registered', () => {
-			const middleware = ( options, next ) => next( options );
+			const middleware: APIFetchMiddleware = ( options, next ) =>
+				next( options );
 
 			expect( apiFetch.unregister( middleware ) ).toBe( false );
 
@@ -450,11 +447,11 @@ describe( 'apiFetch', () => {
 		} );
 
 		it( 'should stop overriding the method once httpV1Middleware is removed', async () => {
-			globalThis.fetch.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
+			fetchMock.mockResolvedValue( DEFAULT_FETCH_MOCK_RETURN );
 
 			await apiFetch( { path: '/random', method: 'DELETE' } );
 
-			expect( globalThis.fetch ).toHaveBeenCalledWith(
+			expect( fetchMock ).toHaveBeenCalledWith(
 				'/random?_locale=user',
 				expect.objectContaining( {
 					method: 'POST',
@@ -470,9 +467,9 @@ describe( 'apiFetch', () => {
 
 			await apiFetch( { path: '/random', method: 'DELETE' } );
 
-			const [ , options ] = globalThis.fetch.mock.lastCall;
-			expect( options.method ).toBe( 'DELETE' );
-			expect( options.headers ).not.toHaveProperty(
+			const [ , options ] = fetchMock.mock.lastCall!;
+			expect( options!.method ).toBe( 'DELETE' );
+			expect( options!.headers ).not.toHaveProperty(
 				'X-HTTP-Method-Override'
 			);
 		} );

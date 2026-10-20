@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { find } from '../focusable';
 
 describe( 'focusable.find() CSS visibility', () => {
-	let node;
+	let node: HTMLDivElement;
 
 	beforeEach( () => {
 		node = document.createElement( 'div' );
@@ -28,7 +28,7 @@ describe( 'focusable.find() CSS visibility', () => {
 		'excludes inputs with %s even when they have layout boxes',
 		( _, html ) => {
 			node.innerHTML = html;
-			const input = node.querySelector( 'input' );
+			const input = node.querySelector( 'input' )!;
 			const checkVisibility = vi.spyOn( input, 'checkVisibility' );
 
 			expect( input.offsetWidth ).toBeGreaterThan( 0 );
@@ -46,7 +46,7 @@ describe( 'focusable.find() CSS visibility', () => {
 	it( 'includes inputs that restore visibility inside a hidden ancestor', () => {
 		node.style.visibility = 'hidden';
 		node.innerHTML = '<input style="visibility: visible">';
-		const input = node.querySelector( 'input' );
+		const input = node.querySelector( 'input' )!;
 
 		input.focus();
 		expect( input ).toHaveFocus();
@@ -56,7 +56,7 @@ describe( 'focusable.find() CSS visibility', () => {
 	it( 'uses the owning window for the computed-style fallback', () => {
 		const iframe = document.createElement( 'iframe' );
 		node.appendChild( iframe );
-		const iframeDocument = iframe.contentDocument;
+		const iframeDocument = iframe.contentDocument!;
 		iframeDocument.body.innerHTML = `
 			<div style="visibility: hidden">
 				<input>
@@ -72,7 +72,7 @@ describe( 'focusable.find() CSS visibility', () => {
 			checkVisibility: { value: undefined },
 		} );
 		const getComputedStyle = vi.spyOn(
-			iframeDocument.defaultView,
+			iframeDocument.defaultView!,
 			'getComputedStyle'
 		);
 
@@ -82,11 +82,12 @@ describe( 'focusable.find() CSS visibility', () => {
 	} );
 } );
 
-const createElement = ( type ) => document.createElement( type );
+const createElement = < K extends keyof HTMLElementTagNameMap >( type: K ) =>
+	document.createElement( type );
 const IMAGE_SOURCE =
 	'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 
-function findFocusable( context ) {
+function findFocusable( context: Element ) {
 	if ( ! context.isConnected ) {
 		document.body.appendChild( context );
 	}
@@ -125,7 +126,7 @@ describe( 'focusable', () => {
 		it( 'finds nested focusable child', () => {
 			const node = createElement( 'div' );
 			node.appendChild( createElement( 'div' ) );
-			node.firstChild.appendChild( createElement( 'input' ) );
+			node.firstChild!.appendChild( createElement( 'input' ) );
 
 			const focusable = findFocusable( node );
 
@@ -150,8 +151,8 @@ describe( 'focusable', () => {
 				</map>
 				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="">
 			`;
-			const area = node.querySelector( 'area' );
-			const image = node.querySelector( 'img' );
+			const area = node.querySelector( 'area' )!;
+			const image = node.querySelector( 'img' )!;
 
 			document.body.appendChild( node );
 			await image.decode();
@@ -171,7 +172,7 @@ describe( 'focusable', () => {
 				</map>
 				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="" style="visibility: hidden">
 			`;
-			const image = node.querySelector( 'img' );
+			const image = node.querySelector( 'img' )!;
 
 			document.body.appendChild( node );
 
@@ -203,8 +204,8 @@ describe( 'focusable', () => {
 				</div>
 				<img src="${ IMAGE_SOURCE }" usemap="#testfocus" width="40" height="40" alt="">
 			`;
-			const area = node.querySelector( 'area' );
-			const image = node.querySelector( 'img' );
+			const area = node.querySelector( 'area' )!;
+			const image = node.querySelector( 'img' )!;
 
 			document.body.appendChild( node );
 			await image.decode();

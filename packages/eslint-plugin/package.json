@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "27.1.0",
+	"version": "28.0.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -60,7 +60,6 @@
 		"typescript-eslint": "^8.70.1"
 	},
 	"devDependencies": {
-		"@types/eslint": "^9",
 		"@types/estree": "^1.0.8",
 		"@typescript-eslint/parser": "^8.70.1",
 		"eslint": "^10.0.0",
