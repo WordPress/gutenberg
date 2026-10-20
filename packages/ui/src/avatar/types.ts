@@ -42,6 +42,7 @@ export type AvatarProps = Omit<
 	/**
 	 * Colors the opaque fallback background and active ring, automatically
 	 * choosing a contrasting foreground tint for the initials.
+	 * When active, choose a color that contrasts with the surrounding surface.
 	 * Accepts CSS colors and variables that resolve to a color. Do not use
 	 * `currentColor`, including through variables, or CSS-wide keywords such as
 	 * `inherit`. Unusable colors use neutral defaults.
