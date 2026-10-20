@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import {
 	Component,
 	cloneElement,
@@ -119,7 +119,7 @@ export function getInnerBlocksProps(
 export function getSaveElement(
 	blockTypeOrName: string | BlockType,
 	attributes: Record< string, unknown >,
-	innerBlocks: Block[] | ReactNode = []
+	innerBlocks: Block[] | ReactElement = []
 ): unknown {
 	const blockType = normalizeBlockType( blockTypeOrName );
 
