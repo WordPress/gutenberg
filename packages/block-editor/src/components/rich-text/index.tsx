@@ -524,7 +524,7 @@ function RichTextWrapper(
 	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		// @ts-expect-error TODO: a replacing completer throws in a field without `onReplace`.
+		// @ts-expect-error TODO: `onReplace` may be missing, and patterns replace with a block array.
 		onReplace,
 		completers: autocompleters,
 		record: value,

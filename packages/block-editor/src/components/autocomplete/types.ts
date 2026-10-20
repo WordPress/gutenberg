@@ -7,7 +7,7 @@ import type {
 
 // Completers in the editor replace the field with blocks.
 type UseAutocompletePropsOptions = Parameters<
-	typeof __unstableUseAutocompleteProps< Block >
+	typeof __unstableUseAutocompleteProps< Block | Block[] >
 >[ 0 ];
 
 // `@wordpress/components` does not export the completer type.
@@ -21,7 +21,7 @@ export type UseBlockEditorAutocompletePropsOptions = Omit<
 };
 
 export type BlockEditorAutocompleteProps = Omit<
-	ComponentProps< typeof WCAutocomplete< Block > >,
+	ComponentProps< typeof WCAutocomplete< Block | Block[] > >,
 	'completers'
 > & {
 	completers?: Completer[];
