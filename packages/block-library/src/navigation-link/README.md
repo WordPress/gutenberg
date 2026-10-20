@@ -78,6 +78,7 @@ _Defined via the [`selectors`](https://developer.wordpress.org/block-editor/refe
 
 - **color**:
   - background: `.wp-block-navigation-link > .wp-block-navigation-item__content`
+  - text: `.wp-block-navigation-link > .wp-block-navigation-item__content`
 - **states**:
   - -current: `.wp-block-navigation .current-menu-item`
 
