@@ -100,8 +100,7 @@ export type RangeControlProps = Pick<
 		/**
 		 * CSS color string for the `RangeControl` wrapper.
 		 *
-		 * @default COLORS.theme.accent
-		 * @see /packages/components/src/utils/colors-values.js
+		 * @default The component accent color
 		 */
 		color?: CSSProperties[ 'color' ];
 		/**
@@ -144,7 +143,7 @@ export type RangeControlProps = Pick<
 		 *
 		 * @default () => void
 		 */
-		onChange?: ( value?: number ) => void;
+		onChange?: ( value: number | undefined ) => void;
 		/**
 		 * Callback for when `RangeControl` input gains focus.
 		 *

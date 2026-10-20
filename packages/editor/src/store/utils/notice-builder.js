@@ -2,11 +2,15 @@ import { __ } from '@wordpress/i18n';
 import { ATTACHMENT_POST_TYPE } from '../constants';
 
 const AUTO_SAVE_FAILURE_NOTICE = __(
-	'Auto-save failed. We’ll try to save a backup in this browser. You can also save manually.'
+	'Auto-save failed. You can also save manually.'
+);
+
+const AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE = __(
+	'Auto-save failed because there was no response from the server. You can also save manually.'
 );
 
 const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
-	'Auto-save failed because you were offline. We’ll try to save a backup in this browser. Please verify your connection and save manually.'
+	'Auto-save failed because you were offline. You can also save manually once you’re back online.'
 );
 
 /**
@@ -99,6 +103,7 @@ export function getNotificationArgumentsForSaveFail( data ) {
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
+	const id = options?.isAutosave ? 'editor-autosave' : 'editor-save';
 
 	if ( error.code === 'offline_error' ) {
 		const messages = {
@@ -125,21 +130,21 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			noticeMessage = AUTO_SAVE_OFFLINE_FAILURE_NOTICE;
 		}
 
-		return [ noticeMessage, { id: 'editor-save' } ];
+		return [ noticeMessage, { id } ];
 	}
 
 	const messages = {
 		publish: __(
-			'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.'
+			'Publishing failed. Keep this page open and try publishing again.'
 		),
 		private: __(
-			'Publishing failed. We’ll try to save a backup in this browser. Please try publishing again.'
+			'Publishing failed. Keep this page open and try publishing again.'
 		),
 		future: __(
-			'Scheduling failed. We’ll try to save a backup in this browser. Please try scheduling again.'
+			'Scheduling failed. Keep this page open and try scheduling again.'
 		),
 		default: __(
-			'Updating failed. We’ll try to save a backup in this browser. Please try updating again.'
+			'Updating failed. Keep this page open and try updating again.'
 		),
 	};
 
@@ -149,15 +154,13 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			: messages.default;
 
 	if ( options?.isAutosave ) {
-		noticeMessage = AUTO_SAVE_FAILURE_NOTICE;
+		noticeMessage =
+			error.code === 'fetch_error'
+				? AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE
+				: AUTO_SAVE_FAILURE_NOTICE;
 	}
 
-	return [
-		noticeMessage,
-		{
-			id: 'editor-save',
-		},
-	];
+	return [ noticeMessage, { id } ];
 }
 
 /**

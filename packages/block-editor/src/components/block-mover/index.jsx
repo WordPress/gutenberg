@@ -52,10 +52,14 @@ function BlockMover( { clientIds, hideDragHandle } ) {
 		[ clientIds ]
 	);
 
+	// Without blocks the buttons render disabled, as a placeholder.
+	const hasBlocks = ! Array.isArray( clientIds ) || clientIds.length > 0;
+
 	if (
-		! canMove ||
-		( isFirst && isLast && ! rootClientId ) ||
-		( hideDragHandle && isManualGrid )
+		hasBlocks &&
+		( ! canMove ||
+			( isFirst && isLast && ! rootClientId ) ||
+			( hideDragHandle && isManualGrid ) )
 	) {
 		return null;
 	}

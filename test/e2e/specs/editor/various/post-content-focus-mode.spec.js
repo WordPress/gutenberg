@@ -143,10 +143,7 @@ test.describe( 'Post Content focus mode', () => {
 					name: 'Block: Title',
 				} );
 				await expect( postTitle ).toBeVisible();
-				await expect( postTitle ).not.toHaveAttribute(
-					'inert',
-					'true'
-				);
+				await expect( postTitle ).not.toHaveAttribute( 'inert' );
 				// Use selectBlocks to avoid toolbar interception issues.
 				await editor.selectBlocks( postTitle );
 				await page.keyboard.type( 'Test Post Title' );
@@ -429,20 +426,14 @@ class PostContentFocusMode {
 	}
 
 	/**
-	 * Enables the "Show template" toggle in the post editor settings sidebar.
+	 * Enables the "Show template" toggle in the top bar View menu.
 	 * If already enabled, this is a no-op.
 	 */
 	async enableShowTemplate() {
-		// Clear selection so the sidebar shows the Post tab.
-		await this.page.evaluate( () => {
-			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
-		} );
-		await this.editor.openDocumentSettingsSidebar();
-
-		const templateOptionsButton = this.page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Template options' } );
-		await templateOptionsButton.click();
+		await this.page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'View', exact: true } )
+			.click();
 
 		const showTemplateButton = this.page.getByRole( 'menuitemcheckbox', {
 			name: 'Show template',

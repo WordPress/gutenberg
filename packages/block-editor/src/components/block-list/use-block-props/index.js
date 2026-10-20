@@ -1,6 +1,7 @@
 import clsx from 'clsx';
 import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { inertValue } from '@wordpress/react-inert-value';
 import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 import { useMergeRefs, useDisabled, useRefEffect } from '@wordpress/compose';
 import { useDispatch } from '@wordpress/data';
@@ -170,7 +171,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusFirstElement( { clientId, initialPosition } ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
-		useEventHandlers( { clientId, isSelected } ),
+		useEventHandlers( { clientId, isSelected, isMultiSelected } ),
 		useIsHovered( { isEnabled: isHoverEnabled } ),
 		useIntersectionObserver(),
 		useMovingAnimation( { triggerAnimationOnChange: index, clientId } ),
@@ -236,7 +237,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		inert: isSubtreeDisabled ? 'true' : undefined,
+		inert: inertValue( isSubtreeDisabled ),
 		className: clsx(
 			'block-editor-block-list__block',
 			{
@@ -246,6 +247,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'is-selected': isSelected,
 				'is-highlighted': isHighlighted,
 				'is-multi-selected': isMultiSelected,
+				'is-movable-multi-selected': isMultiSelected && canMove,
 				'is-partially-selected': isPartiallySelected,
 				'is-reusable': isReusable,
 				'is-dragging': isDragging,

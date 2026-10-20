@@ -5,7 +5,7 @@ import { ControlWithError } from '../../index';
 const ValidatedInput = forwardRef<
 	HTMLInputElement,
 	React.InputHTMLAttributes< HTMLInputElement > & { label?: string }
->( function ValidatedInput( { label, ...restProps }, ref ) {
+>( function UnforwardedValidatedInput( { label, ...restProps }, ref ) {
 	return <input ref={ ref } aria-label={ label } { ...restProps } />;
 } );
 
@@ -20,7 +20,7 @@ type ValidatedInputControlProps = React.ComponentProps<
 export const ValidatedInputControl = forwardRef<
 	HTMLInputElement,
 	ValidatedInputControlProps
->( function ValidatedInputControl(
+>( function UnforwardedValidatedInputControl(
 	{ required, markWhenOptional, customValidity, ...restProps },
 	forwardedRef
 ) {

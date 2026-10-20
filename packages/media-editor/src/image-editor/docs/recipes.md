@@ -76,29 +76,29 @@ function CropperPanel( { src }: { src: string } ) {
 }
 ```
 
-## Use the Media Editor Composite Controller
+## Use the Media Editor Session
 
-Use the media editor controller when cropper state must share history with controls such as aspect ratio.
+Use the media editor session when cropper state must share history with controls such as aspect ratio. The session owns history and gesture boundaries; pass its `cropper` controller to `<Cropper>`.
 
 ```tsx
 import { resolveAspectRatio, useMediaEditor } from '../../state';
 import { Cropper } from '../image-editor';
 
 function MediaEditorCanvas( { src }: { src: string } ) {
-	const controller = useMediaEditor();
+	const session = useMediaEditor();
 	const aspectRatio = resolveAspectRatio(
-		controller.cropOptions.aspectRatioValue,
-		controller.state.image
+		session.cropOptions.aspectRatioValue,
+		session.cropper.state.image
 	);
 
 	return (
 		<Cropper
 			src={ src }
-			controller={ controller }
+			controller={ session.cropper }
 			aspectRatio={ aspectRatio }
 			freeformCrop
-			onGestureStart={ controller.beginGesture }
-			onGestureEnd={ controller.endGesture }
+			onGestureStart={ session.beginGesture }
+			onGestureEnd={ session.endGesture }
 		/>
 	);
 }

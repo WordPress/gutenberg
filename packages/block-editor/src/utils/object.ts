@@ -70,20 +70,15 @@ export const getValueFromObjectPath = (
 };
 
 /**
- * Helper util to filter out objects with duplicate values for a given property.
+ * Whether a value is a plain object, meaning a non-null object that is not an
+ * array.
  *
- * @param array    Array of objects to filter.
- * @param property Property to filter unique values by.
+ * @param value Value to test.
  *
- * @return Array of objects with unique values for the specified property.
+ * @return Whether the value is a plain object.
  */
-export function uniqByProperty< T extends AnyObject >(
-	array: T[],
-	property: string
-) {
-	const seen = new Set();
-	return array.filter( ( item ) => {
-		const value = item[ property ];
-		return seen.has( value ) ? false : seen.add( value );
-	} );
+export function isPlainObject( value: unknown ): value is AnyObject {
+	return (
+		typeof value === 'object' && value !== null && ! Array.isArray( value )
+	);
 }

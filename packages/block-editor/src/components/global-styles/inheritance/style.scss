@@ -16,7 +16,9 @@
 	// visible label as `.components-input-control__label`, so it must be
 	// targeted too or those controls silently miss the inherited treatment.
 	.components-base-control__label,
-	.components-input-control__label {
+	.components-input-control__label,
+	.block-editor-font-appearance-control__label,
+	.block-editor-font-family-control__label {
 		text-decoration-line: underline;
 		text-decoration-style: dotted;
 		text-decoration-thickness: 1px;
@@ -115,7 +117,7 @@
 
 	&:focus-visible {
 		// Inset focus ring so it doesn't push other text around.
-		outline: 1.5px solid var(--wp-admin-theme-color, #007cba);
+		outline: 1.5px solid var(--wp-admin-theme-color, #3858e9);
 		outline-offset: 1px;
 	}
 
@@ -168,7 +170,7 @@
 	display: block;
 	width: 8px;
 	height: 8px;
-	background-color: var(--wp-admin-theme-color, #007cba);
+	background-color: var(--wp-admin-theme-color, #3858e9);
 	border-radius: 50%;
 }
 
@@ -180,5 +182,5 @@
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	color: var(--wp-admin-theme-color, #007cba);
+	color: var(--wp-admin-theme-color, #3858e9);
 }

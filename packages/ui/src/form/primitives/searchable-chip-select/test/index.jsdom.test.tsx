@@ -76,7 +76,9 @@ describe( 'SearchableChipSelect', () => {
 										key={ item.value }
 										value={ item }
 									>
-										{ item.label }
+										<SearchableChipSelect.ItemLabel>
+											{ item.label }
+										</SearchableChipSelect.ItemLabel>
 									</SearchableChipSelect.Item>
 								) }
 							</SearchableChipSelect.Collection>

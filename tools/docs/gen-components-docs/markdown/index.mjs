@@ -15,6 +15,7 @@ export function generateMarkdownDocs( {
 	typeDocs,
 	subcomponentTypeDocs,
 	tags,
+	deprecated,
 } ) {
 	const mainDocsJson = [
 		{ h1: typeDocs.displayName },
@@ -22,6 +23,11 @@ export function generateMarkdownDocs( {
 		tags.includes( 'status-private' ) && [
 			{
 				p: '🔒 This component is locked as a [private API](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-private-apis/). We do not yet recommend using this outside of the Gutenberg project.',
+			},
+		],
+		deprecated && [
+			{
+				p: `<p class="callout callout-alert">This component is deprecated. ${ deprecated }</p>`,
 			},
 		],
 		{

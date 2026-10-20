@@ -1,5 +1,4 @@
-import { useMemoOne } from 'use-memo-one';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useMemo } from '@wordpress/element';
 import { debounce } from '../../utils/debounce';
 import type { DebounceOptions, DebouncedFunc } from '../../utils/debounce';
 
@@ -23,8 +22,10 @@ export default function useDebounce< TFunc extends ( ...args: any[] ) => void >(
 	wait?: number,
 	options?: DebounceOptions
 ): DebouncedFunc< TFunc > {
-	const debounced = useMemoOne(
+	const debounced = useMemo(
 		() => debounce( fn, wait ?? 0, options ),
+		// Depends on the individual options rather than the `options` object.
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ fn, wait, options?.leading, options?.trailing, options?.maxWait ]
 	);
 	useEffect( () => () => debounced.cancel(), [ debounced ] );

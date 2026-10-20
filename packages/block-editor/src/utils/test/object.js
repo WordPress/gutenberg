@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { setImmutably } from '../object';
+import { isPlainObject, setImmutably } from '../object';
 
 describe( 'setImmutably', () => {
 	describe( 'handling falsy values properly', () => {
@@ -175,5 +175,28 @@ describe( 'setImmutably', () => {
 				input[ 0 ][ 0 ][ 0 ][ 1 ]
 			);
 		} );
+	} );
+} );
+
+describe( 'isPlainObject', () => {
+	it( 'returns true for an object', () => {
+		expect( isPlainObject( {} ) ).toBe( true );
+		expect( isPlainObject( { a: 1 } ) ).toBe( true );
+	} );
+
+	it( 'returns false for an array', () => {
+		expect( isPlainObject( [] ) ).toBe( false );
+		expect( isPlainObject( [ 1, 2 ] ) ).toBe( false );
+	} );
+
+	it( 'returns false for null and undefined', () => {
+		expect( isPlainObject( null ) ).toBe( false );
+		expect( isPlainObject( undefined ) ).toBe( false );
+	} );
+
+	it( 'returns false for primitives', () => {
+		expect( isPlainObject( 'a' ) ).toBe( false );
+		expect( isPlainObject( 1 ) ).toBe( false );
+		expect( isPlainObject( false ) ).toBe( false );
 	} );
 } );

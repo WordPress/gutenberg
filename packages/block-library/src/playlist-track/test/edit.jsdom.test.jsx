@@ -7,7 +7,7 @@ import { useUploadMediaFromBlobURL } from '../../utils/hooks';
 
 let mockMediaReplaceFlowProps;
 
-vi.mock( '@wordpress/block-editor', async () => {
+vi.mock( import( '@wordpress/block-editor' ), async () => {
 	const { default: PlainText } =
 		await import( '../../../../block-editor/src/components/plain-text' );
 
@@ -44,11 +44,11 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => {
 	} );
 } );
 
-vi.mock( '@wordpress/notices', () => ( {
+vi.mock( import( '@wordpress/notices' ), () => ( {
 	store: 'core/notices',
 } ) );
 
-vi.mock( '../../utils/hooks', () => ( {
+vi.mock( import( '../../utils/hooks' ), () => ( {
 	useUploadMediaFromBlobURL: vi.fn(),
 } ) );
 
