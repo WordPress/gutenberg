@@ -78,8 +78,9 @@ export interface InnerBlocksProps extends Omit< InnerBlocksOptions, 'layout' > {
 
 /**
  * Props passed to `useInnerBlocksProps`, merged into the returned props.
+ * Any props object is accepted, including typed element attributes.
  */
-export type UseInnerBlocksPropsProps = Record< string, unknown > & {
+export type UseInnerBlocksPropsProps = object & {
 	ref?: Ref< HTMLElement >;
 	className?: string;
 };
