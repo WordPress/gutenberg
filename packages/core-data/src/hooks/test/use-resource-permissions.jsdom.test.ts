@@ -196,14 +196,8 @@ describe( 'useResourcePermissions', () => {
 
 	it( 'should warn when called with incorrect arguments signature', () => {
 		renderHookWithRegistry( () =>
-			useResourcePermissions(
-				{
-					kind: 'root',
-					name: 'user',
-				},
-				// @ts-expect-error Tests the warning for an ID passed beside an entity resource.
-				1
-			)
+			// @ts-expect-error An ID beside an entity resource; one line, as TS 6 and 7 flag different lines.
+			useResourcePermissions( { kind: 'root', name: 'user' }, 1 )
 		);
 
 		expect( console ).toHaveWarnedWith(
