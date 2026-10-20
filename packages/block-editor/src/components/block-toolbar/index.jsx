@@ -200,13 +200,13 @@ export function PrivateBlockToolbar( {
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
 
-	// The redesign covers blocks in the default editing mode. Zoomed out,
-	// content-only and placeholder toolbars keep the current design.
+	// The redesign covers blocks in the default and content-only editing
+	// modes (content-only is most of what can be edited in a pattern).
+	// Zoomed out and placeholder toolbars keep the current design.
 	if (
 		isBlockToolbarRedesign() &&
 		! isPlaceholder &&
 		! showShuffleButton &&
-		isDefaultEditingMode &&
 		( shouldShowVisualToolbar || isMultiToolbar )
 	) {
 		const isFixed = variant !== 'toolbar';
@@ -250,6 +250,11 @@ export function PrivateBlockToolbar( {
 						isFixed={ isFixed }
 						blockNameRef={ nodeRef }
 						blockNameProps={ showHoveredOrFocusedGestures }
+						canEdit={ canEdit }
+						showSectionStyle={
+							showSwitchSectionStyleButton &&
+							! areSelectedBlocksHiddenOnViewport
+						}
 					/>
 				</div>
 			</NavigableToolbar>

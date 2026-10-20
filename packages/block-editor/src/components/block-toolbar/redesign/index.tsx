@@ -13,6 +13,16 @@ import Movers from './movers';
 import PrimaryActions from './primary-actions';
 import OptionsMenu from './options-menu';
 import ParentChain from './parent-chain';
+import _EditSectionButton from '../edit-section-button';
+import _SwitchSectionStyle from '../switch-section-style';
+
+// Their JSDoc marks every prop as required.
+const EditSectionButton = _EditSectionButton as unknown as ComponentType< {
+	clientId: string;
+} >;
+const SwitchSectionStyle = _SwitchSectionStyle as unknown as ComponentType< {
+	clientId: string;
+} >;
 
 // `BlockControls.Slot` is added at runtime, out of sight of its types.
 const BlockControls = _BlockControls as unknown as {
@@ -86,14 +96,17 @@ function DeleteButton( { clientIds }: { clientIds: string[] } ) {
  * the same place, and text formatting has its own toolbar over selected
  * text.
  *
- * @param props                Component props.
- * @param props.clientIds      Selected blocks.
- * @param props.showParent     Show the parent selector.
- * @param props.showControls   Show block controls from slots.
- * @param props.isFixed        The toolbar is in the top bar, not floating
- *                             over the block.
- * @param props.blockNameRef   Ref for the block name area.
- * @param props.blockNameProps Hover and focus props that outline the block.
+ * @param props                  Component props.
+ * @param props.clientIds        Selected blocks.
+ * @param props.showParent       Show the parent selector.
+ * @param props.showControls     Show block controls from slots.
+ * @param props.isFixed          The toolbar is in the top bar, not floating
+ *                               over the block.
+ * @param props.blockNameRef     Ref for the block name area.
+ * @param props.blockNameProps   Hover and focus props that outline the block.
+ * @param props.canEdit          The selected block can be edited, so a section
+ *                               (an unsynced pattern) can be opened for editing.
+ * @param props.showSectionStyle Show the section style switcher.
  */
 export default function RedesignedBlockToolbar( {
 	clientIds,
@@ -102,6 +115,8 @@ export default function RedesignedBlockToolbar( {
 	isFixed,
 	blockNameRef,
 	blockNameProps,
+	canEdit,
+	showSectionStyle,
 }: {
 	clientIds: string[];
 	showParent: boolean;
@@ -109,6 +124,8 @@ export default function RedesignedBlockToolbar( {
 	isFixed: boolean;
 	blockNameRef?: Ref< HTMLDivElement >;
 	blockNameProps?: HTMLAttributes< HTMLDivElement >;
+	canEdit?: boolean;
+	showSectionStyle?: boolean;
 } ) {
 	const isSingle = clientIds.length === 1;
 	return (
@@ -130,6 +147,14 @@ export default function RedesignedBlockToolbar( {
 			</div>
 			<Movers clientIds={ clientIds } />
 			{ isSingle && <PrimaryActions clientId={ clientIds[ 0 ] } /> }
+			{ /* Labelled structural actions on sections (patterns), which
+			stay top-level like the other primary actions. */ }
+			{ isSingle && canEdit && (
+				<EditSectionButton clientId={ clientIds[ 0 ] } />
+			) }
+			{ isSingle && showSectionStyle && (
+				<SwitchSectionStyle clientId={ clientIds[ 0 ] } />
+			) }
 			{ showControls && <LegacyControls /> }
 			<ToolbarGroup className="block-editor-block-toolbar-redesign__end">
 				<OptionsMenu clientIds={ clientIds } />

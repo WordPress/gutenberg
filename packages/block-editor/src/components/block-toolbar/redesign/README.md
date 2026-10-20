@@ -18,7 +18,7 @@ The toolbar is a fixed sequence of groups. This is the guide for block authors, 
 | Parent selector | The nearest parent block; its menu lists every parent up to the top of the page. Sits outside the toolbar, to its left (or first, in the top toolbar). | Core |
 | Block name | `Paragraph ⌄`: transforms, the block's own variations (heading levels) and style presets. The only place for these; ad hoc transform controls such as a heading level dropdown don't belong on the toolbar. | Core, from transforms, `transform` scoped variations and block styles |
 | Movers | Drag handle, move up, move down (left and right in a row). | Core |
-| Primary actions | The few structural actions a block keeps on top. For containers: a labelled `Layout ⌄` button (layout variations, justification, vertical alignment) and a `+` that adds a block inside. Most atomic blocks leave it empty. | Core, from the `layout` support and inner blocks |
+| Primary actions | The few structural actions a block keeps on top. For containers: a labelled `Layout ⌄` button (layout variations, justification, vertical alignment) and a `+` that adds a block inside. For sections (patterns): `Edit pattern` and the section style switcher. Most atomic blocks leave it empty. | Core, from the `layout` support, inner blocks and sections |
 | Block controls | Controls registered with `BlockControls`. In the redesign core no longer puts alignment, layout or formatting controls here, so what's left is block-specific (Replace on an image) and third-party controls. See open questions. | Blocks and plugins |
 | Options | `⋮`: one searchable menu with labelled flyouts. Align (Text, Block), Format, Styles (copy and paste), Insert (inline image, footnote, math, block before and after), Copy, Cut, Duplicate, Group, and More (Lock, Rename, Hide, Edit as HTML, plugin items). | Core, plus `BlockSettingsMenuControls` fills under More |
 | Delete | Trash button, on every block that can be removed. | Core |
@@ -41,4 +41,5 @@ Text has its own toolbar, the **selection toolbar**, which appears just below se
 -   **Where the parent selector sits.** To the left of the toolbar for now; above it is the other option. A long chain is in its menu, not on the toolbar.
 -   **A preference to hide the movers,** and whether "Show button text labels" is still needed once every non-standard icon has a label.
 -   **Search** finds items in the flyouts, but not Copy and Cut (the clipboard needs the click on the item itself) or plugin items.
--   Zoomed out, content-only and placeholder toolbars keep the current design.
+-   Content-only blocks (most of what can be edited inside a pattern) use the redesign too, with what the current toolbar allows there: the block name offers style presets but no transforms, alignment is left out, and a section keeps its labelled **Edit pattern** button among the primary actions. Zoomed out and placeholder toolbars keep the current design.
+-   A synced pattern's overrides keep their current menu in place of the block name.

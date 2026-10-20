@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { Button, Icon as WCIcon, ToolbarItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -15,7 +16,23 @@ import BlockIcon from '../../block-icon';
 import useBlockDisplayInformation from '../../use-block-display-information';
 import useStylesForBlocks from '../../block-styles/use-styles-for-block';
 import { store as blockEditorStore } from '../../../store';
+import _BlockToolbarIcon, { getBlockIconVariant } from '../block-toolbar-icon';
 import { isLayoutVariation } from './utils';
+
+// Its JSDoc marks every prop as required.
+const BlockToolbarIcon = _BlockToolbarIcon as unknown as ComponentType< {
+	clientIds: string[];
+	isSynced?: boolean;
+} >;
+
+/*
+ * What the block name menu may offer, by the same rules as the current block
+ * icon button: `switcher` allows transforms and style presets, `styles-only`
+ * (a content-only block, e.g. inside a pattern) only style presets,
+ * `pattern-overrides` the overrides of a synced pattern, and `default`
+ * nothing, so the name is just a label.
+ */
+type NameVariant = 'switcher' | 'styles-only' | 'pattern-overrides' | 'default';
 
 type BlockStyle = { name: string; label?: string };
 
@@ -60,7 +77,13 @@ function TransformItems( {
 	) );
 }
 
-function StylePresets( { clientId }: { clientId: string } ) {
+function StylePresets( {
+	clientId,
+	withSeparator,
+}: {
+	clientId: string;
+	withSeparator: boolean;
+} ) {
 	const { onSelect, stylesToRender, activeStyle } = useStylesForBlocks( {
 		clientId,
 		onSwitch: () => {},
@@ -74,7 +97,7 @@ function StylePresets( { clientId }: { clientId: string } ) {
 	}
 	return (
 		<>
-			<Menu.Separator />
+			{ withSeparator && <Menu.Separator /> }
 			<Menu.RadioGroup
 				value={ activeStyle?.name ?? null }
 				onValueChange={ ( name ) => {
@@ -119,60 +142,75 @@ export default function BlockNameMenu( {
 	const { replaceBlocks, multiSelect, updateBlockAttributes } =
 		useDispatch( blockEditorStore );
 
-	const { blocks, transforms, variations, activeVariation, canTransform } =
-		useSelect(
-			( select ) => {
-				const {
-					getBlocksByClientId,
-					getBlockRootClientId,
-					getBlockTransformItems,
-					canRemoveBlocks,
-					getBlockAttributes,
-					getBlockName,
-				} = select( blockEditorStore );
-				const { getBlockVariations, getActiveBlockVariation } =
-					select( blocksStore );
-				const _blocks = getBlocksByClientId( clientIds ) as any[];
-				const name = isSingle ? getBlockName( firstClientId ) : null;
-				return {
-					blocks: _blocks,
-					transforms: getBlockTransformItems(
-						_blocks,
-						getBlockRootClientId( firstClientId )
-					),
-					variations: name
-						? getBlockVariations( name, 'transform' )
-						: undefined,
-					activeVariation: name
-						? getActiveBlockVariation(
-								name,
-								getBlockAttributes( firstClientId ) ?? {}
-							)
-						: undefined,
-					canTransform: canRemoveBlocks( clientIds ),
-				};
-			},
-			[ clientIds, firstClientId, isSingle ]
-		);
+	const {
+		blocks,
+		transforms,
+		variations,
+		activeVariation,
+		canTransform,
+		variant,
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlocksByClientId,
+				getBlockRootClientId,
+				getBlockTransformItems,
+				canRemoveBlocks,
+				getBlockAttributes,
+				getBlockName,
+			} = select( blockEditorStore );
+			const { getBlockVariations, getActiveBlockVariation } =
+				select( blocksStore );
+			const _blocks = getBlocksByClientId( clientIds ) as any[];
+			const name = isSingle ? getBlockName( firstClientId ) : null;
+			return {
+				blocks: _blocks,
+				transforms: getBlockTransformItems(
+					_blocks,
+					getBlockRootClientId( firstClientId )
+				),
+				variations: name
+					? getBlockVariations( name, 'transform' )
+					: undefined,
+				activeVariation: name
+					? getActiveBlockVariation(
+							name,
+							getBlockAttributes( firstClientId ) ?? {}
+						)
+					: undefined,
+				canTransform: canRemoveBlocks( clientIds ),
+				variant: getBlockIconVariant( {
+					select,
+					clientIds,
+				} ) as NameVariant,
+			};
+		},
+		[ clientIds, firstClientId, isSingle ]
+	);
 
 	const isSynced =
 		isSingle &&
 		( isReusableBlock( blocks[ 0 ] ) || isTemplatePart( blocks[ 0 ] ) );
 
+	const allowTransforms = variant === 'switcher';
+	const allowStyles = variant === 'switcher' || variant === 'styles-only';
+
 	const sortedTransforms = useMemo(
 		() =>
-			canTransform && ! isSynced
+			allowTransforms && canTransform && ! isSynced
 				? sortTransforms( ( transforms ?? [] ) as TransformItem[] )
 				: [],
-		[ canTransform, isSynced, transforms ]
+		[ allowTransforms, canTransform, isSynced, transforms ]
 	);
 	// Variations that only switch the layout belong to the Layout button.
 	const contentVariations = useMemo(
 		() =>
-			( variations ?? [] ).filter(
-				( variation ) => ! isLayoutVariation( variation )
-			),
-		[ variations ]
+			allowTransforms
+				? ( variations ?? [] ).filter(
+						( variation ) => ! isLayoutVariation( variation )
+					)
+				: [],
+		[ allowTransforms, variations ]
 	);
 
 	function selectForMultipleBlocks( insertedBlocks: { clientId: string }[] ) {
@@ -212,6 +250,42 @@ export default function BlockNameMenu( {
 	const visibleTransforms = sortedTransforms.slice( 0, VISIBLE_TRANSFORMS );
 	const moreTransforms = sortedTransforms.slice( VISIBLE_TRANSFORMS );
 
+	// A synced pattern's overrides keep their own menu for now.
+	if ( variant === 'pattern-overrides' ) {
+		return <BlockToolbarIcon clientIds={ clientIds } isSynced />;
+	}
+
+	const nameContent = (
+		<>
+			<BlockIcon
+				icon={ isSingle ? blockInformation?.icon : null }
+				showColors
+			/>
+			<span className="block-editor-block-toolbar-redesign__name-label">
+				{ label }
+			</span>
+		</>
+	);
+
+	// Nothing can change: the name is only a label.
+	if ( ! allowTransforms && ! allowStyles ) {
+		return (
+			<ToolbarItem>
+				{ ( itemProps ) => (
+					<Button
+						{ ...itemProps }
+						__next40pxDefaultSize
+						accessibleWhenDisabled
+						disabled
+						className="block-editor-block-toolbar-redesign__name is-label"
+					>
+						{ nameContent }
+					</Button>
+				) }
+			</ToolbarItem>
+		);
+	}
+
 	return (
 		<Menu.Root>
 			<ToolbarItem>
@@ -228,13 +302,7 @@ export default function BlockNameMenu( {
 							/>
 						}
 					>
-						<BlockIcon
-							icon={ isSingle ? blockInformation?.icon : null }
-							showColors
-						/>
-						<span className="block-editor-block-toolbar-redesign__name-label">
-							{ label }
-						</span>
+						{ nameContent }
 						<WCIcon
 							className="block-editor-block-toolbar-redesign__chevron"
 							icon={ chevronDown }
@@ -291,14 +359,24 @@ export default function BlockNameMenu( {
 						) }
 					</Menu.Group>
 				) }
-				{ isSingle && <StylePresets clientId={ firstClientId } /> }
-				{ ! sortedTransforms.length && contentVariations.length < 2 && (
-					<Menu.Item disabled>
-						<Menu.ItemLabel>
-							{ __( 'No transforms.' ) }
-						</Menu.ItemLabel>
-					</Menu.Item>
+				{ isSingle && allowStyles && (
+					<StylePresets
+						clientId={ firstClientId }
+						withSeparator={
+							!! sortedTransforms.length ||
+							contentVariations.length > 1
+						}
+					/>
 				) }
+				{ allowTransforms &&
+					! sortedTransforms.length &&
+					contentVariations.length < 2 && (
+						<Menu.Item disabled>
+							<Menu.ItemLabel>
+								{ __( 'No transforms.' ) }
+							</Menu.ItemLabel>
+						</Menu.Item>
+					) }
 			</Menu.Popup>
 		</Menu.Root>
 	);

@@ -173,9 +173,11 @@ function useSelectedBlockDetails( clientIds: string[] ): BlockDetails {
  * @return The current value and a setter, or null.
  */
 function useTextAlignment( block: BlockDetails ): RadioControl | null {
-	const { clientId, isSingle, name, attributes, canEdit } = block;
+	const { clientId, isSingle, name, attributes, canEdit, isContentOnly } =
+		block;
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	if ( ! isSingle || ! canEdit || ! name ) {
+	// Like the toolbar control it replaces, only in the default editing mode.
+	if ( ! isSingle || ! canEdit || isContentOnly || ! name ) {
 		return null;
 	}
 	if ( hasBlockSupport( name, 'typography.textAlign', false ) ) {
@@ -226,13 +228,14 @@ function useBlockAlignment( block: BlockDetails ): RadioControl | null {
 		canEdit,
 		themeSupportsWide,
 		parentLayoutType,
+		isContentOnly,
 	} = block;
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const [ contentSize, wideSize ] = useSettings(
 		'layout.contentSize',
 		'layout.wideSize'
 	) as [ string | undefined, string | undefined ];
-	if ( ! isSingle || ! canEdit || ! name ) {
+	if ( ! isSingle || ! canEdit || isContentOnly || ! name ) {
 		return null;
 	}
 	const support = getBlockSupport( name, 'align' ) as
