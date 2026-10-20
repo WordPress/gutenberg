@@ -1358,6 +1358,11 @@ async function transpilePackage( packageName ) {
 					return null;
 				}
 
+				// Let SVG files be inlined by the `dataurl` loader.
+				if ( args.path.endsWith( '.svg' ) ) {
+					return null;
+				}
+
 				// Fully resolve local dependencies without file extension
 				// and replace the extension with the target extension.
 				if ( args.path.startsWith( '.' ) ) {
