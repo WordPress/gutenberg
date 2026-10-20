@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Make the `inline` argument to `removeInvalidHTML` optional in its types, matching existing behavior ([#85161](https://github.com/WordPress/gutenberg/pull/85161)).
+
+### Internal
+
+-   Convert the remaining tests to TypeScript ([#85161](https://github.com/WordPress/gutenberg/pull/85161)).
+
+## 5.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).

@@ -21,7 +21,7 @@ import {
 	insert,
 	privateApis as richTextPrivateApis,
 } from '@wordpress/rich-text';
-import type { EventListenersProps, RichTextValue } from '@wordpress/rich-text';
+import type { EventCallbacksSet, RichTextValue } from '@wordpress/rich-text';
 import { unlock } from '../../../lock-unlock';
 import { getAllowedFormats } from './utils';
 import FormatEdit from './format-edit';
@@ -204,10 +204,12 @@ export default function RichTextControl( {
 	} );
 	const [ isSelected, setIsSelected ] = useState( false );
 	const anchorRef = useRef< HTMLElement | undefined >( undefined );
-	const inputEvents = useRef( new Set< ( event: Event ) => void >() );
-	const keyboardShortcuts = useRef(
-		new Set< ( event: KeyboardEvent ) => void >()
+	const [ inputEvents ] = useState< EventCallbacksSet< InputEvent > >(
+		() => new Set()
 	);
+	const [ keyboardShortcuts ] = useState<
+		EventCallbacksSet< KeyboardEvent >
+	>( () => new Set() );
 
 	// The focus boundary (below) wraps the editable and its format UI. Format
 	// popovers portal out of it in the DOM but still bubble focus events
@@ -253,15 +255,6 @@ export default function RichTextControl( {
 	function onFocus() {
 		anchorRef.current?.focus();
 	}
-
-	// Wire registered format keyboard shortcuts (e.g. Cmd+B, Cmd+I, Cmd+K)
-	// and InputEvent handlers (e.g. native formatBold) to the contenteditable.
-	// FormatEdit populates these Sets via context; without these listeners the
-	// callbacks would never fire.
-	const eventListenersPropsRef = useRef< EventListenersProps >( {
-		keyboardShortcuts,
-		inputEvents,
-	} );
 
 	// Keep `formatTypes`/`getValue`/`onChange` accessible to the input-rule
 	// and Enter listeners without retearing them down on every value change.
@@ -336,12 +329,10 @@ export default function RichTextControl( {
 			if ( ! isSelected ) {
 				return;
 			}
-			const cleanupShortcuts = shortcutsListener(
-				eventListenersPropsRef
-			)( element );
-			const cleanupInputEvents = inputEventsListener(
-				eventListenersPropsRef
-			)( element );
+			const cleanupShortcuts =
+				shortcutsListener( keyboardShortcuts )( element );
+			const cleanupInputEvents =
+				inputEventsListener( inputEvents )( element );
 
 			// Apply format-level input rules (e.g. `core/code`'s
 			// backtick→inline-code transform). Block-transform input rules
@@ -392,7 +383,7 @@ export default function RichTextControl( {
 				element.removeEventListener( 'compositionend', onFormatInput );
 			};
 		},
-		[ isSelected ]
+		[ isSelected, keyboardShortcuts, inputEvents ]
 	);
 
 	/*

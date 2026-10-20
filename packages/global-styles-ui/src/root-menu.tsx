@@ -1,6 +1,7 @@
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import {
 	background,
+	blockDefault,
 	typography,
 	color,
 	layout,
@@ -72,6 +73,9 @@ function RootMenu() {
 						{ __( 'Layout' ) }
 					</NavigationButtonAsItem>
 				) }
+				<NavigationButtonAsItem icon={ blockDefault } path="/blocks">
+					{ __( 'Blocks & Elements' ) }
+				</NavigationButtonAsItem>
 			</ItemGroup>
 		</>
 	);

@@ -11,7 +11,7 @@ import type { Action, BlocksStoreThunkArgs } from './types';
 
 /**
  * Returns an action object used in signalling that block types have been added.
- * Ignored from documentation as the recommended usage for this action through registerBlockType from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through registerBlockType from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -74,7 +74,7 @@ export function __experimentalReapplyBlockFilters() {
 
 /**
  * Returns an action object used to remove a registered block type.
- * Ignored from documentation as the recommended usage for this action through unregisterBlockType from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockType from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -91,7 +91,7 @@ export function removeBlockTypes( names: string | string[] ): Action {
 
 /**
  * Returns an action object used in signalling that new block styles have been added.
- * Ignored from documentation as the recommended usage for this action through registerBlockStyle from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through registerBlockStyle from `@wordpress/blocks`.
  *
  * @param blockNames Block names to register new styles for.
  * @param styles     Block style object or array of block style objects.
@@ -113,7 +113,7 @@ export function addBlockStyles(
 
 /**
  * Returns an action object used in signalling that block styles have been removed.
- * Ignored from documentation as the recommended usage for this action through unregisterBlockStyle from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockStyle from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -135,7 +135,7 @@ export function removeBlockStyles(
 
 /**
  * Returns an action object used in signalling that new block variations have been added.
- * Ignored from documentation as the recommended usage for this action through registerBlockVariation from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through registerBlockVariation from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -157,7 +157,7 @@ export function addBlockVariations(
 
 /**
  * Returns an action object used in signalling that block variations have been removed.
- * Ignored from documentation as the recommended usage for this action through unregisterBlockVariation from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockVariation from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -181,7 +181,7 @@ export function removeBlockVariations(
 
 /**
  * Returns an action object used to set the default block name.
- * Ignored from documentation as the recommended usage for this action through setDefaultBlockName from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through setDefaultBlockName from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -199,7 +199,7 @@ export function setDefaultBlockName( name: string ): Action {
 /**
  * Returns an action object used to set the name of the block used as a fallback
  * for non-block content.
- * Ignored from documentation as the recommended usage for this action through setFreeformContentHandlerName from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through setFreeformContentHandlerName from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -217,7 +217,7 @@ export function setFreeformFallbackBlockName( name: string ): Action {
 /**
  * Returns an action object used to set the name of the block used as a fallback
  * for unregistered blocks.
- * Ignored from documentation as the recommended usage for this action through setUnregisteredTypeHandlerName from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through setUnregisteredTypeHandlerName from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -236,7 +236,7 @@ export function setUnregisteredFallbackBlockName( name: string ): Action {
  * Returns an action object used to set the name of the block used
  * when grouping other blocks
  * eg: in "Group/Ungroup" interactions
- * Ignored from documentation as the recommended usage for this action through setGroupingBlockName from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through setGroupingBlockName from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -253,7 +253,7 @@ export function setGroupingBlockName( name: string ): Action {
 
 /**
  * Returns an action object used to set block categories.
- * Ignored from documentation as the recommended usage for this action through setCategories from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through setCategories from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -270,7 +270,7 @@ export function setCategories( categories: BlockCategory[] ): Action {
 
 /**
  * Returns an action object used to update a category.
- * Ignored from documentation as the recommended usage for this action through updateCategory from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through updateCategory from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -292,7 +292,7 @@ export function updateCategory(
 
 /**
  * Returns an action object used to add block collections
- * Ignored from documentation as the recommended usage for this action through registerBlockCollection from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through registerBlockCollection from `@wordpress/blocks`.
  *
  * @ignore
  *
@@ -317,7 +317,7 @@ export function addBlockCollection(
 
 /**
  * Returns an action object used to remove block collections
- * Ignored from documentation as the recommended usage for this action through unregisterBlockCollection from @wordpress/blocks.
+ * Ignored from documentation as the recommended usage for this action through unregisterBlockCollection from `@wordpress/blocks`.
  *
  * @ignore
  *
