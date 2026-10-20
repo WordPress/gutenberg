@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   `Avatar`: Replace the compound API with a single component requiring `name`. Use `src` and optional `imageProps` for images; initials are the only fallback. Sizes now describe the intended high-DPI image size with a fixed additional footprint for the activity ring and transparent halo.
+-   `Avatar`: Replace the compound API with a single component requiring `name`. Use `src` and optional `imageProps` for images; initials are the only fallback. Sizes now describe the intended high-DPI image size with a fixed additional footprint for the activity ring and transparent halo. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 
 -   `Calendar` and `RangeCalendar`: Fill their container width with no internal maximum. Constrain the container width to keep a compact calendar ([#86086](https://github.com/WordPress/gutenberg/pull/86086)).
 -   `Menu`, `Popover`: Remove the same-origin iframe outside-press workaround. Parent documents that need canvas presses to dismiss popups should forward those events from the iframe document onto the `<iframe>` element, as the block editor canvas does ([#85263](https://github.com/WordPress/gutenberg/pull/85263)).
@@ -16,7 +16,7 @@
 
 ### Enhancements
 
--   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, share opaque colors between the ring and fallback, fit initials to small sizes, and enlarge single initials.
+-   `Avatar`: Add a visual `active` state with a ring, remove inactive borders, share opaque colors between the ring and fallback, fit initials to small sizes, and enlarge single initials. ([#85208](https://github.com/WordPress/gutenberg/pull/85208))
 
 -   `Input`, `InputControl`, `Textarea`, and `TextareaControl`: Style read-only fields with a muted border, keeping the value at full text contrast ([#86504](https://github.com/WordPress/gutenberg/pull/86504)).
 -   `Select`, `Combobox`, `Autocomplete`, and `Menu`: Tighten item label and description line-height, add spacing between labels and descriptions, and increase menu item block padding ([#84612](https://github.com/WordPress/gutenberg/pull/84612)).
