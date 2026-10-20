@@ -2,22 +2,34 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { speak } from '@wordpress/a11y';
 
-let location;
+type UseSelect = ( typeof import( '@wordpress/data' ) )[ 'useSelect' ];
+type CoreStore = ( typeof import( '@wordpress/core-data' ) )[ 'store' ];
+type RouterPrivateApis =
+	( typeof import( '@wordpress/router' ) )[ 'privateApis' ];
+type Unlock = ( typeof import( '../../../lock-unlock' ) )[ 'unlock' ];
+type UseTitle = ( typeof import( '../use-title' ) )[ 'default' ];
+type Props = { title?: string | false };
+
+let location: { path: string; query: Record< string, string > };
 
 vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
 
 vi.mock( import( '@wordpress/data' ), () => ( {
-	useSelect: () => 'My Site',
+	useSelect: ( () => 'My Site' ) as unknown as UseSelect,
 } ) );
 
-vi.mock( import( '@wordpress/core-data' ), () => ( { store: 'core' } ) );
+vi.mock( import( '@wordpress/core-data' ), () => ( {
+	store: 'core' as unknown as CoreStore,
+} ) );
 
 vi.mock( import( '@wordpress/router' ), () => ( {
-	privateApis: { useLocation: () => location },
+	privateApis: {
+		useLocation: () => location,
+	} as unknown as RouterPrivateApis,
 } ) );
 
 vi.mock( import( '../../../lock-unlock' ), () => ( {
-	unlock: ( object ) => object,
+	unlock: ( ( object: unknown ) => object ) as unknown as Unlock,
 } ) );
 
 async function loadUseTitle() {
@@ -25,12 +37,12 @@ async function loadUseTitle() {
 	return ( await import( '../use-title' ) ).default;
 }
 
-function navigate( path, query = {} ) {
+function navigate( path: string, query: Record< string, string > = {} ) {
 	location = { path, query };
 }
 
 describe( 'useTitle', () => {
-	let useTitle;
+	let useTitle: UseTitle;
 
 	beforeEach( async () => {
 		vi.mocked( speak ).mockClear();
@@ -49,9 +61,10 @@ describe( 'useTitle', () => {
 	} );
 
 	it( 'announces the new screen when the path changes', () => {
-		const { rerender } = renderHook( ( { title } ) => useTitle( title ), {
-			initialProps: { title: 'Design' },
-		} );
+		const { rerender } = renderHook(
+			( { title }: Props ) => useTitle( title ),
+			{ initialProps: { title: 'Design' } }
+		);
 
 		navigate( '/page' );
 		rerender( { title: 'Pages' } );
@@ -63,9 +76,10 @@ describe( 'useTitle', () => {
 
 	it( 'does not announce when only the query changes', () => {
 		navigate( '/page' );
-		const { rerender } = renderHook( ( { title } ) => useTitle( title ), {
-			initialProps: { title: 'Pages' },
-		} );
+		const { rerender } = renderHook(
+			( { title }: Props ) => useTitle( title ),
+			{ initialProps: { title: 'Pages' } }
+		);
 
 		navigate( '/page', { search: 'Team' } );
 		rerender( { title: 'Pages' } );
@@ -77,9 +91,10 @@ describe( 'useTitle', () => {
 
 	it( 'does not announce a title that changes on the same screen', () => {
 		navigate( '/page/12', { canvas: 'edit' } );
-		const { rerender } = renderHook( ( { title } ) => useTitle( title ), {
-			initialProps: { title: 'About ‹ Page' },
-		} );
+		const { rerender } = renderHook(
+			( { title }: Props ) => useTitle( title ),
+			{ initialProps: { title: 'About ‹ Page' } }
+		);
 
 		rerender( { title: 'About us ‹ Page' } );
 
@@ -91,9 +106,10 @@ describe( 'useTitle', () => {
 
 	it( 'announces when the canvas switches to edit mode', () => {
 		navigate( '/page/12' );
-		const { rerender } = renderHook( ( { title } ) => useTitle( title ), {
-			initialProps: { title: 'Pages' },
-		} );
+		const { rerender } = renderHook(
+			( { title }: Props ) => useTitle( title ),
+			{ initialProps: { title: 'Pages' } }
+		);
 
 		navigate( '/page/12', { canvas: 'edit' } );
 		rerender( { title: 'About ‹ Page' } );
@@ -103,11 +119,11 @@ describe( 'useTitle', () => {
 
 	it( 'shares the last announced screen between callers', () => {
 		navigate( '/page' );
-		const { rerender: rerenderLayout } = renderHook(
+		const { rerender: rerenderLayout } = renderHook< void, Props >(
 			( { title } ) => useTitle( title ),
 			{ initialProps: { title: 'Pages' } }
 		);
-		const { rerender: rerenderEditor } = renderHook(
+		const { rerender: rerenderEditor } = renderHook< void, Props >(
 			( { title } ) => useTitle( title ),
 			{ initialProps: { title: undefined } }
 		);

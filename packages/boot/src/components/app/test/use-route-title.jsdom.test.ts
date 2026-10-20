@@ -3,25 +3,42 @@ import { renderHook } from '@testing-library/react';
 import { speak } from '@wordpress/a11y';
 import useRouteTitle from '../use-route-title';
 
-let matches;
+type UseSelect = ( typeof import( '@wordpress/data' ) )[ 'useSelect' ];
+type CoreStore = ( typeof import( '@wordpress/core-data' ) )[ 'store' ];
+type RoutePrivateApis =
+	( typeof import( '@wordpress/route' ) )[ 'privateApis' ];
+type Unlock = ( typeof import( '../../../lock-unlock' ) )[ 'unlock' ];
+type Match = {
+	pathname: string;
+	search?: Record< string, unknown >;
+	loaderData?: { title: string };
+};
+
+let matches: Match[];
 
 vi.mock( import( '@wordpress/a11y' ), () => ( { speak: vi.fn() } ) );
 
 vi.mock( import( '@wordpress/data' ), () => ( {
-	useSelect: () => 'My Site',
+	useSelect: ( () => 'My Site' ) as unknown as UseSelect,
 } ) );
 
-vi.mock( import( '@wordpress/core-data' ), () => ( { store: 'core' } ) );
+vi.mock( import( '@wordpress/core-data' ), () => ( {
+	store: 'core' as unknown as CoreStore,
+} ) );
 
 vi.mock( import( '@wordpress/route' ), () => ( {
-	privateApis: { useMatches: () => matches },
+	privateApis: { useMatches: () => matches } as unknown as RoutePrivateApis,
 } ) );
 
 vi.mock( import( '../../../lock-unlock' ), () => ( {
-	unlock: ( object ) => object,
+	unlock: ( ( object: unknown ) => object ) as unknown as Unlock,
 } ) );
 
-function navigate( pathname, title, search = {} ) {
+function navigate(
+	pathname: string,
+	title: string,
+	search: Record< string, unknown > = {}
+) {
 	matches = [
 		{ pathname: '/' },
 		{ pathname, search, loaderData: { title } },

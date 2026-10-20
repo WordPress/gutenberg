@@ -76,7 +76,7 @@ export function useScreenTitle() {
  * when only the query changes (search, filters, selection), or when the title
  * changes while the screen stays the same (for example a rename).
  *
- * @param {string} title Title of the current screen. Nothing happens when empty.
+ * @param {string|false} [title] Title of the current screen. Nothing happens when empty.
  */
 export default function useTitle( title ) {
 	const { path, query } = useLocation();
