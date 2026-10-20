@@ -16,11 +16,7 @@ import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
-import type {
-	ForwardedRef,
-	ForwardRefExoticComponent,
-	RefAttributes,
-} from 'react';
+import type { ForwardedRef, ReactElement, RefAttributes } from 'react';
 import type { SelectFunction } from '@wordpress/data';
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
@@ -50,6 +46,7 @@ import type { UseBlockEditorAutocompletePropsOptions } from '../autocomplete/typ
 import type {
 	RichTextBinding,
 	RichTextEventListenerProps,
+	RichTextFieldValue,
 	RichTextProps,
 } from './types';
 
@@ -721,10 +718,15 @@ export { ForwardedRichTextWrapper as RichTextWrapper };
 
 const RichTextWithDeprecations = withDeprecations( ForwardedRichTextWrapper );
 
-// `forwardRef` types no statics, which are assigned below.
-type RichTextComponent = ForwardRefExoticComponent<
-	Omit< RichTextProps, 'ref' > & RefAttributes< HTMLElement >
-> & {
+/*
+ * `forwardRef` types no statics, which are assigned below, and drops the
+ * value generic that ties `onChange` to `value`.
+ */
+type RichTextComponent = ( <
+	V extends RichTextFieldValue = RichTextFieldValue,
+>(
+	props: Omit< RichTextProps< V >, 'ref' > & RefAttributes< HTMLElement >
+) => ReactElement | null ) & {
 	Content: typeof Content;
 	isEmpty: typeof isEmpty;
 };
@@ -785,7 +787,7 @@ const PublicForwardedRichTextContainer = forwardRef<
 	return (
 		<RichTextWithDeprecations ref={ ref } { ...props } readOnly={ false } />
 	);
-} ) as RichTextComponent;
+} ) as unknown as RichTextComponent;
 
 PublicForwardedRichTextContainer.Content = Content;
 PublicForwardedRichTextContainer.isEmpty = isEmpty;

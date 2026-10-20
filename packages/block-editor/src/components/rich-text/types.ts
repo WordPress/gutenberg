@@ -1,7 +1,7 @@
 import type {
+	AllHTMLAttributes,
 	ComponentProps,
 	ElementType,
-	HTMLAttributes,
 	ReactNode,
 	Ref,
 	RefObject,
@@ -169,16 +169,19 @@ type InputEvents = Set< ( event: InputEvent ) => void >;
 
 /**
  * Props of the `RichText` component. Other props go to the editable element.
+ * `onChange` receives the same kind of value the field was given.
  */
-export type RichTextOwnProps = {
+export type RichTextOwnProps<
+	V extends RichTextFieldValue = RichTextFieldValue,
+> = {
 	children?: ( props: {
 		value: RichTextValue;
 		onChange: ( value: RichTextValue ) => void;
 		onFocus: () => void;
 	} ) => ReactNode;
 	tagName?: ElementType;
-	value?: RichTextFieldValue;
-	onChange?: ( value: RichTextFieldValue ) => void;
+	value?: V;
+	onChange?: ( value: V ) => void;
 	isSelected?: boolean;
 	multiline?: boolean | string;
 	inlineToolbar?: boolean;
@@ -207,11 +210,15 @@ export type RichTextOwnProps = {
 	readOnly?: boolean;
 };
 
-export type RichTextProps = RichTextOwnProps &
-	Omit< HTMLAttributes< HTMLElement >, keyof RichTextOwnProps > & {
-		ref?: Ref< HTMLElement >;
-		[ key: `data-${ string }` ]: unknown;
-	};
+/**
+ * The element attributes cover any `tagName`, such as `href` for a link.
+ */
+export type RichTextProps< V extends RichTextFieldValue = RichTextFieldValue > =
+	RichTextOwnProps< V > &
+		Omit< AllHTMLAttributes< HTMLElement >, keyof RichTextOwnProps > & {
+			ref?: Ref< HTMLElement >;
+			[ key: `data-${ string }` ]: unknown;
+		};
 
 /**
  * The latest props of the rich text event listeners, read when an event

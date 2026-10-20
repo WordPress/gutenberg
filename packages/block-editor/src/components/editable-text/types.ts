@@ -1,8 +1,9 @@
 import type { ElementType, HTMLAttributes } from 'react';
 import type { RichTextProps } from '../rich-text/types';
 
+// Editable text holds plain text, so the value is a string.
 export type EditableTextProps = Omit<
-	RichTextProps,
+	RichTextProps< string >,
 	'ref' | '__unstableDisableFormats'
 >;
 
