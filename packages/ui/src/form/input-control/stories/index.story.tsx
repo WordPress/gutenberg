@@ -109,17 +109,6 @@ export const Password: Story = {
 	},
 };
 
-export const Monospace: Story = {
-	args: {
-		...Default.args,
-		label: 'API key',
-		description: undefined,
-		placeholder: undefined,
-		monospace: true,
-		defaultValue: 'sk_1iIl0O-Il1O0i',
-	},
-};
-
 export const Date: Story = {
 	args: {
 		...Default.args,
@@ -177,5 +166,16 @@ export const Disabled: Story = {
 	args: {
 		...Default.args,
 		disabled: true,
+	},
+};
+
+export const Monospace: Story = {
+	args: {
+		...Default.args,
+		label: 'API key',
+		description: undefined,
+		placeholder: undefined,
+		monospace: true,
+		defaultValue: 'sk_1iIl0O-Il1O0i',
 	},
 };
