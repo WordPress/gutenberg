@@ -839,7 +839,7 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 		] );
 	} );
 
-	test( 'should draw a selection box while dragging', async ( {
+	test( 'should not draw a selection box when selecting text', async ( {
 		page,
 		editor,
 		multiBlockSelectionUtils,
@@ -864,11 +864,9 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 
 		await paragraph1.hover();
 		await page.mouse.down();
-		await expect( box ).toBeHidden();
 		await paragraph2.hover();
-		await expect( box ).toBeVisible();
-		await page.mouse.up();
 		await expect( box ).toBeHidden();
+		await page.mouse.up();
 
 		await expect
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
@@ -931,6 +929,83 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.toMatchObject( [
 				{ name: 'core/paragraph', attributes: { content: '3' } },
 			] );
+	} );
+
+	test( 'should select the inner blocks the selection box touches within a container', async ( {
+		page,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"style":{"spacing":{"padding":{"top":"40px","bottom":"40px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group" style="padding-top:40px;padding-bottom:40px"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:paragraph -->
+<p>4</p>
+<!-- /wp:paragraph -->` );
+
+		const [ paragraph1, paragraph2, , paragraph4 ] = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.all();
+
+		// Start to the left of the first inner paragraph, outside of any
+		// block.
+		const paragraph1Box = await paragraph1.boundingBox();
+		const groupBox = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Group' } )
+			.boundingBox();
+		await page.mouse.move( groupBox.x - 20, paragraph1Box.y + 1 );
+		await page.mouse.down();
+		await paragraph2.hover( { position: { x: 1, y: 1 } } );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 2, 3 ] );
+
+		// Past the container, the container is selected.
+		await paragraph4.hover( { position: { x: 1, y: 1 } } );
+		await page.mouse.up();
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
+			.toEqual( [ 1, 5 ] );
+	} );
+
+	test( 'should not draw a selection box from inside a block', async ( {
+		page,
+		editor,
+	} ) => {
+		await editor.setContent( `<!-- wp:group {"style":{"spacing":{"padding":{"top":"40px","right":"40px","bottom":"40px","left":"40px"}}},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group" style="padding-top:40px;padding-right:40px;padding-bottom:40px;padding-left:40px"><!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->` );
+
+		const groupBox = await editor.canvas
+			.getByRole( 'document', { name: 'Block: Group' } )
+			.boundingBox();
+		const box = editor.canvas.locator(
+			'.block-editor-writing-flow__selection-box'
+		);
+
+		// Press in the container's padding.
+		await page.mouse.move( groupBox.x + 10, groupBox.y + 10 );
+		await page.mouse.down();
+		await page.mouse.move( groupBox.x + 60, groupBox.y + 60, {
+			steps: 5,
+		} );
+		await expect( box ).toBeHidden();
+		await page.mouse.up();
 	} );
 
 	test( 'should clear selection when clicking next to blocks', async ( {
