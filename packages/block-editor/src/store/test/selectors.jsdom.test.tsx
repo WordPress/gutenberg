@@ -2967,11 +2967,11 @@ describe( 'selectors', () => {
 				parents: new Map(),
 				blockEditingModes: new Map(),
 			};
-			const editing = {
+			const editing = partial< State >( {
 				blocks,
 				blockListSettings: new Map(),
 				settings: {},
-			};
+			} );
 			// Ask once while the canvas is editable, so the answer is
 			// memoized, then turn preview mode on. The editor intent flips
 			// this setting at runtime, so a stale `true` here is what lets a
@@ -2980,11 +2980,11 @@ describe( 'selectors', () => {
 				true
 			);
 
-			const previewing = {
+			const previewing = partial< State >( {
 				blocks,
 				blockListSettings: new Map(),
 				settings: { isPreviewMode: true },
-			};
+			} );
 			expect(
 				canInsertBlockType( previewing, 'core/test-block-a' )
 			).toBe( false );
