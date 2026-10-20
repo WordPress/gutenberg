@@ -12,9 +12,6 @@ import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 const REFUSED_FIELD_MESSAGE =
 	"This setting can't be changed while suggesting. Switch to Editing to change it.";
 
-const LOCKED_FIELD_HINT =
-	'This setting cannot be suggested. Switch to Editing to change it.';
-
 async function switchIntent( page: any, intentLabel: string ) {
 	await page
 		.getByRole( 'region', { name: 'Editor top bar' } )
@@ -259,26 +256,27 @@ test.describe( 'Suggestion mode: post fields', () => {
 			const settings = page.getByRole( 'region', {
 				name: 'Editor settings',
 			} );
+			// A read-only DataForm field shows its value without the button
+			// that opens its editor.
 			const discussion = settings.getByRole( 'button', {
-				name: 'Change discussion options',
+				name: 'Edit Discussion',
 			} );
 			const author = settings.getByRole( 'button', {
-				name: /^Change author:/,
+				name: 'Edit Author',
 			} );
-			await expect( discussion ).toBeEnabled();
-			await expect( author ).toBeEnabled();
+			await expect( discussion ).toBeVisible();
+			await expect( author ).toBeVisible();
 
 			await switchIntent( page, 'Suggesting' );
 
-			for ( const toggle of [ discussion, author ] ) {
-				await expect( toggle ).toBeDisabled();
-				await expect( toggle ).toHaveAccessibleDescription(
-					LOCKED_FIELD_HINT
-				);
-			}
+			await expect( discussion ).toBeHidden();
+			await expect( author ).toBeHidden();
+			await expect(
+				settings.getByText( 'Discussion', { exact: true } )
+			).toBeVisible();
 
 			await switchIntent( page, 'Editing' );
-			await expect( discussion ).toBeEnabled();
+			await expect( discussion ).toBeVisible();
 		} );
 	} );
 
@@ -420,12 +418,9 @@ test.describe( 'Suggestion mode: post fields', () => {
 			await switchIntent( page, 'Suggesting' );
 			await page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: /excerpt/i } )
-				.first()
+				.getByRole( 'button', { name: 'Edit Excerpt' } )
 				.click();
-			const textarea = page.getByRole( 'textbox', {
-				name: 'Write an excerpt (optional)',
-			} );
+			const textarea = page.getByRole( 'textbox', { name: 'Excerpt' } );
 			const saved = suggestionSavedPromise( page );
 			await textarea.fill( 'Typed excerpt' );
 			// The panel commits the excerpt when the textarea loses focus.
@@ -1468,22 +1463,19 @@ test.describe( 'Suggestion mode: post fields', () => {
 				const settings = page.getByRole( 'region', {
 					name: 'Editor settings',
 				} );
-				const rows = [
-					settings.getByRole( 'button', {
-						name: 'Change blog title: Blog',
-					} ),
-					settings.getByRole( 'button', {
-						name: 'Change posts per page',
-					} ),
-					settings.getByRole( 'button', {
-						name: 'Change discussion settings',
-					} ),
-				];
-				for ( const row of rows ) {
-					await expect( row ).toBeDisabled();
-					await expect( row ).toHaveAccessibleDescription(
-						LOCKED_FIELD_HINT
-					);
+				// The rows show their values, without the buttons that open
+				// their editors.
+				await expect(
+					settings.getByText( 'Posts per page', { exact: true } )
+				).toBeVisible();
+				for ( const name of [
+					'Edit Blog title',
+					'Edit Posts per page',
+					'Edit Discussion',
+				] ) {
+					await expect(
+						settings.getByRole( 'button', { name } )
+					).toHaveCount( 0 );
 				}
 
 				// The blog title is the posts page's title, also refused.
@@ -1543,7 +1535,7 @@ test.describe( 'Suggestion mode: post fields', () => {
 						name: 'Editor settings',
 					} );
 					await expect(
-						settings.getByText( 'Posts per page' )
+						settings.getByText( 'Posts per page', { exact: true } )
 					).toBeVisible();
 					await expect(
 						settings.getByRole( 'button', {
