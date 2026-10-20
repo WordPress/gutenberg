@@ -872,6 +872,7 @@
       - label
 - name: MenuItem
   props:
+      - accessibleWhenDisabled
       - children
       - className
       - icon
