@@ -355,6 +355,39 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	}
 
 	/**
+	 * Updates a comment.
+	 *
+	 * Extends core to reject changes to a deleted note, other than restoring it.
+	 * Another session can delete a note while it is still open here. Changing
+	 * its status would bring it back without the replies trashed along with
+	 * it, as reopening it with a reply does, and an edited note stays hidden.
+	 *
+	 * @since 7.2.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
+	 */
+	public function update_item( $request ) {
+		// START CHANGE: Only allow restoring a deleted note.
+		$comment = $this->get_comment( $request['id'] );
+		if (
+			! is_wp_error( $comment ) &&
+			'note' === $comment->comment_type &&
+			in_array( $comment->comment_approved, array( 'trash', 'spam' ), true ) &&
+			! in_array( $request['status'], array( 'untrash', 'unspam' ), true )
+		) {
+			return new WP_Error(
+				'rest_comment_invalid_status',
+				__( 'This note was deleted, so it could not be updated.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+		// END CHANGE.
+
+		return parent::update_item( $request );
+	}
+
+	/**
 	 * Checks if a given request has access to create a comment.
 	 *
 	 * Copied from core, extended to the 'reaction' type. A reaction can only
@@ -694,7 +727,7 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 		/*
 		 * Another session can delete a note while a reply to it is being
 		 * written. Stored under the deleted note, the reply would be lost:
-		 * the editor no longer shows its thread.
+		 * the editor no longer shows its thread. See also update_item().
 		 */
 		if ( 'note' === $request['type'] && ! empty( $request['parent'] ) ) {
 			$parent_note = get_comment( $request['parent'] );
