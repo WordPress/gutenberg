@@ -521,7 +521,8 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 	 * Creates a comment.
 	 *
 	 * Copied from core, extended to support the 'reaction' comment type
-	 * with validation for parent note, valid emoji hex keys, and uniqueness.
+	 * with validation for parent note, valid emoji hex keys, and uniqueness,
+	 * and to reject a note reply to a deleted note.
 	 *
 	 * @since 7.2.0
 	 *
@@ -686,6 +687,24 @@ class Gutenberg_REST_Comment_Controller_7_2 extends WP_REST_Comments_Controller 
 			}
 
 			$reaction_key = $emoji_key;
+		}
+		// END CHANGE.
+
+		// START CHANGE: Reject a note reply to a deleted note.
+		/*
+		 * Another session can delete a note while a reply to it is being
+		 * written. Stored under the deleted note, the reply would be lost:
+		 * the editor no longer shows its thread.
+		 */
+		if ( 'note' === $request['type'] && ! empty( $request['parent'] ) ) {
+			$parent_note = get_comment( $request['parent'] );
+			if ( ! $parent_note || in_array( $parent_note->comment_approved, array( 'trash', 'spam' ), true ) ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'This note was deleted, so your reply could not be added.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
 		}
 		// END CHANGE.
 

@@ -725,6 +725,105 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	}
 
 	/**
+	 * Dispatches a request to reply to a note.
+	 *
+	 * @param int $post_id   Post ID.
+	 * @param int $parent_id ID of the note to reply to.
+	 * @return WP_REST_Response Response object.
+	 */
+	protected function reply_to_note( $post_id, $parent_id ) {
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body(
+			wp_json_encode(
+				array(
+					'post'    => $post_id,
+					'type'    => 'note',
+					'parent'  => $parent_id,
+					'content' => 'Test reply',
+					'author'  => self::$editor_id,
+					'status'  => 'hold',
+				)
+			)
+		);
+		return rest_get_server()->dispatch( $request );
+	}
+
+	/**
+	 * A reply stored under a deleted note would be lost: the editor no longer
+	 * shows its thread.
+	 *
+	 * @dataProvider data_hidden_note_statuses
+	 *
+	 * @param string $status Status to move the parent note to.
+	 */
+	public function test_cannot_reply_to_deleted_note( $status ) {
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		wp_set_comment_status( $note_id, $status );
+
+		$response = $this->reply_to_note( $post_id, $note_id );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+		$this->assertSame(
+			array(),
+			get_comments(
+				array(
+					'parent' => $note_id,
+					'type'   => 'note',
+					'status' => 'any',
+					'fields' => 'ids',
+				)
+			),
+			'No reply should be stored under the deleted note.'
+		);
+	}
+
+	/**
+	 * Without the trash, a deleted note is gone entirely.
+	 */
+	public function test_cannot_reply_to_permanently_deleted_note() {
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		wp_delete_comment( $note_id, true );
+
+		$response = $this->reply_to_note( $post_id, $note_id );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	/**
+	 * Replying to an open note, or reopening a resolved one with a reply, still
+	 * works.
+	 *
+	 * @dataProvider data_note_reply_parent_statuses
+	 *
+	 * @param string $status Status to move the parent note to.
+	 */
+	public function test_can_reply_to_note( $status ) {
+		$post_id = self::factory()->post->create( array( 'post_author' => self::$editor_id ) );
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+		wp_set_comment_status( $note_id, $status );
+
+		$response = $this->reply_to_note( $post_id, $note_id );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertSame( $note_id, $response->get_data()['parent'] );
+	}
+
+	/**
+	 * Data provider for test_can_reply_to_note().
+	 *
+	 * @return array[]
+	 */
+	public function data_note_reply_parent_statuses() {
+		return array(
+			'open'     => array( 'hold' ),
+			'resolved' => array( 'approve' ),
+		);
+	}
+
+	/**
 	 * Creating a note requires edit access to the target post.
 	 */
 	public function test_cannot_create_note_without_edit_post_capability() {
