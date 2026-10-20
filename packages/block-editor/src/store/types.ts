@@ -7,12 +7,17 @@ import type {
 import type { ThunkArgs, select as globalSelect } from '@wordpress/data';
 import type { BlockEditingMode } from '../components/block-editing-mode';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
-import type { WPDropOperation } from '../components/use-on-block-drop/types';
+import type {
+	FetchLinkSuggestions,
+	FetchRichUrlData,
+} from '../components/link-control/types';
+import type { BlockDropOperation } from '../components/use-on-block-drop/types';
 import type { Bindings } from '../utils/block-bindings';
 import type { store } from '.';
 import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
 import type {
+	currentUserIdSelectKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
@@ -243,6 +248,7 @@ export interface UserPattern {
 	content: { raw: string };
 	wp_pattern_category?: number[];
 	wp_pattern_sync_status?: string;
+	author?: number;
 }
 
 export interface UserPatternCategory {
@@ -324,9 +330,9 @@ export interface ShowInsertionPointOptions {
 	 */
 	__unstableWithInserter?: boolean;
 	/**
-	 * The operation to perform when applied, either 'insert' or 'replace'.
+	 * The operation to perform when applied.
 	 */
-	operation?: WPDropOperation;
+	operation?: BlockDropOperation;
 	nearestSide?: string;
 }
 
@@ -363,17 +369,30 @@ export interface PresetsByOrigin {
  */
 export type Settings = Record< string | symbol, unknown > & {
 	allowedBlockTypes?: boolean | string[];
+	alignWide?: boolean;
 	allowedMimeTypes?: Record< string, string > | null;
+	pageForPosts?: number;
+	pageOnFront?: number;
 	canLockBlocks?: boolean;
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
+	__experimentalUndo?: () => void;
+	__unstableResolvedAssets?: ResolvedAssets;
+	__internalIsInitialized?: boolean;
+	supportsLayout?: boolean;
 	template?: BlockTemplate;
 	templateLock?: string | false;
 	__experimentalBlockPatterns?: BlockPattern[];
 	__experimentalFeatures?: FeatureSettings;
+	__experimentalFetchLinkSuggestions?: FetchLinkSuggestions;
+	__experimentalFetchRichUrlData?: FetchRichUrlData;
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
+	__unstableIsBlockBasedTheme?: boolean;
+	[ currentUserIdSelectKey ]?: (
+		select: typeof globalSelect
+	) => number | undefined;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect
@@ -392,6 +411,15 @@ export type Settings = Record< string | symbol, unknown > & {
  */
 export interface LastFocus {
 	current: HTMLElement | SVGElement | null;
+}
+
+/**
+ * The styles and scripts the editor canvas iframe loads, as HTML.
+ */
+export interface ResolvedAssets {
+	// The defaults are empty lists.
+	styles?: string | string[];
+	scripts?: string | string[];
 }
 
 export interface StyleOverride {
@@ -506,7 +534,6 @@ export interface State {
 	blockRemovalRules: BlockRemovalRule[] | false;
 	registeredInserterMediaCategories: InserterMediaCategory[];
 	zoomLevel: number | 'auto-scaled';
-	hasBlockSpotlight: string | null | undefined;
 	openedListViewPanels: {
 		allOpen: boolean;
 		panels: Record< string, boolean >;
@@ -695,11 +722,6 @@ export type Action =
 			isHighlighted: boolean;
 	  }
 	| { type: 'TOGGLE_BLOCK_MODE'; clientId: string }
-	| {
-			type: 'TOGGLE_BLOCK_SPOTLIGHT';
-			clientId: string;
-			hasBlockSpotlight: boolean;
-	  }
 	| { type: 'TOGGLE_LIST_VIEW_PANEL'; clientId: string; isOpen: boolean }
 	| { type: 'TOGGLE_SELECTION'; isSelectionEnabled: boolean }
 	| { type: 'UNSET_BLOCK_EDITING_MODE'; clientId: string }

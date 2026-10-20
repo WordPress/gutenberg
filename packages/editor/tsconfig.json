@@ -27,7 +27,6 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../global-styles-ui" },
 		{ "path": "../hooks" },
@@ -53,7 +52,7 @@
 		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../views/tsconfig.build.json" },
-		{ "path": "../warning" },
+		{ "path": "../warning/tsconfig.build.json" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	]
 }

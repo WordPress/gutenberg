@@ -17,6 +17,6 @@
 		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../shortcode/tsconfig.build.json" },
-		{ "path": "../warning" }
+		{ "path": "../warning/tsconfig.build.json" }
 	]
 }
