@@ -54,7 +54,7 @@ const UnforwardedInserterToggle = (
 	}
 
 	// Handle both onClick functions from the toggle and the parent component.
-	function handleClick( event: MouseEvent ) {
+	function handleClick( event: MouseEvent< HTMLButtonElement > ) {
 		if ( onToggle ) {
 			onToggle( event );
 		}

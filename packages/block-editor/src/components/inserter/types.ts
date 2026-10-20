@@ -2,6 +2,7 @@ import type {
 	ComponentProps,
 	ElementType,
 	MouseEvent,
+	MouseEventHandler,
 	ReactNode,
 	RefObject,
 } from 'react';
@@ -37,7 +38,8 @@ export interface InserterToggleRenderProps {
 export type InserterToggleProps = Record< string, unknown > & {
 	as?: ElementType;
 	label?: string;
-	onClick?: ( event: MouseEvent ) => void;
+	/** The default toggle is a button, which passes its click event on. */
+	onClick?: MouseEventHandler< HTMLButtonElement >;
 };
 
 /**
