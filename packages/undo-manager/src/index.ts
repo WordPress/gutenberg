@@ -1,3 +1,4 @@
+// DROPME: Demo change for the CHANGELOG presence matrix.
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import type {
 	HistoryChange as _HistoryChange,

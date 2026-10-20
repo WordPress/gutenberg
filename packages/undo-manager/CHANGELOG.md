@@ -9,6 +9,7 @@
 ### Internal
 
 -   Convert the tests to TypeScript, and split tsconfig into a build project and a default dev project so the tests are type checked without publishing their declarations ([#84895](https://github.com/WordPress/gutenberg/pull/84895)).
+-   DROPME: Demo entry for the CHANGELOG presence check ([#85076](https://github.com/WordPress/gutenberg/pull/85076)).
 
 ## 1.57.0 (2026-10-07)
 
