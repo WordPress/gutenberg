@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/vips",
-	"version": "4.3.0",
+	"version": "5.0.0",
 	"description": "Utils for working with libvips.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -54,7 +54,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/worker-threads": "file:../worker-threads",
-		"wasm-vips": "^0.0.18"
+		"wasm-vips": "^0.0.19"
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",

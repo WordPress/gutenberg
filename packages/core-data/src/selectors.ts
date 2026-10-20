@@ -18,6 +18,7 @@ import {
 	getUserPermissionCacheKey,
 } from './utils';
 import type * as ET from './entity-types';
+import type { EntityActionsConfig, FieldsConfig } from './private-selectors';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 // This is an incomplete, high-level approximation of the State type.
@@ -49,6 +50,11 @@ export interface State {
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 	collaborationSupported: boolean;
 	viewConfigs: Record< string, Record< string, any > >;
+	fieldsConfigs: Record< string, Record< string, FieldsConfig > >;
+	entityActionsConfigs: Record<
+		string,
+		Record< string, EntityActionsConfig >
+	>;
 }
 
 type EntityRecordKey = string | number;
