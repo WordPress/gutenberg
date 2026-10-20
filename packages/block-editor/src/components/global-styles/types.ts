@@ -87,8 +87,10 @@ export interface StyleSettings {
 		dimensionSizes?: DimensionSizes;
 	};
 	layout?: Record< string, unknown > & {
-		contentSize?: string;
-		wideSize?: string;
+		/** `false` when the block does not support the control. */
+		contentSize?: string | false;
+		/** `false` when the block does not support the control. */
+		wideSize?: string | false;
 	};
 	parentLayout?: Layout & LayoutBlockSupport;
 	shadow?:
@@ -101,7 +103,8 @@ export interface StyleSettings {
 	spacing?: Record< string, unknown > & {
 		padding?: SpacingSidesSetting;
 		margin?: SpacingSidesSetting;
-		blockGap?: SpacingSidesSetting;
+		/** `null` turns off the layout styles. */
+		blockGap?: SpacingSidesSetting | null;
 		units?: string[];
 		spacingSizes?: Record< string, SpacingSizePreset[] >;
 		defaultSpacingSizes?: boolean;
