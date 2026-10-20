@@ -316,9 +316,9 @@ allowedBlocks: [ 'core/columns' ],
 -   **Type:** `Boolean`
 -   **Default:** `true`
 
-When the saved markup of a block does not match the output of its `save` function and no deprecation matches, the editor attempts to regenerate the block from its parsed attributes rather than flagging it as invalid, as long as doing so does not lose content: either the `save` output only adds attributes or changes attribute values (for example class names generated from attributes are missing), or the markup differs structurally but every word of visible text is preserved. The outcome is recorded on the parsed block as `validationLevel`.
+When the saved markup of a block does not match the output of its `save` function and no deprecation matches, the editor attempts to regenerate the block from its parsed attributes rather than flagging it as invalid, as long as doing so does not lose content: either the `save` output only adds attributes or changes attribute values (for example class names generated from attributes are missing), or the markup differs structurally but all of its text, media and links are preserved. The outcome is recorded on the parsed block as `validationLevel`.
 
-Set `allowsReconstruction` to `false` to opt out of this behavior. The block will then only be considered valid when its saved markup matches the `save` output exactly or matches one of its deprecations; any other mismatch shows the invalid block warning so that the user can resolve it.
+Set `allowsReconstruction` to `false` to opt out of this behavior. The block will then only be considered valid when its saved markup matches the `save` output exactly or matches one of its deprecations; any other mismatch shows the invalid block warning so that the user can resolve it. The setting is read from `block.json` metadata passed to `registerBlockType` on the client; it is not yet part of the server-side block type definition.
 
 ```js
 // Only accept markup that matches `save` or a deprecation exactly.

@@ -253,7 +253,7 @@ export function parseRawBlock(
 	// This is performed on both invalid and valid blocks because
 	// migration using the `migrate` functions should run even
 	// if the output is deemed valid.
-	const updatedBlock = applyBlockDeprecatedVersions(
+	let updatedBlock = applyBlockDeprecatedVersions(
 		validatedBlock,
 		normalizedBlock,
 		blockType
@@ -262,12 +262,13 @@ export function parseRawBlock(
 	// If no deprecation matched, fall back to automated reconstruction when
 	// validation determined that the block can be safely regenerated from its
 	// attributes (`RECONSTRUCTED_BLOCK` or `REGENERATED_BLOCK`). Deprecations
-	// are tried first so that explicit author instructions take priority.
+	// are tried first so that explicit author instructions take priority. A
+	// new object is created so that `validatedBlock` keeps its outcome.
 	if (
 		! updatedBlock.isValid &&
 		updatedBlock.validationLevel !== VALIDATION_LEVEL.INVALID_BLOCK
 	) {
-		updatedBlock.isValid = true;
+		updatedBlock = { ...updatedBlock, isValid: true };
 	}
 
 	if ( ! updatedBlock.isValid ) {
@@ -297,6 +298,11 @@ export function parseRawBlock(
 			blockType,
 			getSaveContent( blockType, updatedBlock.attributes ),
 			updatedBlock.originalContent
+		);
+		// For reconstructed and regenerated blocks, the issues found by the
+		// strict comparison explain what was rewritten.
+		updatedBlock.validationIssues?.forEach( ( { log, args } ) =>
+			log( ...args )
 		);
 		console.groupEnd();
 		/* eslint-enable no-console */

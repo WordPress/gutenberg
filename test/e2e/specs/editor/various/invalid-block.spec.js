@@ -63,7 +63,7 @@ test.describe( 'Invalid blocks', () => {
 		);
 	} );
 
-	test( 'should strip potentially malicious on* attributes', async ( {
+	test( 'should not execute on* attributes when regenerating a block', async ( {
 		editor,
 		page,
 	} ) => {
@@ -79,8 +79,10 @@ test.describe( 'Invalid blocks', () => {
 			<!-- /wp:paragraph -->
 		` );
 
-		// The block should be regenerated (Level 3) and the malicious
-		// attributes stripped during the regeneration process.
+		// The block is regenerated from its attributes (Level 3) instead of
+		// being flagged as invalid. Rich text neutralizes `on*` attributes
+		// while the content is rendered in the editor, so the handler must
+		// not run.
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toBeVisible();

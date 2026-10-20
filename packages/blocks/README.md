@@ -1015,7 +1015,7 @@ _Parameters_
 
 Returns validation results for a parsed block. Validation classifies the block's content integrity into one of the `VALIDATION_LEVEL` levels, from a perfect match (`VALID_BLOCK`) to requiring user intervention (`INVALID_BLOCK`).
 
-A block is considered valid when its content can be regenerated from its attributes without losing anything meaningful: the `save` output either matches the stored content, differs from it only in tag attributes, or differs structurally while preserving all of the visible text. Block types can opt out of the latter two with `allowsReconstruction: false`.
+A block is considered valid when its content can be regenerated from its attributes without losing anything meaningful: the `save` output either matches the stored content, only adds attributes to it, or differs structurally while preserving all of its text, media and links. Block types can opt out of the latter two with `allowsReconstruction: false`.
 
 Note: `MIGRATED_BLOCK` (Level 1) is assigned by the parser when a block deprecation matches, not by this function.
 
@@ -1026,7 +1026,7 @@ _Parameters_
 
 _Returns_
 
-- `[ boolean, LoggerItem[], ValidationMetadata ]`: Validation results tuple: whether the block is valid, the validation issues found, and metadata with the validation level and the original and generated content.
+- `[ boolean, LoggerItem[], ValidationMetadata ]`: Validation results tuple: whether the block is valid, the validation issues found by the strict comparison (empty for an exact match), and metadata with the validation level and the original and generated content.
 
 ### VALIDATION_LEVEL
 

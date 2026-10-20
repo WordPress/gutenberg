@@ -920,82 +920,112 @@ export function isEquivalentHTMLStructure(
 }
 
 /**
- * Matches HTML comments and tags. Used to approximate the text content of
- * markup which cannot be tokenized.
+ * Attributes whose values are content in their own right, as opposed to
+ * presentation which a block regenerates from its attributes: media sources,
+ * link targets and alternative text.
  */
-const REGEXP_HTML_TAG_OR_COMMENT = /<!--[\s\S]*?-->|<[^>]*>/g;
+const CONTENT_ATTRIBUTES = [ 'src', 'srcset', 'poster', 'href', 'alt' ];
 
 /**
- * Returns the words of visible text content in the given HTML, in document
- * order. Text within tag attributes and comments is not considered.
+ * Returns the content tokens of the given HTML, in document order: the words
+ * of its text content, followed by the values of content-bearing attributes
+ * (`src`, `srcset`, `poster`, `href`, `alt`), each prefixed with the attribute
+ * name. Comments and other attributes are not considered.
  *
- * Falls back to stripping tags when the markup cannot be tokenized, so that
- * malformed content can still be assessed.
+ * The markup is parsed with an inert HTML document rather than tokenized, so
+ * that malformed markup is interpreted the way a browser renders it (e.g. a
+ * `<` which does not start a tag is text), entities are decoded, and no
+ * scripts run nor resources load.
  *
- * @param html   HTML string.
- * @param logger Validation logger object.
+ * @param html HTML string.
  *
- * @return Words of text content.
+ * @return Content tokens.
  */
-export function getTextContentWords(
-	html: string,
-	logger: Logger = createQueuedLogger()
-): string[] {
-	const tokens = getHTMLTokens( html, logger );
-	const text = tokens
-		? tokens
-				.filter( ( token ) => token.type === 'Chars' )
-				.map( ( token ) => token.chars! )
-				.join( ' ' )
-		: decodeEntities( html.replace( REGEXP_HTML_TAG_OR_COMMENT, ' ' ) );
+export function getContentTokens( html: string ): string[] {
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = html;
 
-	return text.split( /\s+/ ).filter( Boolean );
+	// Collect the words of each text node separately, since adjacent text
+	// nodes (e.g. of sibling elements) are not separated by whitespace.
+	const tokens: string[] = [];
+	const walker = doc.createTreeWalker( doc.body, NodeFilter.SHOW_TEXT );
+	while ( walker.nextNode() ) {
+		const words = ( walker.currentNode as Text ).data
+			.split( /\s+/ )
+			.filter( Boolean );
+		tokens.push( ...words );
+	}
+
+	const selector = CONTENT_ATTRIBUTES.map( ( name ) => `[${ name }]` ).join(
+		','
+	);
+	for ( const element of doc.body.querySelectorAll( selector ) ) {
+		for ( const name of CONTENT_ATTRIBUTES ) {
+			const value = element.getAttribute( name )?.trim();
+			if ( value ) {
+				tokens.push( `${ name }=${ value }` );
+			}
+		}
+	}
+
+	return tokens;
 }
 
 /**
- * Returns true if every word of visible text in the original HTML is also
- * present in the generated HTML, or false if regenerating the content would
- * drop text.
+ * Returns true if every content token of the original HTML (see
+ * `getContentTokens`) is also present in the generated HTML, or false if
+ * regenerating the content would drop text, media or links.
  *
- * Additional text in the generated markup is acceptable (e.g. labels rendered
- * from attributes); missing text is not. Only text nodes are compared, since
- * tag attributes are the block's own to regenerate.
+ * Additional content in the generated markup is acceptable (e.g. labels
+ * rendered from attributes); missing content is not. Tokens are compared as a
+ * multiset, so repeated words or images must be present as many times.
  *
  * @example
  * ```js
- * isTextContentPreserved( '<h3>Title</h3>', '<h2 class="wp-block-heading">Title</h2>' ); // true
- * isTextContentPreserved( '<h2>Title</h2><p>Intro</p>', '<h2>Title</h2>' ); // false
+ * isContentPreserved( '<h3>Title</h3>', '<h2 class="wp-block-heading">Title</h2>' ); // true
+ * isContentPreserved( '<h2>Title</h2><p>Intro</p>', '<h2>Title</h2>' ); // false
+ * isContentPreserved( '<img src="a.png"/><img src="b.png"/>', '<figure><img src="a.png"/></figure>' ); // false
  * ```
  *
  * @param original  Original HTML string.
  * @param generated Generated HTML string.
  * @param logger    Validation logger object.
  *
- * @return Whether all text content is preserved.
+ * @return Whether all content is preserved.
  */
-export function isTextContentPreserved(
+export function isContentPreserved(
 	original: string,
 	generated: string,
 	logger: Logger = createQueuedLogger()
 ): boolean {
-	const originalWords = getTextContentWords( original, logger );
-	if ( originalWords.length === 0 ) {
+	const originalTokens = getContentTokens( original );
+	if ( originalTokens.length === 0 ) {
 		return true;
 	}
 
-	const availableWords = new Map< string, number >();
-	for ( const word of getTextContentWords( generated, logger ) ) {
-		availableWords.set( word, ( availableWords.get( word ) ?? 0 ) + 1 );
+	const availableTokens = new Map< string, number >();
+	for ( const token of getContentTokens( generated ) ) {
+		availableTokens.set( token, ( availableTokens.get( token ) ?? 0 ) + 1 );
 	}
 
-	return originalWords.every( ( word ) => {
-		const count = availableWords.get( word );
+	const missingToken = originalTokens.find( ( token ) => {
+		const count = availableTokens.get( token );
 		if ( ! count ) {
-			return false;
+			return true;
 		}
-		availableWords.set( word, count - 1 );
-		return true;
+		availableTokens.set( token, count - 1 );
+		return false;
 	} );
+
+	if ( missingToken !== undefined ) {
+		logger.warning(
+			'Content `%s` is not present in the generated markup.',
+			missingToken
+		);
+		return false;
+	}
+
+	return true;
 }
 
 /**
@@ -1006,8 +1036,8 @@ export function isTextContentPreserved(
  *
  * A block is considered valid when its content can be regenerated from its
  * attributes without losing anything meaningful: the `save` output either
- * matches the stored content, differs from it only in tag attributes, or
- * differs structurally while preserving all of the visible text. Block types
+ * matches the stored content, only adds attributes to it, or differs
+ * structurally while preserving all of its text, media and links. Block types
  * can opt out of the latter two with `allowsReconstruction: false`.
  *
  * Note: `MIGRATED_BLOCK` (Level 1) is assigned by the parser when a block
@@ -1017,8 +1047,9 @@ export function isTextContentPreserved(
  * @param blockTypeOrName Block type or name, inferred from block if not given.
  *
  * @return Validation results tuple: whether the block is valid, the
- *         validation issues found, and metadata with the validation level and
- *         the original and generated content.
+ *         validation issues found by the strict comparison (empty for an
+ *         exact match), and metadata with the validation level and the
+ *         original and generated content.
  */
 export function validateBlock(
 	block: Block,
@@ -1091,7 +1122,7 @@ export function validateBlock(
 		validationLevel: ValidationLevel
 	): [ boolean, LoggerItem[], ValidationMetadata ] => [
 		isValid,
-		isValid ? [] : logger.getItems(),
+		logger.getItems(),
 		{
 			validationLevel,
 			originalContent: block.originalContent,
@@ -1112,9 +1143,9 @@ export function validateBlock(
 	const allowsReconstruction = blockType.allowsReconstruction !== false;
 
 	// Level 2 (ReconstructedBlock): the stored content has the same elements
-	// and text as the `save` output and only tag attributes differ, such as
-	// class names generated from attributes being absent. Regenerating the
-	// block only rewrites those attributes.
+	// and text as the `save` output, which only adds attributes or changes
+	// their values, such as class names generated from attributes being
+	// absent. Regenerating the block only adds to its markup.
 	if (
 		allowsReconstruction &&
 		isEquivalentHTMLStructure(
@@ -1127,12 +1158,13 @@ export function validateBlock(
 	}
 
 	// Level 3 (RegeneratedBlock): the structure differs (wrong tags, malformed
-	// or extraneous markup), but every word of visible text in the stored
-	// content is present in the `save` output, so regenerating the block from
-	// its attributes rewrites the markup without dropping what the user wrote.
+	// or extraneous markup, unmodelled attributes), but all of the content of
+	// the stored markup (text, media and links) is present in the `save`
+	// output, so regenerating the block from its attributes rewrites the
+	// markup without dropping what the user wrote.
 	if (
 		allowsReconstruction &&
-		isTextContentPreserved(
+		isContentPreserved(
 			originalContent,
 			generatedBlockContent,
 			createQueuedLogger()

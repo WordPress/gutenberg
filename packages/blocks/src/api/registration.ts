@@ -68,6 +68,7 @@ function getBlockSettingsFromMetadata( {
 		'variations',
 		'blockHooks',
 		'allowedBlocks',
+		'allowsReconstruction',
 	];
 
 	const settings = Object.fromEntries(

@@ -17,8 +17,8 @@ import {
 	getNextNonWhitespaceToken,
 	isEquivalentHTML,
 	isEquivalentHTMLStructure,
-	getTextContentWords,
-	isTextContentPreserved,
+	getContentTokens,
+	isContentPreserved,
 	validateBlock,
 	isClosedByToken,
 	VALIDATION_LEVEL,
@@ -30,6 +30,8 @@ import {
 	getBlockTypes,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
+	setFreeformContentHandlerName,
+	setUnregisteredTypeHandlerName,
 } from '../registration';
 
 describe( 'validation', () => {
@@ -881,10 +883,10 @@ describe( 'validation', () => {
 		} );
 	} );
 
-	describe( 'getTextContentWords()', () => {
-		it( 'returns the words of text content, ignoring tags and attributes', () => {
+	describe( 'getContentTokens()', () => {
+		it( 'returns the words of text content, ignoring tags and presentational attributes', () => {
 			expect(
-				getTextContentWords(
+				getContentTokens(
 					'<h2 class="wp-block-heading" title="Ignored">Hello <em>big</em>\n	world</h2>'
 				)
 			).toEqual( [ 'Hello', 'big', 'world' ] );
@@ -892,32 +894,48 @@ describe( 'validation', () => {
 
 		it( 'ignores comments and decodes entities', () => {
 			expect(
-				getTextContentWords(
-					'<!-- not text --><p>Fish &amp; Chips</p>'
-				)
+				getContentTokens( '<!-- not text --><p>Fish &amp; Chips</p>' )
 			).toEqual( [ 'Fish', '&', 'Chips' ] );
 		} );
 
-		it( 'returns an empty array when there is no text', () => {
-			expect( getTextContentWords( '' ) ).toEqual( [] );
+		it( 'includes media sources, link targets and alternative text', () => {
 			expect(
-				getTextContentWords( '<figure><img src="a.png"/></figure>' )
-			).toEqual( [] );
+				getContentTokens(
+					'<figure class="wp-block-image"><img src="a.png" alt="A cat" class="wp-image-1"/><figcaption><a href="https://a.example/?x=1&amp;y=2">Cap</a></figcaption></figure>'
+				)
+			).toEqual( [
+				'Cap',
+				'src=a.png',
+				'alt=A cat',
+				'href=https://a.example/?x=1&y=2',
+			] );
 		} );
 
-		it( 'falls back to stripping tags when the markup cannot be tokenized', () => {
+		it( 'returns an empty array when there is no content', () => {
+			expect( getContentTokens( '' ) ).toEqual( [] );
 			expect(
-				getTextContentWords(
+				getContentTokens( '<hr class="wp-block-separator"/>' )
+			).toEqual( [] );
+			expect( getContentTokens( '<img src="" alt=""/>' ) ).toEqual( [] );
+		} );
+
+		it( 'interprets malformed markup the way a browser renders it', () => {
+			expect(
+				getContentTokens(
 					'<p>aaaa <img src onerror=alert(1)></x dde></x>1'
 				)
 			).toEqual( [ 'aaaa', '1' ] );
+			// A `<` which does not start a tag is text.
+			expect(
+				getContentTokens( '<p>1 < 2 and <3 and 3 > 2</p>' )
+			).toEqual( [ '1', '<', '2', 'and', '<3', 'and', '3', '>', '2' ] );
 		} );
 	} );
 
-	describe( 'isTextContentPreserved()', () => {
+	describe( 'isContentPreserved()', () => {
 		it( 'returns true when the generated markup contains all original text', () => {
 			expect(
-				isTextContentPreserved(
+				isContentPreserved(
 					'<h3>Title</h3>',
 					'<h2 class="wp-block-heading">Title</h2>'
 				)
@@ -926,16 +944,16 @@ describe( 'validation', () => {
 
 		it( 'returns true when the generated markup adds text', () => {
 			expect(
-				isTextContentPreserved(
+				isContentPreserved(
 					'<p>Intro</p>',
 					'<p>Intro</p><p>Read more</p>'
 				)
 			).toBe( true );
 		} );
 
-		it( 'returns true when the original has no text', () => {
+		it( 'returns true when the original has no content', () => {
 			expect(
-				isTextContentPreserved(
+				isContentPreserved(
 					'<div class="wp-block-spacer"></div>',
 					'<div class="wp-block-spacer" style="height:100px"></div>'
 				)
@@ -944,37 +962,68 @@ describe( 'validation', () => {
 
 		it( 'returns true regardless of whitespace and entity encoding', () => {
 			expect(
-				isTextContentPreserved(
+				isContentPreserved(
 					'<p>Fish &amp;\n	Chips</p>',
 					'<p>Fish &amp; Chips</p>'
 				)
 			).toBe( true );
 		} );
 
+		it( 'returns true when media is kept in a different structure', () => {
+			expect(
+				isContentPreserved(
+					'<img src="a.png" alt="Bare"/>',
+					'<figure class="wp-block-image"><img src="a.png" alt="Bare"/></figure>'
+				)
+			).toBe( true );
+		} );
+
 		it( 'returns false when text would be dropped', () => {
 			expect(
-				isTextContentPreserved(
+				isContentPreserved(
 					'<h2>Title</h2><p>Intro</p>',
 					'<h2 class="wp-block-heading">Title</h2>'
 				)
 			).toBe( false );
 			expect(
-				isTextContentPreserved(
+				isContentPreserved(
 					'<p class="wp-block-heading">Some content</p>',
 					'<h2 class="wp-block-heading"></h2>'
+				)
+			).toBe( false );
+			// Text following a `<` which does not start a tag.
+			expect(
+				isContentPreserved(
+					'<h2>Title</h2><p><3 lost text</p>',
+					'<h2 class="wp-block-heading">Title</h2>'
+				)
+			).toBe( false );
+		} );
+
+		it( 'returns false when media or links would be dropped', () => {
+			expect(
+				isContentPreserved(
+					'<figure class="wp-block-image"><img src="a.png"/><img src="b.png"/></figure>',
+					'<figure class="wp-block-image"><img src="a.png"/></figure>'
+				)
+			).toBe( false );
+			expect(
+				isContentPreserved(
+					'<cite><a href="https://a.example">Me</a></cite>',
+					'<cite>Me</cite>'
 				)
 			).toBe( false );
 		} );
 
 		it( 'returns false when text is replaced', () => {
 			expect(
-				isTextContentPreserved( 'Client rendered', 'Server rendered' )
+				isContentPreserved( 'Client rendered', 'Server rendered' )
 			).toBe( false );
 		} );
 
 		it( 'accounts for repeated words', () => {
 			expect(
-				isTextContentPreserved( '<p>one</p><p>one</p>', '<p>one</p>' )
+				isContentPreserved( '<p>one</p><p>one</p>', '<p>one</p>' )
 			).toBe( false );
 		} );
 	} );
@@ -1021,34 +1070,44 @@ describe( 'validation', () => {
 
 		it( 'should treat freeform content as valid', () => {
 			// Freeform content preserves its raw HTML unchanged.
-			const [ isValid, , metadata ] = validateBlock( {
-				name: getFreeformContentHandlerName(),
-				attributes: {},
-				originalContent: '<p>Classic editor content</p>',
-			} );
+			setFreeformContentHandlerName( 'core/freeform' );
+			try {
+				const [ isValid, , metadata ] = validateBlock( {
+					name: getFreeformContentHandlerName(),
+					attributes: {},
+					originalContent: '<p>Classic editor content</p>',
+				} );
 
-			expect( isValid ).toBe( true );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.VALID_BLOCK
-			);
+				expect( isValid ).toBe( true );
+				expect( metadata.validationLevel ).toBe(
+					VALIDATION_LEVEL.VALID_BLOCK
+				);
+			} finally {
+				setFreeformContentHandlerName( undefined );
+			}
 		} );
 
 		it( 'should treat the unregistered block handler as valid', () => {
 			// The parser wraps unknown blocks in the missing block handler
 			// before validation, which preserves their content as-is.
-			const [ isValid, , metadata ] = validateBlock( {
-				name: getUnregisteredTypeHandlerName(),
-				attributes: {
-					originalName: 'plugin/unknown-block',
+			setUnregisteredTypeHandlerName( 'core/missing' );
+			try {
+				const [ isValid, , metadata ] = validateBlock( {
+					name: getUnregisteredTypeHandlerName(),
+					attributes: {
+						originalName: 'plugin/unknown-block',
+						originalContent: '<p>Content from unknown block</p>',
+					},
 					originalContent: '<p>Content from unknown block</p>',
-				},
-				originalContent: '<p>Content from unknown block</p>',
-			} );
+				} );
 
-			expect( isValid ).toBe( true );
-			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.VALID_BLOCK
-			);
+				expect( isValid ).toBe( true );
+				expect( metadata.validationLevel ).toBe(
+					VALIDATION_LEVEL.VALID_BLOCK
+				);
+			} finally {
+				setUnregisteredTypeHandlerName( undefined );
+			}
 		} );
 	} );
 
@@ -1171,7 +1230,8 @@ describe( 'validation', () => {
 			} );
 
 			expect( isValid ).toBe( true );
-			expect( issues ).toEqual( [] );
+			// The issues found by the strict comparison explain the rewrite.
+			expect( issues.length ).toBeGreaterThan( 0 );
 			expect( metadata.validationLevel ).toBe(
 				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
 			);
@@ -1342,23 +1402,29 @@ describe( 'validation', () => {
 					),
 			} );
 
-			const parsedBlock = parseRawBlock(
-				{
-					blockName: 'core/paragraph',
-					attrs: { textColor: 'vivid-red' },
-					innerHTML: '<p>Paragraph missing color classes</p>',
-					innerBlocks: [],
-					innerContent: [ '<p>Paragraph missing color classes</p>' ],
-				},
-				{ __unstableSkipMigrationLogs: true }
-			);
+			const parsedBlock = parseRawBlock( {
+				blockName: 'core/paragraph',
+				attrs: { textColor: 'vivid-red' },
+				innerHTML: '<p>Paragraph missing color classes</p>',
+				innerBlocks: [],
+				innerContent: [ '<p>Paragraph missing color classes</p>' ],
+			} );
 
 			expect( parsedBlock.isValid ).toBe( true );
-			expect( parsedBlock.validationIssues ).toEqual( [] );
 			expect( parsedBlock.validationLevel ).toBe(
 				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
 			);
 			expect( parsedBlock.__unstableBlockSource ).toBeUndefined();
+
+			// The reconstruction is reported in a console group, together
+			// with the issues found by the strict comparison.
+			expect( console ).toHaveLoggedWith(
+				'Updated Block: %s (%s)',
+				'core/paragraph',
+				'ReconstructedBlock'
+			);
+			expect( console ).toHaveInformed();
+			expect( console ).toHaveWarned();
 		} );
 	} );
 
@@ -1387,7 +1453,7 @@ describe( 'validation', () => {
 			} );
 
 			expect( isValid ).toBe( true );
-			expect( issues ).toEqual( [] );
+			expect( issues.length ).toBeGreaterThan( 0 );
 			expect( metadata.validationLevel ).toBe(
 				VALIDATION_LEVEL.REGENERATED_BLOCK
 			);
@@ -1517,23 +1583,70 @@ describe( 'validation', () => {
 					),
 			} );
 
-			const parsedBlock = parseRawBlock(
-				{
-					blockName: 'core/heading',
-					attrs: { level: 3 },
-					innerHTML: '<h2>Should be h3 tag</h2>',
-					innerBlocks: [],
-					innerContent: [ '<h2>Should be h3 tag</h2>' ],
-				},
-				{ __unstableSkipMigrationLogs: true }
-			);
+			const parsedBlock = parseRawBlock( {
+				blockName: 'core/heading',
+				attrs: { level: 3 },
+				innerHTML: '<h2>Should be h3 tag</h2>',
+				innerBlocks: [],
+				innerContent: [ '<h2>Should be h3 tag</h2>' ],
+			} );
 
 			expect( parsedBlock.isValid ).toBe( true );
-			expect( parsedBlock.validationIssues ).toEqual( [] );
 			expect( parsedBlock.validationLevel ).toBe(
 				VALIDATION_LEVEL.REGENERATED_BLOCK
 			);
 			expect( parsedBlock.attributes.content ).toBe( 'Should be h3 tag' );
+			expect( parsedBlock.__unstableBlockSource ).toBeUndefined();
+
+			// The regeneration is reported in a console group, together with
+			// the issues found by the strict comparison.
+			expect( console ).toHaveLoggedWith(
+				'Updated Block: %s (%s)',
+				'core/heading',
+				'RegeneratedBlock'
+			);
+			expect( console ).toHaveInformed();
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should not regenerate when media would be dropped', () => {
+			registerBlockType( 'core/image', {
+				...defaultBlockSettings,
+				attributes: {
+					url: {
+						type: 'string',
+						source: 'attribute',
+						selector: 'img',
+						attribute: 'src',
+					},
+				},
+				save: ( { attributes } ) =>
+					createElement(
+						'figure',
+						{ className: 'wp-block-image' },
+						createElement( 'img', { src: attributes.url } )
+					),
+			} );
+
+			// There is no text, but the second image is content too.
+			const parsedBlock = parseRawBlock( {
+				blockName: 'core/image',
+				attrs: {},
+				innerHTML:
+					'<figure class="wp-block-image"><img src="a.png"/><img src="b.png"/></figure>',
+				innerBlocks: [],
+				innerContent: [
+					'<figure class="wp-block-image"><img src="a.png"/><img src="b.png"/></figure>',
+				],
+			} );
+
+			expect( parsedBlock.isValid ).toBe( false );
+			expect( parsedBlock.validationLevel ).toBe(
+				VALIDATION_LEVEL.INVALID_BLOCK
+			);
+			expect( parsedBlock.__unstableBlockSource ).toBeDefined();
+			expect( console ).toHaveWarned();
+			expect( console ).toHaveErrored();
 		} );
 	} );
 

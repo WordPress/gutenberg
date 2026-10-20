@@ -80,6 +80,11 @@
 				"type": "string"
 			}
 		},
+		"allowsReconstruction": {
+			"description": "Whether the editor may regenerate the block from its attributes when its saved markup does not match the output of its `save` function and no deprecation matches, as long as no content would be lost. Set to `false` to only accept markup that matches `save` or a deprecation exactly, and show the invalid block warning otherwise.",
+			"type": "boolean",
+			"default": true
+		},
 		"icon": {
 			"description": "An icon property should be specified to make it easier to identify a block. These can be any of WordPress’ Dashicons (slug serving also as a fallback in non-js contexts).",
 			"type": "string"
