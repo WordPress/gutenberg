@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `use-recommended-components`: Recommend `SelectionIndicator` from `@wordpress/ui`.
+-   `use-recommended-components`: Recommend `SelectionIndicator` from `@wordpress/ui` ([#85191](https://github.com/WordPress/gutenberg/pull/85191)).
 
 ## 28.0.0 (2026-10-20)
 
