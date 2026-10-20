@@ -16,9 +16,9 @@
  *
  * @todo Needs to be deduplicated with its copy in `@wordpress/edit-site`.
  *
- * @param {Object}       object Object to modify
- * @param {Array|string} path   Path of the property to set.
- * @param {*}            value  Value to set.
+ * @param object Object to modify
+ * @param path   Path of the property to set.
+ * @param value  Value to set.
  */
 export default function setNestedValue< T >(
 	object: T,

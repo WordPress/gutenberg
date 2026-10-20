@@ -3,9 +3,9 @@ import type { ForwardedResolverArgs } from './types';
 /**
  * Higher-order function which forward the resolution to another resolver with the same arguments.
  *
- * @param {string} resolverName forwarded resolver.
+ * @param resolverName forwarded resolver.
  *
- * @return {Function} Enhanced resolver.
+ * @return Enhanced resolver.
  */
 const forwardResolver =
 	( resolverName: string ) =>
