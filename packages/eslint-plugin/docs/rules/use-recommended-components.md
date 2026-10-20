@@ -53,6 +53,21 @@ import { unlock } from '../../lock-unlock';
 const { SomethingElse } = unlock( componentsPrivateApis );
 ```
 
+## Inline exceptions in Gutenberg
+
+For intentional early adoption, place `eslint-disable-next-line` immediately above the individual import specifier in a multiline import. Include a reason for the exception. The Gutenberg repository enforces this placement with its local `gutenberg/no-broad-component-suppression` rule, so adding another component to an import does not silently extend an existing exception.
+
+```js
+import {
+	Field,
+	// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of Menu.
+	Menu,
+	Stack,
+} from '@wordpress/ui';
+```
+
+For direct destructuring from `unlock( privateApis )`, put each exception above the individual property on its own line. Do not disable the rule for an entire import, destructuring declaration, block, or file. Existing legacy usages awaiting migration belong in Gutenberg's bulk suppression file instead.
+
 ## Options
 
 This rule has an object option:
