@@ -35,6 +35,7 @@
 		{ "path": "packages/grid" },
 		{ "path": "packages/grid/tsconfig.test.json" },
 		{ "path": "packages/html-entities" },
+		{ "path": "packages/hooks" },
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
 		{ "path": "packages/image-cropper" },

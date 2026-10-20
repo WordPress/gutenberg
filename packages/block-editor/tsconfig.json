@@ -23,7 +23,7 @@
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../priority-queue/tsconfig.build.json" },
 		{ "path": "../private-apis/tsconfig.build.json" },
-		{ "path": "../hooks" },
+		{ "path": "../hooks/tsconfig.build.json" },
 		{ "path": "../html-entities/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
