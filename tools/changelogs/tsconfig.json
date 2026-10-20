@@ -1,0 +1,8 @@
+{
+	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
+	"compilerOptions": {
+		"rootDir": "./",
+		"outDir": "./build"
+	},
+	"include": [ "./**/*.ts" ]
+}
