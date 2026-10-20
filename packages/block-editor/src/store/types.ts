@@ -11,12 +11,13 @@ import type {
 	FetchLinkSuggestions,
 	FetchRichUrlData,
 } from '../components/link-control/types';
-import type { WPDropOperation } from '../components/use-on-block-drop/types';
+import type { BlockDropOperation } from '../components/use-on-block-drop/types';
 import type { Bindings } from '../utils/block-bindings';
 import type { store } from '.';
 import type * as privateSelectors from './private-selectors';
 import type * as privateActions from './private-actions';
 import type {
+	currentUserIdSelectKey,
 	isIsolatedEditorKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
@@ -247,6 +248,7 @@ export interface UserPattern {
 	content: { raw: string };
 	wp_pattern_category?: number[];
 	wp_pattern_sync_status?: string;
+	author?: number;
 }
 
 export interface UserPatternCategory {
@@ -328,9 +330,9 @@ export interface ShowInsertionPointOptions {
 	 */
 	__unstableWithInserter?: boolean;
 	/**
-	 * The operation to perform when applied, either 'insert' or 'replace'.
+	 * The operation to perform when applied.
 	 */
-	operation?: WPDropOperation;
+	operation?: BlockDropOperation;
 	nearestSide?: string;
 }
 
@@ -388,6 +390,9 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
 	__unstableIsBlockBasedTheme?: boolean;
+	[ currentUserIdSelectKey ]?: (
+		select: typeof globalSelect
+	) => number | undefined;
 	[ isIsolatedEditorKey ]?: boolean;
 	[ reusableBlocksSelectKey ]?: (
 		select: typeof globalSelect
@@ -529,7 +534,6 @@ export interface State {
 	blockRemovalRules: BlockRemovalRule[] | false;
 	registeredInserterMediaCategories: InserterMediaCategory[];
 	zoomLevel: number | 'auto-scaled';
-	hasBlockSpotlight: string | null | undefined;
 	openedListViewPanels: {
 		allOpen: boolean;
 		panels: Record< string, boolean >;
@@ -718,11 +722,6 @@ export type Action =
 			isHighlighted: boolean;
 	  }
 	| { type: 'TOGGLE_BLOCK_MODE'; clientId: string }
-	| {
-			type: 'TOGGLE_BLOCK_SPOTLIGHT';
-			clientId: string;
-			hasBlockSpotlight: boolean;
-	  }
 	| { type: 'TOGGLE_LIST_VIEW_PANEL'; clientId: string; isOpen: boolean }
 	| { type: 'TOGGLE_SELECTION'; isSelectionEnabled: boolean }
 	| { type: 'UNSET_BLOCK_EDITING_MODE'; clientId: string }

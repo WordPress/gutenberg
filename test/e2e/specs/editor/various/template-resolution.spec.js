@@ -1,4 +1,9 @@
-const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
+const {
+	test,
+	expect,
+	Editor,
+} = require( '@wordpress/e2e-test-utils-playwright' );
+const { openPostSummary } = require( './post-summary/utils' );
 
 async function updateSiteSettings( { pageId, requestUtils } ) {
 	return requestUtils.updateSiteSettings( {
@@ -44,6 +49,90 @@ test.describe( 'Template resolution', () => {
 		);
 	} );
 
+	test.describe( 'without template capabilities', () => {
+		let postId;
+
+		test.beforeAll( async ( { requestUtils } ) => {
+			const editorUser = await requestUtils.createUser( {
+				username: 'editoruser',
+				email: 'editoruser@example.com',
+				password: 'editoruserpassword',
+				roles: [ 'editor' ],
+			} );
+			const post = await requestUtils.createPost( {
+				title: 'Custom template post',
+				status: 'draft',
+				author: editorUser.id,
+				template: 'custom-template',
+			} );
+			postId = post.id;
+		} );
+
+		test.afterAll( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPosts();
+			await requestUtils.deleteAllUsers();
+		} );
+
+		test( 'shows the assigned template to an editor', async ( {
+			browser,
+			requestUtils,
+		} ) => {
+			const context = await browser.newContext( {
+				baseURL: requestUtils.baseURL,
+				storageState: { cookies: [], origins: [] },
+			} );
+			const page = await context.newPage();
+			await page.goto( '/wp-login.php' );
+			await page
+				.getByLabel( 'Username or Email Address' )
+				.fill( 'editoruser' );
+			await page
+				.getByLabel( 'Password', { exact: true } )
+				.fill( 'editoruserpassword' );
+			await page.getByRole( 'button', { name: 'Log In' } ).click();
+			await page.waitForURL( '**/wp-admin/**' );
+
+			await page.goto(
+				`/wp-admin/post.php?post=${ postId }&action=edit`
+			);
+			await page.waitForFunction( () => !! window.wp?.data );
+			await page.evaluate( () => {
+				window.wp.data
+					.dispatch( 'core/preferences' )
+					.set( 'core/edit-post', 'welcomeGuide', false );
+			} );
+
+			const summary = await openPostSummary( {
+				editor: new Editor( { page } ),
+				page,
+			} );
+			await expect(
+				summary.getByRole( 'button', { name: 'Edit Template' } )
+			).toHaveAccessibleDescription( 'Custom' );
+
+			// The template actions panel offers no template editing or creation.
+			const sidebar = page.getByRole( 'region', {
+				name: 'Editor settings',
+			} );
+			const panelToggle = sidebar.getByRole( 'button', {
+				name: 'Template: Custom',
+			} );
+			await panelToggle.click();
+			await expect( panelToggle ).toHaveAttribute(
+				'aria-expanded',
+				'true'
+			);
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Edit', exact: true } )
+			).toBeHidden();
+			await expect(
+				sidebar.getByRole( 'button', { name: 'Create new' } )
+			).toBeHidden();
+
+			await context.close();
+		} );
+	} );
+
 	test.describe( '`page_for_posts` setting', () => {
 		test( 'Post editor proper template resolution', async ( {
 			page,
@@ -56,15 +145,16 @@ test.describe( 'Template resolution', () => {
 				status: 'publish',
 			} );
 			await admin.editPost( newPage.id );
-			await editor.openDocumentSettingsSidebar();
+			const summary = await openPostSummary( { editor, page } );
 			await expect(
-				page.getByRole( 'button', { name: 'Template options' } )
-			).toHaveText( 'Single Entries' );
+				summary.getByRole( 'button', { name: 'Edit Template' } )
+			).toHaveAccessibleDescription( 'Single Entries' );
 			await updateSiteSettings( { requestUtils, pageId: newPage.id } );
 			await page.reload();
+			await openPostSummary( { editor, page } );
 			await expect(
-				page.getByRole( 'button', { name: 'Template options' } )
-			).toHaveText( 'Index' );
+				summary.getByRole( 'button', { name: 'Edit Template' } )
+			).toHaveAccessibleDescription( 'Index' );
 		} );
 
 		test( 'Site editor proper template resolution', async ( {
@@ -83,10 +173,10 @@ test.describe( 'Template resolution', () => {
 				postType: 'page',
 				canvas: 'edit',
 			} );
-			await editor.openDocumentSettingsSidebar();
+			const summary = await openPostSummary( { editor, page } );
 			await expect(
-				page.getByRole( 'button', { name: 'Template options' } )
-			).toHaveText( 'Index' );
+				summary.getByRole( 'button', { name: 'Edit Template' } )
+			).toHaveAccessibleDescription( 'Index' );
 		} );
 	} );
 } );
