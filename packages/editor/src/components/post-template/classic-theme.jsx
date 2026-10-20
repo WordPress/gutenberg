@@ -13,6 +13,10 @@ import { useAllowSwitchingTemplates } from './hooks';
 import PostPanelRow from '../post-panel-row';
 import { useLockedPostSettingProps } from '../suggestion-mode/use-locked-post-field';
 
+// The default template is stored as an empty string, but the select treats an
+// empty value as no selection and shows its placeholder.
+const DEFAULT_TEMPLATE_VALUE = '//default';
+
 function PostTemplateToggle( { isOpen, onClick } ) {
 	const lockedProps = useLockedPostSettingProps();
 	const templateTitle = useSelect( ( select ) => {
@@ -118,13 +122,16 @@ function PostTemplateDropdownContent( { onClose } ) {
 						title.rendered,
 					] )
 				),
-			} ).map( ( [ slug, title ] ) => ( { value: slug, label: title } ) ),
+			} ).map( ( [ slug, title ] ) => ( {
+				value: slug || DEFAULT_TEMPLATE_VALUE,
+				label: title,
+			} ) ),
 		[ availableTemplates, fetchedTemplates ]
 	);
 
 	const selectedOption =
 		options.find( ( option ) => option.value === selectedTemplateSlug ) ??
-		options.find( ( option ) => ! option.value ); // The default option has '' value.
+		options.find( ( option ) => option.value === DEFAULT_TEMPLATE_VALUE );
 
 	const { editPost } = useDispatch( editorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
@@ -161,7 +168,13 @@ function PostTemplateDropdownContent( { onClose } ) {
 					value={ selectedOption ?? null }
 					items={ options }
 					onValueChange={ ( item ) =>
-						editPost( { template: item?.value ?? '' } )
+						editPost( {
+							template:
+								! item?.value ||
+								item.value === DEFAULT_TEMPLATE_VALUE
+									? ''
+									: item.value,
+						} )
 					}
 				/>
 			) }

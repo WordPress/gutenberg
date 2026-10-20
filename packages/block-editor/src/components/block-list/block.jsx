@@ -132,6 +132,7 @@ function BlockListBlock( {
 			mayDisplayPatternEditingControls={ isSelectionWithinCurrentSection }
 			blockEditingMode={ context.blockEditingMode }
 			isPreviewMode={ context.isPreviewMode }
+			isMultiSelected={ context.isMultiSelected }
 		/>
 	);
 

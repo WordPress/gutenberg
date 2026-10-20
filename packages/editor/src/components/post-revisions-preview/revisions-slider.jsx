@@ -1,5 +1,9 @@
 import { useSelect, useDispatch } from '@wordpress/data';
-import { RangeControl, Spinner, Button } from '@wordpress/components';
+import {
+	RangeControl,
+	Spinner as WCSpinner,
+	Button,
+} from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
@@ -141,7 +145,7 @@ export function RevisionsSlider( {
 	const showPagination = totalPages > 1;
 
 	if ( isLoading && ! showPagination ) {
-		return <Spinner ref={ loadingRef } />;
+		return <WCSpinner ref={ loadingRef } />;
 	}
 
 	if ( ! isLoading && ! revisions?.length ) {
@@ -173,7 +177,7 @@ export function RevisionsSlider( {
 
 	const sliderOrSpinner =
 		isLoading || selectedIndex === -1 ? (
-			<Spinner ref={ loadingRef } />
+			<WCSpinner ref={ loadingRef } />
 		) : (
 			<RangeControl
 				ref={ focusOnMountRef }

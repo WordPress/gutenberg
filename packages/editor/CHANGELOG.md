@@ -2,21 +2,14 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
 ### New Features
 
 -   Add a session-scoped editor intent (`edit`, `suggest`, `view`), with a private `setEditorIntent` action and `getEditorIntent` selector - the intent API stays private while Suggest mode is experimental. It is surfaced as an Edit / Suggest / View menu in the editor options for post types that support notes, and announced on change with a snackbar. Keyboard shortcuts follow the Google Docs convention: Ctrl+Alt+Shift+Z (Edit), +X (Suggest), +C (View) on Windows, ⌘⌥⇧Z/X/C on macOS ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Added a suggestion-overlay subsystem that powers the `suggest` intent. When active, an `editor.BlockEdit` filter diverts `setAttributes` into an in-memory overlay keyed by `clientId`; the block renders with the pending change merged on top of its real attributes, but the block-editor store stays at the baseline. Pending overlay edits auto-save as a note comment with a `_wp_suggestion` meta payload (`schemaVersion`, `blockName`, `baseRevision`, `operations`) after a short idle window, and subsequent edits on the same block update the existing note rather than creating a new one. Blocks with a pending suggestion are marked with a green bracket/outline, and the notes sidebar shows a Docs-style 'Add / Delete / Format' summary with checkmark-and-close icon buttons to accept or reject ([#80428](https://github.com/WordPress/gutenberg/pull/80428)).
 
-### Enhancements
-
--   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
-
 ### Bug Fixes
 
+-   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 -   `DocumentTools`: Disable the Block Inserter toggle while the canvas is a preview, and close an inserter left open when the editor enters the `view` intent, so the control that adds blocks does not open onto a library the editor will refuse ([#80427](https://github.com/WordPress/gutenberg/pull/80427), [#81661](https://github.com/WordPress/gutenberg/pull/81661)).
 -   Close the editor-level mutation paths the read-only canvas does not cover while the editor is in the `view` intent: the code editor - a raw `post_content` textarea preview rendering leaves writable - is refused from the Options menu, the toggle-mode shortcut and the command palette, and undo and redo are declined by the store and stop advertising themselves in the header ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
 -   Register the editor intent keyboard shortcuts only where they can be used - the Suggestion Mode experiment and `editor.notes` support on the current post type - so the Keyboard Shortcuts help modal no longer advertises them on screens that cannot act on them ([#80427](https://github.com/WordPress/gutenberg/pull/80427)).
@@ -31,8 +24,55 @@
 -   Suggest mode: keep a review decision and its note together through undo. Accepting or rejecting a suggestion changes block content and resolves the note, but only the content half is in the undo stack, so undo put the marker back on a note that stayed resolved - a marked-up run with no Accept/Reject on it and no way to clear it. Undoing a decision made in this session now reopens its note along with the marker, restoring the suggestion's lifecycle meta to `pending` ([#81669](https://github.com/WordPress/gutenberg/pull/81669), [#81963](https://github.com/WordPress/gutenberg/pull/81963)).
 -   Suggest mode: extend a format suggestion on a second toggle instead of opening a second one. Toggling a further format over a run that already carries the suggester's own pending `format` marker recorded a suggestion whose before and after were both empty - unreviewable and unapplyable - and made every marker in the block disappear. The existing suggestion is now revised in place, a toggle that restores the original run retracts it rather than storing a note that proposes nothing, and a note that has replies is revised rather than withdrawn ([#81665](https://github.com/WordPress/gutenberg/pull/81665)).
 -   Suggest mode: refuse post status changes while suggesting. `editPost` drops the `status` field in the `suggest` intent, the status control and the summary panel show the status without offering to change it, and the publish button is disabled there when its click would change the status, rather than dropping the status edit and saving the post anyway; a plain save of a published or scheduled post stays available so the suggestion markers can be persisted. A status edit that travels with a companion field - the `password` that visibility changes carry, the `date` that scheduling carries - is refused whole rather than half-applied, a status repeated at the value it already holds is not announced as a refusal, and a status staged before the intent changed is discarded on the way in. The refusal is announced and shown in a snackbar ([#81664](https://github.com/WordPress/gutenberg/pull/81664)).
+
+## 16.0.0 (2026-10-20)
+
+### Breaking Changes
+
+-   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+-   The editor stylesheet no longer includes the styles of `@wordpress/fields`. A plugin that renders `MediaEdit` loads `@wordpress/fields/build-style/style.css` with its own script, as the package README describes ([#84897](https://github.com/WordPress/gutenberg/pull/84897)).
+-   Every action of a post type now comes from the server: `usePostActions` shows the actions the `wp/v2/entity-actions` route returns, merged with the JavaScript parts of the script modules registered along with them, and `registerPostTypeSchema()` registers no action. When the actions cannot be loaded, a notice says so ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
+-   `registerEntityAction` and `unregisterEntityAction`, only available in the Gutenberg plugin, have no effect. They still warn, and they no longer register or unregister anything: every action of an entity is registered on the server. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for their JavaScript parts ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
+
+### New Features
+
+-   Notes: allow reacting to a note with an emoji. Reactions display as pill buttons on the note with per-emoji counts, backed by a new `reaction` comment type. The add-reaction trigger fades in on hover or focus in the note's top corner, so a note with no reactions costs no vertical space for the option ([#76767](https://github.com/WordPress/gutenberg/pull/76767)).
+
+### Enhancements
+
+-   The document sidebar shows the post summary built with DataForm, the same fields as Quick Edit, for every post type, and the template actions panel below it ([#85081](https://github.com/WordPress/gutenberg/pull/85081)).
+-   `usePostActions` no longer adds the "Set as homepage" and "Set as posts page" actions to pages: they moved to `@wordpress/core-actions`, which registers them on the server for the users who can manage the site settings when the theme has no `front-page` template, so a plugin can remove them with `wp_unregister_entity_actions()`. The pages they apply to come from the `wp:action-set-homepage` and `wp:action-set-posts-page` REST links ([#84932](https://github.com/WordPress/gutenberg/pull/84932)).
+-   The post summary of the DataForm-based inspector, the media editor, and the private `usePostFields` hook, through which the site editor screens get their fields, read the fields of the post type from the server, through the Entity fields API. The media editor also lays out the attachment fields with the form of the attachment view configuration ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   Notes: Mark noted content in the author's color at rest. Inline notes get a tint and an underline that thickens when the note is selected, and block-level notes tint the whole block with an outline around it. Selecting a note outlines its block instead of dimming the rest of the canvas, and hiding notes hides the marks ([#80578](https://github.com/WordPress/gutenberg/pull/80578)).
+-   Migrate the classic-theme template selector to `@wordpress/ui` `SelectControl` ([#84345](https://github.com/WordPress/gutenberg/pull/84345)).
+-   Show viewport dimensions and responsive editing status in the editor footer, and clarify when viewport-specific styling is available ([#84146](https://github.com/WordPress/gutenberg/pull/84146)).
+-   Save failures: Pass the server's message as the notice's `details`, as plain text with links kept as `text (URL)`, rather than building escaped HTML behind `__unstableHTML`. For a PHP fatal error, the PHP error and its stack trace from `data.error` follow the message. The notice shows it behind "Show details" and offers to copy it with the message ([#82496](https://github.com/WordPress/gutenberg/pull/82496)).
+-   Notes: Once a post has a note, replace the avatars in the block toolbar with an "Add note" button, whose label says how many notes the block has ([#78205](https://github.com/WordPress/gutenberg/pull/78205)).
+
+### Deprecations
+
+-   `registerEntityField` and `unregisterEntityField`, which only had an effect in the Gutenberg plugin, are deprecated and have no effect anymore: the fields of an entity are registered on the server. Register and unregister them in PHP, with `wp_register_entity_fields()` and `wp_unregister_entity_fields()` on the `wp_entity_fields_api_init` action, and a script module for their JavaScript parts ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
+-   `registerEntityAction` and `unregisterEntityAction`, only available in the Gutenberg plugin, are deprecated. Register and unregister actions in PHP on the `wp_entity_actions_api_init` action instead, with a script module for their JavaScript parts ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
+
+### Bug Fixes
+
+-   `PostTaxonomiesFlatTermSelector`: Pressing Enter adds the typed terms, and comma-separated names are added as separate terms ([#84601](https://github.com/WordPress/gutenberg/pull/84601)).
+-   Notes: Keep the canvas from scrolling to the top when adding a floating note on a scrolled post ([#84639](https://github.com/WordPress/gutenberg/pull/84639)).
 -   Notes: Highlight the text an unsent note is about, and keep the note anchored to it when the selection changes or the text is edited before the note is sent ([#84125](https://github.com/WordPress/gutenberg/pull/84125)).
 -   Notes: Select the note under the caret: an inline note while the caret is inside its highlight, otherwise the block's unsent draft or block-level note, instead of an inline note on any click in the block ([#84147](https://github.com/WordPress/gutenberg/pull/84147)).
+-   `PostPanelRow`: Wrap long unbroken values (such as an author name or email) inside the row instead of overflowing the Post sidebar ([#84165](https://github.com/WordPress/gutenberg/pull/84165)).
+-   Visual History: Render the inline removed-text diff (`<del>`) at the theme's body color over a red-tinted background instead of recoloring it with a translucent color-matrix filter, so it keeps the theme's WCAG AA contrast on any background ([#82258](https://github.com/WordPress/gutenberg/pull/82258)).
+-   Notes: Stop announcing the "Add note" block menu item as opening a dialog ([#84818](https://github.com/WordPress/gutenberg/pull/84818)).
+-   `EditorProvider`: Keep a preview canvas from restoring a block selection written to the entity by another editor, such as the site editor's navigation sidebar ([#84832](https://github.com/WordPress/gutenberg/pull/84832)).
+-   Post slug: Show the slug of the current title instead of the server-generated slug, which could be `auto-draft` or the slug of an outdated title. A post without a slug or a title shows `None` and its plain `?p=ID` permalink: `getEditedPostSlug` now returns an empty string instead of the post ID, `getPermalinkParts` uses it as the post name, and `getPermalink` returns the post's `link` ([#84893](https://github.com/WordPress/gutenberg/pull/84893)).
+-   `PostURL`: Only clean and save the slug when the field loses focus if its value changed, so focusing the field no longer strips characters such as emoji that WordPress kept in the slug ([#84893](https://github.com/WordPress/gutenberg/pull/84893)).
+
+### Internal
+
+-   Move footer-specific block breadcrumb layout styles into the package ([#84295](https://github.com/WordPress/gutenberg/pull/84295)).
+-   Import the core actions `registerPostTypeSchema()` registers from the `@wordpress/core-actions` script modules instead of `@wordpress/fields` ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   Take `CreateTemplatePartModal` from the private APIs of `@wordpress/patterns` instead of `@wordpress/fields`, and remove it from the private APIs of the editor ([#84643](https://github.com/WordPress/gutenberg/pull/84643)).
+-   The `core/editor` store no longer holds the actions of an entity: its private `registerEntityAction`, `unregisterEntityAction` and `getEntityActions` are gone ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
 
 ## 15.2.0 (2026-10-07)
 
