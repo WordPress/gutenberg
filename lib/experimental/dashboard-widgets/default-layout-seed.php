@@ -7,6 +7,9 @@
  * it. Plugins and themes can layer their own callback on top of the same
  * filter to extend or replace this set.
  *
+ * Placements count against `GUTENBERG_DASHBOARD_LAYOUT_GEOMETRY`: four
+ * columns of 40px rows, so a height of 15 is 936px.
+ *
  * @package gutenberg
  */
 
@@ -36,7 +39,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'type'      => 'core/welcome',
 			'placement' => array(
 				'width'  => 'full',
-				'height' => 3,
+				'height' => 15,
 				'order'  => 0,
 			),
 		);
@@ -48,7 +51,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'type'      => 'core/activity',
 			'placement' => array(
 				'width'  => 3,
-				'height' => 3,
+				'height' => 15,
 				'order'  => 1,
 			),
 		);
@@ -60,7 +63,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'type'      => 'core/quick-draft',
 			'placement' => array(
 				'width'  => 4,
-				'height' => 3,
+				'height' => 15,
 				'order'  => 2,
 			),
 		);
@@ -72,7 +75,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'type'      => 'core/site-health',
 			'placement' => array(
 				'width'  => 2,
-				'height' => 2,
+				'height' => 10,
 				'order'  => 3,
 			),
 		);
@@ -84,7 +87,7 @@ function gutenberg_seed_default_dashboard_layout( $dashboard_layout, $dashboard_
 			'type'      => 'core/site-preview',
 			'placement' => array(
 				'width'  => 2,
-				'height' => 3,
+				'height' => 15,
 				'order'  => 4,
 			),
 		);

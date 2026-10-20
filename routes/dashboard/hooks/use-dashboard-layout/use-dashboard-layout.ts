@@ -108,8 +108,9 @@ function readStored(
  * Spans are relative to the geometry they were saved under, so the
  * preference holds a record of the layout and that geometry, and a record
  * whose geometry differs from the current one is rescaled on read. A plain
- * array, saved before the record existed, and the registered default count
- * as four columns of the row height the dashboard rendered with at the time.
+ * array, saved before the record existed or served as a default without a
+ * geometry, counts as four columns of the row height the dashboard rendered
+ * with at the time.
  *
  * @param dashboardName Identifier of the dashboard as produced by the
  *                      build pipeline. Used as the `{name}` segment of
@@ -158,14 +159,15 @@ export function useDashboardLayout(
 	async function resetLayout() {
 		const fresh = ( await apiFetch( {
 			path: `/wp/v2/dashboards/${ dashboardName }/default-layout`,
-		} ) ) as DashboardWidget[];
-
-		setLayout(
-			rescaleLayout( fresh, legacyGeometry( legacySettings ), {
-				columns,
-				rowHeight,
-			} )
+		} ) ) as unknown;
+		const current = { columns, rowHeight };
+		const { geometry: from, widgets } = readStored(
+			fresh,
+			legacyGeometry( legacySettings ),
+			current
 		);
+
+		setLayout( rescaleLayout( widgets, from, current ) );
 	}
 
 	return [ layout, setLayout, resetLayout ];
