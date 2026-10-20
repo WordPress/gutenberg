@@ -10,8 +10,7 @@
  */
 import { test, expect } from '@wordpress/e2e-test-utils-playwright';
 
-const DISABLED_STATUS_LABEL =
-	'The post status cannot be suggested. Switch to Editing to change it.';
+const PUBLISH_HINT = 'Switch to Editing to change the post status.';
 
 const REFUSED_STATUS_MESSAGE =
 	"The post status can't be changed while suggesting. Switch to Editing to change it.";
@@ -87,26 +86,21 @@ test.describe( 'Suggestion mode post status', () => {
 			name: 'Editor settings',
 		} );
 
-		// Editing intent: the status control is a working dropdown toggle.
+		// Editing intent: the status field opens for editing.
 		await expect(
-			settings.getByRole( 'button', { name: /^Change status:/ } )
-		).toBeEnabled();
+			settings.getByRole( 'button', { name: 'Edit Status' } )
+		).toBeVisible();
 
 		await switchIntent( page, 'Suggesting' );
 
-		// Suggesting intent: the control shows the status but refuses to
-		// change it, and explains where to change it instead.
+		// Suggesting intent: the summary still shows the status, read-only.
 		await expect(
-			settings.getByRole( 'button', { name: /^Change status:/ } )
+			settings.getByRole( 'button', { name: 'Edit Status' } )
 		).toBeHidden();
-		const statusToggle = settings.locator( '.editor-post-status__toggle' );
-		await expect( statusToggle ).toBeDisabled();
-		// The status stays the accessible name so it is still announced; the
-		// reason rides along as the description.
-		await expect( statusToggle ).toHaveAccessibleName( 'Draft' );
-		await expect( statusToggle ).toHaveAccessibleDescription(
-			DISABLED_STATUS_LABEL
-		);
+		await expect(
+			settings.getByText( 'Draft', { exact: true } )
+		).toBeVisible();
+		expect( await getEditedStatus( page ) ).toBe( 'draft' );
 	} );
 
 	test( 'a status edit dispatched while suggesting is refused', async ( {
@@ -160,17 +154,18 @@ test.describe( 'Suggestion mode post status', () => {
 		 * `editPost` drops the status, but the button doesn't stop there: it
 		 * calls `savePost()` next, which would write the post to the server as
 		 * a draft while the pre-publish flow waits for a state change that
-		 * never comes.
+		 * never comes. The click explains where to change the status instead.
 		 */
 		await expect( publishButton ).toHaveAttribute(
-			'aria-disabled',
+			'aria-expanded',
+			'false'
+		);
+		await publishButton.click();
+		await expect( publishButton ).toHaveAttribute(
+			'aria-expanded',
 			'true'
 		);
-
-		// Playwright treats `aria-disabled` as not enabled and would refuse a
-		// normal click, but the point of the test is that a click reaching the
-		// button still does nothing.
-		await publishButton.dispatchEvent( 'click' );
+		await expect( page.getByText( PUBLISH_HINT ) ).toBeVisible();
 
 		await expect(
 			page.getByRole( 'region', { name: 'Editor publish' } )
