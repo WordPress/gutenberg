@@ -14,3 +14,9 @@
 .pattern-title > span:first-child {
 	flex: 1;
 }
+
+/* Who is editing a locked post, below its title. */
+.locked-by {
+	font-size: var(--wpds-typography-font-size-sm);
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}

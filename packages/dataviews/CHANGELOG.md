@@ -10,6 +10,7 @@
 
 -   DataViews: Use `Select` from `@wordpress/ui` for the pagination page selector and filter operator selector ([#83035](https://github.com/WordPress/gutenberg/pull/83035)).
 -   Format footer item and selection counts with locale-specific separators ([#84622](https://github.com/WordPress/gutenberg/pull/84622)).
+-   Add the `isItemLocked` prop. A locked item shows a lock icon in place of its selection checkbox and can't be selected for bulk actions ([#84152](https://github.com/WordPress/gutenberg/issues/84152)).
 -   DataForm: The `text` control's `prefix` and `suffix` accept a string, and the new `prefixPadding` and `suffixPadding` options use the minimal slot padding for icons and buttons. ([#84314](https://github.com/WordPress/gutenberg/pull/84314))
 
 ### Bug Fixes

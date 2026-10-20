@@ -1,3 +1,9 @@
+.dataviews-selection-checkbox__lock {
+	display: inline-flex;
+	flex-shrink: 0;
+	color: var(--wpds-color-foreground-content-neutral-weak);
+}
+
 .dataviews-selection-checkbox {
 	line-height: 0;
 	flex-shrink: 0;

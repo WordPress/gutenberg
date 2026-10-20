@@ -99,15 +99,19 @@ export function BulkSelectionCheckbox< Item >( {
 	getItemId,
 	disableSelectAll = false,
 }: BulkSelectionCheckboxProps< Item > ) {
+	const { isItemLocked } = useContext( DataViewsContext );
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
+			if ( isItemLocked( item ) ) {
+				return false;
+			}
 			return actions.some(
 				( action ) =>
 					action.supportsBulk &&
 					( ! action.isEligible || action.isEligible( item ) )
 			);
 		} );
-	}, [ data, actions ] );
+	}, [ data, actions, isItemLocked ] );
 	const selectedItems = data.filter(
 		( item ) =>
 			selection.includes( getItemId( item ) ) &&

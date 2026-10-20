@@ -399,6 +399,7 @@ function PostListView( {
 					// statuses `status` is typed as exclude 'trash'.
 					( item.status as string ) !== 'trash'
 				}
+				isItemLocked={ ( item: Post ) => !! item.locked_by }
 				renderItemLink={ ( { item, ...props }: { item: Post } ) => (
 					<Link
 						to={ `/types/${ postType }/edit/${ encodeURIComponent(

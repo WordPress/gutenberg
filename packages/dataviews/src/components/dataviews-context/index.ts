@@ -34,6 +34,7 @@ type DataViewsContextType< Item > = {
 		} & ComponentProps< 'a' >
 	) => ReactElement;
 	isItemClickable: ( item: Item ) => boolean;
+	isItemLocked: ( item: Item ) => boolean;
 	containerWidth: number;
 	containerRef: React.RefObject< HTMLDivElement | null >;
 	resizeObserverRef: React.Ref< HTMLDivElement | null >;
@@ -64,6 +65,7 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	openedFilter: null,
 	getItemId: ( item ) => item.id,
 	isItemClickable: () => true,
+	isItemLocked: () => false,
 	renderItemLink: undefined,
 	containerWidth: 0,
 	containerRef: createRef(),

@@ -144,6 +144,19 @@ declare module './base-entity-records' {
 			 * Class names for the post container element.
 			 */
 			class_list: ContextualField< string[], 'view' | 'edit', C >;
+			/**
+			 * The user currently editing the post, if it is not the current
+			 * user.
+			 */
+			locked_by: ContextualField<
+				{
+					id: number;
+					name: string;
+					avatar_urls: Record< string, string >;
+				} | null,
+				'edit',
+				C
+			>;
 		}
 	}
 }

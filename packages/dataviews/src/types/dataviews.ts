@@ -130,6 +130,15 @@ export type DataViewsProps< Item > = {
 	isItemClickable?: ( item: Item ) => boolean;
 
 	/**
+	 * Whether an item is locked, e.g. because someone else is editing it. A
+	 * locked item shows a lock icon in place of its selection checkbox, and
+	 * cannot be selected for bulk actions.
+	 *
+	 * @default () => false
+	 */
+	isItemLocked?: ( item: Item ) => boolean;
+
+	/**
 	 * Extra content rendered in the toolbar area, next to the view
 	 * configuration controls.
 	 */

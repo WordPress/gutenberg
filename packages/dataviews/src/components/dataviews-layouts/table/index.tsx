@@ -273,7 +273,7 @@ function ViewTable< Item >( {
 	className,
 	empty,
 }: ViewTableProps< Item > ) {
-	const { containerRef } = useContext( DataViewsContext );
+	const { containerRef, isItemLocked } = useContext( DataViewsContext );
 	const isDelayedLoading = useDelayedLoading( isLoading );
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
@@ -287,7 +287,8 @@ function ViewTable< Item >( {
 	const { getSelectionProps } = useSelectionProps( {
 		data: orderedData,
 		getItemId,
-		isItemSelectable: ( item ) => hasAPossibleBulkAction( actions, item ),
+		isItemSelectable: ( item ) =>
+			! isItemLocked( item ) && hasAPossibleBulkAction( actions, item ),
 		selection,
 		onChangeSelection,
 		selectionMode: 'multi',

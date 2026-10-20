@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import type { ReactNode } from 'react';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
 import { getItemTitle } from './get-item-title';
 import type { ItemWithTitle } from './get-item-title';
@@ -20,7 +20,7 @@ export function BaseTitleView( {
 	children?: ReactNode;
 } ) {
 	const renderedTitle = getItemTitle( item );
-	return (
+	const title = (
 		<Stack
 			direction="row"
 			align="center"
@@ -32,6 +32,23 @@ export function BaseTitleView( {
 		>
 			<span>{ renderedTitle || __( '(no title)' ) }</span>
 			{ children }
+		</Stack>
+	);
+
+	if ( ! item.locked_by ) {
+		return title;
+	}
+
+	return (
+		<Stack direction="column">
+			{ title }
+			<span className={ styles[ 'locked-by' ] }>
+				{ sprintf(
+					/* translators: %s: The name of the user editing the post. */
+					__( '%s is currently editing' ),
+					item.locked_by.name
+				) }
+			</span>
 		</Stack>
 	);
 }

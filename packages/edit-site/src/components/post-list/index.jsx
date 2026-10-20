@@ -296,6 +296,7 @@ export default function PostList( { postType } ) {
 				selection={ selection }
 				onChangeSelection={ onChangeSelection }
 				isItemClickable={ ( item ) => item.status !== 'trash' }
+				isItemLocked={ ( item ) => !! item.locked_by }
 				onClickItem={ ( { id } ) => {
 					history.navigate( `/${ postType }/${ id }?canvas=edit` );
 				} }
