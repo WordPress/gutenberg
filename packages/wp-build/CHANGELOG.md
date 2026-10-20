@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.26.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Remove the automatic Babel processing for `packages/components`, including the Emotion transform, implicit project Babel configuration support, and build-time dependencies. Projects that rely on these transforms must run Babel separately before `@wordpress/build` ([#84707](https://github.com/WordPress/gutenberg/pull/84707)).

@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
+
+## 2.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
@@ -9,7 +15,7 @@
 
 ### New Features
 
--   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
+-   Add `:required`, `:user-valid`, `:user-invalid`, `:focus`, `:focus-visible`, and `::placeholder` support for the `textInput` element ([#71634](https://github.com/WordPress/gutenberg/pull/71634)).
 
 ### Enhancements
 
