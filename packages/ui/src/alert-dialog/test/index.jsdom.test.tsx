@@ -1,4 +1,3 @@
-// DROPME: Demo change for the CHANGELOG presence matrix.
 import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import { createRef } from '@wordpress/element';
