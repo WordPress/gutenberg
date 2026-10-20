@@ -1,4 +1,4 @@
-import { __experimentalHStack as HStack, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import {
 	__experimentalRegisterConnector as registerConnector,
@@ -11,7 +11,7 @@ import {
 } from '@wordpress/connectors';
 import { select } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { Badge, Link } from '@wordpress/ui';
+import { Badge, Link, Stack } from '@wordpress/ui';
 import { unlock } from '@wordpress/routes-lock-unlock';
 import { useConnectorPlugin, type PluginStatus } from './use-connector-plugin';
 import {
@@ -143,7 +143,7 @@ function ConnectorActionArea( {
 	getButtonLabel,
 }: ConnectorActionAreaProps ) {
 	return (
-		<HStack spacing={ 3 } expanded={ false }>
+		<Stack gap="md" className="connector-action-area">
 			{ isConnected && <ConnectedBadge /> }
 			{ showUnavailableBadge &&
 				( pluginSlug ? (
@@ -166,7 +166,7 @@ function ConnectorActionArea( {
 					{ getButtonLabel() }
 				</Button>
 			) }
-		</HStack>
+		</Stack>
 	);
 }
 

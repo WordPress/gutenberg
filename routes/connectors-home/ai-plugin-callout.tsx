@@ -1,4 +1,4 @@
-import { Button, ExternalLink } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -10,6 +10,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
+import { Link } from '@wordpress/ui';
 import { getConnectorData } from './default-connectors';
 import { WpLogoDecoration } from './wp-logo-decoration';
 import type { PluginStatus } from './use-connector-plugin';
@@ -246,8 +247,7 @@ export function AiPluginCallout() {
 				<p>
 					{ createInterpolateElement( getMessage(), {
 						strong: <strong />,
-						// @ts-expect-error `children` is injected by `createInterpolateElement` at runtime.
-						a: <ExternalLink href={ AI_PLUGIN_URL } />,
+						a: <Link href={ AI_PLUGIN_URL } openInNewTab />,
 					} ) }
 				</p>
 				{ ! hideButtons &&

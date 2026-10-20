@@ -24,9 +24,13 @@ $sticky-header-clearance: 120px;
 		color: $alert-red;
 	}
 
-	.connector-settings .components-text-control__input {
+	.connector-settings input {
 		font-family: monospace;
 		scroll-margin-top: $sticky-header-clearance;
+	}
+
+	.connector-action-area {
+		align-items: center;
 	}
 
 	&__file-mods-notice {
@@ -113,18 +117,16 @@ $sticky-header-clearance: 120px;
 		.components-item {
 			padding: 12px;
 
-			> .components-v-stack > .components-h-stack:first-child {
-				svg {
-					width: 32px;
-					height: 32px;
-				}
-
-				// Stack badge and action button vertically on small screens.
-				> .components-h-stack:last-child {
-					flex-direction: column;
-					align-items: flex-end;
-				}
+			.connector-item__header svg {
+				width: 32px;
+				height: 32px;
 			}
+		}
+
+		// Stack badge and action button vertically on small screens.
+		.connector-action-area {
+			flex-direction: column;
+			align-items: flex-end;
 		}
 	}
 }
