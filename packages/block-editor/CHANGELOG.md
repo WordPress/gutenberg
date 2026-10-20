@@ -22,7 +22,7 @@
 
 ### Enhancements
 
--   List View: Show an appender at the end of a nested list while its parent, or a block inside it, is selected ([#84866](https://github.com/WordPress/gutenberg/pull/84866)).
+-   List View: Show an appender at the end of a nested list while the pointer or focus is on its parent, on a block inside it, or on the appender itself ([#84866](https://github.com/WordPress/gutenberg/pull/84866)).
 -   Migrate `FontFamilyControl` to `@wordpress/ui` ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
 -   Migrate date format and preset input custom selectors to `@wordpress/ui`, preserving saved values, option previews, forwarded trigger props, and control-specific root CSS hooks. Also migrate the date format switch, custom input, link, and layout, and simplify the aspect-ratio control's option rendering ([#84584](https://github.com/WordPress/gutenberg/pull/84584)).
 -   Migrate `FontAppearanceControl` to `@wordpress/ui`. Internal markup and CSS classes have changed; custom CSS overrides may need updates. See the pull request for details ([#84716](https://github.com/WordPress/gutenberg/pull/84716)).

@@ -406,9 +406,9 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			return listView;
 		};
 
-		// The nesting levels of the appender rows, top to bottom. The
-		// top-level appender is always present, so `[ 1 ]` means no nested
-		// appender is shown.
+		// The nesting levels of the appender rows whose toggle is shown, top
+		// to bottom. Every appender keeps its row, and the top-level one is
+		// always shown, so `[ 1 ]` means no nested appender is shown.
 		const appenderLevels = ( listView ) =>
 			listView
 				.getByRole( 'row' )
@@ -418,12 +418,19 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 						.getByRole( 'button', { name: /^Add / } ),
 				} )
 				.evaluateAll( ( rows ) =>
-					rows.map( ( row ) =>
-						Number( row.getAttribute( 'aria-level' ) )
-					)
+					rows
+						.filter(
+							( row ) =>
+								window.getComputedStyle(
+									row.querySelector( 'button' )
+								).opacity === '1'
+						)
+						.map( ( row ) =>
+							Number( row.getAttribute( 'aria-level' ) )
+						)
 				);
 
-		test( 'shows an appender for a submenu while it or one of its items is selected', async ( {
+		test( 'shows an appender for a submenu while the pointer or focus is on it or its items', async ( {
 			admin,
 			page,
 			requestUtils,
@@ -440,38 +447,80 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 				.poll( () => appenderLevels( listView ) )
 				.toEqual( [ 1 ] );
 
-			await test.step( 'selecting the submenu shows its appender', async () => {
-				await item( 'Top Level Item 1' ).click();
+			await test.step( 'hovering the submenu shows its appender', async () => {
+				await item( 'Top Level Item 1' ).hover();
 				await expect
 					.poll( () => appenderLevels( listView ) )
 					.toEqual( [ 2, 1 ] );
 			} );
 
-			await test.step( 'selecting an item in the submenu keeps it', async () => {
-				await item( 'Submenu Item' ).click();
+			await test.step( 'hovering an item in the submenu keeps it', async () => {
+				await item( 'Submenu Item' ).hover();
 				await expect
 					.poll( () => appenderLevels( listView ) )
 					.toEqual( [ 2, 1 ] );
 			} );
 
-			await test.step( 'selecting a nested item shows one for each ancestor', async () => {
-				await item( 'Nested Item' ).click();
+			await test.step( 'hovering a nested item shows one for each ancestor', async () => {
+				await item( 'Nested Item' ).hover();
 				await expect
 					.poll( () => appenderLevels( listView ) )
 					.toEqual( [ 3, 2, 1 ] );
 			} );
 
-			await test.step( 'selecting a block outside the submenu hides them', async () => {
-				await item( 'Top Level Item 2' ).click();
+			await test.step( 'hovering a block outside the submenu hides them', async () => {
+				await item( 'Top Level Item 2' ).hover();
 				await expect
 					.poll( () => appenderLevels( listView ) )
 					.toEqual( [ 1 ] );
 			} );
 
+			await test.step( 'leaving the list hides them', async () => {
+				await item( 'Nested Item' ).hover();
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 3, 2, 1 ] );
+				await page.mouse.move( 0, 0 );
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 1 ] );
+			} );
+
+			await test.step( 'keyboard focus inside the submenu shows them', async () => {
+				// Focus the row without selecting it, so no popover takes the
+				// focus away. The pointer leaves the list so only focus
+				// decides what is shown.
+				await item( 'Top Level Item 2' ).getByRole( 'link' ).focus();
+				await page.mouse.move( 0, 0 );
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 1 ] );
+				// The rows above are the submenu's appender, then the nested
+				// submenu's appender, then the nested item.
+				await page.keyboard.press( 'ArrowUp' );
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 2, 1 ] );
+				await page.keyboard.press( 'ArrowUp' );
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 3, 2, 1 ] );
+				await page.keyboard.press( 'ArrowUp' );
+				await expect(
+					item( 'Nested Item' ).getByRole( 'link' )
+				).toBeFocused();
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 3, 2, 1 ] );
+			} );
+
 			await test.step( 'a collapsed submenu shows no appender', async () => {
-				// Clicking the row selects it and moves focus there, so the
-				// arrow keys collapse and expand it.
-				await item( 'Top Level Item 1' ).click();
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.press( 'ArrowUp' );
+				await page.keyboard.press( 'ArrowUp' );
+				await expect
+					.poll( () => appenderLevels( listView ) )
+					.toEqual( [ 2, 1 ] );
 				await page.keyboard.press( 'ArrowLeft' );
 				await expect( item( 'Submenu Item' ) ).toBeHidden();
 				await expect
@@ -485,11 +534,20 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 			} );
 
 			await test.step( 'the submenu appender adds a link inside the submenu', async () => {
-				// The nested appender row comes before the top-level one.
-				await listView
-					.getByRole( 'button', { name: 'Add page' } )
-					.first()
-					.click();
+				// Arrow down past the submenu's items to its appender row, which
+				// stays while focus moves through the submenu.
+				await page.keyboard.press( 'ArrowDown' );
+				await page.keyboard.press( 'ArrowDown' );
+				await page.keyboard.press( 'ArrowDown' );
+				await page.keyboard.press( 'ArrowDown' );
+				await page.keyboard.press( 'ArrowDown' );
+				// The nested submenu's appender row comes first, then this one.
+				await expect(
+					listView
+						.getByRole( 'button', { name: 'Add page' } )
+						.nth( 1 )
+				).toBeFocused();
+				await page.keyboard.press( 'Enter' );
 
 				// The Link UI opens for the new item, as it does at the top level.
 				await linkControl.useLinkControlSearch( 'Test Page 1' );
@@ -516,15 +574,13 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 				}
 			);
 
-			await expect(
-				listView.getByRole( 'button', { name: 'Add Button' } )
-			).toBeHidden();
-
-			await listView.getByRole( 'gridcell', { name: /^First/ } ).click();
 			const appender = listView.getByRole( 'button', {
 				name: 'Add Button',
 			} );
-			await expect( appender ).toBeVisible();
+			await expect( appender ).toHaveCSS( 'opacity', '0' );
+
+			await listView.getByRole( 'gridcell', { name: /^First/ } ).hover();
+			await expect( appender ).toHaveCSS( 'opacity', '1' );
 			await appender.click();
 
 			// The new Button follows the first one inside the Buttons block.

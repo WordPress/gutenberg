@@ -22,6 +22,7 @@ import { __ } from '@wordpress/i18n';
 import ListViewBranch from './branch';
 import {
 	ListViewContext,
+	ListViewHoveredBlockContext,
 	ListViewInsertedBlockContext,
 	ListViewTreeStateContext,
 } from './context';
@@ -148,6 +149,19 @@ function ListViewComponent(
 
 	const [ insertedBlockClientId, setInsertedBlockClientId ] =
 		useState( null );
+	const [ hoveredClientId, setHoveredClientId ] = useState( null );
+	// Rows only set the hovered block on enter. Clearing happens here, once
+	// the pointer or focus leaves the whole tree, so moving between rows never
+	// passes through an empty state that would unmount a nested appender.
+	const clearHoveredClientId = useCallback( ( event ) => {
+		if (
+			event.type === 'blur' &&
+			event.currentTarget.contains( event.relatedTarget )
+		) {
+			return;
+		}
+		setHoveredClientId( null );
+	}, [] );
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
@@ -314,6 +328,7 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			listViewInstanceId: instanceId,
 			rootClientId,
+			setHoveredClientId,
 			setInsertedBlockClientId,
 			treeGridElementRef: elementRef,
 			updateExpansion,
@@ -323,6 +338,7 @@ function ListViewComponent(
 			BlockSettingsMenu,
 			instanceId,
 			rootClientId,
+			setHoveredClientId,
 			setInsertedBlockClientId,
 			updateExpansion,
 		]
@@ -396,6 +412,8 @@ function ListViewComponent(
 				onCollapseRow={ collapseRow }
 				onExpandRow={ expandRow }
 				onFocusRow={ focusRow }
+				onMouseLeave={ clearHoveredClientId }
+				onBlur={ clearHoveredClientId }
 				applicationAriaLabel={ __( 'Block navigation structure' ) }
 				aria-describedby={ describedById }
 				style={ {
@@ -412,20 +430,24 @@ function ListViewComponent(
 					<ListViewInsertedBlockContext.Provider
 						value={ insertedBlockClientId }
 					>
-						<ListViewTreeStateContext.Provider
-							value={ treeStateContextValue }
+						<ListViewHoveredBlockContext.Provider
+							value={ hoveredClientId }
 						>
-							<ListViewBranch
-								blocks={ clientIdsTree }
-								parentId={ rootClientId }
-								selectBlock={ selectEditorBlock }
-								showBlockMovers={ showBlockMovers }
-								fixedListWindow={ fixedListWindow }
-								selectedClientIds={ selectedClientIds }
-								isExpanded={ isExpanded }
-								showAppender={ showAppender }
-							/>
-						</ListViewTreeStateContext.Provider>
+							<ListViewTreeStateContext.Provider
+								value={ treeStateContextValue }
+							>
+								<ListViewBranch
+									blocks={ clientIdsTree }
+									parentId={ rootClientId }
+									selectBlock={ selectEditorBlock }
+									showBlockMovers={ showBlockMovers }
+									fixedListWindow={ fixedListWindow }
+									selectedClientIds={ selectedClientIds }
+									isExpanded={ isExpanded }
+									showAppender={ showAppender }
+								/>
+							</ListViewTreeStateContext.Provider>
+						</ListViewHoveredBlockContext.Provider>
 					</ListViewInsertedBlockContext.Provider>
 				</ListViewContext.Provider>
 			</TreeGrid>

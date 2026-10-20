@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
@@ -6,7 +7,12 @@ import { memo } from '@wordpress/element';
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { Appender } from './appender';
 import ListViewBlock from './block';
-import { useInsertedBlockClientId, useListViewTreeState } from './context';
+import {
+	useHoveredClientId,
+	useInsertedBlockClientId,
+	useListViewContext,
+	useListViewTreeState,
+} from './context';
 import {
 	BLOCK_LIST_ITEM_HEIGHT,
 	getDragDisplacementValues,
@@ -58,17 +64,17 @@ function countBlocks(
 const noop = () => {};
 
 /**
- * Whether any of the blocks, or any block nested inside them, is selected.
+ * Whether the block is one of the blocks, or nested inside one of them.
  *
- * @param {Array} blocks            Block tree.
- * @param {Array} selectedClientIds Selected block client IDs.
- * @return {boolean} Whether the selection is within the blocks.
+ * @param {Array}  blocks   Block tree.
+ * @param {string} clientId Block client ID.
+ * @return {boolean} Whether the block is within the blocks.
  */
-function hasSelectedBlock( blocks, selectedClientIds ) {
+function hasBlock( blocks, clientId ) {
 	return blocks.some(
 		( block ) =>
-			isClientIdSelected( block.clientId, selectedClientIds ) ||
-			hasSelectedBlock( block.innerBlocks ?? [], selectedClientIds )
+			block.clientId === clientId ||
+			hasBlock( block.innerBlocks ?? [], clientId )
 	);
 }
 
@@ -116,20 +122,27 @@ function ListViewBranch( props ) {
 		draggedClientIds,
 	} = useListViewTreeState();
 	const insertedBlockClientId = useInsertedBlockClientId();
+	const hoveredClientId = useHoveredClientId();
+	const { setHoveredClientId } = useListViewContext();
 
 	if ( ! canParentExpand ) {
 		return null;
 	}
 
 	const filteredBlocks = blocks.filter( Boolean );
-	// The first level always shows the appender. A nested level shows it while
-	// its parent, or any block inside the parent, is selected, so the
-	// appender sits at the end of the list the user is working in.
-	const showAppender =
-		showAppenderProp &&
-		( level === 1 ||
-			isClientIdSelected( parentId, selectedClientIds ) ||
-			hasSelectedBlock( filteredBlocks, selectedClientIds ) );
+	const showAppender = showAppenderProp;
+	// Every level keeps its appender row, so rows never move under the
+	// pointer. The first level always shows its appender. A nested level
+	// shows it while the pointer or focus is on its parent, on any block
+	// inside the parent, or on the appender itself, so the appender shows at
+	// the end of the list the user is working in.
+	const isAppenderRevealed =
+		level === 1 ||
+		hoveredClientId === parentId ||
+		hasBlock( filteredBlocks, hoveredClientId );
+	// The appender row stands in for its parent, so hovering or focusing it
+	// keeps it shown.
+	const hoverAppender = () => setHoveredClientId( parentId );
 	const blockCount = filteredBlocks.length;
 	// The appender means an extra row in List View, so add 1 to the row count.
 	const rowCount = showAppender ? blockCount + 1 : blockCount;
@@ -290,10 +303,15 @@ function ListViewBranch( props ) {
 			{ rows }
 			{ showAppender && (
 				<TreeGridRow
+					className={ clsx( 'block-editor-list-view-appender-row', {
+						'is-hidden': ! isAppenderRevealed,
+					} ) }
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }
 					isExpanded
+					onMouseEnter={ hoverAppender }
+					onFocus={ hoverAppender }
 				>
 					<TreeGridCell>
 						{ ( treeGridCellProps ) => (

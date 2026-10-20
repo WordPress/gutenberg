@@ -626,3 +626,10 @@ svg {
 .list-view-appender__description {
 	display: none;
 }
+
+// A nested appender keeps its row, so the list never moves under the
+// pointer, and only its toggle is hidden until the list it belongs to is
+// hovered or holds focus. Focusing the toggle reveals it.
+.block-editor-list-view-appender-row.is-hidden .block-editor-inserter__toggle {
+	opacity: 0;
+}
