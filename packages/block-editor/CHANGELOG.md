@@ -6,6 +6,10 @@
 
 -   Position, Text shadow: Show the "Default" option as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
+### Internal
+
+-   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+
 ## 19.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -90,7 +94,6 @@
 -   Convert `MediaPlaceholder` and `ImageEditor` to TypeScript ([#84923](https://github.com/WordPress/gutenberg/pull/84923)).
 -   Convert `useBlockDropZone` to TypeScript ([#84946](https://github.com/WordPress/gutenberg/pull/84946)).
 -   Convert `BlockManager`, `PublishDateTimePicker` and the fit text hook to TypeScript ([#84949](https://github.com/WordPress/gutenberg/pull/84949)).
--   Convert the utils tests and standalone leaf components to TypeScript ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
 
 ## 18.1.0 (2026-10-07)
 

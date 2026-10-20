@@ -15,6 +15,7 @@
 ### Internal
 
 -   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
+-   `ColorIndicator`: Make `colorValue` optional, and `MenuItem`: Accept `isPressed` in the props types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
 
 ## 43.0.0 (2026-10-20)
 
@@ -95,7 +96,6 @@
 -   Simplify the internal Text highlighter ([#85101](https://github.com/WordPress/gutenberg/pull/85101)).
 -   Update Ariakit to 0.4.41 ([#84539](https://github.com/WordPress/gutenberg/pull/84539)).
 -   Refactor to TypeScript ([#84611](https://github.com/WordPress/gutenberg/pull/84611)).
--   `ColorIndicator`: Make `colorValue` optional, and `MenuItem`: Accept `isPressed` in the props types ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
 
 ### Documentation
 
