@@ -9744,46 +9744,6 @@
 			"count": 1
 		}
 	},
-	"packages/dom/src/dom/test/get-rectangle-from-range.browser.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/dom/src/dom/test/safe-html.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/dom/src/dom/test/strip-html.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/dom/src/test/dom.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/dom/src/test/focusable-area.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/dom/src/test/focusable.browser.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/dom/src/test/tabbable.browser.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/dom/src/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/e2e-test-utils-playwright/src/page-utils/set-browser-viewport.js": {
 		"gutenberg/use-typescript": {
 			"count": 1

@@ -1,9 +1,10 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { find } from '../tabbable';
 
-const createElement = ( type ) => document.createElement( type );
+const createElement = < K extends keyof HTMLElementTagNameMap >( type: K ) =>
+	document.createElement( type );
 
-function findTabbable( context ) {
+function findTabbable( context: Element ) {
 	document.body.appendChild( context );
 	return find( context );
 }
