@@ -47,6 +47,11 @@ export type SelectControlProps = Omit<
 		className?: string;
 		/**
 		 * The array of option items to render in the select.
+		 *
+		 * Items with an empty string `value` show the placeholder when
+		 * selected. Use `null` for an option that means no value (like
+		 * "None"), or a non-empty value for an option that is a choice of its
+		 * own (like "Default").
 		 */
 		items?: SelectItem[];
 		/**
