@@ -59,8 +59,8 @@
 	min-width: 0;
 }
 
-// Zero specificity so the default padding can be overridden by theme.json or theme styles.
-:where(.wp-block-media-text > .wp-block-media-text__content) {
+// One class of specificity: theme.json and theme class rules can override it, but element resets like `div { padding: 0 }` can't.
+.wp-block-media-text > :where(.wp-block-media-text__content) {
 	padding: 0 8%;
 }
 
