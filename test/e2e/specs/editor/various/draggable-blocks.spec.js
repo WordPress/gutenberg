@@ -1207,6 +1207,35 @@ test.describe( 'Draggable text (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'keeps text dropped onto itself selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First second third</p>
+<!-- /wp:paragraph -->` );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+
+		await dragText( page, paragraph, [ 6, 13 ], paragraph, 9 );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First second third' },
+			},
+		] );
+		await expect
+			.poll( () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
+			)
+			.toBe( 'second ' );
+	} );
+
 	test( 'inserts text dropped from outside the editor', async ( {
 		editor,
 		page,

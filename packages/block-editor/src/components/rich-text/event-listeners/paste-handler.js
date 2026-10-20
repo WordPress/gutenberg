@@ -217,12 +217,7 @@ export const drop = ( props ) => ( element ) => {
 	}
 
 	function onDrop( event ) {
-		const { registry } = props.current;
-		const { __unstableMarkLastChangeAsPersistent } =
-			registry.dispatch( blockEditorStore );
-		__unstableMarkLastChangeAsPersistent();
-		registry.batch( () => onPaste( event ) );
-		__unstableMarkLastChangeAsPersistent();
+		props.current.registry.batch( () => onPaste( event ) );
 	}
 
 	element.addEventListener( 'dragenter', onDragOver );

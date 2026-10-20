@@ -77,7 +77,11 @@ export default function useClipboardHandler() {
 		// point.
 		function moveSelectionToDropPoint( event: DragEvent ) {
 			const point = getTextDropPoint( event );
-			if ( ! point || ! node.contains( point.element ) ) {
+			if (
+				! point ||
+				point.isOnDraggedText ||
+				! node.contains( point.element )
+			) {
 				return false;
 			}
 			const { element, offset, range } = point;

@@ -62,8 +62,8 @@ export function isTextDrop(
 }
 
 /**
- * Returns the field a text drop lands in, the offset in it, and the range
- * there.
+ * Returns the field a text drop lands in, the offset in it, the range there,
+ * and whether it lands on the dragged text.
  *
  * @param event Drop event.
  */
@@ -98,7 +98,10 @@ export function getTextDropPoint( event: DragEvent ) {
 		range,
 		__unstableIsEditableTree: true,
 	} ).start as number;
-	return { element, offset, range };
+	const drag = textDrags.get( ownerDocument );
+	const isOnDraggedText =
+		drag?.element === element && offset >= drag.start && offset <= drag.end;
+	return { element, offset, range, isOnDraggedText };
 }
 
 /**
@@ -114,6 +117,8 @@ export const dragStart = ( props: Props ) => ( element: HTMLElement ) => {
 		textDrags.delete( ownerDocument );
 		defaultView.removeEventListener( 'dragenter', stopPropagation, true );
 		defaultView.removeEventListener( 'dragover', stopPropagation, true );
+		defaultView.removeEventListener( 'dragend', stop );
+		defaultView.removeEventListener( 'drop', stop );
 	}
 
 	function onDragStart( event: DragEvent ) {
@@ -161,25 +166,21 @@ export const dragStart = ( props: Props ) => ( element: HTMLElement ) => {
 		// browser's drop caret and shows the block insertion point instead.
 		defaultView.addEventListener( 'dragenter', stopPropagation, true );
 		defaultView.addEventListener( 'dragover', stopPropagation, true );
+		// Not tied to the source field, which may no longer be selected when
+		// the drag ends. A drop in this window also ends it, since Firefox
+		// skips `dragend` when the source node is removed.
+		defaultView.addEventListener( 'dragend', stop );
+		defaultView.addEventListener( 'drop', stop );
 	}
 
 	// Before the block's own drag start handler, which cancels the drags it
 	// does not carry.
-	const unsubscribeDragStart = subscribeDelegatedListener(
+	return subscribeDelegatedListener(
 		defaultView,
 		'dragstart',
 		onDragStart as EventListener,
 		true
 	);
-	const unsubscribeDragEnd = subscribeDelegatedListener(
-		defaultView,
-		'dragend',
-		stop
-	);
-	return () => {
-		unsubscribeDragStart();
-		unsubscribeDragEnd();
-	};
 };
 
 /**
@@ -203,17 +204,21 @@ export function getDropPasteProps(
 	if ( point?.element !== element ) {
 		return;
 	}
-	let { offset } = point;
-
 	const drag = textDrags.get( element.ownerDocument );
-	const isSameField = drag?.element === element;
-	if ( drag && isSameField && offset >= drag.start && offset <= drag.end ) {
+	if ( point.isOnDraggedText ) {
 		event.preventDefault();
-		drag.stop();
+		drag?.stop();
 		return;
 	}
 
+	let { offset } = point;
+	const isSameField = drag?.element === element;
 	const { registry, getValue, onChange } = props;
+	const { __unstableMarkLastChangeAsPersistent } =
+		registry.dispatch( blockEditorStore );
+	// The drop is an undo level of its own, apart from the typing before and
+	// after it.
+	__unstableMarkLastChangeAsPersistent();
 	if ( drag ) {
 		drag.remove();
 		if ( isSameField && offset > drag.end ) {
@@ -221,15 +226,16 @@ export function getDropPasteProps(
 		}
 		// An insertion into the field of the removal would otherwise not
 		// create an undo level.
-		registry
-			.dispatch( blockEditorStore )
-			.__unstableMarkLastChangeAsPersistent();
+		__unstableMarkLastChangeAsPersistent();
 	}
 
 	return {
 		...props,
 		value: { ...getValue(), start: offset, end: offset },
-		onChange: ( value: RichTextValue ) =>
-			onChange( { ...value, start: offset } ),
+		// Select the dropped content.
+		onChange: ( value: RichTextValue ) => {
+			onChange( { ...value, start: offset } );
+			__unstableMarkLastChangeAsPersistent();
+		},
 	};
 }
