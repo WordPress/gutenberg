@@ -207,20 +207,36 @@ jobs:
                   PR_NUMBER: ${{ github.event.number }}
                   BASE_SHA: ${{ github.event.pull_request.base.sha }}
                   PACKAGE_PATH: packages/${{ matrix.package }}
+                  PACKAGE_NAME: ${{ matrix.package }}
               run: |
                   changelog_path="${PACKAGE_PATH}/CHANGELOG.md"
                   optional_check_notice="This isn't a required check, so if you think your changes are small enough that they don't warrant a CHANGELOG entry, please go ahead and merge without one."
 
-                  # Fail if the PR doesn't touch the changelog
-                  if git diff --quiet "$BASE_SHA"...HEAD -- "$changelog_path"; then
-                      echo "Please add a CHANGELOG entry to $changelog_path"
-                      echo
-                      echo "${optional_check_notice}"
-                      exit 1
-                  fi
+                  # If package is using Changie fragments
+                  is_changie=$(node -e "import('./tools/changelogs/lib/config.ts').then(m => console.log(m.isChangiePackage('${PACKAGE_NAME}') ? 'true' : 'false'))")
 
-                  # Confirm that the CHANGELOG has a valid entry for the current PR
-                  node tools/validation/validate-changelogs.ts --require-pr="${PR_NUMBER}" "${changelog_path}"
+                  if [ "$is_changie" = "true" ]; then
+                      # Check if any .changes/unreleased fragment was added/modified for this PR and package
+                      changed_fragments=$(git diff --name-only "$BASE_SHA"...HEAD -- ".changes/unreleased/*.yaml" || true)
+                      if [ -z "$changed_fragments" ]; then
+                          echo "Please add a changelog fragment via 'npm run changelog:add -- -j ${PACKAGE_NAME}'"
+                          echo
+                          echo "${optional_check_notice}"
+                          exit 1
+                      fi
+                      npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"
+                  else
+                      # Fail if the PR doesn't touch the changelog
+                      if git diff --quiet "$BASE_SHA"...HEAD -- "$changelog_path"; then
+                          echo "Please add a CHANGELOG entry to $changelog_path"
+                          echo
+                          echo "${optional_check_notice}"
+                          exit 1
+                      fi
+
+                      # Confirm that the CHANGELOG has a valid entry for the current PR
+                      npm run lint:changelogs -- --require-pr="${PR_NUMBER}" "${changelog_path}"
+                  fi
 
     # Structure: For any revisions to CHANGELOGs (regardless of package),
     # validate that the contents follow the expected format.
@@ -250,12 +266,21 @@ jobs:
                   PR_NUMBER: ${{ github.event.number }}
               run: |
                   changelogs=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- 'packages/*/CHANGELOG.md')
+                  fragments=$(git diff --name-only --diff-filter=d "$BASE_SHA"...HEAD -- '.changes/unreleased/*.yaml')
 
-                  if [ -z "$changelogs" ]; then
-                      echo "No package CHANGELOG.md files changed; skipping structure check."
+                  if [ -z "$changelogs" ] && [ -z "$fragments" ]; then
+                      echo "No package CHANGELOG.md or Changie fragment files changed; skipping structure check."
                       exit 0
                   fi
 
-                  echo "Validating:"
-                  echo "$changelogs"
-                  echo "$changelogs" | xargs node tools/validation/validate-changelogs.ts --pr="${PR_NUMBER}"
+                  if [ -n "$changelogs" ]; then
+                      echo "Validating CHANGELOG files:"
+                      echo "$changelogs"
+                      echo "$changelogs" | xargs npm run lint:changelogs -- --pr="${PR_NUMBER}"
+                  fi
+
+                  if [ -n "$fragments" ]; then
+                      echo "Validating fragments:"
+                      echo "$fragments"
+                      npm run lint:changelogs -- --pr="${PR_NUMBER}"
+                  fi

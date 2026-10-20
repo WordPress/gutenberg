@@ -15,6 +15,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { parseArgs as parseNodeArgs } from 'node:util';
+import { isChangiePackage } from '../changelogs/lib/config.ts';
+import { validateAllFragments } from '../changelogs/lib/validate.ts';
 
 const __dirname = dirname( fileURLToPath( import.meta.url ) );
 const REPO_ROOT = resolve( __dirname, '../..' );
@@ -461,13 +463,29 @@ export function run( argv: string[] ): number {
 
 	let hasErrors = false;
 	for ( const filePath of files ) {
+		const relativePath = relative( REPO_ROOT, filePath );
+		const parts = relativePath.split( '/' );
+		const pkgDir = parts.length >= 2 ? parts[ 1 ] : '';
+
+		// If this package is managed by Changie, validate fragments instead of CHANGELOG.md Unreleased
+		if ( pkgDir && isChangiePackage( pkgDir, REPO_ROOT ) ) {
+			const fragmentErrors = validateAllFragments(
+				{ pr, requirePr, project: pkgDir },
+				REPO_ROOT
+			);
+			for ( const error of fragmentErrors ) {
+				console.error( error );
+				hasErrors = true;
+			}
+			continue;
+		}
+
 		if ( ! existsSync( filePath ) ) {
 			console.error( `${ filePath }: file not found.` );
 			hasErrors = true;
 			continue;
 		}
 		const content = readFileSync( filePath, 'utf8' );
-		const relativePath = relative( REPO_ROOT, filePath );
 		const errors = validateChangelog( content, {
 			filePath: relativePath,
 			pr,
