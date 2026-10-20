@@ -406,11 +406,13 @@ export const editEntityRecord =
 		kind: string,
 		name: string,
 		recordId: number | string | undefined,
-		edits: Record< string, unknown >,
+		edits: object,
 		options: EditEntityRecordOptions = {}
 	) =>
 	( { select, dispatch }: CoreDataThunkArgs ) => {
 		logEntityDeprecation( kind, name, 'editEntityRecord' );
+		// Edits are read by their fields' names.
+		const fieldEdits = edits as Record< string, unknown >;
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			throw new Error(
@@ -428,16 +430,16 @@ export const editEntityRecord =
 
 		// Some fields are merged with the existing value instead of replaced.
 		// See `mergedEdits` definition on the entity config.
-		const editsWithMerges = Object.keys( edits ).reduce<
+		const editsWithMerges = Object.keys( fieldEdits ).reduce<
 			Record< string, unknown >
 		>( ( acc, key ) => {
 			acc[ key ] = mergedEdits[ key ]
 				? {
 						// Merged fields are objects, such as post meta.
 						...( editedRecord[ key ] as object ),
-						...( edits[ key ] as object ),
+						...( fieldEdits[ key ] as object ),
 					}
-				: edits[ key ];
+				: fieldEdits[ key ];
 
 			return acc;
 		}, {} );
@@ -483,12 +485,12 @@ export const editEntityRecord =
 				[
 					{
 						id: { kind, name, recordId },
-						changes: Object.keys( edits ).reduce<
+						changes: Object.keys( fieldEdits ).reduce<
 							Record< string, { from: unknown; to: unknown } >
 						>( ( acc, key ) => {
 							acc[ key ] = {
 								from: editedRecord[ key ],
-								to: edits[ key ],
+								to: fieldEdits[ key ],
 							};
 							return acc;
 						}, {} ),

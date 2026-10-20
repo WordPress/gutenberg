@@ -221,7 +221,7 @@ _Parameters_
 - _kind_ `string`: Kind of the edited entity record.
 - _name_ `string`: Name of the edited entity record.
 - _recordId_ `number | string | undefined`: Pass `undefined` for keyless entities.
-- _edits_ `Record< string, unknown >`: The edits.
+- _edits_ `object`: The edits.
 - _options_ `EditEntityRecordOptions`: Options for the edit.
 - _options.undoIgnore_ `EditEntityRecordOptions`: Whether to ignore the edit in undo history or not.
 - _options.isCached_ `EditEntityRecordOptions`: Whether the edit is transient (e.g. typing). Transient edits are staged and eventually merged into the preceding undo level instead of creating a new one.
