@@ -272,7 +272,7 @@ Each package keeps a `CHANGELOG.md` for changes that affect consumers. Entries a
 ### Writing concise entries
 
 -   Prefer one short sentence naming the affected API or component and what changed for consumers.
--   Omit preserved behavior and internal implementation details. Avoid repeating the same change across subsections.
+-   Omit descriptions of behavior that remains unchanged and internal implementation details. Avoid repeating the same change across subsections.
 -   Keep breaking changes and required upgrade actions explicit. Link to the pull request, a migration guide, or a dev note for longer explanations.
 
 ### Changelog Entry Format
