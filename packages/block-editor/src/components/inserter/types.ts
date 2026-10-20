@@ -38,8 +38,8 @@ export interface InserterToggleRenderProps {
 export type InserterToggleProps = Record< string, unknown > & {
 	as?: ElementType;
 	label?: string;
-	/** The default toggle is a button, which passes its click event on. */
-	onClick?: MouseEventHandler< HTMLButtonElement >;
+	/** The toggle passes its click event on, whichever element `as` renders. */
+	onClick?: MouseEventHandler< HTMLElement >;
 };
 
 /**
