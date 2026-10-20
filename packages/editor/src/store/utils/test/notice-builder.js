@@ -158,6 +158,16 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			],
 			{ isAutosave: true },
 		],
+		[
+			'when the autosave got no response',
+			'fetch_error',
+			[ 'publish', 'publish' ],
+			[
+				'Auto-save failed because there was no response from the server. You can also save manually.',
+				{ id: 'editor-autosave' },
+			],
+			{ isAutosave: true },
+		],
 	].forEach(
 		( [
 			description,
