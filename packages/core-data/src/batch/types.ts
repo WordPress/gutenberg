@@ -39,9 +39,17 @@ export interface BatchPreflightResponse {
 }
 
 /**
- * The response to a batch request.
+ * The response to one request of a batch.
  */
-export interface BatchResponse {
-	failed?: string;
-	responses: Array< { status: number; body: unknown } >;
+export interface BatchItemResponse {
+	status: number;
+	body: unknown;
 }
+
+/**
+ * The response to a batch request. A failed validation leaves `null` for the
+ * requests that passed it.
+ */
+export type BatchResponse =
+	| { failed: 'validation'; responses: Array< BatchItemResponse | null > }
+	| { failed?: undefined; responses: Array< BatchItemResponse > };
