@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 
 /*
@@ -16,6 +17,18 @@ export function getInput( name: string ): string {
 
 export function info( message: string ): void {
 	process.stdout.write( `${ message }\n` );
+}
+
+/* Logs text that may hold `::` lines without the runner acting on them. */
+export function infoVerbatim( message: string ): void {
+	const token = randomUUID();
+
+	info( `::stop-commands::${ token }` );
+	try {
+		info( message );
+	} finally {
+		info( `::${ token }::` );
+	}
 }
 
 function escapeData( value: string ): string {

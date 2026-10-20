@@ -1077,3 +1077,264 @@ test.describe( 'Draggable block', () => {
 		] );
 	} );
 } );
+
+test.describe( 'Draggable text (@firefox, @webkit)', () => {
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	// Returns the page coordinates of a text offset in a paragraph.
+	async function pointAt( page, paragraph, offset ) {
+		const point = await paragraph.evaluate( ( node, textOffset ) => {
+			const range = node.ownerDocument.createRange();
+			range.setStart( node.firstChild, textOffset );
+			const rect = range.getBoundingClientRect();
+			return { x: rect.left, y: rect.top + rect.height / 2 };
+		}, offset );
+		const frameBox = await page
+			.locator( '[name="editor-canvas"]' )
+			.boundingBox();
+		return { x: frameBox.x + point.x, y: frameBox.y + point.y };
+	}
+
+	// Selects text in a paragraph and drags it to a text offset.
+	async function dragText( page, from, [ start, end ], to, offset ) {
+		await from.evaluate(
+			( node, [ startOffset, endOffset ] ) => {
+				const range = node.ownerDocument.createRange();
+				range.setStart( node.firstChild, startOffset );
+				range.setEnd( node.firstChild, endOffset );
+				const selection = node.ownerDocument.defaultView.getSelection();
+				selection.removeAllRanges();
+				selection.addRange( range );
+			},
+			[ start, end ]
+		);
+		const source = await pointAt( page, from, start + 1 );
+		const target = await pointAt( page, to, offset );
+		await page.mouse.move( source.x, source.y );
+		await page.mouse.down();
+		// macOS only starts a drag of selected text after a short press.
+		// eslint-disable-next-line no-restricted-syntax, playwright/no-wait-for-timeout
+		await page.waitForTimeout( 300 );
+		await page.mouse.move( source.x + 10, source.y + 10, { steps: 5 } );
+		await dragTo( page, target.x, target.y );
+		await page.mouse.up();
+	}
+
+	test( 'moves selected text into another paragraph', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First second third</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Fourth fifth</p>
+<!-- /wp:paragraph -->` );
+		const paragraphs = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraphs.nth( 0 ).click();
+
+		// Move "second " to before "fifth".
+		await dragText(
+			page,
+			paragraphs.nth( 0 ),
+			[ 6, 13 ],
+			paragraphs.nth( 1 ),
+			7
+		);
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First third' } },
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'Fourth second fifth' },
+			},
+		] );
+		await expect
+			.poll( () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
+			)
+			.toBe( 'second ' );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First second third' },
+			},
+			{ name: 'core/paragraph', attributes: { content: 'Fourth fifth' } },
+		] );
+	} );
+
+	test( 'moves selected text within a paragraph', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First second third</p>
+<!-- /wp:paragraph -->` );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+
+		// Move "second " to the start.
+		await dragText( page, paragraph, [ 6, 13 ], paragraph, 0 );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'second First third' },
+			},
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First second third' },
+			},
+		] );
+	} );
+
+	test( 'keeps text dropped onto itself selected', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First second third</p>
+<!-- /wp:paragraph -->` );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		await paragraph.click();
+
+		await dragText( page, paragraph, [ 6, 13 ], paragraph, 9 );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First second third' },
+			},
+		] );
+		await expect
+			.poll( () =>
+				editor.canvas
+					.locator( ':root' )
+					.evaluate( () => window.getSelection().toString() )
+			)
+			.toBe( 'second ' );
+	} );
+
+	test( 'inserts text dropped from outside the editor', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First-third</p>
+<!-- /wp:paragraph -->` );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const target = await pointAt( page, paragraph, 6 );
+		const frameBox = await page
+			.locator( '[name="editor-canvas"]' )
+			.boundingBox();
+
+		// Playwright cannot drag from outside the page, so the drop is
+		// dispatched with the data another application would give it.
+		await paragraph.evaluate(
+			( node, [ clientX, clientY ] ) => {
+				const { defaultView } = node.ownerDocument;
+				const dataTransfer = new defaultView.DataTransfer();
+				dataTransfer.setData( 'text/plain', 'second-' );
+				dataTransfer.setData(
+					'text/html',
+					'<span style="color: red;"><b>second</b>-</span>'
+				);
+				node.dispatchEvent(
+					new defaultView.DragEvent( 'drop', {
+						bubbles: true,
+						cancelable: true,
+						clientX,
+						clientY,
+						dataTransfer,
+					} )
+				);
+			},
+			[ target.x - frameBox.x, target.y - frameBox.y ]
+		);
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First-<strong>second</strong>-third',
+				},
+			},
+		] );
+	} );
+
+	test( 'splits the paragraph for paragraphs dropped from outside the editor', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.setContent( `<!-- wp:paragraph -->
+<p>First-third</p>
+<!-- /wp:paragraph -->` );
+		const paragraph = editor.canvas.getByRole( 'document', {
+			name: 'Block: Paragraph',
+		} );
+		const target = await pointAt( page, paragraph, 6 );
+		const frameBox = await page
+			.locator( '[name="editor-canvas"]' )
+			.boundingBox();
+
+		await paragraph.evaluate(
+			( node, [ clientX, clientY ] ) => {
+				const { defaultView } = node.ownerDocument;
+				const dataTransfer = new defaultView.DataTransfer();
+				dataTransfer.setData( 'text/plain', 'Second\n\nThird' );
+				dataTransfer.setData(
+					'text/html',
+					'<p>Second</p><p>Third</p>'
+				);
+				node.dispatchEvent(
+					new defaultView.DragEvent( 'drop', {
+						bubbles: true,
+						cancelable: true,
+						clientX,
+						clientY,
+						dataTransfer,
+					} )
+				);
+			},
+			[ target.x - frameBox.x, target.y - frameBox.y ]
+		);
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{ name: 'core/paragraph', attributes: { content: 'First-Second' } },
+			{ name: 'core/paragraph', attributes: { content: 'Thirdthird' } },
+		] );
+
+		await pageUtils.pressKeys( 'primary+z' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: { content: 'First-third' },
+			},
+		] );
+	} );
+} );

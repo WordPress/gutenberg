@@ -6,6 +6,8 @@ test.describe( 'Global Styles - Button States', () => {
 	} );
 
 	test.beforeEach( async ( { admin, requestUtils } ) => {
+		// Each test saves a hover color, so start from the theme's styles.
+		await requestUtils.resetThemeGlobalStyles();
 		await requestUtils.deleteAllPosts();
 		await admin.visitSiteEditor( {
 			postId: 'emptytheme//index',
@@ -99,6 +101,84 @@ test.describe( 'Global Styles - Button States', () => {
 		await expect( frontendButton ).toHaveCSS(
 			'background-color',
 			'rgb(255, 105, 0)'
+		);
+	} );
+
+	test( 'As a user I want to set the button element hover background color and see it applied on the frontend', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Styles' } )
+			.click();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Blocks & Elements' } )
+			.click();
+
+		await page
+			.getByRole( 'button', { name: 'Button (element)', exact: true } )
+			.click();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'States' } )
+			.click();
+
+		await page
+			.getByRole( 'menuitem', { name: 'Hover', exact: true } )
+			.click();
+
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.locator( '.components-tools-panel' )
+			.filter( {
+				has: page.getByRole( 'heading', { name: 'Background' } ),
+			} )
+			.getByRole( 'button', { name: 'Color', exact: true } )
+			.click();
+
+		await page.getByRole( 'option', { name: 'Vivid purple' } ).click();
+
+		await page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', { name: 'Save' } )
+			.click();
+
+		await page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Save', exact: true } )
+			.click();
+
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toBeVisible();
+
+		await admin.createNewPost();
+
+		await editor.insertBlock( { name: 'core/buttons' } );
+
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Button' } )
+			.getByRole( 'textbox' )
+			.fill( 'Test Button' );
+
+		const postId = await editor.publishPost();
+
+		await page.goto( `/?p=${ postId }` );
+
+		const frontendButton = page.getByText( 'Test Button' );
+
+		await expect( frontendButton ).toBeVisible();
+
+		await frontendButton.hover();
+
+		await expect( frontendButton ).toHaveCSS(
+			'background-color',
+			'rgb(155, 81, 224)'
 		);
 	} );
 } );

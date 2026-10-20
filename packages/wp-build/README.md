@@ -441,6 +441,18 @@ This configuration:
 - **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
 - **Asset files**: `.asset.php` files are always generated for WordPress dependency management
 
+## SVG imports
+
+SVG files can be imported from JavaScript. The file is inlined into the JavaScript and the import resolves to a `data:` URI:
+
+```js
+import logo from './logo.svg';
+
+const Example = () => <img src={ logo } alt="" />;
+```
+
+Because the SVG travels with the JavaScript, it works in bundles and in transpiled packages (`build/`, `build-module/`) without a public path or an extra file to ship. Other image formats are not supported yet.
+
 ## Output Structure
 
 The built tool generates several files in the `build/` directory, but the primary output is the PHP registration file.

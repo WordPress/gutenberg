@@ -1,8 +1,13 @@
+import type { ForwardedRef } from 'react';
 import { DateTimePicker, TimePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
 import { getSettings } from '@wordpress/date';
 import InspectorPopoverHeader from '../inspector-popover-header';
+import type {
+	PrivatePublishDateTimePickerProps,
+	PublishDateTimePickerProps,
+} from './types';
 
 export function PublishDateTimePicker(
 	{
@@ -14,8 +19,8 @@ export function PublishDateTimePicker(
 		currentDate,
 		title,
 		...additionalProps
-	},
-	ref
+	}: PrivatePublishDateTimePickerProps,
+	ref: ForwardedRef< HTMLDivElement >
 ) {
 	const datePickerProps = {
 		startOfWeek: getSettings().l10n.startOfWeek,
@@ -24,7 +29,10 @@ export function PublishDateTimePicker(
 		currentTime: isCompact ? currentDate : undefined,
 		...additionalProps,
 	};
-	const DatePickerComponent = isCompact ? TimePicker : DateTimePicker;
+	// `TimePicker` ignores the date props.
+	const DatePickerComponent = (
+		isCompact ? TimePicker : DateTimePicker
+	) as typeof DateTimePicker;
 	return (
 		<div ref={ ref } className="block-editor-publish-date-time-picker">
 			{ showPopoverHeader && (
@@ -50,7 +58,10 @@ export function PublishDateTimePicker(
 
 export const PrivatePublishDateTimePicker = forwardRef( PublishDateTimePicker );
 
-function PublicPublishDateTimePicker( props, ref ) {
+function PublicPublishDateTimePicker(
+	props: PublishDateTimePickerProps,
+	ref: ForwardedRef< HTMLDivElement >
+) {
 	return (
 		<PrivatePublishDateTimePicker
 			{ ...props }

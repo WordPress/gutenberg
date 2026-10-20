@@ -22,30 +22,37 @@ import {
 	actions,
 	filters,
 } from '..';
+import type { Callback } from '..';
 
-function filterA( str ) {
+declare global {
+	interface Window {
+		actionValue?: string;
+	}
+}
+
+function filterA( str: string ) {
 	return str + 'a';
 }
 
-function filterB( str ) {
+function filterB( str: string ) {
 	return str + 'b';
 }
 
-function filterC( str ) {
+function filterC( str: string ) {
 	return str + 'c';
 }
 
-function filterCRemovesSelf( str ) {
+function filterCRemovesSelf( str: string ) {
 	removeFilter( 'test.filter', 'my_callback_filter_c_removes_self' );
 	return str + 'b';
 }
 
-function filterRemovesB( str ) {
+function filterRemovesB( str: string ) {
 	removeFilter( 'test.filter', 'my_callback_filter_b' );
 	return str;
 }
 
-function filterRemovesC( str ) {
+function filterRemovesC( str: string ) {
 	removeFilter( 'test.filter', 'my_callback_filter_c' );
 	return str;
 }
@@ -108,19 +115,37 @@ test( 'add 2 filters in a row and run them', () => {
 } );
 
 test( 'remove a non-existent filter', () => {
-	expect( removeFilter( 'test.filter', 'my_callback', filterA ) ).toBe( 0 );
+	expect(
+		removeFilter(
+			'test.filter',
+			'my_callback',
+			// @ts-expect-error removeFilter only accepts hookName and namespace.
+			filterA
+		)
+	).toBe( 0 );
 	expect( removeAllFilters( 'test.filter' ) ).toBe( 0 );
 } );
 
 test( 'remove an invalid namespace from a filter', () => {
-	expect( removeFilter( 'test.filter', 42 ) ).toBe( undefined );
+	expect(
+		removeFilter(
+			'test.filter',
+			// @ts-expect-error Deliberate invalid namespace type to test validation.
+			42
+		)
+	).toBe( undefined );
 	expect( console ).toHaveErroredWith(
 		'The namespace must be a non-empty string.'
 	);
 } );
 
 test( 'cannot add filters with non-string hook names', () => {
-	addFilter( 42, 'my_callback', () => null );
+	addFilter(
+		// @ts-expect-error Deliberate invalid hook name type to test validation.
+		42,
+		'my_callback',
+		() => null
+	);
 	expect( console ).toHaveErroredWith(
 		'The hook name must be a non-empty string.'
 	);
@@ -199,14 +224,25 @@ test( 'cannot add filters named with __ prefix', () => {
 } );
 
 test( 'cannot add filters with non-function callbacks', () => {
-	addFilter( 'test', 'my_callback', '42' );
+	addFilter(
+		'test',
+		'my_callback',
+		// @ts-expect-error Deliberate invalid callback type to test validation.
+		'42'
+	);
 	expect( console ).toHaveErroredWith(
 		'The hook callback must be a function.'
 	);
 } );
 
 test( 'cannot add filters with non-numeric priorities', () => {
-	addFilter( 'test', 'my_callback', () => null, '42' );
+	addFilter(
+		'test',
+		'my_callback',
+		() => null,
+		// @ts-expect-error Deliberate invalid priority type to test validation.
+		'42'
+	);
 	expect( console ).toHaveErroredWith(
 		'If specified, the hook priority must be a number.'
 	);
@@ -220,11 +256,11 @@ test( 'add 3 filters with different priorities and run them', () => {
 } );
 
 test( 'filters with the same and different priorities', () => {
-	const callbacks = {};
+	const callbacks: Record< string, ( value: string[] ) => string[] > = {};
 
 	[ 1, 2, 3, 4 ].forEach( ( priority ) => {
 		[ 'a', 'b', 'c', 'd' ].forEach( ( string ) => {
-			callbacks[ 'fn_' + priority + string ] = ( value ) => {
+			callbacks[ 'fn_' + priority + string ] = ( value: string[] ) => {
 				return value.concat( priority + string );
 			};
 		} );
@@ -246,8 +282,18 @@ test( 'filters with the same and different priorities', () => {
 		'3c',
 	] );
 
-	removeFilter( 'test_order', 'my_callback_fn_2b', callbacks.fn_2b );
-	removeFilter( 'test_order', 'my_callback_fn_3a', callbacks.fn_3a );
+	removeFilter(
+		'test_order',
+		'my_callback_fn_2b',
+		// @ts-expect-error removeFilter only accepts hookName and namespace.
+		callbacks.fn_2b
+	);
+	removeFilter(
+		'test_order',
+		'my_callback_fn_3a',
+		// @ts-expect-error removeFilter only accepts hookName and namespace.
+		callbacks.fn_3a
+	);
 
 	expect( applyFilters( 'test_order', [] ) ).toEqual( [
 		'2a',
@@ -641,7 +687,7 @@ test( 'current filter when multiple filters are running', () => {
 } );
 
 test( 'adding and removing filters with recursion', () => {
-	function removeRecurseAndAdd2( val ) {
+	function removeRecurseAndAdd2( val: string ) {
 		expect( removeFilter( 'remove_and_add', 'my_callback_recurse' ) ).toBe(
 			1
 		);
@@ -696,7 +742,7 @@ test( 'filters pass first argument across handlers', () => {
 
 // Test adding via composition.
 test( 'adding hooks via composition', () => {
-	const testObject = {};
+	const testObject: { hooks?: ReturnType< typeof createHooks > } = {};
 	testObject.hooks = createHooks();
 
 	expect( typeof testObject.hooks.applyFilters ).toBe( 'function' );
@@ -704,7 +750,7 @@ test( 'adding hooks via composition', () => {
 
 // Test adding as a mixin.
 test( 'adding hooks as a mixin', () => {
-	const testObject = {};
+	const testObject: Partial< ReturnType< typeof createHooks > > = {};
 	Object.assign( testObject, createHooks() );
 
 	expect( typeof testObject.applyFilters ).toBe( 'function' );
@@ -712,21 +758,24 @@ test( 'adding hooks as a mixin', () => {
 
 // Test context.
 test( '`this` context via composition', () => {
-	const testObject = { test: 'test this' };
+	const testObject: {
+		test: string;
+		hooks?: ReturnType< typeof createHooks >;
+	} = { test: 'test this' };
 
 	testObject.hooks = createHooks();
 
-	const theCallback = function () {
+	const theCallback = function ( this: typeof testObject ) {
 		expect( this.test ).toBe( 'test this' );
 	};
 	addAction( 'test.action', 'my_callback', theCallback.bind( testObject ) );
 	doAction( 'test.action' );
 
-	const testObject2 = {};
+	const testObject2: Partial< ReturnType< typeof createHooks > > = {};
 	Object.assign( testObject2, createHooks() );
 } );
 
-const setupActionListener = ( hookName, callback ) =>
+const setupActionListener = ( hookName: string, callback: Callback ) =>
 	addAction( hookName, 'my_callback', callback );
 
 test( 'adding an action triggers a hookAdded action passing all callback details', () => {
@@ -946,29 +995,33 @@ test( 'checking hasFilter with named callbacks and removeAllActions', () => {
 
 describe( 'async filter', () => {
 	test( 'runs all registered handlers', async () => {
-		addFilter( 'test.async.filter', 'callback_plus1', ( value ) => {
-			return new Promise( ( r ) =>
+		addFilter( 'test.async.filter', 'callback_plus1', ( value: number ) => {
+			return new Promise< number >( ( r ) =>
 				setTimeout( () => r( value + 1 ), 10 )
 			);
 		} );
-		addFilter( 'test.async.filter', 'callback_times2', ( value ) => {
-			return new Promise( ( r ) =>
-				setTimeout( () => r( value * 2 ), 10 )
-			);
-		} );
+		addFilter(
+			'test.async.filter',
+			'callback_times2',
+			( value: number ) => {
+				return new Promise< number >( ( r ) =>
+					setTimeout( () => r( value * 2 ), 10 )
+				);
+			}
+		);
 
 		expect( await applyFiltersAsync( 'test.async.filter', 2 ) ).toBe( 6 );
 	} );
 
 	test( 'aborts when handler throws an error', async () => {
-		const sqrt = vi.fn( async ( value ) => {
+		const sqrt = vi.fn( async ( value: number ) => {
 			if ( value < 0 ) {
 				throw new Error( 'cannot pass negative value to sqrt' );
 			}
 			return Math.sqrt( value );
 		} );
 
-		const plus1 = vi.fn( async ( value ) => {
+		const plus1 = vi.fn( async ( value: number ) => {
 			return value + 1;
 		} );
 
@@ -983,11 +1036,17 @@ describe( 'async filter', () => {
 	} );
 
 	test( 'is correctly tracked by doingFilter and didFilter', async () => {
-		addFilter( 'test.async.filter', 'callback_doing', async ( value ) => {
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
-			expect( doingFilter( 'test.async.filter' ) ).toBe( true );
-			return value;
-		} );
+		addFilter(
+			'test.async.filter',
+			'callback_doing',
+			async ( value: number ) => {
+				await new Promise< void >( ( r ) =>
+					setTimeout( () => r(), 10 )
+				);
+				expect( doingFilter( 'test.async.filter' ) ).toBe( true );
+				return value;
+			}
+		);
 
 		expect( doingFilter( 'test.async.filter' ) ).toBe( false );
 		expect( didFilter( 'test.async.filter' ) ).toBe( 0 );
@@ -997,18 +1056,34 @@ describe( 'async filter', () => {
 	} );
 
 	test( 'is correctly tracked when multiple filters run at once', async () => {
-		addFilter( 'test.async.filter1', 'callback_doing', async ( value ) => {
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
-			expect( doingFilter( 'test.async.filter1' ) ).toBe( true );
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
-			return value;
-		} );
-		addFilter( 'test.async.filter2', 'callback_doing', async ( value ) => {
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
-			expect( doingFilter( 'test.async.filter2' ) ).toBe( true );
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
-			return value;
-		} );
+		addFilter(
+			'test.async.filter1',
+			'callback_doing',
+			async ( value: number ) => {
+				await new Promise< void >( ( r ) =>
+					setTimeout( () => r(), 10 )
+				);
+				expect( doingFilter( 'test.async.filter1' ) ).toBe( true );
+				await new Promise< void >( ( r ) =>
+					setTimeout( () => r(), 10 )
+				);
+				return value;
+			}
+		);
+		addFilter(
+			'test.async.filter2',
+			'callback_doing',
+			async ( value: number ) => {
+				await new Promise< void >( ( r ) =>
+					setTimeout( () => r(), 10 )
+				);
+				expect( doingFilter( 'test.async.filter2' ) ).toBe( true );
+				await new Promise< void >( ( r ) =>
+					setTimeout( () => r(), 10 )
+				);
+				return value;
+			}
+		);
 
 		await Promise.all( [
 			applyFiltersAsync( 'test.async.filter1', 0 ),
@@ -1019,16 +1094,16 @@ describe( 'async filter', () => {
 
 describe( 'async action', () => {
 	test( 'runs all registered handlers sequentially', async () => {
-		const outputs = [];
+		const outputs: number[] = [];
 		const action1 = async () => {
 			outputs.push( 1 );
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			await new Promise< void >( ( r ) => setTimeout( () => r(), 10 ) );
 			outputs.push( 2 );
 		};
 
 		const action2 = async () => {
 			outputs.push( 3 );
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			await new Promise< void >( ( r ) => setTimeout( () => r(), 10 ) );
 			outputs.push( 4 );
 		};
 
@@ -1040,14 +1115,14 @@ describe( 'async action', () => {
 	} );
 
 	test( 'aborts when handler throws an error', async () => {
-		const outputs = [];
+		const outputs: number[] = [];
 		const action1 = async () => {
 			throw new Error( 'aborting' );
 		};
 
 		const action2 = async () => {
 			outputs.push( 3 );
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			await new Promise< void >( ( r ) => setTimeout( () => r(), 10 ) );
 			outputs.push( 4 );
 		};
 
@@ -1062,7 +1137,7 @@ describe( 'async action', () => {
 
 	test( 'is correctly tracked by doingAction and didAction', async () => {
 		addAction( 'test.async.action', 'callback_doing', async () => {
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			await new Promise< void >( ( r ) => setTimeout( () => r(), 10 ) );
 			expect( doingAction( 'test.async.action' ) ).toBe( true );
 		} );
 
@@ -1075,14 +1150,14 @@ describe( 'async action', () => {
 
 	test( 'is correctly tracked when multiple actions run at once', async () => {
 		addAction( 'test.async.action1', 'callback_doing', async () => {
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			await new Promise< void >( ( r ) => setTimeout( () => r(), 10 ) );
 			expect( doingAction( 'test.async.action1' ) ).toBe( true );
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			await new Promise< void >( ( r ) => setTimeout( () => r(), 10 ) );
 		} );
 		addAction( 'test.async.action2', 'callback_doing', async () => {
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			await new Promise< void >( ( r ) => setTimeout( () => r(), 10 ) );
 			expect( doingAction( 'test.async.action2' ) ).toBe( true );
-			await new Promise( ( r ) => setTimeout( () => r(), 10 ) );
+			await new Promise< void >( ( r ) => setTimeout( () => r(), 10 ) );
 		} );
 
 		await Promise.all( [

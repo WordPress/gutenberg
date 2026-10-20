@@ -73,6 +73,10 @@ const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
+/**
+ * esbuild loaders for non-JS imports. SVG files are inlined as `data:` URIs.
+ */
+const LOADER_CONFIG = { '.svg': 'dataurl' };
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
@@ -555,6 +559,7 @@ async function bundlePackage( packageName, options = {} ) {
 		const baseConfig = {
 			entryPoints: [ entryPoint ],
 			bundle: true,
+			loader: LOADER_CONFIG,
 			sourcemap: true,
 			format: 'iife',
 			target,
@@ -673,6 +678,7 @@ async function bundlePackage( packageName, options = {} ) {
 
 			builds.push(
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: [ entryPoint ],
 					outfile: path.join(
 						rootBuildModuleDir,
@@ -704,6 +710,7 @@ async function bundlePackage( packageName, options = {} ) {
 			if ( ! noScriptDebug && ! isWasmWorker ) {
 				builds.push(
 					esbuild.build( {
+						loader: LOADER_CONFIG,
 						entryPoints: [ entryPoint ],
 						outfile: path.join(
 							rootBuildModuleDir,
@@ -1336,10 +1343,14 @@ async function transpilePackage( packageName ) {
 	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
 	await generateWorkerPlaceholder( packageDir, packageJson );
 
-	const externalizeAllExceptCssPlugin = {
-		name: 'externalize-except-css',
+	/*
+	 * Keeps imports external so each source file is transpiled on its own,
+	 * except for styles and SVGs, which are processed and inlined.
+	 */
+	const externalizeJsImportsPlugin = {
+		name: 'externalize-js-imports',
 		setup( build ) {
-			// Externalize all non-CSS imports
+			// Externalize all imports except styles and SVGs
 			build.onResolve( { filter: /.*/ }, async ( args ) => {
 				// Skip recursive calls.
 				if ( args.pluginData?.__fromExternalize ) {
@@ -1353,6 +1364,11 @@ async function transpilePackage( packageName ) {
 
 				// Let CSS/SCSS files be processed by sassPlugin
 				if ( args.path.match( /\.(css|scss)$/ ) ) {
+					return null;
+				}
+
+				// Let SVG files be inlined by the `dataurl` loader.
+				if ( args.path.endsWith( '.svg' ) ) {
 					return null;
 				}
 
@@ -1408,12 +1424,13 @@ async function transpilePackage( packageName ) {
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
 		...createStyleBundlingPlugins( packageDir ),
-		externalizeAllExceptCssPlugin,
+		externalizeJsImportsPlugin,
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
 		builds.push(
 			esbuild.build( {
+				loader: LOADER_CONFIG,
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
@@ -1447,6 +1464,7 @@ async function transpilePackage( packageName ) {
 	if ( packageJson.module ) {
 		builds.push(
 			esbuild.build( {
+				loader: LOADER_CONFIG,
 				entryPoints: srcFiles,
 				outdir: buildModuleDir,
 				outbase: srcDir,
@@ -1691,6 +1709,7 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 		if ( routeEntryPoints.length > 0 ) {
 			const routeBuilds = [
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.min.js' ),
 					bundle: true,
@@ -1713,6 +1732,7 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 			if ( ! noScriptDebug ) {
 				routeBuilds.push(
 					esbuild.build( {
+						loader: LOADER_CONFIG,
 						entryPoints: routeEntryPoints,
 						outfile: path.join( outputDir, 'route.js' ),
 						bundle: true,
@@ -1749,6 +1769,7 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 
 		const contentBuilds = [
 			esbuild.build( {
+				loader: LOADER_CONFIG,
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.min.js' ),
 				bundle: true,
@@ -1771,6 +1792,7 @@ async function buildRoute( routeName, { noScriptDebug = false } = {} ) {
 		if ( ! noScriptDebug ) {
 			contentBuilds.push(
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: [ tempEntryPath ],
 					outfile: path.join( outputDir, 'content.js' ),
 					bundle: true,
@@ -1874,6 +1896,7 @@ async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 			// Build minified and (unless skipped) non-minified versions in parallel
 			const renderBuilds = [
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.min.js' ),
 					bundle: true,
@@ -1896,6 +1919,7 @@ async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 			if ( ! noScriptDebug ) {
 				renderBuilds.push(
 					esbuild.build( {
+						loader: LOADER_CONFIG,
 						entryPoints: renderEntryPoints,
 						outfile: path.join( outputDir, 'render.js' ),
 						bundle: true,
@@ -1932,6 +1956,7 @@ async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 			// Build minified and (unless skipped) non-minified versions in parallel
 			const widgetBuilds = [
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.min.js' ),
 					bundle: true,
@@ -1954,6 +1979,7 @@ async function buildWidget( widgetName, { noScriptDebug = false } = {} ) {
 			if ( ! noScriptDebug ) {
 				widgetBuilds.push(
 					esbuild.build( {
+						loader: LOADER_CONFIG,
 						entryPoints: widgetEntryPoints,
 						outfile: path.join( outputDir, 'widget.js' ),
 						bundle: true,
