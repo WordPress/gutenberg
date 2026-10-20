@@ -34,6 +34,7 @@
 -   `Popover`: Use the design-system stroke color, border width, radius, and background on the default surface. `Dropdown` and `DropdownMenu` pick this up through `Popover` ([#84574](https://github.com/WordPress/gutenberg/pull/84574)).
 -   `Snackbar`: Keep snackbars that have an action on screen for 10 seconds instead of 6 before they are dismissed automatically ([#84842](https://github.com/WordPress/gutenberg/pull/84842)).
 -   `Tabs`: Show the tab panel's focus ring with the design system's outline instead of a legacy box-shadow ([#84914](https://github.com/WordPress/gutenberg/pull/84914)).
+-   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 
 ### Deprecations
 
