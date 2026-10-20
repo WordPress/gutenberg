@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+-   Match pressed document tools to the strong neutral interactive tokens ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 16.0.0 (2026-10-20)

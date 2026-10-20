@@ -7,6 +7,10 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Bug Fixes
+
+-   `Button`, `Toolbar`: Use matching strong neutral colors for pressed and disabled controls, including destructive variants. Use semantic toolbar border and focus colors, and inherit toolbar subscript colors ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+
 ### Internal
 
 -   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
