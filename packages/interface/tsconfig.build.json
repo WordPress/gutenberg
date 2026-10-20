@@ -10,7 +10,7 @@
 		{ "path": "../element/tsconfig.build.json" },
 		{ "path": "../i18n/tsconfig.build.json" },
 		{ "path": "../icons/tsconfig.build.json" },
-		{ "path": "../plugins" },
+		{ "path": "../plugins/tsconfig.build.json" },
 		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../viewport" }
 	]

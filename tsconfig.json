@@ -49,6 +49,7 @@
 		{ "path": "packages/media-fields" },
 		{ "path": "packages/media-utils" },
 		{ "path": "packages/notices" },
+		{ "path": "packages/plugins" },
 		{ "path": "packages/preferences" },
 		{ "path": "packages/priority-queue" },
 		{ "path": "packages/private-apis" },
