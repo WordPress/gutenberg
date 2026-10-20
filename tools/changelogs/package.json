@@ -1,0 +1,38 @@
+{
+	"name": "@wordpress/changelog-tools",
+	"version": "0.0.0",
+	"description": "Changelog and fragment management tooling for Gutenberg packages.",
+	"private": true,
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/tools/changelogs",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/WordPress/gutenberg.git",
+		"directory": "tools/changelogs"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"type": "module",
+	"exports": {
+		".": "./index.js",
+		"./config": "./lib/config.js",
+		"./projects": "./lib/projects.js",
+		"./migrate": "./lib/migrate.js",
+		"./preview": "./lib/preview.js"
+	},
+	"devDependencies": {
+		"@types/node": "^24.13.3",
+		"changie": "^1.26.0",
+		"js-yaml": "^3.15.2",
+		"semver": "^7.5.4",
+		"vitest": "^5.0.3"
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"scripts": {
+		"test": "vitest run"
+	}
+}
