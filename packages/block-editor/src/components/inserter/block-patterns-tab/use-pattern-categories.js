@@ -5,7 +5,7 @@ import usePatternsState from '../hooks/use-patterns-state';
 import {
 	isPatternFiltered,
 	allPatternsCategory,
-	myPatternsCategory,
+	sitePatternsCategory,
 	starterPatternsCategory,
 	getPopulatedCategories,
 	INSERTER_PATTERN_TYPES,
@@ -46,7 +46,7 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 				( pattern ) => pattern.type === INSERTER_PATTERN_TYPES.user
 			)
 		) {
-			categories.unshift( myPatternsCategory );
+			categories.unshift( sitePatternsCategory );
 		}
 		if ( filteredPatterns.length > 0 ) {
 			categories.unshift( {

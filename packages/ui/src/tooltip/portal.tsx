@@ -11,7 +11,11 @@ const Portal = forwardRef< HTMLDivElement, PortalProps >(
 	function TooltipPortal( { container, ...restProps }, ref ) {
 		return (
 			<_Tooltip.Portal
-				container={ container ?? getWpCompatOverlaySlot() }
+				container={
+					container === undefined
+						? getWpCompatOverlaySlot()
+						: container
+				}
 				{ ...restProps }
 				ref={ ref }
 			/>

@@ -11,8 +11,8 @@
 	font-size: $default-font-size;
 }
 
-.components-radio-control__group-wrapper.has-help {
-	margin-block-end: $grid-unit-15;
+.components-radio-control__help {
+	color: var(--wpds-color-foreground-content-neutral-weak);
 }
 
 .components-radio-control__option {

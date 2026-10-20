@@ -192,13 +192,14 @@ function PatternListView( {
 		];
 	}, [ type, postTypeFields, patternCategoryField ] );
 
-	// Apply client-side sorting and pagination, but NOT filtering
-	// Filtering is done server-side in usePatterns hook
+	// Apply client-side sorting and pagination, and the author filter. The
+	// other filters are done server-side in usePatterns hook
 	const { data: posts, paginationInfo } = useMemo( () => {
-		// Remove filters from view - filtering is managed server-side
 		const viewWithoutFilters = { ...view };
 		delete viewWithoutFilters.search; // Search also done server-side
-		viewWithoutFilters.filters = []; // Remove all filters
+		viewWithoutFilters.filters = view.filters?.filter(
+			( { field } ) => field === 'author'
+		);
 		return filterSortAndPaginate(
 			patternsWithPermissions,
 			viewWithoutFilters,

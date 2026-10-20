@@ -10,15 +10,16 @@ import { __, _x } from '@wordpress/i18n';
 import { Icon } from '@wordpress/icons';
 import { useMemo, createInterpolateElement } from '@wordpress/element';
 import {
-	myPatternsCategory,
+	sitePatternsCategory,
 	INSERTER_SYNC_TYPES,
 	INSERTER_PATTERN_TYPES,
+	INSERTER_AUTHOR_TYPES,
 } from './utils';
 
 const getShouldDisableSyncFilter = ( sourceFilter ) =>
 	sourceFilter !== 'all' && sourceFilter !== 'user';
 const getShouldHideSourcesFilter = ( category ) => {
-	return category.name === myPatternsCategory.name;
+	return category.name === sitePatternsCategory.name;
 };
 
 const PATTERN_SOURCE_MENU_OPTIONS = [
@@ -40,20 +41,33 @@ const PATTERN_SOURCE_MENU_OPTIONS = [
 	},
 ];
 
+const PATTERN_AUTHOR_MENU_OPTIONS = [
+	{
+		value: 'all',
+		label: _x( 'All', 'patterns' ),
+	},
+	{
+		value: INSERTER_AUTHOR_TYPES.currentUser,
+		label: __( 'My patterns' ),
+	},
+];
+
 export function PatternsFilter( {
 	setPatternSyncFilter,
 	setPatternSourceFilter,
+	setPatternAuthorFilter,
 	patternSyncFilter,
 	patternSourceFilter,
+	patternAuthorFilter,
 	scrollContainerRef,
 	category,
 } ) {
-	// If the category is `myPatterns` then we need to set the source filter to `user`, but
+	// If the category is `sitePatterns` then we need to set the source filter to `user`, but
 	// we do this by deriving from props rather than calling setPatternSourceFilter otherwise
 	// the user may be confused when switching to another category if the haven't explicitly set
 	// this filter themselves.
 	const currentPatternSourceFilter =
-		category.name === myPatternsCategory.name
+		category.name === sitePatternsCategory.name
 			? INSERTER_PATTERN_TYPES.user
 			: patternSourceFilter;
 
@@ -63,9 +77,14 @@ export function PatternsFilter( {
 		currentPatternSourceFilter
 	);
 
-	// We also hide the directory and theme source filter if the category is `myPatterns`
+	// We also hide the directory and theme source filter if the category is `sitePatterns`
 	// otherwise there will only be one option available.
 	const shouldHideSourcesFilter = getShouldHideSourcesFilter( category );
+
+	// The author filter is only shown while only user patterns are listed, as
+	// they're the only ones with an author on this site.
+	const shouldShowAuthorFilter =
+		currentPatternSourceFilter === INSERTER_PATTERN_TYPES.user;
 
 	const patternSyncMenuOptions = useMemo(
 		() => [
@@ -135,6 +154,21 @@ export function PatternsFilter( {
 										);
 									} }
 									value={ currentPatternSourceFilter }
+								/>
+							</MenuGroup>
+						) }
+						{ shouldShowAuthorFilter && (
+							<MenuGroup label={ __( 'Author' ) }>
+								<MenuItemsChoice
+									choices={ PATTERN_AUTHOR_MENU_OPTIONS }
+									onSelect={ ( value ) => {
+										setPatternAuthorFilter( value );
+										scrollContainerRef.current?.scrollTo(
+											0,
+											0
+										);
+									} }
+									value={ patternAuthorFilter }
 								/>
 							</MenuGroup>
 						) }

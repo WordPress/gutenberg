@@ -1,3 +1,4 @@
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import {
 	cropperReducer,
 	areCropperStatesEqual,
@@ -64,21 +65,31 @@ export function mediaEditorReducer(
 				payload: newCropRect,
 			} );
 			return {
+				...state,
 				cropper: nextCropper,
 				cropOptions: nextCropOptions,
 			};
 		}
-		case 'RESET_CROP_OPTIONS': {
-			if (
-				state.cropOptions.aspectRatioValue ===
-				DEFAULT_CROP_OPTIONS.aspectRatioValue
-			) {
+		case 'RESET': {
+			const next = buildInitialMediaEditorState(
+				cropperReducer( state.cropper, { type: 'RESET' } )
+			);
+			return areMediaEditorStatesEqual( state, next ) ? state : next;
+		}
+		case 'SET_EDIT': {
+			const { name, value } = action.payload;
+			if ( value === undefined ) {
+				if ( ! Object.hasOwn( state.edits, name ) ) {
+					return state;
+				}
+				const edits = { ...state.edits };
+				delete edits[ name ];
+				return { ...state, edits };
+			}
+			if ( fastDeepEqual( state.edits[ name ], value ) ) {
 				return state;
 			}
-			return {
-				...state,
-				cropOptions: { ...DEFAULT_CROP_OPTIONS },
-			};
+			return { ...state, edits: { ...state.edits, [ name ]: value } };
 		}
 		case 'RESTORE_SNAPSHOT':
 			return action.payload;
@@ -112,13 +123,14 @@ export function areMediaEditorStatesEqual(
 	}
 	return (
 		areCropperStatesEqual( a.cropper, b.cropper ) &&
-		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue
+		a.cropOptions.aspectRatioValue === b.cropOptions.aspectRatioValue &&
+		fastDeepEqual( a.edits, b.edits )
 	);
 }
 
 /**
  * Build the composite state a session starts from: the given cropper
- * slice and default crop options.
+ * slice, default crop options, and no edits.
  *
  * @param cropper The cropper slice.
  * @return Composite initial state.
@@ -129,5 +141,6 @@ export function buildInitialMediaEditorState(
 	return {
 		cropper,
 		cropOptions: { ...DEFAULT_CROP_OPTIONS },
+		edits: {},
 	};
 }
