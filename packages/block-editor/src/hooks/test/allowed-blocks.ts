@@ -6,6 +6,24 @@ import {
 } from '@wordpress/blocks';
 import { addTransforms } from '../allowed-blocks';
 
+// The test blocks carry only the fields the transform reads.
+interface TestBlock {
+	name: string;
+	attributes: Record< string, unknown >;
+	innerBlocks: TestBlock[];
+}
+const transform = addTransforms as unknown as (
+	result: TestBlock,
+	source: TestBlock[],
+	index: number,
+	results: TestBlock[]
+) => TestBlock;
+// The test block types need no category, edit or save.
+const register = registerBlockType as unknown as (
+	name: string,
+	settings: Record< string, unknown >
+) => void;
+
 describe( 'allowedBlocks', () => {
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
@@ -15,7 +33,7 @@ describe( 'allowedBlocks', () => {
 
 	describe( 'addTransforms()', () => {
 		it( 'should not preserve allowedBlocks in wrapping transforms', () => {
-			registerBlockType( 'core/bar', {
+			register( 'core/bar', {
 				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
@@ -41,13 +59,13 @@ describe( 'allowedBlocks', () => {
 				innerBlocks: source,
 			};
 
-			const transformed = addTransforms( result, source, 0, [ result ] );
+			const transformed = transform( result, source, 0, [ result ] );
 
 			expect( transformed.attributes.allowedBlocks ).toBeUndefined();
 		} );
 
 		it( 'should not preserve allowedBlocks in one-to-many transforms', () => {
-			registerBlockType( 'core/bar', {
+			register( 'core/bar', {
 				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
@@ -67,18 +85,13 @@ describe( 'allowedBlocks', () => {
 				{ name: 'core/bar', attributes: {}, innerBlocks: [] },
 			];
 
-			const transformed = addTransforms(
-				results[ 0 ],
-				source,
-				0,
-				results
-			);
+			const transformed = transform( results[ 0 ], source, 0, results );
 
 			expect( transformed.attributes.allowedBlocks ).toBeUndefined();
 		} );
 
 		it( 'should not preserve allowedBlocks in many-to-one transforms', () => {
-			registerBlockType( 'core/bar', {
+			register( 'core/bar', {
 				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
@@ -104,13 +117,13 @@ describe( 'allowedBlocks', () => {
 				innerBlocks: [],
 			};
 
-			const transformed = addTransforms( result, source, 0, [ result ] );
+			const transformed = transform( result, source, 0, [ result ] );
 
 			expect( transformed.attributes.allowedBlocks ).toBeUndefined();
 		} );
 
 		it( 'should not preserve allowedBlocks in many-to-many transforms with different counts', () => {
-			registerBlockType( 'core/bar', {
+			register( 'core/bar', {
 				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
@@ -141,8 +154,7 @@ describe( 'allowedBlocks', () => {
 			];
 
 			const [ firstTransformed, secondTransformed ] = results.map(
-				( result, index ) =>
-					addTransforms( result, source, index, results )
+				( result, index ) => transform( result, source, index, results )
 			);
 
 			expect( firstTransformed.attributes.allowedBlocks ).toBeUndefined();
@@ -152,7 +164,7 @@ describe( 'allowedBlocks', () => {
 		} );
 
 		it( 'should preserve allowedBlocks in many-to-many transforms with same counts', () => {
-			registerBlockType( 'core/bar', {
+			register( 'core/bar', {
 				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
@@ -178,8 +190,7 @@ describe( 'allowedBlocks', () => {
 			];
 
 			const [ firstTransformed, secondTransformed ] = results.map(
-				( result, index ) =>
-					addTransforms( result, source, index, results )
+				( result, index ) => transform( result, source, index, results )
 			);
 
 			expect( firstTransformed.attributes.allowedBlocks ).toEqual( [
@@ -192,7 +203,7 @@ describe( 'allowedBlocks', () => {
 		} );
 
 		it( "should filter allowedBlocks based on destination block's allowedBlocks", () => {
-			registerBlockType( 'core/bar', {
+			register( 'core/bar', {
 				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
@@ -218,7 +229,7 @@ describe( 'allowedBlocks', () => {
 				innerBlocks: [],
 			};
 
-			const transformed = addTransforms( result, source, 0, [ result ] );
+			const transformed = transform( result, source, 0, [ result ] );
 
 			expect( transformed.attributes.allowedBlocks ).toEqual( [
 				'core/paragraph',
@@ -226,7 +237,7 @@ describe( 'allowedBlocks', () => {
 		} );
 
 		it( 'should not override existing allowedBlocks in target block', () => {
-			registerBlockType( 'core/bar', {
+			register( 'core/bar', {
 				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
@@ -245,7 +256,7 @@ describe( 'allowedBlocks', () => {
 				innerBlocks: [],
 			};
 
-			const transformed = addTransforms( result, source, 0, [ result ] );
+			const transformed = transform( result, source, 0, [ result ] );
 
 			expect( transformed.attributes.allowedBlocks ).toEqual( [
 				'core/heading',
@@ -253,7 +264,7 @@ describe( 'allowedBlocks', () => {
 		} );
 
 		it( 'should not preserve allowedBlocks when target block does not support allowedBlocks', () => {
-			registerBlockType( 'core/bar', {
+			register( 'core/bar', {
 				apiVersion: 3,
 				title: 'Bar',
 			} );
@@ -272,7 +283,7 @@ describe( 'allowedBlocks', () => {
 				attributes: {},
 				innerBlocks: [],
 			};
-			const transformed = addTransforms( result, source, 0, [ result ] );
+			const transformed = transform( result, source, 0, [ result ] );
 
 			expect( transformed.attributes.allowedBlocks ).toBeUndefined();
 		} );

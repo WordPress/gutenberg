@@ -13,6 +13,7 @@
 -   Convert the grid item tools, ChildLayoutControl and the layout hooks to TypeScript ([#84985](https://github.com/WordPress/gutenberg/pull/84985)).
 -   Convert the color, background and filters global styles panels to TypeScript ([#84986](https://github.com/WordPress/gutenberg/pull/84986)).
 -   Convert the typography, border and dimensions panels to TypeScript ([#84989](https://github.com/WordPress/gutenberg/pull/84989)).
+-   Convert the style support hooks to TypeScript ([#85024](https://github.com/WordPress/gutenberg/pull/85024)).
 
 ## 19.0.0 (2026-10-20)
 

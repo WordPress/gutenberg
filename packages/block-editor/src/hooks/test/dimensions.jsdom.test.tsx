@@ -145,6 +145,7 @@ describe( 'useBlockProps', () => {
 			apiVersion: 3,
 			title: 'Dimensions with aspect ratio',
 			category: 'text',
+			attributes: {},
 			supports: {
 				dimensions: {
 					aspectRatio: true,

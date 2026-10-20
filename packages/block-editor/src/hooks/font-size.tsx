@@ -1,5 +1,7 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import type { Block, BlockType } from '@wordpress/blocks';
+import type { FontSizePreset } from '@wordpress/global-styles-engine';
 import TokenList from '@wordpress/token-list';
 import { getTypographyFontSizeValue } from '@wordpress/global-styles-engine';
 import {
@@ -15,6 +17,11 @@ import {
 	shouldSkipSerialization,
 } from './utils';
 import { useSettings } from '../components/use-settings';
+import type {
+	BlockWrapperProps,
+	FontSizeEditProps,
+	FontSizeStyle,
+} from './types';
 
 export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
 
@@ -22,11 +29,11 @@ export const FONT_SIZE_SUPPORT_KEY = 'typography.fontSize';
  * Filters registered block settings, extending attributes to include
  * `fontSize` and `fontWeight` attributes.
  *
- * @param {Object} settings Original block settings.
+ * @param settings Original block settings.
  *
- * @return {Object} Filtered block settings.
+ * @return Filtered block settings.
  */
-function addAttributes( settings ) {
+function addAttributes( settings: BlockType ): BlockType {
 	if ( ! hasBlockSupport( settings, FONT_SIZE_SUPPORT_KEY ) ) {
 		return settings;
 	}
@@ -46,13 +53,18 @@ function addAttributes( settings ) {
 /**
  * Override props assigned to save component to inject font size.
  *
- * @param {Object} props           Additional props applied to save element.
- * @param {Object} blockNameOrType Block type.
- * @param {Object} attributes      Block attributes.
+ * @param props               Additional props applied to save element.
+ * @param blockNameOrType     Block type.
+ * @param attributes          Block attributes.
+ * @param attributes.fontSize Font size preset slug.
  *
- * @return {Object} Filtered props applied to save element.
+ * @return Filtered props applied to save element.
  */
-function addSaveProps( props, blockNameOrType, attributes ) {
+function addSaveProps(
+	props: BlockWrapperProps,
+	blockNameOrType: BlockType | string,
+	attributes: { fontSize?: string }
+): BlockWrapperProps {
 	if ( ! hasBlockSupport( blockNameOrType, FONT_SIZE_SUPPORT_KEY ) ) {
 		return props;
 	}
@@ -69,7 +81,8 @@ function addSaveProps( props, blockNameOrType, attributes ) {
 
 	// Use TokenList to dedupe classes.
 	const classes = new TokenList( props.className );
-	classes.add( getFontSizeClass( attributes.fontSize ) );
+	// Joining an unset class adds nothing.
+	classes.add( getFontSizeClass( attributes.fontSize ) as string );
 	const newClassName = classes.value;
 	props.className = newClassName ? newClassName : undefined;
 
@@ -79,18 +92,24 @@ function addSaveProps( props, blockNameOrType, attributes ) {
 /**
  * Inspector control panel containing the font size related configuration
  *
- * @param {Object} props
+ * @param props
  *
- * @return {Element} Font size edit element.
+ * @return Font size edit element.
  */
-export function FontSizeEdit( props ) {
+export function FontSizeEdit( props: FontSizeEditProps ) {
 	const {
 		attributes: { fontSize, style },
 		setAttributes,
 	} = props;
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' ) as [
+		// The setting lists the font size presets.
+		FontSizePreset[] | undefined,
+	];
 
-	const onChange = ( value, selectedItem ) => {
+	const onChange = (
+		value: number | string | undefined,
+		selectedItem?: { slug?: string }
+	) => {
 		// Use the selectedItem's slug if available, otherwise fall back to finding by value
 		const fontSizeSlug =
 			selectedItem?.slug ||
@@ -131,24 +150,45 @@ export function FontSizeEdit( props ) {
 /**
  * Custom hook that checks if font-size settings have been disabled.
  *
- * @param {string} name The name of the block.
- * @return {boolean} Whether setting is disabled.
+ * @param props      Block props.
+ * @param props.name The name of the block.
+ * @return Whether setting is disabled.
  */
-export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+export function useIsFontSizeDisabled( {
+	name: blockName,
+}: { name?: string } = {} ) {
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' ) as [
+		// The setting lists the font size presets.
+		FontSizePreset[] | undefined,
+	];
 	const hasFontSizes = !! fontSizes?.length;
 
 	return (
-		! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) || ! hasFontSizes
+		// An unset block name has no support.
+		! hasBlockSupport( blockName as string, FONT_SIZE_SUPPORT_KEY ) ||
+		! hasFontSizes
 	);
 }
 
-function useBlockProps( { name, fontSize, style } ) {
+function useBlockProps( {
+	name,
+	fontSize,
+	style,
+}: {
+	name: string;
+	fontSize?: string;
+	style?: FontSizeStyle;
+} ) {
 	const [ fontSizes, fluidTypographySettings, layoutSettings ] = useSettings(
 		'typography.fontSizes',
 		'typography.fluid',
 		'layout'
-	);
+	) as [
+		// The settings hold the presets, fluid typography and layout settings.
+		FontSizePreset[] | undefined,
+		boolean | Record< string, unknown > | undefined,
+		Record< string, unknown > | undefined,
+	];
 
 	/*
 	 * Only add inline styles if the block supports font sizes,
@@ -163,13 +203,14 @@ function useBlockProps( { name, fontSize, style } ) {
 		return;
 	}
 
-	let props;
+	let props: BlockWrapperProps | undefined;
 
 	if ( style?.typography?.fontSize ) {
 		props = {
 			style: {
 				fontSize: getTypographyFontSizeValue(
-					{ size: style.typography.fontSize },
+					// It reads only the preset size.
+					{ size: style.typography.fontSize } as FontSizePreset,
 					{
 						typography: {
 							fluid: fluidTypographySettings,
@@ -204,7 +245,7 @@ export default {
 	useBlockProps,
 	addSaveProps,
 	attributeKeys: [ 'fontSize', 'style' ],
-	hasSupport( name ) {
+	hasSupport( name: string | BlockType ) {
 		return hasBlockSupport( name, FONT_SIZE_SUPPORT_KEY );
 	},
 };
@@ -213,7 +254,12 @@ const MIGRATION_PATHS = {
 	fontSize: [ [ 'fontSize' ], [ 'style', 'typography', 'fontSize' ] ],
 };
 
-function addTransforms( result, source, index, results ) {
+function addTransforms(
+	result: Block,
+	source: Block[],
+	index: number,
+	results: Block[]
+) {
 	const destinationBlockType = result.name;
 	const activeSupports = {
 		fontSize: hasBlockSupport(

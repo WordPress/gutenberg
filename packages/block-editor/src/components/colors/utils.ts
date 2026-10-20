@@ -22,7 +22,7 @@ extend( [ namesPlugin, a11yPlugin ] );
 export const getColorObjectByAttributeValues = (
 	colors: Color[] | undefined,
 	definedColor: string | null | undefined,
-	customColor: string | null | undefined
+	customColor?: string | null
 ): ColorObject => {
 	if ( definedColor ) {
 		const colorObj = colors?.find(

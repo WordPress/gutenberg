@@ -1,4 +1,5 @@
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import type { BlockType } from '@wordpress/blocks';
 import { useMemo, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -23,11 +24,19 @@ import {
 	useBlockStyleState,
 } from './block-style-state';
 import useBlockColorContrastWarning from './contrast-checker';
+import type { PanelStyle } from '../components/global-styles/types';
+import type {
+	ResetAllFilter,
+	StyleInspectorControlProps,
+	TypographyAttributes,
+	TypographyHookPanelProps,
+} from './types';
 
-function omit( object, keys ) {
+function omit< T extends object >( object: T, keys: string[] ) {
+	// Leaving keys out keeps the rest of the shape.
 	return Object.fromEntries(
 		Object.entries( object ).filter( ( [ key ] ) => ! keys.includes( key ) )
-	);
+	) as Partial< T >;
 }
 
 const LETTER_SPACING_SUPPORT_KEY = 'typography.__experimentalLetterSpacing';
@@ -57,8 +66,8 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	FIT_TEXT_SUPPORT_KEY,
 ];
 
-function styleToAttributes( style ) {
-	const updatedStyle = { ...omit( style, [ 'fontFamily' ] ) };
+function styleToAttributes( style: PanelStyle ): TypographyAttributes {
+	const updatedStyle: PanelStyle = { ...omit( style, [ 'fontFamily' ] ) };
 	const fontSizeValue = style?.typography?.fontSize;
 	const fontFamilyValue = style?.typography?.fontFamily;
 	const textColorValue = style?.color?.text;
@@ -68,10 +77,13 @@ function styleToAttributes( style ) {
 		fontSizeValue?.startsWith( 'var:preset|font-size|' )
 			? fontSizeValue.substring( 'var:preset|font-size|'.length )
 			: undefined;
-	const fontFamilySlug = fontFamilyValue?.startsWith(
-		'var:preset|font-family|'
-	)
-		? fontFamilyValue.substring( 'var:preset|font-family|'.length )
+	// A font family is stored as a string.
+	const fontFamilySlug = (
+		fontFamilyValue as string | undefined
+	 )?.startsWith( 'var:preset|font-family|' )
+		? ( fontFamilyValue as string ).substring(
+				'var:preset|font-family|'.length
+			)
 		: undefined;
 	const textColorSlug = extractPresetSlug( textColorValue, 'color' );
 	const backgroundColorValue = style?.color?.background;
@@ -85,7 +97,10 @@ function styleToAttributes( style ) {
 			? textShadowValue.substring( 'var:preset|text-shadow|'.length )
 			: undefined;
 	updatedStyle.typography = {
-		...omit( updatedStyle.typography, [ 'fontFamily' ] ),
+		// The panel styles always hold typography.
+		...omit( updatedStyle.typography as Record< string, unknown >, [
+			'fontFamily',
+		] ),
 		fontSize: fontSizeSlug ? undefined : fontSizeValue,
 		textShadow: textShadowSlug ? undefined : textShadowValue,
 	};
@@ -96,7 +111,8 @@ function styleToAttributes( style ) {
 		background: backgroundColorSlug ? undefined : backgroundColorValue,
 	};
 	return {
-		style: cleanEmptyObject( updatedStyle ),
+		// Cleaning leaves out only the empty values.
+		style: cleanEmptyObject( updatedStyle ) as PanelStyle | undefined,
 		fontFamily: fontFamilySlug,
 		fontSize: fontSizeSlug,
 		textColor: textColorSlug,
@@ -104,7 +120,7 @@ function styleToAttributes( style ) {
 	};
 }
 
-function attributesToStyle( attributes ) {
+function attributesToStyle( attributes: TypographyAttributes ): PanelStyle {
 	return {
 		...attributes.style,
 		typography: {
@@ -140,9 +156,12 @@ function attributesToStyle( attributes ) {
 	};
 }
 
-function TypographyInspectorControl( { children, resetAllFilter } ) {
+function TypographyInspectorControl( {
+	children,
+	resetAllFilter,
+}: StyleInspectorControlProps ) {
 	const attributesResetAllFilter = useCallback(
-		( attributes ) => {
+		( attributes: TypographyAttributes ) => {
 			const existingStyle = attributesToStyle( attributes );
 			const updatedStyle = resetAllFilter( existingStyle );
 			return {
@@ -156,7 +175,8 @@ function TypographyInspectorControl( { children, resetAllFilter } ) {
 	return (
 		<InspectorControls
 			group="typography"
-			resetAllFilter={ attributesResetAllFilter }
+			// The filter reads the typography attributes.
+			resetAllFilter={ attributesResetAllFilter as ResetAllFilter }
 		>
 			{ children }
 		</InspectorControls>
@@ -172,7 +192,7 @@ export function TypographyPanel( {
 	// blocks direct-render this panel because their support fills are gated
 	// off by editing mode). Defaults to the slot-based wrapper.
 	asWrapper,
-} ) {
+}: TypographyHookPanelProps ) {
 	const selectedState = useBlockStyleState();
 	const isEnabled = useHasTypographyPanel( settings );
 
@@ -186,7 +206,7 @@ export function TypographyPanel( {
 		className,
 		backgroundColor,
 		gradient,
-	} = useSelect(
+	}: TypographyAttributes = useSelect(
 		( select ) => {
 			// Early return to avoid subscription when disabled.
 			if ( ! isEnabled ) {
@@ -202,7 +222,9 @@ export function TypographyPanel( {
 				className: _className,
 				backgroundColor: _backgroundColor,
 				gradient: _gradient,
-			} = select( blockEditorStore ).getBlockAttributes( clientId ) || {};
+			} = ( select( blockEditorStore ).getBlockAttributes( clientId ) ||
+				// The block's attributes hold its typography.
+				{} ) as TypographyAttributes;
 			return {
 				style: _style,
 				fontFamily: _fontFamily,
@@ -251,18 +273,20 @@ export function TypographyPanel( {
 	const value = useMemo(
 		() =>
 			isStateSelected
-				? getStyleForState( style, selectedState )
+				? // The state styles have the shape of the block styles.
+					( getStyleForState( style, selectedState ) as
+						PanelStyle | undefined )
 				: baseValue,
 		[ isStateSelected, selectedState, style, baseValue ]
 	);
 
 	const onChange = isStateSelected
-		? ( newStyle ) => {
+		? ( newStyle: PanelStyle ) => {
 				setAttributes( {
 					style: setStyleForState( style, selectedState, newStyle ),
 				} );
 			}
-		: ( newStyle ) => {
+		: ( newStyle: PanelStyle ) => {
 				const newAttributes = styleToAttributes( newStyle );
 
 				const setsTextGradient =
@@ -283,7 +307,8 @@ export function TypographyPanel( {
 							...newAttributes.style?.color,
 							gradient: style?.color?.gradient,
 						},
-					} );
+						// Cleaning leaves out only the empty values.
+					} ) as PanelStyle | undefined;
 				} else if ( setsTextGradient && gradient ) {
 					// A preset gradient's `background` shorthand resets the clip.
 					newAttributes.gradient = undefined;
@@ -323,14 +348,15 @@ export function TypographyPanel( {
 		return null;
 	}
 
+	// The default controls map control names to whether they show.
 	const typographyDefaultControls = getBlockSupport( name, [
 		TYPOGRAPHY_SUPPORT_KEY,
 		'__experimentalDefaultControls',
-	] );
+	] ) as Record< string, boolean > | undefined;
 	const colorDefaultControls = getBlockSupport( name, [
 		'color',
 		'__experimentalDefaultControls',
-	] );
+	] ) as Record< string, boolean > | undefined;
 	const defaultControls = {
 		...typographyDefaultControls,
 		textColor: colorDefaultControls?.text,
@@ -353,7 +379,7 @@ export function TypographyPanel( {
 	);
 }
 
-export const hasTypographySupport = ( blockName ) => {
+export const hasTypographySupport = ( blockName: string | BlockType ) => {
 	return TYPOGRAPHY_SUPPORT_KEYS.some( ( key ) =>
 		hasBlockSupport( blockName, key )
 	);

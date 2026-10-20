@@ -1,4 +1,4 @@
-import type { ComponentType, CSSProperties } from 'react';
+import type { ComponentType, CSSProperties, ReactNode } from 'react';
 import type {
 	Block,
 	BlockAttribute,
@@ -6,6 +6,12 @@ import type {
 	ColorProps,
 } from '@wordpress/blocks';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import type {
+	PanelResetAllFilter,
+	PanelStyle,
+	StyleSettings,
+	StyleToolsPanelProps,
+} from '../components/global-styles/types';
 import type { BlockVisibility } from '../components/block-visibility/use-block-visibility';
 import type { BlockEditorThunkArgs } from '../store/types';
 import type { Bindings } from '../utils/block-bindings';
@@ -607,3 +613,218 @@ export interface BlockWithLayoutStylesProps extends LayoutStylesSettings {
 	props: BlockListBlockHookProps & { attributes: LayoutAttributes };
 	layoutClasses: string[];
 }
+
+export interface BlockStatesControlProps {
+	/** Block name. */
+	name: string;
+	/** Currently selected style-state value. */
+	value?: BlockStyleState;
+	/** Callback when style-state selection changes. */
+	onChange: ( value: BlockStyleState ) => void;
+	/** Optional menu content rendered after the state groups. */
+	children?: ReactNode;
+}
+
+export interface BlockStateBadgesProps {
+	/** Block name. */
+	name: string;
+	/** Currently selected style-state value. */
+	value?: BlockStyleState;
+	/** Whether Responsive editing is enabled. */
+	isResponsiveEditing?: boolean;
+}
+
+/**
+ * A block style with the text alignment set.
+ */
+export type TextAlignStyle = BlockStyle & {
+	typography?: Record< string, unknown > & { textAlign?: string };
+};
+
+export interface TextAlignAttributes {
+	style?: TextAlignStyle;
+}
+
+export interface TextAlignEditProps extends BlockSupportEditProps {
+	style?: TextAlignStyle;
+}
+
+/**
+ * A block style with the custom font size set.
+ */
+export type FontSizeStyle = BlockStyle & {
+	typography?: Record< string, unknown > & { fontSize?: string | number };
+};
+
+export interface FontSizeEditProps {
+	attributes: { fontSize?: string; style?: FontSizeStyle };
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+}
+
+/**
+ * The block attributes the typography support reads and writes.
+ */
+export type TypographyAttributes = {
+	style?: PanelStyle;
+	fontFamily?: string;
+	fontSize?: string;
+	fitText?: boolean;
+	textColor?: string;
+	textShadow?: string;
+	className?: string;
+	backgroundColor?: string;
+	gradient?: string;
+} & Record< string, unknown >;
+
+export interface TypographyHookPanelProps {
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	settings: StyleSettings;
+	/** Renders the panel outside the `typography` inspector group. */
+	asWrapper?: ComponentType< StyleToolsPanelProps >;
+}
+
+/**
+ * Props of the inspector group a style support panel renders in.
+ */
+export interface StyleInspectorControlProps {
+	children?: ReactNode;
+	resetAllFilter: PanelResetAllFilter;
+}
+
+/**
+ * The block attributes the dimensions support reads.
+ */
+export type DimensionsAttributes = {
+	style?: PanelStyle;
+	className?: string;
+	layout?: Layout;
+};
+
+export interface DimensionsHookPanelProps {
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	settings: StyleSettings;
+}
+
+/**
+ * The block attributes the border support reads and writes.
+ */
+export type BorderAttributes = {
+	style?: PanelStyle;
+	borderColor?: string;
+	className?: string;
+} & Record< string, unknown >;
+
+export interface BorderHookPanelProps {
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	settings: StyleSettings;
+}
+
+/**
+ * A palette color, or an unnamed custom color.
+ */
+export interface MultiOriginColor {
+	color?: string;
+	name?: string;
+	slug?: string;
+}
+
+/**
+ * The block attributes the background support reads and writes.
+ */
+export type BackgroundAttributes = {
+	style?: PanelStyle;
+	className?: string;
+	backgroundColor?: string;
+	gradient?: string;
+} & Record< string, unknown >;
+
+export interface BackgroundHookPanelProps {
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	settings: StyleSettings;
+	/** Renders the panel outside the `background` inspector group. */
+	asWrapper?: ComponentType< StyleToolsPanelProps >;
+}
+
+/**
+ * Options of `getBlockStateStylesCSS`.
+ */
+export interface StateStylesCSSOptions {
+	/** Block name. */
+	name: string;
+	/** Block-instance scoping selector. */
+	baseSelector: string;
+	/** Optional pseudo-state, e.g. ":hover". */
+	state?: string;
+	/** Styles the state layers over. */
+	baseStyle?: PanelStyle;
+}
+
+export interface BlockStyleControlsProps extends BlockSupportEditProps {
+	style?: PanelStyle;
+}
+
+/**
+ * The block attributes the elements support reads.
+ */
+export type ElementsAttributes = {
+	style?: PanelStyle;
+	className?: string;
+};
+
+export interface ElementsEditProps {
+	clientId: string;
+	name: string;
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	settings: StyleSettings;
+	/** Renders the panel outside the `elements` inspector group. */
+	asWrapper?: ComponentType< StyleToolsPanelProps >;
+	/** Label of the panel. */
+	label?: string;
+	/** Which controls are shown by default. */
+	defaultControls?: Record< string, boolean | undefined >;
+}
+
+/**
+ * The block attributes the color support reads and writes.
+ */
+export type ColorAttributes = {
+	backgroundColor?: string;
+	textColor?: string;
+	gradient?: string;
+	style?: PanelStyle;
+} & Record< string, unknown >;
+
+/**
+ * A custom CSS string of one block style state.
+ */
+export interface CustomCSSStateEntry {
+	css: string;
+	pseudoState?: string;
+	mediaQuery?: string;
+}
+
+export interface CustomCSSControlProps {
+	/** Block name. */
+	blockName: string;
+	/** Function to set block attributes. */
+	setAttributes: ( attributes: Record< string, unknown > ) => void;
+	/** Block style attribute. */
+	style?: PanelStyle;
+	/** Currently selected block style state. */
+	selectedState?: BlockStyleState;
+}
+
+/**
+ * The block attributes that hold the block styles.
+ */
+export type StyleAttributes = {
+	style?: PanelStyle;
+} & Record< string, unknown >;

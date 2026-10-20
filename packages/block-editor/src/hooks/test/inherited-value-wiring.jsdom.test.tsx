@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { render } from '@testing-library/react';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
@@ -7,6 +8,12 @@ import { ElementsEdit } from '../elements';
 import { BorderPanel } from '../border';
 import { DimensionsPanel } from '../dimensions';
 import { BackgroundImagePanel } from '../background';
+import type { PanelStyle } from '../../components/global-styles/types';
+
+interface PanelSpyProps {
+	inheritedValue?: PanelStyle;
+	onChange: ( value: PanelStyle ) => void;
+}
 
 /**
  * Tests the wiring between inspector hook wrappers and shared
@@ -21,9 +28,17 @@ import { BackgroundImagePanel } from '../background';
 
 // Vitest hoists `vi.mock` factories, so recorder values are exposed through
 // mutable objects that the factories can close over safely.
-const mockHookRecorder = { calls: [] };
-const mockPanelRecorder = { calls: [] };
-const mockInheritedReturn = { value: {} };
+const mockHookRecorder: {
+	calls: Array< {
+		blockName: string | null | undefined;
+		className?: string | null;
+		selectedState?: unknown;
+	} >;
+} = { calls: [] };
+const mockPanelRecorder: { calls: Array< [ string, PanelSpyProps ] > } = {
+	calls: [],
+};
+const mockInheritedReturn: { value: PanelStyle } = { value: {} };
 
 vi.mock(
 	import( '../../components/global-styles/inherited-value-context' ),
@@ -59,6 +74,7 @@ vi.mock( import( '../../components/global-styles/color-panel' ), () => ( {
 	},
 	useHasColorPanel: () => true,
 } ) );
+// @ts-expect-error The stub has only what the wrappers use.
 vi.mock( import( '../../components/global-styles/border-panel' ), () => ( {
 	__esModule: true,
 	default: ( props ) => {
@@ -98,12 +114,14 @@ vi.mock( import( '../contrast-checker' ), () => ( {
 // Stub the minimal `@wordpress/data` surface the wrappers call into
 // directly. The real store + persistence machinery is intentionally
 // elided. The prop plumbing is testable with the mocked selector surface.
+// @ts-expect-error The stub has only what the wrappers use.
 vi.mock( import( '@wordpress/data' ), () => ( {
 	__esModule: true,
 	useSelect: vi.fn(),
 	useDispatch: () => ( {} ),
 	useRegistry: () => ( {} ),
 	createSelector: ( fn ) => fn,
+	// @ts-expect-error The stub calls the selector without a registry.
 	createRegistrySelector: ( fn ) => fn(),
 	select: () => ( {} ),
 	dispatch: () => ( {} ),
@@ -113,12 +131,14 @@ vi.mock( import( '@wordpress/data' ), () => ( {
 	createReduxStore: () => ( {} ),
 	AsyncModeProvider: ( { children } ) => children,
 	RegistryProvider: ( { children } ) => children,
+	// @ts-expect-error The stub passes an empty registry.
 	RegistryConsumer: ( { children } ) => children( {} ),
 	useRegistryProvider: () => ( {} ),
 	withSelect: () => ( c ) => c,
 	withDispatch: () => ( c ) => c,
 } ) );
 
+// @ts-expect-error The stub has only what the wrappers use.
 vi.mock( import( '@wordpress/blocks' ), () => ( {
 	__esModule: true,
 	getBlockSupport: vi.fn( () => undefined ),
@@ -134,6 +154,7 @@ vi.mock( import( '@wordpress/blocks' ), () => ( {
 // not carry the private-API marker. Short-circuit to a passthrough so
 // these tests can exercise the wrapper wiring without threading
 // the full private-API handshake through every stub.
+// @ts-expect-error The stub has only what the wrappers use.
 vi.mock( import( '@wordpress/private-apis' ), () => ( {
 	__esModule: true,
 	__dangerousOptInToUnstableAPIsOnlyForCoreModules: () => ( {
@@ -150,11 +171,13 @@ vi.mock( import( '@wordpress/private-apis' ), () => ( {
 // is already mocked to a Proxy-driven stub and never actually touches
 // the store. Providing a stub avoids the private-APIs unlock that
 // the real `store/index.ts` performs at module load.
+// @ts-expect-error The stub has only what the wrappers use.
 vi.mock( import( '../../store' ), () => ( {
 	__esModule: true,
 	store: { name: 'core/block-editor' },
 } ) );
 
+// @ts-expect-error The stub has only what the wrappers use.
 vi.mock( import( '../../store/private-keys' ), () => ( {
 	__esModule: true,
 	globalStylesDataKey: Symbol( 'globalStylesDataKey' ),
@@ -168,6 +191,7 @@ vi.mock( import( '../../components' ), () => ( {} ) );
 
 // `InspectorControls` is a slot-fill component with registry dependencies.
 // Mock it to a passthrough div.
+// @ts-expect-error The stub has only what the wrappers use.
 vi.mock( import( '../../components/inspector-controls' ), () => ( {
 	__esModule: true,
 	default: ( { children } ) => (
@@ -176,14 +200,25 @@ vi.mock( import( '../../components/inspector-controls' ), () => ( {
 } ) );
 
 // Block editor selectors used by the wrappers for attribute reads.
-const mockUseSelectImpl = { fn: () => undefined };
+const mockUseSelectImpl: { fn: () => unknown } = { fn: () => undefined };
+
+// The mocked module replaces these with Vitest mocks.
+const mockedUseSelect = useSelect as unknown as Mock<
+	( mapSelect: ( select: unknown ) => unknown ) => unknown
+>;
+const mockedGetBlockSupport = getBlockSupport as unknown as Mock<
+	( nameOrType: unknown, key: unknown ) => unknown
+>;
+const mockedHasBlockSupport = hasBlockSupport as unknown as Mock<
+	() => boolean
+>;
 
 beforeEach( () => {
 	mockHookRecorder.calls = [];
 	mockPanelRecorder.calls = [];
 	mockInheritedReturn.value = {};
 	mockUseSelectImpl.fn = () => undefined;
-	useSelect.mockImplementation( ( mapSelect ) => {
+	mockedUseSelect.mockImplementation( ( mapSelect ) => {
 		// Feed mapSelect a synthetic `select()` that returns an object
 		// whose methods all yield what the current test configured.
 		return mapSelect(
@@ -423,13 +458,13 @@ describe( 'inspector hook wrappers thread inheritedValue into the panel', () => 
 	} );
 
 	test( 'BackgroundImagePanel replaces its pre-feature partial wiring with a full inherited payload', () => {
-		getBlockSupport.mockImplementation( ( _n, key ) => {
+		mockedGetBlockSupport.mockImplementation( ( _n, key ) => {
 			if ( key === 'background' ) {
 				return { backgroundImage: true };
 			}
 			return undefined;
 		} );
-		hasBlockSupport.mockReturnValue( true );
+		mockedHasBlockSupport.mockReturnValue( true );
 
 		mockUseSelectImpl.fn = () => ( {
 			style: undefined,

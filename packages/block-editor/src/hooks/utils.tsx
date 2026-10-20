@@ -63,7 +63,7 @@ export const cleanEmptyObject = < T, >(
 };
 
 export function transformStyles(
-	activeSupports: Record< string, boolean >,
+	activeSupports: Record< string, unknown >,
 	migrationPaths: Record< string, string[][] >,
 	result: Block,
 	source: Block[],
@@ -169,7 +169,7 @@ export function useStyleOverride( {
 	css,
 }: {
 	id?: string | null;
-	css: string;
+	css?: string;
 } ) {
 	return usePrivateStyleOverride( { id, css } );
 }

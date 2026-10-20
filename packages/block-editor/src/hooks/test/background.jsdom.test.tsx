@@ -203,19 +203,23 @@ describe( 'background', () => {
 		};
 
 		beforeAll( () => {
+			// A variable, since the supports type lacks the default controls.
+			const supports = {
+				background: {
+					gradient: true,
+					__experimentalDefaultControls: { gradient: true },
+				},
+				color: {
+					gradients: true,
+					__experimentalDefaultControls: { background: true },
+				},
+			};
 			registerBlockType( BLOCK_NAME, {
 				apiVersion: 3,
 				title: 'Test background gradient',
-				supports: {
-					background: {
-						gradient: true,
-						__experimentalDefaultControls: { gradient: true },
-					},
-					color: {
-						gradients: true,
-						__experimentalDefaultControls: { background: true },
-					},
-				},
+				category: 'text',
+				attributes: {},
+				supports,
 			} );
 		} );
 
