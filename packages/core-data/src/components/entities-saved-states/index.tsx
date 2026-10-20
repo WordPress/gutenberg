@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import type { ReactNode } from 'react';
 import { Button, Flex, FlexItem } from '@wordpress/components';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
@@ -36,7 +37,7 @@ export default function EntitiesSavedStates( {
 	close,
 	renderDialog,
 	variant,
-}: EntitiesSavedStatesProps ) {
+}: EntitiesSavedStatesProps ): ReactNode {
 	const isDirtyProps = useIsDirty();
 	return (
 		<EntitiesSavedStatesExtensible
@@ -80,7 +81,7 @@ export function EntitiesSavedStatesExtensible( {
 	unselectedEntities,
 	variant = 'default',
 	successNoticeContent,
-}: EntitiesSavedStatesExtensibleProps ) {
+}: EntitiesSavedStatesExtensibleProps ): ReactNode {
 	const saveButtonRef = useRef< HTMLButtonElement | undefined >( undefined );
 	const { saveDirtyEntities } = unlock(
 		// The store is selected by name, which carries no store types.
