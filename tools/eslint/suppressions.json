@@ -14440,11 +14440,6 @@
 			"count": 1
 		}
 	},
-	"packages/style-engine/src/styles/test/utils.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/viewport/src/store/test/reducer.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
