@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 0.25.0 (2026-10-20)
-
 ### Breaking Changes
 
 -   `SearchableSelect` and `SearchableSelectControl`: Remove `triggerContent`. Pass custom content as children of a `.Trigger` element through the `trigger` prop instead ([#84934](https://github.com/WordPress/gutenberg/pull/84934)).
