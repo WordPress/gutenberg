@@ -798,6 +798,7 @@
       - className
       - defaultValue
       - disabled
+      - monospace
       - onValueChange
       - prefix
       - render
@@ -815,6 +816,7 @@
       - disabled
       - hideLabelFromVision
       - label
+      - monospace
       - onValueChange
       - prefix
       - render

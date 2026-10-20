@@ -4,7 +4,7 @@
 
 ### Enhancements
 
--   `InputControl`: Add a `monospace` prop to render the value in the monospace font family.
+-   `Input` and `InputControl`: Add a `monospace` prop to render the value in the monospace font family ([#85207](https://github.com/WordPress/gutenberg/pull/85207)).
 -   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
 
 ## 0.25.0 (2026-10-20)
