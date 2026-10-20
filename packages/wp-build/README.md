@@ -613,9 +613,10 @@ Widgets use a dual-entry pattern, similar in spirit to how blocks split metadata
 | Translatable metadata (`title`, `description`, `help`, `keywords`) | `widget.json`     | translated server-side via `textdomain`, so the host receives localized strings without a JS runtime                             |
 | Framing (`category`, `presentation`)                               | `widget.json`     | plain JSON the host reads without a JS runtime                                                                                   |
 | Attribute schema (types, options, labels, `relevance`)             | `widget.json`     | plain JSON; labels translated server-side via `textdomain`; a `widget.ts` entry with the same `id` adds what JSON cannot express |
-| `example`, attribute props that need code                          | `widget.ts`       | runtime values                                                                                                                   |
+| `example` attributes                                               | `widget.json`     | plain JSON; a `widget.ts` `example` wins when its values need code                                                               |
+| Attribute props that need code                                     | `widget.ts`       | runtime values                                                                                                                   |
 
-Rule of thumb: anything the host needs before loading a widget's module — identity, translatable copy, framing, attribute schema — goes in `widget.json`, which the build forwards to `build/widgets/registry.php` and exposes through the REST API. Anything that needs code (`example`, an attribute's `Edit` component or custom validator) goes in `widget.ts`.
+Rule of thumb: anything the host needs before loading a widget's module — identity, translatable copy, framing, attribute schema, example attributes — goes in `widget.json`, which the build forwards to `build/widgets/registry.php` and exposes through the REST API. Anything that needs code (an attribute's `Edit` component or custom validator, an `example` with runtime values) goes in `widget.ts`.
 
 ### `widget.json` — static discovery metadata
 
@@ -626,6 +627,9 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 	"description": "A simple example widget.",
 	"help": {
 		"content": "A short note for compact surfaces such as tooltips."
+	},
+	"example": {
+		"attributes": { "greeting": "World", "showDate": true }
 	},
 	"category": "demo",
 	"textdomain": "my-plugin"
@@ -640,13 +644,14 @@ Rule of thumb: anything the host needs before loading a widget's module — iden
 - **`help`** (optional): Contextual help note for compact surfaces. An object with `content` (may carry `<em>`/`<strong>`) and optional `links` (`label`, `href`). Translated server-side using `textdomain`.
 - **`keywords`** (optional): Search aliases. Translated server-side using `textdomain`.
 - **`attributes`** (optional): Attribute schema, one entry per attribute with the JSON-expressible subset of a DataViews `Field` (`id`, `type`, `label`, `elements`, `isValid` without `custom`, ...) plus an optional `relevance` (`high`, `medium`, `low`). `type` may name a registered field type. `label`, `header`, `description`, `placeholder`, and option labels and descriptions are translated server-side using `textdomain`.
+- **`example`** (optional): Structured example, `{ "attributes": { … } }`: the attributes hosts preview the widget with, and apply to a new instance created without any. JSON values only; an `example` in `widget.ts` wins over it.
 - **`category`** (optional): Grouping category for filtering
 - **`presentation`** (optional): Rendering intent (`framed`, `content-bleed`, `full-bleed`)
 - **`textdomain`** (optional): Gettext text domain for translating `title`, `description`, `help`, `keywords`, and attribute labels
 
 ### `widget.ts` — runtime values
 
-Optional. Exports a default object with what needs code: `example` data, and attribute entries that add an `Edit` component or a custom validator to a `widget.json` attribute with the same `id`. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
+Optional. Exports a default object with what needs code: attribute entries that add an `Edit` component or a custom validator to a `widget.json` attribute with the same `id`, and an `example` whose values only exist at runtime, which wins over the `widget.json` one. The build system injects the `render_module` handle at registration time, so authors don't need to declare it.
 
 ```ts
 import type { WidgetAttributeField } from '@wordpress/widget-primitives';
@@ -662,18 +667,12 @@ const widget = {
 	attributes: [ { id: 'greeting', Edit: GreetingControl } ] satisfies Partial<
 		WidgetAttributeField< HelloWorldAttributes >
 	>[],
-	example: {
-		attributes: {
-			greeting: 'World',
-			showDate: true,
-		},
-	},
 };
 
 export default widget;
 ```
 
-Entries merge by `id` with the `widget.json` schema: the JSON value wins a shared key, the module adds the rest, and `isValid` merges rule by rule so JSON rules and a module `custom` validator coexist. A widget whose attributes are plain data needs no `widget.ts`.
+Entries merge by `id` with the `widget.json` schema: the JSON value wins a shared key, the module adds the rest, and `isValid` merges rule by rule so JSON rules and a module `custom` validator coexist. A widget whose attributes and example are plain data needs no `widget.ts`.
 
 ### `render.tsx` — UI component
 
