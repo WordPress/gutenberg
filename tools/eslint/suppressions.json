@@ -14290,21 +14290,6 @@
 			"count": 1
 		}
 	},
-	"packages/redux-routine/src/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/redux-routine/src/test/is-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/redux-routine/src/test/is-generator.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/rich-text/src/hook/index.ts": {
 		"react-hooks/refs": {
 			"count": 8
