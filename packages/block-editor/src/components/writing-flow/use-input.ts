@@ -335,7 +335,13 @@ export default function useInput() {
 
 		function onCompositionStart( event: CompositionEvent ) {
 			if ( isReadOnly() ) {
+				// Composition cannot be cancelled, so an IME would still
+				// write into the wrapper. Stop it hosting editing instead.
+				setContentEditableWrapper( node, false );
 				event.preventDefault();
+				node.ownerDocument
+					.defaultView!.getSelection()!
+					.removeAllRanges();
 				return;
 			}
 
