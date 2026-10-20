@@ -11,6 +11,7 @@ import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 import isTemplateRevertable from './utils/is-template-revertable';
 import { buildRevisionsPageQuery } from './private-selectors';
 import {
+	BROWSER_BACKUP_NOTICE_ID,
 	EDITOR_INTENTS,
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
@@ -23,7 +24,6 @@ import {
 } from '../utils/device-type';
 import { withoutSuggestPostEditGuard } from './suggest-post-edit-guard';
 import { unlock } from '../lock-unlock';
-import { BROWSER_BACKUP_NOTICE_ID } from './constants';
 export * from '../dataviews/store/private-actions';
 
 /**

@@ -30,11 +30,11 @@ import {
 	EDITOR_INTENT_EDIT,
 	EDITOR_INTENT_SUGGEST,
 	EDITOR_INTENT_VIEW,
+	STORE_NAME,
 	SUGGEST_PROPOSABLE_POST_FIELDS,
 } from './constants';
 import { hasPendingSuggestionMarkers } from './utils/pending-suggestion-markers';
 import { unlock } from '../lock-unlock';
-import { STORE_NAME } from './constants';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
