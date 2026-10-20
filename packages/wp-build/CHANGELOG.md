@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Emit the `footprint` field of `widget.json` into the generated widget registry, so hosts can translate it into a minimum tile size ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ## 0.26.0 (2026-10-20)
 
 ### Breaking Changes

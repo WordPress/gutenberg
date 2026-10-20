@@ -63,6 +63,7 @@ export function getAllWidgets( rootDir ) {
  * @property {WidgetAttributeMetadata[]}                 [attributes]   Attribute schema, the JSON-expressible subset of a DataViews `Field`.
  * @property {string}                                    [category]     Grouping category.
  * @property {'framed' | 'content-bleed' | 'full-bleed'} [presentation] Authoring intent about how the widget wants to render.
+ * @property {'glance' | 'strip' | 'card' | 'panel'}     [footprint]    The smallest form the widget's content can take; hosts translate it into a minimum tile size.
  * @property {string[]}                                  [keywords]     Search aliases used to match the widget.
  * @property {string}                                    [textdomain]   Gettext text domain for translations.
  */
