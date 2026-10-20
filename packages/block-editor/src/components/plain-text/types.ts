@@ -8,7 +8,8 @@ export type PlainTextTextareaProps = Omit<
 	TextareaHTMLAttributes< HTMLTextAreaElement >,
 	'onChange'
 > & {
-	__experimentalVersion?: number;
+	/** Version `2` takes the editable text props instead. */
+	__experimentalVersion?: 1;
 	onChange: ( value: string ) => void;
 };
 
