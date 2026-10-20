@@ -64,9 +64,7 @@ on:
 permissions: {}
 
 jobs:
-    # Lists the allowlisted packages with relevant changes. The workflow's
-    # `paths:` filter triggers on the union of all of them, so most runs touch
-    # none or only a few.
+    # Lists the allowlisted packages with relevant changes.
     changed-packages:
         name: Find packages that need a CHANGELOG entry
         runs-on: 'ubuntu-slim'
