@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `DashboardGrid` and `DashboardLanes` accept `columns` as a `ColumnSteps` map from container width to count, so a surface can step its count by container width, composed with `minColumnWidth` as before; an `'auto'` step lifts the cap from its width up and leaves the count to the floor ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+-   `DashboardGrid` and `DashboardLanes` accept `columns` as a `ColumnSteps` map from container width to count, so a surface can step its count by container width, composed with `minColumnWidth` as before; an `'auto'` step lifts the cap from its width up and leaves the count to the floor ([#85216](https://github.com/WordPress/gutenberg/pull/85216)).
 
 ### Internal
 
