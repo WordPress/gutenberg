@@ -2,6 +2,7 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { compose } from '@wordpress/compose';
 import { combineReducers } from '@wordpress/data';
 import { createUndoManager } from '@wordpress/undo-manager';
+import type { UndoManager } from '@wordpress/undo-manager';
 import type {
 	ConnectionStatus,
 	ConnectionStatusDisconnected,
@@ -309,7 +310,8 @@ function entity( entityConfig: EntityConfig ) {
 
 					case 'EDIT_ENTITY_RECORD':
 						const nextEdits = {
-							...state[ action.recordId ],
+							// A keyless entity keeps its edits under the `undefined` key.
+							...state[ action.recordId as ItemId ],
 							...action.edits,
 						};
 						Object.keys( nextEdits ).forEach( ( key ) => {
@@ -321,7 +323,8 @@ function entity( entityConfig: EntityConfig ) {
 						} );
 						return {
 							...state,
-							[ action.recordId ]: nextEdits,
+							// A keyless entity keeps its edits under the `undefined` key.
+							[ action.recordId as ItemId ]: nextEdits,
 						};
 				}
 
@@ -337,7 +340,8 @@ function entity( entityConfig: EntityConfig ) {
 					case 'SAVE_ENTITY_RECORD_FINISH':
 						return {
 							...state,
-							[ action.recordId ]: {
+							// A new record saves under the `undefined` key.
+							[ action.recordId as ItemId ]: {
 								pending:
 									action.type === 'SAVE_ENTITY_RECORD_START',
 								error: action.error,
@@ -520,7 +524,9 @@ export const entities = (
 	};
 };
 
-export function undoManager( state = createUndoManager() ) {
+export function undoManager(
+	state: UndoManager = createUndoManager()
+): UndoManager {
 	return state;
 }
 

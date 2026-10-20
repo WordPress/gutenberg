@@ -266,6 +266,7 @@ export interface EntityTitleRecord {
 	name?: string;
 	slug?: string;
 	title?: string | { rendered?: string };
+	[ key: string ]: unknown;
 }
 
 /**
@@ -277,7 +278,7 @@ export interface EntityConfig {
 	label?: string;
 	key?: string | false;
 	baseURL: string;
-	baseURLParams?: Record< string, string >;
+	baseURLParams?: Record< string, unknown >;
 	plural?: string;
 	rawAttributes?: ReadonlyArray< string >;
 	transientEdits?: Record< string, boolean | TransientEditConfig >;
@@ -344,7 +345,7 @@ export type Action =
 	  } )
 	| ( EntityActionTarget & {
 			type: 'EDIT_ENTITY_RECORD';
-			recordId: ItemId;
+			recordId: ItemId | undefined;
 			edits: Record< string, unknown >;
 	  } )
 	| { type: 'RECEIVE_AUTOSAVES'; postId: ItemId; autosaves: Array< unknown > }
@@ -408,7 +409,7 @@ export type Action =
 	| {
 			type: 'RECEIVE_USER_QUERY';
 			queryID: string;
-			users: Array< ET.User< 'edit' > >;
+			users: Array< ET.User< 'view' > >;
 	  }
 	| {
 			type: 'RECEIVE_VIEW_CONFIG';
@@ -421,7 +422,7 @@ export type Action =
 	| RemoveItemsAction
 	| ( EntityActionTarget & {
 			type: 'SAVE_ENTITY_RECORD_FINISH' | 'SAVE_ENTITY_RECORD_START';
-			recordId: ItemId;
+			recordId: ItemId | undefined;
 			error?: unknown;
 			isAutosave?: boolean;
 	  } )
