@@ -299,4 +299,90 @@ class Tests_REST_View_Config_Controller_7_2 extends WP_Test_REST_TestCase {
 		$this->assertArrayNotHasKey( 'count', $view_list['all'] );
 		$this->assertSame( 2, $view_list['drafts']['count'], 'Views with filters of their own keep their count in every layout.' );
 	}
+
+	/**
+	 * A search in the config does not narrow the views: the client drops it and
+	 * takes the search from the URL instead.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_counts_views_despite_a_search_in_the_config() {
+		$search_default_view = static function ( $data ) {
+			return $data->merge(
+				array(
+					'default_view' => array( 'search' => 'hello' ),
+				),
+				1
+			);
+		};
+		add_filter( 'get_entity_view_config_posttype_page', $search_default_view );
+		$view_list = $this->get_page_view_list();
+		remove_filter( 'get_entity_view_config_posttype_page', $search_default_view );
+
+		$this->assertSame( 4, $view_list['all']['count'] );
+		$this->assertSame( 2, $view_list['drafts']['count'] );
+	}
+
+	/**
+	 * A status listed twice in a view's filter is counted once, as the query
+	 * lists it once.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_counts_a_repeated_status_once() {
+		$add_repeated = static function ( $data ) {
+			return $data->merge(
+				array(
+					'view_list' => array(
+						array(
+							'slug'  => 'repeated',
+							'title' => 'Repeated',
+							'view'  => array(
+								'filters' => array(
+									array(
+										'field'    => 'status',
+										'operator' => 'isAny',
+										'value'    => array( 'draft', 'draft', 'pending' ),
+									),
+								),
+							),
+						),
+					),
+				),
+				1
+			);
+		};
+		add_filter( 'get_entity_view_config_posttype_page', $add_repeated );
+		$view_list = $this->get_page_view_list();
+		remove_filter( 'get_entity_view_config_posttype_page', $add_repeated );
+
+		$this->assertSame( 3, $view_list['repeated']['count'] );
+	}
+
+	/**
+	 * The counts are not computed when the request leaves out the view list.
+	 *
+	 * @covers ::get_items
+	 */
+	public function test_get_items_skips_counts_when_view_list_is_not_requested() {
+		wp_set_current_user( self::$editor_id );
+
+		$count_calls = 0;
+		$count_posts = static function ( $counts ) use ( &$count_calls ) {
+			++$count_calls;
+			return $counts;
+		};
+		add_filter( 'wp_count_posts', $count_posts );
+
+		$request = new WP_REST_Request( 'GET', self::ROUTE );
+		$request->set_param( 'kind', 'postType' );
+		$request->set_param( 'name', 'page' );
+		$request->set_param( '_fields', 'form' );
+		$response = rest_get_server()->dispatch( $request );
+
+		remove_filter( 'wp_count_posts', $count_posts );
+
+		$this->assertSame( 200, $response->get_status() );
+		$this->assertSame( 0, $count_calls );
+	}
 }
