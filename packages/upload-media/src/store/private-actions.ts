@@ -941,7 +941,7 @@ export function prepareItem( id: QueueItemId ) {
 									canvas,
 									heicFile,
 									quality
-							  )
+								)
 				: undefined;
 			try {
 				heicJpeg = await canvasConvertToJpeg(

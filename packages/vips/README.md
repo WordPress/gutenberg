@@ -67,15 +67,15 @@ This backs the HEIC upload path: wasm-vips ships no HEVC decoder, so the browser
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _pixels_ `ArrayBuffer`: Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
--   _width_ `number`: Image width in pixels.
--   _height_ `number`: Image height in pixels.
--   _options_ `EncodePixelsOptions`: Encoding options.
+- _id_ `ItemId`: Item ID.
+- _pixels_ `ArrayBuffer`: Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
+- _width_ `number`: Image width in pixels.
+- _height_ `number`: Image height in pixels.
+- _options_ `EncodePixelsOptions`: Encoding options.
 
 _Returns_
 
--   `Promise< ArrayBuffer | ArrayBufferLike >`: JPEG file data.
+- `Promise< ArrayBuffer | ArrayBufferLike >`: JPEG file data.
 
 ### getUltraHdrInfo
 
@@ -193,15 +193,15 @@ This backs the HEIC upload path: wasm-vips ships no HEVC decoder, so the browser
 
 _Parameters_
 
--   _id_ `ItemId`: Item ID.
--   _pixels_ `ArrayBuffer`: Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
--   _width_ `number`: Image width in pixels.
--   _height_ `number`: Image height in pixels.
--   _options_ `EncodePixelsOptions`: Encoding options.
+- _id_ `ItemId`: Item ID.
+- _pixels_ `ArrayBuffer`: Tightly packed 8-bit RGBA pixel data, as returned by `ImageData.data`.
+- _width_ `number`: Image width in pixels.
+- _height_ `number`: Image height in pixels.
+- _options_ `EncodePixelsOptions`: Encoding options.
 
 _Returns_
 
--   `Promise< ArrayBuffer | ArrayBufferLike >`: JPEG file data.
+- `Promise< ArrayBuffer | ArrayBufferLike >`: JPEG file data.
 
 ### vipsGetUltraHdrInfo
 
