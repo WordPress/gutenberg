@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 -   `PostTemplatePanel`, `PageTemplate`: Show the default template of classic themes as selected instead of the `Select` placeholder ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
+-   Notes sidebar: Expose the note threads as a list instead of a tree. The tree roles put screen readers into focus mode, which handed the arrow keys to the sidebar's own thread navigation, so a note's text could not be read with the usual reading keys. The selected thread is marked with `aria-current`, which a list item supports, rather than `aria-expanded`, which it does not. Threads no longer carry an `aria-label`, which screen readers handle inconsistently on a list item, and note avatars are now decorative, since the author's name follows them ([#82368](https://github.com/WordPress/gutenberg/pull/82368)).
 
 ## 16.0.0 (2026-10-20)
 
@@ -73,7 +74,6 @@
 -   `PostURL`: Leaving the slug field without typing no longer saves the displayed fallback as the slug, so a new post no longer publishes with the `auto-draft` slug ([#83518](https://github.com/WordPress/gutenberg/pull/83518)).
 -   Notes: Keep the clicked thread selected on a block with several notes, instead of switching to the block's primary note ([#83528](https://github.com/WordPress/gutenberg/pull/83528)).
 -   Notes: Keep floating threads aligned with their blocks when an editor notice or the device preview moves the canvas ([#83485](https://github.com/WordPress/gutenberg/pull/83485)).
--   Notes sidebar: Expose the note threads as a list instead of a tree. The tree roles put screen readers into focus mode, which handed the arrow keys to the sidebar's own thread navigation, so a note's text could not be read with the usual reading keys. The selected thread is marked with `aria-current`, which a list item supports, rather than `aria-expanded`, which it does not. Threads no longer carry an `aria-label`, which screen readers handle inconsistently on a list item, and note avatars are now decorative, since the author's name follows them ([#82368](https://github.com/WordPress/gutenberg/pull/82368)).
 -   Notes: Add an Undo action to the "Note deleted." snackbar, and stop the editor's undo from bringing back the highlight of a deleted note ([#83988](https://github.com/WordPress/gutenberg/pull/83988)).
 -   Notes: Stop the editor's undo from detaching a newly added note from its block, or bringing back the highlight of a resolved note ([#84079](https://github.com/WordPress/gutenberg/pull/84079)).
 -   Notes: Delete notes permanently when they can't be moved to the trash, instead of failing with an error ([#84102](https://github.com/WordPress/gutenberg/pull/84102)).
