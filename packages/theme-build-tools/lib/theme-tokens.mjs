@@ -1,8 +1,7 @@
 /**
  * Token data from the installed `@wordpress/theme`.
  *
- * `@wordpress/theme` is an optional peer dependency: the plugins use the token
- * data of the version installed in the project, and do nothing without it.
+ * The plugins do nothing when `@wordpress/theme` cannot be loaded.
  * Versions of `@wordpress/theme` without the `tokens` export only provide the
  * token names, so the fallback plugins do nothing with them either.
  */
