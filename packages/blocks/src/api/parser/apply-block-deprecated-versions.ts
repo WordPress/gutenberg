@@ -80,19 +80,16 @@ export function applyBlockDeprecatedVersions(
 			),
 		};
 
-		// Deprecations require a perfect match. Unlike parsing where automated
-		// reconstruction is acceptable, deprecations are explicit author instructions
-		// that should only apply when the old `save()` output matches the stored
-		// content exactly.
+		// Deprecations require a perfect match. Unlike parsing, where automated
+		// reconstruction is acceptable, deprecations are explicit author
+		// instructions that should only apply when the old `save` output
+		// matches the stored content exactly.
 		let [ , , metadata ] = validateBlock(
 			migratedBlock,
-			deprecatedBlockType,
-			{
-				log: false,
-			}
+			deprecatedBlockType
 		);
 		let isValidDeprecation =
-			metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
+			metadata.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
 
 		// If the migrated block is not valid initially, try the built-in fixes.
 		if ( ! isValidDeprecation ) {
@@ -102,13 +99,10 @@ export function applyBlockDeprecatedVersions(
 			);
 			[ , , metadata ] = validateBlock(
 				migratedBlock,
-				deprecatedBlockType,
-				{
-					log: false,
-				}
+				deprecatedBlockType
 			);
 			isValidDeprecation =
-				metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
+				metadata.validationLevel === VALIDATION_LEVEL.VALID_BLOCK;
 		}
 
 		// An invalid block does not imply incorrect HTML but the fact block
@@ -145,7 +139,7 @@ export function applyBlockDeprecatedVersions(
 			innerBlocks: migratedInnerBlocks,
 			isValid: true,
 			validationIssues: [],
-			__wasMigrated: true, // Flag to indicate Level 1 (MIGRATED_BLOCK)
+			validationLevel: VALIDATION_LEVEL.MIGRATED_BLOCK,
 		};
 	}
 

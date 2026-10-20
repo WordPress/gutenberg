@@ -27,8 +27,9 @@ test.describe( 'Invalid blocks', () => {
 		// Takes the focus away from the block.
 		await editor.saveDraft();
 
-		// The block should be regenerated (Level 3) and show a validation indicator.
-		// The malformed HTML is fixed by regenerating from attributes.
+		// The malformed HTML can be regenerated from the block's attributes
+		// without losing content, so instead of the invalid block warning the
+		// block is kept and its markup fixed on save.
 		await expect(
 			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
 		).toBeVisible();
@@ -36,6 +37,30 @@ test.describe( 'Invalid blocks', () => {
 		// Check that the block was regenerated properly.
 		const content = await editor.getEditedPostContent();
 		expect( content ).toContain( '<p>invalid paragraph</p>' );
+	} );
+
+	test( 'should show an invalid block message when regenerating would lose content', async ( {
+		editor,
+	} ) => {
+		// The heading block sources its content from heading tags, so the
+		// text in the paragraph cannot be regenerated from attributes.
+		await editor.setContent( `
+			<!-- wp:heading -->
+			<p class="wp-block-heading">Some content</p>
+			<!-- /wp:heading -->
+		` );
+
+		await expect(
+			editor.canvas
+				.getByRole( 'document', { name: 'Block: Heading' } )
+				.getByRole( 'button', { name: 'Attempt recovery' } )
+		).toBeVisible();
+
+		// The original markup is preserved untouched.
+		const content = await editor.getEditedPostContent();
+		expect( content ).toContain(
+			'<p class="wp-block-heading">Some content</p>'
+		);
 	} );
 
 	test( 'should strip potentially malicious on* attributes', async ( {

@@ -268,8 +268,9 @@ describe( 'block parser', () => {
 				expect( block.isValid ).toBe( true );
 				expect( console ).toHaveInformed();
 				expect( console ).toHaveLoggedWith(
-					'Updated Block: %s',
-					'core/test-block'
+					'Updated Block: %s (%s)',
+					'core/test-block',
+					'MigratedBlock'
 				);
 			} );
 			it( 'handle deprecation but not log', () => {

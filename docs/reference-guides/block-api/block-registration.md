@@ -311,6 +311,20 @@ Setting the `allowedBlocks` property will limit which block types can be nested 
 allowedBlocks: [ 'core/columns' ],
 ```
 
+#### allowsReconstruction (optional)
+
+-   **Type:** `Boolean`
+-   **Default:** `true`
+
+When the saved markup of a block does not match the output of its `save` function and no deprecation matches, the editor attempts to regenerate the block from its parsed attributes rather than flagging it as invalid, as long as doing so does not lose content: either only tag attributes differ (for example class names generated from attributes are missing), or the markup differs structurally but every word of visible text is preserved. The outcome is recorded on the parsed block as `validationLevel`.
+
+Set `allowsReconstruction` to `false` to opt out of this behavior. The block will then only be considered valid when its saved markup matches the `save` output exactly or matches one of its deprecations; any other mismatch shows the invalid block warning so that the user can resolve it.
+
+```js
+// Only accept markup that matches `save` or a deprecation exactly.
+allowsReconstruction: false,
+```
+
 #### blockHooks (optional)
 
 -   **Type:** `Object`

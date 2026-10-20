@@ -3,14 +3,19 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import deprecated from '@wordpress/deprecated';
 import { decodeEntities } from '@wordpress/html-entities';
 import { createLogger, createQueuedLogger } from './logger';
-import type { Logger, LoggerItem, ValidationMetadata } from './types';
+import type { Logger, LoggerItem } from './types';
 import { getSaveContent } from '../serializer';
 import {
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
 } from '../registration';
 import { normalizeBlockType } from '../utils';
-import type { Block, BlockType } from '../../types';
+import type {
+	Block,
+	BlockType,
+	ValidationLevel,
+	ValidationMetadata,
+} from '../../types';
 
 interface HTMLToken {
 	type: string;
@@ -21,54 +26,56 @@ interface HTMLToken {
 }
 
 /**
- * Validation level constants ordered by decreasing certainty over content integrity.
- * Lower numbers indicate higher confidence in content preservation.
+ * Validation level constants ordered by decreasing certainty over content
+ * integrity. Lower numbers indicate higher confidence in content preservation.
  */
 export const VALIDATION_LEVEL = {
 	/**
-	 * Idempotent operation where save(attributes) produces exactly the original content.
-	 * Perfect match - no changes needed.
+	 * The `save` output for the parsed attributes is equivalent to the stored
+	 * content. Nothing needs to change. Freeform content and unregistered
+	 * blocks are also classified here, as their raw content is kept as-is.
 	 */
 	VALID_BLOCK: 0,
 
 	/**
-	 * Source matched against defined deprecations sequentially.
-	 * The block was successfully migrated from an older version.
+	 * The stored content matched one of the block type's deprecations and the
+	 * block was migrated to the current version. Assigned by the parser.
 	 */
 	MIGRATED_BLOCK: 1,
 
 	/**
-	 * Conservative reconstruction with only attribute-level differences.
-	 * Content structure is intact but attributes differ (e.g., missing generated classes).
-	 * This level is always allowed and considered safe.
+	 * The stored content has the same elements and text as the `save` output,
+	 * but tag attributes differ (e.g. class names generated from attributes
+	 * are missing). Regenerating the block from its attributes only rewrites
+	 * attributes, never structure or text.
 	 */
 	RECONSTRUCTED_BLOCK: 2,
 
 	/**
-	 * Content regenerated from attributes.
-	 * Content may have structural differences (wrong tags, different text, etc.)
-	 * but can be regenerated from attributes. Requires allowsReconstruction !== false.
-	 * Includes freeform/unregistered blocks as they trust content as-is.
+	 * The stored content differs structurally from the `save` output (e.g.
+	 * wrong tags or malformed markup), but regenerating the block from its
+	 * attributes preserves all of its visible text.
 	 */
 	REGENERATED_BLOCK: 3,
 
 	/**
-	 * Cannot be safely restored; requires user intervention.
-	 * All other validation levels failed.
+	 * The block cannot be safely regenerated from its attributes: text would
+	 * be lost, the block type opted out of reconstruction, or `save` failed.
+	 * Requires user intervention.
 	 */
 	INVALID_BLOCK: 4,
-} as const;
+} as const satisfies Record< string, ValidationLevel >;
 
 /**
  * Human-readable names for validation levels.
  */
-export const VALIDATION_LEVEL_NAME = {
+export const VALIDATION_LEVEL_NAME: Record< ValidationLevel, string > = {
 	[ VALIDATION_LEVEL.VALID_BLOCK ]: 'ValidBlock',
 	[ VALIDATION_LEVEL.MIGRATED_BLOCK ]: 'MigratedBlock',
 	[ VALIDATION_LEVEL.RECONSTRUCTED_BLOCK ]: 'ReconstructedBlock',
 	[ VALIDATION_LEVEL.REGENERATED_BLOCK ]: 'RegeneratedBlock',
 	[ VALIDATION_LEVEL.INVALID_BLOCK ]: 'InvalidBlock',
-} as const;
+};
 
 const identity = ( x: string ): string => x;
 
@@ -664,25 +671,54 @@ export function isClosedByToken(
 }
 
 /**
- * Returns true if the given HTML strings are effectively equivalent, or
- * false otherwise.
+ * Token-type-specific equality handlers which only consider the structure of
+ * the markup: tag names and text content, but not tag attributes.
  *
- * @param actual   Actual HTML string.
- * @param expected Expected HTML string.
- * @param logger   Validation logger object.
- *
- * @return Whether HTML strings are equivalent.
+ * @see isEqualTokensOfType
  */
-export function isEquivalentHTML(
+const isEqualTokenStructureOfType: Record<
+	string,
+	( actual: HTMLToken, expected: HTMLToken, logger?: Logger ) => boolean
+> = {
+	StartTag: (
+		actual: HTMLToken,
+		expected: HTMLToken,
+		logger: Logger = createLogger()
+	): boolean => {
+		if (
+			actual.tagName!.toLowerCase() !== expected.tagName!.toLowerCase()
+		) {
+			logger.warning(
+				'Expected tag name `%s`, instead saw `%s`.',
+				expected.tagName,
+				actual.tagName
+			);
+			return false;
+		}
+
+		return true;
+	},
+	Chars: isEquivalentTextTokens,
+	Comment: isEquivalentTextTokens,
+};
+
+/**
+ * Tokenizes two HTML strings and compares them token by token, deferring to
+ * the given token-type-specific equality handlers.
+ *
+ * @param actual              Actual HTML string.
+ * @param expected            Expected HTML string.
+ * @param logger              Validation logger object.
+ * @param isEqualTokensByType Token-type-specific equality handlers.
+ *
+ * @return Whether all tokens are equivalent.
+ */
+function areEquivalentHTMLTokens(
 	actual: string,
 	expected: string,
-	logger: Logger = createLogger()
+	logger: Logger,
+	isEqualTokensByType: typeof isEqualTokensOfType
 ): boolean {
-	// Short-circuit if markup is identical.
-	if ( actual === expected ) {
-		return true;
-	}
-
 	// Tokenize input content and reserialized save content.
 	const [ actualTokens, expectedTokens ] = [ actual, expected ].map(
 		( html ) => getHTMLTokens( html, logger )
@@ -720,7 +756,7 @@ export function isEquivalentHTML(
 
 		// Defer custom token type equality handling, otherwise continue and
 		// assume as equal.
-		const isEqualTokens = isEqualTokensOfType[ actualToken.type ];
+		const isEqualTokens = isEqualTokensByType[ actualToken.type ];
 		if (
 			isEqualTokens &&
 			! isEqualTokens( actualToken, expectedToken, logger )
@@ -755,124 +791,173 @@ export function isEquivalentHTML(
 }
 
 /**
- * Returns true if validation issues are only related to attributes
- * (not structural problems like wrong tags, text differences, or missing elements).
- * This is used to distinguish Level 2 (ReconstructedBlock) from Level 3 (RegeneratedBlock).
+ * Returns true if the given HTML strings are effectively equivalent, or
+ * false otherwise.
  *
- * @param validationIssues Array of validation issues from logger.
+ * @param actual   Actual HTML string.
+ * @param expected Expected HTML string.
+ * @param logger   Validation logger object.
  *
- * @return Whether issues are only attribute-related.
+ * @return Whether HTML strings are equivalent.
  */
-export function areOnlyAttributeDifferences(
-	validationIssues: LoggerItem[]
+export function isEquivalentHTML(
+	actual: string,
+	expected: string,
+	logger: Logger = createLogger()
 ): boolean {
-	if ( ! validationIssues || validationIssues.length === 0 ) {
-		// No issues means the HTML matches exactly.
-		// This shouldn't happen since Level 0 would have caught it.
-		return false;
+	// Short-circuit if markup is identical.
+	if ( actual === expected ) {
+		return true;
 	}
 
-	// Level 2 only accepts attribute-related issues.
-	// Text differences and structural differences are rejected.
-	// This prevents false positives where wrong content passes as reconstructable.
-	return validationIssues.every( ( issue ) => {
-		const message = ( issue.args?.[ 0 ] as string ) || '';
+	return areEquivalentHTMLTokens(
+		actual,
+		expected,
+		logger,
+		isEqualTokensOfType
+	);
+}
 
-		// Reject text content differences - these are structural, not attribute-only.
-		if ( message.includes( 'Expected text' ) ) {
+/**
+ * Returns true if the given HTML strings have an equivalent structure: the
+ * same sequence of elements with the same text content, ignoring differences
+ * in tag attributes (e.g. missing or additional class names).
+ *
+ * Unlike `isEquivalentHTML`, which stops at the first mismatch of any kind, a
+ * positive result here guarantees that no element or text differs, so that
+ * regenerating `actual` as `expected` only rewrites attributes.
+ *
+ * @param actual   Actual HTML string.
+ * @param expected Expected HTML string.
+ * @param logger   Validation logger object.
+ *
+ * @return Whether HTML strings are structurally equivalent.
+ */
+export function isEquivalentHTMLStructure(
+	actual: string,
+	expected: string,
+	logger: Logger = createLogger()
+): boolean {
+	// Short-circuit if markup is identical.
+	if ( actual === expected ) {
+		return true;
+	}
+
+	return areEquivalentHTMLTokens(
+		actual,
+		expected,
+		logger,
+		isEqualTokenStructureOfType
+	);
+}
+
+/**
+ * Matches HTML comments and tags. Used to approximate the text content of
+ * markup which cannot be tokenized.
+ */
+const REGEXP_HTML_TAG_OR_COMMENT = /<!--[\s\S]*?-->|<[^>]*>/g;
+
+/**
+ * Returns the words of visible text content in the given HTML, in document
+ * order. Text within tag attributes and comments is not considered.
+ *
+ * Falls back to stripping tags when the markup cannot be tokenized, so that
+ * malformed content can still be assessed.
+ *
+ * @param html   HTML string.
+ * @param logger Validation logger object.
+ *
+ * @return Words of text content.
+ */
+export function getTextContentWords(
+	html: string,
+	logger: Logger = createQueuedLogger()
+): string[] {
+	const tokens = getHTMLTokens( html, logger );
+	const text = tokens
+		? tokens
+				.filter( ( token ) => token.type === 'Chars' )
+				.map( ( token ) => token.chars! )
+				.join( ' ' )
+		: decodeEntities( html.replace( REGEXP_HTML_TAG_OR_COMMENT, ' ' ) );
+
+	return text.split( /\s+/ ).filter( Boolean );
+}
+
+/**
+ * Returns true if every word of visible text in the original HTML is also
+ * present in the generated HTML, or false if regenerating the content would
+ * drop text.
+ *
+ * Additional text in the generated markup is acceptable (e.g. labels rendered
+ * from attributes); missing text is not. Only text nodes are compared, since
+ * tag attributes are the block's own to regenerate.
+ *
+ * @example
+ * ```js
+ * isTextContentPreserved( '<h3>Title</h3>', '<h2 class="wp-block-heading">Title</h2>' ); // true
+ * isTextContentPreserved( '<h2>Title</h2><p>Intro</p>', '<h2>Title</h2>' ); // false
+ * ```
+ *
+ * @param original  Original HTML string.
+ * @param generated Generated HTML string.
+ * @param logger    Validation logger object.
+ *
+ * @return Whether all text content is preserved.
+ */
+export function isTextContentPreserved(
+	original: string,
+	generated: string,
+	logger: Logger = createQueuedLogger()
+): boolean {
+	const originalWords = getTextContentWords( original, logger );
+	if ( originalWords.length === 0 ) {
+		return true;
+	}
+
+	const availableWords = new Map< string, number >();
+	for ( const word of getTextContentWords( generated, logger ) ) {
+		availableWords.set( word, ( availableWords.get( word ) ?? 0 ) + 1 );
+	}
+
+	return originalWords.every( ( word ) => {
+		const count = availableWords.get( word );
+		if ( ! count ) {
 			return false;
 		}
-
-		// Accept direct attribute-related messages:
-		// - "Expected attribute `X` of value Y, saw Z"
-		// - "Expected attributes Array(X), saw Array(Y)"
-		// - "Encountered unexpected attribute `X`"
-		const isDirectAttributeIssue =
-			message.includes( 'Expected attribute' ) ||
-			message.includes( 'Expected attributes' ) ||
-			message.includes( 'unexpected attribute' );
-
-		if ( isDirectAttributeIssue ) {
-			return true;
-		}
-
-		// Handle token type mismatches that could be attribute-related.
-		// Example: "Expected token of type `Chars` (%o), instead saw `StartTag` (%o)"
-		// This happens when the tokenizer sees raw HTML vs a parsed tag.
-		// We need to check if both tokens refer to the same HTML element.
-		if ( message.includes( 'Expected token of type' ) ) {
-			// Extract the token objects from the logger arguments.
-			const expectedToken = issue.args?.[ 2 ] as HTMLToken;
-			const actualToken = issue.args?.[ 4 ] as HTMLToken;
-
-			// Try to extract tag names from both tokens.
-			let expectedTagName = null;
-			let actualTagName = null;
-
-			// Extract from expected token.
-			if ( expectedToken?.type === 'Chars' && expectedToken?.chars ) {
-				// Chars token contains raw HTML - extract tag name.
-				const match = expectedToken.chars.match( /<(\w+)/ );
-				expectedTagName = match?.[ 1 ];
-			} else if ( expectedToken?.tagName ) {
-				expectedTagName = expectedToken.tagName;
-			}
-
-			// Extract from actual token.
-			if ( actualToken?.tagName ) {
-				actualTagName = actualToken.tagName;
-			} else if ( actualToken?.type === 'Chars' && actualToken?.chars ) {
-				const match = actualToken.chars.match( /<(\w+)/ );
-				actualTagName = match?.[ 1 ];
-			}
-
-			// If both tokens refer to the same HTML tag, this is likely an attribute difference.
-			// Example: <h6> vs <h6 class="has-text-color"> - same tag, different attributes.
-			// If tags are different, it's a structural issue and belongs in Level 3.
-			if (
-				expectedTagName &&
-				actualTagName &&
-				expectedTagName === actualTagName
-			) {
-				return true;
-			}
-
-			// Different tags or couldn't extract tag names means structural difference.
-			return false;
-		}
-
-		// All other issue types (missing elements, extra content, etc.) are structural.
-		return false;
+		availableWords.set( word, count - 1 );
+		return true;
 	} );
 }
 
 /**
- * Returns validation results for a parsed block. The validation system uses a
- * 5-level classification to determine content integrity with varying degrees of
- * confidence, from perfect match (ValidBlock) to requiring user intervention (InvalidBlock).
+ * Returns validation results for a parsed block. Validation classifies the
+ * block's content integrity into one of the `VALIDATION_LEVEL` levels, from a
+ * perfect match (`VALID_BLOCK`) to requiring user intervention
+ * (`INVALID_BLOCK`).
  *
- * Note: Level 1 (MigratedBlock) is handled by the parser during deprecation checks,
- * not by this function. This function handles Levels 0, 2, 3, and 4.
+ * A block is considered valid when its content can be regenerated from its
+ * attributes without losing anything meaningful: the `save` output either
+ * matches the stored content, differs from it only in tag attributes, or
+ * differs structurally while preserving all of the visible text. Block types
+ * can opt out of the latter two with `allowsReconstruction: false`.
+ *
+ * Note: `MIGRATED_BLOCK` (Level 1) is assigned by the parser when a block
+ * deprecation matches, not by this function.
  *
  * @param block           Block object.
  * @param blockTypeOrName Block type or name, inferred from block if not given.
- * @param options         Validation options.
- * @param options.log     Whether to log Level 3 regenerations.
  *
- * @return Validation results tuple:
- *         - isValid: boolean indicating if block is valid
- *         - issues: array of validation issues
- *         - metadata: object containing validationLevel, originalContent, generatedContent
+ * @return Validation results tuple: whether the block is valid, the
+ *         validation issues found, and metadata with the validation level and
+ *         the original and generated content.
  */
 export function validateBlock(
 	block: Block,
-	blockTypeOrName: BlockType | string = block.name,
-	options: { log: boolean } = { log: true }
+	blockTypeOrName: BlockType | string = block.name
 ): [ boolean, LoggerItem[], ValidationMetadata ] {
-	const { log = true } = options;
-
-	// Freeform blocks and missing block handler both preserve
-	// raw HTML unchanged so we treat them as valid blocks.
+	// Freeform content and the unregistered block handler preserve their raw
+	// HTML as-is, so there is nothing to compare: they are always valid.
 	if (
 		block.name === getFreeformContentHandlerName() ||
 		block.name === getUnregisteredTypeHandlerName()
@@ -890,8 +975,8 @@ export function validateBlock(
 
 	const logger = createQueuedLogger();
 	const blockType = normalizeBlockType( blockTypeOrName );
+	const originalContent = block.originalContent ?? '';
 
-	// If block type still doesn't exist (unregistered), then treat as invalid
 	if ( ! blockType ) {
 		logger.error(
 			'Block type `%s` is not registered.',
@@ -910,14 +995,13 @@ export function validateBlock(
 		];
 	}
 
-	let generatedBlockContent;
+	// Run the block's `save` with the parsed attributes to generate the
+	// expected HTML, which is compared against the content stored in the post.
+	let generatedBlockContent: string;
 	try {
-		// Run the block's `save()` function with current attributes to generate
-		// the expected HTML. This is compared against the original content stored
-		// in the post to determine if the block is valid.
-		generatedBlockContent = getSaveContent( blockType!, block.attributes );
+		generatedBlockContent = getSaveContent( blockType, block.attributes );
 	} catch ( error ) {
-		// If `save()` throws it means the block cannot be validated and is marked invalid.
+		// If `save` throws, the block cannot be regenerated at all.
 		logger.error(
 			'Block validation failed because an error occurred while generating block content:\n\n%s',
 			( error as Error ).toString()
@@ -934,112 +1018,64 @@ export function validateBlock(
 		];
 	}
 
-	// We now have the generated content from save(). Compare it against the
-	// original content to determine the validation level.
+	const result = (
+		isValid: boolean,
+		validationLevel: ValidationLevel
+	): [ boolean, LoggerItem[], ValidationMetadata ] => [
+		isValid,
+		isValid ? [] : logger.getItems(),
+		{
+			validationLevel,
+			originalContent: block.originalContent,
+			generatedContent: generatedBlockContent,
+		},
+	];
 
-	// Level 0 (ValidBlock): Check for a perfect match. A valid block is one
-	// where save() produces identical HTML to what's stored in the post,
-	// meaning the save operation is idempotent.
-	const isValid = isEquivalentHTML(
-		block.originalContent!,
-		generatedBlockContent,
-		logger
-	);
-
-	if ( isValid ) {
-		// Valid blocks return empty issues array
-		return [
-			true,
-			[],
-			{
-				validationLevel: VALIDATION_LEVEL.VALID_BLOCK,
-				originalContent: block.originalContent,
-				generatedContent: generatedBlockContent,
-			},
-		];
+	// Level 0 (ValidBlock): the `save` output is equivalent to the stored
+	// content, i.e. saving the block again is an idempotent operation.
+	if ( isEquivalentHTML( originalContent, generatedBlockContent, logger ) ) {
+		return result( true, VALIDATION_LEVEL.VALID_BLOCK );
 	}
 
-	// Level 2 (ReconstructedBlock): Check for attribute-only differences. This
-	// handles cases where the HTML structure matches but attributes differ, such
-	// as missing classes or changed attribute values. This is considered safe
-	// because we're only restoring attribute values, not changing the structure.
-	// Structural differences (wrong tags, extra content) fall through to the next level.
-	if ( block.attributes ) {
-		// Get validation issues from logger to check if they're only attribute-related
-		const validationIssues = logger.getItems();
-
-		// Check for significant content loss (generated < 50% of original).
-		// This catches cases where extra content isn't logged as validation issues,
-		// e.g., original: `<p>Text</p><p>Extra</p>` vs generated: `<p>Text</p>`.
-		const originalLength = block.originalContent?.trim().length || 0;
-		const generatedLength = generatedBlockContent?.trim().length || 0;
-		const wouldLoseContent =
-			originalLength > 0 && generatedLength < originalLength * 0.5;
-
-		if (
-			areOnlyAttributeDifferences( validationIssues ) &&
-			! wouldLoseContent
-		) {
-			return [
-				true,
-				[],
-				{
-					validationLevel: VALIDATION_LEVEL.RECONSTRUCTED_BLOCK,
-					originalContent: block.originalContent,
-					generatedContent: generatedBlockContent,
-				},
-			];
-		}
-	}
-
-	// Level 3 (RegeneratedBlock): Trust attributes and regenerate the block's HTML.
-	// This accepts any differences including structural ones (wrong tags, different
-	// text) as long as the block type allows reconstruction. At this level we trust
-	// that the attributes contain enough information to regenerate the block correctly,
-	// even if the stored HTML is completely different from what save() produces.
+	// Block types can opt out of any automatic reconstruction, in which case
+	// only an exact match (or a deprecation, handled by the parser) is
+	// acceptable. The comparisons below use a separate logger so that only
+	// the issues found by the strict comparison above are reported.
 	const allowsReconstruction = blockType.allowsReconstruction !== false;
 
-	// Blocks can opt out of reconstruction by setting `allowsReconstruction` to `false`.
-	if ( allowsReconstruction && block.attributes ) {
-		const originalContent = block.originalContent?.trim() || '';
-		const generatedContent = generatedBlockContent?.trim() || '';
-
-		// Reconstruction is safe if there's no original content to lose, or if
-		// generated content is at least 50% of the original (content gain from
-		// added classes is fine, but significant content loss is not).
-		const safeToReconstruct =
-			originalContent.length === 0 ||
-			generatedContent.length >= originalContent.length * 0.5;
-
-		if ( safeToReconstruct ) {
-			// Log reconstruction for visibility.
-			if ( log ) {
-				// eslint-disable-next-line no-console
-				console.log(
-					`Block "${ blockType.name }" regenerated from attributes (Level 3).`,
-					'\nOriginal:',
-					block.originalContent,
-					'\nGenerated:',
-					generatedBlockContent
-				);
-			}
-
-			return [
-				true,
-				[],
-				{
-					validationLevel: VALIDATION_LEVEL.REGENERATED_BLOCK,
-					originalContent: block.originalContent,
-					generatedContent: generatedBlockContent,
-				},
-			];
-		}
+	// Level 2 (ReconstructedBlock): the stored content has the same elements
+	// and text as the `save` output and only tag attributes differ, such as
+	// class names generated from attributes being absent. Regenerating the
+	// block only rewrites those attributes.
+	if (
+		allowsReconstruction &&
+		isEquivalentHTMLStructure(
+			originalContent,
+			generatedBlockContent,
+			createQueuedLogger()
+		)
+	) {
+		return result( true, VALIDATION_LEVEL.RECONSTRUCTED_BLOCK );
 	}
 
-	// Level 4 (InvalidBlock): The block failed all validation levels. This happens
-	// when the HTML doesn't match, reconstruction isn't allowed or would lose too
-	// much content, and no deprecation was able to migrate it. The block is marked
-	// invalid and the original HTML is preserved to prevent data loss.
+	// Level 3 (RegeneratedBlock): the structure differs (wrong tags, malformed
+	// or extraneous markup), but every word of visible text in the stored
+	// content is present in the `save` output, so regenerating the block from
+	// its attributes rewrites the markup without dropping what the user wrote.
+	if (
+		allowsReconstruction &&
+		isTextContentPreserved(
+			originalContent,
+			generatedBlockContent,
+			createQueuedLogger()
+		)
+	) {
+		return result( true, VALIDATION_LEVEL.REGENERATED_BLOCK );
+	}
+
+	// Level 4 (InvalidBlock): regenerating the block would lose content, or
+	// the block type opted out of reconstruction. The block is marked invalid
+	// so that its original HTML is preserved untouched.
 	logger.error(
 		'Block validation failed for `%s` (%o).\n\nContent generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
 		blockType.name,
@@ -1048,15 +1084,7 @@ export function validateBlock(
 		block.originalContent
 	);
 
-	return [
-		false,
-		logger.getItems(),
-		{
-			validationLevel: VALIDATION_LEVEL.INVALID_BLOCK,
-			originalContent: block.originalContent,
-			generatedContent: generatedBlockContent,
-		},
-	];
+	return result( false, VALIDATION_LEVEL.INVALID_BLOCK );
 }
 
 /**

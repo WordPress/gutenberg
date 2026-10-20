@@ -6,7 +6,11 @@ import {
 	getBlockType,
 } from '../registration';
 import { getSaveContent } from '../serializer';
-import { validateBlock, VALIDATION_LEVEL } from '../validation';
+import {
+	validateBlock,
+	VALIDATION_LEVEL,
+	VALIDATION_LEVEL_NAME,
+} from '../validation';
 import { createBlock } from '../factory';
 import { convertLegacyBlockNameAndAttributes } from './convert-legacy-block';
 import { serializeRawBlock } from './serialize-raw-block';
@@ -118,6 +122,13 @@ function createMissingBlockType( rawBlock: RawBlock ): RawBlock {
 /**
  * Validates a block and wraps with validation meta.
  *
+ * Only an exact match between the stored content and the `save` output marks
+ * the block as valid here: deprecations, which are explicit author
+ * instructions, must get a chance to run before automated reconstruction is
+ * considered. For a non-matching block, `validationLevel` records the level
+ * the block could be reconstructed at (or `INVALID_BLOCK`), which
+ * `parseRawBlock` applies once deprecations have been tried.
+ *
  * The name here is regrettable but `validateBlock` is already taken.
  *
  * @param unvalidatedBlock
@@ -128,58 +139,38 @@ function applyBlockValidation(
 	unvalidatedBlock: Block,
 	blockType: BlockType
 ): Block {
-	// Attempt to validate the block. Suppress logging during validation
-	// discovery since we may try multiple approaches (fixes, deprecations).
-	const [ , , metadata ] = validateBlock( unvalidatedBlock, blockType, {
-		log: false,
-	} );
+	// Attempt to validate the block.
+	const [ , , { validationLevel } ] = validateBlock(
+		unvalidatedBlock,
+		blockType
+	);
 
-	// Only accept perfect match as valid here. A valid block is an idempotent
-	// operation where the source and save() output match exactly. Deprecations
-	// must be tried before we attempt automatic block reconstruction.
-	if ( metadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK ) {
+	if ( validationLevel === VALIDATION_LEVEL.VALID_BLOCK ) {
 		return {
 			...unvalidatedBlock,
 			isValid: true,
 			validationIssues: [],
-			validationLevel: VALIDATION_LEVEL.VALID_BLOCK,
+			validationLevel,
 		};
 	}
 
-	// Built-in fixes extract attributes present in HTML but missing from the
-	// block comment (e.g., className, ariaLabel). Unlike Level 2/3 reconstruction
-	// which would lose these values on save, fixes preserve them in the block's
-	// attributes for regeneration.
+	// If the block is not an exact match, attempt some built-in fixes like
+	// custom classNames handling. Unlike reconstruction, which regenerates
+	// the markup from the parsed attributes, fixes carry values found in the
+	// HTML over to the attributes so that they survive regeneration.
 	const fixedBlock = applyBuiltInValidationFixes(
 		unvalidatedBlock,
 		blockType
 	);
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return -- validationIssues is used in final return
-	const [ , validationIssues, fixedMetadata ] = validateBlock(
-		fixedBlock,
-		blockType,
-		{ log: false }
-	);
+	// Attempt to validate the block once again after the built-in fixes.
+	const [ , validationIssues, { validationLevel: fixedValidationLevel } ] =
+		validateBlock( fixedBlock, blockType );
 
-	// After fixes, only accept a perfect match as valid. Automated
-	// reconstruction is determined in `parseRawBlock` after deprecations
-	// have been tried.
-	if ( fixedMetadata?.validationLevel === VALIDATION_LEVEL.VALID_BLOCK ) {
-		return {
-			...fixedBlock,
-			isValid: true,
-			validationIssues: [],
-			validationLevel: VALIDATION_LEVEL.VALID_BLOCK,
-		};
-	}
-
-	// Return as invalid - deprecations will be tried next, and if they fail,
-	// `parseRawBlock` will check for reconstruction eligibility.
 	return {
 		...fixedBlock,
-		isValid: false,
+		isValid: fixedValidationLevel === VALIDATION_LEVEL.VALID_BLOCK,
 		validationIssues,
-		validationLevel: VALIDATION_LEVEL.INVALID_BLOCK,
+		validationLevel: fixedValidationLevel,
 	};
 }
 
@@ -251,6 +242,7 @@ export function parseRawBlock(
 		];
 		parsedBlock.isValid = true;
 		parsedBlock.validationIssues = [];
+		parsedBlock.validationLevel = VALIDATION_LEVEL.VALID_BLOCK;
 		return parsedBlock;
 	}
 
@@ -267,27 +259,15 @@ export function parseRawBlock(
 		blockType
 	);
 
-	// If the block was migrated via deprecation, update validation level to Level 1
-	if ( updatedBlock.__wasMigrated ) {
-		updatedBlock.validationLevel = VALIDATION_LEVEL.MIGRATED_BLOCK;
-		delete updatedBlock.__wasMigrated; // Clean up internal flag
-	}
-
-	// If still invalid after deprecations, check if it qualifies for reconstruction.
-	// This ensures deprecations (explicit author instructions) take priority over
-	// automated block reconstruction.
-	if ( ! updatedBlock.isValid ) {
-		const [ canReconstruct, , reconstructMeta ] = validateBlock(
-			updatedBlock,
-			blockType,
-			{ log: false }
-		);
-
-		if ( canReconstruct ) {
-			updatedBlock.isValid = true;
-			updatedBlock.validationIssues = [];
-			updatedBlock.validationLevel = reconstructMeta.validationLevel;
-		}
+	// If no deprecation matched, fall back to automated reconstruction when
+	// validation determined that the block can be safely regenerated from its
+	// attributes (`RECONSTRUCTED_BLOCK` or `REGENERATED_BLOCK`). Deprecations
+	// are tried first so that explicit author instructions take priority.
+	if (
+		! updatedBlock.isValid &&
+		updatedBlock.validationLevel !== VALIDATION_LEVEL.INVALID_BLOCK
+	) {
+		updatedBlock.isValid = true;
 	}
 
 	if ( ! updatedBlock.isValid ) {
@@ -306,7 +286,11 @@ export function parseRawBlock(
 		! options?.__unstableSkipMigrationLogs
 	) {
 		/* eslint-disable no-console */
-		console.groupCollapsed( 'Updated Block: %s', blockType.name );
+		console.groupCollapsed(
+			'Updated Block: %s (%s)',
+			blockType.name,
+			VALIDATION_LEVEL_NAME[ updatedBlock.validationLevel! ]
+		);
 		console.info(
 			'Block successfully updated for `%s` (%o).\n\nNew content generated by `save` function:\n\n%s\n\nContent retrieved from post body:\n\n%s',
 			blockType.name,
