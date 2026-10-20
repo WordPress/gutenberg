@@ -74,9 +74,9 @@ const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
 /**
- * Inline imported SVG files as `data:` URIs.
+ * esbuild loaders for non-JS imports. SVG files are inlined as `data:` URIs.
  */
-const SVG_LOADER = { '.svg': 'dataurl' };
+const LOADER_CONFIG = { '.svg': 'dataurl' };
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
@@ -558,7 +558,7 @@ async function bundlePackage( packageName, options = {} ) {
 		const baseConfig = {
 			entryPoints: [ entryPoint ],
 			bundle: true,
-			loader: SVG_LOADER,
+			loader: LOADER_CONFIG,
 			sourcemap: true,
 			format: 'iife',
 			target,
@@ -672,7 +672,7 @@ async function bundlePackage( packageName, options = {} ) {
 
 			builds.push(
 				esbuild.build( {
-					loader: SVG_LOADER,
+					loader: LOADER_CONFIG,
 					entryPoints: [ entryPoint ],
 					outfile: path.join(
 						rootBuildModuleDir,
@@ -704,7 +704,7 @@ async function bundlePackage( packageName, options = {} ) {
 			if ( ! isWasmWorker ) {
 				builds.push(
 					esbuild.build( {
-						loader: SVG_LOADER,
+						loader: LOADER_CONFIG,
 						entryPoints: [ entryPoint ],
 						outfile: path.join(
 							rootBuildModuleDir,
@@ -1342,8 +1342,8 @@ async function transpilePackage( packageName ) {
 	 * Keeps imports external so each source file is transpiled on its own,
 	 * except for styles and SVGs, which are processed and inlined.
 	 */
-	const externalizeAllExceptPlugin = {
-		name: 'externalize-all-except',
+	const externalizeJsImportsPlugin = {
+		name: 'externalize-js-imports',
 		setup( build ) {
 			// Externalize all imports except styles and SVGs
 			build.onResolve( { filter: /.*/ }, async ( args ) => {
@@ -1419,13 +1419,13 @@ async function transpilePackage( packageName ) {
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
 		...createStyleBundlingPlugins( packageDir ),
-		externalizeAllExceptPlugin,
+		externalizeJsImportsPlugin,
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
 		builds.push(
 			esbuild.build( {
-				loader: SVG_LOADER,
+				loader: LOADER_CONFIG,
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
@@ -1459,7 +1459,7 @@ async function transpilePackage( packageName ) {
 	if ( packageJson.module ) {
 		builds.push(
 			esbuild.build( {
-				loader: SVG_LOADER,
+				loader: LOADER_CONFIG,
 				entryPoints: srcFiles,
 				outdir: buildModuleDir,
 				outbase: srcDir,
@@ -1703,7 +1703,7 @@ async function buildRoute( routeName ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
 				esbuild.build( {
-					loader: SVG_LOADER,
+					loader: LOADER_CONFIG,
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.min.js' ),
 					bundle: true,
@@ -1722,7 +1722,7 @@ async function buildRoute( routeName ) {
 					],
 				} ),
 				esbuild.build( {
-					loader: SVG_LOADER,
+					loader: LOADER_CONFIG,
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.js' ),
 					bundle: true,
@@ -1757,7 +1757,7 @@ async function buildRoute( routeName ) {
 		// Build both minified and non-minified versions in parallel
 		await Promise.all( [
 			esbuild.build( {
-				loader: SVG_LOADER,
+				loader: LOADER_CONFIG,
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.min.js' ),
 				bundle: true,
@@ -1776,7 +1776,7 @@ async function buildRoute( routeName ) {
 				],
 			} ),
 			esbuild.build( {
-				loader: SVG_LOADER,
+				loader: LOADER_CONFIG,
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.js' ),
 				bundle: true,
@@ -1870,7 +1870,7 @@ async function buildWidget( widgetName ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
 				esbuild.build( {
-					loader: SVG_LOADER,
+					loader: LOADER_CONFIG,
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.min.js' ),
 					bundle: true,
@@ -1889,7 +1889,7 @@ async function buildWidget( widgetName ) {
 					],
 				} ),
 				esbuild.build( {
-					loader: SVG_LOADER,
+					loader: LOADER_CONFIG,
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.js' ),
 					bundle: true,
@@ -1923,7 +1923,7 @@ async function buildWidget( widgetName ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
 				esbuild.build( {
-					loader: SVG_LOADER,
+					loader: LOADER_CONFIG,
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.min.js' ),
 					bundle: true,
@@ -1942,7 +1942,7 @@ async function buildWidget( widgetName ) {
 					],
 				} ),
 				esbuild.build( {
-					loader: SVG_LOADER,
+					loader: LOADER_CONFIG,
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.js' ),
 					bundle: true,
