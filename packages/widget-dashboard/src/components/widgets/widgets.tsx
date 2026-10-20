@@ -9,6 +9,7 @@ import type {
 } from '@wordpress/grid';
 import type { WidgetName } from '@wordpress/widget-primitives';
 import { useDashboardInternalContext } from '../../context/dashboard-context';
+import { resolveItemLimits } from '../../utils/resolve-item-limits';
 import { WidgetChrome } from '../widget-chrome';
 import { WidgetHeader } from '../widget-header';
 import { WidgetLayoutControls } from '../widget-layout-controls';
@@ -130,6 +131,13 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 		} = useDashboardInternalContext();
 		const isMasonry = gridSettings.model === 'masonry';
 
+		// Floors in pixels per instance, from each type's footprint. The
+		// surface quantizes them to its geometry; nothing is stored.
+		const itemLimits = useMemo(
+			() => resolveItemLimits( layout, widgetTypes ),
+			[ layout, widgetTypes ]
+		);
+
 		const permissionsFor = useCallback< TilePermissionsFor >(
 			( widget ) => {
 				const widgetType = widgetTypes.find(
@@ -248,6 +256,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				layout={ gridLayout as DashboardLanesLayoutItem[] }
 				columns={ gridSettings.columns }
 				minColumnWidth={ gridSettings.minColumnWidth }
+				itemLimits={ itemLimits }
 				flowTolerance={ gridSettings.flowTolerance }
 				onChangeLayout={ handleMasonryChange }
 				{ ...sharedRenderProps }
@@ -259,6 +268,7 @@ export const Widgets = forwardRef< HTMLDivElement, WidgetsProps >(
 				layout={ gridLayout as DashboardGridLayoutItem[] }
 				columns={ gridSettings.columns }
 				minColumnWidth={ gridSettings.minColumnWidth }
+				itemLimits={ itemLimits }
 				rowHeight={ gridSettings.rowHeight }
 				onChangeLayout={ handleGridChange }
 				{ ...sharedRenderProps }

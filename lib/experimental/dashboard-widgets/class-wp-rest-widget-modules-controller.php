@@ -195,6 +195,10 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 				$data['presentation'] = $widget_type->presentation;
 			}
 
+			if ( rest_is_field_included( 'footprint', $fields ) ) {
+				$data['footprint'] = $widget_type->footprint;
+			}
+
 			if ( rest_is_field_included( 'category', $fields ) ) {
 				$data['category'] = $widget_type->category;
 			}
@@ -274,6 +278,14 @@ if ( ! class_exists( 'WP_REST_Widget_Modules_Controller' ) ) {
 						'description' => __( 'Authoring intent about how the widget wants to render.', 'gutenberg' ),
 						'type'        => array( 'string', 'null' ),
 						'enum'        => array_merge( WP_Widget_Type::PRESENTATION_VALUES, array( null ) ),
+						'context'     => array( 'view', 'edit', 'embed' ),
+						'readonly'    => true,
+					),
+
+					'footprint'     => array(
+						'description' => __( 'The smallest form the widget content can take, which hosts translate into a minimum tile size.', 'gutenberg' ),
+						'type'        => array( 'string', 'null' ),
+						'enum'        => array_merge( WP_Widget_Type::FOOTPRINT_VALUES, array( null ) ),
 						'context'     => array( 'view', 'edit', 'embed' ),
 						'readonly'    => true,
 					),

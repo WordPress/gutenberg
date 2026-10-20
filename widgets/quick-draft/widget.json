@@ -8,6 +8,7 @@
 	"icon": "dashboard-widgets/drafts",
 	"category": "dashboard",
 	"presentation": "content-bleed",
+	"footprint": "card",
 	"actions": [
 		{
 			"id": "view-drafts",

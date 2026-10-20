@@ -199,6 +199,12 @@ export type WidgetAttributeRecord< Item = unknown > = Omit<
 };
 
 /**
+ * The smallest form a widget's content can take. See
+ * `WidgetTypeMetadata.footprint`.
+ */
+export type WidgetFootprint = 'glance' | 'strip' | 'card' | 'panel';
+
+/**
  * Literal contents of a widget's `widget.json` metadata file.
  *
  * Captures the *authoring* shape only; module entry points and style
@@ -256,6 +262,22 @@ export interface WidgetTypeMetadata< Item = unknown > {
 	 *   surrounding chrome.
 	 */
 	presentation?: 'framed' | 'content-bleed' | 'full-bleed';
+
+	/**
+	 * The smallest form the widget's content can take: the point where its
+	 * own responsive adaptation ends. Not a measurement; every host
+	 * translates the form into a minimum tile size in its own geometry.
+	 *
+	 * - `'glance'` (default when absent): an at-a-glance signal, such as a
+	 *   number or a badge. No floor.
+	 * - `'strip'`: a shallow band of sequential content. Needs breadth,
+	 *   almost no height.
+	 * - `'card'`: a self-contained unit, a heading plus a few rows. Both
+	 *   axes, modest.
+	 * - `'panel'`: a working region, such as a chart with axes, a table,
+	 *   or a preview. Both axes, generously.
+	 */
+	footprint?: WidgetFootprint;
 
 	/**
 	 * Alternative terms used to match the widget type when searching,
@@ -369,6 +391,7 @@ type WidgetModuleRecordOverrides = {
 			| 'help'
 			| 'category'
 			| 'presentation'
+			| 'footprint'
 			| 'keywords'
 		>
 	]?: WidgetTypeMetadata[ K ] | null;

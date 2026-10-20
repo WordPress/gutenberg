@@ -10,6 +10,7 @@
 ### Enhancements
 
 -   Honor `gridSettings.minColumnWidth` as a per-column floor: the surface fits as many columns as the container allows at that width, capped by `columns` when set ([#85228](https://github.com/WordPress/gutenberg/pull/85228)).
+-   Derive per-tile size floors from each widget type's `footprint` and hand them to the surface as `itemLimits`, so a resize never commits a span below the floor and a stored span renders bounded ([#85229](https://github.com/WordPress/gutenberg/pull/85229)).
 
 ## 0.10.0 (2026-10-20)
 

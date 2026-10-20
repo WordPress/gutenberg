@@ -30,6 +30,12 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		const PRESENTATION_VALUES = array( 'framed', 'content-bleed', 'full-bleed' );
 
 		/**
+		 * Allowed values for the `footprint` field: the smallest form the
+		 * widget's content can take, from no floor to a working region.
+		 */
+		const FOOTPRINT_VALUES = array( 'glance', 'strip', 'card', 'panel' );
+
+		/**
 		 * Widget type key. Namespaced identifier, e.g. `core/hello-world`.
 		 *
 		 * @var string
@@ -66,6 +72,18 @@ if ( ! class_exists( 'WP_Widget_Type' ) ) {
 		 * @var string|null
 		 */
 		public $presentation = null;
+
+		/**
+		 * The smallest form the widget's content can take, where its own
+		 * responsive adaptation ends. One of {@see self::FOOTPRINT_VALUES}
+		 * (first entry is the default: no floor). Hosts translate it into a
+		 * minimum tile size in their own geometry.
+		 *
+		 * Null when the widget did not declare the field.
+		 *
+		 * @var string|null
+		 */
+		public $footprint = null;
 
 		/**
 		 * Widget types are grouped into categories to help users browse and
