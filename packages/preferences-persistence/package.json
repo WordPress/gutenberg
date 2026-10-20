@@ -45,6 +45,7 @@
 		"@wordpress/api-fetch": "file:../api-fetch"
 	},
 	"devDependencies": {
+		"@types/node": "^24.13.3",
 		"vitest": "^5.0.3"
 	},
 	"publishConfig": {
