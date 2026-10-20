@@ -3,15 +3,5 @@
 	"extends": "@wordpress/monorepo-tools/tsconfig/base.json",
 	"compilerOptions": {
 		"types": [ "gutenberg-env" ]
-	},
-	"references": [],
-	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/tests/**",
-		"**/__tests__/**",
-		"**/stories/**",
-		"**/*.story.*",
-		"src/loader.ts"
-	]
+	}
 }
