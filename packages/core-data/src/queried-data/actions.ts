@@ -10,11 +10,11 @@ import type {
 /**
  * Returns an action object used in signalling that items have been received.
  *
- * @param {Array}   items Items received.
- * @param {?Object} edits Optional edits to reset.
- * @param {?Object} meta  Meta information about pagination.
+ * @param items Items received.
+ * @param edits Optional edits to reset.
+ * @param meta  Meta information about pagination.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function receiveItems(
 	items: QueriedItem | Array< QueriedItem >,
@@ -33,11 +33,11 @@ export function receiveItems(
  * Returns an action object used in signalling that entity records have been
  * deleted and they need to be removed from entities state.
  *
- * @param {string}              kind            Kind of the removed entities.
- * @param {string}              name            Name of the removed entities.
- * @param {Array|number|string} records         Record IDs of the removed entities.
- * @param {boolean}             invalidateCache Controls whether we want to invalidate the cache.
- * @return {Object} Action object.
+ * @param kind            Kind of the removed entities.
+ * @param name            Name of the removed entities.
+ * @param records         Record IDs of the removed entities.
+ * @param invalidateCache Controls whether we want to invalidate the cache.
+ * @return Action object.
  */
 export function removeItems(
 	kind: string,
@@ -58,12 +58,12 @@ export function removeItems(
  * Returns an action object used in signalling that queried data has been
  * received.
  *
- * @param {Array}   items Queried items received.
- * @param {?Object} query Optional query object.
- * @param {?Object} edits Optional edits to reset.
- * @param {?Object} meta  Meta information about pagination.
+ * @param items Queried items received.
+ * @param query Optional query object.
+ * @param edits Optional edits to reset.
+ * @param meta  Meta information about pagination.
  *
- * @return {Object} Action object.
+ * @return Action object.
  */
 export function receiveQueriedItems(
 	items: QueriedItem | Array< QueriedItem >,
