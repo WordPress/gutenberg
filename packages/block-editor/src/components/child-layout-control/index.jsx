@@ -298,7 +298,10 @@ function GridControls( {
 				: undefined,
 		[ stackGridAttributes, stackItems, panelId ]
 	);
-	const { columnStart, rowStart, columnSpan, rowSpan } =
+	// A block placed freely in a manual grid has a box inside its cells.
+	// Moving it by whole cells keeps its box, so it keeps its shape, while
+	// typing a span snaps it to the cells, so its box goes.
+	const { columnStart, rowStart, columnSpan, rowSpan, box } =
 		stackedLayouts?.child ?? childLayout;
 	const { columnCount, rowCount } = {
 		...parentLayout,
@@ -320,12 +323,14 @@ function GridControls( {
 		onChangeLayout( {
 			columnStart: undefined,
 			rowStart: undefined,
+			box: undefined,
 		} );
 	};
 	const resetGridSpans = () => {
 		onChangeLayout( {
 			columnSpan: undefined,
 			rowSpan: undefined,
+			box: undefined,
 		} );
 	};
 
@@ -370,6 +375,7 @@ function GridControls( {
 								rowStart,
 								rowSpan,
 								columnSpan: constrainedValue,
+								box: undefined,
 							} );
 						} }
 						value={ columnSpanValue }
@@ -393,6 +399,7 @@ function GridControls( {
 								rowStart,
 								columnSpan,
 								rowSpan: constrainedValue,
+								box: undefined,
 							} );
 						} }
 						value={ rowSpanValue }
@@ -427,6 +434,7 @@ function GridControls( {
 									rowStart,
 									columnSpan,
 									rowSpan,
+									box,
 								} );
 								__unstableMarkNextChangeAsNotPersistent();
 								moveBlocksToPosition(
@@ -461,6 +469,7 @@ function GridControls( {
 									rowStart: newRowStart,
 									columnSpan,
 									rowSpan,
+									box,
 								} );
 								__unstableMarkNextChangeAsNotPersistent();
 								moveBlocksToPosition(

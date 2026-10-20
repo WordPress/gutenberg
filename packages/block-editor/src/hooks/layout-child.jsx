@@ -721,14 +721,17 @@ function GridTools( {
 	const isViewportState = hasViewportBlockStyleState( selectedState );
 	// The layout the canvas shows for this block and its grid in the
 	// selected state.
+	const viewportLayout = isViewportState
+		? getStyleForState( style, {
+				viewport: selectedState.viewport,
+				pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
+			} )?.layout
+		: undefined;
 	const effectiveLayout = stackedLayouts?.child ?? {
 		...style?.layout,
-		...( isViewportState
-			? getStyleForState( style, {
-					viewport: selectedState.viewport,
-					pseudo: DEFAULT_BLOCK_STYLE_STATE.pseudo,
-				} )?.layout
-			: undefined ),
+		...viewportLayout,
+		// A viewport that sets its own place has its own box, or none.
+		box: getGridItemBox( style?.layout, viewportLayout ),
 	};
 	const effectiveParentLayout = {
 		...parentLayout,

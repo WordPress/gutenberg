@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { __experimentalToolsPanel as ToolsPanel } from '@wordpress/components';
@@ -18,6 +18,10 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 		if ( typeof mapSelect === 'function' ) {
 			return mapSelect( () => ( {
 				getBlockRootClientId: () => 'root-client-id',
+				getBlockAttributes: () => ( {} ),
+				getBlockOrder: () => [],
+				getBlocksByClientId: () => [],
+				getSelectedBlockStyleState: () => undefined,
 			} ) );
 		}
 
@@ -117,6 +121,67 @@ describe( 'ChildLayoutControl', () => {
 			rowStart: undefined,
 			rowSpan: undefined,
 			columnSpan: 1,
+		} );
+	} );
+
+	describe( 'free box in manual grids', () => {
+		const box = { left: 0.1, top: 0.2, width: 0.5, height: 0.6 };
+		const value = {
+			columnStart: 2,
+			rowStart: 1,
+			columnSpan: 2,
+			rowSpan: 1,
+			box,
+		};
+		const parentLayout = {
+			type: 'grid',
+			isManualPlacement: true,
+			columnCount: 4,
+			rowCount: 4,
+		};
+
+		let originalExperiment;
+		beforeEach( () => {
+			originalExperiment = window.__experimentalEnableGridInteractivity;
+			window.__experimentalEnableGridInteractivity = true;
+		} );
+		afterEach( () => {
+			window.__experimentalEnableGridInteractivity = originalExperiment;
+		} );
+
+		it( 'changing a span clears the box', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderControl( { value, onChange, parentLayout } );
+
+			const input = screen.getByRole( 'spinbutton', {
+				name: 'Column span',
+			} );
+			await user.clear( input );
+			await user.type( input, '1' );
+
+			const change = onChange.mock.calls.at( -1 )[ 0 ];
+			expect( change.columnSpan ).toBe( 1 );
+			expect( Object.hasOwn( change, 'box' ) ).toBe( true );
+			expect( change.box ).toBeUndefined();
+		} );
+
+		it( 'changing a start keeps the box', async () => {
+			const user = userEvent.setup();
+			const onChange = vi.fn();
+			renderControl( { value, onChange, parentLayout } );
+
+			const input = screen.getByRole( 'spinbutton', { name: 'Column' } );
+			await user.clear( input );
+			await user.type( input, '1' );
+
+			expect( onChange.mock.calls.at( -1 )[ 0 ] ).toEqual( {
+				columnStart: 1,
+				rowStart: 1,
+				columnSpan: 2,
+				rowSpan: 1,
+				box,
+			} );
 		} );
 	} );
 

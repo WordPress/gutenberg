@@ -24,6 +24,9 @@ export function GridItemMovers( {
 	const { moveBlocksToPosition, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
+	// Moving a block placed freely by whole cells keeps its box, so it keeps
+	// its shape. A viewport that sets its own place needs its box too.
+	const box = layout?.box;
 	const columnStart = layout?.columnStart ?? 1;
 	const rowStart = layout?.rowStart ?? 1;
 	const columnSpan = layout?.columnSpan ?? 1;
@@ -50,6 +53,7 @@ export function GridItemMovers( {
 						onClick={ () => {
 							onChange( {
 								columnStart: columnStart - 1,
+								box,
 							} );
 							__unstableMarkNextChangeAsNotPersistent();
 							moveBlocksToPosition(
@@ -74,6 +78,7 @@ export function GridItemMovers( {
 						onClick={ () => {
 							onChange( {
 								rowStart: rowStart - 1,
+								box,
 							} );
 							__unstableMarkNextChangeAsNotPersistent();
 							moveBlocksToPosition(
@@ -96,6 +101,7 @@ export function GridItemMovers( {
 						onClick={ () => {
 							onChange( {
 								rowStart: rowStart + 1,
+								box,
 							} );
 							__unstableMarkNextChangeAsNotPersistent();
 							moveBlocksToPosition(
@@ -119,6 +125,7 @@ export function GridItemMovers( {
 						onClick={ () => {
 							onChange( {
 								columnStart: columnStart + 1,
+								box,
 							} );
 							__unstableMarkNextChangeAsNotPersistent();
 							moveBlocksToPosition(
