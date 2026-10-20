@@ -525,7 +525,10 @@ function RichTextWrapper(
 	}, [ crossBlockStart, crossBlockEnd, value, getDomPosition ] );
 
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
-		// Completers replace the field with blocks, not rich text values.
+		/*
+		 * Completers replace the field with blocks, not rich text values.
+		 * TODO: Make the replacement payload generic in `@wordpress/components`.
+		 */
 		onReplace:
 			onReplace as unknown as UseBlockEditorAutocompletePropsOptions[ 'onReplace' ],
 		completers: autocompleters,
