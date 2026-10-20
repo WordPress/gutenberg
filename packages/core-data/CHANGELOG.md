@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Convert the `utils` modules, the store name and the entity context to TypeScript ([#85058](https://github.com/WordPress/gutenberg/pull/85058)).
+
 ## 9.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -14,7 +18,6 @@
 
 ### Internal
 
--   Convert the `utils` modules, the store name and the entity context to TypeScript ([#85058](https://github.com/WordPress/gutenberg/pull/85058)).
 -   Add the private `getFieldsConfig( kind, name )` selector, which returns the fields an entity registered on the server, as the `/wp/v2/entity-fields` REST API route returns them ([#84700](https://github.com/WordPress/gutenberg/pull/84700)).
 -   Add the private `getEntityActionsConfig( kind, name )` selector, which fetches the actions registered on the server for an entity from the `/wp/v2/entity-actions` route ([#84660](https://github.com/WordPress/gutenberg/pull/84660)).
 
