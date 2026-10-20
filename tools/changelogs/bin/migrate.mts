@@ -1,0 +1,50 @@
+#!/usr/bin/env node
+import { parseArgs } from 'node:util';
+import path from 'node:path';
+import {
+	migratePackageToChangie,
+	rollbackPackageFromChangie,
+} from '../lib/migrate.ts';
+
+const REPO_ROOT = path.resolve( import.meta.dirname, '../../..' );
+
+const options = parseArgs( {
+	options: {
+		package: { type: 'string', short: 'p' },
+		rollback: { type: 'boolean', default: false },
+		'dry-run': { type: 'boolean', default: false },
+	},
+	allowPositionals: true,
+} );
+
+const packageName = options.values.package || options.positionals[ 0 ];
+if ( ! packageName ) {
+	console.error(
+		'Usage: node tools/changelogs/bin/migrate.mjs <package-name> [--rollback] [--dry-run]'
+	);
+	process.exit( 1 );
+}
+
+const dryRun = options.values[ 'dry-run' ] || false;
+const isRollback = options.values.rollback || false;
+
+try {
+	if ( isRollback ) {
+		const res = rollbackPackageFromChangie(
+			packageName,
+			REPO_ROOT,
+			dryRun
+		);
+		console.log(
+			`Rollback complete for ${ res.packageName }: restored ${ res.versionsRestored } versions and ${ res.fragmentsRestored } unreleased entries.`
+		);
+	} else {
+		const res = migratePackageToChangie( packageName, REPO_ROOT, dryRun );
+		console.log(
+			`Migration complete for ${ res.packageName }: created ${ res.versionsCreated } version files and ${ res.fragmentsCreated } unreleased fragments.`
+		);
+	}
+} catch ( err: any ) {
+	console.error( `Error: ${ err.message }` );
+	process.exit( 1 );
+}

@@ -1,0 +1,382 @@
+import fs from 'node:fs';
+import path from 'node:path';
+import yaml from 'js-yaml';
+import semver from 'semver';
+import { loadChangieConfig } from './config.ts';
+
+export interface UnreleasedEntry {
+	kind: string;
+	body: string;
+	pr: number;
+}
+
+export interface ParsedChangelog {
+	preamble: string;
+	unreleasedEntries: UnreleasedEntry[];
+	versions: Array< {
+		version: string;
+		filename: string;
+		content: string;
+	} >;
+}
+
+const VERSION_HEADING_REGEX =
+	/^##\s+(\d+\.\d+\.\d+(?:-[a-zA-Z0-9.]+)?)(?:\s+\((.*?)\))?/;
+const GUTENBERG_PR_REGEX =
+	/\[#(\d+)\]\(https:\/\/github\.com\/WordPress\/gutenberg\/pull\/\d+\)/;
+
+/**
+ * Parses an existing CHANGELOG.md file into preamble, unreleased entries, and version blocks.
+ *
+ * @param content Full content of CHANGELOG.md.
+ * @return Parsed changelog structure.
+ */
+export function parseChangelogContent( content: string ): ParsedChangelog {
+	const lines = content.split( /\r?\n/ );
+	let preamble = '';
+	let inUnreleased = false;
+	let currentKind = '';
+	const unreleasedEntries: UnreleasedEntry[] = [];
+	const versions: ParsedChangelog[ 'versions' ] = [];
+
+	let currentVersion: {
+		version: string;
+		headingLine: string;
+		lines: string[];
+	} | null = null;
+
+	let i = 0;
+	while ( i < lines.length ) {
+		const line = lines[ i ];
+
+		if ( /^##\s+Unreleased\s*$/i.test( line ) ) {
+			inUnreleased = true;
+			i++;
+			continue;
+		}
+
+		const versionMatch = line.match( VERSION_HEADING_REGEX );
+		if ( versionMatch ) {
+			inUnreleased = false;
+			if ( currentVersion ) {
+				versions.push( {
+					version: currentVersion.version,
+					filename: `${ currentVersion.version }.md`,
+					content:
+						[ currentVersion.headingLine, ...currentVersion.lines ]
+							.join( '\n' )
+							.trim() + '\n',
+				} );
+			}
+			currentVersion = {
+				version: versionMatch[ 1 ],
+				headingLine: line,
+				lines: [],
+			};
+			i++;
+			continue;
+		}
+
+		if ( inUnreleased ) {
+			if ( /^###\s+/.test( line ) ) {
+				currentKind = line.replace( /^###\s+/, '' ).trim();
+				i++;
+				continue;
+			}
+
+			if ( /^-\s+/.test( line ) ) {
+				const bulletLines = [ line.replace( /^-\s+/, '' ) ];
+				i++;
+				while (
+					i < lines.length &&
+					! /^-\s+/.test( lines[ i ] ) &&
+					! /^#{1,6}\s+/.test( lines[ i ] )
+				) {
+					if ( lines[ i ].trim() !== '' ) {
+						bulletLines.push( lines[ i ] );
+					}
+					i++;
+				}
+				const fullBullet = bulletLines.join( '\n' );
+				const prMatch = fullBullet.match( GUTENBERG_PR_REGEX );
+				const pr = prMatch ? parseInt( prMatch[ 1 ], 10 ) : 0;
+				const cleanBody = fullBullet
+					.replace(
+						/\s*\(\[#\d+\]\(https:\/\/github\.com\/WordPress\/gutenberg\/pull\/\d+\)\)\.?\s*$/,
+						''
+					)
+					.trim();
+
+				unreleasedEntries.push( {
+					kind: currentKind || 'Enhancements',
+					body: cleanBody,
+					pr,
+				} );
+				continue;
+			}
+
+			i++;
+			continue;
+		}
+
+		if ( currentVersion ) {
+			currentVersion.lines.push( line );
+			i++;
+			continue;
+		}
+
+		preamble += ( preamble ? '\n' : '' ) + line;
+		i++;
+	}
+
+	if ( currentVersion ) {
+		versions.push( {
+			version: currentVersion.version,
+			filename: `${ currentVersion.version }.md`,
+			content:
+				[ currentVersion.headingLine, ...currentVersion.lines ]
+					.join( '\n' )
+					.trim() + '\n',
+		} );
+	}
+
+	return {
+		preamble: preamble.trim(),
+		unreleasedEntries,
+		versions,
+	};
+}
+
+/**
+ * Migrates a package's CHANGELOG.md to Changie version files and fragments.
+ *
+ * @param packageName Package directory name (e.g. 'components' or 'ui').
+ * @param repoRoot    Path to Gutenberg repository root.
+ * @param dryRun      If true, does not write changes to disk.
+ * @return Summary of migration actions.
+ */
+export function migratePackageToChangie(
+	packageName: string,
+	repoRoot: string = process.cwd(),
+	dryRun: boolean = false
+) {
+	const normalized = packageName
+		.replace( /^@wordpress\//, '' )
+		.replace( /^packages\//, '' );
+	const changelogPath = path.resolve(
+		repoRoot,
+		'packages',
+		normalized,
+		'CHANGELOG.md'
+	);
+	if ( ! fs.existsSync( changelogPath ) ) {
+		throw new Error( `CHANGELOG.md not found at ${ changelogPath }` );
+	}
+
+	const content = fs.readFileSync( changelogPath, 'utf8' );
+	const parsed = parseChangelogContent( content );
+
+	const changieConfig = loadChangieConfig( repoRoot );
+	const changesDir = path.resolve(
+		repoRoot,
+		changieConfig.changesDir || '.changes'
+	);
+	const projectChangesDir = path.resolve( changesDir, normalized );
+	const unreleasedDir = path.resolve(
+		changesDir,
+		changieConfig.unreleasedDir || 'unreleased'
+	);
+
+	const operations: Array< {
+		type: string;
+		path: string;
+		content?: string;
+	} > = [];
+
+	// 1. Create project version files
+	for ( const v of parsed.versions ) {
+		operations.push( {
+			type: 'write-version',
+			path: path.join( projectChangesDir, v.filename ),
+			content: v.content,
+		} );
+	}
+
+	// 2. Create unreleased YAML fragments
+	for ( const entry of parsed.unreleasedEntries ) {
+		const pr = entry.pr || 0;
+		const safeKind = entry.kind.toLowerCase().replace( /\s+/g, '-' );
+		const filename = `${ normalized }-${ pr }-${ safeKind }.yaml`;
+		const fragmentData = {
+			project: normalized,
+			kind: entry.kind,
+			body: entry.body,
+			time: new Date().toISOString(),
+			custom: {
+				PR: pr ? String( pr ) : '',
+			},
+		};
+		operations.push( {
+			type: 'write-fragment',
+			path: path.join( unreleasedDir, filename ),
+			content: yaml.safeDump( fragmentData ),
+		} );
+	}
+
+	if ( ! dryRun ) {
+		fs.mkdirSync( projectChangesDir, { recursive: true } );
+		fs.mkdirSync( unreleasedDir, { recursive: true } );
+
+		for ( const op of operations ) {
+			if ( op.content ) {
+				fs.writeFileSync( op.path, op.content, 'utf8' );
+			}
+		}
+	}
+
+	return {
+		packageName: normalized,
+		versionsCreated: parsed.versions.length,
+		fragmentsCreated: parsed.unreleasedEntries.length,
+		operations,
+	};
+}
+
+/**
+ * Reverses migration: compiles version files and unreleased fragments back into CHANGELOG.md.
+ *
+ * @param packageName Package directory name (e.g. 'components' or 'ui').
+ * @param repoRoot    Path to Gutenberg repository root.
+ * @param dryRun      If true, does not write changes to disk.
+ * @return Summary of roll back actions.
+ */
+export function rollbackPackageFromChangie(
+	packageName: string,
+	repoRoot: string = process.cwd(),
+	dryRun: boolean = false
+) {
+	const normalized = packageName
+		.replace( /^@wordpress\//, '' )
+		.replace( /^packages\//, '' );
+	const changieConfig = loadChangieConfig( repoRoot );
+	const changesDir = path.resolve(
+		repoRoot,
+		changieConfig.changesDir || '.changes'
+	);
+	const projectChangesDir = path.resolve( changesDir, normalized );
+	const unreleasedDir = path.resolve(
+		changesDir,
+		changieConfig.unreleasedDir || 'unreleased'
+	);
+
+	if ( ! fs.existsSync( projectChangesDir ) ) {
+		throw new Error(
+			`No Changie version directory found for ${ normalized }`
+		);
+	}
+
+	// 1. Read all version files and sort by semver descending
+	const versionFiles = fs
+		.readdirSync( projectChangesDir )
+		.filter( ( f ) => f.endsWith( '.md' ) );
+	const sortedFiles = versionFiles.sort( ( a, b ) => {
+		const vA = semver.valid( path.basename( a, '.md' ) ) || '0.0.0';
+		const vB = semver.valid( path.basename( b, '.md' ) ) || '0.0.0';
+		return semver.rcompare( vA, vB );
+	} );
+
+	const versionContents = sortedFiles.map( ( f ) =>
+		fs.readFileSync( path.join( projectChangesDir, f ), 'utf8' ).trim()
+	);
+
+	// 2. Read any unreleased fragments for this project
+	const fragments: UnreleasedEntry[] = [];
+	if ( fs.existsSync( unreleasedDir ) ) {
+		const fragmentFiles = fs
+			.readdirSync( unreleasedDir )
+			.filter( ( f ) => f.endsWith( '.yaml' ) );
+		for ( const f of fragmentFiles ) {
+			const filePath = path.join( unreleasedDir, f );
+			const parsed = yaml.safeLoad(
+				fs.readFileSync( filePath, 'utf8' )
+			) as any;
+			if ( parsed && parsed.project === normalized ) {
+				fragments.push( {
+					kind: parsed.kind,
+					body: parsed.body,
+					pr: parsed.custom?.PR
+						? parseInt( parsed.custom.PR, 10 )
+						: 0,
+				} );
+			}
+		}
+	}
+
+	// 3. Assemble standard CHANGELOG.md
+	let output =
+		'<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->\n\n## Unreleased\n';
+	if ( fragments.length > 0 ) {
+		const groupedByKind = new Map< string, UnreleasedEntry[] >();
+		for ( const frag of fragments ) {
+			const kind = frag.kind || 'Enhancements';
+			if ( ! groupedByKind.has( kind ) ) {
+				groupedByKind.set( kind, [] );
+			}
+			groupedByKind.get( kind )!.push( frag );
+		}
+
+		for ( const [ kind, items ] of groupedByKind.entries() ) {
+			output += `\n### ${ kind }\n\n`;
+			for ( const item of items ) {
+				const prLink = item.pr
+					? ` ([#${ item.pr }](https://github.com/WordPress/gutenberg/pull/${ item.pr })).`
+					: '.';
+				output += `-   ${ item.body }${ prLink }\n`;
+			}
+		}
+	} else {
+		output += '\n';
+	}
+
+	for ( const vContent of versionContents ) {
+		output += `\n${ vContent }\n`;
+	}
+
+	const changelogPath = path.resolve(
+		repoRoot,
+		'packages',
+		normalized,
+		'CHANGELOG.md'
+	);
+
+	if ( ! dryRun ) {
+		fs.writeFileSync( changelogPath, output.trim() + '\n', 'utf8' );
+		// Clean up project version files
+		for ( const f of versionFiles ) {
+			fs.unlinkSync( path.join( projectChangesDir, f ) );
+		}
+		fs.rmdirSync( projectChangesDir );
+
+		// Clean up unreleased fragments for this project
+		if ( fs.existsSync( unreleasedDir ) ) {
+			const fragmentFiles = fs
+				.readdirSync( unreleasedDir )
+				.filter( ( f ) => f.endsWith( '.yaml' ) );
+			for ( const f of fragmentFiles ) {
+				const filePath = path.join( unreleasedDir, f );
+				const parsed = yaml.safeLoad(
+					fs.readFileSync( filePath, 'utf8' )
+				) as any;
+				if ( parsed && parsed.project === normalized ) {
+					fs.unlinkSync( filePath );
+				}
+			}
+		}
+	}
+
+	return {
+		packageName: normalized,
+		versionsRestored: versionFiles.length,
+		fragmentsRestored: fragments.length,
+	};
+}
