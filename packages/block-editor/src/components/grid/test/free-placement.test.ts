@@ -5,6 +5,7 @@ import {
 	getEqualTracks,
 	getGridPlacementFromPixelRect,
 	getPixelRectFromGridPlacement,
+	getResizedGridPlacement,
 	snapPixelRectEdges,
 	snapPixelRectPosition,
 	type PixelRectEdge,
@@ -193,5 +194,71 @@ describe( 'getEqualTracks', () => {
 			{ start: 0, end: 100 },
 			{ start: 110, end: 210 },
 		] );
+	} );
+} );
+
+describe( 'getResizedGridPlacement', () => {
+	const options = { columnTracks, rowTracks, rowGap: 10 };
+
+	it( 'resizes freely', () => {
+		expect(
+			getResizedGridPlacement( {
+				...options,
+				pixelRect: { left: 110, top: 0, right: 260, bottom: 100 },
+				direction: 'right',
+				snap: false,
+			} )
+		).toEqual( {
+			columnStart: 2,
+			columnSpan: 2,
+			rowStart: 1,
+			rowSpan: 1,
+			box: { left: 0, top: 0, width: 0.7143, height: 1 },
+		} );
+	} );
+
+	it( 'snaps only the dragged edge with Shift', () => {
+		expect(
+			getResizedGridPlacement( {
+				...options,
+				pixelRect: { left: 50, top: 0, right: 260, bottom: 100 },
+				direction: 'right',
+				snap: true,
+			} )
+		).toEqual( {
+			columnStart: 1,
+			columnSpan: 2,
+			rowStart: 1,
+			rowSpan: 1,
+			box: { left: 0.2381, top: 0, width: 0.7619, height: 1 },
+		} );
+	} );
+
+	it( 'grows past the last row', () => {
+		expect(
+			getResizedGridPlacement( {
+				...options,
+				pixelRect: { left: 0, top: 330, right: 100, bottom: 600 },
+				direction: 'bottom',
+				snap: false,
+			} )
+		).toEqual( {
+			columnStart: 1,
+			columnSpan: 1,
+			rowStart: 4,
+			rowSpan: 3,
+			box: { left: 0, top: 0, width: 1, height: 0.8438 },
+		} );
+	} );
+
+	it( 'clamps the left edge to the grid', () => {
+		expect(
+			getResizedGridPlacement( {
+				...options,
+				pixelRect: { left: -30, top: 0, right: 100, bottom: 100 },
+				direction: 'left',
+				snap: false,
+			} )
+		).toEqual( { columnStart: 1, columnSpan: 1, rowStart: 1, rowSpan: 1 } );
 	} );
 } );

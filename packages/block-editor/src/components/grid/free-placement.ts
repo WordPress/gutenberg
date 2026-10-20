@@ -345,3 +345,57 @@ export function snapPixelRectEdges(
 	}
 	return snapped;
 }
+
+/**
+ * Gets a resized block's place in a grid with cells of a fixed size. The
+ * block keeps the size it was resized to, inside the grid's left, top and
+ * right edges. Past the last row, the grid grows, so its bottom edge can go
+ * further. With `snap`, the edge being dragged snaps to the closest grid line.
+ *
+ * @param options
+ * @param options.pixelRect    The resized block's rectangle.
+ * @param options.direction    The edge being dragged.
+ * @param options.columnTracks Column tracks.
+ * @param options.rowTracks    Row tracks.
+ * @param options.rowGap       Row gap in pixels.
+ * @param options.snap         Whether to snap the dragged edge.
+ *
+ * @return The block's place.
+ */
+export function getResizedGridPlacement( {
+	pixelRect,
+	direction,
+	columnTracks,
+	rowTracks,
+	rowGap,
+	snap,
+}: {
+	pixelRect: PixelRect;
+	direction: PixelRectEdge;
+	columnTracks: GridTrack[];
+	rowTracks: GridTrack[];
+	rowGap: number;
+	snap: boolean;
+} ): GridPlacement {
+	const gridRight = columnTracks[ columnTracks.length - 1 ].end;
+	let rect: PixelRect = {
+		left: Math.max( pixelRect.left, 0 ),
+		top: Math.max( pixelRect.top, 0 ),
+		right: Math.min( pixelRect.right, gridRight ),
+		bottom: pixelRect.bottom,
+	};
+	const extendedRowTracks = extendTracks( rowTracks, rect.bottom, rowGap );
+	if ( snap ) {
+		rect = snapPixelRectEdges(
+			rect,
+			[ direction ],
+			columnTracks,
+			extendedRowTracks
+		);
+	}
+	return getGridPlacementFromPixelRect(
+		rect,
+		columnTracks,
+		extendedRowTracks
+	);
+}
