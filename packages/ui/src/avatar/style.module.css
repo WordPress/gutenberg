@@ -28,7 +28,7 @@
 			--_wp-ui-avatar-radius: 50%;
 			--_wp-ui-avatar-background: var(--wpds-color-background-surface-neutral-weak);
 			--_wp-ui-avatar-foreground: var(--wpds-color-foreground-content-neutral-weak);
-			--_wp-ui-avatar-ring: var(--wpds-color-stroke-surface-neutral);
+			--_wp-ui-avatar-ring: var(--wpds-color-stroke-surface-neutral-strong);
 			--_wp-ui-avatar-font-size: var(--wpds-typography-font-size-sm);
 			--_wp-ui-avatar-font-scale: 1;
 			--_wp-ui-avatar-content-size: calc(var(--_wp-ui-avatar-size) + var(--_wp-ui-avatar-track-space) - 4 * var(--wpds-border-width-focus));
