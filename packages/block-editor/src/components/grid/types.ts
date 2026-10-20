@@ -1,5 +1,12 @@
-import type { CSSProperties } from 'react';
+import type {
+	CSSProperties,
+	Dispatch,
+	ReactNode,
+	Ref,
+	SetStateAction,
+} from 'react';
 import type { Layout } from '../../layouts/types';
+import type { GridRect } from './utils';
 
 /**
  * The position and size of a block within its grid, from `style.layout`.
@@ -101,4 +108,58 @@ export interface GridItemMoverProps {
 	isDisabled?: boolean | 0 | null;
 	onClick: () => void;
 	description: string;
+}
+
+export interface GridVisualizerProps {
+	/** Client ID of the grid block. */
+	clientId: string;
+	/** Ref to the element holding the grid cells. */
+	contentRef?: Ref< HTMLDivElement >;
+	/** Layout of the grid block. */
+	parentLayout?: Layout;
+	/** Client ID of a selected child that is itself a grid. */
+	childGridClientId?: string;
+}
+
+export interface GridVisualizerGridProps {
+	gridClientId: string;
+	gridElement: Element;
+	isManualGrid?: boolean;
+	childGridClientId?: string;
+}
+
+export interface GridVisualizerCellProps {
+	color: string;
+	children?: ReactNode;
+	className?: string | false;
+}
+
+/**
+ * A cell of a manual grid, and how it highlights the area a drag covers.
+ */
+export interface GridVisualizerCellPosition {
+	column: number;
+	row: number;
+	gridClientId: string;
+	gridInfo: GridInfo;
+	setHighlightedRect: Dispatch< SetStateAction< GridRect | null > >;
+}
+
+/**
+ * Drop zone handlers, called with the dragged block when it may drop.
+ */
+export interface DropZoneWithValidationOptions {
+	validateDrag: ( srcClientId: string ) => boolean;
+	onDragEnter: ( srcClientId: string ) => void;
+	onDragLeave: () => void;
+	onDrop: ( srcClientId: string ) => void;
+}
+
+export interface AutoGridVisualizerProps {
+	gridInfo: GridInfo;
+	childGridRect: GridRect | null;
+}
+
+export interface ManualGridVisualizerProps extends AutoGridVisualizerProps {
+	gridClientId: string;
 }

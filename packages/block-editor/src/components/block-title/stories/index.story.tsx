@@ -1,3 +1,5 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+// @ts-expect-error `@wordpress/block-library` does not expose type declarations for its entry point.
 import { registerCoreBlocks } from '@wordpress/block-library';
 import { createBlock } from '@wordpress/blocks';
 import { ExperimentalBlockEditorProvider } from '../../provider';
@@ -31,6 +33,7 @@ const meta = {
 	],
 	argTypes: {
 		clientId: {
+			// @ts-expect-error Bug: `null` is not a control type, `false` hides the control.
 			control: { type: null },
 			description: 'Client ID of block.',
 			table: {
@@ -59,11 +62,11 @@ const meta = {
 			},
 		},
 	},
-};
+} satisfies Meta< typeof BlockTitle >;
 
 export default meta;
 
-export const Default = {
+export const Default: StoryObj< typeof meta > = {
 	args: {
 		clientId: blocks[ 0 ].clientId,
 	},
