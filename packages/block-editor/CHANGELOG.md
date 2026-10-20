@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 19.0.0 (2026-10-20)
-
 ### Breaking Changes
 
 -   `FontFamilyControl`: Internal markup and CSS classes have changed; custom CSS overrides may need updates. Popup items render outside the control root, and custom `options[].style` applies only to the option label. See the pull request's dev note for migration details ([#84715](https://github.com/WordPress/gutenberg/pull/84715)).
