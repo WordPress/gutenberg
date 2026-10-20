@@ -45,7 +45,12 @@ const linkColorRow = {
 	newValue: '#ff0000',
 };
 
-function getReviewRows( rows, styles, elements, name = 'core/button' ) {
+function getReviewRows(
+	rows: object[],
+	styles: Record< string, unknown >,
+	elements: string[],
+	name = 'core/button'
+) {
 	const { result } = renderHook( () =>
 		useReviewRows( rows, { styles }, name, elements )
 	);
