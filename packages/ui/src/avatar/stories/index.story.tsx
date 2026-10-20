@@ -1,23 +1,20 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import * as Avatar from '../index';
+import { Avatar } from '../index';
 import { Button } from '../../button';
 import { Stack } from '../../stack';
 import { Text } from '../../text';
+import * as Tooltip from '../../tooltip';
 
 // Profile illustration by Masantocreative: https://unsplash.com/illustrations/someone-is-thinking-and-strategizing-with-their-brain-1L--AMFSThk
 // Used under the Unsplash License: https://unsplash.com/license
 const IMAGE_SRC =
 	'https://images.unsplash.com/vector-1753200161282-0c2bef060ac4?w=128&h=128&fit=crop&fm=jpg';
 
-const meta: Meta< typeof Avatar.Root > = {
+const meta: Meta< typeof Avatar > = {
 	title: 'Components/@wordpress-ui/Avatar',
 	id: 'design-system-components-avatar',
-	component: Avatar.Root,
-	subcomponents: {
-		'Avatar.Image': Avatar.Image,
-		'Avatar.Fallback': Avatar.Fallback,
-		'Avatar.Initials': Avatar.Initials,
-	},
+	component: Avatar,
+	args: { name: 'Alex Morgan' },
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
@@ -28,90 +25,98 @@ const meta: Meta< typeof Avatar.Root > = {
 };
 export default meta;
 
-type Story = StoryObj< typeof Avatar.Root >;
+type Story = StoryObj< typeof Avatar >;
 
 export const Default: Story = {
-	args: {
-		'aria-label': 'Alex Morgan',
-		role: 'img',
-	},
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback delay={ 300 }>AM</Avatar.Fallback>
-			<Avatar.Image src={ IMAGE_SRC } alt="" />
-		</Avatar.Root>
-	),
+	args: { src: IMAGE_SRC },
 };
 
-/** Apply the same color to image rings, initials, and person fallbacks. */
+/** The assigned color fills initials and the activity ring; inactive images have no ring. */
 export const WithColor: Story = {
-	...Default,
-	args: { ...Default.args, color: '#008a20' },
+	args: { color: '#008a20' },
 	render: ( args ) => (
 		<Stack gap="md" align="center">
-			<Avatar.Root { ...args }>
-				<Avatar.Fallback />
-				<Avatar.Image src={ IMAGE_SRC } alt="" />
-			</Avatar.Root>
-			<Avatar.Root { ...args }>
-				<Avatar.Initials name="Alex Morgan" />
-			</Avatar.Root>
-			<Avatar.Root { ...args }>
-				<Avatar.Fallback />
-			</Avatar.Root>
+			<Avatar { ...args } src={ IMAGE_SRC } active />
+			<Avatar { ...args } active />
+			<Avatar { ...args } />
 		</Stack>
 	),
 };
 
-/** Wrap a decorative avatar in a button to make it interactive. */
-export const Interactive: Story = {
+/** Activity changes the ring without changing the avatar's footprint. */
+export const Activity: Story = {
 	render: ( args ) => (
-		<Button
-			variant="unstyled"
-			aria-label="Open Alex Morgan's profile"
-			style={ {
-				display: 'inline-flex',
-				borderRadius:
-					args.shape === 'square'
-						? 'var(--wpds-border-radius-sm)'
-						: '50%',
-			} }
-		>
-			<Avatar.Root { ...args } aria-hidden="true">
-				<Avatar.Initials name="Alex Morgan" />
-			</Avatar.Root>
-		</Button>
+		<Stack gap="md" align="center">
+			<Avatar { ...args } active={ false } />
+			<Avatar { ...args } active />
+			<Avatar { ...args } src={ IMAGE_SRC } active={ false } />
+			<Avatar { ...args } src={ IMAGE_SRC } active />
+		</Stack>
 	),
 };
 
-/** Omit fallback content to display the person icon. */
-export const IconFallback: Story = {
-	...Default,
-	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Fallback />
-		</Avatar.Root>
-	),
-};
-
-/** Derive initials from a display name. */
+/** Single-word names display one larger initial. Hyphens and apostrophes stay within words. */
 export const Initials: Story = {
-	...Default,
 	render: ( args ) => (
-		<Avatar.Root { ...args }>
-			<Avatar.Initials name="Alex Morgan" />
-		</Avatar.Root>
+		<Stack gap="md" align="center">
+			{ [
+				'Alex Morgan',
+				'Alex',
+				'Jean-Luc',
+				"O'Connor",
+				'👩🏽‍💻',
+				'李 小龙',
+			].map( ( name ) => (
+				<Avatar { ...args } key={ name } name={ name } />
+			) ) }
+		</Stack>
 	),
 };
 
-/** Hide the avatar from assistive technology when the name is shown beside it. */
+/** Size describes the intended image size on high-DPI screens, with ring and halo space reserved outside it. */
+export const Sizes: Story = {
+	render: ( args ) => (
+		<Stack gap="md" align="center">
+			{ ( [ 'xs', 'sm', 'md', 'lg', 'xl' ] as const ).map( ( size ) => (
+				<Avatar { ...args } key={ size } size={ size } />
+			) ) }
+		</Stack>
+	),
+};
+
+/** The button owns keyboard focus and the tooltip; Avatar's activity ring remains independent. */
+export const Interactive: Story = {
+	args: { color: '#008a20', active: true },
+	render: ( args ) => (
+		<Tooltip.Root>
+			<Tooltip.Trigger
+				render={
+					<Button
+						variant="unstyled"
+						aria-label={ args.name }
+						style={ {
+							display: 'inline-flex',
+							borderRadius:
+								args.shape === 'square'
+									? 'calc(var(--wpds-border-radius-sm) + 2 * var(--wpds-border-width-focus))'
+									: '50%',
+						} }
+					/>
+				}
+			>
+				<Avatar { ...args } aria-hidden="true" />
+			</Tooltip.Trigger>
+			<Tooltip.Popup>{ args.name }</Tooltip.Popup>
+		</Tooltip.Root>
+	),
+};
+
+/** Hide the avatar from assistive technology when nearby text identifies the person. */
 export const WithVisibleName: Story = {
 	render: ( args ) => (
 		<Stack gap="sm" align="center">
-			<Avatar.Root { ...args } aria-hidden="true">
-				<Avatar.Initials name="Alex Morgan" />
-			</Avatar.Root>
-			<Text>Alex Morgan</Text>
+			<Avatar { ...args } aria-hidden="true" />
+			<Text>{ args.name }</Text>
 		</Stack>
 	),
 };
