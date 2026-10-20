@@ -12,14 +12,13 @@ import {
 	getBlockSupport,
 	isUnmodifiedDefaultBlock,
 	isUnmodifiedBlock,
-	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import type { Block, BlockType } from '@wordpress/blocks';
+import type { Block } from '@wordpress/blocks';
 import type { RichTextData } from '@wordpress/rich-text';
 import {
 	retrieveSelectedAttribute,
@@ -32,7 +31,6 @@ import {
 	editContentOnlySection,
 } from './private-actions';
 import { getSiblingBlockAttributes } from '../utils/sibling-block-attributes';
-import { unlock } from '../lock-unlock';
 import type {
 	BlockEditingMode,
 	BlockEditorThunkArgs,
@@ -49,9 +47,6 @@ import type {
 } from './types';
 
 type RichTextHtml = string | RichTextData | undefined;
-type BlockTypeWithEditableRoot = BlockType & Record< symbol, unknown >;
-
-const { editableRootKey } = unlock( blocksPrivateApis );
 
 const castArray = < T >( maybeArray: T | T[] ): T[] =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -746,30 +741,6 @@ export const insertBlocks =
 					blocksWithTemplates,
 					initialPosition
 				);
-				// Select the start of the inserted block's text when the block
-				// opts into the editable root, so its single field places the
-				// caret as it mounts. Focusing the field later would move focus
-				// off the host and back, which resets the iOS keyboard's
-				// capitalization.
-				if ( updateSelection && initialPosition === 0 ) {
-					const clientId = select.getSelectedBlockClientId();
-					const blockType =
-						clientId &&
-						getBlockType( select.getBlockName( clientId )! );
-					const attributeKey =
-						(
-							blockType as BlockTypeWithEditableRoot | undefined
-						 )?.[ editableRootKey ] &&
-						findRichTextAttributeKey( blockType as BlockType );
-					if ( attributeKey ) {
-						dispatch.selectionChange(
-							clientId!,
-							attributeKey as string,
-							0,
-							0
-						);
-					}
-				}
 			} );
 		}
 	};
@@ -1221,30 +1192,10 @@ export const __unstableSplitSelection =
 		}
 
 		if ( ! blocks.length ) {
-			registry.batch( () => {
-				dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
-					head,
-					tail,
-				] );
-				// Select the start of the tail field in the same batch, like
-				// the branches below, so the field places the caret as it
-				// mounts rather than being focused later. Only for blocks
-				// that opt into the editable root. The tail may have changed
-				// block type, so read the key from its type.
-				const tailType = getBlockType( tail.name );
-				const tailKey =
-					( tailType as BlockTypeWithEditableRoot | undefined )?.[
-						editableRootKey
-					] && findRichTextAttributeKey( tailType! );
-				if ( tailKey ) {
-					dispatch.selectionChange(
-						tail.clientId,
-						tailKey as string,
-						0,
-						0
-					);
-				}
-			} );
+			dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
+				head,
+				tail,
+			] );
 			return;
 		}
 
