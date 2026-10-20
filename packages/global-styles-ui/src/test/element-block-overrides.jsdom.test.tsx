@@ -2,7 +2,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Navigator } from '@wordpress/components';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { createElement } from '@wordpress/element';
 import ElementBlockOverrides from '../element-block-overrides';
 import { getOverridingBlockTypes } from '../screen-block-list';
 import { GlobalStylesContext } from '../context';
@@ -36,26 +35,20 @@ function getConfig( blocks ) {
 function renderOverrides( element, blocks ) {
 	const config = getConfig( blocks );
 	return render(
-		createElement(
-			GlobalStylesContext.Provider,
-			{
-				value: {
-					user: { styles: {}, settings: {} },
-					base: config,
-					merged: config,
-					onChange: () => {},
-				},
-			},
-			createElement(
-				Navigator,
-				{ initialPath: '/' },
-				createElement(
-					Navigator.Screen,
-					{ path: '/' },
-					createElement( ElementBlockOverrides, { element } )
-				)
-			)
-		)
+		<GlobalStylesContext.Provider
+			value={ {
+				user: { styles: {}, settings: {} },
+				base: config,
+				merged: config,
+				onChange: () => {},
+			} }
+		>
+			<Navigator initialPath="/">
+				<Navigator.Screen path="/">
+					<ElementBlockOverrides element={ element } />
+				</Navigator.Screen>
+			</Navigator>
+		</GlobalStylesContext.Provider>
 	);
 }
 
