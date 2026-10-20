@@ -60,7 +60,7 @@
 	}
 }
 
-// Match the Emotion &&& selector, which counteracts wp-admin forms.css.
+// Triple specificity counteracts wp-admin forms.css.
 .unit-select.unit-select.unit-select {
 	appearance: none;
 	background: transparent;

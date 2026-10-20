@@ -21,11 +21,11 @@ import {
 	getCurrentPostRevisionsCount,
 } from './selectors';
 import {
-	getEntityActions as _getEntityActions,
 	getEntityFields as _getEntityFields,
 	isEntityReady as _isEntityReady,
 } from '../dataviews/store/private-selectors';
 import { unlock } from '../lock-unlock';
+import { STORE_NAME } from './constants';
 
 const EMPTY_INSERTION_POINT = {
 	rootClientId: undefined,
@@ -169,10 +169,6 @@ export const getPostIcon = createRegistrySelector(
 		}
 	}
 );
-
-export function getEntityActions( state, ...args ) {
-	return _getEntityActions( state.dataviews, ...args );
-}
 
 export function isEntityReady( state, ...args ) {
 	return _isEntityReady( state.dataviews, ...args );
@@ -436,7 +432,7 @@ export const getPageRevisions = createRegistrySelector(
  * @return {boolean} Whether revisions mode is active.
  */
 export function isRevisionsMode( state ) {
-	return state.revisionId !== null;
+	return state.revisionId !== null || state.browserBackup !== null;
 }
 
 /**
@@ -457,6 +453,27 @@ export function isShowingRevisionDiff( state ) {
  */
 export function getCurrentRevisionId( state ) {
 	return state.revisionId;
+}
+
+/**
+ * Returns whether the revisions view shows the backup kept in the browser.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether the browser backup is shown.
+ */
+export function isViewingBrowserBackup( state ) {
+	return state.browserBackup !== null;
+}
+
+/**
+ * Returns the browser backup shown in the revisions view, shaped like a
+ * revision.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null} The backup, or null when it isn't shown.
+ */
+export function getBrowserBackup( state ) {
+	return state.browserBackup;
 }
 
 /**
@@ -596,6 +613,54 @@ export const getPreviousRevision = createRegistrySelector(
 
 		return null;
 	}
+);
+
+/**
+ * Returns what the revisions view shows: the browser backup, or the current
+ * revision.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The shown version, shaped like a revision.
+ */
+export const getShownVersion = createRegistrySelector(
+	( select ) => ( state ) =>
+		state.browserBackup ??
+		unlock( select( STORE_NAME ) ).getCurrentRevision()
+);
+
+/**
+ * Returns what the revisions view compares the shown version with. The
+ * browser backup is compared with the editor's content, which restoring it
+ * replaces. A revision is compared with the previous revision.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The compared version, shaped like a revision.
+ */
+export const getComparedVersion = createRegistrySelector( ( select ) =>
+	createSelector(
+		( state ) => {
+			const editor = unlock( select( STORE_NAME ) );
+			if ( ! state.browserBackup ) {
+				return editor.getPreviousRevision();
+			}
+			return {
+				title: { raw: editor.getEditedPostAttribute( 'title' ) },
+				content: { raw: editor.getEditedPostContent() },
+				excerpt: { raw: editor.getEditedPostAttribute( 'excerpt' ) },
+			};
+		},
+		( state ) => {
+			const editor = unlock( select( STORE_NAME ) );
+			return state.browserBackup
+				? [
+						state.browserBackup,
+						editor.getEditedPostAttribute( 'title' ),
+						editor.getEditedPostContent(),
+						editor.getEditedPostAttribute( 'excerpt' ),
+					]
+				: [ state.browserBackup, editor.getPreviousRevision() ];
+		}
+	)
 );
 
 /**
