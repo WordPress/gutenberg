@@ -42,5 +42,8 @@ export function useResolvedUrl( url?: string ) {
 				: undefined,
 		[ needsBaseUrl ]
 	);
-	return getResolvedUrl( url, homeUrl );
+	// The home URL has no trailing slash, but the front end serves the home
+	// page as a directory (`/blog/`), so a page-relative link such as
+	// `./about` must resolve inside it.
+	return getResolvedUrl( url, homeUrl && homeUrl.replace( /\/?$/, '/' ) );
 }

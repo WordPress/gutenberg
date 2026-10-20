@@ -57,6 +57,22 @@ describe( 'useResolvedUrl', () => {
 		expect( select ).toHaveBeenCalled();
 	} );
 
+	// A subdirectory install serves its home page at `/blog/`, so a link
+	// relative to the home page must resolve inside the subdirectory.
+	test.each( [
+		[ './page', 'https://example.com/blog/page' ],
+		[ '#faq', 'https://example.com/blog/#faq' ],
+		[ '?s=term', 'https://example.com/blog/?s=term' ],
+		[ '/page', 'https://example.com/page' ],
+		[ '../page', 'https://example.com/page' ],
+	] )( 'resolves %s against a subdirectory home URL', ( url, expected ) => {
+		select.mockImplementation( () => ( {
+			getEntityRecord: () => ( { home: 'https://example.com/blog' } ),
+		} ) );
+		const { result } = renderHook( () => useResolvedUrl( url ) );
+		expect( result.current ).toBe( expected );
+	} );
+
 	test( 'does not read the home URL for an absolute link', () => {
 		const { result } = renderHook( () =>
 			useResolvedUrl( 'https://wordpress.org' )

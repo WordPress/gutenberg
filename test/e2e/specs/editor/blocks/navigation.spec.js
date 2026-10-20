@@ -2650,6 +2650,54 @@ test.describe( 'Navigation block', () => {
 				)
 				.toMatch( /test-page-1/ );
 		} );
+
+		test( 'strips an anchor tag typed into the Text field', async ( {
+			editor,
+			page,
+			requestUtils,
+		} ) => {
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Header Menu',
+				content:
+					'<!-- wp:buttons --><div class="wp-block-buttons">' +
+					'<!-- wp:button --><div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Testing</a></div><!-- /wp:button -->' +
+					'</div><!-- /wp:buttons -->',
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { ref: menu.id },
+			} );
+			const button = editor.canvas.getByRole( 'document', {
+				name: 'Block: Button',
+				exact: true,
+			} );
+			await button.click();
+			await editor.openDocumentSettingsSidebar();
+
+			// A link inside the button's own link is invalid HTML. The canvas
+			// strips the tag as it is typed, and the sidebar must do the same.
+			await page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'textbox', { name: 'Text' } )
+				.fill( '<a href="https://example.com/">Nested</a> link' );
+			await expect( button.getByRole( 'textbox' ) ).toHaveText(
+				'Nested link'
+			);
+			const clientId = await button.getAttribute( 'data-block' );
+			await expect
+				.poll( () =>
+					page.evaluate(
+						( id ) =>
+							String(
+								window.wp.data
+									.select( 'core/block-editor' )
+									.getBlockAttributes( id ).text
+							),
+						clientId
+					)
+				)
+				.toBe( 'Nested link' );
+		} );
 	} );
 } );
 
