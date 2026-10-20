@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `Notice.List`: Add announcements for added and changed notices, with per-notice message and urgency overrides ([#85209](https://github.com/WordPress/gutenberg/pull/85209)).
+
 ### Enhancements
 
 -   `SelectControl`: Warn in development when an item has an empty string `value`, which shows the placeholder instead of the item's label when selected ([#85172](https://github.com/WordPress/gutenberg/pull/85172)).
