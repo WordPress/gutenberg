@@ -446,8 +446,8 @@ export type Settings = Record< string | symbol, unknown > & {
 	__experimentalReusableBlocks?: UserPattern[];
 	__experimentalUserPatternCategories?: UserPatternCategory[];
 	__unstableIsBlockBasedTheme?: boolean;
-	/** The styles of the editor canvas. */
-	styles?: Array< EditorStylesStyle >;
+	/** The styles of the editor canvas, flagged when generated from global styles. */
+	styles?: Array< EditorStylesStyle & { isGlobalStyles?: boolean } >;
 	[ currentUserIdSelectKey ]?: (
 		select: typeof globalSelect
 	) => number | undefined;
