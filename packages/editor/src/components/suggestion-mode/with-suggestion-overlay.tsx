@@ -15,7 +15,6 @@
 import clsx from 'clsx';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useRegistry, useSelect } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -33,6 +32,7 @@ import useMoveGhosts from './use-move-ghosts';
 import {
 	isPartOfPendingInsertion,
 	isPartOfPendingInsertionCached,
+	type SuggestionMarker,
 } from './store-interceptor';
 
 /**
@@ -337,9 +337,8 @@ const withSuggestionBlockClassName = createHigherOrderComponent(
 				( select ) => {
 					const editor = unlock( select( STORE_NAME ) );
 					const blockEditor = select( blockEditorStore );
-					const marker =
-						blockEditor?.getBlockAttributes?.( clientId )?.metadata
-							?.suggestion;
+					const marker = blockEditor?.getBlockAttributes?.( clientId )
+						?.metadata?.suggestion as SuggestionMarker | undefined;
 					return {
 						isSuggestMode:
 							editor.getEditorIntent() === EDITOR_INTENT_SUGGEST,

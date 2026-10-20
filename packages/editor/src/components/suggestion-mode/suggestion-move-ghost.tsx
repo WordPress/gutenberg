@@ -1,5 +1,4 @@
 import { useSelect } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { BlockIcon, store as blockEditorStore } from '@wordpress/block-editor';
 import { getBlockType } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';

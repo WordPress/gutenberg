@@ -13,7 +13,6 @@ import {
 	createReduxStore,
 	RegistryProvider,
 } from '@wordpress/data';
-// @ts-expect-error No exported types
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -42,6 +41,11 @@ import {
 } from '../overlay-context';
 import { store as editorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+
+// Block metadata is `unknown` in the store types; read its marker.
+function markerOf( attributes: any ): Record< string, any > | undefined {
+	return attributes?.metadata?.suggestion;
+}
 
 // The editor store pulls in `@wordpress/viewport`, which reads
 // `window.matchMedia` while loading.
@@ -537,8 +541,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		// Sanity: the first fire tagged the re-inserted block as
 		// pending-remove and recorded the matching structural op.
 		expect(
-			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
-				?.metadata?.suggestion?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( b.clientId )
+			)?.type
 		).toBe( 'pending-remove' );
 		expect( getOverlay().entries[ b.clientId ]?.structuralOp?.type ).toBe(
 			'block-remove'
@@ -557,8 +564,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		// The re-inserted block must still carry the pending-remove
 		// marker and its structural op must still describe a removal.
 		expect(
-			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
-				?.metadata?.suggestion?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( b.clientId )
+			)?.type
 		).toBe( 'pending-remove' );
 		expect( getOverlay().entries[ b.clientId ]?.structuralOp?.type ).toBe(
 			'block-remove'
@@ -591,8 +601,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await linkNote( registry, b.clientId, 4 );
 
 		expect(
-			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
-				?.metadata?.suggestion?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( b.clientId )
+			)?.type
 		).toBe( 'pending-remove' );
 
 		// The accepting client resolved the note before removing the
@@ -643,7 +656,10 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await act( async () => {
 			const { suggestion, ...metadata } = registry
 				.select( blockEditorStore )
-				.getBlockAttributes( b.clientId ).metadata;
+				.getBlockAttributes( b.clientId )?.metadata as Record<
+				string,
+				unknown
+			>;
 			getOverlay().requestInterceptorBypass( b.clientId );
 			registry
 				.dispatch( blockEditorStore )
@@ -677,8 +693,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await flushSubscribers();
 
 		expect(
-			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
-				?.metadata?.suggestion?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( b.clientId )
+			)?.type
 		).toBe( 'pending-remove' );
 		expect( registry.select( blockEditorStore ).getBlockOrder() ).toEqual( [
 			a.clientId,
@@ -733,7 +752,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		expect( liveBlocks[ 0 ].innerBlocks[ 0 ].attributes?.content ).toBe(
 			'Child'
 		);
-		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion?.type ).toBe(
+		expect( markerOf( liveBlocks[ 0 ].attributes )?.type ).toBe(
 			'pending-remove'
 		);
 	} );
@@ -870,9 +889,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			.select( blockEditorStore )
 			.getBlockAttributes( inserted.clientId );
 		expect( attributes?.content ).toBe( 'New words' );
-		expect( attributes?.metadata?.suggestion?.type ).toBe(
-			'pending-insert'
-		);
+		expect( markerOf( attributes )?.type ).toBe( 'pending-insert' );
 		expect(
 			getOverlay().entries[ inserted.clientId ]?.structuralOp?.type
 		).toBe( 'block-insert-after' );
@@ -944,10 +961,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await flushSubscribers();
 
 		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
-				?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( inserted.clientId )
+			)?.type
 		).toBe( 'pending-insert' );
 
 		// Simulate the reject landing: marker-clear + removeBlock
@@ -987,7 +1005,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 		const liveBlocks = registry.select( blockEditorStore ).getBlocks();
 		expect( liveBlocks[ 0 ].clientId ).toBe( inserted.clientId );
-		expect( liveBlocks[ 0 ].attributes?.metadata?.suggestion?.type ).toBe(
+		expect( markerOf( liveBlocks[ 0 ].attributes )?.type ).toBe(
 			'pending-insert'
 		);
 		expect(
@@ -1024,8 +1042,10 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			liveBlocks.map( ( bl: any ) => bl.attributes?.content )
 		).toEqual( [ 'A', 'C', 'D', 'B' ] );
 		expect(
-			liveBlocks.find( ( bl: any ) => bl.clientId === b.clientId )
-				?.attributes?.metadata?.suggestion?.type
+			markerOf(
+				liveBlocks.find( ( bl: any ) => bl.clientId === b.clientId )
+					?.attributes
+			)?.type
 		).toBe( 'pending-move' );
 
 		// Side-effect siblings: NOT tagged.
@@ -1071,10 +1091,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 			b.clientId,
 		] );
 		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
-				?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( inserted.clientId )
+			)?.type
 		).toBe( 'pending-insert' );
 		expect(
 			getOverlay().entries[ inserted.clientId ]?.structuralOp
@@ -1105,10 +1126,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await flushSubscribers();
 
 		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( child.clientId )?.metadata?.suggestion
-				?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( child.clientId )
+			)?.type
 		).toBe( 'pending-insert' );
 	} );
 
@@ -1392,7 +1414,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		);
 		expect( tagged ).toHaveLength( 1 );
 		expect( tagged[ 0 ].clientId ).toBe( c.clientId );
-		expect( tagged[ 0 ].attributes.metadata.suggestion ).toMatchObject( {
+		expect( markerOf( tagged[ 0 ].attributes ) ).toMatchObject( {
 			fromIndex: 2,
 			fromAnchorClientId: b.clientId,
 		} );
@@ -1430,8 +1452,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		} );
 		await flushSubscribers();
 		expect(
-			registry.select( blockEditorStore ).getBlockAttributes( b.clientId )
-				?.metadata?.suggestion?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( b.clientId )
+			)?.type
 		).toBe( 'pending-move' );
 
 		// The reject landing: marker-clear + restoring move in one batch.
@@ -1478,7 +1503,7 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		const insertedRoot = registry
 			.select( blockEditorStore )
 			.getBlock( parent.clientId );
-		expect( insertedRoot?.attributes?.metadata?.suggestion?.type ).toBe(
+		expect( markerOf( insertedRoot?.attributes )?.type ).toBe(
 			'pending-insert'
 		);
 		const insertedChild = registry
@@ -1526,8 +1551,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 
 		// Sanity: the apply-and-tag flow re-inserted and tagged the block.
 		expect(
-			registry.select( blockEditorStore ).getBlockAttributes( clientId )
-				?.metadata?.suggestion?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( clientId )
+			)?.type
 		).toBe( 'pending-remove' );
 		expect(
 			registry.select( blockEditorStore ).isLastBlockChangePersistent()
@@ -1548,10 +1576,11 @@ describe( 'SuggestionStoreInterceptor (integration)', () => {
 		await flushSubscribers();
 
 		expect(
-			registry
-				.select( blockEditorStore )
-				.getBlockAttributes( inserted.clientId )?.metadata?.suggestion
-				?.type
+			markerOf(
+				registry
+					.select( blockEditorStore )
+					.getBlockAttributes( inserted.clientId )
+			)?.type
 		).toBe( 'pending-insert' );
 		expect(
 			registry.select( blockEditorStore ).isLastBlockChangePersistent()
