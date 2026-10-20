@@ -13925,11 +13925,6 @@
 			"count": 5
 		}
 	},
-	"packages/latex-to-mathml/src/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/lazy-editor/src/components/preview/index.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1

@@ -23,7 +23,7 @@ const meta: Meta< typeof Notice.Root > = {
 		docs: {
 			description: {
 				component:
-					'Use Notice.List for announcements of dynamic notices. Standalone notices stay silent. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for examples and migration guidance.',
+					'Use Notice.List for announcements of dynamic notices. Standalone notices stay silent. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for examples and migration guidance. See [Notice with disclosed details](?path=/docs/design-system-components-notice-disclosure--docs) for a composition with native details and a copy button.',
 			},
 		},
 		componentStatus: {
