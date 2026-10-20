@@ -11,6 +11,8 @@ import {
 	searchItems,
 } from './utils/search-ranking';
 import { getPopulatedCategories } from './components/inserter/block-patterns-tab/utils';
+import usePatternsPaging from './components/inserter/hooks/use-patterns-paging';
+import BlockPatternsPaging from './components/block-patterns-paging';
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { PrivateBlockInspectorEditOriginal } from './components/block-inspector/edit-original-slot-fill';
@@ -161,4 +163,6 @@ lock( privateApis, {
 	isElementVisible,
 	getPopulatedCategories,
 	searchItems,
+	usePatternsPaging,
+	BlockPatternsPaging,
 } );
