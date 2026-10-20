@@ -1,3 +1,4 @@
+import { action } from 'storybook/actions';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useRef, useState } from '@wordpress/element';
 import { fn } from 'storybook/test';
@@ -25,6 +26,7 @@ const meta: Meta< typeof SearchableSelectControl > = {
 	id: 'design-system-components-form-searchableselectcontrol',
 	component: SearchableSelectControl,
 	subcomponents: {
+		'SearchableSelectControl.Trigger': SearchableSelectControl.Trigger,
 		'SearchableSelectControl.Group': SearchableSelectControl.Group,
 		'SearchableSelectControl.GroupLabel':
 			SearchableSelectControl.GroupLabel,
@@ -83,6 +85,27 @@ export const WithCustomPlaceholder: Story = {
 		...SearchableSelectStories.WithCustomPlaceholder.args,
 		label: 'Label',
 		description: 'This is a description.',
+	},
+};
+
+/**
+ * Pass a `SearchableSelectControl.Trigger` element to `trigger` to customize
+ * button props and content while retaining the field label and description.
+ */
+export const WithCustomTrigger: Story = {
+	args: {
+		...Default.args,
+		defaultValue: ITEMS[ 0 ],
+		trigger: (
+			<SearchableSelectControl.Trigger
+				onFocus={ action( 'onFocus' ) }
+				onBlur={ action( 'onBlur' ) }
+			>
+				{ ( item ) =>
+					item ? <strong>{ item.label }</strong> : null
+				}
+			</SearchableSelectControl.Trigger>
+		),
 	},
 };
 
@@ -187,11 +210,11 @@ export const Creatable: Story = {
 	},
 };
 
-export const WithCustomTriggerAndItems: Story = {
-	...SearchableSelectStories.WithCustomTriggerAndItems,
+export const WithCustomItems: Story = {
+	...SearchableSelectStories.WithCustomItems,
 	args: {
 		...Default.args,
-		...SearchableSelectStories.WithCustomTriggerAndItems.args,
+		...SearchableSelectStories.WithCustomItems.args,
 	},
 };
 
