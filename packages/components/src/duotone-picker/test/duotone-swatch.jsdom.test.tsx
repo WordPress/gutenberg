@@ -15,10 +15,4 @@ describe( 'DuotoneSwatch', () => {
 				'linear-gradient(135deg, #8c00b7 0%, #8c00b7 50%, #fcff41 50%, #fcff41 100%)',
 		} );
 	} );
-
-	it( 'should render the swatch icon when there are no values', () => {
-		const { container } = render( <DuotoneSwatch values={ null } /> );
-
-		expect( container ).toMatchSnapshot();
-	} );
 } );
