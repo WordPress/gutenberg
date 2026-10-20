@@ -14,6 +14,7 @@ import SuggestionActions, {
 	SuggestionActionButtons,
 	useSuggestionDecision,
 } from './suggestion-actions';
+import { NoteReactions } from './reactions/note-reactions';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -54,6 +55,7 @@ export function Note( {
 	onEditNote,
 	onDeleteNote,
 	onResolve,
+	isThreadResolved = false,
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
@@ -226,9 +228,23 @@ export function Note( {
 		<NoteCard
 			note={ note }
 			actions={ actions }
+			className="editor-collab-sidebar-panel__note"
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
-			{ body }
+			<div className="editor-collab-sidebar-panel__note-body">
+				{ body }
+				<NoteReactions
+					noteId={ note.id }
+					// Not while editing: the trigger floats over the form's
+					// text field.
+					canReact={
+						isSelected &&
+						actionState !== 'edit' &&
+						! isThreadResolved
+					}
+					disabled={ isThreadResolved }
+				/>
+			</div>
 			{ hasSuggestionPayload && (
 				<SuggestionActions
 					thread={ note }

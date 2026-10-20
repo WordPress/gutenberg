@@ -233,7 +233,7 @@ test.describe( 'Query block', () => {
 				.getByRole( 'button', { name: 'Filters options' } )
 				.click();
 			await page
-				.getByRole( 'menuitemcheckbox', { name: 'Show Taxonomies' } )
+				.getByRole( 'menuitemcheckbox', { name: 'Taxonomies, show' } )
 				.click();
 			await page.keyboard.press( 'Escape' );
 

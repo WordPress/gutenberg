@@ -2,9 +2,15 @@
 
 ## Unreleased
 
+## 3.0.0 (2026-10-20)
+
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
+
+### New Features
+
+-   Export `VALID_BACKGROUND_CLIP_VALUES`, the values `background-clip` accepts, so consumers stop keeping their own copy ([#77142](https://github.com/WordPress/gutenberg/pull/77142)).
 
 ## 2.57.0 (2026-10-07)
 
@@ -23,7 +29,6 @@
 ## 2.54.0 (2026-08-26)
 
 ## 2.53.0 (2026-08-12)
-
 
 ## 2.52.0 (2026-07-29)
 

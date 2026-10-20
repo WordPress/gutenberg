@@ -117,7 +117,7 @@ type Selectors = {
 	[ key in keyof AllSelectors ]: CurriedState< AllSelectors[ key ] >;
 };
 
-type ThunkArgs = {
+export type ThunkArgs = {
 	select: Selectors;
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
@@ -870,8 +870,8 @@ export function prepareItem( id: QueueItemId ) {
 				} )
 			: file;
 
-		// Gate very large images out of client-side processing. wasm-vips is
-		// capped at 1 GiB of memory, so high-megapixel images, especially
+		// Gate very large images out of client-side processing. wasm-vips's
+		// memory can grow to at most 2 GiB, so high-megapixel images, especially
 		// interlaced/progressive ones, which can't be decoded with
 		// shrink-on-load, can exhaust it and fail. These are routed to the
 		// server, which has no comparable per-image ceiling. If dimensions
@@ -1191,9 +1191,15 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
-		// Metadata stripping and bit depth cap from the `image_strip_meta`
-		// and `image_max_bit_depth` filters, carried in the editor settings.
-		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+		// Metadata stripping, bit depth cap, and animated sub-sizes from the
+		// `image_strip_meta`, `image_max_bit_depth`, and
+		// `wp_generate_animated_image_subsizes` filters, carried in the
+		// editor settings.
+		const {
+			imageStripMeta,
+			imageMaxBitDepth,
+			generateAnimatedImageSubsizes,
+		} = select.getSettings();
 
 		try {
 			const file = await vipsResizeImage(
@@ -1208,6 +1214,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 					quality: args.quality,
 					stripMeta: imageStripMeta,
 					maxBitdepth: imageMaxBitDepth,
+					preserveAnimation: false !== generateAnimatedImageSubsizes,
 				}
 			);
 

@@ -32,6 +32,7 @@
 		"anchor": true,
 		"className": false,
 		"background": {
+			"backgroundClip": true,
 			"backgroundImage": true,
 			"backgroundSize": true,
 			"gradient": true
