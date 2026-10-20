@@ -1,4 +1,3 @@
-import clsx from 'clsx';
 import {
 	__experimentalTreeGridRow as TreeGridRow,
 	__experimentalTreeGridCell as TreeGridCell,
@@ -130,16 +129,15 @@ function ListViewBranch( props ) {
 	}
 
 	const filteredBlocks = blocks.filter( Boolean );
-	const showAppender = showAppenderProp;
-	// Every level keeps its appender row, so rows never move under the
-	// pointer. The first level always shows its appender. A nested level
-	// shows it while the pointer or focus is on its parent, on any block
-	// inside the parent, or on the appender itself, so the appender shows at
+	// The first level always shows the appender. A nested level adds its
+	// appender row while the pointer or focus is on its parent, on any block
+	// inside the parent, or on the appender itself, so the appender opens at
 	// the end of the list the user is working in.
-	const isAppenderRevealed =
-		level === 1 ||
-		hoveredClientId === parentId ||
-		hasBlock( filteredBlocks, hoveredClientId );
+	const showAppender =
+		showAppenderProp &&
+		( level === 1 ||
+			hoveredClientId === parentId ||
+			hasBlock( filteredBlocks, hoveredClientId ) );
 	// The appender row stands in for its parent, so hovering or focusing it
 	// keeps it shown.
 	const hoverAppender = () => setHoveredClientId( parentId );
@@ -303,9 +301,7 @@ function ListViewBranch( props ) {
 			{ rows }
 			{ showAppender && (
 				<TreeGridRow
-					className={ clsx( 'block-editor-list-view-appender-row', {
-						'is-hidden': ! isAppenderRevealed,
-					} ) }
+					className="block-editor-list-view-appender-row"
 					level={ level }
 					setSize={ rowCount }
 					positionInSet={ rowCount }

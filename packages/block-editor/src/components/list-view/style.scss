@@ -627,9 +627,32 @@ svg {
 	display: none;
 }
 
-// A nested appender keeps its row, so the list never moves under the
-// pointer, and only its toggle is hidden until the list it belongs to is
-// hovered or holds focus. Focusing the toggle reveals it.
-.block-editor-list-view-appender-row.is-hidden .block-editor-inserter__toggle {
-	opacity: 0;
+// An appender is inset with the items it adds to: the toggle sits where a
+// new item's icon will be, one indent level further right per level.
+@for $i from 0 to $block-navigation-max-indent {
+	.block-editor-list-view-appender-row[aria-level="#{ $i + 1 }"]
+	.list-view-appender
+	.block-editor-inserter__toggle {
+		margin-left: ($grid-unit-30 * ( $i + 1 ));
+	}
+}
+
+// A nested appender row is added while its list is hovered or holds focus,
+// and slides open as it arrives.
+@keyframes block-editor-list-view-appender-row__reveal {
+	from {
+		height: 0;
+		opacity: 0;
+	}
+
+	to {
+		height: $button-size-small + $grid-unit-10;
+		opacity: 1;
+	}
+}
+
+.block-editor-list-view-appender-row[aria-level]:not([aria-level="1"]) .list-view-appender {
+	overflow: hidden;
+	animation: block-editor-list-view-appender-row__reveal 0.1s ease-out;
+	@include reduce-motion("animation");
 }

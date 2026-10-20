@@ -926,6 +926,9 @@ async function dragListViewBlockTo(
 	let y = toRect.y + toRect.height * 0.75;
 
 	await from.hover();
+	// Hovering can close a nested appender row above the source row, which
+	// moves the row, so hover again to follow it before pressing.
+	await from.hover();
 	await page.mouse.down();
 	await page.mouse.move( x, fromRect.y + fromRect.height / 2, { steps: 5 } );
 	if ( overshoot ) {

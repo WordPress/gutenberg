@@ -12,6 +12,7 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
 	useCallback,
+	useEffect,
 	useMemo,
 	useRef,
 	useReducer,
@@ -149,19 +150,34 @@ function ListViewComponent(
 
 	const [ insertedBlockClientId, setInsertedBlockClientId ] =
 		useState( null );
-	const [ hoveredClientId, setHoveredClientId ] = useState( null );
+	const [ hoveredClientId, setHoveredClientIdState ] = useState( null );
+	// A nested appender row comes and goes with the hovered block, which
+	// would move rows under a drag, so the hovered block is frozen while
+	// blocks are being dragged.
+	const isDraggingRef = useRef( false );
+	useEffect( () => {
+		isDraggingRef.current = draggedClientIds?.length > 0;
+	}, [ draggedClientIds ] );
+	const setHoveredClientId = useCallback( ( clientId ) => {
+		if ( ! isDraggingRef.current ) {
+			setHoveredClientIdState( clientId );
+		}
+	}, [] );
 	// Rows only set the hovered block on enter. Clearing happens here, once
 	// the pointer or focus leaves the whole tree, so moving between rows never
 	// passes through an empty state that would unmount a nested appender.
-	const clearHoveredClientId = useCallback( ( event ) => {
-		if (
-			event.type === 'blur' &&
-			event.currentTarget.contains( event.relatedTarget )
-		) {
-			return;
-		}
-		setHoveredClientId( null );
-	}, [] );
+	const clearHoveredClientId = useCallback(
+		( event ) => {
+			if (
+				event.type === 'blur' &&
+				event.currentTarget.contains( event.relatedTarget )
+			) {
+				return;
+			}
+			setHoveredClientId( null );
+		},
+		[ setHoveredClientId ]
+	);
 
 	const { setSelectedTreeId } = useListViewExpandSelectedItem( {
 		firstSelectedBlockClientId: selectedClientIds[ 0 ],
