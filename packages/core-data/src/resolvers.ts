@@ -687,7 +687,10 @@ canUser.getResolutionArgs = (
 	action: string,
 	resource: string | PermissionResource,
 	id?: string | number | null
-) => [ resource, id ];
+): [ string | PermissionResource, string | number | null | undefined ] => [
+	resource,
+	id,
+];
 
 /**
  * Checks whether the current user can perform the given action on the given
