@@ -149,7 +149,7 @@ export type BoxControlInputControlProps = UnitControlPassthroughProps & {
 
 export type BoxControlIconProps = {
 	/**
-	 * @default 24
+	 * @default 20
 	 */
 	size?: number;
 	/**

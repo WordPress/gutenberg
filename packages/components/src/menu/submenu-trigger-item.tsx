@@ -45,7 +45,7 @@ export const SubmenuTriggerItem = forwardRef<
 								) }
 								aria-hidden="true"
 								icon={ chevronRightSmall }
-								size={ 24 }
+								size={ 20 }
 								preserveAspectRatio="xMidYMid slice"
 							/>
 						</>

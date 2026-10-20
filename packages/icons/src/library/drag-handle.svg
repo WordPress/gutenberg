@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" style="fill: none" stroke="currentColor" stroke-width="1.5">
-	<path d="M9.25 5.75H8.75V6.25H9.25V5.75Z" fill="currentColor" stroke="none" />
-	<path d="M9.25 11.75H8.75V12.25H9.25V11.75Z" fill="currentColor" stroke="none" />
-	<path d="M9.25 17.75H8.75V18.25H9.25V17.75Z" fill="currentColor" stroke="none" />
-	<path d="M15.25 5.75H14.75V6.25H15.25V5.75Z" fill="currentColor" stroke="none" />
-	<path d="M15.25 11.75H14.75V12.25H15.25V11.75Z" fill="currentColor" stroke="none" />
-	<path d="M15.25 17.75H14.75V18.25H15.25V17.75Z" fill="currentColor" stroke="none" />
-	<path d="M9.25 5.75H8.75V6.25H9.25V5.75Z" />
-	<path d="M9.25 11.75H8.75V12.25H9.25V11.75Z" />
-	<path d="M9.25 17.75H8.75V18.25H9.25V17.75Z" />
-	<path d="M15.25 5.75H14.75V6.25H15.25V5.75Z" />
-	<path d="M15.25 11.75H14.75V12.25H15.25V11.75Z" />
-	<path d="M15.25 17.75H14.75V18.25H15.25V17.75Z" />
+	<path d="M8.5 4.25H8V4.75H8.5V4.25Z" fill="currentColor" stroke="none" />
+	<path d="M8.5 11.75H8V12.25H8.5V11.75Z" fill="currentColor" stroke="none" />
+	<path d="M8.5 19.25H8V19.75H8.5V19.25Z" fill="currentColor" stroke="none" />
+	<path d="M16 4.25H15.5V4.75H16V4.25Z" fill="currentColor" stroke="none" />
+	<path d="M16 11.75H15.5V12.25H16V11.75Z" fill="currentColor" stroke="none" />
+	<path d="M16 19.25H15.5V19.75H16V19.25Z" fill="currentColor" stroke="none" />
+	<path d="M8.5 4.25H8V4.75H8.5V4.25Z" />
+	<path d="M8.5 11.75H8V12.25H8.5V11.75Z" />
+	<path d="M8.5 19.25H8V19.75H8.5V19.25Z" />
+	<path d="M16 4.25H15.5V4.75H16V4.25Z" />
+	<path d="M16 11.75H15.5V12.25H16V11.75Z" />
+	<path d="M16 19.25H15.5V19.75H16V19.25Z" />
 </svg>

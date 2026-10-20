@@ -15,7 +15,7 @@ export default function LinkedButton( {
 			className="components-border-radius-control__linked-button"
 			size="small"
 			icon={ isLinked ? link : linkOff }
-			iconSize={ 24 }
+			iconSize={ 20 }
 			label={ label }
 		/>
 	);

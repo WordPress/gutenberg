@@ -1,6 +1,6 @@
 import type { CustomValueSettings } from './types';
 
-export const ICON_SIZE = 24;
+export const ICON_SIZE = 20;
 export const RANGE_CONTROL_MAX_SIZE = 8;
 export const CUSTOM_VALUE_SETTINGS: CustomValueSettings = {
 	px: { max: 300, steps: 1 },

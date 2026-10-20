@@ -27,6 +27,10 @@
 		flex: 0 0 $icon-size;
 		width: $icon-size;
 		height: $icon-size;
+		// The header top-aligns a 20px icon with a 24px small actions button
+		// and a title line (20px line-height plus 2px padding). Offset the
+		// icon so it shares that 24px slot.
+		margin-block: calc((#{$button-size-small} - #{$icon-size}) / 2);
 	}
 
 	&__header {

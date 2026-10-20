@@ -21,7 +21,7 @@ function GenericNavigationButton( {
 		<Item { ...props }>
 			{ icon && (
 				<HStack justify="flex-start">
-					<IconWithCurrentColor icon={ icon } size={ 24 } />
+					<IconWithCurrentColor icon={ icon } size={ 20 } />
 					<FlexItem>{ children }</FlexItem>
 				</HStack>
 			) }
