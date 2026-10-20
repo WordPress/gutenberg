@@ -5,6 +5,10 @@ const AUTO_SAVE_FAILURE_NOTICE = __(
 	'Auto-save failed. You can also save manually.'
 );
 
+const AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE = __(
+	'Auto-save failed because there was no response from the server. You can also save manually.'
+);
+
 const AUTO_SAVE_OFFLINE_FAILURE_NOTICE = __(
 	'Auto-save failed because you were offline. You can also save manually once you’re back online.'
 );
@@ -150,7 +154,10 @@ export function getNotificationArgumentsForSaveFail( data ) {
 			: messages.default;
 
 	if ( options?.isAutosave ) {
-		noticeMessage = AUTO_SAVE_FAILURE_NOTICE;
+		noticeMessage =
+			error.code === 'fetch_error'
+				? AUTO_SAVE_NO_RESPONSE_FAILURE_NOTICE
+				: AUTO_SAVE_FAILURE_NOTICE;
 	}
 
 	return [ noticeMessage, { id } ];
