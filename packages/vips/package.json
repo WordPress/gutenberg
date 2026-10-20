@@ -54,7 +54,7 @@
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/worker-threads": "file:../worker-threads",
-		"wasm-vips": "^0.0.18"
+		"wasm-vips": "^0.0.19"
 	},
 	"devDependencies": {
 		"@types/node": "^24.13.3",
