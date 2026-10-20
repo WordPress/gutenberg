@@ -16,6 +16,10 @@
 
 -   `use-recommended-components`: Require `allowUseWithCaution` for `ControlWithError`, `ValidatedInputControl`, and `ValidatedTextareaControl` from `@wordpress/ui`, matching their Storybook status ([#84319](https://github.com/WordPress/gutenberg/pull/84319)).
 
+### Internal
+
+-   Remove the unused `@eslint-community/eslint-plugin-eslint-comments` dependency ([#85102](https://github.com/WordPress/gutenberg/pull/85102)).
+
 ## 27.1.0 (2026-10-07)
 
 ### New Features

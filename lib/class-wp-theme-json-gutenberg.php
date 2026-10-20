@@ -996,7 +996,7 @@ class WP_Theme_JSON_Gutenberg {
 
 				$combined_selector = static::append_to_selector( $base_selector, $pseudo_selector );
 				$declarations      = static::compute_style_properties( $pseudo_node, $settings, null, null );
-				$declarations      = static::get_state_declarations_with_text_clip_escapes( $declarations, $pseudo_node, $base_styles );
+				$declarations      = self::get_state_declarations_with_text_clip_escapes( $declarations, $pseudo_node, $base_styles );
 				$add_declarations( $combined_selector, $declarations );
 			}
 		}
@@ -3956,10 +3956,10 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 7.2.0
 	 *
-	 * @param array|null $settings Settings from theme.json.
+	 * @param array<string, mixed> $settings Settings from theme.json.
 	 * @return string[] Style-state keys.
 	 */
-	private static function get_style_state_keys( $settings ) {
+	private static function get_style_state_keys( array $settings ): array {
 		$keys = array_keys( static::get_viewport_media_queries( $settings['viewport'] ?? null ) );
 
 		foreach ( static::VALID_BLOCK_PSEUDO_SELECTORS as $pseudo_selectors ) {
@@ -3984,17 +3984,13 @@ class WP_Theme_JSON_Gutenberg {
 	 *
 	 * @since 7.2.0
 	 *
-	 * @param array      $path     Path to the node within the theme.json tree.
-	 * @param array      $tree     The theme.json tree to read from.
-	 * @param array|null $settings Settings from theme.json.
+	 * @param string[]             $path     Path to the node within the theme.json tree.
+	 * @param array<string, mixed> $tree     The theme.json tree to read from.
+	 * @param array<string, mixed> $settings Settings from theme.json.
 	 * @return array[] Style objects, nearest first.
 	 */
-	private static function get_state_base_styles( $path, $tree, $settings ) {
-		if ( ! is_array( $path ) ) {
-			return array();
-		}
-
-		$state_keys  = static::get_style_state_keys( $settings );
+	private static function get_state_base_styles( array $path, array $tree, array $settings ): array {
+		$state_keys  = self::get_style_state_keys( $settings );
 		$base_path   = $path;
 		$base_styles = array();
 
@@ -4016,24 +4012,18 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Adds the declarations a state needs to escape a text clip set below it.
 	 *
-	 * Mirror of `gutenberg_get_state_declarations_with_text_clip_escapes()`.
-	 *
 	 * @since 7.2.0
 	 *
-	 * @param array   $declarations Declarations generated for the state.
-	 * @param array   $state_style  State style object.
-	 * @param array[] $base_styles  Style objects the state layers over, nearest first.
-	 * @return array Declarations with the escapes applied where needed.
+	 * @param array[]              $declarations Declarations generated for the state.
+	 * @param array<string, mixed> $state_style  State style object.
+	 * @param array[]              $base_styles  Style objects the state layers over, nearest first.
+	 * @return array[] Declarations with the escapes applied where needed.
 	 */
-	private static function get_state_declarations_with_text_clip_escapes( $declarations, $state_style, $base_styles ) {
-		if ( ! is_array( $declarations ) || ! is_array( $state_style ) || ! is_array( $base_styles ) ) {
-			return $declarations;
-		}
-
-		$base_clip = null;
+	private static function get_state_declarations_with_text_clip_escapes( array $declarations, array $state_style, array $base_styles ): array {
+		$base_clip = '';
 		foreach ( $base_styles as $base_style ) {
 			if ( ! empty( $base_style['background']['backgroundClip'] ) ) {
-				$base_clip = $base_style['background']['backgroundClip'];
+				$base_clip = is_string( $base_style['background']['backgroundClip'] ) ? $base_style['background']['backgroundClip'] : '';
 				break;
 			}
 		}
@@ -4042,28 +4032,15 @@ class WP_Theme_JSON_Gutenberg {
 			return $declarations;
 		}
 
-		$state_clip = $state_style['background']['backgroundClip'] ?? null;
+		$escapes = array_merge(
+			gutenberg_get_state_text_clip_escape( $state_style, $base_clip ),
+			gutenberg_get_state_text_fill_reset( $state_style )
+		);
 
-		$paints_its_own_background =
-			! empty( $state_style['background']['gradient'] ) ||
-			! empty( $state_style['background']['backgroundImage'] ) ||
-			! empty( $state_style['color']['gradient'] );
-
-		if ( $state_clip && 'text' !== $state_clip ) {
-			if ( ! $paints_its_own_background ) {
-				$declarations[] = array(
-					'name'  => 'background-image',
-					'value' => 'unset',
-				);
-			}
-
-			return $declarations;
-		}
-
-		if ( ! $state_clip && ! $paints_its_own_background && ! empty( $state_style['color']['text'] ) ) {
+		foreach ( $escapes as $name => $value ) {
 			$declarations[] = array(
-				'name'  => '-webkit-text-fill-color',
-				'value' => 'currentColor',
+				'name'  => $name,
+				'value' => $value,
 			);
 		}
 
@@ -4201,7 +4178,7 @@ class WP_Theme_JSON_Gutenberg {
 
 					// Process base properties for this breakpoint.
 					$breakpoint_declarations = static::compute_style_properties( $breakpoint_node, $settings, null, $this->theme_json );
-					$breakpoint_declarations = static::get_state_declarations_with_text_clip_escapes(
+					$breakpoint_declarations = self::get_state_declarations_with_text_clip_escapes(
 						$breakpoint_declarations,
 						$breakpoint_node,
 						array( $style_variation_node, $node )
@@ -4330,14 +4307,14 @@ class WP_Theme_JSON_Gutenberg {
 		 * element then compute the style properties for it.
 		 * Otherwise just compute the styles for the default selector as normal.
 		 */
-		$base_styles = static::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings );
+		$base_styles = self::get_state_base_styles( $block_metadata['path'] ?? array(), $this->theme_json, $settings ?? array() );
 
 		if ( $pseudo_selector && isset( $node[ $pseudo_selector ] ) &&
 			isset( static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ] )
 			&& in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
-			$declarations = static::get_state_declarations_with_text_clip_escapes(
+			$declarations = self::get_state_declarations_with_text_clip_escapes(
 				$declarations,
 				$node[ $pseudo_selector ],
 				array_merge( array( $node ), $base_styles )
@@ -4349,7 +4326,7 @@ class WP_Theme_JSON_Gutenberg {
 			 * so those properties are not output twice.
 			 */
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
-			$declarations = static::get_state_declarations_with_text_clip_escapes( $declarations, $node, $base_styles );
+			$declarations = self::get_state_declarations_with_text_clip_escapes( $declarations, $node, $base_styles );
 		}
 
 		$block_rules = '';

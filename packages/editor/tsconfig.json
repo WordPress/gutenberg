@@ -27,7 +27,6 @@
 		{ "path": "../deprecated/tsconfig.build.json" },
 		{ "path": "../dom" },
 		{ "path": "../element/tsconfig.build.json" },
-		{ "path": "../escape-html/tsconfig.build.json" },
 		{ "path": "../global-styles-engine/tsconfig.build.json" },
 		{ "path": "../global-styles-ui" },
 		{ "path": "../hooks" },
@@ -45,7 +44,7 @@
 		{ "path": "../plugins" },
 		{ "path": "../preferences/tsconfig.build.json" },
 		{ "path": "../primitives" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
 		{ "path": "../rich-text" },
 		{ "path": "../server-side-render/tsconfig.build.json" },
 		{ "path": "../theme/tsconfig.build.json" },
@@ -53,7 +52,7 @@
 		{ "path": "../url/tsconfig.build.json" },
 		{ "path": "../upload-media/tsconfig.build.json" },
 		{ "path": "../views/tsconfig.build.json" },
-		{ "path": "../warning" },
+		{ "path": "../warning/tsconfig.build.json" },
 		{ "path": "../wordcount/tsconfig.build.json" }
 	]
 }

@@ -9,7 +9,7 @@
 
 return array(
 	'type'          => 'media',
-	'label'         => __( 'Thumbnail', 'gutenberg' ),
+	'label'         => __( 'Thumbnail' ),
 	'enableSorting' => false,
 	'filterBy'      => false,
 );
