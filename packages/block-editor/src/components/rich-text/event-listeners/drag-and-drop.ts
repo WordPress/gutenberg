@@ -9,9 +9,7 @@ import {
 } from '@wordpress/rich-text';
 import { privateApis as composePrivateApis } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../../store';
-import { getPasteEventData } from '../../../utils/pasting';
 import { unlock } from '../../../lock-unlock';
-import { pasteContent } from './paste-handler';
 
 const { subscribeDelegatedListener } = unlock( composePrivateApis );
 const { ownsSelection } = unlock( richTextPrivateApis );
@@ -50,7 +48,10 @@ function stopPropagation( event: Event ) {
 	event.stopPropagation();
 }
 
-function isTextDrop( ownerDocument: Document, dataTransfer: DataTransfer ) {
+export function isTextDrop(
+	ownerDocument: Document,
+	dataTransfer: DataTransfer
+) {
 	const types = Array.from( dataTransfer.types );
 	return (
 		!! ownerDocument.caretPositionFromPoint &&
@@ -182,109 +183,53 @@ export const dragStart = ( props: Props ) => ( element: HTMLElement ) => {
 };
 
 /**
- * Inserts text dropped on the field the way the field would on paste. Text
- * dragged from a field is moved.
+ * Returns the props a text drop on the field pastes with: the value with the
+ * selection at the drop point, and a change handler that selects the dropped
+ * content. Text dragged from a field is removed from there first.
  *
- * @param props Rich text props.
+ * @param props   Rich text props.
+ * @param element The field.
+ * @param event   Drop event.
  */
-export const drop = ( props: Props ) => ( element: HTMLElement ) => {
-	const { ownerDocument } = element;
+export function getDropPasteProps(
+	props: Props[ 'current' ],
+	element: HTMLElement,
+	event: DragEvent
+) {
+	if ( event.defaultPrevented ) {
+		return;
+	}
+	const point = getTextDropPoint( event );
+	if ( point?.element !== element ) {
+		return;
+	}
+	let { offset } = point;
 
-	// The block drop zones cancel every drag over them, which hides the
-	// browser's drop caret and shows the block insertion point instead.
-	function onDragOver( event: DragEvent ) {
-		if (
-			element.isContentEditable &&
-			isTextDrop( ownerDocument, event.dataTransfer! )
-		) {
-			event.stopPropagation();
-		}
+	const drag = textDrags.get( element.ownerDocument );
+	const isSameField = drag?.element === element;
+	if ( drag && isSameField && offset >= drag.start && offset <= drag.end ) {
+		event.preventDefault();
+		drag.stop();
+		return;
 	}
 
-	function onDrop( event: DragEvent ) {
-		if ( event.defaultPrevented ) {
-			return;
+	const { registry, getValue, onChange } = props;
+	if ( drag ) {
+		drag.remove();
+		if ( isSameField && offset > drag.end ) {
+			offset -= drag.end - drag.start;
 		}
-		const point = getTextDropPoint( event );
-		if ( point?.element !== element ) {
-			return;
-		}
-		let { offset } = point;
-
-		const drag = textDrags.get( ownerDocument );
-		const isSameField = drag?.element === element;
-		if (
-			drag &&
-			isSameField &&
-			offset >= drag.start &&
-			offset <= drag.end
-		) {
-			event.preventDefault();
-			drag.stop();
-			return;
-		}
-
-		const dataTransfer = event.dataTransfer!;
-		const data = getPasteEventData( { clipboardData: dataTransfer } );
-		if ( ! data || data.files.length ) {
-			return;
-		}
-		const { html = '', plainText = '' } = data;
-
-		const { registry, getValue, onChange } = props.current;
-		const { __unstableMarkLastChangeAsPersistent } =
-			registry.dispatch( blockEditorStore );
-		let isInserted = false;
-		// The drop is an undo level of its own, apart from the typing before
-		// and after it.
-		__unstableMarkLastChangeAsPersistent();
-		registry.batch( () => {
-			if ( drag ) {
-				drag.remove();
-				if ( isSameField && offset > drag.end ) {
-					offset -= drag.end - drag.start;
-				}
-			}
-			// An insertion into the field of the removal would otherwise not
-			// create an undo level.
-			__unstableMarkLastChangeAsPersistent();
-
-			// Rich text only applies the new selection to a focused field. A
-			// field inside an editing host cannot hold focus.
-			const host =
-				element.parentElement?.closest< HTMLElement >(
-					'[contenteditable]'
-				);
-			( host?.isContentEditable ? host : element ).focus();
-
-			isInserted = pasteContent(
-				{
-					...props.current,
-					value: { ...getValue(), start: offset, end: offset },
-					// Select the dropped content.
-					onChange: ( value: RichTextValue ) =>
-						onChange( { ...value, start: offset } ),
-				},
-				{
-					html,
-					plainText,
-					isInternal: dataTransfer.getData( 'rich-text' ) === 'true',
-				}
-			);
-		} );
-
-		if ( isInserted ) {
-			event.preventDefault();
-			__unstableMarkLastChangeAsPersistent();
-		}
+		// An insertion into the field of the removal would otherwise not
+		// create an undo level.
+		registry
+			.dispatch( blockEditorStore )
+			.__unstableMarkLastChangeAsPersistent();
 	}
 
-	element.addEventListener( 'dragenter', onDragOver );
-	element.addEventListener( 'dragover', onDragOver );
-	element.addEventListener( 'drop', onDrop );
-	return () => {
-		element.removeEventListener( 'dragenter', onDragOver );
-		element.removeEventListener( 'dragover', onDragOver );
-		element.removeEventListener( 'drop', onDrop );
+	return {
+		...props,
+		value: { ...getValue(), start: offset, end: offset },
+		onChange: ( value: RichTextValue ) =>
+			onChange( { ...value, start: offset } ),
 	};
-};
+}
