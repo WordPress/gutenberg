@@ -50,6 +50,15 @@
 			--_wp-ui-item-popup-max-width: var(--wpds-dimension-surface-width-lg);
 		}
 
+		/* Keep searchable popups stable as filtering and creatable labels change. */
+		.fixed-width-presets {
+			&.is-width-sm,
+			&.is-width-md,
+			&.is-width-lg {
+				width: min(var(--available-width), var(--_wp-ui-item-popup-max-width));
+			}
+		}
+
 		.is-width-available {
 			width: var(--available-width);
 		}

@@ -11,7 +11,7 @@ Choose between Menu, Select, and Autocomplete based on what the options represen
 
 ## Popup widths
 
-`Menu.Popup` accepts the same `width` presets as Select, Combobox, and Autocomplete. The `sm`, `md`, and `lg` presets size the popup to its content up to the corresponding surface width token. Menu defaults to `sm`, which keeps its 320px maximum width. Submenus use their own `width` prop and also default to `sm`.
+`Menu.Popup` accepts the same `width` preset names as Select, Combobox, and Autocomplete. In Menu and Select, `sm`, `md`, and `lg` size the popup to its content up to the corresponding surface width token. In Combobox and Autocomplete, including the searchable-select controls, these presets set fixed widths so the popup stays stable while users type or filter results. Menu defaults to `sm`, which keeps its 320px maximum width. Submenus use their own `width` prop and also default to `sm`.
 
 Use `content` to let the popup grow up to the available viewport width, `anchor` to match the trigger width, or `available` to fill the available width. All presets respect Menu's minimum width, which defaults to 160px, and the existing `--wp-ui-menu-min-width` and `--wp-ui-menu-max-width` overrides. A consumer can still set a fixed width with `className` or `style`.
 
