@@ -10,7 +10,7 @@ declare const RichText: typeof import( '..' ).default;
 declare const data: RichTextData;
 
 // Never called, so the public component only needs its type here.
-export function RichTextCallbacks() {
+function RichTextCallbacks() {
 	const [ content, setContent ] = useState( '' );
 	return (
 		<>
