@@ -1,5 +1,3 @@
-@use "@wordpress/base-styles/colors" as *;
-
 // Approximate height of the sticky admin header so that
 // scroll-margin-top keeps focused elements visible at 150 % zoom.
 $sticky-header-clearance: 120px;
@@ -9,22 +7,31 @@ $sticky-header-clearance: 120px;
 	width: 100%;
 	max-width: 680px;
 	margin: 0 auto;
-	padding: 24px;
+	padding: var(--wpds-dimension-padding-2xl);
 
 	.components-item {
-		padding: 20px;
-		border-radius: 8px;
-		border: 1px solid #ddd;
-		background: #fff;
+		padding: var(--wpds-dimension-padding-xl);
+		border-radius: var(--wpds-border-radius-lg);
+		border: var(--wpds-border-width-xs) solid var(--wpds-color-stroke-surface-neutral);
+		background: var(--wpds-color-background-surface-neutral-strong);
 		overflow: hidden;
 		scroll-margin-top: $sticky-header-clearance;
 	}
 
-	.connector-settings__error {
-		color: $alert-red;
+	.connector-item__content {
+		flex: 1 1 0%;
+		min-width: 0;
 	}
 
-	.connector-settings input {
+	.connector-item__description {
+		color: var(--wpds-color-foreground-content-neutral-weak);
+	}
+
+	.connector-settings__error {
+		color: var(--wpds-color-foreground-content-error-weak);
+	}
+
+	.connector-settings__input input {
 		font-family: monospace;
 		scroll-margin-top: $sticky-header-clearance;
 	}
@@ -34,7 +41,7 @@ $sticky-header-clearance: 120px;
 	}
 
 	&__file-mods-notice {
-		margin-bottom: 16px;
+		margin-bottom: var(--wpds-dimension-gap-lg);
 	}
 
 	&--empty {
@@ -43,15 +50,15 @@ $sticky-header-clearance: 120px;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		gap: 32px;
+		gap: var(--wpds-dimension-gap-2xl);
 		text-align: center;
 	}
 
 	.ai-plugin-callout {
 		position: relative;
 		overflow: hidden;
-		border-radius: 8px;
-		padding: 24px;
+		border-radius: var(--wpds-border-radius-lg);
+		padding: var(--wpds-dimension-padding-2xl);
 		padding-inline-end: 150px;
 		background-color: #e7d4e4;
 		background-image:
@@ -69,14 +76,14 @@ $sticky-header-clearance: 120px;
 		&__content {
 			display: flex;
 			flex-direction: column;
-			gap: 12px;
+			gap: var(--wpds-dimension-gap-md);
 			padding-top: 2px;
 			align-items: flex-start;
 
 			p {
 				margin: 0;
-				font-size: 13px;
-				line-height: 20px;
+				font-size: var(--wpds-typography-font-size-md);
+				line-height: var(--wpds-typography-line-height-sm);
 			}
 		}
 
@@ -90,12 +97,12 @@ $sticky-header-clearance: 120px;
 	}
 
 	&__help-text {
-		color: $gray-800;
+		color: var(--wpds-color-foreground-content-neutral);
 	}
 
 	@media (max-width: 680px) {
 		.ai-plugin-callout {
-			padding: 12px;
+			padding: var(--wpds-dimension-padding-md);
 			padding-inline-end: 100px;
 
 			&__decoration {
@@ -108,14 +115,14 @@ $sticky-header-clearance: 120px;
 	}
 
 	@media (max-width: 480px) {
-		padding: 8px;
+		padding: var(--wpds-dimension-padding-sm);
 
 		.ai-plugin-callout {
 			padding-inline-end: 130px;
 		}
 
 		.components-item {
-			padding: 12px;
+			padding: var(--wpds-dimension-padding-md);
 
 			.connector-item__header svg {
 				width: 32px;
