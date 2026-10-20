@@ -109,8 +109,11 @@ test.describe( 'Autosave failure notice', () => {
 			'dropped-connection',
 			AUTOSAVE_FAILED_NO_RESPONSE,
 		],
-		// TODO: Show the status code.
-		[ 'error without a message', 'no-message', AUTOSAVE_FAILED ],
+		[
+			'error without a message',
+			'no-message',
+			withDetails( 'Error code 500' ),
+		],
 		[
 			'error with a plain text message',
 			'plain-message',

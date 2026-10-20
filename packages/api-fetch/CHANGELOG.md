@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   Include the response's status as `data.status` in `invalid_json` errors ([#85157](https://github.com/WordPress/gutenberg/pull/85157)).
+-   Include the response's status as `data.status` in `invalid_json` errors, and in error responses that have no `data` ([#85157](https://github.com/WordPress/gutenberg/pull/85157)).
 
 ## 7.57.0 (2026-10-07)
 
