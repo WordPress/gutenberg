@@ -13,14 +13,14 @@ import {
 	Navigator,
 	__experimentalHeading as Heading,
 	Notice,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	Flex,
 	Button,
-	DropdownMenu,
 	SearchControl,
-	ProgressBar,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 } from '@wordpress/components';
+// eslint-disable-next-line @wordpress/use-recommended-components -- Intentional early adoption of the new Menu, pending WordPress/gutenberg#76135.
+import { Menu, Progress, Select } from '@wordpress/ui';
 import { debounce } from '@wordpress/compose';
 import { sprintf, __, _x, isRTL } from '@wordpress/i18n';
 import {
@@ -87,7 +87,8 @@ function FontCollection( { slug }: { slug: string } ) {
 	const [ renderConfirmDialog, setRenderConfirmDialog ] = useState(
 		requiresPermission && ! getGoogleFontsPermissionFromStorage()
 	);
-	const { installFonts, isInstalling } = useContext( FontLibraryContext );
+	const { installFonts, isInstalling, baseCustomFonts } =
+		useContext( FontLibraryContext );
 	const { record: selectedCollection, isResolving: isLoading } =
 		useEntityRecord< FontCollectionType >( 'root', 'fontCollection', slug );
 
@@ -119,8 +120,7 @@ function FontCollection( { slug }: { slug: string } ) {
 	const collectionFonts = useMemo(
 		() =>
 			( selectedCollection?.font_families as
-				| CollectionFontFamily[]
-				| undefined ) ?? [],
+				CollectionFontFamily[] | undefined ) ?? [],
 		[ selectedCollection ]
 	);
 	const collectionCategories = selectedCollection?.categories ?? [];
@@ -163,6 +163,29 @@ function FontCollection( { slug }: { slug: string } ) {
 	};
 
 	const fontToInstallOutline = getFontsOutline( fontsToInstall );
+	const installedFontsOutline = getFontsOutline( baseCustomFonts );
+
+	const isFontFaceInstalled = ( face: FontFace ) =>
+		!! selectedFont &&
+		isFontFontFaceInOutline(
+			selectedFont.slug,
+			selectedFont.fontFace ? face : null, // If the font has no fontFace, we want to check if the font is installed
+			installedFontsOutline
+		);
+
+	const installableFontFaces = selectedFont?.fontFace?.filter(
+		( face ) => ! isFontFaceInstalled( face )
+	);
+
+	const isAllInstalled =
+		!! selectedFont &&
+		( selectedFont.fontFace?.length
+			? installableFontFaces?.length === 0
+			: isFontFontFaceInOutline(
+					selectedFont.slug,
+					null,
+					installedFontsOutline
+				) );
 
 	const resetFontsToInstall = () => {
 		setFontsToInstall( [] );
@@ -170,23 +193,25 @@ function FontCollection( { slug }: { slug: string } ) {
 
 	const selectFontCount =
 		fontsToInstall.length > 0
-			? fontsToInstall[ 0 ]?.fontFace?.length ?? 0
+			? ( fontsToInstall[ 0 ]?.fontFace?.length ?? 0 )
 			: 0;
 
 	// Check if any fonts are selected.
 	const isIndeterminate =
-		selectFontCount > 0 &&
-		selectFontCount !== selectedFont?.fontFace?.length;
+		selectFontCount > 0 && selectFontCount !== installableFontFaces?.length;
 
-	// Check if all fonts are selected.
-	const isSelectAllChecked =
-		selectFontCount === selectedFont?.fontFace?.length;
+	// Check if all installable fonts are selected.
+	const isSelectAllChecked = selectFontCount === installableFontFaces?.length;
 
 	// Toggle select all fonts.
 	const toggleSelectAll = () => {
 		const newFonts: FontFamily[] = [];
 		if ( ! isSelectAllChecked && selectedFont ) {
-			newFonts.push( selectedFont );
+			newFonts.push(
+				selectedFont.fontFace
+					? { ...selectedFont, fontFace: installableFontFaces }
+					: selectedFont
+			);
 		}
 
 		setFontsToInstall( newFonts );
@@ -263,7 +288,14 @@ function FontCollection( { slug }: { slug: string } ) {
 		<div className="font-library__tabpanel-layout">
 			{ isLoading && (
 				<div className="font-library__loading">
-					<ProgressBar />
+					<Progress.Root
+						value={ null }
+						aria-label={ __( 'Loading fonts' ) }
+					>
+						<Progress.Track>
+							<Progress.Indicator />
+						</Progress.Track>
+					</Progress.Root>
 				</div>
 			) }
 			{ ! isLoading && selectedCollection && (
@@ -283,21 +315,33 @@ function FontCollection( { slug }: { slug: string } ) {
 									</WCText>
 								</VStack>
 								{ showActions && (
-									<DropdownMenu
-										icon={ moreVertical }
-										label={ __( 'Actions' ) }
-										popoverProps={ {
-											position: 'bottom left',
-										} }
-										controls={ [
-											{
-												title: __(
-													'Revoke access to Google Fonts'
-												),
-												onClick: revokeAccess,
-											},
-										] }
-									/>
+									<Menu.Root>
+										<Menu.Trigger
+											render={
+												<Button
+													size="small"
+													icon={ moreVertical }
+													label={ __( 'Actions' ) }
+												/>
+											}
+										/>
+										<Menu.Popup
+											positioner={
+												<Menu.Positioner
+													side="bottom"
+													align="end"
+												/>
+											}
+										>
+											<Menu.Item onClick={ revokeAccess }>
+												<Menu.ItemLabel>
+													{ __(
+														'Revoke access to Google Fonts'
+													) }
+												</Menu.ItemLabel>
+											</Menu.Item>
+										</Menu.Popup>
+									</Menu.Root>
 								) }
 							</HStack>
 							<Spacer margin={ 4 } />
@@ -310,7 +354,7 @@ function FontCollection( { slug }: { slug: string } ) {
 									onChange={ debouncedUpdateSearchInput }
 									hideLabelFromVision={ false }
 								/>
-								<SelectControl
+								<WCSelectControl
 									label={ __( 'Category' ) }
 									value={ filters.category }
 									onChange={ handleCategoryFilter }
@@ -324,7 +368,7 @@ function FontCollection( { slug }: { slug: string } ) {
 												{ category.name }
 											</option>
 										) ) }
-								</SelectControl>
+								</WCSelectControl>
 							</HStack>
 
 							<Spacer margin={ 4 } />
@@ -419,12 +463,13 @@ function FontCollection( { slug }: { slug: string } ) {
 								{ __( 'Select font variants to install.' ) }
 							</WCText>
 							<Spacer margin={ 4 } />
-							<CheckboxControl
+							<WCCheckboxControl
 								className="font-library__select-all"
 								label={ __( 'Select all' ) }
-								checked={ isSelectAllChecked }
+								checked={ isSelectAllChecked || isAllInstalled }
 								onChange={ toggleSelectAll }
 								indeterminate={ isIndeterminate }
+								disabled={ isAllInstalled }
 							/>
 							<VStack spacing={ 0 }>
 								{ /*
@@ -455,6 +500,9 @@ function FontCollection( { slug }: { slug: string } ) {
 																? face
 																: null, // If the font has no fontFace, we want to check if the font is in the outline
 															fontToInstallOutline
+														) }
+														installed={ isFontFaceInstalled(
+															face
 														) }
 													/>
 												</li>
@@ -514,31 +562,45 @@ function FontCollection( { slug }: { slug: string } ) {
 										div: <div aria-hidden />,
 										// @ts-expect-error — Tag injected via sprintf argument, not visible in format string.
 										CurrentPage: (
-											<SelectControl
-												aria-label={ __(
-													'Current page'
-												) }
+											<Select.Root
 												value={ page.toString() }
-												options={ [
-													...Array( totalPages ),
-												].map( ( e, i ) => {
-													return {
-														label: (
+												onValueChange={ ( newPage ) => {
+													if ( newPage !== null ) {
+														setPage(
+															parseInt( newPage )
+														);
+													}
+												} }
+											>
+												<Select.Trigger
+													className="font-library__page-selection-trigger"
+													size="small"
+													variant="minimal"
+													aria-label={ __(
+														'Current page'
+													) }
+												/>
+												<Select.Popup width="content">
+													{ [
+														...Array( totalPages ),
+													].map( ( e, i ) => {
+														const value = (
 															i + 1
-														).toString(),
-														value: (
-															i + 1
-														).toString(),
-													};
-												} ) }
-												onChange={ ( newPage ) =>
-													setPage(
-														parseInt( newPage )
-													)
-												}
-												size="small"
-												variant="minimal"
-											/>
+														).toString();
+														return (
+															<Select.Item
+																key={ value }
+																value={ value }
+																size="small"
+															>
+																<Select.ItemLabel>
+																	{ value }
+																</Select.ItemLabel>
+															</Select.Item>
+														);
+													} ) }
+												</Select.Popup>
+											</Select.Root>
 										),
 									}
 								) }

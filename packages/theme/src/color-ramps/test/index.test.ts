@@ -216,11 +216,9 @@ describe( 'buildRamps', () => {
 			const activeLuminance = getLuminance( accentRamp.ramp.bgFill2 );
 
 			expect( accentRamp.direction ).toBe( direction );
-			if ( direction === 'darker' ) {
-				expect( activeLuminance ).toBeLessThan( restingLuminance );
-			} else {
-				expect( activeLuminance ).toBeGreaterThan( restingLuminance );
-			}
+			expect( Math.sign( activeLuminance - restingLuminance ) ).toBe(
+				direction === 'darker' ? -1 : 1
+			);
 			expect(
 				getContrast( accentRamp.ramp.bgFill1, accentRamp.ramp.fgFill )
 			).toBeGreaterThanOrEqual( 4.5 );

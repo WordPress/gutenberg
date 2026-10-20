@@ -388,7 +388,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 								length: left.length,
 								origin: left.origin,
 								content: left.content,
-						  }
+							}
 						: null,
 					right: right
 						? {
@@ -396,7 +396,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 								length: right.length,
 								origin: right.origin,
 								content: right.content,
-						  }
+							}
 						: null,
 				};
 			} );

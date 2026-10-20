@@ -15,7 +15,7 @@ import {
 import {
 	ToggleControl,
 	Disabled,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -323,7 +323,7 @@ const PlaylistEdit = ( {
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
-			const sortedBlocks = [ ...innerBlockTracks ].sort( ( a, b ) => {
+			const sortedBlocks = innerBlockTracks.toSorted( ( a, b ) => {
 				const titleA = a.attributes.title || '';
 				const titleB = b.attributes.title || '';
 
@@ -654,7 +654,7 @@ const PlaylistEdit = ( {
 						hasValue={ () => order !== 'asc' }
 						onDeselect={ () => setAttributes( { order: 'asc' } ) }
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Order' ) }
 							value={ order }
 							options={ [
@@ -702,7 +702,7 @@ const PlaylistEdit = ( {
 						}
 						panelId={ waveformPanelId }
 					>
-						<SelectControl
+						<WCSelectControl
 							label={ __( 'Shape' ) }
 							value={ waveformStyle }
 							options={ WAVEFORM_STYLE_OPTIONS }

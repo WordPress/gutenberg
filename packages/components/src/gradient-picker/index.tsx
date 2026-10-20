@@ -71,9 +71,9 @@ function SingleOrigin( {
 					aria-label={
 						name
 							? // translators: %s: The name of the gradient e.g: "Angular red to blue".
-							  sprintf( __( 'Gradient: %s' ), name )
+								sprintf( __( 'Gradient: %s' ), name )
 							: // translators: %s: gradient code e.g: "linear-gradient(90deg, rgba(98,16,153,1) 0%, rgba(172,110,22,1) 100%);".
-							  sprintf( __( 'Gradient code: %s' ), gradient )
+								sprintf( __( 'Gradient code: %s' ), gradient )
 					}
 				/>
 			);

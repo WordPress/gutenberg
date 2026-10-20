@@ -12,7 +12,6 @@ import postcss from 'postcss';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
-import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
 import {
@@ -63,9 +62,8 @@ function getEsbuildTarget() {
 // package is not installed (it is an optional peerDependency).
 let dsTokenFallbacksJs;
 try {
-	const { default: esbuildPlugin } = await import(
-		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
-	);
+	const { default: esbuildPlugin } =
+		await import( '@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks' );
 	dsTokenFallbacksJs = esbuildPlugin;
 } catch {
 	// @wordpress/theme is optional; skip token fallbacks if not available.
@@ -75,6 +73,10 @@ const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build' );
 
+/**
+ * esbuild loaders for non-JS imports. SVG files are inlined as `data:` URIs.
+ */
+const LOADER_CONFIG = { '.svg': 'dataurl' };
 const ASSET_EXTENSIONS = 'json';
 const IGNORE_PATTERNS = [
 	'**/benchmark/**',
@@ -140,6 +142,8 @@ const baseDefine = {
 			false
 	),
 };
+// Keep esbuild's module condition when enabling development exports.
+const developmentConditions = [ 'development', 'module' ];
 const getDefine = ( scriptDebug ) => ( {
 	...baseDefine,
 	'globalThis.SCRIPT_DEBUG': JSON.stringify( scriptDebug ),
@@ -186,7 +190,7 @@ function styleRuntimeAliasPlugin() {
  * Get SASS options for the given working directory.
  *
  * Uses NodePackageImporter from sass-embedded for resolving package imports
- * (like @wordpress/base-styles) which works with any package manager (npm, pnpm, yarn).
+ * (like `@wordpress/base-styles`) which works with any package manager (npm, pnpm, yarn).
  *
  * @param {string} workingDir - The directory where we're working (for NodePackageImporter).
  * @return {Object} SASS options object with importers and loadPaths.
@@ -554,6 +558,7 @@ async function bundlePackage( packageName, options = {} ) {
 		const baseConfig = {
 			entryPoints: [ entryPoint ],
 			bundle: true,
+			loader: LOADER_CONFIG,
 			sourcemap: true,
 			format: 'iife',
 			target,
@@ -615,6 +620,7 @@ async function bundlePackage( packageName, options = {} ) {
 				outfile: path.join( outputDir, 'index.js' ),
 				minify: false,
 				define: getDefine( true ),
+				conditions: developmentConditions,
 				plugins: [
 					...baseBundlePlugins,
 					wordpressExternalsPlugin(
@@ -666,6 +672,7 @@ async function bundlePackage( packageName, options = {} ) {
 
 			builds.push(
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: [ entryPoint ],
 					outfile: path.join(
 						rootBuildModuleDir,
@@ -697,6 +704,7 @@ async function bundlePackage( packageName, options = {} ) {
 			if ( ! isWasmWorker ) {
 				builds.push(
 					esbuild.build( {
+						loader: LOADER_CONFIG,
 						entryPoints: [ entryPoint ],
 						outfile: path.join(
 							rootBuildModuleDir,
@@ -710,6 +718,7 @@ async function bundlePackage( packageName, options = {} ) {
 						platform: 'browser',
 						minify: false,
 						define: getDefine( true ),
+						conditions: developmentConditions,
 						plugins: [
 							styleRuntimeAliasPlugin(),
 							wordpressExternalsPlugin(
@@ -917,7 +926,7 @@ async function bundlePackage( packageName, options = {} ) {
 /**
  * Infer style dependencies from script dependencies.
  * Only includes dependencies that:
- * 1. Are @wordpress packages (start with 'wp-')
+ * 1. Are `@wordpress` packages (start with 'wp-')
  * 2. Have wpScript: true in their package.json
  * 3. Actually have a built style.css file
  *
@@ -1329,19 +1338,14 @@ async function transpilePackage( packageName ) {
 	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
 	await generateWorkerPlaceholder( packageDir, packageJson );
 
-	// Check if this is the components package that needs emotion babel plugin.
-	// Ideally we should remove this exception and move away from emotion.
-	const needsEmotionPlugin = packageName === 'components';
-	const emotionPlugin = babel( {
-		filter: /\.[jt]sx?$/,
-		config: {
-			plugins: [ styleRuntimeRequire.resolve( '@emotion/babel-plugin' ) ],
-		},
-	} );
-	const externalizeAllExceptCssPlugin = {
-		name: 'externalize-except-css',
+	/*
+	 * Keeps imports external so each source file is transpiled on its own,
+	 * except for styles and SVGs, which are processed and inlined.
+	 */
+	const externalizeJsImportsPlugin = {
+		name: 'externalize-js-imports',
 		setup( build ) {
-			// Externalize all non-CSS imports
+			// Externalize all imports except styles and SVGs
 			build.onResolve( { filter: /.*/ }, async ( args ) => {
 				// Skip recursive calls.
 				if ( args.pluginData?.__fromExternalize ) {
@@ -1355,6 +1359,11 @@ async function transpilePackage( packageName ) {
 
 				// Let CSS/SCSS files be processed by sassPlugin
 				if ( args.path.match( /\.(css|scss)$/ ) ) {
+					return null;
+				}
+
+				// Let SVG files be inlined by the `dataurl` loader.
+				if ( args.path.endsWith( '.svg' ) ) {
 					return null;
 				}
 
@@ -1388,7 +1397,10 @@ async function transpilePackage( packageName ) {
 					// Replace extension: make sure that file extension is always `.mjs` or `.cjs`.
 					const newExt =
 						build.initialOptions.format === 'cjs' ? '.cjs' : '.mjs';
-					relativePath = relativePath.replace( /\.[jt]sx?$/, newExt );
+					relativePath = relativePath.replace(
+						/\.[cm]?[jt]sx?$/,
+						newExt
+					);
 
 					return {
 						path: relativePath,
@@ -1402,22 +1414,18 @@ async function transpilePackage( packageName ) {
 		},
 	};
 	const plugins = [
-		// Note: dsTokenFallbacksJs and emotionPlugin both use esbuild's onLoad
-		// hook, which is non-composable — the first to return contents wins. If a
-		// file contains --wpds-* tokens, the Emotion transform will be skipped.
-		// Avoid using design tokens in Emotion styles until Emotion is removed.
 		dsTokenFallbacksJs,
-		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
 		// CSS modules import @wordpress/style-runtime in generated JS. Resolve
 		// that alias before externalizing imports so the runtime is bundled.
 		...createStyleBundlingPlugins( packageDir ),
-		externalizeAllExceptCssPlugin,
+		externalizeJsImportsPlugin,
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
 		builds.push(
 			esbuild.build( {
+				loader: LOADER_CONFIG,
 				entryPoints: srcFiles,
 				outdir: buildDir,
 				outbase: srcDir,
@@ -1451,6 +1459,7 @@ async function transpilePackage( packageName ) {
 	if ( packageJson.module ) {
 		builds.push(
 			esbuild.build( {
+				loader: LOADER_CONFIG,
 				entryPoints: srcFiles,
 				outdir: buildModuleDir,
 				outbase: srcDir,
@@ -1694,6 +1703,7 @@ async function buildRoute( routeName ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.min.js' ),
 					bundle: true,
@@ -1712,6 +1722,7 @@ async function buildRoute( routeName ) {
 					],
 				} ),
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.js' ),
 					bundle: true,
@@ -1719,6 +1730,7 @@ async function buildRoute( routeName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						styleRuntimeAliasPlugin(),
 						wordpressExternalsPlugin(
@@ -1745,6 +1757,7 @@ async function buildRoute( routeName ) {
 		// Build both minified and non-minified versions in parallel
 		await Promise.all( [
 			esbuild.build( {
+				loader: LOADER_CONFIG,
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.min.js' ),
 				bundle: true,
@@ -1763,6 +1776,7 @@ async function buildRoute( routeName ) {
 				],
 			} ),
 			esbuild.build( {
+				loader: LOADER_CONFIG,
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.js' ),
 				bundle: true,
@@ -1770,6 +1784,7 @@ async function buildRoute( routeName ) {
 				target: getEsbuildTarget(),
 				minify: false,
 				define: getDefine( true ),
+				conditions: developmentConditions,
 				plugins: [
 					...createStyleBundlingPlugins( routeDir ),
 					wordpressExternalsPlugin(
@@ -1813,7 +1828,7 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 					return metadata.pages.some(
 						( page ) => ! experimentalPageIds.has( page )
 					);
-			  } );
+				} );
 
 	if ( routes.length === 0 ) {
 		console.log( '   No routes found, skipping.\n' );
@@ -1823,9 +1838,7 @@ async function buildRoutes( experimentalPageIds = new Set() ) {
 	await Promise.all(
 		routes.map( async ( routeName ) => {
 			const buildTime = await buildRoute( routeName );
-			console.log(
-				`   ✔ Built route ${ routeName } (${ buildTime }ms)`
-			);
+			console.log( `   ✔ Built route ${ routeName } (${ buildTime }ms)` );
 		} )
 	);
 }
@@ -1857,6 +1870,7 @@ async function buildWidget( widgetName ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.min.js' ),
 					bundle: true,
@@ -1875,6 +1889,7 @@ async function buildWidget( widgetName ) {
 					],
 				} ),
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: renderEntryPoints,
 					outfile: path.join( outputDir, 'render.js' ),
 					bundle: true,
@@ -1882,6 +1897,7 @@ async function buildWidget( widgetName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						...createStyleBundlingPlugins( widgetDir ),
 						wordpressExternalsPlugin(
@@ -1907,6 +1923,7 @@ async function buildWidget( widgetName ) {
 			// Build both minified and non-minified versions in parallel
 			await Promise.all( [
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.min.js' ),
 					bundle: true,
@@ -1925,6 +1942,7 @@ async function buildWidget( widgetName ) {
 					],
 				} ),
 				esbuild.build( {
+					loader: LOADER_CONFIG,
 					entryPoints: widgetEntryPoints,
 					outfile: path.join( outputDir, 'widget.js' ),
 					bundle: true,
@@ -1932,6 +1950,7 @@ async function buildWidget( widgetName ) {
 					target: getEsbuildTarget(),
 					minify: false,
 					define: getDefine( true ),
+					conditions: developmentConditions,
 					plugins: [
 						styleRuntimeAliasPlugin(),
 						wordpressExternalsPlugin(
@@ -2112,10 +2131,10 @@ function toPhpActionsLiteral( actions ) {
 					typeof action.download === 'boolean'
 						? `'download' => ${
 								action.download ? 'true' : 'false'
-						  }`
+							}`
 						: `'download' => ${ toPhpStringLiteral(
 								action.download
-						  ) }`
+							) }`
 				);
 			}
 
@@ -2396,7 +2415,7 @@ async function buildAll( baseUrlExpression ) {
 				normalizedPages
 					.filter( ( page ) => page.experimental )
 					.map( ( page ) => page.id )
-		  )
+			)
 		: new Set();
 	await buildRoutes( experimentalPageIds );
 
@@ -2483,9 +2502,7 @@ async function buildAll( baseUrlExpression ) {
 	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );
 		for ( const page of pageData ) {
-			console.log(
-				`   ✔ Generated build/pages/${ page.slug }/page.php`
-			);
+			console.log( `   ✔ Generated build/pages/${ page.slug }/page.php` );
 			console.log(
 				`   ✔ Generated build/pages/${ page.slug }/page-wp-admin.php`
 			);
@@ -2836,10 +2853,10 @@ async function main() {
 			'base-url': {
 				type: 'string',
 				default:
-					boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
+					( boolConfigVal( process.env.IS_WORDPRESS_CORE ) ??
 					boolConfigVal(
 						process.env.npm_package_config_IS_WORDPRESS_CORE
-					)
+					) )
 						? "includes_url( 'build/' )"
 						: 'plugin_dir_url( __FILE__ )',
 			},

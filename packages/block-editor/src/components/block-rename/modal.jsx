@@ -59,12 +59,12 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 						/* translators: %s: new name/label for the block */
 						__( 'Block name reset to: "%s".' ),
 						editedBlockName
-				  )
+					)
 				: sprintf(
 						/* translators: %s: new name/label for the block */
 						__( 'Block name changed to: "%s".' ),
 						editedBlockName
-				  );
+					);
 
 		// Must be assertive to immediately announce change.
 		speak( message, 'assertive' );
@@ -106,7 +106,7 @@ export default function BlockRenameModal( { clientId, onClose } ) {
 							hasOverridesWarning
 								? __(
 										'This block allows overrides. Changing the name can cause problems with content entered into instances of this pattern.'
-								  )
+									)
 								: undefined
 						}
 						placeholder={ originalBlockName }

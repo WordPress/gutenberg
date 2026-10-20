@@ -71,11 +71,11 @@ function createBlockCompleter() {
 							categories,
 							collections,
 							filterValue
-					  )
+						)
 					: orderInserterBlockItems(
 							orderBy( items, 'frecency', 'desc' ),
 							prioritizedBlocks
-					  );
+						);
 
 				return initialFilteredItems
 					.filter( ( item ) => item.id !== selectedBlockId )
@@ -133,7 +133,7 @@ function createBlockCompleter() {
 					syncStatus === 'unsynced'
 						? ( blocks ?? [] ).map( ( block ) =>
 								cloneBlock( block )
-						  )
+							)
 						: createBlock(
 								name,
 								initialAttributes,
@@ -141,7 +141,7 @@ function createBlockCompleter() {
 									innerBlocks
 								),
 								innerContent
-						  ),
+							),
 			};
 		},
 	};

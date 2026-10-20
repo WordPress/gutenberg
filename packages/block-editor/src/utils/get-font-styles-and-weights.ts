@@ -7,6 +7,34 @@ import type {
 	CombinedStyleAndWeightOption,
 } from './types';
 
+/*
+ * The absolute keywords a `@font-face` weight may use. `lighter` and `bolder` are
+ * relative to the parent and are not allowed there, so they are not listed.
+ */
+const FONT_WEIGHT_KEYWORDS: Record< string, number | undefined > = {
+	normal: 400,
+	bold: 700,
+};
+
+function isValidWeight( weight: number | undefined ): weight is number {
+	return (
+		weight !== undefined &&
+		Number.isFinite( weight ) &&
+		weight >= 1 &&
+		weight <= 1000
+	);
+}
+
+/*
+ * Read one end of a `@font-face` weight range as a number, or undefined when it is
+ * neither a number nor a keyword the property accepts.
+ */
+function parseWeightValue( value: string ): number | undefined {
+	const token = value.trim().toLowerCase();
+	const weight = FONT_WEIGHT_KEYWORDS[ token ] ?? Number( token );
+	return isValidWeight( weight ) ? weight : undefined;
+}
+
 const FONT_STYLES = [
 	{
 		name: _x( 'Regular', 'font style' ),
@@ -83,23 +111,30 @@ export function getFontStylesAndWeights(
 			'string' === typeof face.fontWeight &&
 			/\s/.test( face.fontWeight.trim() )
 		) {
-			isVariableFont = true;
+			// Read both ends, which may be keywords: "normal 900" is 400 to 900.
+			const [ startStr, endStr ] = face.fontWeight.trim().split( /\s+/ );
+			const start = parseWeightValue( startStr );
+			const end = parseWeightValue( endStr );
 
-			// Find font weight start and end values.
-			const [ startStr, endStr ] = face.fontWeight.split( ' ' );
-			const startValue = parseInt( startStr.slice( 0, 1 ) );
-			const endValue =
-				endStr === '1000' ? 10 : parseInt( endStr.slice( 0, 1 ) );
+			// A range this property cannot express is left to the face's own
+			// formatting below rather than offering weights nobody declared.
+			if ( start !== undefined && end !== undefined ) {
+				isVariableFont = true;
 
-			// Create font weight options for available variable weights.
-			for ( let i = startValue; i <= endValue; i++ ) {
-				const fontWeightValue = `${ i.toString() }00`;
-				if (
-					! fontWeights.some(
-						( weight ) => weight.value === fontWeightValue
-					)
-				) {
-					fontWeights.push( formatFontWeight( fontWeightValue ) );
+				// Find the hundreds inside the range, e.g. 300 to 700 for "250 750".
+				const startValue = Math.ceil( start / 100 );
+				const endValue = Math.floor( end / 100 );
+
+				// Create font weight options for available variable weights.
+				for ( let i = startValue; i <= endValue; i++ ) {
+					const fontWeightValue = `${ i.toString() }00`;
+					if (
+						! fontWeights.some(
+							( weight ) => weight.value === fontWeightValue
+						)
+					) {
+						fontWeights.push( formatFontWeight( fontWeightValue ) );
+					}
 				}
 			}
 		}
@@ -173,7 +208,7 @@ export function getFontStylesAndWeights(
 							_x( '%1$s %2$s', 'font' ),
 							weightName ?? '',
 							styleName ?? ''
-					  );
+						);
 
 			combinedStyleAndWeightOptions.push( {
 				key: `${ styleValue }-${ weightValue }`,

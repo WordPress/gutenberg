@@ -10,10 +10,10 @@ import type { ActionItem, store } from '..';
 type Expect< A, B > = 0 extends 1 & A
 	? never
 	: [ A ] extends [ B ]
-	? [ B ] extends [ A ]
-		? true
-		: never
-	: never;
+		? [ B ] extends [ A ]
+			? true
+			: never
+		: never;
 
 type Selectors = CurriedSelectorsOf< typeof store >;
 type ActionItemOnClick = ComponentProps< typeof ActionItem >[ 'onClick' ];
@@ -22,7 +22,7 @@ type FillPropsOnClick = NonNullable<
 >[ 'onClick' ];
 
 describe( 'Interface types', () => {
-	// eslint-disable-next-line jest/expect-expect -- compile-time assertions only.
+	// eslint-disable-next-line vitest/expect-expect -- compile-time assertions only.
 	it( 'types the selector return values', () => {
 		true satisfies Expect<
 			ReturnType< Selectors[ 'isComplementaryAreaLoading' ] >,
@@ -34,7 +34,7 @@ describe( 'Interface types', () => {
 		>;
 	} );
 
-	// eslint-disable-next-line jest/expect-expect -- compile-time assertions only.
+	// eslint-disable-next-line vitest/expect-expect -- compile-time assertions only.
 	it( 'accepts typed and inline click handlers', () => {
 		const onButtonClick = ( event: MouseEvent< HTMLButtonElement > ) =>
 			event.currentTarget;

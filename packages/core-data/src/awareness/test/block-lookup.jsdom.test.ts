@@ -37,7 +37,7 @@ vi.mock( import( '@wordpress/data' ), async ( importOriginal ) => ( {
 				mockFlattenBlocks( mockGetClientIdsTree( '' ) )
 					.filter( ( b ) => b.name === blockName )
 					.map( ( b ) => b.clientId ),
-		} ) ) ) as unknown as typeof import('@wordpress/data').useSelect,
+		} ) ) ) as unknown as typeof import( '@wordpress/data' ).useSelect,
 } ) );
 
 // @ts-expect-error `@wordpress/block-editor` does not publish TypeScript declarations.

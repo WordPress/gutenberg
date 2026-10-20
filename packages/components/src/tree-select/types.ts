@@ -12,11 +12,10 @@ export interface Tree {
 
 // `TreeSelect` inherits props from `SelectControl`, but only
 // in single selection mode (ie. when the `multiple` prop is not defined).
-export interface TreeSelectProps
-	extends Omit<
-		SelectControlSingleSelectionProps,
-		'value' | 'multiple' | 'onChange'
-	> {
+export interface TreeSelectProps extends Omit<
+	SelectControlSingleSelectionProps,
+	'value' | 'multiple' | 'onChange'
+> {
 	/**
 	 * If this property is added, an option will be added with this label to represent empty selection.
 	 */

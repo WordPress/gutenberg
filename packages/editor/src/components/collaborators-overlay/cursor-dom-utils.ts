@@ -375,7 +375,7 @@ export const getOrderedBlockRange = (
 		? []
 		: getBlocksBetween( firstId, lastId, doc ).filter(
 				( el ) => ! firstEl.contains( el ) && ! lastEl.contains( el )
-		  );
+			);
 
 	return { firstEl, firstId, lastEl, lastId, middleEls, sameContainer };
 };

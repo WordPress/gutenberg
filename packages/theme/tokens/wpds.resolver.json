@@ -18,15 +18,76 @@
 		"corner-radius": {
 			"default": "subtle",
 			"contexts": {
-				"none": [ { "$ref": "modes/border.corner-radius-none.json" } ],
-				"subtle": [
-					{ "$ref": "modes/border.corner-radius-subtle.json" }
+				"none": [
+					{
+						"wpds-border": {
+							"$type": "dimension",
+							"radius": {
+								"xs": {
+									"$value": { "value": 0, "unit": "px" }
+								},
+								"sm": {
+									"$value": { "value": 0, "unit": "px" }
+								},
+								"md": {
+									"$value": { "value": 0, "unit": "px" }
+								},
+								"lg": {
+									"$value": { "value": 0, "unit": "px" }
+								},
+								"xl": { "$value": { "value": 0, "unit": "px" } }
+							}
+						}
+					}
 				],
+				"subtle": [],
 				"moderate": [
-					{ "$ref": "modes/border.corner-radius-moderate.json" }
+					{
+						"wpds-border": {
+							"$type": "dimension",
+							"radius": {
+								"xs": {
+									"$value": { "value": 6, "unit": "px" }
+								},
+								"sm": {
+									"$value": { "value": 8, "unit": "px" }
+								},
+								"md": {
+									"$value": { "value": 12, "unit": "px" }
+								},
+								"lg": {
+									"$value": { "value": 16, "unit": "px" }
+								},
+								"xl": {
+									"$value": { "value": 20, "unit": "px" }
+								}
+							}
+						}
+					}
 				],
 				"pronounced": [
-					{ "$ref": "modes/border.corner-radius-pronounced.json" }
+					{
+						"wpds-border": {
+							"$type": "dimension",
+							"radius": {
+								"xs": {
+									"$value": { "value": 18, "unit": "px" }
+								},
+								"sm": {
+									"$value": { "value": 20, "unit": "px" }
+								},
+								"md": {
+									"$value": { "value": 22, "unit": "px" }
+								},
+								"lg": {
+									"$value": { "value": 24, "unit": "px" }
+								},
+								"xl": {
+									"$value": { "value": 26, "unit": "px" }
+								}
+							}
+						}
+					}
 				]
 			}
 		},
@@ -34,7 +95,18 @@
 			"default": "standard",
 			"contexts": {
 				"standard": [],
-				"high-dpi": [ { "$ref": "modes/border.high-dpi.json" } ]
+				"high-dpi": [
+					{
+						"wpds-border": {
+							"$type": "dimension",
+							"width": {
+								"focus": {
+									"$value": { "value": 1.5, "unit": "px" }
+								}
+							}
+						}
+					}
+				]
 			}
 		}
 	},

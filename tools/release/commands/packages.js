@@ -1,12 +1,11 @@
 const path = require( 'path' );
 const fs = require( 'fs' );
 const readline = require( 'readline' );
-const { join } = require( 'path' );
 const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
 const { inc: semverInc, parse: semverParse } = require( 'semver' );
 const { rimraf } = require( 'rimraf' );
-const SimpleGit = require( 'simple-git' );
+const { simpleGit } = require( 'simple-git' );
 const { log, formats } = require( '../lib/logger' );
 const {
 	askForConfirmation,
@@ -60,7 +59,7 @@ class NpmReleaseVerificationPendingError extends Error {}
  * @typedef WPPackagesCommandOptions
  *
  * @property {boolean} [ci]             Disables interactive mode when executed in CI mode.
- * @property {string}  [repositoryPath] Relative path to the git repository.
+ * @property {string}  [repositoryPath] Path to the git repository, relative to the working directory or absolute.
  * @property {SemVer}  [semver]         The selected semantic versioning. Defaults to `patch`.
  * @property {string}  [wpVersion]      The major WordPress version number, example: `6.0`.
  */
@@ -95,7 +94,7 @@ async function checkoutNpmReleaseBranch( {
 	 * Lerna assumes that all packages need publishing if it can't access
 	 * the necessary information.
 	 */
-	await SimpleGit( gitWorkingDirectoryPath )
+	await simpleGit( gitWorkingDirectoryPath )
 		.fetch( 'origin', npmReleaseBranch, [ '--depth=999' ] )
 		.checkout( npmReleaseBranch );
 	log(
@@ -136,7 +135,7 @@ async function runNpmReleaseBranchSyncStep( pluginReleaseBranch, config ) {
 			`>> Syncing the latest plugin release to "${ pluginReleaseBranch }".`
 		);
 
-		const repo = SimpleGit( gitWorkingDirectoryPath );
+		const repo = simpleGit( gitWorkingDirectoryPath );
 
 		/*
 		 * Replace content from remote branch.
@@ -316,7 +315,7 @@ async function updatePackages( config ) {
 		);
 	}
 
-	const { commit: commitHash } = await SimpleGit( gitWorkingDirectoryPath )
+	const { commit: commitHash } = await simpleGit( gitWorkingDirectoryPath )
 		.add( [ './*' ] )
 		.commit( 'Update changelog files' );
 
@@ -348,7 +347,7 @@ async function runPushGitChangesStep( {
 				abortMessage
 			);
 		}
-		await SimpleGit( gitWorkingDirectoryPath ).push(
+		await simpleGit( gitWorkingDirectoryPath ).push(
 			'origin',
 			npmReleaseBranch
 		);
@@ -368,7 +367,7 @@ async function runPushGitChangesStep( {
  */
 async function getNpmReleasePackages( gitWorkingDirectoryPath, deps = {} ) {
 	const {
-		git = SimpleGit( gitWorkingDirectoryPath ),
+		git = simpleGit( gitWorkingDirectoryPath ),
 		globFn = glob,
 		readJSON = readJSONFile,
 	} = deps;
@@ -487,7 +486,7 @@ function getNpmReleaseGitRecoveryCommands( {
 						( tagName ) =>
 							`git ls-remote --tags origin "refs/tags/${ tagName }" "refs/tags/${ tagName }^{}"`
 					),
-			  ]
+				]
 			: [] ),
 	].join( '\n' );
 }
@@ -550,7 +549,7 @@ async function getRemoteBranchSha(
 	branchName,
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const { git = simpleGit( gitWorkingDirectoryPath ) } = deps;
 	const branchRef = `refs/heads/${ branchName }`;
 	const output = await git.raw( 'ls-remote', '--heads', 'origin', branchRef );
 	const matchingLine = output
@@ -580,7 +579,7 @@ async function isCommitOnRemoteBranch(
 ) {
 	const {
 		getRemoteBranchShaFn = getRemoteBranchSha,
-		git = SimpleGit( gitWorkingDirectoryPath ),
+		git = simpleGit( gitWorkingDirectoryPath ),
 	} = deps;
 	const remoteSha = await getRemoteBranchShaFn(
 		gitWorkingDirectoryPath,
@@ -612,7 +611,7 @@ async function isCommitOnRemoteBranch(
 async function getRemoteTagShas(
 	gitWorkingDirectoryPath,
 	tagNames,
-	{ git = SimpleGit( gitWorkingDirectoryPath ) } = {}
+	{ git = simpleGit( gitWorkingDirectoryPath ) } = {}
 ) {
 	if ( tagNames.length === 0 ) {
 		return new Map();
@@ -774,7 +773,7 @@ async function runNpmPublishPreflight(
 	// TODO: Consider bounded concurrency here if this preflight becomes too slow.
 	// Keep registry checks sequential so errors stay easy to read.
 	for ( const { name, version } of releasePackages ) {
-		let registryPackage;
+		let registryOutput;
 		try {
 			const { stdout } = await commandFn(
 				`npm view ${ name }@${ version } version gitHead dist-tags --json`,
@@ -783,7 +782,7 @@ async function runNpmPublishPreflight(
 					stdio: 'pipe',
 				}
 			);
-			registryPackage = parseNpmJsonOutput(
+			registryOutput = parseNpmJsonOutput(
 				stdout,
 				`${ name }@${ version } metadata`
 			);
@@ -792,6 +791,25 @@ async function runNpmPublishPreflight(
 				continue;
 			}
 			throw error;
+		}
+
+		/* npm v12 always returns an array; older versions return an object for a single match. */
+		const registryPackages = Array.isArray( registryOutput )
+			? registryOutput
+			: [ registryOutput ];
+		if ( registryPackages.length !== 1 ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return one version, got ${ registryPackages.length }.`
+			);
+		}
+
+		const [ registryPackage ] = registryPackages;
+		if ( ! registryPackage || typeof registryPackage !== 'object' ) {
+			throw new Error(
+				`Expected npm registry lookup for ${ name }@${ version } to return package metadata, got ${ JSON.stringify(
+					registryPackage
+				) }.`
+			);
 		}
 
 		const {
@@ -845,7 +863,7 @@ async function pushNpmReleaseGitMetadata(
 	deps = {}
 ) {
 	const {
-		git = SimpleGit( gitWorkingDirectoryPath ),
+		git = simpleGit( gitWorkingDirectoryPath ),
 		isCommitOnRemoteBranchFn = isCommitOnRemoteBranch,
 		runPhase = runNpmReleasePhase,
 		verifyRemoteNpmReleaseBranchFn = verifyRemoteNpmReleaseBranch,
@@ -981,7 +999,7 @@ async function pushNpmReleasePreparedCommit(
 	},
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const { git = simpleGit( gitWorkingDirectoryPath ) } = deps;
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
 	log( '>> Persisting the prepared release state before publishing.' );
 	for ( const packageTagChunk of chunk(
@@ -1045,7 +1063,7 @@ async function getNpmReleasePreparedState(
 	preparedCommit,
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const { git = simpleGit( gitWorkingDirectoryPath ) } = deps;
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
 	const output = await git.raw(
 		'ls-remote',
@@ -1095,7 +1113,7 @@ async function getNpmReleasePreparedCommit(
 	npmReleaseBranch,
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const { git = simpleGit( gitWorkingDirectoryPath ) } = deps;
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
 	const output = await git.raw( 'ls-remote', 'origin', refs.commit );
 	const [ sha ] = output.trim().split( /\s+/ );
@@ -1117,7 +1135,7 @@ async function getNpmReleasePreparedTagNames(
 	npmReleaseBranch,
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const { git = simpleGit( gitWorkingDirectoryPath ) } = deps;
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
 	const output = await git.raw(
 		'ls-remote',
@@ -1145,7 +1163,7 @@ async function restoreNpmReleasePreparedTags(
 	npmReleaseBranch,
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const { git = simpleGit( gitWorkingDirectoryPath ) } = deps;
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
 	log( '>> Restoring the package tags prepared by the previous run.' );
 	await git.raw(
@@ -1169,7 +1187,7 @@ async function deleteNpmReleasePreparedCommit(
 	npmReleaseBranch,
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const { git = simpleGit( gitWorkingDirectoryPath ) } = deps;
 	const refs = getNpmReleasePreparedRefs( npmReleaseBranch );
 	const output = await git.raw(
 		'ls-remote',
@@ -1252,7 +1270,7 @@ async function isNpmReleaseGitMetadataPublished(
 	const {
 		getPreparedTagNamesFn = getNpmReleasePreparedTagNames,
 		getRemoteBranchShaFn = getRemoteBranchSha,
-		git = SimpleGit( gitWorkingDirectoryPath ),
+		git = simpleGit( gitWorkingDirectoryPath ),
 		isCommitOnRemoteBranchFn = isCommitOnRemoteBranch,
 		verifyRemotePackageTagsFn = verifyRemotePackageTags,
 	} = deps;
@@ -1337,7 +1355,7 @@ async function getNpmReleasePreparedChangelogCommit(
 	preparedCommit,
 	deps = {}
 ) {
-	const { git = SimpleGit( gitWorkingDirectoryPath ) } = deps;
+	const { git = simpleGit( gitWorkingDirectoryPath ) } = deps;
 	const output = await git.raw(
 		'show',
 		'--no-patch',
@@ -1385,7 +1403,7 @@ async function resumePreparedNpmRelease( config, deps = {} ) {
 		getPreparedCommitFn = getNpmReleasePreparedCommit,
 		getPreparedPluginReleaseBranchFn = getNpmReleasePreparedPluginBranch,
 		getPreparedStateFn = getNpmReleasePreparedState,
-		git = SimpleGit( config.gitWorkingDirectoryPath ),
+		git = simpleGit( config.gitWorkingDirectoryPath ),
 		isGitMetadataPublishedFn = isNpmReleaseGitMetadataPublished,
 		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
 		restorePreparedTagsFn = restoreNpmReleasePreparedTags,
@@ -1529,7 +1547,7 @@ async function publishVersionedPackagesToNpm(
 ) {
 	const {
 		commandFn = command,
-		git = SimpleGit( gitWorkingDirectoryPath ),
+		git = simpleGit( gitWorkingDirectoryPath ),
 		getNpmReleasePackagesFn = getNpmReleasePackages,
 		pushNpmReleaseGitMetadataFn = pushNpmReleaseGitMetadata,
 		pushPreparedCommitFn = pushNpmReleasePreparedCommit,
@@ -1685,7 +1703,7 @@ async function publishPackagesToNpm(
 ) {
 	const {
 		commandFn = command,
-		git = SimpleGit( gitWorkingDirectoryPath ),
+		git = simpleGit( gitWorkingDirectoryPath ),
 		publishVersionedPackagesToNpmFn = publishVersionedPackagesToNpm,
 	} = deps;
 	await installNpmReleaseDependencies(
@@ -1771,7 +1789,7 @@ async function prepareNpmRelease( config, deps = {} ) {
 				? 'trunk'
 				: await findPluginReleaseBranchNameFn(
 						config.gitWorkingDirectoryPath
-				  );
+					);
 		await runNpmReleaseBranchSyncStepFn( pluginReleaseBranch, config );
 	} else {
 		await checkoutNpmReleaseBranchFn( config );
@@ -1889,7 +1907,7 @@ async function backportCommitsToBranch(
 
 	log( `>> Backporting commits to "${ branchName }".` );
 
-	const repo = SimpleGit( gitWorkingDirectoryPath );
+	const repo = simpleGit( gitWorkingDirectoryPath );
 
 	/*
 	 * Reset any local changes and replace them with the origin branch's copy.
@@ -1977,7 +1995,7 @@ async function runPackagesRelease( config, customMessages, deps = {} ) {
 			config.abortMessage,
 			async () => {
 				log( '>> Cloning the Git repository' );
-				await SimpleGit().clone(
+				await simpleGit().clone(
 					pluginConfig.gitRepositoryURL,
 					gitPath,
 					[ '--depth=1', '--no-single-branch' ]
@@ -2044,7 +2062,7 @@ function getConfig(
 		abortMessage: 'Aborting!',
 		distTag,
 		gitWorkingDirectoryPath:
-			repositoryPath && join( process.cwd(), repositoryPath ),
+			repositoryPath && path.resolve( repositoryPath ),
 		interactive: ! ci,
 		minimumVersionBump: semver,
 		npmReleaseBranch,

@@ -42,7 +42,7 @@ function formatAjvError( ajvError: any, param: string ): string {
 	// Convert AJV's instancePath format (/0/prop) to an array like format to better match WordPress ([0][prop])
 	const instancePath = ajvError.instancePath
 		? ajvError.instancePath.replace( /\//g, '][' ).replace( /^\]\[/, '[' ) +
-		  ']'
+			']'
 		: '';
 	const fullParam = param + instancePath;
 

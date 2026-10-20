@@ -6,7 +6,9 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 import {
 	cloneFile,
 	convertBlobToFile,
+	getFileBasename,
 	isAnimatedGif,
+	isHeicFile,
 	renameFile,
 } from '../utils';
 import {
@@ -111,8 +113,8 @@ type ActionCreators = {
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
-type AllSelectors = typeof import('./selectors') &
-	typeof import('./private-selectors');
+type AllSelectors = typeof import( './selectors' ) &
+	typeof import( './private-selectors' );
 type CurriedState< F > = F extends ( state: State, ...args: infer P ) => infer R
 	? ( ...args: P ) => R
 	: F;
@@ -120,7 +122,7 @@ type Selectors = {
 	[ key in keyof AllSelectors ]: CurriedState< AllSelectors[ key ] >;
 };
 
-type ThunkArgs = {
+export type ThunkArgs = {
 	select: Selectors;
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
@@ -292,6 +294,26 @@ export function processItem( id: QueueItemId ) {
 
 		const item = select.getItem( id );
 		if ( ! item ) {
+			return;
+		}
+
+		/*
+		 * The item already has an operation in flight, so leave it alone:
+		 * several callers dispatch processItem for an item that may still be
+		 * running (resumeQueue walks the whole queue, a finishing child
+		 * sideload pings its parent, a freed concurrency slot kicks the
+		 * pending items). Without this, the same handler would run twice and
+		 * both runs would finish the operation, shifting two steps off the
+		 * pipeline and silently skipping one of them. The running handler
+		 * calls finishOperation when it is done, which picks the pipeline
+		 * back up.
+		 *
+		 * Items parked in PendingRetry keep currentOperation set — it is what
+		 * keeps them out of the concurrency pools while they wait out the
+		 * backoff — but retrying clears it (see the RetryItem reducer case),
+		 * so a retry is not blocked here.
+		 */
+		if ( item.currentOperation ) {
 			return;
 		}
 
@@ -828,11 +850,30 @@ export function prepareItem( id: QueueItemId ) {
 
 		let heicJpeg: File | null = null;
 
-		const isImage = file.type.startsWith( 'image/' );
-		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
-			file.type
-		);
-		const isHeic = HEIC_MIME_TYPES.includes( file.type );
+		// A HEIC photo can arrive with a .jpg or .png name, which is all the
+		// browser has to go on when it types the file, so this goes by content.
+		const isHeic = await isHeicFile( file );
+		const isMisnamedHeic =
+			isHeic && ! HEIC_MIME_TYPES.includes( file.type );
+
+		const isImage = file.type.startsWith( 'image/' ) || isHeic;
+
+		// A misnamed HEIC file claims a vips-processable type. vips cannot
+		// decode HEIC, and taking that branch is what strands the upload.
+		const isVipsSupported =
+			! isHeic && CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes( file.type );
+
+		/*
+		 * Re-label a misnamed file so the rest of the pipeline sees HEIC: the
+		 * WebCodecs decoder is configured from `File.type`, and the untouched
+		 * original is sideloaded under its own name once the attachment exists.
+		 */
+		const heicFile = isMisnamedHeic
+			? new File( [ file ], `${ getFileBasename( file.name ) }.heic`, {
+					type: HEIC_MIME_TYPES[ 0 ],
+					lastModified: file.lastModified,
+				} )
+			: file;
 
 		// Gate very large images out of client-side processing. wasm-vips is
 		// capped at 1 GiB of memory, so high-megapixel images, especially
@@ -852,7 +893,7 @@ export function prepareItem( id: QueueItemId ) {
 		// images routed to the server: the gain map is only preserved by the
 		// client-side resize path, and the probe runs wasm-vips, which the
 		// large-image gate above is specifically meant to avoid.
-		if ( file.type === 'image/jpeg' && ! tooLargeForClient ) {
+		if ( file.type === 'image/jpeg' && ! isHeic && ! tooLargeForClient ) {
 			operations.push( OperationType.DetectUltraHdr );
 		}
 
@@ -898,13 +939,13 @@ export function prepareItem( id: QueueItemId ) {
 							: vipsEncodeCanvasAsJpeg(
 									id,
 									canvas,
-									file,
+									heicFile,
 									quality
 							  )
 				: undefined;
 			try {
 				heicJpeg = await canvasConvertToJpeg(
-					file,
+					heicFile,
 					settings.imageQuality ?? DEFAULT_OUTPUT_QUALITY,
 					encode
 				);
@@ -927,7 +968,7 @@ export function prepareItem( id: QueueItemId ) {
 							? getHeicUnsupportedMessage()
 							: __(
 									'This HEIC image could not be converted. Try converting it to JPEG before uploading.'
-							  ),
+								),
 						file,
 						cause: error instanceof Error ? error : undefined,
 					} )
@@ -966,7 +1007,7 @@ export function prepareItem( id: QueueItemId ) {
 			updates = {
 				file: heicJpeg,
 				sourceFile: heicJpeg,
-				originalHeicFile: item.file,
+				originalHeicFile: heicFile,
 				additionalData: {
 					...item.additionalData,
 					generate_sub_sizes: ! vipsAvailable,
@@ -1175,9 +1216,15 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
-		// Metadata stripping and bit depth cap from the `image_strip_meta`
-		// and `image_max_bit_depth` filters, carried in the editor settings.
-		const { imageStripMeta, imageMaxBitDepth } = select.getSettings();
+		// Metadata stripping, bit depth cap, and animated sub-sizes from the
+		// `image_strip_meta`, `image_max_bit_depth`, and
+		// `wp_generate_animated_image_subsizes` filters, carried in the
+		// editor settings.
+		const {
+			imageStripMeta,
+			imageMaxBitDepth,
+			generateAnimatedImageSubsizes,
+		} = select.getSettings();
 
 		try {
 			const file = await vipsResizeImage(
@@ -1192,6 +1239,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 					quality: args.quality,
 					stripMeta: imageStripMeta,
 					maxBitdepth: imageMaxBitDepth,
+					preserveAnimation: false !== generateAnimatedImageSubsizes,
 				}
 			);
 

@@ -7,7 +7,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	TextControl,
 	TextareaControl as WCTextareaControl,
 	__experimentalToolsPanel as ToolsPanel,
@@ -113,7 +113,7 @@ export default function HomeEdit( { attributes, setAttributes, context } ) {
 						}
 						isShownByDefault
 					>
-						<CheckboxControl
+						<WCCheckboxControl
 							label={ __( 'Open in new tab' ) }
 							checked={ opensInNewTab }
 							onChange={ ( value ) =>

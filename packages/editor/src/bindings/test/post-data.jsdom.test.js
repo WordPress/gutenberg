@@ -25,7 +25,7 @@ describe( 'post-data bindings', () => {
 										modified: '2025-06-07 00:00:00',
 										link: 'https://example.com/post',
 										unknown: 'Unknown field value',
-								  }
+									}
 								: false,
 					};
 				};

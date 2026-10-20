@@ -62,8 +62,7 @@ export function ConnectorItem( {
 export type { ApiKeySource } from './types';
 
 type ConnectorHelpMessage =
-	| `${ string }%s${ string }`
-	| TransformedText< `${ string }%s${ string }` >;
+	`${ string }%s${ string }` | TransformedText< `${ string }%s${ string }` >;
 type ConnectorHelpInterpolatedMessage = `${ string }<a></a>${ string }`;
 
 function getHelpLinkLabel( helpUrl?: string, helpLabel?: string ) {
@@ -145,7 +144,7 @@ function ConnectorSettingsFrame( {
 				readOnly
 					? {
 							'--wp-components-color-background': '#f0f0f0',
-					  }
+						}
 					: undefined
 			}
 		>
@@ -267,7 +266,7 @@ export function DefaultConnectorSettings( {
 						__(
 							'Your API key is stored securely. You can manage it at %s'
 						)
-				  )
+					)
 				: __( 'Your API key is stored securely.' );
 		}
 		if ( saveError ) {

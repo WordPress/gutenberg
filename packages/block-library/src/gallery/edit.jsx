@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import {
-	SelectControl,
+	SelectControl as WCSelectControl,
 	ToggleControl,
 	RangeControl,
 	MenuGroup,
@@ -23,7 +23,7 @@ import {
 	MediaReplaceFlow,
 	useSettings,
 } from '@wordpress/block-editor';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -64,8 +64,14 @@ import useGetMedia from './use-get-media';
 import GalleryStyles from './gallery-styles';
 import useDynamicGallery from './use-dynamic-gallery';
 import { GallerySourcePanel, GalleryDynamicView } from './dynamic-gallery';
-import { getDynamicSource, ATTACHED_MEDIA } from './dynamic-source';
-import { unlock } from '../lock-unlock';
+import { SortImagesControl, SourceOrderControl } from './order-controls';
+import {
+	getDynamicSource,
+	ATTACHED_MEDIA,
+	DEFAULT_ORDERBY,
+	DEFAULT_ORDER,
+} from './dynamic-source';
+import { hasSortableImages, sortImageBlocks } from './order-images';
 import {
 	getViewportGalleryStyle,
 	getUpdatedGalleryStyle,
@@ -156,7 +162,7 @@ export default function GalleryEdit( props ) {
 	const linkOptions = ! lightboxSetting?.allowEditing
 		? LINK_OPTIONS.filter(
 				( option ) => option.value !== LINK_DESTINATION_LIGHTBOX
-		  )
+			)
 		: LINK_OPTIONS;
 
 	const {
@@ -238,7 +244,7 @@ export default function GalleryEdit( props ) {
 				getSettings: _getSettings,
 				getBlock: _getBlock,
 				getSelectedBlockStyleState,
-			} = unlock( select( blockEditorStore ) );
+			} = select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 
 			return {
@@ -264,7 +270,7 @@ export default function GalleryEdit( props ) {
 		? getViewportGalleryStyle(
 				attributes.style,
 				selectedStyleState.viewport
-		  )
+			)
 		: {};
 	const baseColumns = isValidGalleryColumns( columns ) ? columns : undefined;
 	const baseImageCrop = typeof imageCrop === 'boolean' ? imageCrop : true;
@@ -313,6 +319,22 @@ export default function GalleryEdit( props ) {
 
 	const hasImages = !! images.length;
 	const isDynamic = !! attributes.dynamicContent;
+
+	// The static "Order by" control shows the last sort applied from it, for as
+	// long as the images stay in the sequence that sort produced. Any other
+	// change to the images (a drag, an addition, a removal) drops it back to
+	// "Custom"; it never reports an order the user didn't choose. Nothing is
+	// stored, so this is local state rather than an attribute.
+	const [ appliedSort, setAppliedSort ] = useState( null );
+	const currentOrder =
+		appliedSort &&
+		appliedSort.clientIds.length === innerBlockImages.length &&
+		appliedSort.clientIds.every(
+			( id, index ) => innerBlockImages[ index ].clientId === id
+		)
+			? appliedSort.order
+			: null;
+	const canSortImages = hasSortableImages( innerBlockImages, imageData );
 
 	// Dynamic mode (resolving images from a source instead of inner blocks):
 	// source resolution, the editor-preview blocks, and the mode/ordering
@@ -469,7 +491,7 @@ export default function GalleryEdit( props ) {
 					}
 
 					return file;
-			  } )
+				} )
 			: selectedImages;
 
 		if ( ! imageArray.every( isValidFileType ) ) {
@@ -498,8 +520,9 @@ export default function GalleryEdit( props ) {
 		// once the new image blocks are merged in with existing.
 		const newOrderMap = processedImages.reduce(
 			( result, image, index ) => (
-				( result[ image.id ] = index ), result
-			),
+				( result[ image.id ] = index ),
+				result
+			 ),
 			{}
 		);
 
@@ -508,7 +531,7 @@ export default function GalleryEdit( props ) {
 					processedImages.find(
 						( img ) => img.id === block.attributes.id
 					)
-			  )
+				)
 			: innerBlockImages;
 
 		const newImageList = processedImages.filter(
@@ -543,6 +566,49 @@ export default function GalleryEdit( props ) {
 		if ( newBlocks?.length > 0 ) {
 			selectBlock( newBlocks[ 0 ].clientId );
 		}
+	}
+
+	function selectRandomOrder() {
+		setAttributes( { randomOrder: true } );
+	}
+
+	// Choosing any other order turns "Random" off. Called straight after the
+	// edit that applies the order, and marked non-persistent so the two writes
+	// share one undo level: a single undo restores both the order and Random.
+	function clearRandomOrderAfterEdit() {
+		if ( randomOrder ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { randomOrder: false } );
+		}
+	}
+
+	// Reorders the inner image blocks in place. Left persistent on purpose so
+	// the sort is a single undoable step.
+	function sortImages( order ) {
+		const sortedBlocks = sortImageBlocks(
+			getBlock( clientId ).innerBlocks,
+			imageData,
+			order
+		);
+		replaceInnerBlocks( clientId, sortedBlocks );
+		clearRandomOrderAfterEdit();
+		setAppliedSort( {
+			order,
+			clientIds: sortedBlocks.map( ( block ) => block.clientId ),
+		} );
+	}
+
+	// "Custom" is the order arranged in the editor: it turns Random off and
+	// forgets any sort applied earlier, so the control reads "Custom" from
+	// here on rather than that sort.
+	function selectCustomOrder() {
+		setAttributes( { randomOrder: false } );
+		setAppliedSort( null );
+	}
+
+	function changeSourceOrder( { orderby, order } ) {
+		dynamic.setSourceOrder( orderby, order );
+		clearRandomOrderAfterEdit();
 	}
 
 	function onUploadError( message ) {
@@ -613,10 +679,6 @@ export default function GalleryEdit( props ) {
 
 	function toggleImageCrop() {
 		setGallerySettings( { imageCrop: ! activeImageCrop } );
-	}
-
-	function toggleRandomOrder() {
-		setAttributes( { randomOrder: ! randomOrder } );
 	}
 
 	function toggleOpenInNewTab( openInNewTab ) {
@@ -723,12 +785,12 @@ export default function GalleryEdit( props ) {
 					),
 					selectedStyleState.viewport.replace( '@', '' ),
 					aspectRatioText?.label || noticeValue
-			  )
+				)
 			: sprintf(
 					/* translators: %s: aspect ratio setting */
 					__( 'All gallery images updated to aspect ratio: %s' ),
 					aspectRatioText?.label || noticeValue
-			  );
+				);
 
 		createSuccessNotice( noticeText, {
 			id: 'gallery-attributes-aspectRatio',
@@ -855,14 +917,13 @@ export default function GalleryEdit( props ) {
 			<InspectorControls
 				group={
 					isViewportStyleState && hasViewportSettings
-						? 'viewport'
+						? 'style-state'
 						: 'default'
 				}
 			>
 				{ ! isViewportStyleState && (
 					<GallerySourcePanel
 						dynamic={ dynamic }
-						dropdownMenuProps={ dropdownMenuProps }
 						hasImages={ hasImages }
 					/>
 				) }
@@ -889,6 +950,10 @@ export default function GalleryEdit( props ) {
 
 						setAspectRatio( 'auto' );
 
+						if ( isDynamic ) {
+							dynamic.setSourceOrder( undefined, undefined );
+						}
+
 						if ( sizeSlug !== DEFAULT_MEDIA_SIZE_SLUG ) {
 							updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG );
 						}
@@ -907,7 +972,7 @@ export default function GalleryEdit( props ) {
 								isViewportStyleState
 									? hasViewportColumns
 									: !! activeColumns &&
-									  activeColumns !== displayedImageCount
+										activeColumns !== displayedImageCount
 							}
 							onDeselect={ () => setColumnsNumber( undefined ) }
 						>
@@ -918,7 +983,7 @@ export default function GalleryEdit( props ) {
 										? activeColumns
 										: defaultColumnsNumber(
 												displayedImageCount
-										  )
+											)
 								}
 								onChange={ setColumnsNumber }
 								min={ 1 }
@@ -928,6 +993,56 @@ export default function GalleryEdit( props ) {
 								) }
 								required
 							/>
+						</ToolsPanelItem>
+					) }
+					{ ! isViewportStyleState && (
+						// "Random" is stored in both modes. Beyond that, a
+						// dynamic gallery's order is a stored query setting,
+						// while a static gallery's orders are one-off actions.
+						<ToolsPanelItem
+							isShownByDefault
+							label={ __( 'Order by' ) }
+							hasValue={ () =>
+								!! randomOrder ||
+								( isDynamic &&
+									( dynamic.sourceOrderby !==
+										DEFAULT_ORDERBY ||
+										dynamic.sourceOrder !==
+											DEFAULT_ORDER ) )
+							}
+							onDeselect={ () => {
+								if ( isDynamic ) {
+									// Two writes, folded into one undo level.
+									dynamic.setSourceOrder(
+										undefined,
+										undefined
+									);
+									clearRandomOrderAfterEdit();
+								} else {
+									selectCustomOrder();
+								}
+							} }
+						>
+							{ isDynamic ? (
+								<SourceOrderControl
+									order={ {
+										orderby: dynamic.sourceOrderby,
+										order: dynamic.sourceOrder,
+									} }
+									isRandom={ !! randomOrder }
+									onChange={ changeSourceOrder }
+									onSelectRandom={ selectRandomOrder }
+								/>
+							) : (
+								<SortImagesControl
+									currentOrder={ currentOrder }
+									isRandom={ !! randomOrder }
+									canSort={ canSortImages }
+									onSort={ sortImages }
+									onSelectCustom={ selectCustomOrder }
+									onSelectRandom={ selectRandomOrder }
+								/>
+							) }
 						</ToolsPanelItem>
 					) }
 					{ ! isViewportStyleState &&
@@ -942,7 +1057,7 @@ export default function GalleryEdit( props ) {
 									updateImagesSize( DEFAULT_MEDIA_SIZE_SLUG )
 								}
 							>
-								<SelectControl
+								<WCSelectControl
 									label={ __( 'Resolution' ) }
 									help={ __(
 										'Select the size of the source images.'
@@ -954,46 +1069,6 @@ export default function GalleryEdit( props ) {
 								/>
 							</ToolsPanelItem>
 						) }
-					{ isFlexLayout && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Crop images to fit' ) }
-							hasValue={ () =>
-								isViewportStyleState
-									? hasViewportImageCrop
-									: ! activeImageCrop
-							}
-							onDeselect={ () =>
-								setGallerySettings( {
-									imageCrop: isViewportStyleState
-										? undefined
-										: true,
-								} )
-							}
-						>
-							<ToggleControl
-								label={ __( 'Crop images to fit' ) }
-								checked={ activeImageCrop }
-								onChange={ toggleImageCrop }
-							/>
-						</ToolsPanelItem>
-					) }
-					{ ! isViewportStyleState && (
-						<ToolsPanelItem
-							isShownByDefault
-							label={ __( 'Randomize order' ) }
-							hasValue={ () => !! randomOrder }
-							onDeselect={ () =>
-								setAttributes( { randomOrder: false } )
-							}
-						>
-							<ToggleControl
-								label={ __( 'Randomize order' ) }
-								checked={ !! randomOrder }
-								onChange={ toggleRandomOrder }
-							/>
-						</ToolsPanelItem>
-					) }
 					{ ! isViewportStyleState && hasLinkTo && (
 						<ToolsPanelItem
 							isShownByDefault
@@ -1026,7 +1101,7 @@ export default function GalleryEdit( props ) {
 							}
 							isShownByDefault
 						>
-							<SelectControl
+							<WCSelectControl
 								label={ __( 'Aspect ratio' ) }
 								help={ __(
 									'Set a consistent aspect ratio for all images in the gallery.'
@@ -1034,6 +1109,30 @@ export default function GalleryEdit( props ) {
 								value={ activeAspectRatio }
 								options={ aspectRatioOptions }
 								onChange={ setAspectRatio }
+							/>
+						</ToolsPanelItem>
+					) }
+					{ isFlexLayout && (
+						<ToolsPanelItem
+							isShownByDefault
+							label={ __( 'Crop images to fit' ) }
+							hasValue={ () =>
+								isViewportStyleState
+									? hasViewportImageCrop
+									: ! activeImageCrop
+							}
+							onDeselect={ () =>
+								setGallerySettings( {
+									imageCrop: isViewportStyleState
+										? undefined
+										: true,
+								} )
+							}
+						>
+							<ToggleControl
+								label={ __( 'Crop images to fit' ) }
+								checked={ activeImageCrop }
+								onChange={ toggleImageCrop }
 							/>
 						</ToolsPanelItem>
 					) }

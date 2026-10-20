@@ -9,7 +9,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import {
 	Button,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	TreeSelect,
 	withFilters,
 	SearchControl,
@@ -65,7 +65,7 @@ const TermCheckbox = memo( function Checkbox( {
 	onToggle,
 } ) {
 	return (
-		<CheckboxControl
+		<WCCheckboxControl
 			checked={ checked }
 			onChange={ () => onToggle( id ) }
 			label={ decodeEntities( name ) }
@@ -234,12 +234,12 @@ export function HierarchicalTermSelector( { slug } ) {
 				hasCreateAction: _taxonomy
 					? !! post._links?.[
 							'wp:action-create-' + _taxonomy.rest_base
-					  ]
+						]
 					: false,
 				hasAssignAction: _taxonomy
 					? !! post._links?.[
 							'wp:action-assign-' + _taxonomy.rest_base
-					  ]
+						]
 					: false,
 				terms: _taxonomy
 					? getEditedPostAttribute( _taxonomy.rest_base )

@@ -8,7 +8,7 @@ import { DropdownContentWrapper } from '../dropdown-content-wrapper';
 
 const meta: Meta< typeof Dropdown > = {
 	tags: [ 'manifest' ],
-	title: 'Components/Overlays/Dropdown',
+	title: 'Components/@wordpress-components/Overlays/Dropdown',
 	id: 'components-dropdown',
 	component: Dropdown,
 	subcomponents: { DropdownContentWrapper },

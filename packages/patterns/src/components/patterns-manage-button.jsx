@@ -33,10 +33,12 @@ function PatternsManageButton( { clientId, onClose } ) {
 			const _isUnsyncedPattern =
 				!! block?.attributes?.metadata?.patternName;
 
+			// Detaching only copies the pattern's blocks into the post, so
+			// reading the pattern is enough. Editing it isn't required.
 			const _isSyncedPattern =
 				!! block &&
 				isReusableBlock( block ) &&
-				!! canUser( 'update', {
+				!! canUser( 'read', {
 					kind: 'postType',
 					name: 'wp_block',
 					id: block.attributes.ref,
@@ -63,10 +65,10 @@ function PatternsManageButton( { clientId, onClose } ) {
 				} )
 					? addQueryArgs( 'site-editor.php', {
 							p: '/pattern',
-					  } )
+						} )
 					: addQueryArgs( 'edit.php', {
 							post_type: 'wp_block',
-					  } ),
+						} ),
 			};
 		},
 		[ clientId ]
@@ -119,10 +121,10 @@ function PatternsManageButton( { clientId, onClose } ) {
 						{ isSyncedPattern
 							? __(
 									'The blocks will be separated from the original pattern and will be fully editable. Future changes to the pattern will not apply here.'
-							  )
+								)
 							: __(
 									'Blocks will no longer be associated with this pattern and will be fully editable.'
-							  ) }
+								) }
 					</ConfirmDialog>
 				</>
 			) }

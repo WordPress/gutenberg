@@ -46,12 +46,7 @@ describe( 'FormToggle', () => {
 		} );
 
 		it( 'should render an id prop for the input checkbox', () => {
-			render(
-				// Disabled because of our rule restricting literal IDs, preferring
-				// `withInstanceId`. In this case, it's fine to use literal IDs.
-				// eslint-disable-next-line no-restricted-syntax
-				<FormToggle onChange={ noop } id="test" />
-			);
+			render( <FormToggle onChange={ noop } id="test" /> );
 
 			expect( getInput() ).toHaveAttribute( 'id', 'test' );
 		} );

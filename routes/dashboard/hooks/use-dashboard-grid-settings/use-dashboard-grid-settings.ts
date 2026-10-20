@@ -22,8 +22,7 @@ const KEY = 'dashboardGridSettings';
 export function useDashboardGridSettings(): WidgetGridSettings {
 	return useSelect( ( select ) => {
 		const stored = select( preferencesStore ).get( SCOPE, KEY ) as
-			| WidgetGridSettings
-			| undefined;
+			WidgetGridSettings | undefined;
 		return {
 			...normalizeGridSettings(
 				stored ?? DEFAULT_GRID,

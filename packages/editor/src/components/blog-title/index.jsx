@@ -33,7 +33,7 @@ export default function BlogTitle() {
 						'postType',
 						'page',
 						siteSettings?.page_for_posts
-				  )
+					)
 				: EMPTY_OBJECT;
 			const { getEditedPostAttribute, getCurrentPostType } =
 				select( editorStore );

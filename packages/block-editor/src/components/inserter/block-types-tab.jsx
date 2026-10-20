@@ -166,29 +166,33 @@ export function BlockTypesTab(
 		onInsert
 	);
 
+	const [ itemsForCurrentRoot, itemsRemaining ] = useMemo( () => {
+		const forCurrentRoot = [];
+		const remaining = [];
+
+		for ( const item of items ) {
+			// Skip reusable blocks, they moved to the patterns tab.
+			if ( item.category === 'reusable' ) {
+				continue;
+			}
+
+			// Skip search-only items from browse view (they're still searchable).
+			if ( item.isSearchOnly ) {
+				continue;
+			}
+
+			if ( item.isAllowedInCurrentRoot ) {
+				forCurrentRoot.push( item );
+			} else {
+				remaining.push( item );
+			}
+		}
+
+		return [ forCurrentRoot, remaining ];
+	}, [ items ] );
+
 	if ( ! items.length ) {
 		return <InserterNoResults />;
-	}
-
-	const itemsForCurrentRoot = [];
-	const itemsRemaining = [];
-
-	for ( const item of items ) {
-		// Skip reusable blocks, they moved to the patterns tab.
-		if ( item.category === 'reusable' ) {
-			continue;
-		}
-
-		// Skip search-only items from browse view (they're still searchable).
-		if ( item.isSearchOnly ) {
-			continue;
-		}
-
-		if ( item.isAllowedInCurrentRoot ) {
-			itemsForCurrentRoot.push( item );
-		} else {
-			itemsRemaining.push( item );
-		}
 	}
 
 	return (

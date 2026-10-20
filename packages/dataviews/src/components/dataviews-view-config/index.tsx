@@ -5,7 +5,7 @@ import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
-	SelectControl,
+	SelectControl as WCSelectControl,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -25,7 +25,7 @@ const DATAVIEWS_CONFIG_POPOVER_PROPS = {
 	className: 'dataviews-config__popover',
 	placement: 'bottom-end',
 	offset: 9,
-};
+} as const;
 
 export function ViewTypeMenu() {
 	const { view, onChangeView, defaultLayouts } =
@@ -111,7 +111,7 @@ function SortFieldControl() {
 	}, [ fields ] );
 
 	return (
-		<SelectControl
+		<WCSelectControl
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
 			options={ orderOptions }

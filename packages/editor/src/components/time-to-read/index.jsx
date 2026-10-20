@@ -37,7 +37,7 @@ export default function TimeToRead() {
 		minutesToRead === 0
 			? createInterpolateElement( __( '<span>< 1</span> minute' ), {
 					span: <span />,
-			  } )
+				} )
 			: createInterpolateElement(
 					sprintf(
 						/* translators: %s: the number of minutes to read the post. */
@@ -51,7 +51,7 @@ export default function TimeToRead() {
 					{
 						span: <span />,
 					}
-			  );
+				);
 
 	return <span className="time-to-read">{ minutesToReadString }</span>;
 }

@@ -15,7 +15,7 @@ const serverStates = new Map();
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
  */
-export const getConfig = ( namespace?: string ) =>
+export const getConfig = < T extends object = any >( namespace?: string ): T =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
 /**
@@ -108,8 +108,8 @@ type ConvertGeneratorsToPromises< T > = {
 			? T[ K ]
 			: ConvertGeneratorToPromise< T[ K ] >
 		: T[ K ] extends object
-		? Prettify< ConvertGeneratorsToPromises< T[ K ] > >
-		: T[ K ];
+			? Prettify< ConvertGeneratorsToPromises< T[ K ] > >
+			: T[ K ];
 };
 type ConvertPromiseToGenerator< T > = T extends (
 	...args: infer A
@@ -122,8 +122,8 @@ type ConvertPromisesToGenerators< T > = {
 			? T[ K ]
 			: ConvertPromiseToGenerator< T[ K ] >
 		: T[ K ] extends object
-		? Prettify< ConvertPromisesToGenerators< T[ K ] > >
-		: T[ K ];
+			? Prettify< ConvertPromisesToGenerators< T[ K ] > >
+			: T[ K ];
 };
 
 export const universalUnlock =

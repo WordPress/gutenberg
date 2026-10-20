@@ -1,16 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 
-vi.mock( '@wordpress/api-fetch' );
+vi.mock( import( '@wordpress/api-fetch' ) );
 
 describe( 'defaultProcessor', () => {
 	let defaultProcessor;
 
 	beforeEach( async () => {
 		vi.resetModules();
-		( { default: defaultProcessor } = await import(
-			'../default-processor'
-		) );
+		( { default: defaultProcessor } =
+			await import( '../default-processor' ) );
 	} );
 
 	const preflightResponse = {
@@ -83,7 +82,7 @@ describe( 'defaultProcessor', () => {
 								body: 'Error!',
 							},
 						],
-				  }
+					}
 		);
 		const results = await defaultProcessor( requests );
 		expect( apiFetch ).toHaveBeenCalledWith( expectedPreflightOptions );
@@ -107,7 +106,7 @@ describe( 'defaultProcessor', () => {
 								body: 'Error!',
 							},
 						],
-				  }
+					}
 		);
 		const results = await defaultProcessor( requests );
 		expect( apiFetch ).toHaveBeenCalledWith( expectedPreflightOptions );

@@ -51,7 +51,7 @@ export default function AddNewPostModal( { postType, onSave, onClose } ) {
 										[],
 										postTypeObject.template
 									)
-							  )
+								)
 							: undefined,
 				},
 				{ throwOnError: true }

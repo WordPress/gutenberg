@@ -5,7 +5,6 @@
 		"types": [
 			"gutenberg-env",
 			"gutenberg-vitest-test-env",
-			"jest",
 			"node",
 			"style-imports",
 			"react-css-custom-properties"
@@ -29,9 +28,10 @@
 		{ "path": "../icons/tsconfig.build.json" },
 		{ "path": "../keycodes/tsconfig.build.json" },
 		{ "path": "../primitives" },
-		{ "path": "../private-apis" },
+		{ "path": "../private-apis/tsconfig.build.json" },
+		{ "path": "../react-inert-value/tsconfig.build.json" },
 		{ "path": "../style-runtime/tsconfig.build.json" },
 		{ "path": "../theme/tsconfig.build.json" },
-		{ "path": "../warning" }
+		{ "path": "../warning/tsconfig.build.json" }
 	]
 }

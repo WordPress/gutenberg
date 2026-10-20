@@ -29,7 +29,7 @@ function Edit( {
 					Object.entries( blockContext ).filter( ( [ key ] ) =>
 						usesContext.includes( key )
 					)
-			  )
+				)
 			: DEFAULT_BLOCK_CONTEXT;
 	}, [ usesContext, blockContext ] );
 
@@ -45,7 +45,10 @@ function Edit( {
 
 	return (
 		<EditFunction
-			key={ name }
+			// A different active object is a different edit: the UI of an
+			// object starts from its attributes and its position, and the
+			// selection can move from one object straight to another.
+			key={ isObjectActive ? `${ name }-${ value.start }` : name }
 			isActive={ isActive }
 			isVisible={ isVisible }
 			activeAttributes={ isActive ? activeFormat.attributes || {} : {} }

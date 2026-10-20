@@ -24,7 +24,7 @@ export default function PostTrashCheck( { children } ) {
 					kind: 'postType',
 					name: postType,
 					id: postId,
-			  } )
+				} )
 			: false;
 
 		return {

@@ -78,7 +78,14 @@ export function getUpdatedGalleryStyle( {
 	};
 
 	Object.entries( settings ).forEach( ( [ key, value ] ) => {
-		if ( value === undefined || value === baseSettings[ key ] ) {
+		/* Columns is an exception to deletion of duplicate styles because
+		 * we need to be able to override the legacy responsive styles that
+		 * default to 2 columns under 600px.
+		 */
+		if (
+			value === undefined ||
+			( key !== 'columns' && value === baseSettings[ key ] )
+		) {
 			delete nextViewportStyle[ key ];
 		} else {
 			nextViewportStyle[ key ] = value;
@@ -118,7 +125,7 @@ function getColumnsCSS( selector, columns ) {
 			? '100%'
 			: `calc((100% - (var(--wp--style--unstable-gallery-gap, 16px) * ${
 					columns - 1
-			  })) / ${ columns })`;
+				})) / ${ columns })`;
 
 	return `${ getImageSelector( selector ) }{width:${ width } !important;}`;
 }

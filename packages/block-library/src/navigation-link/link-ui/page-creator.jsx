@@ -2,7 +2,7 @@ import {
 	Button,
 	TextControl,
 	Notice,
-	CheckboxControl,
+	CheckboxControl as WCCheckboxControl,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
@@ -127,7 +127,7 @@ export function LinkUIPageCreator( {
 							value={ title }
 						/>
 
-						<CheckboxControl
+						<WCCheckboxControl
 							label={ __( 'Publish' ) }
 							help={ __(
 								"Turn off to save as a draft. Drafts won't appear on your site until published."

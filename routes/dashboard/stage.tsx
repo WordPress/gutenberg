@@ -29,8 +29,7 @@ function Dashboard() {
 	const widgetsModules = useSelect(
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'root', 'widgetModule' ) as
-				| WidgetModuleRecord[]
-				| null,
+				WidgetModuleRecord[] | null,
 		[]
 	);
 

@@ -1,8 +1,9 @@
 import * as Ariakit from '@ariakit/react';
+import clsx from 'clsx';
 import { createContext, useCallback, useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden } from '../visually-hidden';
-import * as Styled from './styles';
+import styles from './style.module.scss';
 import type {
 	CustomSelectContext as CustomSelectContextType,
 	CustomSelectStore,
@@ -37,7 +38,7 @@ function defaultRenderSelectedValue(
 					// translators: %d: number of items selected (it will always be 2 or more items)
 					_n( '%d item selected', '%d items selected', value.length ),
 					value.length
-			  );
+				);
 	}
 
 	return value;
@@ -47,6 +48,7 @@ const CustomSelectButton = ( {
 	renderSelectedValue,
 	size = 'default',
 	store,
+	className,
 	...restProps
 }: Omit<
 	React.ComponentProps< typeof Ariakit.Select > &
@@ -63,14 +65,17 @@ const CustomSelectButton = ( {
 	);
 
 	return (
-		<Styled.Select
+		<Ariakit.Select
 			{ ...restProps }
-			size={ size }
-			hasCustomRenderProp={ !! renderSelectedValue }
+			className={ clsx( styles.select, className, {
+				[ styles[ 'is-compact' ] ]: size === 'compact',
+				[ styles[ 'is-small' ] ]: size === 'small',
+				[ styles[ 'has-custom-render' ] ]: !! renderSelectedValue,
+			} ) }
 			store={ store }
 		>
 			{ computedRenderSelectedValue( currentValue ) }
-		</Styled.Select>
+		</Ariakit.Select>
 	);
 };
 
@@ -128,7 +133,8 @@ function CustomSelect(
 					// Match legacy behavior (move selection rather than open the popover)
 					showOnKeyDown={ ! isLegacy }
 				/>
-				<Styled.SelectPopover
+				<Ariakit.SelectPopover
+					className={ styles.popover }
 					gutter={ 12 }
 					store={ store }
 					sameWidth
@@ -140,7 +146,7 @@ function CustomSelect(
 					<CustomSelectContext.Provider value={ contextValue }>
 						{ children }
 					</CustomSelectContext.Provider>
-				</Styled.SelectPopover>
+				</Ariakit.SelectPopover>
 			</InputBase>
 		</div>
 	);

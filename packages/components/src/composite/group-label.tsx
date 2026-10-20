@@ -7,7 +7,7 @@ import type { CompositeGroupLabelProps } from './types';
 export const CompositeGroupLabel = forwardRef<
 	HTMLDivElement,
 	WordPressComponentProps< CompositeGroupLabelProps, 'div', false >
->( function CompositeGroupLabel( props, ref ) {
+>( function UnforwardedCompositeGroupLabel( props, ref ) {
 	const context = useCompositeContext();
 	const isWithinGroup = useCompositeGroupContext();
 

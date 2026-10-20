@@ -101,7 +101,7 @@ export function WidgetSettings(): React.ReactNode {
 									...( instance.attributes as object ),
 									...edits,
 								},
-						  }
+							}
 						: instance
 				)
 			);
@@ -162,7 +162,7 @@ export function WidgetSettings(): React.ReactNode {
 			<Drawer.Popup size="medium" className={ styles.popup }>
 				<Drawer.Header>
 					<Drawer.Title>{ title }</Drawer.Title>
-					<Drawer.CloseIcon />
+					<Drawer.CloseIconButton />
 				</Drawer.Header>
 
 				<Drawer.Content>

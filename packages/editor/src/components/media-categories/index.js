@@ -68,9 +68,9 @@ const getOpenverseCaption = ( item ) => {
 						? getExternalLink(
 								`${ licenseUrl }?ref=openverse`,
 								fullLicense
-						  )
+							)
 						: fullLicense
-			  )
+				)
 			: sprintf(
 					// translators: %1s: Link attributes for a given Openverse media work; %2s: Name of the work's creator; %3s: Works's licence e.g: "CC0 1.0".
 					_x( '<a %1$s>Work</a> by %2$s/ %3$s', 'caption' ),
@@ -82,9 +82,9 @@ const getOpenverseCaption = ( item ) => {
 						? getExternalLink(
 								`${ licenseUrl }?ref=openverse`,
 								fullLicense
-						  )
+							)
 						: fullLicense
-			  );
+				);
 	} else {
 		_caption = title
 			? sprintf(
@@ -98,9 +98,9 @@ const getOpenverseCaption = ( item ) => {
 						? getExternalLink(
 								`${ licenseUrl }?ref=openverse`,
 								fullLicense
-						  )
+							)
 						: fullLicense
-			  )
+				)
 			: sprintf(
 					// translators: %1s: Link attributes for a given Openverse media work; %2s: Works's licence e.g: "CC0 1.0".
 					_x( '<a %1$s>Work</a>/ %2$s', 'caption' ),
@@ -109,9 +109,9 @@ const getOpenverseCaption = ( item ) => {
 						? getExternalLink(
 								`${ licenseUrl }?ref=openverse`,
 								fullLicense
-						  )
+							)
 						: fullLicense
-			  );
+				);
 	}
 	return _caption.replace( /\s{2}/g, ' ' );
 };
@@ -299,7 +299,7 @@ const getAttachedImagesCategory = ( postId, typeLabel ) =>
 					// translators: %s: Name of the post type e.g: "Page".
 					__( 'No images attached to this %s.' ),
 					typeLabel
-			  )
+				)
 			: __( 'No images attached to this post.' ),
 		async attach( mediaItems ) {
 			const attachmentIds = getImageAttachmentIds( mediaItems );

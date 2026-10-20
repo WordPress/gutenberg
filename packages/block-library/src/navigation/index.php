@@ -1056,6 +1056,10 @@ class WP_Navigation_Block_Renderer {
 
 		unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
+		// Submenu detection is memoized while a navigation block renders. Reset it so
+		// the result of a previously rendered navigation block is not reused for this one.
+		static::$has_submenus = false;
+
 		$inner_blocks = static::get_inner_blocks( $attributes, $block );
 		// Prevent navigation blocks referencing themselves from rendering.
 		if ( block_core_navigation_block_tree_has_block_type(
@@ -1652,13 +1656,6 @@ function block_core_navigation_add_support_classes_to_container( $block_content,
 
 	$attributes = is_array( $block['attrs'] ?? null ) ? $block['attrs'] : array();
 	$style      = is_array( $attributes['style'] ?? null ) ? $attributes['style'] : array();
-	if (
-		defined( 'IS_GUTENBERG_PLUGIN' ) &&
-		IS_GUTENBERG_PLUGIN &&
-		function_exists( 'gutenberg_resolve_style_state_aliases' )
-	) {
-		$style = gutenberg_resolve_style_state_aliases( $style, 'core/navigation' );
-	}
 
 	$global_settings          = wp_get_global_settings();
 	$viewport_settings        = $global_settings['viewport'] ?? null;

@@ -14,6 +14,7 @@ import { useRef } from '@wordpress/element';
 import { check } from '@wordpress/icons';
 import { Text } from '@wordpress/ui';
 import EditContents from './edit-contents';
+import { PrivateBlockInspectorEditOriginal } from './edit-original-slot-fill';
 import SkipToSelectedBlock from '../skip-to-selected-block';
 import BlockCard from '../block-card';
 import MultiSelectionInspector from '../multi-selection-inspector';
@@ -27,6 +28,7 @@ import { BlockInspectorPreTabsSlot } from './inspector-pre-tabs-slot-fill';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import { SectionStyleControls } from '../inspector-controls-tabs/styles-tab';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
+import { PrivateInspectorControlsStyleStateAdvanced } from '../inspector-controls/groups';
 import InspectorControlsLastItem from '../inspector-controls/last-item';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
@@ -147,10 +149,14 @@ function StyleStateInspectorSlots( {
 						label={ __( 'Elements' ) }
 						className="elements-block-support-panel__inner-wrapper"
 					/>
+					{ isViewportStyleState && <PositionControls /> }
 				</>
 			) }
-			{ isViewportStyleState && (
-				<InspectorControls.Slot group="viewport" />
+			{ ! isDefaultBlockStyleState( selectedBlockStyleState ) && (
+				<InspectorControls.Slot group="style-state" />
+			) }
+			{ ! isDefaultBlockStyleState( selectedBlockStyleState ) && (
+				<PrivateInspectorControlsStyleStateAdvanced.Slot />
 			) }
 		</>
 	);
@@ -195,7 +201,7 @@ function BlockInspector() {
 		const _renderedBlockClientId = isWithinEditedSection
 			? _selectedBlockClientId
 			: getParentSectionBlock( _selectedBlockClientId ) ||
-			  _selectedBlockClientId;
+				_selectedBlockClientId;
 		const _renderedBlockName =
 			_renderedBlockClientId && getBlockName( _renderedBlockClientId );
 		const _blockType =
@@ -218,9 +224,9 @@ function BlockInspector() {
 			hasBlockStyles: _hasBlockStyles,
 			editedContentOnlySection: getEditedContentOnlySection(),
 			blockEditingMode: getBlockEditingMode( _renderedBlockClientId ),
-			selectedBlockStyleState: getSelectedBlockStyleState(
-				_renderedBlockClientId
-			),
+			selectedBlockStyleState: _renderedBlockClientId
+				? getSelectedBlockStyleState( _renderedBlockClientId )
+				: undefined,
 			showStateOnCanvas: isSelectedBlockStyleStateShownOnCanvas(
 				_renderedBlockClientId
 			),
@@ -522,6 +528,9 @@ const BlockInspectorSingleBlock = ( {
 			) }
 			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			<EditContents clientId={ renderedBlockClientId } />
+			<PrivateBlockInspectorEditOriginal.Slot
+				fillProps={ { clientId: renderedBlockClientId } }
+			/>
 			{ ! isEditingStyleState && (
 				<BlockVariationTransforms
 					blockClientId={ renderedBlockClientId }

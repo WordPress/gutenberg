@@ -646,7 +646,7 @@ describe( 'DataForm component', () => {
 										}: {
 											item: typeof data;
 										} ) => item.order === 1,
-								  }
+									}
 								: field
 						) }
 						form={ {
@@ -1021,6 +1021,11 @@ describe( 'DataForm component', () => {
 
 		it( 'should not show errors when tabbing past the header of a collapsed card', async () => {
 			const user = userEvent.setup();
+			// TODO: jsdom-only reset; browsers keep a content-visibility:hidden panel out of the tab order, but user-event only skips display:none.
+			const collapsedPanelReset = document.createElement( 'style' );
+			collapsedPanelReset.textContent =
+				'[hidden="until-found"] { display: none; }';
+			document.head.appendChild( collapsedPanelReset );
 			render(
 				<>
 					<Dataform
@@ -1058,6 +1063,8 @@ describe( 'DataForm component', () => {
 			expect(
 				screen.queryByText( /needs? attention/ )
 			).not.toBeInTheDocument();
+
+			collapsedPanelReset.remove();
 		} );
 
 		it( 'should show errors for fields that become invalid after focus already left the card once', async () => {
@@ -1075,7 +1082,7 @@ describe( 'DataForm component', () => {
 										? null
 										: 'Title is not allowed for this order.',
 							},
-					  }
+						}
 					: field
 			);
 
