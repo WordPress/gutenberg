@@ -298,9 +298,8 @@ describe( 'apiFetch', () => {
 		fetchMock.mockImplementation( async ( path, options ) => {
 			if ( ( path as string ).startsWith( '/random' ) ) {
 				if (
-					( options?.headers as Record< string, string > )[
-						'X-WP-Nonce'
-					] === 'new-nonce'
+					new Headers( options?.headers ).get( 'X-WP-Nonce' ) ===
+					'new-nonce'
 				) {
 					return {
 						ok: true,
@@ -345,9 +344,8 @@ describe( 'apiFetch', () => {
 		fetchMock.mockImplementation( async ( path, options ) => {
 			if ( ( path as string ).startsWith( '/random' ) ) {
 				if (
-					( options?.headers as Record< string, string > )[
-						'X-WP-Nonce'
-					] === 'new-nonce'
+					new Headers( options?.headers ).get( 'X-WP-Nonce' ) ===
+					'new-nonce'
 				) {
 					return {
 						ok: true,
