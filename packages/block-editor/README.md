@@ -915,7 +915,15 @@ Undocumented declaration.
 
 ### RichTextToolbarButton
 
-Undocumented declaration.
+A button for the rich text toolbar.
+
+_Parameters_
+
+- _props_ `Object`: Component props.
+- _props.name_ `string`: Name of a fixed slot for the button (bold, italic, link). Leave empty for the shared slot.
+- _props.group_ `string`: What the button does to the text: `format` (the default) formats it, `insert` adds something inline (an image, a footnote). With the block toolbar redesign, insert buttons move to the block options menu.
+- _props.shortcutType_ `string`: Modifier for the shortcut.
+- _props.shortcutCharacter_ `string`: Character for the shortcut.
 
 ### setStyleForState
 

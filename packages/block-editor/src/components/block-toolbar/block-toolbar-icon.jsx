@@ -17,7 +17,16 @@ import { store as blockEditorStore } from '../../store';
 import { hasPatternOverridesDefaultBinding } from '../../utils/block-bindings';
 import { unlock } from '../../lock-unlock';
 
-function getBlockIconVariant( { select, clientIds } ) {
+/**
+ * What the block icon button lets people change about the selected blocks.
+ *
+ * @param {Object}   options           Options.
+ * @param {Function} options.select    Registry select.
+ * @param {string[]} options.clientIds Selected blocks.
+ * @return {string} `switcher` (transforms and styles), `styles-only`,
+ *                  `pattern-overrides` or `default` (nothing).
+ */
+export function getBlockIconVariant( { select, clientIds } ) {
 	if ( ! clientIds.length ) {
 		return 'default';
 	}

@@ -30,6 +30,8 @@ import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
 import { hasViewportBlockStyleState } from '../../hooks/block-style-state';
+import RedesignedBlockToolbar from './redesign';
+import { isBlockToolbarRedesign } from './redesign/utils';
 
 /**
  * Renders the block toolbar.
@@ -197,6 +199,67 @@ export function PrivateBlockToolbar( {
 	const isMultiToolbar = blockClientIds.length > 1;
 	const isSynced =
 		isReusableBlock( blockType ) || isTemplatePart( blockType );
+
+	// The redesign covers blocks in the default and content-only editing
+	// modes (content-only is most of what can be edited in a pattern).
+	// Zoomed out and placeholder toolbars keep the current design.
+	if (
+		isBlockToolbarRedesign() &&
+		! isPlaceholder &&
+		! showShuffleButton &&
+		( shouldShowVisualToolbar || isMultiToolbar )
+	) {
+		const isFixed = variant !== 'toolbar';
+		return (
+			<NavigableToolbar
+				focusEditorOnEscape
+				shouldUseKeyboardFocusShortcut
+				className={ clsx(
+					'block-editor-block-contextual-toolbar',
+					'is-redesign',
+					{ 'is-fixed': isFixed }
+				) }
+				/* translators: accessibility text for the block toolbar */
+				aria-label={ __( 'Block tools' ) }
+				variant={ variant === 'toolbar' ? undefined : variant }
+				focusOnMount={ focusOnMount }
+				__experimentalInitialIndex={ __experimentalInitialIndex }
+				__experimentalOnIndexChange={ __experimentalOnIndexChange }
+				key={ toolbarKey }
+			>
+				<div
+					ref={ toolbarWrapperRef }
+					className={ clsx(
+						'block-editor-block-toolbar',
+						'block-editor-block-toolbar-redesign',
+						{
+							'is-synced': isSynced,
+							'is-connected': isUsingBindings,
+						}
+					) }
+				>
+					<RedesignedBlockToolbar
+						clientIds={ blockClientIds }
+						showParent={ showParentSelector && isLargeViewport }
+						showControls={
+							showSlots &&
+							! isSectionContainer &&
+							! areSelectedBlocksHiddenOnViewport &&
+							shouldShowVisualToolbar
+						}
+						isFixed={ isFixed }
+						blockNameRef={ nodeRef }
+						blockNameProps={ showHoveredOrFocusedGestures }
+						canEdit={ canEdit }
+						showSectionStyle={
+							showSwitchSectionStyleButton &&
+							! areSelectedBlocksHiddenOnViewport
+						}
+					/>
+				</div>
+			</NavigableToolbar>
+		);
+	}
 
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = clsx( 'block-editor-block-contextual-toolbar', {

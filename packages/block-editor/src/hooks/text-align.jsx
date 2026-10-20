@@ -14,6 +14,7 @@ import { shouldSkipSerialization, useBlockSettings } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
+import { isBlockToolbarRedesign } from '../components/block-toolbar/redesign/utils';
 
 export const TEXT_ALIGN_SUPPORT_KEY = 'typography.textAlign';
 
@@ -86,7 +87,13 @@ function BlockEditTextAlignmentToolbarControlsPure( {
 		[ clientId ]
 	);
 
-	if ( ! hasTextAlignControl || blockEditingMode !== 'default' ) {
+	// With the block toolbar redesign, text alignment lives in the block
+	// options menu.
+	if (
+		! hasTextAlignControl ||
+		blockEditingMode !== 'default' ||
+		isBlockToolbarRedesign()
+	) {
 		return null;
 	}
 

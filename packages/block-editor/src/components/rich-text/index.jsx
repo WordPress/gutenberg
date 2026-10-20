@@ -25,6 +25,8 @@ import {
 	isMultiSelectedKey,
 } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
+import SelectionToolbar from './selection-toolbar';
+import { isBlockToolbarRedesign } from '../block-toolbar/redesign/utils';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
 import { useEventListeners } from './event-listeners';
@@ -590,12 +592,18 @@ function RichTextWrapper(
 					</InputEventContext.Provider>
 				</KeyboardShortcutContext.Provider>
 			) }
-			{ isSelected && hasFormats && (
-				<FormatToolbarContainer
-					inline={ inlineToolbar }
-					editableContentElement={ anchorElement }
-				/>
-			) }
+			{ isSelected &&
+				hasFormats &&
+				( isBlockToolbarRedesign() ? (
+					<SelectionToolbar
+						editableContentElement={ anchorElement }
+					/>
+				) : (
+					<FormatToolbarContainer
+						inline={ inlineToolbar }
+						editableContentElement={ anchorElement }
+					/>
+				) ) }
 			<TagName
 				// Overridable props.
 				role="textbox"

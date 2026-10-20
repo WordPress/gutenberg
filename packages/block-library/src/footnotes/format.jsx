@@ -190,6 +190,7 @@ export const format = {
 
 		return (
 			<RichTextToolbarButton
+				group="insert"
 				icon={ icon }
 				title={ __( 'Footnote' ) }
 				onClick={ onClick }

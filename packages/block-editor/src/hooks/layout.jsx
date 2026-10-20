@@ -26,6 +26,7 @@ import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { normalizeLegacyLayout } from '../layouts/utils';
 import { cleanEmptyObject, useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
+import { isBlockToolbarRedesign } from '../components/block-toolbar/redesign/utils';
 import { globalStylesDataKey } from '../store/private-keys';
 import { getVariationNameFromClass } from './block-style-variation';
 import {
@@ -605,22 +606,26 @@ function LayoutPanelPure( {
 					) }
 				</InspectorControls>
 			) }
-			{ ! inherit && layoutType && (
-				<layoutType.toolBarControls
-					layout={ usedLayout }
-					onChange={ onChangeLayout }
-					layoutBlockSupport={ layoutBlockSupport }
-					controlsGroup={
-						isResponsiveEditing &&
-						hasViewportBlockStyleState( selectedState ) &&
-						! hasPseudoBlockStyleState( selectedState )
-							? 'style-state'
-							: 'block'
-					}
-					name={ blockName }
-					clientId={ clientId }
-				/>
-			) }
+			{ ! inherit &&
+				layoutType &&
+				// With the block toolbar redesign, these live in the Layout
+				// menu of the block toolbar.
+				! isBlockToolbarRedesign() && (
+					<layoutType.toolBarControls
+						layout={ usedLayout }
+						onChange={ onChangeLayout }
+						layoutBlockSupport={ layoutBlockSupport }
+						controlsGroup={
+							isResponsiveEditing &&
+							hasViewportBlockStyleState( selectedState ) &&
+							! hasPseudoBlockStyleState( selectedState )
+								? 'style-state'
+								: 'block'
+						}
+						name={ blockName }
+						clientId={ clientId }
+					/>
+				) }
 		</>
 	);
 }
