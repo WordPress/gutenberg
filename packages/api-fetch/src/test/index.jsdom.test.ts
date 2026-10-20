@@ -16,7 +16,7 @@ const DEFAULT_FETCH_MOCK_RETURN = {
 describe( 'apiFetch', () => {
 	let apiFetch: ApiFetch;
 	const originalFetch = globalThis.fetch;
-	const fetchMock = vi.fn() as Mock & typeof globalThis.fetch;
+	let fetchMock: Mock< typeof globalThis.fetch >;
 
 	beforeEach( async () => {
 		// Reset the `apiFetch` module before each test to clear
@@ -24,7 +24,7 @@ describe( 'apiFetch', () => {
 		vi.resetModules();
 		apiFetch = ( await import( '../' ) ).default;
 
-		fetchMock.mockReset();
+		fetchMock = vi.fn< typeof globalThis.fetch >();
 		globalThis.fetch = fetchMock;
 	} );
 
@@ -39,7 +39,7 @@ describe( 'apiFetch', () => {
 			async json() {
 				return { message: 'ok' };
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toEqual( {
 			message: 'ok',
@@ -121,7 +121,7 @@ describe( 'apiFetch', () => {
 					message: 'Bad Request',
 				};
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'bad_request',
@@ -131,7 +131,7 @@ describe( 'apiFetch', () => {
 	} );
 
 	it( 'should keep the data of an error response', async () => {
-		globalThis.fetch.mockResolvedValue( {
+		fetchMock.mockResolvedValue( {
 			ok: false,
 			status: 500,
 			async json() {
@@ -141,7 +141,7 @@ describe( 'apiFetch', () => {
 					data: 'Table does not exist',
 				};
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'db_update_error',
@@ -157,7 +157,7 @@ describe( 'apiFetch', () => {
 			async json() {
 				return JSON.parse( '' );
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
@@ -173,7 +173,7 @@ describe( 'apiFetch', () => {
 			async json() {
 				return JSON.parse( '' );
 			},
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
 			code: 'invalid_json',
@@ -193,8 +193,9 @@ describe( 'apiFetch', () => {
 
 	it( 'should throw AbortError when fetch aborts', async () => {
 		fetchMock.mockImplementation(
-			( path, { signal } ) =>
+			( path, options ) =>
 				new Promise( ( _, reject ) => {
+					const { signal } = options!;
 					if ( ! signal ) {
 						reject( new Error( 'Expected signal as argument' ) );
 						return;
@@ -203,8 +204,8 @@ describe( 'apiFetch', () => {
 					signal.throwIfAborted();
 					signal.addEventListener(
 						'abort',
-						( e: any ) => {
-							reject( e.target.reason );
+						( e ) => {
+							reject( ( e.target as AbortSignal ).reason );
 						},
 						{ once: true }
 					);
@@ -229,7 +230,7 @@ describe( 'apiFetch', () => {
 		fetchMock.mockResolvedValue( {
 			ok: true,
 			status: 204,
-		} );
+		} as Response );
 
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toBe( null );
 	} );
@@ -266,7 +267,7 @@ describe( 'apiFetch', () => {
 		const mockResponse = {
 			ok: true,
 			status: 200,
-		};
+		} as Response;
 
 		fetchMock.mockResolvedValue( mockResponse );
 
@@ -279,7 +280,7 @@ describe( 'apiFetch', () => {
 		const mockResponse = {
 			ok: false,
 			status: 400,
-		};
+		} as Response;
 
 		fetchMock.mockResolvedValue( mockResponse );
 
@@ -295,35 +296,39 @@ describe( 'apiFetch', () => {
 		apiFetch.nonceEndpoint = '/rest-nonce';
 
 		fetchMock.mockImplementation( async ( path, options ) => {
-			if ( path.startsWith( '/random' ) ) {
-				if ( options?.headers[ 'X-WP-Nonce' ] === 'new-nonce' ) {
+			if ( ( path as string ).startsWith( '/random' ) ) {
+				if (
+					( options?.headers as Record< string, string > )[
+						'X-WP-Nonce'
+					] === 'new-nonce'
+				) {
 					return {
 						ok: true,
 						status: 200,
 						json: async () => ( { code: 'success' } ),
-					};
+					} as Response;
 				}
 
 				return {
 					ok: false,
 					status: 403,
 					json: async () => ( { code: 'rest_cookie_invalid_nonce' } ),
-				};
+				} as Response;
 			}
 
-			if ( path.startsWith( '/rest-nonce' ) ) {
+			if ( ( path as string ).startsWith( '/rest-nonce' ) ) {
 				return {
 					ok: true,
 					status: 200,
 					text: async () => 'new-nonce',
-				};
+				} as Response;
 			}
 
 			return {
 				ok: false,
 				status: 404,
 				json: async () => ( { code: 'rest_no_route' } ),
-			};
+			} as Response;
 		} );
 
 		await expect( apiFetch( { path: '/random' } ) ).resolves.toEqual( {
@@ -338,35 +343,39 @@ describe( 'apiFetch', () => {
 		apiFetch.nonceEndpoint = '/rest-nonce';
 
 		fetchMock.mockImplementation( async ( path, options ) => {
-			if ( path.startsWith( '/random' ) ) {
-				if ( options?.headers[ 'X-WP-Nonce' ] === 'new-nonce' ) {
+			if ( ( path as string ).startsWith( '/random' ) ) {
+				if (
+					( options?.headers as Record< string, string > )[
+						'X-WP-Nonce'
+					] === 'new-nonce'
+				) {
 					return {
 						ok: true,
 						status: 200,
 						json: async () => ( { code: 'success' } ),
-					};
+					} as Response;
 				}
 
 				return {
 					ok: false,
 					status: 403,
 					json: async () => ( { code: 'rest_cookie_invalid_nonce' } ),
-				};
+				} as Response;
 			}
 
-			if ( path.startsWith( '/rest-nonce' ) ) {
+			if ( ( path as string ).startsWith( '/rest-nonce' ) ) {
 				return {
 					ok: false,
 					status: 400,
 					text: async () => '0',
-				};
+				} as Response;
 			}
 
 			return {
 				ok: false,
 				status: 404,
 				json: async () => ( { code: 'rest_no_route' } ),
-			};
+			} as Response;
 		} );
 
 		await expect( apiFetch( { path: '/random' } ) ).rejects.toEqual( {
@@ -461,8 +470,8 @@ describe( 'apiFetch', () => {
 			await apiFetch( { path: '/random', method: 'DELETE' } );
 
 			const [ , options ] = fetchMock.mock.lastCall!;
-			expect( options.method ).toBe( 'DELETE' );
-			expect( options.headers ).not.toHaveProperty(
+			expect( options!.method ).toBe( 'DELETE' );
+			expect( options!.headers ).not.toHaveProperty(
 				'X-HTTP-Method-Override'
 			);
 		} );
