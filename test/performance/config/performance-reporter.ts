@@ -23,6 +23,9 @@ export interface WPRawPerformanceResults {
 	typeWithTopToolbar: number[];
 	typeContainer: number[];
 	typeSuggest: number[];
+	suggestionTypeEditing: number[];
+	suggestionTypeSuggesting: number[];
+	suggestionAccept: number[];
 	focus: number[];
 	firstFocus: number[];
 	selectAll: number[];
@@ -69,6 +72,9 @@ export interface WPPerformanceResults {
 	typeWithTopToolbar?: PerformanceStats;
 	typeContainer?: PerformanceStats;
 	typeSuggest?: PerformanceStats;
+	suggestionTypeEditing?: PerformanceStats;
+	suggestionTypeSuggesting?: PerformanceStats;
+	suggestionAccept?: PerformanceStats;
 	focus?: PerformanceStats;
 	firstFocus?: PerformanceStats;
 	selectAll?: PerformanceStats;
@@ -117,6 +123,9 @@ export function curateResults(
 		typeWithTopToolbar: stats( results.typeWithTopToolbar ),
 		typeContainer: stats( results.typeContainer ),
 		typeSuggest: stats( results.typeSuggest ),
+		suggestionTypeEditing: stats( results.suggestionTypeEditing ),
+		suggestionTypeSuggesting: stats( results.suggestionTypeSuggesting ),
+		suggestionAccept: stats( results.suggestionAccept ),
 		focus: stats( results.focus ),
 		firstFocus: stats( results.firstFocus ),
 		selectAll: stats( results.selectAll ),
@@ -179,7 +188,9 @@ class PerformanceReporter implements Reporter {
 				throw new Error( 'Empty results attachment' );
 			}
 
-			const testSuite = path.basename( test.location.file, '.spec.js' );
+			const testSuite = path
+				.basename( test.location.file )
+				.replace( /\.spec\.[jt]s$/, '' );
 			const resultsId = process.env.RESULTS_ID || testSuite;
 			const resultsPath = process.env.WP_ARTIFACTS_PATH as string;
 			const resultsBody = attachment.body.toString();
