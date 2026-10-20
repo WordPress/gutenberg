@@ -9,6 +9,7 @@
 ### Internal
 
 -   Type the `spacing.spacingSizes` and `border.radiusSizes` settings ([#84950](https://github.com/WordPress/gutenberg/pull/84950)).
+-   Accept the boolean and sides forms of the `padding`, `margin` and `blockGap` spacing settings, and `false` for the unsupported `contentSize` and `wideSize` layout settings ([#84989](https://github.com/WordPress/gutenberg/pull/84989)).
 
 ## 2.0.0 (2026-10-20)
 

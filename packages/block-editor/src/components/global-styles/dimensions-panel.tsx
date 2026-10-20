@@ -10,6 +10,9 @@ import {
 import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState } from '@wordpress/element';
 import { getValueFromVariable } from '@wordpress/global-styles-engine';
+import type { ComponentProps } from 'react';
+import type { ClassValue } from 'clsx';
+import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
 import DimensionControl from '../dimension-control';
@@ -27,6 +30,22 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
+import type { BlockStyleState } from '../../hooks/types';
+import type { ChildLayout } from '../child-layout-control/types';
+import type {
+	DimensionsPanelProps,
+	PanelResetAllFilter,
+	PanelStyle,
+	SpacingSidesValue,
+	StyleSettings,
+	StyleToolsPanelProps,
+	StyleValue,
+} from './types';
+
+type BoxValues = ComponentProps< typeof BoxControl >[ 'values' ];
+type BoxSides = ComponentProps< typeof BoxControl >[ 'sides' ];
+type SpacingValues = ComponentProps< typeof SpacingSizesControl >[ 'values' ];
+type SpacingSides = ComponentProps< typeof SpacingSizesControl >[ 'sides' ];
 
 const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
 
@@ -35,13 +54,16 @@ const AXIAL_SIDES = [ 'horizontal', 'vertical' ];
  * renders its linked/unlink toggle button, which the local-override reset dot
  * offsets itself against.
  *
- * @param {string[]|undefined} sides            Configurable sides for the control.
- * @param {boolean}            isPresetsControl Whether the presets-based
- *                                              `SpacingSizesControl` is used.
+ * @param sides            Configurable sides for the control.
+ * @param isPresetsControl Whether the presets-based
+ *                         `SpacingSizesControl` is used.
  *
- * @return {boolean} Whether the toggle button is rendered.
+ * @return Whether the toggle button is rendered.
  */
-function hasSpacingToggle( sides, isPresetsControl ) {
+function hasSpacingToggle(
+	sides: string[] | undefined,
+	isPresetsControl: boolean
+): boolean {
 	if ( sides?.length === 1 ) {
 		return false;
 	}
@@ -56,8 +78,8 @@ function hasSpacingToggle( sides, isPresetsControl ) {
 }
 
 export function useHasDimensionsPanel(
-	settings,
-	styleState = DEFAULT_BLOCK_STYLE_STATE
+	settings: StyleSettings | undefined,
+	styleState: BlockStyleState = DEFAULT_BLOCK_STYLE_STATE
 ) {
 	return (
 		hasContentSize( settings ) ||
@@ -74,50 +96,56 @@ export function useHasDimensionsPanel(
 	);
 }
 
-function hasContentSize( settings ) {
+function hasContentSize( settings: StyleSettings | undefined ) {
 	return settings?.layout?.contentSize;
 }
 
-function hasWideSize( settings ) {
+function hasWideSize( settings: StyleSettings | undefined ) {
 	return settings?.layout?.wideSize;
 }
 
-function hasPadding( settings ) {
+function hasPadding( settings: StyleSettings | undefined ) {
 	return settings?.spacing?.padding;
 }
 
-function hasMargin( settings ) {
+function hasMargin( settings: StyleSettings | undefined ) {
 	return settings?.spacing?.margin;
 }
 
-function hasGap( settings ) {
+function hasGap( settings: StyleSettings | undefined ) {
 	return settings?.spacing?.blockGap;
 }
 
-function hasHeight( settings ) {
+function hasHeight( settings: StyleSettings | undefined ) {
 	return settings?.dimensions?.height;
 }
 
-function hasMinHeight( settings ) {
+function hasMinHeight( settings: StyleSettings | undefined ) {
 	return settings?.dimensions?.minHeight;
 }
 
-function hasMinWidth( settings ) {
+function hasMinWidth( settings: StyleSettings | undefined ) {
 	return settings?.dimensions?.minWidth;
 }
 
-function hasWidth( settings ) {
+function hasWidth( settings: StyleSettings | undefined ) {
 	return settings?.dimensions?.width;
 }
 
-function hasAspectRatio( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
+function hasAspectRatio(
+	settings: StyleSettings | undefined,
+	styleState: BlockStyleState = DEFAULT_BLOCK_STYLE_STATE
+) {
 	return (
 		! hasPseudoBlockStyleState( styleState ) &&
 		settings?.dimensions?.aspectRatio
 	);
 }
 
-function hasChildLayout( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
+function hasChildLayout(
+	settings: StyleSettings | undefined,
+	styleState: BlockStyleState = DEFAULT_BLOCK_STYLE_STATE
+) {
 	if ( hasPseudoBlockStyleState( styleState ) ) {
 		return false;
 	}
@@ -137,17 +165,21 @@ function hasChildLayout( settings, styleState = DEFAULT_BLOCK_STYLE_STATE ) {
 	return !! settings?.layout && support;
 }
 
-function hasSpacingPresets( settings ) {
+function hasSpacingPresets( settings: StyleSettings | undefined ) {
+	// A missing count compares as no presets.
 	const { defaultSpacingSizes, spacingSizes } = settings?.spacing || {};
 	return (
 		( defaultSpacingSizes !== false &&
-			spacingSizes?.default?.length > 0 ) ||
-		spacingSizes?.theme?.length > 0 ||
-		spacingSizes?.custom?.length > 0
+			( spacingSizes?.default?.length as number ) > 0 ) ||
+		( spacingSizes?.theme?.length as number ) > 0 ||
+		( spacingSizes?.custom?.length as number ) > 0
 	);
 }
 
-function filterValuesBySides( values, sides ) {
+function filterValuesBySides(
+	values: SpacingSidesValue | undefined,
+	sides: string[] | undefined
+) {
 	// If no custom side configuration, all sides are opted into by default.
 	// Without any values, we have nothing to filter either.
 	if ( ! sides || ! values ) {
@@ -155,7 +187,7 @@ function filterValuesBySides( values, sides ) {
 	}
 
 	// Only include sides opted into within filtered values.
-	const filteredValues = {};
+	const filteredValues: SpacingSidesValue = {};
 	sides.forEach( ( side ) => {
 		if ( side === 'vertical' ) {
 			filteredValues.top = values.top;
@@ -171,9 +203,9 @@ function filterValuesBySides( values, sides ) {
 	return filteredValues;
 }
 
-const EMPTY_VALUES = [ undefined, null, '' ];
+const EMPTY_VALUES: unknown[] = [ undefined, null, '' ];
 
-function hasValue( value ) {
+function hasValue( value: unknown ) {
 	return ! EMPTY_VALUES.includes( value );
 }
 
@@ -183,10 +215,12 @@ function hasValue( value ) {
  * inherited unit, so the placeholder must contain only the number (e.g.
  * `120px` -> `120`) rather than the full unit string.
  *
- * @param {string|number|undefined} rawValue Inherited value to parse.
- * @return {number|undefined} The numeric quantity, or `undefined` when absent.
+ * @param rawValue Inherited value to parse.
+ * @return The numeric quantity, or `undefined` when absent.
  */
-function getNumericPlaceholder( rawValue ) {
+function getNumericPlaceholder(
+	rawValue: string | number | undefined
+): number | undefined {
 	if ( ! hasValue( rawValue ) ) {
 		return undefined;
 	}
@@ -194,7 +228,9 @@ function getNumericPlaceholder( rawValue ) {
 	return quantity;
 }
 
-function splitStyleValue( value ) {
+function splitStyleValue(
+	value: StyleValue | SpacingSidesValue
+): StyleValue | SpacingSidesValue {
 	// Check for shorthand value (a string value).
 	if ( hasValue( value ) && typeof value === 'string' ) {
 		// Convert to value for individual sides for BoxControl.
@@ -219,10 +255,12 @@ function splitStyleValue( value ) {
  * from each other, the placeholder is suppressed because BoxControl's
  * `inputProps.placeholder` cannot vary per side.
  *
- * @param {Object|string|undefined} sidesValue The inherited sides shape.
- * @return {string|undefined} The common value, or undefined.
+ * @param sidesValue The inherited sides shape.
+ * @return The common value, or undefined.
  */
-function getCommonSidesValue( sidesValue ) {
+function getCommonSidesValue(
+	sidesValue: StyleValue | SpacingSidesValue
+): StyleValue {
 	if ( ! hasValue( sidesValue ) ) {
 		return undefined;
 	}
@@ -233,7 +271,10 @@ function getCommonSidesValue( sidesValue ) {
 		return undefined;
 	}
 	const sideKeys = [ 'top', 'right', 'bottom', 'left' ];
-	const values = sideKeys.map( ( k ) => sidesValue[ k ] );
+	// An object holds a value per side.
+	const values = sideKeys.map(
+		( k ) => ( sidesValue as SpacingSidesValue )[ k ]
+	);
 	const allDefined = values.every( hasValue );
 	if ( ! allDefined ) {
 		return undefined;
@@ -252,10 +293,12 @@ function getCommonSidesValue( sidesValue ) {
  * of an inherited value regardless of whether the individual sides match (a
  * constraint that only applies to BoxControl's single-string placeholder).
  *
- * @param {Object|string|undefined} sidesValue The sides shape.
- * @return {boolean} Whether any side holds a value.
+ * @param sidesValue The sides shape.
+ * @return Whether any side holds a value.
  */
-function hasAnySideValue( sidesValue ) {
+function hasAnySideValue(
+	sidesValue: StyleValue | SpacingSidesValue
+): boolean {
 	if ( ! hasValue( sidesValue ) ) {
 		return false;
 	}
@@ -266,11 +309,15 @@ function hasAnySideValue( sidesValue ) {
 		return false;
 	}
 	return [ 'top', 'right', 'bottom', 'left' ].some( ( side ) =>
-		hasValue( sidesValue[ side ] )
+		// An object holds a value per side.
+		hasValue( ( sidesValue as SpacingSidesValue )[ side ] )
 	);
 }
 
-function splitGapValue( value, isAxialGap ) {
+function splitGapValue(
+	value: StyleValue | SpacingSidesValue,
+	isAxialGap: boolean | undefined
+): StyleValue | SpacingSidesValue {
 	if ( ! hasValue( value ) ) {
 		return value;
 	}
@@ -289,10 +336,11 @@ function splitGapValue( value, isAxialGap ) {
 			: { top: value };
 	}
 
+	// An object holds the gap of each axis.
 	return {
-		...value,
-		right: value?.left,
-		bottom: value?.top,
+		...( value as SpacingSidesValue ),
+		right: ( value as SpacingSidesValue )?.left,
+		bottom: ( value as SpacingSidesValue )?.top,
 	};
 }
 
@@ -302,7 +350,7 @@ function DimensionsToolsPanel( {
 	value,
 	panelId,
 	children,
-} ) {
+}: StyleToolsPanelProps ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -321,7 +369,7 @@ function DimensionsToolsPanel( {
 	);
 }
 
-const DEFAULT_CONTROLS = {
+const DEFAULT_CONTROLS: Record< string, boolean > = {
 	contentSize: true,
 	wideSize: true,
 	padding: true,
@@ -350,29 +398,41 @@ export default function DimensionsPanel( {
 	allowAxialBlockGap = true,
 	styleState = DEFAULT_BLOCK_STYLE_STATE,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
-} ) {
+}: DimensionsPanelProps ) {
 	const { dimensions, spacing } = settings;
 
-	const decodeValue = ( rawValue ) => {
+	const decodeValue = ( rawValue: StyleValue | SpacingSidesValue ) => {
 		if ( rawValue && typeof rawValue === 'object' ) {
-			return Object.keys( rawValue ).reduce( ( acc, key ) => {
-				acc[ key ] = getValueFromVariable(
-					{ settings: { dimensions, spacing } },
-					'',
-					rawValue[ key ]
-				);
-				return acc;
-			}, {} );
+			return Object.keys( rawValue ).reduce< SpacingSidesValue >(
+				( acc, key ) => {
+					acc[ key ] = getValueFromVariable(
+						// Only the dimension and spacing presets are read.
+						{
+							settings: { dimensions, spacing },
+						} as GlobalStylesConfig,
+						'',
+						// An object holds a value per side.
+						( rawValue as SpacingSidesValue )[ key ]
+					);
+					return acc;
+				},
+				{}
+			);
 		}
 		return getValueFromVariable(
-			{ settings: { dimensions, spacing } },
+			// Only the dimension and spacing presets are read.
+			{ settings: { dimensions, spacing } } as GlobalStylesConfig,
 			'',
 			rawValue
 		);
 	};
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
-	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
+	const inheritanceProps = (
+		isInherited: unknown,
+		hasLocalOverride: unknown,
+		className?: ClassValue
+	) =>
 		getInheritanceProps(
 			showInheritanceLabelIndicators && isInherited,
 			showInheritanceLabelIndicators && hasLocalOverride,
@@ -394,36 +454,39 @@ export default function DimensionsPanel( {
 	const minimumMargin = -Infinity;
 	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
 
-	const resetAllFilter = useCallback( ( previousValue ) => {
-		return {
-			...previousValue,
-			layout: cleanEmptyObject( {
-				...previousValue?.layout,
-				contentSize: undefined,
-				wideSize: undefined,
-				selfStretch: undefined,
-				flexSize: undefined,
-				columnStart: undefined,
-				rowStart: undefined,
-				columnSpan: undefined,
-				rowSpan: undefined,
-			} ),
-			spacing: {
-				...previousValue?.spacing,
-				padding: undefined,
-				margin: undefined,
-				blockGap: undefined,
-			},
-			dimensions: {
-				...previousValue?.dimensions,
-				height: undefined,
-				minHeight: undefined,
-				minWidth: undefined,
-				aspectRatio: undefined,
-				width: undefined,
-			},
-		};
-	}, [] );
+	const resetAllFilter: PanelResetAllFilter = useCallback(
+		( previousValue ) => {
+			return {
+				...previousValue,
+				layout: cleanEmptyObject( {
+					...previousValue?.layout,
+					contentSize: undefined,
+					wideSize: undefined,
+					selfStretch: undefined,
+					flexSize: undefined,
+					columnStart: undefined,
+					rowStart: undefined,
+					columnSpan: undefined,
+					rowSpan: undefined,
+				} ),
+				spacing: {
+					...previousValue?.spacing,
+					padding: undefined,
+					margin: undefined,
+					blockGap: undefined,
+				},
+				dimensions: {
+					...previousValue?.dimensions,
+					height: undefined,
+					minHeight: undefined,
+					minWidth: undefined,
+					aspectRatio: undefined,
+					width: undefined,
+				},
+			};
+		},
+		[]
+	);
 
 	// Content Width
 	const showContentSizeControl =
@@ -435,7 +498,7 @@ export default function DimensionsPanel( {
 	const isContentSizePlaceholder =
 		! hasValue( value?.layout?.contentSize ) &&
 		hasValue( inheritedContentSizeValue );
-	const setContentSizeValue = ( newValue ) => {
+	const setContentSizeValue = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -458,7 +521,7 @@ export default function DimensionsPanel( {
 	const isWideSizePlaceholder =
 		! hasValue( value?.layout?.wideSize ) &&
 		hasValue( inheritedWideSizeValue );
-	const setWideSizeValue = ( newValue ) => {
+	const setWideSizeValue = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -501,17 +564,20 @@ export default function DimensionsPanel( {
 		! hasValue( value?.spacing?.padding ) && hasInheritedPadding;
 	const paddingSides = Array.isArray( settings?.spacing?.padding )
 		? settings?.spacing?.padding
-		: settings?.spacing?.padding?.sides;
+		: // The setting is an array or an object with the sides.
+			( settings?.spacing?.padding as { sides?: string[] } | undefined )
+				?.sides;
 	const isAxialPadding =
 		paddingSides &&
-		paddingSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-	const setPaddingValues = ( newPaddingValues ) => {
+		paddingSides.some( ( side: string ) => AXIAL_SIDES.includes( side ) );
+	const setPaddingValues = ( newPaddingValues?: SpacingSidesValue ) => {
 		const padding = filterValuesBySides( newPaddingValues, paddingSides );
 		onChange( setImmutably( value, [ 'spacing', 'padding' ], padding ) );
 	};
 	const hasPaddingValue = () =>
 		hasValue( value?.spacing?.padding ) &&
-		Object.keys( value?.spacing?.padding ).length;
+		// A set value is a string or an object.
+		Object.keys( value?.spacing?.padding as object ).length;
 	const resetPaddingValue = () => setPaddingValues( undefined );
 	const onMouseOverPadding = () => onVisualize( 'padding' );
 
@@ -537,17 +603,20 @@ export default function DimensionsPanel( {
 		! hasValue( value?.spacing?.margin ) && hasInheritedMargin;
 	const marginSides = Array.isArray( settings?.spacing?.margin )
 		? settings?.spacing?.margin
-		: settings?.spacing?.margin?.sides;
+		: // The setting is an array or an object with the sides.
+			( settings?.spacing?.margin as { sides?: string[] } | undefined )
+				?.sides;
 	const isAxialMargin =
 		marginSides &&
-		marginSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
-	const setMarginValues = ( newMarginValues ) => {
+		marginSides.some( ( side: string ) => AXIAL_SIDES.includes( side ) );
+	const setMarginValues = ( newMarginValues?: SpacingSidesValue ) => {
 		const margin = filterValuesBySides( newMarginValues, marginSides );
 		onChange( setImmutably( value, [ 'spacing', 'margin' ], margin ) );
 	};
 	const hasMarginValue = () =>
 		hasValue( value?.spacing?.margin ) &&
-		Object.keys( value?.spacing?.margin ).length;
+		// A set value is a string or an object.
+		Object.keys( value?.spacing?.margin as object ).length;
 	const resetMarginValue = () => setMarginValues( undefined );
 	const onMouseOverMargin = () => onVisualize( 'margin' );
 
@@ -555,11 +624,13 @@ export default function DimensionsPanel( {
 	const showGapControl = hasGap( settings );
 	const gapSides = Array.isArray( settings?.spacing?.blockGap )
 		? settings?.spacing?.blockGap
-		: settings?.spacing?.blockGap?.sides;
+		: // The setting is an array or an object with the sides.
+			( settings?.spacing?.blockGap as { sides?: string[] } | undefined )
+				?.sides;
 	const isAxialGap =
 		allowAxialBlockGap &&
 		gapSides &&
-		gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+		gapSides.some( ( side: string ) => AXIAL_SIDES.includes( side ) );
 	const localGapRaw = decodeValue( value?.spacing?.blockGap );
 	const inheritedGapRaw = decodeValue( inheritedValue?.spacing?.blockGap );
 	const localGapForSingleInput =
@@ -585,12 +656,14 @@ export default function DimensionsPanel( {
 		! hasValue( value?.spacing?.blockGap ) &&
 		typeof inheritedGapForSingleInput === 'string' &&
 		inheritedGapForSingleInput !== '';
-	const setGapValue = ( newGapValue ) => {
+	const setGapValue = (
+		newGapValue: StyleValue | { top?: StyleValue; left?: StyleValue }
+	) => {
 		onChange(
 			setImmutably( value, [ 'spacing', 'blockGap' ], newGapValue )
 		);
 	};
-	const setGapValues = ( nextBoxGapValue ) => {
+	const setGapValues = ( nextBoxGapValue?: SpacingSidesValue ) => {
 		if ( ! hasValue( nextBoxGapValue ) ) {
 			setGapValue( null );
 		}
@@ -616,7 +689,7 @@ export default function DimensionsPanel( {
 	const isMinHeightPlaceholder =
 		! hasValue( value?.dimensions?.minHeight ) &&
 		hasValue( inheritedMinHeightValue );
-	const setMinHeightValue = ( newValue ) => {
+	const setMinHeightValue = ( newValue?: string ) => {
 		const tempValue = setImmutably(
 			value,
 			[ 'dimensions', 'minHeight' ],
@@ -645,7 +718,7 @@ export default function DimensionsPanel( {
 	const isHeightPlaceholder =
 		! hasValue( value?.dimensions?.height ) &&
 		hasValue( inheritedHeightValue );
-	const setHeightValue = ( newValue ) => {
+	const setHeightValue = ( newValue?: string ) => {
 		const tempValue = setImmutably(
 			value,
 			[ 'dimensions', 'height' ],
@@ -674,7 +747,7 @@ export default function DimensionsPanel( {
 	const isMinWidthPlaceholder =
 		! hasValue( value?.dimensions?.minWidth ) &&
 		hasValue( inheritedMinWidthValue );
-	const setMinWidthValue = ( newValue ) => {
+	const setMinWidthValue = ( newValue?: string ) => {
 		onChange(
 			setImmutably( value, [ 'dimensions', 'minWidth' ], newValue )
 		);
@@ -693,7 +766,7 @@ export default function DimensionsPanel( {
 	const isWidthPlaceholder =
 		! hasValue( value?.dimensions?.width ) &&
 		hasValue( inheritedWidthValue );
-	const setWidthValue = ( newValue ) => {
+	const setWidthValue = ( newValue?: string ) => {
 		onChange( setImmutably( value, [ 'dimensions', 'width' ], newValue ) );
 	};
 	const resetWidthValue = () => {
@@ -711,7 +784,7 @@ export default function DimensionsPanel( {
 	const isAspectRatioPlaceholder =
 		! hasValue( value?.dimensions?.aspectRatio ) &&
 		hasValue( inheritedAspectRatioValue );
-	const setAspectRatioValue = ( newValue ) => {
+	const setAspectRatioValue = ( newValue?: string ) => {
 		const tempValue = setImmutably(
 			value,
 			[ 'dimensions', 'aspectRatio' ],
@@ -732,15 +805,17 @@ export default function DimensionsPanel( {
 	// reflected in the control rather than washed out by a misshapen
 	// inherited layout payload.
 	const showChildLayoutControl = hasChildLayout( settings, styleState );
-	const childLayout = value?.layout;
+	// The block's layout style holds its child layout.
+	const childLayout = value?.layout as ChildLayout | undefined;
 
-	const setChildLayout = ( newChildLayout ) => {
+	const setChildLayout = ( newChildLayout: ChildLayout ) => {
 		onChange( {
 			...value,
+			// A child layout holds style values.
 			layout: {
 				...value?.layout,
 				...newChildLayout,
-			},
+			} as PanelStyle[ 'layout' ],
 		} );
 	};
 
@@ -787,9 +862,10 @@ export default function DimensionsPanel( {
 						}
 						placeholder={
 							isContentSizePlaceholder
-								? getNumericPlaceholder(
+								? // The input renders the number as is.
+									( getNumericPlaceholder(
 										inheritedContentSizeValue
-									)
+									) as unknown as string )
 								: undefined
 						}
 						onChange={ ( nextContentSize ) => {
@@ -830,9 +906,10 @@ export default function DimensionsPanel( {
 						value={ localWideSizeValue ?? inheritedWideSizeValue }
 						placeholder={
 							isWideSizePlaceholder
-								? getNumericPlaceholder(
+								? // The input renders the number as is.
+									( getNumericPlaceholder(
 										inheritedWideSizeValue
-									)
+									) as unknown as string )
 								: undefined
 						}
 						onChange={ ( nextWideSize ) => {
@@ -849,7 +926,8 @@ export default function DimensionsPanel( {
 			) }
 			{ showPaddingControl && (
 				<InheritanceToolsPanelItem
-					hasValue={ hasPaddingValue }
+					// A side count is truthy like `true`.
+					hasValue={ hasPaddingValue as () => boolean }
 					label={ __( 'Padding' ) }
 					hasInlineEndToggle={ hasSpacingToggle(
 						paddingSides,
@@ -871,28 +949,34 @@ export default function DimensionsPanel( {
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
-							values={ localPaddingValues }
+							// Split values hold a size per side.
+							values={ localPaddingValues as BoxValues }
 							onChange={ setPaddingValues }
 							label={ __( 'Padding' ) }
-							sides={ paddingSides }
+							// The setting lists side names.
+							sides={ paddingSides as BoxSides }
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialPadding }
 							inputProps={ {
 								onMouseOver: onMouseOverPadding,
 								onMouseOut: onMouseLeaveControls,
+								// The common side value is a CSS size.
 								placeholder: isPaddingPlaceholder
-									? inheritedPaddingPlaceholder
+									? ( inheritedPaddingPlaceholder as string )
 									: undefined,
 							} }
 						/>
 					) }
 					{ showSpacingPresetsControl && (
 						<SpacingSizesControl
-							values={ paddingValues }
+							// Split values hold a size per side.
+							values={ paddingValues as SpacingValues }
 							onChange={ setPaddingValues }
 							label={ __( 'Padding' ) }
-							sides={ paddingSides }
+							// The setting lists side names.
+							sides={ paddingSides as SpacingSides }
+							// @ts-expect-error SpacingSizesControl ignores this prop.
 							units={ units }
 							allowReset={ false }
 							onMouseOver={ onMouseOverPadding }
@@ -903,7 +987,8 @@ export default function DimensionsPanel( {
 			) }
 			{ showMarginControl && (
 				<InheritanceToolsPanelItem
-					hasValue={ hasMarginValue }
+					// A side count is truthy like `true`.
+					hasValue={ hasMarginValue as () => boolean }
 					label={ __( 'Margin' ) }
 					hasInlineEndToggle={ hasSpacingToggle(
 						marginSides,
@@ -925,7 +1010,8 @@ export default function DimensionsPanel( {
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
-							values={ localMarginValues }
+							// Split values hold a size per side.
+							values={ localMarginValues as BoxValues }
 							onChange={ setMarginValues }
 							inputProps={ {
 								min: minMarginValue,
@@ -938,12 +1024,14 @@ export default function DimensionsPanel( {
 								},
 								onMouseOver: onMouseOverMargin,
 								onMouseOut: onMouseLeaveControls,
+								// The common side value is a CSS size.
 								placeholder: isMarginPlaceholder
-									? inheritedMarginPlaceholder
+									? ( inheritedMarginPlaceholder as string )
 									: undefined,
 							} }
 							label={ __( 'Margin' ) }
-							sides={ marginSides }
+							// The setting lists side names.
+							sides={ marginSides as BoxSides }
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialMargin }
@@ -951,11 +1039,14 @@ export default function DimensionsPanel( {
 					) }
 					{ showSpacingPresetsControl && (
 						<SpacingSizesControl
-							values={ marginValues }
+							// Split values hold a size per side.
+							values={ marginValues as SpacingValues }
 							onChange={ setMarginValues }
 							minimumCustomValue={ -Infinity }
 							label={ __( 'Margin' ) }
-							sides={ marginSides }
+							// The setting lists side names.
+							sides={ marginSides as SpacingSides }
+							// @ts-expect-error SpacingSizesControl ignores this prop.
 							units={ units }
 							allowReset={ false }
 							onMouseOver={ onMouseOverMargin }
@@ -990,11 +1081,14 @@ export default function DimensionsPanel( {
 						( isAxialGap ? (
 							<BoxControl
 								label={ __( 'Block spacing' ) }
+								// @ts-expect-error BoxControl ignores this prop.
 								min={ 0 }
 								onChange={ setGapValues }
 								units={ units }
-								sides={ gapSides }
-								values={ gapValues }
+								// The setting lists side names.
+								sides={ gapSides as BoxSides }
+								// Split values hold a size per side.
+								values={ gapValues as BoxValues }
 								allowReset={ false }
 								splitOnAxis={ isAxialGap }
 							/>
@@ -1016,11 +1110,13 @@ export default function DimensionsPanel( {
 						<SpacingSizesControl
 							key={ isAxialGap ? 'axial-gap' : 'single-gap' }
 							label={ __( 'Block spacing' ) }
+							// @ts-expect-error SpacingSizesControl ignores this prop.
 							min={ 0 }
 							onChange={ setGapValues }
 							showSideInLabel={ false }
 							sides={ isAxialGap ? gapSides : [ 'top' ] } // Use 'top' as the shorthand property in non-axial configurations.
-							values={ gapValues }
+							// Split values hold a size per side.
+							values={ gapValues as SpacingValues }
 							allowReset={ false }
 						/>
 					) }
@@ -1031,7 +1127,8 @@ export default function DimensionsPanel( {
 					value={ childLayout }
 					onChange={ setChildLayout }
 					parentLayout={ settings?.parentLayout }
-					panelId={ panelId }
+					// The block inspector passes the block's client ID here.
+					panelId={ panelId as string }
 					showGridSpanDefaults={
 						! hasViewportBlockStyleState( styleState )
 					}
@@ -1067,9 +1164,10 @@ export default function DimensionsPanel( {
 						onChange={ setMinHeightValue }
 						placeholder={
 							isMinHeightPlaceholder
-								? getNumericPlaceholder(
+								? // The input renders the number as is.
+									( getNumericPlaceholder(
 										inheritedMinHeightValue
-									)
+									) as unknown as string )
 								: undefined
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }
@@ -1101,9 +1199,10 @@ export default function DimensionsPanel( {
 						onChange={ setMinWidthValue }
 						placeholder={
 							isMinWidthPlaceholder
-								? getNumericPlaceholder(
+								? // The input renders the number as is.
+									( getNumericPlaceholder(
 										inheritedMinWidthValue
-									)
+									) as unknown as string )
 								: undefined
 						}
 						dimensionSizes={ dimensions?.dimensionSizes }

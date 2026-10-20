@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import type { UserEvent } from '@testing-library/user-event';
 import BorderPanel from '../border-panel';
+import type { PresetsPerOrigin, ShadowPreset } from '../types';
 
 globalThis.wpVitest.mockMatchMedia();
 
@@ -265,7 +267,8 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			await user.type( radiusInput, '20' );
 
 			expect( onChange ).toHaveBeenCalled();
-			const lastCall = onChange.mock.calls.at( -1 )[ 0 ];
+			// The panel called `onChange`.
+			const lastCall = onChange.mock.calls.at( -1 )![ 0 ];
 			expect( lastCall?.border?.radius ).toBeDefined();
 			expect( lastCall?.shadow ).toBeUndefined();
 		} );
@@ -297,7 +300,8 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			await user.type( radiusInput, '20' );
 
 			expect( onChange ).toHaveBeenCalled();
-			const committedBorder = onChange.mock.calls.at( -1 )[ 0 ]?.border;
+			// The panel called `onChange`.
+			const committedBorder = onChange.mock.calls.at( -1 )![ 0 ]?.border;
 			expect( committedBorder?.radius ).toBeDefined();
 			expect( committedBorder?.color ).toBeUndefined();
 			expect( committedBorder?.style ).toBeUndefined();
@@ -384,7 +388,8 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 			await user.type( widthInput, '4' );
 
 			expect( onChange ).toHaveBeenCalled();
-			const lastCall = onChange.mock.calls.at( -1 )[ 0 ];
+			// The panel called `onChange`.
+			const lastCall = onChange.mock.calls.at( -1 )![ 0 ];
 			expect( lastCall?.border?.radius ).toBeUndefined();
 		} );
 
@@ -534,14 +539,17 @@ describe( 'BorderPanel — inherited Global Styles label treatment', () => {
 } );
 
 describe( 'BorderPanel — shadow preset persistence', () => {
-	const selectShadowPreset = async ( user, name ) => {
+	const selectShadowPreset = async ( user: UserEvent, name: string ) => {
 		await user.click(
 			screen.getByRole( 'button', { name: 'Drop shadow' } )
 		);
 		await user.click( screen.getByRole( 'option', { name } ) );
 	};
 
-	const shadowSettings = ( presets, defaultPresets = true ) => ( {
+	const shadowSettings = (
+		presets: PresetsPerOrigin< ShadowPreset >,
+		defaultPresets = true
+	) => ( {
 		shadow: { defaultPresets, presets },
 	} );
 

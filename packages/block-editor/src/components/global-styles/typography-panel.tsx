@@ -9,6 +9,8 @@ import {
 import { Notice } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useContext, useMemo } from '@wordpress/element';
+import type { ComponentProps, ReactNode } from 'react';
+import type { FontSize } from '@wordpress/global-styles-engine';
 import FontFamilyControl from '../font-family';
 import FontAppearanceControl from '../font-appearance-control';
 import LineHeightControl from '../line-height-control';
@@ -43,6 +45,14 @@ import {
 	InheritanceToolsPanelItem,
 	isGlobalStylesInheritanceIndicatorUIEnabled,
 } from './inheritance';
+import type {
+	PanelResetAllFilter,
+	PanelStyle,
+	StyleSettings,
+	StyleToolsPanelProps,
+	StyleValue,
+	TypographyPanelProps,
+} from './types';
 
 const MIN_TEXT_COLUMNS = 1;
 const MAX_TEXT_COLUMNS = 6;
@@ -54,11 +64,14 @@ const MAX_TEXT_COLUMNS = 6;
  * deliberately. Raw preset refs are compared rather than decoded hex, since
  * distinct slots can share a hex (`dark-background`/`dark-text` both `#000`).
  *
- * @param {Object} value          Local block styles.
- * @param {Object} inheritedValue Styles inherited from Global Styles.
- * @return {boolean} Whether to sync the link color to the text color.
+ * @param value          Local block styles.
+ * @param inheritedValue Styles inherited from Global Styles.
+ * @return Whether to sync the link color to the text color.
  */
-function shouldSyncLinkColor( value, inheritedValue ) {
+function shouldSyncLinkColor(
+	value: PanelStyle | undefined,
+	inheritedValue: PanelStyle | undefined
+): boolean {
 	const localLinkColor = value?.elements?.link?.color?.text;
 	// A local link color keeps tracking only while it matches the text color;
 	// once it differs it was set deliberately and is left alone.
@@ -73,7 +86,7 @@ function shouldSyncLinkColor( value, inheritedValue ) {
 	);
 }
 
-export function useHasTypographyPanel( settings ) {
+export function useHasTypographyPanel( settings: StyleSettings | undefined ) {
 	const hasFontFamily = useHasFontFamilyControl( settings );
 	const hasLineHeight = useHasLineHeightControl( settings );
 	const hasFontAppearance = useHasAppearanceControl( settings );
@@ -105,7 +118,7 @@ export function useHasTypographyPanel( settings ) {
 	);
 }
 
-function useHasFontSizeControl( settings ) {
+function useHasFontSizeControl( settings: StyleSettings | undefined ) {
 	return (
 		( settings?.typography?.defaultFontSizes !== false &&
 			settings?.typography?.fontSizes?.default?.length ) ||
@@ -115,21 +128,21 @@ function useHasFontSizeControl( settings ) {
 	);
 }
 
-function useHasFontFamilyControl( settings ) {
+function useHasFontFamilyControl( settings: StyleSettings | undefined ) {
 	return [ 'default', 'theme', 'custom' ].some(
 		( key ) => settings?.typography?.fontFamilies?.[ key ]?.length
 	);
 }
 
-function useHasLineHeightControl( settings ) {
+function useHasLineHeightControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.lineHeight;
 }
 
-function useHasAppearanceControl( settings ) {
+function useHasAppearanceControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.fontStyle || settings?.typography?.fontWeight;
 }
 
-function useAppearanceControlLabel( settings ) {
+function useAppearanceControlLabel( settings: StyleSettings | undefined ) {
 	if ( ! settings?.typography?.fontStyle ) {
 		return __( 'Font weight' );
 	}
@@ -139,46 +152,46 @@ function useAppearanceControlLabel( settings ) {
 	return __( 'Appearance' );
 }
 
-function useHasLetterSpacingControl( settings ) {
+function useHasLetterSpacingControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.letterSpacing;
 }
 
-function useHasTextTransformControl( settings ) {
+function useHasTextTransformControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.textTransform;
 }
 
-function useHasTextAlignmentControl( settings ) {
+function useHasTextAlignmentControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.textAlign;
 }
 
-function useHasTextDecorationControl( settings ) {
+function useHasTextDecorationControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.textDecoration;
 }
 
-function useHasWritingModeControl( settings ) {
+function useHasWritingModeControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.writingMode;
 }
 
-function useHasTextColumnsControl( settings ) {
+function useHasTextColumnsControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.textColumns;
 }
 
-function useHasTextIndentControl( settings ) {
+function useHasTextIndentControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.textIndent;
 }
 
-function useHasTextShadowControl( settings ) {
+function useHasTextShadowControl( settings: StyleSettings | undefined ) {
 	return settings?.typography?.textShadow;
 }
 
 /**
  * Concatenate all the font sizes into a single list for the font size picker.
  *
- * @param {Object} settings The global styles settings.
+ * @param settings The global styles settings.
  *
- * @return {Array} The merged font sizes.
+ * @return The merged font sizes.
  */
-function getMergedFontSizes( settings ) {
+function getMergedFontSizes( settings: StyleSettings | undefined ): FontSize[] {
 	const fontSizes = settings?.typography?.fontSizes;
 	const defaultFontSizesEnabled = !! settings?.typography?.defaultFontSizes;
 	return [
@@ -194,7 +207,7 @@ export function TypographyToolsPanel( {
 	value,
 	panelId,
 	children,
-} ) {
+}: StyleToolsPanelProps ) {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
@@ -216,13 +229,21 @@ export function TypographyToolsPanel( {
 }
 
 // Renders `children` only while the control registered as `label` is shown.
-function NoticeForControl( { label, isShownByDefault, children } ) {
+function NoticeForControl( {
+	label,
+	isShownByDefault,
+	children,
+}: {
+	label: string;
+	isShownByDefault?: boolean;
+	children: ReactNode;
+} ) {
 	const { menuItems } = useContext( ToolsPanelContext );
 	const isShown = isShownByDefault || !! menuItems?.optional?.[ label ];
 	return isShown ? children : null;
 }
 
-const DEFAULT_CONTROLS = {
+const DEFAULT_CONTROLS: Record< string, boolean > = {
 	textColor: true,
 	fontFamily: true,
 	fontSize: true,
@@ -239,9 +260,9 @@ const DEFAULT_CONTROLS = {
 	textGradient: false,
 };
 
-const EMPTY_VALUES = [ undefined, null, '' ];
+const EMPTY_VALUES: unknown[] = [ undefined, null, '' ];
 
-function hasValue( value ) {
+function hasValue( value: unknown ) {
 	return ! EMPTY_VALUES.includes( value );
 }
 
@@ -251,10 +272,12 @@ function hasValue( value ) {
  * inherited unit, so the placeholder must contain only the number (e.g.
  * `1.5em` -> `1.5`) rather than the full unit string.
  *
- * @param {string|number|undefined} rawValue Inherited value to parse.
- * @return {number|undefined} The numeric quantity, or `undefined` when absent.
+ * @param rawValue Inherited value to parse.
+ * @return The numeric quantity, or `undefined` when absent.
  */
-function getNumericPlaceholder( rawValue ) {
+function getNumericPlaceholder(
+	rawValue: string | number | undefined
+): number | undefined {
 	if ( ! hasValue( rawValue ) ) {
 		return undefined;
 	}
@@ -275,7 +298,7 @@ export default function TypographyPanel( {
 	isGlobalStyles = false,
 	showInheritanceLabelIndicators = isGlobalStylesInheritanceIndicatorUIEnabled(),
 	contrastWarning,
-} ) {
+}: TypographyPanelProps ) {
 	const {
 		colors,
 		gradients,
@@ -288,7 +311,11 @@ export default function TypographyPanel( {
 	} = useColorGradientSettings( settings );
 	// Always keep the layout className (e.g. `single-column`); only the
 	// inheritance treatment is gated on `showInheritanceLabelIndicators`.
-	const inheritanceProps = ( isInherited, hasLocalOverride, className ) =>
+	const inheritanceProps = (
+		isInherited: boolean,
+		hasLocalOverride: boolean,
+		className?: string
+	) =>
 		getInheritanceProps(
 			showInheritanceLabelIndicators && isInherited,
 			showInheritanceLabelIndicators && hasLocalOverride,
@@ -302,7 +329,7 @@ export default function TypographyPanel( {
 	const textColor = decodeValue( inheritedValue?.color?.text );
 	const userTextColor = decodeValue( value?.color?.text );
 	const hasTextColorValue = () => !! value?.color?.text;
-	const setTextColor = ( newColor, newSlug ) => {
+	const setTextColor = ( newColor?: string, newSlug?: string ) => {
 		const encoded = encodeColorValueWithPalette(
 			allColors,
 			newColor,
@@ -366,7 +393,7 @@ export default function TypographyPanel( {
 		: __(
 				'Setting a text gradient clips the background to the text, including any color or image.'
 			);
-	const setTextGradient = ( newGradient, newSlug ) => {
+	const setTextGradient = ( newGradient?: string, newSlug?: string ) => {
 		let changedObject = setImmutably(
 			value,
 			[ 'background', 'gradient' ],
@@ -410,7 +437,7 @@ export default function TypographyPanel( {
 		return getMergedFontFamiliesAndFontFamilyFaces( settings, fontFamily );
 	}, [ settings, fontFamily ] );
 
-	const setFontFamily = ( newValue ) => {
+	const setFontFamily = ( newValue?: string ) => {
 		const slug = fontFamilies?.find(
 			( { fontFamily: f } ) => f === newValue
 		)?.slug;
@@ -494,7 +521,7 @@ export default function TypographyPanel( {
 		! hasValue( rawLocalFontSize ) && hasValue( rawInheritedFontSize );
 
 	// Extract the slug from the CSS custom property if it exists.
-	const extractSlug = ( rawValue ) => {
+	const extractSlug = ( rawValue: StyleValue ) => {
 		if ( ! rawValue || typeof rawValue !== 'string' ) {
 			return undefined;
 		}
@@ -514,7 +541,10 @@ export default function TypographyPanel( {
 	const currentFontSizeSlug = extractSlug( rawFontSizeForDisplay );
 	const inheritedFontSizeSlug = extractSlug( rawInheritedFontSize );
 
-	const setFontSize = ( newValue, metadata ) => {
+	const setFontSize = (
+		newValue?: string | number,
+		metadata?: { slug?: string }
+	) => {
 		const actualValue = !! metadata?.slug
 			? `var:preset|font-size|${ metadata?.slug }`
 			: newValue;
@@ -536,7 +566,10 @@ export default function TypographyPanel( {
 	// deselect, so we let it pass through unchanged. The custom-size
 	// input does not emit `undefined` on focus or activation, so this
 	// hook is correctly scoped to the ToggleGroup activation path.
-	const setFontSizeWithInheritedCommit = ( newValue, metadata ) => {
+	const setFontSizeWithInheritedCommit = (
+		newValue?: string | number,
+		metadata?: { slug?: string }
+	) => {
 		if ( isFontSizePlaceholder && newValue === undefined && ! metadata ) {
 			if ( inheritedFontSizeSlug ) {
 				setFontSize( undefined, { slug: inheritedFontSizeSlug } );
@@ -572,7 +605,13 @@ export default function TypographyPanel( {
 		! hasValue( value?.typography?.fontWeight ) &&
 		( hasValue( inheritedFontStyle ) || hasValue( inheritedFontWeight ) );
 	const setFontAppearance = useCallback(
-		( { fontStyle: newFontStyle, fontWeight: newFontWeight } ) => {
+		( {
+			fontStyle: newFontStyle,
+			fontWeight: newFontWeight,
+		}: {
+			fontStyle?: string;
+			fontWeight?: string;
+		} ) => {
 			// Only update the font style and weight if they have changed.
 			if ( newFontStyle !== fontStyle || newFontWeight !== fontWeight ) {
 				onChange( {
@@ -599,7 +638,7 @@ export default function TypographyPanel( {
 	// "accept this inherited value" affordance and commit the
 	// inherited values to local explicitly.
 	const setFontAppearanceWithInheritedCommit = useCallback(
-		( next ) => {
+		( next: { fontStyle?: string; fontWeight?: string } ) => {
 			if (
 				isFontAppearancePlaceholder &&
 				next.fontStyle === fontStyle &&
@@ -646,7 +685,7 @@ export default function TypographyPanel( {
 	const isLineHeightPlaceholder =
 		! hasValue( value?.typography?.lineHeight ) &&
 		hasValue( inheritedLineHeight );
-	const setLineHeight = ( newValue ) => {
+	const setLineHeight = ( newValue?: string | number ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -667,7 +706,7 @@ export default function TypographyPanel( {
 	const isLetterSpacingPlaceholder =
 		! hasValue( value?.typography?.letterSpacing ) &&
 		hasValue( inheritedLetterSpacing );
-	const setLetterSpacing = ( newValue ) => {
+	const setLetterSpacing = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -694,7 +733,7 @@ export default function TypographyPanel( {
 	const textIndentSetting = settings?.typography?.textIndent ?? 'subsequent';
 	const isTextIndentAll = textIndentSetting === 'all';
 
-	const setTextIndentValue = ( newValue ) => {
+	const setTextIndentValue = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -704,7 +743,7 @@ export default function TypographyPanel( {
 		);
 	};
 
-	const onToggleTextIndentAll = ( newValue ) => {
+	const onToggleTextIndentAll = ( newValue: boolean ) => {
 		// Toggle between 'all' and 'subsequent' for the setting.
 		// Include the settings change so it can be handled atomically by the parent.
 		onChange( {
@@ -736,7 +775,7 @@ export default function TypographyPanel( {
 	const isTextColumnsPlaceholder =
 		! hasValue( value?.typography?.textColumns ) &&
 		hasValue( inheritedTextColumns );
-	const setTextColumns = ( newValue ) => {
+	const setTextColumns = ( newValue?: number | string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -759,7 +798,7 @@ export default function TypographyPanel( {
 	const isTextTransformPlaceholder =
 		! hasValue( value?.typography?.textTransform ) &&
 		hasValue( inheritedTextTransform );
-	const setTextTransform = ( newValue ) => {
+	const setTextTransform = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -776,7 +815,7 @@ export default function TypographyPanel( {
 	// committed (no longer at-rest), the same `undefined` payload
 	// represents a normal `isDeselectable` deselect, so we let it pass
 	// through unchanged.
-	const setTextTransformWithInheritedCommit = ( newValue ) => {
+	const setTextTransformWithInheritedCommit = ( newValue?: string ) => {
 		if ( isTextTransformPlaceholder && newValue === undefined ) {
 			setTextTransform( inheritedTextTransform );
 			return;
@@ -797,7 +836,7 @@ export default function TypographyPanel( {
 	const isTextDecorationPlaceholder =
 		! hasValue( value?.typography?.textDecoration ) &&
 		hasValue( inheritedTextDecoration );
-	const setTextDecoration = ( newValue ) => {
+	const setTextDecoration = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -806,7 +845,7 @@ export default function TypographyPanel( {
 			)
 		);
 	};
-	const setTextDecorationWithInheritedCommit = ( newValue ) => {
+	const setTextDecorationWithInheritedCommit = ( newValue?: string ) => {
 		if ( isTextDecorationPlaceholder && newValue === undefined ) {
 			setTextDecoration( inheritedTextDecoration );
 			return;
@@ -827,7 +866,7 @@ export default function TypographyPanel( {
 	const isWritingModePlaceholder =
 		! hasValue( value?.typography?.writingMode ) &&
 		hasValue( inheritedWritingMode );
-	const setWritingMode = ( newValue ) => {
+	const setWritingMode = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -836,7 +875,7 @@ export default function TypographyPanel( {
 			)
 		);
 	};
-	const setWritingModeWithInheritedCommit = ( newValue ) => {
+	const setWritingModeWithInheritedCommit = ( newValue?: string ) => {
 		if ( isWritingModePlaceholder && newValue === undefined ) {
 			setWritingMode( inheritedWritingMode );
 			return;
@@ -857,7 +896,7 @@ export default function TypographyPanel( {
 	const isTextAlignPlaceholder =
 		! hasValue( value?.typography?.textAlign ) &&
 		hasValue( inheritedTextAlign );
-	const setTextAlign = ( newValue ) => {
+	const setTextAlign = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -866,7 +905,7 @@ export default function TypographyPanel( {
 			)
 		);
 	};
-	const setTextAlignWithInheritedCommit = ( newValue ) => {
+	const setTextAlignWithInheritedCommit = ( newValue?: string ) => {
 		if ( isTextAlignPlaceholder && newValue === undefined ) {
 			setTextAlign( inheritedTextAlign );
 			return;
@@ -883,7 +922,7 @@ export default function TypographyPanel( {
 	const isTextShadowPlaceholder =
 		! hasValue( value?.typography?.textShadow ) &&
 		hasValue( inheritedTextShadow );
-	const setTextShadow = ( newValue ) => {
+	const setTextShadow = ( newValue?: string ) => {
 		onChange(
 			setImmutably(
 				value,
@@ -895,7 +934,7 @@ export default function TypographyPanel( {
 	const hasTextShadow = () => hasValue( value?.typography?.textShadow );
 	const resetTextShadow = () => setTextShadow( undefined );
 
-	const resetAllFilter = useCallback(
+	const resetAllFilter: PanelResetAllFilter = useCallback(
 		( previousValue ) => {
 			const clearsTextGradient =
 				hasTextGradientEnabled &&
@@ -1053,7 +1092,12 @@ export default function TypographyPanel( {
 						value={ currentFontSizeSlug || fontSize }
 						valueMode={ currentFontSizeSlug ? 'slug' : 'literal' }
 						onChange={ setFontSizeWithInheritedCommit }
-						fontSizes={ mergedFontSizes }
+						// The picker reads the slug, name and size of each preset.
+						fontSizes={
+							mergedFontSizes as ComponentProps<
+								typeof FontSizePicker
+							>[ 'fontSizes' ]
+						}
 						disableCustomFontSizes={ disableCustomFontSizes }
 						withReset={ false }
 						withSlider
@@ -1109,10 +1153,10 @@ export default function TypographyPanel( {
 						// (1.5) placeholder.
 						{ ...( isLineHeightPlaceholder
 							? {
-									placeholder:
-										getNumericPlaceholder(
-											inheritedLineHeight
-										),
+									// The input renders the number as is.
+									placeholder: getNumericPlaceholder(
+										inheritedLineHeight
+									) as unknown as string,
 								}
 							: {} ) }
 					/>
@@ -1145,9 +1189,10 @@ export default function TypographyPanel( {
 						__unstableInputWidth="auto"
 						placeholder={
 							isLetterSpacingPlaceholder
-								? getNumericPlaceholder(
+								? // The input renders the number as is.
+									( getNumericPlaceholder(
 										inheritedLetterSpacing
-									)
+									) as unknown as string )
 								: undefined
 						}
 					/>
@@ -1179,7 +1224,10 @@ export default function TypographyPanel( {
 						hasBottomMargin={ isGlobalStyles }
 						placeholder={
 							isTextIndentPlaceholder
-								? getNumericPlaceholder( inheritedTextIndent )
+								? // The input renders the number as is.
+									( getNumericPlaceholder(
+										inheritedTextIndent
+									) as unknown as string )
 								: undefined
 						}
 					/>
@@ -1218,6 +1266,7 @@ export default function TypographyPanel( {
 						}
 						spinControls="custom"
 						value={ localTextColumns }
+						// @ts-expect-error NumberControl takes no initial position.
 						initialPosition={ 1 }
 					/>
 				</InheritanceToolsPanelItem>
@@ -1239,6 +1288,7 @@ export default function TypographyPanel( {
 					<TextDecorationControl
 						value={ textDecoration }
 						onChange={ setTextDecorationWithInheritedCommit }
+						// @ts-expect-error TextDecorationControl takes no input width.
 						__unstableInputWidth="auto"
 					/>
 				</InheritanceToolsPanelItem>
@@ -1278,6 +1328,7 @@ export default function TypographyPanel( {
 					<TextTransformControl
 						value={ textTransform }
 						onChange={ setTextTransformWithInheritedCommit }
+						// @ts-expect-error TextTransformControl takes no `showNone` or `isBlock`.
 						showNone
 						isBlock
 					/>
@@ -1296,7 +1347,8 @@ export default function TypographyPanel( {
 					panelId={ panelId }
 				>
 					<TextShadowPopover
-						textShadow={ textShadow }
+						// Text shadows are preset references or CSS values.
+						textShadow={ textShadow as string | undefined }
 						onChange={ setTextShadow }
 					/>
 				</InheritanceToolsPanelItem>
