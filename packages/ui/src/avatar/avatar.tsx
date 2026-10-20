@@ -83,7 +83,7 @@ export const Avatar = forwardRef< HTMLSpanElement, AvatarProps >(
 					>
 						{ initials.join( '' ) }
 					</FallbackWithLoadingDelay>
-					{ src && (
+					{ ( src || imageProps?.srcSet || imageProps?.render ) && (
 						<_Avatar.Image
 							{ ...imageProps }
 							src={ src }
