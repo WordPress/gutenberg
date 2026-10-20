@@ -8,6 +8,7 @@
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
 -   `DataViews.BulkActionToolbar` now renders nothing; built-in table and grid layouts include bulk actions automatically ([#82730](https://github.com/WordPress/gutenberg/pull/82730)).
+-   Remove `single` from the values of the `context` of an action, which no screen supported ([#85186](https://github.com/WordPress/gutenberg/pull/85186)).
 
 ### Enhancements
 
