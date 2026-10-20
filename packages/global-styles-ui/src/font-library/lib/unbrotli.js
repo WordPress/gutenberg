@@ -28,7 +28,20 @@
  * SOFTWARE.
  */
 
-export default ( function () {
+/*
+ * The decoder is set up on first use: setting it up decompresses the Brotli
+ * dictionary, which is too costly to do while the editor loads.
+ */
+let brotliDecompressBuffer;
+
+export default function unbrotli( ...args ) {
+	if ( ! brotliDecompressBuffer ) {
+		brotliDecompressBuffer = createBrotliDecompressBuffer();
+	}
+	return brotliDecompressBuffer( ...args );
+}
+
+function createBrotliDecompressBuffer() {
 	var define, module, exports;
 	return ( function () {
 		function r( e, n, t ) {
@@ -2682,4 +2695,4 @@ export default ( function () {
 		{},
 		[ 12 ]
 	)( 12 );
-} )();
+}
