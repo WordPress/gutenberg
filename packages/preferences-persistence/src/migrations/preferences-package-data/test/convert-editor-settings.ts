@@ -37,7 +37,9 @@ describe( 'convertEditorSettings', () => {
 		( scope ) => {
 			expect(
 				convertEditorSettings( {
+					// @ts-expect-error The table includes strings, arrays, and null to test invalid editor data.
 					'core/edit-post': scope,
+					// @ts-expect-error The table includes strings, arrays, and null to test invalid editor data.
 					'core/edit-site': scope,
 				} )
 			).toEqual( {} );
@@ -47,6 +49,7 @@ describe( 'convertEditorSettings', () => {
 	it( 'replaces a `core` scope that is not an object', () => {
 		expect(
 			convertEditorSettings( {
+				// @ts-expect-error A string tests replacement of an invalid core scope.
 				core: 'abc',
 				'core/edit-post': { fixedToolbar: true },
 			} )

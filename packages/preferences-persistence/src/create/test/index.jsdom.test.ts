@@ -2,11 +2,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import create from '..';
 
-vi.mock( import( '@wordpress/api-fetch' ), () => ( {
-	default: vi.fn(),
+type Fetch = (
+	...args: Parameters< typeof apiFetch >
+) => ReturnType< typeof apiFetch >;
+
+vi.mock< { default: Fetch } >( import( '@wordpress/api-fetch' ), () => ( {
+	default: vi.fn< Fetch >(),
 } ) );
 
-const mockedApiFetch = vi.mocked( apiFetch );
+const mockedApiFetch = vi.mocked(
+	apiFetch< { meta: { persisted_preferences: unknown } } | void >
+);
 
 describe( 'create', () => {
 	afterEach( () => {
@@ -180,7 +186,10 @@ describe( 'create', () => {
 				},
 			} );
 
-			const { get } = create( { preloadedData: [] } );
+			const { get } = create( {
+				// @ts-expect-error An array tests rejection of invalid preloaded preferences.
+				preloadedData: [],
+			} );
 			expect( await get() ).toEqual( { core: { fixedToolbar: true } } );
 			expect( mockedApiFetch ).toHaveBeenCalled();
 		} );

@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableCreatePersistenceLayer } from '..';
 
-vi.mock( import( '@wordpress/api-fetch' ), () => ( {
+type Fetch = (
+	...args: Parameters< typeof apiFetch >
+) => ReturnType< typeof apiFetch >;
+
+vi.mock< { default: Fetch } >( import( '@wordpress/api-fetch' ), () => ( {
 	default: vi.fn( () => Promise.resolve() ),
 } ) );
 
