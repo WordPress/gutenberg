@@ -73,4 +73,6 @@ Every link is a real anchor: middle-click, copy address, and download survive. A
 
 The divider spans the tile, and the body above keeps no bottom padding, so scrolled content runs flush against it.
 
+The strip has one height, the text line plus its padding, whatever it holds: a compact control sits centered in it, so dividers stay level across tiles and the body keeps its size when an action arrives at runtime.
+
 The widget declares importance; the footer materializes it.
