@@ -12,7 +12,7 @@ import usePatternsPaging from '../hooks/use-patterns-paging';
 import {
 	INSERTER_PATTERN_TYPES,
 	allPatternsCategory,
-	myPatternsCategory,
+	sitePatternsCategory,
 	starterPatternsCategory,
 } from '../block-patterns-tab/utils';
 
@@ -49,7 +49,7 @@ function PatternList( {
 				return true;
 			}
 			if (
-				selectedCategory === myPatternsCategory.name &&
+				selectedCategory === sitePatternsCategory.name &&
 				pattern.type === INSERTER_PATTERN_TYPES.user
 			) {
 				return true;

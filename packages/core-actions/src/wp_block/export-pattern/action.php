@@ -7,6 +7,6 @@
  */
 
 return array(
-	'label'        => __( 'Export as JSON', 'gutenberg' ),
+	'label'        => __( 'Export as JSON' ),
 	'supportsBulk' => true,
 );

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from '@wordpress/element';
@@ -214,6 +214,101 @@ describe( 'MediaCategoryPanel querying', () => {
 		expect( screen.getByTestId( 'media-grid' ) ).toHaveAttribute(
 			'data-loading',
 			'true'
+		);
+	} );
+} );
+
+describe( 'MediaCategoryPanel page sizing', () => {
+	const lastQuery = () => useMediaResults.mock.lastCall[ 1 ];
+
+	const setViewportHeight = ( height ) => {
+		Object.defineProperty( window, 'innerHeight', {
+			value: height,
+			configurable: true,
+			writable: true,
+		} );
+	};
+
+	afterEach( () => {
+		setViewportHeight( 768 );
+	} );
+
+	it( 'asks for the minimum page on a short viewport', () => {
+		setViewportHeight( 700 );
+		renderPanel( baseCategory );
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 8 } )
+		);
+	} );
+
+	it( 'grows a row at a time as the viewport gets taller', () => {
+		setViewportHeight( 1450 );
+		const { unmount } = renderPanel( baseCategory );
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 12 } )
+		);
+		unmount();
+
+		setViewportHeight( 1620 );
+		renderPanel( baseCategory );
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 14 } )
+		);
+	} );
+
+	it( 'holds the smaller page just below a threshold', () => {
+		// 10px short of the 1550 entry.
+		setViewportHeight( 1540 );
+		renderPanel( baseCategory );
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 12 } )
+		);
+	} );
+
+	it( 'tops out on a very tall viewport', () => {
+		setViewportHeight( 3000 );
+		renderPanel( baseCategory );
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 20 } )
+		);
+	} );
+
+	it( 'keeps the page size when the viewport resizes mid-browse', () => {
+		setViewportHeight( 700 );
+		const { rerender } = render(
+			<PanelHarness category={ baseCategory } />
+		);
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 8 } )
+		);
+
+		setViewportHeight( 1620 );
+		rerender( <PanelHarness category={ baseCategory } /> );
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 8 } )
+		);
+	} );
+
+	it( 'takes the page size again when the source changes', () => {
+		setViewportHeight( 700 );
+		const { rerender } = render(
+			<PanelHarness category={ baseCategory } />
+		);
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 8 } )
+		);
+
+		setViewportHeight( 1620 );
+		rerender(
+			<PanelHarness category={ { ...baseCategory, name: 'images' } } />
+		);
+
+		expect( lastQuery() ).toEqual(
+			expect.objectContaining( { per_page: 14 } )
 		);
 	} );
 } );

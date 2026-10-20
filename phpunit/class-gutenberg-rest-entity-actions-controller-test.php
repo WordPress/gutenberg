@@ -150,6 +150,10 @@ class Tests_REST_Entity_Actions_Controller extends WP_Test_REST_TestCase {
 	public function test_the_route_of_a_taxonomy_with_the_same_base_is_kept() {
 		global $wp_rest_server;
 		$this->setExpectedIncorrectUsage( 'Gutenberg_REST_Entity_Actions_Controller_7_2::is_route_of_entity_items' );
+		if ( class_exists( 'WP_REST_Entity_Actions_Controller' ) ) {
+			// The controller of core, registered before this one, reports it too.
+			$this->setExpectedIncorrectUsage( 'WP_REST_Entity_Actions_Controller::is_route_of_entity_items' );
+		}
 		register_taxonomy( 'entity-actions', 'post', array( 'show_in_rest' => true ) );
 
 		try {
