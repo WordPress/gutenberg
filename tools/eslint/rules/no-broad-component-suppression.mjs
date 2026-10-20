@@ -1,4 +1,7 @@
+import { ConfigCommentParser } from '@eslint/plugin-kit';
+
 const RECOMMENDATION_RULE = '@wordpress/use-recommended-components';
+const commentParser = new ConfigCommentParser();
 
 /** @type {import('eslint').Rule.RuleModule} */
 export default {
@@ -16,35 +19,37 @@ export default {
 	},
 	create( context ) {
 		const { sourceCode } = context;
-		/** @type {import('estree').ImportSpecifier[]} */
-		const specifiers = [];
 
 		return {
-			ImportSpecifier( node ) {
-				specifiers.push( node );
-			},
 			'Program:exit'() {
 				for ( const comment of sourceCode.getAllComments() ) {
-					const directive = comment.value.match(
-						/^\s*(eslint-disable(?:-next-line|-line)?)(?:\s|$)([\s\S]*)/
+					const directive = commentParser.parseDirective(
+						comment.value
 					);
-					const rules = directive?.[ 2 ]
-						.split( /\s-{2,}\s/u )[ 0 ]
-						.trim()
-						.split( /[\s,]+/u );
-					if ( ! rules?.includes( RECOMMENDATION_RULE ) ) {
+					if (
+						! directive ||
+						! /^eslint-disable(?:-next-line|-line)?$/u.test(
+							directive.label
+						) ||
+						! commentParser.parseListConfig( directive.value )[
+							RECOMMENDATION_RULE
+						]
+					) {
 						continue;
 					}
 
 					const targetLine = comment.loc.end.line + 1;
-					const specifier = specifiers.find(
-						( node ) =>
-							node.loc.start.line === targetLine &&
-							node.loc.end.line === targetLine
-					);
+					const token = sourceCode.getTokenAfter( comment );
+					const node =
+						token &&
+						sourceCode.getNodeByRangeIndex( token.range[ 0 ] );
+					const specifier =
+						node?.type === 'ImportSpecifier' ? node : node?.parent;
 					if (
-						directive[ 1 ] === 'eslint-disable-next-line' &&
-						specifier
+						directive.label === 'eslint-disable-next-line' &&
+						specifier?.type === 'ImportSpecifier' &&
+						specifier.loc.start.line === targetLine &&
+						specifier.loc.end.line === targetLine
 					) {
 						const before = sourceCode.getTokenBefore( specifier );
 						let after = sourceCode.getTokenAfter( specifier );
