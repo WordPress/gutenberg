@@ -208,7 +208,7 @@ function TileControls( { title }: { title: string } ) {
 }
 
 /**
- * Tiles with their own links, buttons and form controls. Outside edit mode, and for a pinned item (`draggable: false`) in edit mode, the lanes add no drag semantics around the content, so each control keeps its own role and tab stop. Turn on `editMode` to compare the pinned tile with the draggable ones.
+ * Tiles with their own links, buttons and form controls. The a11y addon checks that the lanes do not wrap them in drag semantics. In edit mode, the first tile is pinned (`draggable: false`) and its controls keep their semantics.
  */
 export const InteractiveContent: Story = {
 	args: {
@@ -223,10 +223,10 @@ export const InteractiveContent: Story = {
 				<TileControls title="Pinned" />
 			</Tile>,
 			<Tile key="a" tone="info" height={ 180 }>
-				<TileControls title="Draggable" />
+				<TileControls title="Tile" />
 			</Tile>,
 			<Tile key="b" tone="success" height={ 180 }>
-				<TileControls title="Draggable" />
+				<TileControls title="Tile" />
 			</Tile>,
 		],
 	},
