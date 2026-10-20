@@ -1,16 +1,12 @@
 import { __ } from '@wordpress/i18n';
-import {
-	Button,
-	Composite,
-	Dropdown,
-	SelectControl as WCSelectControl,
-} from '@wordpress/components';
-import { Stack, Text } from '@wordpress/ui';
+import { Button, Composite, Dropdown } from '@wordpress/components';
+import { SelectControl, Stack, Text } from '@wordpress/ui';
 import { useRef, useMemo } from '@wordpress/element';
 import { shadow as textShadowIcon, Icon, check, reset } from '@wordpress/icons';
 import type { TextShadowPreset } from '@wordpress/global-styles-engine';
 import clsx from 'clsx';
 import { useSettings } from '../use-settings';
+import { useToolsPanelItemPopoverProps } from './utils';
 
 type TextShadowValue = string | undefined;
 
@@ -33,6 +29,10 @@ const EMPTY_ARRAY: TextShadowPreset[] = [];
 // Above this number of presets, the list is rendered as a compact dropdown
 // rather than a long list of options.
 const PRESETS_SELECT_THRESHOLD = 7;
+
+// The default is stored as an empty string, but the select treats an empty
+// value as no selection and shows its placeholder.
+const DEFAULT_VALUE = '__default';
 
 /**
  * Extracts the preset slug from a raw text shadow value.
@@ -63,9 +63,7 @@ function getTextShadowPresetSlug( rawValue: TextShadowValue ) {
 
 export function TextShadowPopover( { textShadow, onChange }: TextShadowProps ) {
 	const popoverProps = {
-		placement: 'left-start' as const,
-		offset: 36,
-		shift: true,
+		...useToolsPanelItemPopoverProps(),
 		className: 'block-editor-global-styles__text-shadow-popover',
 	};
 
@@ -125,6 +123,10 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 			label: preset.name,
 		} ) ),
 	];
+	const items = [
+		{ value: DEFAULT_VALUE, label: __( 'Default' ) },
+		...choices,
+	];
 
 	const activeSlug = getTextShadowPresetSlug( textShadow );
 	const activeValue = activeSlug
@@ -150,15 +152,23 @@ function TextShadowControl( { textShadow, onChange }: TextShadowProps ) {
 				{ __( 'Code is poetry' ) }
 			</div>
 			{ presets.length >= PRESETS_SELECT_THRESHOLD ? (
-				<WCSelectControl
+				<SelectControl
 					hideLabelFromVision
 					label={ __( 'Text shadow preset' ) }
-					value={ activeValue }
-					options={ [
-						{ value: '', label: __( 'Default' ) },
-						...choices,
-					] }
-					onChange={ onChange }
+					value={
+						items.find(
+							( item ) =>
+								item.value === ( activeValue || DEFAULT_VALUE )
+						) ?? items[ 0 ]
+					}
+					items={ items }
+					onValueChange={ ( item ) =>
+						onChange(
+							! item?.value || item.value === DEFAULT_VALUE
+								? ''
+								: item.value
+						)
+					}
 				/>
 			) : (
 				<Composite

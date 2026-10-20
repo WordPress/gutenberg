@@ -10,6 +10,7 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import { NoteReactions } from './reactions/note-reactions';
 
 function NoteActionsMenu( { items, buttonRef } ) {
 	return (
@@ -50,6 +51,7 @@ export function Note( {
 	onEditNote,
 	onDeleteNote,
 	onResolve,
+	isThreadResolved = false,
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
@@ -99,7 +101,7 @@ export function Note( {
 			id: 'reopen',
 			title: _x( 'Reopen', 'Reopen note' ),
 			isEligible: ( { status } ) => canResolve && hasResolved( status ),
-			onClick: () => onEditNote( { id: note.id, status: 'hold' } ),
+			onClick: () => onEditNote( note, { status: 'hold' } ),
 		},
 		{
 			id: 'delete',
@@ -130,8 +132,7 @@ export function Note( {
 		body = (
 			<NoteForm
 				onSubmit={ async ( value ) => {
-					const saved = await onEditNote( {
-						id: note.id,
+					const saved = await onEditNote( note, {
 						content: value,
 					} );
 					// Keep the form open on failure so the edit isn't lost.
@@ -207,8 +208,25 @@ export function Note( {
 	) : null;
 
 	return (
-		<NoteCard note={ note } actions={ actions }>
-			{ body }
+		<NoteCard
+			note={ note }
+			actions={ actions }
+			className="editor-collab-sidebar-panel__note"
+		>
+			<div className="editor-collab-sidebar-panel__note-body">
+				{ body }
+				<NoteReactions
+					noteId={ note.id }
+					// Not while editing: the trigger floats over the form's
+					// text field.
+					canReact={
+						isSelected &&
+						actionState !== 'edit' &&
+						! isThreadResolved
+					}
+					disabled={ isThreadResolved }
+				/>
+			</div>
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

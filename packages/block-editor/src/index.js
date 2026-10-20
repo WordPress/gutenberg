@@ -1,5 +1,7 @@
 import './hooks';
 export {
+	getBackgroundClassesAndStyles,
+	useBackgroundProps,
 	getBorderClassesAndStyles as __experimentalGetBorderClassesAndStyles,
 	useBorderProps as __experimentalUseBorderProps,
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,

@@ -95,6 +95,8 @@ When designing props for a new component:
 
 When you change a component's Storybook `parameters.componentStatus.status` or its public export, check the `@wordpress/ui` entry in the [`use-recommended-components`](../eslint-plugin/docs/rules/use-recommended-components.md) ESLint rule. `recommended` components belong in `allowed`, `use-with-caution` components in `caution`, and other statuses in neither.
 
+The Design System MCP catalog uses a curated Storybook manifest. Add `tags: [ 'manifest' ]` to a recommended component's story metadata, and remove the tag from the component it replaces. The tag is independent of `componentStatus`, so update both when changing the recommendation. Update the ESLint rule's replacement guidance and any migration documentation as needed. Run `npm run storybook:build` and `npm run storybook:manifest-snapshot`, then review and commit the generated snapshot and any allowlist reductions. See [Manifest snapshot regression testing](../../storybook/README.md#manifest-snapshot-regression-testing).
+
 ## Compound Components
 
 This package follows the [compound component approach outlined in the `@wordpress/components` contributing guidelines](https://github.com/WordPress/gutenberg/blob/trunk/packages/components/CONTRIBUTING.md#compound-components).
@@ -318,9 +320,9 @@ High-level wrappers that hide `Popup` (for example `IconButton`, which renders a
 
 ### CSS Layers
 
-We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. All component stylesheets must follow this layering approach to maintain consistency and prevent specificity conflicts.
+We use [CSS cascade layers](https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Styling_basics/Cascade_layers) to ensure an expected order of precedence in style resolution. Component stylesheets follow this layering approach to maintain consistency and prevent specificity conflicts. `VisuallyHidden` is an exception: its styles are unlayered so global element styles cannot override its hiding behavior solely through cascade layer precedence.
 
-Every component stylesheet must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
+Layered component stylesheets must include the layer definition in the top-level `wp-ui` layer and wrap all styles within the appropriate layer:
 
 ```css
 @layer wp-ui {

@@ -7,7 +7,6 @@ import type { CropperController } from '../../hooks/use-cropper-reducer';
 import { DEFAULT_STATE } from '../../../core/constants';
 import { getSourceRegion } from '../../../core/source-region';
 // Browser Mode needs the package's real styles for layout and transitions.
-// eslint-disable-next-line @wordpress/no-non-module-stylesheet-imports
 import '../../../style.scss';
 
 const GRID_TEST_ID = 'cropper-grid';

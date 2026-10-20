@@ -5,13 +5,21 @@ import NoteIconToolbarSlotFill from '../../components/collab/note-icon-toolbar-s
 export function BlockSettingsMenu( { clientIds, ...props } ) {
 	return (
 		<ToolbarGroup>
-			<NoteIconToolbarSlotFill.Slot />
+			<NoteIconToolbarSlotFill.Slot fillProps={ { clientIds } } />
 
 			<ToolbarItem>
 				{ ( toggleProps ) => (
 					<BlockSettingsDropdown
 						clientIds={ clientIds }
-						toggleProps={ toggleProps }
+						toggleProps={
+							clientIds.length
+								? toggleProps
+								: {
+										...toggleProps,
+										disabled: true,
+										accessibleWhenDisabled: true,
+									}
+						}
 						{ ...props }
 					/>
 				) }

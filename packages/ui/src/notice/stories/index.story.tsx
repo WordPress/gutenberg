@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { unseen } from '@wordpress/icons';
+import { tip, unseen } from '@wordpress/icons';
 import * as Notice from '../index';
 
 const meta: Meta< typeof Notice.Root > = {
@@ -19,7 +19,7 @@ const meta: Meta< typeof Notice.Root > = {
 		docs: {
 			description: {
 				component:
-					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`.',
+					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`. See [Notice with disclosed details](?path=/docs/design-system-components-notice-disclosure--docs) for a composition with native details and a copy button.',
 			},
 		},
 		componentStatus: {
@@ -169,6 +169,22 @@ export const CustomIcon: Story = {
 		children: [
 			<Notice.Description key="description">
 				Parent block is hidden on Desktop
+			</Notice.Description>,
+		],
+	},
+};
+
+/**
+ * Use an info notice with the tip icon for contextual guidance.
+ */
+export const Tip: Story = {
+	args: {
+		intent: 'info',
+		icon: tip,
+		children: [
+			<Notice.Description key="description">
+				While writing, you can press <kbd>/</kbd> to quickly insert new
+				blocks.
 			</Notice.Description>,
 		],
 	},

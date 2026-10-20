@@ -3,7 +3,7 @@ import Tip from '..';
 
 const meta: Meta< typeof Tip > = {
 	component: Tip,
-	title: 'Components/@wordpress-components/Feedback/Tip',
+	title: 'Components/@wordpress-components/Deprecated/Tip',
 	id: 'components-tip',
 	argTypes: {
 		children: { control: { type: 'text' } },
@@ -14,8 +14,9 @@ const meta: Meta< typeof Tip > = {
 		},
 		docs: { canvas: { sourceState: 'shown' } },
 		componentStatus: {
-			status: 'unaudited',
+			status: 'not-recommended',
 			whereUsed: 'global',
+			notes: 'Deprecated. Use [`Notice`](?path=/docs/design-system-components-notice--docs) from `@wordpress/ui` instead. See the [migration guide](?path=/docs/components-tip--migration-guide).',
 		},
 	},
 };
