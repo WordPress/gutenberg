@@ -218,6 +218,41 @@ export const Columns: Story = {
 };
 
 /**
+ * `columns` as a map: one lane from 0px, two from 600px, four from
+ * 960px. The count steps at those container widths regardless of how
+ * wide each lane ends up; add `minColumnWidth` to lower it further.
+ */
+export const ColumnSteps: Story = {
+	parameters: {
+		// FIXME: Resize handles are nameless aria commands; edit mode nests interactive controls (aria-command-name, nested-interactive).
+		// See: https://github.com/WordPress/gutenberg/issues/81596
+		a11y: { test: 'todo' },
+	},
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		columns: { 0: 1, 600: 2, 960: 4 },
+		layout: [
+			{ key: 'a' },
+			{ key: 'b' },
+			{ key: 'c' },
+			{ key: 'd' },
+			{ key: 'e' },
+			{ key: 'f' },
+		],
+		children: [
+			<Tile key="a" tone="brand" height={ 120 } index={ 1 } />,
+			<Tile key="b" tone="info" height={ 200 } index={ 2 } />,
+			<Tile key="c" tone="success" height={ 80 } index={ 3 } />,
+			<Tile key="d" tone="warning" height={ 160 } index={ 4 } />,
+			<Tile key="e" tone="error" height={ 100 } index={ 5 } />,
+			<Tile key="f" tone="neutral" height={ 240 } index={ 6 } />,
+		],
+	},
+};
+
+/**
  * Items with `width: 2` span two lanes. The skyline picks a span
  * position that minimizes the resulting baseline across spanned
  * lanes.

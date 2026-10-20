@@ -329,6 +329,49 @@ export const Columns: Story = {
 };
 
 /**
+ * `columns` as a map: one column from 0px, two from 600px, four from
+ * 960px. The count steps at those container widths regardless of how
+ * wide each column ends up; add `minColumnWidth` to lower it further.
+ */
+export const ColumnSteps: Story = {
+	argTypes: {
+		columns: { control: 'object' },
+	},
+	args: {
+		columns: { 0: 1, 600: 2, 960: 4 },
+		rowHeight: 96,
+		layout: [
+			{ key: 'a', width: 1 },
+			{ key: 'b', width: 'fill' },
+			{ key: 'c', width: 1, height: 2 },
+			{ key: 'd', width: 1 },
+			{ key: 'e', width: 'fill' },
+			{ key: 'f', width: 'full' },
+		],
+		children: [
+			<Tile key="a" tone="brand">
+				1
+			</Tile>,
+			<Tile key="b" tone="info">
+				fill
+			</Tile>,
+			<Tile key="c" tone="success">
+				1 · 2 rows
+			</Tile>,
+			<Tile key="d" tone="warning">
+				1
+			</Tile>,
+			<Tile key="e" tone="error">
+				fill
+			</Tile>,
+			<Tile key="f" tone="neutral">
+				full
+			</Tile>,
+		],
+	},
+};
+
+/**
  * A `width: 'fill'` item expands to cover the remaining columns in
  * its row. Mix it with fixed-width items on either side to build
  * sidebar-like layouts that adapt to the column count.
