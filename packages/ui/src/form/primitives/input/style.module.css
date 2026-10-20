@@ -42,7 +42,7 @@
 			}
 
 			&.monospace {
-				font-family: var(--wpds-typography-font-family-mono);
+				--_gcd-input-font-family: var(--wpds-typography-font-family-mono);
 			}
 
 			&[type="email"],
