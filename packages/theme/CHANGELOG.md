@@ -11,6 +11,10 @@
 -   Add `tokens` and `groups` named exports to `design-tokens.js`, exposing descriptions, types, the full group hierarchy, default DTCG and CSS values, and build-plugin fallback expressions for every semantic token while retaining the default token-name list ([#76604](https://github.com/WordPress/gutenberg/pull/76604)).
 -   Export the `$description` of token groups on their `groups` nodes in `design-tokens.js`, and add descriptions for the dimension and border width groups ([#84373](https://github.com/WordPress/gutenberg/pull/84373)).
 
+### Enhancements
+
+-   `ThemeProvider` uses the prebuilt ramps of the default seed colors instead of building them, so a provider seeded with the default colors (such as the default admin color scheme) builds no ramp at all.
+
 ### Internal
 
 -   Update `@testing-library/user-event` to 14.6.8 for Theme tests ([#85068](https://github.com/WordPress/gutenberg/pull/85068)).
