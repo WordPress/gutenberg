@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useShortcutEventMatch`: Accept React keyboard events ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
+
 ## 6.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -11,7 +15,6 @@
 ### Bug Fixes
 
 -   Type the key combination `modifier` as optional, as shortcuts can be registered without one ([#84902](https://github.com/WordPress/gutenberg/pull/84902)).
--   `useShortcutEventMatch`: Accept React keyboard events ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
 
 ## 5.57.0 (2026-10-07)
 

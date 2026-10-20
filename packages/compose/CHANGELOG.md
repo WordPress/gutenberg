@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `useFixedWindowList`: Accept a ref whose element is not set yet ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
+
 ## 9.0.0 (2026-10-20)
 
 ### Breaking Changes
@@ -15,7 +19,6 @@
 ### Bug Fixes
 
 -   `useConstrainedTabbing`: Retain focus when the constrained area has no tabbable elements ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
--   `useFixedWindowList`: Accept a ref whose element is not set yet ([#85027](https://github.com/WordPress/gutenberg/pull/85027)).
 
 ### Internal
 
