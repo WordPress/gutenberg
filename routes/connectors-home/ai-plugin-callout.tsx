@@ -10,7 +10,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { addQueryArgs } from '@wordpress/url';
-import { Link } from '@wordpress/ui';
+import { Card, Link, Stack, Text } from '@wordpress/ui';
 import { getConnectorData } from './default-connectors';
 import { WpLogoDecoration } from './wp-logo-decoration';
 import type { PluginStatus } from './use-connector-plugin';
@@ -242,40 +242,51 @@ export function AiPluginCallout() {
 	};
 
 	return (
-		<div className="ai-plugin-callout">
-			<div className="ai-plugin-callout__content">
-				<p>
-					{ createInterpolateElement( getMessage(), {
-						strong: <strong />,
-						a: <Link href={ AI_PLUGIN_URL } openInNewTab />,
-					} ) }
-				</p>
-				{ ! hideButtons &&
-					( showInstallActivate ? (
-						<Button
-							variant="primary"
-							size="compact"
-							isBusy={ isBusy }
-							disabled={ getPrimaryButtonProps().disabled }
-							accessibleWhenDisabled
-							onClick={ getPrimaryButtonProps().onClick }
-						>
-							{ getPrimaryButtonProps().label }
-						</Button>
-					) : (
-						<Button
-							ref={ actionButtonRef }
-							variant="secondary"
-							size="compact"
-							href={ addQueryArgs( 'options-general.php', {
-								page: AI_PLUGIN_PAGE_SLUG,
+		<Card.Root className="ai-plugin-callout">
+			<Card.Content>
+				<Card.FullBleed className="ai-plugin-callout__surface">
+					<Stack direction="column" align="flex-start" gap="md">
+						<Text variant="body-md" render={ <p /> }>
+							{ createInterpolateElement( getMessage(), {
+								strong: <strong />,
+								a: <Link href={ AI_PLUGIN_URL } openInNewTab />,
 							} ) }
-						>
-							{ __( 'Control features in the AI plugin' ) }
-						</Button>
-					) ) }
-			</div>
-			<WpLogoDecoration />
-		</div>
+						</Text>
+						{ ! hideButtons &&
+							( showInstallActivate ? (
+								<Button
+									variant="primary"
+									size="compact"
+									isBusy={ isBusy }
+									disabled={
+										getPrimaryButtonProps().disabled
+									}
+									accessibleWhenDisabled
+									onClick={ getPrimaryButtonProps().onClick }
+								>
+									{ getPrimaryButtonProps().label }
+								</Button>
+							) : (
+								<Button
+									ref={ actionButtonRef }
+									variant="secondary"
+									size="compact"
+									href={ addQueryArgs(
+										'options-general.php',
+										{
+											page: AI_PLUGIN_PAGE_SLUG,
+										}
+									) }
+								>
+									{ __(
+										'Control features in the AI plugin'
+									) }
+								</Button>
+							) ) }
+					</Stack>
+					<WpLogoDecoration />
+				</Card.FullBleed>
+			</Card.Content>
+		</Card.Root>
 	);
 }
