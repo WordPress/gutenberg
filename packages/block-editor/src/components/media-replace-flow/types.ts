@@ -21,7 +21,7 @@ export interface MediaReplaceFlowToggleProps {
  */
 interface MediaReplaceFlowBaseProps {
 	/** The URL of the media. */
-	mediaURL: string;
+	mediaURL?: string;
 	/** The Id of the attachment post type for the current media. */
 	mediaId?: number;
 	/** The Ids of the attachments of a gallery. */
@@ -29,7 +29,7 @@ interface MediaReplaceFlowBaseProps {
 	/** A list of media types allowed to replace the current media. */
 	allowedTypes: string[];
 	/** Comma delimited list of MIME types accepted for upload. */
-	accept: string;
+	accept?: string;
 	/**
 	 * Callback called when an upload error happens and receives an error
 	 * message as an argument.
