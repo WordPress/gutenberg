@@ -49,6 +49,26 @@
 			color: var(--wpds-color-foreground-interactive-brand-strong-active);
 		}
 	}
+
+	// In a list with items, the appender is shown only while a top-level item
+	// is selected, as on the canvas, or while it has focus itself. It keeps
+	// its row in the tree grid, so keyboard users reach it as before. An
+	// empty list has nothing to select, so its appender stays shown.
+	.block-editor-list-view-tree:has(.block-editor-list-view-leaf) {
+		.list-view-appender .block-editor-inserter__toggle {
+			opacity: 0;
+
+			&:focus {
+				opacity: 1;
+			}
+		}
+
+		&:has(.block-editor-list-view-leaf.is-selected[aria-level="1"]) {
+			.list-view-appender .block-editor-inserter__toggle {
+				opacity: 1;
+			}
+		}
+	}
 }
 
 .edit-site-sidebar-navigation-screen-navigation-menus__empty-message {

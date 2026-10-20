@@ -148,6 +148,45 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		} );
 	} );
 
+	test( 'shows the appender while a top-level item is selected or it has focus', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		const existingItem = listView.getByRole( 'link', {
+			name: 'Existing Item',
+		} );
+		await expect( existingItem ).toBeVisible();
+
+		// Hidden while nothing is selected.
+		await expect( appender ).toHaveCSS( 'opacity', '0' );
+
+		// Keyboard focus on the appender itself reveals it.
+		await appender.focus();
+		await expect( appender ).toHaveCSS( 'opacity', '1' );
+
+		// Moving focus to a row without selecting it hides it again.
+		await page.keyboard.press( 'ArrowUp' );
+		await expect( existingItem ).toBeFocused();
+		await expect( appender ).toHaveCSS( 'opacity', '0' );
+
+		// Selecting a top-level item shows it.
+		await existingItem.click();
+		await expect( appender ).toHaveCSS( 'opacity', '1' );
+	} );
+
 	test( 'does not select blocks in the canvas preview when editing from the sidebar', async ( {
 		admin,
 		page,
@@ -337,9 +376,10 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		await expect(
 			page.getByText( 'This Navigation Menu is empty.' )
 		).toBeVisible();
-		await expect(
-			listView.getByRole( 'button', { name: 'Add page' } )
-		).toBeVisible();
+		const appender = listView.getByRole( 'button', { name: 'Add page' } );
+		await expect( appender ).toBeVisible();
+		// An empty menu has nothing to select, so its appender stays shown.
+		await expect( appender ).toHaveCSS( 'opacity', '1' );
 	} );
 
 	test( 'can add the first item to an empty menu', async ( {
