@@ -265,10 +265,19 @@ export default function SuggestionAdditionKeyboard() {
 			caret: number
 		) => {
 			requestInterceptorBypass( clientId );
-			updateBlockAttributes( clientId, { [ attributeKey ]: value } );
-			selectionChange( clientId, attributeKey, caret, caret );
+			// One store change, not two: every block-editor listener walks
+			// the document, and the entity sync records each change.
+			registry.batch( () => {
+				updateBlockAttributes( clientId, { [ attributeKey ]: value } );
+				selectionChange( clientId, attributeKey, caret, caret );
+			} );
 		},
-		[ requestInterceptorBypass, updateBlockAttributes, selectionChange ]
+		[
+			registry,
+			requestInterceptorBypass,
+			updateBlockAttributes,
+			selectionChange,
+		]
 	);
 
 	/*
