@@ -23,8 +23,9 @@ const EMPTY_ARRAY: [] = [];
 
 // The value of the default template option. The post stores the default
 // template as an empty string, but the select treats an empty value as no
-// selection and shows its placeholder.
-const DEFAULT_TEMPLATE_VALUE = '__default';
+// selection and shows its placeholder. Template slugs can't start with a
+// slash, so this can't clash with a real template.
+const DEFAULT_TEMPLATE_VALUE = '//default';
 
 function toItemValue( template: string | undefined ) {
 	return template || DEFAULT_TEMPLATE_VALUE;
