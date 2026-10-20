@@ -794,6 +794,8 @@ function BlockListBlockProvider( props ) {
 					isMultiSelected &&
 					! __unstableIsFullySelected() &&
 					! __unstableSelectionHasUnmergeableBlock(),
+				// A single block selected as a whole, not its text.
+				isFullySelected: _isSelected && __unstableIsFullySelected(),
 				isDragging: isBlockBeingDragged( clientId ),
 				hasChildSelected: isAncestorOfSelectedBlock,
 				isEditingDisabled: blockEditingMode === 'disabled',
@@ -879,6 +881,7 @@ function BlockListBlockProvider( props ) {
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,
+		isFullySelected,
 		isReusable,
 		isDragging,
 		hasChildSelected,
@@ -917,6 +920,7 @@ function BlockListBlockProvider( props ) {
 		isHighlighted,
 		isMultiSelected,
 		isPartiallySelected,
+		isFullySelected,
 		isReusable,
 		isDragging,
 		hasChildSelected,
