@@ -142,6 +142,49 @@ test.describe( 'Suggestion mode - Viewing intent is read-only', () => {
 			.toBe( false );
 	} );
 
+	test( 'IME composition does not enter text in Viewing mode', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.saveDraft();
+		await switchIntent( page, 'Viewing' );
+
+		const paragraph = editor.canvas
+			.getByRole( 'document', { name: 'Block: Paragraph' } )
+			.first();
+		await paragraph.click();
+
+		/*
+		 * A Japanese IME commits text through composition events, which
+		 * cannot be cancelled, so a `beforeinput` guard that stops plain
+		 * keystrokes does not stop it. Drive the composition through CDP,
+		 * the same way an IME would.
+		 */
+		const cdp = await page.context().newCDPSession( page );
+		await cdp.send( 'Input.imeSetComposition', {
+			text: 'にほん',
+			selectionStart: 3,
+			selectionEnd: 3,
+		} );
+		await cdp.send( 'Input.insertText', { text: '日本' } );
+
+		await expect( paragraph ).toHaveText( 'First paragraph' );
+		await expect( editor.canvas.locator( 'body' ) ).not.toContainText(
+			'日本'
+		);
+
+		const blocks = await editor.getBlocks();
+		expect( blocks ).toHaveLength( 2 );
+		expect( blocks[ 0 ].attributes.content ).toBe( 'First paragraph' );
+		await expect
+			.poll( () =>
+				page.evaluate( () =>
+					window.wp.data.select( 'core/editor' ).isEditedPostDirty()
+				)
+			)
+			.toBe( false );
+	} );
+
 	test( 'the block inserter is disabled in Viewing mode', async ( {
 		page,
 	} ) => {
