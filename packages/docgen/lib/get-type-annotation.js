@@ -1,10 +1,7 @@
-// See https://babeljs.io/docs/en/babel-types.
-const babelTypes = require( '@babel/types' );
-
 /** @typedef {ReturnType<import('comment-parser').parse>[0]} CommentBlock */
 /** @typedef {CommentBlock['tags'][0]} CommentTag */
-/** @typedef {babelTypes.TSType} TypeAnnotation */
-/** @typedef {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} ExtendedTypeAnnotation */
+/** @typedef {import('@babel/types').TSType} TypeAnnotation */
+/** @typedef {import('@babel/types').TSCallSignatureDeclaration | import('@babel/types').TSFunctionType | import('@babel/types').TSConstructSignatureDeclaration} ExtendedTypeAnnotation */
 /** @typedef {import('@babel/types').Node} ASTNode */
 
 /**
@@ -13,7 +10,7 @@ const babelTypes = require( '@babel/types' );
  */
 function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 	const nonRestParams = typeAnnotation.parameters
-		.filter( ( p ) => babelTypes.isIdentifier( p ) )
+		.filter( ( p ) => p?.type === 'Identifier' )
 		.map(
 			( p ) =>
 				`${ p.name }: ${ getTypeAnnotation(
@@ -24,7 +21,7 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 
 	let params = nonRestParams;
 	const restParam = typeAnnotation.parameters.find(
-		babelTypes.isRestElement
+		( p ) => p?.type === 'RestElement'
 	);
 	if ( restParam ) {
 		const paramName = restParam.argument.name;
@@ -45,13 +42,13 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 }
 
 /**
- * @param {babelTypes.TSTypeLiteral} typeAnnotation
+ * @param {import('@babel/types').TSTypeLiteral} typeAnnotation
  */
 function getTypeLiteralCallSignatureDeclarationTypeAnnotations(
 	typeAnnotation
 ) {
 	const callProperties = typeAnnotation.members
-		.filter( ( m ) => babelTypes.isTSCallSignatureDeclaration( m ) )
+		.filter( ( m ) => m?.type === 'TSCallSignatureDeclaration' )
 		.map( ( callProperty ) => {
 			return getFunctionTypeAnnotation( callProperty, ': ' );
 		} );
@@ -63,11 +60,11 @@ function getTypeLiteralCallSignatureDeclarationTypeAnnotations(
 }
 
 /**
- * @param {babelTypes.TSTypeLiteral} typeAnnotation
+ * @param {import('@babel/types').TSTypeLiteral} typeAnnotation
  */
 function getTypeLiteralIndexSignatureTypeAnnotations( typeAnnotation ) {
 	const indexers = typeAnnotation.members
-		.filter( ( m ) => babelTypes.isTSIndexSignature( m ) )
+		.filter( ( m ) => m?.type === 'TSIndexSignature' )
 		.map( ( indexer ) => {
 			const parameter = indexer.parameters[ 0 ];
 			return `[ ${ parameter.name }: ${ getTypeAnnotation(
@@ -84,11 +81,11 @@ function getTypeLiteralIndexSignatureTypeAnnotations( typeAnnotation ) {
 }
 
 /**
- * @param {babelTypes.TSTypeLiteral} typeAnnotation
+ * @param {import('@babel/types').TSTypeLiteral} typeAnnotation
  */
 function getTypeLiteralPropertyTypeAnnotations( typeAnnotation ) {
 	const properties = typeAnnotation.members
-		.filter( ( m ) => babelTypes.isTSPropertySignature( m ) )
+		.filter( ( m ) => m?.type === 'TSPropertySignature' )
 		.map( ( prop ) => {
 			return `${ prop.key.name }${
 				prop.optional ? '?' : ''
@@ -102,7 +99,7 @@ function getTypeLiteralPropertyTypeAnnotations( typeAnnotation ) {
 }
 
 /**
- * @param {babelTypes.TSTypeLiteral} typeAnnotation
+ * @param {import('@babel/types').TSTypeLiteral} typeAnnotation
  */
 function getTypeLiteralTypeAnnotation( typeAnnotation ) {
 	const callProperties =
@@ -115,21 +112,21 @@ function getTypeLiteralTypeAnnotation( typeAnnotation ) {
 }
 
 /**
- * @param {babelTypes.TSUnionType} typeAnnotation
+ * @param {import('@babel/types').TSUnionType} typeAnnotation
  */
 function getUnionTypeAnnotation( typeAnnotation ) {
 	return typeAnnotation.types.map( getTypeAnnotation ).join( ' | ' );
 }
 
 /**
- * @param {babelTypes.TSIntersectionType} typeAnnotation
+ * @param {import('@babel/types').TSIntersectionType} typeAnnotation
  */
 function getIntersectionTypeAnnotation( typeAnnotation ) {
 	return typeAnnotation.types.map( getTypeAnnotation ).join( ' & ' );
 }
 
 /**
- * @param {babelTypes.TSArrayType} typeAnnotation
+ * @param {import('@babel/types').TSArrayType} typeAnnotation
  * @return {string} The type annotation
  */
 function getArrayTypeAnnotation( typeAnnotation ) {
@@ -137,7 +134,7 @@ function getArrayTypeAnnotation( typeAnnotation ) {
 }
 
 /**
- * @param {babelTypes.TSTupleType} typeAnnotation
+ * @param {import('@babel/types').TSTupleType} typeAnnotation
  */
 function getTupleTypeAnnotation( typeAnnotation ) {
 	const types = typeAnnotation.elementTypes
@@ -150,7 +147,7 @@ function getTupleTypeAnnotation( typeAnnotation ) {
 }
 
 /**
- * @param {babelTypes.TSQualifiedName} qualifiedName
+ * @param {import('@babel/types').TSQualifiedName} qualifiedName
  */
 function unifyQualifiedName( qualifiedName ) {
 	if ( ! qualifiedName.right ) {
@@ -165,7 +162,7 @@ function unifyQualifiedName( qualifiedName ) {
 }
 
 /**
- * @param {babelTypes.TSImportType} typeAnnotation
+ * @param {import('@babel/types').TSImportType} typeAnnotation
  */
 function getImportTypeAnnotation( typeAnnotation ) {
 	// Should this just return the unqualified name (i.e., typeAnnotation.name || typeAnnotation.right.name)?
@@ -176,17 +173,17 @@ function getImportTypeAnnotation( typeAnnotation ) {
 
 /**
  *
- * @param {babelTypes.TSType} objectType
+ * @param {import('@babel/types').TSType} objectType
  */
 function getIndexedAccessTypeAnnotationObjectName( objectType ) {
-	if ( babelTypes.isTSImportType( objectType ) ) {
+	if ( objectType?.type === 'TSImportType' ) {
 		return getImportTypeAnnotation( objectType );
 	}
 	return objectType.typeName.name;
 }
 
 /**
- * @param {babelTypes.TSIndexedAccessType} typeAnnotation
+ * @param {import('@babel/types').TSIndexedAccessType} typeAnnotation
  */
 function getIndexedAccessTypeAnnotation( typeAnnotation ) {
 	const objName = getIndexedAccessTypeAnnotationObjectName(
@@ -198,7 +195,7 @@ function getIndexedAccessTypeAnnotation( typeAnnotation ) {
 
 /**
  *
- * @param {babelTypes.TSLiteralType} typeAnnotation
+ * @param {import('@babel/types').TSLiteralType} typeAnnotation
  */
 function getLiteralTypeAnnotation( typeAnnotation ) {
 	switch ( typeAnnotation.literal.type ) {
@@ -216,7 +213,7 @@ function getLiteralTypeAnnotation( typeAnnotation ) {
 }
 
 /**
- * @param {babelTypes.TSMappedType} typeAnnotation
+ * @param {import('@babel/types').TSMappedType} typeAnnotation
  */
 function getMappedTypeAnnotation( typeAnnotation ) {
 	const typeParam = typeAnnotation.typeParameter.name;
@@ -229,11 +226,11 @@ function getMappedTypeAnnotation( typeAnnotation ) {
 }
 
 /**
- * @param {babelTypes.TSTypeReference} typeAnnotation
+ * @param {import('@babel/types').TSTypeReference} typeAnnotation
  */
 function getTypeReferenceTypeAnnotation( typeAnnotation ) {
 	let typeName;
-	if ( babelTypes.isTSQualifiedName( typeAnnotation.typeName ) ) {
+	if ( typeAnnotation.typeName?.type === 'TSQualifiedName' ) {
 		typeName = unifyQualifiedName( typeAnnotation.typeName );
 	} else {
 		typeName = typeAnnotation.typeName.name;
@@ -396,29 +393,29 @@ function getTypeAnnotation( typeAnnotation ) {
  *                        TODO: Remove the special-casing here once we're able to infer the types from TypeScript itself.
  */
 function unwrapWrappedSelectors( token ) {
-	if ( babelTypes.isTSDeclareFunction( token ) ) {
+	if ( token?.type === 'TSDeclareFunction' ) {
 		return token;
 	}
 
-	if ( babelTypes.isFunctionDeclaration( token ) ) {
+	if ( token?.type === 'FunctionDeclaration' ) {
 		return token;
 	}
 
-	if ( babelTypes.isFunctionExpression( token ) ) {
+	if ( token?.type === 'FunctionExpression' ) {
 		return token;
 	}
 
-	if ( babelTypes.isArrowFunctionExpression( token ) ) {
+	if ( token?.type === 'ArrowFunctionExpression' ) {
 		return token;
 	}
 
-	if ( babelTypes.isTSAsExpression( token ) ) {
+	if ( token?.type === 'TSAsExpression' ) {
 		// ( ( state, queryId ) => state.queries[ queryId ] ) as any;
 		// \------------------------------------------------/ CallExpression.expression
 		return unwrapWrappedSelectors( token.expression );
 	}
 
-	if ( babelTypes.isCallExpression( token ) ) {
+	if ( token?.type === 'CallExpression' ) {
 		// createSelector( ( state, queryId ) => state.queries[ queryId ] );
 		//                 \--------------------------------------------/ CallExpression.arguments[0]
 		if ( token.callee.name === 'createSelector' ) {
@@ -436,19 +433,19 @@ function unwrapWrappedSelectors( token ) {
 
 /**
  * @param {ASTNode} token
- * @return {babelTypes.ArrowFunctionExpression | babelTypes.FunctionDeclaration | babelTypes.FunctionExpression} The function token.
+ * @return {import('@babel/types').ArrowFunctionExpression | import('@babel/types').FunctionDeclaration | import('@babel/types').FunctionExpression} The function token.
  */
 function getFunctionToken( token ) {
 	let resolvedToken = token;
-	if ( babelTypes.isExportDefaultDeclaration( resolvedToken ) ) {
+	if ( resolvedToken?.type === 'ExportDefaultDeclaration' ) {
 		resolvedToken = resolvedToken.declaration;
 	}
 
-	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
+	if ( resolvedToken?.type === 'ExportNamedDeclaration' ) {
 		resolvedToken = resolvedToken.declaration;
 	}
 
-	if ( babelTypes.isVariableDeclaration( resolvedToken ) ) {
+	if ( resolvedToken?.type === 'VariableDeclaration' ) {
 		// Ignore multiple variable declarations.
 		resolvedToken = resolvedToken.declarations[ 0 ].init;
 	}
@@ -459,13 +456,13 @@ function getFunctionToken( token ) {
 function getFunctionNameForError( declarationToken ) {
 	let namedFunctionToken = declarationToken;
 	if (
-		babelTypes.isExportNamedDeclaration( declarationToken ) ||
-		babelTypes.isExportDefaultDeclaration( declarationToken )
+		declarationToken?.type === 'ExportNamedDeclaration' ||
+		declarationToken?.type === 'ExportDefaultDeclaration'
 	) {
 		namedFunctionToken = declarationToken.declaration;
 	}
 
-	if ( babelTypes.isVariableDeclaration( namedFunctionToken ) ) {
+	if ( namedFunctionToken?.type === 'VariableDeclaration' ) {
 		namedFunctionToken = namedFunctionToken.declarations[ 0 ];
 	}
 
@@ -477,13 +474,13 @@ function getArrayTagNamePosition( tag ) {
 }
 
 function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
-	if ( babelTypes.isTSArrayType( paramType ) ) {
-		if ( babelTypes.isTSTypeReference( paramType.elementType ) ) {
+	if ( paramType?.type === 'TSArrayType' ) {
+		if ( paramType.elementType?.type === 'TSTypeReference' ) {
 			// Just get the element type for the array.
 			return paramType.elementType.typeName.name;
 		}
 		return getTypeAnnotation( paramType.elementType.typeAnnotation );
-	} else if ( babelTypes.isTSTupleType( paramType ) ) {
+	} else if ( paramType?.type === 'TSTupleType' ) {
 		return getTypeAnnotation(
 			paramType.elementTypes[ getArrayTagNamePosition( tag ) ]
 		);
@@ -497,7 +494,7 @@ function getQualifiedArrayPatternTypeAnnotation( tag, paramType ) {
 
 function getQualifiedObjectPatternTypeAnnotation( tag, paramType ) {
 	const memberName = tag.name.split( '.' ).slice( -1 )[ 0 ];
-	if ( babelTypes.isTSTypeLiteral( paramType ) ) {
+	if ( paramType?.type === 'TSTypeLiteral' ) {
 		// If it's a type literal we can try to find the member on the type.
 		const member = paramType.members.find(
 			( m ) => m.key.name === memberName
@@ -532,7 +529,7 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 		);
 	}
 
-	if ( babelTypes.isAssignmentPattern( paramToken ) ) {
+	if ( paramToken?.type === 'AssignmentPattern' ) {
 		paramToken = paramToken.left;
 	}
 
@@ -547,16 +544,16 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const isQualifiedName = tag.name.includes( '.' );
 
 	if (
-		babelTypes.isIdentifier( paramToken ) ||
-		babelTypes.isRestElement( paramToken ) ||
-		( ( babelTypes.isArrayPattern( paramToken ) ||
-			babelTypes.isObjectPattern( paramToken ) ) &&
+		paramToken?.type === 'Identifier' ||
+		paramToken?.type === 'RestElement' ||
+		( ( paramToken?.type === 'ArrayPattern' ||
+			paramToken?.type === 'ObjectPattern' ) &&
 			! isQualifiedName )
 	) {
 		return getTypeAnnotation( paramType );
-	} else if ( babelTypes.isArrayPattern( paramToken ) ) {
+	} else if ( paramToken?.type === 'ArrayPattern' ) {
 		return getQualifiedArrayPatternTypeAnnotation( tag, paramType );
-	} else if ( babelTypes.isObjectPattern( paramToken ) ) {
+	} else if ( paramToken?.type === 'ObjectPattern' ) {
 		return getQualifiedObjectPatternTypeAnnotation( tag, paramType );
 	}
 }
@@ -580,16 +577,16 @@ function getReturnTypeAnnotation( declarationToken ) {
  */
 function getVariableTypeAnnotation( declarationToken ) {
 	let resolvedToken = declarationToken;
-	if ( babelTypes.isExportNamedDeclaration( resolvedToken ) ) {
+	if ( resolvedToken?.type === 'ExportNamedDeclaration' ) {
 		resolvedToken = resolvedToken.declaration;
 	}
 
-	if ( babelTypes.isClassDeclaration( resolvedToken ) ) {
+	if ( resolvedToken?.type === 'ClassDeclaration' ) {
 		// Just use the classname if we're exporting a class.
 		return resolvedToken.id.name;
 	}
 
-	if ( babelTypes.isVariableDeclaration( resolvedToken ) ) {
+	if ( resolvedToken?.type === 'VariableDeclaration' ) {
 		resolvedToken = resolvedToken.declarations[ 0 ].id;
 	}
 
