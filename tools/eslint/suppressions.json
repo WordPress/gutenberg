@@ -9,11 +9,6 @@
 			"count": 1
 		}
 	},
-	"packages/api-fetch/src/test/index.jsdom.test.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
 	"packages/block-directory/src/components/block-ratings/index.jsx": {
 		"react/jsx-filename-extension": {
 			"count": 1
@@ -14291,21 +14286,6 @@
 		}
 	},
 	"packages/prettier-config/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/redux-routine/src/test/index.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/redux-routine/src/test/is-action.js": {
-		"gutenberg/use-typescript": {
-			"count": 1
-		}
-	},
-	"packages/redux-routine/src/test/is-generator.js": {
 		"gutenberg/use-typescript": {
 			"count": 1
 		}

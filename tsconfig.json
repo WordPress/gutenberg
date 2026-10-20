@@ -55,6 +55,7 @@
 		{ "path": "packages/priority-queue" },
 		{ "path": "packages/private-apis" },
 		{ "path": "packages/react-inert-value" },
+		{ "path": "packages/redux-routine" },
 		{ "path": "packages/report-flaky-tests" },
 		{ "path": "packages/report-flaky-tests/tsconfig.test.json" },
 		{ "path": "packages/server-side-render" },
