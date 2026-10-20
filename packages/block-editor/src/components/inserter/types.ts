@@ -39,6 +39,17 @@ export type InsertBlocks = (
 ) => void;
 
 /**
+ * Inserts the blocks of a pattern. The menu wraps the pattern name into the
+ * insertion meta.
+ */
+export type InsertPattern = (
+	blocks: Block[],
+	patternName: string,
+	shouldForceFocusBlock?: boolean,
+	rootClientId?: string | null
+) => void;
+
+/**
  * Where the inserter inserts, and what it calls on insertion.
  */
 export interface InserterConfig {
@@ -119,14 +130,14 @@ export interface MobileTabNavigationProps< T extends InserterTabCategory > {
 export interface BlockPatternsTabProps {
 	onSelectCategory: ( category: PatternCategory | undefined ) => void;
 	selectedCategory?: PatternCategory | null;
-	onInsert: InsertBlocks;
+	onInsert: InsertPattern;
 	rootClientId?: string | null;
 	children?: ReactNode;
 }
 
 export interface PatternCategoryPreviewsProps {
 	rootClientId?: string | null;
-	onInsert: InsertBlocks;
+	onInsert: InsertPattern;
 	onHover?: ( pattern: BlockPattern | null ) => void;
 	category: PatternCategory;
 	showTitlesAsTooltip?: boolean;

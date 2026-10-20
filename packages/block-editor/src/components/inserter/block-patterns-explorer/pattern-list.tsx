@@ -32,6 +32,7 @@ function PatternList( {
 		shouldFocusBlock: true,
 	} );
 	const [ patterns, , onClickPattern ] = usePatternsState(
+		// @ts-expect-error Bug: the pattern name is passed unwrapped, as the meta object, which the store ignores.
 		onInsertBlocks,
 		destinationRootClientId,
 		selectedCategory

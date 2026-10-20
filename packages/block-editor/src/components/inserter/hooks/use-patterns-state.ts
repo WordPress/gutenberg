@@ -13,7 +13,7 @@ import {
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
 import type { BlockPattern } from '../../../store/types';
-import type { InsertBlocks, PatternCategory, PatternsState } from '../types';
+import type { InsertPattern, PatternCategory, PatternsState } from '../types';
 
 // Shared so the selector cache survives the inserter closing and reopening.
 const FILTERED_OPTIONS = { [ isFiltered ]: true };
@@ -30,7 +30,7 @@ const UNFILTERED_OPTIONS = { [ isFiltered ]: false };
  * @return Returns the patterns state. (patterns, categories, onSelect handler)
  */
 const usePatternsState = (
-	onInsert: InsertBlocks | undefined,
+	onInsert: InsertPattern | undefined,
 	rootClientId: string | null | undefined,
 	selectedCategory?: string,
 	isQuick?: boolean
@@ -136,7 +136,6 @@ const usePatternsState = (
 					}
 					return clonedBlock;
 				} ),
-				// @ts-expect-error Bug: the pattern name is passed as the meta object, which the store ignores.
 				pattern.name,
 				false,
 				destinationRootClientId
