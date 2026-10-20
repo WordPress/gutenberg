@@ -11,6 +11,7 @@ import useAvailableAlignments, {
 	useAlignmentMenu,
 } from '../components/block-alignment-control/use-available-alignments';
 import { useBlockEditingMode } from '../components/block-editing-mode';
+import { isBlockToolbarRedesign } from '../components/block-toolbar/redesign/utils';
 import type {
 	AlignAttributes,
 	AlignEditProps,
@@ -129,7 +130,13 @@ function BlockEditAlignmentToolbarControlsPure( {
 	 * in a layout offering neither, a control made only of unavailable options
 	 * would sit on the toolbar unable to change anything.
 	 */
-	if ( ! enabled.length || blockEditingMode !== 'default' ) {
+	// With the block toolbar redesign, block alignment lives in the block
+	// options menu.
+	if (
+		! enabled.length ||
+		blockEditingMode !== 'default' ||
+		isBlockToolbarRedesign()
+	) {
 		return null;
 	}
 

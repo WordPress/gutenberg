@@ -195,6 +195,7 @@ function Edit( {
 	return (
 		<>
 			<RichTextToolbarButton
+				group="insert"
 				icon={ icon }
 				title={ title }
 				onClick={ onClick }

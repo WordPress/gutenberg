@@ -222,6 +222,7 @@ function Edit( {
 				} }
 				render={ ( { open }: { open: () => void } ) => (
 					<RichTextToolbarButton
+						group="insert"
 						icon={ inlineImage }
 						title={ isObjectActive ? __( 'Replace image' ) : title }
 						onClick={ open }

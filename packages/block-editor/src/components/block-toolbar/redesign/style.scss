@@ -1,0 +1,165 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+/**
+ * Block toolbar redesign (the `gutenberg-block-toolbar-redesign` experiment).
+ */
+
+.block-editor-block-toolbar-redesign {
+	align-items: stretch;
+
+	// Text buttons: the block name and labelled primary actions.
+	.block-editor-block-toolbar-redesign__name,
+	.block-editor-block-toolbar-redesign__text-button {
+		gap: $grid-unit-05;
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-10;
+		white-space: nowrap;
+		font-weight: 500;
+	}
+
+	.block-editor-block-toolbar-redesign__name {
+		padding-left: $grid-unit-10;
+
+		.block-editor-block-icon {
+			flex-shrink: 0;
+		}
+	}
+
+	.block-editor-block-toolbar-redesign__name-label {
+		max-width: 160px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.block-editor-block-toolbar-redesign__chevron {
+		flex-shrink: 0;
+		fill: currentColor;
+	}
+
+	// Bigger movers: three full-size buttons in a row, instead of two half
+	// height chevrons stacked beside the drag handle.
+	.block-editor-block-toolbar-redesign__movers {
+		.components-button.has-icon {
+			min-width: $block-toolbar-height;
+			justify-content: center;
+		}
+
+		.block-editor-block-toolbar-redesign__drag {
+			cursor: grab;
+		}
+	}
+
+	// An empty group draws no separator. Block controls can have a fill
+	// that renders nothing (the paragraph's RTL control in a left-to-right
+	// language), which leaves an empty slot inside its group.
+	.block-editor-block-toolbar-redesign__primary:empty,
+	.components-toolbar-group:has(> .block-editor-block-toolbar__slot:empty) {
+		display: none;
+	}
+
+	// The separator after the last group is the toolbar's own border.
+	.block-editor-block-toolbar-redesign__end {
+		border-right: 0;
+	}
+}
+
+// The parent selector sits outside the toolbar, to its left, so the toolbar
+// stays put whether or not the block has a parent.
+.block-editor-block-toolbar-redesign__parents {
+	display: flex;
+
+	.block-editor-block-toolbar-redesign__parents-button {
+		gap: 2px;
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-05;
+	}
+}
+
+.block-editor-block-contextual-toolbar.is-redesign:not(.is-fixed) {
+	.block-editor-block-toolbar-redesign__parents {
+		position: absolute;
+		top: -$border-width;
+		right: calc(100% + #{$grid-unit-10});
+		border: $border-width solid $gray-900;
+		border-radius: $radius-small;
+		background-color: $white;
+	}
+}
+
+.block-editor-block-contextual-toolbar.is-redesign.is-fixed {
+	.block-editor-block-toolbar-redesign__parents {
+		border-right: $border-width solid $gray-300;
+	}
+}
+
+// Menus opened from the redesigned toolbar.
+.block-editor-block-toolbar-redesign__menu {
+	min-width: 240px;
+}
+
+.block-editor-block-toolbar-redesign__options {
+	min-width: 280px;
+}
+
+.block-editor-block-toolbar-redesign__search {
+	position: relative;
+	// The menu list is a grid; span all of it, as menu items do.
+	grid-column: 1 / -1;
+	margin: 0 0 $grid-unit-05;
+
+	.block-editor-block-toolbar-redesign__search-icon {
+		position: absolute;
+		top: 50%;
+		left: $grid-unit-10;
+		transform: translateY(-50%);
+		display: flex;
+		pointer-events: none;
+		color: $gray-700;
+	}
+
+	.block-editor-block-toolbar-redesign__search-input {
+		box-sizing: border-box;
+		width: 100%;
+		height: $grid-unit-50;
+		margin: 0;
+		padding: 0 $grid-unit-10 0 $grid-unit-50;
+		border: $border-width solid $gray-600;
+		border-radius: $radius-small;
+		font-size: $default-font-size;
+		background: $white;
+		color: $gray-900;
+
+		&:focus {
+			border-color: var(--wp-admin-theme-color);
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+			outline: 2px solid transparent;
+		}
+
+		// The field's own clear button would sit on top of the icon slot.
+		&::-webkit-search-cancel-button {
+			cursor: var(--wpds-cursor-control);
+		}
+	}
+}
+
+.block-editor-block-toolbar-redesign__parents-indent {
+	display: inline-flex;
+}
+
+// Plugin items (legacy menu items) inside the More menu.
+.block-editor-block-toolbar-redesign__legacy-items {
+	&:empty,
+	> div:empty {
+		display: none;
+	}
+
+	.components-menu-group + .components-menu-group,
+	.components-menu-item__button {
+		margin-top: 0;
+	}
+
+	.components-menu-item__button {
+		width: 100%;
+	}
+}
