@@ -242,13 +242,19 @@ function paintsItsOwnBackground( stateStyles: PanelStyle | undefined ) {
  * Returns a state's clip, or `undefined` when it is not a valid clip value.
  * Mirrors the PHP helpers, which ignore invalid clips.
  *
- * @param {Object} stateStyles State style object.
- * @return {string|undefined} The state's valid clip value.
+ * @param stateStyles State style object.
+ * @return The state's valid clip value.
  */
-function getValidStateClip( stateStyles ) {
+function getValidStateClip(
+	stateStyles: PanelStyle | undefined
+): string | undefined {
 	const stateClip = stateStyles?.background?.backgroundClip;
-	return VALID_BACKGROUND_CLIP_VALUES.includes( stateClip )
-		? stateClip
+	// Widened so the lookup takes any raw style value.
+	return (
+		VALID_BACKGROUND_CLIP_VALUES as ReadonlyArray< unknown >
+	 ).includes( stateClip )
+		? // A listed clip value is a string.
+			( stateClip as string )
 		: undefined;
 }
 
