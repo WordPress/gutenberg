@@ -1,4 +1,4 @@
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { store as annotationsStore } from '@wordpress/annotations';
 
@@ -28,16 +28,48 @@ export function useAnnotateRanges( source: string, ranges: any[] ) {
 	const {
 		__experimentalAddAnnotation: addAnnotation,
 		__experimentalRemoveAnnotationsBySource: removeAnnotationsBySource,
+		__experimentalUpdateAnnotationRange: updateAnnotationRange,
 	} = useDispatch( annotationsStore );
+	// The ranges currently registered under `source`.
+	const appliedRef = useRef< any[] >( [] );
 
 	useEffect( () => {
-		if ( ! ranges?.length ) {
-			return;
-		}
-		// Batched so every annotated block re-renders once per range set,
-		// not once per range.
+		const applied = appliedRef.current;
+		const next = ranges ?? [];
+		/*
+		 * Typing inside a marker only moves its range. Updating that range in
+		 * place is one annotations store change; clearing the source and
+		 * adding everything back is two, and each one re-renders every block
+		 * and re-applies the edited rich text, caret included.
+		 */
+		const isMove =
+			applied.length === next.length &&
+			next.every(
+				( range, index ) =>
+					range.id === applied[ index ].id &&
+					range.clientId === applied[ index ].clientId &&
+					range.attributeKey === applied[ index ].attributeKey
+			);
 		registry.batch( () => {
-			for ( const range of ranges ) {
+			if ( isMove ) {
+				next.forEach( ( range, index ) => {
+					if (
+						range.start !== applied[ index ].start ||
+						range.end !== applied[ index ].end
+					) {
+						updateAnnotationRange(
+							range.id,
+							range.start,
+							range.end
+						);
+					}
+				} );
+				return;
+			}
+			if ( applied.length ) {
+				removeAnnotationsBySource( source );
+			}
+			for ( const range of next ) {
 				addAnnotation( {
 					id: range.id,
 					source,
@@ -47,8 +79,23 @@ export function useAnnotateRanges( source: string, ranges: any[] ) {
 				} );
 			}
 		} );
-		return () => {
-			removeAnnotationsBySource( source );
-		};
-	}, [ registry, source, ranges, addAnnotation, removeAnnotationsBySource ] );
+		appliedRef.current = next;
+	}, [
+		registry,
+		source,
+		ranges,
+		addAnnotation,
+		removeAnnotationsBySource,
+		updateAnnotationRange,
+	] );
+
+	useEffect(
+		() => () => {
+			if ( appliedRef.current.length ) {
+				removeAnnotationsBySource( source );
+				appliedRef.current = [];
+			}
+		},
+		[ source, removeAnnotationsBySource ]
+	);
 }
