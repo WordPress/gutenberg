@@ -25,6 +25,10 @@ const iconReferenceRecords: WidgetModuleRecord[] = [
 	{ ...records[ 0 ], icon: 'core/calendar' },
 ];
 
+const footprintRecords: WidgetModuleRecord[] = [
+	{ ...records[ 0 ], footprint: 'panel' },
+];
+
 const emptyRecords: WidgetModuleRecord[] = [
 	{ name: 'test/empty', widget_module: null },
 ];
@@ -229,6 +233,16 @@ describe( 'useWidgetTypes', () => {
 		expect( attributes[ 0 ].isValid ).toMatchObject( { required: true } );
 		expect( attributes[ 0 ].isValid?.custom ).toBeTypeOf( 'function' );
 		expect( attributes[ 2 ] ).toMatchObject( { label: 'Label' } );
+	} );
+
+	it( 'overlays the record footprint onto the resolved type', async () => {
+		const { result } = renderHook( () =>
+			useWidgetTypes( footprintRecords )
+		);
+
+		await waitFor( () => expect( result.current[ 1 ] ).toBe( false ) );
+
+		expect( result.current[ 0 ][ 0 ].footprint ).toBe( 'panel' );
 	} );
 
 	it( 'drops a record with neither metadata nor render module', async () => {

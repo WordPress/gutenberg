@@ -115,6 +115,7 @@ function recordOverlay( record: WidgetModuleRecord ) {
 		name: record.name as WidgetName,
 		renderModule: record.render_module ?? '',
 		...( record.presentation ? { presentation: record.presentation } : {} ),
+		...( record.footprint ? { footprint: record.footprint } : {} ),
 		...( record.category ? { category: record.category } : {} ),
 		...( record.description ? { description: record.description } : {} ),
 		...( record.help ? { help: record.help } : {} ),

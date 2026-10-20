@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `footprint` on `WidgetTypeMetadata` and `WidgetModuleRecord`: the smallest form a widget's content can take (`glance`, `strip`, `card`, `panel`), which hosts translate into a minimum tile size in their own geometry. Adds the `WidgetFootprint` type ([#XXXXX](https://github.com/WordPress/gutenberg/pull/XXXXX)).
+
 ## 0.10.0 (2026-10-20)
 
 ### Breaking Changes
