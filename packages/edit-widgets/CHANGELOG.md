@@ -2,15 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Use matching strong neutral colors for pressed header controls and semantic header background and divider colors ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+
 ## 7.0.0 (2026-10-20)
 
 ### Breaking Changes
 
 -   Raise the minimum required Node.js version to `>=22.13.0`, for stable `require(esm)` support ([#84313](https://github.com/WordPress/gutenberg/pull/84313)).
-
-### Bug Fixes
-
--   Use matching strong neutral colors for pressed header controls and semantic header background and divider colors ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
 
 ### Internal
 

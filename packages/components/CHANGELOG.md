@@ -7,6 +7,10 @@
 -   `Snackbar`: Use design system focus ring ([#85168](https://github.com/WordPress/gutenberg/pull/85168)).
 -   `BorderControl`: Remove double outline & use design system's focus ring ([#85173](https://github.com/WordPress/gutenberg/pull/85173)).
 
+### Bug Fixes
+
+-   `Button`, `Toolbar`: Use matching strong neutral colors for pressed and disabled controls, including destructive variants. Use semantic toolbar border and focus colors, and inherit toolbar subscript colors ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
+
 ### Internal
 
 -   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
@@ -66,7 +70,6 @@
 -   `Tabs`: Restore the `fit-content` width of horizontal tab lists, which stretched to full width after the SCSS Modules migration ([#84626](https://github.com/WordPress/gutenberg/pull/84626)).
 -   `Snackbar`: Return focus to the previously focused control when dismissing a focused snackbar outside SnackbarList, including portaled snackbars ([#84342](https://github.com/WordPress/gutenberg/pull/84342)).
 -   `Notice`: Tint dismiss controls and their focus rings with the notice status color ([#84571](https://github.com/WordPress/gutenberg/pull/84571)).
--   `Button`, `Toolbar`: Use matching strong neutral colors for pressed and disabled controls, including destructive variants. Use semantic toolbar border and focus colors, and inherit toolbar subscript colors ([#84573](https://github.com/WordPress/gutenberg/pull/84573)).
 -   `InputControl`, `NumberControl`, `UnitControl`: Ignore the drag gesture for touch input, where it has no cursor affordance and is easy to trigger by accident ([#38865](https://github.com/WordPress/gutenberg/issues/38865), [#81519](https://github.com/WordPress/gutenberg/pull/81519)).
 -   `Modal`: Keep focus inside the dialog when `focusOnMount="firstContentElement"` finds no tabbable elements in the content ([#84344](https://github.com/WordPress/gutenberg/pull/84344)).
 -   `navigateRegions`: Only outline the Publish and Save controls when their region has focus ([#84343](https://github.com/WordPress/gutenberg/pull/84343)).
