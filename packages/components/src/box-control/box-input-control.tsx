@@ -74,6 +74,7 @@ export default function BoxInputControl( {
 	values,
 	selectedUnits,
 	setSelectedUnits,
+	units,
 	sides,
 	side,
 	min = 0,
@@ -144,16 +145,18 @@ export default function BoxInputControl( {
 		isValueMixed( values, defaultValuesToModify );
 	const [ parsedQuantity, parsedUnit ] =
 		parseQuantityAndUnitFromRawValue( mergedValue );
-	const computedUnit = hasValues
-		? parsedUnit
-		: selectedUnits[ defaultValuesToModify[ 0 ] ];
+	const resolvedUnit =
+		parsedUnit ?? selectedUnits[ defaultValuesToModify[ 0 ] ];
+	// Fall back to the first allowed unit so slider changes never emit
+	// unitless values, including after a reset clears the selected units.
+	const computedUnit = resolvedUnit ?? units?.[ 0 ]?.value ?? 'px';
 	const generatedId = useInstanceId( BoxInputControl, 'box-control-input' );
 	const inputId = [ generatedId, side ].join( '-' );
 	const isMixedUnit =
 		defaultValuesToModify.length > 1 &&
 		mergedValue === undefined &&
 		defaultValuesToModify.some(
-			( s ) => selectedUnits[ s ] !== computedUnit
+			( s ) => selectedUnits[ s ] !== resolvedUnit
 		);
 	const usedValue =
 		mergedValue === undefined && computedUnit ? computedUnit : mergedValue;
@@ -207,6 +210,7 @@ export default function BoxInputControl( {
 						<UnitControl
 							{ ...props }
 							min={ min }
+							units={ units }
 							className={ clsx(
 								styles[ 'unit-control' ],
 								'component-box-control__unit-control'
@@ -237,13 +241,9 @@ export default function BoxInputControl( {
 							);
 						} }
 						min={ isFinite( min ) ? min : 0 }
-						max={
-							CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
-								?.max ?? 10
-						}
+						max={ CUSTOM_VALUE_SETTINGS[ computedUnit ]?.max ?? 10 }
 						step={
-							CUSTOM_VALUE_SETTINGS[ computedUnit ?? 'px' ]
-								?.step ?? 0.1
+							CUSTOM_VALUE_SETTINGS[ computedUnit ]?.step ?? 0.1
 						}
 						value={ parsedQuantity ?? 0 }
 						withInputField={ false }

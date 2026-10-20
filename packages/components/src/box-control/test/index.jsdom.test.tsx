@@ -471,6 +471,53 @@ describe( 'BoxControl', () => {
 				expect( control ).toHaveValue( expected );
 			} );
 		} );
+
+		it( 'should fall back to the first allowed unit when using the slider without a value', () => {
+			const onChangeSpy = vi.fn();
+
+			render(
+				<UncontrolledBoxControl
+					onChange={ onChangeSpy }
+					units={ [ { value: 'em', label: 'em' } ] }
+				/>
+			);
+
+			fireEvent.change( screen.getByRole( 'slider' ), {
+				target: { value: 2 },
+			} );
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
+				top: '2em',
+				right: '2em',
+				bottom: '2em',
+				left: '2em',
+			} );
+		} );
+
+		it( 'should keep a unit when using the slider after a reset', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = vi.fn();
+
+			render( <UncontrolledBoxControl onChange={ onChangeSpy } /> );
+
+			await user.type(
+				screen.getByRole( 'textbox', { name: 'All sides' } ),
+				'10'
+			);
+			await user.keyboard( '{Enter}' );
+			await user.click( screen.getByRole( 'button', { name: 'Reset' } ) );
+
+			fireEvent.change( screen.getByRole( 'slider' ), {
+				target: { value: 50 },
+			} );
+
+			expect( onChangeSpy ).toHaveBeenLastCalledWith( {
+				top: '50px',
+				right: '50px',
+				bottom: '50px',
+				left: '50px',
+			} );
+		} );
 	} );
 
 	describe( 'onChange updates', () => {
