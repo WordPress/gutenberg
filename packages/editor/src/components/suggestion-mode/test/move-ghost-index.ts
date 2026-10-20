@@ -49,7 +49,7 @@ describe( 'buildMoveGhostIndex', () => {
 		expect( after.size ).toBe( 0 );
 	} );
 
-	it( 'falls back to "before" when the anchor block no longer exists', () => {
+	it( 'places the ghost by its old index when the anchor block no longer exists', () => {
 		const moved = [
 			{
 				clientId: 'm1',
@@ -64,8 +64,32 @@ describe( 'buildMoveGhostIndex', () => {
 			moved,
 			resolvers( [], { '': [ 'top1', 'm1' ] } )
 		);
-		expect( before.get( 'top1' ) ).toEqual( [ moved[ 0 ] ] );
-		expect( after.size ).toBe( 0 );
+		// Index 2 is past the one surviving sibling, so the ghost trails it.
+		expect( after.get( 'top1' ) ).toEqual( [ moved[ 0 ] ] );
+		expect( before.size ).toBe( 0 );
+	} );
+
+	it( 'places the ghost by its old index when the recorded ids are stale after a reload', () => {
+		// [ a, b, m1, c ] with m1 moved to the end, read back after a reload:
+		// parsing regenerated every client id, so the anchor matches nothing.
+		const moved = [
+			{
+				clientId: 'm1',
+				name: 'core/paragraph',
+				authorId: null,
+				fromAnchorClientId: 'previous-session-b',
+				fromParentClientId: '',
+				fromIndex: 2,
+			},
+		];
+		const { after, before } = buildMoveGhostIndex(
+			moved,
+			resolvers( [ 'a', 'b', 'c', 'm1' ], {
+				'': [ 'a', 'b', 'c', 'm1' ],
+			} )
+		);
+		expect( after.get( 'b' ) ).toEqual( [ moved[ 0 ] ] );
+		expect( before.size ).toBe( 0 );
 	} );
 
 	it( 'groups multiple moves sharing an anchor in fromIndex order', () => {
@@ -95,8 +119,7 @@ describe( 'buildMoveGhostIndex', () => {
 	it( 'skips a previous-sibling anchor that is itself pending-moved', () => {
 		// `b` was `c`'s previous sibling, but `b` is also moving away. Using
 		// `b` as the anchor would render `c`'s ghost wherever `b` lands, not
-		// at `c`'s original spot, so `c` falls back to the first surviving
-		// sibling instead.
+		// at `c`'s original spot, so `c` falls back to its old index.
 		const movedB = {
 			clientId: 'b',
 			name: 'core/paragraph',
@@ -119,10 +142,11 @@ describe( 'buildMoveGhostIndex', () => {
 			resolvers( [ 'a', 'b' ], { '': [ 'a', 'd' ] } )
 		);
 		// `b` anchors to the surviving `a`; `c` cannot anchor to the moved
-		// `b`, so it falls back to the first surviving sibling `a`.
-		expect( after.get( 'a' ) ).toEqual( [ movedB ] );
+		// `b`, so its old index places it after `a` too: `b` also left the
+		// slots before it, leaving `a` as the only survivor ahead of `c`.
+		expect( after.get( 'a' ) ).toEqual( [ movedB, movedC ] );
 		expect( after.has( 'b' ) ).toBe( false );
-		expect( before.get( 'a' ) ).toEqual( [ movedC ] );
+		expect( before.size ).toBe( 0 );
 	} );
 
 	it( 'excludes pending-moved blocks from the first-sibling fallback', () => {
