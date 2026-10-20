@@ -395,7 +395,11 @@ async function runPerformanceTests( branches, options ) {
 		.filter( Boolean );
 	const availableSuites = getFilesFromDir(
 		path.join( testRunnerDir, 'test/performance/specs' )
-	).map( ( file ) => path.basename( file, '.spec.js' ) );
+	)
+		.filter( ( file ) => /\.spec\.[jt]s$/.test( file ) )
+		.map( ( file ) =>
+			path.basename( file ).replace( /\.spec\.[jt]s$/, '' )
+		);
 	const unknownSuites = requestedSuites.filter(
 		( suite ) => ! availableSuites.includes( suite )
 	);

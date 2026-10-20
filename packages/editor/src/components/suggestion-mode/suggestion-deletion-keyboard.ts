@@ -581,12 +581,19 @@ export default function SuggestionDeletionKeyboard() {
 				return;
 			}
 			requestInterceptorBypass( clientId );
-			updateBlockAttributes( clientId, { [ attributeKey ]: wrapped } );
-			if ( caret !== undefined ) {
-				selectionChange( clientId, attributeKey, caret, caret );
-			}
+			// One store change for the write and the caret, as in the
+			// addition keyboard.
+			registry.batch( () => {
+				updateBlockAttributes( clientId, {
+					[ attributeKey ]: wrapped,
+				} );
+				if ( caret !== undefined ) {
+					selectionChange( clientId, attributeKey, caret, caret );
+				}
+			} );
 		},
 		[
+			registry,
 			getBlockAttributes,
 			updateBlockAttributes,
 			selectionChange,
@@ -609,16 +616,19 @@ export default function SuggestionDeletionKeyboard() {
 			resetRun();
 			const value = getBlockAttributes( clientId )?.[ attributeKey ];
 			requestInterceptorBypass( clientId );
-			updateBlockAttributes( clientId, {
-				[ attributeKey ]: removeInlineAdditionRange(
-					value,
-					start,
-					end
-				),
+			registry.batch( () => {
+				updateBlockAttributes( clientId, {
+					[ attributeKey ]: removeInlineAdditionRange(
+						value,
+						start,
+						end
+					),
+				} );
+				selectionChange( clientId, attributeKey, start, start );
 			} );
-			selectionChange( clientId, attributeKey, start, start );
 		},
 		[
+			registry,
 			getBlockAttributes,
 			updateBlockAttributes,
 			selectionChange,
@@ -704,8 +714,12 @@ export default function SuggestionDeletionKeyboard() {
 			}
 			resetRun();
 			requestInterceptorBypass( clientId );
-			updateBlockAttributes( clientId, { [ attributeKey ]: plan.value } );
-			selectionChange( clientId, attributeKey, start, start );
+			registry.batch( () => {
+				updateBlockAttributes( clientId, {
+					[ attributeKey ]: plan.value,
+				} );
+				selectionChange( clientId, attributeKey, start, start );
+			} );
 			if ( plan.deletion ) {
 				deleteSelection( {
 					clientId,
@@ -716,6 +730,7 @@ export default function SuggestionDeletionKeyboard() {
 			return true;
 		},
 		[
+			registry,
 			getBlockAttributes,
 			updateBlockAttributes,
 			selectionChange,

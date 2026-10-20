@@ -88,6 +88,38 @@ export function describeAnchor( note: any ): SuggestionAnchor | null {
 	return { kind: 'structural', pendingType: PENDING_ATTRIBUTES };
 }
 
+/*
+ * Marker ids per rich-text value. Values are immutable and an edit replaces
+ * only the edited block's, so a rebuild after a keystroke scans one block's
+ * formats rather than every character in the document.
+ */
+const markerIdsByValue = new WeakMap< RichTextData, string[] >();
+
+function richTextMarkerIds( value: RichTextData ): string[] {
+	let ids = markerIdsByValue.get( value );
+	if ( ids ) {
+		return ids;
+	}
+	const found = new Set< string >();
+	// Read marker ids off the parsed formats; serializing every block's
+	// content on every store update was the cost here. `RichTextData` types
+	// its `formats` as `never[]`.
+	const formats: RichTextValue[ 'formats' ] = value.formats;
+	for ( const stack of formats ) {
+		for ( const format of stack ?? [] ) {
+			const id =
+				isSuggestionFormat( format ) &&
+				format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
+			if ( id ) {
+				found.add( String( id ) );
+			}
+		}
+	}
+	ids = [ ...found ];
+	markerIdsByValue.set( value, ids );
+	return ids;
+}
+
 /**
  * The anchors present in the editor, indexed in one pass over the blocks.
  *
@@ -136,20 +168,7 @@ export function buildAnchorIndex(
 				ids.add( String( id ) );
 			};
 			if ( value instanceof RichTextData ) {
-				// Read marker ids off the parsed formats; serializing every
-				// block's content on every store update was the cost here.
-				// `RichTextData` types its `formats` as `never[]`.
-				const formats: RichTextValue[ 'formats' ] = value.formats;
-				for ( const stack of formats ) {
-					for ( const format of stack ?? [] ) {
-						const id =
-							isSuggestionFormat( format ) &&
-							format.attributes?.[ SUGGESTION_ID_ATTRIBUTE ];
-						if ( id ) {
-							addId( id );
-						}
-					}
-				}
+				richTextMarkerIds( value ).forEach( addId );
 			} else if (
 				typeof value === 'string' &&
 				value.includes( SUGGESTION_CLASS_PROBE )

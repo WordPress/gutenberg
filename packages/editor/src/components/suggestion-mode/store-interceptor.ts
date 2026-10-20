@@ -959,14 +959,14 @@ function detectMovedBlocks(
 					( tree.indexByClientId.get( a ) ?? 0 ) -
 					( tree.indexByClientId.get( b ) ?? 0 )
 			);
-		const newSiblingOrder =
-			blockEditor.getBlockOrder?.( parent ?? undefined ) ?? [];
-		const newSiblings = candidates
-			.slice()
-			.sort(
-				( a: string, b: string ) =>
-					newSiblingOrder.indexOf( a ) - newSiblingOrder.indexOf( b )
-			);
+		// Every candidate is a live child of `parent`, so the live order
+		// filtered to the candidates is their new order. Sorting by
+		// `indexOf` instead was quadratic in the sibling count, and this
+		// runs on every keystroke.
+		const candidateSet = new Set( candidates );
+		const newSiblings: string[] = (
+			blockEditor.getBlockOrder?.( parent ?? undefined ) ?? []
+		).filter( ( id: string ) => candidateSet.has( id ) );
 		const samePosition =
 			oldSiblings.length === newSiblings.length &&
 			oldSiblings.every( ( id, i ) => id === newSiblings[ i ] );
