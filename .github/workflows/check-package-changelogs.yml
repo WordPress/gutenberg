@@ -154,6 +154,12 @@ jobs:
                   relevant_changes=$(git diff --name-only "$BASE_SHA"...HEAD -- packages/ \
                       | grep -Ev "$ignored" || true)
 
+                  # RUNNER_DEBUG is 1 when the run has debug logging enabled.
+                  if [[ "${RUNNER_DEBUG:-}" == 1 ]]; then
+                      echo "Changed files under packages/ that count toward a CHANGELOG entry:"
+                      echo "${relevant_changes:-none}"
+                  fi
+
                   changed=()
                   for package in "${packages[@]}"; do
                       if grep -q "^packages/${package}/" <<< "$relevant_changes"; then
@@ -161,7 +167,6 @@ jobs:
                       fi
                   done
 
-                  echo "Packages with relevant changes: ${changed[*]:-none}"
                   echo "packages=$(jq --compact-output --null-input '$ARGS.positional' --args "${changed[@]}")" >> "$GITHUB_OUTPUT"
 
     # Presence: Each package with relevant changes needs a changelog note
