@@ -44,17 +44,20 @@ export const VALIDATION_LEVEL = {
 	MIGRATED_BLOCK: 1,
 
 	/**
-	 * The stored content has the same elements and text as the `save` output,
-	 * but tag attributes differ (e.g. class names generated from attributes
-	 * are missing). Regenerating the block from its attributes only rewrites
-	 * attributes, never structure or text.
+	 * The stored content has the same elements, text and attributes as the
+	 * `save` output, except that the `save` output adds attributes or uses
+	 * different attribute values (e.g. class names generated from attributes
+	 * are missing). Regenerating the block from its attributes only adds to
+	 * the markup; it never drops an element, text, attribute, class name or
+	 * style property.
 	 */
 	RECONSTRUCTED_BLOCK: 2,
 
 	/**
 	 * The stored content differs structurally from the `save` output (e.g.
-	 * wrong tags or malformed markup), but regenerating the block from its
-	 * attributes preserves all of its visible text.
+	 * wrong tags, malformed markup, or attributes that the block does not
+	 * model), but regenerating the block from its attributes preserves all of
+	 * its visible text.
 	 */
 	REGENERATED_BLOCK: 3,
 
@@ -671,8 +674,67 @@ export function isClosedByToken(
 }
 
 /**
- * Token-type-specific equality handlers which only consider the structure of
- * the markup: tag names and text content, but not tag attributes.
+ * Returns true if every meaningful attribute of the actual (stored) tag is
+ * still present on the expected (generated) tag, or false if regenerating the
+ * markup would drop one. Attribute values may differ and the generated tag may
+ * carry additional attributes; for `class` and `style`, every class name and
+ * style property of the stored tag must be kept.
+ *
+ * @param actual   Actual (stored) attribute tuples.
+ * @param expected Expected (generated) attribute tuples.
+ * @param logger   Validation logger object.
+ *
+ * @return Whether all stored attributes are preserved.
+ */
+export function areAttributesPreserved(
+	actual: Array< [ string, string ] >,
+	expected: Array< [ string, string ] >,
+	logger: Logger = createLogger()
+): boolean {
+	const expectedByName = new Map(
+		expected.map( ( [ name, value ] ) => [ name.toLowerCase(), value ] )
+	);
+
+	for ( const [ name, actualValue ] of actual ) {
+		const nameLower = name.toLowerCase();
+		if ( ! expectedByName.has( nameLower ) ) {
+			logger.warning( 'Attribute `%s` would be dropped.', name );
+			return false;
+		}
+
+		const expectedValue = expectedByName.get( nameLower )!;
+		let dropped: string[] = [];
+		if ( nameLower === 'class' ) {
+			const expectedClasses =
+				getTextPiecesSplitOnWhitespace( expectedValue );
+			dropped = getTextPiecesSplitOnWhitespace( actualValue ).filter(
+				( className ) => ! expectedClasses.includes( className )
+			);
+		} else if ( nameLower === 'style' ) {
+			const expectedProperties = getStyleProperties( expectedValue );
+			dropped = Object.keys( getStyleProperties( actualValue ) ).filter(
+				( property ) => ! ( property in expectedProperties )
+			);
+		}
+
+		if ( dropped.length ) {
+			logger.warning(
+				'Attribute `%s` values `%s` would be dropped.',
+				name,
+				dropped.join( ' ' )
+			);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * Token-type-specific equality handlers which consider the structure of the
+ * markup (tag names and text content) and whether the attributes of the
+ * actual markup are preserved, but not whether attributes are added or their
+ * values changed.
  *
  * @see isEqualTokensOfType
  */
@@ -696,7 +758,11 @@ const isEqualTokenStructureOfType: Record<
 			return false;
 		}
 
-		return true;
+		return areAttributesPreserved(
+			getMeaningfulAttributePairs( actual ),
+			getMeaningfulAttributePairs( expected ),
+			logger
+		);
 	},
 	Chars: isEquivalentTextTokens,
 	Comment: isEquivalentTextTokens,
@@ -820,12 +886,14 @@ export function isEquivalentHTML(
 
 /**
  * Returns true if the given HTML strings have an equivalent structure: the
- * same sequence of elements with the same text content, ignoring differences
- * in tag attributes (e.g. missing or additional class names).
+ * same sequence of elements with the same text content, where `expected` may
+ * add attributes to an element or change attribute values (e.g. missing class
+ * names), but never drops an attribute, class name or style property that
+ * `actual` has.
  *
  * Unlike `isEquivalentHTML`, which stops at the first mismatch of any kind, a
- * positive result here guarantees that no element or text differs, so that
- * regenerating `actual` as `expected` only rewrites attributes.
+ * positive result here guarantees that regenerating `actual` as `expected`
+ * only adds to the markup, so nothing the stored markup carried is lost.
  *
  * @param actual   Actual HTML string.
  * @param expected Expected HTML string.

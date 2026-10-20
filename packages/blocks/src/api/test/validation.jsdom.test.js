@@ -822,11 +822,42 @@ describe( 'validation', () => {
 			// structural comparison must keep going and spot the extra element.
 			expect(
 				isEquivalentHTMLStructure(
-					'<p data-foo="bar">Text</p><p>Extra</p>',
-					'<p>Text</p>'
+					'<p>Text</p><p>Extra</p>',
+					'<p class="x">Text</p>'
 				)
 			).toBe( false );
 			expect( console ).toHaveWarned();
+		} );
+
+		it( 'returns false when a stored attribute, class name or style property would be dropped', () => {
+			expect(
+				isEquivalentHTMLStructure(
+					'<p data-track="hero">Text</p>',
+					'<p class="x">Text</p>'
+				)
+			).toBe( false );
+			expect(
+				isEquivalentHTMLStructure(
+					'<p class="has-blue-color custom">Text</p>',
+					'<p class="has-red-color has-text-color custom">Text</p>'
+				)
+			).toBe( false );
+			expect(
+				isEquivalentHTMLStructure(
+					'<a style="background-color:#f00;border-radius:2px">Go</a>',
+					'<a class="wp-element-button" style="border-radius:2px">Go</a>'
+				)
+			).toBe( false );
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'returns true when attribute values change but nothing is dropped', () => {
+			expect(
+				isEquivalentHTMLStructure(
+					'<a style="border-radius:2px" href="https://a.example">Go</a>',
+					'<a style="border-radius:4px" href="https://b.example" target="_blank">Go</a>'
+				)
+			).toBe( true );
 		} );
 
 		it( 'returns false when the generated markup has extra elements', () => {
@@ -1146,7 +1177,42 @@ describe( 'validation', () => {
 			);
 		} );
 
-		it( 'should validate when structure matches but attribute values differ', () => {
+		it( 'should validate when attribute values change without dropping any', () => {
+			registerBlockType( 'core/paragraph', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string' },
+					textColor: { type: 'string' },
+				},
+				save: ( { attributes } ) =>
+					createElement(
+						'p',
+						{
+							className: attributes.textColor
+								? `has-${ attributes.textColor }-color has-text-color`
+								: undefined,
+							'data-color': attributes.textColor,
+						},
+						attributes.content
+					),
+			} );
+
+			// The generated markup keeps every stored class name and
+			// attribute, and only changes the value of `data-color`.
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello World', textColor: 'red' },
+				originalContent:
+					'<p class="has-red-color" data-color="blue">Hello World</p>',
+			} );
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
+			);
+		} );
+
+		it( 'should regenerate rather than reconstruct when a stored class name would be dropped', () => {
 			registerBlockType( 'core/paragraph', {
 				...defaultBlockSettings,
 				attributes: {
@@ -1165,6 +1231,8 @@ describe( 'validation', () => {
 					),
 			} );
 
+			// `has-blue-color` is not part of the generated markup: the text
+			// is preserved, but the block is not a pure reconstruction.
 			const [ isValid, , metadata ] = validateBlock( {
 				name: 'core/paragraph',
 				attributes: { content: 'Hello World', textColor: 'red' },
@@ -1173,7 +1241,29 @@ describe( 'validation', () => {
 
 			expect( isValid ).toBe( true );
 			expect( metadata.validationLevel ).toBe(
-				VALIDATION_LEVEL.RECONSTRUCTED_BLOCK
+				VALIDATION_LEVEL.REGENERATED_BLOCK
+			);
+		} );
+
+		it( 'should regenerate rather than reconstruct when an unmodelled attribute would be dropped', () => {
+			registerBlockType( 'core/paragraph', {
+				...defaultBlockSettings,
+				attributes: {
+					content: { type: 'string' },
+				},
+				save: ( { attributes } ) =>
+					createElement( 'p', null, attributes.content ),
+			} );
+
+			const [ isValid, , metadata ] = validateBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Hello World' },
+				originalContent: '<p style="color:red">Hello World</p>',
+			} );
+
+			expect( isValid ).toBe( true );
+			expect( metadata.validationLevel ).toBe(
+				VALIDATION_LEVEL.REGENERATED_BLOCK
 			);
 		} );
 

@@ -818,7 +818,8 @@ export interface Block<
 	 * Level at which the block passed validation when parsed, as defined by
 	 * `VALIDATION_LEVEL`. Migrated, reconstructed and regenerated blocks
 	 * have their markup regenerated from attributes when saved; invalid
-	 * blocks keep their original markup.
+	 * blocks keep their original markup. Undefined for blocks that were not
+	 * parsed from stored content (e.g. created with `createBlock`).
 	 */
 	validationLevel?: ValidationLevel;
 	/**
