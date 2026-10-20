@@ -22,6 +22,60 @@ async function openRowActions( page, title ) {
 	await row.getByRole( 'button', { name: 'Actions' } ).click();
 }
 
+// Fails every request that would change the given page, so a bulk action on it
+// and another page only partly succeeds.
+async function failChangesToPage( page, id ) {
+	await page.route(
+		( url ) =>
+			( url.searchParams.get( 'rest_route' ) ?? url.pathname ).endsWith(
+				`/wp/v2/pages/${ id }`
+			),
+		async ( route ) => {
+			if ( route.request().method() === 'GET' ) {
+				await route.continue();
+				return;
+			}
+			await route.fulfill( {
+				status: 500,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					code: 'rest_failed',
+					message: 'The request failed.',
+				} ),
+			} );
+		}
+	);
+}
+
+// Creates two pages in the trash: one an action can change, and one whose
+// changes fail.
+async function trashTwoPages( page, requestUtils ) {
+	const changed = await requestUtils.createPage( {
+		title: 'Changed Page',
+		status: 'draft',
+	} );
+	const failing = await requestUtils.createPage( {
+		title: 'Failing Page',
+		status: 'draft',
+	} );
+	for ( const { id } of [ changed, failing ] ) {
+		await requestUtils.rest( {
+			method: 'DELETE',
+			path: `/wp/v2/pages/${ id }`,
+		} );
+	}
+	await failChangesToPage( page, failing.id );
+}
+
+async function selectAllInTrash( page ) {
+	await getTab( page, 'Trash' ).click();
+	const table = page.getByRole( 'table' );
+	await table.getByRole( 'checkbox', { name: 'Select all' } ).click();
+	await expect(
+		table.getByRole( 'checkbox', { name: 'Deselect all' } )
+	).toBeChecked();
+}
+
 test.describe( 'Page List status tab counts', () => {
 	test.skip( ! isSiteEditorV2, 'Only the v2 Pages screen renders tabs.' );
 
@@ -170,5 +224,46 @@ test.describe( 'Page List status tab counts', () => {
 
 		await expectCounts( page, { 'All Pages': 2, Published: 2, Drafts: 0 } );
 		await expect( page.getByRole( 'table' ) ).toBeVisible();
+	} );
+
+	test( 'updates the counts when a bulk restore only partly succeeds', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await trashTwoPages( page, requestUtils );
+		await admin.visitSiteEditor( { postType: 'page' } );
+		await expectCounts( page, { 'All Pages': 2, Drafts: 1, Trash: 2 } );
+
+		await selectAllInTrash( page );
+		await page
+			.locator( '.dataviews-bulk-actions-footer__container' )
+			.getByRole( 'button', { name: 'Restore' } )
+			.click();
+
+		// Restored pages become drafts; the failing page stays in the trash.
+		await expectCounts( page, { 'All Pages': 3, Drafts: 2, Trash: 1 } );
+	} );
+
+	test( 'updates the counts when a bulk permanent delete only partly succeeds', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		await trashTwoPages( page, requestUtils );
+		await admin.visitSiteEditor( { postType: 'page' } );
+		await expectCounts( page, { 'All Pages': 2, Trash: 2 } );
+
+		await selectAllInTrash( page );
+		await page
+			.locator( '.dataviews-bulk-actions-footer__container' )
+			.getByRole( 'button', { name: 'Permanently delete…' } )
+			.click();
+		await page
+			.getByRole( 'dialog' )
+			.getByRole( 'button', { name: 'Delete permanently' } )
+			.click();
+
+		await expectCounts( page, { 'All Pages': 2, Trash: 1 } );
 	} );
 } );
