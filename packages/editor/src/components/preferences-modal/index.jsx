@@ -47,7 +47,7 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 
 function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { showBlockBreadcrumbsOption, showCollaborationOptions } = useSelect(
+	const { showFooterOptions, showCollaborationOptions } = useSelect(
 		( select ) => {
 			const { getEditorSettings, isCollaborationEnabledForCurrentPost } =
 				unlock( select( editorStore ) );
@@ -55,7 +55,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
 			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
 			return {
-				showBlockBreadcrumbsOption:
+				showFooterOptions:
 					! isDistractionFreeEnabled &&
 					isLargeViewport &&
 					isRichEditingEnabled,
@@ -89,14 +89,14 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Always open List View' ) }
 								/>
-								{ showBlockBreadcrumbsOption && (
+								{ showFooterOptions && (
 									<PreferenceToggleControl
 										scope="core"
 										featureName="showBlockBreadcrumbs"
 										help={ __(
-											'Display the block hierarchy trail at the bottom of the editor.'
+											'Display block breadcrumbs, viewport dimensions, and responsive editing status at the bottom of the editor.'
 										) }
-										label={ __( 'Show block breadcrumbs' ) }
+										label={ __( 'Show editor footer' ) }
 									/>
 								) }
 								<PreferenceToggleControl
@@ -370,7 +370,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 				},
 			].filter( Boolean ),
 		[
-			showBlockBreadcrumbsOption,
+			showFooterOptions,
 			showCollaborationOptions,
 			extraSections,
 			setIsInserterOpened,

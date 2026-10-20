@@ -28,7 +28,7 @@ import {
 	ToggleControl,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
-	Spinner,
+	Spinner as WCSpinner,
 	Notice,
 	ToolbarButton,
 	ToolbarGroup,
@@ -36,7 +36,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
 import { page } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, getBlockSupport } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import useNavigationMenu from '../use-navigation-menu';
 import Placeholder from './placeholder';
@@ -238,6 +238,7 @@ function Navigation( {
 	attributes,
 	setAttributes,
 	clientId,
+	name,
 	isSelected,
 	className,
 	backgroundColor,
@@ -590,6 +591,7 @@ function Navigation( {
 			setAttributes( {
 				submenuVisibility: 'always',
 				layout: {
+					...getBlockSupport( name, 'layout' )?.default,
 					...attributes.layout,
 					orientation: 'vertical',
 				},
@@ -599,6 +601,7 @@ function Navigation( {
 	}, [
 		attributes.layout,
 		isWithinOverlay,
+		name,
 		overlayMenu,
 		ref,
 		setAttributes,
@@ -1139,7 +1142,7 @@ function Navigation( {
 					>
 						{ isLoading && ! isHiddenByDefault && (
 							<div className="wp-block-navigation__loading-indicator-container">
-								<Spinner className="wp-block-navigation__loading-indicator" />
+								<WCSpinner className="wp-block-navigation__loading-indicator" />
 							</div>
 						) }
 
