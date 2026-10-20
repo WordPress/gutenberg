@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Internal
+
+-   Restore `change-case` for connected component class-name generation ([#85192](https://github.com/WordPress/gutenberg/pull/85192)).
+
 ## 43.0.0 (2026-10-20)
 
 ### Breaking Changes
