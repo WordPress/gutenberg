@@ -6599,11 +6599,6 @@
 			"count": 1
 		}
 	},
-	"packages/connectors/src/connector-item.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 6
-		}
-	},
 	"packages/core-actions/src/page/set-site-page-modal.tsx": {
 		"@wordpress/use-recommended-components": {
 			"count": 3
@@ -11585,22 +11580,9 @@
 			"count": 1
 		}
 	},
-	"routes/connectors-home/ai-plugin-callout.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
-	"routes/connectors-home/default-connectors.tsx": {
-		"@wordpress/use-recommended-components": {
-			"count": 1
-		}
-	},
 	"routes/connectors-home/stage.tsx": {
 		"@wordpress/no-non-module-stylesheet-imports": {
 			"count": 1
-		},
-		"@wordpress/use-recommended-components": {
-			"count": 3
 		}
 	},
 	"routes/experiments-home/stage.tsx": {

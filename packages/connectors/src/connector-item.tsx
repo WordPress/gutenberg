@@ -1,15 +1,7 @@
-import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
-	__experimentalItem as Item,
-	__experimentalText as WCText,
-	ExternalLink,
-	FlexBlock,
-	Button,
-	TextControl,
-} from '@wordpress/components';
+import { __experimentalItem as Item, Button } from '@wordpress/components';
 import { createInterpolateElement, useId, useState } from '@wordpress/element';
 import { __, sprintf, type TransformedText } from '@wordpress/i18n';
+import { InputControl, Link, Stack, Text } from '@wordpress/ui';
 import type { ReactNode } from 'react';
 import type { ApiKeySource } from './types';
 
@@ -33,28 +25,43 @@ export function ConnectorItem( {
 	const headingId = useId();
 	return (
 		<Item className={ className } role="listitem">
-			<VStack spacing={ 4 } role="group" aria-labelledby={ headingId }>
-				<HStack alignment="center" spacing={ 4 } wrap>
+			<Stack
+				direction="column"
+				gap="lg"
+				role="group"
+				aria-labelledby={ headingId }
+			>
+				<Stack
+					direction="row"
+					align="center"
+					gap="lg"
+					wrap="wrap"
+					className="connector-item__header"
+				>
 					{ logo }
-					<FlexBlock>
-						<VStack spacing={ 0 }>
-							<WCText
-								weight="var(--wpds-typography-font-weight-emphasis)"
-								size={ 15 }
-								id={ headingId }
-								as="h2"
-							>
-								{ name }
-							</WCText>
-							<WCText variant="muted" size={ 12 }>
-								{ description }
-							</WCText>
-						</VStack>
-					</FlexBlock>
+					<Stack
+						direction="column"
+						style={ { flex: '1 1 0%', minWidth: 0 } }
+					>
+						<Text
+							variant="heading-lg"
+							render={ <h2 id={ headingId } /> }
+						>
+							{ name }
+						</Text>
+						<Text
+							variant="body-sm"
+							style={ {
+								color: 'var(--wpds-color-foreground-content-neutral-weak)',
+							} }
+						>
+							{ description }
+						</Text>
+					</Stack>
 					{ actionArea }
-				</HStack>
+				</Stack>
 				{ children }
-			</VStack>
+			</Stack>
 		</Item>
 	);
 }
@@ -92,9 +99,9 @@ function createConnectorHelpLink(
 		sprintf( message, '<a></a>' ) as ConnectorHelpInterpolatedMessage,
 		{
 			a: (
-				<ExternalLink href={ helpUrl }>
+				<Link href={ helpUrl } openInNewTab>
 					{ getHelpLinkLabel( helpUrl, helpLabel ) }
-				</ExternalLink>
+				</Link>
 			),
 		}
 	);
@@ -129,27 +136,11 @@ function useConnectorSettingsSave< TValue >(
 	};
 }
 
-function ConnectorSettingsFrame( {
-	readOnly,
-	children,
-}: {
-	readOnly: boolean;
-	children: ReactNode;
-} ) {
+function ConnectorSettingsFrame( { children }: { children: ReactNode } ) {
 	return (
-		<VStack
-			spacing={ 4 }
-			className="connector-settings"
-			style={
-				readOnly
-					? {
-							'--wp-components-color-background': '#f0f0f0',
-						}
-					: undefined
-			}
-		>
+		<Stack direction="column" gap="lg" className="connector-settings">
 			{ children }
-		</VStack>
+		</Stack>
 	);
 }
 
@@ -172,16 +163,16 @@ function ConnectorSettingsFooter( {
 		}
 
 		return (
-			<HStack justify="flex-start">
+			<Stack direction="row" justify="flex-start">
 				<Button variant="link" isDestructive onClick={ onRemove }>
 					{ __( 'Remove and replace' ) }
 				</Button>
-			</HStack>
+			</Stack>
 		);
 	}
 
 	return (
-		<HStack justify="flex-start">
+		<Stack direction="row" justify="flex-start">
 			<Button
 				__next40pxDefaultSize
 				variant="primary"
@@ -192,7 +183,7 @@ function ConnectorSettingsFooter( {
 			>
 				{ __( 'Save' ) }
 			</Button>
-		</HStack>
+		</Stack>
 	);
 }
 
@@ -243,48 +234,54 @@ export function DefaultConnectorSettings( {
 		__( 'Get your API key at %s' )
 	);
 
-	const isExternallyConfigured =
-		keySource === 'env' || keySource === 'constant';
-
-	const getHelp = () => {
-		if ( isExternallyConfigured ) {
-			if ( keySource === 'env' ) {
-				return __(
+	const getHelp = (): {
+		description?: string;
+		details?: ReactNode;
+	} => {
+		if ( keySource === 'env' ) {
+			return {
+				description: __(
 					'This API key is configured using an environment variable.'
-				);
-			}
-			if ( keySource === 'constant' ) {
-				return __( 'This API key is configured as a constant.' );
-			}
+				),
+			};
+		}
+		if ( keySource === 'constant' ) {
+			return {
+				description: __( 'This API key is configured as a constant.' ),
+			};
 		}
 		if ( readOnly ) {
 			return helpUrl
-				? createConnectorHelpLink(
-						helpUrl,
-						helpLabel,
-						/* translators: %s: Link to provider settings. */
-						__(
-							'Your API key is stored securely. You can manage it at %s'
-						)
-					)
-				: __( 'Your API key is stored securely.' );
+				? {
+						details: createConnectorHelpLink(
+							helpUrl,
+							helpLabel,
+							/* translators: %s: Link to provider settings. */
+							__(
+								'Your API key is stored securely. You can manage it at %s'
+							)
+						),
+					}
+				: { description: __( 'Your API key is stored securely.' ) };
 		}
 		if ( saveError ) {
-			return (
-				<span role="alert" className="connector-settings__error">
-					{ saveError }
-				</span>
-			);
+			return {
+				details: (
+					<span role="alert" className="connector-settings__error">
+						{ saveError }
+					</span>
+				),
+			};
 		}
-		return helpLink;
+		return { details: helpLink };
 	};
 
 	return (
-		<ConnectorSettingsFrame readOnly={ readOnly }>
-			<TextControl
+		<ConnectorSettingsFrame>
+			<InputControl
 				label={ __( 'API Key' ) }
 				value={ apiKey }
-				onChange={ ( value ) => {
+				onValueChange={ ( value ) => {
 					if ( ! readOnly ) {
 						setSaveError( null );
 						setApiKey( value );
@@ -293,7 +290,7 @@ export function DefaultConnectorSettings( {
 				placeholder={ __( 'Enter your API key' ) }
 				disabled={ readOnly || isSaving }
 				autoComplete="off"
-				help={ getHelp() }
+				{ ...getHelp() }
 			/>
 			<ConnectorSettingsFooter
 				readOnly={ readOnly }
@@ -359,34 +356,43 @@ export function ApplicationPasswordConnectorSettings( {
 		__( 'Create an application password at %s' )
 	);
 
-	let applicationPasswordHelp: ReactNode = help;
+	let applicationPasswordHelp: {
+		description?: string;
+		details?: ReactNode;
+	} = { details: help };
 	if ( keySource === 'env' ) {
-		applicationPasswordHelp = __(
-			'These credentials are configured using an environment variable.'
-		);
+		applicationPasswordHelp = {
+			description: __(
+				'These credentials are configured using an environment variable.'
+			),
+		};
 	} else if ( keySource === 'constant' ) {
-		applicationPasswordHelp = __(
-			'These credentials are configured as a constant.'
-		);
+		applicationPasswordHelp = {
+			description: __(
+				'These credentials are configured as a constant.'
+			),
+		};
 	} else if ( readOnly ) {
-		applicationPasswordHelp = __(
-			'Your application password is stored securely.'
-		);
+		applicationPasswordHelp = {
+			description: __( 'Your application password is stored securely.' ),
+		};
 	}
 	if ( saveError ) {
-		applicationPasswordHelp = (
-			<span role="alert" className="connector-settings__error">
-				{ saveError }
-			</span>
-		);
+		applicationPasswordHelp = {
+			details: (
+				<span role="alert" className="connector-settings__error">
+					{ saveError }
+				</span>
+			),
+		};
 	}
 
 	return (
-		<ConnectorSettingsFrame readOnly={ readOnly }>
-			<TextControl
+		<ConnectorSettingsFrame>
+			<InputControl
 				label={ __( 'Username' ) }
 				value={ username }
-				onChange={ ( value ) => {
+				onValueChange={ ( value ) => {
 					if ( ! readOnly ) {
 						setSaveError( null );
 						setUsername( value );
@@ -396,10 +402,10 @@ export function ApplicationPasswordConnectorSettings( {
 				disabled={ readOnly || isSaving }
 				autoComplete="username"
 			/>
-			<TextControl
+			<InputControl
 				label={ __( 'Application password' ) }
 				value={ readOnly ? '••••••••••••••••' : applicationPassword }
-				onChange={ ( value ) => {
+				onValueChange={ ( value ) => {
 					if ( ! readOnly ) {
 						setSaveError( null );
 						setApplicationPassword( value );
@@ -409,7 +415,7 @@ export function ApplicationPasswordConnectorSettings( {
 				placeholder={ __( 'Enter your application password' ) }
 				disabled={ readOnly || isSaving }
 				autoComplete="new-password"
-				help={ applicationPasswordHelp }
+				{ ...applicationPasswordHelp }
 			/>
 			<ConnectorSettingsFooter
 				readOnly={ readOnly }
