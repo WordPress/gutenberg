@@ -146,9 +146,9 @@ class BlockNoteUtils {
 	 * @param {string} content Text of the thread's root note.
 	 */
 	getThread( content ) {
-		return this.#getNotesSurface().getByRole( 'listitem', {
-			name: `Note: ${ content }`,
-		} );
+		return this.#getNotesSurface()
+			.getByRole( 'listitem' )
+			.filter( { hasText: content } );
 	}
 
 	/**

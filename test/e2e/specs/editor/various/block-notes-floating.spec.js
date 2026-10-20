@@ -49,9 +49,9 @@ test.describe( 'Block Notes: floating notes', () => {
 	}
 
 	function getThread( page, content ) {
-		return getFloatingNotes( page ).getByRole( 'listitem', {
-			name: `Note: ${ content }`,
-		} );
+		return getFloatingNotes( page )
+			.getByRole( 'listitem' )
+			.filter( { hasText: content } );
 	}
 
 	// Space reserved for the notes inside the canvas.
@@ -562,10 +562,14 @@ test.describe( 'Block Notes: floating notes', () => {
 
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 
-		const form = getFloatingNotes( page ).getByRole( 'listitem', {
-			name: 'New note',
-			exact: true,
-		} );
+		const form = getFloatingNotes( page )
+			.getByRole( 'listitem' )
+			.filter( {
+				has: page.getByRole( 'textbox', {
+					name: 'New note',
+					exact: true,
+				} ),
+			} );
 		const input = form.getByRole( 'textbox', {
 			name: 'New note',
 			exact: true,
@@ -934,10 +938,14 @@ test.describe( 'Block Notes: floating notes', () => {
 
 			// The selected text carries a draft marker until the note is sent,
 			// so the form anchors to it even once the canvas selection is gone.
-			const form = getFloatingNotes( page ).getByRole( 'listitem', {
-				name: 'New note',
-				exact: true,
-			} );
+			const form = getFloatingNotes( page )
+				.getByRole( 'listitem' )
+				.filter( {
+					has: page.getByRole( 'textbox', {
+						name: 'New note',
+						exact: true,
+					} ),
+				} );
 			const mark = editor.canvas.locator( 'mark.wp-note[data-id="new"]' );
 			await expect( form ).toHaveClass( /is-floating/ );
 			await expectBelow( mark, paragraph );
@@ -995,9 +1003,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			const notes = getFloatingNotes( page );
 
 			// Resolve Note A.
-			const threadA = notes.getByRole( 'listitem', {
-				name: 'Note: Note A',
-			} );
+			const threadA = notes
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'Note A' } );
 			await threadA.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
 			// Resolving removes the note from the floating "Unresolved notes"
@@ -1005,9 +1013,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			await expect( threadA ).toBeHidden();
 
 			// Note B should still be visible and unresolved (expanded).
-			const threadB = notes.getByRole( 'listitem', {
-				name: 'Note: Note B',
-			} );
+			const threadB = notes
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'Note B' } );
 			await expect( threadB ).toBeVisible();
 
 			// Both notes should still exist in metadata.
@@ -1034,9 +1042,9 @@ test.describe( 'Block Notes: floating notes', () => {
 			const notes = getFloatingNotes( page );
 
 			// Resolve the first note.
-			const firstThread = notes.getByRole( 'listitem', {
-				name: 'Note: First note',
-			} );
+			const firstThread = notes
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'First note' } );
 			await firstThread.click();
 			await page.getByRole( 'button', { name: 'Resolve' } ).click();
 			// Resolving removes the note from the floating "Unresolved notes"
@@ -1055,9 +1063,9 @@ test.describe( 'Block Notes: floating notes', () => {
 				.click();
 
 			// The second (unresolved) note should be the active one.
-			const secondThread = notes.getByRole( 'listitem', {
-				name: 'Note: Second note',
-			} );
+			const secondThread = notes
+				.getByRole( 'listitem' )
+				.filter( { hasText: 'Second note' } );
 			await expect( secondThread ).toHaveAttribute(
 				'aria-current',
 				'true'
@@ -1400,10 +1408,14 @@ test.describe( 'Block Notes: floating notes', () => {
 				page.getByRole( 'textbox', { name: 'New note', exact: true } )
 			).toBeFocused();
 			await expect(
-				getFloatingNotes( page ).getByRole( 'listitem', {
-					name: 'New note',
-					exact: true,
-				} )
+				getFloatingNotes( page )
+					.getByRole( 'listitem' )
+					.filter( {
+						has: page.getByRole( 'textbox', {
+							name: 'New note',
+							exact: true,
+						} ),
+					} )
 			).toBeVisible();
 		} );
 	} );

@@ -30,7 +30,7 @@ collab-sidebar/
 │   └── reaction-emojis.ts           the reaction emoji and their storage keys
 │
 ├── hooks.js                        useNoteThreads, useNoteActions, useNoteSelection, usePickNote, useNoteFocus, useFloatingBoard, useEnableFloatingSidebar
-├── utils.js                        focusNoteThread, getNoteExcerpt, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
+├── utils.js                        focusNoteThread, sanitizeNoteContent, calculateNotePositions, getAvatarBorderColor
 ├── board-store.js                  createBoardStore - DOM measurement for the floating layout
 ├── constants.js                    sidebar identifier strings
 ├── style.scss

@@ -8,7 +8,6 @@ import {
 } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
@@ -21,7 +20,6 @@ import { FloatingContainer } from './floating-container';
 import { NoteDraftsContext, useNoteDraft, usePickNote } from './hooks';
 import {
 	focusNoteThread,
-	getNoteExcerpt,
 	hasFocusWithin,
 	scrollNoteThreadIntoView,
 } from './utils';
@@ -212,22 +210,6 @@ export function NoteThread( {
 		allReplies.length > 0 ? allReplies[ allReplies.length - 1 ] : undefined;
 	const restReplies = allReplies.length > 0 ? allReplies.slice( 0, -1 ) : [];
 
-	const noteExcerpt = getNoteExcerpt(
-		stripHTML( note.content?.rendered ),
-		10
-	);
-	const ariaLabel = !! note.blockClientId
-		? sprintf(
-				// translators: %s: note excerpt
-				__( 'Note: %s' ),
-				noteExcerpt
-			)
-		: sprintf(
-				// translators: %s: note excerpt
-				__( 'Original block deleted. Note: %s' ),
-				noteExcerpt
-			);
-
 	if ( isFloating && note.id === 'new' ) {
 		return (
 			<AddNote
@@ -270,8 +252,9 @@ export function NoteThread( {
 				}
 			} }
 			tabIndex={ 0 }
+			// No `aria-label`: screen readers handle one on a list item
+			// inconsistently, so the thread is announced from its content.
 			role="listitem"
-			aria-label={ ariaLabel }
 			/*
 			 * `aria-current` rather than `aria-expanded`: a list item supports
 			 * the former, and the selected thread is the current one in the set.
