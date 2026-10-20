@@ -12,6 +12,7 @@
 ### New Features
 
 -   Add `:required`, `:user-valid`, `:user-invalid`, `:focus`, `:focus-visible`, and `::placeholder` support for the `textInput` element ([#71634](https://github.com/WordPress/gutenberg/pull/71634)).
+-   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
 
 ### Enhancements
 
