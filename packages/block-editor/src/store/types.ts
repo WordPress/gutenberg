@@ -380,6 +380,8 @@ export type Settings = Record< string | symbol, unknown > & {
 	enableOpenverseMediaCategory?: boolean;
 	inserterMediaCategories?: InserterMediaCategory[];
 	isPreviewMode?: boolean;
+	/** The placeholder of the default block appender. */
+	bodyPlaceholder?: string;
 	/** Whether each block shows the inspector tabs, keyed by name or `default`. */
 	blockInspectorTabs?: Record< string, boolean >;
 	blockInspectorAnimation?: BlockInspectorAnimationSettings;

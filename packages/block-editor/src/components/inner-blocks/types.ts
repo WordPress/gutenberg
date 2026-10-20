@@ -1,4 +1,10 @@
-import type { ComponentType, ReactNode, Ref, RefCallback } from 'react';
+import type {
+	ComponentType,
+	ElementType,
+	ReactNode,
+	Ref,
+	RefCallback,
+} from 'react';
 import type { BlockType } from '@wordpress/blocks';
 import type { Layout } from '../../layouts/types';
 import type { UseBlockSyncProps } from '../provider/types';
@@ -46,7 +52,7 @@ export interface InnerBlocksOptions extends Pick<
 	templateInsertUpdatesSelection?: boolean;
 	/** Whether the inner blocks show their toolbars on this block. */
 	__experimentalCaptureToolbars?: boolean;
-	__experimentalAppenderTagName?: string;
+	__experimentalAppenderTagName?: ElementType;
 	/** A custom appender, or `false` for none. */
 	renderAppender?: ComponentType | false;
 	/** The direction in which the inner blocks flow. */

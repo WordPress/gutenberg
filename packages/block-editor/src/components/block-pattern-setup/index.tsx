@@ -1,3 +1,4 @@
+import type { Block } from '@wordpress/blocks';
 import { useDispatch } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import { Composite } from '@wordpress/components';
@@ -10,6 +11,13 @@ import BlockPreview from '../block-preview';
 import SetupToolbar from './setup-toolbar';
 import usePatternsSetup from './use-patterns-setup';
 import { VIEWMODES } from './constants';
+import type {
+	BlockPatternSetupProps,
+	BlockPatternSlideProps,
+	SetupContentProps,
+	SetupPatternProps,
+	ViewMode,
+} from './types';
 
 const SetupContent = ( {
 	viewMode,
@@ -17,7 +25,7 @@ const SetupContent = ( {
 	patterns,
 	onBlockPatternSelect,
 	showTitles,
-} ) => {
+}: SetupContentProps ) => {
 	const containerClass = 'block-editor-block-pattern-setup__container';
 
 	if ( viewMode === VIEWMODES.carousel ) {
@@ -64,7 +72,7 @@ const SetupContent = ( {
 	);
 };
 
-function BlockPattern( { pattern, onSelect, showTitles } ) {
+function BlockPattern( { pattern, onSelect, showTitles }: SetupPatternProps ) {
 	const baseClassName = 'block-editor-block-pattern-setup-list';
 	const { blocks, description, viewportWidth = 700 } = pattern;
 	const descriptionId = useInstanceId(
@@ -106,7 +114,12 @@ function BlockPattern( { pattern, onSelect, showTitles } ) {
 	);
 }
 
-function BlockPatternSlide( { active, className, pattern, minHeight } ) {
+function BlockPatternSlide( {
+	active,
+	className,
+	pattern,
+	minHeight,
+}: BlockPatternSlideProps ) {
 	const { blocks, title, description } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
@@ -137,8 +150,8 @@ const BlockPatternSetup = ( {
 	onBlockPatternSelect,
 	initialViewMode = VIEWMODES.carousel,
 	showTitles = false,
-} ) => {
-	const [ viewMode, setViewMode ] = useState( initialViewMode );
+}: BlockPatternSetupProps ) => {
+	const [ viewMode, setViewMode ] = useState< ViewMode >( initialViewMode );
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );
@@ -147,7 +160,7 @@ const BlockPatternSetup = ( {
 		return null;
 	}
 
-	const onBlockPatternSelectDefault = ( blocks ) => {
+	const onBlockPatternSelectDefault = ( blocks: Block[] ) => {
 		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 		replaceBlock( clientId, clonedBlocks );
 	};
