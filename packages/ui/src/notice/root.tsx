@@ -1,4 +1,11 @@
-import { forwardRef } from '@wordpress/element';
+import {
+	forwardRef,
+	useContext,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+} from '@wordpress/element';
 import { info, published, error, caution } from '@wordpress/icons';
 import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
@@ -7,6 +14,7 @@ import resetStyles from '../utils/css/resets.module.css';
 import type { NoticeIntent, RootProps } from './types';
 import type { IconProps } from '../icon/types';
 import styles from './style.module.css';
+import { NoticeListContext, NoticeTextContext } from './context';
 
 const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
 	neutral: null,
@@ -18,9 +26,8 @@ const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
 
 /**
  * A notice component that communicates system status and provides actions.
- * It does not announce its content to assistive technology. Consumers are
- * responsible for announcing dynamic updates, for example with `speak()` from
- * `@wordpress/a11y`.
+ * Render inside `Notice.List` to announce added or changed messages. Outside
+ * a list, it does not announce its content to assistive technology.
  *
  * ```jsx
  * import { Notice } from '@wordpress/ui';
@@ -40,9 +47,77 @@ const icons: { [ key in NoticeIntent ]: IconProps[ 'icon' ] | null } = {
  * ```
  */
 export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
-	{ intent = 'neutral', children, icon, render, ...restProps },
+	{
+		intent = 'neutral',
+		children,
+		icon,
+		render,
+		politeness = 'polite',
+		spokenMessage,
+		...restProps
+	},
 	ref
 ) {
+	const list = useContext( NoticeListContext );
+	const id = useId();
+	const textElements = useRef(
+		new Map< HTMLElement, 'title' | 'description' >()
+	);
+	const textContext = useMemo(
+		() =>
+			list && {
+				register(
+					element: HTMLElement,
+					kind: 'title' | 'description'
+				) {
+					textElements.current.set( element, kind );
+					list.update();
+					return () => {
+						textElements.current.delete( element );
+						list.update();
+					};
+				},
+			},
+		[ list ]
+	);
+	useEffect(
+		() =>
+			list?.register( id, () => {
+				function readText( kind: 'title' | 'description' ) {
+					return Array.from( textElements.current )
+						.filter(
+							( [ element, type ] ) =>
+								type === kind &&
+								! element.closest(
+									'[hidden], [aria-hidden="true"]'
+								)
+						)
+						.sort( ( [ a ], [ b ] ) =>
+							// compareDocumentPosition returns a bitmask of DOM relationships.
+							// eslint-disable-next-line no-bitwise
+							a.compareDocumentPosition( b ) &
+							Node.DOCUMENT_POSITION_PRECEDING
+								? 1
+								: -1
+						)
+						.map( ( [ element ] ) => element.textContent?.trim() )
+						.filter( Boolean )
+						.join( ' ' );
+				}
+				const title = readText( 'title' );
+				const description = readText( 'description' );
+				const separator = /[.!?。！？…]$/u.test( title ) ? ' ' : '. ';
+				return {
+					message:
+						spokenMessage ??
+						( title && description
+							? title + separator + description
+							: title || description ),
+					politeness,
+				};
+			} ),
+		[ list, id, spokenMessage, politeness ]
+	);
 	const iconElement = icon === null ? null : ( icon ?? icons[ intent ] );
 
 	const mergedClassName = clsx(
@@ -74,5 +149,9 @@ export const Root = forwardRef< HTMLDivElement, RootProps >( function Notice(
 		),
 	} );
 
-	return element;
+	return (
+		<NoticeTextContext.Provider value={ textContext }>
+			{ element }
+		</NoticeTextContext.Provider>
+	);
 } );
