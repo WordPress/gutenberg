@@ -8,6 +8,7 @@ const meta: Meta< typeof Notice.Root > = {
 	component: Notice.Root,
 	tags: [ 'manifest' ],
 	subcomponents: {
+		'Notice.List': Notice.List,
 		'Notice.Title': Notice.Title,
 		'Notice.Description': Notice.Description,
 		'Notice.Actions': Notice.Actions,
@@ -19,7 +20,7 @@ const meta: Meta< typeof Notice.Root > = {
 		docs: {
 			description: {
 				component:
-					'Notice does not announce its content automatically. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for announcement examples and migration from `spokenMessage` and `politeness`. See [Notice with disclosed details](?path=/docs/design-system-components-notice-disclosure--docs) for a composition with native details and a copy button.',
+					'Use Notice.List for announcements of dynamic notices. Standalone notices stay silent. See [Notice announcements](?path=/docs/design-system-components-notice-announcements--docs) for examples and migration guidance. See [Notice with disclosed details](?path=/docs/design-system-components-notice-disclosure--docs) for a composition with native details and a copy button.',
 			},
 		},
 		componentStatus: {
