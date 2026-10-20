@@ -39,6 +39,7 @@ export function localAutosaveSet(
 		post_title: title,
 		content,
 		excerpt,
+		time: Date.now(),
 	};
 
 	// During real-time collaboration, record which shared document state this

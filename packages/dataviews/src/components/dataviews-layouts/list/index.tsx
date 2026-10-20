@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
-import { Button, Spinner, Composite } from '@wordpress/components';
+import { Button, Spinner as WCSpinner, Composite } from '@wordpress/components';
 import {
 	useCallback,
 	useEffect,
@@ -666,7 +666,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					className="dataviews-loading-more"
 					aria-hidden={ ! isLoading }
 				>
-					<Spinner />
+					<WCSpinner />
 				</p>
 			) }
 		</>
