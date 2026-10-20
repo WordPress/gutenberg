@@ -47,6 +47,15 @@ export type SelectControlProps = Omit<
 		className?: string;
 		/**
 		 * The array of option items to render in the select.
+		 *
+		 * Use a non-empty string `value` for an ordinary choice. To
+		 * provide an option that clears the selection, use `value: null`.
+		 *
+		 * Empty string values are treated as empty selections by default.
+		 * To preserve an empty string in application state, provide
+		 * `itemToStringValue` that returns a unique, non-empty string.
+		 * This changes the submitted form value, but not the item passed
+		 * to `onValueChange`.
 		 */
 		items?: SelectItem[];
 		/**
