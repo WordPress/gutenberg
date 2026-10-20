@@ -172,19 +172,19 @@ export type ListViewProps = {
 	showBlockMovers?: boolean;
 	/** Flag to determine whether nested levels are expanded by default. Defaults to `false`. */
 	isExpanded?: boolean;
+	/** Flag to move focus into the list when it mounts. Defaults to `false`. */
+	focusOnMount?: boolean;
+	/** Optional accessible description for the tree grid component. */
+	description?: string;
 };
 
 export type PrivateListViewProps = ListViewProps & {
 	/** Flag to show or hide the block appender. Defaults to `false`. */
 	showAppender?: boolean;
-	/** Flag to move focus into the list when it mounts. Defaults to `false`. */
-	focusOnMount?: boolean;
 	/** Optional more menu substitution. Defaults to the standard `BlockSettingsDropdown` component. */
 	blockSettingsMenu?: ComponentType< ListViewBlockSettingsMenuProps >;
 	/** The client id of the root block from which we determine the blocks to show in the list. */
 	rootClientId?: string | null;
-	/** Optional accessible description for the tree grid component. */
-	description?: string;
 	/** Optional callback to be invoked when a block is selected. Receives the block object that was selected. */
 	onSelect?: ( ( block: Block | null ) => void ) | null;
 	/** Component that renders additional block content UI. */
