@@ -8,8 +8,7 @@
 .block-editor-block-toolbar-redesign {
 	align-items: stretch;
 
-	// Text buttons: the block name and labelled primary actions.
-	.block-editor-block-toolbar-redesign__name,
+	// Labelled primary actions (Layout).
 	.block-editor-block-toolbar-redesign__text-button {
 		gap: $grid-unit-05;
 		padding-left: $grid-unit-15;
@@ -18,29 +17,21 @@
 		font-weight: 500;
 	}
 
+	// The block button is icon only, like the other toolbar buttons.
 	.block-editor-block-toolbar-redesign__name {
-		padding-left: $grid-unit-10;
+		min-width: $block-toolbar-height;
+		justify-content: center;
 
 		.block-editor-block-icon {
 			flex-shrink: 0;
 		}
 	}
 
-	// A block name with nothing to change is a label, not a disabled button.
+	// A block button with nothing to change is a label, not a disabled
+	// button.
 	.block-editor-block-toolbar-redesign__name.is-label:disabled {
 		opacity: 1;
 		color: $gray-900;
-	}
-
-	.block-editor-block-toolbar-redesign__name-label {
-		max-width: 160px;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
-	.block-editor-block-toolbar-redesign__chevron {
-		flex-shrink: 0;
-		fill: currentColor;
 	}
 
 	// Bigger movers: three full-size buttons in a row, instead of two half

@@ -1,9 +1,9 @@
 import type { ComponentType } from 'react';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Button, Icon as WCIcon, ToolbarItem } from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { chevronDown } from '@wordpress/icons';
+import { copy } from '@wordpress/icons';
 import {
 	isReusableBlock,
 	isTemplatePart,
@@ -30,7 +30,7 @@ const BlockToolbarIcon = _BlockToolbarIcon as unknown as ComponentType< {
  * icon button: `switcher` allows transforms and style presets, `styles-only`
  * (a content-only block, e.g. inside a pattern) only style presets,
  * `pattern-overrides` the overrides of a synced pattern, and `default`
- * nothing, so the name is just a label.
+ * nothing, so the icon is just a label.
  */
 type NameVariant = 'switcher' | 'styles-only' | 'pattern-overrides' | 'default';
 
@@ -123,8 +123,9 @@ function StylePresets( {
 }
 
 /**
- * The block name button: shows what the block is ("Paragraph") and is the one
- * place to turn it into something else or pick one of its style presets.
+ * The block button: shows the block's icon, with its name ("Paragraph") as
+ * the tooltip and accessible label, and is the one place to turn it into
+ * something else or pick one of its style presets.
  * It replaces the block switcher and ad hoc transform controls such as the
  * heading level dropdown.
  *
@@ -255,16 +256,13 @@ export default function BlockNameMenu( {
 		return <BlockToolbarIcon clientIds={ clientIds } isSynced />;
 	}
 
-	const nameContent = (
-		<>
-			<BlockIcon
-				icon={ isSingle ? blockInformation?.icon : null }
-				showColors
-			/>
-			<span className="block-editor-block-toolbar-redesign__name-label">
-				{ label }
-			</span>
-		</>
+	// The toolbar shows the block's icon; its name is the button's label,
+	// in a tooltip and for screen readers.
+	const nameIcon = (
+		<BlockIcon
+			icon={ isSingle ? blockInformation?.icon : copy }
+			showColors
+		/>
 	);
 
 	// Nothing can change: the name is only a label.
@@ -278,9 +276,10 @@ export default function BlockNameMenu( {
 						accessibleWhenDisabled
 						disabled
 						className="block-editor-block-toolbar-redesign__name is-label"
-					>
-						{ nameContent }
-					</Button>
+						icon={ nameIcon }
+						label={ label }
+						showTooltip
+					/>
 				) }
 			</ToolbarItem>
 		);
@@ -296,19 +295,15 @@ export default function BlockNameMenu( {
 								{ ...itemProps }
 								__next40pxDefaultSize
 								className="block-editor-block-toolbar-redesign__name"
+								icon={ nameIcon }
+								label={ label }
+								showTooltip
 								description={ __(
 									'Change block type or style'
 								) }
 							/>
 						}
-					>
-						{ nameContent }
-						<WCIcon
-							className="block-editor-block-toolbar-redesign__chevron"
-							icon={ chevronDown }
-							size={ 16 }
-						/>
-					</Menu.Trigger>
+					/>
 				) }
 			</ToolbarItem>
 			<Menu.Popup

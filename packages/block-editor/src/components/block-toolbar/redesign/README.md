@@ -16,7 +16,7 @@ The toolbar is a fixed sequence of groups. This is the guide for block authors, 
 | Group | What goes here | Who fills it |
 | --- | --- | --- |
 | Parent selector | The nearest parent block; its menu lists every parent up to the top of the page. Sits outside the toolbar, to its left (or first, in the top toolbar). | Core |
-| Block name | `Paragraph ⌄`: transforms, the block's own variations (heading levels) and style presets. The only place for these; ad hoc transform controls such as a heading level dropdown don't belong on the toolbar. | Core, from transforms, `transform` scoped variations and block styles |
+| Block | The block's icon (¶), with its name in the tooltip: transforms, the block's own variations (heading levels) and style presets. The only place for these; ad hoc transform controls such as a heading level dropdown don't belong on the toolbar. | Core, from transforms, `transform` scoped variations and block styles |
 | Movers | Drag handle, move up, move down (left and right in a row). | Core |
 | Primary actions | The few structural actions a block keeps on top. For containers: a labelled `Layout ⌄` button (layout variations, justification, vertical alignment) and a `+` that adds a block inside. For sections (patterns): `Edit pattern` and the section style switcher. Most atomic blocks leave it empty. | Core, from the `layout` support, inner blocks and sections |
 | Block controls | Controls registered with `BlockControls`. In the redesign core no longer puts alignment, layout or formatting controls here, so what's left is block-specific (Replace on an image) and third-party controls. See open questions. | Blocks and plugins |
@@ -30,7 +30,7 @@ Text has its own toolbar, the **selection toolbar**, which appears just below se
 -   It changes how the block's text or box looks, and a theme could set it for every block of this type: **options menu**. Today that means registering a block support rather than a toolbar control.
 -   It formats or links selected text: a `RichTextToolbarButton`, which shows in the **selection toolbar**.
 -   It inserts something inline in the text (an image, a footnote): a `RichTextToolbarButton` with `group="insert"`, which shows in **Insert** in the options menu.
--   It changes what the block is: a transform or a `transform` scoped variation, which shows under the **block name**.
+-   It changes what the block is: a transform or a `transform` scoped variation, which shows in the **block** menu.
 -   It's a structural action people take often on this block, and it has a short text label: **primary actions**. Only core fills this for now.
 -   Anything else: `BlockSettingsMenuControls`, under **More** in the options menu.
 
@@ -41,5 +41,5 @@ Text has its own toolbar, the **selection toolbar**, which appears just below se
 -   **Where the parent selector sits.** To the left of the toolbar for now; above it is the other option. A long chain is in its menu, not on the toolbar.
 -   **A preference to hide the movers,** and whether "Show button text labels" is still needed once every non-standard icon has a label.
 -   **Search** finds items in the flyouts, but not Copy and Cut (the clipboard needs the click on the item itself) or plugin items.
--   Content-only blocks (most of what can be edited inside a pattern) use the redesign too, with what the current toolbar allows there: the block name offers style presets but no transforms, alignment is left out, and a section keeps its labelled **Edit pattern** button among the primary actions. Zoomed out and placeholder toolbars keep the current design.
--   A synced pattern's overrides keep their current menu in place of the block name.
+-   Content-only blocks (most of what can be edited inside a pattern) use the redesign too, with what the current toolbar allows there: the block menu offers style presets but no transforms, alignment is left out, and a section keeps its labelled **Edit pattern** button among the primary actions. Zoomed out and placeholder toolbars keep the current design.
+-   A synced pattern's overrides keep their current menu in place of the block menu.

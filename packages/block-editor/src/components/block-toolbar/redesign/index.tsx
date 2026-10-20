@@ -84,7 +84,7 @@ function DeleteButton( { clientIds }: { clientIds: string[] } ) {
  * The redesigned block toolbar, behind the `gutenberg-block-toolbar-redesign`
  * experiment. In order:
  *
- * 1. Block name: transforms and style presets.
+ * 1. Block: the block's icon, opening transforms and style presets.
  * 2. Movers: drag, move up, move down.
  * 3. Primary actions: structural actions a block keeps on top (Layout and
  *    add inside, for containers).
