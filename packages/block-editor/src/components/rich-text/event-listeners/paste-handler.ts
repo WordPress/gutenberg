@@ -39,12 +39,11 @@ export function createPasteListener(
 		// A drop pastes at the drop point.
 		const pasteProps =
 			event.type === 'drop'
-				? // The drop props are the field props, positioned at the drop.
-					( getDropPasteProps(
+				? getDropPasteProps(
 						props.current,
 						element,
 						event as DragEvent
-					) as RichTextEventListenerProps | undefined )
+					)
 				: props.current;
 
 		if ( ! pasteProps ) {
