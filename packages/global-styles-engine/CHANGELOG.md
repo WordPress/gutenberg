@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `:hover`, `:focus`, `:focus-visible`, and `:active` support for the `select` element ([#81644](https://github.com/WordPress/gutenberg/pull/81644)).
+
 ## 2.0.0 (2026-10-20)
 
 ### Breaking Changes

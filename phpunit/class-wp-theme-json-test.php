@@ -2271,6 +2271,80 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
 	}
 
+	public function test_get_stylesheet_handles_select_pseudo_selectors() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'elements' => array(
+						'select' => array(
+							'color'          => array(
+								'text' => 'green',
+							),
+							':hover'         => array(
+								'color' => array(
+									'background' => 'blue',
+								),
+							),
+							':focus'         => array(
+								'outline' => array(
+									'style' => 'dotted',
+								),
+							),
+							':focus-visible' => array(
+								'outline' => array(
+									'style' => 'solid',
+								),
+							),
+							':active'        => array(
+								'color' => array(
+									'background' => 'yellow',
+								),
+							),
+							':visited'       => array(
+								'color' => array(
+									'text' => 'red',
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = 'select{color: green;}:root :where(select:hover){background-color: blue;}:root :where(select:focus){outline-style: dotted;}:root :where(select:focus-visible){outline-style: solid;}:root :where(select:active){background-color: yellow;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
+	public function test_get_stylesheet_handles_block_level_select_pseudo_selectors() {
+		$theme_json = new WP_Theme_JSON_Gutenberg(
+			array(
+				'version' => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
+				'styles'  => array(
+					'blocks' => array(
+						'core/categories' => array(
+							'elements' => array(
+								'select' => array(
+									'color'  => array(
+										'text' => 'green',
+									),
+									':hover' => array(
+										'color' => array(
+											'background' => 'blue',
+										),
+									),
+								),
+							),
+						),
+					),
+				),
+			)
+		);
+
+		$expected = ':root :where(.wp-block-categories select){color: green;}:root :where(.wp-block-categories select:hover){background-color: blue;}';
+		$this->assertSameCSS( $expected, $theme_json->get_stylesheet( array( 'styles' ), null, array( 'skip_root_layout_styles' => true ) ) );
+	}
+
 	public function test_get_stylesheet_ignores_non_whitelisted_pseudo_selectors() {
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
