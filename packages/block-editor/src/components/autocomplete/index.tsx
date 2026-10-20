@@ -35,7 +35,7 @@ function useCompleters( {
 			filteredCompleters = [
 				...filteredCompleters,
 				// It lists its items through `useItems`, so it has no `options`.
-				blockAutocompleter as unknown as Completer,
+				blockAutocompleter as Completer,
 			];
 		}
 

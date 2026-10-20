@@ -13,6 +13,7 @@ import { store as blockEditorStore } from '../store';
 import { orderBy } from '../utils/sorting';
 import { orderInserterBlockItems } from '../utils/order-inserter-block-items';
 import type { InserterItem } from '../store/types';
+import type { BlockCompleter } from './types';
 
 const noop = () => {};
 const SHOWN_BLOCK_TYPES = 9;
@@ -22,7 +23,7 @@ const SHOWN_BLOCK_TYPES = 9;
  *
  * @return A blocks completer.
  */
-function createBlockCompleter() {
+function createBlockCompleter(): BlockCompleter {
 	return {
 		name: 'blocks',
 		className: 'block-editor-autocompleters__block',
