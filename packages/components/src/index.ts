@@ -1,3 +1,4 @@
+// DROPME: Demo change for the CHANGELOG presence matrix.
 // Primitives.
 export {
 	SVG,
