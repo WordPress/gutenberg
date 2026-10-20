@@ -100,8 +100,7 @@ export type RangeControlProps = Pick<
 		/**
 		 * CSS color string for the `RangeControl` wrapper.
 		 *
-		 * @default COLORS.theme.accent
-		 * @see /packages/components/src/utils/colors-values.js
+		 * @default The component accent color
 		 */
 		color?: CSSProperties[ 'color' ];
 		/**
@@ -199,6 +198,12 @@ export type RangeControlProps = Pick<
 		 * when `step` is set to the special string value `any`.
 		 */
 		showTooltip?: boolean;
+		/**
+		 * Adjusts the size of the control.
+		 *
+		 * @default 'default'
+		 */
+		size?: 'default' | 'compact';
 		/**
 		 * CSS color string to customize the track element's background.
 		 */

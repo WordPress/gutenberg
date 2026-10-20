@@ -85,7 +85,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 			popoverProps={ mergedPopoverProps }
 			renderToggle={ ( { isOpen, onToggle } ) => {
 				const openOnArrowDown = ( event: React.KeyboardEvent ) => {
-					if ( disableOpenOnArrowDown ) {
+					// A toggle disabled with `accessibleWhenDisabled` can still be
+					// focused, and `Button` only blocks its mouse events.
+					if ( disableOpenOnArrowDown || toggleProps?.disabled ) {
 						return;
 					}
 

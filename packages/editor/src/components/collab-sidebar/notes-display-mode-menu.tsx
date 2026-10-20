@@ -1,5 +1,4 @@
 import { speak } from '@wordpress/a11y';
-// @ts-expect-error - No type declarations available for @wordpress/block-editor
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __experimentalUseSlot as useSlot } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';

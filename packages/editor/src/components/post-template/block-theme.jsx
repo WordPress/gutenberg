@@ -138,6 +138,8 @@ export default function BlockThemeControl() {
 							) }
 							<SwapTemplateButton
 								onClick={ () => setActiveModal( 'swap' ) }
+								// The menu has its own "Use default template" item.
+								includeDefaultTemplate={ false }
 							/>
 							<ResetDefaultTemplate />
 							{ canCreateTemplate && (
@@ -178,6 +180,7 @@ export default function BlockThemeControl() {
 			{ activeModal === 'swap' && (
 				<SwapTemplateModal
 					onRequestClose={ () => setActiveModal( null ) }
+					includeDefaultTemplate={ false }
 				/>
 			) }
 			{ activeModal === 'create' && (

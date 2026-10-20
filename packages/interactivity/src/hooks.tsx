@@ -232,6 +232,8 @@ const resolve = ( path: string, namespace: string ) => {
 /**
  * Creates an evaluator bound to a directive scope.
  *
+ * Returned functions restore the caller's scope when the wrapped call throws.
+ *
  * @param args       Arguments used to bind the evaluator to a scope.
  * @param args.scope Scope used to resolve directive values.
  * @return An evaluator for directive entries.
@@ -261,9 +263,11 @@ export const getEvaluate: GetEvaluate =
 			resetScope();
 			const wrappedFunction: Function = ( ...functionArgs: any[] ) => {
 				setScope( scope );
-				const functionResult = value( ...functionArgs );
-				resetScope();
-				return functionResult;
+				try {
+					return value( ...functionArgs );
+				} finally {
+					resetScope();
+				}
 			};
 			// Preserve the sync property from the original function
 			if ( value.sync ) {
