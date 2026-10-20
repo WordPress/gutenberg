@@ -24,7 +24,7 @@ export interface EntityBlockEditorRecord {
 export type EntityBlockEditorHandler = (
 	newBlocks: Array< Block >,
 	options: EntityBlockEditorChangeOptions
-) => void;
+) => Promise< unknown > | void;
 
 /**
  * Options of `useEntityBlockEditor`.
